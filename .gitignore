@@ -1,5 +1,10 @@
 venv
 *.pyc
-_site
-.jekyll-cache
+_site/
+web/.jekyll-cache
 .DS_Store
+.jekyll-cache/
+.sass-cache/
+.jekyll-metadata
+.bundle/
+vendor/
