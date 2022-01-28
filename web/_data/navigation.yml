@@ -1,0 +1,9 @@
+- name: Home
+  link: /
+- name: Museum of Awesomeness
+  link: /museum/
+- name: discord
+  link: /discord
+- name: Blog
+  link: /blog/
+

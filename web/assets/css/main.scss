@@ -1,0 +1,34 @@
+---
+# for jekyll
+---
+
+@charset "utf-8";
+@import 'colours';
+
+.cover {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+nav {
+    background-color: $kevred;
+    .nav-link {
+      color: white;
+    
+    }
+    .nav-link:hover {
+        color: #FFCA29;
+    }
+    .navbar-brand {
+        color: white;
+    }
+    
+    .brand {
+        color: white;
+    }
+}
+.navbar-toggler {
+    color: white;
+    border: 1px solid white !important; 
+}

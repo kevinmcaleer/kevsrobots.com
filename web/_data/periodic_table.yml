@@ -1,0 +1,11 @@
+---
+- name: Ardiuno
+  title: Ar
+  description: The starting place for many people creating their first robot.
+  link: https://www.arduino.cc
+  color: blue 
+- name: Python
+  title: Py
+  description: Python programming language
+  link: https://www.python.org
+  color: blue
