@@ -12,3 +12,8 @@ webserver_headers:
     - "*"
   - - Access-Control-Allow-Methods
     - GET, OPTIONS, HEAD
+
+collections:
+  rooms:
+    output: true
+    permalink: /museum/:collection/:name

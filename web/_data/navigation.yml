@@ -1,9 +1,17 @@
 - name: Home
   link: /
+  icon: "fas fa-home"
+- name: Robots
+  link: /robots
+  icon: "fas fa-robot"
+- name: 
 - name: Museum of Awesomeness
   link: /museum/
+  icon: "fas fa-landmark"
 - name: discord
   link: /discord
+  icon: "fab fa-discord"
 - name: Blog
   link: /blog/
+  icon: "fas fa-typewriter"
 
