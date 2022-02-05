@@ -17,3 +17,6 @@ collections:
   rooms:
     output: true
     permalink: /museum/:collection/:name
+  ptor:
+    output: true
+    permalink: /periodic-table-of-robotics/:name
