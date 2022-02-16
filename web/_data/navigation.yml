@@ -5,7 +5,7 @@
   link: /robots/
   icon: "fas fa-robot"
 - name: Periodic Table of Robotics
-  link: /ptor/
+  link: /ptor/index.html
   icon: "fa-solid fa-atom-simple"
 - name: discord
   link: /discord
@@ -14,5 +14,5 @@
   link: /blog/
   icon: "fas fa-typewriter"
 - name: Links
-  link: /links/
+  link: /links
   icon: "fas fa-link"
