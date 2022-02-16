@@ -19,7 +19,7 @@ collections:
     permalink: /museum/:collection/:name
   ptor:
     output: true
-    permalink: /ptor/:name
+    permalink: /ptor/:name.html
   robots:
     output: true
-    permalink: /robots/:name
+    permalink: /robots/:name.html
