@@ -1,0 +1,15 @@
+<div class="row">
+    {% for item in site.data.links %}
+        <div class="col-4">
+            <div class="card my-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text">{{ item.description }}</p>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-primary" href="{{ item.link }}">Go</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

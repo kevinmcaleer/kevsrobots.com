@@ -4,9 +4,8 @@
 - name: Robots
   link: /robots
   icon: "fas fa-robot"
-- name: 
-- name: Museum of Awesomeness
-  link: /museum/
+- name: Periodic Table of Robotics
+  link: /ptor/
   icon: "fas fa-landmark"
 - name: discord
   link: /discord
@@ -14,4 +13,6 @@
 - name: Blog
   link: /blog/
   icon: "fas fa-typewriter"
-
+- name: Links
+  link: /links
+  icon: "fas fa-link"

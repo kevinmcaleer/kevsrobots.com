@@ -20,3 +20,6 @@ collections:
   ptor:
     output: true
     permalink: /periodic-table-of-robotics/:name
+  robots:
+    output: true
+    permalink: /robots/:name
