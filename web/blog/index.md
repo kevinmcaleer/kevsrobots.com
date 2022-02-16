@@ -3,5 +3,8 @@ layout: default
 title: Blog
 ---
 
-Articles
+{% include breadcrumbs.html %}
+
+# Articles
+
 {% include blog_posts.html%}

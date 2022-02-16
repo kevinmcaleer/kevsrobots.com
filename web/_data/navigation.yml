@@ -6,7 +6,7 @@
   icon: "fas fa-robot"
 - name: Periodic Table of Robotics
   link: /ptor/
-  icon: "fas fa-landmark"
+  icon: "fa-solid fa-atom-simple"
 - name: discord
   link: /discord
   icon: "fab fa-discord"

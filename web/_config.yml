@@ -19,7 +19,7 @@ collections:
     permalink: /museum/:collection/:name
   ptor:
     output: true
-    permalink: /periodic-table-of-robotics/:name
+    permalink: /ptor/:name
   robots:
     output: true
     permalink: /robots/:name

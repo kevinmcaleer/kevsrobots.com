@@ -37,3 +37,14 @@ nav {
     color: white;
     border: 1px solid white !important; 
 }
+
+.breadcrumb {
+    background-color: white;
+    a {
+        color: $kevred;
+        text-decoration: none ;
+    }
+}
+.breadcrumb-item::before {
+    color: $kevred!important;
+}
