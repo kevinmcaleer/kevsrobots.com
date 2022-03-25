@@ -4,9 +4,9 @@
 - name: Robots
   link: /robots/
   icon: "fas fa-robot"
-- name: Periodic Table of Robotics
-  link: /ptor/index.html
-  icon: "fa-solid fa-atom-simple"
+# - name: Periodic Table of Robotics
+#   link: /ptor/index.html
+  # icon: "fa-solid fa-atom-simple"
 - name: Discord
   link: /discord
   icon: "fab fa-discord"
