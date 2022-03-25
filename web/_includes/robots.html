@@ -1,0 +1,18 @@
+{% assign robots = site.data.robots %}
+
+<div class="row">
+{% for item in robots %}
+<div class="col-3">
+<div class="card">
+    <img src="{{item.cover}}" class="card-img-top">
+    <div class="card-body">
+        <h5 class="card-title">
+            {{ item.name}}
+        </h5>
+        <p class="card-text small text-mute">{{item.description}}</p>
+        <a href="{{item.link}}" class="btn btn-primary">Read More</a>
+    </div>    
+</div>
+</div>
+{% endfor %}
+</div>

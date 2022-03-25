@@ -1,0 +1,9 @@
+---
+- name: 🐱 PicoCat
+  link: http://www.kevsrobots.com/blog/picocat-v2.html
+  cover: /assets/img/picocat01.jpg
+  description: A Cute Robot Cat
+- name: SMARS
+  link: http://www.smarsfan.com
+  cover: https://www.smarsfan.com/assets/img/whatissmars.png
+  description: The best Starter Robot there is
