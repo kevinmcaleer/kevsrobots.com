@@ -16,3 +16,6 @@
 - name: Links
   link: /links/
   icon: "fas fa-link"
+- name: SMARSFan
+  link: https://www.smarsfan.com
+  icon: "fa-solid fa-user-robot"
