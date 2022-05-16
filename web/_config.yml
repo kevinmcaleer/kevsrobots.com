@@ -7,6 +7,9 @@ url: "http://www.kevsrobots.com"
 markdown: kramdown
 permalink: /blog/:title:output_ext
 
+plugins:
+  - jekyll-redirect-from
+
 webserver_headers:
   - - Access-Control-Allow-Origin
     - "*"
