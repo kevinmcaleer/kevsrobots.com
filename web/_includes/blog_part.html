@@ -6,11 +6,10 @@
    <a href="{{post.url}}"><img class="card-img-top" src="{{post.cover}}"></a>
     <div class="card-body">
         <h5 class="card-title">{{post.title}}</h5>
-        <h6 class="card-subtutle mb-2 text-muted">{{post.date | date_to_string }}</h6>
-        {{ post.excerpt }}
-        <a class="btn btn-primary mt-3" href="{{post.url}}">Read Article</a>
+        <h6 class="card-subtitle mb-2 text-muted">{{post.date | date_to_string }}</h6>
+        <p class="card-text small">{{ post.excerpt }}</p>
+        <a class="btn btn-primary" href="{{post.url}}">Read Article</a>
     </div>
-
 </div>
 </div>
 {% endfor %}
