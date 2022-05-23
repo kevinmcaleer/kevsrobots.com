@@ -23,7 +23,7 @@ tags:
 {% include youtubeplayer.html id="mG7stDcin3c" %}
 
 ## Design and Inspiration
-RoboBunny is based on [PicoCat version 2](/blog/picocat-v2), which was originally based on OpenCat. I uses the [pimoroni](https://www.pimoroni.com/servo2040) Servo 2040 all-in-one 18 servo microcontroller, powered by the Raspberry Pi RP2040.
+RoboBunny is based on [PicoCat version 2](/blog/picocat-v2.html), which was originally based on OpenCat. I uses the [pimoroni](https://www.pimoroni.com/servo2040) Servo 2040 all-in-one 18 servo microcontroller, powered by the Raspberry Pi RP2040.
 
 ![Servo2040](/assets/img/blog/servo2040.jpg){:class="img-fluid w-50"}
 
