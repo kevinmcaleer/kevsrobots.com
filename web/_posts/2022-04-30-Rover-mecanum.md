@@ -40,9 +40,9 @@ HC-SR04 | Detect objects in front of the robot using Ultrasound | £5
 
 ## Print your own - (the STL files)
 Rover is made up of three 3d printable files:
-- [Chassis](/assets/stl/chassis_v2.stl)
-- [Range Finder Holder](/assets/stl/range_finder_holder.stl)
-- [Motor Holders](/assets/stl/rover_wheel_holder_v9.stl)
+- [Chassis](/assets/stl/rover/chassis_v2.stl)
+- [Range Finder Holder](/assets/stl/rover/range_finder_holder.stl)
+- [Motor Holders](/assets/stl/rover/rover_wheel_holder_v9.stl)
 
 ## Mecanum wheels
 You can buy mecanum wheels online from companies such as [Pimoroni](https://shop.pimoroni.com/products/mecanum-wheels-pack-of-4?variant=31590632030291) at a price of around £24 (excluding shipping).
