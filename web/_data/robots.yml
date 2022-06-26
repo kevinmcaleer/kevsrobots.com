@@ -11,3 +11,7 @@
   link: /blog/explora
   cover: /assets/img/blog/explora/explora.jpg
   description: A cool Raspberry Pi Zero based robot you can build youself
+- name: Rover
+  link: /blog/rover
+  cover: /assets/img/blog/rover/rover.jpg
+  description: A 3d printed mecanum robot powered by the Pimoroni Motor 2040
