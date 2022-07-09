@@ -15,3 +15,7 @@
   link: /blog/Rover-mecanum.html
   cover: /assets/img/blog/rover/rover.jpg
   description: A 3d printed mecanum robot powered by the Pimoroni Motor 2040
+- name: Big Mouth Pico
+  link: /blog/big-mouth.html
+  cover: /assets/img/bigmouthbillybass/fish01.jpg
+  description: Hack a Big Mouth Billy Bass with a Raspberry Pi Pico W
