@@ -1,0 +1,12 @@
+{% if page.cover %}
+    <meta property="og:image" content="{{ site.url }}{{ page.cover }}" />
+{% endif %}
+{% if page.description %}
+<meta property="og:description" content="{{ page.description }}" />
+{% endif %}
+{% if page.subtitle %}
+<meta property="og:description" content="{{ page.subtitle }}" />
+{% endif %}
+{% if page.header-subtext %}
+<meta property="og:description" content="{{ page.header-subtext }}" />
+{% endif %}
