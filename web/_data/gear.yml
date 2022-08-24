@@ -1,0 +1,13 @@
+- name: Raspberry Pi 4 2G
+  category:
+   - Computer
+  price: £35
+  Manufacturer: Raspberry Pi
+  link: 
+- name: Raspberry Pi Zero 2W
+  category:
+   - Computer
+  price: £15
+- name: Motor 2040
+   - Micro Controller
+  price: £24
