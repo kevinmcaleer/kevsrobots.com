@@ -11,6 +11,18 @@ layout: default
 <p class="orange">{{page.date | date: "%-d %B %Y" }} by {{ page.author}}</p>
 <hr />
 
+<div class="row">
+<div class="col-9">
 <article>
 {{content}}
 </article>
+</div>
+<div class="col-3">
+{% include blog_profile.html %}
+
+<hr>
+{% include blog_archive.html %}
+</div>
+</div>
+
+

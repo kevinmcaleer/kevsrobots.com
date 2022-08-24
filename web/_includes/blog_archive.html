@@ -1,0 +1,10 @@
+<ul>
+    {% for post in site.posts %}
+      {% assign currentdate = post.date | date: "%B %Y" %}
+      {% if currentdate != date %}
+        <h5 class="mt-3 mb-0"><a id="y{{currentdate}}">{{ currentdate }}</a></h5>
+        {% assign date = currentdate %} 
+      {% endif %}
+        <li class="list-unstyled"><a href="{{ post.url }}" class="text-decoration-none small">{{ post.title }}</a></li>
+    {% endfor %}
+</ul>

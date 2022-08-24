@@ -1,4 +1,36 @@
+
 {% assign posts = site.posts %}
 {% for post in posts %}
-<a href="{{post.url}}">{{ post.title}}</a>
+
+<div class="card top1 w-100" >
+<div class="row g-0">
+<div class="col-md-3">
+    <a href="{{ post.url }}">
+ <img src="{{ post.cover }}" class="img-fluid rounded-start" alt="..."></a>
+</div>
+
+<div class="col-md-9">
+<div class="container p-3">
+<h5 class="card-title">{{ post.title }}</h5>
+<p class="card-text ">{{ post.excerpt }}</p>
+<div class="row">
+    <div class="col-4">
+<p class="card-text small">{{ post.date | date: "%-d %B %Y" }} 
+    by
+    {{ post.author }} </p>
+    </div>
+<div class="col-8">
+    {% assign tags = post.tags %}
+    {% for tag in tags %}
+    <a class="btn btn-secondary btn-sm m-1">{{tag}}</a>
+    {% endfor %}
+</div>
+</div> <!-- row -->
+<a class="btn btn-primary" href="{{post.url}}">Read</a>
+
+</div> <!-- container -->
+</div> <!-- col-md-8 -->
+</div> <!-- row -->
+</div> <!-- card -->
+
 {% endfor %}

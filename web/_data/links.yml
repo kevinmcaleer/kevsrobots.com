@@ -3,9 +3,13 @@
   description: A website dedicated to the SMARS Robot, learn how to print, build, wire up and program your own SMARS robot.
 - name: Clustered-Pi.com
   link: http://www.clustered-pi.com
+  description: The home of Clustered-Pi (that runs this website!)
 - name: Kevin McAleers YouTube Channel
   link: https://www.youtube.com/kevinmcaleer28
+  description:  My Youtube channel
 - name: Discord
   link: https://action.smarsfan.com/join-discord
+  description: Join our discord server
 - name: SMARSFan
   link: https://www.smarsfan.com
+  description: The home of SMARS robot information

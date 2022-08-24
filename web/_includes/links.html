@@ -1,15 +1,20 @@
 <div class="row">
-    {% for item in site.data.links %}
-        <div class="col-4">
-            <div class="card my-3">
-                <div class="card-body">
-                    <h5 class="card-title">{{ item.name }}</h5>
-                    <p class="card-text">{{ item.description }}</p>
-                </div>
-                <div class="card-footer">
-                    <a class="btn btn-primary" href="{{ item.link }}">Go</a>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in site.data.links %}
+                <tr>
+                    <td><b><a class="text-decoration-none" href="{{ item.link }}">{{ item.name }}</a></b></td>
+                    <td><a class="text-decoration-none" href="{{ item.link }}">{{ item.description }}</a></td>
+                    <td><a class="btn btn-primary" href="{{ item.link }}">Go</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>

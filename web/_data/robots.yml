@@ -19,3 +19,7 @@
   link: /blog/big-mouth.html
   cover: /assets/img/bigmouthbillybass/fish01.jpg
   description: Hack a Big Mouth Billy Bass with a Raspberry Pi Pico W
+- name: BurgerBot
+  link: /blog/burgerbot.html
+  cover: /assets/img/blog/burgerbot/burgerbot.jpg
+  description: Build your own 2 motor, Pico W-based, 3d printable robot
