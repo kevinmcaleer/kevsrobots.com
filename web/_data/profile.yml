@@ -1,3 +1,20 @@
 name: Kevin McAleer
-profile: I build robots, bring them to life with code, and have a whole fun along the way
+profile: I build robots, bring them to life with code, and have a whole load of fun along the way
 image: /assets/img/kevin.jpg
+social:
+   - site: Twitter 
+     name: kevsmac
+     link: https://www.twitter.com/kevsmac
+     icon: fa-brands fa-twitter
+   - site: Facebook
+     name: Small Robots Group
+     link: https://www.facebook.com/groups/smallrobots
+     icon: fa-brands fa-facebook
+   - site: Instagram
+     name: kevinmcaleer
+     link: https://www.instagram.com/kevinmcaleer
+     icon: fa-brands fa-instagram
+   - site: Youtube
+     name: Kevin McAleer
+     link: https://www.youtube.com/c/kevinmcaleer28
+     icon: fa-brands fa-youtube

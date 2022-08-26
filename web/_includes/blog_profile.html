@@ -1,8 +1,15 @@
 {% assign profile = site.data.profile %}
+{% assign socials = profile.social %}
 
 <div class="container bg-light p-3">
 <img src="{{profile.image}}" class="img-fluid rounded">
 
 <p class="mt-3"><b>{{ profile.name }}</b></p>
 <p><i>{{profile.profile}}</i></p>
+<p><b>Social Links:</b></p>
+<ul class="list-group "> 
+    {% for social in socials %}
+    <li class="list-group-item small"><i class="{{social.icon}} mx-2 small"></i>{{social.site}} - <a href="{{social.link}}" class="small">{{social.name}}</a></li>
+    {% endfor %}
+</ul>
 </div>
