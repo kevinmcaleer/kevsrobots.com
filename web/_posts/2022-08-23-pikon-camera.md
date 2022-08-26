@@ -28,6 +28,19 @@ The High Quality Camera Module has 4 mount points, so the first task is to model
 
 ---
 
+### Parts
+
+Part                             | Description                                                     | Link
+---------------------------------|-----------------------------------------------------------------|---------------------------------------------------------------------------
+Raspberry Pi High Quality Camera | 12.3 Megapixel Camera sensor, lenses sold separately            | <https://shop.pimoroni.com/products/raspberry-pi-high-quality-camera>
+Raspberry Pi 2/3/4               | An official Raspberry Pi computer, works with models 2, 3 and 4 | <https://www.pimoroni.com/products/raspberry-pi>
+Lens                             | 6mm Wide angle Lens                                             | <https://shop.pimoroni.com/products/raspberry-pi-hq-camera-lens>
+Battery Pack                     | NanoWave 3 5000mAh USB-C & A Power Bank                         | <https://shop.pimoroni.com/products/nanowave-3-5000mah-usb-c-a-power-bank>
+Rear Display                     | a 3.5" Display for the back of the camera                       | <https://thepihut.com/products/spi-3-5-320x480-ips-touch-screen-gpio>
+Chassis                          | 3d Printed chassis                                              | [Chassis](/assets/stl/pikon/chassis.stl)
+Bottom                           | Bottom door                                                     | [Bottom](/assets/stl/pikon/bottom.stl)
+{:class="table table-striped"}
+
 ### Dimensions
 ![Module Dimensions](/assets/img/blog/pikon/module_dimensions.png){:class="img-fluid w-50"}
 
@@ -84,7 +97,13 @@ If you want to download the project files for this, they are available here:
 
 ![3d Render](/assets/img/blog/pikon/final.png){:class="img-fluid w-50"}
 
-![photo](/assets/img/blog/pikon/pikon.jpg){:class="img-fluid w-50"}
+---
+[![photo](/assets/img/blog/pikon/pikon.jpg){:class="img-fluid w-25 rounded m-1"}](/assets/img/blog/pikon/pikon.jpg)
+[![photo](/assets/img/blog/pikon/pikon05.jpg){:class="img-fluid w-25 rounded m-1"}](/assets/img/blog/pikon/pikon05.jpg)
+[![photo](/assets/img/blog/pikon/pikon02.jpg){:class="img-fluid w-25 rounded m-1"}](/assets/img/blog/pikon/pikon02.jpg)
+[![photo](/assets/img/blog/pikon/pikon03.jpg){:class="img-fluid w-25 rounded m-1"}](/assets/img/blog/pikon/pikon03.jpg)
+[![photo](/assets/img/blog/pikon/pikon04.jpg){:class="img-fluid w-25 rounded m-1"}](/assets/img/blog/pikon/pikon04.jpg)
+[![photo](/assets/img/blog/pikon/pikon01.jpg){:class="img-fluid w-25 rounded m-1"}](/assets/img/blog/pikon/pikon01.jpg)
 
 ---
 

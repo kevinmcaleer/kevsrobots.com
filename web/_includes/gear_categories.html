@@ -1,0 +1,13 @@
+Categories 
+{% assign items = site.data.gear %}
+{% assign categories = site.data.gear.category %}
+{{categories}}
+{% for category in categories %}
+<h5>{{ category}}</h5>
+
+{% for item in items %}
+{{ if item.categories contains category }}
+{{ item.name }}
+{{ endif }}
+{% endfor %}
+{% endfor %}

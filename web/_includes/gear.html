@@ -1,0 +1,20 @@
+{% assign gear = site.data.gear %}
+{% for item in gear %}
+
+<div class="card">
+<div class="row g-0">
+<div class="col-3">
+    <a href="{{ item.url }}">
+    <img src="{{item.image}}" class="img-fluid">
+    </a>
+</div>
+<div class="col-9 p-3">
+    <a href="{{ item.link}}" class="text-decoration-none"><h5>{{item.name}}</h5></a>
+    <p>{{item.manufacturer}}</p>
+    <h4>{{item.price}}</h4>
+</div>
+</div>
+
+</div>
+
+{% endfor %}
