@@ -1,6 +1,8 @@
 ---
 layout: blog
 title: PIKON Camera - Raspberry Pi High Quality Camera Project
+short_title: PIKON Camera
+short_description: Raspberry Pi High Quality Camera Project
 date: 2022-08-23
 author: Kevin McAleer
 excerpt: Build your own portable Raspberry Pi Camera featuring the High Quality

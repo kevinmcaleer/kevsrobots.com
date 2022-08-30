@@ -1,0 +1,35 @@
+{% assign vids = site.data.youtube %}
+
+<div class="bg-light p-0 m-0">
+
+<div class="container pb-3 m-1">
+
+    <nav class="navbar bg-light">
+        <div class="container-fluid">
+          <span class="navbar-text">
+            Recent Videos 
+          </span>
+          <span class="navbar-text">
+            <a href="youtube_videos.html" class="">All Videos ></a>
+          </span>
+        </div>
+      </nav>
+   
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+{% for vid in vids limit:4 %}
+<!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
+    <div class="card-group">
+    <div class="card">
+        <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid"></a>
+        <div class="card-body">
+        <p class="small">{{vid.title}}</p>
+        <p class="text-mute small">{{vid.published}} | {{vid.view}} Views</p>
+    </div>
+    </div>
+
+</div>
+
+{% endfor %}
+</div>
+</div>
+</div>

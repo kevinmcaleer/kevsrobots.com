@@ -7,15 +7,20 @@
 # - name: Periodic Table of Robotics
 #   link: /ptor/index.html
   # icon: "fa-solid fa-atom-simple"
-- name: Discord
-  link: https://action.smarsfan.com/join-discord
-  icon: "fab fa-discord"
 - name: Blog
   link: /blog/
   icon: "fas fa-typewriter"
 - name: Links
   link: /links/
   icon: "fas fa-link"
+- name: "|"
+
 - name: SMARSFan
   link: https://www.smarsfan.com
   icon: "fa-solid fa-user-robot"
+- name: Discord
+  link: https://action.smarsfan.com/join-discord
+  icon: "fab fa-discord"
+- name: YouTube
+  link: https://www.youtube.com/kevinmcaleer28
+  icon: "fa-brands fa-youtube"

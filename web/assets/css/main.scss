@@ -57,3 +57,31 @@ nav {
 .top1 img {
     height:100%;
 }
+.bg-red {
+    background-color: #C0342B;
+    color: white;
+  }
+
+.bg-white {
+    background-color: white;
+    color: black;
+  }
+
+.bg-orange {
+    background-color: #fd9c00;
+    color: white;
+  }
+
+.bg-black a {
+    background-color: rgba(0, 0, 0, 0.879);
+    color: white;
+    text-decoration: none;
+    bottom: 0px;
+    right: 0px;
+    position: absolute;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: normal;
+    padding: 6px;
+    width: 70px;
+  }

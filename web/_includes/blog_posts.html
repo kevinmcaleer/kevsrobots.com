@@ -1,8 +1,9 @@
 
 {% assign posts = site.posts %}
+<div class="row row-cols-2">
 {% for post in posts %}
 
-<div class="card top1 w-100" >
+<div class="card " >
 <div class="row g-0">
 <div class="col-md-3">
     <a href="{{ post.url }}">
@@ -34,3 +35,4 @@
 </div> <!-- card -->
 
 {% endfor %}
+</div>

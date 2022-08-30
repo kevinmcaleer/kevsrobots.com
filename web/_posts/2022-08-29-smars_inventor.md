@@ -1,6 +1,8 @@
 ---
 layout: blog
 title: SMARS Inventor
+short_title: SMARS Inventor
+short_description: Pimoroni Inventor 2040W
 date: 2022-08-29
 author: Kevin McAleer
 excerpt: Build your own SMARS Robot using the Pimoroni Inventor 2040W

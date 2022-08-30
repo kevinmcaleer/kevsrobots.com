@@ -1,6 +1,8 @@
 ---
 layout: blog
 title: Rover the Mecanum Robot
+short_title: Rover Robot
+short_description: Build your own Mecanum Robot
 date: 2022-04-30
 author: Kevin McAleer
 excerpt: Build your own Mecanum Robot using this guide

@@ -1,4 +1,4 @@
 ---
- redirect:   /blog/burgerbot
+ redirect:   /blog/Burgerbot
  layout:     redirect
 ---

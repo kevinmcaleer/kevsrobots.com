@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: content
 title: Links
 subtitle: Links to other sites you may be interested in
 ---

@@ -1,6 +1,8 @@
 ---
 layout: blog
 title: Pimoroni Enviro Indoor Stevenson Screen case
+short_title: Stevenson Screen
+short_description: For Pimoroni Enviro Indoor
 date: 2022-08-10
 author: Kevin McAleer
 excerpt: 3D Print your own Stevenson Screen for the Pimoroni Enviro Indoor sensor

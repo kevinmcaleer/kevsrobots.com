@@ -1,6 +1,8 @@
 ---
 layout: blog
 title: Zero Stand
+short_title: Zero Stand
+short_description: Cute stand for Raspberry Pi Zeros
 date: 2022-05-15
 author: Kevin McAleer
 excerpt: 3D Print a cute stand for Raspberry Pi Zeros - specifically designed for pHats
