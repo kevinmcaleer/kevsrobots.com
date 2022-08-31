@@ -1,8 +1,9 @@
 ---
-layout: default
+layout: content
 title: Gear
 ---
 
+{% include breadcrumbs.html %}
 # The Gear List
 I've curated a hand picked list of tools, components and electronics that I'll think you'll love.[^1]
 

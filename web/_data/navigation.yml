@@ -13,8 +13,10 @@
 - name: Links
   link: /links/
   icon: "fas fa-link"
+- name: About
+  link: /about
+  icon: "fa-solid fa-user-bounty-hunter"
 - name: "|"
-
 - name: SMARSFan
   link: https://www.smarsfan.com
   icon: "fa-solid fa-user-robot"
