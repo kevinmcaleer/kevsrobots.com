@@ -11,3 +11,38 @@ Categories
 {{ endif }}
 {% endfor %}
 {% endfor %}
+
+
+{% assign categories = '' | split: ',' %}
+{% for category_page in site.data.gear %}
+    {% assign category = categories | push: category_page.category %}
+{% endfor %}
+
+{% assign uniqcat = categories | uniq %}
+{% for category in uniqcat %}
+<p>{{ category | upcase }}</p>
+<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+{% for result_page in site.data.gear %}
+
+
+{% if result_page.category == category %}
+<div class="col">
+<a href="{{result_page.link}}" class="text-decoration-none">
+<div class="card border-0">
+    <img src="{{ result_page.cover }}" class="card-img-top">
+    <div class="card-body">
+        <h5 class="card-title">{{ result_page.title }}</h5>
+        <p class="text-color">{{ result_page.description }}</p>
+        {% for tag_in_page in result_page.tags %}
+        <span class="badge badge-secondary badge-pill">{{tag_in_page}}</span>
+        {% endfor %}
+    </div>
+</div>
+</a>
+</div>
+{% endif %}
+
+{% endfor %} <!--end result page-->
+</div>
+<hr>
+{% endfor %} <!-- end for tag-->
