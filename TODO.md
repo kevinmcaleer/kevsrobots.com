@@ -1,5 +1,6 @@
 # TODO
 
+- [ ] Add which node the site is running on to the footer (for troubleshooting)
 - [ ] Show Schedule
 - [ ] Show Notes
 - [x] Robots
