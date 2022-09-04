@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Add which node the site is running on to the footer (for troubleshooting)
+- [X] Add which node the site is running on to the footer (for troubleshooting) - swarm makes this difficult
 - [ ] Show Schedule
 - [ ] Show Notes
 - [x] Robots
@@ -9,10 +9,10 @@
 - [ ] A link to playlists
 - [ ] A link to Fusion 360 designs (like the SMARS design studio) 
 - [x] Call to action - sign up to our newsletter (need landing page for that too)
-- [ ] Call to action - support my work
+- [x] Call to action - support my work
 - [ ] links to github repository
 - [X] Get a list of tweets from Twitter
-
+- [ ] Article about Access Points 
 ## Museum of Awesomeness
 
 Rooms
