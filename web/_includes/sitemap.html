@@ -5,7 +5,7 @@
             {% assign posts = site.posts %}
     <ul class="decoration-none nav flex-column">
         {% for post in posts limit: 10 %}
-        <li class="decoration-none nav-item m-0 p-0"><a class="nav-link  small" href="{{post.url}}">{{ post.title }}</a></li>
+        <li class="decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{post.url}}">{{ post.title }}</a></li>
         {% endfor %}
     </ul>
         </div>
@@ -14,7 +14,17 @@
             {% assign links = site.data.links %}
             <ul class="decoration-none nav flex-column">
             {% for link in links limit: 10 %}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link  small" href="{{link.url}}">{{link.name}}</a></li>
+            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{link.url}}">{{link.name}}</a></li>
+            {% endfor %}
+            </ul>
+            {% assign reviews = site.reviews %}
+            <h5 class="mt-4">Reviews</h5>
+            <ul class="decoration-none nav flex-column">
+            {% for review in reviews limit: 10 %}
+            {% if review.url contains "index" %}
+            {% else %}
+            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{review.url}}">{{review.title}}</a></li>
+            {% endif %}
             {% endfor %}
             </ul>
         </div>
@@ -22,7 +32,7 @@
             <h5 class="">Robots</h5>
             <ul class="decoration-none nav flex-column">
                 {% for robot in site.data.robots limit:10%}
-                <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link small" href="{{robot.link}}">{{robot.name}}</a></li>
+                <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{robot.link}}">{{robot.name}}</a></li>
                 {% endfor %}
                 </ul>
         </div>
@@ -30,7 +40,7 @@
             <h5 class="">Videos</h5>
             <ul class="decoration-none nav flex-column">
             {% for video in site.data.youtube limit:10%}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link small" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
+            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
             {% endfor %}
             </ul>
         </div>
