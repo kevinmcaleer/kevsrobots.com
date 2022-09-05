@@ -26,3 +26,6 @@ collections:
   robots:
     output: true
     permalink: /robots/:name.html
+  reviews:
+    output: true
+    permalink: /reviews/:name.html

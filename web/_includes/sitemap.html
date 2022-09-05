@@ -1,0 +1,39 @@
+<div class="container p-3 sitemap mt-3 bg-secondary  bg-gradient">
+    <div class="row row-cols-1 row-cols-md-4">
+        <div class="col mt-4">
+            <h5 class="">Posts</h5>
+            {% assign posts = site.posts %}
+    <ul class="decoration-none nav flex-column">
+        {% for post in posts limit: 10 %}
+        <li class="decoration-none nav-item m-0 p-0"><a class="nav-link  small" href="{{post.url}}">{{ post.title }}</a></li>
+        {% endfor %}
+    </ul>
+        </div>
+        <div class="col mt-4">
+            <h5 class="">Links</h5>
+            {% assign links = site.data.links %}
+            <ul class="decoration-none nav flex-column">
+            {% for link in links limit: 10 %}
+            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link  small" href="{{link.url}}">{{link.name}}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="col mt-4">
+            <h5 class="">Robots</h5>
+            <ul class="decoration-none nav flex-column">
+                {% for robot in site.data.robots limit:10%}
+                <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link small" href="{{robot.link}}">{{robot.name}}</a></li>
+                {% endfor %}
+                </ul>
+        </div>
+        <div class="col mt-4">
+            <h5 class="">Videos</h5>
+            <ul class="decoration-none nav flex-column">
+            {% for video in site.data.youtube limit:10%}
+            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link small" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <hr class="m-0 mt-3 p-0" />
+</div>

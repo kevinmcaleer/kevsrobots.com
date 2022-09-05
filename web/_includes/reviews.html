@@ -1,0 +1,12 @@
+<div class="container-fluid mx-0 px-0">
+{% assign reviews = site.reviews %}
+<ul class="nav flex-column">
+{% for review in reviews limit:20 %}
+{% if review.url contains 'index.html' %}
+{% else %}
+<li class="nav-item"><a href="{{review.url}}" class="mx-0 px-0 grey text-decoration-none">{{review.title}}</a></li>
+{% endif %}
+{% endfor %}
+<a href="/reviews">All Reviews ></a>
+</ul>
+</div>
