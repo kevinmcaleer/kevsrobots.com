@@ -20,6 +20,10 @@ I live in the UK (up North), with my beautiful wife, 2 Chihuahuas and way too ma
 
 ---
 
+{% include youtube_latest.html%}
+
+---
+
 ## Links
 
 Platform | Description                                                                                        | Link
@@ -36,3 +40,5 @@ Pimoroni.com | I do a lot of Product Intro videos for Pimoroni - check them out 
 {:class="table table-striped"}
 
 ---
+
+{% include thanks.html %}
