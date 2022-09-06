@@ -1,7 +1,7 @@
 ---
 layout: content
 title: Reviews
-
+thanks: false
 ---
 
 # Reviews
