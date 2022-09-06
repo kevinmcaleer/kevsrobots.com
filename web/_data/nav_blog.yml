@@ -1,0 +1,4 @@
+- name: Latest Blogs
+  link: /blog/
+- name: All Blogs
+  link: /blog/all_blogs.html

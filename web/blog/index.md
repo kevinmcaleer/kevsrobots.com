@@ -1,5 +1,5 @@
 ---
-layout: content
+layout: blog_index
 title: Blog
 thanks: false
 ---
