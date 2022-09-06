@@ -24,6 +24,12 @@ tags:
 
 ---
 
+## Video
+
+{% include youtubeplayer.html id='2Y42DSZpR0w' %}
+
+---
+
 ## Phew! That was too easy
 
 You can quickly setup an Access Point / Captive Portal using MicroPython, a Raspberry Pi Pico W and the [Phew!](https://github.com/pimoroni/phew) library from [Pimoroni](https://www.pimoroni.com).

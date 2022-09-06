@@ -1,5 +1,5 @@
 ---
-layout: content
+layout: about
 title: About Kevin McAleer
 subtitle: Learn about Kevin McAleer, Small Robots and links to all his social media
 ---

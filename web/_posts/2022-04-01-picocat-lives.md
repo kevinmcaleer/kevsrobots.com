@@ -70,3 +70,9 @@ new parts:
 ![Servo Comparison](/assets/img/blog/picocat10.jpg){:class="img-fluid w-25"}
 ![Servo Comparison](/assets/img/blog/picocat11.jpg){:class="img-fluid w-25"}
 ![Servo Comparison](/assets/img/blog/picocat12.jpg){:class="img-fluid w-25"}
+
+---
+## Related Links
+
+* [PicoCat Lives - April 2022 update](/blog/picocat-lives)
+* [PicoCat v2 - March 2022 update](/blog/picocat-v2)

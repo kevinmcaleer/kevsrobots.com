@@ -23,6 +23,12 @@ tags:
 
 ---
 
+## Video
+
+{% include youtubeplayer.html id='4BEjKUK8DSQ' %}
+
+---
+
 ## PIKON Camera Project
 During the recent [Pimoroni Sale](https://www.pimoroni.com) I purchased an official [Raspberry Pi High Quality Camera](https://shop.pimoroni.com/products/raspberry-pi-high-quality-camera). I wanted to create a suitable project to showcase the camera, and as a [livestreamer](https://www.youtube.com/c/kevinmcaleer28) I look at a DSLR camera everyday, so I decided to recreate a DSLR shaped body in Fusion 360.
 

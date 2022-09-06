@@ -1,5 +1,5 @@
 ---
-layout: content
+layout: home
 title: YouTube Videos
 excerpt: All my YouTube Videos
 ---

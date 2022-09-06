@@ -4,7 +4,7 @@
   cover: /assets/img/blog/smars_inventor/smars_inventor.jpg
   description: Build your own SMARS Robot using the Pimoroni Inventor 2040W
 - name: 🐱 PicoCat
-  link: http://www.kevsrobots.com/blog/picocat-v2.html
+  link: /blog/picocat-lives
   cover: /assets/img/picocat01.jpg
   description: A Cute Robot Cat
 - name: SMARS

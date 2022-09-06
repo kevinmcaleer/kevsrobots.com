@@ -1,5 +1,5 @@
 ---
-layout: content
+layout: about
 title: About KevsRobots
 ---
 
