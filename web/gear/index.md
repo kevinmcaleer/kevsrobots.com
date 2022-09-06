@@ -1,6 +1,7 @@
 ---
 layout: content
 title: Gear
+thanks: false
 ---
 
 {% include breadcrumbs.html %}

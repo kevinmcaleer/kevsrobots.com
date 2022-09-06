@@ -1,6 +1,7 @@
 ---
 layout: content
 title: Blog
+thanks: false
 ---
 
 {% include breadcrumbs.html %}
