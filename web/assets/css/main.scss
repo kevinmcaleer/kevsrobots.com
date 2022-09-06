@@ -114,9 +114,14 @@ nav {
   }
 
   .media {
-    width: 200px;
-  }
-
+    @media screen and (min-width: 300px) {
+        width: 100px;
+    }
+    @media screen and (min-width: 768px) {
+      width: 200px;
+        }
+    }
+ 
   .grey {
     color: gray;
     text-decoration: none;

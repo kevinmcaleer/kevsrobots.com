@@ -13,4 +13,4 @@ I've curated a hand picked list of tools, components and electronics that I'll t
 
 ---
 
-[^1]: These are Amazon Affiliate links, I get a small kick back for each link you click, but it costs you nothing extra.
+[^1]: Some of these are Amazon Affiliate links, I get a small kick back for the Amazon links you click, but it costs you nothing extra.
