@@ -5,14 +5,14 @@
 
 <div class="col my-3">
 
-<div class="bg-light border-0 position-relative shadow ">
+<div class="bg-light border-0 position-relative shadow">
   
     <div class="position-static">
-        <a href="{{post.url}}"><img class="img-fluid m-0 p-0" src="{{post.cover}}"></a>
+        <a href="{{post.url}}"><img class="img-fluid m-0 p-0 rounded" src="{{post.cover}}"></a>
     </div>
-    <div class="position-absolute top-0 left-0 my-0 overflow-hidden">
-        <span class="top-0 left-0 bg-orange p-1 my-2 lh-0 overflow-hidden shadow-lg"><b>{{post.short_title}}</b></span><br>
-        <span class=" bg-white px-1 py-1 my-1 overflow-hidden shadow-lg">{{post.short_description}}</span>
+    <div class="position-absolute top-0 left-0 my-0 overflow-hidden blog-part">
+        <span class="top-0 left-0  p-1 my-2 lh-0 overflow-hidden overflow-wrap shadow-lg bg-orange "><b>{{post.short_title}}</b></span><br>
+        <span class="  p-1 my-3 overflow-hidden shadow-lg text-wrap bg-white"><b>{{post.short_description}}</b></span>
     </div>
     <div class="position-absolute bottom-0 end-0">
         <span class="bg-black"><a href="{{post.url}}" class="text-decoration-none">Read ></a></span>
