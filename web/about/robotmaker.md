@@ -2,9 +2,12 @@
 layout: about
 title: Become a Robot Maker
 subtitle: Support the channel Kevin McAleer by becoming a Robot Maker
+cover: /assets/img/credits.png
 ---
 
 {% include breadcrumbs.html %}
+
+<img src="{{page.cover}}" class="cover rounded my-3">
 {% assign profile = site.data.profile %}
 
 # Hey 🤖 Robot Makers! 
