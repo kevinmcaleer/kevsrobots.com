@@ -164,3 +164,26 @@ nav {
       font-size: 20pt;
     }
   }
+
+
+
+  article {
+    font-family: lora;
+    p, li {
+      font-size: 16pt;
+      color: gray;
+      strong {
+        font-weight: 700; 
+      }
+    }
+    h1, h2, h3, h4 {
+      font-family: lora;
+    }
+    h2 {
+      font-size: 30pt;
+    }
+    a {
+      color: $orange;
+      text-decoration-style: dotted;
+    }
+  }

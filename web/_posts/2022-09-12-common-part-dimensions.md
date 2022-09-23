@@ -46,3 +46,17 @@ Height    |        30.5mm
 {:class="table"}
 
 [![SG90 Dimensions](/assets/img/design/sg90.png){:class="img-fluid m-3 m-3 w-50 border-1 shadow-lg"}](/assets/img/design/sg90.png)
+
+
+---
+
+## Raspberry Pi Pico & Pico W
+The Raspberry Pi Pico & Pico W are low cost 32 bit Microcontroller.
+
+Here are the dimensions:
+
+Dimension | Measurement
+:---------|-----------:
+Length    |        51mm
+Width     |        21mm
+{:class="table"}
