@@ -1,4 +1,9 @@
 ---
+
+- name: BurgerBot
+  link: /burgerbot
+  cover: /assets/img/blog/burgerbot/burgerbot_v2.jpg
+  description: Build your own 2 motor, Pico W-based, 3d printable robot
 - name: SMARS Inventor
   link: /blog/smars_inventor.html
   cover: /assets/img/blog/smars_inventor/smars_inventor.jpg
@@ -23,7 +28,3 @@
   link: /blog/big-mouth.html
   cover: /assets/img/bigmouthbillybass/fish01.jpg
   description: Hack a Big Mouth Billy Bass with a Raspberry Pi Pico W
-- name: BurgerBot
-  link: /blog/burgerbot.html
-  cover: /assets/img/blog/burgerbot/burgerbot.jpg
-  description: Build your own 2 motor, Pico W-based, 3d printable robot

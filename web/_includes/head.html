@@ -1,12 +1,26 @@
 {% if page.cover %}
     <meta property="og:image" content="{{ site.url }}{{ page.cover }}" />
+    <meta name="twitter:image" content="{{ site.url}}{{page.cover }}" />
 {% endif %}
 {% if page.description %}
 <meta property="og:description" content="{{ page.description }}" />
+<meta name="twitter:description" content="{{ page.description }}" />
 {% endif %}
 {% if page.subtitle %}
 <meta property="og:description" content="{{ page.subtitle }}" />
 {% endif %}
 {% if page.header-subtext %}
 <meta property="og:description" content="{{ page.header-subtext }}" />
+<meta name="twitter:card" content="{{page.header-subtext}}" />
 {% endif %}
+
+{% if page.excerpt %}
+<meta name="twitter:card" content="{{page.excerpt}}" />
+{% endif %}
+
+{% if page.title %}
+<meta name="twitter:title" content="{{page.title}}" />
+{% endif %}
+
+<meta name="twitter:site" content="@kevsmac" />
+
