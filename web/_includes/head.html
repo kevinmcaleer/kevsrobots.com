@@ -4,18 +4,22 @@
 {% endif %}
 {% if page.description %}
 <meta property="og:description" content="{{ page.description }}" />
-<meta name="twitter:description" content="{{ page.description }}" />
+
 {% endif %}
 {% if page.subtitle %}
 <meta property="og:description" content="{{ page.subtitle }}" />
 {% endif %}
 {% if page.header-subtext %}
 <meta property="og:description" content="{{ page.header-subtext }}" />
-<meta name="twitter:card" content="{{page.header-subtext}}" />
+
 {% endif %}
 
+<meta property="twitter:domain" content="{{site.url}}" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="{{site.url}}{{page.url}}" />
+
 {% if page.excerpt %}
-<meta name="twitter:card" content="{{page.excerpt}}" />
+<meta name="twitter:description" content="{{page.excerpt}}" />
 {% endif %}
 
 {% if page.title %}
