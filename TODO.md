@@ -1,7 +1,9 @@
 # TODO
 
+
 - [X] Add which node the site is running on to the footer (for troubleshooting) - swarm makes this difficult
 - [ ] Show Schedule
+- [ ] Add list of episodes like wikipedia
 - [ ] Show Notes
 - [x] Robots
 - [x] pull a list of videos and update a yaml file automatically

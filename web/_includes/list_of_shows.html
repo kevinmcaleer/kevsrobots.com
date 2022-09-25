@@ -1,0 +1,31 @@
+{% assign vids = site.data.youtube %}
+
+{% assign previousNum = "" %}
+{% assign currentNum = 0 %}
+{% assign counter = 0 %}
+
+<table class="table table-sm table-bordered">
+  <th class="text-end">#</th>
+  <th>Title</th>
+  <th>Date</th>
+  <th>Views</th>
+{% for vid in vids reversed %}
+
+{% if previousNum == "" %}
+{% assign previousNum = currentNum %}
+{% endif %}
+
+{% if currentNum == previousNum %}
+{% assign counter = counter | plus: 1 %}
+{% endif %}
+
+
+<tr>
+  <td class="text-end">{{counter}}</td>
+  <td><a href="https://www.youtube.com/watch?v={{vid.video_id}}">{{vid.title}}</a></td>
+  <td>{{vid.published}}</td>
+  <td>{{vid.view}}</td>
+</tr>
+
+{% endfor %}
+</table>
