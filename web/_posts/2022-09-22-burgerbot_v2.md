@@ -24,6 +24,15 @@ tags:
 
 ---
 
+## Videos
+There are a couple of videos covering the features, demo and build process for BurgerBot, as well as the original BurgerBot and why I created it.
+
+{% include youtubeplayer.html id="5G6psAuTYT4" %}
+{% include youtubeplayer.html id="CYP3oL3Vs9o" %}
+{% include youtubeplayer.html id="awQ97DOyOcM" %}
+
+---
+
 ## What's new, in version 2
 
 There are a bunch of new features in this release:
