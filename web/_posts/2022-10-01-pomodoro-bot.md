@@ -65,6 +65,11 @@ This project also uses a couple of Pimoroni MicroPython libraries:
 * [Phew!](https://github.com/pimoroni/phew) - the Pico HTTP Endpoint Wrangler, for quick connection to wifi, and NTP time library
 * [Pimoroni-Pico](https://github.com/pimoroni/pimoroni-pico/releases) - the 'batteries included' build of MicroPython
 
+> **NOTE**:
+>
+> Be sure to copy all the jpeg images to the Pico W; Thonny makes this easy, just select them in the file browser, right click and upload to the Pico.
+{:class="blockquote  note m-3 p-3 rounded-1"}
+
 ---
 
 ### CountDownTimer Class
@@ -412,6 +417,7 @@ Screw the Pico W into the Head using the mount points, using 4x M2 Bolts.
 [![Pico W Headers](/assets/img/blog/heybot/pico.jpg){:class="img-fluid w-100"}](/assets/img/blog/heybot/pico.jpg)
 
 The Pico W simply pushed onto the Pico Display Pack 2.0. Ensure you align the USB graphic on the back of the Pico Display Pack to make sure its the correct way round.
+
 
 ---
 
