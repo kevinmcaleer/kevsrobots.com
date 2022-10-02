@@ -1,3 +1,7 @@
+- name: HeyBot
+  link: /heybot
+  cover: /assets/img/blog/heybot/heybot.jpg
+  description: Build your own Cute Pomodoro Desk Robot
 - name: BurgerBot
   link: /burgerbot
   cover: /assets/img/blog/burgerbot/burgerbot_v2.jpg

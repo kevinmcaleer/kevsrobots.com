@@ -420,9 +420,9 @@ The Pico W simply pushed onto the Pico Display Pack 2.0. Ensure you align the US
 
 There are 4 parts to download and print:
 
-* `head.stl` - the robot head
-* `body.stl` - the robot body
-* `left_arm.stl` - the left arm
-* `right_arm.stl` - the right arm.
+* [`head.stl`](/assets/stl/heybot/head.stl) - the robot head
+* [`body.stl`](/assets/stl/heybot/body.stl) - the robot body
+* [`left_arm.stl`](/assets/stl/heybot/left_arm.stl) - the left arm
+* [`right_arm.stl`](/assets/stl/heybot/right_arm.stl) - the right arm.
 
 If you enjoy these files, please consider [buying me a coffee](/coffee) (it took a while to design these!)
