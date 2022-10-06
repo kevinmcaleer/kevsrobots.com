@@ -1,0 +1,6 @@
+- name: home01
+  image: /assets/img/home01.jpg
+- name: home02
+  image: /assets/img/home01.jpg
+- name: home03
+  image: /assets/img/home01.jpg

@@ -1,8 +1,8 @@
 {% assign crumb = page.url | remove_first: "/" | replace: "/", " " %}
 
-<div class="breadcrumb-area border-0">
-  <nav aria-label="breadcrumb bg-light">
-  <ol class="breadcrumb my-3 m-0">
+<div class="breadcrumb-area border-0 bg-light my-3 mx-4 px-3 rounded-3">
+  <nav aria-label="breadcrumb  m-0 p-0">
+  <ol class="breadcrumb p-2 m-0">
     {% assign crumbs = page.url | remove:'/index.html' | split: '/' %}
     <li class="breadcrumb-item"><a href="/">Home </a></li>
     {% for crumb in crumbs offset: 1 %}

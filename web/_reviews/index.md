@@ -1,5 +1,5 @@
 ---
-layout: content
+layout: reviews_and_gear
 title: Reviews
 thanks: false
 ---

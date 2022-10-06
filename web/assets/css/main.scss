@@ -5,6 +5,7 @@
 @charset "utf-8";
 @import 'colours';
 @import 'typography';
+@import 'debug';
 
 .cover {
     height: 200px;
@@ -13,7 +14,7 @@
 }
 
 nav {
-    background-color: $kevred;
+    
     .nav-link {
       color: white;
     
@@ -33,6 +34,10 @@ nav {
     .navbar-brand:hover, .brand:hover {
         color: #FFCA29;
     }
+}
+
+.nav-bg-red {
+    background-color: $kevred;
 }
 .navbar-toggler {
     color: white;
@@ -132,9 +137,28 @@ nav {
     background-color: #ffe5e3;
   }
 
+  .bg-pynav {
+    background-color: #fcfcfc;
+  }
+  .bg-pynav a {
+    color: black;
+  }
+
   .bg-nav a {
     color: black;
   }
+
+  .bg-pynav a:hover {
+    color: $kevred;
+  }
+
+  .bg-pynav ul li a.active {
+    background-color: #C0342B;
+    color: white;
+    border-bottom-left-radius: 4pt;
+    border-bottom-right-radius: 4pt;
+  }
+
   .bg-nav ul li a.active {
     background-color: #C0342B;
     color: white;
@@ -201,3 +225,28 @@ h1, h2 {
   }
   
 }
+
+.small-nav {
+  font-size: 10pt !important; 
+}
+
+.nav-link.small-nav {
+  
+    color: #ff5500;
+    
+}
+
+.nav-link.small-nav.active {
+    font-weight: 600;
+    background-color: whitesmoke !important;
+    color: #0088ff;
+}
+
+a.nav-link.white-text {
+  color: white;
+}
+
+a.nav-link.white-text:hover
+ {
+    color: #FFCA29;
+  }

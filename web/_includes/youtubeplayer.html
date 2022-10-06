@@ -1,1 +1,8 @@
+
+{% if include.small == true%}
+<iframe width="230" class="rounded-3 text-right" src="https://www.youtube.com/embed/{{ include.id }}" frameborder="0" allowfullscreen></iframe>
+
+{% else %}
 <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ include.id }}" frameborder="0" allowfullscreen></iframe>
+
+{% endif%}

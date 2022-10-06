@@ -1,0 +1,12 @@
+- name: Join our Discord
+  link: /discord
+  icon: "fab fa-discord"
+- name: Join the Robot Overlord Army
+  link: /robotmaker
+  icon: "fa-sharp fa-solid fa-ticket"
+- name: Watch on YouTube
+  link: /youtube
+  icon: "fa-brands fa-youtube"
+- name: Sign up for our newsletter
+  link: https://action.smarsfan.com/join-the-list
+  icon: "fa-solid fa-envelope-circle-check"

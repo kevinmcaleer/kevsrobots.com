@@ -1,0 +1,21 @@
+<div class="row row-cols-4">
+    {% assign cards = site.data.nav_pythonai %}
+
+    {% for card in cards %}
+    {% if card.show != false %}
+
+    <div class="col">
+        <a href="{{card.link}}" class="text-decoration-none">
+        <div class="card text-bg-light mb-3 ">
+            <div class="card-body ">
+                <h5 class="card-title">{{card.name}}</h5>
+                <p class="card-text mt-2">{{card.description}}</p>
+            </div>
+        </div>
+        </a>
+    </div>
+
+    {% endif%}
+    {% endfor%}
+
+</div>

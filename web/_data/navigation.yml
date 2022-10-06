@@ -1,7 +1,7 @@
 - name: Home
   link: /
   icon: "fas fa-home"
-- name: Robots
+- name: Robots & Projects
   link: /robots/
 - name: Blog
   link: /blog/
@@ -9,17 +9,15 @@
   link: /links/
 - name: About
   link: /about/
-- name: Reviews
+- name: Reviews & Gear
   link: /reviews/
-- name: Gear List
-  link: /gear/
-- name: "|"
-- name: SMARSFan
-  link: https://www.smarsfan.com
+# - name: "|"
+# - name: SMARSFan
+#   link: https://www.smarsfan.com
 
-- name: Discord
-  link: https://action.smarsfan.com/join-discord
-  icon: "fab fa-discord"
-- name: YouTube
-  link: https://www.youtube.com/kevinmcaleer28
-  icon: "fa-brands fa-youtube"
+# - name: Discord
+#   link: https://action.smarsfan.com/join-discord
+#   icon: "fab fa-discord"
+# - name: YouTube
+#   link: https://www.youtube.com/kevinmcaleer28
+#   icon: "fa-brands fa-youtube"
