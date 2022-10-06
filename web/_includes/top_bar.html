@@ -1,6 +1,6 @@
 
-<div class="container-fluid bg-dark ">
-<ul class="nav mb-2 mb-lg-0 justify-content-center white-nav">
+<div class="container-fluid bg-dark sticky-top navbar ">
+<ul class="nav mb-2  mb-lg-0 justify-content-center white-nav">
     {% assign navs = site.data.top-nav %}
     {% for nav in navs %}
     <li class="nav-item">
@@ -8,4 +8,23 @@
     </li>
     {% endfor %}
 </ul>
+<ul class="nav mb-2  mb-lg-0 justify-content-center white-nav">
+    {% assign navs = site.data.top-nav %}
+    {% for nav in navs %}
+    <li class="nav-item">
+        <a href="{{ nav.link }}" class="nav-link white-text"><i class="{{ nav.icon }} mx-1"></i></a>
+    </li>
+    {% endfor %}
+</ul>
+
+
+<ul class="nav mb-2  mb-lg-0 justify-content-center white-nav">
+    {% assign socials = site.data.socials %}
+    {% for social in socials %}
+    <li class="nav-item">
+        <a href="{{ social.link }}" class="nav-link white-text"><i class="{{ social.icon }} mx-1"></i></a>
+    </li>
+    {% endfor %}
+</ul>
+
 </div>

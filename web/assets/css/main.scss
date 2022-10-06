@@ -14,20 +14,22 @@
 }
 
 nav {
-    background-color: $kevred;
+    // background-color: $kevred;
     .nav-link {
-      color: white;
+      font-family: vox, sans-serif;
+      font-size: 12pt;
+      color: $kevred;
     
     }
     .nav-link:hover {
         color: #FFCA29;
     }
     .navbar-brand {
-        color: white;
+        color: $kevred;
     }
     
     .brand {
-        color: white;
+        color: $kevred;
         font-size: 30px;
         
     }
@@ -36,8 +38,8 @@ nav {
     }
 }
 .navbar-toggler {
-    color: white;
-    border: 1px solid white !important; 
+    color: $kevred;
+    border: 1px solid $kevred !important; 
 }
 
 .breadcrumb {
@@ -155,9 +157,11 @@ nav {
   }
 
   .dotted {
-    text-decoration-style: dotted;
+    text-decoration-style: dotted !important;
     text-decoration-line: 1px;
-    color:black;
+   
+    // color:black;
+    color: $orange ;
   }
 
   .blog-part {
@@ -168,20 +172,30 @@ nav {
   }
 
 h1, h2 {
-  font-family: 'Lato';
+  // font-family: 'Vox', sans-serif;
+  font-family: $kev_font;
+  letter-spacing: -3px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 50pt !important;
+  font-stretch: condensed !important;
+  font-weight: 800;
+  // color: $kevred;
 }
 
   article {
     font-family: 'Lato';
-    p, li {
-      font-size: 16pt;
-      color: gray;
+    p, li, td {
+      font-size: 11pt !important;
+      color: rgb(86, 86, 86) !important;
       strong {
         font-weight: 700; 
       }
     }
-    h1, h2, h3, h4 {
-      font-family: 'Lato';
+    h1, h2, h3, h4, h5 {
+      font-family: 'Vox', sans-serif;
     }
     h2 {
       font-size: 30pt;
@@ -214,7 +228,7 @@ a.nav-link.white-text:hover
   
   .nav-link.small-nav {
     
-      color: #ff5500;
+      color: $orange;
       
   }
   
@@ -232,4 +246,50 @@ nav-vox {
   font-family: vox, sans-serif;
   font-weight: 700;
   font-style: normal;
+}
+
+.sub-nav {
+  background-color: $kevred;
+  
+}
+
+.sub-nav a {
+  font-size: 12pt;
+  color: gray;
+}
+
+hr {
+  color:lightgrey !important;
+  height: 1px !important;
+}
+
+.orange {
+  color: $orange !important;
+  text-decoration: none;
+}
+
+a.dotted {
+  text-decoration-style: dotted !important;
+  text-decoration-color: $orange !important;
+  text-decoration-line: 1px !important;
+}
+
+h5 {
+  font-family: Vox, sans-serif;
+  font-size: 17pt !important;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1250px) {
+  /* … */
+  #small_nav {
+    visibility: hidden;
+  }
+}
+
+@media (min-width: 1249px) {
+  
+  #small_nav {
+    visibility: visible;
+  }
 }
