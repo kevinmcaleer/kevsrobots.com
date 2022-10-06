@@ -1,0 +1,20 @@
+{% assign nav = site.data.nav_pythonai %}
+
+
+<div class="container bg-pynav pt-3">
+    <h5>BYO AI Assistant</h5>
+
+<nav class="navbar navbar-expand-lg my-0 py-0 bg-pynav">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="nav flex-column mt-0 mb-2 mb-lg-0">
+        {% for item in nav %}
+        <li class="nav-item">
+            <a href="{{ item.link }}" class="nav-link  {% if page.url == item.link %}active{% endif %}">{{ item.name }}</a>
+        </li>
+        {% endfor %}
+        </ul>
+        </div>
+    </div>
+</nav>
+</div>
