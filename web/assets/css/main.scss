@@ -6,6 +6,7 @@
 @import 'colours';
 @import 'typography';
 
+
 .cover {
     height: 200px;
     width: 100%;
@@ -200,4 +201,10 @@ h1, h2 {
   
   }
   
+}
+
+nav-vox {
+  font-family: vox, sans-serif;
+  font-weight: 700;
+  font-style: normal;
 }
