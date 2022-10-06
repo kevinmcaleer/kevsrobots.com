@@ -1,0 +1,11 @@
+
+<div class="container-fluid bg-dark ">
+<ul class="nav mb-2 mb-lg-0 justify-content-center white-nav">
+    {% assign navs = site.data.top-nav %}
+    {% for nav in navs %}
+    <li class="nav-item">
+        <a href="{{ nav.link }}" class="nav-link white-text"><i class="{{ nav.icon }} mx-1"></i>{{ nav.name }}</a>
+    </li>
+    {% endfor %}
+</ul>
+</div>
