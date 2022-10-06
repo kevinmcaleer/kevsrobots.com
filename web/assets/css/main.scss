@@ -41,6 +41,10 @@ nav {
         color: #FFCA29;
     }
 }
+
+.nav-bg-red {
+    background-color: $kevred;
+}
 .navbar-toggler {
     color: $kevred;
     border: 1px solid $kevred !important; 
@@ -139,9 +143,28 @@ nav {
     background-color: #ffe5e3;
   }
 
+  .bg-pynav {
+    background-color: #fcfcfc;
+  }
+  .bg-pynav a {
+    color: black;
+  }
+
   .bg-nav a {
     color: black;
   }
+
+  .bg-pynav a:hover {
+    color: $kevred;
+  }
+
+  .bg-pynav ul li a.active {
+    background-color: #C0342B;
+    color: white;
+    border-bottom-left-radius: 4pt;
+    border-bottom-right-radius: 4pt;
+  }
+
   .bg-nav ul li a.active {
     background-color: #C0342B;
     color: white;

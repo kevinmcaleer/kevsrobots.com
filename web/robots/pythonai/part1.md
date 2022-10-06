@@ -5,14 +5,18 @@ subtitle: Learn how to build your own Jarvis-like AI assistant, in Python
 thanks: true
 description: Learn how to build your own Jarvis-like AI assistant, in Python
 excerpt: Learn how to build your own Jarvis-like AI assistant, in Python
+video: Y5atyJbVsAU
+code: https://www.github.com/kevinmcaleer/pythonai
 ---
 
-Welcome to the Build Your Own AI in Python series! We cover a lot of content in this series. It makes sense to start at the beginning as each part builds on the previous lesson and each also contains vital skills and knowledge used in future lessons too.
+Welcome to the Build Your Own AI in Python series! We cover a lot of content in this series, so it makes sense to start at the beginning as each part builds on the previous lesson and each also contains vital skills and knowledge used in future lessons too.
 
-### Part 1 - Table of Contents
+### Table of Contents
 
 {:toc}
 * toc
+
+---
 
 ### Video on YouTube
 I created a popular video series on YouTube, which goes over each of the steps below. The first video, `Creating the Assistant` is featured below.
@@ -54,34 +58,47 @@ So how do AI Assistants actually work? Lets take a look at the logical flow...
 [![How do AI Assistants Diagram](/assets/img/pythonai/part1_004.png){:class="img-fluid w-25"}](/assets/img/pythonai/part1_004.png)
 
 #### Logic Flow
-* Listen for a wake word
-* If heard listen for a known command (use elastic search and fuzzy logic to derive command from many possible ways of saying it)
-* Execute the known command
-* Speak response
+AI Assistants are typcially connected to a web service for converting sound samples to text; Siri can do this on device, whereas Amazon Alexa and Google Home devices rely on the web service.
+
+Originally this project uses the same Google voice service API, and accompanying python client to send voice data to the cloud, however Google has since changed this to a paid for service. We will instead use Vosk which is a Python library that can do voice to text without an internet connection.
+
+The logical flow of tasks for voice recognition looks like this:
+
+* **Wake** - Listen for a wake word
+* **Listen** - If wake word is heard, then listen for a known command
+* **Act** - Execute the known command
+* **Respond** - Speak response
 
 [![How do AI Assistants Diagram](/assets/img/pythonai/part1_005.png){:class="img-fluid w-25"}](/assets/img/pythonai/part1_005.png)
 
 ---
 
 ### A overview sketch of out AI Assistant
+
+I like to sketch out things before I work on them, this helps by using the spacial part of my brain to separate out the different components of the system.
+
 The Initial idea is:
-* The core AI code is a loop, listening to speech, or taking actions from the Web UI
+
+* The core AI code is a loop, listening to speech, or taking actions from the Web UI, the core loop can also be referred to as the ***Orchestrator***
 * We can add Skills as we go
   * Home Automation
   * Weather
   * News
   * Fun - Jokes
+  * Calendar
 
 [![How do AI Assistants Diagram](/assets/img/pythonai/part1_007.png){:class="img-fluid w-25"}](/assets/img/pythonai/part1_007.png)
 
 ---
 
 ### AI Assistant Architecture
-Our AI Assistant is made up of a number of parts:
-* The Speech Engine
-  * Speech Recognition
-  * Speech Synthesis
-* The Orchestration Engine
+
+Our AI Assistant is therefore made up of a number of parts:
+
+* **The Speech Engine**
+  * ***Speech Recognition*** - either on-device, or web service
+  * ***Speech Synthesis*** - there is a nice python library called 'Python Text to Speech v3' or `pyttsx3`
+* **The Orchestration Engine**
 * The Web UI
 * The Skills
   * News
@@ -200,3 +217,91 @@ pip install -r requirements.txt
 The source code repository for this project is hosted at GitHub. Click this link: <https://github.com/kevinmcaleer/pythonai> to download the latest version of the code.
 
 Please note that as the series progresses, code is changes, so you will be working from the latest version of the code.
+
+#### Version 1.0 - Initial release
+The first version of our Python AI is very simple.
+
+Here is the code for the `ai.py`
+
+##### ai.py
+
+``` python
+import pyttsx3
+import speech_recognition as sr 
+
+class AI():
+    __name = ""
+    __skill = []
+
+    def __init__(self, name=None):
+        self.engine = pyttsx3.init()
+        self.r = sr.Recognizer()
+        self.m = sr.Microphone()
+
+        if name is not None:
+            self.__name = name 
+
+        print("Listening")
+        with self.m as source:
+            self.r.adjust_for_ambient_noise(source)
+
+    @property 
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        sentence = "Hello, my name is" + self.__name
+        self.__name = value
+        self.engine.say(sentence)
+        self.engine.runAndWait()
+
+    def say(self, sentence):
+        self.engine.say(sentence)
+        self.engine.runAndWait()
+
+    def listen(self):
+        print("Say Something")
+        with self.m as source:
+            audio = self.r.listen(source)
+        print("got it")
+        try:
+            phrase = self.r.recognize_google(audio, show_all=True, language="en_US")
+            sentence = "Got it, you said" + phrase
+            self.engine.say(sentence)
+            self.engine.runAndWait()
+        except e as error:
+            print("Sorry, didn't catch that",e)
+            self.engine.say("Sorry didn't catch that")
+            self.engine.runAndWait()
+        print("You Said", phrase)
+        return phrase
+```
+
+---
+
+##### alf.py
+Our first AI Assistant was named `Alf` by one of our viewers. You'll see that the program is pretty simple and has just one skill `joke`.
+
+``` python
+import pyjokes
+from ai import AI
+
+
+alf = AI()
+
+def joke():
+    funny = pyjokes.get_joke()
+    print(funny)
+    alf.say(funny)
+
+command = ""
+while True and command != "goodbye":
+    command = alf.listen()
+    print("command was:", command)
+
+    if command == "tell me a joke":
+        joke()
+    
+alf.say("Goodbye, I'm going to sleep now")
+```
