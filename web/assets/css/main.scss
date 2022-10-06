@@ -208,6 +208,26 @@ a.nav-link.white-text:hover
     color: #FFCA29;
   }
 
+  .small-nav {
+    font-size: 10pt !important; 
+  }
+  
+  .nav-link.small-nav {
+    
+      color: #ff5500;
+      
+  }
+  
+  .nav-link.small-nav.active {
+      font-weight: 600;
+      background-color: whitesmoke !important;
+      color: #0088ff;
+  }
+  
+  a.nav-link.white-text {
+    color: white;
+  }
+
 nav-vox {
   font-family: vox, sans-serif;
   font-weight: 700;
