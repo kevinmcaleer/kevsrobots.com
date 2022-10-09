@@ -1,24 +1,33 @@
 {% assign nav = site.data.navigation %}
-<nav class="navbar navbar-expand-lg" id="myNavbar">
+<nav class="navbar navbar-expand" id="myNavbar">
     <div class="container-fluid">
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon">   
-                <i class="fa-solid fa-bars" style="color:$kevred; font-size:28px;"></i>
-            </span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
        
         <li class="nav-item">
             <a href="/" class="nav-link text-uppercase"><i class="fas fa-home mx-1"></i></a>
         </li>
         <li class="nav-item dropdown">
-            <a href="#" class="nav-link text-uppercase dropdown-toggle" role="button" id="projectsDropdown" data-bs-toggle="dropdown" aria-expanded="false">Projects</a>
+            <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop">Toggle top offcanvas</button> -->
+
+            <a href="#" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop" aria-expanded="false">Projects</a>
         
+          
+            <div class="offcanvas offcanvas-top" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
+                <div class="offcanvas-header">
+                  <h5 class="offcanvas-title" id="offcanvasTopLabel">Offcanvas top</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                  ...
+                </div>
+              </div>
+          
+
+
+
         <!-- Mega menu starts here!  -->
-        <div class="dropdown-menu container-fluid" aria-labelledby="projectsDropdown">
-            <div class="container-fluid">
+        <!-- <div class="dropdown-menu container-fluid shadow-lg" aria-labelledby="projectsDropdown">
+            <div class="container-fluid m-5 p-5">
             <a class="dropdown-item" href="">Projects Home</a>
             <a class="dropdown-item" href="">Robots</a>
             <div class="dropdown-divider"></div>
@@ -39,7 +48,7 @@
                 </div>
 
             </div>
-        </div>
+        </div> -->
         </li>
         <li class="nav-item">
             <a href="/blog/" class="nav-link text-uppercase">Blog</a>
@@ -47,7 +56,7 @@
 
         </ul>
         
-        </div>
+       
         
     </div>
     

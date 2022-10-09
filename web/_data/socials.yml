@@ -1,12 +1,9 @@
 - name: YouTube
   link: https://www.youtube.com/kevinmcaleer28
-  icon: "fa-brands fa-youtube"
+  icon: "fab fa-youtube"
 - name: Twitter
   link: https://www.twitter.com/kevsmac
-  icon: "fa-brands fa-twitter"
-- name: Discord
-  link: /discord
-  icon: "fab fa-discord"
+  icon: "fab fa-twitter"
 - name: Instagram
   link: https://www.instagram.com/kevinmcaleer
-  icon: "fa-brands fa-instagram"
+  icon: "fab fa-instagram"
