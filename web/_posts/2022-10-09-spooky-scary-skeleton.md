@@ -27,7 +27,7 @@ tags:
 ## Videos
 There are a couple of videos covering the features, demo and build process for HeyBot.
 
-{% include youtubeplayer.html id="/" %}
+{% include youtubeplayer.html id="/Ldio6vxHGfI" %}
 {% include youtubeplayer.html id="/gboF8HgULg0" %}
 
 ---
