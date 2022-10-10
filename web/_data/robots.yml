@@ -1,3 +1,7 @@
+- name: Spooky Scary Skeleton
+  link: /blog/spooky-scary-skeleton.html
+  cover: /assets/img/blog/spookyscaryskeleton/spookyscaryskeleton.jpg
+  description: Build your own cute Spooky Scary Skeleton Robot for Halloween
 - name: HeyBot
   link: /heybot
   cover: /assets/img/blog/heybot/heybot.jpg
