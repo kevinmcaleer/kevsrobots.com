@@ -257,6 +257,7 @@ Screw in the servo using 2 M2 bolts. The servo spindle should be towards the mid
 
 ## The STL files
 
+### Skeleton
 There are a few parts to download and print:
 
 * [`top.stl`](/assets/stl/skeleton/top.stl) - the top section
@@ -266,5 +267,17 @@ There are a few parts to download and print:
 * [`eyebrows_v2.stl`](/assets/stl/skeleton/eyebrows_v2.stl) - the eye brows
 * [`jaw.stl`](/assets/stl/skeleton/jaw.stl) - the jaw
 * [`gasket_v3.stl`](/assets/stl/skeleton/gasket_v3.stl) - the gasket
+
+If you want the Pumpkin version here are the STL files you'll need (the electronics are exactly the same).
+
+### Pumpkin
+* [`top.stl`](/assets/stl/skeleton/top.stl) - the top section
+* [`bottom.stl`](/assets/stl/skeleton/bottom.stl) - the bottom section
+* [`cog.stl`](/assets/stl/skeleton/cog.stl) - the servo cog
+* [`gasket_v3.stl`](/assets/stl/skeleton/gasket_v3.stl) - the gasket (you may need x2 of these)
+* [`eyebrows_v2.stl`](/assets/stl/skeleton/eyebrows_v2.stl) - the eye brows
+* [`jaw.stl`](/assets/stl/skeleton/jaw.stl) - the jaw
+* [`pumpkin.stl`](/assets/stl/skeleton/pumpkin.stl) - Pumpkin face
+* [`eyemask.stl`](/assets/stl/skeleton/eyemask.stl) - Eye mask (goes behind the pumpkin face, best printed in Black PLA)
 
 If you enjoy these files, please consider [buying me a coffee](/coffee) (it took a while to design these!)
