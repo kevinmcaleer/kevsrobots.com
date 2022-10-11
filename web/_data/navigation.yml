@@ -1,7 +1,7 @@
 - name: 
   link: /
   icon: "fas fa-home"
-- name: Projects
+- name: Robots & Projects
   link: /robots/
 - name: BLOG
   link: /blog/

@@ -3,61 +3,102 @@
     <div class="container-fluid">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
        
-        <li class="nav-item">
-            <a href="/" class="nav-link text-uppercase"><i class="fas fa-home mx-1"></i></a>
-        </li>
-        <li class="nav-item dropdown">
-            <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop">Toggle top offcanvas</button> -->
-
-            <a href="#" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop" aria-expanded="false">Projects</a>
-        
-          
-            <div class="offcanvas offcanvas-top" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
-                <div class="offcanvas-header">
-                  <h5 class="offcanvas-title" id="offcanvasTopLabel">Offcanvas top</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <li class="nav-item dropdown has-megamenu">
+            <a href="/" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="dropdown"><i class="fas fa-home mx-1"></i></a>
+            <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
+                <div class="bg-white rounded-3 p-3">
+                <a href="/" class="text-decoration-none black"><h5 class="menu-title">home</h5></a>
+                {% assign pages = site.data.nav_home %}
+                <ul class="nav flex-column">
+                    {% for page in pages %}
+                    <li class="nav-link m-0 p-0">
+                        <a class="nav-item dotted" href="{{page.link}}">{{page.name}}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
                 </div>
-                <div class="offcanvas-body">
-                  ...
-                </div>
-              </div>
-          
-
-
-
-        <!-- Mega menu starts here!  -->
-        <!-- <div class="dropdown-menu container-fluid shadow-lg" aria-labelledby="projectsDropdown">
-            <div class="container-fluid m-5 p-5">
-            <a class="dropdown-item" href="">Projects Home</a>
-            <a class="dropdown-item" href="">Robots</a>
-            <div class="dropdown-divider"></div>
-            <div class="d-md-flex align-items-start justify-content-center">
-
-                <div>
-                    <div class="dropdown-header">Robots</div>
-                    <a class="dropdown-item" href="">item 1</a>
-                    <a class="dropdown-item" href="">item 2</a>
-                    <a class="dropdown-item" href="">item 3</a>
-                </div>
-
-                <div>
-                    <div class="dropdown-header">Projects</div>
-                    <a class="dropdown-item" href="">item 1</a>
-                    <a class="dropdown-item" href="">item 2</a>
-                    <a class="dropdown-item" href="">item 3</a>
-                </div>
-
             </div>
-        </div> -->
         </li>
-        <li class="nav-item">
-            <a href="/blog/" class="nav-link text-uppercase">Blog</a>
+        <li class="nav-item dropdown has-megamenu">
+            <a href="#" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="dropdown">Robots &amp; Projects</a>
+            <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
+                <div class="row row-cols-md-5 row-cols-sm-2 m-0">
+                    <div class="col h-100">
+                    <div class="bg-white rounded-3 p-3">
+                    <a href="/robots/" class="text-decoration-none black"><h5 class="menu-title">Robots</h5></a>
+                    {% assign robots = site.data.robots %}
+                    {% for robot in robots %}
+                    <ul class="nav flex-column">
+                        <li class="nav-link m-0 p-0">
+                            <a class="nav-item dotted" href="{{robot.link}}">{{robot.name}}</a>
+                        </li>
+                    </ul>
+                    
+                    {% endfor %}
+                    </div>
+                    </div>
+                <div class="col h-100">
+                    <div class="bg-white rounded-3 p-3">
+                    <h5 class="menu-title">Projects</h5>
+                    <div class="">Coming soon!</div>
+                    </div>
+                </div>
+                <div class="col h-100">
+                    <div class="bg-white rounded-3 p-3">
+                    <a href="/links/" class="text-decoration-none black"><h5 class="menu-title">Links</h5></a>
+                    <ul class="nav flex-column">
+                      {% assign links = site.data.links %}
+                      {% for link in links %}
+                        <li class="nav-link m-0 p-0"><a href="{{ link.link }}" class="nav-item dotted">{{ link.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    </div>
+                  </div>
+                <div class="col h-100">
+                    <div class="bg-white rounded-3 p-3">
+                    <h5 class="menu-title">Recommendations</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-link m-0 p-0">
+                            <a href="/gear/" class="nav-item dotted">Gear List</a>
+                        </li>
+                        <li class="nav-link m-0 p-0">
+                            <a href="/reviews/" class="nav-item dotted">Reviews</a>
+                        </li>
+                    </ul>
+                </div>
+                  </div>
+                  <div class="col h-100">
+                    <div class="bg-white rounded-3 p-3">
+                    <h5 class="menu-title">About Kevs Robots</h5>
+                    <ul class="nav flex-column">
+                        {% assign links = site.data.nav_about %}
+                        {% for link in links%}
+                        <li class="nav-link m-0 p-0">
+                            <a class="nav-item dotted" href="{{link.link}}">{{link.name}}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                  </div>
+                  </div> 
+              </div>
+              <div>
         </li>
-
+        <li class="nav-item dropdown has-megamenu"> 
+            <a href="/blog/" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Blog</a>
+            <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
+                <div class="bg-white rounded-3 p-3">
+                <a href="/blog/" class="text-decoration-none black"><h5 class="menu-title">Blog</h5></a>
+                {% assign pages = site.data.nav_blog %}
+                <ul class="nav flex-column">
+                    {% for page in pages %}
+                    <li class="nav-link m-0 p-0">
+                        <a class="nav-item dotted" href="{{page.link}}">{{page.name}}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            </div>
+        </li>
         </ul>
-        
-       
-        
     </div>
-    
 </nav>

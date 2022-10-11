@@ -21,10 +21,9 @@ html {
 nav {
     // background-color: $kevred;
     .nav-link {
-      font-family: vox, sans-serif;
+      font-family: $kev_font, sans-serif;
       font-size: 12pt;
       color: $kevred;
-    
     }
     .nav-link:hover {
         color: #FFCA29;
@@ -161,6 +160,12 @@ nav {
     font-weight: 700;
   }
 
+  .menu-title {
+    text-decoration-line: underline;
+    text-decoration-style: dotted !important;
+    text-decoration-line: 1px;
+  }
+
   .dotted {
     text-decoration-style: dotted !important;
     text-decoration-line: 1px;
@@ -200,7 +205,7 @@ h1 {
       }
     }
     h1, h2, h3, h4, h5 {
-      font-family: 'Vox', sans-serif;
+      font-family: $kev_font, sans-serif;
     }
     h2 {
       font-size: 30pt;
@@ -280,9 +285,13 @@ a.dotted {
 }
 
 h5 {
-  font-family: Vox, sans-serif;
+  font-family: $kev_font, sans-serif;
   font-size: 17pt !important;
   text-transform: uppercase;
+}
+
+.bg-white {
+  background-color: white;
 }
 
 @media (max-width: 1250px) {
@@ -303,17 +312,20 @@ h5 {
   background-color: #FFCA29;
   color: black !important;
   border-radius: 5px;
-  transition: ease 0.15s;
+  transition: ease 0.5s;
 }
 
 i {
   width: 16px !important; height: inherit; 
 }
 
-.navbar .megamenu{ padding: 1rem; }
+.navbar .megamenu{ 
+  padding: 10px; 
+  transition: ease 0.5s;
+}
 
 /* ============ desktop view ============ */
-@media all and (min-width: 992px) {
+@media all  {
 
   .navbar .has-megamenu{position:static!important;}
   .navbar .megamenu{left:0; right:0; width:100%; margin-top:0;  }
@@ -322,11 +334,19 @@ i {
 /* ============ desktop view .end// ============ */
 
 /* ============ mobile view ============ */
-@media(max-width: 991px){
-  .navbar.fixed-top .navbar-collapse, .navbar.sticky-top .navbar-collapse{
-    overflow-y: auto;
-      max-height: 90vh;
-      margin-top:10px;
-  }
-}
+// @media(max-width: 991px){
+//   .navbar.fixed-top .navbar-collapse, .navbar.sticky-top .navbar-collapse{
+//     overflow-y: auto;
+//       max-height: 90vh;
+//       margin-top: 0px;
+//   }
+// }
 /* ============ mobile view .end// ============ */
+
+ul.nav li.nav-link a.nav-item.dotted {
+  text-decoration-style: dotted !important;
+  text-decoration-line: 1px !important;
+  // text-decoration-color: $orange !important;
+  color: $orange ;
+  font-family: Lato, sans-serif;
+}
