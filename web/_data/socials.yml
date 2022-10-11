@@ -1,0 +1,9 @@
+- name: YouTube
+  link: https://www.youtube.com/kevinmcaleer28
+  icon: "fab fa-youtube"
+- name: Twitter
+  link: https://www.twitter.com/kevsmac
+  icon: "fab fa-twitter"
+- name: Instagram
+  link: https://www.instagram.com/kevinmcaleer
+  icon: "fab fa-instagram"
