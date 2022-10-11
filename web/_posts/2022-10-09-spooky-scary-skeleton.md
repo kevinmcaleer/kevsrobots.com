@@ -265,6 +265,6 @@ There are a few parts to download and print:
 * [`cog.stl`](/assets/stl/skeleton/cog.stl) - the servo cog
 * [`eyebrows_v2.stl`](/assets/stl/skeleton/eyebrows_v2.stl) - the eye brows
 * [`jaw.stl`](/assets/stl/skeleton/jaw.stl) - the jaw
-* [`gasket_v2.stl`](/assets/stl/skeleton/gasket_v2.stl) - the gasket
+* [`gasket_v3.stl`](/assets/stl/skeleton/gasket_v3.stl) - the gasket
 
 If you enjoy these files, please consider [buying me a coffee](/coffee) (it took a while to design these!)
