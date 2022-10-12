@@ -1,11 +1,14 @@
 ---
-layout: content
+layout: default
 ---
+{% include nav_robots.html %}
+<div class="container-fluid">
+    {% include breadcrumbs.html %}
 
-{% include breadcrumbs.html %}
 
-<h1>{{page.title}}</h1>
-<h2>{{page.subtitle}}</h2>
-<hr />
+    <h1>{{page.title}}</h1>
+    <h2>{{page.subtitle}}</h2>
+    <hr />
 
-{{content}}
+    {{content}}
+</div>

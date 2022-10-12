@@ -1,0 +1,5 @@
+- name: Robots
+  link: /robots/index.html
+- name: Build Your Own AI Assistant
+  link: /robots/pythonai/
+
