@@ -201,19 +201,33 @@ h1 {
       font-size: 11pt !important;
       color: rgb(86, 86, 86) !important;
       strong {
-        font-weight: 700; 
+        font-weight: 900; 
       }
     }
     h1, h2, h3, h4, h5 {
       font-family: $kev_font, sans-serif;
+      text-transform: uppercase;
     }
     h2 {
       font-size: 30pt;
     }
-    a {
+    #markdown-toc
+    {
+      list-style: none;
+      margin-left: 0px;
+      padding-left: 0px;
+      li a {
+        color: $orange;
+        text-decoration-style: dotted;
+      }
+    }
+
+    li a {
       color: $orange;
       text-decoration-style: dotted;
     }
+    
+
   }
 
 .note {
@@ -350,3 +364,4 @@ ul.nav li.nav-link a.nav-item.dotted {
   color: $orange ;
   font-family: Lato, sans-serif;
 }
+

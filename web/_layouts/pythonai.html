@@ -1,27 +1,25 @@
 ---
-layout: default
+layout: content
 ---
 {% include nav_robots.html %}
 <div class="container-fluid">
     {% include breadcrumbs.html %}
     <div class="row">
-    <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bg-light rounded-3">
         {% include nav_pythonai.html %}
     </div>
-    <div class="col-lg-8 col-md-10 col-sm-12 col-xs-12">
+    
+    <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12">
+        <article>
+        <div class="px-3">
         <h1>{{page.title}}</h1>
-        <h2>{{page.subtitle}}</h2>
+        <h5>{{page.subtitle}}</h5>
         <hr />
 
         {{content}}
     </div>
-    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
-        {% if page.video %}
-        <h5>Watch the Video</h5>
-        {% include youtubeplayer.html id=page.video small=true %}
-        <p><a href="{{ page.code }}">Grab the code</a></p>
-        {% endif%}
-    </div>
+</div>
+</article>
 </div>
 
 </div>
