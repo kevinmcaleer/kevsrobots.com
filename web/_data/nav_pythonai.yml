@@ -1,0 +1,22 @@
+- name: Introduction
+  link: /robots/pythonai/index.html
+  show: false
+- name: Part 1 - Creating the Assistant
+  link: /robots/pythonai/part1.html
+  description: Learn how to build your own Jarvis-like AI assistant, in Python
+- name: Part 2 - To Do Lists!
+  link: /robots/pythonai/part2.html
+- name: Part 3 - Object Classification with Python
+  link: /robots/pythonai/part3.html
+# - name: Part 4 - Weather Skill
+#   link: /robots/pythonai/part4.html
+# - name: Part 5 - Calendar Skill
+#   link: /robots/pythonai/part5.html
+# - name: Part 6 - Skills and Plugins
+#   link: /robots/pythonai/part6.html
+# - name: Part 7 - Simple Pomodoro Skill
+#   link: /robots/pythonai/part7.html
+# - name: Bonus - Jetson Nano Custom Object Detection - how to train your AI
+#   link: /robots/pythonai/bonus01.html
+# - name: Bonus - Face Detection using OpenCV and a Raspberry Pi Zero
+#   link: /robots/pythonai/bonus02.html
