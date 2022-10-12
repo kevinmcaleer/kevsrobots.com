@@ -1,0 +1,28 @@
+{% assign posts = site.posts %}
+<div class="">
+<nav class="navbar">
+    <div class="container-fluid">
+      <span class="navbar-text">
+        Recent Posts 
+      </span>
+      <span class="navbar-text">
+        <a href="/blog/all_blogs.html" class="dotted">All Posts ></a>
+      </span>
+    </div>
+  </nav>
+
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6">
+    {% for post in posts limit:6 %}
+    <div class="col mb-3">
+        <div class="card h-100">
+            <a href="{{post.url}}" class="nav-item dotted">
+                <img src="{{post.cover}}" class="card-img-top">
+            <div class="card-body">
+                <p class="card-text">{{post.title}}</p>
+            </div>    
+            </a>
+        </div>
+    </div>
+    {% endfor %} 
+</div>
+</div>
