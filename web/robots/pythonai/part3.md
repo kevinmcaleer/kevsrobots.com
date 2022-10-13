@@ -22,8 +22,6 @@ This is a bit of a tangent, though it is part of our AI series. Watch the video,
 
 ### Video on YouTube
 
-### Video on YouTube
-
 I created a popular video series on YouTube, which goes over each of the steps below. The third part is featured below.
 
 {% include youtubeplayer.html id="2rIJFSLZzhM" %}
