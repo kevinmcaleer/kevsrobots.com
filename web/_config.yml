@@ -23,9 +23,9 @@ collections:
   ptor:
     output: true
     permalink: /ptor/:name.html
-  robots:
-    output: true
-    permalink: /robots/:name.html
+  # robots:
+  #   output: true
+  #   permalink: /robots/:name.html
   reviews:
     output: true
     permalink: /reviews/:name.html
