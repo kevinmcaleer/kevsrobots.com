@@ -6,12 +6,12 @@ date: 22-10-30
 excerpt: A great robot kit, particularly for the classroom - small, affordable and rich in features.
 cover: /assets/img/reviews/cutebot.jpg
 link: https://amzn.to/3DMG0v4
-rating: 4
+rating: 5
 ---
 
 ## 👍 Recommendation
 
-This is a solid buy recommendation, if you already have a micro:bit you can use that instead of the Pico:ed.
+This is a solid buy recommendation, This is a perfect starter kit for getting into robotics, and learning how to programme. if you already have a micro:bit you can use that instead of the Pico:ed.
 
 ---
 
@@ -21,7 +21,10 @@ This is a solid buy recommendation, if you already have a micro:bit you can use 
 ---
 
 ## Elecfreak Cutebot Review
-[Cutebot](https://www.elecfreaks.com/elecfreaks-pico-ed-smart-cutebot-kit-with-pico-ed-board.html) is a small programmable robot, based on the Pico:Ed or Micro:bit microcontroller. It can be programmed in MicroPython, [Microblocks](https://microblocks.fun/) and C++.
+[Cutebot](https://www.elecfreaks.com/elecfreaks-pico-ed-smart-cutebot-kit-with-pico-ed-board.html) is a small programmable robot, based on the Pico:Ed or Micro:bit microcontroller. It can be programmed in MicroPython, [Microblocks](http://www.microblocks.fun/) and C++.
+
+
+[![Cutebot on a desk](/assets/img/reviews/cutebot02.jpg){:class="img-fluid w-100"}](/assets/img/reviews/cutebot02.jpg)
 
 ### Features
 Cutebot has the following features:
@@ -38,6 +41,7 @@ Cutebot has the following features:
 ---
 
 ### Whats in the box
+
 The Cutebot kit contains everything you need to get started (apart from 3 AAA batteries). The box contains:
 
 * The Cutebot robot
@@ -48,6 +52,28 @@ The Cutebot kit contains everything you need to get started (apart from 3 AAA ba
 * User Instructions
 * A line following sheet; the robot can follow the black line drawn on the sheet
 
+#### User instructions
+
+The guide that comes with the kit has a couple of easy examples (they call then cases, as in use-cases) to get you started:
+
+* Case 01: Move Forward or Reverse at the Full Speed
+* Case 02: Speed Up Gradually
+* Case 03: Dance in Figure-of-eight
+* Case 04: Run at Random
+* Case 05: Automatic Headlights
+* Case 06: Steering&Clearance Lamps
+* Case 07: Fall-arrest Cutebot
+* Case 08: Run Along the Black Line
+* Case 09: Autonomous Obstacle Avoidance
+* Case 10: Car Following with A Fixed Distance
+* Case 11: micro:bit Remote Control
+* Case 12: Remote Control the Cutebot with micro:bit Accelerometer
+* Case 13: Remote Control with Joystick:bit
+* Case 14: IR Remote Control Car
+* Case 15: Seeking the Light
+
+You can access the examples here: <https://www.elecfreaks.com/learn-en/microbitKit/smart_cutebot/index.html>
+
 ---
 
 ### Programming languages
@@ -55,13 +81,13 @@ The Cutebot kit contains everything you need to get started (apart from 3 AAA ba
 The Pico:ed (and therefore cutebot), can be programmed using a couple of different approaches:
 
 #### Microblocks
-[Microblocks](https://microblocks.fun/) is a Scratch-like, visual programming environment suited to beginners, particularly young people in education.
+[Microblocks](http://www.microblocks.fun/) is a Scratch-like, visual programming environment suited to beginners, particularly young people in education.
 
 #### MicroPython
-[Micro:bit Makemode](https://makemode.microbit.org) provides an web-based environment for coding in MicroPython.
+[Micro:bit Makemode](https://makecode.microbit.org) provides an web-based environment for coding in MicroPython.
 
 #### Javascript
-[Micro:bit Makemode - Javascript mode](https://makemode.microbit.org) also enables you to program the Pico:ed in Javascript, simply by toggling he slider over from Python to Javascript.
+[Micro:bit Makemode - Javascript mode](https://makecode.microbit.org) also enables you to program the Pico:ed in Javascript, simply by toggling he slider over from Python to Javascript.
 
 #### C++
 For the more experienced and hardcore programmer, the Pico:ed can be programmed in C++. The main benefit of this is the speed of execution of code, and the smaller code size on board. The main disadvantage is that C++ can be quite complicated and intimidating for beginners, and requires experience and knowledge to do the most basic of things.
