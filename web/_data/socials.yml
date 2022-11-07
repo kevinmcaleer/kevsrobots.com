@@ -7,3 +7,6 @@
 - name: Instagram
   link: https://www.instagram.com/kevinmcaleer
   icon: "fab fa-instagram"
+- name: Mastodon
+  link: https://mastodon.social/@kevsmac
+  icon: "fa-brands fa-mastodon"
