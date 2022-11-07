@@ -25,7 +25,10 @@ tags:
 
 # YouTube Video
 Click the thumbnail below to watch the show all about this build.
-{% include youtubeplayer.html id="2f0fhte4vno" %}
+
+{% include youtubeplayer.html id="8oVOS6xfmkw" %}
+{% include youtubeplayer.html id="aUqe8S0VR0M" %}
+{% include youtubeplayer.html id="qzTNFwcfJ5U" %}
 
 ---
 
