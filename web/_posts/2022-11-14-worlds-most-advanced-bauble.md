@@ -43,6 +43,17 @@ In this tutorial we'll look at:
 
 ---
 
+## Bill of Materials
+
+Item                             | Description               | Qty |  Price
+---------------------------------|---------------------------|:---:|------:
+[Pimoroni Plasma Stick 2040 W ](https://shop.pimoroni.com/products/plasma-stick-2040-w)    | Raspberry Pi Pico, aboard |  1  | £12.00
+[Adafruit Jewel 7x Neopixel model](https://www.adafruit.com/product/2226) | 7 RGB unit                |  1  |  $5.95
+{:class="table table-striped"}
+
+
+---
+
 ## Cheerlights
 
 ### What is it?
