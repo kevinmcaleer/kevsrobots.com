@@ -1,3 +1,7 @@
+- name: Ultrasonic Radar Robot
+  link: https://www.kevsrobots.com/blog/radar-robot.html
+  cover: /assets/img/blog/radar/radar.jpg
+  description: Build a robot that can scan its surroundings with sound
 - name: Spooky Scary Skeleton
   link: /blog/spooky-scary-skeleton.html
   cover: /assets/img/blog/spookyscaryskeleton/spookyscaryskeleton.jpg
