@@ -1,0 +1,26 @@
+- name: Learn MicroPython
+  author: Kevin McAleer
+  date_created: 28-10-2022
+  date_published: 28-10-2022
+  layout: course
+  cover: assets/thonny.png
+  description: >- 
+     Get started with MicroPython, What Python is, where to download it and which software to use to develop Python code
+     Reserved words
+     Variables
+     Loops
+     Flow control
+     Operators
+     Functions
+  content:
+  - section:
+      name: Overview
+      content:
+      - intro.md 
+      
+  - section:
+      name: Introduction
+      content:
+      - lesson01.md
+      - lesson02.md
+      - lesson03.md
