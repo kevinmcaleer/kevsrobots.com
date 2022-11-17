@@ -1,6 +1,5 @@
 - cover: /learn/micropython/assets/thonny.png
   description: Get started with MicroPython, What Python is, where to download it
-    and which software to use to develop Python code Reserved words Variables Loops
-    Flow control Operators Functions
+    and which software to use to develop MicroPython code
   link: /learn/micropython/intro.html
   name: Learn MicroPython

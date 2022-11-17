@@ -3,6 +3,7 @@ title: Why is it called Python?
 description: It’s nothing to do with snakes 🐍
 layout: lesson
 type: lesson
+thanks: false
 ---
 
 Python gets it name from a TV show...

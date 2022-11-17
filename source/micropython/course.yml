@@ -5,13 +5,7 @@
   layout: course
   cover: assets/thonny.png
   description: >- 
-     Get started with MicroPython, What Python is, where to download it and which software to use to develop Python code
-     Reserved words
-     Variables
-     Loops
-     Flow control
-     Operators
-     Functions
+     Get started with MicroPython, What Python is, where to download it and which software to use to develop MicroPython code
   content:
   - section:
       name: Overview
@@ -24,3 +18,14 @@
       - lesson01.md
       - lesson02.md
       - lesson03.md
+      - lesson04.md
+      - lesson05.md
+      - lesson06.md
+  - section:
+      name: Variables and Reserved Words
+      content:
+      - lesson07.md
+      - values_and_variable_types.md
+      - reserved_words.md
+      - loops.md
+      - example02.md

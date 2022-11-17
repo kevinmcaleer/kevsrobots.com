@@ -1,12 +1,12 @@
 ---
 layout: lesson
-title: Why use MicroPython?
+title: Loops
 author: Kevin McAleer
 type: page
-previous: lesson02.html
-next: lesson04.html
-description: It's designed to be easy to read and write, perfect for beginners
-percent: 32
+previous: reserved_words.html
+next: example02.html
+description: Flow Control
+percent: 88
 navigation:
 - name: Learn MicroPython
 - content:
@@ -43,27 +43,10 @@ navigation:
 ---
 
 
-MicroPython is easier to write, cleaner and clearer to read, and faster to get the results you want, than other languages such as C++.
+The `If` statement will evalute (check or test) if a condition is `True` or `False`.
 
-Compare these two examples below. First is a piece of code written for the Arduino in C++:
+If the statement is `True` it will run a block of code.
 
-```C
-#include “stdio.h”
-void helloWorld() {
-  printf(“hello world”);
-}
-void main() {
-  helloWorld();
-}
-```
+If the statement is `False` it will not run the block of code and continue the normal flow of the program.
 
-The second piece of code is written in MicroPython:
-
-```python
-def hello_world():
-  print(“hello world)
-
-hello_world()
-```
-
-As you can see, the MicroPython code is simpler, easier to read, shorter and faster to write.
+![If Else](assets/if_else.jpg){:class="img-fluid w-100"}

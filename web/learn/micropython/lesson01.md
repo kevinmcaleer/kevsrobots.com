@@ -6,7 +6,8 @@ type: lesson
 previous: intro.html
 next: lesson02.html
 description: "It\u2019s nothing to do with snakes \U0001F40D"
-percent: 50
+percent: 16
+thanks: false
 navigation:
 - name: Learn MicroPython
 - content:
@@ -22,6 +23,24 @@ navigation:
       link: lesson02.html
     - name: Why use MicroPython?
       link: lesson03.html
+    - name: Python Development Environments
+      link: lesson04.html
+    - name: Our first program
+      link: lesson05.html
+    - name: Example 01
+      link: lesson06.html
+  - section: Variables and Reserved Words
+    content:
+    - name: Variables
+      link: lesson07.html
+    - name: Values & Variables Types
+      link: values_and_variable_types.html
+    - name: Reserved Words
+      link: reserved_words.html
+    - name: Loops
+      link: loops.html
+    - name: Example 02
+      link: example02.html
 ---
 
 

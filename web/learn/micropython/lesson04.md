@@ -1,12 +1,12 @@
 ---
 layout: lesson
-title: Why use MicroPython?
+title: Python Development Environments
 author: Kevin McAleer
 type: page
-previous: lesson02.html
-next: lesson04.html
-description: It's designed to be easy to read and write, perfect for beginners
-percent: 32
+previous: lesson03.html
+next: lesson05.html
+description: Choose the best development tool for you
+percent: 40
 navigation:
 - name: Learn MicroPython
 - content:
@@ -43,27 +43,16 @@ navigation:
 ---
 
 
-MicroPython is easier to write, cleaner and clearer to read, and faster to get the results you want, than other languages such as C++.
+You can write MicroPython code in NotePad (on Windows), or TextEdit (on macOS), however its better to use a MicroPython editor, also known as a development environment, to create code.
 
-Compare these two examples below. First is a piece of code written for the Arduino in C++:
+The development environment will enable you to create faster, more accurate code, with features such as autocomplete, code hinting (it tells you what the code means) and line numbering. Most development environments also have code highlighting where the words you type change colour based on their meaning within the code.
 
-```C
-#include “stdio.h”
-void helloWorld() {
-  printf(“hello world”);
-}
-void main() {
-  helloWorld();
-}
-```
+Here are a list of development environments:
 
-The second piece of code is written in MicroPython:
+* VS Code - Microsoft Visual Studio Code (My personal favourite)
+* Atom
+* PyCharm
+* MU
+* Thonny
+* Microsoft Makecode
 
-```python
-def hello_world():
-  print(“hello world)
-
-hello_world()
-```
-
-As you can see, the MicroPython code is simpler, easier to read, shorter and faster to write.

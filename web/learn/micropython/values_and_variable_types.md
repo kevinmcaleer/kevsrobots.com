@@ -1,0 +1,73 @@
+---
+layout: lesson
+title: Values & Variables Types
+author: Kevin McAleer
+type: page
+previous: lesson07.html
+next: reserved_words.html
+description: NUMBERS, TEXT, LISTS AND DICTIONARIES
+percent: 72
+navigation:
+- name: Learn MicroPython
+- content:
+  - section: Overview
+    content:
+    - name: Introduction
+      link: intro.html
+  - section: Introduction
+    content:
+    - name: Why is it called Python?
+      link: lesson01.html
+    - name: Where to get MicroPython
+      link: lesson02.html
+    - name: Why use MicroPython?
+      link: lesson03.html
+    - name: Python Development Environments
+      link: lesson04.html
+    - name: Our first program
+      link: lesson05.html
+    - name: Example 01
+      link: lesson06.html
+  - section: Variables and Reserved Words
+    content:
+    - name: Variables
+      link: lesson07.html
+    - name: Values & Variables Types
+      link: values_and_variable_types.html
+    - name: Reserved Words
+      link: reserved_words.html
+    - name: Loops
+      link: loops.html
+    - name: Example 02
+      link: example02.html
+---
+
+
+Programs often need to work with numbers and text, adding and subtracting, asking questions and processing answers.
+
+Python is able to label different types of values so that it can make different commands available to us.
+
+The different types of values are listed below:
+
+| Value Types | Description                                                  | Example                                            |
+|:------------|:-------------------------------------------------------------|----------------------------------------------------|
+| `integer`   | A whole number, which can be positive or negative            | `1, 2, 3, 4, -500, 1000`                            |
+| `float`     | A decimal number, which can be positive or negative          | `3.14, -2.5, 1.66666 `                               |
+| `string`    | A line of text                                               | `'hello world', 'my name is Kevin'  `                |
+| `list`      | A collection of words or numbers, or objects                 | `[‘cat’,’dog’,’fish’,’gecko’], `or `[1,2,3,5,8,13,21]` |
+| `dict`      | A dictionary - a list, with pairs of values                  | `{‘name’:’Kevin’, ‘address’:’UK’, ‘age’:45} `        |
+| `object`    | An instance of a class (we’ll cover this in a later session) | Object of `'Cat'` Class                              |
+{:class="table-w100 table table-bordered"}
+
+When we assign a value to a variable, it is said to have the a *type*.
+e.g.
+
+```python
+a = 1
+b = 2.1
+c = "hello"
+```
+
+In this example `a` contains the value `1` and is of type `integer`, `b` contains the value `2.1` and is of type `float` (because it has a decimal point), and `c` contains `hello` and is of type `string` because it contains a text wrapped inside some speech marks.
+
+---
