@@ -3,8 +3,8 @@ layout: lesson
 title: Where to get MicroPython
 author: Kevin McAleer
 type: page
-previous: why_is_it_called_micropython.html
-next: installing_micropython.html
+previous: 01_why_is_it_called_micropython.html
+next: 03_installing_micropython.html
 description: MicroPython can be installed on many 32bit microcontrollers
 percent: 21
 navigation:
@@ -13,19 +13,19 @@ navigation:
   - section: Overview
     content:
     - name: Introduction
-      link: intro.html
+      link: 00_intro.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?
-      link: why_is_it_called_micropython.html
+      link: 01_why_is_it_called_micropython.html
     - name: Where to get MicroPython
-      link: lesson02.html
+      link: 02_where_to_get_micropython.html
     - name: How to Install MicroPython
-      link: installing_micropython.html
+      link: 03_installing_micropython.html
     - name: Why use MicroPython?
-      link: lesson03.html
+      link: 04_why_use_micropython.html
     - name: Python Development Environments
-      link: lesson04.html
+      link: 05_ides.html
     - name: Our first program
       link: lesson05.html
     - name: Example 01

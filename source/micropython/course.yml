@@ -10,16 +10,16 @@
   - section:
       name: Overview
       content:
-      - intro.md 
+      - 00_intro.md 
       
   - section:
       name: Introduction
       content:
-      - why_is_it_called_micropython.md
-      - lesson02.md
-      - installing_micropython.md
-      - lesson03.md
-      - lesson04.md
+      - 01_why_is_it_called_micropython.md
+      - 02_where_to_get_micropython.md
+      - 03_installing_micropython.md
+      - 04_why_use_micropython.md
+      - 05_ides.md
       - lesson05.md
       - lesson06.md
   - section:

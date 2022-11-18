@@ -3,8 +3,8 @@ layout: lesson
 title: Why use MicroPython?
 author: Kevin McAleer
 type: page
-previous: installing_micropython.html
-next: lesson04.html
+previous: 03_installing_micropython.html
+next: 05_ides.html
 description: It's designed to be easy to read and write, perfect for beginners
 percent: 35
 navigation:
@@ -13,19 +13,19 @@ navigation:
   - section: Overview
     content:
     - name: Introduction
-      link: intro.html
+      link: 00_intro.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?
-      link: why_is_it_called_micropython.html
+      link: 01_why_is_it_called_micropython.html
     - name: Where to get MicroPython
-      link: lesson02.html
+      link: 02_where_to_get_micropython.html
     - name: How to Install MicroPython
-      link: installing_micropython.html
+      link: 03_installing_micropython.html
     - name: Why use MicroPython?
-      link: lesson03.html
+      link: 04_why_use_micropython.html
     - name: Python Development Environments
-      link: lesson04.html
+      link: 05_ides.html
     - name: Our first program
       link: lesson05.html
     - name: Example 01
@@ -45,9 +45,13 @@ navigation:
 ---
 
 
-MicroPython is easier to write, cleaner and clearer to read, and faster to get the results you want, than other languages such as C++.
+MicroPython is ***easier to write***, ***cleaner*** and ***clearer to read***, and ***faster to get the results you want***, than other languages such as C++.
 
-Compare these two examples below. First is a piece of code written for the Arduino in C++:
+Compare these two examples below. 
+
+First is a piece of code written for the `Arduino` in `C++`:
+
+## C++
 
 ```C
 #include “stdio.h”
@@ -59,7 +63,9 @@ void main() {
 }
 ```
 
-The second piece of code is written in MicroPython:
+The second piece of code is written in `MicroPython`:
+
+## MicroPython
 
 ```python
 def hello_world():

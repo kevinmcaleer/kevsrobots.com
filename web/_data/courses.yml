@@ -1,5 +1,5 @@
 - cover: /learn/micropython/assets/thonny.png
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code
-  link: /learn/micropython/intro.html
+  link: /learn/micropython/00_intro.html
   name: Learn MicroPython

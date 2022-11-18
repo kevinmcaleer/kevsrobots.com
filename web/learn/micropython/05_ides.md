@@ -3,7 +3,7 @@ layout: lesson
 title: Python Development Environments
 author: Kevin McAleer
 type: page
-previous: lesson03.html
+previous: 04_why_use_micropython.html
 next: lesson05.html
 description: Choose the best development tool for you
 percent: 42
@@ -13,19 +13,19 @@ navigation:
   - section: Overview
     content:
     - name: Introduction
-      link: intro.html
+      link: 00_intro.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?
-      link: why_is_it_called_micropython.html
+      link: 01_why_is_it_called_micropython.html
     - name: Where to get MicroPython
-      link: lesson02.html
+      link: 02_where_to_get_micropython.html
     - name: How to Install MicroPython
-      link: installing_micropython.html
+      link: 03_installing_micropython.html
     - name: Why use MicroPython?
-      link: lesson03.html
+      link: 04_why_use_micropython.html
     - name: Python Development Environments
-      link: lesson04.html
+      link: 05_ides.html
     - name: Our first program
       link: lesson05.html
     - name: Example 01
@@ -45,13 +45,13 @@ navigation:
 ---
 
 
-You can write MicroPython code in NotePad (on Windows), or TextEdit (on macOS), however its better to use a MicroPython editor, also known as a development environment, to create code.
+You could write MicroPython code in `NotePad` (on `Windows`), or `TextEdit` (on `macOS`), however it is better to use a MicroPython editor, also known as a `development environment`, to create code.
 
 The development environment will enable you to create faster, more accurate code, with features such as autocomplete, code hinting (it tells you what the code means) and line numbering. Most development environments also have code highlighting where the words you type change colour based on their meaning within the code.
 
 Here are a list of development environments:
 
-* VS Code - Microsoft Visual Studio Code (My personal favourite)
+* [`VS Code`](https://code.microsoft.com) - Microsoft Visual Studio Code (My personal favourite)
 * Atom
 * PyCharm
 * MU

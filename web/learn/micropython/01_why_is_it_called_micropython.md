@@ -3,8 +3,8 @@ layout: lesson
 title: Why is it called MicroPython?
 author: Kevin McAleer
 type: lesson
-previous: intro.html
-next: lesson02.html
+previous: 00_intro.html
+next: 02_where_to_get_micropython.html
 description: "It\u2019s nothing to do with tiny snakes \U0001F40D"
 percent: 14
 thanks: false
@@ -14,19 +14,19 @@ navigation:
   - section: Overview
     content:
     - name: Introduction
-      link: intro.html
+      link: 00_intro.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?
-      link: why_is_it_called_micropython.html
+      link: 01_why_is_it_called_micropython.html
     - name: Where to get MicroPython
-      link: lesson02.html
+      link: 02_where_to_get_micropython.html
     - name: How to Install MicroPython
-      link: installing_micropython.html
+      link: 03_installing_micropython.html
     - name: Why use MicroPython?
-      link: lesson03.html
+      link: 04_why_use_micropython.html
     - name: Python Development Environments
-      link: lesson04.html
+      link: 05_ides.html
     - name: Our first program
       link: lesson05.html
     - name: Example 01
