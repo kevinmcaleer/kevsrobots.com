@@ -15,8 +15,9 @@
   - section:
       name: Introduction
       content:
-      - lesson01.md
+      - why_is_it_called_micropython.md
       - lesson02.md
+      - installing_micropython.md
       - lesson03.md
       - lesson04.md
       - lesson05.md

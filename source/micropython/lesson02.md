@@ -4,19 +4,10 @@ title: Where to get MicroPython
 description: MicroPython can be installed on many 32bit microcontrollers
 ---
 
-Visit <www.micropython.org> for the latest version, documentation and tutorials.
+[MicroPython](https://www.micropython.org) is actively developed and maintainted by a small group of developers. Visit <https://www.micropython.org> for the latest version, documentation and tutorials.
 
-On the MicroPython website, there is a link to Downloads. There is a build of MicroPython for almost all types of MicroController - as long as the MicroController is capable of running MicroPython, which requires a 32bit processor.
+On the MicroPython website, there is a link to [Downloads](https://www.micropython.org/download/). There is a build of MicroPython for almost all types of MicroController - as long as the MicroController is capable of running MicroPython, which requires a 32bit processor. You'll see a small thumbnail picture of each board along with the name of the board, click on the image of the board you have and then click on the latest release. As of the writing of this tutorial, `v1.19.1 (2022-06-18).uf2` is the latest version.
 
-To make installing MicroPython easier you can use Thonny - which is an Integrated Development Environment (IDE) for Python and MicroPython. To download Thonny, go <https://www.thonny.org> and download the version your computer.
+This will download the firmware onto your computer in your `downloads` folder.
 
-![Screenshot of the Thonny download page](assets/thonny.png){:class="img-fluid w-100"}
-
----
-
-## Installing MicroPython with Thonny
-
-> blurb
-
-Congratulations, you now have the most up-to-date MicroPython installed on your MicroController.
-
+![screenshot of the downloads page on micropython.org](assets/downloads.png){:class="img-fluid w-75 shadow-lg"}

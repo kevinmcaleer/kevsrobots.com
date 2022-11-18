@@ -181,11 +181,17 @@ nav {
     }
   }
 
-h1, h2 {
+h1 {
   // font-family: 'Vox', sans-serif;
   font-family: $kev_font;
   letter-spacing: -3px;
   text-transform: uppercase;
+}
+
+h2 {
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  font-family: $kev_font;
 }
 
 h1 {
@@ -196,10 +202,11 @@ h1 {
 }
 
   article {
-    font-family: 'Lato';
+    // font-family: 'Lato';
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
     p, li, td {
-      font-size: 11pt !important;
-      color: rgb(86, 86, 86) !important;
+      font-size: 13pt !important;
+      color: rgb(113, 113, 113) !important;
       strong {
         font-weight: 900; 
       }
@@ -227,7 +234,7 @@ h1 {
       text-decoration-style: dotted;
     }
     
-
+    
   }
 
 .note {
@@ -363,5 +370,28 @@ ul.nav li.nav-link a.nav-item.dotted {
   // text-decoration-color: $orange !important;
   color: $orange ;
   font-family: Lato, sans-serif;
+  
+}
+ul.nav li.nav-link.active, ul.nav li.nav-link.active a.nav-item.dotted {
+  font-weight: 700 !important;
+  background-color: $orange !important;
+  color: white !important;
+  border-radius: 3px;
+  padding-left: 10px;
 }
 
+.bg-learnhead {
+    background-color: $kevred !important;
+    color:white !important;
+  }
+
+blockquote {
+  border-left: 5px solid $orange;
+  padding: 10px;
+  margin-left: 0px;
+  font-size: 14pt;
+  font-style: italic;
+  color: rgb(255, 255, 255) !important;
+  background-color: $orange!important;
+  border-radius: 3px;
+}

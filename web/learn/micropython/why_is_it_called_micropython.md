@@ -1,12 +1,13 @@
 ---
 layout: lesson
-title: Python Development Environments
+title: Why is it called MicroPython?
 author: Kevin McAleer
-type: page
-previous: lesson03.html
-next: lesson05.html
-description: Choose the best development tool for you
-percent: 42
+type: lesson
+previous: intro.html
+next: lesson02.html
+description: "It\u2019s nothing to do with tiny snakes \U0001F40D"
+percent: 14
+thanks: false
 navigation:
 - name: Learn MicroPython
 - content:
@@ -45,16 +46,14 @@ navigation:
 ---
 
 
-You can write MicroPython code in NotePad (on Windows), or TextEdit (on macOS), however its better to use a MicroPython editor, also known as a development environment, to create code.
+`MicroPython` is a smaller version of the programming language `Python`, designed for use with MicroControllers: `Micro` + `Python`
 
-The development environment will enable you to create faster, more accurate code, with features such as autocomplete, code hinting (it tells you what the code means) and line numbering. Most development environments also have code highlighting where the words you type change colour based on their meaning within the code.
+`Python` gets it name from a TV show...
+> “When he began implementing Python, Guido van Rossum was also reading the published scripts from ‘Monty 
+> Python’s Flying Circus’, a BBC comedy series from the 1970s. Van Rossum thought he needed a name that was 
+> short, unique, and slightly mysterious, so he decided to call the language Python”
+>
+> – docs.python.org
 
-Here are a list of development environments:
-
-* VS Code - Microsoft Visual Studio Code (My personal favourite)
-* Atom
-* PyCharm
-* MU
-* Thonny
-* Microsoft Makecode
-
+## MicroPython background
+MicroPython was created by Damien George, with the initial release launched on 3 May 2014. It's actually a program that runs on MicroControllers, and is itself written in the C language.

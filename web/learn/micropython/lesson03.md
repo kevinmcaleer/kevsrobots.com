@@ -3,10 +3,10 @@ layout: lesson
 title: Why use MicroPython?
 author: Kevin McAleer
 type: page
-previous: lesson02.html
+previous: installing_micropython.html
 next: lesson04.html
 description: It's designed to be easy to read and write, perfect for beginners
-percent: 32
+percent: 35
 navigation:
 - name: Learn MicroPython
 - content:
@@ -16,10 +16,12 @@ navigation:
       link: intro.html
   - section: Introduction
     content:
-    - name: Why is it called Python?
-      link: lesson01.html
+    - name: Why is it called MicroPython?
+      link: why_is_it_called_micropython.html
     - name: Where to get MicroPython
       link: lesson02.html
+    - name: How to Install MicroPython
+      link: installing_micropython.html
     - name: Why use MicroPython?
       link: lesson03.html
     - name: Python Development Environments

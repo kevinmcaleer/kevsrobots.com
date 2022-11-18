@@ -1,12 +1,13 @@
 ---
 layout: lesson
-title: Python Development Environments
+title: How to Install MicroPython
 author: Kevin McAleer
-type: page
-previous: lesson03.html
-next: lesson05.html
-description: Choose the best development tool for you
-percent: 42
+type: lesson
+previous: lesson02.html
+next: lesson03.html
+description: Easy Install with Thonny
+percent: 28
+thanks: false
 navigation:
 - name: Learn MicroPython
 - content:
@@ -45,16 +46,15 @@ navigation:
 ---
 
 
-You can write MicroPython code in NotePad (on Windows), or TextEdit (on macOS), however its better to use a MicroPython editor, also known as a development environment, to create code.
+To make installing MicroPython easier you can use `Thonny`, which is an Integrated Development Environment (IDE) for Python and MicroPython. To download Thonny, go <https://www.thonny.org> and download the version your computer (`Windows`, `Mac` or `Linux`).
 
-The development environment will enable you to create faster, more accurate code, with features such as autocomplete, code hinting (it tells you what the code means) and line numbering. Most development environments also have code highlighting where the words you type change colour based on their meaning within the code.
+![Screenshot of the Thonny download page](assets/thonny.png){:class="img-fluid w-75 shadow-lg"}
 
-Here are a list of development environments:
+---
 
-* VS Code - Microsoft Visual Studio Code (My personal favourite)
-* Atom
-* PyCharm
-* MU
-* Thonny
-* Microsoft Makecode
+## Installing MicroPython with Thonny
+
+![Screenshot of the Thonny Install dialog box](assets/install_micropython.png){:class="img-fluid w-75 shadow-lg"}
+
+Congratulations, you now have the most up-to-date MicroPython installed on your MicroController.
 

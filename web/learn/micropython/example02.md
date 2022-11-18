@@ -5,7 +5,7 @@ author: Kevin McAleer
 type: page
 previous: loops.html
 description: variables.py
-percent: 96
+percent: 91
 navigation:
 - name: Learn MicroPython
 - content:
@@ -15,10 +15,12 @@ navigation:
       link: intro.html
   - section: Introduction
     content:
-    - name: Why is it called Python?
-      link: lesson01.html
+    - name: Why is it called MicroPython?
+      link: why_is_it_called_micropython.html
     - name: Where to get MicroPython
       link: lesson02.html
+    - name: How to Install MicroPython
+      link: installing_micropython.html
     - name: Why use MicroPython?
       link: lesson03.html
     - name: Python Development Environments

@@ -6,7 +6,7 @@ type: page
 previous: lesson04.html
 next: lesson06.html
 description: "\u2018Hello World\u2019 - its a tradition"
-percent: 48
+percent: 49
 navigation:
 - name: Learn MicroPython
 - content:
@@ -16,10 +16,12 @@ navigation:
       link: intro.html
   - section: Introduction
     content:
-    - name: Why is it called Python?
-      link: lesson01.html
+    - name: Why is it called MicroPython?
+      link: why_is_it_called_micropython.html
     - name: Where to get MicroPython
       link: lesson02.html
+    - name: How to Install MicroPython
+      link: installing_micropython.html
     - name: Why use MicroPython?
       link: lesson03.html
     - name: Python Development Environments
