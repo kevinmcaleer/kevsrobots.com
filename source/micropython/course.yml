@@ -3,7 +3,7 @@
   date_created: 28-10-2022
   date_published: 28-10-2022
   layout: course
-  cover: assets/thonny.png
+  cover: assets/micropython.jpg
   description: >- 
      Get started with MicroPython, What Python is, where to download it and which software to use to develop MicroPython code
   content:
@@ -20,13 +20,13 @@
       - 03_installing_micropython.md
       - 04_why_use_micropython.md
       - 05_ides.md
-      - lesson05.md
-      - lesson06.md
+      - 06_our_first_program.md
+      - 07_hello_world.md
   - section:
       name: Variables and Reserved Words
       content:
-      - lesson07.md
-      - values_and_variable_types.md
-      - reserved_words.md
-      - loops.md
-      - example02.md
+      - 08_variables.md
+      - 09_example02.md
+      - 10_values_and_variable_types.md
+      - 11_reserved_words.md
+      - 12_loops.md

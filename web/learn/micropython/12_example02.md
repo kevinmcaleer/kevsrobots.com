@@ -1,12 +1,11 @@
 ---
 layout: lesson
-title: Loops
+title: Example 02
 author: Kevin McAleer
 type: page
-previous: reserved_words.html
-next: example02.html
-description: Flow Control
-percent: 84
+previous: 11_loops.html
+description: variables.py
+percent: 91
 navigation:
 - name: Learn MicroPython
 - content:
@@ -27,28 +26,37 @@ navigation:
     - name: Python Development Environments
       link: 05_ides.html
     - name: Our first program
-      link: lesson05.html
+      link: 06_our_first_program.html
     - name: Example 01
-      link: lesson06.html
+      link: 07_hello_world.html
   - section: Variables and Reserved Words
     content:
     - name: Variables
-      link: lesson07.html
+      link: 08_variables.html
     - name: Values & Variables Types
-      link: values_and_variable_types.html
+      link: 09_values_and_variable_types.html
     - name: Reserved Words
-      link: reserved_words.html
+      link: 10_reserved_words.html
     - name: Loops
-      link: loops.html
+      link: 11_loops.html
     - name: Example 02
-      link: example02.html
+      link: 12_example02.html
 ---
 
 
-The `If` statement will evalute (check or test) if a condition is `True` or `False`.
+Type of the program below into your Python Editor
 
-If the statement is `True` it will run a block of code.
+```python
+# Variables
+# Python_101
 
-If the statement is `False` it will not run the block of code and continue the normal flow of the program.
+print("Please type your name:")
+name = input()
+print("Hello", name)
+```
 
-![If Else](assets/if_else.jpg){:class="img-fluid w-100"}
+Save the file and then run it either from the editor or from the command line:
+
+```bash
+python3 variables.py
+```

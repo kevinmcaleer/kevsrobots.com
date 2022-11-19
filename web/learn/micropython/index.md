@@ -1,11 +1,12 @@
 ---
 layout: lesson
-title: Example 02
+title: Introduction
 author: Kevin McAleer
 type: page
-previous: loops.html
-description: variables.py
-percent: 91
+next: 01_why_is_it_called_micropython.html
+description: Get started with MicroPython, What Python is, where to download it and
+  which software to use to develop MicroPython code.
+percent: 7
 navigation:
 - name: Learn MicroPython
 - content:
@@ -26,37 +27,32 @@ navigation:
     - name: Python Development Environments
       link: 05_ides.html
     - name: Our first program
-      link: lesson05.html
+      link: 06_our_first_program.html
     - name: Example 01
-      link: lesson06.html
+      link: 07_hello_world.html
   - section: Variables and Reserved Words
     content:
     - name: Variables
-      link: lesson07.html
+      link: 08_variables.html
     - name: Values & Variables Types
-      link: values_and_variable_types.html
+      link: 09_values_and_variable_types.html
     - name: Reserved Words
-      link: reserved_words.html
+      link: 10_reserved_words.html
     - name: Loops
-      link: loops.html
+      link: 11_loops.html
     - name: Example 02
-      link: example02.html
+      link: 12_example02.html
 ---
 
 
-Type of the program below into your Python Editor
+## Course Content
 
-```python
-# Variables
-# Python_101
+In this course you will learn:
 
-print("Please type your name:")
-name = input()
-print("Hello", name)
-```
-
-Save the file and then run it either from the editor or from the command line:
-
-```bash
-python3 variables.py
-```
+* What MicroPython is, where to download it and which software to use to develop Python code
+* Reserved words
+* Variables
+* Loops
+* Flow control
+* Operators
+* Functions

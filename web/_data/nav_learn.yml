@@ -1,0 +1,4 @@
+- name: All Courses
+  link: /learn/
+- name: Recent courses
+  link: /learn/recent/

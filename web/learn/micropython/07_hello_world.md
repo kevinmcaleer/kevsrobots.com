@@ -3,8 +3,8 @@ layout: lesson
 title: Example 01
 author: Kevin McAleer
 type: page
-previous: lesson05.html
-next: lesson07.html
+previous: 06_our_first_program.html
+next: 08_variables.html
 description: hello_world.py
 percent: 56
 navigation:
@@ -27,21 +27,21 @@ navigation:
     - name: Python Development Environments
       link: 05_ides.html
     - name: Our first program
-      link: lesson05.html
+      link: 06_our_first_program.html
     - name: Example 01
-      link: lesson06.html
+      link: 07_hello_world.html
   - section: Variables and Reserved Words
     content:
     - name: Variables
-      link: lesson07.html
+      link: 08_variables.html
     - name: Values & Variables Types
-      link: values_and_variable_types.html
+      link: 09_values_and_variable_types.html
     - name: Reserved Words
-      link: reserved_words.html
+      link: 10_reserved_words.html
     - name: Loops
-      link: loops.html
+      link: 11_loops.html
     - name: Example 02
-      link: example02.html
+      link: 12_example02.html
 ---
 
 

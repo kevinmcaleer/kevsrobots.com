@@ -5,7 +5,7 @@
 import os
 import yaml
 import json
-from shutil import copytree as copy, rmtree as rmdir
+from shutil import copytree as copy, rmtree as rmdir, copyfile as copyfile
 
 class Course():
     name = ""
@@ -68,6 +68,10 @@ class Course():
         # print(course['content'])
         print(f'found {self.no_of_lessons} lessons')
         return self
+
+    def build_index(self):
+        # copy the first course file as index.md
+        copyfile(self.output_folder + '/' + self.lessons[0], self.output_folder + '/index.md')
 
     def create_output(self, output_folder=None):
         """ Build the course """
@@ -303,6 +307,7 @@ class Course():
                     build_file.writelines(page)
                     
         self.copy_assets() # copy the assets folder to the output folder
+        self.build_index() # build the index page
         return lesson
         
     def __str__(self):
@@ -324,8 +329,9 @@ class Courses():
     def read_courses(self, course_folder):
         """ Read all the courses in the course folder """
 
-        new_course = Course()
+        
         for course in os.listdir(course_folder):
+            new_course = Course()
             if os.path.isdir(os.path.join(course_folder, course)):
                 print(f'Found course: {course}')
                 new_course.read_course(os.path.join(course_folder, course))
@@ -353,4 +359,39 @@ class Courses():
         
         for course in self.course_list:
             course.build()
+        
+        self.build_index()
+        self.build_recent()
     
+    def build_index(self):
+
+        # remove the index file if it exists
+        if os.path.exists(f'{self.output_folder}/index.md'):
+            os.remove(f'{self.output_folder}/index.md')
+            
+        index = f'---' + "\n"
+        index += f'layout: content' + "\n"
+        index += f'title: Learn' + "\n"
+        index += f'description: Take a course and learn something new' + "\n"
+        index += f'---' + "\n"
+        index += f'{{% include all_courses.html %}}' + "\n"
+
+        with open(f'{self.output_folder}/index.md', 'w') as build_file:
+            build_file.writelines(index)
+
+    def build_recent(self):
+        """ Build the recent Courses page """
+
+        # remove the index file if it exists
+        if os.path.exists(f'{self.output_folder}/recent.md'):
+            os.remove(f'{self.output_folder}/recent.md')
+            
+        index = f'---' + "\n"
+        index += f'layout: content' + "\n"
+        index += f'title: Recent Courses' + "\n"
+        index += f'description: Recent Courses' + "\n"
+        index += f'---' + "\n"
+        index += f'{{% include recent_courses.html %}}' + "\n"
+
+        with open(f'{self.output_folder}/recent.md', 'w') as build_file:
+            build_file.writelines(index)
