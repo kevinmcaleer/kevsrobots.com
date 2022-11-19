@@ -1,11 +1,11 @@
 ---
 layout: lesson
-title: Loops
+title: Modules
 author: Kevin McAleer
 type: page
-previous: 11_reserved_words.html
-description: Flow Control
-percent: 91
+previous: 15_functions.html
+description: Learn about the built-in Modules
+percent: 85
 navigation:
 - name: Learn MicroPython
 - content:
@@ -39,15 +39,31 @@ navigation:
       link: 10_values_and_variable_types.html
     - name: Reserved Words
       link: 11_reserved_words.html
+  - section: Controlling the Flow
+    content:
+    - name: If, elif, else
+      link: 12_if_elif_else.html
     - name: Loops
-      link: 12_loops.html
+      link: 13_loops.html
+    - name: Operators
+      link: 14_operators.html
+  - section: Functions and Modules
+    content:
+    - name: Functions
+      link: 15_functions.html
+    - name: Modules
+      link: 16_modules.html
 ---
 
 
-The `If` statement will evalute (check or test) if a condition is `True` or `False`.
+# Modules
+MicroPython has many libraries that are built into the firmware. We still need to `import` these if we want to use them in our code.
 
-If the statement is `True` it will run a block of code.
+This is because when we `import` a library MicroPython has to read all the lines of code in that library and store the functions in `RAM` (Random Access Memory). MicroPython devices have limited `RAM` so we need to ensure we only import the libraries we need for each specific program.
 
-If the statement is `False` it will not run the block of code and continue the normal flow of the program.
+Lets have alook at all the libraries on our MicroPython device:
 
-![If Else](assets/if_else.jpg){:class="img-fluid w-100"}
+**Example**
+```python
+help('modules')
+```

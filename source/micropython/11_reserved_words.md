@@ -7,7 +7,7 @@ layout: lesson
 
 ![Reserved sign on a table](assets/reserved.jpg){:class="cover"}
 
-Here is a list of all the reserved words that python understands:
+Here is a list of all the reserved words that MicroPython understands:
 
 | Reserved Words |         |          |            |          |            |
 |:--------------:|:-------:|:--------:|:----------:|:--------:|:----------:|
@@ -18,3 +18,5 @@ Here is a list of all the reserved words that python understands:
 |     `pass`     | `raise` | `return` |   `try`    | `while`  |   `with`   |
 |    `yield`     | `True`  | `False`  |   `None`   |          |            |
 {:class="table-w100 table table-bordered"}
+
+We'll dive into some of these in more detail later. 

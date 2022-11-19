@@ -1,12 +1,11 @@
 ---
 layout: lesson
-title: Where to get MicroPython
+title: Modules
 author: Kevin McAleer
 type: page
-previous: 01_why_is_it_called_micropython.html
-next: 03_installing_micropython.html
-description: MicroPython can be installed on many 32bit microcontrollers
-percent: 15
+previous: 16_repl.html
+description: Learn about the built-in Modules
+percent: 90
 navigation:
 - name: Learn MicroPython
 - content:
@@ -59,10 +58,20 @@ navigation:
 ---
 
 
-[MicroPython](https://www.micropython.org) is actively developed and maintainted by a small group of developers. Visit <https://www.micropython.org> for the latest version, documentation and tutorials.
+## Modules
 
-On the MicroPython website, there is a link to [Downloads](https://www.micropython.org/download/). There is a build of MicroPython for almost all types of MicroController - as long as the MicroController is capable of running MicroPython, which requires a 32bit processor. You'll see a small thumbnail picture of each board along with the name of the board, click on the image of the board you have and then click on the latest release. As of the writing of this tutorial, `v1.19.1 (2022-06-18).uf2` is the latest version.
+MicroPython has many modules that are built into the firmware. We still need to `import` these if we want to use them in our code.
 
-This will download the firmware onto your computer in your `downloads` folder.
+This is because when we `import` a modules MicroPython has to read all the lines of code in that modules and store the functions in `RAM` (Random Access Memory). MicroPython devices have limited `RAM` so we need to ensure we only import the libraries we need for each specific program.
 
-![screenshot of the downloads page on micropython.org](assets/downloads.png){:class="img-fluid w-75 shadow-lg"}
+Lets have alook at all the modules on our MicroPython device. 
+
+**Example**
+
+1. Type the following directly into the `REPL`:
+
+```python
+help('modules')
+```
+
+![Screenshot of all the installed Modules](assets/modules.png){:class="img-fluid w-100 shadow-lg"}

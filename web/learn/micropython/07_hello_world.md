@@ -6,7 +6,7 @@ type: page
 previous: 06_our_first_program.html
 next: 08_variables.html
 description: hello_world.py
-percent: 56
+percent: 40
 navigation:
 - name: Learn MicroPython
 - content:
@@ -40,8 +40,22 @@ navigation:
       link: 10_values_and_variable_types.html
     - name: Reserved Words
       link: 11_reserved_words.html
+  - section: Controlling the Flow
+    content:
+    - name: If, elif, else
+      link: 12_if_elif_else.html
     - name: Loops
-      link: 12_loops.html
+      link: 13_loops.html
+    - name: Operators
+      link: 14_operators.html
+  - section: Functions and Modules
+    content:
+    - name: Functions
+      link: 15_functions.html
+    - name: The REPL
+      link: 16_repl.html
+    - name: Modules
+      link: 17_modules.html
 ---
 
 
@@ -55,8 +69,8 @@ print("Hello, world!")
 
 In Thonny, save the file and then run it with the green `run` button.
 
-![](assets/hello_world_program.png){:class="img-fluid w-100"}
+![A screenshot of the hello world program](assets/hello_world_program.png){:class="img-fluid w-100 shadow-lg"}
 
-![](assets/hello_world_console.png){:class="img-fluid w-100"}
+![A screenshot of the results in the console from running the Hello World program](assets/hello_world_console.png){:class="img-fluid w-100 shadow-lg"}
 
 ---

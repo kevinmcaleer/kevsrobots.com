@@ -394,7 +394,20 @@ blockquote {
   color: rgb(255, 255, 255) !important;
   background-color: $orange!important;
   border-radius: 3px;
-  code {
+  // code {
+  //   color: rgb(255, 255, 255) !important;
+  // }
+  .language-python.highlighter-rouge {
+    border-left: $clr-green 5px solid;
+    // padding: 3px;
+  }
+  .language-plaintext.highlighter-rouge {
+
     color: rgb(255, 255, 255) !important;
   }
+}
+
+.language-python.highlighter-rouge {
+  border-left: $clr-green 5px solid;
+  // padding: 3px;
 }

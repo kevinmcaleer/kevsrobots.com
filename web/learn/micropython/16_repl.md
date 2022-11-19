@@ -1,12 +1,12 @@
 ---
 layout: lesson
-title: Where to get MicroPython
+title: The REPL
 author: Kevin McAleer
 type: page
-previous: 01_why_is_it_called_micropython.html
-next: 03_installing_micropython.html
-description: MicroPython can be installed on many 32bit microcontrollers
-percent: 15
+previous: 15_functions.html
+next: 17_modules.html
+description: Read Evaluation Print Loop
+percent: 85
 navigation:
 - name: Learn MicroPython
 - content:
@@ -59,10 +59,14 @@ navigation:
 ---
 
 
-[MicroPython](https://www.micropython.org) is actively developed and maintainted by a small group of developers. Visit <https://www.micropython.org> for the latest version, documentation and tutorials.
+## The REPL
 
-On the MicroPython website, there is a link to [Downloads](https://www.micropython.org/download/). There is a build of MicroPython for almost all types of MicroController - as long as the MicroController is capable of running MicroPython, which requires a 32bit processor. You'll see a small thumbnail picture of each board along with the name of the board, click on the image of the board you have and then click on the latest release. As of the writing of this tutorial, `v1.19.1 (2022-06-18).uf2` is the latest version.
+MicroPython has an input and output console thats called the `REPL`, which stands for Read Evaluation Print Loop. This is because the `REPL` reads in commands, evaluates them, prints out the results and then loops back to the reading in stage.
 
-This will download the firmware onto your computer in your `downloads` folder.
+You will have noticed the `REPL` at the bottom of the screen, its where we see the output of all the code we've run so far.
 
-![screenshot of the downloads page on micropython.org](assets/downloads.png){:class="img-fluid w-75 shadow-lg"}
+You can type MicroPython code directly into the `REPL`, which is useful for quickly testing things or examining the attached MicroPython device.
+
+![Screenshot of the REPL](assets/repl.png){:class="img-fluid w-100 shadow-lg"}
+
+A screenshot of the `REPL` showing the currently installed version of MicroPython.

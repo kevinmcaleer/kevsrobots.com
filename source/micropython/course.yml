@@ -29,4 +29,15 @@
       - 09_example02.md
       - 10_values_and_variable_types.md
       - 11_reserved_words.md
-      - 12_loops.md
+  - section:
+      name: Controlling the Flow
+      content:
+      - 12_if_elif_else.md
+      - 13_loops.md
+      - 14_operators.md
+  - section:
+      name: Functions and Modules
+      content:
+      - 15_functions.md
+      - 16_repl.md
+      - 17_modules.md

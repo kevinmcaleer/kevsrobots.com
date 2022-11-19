@@ -14,8 +14,8 @@ print("Hello, world!")
 
 In Thonny, save the file and then run it with the green `run` button.
 
-![](assets/hello_world_program.png){:class="img-fluid w-100"}
+![A screenshot of the hello world program](assets/hello_world_program.png){:class="img-fluid w-100 shadow-lg"}
 
-![](assets/hello_world_console.png){:class="img-fluid w-100"}
+![A screenshot of the results in the console from running the Hello World program](assets/hello_world_console.png){:class="img-fluid w-100 shadow-lg"}
 
 ---

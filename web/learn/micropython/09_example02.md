@@ -6,7 +6,7 @@ type: page
 previous: 08_variables.html
 next: 10_values_and_variable_types.html
 description: Variables
-percent: 70
+percent: 50
 navigation:
 - name: Learn MicroPython
 - content:
@@ -40,8 +40,22 @@ navigation:
       link: 10_values_and_variable_types.html
     - name: Reserved Words
       link: 11_reserved_words.html
+  - section: Controlling the Flow
+    content:
+    - name: If, elif, else
+      link: 12_if_elif_else.html
     - name: Loops
-      link: 12_loops.html
+      link: 13_loops.html
+    - name: Operators
+      link: 14_operators.html
+  - section: Functions and Modules
+    content:
+    - name: Functions
+      link: 15_functions.html
+    - name: The REPL
+      link: 16_repl.html
+    - name: Modules
+      link: 17_modules.html
 ---
 
 
@@ -84,14 +98,17 @@ The function `input`, is another built-in function that MicroPython provides to 
 The variable is like a box that we can put things in, in this case a persons name.
 
 ## Numbers
+
 We can also store `numbers` in variables; let's extend our example and add an extra question
 
 type:
+
 ```python
 name = input('hello, please enter your name > ')
 age = input('please enter your age > ')
-print('hello', name, 'now does', age, 'feel?')
+print('hello', name, 'how does', age, 'feel?')
 ```
+
 ![Age Program](assets/age_program.png){:class="img-fluid w-100"}
 ![Age Console Output](assets/age_console.png){:class="img-fluid w-100"}
 
@@ -100,9 +117,10 @@ print('hello', name, 'now does', age, 'feel?')
 We can use variables in maths, for example if we want to find the missing angle in a triangle, and we have the other two angles we can use a formula - `180 - a + b = c`
 
 type:
+
 ```python
 a = 65
 b = 42
 c = 180 - a + b 
-print(‘the missing angle is: ‘,c)
+print('the missing angle is: ', c)
 ```

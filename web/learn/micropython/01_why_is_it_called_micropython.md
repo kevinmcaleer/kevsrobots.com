@@ -6,7 +6,7 @@ type: lesson
 previous: 00_intro.html
 next: 02_where_to_get_micropython.html
 description: "It\u2019s nothing to do with tiny snakes \U0001F40D"
-percent: 14
+percent: 10
 thanks: false
 navigation:
 - name: Learn MicroPython
@@ -41,8 +41,22 @@ navigation:
       link: 10_values_and_variable_types.html
     - name: Reserved Words
       link: 11_reserved_words.html
+  - section: Controlling the Flow
+    content:
+    - name: If, elif, else
+      link: 12_if_elif_else.html
     - name: Loops
-      link: 12_loops.html
+      link: 13_loops.html
+    - name: Operators
+      link: 14_operators.html
+  - section: Functions and Modules
+    content:
+    - name: Functions
+      link: 15_functions.html
+    - name: The REPL
+      link: 16_repl.html
+    - name: Modules
+      link: 17_modules.html
 ---
 
 

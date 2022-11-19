@@ -43,14 +43,17 @@ The function `input`, is another built-in function that MicroPython provides to 
 The variable is like a box that we can put things in, in this case a persons name.
 
 ## Numbers
+
 We can also store `numbers` in variables; let's extend our example and add an extra question
 
 type:
+
 ```python
 name = input('hello, please enter your name > ')
 age = input('please enter your age > ')
-print('hello', name, 'now does', age, 'feel?')
+print('hello', name, 'how does', age, 'feel?')
 ```
+
 ![Age Program](assets/age_program.png){:class="img-fluid w-100"}
 ![Age Console Output](assets/age_console.png){:class="img-fluid w-100"}
 
@@ -59,9 +62,10 @@ print('hello', name, 'now does', age, 'feel?')
 We can use variables in maths, for example if we want to find the missing angle in a triangle, and we have the other two angles we can use a formula - `180 - a + b = c`
 
 type:
+
 ```python
 a = 65
 b = 42
 c = 180 - a + b 
-print(‘the missing angle is: ‘,c)
+print('the missing angle is: ', c)
 ```

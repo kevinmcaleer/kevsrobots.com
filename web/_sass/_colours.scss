@@ -19,6 +19,9 @@ $clr-darkgrey: #888888;
 $clr-purple: #e83e8c;
 $clr-green: #599C60;
 
+.kevgreen {
+  color: $clr-green;
+}
 
 /* import only the necessary Bootstrap files */
 // @import "bootstrap/scss/functions";

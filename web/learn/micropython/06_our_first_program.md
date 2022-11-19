@@ -6,7 +6,7 @@ type: page
 previous: 05_ides.html
 next: 07_hello_world.html
 description: "\u2018Hello World\u2019 - its a tradition"
-percent: 49
+percent: 35
 navigation:
 - name: Learn MicroPython
 - content:
@@ -40,8 +40,22 @@ navigation:
       link: 10_values_and_variable_types.html
     - name: Reserved Words
       link: 11_reserved_words.html
+  - section: Controlling the Flow
+    content:
+    - name: If, elif, else
+      link: 12_if_elif_else.html
     - name: Loops
-      link: 12_loops.html
+      link: 13_loops.html
+    - name: Operators
+      link: 14_operators.html
+  - section: Functions and Modules
+    content:
+    - name: Functions
+      link: 15_functions.html
+    - name: The REPL
+      link: 16_repl.html
+    - name: Modules
+      link: 17_modules.html
 ---
 
 
@@ -61,7 +75,7 @@ Hello World!
 
 To run this in Thonny, click the green `run` button:
 
-![picture of run button](assets/run.png){:class="img-fluid w-100"}
+![picture of run button](assets/run.png){:class="img-fluid w-100 shadow-lg"}
 
 As you can see this is a very simple piece of code. The word `print` is a special word that Python understands. Python expects a line of text between the brackets, inside of the speech marks.
 

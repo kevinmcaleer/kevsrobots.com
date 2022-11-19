@@ -20,7 +20,7 @@ Hello World!
 
 To run this in Thonny, click the green `run` button:
 
-![picture of run button](assets/run.png){:class="img-fluid w-100"}
+![picture of run button](assets/run.png){:class="img-fluid w-100 shadow-lg"}
 
 As you can see this is a very simple piece of code. The word `print` is a special word that Python understands. Python expects a line of text between the brackets, inside of the speech marks.
 
