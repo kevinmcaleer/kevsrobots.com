@@ -390,8 +390,11 @@ blockquote {
   padding: 10px;
   margin-left: 0px;
   font-size: 14pt;
-  font-style: italic;
+  // font-style: italic;
   color: rgb(255, 255, 255) !important;
   background-color: $orange!important;
   border-radius: 3px;
+  code {
+    color: rgb(255, 255, 255) !important;
+  }
 }

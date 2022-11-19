@@ -11,9 +11,9 @@ thanks: false
 `MicroPython` is a smaller version of the programming language `Python`, designed for use with MicroControllers: `Micro` + `Python`
 
 `Python` gets it name from a TV show...
-> “When he began implementing Python, Guido van Rossum was also reading the published scripts from ‘Monty 
-> Python’s Flying Circus’, a BBC comedy series from the 1970s. Van Rossum thought he needed a name that was 
-> short, unique, and slightly mysterious, so he decided to call the language Python”
+> *“When he began implementing Python, Guido van Rossum was also reading the published scripts from ‘Monty*
+> *Python’s Flying Circus’, a BBC comedy series from the 1970s. Van Rossum thought he needed a name that was*
+> *short, unique, and slightly mysterious, so he decided to call the language Python”*
 >
 > – docs.python.org
 
