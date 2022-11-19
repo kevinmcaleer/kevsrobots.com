@@ -6,6 +6,8 @@ type: lesson
 thanks: false
 ---
 
+![Cover photo of students looking confused](assets/what_is_it.jpg){:class="cover"}
+
 `MicroPython` is a smaller version of the programming language `Python`, designed for use with MicroControllers: `Micro` + `Python`
 
 `Python` gets it name from a TV show...

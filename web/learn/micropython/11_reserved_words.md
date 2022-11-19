@@ -1,12 +1,12 @@
 ---
 layout: lesson
-title: Why use MicroPython?
+title: Reserved Words
 author: Kevin McAleer
 type: page
-previous: 03_installing_micropython.html
-next: 05_ides.html
-description: It's designed to be easy to read and write, perfect for beginners
-percent: 35
+previous: 10_values_and_variable_types.html
+next: 12_loops.html
+description: All the words that have a special meaning in Python
+percent: 84
 navigation:
 - name: Learn MicroPython
 - content:
@@ -45,33 +45,17 @@ navigation:
 ---
 
 
-MicroPython is ***easier to write***, ***cleaner*** and ***clearer to read***, and ***faster to get the results you want***, than other languages such as C++.
 
-Compare these two examples below. 
+![Reserved sign on a table](assets/reserved.jpg){:class="cover"}
 
-First is a piece of code written for the `Arduino` in `C++`:
+Here is a list of all the reserved words that python understands:
 
-## C++
-
-```C
-#include “stdio.h”
-void helloWorld() {
-  printf(“hello world”);
-}
-void main() {
-  helloWorld();
-}
-```
-
-The second piece of code is written in `MicroPython`:
-
-## MicroPython
-
-```python
-def hello_world():
-  print(“hello world)
-
-hello_world()
-```
-
-As you can see, the MicroPython code is simpler, easier to read, shorter and faster to write.
+| Reserved Words |         |          |            |          |            |
+|:--------------:|:-------:|:--------:|:----------:|:--------:|:----------:|
+|     `and`      |  `as`   | `assert` |  `break`   | `class`  | `continue` |
+|     `def`      |  `del`  |  `elif`  |   `else`   | `except` |   `exec`   |
+|   `finally`    |  `for`  |  `from`  |  `global`  |   `if`   |  `import`  |
+|      `in`      |  `is`   | `lambda` | `nonlocal` |  `not`   |    `or`    |
+|     `pass`     | `raise` | `return` |   `try`    | `while`  |   `with`   |
+|    `yield`     | `True`  | `False`  |   `None`   |          |            |
+{:class="table-w100 table table-bordered"}

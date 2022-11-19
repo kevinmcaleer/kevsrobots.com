@@ -4,7 +4,7 @@ title: Variables
 author: Kevin McAleer
 type: page
 previous: 07_hello_world.html
-next: 09_values_and_variable_types.html
+next: 09_example02.html
 description: A Place to store values
 percent: 63
 navigation:
@@ -34,14 +34,14 @@ navigation:
     content:
     - name: Variables
       link: 08_variables.html
-    - name: Values & Variables Types
-      link: 09_values_and_variable_types.html
-    - name: Reserved Words
-      link: 10_reserved_words.html
-    - name: Loops
-      link: 11_loops.html
     - name: Example 02
-      link: 12_example02.html
+      link: 09_example02.html
+    - name: Values & Variables Types
+      link: 10_values_and_variable_types.html
+    - name: Reserved Words
+      link: 11_reserved_words.html
+    - name: Loops
+      link: 12_loops.html
 ---
 
 
