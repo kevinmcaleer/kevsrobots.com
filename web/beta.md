@@ -31,8 +31,13 @@ You'll need to have a free Github account to create comments.
 
 ---
 
-How to access the new course content:
+## How to access the new course content
 
-On the website menu, you'll notice a new `learn` item. Click this and you should be presented with 2 courses:
+On the website menu, you'll notice a new [`learn`](/learn/) item. Click this and you should be presented with 2 courses:
 1. `How to use the learning platform` - take this first
 2. `Learn MicroPython` - the main course I'd like you to test
+
+There is also a special private channel in our [discord](https://www.kevsrobots.com/discord) server, click [here](https://www.kevsrobots.com/discord) to sign up if you're not already a member (its free!).
+
+
+Ok - head over to [Learn](/learn/) to start the beta.
