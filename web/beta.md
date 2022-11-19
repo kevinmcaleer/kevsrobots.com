@@ -41,3 +41,5 @@ There is also a special private channel in our [discord](https://www.kevsrobots.
 
 
 Ok - head over to [Learn](/learn/) to start the beta.
+
+Thanks again!
