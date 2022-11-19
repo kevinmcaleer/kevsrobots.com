@@ -12,3 +12,7 @@
       content:
       - 00_intro.md 
       - 01_how_to_use.md
+  - section:
+      name: Navigating Content
+      content:
+      - 02_navigate_content.md
