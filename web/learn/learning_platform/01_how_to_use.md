@@ -27,7 +27,7 @@ navigation:
 
 ## Accessing courses
 
-Use the [Learn](/learn) page to access courses.
+Use the [Learn](/learn/) page to access courses.
 
 ![screen layout](assets/course_layout.jpg){:class="img-fluid w-100"}
 
