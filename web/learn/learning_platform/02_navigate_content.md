@@ -4,8 +4,9 @@ title: Navigating Content
 author: Kevin McAleer
 type: page
 previous: 01_how_to_use.html
+next: 03_download_content.html
 description: How to navigate content
-percent: 99
+percent: 75
 navigation:
 - name: How to use the Learning Platform
 - content:
@@ -19,6 +20,8 @@ navigation:
     content:
     - name: Navigating Content
       link: 02_navigate_content.html
+    - name: Downloading Course Content
+      link: 03_download_content.html
 ---
 
 

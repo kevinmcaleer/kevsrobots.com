@@ -5,7 +5,7 @@ author: Kevin McAleer
 type: page
 next: 01_how_to_use.html
 description: How to use the Learning Platform
-percent: 33
+percent: 25
 navigation:
 - name: How to use the Learning Platform
 - content:
@@ -19,8 +19,12 @@ navigation:
     content:
     - name: Navigating Content
       link: 02_navigate_content.html
+    - name: Downloading Course Content
+      link: 03_download_content.html
 ---
 
+
+![Learning Platform Logo](assets/learning_platform.jpg){:class="img-fluid w-100"}
 
 ## Welcome
 

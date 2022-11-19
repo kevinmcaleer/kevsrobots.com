@@ -5,6 +5,8 @@ type: page
 description: How to use the Learning Platform
 ---
 
+![Learning Platform Logo](assets/learning_platform.jpg){:class="img-fluid w-100"}
+
 ## Welcome
 
 Welcome to the new Learning Platform. This learning platform is a new feature of KevsRobots.com, and will help you level up your skills with tutorials specifically aimed at robotics topics.
