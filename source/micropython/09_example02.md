@@ -1,6 +1,6 @@
 ---
 title: Example 02
-description: variables.py
+description: Variables
 layout: lesson
 ---
 
@@ -8,6 +8,7 @@ Let’s do something more interesting.
 
 Lets make the Raspberry Pi Pico (or whichever board you are using) ask us a question, then reply back to us.
 
+## name.py
 Type of the program below into your Python Editor
 
 ```python
@@ -24,10 +25,16 @@ Save the file and then run it by pressing the green `run` button.
 > ## Note
 > The pound (or hash) symbol `#` means the reset of the line is a comment
 > MicroPython ignores comments, so you can type useful reminders or notes to others here
-> For comments that span multiple lines, you can use 3 double quotations:
-> `""" This is a multi -`
 > 
-> `line message """`
+> ```python
+> # a single line comment
+>```
+>
+> For comments that span multiple lines, you can use 3 double quotations:
+> ```python
+> """ This is a multi -
+> line comment """
+> ```
 
 We’ve introduced something new - the word ‘`name`’ is what we call a `variable` (something that can change). The `name` variable holds the value that it is assigned, and we assigned it by using the `=` equals sign.
 
@@ -35,6 +42,7 @@ The function `input`, is another built-in function that MicroPython provides to 
 
 The variable is like a box that we can put things in, in this case a persons name.
 
+## Numbers
 We can also store `numbers` in variables; let's extend our example and add an extra question
 
 type:
