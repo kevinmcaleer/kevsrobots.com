@@ -11,8 +11,9 @@ The development environment will enable you to create faster, more accurate code
 Here are a list of development environments:
 
 * [`VS Code`](https://code.microsoft.com) - Microsoft Visual Studio Code (My personal favourite)
-* Atom
-* PyCharm
-* MU
-* Thonny
-* Microsoft Makecode
+* [Atom](https://atom.io)
+* [PyCharm](https://www.jetbrains.com/pycharm/)
+* [MU](https://codewith.mu)
+* [Thonny](https://www.thonny.org)
+* [Microsoft Makecode](https://www.makecode.com)
+* [Arduino IDE](https://www.arduino.cc/en/software) (Yes! it can do MicroPython too)
