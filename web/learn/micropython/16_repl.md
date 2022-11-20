@@ -32,7 +32,7 @@ navigation:
       link: 07_hello_world.html
   - section: Variables and Reserved Words
     content:
-    - name: Variables
+    - name: Variables and Constants
       link: 08_variables.html
     - name: Example 02
       link: 09_example02.html
@@ -61,7 +61,7 @@ navigation:
 
 ## The REPL
 
-MicroPython has an input and output console thats called the `REPL`, which stands for Read Evaluation Print Loop. This is because the `REPL` reads in commands, evaluates them, prints out the results and then loops back to the reading in stage.
+MicroPython has an input and output console thats called the `REPL`, which stands for Read Evaluation Print Loop. This is because the `REPL` `reads` in commands, `evaluates` them, `prints` out the results to the console and then `loops` back to the reading in stage.
 
 You will have noticed the `REPL` at the bottom of the screen, its where we see the output of all the code we've run so far.
 

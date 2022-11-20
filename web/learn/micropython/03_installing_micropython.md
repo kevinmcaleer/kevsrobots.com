@@ -33,7 +33,7 @@ navigation:
       link: 07_hello_world.html
   - section: Variables and Reserved Words
     content:
-    - name: Variables
+    - name: Variables and Constants
       link: 08_variables.html
     - name: Example 02
       link: 09_example02.html

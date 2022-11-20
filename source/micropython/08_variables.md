@@ -1,5 +1,5 @@
 --- 
-title: Variables
+title: Variables and Constants
 description: A Place to store values
 layout: lesson
 ---
@@ -27,3 +27,18 @@ age = 21
 > ## MicroPython Facts
 >
 > In MicroPython variables don’t actually store the value, they just point to the thing that does.
+
+---
+
+## Constants
+
+If `variables` contain values that change, `Constants` contain values that dont change.
+For example, if we wanted to store the value of `pi`, the value of `pi` does not change, so we can store this in a special type of object called a `constant`.
+
+**Example**
+
+```python
+PI = const(3.141592654)
+```
+
+In the example above we use the `const()` function to define the value `3.141592654` as the constant `PI`. The convention is that constants are always in uppercase.

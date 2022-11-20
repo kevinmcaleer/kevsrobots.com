@@ -6,6 +6,7 @@ import os
 import yaml
 import json
 from shutil import copytree as copy, rmtree as rmdir, copyfile as copyfile
+from math import ceil, floor
 
 class Course():
     name = ""
@@ -268,7 +269,10 @@ class Course():
                 print(f'item is: {item}, index is {index}, page_count is {page_count}')
            
                 item_percentage = page_percent * page_count
-                
+                if item_percentage > 100:
+                    item_percentage = 100
+                elif item_percentage < 100 and page_count == self.no_of_lessons:
+                    item_percentage = 100
                 # set the previous and next links
                 next = self.next_lesson(page_count)
                 previous = self.previous_lesson(page_count)
