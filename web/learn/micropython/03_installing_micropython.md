@@ -72,6 +72,8 @@ To make installing MicroPython easier you can use `Thonny`, an Integrated Develo
 
 ![Screenshot of the Thonny download page](assets/thonny.png){:class="img-fluid w-50 shadow-lg"}
 
+Screenshot of the Thonny download page{:.caption}
+
 ---
 
 ## Change to Standard Mode
