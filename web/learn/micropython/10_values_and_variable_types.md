@@ -59,7 +59,7 @@ navigation:
 ---
 
 
-![Cover photo of a yellow typewritter](assets/type.jpg){:class="cover"}
+![Cover photo of a yellow typewritter](assets/types.jpg){:class="cover"}
 
 Programs often need to work with numbers and text, adding and subtracting, asking questions and processing answers.
 
