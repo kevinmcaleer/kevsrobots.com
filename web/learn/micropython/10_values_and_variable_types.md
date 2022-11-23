@@ -61,6 +61,8 @@ navigation:
 
 ![Cover photo of a yellow typewritter](assets/types.jpg){:class="cover"}
 
+## Data Types
+
 Programs often need to work with numbers and text, adding and subtracting, asking questions and processing answers.
 
 MicroPython is able to label different types of values so that it can make different commands available to us.
