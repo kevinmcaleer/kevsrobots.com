@@ -59,7 +59,7 @@ navigation:
 ---
 
 
-![Cover photo of a liminal backrooms space](assets/environment.jpg){:class="cover"}
+![Cover photo of a liminal backrooms space](assets/environments.jpg){:class="cover"}
 
 You could write MicroPython code in `NotePad` (on `Windows`), or `TextEdit` (on `macOS`), however it is better to use a MicroPython editor, also known as a `development environment`, to create code.
 

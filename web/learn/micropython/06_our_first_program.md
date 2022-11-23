@@ -59,6 +59,8 @@ navigation:
 ---
 
 
+![Cover photo of a duckling running on grass](assets/hello_world.jpg){:class="cover"}
+
 Lets create a simple program that will display the message ‘Hello World’[^1].
 
 First, here is the code, type this into your MicroPython editor:

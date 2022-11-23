@@ -4,6 +4,8 @@ description: NUMBERS, TEXT, LISTS AND DICTIONARIES
 layout: lesson
 ---
 
+![Cover photo of a yellow typewritter](assets/type.jpg){:class="cover"}
+
 Programs often need to work with numbers and text, adding and subtracting, asking questions and processing answers.
 
 MicroPython is able to label different types of values so that it can make different commands available to us.
