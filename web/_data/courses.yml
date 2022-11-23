@@ -7,7 +7,3 @@
   description: Learn how to use the new Learning Platform
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
-- cover: /learn/micropython_text/assets/text.jpg
-  description: Learn how to work with text in MicroPython
-  link: /learn/micropython_text/00_intro.html
-  name: MicroPython - Working with text
