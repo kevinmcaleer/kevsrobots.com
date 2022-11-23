@@ -72,7 +72,8 @@ To make installing MicroPython easier you can use `Thonny`, an Integrated Develo
 
 ![Screenshot of the Thonny download page](assets/thonny.png){:class="img-fluid w-50 shadow-lg"}
 
-Screenshot of the Thonny download page{:.caption}
+Screenshot of the Thonny download page
+{:.caption}
 
 ---
 
@@ -83,6 +84,9 @@ Screenshot of the Thonny download page{:.caption}
 
 ![Screenshot of the standard mode link](assets/standard_mode.png){:class="img-fluid w-75 shadow-lg my-3"}
 
+Screenshot of the standard mode link
+{:.caption}
+
 ---
 
 ## Installing MicroPython
@@ -91,14 +95,23 @@ Screenshot of the Thonny download page{:.caption}
 
 ![Screenshot of the Thonny Install dialog option](assets/install_micropython.png){:class="img-fluid w-75 shadow-lg my-3"}
 
+Screenshot of the Thonny Install dialog option
+{:.caption}
+
 ---
 
 ![Screenshot of the Thonny Install dialog box](assets/install_dialog.png){:class="img-fluid w-75 shadow-lg my-3"}
 
-1. Select variant (the version specific to your board), for example the version for the Raspberry Pi Pico is `Raspberry Pi - Pico / Pico H`. 
+Screenshot of the Thonny Install dialog box
+{:.caption}
+
+---
+
+1. Select variant (the version specific to your board), for example the version for the Raspberry Pi Pico is `Raspberry Pi - Pico / Pico H`.
 1. Then click the `Install` button. The firmware will now be uploaded to your microcontroller.
 
 ---
+
 ## Well done
 
 Congratulations, you now have the most up-to-date MicroPython installed on your MicroController.

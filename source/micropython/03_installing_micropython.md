@@ -26,6 +26,9 @@ Screenshot of the Thonny download page
 
 ![Screenshot of the standard mode link](assets/standard_mode.png){:class="img-fluid w-75 shadow-lg my-3"}
 
+Screenshot of the standard mode link
+{:.caption}
+
 ---
 
 ## Installing MicroPython
@@ -34,9 +37,17 @@ Screenshot of the Thonny download page
 
 ![Screenshot of the Thonny Install dialog option](assets/install_micropython.png){:class="img-fluid w-75 shadow-lg my-3"}
 
+Screenshot of the Thonny Install dialog option
+{:.caption}
+
 ---
 
 ![Screenshot of the Thonny Install dialog box](assets/install_dialog.png){:class="img-fluid w-75 shadow-lg my-3"}
+
+Screenshot of the Thonny Install dialog box
+{:.caption}
+
+---
 
 1. Select variant (the version specific to your board), for example the version for the Raspberry Pi Pico is `Raspberry Pi - Pico / Pico H`.
 1. Then click the `Install` button. The firmware will now be uploaded to your microcontroller.
