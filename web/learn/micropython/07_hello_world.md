@@ -56,6 +56,10 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
 

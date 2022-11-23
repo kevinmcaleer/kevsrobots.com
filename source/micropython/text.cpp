@@ -3,7 +3,10 @@
 
 void main(){
     int a;
-    if (a ==1) {
+    float b;
+    a = 1;
+    b = 2.3;
+    if (a == 1) {
     std::cout << "a = " << a;
     }
 }

@@ -19,3 +19,5 @@ thanks: false
 
 ## MicroPython background
 MicroPython was created by Damien George, with the initial release launched on 3 May 2014. It's actually a program that runs on MicroControllers, and is itself written in the C language.
+
+---

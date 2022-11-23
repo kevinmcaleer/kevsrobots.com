@@ -13,3 +13,5 @@ On the MicroPython website, there is a link to [Downloads](https://www.micropyth
 This will download the firmware onto your computer in your `downloads` folder.
 
 ![screenshot of the downloads page on micropython.org](assets/downloads.png){:class="img-fluid w-75 shadow-lg"}
+
+---

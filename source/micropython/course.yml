@@ -41,3 +41,7 @@
       - 15_functions.md
       - 16_repl.md
       - 17_modules.md
+  - section:
+      name: Summary and Review
+      content:
+      - 18_summary.md

@@ -4,6 +4,8 @@ description: Comparitive operators
 layout: lesson
 ---
 
+![Cover photo of a telephone operator from the 1920s](assets/operators.jpg){:class="cover"}
+
 ## Operators
 
 ---
@@ -18,13 +20,15 @@ Have a look through these, but don't worry, there isn't a test!
 
 ---
 
-- [Arithmetic Operators](#arithmetic-operators)
-- [Comparison (Relational) Operators](#comparison-operators)
-- [Assignment Operators](#assignment-operators)
-- [Logical Operators](#logical-operators)
-- [Bitwise Operators](#bitwise-operators)
-- [Membership Operators](#membership-operators)
-- [Identity Operators](#identity-operators)
+Here are the shortcut links to each of the types of Operators defined below:
+
+[Arithmetic Operators](#arithmetic-operators){:.btn.btn-primary.my-3}
+[Comparison (Relational) Operators](#comparison-operators){:.btn.btn-primary.my-3}
+[Assignment Operators](#assignment-operators){:.btn.btn-primary.my-3}
+[Logical Operators](#logical-operators){:.btn.btn-primary.my-3}
+[Bitwise Operators](#bitwise-operators){:.btn.btn-primary.my-3}
+[Membership Operators](#membership-operators){:.btn.btn-primary.my-3}
+[Identity Operators](#identity-operators){:.btn.btn-primary.my-3}
 
 ---
 
@@ -141,3 +145,5 @@ Table of MicroPython Identity Operators
 |   `is`   | Evaluates to true if the variables on either side of the operator point to the same object and false otherwise. | `x is y`, here `is` results in 1 if id(x) equals id(y).                  |
 | `is not` | Evaluates to false if the variables on either side of the operator point to the same object and true otherwise. | `x is not y`, here `is not` results in 1 if id(x) is not equal to id(y). |
 {:class="table-w100 table table-bordered"}
+
+---

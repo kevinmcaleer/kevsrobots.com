@@ -56,6 +56,10 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
 
@@ -68,3 +72,5 @@ On the MicroPython website, there is a link to [Downloads](https://www.micropyth
 This will download the firmware onto your computer in your `downloads` folder.
 
 ![screenshot of the downloads page on micropython.org](assets/downloads.png){:class="img-fluid w-75 shadow-lg"}
+
+---

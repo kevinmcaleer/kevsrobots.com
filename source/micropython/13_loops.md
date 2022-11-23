@@ -4,6 +4,8 @@ description: Flow Control
 layout: lesson
 ---
 
+![Cover photo of a yellow Basket Ball court and Hoop](assets/hoops.jpg){:class="cover"}
+
 ## For Loops
 
 Often we want to run a piece of code a specific number of times.
@@ -27,14 +29,18 @@ i is 0
 > An example of an argument is the value `100` that we just used in in the `range` function.
 > In some programming languages there is a difference between an argument (a literal value like `100`), and a parameter that is a variable (such as `a` that refers to another value). MicroPython doesn't make such a distinction.
 
-### The range() Function
+## The range() Function
 
 The range function can take one, two or three parameters:
 `range`(`start` <<optional>>, `end`, `steps` <<optional>>)
 
-#### The range() Function with one parameter
+---
+
+## The range() Function with one parameter
 
 The `range()` function returns a sequence of numbers, starting from `0` by default, and increments by `1` until the `end` number is reached.
+
+---
 
 ##### Example
 
@@ -43,7 +49,10 @@ for i in range(100):
     print(i)
 ```
 
-#### The range() Function with two parameters
+---
+
+## The range() Function with two parameters
+
 If two parameters are provided, the `range()` function starts from `start` value and increments in steps of `1` until the `end` value is reached (its actually the end value `-1`).
 
 ##### Example
@@ -53,8 +62,13 @@ for i in range(50,200):
     print(i)
 ```
 
-#### The range() Function with three parameters
+---
+
+## The range() Function with three parameters
+
 If three parameters are provided, the `range()` function starts from `start` value and increments in steps of the `steps` value until the `end` value is reached (again, the end value `-1`).
+
+---
 
 ##### Example
 
@@ -71,6 +85,8 @@ if we want to run a block of code many times, based on whether or not a conditio
 
 You'll often see this to run blocks of code indefinetly on MicroControllers as we may want to run the code forever or until the device is reset.
 
+---
+
 ##### Example
 
 ```python
@@ -79,6 +95,8 @@ while True:
 ```
 
 The while loop is particularly useful in MicroPython as we may want to check the status of a sensor or externally connected device.
+
+---
 
 ##### Example
 
@@ -108,3 +126,5 @@ The progam will keep printing the `button is not pressed` until button is presse
 |`Continue`|	Causes the loop to skip the remainder of its body and immediately retest its condition prior to reiterating.|
 |`Pass`	|The pass statement in Python is used when a statement is required syntactically but you do not want any command or code to execute.|
 {:class="table-w100 table table-bordered"}
+
+---

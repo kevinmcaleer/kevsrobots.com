@@ -56,6 +56,10 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
 
@@ -102,3 +106,5 @@ In the example above we use the `const()` function to define the value `3.141592
 > ## Const()
 >
 > `const()` is a specific to MicroPython, in regular python constants are treated as varibles, just in upper case.
+
+---

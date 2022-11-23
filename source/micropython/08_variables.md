@@ -47,3 +47,5 @@ In the example above we use the `const()` function to define the value `3.141592
 > ## Const()
 >
 > `const()` is a specific to MicroPython, in regular python constants are treated as varibles, just in upper case.
+
+---

@@ -18,3 +18,5 @@ Here are a list of development environments:
 * [`Thonny`](https://www.thonny.org)
 * [`Microsoft Makecode`](https://www.makecode.com)
 * [`Arduino IDE`](https://www.arduino.cc/en/software) (Yes! it can do MicroPython too)
+
+---

@@ -40,4 +40,7 @@ To make installing MicroPython easier you can use `Thonny`, an Integrated Develo
 
 ---
 ## Well done
+
 Congratulations, you now have the most up-to-date MicroPython installed on your MicroController.
+
+---

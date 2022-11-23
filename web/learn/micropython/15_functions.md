@@ -56,12 +56,19 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
+
+![Photo of a laptop and notepad on a desk](assets//functions.jpg){:.cover}
 
 At some point you will want to make a block of code that you will use many times, perhaps with different values. This is not only essential to save repeating the same block of code over and over again, its a better technique to improve reliability and readability.
 
 ## Defining a function
+
 In MicroPython we use the `def` keyword to define the code that follows as a function. 
 
 Functions can also have parameters of there own.
@@ -103,6 +110,8 @@ say_hello('Kev', 47)
 In the example above we've added two parameters `name` and `age`. Our functions can use these parameters within its block of code, in this case we use it to print out the message `hello Kev how does 47 feel?`.
 Notice how Python accepts the two different types of variables - the `name` is a string (`Str`) of text, and `age` is an integer (a whole number with no decimal points).
 
+---
+
 We can take this a step further and pass variables to the function and it will work just the same:
 
 ##### Example
@@ -119,6 +128,8 @@ say_hello(my_name, my_age)
 ```
 
 Functions can also call other functions, though on a MicroController you may find that the device crashes if it runs out of memory, if you nest too many functions, but that will take quite a few levels.
+
+---
 
 ## Returning values
 
@@ -139,9 +150,12 @@ In the example above we define the function `add_one` which has one parameter `n
 
 We assign `a` to the result of running `add_one(1)`, which should return the value `2`. Therefore the variable `a` should contain the value `2`. Run the code and try passing different values and changing the `number += 1` to different values.
 
-
 ---
 
-## Challenge
+> ## Challenge
+>
+> Write your own function that takes a value, multiplies it by `10`, and then returns that value.
+>
+{:.bg-blue}
 
-Write your own function that takes a value and multiplies it by `10`, then returns that value.
+---

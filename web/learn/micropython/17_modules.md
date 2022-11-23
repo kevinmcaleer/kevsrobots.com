@@ -4,8 +4,9 @@ title: Modules
 author: Kevin McAleer
 type: page
 previous: 16_repl.html
+next: 18_summary.html
 description: Learn about the built-in Modules
-percent: 100
+percent: 90
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -55,8 +56,14 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
+
+![Picture of a honeycomb close up](assets/modules.jpg){:.cover}
 
 ## Modules
 
@@ -75,6 +82,11 @@ help('modules')
 ```
 
 ![Screenshot of all the installed Modules](assets/modules.png){:class="img-fluid w-100 shadow-lg"}
+
+A screenshot of all the installed Modules
+{:.caption}
+
+---
 
 You'll notice that most of the modules have `u` as the first letter, this is because they are the simplified MicroPython version of standard Python libraries (in some cases). The `u` is an ascii version of the Mu or `μ` symbol which is the Greek letter for Micro.
 
@@ -111,3 +123,5 @@ dir(machine)
 ```
 
 In the example above you'll discover a list of all the functions, classes and Constants in the module named `machine`.
+
+---

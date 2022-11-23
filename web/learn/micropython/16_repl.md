@@ -56,8 +56,14 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
+
+![Picture of a Reptile close up](assets/repl.jpg){:.cover}
 
 ## The REPL
 
@@ -70,3 +76,6 @@ You can type MicroPython code directly into the `REPL`, which is useful for quic
 ![Screenshot of the REPL](assets/repl.png){:class="img-fluid w-100 shadow-lg"}
 
 A screenshot of the `REPL` showing the currently installed version of MicroPython.
+{:.caption}
+
+---

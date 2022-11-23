@@ -56,6 +56,10 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
 
@@ -211,3 +215,5 @@ else:
 >
 > **Note** `1` is also `True` and `0` is also `False`
 >
+
+---

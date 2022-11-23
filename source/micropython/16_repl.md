@@ -4,6 +4,8 @@ description: Read Evaluation Print Loop
 layout: lesson
 ---
 
+![Picture of a Reptile close up](assets/repl.jpg){:.cover}
+
 ## The REPL
 
 MicroPython has an input and output console thats called the `REPL`, which stands for Read Evaluation Print Loop. This is because the `REPL` `reads` in commands, `evaluates` them, `prints` out the results to the console and then `loops` back to the reading in stage.
@@ -15,3 +17,6 @@ You can type MicroPython code directly into the `REPL`, which is useful for quic
 ![Screenshot of the REPL](assets/repl.png){:class="img-fluid w-100 shadow-lg"}
 
 A screenshot of the `REPL` showing the currently installed version of MicroPython.
+{:.caption}
+
+---

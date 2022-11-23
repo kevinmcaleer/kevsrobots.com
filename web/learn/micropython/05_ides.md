@@ -56,6 +56,10 @@ navigation:
       link: 16_repl.html
     - name: Modules
       link: 17_modules.html
+  - section: Summary and Review
+    content:
+    - name: Summary and Review
+      link: 18_summary.html
 ---
 
 
@@ -73,3 +77,5 @@ Here are a list of development environments:
 * [`Thonny`](https://www.thonny.org)
 * [`Microsoft Makecode`](https://www.makecode.com)
 * [`Arduino IDE`](https://www.arduino.cc/en/software) (Yes! it can do MicroPython too)
+
+---

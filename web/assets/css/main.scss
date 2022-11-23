@@ -407,16 +407,24 @@ blockquote {
     border-left: #00000060 5px solid;
     // padding: 3px;
   }
+  
+  .language-c\+\+.highlighter-rouge {
+    border-left: rgb(255, 238, 0) 5px solid;
+  }
+
   .language-plaintext.highlighter-rouge {
 
-    color: rgb(255, 255, 255) !important;
+    color: rgb(255, 238, 0) !important;
   }
   a {
     color: rgb(255, 255, 255) !important;
     text-decoration-style: dotted !important;
     text-decoration-line: 1px !important;
   }
-  
+  .table {
+    color: white;
+    border-color: white;
+  }
 }
 
 .language-python.highlighter-rouge {

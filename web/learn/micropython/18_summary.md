@@ -1,13 +1,11 @@
 ---
 layout: lesson
-title: Why is it called MicroPython?
+title: Summary and Review
 author: Kevin McAleer
-type: lesson
-previous: 00_intro.html
-next: 02_where_to_get_micropython.html
-description: "It\u2019s nothing to do with tiny snakes \U0001F40D"
-percent: 10
-thanks: false
+type: page
+previous: 17_modules.html
+description: A summary of what you have learned so far
+percent: 100
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -64,18 +62,30 @@ navigation:
 ---
 
 
-![Cover photo of students looking confused](assets/what_is_it.jpg){:class="cover"}
+![Picture of a group high-five](assets/summary.jpg){:.cover}
 
-`MicroPython` is a smaller version of the programming language `Python`, designed for use with MicroControllers: `Micro` + `Python`
+## Summary of learning
 
-`Python` gets it name from a TV show...
-> *“When he began implementing Python, Guido van Rossum was also reading the published scripts from ‘Monty*
-> *Python’s Flying Circus’, a BBC comedy series from the 1970s. Van Rossum thought he needed a name that was*
-> *short, unique, and slightly mysterious, so he decided to call the language Python”*
->
-> – docs.python.org
+Let's review the things you've learned in this course.
 
-## MicroPython background
-MicroPython was created by Damien George, with the initial release launched on 3 May 2014. It's actually a program that runs on MicroControllers, and is itself written in the C language.
+### Introduction
+
+In this introduction you learned about where MicroPython gets it name, how to download and install it and why you would want to use it instead of other progrmaming languages. You also learned about the different programming environments available and wrote your first MicroPython program.
+
+---
+
+### Variables and Reserved Words
+
+---
+
+### Controlling the Flow
+
+---
+
+### Functions and Modules
+
+---
+
+### Next Steps
 
 ---
