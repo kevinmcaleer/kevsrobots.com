@@ -14,4 +14,7 @@ This will download the firmware onto your computer in your `downloads` folder.
 
 ![screenshot of the downloads page on micropython.org](assets/downloads.png){:class="img-fluid w-75 shadow-lg"}
 
+A screenshot of the downloads page on [micropython.org](https://www.micropython.org/download/)
+{:.caption}
+
 ---
