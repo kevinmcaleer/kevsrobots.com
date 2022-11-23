@@ -59,6 +59,8 @@ navigation:
 ---
 
 
+![Cover photo of a jungle](assets/why_micropython.jpg){:class="cover"}
+
 MicroPython is ***easier to write***, ***cleaner*** and ***clearer to read***, and ***faster to get the results you want***, than other languages such as C++.
 
 Compare these two examples below. 

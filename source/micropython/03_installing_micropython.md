@@ -6,7 +6,10 @@ type: lesson
 thanks: false
 ---
 
+![Cover photo of a laptop with code on it](assets/how_install.jpg){:class="cover"}
+
 To make installing MicroPython easier you can use `Thonny`, an Integrated Development Environment (IDE) for Python and MicroPython. To download Thonny:
+
 1. Go <https://www.thonny.org> and download the version your computer (`Windows`, `Mac` or `Linux`).
 
 ![Screenshot of the Thonny download page](assets/thonny.png){:class="img-fluid w-50 shadow-lg"}
