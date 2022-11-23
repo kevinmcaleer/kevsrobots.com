@@ -20,14 +20,14 @@ Using the `if` statement is simple, we need a condition to check, and then an ac
 
 We also need to do something different in our code, we need to indent the code under the `if` statement to tell MicroPython that this block of code is only to be run `if` the condition is `True`.
 
-### If statement example
+##### Example
 
 ```python
 if name == 'Kevin':
     print('Hi Boss')
 ```
 
-Notice that there are two equals signs `==`. This is because we use one equal sign `=` to assign values, but two equal signs `==` to compare two value.
+Notice that there are two equals signs `==`. This is because we use one equal sign `=` to assign values, but two equal signs `==` for comparing two value.
 
 ### Comparing values
 
@@ -43,9 +43,10 @@ if a == b: print('They are the same')
 In the example above we assign the value `1` to the variable named `a`, and then we assign the value `1` to the variable `b`. We then compare the two using the `if a == b` condition. 
 
 > ## Colons
-
-> Notice the `:` colon after the condtional statement, this tells MicroPython that what follows is a 
-> block of code. We can write the code on the same line if its just one line, otherwise we need to indent the block of code like this:
+>
+> Notice the `:` colon after the condtional statement, this tells MicroPython that what follows is a
+> block of code. We can write the code on the same line if its just one line, otherwise we need to
+> indent the block of code like this:
 
 ```python
 if a == b: 
@@ -86,11 +87,43 @@ else:
     print('a is not 1')
 ```
 
-### elif
+> ## Code Blocks & Indentation
+>
+> Note that Python and MicroPython recognise blocks of code by their indentation, which is defined by white space (typically `4` spaces per indented block).
+> Other languages like `JavaScript` and `C` use curly braces `{ }` to define blocks of code.
+>
+> ##### Python Example
+>
+> ```python
+> if a == 1:
+>     # this is a code block, notice its indented by 4 spaces
+>     print('a = ', a)
+> ```
+>
+> ---
+>
+> ##### C++ Example
+>
+> ```c++
+> #include <iostream>
+>
+> void main(){
+>  int a;
+>  if (a ==1) {
+>  std::cout << "a = " << a;
+>  }
+> }
+> ```
+>
+> You can see in the C++ example blocks of code are defined by the curly braces `{}`, and these are
+> nested. Curly braces make the code more cluttered and also mean to have to remember to close the curly braces otherwise you'll have errors.
+{:.bg-blue}
 
-We're not done yet - `if` statements have one more trick, it can run another alternative block of code after checking and running the first block of code, or before running the `else` statement.
+## elif
 
-Elif, a shorting of else, if, sits between the first `if` statement test, and the final `else` statement. It can provide for additional checks each with their own blocks of code.
+We're not done yet; `if` statements have one more trick, it can run another alternative block of code after checking and running the first block of code, or before running the `else` statement.
+
+Elif, a shortening of "else if", sits between the first `if` statement test, and the final `else` statement. It can provide for additional checks each with their own blocks of code.
 
 Only one of the blocks of code is run using the `if`, `elif` and `else` statement.
 

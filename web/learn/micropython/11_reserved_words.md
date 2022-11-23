@@ -8,7 +8,7 @@ next: 12_if_elif_else.html
 description: All the words that have a special meaning in Python
 percent: 60
 navigation:
-- name: Learn MicroPython
+- name: Learn MicroPython - The basics
 - content:
   - section: Overview
     content:

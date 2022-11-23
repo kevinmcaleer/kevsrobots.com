@@ -8,7 +8,7 @@ next: 11_reserved_words.html
 description: NUMBERS, TEXT, LISTS AND DICTIONARIES
 percent: 55
 navigation:
-- name: Learn MicroPython
+- name: Learn MicroPython - The basics
 - content:
   - section: Overview
     content:
@@ -61,18 +61,32 @@ navigation:
 
 Programs often need to work with numbers and text, adding and subtracting, asking questions and processing answers.
 
-Python is able to label different types of values so that it can make different commands available to us.
+MicroPython is able to label different types of values so that it can make different commands available to us.
 
 The different types of values are listed below:
 
-| Value Types | Description                                                  | Example                                            |
-|:------------|:-------------------------------------------------------------|----------------------------------------------------|
-| `integer`   | A whole number, which can be positive or negative            | `1, 2, 3, 4, -500, 1000`                            |
-| `float`     | A decimal number, which can be positive or negative          | `3.14, -2.5, 1.66666 `                               |
-| `string`    | A line of text                                               | `'hello world', 'my name is Kevin'  `                |
+{:.caption}
+List of MicroPython data types
+
+| Text type: | `str`
+| Numeric types: | `int`, `float`, `complex`|
+| Lists and sequences: | `list`, `tuple` |
+| Dictionaries (mapping of key-value pairs) | `dict` |
+| Set types: | `set`, `frozenset` |
+| True/False (Boolean) type: | `bool`|
+| Binary types: | `bytes`, `bytearray`, `memoryview` |
+| None type: | `NoneType`|
+{:class="table-w100 table table-bordered"}
+
+| Value Types | Description                                                  | Example                                                |
+|:------------|:-------------------------------------------------------------|--------------------------------------------------------|
+| `int`       | A whole number, which can be positive or negative            | `1, 2, 3, 4, -500, 1000`                               |
+| `float`     | A decimal number, which can be positive or negative          | `3.14, -2.5, 1.66666 `                                 |
+| `str`       | A line of text                                               | `'hello world', 'my name is Kevin'  `                  |
 | `list`      | A collection of words or numbers, or objects                 | `[‘cat’,’dog’,’fish’,’gecko’], `or `[1,2,3,5,8,13,21]` |
-| `dict`      | A dictionary - a list, with pairs of values                  | `{‘name’:’Kevin’, ‘address’:’UK’, ‘age’:45} `        |
-| `object`    | An instance of a class (we’ll cover this in a later session) | Object of `'Cat'` Class                              |
+| `dict`      | A dictionary - a list, with pairs of values                  | `{‘name’:’Kevin’, ‘address’:’UK’, ‘age’:45} `          |
+| 'tuple'     | a collection of                                              |                                                        |
+| `object`    | An instance of a class (we’ll cover this in a later session) | Object of `'Cat'` Class                                |
 {:class="table-w100 table table-bordered"}
 
 When we assign a value to a variable, it is said to have the a *type*.

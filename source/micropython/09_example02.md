@@ -6,9 +6,10 @@ layout: lesson
 
 Let’s do something more interesting.
 
-Lets make the Raspberry Pi Pico (or whichever board you are using) ask us a question, then reply back to us.
+We'll make the Raspberry Pi Pico (or whichever board you are using) ask us a question, then reply back to us.
 
 ## name.py
+
 Type of the program below into your Python Editor
 
 ```python
@@ -22,21 +23,7 @@ print("Hello", name)
 
 Save the file and then run it by pressing the green `run` button.
 
-> ## Note
-> The pound (or hash) symbol `#` means the reset of the line is a comment
-> MicroPython ignores comments, so you can type useful reminders or notes to others here
-> 
-> ```python
-> # a single line comment
->```
->
-> For comments that span multiple lines, you can use 3 double quotations:
-> ```python
-> """ This is a multi -
-> line comment """
-> ```
-
-We’ve introduced something new - the word ‘`name`’ is what we call a `variable` (something that can change). The `name` variable holds the value that it is assigned, and we assigned it by using the `=` equals sign.
+The `name` variable holds the value that it is assigned, and we assigned it by using the `=` equals sign.
 
 The function `input`, is another built-in function that MicroPython provides to get user input from the keyboard and return it to our program.
 
@@ -59,7 +46,23 @@ print('hello', name, 'how does', age, 'feel?')
 
 ---
 
-We can use variables in maths, for example if we want to find the missing angle in a triangle, and we have the other two angles we can use a formula - `180 - a + b = c`
+> ## Note
+>
+> `input()` only returns text (`str`) types of data, this means if you try to do any math with the age
+> it will not work in the way you expect. 
+>
+> If you want `age` to be a number you will too to wrap it in the `int()` type to change it. 
+>
+> E.g.
+>
+> ```python
+> age = int(input('please enter your age >'))
+> print('next year you will be', age + 1, 'years old')
+> ```
+>
+> This is called `casting` and we'll look at this in more depth in later modules.
+
+We can use variables in maths, for example if we want to find the missing angle in a triangle, and we have the other two angles we can use a formula: `180 - a + b = c`
 
 type:
 

@@ -12,7 +12,7 @@ This is because when we `import` a module MicroPython has to read all the lines 
 
 Lets have alook at all the modules on our MicroPython device. 
 
-**Example**
+##### Example
 
 1. Type the following directly into the `REPL`:
 
@@ -49,7 +49,7 @@ This isn't an extensive list, and each variety of board may have a slightly diff
 
 To investigate each module you can use the `dir()` function:
 
-**Example**
+##### Example
 
 From the `REPL` type:
 ```python

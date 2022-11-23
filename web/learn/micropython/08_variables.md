@@ -8,7 +8,7 @@ next: 09_example02.html
 description: A Place to store values
 percent: 45
 navigation:
-- name: Learn MicroPython
+- name: Learn MicroPython - The basics
 - content:
   - section: Overview
     content:
@@ -61,7 +61,7 @@ navigation:
 
 ![Pigeon Holes Photo](assets/pigeon_holes.jpg){:class="cover"}
 
-## Example
+##### Example
 
 ```python
 a = 1
@@ -81,7 +81,8 @@ age = 21
 
 > ## MicroPython Facts
 >
-> In MicroPython variables don’t actually store the value, they just point to the thing that does.
+> Like Python, MicroPython variables don’t actually store the value, they just point to the thing that does.
+{:class="blockquote bg-blue"}
 
 ---
 
@@ -90,10 +91,14 @@ age = 21
 If `variables` contain values that change, `Constants` contain values that dont change.
 For example, if we wanted to store the value of `pi`, the value of `pi` does not change, so we can store this in a special type of object called a `constant`.
 
-**Example**
+##### Example
 
 ```python
 PI = const(3.141592654)
 ```
 
 In the example above we use the `const()` function to define the value `3.141592654` as the constant `PI`. The convention is that constants are always in uppercase.
+
+> ## Const()
+>
+> `const()` is a specific to MicroPython, in regular python constants are treated as varibles, just in upper case.

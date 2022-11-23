@@ -63,7 +63,7 @@ This is because when we `import` a library MicroPython has to read all the lines
 
 Lets have alook at all the libraries on our MicroPython device:
 
-**Example**
+##### Example
 ```python
 help('modules')
 ```

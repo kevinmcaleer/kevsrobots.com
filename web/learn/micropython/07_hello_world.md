@@ -8,7 +8,7 @@ next: 08_variables.html
 description: hello_world.py
 percent: 40
 navigation:
-- name: Learn MicroPython
+- name: Learn MicroPython - The basics
 - content:
   - section: Overview
     content:

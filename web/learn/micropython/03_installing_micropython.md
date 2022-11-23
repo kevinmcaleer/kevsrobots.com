@@ -9,7 +9,7 @@ description: Easy Install with Thonny
 percent: 20
 thanks: false
 navigation:
-- name: Learn MicroPython
+- name: Learn MicroPython - The basics
 - content:
   - section: Overview
     content:

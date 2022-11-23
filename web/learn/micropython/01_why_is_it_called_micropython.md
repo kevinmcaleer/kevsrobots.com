@@ -9,7 +9,7 @@ description: "It\u2019s nothing to do with tiny snakes \U0001F40D"
 percent: 10
 thanks: false
 navigation:
-- name: Learn MicroPython
+- name: Learn MicroPython - The basics
 - content:
   - section: Overview
     content:

@@ -13,12 +13,10 @@ First is a piece of code written for the `Arduino` in `C++`:
 ## C++
 
 ```C
-#include “stdio.h”
-void helloWorld() {
-  printf(“hello world”);
-}
+#include <iostream>
+
 void main() {
-  helloWorld();
+  std::cout << "hello world";
 }
 ```
 
@@ -27,10 +25,7 @@ The second piece of code is written in `MicroPython`:
 ## MicroPython
 
 ```python
-def hello_world():
   print(“hello world)
-
-hello_world()
 ```
 
 As you can see, the MicroPython code is simpler, easier to read, shorter and faster to write.

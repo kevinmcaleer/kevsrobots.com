@@ -8,7 +8,7 @@ next: 16_repl.html
 description: Learn how to make reusable blocks of code
 percent: 80
 navigation:
-- name: Learn MicroPython
+- name: Learn MicroPython - The basics
 - content:
   - section: Overview
     content:
@@ -68,7 +68,7 @@ Functions can also have parameters of there own.
 
 Lets create a simple function that will print a message when its called:
 
-**Example**
+##### Example
 
 ```python
 def say_hello():
@@ -89,7 +89,7 @@ The function code is also indented.
 
 We often want our function to take in an input variable so that we can use it in the function code. Lets extend our `say_hello` example so that it can include a name and age.
 
-**Example**
+##### Example
 
 ```python
 def say_hello(name, age):
@@ -105,7 +105,7 @@ Notice how Python accepts the two different types of variables - the `name` is a
 
 We can take this a step further and pass variables to the function and it will work just the same:
 
-**Example**
+##### Example
 
 ```python
 def say_hello(name, age):
@@ -124,7 +124,7 @@ Functions can also call other functions, though on a MicroController you may fin
 
 Functions can do more than just run blocks of code, they can return values too. Lets make a new function that takes a value and adds `1` to it.
 
-**Example**
+##### Example
 
 ```python
 def add_one(number):
