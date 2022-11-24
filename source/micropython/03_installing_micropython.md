@@ -35,7 +35,7 @@ Screenshot of the standard mode link
 
 1. Click on on the bottom right corner and select `Install MicroPython...`
 
-![Screenshot of the Thonny Install dialog option](assets/install_micropython.png){:class="img-fluid w-75 shadow-lg my-3"}
+![Screenshot of the Thonny Install dialog option](assets/thonny_install.png){:class="img-fluid w-75 shadow-lg my-3"}
 
 Screenshot of the Thonny Install dialog option
 {:.caption}
