@@ -67,7 +67,7 @@ This will output:
 
 ## If, Else
 
-So far we've checked for a condition and `if` that condition is `True` then we've run a block of code, but what if we want to run another block of code if the condion is `False`. We ***could*** do this:
+So far we've checked for a condition and `if` that condition is `True` then we've run a block of code, but what if we want to run another block of code if the condition is `False`. We ***could*** do this:
 
 ```python
 if a == 1:
