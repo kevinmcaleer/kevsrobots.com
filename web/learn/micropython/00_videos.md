@@ -1,12 +1,12 @@
 ---
 layout: lesson
-title: Example 01
+title: Learm MicroPython Introduction Video
 author: Kevin McAleer
 type: page
-previous: 06_our_first_program.html
-next: 08_variables.html
-description: hello_world.py
-percent: 45
+previous: 00_intro.html
+next: 01_why_is_it_called_micropython.html
+description: Watch the MicroPython Introduction Video
+percent: 10
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -65,18 +65,9 @@ navigation:
 ---
 
 
-Type of the program below into your MicroPython Editor.
+## YouTube Series
+I've recorded the Learn MicroPython course in video form, so if you prefer to watch than read you can follow along here too. If you find this of value, please consider [subscribing](https://www.youtube.com/c/kevinmacleer28).
 
-```python
-# Hello World
-
-print("Hello, world!")
-```
-
-In Thonny, save the file and then run it with the green `run` button.
-
-![A screenshot of the hello world program](assets/hello_world_program.png){:class="img-fluid w-100 shadow-lg"}
-
-![A screenshot of the results in the console from running the Hello World program](assets/hello_world_console.png){:class="img-fluid w-100 shadow-lg"}
+{% include youtubeplayer.html id="TkuDQ-SzXwU" %}
 
 ---

@@ -3,10 +3,10 @@ layout: lesson
 title: Why is it called MicroPython?
 author: Kevin McAleer
 type: lesson
-previous: 00_intro.html
+previous: 00_videos.html
 next: 02_where_to_get_micropython.html
 description: "It\u2019s nothing to do with tiny snakes \U0001F40D"
-percent: 10
+percent: 15
 thanks: false
 navigation:
 - name: Learn MicroPython - The basics
@@ -15,6 +15,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

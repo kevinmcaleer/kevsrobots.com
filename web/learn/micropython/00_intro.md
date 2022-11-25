@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-next: 01_why_is_it_called_micropython.html
+next: 00_videos.html
 description: Get started with MicroPython, What it is, where to download it and which
   software to use to develop MicroPython code.
 percent: 5
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

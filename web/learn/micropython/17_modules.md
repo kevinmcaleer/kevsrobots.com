@@ -6,7 +6,7 @@ type: page
 previous: 16_repl.html
 next: 18_summary.html
 description: Learn about the built-in Modules
-percent: 90
+percent: 95
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

@@ -6,7 +6,7 @@ type: page
 previous: 14_operators.html
 next: 16_repl.html
 description: Learn how to make reusable blocks of code
-percent: 80
+percent: 85
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

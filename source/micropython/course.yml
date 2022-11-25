@@ -11,6 +11,7 @@
       name: Overview
       content:
       - 00_intro.md 
+      - 00_videos.md
       
   - section:
       name: Introduction

@@ -6,7 +6,7 @@ type: page
 previous: 11_reserved_words.html
 next: 13_loops.html
 description: Conditional control
-percent: 65
+percent: 70
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

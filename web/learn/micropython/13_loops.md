@@ -6,7 +6,7 @@ type: page
 previous: 12_if_elif_else.html
 next: 14_operators.html
 description: Flow Control
-percent: 70
+percent: 75
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

@@ -6,7 +6,7 @@ type: page
 previous: 04_why_use_micropython.html
 next: 06_our_first_program.html
 description: Choose the best development tool for you
-percent: 30
+percent: 35
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

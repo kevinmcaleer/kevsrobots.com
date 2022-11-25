@@ -6,7 +6,7 @@ type: page
 previous: 10_values_and_variable_types.html
 next: 12_if_elif_else.html
 description: All the words that have a special meaning in Python
-percent: 60
+percent: 65
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

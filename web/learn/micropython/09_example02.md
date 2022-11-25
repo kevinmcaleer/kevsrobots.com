@@ -6,7 +6,7 @@ type: page
 previous: 08_variables.html
 next: 10_values_and_variable_types.html
 description: Variables
-percent: 50
+percent: 55
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

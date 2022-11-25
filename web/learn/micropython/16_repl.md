@@ -6,7 +6,7 @@ type: page
 previous: 15_functions.html
 next: 17_modules.html
 description: Read Evaluation Print Loop
-percent: 85
+percent: 90
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

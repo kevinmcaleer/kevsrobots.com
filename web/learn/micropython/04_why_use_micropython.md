@@ -6,7 +6,7 @@ type: page
 previous: 03_installing_micropython.html
 next: 05_ides.html
 description: It's designed to be easy to read and write, perfect for beginners
-percent: 25
+percent: 30
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

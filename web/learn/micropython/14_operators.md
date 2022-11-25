@@ -6,7 +6,7 @@ type: page
 previous: 13_loops.html
 next: 15_functions.html
 description: Comparitive operators
-percent: 75
+percent: 80
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

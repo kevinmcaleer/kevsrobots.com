@@ -6,7 +6,7 @@ type: page
 previous: 09_example02.html
 next: 11_reserved_words.html
 description: NUMBERS, TEXT, LISTS AND DICTIONARIES
-percent: 55
+percent: 60
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

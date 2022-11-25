@@ -6,7 +6,7 @@ type: page
 previous: 05_ides.html
 next: 07_hello_world.html
 description: "\u2018Hello World\u2019 - its a tradition"
-percent: 35
+percent: 40
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?

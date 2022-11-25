@@ -6,7 +6,7 @@ type: lesson
 previous: 02_where_to_get_micropython.html
 next: 04_why_use_micropython.html
 description: Easy Install with Thonny
-percent: 20
+percent: 25
 thanks: false
 navigation:
 - name: Learn MicroPython - The basics
@@ -15,6 +15,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: Learm MicroPython Introduction Video
+      link: 00_videos.html
   - section: Introduction
     content:
     - name: Why is it called MicroPython?
