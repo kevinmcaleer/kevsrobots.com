@@ -1,0 +1,13 @@
+- name: Working with Data
+  author: Kevin McAleer
+  date_created: 24-11-2022
+  date_published: 24-11-2022
+  layout: course
+  cover: assets/data.jpg
+  description: >- 
+     Learn how to read and write data to files, how to work with lists, dictionaries, strings and how to cast between data types
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
