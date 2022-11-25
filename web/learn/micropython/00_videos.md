@@ -1,6 +1,6 @@
 ---
 layout: lesson
-title: Learm MicroPython Introduction Video
+title: Learn MicroPython Introduction Video
 author: Kevin McAleer
 type: page
 previous: 00_intro.html
@@ -14,7 +14,7 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
-    - name: Learm MicroPython Introduction Video
+    - name: Learn MicroPython Introduction Video
       link: 00_videos.html
   - section: Introduction
     content:
@@ -66,6 +66,7 @@ navigation:
 
 
 ## YouTube Series
+
 I've recorded the Learn MicroPython course in video form, so if you prefer to watch than read you can follow along here too. If you find this of value, please consider [subscribing](https://www.youtube.com/c/kevinmacleer28).
 
 {% include youtubeplayer.html id="TkuDQ-SzXwU" %}

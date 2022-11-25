@@ -14,7 +14,7 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
-    - name: Learm MicroPython Introduction Video
+    - name: Learn MicroPython Introduction Video
       link: 00_videos.html
   - section: Introduction
     content:
