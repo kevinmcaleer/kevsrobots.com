@@ -119,6 +119,8 @@ else:
 > nested. Curly braces make the code more cluttered and also mean to have to remember to close the curly braces otherwise you'll have errors.
 {:.bg-blue}
 
+---
+
 ## elif
 
 We're not done yet; `if` statements have one more trick, it can run another alternative block of code after checking and running the first block of code, or before running the `else` statement.
