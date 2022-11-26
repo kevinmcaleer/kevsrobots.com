@@ -92,7 +92,7 @@ i is 0
 >
 > * Arguments can be values or variables
 > * Arguments are separated by commas
-> * Arguments are position - the order the arguments are provided should match the order the function expects
+> * Arguments are positional - the order the arguments are provided should match the order the function expects
 > * Arguments can be named, in which case the order doesn’t matter
 > * Arguments can be optional
 >
@@ -153,7 +153,7 @@ for i in range(50,200,10):
 
 if we want to run a block of code many times, based on whether or not a condition is `True` or `False`, we can use the `while` loop.
 
-You'll often see this to run blocks of code indefinetly on MicroControllers as we may want to run the code forever or until the device is reset.
+You'll often see this to run blocks of code indefinitely on MicroControllers as we may want to run the code forever or until the device is reset.
 
 ---
 
