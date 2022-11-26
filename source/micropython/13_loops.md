@@ -28,6 +28,15 @@ i is 0
 > **`Parameters`**, also known as **`arguments`** are variables that act as inputs into a function. We'll look at functions shortly.
 > An example of an argument is the value `100` that we just used in in the `range` function.
 > In some programming languages there is a difference between an argument (a literal value like `100`), and a parameter that is a variable (such as `a` that refers to another value). MicroPython doesn't make such a distinction.
+>
+> * Arguments can be values or variables
+> * Arguments are separated by commas
+> * Arguments are positional - the order the arguments are provided should match the order the function expects
+> * Arguments can be named, in which case the order doesn’t matter
+> * Arguments can be optional
+>
+> ![Picture of a function with arguments labelled](assets/arguments.png){:class="img-fluid w-50"}
+>
 
 ## The range() Function
 
