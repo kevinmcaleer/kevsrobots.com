@@ -61,9 +61,9 @@ Important notes will be highlighted in sections like the two below:
 
 ---
 
-> ## Another asside
+> ## Another aside
 >
-> Assides are also highlighed in sections, but in an alternative colour
+> Asides are also highlighed in sections, but in an alternative colour
 {:.bg-blue}
 
 ---
