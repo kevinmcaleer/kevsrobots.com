@@ -1,0 +1,13 @@
+- name: MicroPython - Working with text
+  author: Kevin McAleer
+  date_created: 21-11-2022
+  date_published: 21-11-2022
+  layout: course
+  cover: assets/text.jpg
+  description: >- 
+      Learn how to work with text in MicroPython
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 

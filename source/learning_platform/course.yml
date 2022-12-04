@@ -1,0 +1,19 @@
+- name: How to use the Learning Platform
+  author: Kevin McAleer
+  date_created: 18-11-2022
+  date_published: 18-11-2022
+  layout: course
+  cover: assets/learn.jpg
+  description: >- 
+     Learn how to use the new Learning Platform
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
+      - 01_how_to_use.md
+  - section:
+      name: Navigating Content
+      content:
+      - 02_navigate_content.md
+      - 03_download_content.md

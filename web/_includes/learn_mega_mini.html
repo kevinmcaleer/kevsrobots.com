@@ -1,0 +1,29 @@
+{% assign courses = site.data.courses %}
+<div class="">
+<nav class="navbar">
+    <div class="container-fluid">
+      <span class="navbar-text">
+        Recent Courses
+      </span>
+      <span class="navbar-text">
+        <a href="/learn/all_courses.html" class="dotted">All Courses ></a>
+      </span>
+    </div>
+  </nav>
+
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6">
+    {% for course in courses limit:6 %}
+    <div class="col mb-3">
+        <div class="card h-100">
+            <a href="{{course.link}}" class="nav-item dotted">
+                <img src="{{course.cover}}" class="card-img-top">
+            <div class="card-body">
+                <p class="card-text">{{course.name}}</p>
+                <small class="text-muted duration">{{course.duration}}</small>
+            </div> 
+          </a> 
+        </div>
+    </div>
+    {% endfor %} 
+</div>
+</div>

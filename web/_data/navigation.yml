@@ -3,6 +3,8 @@
   icon: "fas fa-home"
 - name: Robots & Projects
   link: /robots/
+- name: Learn
+  link: /learn/
 - name: BLOG
   link: /blog/
 # - name: Links

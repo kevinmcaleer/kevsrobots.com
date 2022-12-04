@@ -1,0 +1,23 @@
+<h1>All Courses</h1>
+<h5>Learn something new.</h5>
+<hr class="my-2">
+
+{% assign courses = site.data.courses %}
+
+<div class="row row-cols-lg-4 row-cols-sm-2 row-cols-md-3">
+    {% for course in courses %}
+<div class="col mb-3">
+    <div class="card h-100">
+        <a href="{{course.link}}" class="nav-item dotted">
+            <img src="{{course.cover}}" class="card-img-top">
+        <div class="card-body">
+            <p class="small mute align-right">{{course.duration}}</p>
+            <p class="card-text">{{course.name}}</p>
+            <p class="small mute align-right">{{course.author}}</p>
+        </div>    
+        </a>
+    </div>
+</div>
+
+{% endfor %} 
+</div>

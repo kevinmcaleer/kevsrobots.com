@@ -1,0 +1,48 @@
+- name: Learn MicroPython - The basics
+  author: Kevin McAleer
+  date_created: 28-10-2022
+  date_published: 28-10-2022
+  layout: course
+  cover: assets/micropython.jpg
+  description: >- 
+     Get started with MicroPython, What Python is, where to download it and which software to use to develop MicroPython code
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
+      - 00_videos.md
+      
+  - section:
+      name: Introduction
+      content:
+      - 01_why_is_it_called_micropython.md
+      - 02_where_to_get_micropython.md
+      - 03_installing_micropython.md
+      - 04_why_use_micropython.md
+      - 05_ides.md
+      - 06_our_first_program.md
+      - 07_hello_world.md
+  - section:
+      name: Variables and Reserved Words
+      content:
+      - 08_variables.md
+      - 09_example02.md
+      - 10_values_and_variable_types.md
+      - 11_reserved_words.md
+  - section:
+      name: Controlling the Flow
+      content:
+      - 12_if_elif_else.md
+      - 13_loops.md
+      - 14_operators.md
+  - section:
+      name: Functions and Modules
+      content:
+      - 15_functions.md
+      - 16_repl.md
+      - 17_modules.md
+  - section:
+      name: Summary and Review
+      content:
+      - 18_summary.md

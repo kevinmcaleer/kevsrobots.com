@@ -1,0 +1,34 @@
+- name: Learn MicroPython Introduction
+  topics:
+  - Introduction
+  - Variables and Reserved Words
+  - Controlling the Flow
+  - Functions and Modules
+- name: Working with Data
+  topics:
+  - Pins & reading values
+  - Reading and writing files
+  - working with lists
+  - working with dictionaries
+  - working with strings
+  - Casting
+- name: Object Oriented Programming
+  topics:
+  - classes and objects
+  - inheritance
+  - polymorphism
+  - encapsulation
+  - abstraction
+- name: MicroPython on the Internet
+  topics:
+  - HTTP
+  - Websockets
+  - MQTT
+  - JSON
+  - REST
+  - Web APIs
+
+documenting code with doc strings
+Pep8 and black
+Intermediate control & control theory
+electronics

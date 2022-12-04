@@ -1,0 +1,69 @@
+---
+layout: default
+thanks: false
+---
+<div class="container-fluid mx-3">
+{% include breadcrumbs.html %}
+</div>
+<div class="row">
+    <div class="col-12 col-md-12 col-lg-3 bg-light">
+        {% assign nav = page.navigation %}
+        <div class="container-fluid my-3">
+            <div class="learn-nav m-0 p-0">
+        <div class="card">
+            <div class="card-header bg-learnhead py-0">
+              <p class="text-white my-0 text-center text-nowrap ">KevsRobots Learning Platform</p>
+            </div>
+            <div class="card-body">
+                <div class="container mb-3">
+                    <h5>{{nav[0].name}}</h5>
+                    
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{page.percent}}%" aria-valuenow="{{nav.progress}}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-small">{{page.percent}}% Percent Complete</p>
+                </div>
+            </div>
+            </div>  
+        </div>
+        </div>
+        
+        <div class="container-fluid m-0 test">
+        {% for item in nav %}
+        {% for section in item.content %}
+        
+        <h5>{{section.section}}</h5>
+
+        <ul class="nav flex-column m-0 p-0">
+        {% for lesson in section.content %}
+        {% assign page_url = page.url | relative_url %}
+        {% assign current = page.url | downcase | split: '/' %}
+        
+            <li class="nav-link m-0 mb-1 p-0 {% if current[-1] == lesson.link %}active{% endif %}"><a href="{{lesson.link}}" class="nav-item dotted {% if current[-1] == lesson.link %}active{% endif %}">{{lesson.name}}</a></li>
+            {% endfor %}
+        </ul>
+        <hr class="m-1 p-0"/>
+        {% endfor %}
+        {% endfor %}
+        </div>
+        </div>
+    
+    <div class="col-12 col-md-12 col-lg-9">
+        <div class="px-3 m-3">
+            <h1>{{page.title}}</h1>
+            <h2>{{page.description}}</h2>
+            <p class="text-small mute">By {{page.author}}, Duration: {{page.duration}} Minutes</p>
+            <hr />
+            {{content}}
+        </div>
+        <p class="text-center">
+        {% if page.previous %}
+        <a href="{{page.previous}}" class="btn btn-primary"> < Previous</a>
+        {% endif %}
+        {% if page.next %}
+        <a href="{{page.next}}" class="btn btn-primary">Next ></a>
+        {% endif %}
+        </p>
+    </div>
+</div>
+
