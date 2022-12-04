@@ -7,6 +7,7 @@ previous: 14_operators.html
 next: 16_repl.html
 description: Learn how to make reusable blocks of code
 percent: 85
+duration: 5
 navigation:
 - name: Learn MicroPython - The basics
 - content:

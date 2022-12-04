@@ -6,6 +6,7 @@ type: page
 next: 01_how_to_use.html
 description: How to use the Learning Platform
 percent: 25
+duration: 1
 navigation:
 - name: How to use the Learning Platform
 - content:

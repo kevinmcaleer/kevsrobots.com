@@ -7,6 +7,7 @@ previous: 02_where_to_get_micropython.html
 next: 04_why_use_micropython.html
 description: Easy Install with Thonny
 percent: 25
+duration: 2
 thanks: false
 navigation:
 - name: Learn MicroPython - The basics

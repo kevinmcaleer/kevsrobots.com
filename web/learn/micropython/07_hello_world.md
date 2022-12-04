@@ -7,6 +7,7 @@ previous: 06_our_first_program.html
 next: 08_variables.html
 description: hello_world.py
 percent: 45
+duration: 1
 navigation:
 - name: Learn MicroPython - The basics
 - content:

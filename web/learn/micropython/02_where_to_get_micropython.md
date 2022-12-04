@@ -7,6 +7,7 @@ previous: 01_why_is_it_called_micropython.html
 next: 03_installing_micropython.html
 description: MicroPython can be installed on many 32bit microcontrollers
 percent: 20
+duration: 1
 navigation:
 - name: Learn MicroPython - The basics
 - content:

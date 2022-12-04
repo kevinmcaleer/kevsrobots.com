@@ -6,7 +6,7 @@ import os
 import yaml
 import json
 from shutil import copytree as copy, rmtree as rmdir, copyfile as copyfile
-from math import ceil, floor
+from course_builder.lesson import Lesson
 
 class Course():
     name = ""
@@ -21,7 +21,6 @@ class Course():
     output = ""
     output_folder = "web/build"
     course_folder = ""
-    content = []
     level = 'beginner'
     cover = "" # cover image
     link = "" # url to first file in course
@@ -52,6 +51,7 @@ class Course():
         if duration: self.duration = duration
 
     def calculate_duration(self):
+        """ Read in all the text, count the words and eastimate the reading time """
         duration = 0
         with open(f'{self.course_folder}/course.yml', 'r') as stream:
             try:
@@ -276,15 +276,59 @@ class Course():
             
         copy(self.course_folder + '/assets', self.output_folder + '/assets')
 
+    def build_front_matter(self, item, lesson:Lesson())->int:
+        """ build the front matter for the lesson and returns the duration """
+
+        front_matter = f'---' + "\n"
+        front_matter += f'layout: {self.layout}' + "\n"
+        front_matter += f'title: {item}' + "\n"
+        front_matter += f'author: {self.author}' + "\n"
+        front_matter += f'type: {self.type}' + "\n"
+        if lesson.previous_link is not None:
+            front_matter += f'previous: {lesson.previous_link}' + "\n"
+        if lesson.next_link is not None:
+            front_matter += f'next: {lesson.next_link}' + "\n"
+        front_matter += f'description: {self.description}' + "\n"
+        front_matter += f'percent: {lesson.percentage}' + "\n"
+        
+        # update front matter
+        lesson_file = f'{self.course_folder}/{item}'
+        with open(lesson_file, 'r') as f:
+            print(f'reading {lesson_file}')
+            lines = f.read()
+            # print(f'lines is: {lines}')
+        
+        # words per minute
+        words_per_minute = 100
+
+        # count the number of words in the lines
+        lesson.word_count = len(lines.split())  
+        lesson.duration = round(lesson.word_count // words_per_minute)
+
+        if lesson.duration == 0:
+            lesson.duration = 1
+
+        front_matter += f'duration: {lesson.duration}' + "\n" 
+        front_matter += f'---' + "\n"
+        page = self.update_front_matter(lesson_file=lines, front_matter=front_matter)
+        
+        # write the file
+        with open(f'{self.output_folder}/{item}', 'w') as build_file:
+            build_file.writelines(page)
+
+        return lesson.duration
 
     def build(self):
         """ Build the front matter for each content page, and output to the build folder """
+        # create front matter
+        # calculate percentage complete
+        # get reading duration
 
+        # TODO: refactor - make simpler
+        
         # Create the front matter that is used to build the page navigation and previous, next buttons
         self.create_output(self.output_folder)
-        lesson = ""
-        lesson += "<nav>" + "\n"
-
+   
         # work out how much each page is as a percentage
         if self.no_of_lessons > 0:
             page_percent = 100 // self.no_of_lessons
@@ -300,14 +344,13 @@ class Course():
 
         for section in self.content:
             # Each section has a name and a content list of items
-            # print(f'section is: {section}')
             just_item = section['section']    
 
             #  for each item in the content section 
             for item in just_item['content']:
                 
-                # open the file and get the duration, add it to the course duration
-                self.duration += self.get_duration(item)
+                # create a lesson to hold the lesson details
+                lesson = Lesson()
 
                 if page_count == 1:
                     url = item.replace('.md', '.html')
@@ -317,48 +360,25 @@ class Course():
                
                 print(f'item is: {item}, index is {index}, page_count is {page_count}')
            
-                item_percentage = page_percent * page_count
-                if item_percentage > 100:
-                    item_percentage = 100
-                elif item_percentage < 100 and page_count == self.no_of_lessons:
-                    item_percentage = 100
+                # item_percentage = page_percent * page_count
+                lesson.percentage = page_percent * page_count
+
+                if lesson.percentage > 100:
+                    lesson.percentage = 100
+                elif lesson.percentage < 100 and page_count == self.no_of_lessons:
+                    lesson.percentage = 100
+
                 # set the previous and next links
-                next = self.next_lesson(page_count)
-                previous = self.previous_lesson(page_count)
+                lesson.next_link = self.next_lesson(page_count)
+                lesson.previous_link = self.previous_lesson(page_count)
                 
                 # increment if it's a page
                 if item in self.lessons and page_count < self.no_of_lessons: 
                     page_count += 1
                     print(f'page is: {item}, page_count is {page_count}')
                    
-                front_matter = f'---' + "\n"
-                front_matter += f'layout: {self.layout}' + "\n"
-                front_matter += f'title: {item}' + "\n"
-                front_matter += f'author: {self.author}' + "\n"
-                front_matter += f'type: {self.type}' + "\n"
-                if previous is not None:
-                    front_matter += f'previous: {previous}' + "\n"
-                if next is not None:
-                    front_matter += f'next: {next}' + "\n"
-                front_matter += f'description: {self.description}' + "\n"
-                front_matter += f'percent: {item_percentage}' + "\n"
-                # front_matter += f'duration: {self.duration}' + "\n"
-                front_matter += f'---' + "\n"
-            
-                # update front matter
-                lesson_file = f'{self.course_folder}/{item}'
-                with open(lesson_file, 'r') as f:
-                    print(f'reading {lesson_file}')
-                    lines = f.read()
-                    # print(f'lines is: {lines}')
-                page = self.update_front_matter(lesson_file=lines, front_matter=front_matter)
-
-                # print(f'{page}')
-
-                # write the file
-                # print(f'writing file: {self.output_folder}/{item}')
-                with open(f'{self.output_folder}/{item}', 'w') as build_file:
-                    build_file.writelines(page)
+                duration = self.build_front_matter(item, lesson)
+                self.duration += duration
 
         self.copy_assets() # copy the assets folder to the output folder
         self.build_index() # build the index page
@@ -370,7 +390,10 @@ class Course():
         
         hours = self.duration // 60
         minutes = self.duration % 60
-        duration = f'{hours}h {minutes}m'
+        if hours > 0:
+            duration = f'{hours}h {minutes}m'
+        else:
+            duration = f'{minutes}m'
         return duration 
 
     def __str__(self):
@@ -380,84 +403,3 @@ class Course():
         link_path = self.output_folder.replace('web','') + "/" + self.link
         
         return {'description':self.description, 'name':self.name, 'cover':cover_path, 'link':link_path, 'duration':self.duration_str, 'author':self.author}  
-
-
-class Courses():
-    course_list = []
-    output_folder = "web/learn"
-    duration = 0
-
-    def __init__(self, data=None):
-        if data: self.course_list = data
-
-    def read_courses(self, course_folder):
-        """ Read all the courses in the course folder """
-        
-        for course in os.listdir(course_folder):
-            new_course = Course()
-            if os.path.isdir(os.path.join(course_folder, course)):
-                print(f'Found course: {course}')
-                new_course.read_course(os.path.join(course_folder, course))
-                new_course.output_folder = os.path.join(self.output_folder,course)
-                self.course_list.append(new_course)
-        return self
-
-
-
-    def output_yml(self, output_folder):
-        """ Output the course data to a yml file """
-
-        # check if folder exists
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
-
-        with open(f'{output_folder}/courses.yml', 'w') as outfile:
-
-            c = []
-            for course in self.course_list:
-                c.append(course.__str__())
-
-            yaml.safe_dump(c, outfile, default_flow_style=False)
-        
-    def build(self):
-        """ Build the courses """
-        
-        for course in self.course_list:
-            self.duration = course.build()
-        
-        self.build_index()
-        self.build_recent()
-    
-    def build_index(self):
-
-        # remove the index file if it exists
-        if os.path.exists(f'{self.output_folder}/index.md'):
-            os.remove(f'{self.output_folder}/index.md')
-            
-        index = f'---' + "\n"
-        index += f'layout: content' + "\n"
-        index += f'title: Learn' + "\n"
-        index += f'description: Take a course and learn something new' + "\n"
-        index += f'duration: {self.duration}' + "\n"
-        index += f'---' + "\n"
-        index += f'{{% include all_courses.html %}}' + "\n"
-        
-        with open(f'{self.output_folder}/index.md', 'w') as build_file:
-            build_file.writelines(index)
-
-    def build_recent(self):
-        """ Build the recent Courses page """
-
-        # remove the index file if it exists
-        if os.path.exists(f'{self.output_folder}/recent.md'):
-            os.remove(f'{self.output_folder}/recent.md')
-            
-        index = f'---' + "\n"
-        index += f'layout: content' + "\n"
-        index += f'title: Recent Courses' + "\n"
-        index += f'description: Recent Courses' + "\n"
-        index += f'---' + "\n"
-        index += f'{{% include recent_courses.html %}}' + "\n"
-
-        with open(f'{self.output_folder}/recent.md', 'w') as build_file:
-            build_file.writelines(index)

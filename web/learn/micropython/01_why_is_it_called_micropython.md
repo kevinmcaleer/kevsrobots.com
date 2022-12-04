@@ -7,6 +7,7 @@ previous: 00_videos.html
 next: 02_where_to_get_micropython.html
 description: "It\u2019s nothing to do with tiny snakes \U0001F40D"
 percent: 15
+duration: 1
 thanks: false
 navigation:
 - name: Learn MicroPython - The basics

@@ -6,6 +6,7 @@ type: page
 previous: 17_modules.html
 description: A summary of what you have learned so far
 percent: 100
+duration: 2
 navigation:
 - name: Learn MicroPython - The basics
 - content:

@@ -7,6 +7,7 @@ previous: 11_reserved_words.html
 next: 13_loops.html
 description: Conditional control
 percent: 70
+duration: 8
 navigation:
 - name: Learn MicroPython - The basics
 - content:

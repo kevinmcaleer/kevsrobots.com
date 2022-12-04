@@ -1,14 +1,13 @@
-- cover: /learn/micropython/assets/micropython.jpg
+- author: Kevin McAleer
+  cover: /learn/micropython/assets/micropython.jpg
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code
+  duration: 1h 11m
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
-- cover: /learn/learning_platform/assets/learn.jpg
+- author: Kevin McAleer
+  cover: /learn/learning_platform/assets/learn.jpg
   description: Learn how to use the new Learning Platform
+  duration: 4m
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
-- cover: /learn/working_with_data/assets/data.jpg
-  description: Learn how to read and write data to files, how to work with lists,
-    dictionaries, strings and how to cast between data types
-  link: /learn/working_with_data/00_intro.html
-  name: Working with Data

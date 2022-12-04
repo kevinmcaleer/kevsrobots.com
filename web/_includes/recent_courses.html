@@ -8,10 +8,15 @@
     {% for course in courses %}
 <div class="col mb-3">
     <div class="card h-100">
+       
         <a href="{{course.link}}" class="nav-item dotted">
             <img src="{{course.cover}}" class="card-img-top">
         <div class="card-body">
+           
+            <p class="small mute text-right">{{course.duration}}</p>
             <p class="card-text">{{course.name}}</p>
+            <p class="small mute text-right">{{course.author}}</p>
+            
         </div>    
         </a>
     </div>

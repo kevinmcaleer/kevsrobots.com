@@ -7,6 +7,7 @@ previous: 13_loops.html
 next: 15_functions.html
 description: Comparitive operators
 percent: 80
+duration: 14
 navigation:
 - name: Learn MicroPython - The basics
 - content:

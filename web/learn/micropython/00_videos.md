@@ -7,6 +7,7 @@ previous: 00_intro.html
 next: 01_why_is_it_called_micropython.html
 description: Watch the MicroPython Introduction Video
 percent: 10
+duration: 1
 navigation:
 - name: Learn MicroPython - The basics
 - content:

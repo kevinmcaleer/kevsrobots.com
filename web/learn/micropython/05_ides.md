@@ -7,6 +7,7 @@ previous: 04_why_use_micropython.html
 next: 06_our_first_program.html
 description: Choose the best development tool for you
 percent: 35
+duration: 1
 navigation:
 - name: Learn MicroPython - The basics
 - content:

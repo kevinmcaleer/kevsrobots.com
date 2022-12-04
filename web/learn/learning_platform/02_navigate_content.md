@@ -7,6 +7,7 @@ previous: 01_how_to_use.html
 next: 03_download_content.html
 description: How to navigate content
 percent: 75
+duration: 1
 navigation:
 - name: How to use the Learning Platform
 - content:

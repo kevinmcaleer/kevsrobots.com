@@ -7,6 +7,7 @@ previous: 05_ides.html
 next: 07_hello_world.html
 description: "\u2018Hello World\u2019 - its a tradition"
 percent: 40
+duration: 5
 navigation:
 - name: Learn MicroPython - The basics
 - content:

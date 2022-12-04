@@ -7,6 +7,7 @@ previous: 15_functions.html
 next: 17_modules.html
 description: Read Evaluation Print Loop
 percent: 90
+duration: 1
 navigation:
 - name: Learn MicroPython - The basics
 - content:

@@ -7,6 +7,7 @@ previous: 10_values_and_variable_types.html
 next: 12_if_elif_else.html
 description: All the words that have a special meaning in Python
 percent: 65
+duration: 1
 navigation:
 - name: Learn MicroPython - The basics
 - content:

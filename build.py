@@ -2,9 +2,7 @@
 # Kevin McAleer
 # October 2022
 
-import yaml
-from course import Course, Courses
-import os
+from course_builder.courses import Courses
 
 # copy the build files to the /learn folder for Jekyll to build
 

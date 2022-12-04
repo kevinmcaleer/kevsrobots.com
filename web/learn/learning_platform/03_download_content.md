@@ -6,6 +6,7 @@ type: page
 previous: 02_navigate_content.html
 description: Learn how to download supporting files and content
 percent: 100
+duration: 1
 navigation:
 - name: How to use the Learning Platform
 - content:

@@ -7,6 +7,7 @@ previous: 00_intro.html
 next: 02_navigate_content.html
 description: Orientation
 percent: 50
+duration: 1
 navigation:
 - name: How to use the Learning Platform
 - content:
