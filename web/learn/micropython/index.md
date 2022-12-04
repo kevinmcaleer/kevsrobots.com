@@ -7,6 +7,7 @@ next: 00_videos.html
 description: Get started with MicroPython, What it is, where to download it and which
   software to use to develop MicroPython code.
 percent: 5
+duration: 2
 navigation:
 - name: Learn MicroPython - The basics
 - content:
