@@ -1,7 +1,7 @@
 - name: Learn MicroPython - The basics
   author: Kevin McAleer
   date_created: 28-10-2022
-  date_published: 28-10-2022
+  date_published: 04-12-2022
   layout: course
   cover: assets/micropython.jpg
   description: >- 
@@ -12,7 +12,6 @@
       content:
       - 00_intro.md 
       - 00_videos.md
-      
   - section:
       name: Introduction
       content:
