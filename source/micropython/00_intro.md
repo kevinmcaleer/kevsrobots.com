@@ -3,6 +3,7 @@ layout: lesson
 title: Introduction
 type: page
 description: Get started with MicroPython, What it is, where to download it and which software to use to develop MicroPython code.
+duration: 2
 ---
 
 ![Cover photo of students in a classroom](assets/cover.jpg){:class="cover"}

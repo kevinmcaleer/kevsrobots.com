@@ -11,3 +11,7 @@
       name: Overview
       content:
       - 00_intro.md 
+  - section:
+      name: Data
+      content:
+      - 01_what_is_data.md
