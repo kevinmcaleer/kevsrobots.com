@@ -9,6 +9,7 @@ $clr-blue: #108BB9;
 $dark-blue: #072441;
 $clr-black: #222222;
 $clr-grey: #e9ecef;
+$clr-lightgrey: #fafafa;
 $clr-red: #ff0000;
 $clr-red-hover: #ffeeee;
 $clr-text-lg: #A9A9A9;
@@ -345,4 +346,8 @@ $clr-text-color: #686868;
 
 .text-color {
   color: $clr-text-color;
+}
+
+.light-grey {
+  color: $clr-lightgrey;
 }
