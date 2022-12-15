@@ -2,27 +2,25 @@
 
 <div class="bg-light p-0 m-0">
 
-<div class="container pb-3 m-1">
+<div class="container">
 
     <nav class="navbar bg-light">
         <div class="container-fluid">
+          {% include video_tabs.html %}
+         
           <span class="navbar-text">
-            Recent Videos 
-          </span>
-          <span class="navbar-text">
-            <a href="/videos" class="dotted">All Videos ></a>
+            <p><a href="https://www.youtube.com/c/kevinmcaleer28" class="">View YouTube Channel></a></p>
           </span>
         </div>
       </nav>
    
-    <div class="row row-cols-1 row-cols-md-3 row-cols-sm-2 row-cols-lg-4 g-4">
-{% for vid in vids limit:6  %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-4">
+{% for vid in vids %}
 <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
-  <!-- {% if vid.type != "short" %} -->
     <div class="card-group">
     <div class="card">
         <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid"></a>
-        <div class="card-body">
+      <div class="card-body mb-0 pb-0">
           <div class="row h-100">
             <div class="col-12 m-0 p-0">
               <div class="row w-100 p-1 m-0 h-50">
@@ -31,21 +29,22 @@
                   </div>
               </div>
 
-              <div class="row w-100 p-1 m-0 h-50">
+              <div class="row w-100 p-1 pb-2 m-0 h-50 align-items-end">
                   <div class="col-6 m-0 p-0">
-                      <p class="text-mute small text-left">{{ vid.published | date: "%d %B %Y" }}</p>
+                      <p class="text-date text-start  mb-0">{{ vid.published | date: "%d %B %Y" }}</p>
                   </div>
-                  <div class="col-6 m-0 p-0">
-                      <span class="badge float-end {% if vid.type == 'video' %}bg-secondary{% elsif vid.type =='short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% endif %}">{{ vid.type | capitalize }}</span>
+                  <div class="col-6  m-0 p-0">
+                      <span class="badge badge-sm float-end mb-0 {% if vid.type == 'video' %}bg-secondary{% elsif vid.type =='short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% endif %}">{{ vid.type | capitalize }}</span>
                   </div>
               </div>
           </div>
         </div>
-    </div>
+      </div>
+
     </div>
 
 </div>
-<!-- {% endif %} -->
+
 {% endfor %}
 </div>
 </div>

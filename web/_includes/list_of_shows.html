@@ -3,12 +3,24 @@
 {% assign previousNum = "" %}
 {% assign currentNum = 0 %}
 {% assign counter = 0 %}
+<div class="bg-light p-0 m-0">
+<div class="container">
+<nav class="navbar bg-light">
+  <div class="container-fluid">
+    {% include video_tabs.html %}
+   
+    <span class="navbar-text">
+      <p><a href="https://www.youtube.com/c/kevinmcaleer28" class="">View YouTube Channel></a></p>
+    </span>
+  </div>
+</nav>
 
 <table class="table table-sm table-bordered">
   <th class="text-end">#</th>
   <th>Title</th>
   <th>Date</th>
-  <th>Views</th>
+  <th>Type</th>
+  <th>Popular</th>
 {% for vid in vids reversed %}
 
 {% if previousNum == "" %}
@@ -23,9 +35,12 @@
 <tr>
   <td class="text-end">{{counter}}</td>
   <td><a href="https://www.youtube.com/watch?v={{vid.video_id}}">{{vid.title}}</a></td>
-  <td>{{vid.published}}</td>
-  <td>{{vid.view}}</td>
+  <td>{{vid.published | date: "%d %B %Y"}}</td>
+  <td>{{vid.type | capitalize }}</td>
+  <td>{%if vid.popular%}Popular{% endif %}</td>
 </tr>
 
 {% endfor %}
 </table>
+</div>
+</div>

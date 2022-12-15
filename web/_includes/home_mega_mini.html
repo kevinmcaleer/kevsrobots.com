@@ -1,0 +1,29 @@
+{% assign vids = site.data.youtube | sort: 'published' | reverse | where: "popular", "true" %}
+<div class="">
+<nav class="navbar">
+    <div class="container-fluid">
+      <span class="navbar-text">
+        Most Popular Videos
+      </span>
+      <span class="navbar-text">
+        <a href="popular_videos" class="dotted">See More Most Popular Videos ></a>
+      </span>
+    </div>
+  </nav>
+
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6">
+    {% for vid in vids limit:6 %}
+    <div class="col mb-3">
+        <div class="card h-100">
+            <a href="{{vid.link}}" class="nav-item dotted">
+                <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="card-img-top">
+            <div class="card-body">
+                <p class="card-text small">{{vid.title}}</p>
+                <p class="text-date">{{vid.published | date: "%d %B %Y"}}</p>
+            </div> 
+          </a> 
+        </div>
+    </div>
+    {% endfor %} 
+</div>
+</div>

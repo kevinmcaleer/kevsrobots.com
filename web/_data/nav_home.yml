@@ -1,5 +1,11 @@
-- name: Videos
-  link: /videos
+- name: All Videos
+  link: /all_videos
+- name: Most Popular Videos
+  link: /popular_videos
+- name: Shorts
+  link: /shorts
+- name: Livestreams
+  link: /livestreams
 - name: Episode List
   link: /list_of_shows
 - name: Credits

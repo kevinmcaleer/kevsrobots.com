@@ -6,7 +6,10 @@
         <li class="nav-item dropdown has-megamenu">
             <a href="/" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="dropdown"><i class="fas fa-home mx-1"></i></a>
             <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
-                <div class="bg-white rounded-3 p-3">
+                <div class="row row-cols-2">
+                    <div class="col-12 col-md-2 h-100">
+                        
+                <div class="bg-white rounded-3 p-3 h-100">
                 <a href="/" class="text-decoration-none black"><h5 class="menu-title">home</h5></a>
                 {% assign pages = site.data.nav_home %}
                 <ul class="nav flex-column">
@@ -18,6 +21,12 @@
                 </ul>
                 </div>
             </div>
+        <div class="col-12 col-md-10 h-100">
+            <div class="bg-white rounded-3 p-3 h-100">
+                {% include home_mega_mini.html %}
+        </div>
+    </div>
+    </div>
         </li>
         <li class="nav-item dropdown has-megamenu">
             <a href="#" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="dropdown">Robots &amp; Projects</a>
@@ -40,10 +49,14 @@
                 <div class="col h-100">
                     <div class="bg-white rounded-3 p-3">
                     <h5 class="menu-title">Projects</h5>
+                    {% assign projects = site.data.projects %}
+                    
                     <ul class="nav flex-column">
+                        {% for project in projects %}
                         <li class="nav-link m-0 p-0">
-                            <a href="/robots/pythonai/" class="nav-item dotted">Build your own AI Assistant in Python</a>
+                            <a class="nav-item dotted" href="{{project.link}}">{{project.name}}</a>
                         </li>
+                        {% endfor %}
                     </ul>
                     </div>
                 </div>

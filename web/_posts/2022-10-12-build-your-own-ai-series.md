@@ -6,7 +6,7 @@ short_description: 3 parts are now available!
 date: 2022-10-12
 author: Kevin McAleer
 excerpt: Learn how to build your own AI Assistant using Python
-cover: /assets/img/blog/byoai/byoai.jpg
+cover: /assets/img/blog/byoai/build_your_own_ai.jpg
 tags:
  - Raspberry Pi
  - Python
