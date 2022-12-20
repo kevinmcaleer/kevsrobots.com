@@ -390,6 +390,7 @@ ul.nav li.nav-link.active, ul.nav li.nav-link.active a.nav-item.dotted {
   }
 
 blockquote {
+  
   // border-left: 5px solid $orange;
   border-left: #ffffff60 5px solid;
   padding: 15px;
@@ -402,11 +403,13 @@ blockquote {
   // code {
   //   color: rgb(255, 255, 255) !important;
   // }
-
+  
   .bg-blue {
     background-color: $clr-blue;
   }
-
+  p, ul, li {
+    color: rgb(255, 255, 255) !important;
+  }
   .language-python.highlighter-rouge {
     border-left: #00000060 5px solid;
     // padding: 3px;
