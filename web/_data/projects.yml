@@ -1,20 +1,44 @@
 - name: Build your own AI Assistant in Python
   link: /robots/pythonai/
+  cover: /assets/img/blog/byoai/byoai.jpg
+  description: Build your own AI Assistant in Python
 - name: Galactic Guitar Hero
   link: /blog/galactic_hero.html
+  cover: /assets/img/blog/galactic_hero/galactic_hero01.jpg
+  description: Build your own Galactic Guitar Hero Game
 - name: Worlds most advanced bauble
   link: /blog/worlds-most-advanced-bauble.html
+  cover: /assets/img/blog/cheerlights/cheerlights.jpg
+  description: Fun with Cheerlights
 - name: How to setup a Phew! access point
   link: /blog/phew-access-point.html
+  cover: /assets/img/blog/phew/saddle.jpg
+  description: MicroPython Captive Portal
 - name: Next cube a homage to the original www server
   link: /blog/next-cube.html
+  cover: /assets/img/blog/nextcube/nextcube.jpg
+  description: a Homage to the original WWW server
 - name: Pikon camera
   link: /blog/pikon-camera.html
+  cover: /assets/img/blog/pikon/pikon.jpg
+  description: Raspberry Pi High Quality Camera Project
 - name: Pimoroni enviro indoor stevenson screen case
   link: /blog/enviro-case.html
+  cover: /assets/img/stevenson_screen.jpg
+  description: 3D Print your own Stevenson Screen for the Pimoroni Enviro Indoor sensor
 - name: Pi stands
   link: /blog/pistands.html
+  cover: /assets/img/blog/pi_stand/pi_stand.jpg
+  description: Cute stands for Raspberry Pis
 - name: Zero stand
   link: /blog/zero-stand.html
+  cover: /assets/img/blog/zero_stand/enviro.jpg
+  description: Cute stand for Raspberry Pi Zeros
 - name: Atari 2600 Compute Case
   link: /blog/atari-2600.html
+  cover: /assets/img/blog/atari/hero03.jpg
+  description: Cute Retro case
+- name: Ghostbusters Wifi Scanner
+  link: /blog/ghostbusters-wifi.html
+  cover: /assets/img/blog/ghostbusters/ghost02.jpg
+  description: Who you gonna call?

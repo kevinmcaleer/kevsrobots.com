@@ -1,0 +1,18 @@
+{% assign projects = site.data.projects %}
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
+{% for item in projects %}
+<div class="col mb-3">
+<div class="card mt-3 bg-light h-100">
+    <a href="{{item.link}}"><img src="{{item.cover}}" class="card-img-top"></a>
+    <div class="card-body">
+        <h5 class="card-title">
+            {{ item.name}}
+        </h5>
+        <p class="card-text small text-mute">{{item.description}}</p>
+        <a href="{{item.link}}" class="btn btn-primary">Read More</a>
+    </div>    
+</div>
+</div>
+{% endfor %}
+</div>

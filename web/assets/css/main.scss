@@ -368,12 +368,19 @@ i {
 // }
 /* ============ mobile view .end// ============ */
 
+ul.nav li.nav-link {
+  background-color: #00000005;
+  border-radius: 5px;
+  padding: 5px;
+}
+
 ul.nav li.nav-link a.nav-item.dotted {
   text-decoration-style: dotted !important;
   text-decoration-line: 1px !important;
   // text-decoration-color: $orange !important;
   color: $orange ;
   font-family: Lato, sans-serif;
+  
   
 }
 ul.nav li.nav-link.active, ul.nav li.nav-link.active a.nav-item.dotted {

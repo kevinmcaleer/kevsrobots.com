@@ -31,14 +31,14 @@
         <li class="nav-item dropdown has-megamenu">
             <a href="#" class="nav-link text-uppercase dropdown-toggle" role="button" data-bs-toggle="dropdown">Robots &amp; Projects</a>
             <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
-                <div class="row row-cols-md-5 row-cols-sm-2 m-0">
+                <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-1 row-cols-sm-2 m-0">
                     <div class="col h-100">
-                    <div class="bg-white rounded-3 p-3">
+                    <div class="bg-white rounded-3 p-3 mb-3">
                     <a href="/robots/" class="text-decoration-none black"><h5 class="menu-title">Robots</h5></a>
                     {% assign robots = site.data.robots %}
                     {% for robot in robots %}
                     <ul class="nav flex-column">
-                        <li class="nav-link m-0 p-0">
+                        <li class="nav-link m-0 mb-1 p-0">
                             <a class="nav-item dotted" href="{{robot.link}}">{{robot.name}}</a>
                         </li>
                     </ul>
@@ -47,13 +47,13 @@
                     </div>
                     </div>
                 <div class="col h-100">
-                    <div class="bg-white rounded-3 p-3">
-                    <h5 class="menu-title">Projects</h5>
+                    <div class="bg-white rounded-3 p-3 mb-3">
+                    <a href="/robots/projects" class="text-decoration-none black"><h5 class="menu-title">Projects</h5></a>
                     {% assign projects = site.data.projects %}
                     
                     <ul class="nav flex-column">
                         {% for project in projects %}
-                        <li class="nav-link m-0 p-0">
+                        <li class="nav-link m-0 mb-1 p-0">
                             <a class="nav-item dotted" href="{{project.link}}">{{project.name}}</a>
                         </li>
                         {% endfor %}
@@ -61,36 +61,36 @@
                     </div>
                 </div>
                 <div class="col h-100">
-                    <div class="bg-white rounded-3 p-3">
+                    <div class="bg-white rounded-3 p-3 mb-3">
                     <a href="/links/" class="text-decoration-none black"><h5 class="menu-title">Links</h5></a>
                     <ul class="nav flex-column">
                       {% assign links = site.data.links %}
                       {% for link in links %}
-                        <li class="nav-link m-0 p-0"><a href="{{ link.link }}" class="nav-item dotted">{{ link.name }}</a></li>
+                        <li class="nav-link m-0 mb-1 p-0"><a href="{{ link.link }}" class="nav-item dotted">{{ link.name }}</a></li>
                         {% endfor %}
                     </ul>
                     </div>
                   </div>
                 <div class="col h-100">
-                    <div class="bg-white rounded-3 p-3">
+                    <div class="bg-white rounded-3 p-3 mb-3">
                     <h5 class="menu-title">Recommendations</h5>
                     <ul class="nav flex-column">
-                        <li class="nav-link m-0 p-0">
+                        <li class="nav-link m-0 mb-1 p-0">
                             <a href="/gear/" class="nav-item dotted">Gear List</a>
                         </li>
-                        <li class="nav-link m-0 p-0">
+                        <li class="nav-link m-0 mb-1 p-0">
                             <a href="/reviews/" class="nav-item dotted">Reviews</a>
                         </li>
                     </ul>
                 </div>
                   </div>
                   <div class="col h-100">
-                    <div class="bg-white rounded-3 p-3">
+                    <div class="bg-white rounded-3 p-3 mb-3">
                     <h5 class="menu-title">About Kevs Robots</h5>
                     <ul class="nav flex-column">
                         {% assign links = site.data.nav_about %}
                         {% for link in links%}
-                        <li class="nav-link m-0 p-0">
+                        <li class="nav-link m-0 p-0 mb-1">
                             <a class="nav-item dotted" href="{{link.link}}">{{link.name}}</a>
                         </li>
                         {% endfor %}
