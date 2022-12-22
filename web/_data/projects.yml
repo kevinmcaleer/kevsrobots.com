@@ -1,7 +1,11 @@
-- name: Build your own AI Assistant in Python
-  link: /robots/pythonai/
-  cover: /assets/img/blog/byoai/byoai.jpg
-  description: Build your own AI Assistant in Python
+- name: Ghostbusters Wifi Scanner
+  link: /blog/ghostbusters-wifi.html
+  cover: /assets/img/blog/ghostbusters/ghost02.jpg
+  description: Who you gonna call?
+- name: Atari 2600 Compute Case
+  link: /blog/atari-2600.html
+  cover: /assets/img/blog/atari/hero03.jpg
+  description: Cute Retro case
 - name: Galactic Guitar Hero
   link: /blog/galactic_hero.html
   cover: /assets/img/blog/galactic_hero/galactic_hero01.jpg
@@ -34,11 +38,7 @@
   link: /blog/zero-stand.html
   cover: /assets/img/blog/zero_stand/enviro.jpg
   description: Cute stand for Raspberry Pi Zeros
-- name: Atari 2600 Compute Case
-  link: /blog/atari-2600.html
-  cover: /assets/img/blog/atari/hero03.jpg
-  description: Cute Retro case
-- name: Ghostbusters Wifi Scanner
-  link: /blog/ghostbusters-wifi.html
-  cover: /assets/img/blog/ghostbusters/ghost02.jpg
-  description: Who you gonna call?
+- name: Build your own AI Assistant in Python
+  link: /robots/pythonai/
+  cover: /assets/img/blog/byoai/byoai.jpg
+  description: Build your own AI Assistant in Python
