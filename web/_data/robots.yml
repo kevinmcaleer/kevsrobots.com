@@ -1,5 +1,9 @@
+- name: Cubie-1
+  link: /blog/meet-cubie.html
+  cover: /assets/img/blog/cubie-1/cubie07.jpg
+  description: Build a ROS robot with a Raspberry Pi 4
 - name: Ultrasonic Radar Robot
-  link: https://www.kevsrobots.com/blog/radar-robot.html
+  link: /blog/radar-robot.html
   cover: /assets/img/blog/radar/radar.jpg
   description: Build a robot that can scan its surroundings with sound
 - name: Spooky Scary Skeleton

@@ -1,0 +1,44 @@
+- term: ros
+  definition: Robot Operating System
+  full: "The Robot Operating System (ROS) is a set of software libraries and tools that help you build robot applications."
+  link: https://www.ros.org/
+- term: ros2
+  definition: Robot Operating System, version 2
+  full: "ROS 2 is the next generation of ROS, built to support the needs of the robotics community in an era of rapidly evolving hardware and increasing competition."
+  link: https://index.ros.org/doc/ros2/
+- term: lidar
+  definition: Light Detection and Ranging
+  full: "LIDAR is a surveying method that measures distance to a target by illuminating that target with a laser light and measuring the reflected light with a sensor."
+  link: https://en.wikipedia.org/wiki/Lidar
+- term: slam
+  definition: Simultaneous Localization and Mapping
+  full: "Simultaneous localization and mapping (SLAM) is the computational problem of constructing or updating a map of an unknown environment while simultaneously keeping track of an agent's location within it."
+  link: https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping
+- term: radar
+  definition: Radio Detection and Ranging
+  full: "Radar is a detection system that uses radio waves to determine the distance (ranging), angle, and radial velocity of objects relative to the site. It can be used to detect aircraft, ships, spacecraft, guided missiles, motor vehicles, weather formations, and terrain."
+  link: https://en.wikipedia.org/wiki/Radar
+- term: imu
+  definition: Inertial Measurement Unit
+  full: "An inertial measurement unit (IMU) is an electronic device that measures and reports a body's specific force, angular rate, and sometimes the magnetic field surrounding the body, using a combination of accelerometers and gyroscopes, or magnetometers."
+  link: https://en.wikipedia.org/wiki/Inertial_measurement_unit
+- term: gps
+  definition: Global Positioning System
+  full: "The Global Positioning System (GPS) is a space-based radionavigation system owned by the United States government and operated by the United States Space Force. It is one of the global navigation satellite systems (GNSS) that provides geolocation and time information to a GPS receiver anywhere on or near the Earth where there is an unobstructed line of sight to four or more GPS satellites."
+  link: https://en.wikipedia.org/wiki/Global_Positioning_System
+- term: rtk
+  definition: Real Time Kinematic
+  full: "Real-time kinematic (RTK) is a satellite navigation positioning technique that allows the user to achieve centimeter-level accuracy. RTK is a form of differential GPS (DGPS) that uses a base station to provide corrections to a rover receiver."
+  link: https://en.wikipedia.org/wiki/Real-time_kinematic
+- term: ik
+  definition: Inverse Kinematics
+  full: "The use of the kinematic equations of a robot to compute the position of the end-effector from specified values for the joint parameters."
+  link: https://en.wikipedia.org/wiki/Inverse_kinematics
+- term: fk
+  full: "The use of the kinematic equations of a robot to compute the joint parameters from specified values for the position of the end-effector."
+  link: https://en.wikipedia.org/wiki/Forward_kinematics
+  definition: Forward Kinematics
+- term: raspberrypi
+  definition: A series of small single-board computers developed in the United Kingdom by the Raspberry Pi Ltd
+  full: "The Raspberry Pi is a series of small single-board computers developed in the United Kingdom by the Raspberry Pi Foundation to promote the teaching of basic computer science in schools and in developing countries."
+  link: https://en.wikipedia.org/wiki/Raspberry_Pi

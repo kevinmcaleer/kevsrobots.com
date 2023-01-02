@@ -10,3 +10,6 @@
 - name: Mastodon
   link: https://mastodon.social/@kevsmac
   icon: "fa-brands fa-mastodon"
+- name: TikTok
+  link: https://www.tiktok.com/kevinmcaleer6
+  icon: "fa-brands fa-tiktok"

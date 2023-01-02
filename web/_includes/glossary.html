@@ -1,0 +1,13 @@
+{% assign terms = site.data.glossary | sort: "term"   %}
+<dl>
+{% for term in terms %}
+
+<a name="{{term.term | lower}}"></a>
+<h2><dt>{{term.term}}</dt></h2>
+<h5 class="mute"><dd>{{term.definition}}</dd></h5>
+<dd>{{term.full}}</dd>
+<p><a href="{{term.link}}">{{term.link}}</a></p>
+<hr /> 
+
+{% endfor %}
+</dl>
