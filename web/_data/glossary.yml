@@ -42,3 +42,23 @@
   definition: A series of small single-board computers developed in the United Kingdom by the Raspberry Pi Ltd
   full: "The Raspberry Pi is a series of small single-board computers developed in the United Kingdom by the Raspberry Pi Foundation to promote the teaching of basic computer science in schools and in developing countries."
   link: https://en.wikipedia.org/wiki/Raspberry_Pi
+- term: arduino
+  definition: An open-source electronics platform based on easy-to-use hardware and software
+  full: "Arduino is an open-source electronics platform based on easy-to-use hardware and software. It's intended for anyone making interactive projects."
+  link: https://www.arduino.cc/
+- term: stm32
+  definition: A series of ARM Cortex-M based microcontroller ICs
+  full: "The STM32 series of 32-bit Flash microcontrollers based on the ARM® Cortex®-M processor is designed to offer new degrees of freedom to MCU users."
+  link: https://www.st.com/en/microcontrollers-microprocessors/stm32-32-bit-arm-cortex-mcus.html
+- term: esp32
+  definition: A series of low-cost, low-power system on a chip microcontrollers with integrated Wi-Fi and dual-mode Bluetooth
+  full: "ESP32 is a series of low-cost, low-power system on a chip microcontrollers with integrated Wi-Fi and dual-mode Bluetooth."
+  link: https://www.espressif.com/en/products/socs/esp32
+- term: esp8266
+  definition: A series of low-cost, self-contained Wi-Fi microcontrollers with integrated TCP/IP stack
+  full: "ESP8266 is a series of low-cost, self-contained Wi-Fi microcontrollers with integrated TCP/IP stack."
+  link: https://www.espressif.com/en/products/hardware/esp8266ex/overview
+- term: mah
+  definition: Milliampere hour
+  full: "An ampere hour or amp hour (symbol: A⋅h or A h; often simplified as Ah) is a unit of electric charge, having dimensions of electric current multiplied by time, equal to the charge transferred by a steady current of one ampere flowing for one hour, or 3,600 coulombs."
+  link: https://en.wikipedia.org/wiki/Ampere_hour

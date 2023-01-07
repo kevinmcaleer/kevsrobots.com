@@ -1,0 +1,8 @@
+{% assign resources = site.data.nav_resource %}
+<ul class="nav flex-column">
+{% for resource in resources %}
+<li class="nav-link m-0 p-0">
+    <a class="nav-item dotted" href="{{resource.link}}">{{resource.name}}</a>
+</li>
+{% endfor %}
+</ul>

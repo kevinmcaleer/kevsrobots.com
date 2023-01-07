@@ -145,6 +145,19 @@
                     {% endfor %}
                 </ul>
             </div>
+            <div class="bg-white rounded-3 p-3 h-100">
+                <a href="/resources/" class="text-decoration-none black">
+                    <h5 class="menu-title">Resources</h5>
+                </a>
+                {% assign resources = site.data.nav_resource %}
+                <ul class="nav flex-column">
+                    {% for resource in resources %}
+                    <li class="nav-link m-0 p-0">
+                        <a class="nav-item dotted" href="{{resource.link}}">{{resource.name}}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
             </div>
             <div class="col-12 col-md-10 h-100">
                 <div class="bg-white rounded-3 p-3 h-100">

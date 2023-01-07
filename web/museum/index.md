@@ -6,6 +6,7 @@ room: Lobby
 ---
 
 # Museum of awesomeness
+
 {% include museum.html %}
 Welcome to the Lobby
 

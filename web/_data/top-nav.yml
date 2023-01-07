@@ -6,7 +6,7 @@
   # icon: "fa-sharp fa-solid fa-ticket"
   # icon: "fab fa-discord"
   # icon: "fab fa-youtube"
-  icon: "fa-solid fa-badge-check"
+  icon: "fas fa-stars"
 - name: Sign up for our newsletter
   link: https://action.smarsfan.com/join-the-list
   # icon: "fa-solid fa-envelope-circle-check"
