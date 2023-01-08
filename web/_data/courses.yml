@@ -1,4 +1,11 @@
 - author: Kevin McAleer
+  cover: /learn/learn_ros/assets/learn_ros.jpg
+  description: Learning ROS with me, is a course that will teach you how to use ROS2
+    on Raspberry Pi 4.
+  duration: 13m
+  link: /learn/learn_ros/00_intro.html
+  name: Learn ROS with me
+- author: Kevin McAleer
   cover: /learn/micropython/assets/micropython.jpg
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code
