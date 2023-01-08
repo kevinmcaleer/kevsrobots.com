@@ -60,6 +60,7 @@ Cubie is made up of several 3d printable parts:
 * Pillar
 * Shelf
 * Top
+* Spacer
 * Motor Holders
 * Pi Holder
 * Camera holder
@@ -106,10 +107,10 @@ A later update will provide the code.
 * [`pillar.stl`](/assets/stl/cubie-1/pillar.stl)
 * [`shelf.stl`](/assets/stl/cubie-1/shelf.stl)
 * [`top.stl`](/assets/stl/cubie-1/top.stl)
+* [`spacer.stl`](/assets/stl/cubie-1/spacer.stl)
 * [`motor_holders.stl`](/assets/stl/cubie-1/motor_holder.stl)
 * [`pi_holder.stl`](/assets/stl/cubie-1/pi_holder.stl)
 * [`camera_holder.stl`](/assets/stl/cubie-1/camera_holder.stl)
 * [`front_plate.stl`](/assets/stl/cubie-1/front_plate.stl)
 * [`side_panel.stl`](/assets/stl/cubie-1/side_panel.stl)
-* `top_side_panel.stl` - coming soon
-* `back_top_panel.stl` - coming soon
+* [`top_side_panel.stl`](/assets/stl/cubie-1/top_side_panel.stl)
