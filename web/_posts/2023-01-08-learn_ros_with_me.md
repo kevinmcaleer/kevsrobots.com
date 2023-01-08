@@ -40,6 +40,6 @@ This course will teach you all about the Robot Operating System, how to use the 
 
 ---
 
-What are you waiting for? [Get started >](/learn/learn_ros){:class="button btn btn-primary"}
+What are you waiting for? [Get started >](/learn/learn_ros/){:class="button btn btn-primary"}
 
 ---
