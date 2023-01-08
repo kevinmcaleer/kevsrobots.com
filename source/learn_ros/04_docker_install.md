@@ -51,7 +51,7 @@ Docker can run commands from a regular user account, but first we need to fix th
 * **Make pi user execute docker commands** - From the terminal, type:
 
 ```bash
-usermod -aG docker pi
+sudo usermod -aG docker pi
 ```
 
 *Where `Pi` is the user account you created when [setting up the Pi](02_pi_setup#setup-the-sd-card-using-raspberry-pi-imager)*
