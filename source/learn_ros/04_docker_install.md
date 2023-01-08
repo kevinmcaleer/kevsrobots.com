@@ -69,7 +69,7 @@ sudo systemctl unmask docker
 * **Fix permissions** - From the terminal, type:
 
 ```bash
-chmod 666 /var/run/docker.sock
+sudo chmod 666 /var/run/docker.sock
 ```
 
 ---
