@@ -6,7 +6,7 @@ type: page
 previous: 03_install_updates.html
 next: 05_get_cubie.html
 description: Install and configure Docker
-percent: 44
+percent: 50
 duration: 2
 navigation:
 - name: Learn ROS with me
@@ -15,6 +15,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup

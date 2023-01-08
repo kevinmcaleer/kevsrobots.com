@@ -7,7 +7,7 @@ previous: 07_build_container.html
 next: 09_first_ros_program.html
 description: Install the VSCode extensions so we can remotely connect to the Raspberry
   Pi and Docker container instances
-percent: 88
+percent: 90
 duration: 5
 navigation:
 - name: Learn ROS with me
@@ -16,6 +16,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup

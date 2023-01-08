@@ -3,10 +3,10 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-next: 02_pi_setup.html
+next: 01_what_is_ros.html
 description: Get started with ROS, the Robot Operating System and learn how to build
   robots using this industry standard framework
-percent: 11
+percent: 10
 duration: 4
 navigation:
 - name: Learn ROS with me
@@ -15,6 +15,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup

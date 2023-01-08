@@ -11,6 +11,7 @@
       name: Overview
       content:
       - 00_intro.md 
+      - 01_what_is_ros.md
   - section:
       name: Setting up the Raspberry Pi 4 environment
       content:

@@ -14,6 +14,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup

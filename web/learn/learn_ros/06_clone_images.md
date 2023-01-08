@@ -7,7 +7,7 @@ previous: 05_get_cubie.html
 next: 07_build_container.html
 description: Download the official docker images for ROS from the Open Source Robotics
   Foundation (OSRF)
-percent: 66
+percent: 70
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -16,6 +16,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup

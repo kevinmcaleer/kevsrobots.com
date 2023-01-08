@@ -3,10 +3,10 @@ layout: lesson
 title: Raspberry Pi Setup
 author: Kevin McAleer
 type: page
-previous: 00_intro.html
+previous: 01_what_is_ros.html
 next: 03_install_updates.html
 description: How to setup a Raspberry Pi 4
-percent: 22
+percent: 30
 duration: 2
 navigation:
 - name: Learn ROS with me
@@ -15,6 +15,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup

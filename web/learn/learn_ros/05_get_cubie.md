@@ -6,7 +6,7 @@ type: page
 previous: 04_docker_install.html
 next: 06_clone_images.html
 description: Download the Cubie-1 example files
-percent: 55
+percent: 60
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -15,6 +15,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup

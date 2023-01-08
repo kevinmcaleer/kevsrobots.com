@@ -6,7 +6,7 @@ type: page
 previous: 02_pi_setup.html
 next: 04_docker_install.html
 description: Update and Upgrade the OS to the latest patch level
-percent: 33
+percent: 40
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -15,6 +15,8 @@ navigation:
     content:
     - name: Introduction
       link: 00_intro.html
+    - name: What is ROS
+      link: 01_what_is_ros.html
   - section: Setting up the Raspberry Pi 4 environment
     content:
     - name: Raspberry Pi Setup
