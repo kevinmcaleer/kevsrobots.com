@@ -6,7 +6,7 @@ type: page
 previous: 03_install_updates.html
 next: 05_get_cubie.html
 description: Install and configure Docker
-percent: 48
+percent: 44
 duration: 2
 navigation:
 - name: Learn ROS with me
@@ -37,6 +37,10 @@ navigation:
     content:
     - name: VSCode setup
       link: 08_vscode_setup.html
+  - section: First ROS2 Program
+    content:
+    - name: First ROS2 Program
+      link: 09_first_ros_program.html
 ---
 
 

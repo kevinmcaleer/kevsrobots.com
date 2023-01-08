@@ -6,7 +6,7 @@ type: page
 previous: 04_docker_install.html
 next: 06_clone_images.html
 description: Download the Cubie-1 example files
-percent: 60
+percent: 55
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -37,6 +37,10 @@ navigation:
     content:
     - name: VSCode setup
       link: 08_vscode_setup.html
+  - section: First ROS2 Program
+    content:
+    - name: First ROS2 Program
+      link: 09_first_ros_program.html
 ---
 
 

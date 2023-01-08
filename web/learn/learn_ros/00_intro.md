@@ -6,7 +6,7 @@ type: page
 next: 02_pi_setup.html
 description: Get started with ROS, the Robot Operating System and learn how to build
   robots using this industry standard framework
-percent: 12
+percent: 11
 duration: 4
 navigation:
 - name: Learn ROS with me
@@ -37,6 +37,10 @@ navigation:
     content:
     - name: VSCode setup
       link: 08_vscode_setup.html
+  - section: First ROS2 Program
+    content:
+    - name: First ROS2 Program
+      link: 09_first_ros_program.html
 ---
 
 

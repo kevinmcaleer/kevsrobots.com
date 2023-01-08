@@ -6,7 +6,7 @@ type: page
 previous: 02_pi_setup.html
 next: 04_docker_install.html
 description: Update and Upgrade the OS to the latest patch level
-percent: 36
+percent: 33
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -37,6 +37,10 @@ navigation:
     content:
     - name: VSCode setup
       link: 08_vscode_setup.html
+  - section: First ROS2 Program
+    content:
+    - name: First ROS2 Program
+      link: 09_first_ros_program.html
 ---
 
 

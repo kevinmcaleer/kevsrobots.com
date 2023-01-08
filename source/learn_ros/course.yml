@@ -30,3 +30,7 @@
       name: Setting up VSCode
       content:
       - 08_vscode_setup.md
+  - section:
+      name: First ROS2 Program
+      content:
+      - 09_first_ros_program.md

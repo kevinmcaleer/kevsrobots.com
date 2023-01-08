@@ -6,7 +6,7 @@ type: page
 previous: 00_intro.html
 next: 03_install_updates.html
 description: How to setup a Raspberry Pi 4
-percent: 24
+percent: 22
 duration: 2
 navigation:
 - name: Learn ROS with me
@@ -37,6 +37,10 @@ navigation:
     content:
     - name: VSCode setup
       link: 08_vscode_setup.html
+  - section: First ROS2 Program
+    content:
+    - name: First ROS2 Program
+      link: 09_first_ros_program.html
 ---
 
 
