@@ -22,13 +22,3 @@ git clone https://github.com/kevinmcaleer/cubie-1
 ```
 
 ---
-
-## Get official ROS docker images
-
-* **Get official ROS docker images**
-
-```bash
-git clone https://www.github.com/osrf/docker_images
-```
-
----
