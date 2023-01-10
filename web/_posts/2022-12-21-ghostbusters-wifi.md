@@ -33,7 +33,7 @@ Build a fun Ghostbusters PKE style Wifi scanner using a Raspberry Pi Pico, a cou
 
 ## Bill of Materials
 
-You will also need the following electornics:
+You will also need the following electronics:
 
 Item                   | Description                                                                                                       | Qty |  Price
 -----------------------|-------------------------------------------------------------------------------------------------------------------|----:|------:
