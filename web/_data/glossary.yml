@@ -10,6 +10,7 @@
   definition: Light Detection and Ranging
   full: "LIDAR is a surveying method that measures distance to a target by illuminating that target with a laser light and measuring the reflected light with a sensor."
   link: https://en.wikipedia.org/wiki/Lidar
+  article: /resources/how_it_works/lidar
 - term: slam
   definition: Simultaneous Localization and Mapping
   full: "Simultaneous localization and mapping (SLAM) is the computational problem of constructing or updating a map of an unknown environment while simultaneously keeping track of an agent's location within it."
@@ -34,6 +35,7 @@
   definition: Inverse Kinematics
   full: "The use of the kinematic equations of a robot to compute the position of the end-effector from specified values for the joint parameters."
   link: https://en.wikipedia.org/wiki/Inverse_kinematics
+  article: /resources/how_it_works/inverse-kinematics
 - term: fk
   full: "The use of the kinematic equations of a robot to compute the joint parameters from specified values for the position of the end-effector."
   link: https://en.wikipedia.org/wiki/Forward_kinematics
@@ -60,5 +62,20 @@
   link: https://www.espressif.com/en/products/hardware/esp8266ex/overview
 - term: mah
   definition: Milliampere hour
-  full: "An ampere hour or amp hour (symbol: A⋅h or A h; often simplified as Ah) is a unit of electric charge, having dimensions of electric current multiplied by time, equal to the charge transferred by a steady current of one ampere flowing for one hour, or 3,600 coulombs."
+  full: >-
+    An ampere hour or amp hour (symbol: A⋅h or A h; often simplified as Ah) is a unit of electric charge, having dimensions of electric current multiplied by time, equal to the charge transferred by a steady current of one ampere flowing for one hour, or 3,600 coulombs.
   link: https://en.wikipedia.org/wiki/Ampere_hour
+- term: Ultrasonic
+  definition: Ultrasonic Distance/Range Finder
+  full: >-
+    "Ultrasonic refers to frequencies above the upper limit of the human hearing range, which is generally taken as 20 kHz.
+    Ultrasonic distance sensors use ultrasonic waves to measure the distance to an object."
+  link: /resources/how_it_works/ultrasonic
+  article: /resources/how_it_works/ultrasonic
+- term: Neural Network
+  definition: Neural Network
+  full: >-
+    A neural network is a network or circuit of neurons, or in a modern sense, an artificial neural network, composed of artificial neurons or nodes.
+    Thus a neural network is either a biological neural network, made up of real biological neurons, or an artificial neural network, for solving artificial intelligence (AI) problems."
+  link: https://en.wikipedia.org/wiki/Neural_network  
+  article: /resources/how_it_works/machine-learning

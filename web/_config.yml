@@ -29,3 +29,6 @@ collections:
   reviews:
     output: true
     permalink: /reviews/:name.html
+  how_it_works:
+    output: true
+    permalink: /resources/how_it_works/:name.html

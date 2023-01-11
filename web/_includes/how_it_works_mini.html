@@ -1,0 +1,20 @@
+
+{% assign articles = site.how_it_works %}
+
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+
+{% for article in articles | limit:6 %}
+{% if article.title != 'How it Works' %}
+<div class="col">
+<div class="card border-0 shadow-lg">
+    <a href="{{article.url}}" class=""><img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}"></a>
+    <div class="card-body">
+
+        <a href="{{article.url}}" class="btn btn-primary btn-sm">{{article.title}}</a>
+    </div>
+</div>
+</div>
+{% endif %}
+{% endfor %}
+
+</div>

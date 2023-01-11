@@ -1,8 +1,15 @@
 {% assign resources = site.data.nav_resource %}
-<ul class="nav flex-column">
+<div class="container-fluid p-0 m-0">
+<p>Click a resource link below to learn more about the topic:</p>
+<ul class="nav flex-column bg-white p-3 m-0">
 {% for resource in resources %}
 <li class="nav-link m-0 p-0">
     <a class="nav-item dotted" href="{{resource.link}}">{{resource.name}}</a>
 </li>
 {% endfor %}
 </ul>
+
+<div class="mt-3">
+{% include how_it_works_part.html %}
+</div>
+</div>
