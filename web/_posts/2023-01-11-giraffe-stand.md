@@ -64,14 +64,14 @@ The Giraffe camera stand is made up of several 3d printable parts:
 
 ## Gallery
 
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe01.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe01.jpg)
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe02.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe02.jpg)
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe03.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe03.jpg)
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe04.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe04.jpg)
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe05.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe05.jpg)
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe06.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe06.jpg)
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe07.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe07.jpg)
-[![Giraffe photos](/assets/img/blog/giraffe/giraffe08.jpg){:class="img-fluid w-50"}](/assets/img/blog/giraffe/giraffe08.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe01.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe01.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe02.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe02.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe03.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe03.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe04.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe04.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe05.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe05.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe06.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe06.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe07.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe07.jpg)
+[![Giraffe photos](/assets/img/blog/giraffe/giraffe08.jpg){:class="img-fluid w-25"}](/assets/img/blog/giraffe/giraffe08.jpg)
 
 ---
 
