@@ -79,3 +79,12 @@
     Thus a neural network is either a biological neural network, made up of real biological neurons, or an artificial neural network, for solving artificial intelligence (AI) problems."
   link: https://en.wikipedia.org/wiki/Neural_network  
   article: /resources/how_it_works/machine-learning
+
+- term: MQTT
+  definition: MQTT
+  full: >-
+    MQTT is a machine-to-machine (M2M)/"Internet of Things" connectivity protocol. It was designed as an extremely lightweight publish/subscribe messaging transport.
+    It is useful for connections with remote locations where a small code footprint is required and/or network bandwidth is at a premium.
+    For example, it has been used in sensors communicating to a broker via satellite link, over occasional dial-up connections with healthcare providers, and in a range of home automation and small device scenarios.  
+  link: https://en.wikipedia.org/wiki/MQTT
+  article: /resources/how_it_works/mqtt
