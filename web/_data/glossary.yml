@@ -15,6 +15,7 @@
   definition: Simultaneous Localization and Mapping
   full: "Simultaneous localization and mapping (SLAM) is the computational problem of constructing or updating a map of an unknown environment while simultaneously keeping track of an agent's location within it."
   link: https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping
+  article: /resources/how_it_works/slam
 - term: radar
   definition: Radio Detection and Ranging
   full: "Radar is a detection system that uses radio waves to determine the distance (ranging), angle, and radial velocity of objects relative to the site. It can be used to detect aircraft, ships, spacecraft, guided missiles, motor vehicles, weather formations, and terrain."
