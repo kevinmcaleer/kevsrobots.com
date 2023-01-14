@@ -26,7 +26,7 @@ The SLAM algorithm starts by generating an initial map of the environment and th
 
 [![SLAM Process diagram](/assets/img/how_it_works/slam02.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/slam02.jpg)
 
-### Post esimation
+### Pose esimation
 
 `Pose estimation` is a process of estimating the position and orientation of an object in a 3D space. It uses a combination of computer vision and machine learning techniques to determine the 3D position of an object from an image or video.
 
