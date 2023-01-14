@@ -96,3 +96,25 @@
     MEMS devices are also used in a variety of sensors, actuators, and other devices.
   link: https://en.wikipedia.org/wiki/Microelectromechanical_systems
   article: /resources/how_it_works/mems
+- term: Pose Estimation
+  definition: Pose Estimation
+  full: >-
+    Pose estimation is the process of determining the position and orientation of an object in a given image.
+    Pose estimation is a fundamental problem in computer vision and robotics.
+    It is used in many applications, such as augmented reality, robotics, and autonomous driving.
+  link: https://en.wikipedia.org/wiki/Pose_estimation
+  article: /resources/how_it_works/slam.html#pose-estimation
+- term: Bundle Adjustment
+  definition: Bundle Adjustment
+  full: >-
+    Bundle adjustment is a technique used in computer vision to refine the parameters of a camera model and the 3D structure of a scene from a set of 2D-3D point correspondences.
+    It is a nonlinear least squares optimization problem.
+  link: https://en.wikipedia.org/wiki/Bundle_adjustment
+  article: /resources/how_it_works/slam.html#bundle-adjustment
+- term: Loop closure
+  definition: Loop closure
+  full: >-
+    Loop closure is a technique used in simultaneous localization and mapping (SLAM) to determine the relative pose of a robot with respect to a previously visited location.
+    Loop closure is a fundamental problem in SLAM.
+  link: https://en.wikipedia.org/wiki/Loop_closure
+  article: /resources/how_it_works/slam.html#loop-closure

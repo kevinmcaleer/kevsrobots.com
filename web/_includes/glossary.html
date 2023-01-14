@@ -14,13 +14,16 @@
 {% if term.article != nil %}
 {% for article in articles %}
 
-{% assign article_url = article.url | remove:'.html'%}
-{% if article_url == term.article %}
+{% assign article_url = article.url | remove:'.html' %}
+{% assign no_tag = term.article  | remove:'.html' | split:'#' %}
+
+{% if article_url == no_tag[0] %}
+
 <div class="bg-light p-3 rounded-1"><h5>How it works article - {{article.title}}</h5>
 <div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-1 p-3 p-0">
 <div class="col">
 <div class="card shadow-lg">
-    <a href="{{article.url}}" class=""><img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}"></a>
+    <a href="{{term.article}}" class=""><img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}"></a>
     <div class="card-body">
         <h5>{{term.article.title}}</h5>
         <p>{{term.article.excerpt}}</p>
