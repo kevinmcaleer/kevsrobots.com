@@ -118,3 +118,11 @@
     Loop closure is a fundamental problem in SLAM.
   link: https://en.wikipedia.org/wiki/Loop_closure
   article: /resources/how_it_works/slam.html#loop-closure
+- term: Pot
+  definition: Potentiometer
+  full: >-
+    A potentiometer, or pot, is a three-terminal resistor with a sliding or rotating contact that forms an adjustable voltage divider.
+    If only two terminals are used, one end and the wiper, it acts as a variable resistor or rheostat.
+    A potentiometer is a passive two-terminal resistor.
+  link: https://en.wikipedia.org/wiki/Potentiometer
+  article: /resources/how_it_works/pots
