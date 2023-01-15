@@ -143,3 +143,21 @@
     Algorithms are always unambiguous and are used as specifications for performing calculations, data processing, automated reasoning, and other tasks.
   link: https://en.wikipedia.org/wiki/Algorithm
   article: /resources/how_it_works/algorithm
+- term: Android (Operating System)
+  definition: Android
+  full: >-
+    Android is a mobile operating system developed by Google.
+    It is based on a modified version of the Linux kernel and other open source software, and is designed primarily for touchscreen mobile devices such as smartphones and tablets.
+  link: https://en.wikipedia.org/wiki/Android_(operating_system)
+- term: Android (Robot)
+  definition: Android
+  full: >-
+    An android is a humanoid robot or synthetic organism designed to look and act like a human, 
+    especially one with a body that resembles a human's in appearance or behavior.
+  link: https://en.wikipedia.org/wiki/Android_(robot)
+- term: Robot
+  definition: Robot
+  full: >-
+    A robot is a machine, especially one programmable by a computer, capable of carrying out a complex series of actions automatically.
+    Robots can be guided by an external control device or the control may be embedded within.
+  link: https://en.wikipedia.org/wiki/Robot
