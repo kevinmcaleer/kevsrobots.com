@@ -6,7 +6,7 @@ type: page
 previous: 03_install_updates.html
 next: 05_get_cubie.html
 description: Install and configure Docker
-percent: 50
+percent: 35
 duration: 2
 navigation:
 - name: Learn ROS with me
@@ -43,6 +43,16 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
+    - name: Talker ROS2 Program
+      link: 10_talker.html
+  - section: ROS2 Python Packages
+    content:
+    - name: Create a ROS2 Python Package
+      link: 11_create_py_package.html
+    - name: Create a ROS2 Python Publisher
+      link: 12_create_publisher.html
+    - name: Create a ROS2 Python Subscriber
+      link: 13_create_subscriber.html
 ---
 
 
@@ -92,7 +102,7 @@ Docker can run commands from a regular user account, but first we need to fix th
 * **Make pi user execute docker commands** - From the terminal, type:
 
 ```bash
-usermod -aG docker pi
+sudo usermod -aG docker pi
 ```
 
 *Where `Pi` is the user account you created when [setting up the Pi](02_pi_setup#setup-the-sd-card-using-raspberry-pi-imager)*
@@ -110,7 +120,7 @@ sudo systemctl unmask docker
 * **Fix permissions** - From the terminal, type:
 
 ```bash
-chmod 666 /var/run/docker.sock
+sudo chmod 666 /var/run/docker.sock
 ```
 
 ---

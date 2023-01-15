@@ -35,8 +35,10 @@
       name: First ROS2 Program
       content:
       - 09_first_ros_program.md
-      - 10_listener.md
+      - 10_talker.md
   - section:
       name: ROS2 Python Packages
       content:
       - 11_create_py_package.md
+      - 12_create_publisher.md
+      - 13_create_subscriber.md

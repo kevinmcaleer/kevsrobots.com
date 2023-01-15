@@ -6,7 +6,7 @@ type: page
 previous: 00_intro.html
 next: 02_pi_setup.html
 description: Learn about ROS, the different versions and what it does
-percent: 20
+percent: 14
 duration: 2
 navigation:
 - name: Learn ROS with me
@@ -43,6 +43,16 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
+    - name: Talker ROS2 Program
+      link: 10_talker.html
+  - section: ROS2 Python Packages
+    content:
+    - name: Create a ROS2 Python Package
+      link: 11_create_py_package.html
+    - name: Create a ROS2 Python Publisher
+      link: 12_create_publisher.html
+    - name: Create a ROS2 Python Subscriber
+      link: 13_create_subscriber.html
 ---
 
 

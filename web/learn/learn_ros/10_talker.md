@@ -1,12 +1,12 @@
 ---
 layout: lesson
-title: Get Cubie-1 files
+title: Talker ROS2 Program
 author: Kevin McAleer
 type: page
-previous: 04_docker_install.html
-next: 06_clone_images.html
-description: Download the Cubie-1 example files
-percent: 42
+previous: 09_first_ros_program.html
+next: 11_create_py_package.html
+description: Lets create a talker program to publish messages
+percent: 77
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -56,20 +56,38 @@ navigation:
 ---
 
 
-![Cubie Robot image](assets/cubie.jpg){:class="cover"}
+## Talker Program
 
-## Example files
+Lets create another program, that will publishes messages.
 
-This course has some example files that you can use to follow along. Lets grab these and continue with the container build.
+This time we'll make it in a class:
 
----
+```python
 
-## Get Cubie-1 files
+import rclpy
+from rclpy.node import Node
 
-* **Get Cubie-1 files** - From the terminal, type:
+class talker(Node):
 
-```bash
-git clone https://github.com/kevinmcaleer/cubie-1
+    def __init__(self):
+        super().__init__("node_test")
+        self.counter_ = 0
+        self.get_logger().info("Hello World")
+        self.create_timer(0.5, self.timer_callback)
+
+    def timer_callback(self):
+        self.counter_ += 1
+        self.get_logger().info("Hello" + str(self.counter_))
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = talker()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()
+
 ```
 
 ---

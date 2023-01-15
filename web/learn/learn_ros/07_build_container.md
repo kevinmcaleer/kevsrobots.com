@@ -6,7 +6,7 @@ type: page
 previous: 06_clone_images.html
 next: 08_vscode_setup.html
 description: Use the official docker images to build our ROS2 container
-percent: 80
+percent: 56
 duration: 3
 navigation:
 - name: Learn ROS with me
@@ -43,6 +43,16 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
+    - name: Talker ROS2 Program
+      link: 10_talker.html
+  - section: ROS2 Python Packages
+    content:
+    - name: Create a ROS2 Python Package
+      link: 11_create_py_package.html
+    - name: Create a ROS2 Python Publisher
+      link: 12_create_publisher.html
+    - name: Create a ROS2 Python Subscriber
+      link: 13_create_subscriber.html
 ---
 
 

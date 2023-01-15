@@ -7,7 +7,7 @@ previous: 05_get_cubie.html
 next: 07_build_container.html
 description: Download the official docker images for ROS from the Open Source Robotics
   Foundation (OSRF)
-percent: 70
+percent: 49
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -44,6 +44,16 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
+    - name: Talker ROS2 Program
+      link: 10_talker.html
+  - section: ROS2 Python Packages
+    content:
+    - name: Create a ROS2 Python Package
+      link: 11_create_py_package.html
+    - name: Create a ROS2 Python Publisher
+      link: 12_create_publisher.html
+    - name: Create a ROS2 Python Subscriber
+      link: 13_create_subscriber.html
 ---
 
 

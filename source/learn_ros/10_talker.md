@@ -1,13 +1,13 @@
 ---
 layout: lesson
-title: Listener ROS2 Program
+title: Talker ROS2 Program
 type: page
-description: Lets create a listener program to show the talker messages
+description: Lets create a talker program to publish messages
 ---
 
-## Listener Program
+## Talker Program
 
-Lets create another program, that will print out every message that the talker program produces.
+Lets create another program, that will publishes messages.
 
 This time we'll make it in a class:
 
