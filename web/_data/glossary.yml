@@ -136,3 +136,10 @@
     The output of the sensor is then used to measure the angular position of the object.
   link: https://en.wikipedia.org/wiki/Hall_effect
   article: /resources/how_it_works/encoders#hall-effect-encoders
+- term: Algorithm
+  definition: Algorithm
+  full: >-
+    An algorithm is a finite sequence of well-defined, computer-implementable instructions, typically to solve a class of problems or to perform a computation.
+    Algorithms are always unambiguous and are used as specifications for performing calculations, data processing, automated reasoning, and other tasks.
+  link: https://en.wikipedia.org/wiki/Algorithm
+  article: /resources/how_it_works/algorithm
