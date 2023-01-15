@@ -6,7 +6,7 @@ short_description: Learn about Pots
 date: 2023-01-15
 author: Kevin McAleer
 excerpt:
-cover: /assets/img/how_it_works/pots.png
+cover: /assets/img/how_it_works/pots.jpg
 tags:
  - Robot
  - Tips
