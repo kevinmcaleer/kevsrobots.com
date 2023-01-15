@@ -14,13 +14,13 @@ tags:
  - ROS
 ---
 
-`SLAM` (`Simultaneous Localization and Mapping`) is an algorithm used in robotics for navigation and mapping. It works by using [LIDAR](/resources/glossary#lidar) data to construct a 3D map of the environment and then using this map to localize the robot within it.
+`SLAM` (`Simultaneous Localization and Mapping`) is an collection of algorithms used in robotics for navigation and mapping. It works by using [LIDAR](/resources/glossary#lidar), sonor and other sensor data to construct a 3D map of the environment and then using this map to localize the robot within it.
 
 LIDAR (Light Detection and Ranging) is a sensing technology that uses lasers to measure distances to nearby objects by timing how long it takes for the laser to return after being emitted. 
 
 The LIDAR data is used to construct a 3D point cloud of the environment which is then used to build an occupancy grid map. The occupancy grid map is then used to localize the robot and navigate it through the environment. Additionally, SLAM algorithms can use additional sensory data such as inertial measurements and camera images to improve the accuracy and reliability of the mapping and localization process.
 
-The SLAM algorithm starts by generating an initial map of the environment and then uses the data from the sensors to refine the map. The algorithm can also localize the robot in the environment by tracking its motion and comparing it to the map. Slam algorithms are a powerful tool for navigation and can be used in many applications such as self-driving cars, robotics, and augmented reality.
+The SLAM algorithm starts by generating an initial map of the environment and then uses the data from the sensors to refine the map. SLAM algorithms can also localize the robot in the environment by tracking its motion and comparing it to the map. Slam algorithms are a powerful tool for navigation and can be used in many applications such as self-driving cars, robotics, and augmented reality.
 
 ## SLAM Process
 
