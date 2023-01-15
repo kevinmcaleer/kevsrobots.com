@@ -126,3 +126,13 @@
     A potentiometer is a passive two-terminal resistor.
   link: https://en.wikipedia.org/wiki/Potentiometer
   article: /resources/how_it_works/pots
+- term: Hall effect
+  definition: Hall effect
+  full: >-
+    Hall effect encoders are sensors that use the Hall effect to detect the angular position of a rotating object. 
+    The Hall effect is a phenomenon in which a voltage is created when a magnetic field is exposed to a current carrying conductor. 
+    In a Hall effect encoder, a magnet is attached to the rotating object, and a Hall effect sensor is placed near it. 
+    As the object rotates, the magnetic field changes and the Hall effect sensor detects these changes. 
+    The output of the sensor is then used to measure the angular position of the object.
+  link: https://en.wikipedia.org/wiki/Hall_effect
+  article: /resources/how_it_works/encoders#hall-effect-encoders
