@@ -42,3 +42,7 @@
   link: /robots/pythonai/
   cover: /assets/img/blog/byoai/byoai.jpg
   description: Build your own AI Assistant in Python
+- name: Cyberglasses
+  link: /blog/cyberglasses.html
+  cover: /assets/img/blog/cyberglasses/cyberglasses04.png
+  description: Build your own Hackable Cyberglasses
