@@ -83,7 +83,7 @@ The code for this project is available here: <https://github.com/kevinmcaleer/cy
 
 ![Cyberglasses](/assets/img/blog/cyberglasses/cyberglasses01.png){:class="img-fluid w-50"}
 
-![Cyberglasses](/assets/img/blog/cyberglasses/cyberglasses012.jpg){:class="img-fluid w-50"}
+![Cyberglasses](/assets/img/blog/cyberglasses/cyberglasses02.jpg){:class="img-fluid w-50"}
 
 ![Cyberglasses](/assets/img/blog/cyberglasses/cyberglasses03.jpg){:class="img-fluid w-50"}
 
