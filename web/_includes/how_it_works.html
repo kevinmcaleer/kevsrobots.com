@@ -1,17 +1,17 @@
 
 {% assign articles = site.how_it_works | sort:'date' | reverse%}
 
-<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-1">
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
 
 {% for article in articles %}
 {% if article.title != 'How it Works' %}
 <div class="col">
-<div class="card h-100">
-    <a href="{{article.url}}" class=""><img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}"></a>
-    <div class="card-body">
-        <h5>{{article.title}}</h5>
-        <p>{{article.excerpt}}</p>
-        <a href="{{article.url}}" class="btn btn-primary">Read Article</a>
+<div class="card h-100 border-0 m-0 p-0">
+    <a href="{{article.url}}" class=""><img class="card-img-top rounded-3" src="{{article.cover}}" alt="{{article.title}}"></a>
+    <div class="card-body m-0 mt-2 p-0">
+        <p class="m-0 p-0"><strong>{{article.title}}</strong></p>
+        <p class="small m-0 p-0">{{article.excerpt}}</p>
+        <a href="{{article.url}}" class="btn btn-outline-primary btn-sm">Read Article</a>
     </div>
 </div>
 </div>

@@ -1,11 +1,12 @@
 {% assign vids = site.data.youtube | sort: 'published' | reverse %}
 
-<div class="bg-light p-0 m-0 rounded-1">
+<hr>
+<div class=" p-0 m-0 rounded-1">
 
-<div class="container pb-3 m-1">
+<div class="container pb-3 m-0 p-0">
 
-    <nav class="navbar">
-        <div class="container-fluid">
+    <nav class="navbar p-0">
+        <div class="container-fluid p-0">
           <span class="navbar-text">
             Recent Videos 
           </span>
@@ -20,18 +21,18 @@
 <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
   <!-- {% if vid.type != "short" %} -->
     <div class="card-group">
-    <div class="card">
-        <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid"></a>
+    <div class="card border-0">
+        <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-3"></a>
         <div class="card-body">
           <div class="row h-100">
             <div class="col-12 m-0 p-0">
-              <div class="row w-100 p-1 m-0 h-50">
+              <div class="row w-100 p-0 m-0 h-50">
                   <div class="col-12 m-0 p-0">
                       <p class="small">{{ vid.title }}</p>
                   </div>
               </div>
 
-              <div class="row w-100 p-1 m-0 h-50">
+              <div class="row w-100 p-0 m-0 h-50">
                   <div class="col-6 m-0 p-0">
                       <p class="text-mute small text-left">{{ vid.published | date: "%d %B %Y" }}</p>
                   </div>
