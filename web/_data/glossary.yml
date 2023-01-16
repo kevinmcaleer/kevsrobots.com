@@ -161,3 +161,20 @@
     A robot is a machine, especially one programmable by a computer, capable of carrying out a complex series of actions automatically.
     Robots can be guided by an external control device or the control may be embedded within.
   link: https://en.wikipedia.org/wiki/Robot
+- term: Servo
+  definition: Servo
+  full: >-
+    A servo is a device for controlling the position or the velocity of a mechanism.
+    Servos can be pneumatic, hydraulic or electric.
+    In general, the servo operates on one of two principles: the control of angular position or the control of linear position.
+  link: https://en.wikipedia.org/wiki/Servo
+  article: /resources/how_it_works/servos
+- term: NeoPixel
+  definition: NeoPixel
+  full: >-
+    NeoPixel is a brand name for individually addressable RGB LED pixels.
+    The pixels are controlled by a single microcontroller, such as an Arduino or Raspberry Pi.
+    The pixels are arranged in a strip, and the strip is connected to the microcontroller.
+    The microcontroller can then control the color of each pixel.
+  link: https://en.wikipedia.org/wiki/NeoPixel
+  article: /resources/how_it_works/neopixel
