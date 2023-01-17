@@ -4,7 +4,7 @@ title: First ROS2 Program
 author: Kevin McAleer
 type: page
 previous: 08_vscode_setup.html
-next: 10_talker.html
+next: 10_listener.html
 description: Lets create our first ROS2 program
 percent: 70
 duration: 5
@@ -44,7 +44,7 @@ navigation:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
     - name: Talker ROS2 Program
-      link: 10_talker.html
+      link: 10_listener.html
   - section: ROS2 Python Packages
     content:
     - name: Create a ROS2 Python Package

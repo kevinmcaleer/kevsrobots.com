@@ -45,7 +45,7 @@ navigation:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
     - name: Talker ROS2 Program
-      link: 10_talker.html
+      link: 10_listener.html
   - section: ROS2 Python Packages
     content:
     - name: Create a ROS2 Python Package

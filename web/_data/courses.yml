@@ -18,3 +18,10 @@
   duration: 4m
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
+- author: Kevin McAleer
+  cover: /learn/robotics_101/assets/basics_101.jpg
+  description: Learning ROS with me, is a course that will teach you how to use ROS2
+    on Raspberry Pi 4.
+  duration: 16m
+  link: /learn/robotics_101/00_overview.html
+  name: Robotics 101

@@ -1,0 +1,21 @@
+- name: Robotics 101
+  author: Kevin McAleer
+  date_created: 17-01-2023
+  date_published: 17-01-2023
+  layout: course
+  cover: assets/basics_101.jpg
+  description: >- 
+     Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_overview.md
+  - section:
+      name: Robotics 101
+      content:
+      - lesson_01.md
+      - lesson_02.md
+      - lesson_03.md
+      - lesson_04.md
+      - lesson_05.md

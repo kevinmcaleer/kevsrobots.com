@@ -161,6 +161,7 @@
     A robot is a machine, especially one programmable by a computer, capable of carrying out a complex series of actions automatically.
     Robots can be guided by an external control device or the control may be embedded within.
   link: https://en.wikipedia.org/wiki/Robot
+  article: /resources/how_it_works/robots
 - term: Servo
   definition: Servo
   full: >-
@@ -178,3 +179,17 @@
     The microcontroller can then control the color of each pixel.
   link: https://en.wikipedia.org/wiki/NeoPixel
   article: /resources/how_it_works/neopixel
+- term: Motor
+  definition: Motor
+  full: >-
+    A motor is a machine that converts other forms of energy into mechanical energy.
+    Most motors operate through the conversion of electrical energy into mechanical energy, but some types of motors convert energy from other sources, such as hydraulic or pneumatic energy.
+  link: https://en.wikipedia.org/wiki/Motor
+  # article: /resources/how_it_works/motors
+- term: Actuator
+  definition: Actuator
+  full: >-
+    An actuator is a component of a machine that is responsible for moving and controlling a mechanism or system.
+    Actuators are powered by electric motors, hydraulic cylinders, pneumatic cylinders, or even compressed air or hand.
+  link: https://en.wikipedia.org/wiki/Actuator
+  # article: /resources/how_it_works/actuators

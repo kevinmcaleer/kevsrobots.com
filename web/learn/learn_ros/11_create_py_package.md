@@ -3,7 +3,7 @@ layout: lesson
 title: Create a ROS2 Python Package
 author: Kevin McAleer
 type: page
-previous: 10_talker.html
+previous: 10_listener.html
 next: 12_create_publisher.html
 description: Lets create a new Python Package
 percent: 84
@@ -44,7 +44,7 @@ navigation:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
     - name: Talker ROS2 Program
-      link: 10_talker.html
+      link: 10_listener.html
   - section: ROS2 Python Packages
     content:
     - name: Create a ROS2 Python Package
