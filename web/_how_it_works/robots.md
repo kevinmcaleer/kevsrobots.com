@@ -20,3 +20,7 @@ A `robot` is an electromechanical machine that is programmed to perform a specif
 Motors are used to move the robot around, actuators move the robot's joints, sensors provide information from the environment, and software controls the robot's behavior. Robots are able to interact with their environment using a variety of sensors, including vision, touch, and sound, and can be programmed to respond to specific commands. The programming of a robot can be complex, but the basic principles are simple: robots are directed to complete tasks by following a set of instructions. 
 
 As robots become more advanced, they can be programmed to learn from their environment and make decisions based on the data they collect.
+
+For more information take the [Robotics 101](/learn/robotics_101/) course.
+
+---
