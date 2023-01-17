@@ -6,7 +6,7 @@ type: page
 previous: 02_pi_setup.html
 next: 04_docker_install.html
 description: Update and Upgrade the OS to the latest patch level
-percent: 40
+percent: 28
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -43,6 +43,16 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
+    - name: Talker ROS2 Program
+      link: 10_listener.html
+  - section: ROS2 Python Packages
+    content:
+    - name: Create a ROS2 Python Package
+      link: 11_create_py_package.html
+    - name: Create a ROS2 Python Publisher
+      link: 12_create_publisher.html
+    - name: Create a ROS2 Python Subscriber
+      link: 13_create_subscriber.html
 ---
 
 

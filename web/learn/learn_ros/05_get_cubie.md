@@ -6,7 +6,7 @@ type: page
 previous: 04_docker_install.html
 next: 06_clone_images.html
 description: Download the Cubie-1 example files
-percent: 60
+percent: 42
 duration: 1
 navigation:
 - name: Learn ROS with me
@@ -43,6 +43,16 @@ navigation:
     content:
     - name: First ROS2 Program
       link: 09_first_ros_program.html
+    - name: Talker ROS2 Program
+      link: 10_listener.html
+  - section: ROS2 Python Packages
+    content:
+    - name: Create a ROS2 Python Package
+      link: 11_create_py_package.html
+    - name: Create a ROS2 Python Publisher
+      link: 12_create_publisher.html
+    - name: Create a ROS2 Python Subscriber
+      link: 13_create_subscriber.html
 ---
 
 
@@ -60,16 +70,6 @@ This course has some example files that you can use to follow along. Lets grab t
 
 ```bash
 git clone https://github.com/kevinmcaleer/cubie-1
-```
-
----
-
-## Get official ROS docker images
-
-* **Get official ROS docker images**
-
-```bash
-git clone https://www.github.com/osrf/docker_images
 ```
 
 ---
