@@ -29,7 +29,7 @@ navigation:
 ---
 
 
-![Cover photo](assets/Basics_101.jpg){:class="cover"}
+![Cover photo](assets/basics_101.jpg){:class="cover"}
 
 ## Overview
 
