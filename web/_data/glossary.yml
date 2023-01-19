@@ -200,3 +200,17 @@
     The name general-purpose input/output reflects the fact that the pin is not dedicated to a specific function at design time.
   link: https://en.wikipedia.org/wiki/General-purpose_input/output
   article: /resources/how_it_works/shift_registers
+- term: Anode
+  definition: Anode; an electrode through which the conventional current enters
+  full: >-
+    In electronics, an anode is the electrode of an electrolytic cell or a diode through which the conventional current enters.
+    The anode is the electrode at which oxidation occurs.
+  link: https://en.wikipedia.org/wiki/Anode
+  article: /resources/how_it_works/diodes
+- term: Cathode
+  definition: Cathode; an electrode through which the conventional current leaves
+  full: >-
+    In electronics, a cathode is the electrode of an electrolytic cell or a diode through which the conventional current leaves.
+    The cathode is the electrode at which reduction occurs.
+  link: https://en.wikipedia.org/wiki/Cathode
+  article: /resources/how_it_works/diodes

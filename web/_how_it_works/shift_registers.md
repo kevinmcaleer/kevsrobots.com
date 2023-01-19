@@ -27,12 +27,6 @@ This `SN74HC595` is common shift register that takes a serial input (SPI) of 1 b
 
 ---
 
-## Anode & Cathode
-
-[![Diode diagram](/assets/img/how_it_works/doides02.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/doides02.jpg)
-
----
-
 ## Video
 
 In this video I show you how to use shift registers to reduce the number of pins required to control several seven segment displays.
