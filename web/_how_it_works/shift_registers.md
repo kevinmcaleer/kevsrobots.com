@@ -2,8 +2,8 @@
 layout: blog
 title: Shift Registers
 short_title: How it works - Shift Registers
-short_description: Learn about Shift Registers works
-date: 2023-01-19
+short_description: Learn about how Shift Registers works
+date: 2023-01-18
 author: Kevin McAleer
 excerpt: 
 cover: /assets/img/how_it_works/shift_registers.png
@@ -24,6 +24,12 @@ Shift registers are commonly used in communication and audio/video systems to st
 ## SN74HC595
 
 This `SN74HC595` is common shift register that takes a serial input (SPI) of 1 byte (8 bits) and then output those digital bits onto 8 pins. They can be chained together, for example, putting three in a row with the serial output of one plugged into the serial input of another to make 3 x 8 = 24 digital outputs.
+
+---
+
+## Anode & Cathode
+
+[![Diode diagram](/assets/img/how_it_works/doides02.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/doides02.jpg)
 
 ---
 
