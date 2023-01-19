@@ -193,3 +193,10 @@
     Actuators are powered by electric motors, hydraulic cylinders, pneumatic cylinders, or even compressed air or hand.
   link: https://en.wikipedia.org/wiki/Actuator
   # article: /resources/how_it_works/actuators
+- term: GPIO
+  definition: General Purpose Input/Output
+  full: >-
+    General-purpose input/output (GPIO) is a generic pin on an integrated circuit whose behavior, including whether it is an input or output pin, is controllable by the user at run time.
+    The name general-purpose input/output reflects the fact that the pin is not dedicated to a specific function at design time.
+  link: https://en.wikipedia.org/wiki/General-purpose_input/output
+  article: /resources/how_it_works/shift_registers
