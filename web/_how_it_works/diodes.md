@@ -4,7 +4,7 @@ title: Diodes
 short_title: How it works - Diodes
 short_description: Learn about how Diodes work
 date: 2023-01-19
-author: Kevin McAleer
+author: Kevin McAleer & Bill McAleer
 excerpt: 
 cover: /assets/img/how_it_works/diodes.png
 tags:
