@@ -34,3 +34,20 @@ This diagram shows the Diode with its two terminals; anode and cathode. The diod
 `Light emmiting diodes` (LEDs) are a special type of diode that produces light when current passes through it. The colour of the LED is defined by colour of the plastic that encases the compoent.
 
 ---
+
+Diodes come in two types; `Germanium` and `Silicon`.
+
+`Germanium` diodes are used for rectifying small signals, for example in early radios. They require only 0.2 volts, anode to cathode, to pass tiny amounts of current in one direction.
+
+`Silicon` diodes require 0.7 volts to open. Electrons pass from cathode to anode and 0.7 volts difference will be maintained over a wide range of current. 
+
+> ### Voltage Flow
+> 
+> Here we get into the realms of confusion.
+>
+> On circuits, the `cathode` is regarding as `positive`, e.g. If you apply an *A.C.* signal to the `anode`, a positive voltage will be measured on the `cathode`.
+>
+> In the infancy of electronics, ‘conventional’ current is said to flow
+> from `anode` to `cathode`, when in fact electrons travel from `cathode` to `anode`.
+
+---
