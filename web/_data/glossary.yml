@@ -214,3 +214,22 @@
     The cathode is the electrode at which reduction occurs.
   link: https://en.wikipedia.org/wiki/Cathode
   article: /resources/how_it_works/diodes
+- term: X11
+  definition: X11
+  full: >-
+    X11, also known as the X Window System, is a windowing system for bitmap displays, common on UNIX-like operating systems.
+    It is based on the X Window System protocol, which was developed by the Massachusetts Institute of Technology (MIT) Artificial Intelligence Laboratory (AI Lab) in the 1980s.
+  link: https://en.wikipedia.org/wiki/X11
+- term: X11 Forwarding
+  definition: X11 Forwarding
+  full: >-
+    X11 forwarding is a feature of SSH protocol version 2 that allows a user to connect to a remote host and have the remote host's X11 server forward its display to the user's own X11 server.
+    This allows the user to run graphical applications on the remote host and have them displayed on the local host.
+  link: https://en.wikipedia.org/wiki/X11_forwarding
+- term: RViz2
+  definition: ROS Visualization tool
+  full: >-
+    RViz is a 3D visualization tool for ROS.
+    It is a graphical tool that allows the user to visualize data from a ROS system.
+    It is a tool that is used to visualize data from a ROS system.
+  link: https://en.wikipedia.org/wiki/RViz

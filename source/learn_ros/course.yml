@@ -42,3 +42,14 @@
       - 11_create_py_package.md
       - 12_create_publisher.md
       - 13_create_subscriber.md
+  - section:
+      name: Docker and X11
+      content:
+      - 14_docker_x11.md
+  - section:
+      name: RViz2
+      content:
+      - 15_rviz.md
+      - 16_rviz_displays.md
+      - 17_tf2.md
+      - 18_laserscan.md

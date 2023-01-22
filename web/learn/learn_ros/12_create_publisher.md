@@ -6,7 +6,7 @@ type: page
 previous: 11_create_py_package.html
 next: 13_create_subscriber.html
 description: Lets create a new Python Publisher program
-percent: 91
+percent: 65
 duration: 4
 navigation:
 - name: Learn ROS with me
@@ -53,6 +53,20 @@ navigation:
       link: 12_create_publisher.html
     - name: Create a ROS2 Python Subscriber
       link: 13_create_subscriber.html
+  - section: Docker and X11
+    content:
+    - name: Getting Rviz2 and RQT to work in docker
+      link: 14_docker_x11.html
+  - section: RViz2
+    content:
+    - name: Rviz2
+      link: 15_rviz.html
+    - name: Rviz2 Displays
+      link: 16_rviz_displays.html
+    - name: Transformations with TF2
+      link: 17_tf2.html
+    - name: Laserscan data
+      link: 18_laserscan.html
 ---
 
 

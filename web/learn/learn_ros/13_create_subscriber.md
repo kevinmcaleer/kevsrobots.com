@@ -4,8 +4,9 @@ title: Create a ROS2 Python Subscriber
 author: Kevin McAleer
 type: page
 previous: 12_create_publisher.html
+next: 14_docker_x11.html
 description: Lets create a new Python Subscriber program
-percent: 100
+percent: 70
 duration: 3
 navigation:
 - name: Learn ROS with me
@@ -52,6 +53,20 @@ navigation:
       link: 12_create_publisher.html
     - name: Create a ROS2 Python Subscriber
       link: 13_create_subscriber.html
+  - section: Docker and X11
+    content:
+    - name: Getting Rviz2 and RQT to work in docker
+      link: 14_docker_x11.html
+  - section: RViz2
+    content:
+    - name: Rviz2
+      link: 15_rviz.html
+    - name: Rviz2 Displays
+      link: 16_rviz_displays.html
+    - name: Transformations with TF2
+      link: 17_tf2.html
+    - name: Laserscan data
+      link: 18_laserscan.html
 ---
 
 

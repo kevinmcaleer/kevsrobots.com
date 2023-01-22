@@ -63,7 +63,7 @@ docker build -t ros2 .
 
 *Where `ros2` is the name of the docker image we have created*
 
-![Build output on a terminal](assets/build.png){:class="img-fluid w-50"}
+![Build output on a terminal](assets/build.png){:class="img-fluid w-100"}
 
 ---
 
