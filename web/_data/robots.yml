@@ -1,3 +1,7 @@
+- name: SMARS Mini
+  link: /blog/smars-mini.html
+  cover: /assets/img/blog/smars_mini/smarsmini.jpg
+  description: Build a Tiny robot with a Pimoronit Tiny 2040
 - name: Cubie-1
   link: /blog/meet-cubie.html
   cover: /assets/img/blog/cubie-1/cubie07.jpg
