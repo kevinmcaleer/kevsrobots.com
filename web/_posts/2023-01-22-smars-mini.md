@@ -34,7 +34,7 @@ Head over to YouTube and start watching a SMARS Mini Video Overview and Tutorial
 
 SMARS Mini is smaller version of the original SMARS Robot. It is 1/10 the size of the original, barely wide enough to house the two `N20 Motors`.
 
-![SMARS Mini 3d render](/assets/img/blog/smars_mini/tiny2040.png){:class="img-fluid w-50 shadow-lg"}
+![SMARS Mini 3d render](/assets/img/blog/smars_mini/smarsmini.jpg){:class="img-fluid w-100 shadow-lg"}
 
 ![SMARS Mini 3d render](/assets/img/blog/smars_mini/pack04.jpg){:class="img-fluid w-100"}
 
