@@ -25,3 +25,10 @@
   duration: 16m
   link: /learn/robotics_101/00_overview.html
   name: Robotics 101
+- author: Kevin McAleer
+  cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+  description: Robot Eye Mechansim, is a course that will teach you how to use Fusion
+    360 to create a Servo controled Robot eye mechanism.
+  duration: 25m
+  link: /learn/eye_mechanism/00_intro.html
+  name: Robot Eye Mechansim

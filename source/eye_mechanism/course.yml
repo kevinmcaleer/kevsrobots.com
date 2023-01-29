@@ -1,0 +1,30 @@
+- name: Robot Eye Mechansim
+  author: Kevin McAleer
+  date_created: 28-01-2023
+  date_published: 29-01-2023
+  layout: course
+  cover: assets/eye_mechanism.jpg
+  description: >- 
+     Robot Eye Mechansim, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
+  - section:
+      name: Initial Design
+      content:
+      - 01_create_component.md
+      - 02_create_sketch.md
+      - 03_revolve.md
+  - section:
+      name: Refine the Top Eyelid detail
+      content:
+      - 04_create_hinges.md
+      - 05_hinge.md
+  - section:
+      name: Create the Lower Eyelid 
+      content:
+      - 06_lower_eyelid_sketch.md
+      - 07_create_lower_sketch.md
+      - 08_hinge.md
