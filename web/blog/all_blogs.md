@@ -4,4 +4,4 @@ title: All Blogs
 thanks: false
 ---
 
-{% include blog_archive.html %}
+{% include blog_all.html %}

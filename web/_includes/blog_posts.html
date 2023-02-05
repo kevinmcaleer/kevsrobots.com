@@ -4,9 +4,9 @@
 <div class="row">
     <div class="col-md-9 col-12">
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-            {% for post in posts limit:6 %}
+            {% for post in posts limit:4 %}
             <div class="col">
-            <div class="card p-0">
+            <div class="card p-0 h-100">
             <a href="{{ post.url }}">
              <img src="{{ post.cover }}" class="card-img-top" alt="..."></a>
      
@@ -22,7 +22,7 @@
             <div class="m-0 px-2">
                 {% assign tags = post.tags %}
                 {% for tag in tags %}
-                <a class="small m-1 text-decoration-none text-mute">{{tag}}</a>
+                <a class="badge bg-ocre small m-1 text-decoration-none">{{tag}}</a>
                 {% endfor %}
             </div>
             </div> <!-- row -->
