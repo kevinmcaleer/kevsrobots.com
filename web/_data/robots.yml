@@ -1,3 +1,7 @@
+- name: Bubo-2T
+  link: /blog/bubo-2t.html
+  cover: /assets/img/blog/bubo_cover.jpg
+  description: A Steam Punk Robot that can Toot messages
 - name: SMARS Mini
   link: /blog/smars-mini.html
   cover: /assets/img/blog/smars_mini/smarsmini.jpg
