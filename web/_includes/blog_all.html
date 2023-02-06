@@ -4,9 +4,18 @@
     </div>
     <div class="col-md-9">
     {% for post in site.posts %}
+        
         {% assign currentdate = post.date | date: "%B %Y" %}
         {% if currentdate != date %}
+        {% assign blog_articles = 0 %}
+            {% for post in site.posts %}
+            {% assign postdate = post.date | date: "%B %Y" %}
+            {% if postdate == currentdate %}
+            {% assign blog_articles = blog_articles | plus: 1 %}
+            {% endif %}
+            {% endfor %}
         <h2 class="mt-3 mb-0"><a id="y{{currentdate}}">{{ currentdate }}</a></h2>
+        <p>{{blog_articles}} Article(s)</p>
         <hr />
         {% assign date = currentdate %} 
         {% endif %}
