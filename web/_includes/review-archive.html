@@ -13,9 +13,11 @@
       </div>
     <div class="flex-grow-1 ms-3 p-3">
         <a href="{{page.url}}" class="text-decoration-none"><h5 class="card-title black">{{page.title}}</h5></a>
-        {% for i in (1..page.rating) %}
+        {% assign rating = page.rating | to_integer %}
+        
+        {% for i in (1..rating) %}
         ⭐️
-        {% endfor %}
+        {% endfor %}({{page.rating}} out of 5)
         <p class="card-text"><a href="{{page.url}}" class="text-decoration-none black">{{page.excerpt}}</a></p>
         <span class="float-end"><a href="{{page.url}}" class="btn btn-primary right">Read more</a></span>
     </div>

@@ -1,0 +1,101 @@
+{% assign score = include.score | split: ", " %}
+{% assign new_score = 0 %}
+{% assign total = 0 %}
+{% for item in score %}
+
+{% assign new_score = item | to_i %}
+{% assign result = new_score | to_i + total | to_i %}
+{% assign total = result | plus: total | to_i %}
+{% endfor %}
+
+Below is the Kevs Robots review framework. First, each product is scored out of 5 for each of the 9 areas. 
+The total score is then calculated by adding the scores for each area and dividing by 9. 
+The total score is then rounded to the nearest whole number.
+
+<table class="scoring-table">
+    <tr>
+    <th class="w-20">Scoring area</th>
+    <th class="w-16 text-center">1</th>
+    <th class="w-16 text-center">2</th>
+    <th class="w-16 text-center">3</th>
+    <th class="w-16 text-center">4</th>
+    <th class="w-16 text-center">5</th>
+    </tr>
+    <tr>
+    <td>Price</td>
+    <td class="{% if score[0]=='1' %}active{% endif %}">Very Expensive, verging on not worth it</td>
+    <td class="{% if score[0]=='2' %}active{% endif %}">Expensive, but worth it for the value add</td>
+    <td class="{% if score[0]=='3' %}active{% endif %}">Affordable, similar in price to competitors</td>
+    <td class="{% if score[0]=='4' %}active{% endif %}">Cheap / great value for the parts and features</td>
+    <td class="{% if score[0]=='5' %}active{% endif %}">Free / Very low cost</td>
+    </tr>
+    <tr>
+    <td>Ease of use</td>
+    <td class="{% if score[1]=='1' %}active{% endif %}">Hard to use, complex operations requiring multipe steps</td>
+    <td class="{% if score[1]=='2' %}active{% endif %}">Many steps, some of which as complex.</td>
+    <td class="{% if score[1]=='3' %}active{% endif %}">Some steps to construct or operate, some of which are complex </td>
+    <td class="{% if score[1]=='4' %}active{% endif %}">Few steps, simple to do</td>
+    <td class="{% if score[1]=='5' %}active{% endif %}">Very easy to use / use is obvious and clear</td>
+    </tr>
+    <tr>
+    <td>Functionality</td>
+    <td class="{% if score[2]=='1' %}active{% endif %}">Very little innovation or usefulness</td>
+    <td class="{% if score[2]=='2' %}active{% endif %}">Does less then you’d expect, but still useful</td>
+    <td class="{% if score[2]=='3' %}active{% endif %}">Practice, does what you expect but no more</td>
+    <td class="{% if score[2]=='4' %}active{% endif %}">Quite a few innovative functions, does more than you’d expect</td>
+    <td class="{% if score[2]=='5' %}active{% endif %}">Amazing features & innovation, industry leading</td>
+    </tr>
+    <tr>
+    <td>Availability</td>
+    <td class="{% if score[3]=='1' %}active{% endif %}">Very difficult to get hold of any variation or version</td>
+    <td class="{% if score[3]=='2' %}active{% endif %}">Little available; some variations or versions are available</td>
+    <td class="{% if score[3]=='3' %}active{% endif %}">Available in some countries and stocks mostly available</td>
+    <td class="{% if score[3]=='4' %}active{% endif %}">Available in most countries & mostly in stock, short wait for stock replenishment</td>
+    <td class="{% if score[3]=='5' %}active{% endif %}">All versions and variations widely available in all countries & in stock</td>
+    </tr>
+    <tr>
+    <td>Aesthetics</td>
+    <td class="{% if score[4]=='1' %}active{% endif %}">Design is not pleasing to the eye; poor colour choice, parts do not fit together, no cohesive design</td>
+    <td class="{% if score[4]=='2' %}active{% endif %}">Design is acceptable, some elements do not work together well</td>
+    <td class="{% if score[4]=='3' %}active{% endif %}">Design is functional, no overall cohesion</td>
+    <td class="{% if score[4]=='4' %}active{% endif %}">Design is functional with some flair, most elements work together well</td>
+    <td class="{% if score[4]=='5' %}active{% endif %}">Very pleasing to the eye, complimentary colour choices, great fit and finish, with an overall cohesive design</td>
+    </tr>
+    <tr>
+    <td>Build Quality</td>
+    <td class="{% if score[5]=='1' %}active{% endif %}">Poor construction, with gaps or overlapping parts. Poor quality materials used</td>
+    <td class="{% if score[5]=='2' %}active{% endif %}">Functional construction, cheap materials</td>
+    <td class="{% if score[5]=='3' %}active{% endif %}">Functional construction, acceptable materials used</td>
+    <td class="{% if score[5]=='4' %}active{% endif %}">Durable design, some parts are high quality, most are acceptable</td>
+    <td class="{% if score[5]=='5' %}active{% endif %}">Solid construction, parts fit together as intended with no unexpected gaps or overlapping parts. High quality materials and parts used</td>
+    </tr>
+    <tr>
+    <td>Documentation</td>
+    <td class="{% if score[6]=='1' %}active{% endif %}">Single language instructions, no diagrams, basic features only</td>
+    <td class="{% if score[6]=='2' %}active{% endif %}">Basic instructions, technical specifications in a few languages, little no diagrams, no example code</td>
+    <td class="{% if score[6]=='3' %}active{% endif %}">Basic instructions, technical  specifications in a few languages, diagrams for use. Some example code</td>
+    <td class="{% if score[6]=='4' %}active{% endif %}">Documentation available in multiple languages, with all features covered and diagrams for use. Some example code</td>
+    <td class="{% if score[6]=='5' %}active{% endif %}">Documentation available in multiple languages, with all features covered and simple diagrams for use. Mechanical and circuit diagrams also included. Example code. Advanced topics covered too</td>
+    </tr>
+    <tr>
+    <td>Packaging</td>
+    <td class="{% if score[7]=='1' %}active{% endif %}">Little to no thought given to environment. Wasteful use of space leading to higher shipping costs. Excess layers of packaging</td>
+    <td class="{% if score[7]=='2' %}active{% endif %}">Some thought given to environmental packaging & recycling. A few layers of packaging</td>
+    <td class="{% if score[7]=='3' %}active{% endif %}">Some thought given to environmental packaging materials & recycling. Single layer of packaging</td>
+    <td class="{% if score[7]=='4' %}active{% endif %}">Environmentally friendly, packaging designed for recycling with some effort. Packaging is has mostly efficient use of space to cut down on shipping costs</td>
+    <td class="{% if score[7]=='5' %}active{% endif %}">Environmentally friendly, packaging designed for easy recycling. Packaging is small with efficient use of space to cut down on shipping costs</td>
+    </tr>
+    <tr>
+    <td>Environmental</td>
+    <td class="{% if score[8]=='1' %}active{% endif %}">No consideration given to sourcing, production, supply, delivery or disposal of product, with toxic chemicals used in production</td>
+    <td class="{% if score[8]=='2' %}active{% endif %}">No consideration given to sourcing, production, supply, delivery or disposal of product</td>
+    <td class="{% if score[8]=='3' %}active{% endif %}">Product is efficient to operate, but may have poor environmental production or disposal impacts</td>
+    <td class="{% if score[8]=='4' %}active{% endif %}">Most of the product is sourced from recycled materials, no toxic chemicals used in production, some thought given to production and delivery energy used</td>
+    <td class="{% if score[8]=='5' %}active{% endif %}">Product is sourced from 100% recycled materials, with no toxic chemicals used in production. produced with clean energy, packaging designed to lower delivery costs and disposal of product is taken care of</td>
+    </tr>
+    
+</table>
+
+<h2 class="mt-3">total is {{total | divided_by: 9.0 | round: 1 }}</h2>
+
+<hr />

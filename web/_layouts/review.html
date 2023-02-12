@@ -9,7 +9,9 @@ layout: content
 <h2>{{page.subtitle}}</h2>
 <p>{{page.excerpt}}</p>
 
-{% for i in (1..page.rating) %}
+{% assign rating = page.rating | to_integer %}
+
+{% for i in (1..rating) %}
 ⭐️
 {% endfor %}
 <p class="orange">{{page.date | date: "%-d %B %Y" }} by {{ page.author}}</p>

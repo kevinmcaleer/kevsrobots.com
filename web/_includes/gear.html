@@ -15,7 +15,8 @@
 </div>
 <div class="col-9 p-3">
     <a href="{{ item.link}}" class="text-decoration-none"><h5 class="black">{{item.title}}</h5></a>
-    {% for i in (1..item.rating) %}
+    {% assign rating = item.rating | to_integer%}
+    {% for i in (1..rating) %}
     ⭐️
     {% endfor %}
     <p>{{item.manufacturer}}</p>

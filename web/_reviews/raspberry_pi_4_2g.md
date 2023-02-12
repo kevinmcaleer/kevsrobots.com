@@ -6,7 +6,7 @@ date: 22-09-04
 excerpt: This is very much a buy recommendation. If you can afford it, go for the 4Gb or 8Gb version. Also don't cheap out on the SD Card; buy a quality memory card such as Sandisk.
 cover: /assets/img/reviews/raspberry-pi-4.png
 link: https://amzn.to/3wvFeyj
-rating: 5
+rating: 4.3
 ---
 
 ## 👍 Recommendation
@@ -75,3 +75,9 @@ Raspberry Pi standard 40 pin GPIO header (fully backwards compatible with previo
 * Price (due to price scalping)
 * Runs hot - may require cooling depending on workload
 * Micro HDMI Connectors are a bit fiddly; I've broken a cable of on one
+
+## Review Score
+
+{% include review_scoring.html score="4, 5, 5, 2, 5, 5, 5, 5, 3" %}
+
+---

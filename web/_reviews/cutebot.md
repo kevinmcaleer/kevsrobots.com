@@ -6,7 +6,7 @@ date: 22-10-30
 excerpt: A great robot kit, particularly for the classroom - small, affordable and rich in features.
 cover: /assets/img/reviews/cutebot.jpg
 link: https://amzn.to/3DMG0v4
-rating: 5
+rating: 4.2
 ---
 
 ## 👍 Recommendation
@@ -119,3 +119,9 @@ The pico:ed is priced around $12.90.
 
 ## Cons
 * I had a few problem getting the software to work initially (CircuitPython libraries)
+
+## Review Score
+
+{% include review_scoring.html score="4, 5, 4, 4, 5, 5, 5, 4, 2" %}
+
+---
