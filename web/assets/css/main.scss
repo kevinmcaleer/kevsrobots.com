@@ -207,9 +207,9 @@ h1 {
     p, li, td {
       font-size: 13pt !important;
       color: rgb(113, 113, 113) !important;
-      strong {
-        font-weight: 900; 
-      }
+      // strong {
+      //   font-weight: 900; 
+      // }
     }
     h1, h2, h3, h4, h5 {
       font-family: $kev_font, sans-serif;

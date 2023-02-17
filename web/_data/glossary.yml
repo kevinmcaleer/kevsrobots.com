@@ -233,3 +233,12 @@
     It is a graphical tool that allows the user to visualize data from a ROS system.
     It is a tool that is used to visualize data from a ROS system.
   link: https://en.wikipedia.org/wiki/RViz
+
+- term: PWM
+  definition: Pulse Width Modulation
+  full: >-
+    Pulse-width modulation (PWM) is a modulation technique used to encode a message into a pulsing signal.
+    The width of each pulse is varied in accordance with the message.
+    The pulse width can be varied between 0% and 100% of the period.
+  link: https://en.wikipedia.org/wiki/Pulse-width_modulation
+  article: /resources/how_it_works/servos

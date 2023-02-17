@@ -23,7 +23,7 @@ Depending on the type of encoder, the signals may be pulses, pulses with directi
 
 ---
 
-## Video 
+## Video
 
 Here is a video explaining the concept; you can skip to the [explaination here](https://youtu.be/ILELVP0kFl8?t=140).
 
