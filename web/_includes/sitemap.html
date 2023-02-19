@@ -14,7 +14,7 @@
             {% assign links = site.data.links %}
             <ul class="decoration-none nav flex-column">
             {% for link in links limit: 10 %}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{link.url}}">{{link.name}}</a></li>
+            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{link.link}}">{{link.name}}</a></li>
             {% endfor %}
             </ul>
             {% assign reviews = site.reviews %}
