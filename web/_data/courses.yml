@@ -6,6 +6,12 @@
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
 - author: Kevin McAleer
+  cover: /learn/smars/assets/how_to_build_a_smars.jpg
+  description: Learn how to 3d print, build and program a SMARS robot
+  duration: 21m
+  link: /learn/smars/00_intro.html
+  name: SMARS
+- author: Kevin McAleer
   cover: /learn/micropython/assets/micropython.jpg
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code

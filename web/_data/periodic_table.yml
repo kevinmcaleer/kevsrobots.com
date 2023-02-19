@@ -9,3 +9,21 @@
   description: Python programming language
   link: https://www.python.org
   color: blue
+- name: Tiny 2040
+  code: Ti
+  title: Ti
+  description: A postage stamp sized RP2040 development board with a USB-C connection, perfect for portable projects, wearables, and embedding into stuff.
+  link: https://shop.pimoroni.com/products/tiny-2040
+  image: https://drive.google.com/open?id=1AEe6S4RQByX2QOABdVaBD7qI1vM-megE
+  author: Jonathan Williamson
+  date: 2022-02-08
+- name: Raspberry Pi
+  title: RP
+  description: The Raspberry Pi is a series of small single-board computers developed in the United Kingdom by the Raspberry Pi Foundation to promote the teaching of basic computer science in schools and in developing countries.
+  link: https://www.raspberrypi.org
+  color: blue
+- name: MicroPython
+  title: MP
+  description: MicroPython is a lean and efficient implementation of the Python 3 programming language that includes a small subset of the Python standard library and is optimised to run on microcontrollers and in constrained environments.
+  link: https://micropython.org
+  color: blue

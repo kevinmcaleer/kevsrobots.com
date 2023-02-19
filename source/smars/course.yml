@@ -1,0 +1,42 @@
+- name: SMARS
+  author: Kevin McAleer
+  date_created: 19-02-2023
+  date_published: 19-02-2022
+  layout: course
+  cover: assets/how_to_build_a_smars.jpg
+  description: >- 
+     Learn how to 3d print, build and program a SMARS robot
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
+  - section:
+      name: Print Parts
+      content:
+      - smars01.md
+  - section:
+      name: Assemble Robot
+      content:
+      - smars02.md
+      - smars03.md
+      - smars04.md
+      - smars05.md
+      - smars06.md
+      - smars07.md
+  - section:
+      name: Wiring up the Robot
+      content:
+      - smars08.md
+      - smars09.md
+      - smars10.md
+      - smars11.md
+  - section:
+      name: Code
+      content:
+      - smars12.md
+      - smars13.md
+  - section:
+      name: Summary
+      content:
+      - summary.md
