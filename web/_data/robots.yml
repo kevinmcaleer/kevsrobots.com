@@ -1,52 +1,70 @@
+- name: Pancake-Bot
+  link: /blog/servo-easing-with-pancake-bot.html
+  cover: /assets/img/blog/easing/pancakebot.jpg
+  description: A fun Pancake-flipping robot with Servo Easing
+  date: 2023/02/19
 - name: Bubo-2T
   link: /blog/bubo-2t.html
-  cover: /assets/img/blog/bubo_cover.jpg
+  cover: /assets/img/blog/bubo/bubo_cover.jpg
   description: A Steam Punk Robot that can Toot messages
+  date: 2023/02/12
 - name: SMARS Mini
   link: /blog/smars-mini.html
   cover: /assets/img/blog/smars_mini/smarsmini.jpg
   description: Build a Tiny robot with a Pimoronit Tiny 2040
+  date: 2023/01/22
 - name: Cubie-1
   link: /blog/meet-cubie.html
   cover: /assets/img/blog/cubie-1/cubie07.jpg
   description: Build a ROS robot with a Raspberry Pi 4
-- name: Ultrasonic Radar Robot
+  date: 2023/01/01
+- name: Sonic
   link: /blog/radar-robot.html
   cover: /assets/img/blog/radar/radar.jpg
   description: Build a robot that can scan its surroundings with sound
-- name: Spooky Scary Skeleton
+  date: 2022/11/06
+- name: Scary Skeleton
   link: /blog/spooky-scary-skeleton.html
   cover: /assets/img/blog/spookyscaryskeleton/spookyscaryskeleton.jpg
   description: Build your own cute Spooky Scary Skeleton Robot for Halloween
+  date: 2022/10/09
 - name: HeyBot
   link: /heybot
   cover: /assets/img/blog/heybot/heybot.jpg
   description: Build your own Cute Pomodoro Desk Robot
+  date: 2022/10/02
 - name: BurgerBot
   link: /burgerbot
   cover: /assets/img/blog/burgerbot/burgerbot_v2.jpg
   description: Build your own 2 motor, Pico W-based, 3d printable robot
+  date: 2022/09/22
 - name: SMARS Inventor
   link: /blog/smars_inventor.html
   cover: /assets/img/blog/smars_inventor/smars_inventor.jpg
   description: Build your own SMARS Robot using the Pimoroni Inventor 2040W
+  date: 2022/08/29
 - name: 🐱 PicoCat
   link: /blog/picocat-lives
   cover: /assets/img/picocat01.jpg
   description: A Cute Robot Cat
+  date: 2022/04/01
 - name: SMARS
   link: http://www.smarsfan.com
   cover: https://www.smarsfan.com/assets/img/whatissmars.png
   description: The best Starter Robot there is
+  date: 2022/01/01
 - name: Explora
   link: /blog/explora.html
   cover: /assets/img/blog/explora/explora.jpg
   description: A cool Raspberry Pi Zero based robot you can build youself
+  date: 2022/05/15
 - name: Rover
   link: /blog/Rover-mecanum.html
   cover: /assets/img/blog/rover/rover.jpg
   description: A 3d printed mecanum robot powered by the Pimoroni Motor 2040
+  date: 2022/04/30
 - name: Big Mouth Pico
   link: /blog/big-mouth.html
   cover: /assets/img/bigmouthbillybass/fish01.jpg
   description: Hack a Big Mouth Billy Bass with a Raspberry Pi Pico W
+  date: 2022/07/09

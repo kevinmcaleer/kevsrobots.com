@@ -1,0 +1,20 @@
+
+{% assign robots = site.data.robots %}
+
+<div class="row row-cols-2 row-cols-xl-12 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-3">
+
+{% for robot in robots | limit:6 %}
+
+<div class="col">
+<div class="card border-0 shadow-lg">
+    <a href="{{robot.link}}" class=""><img class="card-img-top" src="{{robot.cover}}" alt="{{robot.title}}"></a>
+    <div class="card-body">
+
+        <a href="{{robot.link}}" class="btn btn-primary btn-sm">{{robot.name}}</a>
+    </div>
+</div>
+</div>
+
+{% endfor %}
+
+</div>

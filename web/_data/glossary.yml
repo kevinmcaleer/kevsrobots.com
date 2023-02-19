@@ -242,3 +242,9 @@
     The pulse width can be varied between 0% and 100% of the period.
   link: https://en.wikipedia.org/wiki/Pulse-width_modulation
   article: /resources/how_it_works/servos
+- term: Servo Easing
+  definition: Servo Easing
+  full: >-
+    Servo easing is a technique used to make a servo move smoothly from one position to another.
+  link: https://en.wikipedia.org/wiki/Servo_easing
+  # article: /resources/how_it_works/servos-easing
