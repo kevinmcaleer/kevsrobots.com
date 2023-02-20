@@ -36,6 +36,17 @@ Click here to watch the videos:
 
 ---
 
+> ### Get the Servo Easing cheatsheet PDF and support my work
+>
+> You can download a Servo Easing cheatsheet PDF and support my work at the same time, its available on my [Buy Me A Coffee](https://www.buymeacoffee.com/kevinmcaleer) page. It only costs £5 and will help support my YouTube channel and keep me making more robots!
+>
+> [Click Here](https://www.buymeacoffee.com/kevinmcaleer/e/119219) to get the PDF
+>
+> [![PDF Thumbnail](/assets/img/easing_pdf.png){:class="img-fluid w-25"}](https://www.buymeacoffee.com/kevinmcaleer/e/119219)
+> [![PDF Thumbnail](/assets/img/easing_pdf2.jpg){:class="img-fluid w-25"}](https://www.buymeacoffee.com/kevinmcaleer/e/119219)
+>
+{:class="bg-ocre"}
+
 ### Types of Servo easing algorithms
 
 There are quite a few common servo easing algorithms, we'll look at the most common here.
