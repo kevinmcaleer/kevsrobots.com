@@ -1,3 +1,7 @@
+- name: GhostBox
+  link: /blog/ghostbox.html
+  cover: /assets/img/blog/ghostbox/ghostbox.jpg
+  description: Build your own GhostBox
 - name: Eye Mechanism
   link: /learn/eye_mechanism/
   cover: /learn/assets/cover.jpg
