@@ -1,10 +1,18 @@
+- name: Duckface
+  link: /blog/duckface.html
+  cover: /assets/img/blog/duckface/duckface.jpg
+  description: Duckface lets you apply filters and overlays to images, then post to Twitter and Instagram.
+- name: Pi Stand v6
+  link: /blog/pi-stand-v6.html
+  cover: /assets/img/blog/pi_stand/pi_stand04.png
+  description: The Pi Stand gets an upgrade; a GoPro compatible Camera module and Hyperpixel 4.0 display
 - name: GhostBox
   link: /blog/ghostbox.html
   cover: /assets/img/blog/ghostbox/ghostbox.jpg
   description: Build your own GhostBox
 - name: Eye Mechanism
   link: /learn/eye_mechanism/
-  cover: /learn/assets/cover.jpg
+  cover: /learn/eye_mechanism/assets/cover.jpg
   description: Robot Eye Mechansim, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.
 - name: Cyberglasses
   link: /blog/cyberglasses.html

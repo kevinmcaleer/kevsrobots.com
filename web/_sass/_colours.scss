@@ -1,16 +1,23 @@
 $kevred: #C22032;
 $orange: #EB642B;
+$ocre: #FFCA29;
 
 .kevred {
     color: $kevred;
 }
 
 .bg-ocre {
-  background-color: #FFCA29;
+  background-color: $ocre;
 }
 
 .ocre {
-  color: #FFCA29;
+  color: $ocre;
+}
+
+.btn-ocre {
+  background-color: $ocre;
+  color: $ocre !important;
+
 }
 
 .bg-white {
