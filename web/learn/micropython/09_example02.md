@@ -7,7 +7,7 @@ previous: 08_variables.html
 next: 10_values_and_variable_types.html
 description: Variables
 percent: 55
-duration: 3
+duration: 2
 navigation:
 - name: Learn MicroPython - The basics
 - content:

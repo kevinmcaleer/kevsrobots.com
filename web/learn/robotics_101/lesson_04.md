@@ -7,7 +7,7 @@ previous: lesson_03.html
 next: lesson_05.html
 description: The Anatomy of a Robot
 percent: 80
-duration: 4
+duration: 3
 navigation:
 - name: Robotics 101
 - content:

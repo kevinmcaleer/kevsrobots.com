@@ -7,7 +7,7 @@ previous: 07_hello_world.html
 next: 09_example02.html
 description: A Place to store values
 percent: 50
-duration: 3
+duration: 2
 navigation:
 - name: Learn MicroPython - The basics
 - content:

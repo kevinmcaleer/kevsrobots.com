@@ -7,7 +7,7 @@ previous: 10_listener.html
 next: 12_create_publisher.html
 description: Lets create a new Python Package
 percent: 60
-duration: 3
+duration: 2
 navigation:
 - name: Learn ROS with me
 - content:

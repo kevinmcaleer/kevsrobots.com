@@ -2,8 +2,11 @@
 {% assign articles = site.how_it_works %}
 
 <dl>
+
+<div class="row row-cols-1 row-cols-md-3 g-1 p-0">
 {% for term in terms %}
-<div class="card bg-white mb-3 shadow-lg rounded-3">
+<div class="col">
+<div class="card bg-white mb-3 border-0 rounded-3 h-100 p-0">
 <div class="card-body">
 {% assign term-tag = term.term | downcase | replace:' ','-' %}
 <a name="{{term.term | downcase | replace:' ','-'}}"></a>
@@ -12,8 +15,6 @@
 <h2><dt>{{term.term}}</dt></h2>
 <h5 class="mute kevred "><dd>{{term.definition}}</dd></h5>
 <dd>{{term.full}}</dd>
-<p><a href="{{term.link}}" class="dotted">{{term.link}}</a></p>
-
 
 {% if term.article != nil %}
 {% for article in articles %}
@@ -23,11 +24,11 @@
 
 {% if article_url == no_tag[0] %}
 
-<div class="bg-light p-3 rounded-1">
+<div class="bg-light p-3 rounded-3">
     <h5>How it works article - {{article.title}}</h5>
-<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-1 p-3 p-0">
+<div class="row row-cols-1 g-3 p-0">
 <div class="col">
-<div class="card shadow-lg">
+<div class="card shadow-lg border-0 h-100">
     <a href="{{term.article}}" class=""><img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}"></a>
     <div class="card-body">
         <h5>{{term.article.title}}</h5>
@@ -43,8 +44,15 @@
 {% endif %}
 
 <!-- <hr />  -->
-</div>
-</div>
-{% endfor %}
-</dl>
 
+
+</div>
+<div class="card-footer border-0 rounded-3  bg-white">
+    <p class="truncate"><a href="{{term.link}}" class="dotted truncate">{{term.link}}</a></p>
+    </div>
+</div>
+</div>
+
+{% endfor %}
+</div>
+</dl>

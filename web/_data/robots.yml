@@ -1,3 +1,8 @@
+- name: PicoCrab2
+  link: /blog/picocrab2.html
+  cover: /assets/img/blog/picocrab2/picocrab2.jpg
+  description: Pico Crab version 2.0
+  date: 2023/03/05
 - name: Pancake-Bot
   link: /blog/servo-easing-with-pancake-bot.html
   cover: /assets/img/blog/easing/pancakebot.jpg

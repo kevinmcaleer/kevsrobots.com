@@ -7,7 +7,7 @@ previous: 06_clone_images.html
 next: 08_vscode_setup.html
 description: Use the official docker images to build our ROS2 container
 percent: 40
-duration: 3
+duration: 2
 navigation:
 - name: Learn ROS with me
 - content:

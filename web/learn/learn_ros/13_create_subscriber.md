@@ -7,7 +7,7 @@ previous: 12_create_publisher.html
 next: 14_docker_x11.html
 description: Lets create a new Python Subscriber program
 percent: 70
-duration: 3
+duration: 2
 navigation:
 - name: Learn ROS with me
 - content:

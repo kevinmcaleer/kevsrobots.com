@@ -1,4 +1,4 @@
-{% assign courses = site.data.courses %}
+{% assign courses = site.data.courses | sort: 'date_published' | reverse %}
 <div class="">
 <nav class="navbar">
     <div class="container-fluid">
@@ -12,7 +12,7 @@
   </nav>
 
 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6">
-    {% for course in courses limit:6 %}
+    {% for course in courses | limit:6 %}
     <div class="col mb-3">
         <div class="card h-100">
             <a href="{{course.link}}" class="nav-item dotted">

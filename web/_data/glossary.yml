@@ -248,3 +248,27 @@
     Servo easing is a technique used to make a servo move smoothly from one position to another.
   link: https://en.wikipedia.org/wiki/Servo_easing
   # article: /resources/how_it_works/servos-easing
+- term: "18650"
+  definition: 18650 Battery
+  full: >-
+    The 18650 is a type of rechargeable lithium-ion battery.
+    It is commonly used in portable electronics, such as mobile phones, laptops, flashlights, e-cigarettes (Vape) and in electric vehicles.
+  link: https://en.wikipedia.org/wiki/18650_battery
+  # article: /resources/how_it_works/batteries
+- term: Battery
+  definition: Battery
+  full: >-
+    A battery is a device consisting of one or more electrochemical cells with external connections provided to power electrical devices such as flashlights, smartphones, and electric cars.
+    When a battery is supplying electric power, its positive terminal is the cathode and its negative terminal is the anode.
+    The terminal marked negative is the source of electrons that when connected to an external circuit will flow and power the circuit.
+    It is the movement of those electrons within the external circuit that allows current to flow.
+  link: https://en.wikipedia.org/wiki/Battery
+  # article: /resources/how_it_works/batteries
+- term: PCA9685
+  definition: PCA9685 Servo Driver Board
+  full: >-
+    The PCA9685 is a 16-channel, 12-bit PWM controller.
+    It is designed to drive LED loads with up to 25 mA per channel.
+    It can be controlled via I2C.
+  link: https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf
+  article: /resources/how_it_works/servos

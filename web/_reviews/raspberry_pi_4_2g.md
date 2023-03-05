@@ -4,7 +4,7 @@ title: Raspberry Pi 4 2G
 author: Kevin McAleer
 date: 22-09-04
 excerpt: This is very much a buy recommendation. If you can afford it, go for the 4Gb or 8Gb version. Also don't cheap out on the SD Card; buy a quality memory card such as Sandisk.
-cover: /assets/img/reviews/raspberry-pi-4.png
+cover: /assets/img/reviews/raspberrypi4_review.jpg
 link: https://amzn.to/3wvFeyj
 rating: 4.3
 ---

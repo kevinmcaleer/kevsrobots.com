@@ -8,7 +8,7 @@ next: lesson_03.html
 description: Learn about the term 'Robot', who the Father of robotics is, and examples
   from the early age of robotics
 percent: 48
-duration: 7
+duration: 4
 navigation:
 - name: Robotics 101
 - content:

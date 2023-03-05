@@ -1,26 +1,34 @@
-{% assign pages = site.reviews %}
+{% assign pages = site.reviews | sort: 'date' | reverse %}
 
-<div class="row row-cols-1 row-cols-lg-2  mt-3">
+<div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-xl-3 mt-3 g-3">
 {% for page in pages %}
-
 {% if page.url contains 'index.html' %}
 {% else %}
 <div class="col">
-<div class="card">
-    <div class="d-flex align-items-center">
-    <div class="flex-shrink-0">
-        <a href="{{page.url}}"><img src="{{page.cover}}" alt="..." class="media"></a>
-      </div>
-    <div class="flex-grow-1 ms-3 p-3">
+<div class="card border-0 h-100">
+    <div class="card-header bg-white border-0">
         <a href="{{page.url}}" class="text-decoration-none"><h5 class="card-title black">{{page.title}}</h5></a>
+    </div>
+    <div class="d-flex align-items-center card-body">
+    <div class="flex-shrink-0">
+        <a href="{{page.url}}"><img src="{{page.cover}}" alt="..." class="media rounded-3"></a>
+      </div>
+    <div class="flex-grow-1 ms-3 p-0">
+        
         {% assign rating = page.rating | to_integer %}
         
         {% for i in (1..rating) %}
         ⭐️
         {% endfor %}({{page.rating}} out of 5)
+        
         <p class="card-text"><a href="{{page.url}}" class="text-decoration-none black">{{page.excerpt}}</a></p>
-        <span class="float-end"><a href="{{page.url}}" class="btn btn-primary right">Read more</a></span>
+        
+        
     </div>
+    </div>
+    <div class="card-footer border-0">
+        <span>{{page.date | date: '%d %B %y'}}</span>
+        <span class="float-end"><a href="{{page.url}}" class="btn btn-primary btn-sm right">Read more</a></span>
     </div>
 </div>
 

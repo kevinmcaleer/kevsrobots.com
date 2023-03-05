@@ -7,7 +7,7 @@ previous: 16_repl.html
 next: 18_summary.html
 description: Learn about the built-in Modules
 percent: 95
-duration: 4
+duration: 3
 navigation:
 - name: Learn MicroPython - The basics
 - content:

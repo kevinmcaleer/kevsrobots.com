@@ -7,7 +7,7 @@ previous: 13_create_subscriber.html
 next: 15_rviz.html
 description: Lets learn how to redirect our X11 Display
 percent: 75
-duration: 4
+duration: 3
 cover: assets/x11cover.jpg
 navigation:
 - name: Learn ROS with me

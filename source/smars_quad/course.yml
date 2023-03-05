@@ -1,0 +1,31 @@
+- name: SMARS Quad
+  author: Kevin McAleer
+  date_created: 2022-02-19
+  date_published: 2023-03-04
+  layout: course
+  cover: assets/how_to_build_a_quad.jpg
+  description: >- 
+     Learn how to 3d print, build and program a SMARS Quad robot
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
+  - section:
+      name: Print parts
+      content:
+      - quad_01.md
+      - quad_02.md
+      - quad_03.md
+  - section:
+      name: Assemble robot
+      content:
+      - quad_04.md
+      - quad_05.md
+      - quad_06.md
+      - quad_07.md
+      - quad_08.md
+      - quad_09.md
+      - quad_10.md
+      - quad_11.md
+      - quad_12.md

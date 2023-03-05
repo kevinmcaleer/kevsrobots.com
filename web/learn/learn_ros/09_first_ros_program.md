@@ -7,7 +7,7 @@ previous: 08_vscode_setup.html
 next: 10_listener.html
 description: Lets create our first ROS2 program
 percent: 50
-duration: 5
+duration: 3
 navigation:
 - name: Learn ROS with me
 - content:

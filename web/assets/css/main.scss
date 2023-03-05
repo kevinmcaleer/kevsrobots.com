@@ -573,3 +573,18 @@ table .w-10 { width:10%; }
 table .w-16 { width:16%; }
 table .w-20 { width:20%; }
 table .w-30 { width:30%; }
+
+.truncate {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  -o-text-overflow:ellipsis;
+  -ms-text-overflow:ellipsis;
+  -moz-text-overflow:ellipsis;
+  -webkit-text-overflow:ellipsis;
+  
+}
+
+.text-shadow {
+  text-shadow: 0px 0px 6px #000000;
+}

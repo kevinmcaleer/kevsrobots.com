@@ -1,8 +1,8 @@
 <h1>All Courses</h1>
-<h5>Learn something new.</h5>
+<h5>Learn something new. Today.</h5>
 <hr class="my-2">
 
-{% assign courses = site.data.courses | limit:6%}
+{% assign courses = site.data.courses | sort: 'date_published' | reverse | limit:6 %}
 
 <div class="row row-cols-4">
     {% for course in courses %}
@@ -12,10 +12,11 @@
         <a href="{{course.link}}" class="nav-item dotted">
             <img src="{{course.cover}}" class="card-img-top">
         <div class="card-body">
-           
+            <h5 class="card-text">{{course.name}}</h5>
             <p class="small mute text-right">{{course.duration}}</p>
-            <p class="card-text">{{course.name}}</p>
+            
             <p class="small mute text-right">{{course.author}}</p>
+            <p calss="card-text">{{course.date_published}}</p>
             
         </div>    
         </a>

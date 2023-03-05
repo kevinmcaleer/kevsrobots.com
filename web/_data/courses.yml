@@ -1,40 +1,53 @@
 - author: Kevin McAleer
   cover: /learn/learn_ros/assets/learn_ros.jpg
+  date_published: 2023-01-07
   description: Learning ROS with me, is a course that will teach you how to use ROS2
     on Raspberry Pi 4.
-  duration: 50m
+  duration: 0h 38m
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
 - author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
+  date_published: 2023-02-19
   description: Learn how to 3d print, build and program a SMARS robot
-  duration: 21m
+  duration: 0h 30m
   link: /learn/smars/00_intro.html
   name: SMARS
 - author: Kevin McAleer
   cover: /learn/micropython/assets/micropython.jpg
+  date_published: 2022-12-04
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code
-  duration: 1h 11m
+  duration: 0h 40m
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
+  date_published: 2022-12-04
   description: Learn how to use the new Learning Platform
-  duration: 4m
+  duration: 0h 8m
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
 - author: Kevin McAleer
   cover: /learn/robotics_101/assets/basics_101.jpg
+  date_published: 2023-01-17
   description: Learning ROS with me, is a course that will teach you how to use ROS2
     on Raspberry Pi 4.
-  duration: 16m
+  duration: 0h 12m
   link: /learn/robotics_101/00_overview.html
   name: Robotics 101
 - author: Kevin McAleer
+  cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
+  date_published: 2023-03-04
+  description: Learn how to 3d print, build and program a SMARS Quad robot
+  duration: 0h 26m
+  link: /learn/smars_quad/00_intro.html
+  name: SMARS Quad
+- author: Kevin McAleer
   cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+  date_published: 2023-01-29
   description: Robot Eye Mechansim, is a course that will teach you how to use Fusion
     360 to create a Servo controled Robot eye mechanism.
-  duration: 25m
+  duration: 0h 18m
   link: /learn/eye_mechanism/00_intro.html
   name: Robot Eye Mechansim

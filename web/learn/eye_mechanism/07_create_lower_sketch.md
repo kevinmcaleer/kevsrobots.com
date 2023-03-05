@@ -7,7 +7,7 @@ previous: 06_lower_eyelid_sketch.html
 next: 08_hinge.html
 description: Lets create the lower eyelid, similar to the upper eyelid
 percent: 88
-duration: 4
+duration: 3
 navigation:
 - name: Robot Eye Mechansim
 - content:

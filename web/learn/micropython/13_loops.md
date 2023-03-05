@@ -7,7 +7,7 @@ previous: 12_if_elif_else.html
 next: 14_operators.html
 description: Flow Control
 percent: 75
-duration: 6
+duration: 4
 navigation:
 - name: Learn MicroPython - The basics
 - content:

@@ -7,7 +7,7 @@ previous: 03_revolve.html
 next: 05_hinge.html
 description: Create the hinge profile
 percent: 55
-duration: 4
+duration: 3
 navigation:
 - name: Robot Eye Mechansim
 - content:

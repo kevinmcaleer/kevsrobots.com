@@ -7,7 +7,7 @@ next: smars01.html
 description: Learn how to download, print, assemble, and program the original SMARS
   robot
 percent: 6
-duration: 3
+duration: 2
 cover: assets/how_to_build_a_smars.jpg
 navigation:
 - name: SMARS

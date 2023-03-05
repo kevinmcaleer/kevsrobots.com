@@ -1,0 +1,30 @@
+<div class="container-fluid bg-blue pt-2 pb-3 mb-1 rounded-1">
+    <nav class="navbar p-0 m-0">
+        <div class="container-fluid m-0 p-0 px-2">
+          <span class="navbar-text text-decoration-none text-white">
+            Reviews
+          </span>
+          <span class="navbar-text">
+            <a href="/learn/" class="text-decoration-none text-white">All Review ></a>
+          </span>
+        </div>
+      </nav>
+    <div class="row row-cols-2 row-cols-xl-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 g-2 bg-blue rounded-1 mb-1 p-0 mt-0">
+        {% assign articles = site.reviews | sort:date | reverse  %}
+        {% for article in articles | limit:3 %}
+        {% if article.title != 'Reviews' %}
+        <div class="col">
+            <a href="{{article.url}}" class="">
+        <div class="card border-0 shadow-lg m-0">
+        <img class="card-img-top rounded-2" src="{{article.cover}}" alt="{{article.title}}">
+        <div class="card-img-overlay">
+            <h6 class="card-title text-truncate text-decoration-none text-white text-shadow">{{article.title}}</h6>
+        </div>
+        </div>
+    </a>
+        </div>
+    
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>

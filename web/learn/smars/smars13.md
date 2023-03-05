@@ -7,7 +7,7 @@ previous: smars12.html
 next: summary.html
 description: Control your SMARS with Bluetooth
 percent: 84
-duration: 4
+duration: 3
 navigation:
 - name: SMARS
 - content:

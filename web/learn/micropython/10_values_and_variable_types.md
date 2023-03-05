@@ -7,7 +7,7 @@ previous: 09_example02.html
 next: 11_reserved_words.html
 description: NUMBERS, TEXT, LISTS AND DICTIONARIES
 percent: 60
-duration: 8
+duration: 5
 navigation:
 - name: Learn MicroPython - The basics
 - content:

@@ -7,7 +7,7 @@ previous: 01_create_component.html
 next: 03_revolve.html
 description: Creating the initial Sketch
 percent: 33
-duration: 7
+duration: 4
 cover: null
 navigation:
 - name: Robot Eye Mechansim

@@ -7,7 +7,7 @@ previous: 04_create_hinges.html
 next: 06_lower_eyelid_sketch.html
 description: Create the hinge from the profile and join it to the eyelid
 percent: 66
-duration: 4
+duration: 3
 navigation:
 - name: Robot Eye Mechansim
 - content:
