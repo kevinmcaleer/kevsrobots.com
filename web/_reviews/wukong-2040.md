@@ -23,7 +23,7 @@ This is a great board for the price and is jam packed full of features. Its idea
 
 ## Wukong 2040 by Elecfreaks
 
-The `ELECFREAKS Wukong2040 Breakout Board For Raspberry Pi Pico` is a Raspberry Pi Pico expansion board, aimed at education, and hobbyists.
+The [`ELECFREAKS Wukong2040 Breakout Board For Raspberry Pi Pico`](https://shop.elecfreaks.com/products/elecfreaks-wukong2040-expansion-board-adapter-for-raspberry-pi-pico){:class="dotted"} is a Raspberry Pi Pico expansion board, aimed at education, and hobbyists.
 
 The Pico or Pico W (not included) simply slots into the header socket on the board and can be powered by the onboard 18650, or by the Pico's Micro-B USB connector.
 
