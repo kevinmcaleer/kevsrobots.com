@@ -1,6 +1,10 @@
+- name: Hal-apeno 9000
+  link: /blog/self-watering-plants.html
+  cover: /assets/img/blog/halapeno9000/halapeno9000.jpg
+  description: Build a self watering plant system
 - name: Duckface
   link: /blog/duckface.html
-  cover: /assets/img/blog/duckface/duckface.jpg
+  cover: /assets/img/blog/bubo/bubo-2t.jpg
   description: Duckface lets you apply filters and overlays to images, then post to Twitter and Instagram.
 - name: Pi Stand v6
   link: /blog/pi-stand-v6.html
