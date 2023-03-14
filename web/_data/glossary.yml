@@ -272,3 +272,10 @@
     It can be controlled via I2C.
   link: https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf
   article: /resources/how_it_works/servos
+- term: PID
+  definition: PID
+  full: >-
+    PID is a control loop feedback mechanism.
+    It is used to control the position of a servo.
+  link: https://en.wikipedia.org/wiki/PID_controller
+  article: /resources/how_it_works/pid-controllers

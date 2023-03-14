@@ -1,3 +1,7 @@
+- name: PicoDeck
+  link: /blog/picodeck.html
+  cover: /assets/img/blog/picodeck/picodeck.jpg
+  description: Build a shortcut keyboard for your Raspberry Pi Pico
 - name: Hal-apeno 9000
   link: /blog/self-watering-plants.html
   cover: /assets/img/blog/halapeno9000/halapeno9000.jpg
