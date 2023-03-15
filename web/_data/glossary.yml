@@ -279,3 +279,25 @@
     It is used to control the position of a servo.
   link: https://en.wikipedia.org/wiki/PID_controller
   article: /resources/how_it_works/pid-controllers
+- term: Buck Converter
+  definition: Buck Converter
+  full: >-
+    A buck converter is a DC-to-DC power converter that steps down voltage from its input to its output.
+    It is a type of switched-mode power supply (SMPS) that uses a switching regulator to convert the input voltage to a lower output voltage.
+  link: https://en.wikipedia.org/wiki/Buck_converter
+  article: /resources/how_it_works/buck-converters
+- term: Diode
+  definition: Diode
+  full: >-
+    A diode is a two-terminal electronic component with asymmetric conductance.
+    It has low (ideally zero) resistance to the current in one direction, and high (ideally infinite) resistance in the other.
+  link: https://en.wikipedia.org/wiki/Diode
+  article: /resources/how_it_works/diodes
+- term: Capacitor
+  definition: Capacitor
+  full: >-
+    A capacitor is a passive two-terminal electrical component that stores electrical energy in an electric field.
+    The effect of a capacitor is known as capacitance.
+    The capacitor was originally known as a condenser or condensator.
+  link: https://en.wikipedia.org/wiki/Capacitor
+  # article: /resources/how_it_works/capacitors
