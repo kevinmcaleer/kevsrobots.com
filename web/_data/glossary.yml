@@ -263,7 +263,7 @@
     The terminal marked negative is the source of electrons that when connected to an external circuit will flow and power the circuit.
     It is the movement of those electrons within the external circuit that allows current to flow.
   link: https://en.wikipedia.org/wiki/Battery
-  # article: /resources/how_it_works/batteries
+  article: /resources/how_it_works/batteries
 - term: PCA9685
   definition: PCA9685 Servo Driver Board
   full: >-
