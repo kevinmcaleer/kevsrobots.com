@@ -2,75 +2,94 @@
   link: /blog/picodeck.html
   cover: /assets/img/blog/picodeck/picodeck.jpg
   description: Build a shortcut keyboard for your Raspberry Pi Pico
+  date: 2023-04-14
 - name: Hal-apeno 9000
   link: /blog/self-watering-plants.html
   cover: /assets/img/blog/halapeno9000/halapeno9000.jpg
   description: Build a self watering plant system
+  date: 2023-04-11
 - name: Duckface
   link: /blog/duckface.html
   cover: /assets/img/blog/bubo/bubo-2t.jpg
   description: Duckface lets you apply filters and overlays to images, then post to Twitter and Instagram.
+  date: 2023-02-22
 - name: Pi Stand v6
   link: /blog/pi-stand-v6.html
   cover: /assets/img/blog/pi_stand/pi_stand04.png
   description: The Pi Stand gets an upgrade; a GoPro compatible Camera module and Hyperpixel 4.0 display
+  date: 2023-02-22
 - name: GhostBox
   link: /blog/ghostbox.html
   cover: /assets/img/blog/ghostbox/ghostbox.jpg
   description: Build your own GhostBox
+  date: 2023-02-27
 - name: Eye Mechanism
   link: /learn/eye_mechanism/
   cover: /learn/eye_mechanism/assets/cover.jpg
   description: Robot Eye Mechansim, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.
+  date: 2023-01-29
 - name: Cyberglasses
   link: /blog/cyberglasses.html
   cover: /assets/img/blog/cyberglasses/cyberglasses04.png
   description: Build your own Hackable Cyberglasses
+  date: 2023-01-16
 - name: Giraffe Stand
   link: /blog/giraffe-stand.html
   cover: /assets/img/blog/giraffe/giraffe01.jpg
   description: Cute Giraffe Stand for Raspberry Pis
+  date: 2023-01-11
 - name: Ghostbusters Wifi Scanner
   link: /blog/ghostbusters-wifi.html
   cover: /assets/img/blog/ghostbusters/ghost02.jpg
   description: Who you gonna call?
+  date: 2022-12-21
 - name: Atari 2600 Compute Case
   link: /blog/atari-2600.html
   cover: /assets/img/blog/atari/hero03.jpg
   description: Cute Retro case
+  date: 2022-12-20
 - name: Galactic Guitar Hero
   link: /blog/galactic_hero.html
   cover: /assets/img/blog/galactic_hero/galactic_hero01.jpg
   description: Build your own Galactic Guitar Hero Game
+  date: 2022-12-13
 - name: Worlds most advanced bauble
   link: /blog/worlds-most-advanced-bauble.html
   cover: /assets/img/blog/cheerlights/cheerlights.jpg
   description: Fun with Cheerlights
+  date: 2022-11-06
 - name: How to setup a Phew! access point
   link: /blog/phew-access-point.html
   cover: /assets/img/blog/phew/saddle.jpg
   description: MicroPython Captive Portal
+  date: 2022-09-04
 - name: Next cube a homage to the original www server
   link: /blog/next-cube.html
   cover: /assets/img/blog/nextcube/nextcube.jpg
   description: a Homage to the original WWW server
+  date: 2022-08-28
 - name: Pikon camera
   link: /blog/pikon-camera.html
   cover: /assets/img/blog/pikon/pikon.jpg
   description: Raspberry Pi High Quality Camera Project
+  date: 2022-08-23
 - name: Pimoroni enviro indoor stevenson screen case
   link: /blog/enviro-case.html
   cover: /assets/img/stevenson_screen.jpg
   description: 3D Print your own Stevenson Screen for the Pimoroni Enviro Indoor sensor
+  date: 2022-08-10
 - name: Pi stands
   link: /blog/pistands.html
   cover: /assets/img/blog/pi_stand/pi_stand.jpg
   description: Cute stands for Raspberry Pis
+  date: 2022-05-22
 - name: Zero stand
   link: /blog/zero-stand.html
   cover: /assets/img/blog/zero_stand/enviro.jpg
   description: Cute stand for Raspberry Pi Zeros
+  date: 2022-05-15
 - name: Build your own AI Assistant in Python
   link: /robots/pythonai/
   cover: /assets/img/blog/byoai/byoai.jpg
   description: Build your own AI Assistant in Python
+  date: 2022-10-12

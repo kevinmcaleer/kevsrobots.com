@@ -1,0 +1,10 @@
+{% assign terms = site.data.glossary  | sort_natural: "term" %}
+
+{% for article in terms  %}
+<div class="col">
+<a href="{{article.url}}" class="text-decoration-none">
+<p class="w-100 black small m-0">{{article.term}}</p>
+</a>
+</div>
+
+{% endfor %}

@@ -85,9 +85,28 @@ nav {
     color: white;
   }
 
-.bg-black a {
-    background-color: rgba(0, 0, 0, 0.879);
+.bg-black {
+  background-color: rgba(0, 0, 0, 0.879);
+  // a {
+  //   color: white;
+  //   background-color: rgba(0, 0, 0, 0.879);
+  //   text-decoration: none;
+  //   bottom: 0px;
+  //   right: 0px;
+  //   position: absolute;
+  //   overflow: hidden;
+  //   text-overflow: ellipsis;
+  //   text-wrap: normal;
+  //   padding: 6px;
+  //   width: 70px;
+  // }
+}
+
+.bg-darkgrey {
+  background-color: rgba(0, 0, 0, 0.879);
+  a {
     color: white;
+    background-color: rgba(0, 0, 0, 0.879);
     text-decoration: none;
     bottom: 0px;
     right: 0px;
@@ -98,6 +117,10 @@ nav {
     padding: 6px;
     width: 70px;
   }
+}
+.text-black {
+  color: black;
+}
 
 .sitemap {
   h5 {
@@ -177,6 +200,12 @@ nav {
    
     // color:black;
     color: $orange ;
+   
+  }
+  .dotted-white {
+      color: white ;
+      text-decoration-style: dotted !important;
+      text-decoration-line: 1px;
   }
 
   .blog-part {
@@ -587,4 +616,46 @@ table .w-30 { width:30%; }
 
 .text-shadow {
   text-shadow: 0px 0px 6px #000000;
+}
+.btn.btn-overlay {
+  background-color: rgba(255, 255, 255, 0.75);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 0px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 0px;
+  backdrop-filter: blur(10px);
+  
+}
+.btn.btn-overlay:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+}
+
+.bg-grey {
+  background-color: #d3d3d3;
+}
+
+.btn.btn-overlay-black {
+  background-color: rgba(0, 0, 0, 0.75);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 0px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 0px;
+  backdrop-filter: blur(10px);
+  
+}
+.btn.btn-overlay-black:hover {
+    background-color: rgba(60, 60, 60, 0.75);
+    color: #000;
+}
+
+.homepage {
+  display: grid;
+  grid-template-columns: 50px 50px 50px 50px;
+  grid-template-rows: auto;
+  grid-template-areas: 
+    "how_it_works how_it_works how_it_works reviews"
+    "glossary robots recent reviews"
+    "glossary projects recent courses"
+    "blog blog blog twitter"
 }

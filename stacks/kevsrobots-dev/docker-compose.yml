@@ -1,16 +1,20 @@
 version: "3.9"
 services:
-  jekyll-serve:
-    image: jekyll/jekyll:4.2.0
+  kevsrobots-dev:
     environment:
       JEKYLL_UID: 1000
       JEKYLL_GID: 1000
-      JEKYLL_ENV: development
+      JEKYLL_ENV: production
     build: .
-    # restart: always
-    volumes:
-      - '../../web:/srv/jekyll'
-    ports:
+    restart: always
+    ports: 
       - 4000:4000
       - 35729:35729
-    command: "jekyll serve --watch --livereload"
+    volumes:
+      - ../../web:/srv/jekyll
+    # command: "jekyll serve --watch --livereload"
+  
+    command: "jekyll serve /srv/jekyll --watch --livereload --incremental --host 0.0.0.0"
+    
+
+   

@@ -1,15 +1,15 @@
 {% assign courses = site.data.courses | sort: 'date_published' | reverse  %}
 
-<div class="row row-cols-lg-2 row-cols-sm-2 row-cols-md-2 g-2">
+<div class="row row-cols-lg-2 row-cols-sm-2 row-cols-md-2 g-2 m-0">
 {% for course in courses | sort: 'date_published' | reverse | limit: 2 %}
 {{couse.date_published}}
 <div class="col-12 mb-3">
-    <div class="card h-100 w-100">
+    <div class="card w-100">
         <a href="{{course.link}}" class="nav-item dotted">
-            <img src="{{course.cover}}" class="card-img-top">
-        <div class="card-body">
-            <p class="card-text black text-decoration-none">{{course.name}}</p>
-        </div>    
+            <img src="{{course.cover}}" class="img-fluid w-100 rounded-2">
+            <div class="card-img-overlay rounded-2 m-0 p-0">
+                <h6 class="btn btn-overlay-black text-white btn-sm align-bottom w-100">{{course.name}}</h6>
+            </div>
         </a>
     </div>
 </div>

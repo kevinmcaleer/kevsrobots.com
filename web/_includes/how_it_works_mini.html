@@ -1,17 +1,17 @@
 
 {% assign articles = site.how_it_works | sort:date| reverse  %}
 
-<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2">
 
 {% for article in articles | limit:6 %}
 {% if article.title != 'How it Works' %}
 <div class="col">
 <div class="card border-0 shadow-lg">
-    <a href="{{article.url}}" class=""><img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}"></a>
-    <div class="card-body">
-
-        <a href="{{article.url}}" class="btn btn-primary btn-sm">{{article.title}}</a>
+    <a href="{{article.url}}" class=""><img class="card-img-top rounded-2" src="{{article.cover}}" alt="{{article.title}}">
+    <div class="card-img-overlay m-0 p-0">
+        <h6 class="btn btn-overlay w-100 btn-sm align-bottom">{{article.title}}</h6>
     </div>
+    </a>
 </div>
 </div>
 {% endif %}
