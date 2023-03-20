@@ -22,3 +22,7 @@ social:
      name: kevinmcaleer6
      link: https://www.tiktok.com/kevinmcaleer6
      icon: "fa-brands fa-tiktok"
+   - site: Mastodon
+     name: "@kevsmac@mastodon.social"
+     link: https://mastodon.social/@kevsmac
+     icon: "fab fa-mastodon"
