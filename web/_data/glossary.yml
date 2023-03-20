@@ -185,7 +185,7 @@
     A motor is a machine that converts other forms of energy into mechanical energy.
     Most motors operate through the conversion of electrical energy into mechanical energy, but some types of motors convert energy from other sources, such as hydraulic or pneumatic energy.
   link: https://en.wikipedia.org/wiki/Motor
-  # article: /resources/how_it_works/motors
+  article: /resources/how_it_works/stepper-motors
 - term: Actuator
   definition: Actuator
   full: >-
@@ -233,7 +233,6 @@
     It is a graphical tool that allows the user to visualize data from a ROS system.
     It is a tool that is used to visualize data from a ROS system.
   link: https://en.wikipedia.org/wiki/RViz
-
 - term: PWM
   definition: Pulse Width Modulation
   full: >-
@@ -254,7 +253,7 @@
     The 18650 is a type of rechargeable lithium-ion battery.
     It is commonly used in portable electronics, such as mobile phones, laptops, flashlights, e-cigarettes (Vape) and in electric vehicles.
   link: https://en.wikipedia.org/wiki/18650_battery
-  # article: /resources/how_it_works/batteries
+  article: /resources/how_it_works/batteries
 - term: Battery
   definition: Battery
   full: >-
@@ -301,3 +300,30 @@
     The capacitor was originally known as a condenser or condensator.
   link: https://en.wikipedia.org/wiki/Capacitor
   # article: /resources/how_it_works/capacitors
+- term: ADC
+  definition: Analog to Digital Converter
+  full: >-
+    An analog-to-digital converter (ADC, A/D, or A-to-D) is a system that converts an analog signal, such as a sound picked up by a microphone or light entering a digital camera, into a digital signal.
+  link: https://en.wikipedia.org/wiki/Analog-to-digital_converter
+  # article: /resources/how_it_works/adc
+- term: I2C
+  definition: i2c (I-squared-C)
+  full: >-
+    I2C, pronounced I-squared-C, is a synchronous, multi-master, multi-slave, packet switched, single-ended, serial computer bus invented by Philips Semiconductor (now NXP Semiconductors).
+    It is commonly used for attaching lower-speed peripheral ICs to processors and microcontrollers in short-distance, intra-board communication.
+  link: https://en.wikipedia.org/wiki/I%C2%B2C
+  # article: /resources/how_it_works/i2c
+- term: SPI
+  definition: SPI
+  full: >-
+    Serial Peripheral Interface Bus (SPI) is a synchronous serial data protocol used by microcontrollers for communicating with one or more peripheral devices quickly over short distances.
+    It can also be used for communication between two microcontrollers.
+  link: https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus
+  # article: /resources/how_it_works/spi
+- term: UART
+  definition: UART (Universal Asynchronous Receiver/Transmitter)
+  full: >-
+    UART is a hardware device for asynchronous serial communication in which the data format and transmission speeds are configurable.
+    UART stands for Universal Asynchronous Receiver/Transmitter.
+  link: https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter
+  # article: /resources/how_it_works/uart

@@ -14,7 +14,7 @@ services:
       - ../../web:/srv/jekyll
     # command: "jekyll serve --watch --livereload"
   
-    command: "jekyll serve /srv/jekyll --watch --livereload --incremental --host 0.0.0.0"
+    command: "jekyll serve /srv/jekyll --watch --livereload --host 0.0.0.0"
     
 
    
