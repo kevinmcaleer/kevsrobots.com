@@ -32,3 +32,6 @@ collections:
   how_it_works:
     output: true
     permalink: /resources/how_it_works/:name.html
+  code_liberry:
+    output: true
+    permalink: /code_liberry/:name.html
