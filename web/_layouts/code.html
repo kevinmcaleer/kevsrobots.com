@@ -1,0 +1,18 @@
+---
+layout: content
+---
+
+{% include breadcrumbs.html %}
+<img src="{{page.cover}}" / alt="{{page.title}}" class="cover">
+<h1>{{page.title}}</h1>
+<h2>{{page.description}}</h2>
+<p>Language: 
+    {% for lang in page.languages %}
+    <span class="badge bg-ocre badge-sm"><code>{{lang}}</code></span>
+    {% endfor %}| Level: {% include level.html level=page.level %}</p>
+
+    <hr />
+
+<code><script src="{{page.gist}}.js"></script></code>
+
+{{content}}

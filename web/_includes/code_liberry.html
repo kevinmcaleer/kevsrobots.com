@@ -1,0 +1,31 @@
+{% assign code_cards = site.code_liberry %}
+
+<div class="container-fluid bg-light pb-3">
+<div class="row row-cols-12 row-cols-md-4 mt-3 mb-3 g-3">
+
+{% for code_card in code_cards %}
+{% assign name = code_card.url | replace: "/code_liberry/","" %}
+
+{% if name != 'index.html'%}
+<div class="col">
+    <a href="{{code_card.url}}" class="text-decoration-none">
+<div class="card shadow-lg">
+<img src="{{code_card.cover}}" class="card-img-top" />
+<div class="card-body">
+    <h5 class="card-title black">{{code_card.title}}</h5>
+    <p class="card-text black">{{code_card.description}}</p>    
+    {% for lang in code_card.languages %}
+    <span class="badge bg-ocre badge-sm"><code>{{lang}}</code></span>
+    {% endfor %}
+    
+</div>
+<div class="card-footer">
+<p class="text-decoration-none">level: {% include level.html level=code_card.level %}</p>
+</div>
+</div>
+</a>
+</div>  
+{% endif %}
+{% endfor %}
+</div>
+</div>
