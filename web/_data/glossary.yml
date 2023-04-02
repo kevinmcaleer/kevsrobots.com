@@ -327,3 +327,10 @@
     UART stands for Universal Asynchronous Receiver/Transmitter.
   link: https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter
   # article: /resources/how_it_works/uart
+- term: pybricks
+  definition: pybricks
+  full: >-
+    pybricks is a Python library for LEGO® MINDSTORMS® EV3 and LEGO® BOOST.
+    It is a Python library for LEGO® MINDSTORMS® EV3 and LEGO® BOOST.
+  link: https://pybricks.com/
+  article: /blog/pybricks

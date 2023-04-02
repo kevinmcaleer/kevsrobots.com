@@ -1,3 +1,8 @@
+- name: Self Balancing Robot
+  link: /blog/pybricks.html
+  cover: /assets/img/blog/pybricks/pybricks01.jpg
+  description: A simple self balancing robot using the Pybricks library
+  date: 2023/04/02
 - name: PicoCrab2
   link: /blog/picocrab2.html
   cover: /assets/img/blog/picocrab2/picocrab2.jpg
