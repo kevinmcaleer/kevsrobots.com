@@ -334,3 +334,29 @@
     It is a Python library for LEGO® MINDSTORMS® EV3 and LEGO® BOOST.
   link: https://pybricks.com/
   article: /blog/pybricks
+- term: ws2812
+  definition: ws2812
+  full: >-
+    The WS2812 is a smart control LED light source that the control circuit and RGB chip are integrated in a package of 5050 components.
+    It internally includes digital port latch and signal reshaping amplification drive circuit.
+    The control circuit can receive and translate data from the microcontroller.
+    The RGB chip can generate a variety of colors.
+  link: https://www.seeedstudio.com/blog/2018/06/28/ws2812b/
+  article: /resources/how_it_works/rgb-led_strips
+- term: RGB LED Strip
+  definition: RGB LED Strip
+  full: >-
+    An RGB LED strip is a flexible circuit board populated with RGB LEDs.
+    The LEDs are arranged in a row, and the strip is typically 5 mm wide.
+    The strip is powered by a DC voltage, and the LEDs are controlled by a microcontroller.
+  link: https://www.seeedstudio.com/blog/2018/06/28/ws2812b/
+  article: /resources/how_it_works/rgb-led_strips
+- term: APA102
+  definition: APA102
+  full: >-
+    The APA102 is a smart control LED light source that the control circuit and RGB chip are integrated in a package of 5050 components.
+    It internally includes digital port latch and signal reshaping amplification drive circuit.
+    The control circuit can receive and translate data from the microcontroller.
+    The RGB chip can generate a variety of colors.
+  link: https://www.seeedstudio.com/blog/2018/06/28/ws2812b/
+  article: /resources/how_it_works/rgb-led_strips
