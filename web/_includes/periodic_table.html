@@ -1,14 +1,14 @@
-{% assign items = site.data.periodic_table %}
+{% assign items = site.data.ptor %}
 <div class="container">
-    <div class="row">
+    <div class="row row-cols-12 g-1 m-0 p-0">
     {% for item in items %}
-    {% if item.hide != true %}
-        <div class="col-2">
+  
+        <div class="col-1">
             <a href="{{item.url}}" class="text-decoration-none">
             <div class="card border-0 shadow-lg">
                 <div class="card card-body">
-                    <h1 class="text-decoration-none">{{ item.title }}</h1>
-                    <p class="text-decoration-none">{{ item.name }}</p>
+                    <h2 class="text-decoration-none black">{{ item.code }}</h2>
+                    <p class="text-decoration-none small">{{ item.title }}</p>
                     <!-- <p>{{ item.description }}</p> -->
                     <!-- <p class="card-link"><a href="{{ item.link }}">{{ item.link }}</a></p> -->
                 </div>
@@ -18,7 +18,7 @@
             </div>
             </a>
         </div>
-        {% endif %}
+
     {% endfor %}
 </div>
 </div>

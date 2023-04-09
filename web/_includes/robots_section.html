@@ -1,0 +1,36 @@
+<div class="container-fluid rounded-1 pb-3 mb-3 m-0 p-0 pt-3" style="background-image: url('/assets/img/robots_background.jpg');">
+    
+    <div class="row row-cols-2 row-col-sm-1 mx-1 flex-md-row-reverse">
+        <div class="col-12 col-md-6 mx-0">
+            {% assign articles = site.data.robots  %}
+            <div class="row row-cols-2 g-3">
+            {% for article in articles | limit:4 | sort:date | reverse %}
+            {% if article.title != 'Robots' %}
+            <div class="col text-white">
+                <a href="{{article.url}}" class="text-decoration-none">
+                <div class="card border-0 shadow-lg h-100">
+                <img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}">
+                <div class="card-body">
+                <h5 class="card-title black">{{article.name}}</h5>    
+                <p class="card-text small black">{{article.description}}</p>
+                </div>
+                </div>
+                </a>
+            </div>
+            {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 d-flex flex-column align-self-center h-100">
+            <div class="d-flex flex-column align-self-center h-100 text-white">
+            <h1 class="text-white">Robots</h1>
+            <h5>Learn more about my builds</h5>
+            <p class="lead">I love building robots, and if you're here you probably do too! I've written up each robot build with a bill of materials
+                and a step-by-step guide to building your own. I've also included the downloadable 3D printable STL files as well as the code to bring it to life.
+            </p>
+                <a href="/robots/"><button class="btn btn-light">To the Robots ></button></a>
+            </div>
+        </div>
+    </div>  
+</div>

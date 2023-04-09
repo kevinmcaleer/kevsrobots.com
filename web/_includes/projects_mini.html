@@ -1,9 +1,9 @@
 
 {% assign articles = site.data.projects  %}
 
-<div class="row row-cols-1 row-cols-xl-10 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 g-2">
+<div class="row row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 g-3">
 
-{% for article in articles | limit:6 %}
+{% for article in articles | limit:4 %}
 {% if article.title != 'Projects' %}
 <div class="col">
 <div class="card border-0 shadow-lg">

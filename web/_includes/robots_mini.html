@@ -1,20 +1,34 @@
 
 {% assign robots = site.data.robots %}
 
-<div class="row row-cols-1 row-cols-xl-12 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 g-2">
+<div class="row pt-3 d-flex flex-row-reverse row-col-md-2 row-col-1">
+    <div class="col-12 col-sm-6">
+        <div class="row row-cols-1 row-cols-xl-12 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 g-2">
 
-{% for robot in robots | limit:6 %}
-
-<div class="col">
-<div class="card border-0 shadow-lg">
-    <a href="{{robot.link}}" class=""><img class="card-img-top rounded-2" src="{{robot.cover}}" alt="{{robot.title}}">
-    <div class="card-img-overlay m-0 p-0">
-        <h6 class="btn btn-overlay w-100 btn-sm align-bottom">{{robot.name}}</h6>
+            {% for robot in robots | limit:4 %}
+            
+            <div class="col">
+            <div class="card border-0 shadow-lg">
+                <a href="{{robot.link}}" class=""><img class="card-img-top rounded-2" src="{{robot.cover}}" alt="{{robot.title}}">
+                <div class="card-img-overlay m-0 p-0">
+                    <h6 class="btn btn-overlay w-100 btn-sm align-bottom">{{robot.name}}</h6>
+                </div>
+                </a>
+            </div>
+            </div>
+            
+            {% endfor %}
+            
+            </div>
     </div>
-    </a>
-</div>
-</div>
-
-{% endfor %}
-
+    <div class="col-12 col-sm-6">
+        <div class="container-fluid d-flex flex-column align-self-center m-5 px-5">
+            <h1>Robots</h1>
+            <h5>Learn more about my builds</h5>
+            <p class="lead">I love building robots, and if you're here you probably do too! I've written up each robot build with a bill of materials
+                and a step-by-step guide to building your own. I've also included the downloadable 3D printable STL files as well as the code to bring it to life.
+            </p>
+                <a href="/robots/"><button class="btn btn-light">To the Robots ></button></a>
+        </div>
+    </div>
 </div>

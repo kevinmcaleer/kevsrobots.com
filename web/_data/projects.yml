@@ -1,8 +1,13 @@
+- name: Ikea Lamp Hack
+  link: /blog/ikea-lamp-hack.html
+  cover: /assets/img/blog/ikea_hack/ikea_hack.jpg
+  description: "Lets hack the Ikea Iskarna Head lamp to make it programmable with MicroPython using the Pimoroni Plasma 2040 W, a sound sensor, an Adafruit NeoPixel ring and some 3d printed parts."
+  date: 2023-04-09
 - name: Pi-PipBoy
   link: /blog/pi-pipboy.html
   cover: /assets/img/blog/pipipboy/pipboy.jpg
   description: "We delve into the amazing world of the Pi-PipBoy Raspberry Pi Wrist Computer, an innovative project that combines the power and versatility of a Raspberry Pi with the convenience and functionality of a wearable device."
-  date: 2023-04-26
+  date: 2023-03-26
 - name: PicoDeck
   link: /blog/picodeck.html
   cover: /assets/img/blog/picodeck/picodeck.jpg

@@ -2,7 +2,7 @@
 layout: blog
 title: Batteries
 short_title: How it works - Batteries
-short_description: Learn about how Buck Batteries work, and how to power your projects
+short_description: Learn about how Batteries work, and how to power your projects
 date: 2023-03-16
 author: Kevin McAleer
 excerpt: 

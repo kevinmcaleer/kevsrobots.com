@@ -1,0 +1,1067 @@
+- code: AC
+  title: Actuators
+  description: Components responsible for converting electrical or hydraulic signals into physical motion.
+
+- code: AD
+  title: Adversarial Robotics
+  description: Area of knowledge concerned with designing robots to operate in adversarial environments such as in combat or competitive scenarios.
+
+- code: AI
+  title: Artificial Intelligence
+  description: Area of knowledge focused on creating machines capable of intelligent behavior, such as learning, problem-solving, and decision-making.
+
+- code: AL
+  title: Algorithmic Robotics
+  description: Area of knowledge concerned with designing algorithms for autonomous robotic systems, including motion planning and control.
+
+- code: AN
+  title: Animal Robotics
+  description: Area of research concerned with developing robots that mimic animal behavior or are designed to interact with animals.
+
+- code: AR
+  title: Augmented Reality
+  description: Area of knowledge focused on enhancing the perception of the real world by overlaying virtual information or objects.
+
+- code: AS
+  title: Assembly Systems
+  description: Area of robotics concerned with designing robotic systems for assembling products in manufacturing settings.
+
+- code: AT
+  title: Autonomous Transportation
+  description: Area of robotics focused on developing self-driving vehicles and other autonomous transportation systems.
+
+- code: BC
+  title: Biomimetic Control
+  description: Area of research concerned with creating robotic systems that mimic biological systems and are controlled using similar principles.
+
+- code: BD
+  title: Bipedal Dynamics
+  description: Area of research concerned with the dynamics and control of bipedal robots, which have two legs like a human.
+
+- code: BE
+  title: Bio-inspired Engineering
+  description: Area of research concerned with applying biological principles to engineering design, including the design of robots.
+
+- code: BH
+  title: Behavior-based Robotics
+  description: Area of research concerned with designing robots that exhibit complex behaviors through the integration of simple, reactive rules.
+
+- code: BL
+  title: Bayesian Learning
+  description: Area of machine learning concerned with the use of Bayesian methods to model and update probabilistic beliefs about the environment.
+
+- code: BP
+  title: Bayesian Planning
+  description: Area of research concerned with the use of Bayesian methods to model and plan actions in uncertain environments.
+
+- code: BS
+  title: Brain-inspired Systems
+  description: Area of research concerned with creating artificial systems that mimic the structure and function of the brain.
+
+- code: CB
+  title: Computer Vision
+  description: Area of robotics focused on enabling machines to interpret and understand visual information from the environment.
+
+- code: CC
+  title: Cognitive Computing
+  description: Area of research concerned with creating machines that can reason and learn like humans, including language processing and decision-making.
+
+- code: CD
+  title: Cooperative Decision-making
+  description: Area of research focused on developing algorithms and techniques for enabling groups of robots to make coordinated decisions.
+
+- code: CH
+  title: Control Theory
+  description: Area of knowledge concerned with designing and analyzing systems that can be controlled to behave in a desired manner.
+
+- code: CI
+  title: Collective Intelligence
+  description: Area of research focused on developing algorithms and systems that enable groups of robots to work together towards a common goal.
+
+- code: CM
+  title: Cybernetics and Mechatronics
+  description: Area of knowledge concerned with the integration of mechanical and electrical systems with computer control for creating intelligent machines.
+
+- code: CN
+  title: Computational Neuroscience
+  description: Area of research concerned with understanding the structure and function of the brain using computational models.
+
+- code: CO
+  title: Collaborative Robotics
+  description: Area of research focused on developing robots that can safely and effectively work alongside humans in shared workspaces.
+
+- code: CP
+  title: Control and Planning
+  description: Area of research concerned with integrating control and planning algorithms for enabling robots to perform complex tasks.
+
+- code: CR
+  title: Cognitive Robotics
+  description: Area of research focused on developing robots that can reason about and learn from their environment, using knowledge representation and reasoning.
+
+- code: CS
+  title: Computer Science
+  description: Area of knowledge concerned with the theoretical foundations and practical applications of computing.
+
+- code: CV
+  title: Computer Vision Systems
+  description: Area of research focused on developing computer vision algorithms and systems for robotics applications.
+
+- code: CY
+  title: Cyber Physical Systems
+  description: Area of research focused on the integration of physical and computational components to create intelligent systems.
+
+- code: DC
+  title: Distributed Control
+  description: Area of research focused on developing algorithms and techniques for controlling systems that are distributed across multiple agents or devices.
+
+- code: DE
+  title: Decision-making
+  description: Area of research focused on developing algorithms and techniques for enabling robots to make decisions based on environmental and task-related factors.
+
+- code: DG
+  title: Digital Geometry
+  description: Area of research concerned with the analysis and processing of geometric data using computational methods.
+
+- code: DL
+  title: Deep Learning
+  description: Area of machine learning focused on the development of neural networks with multiple layers for learning hierarchical representations of data.
+
+- code: DM
+  title: Dynamic Modeling
+  description: Area of research concerned with the development of mathematical models to describe the behavior of dynamic systems.
+
+- code: DR
+  title: Disaster Response Robotics
+  description: Area of research focused on developing robots for use in disaster response scenarios, including search and rescue and hazardous material handling.
+
+- code: DS
+  title: Data Science
+  description: Area of knowledge concerned with the collection, analysis, and interpretation of large-scale data using computational and statistical methods.
+
+- code: DT
+  title: Decision Trees
+  description: Algorithmic approach to decision-making based on tree-like models of decisions and their possible consequences.
+
+- code: DV
+  title: Data Visualization
+  description: Area of research concerned with the graphical representation of data for the purpose of communicating information effectively.
+
+- code: EA
+  title: Evolutionary Algorithms
+  description: Class of algorithms inspired by the process of biological evolution, used for optimization and search problems.
+
+- code: EC
+  title: Embedded Control
+  description: Area of research focused on the development of control algorithms and systems for embedded hardware platforms.
+
+- code: ED
+  title: Education and Outreach
+  description: Area of research focused on developing educational materials and outreach programs to promote the understanding and use of robotics.
+
+- code: EE
+  title: Electrical Engineering
+  description: Area of knowledge concerned with the study and application of electricity, electronics, and electromagnetism.
+
+- code: EG
+  title: Evolutionary Game Theory
+  description: Area of research concerned with the study of game theory models that incorporate evolutionary principles.
+
+- code: EM
+  title: Electromechanics
+  description: Area of knowledge concerned with the interaction of electrical and mechanical systems.
+
+- code: EN
+  title: Energy Storage and Management
+  description: Area of research focused on developing energy storage and management systems for robotics applications.
+
+- code: EP
+  title: Evolutionary Programming
+  description: Subset of evolutionary algorithms focused on the development of heuristics for optimization problems.
+
+- code: EQ
+  title: Emotional Intelligence
+  description: Area of research focused on creating robots that can recognize, interpret, and respond to human emotions.
+
+- code: ER
+  title: Ethics and Robotics
+  description: Area of research focused on exploring ethical issues related to the development and use of robotic technologies.
+
+- code: ES
+  title: Evolution Strategies
+  description: Subset of evolutionary algorithms focused on the optimization of real-valued functions.
+
+- code: ET
+  title: Ethics of Technology
+  description: Area of research focused on exploring ethical issues related to the development and use of technology in general.
+
+- code: FA
+  title: Feedback Control
+  description: Area of research focused on the development of control systems that use feedback to adjust behavior based on sensor measurements.
+
+- code: FC
+  title: Fuzzy Control
+  description: Area of research focused on the development of control systems that use fuzzy logic for decision-making.
+
+- code: FD
+  title: Force Control
+  description: Area of research focused on the development of control systems that regulate the force exerted by robotic systems.
+
+- code: FE
+  title: Field Robotics
+  description: Area of research focused on the development of robots for use in outdoor environments and unstructured terrain.
+
+- code: FF
+  title: Fuzzy Logic
+  description: Mathematical logic that deals with uncertainty and partial truth, used in control and decision-making algorithms.
+
+- code: FH
+  title: Flexible and Soft Robotics
+  description: Area of research focused on the development of robots made from flexible or soft materials, which can adapt to changing environments and perform delicate tasks.
+
+- code: FI
+  title: Financial Intelligence
+  description: Area of research focused on creating algorithms and systems for financial analysis and decision-making, including trading and investment strategies.
+
+- code: FL
+  title: Flocking
+  description: Algorithmic approach to collective behavior based on the movement of groups of agents, inspired by bird flocks or fish schools.
+
+- code: FM
+  title: Field Mapping
+  description: Area of research focused on developing algorithms and techniques for mapping and navigating outdoor environments using robotic systems.
+
+- code: FR
+  title: Fabrication Robotics
+  description: Area of research focused on developing robotic systems for the automated manufacture of products, including additive manufacturing and CNC machining.
+
+- code: FS
+  title: Feedback Systems
+  description: Area of research focused on the development of systems that use feedback to regulate behavior, including control systems and learning algorithms.
+
+- code: FT
+  title: Fault Tolerance
+  description: Area of research focused on the development of algorithms and techniques for detecting and recovering from faults in robotic systems.
+
+- code: GA
+  title: Genetic Algorithms
+  description: Class of algorithms inspired by the process of biological evolution, used for optimization and search problems.
+
+- code: GC
+  title: Graphical Models
+  description: Area of machine learning focused on the development of probabilistic graphical models for modeling complex data distributions.
+
+- code: GD
+  title: Geometric Design
+  description: Area of research focused on the development of algorithms and techniques for geometric modeling and design.
+
+- code: GE
+  title: Generalization
+  description: Area of machine learning focused on the ability of models to perform well on new, unseen data beyond their training set.
+
+- code: GF
+  title: Grasping and Fixturing
+  description: Area of research focused on the development of robotic systems for grasping and manipulating objects, including sensors and grippers.
+
+- code: GI
+  title: Global Intelligence
+  description: Area of research focused on creating robots that can learn and adapt to their environment and make decisions based on global goals.
+
+- code: GL
+  title: Gesture Recognition
+  description: Area of research focused on developing algorithms and systems for interpreting human gestures and movements, including sign language.
+
+- code: GN
+  title: Generative Networks
+  description: Area of machine learning focused on the development of generative models that can create new data based on patterns in existing data.
+
+- code: GP
+  title: Genetic Programming
+  description: Subset of evolutionary algorithms focused on the automatic generation of computer programs using principles of natural selection.
+
+- code: GR
+  title: Grasping and Manipulation
+  description: Area of research focused on the development of robotic systems for grasping, manipulating, and interacting with objects in the environment.
+
+- code: GS
+  title: Grid-based Search
+  description: Algorithmic approach to path planning and exploration based on the discretization of the environment into a grid of cells.
+
+- code: GT
+  title: Game Theory
+  description: Mathematical framework for analyzing decision-making in strategic interactions between multiple agents.
+
+- code: HC
+  title: Humanoid Robotics
+  description: Area of research focused on the development of robots with a human-like appearance and capabilities, including bipedal locomotion and facial expressions.
+
+- code: HD
+  title: Human-Robot Interaction and Design
+  description: Area of research focused on designing and developing robots that can effectively interact with humans, including user interface design and social robotics.
+
+- code: HE
+  title: Heterogeneous Systems
+  description: Area of research focused on the integration of multiple types of agents or devices into a single system, including robots and other sensors.
+
+- code: HI
+  title: Human Intelligence
+  description: Area of research focused on creating machines that can replicate or augment human cognitive abilities, including perception and reasoning.
+
+- code: HR
+  title: Human-Robot Collaboration
+  description: Area of research focused on developing algorithms and techniques for enabling effective collaboration between humans and robots in shared workspaces.
+
+- code: HV
+  title: Haptic Feedback
+  description: Area of research focused on the development of sensory feedback systems to provide touch or force feedback to users of robotic systems.
+
+- code: IA
+  title: Intelligent Agents
+  description: Area of research focused on developing algorithms and systems for creating autonomous agents capable of intelligent behavior.
+
+- code: IC
+  title: Image Classification
+  description: Area of computer vision focused on the development of algorithms for classifying images into categories based on their content.
+
+- code: ID
+  title: Industrial Design
+  description: Area of design concerned with the development of products and systems for commercial and industrial use.
+
+- code: IM
+  title: Image Processing
+  description: Area of research focused on the development of algorithms for analyzing and manipulating digital images.
+
+- code: IN
+  title: Inverse Kinematics
+  description: Area of robotics concerned with the computation of joint angles to achieve a desired end-effector position.
+
+- code: IO
+  title: Information Theory
+  description: Mathematical theory concerned with the quantification of information and the communication of information over noisy channels.
+
+- code: IP
+  title: Image-based Planning
+  description: Area of robotics focused on using visual information to plan actions and control behavior in the environment.
+
+- code: IR
+  title: Infrared Sensing
+  description: Sensing technology that uses infrared radiation to detect objects and measure their temperature.
+
+- code: IS
+  title: Intelligent Sensing
+  description: Area of research focused on the development of intelligent sensors and sensing systems for robotic applications.
+
+- code: IT
+  title: Information Technology
+  description: Area of knowledge concerned with the development and use of computer systems and networks for storing, processing, and transmitting information.
+
+- code: IV
+  title: Inverse Reinforcement Learning
+  description: Area of machine learning focused on learning the underlying reward function of an environment, based on observations of behavior.
+
+- code: KA
+  title: Kalman Filtering
+  description: Algorithmic approach to estimation and filtering of noisy sensor data, commonly used in robotics.
+
+- code: KB
+  title: Knowledge-based Systems
+  description: Area of research focused on the development of systems that use knowledge representation and reasoning for decision-making.
+
+- code: KD
+  title: Kinematics and Dynamics
+  description: Area of robotics concerned with the mathematical modeling of robot motion and behavior.
+
+- code: KI
+  title: Kinematic Inference
+  description: Area of robotics focused on the estimation of unknown kinematic parameters of robotic systems from sensory data.
+
+- code: KO
+  title: Knowledge Representation and Ontologies
+  description: Area of research focused on the development of formal representations of knowledge and their organization into hierarchies and taxonomies.
+
+- code: LA
+  title: Lattice-based Algorithms
+  description: Algorithmic approach to path planning and exploration based on the representation of the environment as a lattice of discrete states.
+
+- code: LC
+  title: Localization and Mapping
+  description: Area of research focused on the development of algorithms and techniques for mapping and localizing robots in the environment.
+
+- code: LD
+  title: Learning from Demonstrations
+  description: Area of research focused on enabling robots to learn from demonstrations of human or expert behavior.
+
+- code: LE
+  title: Learning and Evolution
+  description: Area of research focused on the integration of machine learning and evolutionary algorithms for optimization and search problems.
+
+- code: LG
+  title: Legged Locomotion
+  description: Area of research concerned with the dynamics and control of legged robots, including quadrupeds and hexapods.
+
+- code: LI
+  title: Lidar Imaging
+  description: Sensing technology that uses laser light to measure distances and create 3D maps of the environment.
+
+- code: LL
+  title: Lifelong Learning
+  description: Area of machine learning focused on the development of algorithms that can continuously learn and adapt to new tasks and environments.
+
+- code: LM
+  title: Machine Learning
+  description: Area of artificial intelligence concerned with the development of algorithms that can learn from data and make predictions or decisions based on that data.
+
+- code: LN
+  title: Linear and Nonlinear Control
+  description: Area of research concerned with the design and analysis of control systems using linear or nonlinear mathematical models.
+
+- code: LO
+  title: Logic and Reasoning
+  description: Area of artificial intelligence focused on the development of formal logic and reasoning systems for decision-making and problem-solving.
+
+- code: LP
+  title: Linear Programming
+  description: Mathematical optimization technique used for solving linear equations subject to linear constraints, commonly used in robotics.
+
+- code: LR
+  title: Learning and Representation
+  description: Area of machine learning focused on the integration of learning algorithms and knowledge representation for intelligent behavior.
+
+- code: LS
+  title: Learning from Sensors
+  description: Area of research focused on enabling robots to learn from sensor data, including perception, localization, and mapping.
+
+- code: LT
+  title: Learning and Transfer
+  description: Area of machine learning focused on the transfer of knowledge from one task or domain to another, including domain adaptation and transfer learning.
+
+- code: LV
+  title: Language and Vision
+  description: Area of research focused on the integration of natural language processing and computer vision for intelligent behavior.
+
+- code: MA
+  title: Manipulation and Grasping
+  description: Area of robotics concerned with the development of algorithms and techniques for manipulating objects, including grasping and dexterous manipulation.
+
+- code: MC
+  title: Multi-agent Systems and Control
+  description: Area of research focused on the development of algorithms and techniques for controlling systems that involve multiple agents or robots.
+
+- code: MD
+  title: Machine Design
+  description: Area of engineering concerned with the design of machines, including robotics systems.
+
+- code: ME
+  title: Mechatronics
+  description: Area of engineering concerned with the integration of mechanical, electrical, and computing components to create intelligent systems.
+
+- code: MF
+  title: Motion Planning and Control
+  description: Area of research focused on the development of algorithms and techniques for planning and controlling the motion of robots.
+
+- code: MG
+  title: Mobile Robotics
+  description: Area of research focused on the development of robots that can move autonomously in the environment, including wheeled and legged robots.
+
+- code: MI
+  title: Medical Imaging
+  description: Area of research focused on the development of imaging technologies for medical applications, including MRI and CT.
+
+- code: ML
+  title: Machine Vision
+  description: Area of computer vision focused on the development of algorithms for interpreting visual data from sensors, including cameras and lidar.
+
+- code: MM
+  title: Manufacturing and Assembly
+  description: Area of research focused on the development of robotic systems for manufacturing and assembly processes.
+
+- code: MN
+  title: Motion and Navigation
+  description: Area of research focused on the development of algorithms and techniques for robot motion and navigation in the environment.
+
+- code: MO
+  title: Modular Robotics
+  description: Area of research focused on the development of robots composed of interchangeable modules, allowing for flexible and customizable behavior.
+
+- code: MP
+  title: Model Predictive Control
+  description: Algorithmic approach to control and planning that uses a predictive model of the environment to plan future behavior.
+
+- code: MR
+  title: Multi-robot Systems
+  description: Area of research focused on the development of algorithms and techniques for controlling and coordinating multiple robots.
+
+- code: MS
+  title: Machine Perception
+  description: Area of research focused on enabling robots to perceive and understand the environment, including sensing and perception algorithms.
+
+- code: MT
+  title: Machine Translation
+  description: Area of natural language processing focused on the development of algorithms for translating between different languages.
+
+- code: MV
+  title: Motion Vision
+  description: Area of research focused on using visual information to guide robot motion and behavior.
+
+- code: NA
+  title: Nonlinear Analysis
+  description: Area of mathematics concerned with the analysis of nonlinear systems and equations.
+
+- code: NC
+  title: Networked Control
+  description: Area of research focused on the development of control systems that operate over communication networks.
+
+- code: NE
+  title: Neuroengineering
+  description: Area of research focused on the interface between neural systems and engineering, including brain-computer interfaces and neural prosthetics.
+
+- code: NI
+  title: Natural Interaction
+  description: Area of research focused on creating robots that can interact with humans using natural forms of communication, including speech and gestures.
+
+- code: NN
+  title: Neural Networks
+  description: Computational models inspired by biological neural networks, used for machine learning and pattern recognition.
+
+- code: NO
+  title: Nonlinear Optimization
+  description: Mathematical optimization technique used for solving nonlinear equations subject to nonlinear constraints.
+
+- code: NP
+  title: Natural Language Processing
+  description: Area of research focused on the development of algorithms for interpreting and generating human language.
+
+- code: NR
+  title: Navigation and Robotics
+  description: Area of research focused on the development of algorithms and techniques for robot navigation, including localization, mapping, and path planning.
+
+- code: NS
+  title: Network Science
+  description: Interdisciplinary field concerned with the study of complex networks, including social networks, biological networks, and communication networks.
+
+- code: NT
+  title: Nanotechnology
+  description: Area of science and engineering focused on the manipulation of matter on the nanoscale, including the development of nanorobots.
+
+- code: OB
+  title: Object Detection and Recognition
+  description: Area of computer vision focused on the development of algorithms for detecting and recognizing objects in images and video.
+
+- code: OC
+  title: Optimal Control
+  description: Area of control theory focused on the development of optimal control policies that minimize a cost or maximize a reward.
+
+- code: OD
+  title: Object Manipulation
+  description: Area of robotics focused on the manipulation of objects, including grasping, lifting, and moving.
+
+- code: OE
+  title: Open-Source Robotics
+  description: Movement within the robotics community focused on the development of open-source hardware and software for robotics.
+
+- code: OG
+  title: Optogenetics
+  description: Interdisciplinary field that combines optics and genetics to enable the control of cells and neural circuits with light.
+
+- code: OH
+  title: Optics and Holography
+  description: Area of physics concerned with the study of light and its interactions with matter, including the development of holographic displays.
+
+- code: OP
+  title: Optimization and Control
+  description: Area of research focused on the development of algorithms and techniques for optimization and control problems in robotics.
+
+- code: OR
+  title: Object Recognition
+  description: Area of computer vision focused on the development of algorithms for recognizing objects in images and video.
+
+- code: OS
+  title: Operating Systems
+  description: Area of computer science concerned with the development and management of software systems that control the resources of a computer.
+
+- code: OV
+  title: Object Vision
+  description: Area of research focused on the perception and interpretation of objects in the environment, including object recognition and segmentation.
+
+- code: PA
+  title: Path Planning and Navigation
+  description: Area of robotics concerned with the development of algorithms and techniques for planning and navigating robot motion in the environment.
+
+- code: PC
+  title: Probabilistic Robotics
+  description: Area of robotics focused on the use of probability theory for modeling and controlling robot behavior.
+
+- code: PD
+  title: Perception and Decision-making
+  description: Area of research focused on enabling robots to perceive and interpret the environment, and make decisions based on that perception.
+
+- code: PE
+  title: Performance Evaluation
+  description: Area of research focused on the development of metrics and techniques for evaluating the performance of robotic systems.
+
+- code: PG
+  title: Procedural Generation
+  description: Technique for generating content algorithmically, often used in video games and simulations.
+
+- code: PH
+  title: Photovoltaic Systems
+  description: Technology for converting sunlight into electrical energy, often used in solar-powered robotic systems.
+
+- code: PI
+  title: Path Integration
+  description: Algorithmic approach to robot localization and mapping based on integrating information from motion sensors.
+
+- code: PL
+  title: Programming Languages and Systems
+  description: Area of computer science concerned with the development and analysis of programming languages and software systems.
+
+- code: PM
+  title: Probabilistic Modeling and Inference
+  description: Area of machine learning focused on the use of probability theory for modeling and inference.
+
+- code: PN
+  title: Planning and Reasoning
+  description: Area of artificial intelligence concerned with the development of algorithms for planning and reasoning about actions and decisions.
+
+- code: PO
+  title: Power Systems and Energy Storage
+  description: Area of engineering concerned with the development of power systems and energy storage technologies for robotics applications.
+
+- code: PP
+  title: Particle Filtering
+  description: Algorithmic approach to state estimation and filtering of noisy sensor data, commonly used in robotics.
+
+- code: PR
+  title: Pattern Recognition
+  description: Area of machine learning concerned with the development of algorithms for identifying patterns and structures in data.
+
+- code: PS
+  title: Perception and Sensing
+  description: Area of robotics concerned with the development of algorithms and techniques for sensing and perception in the environment.
+
+- code: PT
+  title: Planning and Task Execution
+  description: Area of robotics concerned with the development of algorithms and techniques for planning and executing complex tasks.
+
+- code: PU
+  title: Pneumatics and Actuators
+  description: Area of engineering concerned with the development of pneumatic systems and actuators for robotic applications.
+
+- code: PV
+  title: Probabilistic Vision
+  description: Area of computer vision focused on the use of probability theory for modeling and inference in visual perception.
+
+- code: QC
+  title: Quantum Computing
+  description: Area of computer science and physics concerned with the development of computers that use quantum mechanical phenomena to process information.
+
+- code: QP
+  title: Quadrupedal Locomotion
+  description: Area of research concerned with the dynamics and control of quadrupedal robots.
+
+- code: RA
+  title: Robot Architecture
+  description: Area of research concerned with the development of software and hardware architectures for robotic systems.
+
+- code: RB
+  title: Robotics and Biology
+  description: Area of research focused on the intersection of robotics and biology, including biomimicry and bioinspired robotics.
+
+- code: RC
+  title: Robotic Control Systems
+  description: Area of research focused on the development of control systems for robotic systems.
+
+- code: RD
+  title: Robot Design
+  description: Area of engineering concerned with the design of robotic systems, including mechanical, electrical, and computing components.
+
+- code: RE
+  title: Robot Ethics
+  description: Area of research focused on the ethical considerations related to the development and deployment of robotic systems.
+
+- code: RF
+  title: Radio Frequency Identification
+  description: Technology for identifying and tracking objects using radio waves, commonly used in supply chain management and logistics.
+
+- code: RG
+  title: Robot Grasping
+  description: Area of robotics concerned with the development of algorithms and techniques for grasping objects, including dexterous manipulation.
+
+- code: RH
+  title: Robot Haptics
+  description: Area of research focused on the development of haptic interfaces for robots, enabling them to sense and interact with the environment.
+
+- code: RI
+  title: Robot Intelligence
+  description: Area of research focused on the development of intelligent robotic systems, including perception, decision-making, and planning.
+
+- code: RL
+  title: Reinforcement Learning
+  description: Area of machine learning focused on the development of algorithms for learning optimal behavior through trial-and-error interactions with the environment.
+
+- code: RM
+  title: Robot Mobility
+  description: Area of research focused on the mobility of robotic systems, including wheeled, legged, and flying robots.
+
+- code: RN
+  title: Robot Navigation
+  description: Area of robotics focused on the development of algorithms and techniques for robot navigation in the environment.
+
+- code: RO
+  title: Robot Operating Systems
+  description: Software framework for robotics that provides a set of tools and libraries for developing and running robotic applications.
+
+- code: RP
+  title: Robot Planning
+  description: Area of robotics focused on the development of algorithms and techniques for robot planning, including task planning and motion planning.
+
+- code: RQ
+  title: Robot Control and Quantization
+  description: Area of research concerned with the quantization of robot control signals to reduce data transmission requirements.
+
+- code: RR
+  title: Robot Recognition
+  description: Area of computer vision focused on the development of algorithms for recognizing robots and their components.
+
+- code: RS
+  title: Robot Sensing
+  description: Area of robotics focused on the development of algorithms and techniques for sensing the environment, including vision, lidar, and other sensors.
+
+- code: RT
+  title: Robot Teleoperation
+  description: Area of research focused on the development of interfaces for teleoperating robots, allowing for remote control by a human operator.
+
+- code: RU
+  title: Robotics and the Environment
+  description: Area of research focused on the interaction between robotic systems and the natural and built environment.
+
+- code: RV
+  title: Robot Vision
+  description: Area of research focused on the development of algorithms and techniques for visual perception in robotic systems.
+
+- code: RW
+  title: Robot Workspace
+  description: Area of research focused on the workspace and range of motion of robotic systems.
+
+- code: RX
+  title: Robot Experimentation
+  description: Area of research focused on the design and execution of experiments to evaluate and improve robotic systems.
+
+- code: RY
+  title: Robot Dynamics
+  description: Area of research concerned with the dynamics and motion of robotic systems, including modeling and control.
+
+- code: RZ
+  title: Robot Zoo
+  description: Interactive exhibit or museum featuring robotic animals and other creatures.
+
+- code: SA
+  title: Swarm Robotics and Ant Colony Optimization
+  description: Area of research focused on the development of algorithms and techniques for controlling swarms of robots, inspired by ant colonies and other natural systems.
+
+- code: SB
+  title: Soft Robotics and Bio-inspired Materials
+  description: Area of research focused on the development of soft, flexible robots and materials inspired by biological systems.
+
+- code: SC
+  title: Service Robotics and Consumer Robots
+  description: Area of research focused on the development of robotic systems for consumer and service applications, such as home cleaning, entertainment, and assistance.
+
+- code: SD
+  title: Sensing and Detection
+  description: Area of research focused on the development of sensors and detection technologies for robotic applications.
+
+- code: SE
+  title: Sensor Fusion and Estimation
+  description: Area of robotics focused on the integration of sensor data from multiple sources to improve robot perception and estimation.
+
+- code: SF
+  title: Sensor Feedback Control
+  description: Area of control theory focused on using sensor data to provide feedback for robot control.
+
+- code: SG
+  title: Soft Grasping and Manipulation
+  description: Area of research focused on the development of algorithms and techniques for grasping and manipulating soft and deformable objects.
+
+- code: SH
+  title: Social Haptics
+  description: Area of research focused on the development of haptic feedback for social robots, enabling them to interact with humans through touch.
+
+- code: SI
+  title: Social Interaction
+  description: Area of research focused on the development of algorithms and techniques for enabling robots to interact socially with humans.
+
+- code: SJ
+  title: Sensory Joint Control
+  description: Approach to robot control that uses sensory feedback to regulate joint movements and improve performance.
+
+- code: SK
+  title: Sensorimotor Control
+  description: Area of research concerned with the integration of sensory and motor systems in robotic control, inspired by the human sensorimotor system.
+
+- code: SL
+  title: Simulation and Modeling
+  description: Area of research focused on the development of simulation and modeling tools for robotics applications.
+
+- code: SM
+  title: Soft Manipulation
+  description: Area of robotics focused on the manipulation of soft and deformable objects, such as food or biological tissue.
+
+- code: SN
+  title: Speech Recognition and Natural Language Processing
+  description: Area of artificial intelligence focused on the development of algorithms for speech recognition and natural language processing, enabling robots to understand and respond to human language.
+
+- code: SO
+  title: Social Robotics
+  description: Area of research focused on the development of robots that can interact socially with humans, often used in applications such as education, healthcare, and entertainment.
+
+- code: SP
+  title: Sensor Planning
+  description: Area of robotics focused on the development of algorithms and techniques for planning the motion of sensors in the environment.
+
+- code: SQ
+  title: Sensor-based Quality Control
+  description: Approach to quality control that uses sensors to detect defects and variations in manufactured products.
+
+- code: SR
+  title: Safety and Risk Assessment
+  description: Area of research focused on the safety and risk assessment of robotic systems, including hazard analysis and risk mitigation.
+
+- code: SS
+  title: Swarm Intelligence
+  description: Area of research concerned with the development of algorithms and techniques inspired by the collective behavior of social insects and other natural systems.
+
+- code: ST
+  title: Soft Robotics and Tactile Sensing
+  description: Area of research focused on the development of soft, flexible robots and tactile sensors inspired by biological systems.
+
+- code: SU
+  title: Supervised and Unsupervised Learning
+  description: Areas of machine learning concerned with the development of algorithms for learning from labeled (supervised) or unlabeled (unsupervised) data.
+
+- code: SV
+  title: Synthetic Vision
+  description: Area of research focused on the development of artificial vision systems, often using computer graphics and simulation.
+
+- code: SW
+  title: Smart and Wearable Devices
+  description: Area of research focused on the development of smart and wearable devices for robotics applications, such as augmented reality headsets and haptic feedback systems.
+
+- code: SX
+  title: Sensing and Exploration
+  description: Area of robotics focused on the development of algorithms and techniques for sensing and exploring the environment.
+
+- code: SY
+  title: Soft Robotics and Yield Enhancement
+  description: Area of research focused on the development of soft, flexible robots and materials for enhancing the yield and efficiency of manufacturing processes.
+
+- code: SZ
+  title: Swarm Robotics and Zero-sum Games
+  description: Area of research focused on the development of algorithms and techniques for controlling swarms of robots in zero-sum games, such as pursuit-evasion scenarios.
+
+- code: TA
+  title: Telepresence and Teleoperation
+  description: Area of research focused on the development of interfaces and systems for remote telepresence and teleoperation of robotic systems.
+
+- code: TB
+  title: Tactile and Bio-inspired Robotics
+  description: Area of research focused on the development of tactile sensing and bio-inspired robotics systems, including soft robotics and biomimicry.
+
+- code: TC
+  title: Traffic Control and Management
+  description: Area of research focused on the development of algorithms and techniques for controlling and managing traffic in urban environments, often using autonomous vehicles.
+
+- code: TD
+  title: Trajectory Planning and Control
+  description: Area of robotics focused on the development of algorithms and techniques for planning and controlling the trajectory of robotic motion.
+
+- code: TE
+  title: Testing and Evaluation
+  description: Area of research focused on the development of testing and evaluation methodologies for robotic systems.
+
+- code: TF
+  title: Telemanipulation and Force Feedback
+  description: Area of research focused on the development of interfaces and systems for telemanipulation of robotic systems with force feedback.
+
+- code: TG
+  title: Topological Mapping
+  description: Algorithmic approach to robot mapping that uses topological features, such as landmarks and connectivity, to represent the environment.
+
+- code: TH
+  title: Human-Robot Interaction and Collaboration
+  description: Area of research focused on the development of algorithms and techniques for enabling human-robot interaction and collaboration.
+
+- code: TI
+  title: Time-series Analysis
+  description: Area of machine learning focused on the analysis and prediction of time-series data, often used in robotics for motion planning and control.
+
+- code: TJ
+  title: Telepresence and Human Augmentation
+  description: Area of research focused on the development of telepresence systems and human augmentation technologies, enabling remote presence and enhanced human capabilities.
+
+- code: TK
+  title: Teleoperation and Kinesthetic Feedback
+  description: Approach to teleoperation of robotic systems that uses kinesthetic feedback to provide a sense of touch and force feedback to the operator.
+
+- code: TL
+  title: Task and Motion Planning
+  description: Area of robotics focused on the development of algorithms and techniques for planning and executing complex tasks and motion.
+
+- code: TM
+  title: Telerobotics and Mixed Reality
+  description: Area of research focused on the development of interfaces and systems for telerobotics and mixed reality applications.
+
+- code: TN
+  title: Tactile Navigation
+  description: Approach to robot navigation that uses tactile sensing to perceive and interpret the environment.
+
+- code: TO
+  title: Temporal Logic and Planning
+  description: Area of robotics focused on the use of temporal logic for planning and reasoning about actions and events.
+
+- code: TP
+  title: Trajectory Planning and Optimization
+  description: Area of robotics focused on the development of algorithms and techniques for planning and optimizing robot trajectories in the environment.
+
+- code: TQ
+  title: Team Robotics and Coordination
+  description: Area of robotics focused on the development of algorithms and techniques for team coordination and cooperation among multiple robots.
+
+- code: TR
+  title: Tracking and Recognition
+  description: Area of computer vision focused on the development of algorithms for tracking and recognizing objects and patterns in images and video.
+
+- code: TS
+  title: Time Synchronization and Communication
+  description: Area of research focused on the synchronization and communication of robotic systems across different time domains and networks.
+
+- code: TT
+  title: Telepresence and Telerobotics
+  description: Area of research focused on the development of interfaces and systems for telepresence and telerobotics applications.
+
+- code: TU
+  title: Text Mining and Natural Language Processing
+  description: Area of artificial intelligence focused on the development of algorithms for extracting information from text and natural language data.
+
+- code: TV
+  title: Thermal Imaging and Vision
+  description: Area of research focused on the use of thermal imaging for perception and vision in robotic systems.
+
+- code: TW
+  title: Task and Workload Analysis
+  description: Area of research focused on the analysis and modeling of human and robot task performance and workload.
+
+- code: TX
+  title: Teleoperation and Haptic Feedback
+  description: Approach to teleoperation of robotic systems that uses haptic feedback to provide a sense of touch and force feedback to the operator.
+
+- code: TY
+  title: Trust and Autonomy
+  description: Area of research focused on the development of trust and autonomy in robotic systems, including human-robot interaction and collaboration.
+
+- code: TZ
+  title: Telerobotics and Haptic Interfaces
+  description: Area of research focused on the development of interfaces and systems for telerobotics and haptic feedback applications.
+
+- code: UA
+  title: Uncertainty Analysis and Estimation
+  description: Area of research focused on the analysis and estimation of uncertainty in robotic systems, including sensor noise and environmental variability.
+
+- code: UB
+  title: Underwater Robotics
+  description: Area of research focused on the development of robotic systems for underwater exploration and inspection.
+
+- code: UC
+  title: Unmanned Aerial Vehicles
+  description: Area of research focused on the development of unmanned aerial vehicles (UAVs), often used for aerial mapping and surveying.
+
+- code: UD
+  title: Underactuated Robotics
+  description: Area of research focused on the development of underactuated robotic systems, which have fewer actuators than degrees of freedom.
+
+- code: UE
+  title: User Experience and Interaction Design
+  description: Area of research focused on the design and evaluation of user experience and interaction in robotic systems.
+
+- code: UF
+  title: Urban Robotics and Mobility
+  description: Area of research focused on the development of robotic systems for urban mobility and transportation, such as autonomous vehicles and delivery robots.
+
+- code: UG
+  title: Unmanned Ground Vehicles
+  description: Area of research focused on the development of unmanned ground vehicles (UGVs), often used for reconnaissance and inspection in hazardous environments.
+
+- code: UH
+  title: Unmanned Surface Vehicles
+  description: Area of research focused on the development of unmanned surface vehicles (USVs), often used for marine mapping and surveying.
+
+- code: UI
+  title: Unsupervised and Semi-supervised Learning
+  description: Areas of machine learning concerned with the development of algorithms for learning from unlabeled (unsupervised) or partially labeled (semi-supervised) data.
+
+- code: UJ
+  title: Unmanned Systems Integration
+  description: Area of research focused on the integration of unmanned systems, including robotics, UAVs, and UGVs.
+
+- code: UK
+  title: User Modeling and Personalization
+  description: Area of research focused on the development of algorithms and techniques for modeling user preferences and personalizing robotic interactions.
+
+- code: UL
+  title: Unmanned Systems Safety
+  description: Area of research focused on the safety and reliability of unmanned systems, including robotic systems and UAVs.
+
+- code: UM
+  title: Unsupervised Motion Analysis
+  description: Area of computer vision focused on the development of algorithms for unsupervised analysis of motion and activity in video.
+
+- code: UN
+  title: Universal Robot   description Format
+  description: Standard format for describing and sharing information about robotic systems, including their components and capabilities.
+
+- code: UO
+  title: Unmanned Systems Control
+  description: Area of research focused on the development of algorithms and techniques for controlling unmanned systems, including robotics and UAVs.
+
+- code: UP
+  title: User Interface and Interaction Design
+  description: Area of research focused on the design and evaluation of user interfaces and interactions for robotic systems.
+
+- code: UQ
+  title: Ubiquitous Robotics
+  description: Area of research focused on the development of robotic systems that can operate in a wide range of environments and contexts.
+
+- code: UR
+  title: Unmanned Systems Networking
+  description: Area of research focused on the networking and communication of unmanned systems, including robotics and UAVs.
+
+- code: US
+  title: Unmanned Systems Autonomy
+  description: Area of research focused on the development of autonomous unmanned systems, including robotics and UAVs.
+
+- code: UT
+  title: Unmanned Systems Integration and Test
+  description: Area of research focused on the integration and testing of unmanned systems, including robotics and UAVs.
+
+- code: UU
+  title: Universal Robotic Interface
+  description: Standard interface for robotic systems, enabling interoperability and communication between different systems.
+
+- code: UV
+  title: User Verification and Authentication
+  description: Area of research focused on the development of algorithms and techniques for verifying and authenticating user identity in robotic systems.
+
+- code: UW
+  title: Urban Mobility and Transportation
+  description: Area of research focused on the development of autonomous vehicles and other robotic systems for urban mobility and transportation.
+
+- code: UX
+  title: User Experience and Usability Testing
+  description: Area of research focused on the evaluation of user experience and usability of robotic systems through testing and user studies.
+
+- code: UY
+  title: Unsupervised Learning and Clustering
+  description: Areas of machine learning concerned with the development of algorithms for unsupervised learning and clustering of data.
+
+- code: UZ
+  title: Unmanned Systems Perception
+  description: Area of research focused on the development of algorithms and techniques for perception in unmanned systems, including robotics and UAVs.

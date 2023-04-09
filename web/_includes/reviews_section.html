@@ -1,0 +1,42 @@
+<div class="container-fluid rounded-1 pb-3 m-0 p-0 pt-3" style="background-image: url('/assets/img/reviews_background.jpg');">
+    
+    <div class="row row-sm-column-reverse m-0 p-0 row-cols-2 row-col-sm-1">
+        <div class="col-12 col-md-6 ">
+        
+        <nav class="navbar p-0 m-0">
+            <div class="container-fluid m-0 p-0 px-3">
+            </div>
+            </nav>
+            <div class="col col-sm-12">
+            {% assign articles = site.reviews | sort:date| reverse  %}
+            <div class="row row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 g-3">
+            {% for article in articles | limit:5 %}
+            {% if article.title != 'Reviews' %}
+            <div class="col">
+                <a href="{{article.url}}" class="text-decoration-none">
+                <div class="card border-0 shadow-lg h-100">
+                <img class="card-img-top black" src="{{article.cover}}" alt="{{article.title}}">
+                <div class="card-body">
+                <h5 class="card-title black">{{article.title}}</h5>    
+                <p class="card-text small black">{{article.description}}</p>
+                </div>
+            </div>
+            </a>
+            </div>
+            {% endif %}
+            {% endfor %}
+            </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 d-flex flex-column align-self-center h-100">
+            <div class="d-flex flex-column align-self-center h-100">
+            <h1 class="text-white">Reviews</h1>
+            <h5 class="text-white">Detailed reviews of products</h5>
+            <p class="lead text-white">When I get sent products from companies, or when I purchase them myself, I like to give them an honest review. 
+                There is a scoring system that is applied objectively to all products reviewed.</p>
+            <a href="/reviews/" class="mb-3"><button type="button" class="btn btn-light">All Reviews ></button></a>
+            </div>
+        </div>
+    </div>
+        
+    </div>

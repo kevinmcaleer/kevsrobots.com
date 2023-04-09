@@ -1,0 +1,32 @@
+- keywords:
+  - Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry
+    Pi 4.
+  link: /learn/learn_ros/00_intro.html
+  title: Learn ROS with me
+- keywords:
+  - Learn how to 3d print, build and program a SMARS robot
+  link: /learn/smars/00_intro.html
+  title: SMARS
+- keywords:
+  - Get started with MicroPython, What Python is, where to download it and which software
+    to use to develop MicroPython code
+  link: /learn/micropython/00_intro.html
+  title: Learn MicroPython - The basics
+- keywords:
+  - Learn how to use the new Learning Platform
+  link: /learn/learning_platform/00_intro.html
+  title: How to use the Learning Platform
+- keywords:
+  - Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry
+    Pi 4.
+  link: /learn/robotics_101/00_overview.html
+  title: Robotics 101
+- keywords:
+  - Learn how to 3d print, build and program a SMARS Quad robot
+  link: /learn/smars_quad/00_intro.html
+  title: SMARS Quad
+- keywords:
+  - Robot Eye Mechansim, is a course that will teach you how to use Fusion 360 to
+    create a Servo controled Robot eye mechanism.
+  link: /learn/eye_mechanism/00_intro.html
+  title: Robot Eye Mechansim
