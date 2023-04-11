@@ -3,6 +3,7 @@ layout: lesson
 title: Our first program
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 05_ides.html
 next: 07_hello_world.html
 description: "\u2018Hello World\u2019 - its a tradition"

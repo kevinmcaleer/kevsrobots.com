@@ -3,6 +3,7 @@ layout: lesson
 title: Laserscan data
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 17_tf2.html
 description: Lets Visualise our Laser scan data
 percent: 100

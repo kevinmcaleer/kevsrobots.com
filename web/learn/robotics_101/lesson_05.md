@@ -3,6 +3,7 @@ layout: lesson
 title: How does a Robot think?
 author: Kevin McAleer
 type: page
+cover: /learn/robotics_101/assets/basics_101.jpg
 previous: lesson_04.html
 description: The Robot Brain
 percent: 100

@@ -2,7 +2,7 @@
 title: SMARS Quad robot Overview
 description: Learn how to build your own SMARS Quad robot
 layout: lesson 
-cover: assets/how_to_build_a_quad.jpg
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 ---
 
 ![How to build a SMARS Quad](assets/how_to_build_a_quad.jpg){:class="cover"}

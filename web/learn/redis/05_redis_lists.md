@@ -3,6 +3,7 @@ layout: lesson
 title: Redis Lists
 author: Kevin McAleer
 type: page
+cover: /learn/redis/assets/redis-cover.jpg
 previous: 04_commands_and_transactions.html
 next: 06_redis_sets.html
 description: Learn about Redis lists and how to use them with Python.

@@ -3,6 +3,7 @@ layout: lesson
 title: Attach Wheels
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars05.html
 next: smars07.html
 description: Attach Wheels to the motors

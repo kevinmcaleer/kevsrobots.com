@@ -2,7 +2,7 @@
 title:  Summary and Review
 description: A summary of what you have learned so far
 layout: lesson
-cover: assets/heroshot.jpg
+cover: /learn/smars/assets/heroshot.jpg
 ---
 
 ## SUMMARY OF LEARNING

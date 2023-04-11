@@ -3,6 +3,7 @@ layout: lesson
 title: Servo Horns
 author: Kevin McAleer
 type: page
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 previous: quad_07.html
 next: quad_09.html
 description: Attach the other servo holders to the frame

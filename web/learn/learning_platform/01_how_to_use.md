@@ -3,6 +3,7 @@ layout: lesson
 title: How to use the Learning Platform
 author: Kevin McAleer
 type: page
+cover: /learn/learning_platform/assets/learn.jpg
 previous: 00_intro.html
 next: 02_navigate_content.html
 description: Orientation

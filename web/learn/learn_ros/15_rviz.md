@@ -3,12 +3,12 @@ layout: lesson
 title: Rviz2
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/rviz2.jpg
 previous: 14_docker_x11.html
 next: 16_rviz_displays.html
 description: Lets learn about RViz2, the ROS Visualisation tool
 percent: 80
 duration: 2
-cover: assets/rviz2.jpg
 navigation:
 - name: Learn ROS with me
 - content:

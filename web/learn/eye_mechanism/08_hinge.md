@@ -3,6 +3,7 @@ layout: lesson
 title: Create Hinge from Profile
 author: Kevin McAleer
 type: page
+cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 previous: 07_create_lower_sketch.html
 description: Lets create the lower eyelid hinge from the new profile
 percent: 100

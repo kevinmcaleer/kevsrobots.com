@@ -3,6 +3,7 @@ layout: lesson
 title: Clone Docker Images
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 05_get_cubie.html
 next: 07_build_container.html
 description: Download the official docker images for ROS from the Open Source Robotics

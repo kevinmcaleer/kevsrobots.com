@@ -3,6 +3,7 @@ layout: lesson
 title: If, elif, else
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 11_reserved_words.html
 next: 13_loops.html
 description: Conditional control

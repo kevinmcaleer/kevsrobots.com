@@ -3,12 +3,12 @@ layout: lesson
 title: Solder wires to motors
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars01.html
 next: smars03.html
 description: Build Instructions for standard SMARS
 percent: 18
 duration: 1
-cover: assets/how_to_build_a_smars.jpg
 navigation:
 - name: SMARS
 - content:

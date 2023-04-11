@@ -3,6 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 next: 00_videos.html
 description: Get started with MicroPython, What it is, where to download it and which
   software to use to develop MicroPython code.

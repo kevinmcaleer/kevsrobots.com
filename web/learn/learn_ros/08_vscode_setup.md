@@ -3,6 +3,7 @@ layout: lesson
 title: VSCode setup
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 07_build_container.html
 next: 09_first_ros_program.html
 description: Install the VSCode extensions so we can remotely connect to the Raspberry

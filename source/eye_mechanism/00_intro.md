@@ -3,7 +3,7 @@ title: Overview
 description:
 layout: lesson
 type: page
-cover: assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 ---
 
 ![Page cover photo]({{page.cover}}){:class="cover"}

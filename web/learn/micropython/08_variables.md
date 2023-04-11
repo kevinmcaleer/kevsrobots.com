@@ -3,6 +3,7 @@ layout: lesson
 title: Variables and Constants
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 07_hello_world.html
 next: 09_example02.html
 description: A Place to store values

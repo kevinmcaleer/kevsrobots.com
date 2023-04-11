@@ -3,6 +3,7 @@ layout: lesson
 title: Insert Wires
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars09.html
 next: smars11.html
 description: Add the power wires to the robot

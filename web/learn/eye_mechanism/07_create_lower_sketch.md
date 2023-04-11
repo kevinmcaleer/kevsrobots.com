@@ -3,6 +3,7 @@ layout: lesson
 title: Creating the Lower Eyelid
 author: Kevin McAleer
 type: page
+cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 previous: 06_lower_eyelid_sketch.html
 next: 08_hinge.html
 description: Lets create the lower eyelid, similar to the upper eyelid

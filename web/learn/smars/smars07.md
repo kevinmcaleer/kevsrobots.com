@@ -3,6 +3,7 @@ layout: lesson
 title: Test Motors
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars06.html
 next: smars08.html
 description: Test Motors to ensure they work ok

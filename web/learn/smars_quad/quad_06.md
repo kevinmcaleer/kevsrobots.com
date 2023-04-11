@@ -3,6 +3,7 @@ layout: lesson
 title: Assemble arms
 author: Kevin McAleer
 type: page
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 previous: quad_05.html
 next: quad_07.html
 description: 6 Mount the servo holder in the servo arm

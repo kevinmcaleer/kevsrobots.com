@@ -3,12 +3,12 @@ layout: lesson
 title: Print the Parts
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: 00_intro.html
 next: smars02.html
 description: Build Instructions for standard SMARS
 percent: 12
 duration: 2
-cover: assets/how_to_build_a_smars.jpg
 navigation:
 - name: SMARS
 - content:

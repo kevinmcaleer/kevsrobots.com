@@ -3,6 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
+cover: /learn/robotics_101/assets/basics_101.jpg
 next: lesson_01.html
 description: Get started with Robotics
 percent: 16

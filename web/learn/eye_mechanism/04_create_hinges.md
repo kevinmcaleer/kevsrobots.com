@@ -3,6 +3,7 @@ layout: lesson
 title: Create Hinge Sketch
 author: Kevin McAleer
 type: page
+cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 previous: 03_revolve.html
 next: 05_hinge.html
 description: Create the hinge profile

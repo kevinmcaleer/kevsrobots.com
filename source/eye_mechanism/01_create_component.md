@@ -3,7 +3,6 @@ title: Create a Component
 layout: lesson
 description: Creating the initial Compoent
 type: page
-cover:
 ---
 
 ## Open Fusion 360

@@ -3,6 +3,7 @@ layout: lesson
 title: Why use MicroPython?
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 03_installing_micropython.html
 next: 05_ides.html
 description: It's designed to be easy to read and write, perfect for beginners

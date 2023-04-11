@@ -3,7 +3,7 @@ layout: lesson
 title: Getting Rviz2 and RQT to work in docker
 type: page
 description: Lets learn how to redirect our X11 Display
-cover: assets/x11cover.jpg
+cover: /learn/learn_ros/assets/x11cover.jpg
 ---
 
 ![Cover Photo]({{page.cover}}){:class="cover"}

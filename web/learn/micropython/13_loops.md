@@ -3,6 +3,7 @@ layout: lesson
 title: Loops
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 12_if_elif_else.html
 next: 14_operators.html
 description: Flow Control

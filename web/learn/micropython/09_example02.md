@@ -3,6 +3,7 @@ layout: lesson
 title: Example 02
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 08_variables.html
 next: 10_values_and_variable_types.html
 description: Variables

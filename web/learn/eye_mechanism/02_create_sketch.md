@@ -3,12 +3,12 @@ layout: lesson
 title: Create a Sketch
 author: Kevin McAleer
 type: page
+cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 previous: 01_create_component.html
 next: 03_revolve.html
 description: Creating the initial Sketch
 percent: 33
 duration: 4
-cover: null
 navigation:
 - name: Robot Eye Mechansim
 - content:

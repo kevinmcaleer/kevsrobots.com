@@ -3,6 +3,7 @@ layout: lesson
 title: Code
 author: Kevin McAleer
 type: page
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 previous: quad_11.html
 description: Download the python code
 percent: 100

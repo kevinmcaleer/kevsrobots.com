@@ -3,6 +3,7 @@ layout: lesson
 title: Raspberry Pi Setup
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 01_what_is_ros.html
 next: 03_install_updates.html
 description: How to setup a Raspberry Pi 4

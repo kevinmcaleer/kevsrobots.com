@@ -3,6 +3,7 @@ layout: lesson
 title: Python Development Environments
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 04_why_use_micropython.html
 next: 06_our_first_program.html
 description: Choose the best development tool for you

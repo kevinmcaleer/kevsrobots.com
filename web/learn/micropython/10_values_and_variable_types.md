@@ -3,6 +3,7 @@ layout: lesson
 title: Values & Variables Types
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 09_example02.html
 next: 11_reserved_words.html
 description: NUMBERS, TEXT, LISTS AND DICTIONARIES

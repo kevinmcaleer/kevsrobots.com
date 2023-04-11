@@ -3,12 +3,12 @@ layout: lesson
 title: Getting Rviz2 and RQT to work in docker
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/x11cover.jpg
 previous: 13_create_subscriber.html
 next: 15_rviz.html
 description: Lets learn how to redirect our X11 Display
 percent: 75
 duration: 3
-cover: assets/x11cover.jpg
 navigation:
 - name: Learn ROS with me
 - content:

@@ -3,6 +3,7 @@ layout: lesson
 title: Operators
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 13_loops.html
 next: 15_functions.html
 description: Comparitive operators

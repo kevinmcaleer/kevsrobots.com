@@ -3,6 +3,7 @@ layout: lesson
 title: Fit the Battery
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars03.html
 next: smars05.html
 description: Fit the Battery to the chassis

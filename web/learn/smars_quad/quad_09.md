@@ -3,6 +3,7 @@ layout: lesson
 title: Print Feet
 author: Kevin McAleer
 type: page
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 previous: quad_08.html
 next: quad_10.html
 description: Print the feet x4

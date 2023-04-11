@@ -3,6 +3,7 @@ layout: lesson
 title: Redis Sorted Sets
 author: Kevin McAleer
 type: page
+cover: /learn/redis/assets/redis-cover.jpg
 previous: 07_redis_hashes.html
 next: 09_redis_pub_sub.html
 description: Learn about Redis sorted sets and how to use them with Python.

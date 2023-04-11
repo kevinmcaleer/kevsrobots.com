@@ -3,6 +3,7 @@ layout: lesson
 title: Redis Sets
 author: Kevin McAleer
 type: page
+cover: /learn/redis/assets/redis-cover.jpg
 previous: 05_redis_lists.html
 next: 07_redis_hashes.html
 description: Learn about Redis sets and how to use them with Python.

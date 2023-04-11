@@ -3,6 +3,7 @@ layout: lesson
 title: Redis Hashes
 author: Kevin McAleer
 type: page
+cover: /learn/redis/assets/redis-cover.jpg
 previous: 06_redis_sets.html
 next: 08_redis_sorted_sets.html
 description: Learn about Redis hashes and how to use them with Python.

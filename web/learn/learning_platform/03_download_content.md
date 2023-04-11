@@ -3,6 +3,7 @@ layout: lesson
 title: Downloading Course Content
 author: Kevin McAleer
 type: page
+cover: /learn/learning_platform/assets/learn.jpg
 previous: 02_navigate_content.html
 description: Learn how to download supporting files and content
 percent: 100
@@ -26,6 +27,7 @@ navigation:
 
 
 ## Downloadable content
+
 Courses will provide links to files, such as 3d printable `STL` files, `PDF` worksheet files
 
 ---

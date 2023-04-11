@@ -3,6 +3,7 @@ layout: lesson
 title: Print the Parts
 author: Kevin McAleer
 type: page
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 previous: 00_intro.html
 next: quad_02.html
 description: Download and print the files

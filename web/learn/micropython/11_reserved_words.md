@@ -3,6 +3,7 @@ layout: lesson
 title: Reserved Words
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 10_values_and_variable_types.html
 next: 12_if_elif_else.html
 description: All the words that have a special meaning in Python

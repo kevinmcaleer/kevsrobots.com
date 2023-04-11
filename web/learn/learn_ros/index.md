@@ -3,6 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 next: 01_what_is_ros.html
 description: Get started with ROS, the Robot Operating System and learn how to build
   robots using this industry standard framework

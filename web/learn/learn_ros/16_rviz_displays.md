@@ -3,12 +3,12 @@ layout: lesson
 title: Rviz2 Displays
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/rviz2_nodes.jpg
 previous: 15_rviz.html
 next: 17_tf2.html
 description: Lets learn about RViz2 Displays and setting it up for Laser scans
 percent: 85
 duration: 3
-cover: assets/rviz2_nodes.jpg
 navigation:
 - name: Learn ROS with me
 - content:

@@ -3,12 +3,12 @@ layout: lesson
 title: Create the Lower Eyelid Component
 author: Kevin McAleer
 type: page
+cover: /learn/eye_mechanism/assets/cover.jpg
 previous: 05_hinge.html
 next: 07_create_lower_sketch.html
 description: Lets create the Lower Eyelid
 percent: 77
 duration: 2
-cover: assets/cover.jpg
 navigation:
 - name: Robot Eye Mechansim
 - content:

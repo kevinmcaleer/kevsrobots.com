@@ -3,7 +3,7 @@ title: Create the Lower Eyelid Component
 description: Lets create the Lower Eyelid
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/eye_mechanism/assets/cover.jpg
 ---
 
 []({{page.cover}}){:class="cover"}

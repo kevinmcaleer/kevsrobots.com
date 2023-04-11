@@ -3,6 +3,7 @@ layout: lesson
 title: Fit the Motors
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars02.html
 next: smars04.html
 description: Fit the Motors to the chassis

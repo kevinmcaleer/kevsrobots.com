@@ -3,11 +3,11 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
+cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 next: 01_create_component.html
 description: null
 percent: 11
 duration: 1
-cover: assets/eye_mechanism.jpg
 navigation:
 - name: Robot Eye Mechansim
 - content:

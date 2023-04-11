@@ -16,7 +16,7 @@ class Courses():
         for course in os.listdir(course_folder):
             new_course = Course()
             if os.path.isdir(os.path.join(course_folder, course)):
-                print(f'Found course: {course}')
+                # print(f'Found course: {course}')
                 new_course.read_course(os.path.join(course_folder, course))
                 new_course.output_folder = os.path.join(self.output_folder,course)
                 self.course_list.append(new_course)

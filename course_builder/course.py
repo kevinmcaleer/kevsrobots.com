@@ -56,21 +56,21 @@ class Course():
         with open(f'{self.course_folder}/course.yml', 'r') as stream:
             try:
                 course=yaml.safe_load(stream)
-                print(f'Course manifest loaded')
+                # print(f'Course manifest loaded')
             except yaml.YAMLError as exc:
                 print(exc)
         
         course = course[0]
         for section in course['content']:
             name = section['section']
-            print(f"Name is: {name['name']}")
+            # print(f"Name is: {name['name']}")
 
             for item in section['section']['content']:
-                print(item)
+                # print(item)
                 duration += self.get_duration(item)
                 
 
-        print(f'Course duration is: {duration}')
+        # print(f'Course duration is: {duration}')
         self.duration = duration
         return duration
 
@@ -86,11 +86,11 @@ class Course():
                 lesson=yaml.safe_load(a)
             except yaml.YAMLError as exc:
                 print(exc)
-            print('lesson is: ', lesson['title'])
+            # print('lesson is: ', lesson['title'])
             words = len(lesson)
-            print(f'words is: {words}')
+            # print(f'words is: {words}')
             duration = ceil(words/200)    
-            print(f'duration is: {duration}')
+            # print(f'duration is: {duration}')
         return duration
 
     def read_course(self, course_folder):
@@ -98,7 +98,7 @@ class Course():
         with open(f'{course_folder}/course.yml', 'r') as stream:
             try:
                 course=yaml.safe_load(stream)
-                print(f'Course manifest loaded')
+                # print(f'Course manifest loaded')
             except yaml.YAMLError as exc:
                 print(exc)
         
@@ -109,10 +109,12 @@ class Course():
         self.date_created = course['date_created']
         self.date_published = course['date_published']
         self.content = course['content']
-        self.cover = course['cover']
+        cover_folder = self.course_folder.replace('source', '/learn')
+        self.cover = cover_folder + '/' + course['cover']
+        # print(f'cover is: {self.cover}')
         self.duration = self.calculate_duration()
         # print(course['content'])
-        print(f'found {self.no_of_lessons} lessons, date published is: {self.date_published}')
+        # print(f'found {self.no_of_lessons} lessons, date published is: {self.date_published}')
         return self
 
     def build_index(self):
@@ -125,7 +127,7 @@ class Course():
         
         # Create the course folder
         if output_folder: self.output_folder = output_folder
-        print("creating output folder: ", self.output_folder)
+        # print("creating output folder: ", self.output_folder)
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)
 
@@ -143,20 +145,20 @@ class Course():
     
     def next_lesson(self, lesson_number):
         """ return the next lesson """
-        print(f'lesson number is: {lesson_number}, {self.lessons[lesson_number-1]}')
+        # print(f'lesson number is: {lesson_number}, {self.lessons[lesson_number-1]}')
         if lesson_number < self.no_of_lessons:
             next = self.lessons[lesson_number].replace('.md', '.html')
-            print(f'next lesson is: {next}')
+            # print(f'next lesson is: {next}')
             return next
         else:
             return None
 
     def previous_lesson(self, lesson_number):
         """ return the next lesson """
-        print(f'lesson is:{lesson_number}, {self.lessons[lesson_number-1]}')
+        # print(f'lesson is:{lesson_number}, {self.lessons[lesson_number-1]}')
         if lesson_number > 1:
             previous = self.lessons[lesson_number-2].replace('.md', '.html')
-            print(f'previous lesson is: {previous}')
+            # print(f'previous lesson is: {previous}')
             return previous
         else:
             return None
@@ -189,7 +191,7 @@ class Course():
         with open(f'{self.course_folder}/course.yml', 'r') as stream:
             try:
                 course=yaml.safe_load(stream)
-                print(f'Course manifest loaded')
+                # print(f'Course manifest loaded')
             except yaml.YAMLError as exc:
                 print(exc)
         
@@ -203,11 +205,11 @@ class Course():
         # print(f"course is {course['content']}")
         for section in course['content']:
             name = section['section']
-            print(f"Name is: {name['name']}")
+            # print(f"Name is: {name['name']}")
             
             item_record = []
             for item in section['section']['content']:
-                print(item)
+                # print(item)
 
                 # open the file and read the name
                 
@@ -324,7 +326,7 @@ class Course():
 
                 index = just_item['content'].index(item)
                
-                print(f'item is: {item}, index is {index}, page_count is {page_count}')
+                # print(f'item is: {item}, index is {index}, page_count is {page_count}')
            
                 item_percentage = page_percent * page_count
                 if item_percentage > 100:
@@ -338,13 +340,15 @@ class Course():
                 # increment if it's a page
                 if item in self.lessons and page_count < self.no_of_lessons: 
                     page_count += 1
-                    print(f'page is: {item}, page_count is {page_count}')
+                    # print(f'page is: {item}, page_count is {page_count}')
                    
                 front_matter = f'---' + "\n"
                 front_matter += f'layout: {self.layout}' + "\n"
                 front_matter += f'title: {item}' + "\n"
                 front_matter += f'author: {self.author}' + "\n"
                 front_matter += f'type: {self.type}' + "\n"
+                front_matter += f'cover: {self.cover}' + "\n"
+                # print(f'front matter cover is: {self.cover}')
                 if previous is not None:
                     front_matter += f'previous: {previous}' + "\n"
                 if next is not None:
@@ -365,7 +369,7 @@ class Course():
                 # update front matter
                 lesson_file = f'{self.course_folder}/{item}'
                 with open(lesson_file, 'r') as f:
-                    print(f'reading {lesson_file}')
+                    # print(f'reading {lesson_file}')
                     lines = f.read()
                     # print(f'lines is: {lines}')
                 page = self.update_front_matter(lesson_file=lines, front_matter=front_matter)
@@ -393,7 +397,8 @@ class Course():
     def __str__(self):
         """ provide a list of information for to build the courses.yml data file """
 
-        cover_path = self.output_folder.replace('web','') + "/" + self.cover
+        # cover_path = self.output_folder.replace('web','') + "/" + self.cover
+        cover_path = self.cover
         link_path = self.output_folder.replace('web','') + "/" + self.link
         # published_date = self.output_folder.replace('web','') + "/" + self.date_published 
         
@@ -414,7 +419,7 @@ class Courses():
         for course in os.listdir(course_folder):
             new_course = Course()
             if os.path.isdir(os.path.join(course_folder, course)):
-                print(f'Found course: {course}')
+                # print(f'Found course: {course}')
                 new_course.read_course(os.path.join(course_folder, course))
                 new_course.output_folder = os.path.join(self.output_folder,course)
                 self.course_list.append(new_course)

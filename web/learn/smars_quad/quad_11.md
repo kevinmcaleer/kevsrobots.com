@@ -3,6 +3,7 @@ layout: lesson
 title: Check Rotation
 author: Kevin McAleer
 type: page
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 previous: quad_10.html
 next: quad_12.html
 description: Check the servo rotation

@@ -2,6 +2,8 @@
 <h5>Learn something new. Today.</h5>
 <hr class="my-2">
 
+{% include breadcrumbs.html %}
+
 {% assign courses = site.data.courses | sort: 'date_published' | reverse %}
 
 <div class="row row-cols-lg-4 row-cols-sm-2 row-cols-md-3">

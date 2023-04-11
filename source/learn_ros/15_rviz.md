@@ -3,7 +3,7 @@ layout: lesson
 title: Rviz2
 type: page
 description: Lets learn about RViz2, the ROS Visualisation tool
-cover: assets/rviz2.jpg
+cover: /learn/learn_ros/assets/rviz2.jpg
 ---
 
 ![RViz2 screenshot]({{page.cover}}){:class="cover"}

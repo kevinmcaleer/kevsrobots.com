@@ -3,6 +3,7 @@ layout: lesson
 title: First ROS2 Program
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 08_vscode_setup.html
 next: 10_listener.html
 description: Lets create our first ROS2 program

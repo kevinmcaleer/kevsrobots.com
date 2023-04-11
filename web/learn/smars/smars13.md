@@ -3,6 +3,7 @@ layout: lesson
 title: Arduino Code
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars12.html
 next: summary.html
 description: Control your SMARS with Bluetooth

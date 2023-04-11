@@ -3,7 +3,6 @@ title: Create a Sketch
 layout: lesson
 description: Creating the initial Sketch
 type: page
-cover:
 ---
 
 ## Create a Sketch

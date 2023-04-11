@@ -3,6 +3,7 @@ layout: lesson
 title: Installing updates
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 02_pi_setup.html
 next: 04_docker_install.html
 description: Update and Upgrade the OS to the latest patch level

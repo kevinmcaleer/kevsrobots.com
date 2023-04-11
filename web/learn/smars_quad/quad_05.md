@@ -3,6 +3,7 @@ layout: lesson
 title: Servo Arms
 author: Kevin McAleer
 type: page
+cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 previous: quad_04.html
 next: quad_06.html
 description: 5 Print the servo arms

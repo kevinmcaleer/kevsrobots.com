@@ -3,12 +3,12 @@ layout: lesson
 title: Create a Component
 author: Kevin McAleer
 type: page
+cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 previous: 00_intro.html
 next: 02_create_sketch.html
 description: Creating the initial Compoent
 percent: 22
 duration: 1
-cover: null
 navigation:
 - name: Robot Eye Mechansim
 - content:

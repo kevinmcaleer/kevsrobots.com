@@ -3,7 +3,7 @@ layout: lesson
 title: Rviz2 Displays
 type: page
 description: Lets learn about RViz2 Displays and setting it up for Laser scans
-cover: assets/rviz2_nodes.jpg
+cover: /learn/learn_ros/assets/rviz2_nodes.jpg
 ---
 
 ![RViz2 screenshot]({{page.cover}}){:class="cover"}

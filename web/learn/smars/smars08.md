@@ -3,6 +3,7 @@ layout: lesson
 title: Add the Arduino
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars07.html
 next: smars09.html
 description: Slide the Arduino into place

@@ -3,6 +3,7 @@ layout: lesson
 title: Fit Motors Holders
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 previous: smars04.html
 next: smars06.html
 description: Fit Motors Holders to the chassis

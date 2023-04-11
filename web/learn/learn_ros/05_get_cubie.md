@@ -3,6 +3,7 @@ layout: lesson
 title: Get Cubie-1 files
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 04_docker_install.html
 next: 06_clone_images.html
 description: Download the Cubie-1 example files

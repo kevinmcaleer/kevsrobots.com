@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 type: page
 description: Learn how to download, print, assemble, and program the original SMARS robot
-cover: assets/how_to_build_a_smars.jpg
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 ---
 
 ![SMARS Course image]({{page.cover}}){:class="cover"}

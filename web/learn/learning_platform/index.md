@@ -3,6 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
+cover: /learn/learning_platform/assets/learn.jpg
 next: 01_how_to_use.html
 description: How to use the Learning Platform
 percent: 25

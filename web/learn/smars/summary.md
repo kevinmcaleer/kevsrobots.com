@@ -3,11 +3,11 @@ layout: lesson
 title: Summary and Review
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/heroshot.jpg
 previous: smars13.html
 description: A summary of what you have learned so far
 percent: 100
 duration: 1
-cover: assets/heroshot.jpg
 navigation:
 - name: SMARS
 - content:

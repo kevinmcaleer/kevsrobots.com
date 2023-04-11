@@ -3,12 +3,12 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
+cover: /learn/smars/assets/how_to_build_a_smars.jpg
 next: smars01.html
 description: Learn how to download, print, assemble, and program the original SMARS
   robot
 percent: 6
 duration: 2
-cover: assets/how_to_build_a_smars.jpg
 navigation:
 - name: SMARS
 - content:

@@ -3,6 +3,7 @@ layout: lesson
 title: Functions
 author: Kevin McAleer
 type: page
+cover: /learn/micropython/assets/micropython.jpg
 previous: 14_operators.html
 next: 16_repl.html
 description: Learn how to make reusable blocks of code

@@ -3,6 +3,7 @@ layout: lesson
 title: Talker ROS2 Program
 author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
 previous: 09_first_ros_program.html
 next: 11_create_py_package.html
 description: Lets create a talker program to publish messages
