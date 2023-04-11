@@ -1,0 +1,34 @@
+- name: Using Redis with Python
+  author: Kevin McAleer
+  date_created: 2023-04-11
+  date_published: 2023-04-12
+  layout: course
+  cover: assets/redis-cover.jpg
+  description: >- 
+     Learn how to use Redis with Python to build fast, scalable applications.
+  content:
+  - section:
+      name: Introduction to Redis
+      content:
+      - 01_introduction.md
+      - 02_redis_basics.md
+  - section:
+      name: Working with data
+      content:
+      - 03_data_types.md
+      - 04_commands_and_transactions.md
+      - 05_redis_lists.md
+  - section:
+      name: Sets, Hashes and Sorted Sets
+      content:
+      - 06_redis_sets.md
+      - 07_redis_hashes.md
+      - 08_redis_sorted_sets.md
+  - section:
+      name: Publish and Subscribe
+      content:
+      - 09_redis_pub_sub.md      
+  - section:
+      name: Conclusion
+      content:
+      - 10_summary.md

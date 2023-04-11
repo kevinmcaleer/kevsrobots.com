@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Course Builder
 # Kevin McAleer
 # October 2022

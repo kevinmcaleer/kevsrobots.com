@@ -7,6 +7,13 @@
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
 - author: Kevin McAleer
+  cover: /learn/redis/assets/redis-cover.jpg
+  date_published: 2023-04-12
+  description: Learn how to use Redis with Python to build fast, scalable applications.
+  duration: 0h 20m
+  link: /learn/redis/01_introduction.html
+  name: Using Redis with Python
+- author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19
   description: Learn how to 3d print, build and program a SMARS robot
