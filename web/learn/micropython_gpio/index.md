@@ -5,8 +5,8 @@ author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
 next: 01_gpio_pin_types.html
-description: Get started with MicroPython, what it is, where to download it, and which
-  software to use to develop MicroPython code.
+description: Learn how to control the GPIO pins on the Raspberry Pi Pico with MicroPython,
+  and connect different components such as LEDs, motors, and sensors.
 percent: 5
 duration: 3
 navigation:
