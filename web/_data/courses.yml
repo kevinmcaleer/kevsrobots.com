@@ -51,6 +51,15 @@
   link: /learn/smars_quad/00_intro.html
   name: SMARS Quad
 - author: Kevin McAleer
+  cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+  date_published: 2023-04-14
+  description: Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython.
+    Learn about various types of pins, their functions, and how to work with them
+    in real-world projects.
+  duration: 0h 36m
+  link: /learn/micropython_gpio/00_intro.html
+  name: Raspberry Pi Pico with MicroPython - GPIO Mastery
+- author: Kevin McAleer
   cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
   date_published: 2023-01-29
   description: Robot Eye Mechansim, is a course that will teach you how to use Fusion

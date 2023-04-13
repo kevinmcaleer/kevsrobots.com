@@ -374,3 +374,18 @@
     In the 1970s the solderless breadboard (a.k.a. plugboard, a terminal array board) became available and nowadays the term "breadboard" is commonly used to refer to these.
   link: https://en.wikipedia.org/wiki/Breadboard
   article: /resources/how_it_works/breadboards
+- term: Level shifter
+  definition: Level shifter
+  full: >-
+    A level shifter is a circuit that converts a signal from one voltage level to another.
+    It is used to convert a signal from one voltage level to another.
+  link: https://en.wikipedia.org/wiki/Level_shifter
+  # article: /resources/how_it_works/level_shifters
+- term: DHT11
+  definition: DHT11
+  full: >-
+    The DHT11 is a basic, ultra low-cost digital temperature and humidity sensor.
+    It uses a capacitive humidity sensor and a thermistor to measure the surrounding air, and spits out a digital signal on the data pin (no analog input pins needed).
+    Its fairly simple to use, but requires careful timing to grab data.
+  link: https://learn.adafruit.com/dht
+  # article: /resources/how_it_works/dht11

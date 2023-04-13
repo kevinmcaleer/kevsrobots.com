@@ -1,0 +1,51 @@
+- name: Raspberry Pi Pico with MicroPython - GPIO Mastery
+  author: Kevin McAleer
+  date_created: 2023-04-13
+  date_published: 2023-04-14
+  layout: course
+  cover: assets/raspberry_pi_pico_gpio.jpg
+  description: >- 
+     Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython. Learn about various types of pins, their functions, and how to work with them in real-world projects.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Introduction to GPIO Pins
+      content:
+      - 01_gpio_pin_types.md
+      - 02_pin_numbering.md
+      - 03_voltage_levels.md
+  - section:
+      name: Digital I/O and PWM
+      content:
+      - 04_digital_io.md
+      - 05_pwm.md
+      - 06_leds.md
+      - 07_motors.md
+  - section:
+      name: Analog I/O (ADC)
+      content:
+      - 08_adc.md
+      - 09_potentiometers.md
+      - 10_temperature_sensors.md
+  - section:
+      name: UART, I2C, and SPI
+      content:
+      - 11_uart.md
+      - 12_i2c.md
+      - 13_spi.md
+  - section:
+      name: Interfacing with Servos and Ultrasonic Range Finders
+      content:
+      - 14_servos.md
+      - 15_ultrasonic_range_finders.md
+  - section:
+      name: Ground Pins
+      content:
+      - 16_ground_pins.md
+  - section:
+      name: Summary and Review
+      content:
+      - 17_summary.md
