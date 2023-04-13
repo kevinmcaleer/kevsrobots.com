@@ -2,7 +2,7 @@
 layout: lesson
 title: Introduction
 type: page
-description: Get started with MicroPython, what it is, where to download it, and which software to use to develop MicroPython code.
+description: Learn how to control the GPIO pins on the Raspberry Pi Pico with MicroPython, and connect different components such as LEDs, motors, and sensors.
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}
