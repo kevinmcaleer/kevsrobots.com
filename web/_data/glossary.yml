@@ -360,3 +360,17 @@
     The RGB chip can generate a variety of colors.
   link: https://www.seeedstudio.com/blog/2018/06/28/ws2812b/
   article: /resources/how_it_works/rgb-led_strips
+- term: redis
+  definition: redis
+  full: >-
+    Redis is an open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
+  link: https://redis.io/
+  article: /learn/redis/
+- term: breadboard
+  definition: breadboard
+  full: >-
+    A breadboard is a construction base for prototyping of electronics.
+    Originally it was literally a bread board, a polished piece of wood used for slicing bread.
+    In the 1970s the solderless breadboard (a.k.a. plugboard, a terminal array board) became available and nowadays the term "breadboard" is commonly used to refer to these.
+  link: https://en.wikipedia.org/wiki/Breadboard
+  article: /resources/how_it_works/breadboards
