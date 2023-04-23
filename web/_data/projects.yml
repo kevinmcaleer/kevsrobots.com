@@ -1,3 +1,8 @@
+- name: Pi-Card
+  link: /blog/pico-birthday-card.html
+  cover: /assets/img/blog/picard/picard.jpg
+  description: "Raspberry Pi Powered Birthday Card"
+  date: 2023-04-23
 - name: Ikea Lamp Hack
   link: /blog/ikea-lamp-hack.html
   cover: /assets/img/blog/ikea_hack/ikea_hack.jpg
