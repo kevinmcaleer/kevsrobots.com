@@ -24,13 +24,14 @@ tags:
 ---
 
 ### BurgerBot
+
 BurgerBot, as the name suggests, is a Burger-shaped robot. BurgerBot is quick and easy to print and assemble, with a low build cost. The Raspberry Pi Pico and Pico W board power the robot making it easy to program with MicroPython.
 
 It uses two Micro Metal Motor which connect to the [Motor SHIM for Pico](https://shop.pimoroni.com/products/motor-shim-for-pico) from Pimoroni, and a Galleon Battery, which connects to the [LiPo SHIM for Pico](https://shop.pimoroni.com/products/pico-lipo-shim).
 
 BurgerBot has an ultrasonic rangefinder mounted at the front; however, this needs to be the 3.3v variant (a later post will cover the wiring).
 
-BurgerBot also features two moon-buggy wheels that attach directly to the motors. In addition, there are two little 'nubs' underneath to stop the robot from falling over backwards or forwards. 
+BurgerBot also features two moon-buggy wheels that attach directly to the motors. In addition, there are two little 'nubs' underneath to stop the robot from falling over backwards or forwards.
 
 The top section has four mounting holes to secure the Pico using four M2 screws.
 
@@ -42,7 +43,7 @@ Part                                                                            
 ---------------------------------------------------------------------------------------------------------|-------------------------------------|-----|-----:
 [Ultrasonic Range Finder](https://shop.pimoroni.com/products/ultrasonic-distance-sensor)                 | Measures distance using sound waves | 1   | £6.90
 [Motor SHIM for Pico](https://shop.pimoroni.com/products/motor-shim-for-pico)                            | drives the motors                   | 1   | £9.60
-[LiPo SHIM for Pico ](https://shop.pimoroni.com/products/pico-lipo-shim)                                 | powers the robot via a LiPo battery | 1   |  £7.5
+[LiPo SHIM for Pico](https://shop.pimoroni.com/products/pico-lipo-shim)                                 | powers the robot via a LiPo battery | 1   |  £7.5
 [Micro Metal Motors](https://shop.pimoroni.com/products/micro-metal-gearmotor-with-motor-connector-shim) | moves the robot around              | 2   | £5.46
 [Moon Buggy Tyres](https://shop.pimoroni.com/products/moon-buggy-wheels-pair)                            | provide grip and traction           | 2   | £4.50
 [Galleon Battery](https://shop.pimoroni.com/products/galleon-400mah-battery)                             | 400mah hardcase LiPo Battery        | 1   | £7.50

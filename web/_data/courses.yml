@@ -60,6 +60,13 @@
   link: /learn/micropython_gpio/00_intro.html
   name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - author: Kevin McAleer
+  cover: /learn/burgerbot/assets/burgerbot.jpg
+  date_published: 2023-04-27
+  description: Build a simple round robot powered by Raspberry Pi Pico
+  duration: 3h 52m
+  link: /learn/burgerbot/00_intro.html
+  name: Build your own BurgerBot
+- author: Kevin McAleer
   cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
   date_published: 2023-01-29
   description: Robot Eye Mechansim, is a course that will teach you how to use Fusion

@@ -68,7 +68,7 @@ navigation:
 ---
 
 
-Welcome to Lesson 10 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, you will learn how to use UART (Universal Asynchronous Receiver/Transmitter) to communicate between your Raspberry Pi Pico board and other devices. UART is a common serial communication protocol used to connect microcontrollers to other devices such as sensors, displays, and GPS modules.
+Welcome to Lesson 11 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, you will learn how to use UART (Universal Asynchronous Receiver/Transmitter) to communicate between your Raspberry Pi Pico board and other devices. UART is a common serial communication protocol used to connect microcontrollers to other devices such as sensors, displays, and GPS modules.
 
 ## What is UART?
 

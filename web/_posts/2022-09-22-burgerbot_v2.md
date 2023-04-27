@@ -64,6 +64,7 @@ The pen is at the very center of the robot, between the wheels which makes drawi
 ---
 
 ## Battery Holder
+
 We love the [Galleon Battery](https://shop.pimoroni.com/products/galleon-400mah-battery) from Pimoroni; it's a hardcase, 400mAh LiPo battery, with a convienient JST-PH connector.
 
 The battery is now located in the rear support section, back to back with the Raspberry Pi Pico W.
@@ -74,6 +75,7 @@ The battery is now located in the rear support section, back to back with the Ra
 ---
 
 ## Pico holder
+
 The rear support also has mounting points for the Pico W, with holes for 4 M2 screws. There is also a small channel for the Battery wire to route from the other side.
 
 [![Pico Holder](/assets/img/blog/burgerbot/pico_holder.png){:class="img-fluid w-75 rounded"}](/assets/img/blog/burgerbot/pico_holder.png)
@@ -87,6 +89,7 @@ Here is a photo of the Pico W, Pico Lipo Shim and Pico Motor Pack assembly, with
 ---
 
 ## Access Point mode
+
 You can now connect to BurgerBot using Wifi via access point mode. This means you can remotely control the robot using a mobile phone, tablet or laptop simply by connecting to the wifi hot spot provided by BurgerBot.
 
 When you connect to the wifi hot spot your browser will be redirected to the interally hosted web page, where you can control the robot.
@@ -94,11 +97,13 @@ When you connect to the wifi hot spot your browser will be redirected to the int
 ---
 
 ## New Look
+
 The front of BurgerBot now has an inset providing a fresh, clean new look. The wheels are also of the new, slimmer design, making for a more compact robot.
 
 ---
 
 ## Logo
+
 One of the very first programmable robots for education used a language called Logo to issue movement commands. Logo also had a PenUp() and PenDown() command to raise and lower a pen. Taking inspration from this, BurgerBot will also support some Logo commands [^1]
 
 [^1]: Coming soon
@@ -106,6 +111,7 @@ One of the very first programmable robots for education used a language called L
 ---
 
 ## Parts
+
 Below is a list of parts with links - if you do some research you may be able to find the parts much cheaper.
 
 Part                                                                                                     | Description                         | Qty           |      Price

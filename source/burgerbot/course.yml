@@ -1,0 +1,37 @@
+- name: Build your own BurgerBot
+  author: Kevin McAleer
+  date_created: 2023-04-27
+  date_published: 2023-04-27
+  layout: course
+  cover: assets/burgerbot.jpg
+  description: >- 
+     Build a simple round robot powered by Raspberry Pi Pico
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_why_video.md
+      - 01_what_is_burger_bot.md
+  - section:
+      name: Assembling the parts
+      content:
+      - 02_assembly.md
+      - 02_video.md
+  - section:
+      name: Installing the code
+      content:
+      - 03_getting_the_code.md
+      - 04_loading_the_code.md
+  - section:
+      name: Programming in MicroPython
+      content:
+      - 05_basic_movement.md
+      - 06_measuring_distance.md
+      - 07_object_avoidance.md
+  - section:
+      name: Upgrades
+      content:
+      - 08_video.md
+      - 08_line_following.md
+      - 09_camera.md

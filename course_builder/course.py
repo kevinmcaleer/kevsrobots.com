@@ -86,11 +86,22 @@ class Course():
                 lesson=yaml.safe_load(a)
             except yaml.YAMLError as exc:
                 print(exc)
-            # print('lesson is: ', lesson['title'])
-            words = len(lesson)
-            # print(f'words is: {words}')
-            duration = ceil(words/200)    
-            # print(f'duration is: {duration}')
+
+            # Check the lesson markdown file for a duration
+
+            if 'duration' in lesson:
+                try:
+                    duration = lesson['duration']
+                except KeyError:
+                    duration = 0
+                # print(f'duration is: {duration}')
+            else:
+
+                # print('lesson is: ', lesson['title'])
+                words = len(lesson)
+                # print(f'words is: {words}')
+                duration = ceil(words/200)    
+                # print(f'duration is: {duration}')
         return duration
 
     def read_course(self, course_folder):
