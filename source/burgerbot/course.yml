@@ -34,4 +34,5 @@
       content:
       - 08_video.md
       - 08_line_following.md
+      - 08_line_following_code.md
       - 09_camera.md

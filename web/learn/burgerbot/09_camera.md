@@ -4,7 +4,7 @@ title: Camera
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
-previous: 08_line_following.html
+previous: 08_line_following_code.html
 description: null
 percent: 100
 duration: 1
@@ -45,6 +45,33 @@ navigation:
       link: 08_video.html
     - name: Line Following
       link: 08_line_following.html
+    - name: Line Following Code
+      link: 08_line_following_code.html
     - name: Camera
       link: 09_camera.html
+---
+
+
+## Vision
+
+Another fun upgrade for your Burgerbot is a camera. The ESP32-Cam module is a cheap and easy to use camera module that can be powered from the Pico's `5v` and `GND` pins. The Camera module hosts its own webserver and can stream the video over wifi to a browser.
+
+[![Camera Module](assets/camera_module.jpg){:class="img-fluid w-100"}](assets/camera_module.jpg)
+
+---
+
+## Setting up the camera
+
+The first time you plug in the camera it will broadcast its own Wifi hotspot ID that you will need to connect to. You can then connect it to your local Wifi hotspot with the password too. The next time it restarts it will remember these settings and connect up. You will need to check the devices connected to your router to find the IP address of the camera, however once you have this you can type that into your browser and being viewing what the robot can see.
+
+---
+
+## The Camera holder 3D Printable part
+
+The camera module requires the existing BurgerBot range finder holder is replaced with a new 3d printable part.
+
+Click here to download the new Camera holder:
+
+* [`camera_holder.stl`](/assets/stl/burgerbot_v2/camera_holder.stl) - The Camera Holder
+
 ---

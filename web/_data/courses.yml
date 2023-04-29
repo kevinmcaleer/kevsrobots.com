@@ -63,7 +63,7 @@
   cover: /learn/burgerbot/assets/burgerbot.jpg
   date_published: 2023-04-27
   description: Build a simple round robot powered by Raspberry Pi Pico
-  duration: 3h 52m
+  duration: 3h 54m
   link: /learn/burgerbot/00_intro.html
   name: Build your own BurgerBot
 - author: Kevin McAleer

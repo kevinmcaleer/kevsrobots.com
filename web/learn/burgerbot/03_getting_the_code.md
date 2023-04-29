@@ -46,6 +46,8 @@ navigation:
       link: 08_video.html
     - name: Line Following
       link: 08_line_following.html
+    - name: Line Following Code
+      link: 08_line_following_code.html
     - name: Camera
       link: 09_camera.html
 ---
@@ -84,20 +86,19 @@ The `BurgerBot` class contains the following methods:
 
 Method | Description
 ---|---
-`__init__(self)` | Initializes the BurgerBot class with a list of motors, `MOTOR_PINS`, and sets the `__speed` variable to 0.
-`line_detected(self) -> bool` | Returns a boolean value indicating whether a line has been detected by the line sensor.
-`pen_middle(self)` | Moves the pen servo to the middle position.
-`pen_down(self)` | Moves the pen servo to the down position.
-`pen_up(self)` | Moves the pen servo to the up position.
-`forward(self)` | Drives the motors forward.
-`backward(self)` | Drives the motors backward.
-`turnleft(self)` | Turns the motors left.
-`turnright(self)` | Turns the motors right.
-`stop(self)` | Stops the motors.
-`left_motor(self, speed)` | Sets the speed of the left motor to the provided value.
-`right_motor(self, speed)` | Sets the speed of the right motor to the provided value.
-`speed(self) -> float` | Returns the current speed of the motors.
-`speed(self, value)` | Sets the speed of the motors to the provided value.
+`__init__()` | Initializes the BurgerBot class with a list of motors, `MOTOR_PINS`, and sets the `__speed` variable to 0.
+`line_detected() -> bool` | Returns a boolean value indicating whether a line has been detected by the line sensor.
+`pen_middle()` | Moves the pen servo to the middle position.
+`pen_down()` | Moves the pen servo to the down position.
+`pen_up()` | Moves the pen servo to the up position.
+`forward(duration)` | Drives the motors forward, the 'duration' is optional and moves for the time specified
+`turnleft(duration)` | Turns the motors left, the 'duration' is optional and moves for the time specified
+`turnright(duration)` | Turns the motors right, the 'duration' is optional and moves for the time specified
+`stop()` | Stops the motors.
+`left_motor(speed)` | Sets the speed of the left motor to the provided value.
+`right_motor(speed)` | Sets the speed of the right motor to the provided value.
+`speed() -> float` | Returns the current speed of the motors.
+`speed(value)` | Sets the speed of the motors to the provided value.
 {:class="table table-code-fit"}
 ---
 

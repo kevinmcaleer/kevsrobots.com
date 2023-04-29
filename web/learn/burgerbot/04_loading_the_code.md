@@ -46,6 +46,8 @@ navigation:
       link: 08_video.html
     - name: Line Following
       link: 08_line_following.html
+    - name: Line Following Code
+      link: 08_line_following_code.html
     - name: Camera
       link: 09_camera.html
 ---

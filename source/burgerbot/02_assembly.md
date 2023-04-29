@@ -36,6 +36,6 @@ Step | Detail
 1. Add the motor cables. If you forgot to do this before, you can undo the motor holders and then re-screw them back into place.
 1. Crimp some female to male Dupont cables and connect the servo to the pins on the back of the Pico.
 1. Check your connections and run some code to test your Burger bot.
-1. By following these steps, you can build your own Burger bot just like the one in the video.
+1. By following these steps, you can build your own Burger bot just like the one in the [video](https://youtu.be/5G6psAuTYT4).
 
 ---
