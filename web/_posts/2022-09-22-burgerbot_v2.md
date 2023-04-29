@@ -17,6 +17,14 @@ tags:
  
 ---
 
+## New BurgerBot Course
+
+Learn how to build your own BurgerBot with the new course:
+
+[![BurgerBot Course](/learn/burgerbot/assets/burgerbot.jpg){:class="img-fluid w-50 rounded-3"}](/learn/burgerbot/)
+
+---
+
 ## Table of Contents
 
 {:toc}
@@ -25,6 +33,7 @@ tags:
 ---
 
 ## Videos
+
 There are a couple of videos covering the features, demo and build process for BurgerBot, as well as the original BurgerBot and why I created it.
 
 {% include youtubeplayer.html id="5G6psAuTYT4" %}
