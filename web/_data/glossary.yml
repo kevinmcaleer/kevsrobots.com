@@ -389,3 +389,10 @@
     Its fairly simple to use, but requires careful timing to grab data.
   link: https://learn.adafruit.com/dht
   # article: /resources/how_it_works/dht11
+- term: H-Bridge
+  definition: H-Bridge
+  full: >-
+    An H bridge is an electronic circuit that enables a voltage to be applied across a load in either direction.
+    These circuits are often used in robotics and other applications to allow DC motors to run forwards or backwards.
+  link: https://en.wikipedia.org/wiki/H_bridge
+  article: /resources/how_it_works/h-bridges
