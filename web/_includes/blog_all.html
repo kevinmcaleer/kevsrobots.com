@@ -3,6 +3,7 @@
     {% include blog_archive.html %}
     </div>
     <div class="col-md-9">
+        <img src="/assets/img/heatmap.png" class="img-fluid w-100" alt="Heat Map">
     {% for post in site.posts %}
         
         {% assign currentdate = post.date | date: "%B %Y" %}

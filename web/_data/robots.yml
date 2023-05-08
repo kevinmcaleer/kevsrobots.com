@@ -1,3 +1,8 @@
+- name: Chip
+  link: /blog/chip.html
+  cover: /assets/img/blog/chip/chip.png
+  description: A cute, 3D Printable Humanoid Robot
+  date: 2023/05/08
 - name: Self Balancing Robot
   link: /blog/pybricks.html
   cover: /assets/img/blog/pybricks/pybricks01.jpg
