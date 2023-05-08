@@ -1,4 +1,4 @@
-venv
+venv*
 *.pyc
 _site/
 web/.jekyll-cache

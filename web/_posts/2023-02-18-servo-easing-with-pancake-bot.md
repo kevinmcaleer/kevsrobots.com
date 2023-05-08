@@ -4,7 +4,7 @@ title: Servo Easing & Pancake-Bot
 description: Learn Servo easing in MicroPython with Pancake-Bot
 short_title: Servo Easing
 short_description: Learn Servo easing in MicroPython with Pancake-Bot
-date: 23-02-18
+date: 2023-02-18
 author: Kevin McAleer
 excerpt: Learn how to use Easing algorithms for servos using MicroPython, with Pancake-Bot
 cover: /assets/img/blog/easing/pancakebot.jpg

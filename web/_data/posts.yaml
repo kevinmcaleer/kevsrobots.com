@@ -1,0 +1,154 @@
+posts:
+- title: Next Cube - a Homage to the original WWW server
+  url: /2022-08-28-next-cube.md
+  date: 2022-08-28
+- title: SMARS Mini
+  url: /2023-01-22-smars-mini.md
+  date: 2023-01-22
+- title: Learn now live!
+  url: /2022-12-04-learn_micropython.md
+  date: 2022-12-04
+- title: How to setup a Phew! Access Point
+  url: /2022-09-04-phew-access-point.md
+  date: 2022-09-04
+- title: Pico-Deck
+  url: /2023-03-14-picodeck.md
+  date: 2023-03-14
+- title: Spooky Scary Skeleton
+  url: /2022-10-09-spooky-scary-skeleton.md
+  date: 2022-10-09
+- title: Camera Module 3 Stand
+  url: /2023-01-11-giraffe-stand.md
+  date: 2023-01-11
+- title: SMARS Inventor
+  url: /2022-08-29-smars_inventor.md
+  date: 2022-08-29
+- title: Hack a Big Mouth Billy Bass
+  url: /2022-07-09-big-mouth.md
+  date: 2022-07-09
+- title: Where is my robot butler?
+  url: /2023-03-20-robot-butler.md
+  date: 2023-03-20
+- title: Bugs the Robo-Bunny
+  url: /2022-04-10-robobunny.md
+  date: 2022-04-10
+- title: Cyberglasses
+  url: /2023-01-16-cyberglasses.md
+  date: 2023-01-16
+- title: Pi Stand v6
+  url: /2023-02-22-pi-stand-v6.md
+  date: 2023-02-22
+- title: What is MicroPython?
+  url: /2023-03-20-what-is-micropython.md
+  date: 2023-03-20
+- title: Duckface
+  url: /2023-02-26-duckface.md
+  date: 2023-02-22
+- title: Radar robot
+  url: /2022-11-06-radar-robot.md
+  date: 2022-11-06
+- title: Explora 3D files
+  url: /2022-05-16-explora.md
+  date: 2022-05-15
+- title: Robotics Roadmap
+  url: /2023-03-21-roadmap.md
+  date: 2023-03-21
+- title: PicoCrab 2
+  url: /2023-03-05-picocrab2.md
+  date: 2023-03-05
+- title: Pybricks
+  url: /2023-04-02-pybricks.md
+  date: 2023-04-02
+- title: Zero Stand
+  url: /2022-05-15-zero-stand.md
+  date: 2022-05-15
+- title: Worlds most advanced Bauble
+  url: /2022-11-14-worlds-most-advanced-bauble.md
+  date: 2022-11-06
+- title: Galactic Hero Game
+  url: /2022-12-13-galactic_hero.md
+  date: 2022-12-13
+- title: Simple Robot Arm
+  url: /2022-09-25-simple-robot-arm.md
+  date: 2022-09-25
+- title: Meet Cubie-1
+  url: /2023-01-01-meet-cubie.md
+  date: 2023-01-01
+- title: Atari 2600 Compute Module Case
+  url: /2022-12-20-atari-2600.md
+  date: 2022-12-20
+- title: Rover the Mecanum Robot
+  url: /2022-04-30-Rover-mecanum.md
+  date: 2022-04-30
+- title: Bubo-2T
+  url: /2023-02-04- bubo-2t.md
+  date: 2023-02-04
+- title: Pi-PipBoy
+  url: /2023-03-26-pi-pipboy.md
+  date: 2023-03-26
+- title: Power up your robot projects
+  url: /2023-03-20-power.md
+  date: 2023-03-19
+- title: 3 parts are now available!
+  url: /2022-10-12-build-your-own-ai-series.md
+  date: 2022-10-12
+- title: Pico Birthday Card
+  url: /2023-04-23-pico-birthday-card.md
+  date: 2023-04-23
+- title: Welcome to Kev's Robots
+  url: /2022-01-27-welcome-to-kevsrobots.md
+  date: 2022-01-28
+- title: PicoCat Lives
+  url: /2022-04-01-picocat-lives.md
+  date: 2022-04-01
+- title: Pomodoro Robot!
+  url: /2022-10-01-pomodoro-bot.md
+  date: 2022-10-02
+- title: 10 Tips for getting started
+  url: /2023-01-10-10-tips-for-getting-started-with-robotics.md
+  date: 2023-01-10
+- title: Servo Easing & Pancake-Bot
+  url: /2023-02-18-servo-easing-with-pancake-bot.md
+  date: 2023-02-18
+- title: PicoCat v2
+  url: /2022-03-25-picocat-v2.md
+  date: 2022-03-25
+- title: Iskarni Hack
+  url: /2023-04-08-ikea-lamp-hack.md
+  date: 2023-04-09
+- title: Everything I made in 2022
+  url: /2022-12-14-end-of-year-review.md
+  date: 2022-12-13
+- title: BurgerBot - a simple 3D Printable Robot
+  url: /2022-08-23-Burgerbot.md
+  date: 2022-08-24
+- title: The Three Laws of Robotics
+  url: /2023-03-23-three-laws-of-robotics.md
+  date: 2023-03-23
+- title: Ghostbusters Wifi Scanner
+  url: /2022-12-21-ghostbusters-wifi.md
+  date: 2022-12-21
+- title: BurgerBot V2 - Quick on the Draw
+  url: /2022-09-22-burgerbot_v2.md
+  date: 2022-09-22
+- title: New ROS Course
+  url: /2023-01-08-learn_ros_with_me.md
+  date: 2023-01-08
+- title: Common Part Dimensions
+  url: /2022-09-12-common-part-dimensions.md
+  date: 2022-09-12
+- title: Pimoroni Enviro Indoor Stevenson Screen case
+  url: /2022-08-10-enviro-case.md
+  date: 2022-08-10
+- title: Self Watering Plants
+  url: /2023-03-11-self-watering-plants.md
+  date: 2023-03-11
+- title: Ghostbox
+  url: /2023-02-27-ghostbox.md
+  date: 2023-02-27
+- title: Pi Stands
+  url: /2022-05-22-pistands.md
+  date: 2022-05-22
+- title: PIKON Camera - Raspberry Pi High Quality Camera Project
+  url: /2022-08-23-pikon-camera.md
+  date: 2022-08-23
