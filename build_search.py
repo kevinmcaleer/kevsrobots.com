@@ -24,7 +24,7 @@ def convert_data(data):
     return new_data
 
 if __name__ == '__main__':
-    input_file_path = ['web/_data/courses.yml','web/_data/glossary.yml']
+    input_file_path = ['web/_data/courses.yml','web/_data/glossary.yml','web/_data/posts.yaml']
     output_file_path = 'web/assets/data/data.yml'
 
     for file in input_file_path:
