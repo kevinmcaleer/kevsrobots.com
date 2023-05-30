@@ -92,6 +92,7 @@ def create_calendar_heatmap(posts, year):
     plt.title(f'Blog Posts Calendar ({year})')
     ax = plt.gca()
     ax.set_frame_on(False)
+    print("Saving heatmap.png")
     plt.savefig('web/assets/img/heatmap.png', dpi=300, bbox_inches='tight')
     # plt.show()
 

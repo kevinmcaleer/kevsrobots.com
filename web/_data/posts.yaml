@@ -5,6 +5,9 @@ posts:
 - title: SMARS Mini
   url: /2023-01-22-smars-mini.md
   date: 2023-01-22
+- title: Pinout.XYZ
+  url: /2023-05-28-pinout-xyz.md
+  date: 2023-05-28
 - title: Learn now live!
   url: /2022-12-04-learn_micropython.md
   date: 2022-12-04
@@ -113,6 +116,9 @@ posts:
 - title: PicoCat v2
   url: /2022-03-25-picocat-v2.md
   date: 2022-03-25
+- title: Makers Central
+  url: /2023-05-22-makers_central.md
+  date: 2023-05-22
 - title: Iskarni Hack
   url: /2023-04-08-ikea-lamp-hack.md
   date: 2023-04-09
@@ -149,6 +155,9 @@ posts:
 - title: Pi Stands
   url: /2022-05-22-pistands.md
   date: 2022-05-22
+- title: Chip
+  url: /2023-05-05-chip.md
+  date: 2023-05-05
 - title: PIKON Camera - Raspberry Pi High Quality Camera Project
   url: /2022-08-23-pikon-camera.md
   date: 2022-08-23
