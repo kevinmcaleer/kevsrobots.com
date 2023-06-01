@@ -396,3 +396,31 @@
     These circuits are often used in robotics and other applications to allow DC motors to run forwards or backwards.
   link: https://en.wikipedia.org/wiki/H_bridge
   article: /resources/how_it_works/h-bridges
+- term: Electrode
+  definition: Electrode
+  full: >-
+    An electrode is an electrical conductor used to make contact with a nonmetallic part of a circuit (e.g. a semiconductor, an electrolyte, a vacuum or air).
+    The word was coined by William Whewell at the request of the scientist Michael Faraday from two Greek words: elektron, meaning amber (from which the word electricity is derived), and hodos, a way.
+  link: https://en.wikipedia.org/wiki/Electrode
+  article: /resources/how_it_works/potato-battery
+- term: electrolyte
+  definition: electrolyte
+  full: >-
+    An electrolyte is a substance that produces an electrically conducting solution when dissolved in a polar solvent, such as water.
+    The dissolved electrolyte separates into cations and anions, which disperse uniformly through the solvent.
+  link: https://en.wikipedia.org/wiki/Electrolyte
+  article: /resources/how_it_works/potato-battery
+- term: cation
+  definition: cation
+  full: >-
+    A cation is a positively charged ion.
+    It may be a monatomic ion or a polyatomic ion.
+  link: https://en.wikipedia.org/wiki/Cation
+  article: /resources/how_it_works/potato-battery
+- term: anion
+  definition: anion
+  full: >-
+    An anion is a negatively charged ion.
+    It may be a monatomic ion or a polyatomic ion.
+  link: https://en.wikipedia.org/wiki/Anion
+  article: /resources/how_it_works/potato-battery
