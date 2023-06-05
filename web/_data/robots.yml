@@ -1,3 +1,8 @@
+- name: MeArm
+  link: /blog/mearm.html
+  cover: /assets/img/blog/mearm/mearm.jpg
+  description: The robotic arm Kit from MeArm
+  date: 2023/06/05
 - name: Chip
   link: /blog/chip.html
   cover: /assets/img/blog/chip/chip.png
