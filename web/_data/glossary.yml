@@ -424,3 +424,10 @@
     It may be a monatomic ion or a polyatomic ion.
   link: https://en.wikipedia.org/wiki/Anion
   article: /resources/how_it_works/potato-battery
+- term: debounce
+  definition: debouncing
+  full: >-
+    Debouncing is the process of removing the small ripple that forms on the output of a switch when it is pressed and released.
+    The effect, from a data input perspective is that the switch is pressed multiple times. Adding a debounce in software or hardware removes this effect.
+  link: https://en.wikipedia.org/wiki/Debounce
+  article: /resources/how_it_works/tact
