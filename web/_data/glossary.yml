@@ -431,3 +431,11 @@
     The effect, from a data input perspective is that the switch is pressed multiple times. Adding a debounce in software or hardware removes this effect.
   link: https://en.wikipedia.org/wiki/Debounce
   article: /resources/how_it_works/tact
+- term: tactile switch
+  definition: tactile switch
+  full: >-
+    A tactile switch is a switch whose operation is perceptible by touch.
+    A main area of tactile switches, are tact switches.
+    These switches are small in size and are commonly used in PDAs, mobile phones and other consumer electronic devices.
+  link: https://en.wikipedia.org/wiki/Tactile_switch
+  article: /resources/how_it_works/tact
