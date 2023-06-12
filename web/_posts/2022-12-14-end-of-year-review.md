@@ -30,7 +30,7 @@ In January 2022 the YouTube channel had `3784` Subscribers, which was a growth o
 
 My projects featured in The MagPi Magazine (the official magazine of Raspberry Pi), a number of times:
 
-* Ghostbusters Wifi project
+* Ghostbusters Wi-Fi project
 * Cyberdog RGB LED Coat
 * Feature on me as a Maker
 * Big Mouth Billy Bass project
@@ -155,8 +155,8 @@ Title                                                                           
 ---------------------------------------------------------------------------------------------------------|---------------------------------------------------------|---------|-----------:
 [Raspberry Pi Pico W Robot - BurgerBot gets an upgrade](https://www.youtube.com/watch?v=jnPR6XAuJ2U)                | BurgerBot v2                                            | Robot   |  3 Jul 2022
 [Raspberry Pi Pico W Robot - Hacking Big Mouth Billy Bass](https://www.youtube.com/watch?v=dOEjfBplueM)             | Its an [Internet controllable fish](https://mouthpi.co) | Project | 10 Jun 2022
-[Raspberry Pi Pico W Ghostbusters PKE style WiFi scanner](https://www.youtube.com/watch?v=XTUOUlSnVpc)              | My favourite project                                    | Project | 17 Jul 2022
-[SMARS Inventor - the Pimoroni Inventor 2040W](https://www.youtube.com/watch?v=MP-kS9g5ui8)                         | A new SMARS robot                                       | Robot   | 24 Jul 2022
+[Raspberry Pi Pico W Ghostbusters PKE style Wi-Fi scanner](https://www.youtube.com/watch?v=XTUOUlSnVpc)              | My favourite project                                    | Project | 17 Jul 2022
+[SMARS Inventor - the Pimoroni Inventor 2040 W](https://www.youtube.com/watch?v=MP-kS9g5ui8)                         | A new SMARS robot                                       | Robot   | 24 Jul 2022
 [How to log motion sensor to google sheets with a Raspberry Pi Pico W](https://www.youtube.com/watch?v=OZ60ws-5jP4) | Does what it says                                       | Project | 31 Jul 2022
 Atari 2600 Raspberry Pi Compute module                                                                   | Atari 2600 Fusion 360 build - write up due in 2023      | Project | 25 Jul 2022
 {:class="table table-striped"}
@@ -178,7 +178,7 @@ Title                                                                           
 
 Title                                             | Description                                | Type    |        Date
 --------------------------------------------------|--------------------------------------------|---------|-----------:
-[How to build a captive portal with MicroPython](https://www.youtube.com/watch?v=2Y42DSZpR0w)    | Build a Wifi Hotspot with a Pico W         | Project |  4 Sep 2022
+[How to build a captive portal with MicroPython](https://www.youtube.com/watch?v=2Y42DSZpR0w)    | Build a Wi-Fi Hotspot with a Pico W         | Project |  4 Sep 2022
 [Cyberdog Coat build and test](https://www.youtube.com/watch?v=_FK4afSG5fA)                      | Archie gets an overengineered RGB LED Coat | Project | 11 Sep 2022
 [Simple Robot Arm you can build yourself](https://www.youtube.com/watch?v=HmZF6e3I1Lo)           | Robotic Arm                                | Robot   | 18 Sep 2022
 [BurgerBot v2 - how to make a robot THAT CAN DRAW!](https://www.youtube.com/watch?v=CYP3oL3Vs9o) | BurgerBot v2 - with Pen module             | Robot   | 25 Sep 2022

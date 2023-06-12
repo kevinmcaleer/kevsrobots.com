@@ -11,6 +11,7 @@ tags:
  - SMARS
  - Mini
  - Tiny Robot
+ - 3D Printing
 ---
 
 ## Contents

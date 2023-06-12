@@ -1,6 +1,6 @@
 ---
 layout: review
-title: Pimoroni Inventor 2040W
+title: Pimoroni Inventor 2040 W
 author: Kevin McAleer
 date: 22-09-05
 excerpt: Buy if you can. This is a great board, packed full of features including 2 micro metal motor encoder connectors, speaker output, and built-in Raspberry Pi Pico W providing wireless access.

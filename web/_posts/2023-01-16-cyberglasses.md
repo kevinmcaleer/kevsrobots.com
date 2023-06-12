@@ -10,7 +10,7 @@ cover: /assets/img/blog/cyberglasses/cyberglasses04.png
 tags:
  - Wearable
  - Tips
- - 3dprinted
+ - 3D Printing
  - Cyberglasses
 ---
 

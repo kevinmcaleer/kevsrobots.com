@@ -1,0 +1,14 @@
+{% assign robots = site.data.robots %}
+{% for robot in robots %}
+<ul class="m-0 p-0">
+    {% assign currentdate = robot.date | date: "%B %Y" %}
+      {% if currentdate != date %}
+        <h5 class="mt-3 mb-0"><a id="y{{currentdate}}">{{ currentdate }}</a></h5>
+        {% assign date = currentdate %} 
+      {% endif %}
+
+    <li class="list-unstyled mt-1">
+        <a class="orange" href="{{robot.link}}">{{robot.name}}</a>
+    </li>
+</ul>
+{% endfor %}

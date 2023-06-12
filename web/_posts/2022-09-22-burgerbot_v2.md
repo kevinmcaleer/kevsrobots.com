@@ -14,6 +14,7 @@ tags:
  - Robot
  - MicroPython
  - Logo
+ - 3D Printing
  
 ---
 
@@ -99,9 +100,9 @@ Here is a photo of the Pico W, Pico Lipo Shim and Pico Motor Pack assembly, with
 
 ## Access Point mode
 
-You can now connect to BurgerBot using Wifi via access point mode. This means you can remotely control the robot using a mobile phone, tablet or laptop simply by connecting to the wifi hot spot provided by BurgerBot.
+You can now connect to BurgerBot using Wi-Fi via access point mode. This means you can remotely control the robot using a mobile phone, tablet or laptop simply by connecting to the Wi-Fi hot spot provided by BurgerBot.
 
-When you connect to the wifi hot spot your browser will be redirected to the interally hosted web page, where you can control the robot.
+When you connect to the Wi-Fi hot spot your browser will be redirected to the interally hosted web page, where you can control the robot.
 
 ---
 

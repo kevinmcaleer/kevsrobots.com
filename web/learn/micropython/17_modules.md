@@ -106,7 +106,7 @@ Module     | Alias     | Description
 `framebuf` | -         | the Frame Buffer class - useful for creating graphics and working with displays
 `gc`       | -         | the Garbage Collector - helps keep memory unfragmented
 `neopixel` | -         | a class for use with Adafruit Neopixels, or any APA102 and WS1218 RGB LED Strips
-`network`  | -         | you'll use this a lot if you're working with Wifi, webservers and APIs
+`network`  | -         | you'll use this a lot if you're working with Wi-Fi, webservers and APIs
 `umachine` | `machine` | contains lots of board specific functions and constants
 `utime`    | `time`    | you'll use this to access the `sleep` function which is used in nearly all physcial computing projects, such as robotics
 {:class="table"}

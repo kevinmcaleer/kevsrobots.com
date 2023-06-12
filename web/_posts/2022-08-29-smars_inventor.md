@@ -2,15 +2,15 @@
 layout: blog
 title: SMARS Inventor
 short_title: SMARS Inventor
-short_description: Pimoroni Inventor 2040W
+short_description: Pimoroni Inventor 2040 W
 date: 2022-08-29
 author: Kevin McAleer
-excerpt: Build your own SMARS Robot using the Pimoroni Inventor 2040W
+excerpt: Build your own SMARS Robot using the Pimoroni Inventor 2040 W
 cover: /assets/img/blog/smars_inventor/smars_inventor.jpg
 tags:
  - Raspberry Pi
  - SMARS
- - Inventor 2040W
+ - Inventor 2040 W
  - SMARS Inventor
  - MicroPython
  
@@ -25,7 +25,7 @@ tags:
 
 ## SMARS Inventor
 
-When the [Pimoroni Inventor 2040W](/reviews/inventor-2040w) launched I just knew I had to put this in a SMARS robot. After all its the exact same dimensions as a SMARS, almost as if it was designed that way!
+When the [Pimoroni Inventor 2040 W](/reviews/inventor-2040w) launched I just knew I had to put this in a SMARS robot. After all its the exact same dimensions as a SMARS, almost as if it was designed that way!
 
 ---
 

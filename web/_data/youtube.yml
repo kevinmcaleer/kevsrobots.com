@@ -394,7 +394,7 @@
   video_id: OZ60ws-5jP4
   type: livestream
 - published: 2022/07/24
-  title: SMARS Inventor, the Pimoroni Inventor 2040W Powered SMARS robot
+  title: SMARS Inventor, the Pimoroni Inventor 2040 W Powered SMARS robot
   video_id: MP-kS9g5ui8
   type: livestream
 - published: 2022/07/20
@@ -402,11 +402,11 @@
   video_id: VbMKRb6SmX8
   type: video
 - published: 2022/07/17
-  title: Raspberry Pi Pico W Ghostbusters PKE style Wifi Scanner
+  title: Raspberry Pi Pico W Ghostbusters PKE style Wi-Fi Scanner
   video_id: XTUOUlSnVpc
   type: livestream
 - published: 2022/07/16
-  title: 'Ghostbusters Wifi Scanner #short'
+  title: 'Ghostbusters Wi-Fi Scanner #short'
   video_id: I-Z9OiFS-D0
   type: short
 - published: 2022/07/10
@@ -422,7 +422,7 @@
   video_id: W6DkIrMIrBo
   type: livestream
 - published: 2022/06/30
-  title: Raspberry Pi Pico W, the new Raspberry Pi Pico with Wifi
+  title: Raspberry Pi Pico W, the new Raspberry Pi Pico with Wi-Fi
   video_id: ZWTEO--0TWc
   type: video
   popular: true
@@ -760,12 +760,12 @@
   video_id: Px_sNAxxpzA
   type: livestream
 - published: 2021/08/11
-  title: Raspberry Pi Pico Wifi Module, how to add Wifi to your Pico Projects
+  title: Raspberry Pi Pico Wi-Fi Module, how to add Wi-Fi to your Pico Projects
   video_id: VFC4XTRUNYk
   type: video
   popular: true
 - published: 2021/08/11
-  title: 'Pico Wifi Module  #shorts'
+  title: 'Pico Wi-Fi Module  #shorts'
   video_id: gzbTaj6ezLM
   type: short
 - published: 2021/08/08
@@ -853,7 +853,7 @@
   video_id: 304YCIk58MU
   type: video
 - published: 2021/05/30
-  title: MicroPython & Wifi
+  title: MicroPython & Wi-Fi
   video_id: 1lI7aIMrM8E
   type: livestream
 - published: 2021/05/30

@@ -10,7 +10,7 @@ cover: /assets/img/blog/giraffe/giraffe01.jpg
 tags:
  - Robot
  - Tips
- - 3dprinted
+ - 3D Printing
 ---
 
 ## Contents

@@ -9,7 +9,7 @@ excerpt: Build a robot that can scan its surroundings with sound
 cover: /assets/img/blog/radar/radar.jpg
 tags:
  - Raspberry Pi Pico
- - 3d Printing
+ - 3D Printing
  - Explora
  - Radar
  - Ultrasonic

@@ -1,18 +1,19 @@
 ---
 layout: blog
-title: Ghostbusters Wifi Scanner
-short_title: Ghostbusters Wifi Scanner
+title: Ghostbusters Wi-Fi Scanner
+short_title: Ghostbusters Wi-Fi Scanner
 short_description: Who you gonna call?
 date: 2022-12-21
 author: Kevin McAleer
-excerpt: 3d Print a Ghostbusters PKE style Wifi Scanner
+excerpt: 3d Print a Ghostbusters PKE style Wi-Fi Scanner
 cover: /assets/img/blog/ghostbusters/ghost02.jpg
 tags:
  - Raspberry Pi Pico
  - Ghostbusters
- - Wifi
+ - Wi-Fi
  - Scanner
  - Movie Prop
+ - 3D Printing
 ---
 
 ## YouTube Video
@@ -23,10 +24,10 @@ Click the thumbnails below to watch the show all about this build.
 
 ## Overview
 
-Build a fun Ghostbusters PKE style Wifi scanner using a Raspberry Pi Pico, a couple of electronics and some 3d printed parts. The scanner will scan and display a list of all the local wifi hotspots, and change the position of the arms depending on the signal strength.
+Build a fun Ghostbusters PKE style Wi-Fi scanner using a Raspberry Pi Pico, a couple of electronics and some 3d printed parts. The scanner will scan and display a list of all the local Wi-Fi hotspots, and change the position of the arms depending on the signal strength.
 
-[![Picture of wifi scan](/assets/img/blog/ghostbusters/ghost01.jpg){:class="img-fluid w-25"}](/assets/img/blog/ghostbusters/ghost01.jpg)
-[![Picture of wifi scan](/assets/img/blog/ghostbusters/ghost03.jpg){:class="img-fluid w-25"}](/assets/img/blog/ghostbusters/ghost03.jpg)
+[![Picture of Wi-Fi scan](/assets/img/blog/ghostbusters/ghost01.jpg){:class="img-fluid w-25"}](/assets/img/blog/ghostbusters/ghost01.jpg)
+[![Picture of Wi-Fi scan](/assets/img/blog/ghostbusters/ghost03.jpg){:class="img-fluid w-25"}](/assets/img/blog/ghostbusters/ghost03.jpg)
 [![Prototype with mechanism showing](/assets/img/blog/ghostbusters/proto01.jpg){:class="img-fluid w-25"}](/assets/img/blog/ghostbusters/proto01.jpg)
 
 ---

@@ -61,7 +61,7 @@
 - name: SMARS Inventor
   link: /blog/smars_inventor.html
   cover: /assets/img/blog/smars_inventor/smars_inventor.jpg
-  description: Build your own SMARS Robot using the Pimoroni Inventor 2040W
+  description: Build your own SMARS Robot using the Pimoroni Inventor 2040 W
   date: 2022/08/29
 - name: 🐱 PicoCat
   link: /blog/picocat-lives

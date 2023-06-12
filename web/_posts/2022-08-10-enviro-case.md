@@ -12,7 +12,7 @@ description: 3D Print your own Stevenson Screen for the Pimoroni Enviro Indoor s
 tags:
  - Pimoroni
  - Enviro
- - 3d Printed
+ - 3D Printing
 ---
 
 ## Table of Contents
@@ -41,7 +41,7 @@ The Enviro has a special feature up it sleeve - it can run on a battery for over
 
 ## Local Storage, MQTT and even InfluxDB connectivity
 
-The Enviro takes data readings every 5 minutes, and after the 5th reading it will connect to the local wifi and upload the readings to a number of end points, including:
+The Enviro takes data readings every 5 minutes, and after the 5th reading it will connect to the local Wi-Fi and upload the readings to a number of end points, including:
 
 * MQTT (this is the endpoint I've choosen)
 * InfluxDB

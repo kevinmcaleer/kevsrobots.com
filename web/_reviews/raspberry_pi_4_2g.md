@@ -35,34 +35,42 @@ Your new Raspberry Pi 4 has upgraded USB capacity: along with two USB 2 ports yo
 
 
 ### Fast networking
+
 Raspberry Pi 4 comes with Gigabit Ethernet, along with onboard wireless networking and Bluetooth.
 
 1Gb Ethernet is provided by the RJ45 connector next to the USB ports. This is plenty fast enough for everything the Pi is capable of. I recommend using the wired connection where possible, as its the most reliable and fastest way to connect your Pi to a network.
 
-### WiFi & Bluetooth
+### Wi-Fi & Bluetooth
+
 2.4 GHz and 5.0 GHz IEEE 802.11ac wireless, Bluetooth 5.0, BLE
 Gigabit Ethernet
 
 ### Display ports
+
 2 Micro-HDMI Display ports
 Supports 2x 4K displays
 
 ### Silent, energy-efficient
+
 The fanless, energy-efficient Raspberry Pi runs silently and uses far less power than other computers.
 
 ### GPIO Header
+
 Raspberry Pi standard 40 pin GPIO header (fully backwards compatible with previous boards)
 
 ### DSI & CSI Ports
+
 2-lane MIPI DSI display port
 2-lane MIPI CSI camera port
 
 ### Audio
+
 4-pole stereo audio and composite video port
 
 ---
 
 ## Pros 
+
 * The best single board computer available
 * Documentation
 * Accessories & Plugins available
@@ -71,6 +79,7 @@ Raspberry Pi standard 40 pin GPIO header (fully backwards compatible with previo
 * Amazing organisation - Produces MagPi Magazine, HackSpace Magazine, Wireframe Magazine and more
 
 ## Cons
+
 * Availability
 * Price (due to price scalping)
 * Runs hot - may require cooling depending on workload

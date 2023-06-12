@@ -5,11 +5,11 @@ short_title: Phew! Access Point
 short_description: MicroPython Captive Portal
 date: 2022-09-04
 author: Kevin McAleer
-excerpt: Setup your own Wifi Captive Portal for Robotics project
+excerpt: Setup your own Wi-Fi Captive Portal for Robotics project
 cover: /assets/img/blog/phew/saddle.jpg
 tags:
  - Raspberry Pi
- - WiFi
+ - Wi-Fi
  - Captive Portal
  - Pimoroni
  - Phew!
@@ -37,12 +37,12 @@ You can quickly setup an Access Point / Captive Portal using MicroPython, a Rasp
 In fact its just a single line to setup the access point:
 
 > ``` python
-> ap = access_point("My Wifi Access Point")
+> ap = access_point("My Wi-Fi Access Point")
 > ```
 
 ![Access Point on an iPhone screen](/assets/img/blog/phew/access_point_iphone.jpg){:class="img-fluid w-25"}
 
-Picture of an iPhone showing the 'My WiFi Access Point'
+Picture of an iPhone showing the 'My Wi-Fi Access Point'
 {:class=" small text-mute"}
 
 ---
@@ -56,7 +56,7 @@ Here are some of the cool things it can do:
 * Serve up Webpages
 * Templating framework, (think Jinja)
 * Logging
-* Captive Portal / WiFi Access Point
+* Captive Portal / Wi-Fi Access Point
 * DNS Server
 
 Check out the [Github](https://github.com/pimoroni/phew) page for more information.
@@ -70,7 +70,7 @@ Check out the [Github](https://github.com/pimoroni/phew) page for more informati
 There are a couple of ways to install Phew! onto your Raspberry Pi Pico W - 
 
 1. Download the code from <https://github.com/pimoroni/phew> and copy the files across [^1]
-1. Use uPip to install, once you have established a wifi connection:
+1. Use uPip to install, once you have established a Wi-Fi connection:
 
     ``` python
     import upip
@@ -94,7 +94,7 @@ Here is a more fuller version of the code, for context:
 
 ``` python
 # Set to Accesspoint mode
-ap = access_point("Wifi In The Woods")
+ap = access_point("Wi-Fi In The Woods")
 ip = ap.ifconfig()[0]
 logging.info(f"starting DNS server on {ip}")
 dns.run_catchall(ip)
@@ -153,7 +153,7 @@ def catch_all(request):
         return redirect("http://" + DOMAIN + "/wrong-host-redirect")
 
 # Set to Accesspoint mode
-ap = access_point("Wifi In The Woods")  # Change this to whatever Wifi SSID you wish
+ap = access_point("Wi-Fi In The Woods")  # Change this to whatever Wi-Fi SSID you wish
 ip = ap.ifconfig()[0]                   # Grab the IP address and store it
 logging.info(f"starting DNS server on {ip}")
 dns.run_catchall(ip)                    # Catch all requests and reroute them

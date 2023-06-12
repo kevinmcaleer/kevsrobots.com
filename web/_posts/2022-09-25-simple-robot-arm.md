@@ -5,7 +5,7 @@ short_title: Robot Arm
 short_description: Build your own Robot Arm
 date: 2022-09-25
 author: Kevin McAleer
-excerpt: 3D print a simple robot arm you can control over WiFi using Phew! and the Pimoroni Inventor 2040 W
+excerpt: 3D print a simple robot arm you can control over Wi-Fi using Phew! and the Pimoroni Inventor 2040 W
 cover: /assets/img/blog/robotarm/robotarm.jpg
 tags:
  - Raspberry Pi Pico W
@@ -16,7 +16,7 @@ tags:
  - MicroPython
  - Logo
  - Arm
- - 3D Print
+ - 3D Printing
  
 ---
 
@@ -46,7 +46,7 @@ Grab the 3d printable STL files for the Grippy-Bot from Cult 3d - <https://cults
 Part            | Description                                                                                                                         | Qty | Cost
 ----------------|-------------------------------------------------------------------------------------------------------------------------------------|-----|-------
 SG90 Servo      | These are the motors that move the parts of the arm                                                                                 | 5   | £4.00
-Inventor 2040 W | This is the brains of the Robot arm and will provide WiFi access. Available from [Pimoroni](https://www.pimoroni.com/inventor2040w) | 1   | £34.50
+Inventor 2040 W | This is the brains of the Robot arm and will provide Wi-Fi access. Available from [Pimoroni](https://www.pimoroni.com/inventor2040w) | 1   | £34.50
 {:class="table table-striped"}
 
 You'll probably find packs of Servos online cheaper than buying them individually.
@@ -54,7 +54,8 @@ You'll probably find packs of Servos online cheaper than buying them individuall
 ---
 
 ## MicroPython Code
-This project enables you to control the robot arm over wifi, using the amazing [Phew!](https://www.github.com/pimoroni/phew) library from Pimoroni. Phew provides simple functions for creating an Access Point, serving Webpages from the Pico W and a templating engine for embedding variables in those web pages.
+
+This project enables you to control the robot arm over Wi-Fi, using the amazing [Phew!](https://www.github.com/pimoroni/phew) library from Pimoroni. Phew provides simple functions for creating an Access Point, serving Webpages from the Pico W and a templating engine for embedding variables in those web pages.
 
 Download the code from here: <https://www.github.com/kevinmcaleer/inventor_arm>
 
@@ -72,11 +73,11 @@ There are two parts to the robot arm code - the MicroPython that runs on the Inv
 
 ### MicroPython code
 
-The Wifi SSID and Password are defined in a `config.py` file on the Pico W - if this doesn't exist you'll need to create it with the following content:
+The Wi-Fi SSID and Password are defined in a `config.py` file on the Pico W - if this doesn't exist you'll need to create it with the following content:
 
 ``` python
-wifi_ssid = '<enter your WIFI name here>'
-wifi_password = '<enter your WIFI password here>'
+wifi_ssid = '<enter your Wi-Fi name here>'
+wifi_password = '<enter your Wi-Fi password here>'
 ```
 
 The first block of code brings in all the software libraries needed for this project, including the phew! library, and the Inventor 2040 W library. 
@@ -93,10 +94,10 @@ import math
 
 ```
 
-The next block of code connects to the wifi network, creates a `board` variable and sets each of the servos to its middle position.
+The next block of code connects to the Wi-Fi network, creates a `board` variable and sets each of the servos to its middle position.
 
 ``` python
-# Connect to WiFi
+# Connect to Wi-Fi
 ip = connect_to_wifi(wifi_ssid, wifi_password)
 
 # Create a new board
@@ -159,7 +160,7 @@ def index(request):
         return render_template('index.html')
 ```
 
-The last block of code shows the IP address of the Inventor 2040 W after it connected to wifi earlier, and then starts the Webserver.
+The last block of code shows the IP address of the Inventor 2040 W after it connected to Wi-Fi earlier, and then starts the Webserver.
 
 ```python
 # Show the IP Address

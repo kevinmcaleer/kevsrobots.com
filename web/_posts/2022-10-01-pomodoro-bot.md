@@ -14,6 +14,7 @@ tags:
  - Robot
  - MicroPython
  - Pomodoro
+ - 3D Printing
  
 ---
 
@@ -62,7 +63,7 @@ The code for HeyBot consists to two main parts:
 
 This project also uses a couple of Pimoroni MicroPython libraries:
 * [PicoGraphics](https://github.com/pimoroni/pimoroni-pico/tree/main/micropython/modules/picographics) - graphics library 
-* [Phew!](https://github.com/pimoroni/phew) - the Pico HTTP Endpoint Wrangler, for quick connection to wifi, and NTP time library
+* [Phew!](https://github.com/pimoroni/phew) - the Pico HTTP Endpoint Wrangler, for quick connection to Wi-Fi, and NTP time library
 * [Pimoroni-Pico](https://github.com/pimoroni/pimoroni-pico/releases) - the 'batteries included' build of MicroPython
 
 > **NOTE**:
@@ -325,9 +326,9 @@ def banner(display, bg_colour, fg_colour):
 
 # ------------------ Main Program ------------------
 
-# connect to wifi
+# connect to Wi-Fi
 draw_jpg(display,EYES)
-logging.debug('about to connect to wifi')
+logging.debug('about to connect to Wi-Fi')
 connect_to_wifi(wifi_ssid, wifi_password)
 
 # update the clock

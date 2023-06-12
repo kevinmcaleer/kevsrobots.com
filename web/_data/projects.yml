@@ -1,3 +1,8 @@
+- name: Picotamachibi
+  link: /blog/picotamachibi.html
+  cover: /assets/img/blog/picotamachibi/picotamachibi.jpg
+  description: "Picotamachibi - Virtual Pet"
+  date: 2023-06-12
 - name: Pi-Card
   link: /blog/pico-birthday-card.html
   cover: /assets/img/blog/picard/picard.jpg
@@ -53,7 +58,7 @@
   cover: /assets/img/blog/giraffe/giraffe01.jpg
   description: Cute Giraffe Stand for Raspberry Pis
   date: 2023-01-11
-- name: Ghostbusters Wifi Scanner
+- name: Ghostbusters Wi-Fi Scanner
   link: /blog/ghostbusters-wifi.html
   cover: /assets/img/blog/ghostbusters/ghost02.jpg
   description: Who you gonna call?

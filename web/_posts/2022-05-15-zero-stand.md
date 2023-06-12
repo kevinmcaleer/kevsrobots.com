@@ -9,7 +9,7 @@ excerpt: 3D Print a cute stand for Raspberry Pi Zeros - specifically designed fo
 cover: /assets/img/blog/zero_stand/enviro.jpg
 tags:
  - Raspberry Pi Zero
- - 3d Printing
+ - 3D Printing
  
 ---
 

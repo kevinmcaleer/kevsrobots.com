@@ -9,7 +9,7 @@ excerpt: Build an internet controllable Christmas Bauble
 cover: /assets/img/blog/cheerlights/cheerlights.jpg
 tags:
  - Raspberry Pi Pico
- - 3d Printing
+ - 3D Printing
  - Christmas
  - Cheerlights
 ---
