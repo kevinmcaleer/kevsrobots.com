@@ -35,3 +35,6 @@ collections:
   code_liberry:
     output: true
     permalink: /code_liberry/:name.html
+  boards:
+    output: true
+    permalink: /resources/boards/:name.html

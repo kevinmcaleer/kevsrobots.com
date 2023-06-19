@@ -1,0 +1,28 @@
+{% assign terms = site.data.glossary  | sort_natural: "term" %}
+<div class="m-0 p-0 bg-orange rounded-2 mb-3">
+<nav class="navbar p-0 m-0">
+    <div class="container-fluid m-0 p-0 px-3">
+      <span class="navbar-text">
+        Common terms used in Robotics
+      </span>
+      <span class="navbar-text">
+        <a href="/resources/glossary" class="dotted">All terms ></a>
+      </span>
+    </div>
+  </nav>
+
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-2 bg-orange rounded-2 p-3 m-0">
+    {% for term in terms | limit:6 %}
+        <div class="col-3">
+        <a class="text-decoration-none" href="/resources/glossary#{{ term.term | downcase | replace:' ','-' }}">
+        <div class="card border-0 shadow-lg h-100">
+            <div class="card-body">
+            <p class="card-title text-black"><b>{{ term.term }}</b></p>
+            <p class="card-text text-black">{{ term.full | truncate:100 }}</p>
+            </div>
+        </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+</div>

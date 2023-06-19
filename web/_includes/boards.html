@@ -1,0 +1,20 @@
+{% assign boards = site.boards %}
+
+<div class="row row-cols-4">
+    <div class="col-3">
+        {% for board in boards %}
+        <a class="text-decoration-none" href="{{ board.url }}">
+        <div class="card">
+            <img class="card-img-top" src="{{ board.cover }}" alt="{{ board.title }}" />
+            <div class="card-body">
+            <h2 class="card-title text-black">{{ board.title }}</h2>
+            <p class="card-text">{{ board.description }}</p>
+            </div>
+        </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+
+    

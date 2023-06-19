@@ -1,0 +1,8 @@
+{% assign boards = site.boards %}
+<h5>Boards</h5>
+<ul class="m-0 p-0">
+    {% for board in boards %}
+    <li class="list-unstyled mt-1"> <a href="{{ board.url }}" class="orange">{{ board.title }}</a></li>    
+    {% endfor %}
+</ul>
+
