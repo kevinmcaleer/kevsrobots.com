@@ -85,6 +85,25 @@ The screen is a SSD1306 black and white display with 128x64 pixels, and connects
 
 ---
 
+## Wiring
+
+The wiring is pretty simple, though you may have to keep the wires short to fit everything in the case.
+
+![Wiring](/assets/img/blog/picotamachibi/wiring.png){:class="img-fluid w-100"}
+
+Pico GPIO  | Component
+-----------|----------
+`GPIO00`   | SDA
+`GPIO01`   | SCL
+`3.3v out` | VCC
+`GND`      | GND
+`GPIO04`   | Button A
+`GPIO03`   | Button B
+`GPIO02`   | Button X
+{:class="table table-striped"}
+
+---
+
 ## Code design
 
 The User Interface has a toolbar menu at the top and a main game area filling the rest of the screen. Some elements of game play always appear in the same place, such as the poop, and skull when your character is low on energy, health and hungry.

@@ -1,11 +1,11 @@
 {% assign boards = site.boards | sort:date| reverse %}
 
-<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 bg-ocre rounded-2 p-3 my-3">
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 bg-white rounded-2 p-3 my-3">
     {% for board in boards %}
         <div class="col-3">
         <a class="text-decoration-none" href="{{ board.url }}">
         <div class="card border-0 shadow-lg h-100">
-            <img class="card-img-top bg-light" src="{{ board.cover }}" alt="{{ board.title }}" />
+            <img class="card-img-top bg-ocre" src="{{ board.cover }}" alt="{{ board.title }}" />
             <div class="card-body">
             <p class="card-title text-black"><b>{{ board.title }}</b></p>
             </div>
