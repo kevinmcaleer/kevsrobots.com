@@ -77,6 +77,13 @@ The kit comes with some simple instructions, telling you how to setup the robot 
 
 The robot kit comes fully assembled, all you need to do is press the button on the top to switch it on. The robot will then stand up, stretch its arm and then retract the arm. By this time the front screen will have booted up (the robot has two independent controllers in it).
 
+There are two apps:
+
+* [XGO](https://apps.apple.com/gb/app/xgo/id1587117964) - Basic control of the robot, and demo apps
+* [XGOBot](https://apps.apple.com/gb/app/xgobot/id6449165215) - Video feed and advanced programming
+
+Both are available from Apple's App store.
+
 ---
 
 ### Availability
