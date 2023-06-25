@@ -1,3 +1,8 @@
+- name: Elecfreaks Xgo
+  link: /reviews/xgo.html
+  cover: /assets/img/reviews/xgo.jpg
+  description: The robotic dog from Elecfreaks
+  date: 2023/06/25
 - name: MeArm
   link: /blog/mearm.html
   cover: /assets/img/blog/mearm/mearm.jpg
