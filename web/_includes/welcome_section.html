@@ -1,26 +1,77 @@
-<div class="container px-4 py-3">
+<div class="container-fluid p-0 p-0">
     <div class="row m-0 p-0">
-        <div class="row flex-lg-row-reverse align-items-center g-1 py-1">
         <div class="col-12 col-lg-6">
-            <img src="/assets/img/kevsrobots.jpg" class="w-100 rounded-1">
-        </div>
-        <div class="col-12 col-lg-6">
-            <h1>Welcome to Kev's Robots</h1>
-            <p class="lead">
-                Welcome to the ultimate destination for all things robots! 
-                </p>
-                <p class="lead">Here, you'll find a wealth of information and resources on robots, including the latest 
-                projects I've created and developed. </p>
-               
-                <p class="lead">From in-depth <a href="/how-it-works/" class="dotted">how-it-works</a> articles, to a build <a href="/blogs/" class="dotted">blog</a>
-                that showcases my latest creations, to product <a href="/reviews/" class="dotted">reviews</a> and <a href="/learn/" class="dotted">courses</a>, KevsRobots.com has everything 
-                you need to bring your robot ideas to life. So, lets dive straight in, learn with me as we build robots, bring them to life with code and have a whole load of fun along the way!
+            <div class="row gx-2 mt-3 mx-0">
+                <div class="col-12 col-lg-6">
+                    <h1>Welcome to Kev's Robots</h1>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <img src="/assets/img/kevsrobots.jpg" class="w-100 rounded-1">
+                </div>
+            </div>
+            <p class="lead">Welcome to the ultimate destination for all things robots!</p>
+            <p class="lead">Here, you'll find a wealth of information and resources on robots, including the latest 
+            projects I've created and developed. </p>
+            
+            <p class="lead">From in-depth <a href="/how-it-works/" class="dotted">how-it-works</a> articles, to a build <a href="/blogs/" class="dotted">blog</a>
+            that showcases my latest creations, to product <a href="/reviews/" class="dotted">reviews</a> and <a href="/learn/" class="dotted">courses</a>, KevsRobots.com has everything 
+            you need to bring your robot ideas to life. So, lets dive straight in, learn with me as we build robots, bring them to life with code and have a whole load of fun along the way!
             </p>
             <div class="d-grid gap-2 d-md-flex justify-content-md-start">
           <a href="/robots/"><button type="button" class="btn btn-ocre btn-lg px-4 me-md-2">To the Robots!</button></a>
           <a href="https://www.youtube.com/kevinmcaleer28"><button type="button" class="btn btn-outline-ocre btn-lg px-4">Watch Kev on Youtube ></button></a>
+          
         </div>
         </div>
-        
+        <div class="col-12 col-lg-6">
+            <div class="row g-1">
+                <div class="col-12 col-lg-6 ">
+                    <div class="bg-red m-1 p-3 rounded-2">
+                        {% assign blogs = site.posts %}
+                        {% for blog in blogs | limit:1 %}
+                        <a href="{{blog.url}}" class="text-decoration-none text-white">
+                        <p class="small">Latest Blog Article > </p>
+                        <img src="{{blog.cover}}" class="img-fluid w-100 rounded-1">
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6 ">
+                    <div class="bg-ocre m-1 p-3 rounded-2">
+                        {% assign vids = site.data.youtube | sort: 'published' | reverse %}
+                        {% for vid in vids | limit:1 %}
+                        <a href="https://www.youtube.com/watch?v={{vid.video_id}}" class="text-decoration-none text-black">
+                        <p class="small">Latest YouTube Video ></p>
+                        <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2">
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="row g-1">
+                <div class="col-12 col-lg-6">
+                    <div class="bg-green m-1 p-3 rounded-2">
+                        {% assign robots = site.data.robots %}
+                        {% for robot in robots | limit:1 %}
+                        <a href="{{robot.link}}" class="text-decoration-none text-white">
+                        <p>Latest Robot ></p>
+                        <img src="{{robot.cover}}" class="img-fluid rounded-1">
+                        </a>
+                        {% endfor %} 
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="bg-blue m-1 p-3 rounded-2 text-white">
+                        {% assign projects = site.data.projects %}
+                        {% for project in projects | limit:1 %}
+                        <a href="{{project.link}}" class="text-decoration-none text-white">
+                        <p>Latest Projects ></p>
+                        <img src="{{project.cover}}" class="img-fluid rounded-1">
+                        </a>
+                        {% endfor %} 
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
