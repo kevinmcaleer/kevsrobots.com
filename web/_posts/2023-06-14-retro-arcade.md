@@ -4,11 +4,11 @@ title: Retro Arcade
 description: "Retro handheld game fun with Micro:bit"
 short_title: Retro Arcade
 short_description: "Retro handheld game fun with Micro:bit"
-date: 2023-06-19
+date: 2023-07-02
 author: Kevin McAleer
 excerpt: >-
     
-cover: /assets/img/blog/retroarcade/retroarcade.jpg
+cover: /assets/img/blog/retroarcade/retro_arcade.jpg
 tags: 
  - Microbit
  - MicroPython
@@ -21,9 +21,15 @@ tags:
 
 ---
 
+## Video
+
+{% include youtubeplayer.html id="ouC5g-xY6rc" %}
+
 ## Overview
 
 The Elecfreaks Retro:Game Arcade Kit is an exciting and interactive educational kit designed to help you explore programming and electronics while having fun with classic arcade games. This kit offers hands-on experience and the satisfaction of building your own mini arcade console.
+
+A link to our [Kevs Robots Review with scoring is available here:](/reviews/retroarcade)
 
 ---
 
