@@ -5,6 +5,9 @@ posts:
 - title: SMARS Mini
   url: /2023-01-22-smars-mini.md
   date: 2023-01-22
+- title: Bluetooth remote controlled robot
+  url: /2023-07-03-bluetooth-remote.md
+  date: 2023-07-03
 - title: Pinout.XYZ
   url: /2023-05-28-pinout-xyz.md
   date: 2023-05-28
@@ -44,6 +47,9 @@ posts:
 - title: What is MicroPython?
   url: /2023-03-20-what-is-micropython.md
   date: 2023-03-20
+- title: Retro Arcade
+  url: /2023-06-14-retro-arcade.md
+  date: 2023-07-02
 - title: Duckface
   url: /2023-02-26-duckface.md
   date: 2023-02-22
@@ -86,6 +92,9 @@ posts:
 - title: Rover the Mecanum Robot
   url: /2022-04-30-Rover-mecanum.md
   date: 2022-04-30
+- title: Picotamachibi
+  url: /2023-06-12-picotamachibi.md
+  date: 2023-06-12
 - title: Bubo-2T
   url: /2023-02-04- bubo-2t.md
   date: 2023-02-04
@@ -163,7 +172,7 @@ posts:
   date: 2022-05-22
 - title: Chip
   url: /2023-05-05-chip.md
-  date: 2023-05-05
+  date: 2023-06-26
 - title: PIKON Camera - Raspberry Pi High Quality Camera Project
   url: /2022-08-23-pikon-camera.md
   date: 2022-08-23

@@ -1,3 +1,8 @@
+- name: BurgerBot Bluetooth
+  link: /blog/bluetooth-remote.html
+  cover: /assets/img/blog/ble/ble.jpg
+  description: Learn how to build a bluetooth remote controlled robot
+  date: 2023/07/03
 - name: Elecfreaks Xgo
   link: /reviews/xgo.html
   cover: /assets/img/reviews/xgo.jpg
