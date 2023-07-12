@@ -2,41 +2,41 @@
 {% assign posts = site.posts %}
 
 <div class="row">
-    <div class="col-md-9 col-12">
-        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-            {% for post in posts limit:4 %}
-            <div class="col">
-            <div class="card p-0 h-100">
-            <a href="{{ post.url }}">
-             <img src="{{ post.cover }}" class="card-img-top" alt="..."></a>
-     
-            <div class="card-body">
-            <h5 class="card-title">{{ post.title }}</h5>
-            <p class="card-text ">{{ post.excerpt }}</p>
+<div class="col-md-9 col-12">
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {% for post in posts limit:4 %}
+        <div class="col">
+        <div class="card p-0 h-100">
+        <a href="{{ post.url }}">
+            <img src="{{ post.cover }}" class="card-img-top" alt="..."></a>
+    
+        <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="card-text ">{{ post.excerpt }}</p>
+        <div class="row">
             <div class="row">
-                <div class="row">
-            <p class="card-text small">{{ post.date | date: "%-d %B %Y" }} 
-                by
-                {{ post.author }} </p>
-                </div>
-            <div class="m-0 px-2">
-                {% assign tags = post.tags %}
-                {% for tag in tags %}
-                <a class="badge bg-ocre small m-1 text-decoration-none">{{tag}}</a>
-                {% endfor %}
+        <p class="card-text small">{{ post.date | date: "%-d %B %Y" }} 
+            by
+            {{ post.author }} </p>
             </div>
-            </div> <!-- row -->
-            </div> <!-- col-md-8 -->
-            <div class="card-footer">
-                <a class="btn btn-primary" href="{{post.url}}">Read</a>
-            </div>
-            </div> <!-- card -->
-        </div> <!-- col -->
+        <div class="m-0 px-2">
+            {% assign tags = post.tags %}
+            {% for tag in tags %}
+            <a class="badge bg-ocre small m-1 text-decoration-none">{{tag}}</a>
             {% endfor %}
-            </div>
-    </div>
-    <div class="col-12 col-md-3">
-        {% include blog_archive.html %}
-    </div>
+        </div>
+        </div> <!-- row -->
+        </div> <!-- col-md-8 -->
+        <div class="card-footer">
+            <a class="btn btn-primary" href="{{post.url}}">Read</a>
+        </div>
+        </div> <!-- card -->
+    </div> <!-- col -->
+        {% endfor %}
+        </div>
+</div>
+<div class="col-12 col-md-3">
+    {% include blog_archive.html %}
+</div>
 </div>
 

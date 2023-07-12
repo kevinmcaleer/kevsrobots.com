@@ -13,3 +13,6 @@
 - name: TikTok
   link: https://www.tiktok.com/kevinmcaleer6
   icon: "fab fa-tiktok"
+- name: Threads
+  link: https://www.threads.net/@kevinmcaleer
+  icon: "fab fa-threads"

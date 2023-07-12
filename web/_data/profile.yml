@@ -26,3 +26,7 @@ social:
      name: "@kevsmac@mastodon.social"
      link: https://mastodon.social/@kevsmac
      icon: "fab fa-mastodon"
+   - site: Threads
+     name: "@kevinmcaleer"
+     link: https://www.threads.net/@kevinmcaleer
+     icon: "fa-solid fa-reel"
