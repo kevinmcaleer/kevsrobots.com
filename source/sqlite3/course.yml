@@ -1,0 +1,39 @@
+- name: SQLite3
+  author: Kevin McAleer
+  date_created: 2023-07-14
+  date_published: 2023-07-14
+  layout: course
+  cover: assets/database.png
+  description: >- 
+     Learn how to create databases in Python with sqlite3
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
+  - section:
+      name: Getting Started
+      content:
+      - 01_introduction_to_databases.md
+      - 02_getting_started_with_sqlite3.md
+      - 03_creating_tables_and_schema.md
+      - 04.inserting_and_retrieving_data.md
+      - 05_updating_and_deleting_data.md
+  - section:
+      name: Advanced topics
+      content:
+      - 06_querying_and_joining_tables.md
+      - 07_advanced_queries.md
+      - 08_transations_and_error_handling.md
+      - 09_indexes_and_performance.md
+      - 10_securing_and_backing_up.md
+  - section:
+      name: Summary and Conclusion
+      content:
+      - 11_summary.md
+  - section:
+      name: bonus
+      content:
+      - 12_boyce_codd_normal_form.md
+      - 13_third_normal_form.md
+      - 14_demo_program.md

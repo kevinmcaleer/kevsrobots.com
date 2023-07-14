@@ -29,6 +29,13 @@
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
+  cover: /learn/sqlite3/assets/database.png
+  date_published: 2023-07-14
+  description: Learn how to create databases in Python with sqlite3
+  duration: 0h 30m
+  link: /learn/sqlite3/00_intro.html
+  name: SQLite3
+- author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
   date_published: 2022-12-04
   description: Learn how to use the new Learning Platform
