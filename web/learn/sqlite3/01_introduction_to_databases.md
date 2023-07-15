@@ -8,7 +8,7 @@ previous: 00_intro.html
 next: 02_getting_started_with_sqlite3.html
 description: What are databases and why do we need them?
 percent: 10
-duration: 7
+duration: 8
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -86,6 +86,22 @@ Databases are essential tools for storing, managing, and retrieving data. They p
 </table>
 
 Data can be stored in databases or represented in tables, graphs, or charts to make it easier to analyze and interpret. It plays a crucial role in fields like science, technology, medicine, and many others. By analyzing data, we can uncover patterns, trends, and insights that help us make informed decisions and solve problems.
+
+---
+
+## Data, Information, Knowledge, Wisdom
+
+You can think of data as a hierachy of meaning.
+
+`Data`, Starting with raw data we might capture values from a sensor, such as a temperature sensor and store this in our database.
+
+`Information` is data that has been processed and has a known meaning associated with it. The raw data `21` could mean anything until we assign it meaning, such as `21 degrees celcius`. This is now information that can be used and understood.
+
+`Knowledge` is the information with added context; we might look at the temperature information and understand that this is hot or cold given a context such as room temperature (its getting warm), or oven temperature - its cold.
+
+`Wisdom` is the application of knowledge and experience to make sound judgements and decisions; the oven will take 10 minutes to warm up from 21 degrees, I better put that on in 20 minutes time ready for cooking a meal.
+
+![Heirachy](assets/dikw.png){:class="img-fluid w-75"}
 
 ---
 
@@ -179,7 +195,7 @@ Before diving into SQLite and Python, it's essential to understand the basic con
 
 ![Tables graphic](assets/table.png){:class="img-fluid w-50"}
 
-`Tables`` are the fundamental building blocks of a relational database. They consist of rows (also called records or tuples) and columns (also called fields or attributes).
+`Tables` are the fundamental building blocks of a relational database. They consist of rows (also called records or tuples) and columns (also called fields or attributes).
 
 A table represents a specific entity or concept within a database. For example, in a simple library database, we might have a "Books" table to store information about books, with each row representing a specific book and each column representing a piece of information about the book (e.g., title, author, publication year).
 
