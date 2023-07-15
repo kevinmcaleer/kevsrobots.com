@@ -3,13 +3,13 @@ layout: lesson
 title: Course Overview
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: assets/overview01.jpg
 next: 01_introduction_to_databases.html
 description: What you'll learn
-percent: 6
+percent: 5
 duration: 2
 navigation:
-- name: SQLite3
+- name: Creating Databases with Python and SQLite3 for Beginners
 - content:
   - section: Overview
     content:
@@ -45,98 +45,41 @@ navigation:
       link: 11_summary.html
   - section: bonus
     content:
+    - name: First Normal Form (1NF)
+      link: 13_1nf.html
+    - name: Second Normal Form (2NF)
+      link: 14_2nf.html
+    - name: Third Normal Form (3NF)
+      link: 15_3nf.html
     - name: Boyce-Codd Normal Form (BCNF)
       link: 12_boyce_codd_normal_form.html
-    - name: Third Normal Form (3NF)
-      link: 13_third_normal_form.html
     - name: Demo program
-      link: 14_demo_program.html
+      link: 16_demo_program.html
+    - name: Desktop Apps for managing SQlite3 databases
+      link: 17_tools.html
 ---
 
 
-## Module 1: Introduction to Databases
+![banner]({{page.cover}}){:class="cover"}
 
-- Overview of databases and their importance
-- Introduction to SQLite as a lightweight database engine
-- Understanding basic database concepts: tables, records, columns, and primary keys
+Welcome to the "Creating Databases with Python and SQLite3 for Beginners" course! In this course, we will explore the fundamentals of working with databases using Python and SQLite3. Here's a summary of what each module covers:
 
----
-
-## Module 2: Getting Started with Python and SQLite3
-
-- Setting up Python and SQLite3
-- Connecting to a database using sqlite3.connect()
-- Creating a new database file
-
----
-
-## Module 3: Creating Tables and Schema Design
-
-- Understanding table structure and data types
-- Creating tables with the CREATE TABLE statement
-- Defining primary keys and constraints
-- Altering tables using ALTER TABLE
+Module | Title                                      | Description
+-------|--------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1      | Introduction to Databases                  | Overview of databases and their importance, Introduction to SQLite as a lightweight database engine, Understanding basic database concepts: tables, records, columns, and primary keys
+2      | Getting Started with Python and SQLite3    | Setting up Python, and SQLite3, Connecting to a database using sqlite3.connect(), Creating a new database file
+3      | Creating Tables and Schema Design          | Understanding table structure,and data types, Creating tables with the CREATE TABLE statement, Defining primary keys and constraints, Altering tables using ALTER TABLE
+4      | Inserting and Retrieving Data              | Inserting data into tables using,INSERT INTO, Querying data using SELECT statements, Filtering data with WHERE clauses, Sorting data with ORDER BY Limiting and offsetting data with LIMIT and OFFSET
+5      | Updating and Deleting Data                 | Modifying existing data using UPDATE statements, Deleting data using DELETE statements, Performing batch updates and deletes
+6      | Querying and Joining Tables                | Working with multiple tables, Understanding relationships between tables, Using JOIN to combine data from multiple tables, Performing inner, outer, left, and right joins
+7      | Advanced SQL Queries                       | Aggregating data with GROUP BY,Filtering grouped data with HAVING,Using built-in functions and expressions, Subqueries and nested queries
+8      | Working with Transactions                  | Understanding transactions and their importance,Beginning and committing transactions,Rolling back transactions
+9      | Error Handling and Exception Management    | Handling database errors and exceptions,Using try and except statements,Properly closing database connections
+10     | Real-World Applications and Best Practices | Designing efficient database schemas, Indexing and optimizing queries,Handling large datasets, Best practices for database security,
+{:class="table table-striped"}
 
 ---
 
-## Module 4: Inserting and Retrieving Data
-
-- Inserting data into tables using INSERT INTO
-- Querying data using SELECT statements
-- Filtering data with WHERE clauses
-- Sorting data with ORDER BY
-- Limiting and offsetting data with LIMIT and OFFSET
-
----
-
-## Module 5: Updating and Deleting Data
-
-Modifying existing data using UPDATE statements
-Deleting data using DELETE statements
-Performing batch updates and deletes
-
----
-
-## Module 6: Querying and Joining Tables
-
-- Working with multiple tables
-- Understanding relationships between tables
-- Using JOIN to combine data from multiple tables
-- Performing inner, outer, left, and right joins
-
----
-
-## Module 7: Advanced SQL Queries
-
-- Aggregating data with GROUP BY
-- Filtering grouped data with HAVING
-- Using built-in functions and expressions
-- Subqueries and nested queries
-
----
-
-## Module 8: Working with Transactions
-
-- Understanding transactions and their importance
-- Beginning and committing transactions
-- Rolling back transactions
-
----
-
-## Module 9: Error Handling and Exception Management
-
-- Handling database errors and exceptions
-- Using try and except statements
-- Properly closing database connections
-
----
-
-## Module 10: Real-World Applications and Best Practices
-
-Designing efficient database schemas
-Indexing and optimizing queries
-Handling large datasets
-Best practices for database security
-Throughout the course, you can include hands-on exercises and projects to allow students to apply what they've learned and reinforce their understanding.
+By the end of this course, you'll have a strong foundation in creating databases with Python and SQLite3. Let's dive in and explore the exciting world of databases together!
 
 ---

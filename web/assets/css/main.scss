@@ -561,6 +561,19 @@ blockquote {
   }
 
 }
+.table-5050 {
+  width: 100% !important;
+  tr td:first-child{
+    width: 50% !important;
+    .img {
+      width:100% !important;; 
+      object-fit: cover !important;
+    }
+  }
+  tr td {
+    width: 50%;
+  }
+}
 
 .text-date {
   font-size: 8pt;

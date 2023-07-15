@@ -4,10 +4,11 @@ title: Demo program
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
-previous: 13_third_normal_form.html
+previous: 12_boyce_codd_normal_form.html
+next: 17_tools.html
 description: This is an example program highlighting some of the simple concepts covered
   in this course
-percent: 100
+percent: 85
 duration: 2
 navigation:
 - name: Creating Databases with Python and SQLite3 for Beginners
@@ -46,12 +47,18 @@ navigation:
       link: 11_summary.html
   - section: bonus
     content:
+    - name: First Normal Form (1NF)
+      link: 13_1nf.html
+    - name: Second Normal Form (2NF)
+      link: 14_2nf.html
+    - name: Third Normal Form (3NF)
+      link: 15_3nf.html
     - name: Boyce-Codd Normal Form (BCNF)
       link: 12_boyce_codd_normal_form.html
-    - name: Third Normal Form (3NF)
-      link: 13_third_normal_form.html
     - name: Demo program
-      link: 14_demo_program.html
+      link: 16_demo_program.html
+    - name: Desktop Apps for managing SQlite3 databases
+      link: 17_tools.html
 ---
 
 

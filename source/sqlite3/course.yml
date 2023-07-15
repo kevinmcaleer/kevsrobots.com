@@ -1,7 +1,7 @@
-- name: SQLite3
+- name: Creating Databases with Python and SQLite3 for Beginners
   author: Kevin McAleer
   date_created: 2023-07-14
-  date_published: 2023-07-14
+  date_published: 2023-07-15
   layout: course
   cover: assets/database.png
   description: >- 
@@ -34,6 +34,9 @@
   - section:
       name: bonus
       content:
+      - 13_1nf.md
+      - 14_2nf.md
+      - 15_3nf.md
       - 12_boyce_codd_normal_form.md
-      - 13_third_normal_form.md
-      - 14_demo_program.md
+      - 16_demo_program.md
+      - 17_tools.md

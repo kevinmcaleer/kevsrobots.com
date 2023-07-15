@@ -7,10 +7,10 @@ cover: /learn/sqlite3/assets/database.png
 previous: 01_introduction_to_databases.html
 next: 03_creating_tables_and_schema.html
 description: ''
-percent: 18
+percent: 15
 duration: 3
 navigation:
-- name: SQLite3
+- name: Creating Databases with Python and SQLite3 for Beginners
 - content:
   - section: Overview
     content:
@@ -46,12 +46,18 @@ navigation:
       link: 11_summary.html
   - section: bonus
     content:
+    - name: First Normal Form (1NF)
+      link: 13_1nf.html
+    - name: Second Normal Form (2NF)
+      link: 14_2nf.html
+    - name: Third Normal Form (3NF)
+      link: 15_3nf.html
     - name: Boyce-Codd Normal Form (BCNF)
       link: 12_boyce_codd_normal_form.html
-    - name: Third Normal Form (3NF)
-      link: 13_third_normal_form.html
     - name: Demo program
-      link: 14_demo_program.html
+      link: 16_demo_program.html
+    - name: Desktop Apps for managing SQlite3 databases
+      link: 17_tools.html
 ---
 
 

@@ -1,9 +1,12 @@
 ---
 title: Introduction to Databases
 description: >-
-    Databases are essential tools for storing, managing, and retrieving data, and play a crucial role in various industries and applications
+    What are databases and why do we need them?
 layout: lesson
+cover: assets/overview01.jpg
 ---
+
+![banner]({{page.cover}}){:class="cover"}
 
 ## Overview of Databases
 
@@ -11,25 +14,60 @@ Databases are essential tools for storing, managing, and retrieving data. They p
 
 ---
 
+## But what is *Data?*
+
+<table width="100%" cellspacing="15" cellpadding="15">
+<tr>
+<td width="25%">
+<img alt="girl taking notes in a science lab next to a microscope" src= "assets/data.jpg" class="img-fluid w-100" />
+</td>
+<td>
+<p>Data refers to pieces of information that we can collect, store, and use to learn about things or make decisions. It can be numbers, words, images, or any other form of information that we can work with. For example, when you fill out a form with your name, age, and favorite color, that information becomes data. Data helps us understand and describe things in a structured way.</p>
+
+<p>Think of data as building blocks of knowledge. We collect data to learn more about a specific topic or to solve problems. For instance, scientists collect data about the weather to study patterns and make predictions. Businesses collect data about their customers to understand their preferences and provide better products or services.</p>
+
+</td>
+</tr>
+</table>
+
+Data can be stored in databases or represented in tables, graphs, or charts to make it easier to analyze and interpret. It plays a crucial role in fields like science, technology, medicine, and many others. By analyzing data, we can uncover patterns, trends, and insights that help us make informed decisions and solve problems.
+
+---
+
 ## What is a Database?
+
+> ### A Definition
+>
+> "*A database is an organised collection of data.*"
+{:class="bg-blue"}
 
 A database is like a giant, well-organized digital filing cabinet for information. Imagine you have lots of pieces of information that you need to store and find quickly later - that's what a database is for. It keeps all your data safe and organized, making sure everything stays consistent, doesn't get messed up, and can grow bigger when needed. It's like a superhero for your data, keeping everything under control and easy to manage.
 
-## Importance of Databases
+![Robot in a datawarehouse](assets/datawarehouse.jpg){:class="img-fluid w-100"}
 
-Databases offer several benefits:
+---
 
-- **Data Organization**: Databases help organize data into logical structures, making it easier to manage and retrieve information efficiently.
-- **Data Integrity**: Databases enforce data integrity rules, ensuring that data remains consistent and accurate.
-- **Data Security**: Databases provide mechanisms to secure sensitive information, controlling access and protecting data from unauthorized users.
-- **Data Scalability**: Databases can handle large amounts of data and scale with the growth of an application or organization.
-- **Data Consistency**: Databases allow for concurrent access, ensuring that multiple users can work with the data simultaneously while maintaining data consistency.
+> ## Why do we use Databases
+>
+> Databases provide many advantages:
+>
+> - **Data Organization**: Databases are like organized filing systems for information. They sort data into categories, so it's easier to find and use it effectively.
+>
+> - **Data Integrity**: Databases have rules in place to keep information accurate and reliable. This means the data stays consistent and doesn't have any mistakes or errors.
+>
+> - **Data Security**: Databases have special features that keep important information safe. They control who can access the data and protect it from people who shouldn't see it.
+>
+> - **Data Scalability**: Databases can handle lots of information, even as it keeps growing. They can grow and adapt with a website or organization as it gets bigger.
+>
+> - **Data Consistency**: Databases let multiple people work with the information at the same time. They make sure everyone sees the most up-to-date and correct version of the data, so there are no conflicts or confusion.
 
 ---
 
 ## Introduction to Relational Databases
 
 Relational databases are the most common type of databases used today. They organize data into tables with rows and columns, establishing relationships between tables. Understanding relational databases is crucial for working with databases effectively.
+
+![Tables](assets/tables.png){:class="img-fluid w-50"}
 
 ---
 
@@ -48,6 +86,8 @@ Popular RDBMS examples include:
 ---
 
 ## Introduction to SQLite
+
+![Tables](assets/sqlite.png){:class="img-fluid w-25"}
 
 `SQLite` is a lightweight and self-contained relational database engine. It is widely used due to its simplicity, portability, and zero-configuration setup. In this section, we will explore the features and use cases of SQLite.
 
@@ -74,7 +114,7 @@ SQLite offers several advantages:
 
 ## Basic Database Concepts
 
-![Overview graphic](assets/overview.png){:class="img-fluid w-100"}
+![Overview graphic](assets/overview.png){:class="img-fluid w-50"}
 
 Before diving into SQLite and Python, it's essential to understand the basic concepts that form the foundation of relational databases. In this section, we will explore tables, records, columns, and primary keys.
 
@@ -82,9 +122,9 @@ Before diving into SQLite and Python, it's essential to understand the basic con
 
 ### Tables: Foundations of a Relational Database
 
-![Tables graphic](assets/table.png){:class="img-fluid w-100"}
+![Tables graphic](assets/table.png){:class="img-fluid w-50"}
 
-Tables are the fundamental building blocks of a relational database. They consist of rows (also called records or tuples) and columns (also called fields or attributes).
+`Tables`` are the fundamental building blocks of a relational database. They consist of rows (also called records or tuples) and columns (also called fields or attributes).
 
 A table represents a specific entity or concept within a database. For example, in a simple library database, we might have a "Books" table to store information about books, with each row representing a specific book and each column representing a piece of information about the book (e.g., title, author, publication year).
 
@@ -92,9 +132,9 @@ A table represents a specific entity or concept within a database. For example, 
 
 ### Records: Storing and Organizing Data
 
-![Rows graphic](assets/rows.png){:class="img-fluid w-100"}
+![Rows graphic](assets/rows.png){:class="img-fluid w-50"}
 
-A record is a complete set of information related to a specific entity in a table. Each record in a table represents a unique occurrence of that entity. For instance, in the "Books" table, each record would correspond to a single book and contain its respective data, such as the book's title, author, and publication year.
+A `record` or `row` is a complete set of information related to a specific entity in a table. Each record in a table represents a unique occurrence of that entity. For instance, in the "Books" table, each record would correspond to a single book and contain its respective data, such as the book's title, author, and publication year.
 
 To store data in a table, we insert records using SQL INSERT statements. These statements specify the values for each column in the table.
 
@@ -102,19 +142,19 @@ To store data in a table, we insert records using SQL INSERT statements. These s
 
 ### Columns: Data Types and Constraints
 
-![Columns graphic](assets/columns.png){:class="img-fluid w-100"}
+![Columns graphic](assets/columns.png){:class="img-fluid w-50"}
 
-Columns represent individual data fields within a table. Each column has a specific data type that defines the kind of data it can store, such as integers, text, dates, or binary data.
+`Columns` represent individual data fields within a table. Each column has a specific data type that defines the kind of data it can store, such as integers, text, dates, or binary data.
 
 Common data types include:
 
-Type | Description | Example
----|---|---
-**Integer**| Whole numbers without decimal places| `0`, `1`, `2` ,`3`
-**Text**| Alphanumeric characters and strings| `"Robots"`
-**Real**| Floating-point numbers| `3.14`
-**Date/Time**| Dates and times|`2023-07-14 23:02:01`
-**Blob**| Binary large objects, used for storing binary data (e.g., images, files)| `[0x00,0x01,x010]`
+Type          | Description                                                              | Example
+--------------|--------------------------------------------------------------------------|----------------------
+**Integer**   | Whole numbers without decimal places                                     | `0`, `1`, `2` ,`3`
+**Text**      | Alphanumeric characters and strings                                      | `"Robots"`
+**Real**      | Floating-point numbers                                                   | `3.14`
+**Date/Time** | Dates and times                                                          | `2023-07-14 23:02:01`
+**Blob**      | Binary large objects, used for storing binary data (e.g., images, files) | `[0x00,0x01,x010]`
 {:class="table table-striped"}
 
 Columns can also have constraints that define additional rules for the data they store. Constraints include:
