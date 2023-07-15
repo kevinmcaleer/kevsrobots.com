@@ -10,7 +10,7 @@ description: Module 7 delves into advanced SQL queries in SQLite
 percent: 40
 duration: 3
 navigation:
-- name: Creating Databases with Python and SQLite3 for Beginners
+- name: Create Databases with Python and SQLite3
 - content:
   - section: Overview
     content:

@@ -34,7 +34,7 @@
   description: Learn how to create databases in Python with sqlite3
   duration: 0h 36m
   link: /learn/sqlite3/00_intro.html
-  name: Creating Databases with Python and SQLite3 for Beginners
+  name: Create Databases with Python and SQLite3
 - author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
   date_published: 2022-12-04

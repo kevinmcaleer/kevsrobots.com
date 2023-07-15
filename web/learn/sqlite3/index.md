@@ -9,7 +9,7 @@ description: What you'll learn
 percent: 5
 duration: 2
 navigation:
-- name: Creating Databases with Python and SQLite3 for Beginners
+- name: Create Databases with Python and SQLite3
 - content:
   - section: Overview
     content:

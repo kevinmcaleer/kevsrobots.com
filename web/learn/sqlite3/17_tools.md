@@ -9,7 +9,7 @@ description: Desktop Apps for managing SQlite3 databases
 percent: 100
 duration: 2
 navigation:
-- name: Creating Databases with Python and SQLite3 for Beginners
+- name: Create Databases with Python and SQLite3
 - content:
   - section: Overview
     content:
@@ -70,7 +70,7 @@ On macOS, SQLite3 comes with a command-line interface by default, as mentioned e
 
 - **DB Browser for SQLite (SQLiteStudio):** This is a popular open-source desktop tool that provides a graphical interface to work with SQLite databases. You can download it from the official website: <https://sqlitebrowser.org/>
 
-- **Base:** Base is a part of LibreOffice, a free office suite. It includes a graphical tool for working with databases, including SQLite. You can download LibreOffice from their website: >https://www.libreoffice.org/>
+- **Base:** Base is a part of LibreOffice, a free office suite. It includes a graphical tool for working with databases, including SQLite. You can download LibreOffice from their website: <https://www.libreoffice.org/>
 
 ### Windows
 

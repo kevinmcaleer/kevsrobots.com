@@ -10,7 +10,7 @@ description: ''
 percent: 20
 duration: 3
 navigation:
-- name: Creating Databases with Python and SQLite3 for Beginners
+- name: Create Databases with Python and SQLite3
 - content:
   - section: Overview
     content:

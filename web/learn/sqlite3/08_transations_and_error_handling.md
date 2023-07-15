@@ -11,7 +11,7 @@ description: Module 8 covers the important topics of database transactions and e
 percent: 45
 duration: 3
 navigation:
-- name: Creating Databases with Python and SQLite3 for Beginners
+- name: Create Databases with Python and SQLite3
 - content:
   - section: Overview
     content:
