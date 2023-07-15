@@ -56,7 +56,7 @@ navigation:
       link: 12_boyce_codd_normal_form.html
     - name: Demo program
       link: 16_demo_program.html
-    - name: Desktop Apps for managing SQlite3 databases
+    - name: Tools
       link: 17_tools.html
 ---
 
