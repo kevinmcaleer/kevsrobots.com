@@ -27,6 +27,10 @@ Understanding these relationships allows us to retrieve related data effectively
 
 To combine data from multiple tables, we use SQL join operations. SQLite supports several types of joins, including inner joins, outer joins, left joins, and right joins.
 
+![Join Types](assets/join_types.jpg){:class="img-fluid w-100"}
+
+---
+
 #### Inner Join
 
 The inner join returns only the records that have matching values in both tables being joined.
