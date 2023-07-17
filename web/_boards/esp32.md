@@ -5,6 +5,8 @@ manufacturer: Espressif
 cover: /assets/img/boards/esp32.png
 date: 2023-06-19
 author: Kevin McAleer
+excerpt: >-
+  A high-performance microcontroller board that offers a potent mix of Wi-Fi, Bluetooth, processing power, and flexibility
 tags:
   - esp32
   - espressif

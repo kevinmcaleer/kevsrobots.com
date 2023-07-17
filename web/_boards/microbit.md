@@ -6,6 +6,8 @@ manufacturer: Micro:Bit Educational Foundation
 cover: /assets/img/boards/microbit.png
 date: 2023-06-19
 author: Kevin McAleer
+excerpt: >-
+  An innovative, user-friendly platform that educates and empowers students and enthusiasts alike to understand technology and develop core skills in digital technology, design and innovation
 tags:
   - microbit
   - microcontroller

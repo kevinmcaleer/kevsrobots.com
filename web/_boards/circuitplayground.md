@@ -5,6 +5,8 @@ manufacturer: Adafruit
 cover: /assets/img/boards/circuitplayground.png
 date: 2023-06-19
 author: Kevin McAleer
+excerpt: >-
+   A compact, all-in-one board that combines an array of sensors, LEDs, and buttons with powerful processors and wireless communication
 tags:
   - circuit playground
   - adafruit

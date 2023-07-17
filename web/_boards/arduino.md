@@ -5,6 +5,8 @@ manufacturer: Arduino CC
 cover: /assets/img/boards/arduino.png
 date: 2023-06-19
 author: Kevin McAleer
+excerpt: >-
+  An open-source microcontroller board that has become a standard for electronics and programming education worldwide
 tags:
   - arduino uno r3
   - arduino

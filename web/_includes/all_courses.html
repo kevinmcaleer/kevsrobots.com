@@ -6,21 +6,39 @@
 
 {% assign courses = site.data.courses | sort: 'date_published' | reverse %}
 
-<div class="row row-cols-lg-4 row-cols-sm-2 row-cols-md-3">
-    {% for course in courses | sort: 'date_published' | reverse %}
-   
-<div class="col mb-3">
-    <div class="card h-100">
-        <a href="{{course.link}}" class="nav-item dotted">
-            <img src="{{course.cover}}" class="card-img-top">
-        <div class="card-body">
-            <h5 class="card-text black text-decoration-none">{{course.name}}</h5>
-            <p class="small mute align-right text-decoration-none">{{course.duration}} | {{course.date_published | date: "%d %B %y"}}</p>
-            <p class="small mute align-right text-decoration-none">{{course.author}}</p>
-        </div>    
-        </a>
+<div class="row">
+    <div class="col col-lg-2 col-md-3 col-sm-4">
+        {% include courses_sidenav.html %}
+        {% include boards_sidenav.html %}
+    </div>
+    <div class="col col-lg-10 col-md-9 col-sm-8">
+        <div class="row row-cols-lg-4 row-cols-sm-1 row-cols-md-2">
+            {% for course in courses | sort: 'date_published' | reverse %}
+           
+        <div class="col mb-3">
+            <div class="card h-100 border-0 shadow-lg">
+                <a href="{{course.link}}" class="nav-item text-decoration-none">
+                    <img src="{{course.cover}}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-text black text-decoration-none">{{course.name}}</h5>
+                    <p class="small mute align-right text-decoration-none dotted">{{course.duration}} | {{course.date_published | date: "%d %B %y"}}</p>
+                    <p class="small mute align-right text-decoration-none dotted">{{course.author}}</p>
+                </div>    
+                </a>
+            </div>
+        </div>
+        
+        {% endfor %} 
+        </div>
+        {% include how_it_works_part.html %}
+        <div class="mt-3">
+        {% include glossary_part_mini.html %}
+        </div>
+        <div class="mt-3">
+            {% include boards_part.html %}
+            </div>
     </div>
 </div>
 
-{% endfor %} 
-</div>
+
+

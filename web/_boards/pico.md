@@ -5,6 +5,8 @@ manufacturer: Raspberry Pi Trading Ltd
 cover: /assets/img/boards/pico.png
 date: 2023-06-19
 author: Kevin McAleer
+excerpt: >-
+  It's an excellent tool for students and beginners stepping into the realm of electronics and programming
 tags:
   - pico
   - raspberry pi

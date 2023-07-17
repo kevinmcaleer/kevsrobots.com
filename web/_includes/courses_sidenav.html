@@ -1,0 +1,9 @@
+{% assign courses = site.data.courses | sort: 'date_published' | reverse  %}
+
+<h5>Courses</h5>
+<ul class="m-0 p-0">
+{% for course in courses | sort: 'date_published' | reverse %}
+{{couse.date_published}}
+<li class="list-unstyled mt-1"><a href="{{ course.link }}" class="orange small">{{ course.name }}</a></li>
+{% endfor %} 
+</ul>
