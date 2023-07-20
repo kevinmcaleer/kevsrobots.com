@@ -690,6 +690,20 @@ table .w-30 { width:30%; }
     color: #000;
 }
 
+.img.img-overlay-black {
+  background-color: rgba(0, 0, 0, 0.25);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 0px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 0px;
+  // backdrop-filter: blur(10px);
+  
+}
+.img.img-overlay-black:hover {
+    background-color: rgba(60, 60, 60, 0.75);
+    color: #000;
+}
+
 .homepage {
   display: grid;
   grid-template-columns: 50px 50px 50px 50px;

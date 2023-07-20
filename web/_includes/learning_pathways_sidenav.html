@@ -1,0 +1,12 @@
+{% assign pathways = site.learning_pathways | sort: 'date_published' | reverse  %}
+<div class="mb-3">
+<h5>Learning Pathways</h5>
+<ul class="m-0 p-0">
+{% for pathway in pathways%}
+    {% if pathway.name != "index.md" %}
+    <li class="list-unstyled mt-1"><a href="{{pathway.url}}" class="orange small">{{pathway.title}}</a></li>
+    {% endif %}
+{% endfor %}
+</ul>
+</div>
+

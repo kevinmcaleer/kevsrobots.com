@@ -10,7 +10,7 @@ description: Create the hinge profile
 percent: 55
 duration: 3
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

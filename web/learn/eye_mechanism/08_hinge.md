@@ -9,7 +9,7 @@ description: Lets create the lower eyelid hinge from the new profile
 percent: 100
 duration: 1
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

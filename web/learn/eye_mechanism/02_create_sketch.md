@@ -10,7 +10,7 @@ description: Creating the initial Sketch
 percent: 33
 duration: 4
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

@@ -1,0 +1,18 @@
+---
+title: Learn Robotics
+date_published: 2023-07-20
+layout: course_pathway
+cover: /assets/img/learn/learn_robotics.png
+courses:
+  - "Robotics 101"
+  - "Python for beginners"
+  - "Learn MicroPython - The basics"
+  - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
+  - "Robot Eye Mechanism"
+---
+
+![Cover image]({{page.cover}}){:class="cover"}
+
+Learn how to build robots, starting with the basics, then move on to learning Python and MicroPython for microcontrollers, finally learn how to make things with Fusion 360.
+
+---

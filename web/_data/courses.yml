@@ -7,6 +7,14 @@
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
 - author: Kevin McAleer
+  cover: /learn/python/assets/python.png
+  date_published: 2023-07-20
+  description: Get started with Python programming, learn why you should  learn Python
+    and how to setup your Python environment.
+  duration: 0h 36m
+  link: /learn/python/01_intro.html
+  name: Python for beginners
+- author: Kevin McAleer
   cover: /learn/redis/assets/redis-cover.jpg
   date_published: 2023-04-12
   description: Learn how to use Redis with Python to build fast, scalable applications.
@@ -58,6 +66,13 @@
   link: /learn/smars_quad/00_intro.html
   name: SMARS Quad
 - author: Kevin McAleer
+  cover: /learn/smars_fusion360/assets/smars_fusion360.png
+  date_published: 2023-07-20
+  description: Learn how to design a robot in 3d using Fusion 360
+  duration: 1h 8m
+  link: /learn/smars_fusion360/00_intro.html
+  name: Build a SMARS Robot in Fusion 360
+- author: Kevin McAleer
   cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
   date_published: 2023-04-14
   description: Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython.
@@ -76,8 +91,8 @@
 - author: Kevin McAleer
   cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
   date_published: 2023-01-29
-  description: Robot Eye Mechansim, is a course that will teach you how to use Fusion
+  description: Robot Eye Mechanism, is a course that will teach you how to use Fusion
     360 to create a Servo controled Robot eye mechanism.
   duration: 0h 18m
   link: /learn/eye_mechanism/00_intro.html
-  name: Robot Eye Mechansim
+  name: Robot Eye Mechanism

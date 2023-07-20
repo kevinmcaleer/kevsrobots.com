@@ -37,6 +37,8 @@ The Arduino Uno R3 is built around the ATmega328P microcontroller, featuring a 1
 
 The board provides 14 digital I/O pins, 6 of which can be used as PWM outputs, and 6 analog input pins. It also features a USB connection for programming and serial communication, a power jack, an ICSP header, and a reset button.
 
+---
+
 ## Programming Languages
 
 The Arduino Uno R3 is programmed using the Arduino IDE, which supports the C and C++ languages using a simplified version of the GCC compiler. The Arduino IDE is user-friendly and includes a wealth of libraries and examples, making programming more accessible for beginners.

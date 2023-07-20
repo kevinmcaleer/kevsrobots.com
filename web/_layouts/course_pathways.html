@@ -1,0 +1,24 @@
+---
+layout: default
+---
+
+<div class="p-3 m-3">
+{% include breadcrumbs.html %}
+<h1>{{page.title}}</h1>
+<h2>Course Pathway</h2>
+<hr>
+<div class="row">
+    <div class="col-3 ">
+    {% include learning_pathways_sidenav.html %}
+    {% include courses_sidenav.html %}
+    </div>
+    <div class="col-9">
+        <div class="p-3 m-3">
+            {{ content }}
+
+            {% include learning_pathways_part.html %}
+
+        </div>
+    </div>
+</div>
+</div>

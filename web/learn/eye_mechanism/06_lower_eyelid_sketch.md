@@ -10,7 +10,7 @@ description: Lets create the Lower Eyelid
 percent: 77
 duration: 2
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

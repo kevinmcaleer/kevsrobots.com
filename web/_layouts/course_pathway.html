@@ -1,0 +1,32 @@
+---
+layout: default
+---
+
+<div class="p-3 m-3">
+{% include breadcrumbs.html %}
+<h1>{{page.title}}</h1>
+<h2>Course Pathway</h2>
+<hr>
+<div class="row">
+    <div class="col-3 ">
+    {% include learning_pathways_sidenav.html %}
+    {% include courses_sidenav.html %}
+    </div>
+    <div class="col-9">
+        <div class="p-3 m-3">
+            {{ content }}
+            <div class="container-fluid bg-ocre p-3 rounded-3">
+            <div class="row row-cols-lg-4 row-cols-md-2 row-cols-sm-1 g-3">
+            {% assign count = 1 %}
+            {% for item in page.courses %}
+            <div class="col">
+                {% include course.html course=item count=count%}
+            </div>
+            {% assign count = count | plus: 1 %}
+            {% endfor %}
+        </div>
+        </div>
+        </div>
+    </div>
+</div>
+</div>

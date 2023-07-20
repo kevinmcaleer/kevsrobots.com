@@ -11,10 +11,10 @@
     </div>
   </nav>
 
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6">
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-2">
     {% for course in courses | limit:6 %}
     <div class="col mb-3">
-        <div class="card h-100">
+        <div class="card h-100 border-0 shadow-lg">
             <a href="{{course.link}}" class="nav-item dotted">
                 <img src="{{course.cover}}" class="card-img-top">
             <div class="card-body">
@@ -25,5 +25,8 @@
         </div>
     </div>
     {% endfor %} 
+</div>
+<div class="row">
+  {% include learning_pathways_mini.html %}
 </div>
 </div>

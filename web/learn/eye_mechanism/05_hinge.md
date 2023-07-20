@@ -10,7 +10,7 @@ description: Create the hinge from the profile and join it to the eyelid
 percent: 66
 duration: 3
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

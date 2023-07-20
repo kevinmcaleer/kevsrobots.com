@@ -1,0 +1,67 @@
+- name: Build a SMARS Robot in Fusion 360
+  author: Kevin McAleer
+  date_created: 2022-07-20
+  date_published: 2023-07-20
+  layout: course
+  cover: assets/smars_fusion360.png
+  description: >- 
+     Learn how to design a robot in 3d using Fusion 360
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md 
+  - section:
+      name: Create the Base
+      content:
+      - 01_base.md
+      - 02_extrude_base.md
+      - 03_shell.md
+      - 04_fillet.md
+      - 05_thin.md
+  - section:
+      name: Refine 
+      content:
+      - 06_front.md
+      - 07_cut.md
+      - 08_side.md
+      - 09_sidecut.md
+      - 10_fillet.md
+      - 11_back.md
+      - 12_back.md
+  - section:
+      name: Wheels
+      content:
+      - 13_wheel.md
+      - 14_cut.md
+      - 15_slots.md
+      - 16_cut.md
+  - section:
+      name: Motor Holders
+      content:
+      - 17_motor.md
+      - 18_extrude.md
+      - 19_nub.md
+      - 20_extrude.md
+      - 21_chamfer.md
+  - section:
+      name: Front
+      content:
+      - 22_front.md
+      - 23_cut.md
+  - section:
+      name: Wheel
+      content:
+      - 24_stub.md
+      - 25_cut.md
+      - 26_stub.md
+      - 27_stub.md
+      - 28_revolve.md
+      - 29_cut.md
+      - 30_extrude.md
+      - 31_slots.md
+      - 32_cut.md
+  - section:
+      name: Final Design
+      content:
+      - 33_final.md

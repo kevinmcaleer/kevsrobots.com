@@ -38,3 +38,6 @@ collections:
   boards:
     output: true
     permalink: /resources/boards/:name.html
+  learning_pathways:
+    output: true
+    permalink: /learn/learning_pathways/:name.html

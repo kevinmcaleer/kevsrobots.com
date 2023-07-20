@@ -1,0 +1,21 @@
+{% assign pathways = site.learning_pathways | sort: 'date_published' | reverse  %}
+<div class="mb-3">
+
+<div class="row row-cols-sm-1 row-cols-md-2 row-cols-lg-4 g-2">
+    {% for item in pathways %}
+    {% if item.name != "index.md" %}
+    <div class="col">
+        <a href="{{item.url}}" class="text-decoration-none black">
+        <div class="card border-0 shadow-lg h-100">
+            <img src="{{item.cover}}" class="card-img-top" alt="...">
+            <div class="card-body">
+                {{item.title}}
+                {{item.description}}
+            </div>
+        </div>  
+        </a>
+    </div>
+    {% endif %}
+{% endfor%}
+</div>
+</div>

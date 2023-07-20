@@ -1,0 +1,17 @@
+- name: Learn Robotics
+  date_published: 2023-07-20
+  courses:
+    link: /learn/robotics_101/
+    link: /learn/micropython/
+    link: /learn/micropython_gpio/
+- name: Learn Python
+  date_published: 2023-07-20
+  courses:
+    link: /learn/micropython/
+    link: /learn/micropython_gpio/
+    link: /learn/burgerbot/
+- name: Learn Databases
+  date_published: 2023-07-20
+  courses:
+    link: /learn/sqlite3/
+    link: /learn/redis/

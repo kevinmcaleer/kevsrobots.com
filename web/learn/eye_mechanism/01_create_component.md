@@ -10,7 +10,7 @@ description: Creating the initial Compoent
 percent: 22
 duration: 1
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

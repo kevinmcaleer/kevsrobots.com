@@ -1,0 +1,34 @@
+- name: Python for beginners
+  author: Kevin McAleer
+  date_created: 2023-07-20
+  date_published: 2023-07-20
+  layout: course
+  cover: assets/python.png
+  description: >- 
+     Get started with Python programming, learn why you should 
+     learn Python and how to setup your Python environment.
+  content:
+  - section:
+      name: Introduction
+      content:
+        - 01_intro.md
+        - 02_basics.md
+        - 03_data_structures.md
+        - 04_flow.md
+        - 05_files.md
+        - 06_errors.md
+        - 07_libraries.md
+        - 08_oop.md
+        - 09_data.md
+  - section:
+      name: Real world Python
+      content:
+        - 10_webscraping.md
+        - 11_data_visualisation.md
+        - 12_ml.md
+        - 13_deep_learning.md
+        - 14_automation.md
+        - 15_databases.md
+        - 16_advanced.md
+        - 17_apps.md
+        - 18_tips_and_tricks.md

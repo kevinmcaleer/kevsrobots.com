@@ -10,7 +10,7 @@ description: Revolve to create the eyelid
 percent: 44
 duration: 1
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

@@ -9,7 +9,7 @@ description: null
 percent: 11
 duration: 1
 navigation:
-- name: Robot Eye Mechansim
+- name: Robot Eye Mechanism
 - content:
   - section: Overview
     content:

@@ -1,17 +1,19 @@
+{% include breadcrumbs.html %}
 <h1>All Courses</h1>
 <h5>Learn something new. Today.</h5>
 <hr class="my-2">
 
-{% include breadcrumbs.html %}
-
 {% assign courses = site.data.courses | sort: 'date_published' | reverse %}
 
 <div class="row">
-    <div class="col col-lg-2 col-md-3 col-sm-4">
+    <div class="col-12 col-lg-2 col-md-3 col-sm-4">
+        {% include learning_pathways_sidenav.html %}
         {% include courses_sidenav.html %}
         {% include boards_sidenav.html %}
     </div>
-    <div class="col col-lg-10 col-md-9 col-sm-8">
+    <div class="col-12 col-lg-10 col-md-9 col-sm-8">
+        <h2>Curated Learning paths</h2>
+        {% include learning_pathways.html %}
         <div class="row row-cols-lg-4 row-cols-sm-1 row-cols-md-2">
             {% for course in courses | sort: 'date_published' | reverse %}
            
@@ -26,8 +28,7 @@
                 </div>    
                 </a>
             </div>
-        </div>
-        
+        </div>    
         {% endfor %} 
         </div>
         {% include how_it_works_part.html %}
