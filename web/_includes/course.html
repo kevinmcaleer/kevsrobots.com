@@ -10,7 +10,7 @@
     <h1 class="img img-overlay-black display-1 text-white p-3">{{ include.count }}</h1>
     </div>
     <div class="card-body">
-        <p class="card-text text-small text-muted">{{ course.duration }}<br /><b>{{ course.name }}</b></p>
+        <p class="card-text text-small text-muted"><i class="fa-regular fa-clock"></i>&nbsp;{{ course.duration | replace: "0h ",""}}<br /><b>{{ course.name }}</b></p>
     </div>
 </div>
 </a>

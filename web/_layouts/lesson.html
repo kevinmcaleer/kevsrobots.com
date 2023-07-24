@@ -53,7 +53,7 @@ thanks: false
         <div class="px-3 m-3">
             <h1>{{page.title}}</h1>
             <h2>{{page.description}}</h2>
-            <p class="text-small mute">By {{page.author}}, Duration: {{page.duration}} Minutes</p>
+            <p class="text-small mute">By {{page.author}},&nbsp; <i class="fa-regular fa-clock"></i>&nbsp; {{page.duration}} Minute{%if page.duration > 1%}s{% endif %}</p>
             <hr />
 
             {% if page.type == "video" %}
