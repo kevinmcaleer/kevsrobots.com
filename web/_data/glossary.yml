@@ -439,3 +439,67 @@
     These switches are small in size and are commonly used in PDAs, mobile phones and other consumer electronic devices.
   link: https://en.wikipedia.org/wiki/Tactile_switch
   article: /resources/how_it_works/tact
+- term: Ohms Law
+  definition: Ohms Law
+  full: >-
+    Ohm's law states that the current through a conductor between two points is directly proportional to the voltage across the two points.
+    Introducing the constant of proportionality, the resistance, one arrives at the usual mathematical equation that describes this relationship:
+    I = V/R. Where I is the current through the conductor in units of amperes, V is the voltage measured across the conductor in units of volts, and R is the resistance of the conductor in units of ohms.
+    Ohms law is named after Georg Simon Ohm, who was a German physicist and mathematician. He discovered Ohm's law in 1827, and published his results in 1827, in the book "Die galvanische Kette, mathematisch bearbeitet" (The Galvanic Circuit Investigated Mathematically).
+  link: https://en.wikipedia.org/wiki/Ohm%27s_law
+- term: Resistance
+  definition: Resistance
+  full: >-
+    Electrical resistance is a measure of the degree to which an object opposes an electric current through it.
+    The SI unit of electrical resistance is the ohm.
+    Its reciprocal quantity is electrical conductance measured in siemens.
+  link: https://en.wikipedia.org/wiki/Electrical_resistance_and_conductance
+- term: Conductance
+  definition: Conductance
+  full: >-
+    The electrical conductance of an electrical conductor is a measure of the ease with which an electric current passes.
+    It is the reciprocal of the electrical resistance.
+    A conductor's conductance is often represented by the symbol G.
+  link: https://en.wikipedia.org/wiki/Electrical_resistance_and_conductance
+- term: Voltage
+  definition: Voltage
+  full: >-
+    Voltage, electric potential difference, electric pressure or electric tension is the difference in electric potential energy between two points per unit electric charge.
+    The voltage between two points is equal to the work done per unit of charge against a static electric field to move the test charge between two points.
+  link: https://en.wikipedia.org/wiki/Voltage
+- term: Current
+  definition: Current
+  full: >-
+    An electric current is a flow of electric charge.
+    In electric circuits this charge is often carried by moving electrons in a wire.
+    It can also be carried by ions in an electrolyte, or by both ions and electrons such as in an ionised gas (plasma).
+  link: https://en.wikipedia.org/wiki/Electric_current
+- term: Capacitance
+  definition: Capacitance
+  full: >-
+    Capacitance is the ability of a body to store an electrical charge.
+    Any object that can be electrically charged exhibits capacitance.
+    A common form of energy storage device is a parallel-plate capacitor.
+    In a parallel plate capacitor, capacitance is directly proportional to the surface area of the conductor plates and inversely proportional to the separation distance between the plates.
+  link: https://en.wikipedia.org/wiki/Capacitance
+- term: Inductance
+  definition: Inductance
+  full: >-
+    In electromagnetism and electronics, inductance is the property of an electrical conductor by which a change in electric current through it induces an electromotive force (voltage) in the conductor.
+    It is called self-inductance to distinguish it from mutual inductance, which is the property of a circuit whereby a change in electric current in one circuit produces an electromotive force in another circuit.
+  link: https://en.wikipedia.org/wiki/Inductance
+- term: Diode
+  definition: Diode
+  full: >-
+    A diode is a two-terminal electronic component that conducts primarily in one direction (asymmetric conductance); it has low (ideally zero) resistance in one direction, and high (ideally infinite) resistance in the other.
+    A diode vacuum tube or thermionic diode is a vacuum tube with two electrodes, a heated cathode and a plate, in which electrons can flow in only one direction, from cathode to plate.
+    A semiconductor diode, the most common type today, is a crystalline piece of semiconductor material with a p–n junction connected to two electrical terminals.
+  link: https://en.wikipedia.org/wiki/Diode
+- term: Transistor
+  definition: Transistor
+  full: >-
+    A transistor is a semiconductor device used to amplify or switch electronic signals and electrical power. It is composed of semiconductor material usually with at least three terminals for connection to an external circuit. A voltage or current applied to one pair of the transistor's terminals controls the current through another pair of terminals. Because the controlled (output) power can be higher than the controlling (input) power, a transistor can amplify a signal. Today, some transistors are packaged individually, but many more are found embedded in integrated circuits.
+  link: https://en.wikipedia.org/wiki/Transistor
+
+
+

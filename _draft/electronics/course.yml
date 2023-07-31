@@ -1,0 +1,22 @@
+- name: Electronics for Makers
+  author: Kevin McAleer
+  date_created: 2023-07-30
+  date_published: 2023-07-30
+  layout: course
+  cover: assets/electronics_101.png
+  description: >- 
+    description
+  content:
+  - section:
+      name: Overview
+      content:
+      - 01_intro.md
+      - 02_basics.md
+      - 03_resistors.md
+  - section:
+      name: Components
+      content:    
+      - 04_resistors.md
+      - 05_capacitors.md
+      - 06_inductors.md
+      - 07_semiconductors.md

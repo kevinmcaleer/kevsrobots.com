@@ -17,10 +17,15 @@ tags:
 ---
 
 ## Contents
-{:no_toc}
 
 {:toc}
 * toc
+
+---
+
+## Video
+
+{% include youtubeplayer.html id="bV2sw7XBaqo" %}
 
 ---
 
@@ -138,7 +143,7 @@ OpenAI has a nice automatic image captioning service, you can get this up and ru
 
 ## Tweak the code
 
-You can also tweak the query, to ask OpenAI how to desribe the image, here is a response generated from the query:
+You can also tweak the query, to ask OpenAI how to describe the image, here is a response generated from the query:
 
 ``` python
 result = index.query('describe what is in the image, be nonchalant and snarky')
