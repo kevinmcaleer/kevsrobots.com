@@ -1,3 +1,8 @@
+- name: Googley Eyes
+  link: /blog/googley-googley-eyes.html
+  cover: /assets/img/blog/googleyeyes/googleyeyes.jpg
+  description: Learn how to build a pair of Googley Eyes that google what they see
+  date: 2023/07/30
 - name: BurgerBot Bluetooth
   link: /blog/bluetooth-remote.html
   cover: /assets/img/blog/ble/ble.jpg

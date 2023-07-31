@@ -5,9 +5,6 @@ posts:
 - title: SMARS Mini
   url: /2023-01-22-smars-mini.md
   date: 2023-01-22
-- title: Bluetooth remote controlled robot
-  url: /2023-07-03-bluetooth-remote.md
-  date: 2023-07-03
 - title: Pinout.XYZ
   url: /2023-05-28-pinout-xyz.md
   date: 2023-05-28
@@ -35,6 +32,9 @@ posts:
 - title: Where is my robot butler?
   url: /2023-03-20-robot-butler.md
   date: 2023-03-20
+- title: Bluetooth remote controlled robot
+  url: /2023-07-03-bluetooth-remote copy.md
+  date: 2023-07-03
 - title: Bugs the Robo-Bunny
   url: /2022-04-10-robobunny.md
   date: 2022-04-10
@@ -50,6 +50,9 @@ posts:
 - title: Retro Arcade
   url: /2023-06-14-retro-arcade.md
   date: 2023-07-02
+- title: Googley Googley Eyes
+  url: /2023-07-26-googley-googley-eyes.md
+  date: 2023-07-26
 - title: Duckface
   url: /2023-02-26-duckface.md
   date: 2023-02-22
@@ -116,6 +119,9 @@ posts:
 - title: PicoCat Lives
   url: /2022-04-01-picocat-lives.md
   date: 2022-04-01
+- title: SQLite3
+  url: /2023-07-15-sqlite.md
+  date: 2023-07-15
 - title: Pomodoro Robot!
   url: /2022-10-01-pomodoro-bot.md
   date: 2022-10-02
