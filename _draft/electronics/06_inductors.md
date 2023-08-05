@@ -17,6 +17,14 @@ Inductors are passive electronic components that store energy in a magnetic fiel
 
 ---
 
+## Schematic Symbol
+
+![Resistors](assets/inductor_symbol.png){:class="img-fluid w-50"}
+
+Inductors are depicted using schematic symbols in circuit diagrams.  The electrical symbol for an inductor, often used in circuit diagrams, typically consists of several curved lines or a series of loops or coils, which represent the coiled wire used in the construction of the inductor.
+
+---
+
 ## Function of Inductors
 
 Inductors serve several purposes in electronic circuits:

@@ -3,13 +3,13 @@ layout: lesson
 title: Diving into Inductors
 author: Kevin McAleer
 type: page
-cover: /learn/electronics/assets/electronics_101.png
+cover: assets/6.jpg
 previous: 05_capacitors.html
 next: 07_semiconductors.html
 description: A comprehensive guide to understanding inductors, their function, different
   types, and how they are used in electronic circuits.
-percent: 84
-duration: 2
+percent: 54
+duration: 3
 navigation:
 - name: Electronics for Makers
 - content:
@@ -29,10 +29,22 @@ navigation:
       link: 05_capacitors.html
     - name: Diving into Inductors
       link: 06_inductors.html
-    - name: Delving into Semiconductors
+    - name: Unveiling the Magic of Semiconductors
       link: 07_semiconductors.html
+  - section: Circuits
+    content:
+    - name: Unraveling the Basics of Electronic Circuits
+      link: 08_circuits.html
+    - name: Decoding the Mysteries of RC Circuits
+      link: 09_rc.html
+    - name: Unlocking the Secrets of RL Circuits
+      link: 10_rl.html
+    - name: Diving Into Digital Electronics
+      link: 11_digital.html
 ---
 
+
+![Cover image]({{page.cover}}){:class="cover"}
 
 In our previous lessons, we've likened an inductor to a water turbine in a river that stores energy in its spinning motion. In this lesson, we'll learn more about inductors: what they are, how they work, their various types, and their uses in electronic circuits.
 
@@ -41,6 +53,14 @@ In our previous lessons, we've likened an inductor to a water turbine in a river
 ## What are Inductors?
 
 Inductors are passive electronic components that store energy in a magnetic field when electric current flows through them. If you've ever seen a metal coil in an electronic device, that's likely an inductor. Think of them as a type of energy reservoir, similar to a flywheel in mechanical systems.
+
+---
+
+## Schematic Symbol
+
+![Resistors](assets/inductor_symbol.png){:class="img-fluid w-50"}
+
+Inductors are depicted using schematic symbols in circuit diagrams.  The electrical symbol for an inductor, often used in circuit diagrams, typically consists of several curved lines or a series of loops or coils, which represent the coiled wire used in the construction of the inductor.
 
 ---
 

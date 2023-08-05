@@ -3,12 +3,12 @@ layout: lesson
 title: Introduction to Electronic Components
 author: Kevin McAleer
 type: page
-cover: /learn/electronics/assets/electronics_101.png
+cover: assets/3.jpg
 previous: 02_basics.html
 next: 04_resistors.html
 description: A detailed introduction to the basic electronic components, including
   resistors, capacitors, inductors, and semiconductors.
-percent: 42
+percent: 27
 duration: 2
 navigation:
 - name: Electronics for Makers
@@ -29,10 +29,22 @@ navigation:
       link: 05_capacitors.html
     - name: Diving into Inductors
       link: 06_inductors.html
-    - name: Delving into Semiconductors
+    - name: Unveiling the Magic of Semiconductors
       link: 07_semiconductors.html
+  - section: Circuits
+    content:
+    - name: Unraveling the Basics of Electronic Circuits
+      link: 08_circuits.html
+    - name: Decoding the Mysteries of RC Circuits
+      link: 09_rc.html
+    - name: Unlocking the Secrets of RL Circuits
+      link: 10_rl.html
+    - name: Diving Into Digital Electronics
+      link: 11_digital.html
 ---
 
+
+![Cover image]({{page.cover}}){:class="cover"}
 
 In the previous lesson, we compared electricity to a river, flowing and doing work as a result of certain forces. Now, let's meet the 'rocks', 'turbines', and 'dams' that manipulate this river in useful ways. These are the components that make up every electronic device.
 

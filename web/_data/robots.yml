@@ -3,6 +3,11 @@
   cover: /assets/img/blog/googleyeyes/googleyeyes.jpg
   description: Learn how to build a pair of Googley Eyes that google what they see
   date: 2023/07/30
+- name: Viam Rover
+  link: https://www.youtube.com/watch?v=wFvYFizRcro
+  cover: https://img.youtube.com/vi/wFvYFizRcro/0.jpg
+  description: How to build a no-code robot with Viam
+  date: 2023/07/23
 - name: BurgerBot Bluetooth
   link: /blog/bluetooth-remote.html
   cover: /assets/img/blog/ble/ble.jpg
