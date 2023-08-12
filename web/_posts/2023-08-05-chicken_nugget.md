@@ -6,7 +6,8 @@ short_title: Chicken Nugget of Doom
 short_description: "Can a Chicken Nugget run Doom?"
 date: 2023-08-05
 author: Kevin McAleer
-excerpt: 
+excerpt: >-
+    Ever wondered if a McDonald's Chicken Nugget could venture into the world of gaming?
 cover: /assets/img/blog/chicken_nugget/cover.jpg
 tags: 
  - Raspberry Pi

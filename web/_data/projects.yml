@@ -1,6 +1,6 @@
 - name: RetroPie on the Compute Module 4
-  link: /blog/setting-up-samba-for-retropie.html
-  cover: /assets/img/blog/retropie/retropie.jpg
+  link: /blog/retropie.html
+  cover: /assets/img/blog/retropie/retropie_cm4.jpg
   description: "RetroPie on the Compute Module 4 in a Atari 2600 case"
   date: 2023-08-12
 - name: Nugget of Doom
