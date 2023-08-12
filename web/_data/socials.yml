@@ -3,7 +3,7 @@
   icon: "fab fa-youtube"
 - name: Twitter
   link: https://www.twitter.com/kevsmac
-  icon: "fab fa-twitter"
+  icon: "fa-brands fa-x-twitter"
 - name: Instagram
   link: https://www.instagram.com/kevinmcaleer
   icon: "fab fa-instagram"
@@ -15,4 +15,4 @@
   icon: "fab fa-tiktok"
 - name: Threads
   link: https://www.threads.net/@kevinmcaleer
-  icon: "fa-brands fa-meta"
+  icon: "fa-brands fa-threads"

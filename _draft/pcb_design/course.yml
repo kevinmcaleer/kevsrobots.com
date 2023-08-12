@@ -1,0 +1,67 @@
+- name: Fusion 360 PCB Design for beginners
+  author: Kevin McAleer
+  date_created: 2023-08-07
+  date_published: 2023-08-07
+  layout: course
+  cover: assets/pcb.png
+  description: >- 
+      Learn how to design, create and build PCBs using Autodesk Fusion 360 Electronic Design.
+  content:
+  - section:
+      name: Introduction
+      content:
+        - 00_intro.md
+  - section:
+      name: 1. 3D Model Initiation
+      content:
+        - 01_start.md
+        - 02_create.md
+        - 03_extrude.md
+  - section: 
+      name: 2. Sketching and PCB Creation
+      content:
+        - 04_sketch.md
+        - 05_assistate.md
+        - 06_push.md
+  - section: 
+      name: 3. Electronic Design
+      content:
+        - 07_create.md
+  - section: 
+      name: 4. Schematic & Components
+      content:
+        - 08_schematic.md
+        - 09_components.md
+  - section:
+      name: 5. Raspberry Pi Pico Creation
+      content:
+        - 10_pico.md
+        - 11_library.md
+        - 12_schematic.md
+        - 13_components.md  
+        - 14_add.md
+  - section:
+      name: 6. Power and Grounding
+      content:
+        - 15_power.md
+        - 16_components.md
+        - 17_nets.md
+  - section:
+      name: 7. Board Layout
+      content:
+        - 18_components.md
+        - 19_place.md
+        - 20_route.md
+  - section:
+      name: 8. Modifications & Checks
+      content:
+        - 21_mounting.md
+        - 22_3d.md
+        - 23_drc.md
+        - 24_ground.md
+  - section:
+      name: 9. Final Steps
+      content:
+        - 25_export.md
+        - 26_gerber.md
+      

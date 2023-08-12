@@ -5,7 +5,7 @@ social:
    - site: Twitter 
      name: kevsmac
      link: https://www.twitter.com/kevsmac
-     icon: fa-brands fa-twitter
+     icon: fa-brands fa-x-twitter
    - site: Facebook
      name: Small Robots Group
      link: https://www.facebook.com/groups/smallrobots
@@ -29,4 +29,5 @@ social:
    - site: Threads
      name: "@kevinmcaleer"
      link: https://www.threads.net/@kevinmcaleer
-     icon: "fa-solid fa-reel"
+     icon: "fa-brands fa-threads"
+

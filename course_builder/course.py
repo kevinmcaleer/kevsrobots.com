@@ -86,6 +86,10 @@ class Course():
                 lesson=yaml.safe_load(a)
             except yaml.YAMLError as exc:
                 print(exc)
+            except IndexError as exc:
+                print('there was an error parseing the yaml file - looking for the end of the front matter: ---')
+                print(f'item is {item}')
+                print(exc)
 
             # Check the lesson markdown file for a duration
 
