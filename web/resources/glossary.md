@@ -1,12 +1,18 @@
 ---
-layout: home
+layout: content
 title: Glossary
 excerpt: Decoding common robotics terms
 ---
 
+{% include nav_resources.html %}
+
 {% include breadcrumbs.html %}
 
-# Robot Glossary
+# Robotics Glossary
+
+## Find definintions of terms and topics related to robotics
+
+---
 
 Welcome to our robotics glossary page. Here, you can find definitions of key terms related to robotics, including definitions of basic concepts and technical terms. We have included both common and uncommon terms so that anyone interested in robotics can have access to comprehensive and accurate information. We hope this page can be a helpful resource and aid in your understanding of the robotics field.
 

@@ -5,10 +5,11 @@ layout: content
 {% include nav_resources.html %}
 
 {% include breadcrumbs.html %}
+
+<img src="{{page.cover}}" class="cover rounded my-3">
 <h1>{{page.title}}</h1>
 <h2>{{page.subtitle}}</h2>
 <p>{{page.excerpt}}</p>
-<img src="{{page.cover}}" class="cover rounded my-3">
 
 {% for tag in page.tags %}
 <span class="float-end mx-1 bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span>
@@ -16,36 +17,22 @@ layout: content
 
 </span>
 <p class="orange"><i class="fa-regular fa-calendar"></i> {{page.date | date: "%-d %B %Y" }} by <i class="fa-regular fa-user"></i> {{ page.author}}
-| Share this article on <span class=""><a href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
+| Share this article on <span class=""><a href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
     <a href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
 </p>
 <hr />
-<div class="row">
-    <div class="col col-lg-2 col-md-3 col-sm-4">
-        {% include boards_sidenav.html %}
-    </div>
-    <div class="col col-lg-10 col-md-9 col-sm-8">
-       
 <div class="row">
 <div class="col-sm-12 col-md-9">
 <article>
 {{content}}
 </article>
-
-<p>If you liked this, you might like these:</p>
-
-{% include boards_mini.html %}
-
 </div>
 <div class="col-sm-12 col-md-3">
 {% include blog_profile.html %}
 
 <hr>
-{% include boards_nav.html %}
+{% include blog_archive.html %}
 </div>
 </div>
-    </div>
-</div>
-
 
 

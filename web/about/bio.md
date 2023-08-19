@@ -5,20 +5,33 @@ subtitle: Learn about Kevin McAleer, Small Robots and links to all his social me
 ---
 
 {% include breadcrumbs.html %}
+
 {% assign profile = site.data.profile %}
 
-![Kev profile picture]({{profile.image}}){:class="image-fluid w-25"}
+# About Kevin McAleer
 
-## About Kevin McAleer
+## Learn about the Maker behind KevsRobots
+
+---
+
+![Kev profile picture]({{profile.image}}){:class="image-fluid w-50"}
 
 Hi, and thanks for taking an interest in what I do!
-I'm a hobbyist robotics fanatic who likes to build robots, share videos about them on YouTube and teach people how to do the same, or as I say on every video:
+I'm a hobbyist robotics fanatic who likes to build robots, share videos about them on [YouTube](https://www.youtube.com/@kevinmcaleer28) and teach people how to do the same, or as I say on every video:
 
-> ***'Learn with me as we Build Robots, bring them to life with code, and have a whole load of fun along the way'***.
+> **'Learn with me as we Build Robots, bring them to life with code, and have a whole load of fun along the way'**
 
 I live in the UK (up North), with my beautiful wife, 2 Chihuahuas and way too many cats.
 
 ---
+
+## Contact
+
+If you want to contact me about something, feel free to reachout to <kevinmcaleer@gmail.com>
+
+---
+
+## Recent Videos
 
 {% include youtube_latest.html%}
 

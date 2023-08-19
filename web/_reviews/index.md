@@ -4,7 +4,15 @@ title: Reviews
 thanks: false
 ---
 
+{% include nav_robots.html %}
+
+{% include breadcrumbs.html %}
+
 # Reviews
+
+## Robots, Kit, Boards and more
+
+---
 
 He's my take on common components and parts that I've purchased. This page is related to items that appear on the [Gear list](/gear/).
 

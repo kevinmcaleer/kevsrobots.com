@@ -2,12 +2,12 @@
 <nav class="navbar navbar-expand-lg my-0 py-0 sub-nav">
     <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="nav me-auto mt-0 mb-2 mb-lg-0">
+            <ul class="nav me-auto mt-0 mb-0">
         {% for item in nav %}
         <li class="nav-item">
             {% assign p = page.url | remove: '.html'%}    
             {% assign l = item.link | remove: '.html'%}
-            <a href="{{ item.link }}" class="nav-link black {% if p == l %}active{% endif %}">{{ item.name }}</a>
+            <a href="{{ item.link }}" class="nav-link black {% if p contains l %}active{% endif %}">{{ item.name }}</a>
         </li>
         {% endfor %}
         </ul>

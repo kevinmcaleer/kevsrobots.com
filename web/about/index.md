@@ -7,6 +7,8 @@ title: About KevsRobots
 
 # About Kev's Robots
 
+## Learn about this website
+
 ---
 
 Hi - I'm Kevin McAleer and I run this website using a bunch of [Raspberry Pi's](https://www.clustered-pi.com), if you want to know more about me, head over to the [bio](/about/bio) page.

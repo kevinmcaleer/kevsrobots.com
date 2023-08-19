@@ -8,3 +8,5 @@ excerpt: These are some of the projects I've made
 ---
 
 {% include projects.html %}
+
+---

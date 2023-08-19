@@ -5,6 +5,8 @@ description: Robotics resources you may find useful
 subtitle: Robotics resources you may find useful
 ---
 
+{% include nav_resources.html %}
+
 {% include breadcrumbs.html %}
 
 # Resources

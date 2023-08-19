@@ -3,37 +3,14 @@
 
 <!-- Show on Large or higher -->
 <div class="d-lg-block d-md-none d-sm-none d-none mx-auto justify-content-center">
-<ul class="nav mb-2 m-0  mb-lg-0 white-nav">
-    
-    {% assign navs = site.data.top-nav %}
-    {% for nav in navs %}
-    <li class="nav-item top-nav m-2">
-        <a href="{{ nav.link }}" class="nav-link white-text p-1"><i class="{{ nav.icon }} mx-1"></i>{{ nav.name }}</a>
-    </li>
-    {% endfor %}
-</ul>
-</div>
-
-<!-- Show on Medium and smaller -->
-<div class="d-lg-none d-sm-block">
-<ul class="nav mb-2 m-0 mb-lg-0 justify-content-center white-nav ">
-    {% assign navs = site.data.top-nav %}
-    {% for nav in navs %}
-    <li class="nav-item top-nav m-2">
-        <a href="{{ nav.link }}" class="nav-link white-text p-0"><i class="{{ nav.icon }} mx-1"></i></a>
-    </li>
-    {% endfor %}
-</ul>
 </div>
 
 <div class="d-block">
-<ul class="nav mb-2 m-0 mb-lg-0 justify-content-center white-nav">
-    {% assign socials = site.data.socials %}
-    {% for social in socials %}
+<ul class="nav mb-0 m-0 mb-lg-0 justify-content-center white-nav">
     <li class="nav-item top-nav m-2">
-        <a href="{{ social.link }}" class="nav-link white-text p-1"><i class="{{ social.icon }} mx-1"></i></a>
+        <i class="fa-sharp fa-solid fa-share white-text"></i>&nbsp;
+        <a href="https://www.youtube.com/@kevinmcaleer28?sub_confirmation=1" class="btn btn-danger white-text p-1"><i class="fab fa-youtube mx-1"></i>Subscribe on YouTube</a>
     </li>
-    {% endfor %}
 </ul>
 </div>
 </div>

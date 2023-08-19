@@ -5,6 +5,8 @@ description: Learn how common things work
 subtitle: Learn how common things work
 ---
 
+{% include nav_resources.html %}
+
 {% include breadcrumbs.html %}
 
 # How it works

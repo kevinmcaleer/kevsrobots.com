@@ -1,0 +1,39 @@
+
+<div class="container-fluid bg-dark navbar p-0 m-0">
+
+<!-- Show on Large or higher -->
+<div class="d-lg-block d-md-none d-sm-none d-none mx-auto justify-content-center">
+<ul class="nav m-0  mb-lg-0 white-nav">
+    
+    {% assign navs = site.data.top-nav %}
+    {% for nav in navs %}
+    <li class="nav-item top-nav m-2">
+        <a href="{{ nav.link }}" class="nav-link white-text p-1"><i class="{{ nav.icon }} mx-1"></i>{{ nav.name }}</a>
+    </li>
+    {% endfor %}
+</ul>
+</div>
+
+<!-- Show on Medium and smaller -->
+<div class="d-lg-none d-sm-block">
+<ul class="nav m-0 mb-lg-0 justify-content-center white-nav ">
+    {% assign navs = site.data.top-nav %}
+    {% for nav in navs %}
+    <li class="nav-item top-nav m-2">
+        <a href="{{ nav.link }}" class="nav-link white-text p-0"><i class="{{ nav.icon }} mx-1"></i></a>
+    </li>
+    {% endfor %}
+</ul>
+</div>
+
+<div class="d-block">
+<ul class="nav m-0 mb-lg-0 justify-content-center white-nav">
+    {% assign socials = site.data.socials %}
+    {% for social in socials %}
+    <li class="nav-item top-nav m-2">
+        <a href="{{ social.link }}" class="nav-link white-text p-1"><i class="{{ social.icon }} mx-1"></i></a>
+    </li>
+    {% endfor %}
+</ul>
+</div>
+</div>

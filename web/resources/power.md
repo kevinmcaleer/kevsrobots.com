@@ -6,6 +6,8 @@ excerpt: Everything you need to know about powering your robot
 subtitle: Everything you need to know about powering your robot
 ---
 
+{% include nav_resources.html %}
+
 {% include breadcrumbs.html %}
 
 # Power

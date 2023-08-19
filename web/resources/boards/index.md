@@ -6,6 +6,8 @@ subtitle: Raspberry Pis, Microbits, Arduino and more
 excerpt: Learn about the differnt types of boards and the features they provide
 ---
 
+{% include nav_resources.html %}
+
 {% include breadcrumbs.html %}
 
 # Boards

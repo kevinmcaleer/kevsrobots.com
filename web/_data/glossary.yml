@@ -500,6 +500,16 @@
   full: >-
     A transistor is a semiconductor device used to amplify or switch electronic signals and electrical power. It is composed of semiconductor material usually with at least three terminals for connection to an external circuit. A voltage or current applied to one pair of the transistor's terminals controls the current through another pair of terminals. Because the controlled (output) power can be higher than the controlling (input) power, a transistor can amplify a signal. Today, some transistors are packaged individually, but many more are found embedded in integrated circuits.
   link: https://en.wikipedia.org/wiki/Transistor
-
-
-
+- term: OTA
+  definition: Over The Air
+  full: >-
+    OTA stands for Over The Air.
+    It is a method of updating the firmware of a device without having to connect it to a computer.
+  link: https://en.wikipedia.org/wiki/Over-the-air_programming
+  article: /blog/micropython-ota
+- term: Firmware
+  definition: Sofware embedded/fixed in hardware
+  full: >-
+    Firmware is a type of software that is embedded in a hardware device.
+    It is a type of software that is embedded in a hardware device.
+  link: https://en.wikipedia.org/wiki/Firmware

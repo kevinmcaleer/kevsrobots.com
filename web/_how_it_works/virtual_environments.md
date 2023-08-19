@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Python Virtual Environments
 short_title: How it works - Python Virtual Environments
 short_description: Learn about Python Virtual Environments

@@ -1,0 +1,16 @@
+- name: Robots
+  link: /robots/
+- name: Projects
+  link: /robots/projects/
+- name: Links
+  link: /links/
+- name: Gear List
+  link: /gear/
+- name: Reviews
+  link: /reviews/
+- name: About
+  link: /about/
+- name: Bio
+  link: /about/bio.html
+- name: Robot Maker
+  link: /about/robotmaker
