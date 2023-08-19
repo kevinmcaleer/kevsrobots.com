@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Breadboards
 short_title: How it works - Breadboards
 short_description: Learn about how Breadboards work

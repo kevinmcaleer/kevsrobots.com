@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: SLAM
 short_title: How it works - SLAM
 short_description: Learn about Simultaneous Location and Mapping

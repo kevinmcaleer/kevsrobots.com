@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Buck Converters
 short_title: How it works - Buck Converters
 short_description: Learn about how Buck Converters work

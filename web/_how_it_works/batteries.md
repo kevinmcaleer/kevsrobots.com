@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Batteries
 short_title: How it works - Batteries
 short_description: Learn about how Batteries work, and how to power your projects

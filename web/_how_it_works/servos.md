@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Servos
 short_title: How it works - Servos
 short_description: Learn about how Servos work

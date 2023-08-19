@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Encoders
 short_title: How do Encoders work?
 short_description: Learn about Encoders

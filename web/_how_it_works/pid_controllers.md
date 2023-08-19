@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: PID Controlers
 short_title: How it works - PID Controllers
 short_description: How it works - PID Controllers

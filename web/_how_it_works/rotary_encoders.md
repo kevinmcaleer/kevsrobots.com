@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Rotary Encoders
 short_title: How it works - Rotary Encoders
 short_description: Learn about Rotary Encoders

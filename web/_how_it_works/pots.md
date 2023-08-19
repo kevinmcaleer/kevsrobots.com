@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Pots
 short_title: How do Potentiometers work?
 short_description: Learn about Pots

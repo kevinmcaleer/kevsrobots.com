@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Shift Registers
 short_title: How it works - Shift Registers
 short_description: Learn about how Shift Registers works

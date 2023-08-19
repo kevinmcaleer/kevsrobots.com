@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Potato Battery
 short_title: How it works - Potato Battery
 short_description: How it works - Potato Battery

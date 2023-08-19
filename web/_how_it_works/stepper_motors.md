@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Stepper Motors
 short_title: How it works - Stepper Motors
 short_description: Learn about Stepper Motors

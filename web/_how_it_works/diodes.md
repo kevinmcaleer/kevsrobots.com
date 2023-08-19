@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Diodes
 short_title: How it works - Diodes
 short_description: Learn about how Diodes work

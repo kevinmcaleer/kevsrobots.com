@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Inverse Kinematics
 short_title: How it works - LiDAR
 short_description: Learn about LiDAR

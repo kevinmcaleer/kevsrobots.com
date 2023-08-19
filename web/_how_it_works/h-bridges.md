@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: H-Bridges
 short_title: How do H-Bridges work?
 short_description: Learn about H-Bridges

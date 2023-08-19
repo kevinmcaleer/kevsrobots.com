@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: Tact Switches
 short_title: How do Tact Switches work?
 short_description: Learn about Tact Switches

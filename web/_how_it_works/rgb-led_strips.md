@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: RGB LED Strips
 short_title: RGB LED Strips
 short_description: Learn about how RGB LED Strips work

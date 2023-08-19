@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: how_it_works
 title: MQTT
 short_title: How it works - MQTT
 short_description: Learn about MQTT
