@@ -4,7 +4,7 @@ title: Over the Air updates with MicroPython
 description: "Automatically update code on your embedded devices"
 short_title: OTA with MicroPython 
 short_description: "Automatically update code on your embedded devices"
-date: 2023-08-19
+date: 2023-08-18
 author: Kevin McAleer
 excerpt: >-
     Over-The-Air refers to the method of transmitting data, typically a software update, across a network without any wired connection

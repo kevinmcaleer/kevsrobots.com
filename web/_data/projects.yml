@@ -1,3 +1,13 @@
+- name: Over the air updates with micropython
+  link: /blog/micropython-ota.html
+  cover: /assets/img/blog/ota/ota.jpg
+  description: "Over the air updates with micropython"
+  date: 2023-08-20
+- name: Bluetooth Remote PCB
+  link: /blog/bluetooth-remote-pcb.html
+  cover: /assets/img/blog/pcb/pcb.png
+  description: "Bluetooth Remote PCB"
+  date: 2023-08-19
 - name: RetroPie on the Compute Module 4
   link: /blog/retropie.html
   cover: /assets/img/blog/retropie/retropie_cm4.jpg
