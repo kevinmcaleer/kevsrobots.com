@@ -23,6 +23,14 @@ tags:
 
 ---
 
+## Video
+
+Watch this video for an explanation and demo of the code in action.
+
+{% include youtubeplayer.html id="f1widOJYQDc" %}
+
+---
+
 ## Demystifying Over-The-Air (OTA) Updates
 
 If you've ever had a software update pop up on your smartphone or smart TV, you've encountered an [`OTA`](/resources/glossary#ota) update, even if you didn't know it by name. `OTA`, or `Over-The-Air`, refers to the method of transmitting data across a network without any wired connection. In the realm of embedded devices and the Internet of Things (IoT), this term has become increasingly vital. Let's delve into what OTA is, why it's invaluable, and some potential pitfalls.
