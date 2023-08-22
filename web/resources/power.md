@@ -12,6 +12,8 @@ subtitle: Everything you need to know about powering your robot
 
 # Power
 
+## Making robots go!
+
 {{ page.description }}
 
 ---
