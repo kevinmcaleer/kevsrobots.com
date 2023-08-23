@@ -299,7 +299,7 @@
     The effect of a capacitor is known as capacitance.
     The capacitor was originally known as a condenser or condensator.
   link: https://en.wikipedia.org/wiki/Capacitor
-  # article: /resources/how_it_works/capacitors
+  article: /resources/how_it_works/capacitors
 - term: ADC
   definition: Analog to Digital Converter
   full: >-
@@ -513,3 +513,10 @@
     Firmware is a type of software that is embedded in a hardware device.
     It is a type of software that is embedded in a hardware device.
   link: https://en.wikipedia.org/wiki/Firmware
+- term: Farad
+  definition: A unit of electrical capacitance
+  full: >-
+    The farad (symbol: F) is the SI derived unit of electrical capacitance, the ability of a body to store an electrical charge.
+    It is named after the English physicist Michael Faraday.
+  link: https://en.wikipedia.org/wiki/Farad
+  article: /resources/how_it_works/capacitors
