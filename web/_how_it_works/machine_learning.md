@@ -10,6 +10,7 @@ cover: /assets/img/how_it_works/ml.jpg
 tags:
  - Robot
  - Tips
+ - How it works
 ---
 
 `Machine learning` is a type of artificial intelligence ([AI](/resources/glossary#ai)) that enables computer systems to learn from data, identify patterns, and make decisions with minimal human intervention.

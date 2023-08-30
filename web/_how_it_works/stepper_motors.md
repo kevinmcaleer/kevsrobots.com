@@ -12,6 +12,7 @@ tags:
  - NEMA 17
  - Stepper Motors
  - Motors 
+ - How it works
 ---
 
 `Stepper Motors` are electric motors that convert electrical pulses into precise mechanical movements.

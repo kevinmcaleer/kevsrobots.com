@@ -14,6 +14,7 @@ tags:
  - Electronics
  - Control systems
  - PID
+ - How it works
 ---
 
 `PID controllers`, short for Proportional Integral Derivative controllers, are a type of control system that are widely used in robotics, automation, and process control.

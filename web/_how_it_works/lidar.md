@@ -10,6 +10,7 @@ cover: /assets/img/how_it_works/lidar04.jpg
 tags:
  - Robot
  - Tips
+ - How it works
 ---
 
 Lidar (`Light Detection and Ranging`) is a remote sensing technology that measures the distance to an object by emitting a laser light and then measuring the amount of time it takes for the light to return after bouncing off the object.

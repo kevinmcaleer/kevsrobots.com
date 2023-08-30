@@ -12,6 +12,7 @@ tags:
  - Tips
  - h-bridge
  - motor driver
+ - How it works
 ---
 
 In the world of electronics and motor control, `H-bridges` are ubiquitous. You may have come across the term when working with robotics, automotive systems, or even home appliances. But what exactly is an H-bridge, and why is it so important? In this article, we'll explore the fundamentals of H-bridges, their applications, and common types.

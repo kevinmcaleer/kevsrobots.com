@@ -12,11 +12,12 @@ tags:
  - Tips
  - pots
  - Potentiometers
+ - How it works
 ---
 
-Motor `encoders` are used in robotics to measure the position of a motor shaft. 
+Motor `encoders` are used in robotics to measure the position of a motor shaft.
 
-They are typically small, cylindrical devices that contain a series of magnets that interact with a sensor to produce an electrical signal. This signal is then used to calculate the amount of rotation of the motor, which in turn can be used to control the speed and position of the robot. 
+They are typically small, cylindrical devices that contain a series of magnets that interact with a sensor to produce an electrical signal. This signal is then used to calculate the amount of rotation of the motor, which in turn can be used to control the speed and position of the robot.
 
 Encoders are very important in robotics and are used to ensure precise movement and control of robotic systems.
 

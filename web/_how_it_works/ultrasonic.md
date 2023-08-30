@@ -10,6 +10,7 @@ cover: /assets/img/how_it_works/ultrasonic02.png
 tags:
  - Robot
  - Tips
+ - How it works
 ---
 
 `Ultrasonic` sensors use high-frequency sound waves to measure the distance between the sensor and an object.

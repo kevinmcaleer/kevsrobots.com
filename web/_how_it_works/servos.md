@@ -10,6 +10,7 @@ cover: /assets/img/how_it_works/servo.png
 tags:
  - Servos
  - PWM
+ - How it works
 ---
 
 `Servos` are special types of motors that are used to precisely control various movements.
@@ -72,7 +73,7 @@ A servo is made up of a couple of parts:
 
 This technique is used to control the output of a circuit using varying pulse widths, or the amount of time the circuit is on or off.
 
-PWM is also used to control the speed and direction of motors. This is achieved by varying the duty cycle of the PWM signal, which is the ratio of the “on” time to the total period of the wave. 
+PWM is also used to control the speed and direction of motors. This is achieved by varying the duty cycle of the PWM signal, which is the ratio of the “on” time to the total period of the wave.
 
 A higher duty cycle will result in more power to the motor, while a lower duty cycle will result in less power.
 

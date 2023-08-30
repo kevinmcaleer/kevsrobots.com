@@ -14,6 +14,7 @@ tags:
  - ROS
  - LiDAR
  - Sonar
+ - How it works
 ---
 
 `SLAM` (`Simultaneous Localization and Mapping`) is an collection of algorithms used in robotics for navigation and mapping. It works by using [LIDAR](/resources/glossary#lidar), sonar and other sensor data to construct a 3D map of the environment and then using this map to localize the robot within it.

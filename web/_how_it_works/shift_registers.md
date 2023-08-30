@@ -12,6 +12,7 @@ tags:
  - Tips
  - Shift Registers
  - SN74HC595
+ - How it works
 ---
 
 `Shift registers` are a type of sequential logic circuit used to store and transfer data. They are often used to reduce the number of [GPIO](/resources/glossary#gpio) pins needed from a Microcontroller, such as the Arduino or Raspberry Pi Pico to control another device, such as a keyboard or keypad.

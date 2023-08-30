@@ -41,3 +41,6 @@ collections:
   learning_pathways:
     output: true
     permalink: /learn/learning_pathways/:name.html
+  shortcuts:
+    output: true
+    permalink: :name.html

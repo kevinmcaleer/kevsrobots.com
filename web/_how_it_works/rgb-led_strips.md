@@ -12,6 +12,7 @@ tags:
  - Lighting
  - WS2812
  - APA102
+ - How it works
 ---
 
 `RGB LED Strips` are a popular choice for adding dynamic lighting effects to projects.

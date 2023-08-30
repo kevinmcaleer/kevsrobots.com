@@ -14,6 +14,7 @@ tags:
  - LiPo
  - Alkaline
  - Lead-Acid
+ - How it works
 ---
 
 A `battery` is a device that stores electrical energy in the form of chemical energy and converts it back into electrical energy when needed.

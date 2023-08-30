@@ -13,6 +13,7 @@ tags:
  - Diodes 
  - Electronics
  - Components
+ - How it works
 ---
 
 `Diodes` are electrical components that allow current to flow through them in one direction.
@@ -39,10 +40,10 @@ Diodes come in two types; `Germanium` and `Silicon`.
 
 `Germanium` diodes are used for rectifying small signals, for example in early radios. They require only 0.2 volts, anode to cathode, to pass tiny amounts of current in one direction.
 
-`Silicon` diodes require 0.7 volts to open. Electrons pass from cathode to anode and 0.7 volts difference will be maintained over a wide range of current. 
+`Silicon` diodes require 0.7 volts to open. Electrons pass from cathode to anode and 0.7 volts difference will be maintained over a wide range of current.
 
 > ### Voltage Flow
-> 
+>
 > Here we get into the realms of confusion.
 >
 > On circuits, the `cathode` is regarding as `positive`, e.g. If you apply an *A.C.* signal to the `anode`, a positive voltage will be measured on the `cathode`.

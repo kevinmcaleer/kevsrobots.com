@@ -12,6 +12,7 @@ tags:
  - Tips
  - Capacitors
  - Farad
+ - How it works
 ---
 
 `Capacitors` are like magic little storage boxes in the world of electronics. Though their operation might seem mysterious, with a little exploration, you can understand their core principles and uses. 

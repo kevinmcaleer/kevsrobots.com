@@ -14,6 +14,7 @@ tags:
  - Electronics
  - Components
  - Step-down Converter
+ - How it works
 ---
 
 A `buck converter`, also known as a `step-down converter`, is a type of DC-DC converter that takes an input voltage and efficiently converts it to a lower output voltage while maintaining a consistent output current.

@@ -520,3 +520,18 @@
     It is named after the English physicist Michael Faraday.
   link: https://en.wikipedia.org/wiki/Farad
   article: /resources/how_it_works/capacitors
+- term: Gears
+  definition: Gears & Cogs
+  full: >-
+    A gear or cogwheel is a rotating machine part having cut teeth or, in the case of a cogwheel, inserted teeth (called cogs), which mesh with another toothed part to transmit torque.
+    Geared devices can change the speed, torque, and direction of a power source.
+  link: https://en.wikipedia.org/wiki/Gear
+  article: /resources/how_it_works/gears
+- term: Torque
+  definition: Torque
+  full: >-
+    In physics and mechanics, torque is the rotational equivalent of linear force.
+    It is also referred to as the moment of force, rotational force or turning effect, depending on the field of study.
+    The concept originated with the studies by Archimedes of the usage of levers.
+  link: https://en.wikipedia.org/wiki/Torque
+  article: /resources/how_it_works/gears

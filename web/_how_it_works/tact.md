@@ -13,17 +13,18 @@ tags:
  - Momentary Switch
  - Push Button
  - Button
+ - How it works
 ---
 
-`Tact` (`Tactile`) buttons, also known as momentary switches are a type of electrical switch that is only on when it is being pressed; they return to their default off position when the pressure is released. 
+`Tact` (`Tactile`) buttons, also known as momentary switches are a type of electrical switch that is only on when it is being pressed; they return to their default off position when the pressure is released.
 
-Momentary switches are ubiquitous and are found in various applications, ranging from home electronics to industrial machinery. Buttons on your television remote, keys on your keyboard, and push buttons on a game controller are all examples of momentary switches. 
+Momentary switches are ubiquitous and are found in various applications, ranging from home electronics to industrial machinery. Buttons on your television remote, keys on your keyboard, and push buttons on a game controller are all examples of momentary switches.
 
 ---
 
 ## How do Momentary Switches Work?
 
-When the switch is pressed, it creates a path for current to flow. When the switch is released, this path is broken, and the current flow stops. Essentially, the switch has two states: 
+When the switch is pressed, it creates a path for current to flow. When the switch is released, this path is broken, and the current flow stops. Essentially, the switch has two states:
 
 - **Normally open (NO)**: The switch is open (`off`) when not pressed, meaning no current flows through.
 - **Normally closed (NC)**: The switch is closed (`on`) when not pressed, meaning current flows through.
@@ -58,13 +59,13 @@ When the switch is not pressed, the input pin is connected to GND through the re
 
 Switch `debouncing` is a technique used to avoid the "bouncing" effect when a switch changes state. When a switch is toggled, it doesn't immediately change state. Instead, it quickly oscillates between states before settling down, known as "bouncing."
 
-This bouncing can create multiple transitions for a single button press, which could cause issues in many applications, such as registering multiple clicks instead of one. 
+This bouncing can create multiple transitions for a single button press, which could cause issues in many applications, such as registering multiple clicks instead of one.
 
 To overcome this, a process called 'debouncing' is employed, either via hardware (using components like resistors, capacitors, or Schmitt triggers) or software (using programming).
 
 ## Debouncing Example with Python
 
-Let's consider a simple example of debouncing using Python on a Raspberry Pi. 
+Let's consider a simple example of debouncing using Python on a Raspberry Pi.
 
 First, we need to set up the GPIO pin and initialize the button:
 
@@ -104,4 +105,6 @@ for button_state in debounce(button_pin):
         print("Button released!")
 ```
 
-In the code above, the function `debounce` generates the button states. If the button state changes, it waits 50 milliseconds before checking the state again. If the state is still the same after the delay, the new state is considered valid and is yielded to
+In the code above, the function `debounce` generates the button states. If the button state changes, it waits 50 milliseconds before checking the state again. If the state is still the same after the delay, the new state is considered valid and is yielded to.
+
+---

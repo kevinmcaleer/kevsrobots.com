@@ -12,6 +12,7 @@ tags:
  - Tips
  - Breadboard
  - Prototyping
+ - How it works
 ---
 
 `Breadboards` enable rapid prototyping of circuits without the need for soldering.
@@ -77,9 +78,9 @@ Easy to use: Breadboards require no soldering, making them accessible to beginne
 
 ## Conclusion
 
-Breadboards are a fantastic tool for anyone interested in exploring the world of electronics. Their ease of use, reusability, and flexibility make them an excellent choice for beginners and experts alike. While they do have some limitations, they provide a solid foundation for learning the basics of electronic circuits and experimenting with different components. 
+Breadboards are a fantastic tool for anyone interested in exploring the world of electronics. Their ease of use, reusability, and flexibility make them an excellent choice for beginners and experts alike. While they do have some limitations, they provide a solid foundation for learning the basics of electronic circuits and experimenting with different components.
 
-As you progress in your electronics journey, you may eventually need to explore other methods for creating more permanent and reliable circuits, such as soldering or using printed circuit boards (PCBs). However, breadboards will always have a special place in the hearts of electronics enthusiasts, serving as a gateway to the exciting world of circuit building and sparking creativity in the minds of countless hobbyists, students, and professionals. 
+As you progress in your electronics journey, you may eventually need to explore other methods for creating more permanent and reliable circuits, such as soldering or using printed circuit boards (PCBs). However, breadboards will always have a special place in the hearts of electronics enthusiasts, serving as a gateway to the exciting world of circuit building and sparking creativity in the minds of countless hobbyists, students, and professionals.
 
 So, grab a breadboard, some components, and start exploring the endless possibilities of electronic circuit design!
 

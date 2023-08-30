@@ -11,11 +11,12 @@ tags:
  - Robot
  - Tips
  - MEMS
+ - How it works
 ---
 
 `MEMS` stands for `MicroElectroMechanical Systems` and is a technology that combines both electrical and mechanical elements on a very small scale.
 
-It works by combining microfabrication techniques to create tiny mechanical components like gears, levers, and other structures that are on the order of micrometers in size. 
+It works by combining microfabrication techniques to create tiny mechanical components like gears, levers, and other structures that are on the order of micrometers in size.
 
 This technology is used for a variety of applications, such as accelerometers, gyroscopes, pressure sensors, and many more. The electrical components in MEMS are usually made using standard semiconductor fabrication techniques, while the mechanical elements are made using processes like photolithography, etching, and deposition.
 
@@ -31,20 +32,20 @@ The `MPU9250` is such a component and combines an accelerometer, gyroscope and m
 
 ## Gallery
 
-[![](/assets/img/how_it_works/mems03.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems03.jpg)
+[![gallery image](/assets/img/how_it_works/mems03.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems03.jpg)
 
-[![](/assets/img/how_it_works/mems04.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems04.jpg)
+[![gallery image](/assets/img/how_it_works/mems04.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems04.jpg)
 
-[![](/assets/img/how_it_works/mems05.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems05.jpg)
+[![gallery image](/assets/img/how_it_works/mems05.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems05.jpg)
 
-[![](/assets/img/how_it_works/mems06.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems06.jpg)
+[![gallery image](/assets/img/how_it_works/mems06.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems06.jpg)
 
-[![](/assets/img/how_it_works/mems07.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems07.jpg)
+[![gallery image](/assets/img/how_it_works/mems07.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems07.jpg)
 
-[![](/assets/img/how_it_works/mems08.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems08.jpg)
+[![gallery image](/assets/img/how_it_works/mems08.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems08.jpg)
 
-[![](/assets/img/how_it_works/mems09.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems09.jpg)
+[![gallery image](/assets/img/how_it_works/mems09.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems09.jpg)
 
-[![](/assets/img/how_it_works/mems10.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems10.jpg)
+[![gallery image](/assets/img/how_it_works/mems10.jpg){:class="img-fluid w-100"}](/assets/img/how_it_works/mems10.jpg)
 
 ---

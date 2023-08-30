@@ -12,11 +12,12 @@ tags:
  - Tips
  - pots
  - Potentiometers
+ - How it works
 ---
 
 `Pots` (`Potentiometers`) are electrical components that are used to **measure** and **adjust** the amount of resistance in a circuit.
 
-They have three terminals and are commonly used as volume controls and in adjustable circuits. The resistance of the potentiometer is adjusted by rotating a shaft or sliding a contact along a track. 
+They have three terminals and are commonly used as volume controls and in adjustable circuits. The resistance of the potentiometer is adjusted by rotating a shaft or sliding a contact along a track.
 
 ---
 
@@ -24,7 +25,7 @@ They have three terminals and are commonly used as volume controls and in adjust
 
 There are two main types of potentiometers: rotary and linear.
 
-Rotary potentiometers have a circular track that is rotated by the shaft, while linear potentiometers have a straight track that is adjusted by sliding the contact. 
+Rotary potentiometers have a circular track that is rotated by the shaft, while linear potentiometers have a straight track that is adjusted by sliding the contact.
 
 Both types can be used to measure the position of the contact along the track, or to control the amount of resistance in the circuit.
 

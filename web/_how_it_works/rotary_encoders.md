@@ -11,6 +11,7 @@ tags:
  - Robot
  - Tips
  - Rotary Encoder
+ - How it works
 ---
 
 `Rotary encoders` are devices that measure the angular position or velocity of a rotating shaft.

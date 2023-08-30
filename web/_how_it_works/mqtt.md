@@ -11,6 +11,7 @@ tags:
  - Robot
  - Tips
  - MQTT
+ - How it works
 ---
 
 `MQTT` (MQ Telemetry Transport, not Message Queuing Telemetry Transport as its often mistakenly called) is a lightweight messaging protocol designed by IBM for low-bandwidth, high-latency, unreliable networks.
