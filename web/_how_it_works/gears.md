@@ -13,7 +13,6 @@ tags:
  - Gears
  - Fusion360
  - How it works
- - How it works
 ---
 
 `Gears` are among the oldest and most commonly used tools in the mechanical world. They transform energy from one device to another, adjust speed, and increase torque.
@@ -36,7 +35,13 @@ The gear ratio is the relationship between the number of teeth on two gears that
 
 If Gear A has `A` teeth and is driving Gear B with `B` teeth, the gear ratio `R` is given by:
 
-`R = B/A`
+`R = B / A`
+
+or written more Pythonically:
+
+```python
+gear_ratio = gear_a / gear_b
+```
 
 For example, if Gear A has 10 teeth and Gear B has 20 teeth, the gear ratio is 2:1. This means Gear B will turn half as fast as Gear A, but with double the torque.
 

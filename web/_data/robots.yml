@@ -1,3 +1,8 @@
+- name: Faecbot
+  link: /blog/facebot.html
+  cover: /assets/img/blog/facebot/facebot.png
+  description: Facebot is a cute desktop robot that features a small 8x8 LED Display matrix.
+  date: 2023/09/03
 - name: Googley Eyes
   link: /blog/googley-googley-eyes.html
   cover: /assets/img/blog/googleyeyes/googleyeyes.jpg

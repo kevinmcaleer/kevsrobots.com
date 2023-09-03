@@ -312,7 +312,7 @@
     I2C, pronounced I-squared-C, is a synchronous, multi-master, multi-slave, packet switched, single-ended, serial computer bus invented by Philips Semiconductor (now NXP Semiconductors).
     It is commonly used for attaching lower-speed peripheral ICs to processors and microcontrollers in short-distance, intra-board communication.
   link: https://en.wikipedia.org/wiki/I%C2%B2C
-  # article: /resources/how_it_works/i2c
+  article: /resources/how_it_works/i2c
 - term: SPI
   definition: SPI
   full: >-
