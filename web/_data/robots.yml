@@ -1,4 +1,4 @@
-- name: Faecbot
+- name: Facebot
   link: /blog/facebot.html
   cover: /assets/img/blog/facebot/facebot.png
   description: Facebot is a cute desktop robot that features a small 8x8 LED Display matrix.
