@@ -1,0 +1,4 @@
+---
+ redirect:   /qr/
+ layout:     redirect
+---
