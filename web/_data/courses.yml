@@ -37,6 +37,13 @@
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
+  cover: /learn/smars_code/assets/program_smars.png
+  date_published: 2023-09-10
+  description: Learn how to program SMARS with Arduino
+  duration: 0h 14m
+  link: /learn/smars_code/01_lesson_01.html
+  name: Learn how to program SMARS with Arduino
+- author: Kevin McAleer
   cover: /learn/sqlite3/assets/database.png
   date_published: 2023-07-15
   description: Learn how to create databases in Python with sqlite3

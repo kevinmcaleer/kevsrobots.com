@@ -50,6 +50,9 @@ posts:
 - title: What is MicroPython?
   url: /2023-03-20-what-is-micropython.md
   date: 2023-03-20
+- title: SMARS
+  url: /2023-09-10-smars.md
+  date: 2023-09-10
 - title: Retro Arcade
   url: /2023-06-14-retro-arcade.md
   date: 2023-07-02

@@ -535,3 +535,10 @@
     The concept originated with the studies by Archimedes of the usage of levers.
   link: https://en.wikipedia.org/wiki/Torque
   article: /resources/how_it_works/gears
+- term: tcrt5000
+  definition: TCRT5000 Line Following Sensor
+  full: >-
+    The TCRT5000 is a reflective optical sensor that combines an infrared emitter and phototransistor in a single package.
+    It is used to detect the presence of an object by measuring the amount of light reflected from the object.
+  link: https://www.vishay.com/docs/83760/tcrt5000.pdf
+  # article: /resources/how_it_works/tcrt5000

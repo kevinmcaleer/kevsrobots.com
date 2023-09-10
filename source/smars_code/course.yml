@@ -1,0 +1,25 @@
+- name: Learn how to program SMARS with Arduino
+  author: Kevin McAleer
+  date_created: 2023-09-10
+  date_published: 2023-09-10
+  layout: course
+  cover: assets/program_smars.png
+  description: >- 
+     Learn how to program SMARS with Arduino
+  content:
+  - section:
+      name: Movement
+      content:
+      - 01_lesson_01.md 
+      - 02_lesson_02.md
+  - section:
+      name: Sensing
+      content:
+      - 03_lesson_03.md
+      - 04_lesson_04.md
+  - section:
+      name: Control
+      content:
+      - 05_lesson_05.md
+      - 06_lesson_06.md
+      - 07_lesson_07.md
