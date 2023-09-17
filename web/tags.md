@@ -4,6 +4,8 @@ description: Tags from posts, articles and projects from KevsRobots
 layout: content
 ---
 
+{% include nav_blog.html %}
+
 {% include breadcrumbs.html%}
 
 # {{ page.title }}
