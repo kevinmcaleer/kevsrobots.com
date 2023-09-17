@@ -1,0 +1,54 @@
+
+<div class="related-posts">
+
+  {% assign max_related = 6 %}
+  {% assign related_counter = 0 %}
+  {% assign related_posts = "" | split: "" %}
+  
+  {% for tag in page.tags %}
+    {% for post in site.tags[tag] %}
+      {% unless post.url == page.url %}
+        {% assign related_posts = related_posts | push: post %}
+      {% endunless %}
+    {% endfor %}
+  {% endfor %}
+  
+  {% assign related_posts = related_posts | uniq %}
+  
+  <div class="container-fluid">
+    {% if related_posts.size > 0 %}
+    <h2>Liked this article? You might like these too.</h2>
+    {% endif %}
+    <div class="row row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-12">
+    
+    {% for post in related_posts %}
+      {% if related_counter < max_related %}
+    
+        <div class="col-12 col">
+          <a href="{{ post.url }}" class="text-decoration-none black">
+          <div class="card mb-3 bg-light" style=" max-height: 100px;">
+            <div class="row g-0">
+              <div class="col-md-5 col-4 col-sm-6">
+                <img src="{{post.cover}}" class="img-fluid icon" alt="{{post.title}}" style="max-height: 100px;">
+              </div>
+              <div class="col-md-7 col-8 col-sm-6">
+                <div class="card-body">
+                  <p class="card-title limited-title">{{post.title}}</p>
+                  <p class="card-text text-decoration-none small limited-content">{{post.excerpt | remove: '<p>' | remove: '</p>' | strip_html}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          </a>
+        </div>
+  
+        {% assign related_counter = related_counter | plus: 1 %}
+  
+      {% endif %}
+    {% endfor %}
+  
+    </div>
+  </div>
+  
+  </div>
+  

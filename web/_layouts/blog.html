@@ -9,10 +9,11 @@ layout: content
 <img src="{{page.cover}}" class="cover rounded my-3">
 <h1>{{page.title}}</h1>
 <h2>{{page.subtitle}}</h2>
+<h2>{{page.description}}</h2>
 <p>{{page.excerpt}}</p>
 
 {% for tag in page.tags %}
-<span class="float-end mx-1 bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span>
+<a href="/tags#{{tag}}"><span class="float-end mx-1 bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
 {% endfor %}
 
 </span>
@@ -26,6 +27,8 @@ layout: content
 <article>
 {{content}}
 </article>
+<hr />
+{% include related_articles.html %}
 </div>
 <div class="col-sm-12 col-md-3">
 {% include blog_profile.html %}

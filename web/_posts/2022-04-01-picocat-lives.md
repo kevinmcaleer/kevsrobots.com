@@ -3,6 +3,7 @@ layout: blog
 title: PicoCat Lives
 short_title: PicoCat Lives
 short_description: V2 of PicoCat Robot
+description: V2 of PicoCat Robot
 date: 2022-04-01
 author: Kevin McAleer
 excerpt: Some code and pictures

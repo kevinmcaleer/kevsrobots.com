@@ -3,6 +3,7 @@ layout: blog
 title: Bugs the Robo-Bunny
 short_title: Bugs the Robo-Bunny
 short_description: An Easter Robot
+description: An Easter Robot
 date: 2022-04-10
 author: Kevin McAleer
 excerpt: Robo-Bunny build blog
