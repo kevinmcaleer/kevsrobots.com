@@ -744,3 +744,27 @@ table .w-30 { width:30%; }
   border-radius: 5px;
   transition: ease 0.25s;
 }
+
+.img-icon {
+  max-width: 64px !important;
+  height: auto !important;
+}
+
+.limited-content {
+  display: -webkit-box;       /* Necessary to use line clamping */
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;     /* Number of lines you want to display */
+  overflow: hidden !important;
+  line-height: 1.5em;        /* Define your line-height */
+  max-height: 4.5em;         /* max-height = line-height * number of lines */
+}
+
+.limited-title {
+  display: -webkit-box;       /* Necessary to use line clamping */
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 1 !important;     /* Number of lines you want to display */
+  overflow: hidden !important;
+  line-height: 1.5em;        /* Define your line-height */
+  max-height: 1.5em;         /* max-height = line-height * number of lines */
+}
+

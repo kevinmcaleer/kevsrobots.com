@@ -1,0 +1,20 @@
+<div class="container-fluid rounded-1 pb-3 my-3 m-0 p-0" style="background-image: url('/assets/img/tag_cloud_background.jpg');">
+  <nav class="navbar p-0 m-0">
+    <div class="container-fluid m-0 p-0 px-3">
+      <span class="navbar-text">Tag Cloud</span>
+      <span class="navbar-text">
+        <a href="/tags" class="dotted-white">All Tags ></a>
+      </span>
+    </div>
+</nav>
+<div class="tags_cloud p-3">
+
+  {% assign sorted_tags = (site.tags | sort:0) %}
+  {% for tag in sorted_tags%}
+  {% if tag[1].size > 2 %}
+  <a href="/tags#{{tag[0]}}" class="dotted"><span class="badge rounded-pill text-bg-secondary m-1">{{ tag[0] }} <span class="badge text-bg-light">{{tag[1] | size}}</span> </span></a>
+  {% endif %}
+  {% endfor %}
+</div>
+
+</div>

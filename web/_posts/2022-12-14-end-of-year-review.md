@@ -10,7 +10,7 @@ cover: /assets/img/blog/2022_review/2022_review.jpg
 tags:
  - Raspberry Pi Pico
  - MicroPython
- - 2022
+ - "2022"
 ---
 
 ## Contents

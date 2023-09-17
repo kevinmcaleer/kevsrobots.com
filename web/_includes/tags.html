@@ -1,0 +1,44 @@
+<div class="just-tags mb-3">
+  {% assign sorted_tags = (site.tags | sort:0) %}
+  {% for tag in sorted_tags %}
+  <a href="#{{tag[0]}}"><span class="badge rounded-pill text-bg-success">{{ tag[0] }} <span class="badge text-bg-light">{{tag[1] | size}}</span> </span></a>
+
+  {% endfor %}
+</div>
+
+<div class="my-tags">
+
+  {% for tag in sorted_tags %}
+  
+  <h2><a name="{{ tag[0] }}">{{ tag[0] }}</a></h2>
+  <p>{{ tag[1] | size}} Items</p>
+  <div class="container-fluid">
+    <div class="row row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-12">
+    {% for post in tag[1] %}
+    
+    <div class="col-12 col">
+      <a href="{{ post.url }}" class="text-decoration-none black">
+      <div class="card mb-3 bg-light" style=" max-height: 100px;">
+        <div class="row g-0">
+          <div class="col-md-5 col-4 col-sm-6">
+            <img src="{{post.cover}}" class="img-fluid icon" alt="{{post.title}}" style="max-height: 100px;">
+          </div>
+          <div class="col-md-7 col-8 col-sm-6">
+            <div class="card-body">
+              <p class="card-title limited-title">{{post.title}}</p>
+              <p class="card-text text-decoration-none small limited-content">{{post.excerpt | remove: '<p>' | remove: '</p>' | strip_html}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      </a>
+    </div> 
+
+    {% endfor %}
+    
+  </div>
+  </div>
+    <hr />
+  {% endfor %}
+  </div>
+  

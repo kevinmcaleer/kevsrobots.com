@@ -27,7 +27,7 @@
           </div>
           <div class="row w-100 p-0 m-0 ">
               <div class="col-6 m-0 p-0">
-                  <p class="text-mute small text-left">{{ vid.published | date: "%d %B %Y" }}</p>
+                  <p class="text-mute small text-left">{{ vid.published | date: "%d %b %y" }}</p>
               </div>
               <div class="col-6 m-0 p-0">
                   <span class="badge float-end {% if vid.type == 'video' %}bg-secondary{% elsif vid.type =='short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% endif %}">{{ vid.type | capitalize }}</span>
