@@ -10,7 +10,7 @@ excerpt: A list of common dimensions of parts I use often, but forget
 cover: /assets/img/design/design.jpg
 tags:
  - Fusion 360
- - 3D Printing
+ - 3dprinting
  - Robots
 ---
 

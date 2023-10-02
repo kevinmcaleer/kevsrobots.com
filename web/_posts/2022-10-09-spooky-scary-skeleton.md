@@ -21,7 +21,7 @@ groups:
  - pico
  - halloween
  - robot
- - 3D Printing
+ - 3dprinting
 ---
 
 ## Table of Contents

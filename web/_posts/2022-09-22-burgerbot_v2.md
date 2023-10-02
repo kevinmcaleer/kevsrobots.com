@@ -20,7 +20,7 @@ groups:
  - robots
  - micropython
  - pico
- - 3D Printing
+ - 3dprinting
 ---
 
 ## New BurgerBot Course

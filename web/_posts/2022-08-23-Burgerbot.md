@@ -19,7 +19,7 @@ groups:
  - pico
  - micropython
  - robots
- - 3D Printing 
+ - 3dprinting 
 ---
 
 ## Table of Contents

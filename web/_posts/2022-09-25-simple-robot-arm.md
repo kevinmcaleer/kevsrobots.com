@@ -20,7 +20,7 @@ tags:
  - 3D Printing
 groups:
  - robots
- - 3D Printing
+ - 3dprinting
  - pico
  - micropython
 

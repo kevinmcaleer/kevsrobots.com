@@ -19,7 +19,7 @@ groups:
  - micropython
  - pico
  - halloween
- - 3D Printing
+ - 3dprinting
  - Movie Props 
  - retro
 ---

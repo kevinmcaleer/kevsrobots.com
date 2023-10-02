@@ -18,7 +18,7 @@ tags:
 groups:
  - robots
  - pico
- - 3D Printing
+ - 3dprinting
 ---
 
 ## Contents

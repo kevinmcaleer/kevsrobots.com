@@ -15,7 +15,7 @@ tags:
  - 3D Printing
 groups:
  - weird
- - 3D printing
+ - 3dprinting
 ---
 
 ## Contents

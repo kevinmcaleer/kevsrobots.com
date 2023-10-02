@@ -15,7 +15,7 @@ tags:
  - Cheerlights
 groups:
  - christmas
- - 3D Printing
+ - 3dprinting
  - pico
 ---
 

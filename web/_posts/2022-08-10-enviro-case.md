@@ -14,7 +14,7 @@ tags:
  - Enviro
  - 3D Printing
 groups:
- - 3D Printing
+ - 3dprinting
  - raspberrypi
  - Weather
  - garden

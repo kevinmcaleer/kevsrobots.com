@@ -13,7 +13,7 @@ tags:
  - 3D Printing
 groups:
  - raspberrypi
- - 3D Printing
+ - 3dprinting
 ---
 
 ## Contents

@@ -16,6 +16,7 @@ tags:
 groups:
  - wearable
  - pico
+ - 3dprinting
 ---
 
 ## Contents

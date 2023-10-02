@@ -13,7 +13,7 @@ tags:
  - Tips
  - 3D Printing
 groups:
- - 3D Printing
+ - 3dprinting
  - pets
  - photography
  - raspberrypi
