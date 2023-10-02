@@ -16,6 +16,8 @@ tags:
  - IKEA
  - LED Strip
  - 3D Printing
+groups:
+ - hacks
 ---
 
 {:toc}

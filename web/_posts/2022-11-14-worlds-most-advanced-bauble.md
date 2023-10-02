@@ -3,6 +3,7 @@ layout: blog
 title: Worlds most advanced Bauble
 short_title: Worlds most advanced Bauble
 short_description: Fun with Cheerlights
+description: Fun with Cheerlights
 date: 2022-11-06
 author: Kevin McAleer
 excerpt: Build an internet controllable Christmas Bauble
@@ -12,6 +13,10 @@ tags:
  - 3D Printing
  - Christmas
  - Cheerlights
+groups:
+ - christmas
+ - 3D Printing
+ - pico
 ---
 
 ## Contents

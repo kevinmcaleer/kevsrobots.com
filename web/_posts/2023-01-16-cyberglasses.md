@@ -3,6 +3,7 @@ layout: blog
 title: Cyberglasses
 short_title: Cyberglasses
 short_description: Wearable Tech
+description: RGB LED & servo powered Cyberglasses
 date: 2023-01-16
 author: Kevin McAleer
 excerpt: Learn how to 3D Print, and build your own Raspberry Pi Pico W powered Cyberglasses
@@ -12,6 +13,9 @@ tags:
  - Tips
  - 3D Printing
  - Cyberglasses
+groups:
+ - wearable
+ - pico
 ---
 
 ## Contents

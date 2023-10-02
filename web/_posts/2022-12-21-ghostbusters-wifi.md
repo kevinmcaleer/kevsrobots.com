@@ -3,6 +3,7 @@ layout: blog
 title: Ghostbusters Wi-Fi Scanner
 short_title: Ghostbusters Wi-Fi Scanner
 short_description: Who you gonna call?
+description: Who you gonna call?
 date: 2022-12-21
 author: Kevin McAleer
 excerpt: 3d Print a Ghostbusters PKE style Wi-Fi Scanner
@@ -14,6 +15,13 @@ tags:
  - Scanner
  - Movie Prop
  - 3D Printing
+groups:
+ - micropython
+ - pico
+ - halloween
+ - 3D Printing
+ - Movie Props 
+ - retro
 ---
 
 ## YouTube Video

@@ -3,6 +3,7 @@ layout: blog
 title: Simple Robot Arm
 short_title: Robot Arm
 short_description: Build your own Robot Arm
+description: Build your own Robot Arm
 date: 2022-09-25
 author: Kevin McAleer
 excerpt: 3D print a simple robot arm you can control over Wi-Fi using Phew! and the Pimoroni Inventor 2040 W
@@ -17,7 +18,12 @@ tags:
  - Logo
  - Arm
  - 3D Printing
- 
+groups:
+ - robots
+ - 3D Printing
+ - pico
+ - micropython
+
 ---
 
 ## Table of Contents

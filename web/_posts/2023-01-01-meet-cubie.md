@@ -3,6 +3,7 @@ layout: blog
 title: Meet Cubie-1
 short_title: Meet Cubie-1
 short_description: A ROS Robot
+description: A ROS Robot
 date: 2023-01-01
 author: Kevin McAleer
 excerpt: Build a robot to learn ROS with
@@ -11,6 +12,9 @@ tags:
  - Raspberry Pi 4
  - ROS
  - Robot
+ - 3D Printing
+groups:
+ - robots
  - 3D Printing
 ---
 

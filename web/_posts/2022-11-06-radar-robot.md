@@ -3,6 +3,7 @@ layout: blog
 title: Radar robot
 short_title: Radar Robot
 short_description: Scan surroundings using Ultrasound
+description: Scan surroundings using Ultrasound
 date: 2022-11-06
 author: Kevin McAleer
 excerpt: Build a robot that can scan its surroundings with sound
@@ -14,6 +15,10 @@ tags:
  - Radar
  - Ultrasonic
  - Servo
+groups:
+ - robots
+ - pico
+ - 3D Printing
 ---
 
 ## Contents

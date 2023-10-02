@@ -1,0 +1,11 @@
+{% assign groups = site.groups | sort: 'title'  %}
+<div class="mb-3">
+<ul class="m-0 p-0">
+{% for group in groups %}
+    {% if group.name != "index.md" %}
+    <li class="list-unstyled mt-1"><a href="{{group.url}}" class="orange small">{{group.title}}</a></li>
+    {% endif %}
+{% endfor %}
+</ul>
+</div>
+

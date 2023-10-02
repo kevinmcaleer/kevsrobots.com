@@ -15,6 +15,10 @@ tags:
  - Birthday Card
  - MicroPython
  - 3D Printing
+groups:
+ - weird
+ - christmas
+ - micropython
 ---
 
 {:toc}

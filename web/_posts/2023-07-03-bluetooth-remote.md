@@ -14,7 +14,8 @@ tags:
  - MicroPython
  - Bluetooth
  - Remote Control
-
+groups:
+ - pico
 ---
 
 Learn how to build your own Bluetooth remote controlled robot using a Raspberry Pi Pico and MicroPython.

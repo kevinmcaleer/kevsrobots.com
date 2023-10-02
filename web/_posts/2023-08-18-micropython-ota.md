@@ -14,6 +14,8 @@ tags:
  - Over the Air
  - OTA
  - Auto-update
+groups:
+ - micropython
 ---
 
 ## Contents

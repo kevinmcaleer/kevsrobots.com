@@ -13,7 +13,9 @@ tags:
  - Microbit
  - MicroPython
  - Retro
-
+groups:
+ - retro
+ - games
 ---
 
 {:toc}

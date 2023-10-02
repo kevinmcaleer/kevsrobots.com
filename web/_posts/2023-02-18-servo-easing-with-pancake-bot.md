@@ -13,7 +13,9 @@ tags:
  - servo
  - easing
  - 3D Printing
-
+groups:
+ - weird
+ - 3D printing
 ---
 
 ## Contents

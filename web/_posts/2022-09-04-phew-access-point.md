@@ -3,6 +3,7 @@ layout: blog
 title: How to setup a Phew! Access Point
 short_title: Phew! Access Point
 short_description: MicroPython Captive Portal
+description: MicroPython Captive Portal
 date: 2022-09-04
 author: Kevin McAleer
 excerpt: Setup your own Wi-Fi Captive Portal for Robotics project
@@ -14,7 +15,9 @@ tags:
  - Pimoroni
  - Phew!
  - MicroPython
- 
+groups:
+ - micropython
+ - pico 
 ---
 
 ## Table of Contents

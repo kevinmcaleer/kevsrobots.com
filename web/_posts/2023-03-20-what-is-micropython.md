@@ -12,7 +12,8 @@ cover: /assets/img/blog/micropython/micropython.jpg
 tags: 
  - Micropython
  - What is MicroPython
-
+groups:
+ - micropython
 ---
 
 ## Introduction

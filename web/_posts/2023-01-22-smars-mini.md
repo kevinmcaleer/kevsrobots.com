@@ -3,6 +3,7 @@ layout: blog
 title: SMARS Mini
 short_title: SMARS Mini
 short_description: Big Personality, Tiny Robot
+description: Big Personality, Tiny Robot
 date: 2023-01-22
 author: Kevin McAleer
 excerpt: Learn how to print your own SMARS Mini, download the parts, and get the electronics today
@@ -11,6 +12,9 @@ tags:
  - SMARS
  - Mini
  - Tiny Robot
+ - 3D Printing
+groups:
+ - robots
  - 3D Printing
 ---
 

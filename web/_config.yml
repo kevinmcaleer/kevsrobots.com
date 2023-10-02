@@ -44,3 +44,6 @@ collections:
   shortcuts:
     output: true
     permalink: :name.html
+  groups:
+    output: true
+    permalink: /ideas/:name.html

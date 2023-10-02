@@ -3,6 +3,7 @@ layout: blog
 title: 10 Tips for getting started
 short_title: Top 10 Tips
 short_description: For getting started with robotics
+description: For getting started with robotics
 date: 2023-01-10
 author: Kevin McAleer
 excerpt: Here are my Top 10 tips for getting started with robotics

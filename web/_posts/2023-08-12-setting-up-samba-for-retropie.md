@@ -14,6 +14,9 @@ tags:
  - RetroPie
  - Retro Gaming
  - Gaming
+groups:
+ - retro
+ - raspberrypi
 ---
 
 ## Contents

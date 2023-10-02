@@ -3,6 +3,7 @@ layout: blog
 title: 3 parts are now available!
 short_title: Build your own AI series Released!
 short_description: 3 parts are now available!
+description: 3 parts are now available!
 date: 2022-10-12
 author: Kevin McAleer
 excerpt: Learn how to build your own AI Assistant using Python
@@ -12,6 +13,9 @@ tags:
  - Python
  - Robot
  - Website
+groups:
+ - raspberrypi
+ - Python
 ---
 
 ### Build your own AI Assistant Series - 3 parts now released

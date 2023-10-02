@@ -14,6 +14,10 @@ tags:
  - PCB
  - Bluetooth
  - Remote Control
+groups:
+ - pico
+ - micropython
+ - robots
 ---
 
 ## Building a Custom Raspberry Pi Pico W Game Controller for Robotics

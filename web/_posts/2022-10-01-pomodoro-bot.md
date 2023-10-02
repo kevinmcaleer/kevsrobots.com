@@ -3,6 +3,7 @@ layout: blog
 title: Pomodoro Robot! 
 short_title: Pomodoro Desk Robot
 short_description: Build your own Pomodoro Desk bot
+description: Build your own Pomodoro Desk bot
 date: 2022-10-02
 author: Kevin McAleer
 excerpt: Build your own cute Pomodoro Desk Robot - HeyBot! Using a Raspberry Pi Pico W and Pimoroni Display Pack 2.0
@@ -15,7 +16,12 @@ tags:
  - MicroPython
  - Pomodoro
  - 3D Printing
- 
+groups:
+ - robots
+ - 3D Printing
+ - pico
+ - micropython 
+ - pets
 ---
 
 ## Table of Contents

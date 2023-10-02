@@ -1,0 +1,49 @@
+---
+layout: default
+---
+
+{% assign group = page.name | replace:".md","" %}
+<div class="px-3 py-0 m-3">
+{% include breadcrumbs.html %}
+<div class="card text-bg-dark">
+    <img src="{{ page.cover }}" class="cover rounded-3 opacity-25" alt="{{ include.title }}">
+    <div class="card-img-overlay border-0 rounded-3">
+      <h1 class="card-title">{{page.title}}</h1>
+      <h2 class="card-text">{{page.description}}</h2>
+    </div>
+  </div>
+<hr>
+<div class="row">
+    <div class="col-4 col-md-3 col-lg-2">
+    {% include groups_sidenav.html %}
+    </div>
+    <div class="col-8 col-md-9 col-lg-10">
+        
+        {{ content }}
+        {% if page.name != "index" %}    
+        <div class="row row-cols-md-3 row-cols-sm-1 row-cols-1 row-cols-lg-4 g-3">
+            {% assign projects = site.posts %}
+            
+            {% for item in projects %}
+          
+            {% if item.groups contains group %}
+            <div class="col">
+            <a href="{{item.url}}" class="text-decoration-none">
+            <div class="card border-0 shadow-lg h-100">
+                <div class="card-img-top">
+                    <img src="{{ item.cover }}" class="card-img-top" alt="{{ item.title }}">
+                </div>
+                <div class="card-body">
+                    <h5 class="black">{{item.title}}</h5>
+                    <p class="card-body-text black">{{item.description}}</p> 
+                </div>
+            </div>
+            </a>
+            </div>
+            {% endif%}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>

@@ -3,6 +3,7 @@ layout: blog
 title: PIKON Camera - Raspberry Pi High Quality Camera Project
 short_title: PIKON Camera
 short_description: Raspberry Pi High Quality Camera Project
+description: Raspberry Pi High Quality Camera Project
 date: 2022-08-23
 author: Kevin McAleer
 excerpt: Build your own portable Raspberry Pi Camera featuring the High Quality
@@ -13,7 +14,11 @@ tags:
  - Camera
  - High Quality Camera
  - Python
- 
+groups:
+ - photography
+ - raspberrypi
+ - python
+
 ---
 
 ## Table of Contents
@@ -30,6 +35,7 @@ tags:
 ---
 
 ## PIKON Camera Project
+
 During the recent [Pimoroni Sale](https://www.pimoroni.com) I purchased an official [Raspberry Pi High Quality Camera](https://shop.pimoroni.com/products/raspberry-pi-high-quality-camera). I wanted to create a suitable project to showcase the camera, and as a [livestreamer](https://www.youtube.com/c/kevinmcaleer28) I look at a DSLR camera everyday, so I decided to recreate a DSLR shaped body in Fusion 360.
 
 The High Quality Camera Module has 4 mount points, so the first task is to model something that it can attach to.
@@ -50,6 +56,7 @@ Bottom                           | Bottom door                                  
 {:class="table table-striped"}
 
 ### Dimensions
+
 ![Module Dimensions](/assets/img/blog/pikon/module_dimensions.png){:class="img-fluid w-50"}
 
 The diagram above shows the main dimensions of the module; the mounting holes are 2.5mm in diameter, the holes are spaced 30mm from the center point.
@@ -79,6 +86,7 @@ The battery can be contained within our DSLR, within the hand grip. I quite like
 ---
 
 ### Display
+
 Finally, any DSLR camera wouldn't be complete without a nice display, and I just happened to have some old Waveshare 3.5" displays to hand, which connect to the Raspberry Pi via the 40 pin header.
 
 ![Display](/assets/img/blog/pikon/display.png){:class="img-fluid w-50"}
@@ -86,6 +94,7 @@ Finally, any DSLR camera wouldn't be complete without a nice display, and I just
 ---
 
 ### Lenses
+
 The Raspberry Pi High Quality Camera Module doesn't come with a lens, and there are many to choose from. I originally went with the cheapest one, which was only £9 in the Pimoroni sale, however its wasn't a great choice for general use, so I've since purchased the 16mm (telephoto) and and 6mm (wide angle) versions.
 
 ---
@@ -97,6 +106,7 @@ The components are pretty simple to put together and only require some M2 Nuts a
 The bottom section is attached with 2 x M2 screws.
 
 ### STL files
+
 If you want to download the project files for this, they are available here:
 
 * [Chassis](/assets/stl/pikon/chassis.stl)
@@ -118,3 +128,5 @@ If you want to download the project files for this, they are available here:
 ### Next Steps
 
 This is the hardware build complete, I'm intending to build out a Python App that can be run on the Raspberry Pi 4 that will be able to record video clips, photos and apply filters. With this being a full blown Raspberry Pi 4, we can also livestream from this camera too.
+
+---

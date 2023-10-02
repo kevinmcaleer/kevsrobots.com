@@ -16,6 +16,11 @@ tags:
  - Pimoroni
  - Chicken Nugget
  - Hack
+groups:
+ - hacks
+ - wierd
+ - games
+ - raspberrypi
 ---
 
 ## Contents

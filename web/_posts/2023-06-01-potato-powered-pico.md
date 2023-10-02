@@ -14,6 +14,9 @@ tags:
  - Potato
  - battery
  - DIY battery
+groups:
+ - weird
+ - garden
 ---
 
 The humble `potato`, a staple of many diets around the world, has a surprising additional use: as a battery. Today, we'll explore the science behind potato batteries, perform some calculations, and walk you through how to wire them together.

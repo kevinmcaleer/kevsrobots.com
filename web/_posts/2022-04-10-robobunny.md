@@ -12,7 +12,12 @@ tags:
  - picocat
  - robobunny
  - bugs
- 
+groups:
+ - pets
+ - pico
+ - micropython
+ - servos 
+ - christmas
 ---
 
 ## Table of Contents

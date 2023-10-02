@@ -3,6 +3,7 @@ layout: blog
 title: Everything I made in 2022
 short_title: Everything I made in 2022
 short_description: Here's a review of all the 2022 projects
+description: Here's a review of all the 2022 projects
 date: 2022-12-13
 author: Kevin McAleer
 excerpt: How many robots, projects, code, 3d designs did I make in 2022?

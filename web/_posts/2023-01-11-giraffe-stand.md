@@ -3,6 +3,7 @@ layout: blog
 title: Camera Module 3 Stand
 short_title: Giraffe Stand
 short_description: For RPI Camera v3
+description: For RPI Camera v3
 date: 2023-01-11
 author: Kevin McAleer
 excerpt: Print out a fun and practical stand for your Raspberry Pi Camera Module 3
@@ -11,6 +12,11 @@ tags:
  - Robot
  - Tips
  - 3D Printing
+groups:
+ - 3D Printing
+ - pets
+ - photography
+ - raspberrypi
 ---
 
 ## Contents

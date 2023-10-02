@@ -3,6 +3,7 @@ layout: blog
 title: Common Part Dimensions
 short_title: Common Part Dimensions
 short_description: Sizes of common electronics
+description: Sizes of common electronics
 date: 2022-09-12
 author: Kevin McAleer
 excerpt: A list of common dimensions of parts I use often, but forget

@@ -3,6 +3,7 @@ layout: blog
 title: BurgerBot - a simple 3D Printable Robot
 short_title: BurgerBot
 short_description: A simple 3D Printable Robot
+description: A simple 3D Printable Robot
 date: 2022-08-24
 author: Kevin McAleer
 excerpt: Build your own 2 motor, Pico W-based, 3d printable robot
@@ -13,7 +14,12 @@ tags:
  - Pico W
  - Robot
  - MicroPython
- 
+groups:
+ - raspberrypi
+ - pico
+ - micropython
+ - robots
+ - 3D Printing 
 ---
 
 ## Table of Contents

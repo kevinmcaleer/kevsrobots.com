@@ -10,6 +10,8 @@ excerpt: Learn all about the new features and changes
 cover: /assets/img/blog/raspberrypi5/raspberrypi5.jpg
 tags: 
  - Raspberry Pi
+groups:
+ - raspberrypi
 ---
 
 It's finally [here](https://www.raspberrypi.com/products/raspberry-pi-5/) and it's packed full of new features. The Raspberry Pi 5 is the next generation of the Raspberry Pi Single Board Computer, and will be available to buy in October 2023 (about 4 weeks from launch), along with the new 5V5A Power Supply, Case, and active cooling Fan. The Raspberry Pi 5 will also be ***only*** be available to Makers until the New Year once sufficient supplies have become available, when it will be available to Industrial users, too.

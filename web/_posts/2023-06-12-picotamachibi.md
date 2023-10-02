@@ -14,6 +14,11 @@ tags:
  - MicroPython
  - 3D Printing
  - Picotamachibi
+groups:
+ - pico
+ - micropython
+ - pets
+ - games
 ---
 
 {:toc}

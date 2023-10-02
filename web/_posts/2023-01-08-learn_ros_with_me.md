@@ -3,6 +3,7 @@ layout: blog
 title: New ROS Course
 short_title: New ROS Course
 short_description: Learn ROS with me
+description: Learn ROS with me
 date: 2023-01-08
 author: Kevin McAleer
 excerpt: Learn how to use ROS and build Robots with Python
@@ -11,6 +12,8 @@ tags:
  - Raspberry Pi 4
  - ROS
  - Robot
+groups:
+ - robots
 ---
 
 ## Contents

@@ -16,7 +16,10 @@ tags:
  - Enviro Grow
  - Plants
  - 3D Printing
-
+groups:
+ - garden
+ - pico
+ - micropython
 ---
 
 ## Contents

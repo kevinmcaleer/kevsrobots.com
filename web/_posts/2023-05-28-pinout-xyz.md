@@ -16,7 +16,8 @@ tags:
  - wHAT
  - Shim
  - Bonnet
-
+groups:
+ - raspberrypi
 ---
 
 If you've ever wanted to know what the pinouts are on the Raspberry Pi's 40 pin header, then look no further than [pinout.xyz](https://www.pinout.xyz).

@@ -3,6 +3,7 @@ layout: blog
 title: BurgerBot V2 - Quick on the Draw
 short_title: BurgerBot V2
 short_description: BurgerBot gets an upgrade
+description: BurgerBot gets an upgrade
 date: 2022-09-22
 author: Kevin McAleer
 excerpt: Add a Sharpie to Burgerbot and learn how to draw with a robot!
@@ -15,7 +16,11 @@ tags:
  - MicroPython
  - Logo
  - 3D Printing
- 
+groups:
+ - robots
+ - micropython
+ - pico
+ - 3D Printing
 ---
 
 ## New BurgerBot Course

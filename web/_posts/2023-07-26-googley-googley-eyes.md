@@ -14,6 +14,9 @@ tags:
  - opencv
  - Pimoroni
  - XEyes
+groups:
+ - weird
+ - raspberrypi
 ---
 
 ## Contents

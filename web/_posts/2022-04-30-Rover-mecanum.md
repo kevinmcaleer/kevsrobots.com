@@ -12,7 +12,11 @@ tags:
  - Rover
  - Motor 2040
  - Mecanum
- 
+groups:
+ - robots
+ - pico
+ - micropython
+ - motors
 ---
 
 ## Table of Contents
@@ -41,7 +45,7 @@ Item | Description | Cost
 Mecanum wheels | Make your robot or buggy go every which way with Mecanum omniwheels (pack of 4)| £24
 HC-SR04 | Detect objects in front of the robot using Ultrasound | £5
 4x 50:1 Micro Metal GearMotors | Provide fast and accurate movement with these little motors | £5.10
-4x Standoff | These provide the controller board with room to breath above the chasis, and make it more accessible (pack of 4)  | £4.50 
+4x Standoff | These provide the controller board with room to breath above the chasis, and make it more accessible (pack of 4)  | £4.50
 {:class="table table-striped"}
 
 ![Mecanum Wheel](/assets/img/blog/rover/mecanum_wheel.png){:class="img-fluid w-50"}
@@ -57,6 +61,7 @@ Rover is made up of three 3d printable files:
 * [Motor Holders](/assets/stl/rover/rover_wheel_holder_v9.stl)
 
 ---
+
 ## Mecanum wheels
 
 You can buy mecanum wheels online from companies such as [Pimoroni](https://shop.pimoroni.com/products/mecanum-wheels-pack-of-4?variant=31590632030291) at a price of around £24 (excluding shipping).

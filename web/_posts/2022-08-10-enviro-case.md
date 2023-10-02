@@ -13,6 +13,12 @@ tags:
  - Pimoroni
  - Enviro
  - 3D Printing
+groups:
+ - 3D Printing
+ - raspberrypi
+ - Weather
+ - garden
+ - stands and cases
 ---
 
 ## Table of Contents

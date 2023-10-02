@@ -3,6 +3,7 @@ layout: blog
 title: Learn now live!
 short_title: Learn now live!
 short_description: New MicroPython course
+description: New MicroPython course
 date: 2022-12-04
 author: Kevin McAleer
 excerpt: Learn at MicroPython, from scratch, and your own pace
@@ -13,6 +14,8 @@ tags:
  - MicroPython
  - Course
  - Tutorial
+groups:
+ - micropython
 ---
 
 ## The new Learning Platform is now Live
