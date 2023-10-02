@@ -1,4 +1,7 @@
 posts:
+- title: CyberDog
+  url: /2023-10-02-cyberdog.md
+  date: 2023-10-02
 - title: Next Cube - a Homage to the original WWW server
   url: /2022-08-28-next-cube.md
   date: 2022-08-28
@@ -23,6 +26,9 @@ posts:
 - title: Pico-Deck
   url: /2023-03-14-picodeck.md
   date: 2023-03-14
+- title: Raspberry Pi 5
+  url: /2023-09-27-raspberry_pi_5.md
+  date: 2023-09-27
 - title: Spooky Scary Skeleton
   url: /2022-10-09-spooky-scary-skeleton.md
   date: 2022-10-09
@@ -74,6 +80,9 @@ posts:
 - title: Robotics Roadmap
   url: /2023-03-21-roadmap.md
   date: 2023-03-21
+- title: Lego & Robots
+  url: /2023-10-02-lego.md
+  date: 2023-10-02
 - title: PicoCrab 2
   url: /2023-03-05-picocrab2.md
   date: 2023-03-05
@@ -110,9 +119,6 @@ posts:
 - title: Picotamachibi
   url: /2023-06-12-picotamachibi.md
   date: 2023-06-12
-- title: Bubo-2T
-  url: /2023-02-04- bubo-2t.md
-  date: 2023-02-04
 - title: Pi-PipBoy
   url: /2023-03-26-pi-pipboy.md
   date: 2023-03-26
@@ -158,6 +164,9 @@ posts:
 - title: Bluetooth Remote Control Custom PCB
   url: /2023-08-20-bluetooth-remote-pcb.md
   date: 2023-08-20
+- title: Bubo-2T
+  url: /2023-02-04-bubo-2t.md
+  date: 2023-02-04
 - title: Iskarni Hack
   url: /2023-04-08-ikea-lamp-hack.md
   date: 2023-04-09
