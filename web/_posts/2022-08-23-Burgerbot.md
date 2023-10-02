@@ -41,6 +41,10 @@ BurgerBot also features two moon-buggy wheels that attach directly to the motors
 
 The top section has four mounting holes to secure the Pico using four M2 screws.
 
+There are also a couple of `lego`[^1] compatible studs on the top section.
+
+[^1]: Lego is a registered trade mark of Lego group.
+
 ---
 
 ### Parts

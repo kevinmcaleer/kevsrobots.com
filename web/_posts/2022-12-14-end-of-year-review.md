@@ -13,6 +13,8 @@ tags:
  - MicroPython
  - "2022"
  - Website
+groups:
+ - lego
 ---
 
 ## Contents
