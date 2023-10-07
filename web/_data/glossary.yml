@@ -542,3 +542,9 @@
     It is used to detect the presence of an object by measuring the amount of light reflected from the object.
   link: https://www.vishay.com/docs/83760/tcrt5000.pdf
   # article: /resources/how_it_works/tcrt5000
+- term: CVZone
+  definition: An Open Source Computer Vision Library for Python
+  full: >-
+    CVZone is a computer vision library for Python.
+    It is a computer vision library for Python.
+  link: /learn/cvzone/

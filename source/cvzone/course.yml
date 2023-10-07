@@ -1,0 +1,26 @@
+- name: Computer Vision on Raspberry Pi with CVZone
+  author: Kevin McAleer
+  date_created: 2023-10-07
+  date_published: 2023-10-07
+  layout: course
+  cover: assets/computer_vision.jpg
+  description: >- 
+     Computer Vision on Raspberry Pi with CVZone
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Getting Started
+      content:
+      - 01_install.md
+  - section:
+      name: Face, Hand and Posture Detection
+      content:
+      - 02_face.md
+      - 03_hand.md
+      - 04_posture.md
+      - 05_advanced.md
+
+      

@@ -146,6 +146,9 @@ posts:
 - title: Over the Air updates with MicroPython
   url: /2023-08-18-micropython-ota.md
   date: 2023-08-18
+- title: PicoSMARS 2
+  url: /2023-10-05-picosmars.md
+  date: 2023-10-05
 - title: 10 Tips for getting started
   url: /2023-01-10-10-tips-for-getting-started-with-robotics.md
   date: 2023-01-10
@@ -155,6 +158,9 @@ posts:
 - title: Servo Easing & Pancake-Bot
   url: /2023-02-18-servo-easing-with-pancake-bot.md
   date: 2023-02-18
+- title: Mastering Posture Detection with CVZone
+  url: /2023-10-08-cvzone.md
+  date: 2023-10-07
 - title: PicoCat v2
   url: /2022-03-25-picocat-v2.md
   date: 2022-03-25

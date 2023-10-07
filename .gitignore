@@ -9,3 +9,4 @@ web/.jekyll-cache
 .bundle/
 vendor/
 youtube.yaml
+*venv

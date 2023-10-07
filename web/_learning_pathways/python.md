@@ -7,6 +7,7 @@ courses:
   - "Python for beginners"
   - "Learn MicroPython - The basics"
   - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
+  - "Computer Vision on Raspberry Pi with CVZone"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}

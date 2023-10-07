@@ -48,7 +48,7 @@ You can download the completed code from [GitHub - www.github.com/kevinmcaleer/l
 
 Before you begin, you'll need to make sure you have a couple of things before you start this lesson:
 
-* A [SMARS robot](/learn/buildinstructions/wheeled/)
+* A [SMARS robot](/learn/smars/)
 * A USB Cable to connect to your computer
 * A Computer that can run the [Arduino IDE](https://create.arduino.cc/editor)
 * The code from [Lesson 01 - Movement](01_lesson_01)
