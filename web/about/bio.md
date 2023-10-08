@@ -42,7 +42,7 @@ If you want to contact me about something, feel free to reachout to <kevinmcalee
 Platform | Description                                                                                        | Link
 ---------|----------------------------------------------------------------------------------------------------|-----------------------------------------
 YouTube  | This is where I publish all my videos to, if you like them help me grow the channel by subscribing | <https://www.youtube.com/kevinmcaleer28>
-Twitter | I tweet at least once per day, always on topic about something to do with Robotics, Programming, or Raspberry Pi's| <https://www.twitter.com/kevsmac>
+X (Formally Twitter) | I tweet at least once per day, always on topic about something to do with Robotics, Programming, or Raspberry Pi's| <https://www.x.com/kevsmac>
 Instagram| I post pictures a couple of times per week, showing what I'm currently working on, follow if you want to learn more| <https://www.instagram.com/kevinmcaleer>
 Facebook| I'm not using facebook as much as I used to, but I do a vibrant community of over 23,000 followers in the Small Robots group| <https://www.facebook.com/groups/smallrobots>
 Twitch| I restream to Twitch when I go live, however its not a site I spend any time developing | <https://www.twitch.tv/kevinmcaleer>
