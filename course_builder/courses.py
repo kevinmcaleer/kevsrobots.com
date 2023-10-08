@@ -57,7 +57,9 @@ class Courses():
         index += f'title: Learn' + "\n"
         index += f'description: Take a course and learn something new' + "\n"
         index += f'duration: {self.duration}' + "\n"
-        index += f'---' + "\n"
+        index += f'---' + "\n\n"
+        index += f'{{% include nav_courses.html %}}' + "\n"
+        index += f'{{% include breadcrumbs.html %}}' + "\n"
         index += f'{{% include all_courses.html %}}' + "\n"
         
         with open(f'{self.output_folder}/index.md', 'w') as build_file:
@@ -74,7 +76,9 @@ class Courses():
         index += f'layout: content' + "\n"
         index += f'title: Recent Courses' + "\n"
         index += f'description: Recent Courses' + "\n"
-        index += f'---' + "\n"
+        index += f'---' + "\n\n"
+        index += f'{{% include nav_courses.html %}}' + "\n"
+        index += f'{{% include breadcrumbs.html %}}' + "\n"
         index += f'{{% include recent_courses.html %}}' + "\n"
 
         with open(f'{self.output_folder}/recent.md', 'w') as build_file:
