@@ -8,15 +8,17 @@ previous: 02_face.html
 next: 04_posture.html
 description: This lesson will guide you through capturing and analyzing video feed
   to highlight and track hands effectively
-percent: 64
+percent: 70
 duration: 2
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
   - section: Overview
     content:
-    - name: Computer Vision on Raspberry Pi with CVZone
+    - name: Computer Vision with CVZone
       link: 00_intro.html
+    - name: Watch the demonstration
+      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone

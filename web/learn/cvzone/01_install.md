@@ -4,18 +4,20 @@ title: Installing CVZone
 author: Kevin McAleer
 type: page
 cover: assets/install.png
-previous: 00_intro.html
+previous: 00_video.html
 next: 02_face.html
 description: Kickstart your computer vision journey on Raspberry Pi using CVZone
-percent: 32
+percent: 42
 duration: 2
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
   - section: Overview
     content:
-    - name: Computer Vision on Raspberry Pi with CVZone
+    - name: Computer Vision with CVZone
       link: 00_intro.html
+    - name: Watch the demonstration
+      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone

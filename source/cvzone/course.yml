@@ -11,6 +11,7 @@
       name: Overview
       content:
       - 00_intro.md
+      - 00_video.md
   - section:
       name: Getting Started
       content:

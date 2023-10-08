@@ -1,21 +1,23 @@
 ---
 layout: lesson
-title: Computer Vision on Raspberry Pi with CVZone
+title: Computer Vision with CVZone
 author: Kevin McAleer
 type: page
 cover: assets/computer_vision.jpg
-next: 01_install.html
+next: 00_video.html
 description: Dive deep into the world of computer vision on compact systems with our
   hands-on course tailored for Raspberry Pi enthusiasts
-percent: 16
+percent: 14
 duration: 2
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
   - section: Overview
     content:
-    - name: Computer Vision on Raspberry Pi with CVZone
+    - name: Computer Vision with CVZone
       link: 00_intro.html
+    - name: Watch the demonstration
+      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone

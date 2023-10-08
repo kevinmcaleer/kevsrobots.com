@@ -8,15 +8,17 @@ previous: 03_hand.html
 next: 05_advanced.html
 description: This lesson provides a deep dive into pose estimation, highlighting key
   body landmarks and explaining how to interpret them to assess posture.
-percent: 80
+percent: 84
 duration: 3
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
   - section: Overview
     content:
-    - name: Computer Vision on Raspberry Pi with CVZone
+    - name: Computer Vision with CVZone
       link: 00_intro.html
+    - name: Watch the demonstration
+      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone

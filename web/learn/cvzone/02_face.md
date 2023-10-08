@@ -8,15 +8,17 @@ previous: 01_install.html
 next: 03_hand.html
 description: This lesson breaks down the process step-by-step, from capturing live
   video feeds to processing and displaying detected faces in real-time
-percent: 48
+percent: 56
 duration: 2
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
   - section: Overview
     content:
-    - name: Computer Vision on Raspberry Pi with CVZone
+    - name: Computer Vision with CVZone
       link: 00_intro.html
+    - name: Watch the demonstration
+      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone

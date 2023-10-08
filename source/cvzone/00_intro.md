@@ -1,5 +1,5 @@
 ---
-title: Computer Vision on Raspberry Pi with CVZone
+title: Computer Vision with CVZone
 description: >-
     Dive deep into the world of computer vision on compact systems with our hands-on course tailored for Raspberry Pi enthusiasts
 layout: lesson
