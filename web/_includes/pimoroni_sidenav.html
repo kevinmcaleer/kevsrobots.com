@@ -1,0 +1,11 @@
+{% assign videos = site.data.pimoroni %}
+
+<h5>Product Videos</h5>
+<ul class="m-0 p-0">
+{% for video in videos %}
+<li class="list-unstyled m-0 p-0">
+    <a href="https://www.youtube.com/watch?v={{video.video_id}}" class="orange small">
+        <p class="mt-1 m-0 p-0">{{ video.name }}</p></a>
+</li>
+{% endfor %}
+</ul>

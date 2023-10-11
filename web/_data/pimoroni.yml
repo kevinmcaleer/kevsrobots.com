@@ -1,104 +1,130 @@
 - published: 2023/09/20
   title: "Introducing Picade - a Raspberry Pi powered desktop retro arcade machine"
+  name: "Picade"
   video_id: Ku8S032n6oo
   type: video
 - published: 2023/08/22
   title: "Introducing Stellar Unicorn (16 x 16 smart LED matrix)"
+  name: "Stellar Unicorn"
   video_id: RVW5dExQZpM
   type: video
 - published: 2023/07/19
   title: "Introducing Inventor 2040 W (all in one servo/motor/audio board with Pico W Aboard)"
+  name: "Inventor 2040 W"
   video_id: DrXp8S2bfes
   type: video
 - published: 2023/04/18
   title: "First look at Inventor Hat Mini (motor/servo/audio HAT for Raspberry Pi)"
+  name: "Inventor Hat Mini"
   video_id: O29RC0fTtBQ
   type: video
 - published: 2023/03/08
   title: "First look at Inky Frame 7.3 (800 x 480 seven colour E Ink with Pico W Aboard)"
+  name: "Inky Frame 7.3"
   video_id: TluopgSoSWY
   type: video
 - published: 2023/03/02
   title: "First look at Cosmic Unicorn (32 x 32 RGB LED matrix with Raspberry Pi Pico W Aboard)"
+  name: "Cosmic Unicorn"
   video_id: q1DxovtleYA
   type: video
 - published: 2023/02/16
   title: "First look at Badger 2040 W (all-in-one E Ink badge with Raspberry Pi Pico W Aboard)"
+  name: "Badger 2040 W"
   video_id: beus1VdYdXw
   type: video
 - published: 2023/01/13
   title: "Introducing Wireless Plasma Kit - Cubey Edition (Raspberry Pico W Aboard)"
+  name: "Wireless Plasma Kit: Cubey"
   video_id: utv00wt4kr4
   type: video
 - published: 2023/01/03
   title: "Introducing Inky Frame 4.0 - vibrant seven colour E Ink with Pico W Aboard"
+  name: "Inky Frame 4.0"
   video_id: FzdItbK7OuA
   type: video
 - published: 2022/12/19
   title: "Introducing Interstate 75W - RGB LED matrix driver with Pico W Aboard"
+  name: "Interstate 75W"
   video_id: gRxZ-n0QsYQ
   type: video
 - published: 2022/11/18
   title: "Introducing Pico GFX Pack - a fun LCD display for Raspberry Pi Pico / Pico W"
+  name: "Pico GFX Pack"
   video_id: uPl_a4UVkeQ
   type: video
 - published: 2022/10/21
   title: "Introducing Wireless Plasma Kit - Skully Edition (Raspberry Pico W Aboard)"
+  name: "Wireless Plasma Kit: Skully"
   video_id: yUCs5QcAQtA
   type: video
 - published: 2022/09/06
   title: "Introducing Automation 2040 W Mini - a slimline industrial/automation controller with Pico W Aboard"
+  name: "Automation 2040 W Mini"
   video_id: 8DKiBgtwJjg
   type: video
 - published: 2022/06/17
   title: "First look at Motor 2040 - an all-in-one quad motor controller, powered by RP2040"
+  name: "Motor 2040"
   video_id: Pc8nuLXZsLs
   type: video
 - published: 2022/06/17
   title: "First look at Tufty 2040 - a  snazzy colourful LCD badge powered by RP2040"
+  name: "Tufty 2040"
   video_id: IHsLDxhp_GU
   type: video
 - published: 2022/05/17
   title: "Introducing Tiny 2040 - a postage stamp sized RP2040 dev board"
+  name: "Tiny 2040"
   video_id: 0stHa9vBB-M
   type: video
 - published: 2022/05/09
   title: "Introducing Pico Display Pack - a 1.14 IPS LCD screen for Raspberry Pi Pico"
+  name: "Pico Display Pack"
   video_id: y3J_rHFEtJ8
   type: video
 - published: 2022/04/09
   title: "Introducing Plasma 2040 - an all in one controller for 5V addressable RGB LED strip"
+  name: "Plasma 2040"
   video_id: pdGePtNdfws
   type: video
 - published: 2022/04/08
   title: "Introducing Interstate 75 - a RGB LED matrix driver, powered by RP2040"
+  name: "Interstate 75"
   video_id: 4A_HXJg_py8
   type: video
 - published: 2022/04/04
   title: "Introducing Keybow 2040 - 16 key mini mechanical keyboard powered by RP2040"
+  name: "Keybow 2040"
   video_id: 4U69xDa7R24
   type: video
 - published: 2022/04/04
   title: "Introducing Pico Explorer - an electronic playground for your Raspberry Pi Pico"
+  name: "Pico Explorer"
   video_id: -3PhFSP7dTc
   type: video
 - published: 2022/04/04
   title: "Introducing Picade - a Raspberry Pi powered desktop retro arcade machine"
+  name: "Picade"
   video_id: SVWMLq-_YNs
   type: video
 - published: 2022/04/01
   title: "First look at Servo 2040 - an all-in-one 18 channel servo controller, powered by RP2040"
+  name: "Servo 2040"
   video_id: OQ4Wjgn8A78
   type: video
 - published: 2022/02/25
   title: "First look at Badger 2040 - a super fast E Ink badge powered by RP2040"
+  name: "Badger 2040"
   video_id: RDhw3BlBtig
   type: video
 - published: 2022/02/25
   title: "Introducing Trilobot - a learning friendly Raspberry Pi powered robot"
+  name: "Trilobot"
   video_id: m7y0w-cpFiY
   type: video
 - published: 2022/02/21
   title: "Introducing Weather HAT & Weather Sensors Kit - make your own Raspberry Pi weather station"
+  name: "Weather HAT"
   video_id: FOlBgvZgTk8
   type: video

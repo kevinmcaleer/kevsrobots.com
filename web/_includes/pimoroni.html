@@ -1,16 +1,23 @@
-
-
-{% assign videos = site.data.pimoroni %}
-<div class="row row-cols-4 g-3">
-{% for video in videos %}
-<div class="col">
-<div class="card border-0 shadow-lg h-100">
-    <a href="https://www.youtube.com/watch?v={{video.video_id}}"><img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="img-fluid rounded-2"></a>
-    <div class="card-body">
-        <p class="card-title">{{ video.title }}</p>
-        <p class="text-mute small">{{video.published | date: "%-d %B %Y" }}</p>
+<div class="row g-0 m-0 p-0">
+    <div class="col-12 col-lg-2 col-md-3 col-sm-4">
+        {% include pimoroni_sidenav.html %}
     </div>
-</div>
-</div>
-{% endfor %}
+    <div class="col-12 col-lg-10 col-md-9 col-sm-8">
+        {% assign videos = site.data.pimoroni %}
+        <div class="row row-cols-1 row-cols-lg-4 row-cols-md-3 row-cols-sm-2 g-3">
+            {% for video in videos %}
+                <div class="col">
+                    <div class="card border-0 shadow-lg h-100">
+                        <a href="https://www.youtube.com/watch?v={{ video.video_id }}">
+                            <img src="https://img.youtube.com/vi/{{ video.video_id }}/0.jpg" class="img-fluid rounded-2"></a>
+                            <div class="card-body">
+                                <h5>{{video.name}}</h5>
+                                <p class="card-title">{{ video.title }}</p>
+                                <p class="text-mute small">{{ video.published | date: "%-d %B %Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
 </div>
