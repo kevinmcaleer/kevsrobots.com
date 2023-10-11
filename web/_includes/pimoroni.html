@@ -1,0 +1,16 @@
+
+
+{% assign videos = site.data.pimoroni %}
+<div class="row row-cols-4 g-3">
+{% for video in videos %}
+<div class="col">
+<div class="card border-0 shadow-lg h-100">
+    <a href="https://www.youtube.com/watch?v={{video.video_id}}"><img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="img-fluid rounded-2"></a>
+    <div class="card-body">
+        <p class="card-title">{{ video.title }}</p>
+        <p class="text-mute small">{{video.published | date: "%-d %B %Y" }}</p>
+    </div>
+</div>
+</div>
+{% endfor %}
+</div>
