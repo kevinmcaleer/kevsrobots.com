@@ -1,3 +1,8 @@
+- name: WeatherBot
+  link: /blog/weatherbot.html
+  cover: /assets/img/blog/weatherbot/weatherbot01.jpg
+  date: 2023/10/12
+  description: A cute robot that can tell you the temperature on its stomach
 - name: Facebot
   link: /blog/facebot.html
   cover: /assets/img/blog/facebot/facebot.png
