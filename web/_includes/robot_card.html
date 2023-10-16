@@ -1,0 +1,20 @@
+{% assign robots = site.data.robots %}
+
+{% for robot in robots %}
+
+{% if robot.name == include.name %}
+<div class="col">
+    <a href="{{robot.link}}" class="text-decoration-none">
+<div class="card border-0 shadow-lg rounded-1  h-100">
+    <img src="{{robot.cover}}" alt="{{robot.name}}">
+    <div class="card-body">
+        <h5 class="card-title black">{{robot.name}}</h5>
+        <p class="card-text">{{robot.description}}</p>
+    </div>
+   </div>
+</a>
+</div>
+
+{% endif %}
+
+{% endfor %}

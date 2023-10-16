@@ -1,0 +1,20 @@
+{% assign projects = site.data.projects %}
+
+{% for project in projects %}
+
+{% if project.name == include.name %}
+<div class="col">
+    <a href="{{project.link}}" class="text-decoration-none">
+<div class="card border-0 shadow-lg rounded-1  h-100">
+    <img src="{{project.cover}}" alt="{{project.name}}">
+    <div class="card-body">
+        <h5 class="card-title black">{{project.name}}</h5>
+        <p class="card-text">{{project.description}}</p>
+    </div>
+   </div>
+</a>
+</div>
+
+{% endif %}
+
+{% endfor %}

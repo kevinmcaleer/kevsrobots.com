@@ -1,0 +1,20 @@
+{% assign posts = site.posts %}
+
+{% for post in posts %}
+
+{% if post.title == include.name %}
+<div class="col">
+    <a href="{{post.url}}" class="text-decoration-none">
+<div class="card border-0 shadow-lg rounded-1  h-100">
+    <img src="{{post.cover}}" alt="{{post.title}}">
+    <div class="card-body">
+        <h5 class="card-title black">{{post.title}}</h5>
+        <p class="card-text">{{post.description}}</p>
+    </div>
+   </div>
+</a>
+</div>
+
+{% endif %}
+
+{% endfor %}
