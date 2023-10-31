@@ -131,3 +131,11 @@ The world of microcontrollers is vast and ever-evolving. As foundational element
 - [Coding: The 21st Century's most valuable skill](https://monkmakes.com/coding_book.html) - For those looking for in-depth knowledge.
 
 ---
+
+## Suggested Courses
+
+<div class="row row-cols-4">
+{% include course.html count=1 course="Raspberry Pi Pico with MicroPython - GPIO Mastery" %}
+{% include course.html count=2 course="Learn how to program SMARS with Arduino"%}
+</div>
+---
