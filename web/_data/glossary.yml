@@ -548,3 +548,29 @@
     CVZone is a computer vision library for Python.
     It is a computer vision library for Python.
   link: /learn/cvzone/
+- term: dac
+  definition: Digital to Analog Converter
+  full: >-
+    A digital-to-analog converter (DAC, D/A, D2A, or D-to-A) is a device that converts a digital signal into an analog signal.
+    It is used to convert a digital signal into an analog signal.
+  link: https://en.wikipedia.org/wiki/Digital-to-analog_converter
+- term: rom
+  definition: Read Only Memory
+  full: >-
+    Read-only memory (ROM) is a type of non-volatile memory used in computers and other electronic devices.
+    It is a type of non-volatile memory used in computers and other electronic devices.
+  link: https://en.wikipedia.org/wiki/Read-only_memory
+  # article: /resources/how_it_works/rom
+- term: ram
+  definition: Random Access Memory
+  full: >-
+    Random-access memory (RAM) is a form of computer memory that can be read and changed in any order, typically used to store working data and machine code.
+    It is a form of computer memory that can be read and changed in any order, typically used to store working data and machine code.
+  link: https://en.wikipedia.org/wiki/Random-access_memory
+  # article: /resources/how_it_works/ram
+- term: eeprom
+  definition: Electrically Erasable Programmable Read-Only Memory
+  full: >-
+    EEPROM (also written E2PROM and pronounced "e-e-prom", "double-e prom", "e-squared", or simply "e-prom")
+    stands for Electrically Erasable Programmable Read-Only Memory and is a type of non-volatile memory used in computers and other electronic devices to store relatively small amounts of data but allowing individual bytes to be erased and reprogrammed.
+  link: https://en.wikipedia.org/wiki/EEPROM
