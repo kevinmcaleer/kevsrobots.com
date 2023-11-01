@@ -134,7 +134,7 @@ The world of microcontrollers is vast and ever-evolving. As foundational element
 
 ## Suggested Courses
 
-<div class="row row-cols-4">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
 {% include course.html count=1 course="Raspberry Pi Pico with MicroPython - GPIO Mastery" %}
 {% include course.html count=2 course="Learn how to program SMARS with Arduino"%}
 </div>
