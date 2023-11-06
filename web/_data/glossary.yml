@@ -574,3 +574,10 @@
     EEPROM (also written E2PROM and pronounced "e-e-prom", "double-e prom", "e-squared", or simply "e-prom")
     stands for Electrically Erasable Programmable Read-Only Memory and is a type of non-volatile memory used in computers and other electronic devices to store relatively small amounts of data but allowing individual bytes to be erased and reprogrammed.
   link: https://en.wikipedia.org/wiki/EEPROM
+- term: llm
+  definition: Large Language Model
+  full: >-
+    A large language model (LLM) is a statistical language model that is trained on a large corpus of text.
+    It is a statistical language model that is trained on a large corpus of text.
+  link: https://en.wikipedia.org/wiki/Large_language_model
+  article: /resources/how_it_works/llms
