@@ -51,6 +51,13 @@
   link: /learn/sqlite3/00_intro.html
   name: Create Databases with Python and SQLite3
 - author: Kevin McAleer
+  cover: /learn/pandas_and_numpy/assets/pandas.png
+  date_published: 2023-11-14
+  description: tbc
+  duration: 0h 24m
+  link: /learn/pandas_and_numpy/01_overview.html
+  name: Data Manipulation with Pandas and Numpy
+- author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
   date_published: 2022-12-04
   description: Learn how to use the new Learning Platform

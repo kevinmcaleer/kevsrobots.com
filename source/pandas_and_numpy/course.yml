@@ -1,0 +1,36 @@
+- name: Data Manipulation with Pandas and Numpy
+  author: Kevin McAleer
+  date_created: 2023-11-14
+  date_published: 2023-11-14
+  layout: course
+  cover: assets/pandas.png
+  description: >- 
+     tbc
+  content:
+  - section:
+      name: Overview
+      content:
+        - 01_overview.md
+  - section:
+      name: Introduction to Pandas
+      content:
+        - 02_intro.md
+        - 03_installing.md
+  - section:
+      name: Pandas
+      content:
+        - 04_dataframes.md
+        - 05_basics.md
+        - 06_import_export.md
+        - 07_cleansing.md
+        - 08_analysis.md
+        - 09_advanced.md
+  - section:
+      name: MatPlotLib
+      content:
+        - 10_visualisation.md
+        - 11_case_studies.md
+  - section:
+      name: Conclusion
+      content:
+        - 12_recap.md

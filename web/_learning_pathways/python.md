@@ -8,6 +8,7 @@ courses:
   - "Learn MicroPython - The basics"
   - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
   - "Computer Vision on Raspberry Pi with CVZone"
+  - "Data Manipulation with Pandas and Numpy"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}

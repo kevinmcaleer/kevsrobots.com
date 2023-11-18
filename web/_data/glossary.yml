@@ -581,3 +581,24 @@
     It is a statistical language model that is trained on a large corpus of text.
   link: https://en.wikipedia.org/wiki/Large_language_model
   article: /resources/how_it_works/llms
+- term: Numpy
+  definition: Numpy
+  full: >-
+    NumPy is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.
+    It is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.
+  link: https://en.wikipedia.org/wiki/NumPy
+  article: /learn/pandas_and_numpy/
+- term: Pandas
+  definition: Pandas
+  full: >-
+    Pandas is a software library written for the Python programming language for data manipulation and analysis.
+    It is a software library written for the Python programming language for data manipulation and analysis.
+  link: https://en.wikipedia.org/wiki/Pandas_(software)
+  article: /learn/pandas_and_numpy/
+- term: MatPlotLib
+  definition: matplotlib
+  full: >-
+    Matplotlib is a plotting library for the Python programming language and its numerical mathematics extension NumPy.
+    It is a plotting library for the Python programming language and its numerical mathematics extension NumPy.
+  link: https://en.wikipedia.org/wiki/Matplotlib
+  article: /learn/pandas_and_numpy/
