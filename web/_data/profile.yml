@@ -2,9 +2,9 @@ name: Kevin McAleer
 profile: I build robots, bring them to life with code, and have a whole load of fun along the way
 image: /assets/img/kevin.jpg
 social:
-   - site: Twitter 
+   - site: X (Formerly Twitter)
      name: kevsmac
-     link: https://www.twitter.com/kevsmac
+     link: https://www.x.com/kevsmac
      icon: fa-brands fa-x-twitter
    - site: Facebook
      name: Small Robots Group
@@ -30,4 +30,7 @@ social:
      name: "@kevinmcaleer"
      link: https://www.threads.net/@kevinmcaleer
      icon: "fa-brands fa-threads"
-
+   - site: Bluesky
+     name: "@kevsmac"
+     link: https://bsky.app/profile/kevsmac.bsky.social
+     icon: "fa-brands fa-bluesky"

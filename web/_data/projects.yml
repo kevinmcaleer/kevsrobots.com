@@ -1,3 +1,8 @@
+- name: Pico W Powered Toothbrush
+  link: /blog/pico_toothbrush.html
+  cover: /assets/img/blog/picotoothbrush/picotoothbrush.png
+  description: Build your own DIY Pico W Powered Toothbrush
+  date: 2023-11-26
 - name: Over the air updates with micropython
   link: /blog/micropython-ota.html
   cover: /assets/img/blog/ota/ota.jpg

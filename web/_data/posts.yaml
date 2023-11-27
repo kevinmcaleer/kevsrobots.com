@@ -8,6 +8,9 @@ posts:
 - title: SMARS Mini
   url: /2023-01-22-smars-mini.md
   date: 2023-01-22
+- title: Whats new in Python 3.13a
+  url: /2023-11-21-python13.md
+  date: 2023-11-21
 - title: RetroPie Gaming on the CM4 Inside an Atari 2600 Replica
   url: /2023-08-11-retropie.md
   date: 2023-08-11
@@ -98,6 +101,9 @@ posts:
 - title: Maker Faire Rome 2023
   url: /2023-10-16-maker-faire-rome-2023.md
   date: 2023-10-16
+- title: Pico W Toothbrush
+  url: /2023-11-26-pico_toothbrush.md
+  date: 2023-11-26
 - title: Zero Stand
   url: /2022-05-15-zero-stand.md
   date: 2022-05-15
