@@ -1,8 +1,9 @@
 ---
-layout: blog
+layout: project
 title: Cyberglasses
 short_title: Cyberglasses
 short_description: Wearable Tech
+difficulty: Intermediate
 description: RGB LED & servo powered Cyberglasses
 date: 2023-01-16
 author: Kevin McAleer
@@ -17,21 +18,10 @@ groups:
  - wearable
  - pico
  - 3dprinting
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-### Video
-
-Click here to watch the video:
-
-{% include youtubeplayer.html id="jcGF-C6t1LI" %}
-
+videos:
+ - jcGF-C6t1LI
+repo:
+ - https://github.com/kevinmcaleer/cyber_glasses
 ---
 
 ## CyberGlasses
@@ -106,5 +96,3 @@ Here are the 3d printable STL files:
 * [Right Arm](/assets/stl/cyberglasses/rightarm.stl)
 * [Left Arm](/assets/stl/cyberglasses/leftarm.stl)
 * [NeoPixel holder](/assets/stl/cyberglasses/neopixel_holder.stl)
-
----

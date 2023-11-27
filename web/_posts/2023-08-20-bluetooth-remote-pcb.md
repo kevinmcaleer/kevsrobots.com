@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Bluetooth Remote Control Custom PCB 
 description: Designing a custom Remote Control PCB
 short_title: Bluetooth Custom PCB
 short_description: Designing a custom Remote Control PCB
+difficulty: Intermediate
 date: 2023-08-20
 author: Kevin McAleer
 excerpt: >-
@@ -18,6 +19,10 @@ groups:
  - pico
  - micropython
  - robots
+videos:
+ - H6CNmnT6kGo
+repo:
+ - https://gist.github.com/kevinmcaleer/cb8026c14ecb2b5a22fba065eb11af8c
 ---
 
 ## Building a Custom Raspberry Pi Pico W Game Controller for Robotics

@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: project
 title: Radar robot
 short_title: Radar Robot
 short_description: Scan surroundings using Ultrasound
@@ -19,22 +19,12 @@ groups:
  - robots
  - pico
  - 3dprinting
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-# YouTube Video
-Click the thumbnail below to watch the show all about this build.
-
-{% include youtubeplayer.html id="8oVOS6xfmkw" %}
-{% include youtubeplayer.html id="aUqe8S0VR0M" %}
-{% include youtubeplayer.html id="qzTNFwcfJ5U" %}
-
+videos:
+ - 8oVOS6xfmkw
+ - aUqe8S0VR0M
+ - qzTNFwcfJ5U
+repo:
+ - https://github.com/kevinmcaleer/radar_robot
 ---
 
 ## Ultrasonic Radar - how it works
@@ -48,6 +38,7 @@ Specifically, we will rotate the servo 1 degree at a time, take a distance readi
 Later, in another part of this series we’ll send the set of readings to a trained ML model and see if it can recognise any objects within the scan.
 
 ---
+
 ## Radar display
 
 ### Drawing the Radar
@@ -96,7 +87,7 @@ I’m looking at putting the breakout version of this display on the robot, in a
 
 ![slide 09](/assets/img/blog/radar/slide009.jpg){:class="img-fluid w-100"}
 
-We will draw a series of lines, one for each of the 180° angles of the sweep. 
+We will draw a series of lines, one for each of the 180° angles of the sweep.
 
 To draw the line we need to solve a triangle to find the `x1` and `y1` start positions of the line
 We can then use PicoGraphics function:
@@ -111,7 +102,7 @@ We need to solve the triangle to find the position of `x1, y1`.
 
 We know what `x2, y2`is:
 
-* `y2` is the bottom of the screen (`height`) 
+* `y2` is the bottom of the screen (`height`)
 * `x2` = its the middle of the screen (`width /2`)
 * We know the length of side c of the triangle, angle `A` as well as angle `C`
 * We need to find the length of side a (`y1`), and length of side b (`x1`, or more accurately `middle - b`)
@@ -128,7 +119,7 @@ We know what `x2, y2`is:
 * We can solve sides a and b using the AAS formula:
   * side a = `a/sin A = c/sin C`
   * side b = `b/sin B = c/sin C`
-￼
+
 ---
 
 ## 3D Design
@@ -149,7 +140,7 @@ It's 3mm thick, very quick to print, Solid, doesn’t bend, and easy to attach m
 ![slide 14](/assets/img/blog/radar/slide014.jpg){:class="img-fluid w-100"}
 
 The Explora base starts with a 90 x 70mm rectangle, has four 'tabs'; one for each the wheel.
-There are also front and rear sections. 
+There are also front and rear sections.
 
 You will want to add the holes and mounting points depending on your own design.
 
@@ -174,7 +165,7 @@ Servo screws in from underneath. You can use any commonly available servo, inclu
 * DS929MG
 * TowerPro MG92B
 
-Use the two larger screws included with the Servo to secure the servo to the servo holder. 
+Use the two larger screws included with the Servo to secure the servo to the servo holder.
 
 ---
 
@@ -210,6 +201,7 @@ Connect 4 Dupont cables to:
 Download the latest version of the code from GitHub: <https://github.com/kevinmcaleer/radar_robot>
 
 ### Radar.py
+
 Radar.py will scan the area in front of the robot by rotating the range finder. Each of the readings will be written to a `readings.csv` file on the Pico.
 
 ``` python
@@ -285,7 +277,6 @@ for count in range(1,2):
 ---
 
 ### Radar_Display.py
-
 
 ``` python
 from picographics import PicoGraphics, DISPLAY_PICO_EXPLORER
@@ -413,4 +404,3 @@ Download the STL files for this project here:
 * [`motor_holder_v4.stl`](/assets/stl/radar/motor_holder_v4.stl) - 4x Motor holders
 * [`servo_holder_v2.stl`](/assets/stl/radar/servo_holder_v2.stl) - Servo Holder
 * [`range_finder_holder.stl`](/assets/stl/radar/range_finder_holder.stl) - Range Finder Holder
-

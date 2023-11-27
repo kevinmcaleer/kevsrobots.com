@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Spooky Scary Skeleton 
 short_title: Spooky Scary Skeleton
 short_description: A Halloween Robot 
 description: A Halloween Robot
+difficulty: Intermediate
 date: 2022-10-09
 author: Kevin McAleer
 excerpt: Build your own cute Spooky Scary Skeleton Robot for Halloween - Using a Raspberry Pi Pico/Pico W, HC-SR04 Ultrasonic Range finder, and an SG90 Servo
@@ -22,21 +23,11 @@ groups:
  - halloween
  - robot
  - 3dprinting
----
-
-## Table of Contents
-
-{:toc}
-* toc
-
----
-
-## Videos
-There are a couple of videos covering the features, demo and build process for HeyBot.
-
-{% include youtubeplayer.html id="Ldio6vxHGfI" %}
-{% include youtubeplayer.html id="/gboF8HgULg0" %}
-
+videos:
+ - Ldio6vxHGfI
+ - gboF8HgULg0
+repo:
+ - https://www.github.com/kevinmcaleer/bare_bones
 ---
 
 ## Spooky Scary Skeleton Robot
@@ -67,8 +58,8 @@ Male to Female Dupont cables | For attaching the Pico to the servo and Range fin
 Download or clone the code here: <https://www.github.com/kevinmcaleer/bare_bones>
 
 ### Rangefinder.py
-Below is a simple MicroPython class for measuring distance with a range finder:
 
+Below is a simple MicroPython class for measuring distance with a range finder:
 
 ``` python
 # Range finder
@@ -107,7 +98,7 @@ class RangeFinder():
         return round(self.distance_to_object / 10 ,1) 
 ```
 
-### Bare Bones - a simple Skeleton program!
+### Bare Bones - a simple Skeleton program
 
 Here is a simple program that detects the presence of a person and then triggers the scared stiff expression:
 
@@ -169,7 +160,7 @@ while True:
 
 ## Assembly
 
-### Bottom section 
+### Bottom section
 
 [![The Base](/assets/img/blog/spookyscaryskeleton/part01.png){:class="img-fluid w-50"}](/assets/img/blog/spookyscaryskeleton/part01.png)
 
@@ -217,7 +208,6 @@ Screw in the servo using 2 M2 bolts. The servo spindle should be towards the mid
 1. Push the captive M3 nuts into the nut-holes on the bottom section. Use plyers to gently push them into place
 1. Screw the 3 M3 bolts into place
 
-
 ### The Range Finder
 
 [![The Range Finder](/assets/img/blog/spookyscaryskeleton/part08.png){:class="img-fluid w-50"}](/assets/img/blog/spookyscaryskeleton/part08.png)
@@ -255,6 +245,7 @@ Screw in the servo using 2 M2 bolts. The servo spindle should be towards the mid
 ### Connecting the HC-SR04 Range Finder
 
 1. Connect 4 male to male Dupont cables from the `range finder` to:
+
 * the `VCC` to the `3v` on the Pico
 * the `GND` to a `GND` on the Pico (there are a few to choose from)
 * The `Trigger` to `GPIO00 pin` on the pico
@@ -265,6 +256,7 @@ Screw in the servo using 2 M2 bolts. The servo spindle should be towards the mid
 ## The STL files
 
 ### Skeleton
+
 There are a few parts to download and print:
 
 * [`top.stl`](/assets/stl/skeleton/top.stl) - the top section
@@ -278,6 +270,7 @@ There are a few parts to download and print:
 If you want the Pumpkin version here are the STL files you'll need (the electronics are exactly the same).
 
 ### Pumpkin
+
 * [`top.stl`](/assets/stl/skeleton/top.stl) - the top section
 * [`bottom.stl`](/assets/stl/skeleton/bottom.stl) - the bottom section
 * [`cog.stl`](/assets/stl/skeleton/cog.stl) - the servo cog

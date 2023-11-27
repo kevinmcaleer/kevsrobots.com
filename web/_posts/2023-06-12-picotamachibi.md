@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Picotamachibi
 description: "Picotamachibi"
+difficulty: Intermediate
 short_title: Picotamachibi
 short_description: "Picotamachibi"
 date: 2023-06-12
@@ -19,11 +20,11 @@ groups:
  - micropython
  - pets
  - games
----
-
-{:toc}
-* toc
-
+videos:
+ - c6D1JRDddkE
+ - btG3Pd8ZlBw
+repo:
+ - https://github.com/kevinmcaleer/picotamachibi
 ---
 
 ## What is Picotamachibi?
@@ -35,15 +36,6 @@ The word is formed from '`Pico`' - the name of the MicroPython board, '`tama`' f
 I've always love the 90s Tamagotchi toys and wanted to build and program my own, using MicroPython and a Raspberry Pi Pico.
 
 This project involved programming and 3D design with Fusion 360.
-
----
-
-## Videos
-
-Learn about Picotamachibi with these videos:
-
-{% include youtubeplayer.html id="c6D1JRDddkE" %}
-{% include youtubeplayer.html id="btG3Pd8ZlBw" %}
 
 ---
 

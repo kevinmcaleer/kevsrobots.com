@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Pico Birthday Card
 description: "Raspberry Pi Powered Birthday Card"
 short_title: Pico Birthday Card
 short_description: "Raspberry Pi Powered Birthday Card"
+difficulty: Intermediate
 date: 2023-04-23
 author: Kevin McAleer
 excerpt: >- 
@@ -19,19 +20,10 @@ groups:
  - weird
  - christmas
  - micropython
----
-
-{:toc}
-* toc
-
----
-
-## Video
-
-Click here to watch the videos:
-
-{% include youtubeplayer.html id="ylZYOJ2zx8c" %}
-
+videos:
+ - ylZYOJ2zx8c
+repo:
+ - https://github.com/kevinmcaleer/picobirthdaycard
 ---
 
 ## Overview

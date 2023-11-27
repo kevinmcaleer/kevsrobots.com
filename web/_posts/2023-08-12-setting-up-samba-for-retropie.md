@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: RetroPie Samba Setup 
 description: "Setting up Samba for RetroPie"
+difficulty: Beginner
 short_title: RetroPie Samba Setup 
 short_description: "Setting up Samba for RetroPie"
 date: 2023-08-12
@@ -17,19 +18,8 @@ tags:
 groups:
  - retro
  - raspberrypi
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## Video
-
-{% include youtubeplayer.html id="mtfUUuBg1dw" %}
-
+videos:
+ - mtfUUuBg1dw
 ---
 
 ## Prerequisites

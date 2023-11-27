@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Simple Robot Arm
 short_title: Robot Arm
 short_description: Build your own Robot Arm
 description: Build your own Robot Arm
+difficulty: Intermediate
 date: 2022-09-25
 author: Kevin McAleer
 excerpt: 3D print a simple robot arm you can control over Wi-Fi using Phew! and the Pimoroni Inventor 2040 W
@@ -23,24 +24,14 @@ groups:
  - 3dprinting
  - pico
  - micropython
-
----
-
-## Table of Contents
-
-{:toc}
-* toc
-
----
-
-## Video
-Here is a link to the YouTube video that covers the operation and programming of the Simple Robot Arm.
-
-{% include youtubeplayer.html id="HmZF6e3I1Lo" %}
-
+videos:
+ - HmZF6e3I1Lo
+repo:
+ - https://www.github.com/kevinmcaleer/inventor_arm
 ---
 
 ## Grippy-Bot
+
 Grab the 3d printable STL files for the Grippy-Bot from Cult 3d - <https://cults3d.com/en/3d-model/gadget/grippy-bot>. This model is a free to download, and is pretty quick to 3d print. I used the Cura slicer with 'Standard' print settings and these worked out fine. I managed to print all the items on the build plate at the same time.
 
 [![Picture of the completed 3d printed robot arm](/assets/img/blog/robotarm/robotarm.jpg){:class="img-fluid w-100 rounded"}](/assets/img/blog/robotarm/robotarm.jpg)
@@ -68,6 +59,7 @@ Download the code from here: <https://www.github.com/kevinmcaleer/inventor_arm>
 You'll need to install Phew! on the Pico W, and copy over the `index.html` file too. You can upload files using Thonny (Right click on the files and folders to upload from the thonny files menu). If you want to know more about how to install Phew! [Watch this part of this video](https://youtu.be/0sPPxIq4hg8?t=241)
 
 There are two MicroPython programs in the repository:
+
 - `test01.py` - A simple test program to check the motors are working - they will all move from their minimum to maximum values
 - `test02.py` - This is the main program, it will display a web-based user interface on the IP address logged to the console. Just type that address into the web browser of any device, phone, table or computer on the same network to access the Robot Arm webpage.
 
@@ -86,8 +78,7 @@ wifi_ssid = '<enter your Wi-Fi name here>'
 wifi_password = '<enter your Wi-Fi password here>'
 ```
 
-The first block of code brings in all the software libraries needed for this project, including the phew! library, and the Inventor 2040 W library. 
-
+The first block of code brings in all the software libraries needed for this project, including the phew! library, and the Inventor 2040 W library.
 
 ``` python
 from phew import *
@@ -200,7 +191,6 @@ This code takes the values from each of the sliders and posts them to the webser
 
 ---
 
-
 ## Wiring up the Servos to the Inventor 2040 W
 
 Wiring up the robot arm is pretty simple - just plug each of the servo connectors into the Inventor 2040 W using the connections as shown below:
@@ -213,7 +203,6 @@ Arm    | Servo 4
 Elbow  | Servo 5
 Base   | Servo 6
 {:class="table table-sm"}
-
 
 [![Picture of the Wiring diagram](/assets/img/blog/robotarm/wiring.jpg){:class="img-fluid w-50 shadow-lg"}](/assets/img/blog/robotarm/wiring.jpg)
 
@@ -233,8 +222,8 @@ If you move the slider and then release the mouse button, the servo will then mo
 
 This is a great starter project to experiment with robotics. There are lots of area to improve upon this project including:
 
-* stronger servos
-* servo position feedback (requires a higher quality servo with feedback wiring)
-* more robot 3d design
-* longer arm for further reach
-* double jointed servo claw to enable better and more precise handling of objects with the claw
+- stronger servos
+- servo position feedback (requires a higher quality servo with feedback wiring)
+- more robot 3d design
+- longer arm for further reach
+- double jointed servo claw to enable better and more precise handling of objects with the claw

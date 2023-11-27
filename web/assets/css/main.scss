@@ -258,7 +258,7 @@ h1 {
     h2 {
       font-size: 30pt;
     }
-    #markdown-toc
+    #markdown-toc 
     {
       list-style: none;
       margin-left: 0px;
@@ -268,16 +268,27 @@ h1 {
         text-decoration-style: dotted;
       }
     }
-
+    .toc 
+    { ul 
+    {
+      list-style: none;
+      margin-left: 0px;
+      padding-left: 0px;
+      li a {
+        color: $orange;
+        text-decoration-style: dotted;
+      }
+    }
     em {
       font-weight: 600;
     }
+  }
 
     li a {
       color: $orange;
       text-decoration-style: dotted;
     }
-    
+
     
   }
 

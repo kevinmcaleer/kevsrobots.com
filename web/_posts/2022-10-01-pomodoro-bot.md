@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Pomodoro Robot! 
 short_title: Pomodoro Desk Robot
 short_description: Build your own Pomodoro Desk bot
 description: Build your own Pomodoro Desk bot
+difficulty: Beginner
 date: 2022-10-02
 author: Kevin McAleer
 excerpt: Build your own cute Pomodoro Desk Robot - HeyBot! Using a Raspberry Pi Pico W and Pimoroni Display Pack 2.0
@@ -22,21 +23,11 @@ groups:
  - pico
  - micropython 
  - pets
----
-
-## Table of Contents
-
-{:toc}
-* toc
-
----
-
-## Videos
-There are a couple of videos covering the features, demo and build process for HeyBot.
-
-{% include youtubeplayer.html id="/MWg1xdmgE04" %}
-{% include youtubeplayer.html id="/D2SgH5qxJuI" %}
-
+videos:
+ - /MWg1xdmgE04
+ - /D2SgH5qxJuI
+repo:
+ - https://www.github.com/kevinmcaleer/heybot
 ---
 
 ## HeyBot! The Pomodoro timer Desk Robot

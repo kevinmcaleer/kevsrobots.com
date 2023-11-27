@@ -1,8 +1,9 @@
 ---
-layout: blog
+layout: project
 title: SMARS Mini
 short_title: SMARS Mini
 short_description: Big Personality, Tiny Robot
+difficulty: Intermediate
 description: Big Personality, Tiny Robot
 date: 2023-01-22
 author: Kevin McAleer
@@ -16,23 +17,11 @@ tags:
 groups:
  - robots
  - 3dprinting
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## Videos
-
-Head over to YouTube and start watching a SMARS Mini Video Overview and Tutorial today.
-
-{% include youtubeplayer.html id="yiC5hiVpheg" %}
-
-{% include youtubeplayer.html id="gJUsHlIcHdk" %}
-
+videos:
+ - yiC5hiVpheg
+ - gJUsHlIcHdk
+repo:
+ - https://github.com/kevinmcaleer/picosmars
 ---
 
 ## What is SMARS Mini
@@ -135,5 +124,3 @@ SMARS Mini uses the same N20 motors found in the original SMARS
 SMARS Mini uses the same code as the PicoSMARS robot:
 
 <https://github.com/kevinmcaleer/picosmars>
-
----

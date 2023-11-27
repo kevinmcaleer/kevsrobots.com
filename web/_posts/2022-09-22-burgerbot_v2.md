@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: BurgerBot V2 - Quick on the Draw
 short_title: BurgerBot V2
 short_description: BurgerBot gets an upgrade
 description: BurgerBot gets an upgrade
+difficulty: Intermediate
 date: 2022-09-22
 author: Kevin McAleer
 excerpt: Add a Sharpie to Burgerbot and learn how to draw with a robot!
@@ -21,6 +22,12 @@ groups:
  - micropython
  - pico
  - 3dprinting
+videos:
+ - 5G6psAuTYT4
+ - CYP3oL3Vs9o
+ - awQ97DOyOcM
+repo:
+ - https://www.github.com/kevinmcaleer/burgerbot
 ---
 
 ## New BurgerBot Course
@@ -28,23 +35,6 @@ groups:
 Learn how to build your own BurgerBot with the new course:
 
 [![BurgerBot Course](/learn/burgerbot/assets/burgerbot.jpg){:class="img-fluid w-50 rounded-3"}](/learn/burgerbot/)
-
----
-
-## Table of Contents
-
-{:toc}
-* toc
-
----
-
-## Videos
-
-There are a couple of videos covering the features, demo and build process for BurgerBot, as well as the original BurgerBot and why I created it.
-
-{% include youtubeplayer.html id="5G6psAuTYT4" %}
-{% include youtubeplayer.html id="CYP3oL3Vs9o" %}
-{% include youtubeplayer.html id="awQ97DOyOcM" %}
 
 ---
 
@@ -156,7 +146,3 @@ If you want to print out your own Burgerbot V2, download the files below:
 * [Servo Holder](/assets/stl/burgerbot_v2/servo_holder.stl) - The Servo holder
 * [Cog Wheel](/assets/stl/burgerbot_v2/cog_wheel.stl) - The pinion wheel that attached to the servo
 * [Pen Holder](/assets/stl/burgerbot_v2/pen_holder.stl) - The Pen holder; holds the Sharpie.
-
----
-
-## Notes

@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Galactic Hero Game
 short_title: Galactic Hero Game
 short_description: Build your own Guitar Hero Clone
 description: Build your own Guitar Hero Clone
+difficulty: Intermediate
 date: 2022-12-13
 author: Kevin McAleer
 excerpt: Learn how to build your own Guitar Hero Clone with the Pimoroni Galactic Unicorn and MicroPython
@@ -18,20 +19,11 @@ groups:
  - games
  - micropython
  - pico
+videos:
+ - OBAn3GVU4v0
+repo:
+ - https://github.com/kevinmcaleer/galactic_hero
 ---
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## YouTube Video
-
-Click the thumbnails below to watch the show all about this build.
-
-{% include youtubeplayer.html id="OBAn3GVU4v0" %}
 
 ## Overview
 

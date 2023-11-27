@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Over the Air updates with MicroPython  
 description: "Automatically update code on your embedded devices"
+difficulty: Intermediate    
 short_title: OTA with MicroPython 
 short_description: "Automatically update code on your embedded devices"
 date: 2023-08-18
@@ -16,21 +17,10 @@ tags:
  - Auto-update
 groups:
  - micropython
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## Video
-
-Watch this video for an explanation and demo of the code in action.
-
-{% include youtubeplayer.html id="f1widOJYQDc" %}
-
+videos:
+ - f1widOJYQDc
+repo:
+ - https://www.github.com/kevinmcaleer/ota>
 ---
 
 ## Demystifying Over-The-Air (OTA) Updates

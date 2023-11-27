@@ -1,8 +1,9 @@
 ---
 title: Pico W Toothbrush
 description: Raspberry Pi Pico powered Toothbrush
-layout: blog
+layout: project
 cover: /assets/img/blog/picotoothbrush/picotoothbrush.png
+difficulty: Intermediate
 short_title: Pico W Toothbrush
 short_description: Raspberry Pi Pico powered Toothbrush
 date: 2023-11-26
@@ -18,10 +19,13 @@ groups:
  - weird
  - 3dprinting
  - pico
+videos:
+ - Op-bBzq6H98
+repo:
+ - https://www.github.com/kevinmcaleer/ssd1306_pico
 ---
 
-{:toc}
-* toc
+This is a work-in-progress project, so somethings may change!
 
 ---
 
@@ -37,7 +41,7 @@ There is a small display to show the time remaining, and a button to start the b
 
 The screen is 128x32 pixels, black and white OLED. It is connected to the Pico via I2C. The screen is used to display the time remaining, and the bluetooth status. The screen model is SSD1306.
 
-Shows battery level, bruth time and bluetooth status.
+Shows battery level, brush time and bluetooth status.
 
 ---
 
@@ -58,6 +62,7 @@ Motor              | N20 100RPM DC Motor     |  1  | £5.00
 Motor driver board | mx1508                  |  1  | £1.00
 Battery            | 3.7v LiPo 400mAh        |  1  | £5.22
 Charger            | Pimoroni LiPo Amigo Pro |  1  | £5.88
+M2.5 Screws        | M2.5 Screws             |  5  | £0.10
 {:class="table table-striped"}
 
 ---
@@ -68,10 +73,24 @@ Charger            | Pimoroni LiPo Amigo Pro |  1  | £5.88
 
 [![Pico W Toothbrush](/assets/img/blog/picotoothbrush/pico02.png){:class="img-fluid w-50"}](/assets/img/blog/picotoothbrush/pico02.png)
 
-[![Pico W Toothbrush](/assets/img/blog/picotoothbrush/pico03.png){:class="img-fluid w-50"}](/assets/img/blog/picotoothbrush/pico03.png)
 
 [![Pico W Toothbrush](/assets/img/blog/picotoothbrush/pico04.png){:class="img-fluid w-50"}](/assets/img/blog/picotoothbrush/pico04.png)
 
 [![Pico W Toothbrush](/assets/img/blog/picotoothbrush/pico05.png){:class="img-fluid w-50"}](/assets/img/blog/picotoothbrush/pico05.png)
 
 ---
+
+## 3D Printable STL files
+
+The toothbrush has 4 main 3D printable parts:
+
+* [`holder.stl`](/assets/stl/picotoothbrush/holder.stl) - Houses the Pico, motor, motor driver battery and battery charger
+* [`top.stl`](/assets/stl/picotoothbrush/top.stl) - The top of the case
+* [`bottom.stl`](/assets/stl/picotoothbrush/bottom.stl) - The bottom of the case
+* [`screen_holder.stl`](/assets/stl/picotoothbrush/screen_holder.stl) - The screen holder
+
+---
+
+## Assembly
+
+[![Pico W Toothbrush](/assets/img/blog/picotoothbrush/pico03.png){:class="img-fluid w-50"}](/assets/img/blog/picotoothbrush/pico03.png)

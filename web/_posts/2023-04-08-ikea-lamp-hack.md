@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Iskarni Hack
 description: "Ikea Head Lamp Hack with MicroPython"
+difficulty: Intermediate
 short_title: Iskarni Hack
 short_description: "Ikea Head Lamp Hack with MicroPython"
 date: 2023-04-09
@@ -18,19 +19,10 @@ tags:
  - 3D Printing
 groups:
  - hacks
----
-
-{:toc}
-* toc
-
----
-
-## Video
-
-Click here to watch the videos:
-
-{% include youtubeplayer.html id="fXgVCk3UTk0" %}
-
+videos:
+ - fXgVCk3UTk0
+repo:
+ - https://www.github.com/kevinmcaleer/chatrgb
 ---
 
 ## Overview
@@ -88,5 +80,3 @@ Here are the 2 STL files:
 ## MicroPython code
 
 Follow this link for the code repository <https://www.github.com/kevinmcaleer/chatrgb>
-
----

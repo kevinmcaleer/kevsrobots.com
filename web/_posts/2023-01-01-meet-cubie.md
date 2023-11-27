@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Meet Cubie-1
 short_title: Meet Cubie-1
 short_description: A ROS Robot
 description: A ROS Robot
+difficulty: Intermediate
 date: 2023-01-01
 author: Kevin McAleer
 excerpt: Build a robot to learn ROS with
@@ -16,21 +17,8 @@ tags:
 groups:
  - robots
  - 3dprinting
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## YouTube Video
-
-Click the thumbnails below to watch the show all about this build.
-
-{% include youtubeplayer.html id="_cTJhCRv858" %}
-
+videos:
+ - _cTJhCRv858
 ---
 
 ## Overview

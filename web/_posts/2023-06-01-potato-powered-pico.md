@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Potato Powered Pico
 description: "Power from Potatoes: An Introduction to Potato Batteries"
+difficulty: Beginner
 short_title: Potato powered Pico
 short_description: Intro to Potato Batteries
 date: 2023-06-01
@@ -17,6 +18,8 @@ tags:
 groups:
  - weird
  - garden
+videos:
+ - UURmlI0Sru0
 ---
 
 The humble `potato`, a staple of many diets around the world, has a surprising additional use: as a battery. Today, we'll explore the science behind potato batteries, perform some calculations, and walk you through how to wire them together.
@@ -24,8 +27,6 @@ The humble `potato`, a staple of many diets around the world, has a surprising a
 ## Can you power a Raspberry Pi Pico with 10 potatoes?
 
 I experimented with creating a Potato Powered Pico, however 10 Potatos with Zinc and Copper plates didn't provide enough amps.
-
-{% include youtubeplayer.html id="UURmlI0Sru0" %}
 
 ---
 

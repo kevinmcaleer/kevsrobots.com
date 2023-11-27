@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Chicken Nugget of Doom
 description: "Can a Chicken Nugget run Doom?"
+difficulty: Intermediate
 short_title: Chicken Nugget of Doom
 short_description: "Can a Chicken Nugget run Doom?"
 date: 2023-08-05
@@ -21,19 +22,8 @@ groups:
  - wierd
  - games
  - raspberrypi
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## Video
-
-{% include youtubeplayer.html id="4DH9DLzvx5Y" %}
-
+videos:
+ - 4DH9DLzvx5Y
 ---
 
 ## Can a Chicken Nugget run Doom?

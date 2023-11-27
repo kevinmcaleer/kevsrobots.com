@@ -1,13 +1,14 @@
 ---
-layout: blog
+layout: project
 title: Bluetooth remote controlled robot
 description: "Make your own bluetooth remote controlled robot using a Raspberry Pi Pico W and MicroPython"
+difficulty: Intermediate
 short_title: Bluetooth controlled robot
 short_description: "Control a robot with bluetooth"
 date: 2023-07-03
 author: Kevin McAleer
 excerpt: >-
-    
+    Learn how to build your own Bluetooth remote controlled robot using a Raspberry Pi Pico and MicroPython
 cover: /assets/img/blog/ble/ble.jpg
 tags: 
  - Raspberry Pi Pico W
@@ -16,19 +17,10 @@ tags:
  - Remote Control
 groups:
  - pico
----
-
-Learn how to build your own Bluetooth remote controlled robot using a Raspberry Pi Pico and MicroPython.
-
-{:toc}
-* toc
-
----
-
-## Video
-
-{% include youtubeplayer.html id="-0wCtKz1l78" %}
-
+videos:
+ - -0wCtKz1l78
+repo:
+ - https://gist.github.com/kevinmcaleer/cb8026c14ecb2b5a22fba065eb11af8c
 ---
 
 ## How To Use Bluetooth On Raspberry Pi Pico With MicroPython

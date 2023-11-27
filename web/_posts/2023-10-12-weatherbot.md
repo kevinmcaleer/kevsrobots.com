@@ -1,7 +1,7 @@
 ---
 title: WeatherBot
 description: A cute robot that can show you the temperature
-layout: blog
+layout: project
 cover: /assets/img/blog/weatherbot/weatherbot.png
 short_title: WeatherBot
 short_description: A cute robot that can show you the temperature
@@ -16,11 +16,10 @@ groups:
  - robots
  - garden
  - 3dprinting
----
-
-{:toc}
-* toc
-
+videos:
+ - lynvr7M1F6g
+repo:
+ - https://www.github.com/kevinmcaleer/nodemcu_wifi
 ---
 
 ## Overview
@@ -28,14 +27,6 @@ groups:
 ![assembly instructions](/assets/img/blog/weatherbot/weatherbot.001.jpeg){:class="img-fluid w-50"}
 
 I designed `WeatherBot` to be a fun robot that can show a tempareture reading in an innovate and unusual way; it uses a servo to point to a value on a dial, on its stomach. It even holds the temperature sensor in its hand, with the wires going to the back of the robot where the microcontroller is housed.
-
----
-
-## Video
-
-Watch WeatherBot in action here:
-
-{% include youtubeplayer.html id="lynvr7M1F6g" %}
 
 ---
 

@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Rover the Mecanum Robot
 short_title: Rover Robot
 short_description: Build your own Mecanum Robot
 description: Build your own Mecanum Robot
+difficulty: Intermediate
 date: 2022-04-30
 author: Kevin McAleer
 excerpt: Build your own Mecanum Robot using this guide
@@ -17,19 +18,10 @@ groups:
  - pico
  - micropython
  - motors
----
-
-## Table of Contents
-
-{:toc}
-* toc
-
----
-
-## YouTube Video
-
-{% include youtubeplayer.html id="JsYGHDRF-VQ" %}
-
+videos:
+ - JsYGHDRF-VQ
+repo:
+ - https://github.com/kevinmcaleer/rover
 ---
 
 ## Overview - Rover
@@ -83,5 +75,3 @@ The range finder uses 4 pins (5V, GND, Echo and Trigger).
 ## MicroPython code
 
 You can grab the demo code for this project over on my github repository: <https://github.com/kevinmcaleer/rover>
-
----

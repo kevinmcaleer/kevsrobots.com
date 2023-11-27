@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Zero Stand
 short_title: Zero Stand
 short_description: Cute stand for Raspberry Pi Zeros
 description: Cute stand for Raspberry Pi Zeros
+difficulty: Beginner
 date: 2022-05-15
 author: Kevin McAleer
 excerpt: 3D Print a cute stand for Raspberry Pi Zeros - specifically designed for pHats
@@ -14,13 +15,8 @@ tags:
 groups:
  - raspberrypi
  - 3dprinting
----
-
-## Contents
-
-{:toc}
-* toc
-
+videos:
+- LdWENznjdts
 ---
 
 ## Overview
@@ -44,12 +40,6 @@ It's best to change the orientation of the stand so that the 'face' of the stand
 [![Cura screenshot](/assets/img/blog/zero_stand/cura.png){:class="img-fluid w-50"}](/assets/img/blog/zero_stand/cura.png)
 
 ---
-
-## Video
-
-If you want to see the stand in action, I covered this in a recent video that you can watch here:
-
-{% include youtubeplayer.html id="LdWENznjdts" %}
 
 ## Gallery
 

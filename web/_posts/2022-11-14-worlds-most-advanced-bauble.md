@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Worlds most advanced Bauble
 short_title: Worlds most advanced Bauble
 short_description: Fun with Cheerlights
 description: Fun with Cheerlights
+difficulty: Intermediate
 date: 2022-11-06
 author: Kevin McAleer
 excerpt: Build an internet controllable Christmas Bauble
@@ -17,23 +18,13 @@ groups:
  - christmas
  - 3dprinting
  - pico
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-# YouTube Video
-Click the thumbnails below to watch the show all about this build.
-
-{% include youtubeplayer.html id="UlY00Het18M" %}
-{% include youtubeplayer.html id="ij1zMzfsl74" %}
-{% include youtubeplayer.html id="R9eihHOKTUg" %}
-{% include youtubeplayer.html id="I8WZ7ZEsHjM" %}
-
+videos:
+ - UlY00Het18M
+ - ij1zMzfsl74
+ - R9eihHOKTUg
+ - I8WZ7ZEsHjM
+repo:
+ - https://www.github.com/kevinmcaleer/christmas-cheer
 ---
 
 ## Overview
@@ -52,10 +43,9 @@ In this tutorial we'll look at:
 
 Item                             | Description               | Qty |  Price
 ---------------------------------|---------------------------|:---:|------:
-[Pimoroni Plasma Stick 2040 W ](https://shop.pimoroni.com/products/plasma-stick-2040-w)    | Raspberry Pi Pico, aboard |  1  | £12.00
+[Pimoroni Plasma Stick 2040 W](https://shop.pimoroni.com/products/plasma-stick-2040-w)    | Raspberry Pi Pico, aboard |  1  | £12.00
 [Adafruit Jewel 7x Neopixel model](https://www.adafruit.com/product/2226) | 7 RGB unit                |  1  |  $5.95
 {:class="table table-striped"}
-
 
 ---
 
@@ -63,7 +53,7 @@ Item                             | Description               | Qty |  Price
 
 ### What is it?
 
-* CheerLights is an “Internet of Things” project created by Hans Scharler in 2011 
+* CheerLights is an “Internet of Things” project created by Hans Scharler in 2011
 * Allows people’s lights all across the world to synchronize to one color set by Twitter
 * This is a way to connect physical things with social networking experiences
 
@@ -76,9 +66,10 @@ Checkout Hans' amazing Cheerlights website here: <https://www.cheerlights.com>
 ---
 
 ## Wheatley - 3d design
+
 Wheatley - the Portal 2 Character.
 
-![](/assets/img/blog/cheerlights/slide.004.jpeg){:class="img-fluid w-100"}
+![slide 4](/assets/img/blog/cheerlights/slide.004.jpeg){:class="img-fluid w-100"}
 
 Portal & Portal 2 are amongst my favourite games, I played portal which was bundled as part of the Orange Box Xbox 360 game a couple of years ago.
 
@@ -90,7 +81,7 @@ He’s round, so I’ve chosen to make a model based on this design, and it was 
 
 ### Wheatley 3d design
 
-![](/assets/img/blog/cheerlights/slide.005.jpeg){:class="img-fluid w-100"}
+![slide 5](/assets/img/blog/cheerlights/slide.005.jpeg){:class="img-fluid w-100"}
 
 The design is made up of 4x 3d printable parts:
 
@@ -109,7 +100,7 @@ It also about the same size a regular Christmas Tree Bauble.
 
 ### Left Half
 
-![](/assets/img/blog/cheerlights/slide.006.jpeg){:class="img-fluid w-100"}
+![slide 6](/assets/img/blog/cheerlights/slide.006.jpeg){:class="img-fluid w-100"}
 
 As you can see in the slide above, the left half has a hollow center, where the electronics are housed.
 
@@ -125,7 +116,7 @@ If the fit is different on your 3dprinted model, you can also use 2x M2 screws t
 
 The loop is simply for hanging the bauble from a tree (like a regular decoration).
 
-![](/assets/img/blog/cheerlights/slide.007.jpeg){:class="img-fluid w-100"}
+![slide 7](/assets/img/blog/cheerlights/slide.007.jpeg){:class="img-fluid w-100"}
 
 It features:
 
@@ -137,9 +128,10 @@ It features:
 ---
 
 ### Eye
+
 Diffuses the LED lights.
 
-![](/assets/img/blog/cheerlights/slide.008.jpeg){:class="img-fluid w-100"}
+![slide 8](/assets/img/blog/cheerlights/slide.008.jpeg){:class="img-fluid w-100"}
 
 The eye features:
 
@@ -151,7 +143,8 @@ The eye features:
 ---
 
 ## Electronics
-![](/assets/img/blog/cheerlights/slide.011.jpeg){:class="img-fluid w-100"}
+
+![slide 11](/assets/img/blog/cheerlights/slide.011.jpeg){:class="img-fluid w-100"}
 
 The electronics for this project are super simple:
 
@@ -162,17 +155,16 @@ The electronics for this project are super simple:
   * 3 screw terminal for connecting the LED Strips
 * [Adafruit Neopixel Jewel](https://www.adafruit.com/product/2226) (or compatible), watch out for RGB or RGBW, and RGB order
   
-
 ---
 
 ### Wiring up Electronics
 
-![](/assets/img/blog/cheerlights/slide.012.jpeg){:class="img-fluid w-100"}
+![slide 12](/assets/img/blog/cheerlights/slide.012.jpeg){:class="img-fluid w-100"}
 
 * Solder 3 wires to the back of the RGB led module:
-    * **5v** - red wire
-    * **GND** - black wire
-    * **Data** in - blue wire
+  * **5v** - red wire
+  * **GND** - black wire
+  * **Data** in - blue wire
 
 ---
 
@@ -190,6 +182,7 @@ The main MicroPython code you will need is:
 * `footer.html` - the web page footer template
 
 There are also a couple of stand-alone demo programs:
+
 * `colour.py` - a simple solid colour test
 * `spin.py` - spins colours round the display
 * `glow.py` - glow colours on the display
@@ -197,6 +190,7 @@ There are also a couple of stand-alone demo programs:
 ---
 
 ## STL files
+
 Grab the 3d printable STL files here:
 
 * [`left.stl`](/assets/stl/cheerlights/left.stl) - Left half

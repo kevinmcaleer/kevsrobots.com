@@ -1,0 +1,90 @@
+---
+layout: content
+---
+
+{% include nav_blog.html %}
+
+{% include breadcrumbs.html %}
+
+<div class="row">
+<div class="col-12 p-3 col-sm-4 col-md-3 col-lg-3 py-0">
+<img src="{{page.cover}}" class="img-fluid w-100 rounded-3 mb-3 ">
+<article>
+<h2>{{page.title}}</h2>
+<p>{{page.description}}</p>
+<i class="fa-regular fa-calendar"></i> {{page.date | date: "%-d %B %Y" }}<br />
+<hr>
+<p class="orange">
+     By <i class="fa-regular fa-user"></i> {{ page.author}}<br />
+    Share this article on <span class=""><a href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
+    </p>
+<hr>
+<h5>Table of Contents</h5>
+
+<div class="toc">
+{{ content | toc_only }}
+</div>
+<hr>
+
+<h5>Tags</h5>
+
+{% for tag in page.tags %}
+<a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+{% endfor %}
+
+<hr />
+{% if page.repo %}
+<h5>Code Repo</h5>
+<i class="fa-brands fa-github"></i> <a href="{{page.repo}}" class="dotted">View Code Repository on GitHub</a><br />
+{% endif %}
+</article>
+
+</div>
+<div class="col-12 col-md-8 col-sm-8 col-lg-6">
+
+    {% if page.videos %}
+    <h2>Video{%if page.videos.size > 1 %}s{% endif %}</h2>
+    <p>Watch the associated video{%if page.videos.size > 1 %}s{% endif %} here:</p>
+    <div class="row row-cols-lg-2 row-cols-sm-1 g-1">
+    {% for video in page.videos %}
+    <div class="col">
+        <div class="card">
+        <iframe height="250" src="https://www.youtube.com/embed/{{ video }}" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+        
+    {% endfor %}
+    </div>
+    <hr />
+    {% endif %}
+
+    <article>
+    {{content}}
+    </article>
+    <hr />
+
+    {% include related_articles.html %}
+    
+</div>
+<div class="col-12 col-md-12 col-sm-12 col-lg-3 bg-light rounded-3">
+    <div class="p-0 my-3">
+        <b>Difficulty: </b>{{page.difficulty}}<br />
+        <b>Type: </b>{{page.layout}}<br />
+        <b>Categories: </b><br />
+        {% for category in page.groups %}
+        <a href="/ideas/{{category}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{category}}</span></a>
+        {% endfor %}
+        <br />
+    </div>
+    {% include blog_profile.html %}
+    
+    <hr>
+    {% include blog_archive.html %}
+</div>
+
+</div>
+
+
+
+

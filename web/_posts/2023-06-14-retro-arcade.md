@@ -1,13 +1,14 @@
 ---
-layout: blog
+layout: project
 title: Retro Arcade
 description: "Retro handheld game fun with Micro:bit"
+difficulty: Beginner
 short_title: Retro Arcade
 short_description: "Retro handheld game fun with Micro:bit"
 date: 2023-07-02
 author: Kevin McAleer
 excerpt: >-
-    
+    A review of the Elecfreaks Retro:Game Arcade Kit
 cover: /assets/img/blog/retroarcade/retro_arcade.jpg
 tags: 
  - Microbit
@@ -16,16 +17,9 @@ tags:
 groups:
  - retro
  - games
+videos:
+ - ouC5g-xY6rc
 ---
-
-{:toc}
-* toc
-
----
-
-## Video
-
-{% include youtubeplayer.html id="ouC5g-xY6rc" %}
 
 ## Overview
 
@@ -76,5 +70,3 @@ The Elecfreaks Retro:Game Arcade Kit doesn't have conventional GPIO pins since t
 ---
 
 In conclusion, the Elecfreaks Retro:Game Arcade Kit is a fun, engaging platform for learning programming and electronics. With a combination of classic gaming nostalgia and hands-on building, it offers a uniquely entertaining way to dive into the world of digital making. Whether you're a student, teacher, or hobbyist, this kit offers an exciting journey into the world of coding and hardware.
-
----

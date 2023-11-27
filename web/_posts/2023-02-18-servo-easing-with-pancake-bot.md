@@ -1,5 +1,5 @@
 ---
-layout: blog
+layout: project
 title: Servo Easing & Pancake-Bot
 description: Learn Servo easing in MicroPython with Pancake-Bot
 short_title: Servo Easing
@@ -16,21 +16,10 @@ tags:
 groups:
  - weird
  - 3dprinting
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-### Video
-
-Click here to watch the videos:
-
-{% include youtubeplayer.html id="kXs2nYP-aws" %}
-
+videos:
+ - kXs2nYP-aws
+repo:
+ - https://github.com/kevinmcaleer/bubo-2t
 ---
 
 ## What is Servo Easing?

@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: PicoCat Lives
 short_title: PicoCat Lives
 short_description: V2 of PicoCat Robot
 description: V2 of PicoCat Robot
+difficulty: Intermediate
 date: 2022-04-01
 author: Kevin McAleer
 excerpt: Some code and pictures
@@ -14,20 +15,11 @@ groups:
  - pets
  - pico
  - micropython
- - servos 
----
-
-## Table of Contents
-
-{:toc}
-* toc
-
----
-
-## PicoCat V2 Update Video
-
-{% include youtubeplayer.html id="9txATldoURE" %}
-
+ - servos
+videos:
+ - 9txATldoURE
+repo:
+ - https://www.github.com/kevinmcaleer/picocat
 ---
 
 ## Redesign

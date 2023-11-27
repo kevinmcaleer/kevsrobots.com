@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Ghostbusters Wi-Fi Scanner
 short_title: Ghostbusters Wi-Fi Scanner
 short_description: Who you gonna call?
 description: Who you gonna call?
+difficulty: Advanced
 date: 2022-12-21
 author: Kevin McAleer
 excerpt: 3d Print a Ghostbusters PKE style Wi-Fi Scanner
@@ -22,13 +23,11 @@ groups:
  - 3dprinting
  - Movie Props 
  - retro
+videos:
+ - XTUOUlSnVpc
+repo:
+ - https://github.com/kevinmcaleer/ghostbusters_wifi
 ---
-
-## YouTube Video
-
-Click the thumbnails below to watch the show all about this build.
-
-{% include youtubeplayer.html id="XTUOUlSnVpc" %}
 
 ## Overview
 

@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Self Watering Plants
 description: Build a self watering plant system
+difficulty: Beginner
 short_title: Self Watering Plants
 short_description: Build a self watering plant system
 date: 2023-03-11
@@ -20,21 +21,8 @@ groups:
  - garden
  - pico
  - micropython
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## Video
-
-Click here to watch the videos:
-
-{% include youtubeplayer.html id="fD2qmNgkV0A" %}
-
+videos:
+ - fD2qmNgkV0A
 ---
 
 ## Bill of Materials

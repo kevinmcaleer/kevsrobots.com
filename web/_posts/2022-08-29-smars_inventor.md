@@ -1,8 +1,9 @@
 ---
-layout: blog
+layout: project
 title: SMARS Inventor
 short_title: SMARS Inventor
 short_description: Pimoroni Inventor 2040 W
+difficulty: Intermediate
 description: Pimoroni Inventor 2040 W
 date: 2022-08-29
 author: Kevin McAleer
@@ -17,13 +18,10 @@ tags:
 groups:
  - robots
  - micropython 
----
-
-## Table of Contents
-
-{:toc}
-* toc
-
+videos:
+ - MP-kS9g5ui8
+repo:
+ - https://www.github.com/kevinmcaleer/smars_inventor
 ---
 
 ## SMARS Inventor

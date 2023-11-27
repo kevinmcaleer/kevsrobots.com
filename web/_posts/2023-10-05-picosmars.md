@@ -1,12 +1,14 @@
 ---
 title: PicoSMARS 2
-layout: blog
+layout: project
 short_title: PicoSMARS 2
 short_description: A Raspberry Pi Pico W Powered SMARS Robot
 description: A Raspberry Pi Pico W Powered SMARS Robot
+difficulty: Beginner
 date: 2023-10-05
 author: Kevin McAleer
-excerpt: 
+excerpt: >-
+    A Raspberry Pi Pico W Powered SMARS Robot
 cover: /assets/img/blog/picosmars/picosmars.jpg
 tags:
  - robotics
@@ -17,16 +19,17 @@ groups:
  - pico
  - robots
  - 3dprinting
- - smars
  - micropython
+videos:
+ - XhArIe9UDoc
+ - Gl4o4iHPvDM
+repo:
+ - https://www.github.com/kevinmcaleer/picosmars2
 ---
 
 `PicoSMARS 2` is a [SMARS](/smars) based robot that, unlike the original SMARS is powered by a Raspberry Pi Pico W.
 
 This enables the SMARS to be controlled via WiFi, Bluetooth and run more sophisticated programs. The Pico enables us to write programs in MicroPython as well as in C++, so unlike the Arduino based SMARS it has some extra language options.
-
-{:toc}
-* toc
 
 ---
 

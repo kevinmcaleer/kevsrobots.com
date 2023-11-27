@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Makers Central
 description: Makers Central `23
+difficulty: Beginner
 short_title: Chip
 short_description: Makers Central `23
 date: 2023-05-22
@@ -12,14 +13,13 @@ tags:
  - makers central
  - event
  - meet up
-
+videos:
+ - UgdtHzUiN2o
 ---
 
 `Makers Central` is a UK based event, hosted at the Birmingham National Exhibition Centre (NEC); this year it took place over the 13 & 14 of May 2023.
 
 This was the first large scale, in person event, I've attended this year and it was absolutely magical. Here are some of the highlights.
-
-{% include youtubeplayer.html id="UgdtHzUiN2o" %}
 
 ---
 

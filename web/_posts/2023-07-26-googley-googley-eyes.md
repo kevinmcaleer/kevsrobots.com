@@ -1,7 +1,8 @@
 ---
-layout: blog
+layout: project
 title: Googley Googley Eyes
 description: "Googley Eyes, but they Google what they see"
+difficulty: Intermediate
 short_title: Googley Googley Eyes
 short_description: "Googley Eyes, but they Google what they see"
 date: 2023-07-26
@@ -17,19 +18,10 @@ tags:
 groups:
  - weird
  - raspberrypi
----
-
-## Contents
-
-{:toc}
-* toc
-
----
-
-## Video
-
-{% include youtubeplayer.html id="bV2sw7XBaqo" %}
-
+videos:
+ - bV2sw7XBaqo
+repo:
+ - https://gist.github.com/kevinmcaleer/8bf03bf74ac6cbf43314c41582d1e471
 ---
 
 You’ve seen googley eyes or xeyes, but what if the googley eyes could Google what they see (and then announce it); I present googley googley eyes. (Ok, they don't actually 'Google' the image, they actually use something far more cool - OpenAI).

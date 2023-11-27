@@ -1,8 +1,9 @@
 ---
-layout: blog
+layout: project
 title: Bugs the Robo-Bunny
 short_title: Bugs the Robo-Bunny
 short_description: An Easter Robot
+difficulty: Intermediate
 description: An Easter Robot
 date: 2022-04-10
 author: Kevin McAleer
@@ -18,19 +19,13 @@ groups:
  - micropython
  - servos 
  - christmas
+videos:
+ - mG7stDcin3c
+repo: https://www.github.com/kevinmcaleer/bugs_robobunny
 ---
-
-## Table of Contents
-
-{:toc}
-* toc
-
----
-
-## YouTube Video
-{% include youtubeplayer.html id="mG7stDcin3c" %}
 
 ## Design and Inspiration
+
 RoboBunny is based on [PicoCat version 2](/blog/picocat-v2.html), which was originally based on OpenCat. I uses the [pimoroni](https://www.pimoroni.com/servo2040) Servo 2040 all-in-one 18 servo microcontroller, powered by the Raspberry Pi RP2040.
 
 ![Servo2040](/assets/img/blog/servo2040.jpg){:class="img-fluid w-50"}
@@ -40,6 +35,7 @@ RoboBunny features a new head & ear profile, modified rear legs as well as a pom
 ---
 
 ## 3D Printable Parts
+
 Here is a list of the parts:
 
 Part | stl | Description | Qty to print
@@ -61,12 +57,14 @@ neck | [neck.stl](/assets/stl/bugs/neck.stl) | the neck servo connector | 1
 ---
 
 ## Code Repository
-The Robobunny code is written in MicroPython using the Pimoroni Servo 2040 (batteries included) build. 
+
+The Robobunny code is written in MicroPython using the Pimoroni Servo 2040 (batteries included) build.
 The code is available on github: <https://www.github.com/kevinmcaleer/bugs_robobunny>
 
 ---
 
 ## Gallery
+
 [![picture](/assets/img/blog/bugs/bunny.png){:class="img-fluid w-25"}](/assets/img/blog/bugs/bunny.png)
 [![picture](/assets/img/blog/bugs/foot.png){:class="img-fluid w-25"}](/assets/img/blog/bugs/foot.png)
 [![picture](/assets/img/blog/bugs/tibia.png){:class="img-fluid w-25"}](/assets/img/blog/bugs/tibia.png)

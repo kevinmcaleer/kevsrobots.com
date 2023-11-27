@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Pinout.XYZ
 description: Every single Raspberry Pi HAT, pHAT, wHAT, Bonnet and Shim
 short_title: Pinout.XYZ
 short_description: Every Raspberry Pi HAT
+difficulty: Beginner
 date: 2023-05-28
 author: Kevin McAleer
 excerpt: >-
@@ -18,15 +19,11 @@ tags:
  - Bonnet
 groups:
  - raspberrypi
+videos:
+ - I2RLDGSP6Wk
 ---
 
 If you've ever wanted to know what the pinouts are on the Raspberry Pi's 40 pin header, then look no further than [pinout.xyz](https://www.pinout.xyz).
-
----
-
-Want to see all the Hats in a video, here you go:
-
-{% include youtubeplayer.html id="I2RLDGSP6Wk" %}
 
 ---
 

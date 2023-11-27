@@ -1,9 +1,10 @@
 ---
-layout: blog
+layout: project
 title: Camera Module 3 Stand
 short_title: Giraffe Stand
 short_description: For RPI Camera v3
 description: For RPI Camera v3
+difficulty: Beginner
 date: 2023-01-11
 author: Kevin McAleer
 excerpt: Print out a fun and practical stand for your Raspberry Pi Camera Module 3
@@ -17,26 +18,11 @@ groups:
  - pets
  - photography
  - raspberrypi
+videos:
+ - J_CkQ36tVA4
 ---
 
-## Contents
-
-{:toc}
-* toc
-
----
-
-## A Fun and practical stand for the newly released Raspberry Pi camera module 3
-
----
-
-## YouTube Video
-
-Click the thumbnails below to watch the RPI Camera module 3 launch video.
-
-{% include youtubeplayer.html id="J_CkQ36tVA4" %}
-
----
+A Fun and practical stand for the newly released Raspberry Pi camera module 3
 
 ## Overview
 
