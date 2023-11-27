@@ -1,7 +1,7 @@
 module Jekyll
     module TOCFilter
         def toc_only(input)
-            require 'nokogiri'
+            # require 'nokogiri'
 
       # Parse the content with Nokogiri
       doc = Nokogiri::HTML.fragment(input)
