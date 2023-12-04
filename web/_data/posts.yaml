@@ -56,6 +56,9 @@ posts:
 - title: Bugs the Robo-Bunny
   url: /2022-04-10-robobunny.md
   date: 2022-04-10
+- title: Omnibot 3000
+  url: /2023-12-03-omnibot3000.md
+  date: 2023-12-03
 - title: Cyberglasses
   url: /2023-01-16-cyberglasses.md
   date: 2023-01-16
@@ -137,6 +140,9 @@ posts:
 - title: Pi-PipBoy
   url: /2023-03-26-pi-pipboy.md
   date: 2023-03-26
+- title: Omnibot 3000
+  url: /2023-11-27-omnibot.md
+  date: 2023-11-27
 - title: Power up your robot projects
   url: /2023-03-20-power.md
   date: 2023-03-19
@@ -197,12 +203,12 @@ posts:
 - title: Everything I made in 2022
   url: /2022-12-14-end-of-year-review.md
   date: 2022-12-13
+- title: BurgerBot - a simple 3D Printable Robot
+  url: /2022-08-24-burgerbot.md
+  date: 2022-08-24
 - title: MeArm
   url: /2023-06-05-mearm.md
   date: 2023-06-05
-- title: BurgerBot - a simple 3D Printable Robot
-  url: /2022-08-23-Burgerbot.md
-  date: 2022-08-24
 - title: The Three Laws of Robotics
   url: /2023-03-23-three-laws-of-robotics.md
   date: 2023-03-23
