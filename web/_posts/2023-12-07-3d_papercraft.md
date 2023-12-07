@@ -117,6 +117,14 @@ Papercraft models can be more than just decorative. They can serve as housings o
 
 ---
 
+## Download the Archie 3D papercraft model
+
+If you want to make your own Low-poly Archie model, you can grab the PDF file here:
+
+[![pdf icon](/assets/img/pdf_icon.png){:class="icon m-3"}](/assets/pdf/archie3d.pdf) [Archie 3D papercraft model](/assets/pdf/archie3d.pdf){:class="dotted"}
+
+---
+
 ## Final Thoughts
 
 Whether you're building a robot companion for your pet, experimenting with Raspberry Pi, or exploring the Pico, papercraft provides a unique and accessible way to bring your digital creations into the physical world. So grab your tools, choose your model, and embark on your papercraft journey!
