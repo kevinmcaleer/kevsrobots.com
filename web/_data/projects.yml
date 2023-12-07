@@ -1,3 +1,8 @@
+- name: 3D papercraft
+  link: /blog/3d_papercraft.html
+  cover: /assets/img/blog/papercraft/papercraft.png
+  description: How to create papercraft models from low-poly 3D models
+  date: 2023-12-07
 - name: Pico W Powered Toothbrush
   link: /blog/pico_toothbrush.html
   cover: /assets/img/blog/picotoothbrush/picotoothbrush.png
