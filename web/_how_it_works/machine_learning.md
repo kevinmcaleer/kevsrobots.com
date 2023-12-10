@@ -23,8 +23,10 @@ Machine learning algorithms use statistical techniques to uncover patterns and r
 
 ## Video
 
-This video contains an explaination and demonstration of how to train a [neural network](/resources/glossary#neural-network) using machine learning.
+These videos contain explainations and demonstrations of how to train a [neural network](/resources/glossary#neural-network) using machine learning.
 
 {% include youtubeplayer.html id="kJpLMBqNcIQ" %}
+
+{% include youtubeplayer.html id="5foM8pssKHw" %}
 
 ---
