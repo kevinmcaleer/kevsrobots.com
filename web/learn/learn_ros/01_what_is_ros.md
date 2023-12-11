@@ -90,13 +90,14 @@ There are two versions of ROS:
 
 ## Releases & Distros
 
-ROS2 has several releases, as of the writing of this the **Humble Hawksbill** is the current version:
+ROS2 has several releases, as of the writing of this the **Iron Irwini**, however this is only supported up to Nov 2024,  **Humble Hawksbill** is the release version with Long term support (LTS):
 
-Distro               |       Release date |   End Of Life date
-:--------------------|-------------------:|------------------:
-**Humble Hawksbill** | **May 23rd, 2022** |       **May 2027**
-Galactic Geochelone  |     May 23rd, 2021 | December 9th, 2022
-Foxy Fitzroy         |     June 5th, 2020 |           May 2023
+Distro              |     Release date |   End Of Life date
+:-------------------|-----------------:|------------------:
+**Iron Irwini**     | **May 23, 2023** |       **Nov 2024**
+Humble Hawksbill    |   May 23rd, 2022 |           May 2027
+Galactic Geochelone |   May 23rd, 2021 | December 9th, 2022
+Foxy Fitzroy        |   June 5th, 2020 |           May 2023
 {:class="table table-striped"}
 
 ---

@@ -113,7 +113,8 @@ class Course():
         with open(f'{course_folder}/course.yml', 'r') as stream:
             try:
                 course=yaml.safe_load(stream)
-                # print(f'Course manifest loaded')
+                name = course[0]['name']
+                print(f'Course manifest loaded for {name}') 
             except yaml.YAMLError as exc:
                 print(exc)
         

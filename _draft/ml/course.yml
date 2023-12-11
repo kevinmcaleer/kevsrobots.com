@@ -1,0 +1,16 @@
+- name: Introduction to Machine Learning
+  author: Kevin McAleer
+  date_created: 2023-12-10
+  date_published: 2023-12-10
+  layout: course
+  cover: assets/ml.png
+  description: >- 
+      A comprehensive beginner's guide to understanding and implementing machine learning using Python. This course covers fundamental concepts, practical examples, and real-world applications.
+  content:
+  - section:
+      name: Introduction to Machine Learning
+      content:
+        - 01_intro.md
+        - 02_concepts.md
+        - 03_core.md
+  

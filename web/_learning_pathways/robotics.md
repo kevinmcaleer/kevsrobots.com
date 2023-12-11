@@ -10,6 +10,8 @@ courses:
   - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
   - "Robot Eye Mechanism"
   - "Computer Vision on Raspberry Pi with CVZone"
+  - "Learn ROS with me"
+
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}
