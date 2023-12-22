@@ -9,6 +9,6 @@ It's been a busy year. I've been working on a lot of projects, and I've been to 
 
 ---
 
-I've create a set of pages that show all the things I've created over the years. You can find them here: [Year in Review](/year_in_review/). These pages automatically generate themselves from the content in the website as I add [videos](/all_videos), [projects](/robots/projects/) and [robots](/robots/) to the site.
+I've create a set of pages that show all the things I've created over the years. You can find them here: [Year in Review](/year_in_review/). These pages automatically generate themselves from the content in the website as I add [videos](/all_videos), [projects](/robots/projects) and [robots](/robots/) to the site.
 
 {% include yir_cards.html %}
