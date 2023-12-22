@@ -10,3 +10,5 @@
   link: popular_videos
 - name: List of Shows
   link: list_of_shows
+- name: Year in Review
+  link: /year_in_review

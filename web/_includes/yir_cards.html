@@ -1,0 +1,21 @@
+{% assign cards = site.data.nav_yir %}
+
+<div class="row row-cols-4">
+{% for card in cards %}
+
+<div class="col">
+<a href="{{card.link}}">
+<div class="card border-0 shadow-lg">
+<img src="{{ card.cover }}" class="card-img-top">
+
+<div class="card-body">
+<h5 class="card-title">{{ card.name }}</h5>
+</div>
+
+</div>
+</a>
+</div>
+
+{% endfor %}
+
+</div>

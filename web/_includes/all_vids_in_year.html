@@ -1,0 +1,34 @@
+
+{% assign current_year = include.year | strip %}
+{% assign videos = site.data.youtube | sort: 'published' %}
+
+<h2>{{current_year}}</h2>
+<div class="row row-cols-10 g-0 mb-3 py-3 bg-light">
+{% for month in (1..12) %}
+
+{% assign month_padded = month | prepend: '0' | slice: -2, 2 %}
+{% capture month_date_string %}{{ current_year }}-{{ month }}-01{% endcapture %}
+{% assign month_name = month_date_string | date: '%B' | strip %}
+
+{% for video in videos %}
+    {% assign video_year = video.published | date: '%Y'| strip %}
+    {% assign video_month = video.published | date: '%m' | strip %}
+
+    {% if video_year == current_year %}
+    {% assign video_year = video.published | date: '%Y'| strip %}
+    {% assign video_month = video.published | date: '%m' | strip %}
+    
+        
+{% if video_month == month_padded %}
+<div class="col-1">
+<div class="card border-0 rounded-3">
+<img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="card-img-top">
+</div>
+</div>
+{% endif %}
+    
+{% endif %}
+{% endfor %}
+{% endfor %}
+</div>
+

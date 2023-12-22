@@ -122,6 +122,12 @@ nav {
     width: 70px;
   }
 }
+
+.card.bg-ocre {
+    background-color: #FFCA29;
+    color: black;
+  }
+
 .text-black {
   color: black;
 }
@@ -784,3 +790,37 @@ table .w-30 { width:30%; }
   max-height: 1.5em;         /* max-height = line-height * number of lines */
 }
 
+.timeline-element {
+  position: relative;
+  text-align: center;
+  padding-top: 0px; /* Adjust as needed */
+}
+
+.timeline-circle {
+  width: 10px; /* Adjust size as needed */
+  height: 10px; /* Adjust size as needed */
+  background-color: #000; /* Or any color */
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 10px; /* Adjust based on circle size */
+  height: 20px; /* Adjust length as needed */
+  border-left: 2px solid #000; /* Adjust width and color as needed */
+  z-index: 0;
+}
+.timeline_bottom_line {
+  position: relative;
+  left: 0;
+  right: 0;
+  top: 0px; /* Adjust based on circle size */
+  height: 1px; /* Adjust length as needed */
+  border-top: 2px solid #000; /* Adjust width and color as needed */
+  z-index: 0;
+}

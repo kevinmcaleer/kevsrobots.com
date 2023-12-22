@@ -1,0 +1,85 @@
+{% include nav_yir.html %}
+{% include breadcrumbs.html %}
+{% assign current_year = include.year | strip %}
+{% assign videos = site.data.youtube | sort: 'published' %}
+{% assign popular_videos = site.data.popular_videos %}
+{% assign robots = site.data.robots %}
+{% assign projects = site.data.projects %}
+{% assign total_robots_created = 0 %}
+<h1>Year in Review {{current_year}}</h1>
+<h2>All the videos created in {{current_year}}</h2>
+<hr>
+{% for month in (1..12) %}
+<div class="container-fluid bg-light my-3 rounded-3">
+    {% assign month_padded = month | prepend: '0' | slice: -2, 2 %}
+    {% capture month_date_string %}{{ current_year }}-{{ month }}-01{% endcapture %}
+    {% assign month_name = month_date_string | date: '%B' | strip %}
+
+<!-- work out the number of robots created this month -->
+{% assign robots_created = 0 %}
+{% for robot in robots %}
+{% assign robot_year = robot.date | date: '%Y'| strip %}
+{% assign robot_month = robot.date | date: '%m' | strip %}
+{% if robot_year == current_year and robot_month == month_padded %}
+{% assign robots_created = robots_created | plus: 1 %}
+{% endif %}
+{% endfor %}
+{% assign total_robots_created = total_robots_created | plus: robots_created %}
+
+<div class="container-fluid bg-light pt-3">
+    <h5>{{ month_name }} | {{robots_created}} Robots Created</h5>
+</div>
+
+<div class="row row-cols-md-4 row-cols-lg-6 row-cols-1 row-cols-sm-2 g-1 mb-3 py-3 h-100 bg-light">
+    
+    {% for video in videos %}
+        
+        {% assign video_year = video.published | date: '%Y'| strip %}
+        {% assign video_month = video.published | date: '%m' | strip %}
+       
+        {% if video_year == current_year and video.type != "short" %}
+            
+        {% assign is_popular = false %}
+        {% assign views = false %}
+            {% for popular_video in popular_videos %}
+            
+                {% if video.video_id == popular_video.Content %}
+                {% assign views = popular_video.Views %}
+                {% if popular_video.popular == true %}
+                    {% assign is_popular = true %}
+                    {% break %}
+                {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if video_month == month_padded %}
+            <div class="col mb-1">
+            <a href="https://www.youtube.com/watch?v={{video.video_id}}" class="text-decoration-none">
+            <div class="card h-100 border-0 rounded-3 {% if is_popular %} bg-ocre {% endif %} shadow-lg">
+            
+            <!-- {% include youtubeplayer.html id=video.video_id %} -->
+            <img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="card-img-top">
+            <div class="card-body">
+                <p class="card-title">{{video.title}}</p>
+                <p class="card-text text-muted text-sm">{{ video.published | date: "%d %b"}} | {{views}} views</p>
+                <span class="badge {% if video.type=='livestream' %}bg-danger {% else %} bg-success {% endif %}">{{video.type | upcase }}</span>
+                
+                {% if is_popular %}
+                <span class="text-end badge bg-dark">Popular</span>
+                {% endif %}
+                
+            </div>
+            </div>
+            </a>
+            </div>
+            
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+   
+</div>
+</div>
+{% endfor %}
+
+<h2>Total Robots Created {{total_robots_created}}</h2>
+
+{% include all_vids_in_year.html year=include.year %}

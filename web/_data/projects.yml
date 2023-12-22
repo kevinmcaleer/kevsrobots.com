@@ -1,3 +1,8 @@
+- name: Elf Detector
+  link: /blog/elf-detector.html
+  cover: /assets/img/blog/elf/elf.jpg
+  description: Build your own Elf Detector
+  date: 2023-12-09
 - name: 3D papercraft
   link: /blog/3d_papercraft.html
   cover: /assets/img/blog/papercraft/papercraft.png

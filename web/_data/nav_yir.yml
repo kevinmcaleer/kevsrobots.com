@@ -1,0 +1,9 @@
+- name: 2021
+  link: /year_in_review/2021
+  cover: /assets/img/blog/yir/2021.png
+- name: 2022
+  link: /year_in_review/2022
+  cover: /assets/img/blog/yir/2022.png
+- name: 2023
+  link: /year_in_review/2023
+  cover: /assets/img/blog/yir/2023.png

@@ -1,0 +1,12 @@
+{% assign nav = site.data.nav_yir %}
+<nav class="navbar my-0 py-0 bg-nav">
+    <div class="container-fluid">
+            <ul class="nav me-auto mt-0 mb-0">
+        {% for item in nav %}
+        <li class="nav-item">
+            <a href="{{ item.link }}" class="nav-link {% if page.url contains item.link %}active{% endif %}">{{ item.name }}</a>
+        </li>
+        {% endfor %}
+        </ul>
+        </div>
+</nav>
