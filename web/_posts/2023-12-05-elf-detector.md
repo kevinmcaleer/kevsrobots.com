@@ -205,6 +205,21 @@ We can send the trained model to our robot, so that it can use it to recognise o
 
 ---
 
+## Add Vision Service
+
+Next we need to add a vision service to our robot. This will allow us to use the model we just trained to recognise objects. To do this:
+
+1. Click on the `Config` tab on the robot we want to add the camera to. This will open up the configuration screen for the robot
+1. Click on the `Services` tab
+1. Click the `+ Create Service` button to add a new component to the robot
+1. Select `Vision` from the list of services, then `ML model`
+1. Give the service a name (remember to avoid spaces and special characters).
+1. Click the `Create` button
+1. in the new `Vision` service, choose the `elf-model` we just created from the list of models
+1. Click the `Save config` button
+
+---
+
 ### Evaluating the model
 
 We can test the model to see how well it performs. To do this:

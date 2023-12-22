@@ -19,6 +19,9 @@ groups:
  - 3dprinting
 videos:
  - _cTJhCRv858
+ - 03wKo-riJlA
+ - l9_lBNemtZg
+ - ev9Mt_gg81g
 ---
 
 ## Overview

@@ -51,3 +51,6 @@ collections:
   groups:
     output: true
     permalink: /ideas/:name.html
+  components:
+    output: true
+    permalink: /components/:name.html
