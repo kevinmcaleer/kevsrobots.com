@@ -1,5 +1,12 @@
 # TODO
 
+## Year in Review
+
+- [ ] add Courses
+- [ ] add projects
+- [x] add events
+
+
 ::highlighted text::
 
 - [X] Add which node the site is running on to the footer (for troubleshooting) - swarm makes this difficult
@@ -30,7 +37,7 @@ Non-Robot Projects
 
 Blog page
 
-- [ ] List of blog articles, by year, month
-- [ ] grid of cards, in rows per month
+- [x] List of blog articles, by year, month
+- [x] grid of cards, in rows per month
 
 ---

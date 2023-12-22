@@ -1,0 +1,42 @@
+- event: Makers Central 2023
+  start: "2023-05-13"
+  end: "2023-05-14"
+  location: Birmingham, UK
+  link: https://www.makerscentral.co.uk/
+  status: closed
+- event: Raspberry Pi 5 Launch
+  start: "2023-09-21"
+  end: "2023-09-22"
+  location: Cambridge, UK
+  link: https://www.raspberrypi.com/
+  status: closed
+- event: Maker Faire Rome 2023
+  start: "2023-10-19"
+  end: "2023-10-23"
+  location: Fiera Di Roma, Italy
+  link: https://www.makerfairerome.eu/
+  status: closed
+- event: Opensauce 2024
+  start: "2024-07-01"
+  end: "2024-07-31"
+  location: San Francisco, USA
+  link: https://www.opensauce.live/
+  status: announced
+- event: Liverpool Makefest 2024
+  start: "2024-07-06"
+  end: "2024-07-06"
+  location: Liverpool, UK
+  link: https://liverpoolmakefest.org/
+  status: confirmed
+- event: Maker Faire Rome 2024
+  start: "2024-10-18"
+  end: "2024-10-20"
+  location: Fiera Di Roma, Italy
+  link: https://www.makerfairerome.eu/
+  status: expected
+- event: Makers Central 2024
+  start: "2024-05-18"
+  end: "2024-05-19"
+  location: Birmingham, UK
+  link: https://www.makerscentral.co.uk/
+  status: confirmed
