@@ -40,3 +40,9 @@
   location: Birmingham, UK
   link: https://www.makerscentral.co.uk/
   status: confirmed
+- event: SMRRF 2024
+  start: "2024-10-05"
+  end: "2024-10-06"
+  location: Oxford, UK
+  link: https://www.sanjaymortimerfoundation.org/
+  status: expected
