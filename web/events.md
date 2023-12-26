@@ -15,4 +15,10 @@ cover: /assets/img/events.jpg
 
 ---
 
-{% include events.html year=2024%}
+{% include events.html year="2024" %}
+
+---
+
+# Past events
+
+{% include events.html year="2023" show_download='False' %}

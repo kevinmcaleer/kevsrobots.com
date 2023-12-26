@@ -4,45 +4,60 @@
   location: Birmingham, UK
   link: https://www.makerscentral.co.uk/
   status: closed
+  image: /assets/img/events/makers_central_2024.jpg
 - event: Raspberry Pi 5 Launch
   start: "2023-09-21"
   end: "2023-09-22"
   location: Cambridge, UK
   link: https://www.raspberrypi.com/
   status: closed
+  image: /assets/img/events/raspberry_pi5.jpg
 - event: Maker Faire Rome 2023
   start: "2023-10-19"
   end: "2023-10-23"
   location: Fiera Di Roma, Italy
   link: https://www.makerfairerome.eu/
   status: closed
+  image: /assets/img/events/makerfairerome_2024.jpg
 - event: Opensauce 2024
-  start: "2024-07-01"
-  end: "2024-07-31"
+  start: "2024-07-06"
+  end: "2024-07-07"
   location: San Francisco, USA
   link: https://www.opensauce.live/
-  status: announced
+  status: announced, date to be confirmed
+  image: /assets/img/events/opensauce_2024.jpg
 - event: Liverpool Makefest 2024
   start: "2024-07-06"
   end: "2024-07-06"
   location: Liverpool, UK
   link: https://liverpoolmakefest.org/
   status: confirmed
+  image: /assets/img/events/liverpoolmakefest_2024.jpg
 - event: Maker Faire Rome 2024
   start: "2024-10-18"
   end: "2024-10-20"
   location: Fiera Di Roma, Italy
   link: https://www.makerfairerome.eu/
-  status: expected
+  status: expected, date to be confirmed
+  image: /assets/img/events/makerfairerome_2024.jpg
 - event: Makers Central 2024
   start: "2024-05-18"
   end: "2024-05-19"
   location: Birmingham, UK
   link: https://www.makerscentral.co.uk/
   status: confirmed
+  image: /assets/img/events/makers_central_2024.jpg
 - event: SMRRF 2024
   start: "2024-10-05"
   end: "2024-10-06"
   location: Oxford, UK
   link: https://www.sanjaymortimerfoundation.org/
-  status: expected
+  status: expected, date to be confirmed
+  image: /assets/img/events/smrrf_2024.jpg
+- event: Pi Wars 2024
+  start:  "2024-04-20"
+  end: "2024-04-21"
+  location: Cambridge, UK
+  link: https://www.piwars.org/
+  status: confirmed
+  image: /assets/img/events/piwars_2024.jpg
