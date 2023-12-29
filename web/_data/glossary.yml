@@ -610,3 +610,10 @@
     Machine learning algorithms build a mathematical model based on sample data, known as "training data", in order to make predictions or decisions without being explicitly programmed to do so.
   link: https://en.wikipedia.org/wiki/Machine_learning
   article: /resources/learn/ml
+- term: RTSP
+  definition: Real Time Streaming Protocol
+  full: >-
+    The Real Time Streaming Protocol (RTSP) is a network control protocol designed for use in entertainment and communications systems to control streaming media servers.
+    The protocol is used for establishing and controlling media sessions between end points.
+  link: https://en.wikipedia.org/wiki/Real_Time_Streaming_Protocol
+  article: /blog/esp32cam-rtsp
