@@ -46,38 +46,5 @@
     
     {% endfor %}
 </div>
-<!-- 
-<table class="table table-striped">
-<thead>
-    <tr>
-        <th>Event</th>
-        <th>Location</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Link</th>
-        <th>Status</th>
-    </tr>
-</thead>
-{% for event in events %}
-
-{% assign current_year = include.year %}
-
-{% assign event_month = event.start | date: '%m' %}
-{% assign event_year = event.start | date: '%Y' %}
-
-{% if event_year == current_year %}
-<tr>
-<td><h5>{{ event.event }}</h5></td>
-<td><i class="fa-solid fa-location-dot"></i>{{ event.location }}</td>
-<td>{{ event.start | date: '%d %B %Y' }}</td>
-<td>{{ event.end | date: '%d %B %Y' }}</td>
-<td><a href="{{ event.link }}">{{event.link}}</a></td>
-<td>{{ event.status }}</td>
-</tr>
-
-{% endif %}
-
-{% endfor %}
-</table> -->
 
 </article>

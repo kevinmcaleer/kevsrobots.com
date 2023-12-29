@@ -17,6 +17,8 @@ cover: /assets/img/events.jpg
 
 {% include events.html year="2024" %}
 
+{% include events_map.html %}
+
 ---
 
 # Past events

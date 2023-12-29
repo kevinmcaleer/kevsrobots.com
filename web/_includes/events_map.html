@@ -1,0 +1,75 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<div id="map" style="height: 500px;"></div>
+<script>
+
+    function createPopupContent(event) {
+        var popupDiv = document.createElement('div');
+
+        // Add clickable event image
+        if (event.image && event.link) {
+            var link = document.createElement('a');
+            link.href = event.link;
+            link.target = '_blank'; // Opens link in a new tab
+
+            var img = document.createElement('img');
+            img.src = event.image;
+            img.style.width = '100%'; 
+            img.style.height = 'auto';
+
+            link.appendChild(img);
+            popupDiv.appendChild(link);
+        }
+
+        var title = document.createElement('b');
+        title.textContent = event.event;
+        popupDiv.appendChild(title);
+
+        var location = document.createElement('p');
+        location.textContent = 'Location: ' + event.location;
+        popupDiv.appendChild(location);
+
+        // Format and add event dates
+        var startDate = formatDate(event.start);
+        var endDate = formatDate(event.end);
+        var dateText = document.createElement('p');
+        dateText.textContent = `Dates: ${startDate} to ${endDate}`;
+        popupDiv.appendChild(dateText);
+
+        return popupDiv;
+    }
+
+    function formatDate(dateString) {
+        var options = { year: 'numeric', month: 'long', day: 'numeric' };
+        var date = new Date(dateString);
+        return date.toLocaleDateString(undefined, options); // 'undefined' uses browser's default locale
+    }
+    var map = L.map('map').setView([51.5074, -0.1278], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    fetch('events.json')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(event => {
+                if (event.latitude && event.longitude && event.event && event.start && event.end) {
+                    // var popupContent = '<b>${event.event}</b><br>Location: ${event.location}<br>Start: ${event.start}<br>End: ${event.end}';
+                    // var popupContent = "test";
+                    var popupContent = createPopupContent(event);
+                    var marker1 = L.marker([parseFloat(event.latitude), parseFloat(event.longitude)]).addTo(map);
+                    marker1.bindPopup(popupContent);
+                    console.log("popupContent is:",popupContent); // Log to check content
+
+                } else {
+                    console.log("Invalid event data:", event);
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+        });
+    
+</script>

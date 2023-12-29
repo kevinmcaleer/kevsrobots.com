@@ -61,3 +61,10 @@
   link: https://www.piwars.org/
   status: confirmed
   image: /assets/img/events/piwars_2024.jpg
+- event: EMFCamp 2024
+  start: "2024-05-30"
+  end: "2024-06-02"
+  location: Eastnor Castle, UK
+  link: https://www.emfcamp.org/
+  status: confirmed
+  image: /assets/img/events/emfcamp2024.jpg
