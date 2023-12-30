@@ -3,7 +3,8 @@ layout: lesson
 title: Working with Data in Python
 author: Kevin McAleer
 type: page
-cover: assets/2.png
+cover: /learn/python/assets/2.png
+date: 2023-07-20
 previous: 08_oop.html
 next: 10_webscraping.html
 description: Learn about Python's capabilities for data manipulation and analysis,

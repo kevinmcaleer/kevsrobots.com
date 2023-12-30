@@ -4,6 +4,7 @@ title: Downloading Course Content
 author: Kevin McAleer
 type: page
 cover: /learn/learning_platform/assets/learn.jpg
+date: 2022-12-04
 previous: 02_navigate_content.html
 description: Learn how to download supporting files and content
 percent: 100

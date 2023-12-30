@@ -4,6 +4,7 @@ title: Fillet applied to side cutouts
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 09_sidecut.html
 next: 11_back.html
 description: Round the edges

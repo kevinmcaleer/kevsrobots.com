@@ -4,6 +4,7 @@ title: Pin Numbering
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 01_gpio_pin_types.html
 next: 03_voltage_levels.html
 description: Understand the Raspberry Pi Pico's pin numbering system and the role

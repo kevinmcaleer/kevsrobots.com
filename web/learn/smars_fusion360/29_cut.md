@@ -4,6 +4,7 @@ title: Stub wheel cutout profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 28_revolve.html
 next: 30_extrude.html
 description: Cut out the center

@@ -4,6 +4,7 @@ title: Watch the demonstration
 author: Kevin McAleer
 type: page
 cover: /learn/cvzone/assets/computer_vision.jpg
+date: 2023-10-07
 previous: 00_intro.html
 next: 01_install.html
 description: Learn CVZone with this full video tutorial

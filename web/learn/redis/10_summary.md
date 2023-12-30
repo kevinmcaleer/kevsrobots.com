@@ -4,6 +4,7 @@ title: Conclusion and Additional Resources
 author: Kevin McAleer
 type: page
 cover: /learn/redis/assets/redis-cover.jpg
+date: 2023-04-12
 previous: 09_redis_pub_sub.html
 description: Review what we have learned and find additional resources for further
   study.

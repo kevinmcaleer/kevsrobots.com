@@ -3,7 +3,7 @@ title: Computer Vision with CVZone
 description: >-
     Dive deep into the world of computer vision on compact systems with our hands-on course tailored for Raspberry Pi enthusiasts
 layout: lesson
-cover: assets/computer_vision.jpg
+cover: /learn/cvzone/assets/computer_vision.jpg
 ---
 
 ![Cover Image]({{page.cover}}){:class="cover"}

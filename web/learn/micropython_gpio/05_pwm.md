@@ -4,6 +4,7 @@ title: Pulse Width Modulation (PWM)
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 04_digital_io.html
 next: 06_leds.html
 description: Learn about Pulse Width Modulation (PWM) and controlling devices like

@@ -3,7 +3,7 @@ layout: lesson
 title: Data Analysis and Aggregation
 type: page
 description: Explore the powerful data analysis and aggregation capabilities of Pandas, including summarizing data, grouping, and performing aggregate computations.
-cover: assets/pandas07.png
+cover: /learn/pandas_and_numpy/assets/pandas07.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

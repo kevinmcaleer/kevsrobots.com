@@ -2,7 +2,7 @@
 title: Python Libraries and Modules
 description: Get introduced to the use of Python libraries and modules, learn how to import them and explore a few popular libraries like math, random and datetime.
 layout: lesson
-cover: assets/7.png
+cover: /learn/python/assets/7.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

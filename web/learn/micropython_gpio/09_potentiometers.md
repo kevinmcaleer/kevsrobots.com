@@ -4,6 +4,7 @@ title: Using Potentiometers
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 08_adc.html
 next: 10_temperature_sensors.html
 description: Learn how to use potentiometers with the Raspberry Pi Pico and MicroPython.

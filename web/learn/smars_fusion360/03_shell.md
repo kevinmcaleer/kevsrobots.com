@@ -4,6 +4,7 @@ title: Shell the Extruded Base
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 02_extrude_base.html
 next: 04_fillet.html
 description: Hollow out the chassis

@@ -4,6 +4,7 @@ title: Lesson 04 - Positioning with the MPU-6050
 author: Kevin McAleer
 type: page
 cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
 previous: 03_lesson_03.html
 next: 05_lesson_05.html
 description: Learn how to detect the position and acceleration in space using an the

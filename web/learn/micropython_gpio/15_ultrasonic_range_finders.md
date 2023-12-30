@@ -4,6 +4,7 @@ title: Ultrasonic Range Finders
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 14_servos.html
 next: 16_ground_pins.html
 description: Learn how ultrasonic range finders work and how to use them with the

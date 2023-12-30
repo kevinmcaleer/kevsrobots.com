@@ -4,6 +4,7 @@ title: Create the Lower Eyelid Component
 author: Kevin McAleer
 type: page
 cover: /learn/eye_mechanism/assets/cover.jpg
+date: 2023-01-29
 previous: 05_hinge.html
 next: 07_create_lower_sketch.html
 description: Lets create the Lower Eyelid

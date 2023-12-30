@@ -3,7 +3,7 @@ title: Hand Detection
 description: >-
     This lesson will guide you through capturing and analyzing video feed to highlight and track hands effectively
 layout: lesson
-cover: assets/hand.png
+cover: /learn/cvzone/assets/hand.png
 ---
 
 ![Cover Image]({{page.cover}}){:class="cover"}

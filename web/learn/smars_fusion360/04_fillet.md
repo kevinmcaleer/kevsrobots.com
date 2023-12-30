@@ -4,6 +4,7 @@ title: Fillet the Shell
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 03_shell.html
 next: 05_thin.html
 description: Give the Chassis some roundness

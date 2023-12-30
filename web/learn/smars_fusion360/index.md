@@ -4,6 +4,7 @@ title: Overview
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 next: 01_base.html
 description: Fusion 360 introduction
 percent: 2

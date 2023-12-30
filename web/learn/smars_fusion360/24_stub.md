@@ -4,6 +4,7 @@ title: Unpowered wheel stub profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 23_cut.html
 next: 25_cut.html
 description: Create a wheel stub profile

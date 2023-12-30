@@ -3,7 +3,7 @@ title: Course Overview
 description: >-
     What you'll learn
 layout: lesson
-cover: assets/overview01.jpg
+cover: /learn/sqlite3/assets/overview01.jpg
 ---
 
 ![banner]({{page.cover}}){:class="cover"}

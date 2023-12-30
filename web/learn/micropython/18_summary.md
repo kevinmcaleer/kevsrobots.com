@@ -4,6 +4,7 @@ title: Summary and Review
 author: Kevin McAleer
 type: page
 cover: /learn/micropython/assets/micropython.jpg
+date: 2022-12-04
 previous: 17_modules.html
 description: A summary of what you have learned so far
 percent: 100

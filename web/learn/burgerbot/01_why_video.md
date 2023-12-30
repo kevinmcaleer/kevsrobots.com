@@ -4,6 +4,7 @@ title: Why BurgerBot?
 author: Kevin McAleer
 type: video
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 00_intro.html
 next: 01_what_is_burger_bot.html
 description: null

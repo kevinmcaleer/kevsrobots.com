@@ -3,7 +3,7 @@ title: "Bonus: Python Tips, Tricks and Best Practices"
 description: >-
     Discover various Python tips, tricks, and best practices, such as writing Pythonic code, following PEP 8 style guide, and using the Black code formatter.
 layout: lesson
-cover: assets/4.png
+cover: /learn/python/assets/4.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

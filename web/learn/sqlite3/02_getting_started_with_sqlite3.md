@@ -4,6 +4,7 @@ title: Getting Started with Python and SQLite3
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 01_introduction_to_databases.html
 next: 03_creating_tables_and_schema.html
 description: ''

@@ -4,6 +4,7 @@ title: Measuring Distance
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 05_basic_movement.html
 next: 07_object_avoidance.html
 description: null

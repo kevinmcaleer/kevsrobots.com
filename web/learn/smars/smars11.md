@@ -4,6 +4,7 @@ title: Attach Tracks
 author: Kevin McAleer
 type: page
 cover: /learn/smars/assets/how_to_build_a_smars.jpg
+date: 2023-02-19
 previous: smars10.html
 next: smars12.html
 description: The tracks provide all terrain grip for the robot

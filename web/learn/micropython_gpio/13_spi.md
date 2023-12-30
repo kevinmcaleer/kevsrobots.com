@@ -4,6 +4,7 @@ title: Introduction to SPI
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 12_i2c.html
 next: 14_servos.html
 description: Learn about SPI communication protocol and how to use it with the Raspberry

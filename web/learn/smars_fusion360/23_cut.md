@@ -4,6 +4,7 @@ title: Front cut
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 22_front.html
 next: 24_stub.html
 description: Cut out the front profile

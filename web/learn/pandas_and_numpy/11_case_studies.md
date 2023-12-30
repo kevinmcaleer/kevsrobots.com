@@ -3,7 +3,8 @@ layout: lesson
 title: Practical Examples and Case Studies
 author: Kevin McAleer
 type: page
-cover: assets/pandas10.png
+cover: /learn/pandas_and_numpy/assets/pandas10.png
+date: 2023-11-14
 previous: 10_visualisation.html
 next: 12_recap.html
 description: Apply your skills with Pandas and NumPy to real-world scenarios through

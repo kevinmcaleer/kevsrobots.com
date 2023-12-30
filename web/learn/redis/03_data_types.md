@@ -4,6 +4,7 @@ title: Redis Data Types
 author: Kevin McAleer
 type: page
 cover: /learn/redis/assets/redis-cover.jpg
+date: 2023-04-12
 previous: 02_redis_basics.html
 next: 04_commands_and_transactions.html
 description: Learn about Redis data types and how to use them in Python.

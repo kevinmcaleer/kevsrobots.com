@@ -3,7 +3,8 @@ layout: lesson
 title: Computer Vision with CVZone
 author: Kevin McAleer
 type: page
-cover: assets/computer_vision.jpg
+cover: /learn/cvzone/assets/computer_vision.jpg
+date: 2023-10-07
 next: 00_video.html
 description: Dive deep into the world of computer vision on compact systems with our
   hands-on course tailored for Raspberry Pi enthusiasts

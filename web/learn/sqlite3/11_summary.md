@@ -4,6 +4,7 @@ title: Course Summary
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 10_securing_and_backing_up.html
 next: 13_1nf.html
 description: Throughout this course, you have gained a solid foundation in working

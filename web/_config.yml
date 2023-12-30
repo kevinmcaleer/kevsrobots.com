@@ -2,7 +2,7 @@ title: KevsRobots
 email: kevinmcaleer@gmail.com
 description: This is the official website of Kevin McAleer
 baseurl: ""
-url: "http://www.kevsrobots.com"
+url: "https://www.kevsrobots.com"
 
 markdown: kramdown
 permalink: /blog/:title:output_ext

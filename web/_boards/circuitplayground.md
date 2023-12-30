@@ -1,5 +1,7 @@
 ---
 title: Circuit Playground Express
+description: >-
+    A compact, all-in-one board that combines an array of sensors, LEDs, and buttons with powerful processors and wireless communication
 layout: board
 manufacturer: Adafruit
 cover: /assets/img/boards/circuitplayground.png

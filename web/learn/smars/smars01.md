@@ -4,6 +4,7 @@ title: Print the Parts
 author: Kevin McAleer
 type: page
 cover: /learn/smars/assets/how_to_build_a_smars.jpg
+date: 2023-02-19
 previous: 00_intro.html
 next: smars02.html
 description: Build Instructions for standard SMARS

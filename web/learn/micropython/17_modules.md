@@ -4,6 +4,7 @@ title: Modules
 author: Kevin McAleer
 type: page
 cover: /learn/micropython/assets/micropython.jpg
+date: 2022-12-04
 previous: 16_repl.html
 next: 18_summary.html
 description: Learn about the built-in Modules

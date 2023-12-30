@@ -4,6 +4,7 @@ title: Overview
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 next: 01_why_video.html
 description: null
 percent: 7

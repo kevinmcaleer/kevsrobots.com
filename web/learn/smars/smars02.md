@@ -4,6 +4,7 @@ title: Solder wires to motors
 author: Kevin McAleer
 type: page
 cover: /learn/smars/assets/how_to_build_a_smars.jpg
+date: 2023-02-19
 previous: smars01.html
 next: smars03.html
 description: Build Instructions for standard SMARS

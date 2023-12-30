@@ -4,6 +4,7 @@ title: Stub wheel revolve
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 27_stub.html
 next: 29_cut.html
 description: Revolve the profile to creat the stub

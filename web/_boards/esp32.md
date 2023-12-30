@@ -1,5 +1,7 @@
 ---
 title: Espressif ESP32
+description: >- 
+  The ESP32 is a high-performance microcontroller board that offers a potent mix of Wi-Fi, Bluetooth, processing power, and flexibility.
 layout: board
 manufacturer: Espressif
 cover: /assets/img/boards/esp32.png

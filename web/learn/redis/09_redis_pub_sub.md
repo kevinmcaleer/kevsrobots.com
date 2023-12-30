@@ -4,6 +4,7 @@ title: Redis Pub/Sub
 author: Kevin McAleer
 type: page
 cover: /learn/redis/assets/redis-cover.jpg
+date: 2023-04-12
 previous: 08_redis_sorted_sets.html
 next: 10_summary.html
 description: Learn about Redis pub/sub and how to use it with Python.

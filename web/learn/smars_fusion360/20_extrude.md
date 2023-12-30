@@ -4,6 +4,7 @@ title: Motor nub extrude
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 19_nub.html
 next: 21_chamfer.html
 description: Stops the motor from moving

@@ -4,6 +4,7 @@ title: Working with Indexes and Performance Optimization
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 08_transations_and_error_handling.html
 next: 10_securing_and_backing_up.html
 description: Module 9 focuses on optimizing the performance of SQLite databases

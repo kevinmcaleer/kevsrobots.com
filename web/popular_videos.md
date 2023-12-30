@@ -1,6 +1,8 @@
 ---
 layout: content
 title: Most Popular Videos
+description: All my most popular YouTube videos
+date: 2024-01-01
 excerpt: All my most popular YouTube videos
 ---
 

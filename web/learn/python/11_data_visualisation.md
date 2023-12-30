@@ -3,7 +3,8 @@ layout: lesson
 title: Data Visualization
 author: Kevin McAleer
 type: page
-cover: assets/4.png
+cover: /learn/python/assets/4.png
+date: 2023-07-20
 previous: 10_webscraping.html
 next: 12_ml.html
 description: Explore the basics of data visualization in Python, focusing on using

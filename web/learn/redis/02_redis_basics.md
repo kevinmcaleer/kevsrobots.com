@@ -4,6 +4,7 @@ title: Redis Basics
 author: Kevin McAleer
 type: page
 cover: /learn/redis/assets/redis-cover.jpg
+date: 2023-04-12
 previous: 01_introduction.html
 next: 03_data_types.html
 description: Learn the basics of Redis and how to use it with Python.

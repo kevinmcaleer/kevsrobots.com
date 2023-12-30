@@ -1,5 +1,7 @@
 ---
 title: Arduino Mega
+description: >-
+  The Arduino Mega offers an extensive range of features that enable users to build everything from simple LED displays to advanced robotics and IoT projects
 layout: board
 manufacturer: Arduino CC
 cover: /assets/img/boards/arduino_mega.png

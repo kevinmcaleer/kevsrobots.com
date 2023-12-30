@@ -4,6 +4,7 @@ title: Fit the servos
 author: Kevin McAleer
 type: page
 cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
+date: 2023-03-04
 previous: quad_02.html
 next: quad_04.html
 description: Fit the servos into the servo holder

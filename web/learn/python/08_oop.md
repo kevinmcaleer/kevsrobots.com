@@ -3,7 +3,8 @@ layout: lesson
 title: Python Object-Oriented Programming (OOP)
 author: Kevin McAleer
 type: page
-cover: assets/1.png
+cover: /learn/python/assets/1.png
+date: 2023-07-20
 previous: 07_libraries.html
 next: 09_data.html
 description: Introduction to object-oriented programming in Python, including classes,

@@ -3,7 +3,8 @@ title: Installing CVZone
 description: >-
    Kickstart your computer vision journey on Raspberry Pi using CVZone
 layout: lesson
-cover: assets/install.png
+cover: /learn/cvzone/assets/install.png
+
 ---
 
 ![Cover Image]({{page.cover}}){:class="cover"}

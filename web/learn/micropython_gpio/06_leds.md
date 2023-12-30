@@ -4,6 +4,7 @@ title: Controlling LEDs with PWM
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 05_pwm.html
 next: 07_motors.html
 description: Learn how to control LEDs using Pulse Width Modulation (PWM) with the

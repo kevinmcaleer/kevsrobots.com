@@ -4,6 +4,7 @@ title: Using Temperature Sensors
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 09_potentiometers.html
 next: 11_uart.html
 description: Learn how to use temperature sensors with the Raspberry Pi Pico and MicroPython.

@@ -4,6 +4,7 @@ title: Basic Movement
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 04_loading_the_code.html
 next: 06_measuring_distance.html
 description: null

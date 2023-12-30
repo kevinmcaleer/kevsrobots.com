@@ -4,6 +4,7 @@ title: SMARS Quad robot Overview
 author: Kevin McAleer
 type: page
 cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
+date: 2023-03-04
 next: quad_01.html
 description: Learn how to build your own SMARS Quad robot
 percent: 7

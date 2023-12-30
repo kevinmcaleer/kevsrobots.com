@@ -4,6 +4,7 @@ title: Introduction
 author: Kevin McAleer
 type: page
 cover: /learn/smars/assets/how_to_build_a_smars.jpg
+date: 2023-02-19
 next: smars01.html
 description: Learn how to download, print, assemble, and program the original SMARS
   robot

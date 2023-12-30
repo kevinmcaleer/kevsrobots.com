@@ -4,6 +4,7 @@ title: Learn MicroPython Introduction Video
 author: Kevin McAleer
 type: page
 cover: /learn/micropython/assets/micropython.jpg
+date: 2022-12-04
 previous: 00_intro.html
 next: 01_why_is_it_called_micropython.html
 description: Watch the MicroPython Introduction Video

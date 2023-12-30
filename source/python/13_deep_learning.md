@@ -2,7 +2,7 @@
 title: Deep Learning with Python
 description: Understand the basics of deep learning and explore how Python's TensorFlow and Keras libraries can be used for creating deep learning models.
 layout: lesson
-cover: assets/6.png
+cover: /learn/python/assets/6.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

@@ -1,5 +1,7 @@
 ---
 title: Raspberry Pi Pico
+description: >- 
+  The Raspberry Pi Pico is a powerful yet affordable microcontroller board that serves as a gateway into the world of electronics and programming.
 layout: board
 manufacturer: Raspberry Pi Trading Ltd
 cover: /assets/img/boards/pico.png

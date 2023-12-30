@@ -3,7 +3,8 @@ layout: lesson
 title: Python Basics
 author: Kevin McAleer
 type: page
-cover: assets/2.png
+cover: /learn/python/assets/2.png
+date: 2023-07-20
 previous: 01_intro.html
 next: 03_data_structures.html
 description: Dive into the basics of Python, including variables, data types, syntax,

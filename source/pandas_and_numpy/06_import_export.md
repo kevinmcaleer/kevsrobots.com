@@ -3,7 +3,7 @@ layout: lesson
 title: Importing and Exporting Data
 type: page
 description: Learn how to import data from various file formats into Pandas Data Frames and export Data Frames back into these formats for efficient data handling.
-cover: assets/pandas05.png
+cover: /learn/pandas_and_numpy/assets/pandas05.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

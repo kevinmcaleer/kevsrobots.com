@@ -4,6 +4,7 @@ title: Redis Commands and Transactions
 author: Kevin McAleer
 type: page
 cover: /learn/redis/assets/redis-cover.jpg
+date: 2023-04-12
 previous: 03_data_types.html
 next: 05_redis_lists.html
 description: Learn about Redis commands and transactions, and how to use them in Python.

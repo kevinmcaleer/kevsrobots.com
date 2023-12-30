@@ -1,0 +1,29 @@
+INFO:root:2023-12-30T23:10:09.904838 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:10:21.135865 - IP: 127.0.0.1 - Query: python
+INFO:root:2023-12-30T23:10:27.487670 - IP: 127.0.0.1 - Query: how to learn python
+INFO:root:2023-12-30T23:10:38.375605 - IP: 127.0.0.1 - Query: bio
+INFO:root:2023-12-30T23:11:33.539610 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:11:35.829811 - IP: 127.0.0.1 - Query: bio
+INFO:root:2023-12-30T23:11:59.776023 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:12:02.067784 - IP: 127.0.0.1 - Query: bio
+INFO:root:2023-12-30T23:12:24.376997 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:12:24.414839 - IP: 127.0.0.1 - Query: bio
+INFO:root:2023-12-30T23:13:03.607968 - IP: 127.0.0.1 - Query: bio
+INFO:root:2023-12-30T23:13:07.579408 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:13:18.666839 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:13:20.574887 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:13:51.153602 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:13:52.203491 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:20:00.108934 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:20:03.963866 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:20:48.780030 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:22:01.325526 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:22:03.600779 - IP: 127.0.0.1 - Query: 
+INFO:root:2023-12-30T23:22:45.081089 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:24:39.033204 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:24:57.210150 - IP: 127.0.0.1 - Query: smars
+INFO:root:2023-12-30T23:25:00.794424 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:25:12.594737 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:27:13.189285 - IP: 127.0.0.1 - Query: about
+INFO:root:2023-12-30T23:27:36.446873 - IP: 127.0.0.1 - Query: raspberry pi
+INFO:root:2023-12-30T23:28:26.562358 - IP: 127.0.0.1 - Query: lidar

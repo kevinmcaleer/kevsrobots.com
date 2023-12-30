@@ -4,6 +4,7 @@ title: Controlling Motors with PWM
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 06_leds.html
 next: 08_adc.html
 description: Learn how to control motors using Pulse Width Modulation (PWM) with the

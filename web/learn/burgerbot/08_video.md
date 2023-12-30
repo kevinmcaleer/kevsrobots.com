@@ -4,6 +4,7 @@ title: BurgerBot Upgrades video
 author: Kevin McAleer
 type: video
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 07_object_avoidance.html
 next: 08_line_following.html
 description: null

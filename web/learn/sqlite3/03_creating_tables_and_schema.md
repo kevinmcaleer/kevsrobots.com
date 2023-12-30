@@ -4,6 +4,7 @@ title: Creating Tables and Schema Design
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 02_getting_started_with_sqlite3.html
 next: 04.inserting_and_retrieving_data.html
 description: ''

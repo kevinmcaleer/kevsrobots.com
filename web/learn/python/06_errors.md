@@ -3,7 +3,8 @@ layout: lesson
 title: Error Handling and Exceptions in Python
 author: Kevin McAleer
 type: page
-cover: assets/6.png
+cover: /learn/python/assets/6.png
+date: 2023-07-20
 previous: 05_files.html
 next: 07_libraries.html
 description: Learn how to handle errors and exceptions in your Python programs to

@@ -3,7 +3,8 @@ layout: lesson
 title: Face Detection
 author: Kevin McAleer
 type: page
-cover: assets/face.jpg
+cover: /learn/cvzone/assets/face.jpg
+date: 2023-10-07
 previous: 01_install.html
 next: 03_hand.html
 description: This lesson breaks down the process step-by-step, from capturing live

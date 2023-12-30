@@ -4,6 +4,7 @@ title: A Quick History
 author: Kevin McAleer
 type: page
 cover: /learn/robotics_101/assets/basics_101.jpg
+date: 2023-01-17
 previous: lesson_01.html
 next: lesson_03.html
 description: Learn about the term 'Robot', who the Father of robotics is, and examples

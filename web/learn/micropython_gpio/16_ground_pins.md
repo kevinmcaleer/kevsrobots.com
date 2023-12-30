@@ -4,6 +4,7 @@ title: Ground Pins
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 15_ultrasonic_range_finders.html
 next: 17_summary.html
 description: Learn about ground pins on the Raspberry Pi Pico and how to use them

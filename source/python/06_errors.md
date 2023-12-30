@@ -2,7 +2,7 @@
 title: Error Handling and Exceptions in Python
 description: Learn how to handle errors and exceptions in your Python programs to ensure they can recover gracefully from unexpected issues.
 layout: lesson
-cover: assets/6.png
+cover: /learn/python/assets/6.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

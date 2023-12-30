@@ -4,6 +4,7 @@ title: Laserscan data
 author: Kevin McAleer
 type: page
 cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
 previous: 17_tf2.html
 description: Lets Visualise our Laser scan data
 percent: 100

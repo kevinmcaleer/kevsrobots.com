@@ -4,6 +4,7 @@ title: Side Profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 07_cut.html
 next: 09_sidecut.html
 description: create the side profile

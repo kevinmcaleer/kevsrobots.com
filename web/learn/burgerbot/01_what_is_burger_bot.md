@@ -4,6 +4,7 @@ title: What is BurgerBot?
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 01_why_video.html
 next: 02_assembly.html
 description: null

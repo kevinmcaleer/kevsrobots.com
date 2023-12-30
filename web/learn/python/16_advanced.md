@@ -3,7 +3,8 @@ layout: lesson
 title: Advanced Python Topics
 author: Kevin McAleer
 type: page
-cover: assets/2.png
+cover: /learn/python/assets/2.png
+date: 2023-07-20
 previous: 15_databases.html
 next: 17_apps.html
 description: Dive into some advanced topics in Python, including decorators, generators,

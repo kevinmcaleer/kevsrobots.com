@@ -3,7 +3,8 @@ layout: lesson
 title: Installing Pandas and NumPy
 author: Kevin McAleer
 type: page
-cover: assets/pandas02.png
+cover: /learn/pandas_and_numpy/assets/pandas02.png
+date: 2023-11-14
 previous: 02_intro.html
 next: 04_dataframes.html
 description: This lesson guides you through the installation process of Pandas and

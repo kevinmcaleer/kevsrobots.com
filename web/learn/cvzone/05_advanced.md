@@ -4,6 +4,7 @@ title: Advanced Visualization with CVZone
 author: Kevin McAleer
 type: page
 cover: /learn/cvzone/assets/computer_vision.jpg
+date: 2023-10-07
 previous: 04_posture.html
 description: Dive deeper into CVZone's capabilities and learn how to annotate images
   for better pose analysis insights.

@@ -3,7 +3,7 @@ layout: lesson
 title: Installing Pandas and NumPy
 type: page
 description: This lesson guides you through the installation process of Pandas and NumPy, setting the stage for data manipulation tasks in Python.
-cover: assets/pandas02.png
+cover: /learn/pandas_and_numpy/assets/pandas02.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

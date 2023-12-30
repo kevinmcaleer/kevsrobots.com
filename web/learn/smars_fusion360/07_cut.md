@@ -4,6 +4,7 @@ title: Front Back Cut
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 06_front.html
 next: 08_side.html
 description: Cut away the range finder area

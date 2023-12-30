@@ -3,7 +3,8 @@ layout: lesson
 title: Web Scraping with Python
 author: Kevin McAleer
 type: page
-cover: assets/3.png
+cover: /learn/python/assets/3.png
+date: 2023-07-20
 previous: 09_data.html
 next: 11_data_visualisation.html
 description: Understand the basics of web scraping using Python, including the use

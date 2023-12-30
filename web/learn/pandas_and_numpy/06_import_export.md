@@ -3,7 +3,8 @@ layout: lesson
 title: Importing and Exporting Data
 author: Kevin McAleer
 type: page
-cover: assets/pandas05.png
+cover: /learn/pandas_and_numpy/assets/pandas05.png
+date: 2023-11-14
 previous: 05_basics.html
 next: 07_cleansing.html
 description: Learn how to import data from various file formats into Pandas Data Frames

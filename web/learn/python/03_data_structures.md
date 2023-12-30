@@ -3,7 +3,8 @@ layout: lesson
 title: Python Data Structures
 author: Kevin McAleer
 type: page
-cover: assets/3.png
+cover: /learn/python/assets/3.png
+date: 2023-07-20
 previous: 02_basics.html
 next: 04_flow.html
 description: Discover the primary data structures in Python, including strings, lists,

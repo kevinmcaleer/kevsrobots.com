@@ -3,7 +3,8 @@ layout: lesson
 title: Understanding Data Frames in Pandas
 author: Kevin McAleer
 type: page
-cover: assets/pandas03.png
+cover: /learn/pandas_and_numpy/assets/pandas03.png
+date: 2023-11-14
 previous: 03_installing.html
 next: 05_basics.html
 description: Dive into the world of Data Frames in Pandas, learn how to create, manipulate,

@@ -4,6 +4,7 @@ title: Camera
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 08_line_following_code.html
 description: null
 percent: 100

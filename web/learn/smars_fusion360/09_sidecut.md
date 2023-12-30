@@ -4,6 +4,7 @@ title: Side Cutout
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 08_side.html
 next: 10_fillet.html
 description: Create the classic shape

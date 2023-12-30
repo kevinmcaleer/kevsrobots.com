@@ -1,5 +1,7 @@
 ---
 title: STM32F103C8T6 (Blue Pill)
+description: >-
+  The STM32F103C8T6, popularly known as the Blue Pill, is a powerful and cost-effective ARM Cortex-M3 microcontroller from STMicroelectronics.
 layout: board
 manufacturer: STMicroelectronics
 cover: /assets/img/boards/stm32.png

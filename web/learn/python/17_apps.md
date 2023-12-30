@@ -3,7 +3,8 @@ layout: lesson
 title: 'Project: Building a Simple Python Application'
 author: Kevin McAleer
 type: page
-cover: assets/3.png
+cover: /learn/python/assets/3.png
+date: 2023-07-20
 previous: 16_advanced.html
 next: 18_tips_and_tricks.html
 description: Put everything you've learned to use by building a simple Python application.

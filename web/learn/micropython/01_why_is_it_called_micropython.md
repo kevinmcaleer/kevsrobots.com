@@ -4,6 +4,7 @@ title: Why is it called MicroPython?
 author: Kevin McAleer
 type: lesson
 cover: /learn/micropython/assets/micropython.jpg
+date: 2022-12-04
 previous: 00_videos.html
 next: 02_where_to_get_micropython.html
 description: "It\u2019s nothing to do with tiny snakes \U0001F40D"

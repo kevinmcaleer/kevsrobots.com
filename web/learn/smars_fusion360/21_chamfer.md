@@ -4,6 +4,7 @@ title: Motor holder and nub chamfer
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 20_extrude.html
 next: 22_front.html
 description: Refine the tops

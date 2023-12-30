@@ -1,7 +1,10 @@
 ---
 layout: about
 title: About Kevin McAleer
+description: Learn about Kevin McAleer, Small Robots and links to all his social media
+date: 2024-01-01
 subtitle: Learn about Kevin McAleer, Small Robots and links to all his social media
+cover: /assets/img/kevsrobots.jpg
 ---
 
 {% include breadcrumbs.html %}

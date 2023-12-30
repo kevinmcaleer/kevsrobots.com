@@ -4,6 +4,7 @@ title: Introduction to UART
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 10_temperature_sensors.html
 next: 12_i2c.html
 description: Learn about UART communication protocol and how to use it with the Raspberry

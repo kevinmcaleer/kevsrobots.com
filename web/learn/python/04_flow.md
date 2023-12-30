@@ -3,7 +3,8 @@ layout: lesson
 title: Control Flow in Python
 author: Kevin McAleer
 type: page
-cover: assets/4.png
+cover: /learn/python/assets/4.png
+date: 2023-07-20
 previous: 03_data_structures.html
 next: 05_files.html
 description: Understand how to control the flow of your Python programs using conditional

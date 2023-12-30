@@ -4,6 +4,7 @@ title: Build the ROS2 Container
 author: Kevin McAleer
 type: page
 cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
 previous: 06_clone_images.html
 next: 08_vscode_setup.html
 description: Use the official docker images to build our ROS2 container

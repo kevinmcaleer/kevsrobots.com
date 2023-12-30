@@ -4,6 +4,7 @@ title: Load the code
 author: Kevin McAleer
 type: page
 cover: /learn/smars/assets/how_to_build_a_smars.jpg
+date: 2023-02-19
 previous: smars11.html
 next: smars13.html
 description: Bring the SMARS to life!

@@ -3,7 +3,7 @@ layout: lesson
 title: Understanding Data Frames in Pandas
 type: page
 description: Dive into the world of Data Frames in Pandas, learn how to create, manipulate, and extract information from these powerful data structures.
-cover: assets/pandas03.png
+cover: /learn/pandas_and_numpy/assets/pandas03.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

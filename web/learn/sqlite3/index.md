@@ -3,7 +3,8 @@ layout: lesson
 title: Course Overview
 author: Kevin McAleer
 type: page
-cover: assets/overview01.jpg
+cover: /learn/sqlite3/assets/overview01.jpg
+date: 2023-07-15
 next: 01_introduction_to_databases.html
 description: What you'll learn
 percent: 5

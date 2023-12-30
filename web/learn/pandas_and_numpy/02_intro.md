@@ -3,7 +3,8 @@ layout: lesson
 title: Pandas and NumPy
 author: Kevin McAleer
 type: page
-cover: assets/pandas01.png
+cover: /learn/pandas_and_numpy/assets/pandas01.png
+date: 2023-11-14
 previous: 01_overview.html
 next: 03_installing.html
 description: Kickstart your journey in data manipulation in Python with an introduction

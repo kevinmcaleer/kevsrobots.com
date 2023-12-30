@@ -4,6 +4,7 @@ title: Chassis Wheel hole profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 12_back.html
 next: 14_cut.html
 description: Create the wheel holes

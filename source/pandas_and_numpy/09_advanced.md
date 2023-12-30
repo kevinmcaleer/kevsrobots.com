@@ -3,7 +3,7 @@ layout: lesson
 title: Advanced Data Manipulation Techniques
 type: page
 description: Dive into advanced data manipulation techniques in Pandas, including merging datasets, joining, and handling time series data for sophisticated data analysis.
-cover: assets/pandas08.png
+cover: /learn/pandas_and_numpy/assets/pandas08.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

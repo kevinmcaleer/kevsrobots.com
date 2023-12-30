@@ -4,6 +4,7 @@ title: Thin the Front and Back sides
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 04_fillet.html
 next: 06_front.html
 description: Adjust the wall thickness

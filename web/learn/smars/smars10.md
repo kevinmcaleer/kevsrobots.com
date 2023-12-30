@@ -4,6 +4,7 @@ title: Insert Wires
 author: Kevin McAleer
 type: page
 cover: /learn/smars/assets/how_to_build_a_smars.jpg
+date: 2023-02-19
 previous: smars09.html
 next: smars11.html
 description: Add the power wires to the robot

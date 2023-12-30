@@ -4,6 +4,7 @@ title: Final view
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 32_cut.html
 description: The completed design
 percent: 100

@@ -4,6 +4,7 @@ title: Revolve
 author: Kevin McAleer
 type: page
 cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+date: 2023-01-29
 previous: 02_create_sketch.html
 next: 04_create_hinges.html
 description: Revolve to create the eyelid

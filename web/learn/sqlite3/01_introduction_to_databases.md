@@ -3,7 +3,8 @@ layout: lesson
 title: Introduction to Databases
 author: Kevin McAleer
 type: page
-cover: assets/overview01.jpg
+cover: /learn/sqlite3/assets/overview01.jpg
+date: 2023-07-15
 previous: 00_intro.html
 next: 02_getting_started_with_sqlite3.html
 description: What are databases and why do we need them?

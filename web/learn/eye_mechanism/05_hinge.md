@@ -4,6 +4,7 @@ title: Extrude The Hinge
 author: Kevin McAleer
 type: page
 cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+date: 2023-01-29
 previous: 04_create_hinges.html
 next: 06_lower_eyelid_sketch.html
 description: Create the hinge from the profile and join it to the eyelid

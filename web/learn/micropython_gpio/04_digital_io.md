@@ -4,6 +4,7 @@ title: Digital I/O
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 03_voltage_levels.html
 next: 05_pwm.html
 description: Learn about digital input and output with Raspberry Pi Pico using MicroPython.

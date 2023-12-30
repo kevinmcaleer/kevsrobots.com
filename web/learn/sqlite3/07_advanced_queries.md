@@ -4,6 +4,7 @@ title: Advanced SQL Queries
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 06_querying_and_joining_tables.html
 next: 08_transations_and_error_handling.html
 description: Module 7 delves into advanced SQL queries in SQLite

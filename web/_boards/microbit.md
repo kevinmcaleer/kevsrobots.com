@@ -1,5 +1,7 @@
 ---
 title: Micro:Bit
+description: >-
+  The BBC micro:bit is a pocket-sized computer that brings digital creativity and computational learning to your fingertips.
 subtitle: A great pocket-sized computer for beginners
 layout: board
 manufacturer: Micro:Bit Educational Foundation

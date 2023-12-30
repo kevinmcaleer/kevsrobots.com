@@ -4,6 +4,7 @@ title: Querying and Joining Tables
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 05_updating_and_deleting_data.html
 next: 07_advanced_queries.html
 description: Module 6 focuses on more advanced querying techniques in SQLite, including

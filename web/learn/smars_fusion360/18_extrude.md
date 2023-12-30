@@ -4,6 +4,7 @@ title: Motor holder profile extruded
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 17_motor.html
 next: 19_nub.html
 description: Give the profile some depth

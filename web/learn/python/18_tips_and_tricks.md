@@ -3,7 +3,8 @@ layout: lesson
 title: 'Bonus: Python Tips, Tricks and Best Practices'
 author: Kevin McAleer
 type: page
-cover: assets/4.png
+cover: /learn/python/assets/4.png
+date: 2023-07-20
 previous: 17_apps.html
 description: Discover various Python tips, tricks, and best practices, such as writing
   Pythonic code, following PEP 8 style guide, and using the Black code formatter.

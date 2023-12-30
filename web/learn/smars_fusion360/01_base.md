@@ -4,6 +4,7 @@ title: The Chassis Base
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 00_intro.html
 next: 02_extrude_base.html
 description: null

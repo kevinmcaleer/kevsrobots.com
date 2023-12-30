@@ -1,11 +1,22 @@
 {% if page.cover %}
-    <meta property="og:image" content="{{ site.url }}/{{ page.cover }}" />
-    <meta name="twitter:image" content="{{ site.url}}/{{page.cover }}" />
+    {% capture cover %}{{ site.url }}/{{ page.cover }}{% endcapture %}
+    {% assign cover = cover | replace: '//learn', '/learn' %}
+    <meta property="og:image" content="{{ cover | absolute_url }}" />
+    <meta name="twitter:image" content="{{ cover | absolute_url }}" />
 {% endif %}
 {% if page.description %}
 <meta property="og:description" content="{{ page.description }}" />
-
+<meta property="description" content="{{ page.description }}" />
 {% endif %}
+
+{% if page.date %}
+<meta property="date" content="{{ page.date | date_to_xmlschema }}" />
+{% endif %}
+
+{% if page.author %}
+<meta property="author" content="{{ page.author }}" />
+{% endif %}
+
 {% if page.subtitle %}
 <meta property="og:description" content="{{ page.subtitle }}" />
 {% endif %}

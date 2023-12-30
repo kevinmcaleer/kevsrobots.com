@@ -1,5 +1,7 @@
 ---
 title: Arduino Uno R3
+description: >-
+  An open-source microcontroller board that has become a standard for electronics and programming education worldwide
 layout: board
 manufacturer: Arduino CC
 cover: /assets/img/boards/arduino.png

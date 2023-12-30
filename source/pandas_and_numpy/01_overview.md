@@ -4,7 +4,7 @@ layout: lesson
 title: About this course
 type: page
 description: Learn the basics of data manipulation in Python using Pandas and NumPy, including installation, understanding data structures, and performing data operations.
-cover: assets/pandas.png
+cover: /learn/pandas_and_numpy/assets/pandas.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

@@ -4,6 +4,7 @@ title: Lesson 01 - Movement
 author: Kevin McAleer
 type: page
 cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
 next: 02_lesson_02.html
 description: Learn how to move your robot
 percent: 14

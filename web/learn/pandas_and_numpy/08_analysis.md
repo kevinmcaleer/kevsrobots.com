@@ -3,7 +3,8 @@ layout: lesson
 title: Data Analysis and Aggregation
 author: Kevin McAleer
 type: page
-cover: assets/pandas07.png
+cover: /learn/pandas_and_numpy/assets/pandas07.png
+date: 2023-11-14
 previous: 07_cleansing.html
 next: 09_advanced.html
 description: Explore the powerful data analysis and aggregation capabilities of Pandas,

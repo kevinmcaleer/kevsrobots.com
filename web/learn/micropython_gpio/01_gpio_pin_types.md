@@ -3,7 +3,8 @@ layout: lesson
 title: GPIO Pin Types
 author: Kevin McAleer
 type: page
-cover: assets/burger_bot.jpg
+cover: /learn/micropython_gpio/assets/burger_bot.jpg
+date: 2023-04-14
 previous: 00_intro.html
 next: 02_pin_numbering.html
 description: Learn about the different types of GPIO pins on the Raspberry Pi Pico

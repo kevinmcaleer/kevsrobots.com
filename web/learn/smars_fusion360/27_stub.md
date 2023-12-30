@@ -4,6 +4,7 @@ title: Stub wheel profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 26_stub.html
 next: 28_revolve.html
 description: Create the Stub wheel profile

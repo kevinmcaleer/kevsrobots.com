@@ -4,6 +4,7 @@ title: Stub wheel cutout
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 29_cut.html
 next: 31_slots.html
 description: Cut away the center section

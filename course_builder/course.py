@@ -127,6 +127,7 @@ class Course():
         self.content = course['content']
         cover_folder = self.course_folder.replace('source', '/learn')
         self.cover = cover_folder + '/' + course['cover']
+        self.cover = self.cover.replace('//learn','/learn')
         # print(f'cover is: {self.cover}')
         self.duration = self.calculate_duration()
         # print(course['content'])
@@ -364,6 +365,10 @@ class Course():
                 front_matter += f'author: {self.author}' + "\n"
                 front_matter += f'type: {self.type}' + "\n"
                 front_matter += f'cover: {self.cover}' + "\n"
+                front_matter += f'date: {self.date_published}' + "\n"
+
+                # front_matter += f'cover: {self.output_folder.replace("web/learn","/learn")}{self.cover}' + "\n"
+                # print(f'front_matter cover is: {front_matter}')
                 # print(f'front matter cover is: {self.cover}')
                 if previous is not None:
                     front_matter += f'previous: {previous}' + "\n"

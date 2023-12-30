@@ -4,6 +4,7 @@ title: Database Transactions and Error Handling
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 07_advanced_queries.html
 next: 09_indexes_and_performance.html
 description: Module 8 covers the important topics of database transactions and error

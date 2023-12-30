@@ -4,6 +4,7 @@ title: Voltage Levels
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 02_pin_numbering.html
 next: 04_digital_io.html
 description: Learn about the voltage levels of Raspberry Pi Pico pins and how to work

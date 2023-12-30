@@ -3,7 +3,8 @@ layout: lesson
 title: Deep Learning with Python
 author: Kevin McAleer
 type: page
-cover: assets/6.png
+cover: /learn/python/assets/6.png
+date: 2023-07-20
 previous: 12_ml.html
 next: 14_automation.html
 description: Understand the basics of deep learning and explore how Python's TensorFlow

@@ -39,9 +39,13 @@ title: Search Results
         // Display each result
         results.forEach(function(result) {
             var div = document.createElement('div');
-            var imageUrl = result.cover_image && result.cover_image !== 'defaultImage' 
+            var imageUrl = result.cover_image && result.cover_image !== "https://www.kevsrobots.com/DefaultImagePath"
                         ? result.cover_image 
                         : defaultImage; // Use the default image if cover_image is not available
+            // Format the date
+            var publishedDate = new Date(result.date);
+            var formattedDate = publishedDate.toLocaleDateString('en-US', {  day: 'numeric', month: 'long',year: 'numeric' });
+
             div.innerHTML = `<div class="row row-cols g-1 m-3">
                 <div class="col">
                             <div class="row">
@@ -49,7 +53,8 @@ title: Search Results
                                 <img src="${imageUrl}" alt="Cover Image" class="img-fluid w-100" style="width=100px">
                             </div>
                             <div class="col-11">
-                            <p><b>${result.page_title}</b></p>
+                            <p><b>${result.page_title}</b><br />
+                            ${result.description} | Published: ${formattedDate}</p>
                             <a href="${result.url}">${result.url}</a>
                             </div>                    
                              </div>

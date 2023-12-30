@@ -4,6 +4,7 @@ title: Example 01
 author: Kevin McAleer
 type: page
 cover: /learn/micropython/assets/micropython.jpg
+date: 2022-12-04
 previous: 06_our_first_program.html
 next: 08_variables.html
 description: hello_world.py

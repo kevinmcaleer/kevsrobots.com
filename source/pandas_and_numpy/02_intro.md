@@ -3,7 +3,7 @@ layout: lesson
 title: Pandas and NumPy
 type: page
 description: Kickstart your journey in data manipulation in Python with an introduction to Pandas and NumPy, two powerhouse libraries.
-cover: assets/pandas01.png
+cover: /learn/pandas_and_numpy/assets/pandas01.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

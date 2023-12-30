@@ -1,6 +1,9 @@
 ---
 layout: about
 title: About KevsRobots
+description: About Kev's Robots
+date: 2024-01-01
+cover: /assets/img/kevsrobots.jpg
 ---
 
 {% include breadcrumbs.html %}

@@ -3,7 +3,8 @@ layout: lesson
 title: Basic Operations
 author: Kevin McAleer
 type: page
-cover: assets/pandas04.png
+cover: /learn/pandas_and_numpy/assets/pandas04.png
+date: 2023-11-14
 previous: 04_dataframes.html
 next: 06_import_export.html
 description: Master the fundamental operations with Data Frames in Pandas, including

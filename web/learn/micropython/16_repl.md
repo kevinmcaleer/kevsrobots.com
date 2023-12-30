@@ -4,6 +4,7 @@ title: The REPL
 author: Kevin McAleer
 type: page
 cover: /learn/micropython/assets/micropython.jpg
+date: 2022-12-04
 previous: 15_functions.html
 next: 17_modules.html
 description: Read Evaluation Print Loop

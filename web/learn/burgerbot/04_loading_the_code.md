@@ -4,6 +4,7 @@ title: Loading the code
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 03_getting_the_code.html
 next: 05_basic_movement.html
 description: null

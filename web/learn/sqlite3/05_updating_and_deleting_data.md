@@ -4,6 +4,7 @@ title: Updating and Deleting Data
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 04.inserting_and_retrieving_data.html
 next: 06_querying_and_joining_tables.html
 description: 'Module 5 focuses on modifying data in SQLite tables. '

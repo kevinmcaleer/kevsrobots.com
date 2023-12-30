@@ -4,6 +4,7 @@ title: Stub extrude profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 24_stub.html
 next: 26_stub.html
 description: Cut the profile

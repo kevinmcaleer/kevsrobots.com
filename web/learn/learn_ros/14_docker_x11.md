@@ -4,6 +4,7 @@ title: Getting Rviz2 and RQT to work in docker
 author: Kevin McAleer
 type: page
 cover: /learn/learn_ros/assets/x11cover.jpg
+date: 2023-01-07
 previous: 13_create_subscriber.html
 next: 15_rviz.html
 description: Lets learn how to redirect our X11 Display

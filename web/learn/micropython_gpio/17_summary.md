@@ -4,6 +4,7 @@ title: Recap and Review
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 16_ground_pins.html
 description: A summary of what you have learned in the `Raspberry Pi Pico with MicroPython
   - GPIO Mastery` course.

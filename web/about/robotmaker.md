@@ -1,6 +1,8 @@
 ---
 layout: about
 title: Become a Robot Maker
+description: Support the channel Kevin McAleer by becoming a Robot Maker
+date: 2024-01-01
 subtitle: Support the channel Kevin McAleer by becoming a Robot Maker
 cover: /assets/img/credits.png
 ---

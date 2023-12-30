@@ -3,7 +3,7 @@ layout: lesson
 title: Practical Examples and Case Studies
 type: page
 description: Apply your skills with Pandas and NumPy to real-world scenarios through practical examples and detailed case studies.
-cover: assets/pandas10.png
+cover: /learn/pandas_and_numpy/assets/pandas10.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

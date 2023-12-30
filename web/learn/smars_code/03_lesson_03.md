@@ -4,6 +4,7 @@ title: Lesson 03 - Ultrasonic distance sensor
 author: Kevin McAleer
 type: page
 cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
 previous: 02_lesson_02.html
 next: 04_lesson_04.html
 description: Learn how to detect distance using an ultrasonic sensor

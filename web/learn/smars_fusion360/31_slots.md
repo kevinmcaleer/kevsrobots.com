@@ -4,6 +4,7 @@ title: Motor holder slots profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 30_extrude.html
 next: 32_cut.html
 description: define the motor holder slots

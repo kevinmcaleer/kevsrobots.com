@@ -4,6 +4,7 @@ title: Introduction
 author: Kevin McAleer
 type: page
 cover: /learn/robotics_101/assets/basics_101.jpg
+date: 2023-01-17
 next: lesson_01.html
 description: Get started with Robotics
 percent: 16

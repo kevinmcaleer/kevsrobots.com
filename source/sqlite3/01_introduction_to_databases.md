@@ -3,7 +3,7 @@ title: Introduction to Databases
 description: >-
     What are databases and why do we need them?
 layout: lesson
-cover: assets/overview01.jpg
+cover: /learn/sqlite3/assets/overview01.jpg
 ---
 
 ![banner]({{page.cover}}){:class="cover"}

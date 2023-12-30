@@ -4,6 +4,7 @@ title: Skills and Knowledge
 author: Kevin McAleer
 type: page
 cover: /learn/robotics_101/assets/basics_101.jpg
+date: 2023-01-17
 previous: lesson_02.html
 next: lesson_04.html
 description: "What you\u2019ll need to know to build robots and bring them to life"

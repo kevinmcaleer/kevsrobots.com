@@ -3,7 +3,7 @@ layout: lesson
 title: Basic Operations
 type: page
 description: Master the fundamental operations with Data Frames in Pandas, including data selection, filtering, sorting, and basic computations.
-cover: assets/pandas04.png
+cover: /learn/pandas_and_numpy/assets/pandas04.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

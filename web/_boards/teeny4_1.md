@@ -1,5 +1,7 @@
 ---
 title: Teensy
+description: >-
+  A compact, high-performance board that offers an engaging introduction to embedded systems, digital electronics, and programming
 layout: board
 manufacturer: PJRC
 cover: /assets/img/boards/teensy4_1.png

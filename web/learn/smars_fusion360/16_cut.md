@@ -4,6 +4,7 @@ title: Arduino slot cut
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 15_slots.html
 next: 17_motor.html
 description: Cut the slots out

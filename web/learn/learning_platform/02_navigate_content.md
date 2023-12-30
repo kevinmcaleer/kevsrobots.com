@@ -4,6 +4,7 @@ title: Navigating Content
 author: Kevin McAleer
 type: page
 cover: /learn/learning_platform/assets/learn.jpg
+date: 2022-12-04
 previous: 01_how_to_use.html
 next: 03_download_content.html
 description: How to navigate content

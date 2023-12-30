@@ -4,6 +4,7 @@ title: Introduction to Servos
 author: Kevin McAleer
 type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+date: 2023-04-14
 previous: 13_spi.html
 next: 15_ultrasonic_range_finders.html
 description: Learn about servos and how to control them with the Raspberry Pi Pico

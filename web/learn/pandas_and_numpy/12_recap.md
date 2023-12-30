@@ -4,6 +4,7 @@ title: Recap and Review
 author: Kevin McAleer
 type: page
 cover: /learn/pandas_and_numpy/assets/pandas.png
+date: 2023-11-14
 previous: 11_case_studies.html
 description: Consolidate your learning journey in data manipulation with Pandas and
   NumPy, reviewing key concepts and discussing how to continue developing your data

@@ -4,6 +4,7 @@ title: Securing and Backing Up SQLite Databases
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 09_indexes_and_performance.html
 next: 11_summary.html
 description: Module 10 focuses on securing SQLite databases and implementing backup

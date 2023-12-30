@@ -3,7 +3,7 @@ layout: lesson
 title: Data Cleaning and Preparation
 type: page
 description: Learn the essentials of data cleaning and preparation in Pandas, including handling missing data, data transformation, and data filtering for effective data analysis.
-cover: assets/pandas06.png
+cover: /learn/pandas_and_numpy/assets/pandas06.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

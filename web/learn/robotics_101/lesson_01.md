@@ -4,6 +4,7 @@ title: What is a Robot - a Definition
 author: Kevin McAleer
 type: page
 cover: /learn/robotics_101/assets/basics_101.jpg
+date: 2023-01-17
 previous: 00_overview.html
 next: lesson_02.html
 description: Learn about the different parts of a robot

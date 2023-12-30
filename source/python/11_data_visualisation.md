@@ -2,7 +2,7 @@
 title: Data Visualization
 description: Explore the basics of data visualization in Python, focusing on using Matplotlib and Seaborn libraries.
 layout: lesson
-cover: assets/4.png
+cover: /learn/python/assets/4.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

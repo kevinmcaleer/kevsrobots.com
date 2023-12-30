@@ -4,6 +4,7 @@ title: Tools
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 16_demo_program.html
 description: Desktop Apps for managing SQlite3 databases
 percent: 100

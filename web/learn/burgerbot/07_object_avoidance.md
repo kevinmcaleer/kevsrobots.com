@@ -4,6 +4,7 @@ title: Object Avoidance
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 06_measuring_distance.html
 next: 08_video.html
 description: null

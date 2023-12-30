@@ -4,6 +4,7 @@ title: Summary and Review
 author: Kevin McAleer
 type: page
 cover: /learn/smars/assets/heroshot.jpg
+date: 2023-02-19
 previous: smars13.html
 description: A summary of what you have learned so far
 percent: 100

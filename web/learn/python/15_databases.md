@@ -3,7 +3,8 @@ layout: lesson
 title: Python and Databases
 author: Kevin McAleer
 type: page
-cover: assets/1.png
+cover: /learn/python/assets/1.png
+date: 2023-07-20
 previous: 14_automation.html
 next: 16_advanced.html
 description: Learn how Python can be used to interact with databases, including creating,

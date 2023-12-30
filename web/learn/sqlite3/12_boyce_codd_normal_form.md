@@ -4,6 +4,7 @@ title: Boyce-Codd Normal Form (BCNF)
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 15_3nf.html
 next: 16_demo_program.html
 description: BCNF helps reduce data duplication and ensures accurate data storage

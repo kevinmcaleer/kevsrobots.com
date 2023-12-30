@@ -3,7 +3,7 @@ layout: lesson
 title: Visualization with Pandas and Matplotlib
 type: page
 description: Learn how to use Pandas in conjunction with Matplotlib for effective data visualization, enabling you to present data insights visually.
-cover: assets/pandas09.png
+cover: /learn/pandas_and_numpy/assets/pandas09.png
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}

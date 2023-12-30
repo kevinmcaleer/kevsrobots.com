@@ -3,7 +3,8 @@ layout: lesson
 title: Python Libraries and Modules
 author: Kevin McAleer
 type: page
-cover: assets/7.png
+cover: /learn/python/assets/7.png
+date: 2023-07-20
 previous: 06_errors.html
 next: 08_oop.html
 description: Get introduced to the use of Python libraries and modules, learn how

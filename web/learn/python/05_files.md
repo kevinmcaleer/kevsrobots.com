@@ -3,7 +3,8 @@ layout: lesson
 title: Working with Files in Python
 author: Kevin McAleer
 type: page
-cover: assets/5.png
+cover: /learn/python/assets/5.png
+date: 2023-07-20
 previous: 04_flow.html
 next: 06_errors.html
 description: Learn how to read from and write to files in Python, handling both text

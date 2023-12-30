@@ -3,7 +3,8 @@ layout: lesson
 title: Data Cleaning and Preparation
 author: Kevin McAleer
 type: page
-cover: assets/pandas06.png
+cover: /learn/pandas_and_numpy/assets/pandas06.png
+date: 2023-11-14
 previous: 06_import_export.html
 next: 08_analysis.html
 description: Learn the essentials of data cleaning and preparation in Pandas, including

@@ -4,6 +4,7 @@ title: Assembly
 author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date: 2023-04-27
 previous: 01_what_is_burger_bot.html
 next: 02_video.html
 description: null

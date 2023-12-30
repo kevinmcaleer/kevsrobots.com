@@ -3,7 +3,8 @@ layout: lesson
 title: Python for Automating Tasks
 author: Kevin McAleer
 type: page
-cover: assets/7.png
+cover: /learn/python/assets/7.png
+date: 2023-07-20
 previous: 13_deep_learning.html
 next: 15_databases.html
 description: Learn how Python can be used to automate tasks such as file manipulation

@@ -4,6 +4,7 @@ title: Introduction to Redis
 author: Kevin McAleer
 type: page
 cover: /learn/redis/assets/redis-cover.jpg
+date: 2023-04-12
 next: 02_redis_basics.html
 description: Get started with Redis, learn what it is, why you should use it, and
   where to download it.

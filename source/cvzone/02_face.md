@@ -3,7 +3,7 @@ title: Face Detection
 description: >-
     This lesson breaks down the process step-by-step, from capturing live video feeds to processing and displaying detected faces in real-time
 layout: lesson
-cover: assets/face.jpg
+cover: /learn/cvzone/assets/face.jpg
 ---
 
 ![Cover Image]({{page.cover}}){:class="cover"}

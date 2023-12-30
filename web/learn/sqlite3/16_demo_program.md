@@ -4,6 +4,7 @@ title: Demo program
 author: Kevin McAleer
 type: page
 cover: /learn/sqlite3/assets/database.png
+date: 2023-07-15
 previous: 12_boyce_codd_normal_form.html
 next: 17_tools.html
 description: This is an example program highlighting some of the simple concepts covered

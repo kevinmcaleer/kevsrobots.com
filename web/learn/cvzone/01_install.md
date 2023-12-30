@@ -3,7 +3,8 @@ layout: lesson
 title: Installing CVZone
 author: Kevin McAleer
 type: page
-cover: assets/install.png
+cover: /learn/cvzone/assets/install.png
+date: 2023-10-07
 previous: 00_video.html
 next: 02_face.html
 description: Kickstart your computer vision journey on Raspberry Pi using CVZone

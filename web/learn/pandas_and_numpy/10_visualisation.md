@@ -3,7 +3,8 @@ layout: lesson
 title: Visualization with Pandas and Matplotlib
 author: Kevin McAleer
 type: page
-cover: assets/pandas09.png
+cover: /learn/pandas_and_numpy/assets/pandas09.png
+date: 2023-11-14
 previous: 09_advanced.html
 next: 11_case_studies.html
 description: Learn how to use Pandas in conjunction with Matplotlib for effective

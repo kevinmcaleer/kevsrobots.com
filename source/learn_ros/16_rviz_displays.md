@@ -3,7 +3,7 @@ layout: lesson
 title: Rviz2 Displays
 type: page
 description: Lets learn about RViz2 Displays and setting it up for Laser scans
-cover: /learn/learn_ros/assets/rviz3.jpg
+cover: /learn/learn_ros/assets/rviz03.jpg
 ---
 
 ![RViz2 screenshot]({{page.cover}}){:class="cover"}
@@ -14,7 +14,7 @@ cover: /learn/learn_ros/assets/rviz3.jpg
 
 RViz has 3 main panel by default, and you can add additonal panels to suit your needs (its very flexible).
 
-![RViz2 Screen Layout](assets/rviz3.jpg){:class="img-fluid w-100 shadow-lg"}
+![RViz2 Screen Layout](assets/rviz03.jpg){:class="img-fluid w-100 shadow-lg"}
 
 In the screenshot above you can see the main areas of the screen:
 

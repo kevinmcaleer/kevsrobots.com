@@ -4,6 +4,7 @@ title: Motor nub profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 18_extrude.html
 next: 20_extrude.html
 description: Keep the motors in place

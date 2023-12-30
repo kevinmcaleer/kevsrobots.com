@@ -4,6 +4,7 @@ title: Arduino slot profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 14_cut.html
 next: 16_cut.html
 description: Create the slots for the Arduino

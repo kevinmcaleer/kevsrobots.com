@@ -4,6 +4,7 @@ title: Front profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 21_chamfer.html
 next: 23_cut.html
 description: Create the front profile

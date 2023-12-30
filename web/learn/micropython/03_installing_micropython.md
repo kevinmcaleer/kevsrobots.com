@@ -4,6 +4,7 @@ title: How to Install MicroPython
 author: Kevin McAleer
 type: lesson
 cover: /learn/micropython/assets/micropython.jpg
+date: 2022-12-04
 previous: 02_where_to_get_micropython.html
 next: 04_why_use_micropython.html
 description: Easy Install with Thonny

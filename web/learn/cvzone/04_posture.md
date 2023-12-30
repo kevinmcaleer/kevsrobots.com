@@ -4,6 +4,7 @@ title: Posture Detection
 author: Kevin McAleer
 type: page
 cover: /learn/cvzone/assets/computer_vision.jpg
+date: 2023-10-07
 previous: 03_hand.html
 next: 05_advanced.html
 description: This lesson provides a deep dive into pose estimation, highlighting key

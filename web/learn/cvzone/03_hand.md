@@ -3,7 +3,8 @@ layout: lesson
 title: Hand Detection
 author: Kevin McAleer
 type: page
-cover: assets/hand.png
+cover: /learn/cvzone/assets/hand.png
+date: 2023-10-07
 previous: 02_face.html
 next: 04_posture.html
 description: This lesson will guide you through capturing and analyzing video feed

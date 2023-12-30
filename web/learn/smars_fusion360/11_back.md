@@ -4,6 +4,7 @@ title: Back cutout profile
 author: Kevin McAleer
 type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
+date: 2023-07-20
 previous: 10_fillet.html
 next: 12_back.html
 description: Refine the back area

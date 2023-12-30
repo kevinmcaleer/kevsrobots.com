@@ -4,6 +4,7 @@ title: Overview
 author: Kevin McAleer
 type: page
 cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+date: 2023-01-29
 next: 01_create_component.html
 description: null
 percent: 11

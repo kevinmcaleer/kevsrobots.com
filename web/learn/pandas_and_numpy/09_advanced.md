@@ -3,7 +3,8 @@ layout: lesson
 title: Advanced Data Manipulation Techniques
 author: Kevin McAleer
 type: page
-cover: assets/pandas08.png
+cover: /learn/pandas_and_numpy/assets/pandas08.png
+date: 2023-11-14
 previous: 08_analysis.html
 next: 10_visualisation.html
 description: Dive into advanced data manipulation techniques in Pandas, including

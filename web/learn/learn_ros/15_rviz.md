@@ -4,6 +4,7 @@ title: Rviz2
 author: Kevin McAleer
 type: page
 cover: /learn/learn_ros/assets/rviz2.jpg
+date: 2023-01-07
 previous: 14_docker_x11.html
 next: 16_rviz_displays.html
 description: Lets learn about RViz2, the ROS Visualisation tool
