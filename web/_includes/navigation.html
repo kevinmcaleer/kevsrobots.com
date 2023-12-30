@@ -1,5 +1,5 @@
 {% assign nav = site.data.navigation %}
-<nav class="navbar navbar-expand-md" id="myNavbar">
+<nav class="navbar navbar-expand-md justify-content-between" id="myNavbar">
     <div class="container-fluid">
         <div class="navbar-brand mx-3"><a href="/"><img class="logo" src="/assets/img/logo_red.png"></a></div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation">
@@ -183,10 +183,10 @@
         </div>
         </li>
         <li class="nav-item">
-            <a href="/reviews/" class="nav-link">Reviews & Gear</a>
+            <a href="/reviews/" class="nav-link">Reviews</a>
         </li>
         <li class="nav-item">
-            <a href="/resources/glossary" class="nav-link">Robotics Glossary</a>
+            <a href="/resources/glossary" class="nav-link">Glossary</a>
         </li>
         <li class="nav-item">
             <a href="/resources/how_it_works/" class="nav-link">How it Works</a>
@@ -195,10 +195,17 @@
             <a href="/events" class="nav-link">Events</a>
         </li>
     </ul>
+   
     <form class="form-inline my-2 my-lg-0" onsubmit="performSearch(event)">
-        <input class="form-control mr-sm-2" id="search-box" type="search" placeholder="Search" aria-label="Search">
+        <div class="input-group">
+        <input class="form-control mr-sm-2" id="search-box" type="search" placeholder="watcha lookin for?" aria-label="Search">
+        <div class="input-group-append">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </div>
+    </div>
       </form>
+    
+   
     </div>
     </div>
 </nav>

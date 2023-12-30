@@ -29,15 +29,20 @@ def insert_document(title, content, url, cover_image, page_title):
 def query_documents(query):
     conn = get_db_connection()
     cursor = conn.cursor()
+    
+    # Modify the query to group by URL and return distinct results
     cursor.execute('''
-        SELECT url, cover_image, page_title FROM documents_fts 
+        SELECT DISTINCT url, cover_image, page_title FROM documents_fts 
         WHERE documents_fts MATCH ? 
+        GROUP BY url
         ORDER BY rank 
         LIMIT 10
     ''', (query,))
+    
     results = [{'url': row['url'], 'cover_image': row['cover_image'], 'page_title': row['page_title']} for row in cursor.fetchall()]
     conn.close()
     return results
+
 
 
 if __name__ == '__main__':

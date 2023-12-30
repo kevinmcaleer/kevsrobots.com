@@ -2,14 +2,25 @@
 layout: content
 title: Search Results 
 ---
+{% include breadcrumbs.html %}
     <h1>Search Results</h1>
-    <p>Showing Results</p>
+    <h2>Find articles, tutorials, how it works, projects, ideas and more.</h2>
+    <p id="search-query-display">Showing Results for: <span id="search-query"></span></p>
+
+    <hr />
     <div id="results-container"></div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
         var query = urlParams.get('query');
+
+         // Set the search query in the "Showing Results for" section
+        if (query) {
+            document.getElementById('search-query').textContent = query;
+        } else {
+            document.getElementById('search-query-display').textContent = 'Showing All Results';
+        }
         
         // Call your API to get the search results
         fetch('http://0.0.0.0:8000/search/?query=' + encodeURIComponent(query))
@@ -22,22 +33,27 @@ title: Search Results
         var resultsContainer = document.getElementById('results-container');
         resultsContainer.innerHTML = ''; // Clear previous results
 
+        // Define a default or placeholder image URL
+        var defaultImage = '/assets/img/default_image.png'; // Update with the path to your default image
+
         // Display each result
         results.forEach(function(result) {
             var div = document.createElement('div');
-            div.innerHTML = `<div class="row"><div class="col">
+            var imageUrl = result.cover_image && result.cover_image !== 'defaultImage' 
+                        ? result.cover_image 
+                        : defaultImage; // Use the default image if cover_image is not available
+            div.innerHTML = `<div class="row row-cols g-1 m-3">
+                <div class="col">
                             <div class="row">
-                            <div class="col">
-                                <img src="${result.cover_image}" alt="Cover Image" class="img-fluid w-100">
+                            <div class="col-1">
+                                <img src="${imageUrl}" alt="Cover Image" class="img-fluid w-100" style="width=100px">
                             </div>
-                            <div class="col">
-                                <p>${result.description}</p>
-                            <h5>${result.page_title}</h5>
-                            </div>
-                            <div class="col">
-                             <a href="${result.url}">Read more</a>
+                            <div class="col-11">
+                            <p><b>${result.page_title}</b></p>
+                            <a href="${result.url}">${result.url}</a>
+                            </div>                    
                              </div>
-                             </div></div>`;
+                             </div><hr />`;
             resultsContainer.appendChild(div);
         });
     }

@@ -18,6 +18,8 @@ def parse_html_file(file_path):
         base_url = 'http://www.kevsrobots.com'
         if not cover_image.startswith(('http://', 'https://')):
             cover_image = base_url + ('/' if not cover_image.startswith('/') else '') + cover_image
+        
+        cover_image = cover_image.replace(".com//",".com/")
 
         h1_tag = soup.find('h1')
         page_title = h1_tag.get_text().strip() if h1_tag else 'Default Page Title'
