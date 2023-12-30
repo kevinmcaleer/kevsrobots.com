@@ -1,0 +1,46 @@
+---
+layout: content
+title: Search Results 
+---
+    <h1>Search Results</h1>
+    <p>Showing Results</p>
+    <div id="results-container"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var query = urlParams.get('query');
+        
+        // Call your API to get the search results
+        fetch('http://0.0.0.0:8000/search/?query=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => displayResults(data.results))
+            .catch(error => console.error('Error:', error));
+    });
+
+    function displayResults(results) {
+        var resultsContainer = document.getElementById('results-container');
+        resultsContainer.innerHTML = ''; // Clear previous results
+
+        // Display each result
+        results.forEach(function(result) {
+            var div = document.createElement('div');
+            div.innerHTML = `<div class="row"><div class="col">
+                            <div class="row">
+                            <div class="col">
+                                <img src="${result.cover_image}" alt="Cover Image" class="img-fluid w-100">
+                            </div>
+                            <div class="col">
+                                <p>${result.description}</p>
+                            <h5>${result.page_title}</h5>
+                            </div>
+                            <div class="col">
+                             <a href="${result.url}">Read more</a>
+                             </div>
+                             </div></div>`;
+            resultsContainer.appendChild(div);
+        });
+    }
+    </script>
+</body>
+</html>

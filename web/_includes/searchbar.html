@@ -1,0 +1,9 @@
+<script>
+    function performSearch(event) {
+        event.preventDefault(); // Add this line to prevent default form submission
+        var query = document.getElementById('search-box').value;
+        console.log("Search query: ", query); // For debugging
+        window.location.href = '/search-results.html?query=' + encodeURIComponent(query);
+    }
+    </script>
+    
