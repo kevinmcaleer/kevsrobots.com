@@ -13,7 +13,7 @@ logging.basicConfig(filename='search-logs.log', level=logging.INFO)
 # Set up CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://0.0.0.0:4000"],  # List of allowed origins
+    allow_origins=["http://0.0.0.0:4000", "https://www.kevsrobots.com", "http://www.kevsrobots.com"],  # List of allowed origins
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
@@ -36,6 +36,3 @@ def search_documents(request:Request, query: str):
 
     results = query_documents(query)
     return {"results": results}
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
