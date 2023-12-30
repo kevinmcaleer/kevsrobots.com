@@ -90,7 +90,7 @@ source venv/bin/activate
 ### Install CVZone
 
 ```bash
-pip3 install cvzone, mediapipe, opencv-python
+pip3 install cvzone mediapipe opencv-python
 ```
 
 ---
