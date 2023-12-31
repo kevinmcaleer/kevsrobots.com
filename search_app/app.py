@@ -33,6 +33,5 @@ def search_documents(request:Request, query: str):
     # Log the search query, IP, and timestamp
     logging.info(log_entry)
 
-
     results = query_documents(query)
     return {"results": results}
