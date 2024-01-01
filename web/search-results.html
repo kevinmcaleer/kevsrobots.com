@@ -23,7 +23,7 @@ title: Search Results
         }
         
         // Call your API to get the search results
-        fetch('http://search.kevsrobots.com:8000/search/?query=' + encodeURIComponent(query))
+        fetch('https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query))
             .then(response => response.json())
             .then(data => displayResults(data.results))
             .catch(error => console.error('Error:', error));
