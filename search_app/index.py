@@ -23,6 +23,8 @@ def parse_html_file(file_path):
 
         # Correct the cover image URL if necessary
         base_url = 'https://www.kevsrobots.com'
+        if cover_image.startswith('http://'):
+            cover_image = cover_image.replace('http://', 'https://')
         if not cover_image.startswith(('http://', 'https://')):
             cover_image = base_url + ('/' if not cover_image.startswith('/') else '') + cover_image
         
