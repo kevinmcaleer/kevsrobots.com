@@ -3,6 +3,7 @@ title: Learn Python
 date_published: 2023-07-20
 layout: course_pathway
 cover: /assets/img/learn/learn_python.png
+description: Learn Python, the most popular programming language in the world. Python is used in many different areas, including Web Development, Data Science, Machine Learning, Robotics and more.
 courses:
   - "Python for beginners"
   - "Learn MicroPython - The basics"

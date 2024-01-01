@@ -1,6 +1,7 @@
 ---
 title: Learn SMARS
 date_published: 2023-09-10
+description: Learn how to build SMARS robots, starting with the 3D Printing the model, Designing SMARS and Programming SMARS
 layout: course_pathway
 cover: /assets/img/learn/learn_smars.png
 courses:

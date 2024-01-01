@@ -1,6 +1,7 @@
 ---
 title: Learn 3D Design
 date_published: 2023-07-20
+description: Learn how to create robots in 3D, using Fusion 360. The models can be printed out using a 3d printer and then assembled into a physical robot.
 layout: course_pathway
 cover: /assets/img/learn/learn_3d_design.png
 courses:
