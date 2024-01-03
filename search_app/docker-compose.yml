@@ -9,3 +9,4 @@ services:
       - PORT=8000
     volumes:
       - .:/usr/src/app
+    restart: always
