@@ -525,9 +525,10 @@ blockquote {
 }
 
 .caption {
-  font-size: 10pt;
-  color: $clr-text-lg;
-  margin-bottom: 2px;
+  font-size: 9pt;
+  font-style: italic;
+  color: $orange !important;
+  // margin-bottom: 2px;
 }
 .table-code-fit {
   border-color: $clr-lightgrey;
