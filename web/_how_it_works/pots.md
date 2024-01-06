@@ -3,6 +3,7 @@ layout: how_it_works
 title: Pots
 short_title: How do Potentiometers work?
 short_description: Learn about Pots
+description: Learn about Pots
 date: 2023-01-15
 author: Kevin McAleer
 excerpt:

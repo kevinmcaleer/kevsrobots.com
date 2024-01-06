@@ -3,6 +3,7 @@ layout: how_it_works
 title: MEMS
 short_title: How it works - MEMS
 short_description: Learn about MEMS
+description: Learn about MEMS
 date: 2023-01-13
 author: Kevin McAleer
 excerpt:

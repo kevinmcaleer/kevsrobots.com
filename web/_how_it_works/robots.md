@@ -3,6 +3,7 @@ layout: how_it_works
 title: Robots
 short_title: How it works - Robots
 short_description: Learn about How robots work
+description: Learn about How robots work
 date: 2023-01-17
 author: Kevin McAleer
 excerpt: 

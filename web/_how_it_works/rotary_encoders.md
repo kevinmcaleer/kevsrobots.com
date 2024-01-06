@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Rotary Encoders
 short_title: How it works - Rotary Encoders
+description: Learn about Rotary Encoders
 short_description: Learn about Rotary Encoders
 date: 2023-01-11
 author: Kevin McAleer

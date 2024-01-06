@@ -2,6 +2,7 @@
 layout: how_it_works
 title: H-Bridges
 short_title: How do H-Bridges work?
+description: Learn about H-Bridges
 short_description: Learn about H-Bridges
 date: 2023-05-06
 author: Kevin McAleer

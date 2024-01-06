@@ -2,6 +2,7 @@
 layout: how_it_works
 title: I2C
 short_title: How it works - I2C
+description: Learn about I2C, and how to use it in your projects
 short_description: Learn about how I2C work, and how to use it in your projects
 date: 2023-09-02
 author: Kevin McAleer

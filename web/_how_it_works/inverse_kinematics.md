@@ -3,6 +3,7 @@ layout: how_it_works
 title: Inverse Kinematics
 short_title: How it works - LiDAR
 short_description: Learn about LiDAR
+description: Learn about LiDAR
 date: 2023-01-10
 author: Kevin McAleer
 excerpt:

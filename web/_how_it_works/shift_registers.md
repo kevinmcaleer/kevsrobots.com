@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Shift Registers
 short_title: How it works - Shift Registers
+description: Learn about how Shift Registers works
 short_description: Learn about how Shift Registers works
 date: 2023-01-18
 author: Kevin McAleer

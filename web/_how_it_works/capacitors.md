@@ -1,6 +1,7 @@
 ---
 layout: how_it_works
 title: Capacitors
+description: Learn about how Capacitors work, and how to use them in your projects
 short_title: How it works - Capacitors
 short_description: Learn about how Capacitors work, and how to use them in your projects
 date: 2023-08-23

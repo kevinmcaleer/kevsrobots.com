@@ -3,6 +3,7 @@ layout: how_it_works
 title: RGB LED Strips
 short_title: RGB LED Strips
 short_description: Learn about how RGB LED Strips work
+description: Learn about how RGB LED Strips work
 date: 2023-04-05
 author: Kevin McAleer
 excerpt: 

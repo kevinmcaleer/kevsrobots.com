@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Buck Converters
 short_title: How it works - Buck Converters
+description: Learn about how Buck Converters work
 short_description: Learn about how Buck Converters work
 date: 2023-03-15
 author: Kevin McAleer

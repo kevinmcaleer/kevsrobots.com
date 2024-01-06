@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Encoders
 short_title: How do Encoders work?
+description: Learn about Encoders
 short_description: Learn about Encoders
 date: 2023-01-15
 author: Kevin McAleer

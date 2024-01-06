@@ -2,6 +2,7 @@
 layout: how_it_works
 title: SLAM
 short_title: How it works - SLAM
+description: Learn about Simultaneous Location and Mapping
 short_description: Learn about Simultaneous Location and Mapping
 date: 2023-01-14
 author: Kevin McAleer

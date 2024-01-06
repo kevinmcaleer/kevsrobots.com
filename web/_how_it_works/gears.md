@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Gears
 short_title: How it works - Gears
+description: Learn about how Gears work
 short_description: Learn about how Gears work, and how to use them your projects
 date: 2023-08-30
 author: Kevin McAleer

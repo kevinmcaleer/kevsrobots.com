@@ -3,6 +3,7 @@ layout: how_it_works
 title: Inertial Measurement Units (IMUs)
 short_title: How do IMUs with Magnetic Compass work?
 short_description: Learn about Inertial Measurement Units with Magnetic Compass Integration
+description: Learn about Inertial Measurement Units with Magnetic Compass Integration
 date: 2024-01-05
 author: Kevin McAleer
 excerpt:

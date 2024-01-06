@@ -3,6 +3,7 @@ layout: how_it_works
 title: Potato Battery
 short_title: How it works - Potato Battery
 short_description: How it works - Potato Battery
+description: How it works - Potato Battery
 date: 2023-06-01
 author: Kevin McAleer
 excerpt: 

@@ -3,6 +3,7 @@ layout: how_it_works
 title: Ultrasonic sensors
 short_title: How it works - Ultrasonic sensors
 short_description: Learn about Ultrasonic sensors
+description: Learn about Ultrasonic sensors
 date: 2023-01-10
 author: Kevin McAleer
 excerpt: 

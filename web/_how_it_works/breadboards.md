@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Breadboards
 short_title: How it works - Breadboards
+description: Learn about how Breadboards work
 short_description: Learn about how Breadboards work
 date: 2023-04-13
 author: Kevin McAleer

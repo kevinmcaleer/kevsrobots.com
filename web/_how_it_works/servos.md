@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Servos
 short_title: How it works - Servos
+description: Learn about how Servos work
 short_description: Learn about how Servos work
 date: 2023-02-17
 author: Kevin McAleer

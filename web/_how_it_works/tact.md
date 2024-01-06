@@ -3,6 +3,7 @@ layout: how_it_works
 title: Tact Switches
 short_title: How do Tact Switches work?
 short_description: Learn about Tact Switches
+description: Learn about Tact Switches
 date: 2023-06-06
 author: Kevin McAleer
 excerpt:

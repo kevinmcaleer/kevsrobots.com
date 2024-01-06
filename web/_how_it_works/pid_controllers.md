@@ -3,6 +3,7 @@ layout: how_it_works
 title: PID Controlers
 short_title: How it works - PID Controllers
 short_description: How it works - PID Controllers
+description: How it works - PID Controllers
 date: 2023-03-13
 author: Kevin McAleer & ChatGPT
 excerpt: 

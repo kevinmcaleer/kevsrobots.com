@@ -3,6 +3,7 @@ layout: how_it_works
 title: Stepper Motors
 short_title: How it works - Stepper Motors
 short_description: Learn about Stepper Motors
+description: Learn about Stepper Motors
 date: 2023-03-08
 author: Kevin McAleer
 excerpt: 

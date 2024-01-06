@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Diodes
 short_title: How it works - Diodes
+description: Learn about how Diodes work
 short_description: Learn about how Diodes work
 date: 2023-01-19
 author: Kevin McAleer & Bill McAleer

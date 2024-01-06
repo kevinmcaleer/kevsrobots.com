@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Machine Learning
 short_title: How it works - Machine Learning
+description: Learn about Machine Learning
 short_description: Learn about Machine Learning
 date: 2023-01-11
 author: Kevin McAleer

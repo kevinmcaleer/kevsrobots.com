@@ -2,6 +2,7 @@
 layout: how_it_works
 title: Large Language Models
 short_title: How it works - LLMs
+description: Learn about Large Language Models work
 short_description: Learn about Large Language Models work
 date: 2023-11-06
 author: Kevin McAleer

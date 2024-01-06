@@ -3,6 +3,7 @@ layout: how_it_works
 title: Microcontrollers
 short_title: How it works - Microcontrollers
 short_description: Learn about Microcontrollers
+description: Learn about Microcontrollers
 date: 2023-10-29
 author: Kevin McAleer
 excerpt: 

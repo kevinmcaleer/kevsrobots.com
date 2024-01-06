@@ -3,6 +3,7 @@ layout: how_it_works
 title: MQTT
 short_title: How it works - MQTT
 short_description: Learn about MQTT
+description: Learn about MQTT
 date: 2023-01-12
 author: Kevin McAleer
 excerpt:
