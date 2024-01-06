@@ -33,24 +33,45 @@ def insert_document(title, content, url, cover_image, page_title, description, d
     conn.commit()
     conn.close()
 
-def query_documents(query):
+def total_results(query):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Count query for full-text search
+    count_query = '''
+        SELECT COUNT(*) FROM documents_fts
+        WHERE documents_fts MATCH ?
+    '''
+
+    cursor.execute(count_query, (query,))
+    total_count = cursor.fetchone()[0]
+
+    conn.close()
+    return total_count
+
+def query_documents(query, offset:int=None, limit:int=None):
+    """ Query the documents table for the given query string."""
+    if offset == None: offset = 0
+    if limit == None: limit = 10
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Modify the query to group by URL and return distinct results
-    cursor.execute('''
+    print(f'query: {query}, offset: {offset}, limit: {limit}')
+
+    sql_query = '''
         SELECT DISTINCT url, cover_image, page_title, description, date, author FROM documents_fts 
         WHERE documents_fts MATCH ? 
         GROUP BY url
         ORDER BY rank 
-        LIMIT 10
-    ''', (query,))
+        LIMIT ? OFFSET ?
+    '''
+
+    # Modify the query to group by URL and return distinct results
+    cursor.execute(sql_query, (str(query),int(limit), int(offset)))
     
     results = [{'url': row['url'], 'cover_image': row['cover_image'], 'page_title': row['page_title'], 'description':row['description'], 'date':row['date'], 'author':row['author']} for row in cursor.fetchall()]
     conn.close()
     return results
-
-
 
 if __name__ == '__main__':
     initialize_database()
