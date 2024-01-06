@@ -7,9 +7,11 @@ cover: /learn/sqlite3/assets/database.png
 date: 2023-07-15
 previous: 01_introduction_to_databases.html
 next: 03_creating_tables_and_schema.html
-description: ''
+description: We will cover the initial steps to set up Python and SQLite3, establish
+  a connection to a database, and perform basic operations using Python's sqlite3
+  module
 percent: 15
-duration: 3
+duration: 4
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:

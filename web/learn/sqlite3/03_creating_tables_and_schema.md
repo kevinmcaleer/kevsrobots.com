@@ -7,7 +7,9 @@ cover: /learn/sqlite3/assets/database.png
 date: 2023-07-15
 previous: 02_getting_started_with_sqlite3.html
 next: 04.inserting_and_retrieving_data.html
-description: ''
+description: Creating tables in SQLite databases and understanding the principles
+  of schema design. We will explore how to define table structure, data types, constraints,
+  and primary keys
 percent: 20
 duration: 3
 navigation:
