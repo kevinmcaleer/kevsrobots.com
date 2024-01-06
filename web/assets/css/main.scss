@@ -825,3 +825,13 @@ table .w-30 { width:30%; }
   border-top: 2px solid #000; /* Adjust width and color as needed */
   z-index: 0;
 }
+
+.pagination-link {
+  margin-right: 5px;
+  text-decoration: none;
+  color: blue;
+}
+
+.pagination-link.active {
+  font-weight: bold;
+}

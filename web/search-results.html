@@ -5,28 +5,67 @@ title: Search Results
 {% include breadcrumbs.html %}
     <h1>Search Results</h1>
     <h2>Find articles, tutorials, how it works, projects, ideas and more.</h2>
-    <p id="search-query-display">Showing Results for: <span id="search-query"></span></p>
+    <p id="search-query-display">Showing Results for: <span id="search-query"></span><br />
+    About <span id="total_count"></span> results (<span id="search-time"></span>)</p>
 
     <hr />
     <div id="results-container"></div>
-
     <script>
+    function createPagination(totalCount, pageSize, currentPage, query) {
+        const totalPages = Math.ceil(totalCount / pageSize);
+        const paginationContainer = document.getElementById('pagination-container');
+        paginationContainer.innerHTML = ''; // Clear existing pagination links
+    
+        for (let i = 1; i <= totalPages; i++) {
+            const pageLink = document.createElement('a');
+            // pageLink.href = 'http://0.0.0.0:4000/search-results?query=' + query + '&page=' + i;
+            pageLink.href = 'https://search.kevsrobots.com/search-results?query=' + query + '&page=' + i;
+            pageLink.innerText = i;
+            pageLink.classList.add('pagination-link');
+            if (i === currentPage) {
+                pageLink.classList.add('active');
+            }
+    
+            pageLink.addEventListener('click', function (e) {
+                // e.preventDefault();
+                performSearch(i);
+            });
+    
+            paginationContainer.appendChild(pageLink);
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
         var query = urlParams.get('query');
+        var page = urlParams.get('page');
+        if (page == null) {
+            page = 1;
+            console.log("Page was null, setting to 1");
+        }
 
          // Set the search query in the "Showing Results for" section
         if (query) {
             document.getElementById('search-query').textContent = query;
         } else {
             document.getElementById('search-query-display').textContent = 'Showing All Results';
+      
         }
         
         // Call your API to get the search results
-        fetch('https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query))
+        fetch('https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query)) + '&page=' + page)
+        // fetch('http://0.0.0.0:8000/search/?query=' + encodeURIComponent(query) + '&page=' + page)
             .then(response => response.json())
-            .then(data => displayResults(data.results))
+            .then(data => { 
+                 displayResults(data.results);
+                 document.getElementById('total_count').textContent = data.total_count;
+                 document.getElementById('search-time').textContent = data.execution_time + ' seconds';
+                 console.log(data);
+                 createPagination(data.total_count, data.page_size, data.current_page, query);
+                })
+                 
             .catch(error => console.error('Error:', error));
+        
     });
 
     function displayResults(results) {
@@ -63,5 +102,7 @@ title: Search Results
         });
     }
     </script>
+    <div id="pagination-container"></div>
+
 </body>
 </html>
