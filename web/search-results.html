@@ -15,25 +15,64 @@ title: Search Results
         const totalPages = Math.ceil(totalCount / pageSize);
         const paginationContainer = document.getElementById('pagination-container');
         paginationContainer.innerHTML = ''; // Clear existing pagination links
-    
-        for (let i = 1; i <= totalPages; i++) {
-            const pageLink = document.createElement('a');
-            // pageLink.href = 'http://0.0.0.0:4000/search-results?query=' + query + '&page=' + i;
-            pageLink.href = 'https://www.kevsrobots.com/search-results?query=' + query + '&page=' + i;
-            pageLink.innerText = i;
-            pageLink.classList.add('pagination-link');
-            if (i === currentPage) {
-                pageLink.classList.add('active');
-            }
-    
-            pageLink.addEventListener('click', function (e) {
-                // e.preventDefault();
-                performSearch(i);
-            });
-    
-            paginationContainer.appendChild(pageLink);
+
+        console.log('totalPages is:',totalPages);
+        console.log('currentPage is:',currentPage);
+        console.log('query is:',query);
+
+
+        // Create the unordered list element
+        const ul = document.createElement('ul');
+        ul.className = 'pagination';
+
+        // Helper function to create page item
+        const createPageItem = (page, text = page) => {
+        const li = document.createElement('li');
+        li.className = 'page-item';
+        if (page === currentPage) {
+            li.classList.add('active');
         }
+
+        const a = document.createElement('a');
+        a.className = 'page-link';
+        a.href = 'https://www.kevsrobots.com/search-results?query=' + query + '&page=' + page; // Corrected line
+        a.innerText = text;
+        a.addEventListener('click', function (e) {
+            // e.preventDefault();
+            performSearch(page);
+        });
+
+        li.appendChild(a);
+        return li;
+    };
+
+        // Previous Page
+        if (currentPage > 1) {
+            ul.appendChild(createPageItem(currentPage - 1, 'Previous'));
+        }
+
+        // Page Numbers
+        let startPage = Math.max(currentPage - 2, 1);
+        let endPage = Math.min(startPage + 4, totalPages);
+
+        if (endPage - startPage < 4) {
+            startPage = Math.max(endPage - 4, 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            console.log('i is:',i);
+            ul.appendChild(createPageItem(i));
+        }
+
+        // Next Page
+        if (currentPage < totalPages) {
+            ul.appendChild(createPageItem(currentPage + 1, 'Next'));
+        }
+
+        // Append the constructed list to the pagination container
+        paginationContainer.appendChild(ul);
     }
+
     
     document.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
@@ -61,7 +100,7 @@ title: Search Results
                  document.getElementById('total_count').textContent = data.total_count;
                  document.getElementById('search-time').textContent = data.execution_time + ' seconds';
                  console.log(data);
-                 createPagination(data.total_count, data.page_size, data.current_page, query);
+                 createPagination(data.total_count, data.page_size, data.page, query);
                 })
                  
             .catch(error => console.error('Error:', error));
@@ -102,7 +141,9 @@ title: Search Results
         });
     }
     </script>
-    <div id="pagination-container"></div>
+    <div class="d-flex justify-content-center">
+    <nav aria-label="Page navigation" id="pagination-container"></nav>
+    </div>
 
 </body>
 </html>
