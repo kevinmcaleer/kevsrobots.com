@@ -1,3 +1,8 @@
+- name: Cubie-1 Upgrades
+  link: /blog/viam-slam.html
+  cover: /assets/img/blog/viam_slam/cubie.jpg
+  description: SLAM Navigation with Viam
+  date: 2024/01/07
 - name: Omnibot 3000
   link: /blog/omnibot.html
   cover: /assets/img/blog/omnibot3000/omnibot3000.png

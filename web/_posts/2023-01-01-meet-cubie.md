@@ -22,6 +22,7 @@ videos:
  - 03wKo-riJlA
  - l9_lBNemtZg
  - ev9Mt_gg81g
+ - yjc-bpJVaHo
 ---
 
 ## Overview
@@ -29,6 +30,13 @@ videos:
 Meet Cubie-1; the [Raspberry Pi](/glossary#raspberrypi) 4 robot designed to help you learn [ROS](/glossary#ros). Cubie is a 3d printable robot, with a [LiDAR](/glossary#lidar) sensor and 16mp autofocus Arducam camera module.
 
 Cubie-1 was designed to support the [Learn ROS with me](https://youtube.com/playlist?list=PLU9tksFlQRircAdEplrH9NMm4WtSA8yzi) series.
+
+Cubie-1 also got an update in January 2024 with new Motor Drivers and an [IMU](/resources/how_it_works/imu) sensor. Cubie-1 can also run Viam for SLAM Navigation, see the article on [`VIAM and SLAM` here](/blog/viam-slam.html).
+
+VIAM and SLAM Article
+{:class="caption"}
+
+{% include card.html cardtitle="VIAM and SLAM" img="/assets/img/blog/viam_slam/viam_slam.jpg" link="/blog/viam-slam.html" %}
 
 ---
 
@@ -71,7 +79,7 @@ Cubie is made up of several 3d printable parts:
 [![](/assets/img/blog/cubie-1/02pillar.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/02pillar.png)
 [![](/assets/img/blog/cubie-1/03piholder.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/03piholder.png)
 [![](/assets/img/blog/cubie-1/04raspberrypi.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/04raspberrypi.png)
-[![](/assets/img/blog/cubie-1/05shelf.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/05shelf.png)
+[![](/assets/img/blog/cubie-1/05shelf_v2.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/05shelf_v2.png)
 [![](/assets/img/blog/cubie-1/06lidar.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/06lidar.png)
 [![](/assets/img/blog/cubie-1/07top.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/07top.png)
 [![](/assets/img/blog/cubie-1/08camera.png){:class="img-fluid w-25"}](/assets/img/blog/cubie-1/08camera.png)
@@ -101,7 +109,7 @@ A later update will provide the code.
 
 * [`base.stl`](/assets/stl/cubie-1/base.stl)
 * [`pillar.stl`](/assets/stl/cubie-1/pillar.stl)
-* [`shelf.stl`](/assets/stl/cubie-1/shelf.stl)
+* [`shelf_v2.stl`](/assets/stl/cubie-1/shelf_v2.stl)
 * [`top.stl`](/assets/stl/cubie-1/top.stl)
 * [`spacer.stl`](/assets/stl/cubie-1/spacer.stl)
 * [`motor_holders.stl`](/assets/stl/cubie-1/motor_holder.stl)

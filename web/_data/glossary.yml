@@ -24,6 +24,7 @@
   definition: Inertial Measurement Unit
   full: "An inertial measurement unit (IMU) is an electronic device that measures and reports a body's specific force, angular rate, and sometimes the magnetic field surrounding the body, using a combination of accelerometers and gyroscopes, or magnetometers."
   link: https://en.wikipedia.org/wiki/Inertial_measurement_unit
+  article: /resources/how_it_works/imu
 - term: gps
   definition: Global Positioning System
   full: "The Global Positioning System (GPS) is a space-based radionavigation system owned by the United States government and operated by the United States Space Force. It is one of the global navigation satellite systems (GNSS) that provides geolocation and time information to a GPS receiver anywhere on or near the Earth where there is an unobstructed line of sight to four or more GPS satellites."
