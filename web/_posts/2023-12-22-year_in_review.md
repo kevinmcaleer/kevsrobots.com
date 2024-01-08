@@ -3,6 +3,7 @@ title: Year in Review 2023
 description: A look back at 2023
 layout: blog
 cover: /assets/img/blog/yir/cover.png
+date: 2023-12-22
 ---
 
 It's been a busy year. I've been working on a lot of projects, and I've been to my first in person Makers events at the [Makers Central](https://www.makerscentral.co.uk/) in Birmingham UK, as well as the Maker Faire Rome in Italy.

@@ -102,7 +102,7 @@ def main():
     data = read_yaml_file(filename)
 
     # Specify the year for which the heatmap should be generated
-    year = 2023
+    year = 2024
 
     # Create calendar heatmap
     create_calendar_heatmap(data['posts'], year)
