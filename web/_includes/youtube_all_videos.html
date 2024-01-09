@@ -1,4 +1,5 @@
 {% assign vids = site.data.youtube | sort: 'published' | reverse %}
+{% assign views = site.data.popular_videos %}
 
 <div class="bg-light p-0 m-0">
 
@@ -14,10 +15,14 @@
       </nav>
    
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-4">
-{% for vid in vids %}
+
 <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
-    <div class="card-group">
-    <div class="card">
+    
+      {% for vid in vids %}
+      {% for video in views %}
+      {% if video.Content == vid.video_id %}
+      <div class="card-group">
+    <div class="card {% if video.popular %}bg-ocre{% endif %}">
         <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid"></a>
       <div class="card-body mb-0 pb-0">
           <div class="row h-100">
@@ -25,6 +30,12 @@
               <div class="row w-100 p-1 m-0 h-50">
                   <div class="col-12 m-0 p-0">
                       <p class="small">{{ vid.title }}</p>
+                     
+                      <p class="small">{{ video.Views }} Views</p>
+                      {% if video.popular %}
+                      <span class="badge badge-sm text-bg-dark">Popular</span>
+                      {% endif %}
+                      
                   </div>
               </div>
 
@@ -39,12 +50,12 @@
           </div>
         </div>
       </div>
-
     </div>
-
-</div>
-
+    </div>
+{% endif %}
 {% endfor %}
+{% endfor %}
+
 </div>
 </div>
 </div>
