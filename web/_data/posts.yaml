@@ -158,6 +158,9 @@ posts:
 - title: Year in Review 2023
   url: /2023-12-22-year_in_review.md
   date: 2023-12-22
+- title: How to install MicroPython
+  url: /2024-01-10-how-to-install-micropython.md
+  date: 2024-01-10
 - title: Pico Birthday Card
   url: /2023-04-23-pico-birthday-card.md
   date: 2023-04-23
@@ -254,6 +257,9 @@ posts:
 - title: Chip
   url: /2023-05-05-chip.md
   date: 2023-06-26
+- title: What is MicroPython?
+  url: /2024-01-10-what-is-micropython.md
+  date: 2024-01-10
 - title: PIKON Camera - Raspberry Pi High Quality Camera Project
   url: /2022-08-23-pikon-camera.md
   date: 2022-08-23
