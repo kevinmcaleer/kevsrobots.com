@@ -6,7 +6,7 @@ cover: /assets/img/credits.png
 
 {% include breadcrumbs.html %}
 
-<img src="{{page.cover}}" class="cover rounded my-3">
+<img src="{{page.cover}}" class="cover rounded my-3" alt="{{page.title}}">
 
 # Your Name in the Show Credits
 

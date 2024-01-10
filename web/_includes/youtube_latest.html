@@ -16,7 +16,7 @@
 {% for vid in vids | limit:4 %}
 <div class="col col-lg-3">
 <div class="card border-0 bg-light">
-    <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2"></a>
+    <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2" alt="YouTube Thumbnail for {{vid.title}}"></a>
     <div class="card-body">
       <div class="row">
         <div class="col-12 m-0 p-0">

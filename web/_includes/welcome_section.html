@@ -6,7 +6,7 @@
                     <h1>Welcome to Kev's Robots</h1>
                 </div>
                 <div class="col-12 col-lg-6">
-                    <img src="/assets/img/kevsrobots.jpg" class="w-100 rounded-1">
+                    <img src="/assets/img/kevsrobots.jpg" class="w-100 rounded-1" alt="The Kevs Logo Brand icon, a robot looking at you combined with the letters K and R">
                 </div>
             </div>
             <p class="lead">Hi! I'm <a href="/about/bio.html" class="dotted">Kev</a>, Welcome to the ultimate destination for all things robots!</p>
@@ -31,7 +31,7 @@
                         {% for blog in blogs | limit:1 %}
                         <a href="{{blog.url}}" class="text-decoration-none text-white">
                         <p class="small">Latest Blog Article > </p>
-                        <img src="{{blog.cover}}" class="img-fluid w-100 rounded-1">
+                        <img src="{{blog.cover}}" class="img-fluid w-100 rounded-1" alt="The cover image for {{blog.title}}">
                         </a>
                         {% endfor %}
                     </div>
@@ -42,7 +42,7 @@
                         {% for vid in vids | limit:1 %}
                         <a href="https://www.youtube.com/watch?v={{vid.video_id}}" class="text-decoration-none text-black">
                         <p class="small">Latest YouTube Video ></p>
-                        <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2">
+                        <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2" alt="YouTube thumbnail for {{vid.title}}">
                         </a>
                         {% endfor %}
                     </div>
@@ -55,7 +55,7 @@
                         {% for robot in robots | limit:1 %}
                         <a href="{{robot.link}}" class="text-decoration-none text-white">
                         <p>Latest Robot ></p>
-                        <img src="{{robot.cover}}" class="img-fluid rounded-1">
+                        <img src="{{robot.cover}}" class="img-fluid rounded-1" alt="Robot cover image for {{robot.title}}">
                         </a>
                         {% endfor %} 
                     </div>
@@ -66,7 +66,7 @@
                         {% for project in projects | limit:1 %}
                         <a href="{{project.link}}" class="text-decoration-none text-white">
                         <p>Latest Projects ></p>
-                        <img src="{{project.cover}}" class="img-fluid rounded-1">
+                        <img src="{{project.cover}}" class="img-fluid rounded-1" alt="Project cover image for {{project.name}}">
                         </a>
                         {% endfor %} 
                     </div>

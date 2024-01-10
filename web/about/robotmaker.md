@@ -9,12 +9,12 @@ cover: /assets/img/credits.png
 
 {% include breadcrumbs.html %}
 
-<img src="{{page.cover}}" class="cover rounded my-3">
+<img src="{{page.cover}}" class="cover rounded my-3" alt="Cover image for {{page.title}}">
 {% assign profile = site.data.profile %}
 
-# Hey 🤖 Robot Makers! 
+## Hey 🤖 Robot Makers!
 
-## Want to get see ***your*** name in the credits and get access to **more** content, and also help Kevin create even more quality robot content? 
+## Want to get see ***your*** name in the credits and get access to **more** content, and also help Kevin create even more quality robot content?
 
 ---
 

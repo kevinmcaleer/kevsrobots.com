@@ -4,7 +4,7 @@
 {% for item in projects %}
 <div class="col mb-3">
 <div class="card mt-3 h-100 border-0">
-    <a href="{{item.link}}"><img src="{{item.cover}}" class="img-fluid w-100 rounded-3"></a>
+    <a href="{{item.link}}"><img src="{{item.cover}}" class="img-fluid w-100 rounded-3" alt="Project article cover image for {{item.name}}"></a>
     <div class="card-body">
         <h5 class="card-title text-truncate">
             {{ item.name}}

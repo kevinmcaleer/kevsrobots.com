@@ -57,7 +57,7 @@
             <div class="card h-100 border-0 rounded-3 {% if is_popular %} bg-ocre {% endif %} shadow-lg">
             
             <!-- {% include youtubeplayer.html id=video.video_id %} -->
-            <img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="card-img-top">
+            <img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="card-img-top" alt="YouTube thumbnail for {{video.title}}">
             <div class="card-body">
                 <p class="card-title">{{video.title}}</p>
                 <p class="card-text text-muted text-sm">{{ video.published | date: "%d %b"}} | {{views}} views</p>

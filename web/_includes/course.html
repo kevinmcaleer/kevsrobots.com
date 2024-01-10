@@ -6,7 +6,7 @@
 {% if course.name == name %}
 <a href="{{ course.link }}" class="text-decoration-none">
 <div class="card shadow-lg border-0 h-100">
-    <img src="{{course.cover}}" class="card-img-top">
+    <img src="{{course.cover}}" class="card-img-top" alt="{{course.title}}">
     <div class="card-img-overlay rounded-2 m-0 p-0">
     <h1 class="img img-overlay-black display-1 text-white p-3">{{ include.count }}</h1>
     </div>
