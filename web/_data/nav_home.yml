@@ -1,7 +1,7 @@
 - name: All Videos
   link: /all_videos
 - name: Most Popular Videos
-  link: /popular_videos/
+  link: /popular_videos
 - name: Shorts
   link: /shorts
 - name: Livestreams

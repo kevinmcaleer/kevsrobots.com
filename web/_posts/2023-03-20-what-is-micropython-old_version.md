@@ -1,6 +1,6 @@
 ---
 layout: blog
-title: What is MicroPython?
+title: What is MicroPython (old version)?
 description: "MicroPython: A Lighter, Faster Python for Microcontrollers"
 short_title: What is MicroPython?
 short_description: "MicroPython: A Lighter, Faster Python for Microcontrollers"
@@ -15,6 +15,8 @@ tags:
 groups:
  - micropython
 ---
+
+A newer version of this article is available here: [What is MicroPython?](/blog/what-is-micropython).
 
 ## Introduction
 

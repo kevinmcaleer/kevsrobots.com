@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import yaml
 
+# Got to YouTube Studio -> Analytics and export the default view for Lifetime
+
 def process_most_popular():
     """ Process the most popular videos """
 
@@ -11,7 +13,8 @@ def process_most_popular():
     videos = videos.drop([0])
     videos = videos.drop(['Video title','Impressions',
                         'Impressions click-through rate (%)',
-                        'Average view duration',
+                        'Impressions',
+                        # 'Average view duration',
                         'Estimated revenue (GBP)',
                         'Video publish time',
                         'Subscribers',

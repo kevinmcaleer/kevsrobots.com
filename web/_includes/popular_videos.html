@@ -1,7 +1,12 @@
 {% assign vids = site.data.youtube | sort: 'published' | reverse %}
+{% assign popular = site.data.popular_videos | sort: 'Views' | reverse %}
 <div class="bg-light p-0 m-0">
 
     <div class="container">
+
+      <div class="row">
+        <div class="col-12 col-md-9">
+          
     
         <nav class="navbar bg-light">
             <div class="container-fluid">
@@ -12,28 +17,34 @@
             </div>
           </nav>
        
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-4">
-    {% for vid in vids %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+    {% for vid in popular %}
     {% if vid.popular %}
     <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
+
+      {% assign video = vids | where: 'video_id', vid.Content | first %}
+      {% if video.type != "short" %}
         <div class="card-group">
         <div class="card border-0">
-            <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid" alt="YouTube Thumbnail image for {{video.title}}"></a>
+            <a href="https://www.youtube.com/watch?v={{video.video_id}}"><img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="img-fluid" alt="YouTube Thumbnail image for {{video.title}}"></a>
           <div class="card-body mb-0 pb-0">
               <div class="row h-100">
                 <div class="col-12 m-0 p-0">
                   <div class="row w-100 p-1 m-0 h-50">
                       <div class="col-12 m-0 p-0">
-                          <p class="small">{{ vid.title }}</p>
+                          <p class="small">{{ video.title }}</p>
                       </div>
                   </div>
     
                   <div class="row w-100 p-1 pb-2 m-0 h-50 align-items-end">
                       <div class="col-6 m-0 p-0">
-                          <p class="text-date text-start  mb-0">{{ vid.published | date: "%d %B %Y" }}</p>
+                          <p class="text-date text-start  mb-0">{{ video.published | date: "%d %B %Y" }}</p>
+                          <p class="card-text">{{ vid.Views }} Views</p>
+                        
                       </div>
                       <div class="col-6  m-0 p-0">
-                          <span class="badge badge-sm float-end mb-0 {% if vid.type == 'video' %}bg-secondary{% elsif vid.type =='short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% endif %}">{{ vid.type | capitalize }}</span>
+                          <span class="badge badge-sm float-end mb-0 {% if video.type == 'video' %}bg-secondary{% elsif video.type =='short' %}bg-success{% elsif video.type == 'livestream' %}bg-danger{% endif %}">{{ video.type | capitalize }}</span>
+                          
                       </div>
                   </div>
               </div>
@@ -44,7 +55,15 @@
     
     </div>
     {% endif %}
+    {% endif %}
     {% endfor %}
     </div>
     </div>
+    <div class="col-12 col-md-3 mt-3">
+      <h2 class="text-center">Top 10 Popular Videos</h2>
+      {% include top_10_popular_videos.html %}
+      </div>
+
     </div>
+    </div>
+  </div>
