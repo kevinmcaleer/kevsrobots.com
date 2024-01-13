@@ -140,18 +140,23 @@ nav {
   }
   a {
       color: rgba(248, 248, 255, 0.878);
-      font-size: 10pt;
+      font-size: 11pt;
       font-weight: 400;
-      text-decoration-line: underline;
-      text-decoration-style: dotted;
+      text-decoration-line: none;
+      // text-decoration-line: underline;
+      // text-decoration-style: dotted;
       text-decoration-color: whitesmoke;
+      margin-bottom: 30px;
+      
   }
   ul li a{
       margin-bottom: 4px;
       padding-bottom: 0px;
-      text-decoration-line: underline;
-      text-decoration-style: dotted;
+      // text-decoration-line: underline;
+      // text-decoration-style: dotted;
+      text-decoration-line: none;
       text-decoration-color: whitesmoke;
+     
   }
 }
 
@@ -835,3 +840,9 @@ table .w-30 { width:30%; }
 .pagination-link.active {
   font-weight: bold;
 }
+
+footer.link {
+  color: white;
+  text-decoration: none !important;
+
+} 

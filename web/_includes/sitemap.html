@@ -1,49 +1,111 @@
 <div class="container p-3 sitemap mt-3 bg-secondary  bg-gradient">
-    <div class="row row-cols-1 row-cols-md-4">
-        <div class="col mt-4">
+    <div class="row row-cols-1 row-cols-md-6">
+        <div class="col-md-2 mt-4">
             <h5 class="">Posts</h5>
             {% assign posts = site.posts %}
     <ul class="decoration-none nav flex-column">
-        {% for post in posts limit: 10 %}
-        <li class="decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{post.url}}">{{ post.title }}</a></li>
+        {% for post in posts limit: 5 %}
+        <li class="decoration-none  m-0 p-0"><a class="footer-link px-0 small" href="{{post.url}}">{{ post.title }}</a></li>
         {% endfor %}
+        
+        <p><a href="/blog/"><i class="fa-solid fa-newspaper"></i> More Articles >></a></p>
     </ul>
         </div>
-        <div class="col mt-4">
-            <h5 class="">Links</h5>
-            {% assign links = site.data.links %}
-            <ul class="decoration-none nav flex-column">
-            {% for link in links limit: 10 %}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{link.link}}">{{link.name}}</a></li>
-            {% endfor %}
-            </ul>
-            {% assign reviews = site.reviews %}
-            <h5 class="mt-4">Reviews</h5>
-            <ul class="decoration-none nav flex-column">
-            {% for review in reviews limit: 10 %}
-            {% if review.url contains "index" %}
-            {% else %}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{review.url}}">{{review.title}}</a></li>
-            {% endif %}
-            {% endfor %}
-            </ul>
-        </div>
-        <div class="col mt-4">
+        <div class="col-md-2 mt-4">
             <h5 class="">Robots</h5>
             <ul class="decoration-none nav flex-column">
-                {% for robot in site.data.robots limit:10%}
-                <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="{{robot.link}}">{{robot.name}}</a></li>
+                {% for robot in site.data.robots limit:5 %}
+                <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{robot.link}}">{{robot.name}}</a></li>
                 {% endfor %}
                 </ul>
+              
+        <p><a href="/robots/"><i class="fa-solid fa-robot"></i> More Robots >></a></p>
         </div>
-        <div class="col mt-4">
-            <h5 class="">Videos</h5>
+        <div class="col-md-2 mt-4">
+            <h5 class="">Projects</h5>
             <ul class="decoration-none nav flex-column">
-            {% for video in site.data.youtube limit:10%}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="nav-link px-0 small" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
+            {% for project in site.data.projects limit:5 %}
+            <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{project.link}}">{{project.name}}</a></li>
             {% endfor %}
             </ul>
+           
+        <p><a href="/robots/projects"><i class="fa-solid fa-wrench"></i> More Projects >></a></p>
+        </div>
+       
+        
+        <div class="col-md-6 mt-4">
+            <h5 class="">Videos</h5>
+            <ul class="decoration-none nav">
+            {% for video in site.data.youtube limit:5 %}
+            <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
+            {% endfor %}
+            </ul>
+           
+        <p><a href="/videos"><i class="fa-brands fa-youtube"></i> More videos >></a></p>
         </div>
     </div>
-    <hr class="m-0 mt-3 p-0" />
+    <div class="row row-cols-1 row-cols-md-6">
+        <div class="col-md-2 mt-4">
+            <h5 class="">How it works</h5>
+            <ul class="decoration-none nav flex-column">
+            {% for how_article in site.how_it_works | sort:date | reverse limit:5 %}
+            <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{how_article.url}}">{{how_article.title}}</a></li>
+            {% endfor %}
+            </ul>
+          
+        <p><a href="/resources/how_it_works/"><i class="fa-solid fa-square-question"></i> More articles >></a></p>
+        </div>
+    
+    <div class="col-md-2 mt-4">
+        <h5 class="">Courses</h5>
+        <ul class="decoration-none nav flex-column">
+        {% for course in site.data.courses | sort:date | reverse limit:5 %}
+        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{course.link}}">{{course.name}}</a></li>
+        {% endfor %}
+        </ul>
+        
+    <p><a href="/learn/"><i class="fa-solid fa-graduation-cap"></i> More Courses >></a></p>
+    </div>
+    <div class="col-md-2 mt-4">
+        <h5 class="">Reviews</h5>
+        <ul class="decoration-none nav flex-column">
+        {% for review in site.reviews | sort:date | reverse limit:5 %}
+        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{review.url}}">{{review.title}}</a></li>
+        {% endfor %}
+        </ul>
+        
+    <p><a href="/reviews/"><i class="fa-solid fa-star-sharp"></i> More Reviews >></a></p>
+    </div>
+    <div class="col-md-2 mt-4">
+        <h5 class="">Links</h5>
+        <ul class="decoration-none nav flex-column">
+        {% for link in site.data.links | sort:date | reverse limit:5 %}
+        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{link.link}}">{{link.name}}</a></li>
+        {% endfor %}
+        </ul>
+        
+    <p><a href="/links/"><i class="fa-solid fa-link"></i> More links >></a></p>
+    </div>
+    <div class="col-md-2 mt-4">
+        <h5 class="">Gear</h5>
+        <ul class="decoration-none nav flex-column">
+        {% for gear in site.data.gear | sort:date | reverse limit:5 %}
+        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{gear.link}}">{{gear.name}}</a></li>
+        {% endfor %}
+        </ul>
+        
+    <p><a href="/gear/"><i class="fa-solid fa-hammer"></i> More Gear >></a></p>
+    </div>
+    <div class="col-md-2 mt-4">
+        <h5 class="">Boards</h5>
+        <ul class="decoration-none nav flex-column">
+        {% for board in site.boards | sort:date | reverse limit:5 %}
+        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{board.url}}">{{board.title}}</a></li>
+        {% endfor %}
+        </ul>
+        
+    <p><a href="/resources/boards/"><i class="fa-solid fa-brain-circuit"></i> More Boards >></a></p>
+    </div>
+</div>
+   
 </div>
