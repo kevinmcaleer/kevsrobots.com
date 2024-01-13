@@ -3,6 +3,11 @@
   cover: /assets/img/blog/viam_slam/viam_slam.jpg
   description: SLAM with Viam
   date: 2024-01-07
+- name: Stream ESP32CAM video
+  link: /blog/esp32cam-to-python
+  cover: /assets/img/blog/esp32cam/esp32cam.jpg
+  description: SLAM with Viam
+  date: 2023-12-31
 - name: Elf Detector
   link: /blog/elf-detector.html
   cover: /assets/img/blog/elf/elf.jpg

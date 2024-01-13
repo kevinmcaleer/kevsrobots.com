@@ -618,3 +618,17 @@
     The protocol is used for establishing and controlling media sessions between end points.
   link: https://en.wikipedia.org/wiki/Real_Time_Streaming_Protocol
   article: /blog/esp32cam-rtsp
+- term: NVMe
+  definition: Non-Volatile Memory Express
+  full: >-
+    Non-Volatile Memory Express (NVMe) is a logical device interface specification for accessing non-volatile storage media attached via a PCI Express (PCIe) bus.
+    The specification was developed by the NVM Express Workgroup, which consists of more than 90 companies; Amber Huffman of Intel was the working group's chair.
+  link: https://en.wikipedia.org/wiki/NVM_Express
+  article: /blog/raspberrypi5-nvme-nas
+- term: NAS
+  definition: Network Attached Storage
+  full: >-
+    Network-attached storage (NAS) is a file-level (as opposed to block-level storage) computer data storage server connected to a computer network providing data access to a heterogeneous group of clients.
+    NAS is specialized for serving files either by its hardware, software, or configuration.
+  link: https://en.wikipedia.org/wiki/Network-attached_storage
+  article: /blog/raspberrypi5-nvme-nas

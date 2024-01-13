@@ -1,5 +1,5 @@
 <div class="container p-3 sitemap mt-3 bg-secondary  bg-gradient">
-    <div class="row row-cols-1 row-cols-md-6">
+    <div class="row row-cols-1 row-cols-md-6 g-1">
         <div class="col-md-2 mt-4">
             <h5 class="">Posts</h5>
             {% assign posts = site.posts %}
@@ -7,7 +7,7 @@
         {% for post in posts limit: 5 %}
         <li class="decoration-none  m-0 p-0"><a class="footer-link px-0 small" href="{{post.url}}">{{ post.title }}</a></li>
         {% endfor %}
-        
+        <hr/>
         <p><a href="/blog/"><i class="fa-solid fa-newspaper"></i> More Articles >></a></p>
     </ul>
         </div>
@@ -17,8 +17,9 @@
                 {% for robot in site.data.robots limit:5 %}
                 <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{robot.link}}">{{robot.name}}</a></li>
                 {% endfor %}
+                
                 </ul>
-              
+        <hr/>
         <p><a href="/robots/"><i class="fa-solid fa-robot"></i> More Robots >></a></p>
         </div>
         <div class="col-md-2 mt-4">
@@ -28,6 +29,7 @@
             <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{project.link}}">{{project.name}}</a></li>
             {% endfor %}
             </ul>
+            <hr/>
            
         <p><a href="/robots/projects"><i class="fa-solid fa-wrench"></i> More Projects >></a></p>
         </div>
@@ -40,6 +42,7 @@
             <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
             {% endfor %}
             </ul>
+            <hr/>
            
         <p><a href="/videos"><i class="fa-brands fa-youtube"></i> More videos >></a></p>
         </div>
@@ -52,7 +55,7 @@
             <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{how_article.url}}">{{how_article.title}}</a></li>
             {% endfor %}
             </ul>
-          
+            <hr/>
         <p><a href="/resources/how_it_works/"><i class="fa-solid fa-square-question"></i> More articles >></a></p>
         </div>
     
@@ -63,7 +66,7 @@
         <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{course.link}}">{{course.name}}</a></li>
         {% endfor %}
         </ul>
-        
+        <hr/>
     <p><a href="/learn/"><i class="fa-solid fa-graduation-cap"></i> More Courses >></a></p>
     </div>
     <div class="col-md-2 mt-4">
@@ -73,7 +76,7 @@
         <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{review.url}}">{{review.title}}</a></li>
         {% endfor %}
         </ul>
-        
+        <hr/>
     <p><a href="/reviews/"><i class="fa-solid fa-star-sharp"></i> More Reviews >></a></p>
     </div>
     <div class="col-md-2 mt-4">
@@ -83,7 +86,7 @@
         <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{link.link}}">{{link.name}}</a></li>
         {% endfor %}
         </ul>
-        
+        <hr/>
     <p><a href="/links/"><i class="fa-solid fa-link"></i> More links >></a></p>
     </div>
     <div class="col-md-2 mt-4">
@@ -93,7 +96,7 @@
         <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{gear.link}}">{{gear.name}}</a></li>
         {% endfor %}
         </ul>
-        
+        <hr/>
     <p><a href="/gear/"><i class="fa-solid fa-hammer"></i> More Gear >></a></p>
     </div>
     <div class="col-md-2 mt-4">
@@ -103,7 +106,7 @@
         <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{board.url}}">{{board.title}}</a></li>
         {% endfor %}
         </ul>
-        
+        <hr/>
     <p><a href="/resources/boards/"><i class="fa-solid fa-brain-circuit"></i> More Boards >></a></p>
     </div>
 </div>
