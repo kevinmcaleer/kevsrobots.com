@@ -68,9 +68,6 @@ posts:
 - title: Stream ESP32CAM video
   url: /2023-12-29-esp32cam-to-python.md
   date: 2023-12-29
-- title: What is MicroPython?
-  url: /2023-03-20-what-is-micropython.md
-  date: 2023-03-20
 - title: SMARS
   url: /2023-09-10-smars.md
   date: 2023-09-10
@@ -182,9 +179,15 @@ posts:
 - title: PicoSMARS 2
   url: /2023-10-05-picosmars.md
   date: 2023-10-05
+- title: How to install an NVMe drive on a Raspberry Pi 5
+  url: /2024-01-13-raspberrypi5-nvme-nas.md
+  date: 2024-01-13
 - title: 10 Tips for getting started
   url: /2023-01-10-10-tips-for-getting-started-with-robotics.md
   date: 2023-01-10
+- title: What is MicroPython (old version)?
+  url: /2023-03-20-what-is-micropython-old_version.md
+  date: 2023-03-20
 - title: Chicken Nugget of Doom
   url: /2023-08-05-chicken_nugget.md
   date: 2023-08-05
