@@ -89,24 +89,6 @@ The NVMe drive is installed by pushing it at a slight angle into the NVMe board 
 
 ---
 
-## How to boot a Raspberry Pi 5 from NVMe
-
-Next we need to change the boot order of our Raspberry Pi 5. This is done by editing the EEProm on the Raspberry Pi 5 using the `rpi-eeprom-config` command.
-
-```bash
-sudo rpi-eeprom-config -e
-```
-
-The add the following line to the file:
-
-```bash
-BOOT_ORDER=0xf416
-```
-
-Then save the file and reboot the Raspberry Pi 5.
-
----
-
 ## How to install Raspberry Pi OS on an NVMe drive
 
 This guide assumes you have a Raspberry Pi, a Pimroni NVMe Base and a NVMe drive. The Raspberry Pi 5 is already running Raspberry Pi OS via an SD Card.
@@ -138,6 +120,24 @@ Next we need to install Raspberry Pi OS on the NVMe drive. This is done by using
 1. Once the Raspberry Pi Imager has finished writing the image to the NVMe drive, turn the Raspberry Pi off by pressing the on/off button
 
 1. Finally Remove the SD Card from the Raspberry Pi 5 and reboot the Raspberry Pi 5
+
+---
+
+## How to boot a Raspberry Pi 5 from NVMe
+
+Next we need to change the boot order of our Raspberry Pi 5. This is done by editing the EEProm on the Raspberry Pi 5 using the `rpi-eeprom-config` command.
+
+```bash
+sudo rpi-eeprom-config -e
+```
+
+The add the following line to the file:
+
+```bash
+BOOT_ORDER=0xf416
+```
+
+Then save the file and reboot the Raspberry Pi 5.
 
 ---
 
@@ -180,6 +180,12 @@ Next we need to install Raspberry Pi OS on the NVMe drive. This is done by using
     directory mask = 0777
     Public = yes
     Guest ok = yes
+    ```
+
+1. Add a Samba user
+
+    ```bash
+    sudo smbpasswd -a pi
     ```
 
 1. Restart Samba
