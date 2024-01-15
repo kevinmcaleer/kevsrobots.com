@@ -16,6 +16,8 @@ tags:
     - Raspberry Pi
     - Samba
     - NVMe
+videos:
+    - ZpWuKFOMV-I
 ---
 
 ## Overview
