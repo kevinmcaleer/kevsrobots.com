@@ -1,0 +1,25 @@
+<div class="container-fluid bg-ocre rounded-1 mt-3 p-3">
+    <h5>Random Robot Fact</h5>
+    <div id="random-fact" class="">Loading fact...</div>
+</div>  
+<script>
+
+function fetchRandomFact() {
+    fetch('https://facts.kevsrobots.com/random-fact')
+    // fetch('http://192.168.1.7:8003/random-fact')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('random-fact').innerText = data.fact;
+        })
+        .catch(error => {
+            console.error('Error fetching the random fact:', error);
+            document.getElementById('random-fact').innerText = 'Failed to load fact.';
+        });
+}
+fetchRandomFact();
+</script>
