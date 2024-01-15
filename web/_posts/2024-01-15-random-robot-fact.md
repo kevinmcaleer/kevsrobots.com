@@ -63,7 +63,7 @@ Our collection of robot facts covers a wide range of topics, from the history of
 
 These are just a few examples of the exciting facts you can uncover with our `Random Robot Facts.`
 
-Here's one to whet your appetite:
+Here's one to whet your appetite (hit refresh to see another)):
 
 {% include random_fact.html %}
 
