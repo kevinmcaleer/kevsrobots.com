@@ -6,7 +6,7 @@ layout: project
 date: 2024-01-13
 cover: /assets/img/blog/nvme/nvme.jpg
 excerpt: >-
-    
+    In this article we'll take a quick look at what NVMe is all about, and how to install an NVMe drive on a Raspberry Pi 5.
 author: Kevin McAleer
 difficulty: beginner
 groups:
