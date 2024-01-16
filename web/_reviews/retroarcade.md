@@ -2,12 +2,15 @@
 layout: review
 title: Elecfreaks microbit Retro Arcade
 author: Kevin McAleer
-date: 23-07-02
+date: 2023-07-02
 excerpt: >-
     an exciting and interactive educational kit designed to help you explore programming and electronics while having fun with classic arcade games
 cover: /assets/img/blog/retroarcade/retroarcade.jpg
 link: https://shop.elecfreaks.com/products/micro-bit-retro-programming-arcade
 rating: 3.8
+transparency: 
+ - 🎁
+ - 🤝
 ---
 
 ## 👍 Recommendation

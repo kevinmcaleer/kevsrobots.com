@@ -2,7 +2,7 @@
 layout: review
 title: title
 author: Kevin McAleer
-date: 23-02-12
+date: 2023-02-12
 excerpt: 
 cover: /assets/img/reviews/bittle.jpg
 link: https://amzn.to/3XqFiKc

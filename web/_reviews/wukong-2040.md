@@ -2,12 +2,15 @@
 layout: review
 title: Wukong 2040
 author: Kevin McAleer
-date: 04-03-2023
+date: 2023-04-03
 excerpt: >-
     This 18650 battery powered board is great value for money, and is jam packed full of features; ideal for small robot projects.
 cover: /assets/img/reviews/wukong_review.jpg
 link: https://shop.elecfreaks.com/products/elecfreaks-wukong2040-expansion-board-adapter-for-raspberry-pi-pico
 rating: 4.2
+transparency: 
+ - 🎁
+ - 🤝
 ---
 
 ## 👍 Recommendation

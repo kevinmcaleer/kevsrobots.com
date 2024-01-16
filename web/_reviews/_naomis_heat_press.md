@@ -2,7 +2,7 @@
 layout: review
 title: Naomi Wu's Heat-Set Insert Tool
 author: Kevin McAleer
-date: 23-09-24
+date: 2023-09-24
 excerpt: 
 cover: /assets/img/reviews/naomis_heat-set_tool.jpg
 link: https://cybernightmarket.com

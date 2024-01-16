@@ -99,3 +99,10 @@ The total score is then rounded to the nearest whole number.
 <h2 class="mt-3">total is {{total | divided_by: 9.0 | round: 1 }}</h2>
 
 <hr />
+<p>
+{% for item in page.transparency %}
+<span>{{item}}</span>
+{% endfor %}
+See the <a href="/reviews/disclaimer">transparency notes</a> for details.
+</p>
+

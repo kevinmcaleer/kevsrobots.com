@@ -1,12 +1,15 @@
 ---
 layout: review
-title: XGO Robot Dog kit from Elecfreaks
+title: XGO Robot Dog kit
 author: Kevin McAleer
-date: 23-06-25
+date: 2023-06-25
 excerpt: Though expensive, this has a solid construction, and is a reliable platform to build exciting projects on.
 cover: /assets/img/reviews/xgo.jpg
 link: https://shop.elecfreaks.com/products/elecfreaks-cm4-xgo-robot-dog-kit-for-raspberry-pi
 rating: 4.0
+transparency: 
+ - 🎁
+ - 🤝
 ---
 
 ## 👍 Recommendation

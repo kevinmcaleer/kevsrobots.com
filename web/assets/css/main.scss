@@ -841,8 +841,12 @@ table .w-30 { width:30%; }
   font-weight: bold;
 }
 
-footer.link {
-  color: white;
+.footer-link {
+  color: white !important;
   text-decoration: none !important;
-
+  display:inline !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap;
+  overflow: hidden !important;
+  
 } 

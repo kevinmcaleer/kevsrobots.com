@@ -2,11 +2,13 @@
 layout: review
 title: Petoi Robot Dog Bittle
 author: Kevin McAleer
-date: 23-02-12
+date: 2023-02-12
 excerpt: A great STEM robot dog for learning and playing
 cover: /assets/img/reviews/bittle.jpg
 link: https://amzn.to/3XqFiKc
 rating: 3.7
+transparency: 
+ - 🎁
 ---
 
 ## 👍 Recommendation

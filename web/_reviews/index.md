@@ -1,7 +1,9 @@
 ---
 layout: content
 title: Reviews
+description: Product Reviews
 thanks: false
+date: 2024-01-15
 ---
 
 {% include nav_robots.html %}

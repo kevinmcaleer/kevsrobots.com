@@ -1,114 +1,161 @@
-<div class="container p-3 sitemap mt-3 bg-secondary  bg-gradient">
-    <div class="row row-cols-1 row-cols-md-6 g-1">
-        <div class="col-md-2 mt-4">
-            <h5 class="">Posts</h5>
+<div class="container-fluid sitemap mt-0 bg-secondary bg-gradient m-0 p-0">
+    <div class="row row-cols-1 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-2 mt-0 pt-0">
+        <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+            <div class="card bg-transparent border-0 h-100">
+                <div class="card-body">
+            <h5>Posts</h5>
             {% assign posts = site.posts %}
-    <ul class="decoration-none nav flex-column">
+    <ul class="decoration-none flex-column m-0 p-0">
         {% for post in posts limit: 5 %}
-        <li class="decoration-none  m-0 p-0"><a class="footer-link px-0 small" href="{{post.url}}">{{ post.title }}</a></li>
+        <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small " href="{{post.url}}">{{ post.title }}</a></li>
         {% endfor %}
-        <hr/>
-        <p><a href="/blog/"><i class="fa-solid fa-newspaper"></i> More Articles >></a></p>
     </ul>
-        </div>
-        <div class="col-md-2 mt-4">
+    </div>
+    <div class="card-footer bg-transparent">
+        <a href="/blog/" class="text-nowrap text-truncate"><i class="fa-solid fa-newspaper"></i> More Articles >></a>
+    </div>        
+    </div>
+    </div>
+        <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+            <div class="card bg-transparent border-0 h-100">
+                <div class="card-body">
             <h5 class="">Robots</h5>
-            <ul class="decoration-none nav flex-column">
-                {% for robot in site.data.robots limit:5 %}
-                <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{robot.link}}">{{robot.name}}</a></li>
+            <ul class="decoration-none flex-column m-0 p-0">
+                {% for robot in site.data.robots | limit:5 %}
+                <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{robot.link}}">{{robot.name}}</a></li>
                 {% endfor %}
                 
                 </ul>
-        <hr/>
-        <p><a href="/robots/"><i class="fa-solid fa-robot"></i> More Robots >></a></p>
-        </div>
-        <div class="col-md-2 mt-4">
-            <h5 class="">Projects</h5>
-            <ul class="decoration-none nav flex-column">
-            {% for project in site.data.projects limit:5 %}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{project.link}}">{{project.name}}</a></li>
-            {% endfor %}
-            </ul>
-            <hr/>
-           
-        <p><a href="/robots/projects"><i class="fa-solid fa-wrench"></i> More Projects >></a></p>
-        </div>
-       
-        
-        <div class="col-md-6 mt-4">
-            <h5 class="">Videos</h5>
-            <ul class="decoration-none nav">
-            {% for video in site.data.youtube limit:5 %}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
-            {% endfor %}
-            </ul>
-            <hr/>
-           
-        <p><a href="/videos"><i class="fa-brands fa-youtube"></i> More videos >></a></p>
+                </div>
+                <div class="card-footer bg-transparent">
+        <a href="/robots/" class="text-nowrap text-truncate"><i class="fa-solid fa-robot"></i> More Robots >></a>
         </div>
     </div>
-    <div class="row row-cols-1 row-cols-md-6">
-        <div class="col-md-2 mt-4">
-            <h5 class="">How it works</h5>
-            <ul class="decoration-none nav flex-column">
-            {% for how_article in site.how_it_works | sort:date | reverse limit:5 %}
-            <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{how_article.url}}">{{how_article.title}}</a></li>
-            {% endfor %}
-            </ul>
-            <hr/>
-        <p><a href="/resources/how_it_works/"><i class="fa-solid fa-square-question"></i> More articles >></a></p>
-        </div>
+    </div>
     
-    <div class="col-md-2 mt-4">
+        <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+            <div class="card bg-transparent border-0 h-100">
+                <div class="card-body ">
+            <h5 class="">Projects</h5>
+            <ul class="decoration-none flex-column m-0 p-0">
+            {% for project in site.data.projects | limit:5 %}
+            <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{project.link}}">{{project.name}}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="card-footer bg-transparent">
+        <a href="/robots/projects" class="text-nowrap text-truncate"><i class="fa-solid fa-wrench"></i> More Projects >></a>
+        </div>
+    </div>
+</div>
+    <div class="col-sm-12 col-md-12 col-lg-6 mt-4">
+        <div class="card bg-transparent h-100 border-0">
+        <div class="card-body">
+        <h5 class="">Videos</h5>
+        <ul class="decoration-none flex-column m-0 p-0">
+        {% for video in site.data.youtube | limit:5 %}
+        <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small text-truncate" href="https://www.youtube.com/watch?v={{video.video_id}}">{{video.title}}</a></li>
+        {% endfor %}
+        </ul>
+        </div>
+        <div class="card-footer bg-transparent">
+        <a href="/videos" class="text-nowrap text-truncate"><i class="fa-brands fa-youtube"></i> More videos >></a>
+        </div>
+        </div>
+    </div>
+</div>  
+<div class="row row-cols-1 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 mt-0 pt-0">
+    <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+        <div class="card bg-transparent border-0 h-100">
+            <div class="card-body">
+            <h5 class="text-nowrap text-truncate m-0 p-0 text-white">How it works</h5>
+            <ul class="decoration-none flex-column m-0 p-0">
+            {% for how_article in site.how_it_works | sort:"date" | reverse | limit:5 %}
+            <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{how_article.url}}">{{how_article.title}}</a></li>
+            {% endfor %}
+            </ul>
+            </div>
+        <div class="card-footer bg-transparent">
+        <a href="/resources/how_it_works/" class="text-nowrap text-truncate"><i class="fa-solid fa-square-question"></i> More articles >></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+        <div class="card bg-transparent h-100 border-0">
+            <div class="card-body">
         <h5 class="">Courses</h5>
-        <ul class="decoration-none nav flex-column">
-        {% for course in site.data.courses | sort:date | reverse limit:5 %}
-        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{course.link}}">{{course.name}}</a></li>
+        <ul class="decoration-none flex-column m-0 p-0">
+        {% for course in site.data.courses | sort:"date" | reverse | limit:5 %}
+        <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{course.link}}">{{course.name}}</a></li>
         {% endfor %}
         </ul>
-        <hr/>
-    <p><a href="/learn/"><i class="fa-solid fa-graduation-cap"></i> More Courses >></a></p>
     </div>
-    <div class="col-md-2 mt-4">
+    <div class="card-footer bg-transparent">
+    <a href="/learn/" class="text-nowrap text-truncate"><i class="fa-solid fa-graduation-cap"></i> More Courses >></a>
+    </div>
+        </div>
+</div>
+    <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+        <div class="card bg-transparent border-0 h-100">
+            <div class="card-body">
         <h5 class="">Reviews</h5>
-        <ul class="decoration-none nav flex-column">
-        {% for review in site.reviews | sort:date | reverse limit:5 %}
-        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{review.url}}">{{review.title}}</a></li>
+        <ul class="decoration-none flex-column m-0 p-0">
+        {% assign reviews = site.reviews | reverse %}
+        {% for review in reviews | limit:5 %}
+        <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{review.url}}">{{review.title}}</a></li>
         {% endfor %}
-        </ul>
-        <hr/>
-    <p><a href="/reviews/"><i class="fa-solid fa-star-sharp"></i> More Reviews >></a></p>
     </div>
-    <div class="col-md-2 mt-4">
+    <div class="card-footer bg-transparent">
+    <a href="/reviews/" class="text-nowrap text-truncate"><i class="fa-solid fa-star-sharp"></i> More Reviews >></a>
+    </div>  
+    </div>
+    </div>
+    <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+        <div class="card bg-transparent border-0 h-100">
+            <div class="card-body">
         <h5 class="">Links</h5>
-        <ul class="decoration-none nav flex-column">
-        {% for link in site.data.links | sort:date | reverse limit:5 %}
-        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{link.link}}">{{link.name}}</a></li>
+        <ul class="decoration-none flex-column m-0 p-0">
+        {% for link in site.data.links | sort:"date" | reverse | limit:5 %}
+        <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{link.link}}">{{link.name}}</a></li>
         {% endfor %}
         </ul>
-        <hr/>
-    <p><a href="/links/"><i class="fa-solid fa-link"></i> More links >></a></p>
     </div>
-    <div class="col-md-2 mt-4">
+    <div class="card-footer bg-transparent">
+    <a href="/links/" class="text-nowrap text-truncate"><i class="fa-solid fa-link"></i> More links >></a>
+    </div>
+    </div>
+</div>
+    <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+        <div class="card bg-transparent border-0 h-100">
+            <div class="card-body">
         <h5 class="">Gear</h5>
-        <ul class="decoration-none nav flex-column">
-        {% for gear in site.data.gear | sort:date | reverse limit:5 %}
-        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{gear.link}}">{{gear.name}}</a></li>
+        <ul class="decoration-none flex-column m-0 p-0">
+        {% assign gears = site.data.gear | reverse %}
+        {% for gear in gears | limit:5 %}
+        <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{gear.link}}">{{gear.name}}</a></li>
         {% endfor %}
         </ul>
-        <hr/>
-    <p><a href="/gear/"><i class="fa-solid fa-hammer"></i> More Gear >></a></p>
     </div>
-    <div class="col-md-2 mt-4">
+    <div class="card-footer bg-transparent">
+    <a href="/gear/" class="text-nowrap text-truncate"><i class="fa-solid fa-hammer"></i> More Gear >></a>
+    </div>
+    </div>
+</div>
+    <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+        <div class="card bg-transparent border-0 h-100">
+            <div class="card-body">
         <h5 class="">Boards</h5>
-        <ul class="decoration-none nav flex-column">
+        <ul class="decoration-none flex-column m-0 p-0">
         {% for board in site.boards | sort:date | reverse limit:5 %}
-        <li class=" decoration-none nav-item m-0 p-0"><a class="footer-link px-0 small" href="{{board.url}}">{{board.title}}</a></li>
+        <li class="text-nowrap text-truncate m-0 p-0 text-white list-unstyled"><a class="footer-link px-0 small" href="{{board.url}}">{{board.title}}</a></li>
         {% endfor %}
-        </ul>
-        <hr/>
-    <p><a href="/resources/boards/"><i class="fa-solid fa-brain-circuit"></i> More Boards >></a></p>
     </div>
+    <div class="card-footer bg-transparent">
+    <a href="/resources/boards/" class="text-nowrap text-truncate"><i class="fa-solid fa-brain-circuit"></i> More Boards >></a>
+    </div>
+</div>
+</div>
 </div>
    
 </div>

@@ -2,11 +2,14 @@
 layout: review
 title: Elecfreaks Cutebot
 author: Kevin McAleer
-date: 22-10-30
+date: 2022-10-30
 excerpt: A great robot kit, particularly for the classroom - small, affordable and rich in features.
 cover: /assets/img/reviews/cutebot.jpg
 link: https://amzn.to/3DMG0v4
 rating: 4.2
+transparency: 
+ - 🎁
+ - 🤝
 ---
 
 ## 👍 Recommendation
