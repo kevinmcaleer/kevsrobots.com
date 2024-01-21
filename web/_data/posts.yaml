@@ -65,6 +65,9 @@ posts:
 - title: Pi Stand v6
   url: /2023-02-22-pi-stand-v6.md
   date: 2023-02-22
+- title: Build your own home server with Raspberry Pi 5
+  url: /2024-01-21-build-a-home-server.md
+  date: 2024-01-21
 - title: Stream ESP32CAM video
   url: /2023-12-29-esp32cam-to-python.md
   date: 2023-12-29
@@ -203,6 +206,9 @@ posts:
 - title: PicoCat v2
   url: /2022-03-25-picocat-v2.md
   date: 2022-03-25
+- title: Random Robot Facts
+  url: /2024-01-15-random-robot-fact.md
+  date: 2024-01-15
 - title: Makers Central
   url: /2023-05-22-makers_central.md
   date: 2023-05-22

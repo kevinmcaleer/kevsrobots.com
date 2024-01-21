@@ -1,0 +1,29 @@
+- name: Docker
+  author: Kevin McAleer
+  date_created: 2024-01-21
+  date_published: 2024-01-21
+  layout: course
+  cover: assets/docker.jpg
+  description: >- 
+    Learn how to use Docker to build and deploy applications in a containerised environment.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_what-is-docker.md
+      - 02_installing-docker.md
+  - section:
+      name: "Images and Containers"
+      content:
+      - 03_basics.md
+      - 04_building.md
+      - 05_managing.md
+      - 06_networking.md
+      - 07_volumes.md
+  - section:
+      name: "Docker Compose"
+      content:
+      - 08_docker-compose.md
+      - 09_dockerise.md
+      - 10_conclusion.md
