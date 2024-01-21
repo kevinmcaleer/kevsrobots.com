@@ -9,7 +9,7 @@ excerpt: >-
 author: Kevin McAleer
 difficulty: beginner
 groups:
-    - raspberry-pi
+    - raspberrypi
 tags:
     - Docker
     - Raspberry Pi
