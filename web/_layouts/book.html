@@ -1,0 +1,28 @@
+---
+layout: content
+---
+
+{% include nav_blog.html %}
+
+{% include breadcrumbs.html %}
+
+<h1>{{page.title}}</h1>
+<h2>{{page.description}}</h2>
+
+<p><code>{{page.title}}</code> is a {{page.pages}} page book by {{page.author}}, published in {{page.publish_date}} by {{page.publisher}}.<p>
+<hr />
+<div class="row">
+<div class="col-12 col-md-3">
+    <img src="{{page.cover}}" class="img-fluid w-50 mb-3">
+    <p class="small text-mute">{{page.publish_date}}, {{page.publisher}}<br>
+    {{page.author}}<br>
+    ISBN: {{page.isbn}}</p>
+{% include book_reviews.html %}
+
+</div>
+<div class="col-12 col-md-9">
+
+ 
+    {{content}}
+</div>
+</div>

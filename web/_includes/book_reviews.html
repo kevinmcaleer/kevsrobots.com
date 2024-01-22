@@ -1,0 +1,11 @@
+{% assign books = site.books %}
+
+<div class="bg-light container-fluid rounded-3 p-3">
+<h5>Book Reviews</h5>
+<hr />
+<ul class="nav">
+{% for book in books %}
+<li class="nav-item"><a href="{{book.url}}" class="nav-link">{{book.title}}</a></li>
+{% endfor %}
+</ul>
+</div>

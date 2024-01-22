@@ -54,3 +54,6 @@ collections:
   components:
     output: true
     permalink: /components/:name.html
+  books:
+    output: true
+    permalink: /books/:name.html
