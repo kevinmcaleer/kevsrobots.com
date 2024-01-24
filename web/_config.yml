@@ -13,7 +13,6 @@ kramdown:
 plugins:
   - jekyll-redirect-from
   # - jekyll-toc
-  - jekyll-feed
 
 webserver_headers:
   - - Access-Control-Allow-Origin
