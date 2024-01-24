@@ -1,7 +1,10 @@
 ---
 layout: content
 title: YouTube Videos
+description: >-
+    A complete list of all the shows, including both pre-recorded and live-streamed videos.
 excerpt: All my YouTube Videos
+date: 2024-01-24
 ---
 
 {% include nav_videos.html %}
