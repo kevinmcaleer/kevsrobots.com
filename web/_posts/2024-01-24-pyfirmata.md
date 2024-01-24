@@ -5,7 +5,7 @@ layout: project
 date: 2024-01-24
 author: Kevin McAleer
 excerpt: >-
-    In the world of robotics and DIY electronics, Arduino and Python are two powerful tools that can be combined to create amazing projects. Arduino, an open-source electronics platform, allows us to control various hardware components, while Python provides a flexible and easy-to-use language for programming. But can we harness the power of Python to control an Arduino board?
+    In the world of robotics and DIY electronics, Arduino and Python are two powerful tools that can be combined to create amazing projects.
 cover: /assets/img/blog/pyfirmata/pyfirmata.jpg
 tags:
   - Python
