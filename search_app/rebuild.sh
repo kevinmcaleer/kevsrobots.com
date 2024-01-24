@@ -10,6 +10,6 @@ python3 search/database.py
 time python3 index.py
 
 # run the app
-echo "Running the app"
-uvicorn app:app --reload
+# echo "Running the app"
+# uvicorn app:app --reload
 

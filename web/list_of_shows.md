@@ -1,6 +1,9 @@
 ---
 layout: content
 title: List of Shows
+description: >-
+    A complete list of all the shows, including both pre-recorded and live-streamed videos.
+date: 2024-01-24
 ---
 
 {% include nav_videos.html %}
