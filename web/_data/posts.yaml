@@ -5,6 +5,9 @@ posts:
 - title: Next Cube - a Homage to the original WWW server
   url: /2022-08-28-next-cube.md
   date: 2022-08-28
+- title: Build your own AI Assistant in Python
+  url: /2024-01-23-python-ai.md
+  date: 2024-01-23
 - title: SMARS Mini
   url: /2023-01-22-smars-mini.md
   date: 2023-01-22
@@ -71,6 +74,9 @@ posts:
 - title: Stream ESP32CAM video
   url: /2023-12-29-esp32cam-to-python.md
   date: 2023-12-29
+- title: Face Detection
+  url: /2024-01-24-face-detection-trilobot.md
+  date: 2024-01-21
 - title: SMARS
   url: /2023-09-10-smars.md
   date: 2023-09-10
@@ -140,6 +146,9 @@ posts:
 - title: Rover the Mecanum Robot
   url: /2022-04-30-Rover-mecanum.md
   date: 2022-04-30
+- title: Python and Arduino
+  url: /2024-01-24-pyfirmata.md
+  date: 2024-01-24
 - title: Picotamachibi
   url: /2023-06-12-picotamachibi.md
   date: 2023-06-12
