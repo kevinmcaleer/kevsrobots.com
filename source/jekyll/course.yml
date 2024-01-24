@@ -1,0 +1,27 @@
+- name: Building Websites with Jekyll
+  author: Kevin McAleer
+  date_created: 2024-01-24
+  date_published: 2024-01-24
+  layout: course
+  cover: assets/jekyll.jpg
+  description: >-
+    Learn how to build static websites using Jekyll, from basic setup to advanced features.
+  content:
+  - section:
+      name: Introduction to Jekyll and Static Sites
+      content:
+      - 01_intro.md
+      - 02_install.md
+      - 03_content.md
+      - 04_customizing.md
+  - section:
+      name: Advanced Jekyll
+      content:
+      - 05_advanced.md
+      - 06_deploy.md
+      - 07_realworld.md
+
+  - section:
+      name: Bonus
+      content:
+      - 08_bonus.md

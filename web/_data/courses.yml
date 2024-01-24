@@ -1,4 +1,12 @@
 - author: Kevin McAleer
+  cover: /learn/jekyll/assets/jekyll.jpg
+  date_published: 2024-01-24
+  description: Learn how to build static websites using Jekyll, from basic setup to
+    advanced features.
+  duration: 0h 16m
+  link: /learn/jekyll/01_intro.html
+  name: Building Websites with Jekyll
+- author: Kevin McAleer
   cover: /learn/learn_ros/assets/learn_ros.jpg
   date_published: 2023-01-07
   description: Learning ROS with me, is a course that will teach you how to use ROS2

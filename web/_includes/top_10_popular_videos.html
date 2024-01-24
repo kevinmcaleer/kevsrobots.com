@@ -10,7 +10,7 @@
     
           {% assign video = vids | where: 'video_id', vid.Content | first %}
           {% if video.type != "short" %}
-          <li><a href="{{video.link}}" class="small dotted">{{video.title}}</a></li>
+          <li><a href="https://www.youtube.com/watch?v={{vid.Content}}" class="small dotted">{{video.title}}</a></li>
             
         {% endif %}
         {% endif %}

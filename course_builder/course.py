@@ -110,14 +110,21 @@ class Course():
 
     def read_course(self, course_folder):
         self.course_folder = course_folder
+        course = []
         with open(f'{course_folder}/course.yml', 'r') as stream:
             try:
                 course=yaml.safe_load(stream)
                 name = course[0]['name']
                 print(f'Course manifest loaded for {name}') 
+            except KeyError as exc:
+                print(f'Error loading course manifest: {exc}')
+                return None
             except yaml.YAMLError as exc:
                 print(exc)
         
+        if course == [] or course is None:
+            print(f'Error loading course manifest: {course_folder} is empty')
+            return None
         course = course[0]
         self.author = course['author']
         self.name = course['name']

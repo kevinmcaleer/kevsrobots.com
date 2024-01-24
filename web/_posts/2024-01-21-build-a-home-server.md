@@ -5,7 +5,7 @@ layout: project
 date: 2024-01-21
 cover: /assets/img/blog/homeserver/homeserver.jpg
 excerpt: >-
-    Learn how to set up a home server with Raspberry Pi 5 and Docker.
+    In this guide, we'll focus on turning your Raspberry Pi 5 into a versatile home server & home lab using Docker, a powerful tool for running applications in lightweight containers.
 author: Kevin McAleer
 difficulty: beginner
 groups:
