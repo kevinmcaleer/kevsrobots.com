@@ -253,15 +253,14 @@ h1 {
 }
 
   article {
-    // font-family: 'Lato';
-    font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-    p, li, td {
-      font-size: 13pt !important;
-      color: rgb(113, 113, 113) !important;
-      // strong {
-      //   font-weight: 900; 
-      // }
-    }
+    // font-family: lora !important;
+    //   p, li, td {
+    //   font-size: 14pt !important;
+    //   color: rgb(113, 113, 113) !important;
+    //   strong {
+    //     font-weight: 700; 
+    //   }
+    // }
     h1, h2, h3, h4, h5 {
       font-family: $kev_font, sans-serif;
       text-transform: uppercase;
