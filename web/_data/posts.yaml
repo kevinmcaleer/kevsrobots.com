@@ -77,6 +77,9 @@ posts:
 - title: Face Detection
   url: /2024-01-24-face-detection-trilobot.md
   date: 2024-01-21
+- title: Building an Efficient Web Server Using a Raspberry Pi Pico W and Phew!
+  url: /2024-01-25-picow-webserver.md
+  date: 2024-01-25
 - title: SMARS
   url: /2023-09-10-smars.md
   date: 2023-09-10
