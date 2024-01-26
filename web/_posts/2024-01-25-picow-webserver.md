@@ -6,7 +6,7 @@ layout: project
 date: 2024-01-25
 author: Kevin McAleer
 excerpt: >-
-    Have you ever given thought to building your own website using a Raspberry Pi Pico W, only to pause at the complicated steps or unsatisfactory results? If yes, let's put a halt to that and present a superior alternative, a brilliant tool called Phew! In this blog post, we'll guide on you on using this wonderful web server and templating engine ideally designed for the Raspberry Pi Pico W. So, let's dive right into it!
+    In this blog post, we'll guide on you on using this wonderful web server and templating engine ideally designed for the Raspberry Pi Pico W.
 cover: /assets/img/blog/phew/phew.jpg
 tags:
   - MicroPython
@@ -28,7 +28,7 @@ Hello fellow robot makers! Have you ever given thought to building your own webs
 
 ## The Phew! Web Server
 
-Developed by [Pimoroni](https://shop.pimoroni.com) for their `Enviro` products, Phew! was conceived mainly for creating captive Wi-Fi's robust functioning. This vital tool runs impeccably on Pico W's and practically any other MicroPython board, however, it's customised specifically for the Pico W. Besides offering a sturdy built-in web server, Phew! also provides incredible features such as logging and an intuitive templating system, aiming to make interactive websites building an effortless process.
+Developed by [Pimoroni](https://shop.pimoroni.com) for their `Enviro` products, Phew! was conceived for creating captive Wi-Fi's hotspots and to provide an easy to use web interface when setting up the devices. This vital tool runs impeccably on Pico W's and practically any other MicroPython board, however, it's customised specifically for the Pico W. Besides offering a sturdy built-in web server, Phew! also provides incredible features such as logging and an intuitive templating system, aiming to make interactive websites building an effortless process.
 
 ---
 
