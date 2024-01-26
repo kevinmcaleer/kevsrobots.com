@@ -36,6 +36,22 @@ Developed by [Pimoroni](https://shop.pimoroni.com) for their `Enviro` products, 
 
 With Phew!, templates become a programmer's best friend. They allow you to integrate data from your program dynamically into the web page. A straightforward concept, you merely embed the variable data within 'squiggly brackets' in the template and pass the variables while rendering the template. As a result, you can include the page title, content, or virtually any program data using templates making your development process a breeze!
 
+E.g.
+
+{% raw %}
+    <html>
+        <head>
+            <title>{{ title }}</title>
+        </head>
+        <body>
+            <h1>{{ title }}</h1>
+            <p>{{ content }}</p>
+        </body>
+    </html>
+{% endraw %}
+
+In this example, the title and content are variables that are passed to the template when rendering it. The template engine replaces the variables with the actual values, resulting in a complete web page.
+
 ---
 
 ## Multi-Part Web Pages
