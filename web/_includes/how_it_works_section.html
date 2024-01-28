@@ -1,14 +1,14 @@
 <div class="container-fluid bg-ocre rounded-1 mb-3 pb-3 m-0 p-0 pt-3" style="background-image: url('/assets/img/how_it_works_background.jpg');">
     
 <div class="row row-sm-column-reverse m-0 p-0 row-cols-2">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-9">
     {% assign articles = site.how_it_works | sort:date| reverse  %}
-    <div class="row row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 g-3">
-    {% for article in articles | limit:5 %}
+    <div class="row row-cols-3 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3">
+    {% for article in articles | limit:4 %}
     {% if article.title != 'How it Works' %}
     <div class="col">
         <a href="{{article.url}}" class="text-decoration-none">
-        <div class="card border-0 shadow-lg h-100">
+        <div class="card border-0 card-hover shadow-hover h-100 ">
         <img class="card-img-top black" src="{{article.cover}}" alt="{{article.title}}">
         <div class="card-body">
         <h5 class="card-title black">{{article.short_title}}</h5>    
@@ -21,7 +21,7 @@
     {% endfor %}
     </div>
 </div>
-<div class="col-12 col-md-6 d-flex flex-column align-self-center h-100">
+<div class="col-12 col-md-3 d-flex flex-column align-self-center h-100">
     <div class="d-flex flex-column align-self-center h-100">
     <h1 class="text-white">How it works</h1>
     <h5 class="text-white">Learn how common things work</h5>

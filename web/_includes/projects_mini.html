@@ -1,12 +1,12 @@
 
 {% assign articles = site.data.projects  %}
 
-<div class="row row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 g-3">
+<div class="row row-cols-3 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3">
 
-{% for article in articles | limit:4 %}
+{% for article in articles | limit:3 %}
 {% if article.title != 'Projects' %}
 <div class="col">
-<div class="card border-0 shadow-lg">
+<div class="card border-0 shadow-hover card-hover">
     <a href="{{article.link}}" class=""><img class="img-fluid w-100 rounded-2" src="{{article.cover}}" alt="{{article.name}}">
     <div class="card-img-overlay m-0 p-0">
         <h6 class="btn btn-overlay btn-sm align-bottom w-100">{{article.name}}</h6>

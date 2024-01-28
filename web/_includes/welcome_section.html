@@ -31,7 +31,7 @@
                         {% for blog in blogs | limit:1 %}
                         <a href="{{blog.url}}" class="text-decoration-none text-white">
                         <p class="small">Latest Blog Article > </p>
-                        <img src="{{blog.cover}}" class="img-fluid w-100 rounded-1" alt="The cover image for {{blog.title}}">
+                        <img src="{{blog.cover}}" class="img-fluid w-100 rounded-1 card-hover shadow-hover" alt="The cover image for {{blog.title}}">
                         </a>
                         {% endfor %}
                     </div>
@@ -42,7 +42,7 @@
                         {% for vid in vids | limit:1 %}
                         <a href="https://www.youtube.com/watch?v={{vid.video_id}}" class="text-decoration-none text-black">
                         <p class="small">Latest YouTube Video ></p>
-                        <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2" alt="YouTube thumbnail for {{vid.title}}">
+                        <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2 card-hover shadow-hover" alt="YouTube thumbnail for {{vid.title}}">
                         </a>
                         {% endfor %}
                     </div>
@@ -55,7 +55,7 @@
                         {% for robot in robots | limit:1 %}
                         <a href="{{robot.link}}" class="text-decoration-none text-white">
                         <p>Latest Robot ></p>
-                        <img src="{{robot.cover}}" class="img-fluid rounded-1" alt="Robot cover image for {{robot.title}}">
+                        <img src="{{robot.cover}}" class="img-fluid rounded-1 shadow-hover card-hover" alt="Robot cover image for {{robot.title}}">
                         </a>
                         {% endfor %} 
                     </div>
@@ -66,7 +66,7 @@
                         {% for project in projects | limit:1 %}
                         <a href="{{project.link}}" class="text-decoration-none text-white">
                         <p>Latest Projects ></p>
-                        <img src="{{project.cover}}" class="img-fluid rounded-1" alt="Project cover image for {{project.name}}">
+                        <img src="{{project.cover}}" class="img-fluid rounded-1 shadow-hover card-hover" alt="Project cover image for {{project.name}}">
                         </a>
                         {% endfor %} 
                     </div>

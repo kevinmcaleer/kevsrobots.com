@@ -1,10 +1,10 @@
 {% assign courses = site.data.courses | sort: 'date_published' | reverse  %}
 
-<div class="row row-cols-lg-2 row-cols-sm-2 row-cols-md-2 g-3 m-0">
-{% for course in courses | sort: 'date_published' | reverse | limit: 4 %}
+<div class="row row-cols-lg-3 row-cols-sm-3 row-cols-md-3 g-3 m-0">
+{% for course in courses | sort: 'date_published' | reverse | limit: 3 %}
 {{couse.date_published}}
 <div class="col-6">
-    <div class="card w-100">
+    <div class="card w-100 shadow-hover card-hover">
         <a href="{{course.link}}" class="nav-item dotted">
             <img src="{{course.cover}}" class="img-fluid w-100 rounded-2" alt="{{course.title}}">
             <div class="card-img-overlay rounded-2 m-0 p-0">

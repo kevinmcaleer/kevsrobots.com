@@ -3,8 +3,10 @@ title: Overview
 description: An introductory overview of the Docker for Beginners course.
 layout: lesson
 type: page
-
+cover: /learn/docker/assets/docker.jpg
 ---
+
+![Docker cover artwork](/learn/docker/assets/docker.jpg){:class="cover"}
 
 ## Welcome to the Docker for Beginners Course
 

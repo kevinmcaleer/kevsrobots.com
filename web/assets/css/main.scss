@@ -128,6 +128,25 @@ nav {
     color: black;
   }
 
+.shadow-hover {
+    transition: box-shadow 0.3s ease-in-out; /* Transition effect for the shadow */
+}
+
+/* Custom CSS for hover effect */
+.shadow-hover:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5); /* Bootstrap's standard shadow */
+}
+
+/* Custom CSS for hover effect with transition */
+.card-hover {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Transition effect for the transform and shadow */
+}
+
+.card-hover:hover {
+  transform: scale(1.05); /* Slightly increase the size of the card */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Optional: Add shadow for emphasis */
+}
+
 .text-black {
   color: black;
 }
@@ -253,14 +272,14 @@ h1 {
 }
 
   article {
-    // font-family: lora !important;
-    //   p, li, td {
-    //   font-size: 14pt !important;
-    //   color: rgb(113, 113, 113) !important;
-    //   strong {
-    //     font-weight: 700; 
-    //   }
-    // }
+    p {font-family: lora !important;
+      p, li, td {
+      font-size: 16pt !important;
+      color: rgb(113, 113, 113) !important;
+      strong {
+        font-weight: 700; 
+      }
+    }}
     h1, h2, h3, h4, h5 {
       font-family: $kev_font, sans-serif;
       text-transform: uppercase;

@@ -7,6 +7,14 @@
   link: /learn/jekyll/01_intro.html
   name: Building Websites with Jekyll
 - author: Kevin McAleer
+  cover: /learn/docker/assets/docker.jpg
+  date_published: 2024-01-21
+  description: Learn how to use Docker to build and deploy applications in a containerised
+    environment.
+  duration: 0h 22m
+  link: /learn/docker/00_intro.html
+  name: Docker
+- author: Kevin McAleer
   cover: /learn/learn_ros/assets/learn_ros.jpg
   date_published: 2023-01-07
   description: Learning ROS with me, is a course that will teach you how to use ROS2
