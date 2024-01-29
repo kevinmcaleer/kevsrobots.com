@@ -209,6 +209,9 @@ posts:
 - title: Viam SLAM
   url: /2024-01-02-viam-slam.md
   date: 2024-01-02
+- title: Untitled
+  url: /2024-01-28-retropie.md
+  date: 2024-01-28
 - title: Servo Easing & Pancake-Bot
   url: /2023-02-18-servo-easing-with-pancake-bot.md
   date: 2023-02-18
@@ -233,6 +236,9 @@ posts:
 - title: Iskarni Hack
   url: /2023-04-08-ikea-lamp-hack.md
   date: 2023-04-09
+- title: null
+  url: /2024-01-28-ollama.md
+  date: 2024-01-28
 - title: Tags
   url: /2023-09-18-tags.md
   date: 2023-09-17

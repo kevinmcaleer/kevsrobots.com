@@ -1,12 +1,13 @@
 ---
-title: Building an Efficient Web Server Using a Raspberry Pi Pico W and Phew!
+title: Build a Web Server Using a Raspberry Pi Pico W and Phew!
 description: >-
     Explore Phew! today and revolutionize your web server building experience with a little help from Raspberry Pi Pico W.
 layout: project
 date: 2024-01-25
 author: Kevin McAleer
+difficulty: beginner
 excerpt: >-
-    In this blog post, we'll guide on you on using this wonderful web server and templating engine ideally designed for the Raspberry Pi Pico W.
+    Learn how to build a web server and templating engine using a Raspberry Pi Pico W.
 cover: /assets/img/blog/phew/phew.jpg
 tags:
   - MicroPython
