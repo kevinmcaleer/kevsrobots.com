@@ -1,0 +1,125 @@
+- author: Kevin McAleer
+  cover: /assets/img/reviews/cutebot.jpg
+  date: 2022-10-30
+  excerpt: A great robot kit, particularly for the classroom - small, affordable and
+    rich in features.
+  layout: review
+  link: https://amzn.to/3DMG0v4
+  rating: 4.2
+  title: Elecfreaks Cutebot
+  transparency:
+  - "\U0001F381"
+  - "\U0001F91D"
+- author: Kevin McAleer
+  cover: /assets/img/reviews/bittle.jpg
+  date: 2023-02-12
+  excerpt: null
+  layout: review
+  link: https://amzn.to/3XqFiKc
+  rating: 0
+  title: title
+- author: Kevin McAleer
+  cover: /assets/img/reviews/wukong_review.jpg
+  date: 2023-04-03
+  excerpt: This 18650 battery powered board is great value for money, and is jam packed
+    full of features; ideal for small robot projects.
+  layout: review
+  link: https://shop.elecfreaks.com/products/elecfreaks-wukong2040-expansion-board-adapter-for-raspberry-pi-pico
+  rating: 4.2
+  title: Wukong 2040
+  transparency:
+  - "\U0001F381"
+  - "\U0001F91D"
+- author: Kevin McAleer
+  cover: /assets/img/reviews/bittle.jpg
+  date: 2023-02-12
+  excerpt: A great STEM robot dog for learning and playing
+  layout: review
+  link: https://amzn.to/3XqFiKc
+  rating: 3.7
+  title: Petoi Robot Dog Bittle
+  transparency:
+  - "\U0001F381"
+- author: Kevin McAleer
+  cover: /assets/img/reviews/pimoroni_nvme_base.jpg
+  date: 2024-01-15
+  excerpt: If you're looking for a superfast NVMe board with Gen 3 capabalities, then
+    this is the board for you. It's a great price, and has a host of features.
+  layout: review
+  link: https://www.pimoroni.com/nvmebase
+  rating: 4.6
+  title: Pimoroni NVMe Base
+  transparency:
+  - "\U0001F381"
+  - "\U0001F91D"
+- author: Kevin McAleer
+  cover: /assets/img/reviews/cutebotpro.jpg
+  date: 2023-09-17
+  excerpt: Several great improvements over the original Cutebot
+  layout: review
+  link: null
+  rating: 4.2
+  title: Elecfreaks Cutebot Pro
+- author: Kevin McAleer
+  cover: /assets/img/reviews/inventor2040w.jpg
+  date: 2022-09-05
+  excerpt: Buy if you can. This is a great board, packed full of features including
+    2 micro metal motor encoder connectors, speaker output, and built-in Raspberry
+    Pi Pico W providing wireless access.
+  layout: review
+  link: https://www.pimoroni.com/inventor2040w
+  rating: 5
+  title: Pimoroni Inventor 2040 W
+  transparency:
+  - "\U0001F381"
+  - "\U0001F91D"
+- author: Kevin McAleer
+  cover: /assets/img/reviews/raspberrypi4_review.jpg
+  date: 2022-09-04
+  excerpt: This is very much a buy recommendation. If you can afford it, go for the
+    4Gb or 8Gb version. Also don't cheap out on the SD Card; buy a quality memory
+    card such as Sandisk.
+  layout: review
+  link: https://amzn.to/3wvFeyj
+  rating: 4.3
+  title: Raspberry Pi 4 2G
+  transparency:
+  - "\U0001F381"
+  - "\U0001F91D"
+- date: 2024-01-15
+  description: Product Reviews
+  layout: content
+  thanks: false
+  title: Reviews
+- author: Kevin McAleer
+  cover: /assets/img/blog/retroarcade/retroarcade.jpg
+  date: 2023-07-02
+  excerpt: an exciting and interactive educational kit designed to help you explore
+    programming and electronics while having fun with classic arcade games
+  layout: review
+  link: https://shop.elecfreaks.com/products/micro-bit-retro-programming-arcade
+  rating: 3.8
+  title: Elecfreaks microbit Retro Arcade
+  transparency:
+  - "\U0001F381"
+  - "\U0001F91D"
+- author: Kevin McAleer
+  cover: /assets/img/reviews/naomis_heat-set_tool.jpg
+  date: 2023-09-24
+  excerpt: null
+  layout: review
+  link: https://cybernightmarket.com
+  rating: 0
+  title: Naomi Wu's Heat-Set Insert Tool
+- author: Kevin McAleer
+  cover: /assets/img/reviews/xgo.jpg
+  date: 2023-06-25
+  excerpt: Though expensive, this has a solid construction, and is a reliable platform
+    to build exciting projects on.
+  layout: review
+  link: https://shop.elecfreaks.com/products/elecfreaks-cm4-xgo-robot-dog-kit-for-raspberry-pi
+  rating: 4.0
+  title: XGO Robot Dog kit
+  transparency:
+  - "\U0001F381"
+  - "\U0001F91D"

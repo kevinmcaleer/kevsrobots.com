@@ -10,6 +10,63 @@
 <h2>All the videos created in {{current_year}}</h2>
 <p>Also includes the number of robots, projects and articles were produced each month too.</p>
 <hr>
+<div class="row row-cols-md-3 row-cols-lg-6 row-cols-2 g-3">
+    <div class="col">
+    <div class="card shadow-lg rounded-3 border-0">
+        <img src="/assets/img/robots_{{current_year}}.png" class="img_card_top">
+        
+        <div class="card-body">
+            <h5>Robots</h5>
+        </div>
+    </div>
+    </div>
+    <div class="col">
+        <div class="card shadow-lg rounded-3 border-0">
+            <img src="/assets/img/projects_{{current_year}}.png" class="img_card_top">
+            
+            <div class="card-body">
+                <h5>Projects</h5>
+            </div>
+        </div>
+        </div>
+        <div class="col">
+            <div class="card shadow-lg rounded-3 border-0">
+                <img src="/assets/img/videos_{{current_year}}.png" class="img_card_top">
+                
+                <div class="card-body">
+                    <h5>Videos</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow-lg rounded-3 border-0">
+                <img src="/assets/img/posts_{{current_year}}.png" class="img_card_top">
+                
+                <div class="card-body">
+                    <h5>Posts</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow-lg rounded-3 border-0">
+                <img src="/assets/img/course_{{current_year}}.png" class="img_card_top">
+                
+                <div class="card-body">
+                    <h5>Courses</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow-lg rounded-3 border-0">
+                <img src="/assets/img/reviews_{{current_year}}.png" class="img_card_top">
+                
+                <div class="card-body">
+                    <h5>Reviews</h5>
+                </div>
+            </div>
+        </div>
+</div>
+
 {% for month in (1..12) %}
 <div class="container-fluid bg-light my-3 rounded-3">
     {% assign month_padded = month | prepend: '0' | slice: -2, 2 %}
