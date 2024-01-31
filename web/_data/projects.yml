@@ -1,3 +1,18 @@
+- name: OLLAMA - Local ChatGPT on Pi 5
+  link: /blog/ollama
+  cover: https://www.kevsrobots.com/assets/img/blog/ollama/ollama.jpg
+  description: Creating a Private and Local GPT Server with Raspberry Pi and Olama
+  date: 2024-01-29
+- name: Raspberry pi 5 NAS
+  link: /blog/raspberry-pi-5-nvme
+  cover: /assets/img/blog/nvme/nvme.jpg
+  description: Learn how to install an NVMe drive on a Raspberry Pi 5 and setup a NAS server.
+  date: 2024-01-13
+- name: HomeLab
+  link: /blog/build-a-home-server
+  cover: /assets/img/blog/homeserver/homeserver.jpg
+  description: Learn how to set up a home server with Raspberry Pi 5 and Docker.
+  date: 2024-01-21
 - name: SLAM with Viam
   link: /blog/viam-slam
   cover: /assets/img/blog/viam_slam/viam_slam.jpg
