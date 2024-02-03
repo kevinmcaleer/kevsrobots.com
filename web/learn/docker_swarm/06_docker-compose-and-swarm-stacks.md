@@ -156,7 +156,6 @@ You may often need to update docker services with the latest version of a contai
 - **Force Pull**: If you want to explicitly ensure that Docker Swarm pulls the image on each node, you can use the --with-registry-auth flag to pass registry authentication credentials to the Swarm nodes. This is particularly useful if your image is stored in a private registry that requires authentication.
 
   ```bash
-
   docker service update --image 192.168.2.1:5000/kevsrobots:latest --with-registry-auth kevsrobots
   ```
 
@@ -164,7 +163,6 @@ You may often need to update docker services with the latest version of a contai
 
   ```bash
   docker service update --image 192.168.2.1:5000/kevsrobots:latest --update-parallelism 1 --update-delay 10s kevsrobots
-
   ```
 
 - **Rollback Strategy**: It's also a good practice to configure a rollback strategy in case the new version of the image introduces issues.
