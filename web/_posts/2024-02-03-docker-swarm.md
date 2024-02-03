@@ -140,6 +140,8 @@ The final step is to deploy and manage scalable microservices applications on th
 
 To deploy and manage scalable microservices applications on the Docker Swarm cluster, you will need to create a `Docker Compose` file that describes the services in the microservices application, and then use the `docker stack` command to deploy the services to the Docker Swarm cluster.
 
+I've created a couple of docker-compose files that I use to host kevsrobots.com, and you can use these as a starting point for your own projectsl clone <https://www.github.com/kevinmcaleer/ClusteredPi/> and look in the Stack folder for the files.
+
 ---
 
 ## Conclusion
