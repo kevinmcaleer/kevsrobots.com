@@ -79,11 +79,10 @@ Docker can be installed on various Linux distributions. Here’s a general guide
 
 The script below can be used to install Docker on a Raspberry Pi and configure it to run without sudo. This is useful for running Docker commands as a non-root user.
 
+**Note** - use the `sudo` command to run the script as a superuser.
+
 ```bash
 #!/bin/bash
-
-# Elevate privileges
-sudo su
 
 # Define list of packages to install
 pkgstoinstall=(libffi-dev libssl-dev python3 python3-pip)
@@ -91,9 +90,6 @@ pkgstoinstall=(libffi-dev libssl-dev python3 python3-pip)
 # Update package cache and install packages
 sudo apt-get update
 sudo apt-get install -y "${pkgstoinstall[@]}"
-
-# Remove the Python-configparser package
-sudo apt-get remove -y python-configparser
 
 # Download Docker convenience script if it doesn't exist
 if [ ! -f /home/pi/get-docker.sh ]; then
