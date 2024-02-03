@@ -2,11 +2,14 @@ version: '3.8'
 
 services:
   fastapi-app:
-    image: search:latest  # Use the image from Docker registry
+    image: 192.168.2.1:5000/search/fastapi-app:latest  # Use the full image path including your insecure registry
     ports:
       - "8000:8000"
     environment:
       - PORT=8000
     volumes:
       - .:/usr/src/app
-    
+    deploy:
+      replicas: 4
+      restart_policy:
+        condition: on-failure
