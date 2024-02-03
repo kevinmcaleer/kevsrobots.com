@@ -17,7 +17,7 @@ navigation:
 - content:
   - section: Introduction
     content:
-    - name: Introduction to Docker Swarm on Raspberry Pi 5
+    - name: Docker Swarm on Raspberry Pi 5
       link: 00_intro.html
   - section: Building the Cluster
     content:
