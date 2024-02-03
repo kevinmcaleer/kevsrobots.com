@@ -71,6 +71,59 @@ Swarm Stacks are similar to Docker Compose but are specifically designed for man
 
 ---
 
+## How to update a docker service to the latest version
+
+You may often need to update docker services with the latest version of a container. One of quirks of docker is that it does not automatically update the containers to the latest version, when you do `docker service update <SERVICENAME>`. You need to follow the process below, in this example a service called `kevsrobots` is updated to the latest version.
+
+1. Build (or Rebuild) and tag the image
+
+   ```bash
+   docker build -t 192.168.2.1:5000/kevsrobots:latest .
+   ```
+
+1. Push the image
+   After rebuilding your image, tag it (even if you're reusing the latest tag) and push it to the registry. 
+
+    ```bash
+   
+    docker push 192.168.2.1:5000/kevsrobots:latest
+    ```
+
+1. Update the Service
+   To update the service and force all nodes to pull the latest image, use the --image flag with the docker service update command, specifying the full image name, including the tag:
+
+    ```bash
+    docker service update --image 192.168.2.1:5000/kevsrobots:latest kevsrobots
+    ```
+
+---
+
+## Additional Tips
+
+- **Force Pull**: If you want to explicitly ensure that Docker Swarm pulls the image on each node, you can use the --with-registry-auth flag to pass registry authentication credentials to the Swarm nodes. This is particularly useful if your image is stored in a private registry that requires authentication.
+
+  ```bash
+
+  docker service update --image 192.168.2.1:5000/kevsrobots:latest --with-registry-auth kevsrobots
+  ```
+
+- **No Downtime**: Ensure you have configured the service with an appropriate update policy to achieve zero downtime deployments. You can set parameters like --update-parallelism and --update-delay to control the rollout of the update across the service's tasks.
+
+  ```bash
+  docker service update --image 192.168.2.1:5000/kevsrobots:latest --update-parallelism 1 --update-delay 10s kevsrobots
+
+  ```
+
+- **Rollback Strategy**: It's also a good practice to configure a rollback strategy in case the new version of the image introduces issues.
+
+  ```bash
+  docker service update --image 192.168.2.1:5000/kevsrobots:latest --rollback-parallelism 1 --rollback-delay 10s kevsrobots
+  ```
+
+By following these steps, you can ensure that all nodes in your Docker Swarm pull and use the latest version of your image, maintaining the consistency of your deployment.
+
+---
+
 ### Summary
 
 Docker Compose and Swarm Stacks provide powerful and flexible tools for deploying and managing containerized applications. Understanding when and how to use each tool is crucial for effectively managing your Docker Swarm cluster. By leveraging Docker Stacks, you can take full advantage of Docker Swarm's capabilities for deploying scalable and resilient applications across multiple nodes in your cluster.
