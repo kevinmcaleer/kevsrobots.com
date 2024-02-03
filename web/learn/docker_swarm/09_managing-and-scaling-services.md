@@ -10,7 +10,7 @@ next: 09_rebalancing.html
 description: This lesson covers the essentials of managing and dynamically scaling
   services within your Docker Swarm cluster to meet demand and ensure high availability.
 percent: 60
-duration: 3
+duration: 4
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:
@@ -103,6 +103,30 @@ To update a service, such as changing its image or configuration, you can edit y
    ```
 
    Swarm updates the services based on the changes in the Compose file.
+
+---
+
+### Draining and Removing Services
+
+When you need to remove a service from your stack, you can use the `docker service rm` command. Before removing a service, you may want to drain it to prevent new tasks from being scheduled on it:
+
+- **Drain a Service**: Prevent new tasks from being scheduled on a service with:
+
+  ```sh
+  docker service update --replicas=0 <SERVICE_NAME>
+  ```
+
+- **Remove a Service**: Once the service is drained, remove it from your stack with:
+
+  ```sh
+   docker service rm <SERVICE_NAME>
+   ```
+
+- **Drain a node**: To bring a node down safely, you can drain it to prevent new tasks from being scheduled on it, then remove it from the cluster.
+
+   ```bash
+   docker node update --availability drain <NODE_NAME>
+   ```
 
 ---
 

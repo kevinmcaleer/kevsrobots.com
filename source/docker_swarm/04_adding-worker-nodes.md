@@ -32,6 +32,8 @@ Before adding new Raspberry Pis to your Swarm, ensure they are:
 
    This command will output the complete command to join the Swarm as a worker, including the token.
 
+![Docker Swarm Join Token](/learn/docker_swarm/assets/join.png){:class="img-fluid w-100 shadow-lg rounded"}
+
 1. **Join the Swarm**: On each new Raspberry Pi you wish to add as a worker, execute the join command provided by the manager node:
 
    ```sh

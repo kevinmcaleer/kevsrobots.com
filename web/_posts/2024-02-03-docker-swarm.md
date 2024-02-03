@@ -55,6 +55,8 @@ For a quick refresher on how to install Docker, check out the free [Docker](/lea
 
 The next step is to set up the network for the Docker Swarm cluster. You will need a network switch and a network cable for each Raspberry Pi. Connect each Raspberry Pi to the network switch using a network cable.
 
+![A cluster of 4 Raspberry Pi 5s with cables connected to a switch](/assets/img/blog/docker_swarm/network.jpg){:class="img-fluid w-100 rounded-3 shadow-lg"}
+
 Once you have connected each Raspberry Pi to the network switch, you will need to configure the network settings on each Raspberry Pi. You will need to give each Raspberry Pi a `static` IP address, and configure the network settings to use the same subnet mask and default gateway.
 
 > ## What is a Static IP Address?
@@ -62,12 +64,47 @@ Once you have connected each Raspberry Pi to the network switch, you will need t
 > A `static` IP address is an IP address that is manually assigned to a device, and does not change. A static IP address is used to ensure that a device always has the same IP address, and is often used for devices that need to be accessed over the network.
 >
 > A static IP address is used to ensure that a device always has the same IP address, and is often used for devices that need to be accessed over the network.
+>
+> ## How to setup a static IP address on a Raspberry Pi
+>
+> To set up a static IP address on a Raspberry Pi, you will need to edit the `dhcpcd.conf` file. The `dhcpcd.conf` file is used to configure the network settings on a Raspberry Pi, and can be used to set up a static IP address.
+>
+> To set up a static IP address on a Raspberry Pi, you will need to create a new file called `/etc/systemd/network/10-eth0.network` and add the following lines to the file:
+>
+> ```bash
+> [Match]
+> Name=eth0
+>
+> [Network]
+> Address=192.168.2.1 # or whatever address you want
+> Gateway=192.168.1.254 # or whatever your gateway address is
+> DNS=192.168.1.254 # or whatever your DNS server address is
+> ```
+>
+> Once you have added the lines to the file, you will need to restart the network service with the following command:
+>
+> ```bash
+> sudo systemctl enable systemd-networkd
+> sudo systemctl restart systemd-networkd
+> ```
 
 ---
 
 ## Step 3: Create the Docker Swarm cluster
 
-The next step is to create the Docker Swarm cluster. A Docker Swarm cluster is a group of Docker hosts that run in a cluster mode. To create the Docker Swarm cluster, you will need to run a few commands on the Docker host that you want to use as the `Swarm` manager.
+The next step is to create the Docker Swarm cluster.
+
+A Docker Swarm cluster is a group of Docker hosts that run in a cluster mode. To create the Docker Swarm cluster, you will need to run a few commands on the Docker host that you want to use as the `Swarm` manager.
+
+To initialize the Docker Swarm cluster, you will need to run the following command on the Docker host that you want to use as the Swarm manager:
+
+```bash
+docker swarm init
+```
+
+Notice the join instructions - you can cut and paste these into the other Raspberry Pi's to join them to the cluster.
+
+---
 
 > ## What is a Docker Swarm Manager?
 >

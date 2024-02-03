@@ -10,6 +10,6 @@ services:
     volumes:
       - .:/usr/src/app
     deploy:
-      replicas: 4
+      mode: global
       restart_policy:
         condition: on-failure

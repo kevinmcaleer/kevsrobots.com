@@ -1,4 +1,9 @@
-- name: OLLAMA - Local ChatGPT on Pi 5
+- name: Pi 5 Cluster
+  link: /blog/docker-swarm
+  cover: /assets/img/blog/docker_swarm/docker_swarm.jpg
+  description: Learn how to build a Raspberry Pi 5 Cluster with Docker Swarm
+  date: 2024-02-03
+- name: OLLAMA - Local ChatGPT
   link: /blog/ollama
   cover: https://www.kevsrobots.com/assets/img/blog/ollama/ollama.jpg
   description: Creating a Private and Local GPT Server with Raspberry Pi and Olama

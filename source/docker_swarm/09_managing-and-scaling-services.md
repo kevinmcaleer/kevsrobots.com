@@ -53,6 +53,30 @@ To update a service, such as changing its image or configuration, you can edit y
 
 ---
 
+### Draining and Removing Services
+
+When you need to remove a service from your stack, you can use the `docker service rm` command. Before removing a service, you may want to drain it to prevent new tasks from being scheduled on it:
+
+- **Drain a Service**: Prevent new tasks from being scheduled on a service with:
+
+  ```sh
+  docker service update --replicas=0 <SERVICE_NAME>
+  ```
+
+- **Remove a Service**: Once the service is drained, remove it from your stack with:
+
+  ```sh
+   docker service rm <SERVICE_NAME>
+   ```
+
+- **Drain a node**: To bring a node down safely, you can drain it to prevent new tasks from being scheduled on it, then remove it from the cluster.
+
+   ```bash
+   docker node update --availability drain <NODE_NAME>
+   ```
+
+---
+
 ### Monitoring Service Health
 
 Monitoring is key to managing services effectively. Docker Swarm offers basic monitoring capabilities through service logs and status commands:
