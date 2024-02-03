@@ -38,6 +38,15 @@
   link: /learn/redis/01_introduction.html
   name: Using Redis with Python
 - author: Kevin McAleer
+  cover: /learn/docker_swarm/assets/docker_swarm.jpg
+  date_published: 2024-02-03
+  description: This course guides beginners through the process of setting up a Raspberry
+    Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
+    and scale a mini-computing cluster for various projects.
+  duration: 0h 32m
+  link: /learn/docker_swarm/00_intro.html
+  name: Raspberry Pi 5 Cluster with Docker Swarm
+- author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19
   description: Learn how to 3d print, build and program a SMARS robot

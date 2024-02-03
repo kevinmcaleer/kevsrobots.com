@@ -1,0 +1,40 @@
+- name: Raspberry Pi 5 Cluster with Docker Swarm
+  author: Kevin McAleer
+  date_created: 2024-02-03
+  date_published: 2024-02-03
+  layout: course
+  cover: assets/docker_swarm.jpg
+  description: >-
+    This course guides beginners through the process of setting up a Raspberry Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage, and scale a mini-computing cluster for various projects.
+  content:
+  - section:
+      name: Introduction
+      content:
+      - 00_intro.md
+  - section:
+      name: Building the Cluster
+      content:
+      - 01_planning-the-cluster.md
+      - 02_cloning-raspberry-pi-os.md
+      - 03_initializing-docker-swarm.md
+      - 04_adding-worker-nodes.md
+      - 05_verifying-cluster-setup.md
+  - section:
+      name: Deploying Applications
+      content:
+      - 06_docker-compose-and-swarm-stacks.md
+      - 07_writing-a-docker-compose-file.md
+      - 08_deploying-a-stack.md
+      - 09_managing-and-scaling-services.md
+      - 09_rebalancing.md
+  - section:
+      name: Monitoring and Maintenance
+      content:
+      - 10_monitoring-tools.md
+      - 11_cluster-maintenance.md
+      - 12_backup-and-recovery.md
+  - section:
+      name: Conclusion
+      content:
+      - 13_project-ideas.md
+      - 14_further-resources.md
