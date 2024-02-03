@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  fastapi-app:
+  search-app:
     image: 192.168.2.1:5000/search/fastapi-app:latest  # Use the full image path including your insecure registry
     ports:
       - "8000:8000"
