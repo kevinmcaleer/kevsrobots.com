@@ -94,7 +94,7 @@ This course covers everything from setting up your first Raspberry Pi 5 to deplo
 
 - Basic knowledge of Linux command line.
 - Familiarity with basic networking concepts.
-- Docker introduction course; [available here](/learn/docker).
+- Docker introduction course; [available here](/learn/docker/).
 
 ---
 

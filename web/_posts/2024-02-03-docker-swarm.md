@@ -47,7 +47,7 @@ In this project, we will create a Docker Swarm cluster on Raspberry Pi 5, and de
 
 The first step is to install `Docker` on each Raspberry Pi. Docker is a platform for developing, shipping, and running applications. Docker allows you to package your application and all of its dependencies into a single container that can be run on any Docker host.
 
-For a quick refresher on how to install Docker, check out the free [Docker](/learn/docker) course.
+For a quick refresher on how to install Docker, check out the free [Docker](/learn/docker/) course.
 
 ---
 
