@@ -69,6 +69,14 @@
   link: /learn/smars_code/01_lesson_01.html
   name: Learn how to program SMARS with Arduino
 - author: Kevin McAleer
+  cover: /learn/octapi/assets/octapi.jpg
+  date_published: 2024-02-18
+  description: Learn how to use Crack the Enigma code using a Cluster of Raspberry
+    Pis and Python.
+  duration: 0h 14m
+  link: /learn/octapi/00_intro.html
+  name: OctaPi
+- author: Kevin McAleer
   cover: /learn/sqlite3/assets/database.png
   date_published: 2023-07-15
   description: Learn how to create databases in Python with sqlite3

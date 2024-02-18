@@ -1,0 +1,29 @@
+- name: OctaPi
+  author: Kevin McAleer
+  date_created: 2024-02-18
+  date_published: 2024-02-18
+  layout: course
+  cover: assets/octapi.jpg
+  description: >- 
+    Learn how to use Crack the Enigma code using a Cluster of Raspberry Pis and Python.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Introduction to Enigma
+      content:
+      - 01_lesson01.md
+      - 02_lesson02.md
+  - section:
+      name: Bruteforce attack
+      content:
+      - 03_lesson03.md
+      - 04_lesson04.md
+  - section:
+      name: Build OctaPi
+      content:
+      - 05_dispy.md
+      - 06_octapi.md
+      
