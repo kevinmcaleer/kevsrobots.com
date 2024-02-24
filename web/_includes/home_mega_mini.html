@@ -1,7 +1,7 @@
 {% assign popular_vids = site.data.popular_videos | where: "popular", "true" %}
 {% assign vids = popular_vids | sort: "Views" | reverse %}
 
-<div class="">
+<div class="{{text-col}}">
 <nav class="navbar">
     <div class="container-fluid">
       <span class="navbar-text">
@@ -20,7 +20,7 @@
             <a href="{{vid.link}}" class="nav-item dotted">
                 <img src="https://img.youtube.com/vi/{{vid.Content}}/0.jpg" class="img-fluid w-100 rounded-2" alt="YouTube thumbnail for {{vid.title}}">
             <div class="card-body">
-                <p class="text-date">{{vid.Views}}</p>
+                <p class="text-date">{{vid.Views}} Views</p>
             </div> 
           </a> 
         </div>

@@ -1,15 +1,15 @@
 {% assign crumb = page.url | remove_first: "/" | replace: "/", " " %}
 
-<div class="breadcrumb-area border-0">
+<div class="breadcrumb-area border-0 {% if page.mode=='dark'%}white{% endif%}{% if page.mode =='light'%}black{%endif%}">
   <nav aria-label="breadcrumb bg-light">
   <ol class="breadcrumb my-3 m-0">
     {% assign crumbs = page.url | remove:'/index.html' | split: '/' %}
-    <li class="breadcrumb-item"><a href="/">Home </a></li>
+    <li class="breadcrumb-item"><a href="/" class="{% if page.mode=='dark'%}white{% endif%}{% if page.mode =='light'%}black{%endif%}">Home </a></li>
     {% for crumb in crumbs offset: 1 %}
       {% if forloop.last %}
-        <li class="breadcrumb-item active">{{ page.title | replace:'-',' ' | replace:'_',' ' | remove:'.html' | remove:'.md' | capitalize }}</li>
+        <li class="breadcrumb-item {% if page.mode=='dark'%}white{% endif%}{% if page.mode =='light'%}black{%endif%} active">{{ page.title | replace:'-',' ' | replace:'_',' ' | remove:'.html' | remove:'.md' | capitalize }}</li>
       {% else %}
-        <li class="breadcrumb-item"><a href="{% assign crumb_limit = forloop.index | plus: 1 %}{% for crumb in crumbs limit: crumb_limit %}{{ crumb | append: '/' | replace:'without-plugin/','without-plugins/' }}{% endfor %}">{{ crumb | replace:'-',' ' | replace:'_',' ' | remove:'.html' | capitalize }}</a></li>
+        <li class="breadcrumb-item {% if page.mode=='dark'%}white{% endif%}{% if page.mode =='light'%}black{%endif%}"><a href="{% assign crumb_limit = forloop.index | plus: 1 %}{% for crumb in crumbs limit: crumb_limit %}{{ crumb | append: '/' | replace:'without-plugin/','without-plugins/' }}{% endfor %}">{{ crumb | replace:'-',' ' | replace:'_',' ' | remove:'.html' | capitalize }}</a></li>
       {% endif %}
     {% endfor %}
   </ol>

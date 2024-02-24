@@ -3,6 +3,11 @@
   cover: /assets/img/blog/docker_swarm/docker_swarm.jpg
   description: Learn how to build a Raspberry Pi 5 Cluster with Docker Swarm
   date: 2024-02-03
+- name: "Cracking Enigma with a Raspberry Pi 5 Cluster"
+  link: /blog/enigma
+  cover: /assets/img/blog/enigma/enigma.jpg
+  description: "Cracking Enigma with a Raspberry Pi 5 Cluster"
+  date: 2024-02-18
 - name: OLLAMA - Local ChatGPT
   link: /blog/ollama
   cover: https://www.kevsrobots.com/assets/img/blog/ollama/ollama.jpg

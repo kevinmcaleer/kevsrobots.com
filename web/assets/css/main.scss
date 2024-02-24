@@ -56,7 +56,44 @@ nav {
         color: $kevred;
         text-decoration: none ;
     }
+    
 }
+
+li.breadcrumb-item.black.a {
+  color: black !important;
+  text-decoration: none;
+}
+li.breadcrumb-item.white.a {
+  color: white !important;
+  text-decoration: none;
+}
+
+li.breadcrumb-item.white::before
+{
+  color: white !important;
+  text-decoration: none;
+}
+
+li.breadcrumb-item.black::before
+{
+  color: black !important;
+  text-decoration: none;
+}
+
+li.breadcrumb-item.white {
+  a {
+    color: white !important;
+    text-decoration: none;
+  }
+}
+
+li.breadcrumb-item.black {
+  a {
+    color: black !important;
+    text-decoration: none;
+  }
+}
+
 .breadcrumb-item::before {
     color: $kevred!important;
 }
@@ -860,3 +897,68 @@ table .w-30 { width:30%; }
   overflow: hidden !important;
   
 } 
+
+.showcase {
+  background-image: url({{page.cover}}); 
+  height: 100vh;
+  position: absolute;
+  
+}
+
+.white {
+  color: white !important;
+}
+
+.black {
+  color: black !important;
+}
+
+.blurred-background {
+  backdrop-filter: blur(20px); /* Adjust the blur radius as needed */
+  // background-color: rgba(0, 0, 0, 0.1);
+  
+}
+
+.darken {
+  background-color: rgba(0, 0, 0, 0.1) !important; /* Adjust the background color as needed */
+}
+
+.lighten {
+  background-color: rgba(255, 255, 255, 0.1) !important; /* Adjust the background color as needed */
+}
+
+.darken-2 {
+  background-color: rgba(0, 0, 0, 0.3) !important; /* Adjust the background color as needed */
+
+}
+.darken-3 {
+  background-color: rgba(0, 0, 0, 0.5) !important; /* Adjust the background color as needed */
+}
+
+.lighten-2 {
+  background-color: rgba(255, 255, 255, 0.4) !important; /* Adjust the background color as needed */
+}
+
+.lighten-3 {
+  background-color: rgba(255, 255, 255, 0.5) !important; /* Adjust the background color as needed */
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  // border: 3px solid green;
+  // padding: 10px;
+}
+
+.border-gradient-green {
+  border-image-source: linear-gradient(to left, #00C853, #B2FF59);
+}
+
+.nav-link.white {
+  color: white !important;
+
+}
+
+.nav-link.black {
+  color: black !important;
+}

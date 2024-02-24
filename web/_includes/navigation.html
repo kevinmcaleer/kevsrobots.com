@@ -1,14 +1,27 @@
 {% assign nav = site.data.navigation %}
+
+{% assign logo='/assets/img/logo_red.png'%}
+
+{% if page.mode == 'light' %}
+{% assign textcol='black'%}
+{% assign logo='/assets/img/logo_red.png' %}
+{% endif %}
+
+{% if page.mode == 'dark' %}
+{% assign textcol='white'%}
+{% assign logo='/assets/img/logo_white.png' %}
+{% endif %}
+
 <nav class="navbar navbar-expand-md justify-content-between" id="myNavbar">
     <div class="container-fluid">
-        <div class="navbar-brand mx-3"><a href="/"><img class="logo" src="/assets/img/logo_red.png" alt="The kevsrobots site logo, a graphic of a robot looking at the user combined with the letters K and R"></a></div>
+        <div class="navbar-brand mx-3"><a href="/"><img class="logo" src="{{logo}}" alt="The kevsrobots site logo, a graphic of a robot looking at the user combined with the letters K and R"></a></div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto mb-2 mb-0">
         <li class="nav-item dropdown has-megamenu">
-            <a href="/" class="nav-link" role="button" data-bs-toggle="dropdown"></i> Home</a>
+            <a href="/" class="nav-link {{textcol}}" role="button" data-bs-toggle="dropdown"> Home</a>
             <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
                 <div class="row row-cols-2">
                     <div class="col-12 col-md-2 h-100">
@@ -33,11 +46,11 @@
     </div>
         </li>
         <li class="nav-item">
-            <a href="/ideas/" class="nav-link">Ideas</a>
+            <a href="/ideas/" class="nav-link {{textcol}}">Ideas</a>
 
         </li>
         <li class="nav-item dropdown has-megamenu">
-            <a href="#" class="nav-link dropdown" role="button" data-bs-toggle="dropdown">Robots &amp; Projects</a>
+            <a href="#" class="nav-link {{textcol}} dropdown" role="button" data-bs-toggle="dropdown">Robots &amp; Projects</a>
             <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
                 <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-1 row-cols-sm-2 m-0">
                     <div class="col h-100 p-0">
@@ -113,10 +126,10 @@
               <div>
         </li>
         <li>
-            <a href="/all_videos" class="nav-link" role="button">Videos</a>
+            <a href="/all_videos" class="nav-link {{textcol}}" role="button">Videos</a>
         </li>
         <li class="nav-item has-megamenu"> 
-            <a href="/blog/" class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">Blog</a>
+            <a href="/blog/" class="nav-link  {{textcol}}" role="button" data-bs-toggle="dropdown" aria-expanded="false">Blog</a>
             <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
                 <div class="row row-cols-2">
                 <div class="col-12 col-md-2 h-100">
@@ -143,7 +156,7 @@
         </div>
         </li>
         <li class="nav-item has-megamenu"> 
-            <a href="/learn/" class="nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">Free Courses</a>
+            <a href="/learn/" class="nav-link  {{textcol}}" role="button" data-bs-toggle="dropdown" aria-expanded="false">Free Courses</a>
             <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
                 <div class="row row-cols-2">
                 <div class="col-12 col-md-2 h-100">
@@ -183,16 +196,16 @@
         </div>
         </li>
         <li class="nav-item">
-            <a href="/reviews/" class="nav-link">Reviews</a>
+            <a href="/reviews/" class="nav-link  {{textcol}}">Reviews</a>
         </li>
         <li class="nav-item">
-            <a href="/resources/glossary" class="nav-link">Glossary</a>
+            <a href="/resources/glossary" class="nav-link  {{textcol}}">Glossary</a>
         </li>
         <li class="nav-item">
-            <a href="/resources/how_it_works/" class="nav-link">How it Works</a>
+            <a href="/resources/how_it_works/" class="nav-link  {{textcol}}">How it Works</a>
         </li>
         <li class="nav-item">
-            <a href="/events" class="nav-link">Events</a>
+            <a href="/events" class="nav-link  {{textcol}}">Events</a>
         </li>
     </ul>
    

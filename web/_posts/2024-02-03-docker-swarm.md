@@ -2,20 +2,24 @@
 title: Docker Swarm
 description: >-
     Learn how to build a Docker Swarm cluster on Raspberry Pi 5, and deploy and manage scalable microservices applications.
-layout: project
+layout: showcase
 date: 2024-02-03
 author: Kevin McAleer
 difficulty: intermediate
 excerpt: >-
-
+    Learn how to build a Docker Swarm cluster on Raspberry Pi 5, and deploy and manage scalable microservices applications.
 cover: /assets/img/blog/docker_swarm/docker_swarm.jpg
+hero: /assets/img/blog/docker_swarm/hero.png
 tags:
   - Cluster
   - Docker
+mode: light
 groups:
   - raspberrypi
 videos:
   - tDENgLiJSh0
+code:
+  - https://www.github.com/kevinmcaleer/ClusteredPi
 ---
 
 If you have more than one Raspberry Pi, you can combine the power of all of them to create a `Cluster`. A cluster is a group of computers that work together to solve a problem. In this case, we will use a cluster of Raspberry Pi computers to create a `Docker Swarm` cluster.

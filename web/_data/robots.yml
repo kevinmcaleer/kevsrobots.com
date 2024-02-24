@@ -1,3 +1,8 @@
+- name: GalaxyRVR
+  link: /blog/galaxyrvr.html
+  cover: /assets/img/blog/galaxyrvr/galaxyrvr_review.jpg
+  description: SunFounder GalaxyRVR Review
+  date: 2024/02/24
 - name: Cubie-1 Upgrades
   link: /blog/viam-slam.html
   cover: /assets/img/blog/viam_slam/cubie.jpg

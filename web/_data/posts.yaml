@@ -104,6 +104,9 @@ posts:
 - title: Explora 3D files
   url: /2022-05-16-explora.md
   date: 2022-05-15
+- title: SunFounder GalaxyRVR Review
+  url: /2024-02-24-galaxyrvr.md
+  date: 2024-02-24
 - title: Robotics Roadmap
   url: /2023-03-21-roadmap.md
   date: 2023-03-21
@@ -158,6 +161,9 @@ posts:
 - title: Picotamachibi
   url: /2023-06-12-picotamachibi.md
   date: 2023-06-12
+- title: Ultimate Guide to Setting Up RetroPie on a Raspberry Pi 4
+  url: /2024-01-28-retropie2.md
+  date: 2024-01-28
 - title: Pi-PipBoy
   url: /2023-03-26-pi-pipboy.md
   date: 2023-03-26
@@ -215,9 +221,6 @@ posts:
 - title: Viam SLAM
   url: /2024-01-02-viam-slam.md
   date: 2024-01-02
-- title: Untitled
-  url: /2024-01-28-retropie.md
-  date: 2024-01-28
 - title: Servo Easing & Pancake-Bot
   url: /2023-02-18-servo-easing-with-pancake-bot.md
   date: 2023-02-18

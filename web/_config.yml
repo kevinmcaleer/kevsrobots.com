@@ -57,3 +57,6 @@ collections:
   books:
     output: true
     permalink: /books/:name.html
+  projects:
+    output: true
+    permalink: /projects/:name.html

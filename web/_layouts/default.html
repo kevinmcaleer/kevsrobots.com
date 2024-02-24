@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+{% if page.mode == 'dark' %}
+{% assign bg-col ='bg-dark'%}
+{% endif%}
+
+{% if page.mode == 'light' %}
+{% assign bg-col ='white'%}
+{% endif%}
+
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -23,9 +31,9 @@
         {% include head.html %}
         {% include ads.html %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-
+        
     </head>
-    <body class="p-0 m-0">
+    <body class="p-0 m-0 {{bg-col}}">
         
         {% include top_bar.html %}
         <!-- {% include debug.html %} -->

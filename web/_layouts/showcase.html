@@ -1,0 +1,113 @@
+---
+layout: default
+---
+
+{% if page.mode =='dark' %}
+{% assign textcol='white' %}
+{% assign bg-col= 'bg-dark'%}
+{% endif%}
+
+{% if page.mode =='light' %}
+{% assign textcol='black' %}
+{% assign bg-col= 'bg-light'%}
+{% endif%}
+
+<!-- {% include nav_blog.html %} -->
+<div style="background-image: url('{{ page.cover }}'); background-size: cover; background-position: center; min-height: 100vh;">
+    <!-- All your page content goes here -->
+
+  
+  
+<div class="container p-0 p-3 {{textcol}}">
+    <div class="container m-0 p-0 blurred-background gradient-green {% if page.mode == 'light'%}lighten-3{% endif%}{% if page.mode =='dark'%}darken-3{%endif%} rounded-3">
+        <div class="container p-3 m-3">
+        {% include breadcrumbs.html %}
+       
+        </div>  
+    <div class="row p-0 m-0">
+        <div class="col-6">
+            <div class="container p-3 m-3">
+            <h1 class="{{textcol}}">{{page.title}}</h1>
+            <h2 class="{{textcol}}">{{page.description}}</h2>
+            <br />
+            <br />
+            <br /> 
+            <hr />
+            <i class="fa-regular fa-calendar {{textcol}}"></i> {{page.date | date: "%-d %B %Y" }} | 
+            {% assign reading_time = content | number_of_words %}
+            {% assign minutes = reading_time | divided_by: 200 %}
+            <i class="fa-solid fa-book-open-reader {{textcol}}"></i> {{ minutes | append: " minute read"}}
+            
+            <p class="{{textcol}}">
+                By <i class="fa-regular fa-user"></i> {{ page.author}} | 
+                Share this article on <span class=" {{textcol}}"><a class="{{textcol}}" href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a class="{{textcol}}" href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
+            </p>
+            <i class="fa-solid fa-tags {{textcol}}"></i> &nbsp; Tags: 
+            {% for tag in page.tags %}
+            <a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+            {% endfor %} <br/>
+            <i class="fa-solid fa-code"></i> &nbsp; Difficulty: {{page.difficulty}}<br />
+            <i class="fa-solid fa-list"></i> &nbsp; Category: 
+            {% for category in page.groups %}
+            <a href="/ideas/{{category}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{category}}</span></a>
+            {% endfor %}
+            <br />
+            </div>
+        </div>
+        <div class="col-6">
+            <img src="{{page.hero}}" class="w-100 img-fluid">
+        </div>
+    </div>   
+
+<div class="row {{textcol}} m-0 p-0 g-0">
+<div class="col-12 m-0 p-0">
+    
+    {% if page.videos %}
+    <div class="container-fluid {{bg-col}} m-0 p-3">
+    <div class="container m-0 p-3">
+    <div class="row g-0">
+        <div class="col-6">
+            <h1>Video{%if page.videos.size > 1 %}s{% endif %}</h1>
+            <p>Learn more from {%if page.videos.size > 1 %}these{%else%}this{% endif %} dedicated video{%if page.videos.size > 1 %}s{% endif %}</p>
+        </div>
+        <div class="col-6">
+            <div class="row row-cols-lg-2 row-cols-sm-1 g-1">
+            {% for video in page.videos %}
+            <div class="col">
+                <div class="card">
+                <iframe height="250" src="https://www.youtube.com/embed/{{ video }}" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+    
+    </div>
+    </div>
+    {% endif %}
+    
+    <article>
+    <div class="container-fluid p-3 m-0">
+    {{content}}
+    </div>
+    </article>
+ 
+    {% if page.code %}
+    <div class="container p-3 m-0">
+    <h2>Code</h2>
+    <i class="fa-brands fa-github"></i> <a href="{{page.code}}" class="dotted">View Code Repository on GitHub</a><br />
+    {% endif %}
+    </div>
+    <div class="container py-3 my-3">
+        <hr />
+        {% include related_articles.html %}
+    </div>
+    </div>
+</div>
+</div>
+
+
+</div>
+</div>
