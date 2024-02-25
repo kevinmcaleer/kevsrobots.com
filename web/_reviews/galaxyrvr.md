@@ -7,12 +7,14 @@ excerpt: >-
     A versatile and customizable robot that can be programmed to perform a wide range of tasks, from simple movements to complex behaviors
 cover: /assets/img/reviews/galaxyrvr_review.jpg
 link: https://www.sunfounder.com/collections/arduino-diy-robot/products/sunfounder-galaxyrvr-mars-rover-kit)
-rating: 4.4
+rating: 4.3
+transparency: 
+ - 🎁
 ---
 
 ## 👍 Recommendation
 
-A solid 4.4 out of 5. The SunFounder GalaxyRVR is a versatile and customizable robot that can be programmed to perform a wide range of tasks, from simple movements to complex behaviors. The GalaxyRVR is an excellent choice for anyone who is interested in learning about robotics and programming, and it is suitable for both beginners and experienced enthusiasts. Some extra testing needs to go into making the Wifi connectiion easier to setup, and more reliable.
+A solid {{page.rating}} out of 5. The SunFounder GalaxyRVR is a versatile and customizable robot that can be programmed to perform a wide range of tasks, from simple movements to complex behaviors. The GalaxyRVR is an excellent choice for anyone who is interested in learning about robotics and programming, and it is suitable for both beginners and experienced enthusiasts. Some extra testing needs to go into making the Wifi connectiion easier to setup, and more reliable.
 
 ---
 

@@ -1,8 +1,8 @@
-{% assign reviews = site.reviews | sort: 'date_published' | reverse  %}
+{% assign reviews = site.reviews | sort: 'date' | reverse  %}
 
 <h5>Reviews</h5>
 <ul class="m-0 p-0">
-{% for review in reviews | sort: 'date_published' | reverse %}
+{% for review in reviews | sort: 'date' | reverse %}
 {{couse.date_published}}
 <li class="list-unstyled mt-1"><a href="{{ review.url }}" class="orange small">{{ review.title }}</a></li>
 {% endfor %} 
