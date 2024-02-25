@@ -84,7 +84,10 @@ There is also a free course available for learning about [Docker](/learn/docker/
 {% include card.html img='/learn/docker/assets/docker.jpg' cardtitle='Learn Docker' link='/learn/learning_pathways/docker.html' %}
 </div>
 <div class="col col-md-4">
-{% include card.html img='https://www.clustered-pi.com/assets/img/blog/clustered-pi-zero.jpg' cardtitle='Clustered-Pi' link='https://www.clustered-pi.com' %}
+{% include card.html img='/assets/img/blog/clusteredpi/clusteredpi.jpg' cardtitle='Clustered-Pi' link='https://www.clustered-pi.com' %}
+</div>
+<div class="col col-md-4">
+{% include card.html img='/assets/img/blog/clusteredpi/cover.jpg' cardtitle='How to build a Cluster' link='/blog/clusteredpi' %}
 </div>
 </div>
 

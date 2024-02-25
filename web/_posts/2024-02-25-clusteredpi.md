@@ -8,7 +8,7 @@ author: Kevin McAleer
 difficulty: beginner
 excerpt: >-
     In December 2021 I decided to build a cluster of Raspberry Pi's to learn more about distributed computing and to experiment with Docker Swarm.
-cover: /assets/img/blog/clusteredpi/clusteredpi.jpg
+cover: /assets/img/blog/clusteredpi/cover.jpg
 hero: /assets/img/blog/clusteredpi/hero.png
 mode: light
 tags:
@@ -167,7 +167,7 @@ For Power, I bought some [short 25cm USBA to USB C charger cables](https://amzn.
 
 This Cluster will be running a live website, accessible via the internet, so to ensure its always available I have powered it via an uninterruptable power supply (UPS), I used the [Cyberpower BR1200ELCD BRIC](https://amzn.to/3qo9fMy)
 
-![Chassis](/assets/img/blog/clusteredpi/ups.png){:class="img-fluid w-50"}
+![Chassis](/assets/img/blog/clusteredpi/ups.png){:class="img-fluid w-25"}
 
 Cyberpower UPS: 1200VA/720W, with 6 UK Outlets
 

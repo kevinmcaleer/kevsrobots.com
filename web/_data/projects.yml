@@ -1,3 +1,8 @@
+- name: Clustered-Pi
+  link: /blog/clusteredpi
+  cover: /assets/img/blog/clusteredpi/clusteredpi.jpg
+  description: Learn how to build a Raspberry Pi 4 or Zero Cluster 
+  date: 2024-02-25
 - name: Pi 5 Cluster
   link: /blog/docker-swarm
   cover: /assets/img/blog/docker_swarm/docker_swarm.jpg
