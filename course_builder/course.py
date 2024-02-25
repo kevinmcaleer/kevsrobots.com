@@ -450,7 +450,7 @@ class Course:
         duration = f"{hours}h {minutes}m"
         return duration
 
-    def __str__(self):
+    def __str__(self):  # noqa: F811
             """Return a string representation of the Course object.
 
             Returns:

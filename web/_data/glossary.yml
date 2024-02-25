@@ -632,3 +632,16 @@
     NAS is specialized for serving files either by its hardware, software, or configuration.
   link: https://en.wikipedia.org/wiki/Network-attached_storage
   article: /blog/raspberrypi5-nvme-nas
+- term: Cluster
+  definition: A connected group of Computers
+  full: >-
+    A computer cluster is a set of loosely or tightly connected computers that work together so that, in many respects, they can be viewed as a single system.
+    Unlike grid computers, computer clusters have each node set to perform the same task, controlled and scheduled by software.
+  link: https://en.wikipedia.org/wiki/Computer_cluster
+  article: /resources/how_it_works/clusters
+- term: SSD
+  definition: Solid State Drive
+  full: >-
+    A solid-state drive (SSD) is a solid-state storage device that uses integrated circuit assemblies to store data persistently, typically using flash memory, and functioning as secondary storage in the hierarchy of computer storage.
+  link: https://en.wikipedia.org/wiki/Solid-state_drive
+  article: /blog/raspberrypi5-nvme-nas

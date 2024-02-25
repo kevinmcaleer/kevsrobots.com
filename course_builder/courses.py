@@ -8,7 +8,8 @@ class Courses():
     duration = 0
 
     def __init__(self, data=None):
-        if data: self.course_list = data
+        if data: 
+            self.course_list = data
 
     def read_courses(self, course_folder):
         """ Read all the courses in the course folder """
@@ -52,15 +53,15 @@ class Courses():
         if os.path.exists(f'{self.output_folder}/index.md'):
             os.remove(f'{self.output_folder}/index.md')
             
-        index = f'---' + "\n"
-        index += f'layout: content' + "\n"
-        index += f'title: Learn' + "\n"
-        index += f'description: Take a course and learn something new' + "\n"
+        index = '---' + "\n"
+        index += 'layout: content' + "\n"
+        index += 'title: Learn' + "\n"
+        index += 'description: Take a course and learn something new' + "\n"
         index += f'duration: {self.duration}' + "\n"
-        index += f'---' + "\n\n"
-        index += f'{{% include nav_courses.html %}}' + "\n"
-        index += f'{{% include breadcrumbs.html %}}' + "\n"
-        index += f'{{% include all_courses.html %}}' + "\n"
+        index += '---' + "\n\n"
+        index += '{{% include nav_courses.html %}}' + "\n"
+        index += '{{% include breadcrumbs.html %}}' + "\n"
+        index += '{{% include all_courses.html %}}' + "\n"
         
         with open(f'{self.output_folder}/index.md', 'w') as build_file:
             build_file.writelines(index)
@@ -72,14 +73,14 @@ class Courses():
         if os.path.exists(f'{self.output_folder}/recent.md'):
             os.remove(f'{self.output_folder}/recent.md')
             
-        index = f'---' + "\n"
-        index += f'layout: content' + "\n"
-        index += f'title: Recent Courses' + "\n"
-        index += f'description: Recent Courses' + "\n"
-        index += f'---' + "\n\n"
-        index += f'{{% include nav_courses.html %}}' + "\n"
-        index += f'{{% include breadcrumbs.html %}}' + "\n"
-        index += f'{{% include recent_courses.html %}}' + "\n"
+        index = '---' + "\n"
+        index += 'layout: content' + "\n"
+        index += 'title: Recent Courses' + "\n"
+        index += 'description: Recent Courses' + "\n"
+        index += '---' + "\n\n"
+        index += '{{% include nav_courses.html %}}' + "\n"
+        index += '{{% include breadcrumbs.html %}}' + "\n"
+        index += '{{% include recent_courses.html %}}' + "\n"
 
         with open(f'{self.output_folder}/recent.md', 'w') as build_file:
             build_file.writelines(index)

@@ -24,7 +24,7 @@ code:
 
 If you have more than one Raspberry Pi, you can combine the power of all of them to create a `Cluster`. A cluster is a group of computers that work together to solve a problem. In this case, we will use a cluster of Raspberry Pi computers to create a `Docker Swarm` cluster.
 
-A Docker Swarm cluster is a group of `Docker` hosts that run in a cluster mode. 
+A Docker Swarm cluster is a group of `Docker` hosts that run in a cluster mode.
 
 Clusters can provide high availability and failover, and can be used to spread the workload across many `nodes` in the cluster where each Raspberry Pi is a separate node. This means that you can add more Raspberry Pi computers to the cluster to increase the capacity of the cluster.
 
@@ -150,4 +150,4 @@ I've created a couple of docker-compose files that I use to host kevsrobots.com,
 
 ## Conclusion
 
-In this project, we created a Docker Swarm cluster on Raspberry Pi 5, and deployed and managed scalable microservices applications. We learned how to install Docker on each Raspberry Pi, set up the network for the Docker Swarm cluster, create the Docker Swarm cluster, and deploy and manage scalable microservices applications on the Docker Swarm cluster.
+In this project, we created a Docker Swarm cluster on Raspberry Pi 5, and deployed and managed scalable microservices applications. We learned how to install Docker on each Raspberry Pi, set up the network for the Docker Swarm cluster, create the Docker Swarm cluster, and deploy and manage scalable microservices applications on the Docker Swarm cluster

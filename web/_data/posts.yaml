@@ -128,6 +128,9 @@ posts:
 - title: Zero Stand
   url: /2022-05-15-zero-stand.md
   date: 2022-05-15
+- title: Cracking Enigma with Raspberry Pi
+  url: /2024-02-23-enigma.md
+  date: 2024-02-23
 - title: Worlds most advanced Bauble
   url: /2022-11-14-worlds-most-advanced-bauble.md
   date: 2022-11-06
@@ -149,6 +152,9 @@ posts:
 - title: 3D Papercraft
   url: /2023-12-07-3d_papercraft.md
   date: 2023-12-07
+- title: ClusteredPi
+  url: /2024-02-25-clusteredpi.md
+  date: 2024-02-25
 - title: Atari 2600 Compute Module Case
   url: /2022-12-20-atari-2600.md
   date: 2022-12-20
