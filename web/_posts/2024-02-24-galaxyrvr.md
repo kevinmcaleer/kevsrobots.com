@@ -7,7 +7,7 @@ date: 2024-02-24
 author: Kevin McAleer
 difficulty: beginner
 excerpt: >-
-  This weekend I've been playing with the SunFounder GalaxyRVR, a versatile and customizable robot that can be programmed to perform a wide range of tasks, from simple movements to complex behaviors.
+   A versatile and customizable robot that can be programmed to perform a wide range of tasks
 cover: /assets/img/blog/galaxyrvr/galaxyrvr_review.jpg
 tags:
   - robot

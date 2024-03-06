@@ -2,9 +2,15 @@
 layout: default
 ---
 
+
+
 {% assign group = page.name | replace:".md","" %}
-<div class="px-3 py-0 m-3">
-{% include breadcrumbs.html %}
+<div class="px-3 py-0 mx-3">
+    
+    {% include nav_groups.html %}
+
+    {% include breadcrumbs.html %}
+
 <div class="card text-bg-dark">
     <img src="{{ page.cover }}" class="cover rounded-3 opacity-25" alt="{{ include.title }}">
     <div class="card-img-overlay border-0 rounded-3">
@@ -29,7 +35,7 @@ layout: default
             {% if item.groups contains group %}
             <div class="col">
             <a href="{{item.url}}" class="text-decoration-none">
-            <div class="card border-0 shadow-lg h-100">
+            <div class="card border-0 card-hover shadow-hover h-100">
                 <div class="card-img-top">
                     <img src="{{ item.cover }}" class="card-img-top" alt="{{ item.title }}">
                 </div>

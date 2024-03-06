@@ -2,12 +2,12 @@
 
 <div class="mb-3">
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
     {% for item in groups %}
     
     <div class="col">
         <a href="{{item.url}}" class="text-decoration-none black">
-        <div class="card border-0 shadow-lg h-100">
+        <div class="card border-0 shadow-hover card-hover h-100">
             <img src="{{item.cover}}" class="card-img-top" alt="{{item.title}}">
             <div class="card-body">
                 <p class="card-text">{{item.description}}</p>

@@ -4,6 +4,7 @@ description: Unleash the power of the Pi with these fun projects
 date_published: 2023-10-02
 layout: groups
 cover: /assets/img/groups/raspberry_pi.png
+icon: 'fa-brands fa-raspberry-pi'
 ---
 
 # New Raspberry Pi?

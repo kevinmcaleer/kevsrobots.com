@@ -1,0 +1,26 @@
+
+{% assign posts = site.posts %}
+<div class="row row-cols-lg-4 row-cols-2 row-cols-md-2 g-3">
+{% for post in posts %}
+{% if post.layout == 'showcase' %}
+{% assign showcases = showcases | push: post %}
+<div class="col">
+<a href="{{ post.url }}" class="black text-decoration-none">
+<div class="card border-0 card-hover shadow-hover h-100">
+<img src="{{ post.cover }}" class="card-img-top" alt="{{post.title}}">
+<div class="card-body">
+<h5 class="card-title">{{ post.title }}</h5>
+<p class="card-text ">{{ post.excerpt }}</p>
+<div class="row">
+
+<p class="card-text small">{{ post.date | date: "%-d %B %Y"}} by {{ post.author }} </p>
+</div>
+
+</div>
+
+</div>
+</a>
+</div>
+{% endif %}
+{% endfor %}
+</div>

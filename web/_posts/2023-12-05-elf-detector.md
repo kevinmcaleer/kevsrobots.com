@@ -10,7 +10,7 @@ difficulty: Intermediate
 groups:
     - robot
     - micropython
-    - christmas
+    - seasonal
     - raspberrypi
 tags:
     - robots

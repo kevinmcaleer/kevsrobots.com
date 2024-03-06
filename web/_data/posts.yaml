@@ -5,6 +5,9 @@ posts:
 - title: Next Cube - a Homage to the original WWW server
   url: /2022-08-28-next-cube.md
   date: 2022-08-28
+- title: Electric Trombone
+  url: /2024-03-04-electric-trombone.md
+  date: 2024-03-04
 - title: Build your own AI Assistant in Python
   url: /2024-01-23-python-ai.md
   date: 2024-01-23
@@ -32,6 +35,9 @@ posts:
 - title: Pico-Deck
   url: /2023-03-14-picodeck.md
   date: 2023-03-14
+- title: Motion Controlled Arm
+  url: /2024-03-06-motion-controlled-arm.md
+  date: 2024-03-04
 - title: Raspberry Pi 5
   url: /2023-09-27-raspberry_pi_5.md
   date: 2023-09-27
@@ -74,6 +80,9 @@ posts:
 - title: Build your own home server with Raspberry Pi 5
   url: /2024-01-21-build-a-home-server.md
   date: 2024-01-21
+- title: PicoTico
+  url: /2024-03-03-pico-tico.md
+  date: 2024-03-03
 - title: Stream ESP32CAM video
   url: /2023-12-29-esp32cam-to-python.md
   date: 2023-12-29

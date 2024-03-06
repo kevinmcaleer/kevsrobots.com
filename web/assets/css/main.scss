@@ -172,29 +172,34 @@ li.breadcrumb-item.black {
   color: black;
 }
 
+$transition_speed_in: 0.15s;  // Faster transition for hover in
+$transition_speed_out: 0.3s;  // Slower transition for hover out
+$shadow_amount: 0.3;
+
 .shadow-hover {
-  transition: box-shadow 0.3s ease-in-out;
-  /* Transition effect for the shadow */
+  transition: box-shadow $transition_speed_out ease-in-out; // Slower when moving away from the element
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0); // Set an initial transparent shadow
 }
 
-/* Custom CSS for hover effect */
+// Custom CSS for hover effect
 .shadow-hover:hover {
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
-  /* Bootstrap's standard shadow */
+  transition: box-shadow $transition_speed_in ease-in-out; // Faster when hovering over
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, $shadow_amount);
 }
 
-/* Custom CSS for hover effect with transition */
+// Custom CSS for hover effect with transition
 .card-hover {
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  /* Transition effect for the transform and shadow */
+  transition: transform $transition_speed_out ease-in-out, box-shadow $transition_speed_out ease-in-out; // Slower transition when moving away
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0); // Initial state with an invisible shadow
 }
 
 .card-hover:hover {
-  transform: scale(1.05);
-  /* Slightly increase the size of the card */
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  /* Optional: Add shadow for emphasis */
+  transition: transform $transition_speed_in ease-in-out, box-shadow $transition_speed_in ease-in-out; // Faster transition when hovering
+  transform: scale(1.05); // Slightly increase the size
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, $shadow_amount); // Visible shadow
 }
+
+
 
 .text-black {
   color: black;
@@ -1065,6 +1070,10 @@ table .w-30 {
 .lighten-3 {
   background-color: rgba(255, 255, 255, 0.6) !important;
   /* Adjust the background color as needed */
+  .rounded-left {
+    border-top-left-radius: 10px; /* Adjust as needed */
+    border-bottom-left-radius: 10px;
+  }
 }
 
 .center {
@@ -1086,3 +1095,4 @@ table .w-30 {
 .nav-link.black {
   color: black !important;
 }
+

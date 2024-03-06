@@ -22,7 +22,8 @@
         {% endif %}
         <div class="row row-cols-md-1">
             <div class="col">
-                <div class="card my-3 border-0 bg-light">
+                <a href="{{ post.url }}" >
+                <div class="card my-3 border-0 bg-light card-hover shadow-hover">
                     <div class="row g-0">
                         <div class="col-md-4">
                             <a href="{{ post.url }}"><img class="img-fluid rounded-start" src="{{ post.cover }}" alt="{{ post.title }}"></a>
@@ -41,6 +42,7 @@
                         </div>
                     </div>
                 </div>
+            </a>
             </div>
         </div>
     {% endfor %}

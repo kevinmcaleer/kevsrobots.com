@@ -12,10 +12,10 @@ cover: /assets/img/blog/cheerlights/cheerlights.jpg
 tags:
  - Raspberry Pi Pico
  - 3D Printing
- - Christmas
+ - seasonal
  - Cheerlights
 groups:
- - christmas
+ - seasonal
  - 3dprinting
  - pico
 videos:

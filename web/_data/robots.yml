@@ -1,3 +1,8 @@
+- name: PicoTico
+  link: /blog/pico-tico.html
+  cover: /assets/img/blog/picotico/cover.jpg
+  description: A Tic-Tac-Toe playing robot
+  date: 2021/09/12
 - name: GalaxyRVR
   link: /blog/galaxyrvr.html
   cover: /assets/img/blog/galaxyrvr/galaxyrvr_review.jpg

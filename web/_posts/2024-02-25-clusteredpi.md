@@ -30,7 +30,7 @@ I started by installing the latest version of Raspberry Pi OS on each of the Pi 
 The Clustered-Pi Logo
 {:class="caption"}
 
-![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi01.png){:class="img-fluid w-25 rounded-3 shadow-lg"}
+![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi01.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 ---
 
@@ -39,12 +39,12 @@ I based the 3D printed design of the cluster on the original Cray-1 Super Comput
 The Clustered-Pi Design based on the Cray-1 Super Computer
 {:class="caption"}
 
-![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi03.jpg){:class="img-fluid w-25 rounded-3 shadow-lg"}
+![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi03.jpg){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 The Clustered-Pi Design
 {:class="caption"}
 
-![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi02.jpg){:class="img-fluid w-25 rounded-3 shadow-lg"}
+![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi02.jpg){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 ---
 
@@ -82,7 +82,7 @@ I sourced the rack mount from a local supplier (<https://www.thepihut.co.uk>), a
 
 Clustered-Pi consists of 4 [Raspberry Pi 4](https://www.raspberrypi.org) computers. Each one has slightly different sizes of memory, which is more to do with when they released these than a design choice.
 
-![Raspberry Pi 4](/assets/img/blog/clusteredpi/raspberry-pi-4.png){:class="img-fluid w-25"}
+![Raspberry Pi 4](/assets/img/blog/clusteredpi/raspberry-pi-4.png){:class="img-fluid w-100"}
 Raspberry Pi 4, 8Gb
 
 ---
@@ -91,7 +91,7 @@ Raspberry Pi 4, 8Gb
 
 I recommend getting a branded SD card, from a reputable supplier; in my experience unbranded SD Cards only last a couple of months under reasonable use, whereas the branded ones, particularly those designed for heavy write demands last years.
 
-![sd cards](/assets/img/blog/clusteredpi/sd_card.png){:class="img-fluid w-25"}
+![sd cards](/assets/img/blog/clusteredpi/sd_card.png){:class="img-fluid w-100"}
 64Gb SanDisk Extreme SD Card
 
 ## Disk Imaging
@@ -135,7 +135,7 @@ I also bought bunch of [colourful patch CAT6 cables](https://amzn.to/3FsnSFc) to
 
 |                                                                                                                   |                                                                                                      |
 |:-----------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------:|
-| [![TP Link 8 Port Hub](/assets/img/blog/clusteredpi/tp_link_8port_hub.png){:class="img-fluid"}](https://www.clustered-pi.com/assets/img/tp_link_8port_hub.jpg) | [![Cables](https://www.clustered-pi.com/assets/img/network_cables.jpg){:class="img-fluid w-50"}](https://www.clustered-pi.com/assets/img/network_cables.jpg) |
+| [![TP Link 8 Port Hub](/assets/img/blog/clusteredpi/tp_link_8port_hub.png){:class="img-fluid w-100 card-hover shadow-hover"}](https://www.clustered-pi.com/assets/img/tp_link_8port_hub.jpg) | [![Cables](https://www.clustered-pi.com/assets/img/network_cables.jpg){:class="img-fluid w-100 card-hover shadow-hover"}](https://www.clustered-pi.com/assets/img/network_cables.jpg) |
 |                                                    Network Hub                                                    |                                                Cables                                                |
 {:class="my-4"}
 
@@ -153,7 +153,7 @@ I originally had the Raspberry Pi's in their cases, just sat on top of the netwo
 
 |                                                                                             |                                                                                    |
 |:-------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------:|
-| [![No Chassis](https://www.clustered-pi.com/assets/img/no_chassis.jpg){:class="img-fluid"}](https://www.clustered-pi.com/assets/img/no_chassis.jpg) | [![Chassis](https://www.clustered-pi.com/assets/img/chassis.jpg){:class="img-fluid"}](https://www.clustered-pi.com/assets/img/chassis.jpg) |
+| [![No Chassis](https://www.clustered-pi.com/assets/img/no_chassis.jpg){:class="img-fluid  card-hover shadow-hover"}](https://www.clustered-pi.com/assets/img/no_chassis.jpg) | [![Chassis](https://www.clustered-pi.com/assets/img/chassis.jpg){:class="img-fluid  card-hover shadow-hover"}](https://www.clustered-pi.com/assets/img/chassis.jpg) |
 |                                         No Chassis                                          |                                    With Chassis                                    |
 {:class="mb-4"}
 
@@ -178,7 +178,7 @@ Cyberpower UPS: 1200VA/720W, with 6 UK Outlets
 The Clustered-Pi 5 Upgrades
 {:class="caption"}
 
-![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi04.jpg){:class="img-fluid w-50 rounded-3 shadow-lg"}
+![Clustered-Pi](/assets/img/blog/clusteredpi/clusteredpi04.jpg){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 In October 2023 the Raspberry Pi 5 was released, and this meant I could finally upgrade the Pi 4 cluster with more power, and more reliable and larger storage, via the NVMe SSD's.
 

@@ -12,6 +12,9 @@ tags:
  - AI
  - llms
  - How it works
+videos:
+ - jJKbYj8mIy8
+ - q5lML34Noio
 ---
 
 `Large language models` ([LLMs](/resources/glossary#llm)) like GPT-4 are the result of a significant evolution in the field of artificial intelligence, particularly within the subset of machine learning known as natural language processing (NLP).
@@ -75,5 +78,7 @@ In conclusion, large language models are complex systems that emulate understand
 This video contains an explaination and demonstration of how to create a [Large Language Model](/resources/glossary#llm) in Python.
 
 {% include youtubeplayer.html id="q5lML34Noio" %}
+
+{% include youtubeplayer.html id="jJKbYj8mIy8" %}
 
 ---

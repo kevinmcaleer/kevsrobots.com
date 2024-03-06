@@ -1,9 +1,11 @@
 {% assign groups = site.groups | sort: 'title'  %}
 <div class="mb-3">
 <ul class="m-0 p-0">
+<li class="list-unstyled mt-1"><a href="/showcase/" class="orange small"><i class="fa-solid fa-sparkle pr-3"></i>Showcase</a>
+<hr /></li>
 {% for group in groups %}
     {% if group.name != "index.md" %}
-    <li class="list-unstyled mt-1"><a href="{{group.url}}" class="orange small">{{group.title}}</a></li>
+    <li class="list-unstyled mt-1"><a href="{{group.url}}" class="orange small">{% if group.icon %}<i class="{{group.icon}} pr-3" aria-hidden="false"></i>{%endif%} {{group.title}}</a></li>
     {% endif %}
 {% endfor %}
 </ul>

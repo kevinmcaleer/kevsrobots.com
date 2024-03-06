@@ -18,7 +18,7 @@ groups:
  - pico
  - micropython
  - servos 
- - christmas
+ - seasonal
 videos:
  - mG7stDcin3c
 repo: https://www.github.com/kevinmcaleer/bugs_robobunny

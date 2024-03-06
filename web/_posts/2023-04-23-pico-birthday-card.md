@@ -18,7 +18,7 @@ tags:
  - 3D Printing
 groups:
  - weird
- - christmas
+ - seasonal
  - micropython
 videos:
  - ylZYOJ2zx8c

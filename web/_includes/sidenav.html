@@ -1,0 +1,34 @@
+<img src="{{page.cover}}" class="img-fluid w-100 rounded-3 mb-3 " alt="Cover image for {{page.title}}">
+<article>
+<h2>{{page.title}}</h2>
+<p>{{page.description}}</p>
+<i class="fa-regular fa-calendar"></i> {{page.date | date: "%-d %B %Y" }}<br />
+{% assign reading_time = content | number_of_words %}
+{% assign minutes = reading_time | divided_by: 200 %}
+<i class="fa-solid fa-book-open-reader"></i> {{ minutes | append: " minute read"}}
+<hr>
+<p class="orange">
+     By <i class="fa-regular fa-user"></i> {{ page.author}}<br />
+    Share this article on <span class=""><a href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
+    </p>
+<hr>
+<h5>Table of Contents</h5>
+
+<div class="toc">
+{{ content | toc_only }}
+</div>
+<hr>
+
+<h5>Tags</h5>
+
+{% for tag in page.tags %}
+<a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+{% endfor %}
+
+<hr />
+{% if page.repo %}
+<h5>Code Repo</h5>
+<i class="fa-brands fa-github"></i> <a href="{{page.repo}}" class="dotted">View Code Repository on GitHub</a><br />
+{% endif %}
+</article>
