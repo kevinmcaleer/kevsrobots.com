@@ -1,3 +1,13 @@
+- name: Tic Tac Toe
+  link: /blog/pico-tico.html
+  cover: /assets/img/blog/picotico/cover.jpg
+  description: Build a motion controlled robotic arm using a Raspberry Pi and a camera
+  date: 2024-03-03
+- name: Motion Controlled Arm
+  link: /blog/motion-controlled-arm
+  cover: /assets/img/blog/motioncontrol/cover.png
+  description: Build a motion controlled robotic arm using a Raspberry Pi and a camera
+  date: 2024-03-04
 - name: Clustered-Pi
   link: /blog/clusteredpi
   cover: /assets/img/blog/clusteredpi/clusteredpi.jpg

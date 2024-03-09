@@ -16,10 +16,14 @@
         {% if article.title != 'Reviews' %}
         <div class="col m-0">
             <a href="{{article.url}}" class="">
-        <div class="card border-0 shadow-lg m-0 p-0">
+        <div class="card border-0 shadow-lg m-0 p-0 h-100">
         <img class="card-img-top rounded-2" src="{{article.cover}}" alt="{{article.title}}">
-        <div class="card-img-overlay m-0 p-0">
-          <h6 class="btn btn-overlay-black text-white btn-sm align-bottom w-100">{{article.title}}</h6>
+        <div class="card-body">
+        <h5 class="btn btn-overlay-black text-white btn-sm align-bottom w-100">{{article.title}}</h5>
+        <p>excerpt: {{article.excerpt}}</p>
+        </div>
+        <div class="card-footer border-0">
+        <p>date: {{article.date | date: "%-d %B %Y" }}</p>
         </div>
         </div>
     </a>

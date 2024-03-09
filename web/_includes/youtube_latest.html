@@ -16,14 +16,19 @@
 {% for vid in vids | limit:4 %}
 <div class="col col-lg-3">
 <div class="card border-0 bg-light card-hover shadow-hover">
-    <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2" alt="YouTube Thumbnail for {{vid.title}}"></a>
+    <a href="https://www.youtube.com/watch?v={{vid.video_id}}">
+    <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-top-2" alt="YouTube Thumbnail for {{vid.title}}"></a>
     <div class="card-body">
+    <div class="container">
       <div class="row">
         <div class="col-12 m-0 p-0">
+           
+
           <div class="row w-100 p-0 m-0 ">
               <div class="col-12 m-0 p-0">
                   <p class="small text-truncate">{{ vid.title }}</p>
               </div>
+            
           </div>
           <div class="row w-100 p-0 m-0 ">
               <div class="col-6 m-0 p-0">
@@ -33,6 +38,7 @@
                   <span class="badge float-end {% if vid.type == 'video' %}bg-secondary{% elsif vid.type =='short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% endif %}">{{ vid.type | capitalize }}</span>
               </div>
           </div>
+        </div>
       </div>
     </div>
 </div>

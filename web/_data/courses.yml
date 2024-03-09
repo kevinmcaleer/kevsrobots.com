@@ -47,6 +47,14 @@
   link: /learn/docker_swarm/00_intro.html
   name: Raspberry Pi 5 Cluster with Docker Swarm
 - author: Kevin McAleer
+  cover: /learn/rust/assets/cover.png
+  date_published: 2024-03-09
+  description: Learning Rust with me, is a course that will teach you how to use Rust
+    on Raspberry Pi.
+  duration: 0h 26m
+  link: /learn/rust/01_intro.html
+  name: Introduction to Rust
+- author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19
   description: Learn how to 3d print, build and program a SMARS robot

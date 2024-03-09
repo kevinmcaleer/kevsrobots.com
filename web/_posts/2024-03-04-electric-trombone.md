@@ -23,6 +23,8 @@ vidoes:
   - CxKwNpaZiNY
 ---
 
+> Work in progress - more to come soon; checkback later for more details.
+
 ## Bill of Materials
 
 | Item       | Description         | Cost  | Qty | Total |

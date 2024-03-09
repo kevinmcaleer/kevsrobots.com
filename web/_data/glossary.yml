@@ -645,3 +645,10 @@
     A solid-state drive (SSD) is a solid-state storage device that uses integrated circuit assemblies to store data persistently, typically using flash memory, and functioning as secondary storage in the hierarchy of computer storage.
   link: https://en.wikipedia.org/wiki/Solid-state_drive
   article: /blog/raspberrypi5-nvme-nas
+- term: Rust
+  definition: Rust Programming Language
+  full: >-
+    Rust is a multi-paradigm programming language focused on safety, especially safe concurrency.
+    It is a multi-paradigm programming language focused on safety, especially safe concurrency.
+  link: https://en.wikipedia.org/wiki/Rust_(programming_language)
+  article: /resources/learn/rust

@@ -1,0 +1,41 @@
+- name: Introduction to Rust
+  author: Kevin McAleer
+  date_created: 2024-03-09
+  date_published: 2024-03-09
+  layout: course
+  cover: assets/cover.png
+  description: >- 
+     Learning Rust with me, is a course that will teach you how to use Rust on Raspberry Pi.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 01_intro.md
+  - section:
+      name: Setting Up a Rust Environment
+      content:
+      - 02_rust_and_python.md
+  - section:
+      name: Basics
+      content:
+      - 03_rust_basics.md
+      - 04_ownership_and_borrowing.md
+      - 05_structs_and_enums.md
+      - 06_error_handling.md
+      - 07_common_collections.md
+  - section:
+      name: Tools and Ecosystem
+      content:  
+      - 08_concurrency.md
+      - 09_ecosystem_and_tools.md
+      - 10_example.md
+  - section:
+      name: Rust for Pico
+      content:
+      - 11_rust_for_pico.md
+      - 12_summary_and_resources.md
+      - 13_cargo.md
+
+
+
+

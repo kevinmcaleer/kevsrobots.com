@@ -3,15 +3,18 @@
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
 {% for item in projects %}
 <div class="col mb-3">
-<div class="card mt-3 h-100 border-0">
-    <a href="{{item.link}}"><img src="{{item.cover}}" class="img-fluid w-100 rounded-3" alt="Project article cover image for {{item.name}}"></a>
+<div class="card mt-3 h-100 border-0 card-hover shadow-hover g-3">
+    <a href="{{item.link}}"><img src="{{item.cover}}" class="img-fluid w-100 rounded-top-3" alt="Project article cover image for {{item.name}}"></a>
     <div class="card-body">
         <h5 class="card-title text-truncate">
             {{ item.name}}
         </h5>
         <p class="card-text small text-mute text-truncate">{{item.description}}</p>
-        <a href="{{item.link}}" class="btn btn-primary">Read More</a>
+    </div>
+    <div class="card-footer border-0">
+        {{item.date | date: "%-d %B %Y"}} <a href="{{item.link}}" class="btn btn-primary">Read More</a>
     </div>    
+
 </div>
 </div>
 {% endfor %}

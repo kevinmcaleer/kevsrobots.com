@@ -85,7 +85,7 @@ def produce_courses(year):
 
     # Produce the chart
     fig, ax = plt.subplots(figsize=(12, 6))
-    # bars = ax.bar(course_year['Month'], course_year['count'])
+    bars = ax.bar(course_year['Month'], course_year['count'])
 
     # Set y-axis to only use whole numbers
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -120,7 +120,7 @@ def produce_reviews(year):
 
     # Produce the chart
     fig, ax = plt.subplots(figsize=(12, 6))
-    # bars = ax.bar(review_year['Month'], review_year['count'])
+    bars = ax.bar(review_year['Month'], review_year['count'])
 
     # Set y-axis to only use whole numbers
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -155,7 +155,7 @@ def produce_posts(year):
 
     # Produce the chart
     fig, ax = plt.subplots(figsize=(12, 6))
-    # bars = ax.bar(posts_year['Month'], posts_year['count'])
+    bars = ax.bar(posts_year['Month'], posts_year['count'])
 
     # Set y-axis to only use whole numbers
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -190,7 +190,7 @@ def produce_projects(year):
 
     # Produce the chart
     fig, ax = plt.subplots(figsize=(12, 6))
-    # bars = ax.bar(projects_year['Month'], projects_year['count'])
+    bars = ax.bar(projects_year['Month'], projects_year['count'])
 
     # Set y-axis to only use whole numbers
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -226,7 +226,7 @@ def produce_videos(year):
 
     # Produce the chart
     fig, ax = plt.subplots(figsize=(12, 6))
-    # bars = ax.bar(videos_year['Month'], videos_year['count'])
+    bars = ax.bar(videos_year['Month'], videos_year['count'])
 
     # Set y-axis to only use whole numbers
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -252,6 +252,7 @@ def produce_charts(year):
     produce_posts(year)
     produce_reviews(year)
     produce_courses(year)
+    print_raw_stats()
 
 def produce_robots(year):
     # Create a DataFrame for all months of the year
@@ -269,7 +270,7 @@ def produce_robots(year):
 
     # Produce the chart
     fig, ax = plt.subplots(figsize=(12, 6))
-    # bars = ax.bar(robots_year['Month'], robots_year['count'])
+    bars = ax.bar(robots_year['Month'], robots_year['count'])
 
     # Set y-axis to only use whole numbers
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))

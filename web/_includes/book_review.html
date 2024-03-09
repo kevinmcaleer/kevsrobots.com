@@ -5,7 +5,11 @@
 <hr />
 <ul class="nav">
 {% for book in books %}
+{% assign filename = book.url | split: '/' | last %}
+  
+{% if filename != 'index.html' %}
 <li class="nav-item"><a href="{{book.url}}" class="nav-link">{{book.title}}</a></li>
+{% endif %}
 {% endfor %}
 </ul>
 </div>

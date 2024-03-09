@@ -107,7 +107,7 @@ This course covers everything from setting up your first Raspberry Pi 5 to deplo
 
 ---
 
-### Let's Get Started!
+### Let's Get Started
 
 Prepare to dive into the world of Docker Swarm with your Raspberry Pi 5. This course is your gateway to mastering container orchestration, enabling you to deploy scalable, resilient applications with ease. Whether you're building a home lab, enhancing your professional skills, or incorporating new technologies into your curriculum, you're on the right path.
 

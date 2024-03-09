@@ -6,14 +6,21 @@
 {% for article in articles | limit:3 %}
 {% if article.title != 'Projects' %}
 <div class="col">
-<div class="card border-0 shadow-hover card-hover">
-    <a href="{{article.link}}" class=""><img class="img-fluid w-100 rounded-2" src="{{article.cover}}" alt="{{article.name}}">
-    <div class="card-img-overlay m-0 p-0">
-        <h6 class="btn btn-overlay btn-sm align-bottom w-100">{{article.name}}</h6>
+<a href="{{article.link}}" class="text-decoration-none black">
+<div class="card border-0 shadow-hover card-hover h-100 position-relative">
+    
+    <img class="img-fluid w-100 rounded-top-2" src="{{article.cover}}" alt="{{article.name}}">
+    <div class="card-body">
+        <h5>{{article.name}}</h5>
+        <p class="card-text">{{article.description}}</p>
     </div>
-    </a>
-</div>
-</div>
+    <div class="card-footer border-0">
+        {{article.date | date: "%-d %B %Y" }}
+    </div>
+  
+</div><!-- card -->
+</a>
+</div><!--col-->
 {% endif %}
 {% endfor %}
 

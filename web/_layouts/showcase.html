@@ -2,6 +2,8 @@
 layout: default
 ---
 
+
+
 {% if page.mode =='dark' %}
 {% assign textcol='white' %}
 {% assign bg-col= 'bg-dark'%}
@@ -30,82 +32,127 @@ layout: default
             </div>  
 
             <div class="row p-3 m-3">
-                <div class="col-12 col-lg-6 m-0 p-0">
-                    <div class="container rounded-left">
-                    <h1 class="{{textcol}}">{{page.title}}</h1>
-                    <h2 class="{{textcol}}">{{page.description}}</h2>
-                 
-                   
-                    <br /> 
-                    <hr />
-                    <i class="fa-regular fa-calendar {{textcol}}"></i> {{page.date | date: "%-d %B %Y" }} | 
-                    {% assign reading_time = content | number_of_words %}
-                    {% assign minutes = reading_time | divided_by: 200 %}
-                    <i class="fa-solid fa-book-open-reader {{textcol}}"></i> {{ minutes | append: " minute read"}}
-                    
-                    <p class="{{textcol}}">
-                        <i class="fa-regular fa-user"></i> By {{ page.author}} | 
-                        Share this article on <span class=" {{textcol}}"><a class="{{textcol}}" href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                            <a class="{{textcol}}" href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
-                    </p>
-                    <i class="fa-solid fa-tags {{textcol}}"></i> &nbsp; Tags: 
-                    {% for tag in page.tags %}
-                    <a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
-                    {% endfor %} <br/>
-                    <i class="fa-solid fa-code"></i> &nbsp; Difficulty: {{page.difficulty}}<br />
-                    <i class="fa-solid fa-list"></i> &nbsp; Category: 
-                    {% for category in page.groups %}
-                    <a href="/ideas/{{category}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{category}}</span></a>
-                    {% endfor %}
-                    <br />
-                    </div>
+            <div class="col-12 col-lg-6 m-0 p-0">
+                <div class="container rounded-left">
+                <h1 class="{{textcol}}">{{page.title}}</h1>
+                <h2 class="{{textcol}}">{{page.description}}</h2>
+                <br /> 
+                <hr />
+                <i class="fa-regular fa-calendar {{textcol}}"></i> {{page.date | date: "%-d %B %Y" }} | 
+                {% assign reading_time = content | number_of_words %}
+                {% assign minutes = reading_time | divided_by: 200 %}
+                <i class="fa-solid fa-book-open-reader {{textcol}}"></i> {{ minutes | append: " minute read"}}
+                
+                <p class="{{textcol}}">
+                    <i class="fa-regular fa-user"></i> By {{ page.author}} | 
+                    Share this article on <span class=" {{textcol}}"><a class="{{textcol}}" href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a class="{{textcol}}" href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
+                </p>
+                <i class="fa-solid fa-tags {{textcol}}"></i> &nbsp; Tags: 
+                {% for tag in page.tags %}
+                <a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+                {% endfor %} <br/>
+                <i class="fa-solid fa-code"></i> &nbsp; Difficulty: {{page.difficulty}}<br />
+                <i class="fa-solid fa-list"></i> &nbsp; Category: 
+                {% for category in page.groups %}
+                <a href="/ideas/{{category}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{category}}</span></a>
+                {% endfor %}
+                <br />
                 </div>
-                <div class="col-12 col-lg-6 m-0 p-0">
-                    <img src="{{page.hero}}" class="w-100 img-fluid">
-                </div>
+            </div>
+            <div class="col-12 col-lg-6 m-0 p-0">
+                <img src="{{page.hero}}" class="w-100 img-fluid">
+            </div>
             </div>  
             <div class="row {{textcol}} m-0 p-0 g-0">
-                <div class="col-12 m-0 p-0">
-                    
-                    {% if page.videos %}
-                    <div class="container-fluid {{bg-col}} m-0 p-3">
-                    <div class="container m-0 p-3">
-                    <div class="row g-0">
-                        <div class="col-6">
-                            <h1>Video{%if page.videos.size > 1 %}s{% endif %}</h1>
-                            <p>Often for each project I create I also make a youtube video about, sometimes more than one, you'll find them in this section here. </p>
-                            <p>Learn more from {%if page.videos.size > 1 %}these{%else%}this{% endif %} dedicated video{%if page.videos.size > 1 %}s{% endif %}</p>
-                        </div>
-                        <div class="col-6">
-                            <div class="row row-cols-lg-2 row-cols-sm-1 g-1">
-                            {% for video in page.videos %}
-                            <div class="col">
-                                <div class="card card-hover shadow-hover border-0 rounded-3">
-                                <iframe height="250" src="https://www.youtube.com/embed/{{ video }}" frameborder="0" allowfullscreen></iframe>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
+            <div class="col-12 m-0 p-0">
+            {% if page.videos %}
+            <div class="container-fluid {{bg-col}} m-0 p-3">
+            <div class="container m-0 p-3">
+            <div class="row g-0">
+                <div class="col-6">
+                <h1>Video{%if page.videos.size > 1 %}s{% endif %}</h1>
+                <p>For every project I create, I often make a corresponding YouTube video. Sometimes, 
+                    there might be more than one video for a single project. You can find these videos in this section.</p>
+                <p>Explore more through {%if page.videos.size > 1 %}these{%else%}this{% endif %} this dedicated video{%if page.videos.size > 1 %}s{% endif %}.</p>
+                </div>
+                <div class="col-6">
+                    <div class="row row-cols-lg-2 row-cols-sm-1 g-1">
+                    {% for video in page.videos %}
+                    <div class="col">
+                        <div class="card card-hover shadow-hover border-0 rounded-3">
+                        <iframe height="250" src="https://www.youtube.com/embed/{{ video }}" frameborder="0" allowfullscreen></iframe>
                         </div>
                     </div>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+            
+            </div>
+            </div>
+            {% endif %}
                     
-                    </div>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="container lighten-2 py-3">
-                    <article>
-                    <div class="container mt-3">
-                    {{content}}
-                    </div>
-                    </article>
-                    </div>
+            <div class="container lighten-2 py-3">
+            <article>
+            <div class="container mt-3">
+            {{content}}
+            </div>
+            </article>
+            
                  
             {% if page.code %}
-            <div class="container p-3 m-0">
+            <div class="container px-3 m-0">
+            <hr />
             <h2>Code</h2>
-            <i class="fa-brands fa-github"></i> <a href="{{page.code}}" class="dotted">View Code Repository on GitHub</a><br />
+            <i class="fa-brands fa-github"></i> View Code Repository on GitHub - <a href="{{page.code}}" class="dotted">{{page.code}}</a><br />
+            </div>
             {% endif %}
+
+            {% if page.stl %}
+            <div class="container p-3 m-0">
+            <hr/>
+            <h2>3D Models</h2>
+            <p>Here are the 3D printable STL files:</p>
+            <div class="row row-cols-4">
+                {% assign count = 1 %}
+                {% for stl in page.stl %}  
+                <div class="col ">
+                <div class="card card-hover shadow-hover border-0 h-100">
+                 {% assign count = count | plus:1 %}        
+            <div id="stl_cont{{count}}" class="">
+               {% include stl_viewer.html %} 
+                <script>
+                    var stl_viewer=new StlViewer
+                    (
+                        document.getElementById("stl_cont{{count}}"),
+                        {
+                            models:
+                            [
+                                {filename:"{{stl.link}}"}
+                            ]
+                        }
+                    );
+                </script>
+           
+            </div><!-- stl_cont-->
+            <div class="card-body">
+                {% assign filename = stl.link | split: '/' | last %}
+          
+                <h5>{{stl.name}}</h5>
+                
+                <p>{{stl.description}}</p>
+                <a href="{{stl.link}}" class=""><button class="btn btn-outline-dark">Download <code>{{filename}}</code></button></a>
+            </div><!-- card body -->
+            </div><!-- card -->
+            
+            </div><!-- col -->
+            
+            {% endfor %}
+            {% endif %}
+        </div> <!-- row -->
+        </div><!--container -->
+        </div>
             </div>
             <div class="container py-3 my-3">
                 <hr />

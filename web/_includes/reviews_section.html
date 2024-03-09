@@ -18,8 +18,11 @@
                 <img class="card-img-top black" src="{{article.cover}}" alt="{{article.title}}">
                 <div class="card-body">
                 <h5 class="card-title black">{{article.title}}</h5>    
-                <p class="card-text small black">{{article.description}}</p>
+                <p class="card-text small black">{{article.excerpt}}</p>
                 </div>
+                <div class="card-footer border-0">
+                <p class="black">{{article.date | date: "%-d %B %Y" }}</p>
+                </div> 
             </div>
             </a>
             </div>

@@ -1,0 +1,11 @@
+{% assign books = site.books | sort: 'date' | reverse  %}
+
+<h5>books</h5>
+<ul class="m-0 p-0">
+{% for book in books | sort: 'date' | reverse %}
+{% assign filename = book.url | split: '/' | last %}
+{% if filename != 'index.html' %}
+<li class="list-unstyled mt-1"><a href="{{ book.url }}" class="orange small">{{ book.title }}</a></li>
+{% endif %}
+{% endfor %} 
+</ul>

@@ -23,7 +23,22 @@ groups:
   - 3dprinting
 vidoes:
   - 
+stl:
+ - name: Arm B - Red Side
+   link: /assets/stl/motioncontrol/arm_b_red_side.stl
+   description: Arm B - Red Side
+ - name: Arm B - White Side
+   link: /assets/stl/motioncontrol/arm_b_white_side.stl
+   description: Arm B - White Side
+ - name: Arm A - Red half
+   link: /assets/stl/motioncontrol/arm_a_red_half.stl
+   description: Arm A - Red Half
+ - name: Arm A - White Half
+   link: /assets/stl/motioncontrol/arm_a_white_half.stl
+   description: Arm A - White Half
 ---
+
+> Work in progress - more to come soon
 
 ## Introduction
 
@@ -41,19 +56,11 @@ So this project is about how to create a motion controlled robotic arm using a R
 
 ---
 
-## 3D Printable STL files
-
-Here are the 3d printable files you will need to print for this project:
-
-* [Arm B - Red Side](/assets/stl/motioncontrol/arm_b_red_side.stl)
-* [Arm B - White Side](/assets/stl/motioncontrol/arm_a_white_side.stl)
-* [Arm A - Red Side](/assets/stl/motioncontrol/arm_a_red_side.stl)
-* [Arm A - White Side](/assets/stl/motioncontrol/arm_a_white_side.stl)
-
----
-
 ## Build Log
 
-* Parts take a **Long** time to print (14 hours for 1 part of the Elbow)
-* Dr Chris Parrott is concerned the design will not be structurally strong enough, suggests using Servos for simplicity
-* May be a bit large - over-engineered
+Date | Notes
+---- | -----
+6 March 2024 | * Parts take a **Long** time to print (14 hours for 1 part of the Elbow) <br /> * Dr Chris Parrott is concerned the design will not be structurally strong enough, suggests using Servos for simplicity <br /> * May be a bit large and slightly- over-engineered
+08  March 2024 | * Had a call with [Viam](https://www.viam.com) - they are interested in the robot arm for use with the Viam app.<br /> * May need to buy some bearings to make joints smoother and take some of the load off the motor
+{:class="table table-striped"}
+

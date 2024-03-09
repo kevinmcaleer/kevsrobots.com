@@ -1,0 +1,23 @@
+{% assign books = site.books %}
+<div class="row row-cols-3 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 p-0 m-0 mb-3 g-3">
+{% for book in books %}
+{% assign filename = book.url | split: '/' | last %}
+  
+{% if filename != 'index.html' %}
+<div class="col">
+    <a href="{{book.url}}" class="text-decoration-none black">
+    <div class="card bg-light border-0 position-relative shadow-hover card-hover h-100">
+    <img class="card-img-top" src="{{book.cover}}" alt="{{book.title}}">
+    <div class="card-body">
+        <h5>{{book.title}}</h5>
+        <p>{{book.description}}</p>
+    </div>  <!-- card-body -->
+    <div class="card-footer border-0">
+        {{book.date | date: "%-d %B %Y" }} by {{book.author}}
+    </div>
+    </div><!-- card -->
+    </a>
+</div><!--col-->
+{% endif %}
+{% endfor %}
+</div>

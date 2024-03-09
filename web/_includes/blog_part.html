@@ -4,18 +4,18 @@
 {% for post in posts | limit:3  %}
 
 <div class="col">
-
-<div class="bg-light border-0 position-relative shadow-hover card-hover">
-  
-    <div class="position-static">
-        <a href="{{post.url}}"><img class="img-fluid m-0 p-0 rounded" src="{{post.cover}}" alt="{{post.title}}"></a>
+    <a href="{{post.url}}" class="text-decoration-none black">
+    <div class="card bg-light border-0 position-relative shadow-hover card-hover h-100">
+    <img class="card-img-top" src="{{post.cover}}" alt="{{post.title}}">
+    <div class="card-body">
+        <h5>{{post.title}}</h5>
+        <p>{{post.description}}</p>
+    </div>  <!-- card-body -->
+    <div class="card-footer border-0">
+        {{post.date | date: "%-d %B %Y" }} by {{post.author}}
     </div>
-    <!-- <div class="position-absolute top-0 left-0 my-0 overflow-hidden blog-part">
-        <span class="top-0 left-0 p-1 lh-0 rounded-top overflow-hidden overflow-wrap shadow-lg bg-orange "><b>{{post.title}}</b></span><br>
-       
-    </div> -->
-    
-</div>
-</div>
+    </div><!-- card -->
+    </a>
+</div><!--col-->
 {% endfor %}
 </div>
