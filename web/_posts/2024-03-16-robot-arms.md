@@ -19,7 +19,7 @@ tags:
 groups:
   - robotarms
   - raspberrypi
-vidoes:
+videos:
   - IoVQVaXsyRY
   - Irz5Y5LSG_E
   - HmZF6e3I1Lo

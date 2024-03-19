@@ -19,7 +19,7 @@ tags:
 groups:
   - weird
   - music
-vidoes:
+videos:
   - CxKwNpaZiNY
 ---
 

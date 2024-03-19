@@ -22,7 +22,7 @@ groups:
   - raspberrypi
   - 3dprinting
   - robotarms
-vidoes:
+videos:
   - IoVQVaXsyRY
 stl:
  - name: Arm B - Red Side
