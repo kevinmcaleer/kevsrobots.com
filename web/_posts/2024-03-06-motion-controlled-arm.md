@@ -21,8 +21,9 @@ groups:
   - robots
   - raspberrypi
   - 3dprinting
+  - robotarms
 vidoes:
-  - 
+  - IoVQVaXsyRY
 stl:
  - name: Arm B - Red Side
    link: /assets/stl/motioncontrol/arm_b_red_side.stl

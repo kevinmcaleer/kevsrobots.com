@@ -24,6 +24,7 @@ groups:
  - 3dprinting
  - pico
  - micropython
+ - robotarms
 videos:
  - HmZF6e3I1Lo
 repo:
