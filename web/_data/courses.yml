@@ -38,6 +38,16 @@
   link: /learn/redis/01_introduction.html
   name: Using Redis with Python
 - author: Kevin McAleer
+  cover: /learn/markdown/assets/jekyll.jpg
+  date_published: 2024-03-21
+  description: This comprehensive course is designed to teach you how to effectively
+    use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll.
+    From the basics of Markdown to deploying your site, you'll learn everything you
+    need to get started.
+  duration: 0h 20m
+  link: /learn/markdown/01_overview.html
+  name: Mastering Markdown for Documentation with Jekyll
+- author: Kevin McAleer
   cover: /learn/docker_swarm/assets/docker_swarm.jpg
   date_published: 2024-02-03
   description: This course guides beginners through the process of setting up a Raspberry

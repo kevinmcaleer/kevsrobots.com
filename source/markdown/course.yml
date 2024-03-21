@@ -1,0 +1,31 @@
+- name: Mastering Markdown for Documentation with Jekyll
+  author: Kevin McAleer
+  date_created: 2024-03-21
+  date_published: 2024-03-21
+  layout: course
+  cover: assets/jekyll.jpg
+  description: >-
+      This comprehensive course is designed to teach you how to effectively use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll. From the basics of Markdown to deploying your site, you'll learn everything you need to get started.
+  content:
+    - section:
+        name: Introduction to Markdown and Jekyll
+        content:
+          - 01_overview.md
+          - 02_markdown_basics.md
+          - 03_setup_environment.md
+    - section:
+        name: Creating Content with Markdown and Jekyll
+        content:
+          - 04_writing_content_in_markdown.md
+          - 05_working_with_layouts_and_includes.md
+          - 06_managing_static_assets.md
+    - section:
+        name: Enhancing Your Site
+        content:
+          - 07_using_liquid_templating.md
+          - 08_customizing_themes_and_plugins.md
+    - section:
+        name: Publishing Your Site
+        content:
+          - 09_building_and_testing_locally.md
+          - 10_deploying_to_github_pages.md
