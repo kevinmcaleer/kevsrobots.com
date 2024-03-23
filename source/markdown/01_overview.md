@@ -3,7 +3,7 @@ title: Overview of Jekyll and Static Sites
 description: Introduction to the fundamentals of Jekyll and the advantages of using static sites.
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: assets/markdown.png
 ---
 
 ![Jekyll cover image]({{ page.cover }}){:class="cover"}

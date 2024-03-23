@@ -38,7 +38,7 @@
   link: /learn/redis/01_introduction.html
   name: Using Redis with Python
 - author: Kevin McAleer
-  cover: /learn/markdown/assets/jekyll.jpg
+  cover: /learn/markdown/assets/markdown.png
   date_published: 2024-03-21
   description: This comprehensive course is designed to teach you how to effectively
     use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll.
@@ -115,6 +115,16 @@
   duration: 0h 8m
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
+- author: Kevin McAleer
+  cover: /learn/pydantic/assets/pydantic.png
+  date_published: 2024-03-23
+  description: This in-depth course is designed to teach you how to leverage Pydantic
+    for data validation and settings management in Python applications. From understanding
+    Pydantic's basics to integrating it with FastAPI for web development, you'll master
+    everything needed to use Pydantic effectively.
+  duration: 0h 24m
+  link: /learn/pydantic/01_overview_of_pydantic.html
+  name: Mastering Pydantic for Robust Data Validation
 - author: Kevin McAleer
   cover: /learn/robotics_101/assets/basics_101.jpg
   date_published: 2023-01-17

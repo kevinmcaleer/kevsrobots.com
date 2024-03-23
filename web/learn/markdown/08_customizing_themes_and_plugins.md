@@ -3,7 +3,7 @@ layout: lesson
 title: Customizing Themes and Plugins
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/customizing_themes_plugins.jpg
+cover: assets/8.png
 date: 2024-03-21
 previous: 07_using_liquid_templating.html
 next: 09_building_and_testing_locally.html

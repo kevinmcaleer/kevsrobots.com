@@ -3,7 +3,7 @@ layout: lesson
 title: Building and Testing Your Site Locally
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/building_testing_locally.jpg
+cover: assets/9.png
 date: 2024-03-21
 previous: 08_customizing_themes_and_plugins.html
 next: 10_deploying_to_github_pages.html

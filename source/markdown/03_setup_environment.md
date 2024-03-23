@@ -3,7 +3,7 @@ title: Setting Up Your Environment
 description: Step-by-step guide to installing Jekyll and preparing your development environment for creating Jekyll sites.
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/setup_environment.jpg
+cover: assets/3.png
 ---
 
 ![Environment Setup cover image]({{ page.cover }}){:class="cover"}

@@ -3,14 +3,14 @@ layout: lesson
 title: Working with Jekyll Layouts and Includes
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/layouts_includes.jpg
+cover: assets/5.png
 date: 2024-03-21
 previous: 04_writing_content_in_markdown.html
 next: 06_managing_static_assets.html
 description: Learn how to use Jekyll layouts and includes to create reusable website
   components and streamline your site development process.
 percent: 50
-duration: 2
+duration: 3
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:
@@ -51,9 +51,13 @@ navigation:
 
 Jekyll's layouts and includes are powerful tools that allow you to abstract common website elements and reuse them across your site. This not only makes your site more consistent but also significantly speeds up development and maintenance.
 
+---
+
 ## Understanding Layouts
 
 Layouts are templates that wrap around your content. They're used to define a common structure for your pages or posts.
+
+---
 
 ### Creating a Layout
 
@@ -61,6 +65,7 @@ Layouts are templates that wrap around your content. They're used to define a co
 2. To create a layout, simply create a new HTML file in this directory. For example, `default.html`.
 
 ```html
+{% raw %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,30 +76,40 @@ Layouts are templates that wrap around your content. They're used to define a co
     {{ content }}
 </body>
 </html>
+{% endraw %}
 ```
 
-In this example, {% raw %}`{{ page.title }}`{% endraw %} dynamically inserts the title of the page or post using it, and `{{ content }}` is where Jekyll inserts the content from your Markdown file.
+In this example, {% raw %}`{{ page.title }}`{% endraw %} dynamically inserts the title of the page or post using it, and {% raw %}`{{ content }}`{% endraw %} is where Jekyll inserts the content from your Markdown file.
+
+---
 
 ### Using a Layout
 
 In your Markdown file's front matter, specify the layout you want to use:
 
+```markdown
 {% raw %}
 ---
 layout: default
 title: My First Post
 ---
-{% end raw%}
+{% endraw %}
+```
+
+---
 
 ## Working with Includes
 
 Includes allow you to insert snippets of code into your layouts or content. They're perfect for reusable components like headers, footers, and navigation bars.
+
+---
 
 ### Creating an Include
 
 1. Includes are stored in the `_includes` directory.
 2. To create an include, add a new file in this directory. For example, `header.html`.
 
+```html
 {% raw %}
 <header>
     <nav>
@@ -105,14 +120,21 @@ Includes allow you to insert snippets of code into your layouts or content. They
     </nav>
 </header>
 {% endraw %}
+```
+
+---
 
 ### Using an Include
 
 To use an include in a layout or another include, use the `include` tag:
 
+```html
 {% raw %}
 {% include header.html %}
 {% endraw %}
+```
+
+---
 
 ## Practice Exercise
 

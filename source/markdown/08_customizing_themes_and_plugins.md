@@ -3,7 +3,7 @@ title: Customizing Themes and Plugins
 description: Discover how to personalize your Jekyll site by customizing themes and extending functionality with plugins, making your site uniquely yours.
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/customizing_themes_plugins.jpg
+cover: assets/8.png
 ---
 
 ![Customizing Themes and Plugins cover image]({{ page.cover }}){:class="cover"}

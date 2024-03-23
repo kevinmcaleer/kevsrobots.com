@@ -3,7 +3,7 @@ layout: lesson
 title: Deploying to GitHub Pages
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/deploying_to_github_pages.jpg
+cover: assets/10.png
 date: 2024-03-21
 previous: 09_building_and_testing_locally.html
 description: Step-by-step guide on how to deploy your Jekyll site to GitHub Pages,

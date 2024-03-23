@@ -3,7 +3,7 @@ title: Building and Testing Your Site Locally
 description: Learn how to build your Jekyll site locally, test it for errors, and ensure it's ready for deployment, maintaining high quality and reliability.
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/building_testing_locally.jpg
+cover: assets/9.png
 ---
 
 ![Building and Testing Your Site Locally cover image]({{ page.cover }}){:class="cover"}

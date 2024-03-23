@@ -3,7 +3,7 @@ title: Writing Content in Markdown
 description: Learn advanced Markdown syntax and best practices for creating engaging content for your Jekyll site.
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/writing_content.jpg
+cover: assets/4.png
 ---
 
 ![Writing Content cover image]({{ page.cover }}){:class="cover"}

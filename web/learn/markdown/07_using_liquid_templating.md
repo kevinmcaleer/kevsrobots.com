@@ -3,7 +3,7 @@ layout: lesson
 title: Using Liquid Templating for Dynamic Content
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/liquid_templating.jpg
+cover: assets/7.png
 date: 2024-03-21
 previous: 06_managing_static_assets.html
 next: 08_customizing_themes_and_plugins.html

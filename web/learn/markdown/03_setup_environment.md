@@ -3,7 +3,7 @@ layout: lesson
 title: Setting Up Your Environment
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/setup_environment.jpg
+cover: assets/3.png
 date: 2024-03-21
 previous: 02_markdown_basics.html
 next: 04_writing_content_in_markdown.html

@@ -3,7 +3,7 @@ layout: lesson
 title: Writing Content in Markdown
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/writing_content.jpg
+cover: assets/4.png
 date: 2024-03-21
 previous: 03_setup_environment.html
 next: 05_working_with_layouts_and_includes.html

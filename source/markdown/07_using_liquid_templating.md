@@ -3,7 +3,7 @@ title: Using Liquid Templating for Dynamic Content
 description: Explore how to use the Liquid templating language to add dynamic content and logic to your Jekyll site, enhancing its interactivity and functionality.
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/liquid_templating.jpg
+cover: assets/7.png
 ---
 
 ![Using Liquid Templating for Dynamic Content cover image]({{ page.cover }}){:class="cover"}

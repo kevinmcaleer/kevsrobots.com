@@ -1,0 +1,33 @@
+- name: Mastering Pydantic for Robust Data Validation
+  author: Kevin McAleer
+  date_created: 2024-03-23
+  date_published: 2024-03-23
+  layout: course
+  cover: assets/pydantic.png
+  description: >-
+      This in-depth course is designed to teach you how to leverage Pydantic for data validation and settings management in Python applications. From understanding Pydantic's basics to integrating it with FastAPI for web development, you'll master everything needed to use Pydantic effectively.
+  content:
+    - section:
+        name: Introduction to Pydantic
+        content:
+          - 01_overview_of_pydantic.md
+          - 02_setting_up_your_development_environment.md
+          - 03_basic_data_models.md
+    - section:
+        name: Advanced Data Validation with Pydantic
+        content:
+          - 04_advanced_validation_techniques.md
+          - 05_custom_data_types.md
+          - 06_recursive_models.md
+    - section:
+        name: Pydantic with FastAPI
+        content:
+          - 07_integrating_pydantic_with_fastapi.md
+          - 08_request_validation_and_serialization.md
+          - 09_building_a_crud_application.md
+    - section:
+        name: Best Practices and Real-world Applications
+        content:
+          - 10_pydantic_best_practices.md
+          - 11_performance_optimization_tips.md
+          - 12_case_studies_and_real_world_applications.md

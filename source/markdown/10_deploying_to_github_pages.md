@@ -3,7 +3,7 @@ title: Deploying to GitHub Pages
 description: Step-by-step guide on how to deploy your Jekyll site to GitHub Pages, making your site accessible to anyone on the internet.
 layout: lesson
 type: page
-cover: /learn/jekyll/assets/deploying_to_github_pages.jpg
+cover: assets/10.png
 ---
 
 ![Deploying to GitHub Pages cover image]({{ page.cover }}){:class="cover"}
