@@ -62,9 +62,6 @@ async def search(request:Request, query: str, page: Optional[int] = 1, page_size
     # Assuming `search_query` is a function that performs the actual search
     results = search_documents(request, query, offset=offset, limit=limit)
 
-   
-
-
     return {
         "results": results,
         "total_count": total_count,
