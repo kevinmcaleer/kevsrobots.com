@@ -1,3 +1,8 @@
+- name: PoDog
+  link: /reviews/pidog.html
+  cover: /assets/reviews/pidog.png
+  description: PiDog
+  date: 2024/03/30
 - name: PicoTico
   link: /blog/pico-tico.html
   cover: /assets/img/blog/picotico/cover.jpg

@@ -102,6 +102,16 @@
   link: /learn/sqlite3/00_intro.html
   name: Create Databases with Python and SQLite3
 - author: Kevin McAleer
+  cover: /learn/fastapi/assets/cover.png
+  date_published: 2024-03-28
+  description: This course teaches you how to build a user authentication system using
+    Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll
+    learn to implement features like registration, login, and user management, integrating
+    these with a frontend built with Jekyll.
+  duration: 0h 18m
+  link: /learn/fastapi/01_course_overview.html
+  name: Building User Authentication for Static Sites with FastAPI
+- author: Kevin McAleer
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
   description: tbc

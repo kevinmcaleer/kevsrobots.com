@@ -62,7 +62,7 @@ While type annotations and basic validators cover many common use cases, Pydanti
 Pydantic's `validator` decorator allows you to attach custom validation functions to model fields. These functions can perform additional checks and transformations on field values.
 
 ```python
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, ValidationInfo
 
 class Product(BaseModel):
     name: str
@@ -70,9 +70,9 @@ class Product(BaseModel):
     price: float
     discount_price: float
 
-    @validator('discount_price')
-    def check_discount_price(cls, v, values, **kwargs):
-        if 'price' in values and v >= values['price']:
+    @field_validator('discount_price')
+    def check_discount_price(cls, v: str, info: ValidationInfo):
+        if 'price' in info.data and v >= info.data['price']:
             raise ValueError('discount_price must be less than the price')
         return v
 ```

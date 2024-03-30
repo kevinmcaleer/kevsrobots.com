@@ -1,6 +1,6 @@
 {% assign pages = site.reviews | sort: 'date' | reverse %}
 
-<div class="row">
+<div class="row mb-3 pb-3">
     <div class="col col-lg-2 col-md-3 col-sm-4">
         {% include reviews_sidenav.html %}
     </div>
@@ -11,13 +11,10 @@
             {% else %}
             <div class="col">
             <div class="card border-0 h-100 shadow-lg">
-                <div class="card-header bg-white border-0">
+                <a href="{{page.url}}"><img src="{{page.cover}}" alt="Page cover image for {{page.title}}" class="card-img-top rounded-top-3"></a>
+                <div class="card-body bg-white border-0">
                     <a href="{{page.url}}" class="text-decoration-none"><h5 class="card-title black">{{page.title}}</h5></a>
-                </div>
-                <div class="d-flex align-items-center card-body">
-                <div class="flex-shrink-0">
-                    <a href="{{page.url}}"><img src="{{page.cover}}" alt="Page cover image for {{page.title}}" class="media rounded-3"></a>
-                  </div>
+               
                 <div class="flex-grow-1 ms-3 p-0">
                     
                     {% assign rating = page.rating | to_integer %}

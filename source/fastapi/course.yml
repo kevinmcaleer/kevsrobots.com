@@ -1,0 +1,30 @@
+- name: Building User Authentication for Static Sites with FastAPI
+  author: Kevin McAleer
+  date_created: 2024-03-28
+  date_published: 2024-03-28
+  layout: course
+  cover: assets/cover.png
+  description: >-
+    This course teaches you how to build a user authentication system using Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll learn to implement features like registration, login, and user management, integrating these with a frontend built with Jekyll.
+  content:
+    - section:
+        name: Introduction to User Authentication
+        content:
+          - 01_course_overview.md
+          - 02_setting_up_the_environment.md
+    - section:
+        name: FastAPI and User Authentication Basics
+        content:
+          - 03_fastapi_intro.md
+          - 04_user_authentication_flow.md
+    - section:
+        name: Building the Authentication API
+        content:
+          - 05_creating_user_models.md
+          - 06_implementing_registration_and_login.md
+          - 07_user_management_apis.md
+    - section:
+        name: Integrating with a Jekyll Site
+        content:
+          - 08_integrating_with_jekyll.md
+          - 09_deploying_the_solution.md
