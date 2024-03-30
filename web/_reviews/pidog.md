@@ -1,6 +1,8 @@
 ---
 layout: review
 title: PiDog
+description: >-
+    Dive into the innovative world of robotics with PiDog, a robotic dog that combines fun, education, and advanced technology into a unique learning experience. Perfect for hobbyists and learners of all ages!
 author: Kevin McAleer
 date: 2024-03-30
 excerpt: >-
