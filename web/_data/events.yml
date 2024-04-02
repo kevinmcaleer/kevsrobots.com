@@ -41,11 +41,11 @@
   status: confirmed
   image: /assets/img/events/liverpoolmakefest_2024.jpg
 - event: Maker Faire Rome 2024
-  start: "2024-10-18"
-  end: "2024-10-20"
-  location: Fiera Di Roma, Italy
+  start: "2024-10-25"
+  end: "2024-10-27"
+  location: Gazometro Ostiense, Italy
   link: https://www.makerfairerome.eu/
-  status: expected, date to be confirmed
+  status: confirmed
   image: /assets/img/events/makerfairerome_2024.jpg
 - event: Makers Central 2024
   start: "2024-05-18"
