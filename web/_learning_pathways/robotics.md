@@ -12,6 +12,7 @@ courses:
   - "Robot Eye Mechanism"
   - "Computer Vision on Raspberry Pi with CVZone"
   - "Learn ROS with me"
+  - "Building a Robot Arm with Raspberry Pi and PCA9685"
 
 ---
 

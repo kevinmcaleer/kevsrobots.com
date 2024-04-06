@@ -1,3 +1,8 @@
+- name: Buddy Jr.
+  link: /blog/buddy-jr.html
+  cover: /assets/img/blog/cover.png
+  description: Build a simple Robot arm for the Raspberry Pi with Python and the PCA9685
+  date: 2024/04/06
 - name: PoDog
   link: /reviews/pidog.html
   cover: /assets/reviews/pidog.png

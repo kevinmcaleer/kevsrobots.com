@@ -23,6 +23,18 @@
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
 - author: Kevin McAleer
+  cover: /learn/pca9685/assets/cover.png
+  date_published: 2024-04-06
+  description: Dive into the exciting world of robotics by learning how to control
+    a robot arm using a Raspberry Pi, Python, and the PCA9685 board. This course covers
+    everything from setting up your Raspberry Pi, understanding the PCA9685 board,
+    programming with Python, to constructing and controlling a 4-servo robot arm.
+    Perfect for beginners and enthusiasts alike, this course will guide you through
+    each step with practical examples and hands-on projects.
+  duration: 0h 24m
+  link: /learn/pca9685/01_course_introduction.html
+  name: Building a Robot Arm with Raspberry Pi and PCA9685
+- author: Kevin McAleer
   cover: /learn/python/assets/python.png
   date_published: 2023-07-20
   description: Get started with Python programming, learn why you should  learn Python

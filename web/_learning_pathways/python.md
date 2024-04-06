@@ -11,6 +11,7 @@ courses:
   - "Computer Vision on Raspberry Pi with CVZone"
   - "Data Manipulation with Pandas and Numpy"
   - "OctaPi"
+  - "Building a Robot Arm with Raspberry Pi and PCA9685"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}
