@@ -31,57 +31,54 @@ layout: default
             {% include breadcrumbs.html %}
             </div>  
 
-            <div class="row p-3 m-3">
-            <div class="col-12 col-lg-6 m-0 p-0">
+            <div class="row pt-3 px-3 mt-3 mx-3">
+            <div class="col-12 col-lg-8 m-0 p-0">
                 <div class="container rounded-left">
                 <h1 class="{{textcol}}">{{page.title}}</h1>
                 <h2 class="{{textcol}}">{{page.description}}</h2>
-                <br /> 
-                <hr />
-                <i class="fa-regular fa-calendar {{textcol}}"></i> {{page.date | date: "%-d %B %Y" }} | 
-                {% assign reading_time = content | number_of_words %}
-                {% assign minutes = reading_time | divided_by: 200 %}
-                <i class="fa-solid fa-book-open-reader {{textcol}}"></i> {{ minutes | append: " minute read"}}
-                
-                <p class="{{textcol}}">
-                    <i class="fa-regular fa-user"></i> By {{ page.author}} | 
-                    Share this article on <span class=" {{textcol}}"><a class="{{textcol}}" href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a class="{{textcol}}" href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
-                </p>
-                <i class="fa-solid fa-tags {{textcol}}"></i> &nbsp; Tags: 
-                {% for tag in page.tags %}
-                <a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
-                {% endfor %} <br/>
-                <i class="fa-solid fa-code"></i> &nbsp; Difficulty: {{page.difficulty}}<br />
-                <i class="fa-solid fa-list"></i> &nbsp; Category: 
-                {% for category in page.groups %}
-                <a href="/ideas/{{category}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{category}}</span></a>
-                {% endfor %}
-                <br />
                 </div>
             </div>
-            <div class="col-12 col-lg-6 m-0 p-0">
+            <div class="col-12 col-lg-4 m-0 p-0">
                 <img src="{{page.hero}}" class="w-100 img-fluid">
             </div>
-            </div>  
+            
+            </div> 
+            
+            <div class="row pt-0 px-3 mt-0 mx-3">
+                <div class="col-12 m-0 p-0">
+                    <div class="container rounded-left mb-3">
+                    <hr />
+                    <i class="fa-regular fa-calendar {{textcol}}"></i> &nbsp;{{page.date | date: "%-d %B %Y" }} &nbsp; | &nbsp;
+                    {% assign reading_time = content | number_of_words %}
+                    {% assign minutes = reading_time | divided_by: 200 %}
+                    <i class="fa-solid fa-book-open-reader {{textcol}}"></i> &nbsp; {{ minutes | append: " minute read"}}
+                    &nbsp; | &nbsp;
+                    <i class="fa-regular fa-user"></i> By {{ page.author}} &nbsp; | &nbsp;
+                    Share this article on <span class=" {{textcol}}"><a class="{{textcol}}" href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a class="{{textcol}}" href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
+                    
+                    </div>
+                </div>
+                </div> 
+
             <div class="row {{textcol}} m-0 p-0 g-0">
             <div class="col-12 m-0 p-0">
             {% if page.videos %}
             <div class="container-fluid {{bg-col}} m-0 p-3">
             <div class="container m-0 p-3">
             <div class="row g-0">
-                <div class="col-6">
-                <h1>Video{%if page.videos.size > 1 %}s{% endif %}</h1>
+                <div class="col-12 col-md-6 px-1">
+                <h2 id="Video">Video{%if page.videos.size > 1 %}s{% endif %}</h2>
                 <p>For every project I create, I often make a corresponding YouTube video. Sometimes, 
                     there might be more than one video for a single project. You can find these videos in this section.</p>
                 <p>Explore more through {%if page.videos.size > 1 %}these{%else%}this{% endif %} this dedicated video{%if page.videos.size > 1 %}s{% endif %}.</p>
                 </div>
-                <div class="col-6">
-                    <div class="row row-cols-lg-2 row-cols-sm-1 g-1">
+                <div class="col-12 col-md-6">
+                    <div class="row row-cols-lg-2 row-cols-sm-1 g-2">
                     {% for video in page.videos %}
                     <div class="col">
                         <div class="card card-hover shadow-hover border-0 rounded-3">
-                        <iframe height="250" src="https://www.youtube.com/embed/{{ video }}" frameborder="0" allowfullscreen></iframe>
+                        <iframe class="rounded-1" src="https://www.youtube.com/embed/{{ video }}" frameborder="0" allowfullscreen></iframe>
                         </div>
                     </div>
                     {% endfor %}
@@ -113,7 +110,7 @@ layout: default
             <hr/>
             <h2>3D Models</h2>
             <p>Here are the 3D printable STL files:</p>
-            <div class="row row-cols-4">
+            <div class="row row-cols-lg-2 row-cols-sm-1 row-cols-1 g-3" >
                 {% assign count = 1 %}
                 {% for stl in page.stl %}  
                 <div class="col ">

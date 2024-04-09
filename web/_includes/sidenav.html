@@ -2,6 +2,7 @@
 <article>
 <h2>{{page.title}}</h2>
 <p>{{page.description}}</p>
+{% if page.layout != "showcase" %}
 <i class="fa-regular fa-calendar"></i> {{page.date | date: "%-d %B %Y" }}<br />
 {% assign reading_time = content | number_of_words %}
 {% assign minutes = reading_time | divided_by: 200 %}
@@ -12,6 +13,7 @@
     Share this article on <span class=""><a href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
         <a href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
     </p>
+{% endif %}
 <hr>
 <h5>Table of Contents</h5>
 
@@ -20,15 +22,38 @@
 </div>
 <hr>
 
-<h5>Tags</h5>
+<div class="row pt-0 px-0 mt-0 mx-0">
+    <div class="container px-1">
+        <div class="row mb-2">
+            <div class="col-12 align-top"><i class="fa-solid fa-tags {{textcol}}"></i> &nbsp; Tags:</div>
+            <div class="col-12">
+                {% for tag in page.tags %}
+                <a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+                {% endfor %}
+            </div>
+        </div>
+        <hr />
+        <div class="row mb-2"> 
+            <div class="col-12 align-top"><i class="fa-solid fa-code"></i> &nbsp; Difficulty:</div>
+            <div class="col-12 "><span class="badge rounded-pill text-bg-success">{{page.difficulty}}</span></div>
+        </div>
+        <hr />
+        <div class="row mb-2">
+            <div class="col-12 align-top"><i class="fa-solid fa-list"></i> &nbsp; Category:</div>
+            <div class="col-12">
+                {% for category in page.groups %}
+                <a href="/ideas/{{category}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{category}}</span></a>
+                {% endfor %}
+            </div>
+        </div>
+        <hr />
+        {% if page.code %}
+        <div class="row mb-2">
+            <div class="col-12 align-top"><i class="fa-brands fa-github"></i> &nbsp; Code:</div>
+            <div class="col-12 text-truncate dotted"><a href="{{page.code}}" class="dotted">{{page.code}}</a></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
-{% for tag in page.tags %}
-<a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
-{% endfor %}
-
-<hr />
-{% if page.repo %}
-<h5>Code Repo</h5>
-<i class="fa-brands fa-github"></i> <a href="{{page.repo}}" class="dotted">View Code Repository on GitHub</a><br />
-{% endif %}
 </article>
