@@ -1,0 +1,32 @@
+- name: Introduction to FreeCAD for Beginners
+  author: Kevin McAleer
+  date_created: 2024-04-17
+  date_published: 2024-04-17
+  layout: course
+  cover: assets/cover.png
+  description: >-
+    This beginner's course on FreeCAD teaches you the essentials of 3D modeling with this powerful, open-source tool. From basic shapes to more complex designs, learn the fundamentals of CAD software and how to apply them in your own projects.
+  content:
+    - section:
+        name: Getting Started with FreeCAD
+        content:
+          - 01_introduction_to_freecad.md
+          - 02_installing_freecad.md
+          - 03_user_interface_overview.md
+    - section:
+        name: Basic Modeling Techniques
+        content:
+          - 04_creating_basic_shapes.md
+          - 05_modifying_objects.md
+          - 06_boolean_operations.md
+    - section:
+        name: Advanced Design and Assembly
+        content:
+          - 07_assembly_design.md
+          - 08_creating_drawings.md
+          - 09_exporting_models.md
+    - section:
+        name: Real-World Applications and Best Practices
+        content:
+          - 10_practical_examples.md
+          - 11_tips_and_tricks.md

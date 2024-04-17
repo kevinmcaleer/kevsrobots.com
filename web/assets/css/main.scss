@@ -1096,3 +1096,51 @@ table .w-30 {
   color: black !important;
 }
 
+.course-nav-link {
+  color: grey;
+  text-decoration: none;
+  padding-left: 8px !important;
+  border-left: 8px solid #F8F9FA;
+}
+
+.course-nav-link.active, .course-nav-link.active:hover {
+  color: black !important;
+  // font-weight: 500;
+  padding-left: 5px !important;
+  border-left: 3px solid orangered;
+}
+
+.course-nav-item {
+  color: grey;
+  text-decoration: none;
+  li a {
+    padding-left: 5px !important;
+    border-left: 3px none !important;
+    display: inline-block;
+    width: 100%;
+  }
+}
+
+.course-nav-item.active {
+  color: black !important;
+}
+
+.course-nav-item:hover {
+  color: black;
+}
+
+.course-nav-link:hover {
+  color: black !important;
+  // font-weight: 500;
+  padding-left: 5px !important;
+  border-left: 3px solid grey;
+}
+
+.course-heading {
+  text-transform: capitalize;
+  font-size: 13pt !important;
+  font-style: normal !important;
+  font-weight: 500 !important; 
+  font-family:  "Lato", sans-serif;
+  padding-top: 20px !important;
+}

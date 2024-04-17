@@ -7,6 +7,7 @@ cover: /assets/img/learn/learn_3d_design.png
 courses:
   - "Build a SMARS Robot in Fusion 360"
   - "Robot Eye Mechanism"
+  - "Introduction to FreeCAD for Beginners"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}

@@ -92,6 +92,16 @@
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
+  cover: /learn/freecad/assets/cover.png
+  date_published: 2024-04-17
+  description: This beginner's course on FreeCAD teaches you the essentials of 3D
+    modeling with this powerful, open-source tool. From basic shapes to more complex
+    designs, learn the fundamentals of CAD software and how to apply them in your
+    own projects.
+  duration: 0h 22m
+  link: /learn/freecad/01_introduction_to_freecad.html
+  name: Introduction to FreeCAD for Beginners
+- author: Kevin McAleer
   cover: /learn/smars_code/assets/program_smars.png
   date_published: 2023-09-10
   description: Learn how to program SMARS with Arduino
