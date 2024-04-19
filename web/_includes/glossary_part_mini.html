@@ -13,7 +13,7 @@
 
 <div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-6 g-2 bg-orange rounded-2 p-3 m-0">
     {% for term in terms | limit:6 %}
-        <div class="col-3">
+        <div class="col">
         <a class="text-decoration-none" href="/resources/glossary#{{ term.term | downcase | replace:' ','-' }}">
         <div class="card border-0 shadow-lg h-100">
             <div class="card-body">

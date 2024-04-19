@@ -1,5 +1,6 @@
 {% assign terms = site.data.glossary  | sort_natural: "term" %}
 {% assign articles = site.how_it_works %}
+{% assign courses = site.data.courses %}
 
 <div class="row">
 <div class="col-12 col-sm-3 col-md-2">{% include glossary_part.html %}</div>
@@ -45,6 +46,21 @@
 {% endif %}
 {% endfor %}
 {% endif %}
+
+{% assign course_link = term.course %}
+{% if course_link != nil %}
+    {% assign term_course_base_url = term.course | split: '/' %}
+    {% assign term_course_base_url = term_course_base_url[1] | append: '/' | append: term_course_base_url[2] %}
+    {% for course in courses %}
+        {% assign course_parts = course.link | split: '/' %}
+        {% assign course_base_url = course_parts[1] | append: '/' | append: course_parts[2] %}
+        {% if course_base_url == term_course_base_url %}
+        
+            {% include card.html link=course.link img=course.cover cardtitle=course.name %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 
 <!-- <hr />  -->
 

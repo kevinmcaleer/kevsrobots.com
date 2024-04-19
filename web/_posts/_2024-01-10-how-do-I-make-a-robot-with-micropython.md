@@ -15,7 +15,7 @@ groups:
     - micropython
     - pico
 tags:
-    - Micropython
+    - MicroPython
     - Microcontrollers
     - Python
     - Raspberry Pi

@@ -2,10 +2,12 @@
   definition: Robot Operating System
   full: "The Robot Operating System (ROS) is a set of software libraries and tools that help you build robot applications."
   link: https://www.ros.org/
+  course: /learn/learn_ros
 - term: ros2
   definition: Robot Operating System, version 2
   full: "ROS 2 is the next generation of ROS, built to support the needs of the robotics community in an era of rapidly evolving hardware and increasing competition."
   link: https://index.ros.org/doc/ros2/
+  course: /learn/learn_ros
 - term: lidar
   definition: Light Detection and Ranging
   full: "LIDAR is a surveying method that measures distance to a target by illuminating that target with a laser light and measuring the reflected light with a sensor."
@@ -652,3 +654,10 @@
     It is a multi-paradigm programming language focused on safety, especially safe concurrency.
   link: https://en.wikipedia.org/wiki/Rust_(programming_language)
   article: /resources/learn/rust
+- term: FreeCAD
+  definition: FreeCAD
+  full: >-
+    FreeCAD is a free and open-source general-purpose parametric 3D computer-aided design modeler and a building information modeling software with finite-element-method support.
+    It is a free and open-source general-purpose parametric 3D computer-aided design modeler and a building information modeling software with finite-element-method support.
+  link: https://en.wikipedia.org/wiki/FreeCAD
+  course: /learn/freecad

@@ -18,7 +18,7 @@ groups:
  - servos
 videos:
  - 9txATldoURE
-repo:
+code:
  - https://www.github.com/kevinmcaleer/picocat
 ---
 

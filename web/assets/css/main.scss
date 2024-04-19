@@ -1144,3 +1144,20 @@ table .w-30 {
   font-family:  "Lato", sans-serif;
   padding-top: 20px !important;
 }
+
+.background-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background-color: black; /* Fallback color */
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.6; /* Set the opacity of the image */
+}

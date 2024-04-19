@@ -1,3 +1,8 @@
+- name: Sync files with Syncthing
+  link: /blog/sync-files-with-syncthing
+  cover: /assets/img/blog/syncthing/cover.png
+  date: 2024-04-19
+  description: Learn how to share files between your Raspberry Pis using Syncthing, a secure and private file synchronization tool.
 - name: Tic Tac Toe
   link: /blog/pico-tico.html
   cover: /assets/img/blog/picotico/cover.jpg

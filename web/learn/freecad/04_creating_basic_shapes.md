@@ -9,7 +9,7 @@ previous: 03_user_interface_overview.html
 next: 05_modifying_objects.html
 description: Learn how to create and modify basic 3D shapes using FreeCAD's tools.
 percent: 36
-duration: 2
+duration: 3
 navigation:
 - name: Introduction to FreeCAD for Beginners
 - content:
@@ -56,19 +56,24 @@ This lesson introduces the creation of basic 3D shapes in FreeCAD, providing a f
 
 ## Tools for Creating Basic Shapes
 
+1. Switch the workspace to `Part` to access the tools for creating basic shapes.
+1. Click any of the Yellow 3D shapes on the toolbar to create them.
+
+![Basic Shapes](assets/basic_shapes.png){:class="img-fluid w-100"}
+
 1. **Box (Cube):**
    - Tool: `Create Box`
    - Steps: Click on the tool, then click in the 3D view to place the box. Adjust dimensions in the property editor.
 
-2. **Cylinder:**
+1. **Cylinder:**
    - Tool: `Create Cylinder`
    - Steps: Select the tool, click in the 3D view to set the base, then drag up to define the height.
 
-3. **Sphere:**
+1. **Sphere:**
    - Tool: `Create Sphere`
    - Steps: Click the tool, then click in the 3D view to place the sphere. Specify the radius in the property editor.
 
-4. **Cone:**
+1. **Cone:**
    - Tool: `Create Cone`
    - Steps: Choose the tool, click in the 3D view to set the base, then drag to adjust the height and top radius.
 
@@ -78,6 +83,11 @@ This lesson introduces the creation of basic 3D shapes in FreeCAD, providing a f
 
 - **Moving Objects:**
   - Use the `Move` tool to reposition your shapes within the 3D view.
+
+  1. Change the workspace the 'draft' to access the `Move` tool.
+  1. Click on the move tool, then select the object you want to move.
+
+  ![Move Tool](assets/move_tool.png){:class="img-fluid w-100"}
 - **Rotating Objects:**
   - Select the `Rotate` tool to adjust the orientation of shapes around specified axes.
 - **Scaling Objects:**

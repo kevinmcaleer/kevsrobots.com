@@ -24,6 +24,13 @@ Developed by a community of passionate developers and users, FreeCAD's open-sour
 
 Take a moment to open FreeCAD and familiarize yourself with the interface. Notice the different workspaces tailored to various tasks.
 
+> ### Workspaces
+>
+> ![FreeCAD Workspaces](assets/workspaces.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
+>
+> Workspaces are collections of tools and commands that are grouped together for specific tasks. For example, the Part Design workspace is used for creating mechanical parts.
+> Choose the 'Part Design' workspace and explore the tools available.
+
 ---
 
 ## Key Features of FreeCAD
@@ -36,7 +43,13 @@ Take a moment to open FreeCAD and familiarize yourself with the interface. Notic
 
 ## Visual Tour
 
-Here are some screenshots to guide you through the main areas of the FreeCAD interface. (Insert images of workspaces, sketcher, and robot simulation module)
+Here are some screenshots to guide you through the main areas of the FreeCAD interface.
+
+![FreeCAD Interface Overview](assets/gui01.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
+
+![FreeCAD Interface Overview](assets/gui03.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
+
+![FreeCAD Interface Overview](assets/gui04.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 ---
 

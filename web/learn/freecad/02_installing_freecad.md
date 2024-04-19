@@ -81,7 +81,7 @@ Before diving into the installation process, ensure your system meets the necess
 
 ---
 
-### Linux
+### Linux & Raspbery Pi OS
 
 1. **Using Terminal:**
    - For distributions like Ubuntu, open your terminal and type: `sudo apt install freecad`

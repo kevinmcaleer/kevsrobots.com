@@ -21,7 +21,8 @@ groups:
  - seasonal
 videos:
  - mG7stDcin3c
-repo: https://www.github.com/kevinmcaleer/bugs_robobunny
+code: 
+ - https://www.github.com/kevinmcaleer/bugs_robobunny
 ---
 
 ## Design and Inspiration

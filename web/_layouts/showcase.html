@@ -15,7 +15,9 @@ layout: default
 {% endif%}
 
 <!-- {% include nav_blog.html %} -->
-<div style="background-image: url('{{ page.cover }}'); background-size: cover; background-position: center; min-height: 100vh;">
+<div class="background-wrapper">
+<div class="background-image" style="background-image: url('{{ page.cover }}')"></div>
+
     <!-- All your page content goes here -->
   
 <div class="container p-0 p-3 {{textcol}}">
@@ -34,8 +36,9 @@ layout: default
             <div class="row pt-3 px-3 mt-3 mx-3">
             <div class="col-12 col-lg-8 m-0 p-0">
                 <div class="container rounded-left">
+                
                 <h1 class="{{textcol}}">{{page.title}}</h1>
-                <h2 class="{{textcol}}">{{page.description}}</h2>
+                <p class="{{textcol}}">{{page.description}}</p>
                 </div>
             </div>
             <div class="col-12 col-lg-4 m-0 p-0">
@@ -161,5 +164,5 @@ layout: default
 
 </div>
 
-</div>
+
 </div>

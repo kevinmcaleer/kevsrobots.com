@@ -57,6 +57,8 @@ Understanding the layout and capabilities of the FreeCAD interface is essential 
 
 ## Exploring the Main Elements
 
+![FreeCAD Interface Overview](assets/freecad_ui.png){:class="img-fluid w-100"}
+
 1. **Workspace Selector:**
    - This is where you can switch between different workspaces tailored for specific tasks like drafting, modeling, or analysis.
 
@@ -68,12 +70,6 @@ Understanding the layout and capabilities of the FreeCAD interface is essential 
 
 4. **Navigation Cube:**
    - A small, interactive cube that helps with orienting the view of your model in the workspace.
-
----
-
-### Visual Tour
-
-- **Insert annotated screenshots** here to guide you through each area mentioned above, highlighting key features and tools.
 
 ---
 

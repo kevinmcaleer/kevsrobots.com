@@ -1,7 +1,9 @@
 <img src="{{page.cover}}" class="img-fluid w-100 rounded-3 mb-3 " alt="Cover image for {{page.title}}">
 <article>
+{% if page.layout != 'showcase' %}
 <h2>{{page.title}}</h2>
 <p>{{page.description}}</p>
+{% endif %}
 {% if page.layout != "showcase" %}
 <i class="fa-regular fa-calendar"></i> {{page.date | date: "%-d %B %Y" }}<br />
 {% assign reading_time = content | number_of_words %}
