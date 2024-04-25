@@ -236,6 +236,9 @@ posts:
 - title: What is MicroPython (old version)?
   url: /2023-03-20-what-is-micropython-old_version.md
   date: 2023-03-20
+- title: NextCloud
+  url: /2024-04-14-nextcloud.md
+  date: 2024-04-14
 - title: Chicken Nugget of Doom
   url: /2023-08-05-chicken_nugget.md
   date: 2023-08-05
@@ -284,6 +287,9 @@ posts:
 - title: The Three Laws of Robotics
   url: /2023-03-23-three-laws-of-robotics.md
   date: 2023-03-23
+- title: Guiding Light
+  url: /2024-04-25-guiding-light.md
+  date: 2024-04-25
 - title: Ghostbusters Wi-Fi Scanner
   url: /2022-12-21-ghostbusters-wifi.md
   date: 2022-12-21
@@ -314,6 +320,9 @@ posts:
 - title: Chip
   url: /2023-05-05-chip.md
   date: 2023-06-26
+- title: Sync Files on your Pis, with Syncthing
+  url: /2024-04-19-sync-files-with-syncthing.md
+  date: 2024-04-19
 - title: What is MicroPython?
   url: /2024-01-10-what-is-micropython.md
   date: 2024-01-10
