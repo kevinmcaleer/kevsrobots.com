@@ -1,0 +1,13 @@
+{% assign boards = site.boards %}
+
+<li class="nav-item">
+
+    <ul class="nav flex-column">
+        {% for board in boards | limit:10 %}
+        <li class="nav-link m-0 p-0">
+            <a class="nav-item dotted" href="{{board.url}}">{{board.title}}</a>
+        </li>
+        {% endfor %}
+    <hr>
+    <a href="/resources/boards/" class="nav-link {{textcol}}">More Boards ></a>
+</li>

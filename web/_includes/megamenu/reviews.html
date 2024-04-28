@@ -1,0 +1,15 @@
+{% assign reviews = site.reviews |sort: "date" | reverse %}
+
+<li class="nav-item">
+    {% for review in reviews | limit: 10 %}
+    {% if review.title != 'Reviews' %}
+    <ul class="nav flex-column">
+        <li class="nav-link m-0 mb-1 p-0">
+            <a class="nav-item dotted" href="{{review.url}}">{{review.title}}</a>
+        </li>
+    </ul>
+    {% endif %}
+    {% endfor %}
+    <hr>
+    <a href="/reviews/" class="nav-link {{textcol}}">More Reviews ></a>
+</li>

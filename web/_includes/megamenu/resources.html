@@ -1,0 +1,52 @@
+<li class="nav-item has-megamenu">
+    <a href="/resources/" class="nav-link  {{textcol}}" role="button" data-bs-toggle="dropdown"
+        aria-expanded="false">Resources</a>
+    <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
+        <div class="container-fluid h-100">
+
+        <h2>Resources</h2>
+
+        <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-1 row-cols-sm-2 m-0 g-3 d-flex ">
+            <div class="col h-100 m-0 text-truncate">
+                <div class="bg-white rounded-3 p-3 mb-3">
+
+                <h5><i class="fa-solid fa-circle-question"></i> &nbsp; How It Works</h5>
+                <ul class="nav flex-column">{% include megamenu/how-it-works.html%}</ul>
+                </div>
+            </div>
+            <div class="col h-100 m-0 text-truncate">
+                <div class="bg-white rounded-3 p-3 mb-3">
+                <h5><i class="fa-solid fa-user-magnifying-glass"></i> &nbsp; Reviews</h5>
+                <ul class="nav flex-column">
+                    {% include megamenu/reviews.html %}
+                </ul>
+            </div>
+            </div>
+            <div class="col h-100 m-0 text-truncate">
+                <div class="bg-white rounded-3 p-3 mb-3">
+                <h5><i class="fa-solid fa-cloud-word"></i> &nbsp; Glossary</h5>
+                <ul class="nav flex-column">
+                    {% include megamenu/glossary.html %}
+                </ul>
+            </div>
+            </div>
+            <div class="col h-100 m-0 text-truncate">
+                <div class="bg-white rounded-3 p-3 mb-3">
+                <h5><i class="fa-solid fa-brain-circuit"></i> &nbsp; Boards</h5>
+                <ul class="nav flex-column">
+                    {% include megamenu/boards.html %}
+                </ul>
+            </div>
+            </div>
+            <div class="col h-100 m-0 text-truncate">
+                <div class="bg-white rounded-3 p-3 mb-3">
+                <h5><i class="fa-solid fa-calendar-days"></i> &nbsp; Events</h5>
+                <ul class="nav flex-column">
+                    {% include megamenu/events.html %}
+                </ul>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+</li>

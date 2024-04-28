@@ -1,0 +1,16 @@
+{% assign articles = site.how_it_works | sort:date| reverse  %}
+
+<li class="nav-item">
+    <ul class="nav flex-column">
+        {% for article in articles | limit:10 %}
+        {% if article.title != 'How it Works' %}
+        <li class="nav-link m-0 p-0">
+            <a class="nav-item dotted" href="{{article.url}}">{{article.title}}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+    <hr>
+    <li class="nav-link m-0 p-0">
+    <a href="/resources/how_it_works/" class="nav-link  {{textcol}}">More Articles ></a></li>
+    </ul>
+</li>

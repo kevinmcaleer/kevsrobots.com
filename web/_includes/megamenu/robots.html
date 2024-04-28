@@ -1,0 +1,87 @@
+<li class="nav-item dropdown has-megamenu">
+<a href="#" class="nav-link {{textcol}} dropdown" role="button" data-bs-toggle="dropdown">Robots &amp; Projects</a>
+<div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
+    <h2 class="fs-2">Robots & Projects</h2>
+    <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-1 row-cols-sm-2 m-0 g-3">
+        
+        <div class="col h-100 m-0 text-truncate">
+        <div class="bg-white rounded-3 p-3 mb-3">
+        <h5><i class="fa-solid fa-robot"></i> &nbsp; Robots</h5>
+        
+        {% assign robots = site.data.robots %}
+        {% for robot in robots | limit: 10 %}
+        <ul class="nav flex-column">
+            <li class="nav-link m-0 mb-1 p-0">
+                <a class="nav-item dotted" href="{{robot.link}}">{{robot.name}}</a>
+            </li>
+        </ul>
+        
+        {% endfor %}
+        <hr>
+        <a href="/robots/" class="dotted">More Robots ></a>
+        </div>
+        </div>
+    <div class="col h-100 m-0 text-truncate">
+        <div class="bg-white rounded-3 p-3 mb-3">
+        <h5><i class="fa-duotone fa-rectangle-history"></i> &nbsp; Projects</h5>
+        {% assign projects = site.data.projects %}
+        
+        
+            {% for project in projects | limit: 10 %}
+            <ul class="nav flex-column">
+            <li class="nav-link m-0 mb-1 p-0">
+                <a class="nav-item dotted" href="{{project.link}}">{{project.name}}</a>
+            </li>
+            </ul>
+            {% endfor %}
+            <hr>
+        <a href="/robots/projects" class="dotted">More Projects ></a>
+        
+        </div>
+    </div>
+    <div class="col h-100 m-0 text-truncate">
+        <div class="bg-white rounded-3 p-3 mb-3">
+        <h5><i class="fa-solid fa-link-horizontal"></i> &nbsp; Links</h5>
+        <ul class="nav flex-column">
+            {% assign links = site.data.links %}
+            {% for link in links %}
+            <li class="nav-link m-0 mb-1 p-0"><a href="{{ link.link }}" class="nav-item dotted">{{ link.name }}</a></li>
+            {% endfor %}
+        <hr>
+        <a href="/robots/links" class="dotted">More Links ></a>
+        </ul>
+        </div>
+        </div>
+    <div class="col m-0 h-100">
+        <div class="bg-white rounded-3 p-3 mb-3">
+        <h5><i class="fa-solid fa-star"></i> &nbsp; Recommendations</h5>
+        <ul class="nav flex-column">
+            <li class="nav-link m-0 mb-1 p-0">
+                <a href="/gear/" class="nav-item dotted">Gear List</a>
+            </li>
+            <li class="nav-link m-0 mb-1 p-0">
+                <a href="/reviews/" class="nav-item dotted">Reviews</a>
+            </li>
+            <li>
+                <a href="/pimoroni" class="nav-item dotted">Pimoroni Stuff</a>
+            </li>
+        </ul>
+        <!-- {% include reviews_part.html%} -->
+    </div>
+        </div>
+        <div class="col h-100 m-0">
+        <div class="bg-white rounded-3 p-3 mb-3">
+        <h5><i class="fa-solid fa-address-card"></i> &nbsp; About Kevs Robots</h5>
+        <ul class="nav flex-column">
+            {% assign links = site.data.nav_about %}
+            {% for link in links%}
+            <li class="nav-link m-0 p-0 mb-1">
+                <a class="nav-item dotted" href="{{link.link}}">{{link.name}}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        </div>
+        </div> 
+    </div>
+    <div>
+</li>

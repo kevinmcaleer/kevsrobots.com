@@ -1,0 +1,13 @@
+{% assign events = site.data.events | sort: "date" | reverse %}
+
+<li class="nav-item">
+    <ul class="nav flex-column">
+    {% for event in events %}
+        <li class="nav-link m-0 p-0">
+            <a class="nav-item dotted" href="{{event.link}}">{{event.event}}</a>
+        </li>
+    {% endfor %}
+    </ul>
+    <hr /> 
+    <a href="/events" class="nav-link  {{textcol}}">More Events ></a>
+</li>

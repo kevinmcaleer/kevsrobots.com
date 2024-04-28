@@ -117,6 +117,12 @@ li.breadcrumb-item.black {
   color: white;
 }
 
+.border-bg-red {
+  border-bottom: 3px solid #C0342B;
+  color: white;
+
+}
+
 .bg-white {
   background-color: white;
   color: black;
@@ -454,6 +460,8 @@ a.dotted {
   text-decoration-style: dotted !important;
   text-decoration-color: $orange !important;
   text-decoration-line: 1px !important;
+  min-width: 0;
+  
 }
 
 h5 {
@@ -527,7 +535,7 @@ i {
 /* ============ mobile view .end// ============ */
 
 ul.nav li.nav-link {
-  background-color: #00000005;
+  // background-color: #00000005;
   border-radius: 5px;
   padding: 5px;
 }
@@ -617,14 +625,18 @@ blockquote {
   // color: #FFCA29 !important;
   // background-color: $orange;
   text-decoration-style: dotted !important;
-  text-decoration-color: #FFCA29 !important;
-  text-decoration-line: 1px !important;
-  font-weight: 800;
+  // text-decoration-color: #FFCA29 !important;
+  text-decoration-color: $orange !important;
+  // text-decoration-line: 1px !important;
+  // font-weight: 800;
   // transition: ease-in-out 0.25s;
 
-  background-color: #FFCA29;
-  color: black !important;
-  border-radius: 5px;
+  // background-color: #FFCA29;
+  // background-color: $orange;
+  // color: white !important;
+  // border-radius: 5px;
+  border-bottom: $orange 3px solid;
+  // border-left: $orange 3px solid;
   transition: ease 0.25s;
   // margin: 4px;
   // padding: 4px;

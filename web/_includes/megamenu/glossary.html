@@ -1,0 +1,13 @@
+{% assign items = site.data.glossary %}
+
+<li class="nav-item">
+
+    <ul class="nav flex-column">
+        {% for item in items | limit: 10 %}
+        <li class="nav-link m-0 p-0">
+            <a class="nav-item dotted" href="/resources/glossary#{{item.term}}">{{item.term}}</a>
+        </li>
+        {% endfor %}
+    <hr>
+    <a href="/resources/glossary" class="nav-link {{textcol}}">More Glossary ></a>
+</li>
