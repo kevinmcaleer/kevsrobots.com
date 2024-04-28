@@ -2,7 +2,7 @@
 {% assign popular = site.data.popular_videos | sort: 'Views' | reverse %}
 <div class="bg-light p-0 m-0">
 
-    <div class="container">
+    <div class="container-fluid">
 
       <div class="row">
         <div class="col-12 col-md-9">
@@ -17,7 +17,7 @@
             </div>
           </nav>
        
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-6 g-4">
     {% for vid in popular %}
     {% if vid.popular %}
     <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
@@ -25,8 +25,8 @@
       {% assign video = vids | where: 'video_id', vid.Content | first %}
       {% if video.type != "short" %}
         <div class="card-group">
-        <div class="card border-0">
-            <a href="https://www.youtube.com/watch?v={{video.video_id}}"><img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="img-fluid" alt="YouTube Thumbnail image for {{video.title}}"></a>
+        <div class="card border-0 card-hover card-shadow">
+            <a href="https://www.youtube.com/watch?v={{video.video_id}}"><img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="img-fluid rounded-top-1" alt="YouTube Thumbnail image for {{video.title}}"></a>
           <div class="card-body mb-0 pb-0">
               <div class="row h-100">
                 <div class="col-12 m-0 p-0">
