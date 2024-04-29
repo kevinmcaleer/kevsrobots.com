@@ -6,7 +6,8 @@ type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 next: 01_why_video.html
-description: null
+description: Learn how to build and program Burgerbot, a robot that can move around
+  and avoid objects using a range finder.
 percent: 7
 duration: 2
 navigation:

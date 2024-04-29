@@ -1,6 +1,6 @@
 ---
 title: Why BurgerBot?
-description:
+description: Introduction to BurgerBot and why it was created.
 layout: lesson
 type: video
 cover: /learn/burgerbot/assets/burgerbot.jpg

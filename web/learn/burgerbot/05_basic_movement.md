@@ -7,7 +7,7 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 04_loading_the_code.html
 next: 06_measuring_distance.html
-description: null
+description: Learn how to move the robot forward, backward, left and right.
 percent: 56
 duration: 1
 navigation:

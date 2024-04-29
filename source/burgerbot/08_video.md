@@ -1,6 +1,6 @@
 ---
 title: BurgerBot Upgrades video
-description:
+description: Learn how to upgrade your BurgerBot with a new feature.
 layout: lesson
 type: video
 cover: /learn/burgerbot/assets/burgerbot.jpg

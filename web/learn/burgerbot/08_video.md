@@ -7,7 +7,7 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 07_object_avoidance.html
 next: 08_line_following.html
-description: null
+description: Learn how to upgrade your BurgerBot with a new feature.
 percent: 77
 duration: 44
 video_id: jnPR6XAuJ2U

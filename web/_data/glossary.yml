@@ -661,3 +661,8 @@
     It is a free and open-source general-purpose parametric 3D computer-aided design modeler and a building information modeling software with finite-element-method support.
   link: https://en.wikipedia.org/wiki/FreeCAD
   course: /learn/freecad
+- term: DDOS
+  definition: Distributed Denial of Service
+  full: >-
+    A distributed denial-of-service (DDoS) attack is a malicious attempt to disrupt normal traffic of a targeted server, service or network by overwhelming the target or its surrounding infrastructure with a flood of Internet traffic.
+  link: https://en.wikipedia.org/wiki/Denial-of-service_attack

@@ -7,7 +7,7 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 00_intro.html
 next: 01_what_is_burger_bot.html
-description: null
+description: Introduction to BurgerBot and why it was created.
 percent: 14
 duration: 55
 video_id: awQ97DOyOcM

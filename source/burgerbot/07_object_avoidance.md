@@ -1,6 +1,6 @@
 ---
 title: Object Avoidance
-description:
+description: Learn how to avoid objects with BurgerBot.
 layout: lesson
 type: page
 ---

@@ -1,6 +1,6 @@
 ---
 title: Basic Movement
-description:
+description: Learn how to move the robot forward, backward, left and right.
 layout: lesson
 type: page
 ---

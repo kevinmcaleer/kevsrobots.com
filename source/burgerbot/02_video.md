@@ -1,6 +1,6 @@
 ---
 title: BurgerBot Assembly video
-description:
+description: Learn how to assemble a BurgerBot using a Raspberry Pi Pico and 3D printed parts.
 layout: lesson
 type: video
 cover: /learn/burgerbot/assets/burgerbot.jpg

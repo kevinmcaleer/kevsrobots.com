@@ -1,6 +1,7 @@
 ---
 title: What is BurgerBot?
-description:
+description: >-
+    Learn about BurgerBot, a Raspberry Pi Pico-powered robot that is quick and easy to print and assemble, with a low build cost.
 layout: lesson
 type: page
 ---

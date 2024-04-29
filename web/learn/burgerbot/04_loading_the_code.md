@@ -7,7 +7,8 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 03_getting_the_code.html
 next: 05_basic_movement.html
-description: null
+description: Learn how to upload the burgerbot.py file to a Raspberry Pi Pico using
+  Thonny IDE.
 percent: 49
 duration: 1
 navigation:

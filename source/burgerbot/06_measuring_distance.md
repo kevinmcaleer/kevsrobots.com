@@ -1,6 +1,6 @@
 ---
 title: Measuring Distance
-description:
+description: Learn how to measure distance using the range finder on BurgerBot.
 layout: lesson
 type: page
 ---

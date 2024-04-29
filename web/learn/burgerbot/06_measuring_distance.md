@@ -7,7 +7,7 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 05_basic_movement.html
 next: 07_object_avoidance.html
-description: null
+description: Learn how to measure distance using the range finder on BurgerBot.
 percent: 63
 duration: 2
 navigation:

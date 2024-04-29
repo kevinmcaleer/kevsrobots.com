@@ -7,7 +7,7 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 06_measuring_distance.html
 next: 08_video.html
-description: null
+description: Learn how to avoid objects with BurgerBot.
 percent: 70
 duration: 1
 navigation:

@@ -1,6 +1,6 @@
 ---
 title: Getting the code
-description:
+description: Learn how to use the BurgerBot MicroPython library to control the robotic vehicle.
 layout: lesson
 type: page
 ---

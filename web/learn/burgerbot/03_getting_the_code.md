@@ -7,7 +7,8 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 02_video.html
 next: 04_loading_the_code.html
-description: null
+description: Learn how to use the BurgerBot MicroPython library to control the robotic
+  vehicle.
 percent: 42
 duration: 2
 navigation:

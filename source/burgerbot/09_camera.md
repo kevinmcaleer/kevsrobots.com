@@ -1,6 +1,6 @@
 ---
 title: Camera
-description:
+description: Learn how to upgrade your BurgerBot with a camera.
 layout: lesson
 type: page
 ---

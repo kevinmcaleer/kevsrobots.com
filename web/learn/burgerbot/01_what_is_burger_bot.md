@@ -7,7 +7,8 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 01_why_video.html
 next: 02_assembly.html
-description: null
+description: Learn about BurgerBot, a Raspberry Pi Pico-powered robot that is quick
+  and easy to print and assemble, with a low build cost.
 percent: 21
 duration: 3
 navigation:

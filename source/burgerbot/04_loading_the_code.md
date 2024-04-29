@@ -1,6 +1,6 @@
 ---
 title: Loading the code
-description:
+description: Learn how to upload the burgerbot.py file to a Raspberry Pi Pico using Thonny IDE.
 layout: lesson
 type: page
 ---

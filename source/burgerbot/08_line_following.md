@@ -1,6 +1,6 @@
 ---
 title: Line Following
-description:
+description: Learn how to make BurgerBot follow a line using a line sensor.
 layout: lesson
 type: page
 ---

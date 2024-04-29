@@ -7,7 +7,7 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 08_video.html
 next: 08_line_following_code.html
-description: null
+description: Learn how to make BurgerBot follow a line using a line sensor.
 percent: 84
 duration: 1
 navigation:
