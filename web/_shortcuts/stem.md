@@ -1,0 +1,4 @@
+---
+ redirect:   /stem/
+ layout:     redirect
+---
