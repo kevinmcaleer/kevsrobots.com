@@ -60,3 +60,6 @@ collections:
   projects:
     output: true
     permalink: /projects/:name.html
+  stem:
+    output: true
+    permalink: /stem/:name.html

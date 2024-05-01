@@ -1,14 +1,16 @@
 ---
-layout: project
+layout: showcase
 title: Spooky Scary Skeleton 
 short_title: Spooky Scary Skeleton
 short_description: A Halloween Robot 
-description: A Halloween Robot
+description: A fun Halloween Robot
 difficulty: Intermediate
 date: 2022-10-09
 author: Kevin McAleer
 excerpt: Build your own cute Spooky Scary Skeleton Robot for Halloween - Using a Raspberry Pi Pico/Pico W, HC-SR04 Ultrasonic Range finder, and an SG90 Servo
 cover: /assets/img/blog/spookyscaryskeleton/spookyscaryskeleton.jpg
+hero:  /assets/img/blog/spookyscaryskeleton/hero.png
+mode: light
 tags:
  - Raspberry Pi Pico W
  - Pico
@@ -26,7 +28,7 @@ groups:
 videos:
  - Ldio6vxHGfI
  - gboF8HgULg0
-repo:
+code:
  - https://www.github.com/kevinmcaleer/bare_bones
 ---
 

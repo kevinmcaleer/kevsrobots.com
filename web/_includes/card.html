@@ -1,9 +1,14 @@
 <div class="col">
-    <a href="{{include.link}}" class="dotted">
-        <div class="card h-100 bg-light card-hover shadow-hover">
+    <a href="{{include.link}}" class="text-decoration-none">
+        <div class="card h-100 bg-light card-hover shadow-hover {% if include.noborder %}border-0{% endif %}">
+            {% if include.img != None %}
             <img src="{{include.img}}" class="card-img-top" alt="{{include.cardtitle}}">
+            {% endif %}
             <div class="card-body">
-                <h5 class="card-title">{{include.cardtitle}}</h5>
+                <h5 class="card-title black">{{ include.cardtitle }}</h5>
+                {% if include.description %}
+                <p class="text-small dark-grey">{{ include.description }}</p>
+                {% endif %}
             </div>
         </div>
     </a>

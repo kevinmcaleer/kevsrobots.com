@@ -1,0 +1,28 @@
+{% assign articles = site.stem | sort: "title" %}
+
+<h5>STEM Centre</h5>
+
+<nav class="navbar nav">
+<ul class="nav flex-column">
+    <li class="nav-link">
+        <a href="/stem/" class="nav-item">Articles Home</a>
+    </li>
+
+    {% assign categories = site.stem | map: 'category' | flatten | uniq %}
+
+    {% for category in categories %}
+    <li class="nav-link">
+        <a href="#{{ category | slugify }}" class="nav-item">{{ category }}</a>
+        <ul>
+            {% for article in site.stem %}
+                {% if article.category contains category %}
+                    <li class="nav-link">
+                        <a href="{{ article.url }}" class="nav-item">{{ article.title }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+</nav>

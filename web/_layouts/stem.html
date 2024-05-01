@@ -2,8 +2,6 @@
 layout: default
 ---
 
-
-
 {% if page.mode =='dark' %}
 {% assign textcol='white' %}
 {% assign bg-col= 'bg-dark'%}
@@ -19,6 +17,11 @@ layout: default
 <div class="background-image" style="background-image: url('{{ page.cover }}')"></div>
 
     <!-- All your page content goes here -->
+
+<div class="container-fluid p-0 p-3">
+{% include nav_resources.html %}
+</div>
+
 <article>
 <div class="container p-0 p-3 {{textcol}}">
     <div class="container m-0 p-0 blurred-background gradient-green {% if page.mode == 'light'%}lighten-3{% endif%}{% if page.mode =='dark'%}darken-3{%endif%} rounded-3">
@@ -26,6 +29,7 @@ layout: default
         <div class="col-12 col-lg-3 lighten-3 m-0 p-0 rounded-left">
             <div class="container p-3 rounded-left">
                 {% include sidenav.html %}
+                {% include nav_stem.html %}
             </div>
         </div>
         <div class="col-12 col-lg-9 m-0 p-0">
@@ -65,18 +69,6 @@ layout: default
                 </div> 
 
             <div class="row {{textcol}} m-0 p-0 g-0">
-            {% if page.tabs %}
-            <hr />
-            <div class="col-12 m-0 p-0 {{bg-col}}">
-                <ul class="nav nav-tabs m-3 p-3 mt-2" id="tabs" role="tablist">
-                {% for item in page.tabs %}
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link orange" id="{{item.link}}" data-bs-toggle="tab" data-bs-target="#{{item.link}}" type="button" role="tab" aria-controls="{{item.link}}">{{item.name}}</button>
-                </li>
-                {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
             <div class="col-12 m-0 p-0">
             {% if page.videos %}
             <div class="container-fluid {{bg-col}} m-0 p-3">

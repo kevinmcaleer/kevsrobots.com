@@ -1,0 +1,15 @@
+{% assign categories = site.stem | map: 'category' | flatten | uniq %}
+
+<div class="container">
+  {% for category in categories %}
+    <hr />
+    <h2 class="m-3 ">{{ category }}</h2>
+    <div class="row row-cols-1 row-cols-xxl-4 g-3">
+      {% for article in site.stem %}
+        {% if article.category contains category %}
+            {% include card.html img=article.cover cardtitle=article.title description=article.description link=article.url noborder=true %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
