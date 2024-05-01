@@ -1035,6 +1035,7 @@ table .w-30 {
 
 .blurred-background {
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px); /* for Safari 9+ */
   /* Adjust the blur radius as needed */
   // background-color: rgba(0, 0, 0, 0.1);
 
