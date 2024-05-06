@@ -14,6 +14,9 @@ posts:
 - title: Build your own AI Assistant in Python
   url: /2024-01-23-python-ai.md
   date: 2024-01-23
+- title: Now Ad-Free
+  url: /2024-04-29-ad-free.md
+  date: 2024-04-29
 - title: SMARS Mini
   url: /2023-01-22-smars-mini.md
   date: 2023-01-22
@@ -233,6 +236,9 @@ posts:
 - title: 10 Tips for getting started
   url: /2023-01-10-10-tips-for-getting-started-with-robotics.md
   date: 2023-01-10
+- title: Raspberry Pi Time machine
+  url: /2024-05-06-timemachine.md
+  date: 2024-05-06
 - title: What is MicroPython (old version)?
   url: /2023-03-20-what-is-micropython-old_version.md
   date: 2023-03-20
