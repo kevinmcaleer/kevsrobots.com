@@ -1,3 +1,8 @@
+- name: Pi Time Machine Backup
+  link: /blog/timemachine
+  cover: /assets/img/blog/timemachine/cover.png
+  date: 2024-05-06
+  description: Learn how to use your Pi as a macOS Time Machine backup server
 - name: Sync files with Syncthing
   link: /blog/sync-files-with-syncthing
   cover: /assets/img/blog/syncthing/cover.png
