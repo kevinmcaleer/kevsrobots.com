@@ -666,3 +666,10 @@
   full: >-
     A distributed denial-of-service (DDoS) attack is a malicious attempt to disrupt normal traffic of a targeted server, service or network by overwhelming the target or its surrounding infrastructure with a flood of Internet traffic.
   link: https://en.wikipedia.org/wiki/Denial-of-service_attack
+- term: IDE
+  definition: Integrated Development Environment
+  full: >-
+    An integrated development environment (IDE) is a software application that provides comprehensive facilities to computer programmers for software development.
+    An IDE normally consists of at least a source code editor, build automation tools, and a debugger.
+    Examples of popular IDEs are: Microsoft VS Code, Thonny, PyCharm, Mu, Arduino IDE and Arduino Lab for MicroPython
+  link: https://en.wikipedia.org/wiki/Integrated_development_environment

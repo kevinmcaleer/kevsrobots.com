@@ -13,6 +13,7 @@ tags:
   - PyFirmata
 groups:
   - micropython
+  - arduino
 videos:
   - KPfBOGjJdqE
 ---

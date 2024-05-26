@@ -1,3 +1,8 @@
+- name: Arduino Alvik
+  link: /blog/alvik.html
+  cover: /assets/img/blog/alvik/cover.png
+  description: Arduino's latest Robot kit
+  date: 2024/05/26
 - name: Buddy Jr.
   link: /blog/buddy_jr.html
   cover: /assets/img/blog/buddyjr/cover.png
