@@ -16,6 +16,7 @@ tags:
 groups:
  - raspberrypi
  - Python
+ - ai
 ---
 
 ### Build your own AI Assistant Series - 3 parts now released

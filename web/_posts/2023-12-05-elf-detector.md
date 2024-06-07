@@ -12,6 +12,7 @@ groups:
     - micropython
     - seasonal
     - raspberrypi
+    - ai
 tags:
     - robots
     - ai
