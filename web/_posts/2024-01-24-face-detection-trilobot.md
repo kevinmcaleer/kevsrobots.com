@@ -11,6 +11,7 @@ difficulty: beginner
 groups:
     - raspberrypi
     - robots
+    - ai
 tags:
     - Pimoroni
     - Raspberry Pi
