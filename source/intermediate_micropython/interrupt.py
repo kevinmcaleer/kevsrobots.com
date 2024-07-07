@@ -4,7 +4,7 @@ from machine import Pin, Timer
 from time import sleep
 
 # Define the LED pin
-led = Pin(48, Pin.OUT)
+led = Pin(Pin("LED"), Pin.OUT)
 
 # Define the timer callback function
 def toggle_led(timer):
