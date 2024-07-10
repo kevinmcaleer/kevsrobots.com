@@ -65,7 +65,7 @@ navigation:
 
 ![Cover](assets/cover.png){:class="cover"}
 
-Welcome to the **Intermediate MicroPython** course! Building on the foundations laid in the [Learn MicroPython - the basics](/learn/micropython) course, this course delves into more advanced topics, equipping you with the knowledge and skills to tackle complex projects with confidence.
+Welcome to the **Intermediate MicroPython** course! Building on the foundations laid in the [Learn MicroPython - the basics](/learn/micropython/) course, this course delves into more advanced topics, equipping you with the knowledge and skills to tackle complex projects with confidence.
 
 ---
 
@@ -111,7 +111,7 @@ MicroPython is a versatile and powerful language designed for microcontrollers, 
 
 ## Prerequisites
 
-Before starting this course, you should have a basic understanding of MicroPython and be comfortable with its syntax and fundamental concepts. If you haven’t completed the [Introduction to MicroPython](/learn/micropython) course, we recommend starting there.
+Before starting this course, you should have a basic understanding of MicroPython and be comfortable with its syntax and fundamental concepts. If you haven’t completed the [Introduction to MicroPython](/learn/micropython/) course, we recommend starting there.
 
 ---
 
