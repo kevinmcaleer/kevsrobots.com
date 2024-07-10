@@ -27,7 +27,7 @@ I've launched a new, free, course on MicroPython. This time it's aimed at those 
 Check it out here:
 
 <div class="row row-cols-2">
-{% include card.html cardtitle="Intermediate MicroPython" link="/learn/intermediate_micropython" img="/learn/intermediate_micropython/assets/cover.png" description=" Learn about Obect Oriented Programming, Polymorphism, Inheritance and more" %}
+{% include card.html cardtitle="Intermediate MicroPython" link="/learn/intermediate_micropython/" img="/learn/intermediate_micropython/assets/cover.png" description=" Learn about Obect Oriented Programming, Polymorphism, Inheritance and more" %}
 </div>
 
 ---
