@@ -5,10 +5,9 @@ author: Kevin McAleer
 type: page
 cover: assets/cover.png
 date: 2024-07-07
-previous: 12_timers.html
-next: 14_summary.html
+previous: 13_mp_remote.html
 description: MicroPython Remote - a command-line tool for managing MicroPython devices.
-percent: 90
+percent: 100
 duration: 2
 navigation:
 - name: Intermediate level MicroPython

@@ -12,6 +12,8 @@ In MicroPython, a ***decorator*** is a function that takes another function as a
 
 Decorators are a powerful tool that allows us to add functionality to a function without changing its code. They are a way to ***wrap*** a function, modifying its behavior.
 
+![Decorators](assets/decorators.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
+
 ---
 
 ## How Decorators Work
@@ -38,6 +40,8 @@ say_hello()
 In the example above, we define a decorator `my_decorator` that takes a function `func` as an argument. The `wrapper` function is used to wrap the `func` function, adding functionality before and after the function is called.
 
 We then apply the decorator to the `say_hello` function by reassigning `say_hello` to the result of calling `my_decorator(say_hello)`.
+
+![Inner functions](assets/innerfunctions.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
 ---
 
@@ -99,6 +103,8 @@ print(r.speed)  # notice the speed was capped at 100
 ```
 
 In this example, the `@property` decorator is used to define a getter method for the `speed` attribute, and the `@speed.setter` decorator is used to define a setter method.
+
+![properties](assets/properties.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
 > ## Don't Go Crazy with Property Decorators
 >

@@ -139,7 +139,7 @@
   description: This course is designed to take you from a beginner to an intermediate
     level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules
     and Packages, DocStrings, Interrupts and Timers, and MP Remote.
-  duration: 0h 30m
+  duration: 0h 32m
   link: /learn/intermediate_micropython/01_intro.html
   name: Intermediate level MicroPython
 - author: Kevin McAleer

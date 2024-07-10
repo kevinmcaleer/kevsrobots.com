@@ -45,3 +45,7 @@
         name: MP Remote
         content:
           - 13_mp_remote.md
+    - section:
+        name: Conclusion
+        content:
+          - 14_summary.md

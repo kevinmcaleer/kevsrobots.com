@@ -41,7 +41,7 @@ navigation:
       link: 07_modules.html
     - name: Packages
       link: 08_packages.html
-    - name: PyPi
+    - name: PyPi & MIP
       link: 09_pypi.html
   - section: DocStrings
     content:
@@ -57,6 +57,10 @@ navigation:
     content:
     - name: MP Remote
       link: 13_mp_remote.html
+  - section: Conclusion
+    content:
+    - name: MP Remote
+      link: 14_summary.html
 ---
 
 
