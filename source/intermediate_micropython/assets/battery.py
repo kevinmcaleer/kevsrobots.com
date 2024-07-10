@@ -1,17 +1,18 @@
-class Robot:
-    __battery_max_voltage = 4.2
-    __battery_min_voltage = 3.0
-    _battery_voltage = 3.7
-    __serial_number = "123456"
+class Animal:
+    def __init__(self, name):
+        self.name = name
 
-    def _battery_level(self):
-        battery_percentage = ((self._battery_voltage - self.__battery_min_voltage) / (self.__battery_max_voltage - self.__battery_min_voltage)) * 100
-        return int(battery_percentage)
-    
-    def battery(self):
-        return f"{self._battery_level()}%"
-    
-r = Robot()
-print(r.battery())
+    def speak(self):
+        print("Animal speaking")
 
-print(r._battery_voltage)
+class Dog(Animal):
+    def __init__(self, name, breed):
+        super().__init__(name)
+        self.breed = breed
+
+    def speak(self):
+        print("Dog barking")
+
+animal = Animal("Animal")
+dog = Dog("Dog", "Labrador")
+dog.speak()

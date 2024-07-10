@@ -7,9 +7,10 @@ cover: assets/cover.png
 date: 2024-07-07
 previous: 02a_classes.html
 next: 04_inheritance.html
-description: Hide complexity by exposing only the necessary details
+description: Learn about abstraction in MicroPython and how it simplifies code interaction
+  by hiding complexity.
 percent: 24
-duration: 4
+duration: 3
 navigation:
 - name: Intermediate level MicroPython
 - content:
@@ -74,97 +75,92 @@ This approach allows us to change how the system works without affecting the cod
 
 ## How We Use Abstraction in MicroPython
 
-In MicroPython, we use [`classes`](02a_classes) to create abstractions. A class is a blueprint for creating objects that represent real-world entities.
+In MicroPython, we use [`classes`](02a_classes) to create abstractions. A ***class*** is a blueprint for creating objects that represent real-world entities.
 
-We can hide ***properties*** and ***methods*** using `access modifiers`.
+In the example below, we model a popular road bike, the Yamaha MT-07, using a ***class***. We provide two public methods `ride` and `get_mileage` to interact with the bike object.
 
----
-
-## Access Modifiers
-
-An ***access modifier*** in MicroPython controls the visibility of properties and methods in a class; it can be `public`, `private`, or `protected`.
-
-We don't have to specifically declare methods and properties as ***public*** in MicroPython because everything is public by default.
-
----
-
-## Private and Protected
-
-Both class functions and methods can be marked as `private` (hidden) or `protected` (restricted from changes).
-
-***Private*** methods and properties are not suggested by the Python interpreter or IDEs, making them less accessible to the end user. If you *try* to access a private property or method from outside the class, you will get an `AttributeError`.
-
-***Protected*** properties and methods can, but should not be ***changed*** from outside the class.
-
----
-
-### Private Properties and Methods
-
-Use a double underscore "`__`" in front of a variable name to make it private:
+The **Bike** class also has a private property `__mileage` that stores the mileage of the bike. `__mileage` can only be accessed by the `ride()` method to increase the mileage, and `get_mileage()` method to return the current mileage the bike has traveled.
 
 ```python
-class Robot:
-    __a_private_value = 10
-```
+class Bike:
+    def __init__(self, make, model):
+        self.make = make
+        self.model = model
+        self.__mileage = 0
 
-Private methods and properties cannot be accessed by the user, either through the Python interpreter or an IDE.
-
----
-
-### Protected Properties and Methods
-
-Use a single underscore "`_`" in front of a variable name to make it protected:
-
-```python
-class Robot:
-    _a_protected_value = 20
-```
-
-Protected methods and properties can be accessed from outside the class but should not be changed; its just not polite!
-
----
-
-Below is an example of private and protected properties and methods in a class:
-
-```python
-class Robot:
-    __battery_max_voltage = 4.2
-    __battery_min_voltage = 3.0
-    _battery_voltage = 3.7
-    __serial_number = "123456"
-
-    def _battery_level(self):
-        battery_percentage = ((self._battery_voltage - self.__battery_min_voltage) / (self.__battery_max_voltage - self.__battery_min_voltage)) * 100
-        return int(battery_percentage)
+    def ride(self, distance):
+        self.__mileage += distance
     
-    def battery(self):
-        return f"{self._battery_level()}%"
+    def get_mileage(self):
+        return self.__mileage
     
-r = Robot()
-print(r.battery())
+my_bike = Bike("Yamaha", "MT-07")
+my_bike.ride(100)
+print(my_bike.get_mileage())
 ```
 
-In the example above, the complexity of calculating the battery level is hidden. The user doesn’t need to know the voltage levels or the formula used. The `__battery_max_voltage` and `__battery_min_voltage` are hidden from the user; IDE's such as [Thonny](https://thonny.org/) will not suggest them via autocomplete.
-
-Try to access the `r.__battery_max_voltage` property from outside the class, and you will get an `AttributeError`.
-
-Also try changing the `r._battery_voltage` value; it will work, but its not best practice.
+The ***Bike*** class is an abstraction of a real-world bike. It hides the ***complexity*** of how the bike works and provides a simple interface for interacting with the bike object.
 
 ---
 
-> ### What is Name Mangling?
->
-> MicroPython does not completely hide or protect these methods and properties; it only makes them harder to access. Name mangling is used to obscure the names of private and protected properties and methods.
+## Modularity
+
+MicroPython allows us to create modular code by using classes to create objects that represent real-world entities.
+
+Classes can be composed ***of other*** classes, which allows us to create complex objects that are made up of simpler objects.
+
+For example, if we want to create a robot, we could create a class for the robot and then create objects for the sensors, motors, and other components that make up the robot.
+
+```python
+class Sensor:
+    def __init__(self, type):
+        self.type = type
+
+    def read_value(self):
+        # Simulate reading a sensor value
+        return 42
+
+class Motor:
+    def __init__(self, power):
+        self.power = power
+
+    def move(self, direction):
+        print(f"Moving {direction} with power {self.power}")
+
+class Robot:
+    def __init__(self, name):
+        self.name = name
+        self.sensor = Sensor("Ultrasonic")
+        self.motor = Motor(100)
+
+    def move_forward(self):
+        self.motor.move("forward")
+
+    def read_sensor(self):
+        return self.sensor.read_value()
+
+robot = Robot("Robo")
+robot.move_forward()
+print(robot.read_sensor())
+```
+
+We cover [`Modules`](07_modules) in a future lesson.
 
 ---
 
-### Example
+## Abstraction vs. Encapsulation
+
+`Abstraction` is about hiding complexity by exposing only the necessary details, while `Encapsulation` is about hiding properties and methods using access modifiers. We cover [`Encapsulation`](05_encapsulation) in a future lesson.
+
+---
+
+### Real-World Example
 
 Think of a car. You don’t need to know how the engine works to drive it. You just use the pedals, steering wheel, and gear stick. The engine is abstracted away from you.
 
 ---
 
-### Benefits
+### Benefits of Abstraction
 
 - **Simplicity**: Abstraction simplifies complex systems by hiding unnecessary details.
 - **Flexibility**: We can change the system's implementation without affecting the code that interacts with it.
@@ -172,10 +168,8 @@ Think of a car. You don’t need to know how the engine works to drive it. You j
 
 ---
 
-[Encapsulation](05_encapsulation) and [Inheritance](04_inheritance) also help create abstractions in MicroPython. We will explore these concepts in the following lessons.
-
----
-
 ### Summary
 
 Abstraction in OOP allows us to hide complexity and create simple interfaces for interacting with systems. It helps simplify, add flexibility, and reuse code in our programs.
+
+---
