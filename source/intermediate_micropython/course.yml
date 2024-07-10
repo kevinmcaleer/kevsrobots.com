@@ -1,0 +1,47 @@
+- name: Intermediate level MicroPython
+  author: Kevin McAleer
+  date_created: 2024-07-07
+  date_published: 2024-07-07
+  layout: course
+  cover: assets/cover.png
+  description: >-
+    This course is designed to take you from a beginner to an intermediate level of
+    MicroPython programming. It covers the basics of Object Oriented Programming, 
+    Modules and Packages, DocStrings, Interrupts and Timers, and MP Remote.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 01_intro.md
+    - section:
+        name: Object Oriented Programming
+        content:
+          - 02_oop.md
+          - 02a_classes.md
+          - 03_abstraction.md
+          - 04_inheritance.md
+          - 05_encapsulation.md
+          - 06_polymorphism.md
+    - section:
+        name: Decorators
+        content:
+          - 06a_decorators.md
+    - section:
+        name: Modules and Packages
+        content:
+          - 07_modules.md
+          - 08_packages.md
+          - 09_pypi.md
+    - section:
+        name: DocStrings
+        content:
+          - 10_docstrings.md
+    - section:
+        name: Interrupts and Timers
+        content:
+          - 11_interrupts.md
+          - 12_timers.md
+    - section:
+        name: MP Remote
+        content:
+          - 13_mp_remote.md

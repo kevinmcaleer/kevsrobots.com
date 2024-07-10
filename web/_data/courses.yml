@@ -134,6 +134,15 @@
   link: /learn/fastapi/01_course_overview.html
   name: Building User Authentication for Static Sites with FastAPI
 - author: Kevin McAleer
+  cover: /learn/intermediate_micropython/assets/cover.png
+  date_published: 2024-07-07
+  description: This course is designed to take you from a beginner to an intermediate
+    level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules
+    and Packages, DocStrings, Interrupts and Timers, and MP Remote.
+  duration: 0h 30m
+  link: /learn/intermediate_micropython/01_intro.html
+  name: Intermediate level MicroPython
+- author: Kevin McAleer
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
   description: tbc
