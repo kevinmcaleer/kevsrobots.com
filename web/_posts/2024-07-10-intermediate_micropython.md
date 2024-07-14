@@ -17,7 +17,8 @@ tags:
  - Robotics
 groups:
  - micropython
-# videos:
+videos:
+ - tZ39uUBaljA
 ---
 
 ## Intermediate MicroPython Course now available
