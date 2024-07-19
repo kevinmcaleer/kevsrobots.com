@@ -1,3 +1,7 @@
+- name: Pi-Apps
+  link: /blog/pi-apps
+  cover: /assets/img/blog/pi-apps/cover.png
+  date: 2024-07-19
 - name: Pi Time Machine Backup
   link: /blog/timemachine
   cover: /assets/img/blog/timemachine/cover.png
