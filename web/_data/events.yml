@@ -31,14 +31,14 @@
   end: "2024-06-16"
   location: San Francisco, USA
   link: https://www.opensauce.live/
-  status: confirmed
+  status: closed
   image: /assets/img/events/opensauce_2024.jpg
 - event: Liverpool Makefest 2024
   start: "2024-07-06"
   end: "2024-07-06"
   location: Liverpool, UK
   link: https://liverpoolmakefest.org/
-  status: confirmed
+  status: closed
   image: /assets/img/events/liverpoolmakefest_2024.jpg
 - event: Maker Faire Rome 2024
   start: "2024-10-25"
@@ -73,5 +73,5 @@
   end: "2024-06-02"
   location: Eastnor Castle, UK
   link: https://www.emfcamp.org/
-  status: confirmed
+  status: closed
   image: /assets/img/events/emfcamp2024.jpg

@@ -218,9 +218,6 @@ posts:
 - title: PicoCat Lives
   url: /2022-04-01-picocat-lives.md
   date: 2022-04-01
-- title: Pi-Apps
-  url: /2024-07-19-pi-apps.md
-  date: 2024-07-19
 - title: SQLite3
   url: /2023-07-15-sqlite.md
   date: 2023-07-15
@@ -329,6 +326,9 @@ posts:
 - title: Ghostbox
   url: /2023-02-27-ghostbox.md
   date: 2023-02-27
+- title: Pi-Apps
+  url: /2024-07-19-pi_apps.md
+  date: 2024-07-19
 - title: Pi Stands
   url: /2022-05-22-pistands.md
   date: 2022-05-22
