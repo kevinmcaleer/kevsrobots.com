@@ -2,6 +2,7 @@
   link: /blog/pi_apps
   cover: /assets/img/blog/pi_apps/cover.png
   date: 2024-07-19
+  description: Learn how to install apps using the unofficial Raspberry Pi App Store
 - name: Pi Time Machine Backup
   link: /blog/timemachine
   cover: /assets/img/blog/timemachine/cover.png
