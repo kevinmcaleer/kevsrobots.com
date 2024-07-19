@@ -12,7 +12,7 @@
     <div class="col-6">
       <div class="row row-cols-2 row-cols-xl-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-2 g-2 rounded-1 m-0 p-0 mt-0">
         {% assign articles = site.reviews | sort:date | reverse  %}
-        {% for article in articles | limit:5 %}
+        {% for article in articles | limit:3 %}
         {% if article.title != 'Reviews' %}
         <div class="col m-0">
             <a href="{{article.url}}" class="">
