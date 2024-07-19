@@ -2,8 +2,6 @@
 layout: default
 ---
 
-
-
 {% assign group = page.name | replace:".md","" %}
 <div class="px-3 py-0 mx-3">
     
@@ -29,9 +27,7 @@ layout: default
         {% if page.name != "index" %}    
         <div class="row row-cols-md-3 row-cols-sm-1 row-cols-1 row-cols-lg-4 g-3">
             {% assign projects = site.posts %}
-            
             {% for item in projects %}
-          
             {% if item.groups contains group %}
             <div class="col">
             <a href="{{item.url}}" class="text-decoration-none">
