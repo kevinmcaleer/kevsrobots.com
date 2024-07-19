@@ -218,6 +218,9 @@ posts:
 - title: PicoCat Lives
   url: /2022-04-01-picocat-lives.md
   date: 2022-04-01
+- title: Pi-Apps
+  url: /2024-07-19-pi-apps.md
+  date: 2024-07-19
 - title: SQLite3
   url: /2023-07-15-sqlite.md
   date: 2023-07-15
@@ -263,6 +266,9 @@ posts:
 - title: Random Robot Facts
   url: /2024-01-15-random-robot-fact.md
   date: 2024-01-15
+- title: Intermediate MicroPython
+  url: /2024-07-10-intermediate_micropython.md
+  date: 2024-07-10
 - title: Makers Central
   url: /2023-05-22-makers_central.md
   date: 2023-05-22

@@ -1,0 +1,47 @@
+- name: Introduction to PCB Design with KiCad
+  author: Your Name
+  date_created: 2024-07-19
+  date_published: 2024-07-19
+  layout: course
+  cover: assets/cover.png
+  description: >-
+    This course is designed for beginners who want to learn the basics of PCB design using KiCad. It covers the essential steps from installation and setup to creating schematics, designing PCB layouts, managing libraries, and generating manufacturing files.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 01_intro.md
+    - section:
+        name: Getting Started with KiCad
+        content:
+          - 02_installation.md
+          - 03_interface.md
+    - section:
+        name: Creating Schematic Diagrams
+        content:
+          - 04_schematic_basics.md
+          - 05_adding_components.md
+    - section:
+        name: Designing PCB Layouts
+        content:
+          - 06_pcb_editor_basics.md
+          - 07_routing_placement.md
+    - section:
+        name: Libraries and Footprints
+        content:
+          - 08_managing_libraries.md
+          - 09_custom_footprints.md
+    - section:
+        name: Generating Manufacturing Files
+        content:
+          - 10_gerber_files.md
+          - 11_bom.md
+    - section:
+        name: Project Management
+        content:
+          - 12_version_control.md
+          - 13_documentation.md
+    - section:
+        name: Conclusion
+        content:
+          - 14_summary.md
