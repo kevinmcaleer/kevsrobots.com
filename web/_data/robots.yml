@@ -1,3 +1,8 @@
+- name: HP Robots Otto
+  link: /blog/hprobotsotto.html
+  cover: /assets/img/blog/hprobotsotto/cover.png
+  description: The evolution of the Otto DIY robot
+  date: 2024/07/21
 - name: Arduino Alvik
   link: /blog/alvik.html
   cover: /assets/img/blog/alvik/cover.png
