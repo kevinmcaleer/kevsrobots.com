@@ -40,4 +40,7 @@
 
 <meta name="twitter:site" content="@kevsmac" />
 
-<link href="/feeds/feed.xml" type="application/rss+xml" rel="alternate" title="Latest 10 blog posts (atom)" />
+{% assign feeds = site.data.feeds %}
+{% for feed in feeds %}
+<link href="{{feed.url}}" type="application/rss+xml" rel="alternate" title="{{feed.title}}" />
+{% endfor %}

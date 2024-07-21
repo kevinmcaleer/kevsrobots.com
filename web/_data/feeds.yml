@@ -1,0 +1,6 @@
+- title: All Videos
+  url: /feeds/videos.xml
+- title: All Posts
+  url: /feeds/feed.xml
+- title: 10 most recent Posts
+  url: /feeds/recent.xml
