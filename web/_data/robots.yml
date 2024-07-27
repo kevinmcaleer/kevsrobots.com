@@ -1,6 +1,6 @@
 - name: BrachioGraph
   link: /blog/brachiograph.html
-  cover: /assets/img/blog/brachiograph/brachiograph.jpg
+  cover: /learn/brachiograph/assets/cover.png
   description: A simple drawing robot
   date: 2024/07/26
 - name: HP Robots Otto

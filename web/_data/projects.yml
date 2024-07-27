@@ -1,6 +1,6 @@
 - name: BrachioGraph
   link: /blog/brachiograph
-  cover: /assets/img/blog/brachiograph/cover.png
+  cover: /learn/brachiograph/assets/cover.png
   date: 2024-07-26
   description: Learn how to build a cheap drawing robot using a Raspberry Pi and a few stepper motors.
 - name: Pi-Apps
