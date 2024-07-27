@@ -9,6 +9,7 @@ courses:
   - "Python for beginners"
   - "Learn MicroPython - The basics"
   - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
+  - "BrachioGraph Tutorial"
   - "Robot Eye Mechanism"
   - "Computer Vision on Raspberry Pi with CVZone"
   - "Learn ROS with me"

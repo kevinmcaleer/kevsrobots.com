@@ -92,6 +92,16 @@
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
+  cover: /learn/brachiograph/assets/cover.png
+  date_published: 2024-07-26
+  description: Learn how to build your own BrachioGraph, a simple drawing robot that
+    uses two stepper motors to create beautiful drawings.  This course covers the
+    essential steps from assembling the robot, installing the software, and creating
+    your first drawing.
+  duration: 0h 16m
+  link: /learn/brachiograph/01_intro.html
+  name: BrachioGraph Tutorial
+- author: Kevin McAleer
   cover: /learn/freecad/assets/cover.png
   date_published: 2024-04-17
   description: This beginner's course on FreeCAD teaches you the essentials of 3D

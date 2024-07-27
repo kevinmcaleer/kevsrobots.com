@@ -1,0 +1,30 @@
+- name: BrachioGraph Tutorial
+  author: Kevin McAleer
+  date_created: 2024-07-26
+  date_published: 2024-07-26
+  layout: course
+  cover: assets/cover.png
+  description: >-
+    Learn how to build your own BrachioGraph, a simple drawing robot that uses two stepper motors to create beautiful drawings. 
+    This course covers the essential steps from assembling the robot, installing the software, and creating your first drawing.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 01_intro.md
+    - section:
+        name: Build the plotter
+        content:
+          - 02_build.md
+          - 03_wire.md
+    - section:
+        name: Programming
+        content:
+          - 04_setup_pi.md
+          - 05_code.md
+          - 06_draw.md
+          - 07_vectorize.md
+    - section:
+        name: Summary
+        content:
+          - 08_summary.md
