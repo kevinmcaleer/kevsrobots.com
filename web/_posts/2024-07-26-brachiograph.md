@@ -25,7 +25,7 @@ videos:
 
 ## Introduction
 
-Are you fascinated by the world of robotics and eager to build your own robotic arm? Look no further! In this blog, we'll explore the brachiograph, a simple yet intriguing robotic arm project that you can build at home. Whether you're a hobbyist, a student, or someone with a keen interest in robotics, this article will walk you through the basics of brachiographs and provide step-by-step instructions to create one.
+Are you fascinated by the world of robotics and eager to build your own robotic arm? Look no further! In this blog, we'll explore the brachiograph, a simple yet intriguing robotic arm project that you can build at home. 
 
 ---
 
@@ -37,6 +37,8 @@ A `brachiograph` is a type of robotic arm designed to mimic the movement of a hu
 
 ## Components of a Brachiograph
 
+![Brachiograph Components](/learn/brachiograph/assets/base.jpg){:class="img-fluid w-100 rounded-3 card-shadow card-hover"}
+
 To build a brachiograph, you'll need the following components:
 
 1. **Servomotors:** These are the muscles of your brachiograph, responsible for moving the joints. SG90 servos are cheap and easy to get hold of (though you do get what you pay for)
@@ -47,3 +49,14 @@ To build a brachiograph, you'll need the following components:
 
 ---
 
+## Building a Brachiograph
+
+Building a brachiograph is a fun and educational project that can be completed in a few hours. Here's a step-by-step guide to help you get started:
+
+<div class="row row-cols-md-3 row-cols-1">
+<div class="col">
+{% include card.html cardtitle="BrachioGraph Tutorial" link="/learn/brachiograph/" description="Learn how to build your own pen plotter" img="/learn/brachiograph/assets/cover.png" %}
+</div>
+</div>
+
+---
