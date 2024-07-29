@@ -4,6 +4,7 @@ description: >-
     Dive deep into the world of computer vision on compact systems with our hands-on course tailored for Raspberry Pi enthusiasts
 layout: lesson
 cover: /learn/cvzone/assets/computer_vision.jpg
+date_updated: 2024-07-29
 ---
 
 ![Cover Image]({{page.cover}}){:class="cover"}

@@ -4,6 +4,7 @@ description: Learn how to build and use a BrachioGraph, a simple and fun drawing
 layout: lesson
 type: page
 cover: asses/cover.png
+date_updated: 2024-07-29
 ---
 
 ![Cover](assets/cover.png){:class="cover"}

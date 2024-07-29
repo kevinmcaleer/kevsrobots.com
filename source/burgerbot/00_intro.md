@@ -5,6 +5,7 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
+date_updated: 2024-07-29
 ---
 
 ![Cource Cover Image]({{page.cover}}){:class="cover"}
