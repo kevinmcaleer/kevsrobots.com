@@ -10,6 +10,7 @@ description: Learn how to build and use a BrachioGraph, a simple and fun drawing
   that can be controlled using Python.
 percent: 12
 duration: 2
+date_updated: 2024-07-29
 navigation:
 - name: BrachioGraph Tutorial
 - content:
@@ -44,7 +45,7 @@ navigation:
 
 ---
 
-A BrachioGraph (from the Greek `Brachio`; *Arm*, and `Graph`; *draw*) is a simple pen plotter that you can build at home using a few simple components. It's a fun project that will help you learn about robotics, programming, and electronics. In this tutorial, we'll show you how to build a BrachioGraph from scratch and control it using Python.
+A BrachioGraph (from the Greek `Brachio`; *Arm*, and `Graph`; *draw*) is a simple pen plotter that you can build at home using a few simple components. It's a fun project that will help you create robots, and understand more about programming, and electronics. In this tutorial, we'll show you how to build a BrachioGraph from scratch and control it using Python.
 
 ---
 

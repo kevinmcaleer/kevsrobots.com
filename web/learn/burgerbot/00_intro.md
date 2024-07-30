@@ -10,6 +10,7 @@ description: Learn how to build and program Burgerbot, a robot that can move aro
   and avoid objects using a range finder.
 percent: 7
 duration: 2
+date_updated: 2024-07-29
 navigation:
 - name: Build your own BurgerBot
 - content:
@@ -62,9 +63,9 @@ Welcome to this course on building and programming `Burgerbot`!
 
 `Burgerbot` is a fun and engaging robot that can move around and avoid objects using a range finder.
 
-In this course, you will learn step by step how to assemble the parts of `Burgerbot`, including the Pico lipo shim, motor holders, range finder, and more. You will also learn how to get the code and load it onto the robot using MicroPython.
+In this course, you will create a burgerbot step by step by assembling your own `Burgerbot`, including the Pico lipo shim, motor holders, range finder, and more. You will also create and load it onto the robot using MicroPython.
 
-The course will cover basic movement and using the range finder to avoid objects. You will also learn how to add a pen to your robot to enable it to draw, as well as how to use a line following module and swap out the range finder for a camera. By the end of this course, you will have a fully functional `Burgerbot` that you can program to move and interact with its environment in creative ways. So let's get started!
+The course will cover basic movement and using the range finder to avoid objects. You will add a pen to your robot to enable it to draw, as well as a line following module and swap out the range finder for a camera. By the end of this course, you will have a fully functional `Burgerbot` that you can program to move and interact with its environment in creative ways. So let's get started!
 
 ---
 

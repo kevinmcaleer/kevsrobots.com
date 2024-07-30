@@ -10,6 +10,7 @@ description: Dive deep into the world of computer vision on compact systems with
   hands-on course tailored for Raspberry Pi enthusiasts
 percent: 14
 duration: 2
+date_updated: 2024-07-29
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:

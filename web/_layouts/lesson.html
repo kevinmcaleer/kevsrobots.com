@@ -67,6 +67,10 @@ thanks: false
 
             {{content}}
         </div>
+        {% if page.date_updated %}
+        <hr />
+        <p class="container text-end text-small text-body-secondary">Page Updated {{page.date_updated | date: "%B %d, %Y"}}</p>
+        {% endif %}
         <p class="text-center">
         {% if page.previous %}
         <a href="{{page.previous}}" class="btn btn-primary"> < Previous</a>

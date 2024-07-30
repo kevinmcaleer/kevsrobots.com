@@ -11,6 +11,7 @@ description: Learn how to build the BrachioGraph plotter from scratch using simp
   components and tools.
 percent: 24
 duration: 3
+date_updated: 2021-07-30
 navigation:
 - name: BrachioGraph Tutorial
 - content:
@@ -54,7 +55,7 @@ Hot Blue Gun     | For assembling the parts                           | 1       
 a clothes peg    | For holding the pen                                | 1              | $0.50  | $0.50
 Foam Core board  | For the base                                       | 1              | $1     | $1
 Jumper wires     | For connecting the servos                          | 1 pack         | $5     | $5
-Breadboard       | For wiring up the servos                           | 1              | $1     | $1
+MiniBreadboard   | For wiring up the servos                           | 1              | $1     | $1
 {:class="table table-bordered table-striped"}
 
 ---
