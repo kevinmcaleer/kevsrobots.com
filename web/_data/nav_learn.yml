@@ -1,6 +1,6 @@
 - name: All Courses
   link: /learn/
 - name: Recent courses
-  link: /learn/recent/
+  link: /learn/recent
 - name: Learning Pathways
   link: /learn/learning_pathways/
