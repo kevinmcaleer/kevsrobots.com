@@ -7,7 +7,7 @@ cover: assets/assembly.png
 date_updated: 2024-08-02
 ---
 
-![Assembly](assets/assembly01.png){:class="cover"}
+![Assembly](assets/wiring01.png){:class="cover"}
 
 ---
 
@@ -24,7 +24,6 @@ Item | Action
 **Attach the timing cogs** Secure the timing cogs to the stepper motors using the small grub screws | ![Assembly](assets/assembly05.png){:class="w-100 img-fluid rounded-3 card-shadow card-hover"}
 **Attach to board**: Secure the left and right assemblies to the whiteboard | ![Assembly](assets/assembly06.png){:class="w-100 img-fluid rounded-3 card-shadow card-hover"}
 **Attach to the whiteboard**: Secure the left and right side motor mounts to the whiteboard using screws. | ![Assembly](assets/assembly07.png){:class="w-100 img-fluid rounded-3 card-shadow card-hover"}
-{:class="w-100 img-fluid rounded-3 card-shadow card-hover"}
 {:class="table table-striped"}
 
 ---
