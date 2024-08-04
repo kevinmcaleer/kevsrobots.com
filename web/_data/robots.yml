@@ -1,3 +1,8 @@
+- name: Scrawly Wally
+  link: /learn/scrawly_wally/
+  cover: /learn/scrawly_wally/assets/cover.png
+  description: A Wall drawing robot
+  date: 2024/08/03
 - name: BrachioGraph
   link: /blog/brachiograph.html
   cover: /learn/brachiograph/assets/cover.png

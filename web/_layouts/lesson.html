@@ -56,21 +56,29 @@ thanks: false
         <div class="px-3 m-3">
             <h1>{{page.title}}</h1>
             <h2>{{page.description}}</h2>
-            <p class="text-small mute">By {{page.author}},&nbsp; <i class="fa-regular fa-clock"></i>&nbsp; {{page.duration}} Minute{%if page.duration > 1%}s{% endif %}</p>
+            <div class="container m-0 p-0">
+            <div class="d-flex justify-content-between m-0 p-0">
+                <div class="m-0 p-0">
+                <p class="text-small text-body-secondary text-start m-0 p-0">By {{page.author}},&nbsp; <i class="fa-regular fa-clock"></i>&nbsp; {{page.duration}} Minute{%if page.duration > 1%}s{% endif %}</p>
+                </div>    
+                {% if page.date_updated %}
+                <div class="m-0 p-0">
+                <p class="text-end text-small text-body-secondary m-0 p-0">Page last updated {{page.date_updated | date: "%B %d, %Y"}}</p>
+                </div>
+                {% endif %}
+                </div>
+            </div>
             <hr />
 
-            {% if page.type == "video" %}
-           
-            {% include youtubeplayer.html id=page.video_id %}     
-            
-            {% endif %}
-
-            {{content}}
-        </div>
-        {% if page.date_updated %}
-        <hr />
-        <p class="container text-end text-small text-body-secondary">Page Updated {{page.date_updated | date: "%B %d, %Y"}}</p>
+        {% if page.type == "video" %}
+        
+        {% include youtubeplayer.html id=page.video_id %}     
+        
         {% endif %}
+
+        {{content}}
+            
+        
         <p class="text-center">
         {% if page.previous %}
         <a href="{{page.previous}}" class="btn btn-primary"> < Previous</a>

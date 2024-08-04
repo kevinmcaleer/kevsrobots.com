@@ -18,5 +18,7 @@ Subscribe to our RSS feeds to stay updated on the latest tutorials, courses, and
 - Top 10 most recent posts: [RSS](/feeds/recent.xml)
 - Articles: [RSS](/feeds/feed.xml)
 - Videos: [RSS](/feeds/videos.xml)
+- Robots: [RSS](/feeds/robots.xml)
+- Ideas: [RSS](/feeds/ideas.xml)
 
 ---

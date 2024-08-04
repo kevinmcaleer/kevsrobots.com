@@ -1,10 +1,10 @@
 ---
 title: BrachioGraph Pen Plotter
-description: Learn how to build and use a BrachioGraph, a simple and fun drawing robot that can be controlled using Python.
+description: Build and program a BrachioGraph; a simple and fun drawing robot that can be controlled using Python.
 layout: lesson
 type: page
 cover: asses/cover.png
-date_updated: 2024-07-29
+date_updated: 2024-07-30
 ---
 
 ![Cover](assets/cover.png){:class="cover"}

@@ -6,11 +6,11 @@ type: page
 cover: asses/cover.png
 date: 2024-07-26
 next: 02_build.html
-description: Learn how to build and use a BrachioGraph, a simple and fun drawing robot
-  that can be controlled using Python.
+description: Build and program a BrachioGraph; a simple and fun drawing robot that
+  can be controlled using Python.
 percent: 12
 duration: 2
-date_updated: 2024-07-29
+date_updated: 2024-07-30
 navigation:
 - name: BrachioGraph Tutorial
 - content:
