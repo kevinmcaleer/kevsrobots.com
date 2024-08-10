@@ -673,3 +673,10 @@
     An IDE normally consists of at least a source code editor, build automation tools, and a debugger.
     Examples of popular IDEs are: Microsoft VS Code, Thonny, PyCharm, Mu, Arduino IDE and Arduino Lab for MicroPython
   link: https://en.wikipedia.org/wiki/Integrated_development_environment
+- term: JST
+  definition: JST Connector
+  full: >-
+    "JST connectors are electrical connectors manufactured to the design standards originally developed by J.S.T. Mfg. Co. (Japan Solderless Terminal).
+    JST manufactures numerous series (families) and pitches (pin-to-pin distance) of connectors."
+  link: https://en.wikipedia.org/wiki/JST_connector
+  

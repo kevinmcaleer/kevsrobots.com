@@ -1,14 +1,23 @@
-<nav>
-    <ul class="nav ">
-        <li class="nav-item ml-0 pl-0"><a class="nav-link" href="/learn/learning_pathways">Learning Pathways:</a></li>
-        {% assign nav_items = site.learning_pathways %}
+<nav class="mx-0 py-0">
+    <ul class="nav nav-pills my-1 py-1">
+        <li class="nav-item">
+            <a class="nav-link 
+                {% if page.url == '/learn/learning_pathways' or page.url == '/learn/learning_pathways/index.html' %}active{% endif %} 
+                " 
+                href="/learn/learning_pathways">Learning Pathways:
+            </a>
+        </li>
+        {% assign nav_items = site.learning_pathways | sort: asc%}
         {% for nav_item in nav_items %}
         {% if nav_item.title contains "Learning Pathways" %}
                 <!-- Skip index.html -->
             {% else %}
             <li class="nav-item">
-                <a class="nav-link active" href="{{nav_item.url}}">{{nav_item.name}}</a>
+            
+                <a class="nav-link {% if nav_item.url == page.url %}active{% endif %}" href="{{ nav_item.url | relative_url }}">{{ nav_item.name }}</a>
+                
             </li>
+
         {% endif %}
         {% endfor %}
     </ul>

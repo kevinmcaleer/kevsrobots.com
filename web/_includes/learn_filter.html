@@ -2,15 +2,19 @@
     <div class="row">
         <!-- Sidebar for filters -->
         <div class="col-md-2">
-            <p>Filters</p>
+            <div class="mb-1 p-3 bg-light rounded-1">
+            <p><b>Filters</b></p>
+            <p class="card-text mute small">Check or uncheck the boxes to filter the courses</p>
+            </div>
             <div id="filters" class="list-group-flush">
                 <!-- Filters will be dynamically inserted here -->
             </div>
+            {% include boards_sidenav.html %}
         </div>
         <!-- Main content for course cards -->
         <div class="col-md-10">
             <div class="container-fluid bg-ocre rounded-3 pt-3">
-            <p>Courses</p>
+            <p><b>Courses</b></p>
             <div id="courses" class="row ">
                 <!-- Course cards will be dynamically inserted here -->
                  <p>Loading courses, please wait...</p>

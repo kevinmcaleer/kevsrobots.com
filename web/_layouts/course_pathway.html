@@ -1,23 +1,26 @@
 ---
-layout: default
+layout: content
 ---
 
-<div class="px-3 py-0 mx-3 my-0">
+<div class="px-0 py-0 mx-0 my-0">
 {% include nav_courses.html %}
     {% include breadcrumbs.html %}
-<div class="p-3 m-3">
+<div class="p-0 m-0">
     
 
 <h1>{{page.title}}</h1>
 <h2>Course Pathway</h2>
 <hr>
+
+{% include nav_learning_pathways.html %}
 <div class="row">
     <div class="col-3 ">
-    {% include learning_pathways_sidenav.html %}
+    
     {% include courses_sidenav.html %}
     </div>
     <div class="col-9">
-        <div class="p-3 m-3">
+        <div class="p-0 m-0">
+            
             {{ content }}
             <div class="container-fluid bg-ocre p-3 rounded-3">
             <div class="row row-cols-lg-4 row-cols-md-2 row-cols-sm-1 g-3">

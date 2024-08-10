@@ -338,3 +338,13 @@
   - fusion 360
   link: /learn/eye_mechanism/00_intro.html
   name: Robot Eye Mechanism
+- author: Kevin McAleer
+  cover: /learn/how_to_install_micropython/assets/cover.jpg
+  date_published: 2024-08-10
+  description: Install MicroPython on your Raspberry Pi Pico.
+  duration: 0h 8m
+  groups:
+  - micropython
+  - pico
+  link: /learn/how_to_install_micropython/01_intro.html
+  name: How to install MicroPython

@@ -1,0 +1,26 @@
+- name: How to install MicroPython
+  author: Kevin McAleer
+  date_created: 2024-08-10
+  date_published: 2024-08-10
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+    - micropython
+    - pico
+  description: >-
+    Install MicroPython on your Raspberry Pi Pico.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 01_intro.md
+    - section:
+        name: Raspberry Pi Pico
+        content:
+          - 02_types.md
+          - 03_install.md
+    - section:
+        name: Where to go from here
+        content:
+          - 04_next_steps.md
+          

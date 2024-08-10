@@ -1,5 +1,6 @@
 ---
 title: Learning Pathways
+name: index.html
 description: Curated course collections
 date_published: 2023-07-20
 layout: course_pathways
