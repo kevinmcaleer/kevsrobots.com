@@ -1,0 +1,15 @@
+<nav>
+    <ul class="nav ">
+        <li class="nav-item ml-0 pl-0"><a class="nav-link" href="/learn/learning_pathways">Learning Pathways:</a></li>
+        {% assign nav_items = site.learning_pathways %}
+        {% for nav_item in nav_items %}
+        {% if nav_item.title contains "Learning Pathways" %}
+                <!-- Skip index.html -->
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link active" href="{{nav_item.url}}">{{nav_item.name}}</a>
+            </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</nav>

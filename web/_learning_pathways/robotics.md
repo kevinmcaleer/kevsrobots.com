@@ -1,5 +1,6 @@
 ---
 title: Learn Robotics
+name: Robotics
 date_published: 2023-07-20
 layout: course_pathway
 cover: /assets/img/learn/learn_robotics.png

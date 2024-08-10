@@ -1,5 +1,6 @@
 ---
 title: Learn Databases
+name: Databases
 date_published: 2023-07-20
 layout: course_pathway
 description: Learn how to create Databases in Python, with SQLite3 and Redis.

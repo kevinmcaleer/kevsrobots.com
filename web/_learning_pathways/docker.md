@@ -1,5 +1,6 @@
 ---
 title: Learn Docker
+name: Docker
 date_published: 2024-02-03
 layout: course_pathway
 cover: /assets/img/learn/learn_docker.png

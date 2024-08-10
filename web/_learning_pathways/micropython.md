@@ -1,5 +1,6 @@
 ---
 title: Learn MicroPython
+name: MicroPython
 date_published: 2024-07-10
 layout: course_pathway
 cover: /assets/img/learn/learn_micropython.png

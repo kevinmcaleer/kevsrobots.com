@@ -44,7 +44,7 @@ class Courses():
         for course in self.course_list:
             self.duration = course.build()
         
-        self.build_index()
+        self.build_index() # should use the index.html file in the _learn folder
         self.build_recent()
     
     def build_index(self):
@@ -53,18 +53,23 @@ class Courses():
         if os.path.exists(f'{self.output_folder}/index.md'):
             os.remove(f'{self.output_folder}/index.md')
             
-        index = '---' + "\n"
-        index += 'layout: learn' + "\n"
-        index += 'title: Learn' + "\n"
-        index += 'description: Take a course and learn something new' + "\n"
-        index += f'duration: {self.duration}' + "\n"
-        index += '---' + "\n\n"
-        index += '{% include nav_courses.html %}' + "\n"
-        index += '{% include breadcrumbs.html %}' + "\n"
-        index += '{% include all_courses.html %}' + "\n"
+        import shutil
+        source = "web/_learn/index.md"
+        destination = "web/learn/index.md"
+        shutil.copy(source, destination)
         
-        with open(f'{self.output_folder}/index.md', 'w') as build_file:
-            build_file.writelines(index)
+        # index = '---' + "\n"
+        # index += 'layout: learn' + "\n"
+        # index += 'title: Learn' + "\n"
+        # index += 'description: Take a course and learn something new' + "\n"
+        # index += f'duration: {self.duration}' + "\n"
+        # index += '---' + "\n\n"
+        # index += '{% include nav_courses.html %}' + "\n"
+        # index += '{% include breadcrumbs.html %}' + "\n"
+        # index += '{% include all_courses.html %}' + "\n"
+        
+        # with open(f'{self.output_folder}/index.md', 'w') as build_file:
+        #     build_file.writelines(index)
 
     def build_recent(self):
         """ Build the recent Courses page """

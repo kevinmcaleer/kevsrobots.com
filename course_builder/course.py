@@ -528,25 +528,31 @@ class Courses:
         for course in self.course_list:
             self.duration = course.build()
 
-        self.build_index()
+        self.build_index() 
         self.build_recent()
 
     def build_index(self):
+        import shutil
         # remove the index file if it exists
-        if os.path.exists(f"{self.output_folder}/index.md"):
-            os.remove(f"{self.output_folder}/index.md")
+        # if os.path.exists(f"{self.output_folder}/index.md"):
+        #     os.remove(f"{self.output_folder}/index.md")
 
-        index = "---" + "\n"
-        index += "layout: content" + "\n"
-        index += "title: Learn" + "\n"
-        index += "description: Take a course and learn something new" + "\n"
-        index += f"duration: {self.duration}" + "\n"
-        index += f"date_published: {self.date_published}" + "\n"
-        index += "---" + "\n"
-        index += "{% include all_courses.html %}" + "\n"
+        # index = "---" + "\n"
+        # index += "layout: content" + "\n"
+        # index += "title: Learn" + "\n"
+        # index += "description: Take a course and learn something new" + "\n"
+        # index += f"duration: {self.duration}" + "\n"
+        # index += f"date_published: {self.date_published}" + "\n"
+        # index += "---" + "\n"
+        # index += "{% include all_courses.html %}" + "\n"
 
-        with open(f"{self.output_folder}/index.md", "w") as build_file:
-            build_file.writelines(index)
+        # with open(f"{self.output_folder}/index.md", "w") as build_file:
+        #     build_file.writelines(index)
+        
+        source = "web/_learn/index.md"
+        destination = "web/learn/index.md"
+        shutil.copy(source, destination)
+        
 
     def build_recent(self):
         """Build the recent Courses page"""
