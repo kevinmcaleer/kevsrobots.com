@@ -31,7 +31,8 @@ def get_courses(tags: Optional[List[str]] = Query(None)):
     if tags:
         placeholders = ','.join('?' for _ in tags)
         query = f'''
-            SELECT courses.course_id, courses.course_name, courses.course_url, 
+            SELECT courses.course_id, courses.course_name, courses.course_url,  
+            courses.course_cover, courses.course_author, courses.course_duration, courses.course_date,
                    tags.tag_name
             FROM courses
             JOIN tag_link ON courses.course_id = tag_link.course_id
@@ -51,6 +52,7 @@ def get_courses(tags: Optional[List[str]] = Query(None)):
     else:
         query = '''
             SELECT courses.course_id, courses.course_name, courses.course_url, 
+                   courses.course_cover, courses.course_author, courses.course_duration, courses.course_date,
                    tags.tag_name
             FROM courses
             LEFT JOIN tag_link ON courses.course_id = tag_link.course_id
@@ -71,6 +73,10 @@ def get_courses(tags: Optional[List[str]] = Query(None)):
                 "course_id": course_id,
                 "course_name": row["course_name"],
                 "course_url": row["course_url"],
+                "course_cover": row["course_cover"],
+                "course_author": row["course_author"],
+                "course_duration": row["course_duration"],
+                "course_date": row["course_date"],
                 "course_tags": []
             }
         # Only append the tag if it's not None

@@ -18,7 +18,11 @@ def build_database():
     c.execute('''CREATE TABLE courses
              (course_id INTEGER PRIMARY KEY, 
               course_name TEXT,
-              course_url TEXT
+              course_url TEXT, 
+              course_cover TEXT,
+              course_author TEXT,
+              course_duration TEXT,
+              course_date TEXT
               )''')
     c.execute('''CREATE TABLE tags
                 (tag_id INTEGER PRIMARY KEY, 
@@ -45,8 +49,8 @@ def insert_data(data):
     courses = data
     for course in courses:
         # Insert the course into the courses table
-        c.execute("INSERT INTO courses (course_name, course_url) VALUES (?, ?)", 
-                  (course['name'], course['link']))
+        c.execute("INSERT INTO courses (course_name, course_url, course_cover, course_author, course_duration, course_date) VALUES (?, ?, ?, ?, ?, ?)", 
+                  (course['name'], course['link'], course['cover'], course['author'], course['duration'], course['date_published']))
         
         # Get the course_id of the last inserted course
         course_id = c.lastrowid
