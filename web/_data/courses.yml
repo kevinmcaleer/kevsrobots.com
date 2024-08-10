@@ -186,7 +186,6 @@
   duration: 0h 14m
   groups:
   - octapi
-  - enigma
   - python
   - clusters
   link: /learn/octapi/00_intro.html

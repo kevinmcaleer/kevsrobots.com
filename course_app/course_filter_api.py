@@ -5,6 +5,8 @@ from typing import List, Optional
 
 app = FastAPI()
 
+DATABASE_FILE = 'courses.db'
+
 # Set up CORS to allow all origins (Not recommended for production)
 app.add_middleware(
     CORSMiddleware,
@@ -15,7 +17,8 @@ app.add_middleware(
 )
 
 def get_db_connection():
-    conn = sqlite3.connect('/Users/Kev/Web/kevsrobots.com/courses.db')
+    conn = sqlite3.connect(DATABASE_FILE)
+    print(f"Opened database successfully {DATABASE_FILE}")
     conn.row_factory = sqlite3.Row  # This allows us to return dictionary-like rows
     return conn
 

@@ -1,8 +1,10 @@
 import sqlite3
 import yaml
 
+DATABASE_FILE = 'course_app/courses.db'
+
 def delete_database():
-    conn = sqlite3.connect('courses.db')
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
     c.execute('''DROP TABLE IF EXISTS courses''')
     c.execute('''DROP TABLE IF EXISTS tags''')
@@ -11,7 +13,7 @@ def delete_database():
     conn.close()
 
 def build_database():
-    conn = sqlite3.connect('courses.db')
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
     c.execute('''CREATE TABLE courses
              (course_id INTEGER PRIMARY KEY, 
@@ -38,7 +40,7 @@ def read_yaml(file_path):
     return data
 
 def insert_data(data):
-    conn = sqlite3.connect('courses.db')
+    conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
     courses = data
     for course in courses:

@@ -6,7 +6,6 @@
   cover: assets/octapi.jpg
   groups:
       - octapi
-      - enigma
       - python
       - clusters
   description: >- 

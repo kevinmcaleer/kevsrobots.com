@@ -11,3 +11,4 @@ vendor/
 youtube.yaml
 *venv
 Table data.csv
+__pycache__/

@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build: .
+    container_name: course_app_container
+    volumes:
+      - ./course_app:/app/course_app
+    ports:
+      - "8004:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
