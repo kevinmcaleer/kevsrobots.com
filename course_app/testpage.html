@@ -32,7 +32,7 @@
     <!-- Custom JavaScript -->
   
     <script>
-        const apiBaseUrl = 'http://127.0.0.1:8000'; // Base URL for your FastAPI
+        const apiBaseUrl = 'http://courses.kevsrobots.com'; // Base URL for your FastAPI
     
         // Function to fetch and render filters
         async function fetchAndRenderFilters(allTags, selectedTags) {
@@ -89,6 +89,7 @@
                 courseCard.classList.add('col-md-4', 'mb-4');
                 courseCard.innerHTML = `
                     <div class="card">
+                        <img src="${course.course_cover}" class="card-img-top" alt="${course.course_name}">
                         <div class="card-body">
                             <h5 class="card-title">${course.course_name}</h5>
                             <p class="card-text">Tags: ${course.course_tags.map(tag => `<span class="badge bg-primary">${tag}</span>`).join(' ')}</p>

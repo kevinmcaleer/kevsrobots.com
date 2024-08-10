@@ -232,9 +232,7 @@
   description: Learn how to manipulate data using Pandas and Numpy
   duration: 0h 24m
   groups:
-  - pandas
-  - numpy
-  - data manipulation
+  - pandas & numpy
   link: /learn/pandas_and_numpy/01_overview.html
   name: Data Manipulation with Pandas and Numpy
 - author: Kevin McAleer
@@ -324,7 +322,7 @@
   description: Build a simple round robot powered by Raspberry Pi Pico
   duration: 3h 54m
   groups:
-  - robot
+  - robotics
   - micropython
   - raspberry pi pico
   link: /learn/burgerbot/00_intro.html
@@ -336,7 +334,7 @@
     360 to create a Servo controled Robot eye mechanism.
   duration: 0h 18m
   groups:
-  - robot
+  - robotics
   - fusion 360
   link: /learn/eye_mechanism/00_intro.html
   name: Robot Eye Mechanism

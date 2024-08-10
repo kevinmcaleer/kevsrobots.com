@@ -5,7 +5,7 @@
   layout: course
   cover: assets/burgerbot.jpg
   groups:
-    - robot
+    - robotics
     - micropython
     - raspberry pi pico
   description: >- 

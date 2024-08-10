@@ -1,0 +1,100 @@
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar for filters -->
+        <div class="col-md-2">
+            <p>Filters</p>
+            <div id="filters" class="list-group-flush">
+                <!-- Filters will be dynamically inserted here -->
+            </div>
+        </div>
+        <!-- Main content for course cards -->
+        <div class="col-md-10">
+            <p>Courses</p>
+            <div id="courses" class="row">
+                <!-- Course cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const apiBaseUrl = 'http://courses.kevsrobots.com'; // Base URL for your FastAPI
+
+    // Function to fetch and render filters
+    async function fetchAndRenderFilters(allTags, selectedTags) {
+        const filtersDiv = document.getElementById('filters');
+        filtersDiv.innerHTML = ''; // Clear previous filters
+
+        // Sort the tags alphabetically
+        allTags.sort((a, b) => a.localeCompare(b));
+
+        allTags.forEach(tag => {
+            const filterItem = document.createElement('div');
+            filterItem.classList.add('list-group-item');
+            filterItem.innerHTML = `
+                <input type="checkbox" class="form-check-input me-1" value="${tag}" id="filter-${tag}">
+                <label class="form-check-label small orange" for="filter-${tag}">${tag}</label>
+            `;
+            filtersDiv.appendChild(filterItem);
+        });
+
+        // Reapply the checked state for selected tags
+        selectedTags.forEach(tag => {
+            const checkbox = document.getElementById(`filter-${tag}`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+
+        // Add event listeners to checkboxes
+        document.querySelectorAll('#filters input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', fetchAndRenderCourses);
+        });
+    }
+
+    // Function to fetch and render courses
+    async function fetchAndRenderCourses() {
+        const selectedTags = Array.from(document.querySelectorAll('#filters input[type="checkbox"]:checked')).map(cb => cb.value);
+        let url = `${apiBaseUrl}/courses/`;
+
+        if (selectedTags.length > 0) {
+            const params = selectedTags.map(tag => `tags=${encodeURIComponent(tag)}`).join('&');
+            url += `?${params}`;
+        }
+
+        const response = await fetch(url);
+        const courses = await response.json();
+
+        const coursesDiv = document.getElementById('courses');
+        coursesDiv.innerHTML = ''; // Clear previous courses
+
+        const allTags = new Set();
+
+        courses.forEach(course => {
+            const courseCard = document.createElement('div');
+            courseCard.classList.add('col-md-3', 'mb-4');
+            courseCard.innerHTML = `
+                <div class="card border-0 card-hover card-shadown">
+                    <img src="${course.course_cover}" class="card-img-top" alt="${course.course_name}">
+                    <div class="card-body">
+                        <h5 class="card-title">${course.course_name}</h5>
+                        <p class="card-text">Tags: ${course.course_tags.map(tag => `<span class="badge bg-primary">${tag}</span>`).join(' ')}</p>
+                        <a href="${course.course_url}" class="btn btn-primary">View Course</a>
+                    </div>
+                </div>
+            `;
+            coursesDiv.appendChild(courseCard);
+
+            // Collect all tags from the filtered courses, not just the selected ones
+            course.course_tags.forEach(tag => {
+                allTags.add(tag);
+            });
+        });
+
+        // Update the filter options based on all tags from filtered courses, preserving the checked state
+        fetchAndRenderFilters(Array.from(allTags), selectedTags);
+    }
+
+    // Initial fetch and render of courses
+    fetchAndRenderCourses();
+</script>

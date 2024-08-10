@@ -5,9 +5,7 @@
   layout: course
   cover: assets/pandas.png
   groups:
-    - pandas
-    - numpy
-    - data manipulation
+    - pandas & numpy
   description: >- 
     Learn how to manipulate data using Pandas and Numpy
   content:
