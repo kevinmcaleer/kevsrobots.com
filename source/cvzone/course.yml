@@ -6,6 +6,10 @@
   cover: assets/computer_vision.jpg
   description: >- 
      Computer Vision on Raspberry Pi with CVZone
+  groups:
+    - computer vision
+    - python
+    - cvzone
   content:
   - section:
       name: Overview

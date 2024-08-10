@@ -4,6 +4,8 @@
   date_published: 2023-07-20
   layout: course
   cover: assets/python.png
+  groups:
+    - python
   description: >- 
      Get started with Python programming, learn why you should 
      learn Python and how to setup your Python environment.

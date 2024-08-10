@@ -4,6 +4,9 @@
   date_published: 2022-12-04
   layout: course
   cover: assets/micropython.jpg
+  groups:
+      - micropython
+      - python
   description: >- 
      Get started with MicroPython, What Python is, where to download it and which software to use to develop MicroPython code
   content:

@@ -1,5 +1,5 @@
 ---
-layout: content
+layout: learn
 title: Learn
 description: Take a course and learn something new
 duration: 18

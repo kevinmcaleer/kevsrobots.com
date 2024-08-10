@@ -4,6 +4,10 @@
   date_published: 2023-07-20
   layout: course
   cover: assets/smars_fusion360.png
+  groups:
+      - smars
+      - robotics
+      - fusion 360
   description: >- 
      Learn how to design a robot in 3d using Fusion 360
   content:

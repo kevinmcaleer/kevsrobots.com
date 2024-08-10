@@ -6,6 +6,9 @@
   cover: assets/docker_swarm.jpg
   description: >-
     This course guides beginners through the process of setting up a Raspberry Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage, and scale a mini-computing cluster for various projects.
+  groups:
+    - docker
+    - raspberry pi
   content:
   - section:
       name: Introduction

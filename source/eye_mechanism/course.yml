@@ -6,6 +6,9 @@
   cover: assets/eye_mechanism.jpg
   description: >- 
      Robot Eye Mechanism, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.
+  groups:
+    - robot
+    - fusion 360
   content:
   - section:
       name: Overview

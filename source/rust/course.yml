@@ -4,6 +4,8 @@
   date_published: 2024-03-09
   layout: course
   cover: assets/cover.png
+  groups:
+      - rust
   description: >- 
      Learning Rust with me, is a course that will teach you how to use Rust on Raspberry Pi.
   content:

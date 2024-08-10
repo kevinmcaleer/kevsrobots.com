@@ -4,6 +4,10 @@
   date_published: 2023-04-14
   layout: course
   cover: assets/raspberry_pi_pico_gpio.jpg
+  groups:
+      - micropython
+      - raspberry pi pico
+      - gpio
   description: >- 
      Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython. Learn about various types of pins, their functions, and how to work with them in real-world projects.
   content:

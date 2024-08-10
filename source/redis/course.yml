@@ -4,6 +4,10 @@
   date_published: 2023-04-12
   layout: course
   cover: assets/redis-cover.jpg
+  groups:
+      - redis
+      - python
+      - databases
   description: >- 
      Learn how to use Redis with Python to build fast, scalable applications.
   content:

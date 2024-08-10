@@ -4,6 +4,10 @@
   date_published: 2023-04-27
   layout: course
   cover: assets/burgerbot.jpg
+  groups:
+    - robot
+    - micropython
+    - raspberry pi pico
   description: >- 
      Build a simple round robot powered by Raspberry Pi Pico
   content:

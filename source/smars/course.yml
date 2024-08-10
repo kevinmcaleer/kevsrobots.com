@@ -4,6 +4,10 @@
   date_published: 2023-02-19
   layout: course
   cover: assets/how_to_build_a_smars.jpg
+  groups:
+      - smars
+      - robotics
+      - arduino
   description: >- 
      Learn how to 3d print, build and program a SMARS robot
   content:

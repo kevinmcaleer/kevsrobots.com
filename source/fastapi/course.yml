@@ -4,6 +4,9 @@
   date_published: 2024-03-28
   layout: course
   cover: assets/cover.png
+  groups:
+    - fastapi
+    - python
   description: >-
     This course teaches you how to build a user authentication system using Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll learn to implement features like registration, login, and user management, integrating these with a frontend built with Jekyll.
   content:

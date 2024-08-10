@@ -4,6 +4,10 @@
   date_published: 2023-03-04
   layout: course
   cover: assets/how_to_build_a_quad.jpg
+  groups:
+      - smars
+      - robotics
+      - arduino
   description: >- 
      Learn how to 3d print, build and program a SMARS Quad robot
   content:

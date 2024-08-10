@@ -4,6 +4,10 @@
   date_published: 2024-04-06
   layout: course
   cover: assets/cover.png
+  groups:
+    - robotics
+    - raspberry pi
+    - pca9685
   description: >-
       Dive into the exciting world of robotics by learning how to control a robot arm using a Raspberry Pi, Python, and the PCA9685 board. This course covers everything from setting up your Raspberry Pi, understanding the PCA9685 board, programming with Python, to constructing and controlling a 4-servo robot arm. Perfect for beginners and enthusiasts alike, this course will guide you through each step with practical examples and hands-on projects.
   content:

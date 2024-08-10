@@ -4,6 +4,10 @@
   date_published: 2023-01-17
   layout: course
   cover: assets/basics_101.jpg
+  groups:
+      - robotics
+      - raspberry pi
+      - ros
   description: >- 
      Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.
   content:

@@ -6,6 +6,8 @@
   cover: assets/docker.jpg
   description: >- 
     Learn how to use Docker to build and deploy applications in a containerised environment.
+  groups:
+    - docker
   content:
   - section:
       name: Overview

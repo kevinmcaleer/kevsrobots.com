@@ -4,6 +4,10 @@
   date_published: 2023-07-15
   layout: course
   cover: assets/database.png
+  groups:
+      - python
+      - sqlite3
+      - databases
   description: >- 
      Learn how to create databases in Python with sqlite3
   content:

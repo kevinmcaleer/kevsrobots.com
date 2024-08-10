@@ -23,6 +23,7 @@ class Course:
     output_folder = "web/build"
     course_folder = ""
     content = []
+    groups = []
     level = "beginner"
     cover = ""  # cover image
     link = ""  # url to first file in course
@@ -39,6 +40,7 @@ class Course:
         layout=None,
         type=None,
         links=None,
+        groups=None,
         output=None,
         output_folder=None,
         course_folder=None,
@@ -54,6 +56,8 @@ class Course:
             self.date_created = date_created
         if date_published:
             self.date_published = date_published
+        if groups:
+            self.groups = groups
         if content:
             self.content = content
         if layout:
@@ -138,8 +142,8 @@ class Course:
         with open(f"{course_folder}/course.yml", "r") as stream:
             try:
                 course = yaml.safe_load(stream)
-                name = course[0]["name"]
-                print(f"Course manifest loaded for {name}")
+                # name = course[0]["name"]
+                # print(f"Course manifest loaded for {name}")
             except KeyError as exc:
                 print(f"Error loading course manifest: {exc}")
                 return None
@@ -150,15 +154,20 @@ class Course:
             print(f"Error loading course manifest: {course_folder} is empty")
             return None
         course = course[0]
-        self.author = course["author"]
-        self.name = course["name"]
-        self.description = course["description"]
-        self.date_created = course["date_created"]
-        self.date_published = course["date_published"]
-        self.content = course["content"]
-        cover_folder = self.course_folder.replace("source", "/learn")
-        self.cover = cover_folder + "/" + course["cover"]
-        self.cover = self.cover.replace("//learn", "/learn")
+        try:
+            self.author = course["author"]
+            self.name = course["name"]
+            self.description = course["description"]
+            self.groups = course["groups"]
+            self.date_created = course["date_created"]
+            self.date_published = course["date_published"]
+            self.content = course["content"]
+            cover_folder = self.course_folder.replace("source", "/learn")
+            self.cover = cover_folder + "/" + course["cover"]
+            self.cover = self.cover.replace("//learn", "/learn")
+        except KeyError as exc:
+            print(f"Error reading course manifest: {exc}, course name is: {self.name}")
+            return None
         # print(f'cover is: {self.cover}')
         self.duration = self.calculate_duration()
         # print(course['content'])
@@ -473,6 +482,7 @@ class Course:
                 "link": link_path,
                 "duration": self.duration_str,
                 "author": self.author,
+                "groups": self.groups,
                 "date_published": self.date_published,
             }
 

@@ -4,8 +4,12 @@
   date_published: 2023-11-14
   layout: course
   cover: assets/pandas.png
+  groups:
+    - pandas
+    - numpy
+    - data manipulation
   description: >- 
-     tbc
+    Learn how to manipulate data using Pandas and Numpy
   content:
   - section:
       name: Overview

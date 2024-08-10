@@ -4,6 +4,9 @@
   description: Learn how to build static websites using Jekyll, from basic setup to
     advanced features.
   duration: 0h 16m
+  groups:
+  - jekyll
+  - website development
   link: /learn/jekyll/01_intro.html
   name: Building Websites with Jekyll
 - author: Kevin McAleer
@@ -12,6 +15,8 @@
   description: Learn how to use Docker to build and deploy applications in a containerised
     environment.
   duration: 0h 22m
+  groups:
+  - docker
   link: /learn/docker/00_intro.html
   name: Docker
 - author: Kevin McAleer
@@ -20,6 +25,10 @@
   description: Learning ROS with me, is a course that will teach you how to use ROS2
     on Raspberry Pi 4.
   duration: 0h 38m
+  groups:
+  - ros
+  - raspberry pi
+  - robotics
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
 - author: Kevin McAleer
@@ -32,6 +41,10 @@
     Perfect for beginners and enthusiasts alike, this course will guide you through
     each step with practical examples and hands-on projects.
   duration: 0h 24m
+  groups:
+  - robotics
+  - raspberry pi
+  - pca9685
   link: /learn/pca9685/01_course_introduction.html
   name: Building a Robot Arm with Raspberry Pi and PCA9685
 - author: Kevin McAleer
@@ -40,6 +53,8 @@
   description: Get started with Python programming, learn why you should  learn Python
     and how to setup your Python environment.
   duration: 0h 36m
+  groups:
+  - python
   link: /learn/python/01_intro.html
   name: Python for beginners
 - author: Kevin McAleer
@@ -47,6 +62,10 @@
   date_published: 2023-04-12
   description: Learn how to use Redis with Python to build fast, scalable applications.
   duration: 0h 20m
+  groups:
+  - redis
+  - python
+  - databases
   link: /learn/redis/01_introduction.html
   name: Using Redis with Python
 - author: Kevin McAleer
@@ -57,6 +76,10 @@
     essential steps from assembling the robot, installing the software, and creating
     your first drawing.
   duration: 0h 22m
+  groups:
+  - raspberry pi
+  - robotics
+  - robot arm
   link: /learn/scrawly_wally/01_intro.html
   name: Wall Drawing Robot Tutorial
 - author: Kevin McAleer
@@ -67,6 +90,10 @@
     From the basics of Markdown to deploying your site, you'll learn everything you
     need to get started.
   duration: 0h 20m
+  groups:
+  - markdown
+  - jekyll
+  - documentation
   link: /learn/markdown/01_overview.html
   name: Mastering Markdown for Documentation with Jekyll
 - author: Kevin McAleer
@@ -76,6 +103,9 @@
     Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
     and scale a mini-computing cluster for various projects.
   duration: 0h 32m
+  groups:
+  - docker
+  - raspberry pi
   link: /learn/docker_swarm/00_intro.html
   name: Raspberry Pi 5 Cluster with Docker Swarm
 - author: Kevin McAleer
@@ -84,6 +114,8 @@
   description: Learning Rust with me, is a course that will teach you how to use Rust
     on Raspberry Pi.
   duration: 0h 26m
+  groups:
+  - rust
   link: /learn/rust/01_intro.html
   name: Introduction to Rust
 - author: Kevin McAleer
@@ -91,6 +123,10 @@
   date_published: 2023-02-19
   description: Learn how to 3d print, build and program a SMARS robot
   duration: 0h 30m
+  groups:
+  - smars
+  - robotics
+  - arduino
   link: /learn/smars/00_intro.html
   name: SMARS
 - author: Kevin McAleer
@@ -99,6 +135,9 @@
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code
   duration: 0h 40m
+  groups:
+  - micropython
+  - python
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
@@ -109,6 +148,10 @@
     essential steps from assembling the robot, installing the software, and creating
     your first drawing.
   duration: 0h 16m
+  groups:
+  - robot arm
+  - python
+  - raspberry pi
   link: /learn/brachiograph/01_intro.html
   name: BrachioGraph Tutorial
 - author: Kevin McAleer
@@ -119,6 +162,9 @@
     designs, learn the fundamentals of CAD software and how to apply them in your
     own projects.
   duration: 0h 22m
+  groups:
+  - freecad
+  - 3d modeling
   link: /learn/freecad/01_introduction_to_freecad.html
   name: Introduction to FreeCAD for Beginners
 - author: Kevin McAleer
@@ -126,6 +172,10 @@
   date_published: 2023-09-10
   description: Learn how to program SMARS with Arduino
   duration: 0h 14m
+  groups:
+  - smars
+  - robotics
+  - arduino
   link: /learn/smars_code/01_lesson_01.html
   name: Learn how to program SMARS with Arduino
 - author: Kevin McAleer
@@ -134,6 +184,11 @@
   description: Learn how to use Crack the Enigma code using a Cluster of Raspberry
     Pis and Python.
   duration: 0h 14m
+  groups:
+  - octapi
+  - enigma
+  - python
+  - clusters
   link: /learn/octapi/00_intro.html
   name: OctaPi
 - author: Kevin McAleer
@@ -141,6 +196,10 @@
   date_published: 2023-07-15
   description: Learn how to create databases in Python with sqlite3
   duration: 0h 36m
+  groups:
+  - python
+  - sqlite3
+  - databases
   link: /learn/sqlite3/00_intro.html
   name: Create Databases with Python and SQLite3
 - author: Kevin McAleer
@@ -151,6 +210,9 @@
     learn to implement features like registration, login, and user management, integrating
     these with a frontend built with Jekyll.
   duration: 0h 18m
+  groups:
+  - fastapi
+  - python
   link: /learn/fastapi/01_course_overview.html
   name: Building User Authentication for Static Sites with FastAPI
 - author: Kevin McAleer
@@ -160,13 +222,20 @@
     level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules
     and Packages, DocStrings, Interrupts and Timers, and MP Remote.
   duration: 0h 32m
+  groups:
+  - micropython
+  - python
   link: /learn/intermediate_micropython/01_intro.html
   name: Intermediate level MicroPython
 - author: Kevin McAleer
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
-  description: tbc
+  description: Learn how to manipulate data using Pandas and Numpy
   duration: 0h 24m
+  groups:
+  - pandas
+  - numpy
+  - data manipulation
   link: /learn/pandas_and_numpy/01_overview.html
   name: Data Manipulation with Pandas and Numpy
 - author: Kevin McAleer
@@ -174,6 +243,8 @@
   date_published: 2022-12-04
   description: Learn how to use the new Learning Platform
   duration: 0h 8m
+  groups:
+  - learning platform
   link: /learn/learning_platform/00_intro.html
   name: How to use the Learning Platform
 - author: Kevin McAleer
@@ -184,6 +255,10 @@
     Pydantic's basics to integrating it with FastAPI for web development, you'll master
     everything needed to use Pydantic effectively.
   duration: 0h 24m
+  groups:
+  - pydantic
+  - data validation
+  - fastapi
   link: /learn/pydantic/01_overview_of_pydantic.html
   name: Mastering Pydantic for Robust Data Validation
 - author: Kevin McAleer
@@ -192,6 +267,10 @@
   description: Learning ROS with me, is a course that will teach you how to use ROS2
     on Raspberry Pi 4.
   duration: 0h 12m
+  groups:
+  - robotics
+  - raspberry pi
+  - ros
   link: /learn/robotics_101/00_overview.html
   name: Robotics 101
 - author: Kevin McAleer
@@ -199,6 +278,10 @@
   date_published: 2023-03-04
   description: Learn how to 3d print, build and program a SMARS Quad robot
   duration: 0h 26m
+  groups:
+  - smars
+  - robotics
+  - arduino
   link: /learn/smars_quad/00_intro.html
   name: SMARS Quad
 - author: Kevin McAleer
@@ -206,6 +289,10 @@
   date_published: 2023-07-20
   description: Learn how to design a robot in 3d using Fusion 360
   duration: 1h 8m
+  groups:
+  - smars
+  - robotics
+  - fusion 360
   link: /learn/smars_fusion360/00_intro.html
   name: Build a SMARS Robot in Fusion 360
 - author: Kevin McAleer
@@ -213,6 +300,10 @@
   date_published: 2023-10-07
   description: Computer Vision on Raspberry Pi with CVZone
   duration: 2h 12m
+  groups:
+  - computer vision
+  - python
+  - cvzone
   link: /learn/cvzone/00_intro.html
   name: Computer Vision on Raspberry Pi with CVZone
 - author: Kevin McAleer
@@ -222,6 +313,10 @@
     Learn about various types of pins, their functions, and how to work with them
     in real-world projects.
   duration: 0h 36m
+  groups:
+  - micropython
+  - raspberry pi pico
+  - gpio
   link: /learn/micropython_gpio/00_intro.html
   name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - author: Kevin McAleer
@@ -229,6 +324,10 @@
   date_published: 2023-04-27
   description: Build a simple round robot powered by Raspberry Pi Pico
   duration: 3h 54m
+  groups:
+  - robot
+  - micropython
+  - raspberry pi pico
   link: /learn/burgerbot/00_intro.html
   name: Build your own BurgerBot
 - author: Kevin McAleer
@@ -237,5 +336,8 @@
   description: Robot Eye Mechanism, is a course that will teach you how to use Fusion
     360 to create a Servo controled Robot eye mechanism.
   duration: 0h 18m
+  groups:
+  - robot
+  - fusion 360
   link: /learn/eye_mechanism/00_intro.html
   name: Robot Eye Mechanism

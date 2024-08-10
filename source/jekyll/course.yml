@@ -4,6 +4,9 @@
   date_published: 2024-01-24
   layout: course
   cover: assets/jekyll.jpg
+  groups:
+    - jekyll
+    - website development
   description: >-
     Learn how to build static websites using Jekyll, from basic setup to advanced features.
   content:

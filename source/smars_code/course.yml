@@ -4,6 +4,10 @@
   date_published: 2023-09-10
   layout: course
   cover: assets/program_smars.png
+  groups:
+      - smars
+      - robotics
+      - arduino
   description: >- 
      Learn how to program SMARS with Arduino
   content:

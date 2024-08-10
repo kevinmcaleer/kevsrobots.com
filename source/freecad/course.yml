@@ -4,6 +4,9 @@
   date_published: 2024-04-17
   layout: course
   cover: assets/cover.png
+  groups:
+    - freecad
+    - 3d modeling
   description: >-
     This beginner's course on FreeCAD teaches you the essentials of 3D modeling with this powerful, open-source tool. From basic shapes to more complex designs, learn the fundamentals of CAD software and how to apply them in your own projects.
   content:

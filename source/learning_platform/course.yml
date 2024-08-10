@@ -6,6 +6,8 @@
   cover: assets/learn.jpg
   description: >- 
      Learn how to use the new Learning Platform
+  groups:
+    - learning platform
   content:
   - section:
       name: Overview

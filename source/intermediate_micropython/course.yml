@@ -4,6 +4,9 @@
   date_published: 2024-07-07
   layout: course
   cover: assets/cover.png
+  groups:
+    - micropython
+    - python
   description: >-
     This course is designed to take you from a beginner to an intermediate level of
     MicroPython programming. It covers the basics of Object Oriented Programming, 

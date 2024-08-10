@@ -4,6 +4,11 @@
   date_published: 2024-02-18
   layout: course
   cover: assets/octapi.jpg
+  groups:
+      - octapi
+      - enigma
+      - python
+      - clusters
   description: >- 
     Learn how to use Crack the Enigma code using a Cluster of Raspberry Pis and Python.
   content:

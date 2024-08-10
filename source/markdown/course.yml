@@ -4,6 +4,10 @@
   date_published: 2024-03-21
   layout: course
   cover: assets/markdown.png
+  groups:
+    - markdown
+    - jekyll
+    - documentation
   description: >-
       This comprehensive course is designed to teach you how to effectively use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll. From the basics of Markdown to deploying your site, you'll learn everything you need to get started.
   content:

@@ -54,7 +54,7 @@ class Courses():
             os.remove(f'{self.output_folder}/index.md')
             
         index = '---' + "\n"
-        index += 'layout: content' + "\n"
+        index += 'layout: learn' + "\n"
         index += 'title: Learn' + "\n"
         index += 'description: Take a course and learn something new' + "\n"
         index += f'duration: {self.duration}' + "\n"

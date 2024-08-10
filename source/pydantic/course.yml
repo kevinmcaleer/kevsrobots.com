@@ -4,6 +4,10 @@
   date_published: 2024-03-23
   layout: course
   cover: assets/pydantic.png
+  groups:
+    - pydantic
+    - data validation
+    - fastapi
   description: >-
       This in-depth course is designed to teach you how to leverage Pydantic for data validation and settings management in Python applications. From understanding Pydantic's basics to integrating it with FastAPI for web development, you'll master everything needed to use Pydantic effectively.
   content:

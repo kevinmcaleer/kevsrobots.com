@@ -4,6 +4,10 @@
   date_published: 2024-08-02
   layout: course
   cover: assets/cover.png
+  groups:
+    - raspberry pi
+    - robotics
+    - robot arm
   description: >-
     Learn how to build your own wall drawing robot using a Raspberry Pi Zero 2 W, stepper motors, and a gondola with a marker. 
     This course covers the essential steps from assembling the robot, installing the software, and creating your first drawing.
