@@ -14,9 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# The rest of your FastAPI application code...
-
-# Function to connect to the SQLite database
 def get_db_connection():
     conn = sqlite3.connect('/Users/Kev/Web/kevsrobots.com/courses.db')
     conn.row_factory = sqlite3.Row  # This allows us to return dictionary-like rows
@@ -29,36 +26,58 @@ def get_courses(tags: Optional[List[str]] = Query(None)):
     c = conn.cursor()
 
     if tags:
-        # Generate the SQL query to filter by tags and include all tags for each course
         placeholders = ','.join('?' for _ in tags)
         query = f'''
             SELECT courses.course_id, courses.course_name, courses.course_url, 
-                   GROUP_CONCAT(tags.tag_name, ', ') AS course_tags
+                   tags.tag_name
             FROM courses
             JOIN tag_link ON courses.course_id = tag_link.course_id
             JOIN tags ON tags.tag_id = tag_link.tag_id
-            WHERE tags.tag_name IN ({placeholders})
-            GROUP BY courses.course_id
-            HAVING COUNT(DISTINCT tags.tag_name) = ?
+            WHERE courses.course_id IN (
+                SELECT courses.course_id 
+                FROM courses 
+                JOIN tag_link ON courses.course_id = tag_link.course_id
+                JOIN tags ON tags.tag_id = tag_link.tag_id
+                WHERE tags.tag_name IN ({placeholders})
+                GROUP BY courses.course_id
+                HAVING COUNT(DISTINCT tags.tag_name) = ?
+            )
+            GROUP BY courses.course_id, tags.tag_name
         '''
         c.execute(query, tags + [len(tags)])
     else:
-        # If no tags provided, return all courses with their associated tags
         query = '''
             SELECT courses.course_id, courses.course_name, courses.course_url, 
-                   GROUP_CONCAT(tags.tag_name, ', ') AS course_tags
+                   tags.tag_name
             FROM courses
             LEFT JOIN tag_link ON courses.course_id = tag_link.course_id
             LEFT JOIN tags ON tags.tag_id = tag_link.tag_id
-            GROUP BY courses.course_id
+            GROUP BY courses.course_id, tags.tag_name
         '''
         c.execute(query)
     
-    courses = c.fetchall()
+    rows = c.fetchall()
     conn.close()
 
-    # Convert rows to a list of dictionaries
-    return [dict(course) for course in courses]
+    # Group courses by course_id and collect tags into a list
+    courses_dict = {}
+    for row in rows:
+        course_id = row["course_id"]
+        if course_id not in courses_dict:
+            courses_dict[course_id] = {
+                "course_id": course_id,
+                "course_name": row["course_name"],
+                "course_url": row["course_url"],
+                "course_tags": []
+            }
+        # Only append the tag if it's not None
+        if row["tag_name"]:
+            courses_dict[course_id]["course_tags"].append(row["tag_name"])
+
+    # Convert the dictionary to a list of courses
+    courses = list(courses_dict.values())
+    
+    return courses
 
 # Route to fetch all available tags
 @app.get("/tags/")
@@ -69,6 +88,4 @@ def get_tags():
     tags = c.fetchall()
     conn.close()
 
-    # Convert rows to a list of dictionaries
     return [dict(tag) for tag in tags]
-
