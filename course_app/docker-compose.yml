@@ -10,3 +10,4 @@ services:
       - "8004:8000"
     environment:
       - PYTHONUNBUFFERED=1
+    restart: unless-stopped
