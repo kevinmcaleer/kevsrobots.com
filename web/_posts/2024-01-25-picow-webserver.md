@@ -33,6 +33,12 @@ Developed by [Pimoroni](https://shop.pimoroni.com) for their `Enviro` products, 
 
 ---
 
+## Grab the Next Cube 3D STL files
+
+You can grab the files for the Next Cube build from here: <https://www.kevsrobots.com/blog/next-cube.html>
+
+---
+
 ## The Magic of Templates
 
 With Phew!, templates become a programmer's best friend. They allow you to integrate data from your program dynamically into the web page. A straightforward concept, you merely embed the variable data within 'squiggly brackets' in the template and pass the variables while rendering the template. As a result, you can include the page title, content, or virtually any program data using templates making your development process a breeze!

@@ -1,4 +1,4 @@
 ---
- redirect:   https://www.smarsfan.com
+ redirect:   /blog/picosmars.html
  layout:     redirect
 ---
