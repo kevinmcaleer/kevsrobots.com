@@ -116,6 +116,7 @@
   duration: 0h 26m
   groups:
   - rust
+  - pico
   link: /learn/rust/01_intro.html
   name: Introduction to Rust
 - author: Kevin McAleer
@@ -138,6 +139,7 @@
   groups:
   - micropython
   - python
+  - pico
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
@@ -224,6 +226,7 @@
   groups:
   - micropython
   - python
+  - pico
   link: /learn/intermediate_micropython/01_intro.html
   name: Intermediate level MicroPython
 - author: Kevin McAleer
@@ -312,8 +315,8 @@
   duration: 0h 36m
   groups:
   - micropython
-  - raspberry pi pico
   - gpio
+  - pico
   link: /learn/micropython_gpio/00_intro.html
   name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - author: Kevin McAleer
@@ -324,7 +327,7 @@
   groups:
   - robotics
   - micropython
-  - raspberry pi pico
+  - pico
   link: /learn/burgerbot/00_intro.html
   name: Build your own BurgerBot
 - author: Kevin McAleer
