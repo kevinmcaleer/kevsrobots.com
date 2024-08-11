@@ -8,6 +8,7 @@
       - micropython
       - raspberry pi pico
       - gpio
+      - pico
   description: >- 
      Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython. Learn about various types of pins, their functions, and how to work with them in real-world projects.
   content:

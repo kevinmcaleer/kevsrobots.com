@@ -6,6 +6,7 @@
   cover: assets/cover.png
   groups:
       - rust
+      - pico
   description: >- 
      Learning Rust with me, is a course that will teach you how to use Rust on Raspberry Pi.
   content:

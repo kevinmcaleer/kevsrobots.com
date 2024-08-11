@@ -7,6 +7,7 @@
   groups:
     - micropython
     - python
+    - pico
   description: >-
     This course is designed to take you from a beginner to an intermediate level of
     MicroPython programming. It covers the basics of Object Oriented Programming, 
