@@ -6,6 +6,7 @@ layout: course_pathway
 cover: /assets/img/learn/learnpico.jpg
 description: Learn how to use a Raspberry Pi Pico
 courses:
+  - "How to install MicroPython"
   - "Learn MicroPython - The basics"
   - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
   - "Intermediate level MicroPython"
