@@ -36,7 +36,7 @@ We've added a new navigation and filter system to help you find the courses you'
 
 Future updates may include filters for skill level too.
 
-Check it out now! [Learning System](/learn)
+Check it out now! [Learning System](/learn/)
 
 ---
 
