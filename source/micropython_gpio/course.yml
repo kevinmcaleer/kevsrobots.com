@@ -6,7 +6,6 @@
   cover: assets/raspberry_pi_pico_gpio.jpg
   groups:
       - micropython
-      - raspberry pi pico
       - gpio
       - pico
   description: >- 

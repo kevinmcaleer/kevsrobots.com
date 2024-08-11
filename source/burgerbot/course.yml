@@ -7,7 +7,7 @@
   groups:
     - robotics
     - micropython
-    - raspberry pi pico
+    - pico
   description: >- 
      Build a simple round robot powered by Raspberry Pi Pico
   content:
