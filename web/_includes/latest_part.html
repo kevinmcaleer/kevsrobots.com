@@ -1,0 +1,51 @@
+<div class="bg-light m-0 p-3 mt-3 rounded-1">
+<p>Latest from Kevsrobots</p>
+<div class="row row-cols-1 row-cols-md-4 g-1 m-0 p-0 ">
+    <div class="col">
+        <div class="m-0 p-0 bg-red rounded-2 card-hover shadow-hover">
+            {% assign blogs = site.posts %}
+            {% for blog in blogs | limit:1 %}
+            <a href="{{blog.url}}" class="text-decoration-none text-white">
+            <p class="small pt-3 px-3">Blog > </p>
+            <img src="{{blog.cover}}" class="img-fluid w-100 rounded-bottom-2" alt="The cover image for {{blog.title}}">
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col">
+        <div class="bg-ocre m-0 p-0 rounded-2 card-hover shadow-hover">
+            {% assign vids = site.data.youtube | sort: 'published' | reverse %}
+            {% for vid in vids | limit:1 %}
+            <a href="https://www.youtube.com/watch?v={{vid.video_id}}" class="text-decoration-none text-black">
+            <p class="small pt-3 px-3">Video ></p>
+            <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-bottom-2" alt="YouTube thumbnail for {{vid.title}}">
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+<!-- </div>
+<div class="row g-1"> -->
+    <div class="col">
+        <div class="bg-green m-0 p-0 rounded-2 card-hover shadow-hover">
+            {% assign robots = site.data.robots %}
+            {% for robot in robots | limit:1 %}
+            <a href="{{robot.link}}" class="text-decoration-none text-white">
+            <p class="pt-3 px-3">Robot ></p>
+            <img src="{{robot.cover}}" class="img-fluid rounded-bottom-2" alt="Robot cover image for {{robot.title}}">
+            </a>
+            {% endfor %} 
+        </div>
+    </div>
+    <div class="col">
+        <div class="bg-blue m-0 p-0 rounded-2 text-white card-hover shadow-hover">
+            {% assign projects = site.data.projects %}
+            {% for project in projects | limit:1 %}
+            <a href="{{project.link}}" class="text-decoration-none text-white">
+            <p class="pt-3 px-3">Project ></p>
+            <img src="{{project.cover}}" class="img-fluid rounded-bottom-2" alt="Project cover image for {{project.name}}">
+            </a>
+            {% endfor %} 
+        </div>
+    </div>
+</div> <!-- end row -->
+</div>

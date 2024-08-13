@@ -1,8 +1,8 @@
-<div class="container-fluid p-0 p-0">
+<div class="container-fluid p-0 m-0">
     <div class="row m-0 p-0 align-items-center">
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6 col-xl-7">
             <h1>Learn to build robots,</h1>
-            <p class="fs-2">Bring them to life with code, <br />
+            <p class="fs-2">Bring them to life with code,
             And have a whole load of fun along the way</p>
 
             <p class="lead">Hi! I'm <a href="/about/bio.html" class="dotted">Kev</a> - welcome to kevsrobots!</p>
@@ -15,55 +15,8 @@
             <a href="https://www.youtube.com/kevinmcaleer28"><button type="button" class="btn btn-outline-ocre btn-lg px-4">Watch Kev on Youtube ></button></a>
         </div>
  
-    <div class="col-12 col-lg-6">
-        <div class="row g-1">
-            <div class="col-12 col-lg-6 ">
-                <div class="m-1 p-3 bg-red rounded-2">
-                    {% assign blogs = site.posts %}
-                    {% for blog in blogs | limit:1 %}
-                    <a href="{{blog.url}}" class="text-decoration-none text-white">
-                    <p class="small">Latest Blog Article > </p>
-                    <img src="{{blog.cover}}" class="img-fluid w-100 rounded-1 card-hover shadow-hover" alt="The cover image for {{blog.title}}">
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="col-12 col-lg-6 ">
-                <div class="bg-ocre m-1 p-3 rounded-2">
-                    {% assign vids = site.data.youtube | sort: 'published' | reverse %}
-                    {% for vid in vids | limit:1 %}
-                    <a href="https://www.youtube.com/watch?v={{vid.video_id}}" class="text-decoration-none text-black">
-                    <p class="small">Latest YouTube Video ></p>
-                    <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-2 card-hover shadow-hover" alt="YouTube thumbnail for {{vid.title}}">
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        <div class="row g-1">
-            <div class="col-12 col-lg-6">
-                <div class="bg-green m-1 p-3 rounded-2">
-                    {% assign robots = site.data.robots %}
-                    {% for robot in robots | limit:1 %}
-                    <a href="{{robot.link}}" class="text-decoration-none text-white">
-                    <p>Latest Robot ></p>
-                    <img src="{{robot.cover}}" class="img-fluid rounded-1 shadow-hover card-hover" alt="Robot cover image for {{robot.title}}">
-                    </a>
-                    {% endfor %} 
-                </div>
-            </div>
-            <div class="col-12 col-lg-6">
-                <div class="bg-blue m-1 p-3 rounded-2 text-white">
-                    {% assign projects = site.data.projects %}
-                    {% for project in projects | limit:1 %}
-                    <a href="{{project.link}}" class="text-decoration-none text-white">
-                    <p>Latest Projects ></p>
-                    <img src="{{project.cover}}" class="img-fluid rounded-1 shadow-hover card-hover" alt="Project cover image for {{project.name}}">
-                    </a>
-                    {% endfor %} 
-                </div>
-            </div>
-        </div>
+    <div class="col-12 col-lg-6 col-xl-5">
+        {% include latest_part.html%}
     </div>
 </div>
 </div>

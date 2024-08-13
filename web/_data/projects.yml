@@ -1,5 +1,5 @@
 - name: Scrawly Wally
-  link: /learn/scrawly_wally
+  link: /learn/scrawly_wally/
   cover: /assets/img/blog/scrawly_wally/scrawly_wally.jpg
   date: 2024-08-03
   description: Learn how to build a wall drawing robot using a Raspberry Pi Zero 2 W, stepper motors, and a gondola with a marker.
