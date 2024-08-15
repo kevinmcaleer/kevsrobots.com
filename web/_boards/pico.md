@@ -17,13 +17,13 @@ tags:
 
 ## Overview
 
-The Raspberry Pi Pico is a powerful yet affordable microcontroller board that serves as a gateway into the world of electronics and programming. Released by the Raspberry Pi Foundation in 2021, this compact board offers surprising versatility and functionality that allows users to build a variety of projects, from simple LED blink programs to sophisticated robotics.
+The Raspberry Pi Pico (and Pico 2) is a powerful yet affordable microcontroller board that serves as a gateway into the world of electronics and programming. Released by Raspberry Pi in 2021, this compact board offers surprising versatility and functionality that allows users to build a variety of projects, from simple LED blink programs to sophisticated robotics.
 
 ---
 
 ## About the Manufacturer
 
-The Raspberry Pi Foundation, a UK-based charity, is renowned worldwide for producing the Raspberry Pi series of single-board computers. They aim to boost computer science education by providing low-cost, high-performance computers. The Raspberry Pi Pico, their first microcontroller board, is a new venture that builds on this commitment to accessible technology.
+The Raspberry Pi Ltd, a UK-based company, is renowned worldwide for producing the Raspberry Pi series of single-board computers. They aim to boost computer science education by providing low-cost, high-performance computers. The Raspberry Pi Pico, their first microcontroller board, is a new venture that builds on this commitment to accessible technology.
 
 ---
 
