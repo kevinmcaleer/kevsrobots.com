@@ -342,3 +342,11 @@ Download the 3D printable files here:
 * [`top.stl`](/assets/stl/picotamachibi/top.stl) - The front or top of the case
 
 ---
+
+## Version 2.0
+
+An update to this project is available at [Picotamachibi 2](/blog/picotamachibi2), where we build a similar virtual pet using a Raspberry Pi Pico 2.
+
+[![PCB](/assets/img/blog/picotamachibi2/pcb.jpg){:class="img-fluid w-100 card-shadow card-hover rounded-3"}](/assets/img/blog/picotamachibi2/pcb.jpg)
+
+---
