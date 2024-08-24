@@ -105,7 +105,7 @@ The `rsync` command is a powerful tool for efficiently transferring and synchron
 
     rsync -avh /home/pi/Projects/ pi@192.168.1.10:/home/pi/Projects/
 
-The -avh flags stand for archive mode, verbose output, and human-readable output, respectively.
+The `-avh` flags stand for archive mode, verbose output, and human-readable output, respectively.
 
 ---
 
