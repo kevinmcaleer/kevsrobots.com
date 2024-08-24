@@ -217,6 +217,17 @@
   link: /learn/fastapi/01_course_overview.html
   name: Building User Authentication for Static Sites with FastAPI
 - author: Kevin McAleer
+  cover: /learn/linux_intro/assets/cover.jpg
+  date_published: 2024-08-23
+  description: Learn the fundamentals of using the Linux command line on Raspberry
+    Pi OS. This course covers essential topics including navigation, file management,
+    software installation, system monitoring, networking, and basic scripting.
+  duration: 0h 40m
+  groups:
+  - linux
+  link: /learn/linux_intro/01_intro_terminal.html
+  name: Introduction to the Linux Command Line on Raspberry Pi OS
+- author: Kevin McAleer
   cover: /learn/intermediate_micropython/assets/cover.png
   date_published: 2024-07-07
   description: This course is designed to take you from a beginner to an intermediate

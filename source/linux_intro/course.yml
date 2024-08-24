@@ -1,0 +1,58 @@
+- name: Introduction to the Linux Command Line on Raspberry Pi OS
+  author: Kevin McAleer
+  date_created: 2024-08-23
+  date_published: 2024-08-23
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+    - linux
+  description: >-
+     Learn the fundamentals of using the Linux command line on Raspberry Pi OS. This course covers essential topics including navigation, file management, software installation, system monitoring, networking, and basic scripting.
+  content:
+  - section:
+      name: Getting Started with the Command Line
+      content:
+        - 01_intro_terminal.md
+        - 01a_man.md
+        - 02_basic_navigation.md
+  - section:
+      name: Managing Files and Directories
+      content:
+        - 03_working_with_files.md
+        - 04_working_with_directories.md
+        - 05_file_permissions.md
+  - section:
+      name: Managing Software
+      content:
+        - 06_installing_software.md
+        - 07_managing_software.md
+  - section:
+      name: System Monitoring and Management
+      content:
+        - 08_monitoring_performance.md
+        - 09_managing_processes.md
+  - section:
+      name: Networking Basics
+      content:
+        - 10_networking_commands.md
+        - 11_transferring_files.md
+  - section:
+      name: Scripting Basics
+      content:
+        - 12_intro_scripting.md
+        - 13_basic_scripting_constructs.md
+  - section:
+      name: Working with Git (Optional Advanced Topic)
+      content:
+        - 14_intro_git.md
+        - 15_basic_git_commands.md
+  - section:
+      name: "Final Project: Building a Simple Command Line Application"
+      content:
+        - 16_final_project_overview.md
+        - 17_final_project_steps.md
+  - section:
+      name: Resources and Next Steps
+      content:
+        - 18_resources_next_steps.md
+        - 19_cheatsheet.md
