@@ -8,7 +8,7 @@ date: 2024-08-23
 previous: 15_basic_git_commands.html
 next: 17_final_project_steps.html
 description: Plan and outline a simple command-line tool as your final project.
-percent: 85
+percent: 72
 duration: 2
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -21,6 +21,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

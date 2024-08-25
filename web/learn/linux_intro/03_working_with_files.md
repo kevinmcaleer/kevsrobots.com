@@ -5,7 +5,7 @@ author: Kevin McAleer
 type: page
 cover: /learn/linux_intro/assets/files.png
 date: 2024-08-23
-previous: 02_basic_navigation.html
+previous: 02a_user.html
 next: 04_working_with_directories.html
 description: Learn how to create, view, edit, and manage files using the command line.
 percent: 20
@@ -21,6 +21,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

@@ -8,7 +8,7 @@ date: 2024-08-23
 next: 01a_man.html
 description: Learn what the command line is, why it's useful, and how to open the
   terminal on Raspberry Pi OS.
-percent: 5
+percent: 4
 duration: 3
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -21,6 +21,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

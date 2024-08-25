@@ -9,7 +9,7 @@ previous: 01_intro_terminal.html
 next: 02_basic_navigation.html
 description: Learn how to use the `man` command to access manual pages for other commands,
   providing detailed information and usage examples.
-percent: 10
+percent: 8
 duration: 3
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

@@ -9,7 +9,7 @@ previous: 14_intro_git.html
 next: 16_final_project_overview.html
 description: Learn essential Git commands like init, add, commit, and clone to manage
   your repositories.
-percent: 80
+percent: 68
 duration: 2
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

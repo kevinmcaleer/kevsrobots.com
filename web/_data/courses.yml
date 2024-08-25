@@ -222,7 +222,7 @@
   description: Learn the fundamentals of using the Linux command line on Raspberry
     Pi OS. This course covers essential topics including navigation, file management,
     software installation, system monitoring, networking, and basic scripting.
-  duration: 0h 40m
+  duration: 0h 42m
   groups:
   - linux
   link: /learn/linux_intro/01_intro_terminal.html

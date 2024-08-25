@@ -9,7 +9,7 @@ previous: 16_final_project_overview.html
 next: 18_resources_next_steps.html
 description: Step-by-step guide to coding, testing, and finalizing your command-line
   tool project.
-percent: 90
+percent: 76
 duration: 2
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

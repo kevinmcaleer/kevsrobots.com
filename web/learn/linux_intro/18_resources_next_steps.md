@@ -9,7 +9,7 @@ previous: 17_final_project_steps.html
 next: 19_cheatsheet.html
 description: Explore additional resources and suggested next steps to continue learning
   Linux and Raspberry Pi.
-percent: 95
+percent: 80
 duration: 2
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

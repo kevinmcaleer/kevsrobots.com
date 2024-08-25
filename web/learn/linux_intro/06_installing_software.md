@@ -8,7 +8,7 @@ date: 2024-08-23
 previous: 05_file_permissions.html
 next: 07_managing_software.html
 description: Learn how to install software packages using the apt package manager.
-percent: 35
+percent: 32
 duration: 3
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -21,6 +21,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

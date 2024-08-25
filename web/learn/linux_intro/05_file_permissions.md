@@ -9,7 +9,7 @@ previous: 04_working_with_directories.html
 next: 06_installing_software.html
 description: Understand file permissions and learn how to change them using chmod
   and chown.
-percent: 30
+percent: 28
 duration: 5
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

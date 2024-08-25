@@ -6,10 +6,10 @@ type: page
 cover: /learn/linux_intro/assets/ls-l.png
 date: 2024-08-23
 previous: 01a_man.html
-next: 03_working_with_files.html
+next: 02a_user.html
 description: Learn how to navigate the filesystem using basic commands like pwd, ls,
   and cd.
-percent: 15
+percent: 12
 duration: 3
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

@@ -9,7 +9,7 @@ previous: 08_monitoring_performance.html
 next: 10_networking_commands.html
 description: Learn how to manage processes using commands like kill, killall, and
   how to work with background processes.
-percent: 50
+percent: 44
 duration: 3
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

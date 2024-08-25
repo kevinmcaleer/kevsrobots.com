@@ -9,7 +9,7 @@ previous: 11_transferring_files.html
 next: 13_basic_scripting_constructs.html
 description: Learn the basics of shell scripting, including how to create and run
   simple scripts.
-percent: 65
+percent: 56
 duration: 4
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

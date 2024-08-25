@@ -9,7 +9,7 @@ previous: 03_working_with_files.html
 next: 05_file_permissions.html
 description: Learn how to create, remove, copy, and move directories using the command
   line.
-percent: 25
+percent: 24
 duration: 2
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files

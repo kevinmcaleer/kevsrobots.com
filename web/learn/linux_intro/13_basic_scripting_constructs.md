@@ -9,7 +9,7 @@ previous: 12_intro_scripting.html
 next: 14_intro_git.html
 description: Learn how to use conditional statements, loops, and variables in your
   shell scripts.
-percent: 70
+percent: 60
 duration: 2
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
@@ -22,6 +22,8 @@ navigation:
       link: 01a_man.html
     - name: Basic Command Line Navigation
       link: 02_basic_navigation.html
+    - name: Managing Users and Using `sudo`
+      link: 02a_user.html
   - section: Managing Files and Directories
     content:
     - name: Working with Files
