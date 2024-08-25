@@ -45,7 +45,7 @@ The `pwd` (print working directory) command displays the current directory you a
 pwd
 ```
 
-![pwd command](/learn/linux_intro/assets/pwd.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
+![pwd command](/learn/linux_intro/assets/pwd.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
 ---
 
@@ -57,7 +57,7 @@ The `ls` (list) command lists the contents of a directory. You can use it to see
 ls
 ```
 
-![ls command](/learn/linux_intro/assets/ls.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
+![ls command](/learn/linux_intro/assets/ls.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
 You can also use options with ls to get more detailed information:
 
@@ -65,7 +65,7 @@ You can also use options with ls to get more detailed information:
 ls -l
 ```
 
-![ls -l command](/learn/linux_intro/assets/ls-l.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
+![ls -l command](/learn/linux_intro/assets/ls-l.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
 ---
 
@@ -77,7 +77,7 @@ The `cd` (change directory) command allows you to navigate between directories. 
 cd Documents
 ```
 
-![cd command](/learn/linux_intro/assets/cd.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
+![cd command](/learn/linux_intro/assets/cd.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
 To return to the home directory, simply type:
 
@@ -85,7 +85,7 @@ To return to the home directory, simply type:
 cd $HOME
 ```
 
-![cdhome command](/learn/linux_intro/assets/cdhome.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
+![cdhome command](/learn/linux_intro/assets/cdhome.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
 To back up one directory, use:
 
@@ -93,7 +93,7 @@ To back up one directory, use:
 cd ..
 ```
 
-![cd  .. command](/learn/linux_intro/assets/cddotdot.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
+![cd  .. command](/learn/linux_intro/assets/cddotdot.png){:class="w-100 img-fluid card-shadow rounded-3"}
 
 ---
 
