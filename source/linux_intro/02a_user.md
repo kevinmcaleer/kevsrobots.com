@@ -2,7 +2,7 @@
 title: Managing Users and Using `sudo`
 description: Learn how to manage users, use the `sudo` command, and change passwords in a Unix-like system.
 layout: lesson
-cover: /learn/linux_intro/assets/usersmgr.jpg
+cover: /learn/linux_intro/assets/usermgr.jpg
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

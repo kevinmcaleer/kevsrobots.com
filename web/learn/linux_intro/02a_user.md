@@ -3,7 +3,7 @@ layout: lesson
 title: Managing Users and Using `sudo`
 author: Kevin McAleer
 type: page
-cover: /learn/linux_intro/assets/usersmgr.jpg
+cover: /learn/linux_intro/assets/usermgr.jpg
 date: 2024-08-23
 previous: 02_basic_navigation.html
 next: 03_working_with_files.html
