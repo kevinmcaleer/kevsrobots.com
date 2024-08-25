@@ -10,7 +10,7 @@ next: 02a_user.html
 description: Learn how to navigate the filesystem using basic commands like pwd, ls,
   and cd.
 percent: 12
-duration: 3
+duration: 4
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
 - content:
@@ -88,7 +88,7 @@ Navigating the filesystem is a fundamental skill when working with the command l
 ## Learning Objectives
 
 - Understand the structure of the Raspberry Pi OS filesystem.
-- Learn how to use the `pwd`, `ls`, and `cd` commands.
+- Learn how to use the `pwd`, `ls`, `cd`, `clear` and `history` commands.
 - Differentiate between absolute and relative paths.
 
 ---
@@ -186,8 +186,44 @@ This will clear the terminal screen, making it easier to read the output of new 
 
 ---
 
+## History Command
+
+The `history` command is a useful tool that shows you a list of the commands you’ve previously run in the terminal. This can help you remember commands you've used before or quickly repeat them without typing them out again.
+
+To see your command history, simply type:
+
+```bash
+history
+```
+
+This will display a numbered list of your recent commands.
+
+### Re-running Previous Commands
+
+You can easily re-run a command from your history by using the `!` symbol followed by the command number. For example, if the command you want to repeat is number 42 in the history list, you can type:
+
+```bash
+!42
+```
+
+This will execute the command exactly as you ran it before.
+
+### Using History for Efficiency
+
+- **Repeating the Last Command**: If you want to run the very last command again, you can use `!!`:
+
+  ```bash
+  !!
+  ```
+
+  This is handy if you forgot to use `sudo` and want to rerun the command with it.
+
+- **Searching Your History**: You can search for a previous command by typing `Ctrl + r` and then start typing part of the command. This will show you the most recent match from your history, which you can then execute by pressing `Enter`.
+
+---
+
 ## Summary
 
-In this lesson, you learned how to navigate the filesystem using the `pwd`, `ls`, and `cd` commands, and you now understand the difference between absolute and relative paths. These are essential skills for working efficiently in the command line.
+In this lesson, you learned how to navigate the filesystem using the `pwd`, `ls`, `cd`, `clear` and `history` commands, and you now understand the difference between absolute and relative paths. These are essential skills for working efficiently in the command line.
 
 ---
