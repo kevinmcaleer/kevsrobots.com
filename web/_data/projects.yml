@@ -1,3 +1,8 @@
+- name: GamePad 2
+  link: /blog/gamepad2.html
+  cover: /assets/img/blog/gamepad2/cover.jpg
+  date: 2024-08-29
+  description: Build a Pico 2 powered Bluetooth GamePad
 - name: PicoTamachibi 2
   link: /blog/picotamachibi2.html
   cover: /assets/img/blog/picotamachibi2/picotamachibi2.jpg
