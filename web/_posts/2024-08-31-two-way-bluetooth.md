@@ -19,7 +19,7 @@ groups:
  - pico
  - micropython
 videos:
- - Ln_xreldWOM
+ - l-K_0N1m5kQ
 code:
  - https://www.github.com/kevinmcaleer/pico_two_way_bluetooth
 ---
