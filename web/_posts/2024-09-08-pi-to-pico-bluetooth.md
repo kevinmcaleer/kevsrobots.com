@@ -74,8 +74,7 @@ The repository has 4 lessons, each building on the previous one. The lessons are
 
 1. Lesson 1 - Basic Bluetooth Communication
 2. Lesson 2 - Better Two-Way Communication
-3. Lesson 3 - Communicating to multiple devices
-4. Lesson 4 - Temperature Sensor example
+3. Lesson 3 - Temperature Sensor example
 
 In each lesson folder there is a `pi_demo.py` file and a `pico_a.py` file. These files contain the code that runs on the Raspberry Pi and the Raspberry Pi Pico, respectively.
 

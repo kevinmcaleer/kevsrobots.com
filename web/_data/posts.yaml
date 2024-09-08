@@ -101,6 +101,9 @@ posts:
 - title: Face Detection
   url: /2024-01-24-face-detection-trilobot.md
   date: 2024-01-21
+- title: Gamepad 2
+  url: /2024-08-28-gamepad2.md
+  date: 2024/08/28
 - title: Build a Web Server Using a Raspberry Pi Pico W and Phew!
   url: /2024-01-25-picow-webserver.md
   date: 2024-01-25
@@ -200,6 +203,9 @@ posts:
 - title: Power up your robot projects
   url: /2023-03-20-power.md
   date: 2023-03-19
+- title: Picotamachibi 2
+  url: /2024-08-18-picotamachibi2.md
+  date: 2024/08/18
 - title: 3 parts are now available!
   url: /2022-10-12-build-your-own-ai-series.md
   date: 2022-10-12
@@ -284,6 +290,9 @@ posts:
 - title: Iskarni Hack
   url: /2023-04-08-ikea-lamp-hack.md
   date: 2023-04-09
+- title: Pi to Pico W Bluetooth Communication
+  url: /2024-09-08-pi-to-pico-bluetooth.md
+  date: 2024/09/08
 - title: Tags
   url: /2023-09-18-tags.md
   date: 2023-09-17
@@ -305,6 +314,9 @@ posts:
 - title: Guiding Light
   url: /2024-04-25-guiding-light.md
   date: 2024-04-25
+- title: Two-Way Bluetooth Communication Between Raspberry Pi Picos
+  url: /2024-08-31-two-way-bluetooth.md
+  date: 2024/08/31
 - title: Ghostbusters Wi-Fi Scanner
   url: /2022-12-21-ghostbusters-wifi.md
   date: 2022-12-21
