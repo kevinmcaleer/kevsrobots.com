@@ -1194,3 +1194,43 @@ table .w-30 {
   z-index:  -1;
   // opacity: 0.6; /* Set the opacity of the image */
 }
+
+.blog {
+  grid-area: blog;
+}
+
+.video {
+  grid-area: video;
+}
+
+.project {
+  grid-area: project;
+}
+
+.robot {
+  grid-area: robot;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(100px, auto);
+  grid-template-areas:
+    "blog blog blog robot"
+    "blog blog blog project"
+    "blog blog blog video"
+    "blog blog blog .";
+  gap: 15px; /* Adds 20px space between rows and columns */
+}
+
+.textbox-3-line {
+  // width: 300px;                     /* Set a fixed width */
+  height: calc(1.5em * 3);          /* The height is 3 lines tall, where 1.2em is the approximate line height */
+  display: -webkit-box;             /* Required for truncation to work in WebKit browsers */
+  line-clamp: 3;                    
+  -webkit-line-clamp: 3;            /* Limit the text to 3 lines */
+  -webkit-box-orient: vertical;     /* Orient the box vertically */
+  overflow: hidden;                 /* Hide any overflowed text */
+  text-overflow: ellipsis;          /* Show ellipsis when the text overflows */
+  white-space: normal;              /* Allow text to break to the next line */
+}

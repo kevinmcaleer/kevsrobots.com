@@ -1,0 +1,62 @@
+- name: Introduction to Arduino for Beginners
+  author: [Your Name]
+  date_created: 2024-09-10
+  date_published: 2024-09-10
+  layout: course
+  cover: assets/arduino_cover.jpg
+  groups:
+    - arduino
+  description: >-
+    A comprehensive guide for beginners to get started with Arduino programming and hardware. Learn the fundamentals of using the Arduino IDE, programming in Arduino language (based on C/C++), and building projects with popular Arduino boards such as the Uno R3, Nano, and Nano ESP32. This course covers setup, basic programming concepts, working with sensors, and building simple projects.
+  content:
+  - section:
+      name: Getting Started with Arduino
+      content:
+        - 01_intro_to_arduino.md
+        - 02_setting_up_ide.md
+        - 03_connecting_uno_r3.md
+        - 04_connecting_nano.md
+        - 05_connecting_nano_esp32.md
+  - section:
+      name: Understanding Arduino Programming Language
+      content:
+        - 06_intro_to_programming.md
+        - 07_basic_syntax.md
+        - 08_variables_and_data_types.md
+        - 09_control_structures.md
+        - 10_functions_and_libraries.md
+  - section:
+      name: Working with Digital and Analog I/O
+      content:
+        - 11_digital_inputs_outputs.md
+        - 12_analog_inputs_outputs.md
+        - 13_blinking_led.md
+        - 14_reading_analog_sensors.md
+  - section:
+      name: Serial Communication and Debugging
+      content:
+        - 15_serial_monitor_intro.md
+        - 16_reading_serial_data.md
+        - 17_troubleshooting.md
+  - section:
+      name: Basic Projects for Beginners
+      content:
+        - 18_blink_led_project.md
+        - 19_temperature_sensor_project.md
+        - 20_control_motor_with_potentiometer.md
+  - section:
+      name: Advanced Topics: Working with ESP32
+      content:
+        - 21_intro_to_esp32.md
+        - 22_wifi_and_bluetooth.md
+        - 23_control_led_via_web.md
+  - section:
+      name: Final Project: Building a Simple Arduino Application
+      content:
+        - 24_final_project_overview.md
+        - 25_final_project_steps.md
+  - section:
+      name: Resources and Next Steps
+      content:
+        - 26_resources_next_steps.md
+        - 27_arduino_cheatsheet.md
