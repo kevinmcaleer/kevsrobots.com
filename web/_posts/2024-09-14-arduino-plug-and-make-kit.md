@@ -23,7 +23,7 @@ videos:
 
 ## Arduino Plug and Make kit
 
-The [Arduino Plug and Make Kit](https://store.arduino.cc/products/plug-and-make-kit) is a new Start Kit for beginners. It contains an Arduino Uno R4 and 7 electronics modules called Modulinos. It's priced at €95.20 and contains everything you need to start building fun projects.
+The [Arduino Plug and Make Kit](https://store.arduino.cc/products/plug-and-make-kit) is a new Starter Kit for beginners. It contains an Arduino Uno R4 and 7 electronics modules called Modulinos. It's priced at €95.20 and contains everything you need to start building fun projects.
 
 ![Arduino Plug and Make Kit](/assets/img/blog/arduino_pamk/mounting.jpg){:class="img-fluid w-100 rounded card-shadow"}
 
