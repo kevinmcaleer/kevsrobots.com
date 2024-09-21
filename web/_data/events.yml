@@ -75,3 +75,9 @@
   link: https://www.emfcamp.org/
   status: closed
   image: /assets/img/events/emfcamp2024.jpg
+- event: Open Hardware Summit 2025
+  start: "2025-05-30"
+  end: "2025-05-31"
+  location: "University of Edinburgh, UK"
+  link: https://2025.oshwa.org/
+  status: confirmed
