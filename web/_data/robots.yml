@@ -1,3 +1,8 @@
+- name: Woodbot
+  link: /blog/woodbot.html
+  cover: /assets/img/blog/woodbot/cover.jpg
+  description: Build a Laser Cut Robot
+  date: 2024/09/28
 - name: Scrawly Wally
   link: /learn/scrawly_wally/
   cover: /learn/scrawly_wally/assets/cover.png
