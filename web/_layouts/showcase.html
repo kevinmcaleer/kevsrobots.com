@@ -59,8 +59,13 @@ layout: default
                     <i class="fa-regular fa-user"></i> By {{ page.author}} &nbsp; | &nbsp;
                     Share this article on <span class=" {{textcol}}"><a class="{{textcol}}" href="https://twitter.com/intent/tweet?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
                     <a class="{{textcol}}" href="https://mastodon.social?text=I found this cool KevsRobots Article on {{page.title}}:%0A&url={{site.url}}{{page.url}}%0A&hashtags=robotics" data-toggle="tooltip" title="Share on Mastodon"><i class="fab fa-mastodon"></i></a></span>
-                    
+                    {% if page.date_updated %}
+                <div class="m-0 p-0">
+                <p class="text-start text-small text-body-secondary m-0 p-0">Page last updated {{page.date_updated | date: "%B %d, %Y"}}</p>
+                </div>
+                {% endif %}
                     </div>
+                    
                 </div>
                 </div> 
 
