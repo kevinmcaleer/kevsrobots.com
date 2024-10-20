@@ -1,3 +1,8 @@
+- name: C2Pi-O
+  link: /blog/c2pi_o.html
+  cover: /assets/img/blog/c2pio/cover.jpg
+  description: C2Pi-O - the 2 Pi Camera holder
+  date: 2024/10/20
 - name: Woodbot
   link: /blog/woodbot.html
   cover: /assets/img/blog/woodbot/cover.jpg
