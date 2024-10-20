@@ -1,0 +1,28 @@
+- name: Building Object Detection Models with Raspberry Pi AI Camera
+  author: Kevin McAleer
+  date_created: 2024-10-16
+  date_published: 2024-10-16
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - python
+      - ai
+      - raspberry_pi
+  description: >- 
+      Learn how to build object detection models using the Raspberry Pi AI Camera. 
+      This course covers setting up the model training environment, training the model, and deploying it on the Raspberry Pi.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 01_intro.md
+  - section:
+      name: Setting Up the Model Training Environment
+      content:
+      - 02_setup.md
+      - 03_prep.md
+  - section:
+      name: Training the Model
+      content:
+      - 04_train.md
+  
