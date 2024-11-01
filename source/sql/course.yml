@@ -1,0 +1,39 @@
+- name: Getting Started with SQL
+  author: Kevin McAleer
+  date_created: 2024-11-01
+  date_published: 2024-11-01
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - databases
+  description: >- 
+     Learn the fundamentals of SQL, relational database theory, and essential skills for database management.
+  content:
+  - section:
+      name: Introduction
+      content:
+      - 00_course_overview.md 
+  - section:
+      name: SQL Basics
+      content:
+      - 01_introduction_to_sql.md
+      - 02_setting_up_environment.md
+      - 03_basic_sql_commands.md
+      - 04_working_with_tables.md
+      - 05_data_insertion_and_modification.md
+      - 06_querying_data_with_select.md
+      - 07_advanced_filtering.md
+      - 08_working_with_joins.md
+  - section:
+      name: Intermediate Concepts
+      content:
+      - 09_grouping_and_aggregating_data.md
+      - 10_introduction_to_normalization.md
+      - 11_boyce_codd_normal_form.md
+      - 12_subqueries_and_nested_queries.md
+      - 13_views_and_indexes.md
+      - 14_sql_functions_and_expressions.md
+  - section:
+      name: Conclusion
+      content:
+      - 15_wrap_up_and_final_project.md

@@ -6,6 +6,7 @@ layout: course_pathway
 description: Learn how to create Databases in Python, with SQLite3 and Redis.
 cover: /assets/img/learn/learn_databases.png
 courses:
+  - "Getting Started with SQL"
   - "Create Databases with Python and SQLite3"
   - "Using Redis with Python"
 ---

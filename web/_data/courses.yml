@@ -362,3 +362,13 @@
   - pico
   link: /learn/how_to_install_micropython/01_intro.html
   name: How to install MicroPython
+- author: Kevin McAleer
+  cover: /learn/sql/assets/cover.jpg
+  date_published: 2024-11-01
+  description: Learn the fundamentals of SQL, relational database theory, and essential
+    skills for database management.
+  duration: 0h 32m
+  groups:
+  - databases
+  link: /learn/sql/00_course_overview.html
+  name: Getting Started with SQL
