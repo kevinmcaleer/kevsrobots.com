@@ -1,3 +1,8 @@
+- name: KevsArcade
+  link: /blog/kevsarcade.html
+  cover: /assets/img/blog/kevsarcade/cover.jpg
+  date: 2024-11-02
+  description: Build a Pico 2 powered Bluetooth GamePad
 - name: GamePad 2
   link: /blog/gamepad2.html
   cover: /assets/img/blog/gamepad2/cover.jpg

@@ -50,6 +50,9 @@ posts:
 - title: Spooky Scary Skeleton
   url: /2022-10-09-spooky-scary-skeleton.md
   date: 2022-10-09
+- title: KevsArcade
+  url: /2024-11-01-kevsarcade.md
+  date: 2024/11/01
 - title: Docker Swarm
   url: /2024-02-03-docker-swarm.md
   date: 2024-02-03
@@ -200,6 +203,9 @@ posts:
 - title: Pi-PipBoy
   url: /2023-03-26-pi-pipboy.md
   date: 2023-03-26
+- title: Robots and Lasers
+  url: /2024-09-25-robots-and-lasers.md
+  date: 2024/09/25
 - title: Omnibot 3000
   url: /2023-11-27-omnibot.md
   date: 2023-11-27
@@ -263,6 +269,9 @@ posts:
 - title: Chicken Nugget of Doom
   url: /2023-08-05-chicken_nugget.md
   date: 2023-08-05
+- title: Build a laser-cut robot
+  url: /2024-09-28-woodbot.md
+  date: 2024/09/28
 - title: Viam SLAM
   url: /2024-01-02-viam-slam.md
   date: 2024-01-02
@@ -296,6 +305,9 @@ posts:
 - title: Pi to Pico W Bluetooth Communication
   url: /2024-09-08-pi-to-pico-bluetooth.md
   date: 2024/09/08
+- title: C2Pi-O Laser cut Camera holder
+  url: /2024-10-20-c2pi_o.md
+  date: 2024/10/20
 - title: Tags
   url: /2023-09-18-tags.md
   date: 2023-09-17
