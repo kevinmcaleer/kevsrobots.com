@@ -113,3 +113,21 @@ Connect the two arcade buttons to the Pico:
 ![Wiring diagram](/assets/img/blog/kevsarcade/wiring.jpg){:class="img-fluid w-100 rounded-3"}
 
 ---
+
+## RetroPie
+
+RetroPie is a great piece of software, and I've been using it for years. I've got a few Raspberry Pi's running it, and I've always wanted to build my own arcade cabinet. I've got a few more ideas for this project, so stay tuned.
+
+### Setting up RetroPie
+
+I've created a specific tutorial on setting up RetroPie on the Raspberry Pi, you can find it [here](https://www.kevsrobots.com/blog/retropie2.html).
+
+![Setting up retropie](/assets/img/blog/kevsarcade/setup_retropie01.jpg){:class="img-fluid w-100 rounded-3"}
+
+![Setting up retropie](/assets/img/blog/kevsarcade/setup_retropie02.jpg){:class="img-fluid w-100 rounded-3"}
+
+![Setting up retropie](/assets/img/blog/kevsarcade/setup_retropie03.jpg){:class="img-fluid w-100 rounded-3"}
+
+{% include card.html cardtitle="Ultimate Guide to Setting Up RetroPie on a Raspberry Pi 4" link="/blog/retropie2.html" img="/assets/img/blog/retropie/retropie01.jpg" class="w-50" %}
+
+---
