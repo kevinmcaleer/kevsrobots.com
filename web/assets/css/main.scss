@@ -1234,3 +1234,30 @@ table .w-30 {
   text-overflow: ellipsis;          /* Show ellipsis when the text overflows */
   white-space: normal;              /* Allow text to break to the next line */
 }
+
+/* Apply border to the table */
+// 
+.events table {
+  // border-collapse: collapse; /* Ensures borders are collapsed for a cleaner look */
+  width: 100%; /* Optional: adjust the table width */
+  // border-radius: 5px; /* Optional: adds rounded corners */
+  // overflow: hidden; 
+  
+}
+
+/* Apply border to table cells */
+.events table th,
+.events table td {
+  border: 1px solid #DDD; /* Adds border to table cells */
+  padding: 8px; /* Optional: adds padding inside cells */
+}
+.events table td a {
+  color: #000;
+  text-emphasis: bold;
+  text-decoration: none;
+}
+
+/* Style the first cell in each row */
+.events table td:first-child {
+  background-color: #EEE;
+}

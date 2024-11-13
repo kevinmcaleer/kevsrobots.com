@@ -7,7 +7,7 @@
             {% endcapture %}
 
             {{ welcome_note | markdownify }}
-
+            {% include events_widget.html limit=3 size=full %}
         </div>
  
     <div class="col-12 col-lg-6 col-xl-7">

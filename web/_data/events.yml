@@ -45,7 +45,7 @@
   end: "2024-10-27"
   location: Gazometro Ostiense, Italy
   link: https://www.makerfairerome.eu/
-  status: confirmed
+  status: closed
   image: /assets/img/events/makerfairerome_2024.jpg
 - event: Makers Central 2024
   start: "2024-05-18"
@@ -55,11 +55,11 @@
   status: closed
   image: /assets/img/events/makers_central_2024.jpg
 - event: SMRRF 2024
-  start: "2024-10-05"
-  end: "2024-10-06"
-  location: Oxford, UK
-  link: https://www.sanjaymortimerfoundation.org/
-  status: expected, date to be confirmed
+  start: "2024-12-07"
+  end: "2024-12-08"
+  location: Manchester, UK
+  link: https://www.sanjaymortimerfoundation.org/smrrf24
+  status: confirmed
   image: /assets/img/events/smrrf_2024.jpg
 - event: Pi Wars 2024
   start:  "2024-04-20"
@@ -81,3 +81,21 @@
   location: "University of Edinburgh, UK"
   link: https://2025.oshwa.org/
   status: confirmed
+- event: Open Sauce 2025
+  start: "2025-07-18"
+  end: "2025-07-20"
+  location: "San Francisco, USA"
+  link: https://www.opensauce.com
+  status: confirmed
+- event: Makers Central 2025
+  start: "2025-05-17"
+  end: "2025-05-18"
+  location: "NEC, Birmingham, UK"
+  link: https://www.makerscentral.co.uk
+  status: confirmed
+- event: Makers Faire Rome 2025
+  start: "tbc"
+  end: "tbc"
+  location: "Rome, Italy"
+  link: https://www.makerfairerome.eu
+  status: expected

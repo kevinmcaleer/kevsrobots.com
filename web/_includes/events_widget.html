@@ -1,0 +1,31 @@
+{% assign today = 'now' | date: '%Y-%m-%d' %}
+
+{% assign events = site.data.events | where_exp: "event", "event.end >= today" | sort: "start" %}
+
+{% if include.limit %}
+  {%assign events = events | slice: 0, include.limit %}
+{% endif %}
+<div class="row">
+{% if include.size == full %}
+<div class="events py-3 col-12">
+{% else %}
+<div class="events py-3 col-xs-8 col-sm-8 col-md-5 col-lg-4 col-xl-3">
+{% endif %}
+
+    <h5>Upcoming Events</h5>
+    <table cellpadding="10px" cellspacing="2px" class="py-3">
+    {% for event in events %}
+    <tr valign="top">
+        <td class="w-auto text-nowrap">
+            {{ event.start | date: '%-d %b'}} - {{event.end | date: '%-d %b'}}
+        </td>
+        <td class="w-100">
+            <a href="{{ event.link }}"><b>{{ event.event }}</b> <i class="fa-solid fa-arrow-up-right-from-square"></i></a><br />
+            <p class="text-small small text-mute mute">{{ event.location }}</p>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<p class="text-end"><a href="/events.ics">Add Calendar</a></p>
+</div>
+</div>
