@@ -1,13 +1,39 @@
+
+<!-- Truncate Title lines with tl=2 -->
+<!-- Truncate description lines with dl=3 -->
+
+{% assign title_truncate_class = "" %}
+{% if include.tl == "1" %}
+  {% assign title_truncate_class = "text-truncate-1-lines" %}
+{% elsif include.tl == "2" %}
+  {% assign title_truncate_class = "text-truncate-2-lines" %}
+{% elsif include.tl == "3" %}
+  {% assign title_truncate_class = "text-truncate-3-lines" %}
+{% endif %}
+{% assign description_truncate_class = "" %}
+{% if include.dl == "1" %}
+  {% assign description_truncate_class = "text-truncate-1-lines" %}
+{% elsif include.dl == "2" %}
+  {% assign description_truncate_class = "text-truncate-2-lines" %}
+{% elsif include.dl == "3" %}
+  {% assign description_truncate_class = "text-truncate-3-lines" %}
+{% endif %}
+
 <div class="col">
     <a href="{{include.link}}" class="text-decoration-none">
-        <div class="card h-100 bg-light card-hover shadow-hover {% if include.noborder %}border-0{% endif %}">
+        <div class="card h-100 bg-light card-hover shadow-hover rounded-3 {% if include.noborder %}border-0{% endif %}">
             {% if include.img != None %}
             <img src="{{include.img}}" class="card-img-top" alt="{{include.cardtitle}}">
             {% endif %}
             <div class="card-body">
-                <h5 class="card-title black">{{ include.cardtitle }}</h5>
+                <h5 class="card-title black {{title_truncate_class}}">{{ include.cardtitle }}</h5>
+                {% if include.type == 'video'%}
+                <p class="text-start small grey"><i class="fa-solid fa-circle-video"></i> Video</p>
+                {% elsif include.type == 'blog'%}
+                <p class="text-start small grey"><i class="fa-solid fa-book-open text-end"></i> Read</p>
+                {% endif%}
                 {% if include.description %}
-                <p class="text-small dark-grey">{{ include.description }}</p>
+                <p class="text-small dark-grey {{description_truncate_class}}">{{ include.description }}</p>
                 {% endif %}
             </div>
         </div>

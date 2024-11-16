@@ -248,6 +248,9 @@ posts:
 - title: PicoSMARS 2
   url: /2023-10-05-picosmars.md
   date: 2023-10-05
+- title: Raspberry Pi Ghost Setup with Docker
+  url: /2024-11-12-ghost-on-docker.md
+  date: 2024-11-14
 - title: How to install an NVMe drive on a Raspberry Pi 5
   url: /2024-01-13-raspberrypi5-nvme-nas.md
   date: 2024-01-13
@@ -275,6 +278,9 @@ posts:
 - title: Viam SLAM
   url: /2024-01-02-viam-slam.md
   date: 2024-01-02
+- title: Raspberry Pi WordPress Setup with Docker
+  url: /2024-11-14-wordpress-on-docker.md
+  date: 2024-11-14
 - title: Servo Easing & Pancake-Bot
   url: /2023-02-18-servo-easing-with-pancake-bot.md
   date: 2023-02-18
@@ -296,6 +302,9 @@ posts:
 - title: Bluetooth Remote Control Custom PCB
   url: /2023-08-20-bluetooth-remote-pcb.md
   date: 2023-08-20
+- title: Setting Up Dynamic DNS on a Raspberry Pi for Self-Hosting
+  url: /2024-11-15-dynamic-dns.md
+  date: 2024-11-15
 - title: Bubo-2T
   url: /2023-02-04-bubo-2t.md
   date: 2023-02-04
@@ -308,6 +317,9 @@ posts:
 - title: C2Pi-O Laser cut Camera holder
   url: /2024-10-20-c2pi_o.md
   date: 2024/10/20
+- title: Raspberry Pi WireGuard VPN Setup with Docker
+  url: /2024-11-14-wireguard-on-pi.md
+  date: 2024-11-14
 - title: Tags
   url: /2023-09-18-tags.md
   date: 2023-09-17
@@ -323,6 +335,9 @@ posts:
 - title: MeArm
   url: /2023-06-05-mearm.md
   date: 2023-06-05
+- title: Raspberry Pi MotionEye Camera Setup with Docker
+  url: /2024-11-14-motioneye-on-pi.md
+  date: 2024-11-14
 - title: The Three Laws of Robotics
   url: /2023-03-23-three-laws-of-robotics.md
   date: 2023-03-23
@@ -347,6 +362,9 @@ posts:
 - title: New ROS Course
   url: /2023-01-08-learn_ros_with_me.md
   date: 2023-01-08
+- title: Raspberry Pi Telegraf Setup with Docker
+  url: /2024-11-16-telegraf-on-pi.md
+  date: 2024-11-14
 - title: BrachioGraph
   url: /2024-07-26-brachiograph.md
   date: 2024-07-26

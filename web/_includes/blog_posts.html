@@ -11,8 +11,8 @@
             <img src="{{ post.cover }}" class="card-img-top" alt="{{post.title}}"></a>
     
         <div class="card-body">
-        <h5 class="card-title">{{ post.title }}</h5>
-        <p class="card-text ">{{ post.excerpt }}</p>
+        <h5 class="card-title text-truncate-2-lines">{{ post.title }}</h5>
+        <p class="card-text text-truncate-4-lines">{{ post.excerpt }}</p>
         <div class="row">
             <div class="row">
         <p class="card-text small">{{ post.date | date: "%-d %B %Y" }} 
