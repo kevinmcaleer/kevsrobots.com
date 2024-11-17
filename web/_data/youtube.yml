@@ -1,16 +1,43 @@
+- published: 2024/11/09
+  video_id: KkN-NFa3KI0
+  title: "I got a surprise gift from YouTube! #youtubehighfive"
+  type: short
+- published: 2024/11/10
+  title: "Raspberry Pi 5 Tiny Arcade machine - can the Pi handle it?"
+  video_id: VDilWgcGIBg
+  type: video
+- published: 2024/11/04
+  title: "I made a tiny arcade machine! #micropython #raspberrypi4 #raspberrypi"
+  video_id: KkN-NFa3KI0
+  type: short
 - published: 2024/11/16
   title: "Raspberry Pi & Telegraf - Learn to Monitor your servers"
   video_id: CrWh34bQK7M
   type: livestream
+- published: 2024/11/10
+  title: "Mailbox and Hangout 10 Nov 2024"
+  video_id: KHCOXcZe4jY
+- published: 2024/11/07
+  title: "Raspberry Pi USB 3 Hub - Why did they make this?"
+  video_id: Q42PYKoOGjg
+  type: video
 - published: 2024/11/02
   title: "Build your own miniature retro Arcade with KevsArcade"
   video_id: 1O9-4kNRSrw
   type: livestream
+- published: 2024/11/04
+  title: "Raspberry Pi Touch Display 2 - what's new?"
+  video_id: r05exCyZDmw
+  type: video
+- published: 2024/10/24
+  title: "Raspberry Pi AI HAT+ - Faster than Apple M3 Silicon?"
+  video_id: Nw274Vg0dV4
+  type: video
 - published: 2024/10/23
-  title: "DIY AI: Build and Train Your Own Model with PyTorch!"
-  video_id: Qo4T9EiyCwc
-  type: livestream
-- published: 2024/10/20
+  title: "What is the new Raspberry Pi SSD Kit?"
+  video_id: AYYjq5OMdak
+  type: video
+- published: 2024/10/23
   title: "DIY AI: Build and Train Your Own Model with PyTorch!"
   video_id: Qo4T9EiyCwc
   type: livestream
