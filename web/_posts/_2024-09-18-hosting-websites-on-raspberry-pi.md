@@ -4,7 +4,7 @@ description: >-
 
 excerpt: >-
 layout: showcase
-date: 2024/09/18
+date: 2024-09-18
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/kevsrobots/cover.jpg

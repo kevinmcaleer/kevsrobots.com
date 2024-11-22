@@ -50,7 +50,12 @@ def create_calendar_heatmap(posts, year):
     # Mark the dates with blog posts
     for post in posts:
         post_date_str = post['date']
-        post_date = pd.to_datetime(post_date_str).date()
+        try:
+            post_date = pd.to_datetime(post_date_str).date()
+        except:
+            title = post['title']
+            print(f'there was a problem with the date on article {title}')
+
         print(f"Post date: {post_date}")
 
         if post_date.year == year:

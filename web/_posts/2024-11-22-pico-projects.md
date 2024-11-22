@@ -5,7 +5,7 @@ description: >-
 excerpt: >-
     If you've just got a new Raspberry Pi Pico and you're looking for some inspiration, then you've come to the right place. Here is a collection of projects that you can build with your Raspberry Pi Pico.
 layout: showcase
-date: 2024/11/22
+date: 2024-11-22
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/picoprojects/cover.jpg

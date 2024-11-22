@@ -4,7 +4,7 @@ description: >-
     Learn how to set up two-way Bluetooth communication between two Raspberry Pi Picos using MicroPython.
 excerpt: >-
 layout: showcase
-date: 2024/08/31
+date: 2024-08-31
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/pico2pico/cover.png

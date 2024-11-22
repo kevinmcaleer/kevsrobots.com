@@ -7,52 +7,21 @@
 
 {% assign all_years = "" %}
 
+<!-- Collect all years from posts -->
 {% for post in site.posts %}
-  {% assign year = post.date | date: "%Y" %}
-  {% assign all_years = all_years | append: year | append: "," %}
-   Year is {{year}}
-   all years is {{all_years}}
-{% endfor %}
-<!-- 
-{% for robot in robots %}
-  {% assign year = robot.date | date: "%Y" %}
-  {% unless year == nil %}
+  {% if post.date %}
+    {% assign year = post.date | date: "%Y" %}
     {% assign all_years = all_years | append: year | append: "," %}
-  {% endunless %}
+  {% else %}
+    <p>Error: Post "{{ post.title }}" is missing a valid date.</p>
+  {% endif %}
 {% endfor %}
 
-{% for project in projects %}
-  {% assign year = project.date | date: "%Y" %}
-  {% unless year == nil %}
-    {% assign all_years = all_years | append: year | append: "," %}
-  {% endunless %}
-{% endfor %}
-
-{% for video in videos %}
-  {% assign year = video.published | date: "%Y" %}
-  {% unless year == nil %}
-    {% assign all_years = all_years | append: year | append: "," %}
-  {% endunless %}
-{% endfor %}
-
-{% for course in courses %}
-  {% assign year = course.date_published | date: "%Y" %}
-  {% unless year == nil %}
-    {% assign all_years = all_years | append: year | append: "," %}
-  {% endunless %}
-{% endfor %}
-
-{% for review in reviews %}
-  {% assign year = review.year %}
-  {% unless year == nil %}
-    {% assign all_years = all_years | append: year | append: "," %}
-  {% endunless %}
-{% endfor %} -->
-
+<!-- Get unique years -->
 {% assign years = all_years | split: ',' | uniq | sort %}
 
 <h5>Summary of Stats by Year</h5>
-<table class="table table-bordered">
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
             <th>Year</th>
@@ -66,15 +35,72 @@
     </thead>
     <tbody>
         {% for year in years %}
-        
-        {% assign total_robots = robots | where_exp: "item", item.date | date: '%Y' == year" %}
-        {% assign total_robots_count = total_robots | size %}
+        {% assign total_posts = 0 %} <!-- Initialize total_posts for the current year -->
+        {% assign total_robots = 0 %} <!-- Initialize total_robots for the current year -->
+        {% assign total_projects = 0 %} <!-- Initialize total_projects for the current year -->
+        {% assign total_videos = 0 %} <!-- Initialize total_videos for the current year -->
+        {% assign total_courses = 0 %} <!-- Initialize total_courses for the current year -->
+        {% assign total_reviews = 0 %} <!-- Initialize total_reviews for the current year -->
 
-        {% assign total_projects = projects | where_exp: "item", item.date | date: '%Y' == year" | size %}
-        {% assign total_videos = videos | where_exp: "item", item.published | date: '%Y' == year" | size %}
-        {% assign total_posts = site.posts | where_exp: "post", post.date | date: '%Y' == year" | size %}
-        {% assign total_courses = courses | where: 'year', year | size %}
-        {% assign total_reviews = reviews | where: 'year', year | size %}
+        <!-- Count posts for the current year -->
+        {% for post in site.posts %}
+          {% if post.date %}
+            {% assign post_year = post.date | date: "%Y" %}
+            {% if post_year == year %}
+              {% assign total_posts = total_posts | plus: 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% for robot in robots%}
+          {% if robot.date %}
+            {% assign robot_date = robot.date | replace: "/", "-" %}
+            {% assign robot_year = robot_date | date: "%Y" %}
+            {% if robot_year == year %}
+              {% assign total_robots = total_robots | plus: 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% for project in projects %}
+          {% if project.date %}
+          {% assign project_date = project.date  %}
+          {% assign project_year = project_date | date: "%Y" %}
+            {% if project_year == year %}
+              {% assign total_projects = total_projects | plus: 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% for video in videos %}
+          {% if video.published %}
+            {% assign video_year = video.published | date: "%Y" %}
+            {% if video_year == year %}
+              {% assign total_videos = total_videos | plus: 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% for course in courses %}
+          {% if course.date_published %}
+            {% assign course_date = course.date_published %}
+            {% assign course_year = course_date | date: "%Y" %}
+            {% if course_year == year %}
+              {% assign total_courses = total_courses | plus: 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% for review in reviews %}
+          {% if review.date %}
+            {% assign review_date = review.date  %}
+            {% assign review_year = review_date | date: "%Y" %}
+            {% if review_year == year %}
+              {% assign total_reviews = total_reviews | plus: 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
         <tr>
             <td>{{ year }}</td>
             <td>{{ total_robots }}</td>
@@ -84,7 +110,6 @@
             <td>{{ total_courses }}</td>
             <td>{{ total_reviews }}</td>
         </tr>
-       
         {% endfor %}
     </tbody>
 </table>

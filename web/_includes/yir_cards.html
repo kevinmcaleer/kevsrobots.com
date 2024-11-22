@@ -4,12 +4,12 @@
 {% for card in cards %}
 
 <div class="col">
-<a href="{{card.link}}">
-<div class="card border-0 shadow-lg">
+<a href="{{card.link}}" class="text-decoration-none">
+<div class="card border-0 card-shadow card-hover rounded-top-3">
 <img src="{{ card.cover }}" class="card-img-top" alt="Cover image for {{card.name}}">
 
-<div class="card-body">
-<h5 class="card-title">{{ card.name }}</h5>
+<div class="card-body bg-light rounded-bottom-3">
+<h5 class="card-title text-black ">{{ card.name }}</h5>
 </div>
 
 </div>

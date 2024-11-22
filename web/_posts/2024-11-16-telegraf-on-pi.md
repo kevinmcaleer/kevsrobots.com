@@ -4,7 +4,8 @@ description: "Step-by-step guide to setting up Telegraf on a Raspberry Pi using 
 excerpt: >- 
   "Learn how to set up Telegraf on your Raspberry Pi with Docker to monitor system metrics and integrate with popular time-series databases like InfluxDB or Prometheus."
 author: Kevin McAleer  
-date Updated: 2024-11-22  
+date: 2024-11-16
+date_updated: 2024-11-22
 layout: showcase
 difficulty: Intermediate 
 cover: /assets/img/blog/telegraf-pi/cover.jpg

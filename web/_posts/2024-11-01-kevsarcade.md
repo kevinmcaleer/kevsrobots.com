@@ -5,7 +5,7 @@ description: >-
 excerpt: >-
     KevsArcade is a project to create my own Arcade (yes, with multiple machines) using Raspberry Pi and a laser cutter
 layout: showcase
-date: 2024/11/01
+date: 2024-11-01
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/kevsarcade/cover.jpg

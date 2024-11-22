@@ -4,8 +4,8 @@ description: >-
     Build a Raspberry Pi Pico 2 powered Virtual Pet with a 1.3" OLED display and some MicroPython
 excerpt: >-
 layout: showcase
-date: 2024/08/18
-date_updated: 2024/11/22
+date: 2024-08-18
+date_updated: 2024-11-22
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/picotamachibi2/picotamachibi2.jpg

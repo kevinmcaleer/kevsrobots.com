@@ -4,7 +4,7 @@ description: >-
     Getting up to speed with the Creality Falcon 5W and Lightburn software.
 excerpt: >-
 layout: showcase
-date: 2024/09/25
+date: 2024-09-25
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/falcon5w/cover.jpg

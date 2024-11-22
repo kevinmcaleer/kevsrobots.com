@@ -4,7 +4,7 @@ description: >-
     The Arduino Plug and Make Kit is a great way to get started with Arduino. It includes everything you need to start building projects, and the included guide is easy to follow.
 excerpt: >-
 layout: showcase
-date: 2024/09/14
+date: 2024-09-14
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/arduino_pamk/cover.jpg

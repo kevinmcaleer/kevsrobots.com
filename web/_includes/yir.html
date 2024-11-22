@@ -159,20 +159,21 @@
             {% if video_month == month_padded %}
             <div class="col mb-1">
             <a href="https://www.youtube.com/watch?v={{video.video_id}}" class="text-decoration-none">
-            <div class="card h-100 border-0 rounded-3 {% if is_popular %} bg-ocre {% endif %} shadow-lg">
+
+            <div class="card h-100 border-0 rounded-3 {% if is_popular %} bg-ocre {% endif %} card-shadow card-hover">
             
             <!-- {% include youtubeplayer.html id=video.video_id %} -->
             <img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="card-img-top" alt="YouTube thumbnail for {{video.title}}">
             <div class="card-body">
-                <p class="card-title">{{video.title}}</p>
-                <p class="card-text text-muted text-sm">{{ video.published | date: "%d %b"}} | {{views}} views</p>
+                <p class="card-title text-truncate-2">{{video.title}}</p>
+                <p class="card-text text-muted text-sm text-truncate-2">{{ video.published | date: "%d %b"}} | {{views}} views</p>
                 <span class="badge {% if video.type=='livestream' %}bg-danger {% else %} bg-success {% endif %}">{{video.type | upcase }}</span>
                 
                 {% if is_popular %}
                 <span class="text-end badge bg-dark">Popular</span>
                 {% endif %}
                 
-            </div>
+            </div> <!-- card-body -->
             </div>
             </a>
             

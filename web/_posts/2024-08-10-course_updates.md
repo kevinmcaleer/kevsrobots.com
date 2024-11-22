@@ -4,7 +4,7 @@ description: >-
     The Learning System is now easier to navigate and includes new features
 excerpt: >-
 layout: blog
-date: 2024/08/10
+date: 2024-08-10
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/learning_system/cover.png

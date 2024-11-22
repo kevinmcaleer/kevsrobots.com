@@ -178,3 +178,17 @@
   cover: /assets/img/bigmouthbillybass/fish01.jpg
   description: Hack a Big Mouth Billy Bass with a Raspberry Pi Pico W
   date: 2022/07/09
+- name: OpenCat
+  link: /blog/opencat.html
+  cover: /assets/img/blog/picocat/picocat.jpg
+  date: 2021/01/31
+- name: SMARS
+  link: /blog/smars-beginning.html
+  cover: /assets/img/blog/smars/smars.jpg
+  description: An Arduino based robot that you can build yourself
+  date: 2020/07/01
+- name: SMARS Quad
+  link: /blog/smars-quad.html
+  cover: /assets/img/blog/smars/smars.jpg
+  description: An four legged Arduino based robot that you can build yourself
+  date: 2020/08/16

@@ -5,7 +5,7 @@ description: >-
 excerpt: >-
     If you've just got a new Raspberry Pi and you're looking for some inspiration, then you've come to the right place. Here is a collection of 20 projects that you can build with your Raspberry Pi.
 layout: showcase
-date: 2024/11/13
+date: 2024-11-13
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/20piprojects/cover.jpg
