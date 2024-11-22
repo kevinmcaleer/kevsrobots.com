@@ -1298,3 +1298,18 @@ table .w-30 {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.img-container {
+  height: 200px; /* Fixed height for the container */
+  width: 100%;   /* Full width of the parent */
+  display: flex; /* Enables flexbox for centering */
+  justify-content: center; /* Centers the image horizontally */
+  align-items: center; /* Centers the image vertically */
+}
+
+.img-container img {
+  max-height: 100%; /* Image scales to fit within the container height */
+  max-width: 100%;  /* Image scales to fit within the container width */
+  object-fit: contain; /* Ensures the entire image is visible without distortion */
+  display: block; /* Removes inline spacing */
+}

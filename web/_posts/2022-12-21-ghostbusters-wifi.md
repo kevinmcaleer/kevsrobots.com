@@ -1,14 +1,17 @@
 ---
-layout: project
+layout: showcase
+mode: light
 title: Ghostbusters Wi-Fi Scanner
 short_title: Ghostbusters Wi-Fi Scanner
 short_description: Who you gonna call?
 description: Who you gonna call?
 difficulty: Advanced
 date: 2022-12-21
+date_updated: 2024-11-22
 author: Kevin McAleer
 excerpt: 3d Print a Ghostbusters PKE style Wi-Fi Scanner
 cover: /assets/img/blog/ghostbusters/ghost02.jpg
+hero: /assets/img/blog/ghostbusters/hero.png
 tags:
  - Raspberry Pi Pico
  - Ghostbusters
@@ -25,8 +28,23 @@ groups:
  - retro
 videos:
  - XTUOUlSnVpc
-repo:
+code:
  - https://github.com/kevinmcaleer/ghostbusters_wifi
+stl:
+    - name: top
+      link: /assets/stl/ghostbusters/top.stl
+    - name: back
+      link: /assets/stl/ghostbusters/back.stl
+    - name: middle section
+      link: /assets/stl/ghostbusters/middle_section.stl
+    - name: back layer 
+      link: /assets/stl/ghostbusters/back_layer.stl
+    - name: handle
+      link: /assets/stl/ghostbusters/handle.stl
+    - name: left arm
+      link: /assets/stl/ghostbusters/left_arm.stl
+    - name: right arm
+      link: /assets/stl/ghostbusters/right_arm.stl
 ---
 
 ## Overview
@@ -46,7 +64,7 @@ You will also need the following electronics:
 Item                   | Description                                                                                                       | Qty |  Price
 -----------------------|-------------------------------------------------------------------------------------------------------------------|----:|------:
 Display Pack 2.0       | [Pimoroni Display Pack for Pico](https://shop.pimoroni.com/products/pico-display-pack-2-0?variant=39374122582099) |   1 | £18.90
-Pico W                 | [Raspberry Pi PicoPico W](https://shop.pimoroni.com/products/raspberry-pi-pico-w?variant=40059369619539)          |   1 |  £6.30
+Pico W                 | [Raspberry Pi Pico / Pico W](https://shop.pimoroni.com/products/raspberry-pi-pico-w?variant=40059369619539)          |   1 |  £6.30
 DS-929MG Digital Servo | [DS-959MG Servo](https://shop.pimoroni.com/products/ds-929mg-digital-servo?variant=1015994157)                    |   1 |  £9.60
 Pico Proto             | [Pico Proto board](https://shop.pimoroni.com/products/pico-proto?variant=32369530110035)                          |   1 |  £2.10
 4x M2 screws           | 2M 8mm screws                                                                                                     |   4 |  £1.00

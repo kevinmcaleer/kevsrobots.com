@@ -97,6 +97,21 @@
   link: /learn/markdown/01_overview.html
   name: Mastering Markdown for Documentation with Jekyll
 - author: Kevin McAleer
+  cover: /learn/pico_temp_sensor/assets/cover.jpg
+  date_published: 2024-11-22
+  description: Learn how to use the Raspberry Pi Pico's built-in temperature sensor
+    to measure and display temperature readings  in the Thonny console. This course
+    is designed for beginners and covers the fundamentals of MicroPython programming,  understanding
+    the Pico's ADC, and creating your first temperature monitoring project.  Through
+    step-by-step tutorials and practical examples, you'll gain the skills to confidently
+    use the Pico for sensor-based projects.
+  duration: 0h 24m
+  groups:
+  - pico
+  - micropython
+  link: /learn/pico_temp_sensor/01_course_introduction.html
+  name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
+- author: Kevin McAleer
   cover: /learn/docker_swarm/assets/docker_swarm.jpg
   date_published: 2024-02-03
   description: This course guides beginners through the process of setting up a Raspberry

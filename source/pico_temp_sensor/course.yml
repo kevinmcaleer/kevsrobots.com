@@ -1,0 +1,42 @@
+- name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
+  author: Kevin McAleer
+  date_created: 2024-11-22
+  date_published: 2024-11-22
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+    - pico
+    - micropython
+  description: >-
+      Learn how to use the Raspberry Pi Pico's built-in temperature sensor to measure and display temperature readings 
+      in the Thonny console. This course is designed for beginners and covers the fundamentals of MicroPython programming, 
+      understanding the Pico's ADC, and creating your first temperature monitoring project. 
+      Through step-by-step tutorials and practical examples, you'll gain the skills to confidently use the Pico for sensor-based projects.
+  content:
+    - section:
+        name: Introduction to the Raspberry Pi Pico and MicroPython
+        content:
+          - 01_course_introduction.md
+          - 02_setting_up_thonny.md
+          - 03_installing_micropython_on_pico.md
+    - section:
+        name: Understanding the Built-in Temperature Sensor
+        content:
+          - 04_overview_of_pico_temperature_sensor.md
+          - 05_how_the_temperature_sensor_works.md
+    - section:
+        name: Writing Your First Temperature Sensor Script
+        content:
+          - 06_reading_temperature_with_adc.md
+          - 07_displaying_temperature_in_thonny_console.md
+          - 08_formatting_temperature_readings.md
+    - section:
+        name: Enhancing Your Temperature Monitoring Project
+        content:
+          - 09_converting_adc_to_temperature.md
+          - 10_creating_a_temperature_alert_system.md
+    - section:
+        name: Project Challenges and Next Steps
+        content:
+          - 11_project_ideas_and_extensions.md
+          - 12_troubleshooting_temperature_readings.md

@@ -5,6 +5,7 @@ description: >-
 excerpt: >-
 layout: showcase
 date: 2024/08/18
+date_updated: 2024/11/22
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/picotamachibi2/picotamachibi2.jpg
@@ -22,6 +23,8 @@ videos:
  - c6D1JRDddkE
  - btG3Pd8ZlBw
  - taWCovWiTJ0
+code:
+ - https://github.com/kevinmcaleer/picotamachibi
 ---
 
 ## Version 2.0

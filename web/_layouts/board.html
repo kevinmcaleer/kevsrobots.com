@@ -31,12 +31,11 @@ layout: content
 <article>
 {{content}}
 </article>
-
+</div>
 <p>If you liked this, you might like these:</p>
 
-{% include boards_mini.html %}
+{% include boards_mini.html limit=4 %}
 
-</div>
 <div class="col-sm-12 col-md-3">
 {% include blog_profile.html %}
 

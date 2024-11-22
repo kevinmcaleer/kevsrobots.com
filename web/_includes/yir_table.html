@@ -1,0 +1,90 @@
+{% assign years = site.posts | map: 'date' | map: 'year' | uniq | sort %}
+{% assign robots = site.data.robots %}
+{% assign projects = site.data.projects %}
+{% assign videos = site.data.youtube %}
+{% assign courses = site.data.courses %}
+{% assign reviews = site.data.reviews %}
+
+{% assign all_years = "" %}
+
+{% for post in site.posts %}
+  {% assign year = post.date | date: "%Y" %}
+  {% assign all_years = all_years | append: year | append: "," %}
+   Year is {{year}}
+   all years is {{all_years}}
+{% endfor %}
+<!-- 
+{% for robot in robots %}
+  {% assign year = robot.date | date: "%Y" %}
+  {% unless year == nil %}
+    {% assign all_years = all_years | append: year | append: "," %}
+  {% endunless %}
+{% endfor %}
+
+{% for project in projects %}
+  {% assign year = project.date | date: "%Y" %}
+  {% unless year == nil %}
+    {% assign all_years = all_years | append: year | append: "," %}
+  {% endunless %}
+{% endfor %}
+
+{% for video in videos %}
+  {% assign year = video.published | date: "%Y" %}
+  {% unless year == nil %}
+    {% assign all_years = all_years | append: year | append: "," %}
+  {% endunless %}
+{% endfor %}
+
+{% for course in courses %}
+  {% assign year = course.date_published | date: "%Y" %}
+  {% unless year == nil %}
+    {% assign all_years = all_years | append: year | append: "," %}
+  {% endunless %}
+{% endfor %}
+
+{% for review in reviews %}
+  {% assign year = review.year %}
+  {% unless year == nil %}
+    {% assign all_years = all_years | append: year | append: "," %}
+  {% endunless %}
+{% endfor %} -->
+
+{% assign years = all_years | split: ',' | uniq | sort %}
+
+<h5>Summary of Stats by Year</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Total Robots</th>
+            <th>Total Projects</th>
+            <th>Total Videos</th>
+            <th>Total Posts</th>
+            <th>Total Courses</th>
+            <th>Total Reviews</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year in years %}
+        
+        {% assign total_robots = robots | where_exp: "item", item.date | date: '%Y' == year" %}
+        {% assign total_robots_count = total_robots | size %}
+
+        {% assign total_projects = projects | where_exp: "item", item.date | date: '%Y' == year" | size %}
+        {% assign total_videos = videos | where_exp: "item", item.published | date: '%Y' == year" | size %}
+        {% assign total_posts = site.posts | where_exp: "post", post.date | date: '%Y' == year" | size %}
+        {% assign total_courses = courses | where: 'year', year | size %}
+        {% assign total_reviews = reviews | where: 'year', year | size %}
+        <tr>
+            <td>{{ year }}</td>
+            <td>{{ total_robots }}</td>
+            <td>{{ total_projects }}</td>
+            <td>{{ total_videos }}</td>
+            <td>{{ total_posts }}</td>
+            <td>{{ total_courses }}</td>
+            <td>{{ total_reviews }}</td>
+        </tr>
+       
+        {% endfor %}
+    </tbody>
+</table>

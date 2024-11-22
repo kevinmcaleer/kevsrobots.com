@@ -1,8 +1,8 @@
-{% assign boards = site.boards | sort: 'date_published' | reverse  %}
+{% assign boards = site.boards | sort: 'title'  %}
 <div class="mt-3">
 <h5>Boards</h5>
 <ul class="m-0 p-0">
-{% for board in boards | sort: 'date_published' | reverse %}
+{% for board in boards | sort: 'title' %}
 {{couse.date_published}}
 <li class="list-unstyled mt-1"><a href="{{ board.url }}" class="orange small">{{ board.title }}</a></li>
 {% endfor %} 

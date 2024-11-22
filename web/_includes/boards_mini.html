@@ -1,18 +1,40 @@
-{% assign boards = site.boards | sort:date| reverse %}
+{% assign boards = site.boards | sort: 'launch_date' %}
 
-<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-2 bg-white rounded-2 p-3 my-3">
-    {% for board in boards %}
-    <!-- <div class="col-3">      -->
-    <div class="col"> 
-        <a class="text-decoration-none" href="{{ board.url }}">
-        <div class="card border-0 shadow-lg h-100">
-            <img class="card-img-top bg-ocre" src="{{ board.cover }}" alt="{{ board.title }}" />
-            <div class="card-body">
-            <p class="card-title text-black"><b>{{ board.title }}</b></p>
+<div class="row bg-white rounded-top-2 g-3 p-3 mt-3">
+    {% if include.family %}
+    <div class="col-12"><h2>The {{include.family}} Family</h2></div>
+    {% endif %}
+</div>
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 bg-white rounded-bottom-2 p-3 mb-3 h-100">
+    {% for board in boards | limit: include.limit%}
+        {% if include.family %}
+            {% if board.family == include.family %}
+                <div class="col">
+                    <a class="text-decoration-none" href="{{ board.url }}">
+                        <div class="card border-0 card-shadow card-hover h-100 rounded-top-2">
+                            <div class="img-container bg-ocre rounded-top-2">
+                                <img class="img-card-top bg-ocre" src="{{ board.cover }}" alt="{{ board.title }}" />
+                            </div>
+                            <div class="card-body bg-light rounded-bottom-2">
+                                <p class="card-title text-black"><b>{{ board.title }}</b></p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="col">
+                <a class="text-decoration-none" href="{{ board.url }}">
+                    <div class="card border-0 card-shadow card-hover h-100 rounded-top-2">
+                        <div class="img-container bg-ocre rounded-top-2">
+                            <img class="img-card-top bg-ocre rounded-top-2" src="{{ board.cover }}" alt="{{ board.title }}" />
+                        </div>
+                        <div class="card-body bg-light rounded-bottom-2">
+                            <p class="card-title text-black"><b>{{ board.title }}</b></p>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-        </a>
-    </div>
+        {% endif %}
     {% endfor %}
 </div>
-    

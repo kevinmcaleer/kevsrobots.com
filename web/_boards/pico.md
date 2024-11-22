@@ -13,6 +13,7 @@ tags:
   - pico
   - raspberry pi
   - microcontroller
+family: pico
 ---
 
 ## Overview

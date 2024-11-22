@@ -1,0 +1,29 @@
+---
+layout: board
+---
+
+<h2>Overview</h2>
+
+<p>The <b>{{ page.title }}</b> was released by <b>{{ page.manufacturer }}</b> on <b>{{ page.launch_date | date: "%-d %B %Y" }}.</b></p>
+
+<p>{{ page.overview | markdownify}}</p>
+
+<hr />
+
+<h2>Features</h2>
+<ul>
+    <li><b>Manufacturer</b>: {{ page.manufacturer }}</li>
+    <li><b>Processor</b>: {{ page.processor }}</li>
+    <li><b>RAM</b>: {{page.ram}}</li>
+    <li><b>Processor Speed</b>: {{ page.processor_speed }}</li>
+    <li><b>GPIO Pins</b>: {{ page.gpio_pins }}</li>
+    {% if page.bluetooth %} <li><b>Bluetooth</b>: Yes</li>  {% endif %}
+    {% if page.wifi %} <li><b>WiFi</b>: Yes</li>  {% endif %}
+</ul>
+
+<hr />
+
+<p>{{ page.features | markdownify }}</p>
+<img class="w-25" src="{{page.cover}}">
+
+<hr />
