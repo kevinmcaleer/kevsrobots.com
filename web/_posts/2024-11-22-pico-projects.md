@@ -51,7 +51,7 @@ Did you know the Pico has a built-in temperature sensor? By reading the temperat
 
 <div class="row row-cols-4">
 
-{% include card.html cardtitle="Using the Raspberry Pi Pico's Built-in Temperature Sensor" description="Explore the Raspberry Pi Pico's built-in temperature sensor and learn how to use it with MicroPython." link="/learn/pico_temp_sensor" img="/learn/pico_temp_sensor/assets/cover.jpg"  tl="2" dl="3" %}
+{% include card.html cardtitle="Using the Raspberry Pi Pico's Built-in Temperature Sensor" description="Explore the Raspberry Pi Pico's built-in temperature sensor and learn how to use it with MicroPython." link="/learn/pico_temp_sensor/" img="/learn/pico_temp_sensor/assets/cover.jpg"  tl="2" dl="3" %}
 
 </div>
 
