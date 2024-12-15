@@ -4,7 +4,10 @@ import json
 
 def geocode_location(location):
     response = requests.get(f"https://nominatim.openstreetmap.org/search?format=json&q={location}")
-    data = response.json()
+    try:
+        data = response.json()
+    except json.decoder.JSONDecodeError:
+        print(f"there was an error in {data}")
     if data:
         return data[0]['lat'], data[0]['lon']
     else:
@@ -16,6 +19,8 @@ def process_yaml(yaml_file):
     
     processed_events = []
     for event in events:
+        if event['location'] == "tbc":
+            break
         lat, lon = geocode_location(event['location'])
         if lat and lon:
             event['latitude'] = lat

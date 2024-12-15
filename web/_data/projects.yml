@@ -1,3 +1,8 @@
+- name: 10 Pico Projects
+  link: /blog/pico-projects.html
+  cover: /assets/img/blog/picoprojects/cover.jpg
+  date: 2024-11-22
+  description: Here is a collection of projects that you can build with your Raspberry Pi Pico 
 - name: KevsArcade
   link: /blog/kevsarcade.html
   cover: /assets/img/blog/kevsarcade/cover.jpg

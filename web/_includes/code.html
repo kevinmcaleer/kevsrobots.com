@@ -1,0 +1,14 @@
+<pre>
+    <code id="github-content">
+    Loading...
+    </code>
+    </pre>
+    <script>
+        fetch('{{include.link}}')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('github-content').textContent = data;
+            })
+            .catch(error => console.error('Error fetching file:', error));
+    </script>
+    

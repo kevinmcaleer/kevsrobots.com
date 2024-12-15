@@ -1,0 +1,14 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        <p class="text-center">
+         {% if include.previous %}
+         <a class="btn btn-primary" href="{{include.previous_link}}">< {{include.previous}}</a>
+         {% endif %}
+         {% if include.next %}
+         <a class="btn btn-primary" href="{{include.next_link}}">{{include.next}} > </a>
+         {% endif %}
+        </p>
+        </div>
+    </div>
+</div>

@@ -1313,3 +1313,16 @@ table .w-30 {
   object-fit: contain; /* Ensures the entire image is visible without distortion */
   display: block; /* Removes inline spacing */
 }
+
+.text-grey {
+  color: $clr-darkgrey;
+}
+
+.current_page {
+  border-left: orange 2px solid;
+  padding-left: 5px;
+  margin-left: -5px;
+
+  // border-left-style: solid 2px orange;
+  // background-color: red;
+}

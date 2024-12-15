@@ -4,7 +4,7 @@
 <li class="list-unstyled mt-1"><a href="/showcase/" class="orange small"><i class="fa-solid fa-sparkle pr-3"></i>Showcase</a>
 <hr /></li>
 {% for group in groups %}
-    {% if group.name != "index.md" %}
+    {% if group.title != "index.md" and group.title != "Ideas" %}
     <li class="list-unstyled mt-1 py-1"><a href="{{group.url}}" class="orange small">{% if group.icon %}<i class="{{group.icon}} pr-3" aria-hidden="false"></i>{%endif%} {{group.title}}</a></li>
     {% endif %}
 {% endfor %}

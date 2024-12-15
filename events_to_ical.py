@@ -15,10 +15,14 @@ calendar = Calendar()
 # Process each event
 for item in events:
     event = Event()
+    if event.begin == "tbc" or event.begin is None:
+       continue
     event.name = item['event']
     event.begin = datetime.fromisoformat(item['start'])
     event.end = datetime.fromisoformat(item['end'])
-    event.location = item['location']
+
+    if event.location != "tbc":
+        event.location = item['location']
     event.url = item['link']
     event.description = f"Status: {item['status']}"
     calendar.events.add(event)

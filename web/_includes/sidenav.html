@@ -20,7 +20,20 @@
 <h5>Table of Contents</h5>
 
 <div class="toc">
+{% if page.navigation %}
+<ul>
+{% for item in page.navigation %}
+{% assign item_filename = item.link | split: "/" | last | remove: ".html" %}
+{% assign page_filename = page.url | split: "/" | last | remove: ".html" %}
+<li class="{% if item_filename == page_filename %}current_page{% endif %}">
+    <a href="{{ item.link }}">{{ item.name }}</a>
+   
+  </li>
+{% endfor %}
+</ul>
+{% else %}
 {{ content | toc_only }}
+{% endif %}
 </div>
 <hr>
 

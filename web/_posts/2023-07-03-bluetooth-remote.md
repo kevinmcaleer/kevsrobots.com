@@ -17,6 +17,7 @@ tags:
  - Remote Control
 groups:
  - pico
+ - pcb
 videos:
  - -0wCtKz1l78
 repo:

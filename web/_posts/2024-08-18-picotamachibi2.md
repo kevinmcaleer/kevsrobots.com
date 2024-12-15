@@ -19,6 +19,7 @@ groups:
     - pico
     - microPython
     - pets
+    - pcb
 videos:
  - c6D1JRDddkE
  - btG3Pd8ZlBw
