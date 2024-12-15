@@ -47,3 +47,7 @@ stl:
 BurgerBot version 3 has only a couple of 3D printable parts. These are the motor holders and fixed castors. The motor holders are designed to fit the N20 150RPM motors, fixed using 2x M3 screws and nuts. The fixed castors are designed to fit with the motors holders.
 
 ---
+
+{% include centered_nav.html previous="Code" previous_link="code.html" %}
+
+---
