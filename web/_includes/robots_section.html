@@ -7,7 +7,7 @@
             {% for article in articles | limit:3 | sort:date | reverse %}
             {% if article.title != 'Robots' %}
             <div class="col text-white">
-                <a href="{{article.url}}" class="text-decoration-none">
+                <a href="{{article.link}}" class="text-decoration-none">
                 <div class="card border-0 shadow-hover card-hover h-100">
                 <img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}">
                 <div class="card-body">
