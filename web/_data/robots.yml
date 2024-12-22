@@ -1,3 +1,8 @@
+- name: High Five Bot
+  link: /blog/high-five-bot.html
+  cover: /assets/img/blog/high_five_bot/cover.jpg
+  description: "The bot that gives you a crisp high five"
+  date: 2024/12/22
 - name: BurgerBot v3
   link: /projects/burgerbot/
   cover: /projects/burgerbot/assets/img/cover.jpg
