@@ -3,6 +3,25 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import yaml
 
+# Mapping of three-letter months to a single character
+month_to_letter = {
+    'Jan': 'J',
+    'Feb': 'F',
+    'Mar': 'M',
+    'Apr': 'A',
+    'May': 'M',
+    'Jun': 'J',
+    'Jul': 'J',
+    'Aug': 'A',
+    'Sep': 'S',
+    'Oct': 'O',
+    'Nov': 'N',
+    'Dec': 'D'
+}
+
+label_size = 30
+data_label_size = 30
+
 # Robots
 with open("web/_data/robots.yml", 'r') as stream:
     try:
@@ -86,7 +105,7 @@ def produce_courses(year):
     # Produce the chart
     fig, ax = plt.subplots(figsize=(12, 6))
     bars = ax.bar(course_year['Month'], course_year['count'])
-
+  
     # Set y-axis to only use whole numbers
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
@@ -99,7 +118,17 @@ def produce_courses(year):
     ax.spines['left'].set_visible(False)
     # ax.spines['bottom'].set_visible(False)
     ax.get_yaxis().set_visible(False)
-    ax.get_xaxis().set_ticks([])
+    # ax.get_xaxis().set_ticks([])
+
+    # Convert 'Month' from full abbreviation to single letter
+    short_month_labels = course_year['Month'].map(month_to_letter)
+
+    # Ensure the x-ticks match the length of your DataFrame
+    ax.set_xticks(range(len(course_year)))
+    ax.set_xticklabels(short_month_labels)
+    ax.tick_params(axis='x', labelsize=label_size)
+    ax.bar_label(bars, padding=3, fontsize=data_label_size)  # `padding=3` adds a small gap between the bar and label
+
 
     plt.savefig(f'web/assets/img/course_{year}.png')
     # plt.show()
@@ -134,7 +163,12 @@ def produce_reviews(year):
     ax.spines['left'].set_visible(False)
     # ax.spines['bottom'].set_visible(False)
     ax.get_yaxis().set_visible(False)
-    ax.get_xaxis().set_ticks([])
+    # ax.get_xaxis().set_ticks([])
+    ax.tick_params(axis='x', labelsize=label_size)
+    # Convert 'Month' from full abbreviation to single letter
+    short_month_labels = review_year['Month'].map(month_to_letter)
+    ax.set_xticklabels(short_month_labels)
+    ax.bar_label(bars, padding=3, fontsize=data_label_size)  # `padding=3` adds a small gap between the bar and label
 
     plt.savefig(f'web/assets/img/reviews_{year}.png')
     # plt.show()
@@ -169,7 +203,11 @@ def produce_posts(year):
     ax.spines['left'].set_visible(False)
     # ax.spines['bottom'].set_visible(False)
     ax.get_yaxis().set_visible(False)
-    ax.get_xaxis().set_ticks([])
+    # ax.get_xaxis().set_ticks([])
+    ax.tick_params(axis='x', labelsize=label_size)
+    short_month_labels = posts_year['Month'].map(month_to_letter)
+    ax.set_xticklabels(short_month_labels)
+    ax.bar_label(bars, padding=3, fontsize=data_label_size)  # `padding=3` adds a small gap between the bar and label
 
     plt.savefig(f'web/assets/img/posts_{year}.png')
     # plt.show()
@@ -204,7 +242,12 @@ def produce_projects(year):
     ax.spines['left'].set_visible(False)
     # ax.spines['bottom'].set_visible(False)
     ax.get_yaxis().set_visible(False)
-    ax.get_xaxis().set_ticks([])
+    # ax.get_xaxis().set_ticks([])
+    short_month_labels = projects_year['Month'].map(month_to_letter)
+    ax.set_xticklabels(short_month_labels)
+
+    ax.tick_params(axis='x', labelsize=label_size)
+    ax.bar_label(bars, padding=3, fontsize=data_label_size)  # `padding=3` adds a small gap between the bar and label
 
     plt.savefig(f'web/assets/img/projects_{year}.png')
     # plt.show()
@@ -240,7 +283,11 @@ def produce_videos(year):
     ax.spines['left'].set_visible(False)
     # ax.spines['bottom'].set_visible(False)
     ax.get_yaxis().set_visible(False)
-    ax.get_xaxis().set_ticks([])
+    # ax.get_xaxis().set_ticks([])
+    ax.tick_params(axis='x', labelsize=label_size)
+    short_month_labels = videos_year['Month'].map(month_to_letter)
+    ax.set_xticklabels(short_month_labels)
+    ax.bar_label(bars, padding=3, fontsize=data_label_size)  # `padding=3` adds a small gap between the bar and label
 
     plt.savefig(f'web/assets/img/videos_{year}.png')
     # plt.show()
@@ -284,7 +331,11 @@ def produce_robots(year):
     ax.spines['left'].set_visible(False)
     # ax.spines['bottom'].set_visible(False)
     ax.get_yaxis().set_visible(False)
-    ax.get_xaxis().set_ticks([])
+    # ax.get_xaxis().set_ticks([])
+    ax.tick_params(axis='x', labelsize=label_size)
+    short_month_labels = robots_year['Month'].map(month_to_letter)
+    ax.set_xticklabels(short_month_labels)
+    ax.bar_label(bars, padding=3, fontsize=data_label_size)  # `padding=3` adds a small gap between the bar and label
 
     plt.savefig(f'web/assets/img/robots_{year}.png')
     # plt.show()

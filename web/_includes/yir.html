@@ -5,7 +5,14 @@
 {% assign popular_videos = site.data.popular_videos %}
 {% assign robots = site.data.robots %}
 {% assign projects = site.data.projects %}
+{% assign courses = site.data.courses %}
+{% assign reviews = site.data.reviews %}
 {% assign total_robots_created = 0 %}
+{% assign total_projects_created = 0 %}
+{% assign total_videos_created = 0 %}
+{% assign total_posts_created = 0 %}
+{% assign total_courses_created = 0 %}
+{% assign total_reviews_created = 0 %}
 <h1>Year in Review {{current_year}}</h1>
 <h2>All the videos created in {{current_year}}</h2>
 <p>Also includes the number of robots, projects and articles were produced each month too.</p>
@@ -112,7 +119,40 @@
 {% endif %}
 {% endfor %}
 
+{% assign courses_created = 0 %}
+{% for course in courses %}
+{% assign pr_year = course.date_published | date: '%Y' | strip %}
+{% assign pr_month = course.date_published | date: '%m' | strip %}
+{% assign pr_year_str = pr_year | append: '' %}
+{% assign pr_month_str = pr_month| append: '' %}
+{% assign pr_mp = month_padded | append: '' %}
+{% assign pr_year = current_year | append: '' %}
+
+{% if pr_year_str == pr_year and pr_month_str == pr_mp %}
+{% assign courses_created  = courses_created | plus: 1 %}
+{% endif %}
+{% endfor %}
+
+{% assign reviews_created = 0 %}
+{% for review in reviews %}
+{% assign pr_year = review.date | date: '%Y' | strip %}
+{% assign pr_month = review.date | date: '%m' | strip %}
+{% assign pr_year_str = pr_year | append: '' %}
+{% assign pr_month_str = pr_month| append: '' %}
+{% assign pr_mp = month_padded | append: '' %}
+{% assign pr_year = current_year | append: '' %}
+
+{% if pr_year_str == pr_year and pr_month_str == pr_mp %}
+{% assign reviews_created  = reviews_created | plus: 1 %}
+{% endif %}
+{% endfor %}
+
 {% assign total_robots_created = total_robots_created | plus: robots_created %}
+{% assign total_projects_created = total_projects_created | plus: projects_created %}
+{% assign total_videos_created = total_videos_created | plus: videos_created %}
+{% assign total_posts_created = total_posts_created | plus: count %}
+{% assign total_courses_created = total_courses_created | plus: courses_created %}
+{% assign total_reviews_created = total_reviews_created | plus: reviews_created %}
 {% assign count = 0 %}
 {% for post in site.posts %}
   {% comment%} 
@@ -238,3 +278,60 @@
 <h2>Total Robots Created {{total_robots_created}}</h2>
 
 {% include all_vids_in_year.html year=include.year %}
+
+<div class="row bg-ocre row-cols-lg-6 row-cols-2 g-3 rounded-3 p-3">
+    <div class="col">
+    <div class="card rounded-3 border-0">
+        <img src="/assets/img/robots_{{current_year}}.png" class="img_card_top rounded-top-3 ">
+        
+        <div class="card-body">
+            <h5>Robots - {{total_robots_created}}</h5>
+        </div>
+    </div>
+    </div>
+    <div class="col">
+        <div class="card rounded-3 border-0">
+            <img src="/assets/img/projects_{{current_year}}.png" class="img_card_top rounded-top-3">
+            
+            <div class="card-body">
+                <h5>Projects - {{total_projects_created}}</h5>
+            </div>
+        </div>
+        </div>
+        <div class="col">
+            <div class="card rounded-3 border-0">
+                <img src="/assets/img/videos_{{current_year}}.png" class="img_card_top rounded-top-3">
+                
+                <div class="card-body">
+                    <h5>Videos - {{total_videos_created}}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card rounded-3 border-0">
+                <img src="/assets/img/posts_{{current_year}}.png" class="img_card_top rounded-top-3">
+                
+                <div class="card-body">
+                    <h5>Posts - {{total_posts_created}}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card rounded-3 border-0">
+                <img src="/assets/img/course_{{current_year}}.png" class="img_card_top rounded-top-3">
+                
+                <div class="card-body">
+                    <h5>Courses - {{total_courses_created}}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card rounded-3 border-0">
+                <img src="/assets/img/reviews_{{current_year}}.png" class="img_card_top rounded-top-3">
+                
+                <div class="card-body">
+                    <h5>Reviews - {{total_reviews_created}}</h5>
+                </div>
+            </div>
+        </div>
+</div>
