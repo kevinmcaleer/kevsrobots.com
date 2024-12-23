@@ -14,6 +14,9 @@ posts:
 - title: Build your own AI Assistant in Python
   url: /2024-01-23-python-ai.md
   date: 2024-01-23
+- title: Making a Custom PCB for BurgerBot
+  url: /2024-12-05-burgerbot-pcb.md
+  date: 2024-12-05
 - title: Now Ad-Free
   url: /2024-04-29-ad-free.md
   date: 2024-04-29
@@ -50,6 +53,9 @@ posts:
 - title: Raspberry Pi 5
   url: /2023-09-27-raspberry_pi_5.md
   date: 2023-09-27
+- title: High Five Bot
+  url: /2024-12-22-high-five-bot.md
+  date: 2024-12-21
 - title: Spooky Scary Skeleton
   url: /2022-10-09-spooky-scary-skeleton.md
   date: 2022-10-09
