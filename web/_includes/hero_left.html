@@ -1,4 +1,4 @@
-<div class="container bg-white rounded-3 p-0 my-3">
+<div class="container rounded-3 p-0 my-3 {% if include.bgcolor %} {{ include.bgcolor }} {% endif %}">
     <div class="row h-100 g-0">
       <!-- Image Column -->
       <div class="col-5">
@@ -9,7 +9,7 @@
       <div class="col-7 d-flex align-items-center justify-content-center">
         <div class="text-center">
           <p class="display-6"><b>{{include.title}}</b></p>
-          <p class="lead text-grey">{{include.content}}</p>
+          <p class="lead text-grey m-3">{{include.content}}</p>
           {% if include.button %}
           <a href="{{include.link}}"><button class="btn btn-{{include.button_colour}}">{{include.button}}</button></a>
           {% endif%}

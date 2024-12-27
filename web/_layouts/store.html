@@ -1,0 +1,161 @@
+---
+layout: default
+---
+
+
+
+{% if page.mode =='dark' %}
+{% assign textcol='white' %}
+{% assign bg-col= 'bg-dark'%}
+{% endif%}
+
+{% if page.mode =='light' %}
+{% assign textcol='black' %}
+{% assign bg-col= 'bg-light'%}
+{% endif%}
+
+<!-- {% include nav_blog.html %} -->
+<div class="background-wrapper"style="background-color: white">
+
+
+    <!-- All your page content goes here -->
+<article>
+<div class="container-fluid p-0 p-3 {{textcol}}">
+    <div class="container-fluid m-0 p-0 blurred-background gradient-green {% if page.mode == 'light'%}lighten-3{% endif%}{% if page.mode =='dark'%}darken-3{%endif%} rounded-3">
+    <div class="row m-0 p-0 rounded-left">
+    
+        <div class="col-12 col-lg-12 m-0 p-0">
+    
+        
+            <div class="row pt-3 px-3 mt-3 mx-3">
+            <div class="col-12 col-lg-12 m-0 p-0">
+                <div class="container rounded-left">
+                
+                <h1 class="{{textcol}} text-center">{{page.title}}</h1>
+                <p class="{{textcol}} text-center">{{page.description}}</p>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4 m-0 p-0">
+                <img src="{{page.hero}}" class="w-100 img-fluid">
+            </div>
+            
+            </div> 
+            
+    
+            <div class="row {{textcol}} m-0 p-0 g-0">
+            {% if page.tabs %}
+            <hr />
+            <div class="col-12 m-0 p-0 {{bg-col}}">
+                <ul class="nav nav-tabs m-3 p-3 mt-2" id="tabs" role="tablist">
+                {% for item in page.tabs %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link orange" id="{{item.link}}" data-bs-toggle="tab" data-bs-target="#{{item.link}}" type="button" role="tab" aria-controls="{{item.link}}">{{item.name}}</button>
+                </li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <div class="col-12 m-0 p-0">
+            {% if page.videos %}
+            <div class="container-fluid {{bg-col}} m-0 p-3">
+            <div class="container m-0 p-3">
+            <div class="row g-0">
+                <div class="col-12 col-md-6 px-1">
+                <h2 id="Video">Video{%if page.videos.size > 1 %}s{% endif %}</h2>
+                <p>For every project I create, I often make a corresponding YouTube video. Sometimes, 
+                    there might be more than one video for a single project. You can find these videos in this section.</p>
+                <p>Explore more through {%if page.videos.size > 1 %}these{%else%}this{% endif %} this dedicated video{%if page.videos.size > 1 %}s{% endif %}.</p>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="row row-cols-lg-2 row-cols-sm-1 g-2">
+                    {% for video in page.videos %}
+                    <div class="col">
+                        <div class="card card-hover shadow-hover border-0 rounded-3">
+                        <iframe class="rounded-1" src="https://www.youtube.com/embed/{{ video }}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+            
+            </div>
+            </div>
+            {% endif %}
+                    
+            <div class="container lighten-2 py-3">
+            <article>
+            <div class="text-center">
+                <div><img src="{{page.cover}}" class="img-fluid w-50 rounded-3 "></div>
+                </div>
+            <div class="container mt-3">
+            {{content}}
+            </div>
+            </article>
+                 
+            {% if page.code %}
+            <div class="container px-3 m-0">
+            <hr />
+            <h2>Code</h2>
+            <i class="fa-brands fa-github"></i> View Code Repository on GitHub - <a href="{{page.code}}" class="dotted">{{page.code}}</a><br />
+            </div>
+            {% endif %}
+
+            {% if page.stl %}
+            <div class="container p-3 m-0">
+            <hr/>
+            <h2>3D Models</h2>
+            <p>Here are the 3D printable STL files:</p>
+            <div class="row row-cols-lg-2 row-cols-sm-1 row-cols-1 g-3" >
+                {% assign count = 1 %}
+                {% for stl in page.stl %}  
+                <div class="col ">
+                <div class="card shadow-hover border-0 h-100">
+                 {% assign count = count | plus:1 %}        
+            <div id="stl_cont{{count}}" class="">
+               {% include stl_viewer.html %} 
+                <script>
+                    var stl_viewer=new StlViewer
+                    (
+                        document.getElementById("stl_cont{{count}}"),
+                        {
+                            models:
+                            [
+                                {filename:"{{stl.link}}"}
+                            ]
+                        }
+                    );
+                </script>
+           
+            </div><!-- stl_cont-->
+            <div class="card-body">
+                {% assign filename = stl.link | split: '/' | last %}
+          
+                <h5>{{stl.name}}</h5>
+                
+                <p>{{stl.description}}</p>
+                <a href="{{stl.link}}" class=""><button class="btn btn-outline-dark">Download <code>{{filename}}</code></button></a>
+            </div><!-- card body -->
+            </div><!-- card -->
+            
+            </div><!-- col -->
+            
+            {% endfor %}
+            {% endif %}
+        </div> <!-- row -->
+        </div><!--container -->
+        </div>
+            </div>
+            <div class="container py-3 my-3">
+                <hr />
+                {% include related_articles.html %}
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+</div>
+</article>
+
+</div>
