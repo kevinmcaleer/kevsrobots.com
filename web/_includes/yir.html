@@ -178,7 +178,7 @@
 <div class="row row-cols-md-4 row-cols-lg-6 row-cols-1 row-cols-sm-2 g-1 mb-3 py-3 h-100 bg-light">
     
     {% for video in videos %}
-        
+      
         {% assign video_year = video.published | date: '%Y'| strip %}
         {% assign video_month = video.published | date: '%m' | strip %}
        
@@ -205,12 +205,15 @@
             <!-- {% include youtubeplayer.html id=video.video_id %} -->
             <img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="card-img-top" alt="YouTube thumbnail for {{video.title}}">
             <div class="card-body">
+                
                 <p class="card-title text-truncate-2">{{video.title}}</p>
+                {% assign vtype = video.type | default: "livestream" %}
+                
                 <p class="card-text text-muted text-sm text-truncate-2">{{ video.published | date: "%d %b"}} | {{views}} views</p>
-                <span class="badge {% if video.type=='livestream' %}bg-danger {% else %} bg-success {% endif %}">{{video.type | upcase }}</span>
+                <span class="badge {% if vtype=='livestream' %}bg-danger {% else %} bg-success {% endif %}"><i class="fa-solid fa-video"></i> {{vtype | upcase }}</span>
                 
                 {% if is_popular %}
-                <span class="text-end badge bg-dark">Popular</span>
+                <span class="text-end badge bg-dark"><i class="fa-solid fa-star"></i> Popular</span>
                 {% endif %}
                 
             </div> <!-- card-body -->

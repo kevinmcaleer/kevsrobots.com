@@ -15,7 +15,7 @@ In this lesson, we'll cover the initial planning stages necessary for building a
 
 ### What is a Cluster?
 
-A cluster consists of multiple computers (nodes) working together to perform tasks or run applications more efficiently than a single device could on its own. This setup is ideal for high-availability services, load balancing, and distributed computing tasks.
+A cluster consists of multiple computers (nodes) working together to perform tasks or run applications more efficiently than a single device could on its own. This setup is ideal for {% include explainer.html term="high-availability services" explainer="When one or more computers act in unison to provide a service that is always available"%}, {% include explainer.html term="load balancing" explainer="When the workload is spread across multiple computers nodes"%}, and distributed computing tasks.
 
 ---
 
