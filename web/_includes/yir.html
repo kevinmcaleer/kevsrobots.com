@@ -171,12 +171,13 @@
 
 
 <div class="container-fluid bg-light pt-3">
-    <h5>{{ month_name }}</h5>
-        <p>{{videos_created}} Videos Produced, {{robots_created}} Robots Created, {{projects_created}} Projects Tinkered Together, {{ count }} Articles written</p>
+    <h1>{{ month_name }}</h1>
+        <h2>{{videos_created}} Videos Produced, {{robots_created}} Robots Created, {{projects_created}} Projects Tinkered Together, {{ count }} Articles written</h2>
 </div>
 
-<div class="row row-cols-md-4 row-cols-lg-6 row-cols-1 row-cols-sm-2 g-1 mb-3 py-3 h-100 bg-light">
-    
+<div class="row mb-3 py-3 h-100 bg-light g-1">
+    <div class="col-8">
+    <div class="row row-cols-md-4 row-cols-lg-4 row-cols-12 row-cols-sm-2 g-1">
     {% for video in videos %}
       
         {% assign video_year = video.published | date: '%Y'| strip %}
@@ -206,10 +207,10 @@
             <img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="card-img-top" alt="YouTube thumbnail for {{video.title}}">
             <div class="card-body">
                 
-                <p class="card-title text-truncate-2">{{video.title}}</p>
+                <p class="card-title text-truncate-3-lines">{{video.title}}</p>
                 {% assign vtype = video.type | default: "livestream" %}
                 
-                <p class="card-text text-muted text-sm text-truncate-2">{{ video.published | date: "%d %b"}} | {{views}} views</p>
+                <p class="card-text text-muted text-sm text-truncate-3-lines">{{ video.published | date: "%d %b"}} | {{views}} views</p>
                 <span class="badge {% if vtype=='livestream' %}bg-danger {% else %} bg-success {% endif %}"><i class="fa-solid fa-video"></i> {{vtype | upcase }}</span>
                 
                 {% if is_popular %}
@@ -225,38 +226,46 @@
             {% endif %}
         {% endif %}
     {% endfor %}
-    
-    <div class="col-4 col-md-4 col-lg-4 mb-1 bg-light">
+</div>
+    </div>
+    <div class="col-4">
+    <div class="mb-1 bg-light">
         <div class="card bg-dark border-0 shadow-lg">
         <div class="card-body">
         <h5 class="white">Robots</h5>
-        
+        {% assign robot_count = 0 %}
         {% for robot in robots %}
         {% assign robot_year = robot.date | date: '%Y'| strip %}
         {% assign robot_month = robot.date | date: '%m' | strip %}
         {% if robot_year == current_year and robot_month == month_padded %}
-        
+        {% assign robot_count = robot_count | plus: 1 %}
         <a href="{{robot.link}}" class="text-decoration-none white">{{robot.name}}</a><br />
         
         {% endif %}
         {% endfor %}
-        
+        {% if robot_count == 0 %}
+        <p class="text-white">No robots created this month.</p>
+        {% endif %}
         <div class="my-3">
             <h5 class="white">Projects</h5>
-
+            {% assign project_count = 0 %}
             {% for project in projects %}
             {% assign pr_year = project.date | date: '%Y' | strip %}
             {% assign pr_month = project.date | date: '%m' | strip %}
             {% if pr_year == current_year and pr_month == month_padded %}
-
+            {% assign project_count = project_count | plus: 1 %}
             <a href="{{project.link}}" class="text-decoration-none white">{{project.name}}</a><br />
 
             {% endif %}
             {% endfor %}
+            {% if project_count == 0 %}
+        <p class="text-white">No Projects created this month.</p>
+        {% endif %}
         </div>
         <div class="my-3">
             <h5 class="white">Articles</h5>
 
+            {% assign article_count = 0 %}
             {% for post in site.posts %}
             {% capture post_month %}{{ post.date | date: "%m" }}{% endcapture %}
             {% capture post_year %}{{ post.date | date: "%Y" }}{% endcapture %}
@@ -265,15 +274,19 @@
             {% assign p_year = post_year | to_s %}
             {% assign i_year = include.year | append: '' %}
             {% if post_str == p_month and p_year == i_year %}
-
+            {% assign article_count = article_count | plus: 1 %}
             <a href="{{post.url}}" class="text-decoration-none white">{{post.title}}</a><br>
 
             {% endif %}
             {% endfor %}
+            {% if article_count == 0 %}
+            <p class="text-white">No Articles written this month</p>
+            {% endif %}
         </div>
     </div>
     </div>
     </div>
+</div>
     </div>
 </div>
 {% endfor %}
