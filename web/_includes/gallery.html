@@ -1,0 +1,10 @@
+{% assign images = include.images | split: ',' %}
+{% assign cols = include.cols | default: 3 %}
+
+<div class="gallery" style="display: grid; grid-template-columns: repeat({{ cols }}, 1fr); gap: 10px;">
+    {% for image in images %}
+        <div class="card rounded-3">
+            <a href="{{image}}" class="card-img-top w-100 card-hover card-shadow "><img src="{{ image }}" alt="Gallery Image" class="w-100 rounded-3"></a>
+        </div>
+    {% endfor %}
+</div>
