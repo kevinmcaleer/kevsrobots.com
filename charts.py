@@ -354,3 +354,5 @@ produce_charts(2021)
 produce_charts(2022)  
 produce_charts(2023)
 produce_charts(2024)     
+produce_charts(2025)
+

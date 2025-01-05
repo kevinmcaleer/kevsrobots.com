@@ -30,7 +30,7 @@ Whether you’re a **hobbyist**, **maker**, or **student**, the Robot Makers Alm
 
 No more scrambling online for that elusive pinout or last-minute measurement—this book has all the essential details you need for popular components like ***Raspberry Pi***, ***Arduino***, ***M5Stamp***, and ***Micro:Bit***. Plus, it’s equipped with ***electrical symbols*** and ***resistor values**, making it an indispensable resource for anyone passionate about robotics!
 
-{% include gallery.html images="/assets/img/robot_makers_almanac/cover.jpg,/assets/img/robot_makers_almanac/electronics.jpg,/assets/img/robot_makers_almanac/pico.jpg" cols=3 %}
+{% include gallery.html images="/assets/img/robot_makers_almanac/cover.jpg,/assets/img/robot_makers_almanac/electronics.jpg,/assets/img/robot_makers_almanac/pico.jpg" cols=3 titles='Robot Makers Almanac, Maker Notes, PCBs' %}
 
 ---
 
