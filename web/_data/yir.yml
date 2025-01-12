@@ -1,0 +1,17 @@
+- year: 2020
+  subscribers: 200
+  target: 200
+- year: 2021
+  subscribers: 3761
+  target: 5000
+- year: 2022
+  subscribers: 12788
+  target: 10000
+- year: 2023
+  subscribers: 23964
+  target: 25000
+- year: 2024
+  subscribers: 36998
+  target: 40000
+- year: 2025
+  target: 50000

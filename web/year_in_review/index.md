@@ -18,6 +18,10 @@ cover: /assets/img/blog/yir/cover.png
 
 Learn about all the things created in the past years.
 
+{% include growth.html %}
+
+<hr />
+
 {% include yir_table.html %}
 {% include yir_cards.html %}
 

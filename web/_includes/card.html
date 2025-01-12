@@ -2,6 +2,22 @@
 <!-- Truncate Title lines with tl=2 -->
 <!-- Truncate description lines with dl=3 -->
 
+{% comment %}
+
+Card Title - cardtitle
+Description - description
+Image - img
+Link - link
+Type - type
+tl - Truncate Title lines, with 3 variants tl=1, tl=2, tl=3
+dl - Truncate description lines, with 3 variants dl=1, dl=2, dl=3
+date - date
+author - author
+tags - tags
+small_title - small_title if True then small title
+
+{% endcomment %}
+
 {% assign title_truncate_class = "" %}
 {% if include.tl == "1" %}
   {% assign title_truncate_class = "text-truncate-1-lines" %}
@@ -26,7 +42,11 @@
             <img src="{{include.img}}" class="card-img-top" alt="{{include.cardtitle}}">
             {% endif %}
             <div class="card-body">
+              {% if include.small_title %}
+              <p class="black {{title_truncate_class}}"><b>{{include.cardtitle}}</b></p>
+              {% else %}
                 <h5 class="card-title black {{title_truncate_class}}">{{ include.cardtitle }}</h5>
+                {% endif %}
                 {% if include.type == 'video'%}
                 <p class="text-start small grey"><i class="fa-solid fa-circle-video"></i> Video</p>
                 {% elsif include.type == 'blog'%}
@@ -34,6 +54,14 @@
                 {% endif%}
                 {% if include.description %}
                 <p class="text-small dark-grey {{description_truncate_class}}">{{ include.description }}</p>
+                {% endif %}
+                {% if include.date %}
+                <p class="text-small dark-grey">{{include.date | date: "%e %b %y"}}</p>
+                {% endif %}
+                {% if include.tags %}
+                {% for tag in include.tags %}
+                <span class="badge bg-secondary">{{tag}}</span>
+                {% endfor %}
                 {% endif %}
             </div>
         </div>
