@@ -679,4 +679,9 @@
     "JST connectors are electrical connectors manufactured to the design standards originally developed by J.S.T. Mfg. Co. (Japan Solderless Terminal).
     JST manufactures numerous series (families) and pitches (pin-to-pin distance) of connectors."
   link: https://en.wikipedia.org/wiki/JST_connector
-  
+- term: CAD
+  definition: Computer Aided Design
+  full: >-
+    "Computer-aided design (CAD) is the use of computers (or workstations) to aid in the creation, modification, analysis, or optimization of a design.
+    CAD software is used to increase the productivity of the designer, improve the quality of design, improve communications through documentation, and to create a database for manufacturing."
+  link: /blog/cad-skills

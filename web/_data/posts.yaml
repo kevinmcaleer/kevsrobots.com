@@ -98,6 +98,9 @@ posts:
 - title: 10 Projects for your Raspberry Pi Pico
   url: /2024-11-22-pico-projects.md
   date: 2024-11-22
+- title: Operation Pico
+  url: /2025-01-11-operation-pico.md
+  date: 2025-01-11
 - title: Cyberglasses
   url: /2023-01-16-cyberglasses.md
   date: 2023-01-16
@@ -167,6 +170,9 @@ posts:
 - title: Pico W Toothbrush
   url: /2023-11-26-pico_toothbrush.md
   date: 2023-11-26
+- title: Robot Makers Almanac
+  url: /2024-12-30-robot-makers-almanac.md
+  date: 2024-12-30
 - title: Zero Stand
   url: /2022-05-15-zero-stand.md
   date: 2022-05-15
@@ -356,9 +362,15 @@ posts:
 - title: Raspberry Pi MotionEye Camera Setup with Docker
   url: /2024-11-14-motioneye-on-pi.md
   date: 2024-11-14
+- title: Raspberry Pi Home Hub
+  url: /2025-01-05-pi-home-hib.md
+  date: 2025-01-05
 - title: Obsidian - the best tool for Makers
   url: /2024-12-01-obsidian.md
   date: 2024-12-01
+- title: Hacky Temperature and Humidity Sensor
+  url: /2025-01-04-hacky-sensor.md
+  date: 2025-01-04
 - title: The Three Laws of Robotics
   url: /2023-03-23-three-laws-of-robotics.md
   date: 2023-03-23
