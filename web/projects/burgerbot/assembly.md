@@ -8,8 +8,8 @@ layout: multipage
 date: 2024-12-04
 author: Kevin McAleer
 difficulty: beginner
-cover: /assets/img/burgerbot/cover.jpg
-hero:  /assets/img/burgerbot/hero.png
+cover: /projects/burgerbot/assets/img/cover.jpg
+hero:  /projects/burgerbot/assets/img/hero.png
 mode: light
 tags:
  - robots
