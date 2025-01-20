@@ -69,7 +69,7 @@
   link: /learn/redis/01_introduction.html
   name: Using Redis with Python
 - author: Kevin McAleer
-  cover: /learn/scrawly_wally/learn/scrawly_wally/assets/cover.png
+  cover: /learn/scrawly_wally//assets/cover.png
   date_published: 2024-08-02
   description: Learn how to build your own wall drawing robot using a Raspberry Pi
     Zero 2 W, stepper motors, and a gondola with a marker.  This course covers the
