@@ -3,7 +3,7 @@ title: "Bonus Lesson: Creating and Using Cargo"
 description: >- 
     Learn how to create, manage, and build Rust projects using Cargo, Rust's package manager and build system.
 layout: lesson
-cover: assets/13.png
+cover: /learn/scrawly_wally/assets/13.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

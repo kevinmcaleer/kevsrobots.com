@@ -3,7 +3,7 @@ layout: lesson
 title: Common Collections in Rust
 author: Kevin McAleer
 type: page
-cover: assets/7.png
+cover: /learn/scrawly_wally/assets/7.png
 date: 2024-03-09
 previous: 06_error_handling.html
 next: 08_concurrency.html

@@ -3,7 +3,7 @@ title: Ownership and Borrowing
 description: >-
     Dive into Rust's unique features: ownership, references, and borrowing, and understand their impact on memory safety and concurrency.
 layout: lesson
-cover: assets/4.png
+cover: /learn/scrawly_wally/assets/4.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

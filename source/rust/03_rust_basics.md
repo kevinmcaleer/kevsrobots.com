@@ -2,7 +2,7 @@
 title: Rust Basics
 description: Learn the fundamentals of Rust programming including variables, data types, and control flow.
 layout: lesson
-cover: assets/3.png
+cover: /learn/scrawly_wally/assets/3.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

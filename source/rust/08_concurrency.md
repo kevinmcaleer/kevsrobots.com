@@ -2,7 +2,7 @@
 title: Concurrency in Rust
 description: Discover Rust's approach to safe and efficient concurrency, including threads and the principles of fearless concurrency.
 layout: lesson
-cover: assets/8.png
+cover: /learn/scrawly_wally/assets/8.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

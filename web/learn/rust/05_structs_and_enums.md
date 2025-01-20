@@ -3,7 +3,7 @@ layout: lesson
 title: Structs and Enums
 author: Kevin McAleer
 type: page
-cover: assets/5.png
+cover: /learn/scrawly_wally/assets/5.png
 date: 2024-03-09
 previous: 04_ownership_and_borrowing.html
 next: 06_error_handling.html

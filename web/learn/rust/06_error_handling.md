@@ -3,7 +3,7 @@ layout: lesson
 title: Error Handling in Rust
 author: Kevin McAleer
 type: page
-cover: assets/6.png
+cover: /learn/scrawly_wally/assets/6.png
 date: 2024-03-09
 previous: 05_structs_and_enums.html
 next: 07_common_collections.html

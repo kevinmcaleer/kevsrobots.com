@@ -3,7 +3,7 @@ layout: lesson
 title: Rust Basics
 author: Kevin McAleer
 type: page
-cover: assets/3.png
+cover: /learn/scrawly_wally/assets/3.png
 date: 2024-03-09
 previous: 02_rust_and_python.html
 next: 04_ownership_and_borrowing.html

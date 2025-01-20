@@ -3,7 +3,7 @@ title: Rust Ecosystem and Tools
 description: >- 
     Get familiar with the Rust ecosystem including Cargo, various tooling, and the community resources available to Rust developers.
 layout: lesson
-cover: assets/9.png
+cover: /learn/scrawly_wally/assets/9.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

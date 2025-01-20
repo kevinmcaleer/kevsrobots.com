@@ -2,7 +2,7 @@
 title: Structs and Enums
 description: Learn how to organize data using Rust's structs and enums, and understand how pattern matching works with these types.
 layout: lesson
-cover: assets/5.png
+cover: /learn/scrawly_wally/assets/5.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

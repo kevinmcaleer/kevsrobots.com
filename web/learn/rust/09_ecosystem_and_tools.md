@@ -3,7 +3,7 @@ layout: lesson
 title: Rust Ecosystem and Tools
 author: Kevin McAleer
 type: page
-cover: assets/9.png
+cover: /learn/scrawly_wally/assets/9.png
 date: 2024-03-09
 previous: 08_concurrency.html
 next: 10_example.html

@@ -3,7 +3,7 @@ layout: lesson
 title: 'Bonus Lesson: Creating and Using Cargo'
 author: Kevin McAleer
 type: page
-cover: assets/13.png
+cover: /learn/scrawly_wally/assets/13.png
 date: 2024-03-09
 previous: 12_summary_and_resources.html
 description: Learn how to create, manage, and build Rust projects using Cargo, Rust's

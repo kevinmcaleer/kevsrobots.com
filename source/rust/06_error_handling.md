@@ -2,7 +2,7 @@
 title: Error Handling in Rust
 description: Explore Rust's approach to error handling through the Option and Result types, and learn about error propagation.
 layout: lesson
-cover: assets/6.png
+cover: /learn/scrawly_wally/assets/6.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

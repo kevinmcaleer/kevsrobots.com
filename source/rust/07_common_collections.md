@@ -2,7 +2,7 @@
 title: Common Collections in Rust
 description: Understand how to use Rust's common collections such as vectors, strings, and hash maps to store and manage data efficiently.
 layout: lesson
-cover: assets/7.png
+cover: /learn/scrawly_wally/assets/7.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

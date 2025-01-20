@@ -3,7 +3,7 @@ layout: lesson
 title: Rust for Raspberry Pi Pico
 author: Kevin McAleer
 type: page
-cover: assets/11.png
+cover: /learn/scrawly_wally/assets/11.png
 date: 2024-03-09
 previous: 10_example.html
 next: 12_summary_and_resources.html

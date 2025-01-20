@@ -3,7 +3,7 @@ layout: lesson
 title: Summary and Resources
 author: Kevin McAleer
 type: page
-cover: assets/12.png
+cover: /learn/scrawly_wally/assets/12.png
 date: 2024-03-09
 previous: 11_rust_for_pico.html
 next: 13_cargo.html

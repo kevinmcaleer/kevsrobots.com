@@ -3,7 +3,7 @@ title: Summary and Resources
 description: >-
     Recap of the Rust programming course and a compilation of resources for further learning and exploration.
 layout: lesson
-cover: assets/12.png
+cover: /learn/scrawly_wally/assets/12.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

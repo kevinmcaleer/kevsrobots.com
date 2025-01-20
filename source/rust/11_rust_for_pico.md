@@ -3,7 +3,7 @@ title: Rust for Raspberry Pi Pico
 description: >-
     Learn how to set up Rust for development on the Raspberry Pi Pico, including environment setup, installation, debugging, and a sample program.
 layout: lesson
-cover: assets/11.png
+cover: /learn/scrawly_wally/assets/11.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

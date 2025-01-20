@@ -3,7 +3,7 @@ layout: lesson
 title: Concurrency in Rust
 author: Kevin McAleer
 type: page
-cover: assets/8.png
+cover: /learn/scrawly_wally/assets/8.png
 date: 2024-03-09
 previous: 07_common_collections.html
 next: 09_ecosystem_and_tools.html

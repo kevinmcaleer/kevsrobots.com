@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Rust
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/scrawly_wally/assets/cover.png
 date: 2024-03-09
 next: 02_rust_and_python.html
 description: This lesson introduces you to the Rust programming language, guiding

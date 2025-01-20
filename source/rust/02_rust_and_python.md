@@ -2,7 +2,7 @@
 title: "Rust vs. Python: Understanding the Differences"
 description: Explore key differences between Rust and Python with a focus on Rust's features and a summary comparison with Python.
 layout: lesson
-cover: assets/2.png
+cover: /learn/scrawly_wally/assets/2.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

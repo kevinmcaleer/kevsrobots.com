@@ -3,7 +3,7 @@ title: "Project: Building a Simple Web Application"
 description: >- 
     Apply what you've learned in Rust by building a simple web application. This project will cover setup, logic implementation, and finalization.
 layout: lesson
-cover: assets/10.png
+cover: /learn/scrawly_wally/assets/10.png
 ---
 
 ![cover image]({{page.cover}}){:class="cover"}

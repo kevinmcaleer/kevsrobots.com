@@ -3,7 +3,7 @@ layout: lesson
 title: Ownership and Borrowing
 author: Kevin McAleer
 type: page
-cover: assets/4.png
+cover: /learn/scrawly_wally/assets/4.png
 date: 2024-03-09
 previous: 03_rust_basics.html
 next: 05_structs_and_enums.html

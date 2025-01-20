@@ -3,7 +3,7 @@ layout: lesson
 title: 'Rust vs. Python: Understanding the Differences'
 author: Kevin McAleer
 type: page
-cover: assets/2.png
+cover: /learn/scrawly_wally/assets/2.png
 date: 2024-03-09
 previous: 01_intro.html
 next: 03_rust_basics.html

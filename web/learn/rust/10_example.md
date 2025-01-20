@@ -3,7 +3,7 @@ layout: lesson
 title: 'Project: Building a Simple Web Application'
 author: Kevin McAleer
 type: page
-cover: assets/10.png
+cover: /learn/scrawly_wally/assets/10.png
 date: 2024-03-09
 previous: 09_ecosystem_and_tools.html
 next: 11_rust_for_pico.html
