@@ -31,9 +31,6 @@ navigation:
    link: code
  - name: "Downloadable STL files"
    link: stl
-   
-cover: assets/img/cover.jpg
-hero: assets/img/hero.png
 ---
 
 The full version controlled code for this project is available at [BurgerBot GitHub Respository](https://www.github.com/kevinmcaleer/burgerbot).

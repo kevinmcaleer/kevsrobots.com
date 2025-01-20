@@ -31,9 +31,6 @@ navigation:
    link: code
  - name: "Downloadable STL files"
    link: stl
-   
-cover: assets/img/cover.jpg
-hero: assets/img/hero.png
 ---
 
 ## Drop in a Pico
@@ -52,7 +49,7 @@ The motor driver board will need to be soldered to the PCB - ensure the pins are
 
 The motors will need to have wires soldered to them, and the ultrasonic sensor will need to be connected to the PCB - ensure its facing outwards and the correct pins will be aligned.
 
-![Wiring](assets/img/wiring02.png){:class="w-100 card-shadow rounded-3"}
+![Wiring](/projects/burgerbot/assets/img/wiring02.png){:class="w-100 card-shadow rounded-3"}
 
 ---
 
@@ -62,7 +59,7 @@ The battery box will also need to be connected to the PCB either directly or via
 
 ---
 
-![Wiring](assets/img/wiring.jpg){:class="w-100 card-shadow rounded-3"}
+![Wiring](/projects/burgerbot/assets/img/wiring.jpg){:class="w-100 card-shadow rounded-3"}
 
 ---
   

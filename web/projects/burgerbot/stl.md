@@ -31,10 +31,6 @@ navigation:
    link: code
  - name: "Downloadable STL files"
    link: stl
-   
-cover: assets/img/cover.jpg
-hero: assets/img/hero.png
-
 stl:
   - name: "Motor Holders"
     link: "/projects/burgerbot/assets/stl/motor_holder.stl"

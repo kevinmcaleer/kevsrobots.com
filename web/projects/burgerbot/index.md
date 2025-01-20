@@ -34,9 +34,6 @@ navigation:
    link: code
  - name: "Downloadable STL files"
    link: stl
-
-cover: assets/img/cover.jpg
-hero: assets/img/hero.png
 ---
 
 ## What is BurgerBot?
@@ -51,13 +48,13 @@ BurgerBot is a simple 3d printable robot you can build yourself. It's a flexible
 
 BurgerBot has evolved over the years, from a simple robot with a Raspberry Pi Pico, to a more complex robot with a Raspberry Pi Pico 2 W and a custom PCB.
 
-![evolution](assets/img/evolution01.png){:class="w-100 rounded-3"}
+![evolution](/projects/burgerbot/assets/img/evolution01.png){:class="w-100 rounded-3"}
 
 The ltest version of BurgerBot is based on a custom PCB (Printed Circuit Board) that makes it easier to build and more reliable.
 
 For the best results use a Pico H, Pico WH, Pico 2 H, or Pico 2 WH as these have the header pins already soldered in place, and include a small plastic spaceer to keep the PCB off the surface of the robot. This makes it easier to connect a USB cable to the Pico for programming.
 
-![evolution](assets/img/wiring02.png){:class="w-100 rounded-3"}
+![evolution](/projects/burgerbot/assets/img/wiring02.png){:class="w-100 rounded-3"}
 
 ---
 

@@ -31,12 +31,9 @@ navigation:
    link: code
  - name: "Downloadable STL files"
    link: stl
-   
-cover: assets/img/cover.jpg
-hero: assets/img/hero.png
 ---
 
-![Assembly](assets/img/assembly01.jpg){:class="w-100 card-shadow rounded-3"}
+![Assembly](/projects/burgerbot/assets/img/assembly01.jpg){:class="w-100 card-shadow rounded-3"}
 
 Assembling the BurgerBot only take a couple of minutes.
 
@@ -73,11 +70,11 @@ The first step is to gather all the parts you need. You will need the following:
 
 ---
 
-![technical drawing](assets/img//technical_drawing.png){:class="w-100"}
+![technical drawing](/projects/burgerbot/assets/img//technical_drawing.png){:class="w-100"}
 
-![Holes](assets/img//holes.png){:class="w-100"}
+![Holes](/projects/burgerbot/assets/img//holes.png){:class="w-100"}
 
-![fixed castor](assets/img//fixed_castor.png){:class="w-100"}
+![fixed castor](/projects/burgerbot/assets/img//fixed_castor.png){:class="w-100"}
 
 ---
 

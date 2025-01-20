@@ -31,9 +31,6 @@ navigation:
    link: code
  - name: "Downloadable STL files"
    link: stl
-   
-cover: assets/img/cover.jpg
-hero: assets/img/hero.png
 ---
 
 Here is the Bill of Materials for the version 3 of BurgerBot. This is the base version of the robot, with no additional modules. The drawing module will be added in a later version.

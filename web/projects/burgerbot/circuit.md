@@ -31,9 +31,6 @@ navigation:
    link: code
  - name: "Downloadable STL files"
    link: stl
-   
-cover: assets/img/cover.jpg
-hero: assets/img/hero.png
 ---
 
 The robot is made up of the following electronic compoenents:
@@ -48,9 +45,9 @@ The circuit diagram for the robot is shown below:
 
 ---
   
-![Circuit Diagram](assets/img/custom01.jpg){:class="w-100 card-shadow"}
+![Circuit Diagram](/projects/burgerbot/assets/img/custom01.jpg){:class="w-100 card-shadow"}
 
-![Circuit Diagram](assets/img/custom02.jpg){:class="w-100 card-shadow"}
+![Circuit Diagram](/projects/burgerbot/assets/img/custom02.jpg){:class="w-100 card-shadow"}
 
 ---
 
