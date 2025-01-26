@@ -56,7 +56,10 @@ small_title - small_title if True then small title
                 <p class="text-small dark-grey {{description_truncate_class}}">{{ include.description }}</p>
                 {% endif %}
                 {% if include.date %}
-                <p class="text-small dark-grey">{{include.date | date: "%e %b %y"}}</p>
+                <p class="text-small dark-grey"><i class="fa-solid fa-calendar-days"></i>&nbsp;{{include.date | date: "%e %b %y"}}</p>
+                {% endif %}
+                {% if include.author %}
+                <p class="text-small dark-grey"><i class="fa-solid fa-user"></i>&nbsp;{{include.author}}</p>
                 {% endif %}
                 {% if include.tags %}
                 {% for tag in include.tags %}
