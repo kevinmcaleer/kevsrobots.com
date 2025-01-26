@@ -23,9 +23,14 @@ groups:
  - fusion360
 videos:
  - ds_ItsiosH0
+navigation:
+ - name: "Overview"
+   link: index
+ - name: Wiring
+   link: wiring
 ---
 
-## Version 2.0
+## Overview  - Version 2.0
 
 The `Gamepad 2` is a ***Raspberry Pi Pico 2*** powered bluetooth remote control for your robot. It's a fun project that combines hardware and software to create a digital remote control that you can interact with.
 
@@ -33,12 +38,16 @@ The `Gamepad 2` is a ***Raspberry Pi Pico 2*** powered bluetooth remote control 
 
 ## New Features in Version 2.0
 
-- OLED Display
+- OLED Display (optional)
 - Select, Start and Menu buttons for use with the display
 - Through holes fixed for Pico
 - Button wiring fixed
 
 ![Gamepad 2](/assets/img/blog/gamepad2/gamepad2.png){:class="w-100 img-fluid card-shadow rounded-3"}
+
+---
+
+## Get your GamePad 2 PCB
 
 {% include store/pcbs.html %}
 
