@@ -35,7 +35,7 @@ However its taken until this week for me to writeup the project and update the c
 
 ## Gamepad 2.0
 
-Find the updated project for the GamePad [here](/projects/gamepad2).
+Find the updated project for the GamePad [here](/blog/gamepad2).
 
 ![Gamepad 2](/assets/img/blog/gamepad2/gamepad01.jpg){:class="w-100 img-fluid card-shadow rounded-3"}
 
