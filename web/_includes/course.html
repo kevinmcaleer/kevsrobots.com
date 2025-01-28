@@ -4,6 +4,7 @@
 {% for course in courses %}
 
 {% if course.name == name %}
+
 <a href="{{ course.link }}" class="text-decoration-none">
 <div class="card shadow-lg border-0 h-100">
     <img src="{{course.cover}}" class="card-img-top" alt="{{course.title}}">
@@ -11,7 +12,9 @@
     <h1 class="img img-overlay-black display-1 text-white p-3">{{ include.count }}</h1>
     </div>
     <div class="card-body">
-        <p class="card-text text-small text-muted"><i class="fa-regular fa-clock"></i>&nbsp;{{ course.duration | replace: "0h ",""}}<br /><b>{{ course.name }}</b></p>
+        <p class="card-text text-small dark-grey">{{ course.name }}</p>
+        <p class="card-text text-small text-muted"><i class="fa-regular fa-clock"></i>&nbsp;{{ course.duration | replace: "0h ",""}}<br />
+            
     </div>
 </div>
 </a>

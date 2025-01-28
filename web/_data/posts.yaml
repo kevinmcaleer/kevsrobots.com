@@ -179,6 +179,9 @@ posts:
 - title: Cracking Enigma with Raspberry Pi
   url: /2024-02-23-enigma.md
   date: 2024-02-23
+- title: Level Up your CAD Skills
+  url: /2025-01-19-level-up.md
+  date: 2025-01-19
 - title: Worlds most advanced Bauble
   url: /2022-11-14-worlds-most-advanced-bauble.md
   date: 2022-11-06
@@ -431,3 +434,6 @@ posts:
 - title: PIKON Camera - Raspberry Pi High Quality Camera Project
   url: /2022-08-23-pikon-camera.md
   date: 2022-08-23
+- title: Gamepad & BurgerBot
+  url: /2025-01-25-gamepad-burgerbot.md
+  date: 2025-01-26

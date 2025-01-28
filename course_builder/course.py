@@ -564,8 +564,8 @@ class Courses:
         index = "---" + "\n"
         index += "layout: content" + "\n"
         index += "title: Recent Courses" + "\n"
-        index += "description: Recent Courses" + "\n"
-        index += "---" + "\n"
+        index += "description: Learn something new. Today." + "\n"
+        index += "---" + "\n \n"
         index += "{% include recent_courses.html %}" + "\n"
 
         with open(f"{self.output_folder}/recent.md", "w") as build_file:

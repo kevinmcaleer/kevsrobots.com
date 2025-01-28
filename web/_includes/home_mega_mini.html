@@ -13,18 +13,12 @@
     </div>
   </nav>
 
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-2">
+<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-2 light-bg">
     {% for vid in vids limit:6 %}
-    <div class="col mb-3">
-        <div class="card border-0 h-100">
-            <a href="{{vid.link}}" class="nav-item dotted">
-                <img src="https://img.youtube.com/vi/{{vid.Content}}/0.jpg" class="img-fluid w-100 rounded-2" alt="YouTube thumbnail for {{vid.title}}">
-            <div class="card-body">
-                <p class="text-date">{{vid.Views}} Views</p>
-            </div> 
-          </a> 
-        </div>
-    </div>
+    
+    {% assign img_url = "https://img.youtube.com/vi/" | append: vid.Content | append: "/0.jpg" %}
+    {% include card.html cardtitle=vid.title link=vid.link img=img_url views=vid.Views noborder=true small_title=true %}
+
     {% endfor %} 
 </div>
 </div>

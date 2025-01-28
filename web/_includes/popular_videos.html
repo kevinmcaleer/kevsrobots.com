@@ -7,7 +7,6 @@
       <div class="row">
         <div class="col-12 col-md-9">
           
-    
         <nav class="navbar bg-light">
             <div class="container-fluid">
              
@@ -17,43 +16,18 @@
             </div>
           </nav>
        
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-3">
     {% for vid in popular %}
     {% if vid.popular %}
     <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
 
       {% assign video = vids | where: 'video_id', vid.Content | first %}
       {% if video.type != "short" %}
-        <div class="card-group">
-        <div class="card border-0 card-hover card-shadow">
-            <a href="https://www.youtube.com/watch?v={{video.video_id}}"><img src="https://img.youtube.com/vi/{{video.video_id}}/0.jpg" class="img-fluid rounded-top-1" alt="YouTube Thumbnail image for {{video.title}}"></a>
-          <div class="card-body mb-0 pb-0">
-              <div class="row h-100">
-                <div class="col-12 m-0 p-0">
-                  <div class="row w-100 p-1 m-0 h-50">
-                      <div class="col-12 m-0 p-0">
-                          <p class="small">{{ video.title }}</p>
-                      </div>
-                  </div>
-    
-                  <div class="row w-100 p-1 pb-2 m-0 h-50 align-items-end">
-                      <div class="col-6 m-0 p-0">
-                          <p class="text-date text-start  mb-0">{{ video.published | date: "%d %B %Y" }}</p>
-                          <p class="card-text">{{ vid.Views }} Views</p>
-                        
-                      </div>
-                      <div class="col-6  m-0 p-0">
-                          <span class="badge badge-sm float-end mb-0 {% if video.type == 'video' %}bg-secondary{% elsif video.type =='short' %}bg-success{% elsif video.type == 'livestream' %}bg-danger{% endif %}">{{ video.type | capitalize }}</span>
-                          
-                      </div>
-                  </div>
-              </div>
-            </div>
-          </div>
-    
-        </div>
-    
-    </div>
+      
+      {% assign video_img = "https://img.youtube.com/vi/" | append: video.video_id | append: "/0.jpg" %}
+      {% include card.html cardtitle=video.title link=video.video_id img=video_img date=video.published 
+        views=vid.views_str type=vid.type small_title=true noborder=true tl="3" bg_color=pop_color %}
+
     {% endif %}
     {% endif %}
     {% endfor %}

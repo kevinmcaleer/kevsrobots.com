@@ -1,27 +1,14 @@
-<h1>All Courses</h1>
-<h5>Learn something new. Today.</h5>
+<h1>{{page.title}}</h1>
+<h5>{{page.description}}</h5>
 <hr class="my-2">
 
 {% assign courses = site.data.courses | sort: 'date_published' | reverse | limit:6 %}
 
-<div class="row row-cols-4">
+<div class="row row-cols-4 g-3">
     {% for course in courses %}
-<div class="col mb-3">
-    <div class="card h-100">
-       
-        <a href="{{course.link}}" class="nav-item dotted">
-            <img src="{{course.cover}}" class="card-img-top" alt="Course cover image for {{course.title}}">
-        <div class="card-body">
-            <h5 class="card-text">{{course.name}}</h5>
-            <p class="small mute text-right"><i class="fa-regular fa-clock"></i>{{course.duration}}</p>
-            
-            <p class="small mute text-right">{{course.author}}</p>
-            <p calss="card-text">{{course.date_published}}</p>
-            
-        </div>    
-        </a>
-    </div>
-</div>
+
+    {% include card.html cardtitle=course.name author=course.author date=course.date_published 
+        img=course.cover duration=course.duration noborder=true dl=3 type='course' link=course.link%}
 
 {% endfor %} 
 </div>

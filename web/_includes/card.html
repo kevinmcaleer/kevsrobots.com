@@ -15,6 +15,8 @@ date - date
 author - author
 tags - tags
 small_title - small_title if True then small title
+bg_color - for popular video, set background 
+popular - add popular video tag
 
 {% endcomment %}
 
@@ -37,13 +39,13 @@ small_title - small_title if True then small title
 
 <div class="col">
     <a href="{{include.link}}" class="text-decoration-none">
-        <div class="card h-100 bg-light card-hover shadow-hover rounded-3 {% if include.noborder %}border-0{% endif %}">
+        <div class="card h-100 card-hover shadow-hover {% if include.bg_color %}{{ include.bg_color }}{% else %}bg-light{% endif %} rounded-3 {% if include.noborder %}border-0{% endif %}">
             {% if include.img != None %}
             <img src="{{include.img}}" class="card-img-top" alt="{{include.cardtitle}}">
             {% endif %}
             <div class="card-body">
               {% if include.small_title %}
-              <p class="black {{title_truncate_class}}"><b>{{include.cardtitle}}</b></p>
+              <p class="black {{title_truncate_class}}">{{include.cardtitle}}</p>
               {% else %}
                 <h5 class="card-title black {{title_truncate_class}}">{{ include.cardtitle }}</h5>
                 {% endif %}
@@ -51,20 +53,37 @@ small_title - small_title if True then small title
                 <p class="text-start small grey"><i class="fa-solid fa-circle-video"></i> Video</p>
                 {% elsif include.type == 'blog'%}
                 <p class="text-start small grey"><i class="fa-solid fa-book-open text-end"></i> Read</p>
+                {% elsif include.type =='course' %}
+                <p class="text-start small grey"><i class="fa-solid fa-book-open text-end"></i> Learn</p>
                 {% endif%}
                 {% if include.description %}
-                <p class="text-small dark-grey {{description_truncate_class}}">{{ include.description }}</p>
+                <p class="small dark-grey {{description_truncate_class}}">{{ include.description }}</p>
+                {% endif %}
+                {% if include.duration%}
+                <p class="small dark-grey text-right my-1"><i class="fa-regular fa-clock"></i>&nbsp;{{ include.duration }}</p>
                 {% endif %}
                 {% if include.date %}
-                <p class="text-small dark-grey"><i class="fa-solid fa-calendar-days"></i>&nbsp;{{include.date | date: "%e %b %y"}}</p>
+                <p class="small dark-grey my-1"><i class="fa-solid fa-calendar-days"></i>&nbsp;{{include.date | date: "%e %b %y"}}</p>
                 {% endif %}
                 {% if include.author %}
-                <p class="text-small dark-grey"><i class="fa-solid fa-user"></i>&nbsp;{{include.author}}</p>
+                <p class="small dark-grey my-1"><i class="fa-solid fa-user"></i>&nbsp;{{include.author}}</p>
                 {% endif %}
                 {% if include.tags %}
                 {% for tag in include.tags %}
                 <span class="badge bg-secondary">{{tag}}</span>
                 {% endfor %}
+                {% endif %}
+                {% if include.views %}
+                <p class="small dark-grey">{{include.views }} Views</p>
+                {% endif %}
+                {% if include.badge %}
+                <div class="col-6  m-0 p-0">
+                  <span class="badge badge-sm float-end mb-0 {% if include.type == 'video' %}bg-secondary{% elsif include.type =='short' %}bg-success{% elsif include.type == 'livestream' %}bg-danger{% endif %}">{{ include.type | capitalize }}</span>
+                </div>
+                {% endif %}
+                
+                {% if video.popular %}
+                <span class="badge badge-sm text-bg-dark">Popular</span>
                 {% endif %}
             </div>
         </div>

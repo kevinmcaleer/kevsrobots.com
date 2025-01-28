@@ -16,37 +16,15 @@
         </div>
       </nav>
    
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-3">
 {% for vid in vids %}
 {% if vid.type == "video" %}
 <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
-    <div class="card-group">
-    <div class="card border-0 rounded-1 card-hover card-shadow">
-    <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-top-1" alt="YouTube Thumbnail for {{vid.title}}"></a>
-      <div class="card-body mb-0 pb-0">
-          <div class="row h-100">
-            <div class="col-12 m-0 p-0">
-              <div class="row w-100 p-1 m-0 h-50">
-                  <div class="col-12 m-0 p-0">
-                      <p class="small">{{ vid.title }}</p>
-                  </div>
-              </div>
 
-              <div class="row w-100 p-1 pb-2 m-0 h-50 align-items-end">
-                  <div class="col-6 m-0 p-0">
-                      <p class="text-date text-start  mb-0">{{ vid.published | date: "%d %B %Y" }}</p>
-                  </div>
-                  <div class="col-6  m-0 p-0">
-                      <span class="badge badge-sm float-end mb-0 {% if vid.type == 'video' %}bg-secondary{% elsif vid.type =='short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% endif %}">{{ vid.type | capitalize }}</span>
-                  </div>
-              </div>
-          </div>
-        </div>
-      </div>
+    {% assign vid_img = "https://img.youtube.com/vi/" | append: vid.video_id | append: "/0.jpg" %}
+    {% assign vid_link = "https://www.youtube.com/watch?v=" | append: vid.video_id %}
+    {% include card.html cardtitle=vid.title img=vid_img link=vid_link date=vid.published badge=vid.type small_title=true noborder=true tl="3" %}
 
-    </div>
-
-</div>
 {% endif %}
 {% endfor %}
 </div>

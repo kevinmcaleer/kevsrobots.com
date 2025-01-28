@@ -13,17 +13,7 @@
 
 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-2">
     {% for course in courses | limit:6 %}
-    <div class="col mb-3">
-        <div class="card h-100 border-0 card-hover card-shadow">
-            <a href="{{course.link}}" class="nav-item black text-decoration-none">
-                <img src="{{course.cover}}" class="card-img-top" alt="cover image for {{course.title}}">
-            <div class="card-body">
-                <p class="card-text">{{course.name}}</p>
-                <small class="text-muted duration"><i class="fa-regular fa-clock"></i>{{course.duration}}</small>
-            </div> 
-          </a> 
-        </div>
-    </div>
+    {% include card.html cardtitle=course.name img=course.cover link=course.link duration=course.duration small_title=true noborder=true %}
     {% endfor %} 
 </div>
 <div class="row">

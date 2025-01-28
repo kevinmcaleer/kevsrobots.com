@@ -11,7 +11,7 @@ def process_most_popular():
     videos = pd.read_csv('Table data.csv')
 
     videos = videos.drop([0])
-    videos = videos.drop(['Video title','Impressions',
+    videos = videos.drop(['Impressions',
                         'Impressions click-through rate (%)',
                         'Impressions',
                         # 'Average view duration',
@@ -23,15 +23,22 @@ def process_most_popular():
     videos = videos[videos['Views'].notna()]
     videos['Views'] = videos['Views'].astype(int)
 
+    videos['title'] = videos['Video title']
+
     # Calculate the 90th percentile of views
     percentile_90 = videos['Views'].quantile(0.9)
 
     # Add a new column for the top 10% flag
     videos['popular'] = videos['Views'].apply(lambda x: 'True' if x >= percentile_90 else 'False')
 
+    videos['Content'] = videos['Content'].str.strip()
+
+    videos['Views_str'] = pd.to_numeric(videos['Views'], errors='coerce').fillna(0).astype(int)
+    videos['Views_str'] = videos['Views'].apply(lambda x: "{:,}".format(x))
+
     # Manually construct the YAML string
     yaml_string = "\n".join(
-        "- Content: {}\n  Views: {}\n  popular: {}".format(row['Content'], row['Views'], row['popular']) 
+        '- Content: "{}"\n  Views: {}\n  popular: {}\n  title: "{}"\n  views_str: "{}"'.format(row['Content'], row['Views'], row['popular'], row['title'], row['Views_str']) 
         for index, row in videos.iterrows()
     )
 

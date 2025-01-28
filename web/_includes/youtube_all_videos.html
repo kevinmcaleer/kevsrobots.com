@@ -18,37 +18,20 @@
       {% for vid in vids %}
       {% for video in views %}
       {% if video.Content == vid.video_id %}
-      <div class="card-group">
-    <div class="card {% if video.popular %}bg-ocre{% endif %} border-0 card-shadow card-hover rounded-1">
-      <a href="https://www.youtube.com/watch?v={{vid.video_id}}"><img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-top-1" alt="YouTube Thumbnail for {{video.title}}"></a>
-      <div class="card-body mb-0 pb-0">
-          <div class="row h-100">
-            <div class="col-12 m-0 p-0">
-              <div class="row w-100 p-1 m-0 h-50">
-                  <div class="col-12 m-0 p-0">
-                      <p class="small">{{ vid.title }}</p>
-                     
-                      <p class="small">{{ video.Views }} Views</p>
-                      {% if video.popular %}
-                      <span class="badge badge-sm text-bg-dark">Popular</span>
-                      {% endif %}
-                      
-                  </div>
-              </div>
 
-              <div class="row w-100 p-1 pb-2 m-0 h-50 align-items-end">
-                  <div class="col-6 m-0 p-0">
-                      <p class="text-date text-start  mb-0">{{ vid.published | date: "%d %B %Y" }}</p>
-                  </div>
-                  <div class="col-6  m-0 p-0">
-                      <span class="badge badge-sm float-end mb-0 {% if vid.type == 'video' %}bg-secondary{% elsif vid.type =='short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% endif %}">{{ vid.type | capitalize }}</span>
-                  </div>
-              </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </div>
+      {% assign vid_img = "https://img.youtube.com/vi/" | append: vid.video_id | append: "/0.jpg" %}
+      {% assign vid_link = "https://www.youtube.com/watch?v=" | append: vid.video_id %}
+      {% if video.popular %}
+        {% assign pop_color = "bg-ocre" %}
+      {% endif %}
+    
+      {% include card.html cardtitle=vid.title views=video.views_str badge=video.popular bg_color=pop_color
+         date=vid.published img=vid_img link=vid_link tl="3" small_title=true noborder=true %}
+
+      {% if video.popular %}
+        {% assign pop_color = "" %}
+      {% endif %}
+      
 {% endif %}
 {% endfor %}
 {% endfor %}
