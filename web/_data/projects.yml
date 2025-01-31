@@ -1,3 +1,8 @@
+- name: "Installing and Using DeepSeek-R1:1.5 on a Raspberry Pi with Docker"
+  link: /blog/deepseek-on-pi.html
+  cover: /assets/img/blog/deepseek/cover.png
+  date: 2025-01-31
+  description: "Learn how to install and use DeepSeek-R1:1.5 on your Raspberry Pi using Docker."
 - name: Operation Pico
   link: /blog/operation-pico.html
   cover: /assets/img/blog/operation_pico/cover.jpg
@@ -8,6 +13,11 @@
   cover: /assets/img/blog/hackysensor/cover.jpg
   date: 2025-01-04
   description: Hack together a quick temperature & humidity sensor with a Raspberry Pi Pico W
+- name: Pi HomeHub
+  link: /blog/pi-home-hub.html
+  cover: /assets/img/blog/pihomehub/cover.jpg
+  date: 2025-01-05
+  description: Create your own Home Hub with a Raspberry Pi and a touchscreen display, and Kivy
 - name: 10 Pico Projects
   link: /blog/pico-projects.html
   cover: /assets/img/blog/picoprojects/cover.jpg

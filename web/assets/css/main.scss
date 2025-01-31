@@ -1267,6 +1267,13 @@ table .w-30 {
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+
+  line-height: 1.5em; /* Set line height */
+  min-height: 1.5em; /* 3 lines × 1.5em */
+  text-overflow: ellipsis; /* Optional: Add ellipsis for overflowing text */
+  display: -webkit-box; /* For multi-line truncation (optional) */
+  -webkit-box-orient: vertical; /* Required for -webkit-line-clamp */
+  white-space: normal; /* Allow text to wrap */
 }
 
 .text-truncate-2-lines {
