@@ -3,14 +3,16 @@ title: "Installing and Using DeepSeek-R1:1.5 on a Raspberry Pi with Docker"
 description: "Learn how to install and use DeepSeek-R1:1.5 on your Raspberry Pi using Docker. "
 excerpt: >-
     We explore its features, pros, cons, and why it's a disruptive innovation challenging ChatGPT and Gemini.
-layout: blog
+layout: showcase
 date: 2025-01-26
 date_updated: 2025-01-26
 author: Kevin McAleer
 difficulty: beginner
 cover: /assets/img/blog/deepseek/cover.png
-# hero:  /assets/img/blog/deepseek/hero.png
-# mode: light
+hero:  /assets/img/blog/deepseek/hero.png
+mode: light
+videos:
+  - ZNWeERhGvv8
 tags:
  - Raspberry Pi
  - ai
@@ -19,6 +21,8 @@ groups:
  - robotics
  - ai
  - raspberrypi
+code:
+ - https://www.github.com/kevinmcaleer/ollama-python
 ---
 
 ## Introduction

@@ -12,20 +12,9 @@
             <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3">
             {% for article in articles | limit:3 %}
             {% if article.title != 'Reviews' %}
-            <div class="col">
-                <a href="{{article.url}}" class="text-decoration-none">
-                <div class="card border-0 card-hover shadow-hover h-100">
-                <img class="card-img-top black" src="{{article.cover}}" alt="{{article.title}}">
-                <div class="card-body">
-                <h5 class="card-title black">{{article.title}}</h5>    
-                <p class="card-text small black">{{article.excerpt}}</p>
-                </div>
-                <div class="card-footer border-0">
-                <p class="black">{{article.date | date: "%-d %B %Y" }}</p>
-                </div> 
-            </div>
-            </a>
-            </div>
+                
+            {% include card.html cardtitle=article.title link=article.url img=article.cover date=article.date description=article.excerpt noborder=true small_title=true tl="2" dl="3" %}
+
             {% endif %}
             {% endfor %}
             </div>

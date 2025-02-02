@@ -3,22 +3,8 @@
 <div class="row row-cols-1 row-cols-lg-3 row-cols-sm-3 row-cols-md-2 g-3">
 {% for course in courses | sort: 'date_published' | reverse | limit: 3 %}
 {{couse.date_published}}
-<div class="col my-3">
-    <a href="{{course.link}}" class="text-decoration-none black">
-    <div class="card h-100 shadow-hover card-hover border-0">
-        
-    <img src="{{course.cover}}" class="img-fluid w-100 rounded-top-2" alt="{{course.title}}">
-    <div class="card-body">
-        <h5>{{course.name}}</h5>
-        <p>{{course.description}}</p>
-    </div><!-- card-body -->
-    <div class="card-footer border-0">
-        {{course.date_published | date: "%-d %B %Y" }}
-    </div>    
-    </div><!-- card -->
 
-    </a>
-</div>
+{% include card.html cardtitle=course.name img=course.cover link=course.link description=course.description date=course.date_published duration=course.duration noborder=true small_title=true tl="2" dl="3"%}
 
 {% endfor %} 
 </div>
