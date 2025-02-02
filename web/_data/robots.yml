@@ -1,7 +1,7 @@
 - name: BurgerBot and GamePad
   link: /blog/gamepad2.html
   cover: /assets/img/blog/gamepad2/cover.jpg
-  description: 
+  description: "Build a Raspberry Pi Pico 2 powered bluetooth remote control for your robot"
   date: 2025/01/26
 - name: High Five Bot
   link: /blog/high-five-bot.html
