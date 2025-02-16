@@ -23,6 +23,8 @@ groups:
 stl:
  - name: 2U Corner
    link: /projects/mini-rack/assets/2u_corner_v2.stl
+ - name: 2U Corner Mirrored
+   link: /projects/mini-rack/assets/2u_corner_v2_mirror.stl
  - name: 1U Corner
    link: /projects/mini-rack/assets/1u_corner.stl
  - name: 1U Corner Mirrored
@@ -42,8 +44,6 @@ stl:
 dxf:
  - name: Top Panel
    link: /projects/mini-rack/assets/top_panel.dxf
- - name: Front Panel
-   link: /projects/mini-rack/assets/front_panel.dxf
  - name: Cluster Panel
    link: /projects/mini-rack/assets/cluster_panel.dxf
 
@@ -52,6 +52,10 @@ dxf:
 ## What is a Mini-Rack?
 
 A Mini-Rack is a small, 10" rack that can hold network equipment, computers and other related equipment. A full size rack, one you typially find in a server room or data center are 19" wide. A mini-rack is 10" wide, and designed for smallers spaces, perfect for a home lab or small office.
+
+---
+
+![Finished Mini-Rack](/projects/mini-rack/assets/finished.jpg){:class="img-fluid w-100 rounded-3"}
 
 ---
 
@@ -123,6 +127,8 @@ Add as many Raspberry Pi 5s as you need, I'm using 4 in my build (in the first i
 ---
 
 ## 3D Printed Parts
+
+![Components](/projects/mini-rack/assets/components.jpg){:class="img-fluid w-100 rounded-3"}
 
 To make this project expandable and configurable, and also to make it easy to print on most 3D Printers I've designed a couple of key parts that you can print yourself:
 

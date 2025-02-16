@@ -147,6 +147,13 @@ layout: default
             <hr/>
             <h2>3D Models</h2>
             <p>Here are the 3D printable STL files:</p>
+            <h3>STL List</h3>
+            <ul>
+                {% for stl in page.stl %}
+                <li><a href="{{stl.link}}">{{stl.name}}</a></li>
+                {% endfor %}
+            </ul>
+
             <div class="row row-cols-lg-2 row-cols-sm-1 row-cols-1 g-3" >
                 {% assign count = 1 %}
                 {% for stl in page.stl %}  
