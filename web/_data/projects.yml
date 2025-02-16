@@ -1,3 +1,8 @@
+- name: Mini-Rack
+  link: /projects/mini-rack/index.html
+  cover: /projects/mini-rack//assets/cover.jpg
+  date: 2025-02-14
+  description: "Build a Mini-Rack for your Raspberry Pi Cluster"
 - name: "Installing and Using DeepSeek-R1:1.5 on a Raspberry Pi with Docker"
   link: /blog/deepseek-on-pi.html
   cover: /assets/img/blog/deepseek/cover.png

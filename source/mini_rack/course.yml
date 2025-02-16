@@ -1,0 +1,30 @@
+- name: Mini-Rack 3D Design Tutorial
+  author: Kevin McAleer
+  date_created: 2025-02-16
+  date_published: 2025-02-16
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - raspberrypi
+      - 3ddesign
+      - stands_and_cases
+  description: >- 
+     Design a 3D printable 10" mini-rack for your Raspberry Pi home lab.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_components.md
+  - section:
+      name: Part Designs
+      content:
+      - 02_2u_design.md
+      - 03_bottom.md
+      - 04_top.md
+      - 05_handle.md
+      - 06_panel.md
+  - section:
+      name: Printing
+      content:
+      - 07_print.md

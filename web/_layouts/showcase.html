@@ -129,6 +129,19 @@ layout: default
             </div>
             {% endif %}
 
+            {% if page.dxf %}
+            <div class="container p-3 m-0">
+            <hr/>
+            <h2>DXF Files</h2>
+            <p>Here are the DXF files for the project:</p>
+            <div class="row row-cols-lg-2 row-cols-sm-1 row-cols-1 g-3" >
+                {% assign count = 1 %}
+                {% for dxf in page.dxf %}  
+                {% include card.html cardtitle=dxf.name link=dxf.link %}
+                {% endfor %}
+
+            </div>
+            {% endif %}
             {% if page.stl %}
             <div class="container p-3 m-0">
             <hr/>

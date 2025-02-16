@@ -1,7 +1,7 @@
 ---
 layout: content
 title: Recent Courses
-description: Learn something new. Today.
+description: Recent Courses
 ---
 
 {% include nav_courses.html %}

@@ -685,3 +685,9 @@
     "Computer-aided design (CAD) is the use of computers (or workstations) to aid in the creation, modification, analysis, or optimization of a design.
     CAD software is used to increase the productivity of the designer, improve the quality of design, improve communications through documentation, and to create a database for manufacturing."
   link: /blog/cad-skills
+- term: PoE
+  definition: Power over Ethernet
+  full: >-
+    Power over Ethernet (PoE) is a technology that allows network cables to carry electrical power.
+    It is a technology that allows network cables to carry electrical power.
+  link: https://en.wikipedia.org/wiki/Power_over_Ethernet

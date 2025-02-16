@@ -172,6 +172,17 @@
   link: /learn/brachiograph/01_intro.html
   name: BrachioGraph Tutorial
 - author: Kevin McAleer
+  cover: /learn/mini_rack/assets/cover.jpg
+  date_published: 2025-02-16
+  description: Design a 3D printable 10" mini-rack for your Raspberry Pi home lab.
+  duration: 0h 16m
+  groups:
+  - raspberrypi
+  - 3ddesign
+  - stands_and_cases
+  link: /learn/mini_rack/00_intro.html
+  name: Mini-Rack 3D Design Tutorial
+- author: Kevin McAleer
   cover: /learn/freecad/assets/cover.png
   date_published: 2024-04-17
   description: This beginner's course on FreeCAD teaches you the essentials of 3D
