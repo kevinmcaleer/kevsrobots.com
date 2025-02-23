@@ -3,241 +3,304 @@
   cover: /projects/mini-rack//assets/cover.jpg
   date: 2025-02-14
   description: "Build a Mini-Rack for your Raspberry Pi Cluster"
+  discover: true
+  tags: [3D Printing, Raspberry Pi, Cluster]
 - name: "Installing and Using DeepSeek-R1:1.5 on a Raspberry Pi with Docker"
   link: /blog/deepseek-on-pi.html
   cover: /assets/img/blog/deepseek/cover.png
   date: 2025-01-31
   description: "Learn how to install and use DeepSeek-R1:1.5 on your Raspberry Pi using Docker."
+  discover: true
+  tags: [Raspberry Pi, Docker, AI]
 - name: Operation Pico
   link: /blog/operation-pico.html
   cover: /assets/img/blog/operation_pico/cover.jpg
   date: 2025-01-12
   description: Recreate the Operation board game with a Raspberry Pi Pico
+  tags: [MicroPython, Pico]
 - name: Hacky Sensor
   link: /blog/hacky-sensor.html
   cover: /assets/img/blog/hackysensor/cover.jpg
   date: 2025-01-04
   description: Hack together a quick temperature & humidity sensor with a Raspberry Pi Pico W
+  tags: [MicroPython, Pico, IoT]
 - name: Pi HomeHub
   link: /blog/pi-home-hub.html
   cover: /assets/img/blog/pihomehub/cover.jpg
   date: 2025-01-05
   description: Create your own Home Hub with a Raspberry Pi and a touchscreen display, and Kivy
+  tags: [Raspberry Pi, Python]
 - name: 10 Pico Projects
   link: /blog/pico-projects.html
   cover: /assets/img/blog/picoprojects/cover.jpg
   date: 2024-11-22
   description: Here is a collection of projects that you can build with your Raspberry Pi Pico 
+  tags: [MicroPython, Pico]
 - name: KevsArcade
   link: /blog/kevsarcade.html
   cover: /assets/img/blog/kevsarcade/cover.jpg
   date: 2024-11-02
   description: Build a Pico 2 powered Bluetooth GamePad
+  discover: true
+  tags: [MicroPython, Pico]
 - name: GamePad 2
   link: /blog/gamepad2.html
   cover: /assets/img/blog/gamepad2/cover.jpg
   date: 2024-08-29
   description: Build a Pico 2 powered Bluetooth GamePad
+  discover: true
+  tags: [MicroPython, Pico]
 - name: PicoTamachibi 2
   link: /blog/picotamachibi2.html
   cover: /assets/img/blog/picotamachibi2/picotamachibi2.jpg
   date: 2024-08-18
   description: Build a Pico 2 powered Virtual Pet
+  discover: true
+  tags: [MicroPython, Pico]
 - name: Scrawly Wally
   link: /learn/scrawly_wally/
   cover: /assets/img/blog/scrawly_wally/scrawly_wally.jpg
   date: 2024-08-03
   description: Learn how to build a wall drawing robot using a Raspberry Pi Zero 2 W, stepper motors, and a gondola with a marker.
+  tags: [Raspberry Pi, Python, Robotics]
 - name: BrachioGraph
   link: /blog/brachiograph
   cover: /learn/brachiograph/assets/cover.png
   date: 2024-07-26
   description: Learn how to build a cheap drawing robot using a Raspberry Pi and a few stepper motors.
+  discover: true
+  tags: [Raspberry Pi, Python, Robotics]
 - name: Pi-Apps
   link: /blog/pi_apps
   cover: /assets/img/blog/pi_apps/cover.png
   date: 2024-07-19
   description: Learn how to install apps using the unofficial Raspberry Pi App Store
+  tags: [Raspberry Pi]
 - name: Pi Time Machine Backup
   link: /blog/timemachine
   cover: /assets/img/blog/timemachine/cover.png
   date: 2024-05-06
   description: Learn how to use your Pi as a macOS Time Machine backup server
+  tags: [Raspberry Pi]
 - name: Sync files with Syncthing
   link: /blog/sync-files-with-syncthing
   cover: /assets/img/blog/syncthing/cover.png
   date: 2024-04-19
   description: Learn how to share files between your Raspberry Pis using Syncthing, a secure and private file synchronization tool.
+  tags: [Raspberry Pi]
 - name: Tic Tac Toe
   link: /blog/pico-tico.html
   cover: /assets/img/blog/picotico/cover.jpg
   description: Build a motion controlled robotic arm using a Raspberry Pi and a camera
   date: 2024-03-03
+  tags: [MicroPython, Pico]
 - name: Motion Controlled Arm
   link: /blog/motion-controlled-arm
   cover: /assets/img/blog/motioncontrol/cover.png
   description: Build a motion controlled robotic arm using a Raspberry Pi and a camera
   date: 2024-03-04
+  tags: [Raspberry Pi, Python, Robotics]
 - name: Clustered-Pi
   link: /blog/clusteredpi
   cover: /assets/img/blog/clusteredpi/clusteredpi.jpg
   description: Learn how to build a Raspberry Pi 4 or Zero Cluster 
   date: 2024-02-25
+  discover: true
+  tags: [Raspberry Pi, Cluster]
 - name: Pi 5 Cluster
   link: /blog/docker-swarm
   cover: /assets/img/blog/docker_swarm/docker_swarm.jpg
   description: Learn how to build a Raspberry Pi 5 Cluster with Docker Swarm
   date: 2024-02-03
+  tags: [Raspberry Pi, Cluster]
 - name: "Cracking Enigma with a Raspberry Pi 5 Cluster"
   link: /blog/enigma
   cover: /assets/img/blog/enigma/enigma.jpg
   description: "Cracking Enigma with a Raspberry Pi 5 Cluster"
   date: 2024-02-18
+  tags: [Raspberry Pi, Cluster]
 - name: OLLAMA - Local ChatGPT
   link: /blog/ollama
   cover: https://www.kevsrobots.com/assets/img/blog/ollama/ollama.jpg
   description: Creating a Private and Local GPT Server with Raspberry Pi and Olama
   date: 2024-01-29
+  tags: [Raspberry Pi, AI]
 - name: Raspberry pi 5 NAS
   link: /blog/raspberry-pi-5-nvme
   cover: /assets/img/blog/nvme/nvme.jpg
   description: Learn how to install an NVMe drive on a Raspberry Pi 5 and setup a NAS server.
   date: 2024-01-13
+  discover: true
+  tags: [Raspberry Pi]
 - name: HomeLab
   link: /blog/build-a-home-server
   cover: /assets/img/blog/homeserver/homeserver.jpg
   description: Learn how to set up a home server with Raspberry Pi 5 and Docker.
   date: 2024-01-21
+  discover: true
+  tags: [Raspberry Pi, Docker]
 - name: SLAM with Viam
   link: /blog/viam-slam
   cover: /assets/img/blog/viam_slam/viam_slam.jpg
   description: SLAM with Viam
   date: 2024-01-07
+  tags: [Raspberry Pi, AI]
 - name: Stream ESP32CAM video
   link: /blog/esp32cam-to-python
   cover: /assets/img/blog/esp32cam/esp32cam.jpg
   description: SLAM with Viam
   date: 2023-12-31
+  tags: [Raspberry Pi]
 - name: Elf Detector
   link: /blog/elf-detector.html
   cover: /assets/img/blog/elf/elf.jpg
   description: Build your own Elf Detector
   date: 2023-12-09
+  tags: [Raspberry Pi, Python]
 - name: 3D papercraft
   link: /blog/3d_papercraft.html
   cover: /assets/img/blog/papercraft/papercraft.png
   description: How to create papercraft models from low-poly 3D models
   date: 2023-12-07
+  tags: [3D Printing]
 - name: Pico W Powered Toothbrush
   link: /blog/pico_toothbrush.html
   cover: /assets/img/blog/picotoothbrush/picotoothbrush.png
   description: Build your own DIY Pico W Powered Toothbrush
   date: 2023-11-26
+  tags: [MicroPython, Pico]
 - name: Over the air updates with micropython
   link: /blog/micropython-ota.html
   cover: /assets/img/blog/ota/ota.jpg
   description: "Over the air updates with micropython"
   date: 2023-08-20
+  discover: true
+  tags: [MicroPython]
 - name: Bluetooth Remote PCB
   link: /blog/bluetooth-remote-pcb.html
   cover: /assets/img/blog/pcb/pcb.png
   description: "Bluetooth Remote PCB"
   date: 2023-08-19
+  discover: true
+  tags: [MicroPython, Pico]
 - name: RetroPie on the Compute Module 4
   link: /blog/retropie.html
   cover: /assets/img/blog/retropie/retropie_cm4.jpg
   description: "RetroPie on the Compute Module 4 in a Atari 2600 case"
   date: 2023-08-12
+  tags: [Raspberry Pi]
 - name: Nugget of Doom
   link: /blog/chicken_nugget.html
   cover: /assets/img/blog/chicken_nugget/cover.jpg
   description: "Can a Chicken Nugget run Doom?"
   date: 2023-08-05
+  tags: [Raspberry Pi]
 - name: Picotamachibi
   link: /blog/picotamachibi.html
   cover: /assets/img/blog/picotamachibi/picotamachibi.jpg
   description: "Picotamachibi - Virtual Pet"
   date: 2023-06-12
+  tags: [MicroPython, Pico]
 - name: Pi-Card
   link: /blog/pico-birthday-card.html
   cover: /assets/img/blog/picard/picard.jpg
   description: "Raspberry Pi Powered Birthday Card"
   date: 2023-04-23
+  tags: [MicroPython, Pico]
 - name: Ikea Lamp Hack
   link: /blog/ikea-lamp-hack.html
   cover: /assets/img/blog/ikea_hack/ikea_hack.jpg
   description: "Lets hack the Ikea Iskarna Head lamp to make it programmable with MicroPython using the Pimoroni Plasma 2040 W, a sound sensor, an Adafruit NeoPixel ring and some 3d printed parts."
   date: 2023-04-09
+  tags: [MicroPython, Pico]
 - name: Pi-PipBoy
   link: /blog/pi-pipboy.html
   cover: /assets/img/blog/pipipboy/pipboy.jpg
   description: "We delve into the amazing world of the Pi-PipBoy Raspberry Pi Wrist Computer, an innovative project that combines the power and versatility of a Raspberry Pi with the convenience and functionality of a wearable device."
   date: 2023-03-26
+  tags: [Raspberry Pi, 3D Printing]
 - name: PicoDeck
   link: /blog/picodeck.html
   cover: /assets/img/blog/picodeck/picodeck.jpg
   description: Build a shortcut keyboard for your Raspberry Pi Pico
   date: 2023-04-14
+  tags: [MicroPython, Pico]
 - name: Hal-apeno 9000
   link: /blog/self-watering-plants.html
   cover: /assets/img/blog/halapeno9000/halapeno9000.jpg
   description: Build a self watering plant system
   date: 2023-04-11
+  tags: [Raspberry Pi, Python]
 - name: Duckface
   link: /blog/duckface.html
   cover: /assets/img/blog/bubo/bubo-2t.jpg
   description: Duckface lets you apply filters and overlays to images, then post to Twitter and Instagram.
   date: 2023-02-22
+  tags: [Raspberry Pi, Python, AI]
 - name: Pi Stand v6
   link: /blog/pi-stand-v6.html
   cover: /assets/img/blog/pi_stand/pi_stand04.png
   description: The Pi Stand gets an upgrade; a GoPro compatible Camera module and Hyperpixel 4.0 display
   date: 2023-02-22
+  discover: true
+  tags: [3D Printing, Raspberry Pi]
 - name: GhostBox
   link: /blog/ghostbox.html
   cover: /assets/img/blog/ghostbox/ghostbox.jpg
   description: Build your own GhostBox
   date: 2023-02-27
+  discover: true
+  tags: [Pico, MicroPython, 3D Printing]
 - name: Eye Mechanism
   link: /learn/eye_mechanism/
   cover: /learn/eye_mechanism/assets/cover.jpg
   description: Robot Eye Mechansim, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.
   date: 2023-01-29
+  tags: [3D Printing]
 - name: Cyberglasses
   link: /blog/cyberglasses.html
   cover: /assets/img/blog/cyberglasses/cyberglasses04.png
   description: Build your own Hackable Cyberglasses
   date: 2023-01-16
+  tags: [Pico, MicroPython, 3D Printing]
 - name: Giraffe Stand
   link: /blog/giraffe-stand.html
   cover: /assets/img/blog/giraffe/giraffe01.jpg
   description: Cute Giraffe Stand for Raspberry Pis
   date: 2023-01-11
+  tags: [3D Printing]
 - name: Ghostbusters Wi-Fi Scanner
   link: /blog/ghostbusters-wifi.html
   cover: /assets/img/blog/ghostbusters/ghost02.jpg
   description: Who you gonna call?
   date: 2022-12-21
+  discover: true
+  tags: [Pico, MicroPython, 3D Printing]
 - name: Atari 2600 Compute Case
   link: /blog/atari-2600.html
   cover: /assets/img/blog/atari/hero03.jpg
   description: Cute Retro case
   date: 2022-12-20
+  discover: true
+  tags: [3D Printing]
 - name: Galactic Guitar Hero
   link: /blog/galactic_hero.html
   cover: /assets/img/blog/galactic_hero/galactic_hero01.jpg
   description: Build your own Galactic Guitar Hero Game
   date: 2022-12-13
+  tags: [Pico, MicroPython]
 - name: Worlds most advanced bauble
   link: /blog/worlds-most-advanced-bauble.html
   cover: /assets/img/blog/cheerlights/cheerlights.jpg
   description: Fun with Cheerlights
   date: 2022-11-06
+  tags: [Pico, MicroPython, IoT]
 - name: How to setup a Phew! access point
   link: /blog/phew-access-point.html
   cover: /assets/img/blog/phew/saddle.jpg
   description: MicroPython Captive Portal
   date: 2022-09-04
+  tags: [Pico, MicroPython,IoT]
 - name: Next cube a homage to the original www server
   link: /blog/next-cube.html
   cover: /assets/img/blog/nextcube/nextcube.jpg
@@ -248,23 +311,29 @@
   cover: /assets/img/blog/pikon/pikon.jpg
   description: Raspberry Pi High Quality Camera Project
   date: 2022-08-23
+  discover: true
+  tags: [Raspberry Pi, Python, 3D Printing]
 - name: Pimoroni enviro indoor stevenson screen case
   link: /blog/enviro-case.html
   cover: /assets/img/stevenson_screen.jpg
   description: 3D Print your own Stevenson Screen for the Pimoroni Enviro Indoor sensor
   date: 2022-08-10
+  tags: [3D Printing]
 - name: Pi stands
   link: /blog/pistands.html
   cover: /assets/img/blog/pi_stand/pi_stand.jpg
   description: Cute stands for Raspberry Pis
   date: 2022-05-22
+  tags: [3D Printing, Raspberry Pi]
 - name: Zero stand
   link: /blog/zero-stand.html
   cover: /assets/img/blog/zero_stand/enviro.jpg
   description: Cute stand for Raspberry Pi Zeros
   date: 2022-05-15
+  tags: [3D Printing, Raspberry Pi]
 - name: Build your own AI Assistant in Python
   link: /robots/pythonai/
   cover: /assets/img/blog/byoai/byoai.jpg
   description: Build your own AI Assistant in Python
   date: 2022-10-12
+  tags: [Python, AI]

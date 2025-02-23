@@ -44,6 +44,9 @@ posts:
 - title: How to setup a Phew! Access Point
   url: /2022-09-04-phew-access-point.md
   date: 2022-09-04
+- title: Installing and Using DeepSeek-R1:1.5 on a Raspberry Pi with Docker
+  url: /2025-01-28-deepseek-on-pi.md
+  date: 2025-01-26
 - title: Pico-Deck
   url: /2023-03-14-picodeck.md
   date: 2023-03-14
@@ -104,6 +107,9 @@ posts:
 - title: Cyberglasses
   url: /2023-01-16-cyberglasses.md
   date: 2023-01-16
+- title: Raspberry Pi Home Hub
+  url: /2025-01-05-pi-home-hub.md
+  date: 2025-01-05
 - title: SMARS Quad
   url: /2020-08-16-smars-quad.md
   date: 2020-08-16
@@ -116,6 +122,9 @@ posts:
 - title: PicoTico
   url: /2024-03-03-pico-tico.md
   date: 2024-03-03
+- title: Pi 10 Inch Mini-rack
+  url: /2025-02-04-mini-rack.md
+  date: 2025-02-04
 - title: Stream ESP32CAM video
   url: /2023-12-29-esp32cam-to-python.md
   date: 2023-12-29
@@ -170,6 +179,9 @@ posts:
 - title: Pico W Toothbrush
   url: /2023-11-26-pico_toothbrush.md
   date: 2023-11-26
+- title: Weather Station Display
+  url: /2025-02-22-weather-station-display.md
+  date: 2025-02-22
 - title: Robot Makers Almanac
   url: /2024-12-30-robot-makers-almanac.md
   date: 2024-12-30
@@ -365,9 +377,6 @@ posts:
 - title: Raspberry Pi MotionEye Camera Setup with Docker
   url: /2024-11-14-motioneye-on-pi.md
   date: 2024-11-14
-- title: Raspberry Pi Home Hub
-  url: /2025-01-05-pi-home-hib.md
-  date: 2025-01-05
 - title: Obsidian - the best tool for Makers
   url: /2024-12-01-obsidian.md
   date: 2024-12-01

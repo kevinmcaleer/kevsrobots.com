@@ -1,0 +1,13 @@
+{% assign discover = site.data.projects %}
+
+<div class="container-fluid bg-light p-3 rounded-3">
+    <h2>Best Projects</h2>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 m-0 p-0">
+        {% for item in discover %}
+        {% if item.discover %}
+        {% include card.html cardtitle=item.name img=item.cover date=item.date link=item.link description=item.description small_title=true tl="2" dl="3" noborder=true%}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>

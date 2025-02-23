@@ -105,3 +105,9 @@
   location: "tbc"
   link: https://www.sanjaymortimerfoundation.org/smrrf25
   status: expected
+- event: CamJam Raspberry Pi Birthday Party 2025
+  start: "2025-03-01"
+  end: "2025-03-01"
+  location: "Cambridge, UK"
+  link: https://camjam.me/
+  status: confirmed

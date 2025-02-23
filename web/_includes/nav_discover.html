@@ -1,0 +1,22 @@
+<!-- Get unique tags -->
+{% assign all_tags = "" | split: "," %}
+{% for project in site.data.projects %}
+  {% for tag in project.tags %}
+    {% unless all_tags contains tag %}
+      {% assign all_tags = all_tags | push: tag %}
+    {% endunless %}
+  {% endfor %}
+{% endfor %}
+
+<!-- Render Tag Navigation -->
+<nav class="navbar my-0 py-0 bg-nav">
+    <div class="container-fluid">
+  <ul class="nav me-auto my-0">
+    {% for tag in all_tags %}
+      <li class="nav-item">
+        <a class="nav-link {% if page.url == item.link %}active{% endif %}" href="/discover/{{ tag | slugify }}/">{{ tag }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+</nav>

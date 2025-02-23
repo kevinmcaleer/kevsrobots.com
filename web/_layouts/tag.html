@@ -1,0 +1,21 @@
+---
+layout: content
+title: "{{ page.tag }}"
+permalink: /discover/{{ page.tag | slugify }}/
+---
+
+{% include breadcrumbs.html %}
+
+{% include nav_discover.html %}
+
+<h1>Discover</h1>
+<h2>{{page.title}}</h2>
+<hr />
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 bg-light rounded-3">
+  {% for project in site.data.projects %}
+    {% if project.tags contains page.tag %}
+    {% include card.html cardtitle=project.name img=project.cover link=project.link description=project.description noborder=true tl="1" dl="2" date=project.date duration=project.duration %}
+    {% endif %}
+  {% endfor %}
+</div>

@@ -1,0 +1,11 @@
+- name: Mini-Rack
+  description: Learn how to design and build your own mini server rack.
+  cover: /projects/mini-rack/cover.jpg
+  link: /projects/mini-rack/
+  type: project
+  date: 
+- name: GamePad 2.0
+  description: Learn how to build a custom gamepad to control your robots.
+  cover: /assets/img/blog/gamepad2/cover.jpg
+  link: /blogs/gamepad2
+  type: project

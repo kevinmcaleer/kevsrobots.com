@@ -63,3 +63,6 @@ collections:
   stem:
     output: true
     permalink: /stem/:name.html
+  discover:
+    output: true
+    permalink: /discover/:name.html
