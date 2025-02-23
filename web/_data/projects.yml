@@ -1,3 +1,10 @@
+- name: Presto Weather Display
+  link: /blog/weather-station-display.html
+  cover: /assets/img/blog/presto/cover.jpg
+  discover: true
+  date: 2025-02-23
+  description: "Build a weather display using a Pimoroni Presto touch-display and PiChart"
+  tags: [Raspberry Pi, Python, MicroPython, IoT]
 - name: Mini-Rack
   link: /projects/mini-rack/index.html
   cover: /projects/mini-rack//assets/cover.jpg
