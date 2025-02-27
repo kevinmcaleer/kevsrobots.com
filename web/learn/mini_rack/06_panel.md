@@ -8,7 +8,7 @@ date: 2025-02-16
 previous: 05_handle.html
 next: 07_pi_tray.html
 description: Learn how to create the cluster panel for the mini-rack
-percent: 63
+percent: 70
 duration: 1
 navigation:
 - name: Mini-Rack 3D Design Tutorial
@@ -35,8 +35,6 @@ navigation:
       link: 07_pi_tray.html
     - name: Create the Top Panel
       link: 08_top_panel.html
-    - name: Create the Cluster Panel
-      link: 09_cluster_panel.html
   - section: Printing
     content:
     - name: Print the parts

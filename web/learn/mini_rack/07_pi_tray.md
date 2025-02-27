@@ -8,7 +8,7 @@ date: 2025-02-16
 previous: 06_panel.html
 next: 08_top_panel.html
 description: Raspberry Pi 5 Cluster Panel Tray
-percent: 72
+percent: 80
 duration: 2
 navigation:
 - name: Mini-Rack 3D Design Tutorial
@@ -35,8 +35,6 @@ navigation:
       link: 07_pi_tray.html
     - name: Create the Top Panel
       link: 08_top_panel.html
-    - name: Create the Cluster Panel
-      link: 09_cluster_panel.html
   - section: Printing
     content:
     - name: Print the parts

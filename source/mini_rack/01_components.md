@@ -15,6 +15,6 @@ The following components make up the 10" mini-rack for Raspberry Pi:
 - [Handle](05_handle)
 - [Pi Tray](07_pi_tray)
 - [Top Panel](08_top_panel) (laser cut)
-- [Cluster Panel](09_cluster_panel) (laser cut)
+- [Cluster Panel](06_panel) (laser cut)
 
 ---

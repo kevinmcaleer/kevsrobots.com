@@ -8,7 +8,7 @@ date: 2025-02-16
 previous: 01_components.html
 next: 03_bottom.html
 description: Learn how to create the 2U corner piece for the mini-rack
-percent: 27
+percent: 30
 duration: 3
 navigation:
 - name: Mini-Rack 3D Design Tutorial
@@ -35,8 +35,6 @@ navigation:
       link: 07_pi_tray.html
     - name: Create the Top Panel
       link: 08_top_panel.html
-    - name: Create the Cluster Panel
-      link: 09_cluster_panel.html
   - section: Printing
     content:
     - name: Print the parts

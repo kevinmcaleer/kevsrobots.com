@@ -5,7 +5,7 @@ author: Kevin McAleer
 type: page
 cover: /learn/mini_rack/assets/cover.jpg
 date: 2025-02-16
-previous: 09_cluster_panel.html
+previous: 08_top_panel.html
 description: Learn how to print the parts for the mini-rack
 percent: 100
 duration: 1
@@ -34,8 +34,6 @@ navigation:
       link: 07_pi_tray.html
     - name: Create the Top Panel
       link: 08_top_panel.html
-    - name: Create the Cluster Panel
-      link: 09_cluster_panel.html
   - section: Printing
     content:
     - name: Print the parts
