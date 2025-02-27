@@ -24,6 +24,9 @@
       - 04_top.md
       - 05_handle.md
       - 06_panel.md
+      - 07_pi_tray.md
+      - 08_top_panel.md
+      - 09_cluster_panel.md
   - section:
       name: Printing
       content:

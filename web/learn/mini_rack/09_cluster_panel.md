@@ -5,10 +5,10 @@ author: Kevin McAleer
 type: page
 cover: /learn/mini_rack/assets/cover.jpg
 date: 2025-02-16
-previous: 05_handle.html
-next: 07_pi_tray.html
+previous: 08_top_panel.html
+next: 07_print.html
 description: Learn how to create the cluster panel for the mini-rack
-percent: 63
+percent: 90
 duration: 1
 navigation:
 - name: Mini-Rack 3D Design Tutorial
@@ -44,24 +44,30 @@ navigation:
 ---
 
 
-![Cluster Panel Design](assets/cluster_panel_design.png){:class="img-fluid w-100"}
+## How to create the Cluster Panel for the Mini-Rack
 
 1. Create a new file named `cluster_panel` in Fusion 360
 
 1. Create a new sketch on the XY plane, named `panel_base`
 
-    ![dimensions](/learn/mini_rack/assets/panel_01_sketch.png){:class="img-fluid w-100"}
+    ![cluster panel](/learn/mini_rack/assets/cluster_panel_01_sketch.png){:class="img-fluid w-100"}
 
-1. Extrude the body profile by `4mm`:
+1. Extrude the body profile by `2mm` (or whatever the depth of the wood you're looking to use is):
 
-    ![Extrude](/learn/mini_rack/assets/panel_02_extrude.png){:class="img-fluid w-100"}
+    ![Extrude](/learn/mini_rack/assets/cluster_panel_02_extrude.png){:class="img-fluid w-100"}
 
 1. Create a new sketch on the top of the new part, named `holes`
 
-    ![Sketch](/learn/mini_rack/assets/panel_03_sketch.png){:class="img-fluid w-100"}
+    ![Sketch](/learn/mini_rack/assets/cluster_panel_03_sketch.png){:class="img-fluid w-100"}
 
 1. Extrude-Cut the `holes` sketch:
 
-    ![Extrude](/learn/mini_rack/assets/panel_04_extrude.png){:class="img-fluid w-100"}
+    ![Extrude](/learn/mini_rack/assets/cluster_panel_04_extrude.png){:class="img-fluid w-100"}
+
+    ![Extrude](/learn/mini_rack/assets/cluster_panel_05_extrude.png){:class="img-fluid w-100"}
+
+1. Use the Fillet tool to round the outside edges of the frame by `4mm`:
+
+    ![Fillet](/learn/mini_rack/assets/cluster_panel_06_fillet.png){:class="img-fluid w-100"}
 
 ---

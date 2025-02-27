@@ -9,7 +9,7 @@ previous: 00_intro.html
 next: 02_2u_design.html
 description: Learn about the components that make up the 10" mini-rack for Raspberry
   Pi
-percent: 24
+percent: 18
 duration: 1
 navigation:
 - name: Mini-Rack 3D Design Tutorial
@@ -32,6 +32,12 @@ navigation:
       link: 05_handle.html
     - name: Create the Cluster Panel
       link: 06_panel.html
+    - name: Create the Pi-Tray
+      link: 07_pi_tray.html
+    - name: Create the Top Panel
+      link: 08_top_panel.html
+    - name: Create the Cluster Panel
+      link: 09_cluster_panel.html
   - section: Printing
     content:
     - name: Print the parts
@@ -44,12 +50,11 @@ navigation:
 The following components make up the 10" mini-rack for Raspberry Pi:
 
 - [2U Corner](02_2u_design)
-- 1U Corner
 - [Top Corner](04_top)
 - [Bottom Corner](03_bottom)
 - [Handle](05_handle)
-- Pi Tray
-- Top Panel (laser cut)
-- Cluster Panel (laser cut)
+- [Pi Tray](07_pi_tray)
+- [Top Panel](08_top_panel) (laser cut)
+- [Cluster Panel](09_cluster_panel) (laser cut)
 
 ---

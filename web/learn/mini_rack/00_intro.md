@@ -7,7 +7,7 @@ cover: /learn/mini_rack/assets/cover.jpg
 date: 2025-02-16
 next: 01_components.html
 description: Overview of this course
-percent: 12
+percent: 9
 duration: 1
 navigation:
 - name: Mini-Rack 3D Design Tutorial
@@ -30,6 +30,12 @@ navigation:
       link: 05_handle.html
     - name: Create the Cluster Panel
       link: 06_panel.html
+    - name: Create the Pi-Tray
+      link: 07_pi_tray.html
+    - name: Create the Top Panel
+      link: 08_top_panel.html
+    - name: Create the Cluster Panel
+      link: 09_cluster_panel.html
   - section: Printing
     content:
     - name: Print the parts

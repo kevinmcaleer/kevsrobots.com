@@ -10,12 +10,11 @@ layout: lesson
 The following components make up the 10" mini-rack for Raspberry Pi:
 
 - [2U Corner](02_2u_design)
-- 1U Corner
 - [Top Corner](04_top)
 - [Bottom Corner](03_bottom)
 - [Handle](05_handle)
-- Pi Tray
-- Top Panel (laser cut)
-- Cluster Panel (laser cut)
+- [Pi Tray](07_pi_tray)
+- [Top Panel](08_top_panel) (laser cut)
+- [Cluster Panel](09_cluster_panel) (laser cut)
 
 ---
