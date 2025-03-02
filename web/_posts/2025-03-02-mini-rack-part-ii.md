@@ -11,6 +11,7 @@ cover: /assets/img/blog/pi_tray/cover.jpg
 hero:  /assets/img/blog/pi_tray/hero.png
 mode: light
 videos:
+  - fJC68N9nphA
   - qnewKGO8EOc
 tags:
  - Raspberry Pi

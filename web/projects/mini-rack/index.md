@@ -11,8 +11,9 @@ difficulty: beginner
 cover: /projects/mini-rack/assets//cover.jpg
 hero:  /projects/mini-rack/assets/hero.png
 mode: light
-# videos:
-#   - 
+videos:
+  - fJC68N9nphA
+  - qnewKGO8EOc
 tags:
  - Raspberry Pi
  - cluster
