@@ -4,11 +4,11 @@
 
 {% assign courses = site.data.courses | sort: 'date_published' | reverse | limit:6 %}
 
-<div class="row row-cols-4 g-3">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
     {% for course in courses %}
 
     {% include card.html cardtitle=course.name author=course.author date=course.date_published 
-        img=course.cover duration=course.duration noborder=true dl=3 type='course' link=course.link%}
+        img=course.cover duration=course.duration noborder=true dl="3" tl="2" type='course' link=course.link small_title=true bg_color="bg-card-blue" %}
 
 {% endfor %} 
 </div>

@@ -6,7 +6,7 @@
 {% for article in articles | limit:3 %}
 {% if article.title != 'Projects' %}
 
-{% include card.html cardtitle=article.name link=article.link img=article.cover description=article.description date=article.date noborder=true tl="3" dl="2" %}
+{% include card.html cardtitle=article.name link=article.link img=article.cover description=article.description date=article.date noborder=true tl="3" dl="2" bg_color="bg-card-blue" %}
 
 {% endif %}
 {% endfor %}

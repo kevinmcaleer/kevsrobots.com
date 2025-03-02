@@ -2,9 +2,10 @@
 title: "10 Inch Mini-rack for Raspberry Pi"
 description: "Upgrade your home lab with this fun 3d printable project"
 excerpt: >-
-   
+    Learn how to design and build your own 10" mini-rack for your Raspberry Pi cluster or home lab. This project is perfect for upgrading your home lab and keeping your equipment organized and easily accessible.
 layout: showcase
 date: 2025-02-14
+date_updated: 2025-03-02
 author: Kevin McAleer
 difficulty: beginner
 cover: /projects/mini-rack/assets//cover.jpg
@@ -39,8 +40,11 @@ stl:
    link: /projects/mini-rack/assets/bottom_corner_v2_mirror.stl
  - name: Handle
    link: /projects/mini-rack/assets/handle.stl
- - name: Pi Tray
-   link: /projects/mini-rack/assets/pi_tray.stl
+ - name: Pi Tray 5
+   link: /projects/mini-rack/assets/pi4_tray.stl
+ - name: Pi Tray 4
+   link: /projects/mini-rack/assets/pi5_tray.stl
+
 dxf:
  - name: Top Panel
    link: /projects/mini-rack/assets/top_panel.dxf
@@ -155,7 +159,7 @@ This is a list of laser-cut parts:
 
 ## Gallery of Parts
 
-{% include gallery.html images="/projects/mini-rack/assets/minirack01.jpg,/projects/mini-rack/assets/minirack02.jpg,/projects/mini-rack/assets/minirack03.jpg,/projects/mini-rack/assets/minirack04.jpg,/projects/mini-rack/assets/minirack05.jpg,/projects/mini-rack/assets/minirack06.jpg,/projects/mini-rack/assets/minirack07.jpg,/projects/mini-rack/assets/minirack08.jpg,/projects/mini-rack/assets/minirack09.jpg" titles="Bottom Corner, Top Corner, 1U Corner, 2U Corner, Handle, Pi Tray, 20x20 Extruded Bar, 2U Dimensions, Assembled Design" cols=1 %}
+{% include gallery.html images="/projects/mini-rack/assets/minirack01.jpg,/projects/mini-rack/assets/minirack02.jpg,/projects/mini-rack/assets/minirack03.jpg,/projects/mini-rack/assets/minirack04.jpg,/projects/mini-rack/assets/minirack05.jpg,/projects/mini-rack/assets/minirack06.jpg,/projects/mini-rack/assets/minirack07.jpg,/projects/mini-rack/assets/minirack08.jpg,/projects/mini-rack/assets/minirack09.jpg" titles="Bottom Corner, Top Corner, 1U Corner, 2U Corner, Handle, Pi Tray, 20x20 Extruded Bar, 2U Dimensions, Assembled Design" cols=3 %}
 
 ---
 

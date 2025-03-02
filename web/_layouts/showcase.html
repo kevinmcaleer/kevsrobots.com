@@ -65,7 +65,7 @@ layout: default
                 </span>
                     {% if page.date_updated %}
                 <div class="m-0 p-0">
-                <p class="text-start text-small text-body-secondary m-0 p-0">Page last updated {{page.date_updated | date: "%B %d, %Y"}}</p>
+                <p class="text-start text-small text-body-secondary m-0 p-0">Page last updated {{page.date_updated | date: "%-d %B %Y"}}</p>
                 </div>
                 {% endif %}
                     </div>

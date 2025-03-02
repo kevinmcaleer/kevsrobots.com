@@ -6,17 +6,9 @@
             <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3">
             {% for article in articles | limit:3 | sort:date | reverse %}
             {% if article.title != 'Robots' %}
-            <div class="col text-white">
-                <a href="{{article.link}}" class="text-decoration-none">
-                <div class="card border-0 shadow-hover card-hover h-100">
-                <img class="card-img-top" src="{{article.cover}}" alt="{{article.title}}">
-                <div class="card-body">
-                <h5 class="card-title black">{{article.name}}</h5>    
-                <p class="card-text small black">{{article.description}}</p>
-                </div>
-                </div>
-                </a>
-            </div>
+
+            {% include card.html cardtitle=article.name link=article.link img=article.cover description=article.description tl="1" dl="3" date=article.date small_title=true noborder=true bg_color="bg-card-green"%}
+
             {% endif %}
             {% endfor %}
             </div>
