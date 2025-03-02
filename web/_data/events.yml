@@ -111,3 +111,9 @@
   location: "Cambridge, UK"
   link: https://camjam.me/
   status: confirmed
+- event: Liverpool Makefest 2025
+  link: https://liverpoolmakefest.org/
+  start: "2025-07-05"
+  end: "2025-07-05"
+  location: "Liverpool, UK"
+  status: confirmed
