@@ -58,6 +58,8 @@ The easiest way to start is to cut out some aluminium foil and stick it to some 
 
 I plugged the Pico into a breadboard to make the wiring easier, there is just enough room to put a jumper wire and 1M Ohm resistor in the same row on the breadboard. I then connect the crocodile clips to the jumper wire and also to the foil on the piano.
 
+Download the [Touch Piano PDF](/assets/pdf/touch_piano/touch_piano.pdf) here.
+
 ---
 
 ## Nugget Piano
