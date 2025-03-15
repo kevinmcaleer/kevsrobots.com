@@ -1,0 +1,8 @@
+{% assign women = site.data.women %}
+<div class="row row-cols-3 g-3">
+{% for woman in women %}
+
+{% include card.html cardtitle=woman.name img=woman.cover description=woman.bio link=woman.x col=3 %}
+
+{% endfor %}
+</div>

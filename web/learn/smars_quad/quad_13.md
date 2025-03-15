@@ -1,14 +1,13 @@
 ---
 layout: lesson
-title: Servo Horns
+title: Wiring
 author: Kevin McAleer
 type: page
 cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 date: 2023-03-04
-previous: quad_07.html
-next: quad_09.html
-description: Attach the other servo holders to the frame
-percent: 63
+previous: quad_12.html
+description: Wiring the SMARS Quad robot
+percent: 100
 duration: 1
 navigation:
 - name: SMARS Quad
@@ -50,10 +49,36 @@ navigation:
 ---
 
 
-## 8 Attach the other servo holders to the frame
+![wiring](assets/wiring01.jpg){:class="img-fluid w-100"}
 
-Insert the servo horn onto the servo and screw in securely to the servo arm.
+![wiring](assets/wiring02.jpg){:class="img-fluid w-100"}
 
-![Attach the other servo holders to the frame](assets/instruction08.png){:class="img-fluid w-25"}
+---
+
+## PCA9685 Pinout
+
+PCA9685 Pin | Quad Limb
+:----------:|-----------------
+     0      | Front Left Leg
+     1      | Front Left Foot
+     2      | Back Left Leg
+     3      | Back Left Foot
+     4      | Back Right Leg
+     5      | Back Right Foot
+     6      | Front Right Leg
+     7      | Front Right Foot
+{:class="table table-striped "}
+
+---
+
+## PCA9685 to Pi Wiring
+
+PCA9685 | Raspberry Pi
+:------:|:-----------:
+  GND   |   6 (GND)
+  VCC   |   2 (VCC)
+  SCL   |   5 (SDL)
+  SDA   |   3 (SDA)
+{:class="table table-striped "}
 
 ---

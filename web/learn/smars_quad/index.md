@@ -44,6 +44,8 @@ navigation:
       link: quad_11.html
     - name: Code
       link: quad_12.html
+    - name: Wiring
+      link: quad_13.html
 ---
 
 
