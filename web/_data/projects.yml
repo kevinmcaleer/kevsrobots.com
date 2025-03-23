@@ -1,5 +1,5 @@
 - name: SMARS GamePad
-  link: /blog/best_arduino.html
+  link: /blog/best-arduino-robot.html
   cover: /assets/img/blog/best_arduino/cover.jpg
   discover: true
   description: "Control SMARS with a GamePad"
