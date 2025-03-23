@@ -1,3 +1,8 @@
+- name: SMARS GamePad
+  link: /blog/best_arduino.html
+  cover: /assets/img/blog/best_arduino/cover.jpg
+  description: "Control SMARS with a GamePad"
+  date: 2025/03/23
 - name: SMARS Quad
   link: /blog/pycharm.html
   cover: /assets/img/blog/pycharm/cover.jpg
