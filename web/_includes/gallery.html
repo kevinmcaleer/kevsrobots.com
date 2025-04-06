@@ -1,12 +1,22 @@
 {% assign images = include.images | split: ',' %}
 {% assign titles = include.titles | split: ',' %}
 {% assign cols = include.cols | default: 3 %}
+{% assign links = include.links | split: ',' %}
+{% comment %}
+
+use-links if you want to use the included links rather than links to the images
+
+{% endcomment %}
 
 <div class="gallery" style="display: grid; grid-template-columns: repeat({{ cols }}, 1fr); gap: 10px;">
     {% for image in images %}
         {% assign index = forloop.index0 %}
         <div class="card rounded-3 card-hover card-shadow">
+            {%if include.use-links %}
+            <a href="{{links[index]}}" class="card-img-top w-100">
+            {% else %}
             <a href="{{ image | strip }}" class="card-img-top w-100">
+            {% endif %}
                 <img src="{{ image | strip }}" alt="Gallery Image" class="w-100 rounded-top-3">
             </a>
             {% if titles.size > index %}
