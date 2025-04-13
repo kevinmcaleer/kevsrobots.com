@@ -20,10 +20,24 @@ groups:
  - raspberrypi
 # code:
 #  - 
-stls:
-- name: "Bottom"
-  link: "/assets/stl/snaszy_nas/bottom.stl"
----
+stl:
+- name: "Bottom - snaszy_bottom.stl"
+  link: "/assets/stl/snaszy_nas/snaszy_bottom.stl"
+- name: "Top - snaszy_top.stl"
+  link: "/assets/stl/snaszy_nas/snaszy_top.stl"
+- name: "Back - snaszy_back.stl"
+  link: "/assets/stl/snaszy_nas/snaszy_back.stl"
+- name: "Front - snaszy_front.stl"
+  link: "/assets/stl/snaszy_nas/snaszy_front.stl"
+- name: "Pi 5 Tray - pi_5_tray.stl"
+  link: "/assets/stl/snaszy_nas/pi_5_tray.stl"
+- name: "Frame - snaszy_frame.stl"
+  link: "/assets/stl/snaszy_nas/snaszy_frame.stl"
+- name: "Flap - snaszy_flap.stl"
+  link: "/assets/stl/snaszy_nas/snaszy_flap.stl"
+- name: "Lid - snaszy_lid.stl"
+  link: "/assets/stl/snaszy_nas/snaszy_lid.stl"
+---  
 
 ## What is Snaszy NAS?
 
