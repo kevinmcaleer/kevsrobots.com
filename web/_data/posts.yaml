@@ -8,6 +8,9 @@ posts:
 - title: Next Cube - a Homage to the original WWW server
   url: /2022-08-28-next-cube.md
   date: 2022-08-28
+- title: The Best Arduino Robot for Beginners
+  url: /2025-03-22-best-arduino-robot.md
+  date: 2025-03-23
 - title: Electric Trombone
   url: /2024-03-04-electric-trombone.md
   date: 2024-03-04
@@ -161,6 +164,9 @@ posts:
 - title: Explora 3D files
   url: /2022-05-16-explora.md
   date: 2022-05-15
+- title: Snaszy NAS a 3D printed NAS for Raspberry Pi
+  url: /2025-04-11-snaszy_nas.md
+  date: 2025-04-11
 - title: SunFounder GalaxyRVR Review
   url: /2024-02-24-galaxyrvr.md
   date: 2024-02-24
@@ -275,6 +281,12 @@ posts:
 - title: Welcome to Kev's Robots
   url: /2022-01-27-welcome-to-kevsrobots.md
   date: 2022-01-28
+- title: SMARS Lab upgrade with PyCharm
+  url: /2025-03-14-pycharm.md
+  date: 2025-03-14
+- title: Waveshare CM5 boards
+  url: /2025-04-06-waveshare-cm5.md
+  date: 2025-04-06
 - title: PicoCat Lives
   url: /2022-04-01-picocat-lives.md
   date: 2022-04-01

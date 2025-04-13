@@ -10,9 +10,16 @@ def extract_front_matter(file_path):
     match = front_matter_regex.search(content)
 
     if match:
-        return yaml.safe_load(match.group(1))
+        yaml_string_to_parse = match.group(1)
+        # print(f"--- DEBUG: Processing file: {file_path} ---")
+        # print(f"--- DEBUG: String passed to yaml.safe_load: ---")
+        # print(yaml_string_to_parse)
+        # print(f"--- END DEBUG ---")
+        return yaml.safe_load(yaml_string_to_parse)
     else:
+        # print(f"--- DEBUG: No front matter match found in: {file_path} ---")
         return None
+        # return yaml.safe_load(match.group(1))
 
 def main():
     input_folder = 'web/_posts'

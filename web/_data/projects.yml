@@ -1,3 +1,10 @@
+- name: Snaszy NAS
+  link: /blog/snaszy_nas.html
+  cover: /assets/img/blog/snaszy_nas/cover.jpg
+  discover: true
+  description: "3D print your own NAS case for the Raspberry Pi 5"
+  date: 2025-04-13
+  tags: [Raspberry Pi, NAS, 3D Printing]
 - name: SMARS GamePad
   link: /blog/best-arduino-robot.html
   cover: /assets/img/blog/best_arduino/cover.jpg
