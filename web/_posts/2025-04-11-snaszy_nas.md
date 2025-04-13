@@ -3,7 +3,7 @@ title: "Snaszy NAS - a 3D printed NAS for Raspberry Pi"
 description: >- 
     "Snaszy NAS is a 3D printed NAS for Raspberry Pi, designed for 2.5 inch drives. It uses BTRFS for RAID and is powered by a Raspberry Pi 5."
 excerpt: >-
-    
+     "Snaszy NAS is a 3D printed NAS for Raspberry Pi, designed for 2.5 inch drives. It uses BTRFS for RAID and is powered by a Raspberry Pi 5."
 layout: showcase
 date: 2025-04-11
 author: Kevin McAleer

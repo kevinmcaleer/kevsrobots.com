@@ -1,8 +1,8 @@
 ---
 title: "Waveshare CM5 boards"
-description: ""
+description: "The Waveshare Compute Module 5 boards are a great option for those looking to use the Compute Module 5 in a compact design"
 excerpt: >-
-    
+  The Waveshare Compute Module 5 boards are a great option for those looking to use the Compute Module 5 in a compact design. They are affordable and have a number of features that make them ideal for a variety of projects.
 layout: showcase
 date: 2025-04-06
 author: Kevin McAleer
@@ -24,7 +24,6 @@ groups:
 ---
 
 I recently received a carepackage from Waveshare with a number of their Compute Module 5 boards. I have been using the Raspberry Pi Compute Module 5 for a number of projects and I was excited to see what Waveshare had to offer. The boards are affordable and have a number of features that make them great for a variety of projects.
-
 
 {% include gallery.html ignoretitles="Compute Module 5,What are Compute Modules,Timeline,Anatomy of a Compute Module,Variants" images="/assets/img/blog/waveshare_cm5/cm5_01.jpg,/assets/img/blog/waveshare_cm5/cm5_02.jpg,/assets/img/blog/waveshare_cm5/cm5_03.jpg,/assets/img/blog/waveshare_cm5/cm5_04.jpg,/assets/img/blog/waveshare_cm5/cm5_05.jpg" links="/assets/img/blog/waveshare_cm5/cm5_01.jpg,/assets/img/blog/waveshare_cm5/cm5_02.jpg/assets/img/blog/waveshare_cm5/cm5_03.jpg,/assets/img/blog/waveshare_cm5/cm5_04.jpg,/assets/img/blog/waveshare_cm5/cm5_05.jpg" cols=1 %}
 
