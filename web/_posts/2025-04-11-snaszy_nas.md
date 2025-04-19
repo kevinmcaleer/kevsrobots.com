@@ -35,6 +35,8 @@ stl:
     link: "/assets/stl/snaszy_nas/snaszy_flap.stl"
   - name: "Lid - snaszy_lid.stl"
     link: "/assets/stl/snaszy_nas/snaszy_lid.stl"
+  - name: "Base - snaszy_base.stl"
+    link: "/assets/stl/snaszy_nas/snaszy_base.stl"
 ---
 
 ## What is Snaszy NAS?
