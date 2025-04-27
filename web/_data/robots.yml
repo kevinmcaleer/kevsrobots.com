@@ -1,3 +1,8 @@
+- name: LidarBot
+  link: /blog/lidarbot.html
+  cover: /assets/img/blog/lidarbot/cover.jpg
+  description: "Build a LidarBot with a Raspberry Pi Pico W"
+  date: 2025/04/26
 - name: SMARS GamePad
   link: /blog/best-arduino-robot.html
   cover: /assets/img/blog/best_arduino/cover.jpg
