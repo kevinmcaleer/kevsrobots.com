@@ -1,0 +1,43 @@
+- name: Bottango Basics
+  author: Kevin McAleer
+  date_created: 2025-05-03
+  date_published: 2025-05-10
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - animation
+      - robotics
+      - arduino
+  description: >-
+    Learn how to bring characters and props to life using Bottango, a powerful no-code motion tool for animating servos and creating interactive scenes. 
+    This course walks you through installing Bottango, wiring servos, programming boards, and creating expressive motion sequences.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 01_intro.md
+    - section:
+        name: Getting Started
+        content:
+          - 02_install.md
+          - 03_setup_board.md
+    - section:
+        name: Wiring and Configuration
+        content:
+          - 04_wiring.md
+          - 05_configure_bottango.md
+    - section:
+        name: Creating Animations
+        content:
+          - 06_create_motion.md
+          - 07_triggers.md
+          - 08_sync_music.md
+    - section:
+        name: Advanced Projects
+        content:
+          - 09_arduino_mode.md
+          - 10_use_with_gamepad.md
+    - section:
+        name: Summary
+        content:
+          - 11_summary.md

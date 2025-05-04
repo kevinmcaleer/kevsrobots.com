@@ -1,3 +1,8 @@
+- name: Bottango and Isaaca
+  link: /blog/bottango.html
+  cover: /assets/img/blog/bottango/cover.jpg
+  description: Build a DIY Animatronic 
+  date: 2025/05/04
 - name: LidarBot
   link: /blog/lidarbot.html
   cover: /assets/img/blog/lidarbot/cover.jpg

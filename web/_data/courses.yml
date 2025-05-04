@@ -267,6 +267,20 @@
   link: /learn/intermediate_micropython/01_intro.html
   name: Intermediate level MicroPython
 - author: Kevin McAleer
+  cover: /learn/bottango/assets/cover.jpg
+  date_published: 2025-05-10
+  description: Learn how to bring characters and props to life using Bottango, a powerful
+    no-code motion tool for animating servos and creating interactive scenes.  This
+    course walks you through installing Bottango, wiring servos, programming boards,
+    and creating expressive motion sequences.
+  duration: 0h 22m
+  groups:
+  - animation
+  - robotics
+  - arduino
+  link: /learn/bottango/01_intro.html
+  name: Bottango Basics
+- author: Kevin McAleer
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
   description: Learn how to manipulate data using Pandas and Numpy
