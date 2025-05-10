@@ -112,12 +112,15 @@ while True:
     for angle in range(180, -1, -15):
         set_angle(angle)
         sleep(0.1)
-🧠 Scanning with the Ultrasonic Sensor
+```
+
+---
+
+## 🧠 Scanning with the Ultrasonic Sensor
+
 Combine the servo sweep with distance measurement:
 
-python
-Copy
-Edit
+```python
 from machine import Pin, PWM, time_pulse_us
 from time import sleep
 
@@ -170,6 +173,6 @@ Choose direction to turn based on obstacle data
 
 Now your robot can look around before moving — just like a cautious driver!
 
-Next up: [Bluetooth Control with HC-05](bluetooth_control)
+Next up: [Bluetooth Control with HC-05](08_bluetooth_control)
 
 ---
