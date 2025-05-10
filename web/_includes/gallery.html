@@ -2,6 +2,7 @@
 {% assign titles = include.titles | split: ',' %}
 {% assign cols = include.cols | default: 3 %}
 {% assign links = include.links | split: ',' %}
+{% assign descriptions = include.descriptions | split: ',' %}
 {% comment %}
 
 use-links if you want to use the included links rather than links to the images
@@ -22,6 +23,9 @@ use-links if you want to use the included links rather than links to the images
             {% if titles.size > index %}
                 <div class="card-body">
                     <h5 class="card-title">{{ titles[index] | strip }}</h5>
+                    {% if descriptions.size > index %}
+                        <p class="card-text">{{ descriptions[index] | strip }}</p>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>

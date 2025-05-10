@@ -196,6 +196,21 @@
   link: /learn/freecad/01_introduction_to_freecad.html
   name: Introduction to FreeCAD for Beginners
 - author: Kevin McAleer
+  cover: /learn/micropython_robotics/assets/cover.jpg
+  date_published: 2025-05-20
+  description: Learn how to build simple yet powerful robots using the Raspberry Pi
+    Pico and MicroPython.  This hands-on course guides you through controlling motors,
+    reading sensors, and combining hardware to create autonomous and remotely controlled
+    robots.  Perfect for makers ready to go beyond GPIO and start building real-world
+    robotics projects.
+  duration: 0h 24m
+  groups:
+  - robotics
+  - micropython
+  - raspberrypi
+  link: /learn/micropython_robotics/01_intro.html
+  name: MicroPython Robotics Projects with the Raspberry Pi Pico
+- author: Kevin McAleer
   cover: /learn/smars_code/assets/program_smars.png
   date_published: 2023-09-10
   description: Learn how to program SMARS with Arduino

@@ -11,6 +11,7 @@ courses:
   - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
   - "Intermediate level MicroPython"
   - "Using the Raspberry Pi Pico's Built-in Temperature Sensor"
+  - "MicroPython Robotics Projects with the Raspberry Pi Pico"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}
