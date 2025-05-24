@@ -46,12 +46,22 @@ def read_yaml(file_path):
 def insert_data(data):
     conn = sqlite3.connect(DATABASE_FILE)
     c = conn.cursor()
+
+   
+
+
     courses = data
     for course in courses:
-        # Insert the course into the courses table
-        c.execute("INSERT INTO courses (course_name, course_url, course_cover, course_author, course_duration, course_date) VALUES (?, ?, ?, ?, ?, ?)", 
-                  (course['name'], course['link'], course['cover'], course['author'], course['duration'], course['date_published']))
+
+        course_date = str(course['date_published'])  # Convert to ISO string
         
+        # Insert the course into the courses table
+        # c.execute("INSERT INTO courses (course_name, course_url, course_cover, course_author, course_duration, course_date) VALUES (?, ?, ?, ?, ?, ?)", 
+        #           (course['name'], course['link'], course['cover'], course['author'], course['duration'], course['date_published']))
+        
+        c.execute("INSERT INTO courses (course_name, course_url, course_cover, course_author, course_duration, course_date) VALUES (?, ?, ?, ?, ?, ?)", 
+          (course['name'], course['link'], course['cover'], course['author'], course['duration'], course_date))
+
         # Get the course_id of the last inserted course
         course_id = c.lastrowid
 
