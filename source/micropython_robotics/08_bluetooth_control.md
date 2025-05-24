@@ -26,12 +26,15 @@ With Bluetooth, you can control your robot wirelessly from a phone, tablet, or P
 
 ## ⚠️ Wiring the HC-05 to the Pico
 
-| HC-05 Pin | Connect to |
-|-----------|------------|
-| VCC       | 3.3V or 5V (check module label) |
-| GND       | GND |
-| TXD       | **GP1** (Pico RX) via voltage divider (1kΩ + 2kΩ) |
+| HC-05 Pin | Connect to                                                                              |
+|-----------|-----------------------------------------------------------------------------------------|
+| VCC       | 3.3V or 5V (check module label)                                                         |
+| GND       | GND                                                                                     |
+| TXD       | **GP1** (Pico RX) via voltage divider (1kΩ + 2kΩ)                                       |
 | RXD       | **GP0** (Pico TX) – use **voltage divider** to step down 3.3V if HC-05 is 3.3V tolerant |
+{:class="table table-striped"}
+
+---
 
 > 💡 The HC-05 RX pin **must not receive 3.3V directly** from Pico TX. Use a voltage divider (e.g., 1kΩ + 2kΩ).
 

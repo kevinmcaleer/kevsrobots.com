@@ -5,6 +5,7 @@ thanks: false
 <div class="container-fluid px-3">
 {% include nav_courses.html %}
 {% include breadcrumbs.html %}
+{% include course_navigation.html %}
 </div>
 <div class="row m-0 p-0">
     <div class="col-12 col-md-12 col-lg-3 bg-light">
@@ -86,7 +87,14 @@ thanks: false
         {% if page.next %}
         <a href="{{page.next}}" class="btn btn-primary">Next ></a>
         {% endif %}
+        {% if page.previous %}
+        <link rel="prev" href="{{ page.previous }}">
+        {% endif %}
+        {% if page.next %}
+        <link rel="next" href="{{ page.next }}">
+        {% endif %}
         </p>
+        <p class="text-center">You can use the arrows `← →` on your keyboard to navigate between lessons.</p>
     </div>
 </div>
 

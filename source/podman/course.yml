@@ -1,0 +1,48 @@
+- name: From Docker to Podman
+  author: Kevin McAleer
+  date_created: 2025-05-24
+  date_published: 2025-05-24
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+    - devops
+    - containers
+    - podman
+  description: >-
+    Learn how to transition from Docker to Podman and unlock better container workflows 
+    with rootless and daemonless architecture. This hands-on course covers everything from 
+    architectural differences and CLI compatibility to unique Podman features like systemd integration 
+    and Kubernetes support. Perfect for developers and DevOps professionals looking to modernize 
+    their container workflows.
+  content:
+    - section:
+        name: Getting Started
+        content:
+          - 01_intro_to_podman.md
+          - 02_docker_vs_podman_architecture.md
+          - 03_installing_podman.md
+    - section:
+        name: Core Usage
+        content:
+          - 04_cli_compatibility_and_commands.md
+          - 05_podman_unique_features.md
+          - 06_managing_containers_and_images.md
+    - section:
+        name: Advanced Concepts
+        content:
+          - 07_working_with_pods.md
+          - 08_docker_compose_vs_podman_compose.md
+          - 09_podman_and_kubernetes.md
+    - section:
+        name: Real-World Usage
+        content:
+          - 10_podman_in_production.md
+          - 11_troubleshooting_and_debugging.md
+    - section:
+        name: Migration Lab
+        content:
+          - 12_migration_project.md
+    - section:
+        name: Summary
+        content:
+          - 13_wrap_up_and_future.md

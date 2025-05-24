@@ -1,0 +1,14 @@
+<script>
+document.addEventListener('keydown', function (e) {
+  // Ignore keys if an input is focused
+  if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+
+  if (e.key === 'ArrowLeft') {
+    const prev = document.querySelector('link[rel="prev"]');
+    if (prev) window.location.href = prev.href;
+  } else if (e.key === 'ArrowRight') {
+    const next = document.querySelector('link[rel="next"]');
+    if (next) window.location.href = next.href;
+  }
+});
+</script>
