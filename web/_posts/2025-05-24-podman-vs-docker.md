@@ -1,9 +1,9 @@
 ---
 title: "Podman vs Docker"
 description: >-     
-  
+  I've created a new course on Podman vs Docker. This course is designed to help you understand the differences and similarities between Podman and Docker, and how to use Podman effectively
 excerpt: >-
-
+  This course is designed to help you understand the differences and similarities between Podman and Docker, and how to use Podman effectively
 layout: showcase
 date: 2025-05-24
 author: Kevin McAleer
@@ -12,7 +12,7 @@ cover: /assets/img/blog/podman/cover.jpg
 hero:  /assets/img/blog/podman/hero.png
 mode: light
 videos:
-  # -
+  - zwn2mXlYwis
 tags:
   - podman
   - docker
