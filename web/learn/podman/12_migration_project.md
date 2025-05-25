@@ -9,7 +9,7 @@ previous: 11_troubleshooting_and_debugging.html
 next: 13_wrap_up_and_future.html
 description: "Apply everything you\u2019ve learned by migrating a Docker-based application\
   \ to Podman, including Compose conversion, systemd integration, and rootless configuration."
-percent: 84
+percent: 91
 duration: 5
 date_updated: 2025-05-24
 navigation:
@@ -19,6 +19,8 @@ navigation:
     content:
     - name: Introduction to Podman
       link: 01_intro_to_podman.html
+    - name: 'Video: Podman vs Docker'
+      link: 01_video.html
     - name: Docker vs Podman Architecture
       link: 02_docker_vs_podman_architecture.html
     - name: Installing Podman

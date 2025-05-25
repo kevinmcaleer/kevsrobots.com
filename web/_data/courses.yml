@@ -6,7 +6,7 @@
     everything from  architectural differences and CLI compatibility to unique Podman
     features like systemd integration  and Kubernetes support. Perfect for developers
     and DevOps professionals looking to modernize  their container workflows.
-  duration: 0h 26m
+  duration: 0h 28m
   groups:
   - devops
   - containers

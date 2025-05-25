@@ -9,7 +9,7 @@ previous: 03_installing_podman.html
 next: 05_podman_unique_features.html
 description: Learn how to use Podman with Docker-compatible commands and explore its
   CLI for managing containers, images, and volumes.
-percent: 28
+percent: 35
 duration: 3
 date_updated: 2025-05-24
 navigation:
@@ -19,6 +19,8 @@ navigation:
     content:
     - name: Introduction to Podman
       link: 01_intro_to_podman.html
+    - name: 'Video: Podman vs Docker'
+      link: 01_video.html
     - name: Docker vs Podman Architecture
       link: 02_docker_vs_podman_architecture.html
     - name: Installing Podman

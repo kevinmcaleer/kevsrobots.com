@@ -5,11 +5,11 @@ author: Kevin McAleer
 type: page
 cover: assets/podman02.jpg
 date: 2025-05-24
-previous: 01_intro_to_podman.html
+previous: 01_video.html
 next: 03_installing_podman.html
 description: Understand the key architectural differences between Docker and Podman,
   and why Podman's design offers improved security and flexibility.
-percent: 14
+percent: 21
 duration: 3
 date_updated: 2025-05-24
 navigation:
@@ -19,6 +19,8 @@ navigation:
     content:
     - name: Introduction to Podman
       link: 01_intro_to_podman.html
+    - name: 'Video: Podman vs Docker'
+      link: 01_video.html
     - name: Docker vs Podman Architecture
       link: 02_docker_vs_podman_architecture.html
     - name: Installing Podman

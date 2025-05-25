@@ -9,7 +9,7 @@ previous: 04_cli_compatibility_and_commands.html
 next: 06_managing_containers_and_images.html
 description: "Discover the powerful features that set Podman apart from Docker \u2014\
   \ including rootless containers, systemd integration, and pods."
-percent: 35
+percent: 42
 duration: 3
 date_updated: 2025-05-24
 navigation:
@@ -19,6 +19,8 @@ navigation:
     content:
     - name: Introduction to Podman
       link: 01_intro_to_podman.html
+    - name: 'Video: Podman vs Docker'
+      link: 01_video.html
     - name: Docker vs Podman Architecture
       link: 02_docker_vs_podman_architecture.html
     - name: Installing Podman

@@ -9,7 +9,7 @@ previous: 08_docker_compose_vs_podman_compose.html
 next: 10_podman_in_production.html
 description: "Learn how to use Podman with Kubernetes \u2014 including generating\
   \ Kubernetes YAML files, running them locally, and preparing workloads for production."
-percent: 63
+percent: 70
 duration: 3
 date_updated: 2025-05-24
 navigation:
@@ -19,6 +19,8 @@ navigation:
     content:
     - name: Introduction to Podman
       link: 01_intro_to_podman.html
+    - name: 'Video: Podman vs Docker'
+      link: 01_video.html
     - name: Docker vs Podman Architecture
       link: 02_docker_vs_podman_architecture.html
     - name: Installing Podman

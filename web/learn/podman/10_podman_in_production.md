@@ -9,7 +9,7 @@ previous: 09_podman_and_kubernetes.html
 next: 11_troubleshooting_and_debugging.html
 description: Learn how to use Podman in production environments, including rootless
   services, systemd integration, monitoring, and best practices.
-percent: 70
+percent: 77
 duration: 3
 date_updated: 2025-05-24
 navigation:
@@ -19,6 +19,8 @@ navigation:
     content:
     - name: Introduction to Podman
       link: 01_intro_to_podman.html
+    - name: 'Video: Podman vs Docker'
+      link: 01_video.html
     - name: Docker vs Podman Architecture
       link: 02_docker_vs_podman_architecture.html
     - name: Installing Podman

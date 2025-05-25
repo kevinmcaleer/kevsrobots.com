@@ -9,7 +9,7 @@ previous: 06_managing_containers_and_images.html
 next: 08_docker_compose_vs_podman_compose.html
 description: "Learn how to use Podman\u2019s built-in support for pods to group and\
   \ manage multiple containers with shared networking \u2014 just like Kubernetes."
-percent: 49
+percent: 56
 duration: 3
 date_updated: 2025-05-24
 navigation:
@@ -19,6 +19,8 @@ navigation:
     content:
     - name: Introduction to Podman
       link: 01_intro_to_podman.html
+    - name: 'Video: Podman vs Docker'
+      link: 01_video.html
     - name: Docker vs Podman Architecture
       link: 02_docker_vs_podman_architecture.html
     - name: Installing Podman

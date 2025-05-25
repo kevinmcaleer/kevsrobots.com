@@ -19,6 +19,7 @@
         name: Getting Started
         content:
           - 01_intro_to_podman.md
+          - 01_video.md
           - 02_docker_vs_podman_architecture.md
           - 03_installing_podman.md
     - section:
