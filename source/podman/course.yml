@@ -5,9 +5,8 @@
   layout: course
   cover: assets/cover.jpg
   groups:
-    - devops
-    - containers
-    - podman
+    - raspberrypi
+    - docker
   description: >-
     Learn how to transition from Docker to Podman and unlock better container workflows 
     with rootless and daemonless architecture. This hands-on course covers everything from 

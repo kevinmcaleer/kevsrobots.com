@@ -8,9 +8,8 @@
     and DevOps professionals looking to modernize  their container workflows.
   duration: 0h 28m
   groups:
-  - devops
-  - containers
-  - podman
+  - raspberrypi
+  - docker
   link: /learn/podman/01_intro_to_podman.html
   name: From Docker to Podman
 - author: Kevin McAleer
@@ -296,6 +295,20 @@
   - pico
   link: /learn/intermediate_micropython/01_intro.html
   name: Intermediate level MicroPython
+- author: Kevin McAleer
+  cover: /learn/k3s/assets/cover.jpg
+  date_published: 2025-06-01
+  description: "Learn how to build your own lightweight Kubernetes cluster using K3s\
+    \ and Raspberry Pi. This hands-on course will guide you through setup, configuration,\
+    \ networking, persistent storage, and deploying real workloads \u2014 all on affordable\
+    \ single-board computers. Ideal for homelabbers, IoT developers, and anyone curious\
+    \ about Kubernetes at the edge."
+  duration: 0h 36m
+  groups:
+  - docker
+  - raspberrypi
+  link: /learn/k3s/01_intro.html
+  name: Running K3s on Raspberry Pi
 - author: Kevin McAleer
   cover: /learn/bottango/assets/cover.jpg
   date_published: 2025-05-10
