@@ -5,33 +5,8 @@
 <div class="col-md-9 col-12">
     <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
         {% for post in posts limit:4 %}
-        <div class="col">
-        <div class="card p-0 h-100 border-0 card-hover shadow-hover">
-        <a href="{{ post.url }}">
-            <img src="{{ post.cover }}" class="card-img-top" alt="{{post.title}}"></a>
-    
-        <div class="card-body">
-        <h5 class="card-title text-truncate-2-lines">{{ post.title }}</h5>
-        <p class="card-text text-truncate-4-lines">{{ post.excerpt }}</p>
-        <div class="row">
-            <div class="row">
-        <p class="card-text small">{{ post.date | date: "%-d %B %Y" }} 
-            by
-            {{ post.author }} </p>
-            </div>
-        <div class="m-0 px-2">
-            {% assign tags = post.tags %}
-            {% for tag in tags %}
-            <a class="badge bg-ocre small m-1 text-decoration-none">{{tag}}</a>
-            {% endfor %}
-        </div>
-        </div> <!-- row -->
-        </div> <!-- col-md-8 -->
-        <div class="card-footer">
-            <a class="btn btn-primary" href="{{post.url}}">Read</a>
-        </div>
-        </div> <!-- card -->
-    </div> <!-- col -->
+        {% include card.html cardtitle=post.title description=post.description img=post.cover link=post.url date=post.date author=post.author tags=post.tags tl="1" dl="3" cols=4 noborder=true small_title=true type="blog" %}
+     
         {% endfor %}
         </div>
 </div>
