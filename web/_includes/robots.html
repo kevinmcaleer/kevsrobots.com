@@ -2,19 +2,8 @@
 
 <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
 {% for item in robots %}
-<div class="col">
-<div class="card my-3 bg-light h-100 border-0 card-hover hover-shadow">
-    <a href="{{item.link}}"><img src="{{item.cover}}" class="card-img-top" alt="cover image for {{item.name}}"></a>
-    <div class="card-body">
-        <h5 class="card-title">
-            {{ item.name}}
-        </h5>
-        <p class="card-text small text-mute">{{item.description}}</p>
-    </div>   
-    <div class="card-footer border-0 bg-light">
-        <a href="{{item.link}}" class="btn btn-primary">Read More</a>
-    </div> 
-</div>
-</div>
+
+{% include card.html cardtitle=item.name description=item.description link=item.link img=item.cover noborder=true date=item.date dl="2" tl="1" %}
+
 {% endfor %}
 </div>

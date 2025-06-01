@@ -8,21 +8,25 @@
   cover: /assets/img/blog/lidarbot/cover.jpg
   description: "Build a LidarBot with a Raspberry Pi Pico W"
   date: 2025/04/26
+  hero: /assets/img/blog/lidarbot/hero.png
 - name: SMARS GamePad
   link: /blog/best-arduino-robot.html
   cover: /assets/img/blog/best_arduino/cover.jpg
   description: "Control SMARS with a GamePad"
   date: 2025/03/23
+  hero: /assets/img/blog/best_arduino/hero.png
 - name: SMARS Quad
   link: /blog/pycharm.html
   cover: /assets/img/blog/pycharm/cover.jpg
   description: "SMARSLab updates"
   date: 2025/03/15
+  hero: /assets/img/blog/pycharm/hero.png
 - name: BurgerBot and GamePad
   link: /blog/gamepad2.html
   cover: /assets/img/blog/gamepad2/cover.jpg
   description: "Build a Raspberry Pi Pico 2 powered bluetooth remote control for your robot"
   date: 2025/01/26
+  hero: /assets/img/blog/gamepad2/hero.png
 - name: High Five Bot
   link: /blog/high-five-bot.html
   cover: /assets/img/blog/high_five_bot/cover.jpg
@@ -33,16 +37,19 @@
   cover: /projects/burgerbot/assets/img/cover.jpg
   description: Creating a custom PCB for Burgerbot
   date: 2024/12/04
+  hero: /projects/burgerbot/assets/img/hero.png
 - name: C2Pi-O
   link: /blog/c2pi_o.html
   cover: /assets/img/blog/c2pio/cover.jpg
   description: C2Pi-O - the 2 Pi Camera holder
   date: 2024/10/20
+  hero: /assets/img/blog/c2pio/hero.png
 - name: Woodbot
   link: /blog/woodbot.html
   cover: /assets/img/blog/woodbot/cover.jpg
   description: Build a Laser Cut Robot
   date: 2024/09/28
+  herp: /assets/img/blog/woodbot/hero.png
 - name: Scrawly Wally
   link: /learn/scrawly_wally/
   cover: /learn/scrawly_wally/assets/cover.png
@@ -58,11 +65,13 @@
   cover: /assets/img/blog/hprobotsotto/cover.png
   description: The evolution of the Otto DIY robot
   date: 2024/07/21
+  hero: /assets/img/blog/hprobotsotto/hero.png
 - name: Arduino Alvik
   link: /blog/alvik.html
   cover: /assets/img/blog/alvik/cover.png
   description: Arduino's latest Robot kit
   date: 2024/05/26
+  hero: /assets/img/blog/alvik/hero.png
 - name: Buddy Jr.
   link: /blog/buddy_jr.html
   cover: /assets/img/blog/buddyjr/cover.png

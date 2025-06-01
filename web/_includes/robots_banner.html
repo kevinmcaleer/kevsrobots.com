@@ -1,0 +1,162 @@
+<div class="position-relative">
+  <!-- Left Arrow -->
+  <button class="scroll-btn scroll-left btn btn-light shadow" onclick="scrollRobots(-1)">
+    &larr;
+  </button>
+
+  <!-- Scrollable Robot Banner -->
+  <div id="robot-banner" class="d-flex overflow-auto px-2 robot-dock">
+    {% for robot in site.data.robots %}
+      <a href="{{ robot.link | default: '#' }}" class="dock-item text-decoration-none text-center">
+        <div class="dock-img-wrapper">
+            {% if robot.hero %}
+                <img src="{{ robot.hero }}" alt="{{ robot.name }}" class="dock-img">
+                {% else %}
+                <img src="{{ robot.cover }}" alt="{{ robot.name }}" class="dock-img">
+            {% endif %}
+
+        </div>
+        <small class="robot-title text-muted d-block mt-1">{{ robot.name }}</small>
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Right Arrow -->
+  <button class="scroll-btn scroll-right btn btn-light shadow" onclick="scrollRobots(1)">
+    &rarr;
+  </button>
+</div>
+
+
+<style>
+   .robot-dock {
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+#robot-banner {
+  padding-top: 2rem; /* Space for the scroll buttons */
+  overflow-x: auto;  /* horizontal scroll only */
+  overflow-y: visible;  /* allow vertical growth from hover */
+}
+
+
+.robot-dock {
+  align-items: flex-start; /* Important for vertical alignment */
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.dock-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px; /* Or whatever your image width is */
+  transform-origin: bottom center;
+}
+
+.dock-img-wrapper {
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease;
+}
+
+.dock-img-wrapper,
+.robot-title {
+  transition: transform 0.25s ease;
+}
+
+.dock-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+
+.robot-title {
+  height: 2.5em; /* Fixed height for 2 lines */
+  line-height: 1.2em;
+  font-size: 0.75rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+
+.dock-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+  transition: transform 0.25s ease;
+}
+
+.dock-img-wrapper {
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.25s ease;
+}
+
+.dock-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+
+/* Hover grow effect */
+.dock-item:hover{
+  transform: scale(1.5);
+  z-index: 10;
+}
+
+.dock-item:hover {
+  transform: scale(1.5); /* Scale the whole item, not just image */
+  z-index: 10;
+}
+
+/* Optional: shrink others slightly */
+.robot-dock .dock-item:not(:hover) .dock-img-wrapper {
+  transform: scale(0.9);
+  opacity: 0.8;
+}
+
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.5rem;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.scroll-left {
+  left: 0.25rem;
+}
+
+.scroll-right {
+  right: 0.25rem;
+}
+
+</style>
+
+<script>
+  function scrollRobots(direction) {
+    const container = document.getElementById('robot-banner');
+    const scrollAmount = container.offsetWidth * 0.6; // scroll 60% of the visible width
+    container.scrollBy({
+      left: direction * scrollAmount,
+      behavior: 'smooth'
+    });
+  }
+</script>
