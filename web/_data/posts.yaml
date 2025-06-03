@@ -20,6 +20,9 @@ posts:
 - title: Making a Custom PCB for BurgerBot
   url: /2024-12-05-burgerbot-pcb.md
   date: 2024-12-05
+- title: Podman vs Docker
+  url: /2025-05-24-podman-vs-docker.md
+  date: 2025-05-24
 - title: Now Ad-Free
   url: /2024-04-29-ad-free.md
   date: 2024-04-29
@@ -65,6 +68,9 @@ posts:
 - title: High Five Bot
   url: /2024-12-22-high-five-bot.md
   date: 2024-12-21
+- title: MicroPython Robotics
+  url: /2025-05-11-micropython-robotics.md
+  date: 2025-05-11
 - title: Spooky Scary Skeleton
   url: /2022-10-09-spooky-scary-skeleton.md
   date: 2022-10-09
