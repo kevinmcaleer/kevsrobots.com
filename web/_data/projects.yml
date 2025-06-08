@@ -1,3 +1,10 @@
+- name: Thinkman
+  link: /projects/thinkman/index.html
+  cover: /projects/thinkman/assets/cover.jpg
+  discover: true
+  description: "Build your own portable, offline AI using a Raspberry Pi 5"
+  date: 2025-06-08
+  tags: [Raspberry Pi, AI]
 - name: Snaszy NAS
   link: /blog/snaszy_nas.html
   cover: /assets/img/blog/snaszy_nas/cover.jpg
