@@ -1396,3 +1396,14 @@ table .w-30 {
 .bg-ocre {
   background-color: #ffbf002c;
 }
+
+.small-container {
+  width: 800px !important;
+  max-width: 800px !important;
+  margin: auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  // box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+}

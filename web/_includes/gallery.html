@@ -3,16 +3,18 @@
 {% assign cols = include.cols | default: 3 %}
 {% assign links = include.links | split: ',' %}
 {% assign descriptions = include.descriptions | split: ',' %}
+{% assign bgcolor = include.bg_color %}
 {% comment %}
 
 use-links if you want to use the included links rather than links to the images
+bg_color if you want to set a background color for the gallery
 
 {% endcomment %}
 
 <div class="gallery" style="display: grid; grid-template-columns: repeat({{ cols }}, 1fr); gap: 10px;">
     {% for image in images %}
         {% assign index = forloop.index0 %}
-        <div class="card rounded-3 card-hover card-shadow">
+        <div class="card rounded-3 card-hover card-shadow bgcolor {%if include.noborder %}border-0{%endif%}">
             {%if include.use-links %}
             <a href="{{links[index]}}" class="card-img-top w-100">
             {% else %}
