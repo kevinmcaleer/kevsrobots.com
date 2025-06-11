@@ -18,6 +18,7 @@ tags:
  - ai
 groups:
  - raspberrypi
+ - ai
 code:
  - https://www.github.com/kevinmcaleer/thinkman
 stl:
