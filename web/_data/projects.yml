@@ -1,3 +1,10 @@
+- name: Tiny FX
+  link: /blog/tinyfx.html
+  cover: /assets/img/blog/tinyfx/cover.jpg
+  discover: true
+  description: "Bring your LEGO kits to life with Tiny FX"
+  date: 2025-06-13
+  tags: [LEGO, Pico, MicroPython]
 - name: Thinkman
   link: /projects/thinkman/index.html
   cover: /projects/thinkman/assets/cover.jpg
