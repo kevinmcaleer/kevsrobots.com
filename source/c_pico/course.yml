@@ -1,0 +1,42 @@
+- name: Getting Started with C on the Raspberry Pi Pico
+  author: Kevin McAleer
+  date_created: 2025-06-15
+  date_published: 2025-06-16
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+    - raspberrypi
+    - pico
+    - c-programming
+    - beginner
+  description: >-
+    Learn how to program the Raspberry Pi Pico using the C programming language. 
+    This beginner-friendly course covers the fundamentals of C, how to set up your development environment, 
+    and how to write simple programs that run on real hardware. By the end of the course, you'll have a 
+    solid grasp of programming basics and will create your first hardware project; a blinking LED.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 01_intro.md
+    - section:
+        name: Programming Fundamentals
+        content:
+          - 02_what_is_c.md
+          - 03_variables_and_types.md
+          - 04_conditionals_and_loops.md
+          - 05_functions.md
+    - section:
+        name: Raspberry Pi Pico Setup
+        content:
+          - 06_setting_up_toolchain.md
+          - 07_first_program.md
+    - section:
+        name: GPIO Basics
+        content:
+          - 08_gpio_basics.md
+          - 09_blinking_led.md
+    - section:
+        name: Summary and Next Steps
+        content:
+          - 10_summary.md

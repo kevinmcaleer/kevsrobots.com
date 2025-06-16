@@ -1,0 +1,45 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('pre > code').forEach(codeBlock => {
+    const button = document.createElement('button');
+    button.className = 'copy-code-button';
+    button.type = 'button';
+    button.innerText = '📋';
+    button.title = 'Copy to clipboard';
+
+
+    const pre = codeBlock.parentNode;
+    pre.style.position = 'relative';
+    pre.appendChild(button);
+
+    button.addEventListener('click', async () => {
+      const code = codeBlock.innerText;
+      if (!navigator.clipboard) {
+        // Fallback
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = code;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          button.innerText = '✅';
+        } catch (err) {
+          console.error('Fallback copy failed:', err);
+          button.innerText = '❌';
+        }
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(code);
+        button.innerText = '✅';
+        setTimeout(() => button.innerText = '📋', 2000);
+      } catch (err) {
+        console.error('Clipboard write failed:', err);
+        button.innerText = '❌';
+      }
+    });
+  });
+});
+</script>

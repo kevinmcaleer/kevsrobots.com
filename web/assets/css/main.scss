@@ -1396,3 +1396,23 @@ table .w-30 {
 .bg-ocre {
   background-color: #ffbf002c;
 }
+
+.copy-code-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 6px;
+  font-size: 1em;
+  background: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.copy-code-button:hover {
+  opacity: 1;
+}
+pre {
+  position: relative;
+}

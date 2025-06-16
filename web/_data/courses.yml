@@ -83,6 +83,22 @@
   link: /learn/redis/01_introduction.html
   name: Using Redis with Python
 - author: Kevin McAleer
+  cover: /learn/c_pico/assets/cover.jpg
+  date_published: 2025-06-16
+  description: Learn how to program the Raspberry Pi Pico using the C programming
+    language.  This beginner-friendly course covers the fundamentals of C, how to
+    set up your development environment,  and how to write simple programs that run
+    on real hardware. By the end of the course, you'll have a  solid grasp of programming
+    basics and will create your first hardware project; a blinking LED.
+  duration: 0h 20m
+  groups:
+  - raspberrypi
+  - pico
+  - c-programming
+  - beginner
+  link: /learn/c_pico/01_intro.html
+  name: Getting Started with C on the Raspberry Pi Pico
+- author: Kevin McAleer
   cover: /learn/scrawly_wally//assets/cover.png
   date_published: 2024-08-02
   description: Learn how to build your own wall drawing robot using a Raspberry Pi
