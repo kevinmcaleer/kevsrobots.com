@@ -25,7 +25,8 @@
       {% if video.type != "short" %}
       
       {% assign video_img = "https://img.youtube.com/vi/" | append: video.video_id | append: "/0.jpg" %}
-      {% include card.html cardtitle=video.title link=video.video_id img=video_img date=video.published 
+      {% assign video_link = "https://www.youtube.com/watch?v=" | append: video.id %}
+      {% include card.html cardtitle=video.title link=video_link img=video_img date=video.published 
         views=vid.views_str type=vid.type small_title=true noborder=true tl="3" bg_color=pop_color %}
 
     {% endif %}
