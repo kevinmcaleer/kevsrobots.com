@@ -3,7 +3,7 @@ layout: lesson
 title: Summary and Next Steps
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/10.jpg
 date: 2025-06-16
 previous: 09_blinking_led.html
 description: "Wrap up the course, review what you\u2019ve learned, and discover where\
@@ -47,7 +47,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

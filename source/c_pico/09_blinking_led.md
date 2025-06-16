@@ -3,11 +3,11 @@ title: Blinking an LED
 description: Build your first complete hardware project by making an LED blink using the Raspberry Pi Pico and C.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/9.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

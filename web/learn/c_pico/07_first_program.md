@@ -3,7 +3,7 @@ layout: lesson
 title: Your First Program in C
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/7.jpg
 date: 2025-06-16
 previous: 06_setting_up_toolchain.html
 next: 08_gpio_basics.html
@@ -48,7 +48,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Conditionals and Loops
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/4.jpg
 date: 2025-06-16
 previous: 03_variables_and_types.html
 next: 05_functions.html
@@ -48,7 +48,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

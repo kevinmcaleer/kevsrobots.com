@@ -3,11 +3,11 @@ title: Introduction to Programming the Raspberry Pi Pico in C
 description: Welcome to the course! In this lesson, you’ll learn what this course covers and why learning C on the Raspberry Pi Pico is a great place to start.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: assets/1.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

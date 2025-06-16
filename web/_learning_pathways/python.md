@@ -13,6 +13,8 @@ courses:
   - "Data Manipulation with Pandas and Numpy"
   - "OctaPi"
   - "Building a Robot Arm with Raspberry Pi and PCA9685"
+  - "Building User Authentication for Static Sites with FastAPI"
+  - "Mastering Pydantic for Robust Data Validation"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}

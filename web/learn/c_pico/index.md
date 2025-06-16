@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Programming the Raspberry Pi Pico in C
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: assets/1.jpg
 date: 2025-06-16
 next: 02_what_is_c.html
 description: "Welcome to the course! In this lesson, you\u2019ll learn what this course\
@@ -47,7 +47,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

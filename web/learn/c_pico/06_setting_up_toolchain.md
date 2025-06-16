@@ -3,7 +3,7 @@ layout: lesson
 title: Setting Up the Toolchain
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/6.jpg
 date: 2025-06-16
 previous: 05_functions.html
 next: 07_first_program.html
@@ -48,7 +48,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

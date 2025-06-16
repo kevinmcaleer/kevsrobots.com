@@ -3,11 +3,11 @@ title: Variables and Data Types
 description: Learn how to store and manipulate data in C using variables and different data types.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/3.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

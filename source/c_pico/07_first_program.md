@@ -3,11 +3,11 @@ title: Your First Program in C
 description: Write and upload your very first C program for the Raspberry Pi Pico – a custom "Hello, world!" using the onboard serial console.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/7.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

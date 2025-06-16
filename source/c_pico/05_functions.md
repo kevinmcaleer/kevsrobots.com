@@ -3,11 +3,11 @@ title: Functions in C
 description: Learn how to organize and reuse code using functions in the C programming language.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/5.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

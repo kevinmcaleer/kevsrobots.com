@@ -3,11 +3,11 @@ title: Conditionals and Loops
 description: Learn how to write programs that make decisions and repeat actions using if-statements, while-loops, and for-loops in C.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/4.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

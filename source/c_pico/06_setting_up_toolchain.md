@@ -3,11 +3,11 @@ title: Setting Up the Toolchain
 description: Learn how to install and configure the tools you need to write, compile, and upload C code to the Raspberry Pi Pico.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/6.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

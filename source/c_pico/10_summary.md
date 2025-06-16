@@ -3,11 +3,11 @@ title: Summary and Next Steps
 description: Wrap up the course, review what you’ve learned, and discover where to go next in your journey with C and the Raspberry Pi Pico.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/10.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

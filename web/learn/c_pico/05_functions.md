@@ -3,7 +3,7 @@ layout: lesson
 title: Functions in C
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/5.jpg
 date: 2025-06-16
 previous: 04_conditionals_and_loops.html
 next: 06_setting_up_toolchain.html
@@ -48,7 +48,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

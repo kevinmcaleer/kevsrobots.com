@@ -3,7 +3,7 @@ layout: lesson
 title: GPIO Basics
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/8.jpg
 date: 2025-06-16
 previous: 07_first_program.html
 next: 09_blinking_led.html
@@ -48,7 +48,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

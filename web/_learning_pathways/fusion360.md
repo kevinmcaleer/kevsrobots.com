@@ -9,6 +9,7 @@ courses:
   - "Build a SMARS Robot in Fusion 360"
   - "Robot Eye Mechanism"
   - "Introduction to FreeCAD for Beginners"
+  - "Mini-Rack 3D Design Tutorial"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}

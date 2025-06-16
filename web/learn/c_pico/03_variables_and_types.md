@@ -3,7 +3,7 @@ layout: lesson
 title: Variables and Data Types
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/3.jpg
 date: 2025-06-16
 previous: 02_what_is_c.html
 next: 04_conditionals_and_loops.html
@@ -48,7 +48,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

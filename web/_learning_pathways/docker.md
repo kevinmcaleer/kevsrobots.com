@@ -10,6 +10,8 @@ courses:
   - "Docker"
   - "Raspberry Pi 5 Cluster with Docker Swarm"
   - "From Docker to Podman"
+  - "Running K3s on Raspberry Pi"
+  - "Mini-Rack 3D Design Tutorial"
 
 ---
 

@@ -3,11 +3,11 @@ title: GPIO Basics
 description: Learn how to control the Raspberry Pi Pico’s GPIO pins using C to turn digital outputs on and off.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/8.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

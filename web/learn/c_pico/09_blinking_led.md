@@ -3,7 +3,7 @@ layout: lesson
 title: Blinking an LED
 author: Kevin McAleer
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/9.jpg
 date: 2025-06-16
 previous: 08_gpio_basics.html
 next: 10_summary.html
@@ -48,7 +48,7 @@ navigation:
 ---
 
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 

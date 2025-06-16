@@ -3,11 +3,11 @@ title: What is C?
 description: Learn what the C programming language is, where it’s used, and why it’s a great choice for embedded systems like the Raspberry Pi Pico.
 layout: lesson
 type: page
-cover: assets/pico-c-cover.jpg
+cover: assets/2.jpg
 date_updated: 2025-06-15
 ---
 
-![Cover](assets/pico-c-cover.jpg){:class="cover"}
+![Cover]({{page.cover}}){:class="cover"}
 
 ---
 
