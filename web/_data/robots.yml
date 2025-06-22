@@ -1,3 +1,9 @@
+- name: Pico Plotter
+  link: /blog/pico-plotter.html
+  cover: /assets/img/blog/pico_plotter/cover.jpg
+  description: A simple drawing robot using a Raspberry Pi Pico
+  date: 2025/06/22
+  hero: /assets/img/blog/pico_plotter/hero.png
 - name: Bottango and Isaaca
   link: /blog/bottango.html
   cover: /assets/img/blog/bottango/cover.jpg
