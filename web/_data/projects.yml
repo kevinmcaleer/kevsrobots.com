@@ -1,3 +1,10 @@
+- name: Pico Plotter
+  link: /projects/pico_plotter/index.html
+  cover: /projects/pico_plotter/assets/cover.jpg
+  discover: true
+  description: "Build a 3d printable, Raspberry Pi Pico and MicroPython powered plotter"
+  date: 2025-06-26
+  tags: [3D Printing, MicroPython, Pico]
 - name: Tiny FX
   link: /blog/tinyfx.html
   cover: /assets/img/blog/tinyfx/cover.jpg
