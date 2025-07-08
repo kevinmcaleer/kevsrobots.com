@@ -30,6 +30,6 @@ code:
 
 The **Pico Plotter** is a fun project that allows you to create your own drawing robot using the Raspberry Pi Pico and MicroPython. This project guides you through the steps to build a simple yet effective plotter that can draw shapes and patterns.
 
-The full write up for this project is available here: </projects/pico_plotter/index.html>
+The full write up for this project is available here: <https://www.kevsrobots.com/projects/pico_plotter/index.html>
 
 ---
