@@ -148,12 +148,21 @@ layout: default
             <h2>3D Models</h2>
             <p>Here are the 3D printable STL files:</p>
             <h3>STL List</h3>
-            <ul>
+            <table class="table table-stripped mt-3 rounded-3">
+                <tr>
+                    <th>File</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            
                 {% for stl in page.stl %}
-                <li><a href="{{stl.link}}">{{stl.name}}</a></li>
+                <tr>
+                {% assign filename = stl.link | split: '/' | last %}
+                <td><a href="{{stl.link}}">{{filename}}</a></td><td>{{stl.name}}</td><td>{{stl.description}}</td>
+                </tr>
                 {% endfor %}
-            </ul>
-
+            
+            </table>
             <div class="row row-cols-lg-2 row-cols-sm-1 row-cols-1 g-3" >
                 {% assign count = 1 %}
                 {% for stl in page.stl %}  
@@ -180,7 +189,7 @@ layout: default
                 {% assign filename = stl.link | split: '/' | last %}
           
                 <h5>{{stl.name}}</h5>
-                
+
                 <p>{{stl.description}}</p>
                 <a href="{{stl.link}}" class=""><button class="btn btn-outline-dark">Download <code>{{filename}}</code></button></a>
             </div><!-- card body -->
