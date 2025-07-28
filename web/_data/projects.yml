@@ -1,3 +1,10 @@
+- name: PiKon II
+  link: /blog/pikon2.html
+  cover: /assets/img/blog/pikon2/cover.jpg
+  discover: true
+  description: "Build your own Raspberry Pi Camera with the PiKon II"
+  date: 2025-07-27
+  tags: [Raspberry Pi, Python, 3D Printing]
 - name: Pico Plotter
   link: /projects/pico_plotter/index.html
   cover: /projects/pico_plotter/assets/cover.jpg

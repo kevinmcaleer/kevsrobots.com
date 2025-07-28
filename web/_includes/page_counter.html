@@ -1,0 +1,24 @@
+<a href="https://page_count.kevsrobots.com/stats"><div id="visit-count" style="font-size: 0.9em; color: #fff; text-align: center; margin-top: 2rem;">
+  Loading visits...
+</div>
+</a>
+
+<script>
+(function() {
+  const endpoint = 'https://page_count.kevsrobots.com/';
+  const currentURL = window.location.href;
+
+  fetch(`${endpoint}?url=${encodeURIComponent(currentURL)}`)
+    .then(response => response.json())
+    .then(data => {
+      const visits = data.visits || '?';
+      document.getElementById('visit-count').textContent =
+        `This page has been visited ${visits} time${visits === 1 ? '' : 's'}.`;
+    })
+    .catch(err => {
+      console.warn("Visit tracker failed:", err);
+      document.getElementById('visit-count').textContent =
+        "Visit count unavailable.";
+    });
+})();
+</script>
