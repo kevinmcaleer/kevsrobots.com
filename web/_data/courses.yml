@@ -349,6 +349,16 @@
   link: /learn/pandas_and_numpy/01_overview.html
   name: Data Manipulation with Pandas and Numpy
 - author: Kevin McAleer
+  cover: /learn/obsidian/assets/cover.jpg
+  date_published: 2025-08-24
+  description: Learn how to use Obsidian for note-taking and knowledge management.
+  duration: 0h 26m
+  groups:
+  - obsidian
+  - raspberrypi
+  link: /learn/obsidian/00_intro.html
+  name: Obsidian
+- author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
   date_published: 2022-12-04
   description: Learn how to use the new Learning Platform

@@ -94,15 +94,15 @@
   link: https://www.makerscentral.co.uk
   status: confirmed
 - event: Makers Faire Rome 2025
-  start: "tbc"
-  end: "tbc"
+  start: "2025-10-17"
+  end: "2025-10-19"
   location: "Rome, Italy"
   link: https://www.makerfairerome.eu
   status: expected
-- event: SMRRF 2025
-  start: "tbc"
-  end: "tbc"
-  location: "tbc"
+- event: SMRRF 2026
+  start: "2026-03-07"
+  end: "2026-03-08"
+  location: "The Dalton Building, Manchester, Uk"
   link: https://www.sanjaymortimerfoundation.org/smrrf25
   status: expected
 - event: CamJam Raspberry Pi Birthday Party 2025

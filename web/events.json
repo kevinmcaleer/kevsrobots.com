@@ -40,8 +40,8 @@
         "link": "https://www.makerfairerome.eu/",
         "status": "closed",
         "image": "/assets/img/events/makerfairerome_2024.jpg",
-        "latitude": "41.8100626",
-        "longitude": "12.319237277213883"
+        "latitude": "41.8100197",
+        "longitude": "12.3191269"
     },
     {
         "event": "Opensauce 2024",
@@ -63,7 +63,7 @@
         "status": "closed",
         "image": "/assets/img/events/liverpoolmakefest_2024.jpg",
         "latitude": "53.4071991",
-        "longitude": "-2.99168"
+        "longitude": "-2.9916800"
     },
     {
         "event": "Maker Faire Rome 2024",
@@ -73,8 +73,8 @@
         "link": "https://www.makerfairerome.eu/",
         "status": "closed",
         "image": "/assets/img/events/makerfairerome_2024.jpg",
-        "latitude": "41.86950385",
-        "longitude": "12.474698275356998"
+        "latitude": "41.8695039",
+        "longitude": "12.4746983"
     },
     {
         "event": "Makers Central 2024",
@@ -117,8 +117,8 @@
         "link": "https://www.emfcamp.org/",
         "status": "closed",
         "image": "/assets/img/events/emfcamp2024.jpg",
-        "latitude": "52.02970015",
-        "longitude": "-2.3876172900498647"
+        "latitude": "52.0297001",
+        "longitude": "-2.3876173"
     },
     {
         "event": "Open Hardware Summit 2025",
@@ -127,8 +127,8 @@
         "location": "University of Edinburgh, UK",
         "link": "https://2025.oshwa.org/",
         "status": "confirmed",
-        "latitude": "55.94407645",
-        "longitude": "-3.1883735563964555"
+        "latitude": "55.9440764",
+        "longitude": "-3.1883736"
     },
     {
         "event": "Open Sauce 2025",
@@ -147,17 +147,37 @@
         "location": "NEC, Birmingham, UK",
         "link": "https://www.makerscentral.co.uk",
         "status": "confirmed",
-        "latitude": "52.453843199999994",
-        "longitude": "-1.7175496552307064"
+        "latitude": "52.4538432",
+        "longitude": "-1.7175497"
     },
     {
         "event": "Makers Faire Rome 2025",
-        "start": "tbc",
-        "end": "tbc",
+        "start": "2025-10-17",
+        "end": "2025-10-19",
         "location": "Rome, Italy",
         "link": "https://www.makerfairerome.eu",
         "status": "expected",
         "latitude": "41.8933203",
         "longitude": "12.4829321"
+    },
+    {
+        "event": "CamJam Raspberry Pi Birthday Party 2025",
+        "start": "2025-03-01",
+        "end": "2025-03-01",
+        "location": "Cambridge, UK",
+        "link": "https://camjam.me/",
+        "status": "confirmed",
+        "latitude": "52.2055314",
+        "longitude": "0.1186637"
+    },
+    {
+        "event": "Liverpool Makefest 2025",
+        "link": "https://liverpoolmakefest.org/",
+        "start": "2025-07-05",
+        "end": "2025-07-05",
+        "location": "Liverpool, UK",
+        "status": "confirmed",
+        "latitude": "53.4071991",
+        "longitude": "-2.9916800"
     }
 ]

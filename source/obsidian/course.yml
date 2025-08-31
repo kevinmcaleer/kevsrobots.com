@@ -1,0 +1,40 @@
+- name: Obsidian
+  author: Kevin McAleer
+  date_created: 2025-08-24
+  date_published: 2025-08-24
+  cover: assets/cover.jpg
+  groups:
+      - obsidian
+      - raspberrypi
+  description: >- 
+     Learn how to use Obsidian for note-taking and knowledge management.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Getting Started with Obsidian
+      content:
+      - 01_installing.md
+      - 02_first_vault.md
+  - section:
+      name: Taking Notes and Organization
+      content:
+      - 03_creating_notes.md
+      - 04_tagging_notes.md
+      - 05_linking_notes.md
+  - section:
+      name: Advanced Features
+      content:
+      - 06_canvas.md
+      - 07_tasks.md
+      - 08_dataview_and_bases.md
+      - 09_properties.md
+      - 12_graph_view.md
+  - section:
+      name: Markdown in Obsidian
+      content:
+      - 10_markdown_in_obsidian.md
+      - 11_markdown_course_link.md
+

@@ -50,6 +50,9 @@ posts:
 - title: How to setup a Phew! Access Point
   url: /2022-09-04-phew-access-point.md
   date: 2022-09-04
+- title: Pikon II, The Ultimate DIY Raspberry Pi Camera!
+  url: /2025-07-27-pikon2.md
+  date: 2025-07-25
 - title: Installing and Using DeepSeek-R1:1.5 on a Raspberry Pi with Docker
   url: /2025-01-28-deepseek-on-pi.md
   date: 2025-01-26
@@ -116,6 +119,9 @@ posts:
 - title: Operation Pico
   url: /2025-01-11-operation-pico.md
   date: 2025-01-11
+- title: How to Keep your Raspberry Pi happy
+  url: /2025-08-30-pi_maintenance.md
+  date: 2025-08-30
 - title: Cyberglasses
   url: /2023-01-16-cyberglasses.md
   date: 2023-01-16
@@ -134,6 +140,9 @@ posts:
 - title: PicoTico
   url: /2024-03-03-pico-tico.md
   date: 2024-03-03
+- title: Pico Plotter
+  url: /2025-06-22-pico_plotter.md
+  date: 2025-06-22
 - title: Pi 10 Inch Mini-rack
   url: /2025-02-04-mini-rack.md
   date: 2025-02-04
@@ -272,6 +281,9 @@ posts:
 - title: 3 parts are now available!
   url: /2022-10-12-build-your-own-ai-series.md
   date: 2022-10-12
+- title: How to Install Pi-Apps on a Raspberry Pi
+  url: /2025-08-24-install_pi_apps.md
+  date: 2025-08-24
 - title: Bottango and Isaaca
   url: /2025-05-04-bottango.md
   date: 2025-05-04
