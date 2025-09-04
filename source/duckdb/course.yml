@@ -1,0 +1,43 @@
+- name: DuckDB - Fast, free analytics
+  author: Kevin McAleer
+  date_created: 2025-09-04
+  date_published: 2025-09-04
+  layout: course
+  cover: assets/cover.jpg
+  description: >-
+      Learn how to use DuckDB, the fast, free, and embeddable database designed for analytics.
+  groups:
+    - databases
+    - python
+    - raspberry pi
+  content:
+  - section:
+      name: Introduction
+      content:
+      - 00_intro.md
+      - quickstart.md
+      - troubleshooting.md
+  - section:
+      name: Getting Started with DuckDB
+      content:
+      - 01_installing.md
+      - 02_basic_queries.md
+      - 03_advanced_features.md
+  - section:
+      name: Integrating DuckDB with Python
+      content:
+      - 04_python_integration.md
+      - 05_data_analysis.md
+  - section:
+      name: Datalakes, Parquet, and Performance
+      content:
+      - 06_datalakes.md
+      - 07_parquet.md
+      - 08_performance_tuning.md
+  - section:
+      name: Conclusion and Next Steps
+      content:
+      - 09_conclusion.md
+      - 10_additional_resources.md
+      - 11_mini_capstone.md
+

@@ -6,7 +6,7 @@
     everything from  architectural differences and CLI compatibility to unique Podman
     features like systemd integration  and Kubernetes support. Perfect for developers
     and DevOps professionals looking to modernize  their container workflows.
-  duration: 0h 28m
+  duration: 1h 2m
   groups:
   - raspberrypi
   - docker
@@ -17,7 +17,7 @@
   date_published: 2024-01-24
   description: Learn how to build static websites using Jekyll, from basic setup to
     advanced features.
-  duration: 0h 16m
+  duration: 0h 38m
   groups:
   - jekyll
   - website development
@@ -28,7 +28,7 @@
   date_published: 2024-01-21
   description: Learn how to use Docker to build and deploy applications in a containerised
     environment.
-  duration: 0h 22m
+  duration: 0h 54m
   groups:
   - docker
   link: /learn/docker/00_intro.html
@@ -38,7 +38,7 @@
   date_published: 2023-01-07
   description: Learning ROS with me, is a course that will teach you how to use ROS2
     on Raspberry Pi 4.
-  duration: 0h 38m
+  duration: 1h 12m
   groups:
   - ros
   - raspberry pi
@@ -54,7 +54,7 @@
     programming with Python, to constructing and controlling a 4-servo robot arm.
     Perfect for beginners and enthusiasts alike, this course will guide you through
     each step with practical examples and hands-on projects.
-  duration: 0h 24m
+  duration: 1h 8m
   groups:
   - robotics
   - raspberry pi
@@ -66,7 +66,7 @@
   date_published: 2023-07-20
   description: Get started with Python programming, learn why you should  learn Python
     and how to setup your Python environment.
-  duration: 0h 36m
+  duration: 1h 20m
   groups:
   - python
   link: /learn/python/01_intro.html
@@ -75,7 +75,7 @@
   cover: /learn/redis/assets/redis-cover.jpg
   date_published: 2023-04-12
   description: Learn how to use Redis with Python to build fast, scalable applications.
-  duration: 0h 20m
+  duration: 1h 0m
   groups:
   - redis
   - python
@@ -90,7 +90,7 @@
     set up your development environment,  and how to write simple programs that run
     on real hardware. By the end of the course, you'll have a  solid grasp of programming
     basics and will create your first hardware project; a blinking LED.
-  duration: 0h 20m
+  duration: 0h 50m
   groups:
   - raspberrypi
   - pico
@@ -105,7 +105,7 @@
     Zero 2 W, stepper motors, and a gondola with a marker.  This course covers the
     essential steps from assembling the robot, installing the software, and creating
     your first drawing.
-  duration: 0h 22m
+  duration: 0h 28m
   groups:
   - raspberry pi
   - robotics
@@ -119,7 +119,7 @@
     use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll.
     From the basics of Markdown to deploying your site, you'll learn everything you
     need to get started.
-  duration: 0h 20m
+  duration: 0h 40m
   groups:
   - markdown
   - jekyll
@@ -135,7 +135,7 @@
     the Pico's ADC, and creating your first temperature monitoring project.  Through
     step-by-step tutorials and practical examples, you'll gain the skills to confidently
     use the Pico for sensor-based projects.
-  duration: 0h 24m
+  duration: 0h 46m
   groups:
   - pico
   - micropython
@@ -147,7 +147,7 @@
   description: This course guides beginners through the process of setting up a Raspberry
     Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage,
     and scale a mini-computing cluster for various projects.
-  duration: 0h 32m
+  duration: 1h 40m
   groups:
   - docker
   - raspberry pi
@@ -158,7 +158,7 @@
   date_published: 2024-03-09
   description: Learning Rust with me, is a course that will teach you how to use Rust
     on Raspberry Pi.
-  duration: 0h 26m
+  duration: 1h 6m
   groups:
   - rust
   - pico
@@ -168,7 +168,7 @@
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19
   description: Learn how to 3d print, build and program a SMARS robot
-  duration: 0h 30m
+  duration: 0h 38m
   groups:
   - smars
   - robotics
@@ -180,7 +180,7 @@
   date_published: 2022-12-04
   description: Get started with MicroPython, What Python is, where to download it
     and which software to use to develop MicroPython code
-  duration: 0h 40m
+  duration: 1h 36m
   groups:
   - micropython
   - python
@@ -194,7 +194,7 @@
     uses two stepper motors to create beautiful drawings.  This course covers the
     essential steps from assembling the robot, installing the software, and creating
     your first drawing.
-  duration: 0h 16m
+  duration: 0h 46m
   groups:
   - robot arm
   - python
@@ -205,7 +205,7 @@
   cover: /learn/mini_rack/assets/cover.jpg
   date_published: 2025-02-16
   description: Design a 3D printable 10" mini-rack for your Raspberry Pi home lab.
-  duration: 0h 20m
+  duration: 0h 26m
   groups:
   - raspberrypi
   - 3ddesign
@@ -219,7 +219,7 @@
     modeling with this powerful, open-source tool. From basic shapes to more complex
     designs, learn the fundamentals of CAD software and how to apply them in your
     own projects.
-  duration: 0h 22m
+  duration: 0h 44m
   groups:
   - freecad
   - 3d modeling
@@ -233,7 +233,7 @@
     reading sensors, and combining hardware to create autonomous and remotely controlled
     robots.  Perfect for makers ready to go beyond GPIO and start building real-world
     robotics projects.
-  duration: 0h 24m
+  duration: 0h 54m
   groups:
   - robotics
   - micropython
@@ -244,7 +244,7 @@
   cover: /learn/smars_code/assets/program_smars.png
   date_published: 2023-09-10
   description: Learn how to program SMARS with Arduino
-  duration: 0h 14m
+  duration: 1h 20m
   groups:
   - smars
   - robotics
@@ -256,7 +256,7 @@
   date_published: 2024-02-18
   description: Learn how to use Crack the Enigma code using a Cluster of Raspberry
     Pis and Python.
-  duration: 0h 14m
+  duration: 0h 42m
   groups:
   - octapi
   - python
@@ -267,7 +267,7 @@
   cover: /learn/sqlite3/assets/database.png
   date_published: 2023-07-15
   description: Learn how to create databases in Python with sqlite3
-  duration: 0h 36m
+  duration: 1h 48m
   groups:
   - python
   - sqlite3
@@ -281,7 +281,7 @@
     Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll
     learn to implement features like registration, login, and user management, integrating
     these with a frontend built with Jekyll.
-  duration: 0h 18m
+  duration: 0h 48m
   groups:
   - fastapi
   - python
@@ -293,7 +293,7 @@
   description: Learn the fundamentals of using the Linux command line on Raspberry
     Pi OS. This course covers essential topics including navigation, file management,
     software installation, system monitoring, networking, and basic scripting.
-  duration: 0h 42m
+  duration: 1h 50m
   groups:
   - linux
   link: /learn/linux_intro/01_intro_terminal.html
@@ -304,7 +304,7 @@
   description: This course is designed to take you from a beginner to an intermediate
     level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules
     and Packages, DocStrings, Interrupts and Timers, and MP Remote.
-  duration: 0h 32m
+  duration: 1h 38m
   groups:
   - micropython
   - python
@@ -319,7 +319,7 @@
     \ networking, persistent storage, and deploying real workloads \u2014 all on affordable\
     \ single-board computers. Ideal for homelabbers, IoT developers, and anyone curious\
     \ about Kubernetes at the edge."
-  duration: 0h 36m
+  duration: 1h 28m
   groups:
   - docker
   - raspberrypi
@@ -332,7 +332,7 @@
     no-code motion tool for animating servos and creating interactive scenes.  This
     course walks you through installing Bottango, wiring servos, programming boards,
     and creating expressive motion sequences.
-  duration: 0h 22m
+  duration: 0h 44m
   groups:
   - animation
   - robotics
@@ -340,10 +340,22 @@
   link: /learn/bottango/01_intro.html
   name: Bottango Basics
 - author: Kevin McAleer
+  cover: /learn/duckdb/assets/cover.jpg
+  date_published: 2025-09-04
+  description: Learn how to use DuckDB, the fast, free, and embeddable database designed
+    for analytics.
+  duration: 1h 36m
+  groups:
+  - databases
+  - python
+  - raspberry pi
+  link: /learn/duckdb/00_intro.html
+  name: DuckDB - Fast, free analytics
+- author: Kevin McAleer
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
   description: Learn how to manipulate data using Pandas and Numpy
-  duration: 0h 24m
+  duration: 0h 56m
   groups:
   - pandas & numpy
   link: /learn/pandas_and_numpy/01_overview.html
@@ -352,7 +364,7 @@
   cover: /learn/obsidian/assets/cover.jpg
   date_published: 2025-08-24
   description: Learn how to use Obsidian for note-taking and knowledge management.
-  duration: 0h 26m
+  duration: 1h 0m
   groups:
   - obsidian
   - raspberrypi
@@ -374,7 +386,7 @@
     for data validation and settings management in Python applications. From understanding
     Pydantic's basics to integrating it with FastAPI for web development, you'll master
     everything needed to use Pydantic effectively.
-  duration: 0h 24m
+  duration: 0h 50m
   groups:
   - pydantic
   - data validation
@@ -386,7 +398,7 @@
   date_published: 2023-01-17
   description: Learning ROS with me, is a course that will teach you how to use ROS2
     on Raspberry Pi 4.
-  duration: 0h 12m
+  duration: 0h 22m
   groups:
   - robotics
   - raspberry pi
@@ -419,7 +431,7 @@
   cover: /learn/cvzone/assets/computer_vision.jpg
   date_published: 2023-10-07
   description: Computer Vision on Raspberry Pi with CVZone
-  duration: 2h 12m
+  duration: 2h 26m
   groups:
   - computer vision
   - python
@@ -432,7 +444,7 @@
   description: Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython.
     Learn about various types of pins, their functions, and how to work with them
     in real-world projects.
-  duration: 0h 36m
+  duration: 1h 42m
   groups:
   - micropython
   - gpio
@@ -443,7 +455,7 @@
   cover: /learn/burgerbot/assets/burgerbot.jpg
   date_published: 2023-04-27
   description: Build a simple round robot powered by Raspberry Pi Pico
-  duration: 3h 54m
+  duration: 4h 8m
   groups:
   - robotics
   - micropython
@@ -455,7 +467,7 @@
   date_published: 2023-01-29
   description: Robot Eye Mechanism, is a course that will teach you how to use Fusion
     360 to create a Servo controled Robot eye mechanism.
-  duration: 0h 18m
+  duration: 0h 38m
   groups:
   - robotics
   - fusion 360
@@ -465,7 +477,7 @@
   cover: /learn/how_to_install_micropython/assets/cover.jpg
   date_published: 2024-08-10
   description: Install MicroPython on your Raspberry Pi Pico.
-  duration: 0h 8m
+  duration: 0h 20m
   groups:
   - micropython
   - pico
@@ -476,7 +488,7 @@
   date_published: 2024-11-01
   description: Learn the fundamentals of SQL, relational database theory, and essential
     skills for database management.
-  duration: 0h 32m
+  duration: 2h 44m
   groups:
   - databases
   link: /learn/sql/00_course_overview.html

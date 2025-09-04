@@ -9,6 +9,7 @@ courses:
   - "Getting Started with SQL"
   - "Create Databases with Python and SQLite3"
   - "Using Redis with Python"
+  - "DuckDB - Fast, free analytics"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="300" viewBox="0 0 880 300" role="img" aria-labelledby="title desc">
+  <title id="title">Row vs Columnar storage</title>
+  <desc id="desc">Row-oriented stores each row contiguously; columnar stores values column-by-column. Columnar is efficient when scanning a few columns across many rows.</desc>
+  <defs>
+    <style>
+      .label{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;font-size:14px;fill:#111827}
+      .small{font-size:12px;fill:#374151}
+      .rowbox{fill:#f3f4f6;stroke:#9ca3af;stroke-width:2}
+      .colbox{fill:#eef2ff;stroke:#6366f1;stroke-width:2}
+      .hilite{fill:#d1fae5;stroke:#10b981;stroke-width:2}
+    </style>
+  </defs>
+
+  <text x="20" y="28" class="label">Row-oriented (rows stored contiguously)</text>
+
+  <!-- Row store rows -->
+  <rect x="20" y="40" width="320" height="50" rx="6" class="rowbox"/>
+  <text x="30" y="60" class="small">row1: [id=1, day=Fri, total_bill=21.5, tip=3.8]</text>
+
+  <rect x="20" y="100" width="320" height="50" rx="6" class="rowbox"/>
+  <text x="30" y="120" class="small">row2: [id=2, day=Sat, total_bill=30.1, tip=4.2]</text>
+
+  <rect x="20" y="160" width="320" height="50" rx="6" class="rowbox"/>
+  <text x="30" y="180" class="small">row3: [id=3, day=Sun, total_bill=15.0, tip=2.5]</text>
+
+  <text x="20" y="240" class="small">Reading total_bill, tip → read full rows (includes unused columns)</text>
+
+  <text x="460" y="28" class="label">Columnar (columns stored contiguously)</text>
+
+  <!-- Column store columns -->
+  <rect x="460" y="40" width="360" height="40" rx="6" class="colbox"/>
+  <text x="470" y="65" class="small">id: 1, 2, 3, ...</text>
+
+  <rect x="460" y="90" width="360" height="40" rx="6" class="colbox"/>
+  <text x="470" y="115" class="small">day: Fri, Sat, Sun, ...</text>
+
+  <rect x="460" y="140" width="360" height="40" rx="6" class="hilite"/>
+  <text x="470" y="165" class="small">total_bill: 21.5, 30.1, 15.0, ...</text>
+
+  <rect x="460" y="190" width="360" height="40" rx="6" class="hilite"/>
+  <text x="470" y="215" class="small">tip: 3.8, 4.2, 2.5, ...</text>
+
+  <text x="460" y="260" class="small">Reading total_bill, tip → read just those columns (skip others)</text>
+</svg>

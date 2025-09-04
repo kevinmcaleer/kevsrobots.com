@@ -691,3 +691,45 @@
     Power over Ethernet (PoE) is a technology that allows network cables to carry electrical power.
     It is a technology that allows network cables to carry electrical power.
   link: https://en.wikipedia.org/wiki/Power_over_Ethernet
+- term: Parquet
+  definition: Parquet File Format
+  full: >-
+    Apache Parquet is a free and open-source column-oriented data storage format of the Apache Hadoop ecosystem.
+    It is designed to bring efficiency compared to row-based files like CSV.
+  link: https://en.wikipedia.org/wiki/Apache_Parquet
+  article: /learn/duckdb/
+- term: DuckDB
+  definition: DuckDB
+  full: >-
+    DuckDB is an in-process SQL OLAP database management system.
+    It is designed to support analytical query workloads.
+  link: https://en.wikipedia.org/wiki/DuckDB
+  article: /learn/duckdb/
+- term: OLAP
+  definition: Online Analytical Processing
+  full: >-
+    Online analytical processing (OLAP) is an approach to answering multi-dimensional analytical (MDA) queries swiftly in computing.
+    OLAP is part of the broader category of business intelligence, which also encompasses relational database, report writing and data mining.
+  link: https://en.wikipedia.org/wiki/Online_analytical_processing
+  article: /learn/duckdb/
+- term: SQL
+  definition: Structured Query Language
+  full: >-
+    SQL (Structured Query Language) is a domain-specific language used in programming and designed for managing data held in a relational database management system (RDBMS), or for stream processing in a relational data stream management system (RDSMS).
+    It is particularly useful in handling structured data, in which there are relations between different entities/variables of the data.
+  link: https://en.wikipedia.org/wiki/SQL
+  article: /learn/duckdb/
+- term: RDBMS
+  definition: Relational Database Management System
+  full: >-    
+    A relational database management system (RDBMS) is a database management system (DBMS) that is based on the relational model as introduced by E. F. Codd.
+    Most databases in widespread use today are based on this model.
+  link: https://en.wikipedia.org/wiki/Relational_database_management_system
+  article: /learn/duckdb/ 
+- term: columnar
+  definition: Columnar Database
+  full: >-
+    A columnar database is a database that stores data in columns rather than rows.
+    This makes it fast for read-heavy operations, such as data analysis and business intelligence.
+  link: https://en.wikipedia.org/wiki/Column-oriented_DBMS
+  article: /learn/duckdb/

@@ -106,34 +106,39 @@ class Course:
         # get the duration from the lesson
         # return the duration in minutes
 
-        with open(f"{self.course_folder}/{item}", "r") as stream:
-            try:
-                file_content = stream.read()
-                a = file_content.split("---")[1]
-                lesson = yaml.safe_load(a)
-            except yaml.YAMLError as exc:
-                print(exc)
-            except IndexError as exc:
-                print(
-                    "there was an error parseing the yaml file - looking for the end of the front matter: ---"
-                )
-                print(f"item is {item}")
-                print(exc)
+        path = f"{self.course_folder}/{item}"
+        with open(path, "r") as stream:
+            file_content = stream.read()
 
-            # Check the lesson markdown file for a duration
-
-            if "duration" in lesson:
+        # Safely split out YAML front matter only (first two '---' only)
+        front_matter = {}
+        body_text = file_content
+        try:
+            parts = file_content.split("---", 2)
+            if len(parts) >= 3:
+                front_matter_raw = parts[1]
+                body_text = parts[2]
                 try:
-                    duration = lesson["duration"]
-                except KeyError:
-                    duration = 0
-                # print(f'duration is: {duration}')
-            else:
-                # print('lesson is: ', lesson['title'])
-                words = len(lesson)
-                # print(f'words is: {words}')
-                duration = ceil(words / 200)
-                # print(f'duration is: {duration}')
+                    front_matter = yaml.safe_load(front_matter_raw) or {}
+                except yaml.YAMLError as exc:
+                    print(exc)
+                    front_matter = {}
+        except Exception as exc:
+            # If anything unexpected happens, fall back to whole file as body
+            print(exc)
+            front_matter = {}
+            body_text = file_content
+
+        # If duration explicitly provided, use it
+        if isinstance(front_matter, dict) and "duration" in front_matter:
+            try:
+                return int(front_matter["duration"])
+            except Exception:
+                pass
+
+        # Fallback: estimate from body text word count (200 wpm)
+        words = len(body_text.split())
+        duration = ceil(words / 200)
         return duration
 
     def read_course(self, course_folder):
@@ -274,12 +279,17 @@ class Course:
                 # open the file and read the name
 
                 with open(f"{self.course_folder}/{item}", "r") as stream:
-                    try:
-                        file_content = stream.read()
-                        a = file_content.split("---")[1]
-                        lesson = yaml.safe_load(a)
-                    except yaml.YAMLError as exc:
-                        print(exc)
+                    file_content = stream.read()
+                    # Parse only the front matter between the first two '---'
+                    lesson = {"title": item}
+                    parts = file_content.split("---", 2)
+                    if len(parts) >= 2:
+                        try:
+                            fm = yaml.safe_load(parts[1]) or {}
+                            if isinstance(fm, dict) and "title" in fm:
+                                lesson["title"] = fm["title"]
+                        except yaml.YAMLError as exc:
+                            print(exc)
                     # print('lesson is: ', lesson['title'])
                 item = item.replace(".md", ".html")
                 # print(f'item is (should have .md replaced by .html): {item}')
@@ -298,36 +308,50 @@ class Course:
         return yaml_navigation_structure
 
     def update_front_matter(self, lesson_file, front_matter):
-        # read the lesson file, find the front matter makers and remove them
+        # read the lesson file, find the front matter markers and remove them
         lesson_list = lesson_file.split("---", 2)  # splits the string into 3 parts
 
-        lessons = yaml.load(lesson_list[1], Loader=yaml.FullLoader)
-        # print(f'l is {l}')
+        # Safely parse existing front matter block only
+        lessons = {}
+        if len(lesson_list) >= 2:
+            try:
+                lessons = yaml.safe_load(lesson_list[1]) or {}
+            except yaml.YAMLError as exc:
+                print(exc)
+                lessons = {}
 
-        # should now have atleast 3 sections
-        # 1 is empty
-        # 2 is the front matter
-        # 3 is the content
+        # Determine content (body) safely
+        content = lesson_list[2] if len(lesson_list) >= 3 else lesson_file
 
-        content = lesson_list[2]
-
-        front_matter_list = front_matter.split(
-            "---", 2
-        )  # splits the string into 3 parts
-        f = yaml.load(front_matter_list[1], Loader=yaml.FullLoader)
-        # print(f'f is: {f}')
-
-        # merge the existing front matter with the new front matter
+        # Parse the provided front matter block safely
+        front_matter_list = front_matter.split("---", 2)
+        f = {}
+        if len(front_matter_list) >= 2:
+            try:
+                f = yaml.safe_load(front_matter_list[1]) or {}
+            except yaml.YAMLError as exc:
+                print(exc)
+                f = {}
 
         # get navigation front matter
         nav = self.build_navigation()
 
-        merged_frontmatter = f
-        merged_frontmatter.update(lessons)
+        # merge the existing front matter with the new front matter
+        merged_frontmatter = {}
+        merged_frontmatter.update(f)
+        if isinstance(lessons, dict):
+            merged_frontmatter.update(lessons)
 
-        merged_frontmatter = yaml.dump(merged_frontmatter, sort_keys=False)
+        merged_frontmatter_yaml = yaml.dump(merged_frontmatter, sort_keys=False)
 
-        page = "---\n" + merged_frontmatter + "navigation:\n" + nav + "---\n" + content
+        page = (
+            "---\n"
+            + merged_frontmatter_yaml
+            + "navigation:\n"
+            + nav
+            + "---\n"
+            + content
+        )
         return page
 
     def copy_assets(self):
