@@ -1,2 +1,5 @@
 fastapi
 uvicorn
+pandas
+pyarrow
+duckdb
