@@ -2,6 +2,7 @@ import re
 import sqlite3
 from pathlib import Path
 import duckdb
+import sys
 
 LOG_FILE = Path('search-logs.log')
 SQLITE_DB = Path('exports/search_logs.db')
@@ -54,21 +55,28 @@ def write_sqlite(rows):
 
 def export_with_duckdb():
     con = duckdb.connect()
-    # Attach the sqlite db via virtual table using the sqlite extension if available
-    # Simpler: load using read_parquet but we have sqlite, so use sqlite_scan if compiled.
     try:
-        con.execute("INSTALL sqlite; LOAD sqlite;")
-        df = con.execute(f"SELECT * FROM sqlite_scan('{SQLITE_DB}', 'search_logs')").df()
-    except Exception:
-        # Fallback: use python sqlite to fetch and register as relation
-        sq = sqlite3.connect(SQLITE_DB)
-        rows = sq.execute("SELECT * FROM search_logs").fetchall()
-        df = duckdb.from_df_rows(rows, ['line_no', 'timestamp', 'ip', 'query']).df()
-        sq.close()
-    # Cast timestamp to TIMESTAMP if possible
-    try:
-        con.register('logs_df', df)
-        con.execute("CREATE OR REPLACE TABLE logs AS SELECT line_no, TRY_CAST(timestamp AS TIMESTAMP) AS ts, ip, query FROM logs_df")
+        try:
+            con.execute("INSTALL sqlite; LOAD sqlite;")
+            con.execute(f"CREATE OR REPLACE TABLE logs AS SELECT line_no, TRY_CAST(timestamp AS TIMESTAMP) AS ts, ip, query FROM sqlite_scan('{SQLITE_DB}', 'search_logs')")
+        except Exception as e:
+            # Fallback: pull via sqlite3 and create a values clause
+            sq = sqlite3.connect(SQLITE_DB)
+            rows = sq.execute("SELECT line_no, timestamp, ip, query FROM search_logs").fetchall()
+            sq.close()
+            if not rows:
+                print("No rows fetched from SQLite fallback", file=sys.stderr)
+                return
+            # Create a DuckDB relation from Python list of tuples
+            con.register('py_rows', rows)
+            # However register doesn't auto-rel, so build using VALUES
+            values_clause = ",".join(
+                [
+                    f"({r[0]}, '{r[1].replace("'","''")}', '{r[2].replace("'","''")}', '{r[3].replace("'","''")}')" for r in rows
+                ]
+            )
+            con.execute("CREATE OR REPLACE TABLE logs AS SELECT * FROM (VALUES " + values_clause + ") AS t(line_no, timestamp, ip, query)")
+            con.execute("CREATE OR REPLACE TABLE logs AS SELECT line_no, TRY_CAST(timestamp AS TIMESTAMP) AS ts, ip, query FROM logs")
         con.execute(f"COPY logs TO '{PARQUET_FILE}' (FORMAT PARQUET);")
     finally:
         con.close()
