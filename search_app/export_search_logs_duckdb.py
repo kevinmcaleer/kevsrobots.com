@@ -2,6 +2,8 @@ import re
 import sqlite3
 from pathlib import Path
 import duckdb
+import tempfile
+import shutil
 import sys
 
 LOG_FILE = Path('search-logs.log')
@@ -77,7 +79,18 @@ def export_with_duckdb():
             )
             con.execute("CREATE OR REPLACE TABLE logs AS SELECT * FROM (VALUES " + values_clause + ") AS t(line_no, timestamp, ip, query)")
             con.execute("CREATE OR REPLACE TABLE logs AS SELECT line_no, TRY_CAST(timestamp AS TIMESTAMP) AS ts, ip, query FROM logs")
-        con.execute(f"COPY logs TO '{PARQUET_FILE}' (FORMAT PARQUET);")
+        try:
+            con.execute(f"COPY logs TO '{PARQUET_FILE}' (FORMAT PARQUET);")
+        except Exception as e:
+            if "File locks are not supported" in str(e):
+                tmp_dir = Path(tempfile.gettempdir())
+                tmp_file = tmp_dir / PARQUET_FILE.name
+                con.execute(f"COPY logs TO '{tmp_file}' (FORMAT PARQUET);")
+                PARQUET_FILE.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(tmp_file, PARQUET_FILE)
+                print(f"DuckDB wrote to temp {tmp_file}; copied to {PARQUET_FILE}")
+            else:
+                raise
     finally:
         con.close()
 
