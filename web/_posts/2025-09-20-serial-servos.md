@@ -19,6 +19,9 @@ groups:
   - raspberrypi
   - software
   - robotics
+videos:
+  - DQPC1Ev3jng
+  
 ---
 
 If you’ve worked with **regular PWM hobby servos** before, you know the drill: you feed them a repeating pulse, and they move to a position based on pulse width. Simple, cheap, and good enough for many projects.
