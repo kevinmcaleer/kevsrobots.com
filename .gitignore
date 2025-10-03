@@ -13,3 +13,6 @@ youtube.yaml
 Table data.csv
 __pycache__/
 exports
+
+# Image optimization cache
+.optimization_cache.json
