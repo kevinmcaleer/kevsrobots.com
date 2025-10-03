@@ -8,7 +8,7 @@ layout: content
 <h1>{{page.title}}</h1>
 <h2>{{page.subtitle}}</h2>
 <p>{{page.excerpt}}</p>
-<img src="{{page.cover}}" class="cover rounded my-3" alt="Cover image for board - {{page.title}}">
+<img src="{{page.cover}}" class="cover rounded my-3" alt="Cover image for board - {{page.title}}" loading="lazy">
 
 {% for tag in page.tags %}
 <span class="float-end mx-1 bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span>

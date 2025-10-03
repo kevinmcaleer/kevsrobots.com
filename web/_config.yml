@@ -14,6 +14,18 @@ plugins:
   - jekyll-redirect-from
   # - jekyll-toc
 
+# Compression settings for production
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: []
+  blanklines: false
+  profile: false
+
+# Environment-specific settings
+environment: production
+
 webserver_headers:
   - - Access-Control-Allow-Origin
     - "*"

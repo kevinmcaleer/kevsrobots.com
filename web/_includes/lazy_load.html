@@ -1,0 +1,9 @@
+<!-- Lazy loading script for images -->
+<script>
+// Add lazy loading to all images that don't have it
+document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('img:not([loading])');
+    images.forEach(img => {
+        img.setAttribute('loading', 'lazy');
+    });
+});
