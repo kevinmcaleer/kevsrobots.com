@@ -1,0 +1,399 @@
+0:00:00.000,0:00:05.200
+Hey robot makers. In this video I want to show you 
+how to make a rack and pinion system using Fusion
+
+0:00:05.200,0:00:10.160
+360. This is ideal for if you want to convert 
+rotational energy into a linear motion. Okay,
+
+0:00:10.160,0:00:15.200
+let's get started. So I'm over here in Fusion 
+360. What I'm going to do is create a new sketch
+
+0:00:15.200,0:00:21.280
+and then I'm going to create this on the top 
+face. Press C for circle. And I'm going to make
+
+0:00:21.280,0:00:27.760
+this 18 and 12. That's the outer diameter 
+that I want my gear to be within. So let's
+
+0:00:27.760,0:00:32.960
+see what options we have for this. So, I'm just 
+going to make that construction line. Okay. So,
+
+0:00:32.960,0:00:39.120
+if we now go over to utilities and click 
+on the add-ins and then scripts and addins,
+
+0:00:39.120,0:00:43.200
+there's a really useful thing that's called 
+Spurgeear. Now, the bottom one, we click on that,
+
+0:00:43.200,0:00:47.680
+we can see this is a Python program. I think 
+there's another version which is the C++ one. I'm
+
+0:00:47.680,0:00:51.200
+just going to go for the Python one. I don't think 
+it makes any difference whatsoever with what we're
+
+0:00:51.200,0:00:55.360
+doing here, but I'm going to press the run button 
+there. And what we will then get is this little
+
+0:00:55.360,0:01:00.080
+dialogue box over here. We've got a whole bunch 
+of different options that we need to select. So,
+
+0:01:00.080,0:01:05.840
+what I want to be able to do is specify the 
+absolute outer diameter of my gear that it fits
+
+0:01:05.840,0:01:10.640
+within. I know that it's got 10 teeth. So, I can 
+come along over here and type 10 in the number of
+
+0:01:10.640,0:01:15.920
+teeth. But this module, I need to understand what 
+that needs to be. Now, I could look at the bottom
+
+0:01:15.920,0:01:20.080
+pitch diameter down here. The pitch diameter 
+isn't the outer diameter. That's the you can see
+
+0:01:20.080,0:01:24.560
+there the pitch diameter is this kind of middle 
+circle. And what we're really wanting to do is
+
+0:01:24.560,0:01:29.680
+have an external perimeter defined rather than 
+this pitch diameter. So let's have a look how we
+
+0:01:29.680,0:01:34.320
+might do that. So over here in Excel, I've just 
+created a little sheet that can help us do some
+
+0:01:34.320,0:01:38.640
+of the little formulas. These are really simple 
+formulas, but I just wanted to show you how we
+
+0:01:38.640,0:01:43.600
+could do this. So the pitch diameter is actually 
+the module times the number of teeth. But what
+
+0:01:43.600,0:01:48.960
+if we want to understand what module do we want? 
+Let's work backwards from that. So the module is
+
+0:01:48.960,0:01:54.400
+actually this outer diameter divided by the number 
+of teeth plus two. So if we know what the number
+
+0:01:54.400,0:01:59.440
+of teeth are, we know what our outer diameter 
+is, which is 18 1/2. That gives us a module
+
+0:01:59.440,0:02:07.920
+of 1.54. So if we go back over to Fusion 360, 
+and let's type in 1.54 as our module. Now it's
+
+0:02:07.920,0:02:13.280
+saying there that the center hole is too large. We 
+just need to change that center hole to be 3 mm,
+
+0:02:13.280,0:02:20.240
+for example. Let's make the gear thickness three. 
+And this root fillet also needs to be under.9.
+
+0:02:20.240,0:02:25.920
+So let's just change that to 0.9. So we can see 
+there the pitch diameter is 15.4. Let's go back
+
+0:02:25.920,0:02:32.080
+to our spreadsheet and have a quick look there. 
+15.4. 15.4 is this diameter. This pitch diameter.
+
+0:02:32.080,0:02:38.080
+Let's just rename that to pitch diameter so that 
+we can see that. So that's correct. And our outer
+
+0:02:38.080,0:02:43.680
+diameter is still 18.5. So this pitch diameter is 
+the outer diameter kind of minus 2 teeth if you
+
+0:02:43.680,0:02:50.480
+like. Okay. So let's go back to Fusion 360. Let's 
+uh click okay. All those options are good. And if
+
+0:02:50.480,0:02:58.080
+we now look, we have a tooth which fits perfectly 
+within that circle. Okay. So typically what you
+
+0:02:58.080,0:03:04.000
+would want to do next to do the rack piece is we 
+want to copy this profile. But at the moment the
+
+0:03:04.000,0:03:09.600
+tooth isn't oriented very well for us to do that. 
+So we need to rotate this body. So if we open up
+
+0:03:09.600,0:03:14.800
+this spur here, we go to the body. And now that 
+we've got that selected, we can press M for move.
+
+0:03:14.800,0:03:20.080
+If we go up here to the rotate, we can select the 
+axis we want to rotate it on. And then we're free
+
+0:03:20.080,0:03:24.720
+to rotate this round. But how do we know what 
+the exact angle is that we want to rotate this
+
+0:03:24.720,0:03:28.800
+round? Well, it's going to be a function of how 
+many tooth we've got. So let's go over here and
+
+0:03:28.800,0:03:35.920
+just add an extra little thing. So the rotation 
+rotation angle is going to be 360° divided by the
+
+0:03:35.920,0:03:42.080
+number of teeth that we have and then divide that 
+whole by two. So 18° is what we need to rotate it
+
+0:03:42.080,0:03:48.240
+by. Let's go back to our model. Let's type in 18°. 
+We can now see that we've got these two top and
+
+0:03:48.240,0:03:53.760
+bottom teeth perfectly aligned. The next thing we 
+want to do is we want to copy this entire cog and
+
+0:03:53.760,0:03:58.560
+bring that down by the pitch diameter. So let's 
+do that. Let's click on that. Press M again to
+
+0:03:58.560,0:04:04.240
+copy. This time we're going to do a translate. And 
+if we remember what the pitch diameter was, if we
+
+0:04:04.240,0:04:11.360
+go back to our sheet there. So the pitch diameter 
+is 15.4. So if we move this now in the let's try
+
+0:04:11.360,0:04:17.440
+the y ais minus5.4. So we want to actually make 
+a copy of this. And you can see there because
+
+0:04:17.440,0:04:21.760
+we've moved it down by the pitch diameter those 
+teeth are overlapping which is exactly what we
+
+0:04:21.760,0:04:27.200
+want. So I'm going to click okay. We can now hide 
+that original body. And all we want to do next is
+
+0:04:27.200,0:04:33.360
+create a new sketch and just copy this profile. So 
+let's do that. So we're going to go back to solid.
+
+0:04:33.360,0:04:37.360
+Click on create new sketch. I'm just going to do 
+it on the top of this surface here. Going to zoom
+
+0:04:37.360,0:04:42.560
+in a little bit. And then I press P to project. 
+And we can project individual lines. So if I hover
+
+0:04:42.560,0:04:46.800
+there and just select, you can just see it's in 
+black there. That line. We'll do the same with
+
+0:04:46.800,0:04:51.200
+the top. Same with the side. Same with that little 
+piece. And then that last little curve. Let's just
+
+0:04:51.200,0:04:56.720
+do those two on the other side as well. And I'll 
+click okay. And I hide that body. You can see that
+
+0:04:56.720,0:05:01.520
+we've got the actual outline of that profile. 
+I'm just going to do L for line. And just do a
+
+0:05:01.520,0:05:05.280
+line between those two points there. And if we 
+hover over that, you can now see that we've got
+
+0:05:05.280,0:05:10.400
+a profile that's enclosed. So this this shape 
+here is a really interesting curve and that's
+
+0:05:10.400,0:05:15.760
+actually an involute curve. So I'm just going to 
+click finish sketch. Do E for extrude. I'm going
+
+0:05:15.760,0:05:21.200
+to extrude this tooth out by say 3 mm. And let's 
+just go back to the bodies so that we can select
+
+0:05:21.200,0:05:27.440
+that. So let's just go back to our tooth there and 
+see that kind of in 3D. So that's one tooth. Now
+
+0:05:27.440,0:05:31.440
+typically we want to have many teeth in the rack. 
+We don't tend to have just one. So what we need
+
+0:05:31.440,0:05:37.280
+to do is we need to replicate that. But before we 
+do that, let's go back into that sketch and let's
+
+0:05:37.280,0:05:41.760
+define how long is this rack going to be. So I'm 
+going to do a rectangle. I'm going to start there.
+
+0:05:41.760,0:05:48.880
+I'm going to drag this out. I want this to be 
+about 3 mm high and then say 190 mm long. So
+
+0:05:48.880,0:05:54.560
+it's going to be quite long, skinny rack there. 
+There we go. That's what it's going to look like
+
+0:05:54.560,0:05:59.360
+in its entirety. So now that we've got that, that 
+can help us when we're actually calculating how
+
+0:05:59.360,0:06:04.640
+many teeth we need. So let's now go to finish that 
+sketch. So, we need to extrude that sketch. So,
+
+0:06:04.640,0:06:08.560
+I'm going to go to the sketch that we've just 
+created, which is the sketch number four there.
+
+0:06:08.560,0:06:14.720
+And I'm going to extrude this out by 3 mm like 
+so. I'm doing this as a separate operation so that
+
+0:06:14.720,0:06:20.720
+we can actually replicate that tooth along. So, 
+now that we need to do is go to create pattern,
+
+0:06:20.720,0:06:24.880
+rectangular pattern, and we want to find 
+the feature that we created before. So,
+
+0:06:24.880,0:06:30.720
+let's go to features, and let's find that tooth 
+that we created originally. And then the axis is
+
+0:06:30.720,0:06:36.480
+going to be along along this direction. If we now 
+start pulling this out, you'll see that we get get
+
+0:06:36.480,0:06:40.800
+some teeth. And we need to have a certain number 
+of teeth. But what should the spacing be between
+
+0:06:40.800,0:06:45.920
+the teeth? Let's just go to a different view and 
+see the distance between the teeth is quite an
+
+0:06:45.920,0:06:50.000
+important calculation. So let's go back to our 
+spreadsheet and see what this distance between
+
+0:06:50.000,0:06:54.960
+the teeth should be. So it's actually the pitch 
+diameter times pi divided by the number of teeth.
+
+0:06:54.960,0:06:58.400
+So I've got a little calculation there which 
+does exactly that. So it's looking at this pitch
+
+0:06:58.400,0:07:04.560
+diameter which we have just there 15.4 times by pi 
+and then divide the whole of that by the number of
+
+0:07:04.560,0:07:10.640
+teeth. The number that we've got there is 4.84. So 
+4.84 is the number that we need to type into that
+
+0:07:10.640,0:07:18.240
+dialogue box. So we go back over there. Uh we need 
+to go to the spacing and the spacing needs to be
+
+0:07:18.240,0:07:24.640
+4.84. 4.84. So that gives us the correct spacing 
+between the teeth. But how many teeth do we need?
+
+0:07:24.640,0:07:28.320
+Well, we can actually eyeball this quite easily. 
+So, we know it's going to be at least double
+
+0:07:28.320,0:07:34.560
+that. So, let's go for 20 teeth. Oh, it's probably 
+going to be more like 30 or 40 teeth. Let's try 40
+
+0:07:34.560,0:07:38.800
+teeth. You can see that's just one more than we 
+need. So, let's just go to 39. That looks about
+
+0:07:38.800,0:07:44.720
+right for that length. There we go. Now, currently 
+all these teeth are not connected to our hole. So,
+
+0:07:44.720,0:07:49.120
+what we can do is we can select everything. We 
+can click on the combine and then we can just
+
+0:07:49.120,0:07:54.240
+make sure that that's a join operation and click 
+okay. And we've now just got the one body just
+
+0:07:54.240,0:07:58.720
+there. that one that we hidden, that was the 
+original original spurgeear, right? So now to
+
+0:07:58.720,0:08:03.360
+check that these actually match, let's enable that 
+body of that original one. And then we're going
+
+0:08:03.360,0:08:09.440
+to rotate it back by 18° to see that it actually 
+fits. Okay. So let's click on that, press M, go
+
+0:08:09.440,0:08:14.400
+to our rotation, select that middle piece there, 
+and then we're going to rotate it by, it doesn't
+
+0:08:14.400,0:08:20.640
+matter which tooth we select on there, 18°, and we 
+want that to be body. Let's click okay. Let's zoom
+
+0:08:20.640,0:08:25.840
+in. And we can see there that looks like a perfect 
+kind of mesh between the teeth. So that's going to
+
+0:08:25.840,0:08:31.200
+work just right. So we can now print out these 
+pieces and that will work just the way we expect
+
+0:08:31.200,0:08:36.160
+it to. So hope that helps you. I've often found 
+that this dialogue box is a little bit confusing
+
+0:08:36.160,0:08:41.440
+particularly when you want to specify the outer 
+diameter rather than having to calculate what the
+
+0:08:41.440,0:08:45.760
+pitch diameter is from these these numbers 
+and also trying to figure all that module
+
+0:08:45.760,0:08:50.142
+is. So hope you enjoyed this short video and I 
+shall see you next time. Bye for now. [Music]

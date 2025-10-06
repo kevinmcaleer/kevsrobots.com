@@ -9,7 +9,7 @@ date: 2025-10-06
 author: Kevin McAleer
 difficulty: intermediate
 cover: /assets/img/blog/fusion360-gears/cover.jpg
-hero: /assets/img/blog/fusion360-gears/hero.jpg
+hero: /assets/img/blog/fusion360-gears/hero.png
 mode: light
 tags:
  - Fusion 360
@@ -20,6 +20,8 @@ groups:
  - 3dprinting
  - cad
  - design
+videos:
+ - Xa7ocyVCKYo 
 ---
 
 ## Converting Rotational Motion to Linear Motion
@@ -39,6 +41,8 @@ First things first, let's fire up Fusion 360 and get our bearings. The secret we
 3. Look for **SpurGear** (there's a Python version and a C++ one - I'm using the Python version)
 4. Click **Run**
 
+![SpurGear Add-in](/assets/img/blog/fusion360-gears/spurgeear-addon.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
+
 You'll see a dialogue box pop up with loads of options. Don't worry, we'll walk through exactly what you need!
 
 ---
@@ -51,15 +55,17 @@ Here's where things get interesting. The SpurGear dialogue wants you to specify 
 
 I've created a simple spreadsheet to help with these calculations:
 
-- **Pitch Diameter** = Module × Number of Teeth
-- **Module** = Outer Diameter ÷ (Number of Teeth + 2)
-- **Rotation Angle** = 360° ÷ Number of Teeth ÷ 2
+- **Pitch Diameter** = `Module × Number of Teeth`
+- **Module** = `Outer Diameter ÷ (Number of Teeth + 2)`
+- **Rotation Angle** = `360° ÷ Number of Teeth ÷ 2`
+
+![Excel formulas](/assets/img/blog/fusion360-gears/formulas.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 For example, if I want:
-- Outer diameter: 18.5mm
-- Number of teeth: 10
+- Outer diameter: `18.5mm`
+- Number of teeth: `10`
 
-Then my module is: 18.5 ÷ (10 + 2) = 1.54
+Then my module is: `18.5 ÷ (10 + 2) = 1.54`
 
 ### Setting Up Your Gear
 
@@ -69,13 +75,17 @@ Let's create the gear step by step:
 2. Press **C** for circle and create two circles: 18mm and 12mm diameter
 3. Make them construction lines
 4. Run the SpurGear add-in with these settings:
-   - Module: **1.54**
-   - Number of teeth: **10**
-   - Center hole: **3mm**
-   - Gear thickness: **3mm**
-   - Root fillet: **0.9mm** (needs to be under 0.9 to work with this module)
+   - Module: **`1.54`**
+   - Number of teeth: **`10`**
+   - Center hole: **`3mm`**
+   - Gear thickness: **`3mm`**
+   - Root fillet: **`0.9mm`** (needs to be under 0.9 to work with this module)
 
-The pitch diameter should show as 15.4mm - that's the middle circle where the teeth mesh.
+![SpurGear settings](/assets/img/blog/fusion360-gears/settings.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
+
+The pitch diameter should show as `15.4mm` - that's the middle circle where the teeth mesh.
+
+![Finished gear](/assets/img/blog/fusion360-gears/gear-complete.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 ---
 
@@ -87,6 +97,8 @@ Now we need to orient that tooth correctly for copying. Here's the trick:
 2. Press **M** to move it
 3. Select **Rotate** and choose the center axis
 4. Rotate by **18°** (remember that formula? 360 ÷ 10 ÷ 2 = 18°)
+
+![Rotated gear](/assets/img/blog/fusion360-gears/rotated.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 This gives us two teeth perfectly aligned at the top and bottom.
 
@@ -103,6 +115,8 @@ Now for the clever bit - creating the rack that our gear will mesh with!
 3. Make sure **Create Copy** is checked
 4. Click OK
 
+![Overlapping teeth](/assets/img/blog/fusion360-gears/overlapping.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
+
 You'll see the teeth overlapping - that's exactly what we want!
 
 ### Project the Tooth Profile
@@ -114,6 +128,8 @@ You'll see the teeth overlapping - that's exactly what we want!
 5. Draw a line across the bottom to close the profile
 6. Press **E** to extrude the tooth out by **3mm**
 
+![Tooth profile](/assets/img/blog/fusion360-gears/tooth-profile.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
+
 ### Calculate the Rack Length
 
 For the full rack:
@@ -121,6 +137,8 @@ For the full rack:
 1. Go back into the sketch
 2. Create a rectangle: **3mm high × 190mm long** (or whatever length you need)
 3. Extrude this base by **3mm** as well
+
+![Rack base](/assets/img/blog/fusion360-gears/rack-base.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 ---
 
@@ -159,6 +177,8 @@ Let's verify everything meshes properly:
 1. Show the original gear body again
 2. Press **M** to rotate it back by **-18°** to undo our earlier rotation
 3. Zoom in and check the mesh
+
+![Perfect mesh](/assets/img/blog/fusion360-gears/mesh.png){:class="img-fluid w-100 rounded-3 shadow-lg"}
 
 The teeth should fit together perfectly with no gaps or interference. If they do, you're ready to 3D print!
 
