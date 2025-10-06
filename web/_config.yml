@@ -15,13 +15,14 @@ plugins:
   # - jekyll-toc
 
 # Compression settings for production
-compress_html:
-  clippings: all
-  comments: all
-  endings: all
-  startings: []
-  blanklines: false
-  profile: false
+# TEMPORARILY DISABLED - may be breaking footer
+# compress_html:
+#   clippings: all
+#   comments: all
+#   endings: all
+#   startings: []
+#   blanklines: false
+#   profile: false
 
 # Environment-specific settings
 environment: production
