@@ -65,8 +65,9 @@ This file contains guidelines for working with the KevsRobots.com repository.
 ### Courses
 - **Source** - Edit in `/source/course-name/` as Markdown
 - **Build** - Run `python build.py` to generate `/web/learn/` content
-- **Naming** - Use `00_intro.md`, `01_lesson.md`, etc.
+- **Naming Convention** - Use `00_intro.md`, `01_lesson.md`, `02_lesson.md`, etc.
 - **Structure** - Each course needs `course.yml` metadata file
+- **Content Quality** - See "Course Content Guidelines" section below
 
 ### Nginx Configuration
 - **Backend** - `/stacks/kevsrobots/nginx-optimized.conf`
@@ -148,6 +149,218 @@ python3 build.py
 # Processes /source/ → /web/learn/
 # Generates course pages and indexes
 ```
+
+---
+
+## Course Content Guidelines
+
+### Course Structure
+
+Each course must have:
+
+1. **`course.yml`** - Course metadata file
+2. **Markdown lessons** - Numbered sequentially starting from `00_intro.md`
+3. **`assets/`** folder - Course-specific images and resources
+
+### course.yml Format
+
+```yaml
+- name: Course Name
+  author: Kevin McAleer
+  date_created: YYYY-MM-DD
+  date_published: YYYY-MM-DD
+  layout: course
+  cover: assets/cover.jpg
+  description: >-
+    Brief description of what students will learn (1-2 sentences)
+  groups:
+    - relevant-category  # e.g., micropython, docker, robotics
+  content:
+  - section:
+      name: Section Name
+      content:
+      - 00_intro.md
+      - 01_lesson_name.md
+      - 02_lesson_name.md
+  - section:
+      name: Another Section
+      content:
+      - 03_lesson_name.md
+```
+
+### Lesson Frontmatter (Required)
+
+```yaml
+---
+title: Lesson Title
+description: Brief description for SEO and previews
+layout: lesson
+type: page
+cover: /learn/course-name/assets/image.jpg  # Optional
+---
+```
+
+### Lesson File Naming
+
+- **Always start with `00_intro.md`** for course introduction
+- **Number sequentially**: `01_`, `02_`, `03_`, etc.
+- **Use descriptive names**: `01_what-is-docker.md` not `01_lesson.md`
+- **Use hyphens** for spaces: `05_hello-world.md`
+
+### Content Quality Standards
+
+Based on course analysis, all courses should follow these guidelines:
+
+#### 1. **Consistent Introduction Structure**
+
+Every course `00_intro.md` must include:
+
+```markdown
+## Overview
+Brief paragraph about what the course covers
+
+## Course Content
+Bullet list of topics covered:
+- Topic 1
+- Topic 2
+- Topic 3
+
+## Key Results
+What students will be able to do after completing:
+- Skill 1
+- Skill 2
+
+## What you'll need
+List of required hardware/software:
+- Item 1
+- Item 2
+
+## How the course works
+Explain formatting conventions, code examples, notes
+```
+
+#### 2. **Real-World Examples Required**
+
+**BAD** - Reference table only:
+```markdown
+| Operator | Symbol | Description |
+|----------|--------|-------------|
+| Addition | `+`    | Adds values |
+```
+
+**GOOD** - Real-world context:
+```markdown
+### Addition Operator (`+`)
+
+**What it does:** Adds two numbers together
+
+**Real-world robot example:**
+```python
+# Calculate total motor speed
+left_motor_speed = 50
+right_motor_speed = 30
+total_speed = left_motor_speed + right_motor_speed
+print(f"Total: {total_speed}")  # Output: 80
+```
+
+**Common mistake:**
+```python
+speed = "50"  # String, not number!
+total = speed + 10  # TypeError!
+```
+```
+
+#### 3. **Progressive Learning**
+
+- **Start simple** - Basic concepts first
+- **Build complexity** - Each lesson adds one new concept
+- **Practical application** - Show how to use it, not just what it is
+- **Build toward a project** - Each course should culminate in a working project
+
+#### 4. **Interactive Elements**
+
+Add to each lesson:
+
+```markdown
+## Try it Yourself
+
+1. Modify the code to...
+2. Experiment with...
+3. Challenge: Can you...
+
+## Common Issues
+
+**Problem**: Error message or issue
+**Solution**: How to fix it
+**Why**: Explanation
+```
+
+#### 5. **Course Progression Indicators**
+
+Add breadcrumbs to lessons:
+
+```markdown
+> **Course Progress**: Lesson 8 of 20
+>
+> **Previous**: [Variables](/learn/course/07_variables.html) |
+> **Next**: [Functions](/learn/course/09_functions.html)
+```
+
+#### 6. **Learning Paths**
+
+Courses should link to related courses:
+
+```markdown
+## Prerequisites
+
+This course assumes you've completed:
+- [Introduction to MicroPython](/learn/micropython/)
+
+## What's Next
+
+After this course, try:
+- [MicroPython GPIO](/learn/micropython_gpio/)
+- [Building Your First Robot](/learn/smars/)
+```
+
+### Content Length Guidelines
+
+- **Intro lesson**: 300-500 words
+- **Concept lessons**: 400-800 words
+- **Project lessons**: 800-1500 words
+- **Total course**: 10-20 lessons minimum
+
+### Tone and Style
+
+- **Friendly and encouraging** - "Let's build..." not "You must..."
+- **Maker-focused** - Relate to robots, hardware, projects
+- **Practical** - Show working code, not just theory
+- **Conversational** - Write like you're teaching a friend
+- **Visual** - Use images, diagrams, code examples
+
+### Things to Avoid
+
+❌ Long reference tables without context
+❌ Theory-heavy content without examples
+❌ Assuming prior knowledge
+❌ Skipping troubleshooting sections
+❌ No clear end goal or project
+❌ Inconsistent lesson naming (00_intro vs 01_intro)
+
+### Course Review Checklist
+
+Before publishing a course:
+
+- [ ] All lessons start with `00_intro.md`
+- [ ] `course.yml` complete with all required fields
+- [ ] Each lesson has proper frontmatter
+- [ ] Code examples are tested and working
+- [ ] Images optimized (<300KB)
+- [ ] Real-world examples for each concept
+- [ ] "Try it Yourself" sections included
+- [ ] Troubleshooting sections for complex topics
+- [ ] Clear progression from beginner to project
+- [ ] Links to prerequisite/next courses
 
 ---
 
