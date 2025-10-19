@@ -2,6 +2,7 @@
 title: "SMARS Q"
 description: "An Arduino Uno Q Based Robot"
 excerpt: >-
+    This project showcases the design and construction of the SMARS Q robot, an Arduino Uno-based robot designed for various tasks.
    
 layout: showcase
 date: 2025-10-19
