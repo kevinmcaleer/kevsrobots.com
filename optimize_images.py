@@ -111,20 +111,31 @@ class ImageOptimizer:
 
             # Open and process image
             with Image.open(image_path) as img:
-                # Store original format
+                # Store original format and mode
                 original_format = img.format
+                is_png = image_path.suffix.lower() == '.png'
+                has_transparency = img.mode in ('RGBA', 'LA', 'P') and (
+                    img.mode == 'RGBA' or
+                    img.mode == 'LA' or
+                    (img.mode == 'P' and 'transparency' in img.info)
+                )
 
-                # Convert RGBA to RGB for JPEG/WebP
-                if img.mode in ('RGBA', 'LA', 'P'):
+                # Only convert to RGB if it's NOT a PNG or if converting to WebP/JPEG
+                if is_png and has_transparency:
+                    # Keep transparency for PNG files
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                elif img.mode in ('RGBA', 'LA', 'P'):
+                    # Convert to RGB with white background for JPEG/WebP
                     background = Image.new('RGB', img.size, (255, 255, 255))
                     if img.mode == 'P':
                         img = img.convert('RGBA')
                     background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
                     img = background
-                elif img.mode != 'RGB':
+                elif img.mode != 'RGB' and not (is_png and img.mode == 'RGBA'):
                     img = img.convert('RGB')
 
-                # Resize if needed
+                # Resize if needed (maintain aspect ratio)
                 needs_resize = img.width > self.max_width or img.height > self.max_height
                 if needs_resize:
                     img.thumbnail((self.max_width, self.max_height), Image.Resampling.LANCZOS)
@@ -136,15 +147,19 @@ class ImageOptimizer:
                 elif image_path.suffix.lower() in ['.jpg', '.jpeg']:
                     img.save(temp_path, 'JPEG', quality=self.jpeg_quality, optimize=True)
                 elif image_path.suffix.lower() == '.png':
-                    img.save(temp_path, 'PNG', optimize=True)
+                    # Save PNG with transparency preserved
+                    img.save(temp_path, 'PNG', optimize=True, compress_level=9)
                 else:
                     # Copy other formats as-is
                     img.save(temp_path)
 
             optimized_size = temp_path.stat().st_size
 
-            # Only replace if we got a size reduction or format change
-            if optimized_size < original_size or self.convert_to_webp or needs_resize:
+            # Calculate reduction percentage
+            reduction = ((original_size - optimized_size) / original_size * 100) if original_size > 0 else 0
+
+            # Only replace if we got a meaningful size reduction (>0%), format change, or resize
+            if (optimized_size < original_size and reduction > 0.0) or self.convert_to_webp or needs_resize:
                 # Handle format change (e.g., jpg -> webp)
                 if self.convert_to_webp and image_path.suffix.lower() != '.webp':
                     final_path = image_path.with_suffix('.webp')
@@ -162,8 +177,7 @@ class ImageOptimizer:
                 # Mark as optimized
                 self._mark_optimized(image_path, original_size, optimized_size)
 
-                reduction = ((original_size - optimized_size) / original_size * 100) if original_size > 0 else 0
-                resize_msg = f" + resized from {img.size[0]}x{img.size[1]}" if needs_resize else ""
+                resize_msg = f" + resized" if needs_resize else ""
                 print(f"✓ {image_path.name} ({self._format_size(original_size)} → {self._format_size(optimized_size)}, {reduction:.1f}% reduction{resize_msg})")
             else:
                 # No improvement, keep original
