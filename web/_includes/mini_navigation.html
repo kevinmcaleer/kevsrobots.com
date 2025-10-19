@@ -1,0 +1,27 @@
+{% assign links = include.links | split: "," %}
+{% assign icons = include.icons | split: "," %}
+{% assign titles = include.titles | split: "," %}
+{% assign title = include.title %}
+
+<style>
+.mini-nav-icon {
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+.nav-link:hover .mini-nav-icon {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+.nav-link:hover {
+  color: #036f96 !important;
+}
+</style>
+
+<div class="container my-4 bg-grey p-3">
+    <span class="text-uppercase fs-6 bg-cyan m-1 p-1 rounded-1">{{ title }}</span>
+<ul class="nav">
+{% for link in links %}
+  <li class="nav-item"><a class="nav-link black" href="{{ link }}"><span class="mini-nav-icon">{{ icons[forloop.index0] }}</span> {{ titles[forloop.index0] }}</a></li>
+{% endfor %}
+</ul>
+</div>

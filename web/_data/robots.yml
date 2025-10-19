@@ -1,3 +1,9 @@
+- name: SMARS Q
+  link: /projects/smars-q/
+  cover: /projects/smars-q/assets/cover.jpg
+  description: An Arduino Uno Q Based Robot
+  date: 2025/10/19
+  hero: /projects/smars-q/assets/hero.png
 - name: Pico Plotter
   link: /blog/pico-plotter.html
   cover: /assets/img/blog/pico_plotter/cover.jpg
