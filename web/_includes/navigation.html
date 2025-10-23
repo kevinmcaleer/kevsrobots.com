@@ -31,7 +31,7 @@
         {% include megamenu/store.html %}
 
     </ul>
-   
+
     <form class="form-inline my-2 my-lg-0" onsubmit="performSearch(event)">
         <div class="input-group">
         <input class="form-control mr-sm-2" id="search-box" type="search" placeholder="watcha lookin for?" aria-label="Search">
@@ -40,8 +40,29 @@
         </div>
     </div>
       </form>
-    
-   
+
+      <!-- User Menu -->
+      <div class="dropdown d-flex align-items-center ms-3" id="user-menu">
+        <!-- Not logged in state -->
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownGuest" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="display: none;">
+          <i class="fa-solid fa-circle-user fa-lg"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownGuest">
+          <li><a class="dropdown-item" href="https://chatter.kevsrobots.com/login" id="login-link"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</a></li>
+          <li><a class="dropdown-item" href="https://chatter.kevsrobots.com/register" id="register-link"><i class="fa-solid fa-user-plus me-2"></i>Sign Up</a></li>
+        </ul>
+
+        <!-- Logged in state -->
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="display: none;">
+          <i class="fa-solid fa-circle-user me-1"></i><span id="username-display"></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownUser">
+          <li><a class="dropdown-item" href="https://chatter.kevsrobots.com/account"><i class="fa-solid fa-user-gear me-2"></i>My Account</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+
     </div>
     </div>
 </nav>

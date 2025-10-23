@@ -1416,3 +1416,41 @@ table .w-30 {
 pre {
   position: relative;
 }
+
+/* User Menu Styles */
+#user-menu {
+  .nav-link {
+    cursor: pointer;
+    color: $kevred;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .nav-link:hover {
+    color: #FFCA29;
+  }
+
+  /* Remove dropdown arrow */
+  .nav-link.dropdown-toggle::after {
+    display: none;
+  }
+
+  .dropdown-menu {
+    min-width: 180px;
+  }
+
+  .dropdown-item {
+    padding: 0.5rem 1rem;
+
+    i {
+      width: 20px;
+      text-align: center;
+    }
+  }
+
+  #username-display {
+    font-weight: 500;
+    font-size: 14px;
+  }
+}
