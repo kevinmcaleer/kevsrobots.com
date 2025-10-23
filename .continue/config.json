@@ -1,0 +1,10 @@
+{
+  "models": [
+    {
+      "title": "Ollama (Remote)",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:7b",
+      "apiBase": "http://192.168.1.84:11434"
+    }
+  ]
+}
