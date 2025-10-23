@@ -1422,7 +1422,7 @@ pre {
   .nav-link {
     cursor: pointer;
     color: $kevred;
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     text-decoration: none;
   }
@@ -1431,9 +1431,10 @@ pre {
     color: #FFCA29;
   }
 
-  /* Remove dropdown arrow */
+  /* Remove dropdown arrow with higher specificity */
   .nav-link.dropdown-toggle::after {
-    display: none;
+    display: none !important;
+    content: none !important;
   }
 
   .dropdown-menu {
@@ -1449,8 +1450,19 @@ pre {
     }
   }
 
+  /* Username display - ensure vertical alignment */
   #username-display {
     font-weight: 500;
     font-size: 14px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Icon and text alignment */
+  i {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
   }
 }
