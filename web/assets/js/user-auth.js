@@ -108,11 +108,11 @@
     const currentURL = encodeURIComponent(window.location.href);
 
     if (loginLink) {
-      loginLink.href = `${CHATTER_API}/login?return_to=${currentURL}`;
+      loginLink.href = `/login?return_to=${currentURL}`;
     }
 
     if (registerLink) {
-      registerLink.href = `${CHATTER_API}/register?return_to=${currentURL}`;
+      registerLink.href = `/register?return_to=${currentURL}`;
     }
   }
 
