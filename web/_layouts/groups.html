@@ -38,21 +38,26 @@ layout: default
                 <div class="card-body">
                     <h5 class="black">{{item.title}}</h5>
                     <p class="card-body-text black">{{item.description}}</p>
-                </div>
-                {% assign url_without_slash = item.url | remove_first: "/" %}
+                    {% assign url_without_slash = item.url | remove_first: "/" %}
                 {% include like-comment-summary.html url=url_without_slash %}
+                </div>
+                
 
             </div>
             </a>
             </div>
             {% endif%}
             {% endfor %}
-        </div>
-        {% endif %}
-        {% unless page.hide_likes_and_comments %}
+            
         <hr />
+        
+        </div>
+        {% unless page.hide_likes_and_comments %}
         {% include like-comment.html %}
         {% endunless %}
+        
+        {% endif %}
+        
     </div>
 </div>
 </div>

@@ -32,6 +32,8 @@
               <div class="card-body">
                 <p class="card-title limited-title">{{post.title}}</p>
                 <p class="card-text text-decoration-none small limited-content">{{post.excerpt | remove: '<p>' | remove: '</p>' | strip_html}}</p>
+             {% assign url_without_slash = item.url | remove_first: "/" %}
+              {% include like-comment-summary.html url=url_without_slash %}
               </div>
              
           </div>
