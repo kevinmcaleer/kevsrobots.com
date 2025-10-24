@@ -1,0 +1,10 @@
+<!-- Like and Comment Summary Component -->
+<!-- Usage: {% include like-comment-summary.html url="/blog/my-post.html" %} -->
+
+<div class="like-comment-summary" data-summary-url="{{ include.url }}">
+  <span class="text-muted small">
+    <i class="fa-regular fa-heart"></i> <span class="like-count-summary">0</span>
+    &nbsp;&nbsp;
+    <i class="fa-regular fa-comment"></i> <span class="comment-count-summary">0</span>
+  </span>
+</div>
