@@ -15,7 +15,7 @@
         <div class="row row-cols-md-3 row-cols-lg-4 row-cols-1 row-cols-sm-2 g-3">
             {% for post in group.items %}
        
-                {% include card.html cardtitle=post.title small_title=true link=post.url img=post.cover tags=post.tags date=post.date description=post.description noborder=1 tl="1" dl="2" %}
+                {% include card.html cardtitle=post.title small_title=true link=post.url img=post.cover tags=post.tags date=post.date description=post.description noborder=1 tl="1" dl="2" include_likes=true %}
         
             {% endfor %}
         </div>

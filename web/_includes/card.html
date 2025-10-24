@@ -17,6 +17,7 @@ tags - tags
 small_title - small_title if True then small title
 bg_color - for popular video, set background 
 popular - add popular video tag
+include_likes - include like comment summary if true
 
 {% endcomment %}
 
@@ -36,6 +37,7 @@ popular - add popular video tag
 {% elsif include.dl == "3" %}
   {% assign description_truncate_class = "text-truncate-3-lines" %}
 {% endif %}
+{% assign include_likes = include.include_likes %}
 
 <div class="col">
     <a href="{{include.link}}" class="text-decoration-none">
@@ -84,6 +86,10 @@ popular - add popular video tag
                 
                 {% if video.popular %}
                 <span class="badge badge-sm text-bg-dark">Popular</span>
+                {% endif %}
+                {% if include_likes %}
+                {% assign url_without_slash = include.link | remove_first: "/" %}
+                {% include like-comment-summary.html url=url_without_slash %}
                 {% endif %}
             </div>
         </div>
