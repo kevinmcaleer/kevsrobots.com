@@ -108,11 +108,17 @@
     const currentURL = encodeURIComponent(window.location.href);
 
     if (loginLink) {
-      loginLink.href = `/login?return_to=${currentURL}`;
+      const newHref = `/login?return_to=${currentURL}`;
+      console.log('Setting login link href from:', loginLink.href, 'to:', newHref);
+      loginLink.href = newHref;
+      console.log('After setting, href is:', loginLink.href);
     }
 
     if (registerLink) {
-      registerLink.href = `/register?return_to=${currentURL}`;
+      const newHref = `/register?return_to=${currentURL}`;
+      console.log('Setting register link href from:', registerLink.href, 'to:', newHref);
+      registerLink.href = newHref;
+      console.log('After setting, href is:', registerLink.href);
     }
   }
 
