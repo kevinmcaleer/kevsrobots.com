@@ -19,7 +19,7 @@ description: Manage your kevsrobots.com account
           <div id="account-info">
             <div class="mb-3">
               <label class="form-label fw-bold">Username</label>
-              <p class="form-control-plaintext" id="username-display">Loading...</p>
+              <p class="form-control-plaintext" id="account-username">Loading...</p>
             </div>
 
             <div class="mb-3">
@@ -145,7 +145,7 @@ description: Manage your kevsrobots.com account
       currentUser = await ChatterAPI.getCurrentUser();
 
       // Display user info
-      document.getElementById('username-display').textContent = currentUser.username;
+      document.getElementById('account-username').textContent = currentUser.username;
       document.getElementById('fullname-display').textContent = `${currentUser.firstname} ${currentUser.lastname}`;
       document.getElementById('email').value = currentUser.email;
       document.getElementById('status-badge').textContent = currentUser.status.charAt(0).toUpperCase() + currentUser.status.slice(1);
