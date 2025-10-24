@@ -97,6 +97,10 @@ thanks: false
         <p class="text-center">
         <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
         </p>
+        {% unless page.hide_likes_and_comments %}
+        This page is awesome? Show some love!
+        {% include like-comment.html %}
+        {% endunless %}
     </div>
 </div>
 

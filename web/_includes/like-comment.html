@@ -1,0 +1,43 @@
+<div class="like-comment-section mt-4" data-url="{{ page.url }}">
+
+  <!-- Like Button Section -->
+  <div class="like-section mb-3">
+    <button class="btn btn-link p-0 like-button" id="like-btn" aria-label="Like this content">
+      <i class="fa-regular fa-heart heart-outline" style="font-size: 1.5rem; color: #dc3545;"></i>
+      <i class="fa-solid fa-heart heart-filled" style="font-size: 1.5rem; color: #dc3545; display: none;"></i>
+    </button>
+    <span class="like-count text-muted ms-2" id="like-count">0</span>
+  </div>
+
+  <!-- Comment Input Section -->
+     <h5>Comments</h5>
+  <div class="comment-input-section mb-4">
+    <div class="position-relative">
+      <textarea class="form-control comment-input" id="comment-textarea" rows="3" placeholder="Post your comment..." style="resize: vertical; min-height: 80px;"></textarea>
+      <div class="d-flex justify-content-end mt-2">
+        <button class="btn btn-primary btn-sm" id="post-comment-btn" disabled>
+          <i class="fa-solid fa-paper-plane me-1"></i> Post Comment
+        </button>
+      </div>
+    </div>
+    <div id="comment-error" class="alert alert-danger mt-2" style="display: none;"></div>
+    <div id="comment-success" class="alert alert-success mt-2" style="display: none;"></div>
+  </div>
+
+  <!-- Comments List Section -->
+  <div class="comments-list" id="comments-list">
+    <div class="text-center text-muted py-3" id="comments-loading">
+      <div class="spinner-border spinner-border-sm me-2" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      Loading comments...
+    </div>
+    <div id="comments-container"></div>
+    <div class="text-center text-muted py-3" id="no-comments" style="display: none;">
+      <i class="fa-regular fa-comment me-2"></i>No comments yet. Be the first to comment!
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="/assets/css/like-comment.css">
+<script src="/assets/js/like-comment.js"></script>

@@ -199,12 +199,21 @@ layout: default
             
             {% endfor %}
             {% endif %}
+            {% unless page.hide_likes_and_comments %}
+                <div class="mb-4">
+                    <hr />
+                    <p>This page is awesome - Show some love!</p>
+                    {% include like-comment.html %}
+                </div>
+                <hr />
+            {% endunless %}
         </div> <!-- row -->
         </div><!--container -->
         </div>
             </div>
             <div class="container py-3 my-3">
                 <hr />
+                
                 {% include related_articles.html %}
             </div>
             </div>

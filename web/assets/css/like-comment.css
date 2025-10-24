@@ -1,0 +1,30 @@
+/* Like and Comment Component Styles */
+
+.like-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+}
+
+.like-button:active {
+  transform: scale(0.95);
+}
+
+.comment-item {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s;
+}
+
+.comment-item:hover {
+  background-color: #e9ecef;
+}
+
+.comment-input:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}

@@ -28,6 +28,10 @@ layout: content
 {{content}}
 </article>
 <hr />
+{% unless page.hide_likes_and_comments %}
+This page is awesome? Show some love!
+{% include like-comment.html %}
+{% endunless %}
 {% include related_articles.html %}
 </div>
 <div class="col-sm-12 col-md-3">

@@ -4,5 +4,9 @@ layout: default
 
 <div class="px-3 my-0 mx-3">
 {{content}}
+{% unless page.hide_likes_and_comments %}
+This page is awesome? Show some love!
+{% include like-comment.html %}
+{% endunless %}
 {% include thanks.html %}
 </div>
