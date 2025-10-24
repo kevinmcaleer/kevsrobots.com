@@ -57,17 +57,10 @@
         if (commentCountEl) {
           commentCountEl.textContent = comments.length || 0;
         }
-
-        // Hide the summary if there are no likes and no comments
-        if ((likeData.like_count === 0 || !likeData.like_count) &&
-            (comments.length === 0 || !comments.length)) {
-          summaryElement.style.display = 'none';
-        }
       }
     } catch (error) {
       console.error('Error loading summary data for', contentUrl, error);
-      // Hide the summary on error
-      summaryElement.style.display = 'none';
+      // Keep the summary visible even on error (shows 0s)
     }
   }
 
