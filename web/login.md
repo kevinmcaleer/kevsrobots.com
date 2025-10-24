@@ -18,8 +18,8 @@ description: Login to your kevsrobots.com account
 
           <form id="login-form">
             <div class="mb-3">
-              <label for="username" class="form-label fw-bold">Username</label>
-              <input type="text" class="form-control" id="username" name="username" required>
+              <label for="username" class="form-label fw-bold">Username or Email</label>
+              <input type="text" class="form-control" id="username" name="username" required autocomplete="username">
             </div>
 
             <div class="mb-3">
