@@ -9,13 +9,23 @@
 
 <div class="like-comment-section mt-4" data-url="{{ page.url }}">
 
-  <!-- Like Button Section -->
-  <div class="like-section mb-3">
-    <button class="btn btn-link p-0 like-button text-decoration-none {{ text_color }}" id="like-btn" aria-label="Like this content">
-      <i class="fa-regular fa-heart heart-outline" style="font-size: 1.5rem; color: #dc3545;"></i>
-      <i class="fa-solid fa-heart heart-filled" style="font-size: 1.5rem; color: #dc3545; display: none;"></i>
-    </button>
-    <span class="like-count {{ text_color }} ms-2" id="like-count">0</span>
+  <!-- Stats Section -->
+  <div class="engagement-stats mb-3 d-flex align-items-center gap-3">
+    <!-- Page Views -->
+    <div class="view-stats">
+      <i class="fa-solid fa-chart-simple {{ text_color }}"></i>
+      <span class="view-count {{ text_color }} ms-1" id="view-count">0</span>
+      <span class="{{ text_color }} small ms-1">views</span>
+    </div>
+
+    <!-- Like Button -->
+    <div class="like-stats">
+      <button class="btn btn-link p-0 like-button text-decoration-none {{ text_color }}" id="like-btn" aria-label="Like this content">
+        <i class="fa-regular fa-heart heart-outline" style="font-size: 1.5rem; color: #dc3545;"></i>
+        <i class="fa-solid fa-heart heart-filled" style="font-size: 1.5rem; color: #dc3545; display: none;"></i>
+      </button>
+      <span class="like-count {{ text_color }} ms-1" id="like-count">0</span>
+    </div>
   </div>
 
   <!-- Comment Input Section -->

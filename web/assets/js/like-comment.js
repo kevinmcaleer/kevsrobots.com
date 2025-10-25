@@ -43,6 +43,7 @@
     }
 
     // Load initial data
+    loadPageViewData(contentUrl);
     loadLikeData(contentUrl);
     loadComments(contentUrl);
     logPageView(contentUrl);
@@ -71,6 +72,25 @@
     } catch (error) {
       // Silently fail - page view logging is not critical
       console.error('[PageView] Error logging page view:', error);
+    }
+  }
+
+  // Load page view data
+  async function loadPageViewData(contentUrl) {
+    try {
+      const response = await fetch(`${CHATTER_API}/analytics/page-views/${encodeURIComponent(contentUrl)}`, {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const viewCountEl = document.getElementById('view-count');
+        if (viewCountEl) {
+          viewCountEl.textContent = data.view_count_formatted;
+        }
+        console.log('[PageView] Loaded view count:', data.view_count_formatted);
+      }
+    } catch (error) {
+      console.error('[PageView] Error loading view data:', error);
     }
   }
 
