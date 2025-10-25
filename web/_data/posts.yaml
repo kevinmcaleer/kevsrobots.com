@@ -41,6 +41,9 @@ posts:
 - title: Pinout.XYZ
   url: /2023-05-28-pinout-xyz.md
   date: 2023-05-28
+- title: Creating Gears in Fusion 360
+  url: /2025-10-06-creating-gears-in-fusion-360.md
+  date: 2025-10-06
 - title: OpenCat
   url: /2021-01-31-opencat.md
   date: 2021-01-31
@@ -203,6 +206,9 @@ posts:
 - title: Pico W Toothbrush
   url: /2023-11-26-pico_toothbrush.md
   date: 2023-11-26
+- title: 5 Tips for Managing Your Arduino Uno Q
+  url: /2025-10-25-uno-q-tips.md
+  date: 2025-10-25
 - title: Weather Station Display
   url: /2025-02-22-weather-station-display.md
   date: 2025-02-22
@@ -425,6 +431,9 @@ posts:
 - title: Raspberry Pi MotionEye Camera Setup with Docker
   url: /2024-11-14-motioneye-on-pi.md
   date: 2024-11-14
+- title: SMARS Q
+  url: /2025-10-19-smars-q.md
+  date: 2025-10-19
 - title: Obsidian - the best tool for Makers
   url: /2024-12-01-obsidian.md
   date: 2024-12-01
