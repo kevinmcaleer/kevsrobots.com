@@ -3,7 +3,7 @@
 <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
 {% for item in robots %}
 
-{% include card.html cardtitle=item.name description=item.description link=item.link img=item.cover noborder=true date=item.date dl="2" tl="1" %}
+{% include card.html cardtitle=item.name description=item.description link=item.link img=item.cover noborder=true date=item.date dl="2" tl="1" include_likes=true%}
 
 {% endfor %}
 </div>
