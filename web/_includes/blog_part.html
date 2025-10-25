@@ -4,6 +4,6 @@
 {% for post in posts | limit:3  %}
 
     {% include card.html img=post.cover description=post.description link=post.url 
-        date=post.date author=post.author %}
+        date=post.date author=post.author include_likes=true %}
 
 {% endfor %}

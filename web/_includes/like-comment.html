@@ -1,16 +1,25 @@
+{% assign bg_colour = include.bg_color %}
+{% if bg_colour %}
+  {% assign text_color = "text-white" %}
+  {% assign icon_color = "white" %}
+{% else %}
+  {% assign text_color = "text-dark" %}
+  {% assign icon_color = "black" %}
+{% endif %}
+
 <div class="like-comment-section mt-4" data-url="{{ page.url }}">
 
   <!-- Like Button Section -->
   <div class="like-section mb-3">
-    <button class="btn btn-link p-0 like-button text-decoration-none" id="like-btn" aria-label="Like this content">
+    <button class="btn btn-link p-0 like-button text-decoration-none {{ text_color }}" id="like-btn" aria-label="Like this content">
       <i class="fa-regular fa-heart heart-outline" style="font-size: 1.5rem; color: #dc3545;"></i>
       <i class="fa-solid fa-heart heart-filled" style="font-size: 1.5rem; color: #dc3545; display: none;"></i>
     </button>
-    <span class="like-count text-muted ms-2" id="like-count">0</span>
+    <span class="like-count {{ text_color }} ms-2" id="like-count">0</span>
   </div>
 
   <!-- Comment Input Section -->
-     <h5>Comments</h5>
+     <h5 class="{{ text_color }}">Comments</h5>
   <div class="comment-input-section mb-4">
     <div class="position-relative">
       <textarea class="form-control comment-input" id="comment-textarea" rows="3" placeholder="Post your comment..." style="resize: vertical; min-height: 80px;"></textarea>
@@ -26,14 +35,14 @@
 
   <!-- Comments List Section -->
   <div class="comments-list" id="comments-list">
-    <div class="text-center text-muted py-3" id="comments-loading">
+    <div class="text-center {{ text_color }} py-3" id="comments-loading">
       <div class="spinner-border spinner-border-sm me-2" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
       Loading comments...
     </div>
     <div id="comments-container"></div>
-    <div class="text-center text-muted py-3" id="no-comments" style="display: none;">
+    <div class="text-center {{ text_color }} py-3" id="no-comments" style="display: none;">
       <i class="fa-regular fa-comment me-2"></i>No comments yet. Be the first to comment!
     </div>
   </div>

@@ -45,6 +45,33 @@
     // Load initial data
     loadLikeData(contentUrl);
     loadComments(contentUrl);
+    logPageView(contentUrl);
+  }
+
+  // Log page view
+  async function logPageView(contentUrl) {
+    console.log('[PageView] Attempting to log page view for:', contentUrl);
+    try {
+      // Get IP address will be handled server-side via X-Forwarded-For or request.client.host
+      const response = await fetch(`${CHATTER_API}/analytics/page-view`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: contentUrl,
+          ip_address: 'server-detected', // Server will override this
+          user_agent: navigator.userAgent
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[PageView] Successfully logged:', data);
+      } else {
+        console.error('[PageView] Failed with status:', response.status);
+      }
+    } catch (error) {
+      // Silently fail - page view logging is not critical
+      console.error('[PageView] Error logging page view:', error);
+    }
   }
 
   // Check if user is authenticated

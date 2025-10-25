@@ -1,8 +1,17 @@
 <!-- Like and Comment Summary Component -->
-<!-- Usage: include like-comment-summary.html url="blog/my-post.html" -->
+<!-- Usage: include like-comment-summary.html url="blog/my-post.html" bg_color="#036f96" -->
+
+{% assign bg_colour = include.bg_color %}
+{% if bg_colour %}
+  {% assign text_color = "text-white" %}
+{% else %}
+  {% assign text_color = "text-muted" %}
+{% endif %}
 
 <div class="like-comment-summary" data-summary-url="{{ include.url }}">
-  <span class="text-muted small">
+  <span class="{{ text_color }} small">
+    <i class="fa-solid fa-chart-simple"></i> <span class="view-count-summary">0</span>
+    &nbsp;&nbsp;
     <i class="fa-regular fa-heart"></i> <span class="like-count-summary">0</span>
     &nbsp;&nbsp;
     <i class="fa-regular fa-comment"></i> <span class="comment-count-summary">0</span>

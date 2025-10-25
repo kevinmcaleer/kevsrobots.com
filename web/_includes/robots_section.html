@@ -7,7 +7,7 @@
             {% for article in articles | limit:3 | sort:date | reverse %}
             {% if article.title != 'Robots' %}
 
-            {% include card.html cardtitle=article.name link=article.link img=article.cover description=article.description tl="1" dl="3" date=article.date small_title=true noborder=true bg_color="bg-card-green"%}
+            {% include card.html cardtitle=article.name link=article.link img=article.cover description=article.description tl="1" dl="3" date=article.date small_title=true noborder=true bg_color="bg-card-green" include_likes=true%}
 
             {% endif %}
             {% endfor %}

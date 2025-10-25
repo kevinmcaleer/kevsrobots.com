@@ -89,7 +89,7 @@ include_likes - include like comment summary if true
                 {% endif %}
                 {% if include_likes %}
                 {% assign url_without_slash = include.link | remove_first: "/" %}
-                {% include like-comment-summary.html url=url_without_slash %}
+                {% include like-comment-summary.html url=url_without_slash bg_color=include.bg_color %}
                 {% endif %}
             </div>
         </div>

@@ -6,7 +6,7 @@ excerpt: >-
   Discover essential maintenance tips to keep your Raspberry Pi running smoothly and efficiently.
 layout: showcase
 date: 2025-08-30
-date_updated: 2025-08-30
+date_updated: 2025-10-25
 difficulty: beginner
 cover: /assets/img/blog/pi-clean/cover.jpg
 hero: /assets/img/blog/pi-clean/hero.png
@@ -45,13 +45,19 @@ Over time, your Raspberry Pi can fill up with large or unnecessary files, which 
 
 **How might it present itself?**
 
-- “No space left on device” errors  
-- Slow performance  
+- "No space left on device" errors
+- Slow performance
 - Inability to save files or install updates
 
 ---
 
-**How to resolve it:**  
+**Checking your disk space:**
+
+Before you start removing files, it's helpful to see how much space you have available. The `df` (disk free) command shows you filesystem disk space usage. For a more human-readable format, use `df -h` which displays sizes in gigabytes (GB) and megabytes (MB) instead of raw bytes. Simply run `df -h` in the terminal to see a breakdown of all your mounted filesystems, their total size, how much is used, and how much is available. Look for your main filesystem (usually mounted at `/`) to see your SD card's storage status.
+
+---
+
+**How to resolve it:**
 Find and remove large files you no longer need.
 
 ---

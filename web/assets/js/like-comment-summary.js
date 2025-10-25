@@ -32,8 +32,11 @@
 
   async function loadSummaryData(summaryElement, contentUrl) {
     try {
-      // Load both like count and comment count in parallel
-      const [likeResponse, commentResponse] = await Promise.all([
+      // Load view count, like count and comment count in parallel
+      const [viewResponse, likeResponse, commentResponse] = await Promise.all([
+        fetch(`${CHATTER_API}/analytics/page-views/${encodeURIComponent(contentUrl)}`, {
+          credentials: 'include'
+        }),
         fetch(`${CHATTER_API}/interact/likes/${encodeURIComponent(contentUrl)}`, {
           credentials: 'include'
         }),
@@ -42,18 +45,28 @@
         })
       ]);
 
-      if (likeResponse.ok && commentResponse.ok) {
+      // Update view count
+      if (viewResponse.ok) {
+        const viewData = await viewResponse.json();
+        const viewCountEl = summaryElement.querySelector('.view-count-summary');
+        if (viewCountEl) {
+          viewCountEl.textContent = viewData.view_count_formatted || '0';
+        }
+      }
+
+      // Update like count
+      if (likeResponse.ok) {
         const likeData = await likeResponse.json();
-        const comments = await commentResponse.json();
-
-        // Update the summary display
         const likeCountEl = summaryElement.querySelector('.like-count-summary');
-        const commentCountEl = summaryElement.querySelector('.comment-count-summary');
-
         if (likeCountEl) {
           likeCountEl.textContent = likeData.like_count || 0;
         }
+      }
 
+      // Update comment count
+      if (commentResponse.ok) {
+        const comments = await commentResponse.json();
+        const commentCountEl = summaryElement.querySelector('.comment-count-summary');
         if (commentCountEl) {
           commentCountEl.textContent = comments.length || 0;
         }

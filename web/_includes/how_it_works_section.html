@@ -6,17 +6,8 @@
     <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3">
     {% for article in articles | limit:4 %}
     {% if article.title != 'How it Works' %}
-    <div class="col">
-        <a href="{{article.url}}" class="text-decoration-none">
-        <div class="card border-0 card-hover shadow-hover h-100 ">
-        <img class="card-img-top black" src="{{article.cover}}" alt="{{article.title}}">
-        <div class="card-body">
-        <h5 class="card-title black">{{article.short_title}}</h5>    
-        <p class="card-text small black">{{article.short_description}}</p>
-        </div>
-    </div>
-    </a>
-    </div>
+        {% include card.html title = article.short_title img = article.cover description = article.description link = article.url include_likes=true noborder=true%}
+
     {% endif %}
     {% endfor %}
     </div>
