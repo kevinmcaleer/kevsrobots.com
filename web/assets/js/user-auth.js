@@ -49,26 +49,34 @@
 
     // Check if elements exist
     if (!guestDropdown || !userDropdown) {
+      console.error('Navigation elements not found');
       return;
     }
 
-    if (isAuthenticated()) {
-      // User is logged in - show user menu
-      const username = getUsername();
+    const authenticated = isAuthenticated();
+    const username = getUsername();
 
-      if (username) {
-        usernameDisplay.textContent = username;
-        guestDropdown.style.setProperty('display', 'none', 'important');
-        userDropdown.style.setProperty('display', 'block', 'important');
-      } else {
-        // Failed to get username, show guest menu
-        guestDropdown.style.setProperty('display', 'block', 'important');
-        userDropdown.style.setProperty('display', 'none', 'important');
-      }
+    console.log('updateMenu called:', { authenticated, username });
+
+    if (authenticated && username) {
+      // User is logged in - show user menu
+      console.log('Showing user menu for:', username);
+      usernameDisplay.textContent = username;
+      guestDropdown.style.setProperty('display', 'none', 'important');
+      userDropdown.style.setProperty('display', 'block', 'important');
+
+      // Verify after setting
+      console.log('After setting - Guest display:', guestDropdown.style.display);
+      console.log('After setting - User display:', userDropdown.style.display);
     } else {
       // User is not logged in - show guest menu
+      console.log('Showing guest menu');
       guestDropdown.style.setProperty('display', 'block', 'important');
       userDropdown.style.setProperty('display', 'none', 'important');
+
+      // Verify after setting
+      console.log('After setting - Guest display:', guestDropdown.style.display);
+      console.log('After setting - User display:', userDropdown.style.display);
     }
   }
 
