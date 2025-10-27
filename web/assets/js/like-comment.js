@@ -79,6 +79,18 @@
     return false;
   }
 
+  // Get current username from cookies
+  function getCurrentUsername() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'username') {
+        return decodeURIComponent(value);
+      }
+    }
+    return null;
+  }
+
   // Get relative time string
   function getRelativeTime(dateString) {
     const now = new Date();
@@ -196,26 +208,61 @@
         if (noComments) noComments.style.display = 'none';
         if (container) container.innerHTML = '';
 
+        const currentUsername = getCurrentUsername();
+
         comments.forEach(comment => {
           const commentEl = document.createElement('div');
           commentEl.className = 'comment-item mb-3 p-3 border rounded';
+          commentEl.dataset.commentId = comment.id;
+
+          // Check if current user is the author
+          const isAuthor = currentUsername && currentUsername === comment.username;
+
+          // Build dropdown menu items
+          let dropdownItems = '';
+          if (isAuthor) {
+            dropdownItems += `
+              <li><a class="dropdown-item" href="#" onclick="editComment(${comment.id}); return false;">
+                <i class="fa-solid fa-pen me-2"></i>Edit
+              </a></li>
+            `;
+          }
+          dropdownItems += `
+            <li><a class="dropdown-item" href="#" onclick="reportComment(${comment.id}); return false;">
+              <i class="fa-solid fa-flag me-2"></i>Report
+            </a></li>
+          `;
+
+          // Show "edited" indicator if comment was edited
+          const editedIndicator = comment.edited_at ?
+            `<span class="text-muted small ms-1">(<a href="#" class="text-decoration-none" onclick="toggleVersionHistory(${comment.id}); return false;">edited ${getRelativeTime(comment.edited_at)}</a>)</span>` : '';
+
           commentEl.innerHTML = `
             <div class="d-flex justify-content-between align-items-start">
               <div class="flex-grow-1">
                 <div class="d-flex align-items-center mb-1">
                   <strong class="me-2">${escapeHtml(comment.username)}</strong>
                   <span class="text-muted small">${getRelativeTime(comment.created_at)}</span>
+                  ${editedIndicator}
                 </div>
-                <p class="mb-0">${escapeHtml(comment.content)}</p>
+                <div class="comment-content">
+                  <p class="mb-0 comment-text">${escapeHtml(comment.content)}</p>
+                </div>
+                <div class="version-history mt-2" id="version-history-${comment.id}" style="display: none;">
+                  <div class="text-muted small mb-1">
+                    <i class="fa-solid fa-clock-rotate-left me-1"></i>Previous versions:
+                  </div>
+                  <div class="version-history-content" style="max-height: 200px; overflow-y: auto;">
+                    <div class="text-muted small">Loading...</div>
+                  </div>
+                </div>
               </div>
               <div class="dropdown">
                 <button class="btn btn-link btn-sm text-muted p-0" type="button" data-bs-toggle="dropdown">
                   <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="#" onclick="reportComment(${comment.id}); return false;">
-                    <i class="fa-solid fa-flag me-2"></i>Report
-                  </a></li>
+                  ${dropdownItems}
                 </ul>
               </div>
             </div>
@@ -294,6 +341,150 @@
     div.textContent = text;
     return div.innerHTML;
   }
+
+  // Edit comment
+  window.editComment = async function(commentId) {
+    if (!isAuthenticated()) {
+      window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+
+    const commentEl = document.querySelector(`[data-comment-id="${commentId}"]`);
+    if (!commentEl) return;
+
+    const contentDiv = commentEl.querySelector('.comment-content');
+    const textEl = commentEl.querySelector('.comment-text');
+    if (!contentDiv || !textEl) return;
+
+    // Get current text
+    const currentText = textEl.textContent;
+
+    // Replace with textarea
+    contentDiv.innerHTML = `
+      <div class="edit-comment-form">
+        <textarea class="form-control mb-2" rows="3" id="edit-textarea-${commentId}">${escapeHtml(currentText)}</textarea>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-primary" onclick="saveCommentEdit(${commentId}); return false;">Save</button>
+          <button class="btn btn-sm btn-secondary" onclick="cancelCommentEdit(${commentId}, '${escapeHtml(currentText).replace(/'/g, "\\'")}'); return false;">Cancel</button>
+        </div>
+        <div id="edit-error-${commentId}" class="alert alert-danger mt-2" style="display: none;"></div>
+      </div>
+    `;
+
+    // Focus the textarea
+    const textarea = document.getElementById(`edit-textarea-${commentId}`);
+    if (textarea) {
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    }
+  };
+
+  // Save comment edit
+  window.saveCommentEdit = async function(commentId) {
+    const textarea = document.getElementById(`edit-textarea-${commentId}`);
+    if (!textarea) return;
+
+    const newContent = textarea.value.trim();
+    if (!newContent) {
+      alert('Comment cannot be empty');
+      return;
+    }
+
+    // Check for URLs (client-side warning)
+    const urlPattern = /https?:\/\/|www\.|\.com|\.net|\.org|\.io/i;
+    if (urlPattern.test(newContent)) {
+      alert('Comments cannot contain URLs or links to other sites.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${CHATTER_API}/interact/comments/${commentId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newContent })
+      });
+
+      if (response.ok) {
+        const likeSection = document.querySelector('.like-comment-section');
+        const contentUrl = likeSection ? likeSection.dataset.url : null;
+        if (contentUrl) {
+          loadComments(contentUrl);
+        }
+      } else {
+        const error = await response.json();
+        const errorEl = document.getElementById(`edit-error-${commentId}`);
+        if (errorEl) {
+          errorEl.textContent = error.detail || 'Error updating comment';
+          errorEl.style.display = 'block';
+        }
+      }
+    } catch (error) {
+      console.error('Error updating comment:', error);
+      const errorEl = document.getElementById(`edit-error-${commentId}`);
+      if (errorEl) {
+        errorEl.textContent = 'Error updating comment';
+        errorEl.style.display = 'block';
+      }
+    }
+  };
+
+  // Cancel comment edit
+  window.cancelCommentEdit = function(commentId, originalText) {
+    const commentEl = document.querySelector(`[data-comment-id="${commentId}"]`);
+    if (!commentEl) return;
+
+    const contentDiv = commentEl.querySelector('.comment-content');
+    if (!contentDiv) return;
+
+    // Restore original text
+    contentDiv.innerHTML = `<p class="mb-0 comment-text">${originalText}</p>`;
+  };
+
+  // Toggle version history display
+  window.toggleVersionHistory = async function(commentId) {
+    const versionHistoryEl = document.getElementById(`version-history-${commentId}`);
+    if (!versionHistoryEl) return;
+
+    // Toggle visibility
+    if (versionHistoryEl.style.display === 'none') {
+      versionHistoryEl.style.display = 'block';
+
+      // Load versions if not already loaded
+      const contentEl = versionHistoryEl.querySelector('.version-history-content');
+      if (contentEl && contentEl.textContent.includes('Loading')) {
+        try {
+          const response = await fetch(`${CHATTER_API}/interact/comments/${commentId}/versions`, {
+            credentials: 'include'
+          });
+
+          if (response.ok) {
+            const versions = await response.json();
+
+            if (versions.length === 0) {
+              contentEl.innerHTML = '<div class="text-muted small">No previous versions</div>';
+            } else {
+              contentEl.innerHTML = versions.map(version => `
+                <div class="border-start border-2 ps-2 mb-2">
+                  <div class="text-muted small mb-1">
+                    ${new Date(version.edited_at).toLocaleString()}
+                  </div>
+                  <div class="small">${escapeHtml(version.content)}</div>
+                </div>
+              `).join('');
+            }
+          } else {
+            contentEl.innerHTML = '<div class="text-danger small">Error loading versions</div>';
+          }
+        } catch (error) {
+          console.error('Error loading version history:', error);
+          contentEl.innerHTML = '<div class="text-danger small">Error loading versions</div>';
+        }
+      }
+    } else {
+      versionHistoryEl.style.display = 'none';
+    }
+  };
 
   // Report comment (placeholder)
   window.reportComment = function(commentId) {
