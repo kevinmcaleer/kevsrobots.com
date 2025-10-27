@@ -58,17 +58,17 @@
 
       if (username) {
         usernameDisplay.textContent = username;
-        guestDropdown.style.display = 'none';
-        userDropdown.style.display = 'inline-flex';
+        guestDropdown.style.setProperty('display', 'none', 'important');
+        userDropdown.style.setProperty('display', 'block', 'important');
       } else {
         // Failed to get username, show guest menu
-        guestDropdown.style.display = 'inline-flex';
-        userDropdown.style.display = 'none';
+        guestDropdown.style.setProperty('display', 'block', 'important');
+        userDropdown.style.setProperty('display', 'none', 'important');
       }
     } else {
       // User is not logged in - show guest menu
-      guestDropdown.style.display = 'inline-flex';
-      userDropdown.style.display = 'none';
+      guestDropdown.style.setProperty('display', 'block', 'important');
+      userDropdown.style.setProperty('display', 'none', 'important');
     }
   }
 
