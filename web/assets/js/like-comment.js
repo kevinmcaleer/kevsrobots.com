@@ -218,6 +218,9 @@
           // Check if current user is the author
           const isAuthor = currentUsername && currentUsername === comment.username;
 
+          // Debug logging
+          console.log(`Comment ${comment.id}: currentUser="${currentUsername}", author="${comment.username}", isAuthor=${isAuthor}`);
+
           // Build dropdown menu items
           let dropdownItems = '';
           if (isAuthor) {
