@@ -4,7 +4,7 @@
 {% for course in courses | sort: 'date_published' | reverse | limit: 3 %}
 {{couse.date_published}}
 
-{% include card.html cardtitle=course.name img=course.cover link=course.link description=course.description date=course.date_published duration=course.duration noborder=true small_title=true tl="2" dl="3" bg_color="bg-card-red" type="course"%}
+{% include card.html cardtitle=course.name img=course.cover link=course.link description=course.description date=course.date_published duration=course.duration noborder=true small_title=true tl="2" dl="3" bg_color="bg-card-red" type="course" include_likes=true %}
 
 {% endfor %} 
 </div>

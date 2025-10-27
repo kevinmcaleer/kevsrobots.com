@@ -6,6 +6,7 @@
 {% if course.name == name %}
 
 <a href="{{ course.link }}" class="text-decoration-none">
+    
 <div class="card card-hover card-shadow border-0 h-100">
     <img src="{{course.cover}}" class="card-img-top" alt="{{course.title}}">
     <div class="card-img-overlay rounded-2 m-0 p-0">
@@ -14,7 +15,7 @@
     <div class="card-body">
         <p class="card-text text-small dark-grey text-truncate-2-lines">{{ course.name }}</p>
         <p class="card-text text-small text-muted"><i class="fa-regular fa-clock"></i>&nbsp;{{ course.duration | replace: "0h ",""}}<br />
-            
+        {% include like-comment-summary.html %}
     </div>
 </div>
 </a>

@@ -13,7 +13,7 @@
             {% for article in articles | limit:3 %}
             {% if article.title != 'Reviews' %}
                 
-            {% include card.html cardtitle=article.title link=article.url img=article.cover date=article.date description=article.excerpt noborder=true small_title=true tl="2" dl="3" %}
+            {% include card.html cardtitle=article.title link=article.url img=article.cover date=article.date description=article.excerpt noborder=true small_title=true tl="2" dl="3" include_likes=true %}
 
             {% endif %}
             {% endfor %}

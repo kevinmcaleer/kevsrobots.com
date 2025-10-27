@@ -8,7 +8,7 @@
     {% for course in courses %}
 
     {% include card.html cardtitle=course.name author=course.author date=course.date_published 
-        img=course.cover duration=course.duration noborder=true dl="3" tl="2" type='course' link=course.link small_title=true bg_color="bg-card-blue" %}
+        img=course.cover duration=course.duration noborder=true dl="3" tl="2" type='course' link=course.link small_title=true bg_color="bg-card-blue" include_likes=true %}
 
 {% endfor %} 
 </div>
