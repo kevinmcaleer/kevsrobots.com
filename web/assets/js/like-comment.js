@@ -225,6 +225,9 @@
               <li><a class="dropdown-item" href="#" onclick="editComment(${comment.id}); return false;">
                 <i class="fa-solid fa-pen me-2"></i>Edit
               </a></li>
+              <li><a class="dropdown-item text-danger" href="#" onclick="removeComment(${comment.id}); return false;">
+                <i class="fa-solid fa-trash me-2"></i>Remove
+              </a></li>
             `;
           }
           dropdownItems += `
@@ -483,6 +486,41 @@
       }
     } else {
       versionHistoryEl.style.display = 'none';
+    }
+  };
+
+  // Remove comment
+  window.removeComment = async function(commentId) {
+    if (!isAuthenticated()) {
+      window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+
+    // Confirm removal
+    if (!confirm('Are you sure you want to remove this comment? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${CHATTER_API}/interact/comments/${commentId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        // Reload comments to remove the deleted one from view
+        const likeSection = document.querySelector('.like-comment-section');
+        const contentUrl = likeSection ? likeSection.dataset.url : null;
+        if (contentUrl) {
+          loadComments(contentUrl);
+        }
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Error removing comment');
+      }
+    } catch (error) {
+      console.error('Error removing comment:', error);
+      alert('Error removing comment');
     }
   };
 
