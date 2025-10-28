@@ -5,7 +5,7 @@
   date: 2025/10/19
   hero: /projects/smars-q/assets/hero.png
 - name: Pico Plotter
-  link: /blog/pico-plotter.html
+  link: /blog/pico_plotter.html
   cover: /assets/img/blog/pico_plotter/cover.jpg
   description: A simple drawing robot using a Raspberry Pi Pico
   date: 2025/06/22
