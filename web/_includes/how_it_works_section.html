@@ -6,7 +6,7 @@
     <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3">
     {% for article in articles | limit:4 %}
     {% if article.title != 'How it Works' %}
-        {% include card.html title = article.short_title img = article.cover description = article.description link = article.url include_likes=true noborder=true%}
+        {% include card.html title = article.short_title img = article.cover description = article.description link = article.url include_likes=true noborder=true include_likes=true %}
 
     {% endif %}
     {% endfor %}

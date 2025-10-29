@@ -18,6 +18,7 @@ tags:
 groups:
  - pico
  - pcb
+ - electronics
 videos:
  - -0wCtKz1l78
 repo:

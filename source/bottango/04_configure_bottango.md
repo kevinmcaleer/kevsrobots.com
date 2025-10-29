@@ -71,8 +71,61 @@ Use the sliders or create a simple timeline keyframe to test each servo's range 
 
 ---
 
-You’re now fully set up to animate!
+You're now fully set up to animate!
 
-Next up: [Creating Motion Sequences](06_create_motion.md)
+---
+
+## Common Issues
+
+**Problem**: Servo added but doesn't appear in timeline
+
+**Solution**: Check that you've saved the servo settings and that the project window is maximized. Try refreshing the timeline view
+
+**Why**: Sometimes the UI needs to refresh to show newly added servos
+
+**Problem**: Can't select the correct pin in dropdown
+
+**Solution**: Ensure your board is connected and recognized by Bottango. Go to Devices > Board Selection to verify connection
+
+**Why**: Bottango only shows available pins for connected boards
+
+**Problem**: Servo moves when slider changes but not during timeline playback
+
+**Solution**: Make sure you've added keyframes to the timeline. Manual control works differently from animated playback
+
+**Why**: Timeline playback requires keyframes - the servo follows programmed positions, not the slider
+
+**Problem**: Servo calibration is off (90° position isn't centered)
+
+**Solution**: Adjust the PWM values in advanced servo settings:
+- Typical range: Min PWM = 544µs, Max PWM = 2400µs
+- Fine-tune these values until 90° is physically centered
+
+**Why**: Different servo brands use slightly different PWM timing
+
+**Problem**: Multiple servos assigned to same pin by mistake
+
+**Solution**: Edit each servo's settings and ensure each has a unique pin assignment. Bottango will warn you but won't prevent it
+
+**Why**: Two servos on one pin will both receive the same signal and move together
+
+**Problem**: Project won't save or keeps crashing
+
+**Solution**:
+1. Save to a location without special characters in path
+2. Ensure you have write permissions to the folder
+3. Check disk space
+
+**Why**: File system issues can prevent Bottango from writing project files
+
+**Problem**: Servo names disappeared or reset
+
+**Solution**: Always save your project after making changes (Ctrl+S / Cmd+S). Bottango auto-saves but it's good practice
+
+**Why**: Unsaved changes are lost if Bottango closes unexpectedly
+
+---
+
+Next up: [Creating Motion Sequences](05_create_motion.md)
 
 ---

@@ -18,6 +18,7 @@ tags:
 groups:
  - weird
  - raspberrypi
+ - electronics
 videos:
  - bV2sw7XBaqo
 repo:

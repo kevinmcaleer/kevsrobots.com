@@ -19,6 +19,7 @@ groups:
  - pico
  - micropython
  - robots
+ - electronics
 videos:
  - H6CNmnT6kGo
 repo:

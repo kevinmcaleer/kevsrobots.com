@@ -20,6 +20,7 @@ groups:
     - microPython
     - pets
     - pcb
+    - electronics
 videos:
  - c6D1JRDddkE
  - btG3Pd8ZlBw

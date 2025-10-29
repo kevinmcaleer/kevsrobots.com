@@ -18,6 +18,7 @@ groups:
  - seasonal
  - 3dprinting
  - pico
+ - electronics
 videos:
  - UlY00Het18M
  - ij1zMzfsl74

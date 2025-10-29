@@ -12,6 +12,9 @@ tags:
  - Fusion 360
  - 3dprinting
  - Robots
+groups:
+ - electronics
+ - 3dprinting
 ---
 
 **⚠️ Work in progress** Please note, I'll add extra components as I use them.

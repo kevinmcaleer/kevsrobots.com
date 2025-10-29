@@ -22,6 +22,7 @@ groups:
  - micropython
  - music
  - weird
+ - electronics
 code:
  - https://www.github.com/kevinmcaleer/PicoTouch
 ---

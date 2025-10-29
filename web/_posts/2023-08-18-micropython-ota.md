@@ -17,6 +17,7 @@ tags:
  - Auto-update
 groups:
  - micropython
+ - electronics
 videos:
  - f1widOJYQDc
 repo:

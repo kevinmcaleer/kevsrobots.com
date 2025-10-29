@@ -19,6 +19,7 @@ tags:
 groups:
  - pico
  - micropython
+ - electronics
 # videos:
 #  - f4p6wBqGEJI
 repo:

@@ -19,6 +19,7 @@ tags:
  - 3D Printing
 groups:
  - hacks
+ - electronics
 videos:
  - fXgVCk3UTk0
 repo:

@@ -16,6 +16,7 @@ tags:
 groups:
   - robots
   - raspberrypi
+  - electronics
 videos:
   - yjc-bpJVaHo
 

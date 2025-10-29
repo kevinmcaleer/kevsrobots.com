@@ -20,6 +20,7 @@ groups:
  - weird
  - seasonal
  - micropython
+ - electronics
 videos:
  - ylZYOJ2zx8c
 repo:

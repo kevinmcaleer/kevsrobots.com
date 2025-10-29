@@ -194,12 +194,12 @@
     uses two stepper motors to create beautiful drawings.  This course covers the
     essential steps from assembling the robot, installing the software, and creating
     your first drawing.
-  duration: 0h 46m
+  duration: 1h 0m
   groups:
   - robot arm
   - python
   - raspberry pi
-  link: /learn/brachiograph/01_intro.html
+  link: /learn/brachiograph/00_intro.html
   name: BrachioGraph Tutorial
 - author: Kevin McAleer
   cover: /learn/mini_rack/assets/cover.jpg
@@ -332,12 +332,12 @@
     no-code motion tool for animating servos and creating interactive scenes.  This
     course walks you through installing Bottango, wiring servos, programming boards,
     and creating expressive motion sequences.
-  duration: 0h 44m
+  duration: 1h 8m
   groups:
   - animation
   - robotics
   - arduino
-  link: /learn/bottango/01_intro.html
+  link: /learn/bottango/00_intro.html
   name: Bottango Basics
 - author: Kevin McAleer
   cover: /learn/duckdb/assets/cover.jpg
@@ -455,7 +455,7 @@
   cover: /learn/burgerbot/assets/burgerbot.jpg
   date_published: 2023-04-27
   description: Build a simple round robot powered by Raspberry Pi Pico
-  duration: 4h 8m
+  duration: 4h 34m
   groups:
   - robotics
   - micropython

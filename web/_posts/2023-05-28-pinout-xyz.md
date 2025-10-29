@@ -19,6 +19,7 @@ tags:
  - Bonnet
 groups:
  - raspberrypi
+ - electronics
 videos:
  - I2RLDGSP6Wk
 ---

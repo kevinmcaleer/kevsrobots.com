@@ -54,3 +54,31 @@ The VCC Can be 5V or higher depending on the servo, the SG90 servos recommended 
 ![Servo Wiring](assets/servo.jpg){:class="w-50 card-hover card-shadow rounded-3"}
 
 ---
+
+## Common Issues
+
+- **Problem**: Servos don't move at all when code runs
+- **Solution**: Check all connections: Red servo wire to 5V pin (physical pin 2 or 4), black/brown wire to GND, orange/yellow wire to correct GPIO (14, 15, or 18)
+- **Why**: All three connections must be secure for servos to work
+
+- **Problem**: Servos jitter or behave erratically
+- **Solution**: Use an external 5V power supply rated for at least 2A. Connect servo power to external supply, but keep grounds connected together (common ground)
+- **Why**: Three servos draw too much current for the Pi's onboard 5V regulator - causes voltage drops
+
+- **Problem**: Only one servo works, others don't respond
+- **Solution**: Check that each servo's signal wire goes to the correct GPIO pin (Shoulder→GPIO 14, Elbow→GPIO 15, Pen→GPIO 18)
+- **Why**: Wrong GPIO pins means the signal goes nowhere
+
+- **Problem**: Pi shuts down or reboots when servos move
+- **Solution**: You're drawing too much power! Use an external 5V power supply for the servos. Never power all 3 servos from the Pi's 5V pin
+- **Why**: Servo current spikes can cause the Pi to brownout and reboot
+
+- **Problem**: GPIO pins get hot during operation
+- **Solution**: Immediately disconnect power! You may have wired power (5V) to a GPIO signal pin by mistake. Double-check your wiring against the diagram
+- **Why**: GPIO pins are designed for low-current signals, not power - incorrect wiring can damage the Pi
+
+- **Problem**: Servos move but in the wrong direction
+- **Solution**: This is normal and will be fixed in calibration. For now, just verify all servos respond to commands
+- **Why**: Servo direction depends on how the horn is attached - software calibration corrects this
+
+---

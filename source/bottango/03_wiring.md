@@ -89,10 +89,53 @@ Once everything is wired:
 3. Click **Assign Servo** and choose the correct pin.
 4. Use the **manual control slider** to test movement.
 
-If your servo moves as expected, you’re ready to animate!
+If your servo moves as expected, you're ready to animate!
 
 ---
 
-Next up: [Configuring Bottango and Assigning Servos](05_configure_bottango.md)
+## Common Issues
+
+**Problem**: Servo doesn't move at all
+
+**Solution**: Check all three connections (GND, VCC, Signal). Verify the servo is plugged into a PWM-capable pin
+
+**Why**: Loose connections or using a non-PWM pin prevents signal transmission
+
+**Problem**: Servo jitters or vibrates
+
+**Solution**:
+1. Add external power supply (don't power from Arduino 5V)
+2. Ensure all grounds are connected together (common ground)
+3. Check for loose wiring connections
+
+**Why**: Insufficient current causes voltage drops, making the servo unstable
+
+**Problem**: Multiple servos work individually but not together
+
+**Solution**: Use an external 5V power supply rated for at least 1A per servo. Connect all grounds together
+
+**Why**: Arduino's onboard regulator can't provide enough current for multiple servos
+
+**Problem**: Servo moves the wrong direction or to wrong positions
+
+**Solution**: Check servo configuration in Bottango - you may need to invert the direction or adjust min/max PWM values
+
+**Why**: Different servo models have different PWM ranges (typical: 544-2400µs, but varies)
+
+**Problem**: ESP32 servo moves erratically
+
+**Solution**: Ensure you're using an ESP32 GPIO that supports PWM (LED PWM channels). Avoid pins used for other functions
+
+**Why**: Some ESP32 pins are reserved for special functions and don't support servo control
+
+**Problem**: Servo makes grinding/buzzing noise
+
+**Solution**: Check if servo is hitting physical limits. Adjust Bottango's servo range settings to prevent overtravel
+
+**Why**: Forcing a servo past its mechanical limits damages gears
+
+---
+
+Next up: [Configuring Bottango and Assigning Servos](04_configure_bottango.md)
 
 ---

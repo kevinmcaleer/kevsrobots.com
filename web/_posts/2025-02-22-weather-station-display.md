@@ -21,6 +21,7 @@ groups:
  - raspberrypi
  - python
  - micropython
+ - electronics
 code:
  - https://www.github.com/kevinmcaleer/weather-station
 

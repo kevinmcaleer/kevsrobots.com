@@ -17,6 +17,7 @@ tags:
 groups:
  - pcb
  - robots
+ - electronics
 videos:
  - C_IUvI7KuP4
  - Ysi1OJqzwD0

@@ -3,29 +3,15 @@ title: Building the Plotter
 description: Learn how to build the BrachioGraph plotter from scratch using simple components and tools.
 layout: lesson
 type: page
-cover: asses/cover.png
-date_updated: 2021-07-30
----
-
-## Bill of Materials
-
-To build the BrachioGraph plotter, you will need the following components:
-
-Item             | Description                                        | Quantity       | Price  | Total
------------------|----------------------------------------------------|----------------|--------|-------
-SG90 Servo Motor | Micro servo motor for controlling the joints       | 3              | $1     | $3
-Raspberry Pi 3+  | Microcontroller for running the code               | 1              | $24.99 | $24.99
-Popsicle Sticks  | Craft Sticks for building the mechanical structure | 2 - pack of 50 | $1     | $1
-Hot Blue Gun     | For assembling the parts                           | 1              | $5     | $5
-a clothes peg    | For holding the pen                                | 1              | $0.50  | $0.50
-Foam Core board  | For the base                                       | 1              | $1     | $1
-Jumper wires     | For connecting the servos                          | 1 pack         | $5     | $5
-MiniBreadboard   | For wiring up the servos                           | 1              | $1     | $1
-{:class="table table-bordered table-striped"}
-
+cover: assets/cover.png
+date_updated: 2024-07-30
 ---
 
 ## Assembling the BrachioGraph
+
+> **Note:** Make sure you have all the materials from the introduction before starting. You'll need servos, popsicle sticks, hot glue, foam board, and the other items listed in the "What you'll need" section.
+
+---
 
 ![Base](assets/base.jpg){:class="w-100 card-hover card-shadow rounded-3"}
 
@@ -53,7 +39,7 @@ MiniBreadboard   | For wiring up the servos                           | 1       
 
 1. Mark a line on the center of the popsicle stick, 8cm end to end.
 
-1. Drill a small pilot hole (1-2mm drill bit) on either side of the line; this will enable the servo horn to be securely crewed to the stick.
+1. Drill a small pilot hole (1-2mm drill bit) on either side of the line; this will enable the servo horn to be securely screwed to the stick.
 
 1. Glue the two servo horns to the popsicle stick, ensuring the center of the horn is aligned with the center of mark the stick.
 
@@ -74,5 +60,33 @@ MiniBreadboard   | For wiring up the servos                           | 1       
     ![Pen Servo](assets/pen_servo.jpg){:class="w-100 card-hover card-shadow rounded-3"}
 
 [^1]: Provided by <https://brachiograph.art>
+
+---
+
+## Common Issues
+
+- **Problem**: Hot glue doesn't hold the servos in place
+- **Solution**: Roughen the surfaces with sandpaper before gluing. Apply glue to both surfaces and hold firmly for 30 seconds
+- **Why**: Smooth plastic surfaces don't bond well with hot glue without preparation
+
+- **Problem**: The arm lengths aren't exactly 8cm
+- **Solution**: Precision matters! Measure carefully from center to center. Use a ruler with mm markings for accuracy
+- **Why**: The BrachioGraph library assumes 8cm arms - different lengths will cause drawing inaccuracy
+
+- **Problem**: Servo horn won't attach securely to popsicle stick
+- **Solution**: Use small screws through the pilot holes you drilled, plus hot glue. Screws alone or glue alone may not hold under movement
+- **Why**: The servo applies torque to the horn - it needs mechanical fastening, not just adhesive
+
+- **Problem**: The foam board base bends or warps
+- **Solution**: Use thicker foam board (5mm minimum) or reinforce with a second layer. Keep it flat while gluing
+- **Why**: A warped base affects drawing accuracy and servo positioning
+
+- **Problem**: Popsicle sticks crack when drilling
+- **Solution**: Use a very small drill bit (1-2mm), drill slowly, and support the stick on scrap wood underneath
+- **Why**: Popsicle sticks are thin wood that can split easily if drilled too aggressively
+
+- **Problem**: The clothes peg won't hold the pen firmly
+- **Solution**: Try a spring-loaded peg instead of a flat wooden one. You can also wrap tape around the pen for a tighter fit
+- **Why**: The pen must be held firmly to maintain consistent contact with the paper
 
 ---

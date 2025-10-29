@@ -21,6 +21,7 @@ groups:
  - pcb
  - microPython
  - pico
+ - electronics
 videos:
  - HeGr8RnzVqk
 code:

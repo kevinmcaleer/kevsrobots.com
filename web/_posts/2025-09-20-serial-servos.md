@@ -19,6 +19,7 @@ groups:
   - raspberrypi
   - software
   - robotics
+  - electronics
 videos:
   - DQPC1Ev3jng
   

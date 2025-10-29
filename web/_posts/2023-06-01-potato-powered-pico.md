@@ -18,6 +18,7 @@ tags:
 groups:
  - weird
  - garden
+ - electronics
 videos:
  - UURmlI0Sru0
 ---

@@ -18,6 +18,7 @@ groups:
  - raspberrypi
  - pico
  - micropython
+ - electronics
 videos:
  - KYpNk5MRbI8
 code:

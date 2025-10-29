@@ -89,8 +89,49 @@ In the **Trigger Source**, choose a pin (e.g., D7), and define it as HIGH or LOW
 
 ---
 
-Now your project isn’t just moving — it’s responding!
+Now your project isn't just moving — it's responding!
 
-Next up: [Syncing Animations to Music](08_sync_music.md)
+---
+
+## Try it Yourself
+
+Time to make your project interactive! Try these exercises:
+
+1. **Keyboard Control**: Set up three different keyboard triggers:
+   - Press `1` → Servo moves to 0°
+   - Press `2` → Servo moves to 90°
+   - Press `3` → Servo moves to 180°
+
+   Test by pressing the keys in different sequences!
+
+2. **Button Animation**: Create a simple animation (2-3 seconds) and trigger it with:
+   - Keyboard key `SPACE`
+   - The animation should play once and stop
+
+   Try pressing the key multiple times - what happens?
+
+3. **Chained Triggers**: Create two short animations:
+   - Animation A: Servo moves from 0° to 90° (1 second)
+   - Animation B: Servo moves from 90° to 180° (1 second)
+
+   Set up triggers so:
+   - Pressing `A` plays Animation A
+   - When Animation A finishes, it automatically triggers Animation B
+
+   This creates a "chain reaction" effect!
+
+4. **Physical Button (Advanced)**: If you have a pushbutton wired to your board:
+   - Wire button to pin D7
+   - Create a trigger that listens to D7 going HIGH
+   - Make your servo "react" when you press the button
+
+**Challenge**: Can you create a "puppet control panel" where:
+- Keys `Q`, `W`, `E` control different servo positions
+- Key `R` plays a "reset" animation that returns all servos to neutral
+- Holding a key vs. pressing once creates different behaviors
+
+---
+
+Next up: [Syncing Animations to Music](07_sync_music.md)
 
 ---

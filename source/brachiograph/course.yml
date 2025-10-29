@@ -15,20 +15,20 @@
     - section:
         name: Introduction
         content:
-          - 01_intro.md
+          - 00_intro.md
     - section:
         name: Build the plotter
         content:
-          - 02_build.md
-          - 03_wire.md
+          - 01_build.md
+          - 02_wire.md
     - section:
         name: Programming
         content:
-          - 04_setup_pi.md
-          - 05_code.md
-          - 06_draw.md
-          - 07_vectorize.md
+          - 03_setup_pi.md
+          - 04_code.md
+          - 05_draw.md
+          - 06_vectorize.md
     - section:
         name: Summary
         content:
-          - 08_summary.md
+          - 07_summary.md

@@ -15,29 +15,29 @@
     - section:
         name: Introduction
         content:
-          - 01_intro.md
+          - 00_intro.md
     - section:
         name: Getting Started
         content:
-          - 02_install.md
-          - 03_setup_board.md
+          - 01_install.md
+          - 02_setup_board.md
     - section:
         name: Wiring and Configuration
         content:
-          - 04_wiring.md
-          - 05_configure_bottango.md
+          - 03_wiring.md
+          - 04_configure_bottango.md
     - section:
         name: Creating Animations
         content:
-          - 06_create_motion.md
-          - 07_triggers.md
-          - 08_sync_music.md
+          - 05_create_motion.md
+          - 06_triggers.md
+          - 07_sync_music.md
     - section:
         name: Advanced Projects
         content:
-          - 09_arduino_mode.md
-          - 10_use_with_gamepad.md
+          - 08_arduino_mode.md
+          - 09_use_with_gamepad.md
     - section:
         name: Summary
         content:
-          - 11_summary.md
+          - 10_summary.md

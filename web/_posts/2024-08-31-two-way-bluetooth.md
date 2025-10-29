@@ -18,6 +18,7 @@ groups:
  - raspberrypi
  - pico
  - micropython
+ - electronics
 videos:
  - l-K_0N1m5kQ
 code:

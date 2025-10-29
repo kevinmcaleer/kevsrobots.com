@@ -1,6 +1,29 @@
-# Claude Rules for KevsRobots.com
+# CLAUDE.md
 
-This file contains guidelines for working with the KevsRobots.com repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Quick Reference
+
+**Local Development:**
+```bash
+cd stacks && docker-compose up -d    # Start Jekyll server
+# Visit http://localhost:4000
+docker-compose down                   # Stop server
+```
+
+**Content Creation:**
+```bash
+python3 build.py                      # Build courses from /source
+python3 optimize_images.py            # Optimize images
+```
+
+**Important Rules:**
+- Blog posts: `YYYY-MM-DD-title.md` format in `/web/_posts/`
+- Courses: Start with `00_intro.md`, each needs `course.yml`
+- Groups: Categorize content in `/web/_groups/` with Font Awesome icons
+- Images: `<300KB`, use `loading="lazy"`, optimize with script
+- Docker: NEVER use `--no-cache` (Dockerfile has auto cache-busting)
+- Jekyll: Footer MUST be inside `<body>`, all `<script>` tags must close properly
 
 ---
 
@@ -8,13 +31,53 @@ This file contains guidelines for working with the KevsRobots.com repository.
 
 - **`/web`** - Jekyll site source files
   - `_posts/` - Blog posts (format: `YYYY-MM-DD-title.md`)
+  - `_groups/` - Content category pages (electronics, micropython, robots, etc.)
   - `_layouts/` - Jekyll layout templates
   - `_includes/` - Reusable components (header, footer, etc.)
+  - `_data/` - YAML data files (courses.yml, glossary.yml, navigation, etc.)
   - `_site/` - Generated static site (DO NOT edit directly)
   - `_config.yml` - Jekyll configuration
-- **`/source`** - Course content (Markdown lessons)
+- **`/source`** - Course content (Markdown lessons with course.yml files)
 - **`/stacks`** - Docker configurations for deployment
-- **`build.py`** - Builds courses from `/source` to `/web/learn`
+- **Python Scripts** (root directory):
+  - `build.py` - Builds courses from `/source` to `/web/learn`
+  - `optimize_images.py` - Optimizes images in-place, tracks with `.optimization_cache.json`
+  - `build_search.py` - Builds search data from courses/glossary/posts
+  - Other utility scripts for RSS, YouTube integration, analytics
+
+---
+
+## Content Architecture
+
+### Content Types
+The site has four main content types:
+
+1. **Blog Posts** (`/web/_posts/`) - News, tutorials, project showcases
+2. **Courses** (`/source/` → `/web/learn/`) - Structured learning content
+3. **Groups** (`/web/_groups/`) - Category pages that organize content
+4. **Data Files** (`/web/_data/`) - Structured data for navigation, courses, glossary
+
+### Data Files Flow
+```
+source/*/course.yml  ──┐
+                       ├─→ build.py ──→ web/_data/courses.yml ──→ Jekyll builds site
+web/_posts/*.md      ──┘
+```
+
+Key data files:
+- `courses.yml` - Generated from all course.yml files in /source
+- `glossary.yml` - Terms and definitions for search/reference
+- `navigation.yml` / `nav_*.yml` - Site navigation menus
+- `youtube.yml` - YouTube video metadata for embeds
+
+### Build Process
+1. **Course Build** - `build.py` uses `course_builder` module to:
+   - Read all `course.yml` files from `/source` subdirectories
+   - Generate lesson HTML/MD files in `/web/learn/course-name/`
+   - Update `/web/_data/courses.yml` with metadata for Jekyll
+2. **Jekyll Build** - Reads `/web` directory, generates static site to `_site/`
+3. **Search Index** - `build_search.py` combines courses, glossary, posts into searchable data
+4. **Image Optimization** - `optimize_images.py` runs manually to compress images
 
 ---
 
@@ -62,6 +125,13 @@ This file contains guidelines for working with the KevsRobots.com repository.
 - **Images** - Place in `/web/assets/img/blog/post-name/`
 - **Video embeds** - Use `videos:` frontmatter with YouTube IDs
 
+### Groups (Content Categories)
+- **Location** - `/web/_groups/` directory
+- **File naming** - Use lowercase with hyphens: `electronics.md`, `micropython.md`
+- **Frontmatter required** - title, description, date_published, layout (groups), cover, icon
+- **Purpose** - Categorize and organize related content (courses, blog posts, projects)
+- **Icon** - Use Font Awesome classes (e.g., `'fa-solid fa-bolt'` for electronics)
+
 ### Courses
 - **Source** - Edit in `/source/course-name/` as Markdown
 - **Build** - Run `python build.py` to generate `/web/learn/` content
@@ -87,6 +157,39 @@ This file contains guidelines for working with the KevsRobots.com repository.
 
 ---
 
+## Common Development Commands
+
+### Local Development
+```bash
+# Start local Jekyll server (from /stacks directory)
+cd stacks
+docker-compose up -d
+
+# View site at http://localhost:4000
+# LiveReload on port 35729 (auto-refresh on changes)
+
+# Stop server
+docker-compose down
+
+# View logs
+docker logs stacks-jekyll-serve-1
+```
+
+### Build and Test
+```bash
+# Build courses (processes /source → /web/learn)
+python3 build.py
+
+# Optimize images (safe to run multiple times)
+python3 optimize_images.py
+
+# Build search index
+python3 build_search.py
+
+# Check for broken links (if link_checker script exists)
+python3 link_checker/linkchecker.py
+```
+
 ## Common Tasks
 
 ### Add a New Blog Post
@@ -100,6 +203,17 @@ touch YYYY-MM-DD-post-title.md
 # 4. Add images to /web/assets/img/blog/post-title/
 # 5. Test locally at localhost:4000/blog/post-title.html
 # 6. Commit and deploy
+```
+
+### Add a New Content Group
+```bash
+# 1. Create group file
+cd web/_groups
+touch category-name.md
+
+# 2. Add frontmatter with title, description, layout: groups, cover, icon
+# 3. Add cover image to /web/assets/img/groups/
+# 4. Test at localhost:4000/groups/category-name.html
 ```
 
 ### Deploy to Production
@@ -290,9 +404,13 @@ Add to each lesson:
 
 ## Common Issues
 
-**Problem**: Error message or issue
-**Solution**: How to fix it
-**Why**: Explanation
+- **Problem**: Error message or issue
+- **Solution**: How to fix it
+- **Why**: Explanation
+
+- **Problem**: Another error or issue
+- **Solution**: Steps to resolve it
+- **Why**: Explanation of root cause
 ```
 
 #### 5. **Course Progression Indicators**
