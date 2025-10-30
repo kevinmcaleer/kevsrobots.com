@@ -113,36 +113,28 @@
     return `${diffYear}y`;
   }
 
-  // Load like count and user like status
+  // Load like count and user like status (combined into single API call)
   async function loadLikeData(contentUrl) {
     try {
-      const countResponse = await fetch(`${CHATTER_API}/interact/likes/${encodeURIComponent(contentUrl)}`, {
+      const response = await fetch(`${CHATTER_API}/interact/like-status/${encodeURIComponent(contentUrl)}`, {
         credentials: 'include'
       });
-      const countData = await countResponse.json();
-      const likeCountEl = document.getElementById('like-count');
-      if (likeCountEl) {
-        likeCountEl.textContent = countData.like_count;
-      }
 
-      // If user is authenticated, check if they've liked this
-      if (isAuthenticated()) {
-        try {
-          const statusResponse = await fetch(`${CHATTER_API}/interact/user-like-status/${encodeURIComponent(contentUrl)}`, {
-            credentials: 'include'
-          });
-          if (statusResponse.ok) {
-            const statusData = await statusResponse.json();
-            if (statusData.user_has_liked) {
-              // Show filled heart
-              const outlineHeart = document.querySelector('.heart-outline');
-              const filledHeart = document.querySelector('.heart-filled');
-              if (outlineHeart) outlineHeart.style.display = 'none';
-              if (filledHeart) filledHeart.style.display = 'inline';
-            }
-          }
-        } catch (err) {
-          console.log('Could not check user like status:', err);
+      if (response.ok) {
+        const data = await response.json();
+
+        // Update like count
+        const likeCountEl = document.getElementById('like-count');
+        if (likeCountEl) {
+          likeCountEl.textContent = data.like_count;
+        }
+
+        // Update heart icon based on user_has_liked
+        if (data.user_has_liked) {
+          const outlineHeart = document.querySelector('.heart-outline');
+          const filledHeart = document.querySelector('.heart-filled');
+          if (outlineHeart) outlineHeart.style.display = 'none';
+          if (filledHeart) filledHeart.style.display = 'inline';
         }
       }
     } catch (error) {
@@ -169,7 +161,9 @@
         const data = await response.json();
         const outlineHeart = document.querySelector('.heart-outline');
         const filledHeart = document.querySelector('.heart-filled');
+        const likeCountEl = document.getElementById('like-count');
 
+        // Update UI from response data (no need to fetch again)
         if (data.liked) {
           if (outlineHeart) outlineHeart.style.display = 'none';
           if (filledHeart) filledHeart.style.display = 'inline';
@@ -178,7 +172,10 @@
           if (filledHeart) filledHeart.style.display = 'none';
         }
 
-        loadLikeData(contentUrl);
+        // Update like count from response (eliminates 2 API calls)
+        if (likeCountEl && data.like_count !== undefined) {
+          likeCountEl.textContent = data.like_count;
+        }
       }
     } catch (error) {
       console.error('Error toggling like:', error);

@@ -5,17 +5,9 @@
 {% if post.layout == 'showcase' %}
 {% assign showcases = showcases | push: post %}
 <div class="col">
-<a href="{{ post.url }}" class="black text-decoration-none">
-<div class="card border-0 card-hover shadow-hover h-100">
-<img src="{{ post.cover }}" class="card-img-top" alt="{{post.title}}">
-<div class="card-body">
-<h5 class="card-title">{{ post.title }}</h5>
-<p class="card-text ">{{ post.excerpt }}</p>
 
-</div>
+    {% include card.html link=post.url cardtitle=post.title img=post.cover description=post.excerpt include_likes=true tl="3" dl="3" %}
 
-</div>
-</a>
 </div>
 {% endif %}
 {% endfor %}
