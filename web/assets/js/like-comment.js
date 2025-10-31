@@ -113,6 +113,12 @@
     return `${diffYear}y`;
   }
 
+  // Convert @mentions to profile links
+  function linkifyMentions(text) {
+    // Match @username (alphanumeric and underscore)
+    return text.replace(/@(\w+)/g, '<a href="https://chatter.kevsrobots.com/profile/$1" class="text-primary text-decoration-none fw-semibold" target="_blank">@$1</a>');
+  }
+
   // Load like count and user like status (combined into single API call)
   async function loadLikeData(contentUrl) {
     try {
@@ -240,16 +246,25 @@
           const editedIndicator = comment.edited_at ?
             `<span class="text-muted small ms-1">(<a href="#" class="text-decoration-none" onclick="toggleVersionHistory(${comment.id}); return false;">edited ${getRelativeTime(comment.edited_at)}</a>)</span>` : '';
 
+          // Build avatar HTML
+          const avatarHtml = comment.profile_picture ?
+            `<img src="https://chatter.kevsrobots.com/profile_pictures/${escapeHtml(comment.profile_picture)}" alt="${escapeHtml(comment.username)}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">` :
+            `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">${escapeHtml(comment.username[0].toUpperCase())}</div>`;
+
           commentEl.innerHTML = `
             <div class="d-flex justify-content-between align-items-start">
-              <div class="flex-grow-1">
-                <div class="d-flex align-items-center mb-1">
-                  <strong class="me-2">${escapeHtml(comment.username)}</strong>
-                  <span class="text-muted small">${getRelativeTime(comment.created_at)}</span>
-                  ${editedIndicator}
-                </div>
+              <div class="d-flex flex-grow-1">
+                ${avatarHtml}
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center mb-1">
+                    <a href="https://chatter.kevsrobots.com/profile/${escapeHtml(comment.username)}" class="text-decoration-none me-2" target="_blank">
+                      <strong>${escapeHtml(comment.username)}</strong>
+                    </a>
+                    <span class="text-muted small">${getRelativeTime(comment.created_at)}</span>
+                    ${editedIndicator}
+                  </div>
                 <div class="comment-content">
-                  <p class="mb-0 comment-text">${escapeHtml(comment.content)}</p>
+                  <p class="mb-0 comment-text">${linkifyMentions(escapeHtml(comment.content))}</p>
                 </div>
                 <div class="version-history mt-2" id="version-history-${comment.id}" style="display: none;">
                   <div class="text-muted small mb-1">
@@ -258,6 +273,7 @@
                   <div class="version-history-content" style="max-height: 200px; overflow-y: auto;">
                     <div class="text-muted small">Loading...</div>
                   </div>
+                </div>
                 </div>
               </div>
               <div class="dropdown">
