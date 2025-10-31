@@ -227,6 +227,12 @@ description: Manage your kevsrobots.com account
       // Load activity data
       loadActivity();
     } catch (error) {
+      // Check if it's an authentication error (expired or invalid token)
+      if (error.status === 401) {
+        // Redirect to login with return URL
+        window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
       ChatterAPI.displayError('error-message', 'Failed to load account information');
       console.error('Error loading user data:', error);
     }
@@ -275,6 +281,10 @@ description: Manage your kevsrobots.com account
       document.getElementById('email-edit-section').style.display = 'none';
       currentUser.email = newEmail;
     } catch (error) {
+      if (error.status === 401) {
+        window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
       ChatterAPI.displayError('error-message', error);
     }
   });
@@ -306,6 +316,10 @@ description: Manage your kevsrobots.com account
       // Clear form
       document.getElementById('password-form').reset();
     } catch (error) {
+      if (error.status === 401) {
+        window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
       ChatterAPI.displayError('error-message', error);
     } finally {
       document.getElementById('password-spinner').style.display = 'none';
@@ -327,6 +341,10 @@ description: Manage your kevsrobots.com account
       alert('Your account has been deleted.');
       window.location.href = '/';
     } catch (error) {
+      if (error.status === 401) {
+        window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
       ChatterAPI.displayError('error-message', error);
     }
   });
@@ -408,6 +426,10 @@ description: Manage your kevsrobots.com account
         currentUser.profile_picture = data.profile_picture_url.split('/').pop();
         updateProfilePictureDisplay(currentUser.profile_picture);
         setTimeout(() => { statusDiv.innerHTML = ''; }, 3000);
+      } else if (response.status === 401) {
+        // Authentication error - redirect to login
+        window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
       } else {
         statusDiv.innerHTML = `<div class="alert alert-danger alert-sm mt-2">${data.detail || 'Upload failed'}</div>`;
       }
@@ -439,6 +461,10 @@ description: Manage your kevsrobots.com account
         currentUser.profile_picture = null;
         updateProfilePictureDisplay(null);
         setTimeout(() => { statusDiv.innerHTML = ''; }, 3000);
+      } else if (response.status === 401) {
+        // Authentication error - redirect to login
+        window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
       } else {
         statusDiv.innerHTML = `<div class="alert alert-danger alert-sm mt-2">${data.detail || 'Delete failed'}</div>`;
       }
@@ -470,6 +496,10 @@ description: Manage your kevsrobots.com account
         ChatterAPI.displaySuccess('success-message', 'Profile updated successfully!');
         currentUser.location = location;
         currentUser.bio = bio;
+      } else if (response.status === 401) {
+        // Authentication error - redirect to login
+        window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+        return;
       } else {
         ChatterAPI.displayError('error-message', data.detail || 'Failed to update profile');
       }
