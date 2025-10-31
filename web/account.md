@@ -43,6 +43,13 @@ description: Manage your kevsrobots.com account
             <div class="mb-3">
               <label class="form-label fw-bold">Username</label>
               <p class="form-control-plaintext" id="account-username">Loading...</p>
+              <div class="input-group" style="max-width: 500px;">
+                <input type="text" class="form-control form-control-sm" id="profile-link" readonly>
+                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="copyProfileLink()">
+                  <i class="fas fa-copy me-1"></i>Copy Link
+                </button>
+              </div>
+              <small class="text-muted">Share your public profile with others</small>
             </div>
 
             <div class="mb-3">
@@ -185,6 +192,7 @@ description: Manage your kevsrobots.com account
 
       // Display user info
       document.getElementById('account-username').textContent = currentUser.username;
+      document.getElementById('profile-link').value = `https://www.kevsrobots.com/profile?username=${currentUser.username}`;
       document.getElementById('fullname-display').textContent = `${currentUser.firstname} ${currentUser.lastname}`;
       document.getElementById('email').value = currentUser.email;
       document.getElementById('status-badge').textContent = currentUser.status.charAt(0).toUpperCase() + currentUser.status.slice(1);
@@ -322,6 +330,34 @@ description: Manage your kevsrobots.com account
       ChatterAPI.displayError('error-message', error);
     }
   });
+
+  // Copy profile link to clipboard
+  function copyProfileLink() {
+    const profileLinkInput = document.getElementById('profile-link');
+    profileLinkInput.select();
+    profileLinkInput.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+      navigator.clipboard.writeText(profileLinkInput.value).then(() => {
+        // Visual feedback
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-success');
+
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.classList.remove('btn-success');
+          btn.classList.add('btn-outline-secondary');
+        }, 2000);
+      });
+    } catch (err) {
+      // Fallback for older browsers
+      document.execCommand('copy');
+      alert('Profile link copied to clipboard!');
+    }
+  }
 
   // Update profile picture display
   function updateProfilePictureDisplay(profilePicture) {
