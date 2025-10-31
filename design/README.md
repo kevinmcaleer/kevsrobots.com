@@ -88,10 +88,10 @@ You can link to profiles from anywhere on your site:
 
 ```html
 <!-- Link to a profile -->
-<a href="/profile.html?username=kev">View Profile</a>
+<a href="/pages/profile.html?username=kev">View Profile</a>
 
 <!-- Link with user's display name -->
-<a href="/profile.html?username={{ username }}">
+<a href="/pages/profile.html?username={{ username }}">
   {{ firstname }} {{ lastname }}
 </a>
 ```
