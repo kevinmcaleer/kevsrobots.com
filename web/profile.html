@@ -1,0 +1,191 @@
+---
+layout: default
+title: User Profile
+---
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+
+      <!-- Profile Header -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="row">
+            <div class="col-md-3 text-center mb-3 mb-md-0">
+              <div id="profile-avatar"></div>
+            </div>
+            <div class="col-md-9">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <h2 class="mb-1" id="profile-name"></h2>
+                  <p class="text-muted mb-0" id="profile-username"></p>
+                </div>
+                <div id="edit-profile-button"></div>
+              </div>
+
+              <div id="profile-location" class="mb-2" style="display: none;">
+                <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                <span id="location-text"></span>
+              </div>
+
+              <p id="profile-bio" class="mb-3" style="display: none;"></p>
+
+              <p class="text-muted mb-0">
+                <i class="fas fa-calendar me-2"></i>
+                <small id="profile-joined"></small>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <div class="card shadow-sm">
+            <div class="card-body text-center">
+              <div class="row">
+                <div class="col">
+                  <i class="fas fa-comments fa-2x text-primary mb-2"></i>
+                  <h4 class="mb-0" id="comment-count">0</h4>
+                  <p class="text-muted mb-0">Comments</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Comments -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-card-green text-white">
+          <h5 class="mb-0"><i class="fas fa-comment me-3"></i>Recent Comments</h5>
+        </div>
+        <div class="card-body p-4">
+          <div id="comments-list">
+            <div class="text-center py-3">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// Get username from URL parameter
+const urlParams = new URLSearchParams(window.location.search);
+const username = urlParams.get('username');
+
+if (!username) {
+  document.querySelector('.container').innerHTML = '<div class="alert alert-danger">No username provided</div>';
+} else {
+  loadProfile(username);
+}
+
+async function loadProfile(username) {
+  try {
+    // Load profile data
+    const response = await fetch(`https://chatter.kevsrobots.com/profile/${username}`, {
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Profile not found');
+    }
+
+    const profile = await response.json();
+
+    // Update page title
+    document.title = `${profile.username}'s Profile - Kev's Robots`;
+
+    // Set avatar
+    const avatarDiv = document.getElementById('profile-avatar');
+    if (profile.profile_picture_url) {
+      avatarDiv.innerHTML = `<img src="${escapeHtml(profile.profile_picture_url)}" alt="${escapeHtml(profile.username)}" class="rounded-circle img-fluid" style="max-width: 150px; max-height: 150px; object-fit: cover;">`;
+    } else {
+      avatarDiv.innerHTML = `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white" style="width: 150px; height: 150px; font-size: 3rem;">${escapeHtml(profile.username[0].toUpperCase())}</div>`;
+    }
+
+    // Set name and username
+    document.getElementById('profile-name').textContent = `${profile.firstname} ${profile.lastname}`;
+    document.getElementById('profile-username').textContent = `@${profile.username}`;
+
+    // Show edit button if viewing own profile
+    if (profile.is_own_profile) {
+      document.getElementById('edit-profile-button').innerHTML = '<a href="https://chatter.kevsrobots.com/account" class="btn btn-primary btn-sm"><i class="fas fa-edit me-1"></i>Edit Profile</a>';
+    }
+
+    // Show location if available
+    if (profile.location) {
+      document.getElementById('profile-location').style.display = 'block';
+      document.getElementById('location-text').textContent = profile.location;
+    }
+
+    // Show bio if available
+    if (profile.bio) {
+      const bioEl = document.getElementById('profile-bio');
+      bioEl.style.display = 'block';
+      bioEl.textContent = profile.bio;
+    }
+
+    // Set join date
+    const joinDate = new Date(profile.created_at);
+    document.getElementById('profile-joined').textContent = `Joined ${joinDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+
+    // Set comment count
+    document.getElementById('comment-count').textContent = profile.comment_count;
+
+    // Load comments
+    loadComments(username);
+
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    document.querySelector('.container').innerHTML = '<div class="alert alert-danger">Profile not found or error loading profile.</div>';
+  }
+}
+
+async function loadComments(username) {
+  const commentsDiv = document.getElementById('comments-list');
+
+  try {
+    const response = await fetch(`https://chatter.kevsrobots.com/profile/${username}/comments?limit=10`);
+    const data = await response.json();
+
+    if (data.comments && data.comments.length > 0) {
+      const commentsList = data.comments.map(comment => `
+        <div class="border-bottom pb-3 mb-3">
+          <p class="mb-2">${escapeHtml(comment.content)}</p>
+          <small class="text-muted">
+            <i class="fas fa-link me-1"></i>
+            <a href="https://www.kevsrobots.com/${escapeHtml(comment.url)}" target="_blank" class="text-decoration-none">
+              ${escapeHtml(comment.url)}
+            </a>
+            <span class="ms-3">
+              <i class="fas fa-clock me-1"></i>
+              ${new Date(comment.created_at).toLocaleDateString()}
+            </span>
+          </small>
+        </div>
+      `).join('');
+      commentsDiv.innerHTML = commentsList;
+    } else {
+      commentsDiv.innerHTML = '<p class="text-muted mb-0">No comments yet.</p>';
+    }
+  } catch (error) {
+    console.error('Error loading comments:', error);
+    commentsDiv.innerHTML = '<p class="text-danger mb-0">Failed to load comments.</p>';
+  }
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>

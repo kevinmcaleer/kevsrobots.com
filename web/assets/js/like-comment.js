@@ -116,7 +116,7 @@
   // Convert @mentions to profile links
   function linkifyMentions(text) {
     // Match @username (alphanumeric and underscore)
-    return text.replace(/@(\w+)/g, '<a href="https://chatter.kevsrobots.com/profile/$1" class="text-primary text-decoration-none fw-semibold" target="_blank">@$1</a>');
+    return text.replace(/@(\w+)/g, '<a href="https://www.kevsrobots.com/profile?username=$1" class="text-primary text-decoration-none fw-semibold">@$1</a>');
   }
 
   // Load like count and user like status (combined into single API call)
@@ -257,7 +257,7 @@
                 ${avatarHtml}
                 <div class="flex-grow-1">
                   <div class="d-flex align-items-center mb-1">
-                    <a href="https://chatter.kevsrobots.com/profile/${escapeHtml(comment.username)}" class="text-decoration-none me-2" target="_blank">
+                    <a href="https://www.kevsrobots.com/profile?username=${escapeHtml(comment.username)}" class="text-decoration-none me-2">
                       <strong>${escapeHtml(comment.username)}</strong>
                     </a>
                     <span class="text-muted small">${getRelativeTime(comment.created_at)}</span>

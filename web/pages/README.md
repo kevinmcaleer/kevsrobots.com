@@ -2,19 +2,27 @@
 
 ## Overview
 
-This directory contains a static HTML version of the user profile page that can be easily edited without rebuilding the Chatter Docker container.
+The user profile page has been moved to the root of the website for easier access.
+
+**New Location**: `/Users/kev/Web/kevsrobots.com/web/profile.html`
+
+The profile page uses the same template across both the main website and the Chatter app for consistency.
 
 ## Usage
 
 ### Accessing Profiles
 
-The profile page uses URL parameters to load user data:
-
+**Main Website** (uses URL parameters):
 ```
-https://www.kevsrobots.com/pages/profile.html?username=kev
+https://www.kevsrobots.com/profile?username=kev
 ```
 
-Replace `kev` with any username to view that user's profile.
+**Chatter App** (uses path-based routing):
+```
+https://chatter.kevsrobots.com/profile/kev
+```
+
+Both URLs display the same content using the same template design.
 
 ### How It Works
 
