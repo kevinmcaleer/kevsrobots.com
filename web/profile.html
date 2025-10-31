@@ -77,9 +77,27 @@ title: User Profile
 </div>
 
 <script>
-// Get username from URL parameter
-const urlParams = new URLSearchParams(window.location.search);
-const username = urlParams.get('username');
+// Get username from URL parameter OR path
+function getUsernameFromUrl() {
+  // First try query parameter (?username=kev)
+  const urlParams = new URLSearchParams(window.location.search);
+  let username = urlParams.get('username');
+
+  // If no query param, try path-based (/profile/kev)
+  if (!username) {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    // pathParts will be ['profile'] or ['profile', 'kev'] or ['profile.html', 'kev']
+    if (pathParts.length > 1 && pathParts[0] === 'profile') {
+      username = pathParts[1];
+    } else if (pathParts.length > 1 && pathParts[0] === 'profile.html') {
+      username = pathParts[1];
+    }
+  }
+
+  return username;
+}
+
+const username = getUsernameFromUrl();
 
 if (!username) {
   document.querySelector('.container').innerHTML = '<div class="alert alert-danger">No username provided</div>';

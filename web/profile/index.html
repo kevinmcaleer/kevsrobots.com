@@ -1,0 +1,30 @@
+---
+layout: none
+---
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Extract username from path (/profile/username or /profile/username/)
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+
+    // pathParts will be ['profile'] or ['profile', 'username']
+    if (pathParts.length > 1) {
+      const username = pathParts[1];
+      // Redirect to query param format
+      window.location.replace(`/profile?username=${encodeURIComponent(username)}`);
+    } else {
+      // No username provided, redirect to homepage
+      window.location.replace('/');
+    }
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=/">
+  </noscript>
+</head>
+<body>
+  <p>Redirecting to profile...</p>
+</body>
+</html>
