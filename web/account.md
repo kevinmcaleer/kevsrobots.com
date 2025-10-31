@@ -17,6 +17,29 @@ description: Manage your kevsrobots.com account
           <div id="success-message" class="alert alert-success" style="display: none;" role="alert"></div>
 
           <div id="account-info">
+            <!-- Profile Picture -->
+            <div class="mb-4">
+              <label class="form-label fw-bold">Profile Picture</label>
+              <div class="d-flex align-items-center gap-3">
+                <div id="profile-picture-preview">
+                  <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white" style="width: 100px; height: 100px; font-size: 2rem;">
+                    ?
+                  </div>
+                </div>
+                <div>
+                  <button type="button" class="btn btn-sm btn-primary" onclick="document.getElementById('profile-picture-input').click()">
+                    <i class="fas fa-upload me-1"></i>Upload Picture
+                  </button>
+                  <button type="button" class="btn btn-sm btn-danger" id="remove-picture-btn" style="display: none;" onclick="deleteProfilePicture()">
+                    <i class="fas fa-trash me-1"></i>Remove
+                  </button>
+                  <input type="file" id="profile-picture-input" accept="image/*" style="display: none;" onchange="uploadProfilePicture()">
+                  <div id="upload-status" class="mt-2"></div>
+                  <small class="text-muted d-block mt-1">Max 5MB. Will be resized to 400x400px.</small>
+                </div>
+              </div>
+            </div>
+
             <div class="mb-3">
               <label class="form-label fw-bold">Username</label>
               <p class="form-control-plaintext" id="account-username">Loading...</p>
@@ -43,6 +66,22 @@ description: Manage your kevsrobots.com account
               <button class="btn btn-primary me-2" id="save-email-btn">Save Email</button>
               <button class="btn btn-secondary" id="cancel-email-btn">Cancel</button>
             </div>
+
+            <div class="mb-3">
+              <label for="location" class="form-label fw-bold">Location</label>
+              <input type="text" class="form-control" id="location" name="location" placeholder="e.g., United Kingdom">
+              <small class="text-muted">Your location helps with timezone/localization</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="bio" class="form-label fw-bold">Bio</label>
+              <textarea class="form-control" id="bio" name="bio" rows="3" maxlength="500" placeholder="Tell us about yourself..."></textarea>
+              <small class="text-muted">Max 500 characters</small>
+            </div>
+
+            <button class="btn btn-primary mb-3" id="save-profile-btn">
+              <i class="fas fa-save me-2"></i>Update Profile
+            </button>
 
             <div class="mb-3">
               <label class="form-label fw-bold">Account Status</label>
@@ -170,6 +209,13 @@ description: Manage your kevsrobots.com account
         document.getElementById('admin-card').style.display = 'block';
       }
 
+      // Load profile picture
+      updateProfilePictureDisplay(currentUser.profile_picture);
+
+      // Load location and bio
+      document.getElementById('location').value = currentUser.location || '';
+      document.getElementById('bio').value = currentUser.bio || '';
+
       // Load activity data
       loadActivity();
     } catch (error) {
@@ -274,6 +320,126 @@ description: Manage your kevsrobots.com account
       window.location.href = '/';
     } catch (error) {
       ChatterAPI.displayError('error-message', error);
+    }
+  });
+
+  // Update profile picture display
+  function updateProfilePictureDisplay(profilePicture) {
+    const preview = document.getElementById('profile-picture-preview');
+    const removeBtn = document.getElementById('remove-picture-btn');
+
+    if (profilePicture) {
+      preview.innerHTML = `<img src="https://chatter.kevsrobots.com/profile_pictures/${profilePicture}" alt="Profile" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">`;
+      removeBtn.style.display = 'inline-block';
+    } else {
+      const initial = currentUser ? currentUser.username[0].toUpperCase() : '?';
+      preview.innerHTML = `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white" style="width: 100px; height: 100px; font-size: 2rem;">${initial}</div>`;
+      removeBtn.style.display = 'none';
+    }
+  }
+
+  // Upload profile picture
+  async function uploadProfilePicture() {
+    const fileInput = document.getElementById('profile-picture-input');
+    const statusDiv = document.getElementById('upload-status');
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      statusDiv.innerHTML = '<div class="alert alert-danger alert-sm mt-2">File too large. Max 5MB.</div>';
+      return;
+    }
+
+    statusDiv.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Uploading...</div>';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('https://chatter.kevsrobots.com/profile/picture', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        statusDiv.innerHTML = '<div class="alert alert-success alert-sm mt-2">Picture uploaded successfully!</div>';
+        // Update display
+        currentUser.profile_picture = data.profile_picture_url.split('/').pop();
+        updateProfilePictureDisplay(currentUser.profile_picture);
+        setTimeout(() => { statusDiv.innerHTML = ''; }, 3000);
+      } else {
+        statusDiv.innerHTML = `<div class="alert alert-danger alert-sm mt-2">${data.detail || 'Upload failed'}</div>`;
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      statusDiv.innerHTML = '<div class="alert alert-danger alert-sm mt-2">Upload failed. Please try again.</div>';
+    }
+  }
+
+  // Delete profile picture
+  async function deleteProfilePicture() {
+    if (!confirm('Are you sure you want to remove your profile picture?')) {
+      return;
+    }
+
+    const statusDiv = document.getElementById('upload-status');
+    statusDiv.innerHTML = '<div class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Removing...</div>';
+
+    try {
+      const response = await fetch('https://chatter.kevsrobots.com/profile/picture', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        statusDiv.innerHTML = '<div class="alert alert-success alert-sm mt-2">Picture removed successfully!</div>';
+        currentUser.profile_picture = null;
+        updateProfilePictureDisplay(null);
+        setTimeout(() => { statusDiv.innerHTML = ''; }, 3000);
+      } else {
+        statusDiv.innerHTML = `<div class="alert alert-danger alert-sm mt-2">${data.detail || 'Delete failed'}</div>`;
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      statusDiv.innerHTML = '<div class="alert alert-danger alert-sm mt-2">Delete failed. Please try again.</div>';
+    }
+  }
+
+  // Update profile (location and bio)
+  document.getElementById('save-profile-btn').addEventListener('click', async () => {
+    const location = document.getElementById('location').value.trim();
+    const bio = document.getElementById('bio').value.trim();
+
+    ChatterAPI.hideError('error-message');
+    ChatterAPI.hideError('success-message');
+
+    try {
+      const response = await fetch('https://chatter.kevsrobots.com/profile', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location, bio })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        ChatterAPI.displaySuccess('success-message', 'Profile updated successfully!');
+        currentUser.location = location;
+        currentUser.bio = bio;
+      } else {
+        ChatterAPI.displayError('error-message', data.detail || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      ChatterAPI.displayError('error-message', 'Failed to update profile. Please try again.');
     }
   });
 
