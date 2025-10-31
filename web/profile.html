@@ -124,7 +124,11 @@ async function loadProfile(username) {
     // Set avatar
     const avatarDiv = document.getElementById('profile-avatar');
     if (profile.profile_picture_url) {
-      avatarDiv.innerHTML = `<img src="${escapeHtml(profile.profile_picture_url)}" alt="${escapeHtml(profile.username)}" class="rounded-circle img-fluid" style="max-width: 150px; max-height: 150px; object-fit: cover;">`;
+      // Prepend Chatter domain if URL is relative
+      const pictureUrl = profile.profile_picture_url.startsWith('http')
+        ? profile.profile_picture_url
+        : `https://chatter.kevsrobots.com${profile.profile_picture_url}`;
+      avatarDiv.innerHTML = `<img src="${escapeHtml(pictureUrl)}" alt="${escapeHtml(profile.username)}" class="rounded-circle img-fluid" style="max-width: 150px; max-height: 150px; object-fit: cover;">`;
     } else {
       avatarDiv.innerHTML = `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white" style="width: 150px; height: 150px; font-size: 3rem;">${escapeHtml(profile.username[0].toUpperCase())}</div>`;
     }
