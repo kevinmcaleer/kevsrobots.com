@@ -1,0 +1,37 @@
+/**
+ * Mini Page View Graph Styles
+ *
+ * Minimal design with black text on transparent background.
+ * No borders, titles, or axis labels per requirement.
+ */
+
+.page-view-graph {
+  display: inline-block;
+  margin: 1rem 0;
+}
+
+.page-view-graph-inner {
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.page-view-graph-inner:hover {
+  opacity: 0.7;
+}
+
+.page-view-graph-inner:focus {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.page-view-graph .graph-svg {
+  background: transparent;
+}
+
+/* Ensure minimal, clean appearance */
+.page-view-graph text {
+  user-select: none;
+}
