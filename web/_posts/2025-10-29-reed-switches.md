@@ -20,8 +20,8 @@ groups:
  - arduino
  - micropython
  - electronics
-# videos:
-#   - e5mNvGAk_Cg
+videos:
+  - 6SpmwUdcS_g
 ---
 
 Ahoy there makers! Ever wondered how your laptop knows when the lid is closed? Or how security systems detect when a door opens? The secret is a simple but clever component called a **reed switch** - a tiny glass tube that acts like magic when you bring a magnet near it!
