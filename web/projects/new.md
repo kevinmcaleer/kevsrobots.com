@@ -106,7 +106,7 @@ const API_BASE = 'https://chatter.kevsrobots.com/api';
 // Check if user is logged in
 async function checkAuth() {
   try {
-    const response = await fetch(`${API_BASE}/auth/me`, {
+    const response = await fetch(`${API_BASE}/me`, {
       credentials: 'include'
     });
 
