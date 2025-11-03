@@ -85,8 +85,10 @@
       error.style.display = 'none';
 
       try {
+        // Note: Don't use encodeURIComponent for the URL path since FastAPI's {url:path}
+        // already handles path parameters. Only special chars in the URL itself need encoding.
         const response = await fetch(
-          `${CHATTER_API}/page-views/${encodeURIComponent(url)}/timeline?period=${period}`,
+          `${CHATTER_API}/page-views/${url}/timeline?period=${period}`,
           { credentials: 'include' }
         );
 
