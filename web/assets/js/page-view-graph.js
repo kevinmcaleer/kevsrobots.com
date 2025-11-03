@@ -91,10 +91,13 @@
         );
 
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[PageViewGraph] API error ${response.status}:`, errorText);
           throw new Error(`HTTP ${response.status}`);
         }
 
         currentData = await response.json();
+        console.log('[PageViewGraph] Received data:', currentData);
 
         // Hide loading, show graph
         loading.style.display = 'none';
@@ -123,6 +126,13 @@
       svg.innerHTML = '';
 
       const { period, data: dataPoints } = data;
+
+      // Defensive check
+      if (!dataPoints || !Array.isArray(dataPoints)) {
+        console.error('[PageViewGraph] Invalid data format:', data);
+        return;
+      }
+
       const counts = dataPoints.map(d => d.count);
       const labels = dataPoints.map(d => d.label);
 

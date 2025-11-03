@@ -669,7 +669,8 @@
         const likersEl = document.getElementById(`likers-${commentId}`);
         if (!likersEl) return;
 
-        if (data.likers.length === 0) {
+        // Check if data and likers exist
+        if (!data || !data.likers || data.likers.length === 0) {
           likersEl.style.display = 'none';
           return;
         }
@@ -706,6 +707,10 @@
           </div>
         `;
         likersEl.style.display = 'block';
+      } else {
+        // Log non-OK response for debugging
+        const errorText = await response.text();
+        console.error(`Failed to load likers for comment ${commentId}:`, response.status, errorText);
       }
     } catch (error) {
       console.error('Error loading comment likers:', error);
