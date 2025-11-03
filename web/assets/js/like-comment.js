@@ -217,97 +217,9 @@
 
         const currentUsername = getCurrentUsername();
 
+        // Render each top-level comment (which will recursively render replies)
         comments.forEach(comment => {
-          const commentEl = document.createElement('div');
-          commentEl.className = 'comment-item mb-3 p-3 border rounded';
-          commentEl.dataset.commentId = comment.id;
-
-          // Check if current user is the author
-          const isAuthor = currentUsername && currentUsername === comment.username;
-
-          // Debug logging
-          console.log(`Comment ${comment.id}: currentUser="${currentUsername}", author="${comment.username}", isAuthor=${isAuthor}`);
-
-          // Build dropdown menu items
-          let dropdownItems = '';
-          if (isAuthor) {
-            dropdownItems += `
-              <li><a class="dropdown-item" href="#" onclick="editComment(${comment.id}); return false;">
-                <i class="fa-solid fa-pen me-2"></i>Edit
-              </a></li>
-              <li><a class="dropdown-item text-danger" href="#" onclick="removeComment(${comment.id}); return false;">
-                <i class="fa-solid fa-trash me-2"></i>Remove
-              </a></li>
-            `;
-          }
-          dropdownItems += `
-            <li><a class="dropdown-item" href="#" onclick="reportComment(${comment.id}); return false;">
-              <i class="fa-solid fa-flag me-2"></i>Report
-            </a></li>
-          `;
-
-          // Show "edited" indicator if comment was edited
-          const editedIndicator = comment.edited_at ?
-            `<span class="text-muted small ms-1">(<a href="#" class="text-decoration-none" onclick="toggleVersionHistory(${comment.id}); return false;">edited ${getRelativeTime(comment.edited_at)}</a>)</span>` : '';
-
-          // Build avatar HTML
-          const avatarHtml = comment.profile_picture ?
-            `<img src="https://chatter.kevsrobots.com/profile_pictures/${escapeHtml(comment.profile_picture)}" alt="${escapeHtml(comment.username)}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">` :
-            `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">${escapeHtml(comment.username[0].toUpperCase())}</div>`;
-
-          // Like button (filled/outline based on user_has_liked)
-          const likeIconClass = comment.user_has_liked ? 'fa-solid' : 'fa-regular';
-          const likeButtonColor = comment.user_has_liked ? 'text-danger' : 'text-muted';
-
-          commentEl.innerHTML = `
-            <div class="d-flex justify-content-between align-items-start">
-              <div class="d-flex flex-grow-1">
-                ${avatarHtml}
-                <div class="flex-grow-1">
-                  <div class="d-flex align-items-center mb-1">
-                    <a href="https://www.kevsrobots.com/profile?username=${escapeHtml(comment.username)}" class="text-decoration-none me-2">
-                      <strong>${escapeHtml(comment.username)}</strong>
-                    </a>
-                    <span class="text-muted small">${getRelativeTime(comment.created_at)}</span>
-                    ${editedIndicator}
-                  </div>
-                <div class="comment-content">
-                  <p class="mb-0 comment-text">${linkifyMentions(escapeHtml(comment.content))}</p>
-                </div>
-                <div class="comment-actions mt-2 d-flex align-items-center gap-3">
-                  <button class="btn btn-link btn-sm p-0 ${likeButtonColor} comment-like-btn" data-comment-id="${comment.id}" onclick="toggleCommentLike(${comment.id}); return false;">
-                    <i class="${likeIconClass} fa-heart"></i>
-                    <span class="comment-like-count ms-1">${comment.like_count || 0}</span>
-                  </button>
-                  <div class="comment-likers" id="likers-${comment.id}" style="display: none;">
-                    <!-- Profile picture circles will be loaded here -->
-                  </div>
-                </div>
-                <div class="version-history mt-2" id="version-history-${comment.id}" style="display: none;">
-                  <div class="text-muted small mb-1">
-                    <i class="fa-solid fa-clock-rotate-left me-1"></i>Previous versions:
-                  </div>
-                  <div class="version-history-content" style="max-height: 200px; overflow-y: auto;">
-                    <div class="text-muted small">Loading...</div>
-                  </div>
-                </div>
-                </div>
-              </div>
-              <div class="dropdown">
-                <button class="btn btn-link btn-sm text-muted p-0" type="button" data-bs-toggle="dropdown">
-                  <i class="fa-solid fa-ellipsis-vertical"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  ${dropdownItems}
-                </ul>
-              </div>
-            </div>
-          `;
-
-          // Load likers if there are any
-          if (comment.like_count > 0) {
-            loadCommentLikers(comment.id);
-          }
+          const commentEl = renderComment(comment, currentUsername, false);
           if (container) container.appendChild(commentEl);
         });
       }
@@ -316,6 +228,124 @@
       const loading = document.getElementById('comments-loading');
       if (loading) loading.textContent = 'Error loading comments';
     }
+  }
+
+  // Render a single comment (and its replies recursively) - Issue #43
+  function renderComment(comment, currentUsername, isReply = false) {
+    const commentEl = document.createElement('div');
+    commentEl.className = isReply ? 'comment-reply ms-4 mb-2 position-relative' : 'comment-item mb-3 p-3 border rounded';
+    commentEl.dataset.commentId = comment.id;
+
+    // Check if current user is the author
+    const isAuthor = currentUsername && currentUsername === comment.username;
+
+    // Build dropdown menu items
+    let dropdownItems = '';
+    if (isAuthor) {
+      dropdownItems += `
+        <li><a class="dropdown-item" href="#" onclick="editComment(${comment.id}); return false;">
+          <i class="fa-solid fa-pen me-2"></i>Edit
+        </a></li>
+        <li><a class="dropdown-item text-danger" href="#" onclick="removeComment(${comment.id}); return false;">
+          <i class="fa-solid fa-trash me-2"></i>Remove
+        </a></li>
+      `;
+    }
+    dropdownItems += `
+      <li><a class="dropdown-item" href="#" onclick="reportComment(${comment.id}); return false;">
+        <i class="fa-solid fa-flag me-2"></i>Report
+      </a></li>
+    `;
+
+    // Show "edited" indicator if comment was edited
+    const editedIndicator = comment.edited_at ?
+      `<span class="text-muted small ms-1">(<a href="#" class="text-decoration-none" onclick="toggleVersionHistory(${comment.id}); return false;">edited ${getRelativeTime(comment.edited_at)}</a>)</span>` : '';
+
+    // Build avatar HTML
+    const avatarHtml = comment.profile_picture ?
+      `<img src="https://chatter.kevsrobots.com/profile_pictures/${escapeHtml(comment.profile_picture)}" alt="${escapeHtml(comment.username)}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">` :
+      `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">${escapeHtml(comment.username[0].toUpperCase())}</div>`;
+
+    // Like button (filled/outline based on user_has_liked)
+    const likeIconClass = comment.user_has_liked ? 'fa-solid' : 'fa-regular';
+    const likeButtonColor = comment.user_has_liked ? 'text-danger' : 'text-muted';
+
+    // Vertical connector line for replies (Issue #43)
+    const connectorLine = isReply ? '<div class="reply-connector"></div>' : '';
+
+    commentEl.innerHTML = `
+      ${connectorLine}
+      <div class="comment-inner ${isReply ? 'p-2' : ''}">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="d-flex flex-grow-1">
+            ${avatarHtml}
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center mb-1">
+                <a href="https://www.kevsrobots.com/profile?username=${escapeHtml(comment.username)}" class="text-decoration-none me-2">
+                  <strong>${escapeHtml(comment.username)}</strong>
+                </a>
+                <span class="text-muted small">${getRelativeTime(comment.created_at)}</span>
+                ${editedIndicator}
+              </div>
+              <div class="comment-content">
+                <p class="mb-0 comment-text">${linkifyMentions(escapeHtml(comment.content))}</p>
+              </div>
+              <div class="comment-actions mt-2 d-flex align-items-center gap-3">
+                <button class="btn btn-link btn-sm p-0 ${likeButtonColor} comment-like-btn" data-comment-id="${comment.id}" onclick="toggleCommentLike(${comment.id}); return false;">
+                  <i class="${likeIconClass} fa-heart"></i>
+                  <span class="comment-like-count ms-1">${comment.like_count || 0}</span>
+                </button>
+                <div class="comment-likers" id="likers-${comment.id}" style="display: none;"></div>
+                <button class="btn btn-link btn-sm p-0 text-muted reply-btn" onclick="toggleReplyBox(${comment.id}); return false;">
+                  <i class="fa-solid fa-reply me-1"></i>Reply
+                </button>
+              </div>
+              <div class="reply-box mt-2" id="reply-box-${comment.id}" style="display: none;">
+                <textarea class="form-control form-control-sm mb-2" id="reply-textarea-${comment.id}" rows="2" placeholder="Write a reply..."></textarea>
+                <div class="d-flex justify-content-end gap-2">
+                  <button class="btn btn-sm btn-secondary" onclick="toggleReplyBox(${comment.id}); return false;">Cancel</button>
+                  <button class="btn btn-sm btn-primary" onclick="postReply(${comment.id}); return false;">Post Reply</button>
+                </div>
+              </div>
+              <div class="version-history mt-2" id="version-history-${comment.id}" style="display: none;">
+                <div class="text-muted small mb-1">
+                  <i class="fa-solid fa-clock-rotate-left me-1"></i>Previous versions:
+                </div>
+                <div class="version-history-content" style="max-height: 200px; overflow-y: auto;">
+                  <div class="text-muted small">Loading...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-link btn-sm text-muted p-0" type="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              ${dropdownItems}
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Load likers if there are any
+    if (comment.like_count > 0) {
+      loadCommentLikers(comment.id);
+    }
+
+    // Recursively render replies
+    if (comment.replies && comment.replies.length > 0) {
+      const repliesContainer = document.createElement('div');
+      repliesContainer.className = 'replies-container';
+      comment.replies.forEach(reply => {
+        const replyEl = renderComment(reply, currentUsername, true);
+        repliesContainer.appendChild(replyEl);
+      });
+      commentEl.appendChild(repliesContainer);
+    }
+
+    return commentEl;
   }
 
   // Post comment
@@ -703,6 +733,75 @@
     if (likeSection) {
       const contentUrl = likeSection.dataset.url;
       loadComments(contentUrl, sort);
+    }
+  };
+
+  // Toggle reply box (Issue #43)
+  window.toggleReplyBox = function(commentId) {
+    const replyBox = document.getElementById(`reply-box-${commentId}`);
+    if (replyBox) {
+      if (replyBox.style.display === 'none') {
+        replyBox.style.display = 'block';
+        // Focus the textarea
+        const textarea = document.getElementById(`reply-textarea-${commentId}`);
+        if (textarea) textarea.focus();
+      } else {
+        replyBox.style.display = 'none';
+        // Clear textarea
+        const textarea = document.getElementById(`reply-textarea-${commentId}`);
+        if (textarea) textarea.value = '';
+      }
+    }
+  };
+
+  // Post reply to a comment (Issue #43)
+  window.postReply = async function(parentCommentId) {
+    if (!isAuthenticated()) {
+      window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+
+    const textarea = document.getElementById(`reply-textarea-${parentCommentId}`);
+    const content = textarea ? textarea.value.trim() : '';
+
+    if (!content) return;
+
+    // Check for URLs (client-side warning)
+    const urlPattern = /https?:\/\/|www\.|\.com|\.net|\.org|\.io/i;
+    if (urlPattern.test(content)) {
+      alert('Comments cannot contain URLs or links to other sites.');
+      return;
+    }
+
+    try {
+      const likeSection = document.querySelector('.like-comment-section');
+      const contentUrl = likeSection ? likeSection.dataset.url : null;
+
+      const response = await fetch(`${CHATTER_API}/interact/comment`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: contentUrl,
+          content: content,
+          parent_comment_id: parentCommentId
+        })
+      });
+
+      if (response.ok) {
+        // Clear and hide reply box
+        if (textarea) textarea.value = '';
+        toggleReplyBox(parentCommentId);
+
+        // Reload comments to show new reply
+        loadComments(contentUrl, currentSort);
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Error posting reply');
+      }
+    } catch (error) {
+      console.error('Error posting reply:', error);
+      alert('Error posting reply');
     }
   };
 

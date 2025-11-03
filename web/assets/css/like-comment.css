@@ -28,3 +28,52 @@
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
+
+/* Reply Threading Styles (Issue #43) */
+.comment-reply {
+  position: relative;
+}
+
+.reply-connector {
+  position: absolute;
+  left: 16px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #dee2e6;
+  z-index: 0;
+}
+
+.comment-inner {
+  position: relative;
+  z-index: 1;
+  background-color: #f8f9fa;
+  border-radius: 0.375rem;
+}
+
+.comment-reply .comment-inner {
+  background-color: #ffffff;
+}
+
+.comment-reply .comment-inner:hover {
+  background-color: #f8f9fa;
+}
+
+.replies-container {
+  margin-top: 0.5rem;
+}
+
+.reply-btn {
+  text-decoration: none;
+}
+
+.reply-btn:hover {
+  text-decoration: underline;
+}
+
+.reply-box {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.375rem;
+}
