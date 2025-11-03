@@ -8,6 +8,9 @@
 
   const CHATTER_API = 'https://chatter.kevsrobots.com';
 
+  // Track current sort mode
+  let currentSort = 'recent';
+
   // Wait for DOM to be ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
@@ -45,7 +48,7 @@
     // Load initial data
     loadPageViewData(contentUrl);
     loadLikeData(contentUrl);
-    loadComments(contentUrl);
+    loadComments(contentUrl, currentSort);
   }
 
   // Load page view data
@@ -189,9 +192,10 @@
   }
 
   // Load comments
-  async function loadComments(contentUrl) {
+  async function loadComments(contentUrl, sort = 'recent') {
     try {
-      const response = await fetch(`${CHATTER_API}/interact/comments/${encodeURIComponent(contentUrl)}`, {
+      const url = `${CHATTER_API}/interact/comments/${encodeURIComponent(contentUrl)}?sort=${sort}`;
+      const response = await fetch(url, {
         credentials: 'include'
       });
 
@@ -251,6 +255,10 @@
             `<img src="https://chatter.kevsrobots.com/profile_pictures/${escapeHtml(comment.profile_picture)}" alt="${escapeHtml(comment.username)}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">` :
             `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">${escapeHtml(comment.username[0].toUpperCase())}</div>`;
 
+          // Like button (filled/outline based on user_has_liked)
+          const likeIconClass = comment.user_has_liked ? 'fa-solid' : 'fa-regular';
+          const likeButtonColor = comment.user_has_liked ? 'text-danger' : 'text-muted';
+
           commentEl.innerHTML = `
             <div class="d-flex justify-content-between align-items-start">
               <div class="d-flex flex-grow-1">
@@ -265,6 +273,15 @@
                   </div>
                 <div class="comment-content">
                   <p class="mb-0 comment-text">${linkifyMentions(escapeHtml(comment.content))}</p>
+                </div>
+                <div class="comment-actions mt-2 d-flex align-items-center gap-3">
+                  <button class="btn btn-link btn-sm p-0 ${likeButtonColor} comment-like-btn" data-comment-id="${comment.id}" onclick="toggleCommentLike(${comment.id}); return false;">
+                    <i class="${likeIconClass} fa-heart"></i>
+                    <span class="comment-like-count ms-1">${comment.like_count || 0}</span>
+                  </button>
+                  <div class="comment-likers" id="likers-${comment.id}" style="display: none;">
+                    <!-- Profile picture circles will be loaded here -->
+                  </div>
                 </div>
                 <div class="version-history mt-2" id="version-history-${comment.id}" style="display: none;">
                   <div class="text-muted small mb-1">
@@ -286,6 +303,11 @@
               </div>
             </div>
           `;
+
+          // Load likers if there are any
+          if (comment.like_count > 0) {
+            loadCommentLikers(comment.id);
+          }
           if (container) container.appendChild(commentEl);
         });
       }
@@ -547,6 +569,141 @@
       return;
     }
     alert('Report functionality coming soon (Issue #35)');
+  };
+
+  // Toggle comment like (Issue #69)
+  window.toggleCommentLike = async function(commentId) {
+    if (!isAuthenticated()) {
+      window.location.href = `/login?return_to=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+
+    try {
+      const response = await fetch(`${CHATTER_API}/interact/comments/${commentId}/like`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Update the like button UI
+        const commentEl = document.querySelector(`[data-comment-id="${commentId}"]`);
+        if (!commentEl) return;
+
+        const likeBtn = commentEl.querySelector('.comment-like-btn');
+        const likeCount = likeBtn.querySelector('.comment-like-count');
+        const likeIcon = likeBtn.querySelector('i');
+
+        // Update count
+        if (likeCount) {
+          likeCount.textContent = data.like_count;
+        }
+
+        // Toggle icon and color
+        if (data.liked) {
+          likeIcon.classList.remove('fa-regular');
+          likeIcon.classList.add('fa-solid');
+          likeBtn.classList.remove('text-muted');
+          likeBtn.classList.add('text-danger');
+        } else {
+          likeIcon.classList.remove('fa-solid');
+          likeIcon.classList.add('fa-regular');
+          likeBtn.classList.remove('text-danger');
+          likeBtn.classList.add('text-muted');
+        }
+
+        // Reload likers display
+        if (data.like_count > 0) {
+          loadCommentLikers(commentId);
+        } else {
+          // Hide likers if count is 0
+          const likersEl = document.getElementById(`likers-${commentId}`);
+          if (likersEl) likersEl.style.display = 'none';
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling comment like:', error);
+    }
+  };
+
+  // Load comment likers (Issue #69)
+  async function loadCommentLikers(commentId) {
+    try {
+      const response = await fetch(`${CHATTER_API}/interact/comments/${commentId}/likers`, {
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const likersEl = document.getElementById(`likers-${commentId}`);
+        if (!likersEl) return;
+
+        if (data.likers.length === 0) {
+          likersEl.style.display = 'none';
+          return;
+        }
+
+        // Build overlapping profile picture circles
+        const circles = data.likers.map((liker, index) => {
+          const zIndex = data.likers.length - index; // Later users on top
+          const marginLeft = index === 0 ? '0' : '-8px'; // Overlap by 8px
+
+          if (liker.profile_picture) {
+            return `<img src="https://chatter.kevsrobots.com/profile_pictures/${escapeHtml(liker.profile_picture)}"
+                         alt="${escapeHtml(liker.username)}"
+                         title="${escapeHtml(liker.username)}"
+                         class="rounded-circle border border-2 border-white"
+                         style="width: 24px; height: 24px; object-fit: cover; z-index: ${zIndex}; margin-left: ${marginLeft};">`;
+          } else {
+            return `<div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white border border-2 border-white"
+                         title="${escapeHtml(liker.username)}"
+                         style="width: 24px; height: 24px; font-size: 0.7rem; z-index: ${zIndex}; margin-left: ${marginLeft};">
+                      ${escapeHtml(liker.username[0].toUpperCase())}
+                    </div>`;
+          }
+        }).join('');
+
+        const moreText = data.like_count > data.likers.length ?
+          `<span class="text-muted small ms-2">+${data.like_count - data.likers.length} more</span>` : '';
+
+        likersEl.innerHTML = `
+          <div class="d-flex align-items-center">
+            <div class="d-flex" style="position: relative;">
+              ${circles}
+            </div>
+            ${moreText}
+          </div>
+        `;
+        likersEl.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error loading comment likers:', error);
+    }
+  }
+
+  // Sort comments (Issue #69)
+  window.sortComments = function(sort) {
+    currentSort = sort;
+
+    // Update button states
+    const recentBtn = document.getElementById('sort-recent-btn');
+    const popularBtn = document.getElementById('sort-popular-btn');
+
+    if (sort === 'recent') {
+      recentBtn.classList.add('active');
+      popularBtn.classList.remove('active');
+    } else {
+      popularBtn.classList.add('active');
+      recentBtn.classList.remove('active');
+    }
+
+    // Reload comments with new sort
+    const likeSection = document.querySelector('.like-comment-section');
+    if (likeSection) {
+      const contentUrl = likeSection.dataset.url;
+      loadComments(contentUrl, sort);
+    }
   };
 
 })();
