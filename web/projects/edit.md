@@ -511,6 +511,7 @@ function hideAddStepForm() {
 document.getElementById('step-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  // Backend auto-assigns step_number, so we don't need to calculate it
   const data = {
     title: document.getElementById('step-title').value,
     content: document.getElementById('step-content').value
@@ -524,14 +525,17 @@ document.getElementById('step-form').addEventListener('submit', async (e) => {
       body: JSON.stringify(data)
     });
 
-    if (!response.ok) throw new Error('Failed to add step');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to add step');
+    }
 
     hideAddStepForm();
     await loadSteps();
     showToast('Step added successfully');
   } catch (error) {
     console.error('Error adding step:', error);
-    alert('Failed to add step');
+    alert(error.message);
   }
 });
 

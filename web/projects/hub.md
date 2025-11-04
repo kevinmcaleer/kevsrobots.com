@@ -21,9 +21,14 @@ thanks: false
     <div class="col">
       <div class="d-flex justify-content-between align-items-center">
         <h4 class="mb-0">Browse Projects</h4>
-        <a href="/projects/new" id="create-project-btn" class="btn btn-primary">
-          <i class="bi bi-plus-circle"></i> Create New Project
-        </a>
+        <div>
+          <a href="/projects/my-projects" id="my-projects-btn" class="btn btn-outline-primary me-2 d-none">
+            <i class="bi bi-folder2"></i> My Projects
+          </a>
+          <a href="/projects/new" id="create-project-btn" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Project
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -77,10 +82,29 @@ thanks: false
 <!-- JavaScript for Projects Hub -->
 <script>
 const PROJECTS_API = 'https://chatter.kevsrobots.com/api/projects';
+const API_BASE = 'https://chatter.kevsrobots.com/api';
 let currentPage = 1;
 let currentSort = 'recent';
 let currentTag = '';
 let currentSearch = '';
+let currentUser = null;
+
+// Check if user is logged in
+async function checkAuth() {
+  try {
+    const response = await fetch(`${API_BASE}/me`, {
+      credentials: 'include'
+    });
+
+    if (response.ok) {
+      currentUser = await response.json();
+      // Show "My Projects" button
+      document.getElementById('my-projects-btn').classList.remove('d-none');
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
+  }
+}
 
 // Load projects from API
 async function loadProjects(page = 1, sort = 'recent', tag = '', search = '') {
@@ -161,7 +185,18 @@ function renderProjectCard(project) {
         </div>
       </div>
       <div class="card-footer bg-transparent">
-        <a href="/projects/view/${project.id}" class="btn btn-sm btn-primary w-100">View Project</a>
+        ${currentUser && currentUser.id === project.author_id ? `
+          <div class="btn-group w-100" role="group">
+            <a href="/projects/edit?id=${project.id}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a href="/projects/view?id=${project.id}" class="btn btn-sm btn-primary">
+              <i class="bi bi-eye"></i> View
+            </a>
+          </div>
+        ` : `
+          <a href="/projects/view?id=${project.id}" class="btn btn-sm btn-primary w-100">View Project</a>
+        `}
       </div>
     </div>
   `;
@@ -242,7 +277,8 @@ document.getElementById('project-search').addEventListener('input', (e) => {
   }, 500);
 });
 
-// Load projects on page load
+// Load projects and check auth on page load
+checkAuth();
 loadProjects(currentPage, currentSort, currentTag, currentSearch);
 </script>
 
