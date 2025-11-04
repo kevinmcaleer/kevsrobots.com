@@ -183,7 +183,7 @@ document.getElementById('project-form').addEventListener('submit', async (e) => 
     successMsg.classList.remove('d-none');
 
     // Set edit link
-    document.getElementById('edit-project-link').href = `/projects/edit/${project.id}`;
+    document.getElementById('edit-project-link').href = `/projects/edit?id=${project.id}`;
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
