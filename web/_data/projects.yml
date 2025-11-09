@@ -1,3 +1,10 @@
+- name: homelab automation with n8n
+  link: /blog/n8n.html
+  cover: /assets/img/blog/n8n/cover.jpg
+  discover: true
+  description: "Automate your homelab with n8n and a Raspberry Pi"
+  date: 2025-11-09
+  tags: [Raspberry Pi, Docker, Automation, AI]
 - name: PiKon II
   link: /blog/pikon2.html
   cover: /assets/img/blog/pikon2/cover.jpg
