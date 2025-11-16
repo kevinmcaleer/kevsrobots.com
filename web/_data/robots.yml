@@ -1,3 +1,9 @@
+- name: Arduino Alvik Maze Navigation
+  link: /blog/alvik-maze.html
+  cover: /assets/img/blog/alvik_maze/cover.jpg
+  description: Navigate mazes with wall following and ROS2 SLAM
+  date: 2025/11/16
+  hero: /assets/img/blog/alvik_maze/hero.png
 - name: SMARS Q
   link: /projects/smars-q/
   cover: /projects/smars-q/assets/cover.jpg
