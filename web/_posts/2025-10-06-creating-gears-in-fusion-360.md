@@ -6,6 +6,7 @@ excerpt: >-
     Ever wanted to convert rotational energy into linear motion for your robot projects? Learn how to create gears and rack-and-pinion systems in Fusion 360 with this step-by-step guide.
 layout: showcase
 date: 2025-10-06
+date_updated: 2025-11-17
 author: Kevin McAleer
 difficulty: intermediate
 cover: /assets/img/blog/fusion360-gears/cover.jpg
@@ -66,6 +67,10 @@ For example, if I want:
 - Number of teeth: `10`
 
 Then my module is: `18.5 ÷ (10 + 2) = 1.54`
+
+Download the spreadsheet here to play with your own values: [Gear Calculation Spreadsheet](/assets/img/blog/fusion360-gears/gear_calculator.xlsx)
+
+---
 
 ### Setting Up Your Gear
 
