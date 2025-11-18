@@ -3,7 +3,7 @@ title: User Projects Hub
 description: Discover amazing maker projects from the community
 excerpt: Browse, search, and download complete project packages with instructions, code, and files
 layout: content
-hide_likes_comments: true
+hide_likes_and_comments: true
 thanks: false
 ---
 
