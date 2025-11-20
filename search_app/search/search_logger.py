@@ -8,6 +8,7 @@ It tracks search queries, IP addresses, timestamps, and execution metrics.
 import os
 from datetime import datetime
 from typing import Optional
+from urllib.parse import unquote
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -20,12 +21,16 @@ class SearchLogger:
 
     def __init__(self):
         """Initialize database connection parameters from environment variables."""
+        # URL-decode credentials if they are URL-encoded
+        db_user = os.getenv('DB_USER', '')
+        db_password = os.getenv('DB_PASSWORD', '')
+
         self.db_config = {
             'host': os.getenv('DB_HOST', '192.168.2.3'),
             'port': os.getenv('DB_PORT', '5433'),
             'database': os.getenv('DB_NAME', 'searchlogs'),
-            'user': os.getenv('DB_USER'),
-            'password': os.getenv('DB_PASSWORD')
+            'user': unquote(db_user) if db_user else None,
+            'password': unquote(db_password) if db_password else None
         }
         self.initialize_table()
 

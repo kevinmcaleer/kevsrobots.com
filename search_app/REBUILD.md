@@ -1,8 +1,9 @@
 # Quick Rebuild Guide
 
-## Issue Fixed
+## Issues Fixed
 
-Updated Dockerfile to include PostgreSQL dependencies (`libpq-dev`, `gcc`) required for `psycopg2-binary`.
+1. **PostgreSQL Dependencies**: Updated Dockerfile to include PostgreSQL dependencies (`libpq-dev`, `gcc`) required for `psycopg2-binary`
+2. **URL-Encoded Credentials**: Updated search_logger.py to automatically decode URL-encoded database credentials from `.env` file
 
 ## Rebuild Steps
 
@@ -94,6 +95,42 @@ docker exec search-api ls -la /usr/src/app/.env
 2. Test PostgreSQL connection: `psql -h 192.168.2.3 -p 5433 -U your_user -d searchlogs`
 3. Check if database is accessible from Docker network
 4. Review app logs: `docker logs search-api 2>&1 | grep -i postgres`
+
+### Password authentication failed?
+
+**Error**: `password authentication failed for user "Hd4AZn%3ANlSpH"`
+
+**Cause**: Your `.env` file contains URL-encoded credentials, which are now automatically decoded by the application.
+
+**Verify your credentials are decoded correctly**:
+```bash
+cd ~/kevsrobots.com/search_app
+python3 decode_credentials.py
+```
+
+This will show you both the encoded and decoded values to verify they're correct.
+
+**Solution**: No action needed! The application now automatically decodes URL-encoded credentials. Just rebuild and redeploy:
+
+```bash
+# Rebuild
+./build_app.sh
+
+# Deploy to nodes
+ssh pi@dev01
+docker-compose pull
+docker-compose down
+docker-compose up -d
+```
+
+**Understanding URL Encoding**:
+- `%3A` = `:` (colon)
+- `%40` = `@` (at sign)
+- `%26` = `&` (ampersand)
+- `%2B` = `+` (plus)
+- `%23` = `#` (hash)
+
+Your actual credentials are automatically extracted from the encoded values.
 
 ## Quick Test Commands
 
