@@ -1,0 +1,4 @@
+metric,current_median,target,improvement_potential,videos_affected,impact_score,top_action
+Subscriber Conversion,0.7255139056831923,2.0,63.72430471584038,5,0.6569515950086637,Add clear calls-to-action to subscribe (verbally + on screen)
+Views Per Day,3.6993865030674846,9.471794871794872,60.94313112625016,5,0.6282797023324759,"Optimize video SEO (title, description, tags)"
+Click-Through Rate (CTR),2.89,5.0,42.199999999999996,5,0.43505154639175253,"Create more compelling thumbnails with bold, readable text"

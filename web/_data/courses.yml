@@ -165,6 +165,20 @@
   link: /learn/rust/01_intro.html
   name: Introduction to Rust
 - author: Kevin McAleer
+  cover: /learn/arduino_to_python/assets/cover.jpg
+  date_published: 2025-11-20
+  description: Transition from Arduino C++ to MicroPython quickly and easily. Learn
+    Python syntax with side-by-side comparisons, control hardware, and build IoT and
+    robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.
+  duration: 3h 12m
+  groups:
+  - micropython
+  - arduino
+  - electronics
+  - python
+  link: /learn/arduino_to_python/00_intro.html
+  name: Arduino to MicroPython - A Quick Start Guide
+- author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19
   description: Learn how to 3d print, build and program a SMARS robot

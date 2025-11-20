@@ -1,0 +1,10 @@
+{% assign links = include.links %}
+{% assign titles = include.titles %}
+
+<nav class="small-nav">
+  <ul>
+    {% for link in links %}
+      <li><a href="{{ link }}">{{ titles[forloop.index0] }}</a></li>
+    {% endfor %}
+  </ul>
+</nav>

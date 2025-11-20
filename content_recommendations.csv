@@ -1,0 +1,9 @@
+priority,type,keyword,reason
+1,Trending Opportunity,uno,"Trending score 17.32, only 4 existing videos"
+1,Trending Opportunity,drone,"Trending score 17.32, only 3 existing videos"
+1,Trending Opportunity,nas,"Trending score 6.93, only 5 existing videos"
+2,Content Gap,design,"High performance (0.076), room for -4 more videos"
+2,Content Gap,code,"High performance (0.071), room for -3 more videos"
+2,Content Gap,bluetooth,"High performance (0.065), room for -2 more videos"
+3,Proven Combination,pico + raspberry,Appears in 4 top-performing videos
+3,Proven Combination,assistant + part,Appears in 2 top-performing videos

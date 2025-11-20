@@ -443,7 +443,7 @@ In RViz, use the "2D Goal Pose" tool to:
 | State Machine | Medium | No | More complex logic |
 | ROS2 + SLAM | High | Builds own | Unknown environments |
 | ROS2 + Nav2 | High | Yes | Known environments |
-{:class="table table-striped"}
+{:class="table table-single"}
 
 ---
 

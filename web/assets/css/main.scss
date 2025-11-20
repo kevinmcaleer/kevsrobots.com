@@ -1466,3 +1466,34 @@ pre {
     line-height: 1;
   }
 }
+
+.table-single {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid $clr-lightgrey; // Thicker border for visibility
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: transparent !important; // Make table background transparent
+  
+  td, th {
+    border-right: 1px solid #DDD; // Thicker internal borders
+    border-bottom: 1px solid #DDD;
+    background-color: transparent !important; // Make table background transparent
+  }
+  
+  // Remove right border from last column
+  td:last-child, th:last-child {
+    border-right: none;
+  }
+  
+  // Remove bottom border from last row (fixes the double line issue)
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  // Modifier for auto width
+  &.table-narrow {
+    width: auto;
+    display: inline-table; // Makes table shrink to content
+  }
+}

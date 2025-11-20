@@ -1,0 +1,40 @@
+- name: Arduino to MicroPython - A Quick Start Guide
+  author: Kevin McAleer
+  date_created: 2025-11-20
+  date_published: 2025-11-20
+  layout: course
+  cover: assets/cover.jpg
+  description: >-
+    Transition from Arduino C++ to MicroPython quickly and easily. Learn Python syntax
+    with side-by-side comparisons, control hardware, and build IoT and robotics projects
+    on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.
+  groups:
+    - micropython
+    - arduino
+    - electronics
+    - python
+  content:
+  - section:
+      name: Getting Started
+      content:
+      - 00_intro.md
+      - 01_why_micropython.md
+  - section:
+      name: Language Fundamentals
+      content:
+      - 02_syntax_basics.md
+      - 03_control_flow.md
+      - 04_functions.md
+      - 05_pin_control.md
+  - section:
+      name: Hardware Basics
+      content:
+      - 06_analog_pwm.md
+      - 07_timing.md
+      - 08_serial_basics.md
+  - section:
+      name: Practical Projects
+      content:
+      - 09_iot_project.md
+      - 10_robot_project.md
+      - 11_next_steps.md
