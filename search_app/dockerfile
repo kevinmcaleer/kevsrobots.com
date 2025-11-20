@@ -4,6 +4,13 @@ FROM python:3.12.1-slim
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
+# Install system dependencies for psycopg2 and other packages
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy the current directory contents into the container at /usr/src/app
 COPY . .
 
@@ -13,12 +20,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Define environment variable
 ENV PORT=8000
 
-# Create a directory to store the certs and copy them
-# RUN mkdir /certs
-# COPY /etc/letsencrypt/live/search.kevsrobots.com /certs
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://127.0.0.1:8000/health || exit 1
 
 # Run app.py when the container launches
-# CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile=/certs/privkey.pem", "--ssl-certfile=/certs/fullchain.pem"]
-# CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile=/certs/privkey.pem", "--ssl-certfile=/certs/fullchain.pem"]
-
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
