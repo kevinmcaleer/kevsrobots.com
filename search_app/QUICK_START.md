@@ -7,6 +7,9 @@
 ```bash
 cd ~/kevsrobots.com/search_app
 
+# Test timestamp preservation (optional but recommended)
+python3 test_timestamp_preservation.py
+
 # Dry run first (see what would be migrated)
 python3 migrate_logs_to_postgres.py --dry-run
 
@@ -15,6 +18,8 @@ python3 migrate_logs_to_postgres.py
 ```
 
 **What this does**: Reads `search-logs.log` and imports all historical searches into PostgreSQL.
+
+**IMPORTANT**: The migration **preserves historical timestamps**! If your log has entries from 2023, they'll be inserted with 2023 timestamps, not today's date. This means your analytics will show when searches actually occurred.
 
 **Expected output**:
 ```

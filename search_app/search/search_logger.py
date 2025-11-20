@@ -101,7 +101,8 @@ class SearchLogger:
         page: int = 1,
         page_size: int = 10,
         user_agent: Optional[str] = None,
-        referer: Optional[str] = None
+        referer: Optional[str] = None,
+        timestamp: Optional[datetime] = None
     ) -> Optional[int]:
         """
         Log a search query to the database.
@@ -115,6 +116,7 @@ class SearchLogger:
             page_size: Number of results per page (default: 10)
             user_agent: User agent string from the request (optional)
             referer: Referer URL from the request (optional)
+            timestamp: Specific timestamp for the log entry (optional, defaults to current time)
 
         Returns:
             int: The ID of the inserted log entry, or None if failed
@@ -123,18 +125,31 @@ class SearchLogger:
             conn = self.get_connection()
             cursor = conn.cursor()
 
-            insert_query = """
-            INSERT INTO search_logs
-                (client_ip, query, results_count, execution_time, page, page_size, user_agent, referer)
-            VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id;
-            """
-
-            cursor.execute(
-                insert_query,
-                (client_ip, query, results_count, execution_time, page, page_size, user_agent, referer)
-            )
+            # If timestamp provided, include it in INSERT; otherwise use default CURRENT_TIMESTAMP
+            if timestamp:
+                insert_query = """
+                INSERT INTO search_logs
+                    (timestamp, client_ip, query, results_count, execution_time, page, page_size, user_agent, referer)
+                VALUES
+                    (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id;
+                """
+                cursor.execute(
+                    insert_query,
+                    (timestamp, client_ip, query, results_count, execution_time, page, page_size, user_agent, referer)
+                )
+            else:
+                insert_query = """
+                INSERT INTO search_logs
+                    (client_ip, query, results_count, execution_time, page, page_size, user_agent, referer)
+                VALUES
+                    (%s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id;
+                """
+                cursor.execute(
+                    insert_query,
+                    (client_ip, query, results_count, execution_time, page, page_size, user_agent, referer)
+                )
 
             log_id = cursor.fetchone()[0]
             conn.commit()

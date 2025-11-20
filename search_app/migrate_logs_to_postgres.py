@@ -3,12 +3,23 @@
 Migrate historical search logs from search-logs.log to PostgreSQL database.
 
 This script reads the old log file format and inserts records into the
-PostgreSQL search_logs table, preserving timestamps and query data.
+PostgreSQL search_logs table, PRESERVING THE ORIGINAL TIMESTAMPS from the log file.
+
+IMPORTANT: Historical timestamps are preserved! If a log entry is from 2023,
+it will be inserted with a 2023 timestamp, not the current date. This ensures
+your analytics show when searches actually occurred.
 
 Log format: INFO:root:2023-12-30T23:10:09.904838 - IP: 127.0.0.1 - Query: smars
 
 Usage:
     python3 migrate_logs_to_postgres.py [--dry-run] [--log-file search-logs.log]
+
+Example:
+    # Test what will be migrated (no database changes)
+    python3 migrate_logs_to_postgres.py --dry-run
+
+    # Actually migrate the data (preserves historical timestamps!)
+    python3 migrate_logs_to_postgres.py
 """
 
 import re
@@ -121,7 +132,8 @@ class LogMigrator:
                             page=1,
                             page_size=10,
                             user_agent=None,
-                            referer=None
+                            referer=None,
+                            timestamp=timestamp  # Preserve historical timestamp!
                         )
                         if log_id:
                             self.stats['inserted'] += 1

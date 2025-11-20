@@ -40,8 +40,11 @@
 **Solution**:
 - Created `migrate_logs_to_postgres.py` migration script
 - Parses old log format and inserts into PostgreSQL
-- Preserves timestamps and client IPs
+- **Preserves historical timestamps** (not using current time)
+- Preserves client IPs
 - Supports dry-run mode
+
+**Important**: The migration now correctly uses the original timestamps from the log file, so your analytics will show when searches actually occurred, not when they were migrated.
 
 ---
 
