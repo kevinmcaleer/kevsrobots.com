@@ -10,6 +10,22 @@ echo "KevsRobots Search Index Rebuild"
 echo "========================================"
 echo ""
 
+# Step 0: Check Python dependencies
+echo "🔍 Checking Python dependencies..."
+if ! python3 -c "import bs4, lxml" 2>/dev/null; then
+    echo "⚠️  Missing dependencies: beautifulsoup4 and/or lxml"
+    echo ""
+    echo "Install with:"
+    echo "  pip install beautifulsoup4 lxml"
+    echo ""
+    echo "Or if using system Python on macOS:"
+    echo "  python3 -m pip install --break-system-packages beautifulsoup4 lxml"
+    echo ""
+    exit 1
+fi
+echo "✅ Dependencies OK"
+echo ""
+
 # Step 1: Check if Jekyll site exists
 if [ ! -d "../web/_site" ]; then
     echo "❌ ERROR: Jekyll site not found at ../web/_site"

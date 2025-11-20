@@ -4,11 +4,13 @@ FROM python:3.12.1-slim
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Install system dependencies for psycopg2 and other packages
+# Install system dependencies for psycopg2, lxml, and other packages
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
     curl \
+    libxml2-dev \
+    libxslt1-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the current directory contents into the container at /usr/src/app
