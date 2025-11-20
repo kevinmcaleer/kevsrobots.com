@@ -21,6 +21,41 @@ app = FastAPI(
 search_logger = get_search_logger()
 
 
+def get_client_ip(request: Request) -> str:
+    """
+    Extract the real client IP address from request headers.
+
+    When behind proxies (Cloudflare, Nginx), the direct client IP is the proxy.
+    The real client IP is in X-Forwarded-For or X-Real-IP headers.
+
+    Priority order:
+    1. X-Forwarded-For (first IP in the chain)
+    2. X-Real-IP
+    3. request.client.host (fallback)
+
+    Args:
+        request: FastAPI request object
+
+    Returns:
+        str: Client IP address
+    """
+    # X-Forwarded-For contains a chain of IPs: "client, proxy1, proxy2"
+    # The first IP is the original client
+    forwarded_for = request.headers.get("x-forwarded-for")
+    if forwarded_for:
+        # Take the first IP (original client)
+        client_ip = forwarded_for.split(",")[0].strip()
+        return client_ip
+
+    # X-Real-IP is set by Nginx
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip:
+        return real_ip
+
+    # Fallback to direct connection IP (will be proxy IP)
+    return request.client.host if request.client else "unknown"
+
+
 # Set up CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -50,7 +85,9 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
         dict: Search results with metadata and execution time
     """
     start_time = time.time()
-    client_ip = request.client.host
+
+    # Extract real client IP (handles proxy headers)
+    client_ip = get_client_ip(request)
 
     # Extract optional headers
     user_agent = request.headers.get("user-agent")

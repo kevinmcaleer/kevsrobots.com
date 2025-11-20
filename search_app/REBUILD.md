@@ -4,6 +4,7 @@
 
 1. **PostgreSQL Dependencies**: Updated Dockerfile to include PostgreSQL dependencies (`libpq-dev`, `gcc`) required for `psycopg2-binary`
 2. **URL-Encoded Credentials**: Updated search_logger.py to automatically decode URL-encoded database credentials from `.env` file
+3. **Proxy IP Logging**: Added `get_client_ip()` function to extract real client IP from proxy headers (X-Forwarded-For, X-Real-IP) instead of logging proxy IP
 
 ## Rebuild Steps
 
@@ -150,3 +151,27 @@ docker ps | grep search-api
 # Container health
 docker inspect search-api | grep -A 5 Health
 ```
+
+## Verify Real IP Logging
+
+After deployment, verify that real client IPs are being logged:
+
+```bash
+# Make a test search from your browser or another machine
+curl "https://www.kevsrobots.com/search/?query=test"
+
+# Check what IPs are being logged
+psql -h 192.168.2.3 -p 5433 -U your_user -d searchlogs -c \
+  "SELECT timestamp, client_ip, query FROM search_logs ORDER BY timestamp DESC LIMIT 10;"
+```
+
+**Expected**: You should see **different IPs** from different clients, not just 192.168.1.4.
+
+**If all IPs are still the same**:
+1. Check your Nginx configuration includes proxy headers (see `documentation/PROXY_HEADERS.md`)
+2. Ensure these lines are in your Nginx location block:
+   ```nginx
+   proxy_set_header X-Real-IP $remote_addr;
+   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+   ```
+3. Reload Nginx: `sudo systemctl reload nginx`
