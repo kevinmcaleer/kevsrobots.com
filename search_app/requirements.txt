@@ -3,3 +3,6 @@ uvicorn
 pandas
 pyarrow
 duckdb
+psycopg2-binary
+python-dotenv
+sqlalchemy

@@ -1,15 +1,24 @@
-from fastapi import FastAPI, Request, requests
+from fastapi import FastAPI, Request
 from datetime import datetime
-import logging
 from fastapi.middleware.cors import CORSMiddleware
 from search.database import insert_document, query_documents, total_results
+from search.search_logger import get_search_logger
 from typing import Optional
 import time
+import os
+from dotenv import load_dotenv
 
-app = FastAPI()
+# Load environment variables
+load_dotenv()
 
-# Setup logger
-logging.basicConfig(filename='search-logs.log', level=logging.INFO)
+app = FastAPI(
+    title="KevsRobots Search API",
+    description="Search API with PostgreSQL query logging",
+    version="2.0.0"
+)
+
+# Initialize search logger
+search_logger = get_search_logger()
 
 
 # Set up CORS middleware
@@ -27,45 +36,146 @@ def create_document(title: str, content: str, url: str):
     return {"message": "Document created successfully"}
 
 @app.get("/search/")
-async def search_documents(request:Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10):
+async def search_documents(request: Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10):
+    """
+    Search documents endpoint with PostgreSQL query logging.
+
+    Args:
+        request: FastAPI request object
+        query: Search query string
+        page: Page number for pagination (default: 1)
+        page_size: Number of results per page (default: 10)
+
+    Returns:
+        dict: Search results with metadata and execution time
+    """
     start_time = time.time()
     client_ip = request.client.host
-    current_time = datetime.now().isoformat()
-    log_entry = f"{current_time} - IP: {client_ip} - Query: {query}"
-    
-    # Log the search query, IP, and timestamp
-    logging.info(log_entry)
 
-    results = query_documents(query,offset = (page - 1) * page_size, limit = page_size)
+    # Extract optional headers
+    user_agent = request.headers.get("user-agent")
+    referer = request.headers.get("referer")
+
+    # Execute search query
+    results = query_documents(query, offset=(page - 1) * page_size, limit=page_size)
+    total_count = total_results(query)
     execution_time = time.time() - start_time
 
-     # Assuming `total_results` is a function that returns the total count of results
-    total_count = total_results(query)
-    print('results found: ', total_count)
+    # Log to PostgreSQL database
+    try:
+        log_id = search_logger.log_search(
+            client_ip=client_ip,
+            query=query,
+            results_count=total_count,
+            execution_time=execution_time,
+            page=page,
+            page_size=page_size,
+            user_agent=user_agent,
+            referer=referer
+        )
+        print(f'Search logged to PostgreSQL with ID: {log_id}')
+    except Exception as e:
+        print(f'Failed to log search to PostgreSQL: {e}')
+        # Continue even if logging fails - don't break the search functionality
 
     return {
         "results": results,
         "total_count": total_count,
-        "total_pages": total_count // page_size + 1,
+        "total_pages": (total_count // page_size) + (1 if total_count % page_size > 0 else 0),
         "page": page,
         "page_size": page_size,
         "execution_time": round(execution_time, 3)
     }
 
 
-# @app.get("/search/")
-async def search(request:Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10):
-    
-    # For example, fetching results from a database using offset and limit
-    offset = (page - 1) * page_size
-    limit = page_size
-    # Assuming `search_query` is a function that performs the actual search
-    results = search_documents(request, query, offset=offset, limit=limit)
+@app.get("/analytics/recent")
+async def get_recent_searches(limit: Optional[int] = 100):
+    """
+    Get recent search queries.
 
+    Args:
+        limit: Maximum number of results to return (default: 100)
+
+    Returns:
+        dict: Recent search log entries
+    """
+    try:
+        searches = search_logger.get_recent_searches(limit=limit)
+        return {
+            "status": "success",
+            "count": len(searches),
+            "searches": searches
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+
+@app.get("/analytics/popular")
+async def get_popular_searches(limit: Optional[int] = 20, days: Optional[int] = 7):
+    """
+    Get the most popular search queries.
+
+    Args:
+        limit: Maximum number of results to return (default: 20)
+        days: Number of days to look back (default: 7)
+
+    Returns:
+        dict: Popular search queries with counts
+    """
+    try:
+        searches = search_logger.get_popular_searches(limit=limit, days=days)
+        return {
+            "status": "success",
+            "period_days": days,
+            "count": len(searches),
+            "popular_searches": searches
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+
+@app.get("/analytics/stats")
+async def get_search_statistics(days: Optional[int] = 30):
+    """
+    Get aggregate search statistics.
+
+    Args:
+        days: Number of days to look back (default: 30)
+
+    Returns:
+        dict: Aggregate statistics about searches
+    """
+    try:
+        stats = search_logger.get_search_stats(days=days)
+        return {
+            "status": "success",
+            "period_days": days,
+            "statistics": stats
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint.
+
+    Returns:
+        dict: Application health status
+    """
     return {
-        "results": results,
-        "total_count": total_count,
-        "page": page,
-        "page_size": page_size,
-        "execution_time": execution_time
+        "status": "healthy",
+        "service": "KevsRobots Search API",
+        "version": "2.0.0",
+        "timestamp": datetime.now().isoformat()
     }
