@@ -27,17 +27,27 @@ The KevsRobots Search API is a FastAPI-based full-text search service with compr
 
 ## Quick Links
 
+### Getting Started
+- **[QUICK START](../QUICK_START.md)** - ⭐ Start here! Complete setup in 3 steps
+- **[REBUILD](../REBUILD.md)** - Rebuild Docker image and deploy
+
 ### Documentation
 - **[API Documentation](API.md)** - Complete API endpoint reference
 - **[Deployment Guide](DEPLOYMENT.md)** - Production deployment instructions
+- **[Proxy Headers](PROXY_HEADERS.md)** - Nginx configuration for real IP logging
 - **[Architecture](../design/architecture.md)** - System architecture overview
 - **[Database Schema](../design/database_schema.md)** - Database structure and design
 - **[Data Flow](../design/data_flow.md)** - Request/response flow diagrams
+
+### Maintenance
+- **[Rebuild Search Index](../REBUILD_SEARCH_INDEX.md)** - Fix empty search results
+- **[Log Migration](../migrate_logs_to_postgres.py)** - Import historical logs
 
 ### Code
 - **Main Application**: `search_app/app.py`
 - **Search Logger**: `search_app/search/search_logger.py`
 - **Database Module**: `search_app/search/database.py`
+- **Search Indexer**: `search_app/index.py`
 
 ---
 
