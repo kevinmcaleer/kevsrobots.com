@@ -73,6 +73,7 @@ echo ""
 # Step 6: Run indexer
 echo "📚 Indexing HTML files..."
 echo "   This may take 1-2 minutes..."
+echo "   Note: Some files may be skipped due to encoding issues (this is normal)"
 echo ""
 
 # Run indexer and capture output
