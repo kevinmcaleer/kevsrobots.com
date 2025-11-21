@@ -1,0 +1,145 @@
+<!-- Trending Searches Widget -->
+<div class="trending-widget">
+    <h3>🔥 Trending Searches</h3>
+    <ul class="trending-list" id="trendingWidget">
+        <li class="trending-item">Loading...</li>
+    </ul>
+</div>
+
+<style>
+.trending-widget {
+    background: var(--card-bg, white);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.trending-widget h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-primary, #333);
+    font-size: 18px;
+}
+
+.trending-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.trending-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.trending-item:last-child {
+    border-bottom: none;
+}
+
+.trending-item a {
+    color: var(--link-color, #2563eb);
+    text-decoration: none;
+    flex: 1;
+}
+
+.trending-item a:hover {
+    text-decoration: underline;
+}
+
+.trending-rank {
+    font-weight: bold;
+    color: var(--text-secondary, #6b7280);
+    margin-right: 8px;
+    min-width: 25px;
+}
+
+.trending-count {
+    font-size: 14px;
+    color: var(--text-secondary, #6b7280);
+    margin-left: 10px;
+}
+
+.trend-up {
+    color: #10b981;
+    font-weight: bold;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+.trend-down {
+    color: #ef4444;
+    font-weight: bold;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+.trend-new {
+    background: #10b981;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+</style>
+
+<script>
+(function() {
+    // Configuration
+    const API_URL = window.location.hostname.includes('local')
+        ? 'http://192.168.2.4:8008/api/dashboard'
+        : 'https://stats.kevsrobots.com/api/dashboard';
+
+    async function loadTrendingWidget() {
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            const list = document.getElementById('trendingWidget');
+            if (!list) return;
+
+            // Take top 5 trending searches
+            const topTrends = data.search_trends.slice(0, 5);
+
+            list.innerHTML = topTrends.map(item => {
+                let indicator = '';
+                if (item.is_new) {
+                    indicator = '<span class="trend-new">NEW</span>';
+                } else if (item.rank_change > 0) {
+                    indicator = `<span class="trend-up">↑${item.rank_change}</span>`;
+                } else if (item.rank_change < 0) {
+                    indicator = `<span class="trend-down">↓${Math.abs(item.rank_change)}</span>`;
+                }
+
+                return `
+                    <li class="trending-item">
+                        <span class="trending-rank">#${item.rank}</span>
+                        <a href="/search-results.html?query=${encodeURIComponent(item.query)}&page=1">${item.query}</a>
+                        ${indicator}
+                        <span class="trending-count">${item.count}</span>
+                    </li>
+                `;
+            }).join('');
+
+        } catch (error) {
+            console.error('Error loading trending searches widget:', error);
+            const list = document.getElementById('trendingWidget');
+            if (list) {
+                list.innerHTML = '<li class="trending-item">Unable to load trending searches</li>';
+            }
+        }
+    }
+
+    // Load when page is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadTrendingWidget);
+    } else {
+        loadTrendingWidget();
+    }
+})();
+</script>

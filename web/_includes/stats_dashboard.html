@@ -1,0 +1,92 @@
+<!-- Stats Dashboard HTML Structure -->
+<div class="stats-container">
+    <!-- Summary Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Visits (Last Month)</h3>
+            <div class="stat-value" id="totalVisits">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Searches (Last Month)</h3>
+            <div class="stat-value" id="totalSearches">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Users (Last Month)</h3>
+            <div class="stat-value" id="totalUsers">-</div>
+        </div>
+        <div class="stat-card">
+            <h3>Returning Users</h3>
+            <div class="stat-value" id="returningUsers">-</div>
+        </div>
+    </div>
+
+    <!-- Searches Per Day Chart -->
+    <div class="chart-container">
+        <h2>Searches Over Time (Last Year)</h2>
+        <div class="chart-wrapper">
+            <canvas id="searchesPerDayChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Three Pie Charts Side by Side -->
+    <div class="chart-row-3">
+        <div class="chart-container">
+            <h2>Device Breakdown</h2>
+            <div class="chart-wrapper-small">
+                <canvas id="deviceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Operating System Breakdown</h2>
+            <div class="chart-wrapper-small">
+                <canvas id="osChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Popular Content Types</h2>
+            <div class="chart-wrapper-small">
+                <canvas id="pageTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Lists and Popular Pages Side by Side -->
+    <div class="chart-row-3">
+        <div class="chart-container">
+            <h2>Top Searches This Week</h2>
+            <ul class="query-list" id="topSearchesWeek"></ul>
+        </div>
+
+        <div class="chart-container">
+            <h2>Trending Searches (Week-over-Week)</h2>
+            <ul class="query-list" id="trendingSearches"></ul>
+        </div>
+
+        <div class="chart-container">
+            <h2>Most Popular Pages (Last 30 Days)</h2>
+            <ul class="query-list" id="popularPages"></ul>
+        </div>
+    </div>
+
+    <!-- Country Breakdown -->
+    <div class="chart-container">
+        <h2>Visitors by Country (Last 30 Days)</h2>
+        <div class="chart-wrapper">
+            <canvas id="countryChart"></canvas>
+        </div>
+    </div>
+
+    <div class="last-updated" id="lastUpdated">
+        Loading data...
+    </div>
+</div>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Load Dashboard JavaScript -->
+<script>
+{% include stats_dashboard.js %}
+</script>
