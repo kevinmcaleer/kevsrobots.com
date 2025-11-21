@@ -89,32 +89,79 @@ fi
 # Step 7: Verify index
 echo ""
 echo "🔍 Verifying index..."
-DOC_COUNT=$(sqlite3 search.db "SELECT COUNT(DISTINCT url) FROM documents_fts;")
-TOTAL_ENTRIES=$(sqlite3 search.db "SELECT COUNT(*) FROM documents_fts;")
-DB_SIZE=$(du -h search.db | cut -f1)
 
-echo "   📊 Statistics:"
-echo "      • Unique documents: $DOC_COUNT"
-echo "      • Total entries: $TOTAL_ENTRIES"
-echo "      • Database size: $DB_SIZE"
-echo ""
+# Check if sqlite3 command is available
+if command -v sqlite3 &> /dev/null; then
+    # Use sqlite3 command
+    DOC_COUNT=$(sqlite3 search.db "SELECT COUNT(DISTINCT url) FROM documents_fts;" 2>/dev/null || echo "unknown")
+    TOTAL_ENTRIES=$(sqlite3 search.db "SELECT COUNT(*) FROM documents_fts;" 2>/dev/null || echo "unknown")
+    DB_SIZE=$(du -h search.db | cut -f1)
 
-# Step 8: Test searches
-echo "🧪 Testing search functionality..."
+    echo "   📊 Statistics:"
+    echo "      • Unique documents: $DOC_COUNT"
+    echo "      • Total entries: $TOTAL_ENTRIES"
+    echo "      • Database size: $DB_SIZE"
+    echo ""
 
-test_search() {
-    QUERY=$1
-    RESULT_COUNT=$(sqlite3 search.db "SELECT COUNT(*) FROM documents_fts WHERE documents_fts MATCH '$QUERY';")
-    if [ "$RESULT_COUNT" -gt 0 ]; then
-        echo "   ✅ '$QUERY': found $RESULT_COUNT results"
-    else
-        echo "   ⚠️  '$QUERY': no results (this might be ok)"
-    fi
-}
+    # Step 8: Test searches
+    echo "🧪 Testing search functionality..."
 
-test_search "robot"
-test_search "micropython"
-test_search "raspberry"
+    test_search() {
+        QUERY=$1
+        RESULT_COUNT=$(sqlite3 search.db "SELECT COUNT(*) FROM documents_fts WHERE documents_fts MATCH '$QUERY';" 2>/dev/null || echo "0")
+        if [ "$RESULT_COUNT" -gt 0 ]; then
+            echo "   ✅ '$QUERY': found $RESULT_COUNT results"
+        else
+            echo "   ⚠️  '$QUERY': no results (this might be ok)"
+        fi
+    }
+
+    test_search "robot"
+    test_search "micropython"
+    test_search "raspberry"
+else
+    # Use Python to verify
+    echo "   ℹ️  sqlite3 command not found, using Python..."
+    python3 << 'EOF'
+import sqlite3
+import os
+
+if os.path.exists('search.db'):
+    conn = sqlite3.connect('search.db')
+    cursor = conn.cursor()
+
+    # Get counts
+    cursor.execute("SELECT COUNT(DISTINCT url) FROM documents_fts")
+    doc_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM documents_fts")
+    total_entries = cursor.fetchone()[0]
+
+    db_size = os.path.getsize('search.db') / (1024 * 1024)  # MB
+
+    print(f"   📊 Statistics:")
+    print(f"      • Unique documents: {doc_count}")
+    print(f"      • Total entries: {total_entries}")
+    print(f"      • Database size: {db_size:.1f}M")
+    print()
+
+    # Test searches
+    print("🧪 Testing search functionality...")
+    test_queries = ['robot', 'micropython', 'raspberry']
+
+    for query in test_queries:
+        cursor.execute("SELECT COUNT(*) FROM documents_fts WHERE documents_fts MATCH ?", (query,))
+        count = cursor.fetchone()[0]
+        if count > 0:
+            print(f"   ✅ '{query}': found {count} results")
+        else:
+            print(f"   ⚠️  '{query}': no results (this might be ok)")
+
+    conn.close()
+else:
+    print("   ❌ search.db not found!")
+EOF
+fi
 
 echo ""
 echo "========================================"
