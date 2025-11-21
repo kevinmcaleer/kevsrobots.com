@@ -28,6 +28,16 @@
 - Added lxml system dependencies to Dockerfile: `libxml2-dev`, `libxslt1-dev`
 - Updated rebuild script to check for dependencies before running
 
+### 7. ✅ Unicode Decode Errors During Indexing
+**Problem**: Index rebuild crashed on files with non-UTF-8 encoding
+**Error**: `UnicodeDecodeError: 'utf-8' codec can't decode byte 0xb0`
+**Solution**:
+- Added multi-encoding support (UTF-8, then latin-1 fallback)
+- Added comprehensive error handling for parse failures
+- Added progress tracking and summary statistics
+- Files with encoding issues are now skipped gracefully
+- See `ENCODING_FIX.md` for details
+
 ### 5. ✅ Search Returns No Results
 **Problem**: SQLite FTS database empty or outdated
 **Solution**:
