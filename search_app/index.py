@@ -37,12 +37,27 @@ def parse_html_file(file_path):
 
         # Correct the cover image URL if necessary
         base_url = 'https://www.kevsrobots.com'
-        if cover_image.startswith('http://'):
-            cover_image = cover_image.replace('http://', 'https://')
-        if not cover_image.startswith(('http://', 'https://')):
-            cover_image = base_url + ('/' if not cover_image.startswith('/') else '') + cover_image
 
-        cover_image = cover_image.replace(".com//",".com/")
+        # Clean up development URLs
+        if cover_image:
+            # Replace development server URLs with production
+            cover_image = cover_image.replace('http://0.0.0.0:4000', base_url)
+            cover_image = cover_image.replace('https://0.0.0.0:4000', base_url)
+            cover_image = cover_image.replace('http://localhost:4000', base_url)
+            cover_image = cover_image.replace('https://localhost:4000', base_url)
+            cover_image = cover_image.replace('http://127.0.0.1:4000', base_url)
+            cover_image = cover_image.replace('https://127.0.0.1:4000', base_url)
+
+            # Replace http with https
+            if cover_image.startswith('http://'):
+                cover_image = cover_image.replace('http://', 'https://')
+
+            # Add base URL if relative path
+            if not cover_image.startswith(('http://', 'https://')):
+                cover_image = base_url + ('/' if not cover_image.startswith('/') else '') + cover_image
+
+            # Clean up double slashes
+            cover_image = cover_image.replace(".com//",".com/")
 
         h1_tag = soup.find('h1')
         # page_title = h1_tag.get_text().strip() if h1_tag else 'Untitled Page'
