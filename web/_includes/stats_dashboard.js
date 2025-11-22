@@ -31,6 +31,14 @@ async function loadDashboard() {
         const returningUsersEl = document.getElementById('returningUsers');
         if (returningUsersEl) returningUsersEl.textContent = data.user_stats.returning_users.toLocaleString();
 
+        // Visits per day chart
+        renderLineChart(
+            'visitsPerDayChart',
+            'Visits per Day',
+            data.visits_per_day.map(d => d.date),
+            data.visits_per_day.map(d => d.count)
+        );
+
         // Searches per day chart
         renderLineChart(
             'searchesPerDayChart',

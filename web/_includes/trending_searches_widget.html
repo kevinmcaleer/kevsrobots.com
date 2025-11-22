@@ -1,6 +1,9 @@
 <!-- Trending Searches Widget -->
 <div class="trending-widget">
-    <h3>🔥 Trending Searches</h3>
+    <div class="widget-header">
+        <h3>🔥 Trending Searches</h3>
+        <a href="/stats" class="more-stats-link">more stats →</a>
+    </div>
     <ul class="trending-list" id="trendingWidget">
         <li class="trending-item">Loading...</li>
     </ul>
@@ -15,11 +18,28 @@
     margin-bottom: 20px;
 }
 
-.trending-widget h3 {
-    margin-top: 0;
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
+}
+
+.trending-widget h3 {
+    margin: 0;
     color: var(--text-primary, #333);
     font-size: 18px;
+}
+
+.more-stats-link {
+    color: var(--link-color, #2563eb);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.more-stats-link:hover {
+    text-decoration: underline;
 }
 
 .trending-list {
