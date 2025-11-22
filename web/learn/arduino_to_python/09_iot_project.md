@@ -200,7 +200,8 @@ def create_web_server():
 
 def generate_html(temperature, uptime):
     """Generate HTML page with current data"""
-    html = f"""<!DOCTYPE html>
+    html = f"""
+{% raw %}<!DOCTYPE html>
 <html>
 <head>
     <title>Temperature Monitor</title>
@@ -246,7 +247,8 @@ def generate_html(temperature, uptime):
         <p>Page auto-refreshes every 5 seconds</p>
     </div>
 </body>
-</html>"""
+</html>{% endraw %}
+"""
     return html
 ```
 
@@ -305,7 +307,8 @@ def read_temperature():
 
 def generate_html(temperature, uptime):
     """Generate HTML page with current data"""
-    html = f"""<!DOCTYPE html>
+    html = f"""
+{% raw %}<!DOCTYPE html>
 <html>
 <head>
     <title>Temperature Monitor</title>
@@ -363,7 +366,8 @@ def generate_html(temperature, uptime):
         </div>
     </div>
 </body>
-</html>"""
+</html>{% endraw %}
+"""
     return html
 
 def handle_request(client):
@@ -579,7 +583,8 @@ def read_sensors():
     return temperature, humidity
 
 def generate_html(temperature, humidity, uptime):
-    html = f"""<!DOCTYPE html>
+    html = f"""
+{% raw %}<!DOCTYPE html>
 <html>
 <head>
     <title>Environmental Monitor</title>
@@ -630,7 +635,8 @@ def generate_html(temperature, humidity, uptime):
         <div>⏱️ Uptime: {uptime:.0f}s</div>
     </div>
 </body>
-</html>"""
+</html>{% endraw %}
+"""
     return html
 ```
 
@@ -651,7 +657,8 @@ def generate_html(temperature, uptime, led_state):
     led_status = "ON" if led_state else "OFF"
     led_color = "#4caf50" if led_state else "#f44336"
 
-    html = f"""<!DOCTYPE html>
+    html = f"""
+{% raw %}<!DOCTYPE html>
 <html>
 <head>
     <title>Temperature Monitor with Control</title>
@@ -683,7 +690,8 @@ def generate_html(temperature, uptime, led_state):
         </div>
     </div>
 </body>
-</html>"""
+</html>{% endraw %}
+"""
     return html
 
 def handle_request(client):
@@ -727,7 +735,8 @@ def generate_html(temperature, uptime):
     for timestamp, temp in reversed(readings_log):
         readings_html += f"<tr><td>{timestamp:.0f}s</td><td>{temp:.1f}°C</td></tr>"
 
-    html = f"""<!DOCTYPE html>
+    html = f"""
+{% raw %}<!DOCTYPE html>
 <html>
 <head>
     <title>Temperature Logger</title>
@@ -749,7 +758,8 @@ def generate_html(temperature, uptime):
         </table>
     </div>
 </body>
-</html>"""
+</html>{% endraw %}
+"""
     return html
 
 # In main loop, log every reading

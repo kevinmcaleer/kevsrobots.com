@@ -623,7 +623,8 @@ def connect_wifi(ssid, password):
     return wlan
 
 def generate_control_html(distance):
-    html = f"""<!DOCTYPE html>
+    html = f"""
+{% raw %}<!DOCTYPE html>
 <html>
 <head>
     <title>Robot Control</title>
@@ -658,7 +659,8 @@ def generate_control_html(distance):
         <a href="/backward"><button>↓ Backward</button></a>
     </div>
 </body>
-</html>"""
+</html>{% endraw %}
+"""
     return html
 
 def web_control(robot, sensor):

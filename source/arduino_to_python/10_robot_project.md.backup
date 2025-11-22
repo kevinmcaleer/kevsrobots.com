@@ -1,53 +1,10 @@
 ---
-layout: lesson
 title: Robot Project - Simple Motor Control
-author: Kevin McAleer
+description: Build a basic robot control system with motors, sensors, and autonomous behavior using MicroPython
+layout: lesson
 type: page
 cover: /learn/arduino_to_python/assets/cover.jpg
-date: 2025-11-20
-previous: 09_iot_project.html
-next: 11_next_steps.html
-description: Build a basic robot control system with motors, sensors, and autonomous
-  behavior using MicroPython
-percent: 88
-duration: 10
-navigation:
-- name: Arduino to MicroPython - A Quick Start Guide
-- content:
-  - section: Getting Started
-    content:
-    - name: Introduction to Arduino to MicroPython
-      link: 00_intro.html
-    - name: Why MicroPython?
-      link: 01_why_micropython.html
-  - section: Language Fundamentals
-    content:
-    - name: Syntax Basics - No More Semicolons!
-      link: 02_syntax_basics.html
-    - name: Control Flow - If, Loops, and No Braces!
-      link: 03_control_flow.html
-    - name: Functions - Goodbye setup and loop!
-      link: 04_functions.html
-    - name: Pin Control - Goodbye pinMode, Hello Pin Class!
-      link: 05_pin_control.html
-  - section: Hardware Basics
-    content:
-    - name: Analog Reading and PWM - ADC and PWM Classes
-      link: 06_analog_pwm.html
-    - name: Timing and Delays - Seconds vs Milliseconds!
-      link: 07_timing.html
-    - name: Serial Communication and REPL - No More Serial.begin!
-      link: 08_serial_basics.html
-  - section: Practical Projects
-    content:
-    - name: IoT Project - WiFi Temperature Monitor
-      link: 09_iot_project.html
-    - name: Robot Project - Simple Motor Control
-      link: 10_robot_project.html
-    - name: Next Steps and Quick Reference
-      link: 11_next_steps.html
 ---
-
 
 ## Building a Simple Robot
 
@@ -666,8 +623,7 @@ def connect_wifi(ssid, password):
     return wlan
 
 def generate_control_html(distance):
-    html = f"""
-{% raw %}<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html>
 <head>
     <title>Robot Control</title>
@@ -702,8 +658,7 @@ def generate_control_html(distance):
         <a href="/backward"><button>↓ Backward</button></a>
     </div>
 </body>
-</html>{% endraw %}
-"""
+</html>"""
     return html
 
 def web_control(robot, sensor):
