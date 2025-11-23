@@ -31,8 +31,8 @@ async function loadDashboard() {
         const returningUsersEl = document.getElementById('returningUsers');
         if (returningUsersEl) returningUsersEl.textContent = data.user_stats.returning_users.toLocaleString();
 
-        // Visits per day chart
-        renderLineChart(
+        // Visits per day chart (bar chart)
+        renderBarChart(
             'visitsPerDayChart',
             'Visits per Day',
             data.visits_per_day.map(d => d.date),
@@ -117,6 +117,43 @@ function renderLineChart(canvasId, label, labels, data) {
                 backgroundColor: 'rgba(37, 99, 235, 0.1)',
                 tension: 0.4,
                 fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    ticks: {
+                        maxTicksLimit: 12
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Render bar chart
+function renderBarChart(canvasId, label, labels, data) {
+    new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor: '#2563eb',
+                borderColor: '#1e40af',
+                borderWidth: 1
             }]
         },
         options: {

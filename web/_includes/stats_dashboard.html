@@ -20,42 +20,55 @@
         </div>
     </div>
 
-    <!-- Visits Per Day Chart -->
-    <div class="chart-container">
-        <h2>Daily Visits (Last Year)</h2>
-        <div class="chart-wrapper">
-            <canvas id="visitsPerDayChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Searches Per Day Chart -->
-    <div class="chart-container">
-        <h2>Searches Over Time (Last Year)</h2>
-        <div class="chart-wrapper">
-            <canvas id="searchesPerDayChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Three Pie Charts Side by Side -->
-    <div class="chart-row-3">
+    <!-- Daily Visits and Searches Side by Side -->
+    <div class="chart-row-2">
         <div class="chart-container">
-            <h2>Device Breakdown</h2>
-            <div class="chart-wrapper-small">
-                <canvas id="deviceChart"></canvas>
+            <h2>Daily Visits (Last Year)</h2>
+            <div class="chart-wrapper-medium">
+                <canvas id="visitsPerDayChart"></canvas>
             </div>
         </div>
 
         <div class="chart-container">
-            <h2>Operating System Breakdown</h2>
-            <div class="chart-wrapper-small">
-                <canvas id="osChart"></canvas>
+            <h2>Searches Over Time (Last Year)</h2>
+            <div class="chart-wrapper-medium">
+                <canvas id="searchesPerDayChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie Charts and Country Breakdown Side by Side -->
+    <div class="chart-row-2">
+        <!-- Three Pie Charts Side by Side in One Container -->
+        <div class="chart-container">
+            <h2>Breakdown by Device, OS, and Content Type</h2>
+            <div class="pie-chart-grid">
+                <div class="pie-chart-item">
+                    <h3>Device</h3>
+                    <div class="chart-wrapper-tiny">
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                </div>
+                <div class="pie-chart-item">
+                    <h3>OS</h3>
+                    <div class="chart-wrapper-tiny">
+                        <canvas id="osChart"></canvas>
+                    </div>
+                </div>
+                <div class="pie-chart-item">
+                    <h3>Content</h3>
+                    <div class="chart-wrapper-tiny">
+                        <canvas id="pageTypeChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Country Breakdown -->
         <div class="chart-container">
-            <h2>Popular Content Types</h2>
-            <div class="chart-wrapper-small">
-                <canvas id="pageTypeChart"></canvas>
+            <h2>Visitors by Country (Last 30 Days)</h2>
+            <div class="chart-wrapper">
+                <canvas id="countryChart"></canvas>
             </div>
         </div>
     </div>
@@ -75,14 +88,6 @@
         <div class="chart-container">
             <h2>Most Popular Pages (Last 30 Days)</h2>
             <ul class="query-list" id="popularPages"></ul>
-        </div>
-    </div>
-
-    <!-- Country Breakdown -->
-    <div class="chart-container">
-        <h2>Visitors by Country (Last 30 Days)</h2>
-        <div class="chart-wrapper">
-            <canvas id="countryChart"></canvas>
         </div>
     </div>
 
