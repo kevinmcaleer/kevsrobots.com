@@ -1,3 +1,9 @@
+- name:
+  link: /blog/cyberbricks.html
+  cover: /assets/img/blog/cyberbricks/cover.jpg
+  description: "Cyberbricks - are these the Lego Mindstorms killer?"
+  date: 2025/11/30
+  hero: /assets/img/blog/cyberbricks/hero.png
 - name: Arduino Alvik Maze Navigation
   link: /blog/alvik-maze.html
   cover: /assets/img/blog/alvik_maze/cover.jpg
