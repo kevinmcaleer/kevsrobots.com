@@ -17,3 +17,4 @@ exports
 # Image optimization cache
 .optimization_cache.json
 .env
+Chart Data.csv

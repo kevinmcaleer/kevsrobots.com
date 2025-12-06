@@ -1,49 +1,10 @@
 ---
-layout: lesson
 title: Training Custom Object Detection Models
-author: Kevin McAleer
+description: >-
+    Train a custom PyTorch object detection model using transfer learning with Faster R-CNN to detect your own objects
 type: page
-cover: /learn/object_model/assets/cover.jpg
-date: 2025-12-04
-previous: 02_dataset_prep.html
-next: 04_onnx_conversion.html
-description: Train a custom PyTorch object detection model using transfer learning
-  with Faster R-CNN to detect your own objects
-percent: 44
-duration: 7
-navigation:
-- name: Building Object Detection Models with Raspberry Pi AI Camera
-- content:
-  - section: Getting Started
-    content:
-    - name: Introduction
-      link: 00_intro.html
-    - name: Setting up Your Development Environment
-      link: 01_setup.html
-  - section: Dataset Preparation
-    content:
-    - name: Preparing Custom Object Detection Datasets
-      link: 02_dataset_prep.html
-  - section: Model Training
-    content:
-    - name: Training Custom Object Detection Models
-      link: 03_training.html
-    - name: Converting Models to ONNX Format
-      link: 04_onnx_conversion.html
-  - section: Deployment
-    content:
-    - name: Deploying to Raspberry Pi AI Camera
-      link: 05_deployment.html
-    - name: Real-Time Object Detection
-      link: 06_realtime_detection.html
-  - section: Advanced Topics
-    content:
-    - name: Troubleshooting and Optimization
-      link: 07_troubleshooting.html
-    - name: Course Summary and Next Steps
-      link: 08_summary.html
+layout: lesson
 ---
-
 
 ## Overview
 

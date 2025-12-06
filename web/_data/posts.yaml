@@ -215,6 +215,10 @@ posts:
 - title: Weather Station Display
   url: /2025-02-22-weather-station-display.md
   date: 2025-02-22
+- title: Introducing the KevsRobots Stats Dashboard - See What Everyone's Searching
+    For!
+  url: /2025-11-21-stats-dashboard.md
+  date: 2025-11-21
 - title: Robot Makers Almanac
   url: /2024-12-30-robot-makers-almanac.md
   date: 2024-12-30
@@ -323,6 +327,9 @@ posts:
 - title: Waveshare CM5 boards
   url: /2025-04-06-waveshare-cm5.md
   date: 2025-04-06
+- title: Cyberbricks - are these the Lego Mindstorms killer?
+  url: /2025-11-29-cyberbricks.md
+  date: 2025-11-29
 - title: PicoCat Lives
   url: /2022-04-01-picocat-lives.md
   date: 2022-04-01
@@ -377,6 +384,9 @@ posts:
 - title: Servo Easing & Pancake-Bot
   url: /2023-02-18-servo-easing-with-pancake-bot.md
   date: 2023-02-18
+- title: New Course - Arduino to MicroPython Quick Start Guide
+  url: /2025-11-22-arduino-to-micropython.md
+  date: 2025-11-22
 - title: Mastering Posture Detection with CVZone
   url: /2023-10-08-cvzone.md
   date: 2023-10-07
@@ -401,6 +411,9 @@ posts:
 - title: Setting Up Dynamic DNS on a Raspberry Pi for Self-Hosting
   url: /2024-11-15-dynamic-dns.md
   date: 2024-11-15
+- title: Arduino Alvik Maze Navigation - From Wall Following to SLAM
+  url: /2025-11-16-alvik-maze.md
+  date: 2025-11-16
 - title: Bubo-2T
   url: /2023-02-04-bubo-2t.md
   date: 2023-02-04

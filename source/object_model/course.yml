@@ -1,0 +1,42 @@
+- name: Building Object Detection Models with Raspberry Pi AI Camera
+  author: Kevin McAleer
+  date_created: 2025-12-04
+  date_published: 2025-12-04
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - python
+      - ai
+      - raspberry_pi
+      - computer_vision
+  description: >-
+      Learn how to build custom object detection models using the Raspberry Pi AI Camera.
+      Train your own models with PyTorch, optimize them for edge deployment, and run
+      real-time detection on Raspberry Pi hardware. Complete hands-on course from dataset
+      creation to production deployment.
+  content:
+  - section:
+      name: Getting Started
+      content:
+      - 00_intro.md
+      - 01_setup.md
+  - section:
+      name: Dataset Preparation
+      content:
+      - 02_dataset_prep.md
+  - section:
+      name: Model Training
+      content:
+      - 03_training.md
+      - 04_onnx_conversion.md
+  - section:
+      name: Deployment
+      content:
+      - 05_deployment.md
+      - 06_realtime_detection.md
+  - section:
+      name: Advanced Topics
+      content:
+      - 07_troubleshooting.md
+      - 08_summary.md
+  

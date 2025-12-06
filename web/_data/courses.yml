@@ -240,6 +240,21 @@
   link: /learn/freecad/01_introduction_to_freecad.html
   name: Introduction to FreeCAD for Beginners
 - author: Kevin McAleer
+  cover: /learn/object_model/assets/cover.jpg
+  date_published: 2025-12-04
+  description: Learn how to build custom object detection models using the Raspberry
+    Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment,
+    and run real-time detection on Raspberry Pi hardware. Complete hands-on course
+    from dataset creation to production deployment.
+  duration: 2h 0m
+  groups:
+  - python
+  - ai
+  - raspberry_pi
+  - computer_vision
+  link: /learn/object_model/00_intro.html
+  name: Building Object Detection Models with Raspberry Pi AI Camera
+- author: Kevin McAleer
   cover: /learn/micropython_robotics/assets/cover.jpg
   date_published: 2025-05-20
   description: Learn how to build simple yet powerful robots using the Raspberry Pi

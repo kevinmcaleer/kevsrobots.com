@@ -12,29 +12,34 @@
         </span>
       </div>
       </nav>
-   
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-4">
-    
-      {% for vid in vids %}
-      {% for video in views %}
-      {% if video.Content == vid.video_id %}
 
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-4">
+
+      {% for vid in vids %}
       {% assign vid_img = "https://img.youtube.com/vi/" | append: vid.video_id | append: "/0.jpg" %}
       {% assign vid_link = "https://www.youtube.com/watch?v=" | append: vid.video_id %}
-      {% if video.popular %}
+
+      {% comment %} Look up view data from popular_videos if available {% endcomment %}
+      {% assign video_views = nil %}
+      {% assign is_popular = false %}
+      {% for video in views %}
+        {% if video.Content == vid.video_id %}
+          {% assign video_views = video.views_str %}
+          {% assign is_popular = video.popular %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+
+      {% if is_popular %}
         {% assign pop_color = "bg-ocre" %}
+      {% else %}
+        {% assign pop_color = nil %}
       {% endif %}
-    
-      {% include card.html cardtitle=vid.title views=video.views_str badge=video.popular bg_color=pop_color
+
+      {% include card.html cardtitle=vid.title views=video_views badge=is_popular bg_color=pop_color
          date=vid.published img=vid_img link=vid_link tl="3" small_title=true noborder=true %}
 
-      {% if video.popular %}
-        {% assign pop_color = "" %}
-      {% endif %}
-      
-{% endif %}
-{% endfor %}
-{% endfor %}
+      {% endfor %}
 
 </div>
 </div>
