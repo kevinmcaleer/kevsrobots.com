@@ -1,0 +1,21 @@
+- name: Building SMARS with FreeCAD
+  author: Kevin McAleer
+  date_created: 2025-12-12
+  date_published: 2025-12-12
+  layout: course
+  cover: assets/cover.png
+  groups:
+    - freecad
+    - 3d modeling
+  description: >-
+    This course focuses on using FreeCAD to design and build the SMARS (Screwless Modular Assembleable Robotic System). Learn how to create detailed 3D models, assemble components, and prepare your designs for manufacturing using FreeCAD's powerful tools.
+  content:
+    - section:
+        name: Navigating around FreeCAD
+        content:
+          - 01_navigation.md
+        name: Designing the SMARS Base
+        content:
+          - 02_creating_the_base.md
+          - 03_shell_and_fillet.md
+          - 04_sides_and_holes.md

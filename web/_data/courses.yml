@@ -202,6 +202,19 @@
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
 - author: Kevin McAleer
+  cover: /learn/freecad_smars/assets/cover.png
+  date_published: 2025-12-12
+  description: This course focuses on using FreeCAD to design and build the SMARS
+    (Screwless Modular Assembleable Robotic System). Learn how to create detailed
+    3D models, assemble components, and prepare your designs for manufacturing using
+    FreeCAD's powerful tools.
+  duration: 0h 16m
+  groups:
+  - freecad
+  - 3d modeling
+  link: /learn/freecad_smars/02_creating_the_base.html
+  name: Building SMARS with FreeCAD
+- author: Kevin McAleer
   cover: /learn/brachiograph/assets/cover.png
   date_published: 2024-07-26
   description: Learn how to build your own BrachioGraph, a simple drawing robot that
