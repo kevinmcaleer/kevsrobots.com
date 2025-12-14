@@ -3,7 +3,7 @@
   date_created: 2025-12-12
   date_published: 2025-12-12
   layout: course
-  cover: assets/cover.png
+  cover: assets/cover.jpg
   groups:
     - freecad
     - 3d modeling
@@ -14,8 +14,22 @@
         name: Navigating around FreeCAD
         content:
           - 01_navigation.md
+    - section:
         name: Designing the SMARS Base
         content:
           - 02_creating_the_base.md
           - 03_shell_and_fillet.md
           - 04_sides_and_holes.md
+          - 05_front_rear_profiles.md
+          - 06_arduino_slots.md
+          - 07_wheel_stubs.md
+          - 08_motor_holder.md
+    - section:
+        name: Exporting for 3D Printing
+        content:
+          - 09_save_as_stl.md
+    - section:
+        name: Summary
+        content:
+          - 10_summary.md
+

@@ -10,6 +10,7 @@ courses:
   - "Robot Eye Mechanism"
   - "Introduction to FreeCAD for Beginners"
   - "Mini-Rack 3D Design Tutorial"
+  - "Building SMARS with FreeCAD"
 ---
 
 ![Cover image]({{page.cover}}){:class="cover"}

@@ -82,3 +82,8 @@ layout: lesson
 
     ![Pocket the sketch](assets/side16.png){:class="img-fluid w-100"}
     
+10. You should now see the side profile and motor holes cut out of the base.
+
+    ![Final view](assets/side17.png){:class="img-fluid w-100"}
+
+---

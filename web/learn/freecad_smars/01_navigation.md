@@ -3,11 +3,11 @@ layout: lesson
 title: Navigation in FreeCAD
 author: Kevin McAleer
 type: page
-cover: /learn/freecad_smars/assets/cover.png
+cover: /learn/freecad_smars/assets/cover.jpg
 date: 2025-12-12
 next: 02_creating_the_base.html
 description: Learn how to navigate the 3D workspace in FreeCAD.
-percent: 33
+percent: 10
 duration: 2
 navigation:
 - name: Building SMARS with FreeCAD
@@ -16,10 +16,30 @@ navigation:
     content:
     - name: Navigation in FreeCAD
       link: 01_navigation.html
+  - section: Designing the SMARS Base
+    content:
     - name: Creating the Base
       link: 02_creating_the_base.html
     - name: Shell and Fillet the Base
       link: 03_shell_and_fillet.html
+    - name: Side Holes
+      link: 04_sides_and_holes.html
+    - name: Front and Rear Profiles
+      link: 05_front_rear_profiles.html
+    - name: Arduino Slots
+      link: 06_arduino_slots.html
+    - name: Wheel Stubs
+      link: 07_wheel_stubs.html
+    - name: Motor Holder
+      link: 08_motor_holder.html
+  - section: Exporting for 3D Printing
+    content:
+    - name: Save as STL
+      link: 09_save_as_stl.html
+  - section: Summary
+    content:
+    - name: Summary
+      link: 10_summary.html
 ---
 
 

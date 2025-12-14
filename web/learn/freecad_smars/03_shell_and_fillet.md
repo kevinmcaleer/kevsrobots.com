@@ -3,16 +3,20 @@ layout: lesson
 title: Shell and Fillet the Base
 author: Kevin McAleer
 type: page
-cover: /learn/freecad_smars/assets/cover.png
+cover: /learn/freecad_smars/assets/cover.jpg
 date: 2025-12-12
 previous: 02_creating_the_base.html
 next: 04_sides_and_holes.html
 description: Learn how to add shells and fillets to the SMARS robot base using FreeCAD.
-percent: 66
+percent: 30
 duration: 2
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
+  - section: Navigating around FreeCAD
+    content:
+    - name: Navigation in FreeCAD
+      link: 01_navigation.html
   - section: Designing the SMARS Base
     content:
     - name: Creating the Base
@@ -21,6 +25,22 @@ navigation:
       link: 03_shell_and_fillet.html
     - name: Side Holes
       link: 04_sides_and_holes.html
+    - name: Front and Rear Profiles
+      link: 05_front_rear_profiles.html
+    - name: Arduino Slots
+      link: 06_arduino_slots.html
+    - name: Wheel Stubs
+      link: 07_wheel_stubs.html
+    - name: Motor Holder
+      link: 08_motor_holder.html
+  - section: Exporting for 3D Printing
+    content:
+    - name: Save as STL
+      link: 09_save_as_stl.html
+  - section: Summary
+    content:
+    - name: Summary
+      link: 10_summary.html
 ---
 
 

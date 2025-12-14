@@ -1,17 +1,21 @@
 ---
 layout: lesson
-title: Creating the Base
+title: Navigation in FreeCAD
 author: Kevin McAleer
 type: page
-cover: /learn/freecad_smars/assets/cover.png
+cover: /learn/freecad_smars/assets/cover.jpg
 date: 2025-12-12
-next: 03_shell_and_fillet.html
-description: Learn how to create the base component of the SMARS robot using FreeCAD.
-percent: 33
-duration: 3
+next: 02_creating_the_base.html
+description: Learn how to navigate the 3D workspace in FreeCAD.
+percent: 10
+duration: 2
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
+  - section: Navigating around FreeCAD
+    content:
+    - name: Navigation in FreeCAD
+      link: 01_navigation.html
   - section: Designing the SMARS Base
     content:
     - name: Creating the Base
@@ -20,67 +24,49 @@ navigation:
       link: 03_shell_and_fillet.html
     - name: Side Holes
       link: 04_sides_and_holes.html
+    - name: Front and Rear Profiles
+      link: 05_front_rear_profiles.html
+    - name: Arduino Slots
+      link: 06_arduino_slots.html
+    - name: Wheel Stubs
+      link: 07_wheel_stubs.html
+    - name: Motor Holder
+      link: 08_motor_holder.html
+  - section: Exporting for 3D Printing
+    content:
+    - name: Save as STL
+      link: 09_save_as_stl.html
+  - section: Summary
+    content:
+    - name: Summary
+      link: 10_summary.html
 ---
 
 
-1. Create a new FreeCAD document by clicking on `File` > `New`.
+# Navigation in FreeCAD
 
-    ![create new document](assets/base01.png){:class="img-fluid w-100"}
+To move the model around the screen, you can use the following mouse controls:
 
-2. Save the file as `smars_base.FCStd` by clicking on `File` > `Save As`.
+- **Rotate**: Click and hold the middle mouse button (scroll wheel) and move the mouse.
+- **Pan**: Click and hold the middle mouse button (scroll wheel) while holding the `Shift` key, then move the mouse.
+- **Zoom**: Scroll the mouse wheel up to zoom in and down to zoom out.
 
-    ![Save the file](assets/base02.png){:class="img-fluid w-100"}
+You can also use the navigation cube located in the top right corner of the 3D view to quickly change the view orientation. Clicking on different faces, edges, or corners of the cube will adjust the view accordingly.
 
-3. Click on `Create Sketch` to create a new sketch. If you don't see this option, make sure you are in the `Part Design` workbench by selecting it from the drop-down menu in the toolbar.
+Additionally, you can use the following keyboard shortcuts for navigation:
+- `1`: Front view
+- `2`: Back view
+- `3`: Top view
+- `4`: Bottom view
+- `5`: Left view
+- `6`: Right view
+- `0`: Isometric view
+- `Ctrl + 0`: Fit all objects in the view
+- `F`: Focus on the selected object
+- `Shift + F`: Focus on all objects in the scene
+- `+` and `-`: Zoom in and out incrementally
+- `Arrow Keys`: Pan the view in small increments
 
-    ![Create a sketch](assets/base03.png){:class="img-fluid w-100"}
-
-4. Click on the `XY-Plane` to select it as the plane for your sketch.
-
-    ![Select XY Plane](assets/base04.png){:class="img-fluid w-100"}
-
-5. Click on the Rectangle tool in the toolbar to draw a rectangle on the sketch plane.
-
-    ![Rectangle tool](assets/base05.png){:class="img-fluid w-100"}
-
-6. Type in the length as `70mm` and the width as `58mm` in the dimension boxes that appear after drawing the rectangle. Press `Tab` to switch between length and width fields.
-
-    ![Set dimensions](assets/base06.png){:class="img-fluid w-100"}
-
-7. Next, we want to center the rectangle on the origin. We'll do this by adding two diagonal lines and create a point at the center, we'll then constrain this point to the origin.
-
-    - Select the `Line` tool from the toolbar and draw a diagonal line from one corner of the rectangle to the opposite corner. Do this for both diagonals. When your mouse pointer comes close to the intersection of the top or bottom corners of the rectangle, you'll notice the cursor changes to indicate you can snap to that point.
-
-    ![Create Diagonal](assets/base07.png){:class="img-fluid w-100"}
-
-    ![Create second diagonal](assets/base08.png){:class="img-fluid w-100"}
-
-    - Now, select the `Point` tool from the toolbar and click at the intersection of the two diagonal lines to create a point at the center of the rectangle.
-
-    ![Create center point](assets/base09.png){:class="img-fluid w-100"}
-
-    ![Center point created](assets/base10.png){:class="img-fluid w-100"}
-
-8. We'll now make the two diagonal lines construction lines. Press `Escape` to exit the point tool. Select each diagonal line by clicking on it while holding the `Ctrl` key, then click on the `Toggle construction mode` button in the toolbar (it looks like a dashed line).
-
-    ![Toggle construction lines](assets/base11.png){:class="img-fluid w-100"}
-
-9. Finally, we need to constrain the center point to the origin. Select the center point by clicking on it, then hold the `Ctrl` key and click on the origin (the small red and green circle where the axes intersect). With both selected, click on the `Constrain Coincident` button in the toolbar (it looks like two points connected by a line). The shortcut key for this is `C`.
-
-    ![Constrain center to origin](assets/base12.png){:class="img-fluid w-100"}
-
-    ![Constrain center to origin](assets/base13.png){:class="img-fluid w-100"}
-
-    ![Constrain center to origin](assets/base14.png){:class="img-fluid w-100"}
-
-10. We can now close the sketch by clicking on the `Close` button in the toolbar.
-
-    ![Close the sketch](assets/base15.png){:class="img-fluid w-100"}
-
-11. Lets add some thickness to our base. With the sketch selected in the Model tree on the left, click on the `Pad` button in the toolbar (it looks like a yellow box floating above a red rectangle).
-
-    ![Pad the sketch](assets/base16.png){:class="img-fluid w-100"}
-
-    Type in `32mm` for the length of the pad and click `OK`.
+These controls will help you effectively navigate and manipulate your view within FreeCAD.
 
 ---
