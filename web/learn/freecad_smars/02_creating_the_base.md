@@ -3,18 +3,21 @@ layout: lesson
 title: Creating the Base
 author: Kevin McAleer
 type: page
-cover: /learn/freecad_smars/assets/cover.jpg
+cover: assets/cover.jpg
 date: 2025-12-12
 previous: 01_navigation.html
 next: 03_shell_and_fillet.html
-description: Learn how to create the base component of the SMARS robot using FreeCAD.
-percent: 20
-duration: 3
+description: Build the foundation of your SMARS robot - a parametric 3D sketch extruded
+  into a solid
+percent: 27
+duration: 6
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
-  - section: Navigating around FreeCAD
+  - section: Getting Started
     content:
+    - name: Introduction to Building SMARS with FreeCAD
+      link: 00_intro.html
     - name: Navigation in FreeCAD
       link: 01_navigation.html
   - section: Designing the SMARS Base
@@ -39,69 +42,208 @@ navigation:
       link: 09_save_as_stl.html
   - section: Summary
     content:
-    - name: Summary
+    - name: Summary and Next Steps
       link: 10_summary.html
 ---
 
 
-1. Create a new FreeCAD document by clicking on `File` > `New`.
+## What We're Building
 
-    ![create new document](assets/base01.png){:class="img-fluid w-100"}
+The SMARS base is a **70mm × 58mm × 32mm** solid block. These aren't random numbers:
 
-2. Save the file as `smars_base.FCStd` by clicking on `File` > `Save As`.
+| Dimension | Size | Why This Size? |
+|-----------|------|----------------|
+| Length | 70mm | Fits two N20 motors side by side with clearance |
+| Width | 58mm | Matches standard SMARS wheel track width |
+| Height | 32mm | Tall enough for Arduino Nano + batteries |
+{: .table .table-single }
 
-    ![Save the file](assets/base02.png){:class="img-fluid w-100"}
+This block becomes the foundation for everything else - we'll hollow it out, add holes, and create mounting features in later lessons.
 
-3. Click on `Create Sketch` to create a new sketch. If you don't see this option, make sure you are in the `Part Design` workbench by selecting it from the drop-down menu in the toolbar.
+---
 
-    ![Create a sketch](assets/base03.png){:class="img-fluid w-100"}
+## Understanding Parametric Design
 
-4. Click on the `XY-Plane` to select it as the plane for your sketch.
+We're about to do something clever: create a **parametric sketch**. This means:
 
-    ![Select XY Plane](assets/base04.png){:class="img-fluid w-100"}
+1. We draw shapes (rectangles, lines, circles)
+2. We add **constraints** (dimensions, positions, relationships)
+3. FreeCAD calculates the exact geometry
 
-5. Click on the Rectangle tool in the toolbar to draw a rectangle on the sketch plane.
+**Why this matters**: If you later decide the base should be 75mm long instead of 70mm, you change ONE number and the entire model updates. That's the power of parametric CAD!
 
-    ![Rectangle tool](assets/base05.png){:class="img-fluid w-100"}
+---
 
-6. Type in the length as `70mm` and the width as `58mm` in the dimension boxes that appear after drawing the rectangle. Press `Tab` to switch between length and width fields.
+## Step-by-Step: Create the Base
 
-    ![Set dimensions](assets/base06.png){:class="img-fluid w-100"}
+### 1. Create a New Document
 
-7. Next, we want to center the rectangle on the origin. We'll do this by adding two diagonal lines and create a point at the center, we'll then constrain this point to the origin.
+Click on `File` > `New` to create a fresh FreeCAD document.
 
-    - Select the `Line` tool from the toolbar and draw a diagonal line from one corner of the rectangle to the opposite corner. Do this for both diagonals. When your mouse pointer comes close to the intersection of the top or bottom corners of the rectangle, you'll notice the cursor changes to indicate you can snap to that point.
+![Create new document](assets/base01.png){:class="img-fluid w-100"}
 
-    ![Create Diagonal](assets/base07.png){:class="img-fluid w-100"}
+### 2. Save Your Work (Important!)
 
-    ![Create second diagonal](assets/base08.png){:class="img-fluid w-100"}
+Click `File` > `Save As` and name it `smars_base.FCStd`.
 
-    - Now, select the `Point` tool from the toolbar and click at the intersection of the two diagonal lines to create a point at the center of the rectangle.
+![Save the file](assets/base02.png){:class="img-fluid w-100"}
 
-    ![Create center point](assets/base09.png){:class="img-fluid w-100"}
+**Pro tip**: Save frequently! FreeCAD can crash during complex operations. Use `Ctrl+S` after every major step.
 
-    ![Center point created](assets/base10.png){:class="img-fluid w-100"}
+### 3. Enter Part Design Workbench
 
-8. We'll now make the two diagonal lines construction lines. Press `Escape` to exit the point tool. Select each diagonal line by clicking on it while holding the `Ctrl` key, then click on the `Toggle construction mode` button in the toolbar (it looks like a dashed line).
+Click on `Create Sketch`. If you don't see this option, switch to the **Part Design** workbench using the dropdown in the toolbar.
 
-    ![Toggle construction lines](assets/base11.png){:class="img-fluid w-100"}
+![Create a sketch](assets/base03.png){:class="img-fluid w-100"}
 
-9. Finally, we need to constrain the center point to the origin. Select the center point by clicking on it, then hold the `Ctrl` key and click on the origin (the small red and green circle where the axes intersect). With both selected, click on the `Constrain Coincident` button in the toolbar (it looks like two points connected by a line). The shortcut key for this is `C`.
+**What's a workbench?** FreeCAD uses "workbenches" for different tasks. Part Design is for creating solid parts - exactly what we need.
 
-    ![Constrain center to origin](assets/base12.png){:class="img-fluid w-100"}
+### 4. Select the Sketch Plane
 
-    ![Constrain center to origin](assets/base13.png){:class="img-fluid w-100"}
+Click on `XY-Plane` to sketch on the horizontal plane.
 
-    ![Constrain center to origin](assets/base14.png){:class="img-fluid w-100"}
+![Select XY Plane](assets/base04.png){:class="img-fluid w-100"}
 
-10. We can now close the sketch by clicking on the `Close` button in the toolbar.
+**Why XY?** The XY plane is like your workbench surface. Our robot sits on this plane, so it makes sense to start here.
 
-    ![Close the sketch](assets/base15.png){:class="img-fluid w-100"}
+### 5. Draw a Rectangle
 
-11. Lets add some thickness to our base. With the sketch selected in the Model tree on the left, click on the `Pad` button in the toolbar (it looks like a yellow box floating above a red rectangle).
+Select the **Rectangle** tool from the toolbar and draw a rectangle anywhere on the sketch plane.
 
-    ![Pad the sketch](assets/base16.png){:class="img-fluid w-100"}
+![Rectangle tool](assets/base05.png){:class="img-fluid w-100"}
 
-    Type in `32mm` for the length of the pad and click `OK`.
+### 6. Add Dimensions
+
+Type `70mm` for length and `58mm` for width. Press `Tab` to switch between fields.
+
+![Set dimensions](assets/base06.png){:class="img-fluid w-100"}
+
+**Design note**: The 70mm length comes from N20 motor dimensions. Each motor is about 25mm long, and we need space between them plus wall thickness.
+
+---
+
+## Centering the Rectangle (The Professional Way)
+
+Right now our rectangle is somewhere random on the sketch. For a symmetric robot base, we want it **centered on the origin** (0, 0). Here's a clever technique using construction geometry:
+
+### 7. Draw Diagonal Lines
+
+Use the **Line** tool to draw diagonal lines from corner to corner - both diagonals. When your mouse pointer comes close to the corners, the cursor changes to indicate you can snap to that point.
+
+![Create Diagonal](assets/base07.png){:class="img-fluid w-100"}
+
+![Create second diagonal](assets/base08.png){:class="img-fluid w-100"}
+
+**Why diagonals?** The intersection of a rectangle's diagonals is its exact center. Geometry in action!
+
+### 8. Mark the Center Point
+
+Select the **Point** tool and click at the intersection of the two diagonals.
+
+![Create center point](assets/base09.png){:class="img-fluid w-100"}
+
+![Center point created](assets/base10.png){:class="img-fluid w-100"}
+
+### 9. Convert to Construction Geometry
+
+Press `Escape` to exit the point tool. Select both diagonal lines (hold `Ctrl` and click each), then click **Toggle construction mode** (the dashed line icon).
+
+![Toggle construction lines](assets/base11.png){:class="img-fluid w-100"}
+
+**What's construction geometry?** Lines marked as "construction" help you position things but don't become part of the final shape. The dashed appearance shows they're helpers, not features.
+
+### 10. Constrain Center to Origin
+
+This is the key step:
+
+1. Click the center point we created
+2. Hold `Ctrl` and click the origin (the small red/green circle where axes meet)
+3. Click **Constrain Coincident** (or press `C`)
+
+![Constrain center to origin](assets/base12.png){:class="img-fluid w-100"}
+
+![Constrain center to origin](assets/base13.png){:class="img-fluid w-100"}
+
+![Constrain center to origin](assets/base14.png){:class="img-fluid w-100"}
+
+**What just happened?** You told FreeCAD: "These two points must always be in the same place." Now if you change the rectangle size, it stays centered!
+
+### 11. Close the Sketch
+
+Click the **Close** button in the toolbar.
+
+![Close the sketch](assets/base15.png){:class="img-fluid w-100"}
+
+---
+
+## Extrude to 3D: The Pad Operation
+
+We have a 2D sketch. Now let's make it 3D!
+
+### 12. Pad the Sketch
+
+With the sketch selected in the Model tree, click the **Pad** button (looks like a yellow box above a red rectangle).
+
+![Pad the sketch](assets/base16.png){:class="img-fluid w-100"}
+
+Enter `32mm` for the length and click `OK`.
+
+**Why "Pad"?** Different CAD programs call this "extrude" or "boss." FreeCAD calls it "Pad." It pushes your 2D sketch into 3D space.
+
+---
+
+## What You Built
+
+Congratulations! You've created:
+
+- A **parametric sketch** with constraints
+- A **centered rectangle** using construction geometry
+- A **3D solid** using the Pad operation
+
+Your SMARS base is now a solid 70mm × 58mm × 32mm block, perfectly centered on the origin.
+
+---
+
+## Try It Yourself
+
+1. **Change a dimension**: Double-click the sketch in the Model tree, change 70mm to 80mm. Watch everything adjust!
+2. **Examine the constraints**: In sketch edit mode, notice the green color - that means "fully constrained." Orange or white means under-constrained.
+
+---
+
+## Common Issues
+
+### "My sketch is orange/white, not green"
+**Problem**: The sketch isn't fully constrained.
+**Solution**: Add more constraints. Common missing ones: fixing one corner position, or constraining the center to origin.
+
+### "The Pad button is grayed out"
+**Problem**: Nothing is selected, or you're not in Part Design workbench.
+**Solution**: Click on your sketch in the Model tree, ensure you're in Part Design workbench.
+
+### "My rectangle isn't the size I specified"
+**Problem**: Dimensions didn't apply correctly.
+**Solution**: Double-click the sketch to edit it, use the Dimension tool to set/verify each dimension.
+
+### "I can't select the origin point"
+**Problem**: The origin is hard to see or click.
+**Solution**: Zoom in on where the axes cross. The origin appears as a small point where the green and red lines meet.
+
+---
+
+## What You Learned
+
+In this lesson, you mastered:
+
+- **Parametric sketching** - Drawing with constraints for flexible designs
+- **Construction geometry** - Helper lines that guide but don't build
+- **Coincident constraints** - Locking points together
+- **The Pad operation** - Extruding 2D sketches into 3D solids
+
+---
+
+## Next Up
+
+Our solid block needs to become hollow - after all, we need to fit motors, electronics, and batteries inside! In the next lesson, we'll use the **Shell** and **Fillet** tools to create that interior space.
 
 ---

@@ -1,135 +1,295 @@
 ---
 title: Arduino Slots
-description: Learn how to add Arduino mounting slots to the SMARS robot base using FreeCAD.
+description: Create mounting slots with the Mirror tool for perfect symmetry
 layout: lesson
+cover: assets/cover.jpg
 ---
 
-In this lesson we'll learn to use the `Mirror` tool to create slots for mounting an Arduino board inside the SMARS robot base.
+## What We're Building
 
-1. First, we need to create a new sketch on the inside face of the right side of the base. Click on the inside face to select it, then click on `Create Sketch` in the toolbar.
+The Arduino Nano sits inside the SMARS base on two slots - one on each side wall. These slots:
 
-    ![Select inside face](assets/slot01.png){:class="img-fluid w-100"}
+- Hold the Arduino securely without screws
+- Allow easy removal for programming
+- Work with the "screwless" SMARS philosophy
 
-2. When the sketch opens, we can't see the surface we're working on, to fix this we can create a clipped view. Click on the `Clipping plane` menu item from the `View` menu.
+| Feature | Dimension | Purpose |
+|---------|-----------|---------|
+| Slot width | 2mm | Matches Arduino PCB thickness (1.6mm) + clearance |
+| Slot depth | 0.5mm | Shallow grip - won't weaken the wall |
+| Position | 5.5mm from top | Centers Arduino at ideal viewing height |
+{: .table .table-single }
 
-    ![Clip plane](assets/slot02.png){:class="img-fluid w-100"}
+---
 
-    ![Clip plane](assets/slot03.png){:class="img-fluid w-100"}
+## Understanding the Mirror Tool
 
-3. Using the `Rectangle` tool, draw a rectangle; we'll add the dimensions in the next step.
+We need identical slots on both side walls. We could create two separate sketches... but there's a better way!
 
-    ![Draw rectangle](assets/slot04.png){:class="img-fluid w-100"}
+The **Mirror** tool duplicates a feature across a plane. Benefits:
+- **Perfect symmetry** - Both sides are guaranteed identical
+- **Single edit** - Change one side, both update
+- **Less work** - Create once, mirror once
 
-4. Add dimensions to the rectangle using the `Dimensions` tool. Set the height to `2mm`. 
+This is how professionals handle symmetric parts!
 
-    ![Dimension rectangle](assets/slot05.png){:class="img-fluid w-100"}
+---
 
-5. Use the `Create external geometry` tool to project the top edge of the base into the sketch
+## Step-by-Step: Create the First Slot
 
-    - Constrain the bottom edge of the rectangle to be `5.5mm` from the top edge of the base using the `Dimension` tool.
+### 1. Start a Sketch on the Inside Right Face
 
-    ![Project geometry](assets/slot06.png){:class="img-fluid w-100"}
+Click on the **inside face** of the right side wall, then click `Create Sketch`.
 
-6. Use the `Create external geometry` tool to project the inside edge of the base into the sketch, as well as the right most edge.
+![Select inside face](assets/slot01.png){:class="img-fluid w-100"}
 
-    ![Project geometry](assets/slot07.png){:class="img-fluid w-100"}
+### 2. Enable Clipping View
 
-    - Constrain the left edge of the rectangle to the inside edge of the base using the `Constrain Coincident` tool.
+When the sketch opens, you can't see the surface because the model is in the way. Let's fix that with a clipping plane.
 
-    ![Constrain left edge](assets/slot08.png){:class="img-fluid w-100"}
+Go to `View` menu → `Clipping plane`.
 
-7. Next we need to bring in the diagonal edges of the cutout out and then create an enclosed area for the slot.
+![Clip plane](assets/slot02.png){:class="img-fluid w-100"}
 
-    Unlike Fusion 360, FreeCAD insists that ensured shapes are fully enclosed, so we need to create lines to connect the rectangle to the diagonal edges, the area between them needs to just be construction lines only.
+Click the appropriate clipping option to slice the view so you can see inside.
 
-    - Use the `Create external geometry` tool to project in the diagonal edges of the cutout.
+![Clip plane](assets/slot03.png){:class="img-fluid w-100"}
 
-    ![Project diagonal edges](assets/slot09.png){:class="img-fluid w-100"}
+**What's clipping?** It temporarily hides part of the model so you can see and work on interior surfaces. The model isn't changed - it's just a view setting.
 
-    - Next, lets change the two horizonal lines to construction lines by selecting them and clicking the `Toggle construction mode` button in the toolbar.
+### 3. Draw the Slot Rectangle
 
-    ![Draw slot shape](assets/slot10.png){:class="img-fluid w-100"}
+Using the **Rectangle** tool, draw a rectangle for the slot.
 
-    - Create two new points using the `point` tool, along the projected diagonal lines - we'll constrain them in the next step.
+![Draw rectangle](assets/slot04.png){:class="img-fluid w-100"}
 
-    ![Complete slot shape](assets/slot11.png){:class="img-fluid w-100"}
+### 4. Add Dimensions
 
-    - Constrain the new points to be on the projected diagonal edges to the two horizonal lines using the `Constrain Coincident` tool.
+Set the rectangle height to `2mm` using the **Dimensions** tool.
 
-    ![Close sketch](assets/slot12.png){:class="img-fluid w-100"}
+![Dimension rectangle](assets/slot05.png){:class="img-fluid w-100"}
 
-    - Repeat the same steps for the right hand side of the cutout profile.
+### 5. Position from Top Edge
 
-    ![Close sketch](assets/slot13.png){:class="img-fluid w-100"}
+Use **Create external geometry** to project the top edge of the base.
 
-    ![Close sketch](assets/slot14.png){:class="img-fluid w-100"}
+Constrain the bottom of the rectangle to be `5.5mm` from this top edge.
 
-    - Use the `Line` tool to connect the top right corner of the rectangle to the projected diagonal edge, and then connect that to the bottom right corner of the rectangle.
+![Project geometry](assets/slot06.png){:class="img-fluid w-100"}
 
-    ![Close sketch](assets/slot15.png){:class="img-fluid w-100"}
+### 6. Extend to the Inner Edge
 
-    - We need to connect the two new solid lines from the top and bottom lines to the new diagonal lines to create two enclosed areas. Use the `Line` tool to connect the two lines.
-    
-    ![Close sketch](assets/slot16.png){:class="img-fluid w-100"}
+Project both the inner edge (where the slot starts) and the side edges as external geometry.
 
-    ![Close sketch](assets/slot17.png){:class="img-fluid w-100"}
+![Project geometry](assets/slot07.png){:class="img-fluid w-100"}
 
-7. Close the sketch by clicking on the `Close` button in the toolbar.
+Constrain the left edge of the rectangle to the inner wall edge using **Constrain Coincident**.
 
-    ![Close sketch](assets/slot18.png){:class="img-fluid w-100"}
+![Constrain left edge](assets/slot08.png){:class="img-fluid w-100"}
 
-    ![Close sketch](assets/slot19.png){:class="img-fluid w-100"}
+---
 
-    ![Close sketch](assets/slot20.png){:class="img-fluid w-100"}
+## Handling FreeCAD's Closed Sketch Requirement
 
-8. With the sketch selected in the Model tree, click on the `Pocket` button in the toolbar.
+Unlike some CAD tools (like Fusion 360), FreeCAD requires sketch shapes to be **fully enclosed**. Our slot runs into the rhombus cutout, so we need to handle this carefully.
 
-    - In the `Pocket` dialog, set the `Length` value to `0.5mm` to cut into the side of the base. Click `OK` to apply the pocket.
+### 7. Project the Rhombus Diagonal Edges
 
-    ![Pocket the sketch](assets/slot21.png){:class="img-fluid w-100"}
+Use **Create external geometry** to project the diagonal edges of the rhombus cutout.
 
-9. Lets close the clipped view by `Clipping Y` plane again from the `Clipping View` pane.
+![Project diagonal edges](assets/slot09.png){:class="img-fluid w-100"}
 
-    ![Close clip plane](assets/slot22.png){:class="img-fluid w-100"}
+### 8. Convert Horizontal Lines to Construction
 
-    - Then close the Clipping plane dialog with the `close` button at the bottom of the pane. On a Mac this may be off the screen - double clicking the title bar of the pane should bring it into view.
+Select the two horizontal lines of the rectangle and click **Toggle construction mode** to make them construction lines.
 
-10. Next we want to mirror the slot to the other side of the base. We'll need to create a new datum plane in the center of the base to use as the mirror plane. First we need to create a point at the middle of the base that we can then use to create the datum plane from.
+![Draw slot shape](assets/slot10.png){:class="img-fluid w-100"}
 
-    - Click on the `Create new sketch` button in the toolbar and select the back face of the base.
+### 9. Create Intersection Points
 
-    ![Create new sketch](assets/slot23.png){:class="img-fluid w-100"}
+Use the **Point** tool to create points along the projected diagonal lines - where the slot edges would intersect them.
 
-    - Use the `Create external geometry` tool to project in the top edge of the base.
+![Complete slot shape](assets/slot11.png){:class="img-fluid w-100"}
 
-    ![Project geometry](assets/slot24.png){:class="img-fluid w-100"}
+### 10. Constrain the Intersection Points
 
-    - Use the `Point` tool to create a point at the midpoint of the projected front edge.
+Use **Constrain Coincident** to attach these points to both the diagonal edges AND the horizontal construction lines.
 
-    ![Create midpoint](assets/slot25.png){:class="img-fluid w-100"}
+![Close sketch](assets/slot12.png){:class="img-fluid w-100"}
 
-    - Close the sketch by clicking on the `Close` button in the toolbar.
+Repeat for the right side of the cutout profile.
 
-    ![Close sketch](assets/slot26.png){:class="img-fluid w-100"}
+![Close sketch](assets/slot13.png){:class="img-fluid w-100"}
 
-11. With the new sketch selected in the Model tree, click on the `Datum Plane` button in the toolbar.
+![Close sketch](assets/slot14.png){:class="img-fluid w-100"}
 
-    - In the `Datum Plane` dialog, set the attachment to `Object's YZ`. Click `OK` to create the datum plane.
+### 11. Close the Shape with Solid Lines
 
-    ![Create datum plane](assets/slot27.png){:class="img-fluid w-100"}
+Use the **Line** tool to connect the points, creating a closed shape that follows the diagonal edges.
 
-12. Now we can use the `Mirror` tool to mirror the slot to the other side of the base. Select the pocket feature in the Model tree, then click on the `Mirror` button in the toolbar.
+![Close sketch](assets/slot15.png){:class="img-fluid w-100"}
 
-    - In the `Mirror` dialog, set the `Mirror plane` to the datum plane we just created. Click `OK` to create the mirrored slot.
+Connect the top and bottom construction lines to these new diagonal lines to create enclosed areas.
 
-    ![Mirror feature](assets/slot28.png){:class="img-fluid w-100"}
+![Close sketch](assets/slot16.png){:class="img-fluid w-100"}
 
-13. You should now see the Arduino slots on both sides of the base.
+![Close sketch](assets/slot17.png){:class="img-fluid w-100"}
 
-    ![Final view](assets/slot29.png){:class="img-fluid w-100"}
+### 12. Close the Sketch
 
-14. Turn off the datam plane visibility by unchecking the eye icon next to the datum plane in the Model tree.
+Click the **Close** button.
 
-    ![Turn off datum plane](assets/slot30.png){:class="img-fluid w-100"}    
+![Close sketch](assets/slot18.png){:class="img-fluid w-100"}
+
+![Close sketch](assets/slot19.png){:class="img-fluid w-100"}
+
+![Close sketch](assets/slot20.png){:class="img-fluid w-100"}
+
+---
+
+## Create the Slot Pocket
+
+### 13. Pocket the Slot
+
+With the sketch selected, click **Pocket**.
+
+Set the depth to `0.5mm` - just a shallow cut into the wall.
+
+Click `OK`.
+
+![Pocket the sketch](assets/slot21.png){:class="img-fluid w-100"}
+
+### 14. Close Clipping View
+
+Close the clipping plane by clicking **Clipping Y** again in the Clipping View pane.
+
+![Close clip plane](assets/slot22.png){:class="img-fluid w-100"}
+
+**Mac tip**: If the close button is off-screen, double-click the pane's title bar to bring it into view.
+
+---
+
+## Create a Datum Plane for Mirroring
+
+To mirror the slot, we need a plane exactly in the center of the base.
+
+### 15. Create Reference Sketch
+
+Create a new sketch on the back face of the base.
+
+![Create new sketch](assets/slot23.png){:class="img-fluid w-100"}
+
+### 16. Project and Mark Center
+
+Use **Create external geometry** to project the top edge.
+
+![Project geometry](assets/slot24.png){:class="img-fluid w-100"}
+
+Use the **Point** tool to create a point at the midpoint of this edge.
+
+![Create midpoint](assets/slot25.png){:class="img-fluid w-100"}
+
+Close the sketch.
+
+![Close sketch](assets/slot26.png){:class="img-fluid w-100"}
+
+### 17. Create the Datum Plane
+
+With the sketch selected, click **Datum Plane** in the toolbar.
+
+In the dialog, set the attachment to `Object's YZ`.
+
+Click `OK`.
+
+![Create datum plane](assets/slot27.png){:class="img-fluid w-100"}
+
+**What's a datum plane?** It's a reference surface that doesn't show in the final part but helps with operations like mirroring, measuring, or aligning.
+
+---
+
+## Mirror the Slot
+
+### 18. Apply Mirror
+
+Select the **Pocket** feature (the slot) in the Model tree.
+
+Click the **Mirror** button in the toolbar.
+
+Set the mirror plane to the datum plane you just created.
+
+Click `OK`.
+
+![Mirror feature](assets/slot28.png){:class="img-fluid w-100"}
+
+### 19. Verify Both Slots
+
+You should now see Arduino slots on **both** sides of the base!
+
+![Final view](assets/slot29.png){:class="img-fluid w-100"}
+
+### 20. Hide the Datum Plane
+
+Click the eye icon next to the datum plane in the Model tree to hide it.
+
+![Turn off datum plane](assets/slot30.png){:class="img-fluid w-100"}
+
+---
+
+## Why This Technique Matters
+
+The Mirror workflow is essential for professional CAD:
+
+| Technique | Use Case |
+|-----------|----------|
+| Single feature + Mirror | Symmetric parts (like SMARS) |
+| Datum planes | Reference surfaces for operations |
+| Construction geometry | Guides that don't become features |
+
+These skills transfer to any parametric CAD software!
+
+---
+
+## Try It Yourself
+
+1. **Test the slot**: Would an Arduino PCB (1.6mm thick) fit in the 2mm slot? (Yes, with clearance)
+2. **Edit and observe**: Change the slot depth in one pocket - does the mirror update?
+3. **Visibility practice**: Hide/show the datum plane to understand what's construction vs. final geometry
+
+---
+
+## Common Issues
+
+### "The mirror creates the slot in the wrong location"
+**Problem**: The mirrored feature isn't on the opposite wall.
+**Solution**: Check that your datum plane is truly centered. Edit the reference sketch and verify the midpoint is constrained to the center.
+
+### "Clipping view won't close"
+**Problem**: The clipping plane dialog is off-screen.
+**Solution**: On Mac, double-click the title bar. On Windows/Linux, drag the dialog or restart FreeCAD.
+
+### "The slot sketch won't close properly"
+**Problem**: FreeCAD says the sketch isn't valid for pocket.
+**Solution**: Check that all regions are fully enclosed. Use construction lines for reference but solid lines for the actual cut area.
+
+### "Datum plane won't create"
+**Problem**: The Datum Plane button is grayed out.
+**Solution**: Make sure you have a sketch or point selected that can serve as a reference.
+
+---
+
+## What You Learned
+
+In this lesson, you mastered:
+
+- **Clipping views** - Seeing inside your model for interior work
+- **Datum planes** - Creating reference surfaces for operations
+- **Mirror tool** - Duplicating features with perfect symmetry
+- **Closed sketch requirement** - Working with FreeCAD's geometry rules
+
+---
+
+## Next Up
+
+Time to create the wheel stubs - the connection points for SMARS wheels. We'll use the **Revolve** tool and **Polar Pattern** for rotational features!
 
 ---

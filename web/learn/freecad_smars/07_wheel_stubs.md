@@ -3,18 +3,21 @@ layout: lesson
 title: Wheel Stubs
 author: Kevin McAleer
 type: page
-cover: /learn/freecad_smars/assets/cover.jpg
+cover: assets/cover.jpg
 date: 2025-12-12
 previous: 06_arduino_slots.html
 next: 08_motor_holder.html
-description: Learn how to add wheel stubs to the SMARS robot base using FreeCAD.
-percent: 70
+description: Create rotational features with Revolve and duplicate them with Polar
+  Pattern
+percent: 72
 duration: 7
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
-  - section: Navigating around FreeCAD
+  - section: Getting Started
     content:
+    - name: Introduction to Building SMARS with FreeCAD
+      link: 00_intro.html
     - name: Navigation in FreeCAD
       link: 01_navigation.html
   - section: Designing the SMARS Base
@@ -39,195 +42,355 @@ navigation:
       link: 09_save_as_stl.html
   - section: Summary
     content:
-    - name: Summary
+    - name: Summary and Next Steps
       link: 10_summary.html
 ---
 
 
-In this lesson we'll learn how to create the wheel stubs for the SMARS robot base. We'll use a circular pattern to create both stubs at the same time using the `Polar Pattern` tool.
+## What We're Building
 
-1. First, we need to create a new sketch on the left face of the base. Click on the left face to select it, then click on `Create Sketch` in the toolbar.
+The wheel stubs are circular posts that connect to SMARS wheels. Each stub has:
 
-    ![Select bottom face](assets/wheel01.png){:class="img-fluid w-100"}
+- A **cylindrical shaft** that inserts into the wheel
+- A **keyed slot** that prevents wheel spin (the wheel locks to the stub)
 
-2. Using the `External Geometry` tool, project the two circular motor holes into the sketch.
+| Feature | Purpose |
+|---------|---------|
+| Circular profile | Creates a round stub when revolved |
+| 135° chamfer | Easy wheel insertion |
+| Keyed slot | Prevents wheel from spinning on shaft |
+| Polar pattern | Creates both stubs from one design |
+{: .table .table-single }
 
-    ![Project geometry](assets/wheel02.png){:class="img-fluid w-100"}
 
-3. Using the `Point` tool, create a point at the bottom of each projected circle. The cursor will show a red symmetry indicator when you hover over the edge.
+---
 
-    ![Add points](assets/wheel03.png){:class="img-fluid w-100"}
+## Understanding Revolve and Polar Pattern
 
-4. Using the `Line` tool, draw a vertical line between the two points. 
+### The Revolve Tool
 
-    - Select the line and make it construction by clicking the `Toggle construction mode` button in the toolbar.
+**Pad** pushes a shape straight out. **Revolve** spins a shape around an axis - perfect for round parts!
 
-    We'll add a vertical constraint in the next step.
+Think of a pottery wheel: your sketch is the profile, and revolving spins it into a 3D shape.
 
-    ![Draw line](assets/wheel04.png){:class="img-fluid w-100"}
+### Polar Pattern
 
-    ![Make line vertical](assets/wheel05.png){:class="img-fluid w-100"}
+Like Mirror creates a copy across a plane, **Polar Pattern** creates copies around a center point. Perfect for:
+- Multiple holes in a circle (like bolt patterns)
+- Symmetric features on opposite sides
+- Any rotational repetition
 
-5. Select the line and use the `Vertical Constraint` tool to make the line vertical.
+---
 
-    ![Close sketch](assets/wheel06.png){:class="img-fluid w-100"}
+## Step-by-Step: Create the Wheel Stub Profile
 
-6. Close the sketch by clicking on the `Close` button in the toolbar.
+### 1. Start a Sketch on the Left Side Face
 
-    ![Close sketch](assets/wheel07.png){:class="img-fluid w-100"}
+Click on the left face of the base, then click `Create Sketch`.
 
-7. Create a new datum plane using the `Create a datum plane` tool in the toolbar.
+![Select bottom face](assets/wheel01.png){:class="img-fluid w-100"}
 
-    - In the `Data` tab of the datum plane, set the `Attachment mode` value to `Translate Origin`, and click on the point (also known as a vertex) at the bottom of the vertical line we created in the sketch.
+### 2. Project the Motor Holes
 
-    ![Create datum plane](assets/wheel08.png){:class="img-fluid w-100"}
+Using **External Geometry**, project both circular motor holes into the sketch.
 
-    - Close the datum plane dialog by clicking the `Close` button in the toolbar.
+![Project geometry](assets/wheel02.png){:class="img-fluid w-100"}
 
-    ![Close datum plane](assets/wheel09.png){:class="img-fluid w-100"}
+### 3. Create Reference Points
 
-8. Next, we need to create a new sketch on the datum plane we just created. Click on the datum plane to select it, then click on `Create Sketch` in the toolbar.
+Using the **Point** tool, create a point at the bottom of each projected circle. The cursor shows a red indicator when you're at the tangent point.
 
-    ![Select datum plane](assets/wheel10.png){:class="img-fluid w-100"}
+![Add points](assets/wheel03.png){:class="img-fluid w-100"}
 
-9. Create the shape in the picture below, we'll add the dimensions in the next step.
+### 4. Draw a Vertical Reference Line
 
-    ![Draw wheel stub shape](assets/wheel11.png){:class="img-fluid w-100"}
+Using the **Line** tool, draw a vertical line between these two points.
 
-    - Use the Horizontal and Vertical constraint tools to align the shape as shown.
+Select the line and make it **construction geometry**.
 
-10. Add dimensions to the shape using the `Dimensions` tool. 
+![Draw line](assets/wheel04.png){:class="img-fluid w-100"}
 
-    - Use the `Dimension` tool to set the angle of the slanted line to `135 degrees`.
+![Make line vertical](assets/wheel05.png){:class="img-fluid w-100"}
 
-    ![Dimension wheel stub shape](assets/wheel12.png){:class="img-fluid w-100"}
+### 5. Apply Vertical Constraint
 
-11. Add the additional dimensions as shown in the picture below.
+Select the line and apply a **Vertical Constraint** to ensure it's perfectly vertical.
 
-    ![Complete dimensions](assets/wheel13.png){:class="img-fluid w-100"}
+![Close sketch](assets/wheel06.png){:class="img-fluid w-100"}
 
-12. Next we need to project in the motor hole top edges so we can align the wheel stub shape to them.
+### 6. Close the Sketch
 
-    - Click on the `Create external geometry` button in the toolbar.
+Click the **Close** button.
 
-    ![Project geometry](assets/wheel14.png){:class="img-fluid w-100"}
+![Close sketch](assets/wheel07.png){:class="img-fluid w-100"}
 
-    - Click on the circluar edge of motor hole to project them into the sketch. You may need to rotate the view slightly to select the edges.
+---
 
-    - Return the view to the original orientation (press the `3` Key to return to the side view).
+## Create a Datum Plane for the Stub
 
-    - Project in the edge of the base using the `Create external geometry` tool again.
+### 7. Create Datum Plane at Reference Point
 
-    ![Select top edges](assets/wheel15.png){:class="img-fluid w-100"}
+Click **Create a datum plane** in the toolbar.
 
-13. Use the `Line` tool to draw a horizontal line from the left edge of the base, roughtly in the middle of the motor hole. 
+In the Data tab, set `Attachment mode` to `Translate Origin`, then click on the point at the bottom of the vertical line.
 
-    - Select the line and make it construction by clicking the `Toggle construction mode` button in the toolbar.
-    
-    - We'll add a symetric constraint in the next step.
+![Create datum plane](assets/wheel08.png){:class="img-fluid w-100"}
 
-    - Using the `Constrain Symmetric` tool, select the horizontal line we just drew, then hold `Ctrl` and select the two points from the projected geometry we created earlier. This will make the horizontal line symetric about the two points.
+Click **Close**.
 
-    ![Select top edges](assets/wheel16.png){:class="img-fluid w-100"}
+![Close datum plane](assets/wheel09.png){:class="img-fluid w-100"}
 
-13. Using the `Dimension` tool, set the distance from the top edge of the wheel stub shape to the projected edge of the motor hole to `8mm`.
+---
 
-    - Also use the `Constrain Coincident` tool to attach the top right point of the wheel stub shape to the left edge of the base.
+## Design the Stub Profile
 
-    ![Constrain top edge](assets/wheel17.png){:class="img-fluid w-100"}
+### 8. Sketch on the Datum Plane
 
-14. Close the sketch by clicking on the `Close` button in the toolbar.
+Select the datum plane and click `Create Sketch`.
 
-    ![Close sketch](assets/wheel18.png){:class="img-fluid w-100"}
+![Select datum plane](assets/wheel10.png){:class="img-fluid w-100"}
 
-15. Use the Revolve tool to create the wheel stub.
+### 9. Draw the Profile Shape
 
-    - Select the sketch in the Model tree on the left, then click on the `Revolve` button in the toolbar.
+Create the profile shown below - this is half of the wheel stub cross-section.
 
-    - In the `Revolve` dialog, set the `Angle` value to `360 degrees` and make sure the `Axis` is set to `Mirrored:Edge55`. Click `OK` to apply the revolve. *(Note: The edge number may be different in your model)*.
+![Draw wheel stub shape](assets/wheel11.png){:class="img-fluid w-100"}
 
-    - You might need to rotate the view to see the wheel stub after the revolve.
+Use **Horizontal** and **Vertical** constraints to align the shape properly.
 
-    ![Revolve the sketch](assets/wheel19.png){:class="img-fluid w-100"}
+### 10. Add Dimensions
 
-16. Rotate the view so you can see the flat part of the wheel stub. We want to extrude this into the base so that its all one solid piece.
+Using the **Dimensions** tool, set the angle of the slanted line to `135 degrees` (this creates the chamfer for easy wheel insertion).
 
-    - Hide the datum plane by clicking the eye icon next to it in the Model tree.
+![Dimension wheel stub shape](assets/wheel12.png){:class="img-fluid w-100"}
 
-    - Select the flat face of the wheel stub to select it.
+### 11. Complete the Dimensions
 
-    ![Select flat face](assets/wheel20.png){:class="img-fluid w-100"}
+Add the remaining dimensions as shown.
 
-17. Use the `Pad` tool to extrude the wheel stub into the base.
+![Complete dimensions](assets/wheel13.png){:class="img-fluid w-100"}
 
-    - In the `Pad` dialog, set the `Length` value to `2mm`. Click `OK` to apply the pad.
+---
 
-    ![Pad the wheel stub](assets/wheel21.png){:class="img-fluid w-100"}
+## Align to Motor Hole
 
-    - Close the Pad dialog by clicking the `Close` button in the toolbar.
+### 12. Project Motor Hole Geometry
 
-    ![close stub](assets/wheel22.png){:class="img-fluid w-100"}
+Click **Create external geometry** and project the motor hole edges.
 
-    - Press `0` (zero) to return to the default view.
+![Project geometry](assets/wheel14.png){:class="img-fluid w-100"}
 
-    ![Default view](assets/wheel23.png){:class="img-fluid w-100"}
+You may need to rotate the view slightly to select the circular edges.
 
-18. Create a new sketch on the flat part of the wheel stub we just extruded.
+Press `3` to return to the side view.
 
-    ![Select flat face](assets/wheel24.png){:class="img-fluid w-100"}
+Also project the edge of the base.
 
-19. Using the `Rectangle` tool, draw a rectangle; we'll add the dimensions in the next step.
+![Select top edges](assets/wheel15.png){:class="img-fluid w-100"}
 
-    ![Draw rectangle](assets/wheel25.png){:class="img-fluid w-100"}
+### 13. Create Symmetry Reference
 
-20. Add dimensions to the rectangle using the `Dimensions` tool. Set the width to `1mm`, We'll make the top and bottom of the rectangle tangent to the outer circular edge of the wheel stub in the next step.
+Draw a horizontal construction line roughly in the middle of the motor hole area.
 
-    ![Dimension rectangle](assets/wheel26.png){:class="img-fluid w-100"}
+Using **Constrain Symmetric**, select the line and the two points from the projected motor hole geometry to center it.
 
-21. Project in the inner motor hole circle using the `Create external geometry` tool.
+![Select top edges](assets/wheel16.png){:class="img-fluid w-100"}
 
-    - Add a mid-point to the top of the rectangle using the `Point` tool, make it centered by moving the cursor until you see the cursor change to the red `> <` icon. 
+### 14. Position the Stub
 
-    ![Project geometry](assets/wheel27.png){:class="img-fluid w-100"}
+Set the distance from the stub profile's top edge to the motor hole edge at `8mm`.
 
-22. Add a line using the `Line` tool from the mid-point of the rectangle to the bottom of the projected motor hole circle.
+Use **Constrain Coincident** to attach the top right point of the profile to the base edge.
 
-    - Select the line and make it construction by clicking the `Toggle construction mode` button in the toolbar.
+![Constrain top edge](assets/wheel17.png){:class="img-fluid w-100"}
 
-    ![Draw line](assets/wheel28.png){:class="img-fluid w-100"}
+### 15. Close the Sketch
 
-23. Use the `Create external geometry` tool to project in the outer circular edge of the wheel stub.
+Click **Close**.
 
-24. Use the `Constrain Tangent` tool to make the top and bottom edges of the rectangle tangent to the outer circular edge of the wheel stub.
+![Close sketch](assets/wheel18.png){:class="img-fluid w-100"}
 
-    ![Constrain tangent](assets/wheel29.png){:class="img-fluid w-100"}
+---
 
-    ![Constrain tangent](assets/wheel30.png){:class="img-fluid w-100"}
+## Revolve the Stub
 
-    ![Constrain tangent](assets/wheel31.png){:class="img-fluid w-100"}
+### 16. Apply Revolve
 
-25. Close the sketch by clicking on the `Close` button in the toolbar.
+Select the sketch and click the **Revolve** button.
 
-    ![Close sketch](assets/wheel32.png){:class="img-fluid w-100"}
+Set:
+- Angle: `360 degrees` (full rotation)
+- Axis: Select the appropriate edge reference
 
-26. Select the new sketch in the Model tree and use the `Pocket` tool to pocket the sketch into the wheel stub to a depth of `10mm`.
+Click `OK`.
 
-    ![Pocket the sketch](assets/wheel33.png){:class="img-fluid w-100"}
+![Revolve the sketch](assets/wheel19.png){:class="img-fluid w-100"}
 
-    - Click `OK` to confirm the pocket operation.
+**Note**: The axis edge number may vary in your model - select the vertical edge you created as the axis.
 
-27. We will now create a circular pattern to copy the wheel stub to the other side of the base.
+---
 
-    - Select the Pocket in the Model tree.
+## Merge with Base
 
-    ![Select wheel stub](assets/wheel34.png){:class="img-fluid w-100"}
+### 17. Pad into Base
 
-    - Click on the `Polar Pattern` tool in the toolbar.
+Hide the datum plane. Select the flat face of the wheel stub.
 
-    - In the `Polar Pattern` dialog, set the `Axis` to `Z Axis`, set the `Number of occurrences` to `2`, and check the `Symmetric` checkbox. Click `OK` to apply the polar pattern.
+![Select flat face](assets/wheel20.png){:class="img-fluid w-100"}
 
-    - You may have to create another `Polar Pattern` for the `Pocket` feature if it doesn't get copied over automatically.
+### 18. Extrude Inward
 
-    ![Select wheel stub](assets/wheel35.png){:class="img-fluid w-100"}
+Use the **Pad** tool with length `2mm` to merge the stub into the base wall.
 
-    ![Select wheel stub](assets/wheel36.png){:class="img-fluid w-100"}
+![Pad the wheel stub](assets/wheel21.png){:class="img-fluid w-100"}
+
+Click **Close**.
+
+![close stub](assets/wheel22.png){:class="img-fluid w-100"}
+
+Press `0` to return to isometric view.
+
+![Default view](assets/wheel23.png){:class="img-fluid w-100"}
+
+---
+
+## Add the Key Slot
+
+### 19. Sketch on Stub Face
+
+Create a new sketch on the flat end of the wheel stub.
+
+![Select flat face](assets/wheel24.png){:class="img-fluid w-100"}
+
+### 20. Draw Key Rectangle
+
+Draw a rectangle for the keyed slot.
+
+![Draw rectangle](assets/wheel25.png){:class="img-fluid w-100"}
+
+### 21. Dimension the Key
+
+Set the rectangle width to `1mm`.
+
+![Dimension rectangle](assets/wheel26.png){:class="img-fluid w-100"}
+
+### 22. Position the Key
+
+Project the inner motor hole circle.
+
+Add a midpoint to the top of the rectangle (watch for the `> <` cursor).
+
+![Project geometry](assets/wheel27.png){:class="img-fluid w-100"}
+
+### 23. Add Reference Line
+
+Draw a construction line from the rectangle midpoint to the bottom of the projected circle.
+
+![Draw line](assets/wheel28.png){:class="img-fluid w-100"}
+
+### 24. Constrain to Outer Edge
+
+Project the outer circular edge of the stub.
+
+Use **Constrain Tangent** to make the top and bottom edges of the rectangle tangent to this circle.
+
+![Constrain tangent](assets/wheel29.png){:class="img-fluid w-100"}
+
+![Constrain tangent](assets/wheel30.png){:class="img-fluid w-100"}
+
+![Constrain tangent](assets/wheel31.png){:class="img-fluid w-100"}
+
+### 25. Close and Pocket
+
+Close the sketch.
+
+![Close sketch](assets/wheel32.png){:class="img-fluid w-100"}
+
+Select the sketch and use **Pocket** with depth `10mm`.
+
+![Pocket the sketch](assets/wheel33.png){:class="img-fluid w-100"}
+
+---
+
+## Duplicate with Polar Pattern
+
+### 26. Select Features to Pattern
+
+Select the Pocket in the Model tree.
+
+![Select wheel stub](assets/wheel34.png){:class="img-fluid w-100"}
+
+### 27. Apply Polar Pattern
+
+Click the **Polar Pattern** tool.
+
+Set:
+- Axis: `Z Axis`
+- Number of occurrences: `2`
+- Enable **Symmetric** checkbox
+
+Click `OK`.
+
+![Select wheel stub](assets/wheel35.png){:class="img-fluid w-100"}
+
+**Note**: You may need to create additional Polar Patterns for the Revolve and Pad features if they don't copy automatically.
+
+![Select wheel stub](assets/wheel36.png){:class="img-fluid w-100"}
+
+---
+
+## Understanding the Design Choices
+
+| Feature | Reason |
+|---------|--------|
+| 135° chamfer | Makes wheel insertion easy |
+| Key slot | Prevents wheel from spinning |
+| Tangent constraints | Key extends to exact edge |
+| Polar Pattern | Ensures both stubs are identical |
+
+---
+
+## Try It Yourself
+
+1. **Inspect the stub**: Rotate to see the keyed slot - would a matching wheel lock onto it?
+2. **Measure**: Use View → Measure to verify the stub dimensions
+3. **Edit test**: Change the revolve angle to 270° - what shape results?
+
+---
+
+## Common Issues
+
+### "Revolve creates wrong shape"
+**Problem**: The revolved shape doesn't look like a stub.
+**Solution**: Check your revolve axis. It should be the vertical edge, not a horizontal one. Also verify your profile is on the correct side of the axis.
+
+### "Polar Pattern only copies some features"
+**Problem**: The stub appears but the key slot doesn't.
+**Solution**: Apply separate Polar Patterns to each feature (Revolve, Pad, Pocket) if needed.
+
+### "Tangent constraint fails"
+**Problem**: Can't make rectangle tangent to circle.
+**Solution**: The rectangle edges must be able to touch the circle. If it's too big or small, adjust dimensions first.
+
+### "Key slot is in wrong position"
+**Problem**: The keyed slot isn't centered or is rotated wrong.
+**Solution**: Verify the construction line from midpoint to circle center is vertical.
+
+---
+
+## What You Learned
+
+In this lesson, you mastered:
+
+- **Revolve** - Creating rotational 3D shapes from profiles
+- **Datum planes** - Positioning sketches at specific locations
+- **Polar Pattern** - Duplicating features around a center axis
+- **Tangent constraints** - Positioning elements to touch circles precisely
+
+---
+
+## Next Up
+
+Time to add the motor holder tabs - the final structural feature! Then we'll export for 3D printing.
+
+---

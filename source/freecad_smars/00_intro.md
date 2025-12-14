@@ -1,50 +1,9 @@
 ---
-layout: lesson
 title: Introduction to Building SMARS with FreeCAD
-author: Kevin McAleer
-type: page
+description: Learn to design a real robot chassis from scratch using free, open-source CAD software
+layout: lesson
 cover: assets/cover.jpg
-date: 2025-12-12
-next: 01_navigation.html
-description: Learn to design a real robot chassis from scratch using free, open-source
-  CAD software
-percent: 9
-duration: 6
-navigation:
-- name: Building SMARS with FreeCAD
-- content:
-  - section: Getting Started
-    content:
-    - name: Introduction to Building SMARS with FreeCAD
-      link: 00_intro.html
-    - name: Navigation in FreeCAD
-      link: 01_navigation.html
-  - section: Designing the SMARS Base
-    content:
-    - name: Creating the Base
-      link: 02_creating_the_base.html
-    - name: Shell and Fillet the Base
-      link: 03_shell_and_fillet.html
-    - name: Side Holes
-      link: 04_sides_and_holes.html
-    - name: Front and Rear Profiles
-      link: 05_front_rear_profiles.html
-    - name: Arduino Slots
-      link: 06_arduino_slots.html
-    - name: Wheel Stubs
-      link: 07_wheel_stubs.html
-    - name: Motor Holder
-      link: 08_motor_holder.html
-  - section: Exporting for 3D Printing
-    content:
-    - name: Save as STL
-      link: 09_save_as_stl.html
-  - section: Summary
-    content:
-    - name: Summary and Next Steps
-      link: 10_summary.html
 ---
-
 
 ![Course Cover](assets/cover.jpg){:class="cover"}
 

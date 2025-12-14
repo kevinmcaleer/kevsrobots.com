@@ -204,15 +204,17 @@
 - author: Kevin McAleer
   cover: /learn/freecad_smars/assets/cover.jpg
   date_published: 2025-12-12
-  description: This course focuses on using FreeCAD to design and build the SMARS
-    (Screwless Modular Assembleable Robotic System). Learn how to create detailed
-    3D models, assemble components, and prepare your designs for manufacturing using
-    FreeCAD's powerful tools.
-  duration: 1h 4m
+  description: Learn to design a complete 3D-printable robot chassis from scratch
+    using FreeCAD. This hands-on course teaches parametric CAD design, professional
+    modeling techniques, and design-for-manufacturing principles while building the
+    iconic SMARS robot base. Perfect for makers who want to design their own robot
+    parts.
+  duration: 2h 12m
   groups:
   - freecad
   - 3d modeling
-  link: /learn/freecad_smars/01_navigation.html
+  - robots
+  link: /learn/freecad_smars/00_intro.html
   name: Building SMARS with FreeCAD
 - author: Kevin McAleer
   cover: /learn/brachiograph/assets/cover.png

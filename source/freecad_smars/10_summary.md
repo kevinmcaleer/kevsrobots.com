@@ -1,22 +1,229 @@
 ---
-title: Summary
-description: Summary of the FreeCAD SMARS robot base modeling lessons.
+title: Summary and Next Steps
+description: Review what you've learned and explore where to go next
 layout: lesson
+cover: assets/cover.jpg
 ---
 
-In this series of lessons, we have covered the step-by-step process of modeling the SMARS robot base using FreeCAD. Below is a summary of the key topics we explored:
+## Congratulations, Robot Designer!
 
-1. **Creating the Base Shape**: We started by creating the main body of the SMARS robot base, defining its dimensions and overall shape.
-2. **Adding Side Holes**: We learned how to add side holes to the base for mounting purposes, using sketches and pocket operations.
-3. **Incorporating Arduino Slots**: We explored how to create slots for mounting an Arduino board inside the robot base using the Mirror tool.
-4. **Designing Wheel Stubs**: We created wheel stubs for the robot base, utilizing the Polar Pattern tool to efficiently replicate features.
-5. **Constructing the Motor Holder**: We designed the motor holder, including cutouts for motor tabs, using sketches and pocket operations.
-6. **Exporting for 3D Printing**: Finally, we discussed how to prepare and export the model for 3D printing, ensuring it is ready for fabrication.
+You've just completed something remarkable: **designing a real, functional robot chassis from scratch using professional CAD tools**. This isn't a simplified toy project - you've used the same techniques that professional engineers use every day.
 
-Each lesson provided detailed instructions, complete with images and explanations of the tools and techniques used in FreeCAD. By following these lessons, you should now have a solid understanding of how to model complex shapes and features in FreeCAD, specifically tailored to the SMARS robot base design.
+Let's review your journey and look at where these skills can take you next.
 
 ---
 
-We hope you found these lessons helpful and that you are now confident in your ability to use FreeCAD for your own projects! Happy modeling!
+## What You've Accomplished
+
+### The SMARS Base
+
+You designed a complete robot chassis featuring:
+
+| Feature | FreeCAD Skill | Real-World Application |
+|---------|---------------|------------------------|
+| Parametric base | Constrained sketching | Any part that might need dimension changes |
+| Hollow interior | Shell operation | Enclosures, housings, containers |
+| Rounded edges | Fillet | Anywhere strength and comfort matter |
+| Side profiles | Pocket through-all | Windows, vents, weight reduction |
+| Arduino mounting | Mirror tool | Any symmetric feature |
+| Wheel stubs | Revolve | Shafts, knobs, cylindrical features |
+| Motor holders | Multiple sketches | Complex assemblies |
+{: .table .table-single }
+
+### Skills Mastered
+
+Throughout this course, you learned:
+
+**Sketching Fundamentals**
+- Drawing shapes (rectangles, circles, lines)
+- Adding dimensions
+- Using constraints (coincident, symmetric, tangent, vertical, horizontal)
+- Construction geometry for reference
+
+**3D Operations**
+- **Pad** - Extrude sketches into solids
+- **Pocket** - Cut features into solids
+- **Shell/Thickness** - Hollow out parts
+- **Fillet** - Round edges
+- **Revolve** - Create rotational features
+- **Mirror** - Duplicate across a plane
+- **Polar Pattern** - Duplicate around an axis
+
+**Professional Techniques**
+- External geometry referencing
+- Datum planes for complex operations
+- Clipping views for interior work
+- Design-for-manufacturing thinking
+- Parametric design principles
+
+---
+
+## Your Design Toolkit
+
+You now have a mental toolkit for approaching any design:
+
+### The Design Process
+
+```
+1. Understand the problem
+   ↓
+2. Sketch on paper first
+   ↓
+3. Identify key dimensions
+   ↓
+4. Build up from simple shapes
+   ↓
+5. Add features progressively
+   ↓
+6. Export and manufacture
+```
+
+### Choosing the Right Operation
+
+| If you need to... | Use... |
+|-------------------|--------|
+| Create a basic shape | Pad (extrude) |
+| Remove material | Pocket |
+| Make it hollow | Shell/Thickness |
+| Smooth edges | Fillet |
+| Create round parts | Revolve |
+| Duplicate symmetrically | Mirror |
+| Repeat around a center | Polar Pattern |
+{: .table .table-single .table-narrow }
+
+---
+
+## Where to Go Next
+
+### Expand Your SMARS
+
+Now that you have the base, consider designing:
+
+- **Custom sensor mounts** - Ultrasonic, IR, line followers
+- **Battery compartments** - Different battery sizes and types
+- **Arm attachments** - Grippers, pushers, lifters
+- **Track systems** - Alternative to wheels
+- **Body covers** - Protective shells and cosmetic pieces
+
+### Learn More FreeCAD
+
+Features we didn't cover but are worth exploring:
+
+| Feature | What It Does | Use Case |
+|---------|--------------|----------|
+| **Loft** | Blend between two shapes | Organic forms, transitions |
+| **Sweep** | Extrude along a path | Handles, tubes, wires |
+| **Boolean** | Combine/subtract bodies | Complex assemblies |
+| **Assembly workbench** | Combine multiple parts | Full robot design |
+| **FEM workbench** | Stress analysis | Ensure parts won't break |
+{: .table .table-single .table-narrow }
+
+
+### Other Robot Projects
+
+Apply your skills to:
+
+- **Custom drone frames** - Design quadcopter bodies
+- **Robotic arms** - Multi-joint manipulators
+- **3D printer upgrades** - Fan ducts, mounts, brackets
+- **Custom enclosures** - Project boxes, control panels
+- **Mechanical toys** - Gears, cams, linkages
+
+### Learning Resources
+
+**FreeCAD Official**
+- [FreeCAD Documentation](https://wiki.freecad.org/)
+- [FreeCAD Forum](https://forum.freecad.org/)
+
+**SMARS Community**
+- [SMARS on Thingiverse](https://www.thingiverse.com/thing:2662828)
+- [SMARS Modular Robot GitHub](https://github.com/kevinmcaleer/smars)
+
+**CAD Skills**
+- YouTube tutorials (search "FreeCAD Part Design")
+- r/FreeCAD subreddit
+- Maker community forums
+
+---
+
+## Transferable Skills
+
+Everything you learned applies to other CAD software:
+
+| FreeCAD Term | Fusion 360 | SolidWorks | Onshape |
+|--------------|------------|------------|---------|
+| Pad | Extrude | Boss-Extrude | Extrude |
+| Pocket | Extrude (cut) | Cut-Extrude | Extrude (remove) |
+| Thickness | Shell | Shell | Shell |
+| Fillet | Fillet | Fillet | Fillet |
+| Revolve | Revolve | Revolve | Revolve |
+| Mirror | Mirror | Mirror | Mirror |
+{: .table .table-single }
+
+The concepts are universal - only the button names change!
+
+---
+
+## Final Thoughts
+
+### What Makes a Good Designer
+
+1. **Patience** - CAD takes practice. Your 10th design will be much faster than your 1st.
+
+2. **Planning** - Sketch on paper before touching the computer. Think about what operations you'll need.
+
+3. **Iteration** - Your first design won't be perfect. That's okay. Design, print, test, improve.
+
+4. **Curiosity** - Take apart objects. Look at how things are made. Ask "how would I design this?"
+
+### The Maker Mindset
+
+You're no longer just a consumer of products - you're a **creator**. When you see a problem, you can now think: "I could design something to fix that."
+
+That's powerful.
+
+---
+
+## Quick Reference Card
+
+Keep this handy for your next project:
+
+### Navigation
+- **Rotate**: Middle mouse button
+- **Pan**: Shift + middle mouse
+- **Zoom**: Scroll wheel
+- **Views**: Number keys 0-6
+
+### Key Shortcuts
+- `C` - Coincident constraint
+- `Ctrl+S` - Save
+- `Ctrl+Z` - Undo
+- `F` - Focus on selection
+
+### Essential Operations
+1. **Sketch** on a face or plane
+2. **Constrain** with dimensions and relationships
+3. **Close** the sketch
+4. **Pad/Pocket** to create 3D geometry
+5. **Repeat** to add more features
+
+---
+
+## Thank You!
+
+Thank you for completing this course. You've invested your time in learning a valuable skill that will serve you for years to come.
+
+Now go build something amazing!
+
+---
+
+### Share Your Creation
+
+Built your SMARS? Share it!
+- Post on social media with #SMARS
+- Join the KevsRobots community
+- Contribute your modifications back to the project
+
+Happy making!
 
 ---
