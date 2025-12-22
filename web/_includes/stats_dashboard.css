@@ -202,3 +202,119 @@
         grid-column: 1 / -1;
     }
 }
+
+/* Viral Detection Section Styles */
+.section-header {
+    margin: 40px 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color, #2563eb);
+}
+
+.section-header h2 {
+    margin: 0;
+    color: var(--text-primary, #333);
+    font-size: 24px;
+}
+
+.section-description {
+    margin: 5px 0 0 0;
+    color: var(--text-secondary, #6b7280);
+    font-size: 14px;
+}
+
+/* Alert containers for anomalies */
+.alert-container {
+    border-left: 4px solid #f59e0b;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, var(--card-bg, white) 100%);
+}
+
+.alert-container h2 {
+    color: #d97706;
+}
+
+.alert-subtitle {
+    margin: 0 0 15px 0;
+    color: var(--text-secondary, #6b7280);
+    font-size: 14px;
+}
+
+/* Anomaly indicators */
+.anomaly-spike {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.anomaly-new {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Geographic shift indicators */
+.geo-surge {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Page rank change indicators */
+.rank-up {
+    color: #10b981;
+    font-weight: bold;
+}
+
+.rank-down {
+    color: #ef4444;
+    font-weight: bold;
+}
+
+.rank-new {
+    background: #10b981;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Heatmap specific styles */
+.heatmap-container {
+    overflow-x: auto;
+}
+
+.heatmap-cell {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 1px;
+    border-radius: 2px;
+}
+
+/* Stats badges */
+.stats-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 5px;
+}
+
+.stats-badge.visitors {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.stats-badge.increase {
+    background: #d1fae5;
+    color: #065f46;
+}

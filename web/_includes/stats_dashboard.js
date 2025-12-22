@@ -89,6 +89,42 @@ async function loadDashboard() {
             );
         }
 
+        // =====================================================================
+        // VIRAL DETECTION REPORTS
+        // =====================================================================
+
+        // Traffic Anomalies
+        if (data.traffic_anomalies && data.traffic_anomalies.length > 0) {
+            document.getElementById('anomalyAlert').style.display = 'block';
+            renderTrafficAnomalies('trafficAnomalies', data.traffic_anomalies);
+        }
+
+        // Geographic Shifts
+        if (data.geographic_shifts && data.geographic_shifts.length > 0) {
+            document.getElementById('geoShiftAlert').style.display = 'block';
+            renderGeographicShifts('geographicShifts', data.geographic_shifts);
+        }
+
+        // Trending Pages
+        if (data.trending_pages) {
+            renderTrendingPages('trendingPages', data.trending_pages);
+        }
+
+        // New vs Returning Visitors Chart
+        if (data.new_visitor_surge && data.new_visitor_surge.length > 0) {
+            renderNewVisitorChart('newVisitorChart', data.new_visitor_surge);
+        }
+
+        // Bot vs Human Traffic Chart
+        if (data.bot_human_traffic && data.bot_human_traffic.length > 0) {
+            renderBotHumanChart('botHumanChart', data.bot_human_traffic);
+        }
+
+        // Hourly Heatmap
+        if (data.hourly_heatmap && data.hourly_heatmap.length > 0) {
+            renderHourlyHeatmap('hourlyHeatmap', data.hourly_heatmap);
+        }
+
         // Update timestamp
         const lastUpdate = new Date(data.last_updated);
         document.getElementById('lastUpdated').textContent =
@@ -308,6 +344,310 @@ function renderPopularPages(elementId, pages) {
             </li>
         `;
     }).join('');
+}
+
+// =====================================================================
+// VIRAL DETECTION RENDER FUNCTIONS
+// =====================================================================
+
+// Render traffic anomalies list
+function renderTrafficAnomalies(elementId, anomalies) {
+    const list = document.getElementById(elementId);
+    list.innerHTML = anomalies.map((item, index) => {
+        const url = new URL(item.url);
+        const displayUrl = url.pathname;
+
+        let badge = '';
+        if (item.is_new) {
+            badge = '<span class="anomaly-new">NEW PAGE</span>';
+        } else if (item.pct_increase) {
+            badge = `<span class="anomaly-spike">+${item.pct_increase}%</span>`;
+        }
+
+        return `
+            <li class="query-item">
+                <span>
+                    <strong>#${index + 1}</strong>
+                    <a href="${item.url}" target="_blank">${displayUrl}</a>
+                    ${badge}
+                    <span class="stats-badge visitors">${item.unique_visitors} unique</span>
+                </span>
+                <span class="stat-value" style="font-size: 20px;">${item.recent_visits.toLocaleString()}</span>
+            </li>
+        `;
+    }).join('');
+}
+
+// Render geographic shifts list
+function renderGeographicShifts(elementId, shifts) {
+    const list = document.getElementById(elementId);
+    list.innerHTML = shifts.map((item, index) => {
+        let badge = '';
+        if (item.pct_increase === 9999) {
+            badge = '<span class="geo-surge">NEW</span>';
+        } else {
+            badge = `<span class="geo-surge">+${item.pct_increase}%</span>`;
+        }
+
+        return `
+            <li class="query-item">
+                <span>
+                    <strong>#${index + 1}</strong>
+                    ${item.country}
+                    ${badge}
+                    <small style="color: #6b7280;">(baseline: ${item.baseline_daily}/day)</small>
+                </span>
+                <span class="stat-value" style="font-size: 20px;">${item.recent_visits.toLocaleString()}</span>
+            </li>
+        `;
+    }).join('');
+}
+
+// Render trending pages list
+function renderTrendingPages(elementId, pages) {
+    const list = document.getElementById(elementId);
+    list.innerHTML = pages.slice(0, 10).map((item) => {
+        const url = new URL(item.url);
+        const displayUrl = url.pathname;
+
+        let indicator = '';
+        if (item.is_new) {
+            indicator = '<span class="rank-new">NEW</span>';
+        } else if (item.rank_change > 0) {
+            indicator = `<span class="rank-up">↑${item.rank_change}</span>`;
+        } else if (item.rank_change < 0) {
+            indicator = `<span class="rank-down">↓${Math.abs(item.rank_change)}</span>`;
+        }
+
+        return `
+            <li class="query-item">
+                <span>
+                    <strong>#${item.rank}</strong>
+                    <a href="${item.url}" target="_blank">${displayUrl}</a>
+                    ${indicator}
+                    <span class="stats-badge visitors">${item.unique_visitors} unique</span>
+                </span>
+                <span class="stat-value" style="font-size: 20px;">${item.visits.toLocaleString()}</span>
+            </li>
+        `;
+    }).join('');
+}
+
+// Render new vs returning visitors stacked area chart
+function renderNewVisitorChart(canvasId, data) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [
+                {
+                    label: 'New Visitors',
+                    data: data.map(d => d.new_visitors),
+                    backgroundColor: '#10b981',
+                    stack: 'visitors'
+                },
+                {
+                    label: 'Returning Visitors',
+                    data: data.map(d => d.returning_visitors),
+                    backgroundColor: '#6366f1',
+                    stack: 'visitors'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        afterBody: function(context) {
+                            const dataIndex = context[0].dataIndex;
+                            const newPct = data[dataIndex].new_pct;
+                            return `New visitor ratio: ${newPct}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: {
+                        maxTicksLimit: 10
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Render bot vs human traffic stacked bar chart
+function renderBotHumanChart(canvasId, data) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [
+                {
+                    label: 'Human Traffic',
+                    data: data.map(d => d.human),
+                    backgroundColor: '#2563eb',
+                    stack: 'traffic'
+                },
+                {
+                    label: 'Google Bot',
+                    data: data.map(d => d.google_bot),
+                    backgroundColor: '#f59e0b',
+                    stack: 'traffic'
+                },
+                {
+                    label: 'Other Bots',
+                    data: data.map(d => d.other_bots),
+                    backgroundColor: '#9ca3af',
+                    stack: 'traffic'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        afterBody: function(context) {
+                            const dataIndex = context[0].dataIndex;
+                            const humanPct = data[dataIndex].human_pct;
+                            return `Human traffic: ${humanPct}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: {
+                        maxTicksLimit: 10
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Render hourly heatmap as a matrix chart
+function renderHourlyHeatmap(canvasId, data) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    // Group data by date and hour
+    const dates = [...new Set(data.map(d => d.date))].sort();
+    const hours = Array.from({length: 24}, (_, i) => i);
+
+    // Create datasets for each date (row)
+    const datasets = dates.map((date, dateIndex) => {
+        const dayData = data.filter(d => d.date === date);
+        const hourlyVisits = hours.map(hour => {
+            const found = dayData.find(d => d.hour === hour);
+            return found ? found.visits : 0;
+        });
+
+        // Calculate color intensity based on max value
+        const maxVisits = Math.max(...data.map(d => d.visits));
+
+        return {
+            label: date,
+            data: hourlyVisits,
+            backgroundColor: hourlyVisits.map(v => {
+                const intensity = v / maxVisits;
+                return `rgba(37, 99, 235, ${0.1 + intensity * 0.9})`;
+            }),
+            borderWidth: 1,
+            borderColor: '#e5e7eb'
+        };
+    });
+
+    // Use a simple bar chart with hours on x-axis
+    // Average across all days for simplicity
+    const avgByHour = hours.map(hour => {
+        const hourData = data.filter(d => d.hour === hour);
+        return hourData.length > 0
+            ? Math.round(hourData.reduce((sum, d) => sum + d.visits, 0) / hourData.length)
+            : 0;
+    });
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: hours.map(h => `${h}:00`),
+            datasets: [{
+                label: 'Avg Visits/Hour',
+                data: avgByHour,
+                backgroundColor: avgByHour.map(v => {
+                    const maxV = Math.max(...avgByHour);
+                    const intensity = v / maxV;
+                    if (intensity > 0.8) return '#1e40af';
+                    if (intensity > 0.6) return '#2563eb';
+                    if (intensity > 0.4) return '#3b82f6';
+                    if (intensity > 0.2) return '#60a5fa';
+                    return '#93c5fd';
+                }),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return `Hour: ${context[0].label}`;
+                        },
+                        label: function(context) {
+                            return `Avg visits: ${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hour (UTC)'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Avg Visits'
+                    }
+                }
+            }
+        }
+    });
 }
 
 // Load dashboard on page load

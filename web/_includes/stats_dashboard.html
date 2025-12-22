@@ -91,6 +91,58 @@
         </div>
     </div>
 
+    <!-- Viral Detection Section -->
+    <div class="section-header">
+        <h2>Viral Content Detection</h2>
+        <p class="section-description">Automated detection of unusual traffic patterns and viral content</p>
+    </div>
+
+    <!-- Traffic Anomalies Alert -->
+    <div class="chart-container alert-container" id="anomalyAlert" style="display: none;">
+        <h2>🔥 Traffic Anomalies Detected</h2>
+        <p class="alert-subtitle">Pages with unusual traffic spikes in the last 48 hours</p>
+        <ul class="query-list" id="trafficAnomalies"></ul>
+    </div>
+
+    <!-- Geographic Shifts Alert -->
+    <div class="chart-container alert-container" id="geoShiftAlert" style="display: none;">
+        <h2>🌍 Geographic Traffic Shifts</h2>
+        <p class="alert-subtitle">Countries with unusual traffic increases</p>
+        <ul class="query-list" id="geographicShifts"></ul>
+    </div>
+
+    <!-- Trending Pages and New Visitor Surge Side by Side -->
+    <div class="chart-row-2">
+        <div class="chart-container">
+            <h2>Trending Pages (Week-over-Week)</h2>
+            <ul class="query-list" id="trendingPages"></ul>
+        </div>
+
+        <div class="chart-container">
+            <h2>New vs Returning Visitors</h2>
+            <div class="chart-wrapper-medium">
+                <canvas id="newVisitorChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Traffic and Hourly Heatmap Side by Side -->
+    <div class="chart-row-2">
+        <div class="chart-container">
+            <h2>Bot vs Human Traffic</h2>
+            <div class="chart-wrapper-medium">
+                <canvas id="botHumanChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Hourly Traffic Heatmap (Last 7 Days)</h2>
+            <div class="chart-wrapper-medium">
+                <canvas id="hourlyHeatmap"></canvas>
+            </div>
+        </div>
+    </div>
+
     <div class="last-updated" id="lastUpdated">
         Loading data...
     </div>
