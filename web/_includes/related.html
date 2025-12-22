@@ -1,0 +1,17 @@
+{% assign related_posts = page.related %}
+
+{% if related_posts %}
+  <div class="related-posts">
+    <h3>Related Posts</h3>
+    <ul>
+      {% for post_url in related_posts %}
+        {% assign related_post = site.posts | where: "url", post_url | first %}
+        {% if related_post %}
+          <li>
+            <a href="{{ related_post.url }}">{{ related_post.title }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

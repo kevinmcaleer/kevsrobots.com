@@ -26,6 +26,8 @@ stl:
  - name: Side Panel
    link: /assets/stl/basicpi5/side_panel.stl
    description: The side panel of the basic Pi 5 case
+related:
+ - /reviews/pironman5
 ---
 
 The [Sunfounder Pironman 5 Max](https://www.sunfounder.com/collections/raspberry-pi-5-cases/products/pironman-5-max) is a versatile and robust case designed specifically for the Raspberry Pi 5. In this review, we will explore its features, build quality, and overall performance to help you determine if it's the right choice for your Raspberry Pi projects.
