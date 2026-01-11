@@ -1,3 +1,10 @@
+- name: Cubie 3
+  link: /projects/cubie-3/index.html
+  cover: /projects/cubie-3/assets/img/cover.jpg
+  discover: true
+  description: "Build a Raspberry Pi Pico W powered autonomous robot with computer vision"
+  date: 2026-01-11
+  tags: [Python, Robotics, Computer Vision, RaspberryPi]
 - name: homelab automation with n8n
   link: /blog/n8n.html
   cover: /assets/img/blog/n8n/cover.jpg

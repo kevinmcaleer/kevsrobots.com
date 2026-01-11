@@ -1475,7 +1475,12 @@ pre {
   overflow: hidden;
   background-color: transparent !important; // Make table background transparent
   
-  td, th {
+  th {
+    background-color: #F5F5F5 !important; // Light grey background for header
+
+  }
+
+  td {
     border-right: 1px solid #DDD; // Thicker internal borders
     border-bottom: 1px solid #DDD;
     background-color: transparent !important; // Make table background transparent

@@ -14,6 +14,8 @@ layout: default
 {% assign bg-col= 'bg-light'%}
 {% endif%}
 
+{% include course_navigation.html %}
+
 <!-- {% include nav_blog.html %} -->
 <div class="background-wrapper"style="background-color: white">
 
@@ -174,6 +176,27 @@ layout: default
             {% endfor %}
             {% endif %}
         </div> <!-- row -->
+
+        <div class="container my-4">
+         <p class="text-center">
+        {% if page.previous %}
+        <a href="{{page.previous}}" class="btn btn-primary"> < Previous</a>
+        {% endif %}
+        {% if page.next %}
+        <a href="{{page.next}}" class="btn btn-primary">Next ></a>
+        {% endif %}
+        {% if page.previous %}
+        <link rel="prev" href="{{ page.previous }}">
+        {% endif %}
+        {% if page.next %}
+        <link rel="next" href="{{ page.next }}">
+        {% endif %}
+        </p>
+        <p class="text-center">
+        <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
+        </p>
+        </div>  <!--bottom navigation-->
+
         </div><!--container -->
         </div>
             </div>

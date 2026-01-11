@@ -1,3 +1,9 @@
+- name: Cubie-3
+  link: /projects/cubie-3/
+  cover: /projects/cubie-3/assets/img/cover.jpg
+  description: An open-source 3d printable cube robot you can build yourself
+  date: 2026/01/07
+  hero: /projects/cubie-3/assets/img/hero.png
 - name: Cyberbricks
   link: /blog/cyberbricks.html
   cover: /assets/img/blog/cyberbricks/cover.jpg
