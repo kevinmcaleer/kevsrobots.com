@@ -37,24 +37,34 @@ navigation:
 stl:
   - name: "Motor Holders"
     link: "/projects/cubie-3/assets/stl/cubie-3_motor_holder.stl"
+    comments: "4x required"
   - name: "Base"
     link: "/projects/cubie-3/assets/stl/cubie-3_base.stl"
+    comments: "No supports required"
   - name: "Camera Holder (Front Top Panel)"
     link: "/projects/cubie-3/assets/stl/cubie-3_camera_holder.stl"
+    comments: "print flat on its back with text pointing upwards"
   - name: "Lower Front Panel"
     link: "/projects/cubie-3/assets/stl/cubie-3_front_panel.stl"
   - name: "Lower Side Panel"
     link: "/projects/cubie-3/assets/stl/cubie-3_side_panel_mesh.stl"
+    comments: "2x required"
   - name: "Upper Side Panel"
     link: "/projects/cubie-3/assets/stl/cubie-3_top_side_panel.stl"
+    comments: "2x required"
   - name: "Top Spacer"
     link: "/projects/cubie-3/assets/stl/cubie-3_spacer.stl"
+    comments: "Optional"
   - name: "Top Back Panel"
     link: "/projects/cubie-3/assets/stl/cubie-3_top_back_panel.stl"
   - name: "Top Side Panel"
     link: "/projects/cubie-3/assets/stl/cubie-3_top_side_panel.stl"
+    comments: "2x required"
   - name: "Top"
     link: "/projects/cubie-3/assets/stl/cubie-3_top.stl"
+  - name: "Pillars"
+    link: "/projects/cubie-3/assets/stl/cubie-3_pillar.stl"
+    comments: "4x required"
 previous: code
 ---
 
@@ -73,5 +83,6 @@ These are the:
 - Top Back Panel
 - Top Side Panel x2
 - Top
+- Pillar x4
 
 ---
