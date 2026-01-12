@@ -70,7 +70,11 @@ previous: code
 
 ## The 3D Printed Parts
 
-Cubie-3 has only a couple of 3D printable parts. 
+Cubie-3 has only a couple of 3D printable parts:
+
+{% include gallery.html images="/projects/cubie-3/assets/img/parts.jpg" titles="Parts" cols="1" %}
+
+---
 
 These are the:
 - 4x motor holders. The motor holders are designed to fit the N20 150RPM motors, fixed using 2x M3 screws and nuts. 

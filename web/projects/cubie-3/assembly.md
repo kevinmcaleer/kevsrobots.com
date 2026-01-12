@@ -40,6 +40,12 @@ previous: wiring
 
 ## Assembling the Cubie-3
 
+Cubie-3 is made up of several 3D printed parts that need to be assembled together along with the electronic components. Follow the steps below to assemble your Cubie-3 robot.
+
+{% include gallery.html images="/projects/cubie-3/assets/img/parts.jpg" titles="3D Printable Parts" cols="1" %}
+
+---
+
 ### Preparing the Pillars
 
 The 4 pillars have captive nut slots that allow an M3 nut to be inserted. To make a good fit, you can use the tip of a soldering iron to heat the nut and push it into the slot.
