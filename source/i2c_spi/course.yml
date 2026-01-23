@@ -1,0 +1,41 @@
+- name: Talking to the World - Working with I2C and SPI
+  author: Kevin McAleer
+  date_created: 2026-01-15
+  date_published: 2026-01-15
+  layout: course
+  cover: assets/cover.jpg
+  description: >-
+    Master I2C and SPI communication protocols on Raspberry Pi Pico. Learn to connect sensors, scan for devices, read datasheets, and build real-world projects with practical hands-on examples using the BME280 sensor.
+  groups:
+    - micropython
+    - electronics
+    - raspberrypi
+  content:
+  - section:
+      name: Introduction
+      content:
+      - 00_intro.md
+  - section:
+      name: Understanding I2C
+      content:
+      - 01_what-is-i2c.md
+      - 02_i2c-hardware-setup.md
+      - 03_scanning-i2c-devices.md
+      - 04_reading-i2c-sensor.md
+  - section:
+      name: Working with Datasheets
+      content:
+      - 05_demystifying-datasheets.md
+      - 06_bme280-deep-dive.md
+  - section:
+      name: Understanding SPI
+      content:
+      - 07_what-is-spi.md
+      - 08_spi-hardware-setup.md
+      - 09_spi-sensor-example.md
+  - section:
+      name: Choosing and Troubleshooting
+      content:
+      - 10_i2c-vs-spi.md
+      - 11_common-issues.md
+      - 12_final-project.md
