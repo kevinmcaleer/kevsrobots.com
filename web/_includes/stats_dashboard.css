@@ -31,6 +31,22 @@
     color: var(--accent-color, #2563eb);
 }
 
+.stat-breakdown {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text-secondary, #6b7280);
+}
+
+.stat-breakdown .human-stat {
+    color: #059669;
+}
+
+.stat-breakdown .bot-stat {
+    color: #9ca3af;
+}
+
 .chart-container {
     background: var(--card-bg, white);
     padding: 20px;

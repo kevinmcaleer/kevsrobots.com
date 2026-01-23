@@ -22,14 +22,36 @@ async function loadDashboard() {
         console.log('Stats Dashboard: totalVisits element:', totalVisitsEl);
         if (totalVisitsEl) totalVisitsEl.textContent = data.totals.visits_last_month.toLocaleString();
 
+        // Human/bot visits breakdown
+        const humanVisitsEl = document.getElementById('humanVisits');
+        if (humanVisitsEl && data.totals.human_visits_last_month !== undefined) {
+            humanVisitsEl.textContent = data.totals.human_visits_last_month.toLocaleString();
+        }
+        const botVisitsEl = document.getElementById('botVisits');
+        if (botVisitsEl && data.totals.bot_visits_last_month !== undefined) {
+            botVisitsEl.textContent = data.totals.bot_visits_last_month.toLocaleString();
+        }
+
         const totalSearchesEl = document.getElementById('totalSearches');
         if (totalSearchesEl) totalSearchesEl.textContent = data.totals.searches_last_month.toLocaleString();
 
         const totalUsersEl = document.getElementById('totalUsers');
         if (totalUsersEl) totalUsersEl.textContent = data.user_stats.total_users.toLocaleString();
 
+        // Human users breakdown
+        const humanUsersEl = document.getElementById('humanUsers');
+        if (humanUsersEl && data.user_stats.human_total_users !== undefined) {
+            humanUsersEl.textContent = data.user_stats.human_total_users.toLocaleString();
+        }
+
         const returningUsersEl = document.getElementById('returningUsers');
         if (returningUsersEl) returningUsersEl.textContent = data.user_stats.returning_users.toLocaleString();
+
+        // Human returning users breakdown
+        const humanReturningUsersEl = document.getElementById('humanReturningUsers');
+        if (humanReturningUsersEl && data.user_stats.human_returning_users !== undefined) {
+            humanReturningUsersEl.textContent = data.user_stats.human_returning_users.toLocaleString();
+        }
 
         // Visits per day chart (bar chart)
         renderBarChart(
