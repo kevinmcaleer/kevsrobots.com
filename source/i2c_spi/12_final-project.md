@@ -5,7 +5,7 @@ layout: lesson
 type: page
 ---
 
-![Environmental Monitor](/learn/i2c_spi/assets/final-project.jpg){:class="img-fluid w-100"}
+<!-- ![Environmental Monitor](/learn/i2c_spi/assets/final-project.jpg){:class="img-fluid w-100"} -->
 
 ## Your Capstone Project
 
@@ -653,11 +653,3 @@ Congratulations! You've completed "Talking to the World - Working with I2C and S
 **Video tutorials**: Watch the companion video series
 
 Thank you for taking this journey into I2C and SPI communication. You now have the skills to connect your Raspberry Pi Pico to hundreds of sensors and devices. Keep building, keep learning, and most importantly - have fun!
-
----
-
-> **Course Progress**: Lesson 12 of 12 - COMPLETE!
->
-> **Previous**: [Common Issues and Troubleshooting](/learn/i2c_spi/11_common-issues.html)
->
-> **Continue Learning**: [Explore More Courses](/learn/)

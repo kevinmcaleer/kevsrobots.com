@@ -14,10 +14,10 @@ excerpt: >
 videos: 
  - WFiqR9haX5Q
 tags:
- - MicroPython
- - Course
- - Cyberbricks
- - ESP32
+ - micropython
+ - course
+ - cyberbricks
+ - esp32
 
 ---
 

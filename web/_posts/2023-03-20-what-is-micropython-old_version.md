@@ -10,8 +10,8 @@ excerpt: >-
    In this blog post, we will explore what MicroPython is, how it differs from Python, and some of its unique features.
 cover: /assets/img/blog/micropython/micropython.jpg
 tags: 
- - Micropython
- - What is MicroPython
+ - micropython
+ - what_is_micropython
 groups:
  - micropython
 ---

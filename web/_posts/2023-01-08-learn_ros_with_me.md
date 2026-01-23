@@ -9,9 +9,9 @@ author: Kevin McAleer
 excerpt: Learn how to use ROS and build Robots with Python
 cover: /learn/learn_ros/assets/learn_ros.jpg
 tags:
- - Raspberry Pi 4
- - ROS
- - Robot
+ - raspberry_pi_4
+ - ros
+ - robot
 groups:
  - robots
 ---

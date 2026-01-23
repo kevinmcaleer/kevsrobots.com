@@ -12,7 +12,7 @@ cover: /assets/img/blog/high_five_bot/cover.jpg
 hero:  /assets/img/blog/high_five_bot/hero.png
 mode: light
 tags:
- - robots
+ - robot
 groups:
  - pico
  - micropython

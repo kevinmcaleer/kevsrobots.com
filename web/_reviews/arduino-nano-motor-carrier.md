@@ -8,7 +8,8 @@ cover: /assets/img/reviews/arduino_nano_motor_carrier/arduino_nano_motor_carrier
 link: https://store.arduino.cc/products/arduino-nano-motor-carrier
 rating: 4.1
 transparency: 
- 
+manufacturer: Arduino
+manufacturer_url: https://www.arduino.cc/
 ---
 
 ## 👍 Recommendation

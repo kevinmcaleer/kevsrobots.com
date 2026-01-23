@@ -11,9 +11,9 @@ cover: /assets/img/stevenson_screen.jpg
 subtitle: 3d Printable Stevenson Screen for Pimoroni Enviro Indoor
 description: 3D Print your own Stevenson Screen for the Pimoroni Enviro Indoor sensor
 tags:
- - Pimoroni
- - Enviro
- - 3D Printing
+ - pimoroni
+ - enviro
+ - 3d_printing
 groups:
  - 3dprinting
  - raspberrypi

@@ -11,8 +11,8 @@ excerpt: >-
 cover: /assets/img/blog/docker_swarm/docker_swarm.jpg
 hero: /assets/img/blog/docker_swarm/hero.png
 tags:
-  - Cluster
-  - Docker
+  - cluster
+  - docker
 mode: light
 groups:
   - raspberrypi

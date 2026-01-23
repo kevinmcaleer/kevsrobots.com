@@ -10,9 +10,9 @@ author: Kevin McAleer
 excerpt: 
 cover: /assets/img/blog/makers_central_2023/makers_central_2023.jpg
 tags: 
- - makers central
+ - makers_central
  - event
- - meet up
+ - meet_up
 videos:
  - UgdtHzUiN2o
 ---

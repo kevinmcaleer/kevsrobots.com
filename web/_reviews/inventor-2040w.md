@@ -10,6 +10,8 @@ rating: 5
 transparency: 
  - 🎁
  - 🤝
+manufacturer: Pimoroni
+manufacturer_url: https://www.pimoroni.com/
 ---
 
 ## 👍👍👍 Recommendation

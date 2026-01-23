@@ -11,15 +11,15 @@ difficulty: beginner
 groups:
     - raspberrypi
 tags:
-    - Docker
-    - Raspberry Pi
-    - Home Server
-    - Home Lab
-    - Clustered Pi
-    - Docker Compose
-    - Portainer
-    - Mealie
-    - NodeRed
+    - docker
+    - raspberry_pi
+    - home_server
+    - home_lab
+    - clustered_pi
+    - docker_compose
+    - portainer
+    - mealie
+    - nodered
 videos:
     - NmpcKv91LLs
 ---

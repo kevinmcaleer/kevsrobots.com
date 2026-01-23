@@ -12,12 +12,12 @@ cover: /assets/img/blog/ddns-pi/cover.jpg
 hero: /assets/img/blog/ddns-pi/hero.png
 mode: light
 tags: 
- - Raspberry Pi
- - Dynamic DNS
- - Self-Hosting
- - WordPress
- - Ghost
- - Nginx
+ - raspberry_pi
+ - dynamic_dns
+ - self_hosting
+ - wordpress
+ - ghost
+ - nginx
 groups:
  - raspberrypi
 ---

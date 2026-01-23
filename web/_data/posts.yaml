@@ -131,12 +131,18 @@ posts:
 - title: Cyberglasses
   url: /2023-01-16-cyberglasses.md
   date: 2023-01-16
+- title: New Year, new robot - meet Cubie-3
+  url: /2026-01-11-cubie-3.md
+  date: 2026-01-11
 - title: Raspberry Pi Home Hub
   url: /2025-01-05-pi-home-hub.md
   date: 2025-01-05
 - title: SMARS Quad
   url: /2020-08-16-smars-quad.md
   date: 2020-08-16
+- title: Channel Update - Stick, Twist or Fold?
+  url: /2026-01-04-channel-update.md
+  date: 2026-01-04
 - title: Pi Stand v6
   url: /2023-02-22-pi-stand-v6.md
   date: 2023-02-22
@@ -279,6 +285,9 @@ posts:
 - title: Ultimate Guide to Setting Up RetroPie on a Raspberry Pi 4
   url: /2024-01-28-retropie2.md
   date: 2024-01-28
+- title: Pironman 5 Max Review
+  url: /2025-12-21-pironman5-max.md
+  date: 2025-12-21
 - title: Pi-PipBoy
   url: /2023-03-26-pi-pipboy.md
   date: 2023-03-26
@@ -522,6 +531,9 @@ posts:
 - title: What is MicroPython?
   url: /2024-01-10-what-is-micropython.md
   date: 2024-01-10
+- title: How to install RaspberryPi OS
+  url: /2026-01-07-how-to-install-raspberrypi-os.md
+  date: 2026-01-07
 - title: PIKON Camera - Raspberry Pi High Quality Camera Project
   url: /2022-08-23-pikon-camera.md
   date: 2022-08-23

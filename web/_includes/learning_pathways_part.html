@@ -1,7 +1,7 @@
 {% assign pathways = site.learning_pathways | sort: 'date_published' | reverse  %}
 <div class="mb-3">
 
-<div class="row row-cols-sm-1 row-cols-md-2 row-cols-lg-4 g-2">
+<div class="row row-cols-sm-1 row-cols-md-2 row-cols-lg-4 g-2 animate-on-scroll">
     {% for item in pathways %}
     {% if item.name != "index.html" %}
     {% include card.html cardtitle=item.title description=item.description link=item.url img=item.cover tl="2" dl="2" include_likes=true %}

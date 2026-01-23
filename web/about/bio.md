@@ -1,5 +1,5 @@
 ---
-layout: about
+layout: content
 title: About Kevin McAleer
 description: Learn about Kevin McAleer, Small Robots and links to all his social media
 date: 2024-01-01
@@ -9,7 +9,15 @@ cover: /assets/img/kevsrobots.jpg
 
 {% include breadcrumbs.html %}
 
+<div class="row">
+<div class="col-12 col-md-3 col-lg-2">
+{% include about_sidebar.html %}
+</div>
+<div class="col-12 col-md-9 col-lg-10">
+
 {% assign profile = site.data.profile %}
+
+{% capture content %}
 
 # About Kevin McAleer
 
@@ -58,3 +66,8 @@ Pimoroni.com | I do a lot of Product Intro videos for Pimoroni - check them out 
 ---
 
 {% include thanks.html %}
+
+{% endcapture %}
+{{ content | markdownify }}
+</div>
+</div>

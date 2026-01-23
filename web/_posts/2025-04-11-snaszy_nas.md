@@ -14,8 +14,8 @@ mode: light
 videos:
   - CjX5USkejTI
 tags:
-  - NAS
-  - raspberrypi
+  - nas
+  - raspberry_pi
 groups:
   - raspberrypi
 stl:

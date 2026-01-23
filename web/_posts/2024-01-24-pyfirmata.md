@@ -8,9 +8,9 @@ excerpt: >-
     In the world of robotics and DIY electronics, Arduino and Python are two powerful tools that can be combined to create amazing projects.
 cover: /assets/img/blog/pyfirmata/pyfirmata.jpg
 tags:
-  - Python
-  - Arduino
-  - PyFirmata
+  - python
+  - arduino
+  - pyfirmata
 groups:
   - micropython
   - arduino

@@ -10,6 +10,8 @@ rating: 4.2
 transparency: 
  - 🎁
  - 🤝
+manufacturer: Elecfreaks
+manufacturer_url: https://www.elecfreaks.com/
 ---
 
 ## 👍 Recommendation

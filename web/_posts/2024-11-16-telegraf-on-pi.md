@@ -12,11 +12,11 @@ cover: /assets/img/blog/telegraf-pi/cover.jpg
 hero: /assets/img/blog/telegraf-pi/hero.png 
 mode: light
 tags: 
- - Raspberry Pi
- - Telegraf
- - Docker
- - Monitoring
- - Metrics  
+ - raspberry_pi
+ - telegraf
+ - docker
+ - monitoring
+ - metrics
 groups: 
 - Raspberry Pi  
 ---

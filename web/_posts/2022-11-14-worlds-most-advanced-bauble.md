@@ -10,10 +10,10 @@ author: Kevin McAleer
 excerpt: Build an internet controllable Christmas Bauble
 cover: /assets/img/blog/cheerlights/cheerlights.jpg
 tags:
- - Raspberry Pi Pico
- - 3D Printing
+ - raspberry_pi_pico
+ - 3d_printing
  - seasonal
- - Cheerlights
+ - cheerlights
 groups:
  - seasonal
  - 3dprinting

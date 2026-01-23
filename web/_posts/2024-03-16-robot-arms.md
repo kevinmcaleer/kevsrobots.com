@@ -12,9 +12,9 @@ cover: /assets/img/blog/robotarms/robotarms.gif
 hero: /assets/img/blog/robotarms/hero.png
 mode: light
 tags:
-  - robot arms
-  - inverse kinematics
-  - raspberry pi
+  - robot_arms
+  - inverse_kinematics
+  - raspberry_pi
   - python
 groups:
   - robotarms

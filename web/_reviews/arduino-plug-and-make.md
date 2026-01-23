@@ -9,6 +9,8 @@ link: https://store.arduino.cc/products/plug-and-make-kit
 rating: 4.3
 transparency: 
  - 💳 
+manufacturer: Arduino
+manufacturer_url: https://www.arduino.cc/
 ---
 
 ## 👍 Recommendation

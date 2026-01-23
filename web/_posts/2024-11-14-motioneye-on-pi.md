@@ -12,11 +12,11 @@ cover: /assets/img/blog/motioneye-pi/cover.jpg
 hero: /assets/img/blog/motioneye-pi/hero.png
 mode: light
 tags: 
- - Raspberry Pi
- - MotionEye
- - Docker
- - Surveillance
- - Network Camera
+ - raspberry_pi
+ - motioneye
+ - docker
+ - surveillance
+ - network_camera
 groups:
  - raspberrypi
 ---

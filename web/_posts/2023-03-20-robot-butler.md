@@ -10,12 +10,12 @@ excerpt: >-
   From Rosie the robot maid in "The Jetsons" to R2-D2 and C-3PO in "Star Wars," we have been fascinated by the prospect of humanoid robots serving us.
 cover: /assets/img/blog/sleeper01.jpg
 tags: 
- - Robots
- - Future
- - Batteries
+ - robot
+ - future
+ - batteries
  - futureism
- - Robot Butler
- - Personal Robot
+ - robot_butler
+ - personal_robot
 
 ---
 

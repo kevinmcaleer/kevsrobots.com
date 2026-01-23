@@ -11,10 +11,10 @@ excerpt: >-
     I’ve always love the 90s Tamagotchi toys and wanted to build and program my own, using MicroPython and a Raspberry Pi Pico.
 cover: /assets/img/blog/picotamachibi/picotamachibi.jpg
 tags: 
- - Raspberry Pi Pico
- - MicroPython
- - 3D Printing
- - Picotamachibi
+ - raspberry_pi_pico
+ - micropython
+ - 3d_printing
+ - picotamachibi
 groups:
  - pico
  - micropython

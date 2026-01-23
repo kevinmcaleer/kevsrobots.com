@@ -8,6 +8,8 @@ cover: /assets/reviews/pironman5_review.png
 rating: 4.0
 transparency: 
  - 🎁
+manufacturer: Sunfounder
+manufacturer_url: https://www.sunfounder.com/
 ---
 
 ## 👍 Recommendation

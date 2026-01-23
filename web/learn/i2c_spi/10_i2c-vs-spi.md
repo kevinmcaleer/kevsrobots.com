@@ -53,7 +53,7 @@ navigation:
 ---
 
 
-![I2C vs SPI Comparison](/learn/i2c_spi/assets/i2c-vs-spi.jpg){:class="img-fluid w-100"}
+<!-- ![I2C vs SPI Comparison](/learn/i2c_spi/assets/i2c-vs-spi.jpg){:class="img-fluid w-100"} -->
 
 ## Making the Right Choice
 
@@ -75,6 +75,7 @@ You've mastered both I2C and SPI. Now comes the important question: which should
 | **Error detection** | Built-in ACK/NACK | None (application level) |
 | **Multi-controller** | Supported (but complex) | Not supported |
 | **Power consumption** | Lower (slower switching) | Higher (fast switching) |
+{:class="table table-single table-narrow"}
 
 ## Decision Framework
 
@@ -461,10 +462,3 @@ You can now confidently choose the right protocol for any project based on techn
 ## What's Next
 
 Theory and examples are great, but real projects always have surprises. In the next lesson, we'll cover common issues with both I2C and SPI, how to diagnose them, and proven solutions to get your projects working.
-
----
-
-> **Course Progress**: Lesson 10 of 12
->
-> **Previous**: [SPI Sensor Example](/learn/i2c_spi/09_spi-sensor-example.html) |
-> **Next**: [Common Issues and Troubleshooting](/learn/i2c_spi/11_common-issues.html)

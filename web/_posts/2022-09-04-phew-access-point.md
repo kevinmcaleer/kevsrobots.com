@@ -9,12 +9,12 @@ author: Kevin McAleer
 excerpt: Setup your own Wi-Fi Captive Portal for Robotics project
 cover: /assets/img/blog/phew/saddle.jpg
 tags:
- - Raspberry Pi
- - Wi-Fi
- - Captive Portal
- - Pimoroni
- - Phew!
- - MicroPython
+ - raspberry_pi
+ - wi_fi
+ - captive_portal
+ - pimoroni
+ - phew!
+ - micropython
 groups:
  - micropython
  - pico 

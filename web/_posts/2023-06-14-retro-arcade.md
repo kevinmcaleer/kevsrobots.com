@@ -11,9 +11,9 @@ excerpt: >-
     A review of the Elecfreaks Retro:Game Arcade Kit
 cover: /assets/img/blog/retroarcade/retro_arcade.jpg
 tags: 
- - Microbit
- - MicroPython
- - Retro
+ - microbit
+ - micropython
+ - retro
 groups:
  - retro
  - games

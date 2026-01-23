@@ -12,10 +12,10 @@ excerpt: >
 cover: /assets/img/blog/stats/cover.jpg
 hero: /assets/img/blog/stats/hero.png 
 tags:
- - Website
- - Analytics
- - Transparency
- - Stats
+ - website
+ - analytics
+ - transparency
+ - stats
 ---
 
 ## Ahoy there makers!

@@ -11,10 +11,10 @@ excerpt: >-
     Over-The-Air refers to the method of transmitting data, typically a software update, across a network without any wired connection
 cover: /assets/img/blog/ota/ota.jpg
 tags: 
- - MicroPython
- - Over the Air
- - OTA
- - Auto-update
+ - micropython
+ - over_the_air
+ - ota
+ - auto_update
 groups:
  - micropython
  - electronics

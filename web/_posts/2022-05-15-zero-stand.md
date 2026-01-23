@@ -10,8 +10,8 @@ author: Kevin McAleer
 excerpt: 3D Print a cute stand for Raspberry Pi Zeros - specifically designed for pHats
 cover: /assets/img/blog/zero_stand/enviro.jpg
 tags:
- - Raspberry Pi Zero
- - 3D Printing
+ - raspberry_pi_zero
+ - 3d_printing
 groups:
  - raspberrypi
  - 3dprinting

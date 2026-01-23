@@ -12,7 +12,7 @@ tags:
  - robot
  - servo
  - easing
- - 3D Printing
+ - 3d_printing
 groups:
  - weird
  - 3dprinting

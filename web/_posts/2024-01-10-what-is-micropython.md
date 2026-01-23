@@ -15,10 +15,10 @@ groups:
     - micropython
     - pico
 tags:
-    - Micropython
-    - Microcontrollers
-    - Python
-    - Raspberry Pi
+    - micropython
+    - microcontrollers
+    - python
+    - raspberry_pi
 
 ---
 

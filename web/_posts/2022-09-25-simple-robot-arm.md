@@ -10,15 +10,14 @@ author: Kevin McAleer
 excerpt: 3D print a simple robot arm you can control over Wi-Fi using Phew! and the Pimoroni Inventor 2040 W
 cover: /assets/img/blog/robotarm/robotarm.jpg
 tags:
- - Raspberry Pi Pico W
- - Inventor 2040 W
- - Pico
- - Pico W
- - Robot
- - MicroPython
- - Logo
- - Arm
- - 3D Printing
+ - pico_w
+ - inventor_2040_w
+ - pico
+ - robot
+ - micropython
+ - logo
+ - arm
+ - 3d_printing
 groups:
  - robots
  - 3dprinting

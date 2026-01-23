@@ -13,10 +13,10 @@ mode: light
 videos:
   - 9F3R4p2UXoo
 tags:
- - Pico
- - Weather Station
- - Pimoroni
- - MicroPython
+ - pico
+ - weather_station
+ - pimoroni
+ - micropython
 groups:
  - raspberrypi
  - python

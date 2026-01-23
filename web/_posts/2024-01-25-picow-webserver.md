@@ -10,10 +10,10 @@ excerpt: >-
     Learn how to build a web server and templating engine using a Raspberry Pi Pico W.
 cover: /assets/img/blog/phew/phew.jpg
 tags:
-  - MicroPython
-  - Web server
-  - Phew!
-  - Pimoroni
+  - micropython
+  - web_server
+  - phew!
+  - pimoroni
 groups:
   - micropython
   - pico

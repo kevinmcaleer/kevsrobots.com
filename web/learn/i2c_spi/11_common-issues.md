@@ -52,7 +52,7 @@ navigation:
 ---
 
 
-![Troubleshooting Guide](/learn/i2c_spi/assets/troubleshooting.jpg){:class="img-fluid w-100"}
+<!-- ![Troubleshooting Guide](/learn/i2c_spi/assets/troubleshooting.jpg){:class="img-fluid w-100"} -->
 
 ## Systematic Troubleshooting
 
@@ -648,10 +648,3 @@ You can now diagnose and fix communication problems confidently, getting your pr
 ## What's Next
 
 You've learned I2C, SPI, and troubleshooting. Now let's bring it all together! In the final lesson, we'll build a complete environmental monitoring station that combines I2C sensors, data logging, and everything you've learned in this course.
-
----
-
-> **Course Progress**: Lesson 11 of 12
->
-> **Previous**: [I2C vs SPI](/learn/i2c_spi/10_i2c-vs-spi.html) |
-> **Next**: [Final Project](/learn/i2c_spi/12_final-project.html)

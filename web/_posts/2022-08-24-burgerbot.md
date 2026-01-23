@@ -10,11 +10,10 @@ author: Kevin McAleer
 excerpt: Build your own 2 motor, Pico W-based, 3d printable robot
 cover: /assets/img/blog/burgerbot/burgerbot.jpg
 tags:
- - Raspberry Pi Pico W
- - Pico
- - Pico W
- - Robot
- - MicroPython
+ - pico_w
+ - pico
+ - robot
+ - micropython
 groups:
  - raspberrypi
  - pico

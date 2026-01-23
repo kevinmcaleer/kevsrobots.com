@@ -52,7 +52,7 @@ navigation:
 ---
 
 
-![SPI Wiring](/learn/i2c_spi/assets/spi-wiring.jpg){:class="img-fluid w-100"}
+<!-- ![SPI Wiring](/learn/i2c_spi/assets/spi-wiring.jpg){:class="img-fluid w-100"} -->
 
 ## Wiring Your First SPI Device
 
@@ -85,6 +85,7 @@ Typical breakout board pins:
 | SCK | Clock | SPI clock input |
 | DO | Data Out | SPI MISO (data to Pico) |
 | CS | Chip Select | Active LOW chip select |
+{:class="table table-single table-narrow"}
 
 > **Note**: Some modules might have "SO" (Serial Out) instead of "DO" - it's the same signal (connects to MISO).
 
@@ -114,13 +115,13 @@ Raspberry Pi Pico (SPI0 pins):
 ┌─────────────────────────┐
 │  USB PORT               │
 ├─────────────────────────┤
-│ 1  GP0            VBUS 40│
-│ 2  GP1            VSYS 39│
-│ 3  GND             GND 38│ ← Connect GND
+│ 1  GP0           VBUS 40│
+│ 2  GP1           VSYS 39│
+│ 3  GND            GND 38│ ← Connect GND
 │ 4  GP2 (SCK)   3V3_EN 37│
 │ 5  GP3 (MOSI)    3.3V 36│ ← Connect VCC
-│ 6  GP4 (MISO)      REF 35│
-│ 7  GP5 (CS)       GP28 34│
+│ 6  GP4 (MISO)     REF 35│
+│ 7  GP5 (CS)      GP28 34│
 │ 8  GND            GND 33│
 └─────────────────────────┘
 
@@ -159,15 +160,16 @@ Let's also cover a more complex device - an SPI OLED display (like SSD1306 or SH
 
 ### SPI OLED Pinout
 
-| Pin | Name | Description |
-|-----|------|-------------|
-| GND | Ground | Common ground |
-| VCC | Power | 3.3V or 5V (check module) |
-| SCK | Clock | SPI clock |
-| SDA/MOSI | Data | SPI data in (MOSI) |
-| RES/RST | Reset | Display reset (GPIO) |
-| DC | Data/Command | Register select (GPIO) |
-| CS | Chip Select | SPI chip select (GPIO) |
+| Pin      | Name         | Description               |
+|----------|--------------|---------------------------|
+| GND      | Ground       | Common ground             |
+| VCC      | Power        | 3.3V or 5V (check module) |
+| SCK      | Clock        | SPI clock                 |
+| SDA/MOSI | Data         | SPI data in (MOSI)        |
+| RES/RST  | Reset        | Display reset (GPIO)      |
+| DC       | Data/Command | Register select (GPIO)    |
+| CS       | Chip Select  | SPI chip select (GPIO)    |
+{:class="table table-single table-narrow"}
 
 ### Wiring SPI OLED to Pico
 
@@ -488,10 +490,3 @@ Your SPI device is now physically connected and tested. You've verified communic
 ## What's Next
 
 With hardware wired and tested, let's dive into a complete SPI sensor example. In the next lesson, we'll read data continuously, handle errors gracefully, and build a practical temperature monitoring system with the MAX31855.
-
----
-
-> **Course Progress**: Lesson 8 of 12
->
-> **Previous**: [What is SPI?](/learn/i2c_spi/07_what-is-spi.html) |
-> **Next**: [SPI Sensor Example](/learn/i2c_spi/09_spi-sensor-example.html)

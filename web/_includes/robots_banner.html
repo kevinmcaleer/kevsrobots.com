@@ -10,9 +10,9 @@
       <a href="{{ robot.link | default: '#' }}" class="dock-item text-decoration-none text-center">
         <div class="dock-img-wrapper">
             {% if robot.hero %}
-                <img src="{{ robot.hero }}" alt="{{ robot.name }}" class="dock-img">
+                <img src="{{ robot.hero }}" alt="{{ robot.name }}" class="dock-img" loading="lazy">
                 {% else %}
-                <img src="{{ robot.cover }}" alt="{{ robot.name }}" class="dock-img">
+                <img src="{{ robot.cover }}" alt="{{ robot.name }}" class="dock-img" loading="lazy">
             {% endif %}
 
         </div>

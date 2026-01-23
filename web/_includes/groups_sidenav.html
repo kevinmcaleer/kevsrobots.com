@@ -1,13 +1,39 @@
-{% assign groups = site.groups | sort: 'title'  %}
-<div class="mb-3">
-<ul class="m-0 p-0">
-<li class="list-unstyled mt-1"><a href="/showcase/" class="orange small"><i class="fa-solid fa-sparkle pr-3"></i>Showcase</a>
-<hr /></li>
-{% for group in groups %}
-    {% if group.title != "index.md" and group.title != "Ideas" %}
-    <li class="list-unstyled mt-1 py-1"><a href="{{group.url}}" class="orange small">{% if group.icon %}<i class="{{group.icon}} pr-3" aria-hidden="false"></i>{%endif%} {{group.title}}</a></li>
-    {% endif %}
-{% endfor %}
-</ul>
+<div class="ideas-sidebar bg-light rounded-3 p-3 mb-3">
+    <h5 class="mb-3">Explore</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.title == 'Ideas' %}orangered{% else %}transparent{% endif %};" href="/ideas/">
+                All Ideas
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/robots' %}orangered{% else %}transparent{% endif %};" href="/robots/">
+                Robots
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/projects' %}orangered{% else %}transparent{% endif %};" href="/projects/">
+                Projects
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/showcase' %}orangered{% else %}transparent{% endif %};" href="/showcase/">
+                Showcase
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <h5 class="mb-3">Browse by Category</h5>
+    <ul class="nav flex-column">
+        {% assign groups = site.groups | sort: 'title' %}
+        {% for group in groups %}
+            {% if group.title != "index.md" and group.title != "Ideas" %}
+            <li class="nav-item">
+                <a class="nav-link orange small" style="padding-left: 8px; border-left: 3px solid {% if page.title == group.title %}orangered{% else %}transparent{% endif %};" href="{{group.url}}">
+                    {{group.title}}
+                </a>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
 </div>
-

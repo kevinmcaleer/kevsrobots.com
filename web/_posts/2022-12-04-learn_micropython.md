@@ -9,11 +9,11 @@ author: Kevin McAleer
 excerpt: Learn at MicroPython, from scratch, and your own pace
 cover: /assets/img/blog/learn/micropython.jpg
 tags:
- - Raspberry Pi Pico
- - Learn
- - MicroPython
- - Course
- - Tutorial
+ - raspberry_pi_pico
+ - learn
+ - micropython
+ - course
+ - tutorial
 groups:
  - micropython
 ---

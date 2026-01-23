@@ -53,7 +53,7 @@ navigation:
 ---
 
 
-![I2C Scanner Output](/learn/i2c_spi/assets/i2c-scanner.jpg){:class="img-fluid w-100"}
+<!-- ![I2C Scanner Output](/learn/i2c_spi/assets/i2c-scanner.jpg){:class="img-fluid w-100"} -->
 
 ## Finding Devices on the I2C Bus
 
@@ -135,6 +135,7 @@ The "0x" prefix means "this number is in hexadecimal":
 | 118 | 0x76 | 0111 0110 |
 | 119 | 0x77 | 0111 0111 |
 | 127 | 0x7F | 0111 1111 |
+{:class="table table-single table-narrow"}
 
 > **Note**: I2C uses 7-bit addresses, so the maximum is 0x7F (127 in decimal). There are technically 128 possible addresses, but some are reserved.
 
@@ -150,6 +151,7 @@ Here are addresses you'll frequently encounter:
 | DS3231 RTC | 104 | 0x68 |
 | PCF8574 Port Expander | 32-39 | 0x20-0x27 |
 | ADS1115 ADC | 72-75 | 0x48-0x4B |
+{:class="table table-single table-narrow"}
 
 ## Building a Better Scanner
 
@@ -210,6 +212,7 @@ Not all addresses can be used by devices. Some are reserved by the I2C specifica
 |---------------|-----|---------|
 | 0x00-0x07 | 0x00-0x07 | Reserved (bus control) |
 | 0x78-0x7F | 0x78-0x7F | Reserved (10-bit addressing) |
+{:class="table table-single table-narrow"}
 
 Regular devices use addresses from **0x08 to 0x77** (8 to 119 decimal).
 
@@ -473,10 +476,3 @@ You now have powerful diagnostic tools to work with any I2C device. Scanning is 
 ## What's Next
 
 Your BME280 is connected, verified, and you know its address. Now it's time to actually read data from it! In the next lesson, we'll communicate with the sensor, read temperature, humidity, and pressure values, and display them in real-time.
-
----
-
-> **Course Progress**: Lesson 3 of 12
->
-> **Previous**: [I2C Hardware Setup](/learn/i2c_spi/02_i2c-hardware-setup.html) |
-> **Next**: [Reading I2C Sensors](/learn/i2c_spi/04_reading-i2c-sensor.html)

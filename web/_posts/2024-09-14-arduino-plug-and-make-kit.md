@@ -11,9 +11,9 @@ cover: /assets/img/blog/arduino_pamk/cover.jpg
 hero:  /assets/img/blog/arduino_pamk/hero.png
 mode: light
 tags: 
- - Arduino
- - Kits
- - Electronics
+ - arduino
+ - kits
+ - electronics
 groups:
  - arduino
 videos:

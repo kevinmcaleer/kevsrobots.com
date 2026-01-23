@@ -7,6 +7,8 @@ excerpt: Overall, if you're looking for a low cost, compact yet fully featured C
 cover: /assets/img/reviews/waveshare_cm5/cm5-nano-b.jpg
 # link: https://amzn.to/3XqFiKc
 rating: 4.2
+manufacturer: Waveshare
+manufacturer_url: https://www.waveshare.com/
 ---
 
 Overall, if you're looking for a low cost, compact yet fully featured Compute Module then is a solid choice.

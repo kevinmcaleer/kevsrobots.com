@@ -12,8 +12,8 @@ cover: /assets/img/blog/picotamachibi2/picotamachibi2.jpg
 hero:  /assets/img/blog/picotamachibi2/hero.png
 mode: light
 tags: 
- - Raspberry Pi
- - Pico
+ - raspberry_pi
+ - pico
 groups:
     - raspberrypi
     - pico

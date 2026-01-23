@@ -14,9 +14,9 @@ groups:
     - raspberrypi
     - ai
 tags:
-    - robots
+    - robot
     - ai
-    - machine learning
+    - machine_learning
     - opencv
     - viam
 ---

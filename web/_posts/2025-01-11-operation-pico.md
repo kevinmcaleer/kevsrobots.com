@@ -12,7 +12,7 @@ cover: /assets/img/blog/operation_pico/cover.jpg
 hero:  /assets/img/blog/operation_pico/hero.png
 mode: light
 tags:
- - raspberry pi pico
+ - raspberry_pi_pico
  - pico
  - micropython
  - kids

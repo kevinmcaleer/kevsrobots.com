@@ -9,8 +9,8 @@ author: Kevin McAleer
 excerpt: Here are my Top 10 tips for getting started with robotics
 cover: /assets/img/blog/top_10_tips/top_10.jpg
 tags:
- - Robot
- - Tips
+ - robot
+ - tips
 ---
 
 ## Contents

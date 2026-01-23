@@ -1,5 +1,5 @@
 ---
-layout: about
+layout: content
 title: Become a Robot Maker
 description: Support the channel Kevin McAleer by becoming a Robot Maker
 date: 2024-01-01
@@ -8,6 +8,17 @@ cover: /assets/img/credits.png
 ---
 
 {% include breadcrumbs.html %}
+
+<div class="row">
+<div class="col-12 col-md-3 col-lg-2">
+{% include about_sidebar.html %}
+</div>
+<div class="col-12 col-md-9 col-lg-10">
+
+{% assign profile = site.data.profile %}
+
+{% capture content %}
+
 
 <img src="{{page.cover}}" class="cover rounded my-3" alt="Cover image for {{page.title}}">
 {% assign profile = site.data.profile %}
@@ -25,3 +36,8 @@ cover: /assets/img/credits.png
 ---
 
 {% include memberships.html %}
+
+{% endcapture %}
+{{ content | markdownify }}
+</div>
+</div>

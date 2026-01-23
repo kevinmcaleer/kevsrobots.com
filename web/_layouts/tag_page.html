@@ -1,0 +1,38 @@
+---
+layout: content
+---
+
+{% include nav_blog.html %}
+
+{% include breadcrumbs.html %}
+
+<div class="container-fluid">
+    <h1><i class="fa-solid fa-tag"></i>&nbsp;&nbsp;&nbsp;&nbsp;{{ page.tag }}</h1>
+    <p class="lead">{{ site.tags[page.tag] | size }} post{% if site.tags[page.tag].size != 1 %}s{% endif %} tagged with "{{ page.tag }}"</p>
+
+    <p><a href="/tags/" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>All Tags</a></p>
+
+    <hr>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 animate-on-scroll">
+        {% assign tagged_posts = site.tags[page.tag] | sort: 'date' | reverse %}
+        {% for post in tagged_posts %}
+        <div class="col">
+            <a href="{{ post.url }}" class="text-decoration-none">
+                <div class="card h-100 card-hover shadow-hover bg-light border-0 rounded-3">
+                    {% if post.cover %}
+                    <img src="{{ post.cover }}" class="card-img-top" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title black">{{ post.title }}</h5>
+                        <p class="card-text small text-muted">{{ post.description | truncate: 100 }}</p>
+                        <p class="card-text small text-muted">
+                            <i class="fa-regular fa-calendar me-1"></i>{{ post.date | date: "%d %b %Y" }}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>

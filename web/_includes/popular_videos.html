@@ -16,7 +16,7 @@
             </div>
           </nav>
        
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-3">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-3 animate-on-scroll">
     {% for vid in popular %}
     {% if vid.popular %}
     <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
@@ -25,9 +25,9 @@
       {% if video.type != "short" %}
       
       {% assign video_img = "https://img.youtube.com/vi/" | append: video.video_id | append: "/0.jpg" %}
-      {% assign video_link = "https://www.youtube.com/watch?v=" | append: video.id %}
-      {% include card.html cardtitle=video.title link=video_link img=video_img date=video.published 
-        views=vid.views_str type=vid.type small_title=true noborder=true tl="3" bg_color=pop_color %}
+      {% assign video_link = "https://www.youtube.com/watch?v=" | append: video.video_id %}
+      {% include card.html cardtitle=video.title link=video_link img=video_img date=video.published
+        views=vid.views_str type=vid.type small_title=true noborder=true tl="3" bg_color=pop_color popular=vid.popular %}
 
     {% endif %}
     {% endif %}

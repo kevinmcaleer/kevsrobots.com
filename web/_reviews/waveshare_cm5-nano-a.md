@@ -7,6 +7,9 @@ excerpt: "Overall, if you're looking for a low cost, no-frills Compute Module th
 cover: /assets/img/reviews/waveshare_cm5/cm5-nano-a.jpg
 # link: https://amzn.to/3XqFiKc
 rating: 4.2
+manufacturer: Waveshare
+manufacturer_url: https://www.waveshare.com/
+
 ---
 
 

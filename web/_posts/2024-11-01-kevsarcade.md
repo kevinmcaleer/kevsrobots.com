@@ -12,10 +12,10 @@ cover: /assets/img/blog/kevsarcade/cover.jpg
 hero:  /assets/img/blog/kevsarcade/hero.png
 mode: light
 tags:
- - Lasercutting
- - Raspberry Pi
- - Arcade
- - Retro
+ - laser_cutting
+ - raspberry_pi
+ - arcade
+ - retro
 groups:
  - lasercutting
  - raspberrypi

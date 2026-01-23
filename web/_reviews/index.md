@@ -6,18 +6,22 @@ thanks: false
 date: 2024-01-15
 ---
 
-{% include nav_robots.html %}
-
 {% include breadcrumbs.html %}
 
-# Reviews
+<div class="row">
+<div class="col-12 col-md-3 col-lg-2">
+{% include about_sidebar.html %}
+</div>
+<div class="col-12 col-md-9 col-lg-10">
 
-## Robots, Kit, Boards and more
+<h1>Reviews</h1>
+<h2>Robots, Kit, Boards and more</h2>
 
----
+<hr>
 
-He's my take on common components and parts that I've purchased. This page is related to items that appear on the [Gear list](/gear/).
-
-<!-- {% include reviews_mini.html %} -->
+<p>Here's my take on common components and parts that I've purchased. This page is related to items that appear on the <a href="/gear/">Gear list</a>.</p>
 
 {% include review-archive.html %}
+
+</div>
+</div>

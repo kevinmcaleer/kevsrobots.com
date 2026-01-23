@@ -13,8 +13,8 @@ hero: /assets/img/blog/motioncontrol/hero.png
 mode: light
 tags:
   - arm
-  - robotic arm
-  - raspberry pi
+  - robot_arms
+  - raspberry_pi
   - pico
   - camera
 groups:

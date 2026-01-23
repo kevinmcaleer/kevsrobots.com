@@ -1,0 +1,53 @@
+<div class="about-sidebar bg-light rounded-3 p-3 mb-3">
+    <h5 class="mb-3">About</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url == '/about/' %}orangered{% else %}transparent{% endif %};" href="/about/">
+                About KevsRobots
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/about/bio' %}orangered{% else %}transparent{% endif %};" href="/about/bio.html">
+                Bio
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/robotmaker' %}orangered{% else %}transparent{% endif %};" href="/about/robotmaker">
+                Robot Maker
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <h5 class="mb-3">Reviews & Gear</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/reviews' %}orangered{% else %}transparent{% endif %};" href="/reviews/">
+                Reviews
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/gear' %}orangered{% else %}transparent{% endif %};" href="/gear/">
+                Gear List
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/pimoroni' %}orangered{% else %}transparent{% endif %};" href="/pimoroni/">
+                Pimoroni Intros
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <h5 class="mb-3">More</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/books' %}orangered{% else %}transparent{% endif %};" href="/books/">
+                Books
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/links' %}orangered{% else %}transparent{% endif %};" href="/links/">
+                Links
+            </a>
+        </li>
+    </ul>
+</div>

@@ -14,7 +14,7 @@ mode: light
 tags:
   - midi
   - music
-  - raspberry pi
+  - raspberry_pi
   - pico
 groups:
   - weird

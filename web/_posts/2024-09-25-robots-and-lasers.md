@@ -11,7 +11,7 @@ cover: /assets/img/blog/falcon5w/cover.jpg
 hero:  /assets/img/blog/falcon5w/hero.png
 mode: light
 tags: 
- - Lasercutting
+ - laser_cutting
 groups:
  - lasercutting
 # videos:

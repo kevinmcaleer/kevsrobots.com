@@ -5,7 +5,7 @@ layout: lesson
 type: page
 ---
 
-![Datasheet Example](/learn/i2c_spi/assets/datasheet.jpg){:class="img-fluid w-100"}
+<!-- ![Datasheet Example](/learn/i2c_spi/assets/datasheet.jpg){:class="img-fluid w-100"} -->
 
 ## Understanding Datasheets
 
@@ -177,6 +177,7 @@ Key registers:
 | 0xF4 | ctrl_meas | Measurement control | R/W |
 | 0xF5 | config | Configuration | R/W |
 | 0xF7-0xFE | data | Measurement data | Read |
+{:class="table table-single table-narrow"}
 
 **Using this in code**:
 
@@ -477,10 +478,3 @@ You can now approach any I2C or SPI device datasheet with confidence, finding th
 ## What's Next
 
 Armed with datasheet knowledge, let's dive deeper into the BME280's advanced features. In the next lesson, we'll explore power modes, oversampling, filtering, and optimization techniques that aren't covered in simple tutorials.
-
----
-
-> **Course Progress**: Lesson 5 of 12
->
-> **Previous**: [Reading I2C Sensors](/learn/i2c_spi/04_reading-i2c-sensor.html) |
-> **Next**: [BME280 Deep Dive](/learn/i2c_spi/06_bme280-deep-dive.html)

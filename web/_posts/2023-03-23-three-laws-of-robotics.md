@@ -10,11 +10,11 @@ excerpt: >-
   Asimov's Three Laws of Robotics have been widely cited as a foundational framework for designing and programming robots and artificial intelligence systems. These laws are often used as a starting point for discussions on ethics, safety, and responsibility in the field of robotics and AI. However, it is important to examine the limitations and implications of these laws in greater detail.
 cover: /assets/img/blog/asimov/asimov.jpg
 tags: 
- - Machine Learning
- - Asimov
- - Robots
- - Three Laws of Robotics
- - Artificial Inteligence
+ - machine_learning
+ - asimov
+ - robot
+ - three_laws_of_robotics
+ - artificial_inteligence
 
 ---
 

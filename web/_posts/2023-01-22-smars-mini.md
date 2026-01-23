@@ -10,10 +10,10 @@ author: Kevin McAleer
 excerpt: Learn how to print your own SMARS Mini, download the parts, and get the electronics today
 cover: /assets/img/blog/smars_mini/mini07.png
 tags:
- - SMARS
- - Mini
- - Tiny Robot
- - 3D Printing
+ - smars
+ - mini
+ - tiny_robot
+ - 3d_printing
 groups:
  - robots
  - 3dprinting

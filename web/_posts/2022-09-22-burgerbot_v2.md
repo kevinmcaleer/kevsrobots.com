@@ -10,13 +10,12 @@ author: Kevin McAleer
 excerpt: Add a Sharpie to Burgerbot and learn how to draw with a robot!
 cover: /assets/img/blog/burgerbot/burgerbot_v2.jpg
 tags:
- - Raspberry Pi Pico W
- - Pico
- - Pico W
- - Robot
- - MicroPython
- - Logo
- - 3D Printing
+ - pico_w
+ - pico
+ - robot
+ - micropython
+ - logo
+ - 3d_printing
 groups:
  - robots
  - micropython

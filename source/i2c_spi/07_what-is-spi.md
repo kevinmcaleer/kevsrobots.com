@@ -5,7 +5,7 @@ layout: lesson
 type: page
 ---
 
-![SPI Communication](/learn/i2c_spi/assets/spi-diagram.jpg){:class="img-fluid w-100"}
+<!-- ![SPI Communication](/learn/i2c_spi/assets/spi-diagram.jpg){:class="img-fluid w-100"} -->
 
 ## Understanding SPI
 
@@ -36,6 +36,7 @@ You'll encounter various names for the same signals:
 | Data Out | MOSI, SDO, DO, COPI |
 | Data In | MISO, SDI, DI, CIPO |
 | Chip Select | CS, SS, CE, nCS |
+{:class="table table-single table-narrow"}
 
 They all refer to the same four signals - just different naming conventions from different manufacturers.
 
@@ -148,6 +149,7 @@ SPI has four modes defined by two parameters:
 | 1 | 0 | 1 | Clock LOW when idle, sample on falling edge |
 | 2 | 1 | 0 | Clock HIGH when idle, sample on falling edge |
 | 3 | 1 | 1 | Clock HIGH when idle, sample on rising edge |
+{:class="table table-single table-narrow"}
 
 **Most devices use Mode 0 or Mode 3**. Check the datasheet!
 
@@ -167,6 +169,7 @@ SPI can run much faster than I2C:
 |----------|---------------|---------------|
 | I2C | 100-400 kHz | 3.4 MHz |
 | SPI | 1-10 MHz | 60+ MHz |
+{:class="table table-single table-narrow"}
 
 ```python
 # Slow - for testing and compatibility
@@ -234,6 +237,7 @@ cs_memory.value(1)
 | Complexity | Simpler wiring | More wires |
 | Power | Lower | Higher (faster clocking) |
 | Distance | ~1 meter | ~10 cm (very short) |
+{:class="table table-single table-narrow"}
 
 ## When to Use SPI
 
@@ -425,10 +429,3 @@ You now understand the fundamental differences between I2C and SPI. SPI trades s
 ## What's Next
 
 Theory is great, but let's wire up a real SPI device! In the next lesson, we'll connect an SPI sensor or display to your Pico, covering proper wiring, timing, and troubleshooting.
-
----
-
-> **Course Progress**: Lesson 7 of 12
->
-> **Previous**: [BME280 Deep Dive](/learn/i2c_spi/06_bme280-deep-dive.html) |
-> **Next**: [SPI Hardware Setup](/learn/i2c_spi/08_spi-hardware-setup.html)

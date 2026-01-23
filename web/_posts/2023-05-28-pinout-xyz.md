@@ -11,12 +11,12 @@ excerpt: >-
   The really cool thing about the pinout.xyz website is that it has the largest collection of links to Raspberry Pi Hats, pHats, wHats, Bonnets and shims that you'll find anywhere else on the internet.
 cover: /assets/img/blog/pinout/pinout.jpg
 tags: 
- - Raspberry Pi
- - HATs
- - pHATS
- - wHAT
- - Shim
- - Bonnet
+ - raspberry_pi
+ - hats
+ - phats
+ - what
+ - shim
+ - bonnet
 groups:
  - raspberrypi
  - electronics

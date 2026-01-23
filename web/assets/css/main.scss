@@ -1502,3 +1502,92 @@ pre {
     display: inline-table; // Makes table shrink to content
   }
 }
+
+// Gallery grid - responsive columns
+.gallery {
+  display: grid;
+  gap: 10px;
+}
+
+.gallery-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.gallery-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.gallery-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Card rise-up animation
+// Use class "animate-cards" on a container to enable
+// Cards will rise up and fade in sequentially from left to right
+
+@keyframes cardRiseUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-cards {
+  // Target direct children that are card containers
+  > .col,
+  > div > .col,
+  > .card,
+  .gallery > .card {
+    opacity: 0;
+    animation: cardRiseUp 0.5s ease-out forwards;
+  }
+
+  // Stagger delays for first 12 items
+  > .col:nth-child(1), > div > .col:nth-child(1), .gallery > .card:nth-child(1) { animation-delay: 0.05s; }
+  > .col:nth-child(2), > div > .col:nth-child(2), .gallery > .card:nth-child(2) { animation-delay: 0.1s; }
+  > .col:nth-child(3), > div > .col:nth-child(3), .gallery > .card:nth-child(3) { animation-delay: 0.15s; }
+  > .col:nth-child(4), > div > .col:nth-child(4), .gallery > .card:nth-child(4) { animation-delay: 0.2s; }
+  > .col:nth-child(5), > div > .col:nth-child(5), .gallery > .card:nth-child(5) { animation-delay: 0.25s; }
+  > .col:nth-child(6), > div > .col:nth-child(6), .gallery > .card:nth-child(6) { animation-delay: 0.3s; }
+  > .col:nth-child(7), > div > .col:nth-child(7), .gallery > .card:nth-child(7) { animation-delay: 0.35s; }
+  > .col:nth-child(8), > div > .col:nth-child(8), .gallery > .card:nth-child(8) { animation-delay: 0.4s; }
+  > .col:nth-child(9), > div > .col:nth-child(9), .gallery > .card:nth-child(9) { animation-delay: 0.45s; }
+  > .col:nth-child(10), > div > .col:nth-child(10), .gallery > .card:nth-child(10) { animation-delay: 0.5s; }
+  > .col:nth-child(11), > div > .col:nth-child(11), .gallery > .card:nth-child(11) { animation-delay: 0.55s; }
+  > .col:nth-child(12), > div > .col:nth-child(12), .gallery > .card:nth-child(12) { animation-delay: 0.6s; }
+}
+
+// Scroll-triggered animation - only animate when in viewport
+// Animation is applied per-row via JavaScript
+.animate-on-scroll {
+  > .col,
+  > [class*="col-"],
+  > .card,
+  > a {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+
+    // When individual card is marked in-view by JS
+    &.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

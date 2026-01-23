@@ -14,9 +14,9 @@ excerpt: >
 videos: 
  - Ppsly_PdTXg
 tags:
- - Raspberry Pi
- - Case Review
- - SunFounder
+ - raspberry_pi
+ - case_review
+ - sunfounder
 groups:
  - raspberrypi
 stl:

@@ -12,13 +12,12 @@ cover: /assets/img/blog/spookyscaryskeleton/spookyscaryskeleton.jpg
 hero:  /assets/img/blog/spookyscaryskeleton/hero.png
 mode: light
 tags:
- - Raspberry Pi Pico W
- - Pico
- - Pico W
- - Robot
- - MicroPython
- - Halloween
- - 3D Printing
+ - pico_w
+ - pico
+ - robot
+ - micropython
+ - halloween
+ - 3d_printing
 groups:
  - micropython
  - pico

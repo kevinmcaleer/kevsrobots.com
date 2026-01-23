@@ -13,7 +13,7 @@ excerpt: >
     A step-by-step guide to installing Raspberry Pi OS.
 
 tags:
- - raspberrypi
+ - raspberry_pi
 
 groups:
  - raspberrypi

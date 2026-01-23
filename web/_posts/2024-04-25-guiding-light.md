@@ -10,8 +10,8 @@ cover: /assets/img/blog/lidar/cover.png
 hero: /assets/img/blog/lidar/hero.png
 mode: light
 tags:
-  - raspberry pi
-  - file syncing
+  - raspberry_pi
+  - file_syncing
   - syncthing
 groups:
   - robots

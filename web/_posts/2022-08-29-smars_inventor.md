@@ -10,11 +10,11 @@ author: Kevin McAleer
 excerpt: Build your own SMARS Robot using the Pimoroni Inventor 2040 W
 cover: /assets/img/blog/smars_inventor/smars_inventor.jpg
 tags:
- - Raspberry Pi
- - SMARS
- - Inventor 2040 W
- - SMARS Inventor
- - MicroPython
+ - raspberry_pi
+ - smars
+ - inventor_2040_w
+ - smars_inventor
+ - micropython
 groups:
  - robots
  - micropython 

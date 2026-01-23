@@ -2,10 +2,8 @@
 layout: default
 ---
 
-{% assign group = page.name | replace:".md","" %}
+{% assign group = page.slug %}
 <div class="px-3 py-0 mx-3">
-    
-    {% include nav_groups.html %}
 
     {% include breadcrumbs.html %}
 
@@ -24,8 +22,8 @@ layout: default
     <div class="col-8 col-md-9 col-lg-10">
         
         {{ content }}
-        {% if page.name != "index" %}    
-        <div class="row row-cols-md-3 row-cols-sm-1 row-cols-1 row-cols-lg-4 g-3">
+        {% if page.slug != "index" %}    
+        <div class="row row-cols-md-3 row-cols-sm-1 row-cols-1 row-cols-lg-4 g-3 animate-on-scroll">
             {% assign projects = site.posts %}
             {% for item in projects %}
             {% if item.groups contains group %}

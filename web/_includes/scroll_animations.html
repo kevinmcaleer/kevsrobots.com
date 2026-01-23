@@ -1,0 +1,48 @@
+<!-- Scroll-triggered animations using Intersection Observer -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const containers = document.querySelectorAll('.animate-on-scroll');
+
+    if (containers.length === 0) return;
+
+    // Observe individual cards/cols for per-row animation
+    const cardObserver = new IntersectionObserver((entries) => {
+        // Group entries that are intersecting by their top position (same row)
+        const rowGroups = {};
+
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const rect = entry.target.getBoundingClientRect();
+                // Round to nearest 10px to group cards in same row
+                const rowKey = Math.round(rect.top / 10) * 10;
+
+                if (!rowGroups[rowKey]) {
+                    rowGroups[rowKey] = [];
+                }
+                rowGroups[rowKey].push(entry.target);
+                cardObserver.unobserve(entry.target);
+            }
+        });
+
+        // Animate each row with staggered delays
+        Object.values(rowGroups).forEach(rowCards => {
+            // Sort by horizontal position (left to right)
+            rowCards.sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+
+            rowCards.forEach((card, index) => {
+                card.style.transitionDelay = `${index * 0.1}s`;
+                card.classList.add('in-view');
+            });
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -30px 0px'
+    });
+
+    // Find and observe all cards/cols inside animate-on-scroll containers
+    containers.forEach(container => {
+        const cards = container.querySelectorAll(':scope > .col, :scope > [class*="col-"], :scope > .card, :scope > a');
+        cards.forEach(card => cardObserver.observe(card));
+    });
+});
+</script>

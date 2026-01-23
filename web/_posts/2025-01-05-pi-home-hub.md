@@ -12,9 +12,9 @@ cover: /assets/img/blog/pihomehub/cover.jpg
 hero:  /assets/img/blog/pihomehub/hero.png
 mode: light
 tags:
- - raspberry pi
+ - raspberry_pi
  - kivy
- - touch display
+ - touch_display
 groups:
  - raspberry pi
  - python

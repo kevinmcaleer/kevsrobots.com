@@ -13,12 +13,12 @@ excerpt: 3d Print a Ghostbusters PKE style Wi-Fi Scanner
 cover: /assets/img/blog/ghostbusters/ghost02.jpg
 hero: /assets/img/blog/ghostbusters/hero.png
 tags:
- - Raspberry Pi Pico
- - Ghostbusters
- - Wi-Fi
- - Scanner
- - Movie Prop
- - 3D Printing
+ - raspberry_pi_pico
+ - ghostbusters
+ - wi_fi
+ - scanner
+ - movie_prop
+ - 3d_printing
 groups:
  - micropython
  - pico

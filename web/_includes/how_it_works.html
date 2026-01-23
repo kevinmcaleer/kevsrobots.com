@@ -1,7 +1,7 @@
 
 {% assign articles = site.how_it_works | sort:'date' | reverse%}
 
-<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 animate-on-scroll">
 
 {% for article in articles %}
 {% if article.title != 'How it Works' %}

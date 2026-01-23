@@ -5,7 +5,7 @@
     <div class="col-12"><h2>The {{include.family}} Family</h2></div>
     {% endif %}
 </div>
-<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 bg-white rounded-bottom-2 p-3 mb-3 h-100">
+<div class="row row-cols-2 row-cols-xl-10 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 bg-white rounded-bottom-2 p-3 mb-3 h-100 animate-on-scroll">
     {% for board in boards | limit: include.limit%}
         {% if include.family %}
             {% if board.family == include.family %}

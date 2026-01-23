@@ -12,8 +12,8 @@ cover: /learn/brachiograph/assets/cover.png
 hero: /learn/brachiograph/assets/hero.png
 mode: light
 tags: 
- - BrachioGraph
- - Robot arm
+ - brachiograph
+ - robot_arm
 groups:
  - robots
  - robotarms

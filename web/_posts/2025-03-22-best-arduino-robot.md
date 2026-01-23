@@ -13,7 +13,7 @@ mode: light
 videos:
   - Ylc84kAKSxI
 tags:
- - Arduino
+ - arduino
  - robotics
  - micropython
 groups:

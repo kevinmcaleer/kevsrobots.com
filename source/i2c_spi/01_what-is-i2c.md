@@ -5,7 +5,7 @@ layout: lesson
 type: page
 ---
 
-![I2C Communication Diagram](/learn/i2c_spi/assets/i2c-diagram.jpg){:class="img-fluid w-100"}
+<!-- ![I2C Communication Diagram](/learn/i2c_spi/assets/i2c-diagram.jpg){:class="img-fluid w-100"} -->
 
 ## Understanding I2C
 
@@ -84,6 +84,7 @@ I2C supports different communication speeds:
 | Fast | 400 kHz | Most common - good balance of speed and reliability |
 | Fast Plus | 1 MHz | High-speed applications |
 | High Speed | 3.4 MHz | Rare, specialized use |
+{:class="table table-single table-narrow"}
 
 For most projects with sensors like the BME280, use **Fast mode (400 kHz)**. It's reliable and supported by virtually all I2C devices.
 
@@ -229,10 +230,3 @@ In this lesson, you discovered:
 ## What's Next
 
 Now that you understand what I2C is, it's time to wire up a real sensor. In the next lesson, we'll connect a BME280 sensor to your Pico, covering proper wiring, pull-up resistors, and the physical connections that make I2C work.
-
----
-
-> **Course Progress**: Lesson 1 of 12
->
-> **Previous**: [Introduction](/learn/i2c_spi/00_intro.html) |
-> **Next**: [I2C Hardware Setup](/learn/i2c_spi/02_i2c-hardware-setup.html)

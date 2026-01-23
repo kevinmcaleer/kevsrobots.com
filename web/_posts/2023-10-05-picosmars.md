@@ -12,7 +12,7 @@ excerpt: >-
 cover: /assets/img/blog/picosmars/picosmars.jpg
 tags:
  - robotics
- - SMARS
+ - smars
  - pico
  - micropython
 groups:

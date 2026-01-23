@@ -18,3 +18,5 @@ exports
 .optimization_cache.json
 .env
 Chart Data.csv
+Totals.csv
+Table Data.csv

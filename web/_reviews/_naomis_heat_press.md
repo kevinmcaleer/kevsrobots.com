@@ -7,6 +7,8 @@ excerpt:
 cover: /assets/img/reviews/naomis_heat-set_tool.jpg
 link: https://cybernightmarket.com
 rating: 0
+manufacturer: CyberNight Market
+manufacturer_url: https://cybernightmarket.com
 ---
 
 ## 👍 Recommendation

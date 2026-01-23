@@ -13,9 +13,9 @@ cover: /assets/img/blog/gamepad_burgerbot/cover.jpg
 hero:  /assets/img/blog/gamepad_burgerbot/hero.png
 mode: light
 tags:
- - Raspberry Pi
- - Pico
- - MicroPython
+ - raspberry_pi
+ - pico
+ - micropython
 groups:
  - robotics
  - pcb

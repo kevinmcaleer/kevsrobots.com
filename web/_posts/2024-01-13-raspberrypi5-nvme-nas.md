@@ -12,10 +12,10 @@ difficulty: beginner
 groups:
     - raspberrypi
 tags:
-    - NAS
-    - Raspberry Pi
-    - Samba
-    - NVMe
+    - nas
+    - raspberry_pi
+    - samba
+    - nvme
 videos:
     - ZpWuKFOMV-I
 ---

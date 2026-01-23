@@ -18,7 +18,7 @@ videos:
 tags:
   - robot
   - micropython
-  - raspberrypi
+  - raspberry_pi
   - pico
 groups:
   - pico

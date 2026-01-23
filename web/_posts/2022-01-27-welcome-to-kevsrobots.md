@@ -10,7 +10,7 @@ excerpt: Welcome to Kev's Robots, the sister site to Kev's YouTube Channel
 cover: /assets/img/blog/welcome.jpg
 tags:
  - welcome
- - Website
+ - website
 ---
 
 Hey Robot Makers - Welcome to my new website that supports the YouTube Channel - <https://www.youtube.com/@kevinmcaleer28>.

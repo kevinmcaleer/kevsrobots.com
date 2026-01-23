@@ -10,6 +10,8 @@ rating: 4.3
 transparency: 
  - 🎁
  - 🤝
+manufacturer: Raspberry Pi Ltd
+manufacturer_url: https://www.raspberrypi.com/
 ---
 
 ## 👍 Recommendation

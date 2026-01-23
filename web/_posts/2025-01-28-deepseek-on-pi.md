@@ -14,9 +14,9 @@ mode: light
 videos:
   - ZNWeERhGvv8
 tags:
- - Raspberry Pi
+ - raspberry_pi
  - ai
- - MicroPython
+ - micropython
 groups:
  - robotics
  - ai

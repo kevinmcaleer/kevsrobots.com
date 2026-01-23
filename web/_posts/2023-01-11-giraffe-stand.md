@@ -10,9 +10,9 @@ author: Kevin McAleer
 excerpt: Print out a fun and practical stand for your Raspberry Pi Camera Module 3
 cover: /assets/img/blog/giraffe/giraffe01.jpg
 tags:
- - Robot
- - Tips
- - 3D Printing
+ - robot
+ - tips
+ - 3d_printing
 groups:
  - 3dprinting
  - pets

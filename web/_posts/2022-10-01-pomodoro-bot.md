@@ -10,13 +10,12 @@ author: Kevin McAleer
 excerpt: Build your own cute Pomodoro Desk Robot - HeyBot! Using a Raspberry Pi Pico W and Pimoroni Display Pack 2.0
 cover: /assets/img/blog/heybot/heybot.jpg
 tags:
- - Raspberry Pi Pico W
- - Pico
- - Pico W
- - Robot
- - MicroPython
- - Pomodoro
- - 3D Printing
+ - pico_w
+ - pico
+ - robot
+ - micropython
+ - pomodoro
+ - 3d_printing
 groups:
  - robots
  - 3dprinting

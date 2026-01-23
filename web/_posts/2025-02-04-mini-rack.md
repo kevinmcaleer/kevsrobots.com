@@ -14,9 +14,9 @@ videos:
   - fJC68N9nphA
   - qnewKGO8EOc
 tags:
- - Raspberry Pi
+ - raspberry_pi
  - cluster
- - mini-rack
+ - mini_rack
 groups:
  - raspberrypi
  - 3ddesign

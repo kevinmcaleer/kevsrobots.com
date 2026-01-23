@@ -12,8 +12,8 @@ cover: /assets/img/blog/hprobotsotto/cover.png
 hero: /assets/img/blog/hprobotsotto/hero.png
 mode: light
 tags: 
- - OttoDIY
- - Robots
+ - ottodiy
+ - robot
 groups:
  - robots
 videos:

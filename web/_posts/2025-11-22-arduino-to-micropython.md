@@ -10,12 +10,12 @@ excerpt: >
     Calling all Arduino developers! Ready to learn MicroPython but don't want to start from scratch? This new course gets you up to speed in just 2-3 hours with side-by-side code comparisons.
 cover: /assets/img/blog/arduino-to-micropython/cover.jpg
 tags:
- - MicroPython
- - Arduino
- - Course
- - Python
- - ESP32
- - Raspberry Pi Pico
+ - micropython
+ - arduino
+ - course
+ - python
+ - esp32
+ - raspberry_pi_pico
 ---
 
 ## Ahoy Arduino Makers!

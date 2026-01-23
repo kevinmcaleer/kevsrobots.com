@@ -10,9 +10,9 @@ author: Kevin McAleer
 excerpt: Build your own Mecanum Robot using this guide
 cover: /assets/img/blog/rover/rover.jpg
 tags:
- - Rover
- - Motor 2040
- - Mecanum
+ - rover
+ - motor_2040
+ - mecanum
 groups:
  - robots
  - pico

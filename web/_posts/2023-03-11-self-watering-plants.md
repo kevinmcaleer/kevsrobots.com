@@ -10,13 +10,13 @@ author: Kevin McAleer
 excerpt: Create a self watering plant system using the Pimoroni Enviro Grow
 cover: /assets/img/blog/halapeno9000/halapeno9000.jpg
 tags: 
- - Raspberry Pi Pico
- - MicroPython
- - Pimoroni
- - Enviro
- - Enviro Grow
- - Plants
- - 3D Printing
+ - raspberry_pi_pico
+ - micropython
+ - pimoroni
+ - enviro
+ - enviro_grow
+ - plants
+ - 3d_printing
 groups:
  - garden
  - pico

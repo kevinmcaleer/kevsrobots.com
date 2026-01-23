@@ -12,7 +12,7 @@ excerpt: >-
     A 3D Printed Raspberry Pi Pico powered toothbrush you can build and program yourself
 tags:
  - pico
- - robots
+ - robot
  - micropython
  - toothbrush
 groups:

@@ -8,6 +8,8 @@ excerpt: >-
 cover: /assets/img/reviews/waveshare_cm5/cm5-io-base-b.jpg
 # link: https://amzn.to/3XqFiKc
 rating: 4.4
+manufacturer: Waveshare
+manufacturer_url: https://www.waveshare.com/
 ---
 
 Overall, if you're looking for a low cost, fully featured Compute Module in the Raspberry Pi 5 form-factor then is a solid choice.

@@ -1,6 +1,6 @@
 {% assign courses = site.data.courses | sort: 'date_published' | reverse  %}
 
-<div class="row row-cols-1 row-cols-lg-3 row-cols-sm-3 row-cols-md-2 g-3">
+<div class="row row-cols-1 row-cols-lg-3 row-cols-sm-3 row-cols-md-2 g-3 animate-on-scroll">
 {% for course in courses | sort: 'date_published' | reverse | limit: 3 %}
 {{couse.date_published}}
 

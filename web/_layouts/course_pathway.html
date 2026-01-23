@@ -3,7 +3,6 @@ layout: content
 ---
 
 <div class="px-0 py-0 mx-0 my-0">
-{% include nav_courses.html %}
     {% include breadcrumbs.html %}
 <div class="p-0 m-0">
     
@@ -23,7 +22,7 @@ layout: content
             
             {{ content }}
             <div class="container-fluid bg-ocre p-3 rounded-3">
-            <div class="row row-cols-lg-4 row-cols-md-2 row-cols-sm-1 g-3">
+            <div class="row row-cols-lg-4 row-cols-md-2 row-cols-sm-1 g-3 animate-on-scroll">
             {% assign count = 1 %}
             {% for item in page.courses %}
             <div class="col">

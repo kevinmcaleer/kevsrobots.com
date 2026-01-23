@@ -12,6 +12,8 @@ link: https://www.sunfounder.com/collections/robotics/products/sunfounder-pidog-
 rating: 4.2
 transparency: 
  - 🎁
+manufacturer: SunFounder
+manufacturer_url: https://www.sunfounder.com/
 ---
 
 ## 👍 Recommendation

@@ -1,28 +1,3 @@
-<li class="nav-item dropdown has-megamenu">
-    <a href="/" class="nav-link {{textcol}}" role="button" data-bs-toggle="dropdown"> Home</a>
-    <div class="dropdown-menu megamenu m-0 p-3 border-1 bg-light" role="menu">
-        <div class="row row-cols-2">
-            <div class="col-12 col-md-2 h-100">
-
-                <div class="bg-white rounded-3 p-3 h-100">
-                    <a href="/" class="text-decoration-none black">
-                        <h5 class="menu-title">home</h5>
-                    </a>
-                    {% assign pages = site.data.nav_home %}
-                    <ul class="nav flex-column">
-                        {% for page in pages %}
-                        <li class="nav-link m-0 p-0">
-                            <a class="nav-item dotted" href="{{page.link}}">{{page.name}}</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            <div class="col-12 col-md-10 h-100">
-                <div class="bg-white rounded-3 p-3 h-100">
-                    {% include home_mega_mini.html %}
-                </div>
-            </div>
-        </div>
-    </div>
+<li class="nav-item">
+    <a href="/" class="nav-link {{textcol}}">Home</a>
 </li>

@@ -1,7 +1,11 @@
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar for filters -->
-        <div class="col-md-2">
+        <!-- Learn sidebar -->
+        <div class="col-md-3 col-lg-2">
+            {% include learn_sidebar.html %}
+        </div>
+        <!-- Filters column -->
+        <div class="col-md-2 col-lg-2">
             <div class="mb-1 p-3 bg-light rounded-1">
             <p><b>Filters</b></p>
             <p class="card-text mute small">Check or uncheck the boxes to filter the courses</p>
@@ -12,10 +16,13 @@
             {% include boards_sidenav.html %}
         </div>
         <!-- Main content for course cards -->
-        <div class="col-md-10">
+        <div class="col-md-7 col-lg-8">
+            <h1>{{page.title}}</h1>
+            <h2>{{page.description}}</h2>
+            <hr>
             <div class="container-fluid bg-ocre rounded-3 pt-3">
             <p><b>Courses</b></p>
-            <div id="courses" class="row ">
+            <div id="courses" class="row animate-on-scroll">
                 <!-- Course cards will be dynamically inserted here -->
                  <p>Loading courses, please wait...</p>
             </div>
@@ -79,7 +86,7 @@
 
         courses.forEach(course => {
             const courseCard = document.createElement('div');
-            courseCard.classList.add('col-md-4', 'mb-4', 'col-sm-6', 'col-lg-3');
+            courseCard.classList.add('col-md-6', 'mb-4', 'col-sm-6', 'col-lg-3');
             courseCard.innerHTML = `
             <a href="${course.course_url}" class="text-decoration-none">
                 <div class="card border-0 card-hover card-shadown h-100">
@@ -104,6 +111,47 @@
 
         // Update the filter options based on all tags from filtered courses, preserving the checked state
         fetchAndRenderFilters(Array.from(allTags), selectedTags);
+
+        // Use Intersection Observer for per-row animation as cards scroll into view
+        setTimeout(() => {
+            const cards = coursesDiv.querySelectorAll('.col-md-6');
+
+            const cardObserver = new IntersectionObserver((entries) => {
+                // Group entries that are intersecting by their top position (same row)
+                const rowGroups = {};
+
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const rect = entry.target.getBoundingClientRect();
+                        // Round to nearest 10px to group cards in same row
+                        const rowKey = Math.round(rect.top / 10) * 10;
+
+                        if (!rowGroups[rowKey]) {
+                            rowGroups[rowKey] = [];
+                        }
+                        rowGroups[rowKey].push(entry.target);
+                        cardObserver.unobserve(entry.target);
+                    }
+                });
+
+                // Animate each row with staggered delays
+                Object.values(rowGroups).forEach(rowCards => {
+                    // Sort by horizontal position (left to right)
+                    rowCards.sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+
+                    rowCards.forEach((card, index) => {
+                        card.style.transitionDelay = `${index * 0.1}s`;
+                        card.classList.add('in-view');
+                    });
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -30px 0px'
+            });
+
+            // Observe all course cards
+            cards.forEach(card => cardObserver.observe(card));
+        }, 50);
     }
 
     // Initial fetch and render of courses

@@ -12,9 +12,9 @@ cover: /assets/img/blog/picoprojects/cover.jpg
 hero:  /assets/img/blog/picoprojects/hero.png
 mode: light
 tags:
- - Raspberry Pi
- - MicroPython
- - Raspberry Pi Pico
+ - raspberry_pi
+ - micropython
+ - raspberry_pi_pico
 groups:
  - raspberrypi
  - micropython

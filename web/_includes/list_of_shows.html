@@ -4,19 +4,15 @@
 {% assign currentNum = 0 %}
 {% assign counter = 0 %}
 
-<img src="/assets/img/yt_heatmap.png" class="img-fluid w-75 mx-auto d-block m-0 p-0" alt="A YouTube Video Heatmap graphic"/>
-
 <div class="bg-light p-0 m-0">
 <div class="container">
 <nav class="navbar bg-light">
   <div class="container-fluid">
-    <span class="navbar-text">
-      <p><a href="https://www.youtube.com/c/kevinmcaleer28" class="">View YouTube Channel></a></p>
-    </span>
+      <a href="https://www.youtube.com/c/kevinmcaleer28"><button class="btn btn-primary">View YouTube Channel</button></a>    
   </div>
 </nav>
 
-<table class="table table-sm table-bordered">
+<table class="table table-sm table-single ">
   <th class="text-end">#</th>
   <th>Title</th>
   <th>Date</th>
@@ -38,7 +34,7 @@
   <td><a href="https://www.youtube.com/watch?v={{vid.video_id}}">{{vid.title}}</a></td>
   <td>{{vid.published | date: "%d %B %Y"}}</td>
   <td>{{vid.type | capitalize }}</td>
-  <td>{%if vid.popular%}Popular{% endif %}</td>
+  <td class="text-center">{%if vid.popular%}❤️{% endif %}</td>
 </tr>
 
 {% endfor %}

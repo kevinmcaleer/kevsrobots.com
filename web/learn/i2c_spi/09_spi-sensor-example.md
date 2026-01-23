@@ -53,7 +53,7 @@ navigation:
 ---
 
 
-![Temperature Monitoring](/learn/i2c_spi/assets/max31855-monitor.jpg){:class="img-fluid w-100"}
+<!-- ![Temperature Monitoring](/learn/i2c_spi/assets/max31855-monitor.jpg){:class="img-fluid w-100"} -->
 
 ## Building a Temperature Monitor
 
@@ -606,10 +606,3 @@ You now have production-ready code for working with SPI sensors. These patterns 
 ## What's Next
 
 You've mastered both I2C (BME280) and SPI (MAX31855). But how do you choose between them? In the next lesson, we'll compare the protocols side-by-side and learn when to use each for your projects.
-
----
-
-> **Course Progress**: Lesson 9 of 12
->
-> **Previous**: [SPI Hardware Setup](/learn/i2c_spi/08_spi-hardware-setup.html) |
-> **Next**: [I2C vs SPI](/learn/i2c_spi/10_i2c-vs-spi.html)

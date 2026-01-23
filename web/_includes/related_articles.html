@@ -19,7 +19,7 @@
     {% if related_posts.size > 0 %}
     <h2>Liked this article? You might like these too.</h2>
     {% endif %}
-    <div class="row row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-12 g-3">
+    <div class="row row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-12 g-3 animate-on-scroll">
     
     {% for post in related_posts %}
       {% if related_counter < max_related %}

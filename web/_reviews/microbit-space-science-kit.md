@@ -9,6 +9,8 @@ link:
 rating: 3.8
 transparency: 
  - 🎁
+manufacturer: Elecfreaks
+manufacturer_url: https://www.elecfreaks.com/
 ---
 
 ## Recommendation 👍👍👍

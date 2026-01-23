@@ -1,0 +1,46 @@
+<div class="learn-sidebar bg-light rounded-3 p-3 mb-3">
+    <h5 class="mb-3">Courses</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link orange {% if page.url == '/learn/' %}active{% endif %}" style="padding-left: 8px; border-left: 3px solid {% if page.url == '/learn/' %}orangered{% else %}transparent{% endif %};" href="/learn/">
+                All Courses
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange {% if page.url contains '/learn/recent' %}active{% endif %}" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/learn/recent' %}orangered{% else %}transparent{% endif %};" href="/learn/recent">
+                Recent Courses
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange {% if page.url contains 'learning_pathways' %}active{% endif %}" style="padding-left: 8px; border-left: 3px solid {% if page.url contains 'learning_pathways' %}orangered{% else %}transparent{% endif %};" href="/learn/learning_pathways/">
+                Learning Pathways
+            </a>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h5 class="mb-3">Resources</h5>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link orange {% if page.url contains '/resources/glossary' %}active{% endif %}" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/resources/glossary' %}orangered{% else %}transparent{% endif %};" href="/resources/glossary">
+                Glossary
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange {% if page.url contains '/resources/how_it_works' %}active{% endif %}" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/resources/how_it_works' %}orangered{% else %}transparent{% endif %};" href="/resources/how_it_works/">
+                How It Works
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange {% if page.url contains '/resources/boards' %}active{% endif %}" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/resources/boards' %}orangered{% else %}transparent{% endif %};" href="/resources/boards/">
+                Boards
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link orange {% if page.url contains '/stem' %}active{% endif %}" style="padding-left: 8px; border-left: 3px solid {% if page.url contains '/stem' %}orangered{% else %}transparent{% endif %};" href="/stem/">
+                STEM Centre
+            </a>
+        </li>
+    </ul>
+</div>

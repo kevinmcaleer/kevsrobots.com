@@ -11,10 +11,10 @@ excerpt: >-
     This article dives deep into an exciting project: a custom-made game controller using the Raspberry Pi Pico W.
 cover: /assets/img/blog/pcb/pcb.png
 tags: 
- - MicroPython
- - PCB
- - Bluetooth
- - Remote Control
+ - micropython
+ - pcb
+ - bluetooth
+ - remote_control
 groups:
  - pico
  - micropython

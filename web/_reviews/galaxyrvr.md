@@ -10,6 +10,8 @@ link: https://www.sunfounder.com/collections/arduino-diy-robot/products/sunfound
 rating: 4.3
 transparency: 
  - 🎁
+manufacturer: SunFounder
+manufacturer_url: https://www.sunfounder.com/
 ---
 
 ## 👍 Recommendation

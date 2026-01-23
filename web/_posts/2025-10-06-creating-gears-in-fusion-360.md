@@ -13,10 +13,10 @@ cover: /assets/img/blog/fusion360-gears/cover.jpg
 hero: /assets/img/blog/fusion360-gears/hero.png
 mode: light
 tags:
- - Fusion 360
- - CAD
- - 3D Printing
- - Gears
+ - fusion_360
+ - cad
+ - 3d_printing
+ - gears
 groups:
  - 3dprinting
  - cad

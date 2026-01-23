@@ -11,9 +11,9 @@ cover: /assets/img/blog/kevsrobots/cover.jpg
 hero:  /assets/img/blog/kevsrobots/hero.png
 mode: light
 tags: 
- - Website
- - Raspberry Pi
- - Docker
+ - website
+ - raspberry_pi
+ - docker
 groups:
  - raspberrypi
  - docker

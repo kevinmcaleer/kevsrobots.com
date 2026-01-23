@@ -44,7 +44,7 @@
             <div class="col-12 align-top"><i class="fa-solid fa-tags {{textcol}}"></i> &nbsp; Tags:</div>
             <div class="col-12">
                 {% for tag in page.tags %}
-                <a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+                <a href="/tags/{{ tag | slugify }}/"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
                 {% endfor %}
             </div>
         </div>

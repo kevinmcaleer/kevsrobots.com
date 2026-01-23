@@ -11,12 +11,12 @@ excerpt: >-
    Lets hack the Ikea Iskarna Head lamp to make it programmable with MicroPython using the Pimoroni Plasma 2040 W, a sound sensor, an Adafruit NeoPixel ring and some 3d printed parts.
 cover: /assets/img/blog/ikea_hack/ikea_hack.jpg
 tags: 
- - Raspberry Pi
- - Pimoroni
- - Plasma Stick 2040 W
- - IKEA
- - LED Strip
- - 3D Printing
+ - raspberry_pi
+ - pimoroni
+ - plasma_stick_2040_w
+ - ikea
+ - led_strip
+ - 3d_printing
 groups:
  - hacks
  - electronics

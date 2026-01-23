@@ -14,11 +14,11 @@ groups:
     - micropython
     - pico
 tags:
-    - Micropython
-    - Microcontrollers
-    - Raspberry Pi
-    - ESP32
-    - ESP8266
+    - micropython
+    - microcontrollers
+    - raspberry_pi
+    - esp32
+    - esp8266
 
 ---
 

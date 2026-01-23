@@ -12,7 +12,7 @@ cover: /assets/img/blog/pi-clean/cover.jpg
 hero: /assets/img/blog/pi-clean/hero.png
 mode: light
 tags:
-  - raspberry pi
+  - raspberry_pi
   - software
 groups:
   - raspberrypi

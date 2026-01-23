@@ -12,7 +12,7 @@
                     <h3>{{blog.title}}</h3>
                     <p class="small textbox-3-line">{{blog.description}}</p>
                 </div>            
-            <img src="{{blog.cover}}" class="img-fluid w-100 rounded-bottom-2" alt="The cover image for {{blog.title}}">
+            <img src="{{blog.cover}}" class="img-fluid w-100 rounded-bottom-2" alt="The cover image for {{blog.title}}" fetchpriority="high">
             </a>
             {% endfor %}
         </div>
@@ -23,7 +23,7 @@
             {% for vid in vids | limit:1 %}
             <a href="https://www.youtube.com/watch?v={{vid.video_id}}" class="text-decoration-none text-black">
             <p class="small pt-3 px-3">Video ></p>
-            <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-bottom-2" alt="YouTube thumbnail for {{vid.title}}">
+            <img src="https://img.youtube.com/vi/{{vid.video_id}}/0.jpg" class="img-fluid rounded-bottom-2" alt="YouTube thumbnail for {{vid.title}}" loading="lazy">
             </a>
             {% endfor %}
         </div>
@@ -35,7 +35,7 @@
             {% for robot in robots | limit:1 %}
             <a href="{{robot.link}}" class="text-decoration-none text-white">
             <p class="pt-3 px-3">Robot ></p>
-            <img src="{{robot.cover}}" class="img-fluid rounded-bottom-2" alt="Robot cover image for {{robot.title}}">
+            <img src="{{robot.cover}}" class="img-fluid rounded-bottom-2" alt="Robot cover image for {{robot.title}}" loading="lazy">
             </a>
             {% endfor %} 
         </div>
@@ -47,7 +47,7 @@
             {% for project in projects | limit:1 %}
             <a href="{{project.link}}" class="text-decoration-none text-white">
             <p class="pt-3 px-3">Project ></p>
-            <img src="{{project.cover}}" class="img-fluid rounded-bottom-2" alt="Project cover image for {{project.name}}">
+            <img src="{{project.cover}}" class="img-fluid rounded-bottom-2" alt="Project cover image for {{project.name}}" loading="lazy">
             </a>
             {% endfor %} 
         </div>

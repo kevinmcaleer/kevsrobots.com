@@ -1,19 +1,19 @@
 {% assign boards = site.boards %}
 
-<div class="row row-cols-4">
-    <div class="col-3">
-        {% for board in boards %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 animate-on-scroll">
+    {% for board in boards %}
+    <div class="col">
         <a class="text-decoration-none" href="{{ board.url }}">
-        <div class="card">
+        <div class="card border-0 card-hover card-shadow h-100">
             <img class="card-img-top" src="{{ board.cover }}" alt="{{ board.title }}" />
             <div class="card-body">
-            <h2 class="card-title text-black">{{ board.title }}</h2>
-            <p class="card-text">{{ board.description }}</p>
+            <h5 class="card-title text-black">{{ board.title }}</h5>
+            <p class="card-text small">{{ board.description }}</p>
             </div>
         </div>
         </a>
-        {% endfor %}
     </div>
+    {% endfor %}
 </div>
 
 

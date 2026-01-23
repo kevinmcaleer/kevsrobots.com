@@ -9,6 +9,8 @@ link: https://amzn.to/3XqFiKc
 rating: 3.7
 transparency: 
  - 🎁
+manufacturer: Petoi
+manufacturer_url: https://www.petoi.com/
 ---
 
 ## 👍 Recommendation

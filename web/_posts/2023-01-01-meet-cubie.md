@@ -10,10 +10,10 @@ author: Kevin McAleer
 excerpt: Build a robot to learn ROS with
 cover: /assets/img/blog/cubie-1/cubie07.jpg
 tags:
- - Raspberry Pi 4
- - ROS
- - Robot
- - 3D Printing
+ - raspberry_pi_4
+ - ros
+ - robot
+ - 3d_printing
 groups:
  - robots
  - 3dprinting

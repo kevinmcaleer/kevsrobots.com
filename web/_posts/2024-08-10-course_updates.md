@@ -11,7 +11,7 @@ cover: /assets/img/blog/learning_system/cover.png
 hero:  /assets/img/blog/learning_system/hero.png
 # mode: light
 tags: 
- - Learning System
+ - learning_system
 ---
 
 The Learning System has been updated to make it easier to navigate and includes new features. 

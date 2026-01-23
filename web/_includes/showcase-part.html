@@ -1,12 +1,18 @@
 
 {% assign posts = site.posts %}
-<div class="row row-cols-lg-4 row-cols-2 row-cols-md-2 g-3">
+<div class="row row-cols-lg-4 row-cols-2 row-cols-md-2 g-3 animate-on-scroll">
 {% for post in posts %}
 {% if post.layout == 'showcase' %}
 {% assign showcases = showcases | push: post %}
 <div class="col">
 
-    {% include card.html link=post.url cardtitle=post.title img=post.cover description=post.excerpt include_likes=true tl="3" dl="3" %}
+    {% include card.html link=post.url cardtitle=post.title img=post.cover 
+        description=post.excerpt 
+        include_likes=true 
+        tl="3" 
+        dl="3" 
+        noborder=true
+        %}
 
 </div>
 {% endif %}

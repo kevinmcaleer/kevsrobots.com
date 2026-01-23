@@ -138,9 +138,3 @@ After completing this course, you'll be ready for:
 ## Ready to Begin?
 
 In the next lesson, we'll dive into I2C - what it is, why it's everywhere in electronics, and how it allows multiple devices to communicate using just two wires. Let's start talking to the world!
-
----
-
-> **Course Progress**: Introduction
->
-> **Next**: [What is I2C?](/learn/i2c_spi/01_what-is-i2c.html)

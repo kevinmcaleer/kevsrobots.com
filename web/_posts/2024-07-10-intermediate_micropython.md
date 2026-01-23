@@ -12,9 +12,9 @@ cover: /learn/intermediate_micropython/assets/cover.png
 hero: /learn/intermediate_micropython/assets/hero.png
 mode: light
 tags: 
- - Course
- - MicroPython
- - Robotics
+ - course
+ - micropython
+ - robotics
 groups:
  - micropython
 videos:

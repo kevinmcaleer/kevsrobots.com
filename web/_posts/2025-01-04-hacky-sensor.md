@@ -13,7 +13,7 @@ hero:  /assets/img/blog/hackysensor/hero.png
 mode: light
 tags:
  - dht22
- - raspberry pi pico
+ - raspberry_pi_pico
  - pico
  - micropython
 groups:

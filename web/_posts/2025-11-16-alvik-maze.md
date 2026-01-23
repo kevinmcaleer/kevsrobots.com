@@ -12,13 +12,13 @@ cover: /assets/img/blog/alvik_maze/cover.jpg
 hero: /assets/img/blog/alvik_maze/hero.png
 mode: light
 tags:
- - Arduino
- - Alvik
- - MicroPython
- - Robotics
- - ROS2
- - SLAM
- - Navigation
+ - arduino
+ - alvik
+ - micropython
+ - robotics
+ - ros2
+ - slam
+ - navigation
 groups:
  - robots
  - micropython

@@ -1,9 +1,9 @@
 {% assign posts = site.posts %}
 
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 p-0 m-0 mb-3 g-3">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 p-0 m-0 mb-3 g-3 animate-on-scroll">
 {% for post in posts | limit:3  %}
 
-    {% include card.html img=post.cover description=post.description link=post.url 
-        date=post.date author=post.author include_likes=true %}
+    {% include card.html img=post.cover description=post.description link=post.url
+        date=post.date author=post.author include_likes=true noborder=true %}
 
 {% endfor %}

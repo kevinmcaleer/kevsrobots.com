@@ -5,7 +5,7 @@ layout: lesson
 type: page
 ---
 
-![BME280 Advanced Features](/learn/i2c_spi/assets/bme280-advanced.jpg){:class="img-fluid w-100"}
+<!-- ![BME280 Advanced Features](/learn/i2c_spi/assets/bme280-advanced.jpg){:class="img-fluid w-100"} -->
 
 ## Mastering the BME280
 
@@ -129,6 +129,7 @@ Oversampling reduces noise by taking multiple measurements and averaging:
 | x4 | 4 | Good | 9.2ms |
 | x8 | 8 | Very good | 18.4ms |
 | x16 | 16 | Excellent | 36.8ms |
+{:class="table table-single table-narrow"}
 
 ### Configuring Oversampling
 
@@ -203,6 +204,7 @@ The BME280 has a built-in Infinite Impulse Response (IIR) filter to reduce short
 | 2 | 5 | Medium |
 | 3 | 11 | Slow |
 | 4 | 22 | Slowest |
+{:class="table table-single table-narrow"}
 
 ### Enabling the Filter
 
@@ -258,6 +260,7 @@ In normal mode, the sensor alternates between measurement and standby. Configure
 | 5 | 1000 ms | 1 Hz |
 | 6 | 10 ms | 100 Hz |
 | 7 | 20 ms | 50 Hz |
+{:class="table table-single table-narrow"}
 
 ```python
 from machine import I2C, Pin
@@ -475,10 +478,3 @@ You can now configure the BME280 optimally for any application - from ultra-low-
 ## What's Next
 
 You've mastered I2C with a real sensor. Now let's explore SPI - a faster, more flexible protocol used in displays, SD cards, and high-speed sensors. In the next lesson, we'll understand what makes SPI different and when to choose it over I2C.
-
----
-
-> **Course Progress**: Lesson 6 of 12
->
-> **Previous**: [Demystifying Datasheets](/learn/i2c_spi/05_demystifying-datasheets.html) |
-> **Next**: [What is SPI?](/learn/i2c_spi/07_what-is-spi.html)

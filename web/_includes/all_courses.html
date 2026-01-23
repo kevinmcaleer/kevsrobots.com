@@ -15,7 +15,7 @@
     <div class="col-12 col-lg-10 col-md-9 col-sm-8">
         <h2>Curated Learning paths</h2>
         {% include learning_pathways.html %}
-        <div class="row row-cols-lg-4 row-cols-sm-1 row-cols-md-2">
+        <div class="row row-cols-lg-4 row-cols-sm-1 row-cols-md-2 animate-on-scroll">
             {% for course in courses | sort: 'date_published' | reverse %}
            
         <div class="col mb-3">

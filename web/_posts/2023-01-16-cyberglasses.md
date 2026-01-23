@@ -10,10 +10,10 @@ author: Kevin McAleer
 excerpt: Learn how to 3D Print, and build your own Raspberry Pi Pico W powered Cyberglasses
 cover: /assets/img/blog/cyberglasses/cyberglasses04.png
 tags:
- - Wearable
- - Tips
- - 3D Printing
- - Cyberglasses
+ - wearable
+ - tips
+ - 3d_printing
+ - cyberglasses
 groups:
  - wearable
  - pico

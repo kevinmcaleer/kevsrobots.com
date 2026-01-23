@@ -12,9 +12,9 @@ cover: /assets/img/blog/pi-apps/pi-apps.jpg
 hero: /assets/img/blog/pi-apps/hero.png
 mode: light
 tags:
-  - raspberry pi
+  - raspberry_pi
   - software
-  - pi-apps
+  - pi_apps
 groups:
   - raspberrypi
   - software

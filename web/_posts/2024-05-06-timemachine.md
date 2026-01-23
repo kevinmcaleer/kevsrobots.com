@@ -12,10 +12,10 @@ cover: /assets/img/blog/timemachine/cover.png
 hero: /assets/img/blog/timemachine/hero.png
 mode: light
 tags: 
- - Raspberry Pi
- - Time Machine
- - Backup
- - Mac
+ - raspberry_pi
+ - time_machine
+ - backup
+ - mac
 groups:
  - raspberrypi
 videos:

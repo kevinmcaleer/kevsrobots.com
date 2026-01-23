@@ -8,6 +8,8 @@ excerpt: >-
 cover: /assets/img/reviews/waveshare_cm5/cm5-poe-base-a.jpg
 # link: https://amzn.to/3XqFiKc
 rating: 3.9
+manufacturer: Waveshare
+manufacturer_url: https://www.waveshare.com/
 ---
 
 Overall, if you're looking for an affordable development board to the Raspberry Pi 5 Compute Module then is a solid choice.

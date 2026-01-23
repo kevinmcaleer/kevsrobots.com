@@ -10,11 +10,11 @@ author: Kevin McAleer
 excerpt: Learn how to build your own Guitar Hero Clone with the Pimoroni Galactic Unicorn and MicroPython
 cover: /assets/img/blog/galactic_hero/galactic_hero01.jpg
 tags:
- - Raspberry Pi Pico
- - MicroPython
- - Pimoroni
- - Galactic Unicorn
- - Game
+ - raspberry_pi_pico
+ - micropython
+ - pimoroni
+ - galactic_unicorn
+ - game
 groups:
  - games
  - micropython

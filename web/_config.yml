@@ -34,6 +34,9 @@ webserver_headers:
     - GET, OPTIONS, HEAD
 
 collections:
+  learn:
+    output: true
+    permalink: /learn/:name.html
   rooms:
     output: true
     permalink: /museum/:collection/:name

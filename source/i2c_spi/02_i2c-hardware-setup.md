@@ -5,7 +5,7 @@ layout: lesson
 type: page
 ---
 
-![I2C Wiring Example](/learn/i2c_spi/assets/i2c-wiring.jpg){:class="img-fluid w-100"}
+<!-- ![I2C Wiring Example](/learn/i2c_spi/assets/i2c-wiring.jpg){:class="img-fluid w-100"} -->
 
 ## Wiring Your First I2C Device
 
@@ -33,6 +33,7 @@ Most BME280 breakout boards have 4 pins:
 | GND | Ground | Common ground |
 | SCL | Serial Clock | Connect to Pico GP9 |
 | SDA | Serial Data | Connect to Pico GP8 |
+{:class="table table-single table-narrow"}
 
 > **Important**: Some BME280 boards can handle 5V power, but the Pico outputs 3.3V. Always use 3.3V to be safe.
 
@@ -92,12 +93,12 @@ Raspberry Pi Pico Pinout (relevant pins):
 │ 4  GP2           3V3_EN │ 37
 │ 5  GP3              3.3V│ 36 ← Connect VCC here
 │ 6  GP4               REF│ 35
-│ 7  GP5               GP28│ 34
+│ 7  GP5              GP28│ 34
 │ 8  GND               GND│ 33 ← Connect GND here
 │ 9  GP6               GND│ 32
-│10  GP7               GP27│ 31
-│11  GP8 (SDA)         GP26│ 30 ← Connect SDA here
-│12  GP9 (SCL)         RUN │ 29 ← Connect SCL here
+│10  GP7              GP27│ 31
+│11  GP8 (SDA)        GP26│ 30 ← Connect SDA here
+│12  GP9 (SCL)        RUN │ 29 ← Connect SCL here
 └─────────────────────────┘
 ```
 
@@ -323,10 +324,3 @@ Your BME280 is now physically connected and ready to communicate. You've verifie
 ## What's Next
 
 Now that your sensor is wired and responding, let's learn how to scan the I2C bus systematically, understand device addresses, and why that "0x" notation keeps appearing. In the next lesson, we'll explore I2C scanning in detail and prepare to read actual sensor data.
-
----
-
-> **Course Progress**: Lesson 2 of 12
->
-> **Previous**: [What is I2C?](/learn/i2c_spi/01_what-is-i2c.html) |
-> **Next**: [Scanning I2C Devices](/learn/i2c_spi/03_scanning-i2c-devices.html)

@@ -12,13 +12,12 @@ cover: /assets/img/blog/burgerbot/burgerbot_v2.jpg
 hero: /assets/img/blog/burgerbot/burgerbot_v2.jpg
 mode: light
 tags:
- - Raspberry Pi Pico W
- - Pico
- - Pico W
- - Robot
- - MicroPython
- - Logo
- - 3D Printing
+ - pico_w
+ - pico
+ - robot
+ - micropython
+ - logo
+ - 3d_printing
 groups:
  - robots
  - micropython

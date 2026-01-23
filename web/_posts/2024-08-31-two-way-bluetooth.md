@@ -11,9 +11,9 @@ cover: /assets/img/blog/pico2pico/cover.png
 hero:  /assets/img/blog/pico2pico/hero.png
 mode: light
 tags: 
- - Raspberry Pi
- - Pico
- - Bluetooth
+ - raspberry_pi
+ - pico
+ - bluetooth
 groups:
  - raspberrypi
  - pico

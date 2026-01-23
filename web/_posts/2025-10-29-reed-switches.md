@@ -10,12 +10,12 @@ cover: /assets/img/blog/reed_switches/cover.jpg
 hero: /assets/img/blog/reed_switches/hero.png
 mode: light
 tags:
- - MicroPython
- - CircuitPython
- - Arduino
- - Electronics
- - Sensors
- - Reed Switch
+ - micropython
+ - circuitpython
+ - arduino
+ - electronics
+ - sensors
+ - reed_switch
 groups:
  - arduino
  - micropython

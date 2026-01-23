@@ -6,13 +6,8 @@
     <ol class="">
         {% for vid in popular | limit:10 %}
         {% if vid.popular %}
-        <!-- <div class="col-lg-3 col-md-6 col-xs-12 col-sm-12"> -->
-    
           {% assign video = vids | where: 'video_id', vid.Content | first %}
-          {% if video.type != "short" %}
-          <li><a href="https://www.youtube.com/watch?v={{vid.Content}}" class="small dotted">{{video.title}}</a></li>
-            
-        {% endif %}
+          <li><a href="https://www.youtube.com/watch?v={{video.video_id}}" class="small dotted">{{video.title}}</a></li>
         {% endif %}
         {% endfor %}
     </ol>

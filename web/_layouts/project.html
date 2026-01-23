@@ -33,7 +33,7 @@ layout: content
 <h5>Tags</h5>
 
 {% for tag in page.tags %}
-<a href="/tags#{{tag}}"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+<a href="/tags/{{ tag | slugify }}/"><span class="bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
 {% endfor %}
 
 <hr />

@@ -4,31 +4,33 @@
 {% assign links = include.links | split: ',' %}
 {% assign descriptions = include.descriptions | split: ',' %}
 {% assign noborder = include.noborder %}
+{% assign animate = include.animate %}
 {% comment %}
 
 use-links if you want to use the included links rather than links to the images
+animate if you want cards to rise up with staggered animation on scroll
 
 {% endcomment %}
 
-<div class="gallery" style="display: grid; grid-template-columns: repeat({{ cols }}, 1fr); gap: 10px;">
+<div class="gallery gallery-cols-{{ cols }} {% if animate %}animate-on-scroll{% endif %}">
     {% for image in images %}
         {% assign index = forloop.index0 %}
-        <div class="card rounded-3 card-hover card-shadow {% if noborder %}border-0{% endif %}">
-            {%if include.use-links %}
-            <a href="{{links[index]}}" class="card-img-top w-100">
-            {% else %}
-            <a href="{{ image | strip }}" class="card-img-top w-100">
-            {% endif %}
-                <img src="{{ image | strip }}" alt="Gallery Image" class="w-100 rounded-top-3">
-            </a>
-            {% if titles.size > index %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ titles[index] | strip }}</h5>
-                    {% if descriptions.size > index %}
-                        <p class="card-text">{{ descriptions[index] | strip }}</p>
-                    {% endif %}
-                </div>
-            {% endif %}
-        </div>
+        {%if include.use-links %}
+        <a href="{{links[index]}}" class="text-decoration-none">
+        {% else %}
+        <a href="{{ image | strip }}" class="text-decoration-none">
+        {% endif %}
+            <div class="card rounded-3 card-hover card-shadow h-100 {% if noborder %}border-0{% endif %}">
+                <img src="{{ image | strip }}" alt="Gallery Image" class="card-img-top w-100 rounded-top-3">
+                {% if titles.size > index %}
+                    <div class="card-body">
+                        <h5 class="card-title black">{{ titles[index] | strip }}</h5>
+                        {% if descriptions.size > index %}
+                            <p class="card-text text-muted">{{ descriptions[index] | strip }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </a>
     {% endfor %}
 </div>

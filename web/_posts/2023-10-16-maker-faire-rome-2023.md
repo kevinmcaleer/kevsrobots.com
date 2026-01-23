@@ -10,7 +10,7 @@ author: Kevin McAleer
 excerpt: Learn about the projects on show at Maker Faire Rome 2023
 tags:
  - maker
- - robots
+ - robot
  - micropython
 groups:
  - events

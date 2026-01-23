@@ -11,10 +11,10 @@ excerpt: >-
     Learn how to setup Samba file sharing on a Raspberry Pi based RetroPie gaming system 
 cover: /assets/img/blog/retropie/retropie.jpg
 tags: 
- - Raspberry Pi
- - RetroPie
- - Retro Gaming
- - Gaming
+ - raspberry_pi
+ - retropie
+ - retro_gaming
+ - gaming
 groups:
  - retro
  - raspberrypi

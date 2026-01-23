@@ -10,11 +10,11 @@ author: Kevin McAleer
 excerpt: 
 cover: /assets/img/blog/potato-power/potato.jpg
 tags: 
- - Raspberry Pi
- - Pico
- - Potato
+ - raspberry_pi
+ - pico
+ - potato
  - battery
- - DIY battery
+ - diy_battery
 groups:
  - weird
  - garden

@@ -13,12 +13,12 @@ groups:
     - robots
     - ai
 tags:
-    - Pimoroni
-    - Raspberry Pi
-    - Trilobot
-    - OpenCV
-    - Face Detection
-    - Python
+    - pimoroni
+    - raspberry_pi
+    - trilobot
+    - opencv
+    - face_detection
+    - python
 videos:
     - J8OI8z_BWtk
 ---

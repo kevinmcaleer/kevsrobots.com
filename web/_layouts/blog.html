@@ -13,7 +13,7 @@ layout: content
 <p>{{page.excerpt}}</p>
 
 {% for tag in page.tags %}
-<a href="/tags#{{tag}}"><span class="float-end mx-1 bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
+<a href="/tags/{{ tag | slugify }}/"><span class="float-end mx-1 bg-ocre black badge rounded-pill text-bg-success">{{tag}}</span></a>
 {% endfor %}
 
 </span>

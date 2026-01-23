@@ -9,9 +9,9 @@ author: Kevin McAleer
 excerpt: A list of common dimensions of parts I use often, but forget
 cover: /assets/img/design/design.jpg
 tags:
- - Fusion 360
- - 3dprinting
- - Robots
+ - fusion_360
+ - 3d_printing
+ - robot
 groups:
  - electronics
  - 3dprinting

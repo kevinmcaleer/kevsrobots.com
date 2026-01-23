@@ -3,8 +3,6 @@ layout: content
 
 ---
 
-{% include nav_resources.html %}
-
 {% include breadcrumbs.html %}
 <h1>{{page.title}}</h1>
 <h2>{{page.subtitle}}</h2>
@@ -23,6 +21,8 @@ layout: content
 <hr />
 <div class="row">
     <div class="col col-lg-2 col-md-3 col-sm-4">
+        {% include learn_sidebar.html %}
+        <hr>
         {% include boards_sidenav.html %}
     </div>
     <div class="col col-lg-10 col-md-9 col-sm-8">

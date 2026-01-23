@@ -1,0 +1,31 @@
+# Development configuration overrides
+# Use with: bundle exec jekyll serve --config _config.yml,_config_dev.yml
+#
+# This config speeds up builds during local development by:
+# - Excluding slow Year in Review pages (~22 seconds saved)
+# - Limiting blog posts processed
+# - Enabling incremental builds
+
+# Exclude slow-building pages during development
+exclude:
+  - year_in_review/
+  - Gemfile
+  - Gemfile.lock
+
+# Only process recent blog posts (comment out to process all)
+# limit_posts: 20
+
+# Enable incremental builds (only rebuild changed files)
+# incremental: true
+
+# Disable LSI (related posts) which is slow
+lsi: false
+
+# Development-specific settings
+environment: development
+
+# Skip reading certain large data files during dev (optional - uncomment if needed)
+# Note: This will break pages that rely on this data
+# data_sources:
+#   exclude:
+#     - youtube.yml

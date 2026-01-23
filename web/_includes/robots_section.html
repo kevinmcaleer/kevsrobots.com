@@ -3,7 +3,7 @@
     <div class="row rol-cols-3 mx-1 flex-md-row-reverse">
         <div class="col-12 col-md-9 mx-0">
             {% assign articles = site.data.robots  %}
-            <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3">
+            <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 row-cols-lg-3 g-3 animate-on-scroll">
             {% for article in articles | limit:3 | sort:date | reverse %}
             {% if article.title != 'Robots' %}
 

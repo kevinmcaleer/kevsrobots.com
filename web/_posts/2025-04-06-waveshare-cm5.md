@@ -14,8 +14,8 @@ videos:
   - dppyMJERy00
 tags:
  - waveshare
- - compute module
- - raspberrypi
+ - compute_module
+ - raspberry_pi
 groups:
  - robots
  - raspberrypi

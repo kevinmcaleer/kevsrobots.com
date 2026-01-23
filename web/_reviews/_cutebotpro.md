@@ -7,6 +7,8 @@ excerpt: Several great improvements over the original Cutebot
 cover: /assets/img/reviews/cutebotpro.jpg
 link: 
 rating: 4.2
+manufacturer: Elecfreaks
+manufacturer_url: https://www.elecfreaks.com/
 ---
 
 Elecgreaks have recently released the Cutebot Pro, a more higher specification version of the original [cutebot](/reviews/cutebot) reviewed earlier in the year.

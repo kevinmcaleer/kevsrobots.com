@@ -5,7 +5,7 @@ layout: lesson
 type: page
 ---
 
-![BME280 Reading Data](/learn/i2c_spi/assets/bme280-reading.jpg){:class="img-fluid w-100"}
+<!-- ![BME280 Reading Data](/learn/i2c_spi/assets/bme280-reading.jpg){:class="img-fluid w-100"} -->
 
 ## Reading Real Sensor Data
 
@@ -552,10 +552,3 @@ You can now read real-world data from I2C sensors and use it in your projects. T
 ## What's Next
 
 You've successfully read sensor data, but how did you know which commands to send? How do you know what the numbers mean? The answer is in the **datasheet** - the sensor's instruction manual. In the next lesson, we'll demystify datasheets and learn to extract exactly what we need from these technical documents.
-
----
-
-> **Course Progress**: Lesson 4 of 12
->
-> **Previous**: [Scanning I2C Devices](/learn/i2c_spi/03_scanning-i2c-devices.html) |
-> **Next**: [Demystifying Datasheets](/learn/i2c_spi/05_demystifying-datasheets.html)

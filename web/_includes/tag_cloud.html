@@ -14,7 +14,7 @@
   {% for tag in sorted_tags  %}
   {% if count < 10 %}
   {% if tag[1].size > 2 %}
-  <a href="/tags#{{tag[0]}}" class="dotted"><span class="badge rounded-pill text-bg-secondary m-1">{{ tag[0] }} <span class="badge text-bg-light">{{tag[1] | size}}</span> </span></a>
+  <a href="/tags/{{ tag[0] | slugify }}/" class="dotted"><span class="badge rounded-pill text-bg-secondary m-1">{{ tag[0] }} <span class="badge text-bg-light">{{tag[1] | size}}</span> </span></a>
   {% assign count = count | plus: 1 %}
   {% endif %}
   {% endif %}

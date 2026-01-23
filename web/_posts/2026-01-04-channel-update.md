@@ -14,7 +14,7 @@ excerpt: >
 videos: 
  - iabj9TxSuvM
 tags:
- - Channel Update
+ - channel_update
 ---
 
 Hey Robot Makers!

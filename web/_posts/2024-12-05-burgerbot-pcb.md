@@ -13,7 +13,7 @@ cover: /projects/burgerbot/assets/img/cover.jpg
 hero:  /projects/burgerbot/assets/img/hero.png
 mode: light
 tags:
- - PCB
+ - pcb
 groups:
  - pcb
  - robots

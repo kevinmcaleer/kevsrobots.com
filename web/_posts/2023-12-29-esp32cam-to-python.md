@@ -12,11 +12,11 @@ groups:
     - robots
     - raspberrypi
 tags:
-    - OpenCV
-    - Computer Vision
+    - opencv
+    - computer_vision
     - esp32cam
-    - Python
-    - Raspberry Pi
+    - python
+    - raspberry_pi
 ---
 
 ![ESP32CAM](/assets/img/blog/esp32cam/cam01.jpg){:class="cover"}
