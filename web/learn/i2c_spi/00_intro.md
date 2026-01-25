@@ -19,7 +19,7 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
-    - name: Course Video - Working with I2C
+    - name: 'Video: Working with I2C'
       link: 13_course-video.html
   - section: Understanding I2C
     content:
