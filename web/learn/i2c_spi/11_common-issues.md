@@ -8,7 +8,7 @@ date: 2026-01-15
 previous: 10_i2c-vs-spi.html
 next: 12_final-project.html
 description: Learn how to diagnose and fix common I2C and SPI problems
-percent: 84
+percent: 91
 duration: 11
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -17,6 +17,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

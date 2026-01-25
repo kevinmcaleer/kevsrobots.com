@@ -9,7 +9,7 @@ previous: 08_spi-hardware-setup.html
 next: 10_i2c-vs-spi.html
 description: Build a complete temperature monitoring system using the MAX31855 thermocouple
   amplifier
-percent: 70
+percent: 77
 duration: 9
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -18,6 +18,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

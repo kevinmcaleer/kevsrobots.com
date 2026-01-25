@@ -9,7 +9,7 @@ previous: 06_bme280-deep-dive.html
 next: 08_spi-hardware-setup.html
 description: Learn about the SPI protocol, how it differs from I2C, and when to use
   it
-percent: 56
+percent: 63
 duration: 9
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -18,6 +18,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

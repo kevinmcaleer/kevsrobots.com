@@ -5,11 +5,11 @@ author: Kevin McAleer
 type: page
 cover: /learn/i2c_spi/assets/cover.jpg
 date: 2026-01-15
-previous: 00_intro.html
+previous: 13_course-video.html
 next: 02_i2c-hardware-setup.html
 description: Understand the I2C protocol, how it works, and why it's one of the most
   popular communication methods in electronics
-percent: 14
+percent: 21
 duration: 7
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -18,6 +18,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

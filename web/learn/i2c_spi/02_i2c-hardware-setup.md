@@ -9,7 +9,7 @@ previous: 01_what-is-i2c.html
 next: 03_scanning-i2c-devices.html
 description: Learn how to properly wire I2C devices with pull-up resistors and make
   reliable connections
-percent: 21
+percent: 28
 duration: 9
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -18,6 +18,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

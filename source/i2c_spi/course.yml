@@ -15,6 +15,7 @@
       name: Introduction
       content:
       - 00_intro.md
+      - 13_course-video.md
   - section:
       name: Understanding I2C
       content:

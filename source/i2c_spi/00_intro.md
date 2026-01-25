@@ -4,6 +4,8 @@ description: Learn how to make your Raspberry Pi Pico talk to sensors and device
 layout: lesson
 type: page
 cover: /learn/i2c_spi/assets/cover.jpg
+videos:
+  - lthSloWM3Fk
 ---
 
 ![Course Cover](/learn/i2c_spi/assets/cover.jpg){:class="cover"}

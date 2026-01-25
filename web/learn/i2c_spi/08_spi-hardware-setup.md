@@ -8,7 +8,7 @@ date: 2026-01-15
 previous: 07_what-is-spi.html
 next: 09_spi-sensor-example.html
 description: Learn how to wire SPI devices to your Raspberry Pi Pico with proper connections
-percent: 63
+percent: 70
 duration: 9
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -17,6 +17,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

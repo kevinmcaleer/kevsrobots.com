@@ -9,7 +9,7 @@ previous: 09_spi-sensor-example.html
 next: 11_common-issues.html
 description: Learn when to use I2C vs SPI for your projects with practical decision-making
   guidance
-percent: 77
+percent: 84
 duration: 9
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -18,6 +18,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

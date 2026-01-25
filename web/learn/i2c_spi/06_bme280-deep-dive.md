@@ -9,7 +9,7 @@ previous: 05_demystifying-datasheets.html
 next: 07_what-is-spi.html
 description: Explore advanced BME280 features including power modes, filtering, and
   optimization techniques
-percent: 49
+percent: 56
 duration: 9
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -18,6 +18,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

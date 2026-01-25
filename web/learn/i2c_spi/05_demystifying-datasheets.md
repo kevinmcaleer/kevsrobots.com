@@ -8,7 +8,7 @@ date: 2026-01-15
 previous: 04_reading-i2c-sensor.html
 next: 06_bme280-deep-dive.html
 description: Learn how to read and extract essential information from component datasheets
-percent: 42
+percent: 49
 duration: 11
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -17,6 +17,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

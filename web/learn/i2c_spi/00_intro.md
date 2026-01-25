@@ -5,11 +5,13 @@ author: Kevin McAleer
 type: page
 cover: /learn/i2c_spi/assets/cover.jpg
 date: 2026-01-15
-next: 01_what-is-i2c.html
+next: 13_course-video.html
 description: Learn how to make your Raspberry Pi Pico talk to sensors and devices
   using I2C and SPI protocols
 percent: 7
 duration: 5
+videos:
+- lthSloWM3Fk
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:
@@ -17,6 +19,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?

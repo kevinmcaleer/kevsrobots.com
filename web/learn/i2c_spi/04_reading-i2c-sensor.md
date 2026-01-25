@@ -9,7 +9,7 @@ previous: 03_scanning-i2c-devices.html
 next: 05_demystifying-datasheets.html
 description: Learn how to read temperature, humidity, and pressure data from the BME280
   sensor using I2C
-percent: 35
+percent: 42
 duration: 10
 navigation:
 - name: Talking to the World - Working with I2C and SPI
@@ -18,6 +18,8 @@ navigation:
     content:
     - name: Introduction to I2C and SPI Communication
       link: 00_intro.html
+    - name: Course Video - Working with I2C
+      link: 13_course-video.html
   - section: Understanding I2C
     content:
     - name: What is I2C?
