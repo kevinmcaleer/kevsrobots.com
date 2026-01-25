@@ -1,5 +1,7 @@
 {
     "git.ignoreLimitWarning": true,
     "cmake.configureOnOpen": false,
-    "claudeCodeChat.permissions.yoloMode": true
+    "claudeCodeChat.permissions.yoloMode": true,
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.pythonProjects": []
 }
