@@ -1,0 +1,53 @@
+- name: OpenClaw on Raspberry Pi
+  author: Kevin McAleer
+  date_created: 2026-01-31
+  date_published: 2026-01-31
+  layout: course
+  cover: assets/openclaw.jpg
+  description: >-
+    Learn how to set up and run OpenClaw, a powerful AI agent framework, on your Raspberry Pi using Docker. 
+    This course covers installation, configuration, management, and production best practices for running 
+    local AI agents on your own hardware.
+  groups:
+    - openclaw
+    - raspberry-pi
+    - docker
+    - ai
+  content:
+  - section:
+      name: Getting Started
+      content:
+      - 00_intro.md
+      - 01_what-is-openclaw.md
+      - 02_hardware-requirements.md
+      - 03_why-docker.md
+  - section:
+      name: Installation & Setup
+      content:
+      - 04_preparing-your-pi.md
+      - 05_installing-docker.md
+      - 06_docker-compose-setup.md
+      - 07_first-access.md
+  - section:
+      name: Configuration & Usage
+      content:
+      - 08_configuring-openclaw.md
+      - 09_first-agent.md
+      - 10_understanding-skills.md
+  - section:
+      name: Management & Troubleshooting
+      content:
+      - 11_managing-containers.md
+      - 12_monitoring-resources.md
+      - 13_troubleshooting.md
+  - section:
+      name: Advanced Topics
+      content:
+      - 14_security.md
+      - 15_backup-and-recovery.md
+      - 16_updates-and-upgrades.md
+      - 17_production-setup.md
+  - section:
+      name: Summary
+      content:
+      - 18_next-steps.md
