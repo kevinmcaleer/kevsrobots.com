@@ -4,11 +4,13 @@ description: >-
   Configure your Arduino Uno Q's WiFi using App Lab or the command line with ADB and nmcli. Two methods, one guide.
 excerpt: >-
   Get your Arduino Uno Q online using App Lab or the command line. This guide covers both methods for configuring WiFi over USB-C.
-layout: blog
+layout: showcase
+mode: light
 date: 2026-01-30
 author: Kevin McAleer
 difficulty: beginner
-cover: /assets/img/blog/arduino-uno-q-wifi/cover.jpg
+cover: /assets/img/blog/arduino_uno_q_wifi/cover.jpg
+hero: /assets/img/blog/arduino_uno_q_wifi/hero.png
 tags:
   - arduino
   - wifi

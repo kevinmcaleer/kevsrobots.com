@@ -65,6 +65,9 @@ stl:
   - name: "Pillars"
     link: "/projects/cubie-3/assets/stl/cubie-3_pillar.stl"
     comments: "4x required"
+  - name: "Shelf"
+    link: "/projects/cubie-3/assets/stl/cubie-3_shelf.stl"
+    comments: "1x required"
 previous: code
 ---
 
@@ -88,5 +91,6 @@ These are the:
 - Top Side Panel x2
 - Top
 - Pillar x4
+- Shelf x1
 
 ---
