@@ -1,4 +1,46 @@
+---
+layout: null
+permalink: /events.ics
+---
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:ics.py - http://git.io/lLljaA
+PRODID:-//KevsRobots.com//Maker Events Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:KevsRobots Maker Events
+X-WR-CALDESC:Maker faires, conferences, and events featuring KevsRobots
+{% comment %}
+Generate calendar events from events.yml
+Filter for confirmed/expected events only
+{% endcomment %}
+{% for event in site.data.events %}
+  {% if event.status == "confirmed" or event.status == "expected" %}
+    {% comment %}Format start and end dates{% endcomment %}
+    {% assign event_start = event.start | date: "%Y%m%d" %}
+    {% assign event_end = event.end | date: "%Y%m%d" %}
+
+    {% comment %}Calculate end date + 1 day for all-day events (ICS spec requirement){% endcomment %}
+    {% assign end_timestamp = event.end | date: "%s" | plus: 86400 %}
+    {% assign event_end_plus_one = end_timestamp | date: "%Y%m%d" %}
+
+    {% comment %}Generate unique event ID{% endcomment %}
+    {% assign event_slug = event.event | slugify %}
+    {% assign event_uid = event_slug | append: "-" | append: event_start %}
+    {% assign event_uid = event_uid | append: "@kevsrobots.com" %}
+BEGIN:VEVENT
+UID:{{ event_uid }}
+DTSTAMP:{{ site.time | date: "%Y%m%dT%H%M%SZ" }}
+DTSTART;VALUE=DATE:{{ event_start }}
+DTEND;VALUE=DATE:{{ event_end_plus_one }}
+SUMMARY:{{ event.event }}
+DESCRIPTION:{% if event.location %}Location: {{ event.location | uri_escape }}\n\n{% endif %}{% if event.link %}Event link: {{ event.link }}{% endif %}
+LOCATION:{% if event.location %}{{ event.location | uri_escape }}{% endif %}
+URL:{{ event.link }}
+STATUS:{% if event.status == "confirmed" %}CONFIRMED{% else %}TENTATIVE{% endif %}
+TRANSP:TRANSPARENT
+CATEGORIES:MAKER-EVENT,CONFERENCE
+SEQUENCE:0
+END:VEVENT
+  {% endif %}
+{% endfor %}
 END:VCALENDAR

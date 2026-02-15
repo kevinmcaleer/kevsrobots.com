@@ -27,6 +27,9 @@ plugins:
 # Environment-specific settings
 environment: production
 
+# Site timezone for events and schedules
+site_timezone: "Europe/London"
+
 webserver_headers:
   - - Access-Control-Allow-Origin
     - "*"

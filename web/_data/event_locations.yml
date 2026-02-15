@@ -1,0 +1,63 @@
+# Event Location Coordinates Lookup
+# Add latitude and longitude for event venues here
+# Used to auto-generate events.json for the event map
+
+locations:
+  "Cambridge, UK":
+    latitude: "52.2055314"
+    longitude: "0.1186637"
+
+  "Birmingham, UK":
+    latitude: "52.4796992"
+    longitude: "-1.9026911"
+
+  "NEC, Birmingham, UK":
+    latitude: "52.4538432"
+    longitude: "-1.7175497"
+
+  "Fiera Di Roma, Italy":
+    latitude: "41.8100197"
+    longitude: "12.3191269"
+
+  "Gazometro Ostiense, Italy":
+    latitude: "41.8695039"
+    longitude: "12.4746983"
+
+  "Rome, Italy":
+    latitude: "41.8933203"
+    longitude: "12.4829321"
+
+  "San Francisco, USA":
+    latitude: "37.7792588"
+    longitude: "-122.4193286"
+
+  "Liverpool, UK":
+    latitude: "53.4071991"
+    longitude: "-2.9916800"
+
+  "Manchester, UK":
+    latitude: "53.4794892"
+    longitude: "-2.2451148"
+
+  "The Dalton Building, Manchester, UK":
+    latitude: "53.4794892"
+    longitude: "-2.2451148"
+
+  "Eastnor Castle, UK":
+    latitude: "52.0297001"
+    longitude: "-2.3876173"
+
+  "University of Edinburgh, UK":
+    latitude: "55.9440764"
+    longitude: "-3.1883736"
+
+  "ExCeL, London, UK":
+    latitude: "51.5080373"
+    longitude: "0.0294017"
+
+# To add a new location:
+# "Location Name as it appears in events.yml":
+#   latitude: "XX.XXXXXXX"
+#   longitude: "XX.XXXXXXX"
+#
+# You can find coordinates using: https://www.latlong.net/

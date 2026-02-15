@@ -1,183 +1,26 @@
+---
+layout: null
+permalink: /events.json
+---
+{% comment %}
+Auto-generated events JSON for event map
+Pulls coordinates from event_locations.yml
+If location not found in event_locations.yml, coordinates are omitted
+{% endcomment %}
 [
-    {
-        "event": "CamJam Raspberry Pi Birthday Party 2024",
-        "start": "2024-03-02",
-        "end": "2024-03-02",
-        "location": "Cambridge, UK",
-        "link": "https://lu.ma/CamJamBirthday24",
-        "status": "closed",
-        "image": "/assets/img/events/camjam_2024.png",
-        "latitude": "52.2055314",
-        "longitude": "0.1186637"
-    },
-    {
-        "event": "Makers Central 2023",
-        "start": "2023-05-13",
-        "end": "2023-05-14",
-        "location": "Birmingham, UK",
-        "link": "https://www.makerscentral.co.uk/",
-        "status": "closed",
-        "image": "/assets/img/events/makers_central_2024.jpg",
-        "latitude": "52.4796992",
-        "longitude": "-1.9026911"
-    },
-    {
-        "event": "Raspberry Pi 5 Launch",
-        "start": "2023-09-21",
-        "end": "2023-09-22",
-        "location": "Cambridge, UK",
-        "link": "https://www.raspberrypi.com/",
-        "status": "closed",
-        "image": "/assets/img/events/raspberry_pi5.jpg",
-        "latitude": "52.2055314",
-        "longitude": "0.1186637"
-    },
-    {
-        "event": "Maker Faire Rome 2023",
-        "start": "2023-10-19",
-        "end": "2023-10-23",
-        "location": "Fiera Di Roma, Italy",
-        "link": "https://www.makerfairerome.eu/",
-        "status": "closed",
-        "image": "/assets/img/events/makerfairerome_2024.jpg",
-        "latitude": "41.8100197",
-        "longitude": "12.3191269"
-    },
-    {
-        "event": "Opensauce 2024",
-        "start": "2024-06-15",
-        "end": "2024-06-16",
-        "location": "San Francisco, USA",
-        "link": "https://www.opensauce.live/",
-        "status": "closed",
-        "image": "/assets/img/events/opensauce_2024.jpg",
-        "latitude": "37.7792588",
-        "longitude": "-122.4193286"
-    },
-    {
-        "event": "Liverpool Makefest 2024",
-        "start": "2024-07-06",
-        "end": "2024-07-06",
-        "location": "Liverpool, UK",
-        "link": "https://liverpoolmakefest.org/",
-        "status": "closed",
-        "image": "/assets/img/events/liverpoolmakefest_2024.jpg",
-        "latitude": "53.4071991",
-        "longitude": "-2.9916800"
-    },
-    {
-        "event": "Maker Faire Rome 2024",
-        "start": "2024-10-25",
-        "end": "2024-10-27",
-        "location": "Gazometro Ostiense, Italy",
-        "link": "https://www.makerfairerome.eu/",
-        "status": "closed",
-        "image": "/assets/img/events/makerfairerome_2024.jpg",
-        "latitude": "41.8695039",
-        "longitude": "12.4746983"
-    },
-    {
-        "event": "Makers Central 2024",
-        "start": "2024-05-18",
-        "end": "2024-05-19",
-        "location": "Birmingham, UK",
-        "link": "https://www.makerscentral.co.uk/",
-        "status": "closed",
-        "image": "/assets/img/events/makers_central_2024.jpg",
-        "latitude": "52.4796992",
-        "longitude": "-1.9026911"
-    },
-    {
-        "event": "SMRRF 2024",
-        "start": "2024-12-07",
-        "end": "2024-12-08",
-        "location": "Manchester, UK",
-        "link": "https://www.sanjaymortimerfoundation.org/smrrf24",
-        "status": "closed",
-        "image": "/assets/img/events/smrrf_2024.jpg",
-        "latitude": "53.4794892",
-        "longitude": "-2.2451148"
-    },
-    {
-        "event": "Pi Wars 2024",
-        "start": "2024-04-20",
-        "end": "2024-04-21",
-        "location": "Cambridge, UK",
-        "link": "https://www.piwars.org/",
-        "status": "closed",
-        "image": "/assets/img/events/piwars_2024.jpg",
-        "latitude": "52.2055314",
-        "longitude": "0.1186637"
-    },
-    {
-        "event": "EMFCamp 2024",
-        "start": "2024-05-30",
-        "end": "2024-06-02",
-        "location": "Eastnor Castle, UK",
-        "link": "https://www.emfcamp.org/",
-        "status": "closed",
-        "image": "/assets/img/events/emfcamp2024.jpg",
-        "latitude": "52.0297001",
-        "longitude": "-2.3876173"
-    },
-    {
-        "event": "Open Hardware Summit 2025",
-        "start": "2025-05-30",
-        "end": "2025-05-31",
-        "location": "University of Edinburgh, UK",
-        "link": "https://2025.oshwa.org/",
-        "status": "confirmed",
-        "latitude": "55.9440764",
-        "longitude": "-3.1883736"
-    },
-    {
-        "event": "Open Sauce 2025",
-        "start": "2025-07-18",
-        "end": "2025-07-20",
-        "location": "San Francisco, USA",
-        "link": "https://www.opensauce.com",
-        "status": "confirmed",
-        "latitude": "37.7792588",
-        "longitude": "-122.4193286"
-    },
-    {
-        "event": "Makers Central 2025",
-        "start": "2025-05-17",
-        "end": "2025-05-18",
-        "location": "NEC, Birmingham, UK",
-        "link": "https://www.makerscentral.co.uk",
-        "status": "confirmed",
-        "latitude": "52.4538432",
-        "longitude": "-1.7175497"
-    },
-    {
-        "event": "Makers Faire Rome 2025",
-        "start": "2025-10-17",
-        "end": "2025-10-19",
-        "location": "Rome, Italy",
-        "link": "https://www.makerfairerome.eu",
-        "status": "expected",
-        "latitude": "41.8933203",
-        "longitude": "12.4829321"
-    },
-    {
-        "event": "CamJam Raspberry Pi Birthday Party 2025",
-        "start": "2025-03-01",
-        "end": "2025-03-01",
-        "location": "Cambridge, UK",
-        "link": "https://camjam.me/",
-        "status": "confirmed",
-        "latitude": "52.2055314",
-        "longitude": "0.1186637"
-    },
-    {
-        "event": "Liverpool Makefest 2025",
-        "link": "https://liverpoolmakefest.org/",
-        "start": "2025-07-05",
-        "end": "2025-07-05",
-        "location": "Liverpool, UK",
-        "status": "confirmed",
-        "latitude": "53.4071991",
-        "longitude": "-2.9916800"
-    }
+{% for event in site.data.events %}
+  {
+    "event": "{{ event.event }}",
+    "start": "{{ event.start }}",
+    "end": "{{ event.end }}",
+    "location": "{{ event.location }}",
+    "link": "{{ event.link }}",
+    "status": "{{ event.status }}"{% if event.image %},
+    "image": "{{ event.image }}"{% endif %}{% comment %}
+    Include coordinates if location exists in event_locations.yml
+    {% endcomment %}{% if site.data.event_locations.locations[event.location] %},
+    "latitude": "{{ site.data.event_locations.locations[event.location].latitude }}",
+    "longitude": "{{ site.data.event_locations.locations[event.location].longitude }}"{% endif %}
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
 ]

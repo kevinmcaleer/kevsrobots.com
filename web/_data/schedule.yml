@@ -1,0 +1,51 @@
+# Show Schedule for KevsRobots.com
+# Update this file to manage your regular show schedule
+# Times are in 24-hour format (HH:MM)
+# Timezone: Europe/London (GMT/BST)
+
+- name: "Robotlab Hangout Live"
+  description: "Join Kevin for a live hangout discussing robotics, maker projects, and answering your questions"
+  frequency: "Monthly - First Sunday"
+  time: "19:00"
+  duration: "1h"
+  timezone: "Europe/London"
+  youtube_channel: "https://www.youtube.com/@kevinmcaleer28"
+  status: "active"
+  category: "livestream"
+  next_dates:
+    - "2026-03-01"
+    - "2026-04-05"
+    - "2026-05-03"
+    - "2026-06-07"
+    - "2026-07-05"
+    - "2026-08-02"
+- name: "Code to Creation Series"
+  description: "Step-by-step coding tutorials for building your own robots and maker projects"
+  frequency: "Fortnightly - Sundays"
+  time: "19:00"
+  duration: "20m"
+  timezone: "Europe/London"
+  youtube_channel: "https://www.youtube.com/@kevinmcaleer28"
+  status: "active"
+  category: "tutorial"
+  next_dates:
+    - "2026-02-22"
+    - "2026-03-08"
+    - "2026-03-22"
+    - "2026-04-05"
+    - "2026-04-19"
+# Add more shows here as needed
+# Example:
+# - name: "Build Along Session"
+#   description: "Live robot building session - bring your project and build together"
+#   frequency: "Weekly - Thursdays"
+#   time: "19:00"
+#   duration: "1h 30m"
+#   timezone: "Europe/London"
+#   youtube_channel: "https://www.youtube.com/@kevinmcaleer28"
+#   status: "active"
+#   category: "livestream"
+#   next_dates:
+#     - "2026-02-20"
+#     - "2026-02-27"
+#     - "2026-03-06"

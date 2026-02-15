@@ -102,7 +102,7 @@
 - event: SMRRF 2026
   start: "2026-03-07"
   end: "2026-03-08"
-  location: "The Dalton Building, Manchester, Uk"
+  location: "The Dalton Building, Manchester, UK"
   link: https://www.sanjaymortimerfoundation.org/smrrf25
   status: expected
 - event: CamJam Raspberry Pi Birthday Party 2025
@@ -116,4 +116,16 @@
   start: "2025-07-05"
   end: "2025-07-05"
   location: "Liverpool, UK"
+  status: confirmed
+- event: Bett 2026
+  start: "2026-01-29"
+  end: "2026-02-01"
+  location: "ExCeL, London, UK"
+  link: https://www.bettshow.com/
+  status: closed
+- event: OpenSauce 2026
+  start: "2026-07-17"
+  end: "2026-07-19"
+  link: https://www.opensauce.com
+  location: "San Francisco, USA"
   status: confirmed

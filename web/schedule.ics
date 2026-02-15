@@ -1,0 +1,87 @@
+---
+layout: null
+permalink: /schedule.ics
+---
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//KevsRobots.com//Show Schedule//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:KevsRobots Show Schedule
+X-WR-TIMEZONE:{{ site.site_timezone }}
+X-WR-CALDESC:Livestream schedule for KevsRobots maker shows and hangouts
+{% for show in site.data.schedule %}
+  {% if show.status == "active" %}
+    {% for date in show.next_dates %}
+      {% comment %}Format date and time{% endcomment %}
+      {% assign show_date = date | date: "%Y%m%d" %}
+      {% assign show_time = show.time | replace: ":", "" %}
+
+      {% comment %}Parse duration - handle "2h", "30m", or "1h 30m" formats{% endcomment %}
+      {% if show.duration contains "h" %}
+        {% assign duration_parts = show.duration | split: "h" %}
+        {% assign hours_part = duration_parts[0] | strip | times: 60 %}
+        {% if duration_parts[1] contains "m" %}
+          {% assign mins_part = duration_parts[1] | split: "m" | first | strip | times: 1 %}
+        {% else %}
+          {% assign mins_part = 0 %}
+        {% endif %}
+        {% assign total_minutes = hours_part | plus: mins_part %}
+      {% else %}
+        {% assign total_minutes = show.duration | split: "m" | first | strip | times: 1 %}
+      {% endif %}
+
+      {% comment %}Calculate end time{% endcomment %}
+      {% assign end_time_calc = show.time | split: ":" %}
+      {% assign start_hour = end_time_calc[0] | times: 60 %}
+      {% assign start_min = end_time_calc[1] | times: 1 %}
+      {% assign end_total = start_hour | plus: start_min | plus: total_minutes %}
+      {% assign end_hour = end_total | divided_by: 60 | modulo: 24 %}
+      {% assign end_min = end_total | modulo: 60 %}
+
+      {% comment %}Format end time with leading zeros{% endcomment %}
+      {% if end_hour < 10 %}
+        {% assign end_hour_str = "0" | append: end_hour %}
+      {% else %}
+        {% assign end_hour_str = end_hour | append: "" %}
+      {% endif %}
+      {% if end_min < 10 %}
+        {% assign end_min_str = "0" | append: end_min %}
+      {% else %}
+        {% assign end_min_str = end_min | append: "" %}
+      {% endif %}
+      {% assign end_time = end_hour_str | append: end_min_str %}
+BEGIN:VEVENT
+UID:{{ show.name | slugify }}-{{ date | date: "%Y%m%d" }}@kevsrobots.com
+DTSTAMP:{{ site.time | date: "%Y%m%dT%H%M%SZ" }}
+DTSTART;TZID={{ site.site_timezone }}:{{ show_date }}T{{ show_time }}00
+DTEND;TZID={{ site.site_timezone }}:{{ show_date }}T{{ end_time }}00
+SUMMARY:{{ show.name }}
+DESCRIPTION:{{ show.description | strip_html | uri_escape }}{% if show.youtube_channel %}\n\nWatch live: {{ show.youtube_channel }}{% endif %}
+LOCATION:{{ show.youtube_channel }}
+CATEGORIES:{{ show.category | upcase }}
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+SEQUENCE:0
+END:VEVENT
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+BEGIN:VTIMEZONE
+TZID:{{ site.site_timezone }}
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0000
+TZOFFSETTO:+0100
+TZNAME:BST
+DTSTART:19700329T010000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0000
+TZNAME:GMT
+DTSTART:19701025T020000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+END:VCALENDAR
