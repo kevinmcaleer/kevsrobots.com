@@ -17,6 +17,8 @@ cover: /assets/img/events.jpg
 
 {% include events_widget.html limit=5 %}
 
+{% include events.html year="2026" %}
+
 {% include events.html year="2025" %}
 
 {% include events.html year="2024" %}

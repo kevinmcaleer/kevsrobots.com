@@ -63,8 +63,8 @@ Here's what's coming over the next few weeks:
 
 | Episode | Title                                                  | Topic                 |
 |---------|--------------------------------------------------------|-----------------------|
-| 1       | Talking to the World - Working with I2C and SPI        | I2C and SPI protocols |
-| 2       | Adding a Display - OLED Screens with MicroPython       | SSD1306 OLED          |
+| 1       | [Talking to the World - Working with I2C and SPI](/learn/i2c_spi/)        | I2C and SPI protocols |
+| 2       | [Adding a Display - OLED Screens with MicroPython](/blog/micropython-oled-displays/)       | SSD1306 OLED          |
 | 3       | Going Wireless - WiFi and Web Servers on Pico W        | WiFi & web servers    |
 | 4       | Saving Your Data - Files, JSON, and Data Logging       | Data logging          |
 | 5       | Smooth Moves - PWM, Servos, and Motor Control          | Motor control         |
