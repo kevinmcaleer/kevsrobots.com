@@ -5,8 +5,15 @@ title: Search Results
 {% include breadcrumbs.html %}
     <h1>Search Results</h1>
     <h2>Find articles, tutorials, how it works, projects, ideas and more.</h2>
-    <p id="search-query-display">Showing Results for: <span id="search-query"></span><br />
-    About <span id="total_count"></span> results (<span id="search-time"></span>)</p>
+
+    <form class="mb-3" onsubmit="performSearch(event)">
+        <div class="input-group">
+            <input class="form-control" id="search-box" type="search" placeholder="watcha lookin for?" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </div>
+    </form>
+
+    <p id="search-query-display">About <span id="total_count"></span> results (<span id="search-time"></span>)</p>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="btn-group" role="group" aria-label="Sort results" id="sort-toggle">
@@ -305,6 +312,21 @@ title: Search Results
             });
     }
 
+    // --- Search box ---
+    function performSearch(event) {
+        event.preventDefault();
+        var query = document.getElementById('search-box').value;
+        if (!query) return;
+        // Reset filters on new search
+        activeFilters.clear();
+        var url = new URL(window.location);
+        url.searchParams.set('query', query);
+        url.searchParams.set('page', '1');
+        url.searchParams.delete('page_types');
+        window.history.pushState({}, '', url);
+        fetchResults(query, 1, url.searchParams.get('sort') || 'relevance');
+    }
+
     // --- Init ---
     document.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
@@ -313,6 +335,11 @@ title: Search Results
         var sort = urlParams.get('sort') || 'relevance';
         var pageTypesParam = urlParams.get('page_types');
 
+        // Pre-fill search box with current query
+        if (query) {
+            document.getElementById('search-box').value = query;
+        }
+
         // Restore active filters from URL
         if (pageTypesParam) {
             var rawTypes = pageTypesParam.split(',').map(function(t) { return t.trim(); });
@@ -320,13 +347,6 @@ title: Search Results
                 var group = normalizeType(rt);
                 activeFilters.add(group);
             });
-        }
-
-        // Set the search query in the "Showing Results for" section
-        if (query) {
-            document.getElementById('search-query').textContent = query;
-        } else {
-            document.getElementById('search-query-display').textContent = 'Showing All Results';
         }
 
         // Set active sort button
