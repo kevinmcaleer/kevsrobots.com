@@ -68,6 +68,11 @@ def parse_html_file(file_path):
         page_type_tag = soup.find('meta', {'property': 'page-type'})
         page_type = page_type_tag['content'].strip() if page_type_tag and 'content' in page_type_tag.attrs else 'page'
 
+        # Skip utility/infrastructure pages that pollute search results
+        EXCLUDED_TYPES = {'content', 'default', 'home', 'blog_index', 'store', 'tag'}
+        if page_type in EXCLUDED_TYPES:
+            return 'skipped'
+
         h1_tag = soup.find('h1')
         # page_title = h1_tag.get_text().strip() if h1_tag else 'Untitled Page'
         page_title = title
@@ -82,6 +87,7 @@ def main():
     total_files = 0
     processed_files = 0
     skipped_files = 0
+    error_files = 0
 
     print("Scanning for HTML files...")
 
@@ -100,19 +106,22 @@ def main():
         if i % 100 == 0:
             print(f"Progress: {i}/{total_files} files processed...")
 
-        success = parse_html_file(file_path)
-        if success:
+        result = parse_html_file(file_path)
+        if result == 'skipped':
+            skipped_files += 1
+        elif result:
             processed_files += 1
         else:
-            skipped_files += 1
+            error_files += 1
 
     print(f"\n{'='*60}")
     print(f"Indexing Summary:")
     print(f"  Total HTML files: {total_files}")
     print(f"  Successfully indexed: {processed_files}")
-    print(f"  Skipped (errors): {skipped_files}")
-    if skipped_files > 0:
-        print(f"\n  Note: {skipped_files} files had encoding or parsing errors")
+    print(f"  Skipped (utility pages): {skipped_files}")
+    print(f"  Errors: {error_files}")
+    if error_files > 0:
+        print(f"\n  Note: {error_files} files had encoding or parsing errors")
         print(f"        Check warnings above for details")
     print(f"{'='*60}\n")
 
