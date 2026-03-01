@@ -71,7 +71,7 @@ def create_document(title: str, content: str, url: str):
     return {"message": "Document created successfully"}
 
 @app.get("/search/")
-async def search_documents(request: Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10, sort: Optional[str] = "relevance", page_types: Optional[str] = None):
+async def search_documents(request: Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10, sort: Optional[str] = "relevance", page_types: Optional[str] = None, prefix: Optional[bool] = False):
     """
     Search documents endpoint with PostgreSQL query logging.
 
@@ -82,6 +82,7 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
         page_size: Number of results per page (default: 10)
         sort: Sort order — "relevance" (BM25) or "recent" (date descending)
         page_types: Comma-separated page types to filter by (e.g. "lesson,blog")
+        prefix: If true, use prefix matching (e.g. "dock" matches "docker")
 
     Returns:
         dict: Search results with metadata and execution time
@@ -104,8 +105,8 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
 
     # Execute search query
     try:
-        results = query_documents(query, offset=(page - 1) * page_size, limit=page_size, sort=sort, page_types=type_filter)
-        total_count = total_results(query, page_types=type_filter)
+        results = query_documents(query, offset=(page - 1) * page_size, limit=page_size, sort=sort, page_types=type_filter, prefix=prefix)
+        total_count = total_results(query, page_types=type_filter, prefix=prefix)
         facets = get_facet_counts(query)
     except Exception as e:
         print(f"Search query failed: {e}")

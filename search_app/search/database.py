@@ -63,6 +63,28 @@ def sanitize_fts5_query(query):
     return sanitized.strip()
 
 
+def sanitize_fts5_query_prefix(query):
+    """Sanitize a user query and append * to each term for prefix matching.
+
+    E.g. "dock" → "dock*" matches "docker", "dockerfile", etc.
+    Quoted phrases are left intact (no prefix appended inside quotes).
+    Returns None if the query is empty after sanitization.
+    """
+    sanitized = sanitize_fts5_query(query)
+    if sanitized is None:
+        return None
+
+    # Split on quoted phrases vs bare terms, prefix only bare terms
+    parts = re.findall(r'"[^"]*"|\S+', sanitized)
+    prefixed = []
+    for part in parts:
+        if part.startswith('"'):
+            prefixed.append(part)
+        else:
+            prefixed.append(part + '*')
+    return ' '.join(prefixed)
+
+
 def get_facet_counts(query):
     """Return {page_type: count} for all matching documents, ignoring any type filter."""
     sanitized = sanitize_fts5_query(query)
@@ -95,8 +117,8 @@ def _build_type_filter(page_types):
     return f' AND page_type IN ({placeholders})', list(page_types)
 
 
-def total_results(query, page_types=None):
-    sanitized = sanitize_fts5_query(query)
+def total_results(query, page_types=None, prefix=False):
+    sanitized = (sanitize_fts5_query_prefix if prefix else sanitize_fts5_query)(query)
     if sanitized is None:
         return 0
 
@@ -121,7 +143,7 @@ def total_results(query, page_types=None):
         return 0
 
 
-def query_documents(query, offset: int = None, limit: int = None, sort: str = "relevance", page_types=None):
+def query_documents(query, offset: int = None, limit: int = None, sort: str = "relevance", page_types=None, prefix=False):
     """Query the documents table for the given query string.
 
     Args:
@@ -130,13 +152,14 @@ def query_documents(query, offset: int = None, limit: int = None, sort: str = "r
         limit: Maximum number of results to return.
         sort: "relevance" for BM25 ranking, "recent" for date descending.
         page_types: Optional list of page_type values to filter by.
+        prefix: If True, use prefix matching (e.g. "dock" matches "docker").
     """
     if offset is None:
         offset = 0
     if limit is None:
         limit = 10
 
-    sanitized = sanitize_fts5_query(query)
+    sanitized = (sanitize_fts5_query_prefix if prefix else sanitize_fts5_query)(query)
     if sanitized is None:
         return []
 

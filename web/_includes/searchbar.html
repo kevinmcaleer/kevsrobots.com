@@ -6,4 +6,216 @@
         window.location.href = '/search-results.html?query=' + encodeURIComponent(query) + '&page=1';
     }
     </script>
-    
+
+<style>
+.search-autocomplete {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.15);
+    border-top: none;
+    border-radius: 0 0 .375rem .375rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.search-autocomplete .list-group-item {
+    border-left: none;
+    border-right: none;
+    padding: .5rem .75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.search-autocomplete .list-group-item:first-child {
+    border-top: none;
+}
+.search-autocomplete .list-group-item:hover,
+.search-autocomplete .list-group-item.ac-active {
+    background-color: #f0f0f0;
+}
+.search-autocomplete .ac-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: .9rem;
+    color: #212529;
+}
+.search-autocomplete .ac-type {
+    font-size: .7rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.search-autocomplete .ac-viewall {
+    text-align: center;
+    font-size: .85rem;
+    padding: .5rem;
+    border-top: 1px solid rgba(0,0,0,.1);
+    color: #0d6efd;
+    cursor: pointer;
+}
+.search-autocomplete .ac-viewall:hover {
+    background-color: #f0f0f0;
+}
+</style>
+
+<script>
+(function() {
+    var DEBOUNCE_MS = 300;
+    var MIN_CHARS = 2;
+    var API_BASE = 'https://search.kevsrobots.com';
+
+    function initAutocomplete(inputId) {
+        var input = document.getElementById(inputId);
+        if (!input) return;
+
+        var inputGroup = input.closest('.input-group');
+        if (!inputGroup) return;
+
+        // Wrap the input-group in a position:relative container
+        var wrapper = inputGroup.parentElement;
+        if (getComputedStyle(wrapper).position === 'static') {
+            wrapper.style.position = 'relative';
+        }
+
+        // Create dropdown
+        var dropdown = document.createElement('div');
+        dropdown.className = 'search-autocomplete list-group';
+        wrapper.appendChild(dropdown);
+
+        var debounceTimer = null;
+        var controller = null;
+        var activeIndex = -1;
+        var items = [];
+        var currentQuery = '';
+
+        function showDropdown() {
+            if (items.length > 0) dropdown.style.display = 'block';
+        }
+        function hideDropdown() {
+            dropdown.style.display = 'none';
+            activeIndex = -1;
+            updateHighlight();
+        }
+        function updateHighlight() {
+            var els = dropdown.querySelectorAll('.list-group-item');
+            els.forEach(function(el, i) {
+                el.classList.toggle('ac-active', i === activeIndex);
+            });
+        }
+
+        function renderResults(results, query) {
+            items = results;
+            dropdown.innerHTML = '';
+            if (!results || results.length === 0) {
+                hideDropdown();
+                return;
+            }
+
+            results.forEach(function(r, i) {
+                var a = document.createElement('a');
+                a.className = 'list-group-item list-group-item-action';
+                a.href = r.url;
+
+                var title = document.createElement('span');
+                title.className = 'ac-title';
+                title.textContent = r.page_title || r.description || 'Untitled';
+
+                var badge = document.createElement('span');
+                badge.className = 'badge ac-type';
+                var t = r.page_type || 'page';
+                if (t === 'lesson') { badge.classList.add('bg-primary'); badge.textContent = 'Course'; }
+                else if (t === 'blog') { badge.classList.add('bg-success'); badge.textContent = 'Blog'; }
+                else if (t === 'glossary') { badge.classList.add('bg-warning', 'text-dark'); badge.textContent = 'Glossary'; }
+                else { badge.classList.add('bg-secondary'); badge.textContent = t.charAt(0).toUpperCase() + t.slice(1); }
+
+                a.appendChild(title);
+                a.appendChild(badge);
+                dropdown.appendChild(a);
+            });
+
+            // "View all results" link
+            var viewAll = document.createElement('div');
+            viewAll.className = 'ac-viewall';
+            viewAll.innerHTML = 'View all results &rarr;';
+            viewAll.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                window.location.href = '/search-results.html?query=' + encodeURIComponent(query) + '&page=1';
+            });
+            dropdown.appendChild(viewAll);
+
+            activeIndex = -1;
+            showDropdown();
+        }
+
+        function fetchSuggestions(query) {
+            if (controller) controller.abort();
+            controller = new AbortController();
+
+            var url = API_BASE + '/search/?query=' + encodeURIComponent(query) + '&page_size=5&prefix=true';
+            fetch(url, { signal: controller.signal })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    currentQuery = query;
+                    renderResults(data.results || [], query);
+                })
+                .catch(function(err) {
+                    if (err.name !== 'AbortError') console.error('Autocomplete error:', err);
+                });
+        }
+
+        input.addEventListener('input', function() {
+            var val = input.value.trim();
+            clearTimeout(debounceTimer);
+            if (val.length < MIN_CHARS) {
+                hideDropdown();
+                if (controller) controller.abort();
+                return;
+            }
+            debounceTimer = setTimeout(function() { fetchSuggestions(val); }, DEBOUNCE_MS);
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (dropdown.style.display === 'none') return;
+            var visibleItems = dropdown.querySelectorAll('.list-group-item');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeIndex = Math.min(activeIndex + 1, visibleItems.length - 1);
+                updateHighlight();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeIndex = Math.max(activeIndex - 1, -1);
+                updateHighlight();
+            } else if (e.key === 'Enter') {
+                if (activeIndex >= 0 && activeIndex < visibleItems.length) {
+                    e.preventDefault();
+                    visibleItems[activeIndex].click();
+                }
+                // If nothing highlighted, let the form submit normally
+                hideDropdown();
+            } else if (e.key === 'Escape') {
+                hideDropdown();
+            }
+        });
+
+        input.addEventListener('focus', function() {
+            if (items.length > 0 && input.value.trim().length >= MIN_CHARS) showDropdown();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!wrapper.contains(e.target)) hideDropdown();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initAutocomplete('search-box');
+        initAutocomplete('results-search-box');
+    });
+})();
+</script>
