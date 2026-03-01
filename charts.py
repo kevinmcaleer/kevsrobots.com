@@ -90,7 +90,7 @@ courses['date'] = pd.to_datetime(courses['date_published'])
 
 def produce_courses(year):
     # Create a DataFrame for all months of the year
-    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='M').strftime('%b')})
+    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='ME').strftime('%b')})
 
     courses_filtered = courses[courses['date'].dt.year == year]
     monthly_courses = courses_filtered.groupby(courses_filtered['date'].dt.to_period('M'))['name'].agg(['count', lambda x: ', '.join(x)]).reset_index()
@@ -135,7 +135,7 @@ def produce_courses(year):
 
 def produce_reviews(year):
     # Create a DataFrame for all months of the year
-    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='M').strftime('%b')})
+    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='ME').strftime('%b')})
 
     reviews_filtered = reviews[reviews['date'].dt.year == year]
     monthly_reviews = reviews_filtered.groupby(reviews_filtered['date'].dt.to_period('M'))['title'].agg(['count', lambda x: ', '.join(x)]).reset_index()
@@ -175,7 +175,7 @@ def produce_reviews(year):
 
 def produce_posts(year):
     # Create a DataFrame for all months of the year
-    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='M').strftime('%b')})
+    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='ME').strftime('%b')})
 
     posts_filtered = posts[posts['date'].dt.year == year]
     monthly_posts = posts_filtered.groupby(posts_filtered['date'].dt.to_period('M'))['title'].agg(['count', lambda x: ', '.join(x)]).reset_index()
@@ -214,7 +214,7 @@ def produce_posts(year):
 
 def produce_projects(year):
     # Create a DataFrame for all months of the year
-    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='M').strftime('%b')})
+    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='ME').strftime('%b')})
 
     projects_filtered = projects[projects['date'].dt.year == year]
     monthly_projects = projects_filtered.groupby(projects_filtered['date'].dt.to_period('M'))['name'].agg(['count', lambda x: ', '.join(x)]).reset_index()
@@ -255,7 +255,7 @@ def produce_projects(year):
 def produce_videos(year):
     
     # Create a DataFrame for all months of the year
-    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='M').strftime('%b')})
+    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='ME').strftime('%b')})
 
     videos_filtered = videos[videos['date'].dt.year == year]
     monthly_videos = videos_filtered.groupby(videos_filtered['date'].dt.to_period('M'))['title'].agg(['count', lambda x: ', '.join(x)]).reset_index()
@@ -303,7 +303,7 @@ def produce_charts(year):
 
 def produce_robots(year):
     # Create a DataFrame for all months of the year
-    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='M').strftime('%b')})
+    all_months = pd.DataFrame({'Month': pd.date_range(start=f'{year}-01-01', end=f'{year}-12-31', freq='ME').strftime('%b')})
 
     robots_filtered = robots[robots['date'].dt.year == year]
     monthly_robots = robots_filtered.groupby(robots_filtered['date'].dt.to_period('M'))['name'].agg(['count', lambda x: ', '.join(x)]).reset_index()

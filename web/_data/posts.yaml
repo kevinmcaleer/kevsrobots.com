@@ -125,6 +125,9 @@ posts:
 - title: Operation Pico
   url: /2025-01-11-operation-pico.md
   date: 2025-01-11
+- title: 'From Code to Create Part 2: Adding OLED Displays with MicroPython'
+  url: /2026-02-22-micropython-oled-displays.md
+  date: 2026-02-22
 - title: How to Keep your Raspberry Pi happy
   url: /2025-08-30-pi_maintenance.md
   date: 2025-08-30
@@ -173,6 +176,9 @@ posts:
 - title: SMARS
   url: /2023-09-10-smars.md
   date: 2023-09-10
+- title: How to Set Up WiFi on the Arduino Uno Q
+  url: /2026-01-30-arduino-uno-q-wifi-setup.md
+  date: 2026-01-30
 - title: Retro Arcade
   url: /2023-06-14-retro-arcade.md
   date: 2023-07-02
@@ -333,6 +339,9 @@ posts:
 - title: SMARS Lab upgrade with PyCharm
   url: /2025-03-14-pycharm.md
   date: 2025-03-14
+- title: From Code to Creation - New Video Series
+  url: /2026-01-25-from-code-to-creation.md
+  date: 2026-01-25
 - title: Waveshare CM5 boards
   url: /2025-04-06-waveshare-cm5.md
   date: 2025-04-06
