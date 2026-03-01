@@ -1,7 +1,7 @@
 ---
 title: Servo Holders
 description: Print the servo holder parts
-layout: lesson 
+layout: lesson
 ---
 
 ## 2 Print the Servo Holders

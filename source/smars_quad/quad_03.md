@@ -1,7 +1,7 @@
 ---
 title: Fit the servos
 description: Fit the servos into the servo holder
-layout: lesson 
+layout: lesson
 ---
 
 ## 3 Fit the servo into the servo holder

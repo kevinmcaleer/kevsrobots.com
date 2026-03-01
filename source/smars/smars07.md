@@ -1,7 +1,7 @@
 ---
 title: Test Motors
 description: Test Motors to ensure they work ok
-layout: lesson 
+layout: lesson
 ---
 
 ## Test Motors

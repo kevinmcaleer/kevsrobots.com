@@ -60,7 +60,7 @@ def parse_html_file(file_path):
             cover_image = cover_image.replace(".com//",".com/")
 
         page_type_tag = soup.find('meta', {'property': 'page-type'})
-        page_type = page_type_tag['content'] if page_type_tag and 'content' in page_type_tag.attrs else 'page'
+        page_type = page_type_tag['content'].strip() if page_type_tag and 'content' in page_type_tag.attrs else 'page'
 
         h1_tag = soup.find('h1')
         # page_title = h1_tag.get_text().strip() if h1_tag else 'Untitled Page'

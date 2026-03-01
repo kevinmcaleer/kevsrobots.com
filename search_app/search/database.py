@@ -62,7 +62,39 @@ def sanitize_fts5_query(query):
     return sanitized.strip()
 
 
-def total_results(query):
+def get_facet_counts(query):
+    """Return {page_type: count} for all matching documents, ignoring any type filter."""
+    sanitized = sanitize_fts5_query(query)
+    if sanitized is None:
+        return {}
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            '''SELECT page_type, COUNT(*) as cnt
+               FROM documents_fts
+               WHERE documents_fts MATCH ?
+               GROUP BY page_type''',
+            (sanitized,),
+        )
+        facets = {row['page_type']: row['cnt'] for row in cursor.fetchall()}
+        conn.close()
+        return facets
+    except Exception as e:
+        print(f"Error getting facet counts: {e}")
+        return {}
+
+
+def _build_type_filter(page_types):
+    """Build a SQL clause and params for filtering by page_type list."""
+    if not page_types:
+        return '', []
+    placeholders = ','.join('?' for _ in page_types)
+    return f' AND page_type IN ({placeholders})', list(page_types)
+
+
+def total_results(query, page_types=None):
     sanitized = sanitize_fts5_query(query)
     if sanitized is None:
         return 0
@@ -71,12 +103,14 @@ def total_results(query):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        count_query = '''
+        type_clause, type_params = _build_type_filter(page_types)
+
+        count_query = f'''
             SELECT COUNT(*) FROM documents_fts
-            WHERE documents_fts MATCH ?
+            WHERE documents_fts MATCH ?{type_clause}
         '''
 
-        cursor.execute(count_query, (sanitized,))
+        cursor.execute(count_query, [sanitized] + type_params)
         total_count = cursor.fetchone()[0]
 
         conn.close()
@@ -86,7 +120,7 @@ def total_results(query):
         return 0
 
 
-def query_documents(query, offset: int = None, limit: int = None, sort: str = "relevance"):
+def query_documents(query, offset: int = None, limit: int = None, sort: str = "relevance", page_types=None):
     """Query the documents table for the given query string.
 
     Args:
@@ -94,6 +128,7 @@ def query_documents(query, offset: int = None, limit: int = None, sort: str = "r
         offset: Number of results to skip.
         limit: Maximum number of results to return.
         sort: "relevance" for BM25 ranking, "recent" for date descending.
+        page_types: Optional list of page_type values to filter by.
     """
     if offset is None:
         offset = 0
@@ -108,6 +143,8 @@ def query_documents(query, offset: int = None, limit: int = None, sort: str = "r
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        type_clause, type_params = _build_type_filter(page_types)
+
         # Column order: title, content, url, cover_image, page_title, description, date, author, page_type
         # Weights:      10      1       0    0            10          5            0     2       0
         if sort == "recent":
@@ -119,12 +156,12 @@ def query_documents(query, offset: int = None, limit: int = None, sort: str = "r
             SELECT url, cover_image, page_title, description, date, author, page_type,
                    snippet(documents_fts, 1, '<mark>', '</mark>', '...', 32) AS snippet
             FROM documents_fts
-            WHERE documents_fts MATCH ?
+            WHERE documents_fts MATCH ?{type_clause}
             {order_clause}
             LIMIT ? OFFSET ?
         '''
 
-        cursor.execute(sql_query, (sanitized, int(limit), int(offset)))
+        cursor.execute(sql_query, [sanitized] + type_params + [int(limit), int(offset)])
 
         results = [{
             'url': row['url'],

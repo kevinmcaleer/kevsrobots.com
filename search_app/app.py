@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-from search.database import insert_document, query_documents, total_results
+from search.database import insert_document, query_documents, total_results, get_facet_counts
 from search.search_logger import get_search_logger
 from typing import Optional
 import time
@@ -71,7 +71,7 @@ def create_document(title: str, content: str, url: str):
     return {"message": "Document created successfully"}
 
 @app.get("/search/")
-async def search_documents(request: Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10, sort: Optional[str] = "relevance"):
+async def search_documents(request: Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10, sort: Optional[str] = "relevance", page_types: Optional[str] = None):
     """
     Search documents endpoint with PostgreSQL query logging.
 
@@ -81,6 +81,7 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
         page: Page number for pagination (default: 1)
         page_size: Number of results per page (default: 10)
         sort: Sort order — "relevance" (BM25) or "recent" (date descending)
+        page_types: Comma-separated page types to filter by (e.g. "lesson,blog")
 
     Returns:
         dict: Search results with metadata and execution time
@@ -91,6 +92,9 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
     if sort not in ("relevance", "recent"):
         sort = "relevance"
 
+    # Parse page_types filter
+    type_filter = [t.strip() for t in page_types.split(',') if t.strip()] if page_types else None
+
     # Extract real client IP (handles proxy headers)
     client_ip = get_client_ip(request)
 
@@ -100,12 +104,14 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
 
     # Execute search query
     try:
-        results = query_documents(query, offset=(page - 1) * page_size, limit=page_size, sort=sort)
-        total_count = total_results(query)
+        results = query_documents(query, offset=(page - 1) * page_size, limit=page_size, sort=sort, page_types=type_filter)
+        total_count = total_results(query, page_types=type_filter)
+        facets = get_facet_counts(query)
     except Exception as e:
         print(f"Search query failed: {e}")
         results = []
         total_count = 0
+        facets = {}
 
     execution_time = time.time() - start_time
 
@@ -132,6 +138,7 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
         "page": page,
         "page_size": page_size,
         "sort": sort,
+        "facets": facets,
         "execution_time": round(execution_time, 3)
     }
 

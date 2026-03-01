@@ -1,7 +1,7 @@
 ---
 title: Print the Parts
 description: Download and print the files
-layout: lesson 
+layout: lesson
 ---
 
 ## 1 Print the Parts

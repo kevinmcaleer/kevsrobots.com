@@ -15,27 +15,145 @@ title: Search Results
         </div>
     </div>
 
+    <div id="filter-bar" class="mb-3 d-flex flex-wrap gap-2" style="display:none !important;"></div>
+
     <hr />
     <div id="results-container"></div>
     <script>
-    const PAGE_TYPE_MAP = {
-        'blog':         { label: 'Blog Post',     color: 'primary' },
-        'lesson':       { label: 'Course',         color: 'success' },
-        'course':       { label: 'Course',         color: 'success' },
-        'project':      { label: 'Project',        color: 'warning' },
-        'review':       { label: 'Review',         color: 'info' },
-        'robot':        { label: 'Robot',          color: 'danger' },
-        'how_it_works': { label: 'How It Works',   color: 'secondary' },
-        'groups':       { label: 'Category',       color: 'dark' },
-        'content':      { label: 'Page',           color: 'light' },
-        'page':         { label: 'Page',           color: 'light' },
+    // --- Type normalization ---
+    // Maps raw DB page_type values into display groups
+    const TYPE_GROUPS = {
+        'Courses':      { types: ['lesson', 'course'],   color: 'success' },
+        'Blog Posts':   { types: ['blog', 'post'],         color: 'primary' },
+        'Projects':     { types: ['project'],             color: 'warning' },
+        'Reviews':      { types: ['review'],              color: 'info' },
+        'How It Works': { types: ['how_it_works'],        color: 'secondary' },
+        'Showcase':     { types: ['showcase'],             color: 'primary' },
+        'Robots':       { types: ['robot'],               color: 'danger' },
+        'Categories':   { types: ['groups'],              color: 'dark' },
     };
 
-    function getPageTypeBadge(pageType) {
-        const entry = PAGE_TYPE_MAP[pageType] || { label: pageType || 'Page', color: 'light' };
-        return `<span class="badge bg-${entry.color} me-2">${entry.label}</span>`;
+    // Reverse lookup: raw type -> group name
+    const RAW_TO_GROUP = {};
+    for (const [group, info] of Object.entries(TYPE_GROUPS)) {
+        for (const t of info.types) RAW_TO_GROUP[t] = group;
     }
 
+    function normalizeType(rawType) {
+        return RAW_TO_GROUP[rawType] || 'Pages';
+    }
+
+    function groupColor(groupName) {
+        return (TYPE_GROUPS[groupName] || { color: 'secondary' }).color;
+    }
+
+    // All raw types that map to the "Pages" catch-all
+    function rawTypesForGroup(groupName) {
+        const info = TYPE_GROUPS[groupName];
+        return info ? info.types : null; // null means "Pages" catch-all
+    }
+
+    // --- State ---
+    let activeFilters = new Set(); // set of group names
+    let currentFacets = {};        // raw facets from API
+
+    // Compute which raw page_type values the active filters map to
+    function activeRawTypes() {
+        if (activeFilters.size === 0) return null; // no filter
+        const raw = [];
+        for (const group of activeFilters) {
+            const types = rawTypesForGroup(group);
+            if (types) {
+                raw.push(...types);
+            } else {
+                // "Pages" catch-all: include all raw types NOT in any named group
+                for (const key of Object.keys(currentFacets)) {
+                    if (!RAW_TO_GROUP[key]) raw.push(key);
+                }
+            }
+        }
+        return raw.length ? raw : null;
+    }
+
+    // --- Facet counts aggregated by group ---
+    function aggregateFacets(facets) {
+        const grouped = {};
+        for (const [rawType, count] of Object.entries(facets)) {
+            const group = normalizeType(rawType);
+            grouped[group] = (grouped[group] || 0) + count;
+        }
+        return grouped;
+    }
+
+    // --- Filter bar rendering ---
+    function renderFilterBar(facets) {
+        currentFacets = facets;
+        const bar = document.getElementById('filter-bar');
+        const grouped = aggregateFacets(facets);
+
+        // Only show if there are 2+ groups
+        if (Object.keys(grouped).length < 2) {
+            bar.style.display = 'none !important';
+            bar.innerHTML = '';
+            return;
+        }
+
+        bar.removeAttribute('style');
+        bar.innerHTML = '';
+
+        // "All" reset button — only when filters are active
+        if (activeFilters.size > 0) {
+            const allBtn = document.createElement('button');
+            allBtn.className = 'btn btn-sm btn-dark';
+            allBtn.textContent = 'All';
+            allBtn.addEventListener('click', function() {
+                activeFilters.clear();
+                triggerFilteredFetch();
+            });
+            bar.appendChild(allBtn);
+        }
+
+        // Order: named groups first (in TYPE_GROUPS order), then Pages
+        const order = [...Object.keys(TYPE_GROUPS), 'Pages'];
+        for (const group of order) {
+            if (!grouped[group]) continue;
+            const btn = document.createElement('button');
+            const isActive = activeFilters.has(group);
+            const color = groupColor(group);
+            btn.className = `btn btn-sm ${isActive ? 'btn-' + color : 'btn-outline-' + color}`;
+            btn.textContent = `${group} (${grouped[group]})`;
+            btn.addEventListener('click', function() {
+                if (activeFilters.has(group)) {
+                    activeFilters.delete(group);
+                } else {
+                    activeFilters.add(group);
+                }
+                triggerFilteredFetch();
+            });
+            bar.appendChild(btn);
+        }
+    }
+
+    function triggerFilteredFetch() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var query = urlParams.get('query');
+        var sort = urlParams.get('sort') || 'relevance';
+
+        // Update URL with page_types
+        var url = new URL(window.location);
+        var rawTypes = activeRawTypes();
+        if (rawTypes) {
+            url.searchParams.set('page_types', rawTypes.join(','));
+        } else {
+            url.searchParams.delete('page_types');
+        }
+        url.searchParams.set('page', '1');
+        window.history.pushState({}, '', url);
+
+        fetchResults(query, 1, sort);
+    }
+
+    // --- Pagination ---
     function createPagination(totalCount, pageSize, currentPage, query, sort) {
         const totalPages = Math.ceil(totalCount / pageSize);
         const paginationContainer = document.getElementById('pagination-container');
@@ -53,12 +171,15 @@ title: Search Results
 
             const a = document.createElement('a');
             a.className = 'page-link';
-            a.href = '/search-results?query=' + encodeURIComponent(query) + '&page=' + page + '&sort=' + sort;
+            // Preserve page_types in pagination links
+            var linkUrl = '/search-results?query=' + encodeURIComponent(query) + '&page=' + page + '&sort=' + sort;
+            var rawTypes = activeRawTypes();
+            if (rawTypes) linkUrl += '&page_types=' + encodeURIComponent(rawTypes.join(','));
+            a.href = linkUrl;
             a.innerText = text;
             a.addEventListener('click', function (e) {
                 e.preventDefault();
                 fetchResults(query, page, sort);
-                // Update URL without reload
                 const url = new URL(window.location);
                 url.searchParams.set('page', page);
                 window.history.pushState({}, '', url);
@@ -90,6 +211,7 @@ title: Search Results
         paginationContainer.appendChild(ul);
     }
 
+    // --- Results display with section headers ---
     function displayResults(results) {
         var resultsContainer = document.getElementById('results-container');
         resultsContainer.innerHTML = '';
@@ -101,51 +223,76 @@ title: Search Results
             return;
         }
 
+        // Group results by normalized type, preserving original order within each group
+        // Groups are ordered by the position of their first result
+        var groupOrder = [];
+        var grouped = {};
+
         results.forEach(function(result) {
-            var div = document.createElement('div');
-            var imageUrl = result.cover_image && result.cover_image !== "https://www.kevsrobots.com/DefaultImagePath"
-                        ? result.cover_image
-                        : defaultImage;
+            var group = normalizeType(result.page_type);
+            if (!grouped[group]) {
+                grouped[group] = [];
+                groupOrder.push(group);
+            }
+            grouped[group].push(result);
+        });
 
-            var publishedDate = new Date(result.date);
-            var formattedDate = publishedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+        groupOrder.forEach(function(group) {
+            // Section header
+            var header = document.createElement('h5');
+            header.className = 'mt-4 mb-2';
+            header.textContent = group;
+            resultsContainer.appendChild(header);
 
-            var badge = getPageTypeBadge(result.page_type);
+            grouped[group].forEach(function(result) {
+                var div = document.createElement('div');
+                var imageUrl = result.cover_image && result.cover_image !== "https://www.kevsrobots.com/DefaultImagePath"
+                            ? result.cover_image
+                            : defaultImage;
 
-            // Use snippet with highlights if available, otherwise fall back to description
-            var displayText = result.snippet ? result.snippet : (result.description || '');
+                var publishedDate = new Date(result.date);
+                var formattedDate = publishedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 
-            var authorName = result.author || 'Kevin McAleer';
+                var displayText = result.snippet ? result.snippet : (result.description || '');
+                var authorName = result.author || 'Kevin McAleer';
 
-            div.innerHTML = `<div class="row g-1 mb-3">
-                <div class="col-3 col-lg-2">
-                    <a href="${result.url}">
-                        <img src="${imageUrl}" alt="${result.page_title}" class="img-fluid rounded" loading="lazy">
-                    </a>
-                </div>
-                <div class="col-9 col-lg-10">
-                    <h5 class="mb-1">${badge}<a href="${result.url}" class="text-decoration-none">${result.page_title}</a></h5>
-                    <p class="mb-1">${displayText}</p>
-                    <small class="text-muted">
-                        <i class="fa-solid fa-user me-1"></i>${authorName}
-                        <span class="mx-2">|</span>
-                        <i class="fa-regular fa-calendar me-1"></i>${formattedDate}
-                    </small>
-                    <br /><a href="${result.url}" class="small text-muted">${result.url}</a>
-                </div>
-            </div><hr />`;
-            resultsContainer.appendChild(div);
+                div.innerHTML = `<div class="row g-1 mb-3">
+                    <div class="col-3 col-lg-2">
+                        <a href="${result.url}">
+                            <img src="${imageUrl}" alt="${result.page_title}" class="img-fluid rounded" loading="lazy">
+                        </a>
+                    </div>
+                    <div class="col-9 col-lg-10">
+                        <h5 class="mb-1"><a href="${result.url}" class="text-decoration-none">${result.page_title}</a></h5>
+                        <p class="mb-1">${displayText}</p>
+                        <small class="text-muted">
+                            <i class="fa-solid fa-user me-1"></i>${authorName}
+                            <span class="mx-2">|</span>
+                            <i class="fa-regular fa-calendar me-1"></i>${formattedDate}
+                        </small>
+                        <br /><a href="${result.url}" class="small text-muted">${result.url}</a>
+                    </div>
+                </div><hr />`;
+                resultsContainer.appendChild(div);
+            });
         });
     }
 
+    // --- Fetch ---
     function fetchResults(query, page, sort) {
         if (!query) return;
 
         document.getElementById('results-container').innerHTML = '<p class="text-muted">Searching...</p>';
 
-        fetch('https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query) + '&page=' + page + '&sort=' + sort)
+        var url = 'https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query) + '&page=' + page + '&sort=' + sort;
+        var rawTypes = activeRawTypes();
+        if (rawTypes) url += '&page_types=' + encodeURIComponent(rawTypes.join(','));
+
+        fetch(url)
             .then(response => response.json())
             .then(data => {
+                // Always render filter bar from unfiltered facets
+                renderFilterBar(data.facets || {});
                 displayResults(data.results);
                 document.getElementById('total_count').textContent = data.total_count;
                 document.getElementById('search-time').textContent = data.execution_time + ' seconds';
@@ -158,11 +305,22 @@ title: Search Results
             });
     }
 
+    // --- Init ---
     document.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
         var query = urlParams.get('query');
         var page = parseInt(urlParams.get('page')) || 1;
         var sort = urlParams.get('sort') || 'relevance';
+        var pageTypesParam = urlParams.get('page_types');
+
+        // Restore active filters from URL
+        if (pageTypesParam) {
+            var rawTypes = pageTypesParam.split(',').map(function(t) { return t.trim(); });
+            rawTypes.forEach(function(rt) {
+                var group = normalizeType(rt);
+                activeFilters.add(group);
+            });
+        }
 
         // Set the search query in the "Showing Results for" section
         if (query) {
@@ -185,7 +343,6 @@ title: Search Results
                 });
                 this.classList.add('active');
 
-                // Update URL
                 var url = new URL(window.location);
                 url.searchParams.set('sort', newSort);
                 url.searchParams.set('page', '1');
