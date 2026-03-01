@@ -10,7 +10,7 @@ next: 12_migration_project.html
 description: Learn how to troubleshoot and debug Podman containers using built-in
   tools like `inspect`, `logs`, `exec`, and systemd journal logs.
 percent: 84
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: From Docker to Podman

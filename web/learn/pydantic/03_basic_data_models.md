@@ -10,7 +10,7 @@ next: 04_advanced_validation_techniques.html
 description: A guide to creating your first data models with Pydantic, understanding
   field types, validation, and setting default values.
 percent: 24
-duration: 3
+duration: 2
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:

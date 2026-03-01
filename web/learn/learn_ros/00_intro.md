@@ -9,7 +9,7 @@ next: 01_what_is_ros.html
 description: Get started with ROS, the Robot Operating System and learn how to build
   robots using this industry standard framework
 percent: 5
-duration: 3
+duration: 2
 navigation:
 - name: Learn ROS with me
 - content:

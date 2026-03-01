@@ -10,7 +10,7 @@ next: 06_analog_pwm.html
 description: Learn how to control GPIO pins in MicroPython using the Pin class instead
   of Arduino's pinMode, digitalWrite, and digitalRead
 percent: 48
-duration: 9
+duration: 8
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:

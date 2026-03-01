@@ -9,7 +9,7 @@ previous: 01_installing.html
 next: 03_creating_notes.html
 description: How to create and set up your first Obsidian vault.
 percent: 21
-duration: 3
+duration: 2
 navigation:
 - name: Obsidian
 - content:

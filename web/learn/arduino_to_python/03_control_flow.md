@@ -10,7 +10,7 @@ next: 04_functions.html
 description: Learn how if/else statements, for loops, and while loops work in MicroPython
   without curly braces - indentation is everything
 percent: 32
-duration: 10
+duration: 9
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:

@@ -9,7 +9,7 @@ previous: 13_project-ideas.html
 description: A curated list of resources to deepen your knowledge and proficiency
   in Docker Swarm, containerization, and orchestration.
 percent: 100
-duration: 3
+duration: 2
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:

@@ -10,7 +10,7 @@ next: 03_installing_podman.html
 description: Understand the key architectural differences between Docker and Podman,
   and why Podman's design offers improved security and flexibility.
 percent: 21
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: From Docker to Podman

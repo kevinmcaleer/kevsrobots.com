@@ -9,7 +9,7 @@ previous: 06_installing_software.html
 next: 08_monitoring_performance.html
 description: Learn how to remove, update, and manage installed software using apt.
 percent: 36
-duration: 2
+duration: 1
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
 - content:

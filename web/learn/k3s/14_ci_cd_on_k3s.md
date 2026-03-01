@@ -10,7 +10,7 @@ next: 15_custom_cni.html
 description: Learn how to set up continuous integration and deployment workflows for
   your K3s cluster using GitHub Actions and GitOps tools like ArgoCD or Flux.
 percent: 70
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: Running K3s on Raspberry Pi

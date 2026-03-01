@@ -10,7 +10,7 @@ next: 11_project_ideas_and_extensions.html
 description: Build a simple temperature alert system that notifies you when the temperature
   exceeds or falls below a set threshold.
 percent: 80
-duration: 3
+duration: 2
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:

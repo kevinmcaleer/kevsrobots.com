@@ -9,7 +9,7 @@ previous: 05_create_motion.html
 next: 07_sync_music.html
 description: Learn how to add interactivity to your animations using triggers in Bottango.
 percent: 63
-duration: 4
+duration: 3
 date_updated: 2025-05-03
 navigation:
 - name: Bottango Basics

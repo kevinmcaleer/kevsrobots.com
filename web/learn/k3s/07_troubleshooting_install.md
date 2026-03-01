@@ -10,7 +10,7 @@ next: 08_kubectl_basics.html
 description: Solve common problems when installing or joining K3s on Raspberry Pi,
   including networking, tokens, and service errors.
 percent: 35
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: Running K3s on Raspberry Pi

@@ -9,7 +9,7 @@ previous: 02_2u_design.html
 next: 04_top.html
 description: Learn how to create the bottom corner piece for the mini-rack
 percent: 40
-duration: 2
+duration: 1
 navigation:
 - name: Mini-Rack 3D Design Tutorial
 - content:

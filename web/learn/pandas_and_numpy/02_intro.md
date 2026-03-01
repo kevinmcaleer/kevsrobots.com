@@ -10,7 +10,7 @@ next: 03_installing.html
 description: Kickstart your journey in data manipulation in Python with an introduction
   to Pandas and NumPy, two powerhouse libraries.
 percent: 16
-duration: 3
+duration: 2
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:

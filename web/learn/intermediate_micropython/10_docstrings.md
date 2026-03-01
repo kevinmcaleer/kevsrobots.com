@@ -10,7 +10,7 @@ next: 11_interrupts.html
 description: Learn about DocStrings in MicroPython and how they help document your
   code.
 percent: 72
-duration: 4
+duration: 3
 navigation:
 - name: Intermediate level MicroPython
 - content:

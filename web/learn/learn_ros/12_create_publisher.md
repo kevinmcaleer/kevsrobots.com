@@ -9,7 +9,7 @@ previous: 11_create_py_package.html
 next: 13_create_subscriber.html
 description: Lets create a new Python Publisher program
 percent: 65
-duration: 3
+duration: 2
 navigation:
 - name: Learn ROS with me
 - content:

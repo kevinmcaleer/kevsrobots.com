@@ -1,91 +1,79 @@
-from course_builder.course import Course
 import os
+import shutil
+
 import yaml
 
-class Courses():
-    course_list = []
-    output_folder = "web/learn"
-    duration = 0
+from course_builder.course import Course
+
+
+class Courses:
 
     def __init__(self, data=None):
-        if data: 
-            self.course_list = data
+        self.course_list = data or []
+        self.output_folder = "web/learn"
+        self.duration = 0
 
     def read_courses(self, course_folder):
-        """ Read all the courses in the course folder """
-        
-        for course in os.listdir(course_folder):
+        """Read all the courses in the course folder."""
+        for entry in sorted(os.listdir(course_folder)):
+            entry_path = os.path.join(course_folder, entry)
+            if not os.path.isdir(entry_path):
+                continue
+
+            course_yml = os.path.join(entry_path, "course.yml")
+            if not os.path.exists(course_yml):
+                continue
+
+            print(f"Found course: {entry}")
             new_course = Course()
-            if os.path.isdir(os.path.join(course_folder, course)):
-                print(f'Found course: {course}')
-                new_course.read_course(os.path.join(course_folder, course))
-                new_course.output_folder = os.path.join(self.output_folder,course)
-                self.course_list.append(new_course)
+            result = new_course.read_course(entry_path)
+            if result is None:
+                print(f"Warning: skipping course {entry} (failed to load)")
+                continue
+
+            new_course.output_folder = os.path.join(self.output_folder, entry)
+            self.course_list.append(new_course)
         return self
 
     def output_yml(self, output_folder):
-        """ Output the course data to a yml file """
+        """Output the course data to a YAML file."""
+        os.makedirs(output_folder, exist_ok=True)
 
-        # check if folder exists
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
+        courses_data = [course.to_dict() for course in self.course_list]
 
-        with open(f'{output_folder}/courses.yml', 'w') as outfile:
+        with open(os.path.join(output_folder, "courses.yml"), "w") as outfile:
+            yaml.safe_dump(courses_data, outfile, default_flow_style=False)
 
-            c = []
-            for course in self.course_list:
-                c.append(course.__str__())
-
-            yaml.safe_dump(c, outfile, default_flow_style=False)
-        
     def build(self):
-        """ Build the courses """
-        
+        """Build all courses."""
+        self.duration = 0
         for course in self.course_list:
-            self.duration = course.build()
-        
-        self.build_index() # should use the index.html file in the _learn folder
-        self.build_recent()
-    
-    def build_index(self):
+            result = course.build()
+            if result is not None:
+                self.duration += result
 
-        # remove the index file if it exists
-        if os.path.exists(f'{self.output_folder}/index.md'):
-            os.remove(f'{self.output_folder}/index.md')
-            
-        import shutil
+        self.build_index()
+        self.build_recent()
+
+    def build_index(self):
+        """Copy the learn index page."""
         source = "web/_learn/index.md"
-        destination = "web/learn/index.md"
-        shutil.copy(source, destination)
-        
-        # index = '---' + "\n"
-        # index += 'layout: learn' + "\n"
-        # index += 'title: Learn' + "\n"
-        # index += 'description: Take a course and learn something new' + "\n"
-        # index += f'duration: {self.duration}' + "\n"
-        # index += '---' + "\n\n"
-        # index += '{% include nav_courses.html %}' + "\n"
-        # index += '{% include breadcrumbs.html %}' + "\n"
-        # index += '{% include all_courses.html %}' + "\n"
-        
-        # with open(f'{self.output_folder}/index.md', 'w') as build_file:
-        #     build_file.writelines(index)
+        destination = os.path.join(self.output_folder, "index.md")
+        if os.path.exists(source):
+            shutil.copy(source, destination)
 
     def build_recent(self):
-        """ Build the recent Courses page """
+        """Build the recent courses page."""
+        recent_path = os.path.join(self.output_folder, "recent.md")
 
-        # remove the index file if it exists
-        if os.path.exists(f'{self.output_folder}/recent.md'):
-            os.remove(f'{self.output_folder}/recent.md')
-            
-        index = '---' + "\n"
-        index += 'layout: content' + "\n"
-        index += 'title: Recent Courses' + "\n"
-        index += 'description: Recent Courses' + "\n"
-        index += '---' + "\n\n"
-        index += '{% include nav_courses.html %}' + "\n"
-        index += '{% include breadcrumbs.html %}' + "\n"
-        index += '{% include recent_courses.html %}' + "\n"
+        content = (
+            "---\n"
+            "layout: content\n"
+            "title: Recent Courses\n"
+            "description: Learn something new. Today.\n"
+            "---\n\n"
+            "{% include recent_courses.html %}\n"
+        )
 
-        with open(f'{self.output_folder}/recent.md', 'w') as build_file:
-            build_file.writelines(index)
+        with open(recent_path, "w") as f:
+            f.write(content)

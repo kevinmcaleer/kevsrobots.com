@@ -9,7 +9,7 @@ previous: 13_create_subscriber.html
 next: 15_rviz.html
 description: Lets learn how to redirect our X11 Display
 percent: 75
-duration: 3
+duration: 2
 navigation:
 - name: Learn ROS with me
 - content:

@@ -10,7 +10,7 @@ next: 05_installing_k3s.html
 description: Set up reliable networking for your Raspberry Pi K3s cluster, including
   static IPs, hostnames, and local DNS options.
 percent: 20
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: Running K3s on Raspberry Pi

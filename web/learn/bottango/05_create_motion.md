@@ -10,7 +10,7 @@ next: 06_triggers.html
 description: "Learn how to animate your servos using Bottango\u2019s timeline and\
   \ keyframes."
 percent: 54
-duration: 5
+duration: 4
 date_updated: 2025-05-03
 navigation:
 - name: Bottango Basics

@@ -10,7 +10,7 @@ next: 06_managing_static_assets.html
 description: Learn how to use Jekyll layouts and includes to create reusable website
   components and streamline your site development process.
 percent: 50
-duration: 3
+duration: 2
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:

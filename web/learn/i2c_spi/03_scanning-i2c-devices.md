@@ -10,7 +10,7 @@ next: 04_reading-i2c-sensor.html
 description: Learn how to scan for I2C devices, understand hexadecimal addresses,
   and identify what's connected to your bus
 percent: 35
-duration: 9
+duration: 8
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:

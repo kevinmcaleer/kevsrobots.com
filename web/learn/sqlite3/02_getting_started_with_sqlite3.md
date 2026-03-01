@@ -11,7 +11,7 @@ description: We will cover the initial steps to set up Python and SQLite3, estab
   a connection to a database, and perform basic operations using Python's sqlite3
   module
 percent: 15
-duration: 4
+duration: 3
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:

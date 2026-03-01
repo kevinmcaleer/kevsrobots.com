@@ -9,7 +9,7 @@ previous: 06_software.html
 next: 08_positioning.html
 description: Write Python code to control the wall drawing robot.
 percent: 63
-duration: 2
+duration: 1
 date_updated: 2024-08-02
 navigation:
 - name: Wall Drawing Robot Tutorial

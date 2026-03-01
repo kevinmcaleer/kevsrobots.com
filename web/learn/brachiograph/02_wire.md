@@ -10,7 +10,7 @@ next: 03_setup_pi.html
 description: Learn how to wire up the BrachioGraph plotter using a Raspberry Pi and
   SG90 servos.
 percent: 36
-duration: 4
+duration: 3
 navigation:
 - name: BrachioGraph Tutorial
 - content:

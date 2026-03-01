@@ -10,7 +10,7 @@ next: 10_pydantic_best_practices.html
 description: Step-by-step guide to creating a basic CRUD application using FastAPI
   and Pydantic, covering database integration, endpoint creation, and testing.
 percent: 72
-duration: 3
+duration: 2
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:

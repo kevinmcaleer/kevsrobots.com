@@ -9,7 +9,7 @@ previous: 00_course_overview.html
 next: 02_setting_up_environment.html
 description: Overview of SQL, its importance, and foundational database concepts
 percent: 12
-duration: 6
+duration: 5
 navigation:
 - name: Getting Started with SQL
 - content:

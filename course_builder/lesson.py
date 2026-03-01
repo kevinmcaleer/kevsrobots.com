@@ -1,3 +1,1 @@
-class Lesson():
-    filename = ""
-    content = ""
+# Unused - kept for backwards compatibility

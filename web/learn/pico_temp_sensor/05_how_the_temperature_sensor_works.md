@@ -10,7 +10,7 @@ next: 06_reading_temperature_with_adc.html
 description: Learn how to write a Python script to read raw data from the Raspberry
   Pi Pico's built-in temperature sensor using its ADC.
 percent: 40
-duration: 2
+duration: 1
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:

@@ -10,7 +10,7 @@ next: 03_python_basics_for_robotics.html
 description: This lesson guides you through the initial setup of your Raspberry Pi,
   preparing it for robotics projects with the PCA9685 and Python.
 percent: 16
-duration: 4
+duration: 3
 navigation:
 - name: Building a Robot Arm with Raspberry Pi and PCA9685
 - content:

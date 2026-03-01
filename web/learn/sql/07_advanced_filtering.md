@@ -9,7 +9,7 @@ previous: 06_querying_data_with_select.html
 next: 08_working_with_joins.html
 description: Use SQL's AND, OR, and CASE statements for more control over queries
 percent: 48
-duration: 6
+duration: 5
 navigation:
 - name: Getting Started with SQL
 - content:

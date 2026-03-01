@@ -10,7 +10,7 @@ next: 09_podman_and_kubernetes.html
 description: Learn how to use `podman-compose` to run multi-container apps, and understand
   the differences and limitations compared to Docker Compose.
 percent: 63
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: From Docker to Podman

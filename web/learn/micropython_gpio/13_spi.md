@@ -10,7 +10,7 @@ next: 14_servos.html
 description: Learn about SPI communication protocol and how to use it with the Raspberry
   Pi Pico and MicroPython.
 percent: 70
-duration: 3
+duration: 2
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:

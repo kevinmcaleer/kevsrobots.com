@@ -10,7 +10,7 @@ next: 07_using_liquid_templating.html
 description: A guide to effectively organizing and using images, CSS, and JavaScript
   in your Jekyll site to create a visually appealing and interactive experience.
 percent: 60
-duration: 3
+duration: 2
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:

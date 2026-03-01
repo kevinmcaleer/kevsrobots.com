@@ -10,7 +10,7 @@ next: 02_docker_vs_podman_architecture.html
 description: Learn what Podman is, why it's a powerful alternative to Docker, and
   how it's changing the container landscape.
 percent: 14
-duration: 1
+duration: 0
 video_id: zwn2mXlYwis
 navigation:
 - name: From Docker to Podman

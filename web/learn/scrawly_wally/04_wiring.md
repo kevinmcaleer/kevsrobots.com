@@ -9,7 +9,7 @@ previous: 03_assembly.html
 next: 05_setup_pi.html
 description: Guide to wiring the stepper motors, servo, and Raspberry Pi.
 percent: 36
-duration: 2
+duration: 1
 date_updated: 2024-08-02
 navigation:
 - name: Wall Drawing Robot Tutorial

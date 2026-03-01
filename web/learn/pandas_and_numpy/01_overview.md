@@ -9,7 +9,7 @@ next: 02_intro.html
 description: Learn the basics of data manipulation in Python using Pandas and NumPy,
   including installation, understanding data structures, and performing data operations.
 percent: 8
-duration: 3
+duration: 2
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:

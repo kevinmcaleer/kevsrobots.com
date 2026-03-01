@@ -8,7 +8,7 @@ date: 2025-08-24
 previous: 10_markdown_in_obsidian.html
 description: Link to the full Markdown course for advanced Markdown skills.
 percent: 100
-duration: 2
+duration: 1
 navigation:
 - name: Obsidian
 - content:

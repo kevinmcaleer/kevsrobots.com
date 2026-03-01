@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 
 # remove old index
 echo "Removing old index"

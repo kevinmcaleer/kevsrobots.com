@@ -10,7 +10,7 @@ next: 09_wifi_control.html
 description: Learn how to control your robot remotely using Bluetooth and a smartphone
   or computer.
 percent: 64
-duration: 3
+duration: 2
 date_updated: 2025-05-10
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico

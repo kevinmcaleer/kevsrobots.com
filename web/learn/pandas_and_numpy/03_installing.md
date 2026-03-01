@@ -10,7 +10,7 @@ next: 04_dataframes.html
 description: This lesson guides you through the installation process of Pandas and
   NumPy, setting the stage for data manipulation tasks in Python.
 percent: 24
-duration: 3
+duration: 2
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:

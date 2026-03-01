@@ -10,7 +10,7 @@ next: 07_servo_scanning.html
 description: Assemble a simple two-wheeled robot chassis using motors, sensors, and
   the Raspberry Pi Pico.
 percent: 48
-duration: 3
+duration: 2
 date_updated: 2025-05-10
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico

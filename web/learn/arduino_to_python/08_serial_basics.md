@@ -10,7 +10,7 @@ next: 09_iot_project.html
 description: Learn how print() replaces Serial.print() and discover the power of MicroPython's
   REPL for interactive debugging
 percent: 72
-duration: 9
+duration: 8
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:

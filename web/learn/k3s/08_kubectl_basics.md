@@ -10,7 +10,7 @@ next: 09_dashboard_and_monitoring.html
 description: Learn the essential `kubectl` commands to interact with your K3s Kubernetes
   cluster from the command line.
 percent: 40
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: Running K3s on Raspberry Pi

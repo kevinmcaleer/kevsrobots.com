@@ -10,7 +10,7 @@ next: 17_summary.html
 description: Learn about ground pins on the Raspberry Pi Pico and how to use them
   in your projects.
 percent: 85
-duration: 3
+duration: 2
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:

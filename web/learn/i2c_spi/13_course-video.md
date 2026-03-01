@@ -10,7 +10,7 @@ next: 01_what-is-i2c.html
 description: Watch the full video walkthrough covering I2C communication on the Raspberry
   Pi Pico - part of the From Code to Creation series.
 percent: 14
-duration: 1
+duration: 0
 video_id: lthSloWM3Fk
 navigation:
 - name: Talking to the World - Working with I2C and SPI

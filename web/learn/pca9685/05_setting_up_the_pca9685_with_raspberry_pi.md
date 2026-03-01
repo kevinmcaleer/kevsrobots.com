@@ -10,7 +10,7 @@ next: 06_designing_your_robot_arm.html
 description: Step-by-step guide on connecting the PCA9685 servo driver to the Raspberry
   Pi and testing it with Python to control servos.
 percent: 40
-duration: 3
+duration: 2
 navigation:
 - name: Building a Robot Arm with Raspberry Pi and PCA9685
 - content:

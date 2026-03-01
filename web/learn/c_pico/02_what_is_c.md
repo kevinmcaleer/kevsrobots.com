@@ -10,7 +10,7 @@ next: 03_variables_and_types.html
 description: "Learn what the C programming language is, where it\u2019s used, and\
   \ why it\u2019s a great choice for embedded systems like the Raspberry Pi Pico."
 percent: 20
-duration: 4
+duration: 3
 date_updated: 2025-06-15
 navigation:
 - name: Getting Started with C on the Raspberry Pi Pico

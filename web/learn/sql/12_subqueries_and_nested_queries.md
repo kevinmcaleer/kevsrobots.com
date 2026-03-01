@@ -9,7 +9,7 @@ previous: 11_boyce_codd_normal_form.html
 next: 13_views_and_indexes.html
 description: Using subqueries in SQL to perform complex queries within queries
 percent: 78
-duration: 6
+duration: 5
 navigation:
 - name: Getting Started with SQL
 - content:

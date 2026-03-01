@@ -10,7 +10,7 @@ next: 13_using_helm.html
 description: Learn how to deploy real-world applications on your K3s cluster using
   Deployments, Services, and Ingress.
 percent: 60
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: Running K3s on Raspberry Pi

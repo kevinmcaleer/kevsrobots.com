@@ -10,7 +10,7 @@ next: 08_oop.html
 description: Get introduced to the use of Python libraries and modules, learn how
   to import them and explore a few popular libraries like math, random and datetime.
 percent: 35
-duration: 3
+duration: 2
 navigation:
 - name: Python for beginners
 - content:

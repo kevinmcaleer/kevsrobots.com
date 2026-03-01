@@ -10,7 +10,7 @@ next: 05_deployment.html
 description: Convert your trained PyTorch model to ONNX format for deployment on the
   Raspberry Pi AI Camera
 percent: 55
-duration: 7
+duration: 6
 navigation:
 - name: Building Object Detection Models with Raspberry Pi AI Camera
 - content:

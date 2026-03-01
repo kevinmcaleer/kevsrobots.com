@@ -10,7 +10,7 @@ next: 04_cli_compatibility_and_commands.html
 description: Learn how to install Podman on Linux, macOS, and Windows, and verify
   your setup for development or production use.
 percent: 28
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: From Docker to Podman

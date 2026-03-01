@@ -9,7 +9,7 @@ previous: 10_i2c-vs-spi.html
 next: 12_final-project.html
 description: Learn how to diagnose and fix common I2C and SPI problems
 percent: 91
-duration: 11
+duration: 10
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:

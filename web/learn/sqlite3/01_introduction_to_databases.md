@@ -9,7 +9,7 @@ previous: 00_intro.html
 next: 02_getting_started_with_sqlite3.html
 description: What are databases and why do we need them?
 percent: 10
-duration: 8
+duration: 7
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:

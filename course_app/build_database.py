@@ -1,7 +1,12 @@
 import sqlite3
 import yaml
+from pathlib import Path
 
-DATABASE_FILE = 'course_app/courses.db'
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_REPO_ROOT = _SCRIPT_DIR.parent
+
+DATABASE_FILE = str(_SCRIPT_DIR / 'courses.db')
+COURSES_YAML = str(_REPO_ROOT / 'web' / '_data' / 'courses.yml')
 
 def delete_database():
     conn = sqlite3.connect(DATABASE_FILE)
@@ -83,5 +88,5 @@ def insert_data(data):
 
 delete_database()
 build_database()
-data = read_yaml('web/_data/courses.yml')
+data = read_yaml(COURSES_YAML)
 insert_data(data)

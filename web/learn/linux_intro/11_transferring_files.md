@@ -9,7 +9,7 @@ previous: 10_networking_commands.html
 next: 12_intro_scripting.html
 description: Learn how to securely transfer files between machines using scp and rsync.
 percent: 52
-duration: 2
+duration: 1
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
 - content:

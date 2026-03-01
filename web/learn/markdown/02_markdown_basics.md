@@ -10,7 +10,7 @@ next: 03_setup_environment.html
 description: Learn the basics of Markdown syntax and how to use it to create content
   for your Jekyll site.
 percent: 20
-duration: 3
+duration: 2
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:

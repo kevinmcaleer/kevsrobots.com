@@ -10,7 +10,7 @@ next: 08_bluetooth_control.html
 description: Use a servo motor to rotate your ultrasonic sensor and scan the environment
   with MicroPython.
 percent: 56
-duration: 3
+duration: 2
 date_updated: 2025-05-10
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico

@@ -10,7 +10,7 @@ next: 14_ci_cd_on_k3s.html
 description: Learn how to use Helm to deploy and manage applications on your K3s cluster
   with reusable charts and versioned releases.
 percent: 65
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: Running K3s on Raspberry Pi

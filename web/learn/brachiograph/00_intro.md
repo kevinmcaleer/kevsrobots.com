@@ -9,7 +9,7 @@ next: 01_build.html
 description: Build and program a BrachioGraph; a simple and fun drawing robot that
   can be controlled using Python.
 percent: 12
-duration: 6
+duration: 5
 date_updated: 2024-07-30
 navigation:
 - name: BrachioGraph Tutorial

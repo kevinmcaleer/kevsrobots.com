@@ -9,7 +9,7 @@ previous: 11_common-issues.html
 description: Build a complete environmental monitoring station combining I2C sensors,
   data logging, and everything learned in this course
 percent: 100
-duration: 11
+duration: 10
 navigation:
 - name: Talking to the World - Working with I2C and SPI
 - content:

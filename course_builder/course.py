@@ -3,594 +3,364 @@
 # October 2022
 
 import os
+import shutil
 import yaml
-import json
-from shutil import copytree as copy, rmtree as rmdir, copyfile as copyfile
 from math import ceil
+from pathlib import Path
 
 
 class Course:
-    name = ""
-    description = ""
-    author = ""
-    date_created = ""
-    date_published = ""
-    content = []
-    layout = ""
-    type = "page"
-    links = []
-    output = ""
-    output_folder = "web/build"
-    course_folder = ""
-    content = []
-    groups = []
-    level = "beginner"
-    cover = ""  # cover image
-    link = ""  # url to first file in course
-    duration = 0  # duration of course in minutes
 
     def __init__(
         self,
-        name=None,
-        description=None,
-        author=None,
-        date_created=None,
-        date_published=None,
+        name="",
+        description="",
+        author="",
+        date_created="",
+        date_published="",
         content=None,
-        layout=None,
-        type=None,
+        layout="",
+        type="page",
         links=None,
         groups=None,
-        output=None,
-        output_folder=None,
-        course_folder=None,
-        duration=None,
+        output="nav.html",
+        output_folder="not_specified",
+        course_folder="",
+        duration=0,
     ):
-        if name:
-            self.name = name
-        if description:
-            self.description = description
-        if author:
-            self.author = author
-        if date_created:
-            self.date_created = date_created
-        if date_published:
-            self.date_published = date_published
-        if groups:
-            self.groups = groups
-        if content:
-            self.content = content
-        if layout:
-            self.layout = layout
-        if type:
-            self.type = type
-        if links:
-            self.links = links
-        if output:
-            self.output = output
-        else:
-            self.output = "nav.html"
-        if output_folder:
-            self.output_folder = output_folder
-        else:
-            self.output_folder = "not_specified"
-        if course_folder:
-            self.course_folder = course_folder
-        if duration:
-            self.duration = duration
-
-    def calculate_duration(self):
-        duration = 0
-        with open(f"{self.course_folder}/course.yml", "r") as stream:
-            try:
-                course = yaml.safe_load(stream)
-                # print(f'Course manifest loaded')
-            except yaml.YAMLError as exc:
-                print(exc)
-
-        course = course[0]
-        for section in course["content"]:
-            section["section"]
-            # print(f"Name is: {name['name']}")
-
-            for item in section["section"]["content"]:
-                # print(item)
-                duration += self.get_duration(item)
-
-        # print(f'Course duration is: {duration}')
+        self.name = name
+        self.description = description
+        self.author = author
+        self.date_created = date_created
+        self.date_published = date_published
+        self.content = content or []
+        self.layout = layout
+        self.type = type
+        self.links = links or []
+        self.groups = groups or []
+        self.output = output
+        self.output_folder = output_folder
+        self.course_folder = course_folder
+        self.level = "beginner"
+        self.cover = ""
+        self.link = ""
         self.duration = duration
-        return duration
+        self._course_manifest = None
+        self._lesson_cache = {}
+        self._navigation_yaml = None
 
-    def get_duration(self, item):
-        """get the duration of the video"""
-        # get the duration from the lesson
-        # return the duration in minutes
+    def _load_manifest(self):
+        """Load and cache the course.yml manifest."""
+        if self._course_manifest is not None:
+            return self._course_manifest
 
-        path = f"{self.course_folder}/{item}"
-        with open(path, "r") as stream:
-            file_content = stream.read()
-
-        # Safely split out YAML front matter only (first two '---' only)
-        front_matter = {}
-        body_text = file_content
+        manifest_path = Path(self.course_folder) / "course.yml"
         try:
-            parts = file_content.split("---", 2)
-            if len(parts) >= 3:
-                front_matter_raw = parts[1]
-                body_text = parts[2]
-                try:
-                    front_matter = yaml.safe_load(front_matter_raw) or {}
-                except yaml.YAMLError as exc:
-                    print(exc)
-                    front_matter = {}
-        except Exception as exc:
-            # If anything unexpected happens, fall back to whole file as body
-            print(exc)
-            front_matter = {}
-            body_text = file_content
+            with open(manifest_path, "r") as stream:
+                data = yaml.safe_load(stream)
+        except (yaml.YAMLError, OSError) as exc:
+            print(f"Error loading course manifest {manifest_path}: {exc}")
+            return None
 
-        # If duration explicitly provided, use it
+        if not data:
+            print(f"Error loading course manifest: {manifest_path} is empty")
+            return None
+
+        self._course_manifest = data[0]
+        return self._course_manifest
+
+    def _read_lesson_file(self, filename):
+        """Read and cache a lesson file, returning (front_matter_dict, body_text, raw_content)."""
+        if filename in self._lesson_cache:
+            return self._lesson_cache[filename]
+
+        path = Path(self.course_folder) / filename
+        try:
+            raw_content = path.read_text()
+        except OSError as exc:
+            print(f"Warning: could not read lesson file {path}: {exc}")
+            self._lesson_cache[filename] = ({}, "", "")
+            return {}, "", ""
+
+        front_matter = {}
+        body_text = raw_content
+        parts = raw_content.split("---", 2)
+        if len(parts) >= 3:
+            try:
+                front_matter = yaml.safe_load(parts[1]) or {}
+            except yaml.YAMLError as exc:
+                print(f"Warning: invalid front matter in {path}: {exc}")
+                front_matter = {}
+            body_text = parts[2]
+
+        result = (front_matter, body_text, raw_content)
+        self._lesson_cache[filename] = result
+        return result
+
+    def _get_lesson_duration(self, filename):
+        """Get the duration of a lesson in minutes."""
+        front_matter, body_text, _ = self._read_lesson_file(filename)
+
         if isinstance(front_matter, dict) and "duration" in front_matter:
             try:
                 return int(front_matter["duration"])
-            except Exception:
+            except (ValueError, TypeError):
                 pass
 
-        # Fallback: estimate from body text word count (200 wpm)
         words = len(body_text.split())
-        duration = ceil(words / 200)
+        return ceil(words / 200)
+
+    def calculate_duration(self):
+        """Calculate total course duration from all lessons."""
+        duration = 0
+        for item in self.lessons:
+            duration += self._get_lesson_duration(item)
+        self.duration = duration
         return duration
 
     def read_course(self, course_folder):
+        """Read a course manifest and populate this Course object."""
         self.course_folder = course_folder
-        course = []
-        with open(f"{course_folder}/course.yml", "r") as stream:
-            try:
-                course = yaml.safe_load(stream)
-                # name = course[0]["name"]
-                # print(f"Course manifest loaded for {name}")
-            except KeyError as exc:
-                print(f"Error loading course manifest: {exc}")
-                return None
-            except yaml.YAMLError as exc:
-                print(exc)
+        self._course_manifest = None
+        self._lesson_cache = {}
+        self._navigation_yaml = None
 
-        if course == [] or course is None:
-            print(f"Error loading course manifest: {course_folder} is empty")
+        manifest = self._load_manifest()
+        if manifest is None:
             return None
-        course = course[0]
+
         try:
-            self.author = course["author"]
-            self.name = course["name"]
-            self.description = course["description"]
-            self.groups = course["groups"]
-            self.date_created = course["date_created"]
-            self.date_published = course["date_published"]
-            self.content = course["content"]
+            self.author = manifest["author"]
+            self.name = manifest["name"]
+            self.description = manifest["description"]
+            self.groups = manifest["groups"]
+            self.date_created = manifest["date_created"]
+            self.date_published = manifest["date_published"]
+            self.content = manifest["content"]
             cover_folder = self.course_folder.replace("source", "/learn")
-            self.cover = cover_folder + "/" + course["cover"]
+            self.cover = cover_folder + "/" + manifest["cover"]
             self.cover = self.cover.replace("//learn", "/learn")
         except KeyError as exc:
             print(f"Error reading course manifest: {exc}, course name is: {self.name}")
             return None
-        # print(f'cover is: {self.cover}')
-        self.duration = self.calculate_duration()
-        # print(course['content'])
-        # print(f'found {self.no_of_lessons} lessons, date published is: {self.date_published}')
+
+        self.calculate_duration()
         return self
 
     def build_index(self):
-        # copy the first course file as index.md
-        copyfile(
-            self.output_folder + "/" + self.lessons[0], self.output_folder + "/index.md"
-        )
+        """Copy the first course file as index.md."""
+        if self.lessons:
+            src = Path(self.output_folder) / self.lessons[0]
+            dst = Path(self.output_folder) / "index.md"
+            shutil.copyfile(str(src), str(dst))
 
     def create_output(self, output_folder=None):
-        """Build the course"""
+        """Create the output directory for the course."""
         print(f"Building course: {self.name}")
-
-        # Create the course folder
         if output_folder:
             self.output_folder = output_folder
-        # print("creating output folder: ", self.output_folder)
-        if not os.path.exists(self.output_folder):
-            os.makedirs(self.output_folder)
-
-    def __str__(self):
-        return f"Course name: {self.name}, with {self.no_of_lessons} lessons, layout is: {self.layout}, "
+        os.makedirs(self.output_folder, exist_ok=True)
 
     @property
     def lessons(self) -> list:
-        """return a list of lessons"""
+        """Return a flat list of all lesson filenames."""
         lesson_list = []
-        for i in self.content:
-            for item in i["section"]["content"]:
+        for section in self.content:
+            for item in section["section"]["content"]:
                 lesson_list.append(item)
         return lesson_list
 
     def next_lesson(self, lesson_number):
-        """return the next lesson"""
-        # print(f'lesson number is: {lesson_number}, {self.lessons[lesson_number-1]}')
+        """Return the filename of the next lesson (as .html), or None."""
         if lesson_number < self.no_of_lessons:
-            next = self.lessons[lesson_number].replace(".md", ".html")
-            # print(f'next lesson is: {next}')
-            return next
-        else:
-            return None
+            return self.lessons[lesson_number].replace(".md", ".html")
+        return None
 
     def previous_lesson(self, lesson_number):
-        """return the next lesson"""
-        # print(f'lesson is:{lesson_number}, {self.lessons[lesson_number-1]}')
+        """Return the filename of the previous lesson (as .html), or None."""
         if lesson_number > 1:
-            previous = self.lessons[lesson_number - 2].replace(".md", ".html")
-            # print(f'previous lesson is: {previous}')
-            return previous
-        else:
-            return None
+            return self.lessons[lesson_number - 2].replace(".md", ".html")
+        return None
 
     @property
     def no_of_lessons(self):
-        # loop through the sections and count the number of lessons within each section
+        """Count the total number of lessons across all sections."""
         count = 0
-        for i in self.content:
-            for _ in i["section"]["content"]:
-                count += 1
+        for section in self.content:
+            count += len(section["section"]["content"])
         return count
 
-    @staticmethod
-    def find_nth(haystack: str, needle: str, n: int) -> int:
-        start = haystack.find(needle)
-        while start >= 0 and n > 1:
-            start = haystack.find(needle, start + len(needle))
-            n -= 1
-        return start
-
     def build_navigation(self):
-        """Build the navigation front matter"""
-        # output is a nice YML structure with friendly names for each section, with a link to that page
+        """Build the navigation YAML structure. Cached per course."""
+        if self._navigation_yaml is not None:
+            return self._navigation_yaml
 
-        # for this course, go through each section
-        # for each section, go through each item
-        # for each item open the file and read the name, append it to the dictionary
+        manifest = self._load_manifest()
+        if manifest is None:
+            self._navigation_yaml = ""
+            return ""
 
-        with open(f"{self.course_folder}/course.yml", "r") as stream:
-            try:
-                course = yaml.safe_load(stream)
-                # print(f'Course manifest loaded')
-            except yaml.YAMLError as exc:
-                print(exc)
-
-        course = course[0]
-
-        nav = []
+        nav = [{"name": manifest["name"]}]
         sections = []
 
-        details = {"name": course["name"]}
-        nav.append(details)
-        # print(f"course is {course['content']}")
-        for section in course["content"]:
-            name = section["section"]
-            # print(f"Name is: {name['name']}")
+        for section in manifest["content"]:
+            section_data = section["section"]
+            item_records = []
+            for item in section_data["content"]:
+                front_matter, _, _ = self._read_lesson_file(item)
+                title = item
+                if isinstance(front_matter, dict) and "title" in front_matter:
+                    title = front_matter["title"]
+                link = item.replace(".md", ".html")
+                item_records.append({"name": title, "link": link})
+            sections.append({"section": section_data["name"], "content": item_records})
 
-            item_record = []
-            for item in section["section"]["content"]:
-                # print(item)
+        nav.append({"content": sections})
 
-                # open the file and read the name
+        self._navigation_yaml = yaml.dump(nav, sort_keys=False)
+        return self._navigation_yaml
 
-                with open(f"{self.course_folder}/{item}", "r") as stream:
-                    file_content = stream.read()
-                    # Parse only the front matter between the first two '---'
-                    lesson = {"title": item}
-                    parts = file_content.split("---", 2)
-                    if len(parts) >= 2:
-                        try:
-                            fm = yaml.safe_load(parts[1]) or {}
-                            if isinstance(fm, dict) and "title" in fm:
-                                lesson["title"] = fm["title"]
-                        except yaml.YAMLError as exc:
-                            print(exc)
-                    # print('lesson is: ', lesson['title'])
-                item = item.replace(".md", ".html")
-                # print(f'item is (should have .md replaced by .html): {item}')
-                record = {"name": lesson["title"], "link": item}
-                # print(f'record is: {record}')
-                item_record.append(record)
-            sections.append({"section": name["name"], "content": item_record})
+    def update_front_matter(self, lesson_file, front_matter, nav_yaml):
+        """Merge generated front matter with the lesson's existing front matter."""
+        lesson_list = lesson_file.split("---", 2)
 
-        content = {"content": sections}
-        nav.append(content)
-        # print(f'nav {nav}')
-
-        n = yaml.load(json.dumps(nav), Loader=yaml.FullLoader)
-        yaml_navigation_structure = yaml.dump(n, sort_keys=False)
-
-        return yaml_navigation_structure
-
-    def update_front_matter(self, lesson_file, front_matter):
-        # read the lesson file, find the front matter markers and remove them
-        lesson_list = lesson_file.split("---", 2)  # splits the string into 3 parts
-
-        # Safely parse existing front matter block only
-        lessons = {}
+        existing_fm = {}
         if len(lesson_list) >= 2:
             try:
-                lessons = yaml.safe_load(lesson_list[1]) or {}
+                existing_fm = yaml.safe_load(lesson_list[1]) or {}
             except yaml.YAMLError as exc:
                 print(exc)
-                lessons = {}
+                existing_fm = {}
 
-        # Determine content (body) safely
         content = lesson_list[2] if len(lesson_list) >= 3 else lesson_file
 
-        # Parse the provided front matter block safely
         front_matter_list = front_matter.split("---", 2)
-        f = {}
+        generated_fm = {}
         if len(front_matter_list) >= 2:
             try:
-                f = yaml.safe_load(front_matter_list[1]) or {}
+                generated_fm = yaml.safe_load(front_matter_list[1]) or {}
             except yaml.YAMLError as exc:
                 print(exc)
-                f = {}
+                generated_fm = {}
 
-        # get navigation front matter
-        nav = self.build_navigation()
+        merged = {}
+        merged.update(generated_fm)
+        if isinstance(existing_fm, dict):
+            merged.update(existing_fm)
 
-        # merge the existing front matter with the new front matter
-        merged_frontmatter = {}
-        merged_frontmatter.update(f)
-        if isinstance(lessons, dict):
-            merged_frontmatter.update(lessons)
-
-        merged_frontmatter_yaml = yaml.dump(merged_frontmatter, sort_keys=False)
+        merged_yaml = yaml.dump(merged, sort_keys=False)
 
         page = (
             "---\n"
-            + merged_frontmatter_yaml
+            + merged_yaml
             + "navigation:\n"
-            + nav
+            + nav_yaml
             + "---\n"
             + content
         )
         return page
 
     def copy_assets(self):
-        """copy the assets folder to the output folder"""
+        """Copy the assets folder to the output folder."""
+        src = Path(self.course_folder) / "assets"
+        dst = Path(self.output_folder) / "assets"
 
-        # check if the assets folder exists and remove it
-        if os.path.exists(f"{self.output_folder}/assets"):
-            rmdir(f"{self.output_folder}/assets")
-
-        copy(self.course_folder + "/assets", self.output_folder + "/assets")
-
-    def lesson_duration(self, lesson_text):
-        """return the duration of the lesson in minutes"""
-        # count the number of words in the lesson
-        # divide by 200
-        # round up to the nearest minute
-        words = lesson_text.split()
-        no_of_words = len(words)
-        duration = ceil(no_of_words / 200)
-        return duration
-
-    def build(self):
-        """Build the front matter for each content page, and output to the build folder"""
-
-        # Create the front matter that is used to build the page navigation and previous, next buttons
-        self.create_output(self.output_folder)
-        lesson = ""
-        lesson += "<nav>" + "\n"
-
-        # work out how much each page is as a percentage
-        if self.no_of_lessons > 0:
-            page_percent = 100 // self.no_of_lessons
-        else:
-            page_percent = 100
-
-        if len(self.content) == 0:
-            print("no content found")
+        if not src.exists():
             return
 
-        # reset page_count
+        if dst.exists():
+            shutil.rmtree(str(dst))
+        shutil.copytree(str(src), str(dst))
+
+    def build(self):
+        """Build the front matter for each content page and output to the build folder."""
+        self.create_output(self.output_folder)
+
+        total_lessons = self.no_of_lessons
+        if total_lessons == 0:
+            print("no content found")
+            return self.duration
+
+        page_percent = 100 // total_lessons
+
+        # Build navigation once for the entire course
+        nav_yaml = self.build_navigation()
+
         page_count = 1
 
         for section in self.content:
-            # Each section has a name and a content list of items
-            # print(f'section is: {section}')
-            just_item = section["section"]
+            section_data = section["section"]
 
-            #  for each item in the content section
-            for item in just_item["content"]:
-                # open the file and get the duration, add it to the course duration
-                self.duration += self.get_duration(item)
-
+            for item in section_data["content"]:
                 if page_count == 1:
-                    url = item.replace(".md", ".html")
-                    self.link = url
+                    self.link = item.replace(".md", ".html")
 
-                just_item["content"].index(item)
-
-                # print(f'item is: {item}, index is {index}, page_count is {page_count}')
-
-                item_percentage = page_percent * page_count
-                if item_percentage > 100:
+                item_percentage = min(page_percent * page_count, 100)
+                if page_count == total_lessons:
                     item_percentage = 100
-                elif item_percentage < 100 and page_count == self.no_of_lessons:
-                    item_percentage = 100
-                # set the previous and next links
-                next = self.next_lesson(page_count)
-                previous = self.previous_lesson(page_count)
 
-                # increment if it's a page
-                if item in self.lessons and page_count < self.no_of_lessons:
+                next_l = self.next_lesson(page_count)
+                previous_l = self.previous_lesson(page_count)
+
+                if page_count < total_lessons:
                     page_count += 1
-                    # print(f'page is: {item}, page_count is {page_count}')
 
-                front_matter = "---" + "\n"
-                front_matter += f"layout: {self.layout}" + "\n"
-                front_matter += f"title: {item}" + "\n"
-                front_matter += f"author: {self.author}" + "\n"
-                front_matter += f"type: {self.type}" + "\n"
-                front_matter += f"cover: {self.cover}" + "\n"
-                front_matter += f"date: {self.date_published}" + "\n"
+                # Get lesson duration from cache
+                lesson_duration = self._get_lesson_duration(item)
 
-                # front_matter += f'cover: {self.output_folder.replace("web/learn","/learn")}{self.cover}' + "\n"
-                # print(f'front_matter cover is: {front_matter}')
-                # print(f'front matter cover is: {self.cover}')
-                if previous is not None:
-                    front_matter += f"previous: {previous}" + "\n"
-                if next is not None:
-                    front_matter += f"next: {next}" + "\n"
-                front_matter += f"description: {self.description}" + "\n"
-                front_matter += f"percent: {item_percentage}" + "\n"
+                front_matter = "---\n"
+                front_matter += f"layout: {self.layout}\n"
+                front_matter += f"title: {item}\n"
+                front_matter += f"author: {self.author}\n"
+                front_matter += f"type: {self.type}\n"
+                front_matter += f"cover: {self.cover}\n"
+                front_matter += f"date: {self.date_published}\n"
+                if previous_l is not None:
+                    front_matter += f"previous: {previous_l}\n"
+                if next_l is not None:
+                    front_matter += f"next: {next_l}\n"
+                front_matter += f"description: {self.description}\n"
+                front_matter += f"percent: {item_percentage}\n"
+                front_matter += f"duration: {lesson_duration}\n"
+                front_matter += "---\n"
 
-                # Add duration
-                path = os.path.join(self.course_folder, item)
-                with open(path, "r") as f:
-                    lines = f.read()
-                    duration = self.lesson_duration(lines)
+                # Read lesson file content (from cache)
+                _, _, raw_content = self._read_lesson_file(item)
+                if not raw_content:
+                    print(f"Warning: skipping empty/missing lesson {item}")
+                    continue
 
-                front_matter += f"duration: {duration}" + "\n"
-                front_matter += "---" + "\n"
-
-                # update front matter
-                lesson_file = f"{self.course_folder}/{item}"
-                with open(lesson_file, "r") as f:
-                    # print(f'reading {lesson_file}')
-                    lines = f.read()
-                    # print(f'lines is: {lines}')
                 page = self.update_front_matter(
-                    lesson_file=lines, front_matter=front_matter
+                    lesson_file=raw_content,
+                    front_matter=front_matter,
+                    nav_yaml=nav_yaml,
                 )
 
-                # print(f'{page}')
+                output_path = Path(self.output_folder) / item
+                output_path.write_text(page)
 
-                # write the file
-                # print(f'writing file: {self.output_folder}/{item}')
-                with open(f"{self.output_folder}/{item}", "w") as build_file:
-                    build_file.writelines(page)
-
-        self.copy_assets()  # copy the assets folder to the output folder
-        self.build_index()  # build the index page
+        self.copy_assets()
+        self.build_index()
         return self.duration
 
     @property
     def duration_str(self):
-        """return the duration as a string"""
-
+        """Return the duration as a human-readable string."""
         hours = self.duration // 60
         minutes = self.duration % 60
-        duration = f"{hours}h {minutes}m"
-        return duration
+        return f"{hours}h {minutes}m"
 
-    def __str__(self):  # noqa: F811
-            """Return a string representation of the Course object.
+    def to_dict(self):
+        """Return a dictionary representation for courses.yml output."""
+        link_path = self.output_folder.replace("web", "") + "/" + self.link
 
-            Returns:
-                dict: A dictionary containing the information needed to build the courses.yml data file.
-                    - description (str): The description of the course.
-                    - name (str): The name of the course.
-                    - cover (str): The path to the cover image of the course.
-                    - link (str): The path to the link of the course.
-                    - duration (str): The duration of the course.
-                    - author (str): The author of the course.
-                    - date_published (str): The date when the course was published.
-            """
-            cover_path = self.cover
-            link_path = self.output_folder.replace("web", "") + "/" + self.link
-
-            return {
-                "description": self.description,
-                "name": self.name,
-                "cover": cover_path,
-                "link": link_path,
-                "duration": self.duration_str,
-                "author": self.author,
-                "groups": self.groups,
-                "date_published": self.date_published,
-            }
-
-
-class Courses:
-    course_list = []
-    output_folder = "web/learn"
-    duration = 0
-
-    def __init__(self, data=None):
-        if data:
-            self.course_list = data
-
-    def read_courses(self, course_folder):
-        """Read all the courses in the course folder"""
-
-        for course in os.listdir(course_folder):
-            new_course = Course()
-            if os.path.isdir(os.path.join(course_folder, course)):
-                # print(f'Found course: {course}')
-                new_course.read_course(os.path.join(course_folder, course))
-                new_course.output_folder = os.path.join(self.output_folder, course)
-                self.course_list.append(new_course)
-        return self
-
-    def output_yml(self, output_folder):
-        """Output the course data to a yml file"""
-
-        # check if folder exists
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
-
-        with open(f"{output_folder}/courses.yml", "w") as outfile:
-            c = []
-            for course in self.course_list:
-                c.append(course.__str__())
-
-            yaml.safe_dump(c, outfile, default_flow_style=False)
-
-    def build(self):
-        """Build the courses"""
-
-        for course in self.course_list:
-            self.duration = course.build()
-
-        self.build_index() 
-        self.build_recent()
-
-    def build_index(self):
-        import shutil
-        # remove the index file if it exists
-        # if os.path.exists(f"{self.output_folder}/index.md"):
-        #     os.remove(f"{self.output_folder}/index.md")
-
-        # index = "---" + "\n"
-        # index += "layout: content" + "\n"
-        # index += "title: Learn" + "\n"
-        # index += "description: Take a course and learn something new" + "\n"
-        # index += f"duration: {self.duration}" + "\n"
-        # index += f"date_published: {self.date_published}" + "\n"
-        # index += "---" + "\n"
-        # index += "{% include all_courses.html %}" + "\n"
-
-        # with open(f"{self.output_folder}/index.md", "w") as build_file:
-        #     build_file.writelines(index)
-        
-        source = "web/_learn/index.md"
-        destination = "web/learn/index.md"
-        shutil.copy(source, destination)
-        
-
-    def build_recent(self):
-        """Build the recent Courses page"""
-
-        # remove the index file if it exists
-        if os.path.exists(f"{self.output_folder}/recent.md"):
-            os.remove(f"{self.output_folder}/recent.md")
-
-        index = "---" + "\n"
-        index += "layout: content" + "\n"
-        index += "title: Recent Courses" + "\n"
-        index += "description: Learn something new. Today." + "\n"
-        index += "---" + "\n \n"
-        index += "{% include recent_courses.html %}" + "\n"
-
-        with open(f"{self.output_folder}/recent.md", "w") as build_file:
-            build_file.writelines(index)
+        return {
+            "description": self.description,
+            "name": self.name,
+            "cover": self.cover,
+            "link": link_path,
+            "duration": self.duration_str,
+            "author": self.author,
+            "groups": self.groups,
+            "date_published": self.date_published,
+        }

@@ -9,7 +9,7 @@ previous: 03_user_interface_overview.html
 next: 05_modifying_objects.html
 description: Learn how to create and modify basic 3D shapes using FreeCAD's tools.
 percent: 36
-duration: 3
+duration: 2
 navigation:
 - name: Introduction to FreeCAD for Beginners
 - content:

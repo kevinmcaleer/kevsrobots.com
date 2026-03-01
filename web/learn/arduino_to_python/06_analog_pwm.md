@@ -10,7 +10,7 @@ next: 07_timing.html
 description: Learn how to read analog sensors with the ADC class and control PWM outputs
   for LED brightness and motor speed control
 percent: 56
-duration: 9
+duration: 8
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:

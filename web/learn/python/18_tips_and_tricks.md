@@ -9,7 +9,7 @@ previous: 17_apps.html
 description: Discover various Python tips, tricks, and best practices, such as writing
   Pythonic code, following PEP 8 style guide, and using the Black code formatter.
 percent: 100
-duration: 3
+duration: 2
 navigation:
 - name: Python for beginners
 - content:

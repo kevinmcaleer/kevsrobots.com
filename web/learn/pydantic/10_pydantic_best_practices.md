@@ -10,7 +10,7 @@ next: 11_performance_optimization_tips.html
 description: Learn how to deploy your FastAPI application, utilizing Pydantic for
   data validation, to Heroku for production use.
 percent: 80
-duration: 3
+duration: 2
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:

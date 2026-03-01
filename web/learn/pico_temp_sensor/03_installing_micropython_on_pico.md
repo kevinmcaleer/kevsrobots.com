@@ -10,7 +10,7 @@ next: 04_overview_of_pico_temperature_sensor.html
 description: Learn how to install MicroPython on your Raspberry Pi Pico to enable
   programming and communication through Thonny.
 percent: 24
-duration: 2
+duration: 1
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:

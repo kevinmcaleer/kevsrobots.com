@@ -8,7 +8,7 @@ date: 2023-04-27
 previous: 08_line_following_code.html
 description: Learn how to upgrade your BurgerBot with a camera.
 percent: 100
-duration: 2
+duration: 1
 navigation:
 - name: Build your own BurgerBot
 - content:

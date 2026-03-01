@@ -9,7 +9,7 @@ previous: lesson_02.html
 next: lesson_04.html
 description: "What you\u2019ll need to know to build robots and bring them to life"
 percent: 64
-duration: 2
+duration: 1
 navigation:
 - name: Robotics 101
 - content:

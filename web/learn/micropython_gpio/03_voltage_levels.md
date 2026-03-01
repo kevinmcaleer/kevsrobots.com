@@ -10,7 +10,7 @@ next: 04_digital_io.html
 description: Learn about the voltage levels of Raspberry Pi Pico pins and how to work
   with them safely.
 percent: 20
-duration: 3
+duration: 2
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:

@@ -10,7 +10,7 @@ next: 05_working_with_layouts_and_includes.html
 description: Learn advanced Markdown syntax and best practices for creating engaging
   content for your Jekyll site.
 percent: 40
-duration: 3
+duration: 2
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:

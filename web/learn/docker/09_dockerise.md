@@ -9,7 +9,7 @@ previous: 08_docker-compose.html
 next: 10_conclusion.html
 description: Practical project to containerize a simple web application using Docker.
 percent: 90
-duration: 3
+duration: 2
 navigation:
 - name: Docker
 - content:

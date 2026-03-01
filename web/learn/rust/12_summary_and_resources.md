@@ -10,7 +10,7 @@ next: 13_cargo.html
 description: Recap of the Rust programming course and a compilation of resources for
   further learning and exploration.
 percent: 84
-duration: 3
+duration: 2
 navigation:
 - name: Introduction to Rust
 - content:

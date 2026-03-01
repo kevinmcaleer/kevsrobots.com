@@ -10,7 +10,7 @@ next: 09_deploying_the_solution.html
 description: Learn how to integrate your FastAPI authentication system with a Jekyll
   static site, enabling dynamic content delivery based on user authentication.
 percent: 88
-duration: 3
+duration: 2
 navigation:
 - name: Building User Authentication for Static Sites with FastAPI
 - content:

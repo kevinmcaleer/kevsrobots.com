@@ -10,7 +10,7 @@ next: 12_summary.html
 description: "Apply what you\u2019ve learned to design, build, and code your very\
   \ own autonomous robot project."
 percent: 88
-duration: 3
+duration: 2
 date_updated: 2025-05-10
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico

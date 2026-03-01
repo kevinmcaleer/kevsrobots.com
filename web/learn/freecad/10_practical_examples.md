@@ -10,7 +10,7 @@ next: 11_tips_and_tricks.html
 description: Learn how to prepare and share your FreeCAD models through various platforms,
   including GitHub Pages.
 percent: 90
-duration: 3
+duration: 2
 navigation:
 - name: Introduction to FreeCAD for Beginners
 - content:
