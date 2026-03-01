@@ -8,7 +8,7 @@ title: Search Results
 
     <form class="mb-3" onsubmit="performSearch(event)">
         <div class="input-group">
-            <input class="form-control" id="search-box" type="search" placeholder="watcha lookin for?" aria-label="Search">
+            <input class="form-control" id="results-search-box" type="search" placeholder="watcha lookin for?" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Search</button>
         </div>
     </form>
@@ -338,7 +338,7 @@ title: Search Results
     // --- Search box ---
     function performSearch(event) {
         event.preventDefault();
-        var query = document.getElementById('search-box').value;
+        var query = document.getElementById('results-search-box').value;
         if (!query) return;
         // Reset filters on new search
         activeFilters.clear();
@@ -360,7 +360,7 @@ title: Search Results
 
         // Pre-fill search box with current query
         if (query) {
-            document.getElementById('search-box').value = query;
+            document.getElementById('results-search-box').value = query;
         }
 
         // Restore active filters from URL
