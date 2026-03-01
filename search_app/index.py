@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from search.database import insert_document  # Replace with your actual module
 
@@ -31,7 +32,12 @@ def parse_html_file(file_path):
         description_tag = soup.find('meta', {'property': 'description'}) 
         description = description_tag['content'] if description_tag and 'content' in description_tag.attrs else 'No Description'
         date_tag = soup.find('meta', {'property': 'date'})
-        date  = date_tag['content'] if date_tag and 'content' in date_tag.attrs else '2023-30-12'
+        if date_tag and 'content' in date_tag.attrs:
+            date = date_tag['content']
+        else:
+            # Fall back to file's last modified time
+            mtime = os.path.getmtime(file_path)
+            date = datetime.fromtimestamp(mtime, tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%S+00:00')
         author_tag = soup.find('meta', {'property': 'author'})
         author = author_tag['content'] if author_tag and 'content' in author_tag.attrs else 'Kevin McAleer'
 

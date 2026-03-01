@@ -1,5 +1,6 @@
 import sqlite3
 import re
+from datetime import datetime, timezone
 
 SEARCH_DB = 'search.db'
 
@@ -22,7 +23,7 @@ def insert_document(title, content, url, cover_image, page_title, description, d
     if author is None:
         author = "Kevin McAleer"
     if date is None:
-        date = "2023-12-30"
+        date = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S+00:00')
     if description is None:
         description = "No description"
     if page_type is None:
