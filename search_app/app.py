@@ -71,7 +71,7 @@ def create_document(title: str, content: str, url: str):
     return {"message": "Document created successfully"}
 
 @app.get("/search/")
-async def search_documents(request: Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10):
+async def search_documents(request: Request, query: str, page: Optional[int] = 1, page_size: Optional[int] = 10, sort: Optional[str] = "relevance"):
     """
     Search documents endpoint with PostgreSQL query logging.
 
@@ -80,11 +80,16 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
         query: Search query string
         page: Page number for pagination (default: 1)
         page_size: Number of results per page (default: 10)
+        sort: Sort order — "relevance" (BM25) or "recent" (date descending)
 
     Returns:
         dict: Search results with metadata and execution time
     """
     start_time = time.time()
+
+    # Validate sort parameter
+    if sort not in ("relevance", "recent"):
+        sort = "relevance"
 
     # Extract real client IP (handles proxy headers)
     client_ip = get_client_ip(request)
@@ -94,8 +99,14 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
     referer = request.headers.get("referer")
 
     # Execute search query
-    results = query_documents(query, offset=(page - 1) * page_size, limit=page_size)
-    total_count = total_results(query)
+    try:
+        results = query_documents(query, offset=(page - 1) * page_size, limit=page_size, sort=sort)
+        total_count = total_results(query)
+    except Exception as e:
+        print(f"Search query failed: {e}")
+        results = []
+        total_count = 0
+
     execution_time = time.time() - start_time
 
     # Log to PostgreSQL database
@@ -113,7 +124,6 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
         print(f'Search logged to PostgreSQL with ID: {log_id}')
     except Exception as e:
         print(f'Failed to log search to PostgreSQL: {e}')
-        # Continue even if logging fails - don't break the search functionality
 
     return {
         "results": results,
@@ -121,6 +131,7 @@ async def search_documents(request: Request, query: str, page: Optional[int] = 1
         "total_pages": (total_count // page_size) + (1 if total_count % page_size > 0 else 0),
         "page": page,
         "page_size": page_size,
+        "sort": sort,
         "execution_time": round(execution_time, 3)
     }
 

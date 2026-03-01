@@ -18,6 +18,10 @@
 <meta property="author" content="{{ page.author }}" />
 {% endif %}
 
+{% if page.layout %}
+<meta property="page-type" content="{{ page.layout }}" />
+{% endif %}
+
 {% if page.subtitle %}
 <meta property="og:description" content="{{ page.subtitle }}" />
 {% endif %}

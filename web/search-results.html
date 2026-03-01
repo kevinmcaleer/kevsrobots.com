@@ -1,6 +1,6 @@
 ---
 layout: content
-title: Search Results 
+title: Search Results
 ---
 {% include breadcrumbs.html %}
     <h1>Search Results</h1>
@@ -8,50 +8,70 @@ title: Search Results
     <p id="search-query-display">Showing Results for: <span id="search-query"></span><br />
     About <span id="total_count"></span> results (<span id="search-time"></span>)</p>
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="btn-group" role="group" aria-label="Sort results" id="sort-toggle">
+            <button type="button" class="btn btn-outline-secondary active" data-sort="relevance">Relevance</button>
+            <button type="button" class="btn btn-outline-secondary" data-sort="recent">Most Recent</button>
+        </div>
+    </div>
+
     <hr />
     <div id="results-container"></div>
     <script>
-    function createPagination(totalCount, pageSize, currentPage, query) {
+    const PAGE_TYPE_MAP = {
+        'blog':         { label: 'Blog Post',     color: 'primary' },
+        'lesson':       { label: 'Course',         color: 'success' },
+        'course':       { label: 'Course',         color: 'success' },
+        'project':      { label: 'Project',        color: 'warning' },
+        'review':       { label: 'Review',         color: 'info' },
+        'robot':        { label: 'Robot',          color: 'danger' },
+        'how_it_works': { label: 'How It Works',   color: 'secondary' },
+        'groups':       { label: 'Category',       color: 'dark' },
+        'content':      { label: 'Page',           color: 'light' },
+        'page':         { label: 'Page',           color: 'light' },
+    };
+
+    function getPageTypeBadge(pageType) {
+        const entry = PAGE_TYPE_MAP[pageType] || { label: pageType || 'Page', color: 'light' };
+        return `<span class="badge bg-${entry.color} me-2">${entry.label}</span>`;
+    }
+
+    function createPagination(totalCount, pageSize, currentPage, query, sort) {
         const totalPages = Math.ceil(totalCount / pageSize);
         const paginationContainer = document.getElementById('pagination-container');
-        paginationContainer.innerHTML = ''; // Clear existing pagination links
+        paginationContainer.innerHTML = '';
 
-        console.log('totalPages is:',totalPages);
-        console.log('currentPage is:',currentPage);
-        console.log('query is:',query);
-
-
-        // Create the unordered list element
         const ul = document.createElement('ul');
         ul.className = 'pagination';
 
-        // Helper function to create page item
         const createPageItem = (page, text = page) => {
-        const li = document.createElement('li');
-        li.className = 'page-item';
-        if (page === currentPage) {
-            li.classList.add('active');
-        }
+            const li = document.createElement('li');
+            li.className = 'page-item';
+            if (page === currentPage) {
+                li.classList.add('active');
+            }
 
-        const a = document.createElement('a');
-        a.className = 'page-link';
-        a.href = 'https://www.kevsrobots.com/search-results?query=' + query + '&page=' + page; // Corrected line
-        a.innerText = text;
-        a.addEventListener('click', function (e) {
-            // e.preventDefault();
-            performSearch(page);
-        });
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '/search-results?query=' + encodeURIComponent(query) + '&page=' + page + '&sort=' + sort;
+            a.innerText = text;
+            a.addEventListener('click', function (e) {
+                e.preventDefault();
+                fetchResults(query, page, sort);
+                // Update URL without reload
+                const url = new URL(window.location);
+                url.searchParams.set('page', page);
+                window.history.pushState({}, '', url);
+            });
 
-        li.appendChild(a);
-        return li;
-    };
+            li.appendChild(a);
+            return li;
+        };
 
-        // Previous Page
         if (currentPage > 1) {
             ul.appendChild(createPageItem(currentPage - 1, 'Previous'));
         }
 
-        // Page Numbers
         let startPage = Math.max(currentPage - 2, 1);
         let endPage = Math.min(startPage + 4, totalPages);
 
@@ -60,86 +80,124 @@ title: Search Results
         }
 
         for (let i = startPage; i <= endPage; i++) {
-            console.log('i is:',i);
             ul.appendChild(createPageItem(i));
         }
 
-        // Next Page
         if (currentPage < totalPages) {
             ul.appendChild(createPageItem(currentPage + 1, 'Next'));
         }
 
-        // Append the constructed list to the pagination container
         paginationContainer.appendChild(ul);
     }
 
-    
+    function displayResults(results) {
+        var resultsContainer = document.getElementById('results-container');
+        resultsContainer.innerHTML = '';
+
+        var defaultImage = '/assets/img/default_image.png';
+
+        if (!results || results.length === 0) {
+            resultsContainer.innerHTML = '<p class="text-muted">No results found. Try a different search term.</p>';
+            return;
+        }
+
+        results.forEach(function(result) {
+            var div = document.createElement('div');
+            var imageUrl = result.cover_image && result.cover_image !== "https://www.kevsrobots.com/DefaultImagePath"
+                        ? result.cover_image
+                        : defaultImage;
+
+            var publishedDate = new Date(result.date);
+            var formattedDate = publishedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            var badge = getPageTypeBadge(result.page_type);
+
+            // Use snippet with highlights if available, otherwise fall back to description
+            var displayText = result.snippet ? result.snippet : (result.description || '');
+
+            var authorName = result.author || 'Kevin McAleer';
+
+            div.innerHTML = `<div class="row g-1 mb-3">
+                <div class="col-3 col-lg-2">
+                    <a href="${result.url}">
+                        <img src="${imageUrl}" alt="${result.page_title}" class="img-fluid rounded" loading="lazy">
+                    </a>
+                </div>
+                <div class="col-9 col-lg-10">
+                    <h5 class="mb-1">${badge}<a href="${result.url}" class="text-decoration-none">${result.page_title}</a></h5>
+                    <p class="mb-1">${displayText}</p>
+                    <small class="text-muted">
+                        <i class="fa-solid fa-user me-1"></i>${authorName}
+                        <span class="mx-2">|</span>
+                        <i class="fa-regular fa-calendar me-1"></i>${formattedDate}
+                    </small>
+                    <br /><a href="${result.url}" class="small text-muted">${result.url}</a>
+                </div>
+            </div><hr />`;
+            resultsContainer.appendChild(div);
+        });
+    }
+
+    function fetchResults(query, page, sort) {
+        if (!query) return;
+
+        document.getElementById('results-container').innerHTML = '<p class="text-muted">Searching...</p>';
+
+        fetch('https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query) + '&page=' + page + '&sort=' + sort)
+            .then(response => response.json())
+            .then(data => {
+                displayResults(data.results);
+                document.getElementById('total_count').textContent = data.total_count;
+                document.getElementById('search-time').textContent = data.execution_time + ' seconds';
+                createPagination(data.total_count, data.page_size, data.page, query, sort);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('results-container').innerHTML =
+                    '<p class="text-danger">Something went wrong with the search. Please try again.</p>';
+            });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         var urlParams = new URLSearchParams(window.location.search);
         var query = urlParams.get('query');
-        var page = urlParams.get('page');
-        if (page == null) {
-            page = 1;
-            console.log("Page was null, setting to 1");
-        }
+        var page = parseInt(urlParams.get('page')) || 1;
+        var sort = urlParams.get('sort') || 'relevance';
 
-         // Set the search query in the "Showing Results for" section
+        // Set the search query in the "Showing Results for" section
         if (query) {
             document.getElementById('search-query').textContent = query;
         } else {
             document.getElementById('search-query-display').textContent = 'Showing All Results';
-      
         }
-        
-        // Call your API to get the search results
-        fetch('https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query) + '&page=' + page)
-        // fetch('http://0.0.0.0:8000/search/?query=' + encodeURIComponent(query) + '&page=' + page)
-            .then(response => response.json())
-            .then(data => { 
-                 displayResults(data.results);
-                 document.getElementById('total_count').textContent = data.total_count;
-                 document.getElementById('search-time').textContent = data.execution_time + ' seconds';
-                 console.log(data);
-                 createPagination(data.total_count, data.page_size, data.page, query);
-                })
-                 
-            .catch(error => console.error('Error:', error));
-        
-    });
 
-    function displayResults(results) {
-        var resultsContainer = document.getElementById('results-container');
-        resultsContainer.innerHTML = ''; // Clear previous results
-
-        // Define a default or placeholder image URL
-        var defaultImage = '/assets/img/default_image.png'; // Update with the path to your default image
-
-        // Display each result
-        results.forEach(function(result) {
-            var div = document.createElement('div');
-            var imageUrl = result.cover_image && result.cover_image !== "https://www.kevsrobots.com/DefaultImagePath"
-                        ? result.cover_image 
-                        : defaultImage; // Use the default image if cover_image is not available
-            // Format the date
-            var publishedDate = new Date(result.date);
-            var formattedDate = publishedDate.toLocaleDateString('en-US', {  day: 'numeric', month: 'long',year: 'numeric' });
-
-            div.innerHTML = `<div class="row row-cols g-1 m-3">
-                <div class="col">
-                            <div class="row">
-                            <div class="col-4 col-lg-2">
-                                <img src="${imageUrl}" alt="{{page.title}}" class="img-fluid w-100" style="width=100px">
-                            </div>
-                            <div class="col-8 col-lg-10">
-                            <p><b>${result.page_title}</b><br />
-                            ${result.description} | Published: ${formattedDate}</p>
-                            <a href="${result.url}">${result.url}</a>
-                            </div>                    
-                             </div>
-                             </div><hr />`;
-            resultsContainer.appendChild(div);
+        // Set active sort button
+        document.querySelectorAll('#sort-toggle button').forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.sort === sort);
         });
-    }
+
+        // Sort toggle handler
+        document.querySelectorAll('#sort-toggle button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var newSort = this.dataset.sort;
+                document.querySelectorAll('#sort-toggle button').forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // Update URL
+                var url = new URL(window.location);
+                url.searchParams.set('sort', newSort);
+                url.searchParams.set('page', '1');
+                window.history.pushState({}, '', url);
+
+                fetchResults(query, 1, newSort);
+            });
+        });
+
+        // Initial fetch
+        fetchResults(query, page, sort);
+    });
     </script>
     <div class="d-flex justify-content-center">
     <nav aria-label="Page navigation" id="pagination-container"></nav>

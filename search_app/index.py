@@ -59,11 +59,14 @@ def parse_html_file(file_path):
             # Clean up double slashes
             cover_image = cover_image.replace(".com//",".com/")
 
+        page_type_tag = soup.find('meta', {'property': 'page-type'})
+        page_type = page_type_tag['content'] if page_type_tag and 'content' in page_type_tag.attrs else 'page'
+
         h1_tag = soup.find('h1')
         # page_title = h1_tag.get_text().strip() if h1_tag else 'Untitled Page'
         page_title = title
 
-        insert_document(title, content, url, cover_image, page_title, description, date, author)
+        insert_document(title, content, url, cover_image, page_title, description, date, author, page_type)
         return True  # Successfully indexed
     except Exception as e:
         print(f"Warning: Error processing content from {file_path}: {e}")
