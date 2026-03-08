@@ -30,9 +30,10 @@
   category: "tutorial"
   next_dates:
     - "2026-02-22"
+    - "2026-03-15"
     - "2026-03-29"
-    - "2026-04-05"
-    - "2026-04-19"
+    - "2026-04-12"
+    - "2026-04-26"
 # Add more shows here as needed
 # Example:
 # - name: "Build Along Session"
