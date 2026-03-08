@@ -171,6 +171,18 @@ description: Regular livestream schedule for KevsRobots - join us for live build
 }
 </style>
 
+{% include nav_videos.html %}
+
+{% include breadcrumbs.html %}
+
+# Show Schedule
+## Details of upcoming shows, calendar view, and how to subscribe to updates
+
+This page provides a list of upcoming shows, a calendar view of scheduled events, and instructions on how to subscribe to the schedule so you never miss a live stream. All times are in the {{ site.site_timezone }} timezone.
+
+---
+
+
 {% comment %}Build event date lookup for quick checks{% endcomment %}
 {% assign event_dates = "" | split: "" %}
 {% for show in site.data.schedule %}
