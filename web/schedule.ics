@@ -60,7 +60,7 @@ END:VTIMEZONE
 {%- else -%}
 {%- assign end_min_str = end_min | append: "" -%}
 {%- endif -%}
-{%- assign end_time = end_hour_str | append: end_min_str -%}
+{%- assign end_time = end_hour_str | append: end_min_str %}
 BEGIN:VEVENT
 UID:{{ show.name | slugify }}-{{ date | date: "%Y%m%d" }}@kevsrobots.com
 DTSTAMP:{{ site.time | date: "%Y%m%dT%H%M%SZ" }}
@@ -74,7 +74,7 @@ STATUS:CONFIRMED
 TRANSP:OPAQUE
 SEQUENCE:0
 END:VEVENT
-{%- endfor -%}
+{% endfor -%}
 {%- endif -%}
 {%- endfor %}
 END:VCALENDAR
