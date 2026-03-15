@@ -1,3 +1,9 @@
+- name: Eye Mech
+  link: /blog/eyemech.html
+  cover: /assets/img/blog/eyemech/cover.jpg
+  description: "Exploring the Wonders of Animatronic Eyes with Will Coley's Eye Mechanism"
+  date: 2026/03/15
+  hero: /assets/img/blog/eyemech/hero.png
 - name: Cubie-3
   link: /projects/cubie-3/
   cover: /projects/cubie-3/assets/img/cover.jpg
