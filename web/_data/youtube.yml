@@ -2,26 +2,32 @@
   title: "I Let AI Write the Code for My Robot Arm"
   video_id: 90pPahgU9JM
   type: livestream
+  strategy: home
 - published: 2026/04/19
   title: "Why are Bus Servos better?"
   video_id: nzBZOTdEdtE
   type: video
+  strategy: help
 - published: 2026/04/05
   title: "10 Affordable Raspberry Pi Projects for Beginners"
   video_id: TuQYtYlSEWY
   type: livestream
+  strategy: home
 - published: 2026/03/29
   video_id: S0djkk-CtBY
   title: "I made it talk - Add speech to your MicroPython projects with SAM"
   type: video
+  strategy: hero
 - published: 2026/03/15
   title: "You have to build this eyemech"
   video_id: XpKnyTx_1mQ
   type: video
+  strategy: hero
 - published: 2026/03/01
   title: "These 3 Pimoroni Badges are INCREDIBLE! + Mailbag Hangout"
   video_id: L4bFDYHUAy0
   type: livestream
+  strategy: home
 - published: 2026/02/22
   title: "From Code to Creation - Part 2 - Adding an OLED Display to your MicroPython Projects"
   video_id: K0X4W09tiEA
