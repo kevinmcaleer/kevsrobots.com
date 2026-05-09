@@ -1,0 +1,588 @@
+<style>
+/* ============================================
+   NIBSY WIDGET — FIXED POSITION ASSISTANT
+   ============================================ */
+
+#nibsy-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#nibsy-widget * {
+  pointer-events: auto;
+}
+
+#nibsy-widget .nibsy-char {
+  width: 100px;
+  height: 120px;
+  cursor: pointer;
+  position: relative;
+  transition: filter 0.2s ease;
+}
+
+#nibsy-widget .nibsy-char:hover {
+  filter: drop-shadow(0 2px 8px rgba(74, 144, 217, 0.4));
+}
+
+/* ---- Entrance animation ---- */
+
+#nibsy-widget .nibsy-stage {
+  position: relative;
+  overflow: visible;
+}
+
+#nibsy-widget.nibsy-entering .nibsy-char {
+  animation: nibsy-walk-on 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes nibsy-walk-on {
+  0% {
+    transform: translateX(120px) rotate(5deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  40% {
+    transform: translateX(10px) rotate(-3deg);
+  }
+  60% {
+    transform: translateX(-5px) rotate(2deg);
+  }
+  80% {
+    transform: translateX(3px) rotate(-1deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
+/* ---- Peek animation ---- */
+
+#nibsy-widget.nibsy-peeking .nibsy-char {
+  animation: nibsy-peek 0.6s ease-out forwards;
+}
+
+@keyframes nibsy-peek {
+  0% {
+    transform: translateX(80px);
+  }
+  100% {
+    transform: translateX(50px);
+  }
+}
+
+/* ---- Exit animation ---- */
+
+#nibsy-widget.nibsy-exiting .nibsy-char {
+  animation: nibsy-walk-off 0.6s ease-in forwards;
+}
+
+@keyframes nibsy-walk-off {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120px) rotate(5deg);
+    opacity: 0;
+  }
+}
+
+/* ---- Hidden state ---- */
+
+#nibsy-widget.nibsy-hidden .nibsy-char,
+#nibsy-widget.nibsy-hidden .nibsy-menu,
+#nibsy-widget.nibsy-hidden .nibsy-widget-speech {
+  display: none;
+}
+
+#nibsy-widget.nibsy-hidden .nibsy-show-btn {
+  display: flex;
+}
+
+.nibsy-show-btn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #D0D0D0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  transition: all 0.2s ease;
+  z-index: 10000;
+}
+
+.nibsy-show-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+
+/* ---- Menu ---- */
+
+.nibsy-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 8px;
+  background: white;
+  border: 2px solid #D0D0D0;
+  border-radius: 16px;
+  padding: 12px 8px 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  transform: scale(0) translateY(10px);
+  transform-origin: bottom right;
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+  pointer-events: none;
+  min-width: 200px;
+}
+
+.nibsy-menu.open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nibsy-menu::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 32px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white;
+}
+
+.nibsy-menu::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: 31px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid #D0D0D0;
+}
+
+.nibsy-menu-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  padding: 0 8px 8px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 4px;
+}
+
+.nibsy-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s ease;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.nibsy-menu-item:hover {
+  background: #f0f4f8;
+  color: #333;
+  text-decoration: none;
+}
+
+.nibsy-menu-item i {
+  width: 20px;
+  text-align: center;
+  color: #4A90D9;
+  font-size: 15px;
+}
+
+.nibsy-menu-divider {
+  height: 1px;
+  background: #eee;
+  margin: 4px 8px;
+}
+
+.nibsy-menu-item.nibsy-hide-btn {
+  color: #999;
+  font-size: 13px;
+}
+
+.nibsy-menu-item.nibsy-hide-btn:hover {
+  background: #fff0f0;
+  color: #cc4444;
+}
+
+.nibsy-menu-item.nibsy-hide-btn i {
+  color: #999;
+  font-size: 13px;
+}
+
+.nibsy-menu-item.nibsy-hide-btn:hover i {
+  color: #cc4444;
+}
+
+/* ---- Speech bubble (widget version) ---- */
+
+.nibsy-widget-speech {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 8px;
+  background: white;
+  border: 2px solid #D0D0D0;
+  border-radius: 14px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: scale(0);
+  transform-origin: bottom right;
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.nibsy-widget-speech::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 32px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white;
+}
+
+.nibsy-widget-speech::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: 31px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid #D0D0D0;
+}
+
+.nibsy-widget-speech.visible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* ---- Idle animations ---- */
+
+@keyframes nw-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+@keyframes nw-antenna-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  30%      { transform: rotate(4deg); }
+  70%      { transform: rotate(-4deg); }
+}
+
+@keyframes nw-blink {
+  0%   { transform: scaleY(1); }
+  40%  { transform: scaleY(0.05); }
+  60%  { transform: scaleY(0.05); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes nw-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50%      { transform: scale(1.01, 1.008); }
+}
+
+#nibsy-widget.nibsy-idle .nibsy-char svg {
+  animation: nw-bob 3s ease-in-out infinite;
+}
+
+#nibsy-widget.nibsy-idle #nw-antenna {
+  animation: nw-antenna-wobble 2.5s ease-in-out infinite;
+  transform-origin: 100px 88px;
+}
+
+#nibsy-widget.nibsy-idle #nw-body-shape {
+  animation: nw-breathe 4s ease-in-out infinite;
+  transform-origin: 100px 150px;
+}
+
+#nibsy-widget.nibsy-blinking #nw-eye-left,
+#nibsy-widget.nibsy-blinking #nw-eye-right {
+  animation: nw-blink 0.18s ease-in-out forwards;
+}
+
+#nw-eye-left  { transform-origin: 78px 128px; }
+#nw-eye-right { transform-origin: 122px 128px; }
+</style>
+
+<div id="nibsy-widget" class="nibsy-entering">
+  <div class="nibsy-widget-speech" id="nw-speech"></div>
+  <div class="nibsy-menu" id="nw-menu">
+    <div class="nibsy-menu-header">What are you looking for?</div>
+    <a href="/all_videos" class="nibsy-menu-item"><i class="fas fa-play-circle"></i> Watch Videos</a>
+    <a href="/robots/" class="nibsy-menu-item"><i class="fas fa-lightbulb"></i> Get Ideas</a>
+    <a href="/learn/" class="nibsy-menu-item"><i class="fas fa-graduation-cap"></i> Learn Something</a>
+    <a href="/reviews/" class="nibsy-menu-item"><i class="fas fa-star"></i> Read a Review</a>
+    <a href="/blog/" class="nibsy-menu-item"><i class="fas fa-newspaper"></i> Read the Blog</a>
+    <a href="/search" class="nibsy-menu-item"><i class="fas fa-search"></i> Search</a>
+    <div class="nibsy-menu-divider"></div>
+    <button class="nibsy-menu-item nibsy-hide-btn" id="nw-hide-btn"><i class="fas fa-eye-slash"></i> Hide Nibsy</button>
+  </div>
+  <div class="nibsy-stage">
+    <div class="nibsy-char" id="nw-char">
+      <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="nw-body-grad" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <stop offset="100%" stop-color="#F0F0F0" />
+          </radialGradient>
+          <radialGradient id="nw-cheek-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFB6C1" />
+            <stop offset="100%" stop-color="#FFB6C1" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <g id="nw-root">
+          <ellipse cx="100" cy="218" rx="45" ry="6" fill="#00000010" />
+          <g id="nw-legs">
+            <ellipse cx="80" cy="202" rx="16" ry="10" fill="url(#nw-body-grad)" stroke="#CCC" stroke-width="2" />
+            <ellipse cx="120" cy="202" rx="16" ry="10" fill="url(#nw-body-grad)" stroke="#CCC" stroke-width="2" />
+          </g>
+          <g id="nw-arm-left">
+            <ellipse cx="46" cy="152" rx="18" ry="12" fill="url(#nw-body-grad)" stroke="#CCC" stroke-width="2" transform="rotate(-20,46,152)" />
+          </g>
+          <g id="nw-arm-right">
+            <ellipse cx="154" cy="152" rx="18" ry="12" fill="url(#nw-body-grad)" stroke="#CCC" stroke-width="2" transform="rotate(20,154,152)" />
+          </g>
+          <g id="nw-body">
+            <g id="nw-body-shape">
+              <path d="M40,140 Q40,88 100,85 Q160,88 160,140 Q160,200 100,200 Q40,200 40,140 Z" fill="url(#nw-body-grad)" stroke="#D0D0D0" stroke-width="2.5" />
+            </g>
+          </g>
+          <g id="nw-head-dots">
+            <circle cx="140" cy="105" r="3.5" fill="#CCC" />
+            <circle cx="146" cy="114" r="3.5" fill="#CCC" />
+            <circle cx="149" cy="124" r="3.5" fill="#CCC" />
+            <circle cx="148" cy="134" r="3.5" fill="#CCC" />
+            <circle cx="144" cy="143" r="3" fill="#CCC" />
+          </g>
+          <g id="nw-antenna">
+            <line x1="100" y1="85" x2="100" y2="62" stroke="#D0D0D0" stroke-width="3" stroke-linecap="round" />
+            <circle cx="100" cy="58" r="8" fill="#F5C542" stroke="#E0A800" stroke-width="1.5" />
+          </g>
+          <g id="nw-eyes">
+            <circle cx="78" cy="128" r="11" fill="#FFF" opacity="0.5" />
+            <circle cx="122" cy="128" r="11" fill="#FFF" opacity="0.5" />
+            <circle id="nw-eye-left" cx="78" cy="128" r="8" fill="#222" />
+            <circle id="nw-eye-right" cx="122" cy="128" r="8" fill="#222" />
+            <circle cx="81" cy="125" r="3" fill="#FFF" opacity="0.8" />
+            <circle cx="125" cy="125" r="3" fill="#FFF" opacity="0.8" />
+            <circle cx="76" cy="130" r="1.5" fill="#FFF" opacity="0.5" />
+            <circle cx="120" cy="130" r="1.5" fill="#FFF" opacity="0.5" />
+          </g>
+          <g id="nw-cheeks">
+            <circle cx="67" cy="143" r="10" fill="url(#nw-cheek-grad)" opacity="0.5" />
+            <circle cx="133" cy="143" r="10" fill="url(#nw-cheek-grad)" opacity="0.5" />
+          </g>
+          <g id="nw-mouth">
+            <path d="M92,150 Q100,158 108,150" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" />
+          </g>
+          <g id="nw-buttons">
+            <circle cx="93" cy="170" r="3.5" fill="#4A90D9" />
+            <circle cx="100" cy="178" r="3.5" fill="#5CB85C" />
+            <circle cx="93" cy="186" r="3.5" fill="#F5C542" />
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <button class="nibsy-show-btn" id="nw-show-btn" title="Show Nibsy">🤖</button>
+</div>
+
+<script>
+(function() {
+  const widget = document.getElementById('nibsy-widget');
+  const charEl = document.getElementById('nw-char');
+  const menu = document.getElementById('nw-menu');
+  const speech = document.getElementById('nw-speech');
+  const hideBtn = document.getElementById('nw-hide-btn');
+  const showBtn = document.getElementById('nw-show-btn');
+  const eyeLeft = document.getElementById('nw-eye-left');
+  const eyeRight = document.getElementById('nw-eye-right');
+
+  let menuOpen = false;
+  let blinkTimer = null;
+  let speechTimer = null;
+  let hidden = localStorage.getItem('nibsy-hidden') === 'true';
+
+  // --- Entrance ---
+
+  function init() {
+    if (hidden) {
+      widget.classList.remove('nibsy-entering');
+      widget.classList.add('nibsy-hidden');
+      return;
+    }
+
+    widget.classList.add('nibsy-entering');
+    setTimeout(() => {
+      widget.classList.remove('nibsy-entering');
+      widget.classList.add('nibsy-idle');
+      startBlinking();
+      showSpeech("Hi! I'm Nibsy! Click me for help 😊", 4000);
+    }, 1400);
+  }
+
+  // --- Blinking ---
+
+  function startBlinking() {
+    scheduleBlink();
+  }
+
+  function stopBlinking() {
+    if (blinkTimer) { clearTimeout(blinkTimer); blinkTimer = null; }
+  }
+
+  function scheduleBlink() {
+    blinkTimer = setTimeout(() => {
+      doBlink();
+    }, 2500 + Math.random() * 4500);
+  }
+
+  function doBlink() {
+    widget.classList.add('nibsy-blinking');
+    const onEnd = () => {
+      widget.classList.remove('nibsy-blinking');
+      eyeLeft.removeEventListener('animationend', onEnd);
+      if (Math.random() < 0.2) {
+        setTimeout(() => {
+          widget.classList.add('nibsy-blinking');
+          const onEnd2 = () => {
+            widget.classList.remove('nibsy-blinking');
+            eyeLeft.removeEventListener('animationend', onEnd2);
+            scheduleBlink();
+          };
+          eyeLeft.addEventListener('animationend', onEnd2);
+        }, 180);
+      } else {
+        scheduleBlink();
+      }
+    };
+    eyeLeft.addEventListener('animationend', onEnd);
+  }
+
+  // --- Speech ---
+
+  function showSpeech(text, duration) {
+    if (menuOpen) return;
+    if (speechTimer) clearTimeout(speechTimer);
+    speech.textContent = text;
+    speech.classList.add('visible');
+    speechTimer = setTimeout(() => {
+      speech.classList.remove('visible');
+      speechTimer = null;
+    }, duration || 3000);
+  }
+
+  function hideSpeech() {
+    if (speechTimer) clearTimeout(speechTimer);
+    speech.classList.remove('visible');
+    speechTimer = null;
+  }
+
+  // --- Menu ---
+
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+    if (menuOpen) {
+      hideSpeech();
+      menu.classList.add('open');
+    } else {
+      menu.classList.remove('open');
+    }
+  }
+
+  function closeMenu() {
+    menuOpen = false;
+    menu.classList.remove('open');
+  }
+
+  charEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (menuOpen && !menu.contains(e.target) && !charEl.contains(e.target)) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuOpen) closeMenu();
+  });
+
+  // --- Hide / Show ---
+
+  hideBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeMenu();
+    stopBlinking();
+
+    widget.classList.remove('nibsy-idle');
+    widget.classList.add('nibsy-exiting');
+
+    setTimeout(() => {
+      widget.classList.remove('nibsy-exiting');
+      widget.classList.add('nibsy-hidden');
+      hidden = true;
+      localStorage.setItem('nibsy-hidden', 'true');
+    }, 600);
+  });
+
+  showBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hidden = false;
+    localStorage.setItem('nibsy-hidden', 'false');
+    widget.classList.remove('nibsy-hidden');
+    widget.classList.add('nibsy-entering');
+
+    setTimeout(() => {
+      widget.classList.remove('nibsy-entering');
+      widget.classList.add('nibsy-idle');
+      startBlinking();
+      showSpeech("I'm back! 👋", 2500);
+    }, 1400);
+  });
+
+  // --- Init ---
+  init();
+})();
+</script>
