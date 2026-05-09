@@ -452,6 +452,39 @@
 }
 
 #nw-antenna { cursor: pointer; }
+
+/* ---- Click surprised reaction ---- */
+
+#nw-mouth-surprised { display: none; }
+#nibsy-widget.nibsy-surprised #nw-mouth-normal { display: none; }
+#nibsy-widget.nibsy-surprised #nw-mouth-surprised { display: block; }
+
+@keyframes nw-surprise-blink {
+  0%   { transform: scaleY(1); }
+  15%  { transform: scaleY(0.05); }
+  30%  { transform: scaleY(1); }
+  55%  { transform: scaleY(0.05); }
+  70%  { transform: scaleY(1); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes nw-mouth-pop {
+  0%   { transform: scale(0.5); opacity: 0.5; }
+  20%  { transform: scale(1.2); opacity: 1; }
+  40%  { transform: scale(1); opacity: 1; }
+  70%  { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+#nibsy-widget.nibsy-surprised #nw-eyes {
+  animation: nw-surprise-blink 0.5s ease-in-out;
+  transform-origin: 100px 128px;
+}
+
+#nibsy-widget.nibsy-surprised #nw-mouth-surprised {
+  animation: nw-mouth-pop 0.5s ease-in-out forwards;
+  transform-origin: 100px 152px;
+}
 </style>
 
 <div id="nibsy-widget" class="nibsy-entering">
@@ -530,6 +563,7 @@
             <path id="nw-mouth-normal" d="M92,150 Q100,158 108,150" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" />
             <ellipse id="nw-mouth-sleep" cx="100" cy="152" rx="4" ry="3" fill="#555" opacity="0.6" />
             <path id="nw-mouth-giggle" d="M88,148 Q100,164 112,148" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" />
+            <ellipse id="nw-mouth-surprised" cx="100" cy="153" rx="5" ry="6" fill="#555" opacity="0.7" />
           </g>
           <g id="nw-buttons">
             <circle cx="93" cy="170" r="3.5" fill="#4A90D9" />
@@ -783,6 +817,19 @@
     menu.classList.remove('open');
   }
 
+  let surprising = false;
+
+  function surprised(callback) {
+    if (surprising) { if (callback) callback(); return; }
+    surprising = true;
+    widget.classList.add('nibsy-surprised');
+    setTimeout(() => {
+      widget.classList.remove('nibsy-surprised');
+      surprising = false;
+      if (callback) callback();
+    }, 500);
+  }
+
   charEl.addEventListener('click', (e) => {
     e.stopPropagation();
     resetInactivity();
@@ -790,7 +837,7 @@
       wakeUp();
       return;
     }
-    toggleMenu();
+    surprised(() => toggleMenu());
   });
 
   document.addEventListener('click', (e) => {
