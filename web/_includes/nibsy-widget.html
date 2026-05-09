@@ -390,9 +390,11 @@
   display: block;
 }
 
-#nw-mouth-sleep { display: none; }
+#nw-mouth-sleep, #nw-mouth-giggle { display: none; }
 #nibsy-widget.nibsy-sleeping #nw-mouth-normal { display: none; }
 #nibsy-widget.nibsy-sleeping #nw-mouth-sleep { display: block; }
+#nibsy-widget.nibsy-giggling #nw-mouth-normal { display: none; }
+#nibsy-widget.nibsy-giggling #nw-mouth-giggle { display: block; }
 
 #nw-zzz { display: none; }
 #nibsy-widget.nibsy-sleeping #nw-zzz { display: block; }
@@ -406,6 +408,50 @@
 #nibsy-widget.nibsy-sleeping #nw-zzz-3 {
   animation: nw-zzz-float-3 2.5s ease-out infinite 1.6s;
 }
+
+/* ---- Giggle animation ---- */
+
+@keyframes nw-giggle-shake {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  10%  { transform: translateY(-3px) rotate(-2deg); }
+  20%  { transform: translateY(0) rotate(2deg); }
+  30%  { transform: translateY(-4px) rotate(-1deg); }
+  40%  { transform: translateY(0) rotate(1deg); }
+  50%  { transform: translateY(-2px) rotate(-2deg); }
+  60%  { transform: translateY(0) rotate(1deg); }
+  70%  { transform: translateY(-3px) rotate(-1deg); }
+  80%  { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes nw-antenna-boing {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(15deg); }
+  30%  { transform: rotate(-12deg); }
+  45%  { transform: rotate(8deg); }
+  60%  { transform: rotate(-5deg); }
+  75%  { transform: rotate(3deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes nw-cheek-blush {
+  0%, 100% { opacity: 0.5; }
+  30%      { opacity: 0.9; }
+}
+
+#nibsy-widget.nibsy-giggling .nibsy-char svg {
+  animation: nw-giggle-shake 0.8s ease-in-out;
+}
+
+#nibsy-widget.nibsy-giggling #nw-antenna {
+  animation: nw-antenna-boing 0.8s ease-in-out !important;
+  transform-origin: 100px 88px;
+}
+
+#nibsy-widget.nibsy-giggling #nw-cheeks circle {
+  animation: nw-cheek-blush 0.8s ease-in-out;
+}
+
+#nw-antenna { cursor: pointer; }
 </style>
 
 <div id="nibsy-widget" class="nibsy-entering">
@@ -483,6 +529,7 @@
           <g id="nw-mouth">
             <path id="nw-mouth-normal" d="M92,150 Q100,158 108,150" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" />
             <ellipse id="nw-mouth-sleep" cx="100" cy="152" rx="4" ry="3" fill="#555" opacity="0.6" />
+            <path id="nw-mouth-giggle" d="M88,148 Q100,164 112,148" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" />
           </g>
           <g id="nw-buttons">
             <circle cx="93" cy="170" r="3.5" fill="#4A90D9" />
@@ -688,6 +735,36 @@
     speech.classList.remove('visible');
     speechTimer = null;
   }
+
+  // --- Giggle ---
+
+  const giggleMessages = [
+    "Hehe, that tickles!",
+    "Tee-hee!",
+    "Stop it, that tickles!",
+    "Hahaha!",
+    "That's my antenna!"
+  ];
+  let giggling = false;
+
+  function giggle() {
+    if (giggling) return;
+    giggling = true;
+    resetInactivity();
+    if (sleeping) wakeUp();
+    closeMenu();
+    widget.classList.add('nibsy-giggling');
+    showSpeech(giggleMessages[Math.floor(Math.random() * giggleMessages.length)], 2000);
+    setTimeout(() => {
+      widget.classList.remove('nibsy-giggling');
+      giggling = false;
+    }, 800);
+  }
+
+  document.getElementById('nw-antenna').addEventListener('click', (e) => {
+    e.stopPropagation();
+    giggle();
+  });
 
   // --- Menu ---
 
