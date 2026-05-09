@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nibsy — Animated Character Prototype</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f4f8;
+    transition: background 0.3s ease;
+  }
+
+  body.dark {
+    background: #1a1a2e;
+    color: #e0e0e0;
+  }
+
+  .character-container {
+    width: 200px;
+    height: 240px;
+    margin: 40px 0 30px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .controls button {
+    padding: 8px 16px;
+    border: 2px solid #4A90D9;
+    border-radius: 20px;
+    background: white;
+    color: #4A90D9;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .controls button:hover {
+    background: #4A90D9;
+    color: white;
+  }
+
+  .controls button.active {
+    background: #4A90D9;
+    color: white;
+  }
+
+  body.dark .controls button {
+    background: #2a2a4a;
+    border-color: #6ab0ff;
+    color: #6ab0ff;
+  }
+
+  body.dark .controls button:hover,
+  body.dark .controls button.active {
+    background: #6ab0ff;
+    color: #1a1a2e;
+  }
+
+  .label {
+    margin-top: 20px;
+    font-size: 13px;
+    opacity: 0.6;
+  }
+
+  /* ============================================
+     NIBSY ANIMATION KEYFRAMES
+     ============================================ */
+
+  @keyframes nibsy-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+
+  @keyframes nibsy-breathe {
+    0%, 100% { transform: scale(1, 1); }
+    50%      { transform: scale(1.015, 1.01); }
+  }
+
+  @keyframes nibsy-antenna-wobble {
+    0%, 100% { transform: rotate(0deg); }
+    30%      { transform: rotate(4deg); }
+    70%      { transform: rotate(-4deg); }
+  }
+
+  @keyframes nibsy-blink {
+    0%   { transform: scaleY(1); }
+    40%  { transform: scaleY(0.05); }
+    60%  { transform: scaleY(0.05); }
+    100% { transform: scaleY(1); }
+  }
+
+  @keyframes nibsy-arm-sway-left {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(-4deg); }
+  }
+
+  @keyframes nibsy-arm-sway-right {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(4deg); }
+  }
+
+  @keyframes nibsy-cheek-glow {
+    0%, 100% { opacity: 0.45; }
+    50%      { opacity: 0.7; }
+  }
+
+  @keyframes nibsy-antenna-bobble-bounce {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.1, 0.9); }
+  }
+
+  /* ============================================
+     NIBSY ANIMATION CLASSES (applied by JS)
+     ============================================ */
+
+  .nibsy-idle #nibsy {
+    animation: nibsy-bob 3s ease-in-out infinite;
+  }
+
+  .nibsy-idle #nibsy-body-shape {
+    animation: nibsy-breathe 4s ease-in-out infinite;
+    transform-origin: 100px 150px;
+  }
+
+  .nibsy-idle #nibsy-antenna {
+    animation: nibsy-antenna-wobble 2.5s ease-in-out infinite;
+    transform-origin: 100px 88px;
+  }
+
+  .nibsy-idle #nibsy-antenna-bobble {
+    animation: nibsy-antenna-bobble-bounce 2s ease-in-out infinite;
+    transform-origin: 100px 58px;
+  }
+
+  .nibsy-idle #nibsy-arm-left {
+    animation: nibsy-arm-sway-left 5s ease-in-out infinite;
+    transform-origin: 62px 148px;
+  }
+
+  .nibsy-idle #nibsy-arm-right {
+    animation: nibsy-arm-sway-right 5s ease-in-out infinite 0.5s;
+    transform-origin: 138px 148px;
+  }
+
+  .nibsy-idle #nibsy-cheeks circle {
+    animation: nibsy-cheek-glow 4s ease-in-out infinite;
+  }
+
+  .nibsy-blinking #nibsy-eye-left,
+  .nibsy-blinking #nibsy-eye-right-open {
+    animation: nibsy-blink 0.18s ease-in-out forwards;
+  }
+
+  #nibsy-eye-left {
+    transform-origin: 85px 128px;
+  }
+
+  #nibsy-eye-right-open {
+    transform-origin: 115px 128px;
+  }
+</style>
+</head>
+<body>
+
+<div class="character-container">
+  <svg id="nibsy-svg" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="body-gradient" cx="40%" cy="35%" r="60%">
+        <stop offset="0%" stop-color="#FFFFFF" />
+        <stop offset="100%" stop-color="#F0F0F0" />
+      </radialGradient>
+      <radialGradient id="cheek-gradient" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#FFB6C1" />
+        <stop offset="100%" stop-color="#FFB6C1" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+
+    <g id="nibsy">
+
+      <!-- Shadow -->
+      <ellipse cx="100" cy="218" rx="45" ry="6" fill="#00000010" />
+
+      <!-- Legs -->
+      <g id="nibsy-legs">
+        <ellipse cx="80" cy="202" rx="16" ry="10" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" />
+        <ellipse cx="120" cy="202" rx="16" ry="10" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" />
+      </g>
+
+      <!-- Arms (behind body) -->
+      <g id="nibsy-arm-left">
+        <ellipse cx="46" cy="152" rx="18" ry="12" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" transform="rotate(-20, 46, 152)" />
+      </g>
+      <g id="nibsy-arm-right">
+        <ellipse cx="154" cy="152" rx="18" ry="12" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" transform="rotate(20, 154, 152)" />
+      </g>
+
+      <!-- Body -->
+      <g id="nibsy-body">
+        <g id="nibsy-body-shape">
+          <!-- Main body blob - a rounded rectangle-ish shape using a path -->
+          <path d="
+            M 40,140
+            Q 40,88  100,85
+            Q 160,88 160,140
+            Q 160,200 100,200
+            Q 40,200 40,140
+            Z
+          " fill="url(#body-gradient)" stroke="#D0D0D0" stroke-width="2.5" />
+        </g>
+      </g>
+
+      <!-- Head dots (right side) -->
+      <g id="nibsy-head-dots">
+        <circle cx="140" cy="105" r="3.5" fill="#CCCCCC" />
+        <circle cx="146" cy="114" r="3.5" fill="#CCCCCC" />
+        <circle cx="149" cy="124" r="3.5" fill="#CCCCCC" />
+        <circle cx="148" cy="134" r="3.5" fill="#CCCCCC" />
+        <circle cx="144" cy="143" r="3" fill="#CCCCCC" />
+      </g>
+
+      <!-- Antenna -->
+      <g id="nibsy-antenna">
+        <line x1="100" y1="85" x2="100" y2="62" stroke="#D0D0D0" stroke-width="3" stroke-linecap="round" />
+        <circle id="nibsy-antenna-bobble" cx="100" cy="58" r="8" fill="#F5C542" stroke="#E0A800" stroke-width="1.5" />
+      </g>
+
+      <!-- Eyes -->
+      <g id="nibsy-eyes">
+        <!-- Eye whites (subtle) -->
+        <circle cx="85" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
+        <circle cx="115" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
+        <!-- Pupils -->
+        <circle id="nibsy-eye-left" cx="85" cy="128" r="8" fill="#222222" />
+        <g id="nibsy-eye-right">
+          <circle id="nibsy-eye-right-open" cx="115" cy="128" r="8" fill="#222222" />
+        </g>
+        <!-- Eye highlights -->
+        <circle cx="88" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
+        <circle cx="118" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
+        <circle cx="83" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
+        <circle cx="113" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
+      </g>
+
+      <!-- Cheeks -->
+      <g id="nibsy-cheeks">
+        <circle cx="67" cy="143" r="10" fill="url(#cheek-gradient)" opacity="0.5" />
+        <circle cx="133" cy="143" r="10" fill="url(#cheek-gradient)" opacity="0.5" />
+      </g>
+
+      <!-- Mouth -->
+      <g id="nibsy-mouth">
+        <path d="M 92,150 Q 100,158 108,150" stroke="#555555" stroke-width="2" fill="none" stroke-linecap="round" />
+      </g>
+
+      <!-- Chest buttons -->
+      <g id="nibsy-buttons">
+        <circle cx="93" cy="170" r="3.5" fill="#4A90D9" />
+        <circle cx="100" cy="178" r="3.5" fill="#5CB85C" />
+        <circle cx="93" cy="186" r="3.5" fill="#F5C542" />
+      </g>
+
+    </g>
+  </svg>
+</div>
+
+<div class="controls">
+  <button id="btn-start" class="active">Start Idle</button>
+  <button id="btn-stop">Stop Idle</button>
+  <button id="btn-blink">Trigger Blink</button>
+  <button id="btn-bg">Toggle Dark</button>
+</div>
+
+<p class="label">Nibsy Character Prototype — KevsRobots.com</p>
+
+<script>
+class NibsyAnimator {
+  constructor(svgElement) {
+    this.svg = svgElement;
+    this.container = svgElement.parentElement;
+    this.isIdle = false;
+    this.blinkTimer = null;
+    this.eyeLeft = svgElement.querySelector('#nibsy-eye-left');
+    this.eyeRightOpen = svgElement.querySelector('#nibsy-eye-right-open');
+  }
+
+  startIdle() {
+    if (this.isIdle) return;
+    this.isIdle = true;
+    this.container.classList.add('nibsy-idle');
+    this._scheduleBlink();
+  }
+
+  stopIdle() {
+    this.isIdle = false;
+    this.container.classList.remove('nibsy-idle');
+    this.container.classList.remove('nibsy-blinking');
+    if (this.blinkTimer) {
+      clearTimeout(this.blinkTimer);
+      this.blinkTimer = null;
+    }
+  }
+
+  triggerBlink() {
+    this._doBlink();
+  }
+
+  _scheduleBlink() {
+    if (!this.isIdle) return;
+    const delay = 2500 + Math.random() * 4500;
+    this.blinkTimer = setTimeout(() => {
+      this._doBlink();
+    }, delay);
+  }
+
+  _doBlink() {
+    this.container.classList.add('nibsy-blinking');
+
+    const onEnd = () => {
+      this.container.classList.remove('nibsy-blinking');
+      this.eyeLeft.removeEventListener('animationend', onEnd);
+
+      const isDoubleBlink = Math.random() < 0.2;
+      if (isDoubleBlink) {
+        setTimeout(() => {
+          this.container.classList.add('nibsy-blinking');
+          const onEnd2 = () => {
+            this.container.classList.remove('nibsy-blinking');
+            this.eyeLeft.removeEventListener('animationend', onEnd2);
+            this._scheduleBlink();
+          };
+          this.eyeLeft.addEventListener('animationend', onEnd2);
+        }, 180);
+      } else {
+        this._scheduleBlink();
+      }
+    };
+
+    this.eyeLeft.addEventListener('animationend', onEnd);
+  }
+
+  playSequence(name) {
+    // Future expansion: wave, think, type, etc.
+    console.log(`Sequence "${name}" not yet implemented`);
+  }
+}
+
+// Initialize
+const svg = document.getElementById('nibsy-svg');
+const nibsy = new NibsyAnimator(svg);
+
+// Start idle by default
+nibsy.startIdle();
+
+// Controls
+const btnStart = document.getElementById('btn-start');
+const btnStop = document.getElementById('btn-stop');
+const btnBlink = document.getElementById('btn-blink');
+const btnBg = document.getElementById('btn-bg');
+
+btnStart.addEventListener('click', () => {
+  nibsy.startIdle();
+  btnStart.classList.add('active');
+  btnStop.classList.remove('active');
+});
+
+btnStop.addEventListener('click', () => {
+  nibsy.stopIdle();
+  btnStop.classList.add('active');
+  btnStart.classList.remove('active');
+});
+
+btnBlink.addEventListener('click', () => {
+  nibsy.triggerBlink();
+});
+
+btnBg.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  btnBg.textContent = document.body.classList.contains('dark') ? 'Toggle Light' : 'Toggle Dark';
+});
+</script>
+
+</body>
+</html>
