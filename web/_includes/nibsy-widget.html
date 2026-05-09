@@ -515,6 +515,7 @@
     <a href="/blog/" class="nibsy-menu-item"><i class="fas fa-newspaper"></i> Read the Blog</a>
     <a href="/search" class="nibsy-menu-item"><i class="fas fa-search"></i> Search</a>
     <div class="nibsy-menu-divider"></div>
+    <button class="nibsy-menu-item" id="nw-tip-btn"><i class="fas fa-lightbulb"></i> Show New Tip</button>
     <button class="nibsy-menu-item nibsy-hide-btn" id="nw-hide-btn"><i class="fas fa-eye-slash"></i> Hide Nibsy</button>
   </div>
   <div class="nibsy-stage">
@@ -609,6 +610,7 @@
   const speech = document.getElementById('nw-speech');
   const hideBtn = document.getElementById('nw-hide-btn');
   const showBtn = document.getElementById('nw-show-btn');
+  const tipBtn = document.getElementById('nw-tip-btn');
   const eyeLeft = document.getElementById('nw-eye-left');
   const eyeRight = document.getElementById('nw-eye-right');
 
@@ -707,12 +709,12 @@
 
   let lastTipIndex = -1;
 
-  function showNavTip() {
-    if (hidden || sleeping || menuOpen || giggling || surprising) {
+  function showNavTip(force) {
+    if (!force && (hidden || sleeping || menuOpen || giggling || surprising)) {
       scheduleNavTip();
       return;
     }
-    if (speech.classList.contains('visible')) {
+    if (!force && speech.classList.contains('visible')) {
       scheduleNavTip();
       return;
     }
@@ -801,7 +803,8 @@
   }
 
   function onMouseMove(e) {
-    if (sleeping || hidden) return;
+    if (hidden) return;
+    if (sleeping) { wakeUp(); return; }
     resetInactivity();
 
     const rect = svgEl.getBoundingClientRect();
@@ -1011,6 +1014,14 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && menuOpen) closeMenu();
+  });
+
+  // --- Show New Tip ---
+
+  tipBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeMenu();
+    showNavTip(true);
   });
 
   // --- Hide / Show ---
