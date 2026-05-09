@@ -23,26 +23,105 @@
     color: #e0e0e0;
   }
 
-  .character-container {
-    width: 200px;
-    height: 240px;
+  .nibsy-wrapper {
+    position: relative;
     margin: 40px 0 30px;
   }
 
+  .character-container {
+    width: 200px;
+    height: 240px;
+  }
+
+  /* ============================================
+     SPEECH BUBBLE
+     ============================================ */
+
+  .nibsy-speech {
+    position: absolute;
+    bottom: 85%;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: white;
+    border: 2px solid #D0D0D0;
+    border-radius: 16px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .nibsy-speech::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.08));
+  }
+
+  .nibsy-speech::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 9px solid #D0D0D0;
+  }
+
+  .nibsy-speech.visible {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+
+  body.dark .nibsy-speech {
+    background: #2a2a4a;
+    border-color: #555;
+    color: #e0e0e0;
+  }
+
+  body.dark .nibsy-speech::after {
+    border-top-color: #2a2a4a;
+  }
+
+  body.dark .nibsy-speech::before {
+    border-top-color: #555;
+  }
+
+  /* ============================================
+     CONTROLS
+     ============================================ */
+
   .controls {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 500px;
   }
 
   .controls button {
-    padding: 8px 16px;
+    padding: 6px 14px;
     border: 2px solid #4A90D9;
     border-radius: 20px;
     background: white;
     color: #4A90D9;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -70,14 +149,25 @@
     color: #1a1a2e;
   }
 
+  .state-label {
+    margin-top: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4A90D9;
+  }
+
+  body.dark .state-label {
+    color: #6ab0ff;
+  }
+
   .label {
-    margin-top: 20px;
+    margin-top: 8px;
     font-size: 13px;
     opacity: 0.6;
   }
 
   /* ============================================
-     NIBSY ANIMATION KEYFRAMES
+     NIBSY IDLE KEYFRAMES
      ============================================ */
 
   @keyframes nibsy-bob {
@@ -124,7 +214,54 @@
   }
 
   /* ============================================
-     NIBSY ANIMATION CLASSES (applied by JS)
+     WAVE KEYFRAMES
+     ============================================ */
+
+  @keyframes nibsy-wave-arm {
+    0%   { transform: rotate(0deg); }
+    15%  { transform: rotate(-45deg) translateY(-10px); }
+    30%  { transform: rotate(-30deg) translateY(-8px); }
+    45%  { transform: rotate(-50deg) translateY(-10px); }
+    60%  { transform: rotate(-25deg) translateY(-8px); }
+    75%  { transform: rotate(-45deg) translateY(-10px); }
+    90%  { transform: rotate(-10deg) translateY(-3px); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* ============================================
+     SLEEP KEYFRAMES
+     ============================================ */
+
+  @keyframes nibsy-sleep-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(2px); }
+  }
+
+  @keyframes nibsy-zzz-float {
+    0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    20%  { opacity: 1; }
+    100% { transform: translate(15px, -30px) scale(1.2); opacity: 0; }
+  }
+
+  @keyframes nibsy-zzz-float-2 {
+    0%   { transform: translate(0, 0) scale(0.4); opacity: 0; }
+    25%  { opacity: 0.8; }
+    100% { transform: translate(20px, -35px) scale(1); opacity: 0; }
+  }
+
+  @keyframes nibsy-zzz-float-3 {
+    0%   { transform: translate(0, 0) scale(0.3); opacity: 0; }
+    30%  { opacity: 0.6; }
+    100% { transform: translate(12px, -28px) scale(0.9); opacity: 0; }
+  }
+
+  @keyframes nibsy-head-droop {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(5deg); }
+  }
+
+  /* ============================================
+     IDLE ANIMATION CLASSES
      ============================================ */
 
   .nibsy-idle #nibsy {
@@ -160,6 +297,10 @@
     animation: nibsy-cheek-glow 4s ease-in-out infinite;
   }
 
+  /* ============================================
+     BLINK ANIMATION CLASS
+     ============================================ */
+
   .nibsy-blinking #nibsy-eye-left,
   .nibsy-blinking #nibsy-eye-right-open {
     animation: nibsy-blink 0.18s ease-in-out forwards;
@@ -172,173 +313,366 @@
   #nibsy-eye-right-open {
     transform-origin: 115px 128px;
   }
+
+  /* ============================================
+     WAVE ANIMATION CLASS
+     ============================================ */
+
+  .nibsy-waving #nibsy-arm-right {
+    animation: nibsy-wave-arm 1.2s ease-in-out forwards !important;
+    transform-origin: 138px 148px;
+  }
+
+  /* ============================================
+     SIT ANIMATION CLASSES
+     ============================================ */
+
+  .nibsy-sitting #nibsy {
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(12px);
+    animation: none !important;
+  }
+
+  .nibsy-sitting #nibsy-legs {
+    transition: transform 0.6s ease-out;
+    transform: scaleY(0.5) translateY(8px);
+    transform-origin: 100px 202px;
+  }
+
+  .nibsy-sitting #nibsy-arm-left {
+    transition: transform 0.6s ease-out;
+    transform: rotate(-10deg) translateY(5px);
+    transform-origin: 62px 148px;
+    animation: none !important;
+  }
+
+  .nibsy-sitting #nibsy-arm-right {
+    transition: transform 0.6s ease-out;
+    transform: rotate(10deg) translateY(5px);
+    transform-origin: 138px 148px;
+    animation: none !important;
+  }
+
+  .nibsy-sitting #nibsy-body-shape {
+    animation: nibsy-breathe 5s ease-in-out infinite;
+    transform-origin: 100px 150px;
+  }
+
+  .nibsy-sitting #nibsy-antenna {
+    animation: nibsy-antenna-wobble 4s ease-in-out infinite;
+    transform-origin: 100px 88px;
+  }
+
+  /* ============================================
+     SLEEP ANIMATION CLASSES
+     ============================================ */
+
+  .nibsy-sleeping #nibsy {
+    animation: nibsy-sleep-bob 4s ease-in-out infinite;
+  }
+
+  .nibsy-sleeping #nibsy-body-shape {
+    animation: nibsy-breathe 5s ease-in-out infinite;
+    transform-origin: 100px 150px;
+  }
+
+  .nibsy-sleeping #nibsy-legs {
+    transition: transform 0.6s ease-out;
+    transform: scaleY(0.5) translateY(8px);
+    transform-origin: 100px 202px;
+  }
+
+  .nibsy-sleeping #nibsy {
+    transition: transform 0.6s ease-out;
+    transform: translateY(12px);
+  }
+
+  .nibsy-sleeping #nibsy-arm-left {
+    transition: transform 0.6s ease-out;
+    transform: rotate(-5deg) translateY(8px);
+    transform-origin: 62px 148px;
+    animation: none !important;
+  }
+
+  .nibsy-sleeping #nibsy-arm-right {
+    transition: transform 0.6s ease-out;
+    transform: rotate(5deg) translateY(8px);
+    transform-origin: 138px 148px;
+    animation: none !important;
+  }
+
+  .nibsy-sleeping #nibsy-antenna {
+    animation: nibsy-head-droop 3s ease-in-out infinite;
+    transform-origin: 100px 88px;
+  }
+
+  .nibsy-sleeping #nibsy-zzz {
+    display: block;
+  }
+
+  .nibsy-sleeping #nibsy-zzz-1 {
+    animation: nibsy-zzz-float 2.5s ease-out infinite;
+  }
+
+  .nibsy-sleeping #nibsy-zzz-2 {
+    animation: nibsy-zzz-float-2 2.5s ease-out infinite 0.8s;
+  }
+
+  .nibsy-sleeping #nibsy-zzz-3 {
+    animation: nibsy-zzz-float-3 2.5s ease-out infinite 1.6s;
+  }
+
+  #nibsy-zzz {
+    display: none;
+  }
+
+  /* Sleep eyes - closed lines instead of circles */
+  #nibsy-eye-left-closed,
+  #nibsy-eye-right-closed {
+    display: none;
+  }
+
+  .nibsy-sleeping #nibsy-eye-left,
+  .nibsy-sleeping #nibsy-eye-right-open {
+    display: none;
+  }
+
+  .nibsy-sleeping #nibsy-eye-left-closed,
+  .nibsy-sleeping #nibsy-eye-right-closed {
+    display: block;
+  }
+
+  /* Hide eye highlights when sleeping */
+  .nibsy-sleeping .eye-highlight {
+    display: none;
+  }
+
+  /* Sleeping mouth - replace smile with a small 'o' */
+  #nibsy-mouth-sleep {
+    display: none;
+  }
+
+  .nibsy-sleeping #nibsy-mouth-normal {
+    display: none;
+  }
+
+  .nibsy-sleeping #nibsy-mouth-sleep {
+    display: block;
+  }
 </style>
 </head>
 <body>
 
-<div class="character-container">
-  <svg id="nibsy-svg" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="body-gradient" cx="40%" cy="35%" r="60%">
-        <stop offset="0%" stop-color="#FFFFFF" />
-        <stop offset="100%" stop-color="#F0F0F0" />
-      </radialGradient>
-      <radialGradient id="cheek-gradient" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#FFB6C1" />
-        <stop offset="100%" stop-color="#FFB6C1" stop-opacity="0" />
-      </radialGradient>
-    </defs>
+<div class="nibsy-wrapper">
+  <div class="nibsy-speech" id="nibsy-speech"></div>
+  <div class="character-container">
+    <svg id="nibsy-svg" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="body-gradient" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#FFFFFF" />
+          <stop offset="100%" stop-color="#F0F0F0" />
+        </radialGradient>
+        <radialGradient id="cheek-gradient" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FFB6C1" />
+          <stop offset="100%" stop-color="#FFB6C1" stop-opacity="0" />
+        </radialGradient>
+      </defs>
 
-    <g id="nibsy">
+      <g id="nibsy">
 
-      <!-- Shadow -->
-      <ellipse cx="100" cy="218" rx="45" ry="6" fill="#00000010" />
+        <!-- Shadow -->
+        <ellipse id="nibsy-shadow" cx="100" cy="218" rx="45" ry="6" fill="#00000010" />
 
-      <!-- Legs -->
-      <g id="nibsy-legs">
-        <ellipse cx="80" cy="202" rx="16" ry="10" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" />
-        <ellipse cx="120" cy="202" rx="16" ry="10" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" />
-      </g>
-
-      <!-- Arms (behind body) -->
-      <g id="nibsy-arm-left">
-        <ellipse cx="46" cy="152" rx="18" ry="12" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" transform="rotate(-20, 46, 152)" />
-      </g>
-      <g id="nibsy-arm-right">
-        <ellipse cx="154" cy="152" rx="18" ry="12" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" transform="rotate(20, 154, 152)" />
-      </g>
-
-      <!-- Body -->
-      <g id="nibsy-body">
-        <g id="nibsy-body-shape">
-          <!-- Main body blob - a rounded rectangle-ish shape using a path -->
-          <path d="
-            M 40,140
-            Q 40,88  100,85
-            Q 160,88 160,140
-            Q 160,200 100,200
-            Q 40,200 40,140
-            Z
-          " fill="url(#body-gradient)" stroke="#D0D0D0" stroke-width="2.5" />
+        <!-- Legs -->
+        <g id="nibsy-legs">
+          <ellipse cx="80" cy="202" rx="16" ry="10" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" />
+          <ellipse cx="120" cy="202" rx="16" ry="10" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" />
         </g>
-      </g>
 
-      <!-- Head dots (right side) -->
-      <g id="nibsy-head-dots">
-        <circle cx="140" cy="105" r="3.5" fill="#CCCCCC" />
-        <circle cx="146" cy="114" r="3.5" fill="#CCCCCC" />
-        <circle cx="149" cy="124" r="3.5" fill="#CCCCCC" />
-        <circle cx="148" cy="134" r="3.5" fill="#CCCCCC" />
-        <circle cx="144" cy="143" r="3" fill="#CCCCCC" />
-      </g>
-
-      <!-- Antenna -->
-      <g id="nibsy-antenna">
-        <line x1="100" y1="85" x2="100" y2="62" stroke="#D0D0D0" stroke-width="3" stroke-linecap="round" />
-        <circle id="nibsy-antenna-bobble" cx="100" cy="58" r="8" fill="#F5C542" stroke="#E0A800" stroke-width="1.5" />
-      </g>
-
-      <!-- Eyes -->
-      <g id="nibsy-eyes">
-        <!-- Eye whites (subtle) -->
-        <circle cx="85" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
-        <circle cx="115" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
-        <!-- Pupils -->
-        <circle id="nibsy-eye-left" cx="85" cy="128" r="8" fill="#222222" />
-        <g id="nibsy-eye-right">
-          <circle id="nibsy-eye-right-open" cx="115" cy="128" r="8" fill="#222222" />
+        <!-- Arms (behind body) -->
+        <g id="nibsy-arm-left">
+          <ellipse cx="46" cy="152" rx="18" ry="12" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" transform="rotate(-20, 46, 152)" />
         </g>
-        <!-- Eye highlights -->
-        <circle cx="88" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
-        <circle cx="118" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
-        <circle cx="83" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
-        <circle cx="113" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
-      </g>
+        <g id="nibsy-arm-right">
+          <ellipse cx="154" cy="152" rx="18" ry="12" fill="url(#body-gradient)" stroke="#CCCCCC" stroke-width="2" transform="rotate(20, 154, 152)" />
+        </g>
 
-      <!-- Cheeks -->
-      <g id="nibsy-cheeks">
-        <circle cx="67" cy="143" r="10" fill="url(#cheek-gradient)" opacity="0.5" />
-        <circle cx="133" cy="143" r="10" fill="url(#cheek-gradient)" opacity="0.5" />
-      </g>
+        <!-- Body -->
+        <g id="nibsy-body">
+          <g id="nibsy-body-shape">
+            <path d="
+              M 40,140
+              Q 40,88  100,85
+              Q 160,88 160,140
+              Q 160,200 100,200
+              Q 40,200 40,140
+              Z
+            " fill="url(#body-gradient)" stroke="#D0D0D0" stroke-width="2.5" />
+          </g>
+        </g>
 
-      <!-- Mouth -->
-      <g id="nibsy-mouth">
-        <path d="M 92,150 Q 100,158 108,150" stroke="#555555" stroke-width="2" fill="none" stroke-linecap="round" />
-      </g>
+        <!-- Head dots (right side) -->
+        <g id="nibsy-head-dots">
+          <circle cx="140" cy="105" r="3.5" fill="#CCCCCC" />
+          <circle cx="146" cy="114" r="3.5" fill="#CCCCCC" />
+          <circle cx="149" cy="124" r="3.5" fill="#CCCCCC" />
+          <circle cx="148" cy="134" r="3.5" fill="#CCCCCC" />
+          <circle cx="144" cy="143" r="3" fill="#CCCCCC" />
+        </g>
 
-      <!-- Chest buttons -->
-      <g id="nibsy-buttons">
-        <circle cx="93" cy="170" r="3.5" fill="#4A90D9" />
-        <circle cx="100" cy="178" r="3.5" fill="#5CB85C" />
-        <circle cx="93" cy="186" r="3.5" fill="#F5C542" />
-      </g>
+        <!-- Antenna -->
+        <g id="nibsy-antenna">
+          <line x1="100" y1="85" x2="100" y2="62" stroke="#D0D0D0" stroke-width="3" stroke-linecap="round" />
+          <circle id="nibsy-antenna-bobble" cx="100" cy="58" r="8" fill="#F5C542" stroke="#E0A800" stroke-width="1.5" />
+        </g>
 
-    </g>
-  </svg>
+        <!-- Eyes -->
+        <g id="nibsy-eyes">
+          <!-- Eye whites (subtle) -->
+          <circle cx="85" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
+          <circle cx="115" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
+          <!-- Pupils (open) -->
+          <circle id="nibsy-eye-left" cx="85" cy="128" r="8" fill="#222222" />
+          <g id="nibsy-eye-right">
+            <circle id="nibsy-eye-right-open" cx="115" cy="128" r="8" fill="#222222" />
+          </g>
+          <!-- Closed eyes (hidden by default, shown when sleeping) -->
+          <path id="nibsy-eye-left-closed" d="M 77,128 Q 85,133 93,128" stroke="#222222" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path id="nibsy-eye-right-closed" d="M 107,128 Q 115,133 123,128" stroke="#222222" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <!-- Eye highlights -->
+          <circle class="eye-highlight" cx="88" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
+          <circle class="eye-highlight" cx="118" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
+          <circle class="eye-highlight" cx="83" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
+          <circle class="eye-highlight" cx="113" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
+        </g>
+
+        <!-- Cheeks -->
+        <g id="nibsy-cheeks">
+          <circle cx="67" cy="143" r="10" fill="url(#cheek-gradient)" opacity="0.5" />
+          <circle cx="133" cy="143" r="10" fill="url(#cheek-gradient)" opacity="0.5" />
+        </g>
+
+        <!-- Mouth -->
+        <g id="nibsy-mouth">
+          <path id="nibsy-mouth-normal" d="M 92,150 Q 100,158 108,150" stroke="#555555" stroke-width="2" fill="none" stroke-linecap="round" />
+          <ellipse id="nibsy-mouth-sleep" cx="100" cy="152" rx="4" ry="3" fill="#555555" opacity="0.6" />
+        </g>
+
+        <!-- Chest buttons -->
+        <g id="nibsy-buttons">
+          <circle cx="93" cy="170" r="3.5" fill="#4A90D9" />
+          <circle cx="100" cy="178" r="3.5" fill="#5CB85C" />
+          <circle cx="93" cy="186" r="3.5" fill="#F5C542" />
+        </g>
+
+        <!-- ZZZ (hidden by default) -->
+        <g id="nibsy-zzz">
+          <text id="nibsy-zzz-1" x="130" y="100" font-family="sans-serif" font-size="16" font-weight="bold" fill="#4A90D9" opacity="0">Z</text>
+          <text id="nibsy-zzz-2" x="138" y="92" font-family="sans-serif" font-size="13" font-weight="bold" fill="#6ab0ff" opacity="0">Z</text>
+          <text id="nibsy-zzz-3" x="134" y="96" font-family="sans-serif" font-size="10" font-weight="bold" fill="#4A90D9" opacity="0">z</text>
+        </g>
+
+      </g>
+    </svg>
+  </div>
 </div>
 
 <div class="controls">
-  <button id="btn-start" class="active">Start Idle</button>
-  <button id="btn-stop">Stop Idle</button>
-  <button id="btn-blink">Trigger Blink</button>
+  <button id="btn-start" class="active">Idle</button>
+  <button id="btn-wave">Wave</button>
+  <button id="btn-sit">Sit</button>
+  <button id="btn-sleep">Sleep</button>
+  <button id="btn-blink">Blink</button>
+  <button id="btn-say">Say Hi</button>
+  <button id="btn-auto">Auto Mode</button>
   <button id="btn-bg">Toggle Dark</button>
 </div>
 
+<p class="state-label" id="state-label">State: idle</p>
 <p class="label">Nibsy Character Prototype — KevsRobots.com</p>
 
 <script>
 class NibsyAnimator {
   constructor(svgElement) {
     this.svg = svgElement;
-    this.container = svgElement.parentElement;
-    this.isIdle = false;
-    this.blinkTimer = null;
+    this.container = svgElement.closest('.nibsy-wrapper') || svgElement.parentElement;
+    this.charContainer = svgElement.parentElement;
+    this.speechEl = this.container.querySelector('.nibsy-speech') || this._createSpeechEl();
     this.eyeLeft = svgElement.querySelector('#nibsy-eye-left');
     this.eyeRightOpen = svgElement.querySelector('#nibsy-eye-right-open');
+    this.armRight = svgElement.querySelector('#nibsy-arm-right');
+
+    this.state = 'none';
+    this.blinkTimer = null;
+    this.speechTimer = null;
+    this.autoMode = false;
+    this.autoTimer = null;
+    this.inactivityTimer = null;
+    this.inactivitySeconds = 0;
+
+    this._onInteraction = this._onInteraction.bind(this);
   }
 
+  _createSpeechEl() {
+    const el = document.createElement('div');
+    el.className = 'nibsy-speech';
+    el.id = 'nibsy-speech';
+    this.container.prepend(el);
+    return el;
+  }
+
+  // --- State management ---
+
+  _clearState() {
+    this.charContainer.classList.remove('nibsy-idle', 'nibsy-blinking', 'nibsy-waving', 'nibsy-sitting', 'nibsy-sleeping');
+    if (this.blinkTimer) { clearTimeout(this.blinkTimer); this.blinkTimer = null; }
+  }
+
+  _setState(newState) {
+    this._clearState();
+    this.state = newState;
+    this._updateLabel();
+  }
+
+  _updateLabel() {
+    const label = document.getElementById('state-label');
+    if (label) label.textContent = `State: ${this.state}`;
+  }
+
+  // --- Idle ---
+
   startIdle() {
-    if (this.isIdle) return;
-    this.isIdle = true;
-    this.container.classList.add('nibsy-idle');
+    if (this.state === 'idle') return;
+    this._setState('idle');
+    this.charContainer.classList.add('nibsy-idle');
     this._scheduleBlink();
   }
 
-  stopIdle() {
-    this.isIdle = false;
-    this.container.classList.remove('nibsy-idle');
-    this.container.classList.remove('nibsy-blinking');
-    if (this.blinkTimer) {
-      clearTimeout(this.blinkTimer);
-      this.blinkTimer = null;
-    }
-  }
+  // --- Blink ---
 
   triggerBlink() {
     this._doBlink();
   }
 
   _scheduleBlink() {
-    if (!this.isIdle) return;
+    if (this.state !== 'idle' && this.state !== 'sitting') return;
     const delay = 2500 + Math.random() * 4500;
-    this.blinkTimer = setTimeout(() => {
-      this._doBlink();
-    }, delay);
+    this.blinkTimer = setTimeout(() => this._doBlink(), delay);
   }
 
   _doBlink() {
-    this.container.classList.add('nibsy-blinking');
+    if (this.state === 'sleeping') return;
+    this.charContainer.classList.add('nibsy-blinking');
 
     const onEnd = () => {
-      this.container.classList.remove('nibsy-blinking');
+      this.charContainer.classList.remove('nibsy-blinking');
       this.eyeLeft.removeEventListener('animationend', onEnd);
 
-      const isDoubleBlink = Math.random() < 0.2;
-      if (isDoubleBlink) {
+      if (Math.random() < 0.2) {
         setTimeout(() => {
-          this.container.classList.add('nibsy-blinking');
+          this.charContainer.classList.add('nibsy-blinking');
           const onEnd2 = () => {
-            this.container.classList.remove('nibsy-blinking');
+            this.charContainer.classList.remove('nibsy-blinking');
             this.eyeLeft.removeEventListener('animationend', onEnd2);
             this._scheduleBlink();
           };
@@ -352,39 +686,231 @@ class NibsyAnimator {
     this.eyeLeft.addEventListener('animationend', onEnd);
   }
 
-  playSequence(name) {
-    // Future expansion: wave, think, type, etc.
-    console.log(`Sequence "${name}" not yet implemented`);
+  // --- Wave ---
+
+  wave() {
+    if (this.state === 'waving') return;
+    const wasState = this.state;
+    this._setState('waving');
+    this.charContainer.classList.add('nibsy-idle', 'nibsy-waving');
+
+    const onEnd = () => {
+      this.armRight.removeEventListener('animationend', onEnd);
+      this.charContainer.classList.remove('nibsy-waving');
+      this.startIdle();
+    };
+
+    setTimeout(() => {
+      const armInner = this.armRight;
+      if (armInner) armInner.addEventListener('animationend', onEnd);
+    }, 50);
+  }
+
+  // --- Sit (bored) ---
+
+  sit() {
+    if (this.state === 'sitting') return;
+    this._setState('sitting');
+    this.charContainer.classList.add('nibsy-sitting');
+    this._scheduleBlink();
+  }
+
+  // --- Sleep ---
+
+  sleep() {
+    if (this.state === 'sleeping') return;
+    if (this.state !== 'sitting') {
+      this.sit();
+      setTimeout(() => this._doSleep(), 800);
+      return;
+    }
+    this._doSleep();
+  }
+
+  _doSleep() {
+    this._setState('sleeping');
+    this.charContainer.classList.add('nibsy-sleeping');
+  }
+
+  wakeUp() {
+    if (this.state === 'sleeping' || this.state === 'sitting') {
+      this._setState('waking');
+      this.startIdle();
+      this.say('*yawn* ... oh, hi there!');
+    }
+  }
+
+  // --- Speech bubble ---
+
+  say(text, duration) {
+    if (this.speechTimer) clearTimeout(this.speechTimer);
+
+    this.speechEl.textContent = text;
+    this.speechEl.classList.add('visible');
+
+    const ms = duration || Math.max(2000, text.length * 80);
+    this.speechTimer = setTimeout(() => {
+      this.speechEl.classList.remove('visible');
+      this.speechTimer = null;
+    }, ms);
+  }
+
+  hideSpeech() {
+    if (this.speechTimer) clearTimeout(this.speechTimer);
+    this.speechEl.classList.remove('visible');
+    this.speechTimer = null;
+  }
+
+  // --- Auto mode (inactivity state machine) ---
+
+  startAutoMode() {
+    this.autoMode = true;
+    this.inactivitySeconds = 0;
+    this.startIdle();
+    this._resetInactivity();
+    this.say("Hi! I'm Nibsy! 👋");
+    setTimeout(() => this.wave(), 300);
+
+    document.addEventListener('mousemove', this._onInteraction);
+    document.addEventListener('keydown', this._onInteraction);
+    document.addEventListener('click', this._onInteraction);
+    document.addEventListener('scroll', this._onInteraction);
+  }
+
+  stopAutoMode() {
+    this.autoMode = false;
+    if (this.inactivityTimer) { clearInterval(this.inactivityTimer); this.inactivityTimer = null; }
+    document.removeEventListener('mousemove', this._onInteraction);
+    document.removeEventListener('keydown', this._onInteraction);
+    document.removeEventListener('click', this._onInteraction);
+    document.removeEventListener('scroll', this._onInteraction);
+    this.hideSpeech();
+    this.startIdle();
+  }
+
+  _onInteraction() {
+    if (!this.autoMode) return;
+
+    if (this.state === 'sleeping') {
+      this.wakeUp();
+    } else if (this.state === 'sitting') {
+      this.startIdle();
+      this.say("Oh, you're back!");
+    }
+
+    this.inactivitySeconds = 0;
+  }
+
+  _resetInactivity() {
+    if (this.inactivityTimer) clearInterval(this.inactivityTimer);
+    this.inactivitySeconds = 0;
+
+    this.inactivityTimer = setInterval(() => {
+      if (!this.autoMode) return;
+      this.inactivitySeconds++;
+
+      if (this.inactivitySeconds === 10 && this.state === 'idle') {
+        const msgs = [
+          "Need any help?",
+          "I'm here if you need me!",
+          "Working on something cool?",
+          "Check out the latest courses!",
+        ];
+        this.say(msgs[Math.floor(Math.random() * msgs.length)]);
+      }
+
+      if (this.inactivitySeconds === 20 && this.state === 'idle') {
+        this.say("Hmm, things are quiet...");
+        setTimeout(() => this.sit(), 1500);
+      }
+
+      if (this.inactivitySeconds === 35 && this.state === 'sitting') {
+        this.say("*yawn* Getting sleepy...");
+        setTimeout(() => this.sleep(), 2000);
+      }
+
+    }, 1000);
   }
 }
 
-// Initialize
+// --- Initialize ---
+
 const svg = document.getElementById('nibsy-svg');
 const nibsy = new NibsyAnimator(svg);
-
-// Start idle by default
 nibsy.startIdle();
 
-// Controls
+// --- Controls ---
+
 const btnStart = document.getElementById('btn-start');
-const btnStop = document.getElementById('btn-stop');
+const btnWave  = document.getElementById('btn-wave');
+const btnSit   = document.getElementById('btn-sit');
+const btnSleep = document.getElementById('btn-sleep');
 const btnBlink = document.getElementById('btn-blink');
-const btnBg = document.getElementById('btn-bg');
+const btnSay   = document.getElementById('btn-say');
+const btnAuto  = document.getElementById('btn-auto');
+const btnBg    = document.getElementById('btn-bg');
+
+function clearActive() {
+  [btnStart, btnWave, btnSit, btnSleep, btnAuto].forEach(b => b.classList.remove('active'));
+}
 
 btnStart.addEventListener('click', () => {
+  if (nibsy.autoMode) nibsy.stopAutoMode();
+  clearActive(); btnStart.classList.add('active');
   nibsy.startIdle();
-  btnStart.classList.add('active');
-  btnStop.classList.remove('active');
 });
 
-btnStop.addEventListener('click', () => {
-  nibsy.stopIdle();
-  btnStop.classList.add('active');
-  btnStart.classList.remove('active');
+btnWave.addEventListener('click', () => {
+  if (nibsy.autoMode) nibsy.stopAutoMode();
+  clearActive(); btnWave.classList.add('active');
+  nibsy.wave();
+  nibsy.say("Hello there! 👋");
+});
+
+btnSit.addEventListener('click', () => {
+  if (nibsy.autoMode) nibsy.stopAutoMode();
+  clearActive(); btnSit.classList.add('active');
+  nibsy.sit();
+  nibsy.say("I'll just sit here for a bit...");
+});
+
+btnSleep.addEventListener('click', () => {
+  if (nibsy.autoMode) nibsy.stopAutoMode();
+  clearActive(); btnSleep.classList.add('active');
+  nibsy.sleep();
+  nibsy.say("Goodnight... 💤", 2000);
 });
 
 btnBlink.addEventListener('click', () => {
   nibsy.triggerBlink();
+});
+
+const sayMessages = [
+  "Ahoy there, maker!",
+  "Have you tried MicroPython?",
+  "Let's build something cool!",
+  "Robots are awesome! 🤖",
+  "Check out the new courses!",
+  "Need help with anything?",
+  "Keep on making! ⚡",
+];
+let sayIndex = 0;
+
+btnSay.addEventListener('click', () => {
+  nibsy.say(sayMessages[sayIndex]);
+  sayIndex = (sayIndex + 1) % sayMessages.length;
+});
+
+btnAuto.addEventListener('click', () => {
+  if (nibsy.autoMode) {
+    nibsy.stopAutoMode();
+    clearActive(); btnStart.classList.add('active');
+    btnAuto.textContent = 'Auto Mode';
+  } else {
+    clearActive(); btnAuto.classList.add('active');
+    nibsy.startAutoMode();
+    btnAuto.textContent = 'Stop Auto';
+  }
 });
 
 btnBg.addEventListener('click', () => {
