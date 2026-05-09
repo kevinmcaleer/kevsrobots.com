@@ -31,6 +31,7 @@
   .character-container {
     width: 200px;
     height: 240px;
+    cursor: pointer;
   }
 
   /* ============================================
@@ -307,11 +308,11 @@
   }
 
   #nibsy-eye-left {
-    transform-origin: 85px 128px;
+    transform-origin: 78px 128px;
   }
 
   #nibsy-eye-right-open {
-    transform-origin: 115px 128px;
+    transform-origin: 122px 128px;
   }
 
   /* ============================================
@@ -529,21 +530,21 @@
         <!-- Eyes -->
         <g id="nibsy-eyes">
           <!-- Eye whites (subtle) -->
-          <circle cx="85" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
-          <circle cx="115" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
+          <circle cx="78" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
+          <circle cx="122" cy="128" r="11" fill="#FFFFFF" opacity="0.5" />
           <!-- Pupils (open) -->
-          <circle id="nibsy-eye-left" cx="85" cy="128" r="8" fill="#222222" />
+          <circle id="nibsy-eye-left" cx="78" cy="128" r="8" fill="#222222" />
           <g id="nibsy-eye-right">
-            <circle id="nibsy-eye-right-open" cx="115" cy="128" r="8" fill="#222222" />
+            <circle id="nibsy-eye-right-open" cx="122" cy="128" r="8" fill="#222222" />
           </g>
           <!-- Closed eyes (hidden by default, shown when sleeping) -->
-          <path id="nibsy-eye-left-closed" d="M 77,128 Q 85,133 93,128" stroke="#222222" stroke-width="2.5" fill="none" stroke-linecap="round" />
-          <path id="nibsy-eye-right-closed" d="M 107,128 Q 115,133 123,128" stroke="#222222" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path id="nibsy-eye-left-closed" d="M 70,128 Q 78,133 86,128" stroke="#222222" stroke-width="2.5" fill="none" stroke-linecap="round" />
+          <path id="nibsy-eye-right-closed" d="M 114,128 Q 122,133 130,128" stroke="#222222" stroke-width="2.5" fill="none" stroke-linecap="round" />
           <!-- Eye highlights -->
-          <circle class="eye-highlight" cx="88" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
-          <circle class="eye-highlight" cx="118" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
-          <circle class="eye-highlight" cx="83" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
-          <circle class="eye-highlight" cx="113" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
+          <circle class="eye-highlight" cx="81" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
+          <circle class="eye-highlight" cx="125" cy="125" r="3" fill="#FFFFFF" opacity="0.8" />
+          <circle class="eye-highlight" cx="76" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
+          <circle class="eye-highlight" cx="120" cy="130" r="1.5" fill="#FFFFFF" opacity="0.5" />
         </g>
 
         <!-- Cheeks -->
@@ -910,6 +911,17 @@ btnAuto.addEventListener('click', () => {
     clearActive(); btnAuto.classList.add('active');
     nibsy.startAutoMode();
     btnAuto.textContent = 'Stop Auto';
+  }
+});
+
+svg.addEventListener('click', (e) => {
+  e.stopPropagation();
+  nibsy.say(sayMessages[sayIndex]);
+  sayIndex = (sayIndex + 1) % sayMessages.length;
+  if (nibsy.state === 'sleeping') {
+    nibsy.wakeUp();
+  } else if (nibsy.state === 'sitting') {
+    nibsy.startIdle();
   }
 });
 
