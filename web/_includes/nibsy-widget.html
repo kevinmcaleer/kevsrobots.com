@@ -734,6 +734,7 @@
   let tipsTimer = null;
 
   const navTips = [
+    // Site sections
     { text: 'Looking for project ideas?', html: 'Looking for project ideas? <a href="/robots/">Browse projects</a>', duration: 5000 },
     { text: 'Want to learn something new?', html: 'Want to learn something new? <a href="/learn/">Start a course</a>', duration: 5000 },
     { text: 'Fancy watching some videos?', html: 'Fancy watching some videos? <a href="/all_videos">Watch now</a>', duration: 5000 },
@@ -743,15 +744,34 @@
     { text: 'Need some robot inspiration?', html: 'Need some robot inspiration? <a href="/robots/">Get ideas</a>', duration: 5000 },
     { text: 'Have you seen the courses?', html: 'Have you seen the courses? <a href="/learn/">Take a look</a>', duration: 5000 },
     { text: 'Want to see what I can build?', html: 'Want to see what I can build? <a href="/all_videos">Watch a video</a>', duration: 5000 },
-    { text: 'Interested in Arduino?', html: 'Interested in Arduino? <a href="/ideas/arduino.html">Arduino ideas</a>', duration: 5000 },
-    { text: 'Love MicroPython?', html: 'Love MicroPython? <a href="/ideas/micropython.html">MicroPython ideas</a>', duration: 5000 },
-    { text: 'Raspberry Pi projects!', html: 'Raspberry Pi projects! <a href="/ideas/raspberrypi.html">Take a look</a>', duration: 5000 },
-    { text: 'Want to build a robot?', html: 'Want to build a robot? <a href="/ideas/robots.html">Robot ideas</a>', duration: 5000 },
+    // Idea categories
+    { text: 'Into 3D design?', html: 'Into 3D design? <a href="/ideas/3ddesign.html">3D design ideas</a>', duration: 5000 },
     { text: 'Into 3D printing?', html: 'Into 3D printing? <a href="/ideas/3dprinting.html">3D printing ideas</a>', duration: 5000 },
+    { text: 'Try some AI projects!', html: 'Try some AI projects? <a href="/ideas/ai.html">AI ideas</a>', duration: 5000 },
+    { text: 'Interested in Arduino?', html: 'Interested in Arduino? <a href="/ideas/arduino.html">Arduino ideas</a>', duration: 5000 },
     { text: 'Explore electronics!', html: 'Explore electronics! <a href="/ideas/electronics.html">Electronics ideas</a>', duration: 5000 },
-    { text: 'Robot arms are cool!', html: 'Robot arms are cool! <a href="/ideas/robotarms.html">Robot arm ideas</a>', duration: 5000 },
+    { text: 'Love making games?', html: 'Love making games? <a href="/ideas/games.html">Game ideas</a>', duration: 5000 },
+    { text: 'Got a green thumb?', html: 'Got a green thumb? <a href="/ideas/garden.html">Garden ideas</a>', duration: 5000 },
+    { text: 'Feeling hacky?', html: 'Feeling hacky? <a href="/ideas/hacks.html">Hack ideas</a>', duration: 5000 },
+    { text: 'Love Halloween?', html: 'Love Halloween? <a href="/ideas/halloween.html">Spooky ideas</a>', duration: 5000 },
+    { text: 'Fancy some laser cutting?', html: 'Fancy some laser cutting? <a href="/ideas/lasercutting.html">Laser cutting ideas</a>', duration: 5000 },
     { text: 'Love Lego?', html: 'Love Lego? <a href="/ideas/lego.html">Lego ideas</a>', duration: 5000 },
-    { text: 'Try some AI projects!', html: 'Try some AI projects! <a href="/ideas/ai.html">AI ideas</a>', duration: 5000 }
+    { text: 'Love MicroPython?', html: 'Love MicroPython? <a href="/ideas/micropython.html">MicroPython ideas</a>', duration: 5000 },
+    { text: 'Make some music!', html: 'Make some music! <a href="/ideas/music.html">Music ideas</a>', duration: 5000 },
+    { text: 'Design your own PCBs!', html: 'Design your own PCBs! <a href="/ideas/pcb.html">PCB ideas</a>', duration: 5000 },
+    { text: 'Projects for your pets!', html: 'Projects for your pets! <a href="/ideas/pets.html">Pet ideas</a>', duration: 5000 },
+    { text: 'Into photography?', html: 'Into photography? <a href="/ideas/photography.html">Photography ideas</a>', duration: 5000 },
+    { text: 'Love the Pico?', html: 'Love the Pico? <a href="/ideas/pico.html">Pico ideas</a>', duration: 5000 },
+    { text: 'Boost your productivity!', html: 'Boost your productivity! <a href="/ideas/productivity.html">Productivity ideas</a>', duration: 5000 },
+    { text: 'Love Python?', html: 'Love Python? <a href="/ideas/python.html">Python ideas</a>', duration: 5000 },
+    { text: 'Raspberry Pi projects!', html: 'Raspberry Pi projects! <a href="/ideas/raspberrypi.html">Take a look</a>', duration: 5000 },
+    { text: 'Feeling retro?', html: 'Feeling retro? <a href="/ideas/retro.html">Retro ideas</a>', duration: 5000 },
+    { text: 'Robot arms are cool!', html: 'Robot arms are cool! <a href="/ideas/robotarms.html">Robot arm ideas</a>', duration: 5000 },
+    { text: 'Want to build a robot?', html: 'Want to build a robot? <a href="/ideas/robots.html">Robot ideas</a>', duration: 5000 },
+    { text: 'Seasonal projects!', html: 'Seasonal projects! <a href="/ideas/seasonal.html">Seasonal ideas</a>', duration: 5000 },
+    { text: 'Need a stand or case?', html: 'Need a stand or case? <a href="/ideas/stands-and-cases.html">Stands &amp; cases</a>', duration: 5000 },
+    { text: 'Make something wearable!', html: 'Make something wearable! <a href="/ideas/wearable.html">Wearable ideas</a>', duration: 5000 },
+    { text: 'Fancy something weird?', html: 'Fancy something weird? <a href="/ideas/weird.html">Weird ideas</a>', duration: 5000 }
   ];
 
   let lastTipIndex = -1;
