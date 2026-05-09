@@ -249,6 +249,23 @@
   opacity: 0;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
   pointer-events: none;
+  max-width: 220px;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.nibsy-widget-speech.has-link {
+  pointer-events: auto;
+}
+
+.nibsy-widget-speech a {
+  color: #4A90D9;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.nibsy-widget-speech a:hover {
+  color: #2a6cb5;
 }
 
 .nibsy-widget-speech::after {
@@ -626,7 +643,100 @@
       startEyeTracking();
       startInactivityWatch();
       showSpeech("Hi! I'm Nibsy! Click me for help 😊", 4000);
+      setTimeout(showContextGreeting, 6000);
+      setTimeout(() => { if (shouldShowCTA()) setTimeout(showCTA, CTA_DELAY_MS); else scheduleCTA(); }, 100);
     }, 1400);
+  }
+
+  // --- Page awareness ---
+
+  function getPageContext() {
+    const path = window.location.pathname;
+    if (path === '/' || path === '/index.html') return 'home';
+    if (path.startsWith('/blog')) return 'blog';
+    if (path.startsWith('/learn')) return 'learn';
+    if (path.startsWith('/reviews')) return 'reviews';
+    if (path.startsWith('/robots')) return 'ideas';
+    if (path.startsWith('/all_videos') || path.startsWith('/videos')) return 'videos';
+    if (path.startsWith('/search')) return 'search';
+    if (path.startsWith('/about')) return 'about';
+    if (path.startsWith('/groups')) return 'groups';
+    if (path.startsWith('/gear')) return 'gear';
+    return 'other';
+  }
+
+  const contextMessages = {
+    home:    ["Welcome to KevsRobots!", "Hey there, welcome back!", "Good to see you!"],
+    blog:    ["You've found the blog!", "Lots of maker news here!", "Check out the latest posts!"],
+    learn:   ["Ready to learn something new?", "Great courses await you here!", "Level up your skills!"],
+    reviews: ["Looking for a review?", "Honest takes on maker gear!", "Find the right kit here!"],
+    ideas:   ["Need project inspiration?", "So many robots to build!", "Find your next project here!"],
+    videos:  ["Grab some popcorn!", "Lots of videos to watch!", "See builds come to life!"],
+    search:  ["Looking for something?", "I can help you find things!", "Let's find it together!"],
+    about:   ["That's Kev! He made me!", "Learn about KevsRobots!", "The story behind the site!"],
+    groups:  ["Explore by category!", "Find topics you love!", "Discover new areas!"],
+    gear:    ["Checking out the gear?", "Great tools for makers!", "Find the right equipment!"],
+    other:   ["Exploring, are we?", "Nice find!", "Happy browsing!"]
+  };
+
+  function showContextGreeting() {
+    const ctx = getPageContext();
+    const msgs = contextMessages[ctx];
+    const msg = msgs[Math.floor(Math.random() * msgs.length)];
+    showSpeech(msg, 4000);
+  }
+
+  // --- Promotional CTAs ---
+
+  const CTA_INTERVAL_MS = 5 * 60 * 1000;
+  const CTA_DELAY_MS = 30 * 1000;
+
+  const ctaMessages = [
+    {
+      html: '📺 Love robots? <a href="https://www.youtube.com/@kevinmcaleer28?sub_confirmation=1" target="_blank">Subscribe on YouTube</a> for weekly builds!',
+      duration: 8000
+    },
+    {
+      html: '📬 Get the weekly newsletter! <a href="/newsletter" target="_blank">Join the list</a> for tips & projects.',
+      duration: 8000
+    },
+    {
+      html: '💬 Join our maker community on <a href="/discord" target="_blank">Discord</a>!',
+      duration: 8000
+    },
+    {
+      html: '🔔 Never miss a build — <a href="https://www.youtube.com/@kevinmcaleer28?sub_confirmation=1" target="_blank">subscribe on YouTube</a>!',
+      duration: 8000
+    },
+    {
+      html: '✉️ Weekly maker tips in your inbox — <a href="/newsletter" target="_blank">sign up here</a>!',
+      duration: 8000
+    },
+    {
+      html: '🤖 Chat with other makers on <a href="/discord" target="_blank">Discord</a>!',
+      duration: 8000
+    }
+  ];
+
+  let ctaTimer = null;
+
+  function shouldShowCTA() {
+    const lastShown = parseInt(localStorage.getItem('nibsy-cta-last') || '0', 10);
+    return Date.now() - lastShown > CTA_INTERVAL_MS;
+  }
+
+  function showCTA() {
+    if (hidden || sleeping || menuOpen || giggling || surprising) return;
+    if (!shouldShowCTA()) return;
+    const cta = ctaMessages[Math.floor(Math.random() * ctaMessages.length)];
+    showSpeech(cta.html, cta.duration, true);
+    localStorage.setItem('nibsy-cta-last', String(Date.now()));
+    scheduleCTA();
+  }
+
+  function scheduleCTA() {
+    if (ctaTimer) clearTimeout(ctaTimer);
+    ctaTimer = setTimeout(showCTA, CTA_INTERVAL_MS);
   }
 
   // --- Eye tracking ---
@@ -753,20 +863,26 @@
 
   // --- Speech ---
 
-  function showSpeech(text, duration) {
+  function showSpeech(text, duration, isHTML) {
     if (menuOpen) return;
     if (speechTimer) clearTimeout(speechTimer);
-    speech.textContent = text;
+    if (isHTML) {
+      speech.innerHTML = text;
+      speech.classList.add('has-link');
+    } else {
+      speech.textContent = text;
+      speech.classList.remove('has-link');
+    }
     speech.classList.add('visible');
     speechTimer = setTimeout(() => {
-      speech.classList.remove('visible');
+      speech.classList.remove('visible', 'has-link');
       speechTimer = null;
     }, duration || 3000);
   }
 
   function hideSpeech() {
     if (speechTimer) clearTimeout(speechTimer);
-    speech.classList.remove('visible');
+    speech.classList.remove('visible', 'has-link');
     speechTimer = null;
   }
 
