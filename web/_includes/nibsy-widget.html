@@ -645,6 +645,7 @@
       showSpeech("Hi! I'm Nibsy! Click me for help 😊", 4000);
       setTimeout(showContextGreeting, 6000);
       setTimeout(() => { if (shouldShowCTA()) setTimeout(showCTA, CTA_DELAY_MS); else scheduleCTA(); }, 100);
+      setTimeout(scheduleNavTip, 12000);
     }, 1400);
   }
 
@@ -684,6 +685,52 @@
     const msgs = contextMessages[ctx];
     const msg = msgs[Math.floor(Math.random() * msgs.length)];
     showSpeech(msg, 4000);
+  }
+
+  // --- Navigation tips (gentle, frequent nudges) ---
+
+  const TIPS_INTERVAL_MS = 20 * 1000;
+  let tipsTimer = null;
+
+  const navTips = [
+    { text: 'Looking for project ideas?', html: 'Looking for project ideas? <a href="/robots/">Browse projects</a>', duration: 5000 },
+    { text: 'Want to learn something new?', html: 'Want to learn something new? <a href="/learn/">Start a course</a>', duration: 5000 },
+    { text: 'Fancy watching some videos?', html: 'Fancy watching some videos? <a href="/all_videos">Watch now</a>', duration: 5000 },
+    { text: 'Curious about a product?', html: 'Curious about a product? <a href="/reviews/">Read reviews</a>', duration: 5000 },
+    { text: 'Check out the latest blog posts!', html: 'Check out the latest posts! <a href="/blog/">Read the blog</a>', duration: 5000 },
+    { text: 'Looking for something specific?', html: 'Looking for something specific? <a href="/search">Search the site</a>', duration: 5000 },
+    { text: 'Need some robot inspiration?', html: 'Need some robot inspiration? <a href="/robots/">Get ideas</a>', duration: 5000 },
+    { text: 'Have you seen the courses?', html: 'Have you seen the courses? <a href="/learn/">Take a look</a>', duration: 5000 },
+    { text: 'Want to see what I can build?', html: 'Want to see what I can build? <a href="/all_videos">Watch a video</a>', duration: 5000 },
+    { text: 'Explore by category!', html: 'Explore by category! <a href="/groups/">Browse groups</a>', duration: 5000 }
+  ];
+
+  let lastTipIndex = -1;
+
+  function showNavTip() {
+    if (hidden || sleeping || menuOpen || giggling || surprising) {
+      scheduleNavTip();
+      return;
+    }
+    if (speech.classList.contains('visible')) {
+      scheduleNavTip();
+      return;
+    }
+    let idx;
+    do { idx = Math.floor(Math.random() * navTips.length); } while (idx === lastTipIndex && navTips.length > 1);
+    lastTipIndex = idx;
+    const tip = navTips[idx];
+    showSpeech(tip.html, tip.duration, true);
+    scheduleNavTip();
+  }
+
+  function scheduleNavTip() {
+    if (tipsTimer) clearTimeout(tipsTimer);
+    tipsTimer = setTimeout(showNavTip, TIPS_INTERVAL_MS);
+  }
+
+  function stopNavTips() {
+    if (tipsTimer) { clearTimeout(tipsTimer); tipsTimer = null; }
   }
 
   // --- Promotional CTAs ---
@@ -973,6 +1020,7 @@
     closeMenu();
     stopBlinking();
     stopEyeTracking();
+    stopNavTips();
     if (inactivityTimer) { clearInterval(inactivityTimer); inactivityTimer = null; }
 
     widget.classList.remove('nibsy-idle', 'nibsy-sleeping');
