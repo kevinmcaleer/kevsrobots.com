@@ -258,6 +258,36 @@
   pointer-events: auto;
 }
 
+.nibsy-tip-nav {
+  display: none;
+  justify-content: space-between;
+  margin-top: 6px;
+  gap: 6px;
+}
+
+.nibsy-widget-speech.has-nav .nibsy-tip-nav {
+  display: flex;
+}
+
+.nibsy-tip-nav button {
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 28px;
+  height: 22px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+  cursor: pointer;
+  padding: 0;
+  line-height: 20px;
+}
+
+.nibsy-tip-nav button:hover {
+  background: #ddd;
+  color: #333;
+}
+
 .nibsy-widget-speech a {
   color: #4A90D9;
   text-decoration: underline;
@@ -505,7 +535,13 @@
 </style>
 
 <div id="nibsy-widget" class="nibsy-entering">
-  <div class="nibsy-widget-speech" id="nw-speech"></div>
+  <div class="nibsy-widget-speech" id="nw-speech">
+    <span id="nw-speech-text"></span>
+    <div class="nibsy-tip-nav">
+      <button id="nw-tip-prev" title="Previous tip">&lt;</button>
+      <button id="nw-tip-next" title="Next tip">&gt;</button>
+    </div>
+  </div>
   <div class="nibsy-menu" id="nw-menu">
     <div class="nibsy-menu-header">What are you looking for?</div>
     <a href="/all_videos" class="nibsy-menu-item"><i class="fas fa-play-circle"></i> Watch Videos</a>
@@ -608,6 +644,9 @@
   const svgEl = document.getElementById('nw-svg');
   const menu = document.getElementById('nw-menu');
   const speech = document.getElementById('nw-speech');
+  const speechText = document.getElementById('nw-speech-text');
+  const tipPrevBtn = document.getElementById('nw-tip-prev');
+  const tipNextBtn = document.getElementById('nw-tip-next');
   const hideBtn = document.getElementById('nw-hide-btn');
   const showBtn = document.getElementById('nw-show-btn');
   const tipBtn = document.getElementById('nw-tip-btn');
@@ -721,10 +760,30 @@
     let idx;
     do { idx = Math.floor(Math.random() * navTips.length); } while (idx === lastTipIndex && navTips.length > 1);
     lastTipIndex = idx;
-    const tip = navTips[idx];
-    showSpeech(tip.html, tip.duration, true);
+    showTipByIndex(idx);
     scheduleNavTip();
   }
+
+  function showTipByIndex(idx) {
+    lastTipIndex = idx;
+    const tip = navTips[idx];
+    showSpeech(tip.html, tip.duration, true, true);
+  }
+
+  function showPrevTip() {
+    const idx = lastTipIndex <= 0 ? navTips.length - 1 : lastTipIndex - 1;
+    showTipByIndex(idx);
+    scheduleNavTip();
+  }
+
+  function showNextTip() {
+    const idx = lastTipIndex >= navTips.length - 1 ? 0 : lastTipIndex + 1;
+    showTipByIndex(idx);
+    scheduleNavTip();
+  }
+
+  tipPrevBtn.addEventListener('click', (e) => { e.stopPropagation(); showPrevTip(); });
+  tipNextBtn.addEventListener('click', (e) => { e.stopPropagation(); showNextTip(); });
 
   function scheduleNavTip() {
     if (tipsTimer) clearTimeout(tipsTimer);
@@ -913,26 +972,31 @@
 
   // --- Speech ---
 
-  function showSpeech(text, duration, isHTML) {
+  function showSpeech(text, duration, isHTML, showNav) {
     if (menuOpen) return;
     if (speechTimer) clearTimeout(speechTimer);
     if (isHTML) {
-      speech.innerHTML = text;
+      speechText.innerHTML = text;
       speech.classList.add('has-link');
     } else {
-      speech.textContent = text;
+      speechText.textContent = text;
       speech.classList.remove('has-link');
+    }
+    if (showNav) {
+      speech.classList.add('has-nav', 'has-link');
+    } else {
+      speech.classList.remove('has-nav');
     }
     speech.classList.add('visible');
     speechTimer = setTimeout(() => {
-      speech.classList.remove('visible', 'has-link');
+      speech.classList.remove('visible', 'has-link', 'has-nav');
       speechTimer = null;
     }, duration || 3000);
   }
 
   function hideSpeech() {
     if (speechTimer) clearTimeout(speechTimer);
-    speech.classList.remove('visible', 'has-link');
+    speech.classList.remove('visible', 'has-link', 'has-nav');
     speechTimer = null;
   }
 
