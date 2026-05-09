@@ -16,8 +16,8 @@
 }
 
 #nibsy-widget .nibsy-char {
-  width: 100px;
-  height: 120px;
+  width: 200px;
+  height: 240px;
   cursor: pointer;
   position: relative;
   transition: filter 0.2s ease;
@@ -40,7 +40,7 @@
 
 @keyframes nibsy-walk-on {
   0% {
-    transform: translateX(120px) rotate(5deg);
+    transform: translateX(220px) rotate(5deg);
     opacity: 0;
   }
   20% {
@@ -60,21 +60,6 @@
   }
 }
 
-/* ---- Peek animation ---- */
-
-#nibsy-widget.nibsy-peeking .nibsy-char {
-  animation: nibsy-peek 0.6s ease-out forwards;
-}
-
-@keyframes nibsy-peek {
-  0% {
-    transform: translateX(80px);
-  }
-  100% {
-    transform: translateX(50px);
-  }
-}
-
 /* ---- Exit animation ---- */
 
 #nibsy-widget.nibsy-exiting .nibsy-char {
@@ -87,7 +72,7 @@
     opacity: 1;
   }
   100% {
-    transform: translateX(120px) rotate(5deg);
+    transform: translateX(220px) rotate(5deg);
     opacity: 0;
   }
 }
@@ -158,7 +143,7 @@
   content: '';
   position: absolute;
   bottom: -8px;
-  right: 32px;
+  right: 55px;
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
@@ -170,7 +155,7 @@
   content: '';
   position: absolute;
   bottom: -10px;
-  right: 31px;
+  right: 54px;
   width: 0;
   height: 0;
   border-left: 9px solid transparent;
@@ -270,7 +255,7 @@
   content: '';
   position: absolute;
   bottom: -8px;
-  right: 32px;
+  right: 55px;
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
@@ -282,7 +267,7 @@
   content: '';
   position: absolute;
   bottom: -10px;
-  right: 31px;
+  right: 54px;
   width: 0;
   height: 0;
   border-left: 9px solid transparent;
@@ -341,6 +326,86 @@
 
 #nw-eye-left  { transform-origin: 78px 128px; }
 #nw-eye-right { transform-origin: 122px 128px; }
+
+/* ---- Sleep animations ---- */
+
+@keyframes nw-sleep-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(2px); }
+}
+
+@keyframes nw-zzz-float {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(15px, -30px) scale(1.2); opacity: 0; }
+}
+
+@keyframes nw-zzz-float-2 {
+  0%   { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  25%  { opacity: 0.8; }
+  100% { transform: translate(20px, -35px) scale(1); opacity: 0; }
+}
+
+@keyframes nw-zzz-float-3 {
+  0%   { transform: translate(0, 0) scale(0.3); opacity: 0; }
+  30%  { opacity: 0.6; }
+  100% { transform: translate(12px, -28px) scale(0.9); opacity: 0; }
+}
+
+@keyframes nw-head-droop {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(5deg); }
+}
+
+#nibsy-widget.nibsy-sleeping .nibsy-char svg {
+  animation: nw-sleep-bob 4s ease-in-out infinite;
+}
+
+#nibsy-widget.nibsy-sleeping #nw-body-shape {
+  animation: nw-breathe 5s ease-in-out infinite;
+  transform-origin: 100px 150px;
+}
+
+#nibsy-widget.nibsy-sleeping #nw-antenna {
+  animation: nw-head-droop 3s ease-in-out infinite;
+  transform-origin: 100px 88px;
+}
+
+#nibsy-widget.nibsy-sleeping #nw-eye-left,
+#nibsy-widget.nibsy-sleeping #nw-eye-right {
+  display: none;
+}
+
+#nibsy-widget.nibsy-sleeping .nw-eye-highlight {
+  display: none;
+}
+
+#nw-eye-left-closed,
+#nw-eye-right-closed {
+  display: none;
+}
+
+#nibsy-widget.nibsy-sleeping #nw-eye-left-closed,
+#nibsy-widget.nibsy-sleeping #nw-eye-right-closed {
+  display: block;
+}
+
+#nw-mouth-sleep { display: none; }
+#nibsy-widget.nibsy-sleeping #nw-mouth-normal { display: none; }
+#nibsy-widget.nibsy-sleeping #nw-mouth-sleep { display: block; }
+
+#nw-zzz { display: none; }
+#nibsy-widget.nibsy-sleeping #nw-zzz { display: block; }
+
+#nibsy-widget.nibsy-sleeping #nw-zzz-1 {
+  animation: nw-zzz-float 2.5s ease-out infinite;
+}
+#nibsy-widget.nibsy-sleeping #nw-zzz-2 {
+  animation: nw-zzz-float-2 2.5s ease-out infinite 0.8s;
+}
+#nibsy-widget.nibsy-sleeping #nw-zzz-3 {
+  animation: nw-zzz-float-3 2.5s ease-out infinite 1.6s;
+}
 </style>
 
 <div id="nibsy-widget" class="nibsy-entering">
@@ -358,7 +423,7 @@
   </div>
   <div class="nibsy-stage">
     <div class="nibsy-char" id="nw-char">
-      <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+      <svg id="nw-svg" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="nw-body-grad" cx="40%" cy="35%" r="60%">
             <stop offset="0%" stop-color="#FFFFFF" />
@@ -402,22 +467,33 @@
             <circle cx="122" cy="128" r="11" fill="#FFF" opacity="0.5" />
             <circle id="nw-eye-left" cx="78" cy="128" r="8" fill="#222" />
             <circle id="nw-eye-right" cx="122" cy="128" r="8" fill="#222" />
-            <circle cx="81" cy="125" r="3" fill="#FFF" opacity="0.8" />
-            <circle cx="125" cy="125" r="3" fill="#FFF" opacity="0.8" />
-            <circle cx="76" cy="130" r="1.5" fill="#FFF" opacity="0.5" />
-            <circle cx="120" cy="130" r="1.5" fill="#FFF" opacity="0.5" />
+            <!-- Closed eyes for sleep -->
+            <path id="nw-eye-left-closed" d="M 70,128 Q 78,133 86,128" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round" />
+            <path id="nw-eye-right-closed" d="M 114,128 Q 122,133 130,128" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round" />
+            <!-- Eye highlights -->
+            <circle class="nw-eye-highlight" cx="81" cy="125" r="3" fill="#FFF" opacity="0.8" />
+            <circle class="nw-eye-highlight" cx="125" cy="125" r="3" fill="#FFF" opacity="0.8" />
+            <circle class="nw-eye-highlight" cx="76" cy="130" r="1.5" fill="#FFF" opacity="0.5" />
+            <circle class="nw-eye-highlight" cx="120" cy="130" r="1.5" fill="#FFF" opacity="0.5" />
           </g>
           <g id="nw-cheeks">
             <circle cx="67" cy="143" r="10" fill="url(#nw-cheek-grad)" opacity="0.5" />
             <circle cx="133" cy="143" r="10" fill="url(#nw-cheek-grad)" opacity="0.5" />
           </g>
           <g id="nw-mouth">
-            <path d="M92,150 Q100,158 108,150" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" />
+            <path id="nw-mouth-normal" d="M92,150 Q100,158 108,150" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round" />
+            <ellipse id="nw-mouth-sleep" cx="100" cy="152" rx="4" ry="3" fill="#555" opacity="0.6" />
           </g>
           <g id="nw-buttons">
             <circle cx="93" cy="170" r="3.5" fill="#4A90D9" />
             <circle cx="100" cy="178" r="3.5" fill="#5CB85C" />
             <circle cx="93" cy="186" r="3.5" fill="#F5C542" />
+          </g>
+          <!-- ZZZ for sleep -->
+          <g id="nw-zzz">
+            <text id="nw-zzz-1" x="130" y="100" font-family="sans-serif" font-size="16" font-weight="bold" fill="#4A90D9" opacity="0">Z</text>
+            <text id="nw-zzz-2" x="138" y="92" font-family="sans-serif" font-size="13" font-weight="bold" fill="#6ab0ff" opacity="0">Z</text>
+            <text id="nw-zzz-3" x="134" y="96" font-family="sans-serif" font-size="10" font-weight="bold" fill="#4A90D9" opacity="0">z</text>
           </g>
         </g>
       </svg>
@@ -430,6 +506,7 @@
 (function() {
   const widget = document.getElementById('nibsy-widget');
   const charEl = document.getElementById('nw-char');
+  const svgEl = document.getElementById('nw-svg');
   const menu = document.getElementById('nw-menu');
   const speech = document.getElementById('nw-speech');
   const hideBtn = document.getElementById('nw-hide-btn');
@@ -440,7 +517,16 @@
   let menuOpen = false;
   let blinkTimer = null;
   let speechTimer = null;
+  let inactivityTimer = null;
+  let inactivitySeconds = 0;
+  let sleeping = false;
   let hidden = localStorage.getItem('nibsy-hidden') === 'true';
+
+  const EYE_LEFT_CX = 78;
+  const EYE_LEFT_CY = 128;
+  const EYE_RIGHT_CX = 122;
+  const EYE_RIGHT_CY = 128;
+  const EYE_MAX_OFFSET = 3.5;
 
   // --- Entrance ---
 
@@ -456,8 +542,92 @@
       widget.classList.remove('nibsy-entering');
       widget.classList.add('nibsy-idle');
       startBlinking();
+      startEyeTracking();
+      startInactivityWatch();
       showSpeech("Hi! I'm Nibsy! Click me for help 😊", 4000);
     }, 1400);
+  }
+
+  // --- Eye tracking ---
+
+  function startEyeTracking() {
+    document.addEventListener('mousemove', onMouseMove);
+  }
+
+  function stopEyeTracking() {
+    document.removeEventListener('mousemove', onMouseMove);
+    eyeLeft.setAttribute('cx', EYE_LEFT_CX);
+    eyeLeft.setAttribute('cy', EYE_LEFT_CY);
+    eyeRight.setAttribute('cx', EYE_RIGHT_CX);
+    eyeRight.setAttribute('cy', EYE_RIGHT_CY);
+  }
+
+  function onMouseMove(e) {
+    if (sleeping || hidden) return;
+    resetInactivity();
+
+    const rect = svgEl.getBoundingClientRect();
+    const svgCenterX = rect.left + rect.width / 2;
+    const svgCenterY = rect.top + rect.height * 0.53;
+
+    const dx = e.clientX - svgCenterX;
+    const dy = e.clientY - svgCenterY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const maxDist = Math.max(window.innerWidth, window.innerHeight) * 0.5;
+    const factor = Math.min(dist / maxDist, 1);
+
+    const angle = Math.atan2(dy, dx);
+    const offsetX = Math.cos(angle) * EYE_MAX_OFFSET * factor;
+    const offsetY = Math.sin(angle) * EYE_MAX_OFFSET * factor;
+
+    eyeLeft.setAttribute('cx', EYE_LEFT_CX + offsetX);
+    eyeLeft.setAttribute('cy', EYE_LEFT_CY + offsetY);
+    eyeRight.setAttribute('cx', EYE_RIGHT_CX + offsetX);
+    eyeRight.setAttribute('cy', EYE_RIGHT_CY + offsetY);
+  }
+
+  // --- Inactivity / Sleep ---
+
+  function startInactivityWatch() {
+    document.addEventListener('keydown', resetInactivity);
+    document.addEventListener('click', resetInactivity);
+    document.addEventListener('scroll', resetInactivity);
+    inactivitySeconds = 0;
+    inactivityTimer = setInterval(() => {
+      if (hidden || sleeping) return;
+      inactivitySeconds++;
+      if (inactivitySeconds >= 20) {
+        goToSleep();
+      }
+    }, 1000);
+  }
+
+  function resetInactivity() {
+    inactivitySeconds = 0;
+    if (sleeping) wakeUp();
+  }
+
+  function goToSleep() {
+    if (sleeping || hidden) return;
+    sleeping = true;
+    stopBlinking();
+    widget.classList.remove('nibsy-idle');
+    widget.classList.add('nibsy-sleeping');
+  }
+
+  function wakeUp() {
+    if (!sleeping) return;
+    sleeping = false;
+    widget.classList.remove('nibsy-sleeping');
+    widget.classList.add('nibsy-idle');
+    startBlinking();
+    showSpeech("*yawn* ...oh, hi! 😊", 2500);
+
+    eyeLeft.setAttribute('cx', EYE_LEFT_CX);
+    eyeLeft.setAttribute('cy', EYE_LEFT_CY);
+    eyeRight.setAttribute('cx', EYE_RIGHT_CX);
+    eyeRight.setAttribute('cy', EYE_RIGHT_CY);
   }
 
   // --- Blinking ---
@@ -471,12 +641,14 @@
   }
 
   function scheduleBlink() {
+    if (sleeping) return;
     blinkTimer = setTimeout(() => {
       doBlink();
     }, 2500 + Math.random() * 4500);
   }
 
   function doBlink() {
+    if (sleeping) return;
     widget.classList.add('nibsy-blinking');
     const onEnd = () => {
       widget.classList.remove('nibsy-blinking');
@@ -536,6 +708,11 @@
 
   charEl.addEventListener('click', (e) => {
     e.stopPropagation();
+    resetInactivity();
+    if (sleeping) {
+      wakeUp();
+      return;
+    }
     toggleMenu();
   });
 
@@ -555,8 +732,11 @@
     e.stopPropagation();
     closeMenu();
     stopBlinking();
+    stopEyeTracking();
+    if (inactivityTimer) { clearInterval(inactivityTimer); inactivityTimer = null; }
 
-    widget.classList.remove('nibsy-idle');
+    widget.classList.remove('nibsy-idle', 'nibsy-sleeping');
+    sleeping = false;
     widget.classList.add('nibsy-exiting');
 
     setTimeout(() => {
@@ -570,6 +750,7 @@
   showBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hidden = false;
+    sleeping = false;
     localStorage.setItem('nibsy-hidden', 'false');
     widget.classList.remove('nibsy-hidden');
     widget.classList.add('nibsy-entering');
@@ -578,6 +759,8 @@
       widget.classList.remove('nibsy-entering');
       widget.classList.add('nibsy-idle');
       startBlinking();
+      startEyeTracking();
+      startInactivityWatch();
       showSpeech("I'm back! 👋", 2500);
     }, 1400);
   });
