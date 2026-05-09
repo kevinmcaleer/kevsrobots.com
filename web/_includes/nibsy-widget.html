@@ -500,6 +500,147 @@
 
 #nw-antenna { cursor: pointer; }
 
+/* ---- Idle fidget animations ---- */
+
+/* Think: eyes look up, thought bubble appears */
+#nw-thought { display: none; }
+#nibsy-widget.nibsy-thinking #nw-thought { display: block; }
+
+@keyframes nw-thought-appear {
+  0%   { transform: scale(0); opacity: 0; }
+  20%  { transform: scale(1.1); opacity: 1; }
+  80%  { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes nw-eyes-look-up {
+  0%, 100% { transform: translateY(0); }
+  20%, 80% { transform: translateY(-3px); }
+}
+
+#nibsy-widget.nibsy-thinking #nw-thought {
+  animation: nw-thought-appear 3s ease-in-out forwards;
+  transform-origin: 45px 20px;
+}
+
+#nibsy-widget.nibsy-thinking #nw-eyes {
+  animation: nw-eyes-look-up 3s ease-in-out;
+}
+
+/* Look around: eyes glance left then right */
+@keyframes nw-look-around {
+  0%, 100% { transform: translateX(0); }
+  20%, 35% { transform: translateX(-3px); }
+  45%      { transform: translateX(0); }
+  60%, 75% { transform: translateX(3px); }
+  90%      { transform: translateX(0); }
+}
+
+#nibsy-widget.nibsy-looking #nw-eyes {
+  animation: nw-look-around 2.5s ease-in-out;
+}
+
+/* Wave: right arm wiggles */
+@keyframes nw-wave {
+  0%, 100% { transform: rotate(20deg); }
+  15%      { transform: rotate(-15deg); }
+  30%      { transform: rotate(-25deg); }
+  45%      { transform: rotate(-10deg); }
+  60%      { transform: rotate(-25deg); }
+  75%      { transform: rotate(-15deg); }
+  90%      { transform: rotate(10deg); }
+}
+
+#nibsy-widget.nibsy-waving #nw-arm-right {
+  animation: nw-wave 1.5s ease-in-out;
+  transform-origin: 142px 152px;
+}
+
+/* Wiggle/dance: body shimmies side to side */
+@keyframes nw-wiggle {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  15%      { transform: translateX(-3px) rotate(-2deg); }
+  30%      { transform: translateX(3px) rotate(2deg); }
+  45%      { transform: translateX(-3px) rotate(-2deg); }
+  60%      { transform: translateX(3px) rotate(2deg); }
+  75%      { transform: translateX(-2px) rotate(-1deg); }
+  90%      { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes nw-arm-dance-left {
+  0%, 100% { transform: rotate(-20deg); }
+  25%      { transform: rotate(-35deg); }
+  50%      { transform: rotate(-15deg); }
+  75%      { transform: rotate(-30deg); }
+}
+
+@keyframes nw-arm-dance-right {
+  0%, 100% { transform: rotate(20deg); }
+  25%      { transform: rotate(35deg); }
+  50%      { transform: rotate(15deg); }
+  75%      { transform: rotate(30deg); }
+}
+
+#nibsy-widget.nibsy-wiggling .nibsy-char svg {
+  animation: nw-wiggle 1.8s ease-in-out;
+}
+
+#nibsy-widget.nibsy-wiggling #nw-arm-left {
+  animation: nw-arm-dance-left 0.9s ease-in-out 2;
+  transform-origin: 58px 152px;
+}
+
+#nibsy-widget.nibsy-wiggling #nw-arm-right {
+  animation: nw-arm-dance-right 0.9s ease-in-out 2;
+  transform-origin: 142px 152px;
+}
+
+/* Curious tilt: body leans to one side */
+@keyframes nw-tilt {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%, 70% { transform: translateY(-2px) rotate(8deg); }
+}
+
+#nibsy-widget.nibsy-tilting .nibsy-char svg {
+  animation: nw-tilt 2s ease-in-out;
+  transform-origin: 100px 200px;
+}
+
+/* Bounce: excited hop */
+@keyframes nw-bounce {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  10%      { transform: translateY(0) scaleY(0.92); }
+  25%      { transform: translateY(-12px) scaleY(1.05); }
+  40%      { transform: translateY(0) scaleY(0.95); }
+  55%      { transform: translateY(-6px) scaleY(1.02); }
+  70%      { transform: translateY(0) scaleY(0.98); }
+  85%      { transform: translateY(-2px) scaleY(1); }
+}
+
+#nibsy-widget.nibsy-bouncing .nibsy-char svg {
+  animation: nw-bounce 1.2s ease-in-out;
+}
+
+/* Peek: peeks sideways */
+@keyframes nw-peek {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20%, 75% { transform: translateX(8px) rotate(-3deg); }
+}
+
+@keyframes nw-peek-eyes {
+  0%, 100% { transform: translateX(0); }
+  20%, 75% { transform: translateX(3px); }
+}
+
+#nibsy-widget.nibsy-peeking .nibsy-char svg {
+  animation: nw-peek 2.5s ease-in-out;
+  transform-origin: 100px 200px;
+}
+
+#nibsy-widget.nibsy-peeking #nw-eyes {
+  animation: nw-peek-eyes 2.5s ease-in-out;
+}
+
 /* ---- Click surprised reaction ---- */
 
 #nw-mouth-surprised { display: none; }
@@ -624,6 +765,13 @@
             <circle cx="100" cy="178" r="3.5" fill="#5CB85C" />
             <circle cx="93" cy="186" r="3.5" fill="#F5C542" />
           </g>
+          <!-- Thought bubble -->
+          <g id="nw-thought">
+            <circle cx="125" cy="55" r="4" fill="#fff" stroke="#ccc" stroke-width="1" />
+            <circle cx="118" cy="42" r="6" fill="#fff" stroke="#ccc" stroke-width="1" />
+            <ellipse cx="100" cy="18" rx="32" ry="18" fill="#fff" stroke="#ccc" stroke-width="1.5" />
+            <text id="nw-thought-text" x="100" y="22" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#666">...</text>
+          </g>
           <!-- ZZZ for sleep -->
           <g id="nw-zzz">
             <text id="nw-zzz-1" x="130" y="100" font-family="sans-serif" font-size="16" font-weight="bold" fill="#4A90D9" opacity="0">Z</text>
@@ -687,6 +835,7 @@
       setTimeout(showContextGreeting, 6000);
       setTimeout(() => { if (shouldShowCTA()) setTimeout(showCTA, CTA_DELAY_MS); else scheduleCTA(); }, 100);
       setTimeout(scheduleNavTip, 12000);
+      scheduleFidget();
     }, 1400);
   }
 
@@ -925,7 +1074,7 @@
     inactivityTimer = setInterval(() => {
       if (hidden || sleeping) return;
       inactivitySeconds++;
-      if (inactivitySeconds >= 20) {
+      if (inactivitySeconds >= 30) {
         goToSleep();
       }
     }, 1000);
@@ -940,6 +1089,7 @@
     if (sleeping || hidden) return;
     sleeping = true;
     stopBlinking();
+    stopFidgets();
     widget.classList.remove('nibsy-idle');
     widget.classList.add('nibsy-sleeping');
   }
@@ -950,6 +1100,7 @@
     widget.classList.remove('nibsy-sleeping');
     widget.classList.add('nibsy-idle');
     startBlinking();
+    scheduleFidget();
     showSpeech("*yawn* ...oh, hi! 😊", 2500);
 
     eyeLeft.setAttribute('cx', EYE_LEFT_CX);
@@ -996,6 +1147,57 @@
       }
     };
     eyeLeft.addEventListener('animationend', onEnd);
+  }
+
+  // --- Idle fidgets ---
+
+  const thoughtTexts = ['hmm...', '🤔', '💡', '🔧', '🤖', '...?', '✨', '📦', 'ooh!'];
+
+  const fidgets = [
+    { name: 'thinking', duration: 3000, setup: () => {
+      const t = document.getElementById('nw-thought-text');
+      if (t) t.textContent = thoughtTexts[Math.floor(Math.random() * thoughtTexts.length)];
+    }},
+    { name: 'looking',  duration: 2500 },
+    { name: 'waving',   duration: 1500 },
+    { name: 'wiggling', duration: 1800 },
+    { name: 'tilting',  duration: 2000 },
+    { name: 'bouncing', duration: 1200 },
+    { name: 'peeking',  duration: 2500 }
+  ];
+
+  let fidgetTimer = null;
+  let fidgeting = false;
+  let lastFidgetIndex = -1;
+
+  function scheduleFidget() {
+    if (fidgetTimer) clearTimeout(fidgetTimer);
+    fidgetTimer = setTimeout(doFidget, 6000 + Math.random() * 6000);
+  }
+
+  function doFidget() {
+    if (hidden || sleeping || menuOpen || giggling || surprising || fidgeting) {
+      scheduleFidget();
+      return;
+    }
+    let idx;
+    do { idx = Math.floor(Math.random() * fidgets.length); } while (idx === lastFidgetIndex && fidgets.length > 1);
+    lastFidgetIndex = idx;
+    const f = fidgets[idx];
+    fidgeting = true;
+    if (f.setup) f.setup();
+    widget.classList.add('nibsy-' + f.name);
+    setTimeout(() => {
+      widget.classList.remove('nibsy-' + f.name);
+      fidgeting = false;
+      scheduleFidget();
+    }, f.duration);
+  }
+
+  function stopFidgets() {
+    if (fidgetTimer) { clearTimeout(fidgetTimer); fidgetTimer = null; }
+    fidgeting = false;
+    fidgets.forEach(f => widget.classList.remove('nibsy-' + f.name));
   }
 
   // --- Speech ---
@@ -1124,6 +1326,7 @@
     stopBlinking();
     stopEyeTracking();
     stopNavTips();
+    stopFidgets();
     if (inactivityTimer) { clearInterval(inactivityTimer); inactivityTimer = null; }
 
     widget.classList.remove('nibsy-idle', 'nibsy-sleeping');
