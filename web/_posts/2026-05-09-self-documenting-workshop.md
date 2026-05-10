@@ -23,6 +23,8 @@ groups:
   - ai
 code:
   - https://www.github.com/kevinmcaleer/self-documenting-workshop
+videos:
+  - IigSVjMAQxI
 ---
 
 Ahoy there makers,

@@ -1214,9 +1214,9 @@ table .w-30 {
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: minmax(100px, auto);
   grid-template-areas:
-    "blog blog blog robot"
-    "blog blog blog project"
     "blog blog blog video"
+    "blog blog blog project"
+    "blog blog blog robot"
     "blog blog blog .";
   gap: 15px; /* Adds 20px space between rows and columns */
 }
