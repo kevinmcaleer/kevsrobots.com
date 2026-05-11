@@ -1,0 +1,27 @@
+- author: Kevin McAleer
+  cover: /assets/img/reviews/example.jpg
+  date: 2025-01-01
+  excerpt: A good example review for the test suite.
+  layout: review
+  link: https://example.com/products/example
+  rating: 4.5
+  title: Example Test Review
+  transparency:
+  - "\U0001F381"
+- author: Kevin McAleer
+  cover: /assets/img/reviews/placeholder.jpg
+  date: 2025-01-02
+  excerpt: null
+  layout: review
+  link: https://example.com/products/placeholder
+  rating: 0
+  title: title
+- author: Kevin McAleer
+  cover: /assets/img/reviews/second.jpg
+  date: 2025-02-01
+  excerpt: A second review that should ingest cleanly.
+  layout: review
+  link: https://example.com/products/second
+  rating: 4.0
+  title: Second Test Review
+  transparency:

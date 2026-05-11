@@ -1,0 +1,10 @@
+posts:
+- title: Example Test Post
+  url: /2025-01-01-example.md
+  date: 2025-01-01
+- title: Second Test Post
+  url: /2025-02-01-second.md
+  date: 2025-02-01
+- title: Third Test Post
+  url: /2025-03-01-third.md
+  date: 2025-03-01

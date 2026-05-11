@@ -1,0 +1,15 @@
+- published: 2025/01/15
+  title: "Example Test Video"
+  video_id: TEST_VIDEO_ID_1
+  type: video
+  strategy: hero
+- published: 2025/02/15
+  title: "Second Test Video"
+  video_id: TEST_VIDEO_ID_2
+  type: livestream
+  strategy: home
+- published: 2025/03/15
+  title: "Third Test Video"
+  video_id: TEST_VIDEO_ID_3
+  type: video
+  strategy: help

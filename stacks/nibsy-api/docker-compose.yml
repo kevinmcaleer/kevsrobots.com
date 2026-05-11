@@ -1,0 +1,36 @@
+version: '3.8'
+
+# Local development convenience only.
+# Production deployment (#70) ships its own docker-stack.yml with the
+# 192.168.2.1:5000/nibsy-api:latest image — that is NOT included here.
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: nibsy
+      POSTGRES_PASSWORD: nibsy
+      POSTGRES_DB: nibsy
+    ports:
+      - "5434:5432"
+    volumes:
+      - nibsy_pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  nibsy-api:
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - "8200:8200"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://nibsy:nibsy@postgres:5432/nibsy
+      NIBSY_DATA_DIR: /usr/src/app/_data
+      PORT: 8200
+    volumes:
+      - .:/usr/src/app
+      - ../../web/_data:/usr/src/app/_data:ro
+    restart: unless-stopped
+
+volumes:
+  nibsy_pg_data:

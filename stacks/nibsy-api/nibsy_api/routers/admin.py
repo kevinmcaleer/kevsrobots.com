@@ -1,0 +1,34 @@
+"""Administrative endpoints (manual ingest trigger)."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ..config import get_settings
+from ..db import get_session
+from ..ingest import ingest_from_data_dir
+from ..schemas import IngestStats
+
+router = APIRouter(prefix="/api/admin", tags=["admin"])
+
+
+@router.post("/ingest", response_model=IngestStats)
+async def trigger_ingest(
+    session: AsyncSession = Depends(get_session),
+) -> IngestStats:
+    """Trigger a manual ingestion from `NIBSY_DATA_DIR`.
+
+    The startup hook also runs ingestion automatically when the content
+    table is empty; this endpoint is for re-runs after the YAML changes.
+    Production deployment (#69) will eventually replace this with a
+    scheduled job.
+    """
+
+    settings = get_settings()
+    if settings.nibsy_data_dir is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="NIBSY_DATA_DIR is not configured",
+        )
+    return await ingest_from_data_dir(settings.nibsy_data_dir, session)
