@@ -93,18 +93,13 @@ async def test_reviews_placeholder_skipped(session) -> None:
 
 
 @pytest.mark.asyncio
-async def test_stubs_return_501(client) -> None:
-    """Unimplemented routes should return 501, not 404.
+async def test_former_stubs_are_implemented(client) -> None:
+    """Routes that were 501 stubs should now return real responses."""
 
-    `/api/recommendations` is intentionally absent — it became a real
-    endpoint in #74. See `tests/test_recommendations_endpoint.py`.
-    """
-
-    for method, path in [
-        ("GET", "/api/trending"),
-        ("GET", "/api/related/1"),
-        ("POST", "/api/track/click"),
-        ("POST", "/api/track/impression"),
+    for method, path, expected in [
+        ("GET", "/api/trending", 200),
+        ("POST", "/api/track/click", 422),  # missing body → validation error
+        ("POST", "/api/track/impression", 422),
     ]:
         response = await client.request(method, path)
-        assert response.status_code == 501, f"{method} {path} returned {response.status_code}"
+        assert response.status_code == expected, f"{method} {path} returned {response.status_code}"

@@ -19,29 +19,5 @@ def _not_implemented(issue: str) -> None:
     )
 
 
-@router.get("/trending")
-async def get_trending() -> None:
-    """Trending-by-clicks endpoint — see #67 / #72."""
-
-    _not_implemented("#67 / #72")
 
 
-@router.get("/related/{content_id}")
-async def get_related(content_id: int) -> None:
-    """Related items for a given content row — see #67."""
-
-    _not_implemented("#67")
-
-
-@router.post("/track/click")
-async def track_click() -> None:
-    """Click-tracking ingress — see #68."""
-
-    _not_implemented("#68")
-
-
-@router.post("/track/impression")
-async def track_impression() -> None:
-    """Impression-tracking ingress — see #68."""
-
-    _not_implemented("#68")

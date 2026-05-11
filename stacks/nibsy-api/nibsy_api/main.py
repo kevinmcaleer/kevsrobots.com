@@ -14,6 +14,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,9 +23,9 @@ from sqlalchemy import func, select
 from .config import get_settings
 from .db import create_all, get_sessionmaker
 from .generator import generate_recommendations
-from .ingest import ingest_from_data_dir
+from .ingest import ingest_from_data_dir, ingest_from_remote
 from .models import NibsyContent, NibsyRecommendation
-from .routers import admin, health, recommendations, stubs
+from .routers import admin, analytics, health, recommendations, stubs, tracking
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,19 @@ async def _maybe_startup_generate() -> None:
         logger.info("startup generation finished: %s", stats.model_dump())
 
 
+async def _scheduled_remote_ingest() -> None:
+    """Daily remote ingest from the live site (#69)."""
+
+    settings = get_settings()
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        try:
+            stats = await ingest_from_remote(settings.site_base_url, session)
+            logger.info("scheduled remote ingest finished: %s", stats.model_dump())
+        except Exception:  # noqa: BLE001
+            logger.exception("scheduled remote ingest failed")
+
+
 async def _scheduled_regenerate() -> None:
     """Periodic regeneration job invoked by APScheduler."""
 
@@ -101,8 +115,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
     settings = get_settings()
     scheduler: AsyncIOScheduler | None = None
-    if settings.recommendation_refresh_days > 0:
+    has_jobs = False
+
+    if settings.recommendation_refresh_days > 0 or settings.ingest_schedule_hour >= 0:
         scheduler = AsyncIOScheduler()
+
+    if scheduler and settings.recommendation_refresh_days > 0:
         scheduler.add_job(
             _scheduled_regenerate,
             trigger=IntervalTrigger(days=settings.recommendation_refresh_days),
@@ -112,13 +130,34 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             coalesce=True,
             replace_existing=True,
         )
-        scheduler.start()
+        has_jobs = True
         logger.info(
-            "scheduler started — regenerate every %s day(s)",
+            "scheduled: regenerate every %s day(s)",
             settings.recommendation_refresh_days,
         )
-    else:
-        logger.info("recommendation_refresh_days <= 0 — scheduler disabled")
+
+    if scheduler and settings.ingest_schedule_hour >= 0:
+        scheduler.add_job(
+            _scheduled_remote_ingest,
+            trigger=CronTrigger(hour=settings.ingest_schedule_hour, minute=0),
+            id="nibsy-daily-ingest",
+            name="Daily remote ingest from live site",
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True,
+        )
+        has_jobs = True
+        logger.info(
+            "scheduled: daily remote ingest at %02d:00 UTC from %s",
+            settings.ingest_schedule_hour,
+            settings.site_base_url,
+        )
+
+    if scheduler and has_jobs:
+        scheduler.start()
+    elif not has_jobs:
+        scheduler = None
+        logger.info("no scheduled jobs configured")
 
     try:
         yield
@@ -148,6 +187,8 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(admin.router)
     app.include_router(recommendations.router)
+    app.include_router(tracking.router)
+    app.include_router(analytics.router)
     app.include_router(stubs.router)
     return app
 

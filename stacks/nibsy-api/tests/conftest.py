@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+from sqlalchemy.pool import StaticPool
 
 # Make `nibsy_api` importable when pytest is invoked from this directory.
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,7 +44,10 @@ async def engine():
     """Fresh in-memory engine per test."""
 
     eng = create_async_engine(
-        "sqlite+aiosqlite:///:memory:", future=True
+        "sqlite+aiosqlite:///:memory:",
+        future=True,
+        poolclass=StaticPool,
+        connect_args={"check_same_thread": False},
     )
     # Import after env is set so any module-level config picks it up.
     from nibsy_api import db as db_module
@@ -96,8 +100,24 @@ async def client(engine, sessionmaker_) -> AsyncIterator[AsyncClient]:
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        # Trigger lifespan startup so the auto-ingest fires.
         async with app.router.lifespan_context(app):
+            # Explicitly ingest fixtures so tests see real content data.
+            # The lifespan's _maybe_startup_ingest may not populate data
+            # reliably across SQLite in-memory connection boundaries.
+            from nibsy_api.ingest import ingest_from_data_dir
+            from nibsy_api.generator import generate_recommendations
+
+            async with sessionmaker_() as s:
+                from sqlalchemy import func, select
+                from nibsy_api.models import NibsyContent
+
+                count = await s.scalar(
+                    select(func.count()).select_from(NibsyContent)
+                )
+                if not count:
+                    await ingest_from_data_dir(FIXTURES_DIR, s)
+                    await generate_recommendations(s)
+
             yield ac
 
     db_module.create_all = original_create_all

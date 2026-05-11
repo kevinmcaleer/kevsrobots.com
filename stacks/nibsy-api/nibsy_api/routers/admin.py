@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..config import get_settings
 from ..db import get_session
 from ..generator import generate_recommendations
-from ..ingest import ingest_from_data_dir
+from ..ingest import ingest_from_data_dir, ingest_from_remote
 from ..schemas import GenerationStats, IngestStats
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -38,6 +38,16 @@ async def trigger_ingest(
             detail="NIBSY_DATA_DIR is not configured",
         )
     return await ingest_from_data_dir(settings.nibsy_data_dir, session)
+
+
+@router.post("/ingest-remote", response_model=IngestStats)
+async def trigger_remote_ingest(
+    session: AsyncSession = Depends(get_session),
+) -> IngestStats:
+    """Trigger a remote ingestion from the live site (#69)."""
+
+    settings = get_settings()
+    return await ingest_from_remote(settings.site_base_url, session)
 
 
 @router.post("/regenerate-recommendations", response_model=GenerationStats)

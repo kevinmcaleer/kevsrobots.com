@@ -36,6 +36,13 @@ Set `CORS_ORIGINS` to a comma-separated list of allowed browser origins
 export CORS_ORIGINS="https://www.kevsrobots.com,http://localhost:4000"
 ```
 
+For remote ingestion from the live site (#69):
+
+```bash
+export SITE_BASE_URL="https://www.kevsrobots.com"  # default
+export INGEST_SCHEDULE_HOUR=1                       # UTC hour for daily ingest (default 1, negative to disable)
+```
+
 Then hit `http://127.0.0.1:8200/health`.
 
 On first boot the service ingests `NIBSY_DATA_DIR`, generates an initial
@@ -79,12 +86,15 @@ docker compose up --build
 |---|---|---|
 | `GET /health` | implemented | `{status, content_count, recommendation_count}` |
 | `GET /api/recommendations` | implemented | Precomputed top-N lookup keyed by `?page=...` |
+| `GET /api/related/{content_id}` | implemented | Tag/affinity-based related content (#67) |
+| `GET /api/trending` | implemented | Click-based trending content (#67) |
+| `POST /api/track/click` | implemented | Log recommendation clicks (#68) |
+| `POST /api/track/impression` | implemented | Log recommendation impressions (#68) |
+| `GET /api/analytics/top-clicked` | implemented | Most clicked content by period (#68) |
+| `GET /api/analytics/nibsy-stats` | implemented | Dashboard-level stats (#68) |
 | `POST /api/admin/ingest` | implemented | Re-ingest from `NIBSY_DATA_DIR` |
+| `POST /api/admin/ingest-remote` | implemented | Re-ingest from live site over HTTP (#69) |
 | `POST /api/admin/regenerate-recommendations` | implemented | Ad-hoc recompute (also runs on a 14-day schedule) |
-| `GET /api/trending` | 501 stub | #67 / #72 |
-| `GET /api/related/{content_id}` | 501 stub | #67 |
-| `POST /api/track/click` | 501 stub | #68 |
-| `POST /api/track/impression` | 501 stub | #68 |
 
 ## How recommendations work
 
@@ -119,9 +129,9 @@ caches when the scoring evolves.
 |---|---|---|
 | #66 | done | FastAPI scaffold, schema, ingest, `/health`, admin ingest |
 | #74 | done | Heuristic recommendations generator + 14-day scheduler + read endpoint |
-| #67 | partial | `/api/recommendations` implemented; `/api/related` and `/api/trending` still stubs |
-| #68 | open | Click & impression tracking endpoints |
-| #69 | open | Production ingest pipeline from live site assets |
+| #67 | done | Context-aware recommendations, related, and trending endpoints |
+| #68 | done | Click & impression tracking + analytics endpoints |
+| #69 | done | Remote ingest from live site + daily 1am scheduler |
 | #70 | open | Production deployment (docker-stack, swarm, port 8200) |
 | #71 | open | Widget integration on kevsrobots.com pages |
 | #72 | open | Trending integration with Chatter analytics |

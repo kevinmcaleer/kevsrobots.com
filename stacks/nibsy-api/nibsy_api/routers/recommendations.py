@@ -12,14 +12,16 @@ the widget should degrade gracefully, never throw.
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
 from ..db import get_session
-from ..models import NibsyRecommendation
+from ..generator import _jaccard, _affinity, _recency
+from ..models import NibsyClick, NibsyContent, NibsyRecommendation
 from ..schemas import RecommendationItem, RecommendationsResponse
 
 logger = logging.getLogger(__name__)
@@ -97,3 +99,87 @@ async def get_recommendations(
         generated_at=row.generated_at,
         generator_version=row.generator_version,
     )
+
+
+@router.get("/related/{content_id}")
+async def get_related(
+    content_id: int,
+    limit: int = Query(5, ge=1, le=10),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    source = await session.get(NibsyContent, content_id)
+    if source is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Content not found")
+
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    all_content = (await session.scalars(select(NibsyContent))).all()
+
+    scored = []
+    for target in all_content:
+        if target.id == source.id:
+            continue
+        tag_overlap = _jaccard(source.tags, target.tags)
+        affinity = _affinity(source.content_type, target.content_type)
+        recency = _recency(target.date_published, now)
+        score = 1.0 * tag_overlap + 0.5 * affinity + 0.3 * recency
+        if score <= 0:
+            continue
+        scored.append((score, target))
+
+    scored.sort(key=lambda t: t[0], reverse=True)
+
+    return {
+        "related": [
+            {
+                "id": t.id,
+                "type": t.content_type,
+                "title": t.title,
+                "url": t.url,
+                "score": round(s, 4),
+            }
+            for s, t in scored[:limit]
+        ]
+    }
+
+
+_TRENDING_PERIOD_MAP = {"24h": 1, "7d": 7, "30d": 30}
+
+
+@router.get("/trending")
+async def get_trending(
+    period: str = Query("7d", pattern="^(24h|7d|30d)$"),
+    limit: int = Query(5, ge=1, le=20),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    days = _TRENDING_PERIOD_MAP.get(period, 7)
+    cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
+
+    rows = (
+        await session.execute(
+            select(
+                NibsyContent.id,
+                NibsyContent.content_type,
+                NibsyContent.title,
+                NibsyContent.url,
+                func.count(NibsyClick.id).label("views"),
+            )
+            .join(NibsyClick, NibsyClick.content_url == NibsyContent.url)
+            .where(NibsyClick.clicked_at >= cutoff)
+            .group_by(NibsyContent.id)
+            .order_by(func.count(NibsyClick.id).desc())
+            .limit(limit)
+        )
+    ).all()
+
+    return {
+        "trending": [
+            {
+                "id": r.id,
+                "type": r.content_type,
+                "title": r.title,
+                "url": r.url,
+                "views": r.views,
+            }
+            for r in rows
+        ]
+    }

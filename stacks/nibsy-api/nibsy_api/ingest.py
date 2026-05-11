@@ -16,6 +16,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Optional
 
+import httpx
 import yaml
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -315,6 +316,17 @@ async def _merge_popular_videos(
 # --- Public entrypoint ---------------------------------------------------
 
 
+_REMOTE_FILES = [
+    "courses.yml",
+    "posts.yaml",
+    "youtube.yml",
+    "robots.yml",
+    "reviews.yml",
+    "glossary.yml",
+    "popular_videos.yaml",
+]
+
+
 _FILE_HANDLERS: dict[str, Any] = {
     "courses.yml": _rows_from_courses,
     "posts.yaml": _rows_from_posts,
@@ -376,6 +388,67 @@ async def ingest_from_data_dir(
     if pop_data is not None:
         stats.files_processed.append("popular_videos.yaml")
         await _merge_popular_videos(pop_data, session, stats)
+
+    await session.commit()
+    return stats
+
+
+async def ingest_from_remote(
+    base_url: str, session: AsyncSession
+) -> IngestStats:
+    """Fetch YAML files over HTTP from the live site and ingest them (#69)."""
+
+    stats = IngestStats()
+    base_url = base_url.rstrip("/")
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        # Pass 1 — row-producing files.
+        for filename in _REMOTE_FILES:
+            if filename == "popular_videos.yaml":
+                continue
+            handler = _FILE_HANDLERS.get(filename)
+            if handler is None:
+                continue
+            url = f"{base_url}/assets/data/{filename}"
+            try:
+                resp = await client.get(url)
+                resp.raise_for_status()
+            except httpx.HTTPError as exc:
+                stats.errors += 1
+                stats.error_details.append(f"{filename}: {exc}")
+                continue
+            try:
+                data = yaml.safe_load(resp.text)
+            except yaml.YAMLError as exc:
+                stats.errors += 1
+                stats.error_details.append(f"{filename}: {exc}")
+                continue
+            if data is None:
+                continue
+            stats.files_processed.append(filename)
+            rows = handler(data)
+            for row in rows:
+                try:
+                    await _upsert_row(session, row, stats)
+                except Exception as exc:  # noqa: BLE001
+                    stats.errors += 1
+                    stats.error_details.append(f"{filename} {row.get('url')}: {exc}")
+
+        await session.flush()
+
+        # Pass 2 — popular_videos.yaml merges metadata only.
+        pop_url = f"{base_url}/assets/data/popular_videos.yaml"
+        try:
+            resp = await client.get(pop_url)
+            resp.raise_for_status()
+            pop_data = yaml.safe_load(resp.text)
+        except (httpx.HTTPError, yaml.YAMLError) as exc:
+            stats.errors += 1
+            stats.error_details.append(f"popular_videos.yaml: {exc}")
+            pop_data = None
+        if pop_data is not None:
+            stats.files_processed.append("popular_videos.yaml")
+            await _merge_popular_videos(pop_data, session, stats)
 
     await session.commit()
     return stats

@@ -39,6 +39,12 @@ class Settings(BaseSettings):
             return [s.strip() for s in v.split(",") if s.strip()]
         return v
 
+    # Base URL of the live site for remote ingestion (#69).
+    site_base_url: str = "https://www.kevsrobots.com"
+
+    # Hour (UTC) at which the daily remote ingest runs. Set negative to disable.
+    ingest_schedule_hour: int = 1
+
     # Service port — #70 standardises on 8200.
     port: int = 8200
 
