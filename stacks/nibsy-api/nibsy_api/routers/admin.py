@@ -15,6 +15,7 @@ from ..db import get_session
 from ..generator import generate_recommendations
 from ..ingest import ingest_from_data_dir, ingest_from_remote
 from ..schemas import GenerationStats, IngestStats
+from ..trending import compute_trending
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -48,6 +49,16 @@ async def trigger_remote_ingest(
 
     settings = get_settings()
     return await ingest_from_remote(settings.site_base_url, session)
+
+
+@router.post("/recompute-trending")
+async def trigger_trending(
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Trigger a manual trending score recomputation (#72)."""
+
+    settings = get_settings()
+    return await compute_trending(session, settings.page_count_url)
 
 
 @router.post("/regenerate-recommendations", response_model=GenerationStats)

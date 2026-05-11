@@ -94,6 +94,23 @@ class NibsyImpression(Base):
     )
 
 
+class NibsyTrending(Base):
+    """Precomputed trending scores per content item (#72)."""
+
+    __tablename__ = "nibsy_trending"
+
+    content_id: Mapped[int] = mapped_column(
+        ForeignKey("nibsy_content.id", ondelete="CASCADE"), primary_key=True
+    )
+    trending_score: Mapped[float] = mapped_column(nullable=False, default=0.0)
+    nibsy_clicks: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    page_views: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    youtube_views: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    computed_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
 class NibsyRecommendation(Base):
     """Precomputed top-N recommendations per source URL (#73a).
 

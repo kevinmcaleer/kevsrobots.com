@@ -21,7 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
 from ..generator import _jaccard, _affinity, _recency
-from ..models import NibsyClick, NibsyContent, NibsyRecommendation
+from ..models import NibsyClick, NibsyContent, NibsyRecommendation, NibsyTrending
 from ..schemas import RecommendationItem, RecommendationsResponse
 
 logger = logging.getLogger(__name__)
@@ -142,20 +142,36 @@ async def get_related(
     }
 
 
-_TRENDING_PERIOD_MAP = {"24h": 1, "7d": 7, "30d": 30}
-
-
 @router.get("/trending")
 async def get_trending(
-    period: str = Query("7d", pattern="^(24h|7d|30d)$"),
     limit: int = Query(5, ge=1, le=20),
+    content_type: Optional[str] = Query(None, description="Filter by content type"),
     session: AsyncSession = Depends(get_session),
 ) -> dict:
-    days = _TRENDING_PERIOD_MAP.get(period, 7)
-    cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
+    query = (
+        select(
+            NibsyContent.id,
+            NibsyContent.content_type,
+            NibsyContent.title,
+            NibsyContent.url,
+            NibsyTrending.trending_score,
+            NibsyTrending.nibsy_clicks,
+            NibsyTrending.page_views,
+            NibsyTrending.youtube_views,
+        )
+        .join(NibsyTrending, NibsyTrending.content_id == NibsyContent.id)
+        .order_by(NibsyTrending.trending_score.desc())
+        .limit(limit)
+    )
+    if content_type:
+        query = query.where(NibsyContent.content_type == content_type)
 
-    rows = (
-        await session.execute(
+    rows = (await session.execute(query)).all()
+
+    if not rows:
+        # Fallback: if no precomputed trending data, use raw click counts.
+        cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=7)
+        fallback_query = (
             select(
                 NibsyContent.id,
                 NibsyContent.content_type,
@@ -169,7 +185,21 @@ async def get_trending(
             .order_by(func.count(NibsyClick.id).desc())
             .limit(limit)
         )
-    ).all()
+        if content_type:
+            fallback_query = fallback_query.where(NibsyContent.content_type == content_type)
+        fallback_rows = (await session.execute(fallback_query)).all()
+        return {
+            "trending": [
+                {
+                    "id": r.id,
+                    "type": r.content_type,
+                    "title": r.title,
+                    "url": r.url,
+                    "score": r.views,
+                }
+                for r in fallback_rows
+            ]
+        }
 
     return {
         "trending": [
@@ -178,7 +208,10 @@ async def get_trending(
                 "type": r.content_type,
                 "title": r.title,
                 "url": r.url,
-                "views": r.views,
+                "score": round(r.trending_score, 2),
+                "nibsy_clicks": r.nibsy_clicks,
+                "page_views": r.page_views,
+                "youtube_views": r.youtube_views,
             }
             for r in rows
         ]

@@ -24,6 +24,7 @@ from .config import get_settings
 from .db import create_all, get_sessionmaker
 from .generator import generate_recommendations
 from .ingest import ingest_from_data_dir, ingest_from_remote
+from .trending import compute_trending
 from .models import NibsyContent, NibsyRecommendation
 from .routers import admin, analytics, health, recommendations, stubs, tracking
 
@@ -93,6 +94,19 @@ async def _scheduled_remote_ingest() -> None:
             logger.exception("scheduled remote ingest failed")
 
 
+async def _scheduled_trending() -> None:
+    """Hourly trending score recomputation (#72)."""
+
+    settings = get_settings()
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        try:
+            stats = await compute_trending(session, settings.page_count_url)
+            logger.info("scheduled trending finished: %s", stats)
+        except Exception:  # noqa: BLE001
+            logger.exception("scheduled trending failed")
+
+
 async def _scheduled_regenerate() -> None:
     """Periodic regeneration job invoked by APScheduler."""
 
@@ -152,6 +166,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             settings.ingest_schedule_hour,
             settings.site_base_url,
         )
+
+    if scheduler:
+        scheduler.add_job(
+            _scheduled_trending,
+            trigger=IntervalTrigger(hours=1),
+            id="nibsy-trending",
+            name="Recompute trending scores",
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True,
+        )
+        has_jobs = True
+        logger.info("scheduled: trending recompute every 1 hour")
 
     if scheduler and has_jobs:
         scheduler.start()

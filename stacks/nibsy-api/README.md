@@ -120,12 +120,13 @@ then add an upstream in the nginx config for port 8200.
 | `GET /health` | implemented | `{status, content_count, recommendation_count}` |
 | `GET /api/recommendations` | implemented | Precomputed top-N lookup keyed by `?page=...` |
 | `GET /api/related/{content_id}` | implemented | Tag/affinity-based related content (#67) |
-| `GET /api/trending` | implemented | Click-based trending content (#67) |
+| `GET /api/trending` | implemented | Composite trending scores: clicks + page views + YouTube views (#67, #72) |
 | `POST /api/track/click` | implemented | Log recommendation clicks (#68) |
 | `POST /api/track/impression` | implemented | Log recommendation impressions (#68) |
 | `GET /api/analytics/top-clicked` | implemented | Most clicked content by period (#68) |
 | `GET /api/analytics/nibsy-stats` | implemented | Dashboard-level stats (#68) |
 | `POST /api/admin/ingest` | implemented | Re-ingest from `NIBSY_DATA_DIR` |
+| `POST /api/admin/recompute-trending` | implemented | Recompute trending scores (#72) |
 | `POST /api/admin/ingest-remote` | implemented | Re-ingest from live site over HTTP (#69) |
 | `POST /api/admin/regenerate-recommendations` | implemented | Ad-hoc recompute (also runs on a 14-day schedule) |
 
@@ -167,7 +168,7 @@ caches when the scoring evolves.
 | #69 | done | Remote ingest from live site + daily 1am scheduler |
 | #70 | done | Production deployment (docker-stack, swarm, port 8200) |
 | #71 | done | Widget integration on kevsrobots.com pages |
-| #72 | open | Trending integration with Chatter analytics |
+| #72 | done | Trending integration with page views + click data |
 | #73 | open | Intelligent recommendations (umbrella) |
 | #75 | open | AI categorisation pass for richer tags |
 | #76 | open | Course pathway / next-course recommendations (pairs with #43) |
