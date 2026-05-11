@@ -7,9 +7,9 @@ suitable for local development against the docker-compose Postgres.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
-from pydantic import field_validator
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,14 +30,14 @@ class Settings(BaseSettings):
     # `nibsy_content` table is empty on startup, ingestion runs automatically.
     nibsy_data_dir: Optional[Path] = None
 
-    cors_origins: list[str] = ["http://localhost:4000"]
+    # Comma-separated allowed origins for CORS. Stored as a plain string
+    # so pydantic-settings doesn't try to JSON-parse it.
+    cors_origins: str = "http://localhost:4000"
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def _parse_cors_origins(cls, v: Any) -> Any:
-        if isinstance(v, str):
-            return [s.strip() for s in v.split(",") if s.strip()]
-        return v
+    @computed_field
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [s.strip() for s in self.cors_origins.split(",") if s.strip()]
 
     # Base URL of the live site for remote ingestion (#69).
     site_base_url: str = "https://www.kevsrobots.com"
