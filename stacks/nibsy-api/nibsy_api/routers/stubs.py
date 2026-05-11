@@ -19,15 +19,6 @@ def _not_implemented(issue: str) -> None:
     )
 
 
-@router.get("/recommendations")
-async def get_recommendations() -> None:
-    """Read precomputed recs out of `nibsy_recommendations` (see #67 / #73a)."""
-
-    # The table exists (added in this PR for #73a) but the read path itself
-    # lands in #67, and the generator that populates it lands in #73a/#73b.
-    _not_implemented("#67 / #73a")
-
-
 @router.get("/trending")
 async def get_trending() -> None:
     """Trending-by-clicks endpoint — see #67 / #72."""

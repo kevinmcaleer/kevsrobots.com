@@ -1,4 +1,9 @@
-"""Administrative endpoints (manual ingest trigger)."""
+"""Administrative endpoints (manual ingest + regenerate triggers).
+
+Both endpoints are unauthenticated for now. Auth lands with #69 (production
+ingest pipeline) and #71 (widget integration) — the API will live on the
+private Pi cluster network until then.
+"""
 
 from __future__ import annotations
 
@@ -7,8 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import get_settings
 from ..db import get_session
+from ..generator import generate_recommendations
 from ..ingest import ingest_from_data_dir
-from ..schemas import IngestStats
+from ..schemas import GenerationStats, IngestStats
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -32,3 +38,17 @@ async def trigger_ingest(
             detail="NIBSY_DATA_DIR is not configured",
         )
     return await ingest_from_data_dir(settings.nibsy_data_dir, session)
+
+
+@router.post("/regenerate-recommendations", response_model=GenerationStats)
+async def trigger_regenerate(
+    session: AsyncSession = Depends(get_session),
+) -> GenerationStats:
+    """Trigger a manual recommendations regeneration (#74).
+
+    The scheduler also runs this every `RECOMMENDATION_REFRESH_DAYS` days
+    in the background; this endpoint is for ad-hoc refreshes after a
+    content change or an algorithm tweak.
+    """
+
+    return await generate_recommendations(session)
