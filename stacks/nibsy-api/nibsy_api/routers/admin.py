@@ -7,12 +7,15 @@ private Pi cluster network until then.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Any
+
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import get_settings
 from ..db import get_session
 from ..generator import generate_recommendations
+from ..categorise import export_for_categorisation, import_categorisation
 from ..ingest import ingest_from_data_dir, ingest_from_remote
 from ..schemas import GenerationStats, IngestStats
 from ..trending import compute_trending
@@ -59,6 +62,45 @@ async def trigger_trending(
 
     settings = get_settings()
     return await compute_trending(session, settings.page_count_url)
+
+
+@router.get("/categorise/export")
+async def categorise_export(
+    force: bool = Query(False, description="Re-export already categorised items"),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Export content items for manual AI categorisation (#75).
+
+    Take the output to Claude (AI Max subscription), ask it to
+    categorise each item, then POST the results back to /import.
+    """
+
+    items = await export_for_categorisation(session, force=force)
+    return {
+        "count": len(items),
+        "prompt_hint": (
+            "For each item, return JSON with: id, topics (list of specific "
+            "topic tags like 'servo motors', 'PID control', 'MicroPython'), "
+            "difficulty ('beginner'/'intermediate'/'advanced'), "
+            "introduces (concepts taught), assumes (prerequisites). "
+            "For courses in a sequence, add pathway: {name, order, total}."
+        ),
+        "items": items,
+    }
+
+
+@router.post("/categorise/import")
+async def categorise_import(
+    results: list[dict[str, Any]] = Body(...),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Import categorisation results from a manual AI pass (#75).
+
+    Each item should have: id, topics, difficulty, introduces, assumes.
+    Optionally: pathway ({name, order, total}) for course sequencing.
+    """
+
+    return await import_categorisation(session, results)
 
 
 @router.post("/regenerate-recommendations", response_model=GenerationStats)

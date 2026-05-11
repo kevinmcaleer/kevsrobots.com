@@ -127,6 +127,8 @@ then add an upstream in the nginx config for port 8200.
 | `GET /api/analytics/top-clicked` | implemented | Most clicked content by period (#68) |
 | `GET /api/analytics/nibsy-stats` | implemented | Dashboard-level stats (#68) |
 | `POST /api/admin/ingest` | implemented | Re-ingest from `NIBSY_DATA_DIR` |
+| `GET /api/admin/categorise/export` | implemented | Export content for manual AI categorisation (#75) |
+| `POST /api/admin/categorise/import` | implemented | Import categorisation results (#75) |
 | `POST /api/admin/recompute-trending` | implemented | Recompute trending scores (#72) |
 | `POST /api/admin/ingest-remote` | implemented | Re-ingest from live site over HTTP (#69) |
 | `POST /api/admin/regenerate-recommendations` | implemented | Ad-hoc recompute (also runs on a 14-day schedule) |
@@ -170,8 +172,8 @@ caches when the scoring evolves.
 | #70 | done | Production deployment (docker-stack, swarm, port 8200) |
 | #71 | done | Widget integration on kevsrobots.com pages |
 | #72 | done | Trending integration with page views + click data |
-| #73 | open | Intelligent recommendations (umbrella) |
-| #75 | open | AI categorisation pass for richer tags |
+| #73 | done | Intelligent recommendations (umbrella) |
+| #75 | done | AI categorisation export/import for richer tags |
 | #76 | done | Course pathway / next-course recommendations (pairs with #43) |
 | #78 | done | CORS middleware |
 | #79 | done | Dockerfile build-deps trim |
