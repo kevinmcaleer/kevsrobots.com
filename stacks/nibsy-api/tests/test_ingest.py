@@ -94,10 +94,13 @@ async def test_reviews_placeholder_skipped(session) -> None:
 
 @pytest.mark.asyncio
 async def test_stubs_return_501(client) -> None:
-    """Unimplemented routes should return 501, not 404."""
+    """Unimplemented routes should return 501, not 404.
+
+    `/api/recommendations` is intentionally absent — it became a real
+    endpoint in #74. See `tests/test_recommendations_endpoint.py`.
+    """
 
     for method, path in [
-        ("GET", "/api/recommendations"),
         ("GET", "/api/trending"),
         ("GET", "/api/related/1"),
         ("POST", "/api/track/click"),

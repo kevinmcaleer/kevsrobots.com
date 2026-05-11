@@ -8,5 +8,6 @@ pydantic-settings
 pyyaml
 python-dotenv
 httpx
+apscheduler
 pytest
 pytest-asyncio
