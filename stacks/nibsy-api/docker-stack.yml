@@ -1,17 +1,25 @@
 # Production deployment for Nibsy API on the Pi cluster.
-# Deploy with: docker stack deploy -c docker-stack.yml nibsy
+#
+# Setup:
+#   1. Copy .env.example to .env and fill in values
+#   2. Create the Postgres database:
+#      psql -h 192.168.2.1 -p 5433 -U nibsy -c "CREATE DATABASE nibsy;"
+#   3. Build and push the image:
+#      docker build -t 192.168.2.1:5000/nibsy-api:latest .
+#      docker push 192.168.2.1:5000/nibsy-api:latest
+#   4. Deploy:
+#      docker stack deploy --compose-file docker-stack.yml nibsy
 
 services:
   nibsy-api:
     image: 192.168.2.1:5000/nibsy-api:latest
-    ports:
-      - "8200:8200"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://nibsy:nibsy@192.168.2.1:5433/nibsy
-      - CORS_ORIGINS=https://www.kevsrobots.com,http://localhost:4000
-      - SITE_BASE_URL=https://www.kevsrobots.com
-      - INGEST_SCHEDULE_HOUR=1
-      - RECOMMENDATION_REFRESH_DAYS=14
+      - DATABASE_URL=${DATABASE_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - SITE_BASE_URL=${SITE_BASE_URL}
+      - PAGE_COUNT_URL=${PAGE_COUNT_URL}
+      - INGEST_SCHEDULE_HOUR=${INGEST_SCHEDULE_HOUR}
+      - RECOMMENDATION_REFRESH_DAYS=${RECOMMENDATION_REFRESH_DAYS}
       - PORT=8200
     deploy:
       replicas: 1
@@ -28,3 +36,13 @@ services:
       timeout: 10s
       start_period: 10s
       retries: 3
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${NIBSY_TUNNEL_TOKEN}
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
