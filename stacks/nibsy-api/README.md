@@ -29,6 +29,13 @@ export NIBSY_DATA_DIR="$(pwd)/../../web/_data"
 uvicorn nibsy_api.main:app --reload --port 8200
 ```
 
+Set `CORS_ORIGINS` to a comma-separated list of allowed browser origins
+(default: `http://localhost:4000`):
+
+```bash
+export CORS_ORIGINS="https://www.kevsrobots.com,http://localhost:4000"
+```
+
 Then hit `http://127.0.0.1:8200/health`.
 
 On first boot the service ingests `NIBSY_DATA_DIR`, generates an initial
@@ -121,9 +128,9 @@ caches when the scoring evolves.
 | #73 | open | Intelligent recommendations (umbrella) |
 | #75 | open | AI categorisation pass for richer tags |
 | #76 | open | Course pathway / next-course recommendations (pairs with #43) |
-| #78 | open | CORS middleware |
-| #79 | open | Dockerfile build-deps trim |
-| #80 | open | Minor cleanups (compose `version:`, dead reviews check) |
+| #78 | done | CORS middleware |
+| #79 | done | Dockerfile build-deps trim |
+| #80 | done | Minor cleanups (compose `version:`, dead reviews check) |
 
 ## Conventions
 

@@ -7,8 +7,9 @@ suitable for local development against the docker-compose Postgres.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -28,6 +29,15 @@ class Settings(BaseSettings):
     # Path to a directory containing the YAML data files. If set and the
     # `nibsy_content` table is empty on startup, ingestion runs automatically.
     nibsy_data_dir: Optional[Path] = None
+
+    cors_origins: list[str] = ["http://localhost:4000"]
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _parse_cors_origins(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            return [s.strip() for s in v.split(",") if s.strip()]
+        return v
 
     # Service port — #70 standardises on 8200.
     port: int = 8200

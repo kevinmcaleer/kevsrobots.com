@@ -177,7 +177,7 @@ def _rows_from_reviews(data: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
         excerpt = entry.get("excerpt")
         link = entry.get("link")
         # Skip placeholder rows per brief: `excerpt: null` or `title: title`.
-        if excerpt is None or title == "title" or not link or not title:
+        if not title or excerpt is None or title == "title" or not link:
             continue
         rows.append(
             {

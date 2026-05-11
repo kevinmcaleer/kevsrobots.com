@@ -16,6 +16,7 @@ from typing import AsyncIterator
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 
 from .config import get_settings
@@ -135,6 +136,14 @@ def create_app() -> FastAPI:
         description="Recommendation microservice for kevsrobots.com",
         version="0.2.0",
         lifespan=lifespan,
+    )
+    settings = get_settings()
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST"],
+        allow_headers=["*"],
     )
     app.include_router(health.router)
     app.include_router(admin.router)
