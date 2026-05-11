@@ -692,6 +692,7 @@
     <a href="/blog/" class="nibsy-menu-item"><i class="fas fa-newspaper"></i> Read the Blog</a>
     <a href="/search" class="nibsy-menu-item"><i class="fas fa-search"></i> Search</a>
     <div class="nibsy-menu-divider"></div>
+    <button class="nibsy-menu-item" id="nw-trending-btn"><i class="fas fa-fire"></i> What's Trending</button>
     <button class="nibsy-menu-item" id="nw-tip-btn"><i class="fas fa-lightbulb"></i> Show New Tip</button>
     <button class="nibsy-menu-item nibsy-hide-btn" id="nw-hide-btn"><i class="fas fa-eye-slash"></i> Hide Nibsy</button>
   </div>
@@ -798,8 +799,70 @@
   const hideBtn = document.getElementById('nw-hide-btn');
   const showBtn = document.getElementById('nw-show-btn');
   const tipBtn = document.getElementById('nw-tip-btn');
+  const trendingBtn = document.getElementById('nw-trending-btn');
   const eyeLeft = document.getElementById('nw-eye-left');
   const eyeRight = document.getElementById('nw-eye-right');
+
+  // --- Nibsy API integration (#71) ---
+  const NIBSY_API = 'https://nibsy.kevsrobots.com';
+  const nibsySession = sessionStorage.getItem('nibsy-sid') || (() => {
+    const sid = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+    sessionStorage.setItem('nibsy-sid', sid);
+    return sid;
+  })();
+  let apiTips = null;
+
+  function sendBeaconJSON(path, data) {
+    try {
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      navigator.sendBeacon(NIBSY_API + path, blob);
+    } catch (e) { /* non-critical */ }
+  }
+
+  function trackClick(contentId, url) {
+    sendBeaconJSON('/api/track/click', {
+      content_id: contentId,
+      content_url: url,
+      source_page: window.location.pathname,
+      session_id: nibsySession
+    });
+  }
+
+  function trackImpressions(contentIds) {
+    sendBeaconJSON('/api/track/impression', {
+      content_ids: contentIds,
+      source_page: window.location.pathname,
+      session_id: nibsySession
+    });
+  }
+
+  async function fetchRecommendations() {
+    try {
+      const page = window.location.pathname;
+      const res = await fetch(NIBSY_API + '/api/recommendations?page=' + encodeURIComponent(page) + '&limit=6');
+      if (!res.ok) return;
+      const data = await res.json();
+      const recs = data.recommendations || [];
+      if (recs.length === 0) return;
+      apiTips = recs.map(r => ({
+        text: r.title,
+        html: (r.reason ? r.reason + ' — ' : '') + '<a href="' + r.url + '" data-nibsy-id="' + r.content_id + '" data-nibsy-url="' + r.url + '">' + r.title + '</a>',
+        duration: 6000,
+        contentId: r.content_id,
+        url: r.url
+      }));
+      trackImpressions(recs.map(r => r.content_id));
+    } catch (e) { /* fall back to hardcoded tips */ }
+  }
+
+  async function fetchTrending() {
+    try {
+      const res = await fetch(NIBSY_API + '/api/trending?period=7d&limit=5');
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.trending || [];
+    } catch (e) { return null; }
+  }
 
   let menuOpen = false;
   let blinkTimer = null;
@@ -834,6 +897,7 @@
       showSpeech("Hi! I'm Nibsy! Click me for help 😊", 4000);
       setTimeout(showContextGreeting, 6000);
       setTimeout(() => { if (shouldShowCTA()) setTimeout(showCTA, CTA_DELAY_MS); else scheduleCTA(); }, 100);
+      fetchRecommendations();
       setTimeout(scheduleNavTip, 12000);
       scheduleFidget();
     }, 1400);
@@ -925,6 +989,8 @@
 
   let lastTipIndex = -1;
 
+  function activeTips() { return apiTips || navTips; }
+
   function showNavTip(force) {
     if (!force && (hidden || sleeping || menuOpen || giggling || surprising)) {
       scheduleNavTip();
@@ -934,27 +1000,31 @@
       scheduleNavTip();
       return;
     }
+    const tips = activeTips();
     let idx;
-    do { idx = Math.floor(Math.random() * navTips.length); } while (idx === lastTipIndex && navTips.length > 1);
+    do { idx = Math.floor(Math.random() * tips.length); } while (idx === lastTipIndex && tips.length > 1);
     lastTipIndex = idx;
     showTipByIndex(idx);
     scheduleNavTip();
   }
 
   function showTipByIndex(idx) {
+    const tips = activeTips();
     lastTipIndex = idx;
-    const tip = navTips[idx];
+    const tip = tips[idx];
     showSpeech(tip.html, tip.duration, true, true);
   }
 
   function showPrevTip() {
-    const idx = lastTipIndex <= 0 ? navTips.length - 1 : lastTipIndex - 1;
+    const tips = activeTips();
+    const idx = lastTipIndex <= 0 ? tips.length - 1 : lastTipIndex - 1;
     showTipByIndex(idx);
     scheduleNavTip();
   }
 
   function showNextTip() {
-    const idx = lastTipIndex >= navTips.length - 1 ? 0 : lastTipIndex + 1;
+    const tips = activeTips();
+    const idx = lastTipIndex >= tips.length - 1 ? 0 : lastTipIndex + 1;
     showTipByIndex(idx);
     scheduleNavTip();
   }
@@ -1308,6 +1378,32 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && menuOpen) closeMenu();
+  });
+
+  // --- Click tracking on recommendation links ---
+
+  speech.addEventListener('click', (e) => {
+    const link = e.target.closest('a[data-nibsy-id]');
+    if (link) {
+      trackClick(parseInt(link.dataset.nibsyId, 10), link.dataset.nibsyUrl);
+    }
+  });
+
+  // --- What's Trending ---
+
+  trendingBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    closeMenu();
+    showSpeech('Checking what\'s hot...', 2000);
+    const items = await fetchTrending();
+    if (!items || items.length === 0) {
+      showSpeech('Nothing trending right now — check back later!', 4000);
+      return;
+    }
+    const links = items.slice(0, 3).map(t =>
+      '<a href="' + t.url + '" data-nibsy-id="' + t.id + '" data-nibsy-url="' + t.url + '">' + t.title + '</a>'
+    ).join('<br>');
+    showSpeech('🔥 Trending now:<br>' + links, 8000, true);
   });
 
   // --- Show New Tip ---

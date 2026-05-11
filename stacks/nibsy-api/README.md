@@ -133,7 +133,7 @@ caches when the scoring evolves.
 | #68 | done | Click & impression tracking + analytics endpoints |
 | #69 | done | Remote ingest from live site + daily 1am scheduler |
 | #70 | open | Production deployment (docker-stack, swarm, port 8200) |
-| #71 | open | Widget integration on kevsrobots.com pages |
+| #71 | done | Widget integration on kevsrobots.com pages |
 | #72 | open | Trending integration with Chatter analytics |
 | #73 | open | Intelligent recommendations (umbrella) |
 | #75 | open | AI categorisation pass for richer tags |
