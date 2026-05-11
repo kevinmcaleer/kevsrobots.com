@@ -1,0 +1,28 @@
+- author: Kevin McAleer
+  cover: /learn/example/cover.jpg
+  date_published: 2025-01-01
+  description: An example fixture course used by the Nibsy API test suite.
+  duration: 1h 00m
+  groups:
+  - micropython
+  - testing
+  link: /learn/example/00_intro.html
+  name: Example Test Course
+- author: Kevin McAleer
+  cover: /learn/another/cover.jpg
+  date_published: 2024-06-15
+  description: A second fixture course.
+  duration: 0h 45m
+  groups:
+  - robotics
+  link: /learn/another/00_intro.html
+  name: Another Test Course
+- author: Kevin McAleer
+  cover: /learn/third/cover.jpg
+  date_published: 2023-11-30
+  description: A third fixture course.
+  duration: 2h 15m
+  groups:
+  - python
+  link: /learn/third/00_intro.html
+  name: Third Test Course

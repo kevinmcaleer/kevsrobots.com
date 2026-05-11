@@ -1,0 +1,14 @@
+- term: test-term-one
+  definition: A first fixture glossary term.
+  full: "A longer description of the first fixture glossary term."
+  link: https://example.com/glossary/test-term-one
+  article: /resources/how_it_works/test-term-one
+- term: test-term-two
+  definition: A second fixture glossary term.
+  full: "A longer description of the second fixture glossary term."
+  link: https://example.com/glossary/test-term-two
+- term: test-term-three
+  definition: A third fixture glossary term.
+  full: "A longer description of the third fixture glossary term."
+  link: https://example.com/glossary/test-term-three
+  course: /learn/test-course

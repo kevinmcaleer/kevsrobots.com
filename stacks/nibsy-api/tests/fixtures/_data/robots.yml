@@ -1,0 +1,18 @@
+- name: Example Test Robot
+  link: /projects/example-robot/
+  cover: /assets/img/projects/example-robot/cover.jpg
+  description: A fixture robot used by the Nibsy API test suite.
+  date: 2025/01/01
+  hero: /assets/img/projects/example-robot/hero.png
+- name: Second Test Robot
+  link: /projects/second-robot/
+  cover: /assets/img/projects/second-robot/cover.jpg
+  description: A second fixture robot.
+  date: 2024/06/15
+  hero: /assets/img/projects/second-robot/hero.png
+- name: Third Test Robot
+  link: /projects/third-robot/
+  cover: /assets/img/projects/third-robot/cover.jpg
+  description: A third fixture robot.
+  date: 2023/11/30
+  hero: /assets/img/projects/third-robot/hero.png
