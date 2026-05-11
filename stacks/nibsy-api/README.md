@@ -120,6 +120,7 @@ then add an upstream in the nginx config for port 8200.
 | `GET /health` | implemented | `{status, content_count, recommendation_count}` |
 | `GET /api/recommendations` | implemented | Precomputed top-N lookup keyed by `?page=...` |
 | `GET /api/related/{content_id}` | implemented | Tag/affinity-based related content (#67) |
+| `GET /api/recommendations/next-course` | implemented | Next course in pathway or related courses (#76) |
 | `GET /api/trending` | implemented | Composite trending scores: clicks + page views + YouTube views (#67, #72) |
 | `POST /api/track/click` | implemented | Log recommendation clicks (#68) |
 | `POST /api/track/impression` | implemented | Log recommendation impressions (#68) |
@@ -171,7 +172,7 @@ caches when the scoring evolves.
 | #72 | done | Trending integration with page views + click data |
 | #73 | open | Intelligent recommendations (umbrella) |
 | #75 | open | AI categorisation pass for richer tags |
-| #76 | open | Course pathway / next-course recommendations (pairs with #43) |
+| #76 | done | Course pathway / next-course recommendations (pairs with #43) |
 | #78 | done | CORS middleware |
 | #79 | done | Dockerfile build-deps trim |
 | #80 | done | Minor cleanups (compose `version:`, dead reviews check) |

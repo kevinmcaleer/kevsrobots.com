@@ -142,6 +142,100 @@ async def get_related(
     }
 
 
+@router.get("/recommendations/next-course")
+async def get_next_course(
+    current: str = Query(..., description="URL or content ID of the current course"),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Recommend the next course to take after the current one (#76).
+
+    If the current course belongs to a pathway (metadata.pathway),
+    return the next course in the sequence. Otherwise, fall back to
+    the top related courses by tag overlap and recency.
+    """
+
+    # Resolve by URL or content ID.
+    try:
+        content_id = int(current)
+        source = await session.get(NibsyContent, content_id)
+    except ValueError:
+        source = await session.scalar(
+            select(NibsyContent).where(NibsyContent.url == current)
+        )
+
+    if source is None or source.content_type != "course":
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Course not found")
+
+    # Check for explicit pathway metadata.
+    meta = source.content_metadata or {}
+    pathway = meta.get("pathway")
+    if pathway and isinstance(pathway, dict):
+        pathway_name = pathway.get("name")
+        pathway_order = pathway.get("order", 0)
+        if pathway_name:
+            # Find the next course in this pathway.
+            all_courses = (
+                await session.scalars(
+                    select(NibsyContent).where(NibsyContent.content_type == "course")
+                )
+            ).all()
+            for c in all_courses:
+                c_meta = (c.content_metadata or {}).get("pathway", {})
+                if (
+                    isinstance(c_meta, dict)
+                    and c_meta.get("name") == pathway_name
+                    and c_meta.get("order") == pathway_order + 1
+                ):
+                    return {
+                        "source": "pathway",
+                        "pathway": pathway_name,
+                        "next_course": {
+                            "id": c.id,
+                            "title": c.title,
+                            "url": c.url,
+                            "description": c.description,
+                            "reason": f"Next in {pathway_name} pathway",
+                        },
+                    }
+
+    # Fallback: top related courses by tag/affinity scoring.
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    all_courses = (
+        await session.scalars(
+            select(NibsyContent).where(NibsyContent.content_type == "course")
+        )
+    ).all()
+
+    scored = []
+    for target in all_courses:
+        if target.id == source.id:
+            continue
+        tag_overlap = _jaccard(source.tags, target.tags)
+        recency = _recency(target.date_published, now)
+        score = 1.0 * tag_overlap + 0.3 * recency
+        if score <= 0:
+            continue
+        scored.append((score, target))
+
+    scored.sort(key=lambda t: t[0], reverse=True)
+    top = scored[:3]
+
+    return {
+        "source": "related",
+        "next_courses": [
+            {
+                "id": t.id,
+                "title": t.title,
+                "url": t.url,
+                "description": t.description,
+                "reason": "Related course",
+                "score": round(s, 4),
+            }
+            for s, t in top
+        ],
+    }
+
+
 @router.get("/trending")
 async def get_trending(
     limit: int = Query(5, ge=1, le=20),
