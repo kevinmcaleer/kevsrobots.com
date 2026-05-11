@@ -80,6 +80,39 @@ Or with compose (also brings up a local Postgres on host port 5434):
 docker compose up --build
 ```
 
+## Production deployment
+
+Build and push the image to the Pi registry:
+
+```bash
+cd stacks/nibsy-api
+docker build -t 192.168.2.1:5000/nibsy-api:latest .
+docker push 192.168.2.1:5000/nibsy-api:latest
+```
+
+Deploy to the swarm:
+
+```bash
+docker stack deploy -c docker-stack.yml nibsy
+```
+
+The stack connects to Postgres at `192.168.2.1:5433/nibsy`. Create
+the database first if it doesn't exist:
+
+```bash
+psql -h 192.168.2.1 -p 5433 -U nibsy -c "CREATE DATABASE nibsy;"
+```
+
+Verify the deployment:
+
+```bash
+docker service ls | grep nibsy
+curl http://<any-pi-ip>:8200/health
+```
+
+DNS: point `nibsy.kevsrobots.com` to the Cloudflare load balancer,
+then add an upstream in the nginx config for port 8200.
+
 ## Endpoints
 
 | Path | Status | Notes |
@@ -132,7 +165,7 @@ caches when the scoring evolves.
 | #67 | done | Context-aware recommendations, related, and trending endpoints |
 | #68 | done | Click & impression tracking + analytics endpoints |
 | #69 | done | Remote ingest from live site + daily 1am scheduler |
-| #70 | open | Production deployment (docker-stack, swarm, port 8200) |
+| #70 | done | Production deployment (docker-stack, swarm, port 8200) |
 | #71 | done | Widget integration on kevsrobots.com pages |
 | #72 | open | Trending integration with Chatter analytics |
 | #73 | open | Intelligent recommendations (umbrella) |

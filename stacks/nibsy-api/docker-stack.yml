@@ -1,0 +1,30 @@
+# Production deployment for Nibsy API on the Pi cluster.
+# Deploy with: docker stack deploy -c docker-stack.yml nibsy
+
+services:
+  nibsy-api:
+    image: 192.168.2.1:5000/nibsy-api:latest
+    ports:
+      - "8200:8200"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://nibsy:nibsy@192.168.2.1:5433/nibsy
+      - CORS_ORIGINS=https://www.kevsrobots.com,http://localhost:4000
+      - SITE_BASE_URL=https://www.kevsrobots.com
+      - INGEST_SCHEDULE_HOUR=1
+      - RECOMMENDATION_REFRESH_DAYS=14
+      - PORT=8200
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8200/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
