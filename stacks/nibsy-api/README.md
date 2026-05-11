@@ -90,28 +90,29 @@ docker build -t 192.168.2.1:5000/nibsy-api:latest .
 docker push 192.168.2.1:5000/nibsy-api:latest
 ```
 
-Deploy to the swarm:
-
-```bash
-docker stack deploy -c docker-stack.yml nibsy
-```
-
-The stack connects to Postgres at `192.168.2.1:5433/nibsy`. Create
-the database first if it doesn't exist:
+Create the Postgres database:
 
 ```bash
 psql -h 192.168.2.1 -p 5433 -U nibsy -c "CREATE DATABASE nibsy;"
 ```
 
+Copy `.env.example` to `.env` and fill in the tunnel token, then:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
+
+This starts the API and a `cloudflared` sidecar that exposes it via
+Cloudflare Tunnel at `nibsy.kevsrobots.com`. Configure the tunnel
+in the Cloudflare Zero Trust dashboard to route to
+`http://nibsy-api:8200`.
+
 Verify the deployment:
 
 ```bash
-docker service ls | grep nibsy
-curl http://<any-pi-ip>:8200/health
+docker compose -f docker-compose.prod.yml ps
+curl https://nibsy.kevsrobots.com/health
 ```
-
-DNS: point `nibsy.kevsrobots.com` to the Cloudflare load balancer,
-then add an upstream in the nginx config for port 8200.
 
 ## Endpoints
 
