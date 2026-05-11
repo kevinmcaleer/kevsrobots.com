@@ -19,3 +19,8 @@ exports
 .env
 Chart data.csv
 Totals.csv
+
+# Claude Code — personal/local permission overrides (never commit)
+.claude/settings.local.json
+.claude/.credentials.json
+
