@@ -261,7 +261,7 @@ async def get_trending(
     if content_type:
         query = query.where(NibsyContent.content_type == content_type)
     if site_only:
-        query = query.where(NibsyContent.url.startswith("/"))
+        query = query.where(NibsyContent.url.like("/%"))
 
     rows = (await session.execute(query)).all()
 
