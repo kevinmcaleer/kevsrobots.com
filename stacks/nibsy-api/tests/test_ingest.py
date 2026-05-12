@@ -28,7 +28,7 @@ async def test_ingest_populates_content(session) -> None:
     urls = {r.url for r in rows}
 
     assert "/learn/example/00_intro.html" in urls
-    assert "/2025-01-01-example.md" in urls
+    assert "/blog/example.html" in urls
     assert "https://youtube.com/watch?v=TEST_VIDEO_ID_1" in urls
     assert "/projects/example-robot/" in urls
     assert "https://example.com/products/example" in urls

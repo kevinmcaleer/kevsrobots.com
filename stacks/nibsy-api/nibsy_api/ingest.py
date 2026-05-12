@@ -94,6 +94,21 @@ def _rows_from_courses(data: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def _post_url_to_blog_path(url: str) -> str:
+    """Convert a posts.yaml URL like /2026-02-22-slug.md to /blog/slug.html."""
+
+    name = url.strip("/")
+    if name.endswith(".md"):
+        name = name[:-3]
+    # Strip the YYYY-MM-DD- date prefix.
+    parts = name.split("-", 3)
+    if len(parts) >= 4 and len(parts[0]) == 4:
+        slug = parts[3]
+    else:
+        slug = name
+    return f"/blog/{slug}.html"
+
+
 def _rows_from_posts(data: Any) -> list[dict[str, Any]]:
     # posts.yaml is dict-wrapped: {posts: [...]} — issue body missed this.
     if isinstance(data, dict):
@@ -110,7 +125,7 @@ def _rows_from_posts(data: Any) -> list[dict[str, Any]]:
             {
                 "content_type": "post",
                 "title": title,
-                "url": url,
+                "url": _post_url_to_blog_path(url),
                 "description": None,
                 "tags": [],
                 "date_published": _parse_date(entry.get("date")),
