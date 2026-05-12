@@ -42,8 +42,9 @@ class Settings(BaseSettings):
     # Base URL of the live site for remote ingestion (#69).
     site_base_url: str = "https://www.kevsrobots.com"
 
-    # Page count service URL for trending score integration (#72).
-    page_count_url: str = "https://page_count.kevsrobots.com"
+    # Pagecount database URL for trending scores (#72).
+    # Direct DB query instead of HTTP to avoid inflating visit counts.
+    page_count_url: str = ""
 
     # Hour (UTC) at which the daily remote ingest runs. Set negative to disable.
     ingest_schedule_hour: int = 1

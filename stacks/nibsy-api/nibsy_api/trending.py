@@ -2,7 +2,7 @@
 
 Combines multiple signals into a composite trending score per content item:
 - Nibsy click-throughs (high signal, 7-day window)
-- Page views from the page_count service
+- Page views from the pagecount database (direct query, no HTTP)
 - YouTube view counts from popular_videos metadata
 - Recency boost for newer content
 
@@ -16,8 +16,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import httpx
-from sqlalchemy import delete, func, select
+from sqlalchemy import create_engine, text, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import NibsyClick, NibsyContent, NibsyTrending
@@ -37,21 +36,22 @@ def _recency_boost(date_published: Optional[datetime], now: datetime) -> float:
     return min(1.0, 1.0 / (1.0 + days / 90.0))
 
 
-async def _fetch_page_views(
-    page_count_url: str, url: str
-) -> int:
+def _fetch_all_page_views(pagecount_db_url: str) -> dict[str, int]:
+    """Query the pagecount database directly for visit counts per URL."""
+
+    if not pagecount_db_url:
+        return {}
     try:
-        async with httpx.AsyncClient(timeout=5) as client:
-            resp = await client.get(
-                page_count_url,
-                params={"url": f"https://www.kevsrobots.com{url}"},
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                return data.get("visits", 0)
-    except Exception:
-        pass
-    return 0
+        engine = create_engine(pagecount_db_url)
+        with engine.connect() as conn:
+            rows = conn.execute(
+                text("SELECT page_url, COUNT(*) as views FROM page_visits GROUP BY page_url")
+            ).fetchall()
+        engine.dispose()
+        return {row[0]: row[1] for row in rows}
+    except Exception as exc:
+        logger.warning("trending: could not query pagecount DB: %s", exc)
+        return {}
 
 
 async def compute_trending(
@@ -80,6 +80,11 @@ async def compute_trending(
     for row in click_rows:
         click_counts[row.content_url] = row.clicks
 
+    # Query pagecount DB directly — single query for all URLs.
+    # Reuse the same Postgres host but the pagecount database.
+    pagecount_db_url = page_count_url
+    page_view_counts = _fetch_all_page_views(pagecount_db_url)
+
     await session.execute(delete(NibsyTrending))
 
     computed = 0
@@ -91,7 +96,8 @@ async def compute_trending(
         if content.content_type == "video":
             youtube_views = meta.get("views", 0) or 0
 
-        page_views = await _fetch_page_views(page_count_url, content.url)
+        full_url = f"https://www.kevsrobots.com{content.url}"
+        page_views = page_view_counts.get(full_url, 0)
 
         recency = _recency_boost(content.date_published, now)
 
