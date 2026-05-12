@@ -240,6 +240,7 @@ async def get_next_course(
 async def get_trending(
     limit: int = Query(5, ge=1, le=20),
     content_type: Optional[str] = Query(None, description="Filter by content type"),
+    site_only: bool = Query(True, description="Exclude external URLs (YouTube etc.)"),
     session: AsyncSession = Depends(get_session),
 ) -> dict:
     query = (
@@ -259,6 +260,8 @@ async def get_trending(
     )
     if content_type:
         query = query.where(NibsyContent.content_type == content_type)
+    if site_only:
+        query = query.where(NibsyContent.url.startswith("/"))
 
     rows = (await session.execute(query)).all()
 

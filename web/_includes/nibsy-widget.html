@@ -857,7 +857,7 @@
 
   async function fetchTrending() {
     try {
-      const res = await fetch(NIBSY_API + '/api/trending?period=7d&limit=5');
+      const res = await fetch(NIBSY_API + '/api/trending?limit=5');
       if (!res.ok) return null;
       const data = await res.json();
       return data.trending || [];
