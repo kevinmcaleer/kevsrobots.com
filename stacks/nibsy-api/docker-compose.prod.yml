@@ -30,7 +30,6 @@ services:
     image: cloudflare/cloudflared:latest
     network_mode: host
     command: tunnel --no-autoupdate run
-    env_file: .env
     environment:
       - TUNNEL_TOKEN=${NIBSY_TUNNEL_TOKEN}
     restart: unless-stopped
