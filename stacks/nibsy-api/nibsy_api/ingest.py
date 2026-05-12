@@ -18,7 +18,7 @@ from typing import Any, Iterable, Optional
 
 import httpx
 import yaml
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import NibsyContent
@@ -403,6 +403,16 @@ async def ingest_from_data_dir(
     if pop_data is not None:
         stats.files_processed.append("popular_videos.yaml")
         await _merge_popular_videos(pop_data, session, stats)
+
+    # Clean up stale .md post URLs left over from before the URL fix.
+    stale = await session.execute(
+        delete(NibsyContent).where(
+            NibsyContent.content_type == "post",
+            NibsyContent.url.like("%.md"),
+        )
+    )
+    if stale.rowcount:
+        logger.info("ingest: removed %s stale .md post rows", stale.rowcount)
 
     await session.commit()
     return stats
