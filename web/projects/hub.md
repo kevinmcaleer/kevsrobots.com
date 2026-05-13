@@ -22,11 +22,11 @@ thanks: false
       <div class="d-flex justify-content-between align-items-center">
         <h4 class="mb-0">Browse Projects</h4>
         <div>
-          <a href="/projects/my-projects" id="my-projects-btn" class="btn btn-outline-primary me-2 d-none">
-            <i class="bi bi-folder2"></i> My Projects
+          <a href="/projects/my-projects.html" id="my-projects-btn" class="btn btn-outline-primary me-2 d-none">
+            <i class="fas fa-folder"></i> My Projects
           </a>
-          <a href="/projects/new" id="create-project-btn" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New Project
+          <a href="/projects/editor.html" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Create New Project
           </a>
         </div>
       </div>
@@ -39,18 +39,15 @@ thanks: false
       <input type="text" id="project-search" class="form-control" placeholder="Search projects by title or tag...">
     </div>
     <div class="col-md-3">
-      <select id="sort-select" class="form-select">
-        <option value="recent">Most Recent</option>
-        <option value="popular">Most Popular</option>
-        <option value="most_liked">Most Liked</option>
-        <option value="most_viewed">Most Viewed</option>
+      <select id="difficulty-filter" class="form-select">
+        <option value="">All Difficulties</option>
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
       </select>
     </div>
     <div class="col-md-3">
-      <select id="tag-filter" class="form-select">
-        <option value="">All Tags</option>
-        <!-- Tags will be populated dynamically -->
-      </select>
+      <input type="text" id="tag-filter" class="form-control" placeholder="Filter by tag...">
     </div>
   </div>
 
@@ -61,226 +58,117 @@ thanks: false
     </div>
   </div>
 
-  <!-- Error Message -->
-  <div id="error-message" class="alert alert-danger d-none" role="alert">
-    <strong>Error loading projects.</strong> Please try again later.
-  </div>
-
   <!-- Projects Grid -->
-  <div id="projects-grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-    <!-- Projects will be loaded here dynamically -->
+  <div id="projects-grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
   </div>
 
-  <!-- Pagination -->
-  <nav aria-label="Projects pagination" class="mt-4">
-    <ul id="pagination" class="pagination justify-content-center">
-      <!-- Pagination will be generated dynamically -->
-    </ul>
-  </nav>
+  <!-- No Projects -->
+  <div id="no-projects" class="text-center py-5 d-none">
+    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">No projects yet</h4>
+    <p class="text-muted">Be the first to share a build!</p>
+    <a href="/projects/editor.html" class="btn btn-primary">Create a Project</a>
+  </div>
 </div>
 
-<!-- JavaScript for Projects Hub -->
 <script>
-const PROJECTS_API = 'https://chatter.kevsrobots.com/api/projects';
-const API_BASE = 'https://chatter.kevsrobots.com/api';
-let currentPage = 1;
-let currentSort = 'recent';
-let currentTag = '';
-let currentSearch = '';
-let currentUser = null;
-
-// Check if user is logged in
-async function checkAuth() {
-  try {
-    const response = await fetch(`${API_BASE}/me`, {
-      credentials: 'include'
-    });
-
-    if (response.ok) {
-      currentUser = await response.json();
-      // Show "My Projects" button
-      document.getElementById('my-projects-btn').classList.remove('d-none');
-    }
-  } catch (error) {
-    console.error('Auth check failed:', error);
-  }
-}
-
-// Load projects from API
-async function loadProjects(page = 1, sort = 'recent', tag = '', search = '') {
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  const grid = document.getElementById('projects-grid');
   const spinner = document.getElementById('loading-spinner');
-  const errorMsg = document.getElementById('error-message');
-  const grid = document.getElementById('projects-grid');
+  const noProjects = document.getElementById('no-projects');
+  const searchInput = document.getElementById('project-search');
+  const difficultyFilter = document.getElementById('difficulty-filter');
+  const tagFilter = document.getElementById('tag-filter');
 
-  spinner.classList.remove('d-none');
-  errorMsg.classList.add('d-none');
-  grid.innerHTML = '';
+  const difficultyColors = {
+    beginner: 'success',
+    intermediate: 'warning',
+    advanced: 'danger',
+  };
 
-  try {
-    // Build query parameters
-    const params = new URLSearchParams({
-      page: page,
-      per_page: 20,
-      sort: sort,
-      status_filter: 'published' // Only show published projects
-    });
-
-    if (tag) params.append('tag', tag);
-    // Note: Search functionality would need to be added to the API
-
-    const response = await fetch(`${PROJECTS_API}?${params}`);
-    if (!response.ok) throw new Error('Failed to fetch projects');
-
-    const data = await response.json();
-
-    // Hide spinner
-    spinner.classList.add('d-none');
-
-    // Render projects
-    if (data.projects && data.projects.length > 0) {
-      data.projects.forEach(project => renderProjectCard(project));
-      renderPagination(data.page, data.pages);
-    } else {
-      grid.innerHTML = '<div class="col-12"><p class="text-center text-muted">No projects found.</p></div>';
-    }
-
-  } catch (error) {
-    console.error('Error loading projects:', error);
-    spinner.classList.add('d-none');
-    errorMsg.classList.remove('d-none');
-  }
-}
-
-// Render a project card
-function renderProjectCard(project) {
-  const grid = document.getElementById('projects-grid');
-  const card = document.createElement('div');
-  card.className = 'col';
-
-  // Format date
-  const date = new Date(project.created_at).toLocaleDateString();
-
-  // Get primary image or placeholder
-  const imageUrl = project.primary_image_url || '/assets/img/placeholder-project.jpg';
-
-  // Build tags HTML
-  const tagsHtml = project.tags.slice(0, 3).map(tag =>
-    `<span class="badge bg-secondary me-1">${tag}</span>`
-  ).join('');
-
-  card.innerHTML = `
-    <div class="card h-100 shadow-sm">
-      <img src="${imageUrl}" class="card-img-top" alt="${project.title}" style="height: 200px; object-fit: cover;">
-      <div class="card-body">
-        <h5 class="card-title">${escapeHtml(project.title)}</h5>
-        <p class="card-text text-muted small">${escapeHtml(project.description.substring(0, 100))}...</p>
-        <div class="mb-2">${tagsHtml}</div>
-        <div class="d-flex justify-content-between align-items-center">
-          <small class="text-muted">
-            <i class="bi bi-eye"></i> ${project.view_count}
-            <i class="bi bi-heart ms-2"></i> ${project.like_count}
-            <i class="bi bi-chat ms-2"></i> ${project.comment_count}
-          </small>
-          <small class="text-muted">${date}</small>
-        </div>
-      </div>
-      <div class="card-footer bg-transparent">
-        ${currentUser && currentUser.id === project.author_id ? `
-          <div class="btn-group w-100" role="group">
-            <a href="/projects/edit?id=${project.id}" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="/projects/view?id=${project.id}" class="btn btn-sm btn-primary">
-              <i class="bi bi-eye"></i> View
-            </a>
-          </div>
-        ` : `
-          <a href="/projects/view?id=${project.id}" class="btn btn-sm btn-primary w-100">View Project</a>
-        `}
-      </div>
-    </div>
-  `;
-
-  grid.appendChild(card);
-}
-
-// Render pagination
-function renderPagination(currentPage, totalPages) {
-  const pagination = document.getElementById('pagination');
-  pagination.innerHTML = '';
-
-  if (totalPages <= 1) return;
-
-  // Previous button
-  const prevLi = document.createElement('li');
-  prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-  prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>`;
-  pagination.appendChild(prevLi);
-
-  // Page numbers (show max 5 pages)
-  const startPage = Math.max(1, currentPage - 2);
-  const endPage = Math.min(totalPages, startPage + 4);
-
-  for (let i = startPage; i <= endPage; i++) {
-    const pageLi = document.createElement('li');
-    pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
-    pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
-    pagination.appendChild(pageLi);
-  }
-
-  // Next button
-  const nextLi = document.createElement('li');
-  nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-  nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>`;
-  pagination.appendChild(nextLi);
-
-  // Add click handlers
-  pagination.querySelectorAll('a.page-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const page = parseInt(link.dataset.page);
-      if (page >= 1 && page <= totalPages) {
-        loadProjects(page, currentSort, currentTag, currentSearch);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Check auth to show My Projects button
+  async function checkAuth() {
+    try {
+      const resp = await fetch(API + '/api/projects/my/list', { credentials: 'include' });
+      if (resp.ok) {
+        document.getElementById('my-projects-btn').classList.remove('d-none');
       }
-    });
-  });
-}
+    } catch (e) {}
+  }
 
-// Helper function to escape HTML
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+  async function loadProjects() {
+    spinner.classList.remove('d-none');
+    noProjects.classList.add('d-none');
+    grid.innerHTML = '';
 
-// Event listeners
-document.getElementById('sort-select').addEventListener('change', (e) => {
-  currentSort = e.target.value;
-  currentPage = 1;
-  loadProjects(currentPage, currentSort, currentTag, currentSearch);
-});
+    const params = new URLSearchParams();
+    if (searchInput.value) params.set('search', searchInput.value);
+    if (difficultyFilter.value) params.set('difficulty', difficultyFilter.value);
+    if (tagFilter.value) params.set('tag', tagFilter.value.toLowerCase());
 
-document.getElementById('tag-filter').addEventListener('change', (e) => {
-  currentTag = e.target.value;
-  currentPage = 1;
-  loadProjects(currentPage, currentSort, currentTag, currentSearch);
-});
+    try {
+      const resp = await fetch(API + '/api/projects?' + params.toString());
+      if (!resp.ok) throw new Error('API error');
+      const projects = await resp.json();
+      spinner.classList.add('d-none');
 
-document.getElementById('project-search').addEventListener('input', (e) => {
-  currentSearch = e.target.value;
-  // Debounce search
-  clearTimeout(window.searchTimeout);
-  window.searchTimeout = setTimeout(() => {
-    currentPage = 1;
-    loadProjects(currentPage, currentSort, currentTag, currentSearch);
-  }, 500);
-});
+      if (projects.length === 0) {
+        noProjects.classList.remove('d-none');
+        return;
+      }
 
-// Load projects and check auth on page load
-checkAuth();
-loadProjects(currentPage, currentSort, currentTag, currentSearch);
+      grid.innerHTML = projects.map(p => `
+        <div class="col">
+          <a href="/projects/view.html?id=${p.id}" class="text-decoration-none">
+            <div class="card h-100 border-0 shadow-sm card-hover">
+              ${p.cover_image
+                ? `<img src="${p.cover_image}" class="card-img-top" alt="${esc(p.title)}" style="height:200px;object-fit:cover">`
+                : `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px"><i class="fas fa-project-diagram fa-3x text-muted"></i></div>`
+              }
+              <div class="card-body">
+                <h5 class="card-title text-dark">${esc(p.title)}</h5>
+                <p class="card-text text-muted small">${esc(p.short_description || '')}</p>
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                  ${p.difficulty ? `<span class="badge bg-${difficultyColors[p.difficulty] || 'secondary'}">${p.difficulty}</span>` : ''}
+                  ${p.estimated_minutes ? `<span class="badge bg-light text-dark"><i class="fas fa-clock"></i> ${p.estimated_minutes}min</span>` : ''}
+                </div>
+                <div class="d-flex flex-wrap gap-1">
+                  ${(p.tags || []).slice(0, 4).map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('')}
+                </div>
+              </div>
+              <div class="card-footer bg-transparent border-0">
+                <small class="text-muted">by ${esc(p.author_username)} &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
+              </div>
+            </div>
+          </a>
+        </div>
+      `).join('');
+
+    } catch (e) {
+      console.error('Failed to load projects:', e);
+      spinner.classList.add('d-none');
+      grid.innerHTML = '<div class="text-center py-5 w-100"><p class="text-muted">Failed to load projects. Please try again later.</p></div>';
+    }
+  }
+
+  function esc(text) {
+    const div = document.createElement('div');
+    div.textContent = text || '';
+    return div.innerHTML;
+  }
+
+  let debounce;
+  function debouncedLoad() {
+    clearTimeout(debounce);
+    debounce = setTimeout(loadProjects, 300);
+  }
+
+  searchInput.addEventListener('input', debouncedLoad);
+  difficultyFilter.addEventListener('change', loadProjects);
+  tagFilter.addEventListener('input', debouncedLoad);
+
+  checkAuth();
+  loadProjects();
+})();
 </script>
-
-<!-- Add Bootstrap Icons if not already included -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
