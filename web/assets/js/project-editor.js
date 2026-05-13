@@ -25,34 +25,83 @@
   const saveIndicator = document.getElementById('save-indicator');
 
   // --- Auth ---
-  function getAuthHeaders() {
-    // Chatter sets cookies on .kevsrobots.com, they're sent automatically.
-    // For API calls we also check localStorage as fallback.
-    const token = document.cookie.split(';').find(c => c.trim().startsWith('access_token='));
-    if (token) return {};  // Cookie will be sent automatically
-    return {};
+  const IS_LOCAL = location.hostname === 'localhost'
+    || location.hostname === '0.0.0.0'
+    || location.hostname === 'local.kevsrobots.com';
+
+  // In local dev, use a token from localStorage since secure cookies
+  // don't work over HTTP.
+  function getDevToken() {
+    return localStorage.getItem('dev_jwt_token');
+  }
+
+  function apiFetch(url, opts = {}) {
+    opts.credentials = 'include';
+    const token = getDevToken();
+    if (token) {
+      opts.headers = opts.headers || {};
+      if (opts.headers instanceof Headers) {
+        opts.headers.set('Authorization', 'Bearer ' + token);
+      } else {
+        opts.headers['Authorization'] = 'Bearer ' + token;
+      }
+    }
+    return fetch(url, opts);
   }
 
   async function checkAuth() {
     try {
-      const resp = await fetch(API + '/api/projects/my/list', { credentials: 'include' });
+      const resp = await apiFetch(API + '/api/projects/my/list');
       if (resp.status === 401) {
-        authRequired.classList.remove('d-none');
+        if (IS_LOCAL) {
+          showDevLogin();
+        } else {
+          authRequired.classList.remove('d-none');
+        }
         return false;
       }
       editorContainer.classList.remove('d-none');
       return true;
     } catch (e) {
-      authRequired.classList.remove('d-none');
+      if (IS_LOCAL) {
+        showDevLogin();
+      } else {
+        authRequired.classList.remove('d-none');
+      }
       return false;
     }
+  }
+
+  function showDevLogin() {
+    authRequired.innerHTML = `
+      <div class="card p-3">
+        <h5>Local Dev Login</h5>
+        <p class="small text-muted">Secure cookies don't work over HTTP. Log in on
+          <a href="https://www.kevsrobots.com/login" target="_blank">kevsrobots.com</a>,
+          then open browser console there and run:<br>
+          <code>document.cookie.match(/access_token=Bearer%20([^;]+)/)?.[1]</code><br>
+          Paste the token below.</p>
+        <div class="input-group mb-2">
+          <input type="text" id="dev-token-input" class="form-control form-control-sm" placeholder="Paste JWT token...">
+          <button class="btn btn-sm btn-primary" id="dev-token-btn">Set Token</button>
+        </div>
+      </div>
+    `;
+    authRequired.classList.remove('d-none');
+    document.getElementById('dev-token-btn').addEventListener('click', () => {
+      const token = document.getElementById('dev-token-input').value.trim();
+      if (token) {
+        localStorage.setItem('dev_jwt_token', token);
+        location.reload();
+      }
+    });
   }
 
   // --- Load existing project ---
   async function loadProject() {
     if (!projectId) return;
     try {
-      const resp = await fetch(API + '/api/projects/' + projectId, { credentials: 'include' });
+      const resp = await apiFetch(API + '/api/projects/' + projectId, { credentials: 'include' });
       if (!resp.ok) return;
       currentProject = await resp.json();
       titleInput.value = currentProject.title || '';
@@ -95,13 +144,13 @@
     try {
       let resp;
       if (currentProject) {
-        resp = await fetch(API + '/api/projects/' + currentProject.id, {
+        resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
           method: 'PUT', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
       } else {
-        resp = await fetch(API + '/api/projects', {
+        resp = await apiFetch(API + '/api/projects', {
           method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
@@ -132,7 +181,7 @@
     if (!currentProject) await saveProject();
     if (!currentProject) return;
     try {
-      const resp = await fetch(API + '/api/projects/' + currentProject.id, {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
         method: 'PUT', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'published' }),
@@ -148,7 +197,7 @@
   document.getElementById('unpublish-btn').addEventListener('click', async () => {
     if (!currentProject) return;
     try {
-      const resp = await fetch(API + '/api/projects/' + currentProject.id, {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
         method: 'PUT', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'draft' }),
@@ -165,7 +214,7 @@
     if (!currentProject) return;
     if (!confirm('Delete this project? This cannot be undone.')) return;
     try {
-      await fetch(API + '/api/projects/' + currentProject.id, {
+      await apiFetch(API + '/api/projects/' + currentProject.id, {
         method: 'DELETE', credentials: 'include',
       });
       window.location.href = '/projects/hub';
@@ -313,7 +362,7 @@
       const form = new FormData();
       form.append('file', file);
       try {
-        const resp = await fetch(API + '/api/projects/' + currentProject.id + '/files', {
+        const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', {
           method: 'POST', credentials: 'include', body: form,
         });
         if (!resp.ok) {
@@ -328,7 +377,7 @@
 
   async function loadFiles() {
     if (!currentProject) return;
-    const resp = await fetch(API + '/api/projects/' + currentProject.id + '/files', { credentials: 'include' });
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', { credentials: 'include' });
     const files = await resp.json();
     const list = document.getElementById('file-list');
     list.innerHTML = files.map(f => `
@@ -344,7 +393,7 @@
   }
 
   window.deleteFile = async function(fileId) {
-    await fetch(API + '/api/projects/' + currentProject.id + '/files/' + fileId, {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/files/' + fileId, {
       method: 'DELETE', credentials: 'include',
     });
     loadFiles();
@@ -372,7 +421,7 @@
     for (const file of fileList) {
       const form = new FormData();
       form.append('file', file);
-      await fetch(API + '/api/projects/' + currentProject.id + '/images', {
+      await apiFetch(API + '/api/projects/' + currentProject.id + '/images', {
         method: 'POST', credentials: 'include', body: form,
       });
     }
@@ -381,7 +430,7 @@
 
   async function loadImages() {
     if (!currentProject) return;
-    const resp = await fetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
     const images = await resp.json();
     const gallery = document.getElementById('image-gallery');
     gallery.innerHTML = images.map(img => `
@@ -395,7 +444,7 @@
   }
 
   window.deleteImage = async function(imageId) {
-    await fetch(API + '/api/projects/' + currentProject.id + '/images/' + imageId, {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageId, {
       method: 'DELETE', credentials: 'include',
     });
     loadImages();
@@ -404,7 +453,7 @@
   // --- BOM ---
   document.getElementById('add-bom-btn').addEventListener('click', async () => {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
-    await fetch(API + '/api/projects/' + currentProject.id + '/bom', {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/bom', {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: '', quantity: 1, unit: 'qty', unit_cost: 0 }),
@@ -414,7 +463,7 @@
 
   async function loadBOM() {
     if (!currentProject) return;
-    const resp = await fetch(API + '/api/projects/' + currentProject.id + '/bom', { credentials: 'include' });
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom', { credentials: 'include' });
     const items = await resp.json();
     const tbody = document.getElementById('bom-body');
     tbody.innerHTML = items.map(item => `
@@ -445,7 +494,7 @@
       else if (field === 'unit_cost') val = parseFloat(val) || 0;
       data[field] = val;
     });
-    await fetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
       method: 'PUT', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -454,7 +503,7 @@
   };
 
   window.deleteBOM = async function(itemId) {
-    await fetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
       method: 'DELETE', credentials: 'include',
     });
     loadBOM();
@@ -468,7 +517,7 @@
     const url = prompt('URL:');
     if (!url) return;
     const type = prompt('Type (article/video/tutorial/documentation/other):', 'article') || 'article';
-    await fetch(API + '/api/projects/' + currentProject.id + '/links', {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/links', {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, url, link_type: type }),
@@ -478,7 +527,7 @@
 
   async function loadLinks() {
     if (!currentProject) return;
-    const resp = await fetch(API + '/api/projects/' + currentProject.id + '/links', { credentials: 'include' });
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/links', { credentials: 'include' });
     const links = await resp.json();
     const typeIcons = { article: 'fa-newspaper', video: 'fa-play-circle', tutorial: 'fa-graduation-cap', documentation: 'fa-book', other: 'fa-external-link-alt' };
     document.getElementById('links-list').innerHTML = links.map(l => `
@@ -493,7 +542,7 @@
   }
 
   window.deleteLink = async function(linkId) {
-    await fetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
       method: 'DELETE', credentials: 'include',
     });
     loadLinks();
@@ -504,7 +553,7 @@
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     const title = prompt('Journal entry title:');
     if (!title) return;
-    await fetch(API + '/api/projects/' + currentProject.id + '/journal', {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, status: 'in_progress' }),
@@ -514,7 +563,7 @@
 
   async function loadJournal() {
     if (!currentProject) return;
-    const resp = await fetch(API + '/api/projects/' + currentProject.id + '/journal', { credentials: 'include' });
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', { credentials: 'include' });
     const entries = await resp.json();
     const statusLabels = { planning: 'Planning', in_progress: 'In Progress', completed: 'Completed' };
     document.getElementById('journal-list').innerHTML = entries.map(e => `
