@@ -334,7 +334,7 @@
   - python
   - ai
   - raspberry_pi
-  - computer_vision
+  - computer vision
   link: /learn/object_model/00_intro.html
   name: Building Object Detection Models with Raspberry Pi AI Camera
 - author: Kevin McAleer

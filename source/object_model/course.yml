@@ -8,7 +8,7 @@
       - python
       - ai
       - raspberry_pi
-      - computer_vision
+      - computer vision
   description: >-
       Learn how to build custom object detection models using the Raspberry Pi AI Camera.
       Train your own models with PyTorch, optimize them for edge deployment, and run

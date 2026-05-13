@@ -72,7 +72,17 @@ class Courses:
             "title: Recent Courses\n"
             "description: Learn something new. Today.\n"
             "---\n\n"
+            "<div class=\"px-0 py-0 mx-0 my-0\">\n"
+            "{% include breadcrumbs.html %}\n\n"
+            "<div class=\"row\">\n"
+            "<div class=\"col-12 col-md-3 col-lg-2\">\n"
+            "{% include learn_sidebar.html %}\n"
+            "</div>\n"
+            "<div class=\"col-12 col-md-9 col-lg-10\">\n"
             "{% include recent_courses.html %}\n"
+            "{{ content }}\n"
+            "</div>\n</div>\n"
+            
         )
 
         with open(recent_path, "w") as f:
