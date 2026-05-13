@@ -1,0 +1,208 @@
+---
+title: Project Editor
+layout: default
+description: Create or edit a project
+---
+
+<link rel="stylesheet" href="/assets/css/project-editor.css">
+
+<div class="container-fluid py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <a href="/projects/" class="text-decoration-none text-muted"><i class="fas fa-arrow-left"></i> Back to Projects</a>
+    </div>
+    <div id="editor-status" class="text-muted small">
+      <span id="status-badge" class="badge bg-secondary">Draft</span>
+      <span id="save-indicator"></span>
+    </div>
+  </div>
+
+  <div id="auth-required" class="alert alert-warning d-none">
+    You need to <a href="javascript:void(0)" onclick="document.querySelector('.nibsy-menu-item[href=\'/login\']')?.click()">log in</a> to create or edit projects.
+  </div>
+
+  <div id="editor-container" class="row d-none">
+    <!-- LEFT PANEL: Main Content -->
+    <div class="col-lg-8">
+      <!-- Title & Description -->
+      <div class="mb-3">
+        <input type="text" id="project-title" class="form-control form-control-lg border-0 fw-bold"
+               placeholder="Project title..." maxlength="200">
+        <div id="title-error" class="text-danger small d-none"></div>
+      </div>
+      <div class="mb-4">
+        <input type="text" id="project-description" class="form-control border-0 text-muted"
+               placeholder="Short description (one-liner)..." maxlength="500">
+      </div>
+
+      <hr>
+
+      <!-- Markdown Editor -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center py-1">
+          <div>
+            <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="bold" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="italic" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="heading" title="Heading"><i class="fas fa-heading"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="code" title="Code block"><i class="fas fa-code"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="link" title="Link (Ctrl+K)"><i class="fas fa-link"></i></button>
+            <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="image" title="Image"><i class="fas fa-image"></i></button>
+            <button class="btn btn-sm btn-outline-secondary editor-tool" data-action="list" title="Bullet list"><i class="fas fa-list-ul"></i></button>
+          </div>
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-outline-secondary active" id="btn-write">Write</button>
+            <button class="btn btn-outline-secondary" id="btn-preview">Preview</button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <textarea id="content-editor" class="form-control border-0 rounded-0" rows="20"
+                    placeholder="Write your project content in Markdown...
+
+# Background
+Describe what this project is about...
+
+## How to Build
+- Step 1: ...
+- Step 2: ...
+
+## Code
+```python
+# Your code here
+```"></textarea>
+          <div id="content-preview" class="p-3 d-none" style="min-height: 400px;"></div>
+        </div>
+      </div>
+
+      <!-- File Upload -->
+      <div class="card mb-4">
+        <div class="card-header py-2">
+          <i class="fas fa-paperclip me-1"></i> Files & Models
+        </div>
+        <div class="card-body">
+          <div id="file-dropzone" class="text-center p-4 border border-dashed rounded mb-3">
+            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+            <p class="text-muted mb-1">Drag files here or <label for="file-input" class="text-primary" style="cursor:pointer">click to choose</label></p>
+            <small class="text-muted">.py, .cpp, .ino, .stl, .pdf, .md, .json — 25MB max per file</small>
+            <input type="file" id="file-input" class="d-none" multiple>
+          </div>
+          <div id="file-list"></div>
+          <div id="file-progress" class="d-none">
+            <div class="progress"><div class="progress-bar" role="progressbar" style="width: 0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bill of Materials -->
+      <div class="card mb-4">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+          <span><i class="fas fa-clipboard-list me-1"></i> Bill of Materials</span>
+          <button class="btn btn-sm btn-outline-primary" id="add-bom-btn"><i class="fas fa-plus"></i> Add Item</button>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0" id="bom-table">
+            <thead>
+              <tr>
+                <th>Part</th>
+                <th style="width:60px">Qty</th>
+                <th style="width:60px">Unit</th>
+                <th style="width:80px">Cost</th>
+                <th>Supplier</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="bom-body"></tbody>
+            <tfoot>
+              <tr class="table-light">
+                <td colspan="3" class="text-end fw-bold">Total:</td>
+                <td id="bom-total" class="fw-bold">£0.00</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Related Links -->
+      <div class="card mb-4">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+          <span><i class="fas fa-link me-1"></i> Related Links</span>
+          <button class="btn btn-sm btn-outline-primary" id="add-link-btn"><i class="fas fa-plus"></i> Add Link</button>
+        </div>
+        <div class="card-body">
+          <div id="links-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: Metadata -->
+    <div class="col-lg-4">
+      <div class="sticky-top" style="top: 20px;">
+        <div class="card mb-3">
+          <div class="card-header py-2">Metadata</div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label small text-muted">Difficulty</label>
+              <select id="project-difficulty" class="form-select form-select-sm">
+                <option value="">Select...</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted">Time to Build (minutes)</label>
+              <input type="number" id="project-time" class="form-control form-control-sm" min="1" placeholder="e.g. 60">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted">Tags</label>
+              <div id="tags-container" class="d-flex flex-wrap gap-1 mb-1"></div>
+              <div class="input-group input-group-sm">
+                <input type="text" id="tag-input" class="form-control" placeholder="Add tag...">
+                <button class="btn btn-outline-secondary" id="add-tag-btn">Add</button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small text-muted">Code Repository URL</label>
+              <input type="url" id="project-repo" class="form-control form-control-sm" placeholder="https://github.com/...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Images sidebar -->
+        <div class="card mb-3">
+          <div class="card-header py-2">
+            <i class="fas fa-camera me-1"></i> Images
+          </div>
+          <div class="card-body">
+            <div id="image-dropzone" class="text-center p-3 border border-dashed rounded mb-2">
+              <small class="text-muted"><label for="image-input" style="cursor:pointer" class="text-primary">Upload images</label></small>
+              <input type="file" id="image-input" class="d-none" multiple accept="image/*">
+            </div>
+            <div id="image-gallery" class="row g-2"></div>
+          </div>
+        </div>
+
+        <!-- Build Journal sidebar -->
+        <div class="card mb-3">
+          <div class="card-header py-2 d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-calendar-alt me-1"></i> Build Journal</span>
+            <button class="btn btn-sm btn-outline-primary" id="add-journal-btn"><i class="fas fa-plus"></i></button>
+          </div>
+          <div class="card-body">
+            <div id="journal-list"></div>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="d-grid gap-2">
+          <button class="btn btn-primary" id="save-btn"><i class="fas fa-save me-1"></i> Save Draft</button>
+          <button class="btn btn-success" id="publish-btn"><i class="fas fa-rocket me-1"></i> Publish</button>
+          <button class="btn btn-outline-danger btn-sm" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete Project</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/assets/js/project-editor.js"></script>

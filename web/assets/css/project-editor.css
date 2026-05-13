@@ -1,0 +1,204 @@
+/* Project Editor Styles */
+
+#project-title {
+  font-size: 1.8rem;
+}
+
+#project-title:focus,
+#project-description:focus {
+  box-shadow: none;
+  background: #f8f9fa;
+}
+
+#content-editor {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 400px;
+}
+
+#content-editor:focus {
+  box-shadow: none;
+}
+
+#content-preview {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+#content-preview pre {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+#content-preview code {
+  font-size: 0.85rem;
+}
+
+#content-preview img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+/* Drop zones */
+.border-dashed {
+  border-style: dashed !important;
+  border-color: #dee2e6 !important;
+}
+
+#file-dropzone.dragover,
+#image-dropzone.dragover {
+  background: #e8f4fd;
+  border-color: #4A90D9 !important;
+}
+
+/* BOM table */
+#bom-table input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  padding: 2px 4px;
+}
+
+#bom-table input:focus {
+  background: #f8f9fa;
+  outline: 1px solid #4A90D9;
+  border-radius: 3px;
+}
+
+#bom-table td {
+  vertical-align: middle;
+  padding: 4px 8px;
+}
+
+/* Tag badges */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #e8f4fd;
+  color: #4A90D9;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+.tag-badge .remove-tag {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.tag-badge .remove-tag:hover {
+  opacity: 1;
+}
+
+/* File list */
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-item .file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-item .file-size {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+/* Image gallery */
+.image-thumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  aspect-ratio: 1;
+}
+
+.image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-thumb .delete-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgba(220, 53, 69, 0.8);
+  color: white;
+  border: none;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  border-radius: 0 6px 0 6px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.image-thumb:hover .delete-overlay {
+  opacity: 1;
+}
+
+/* Journal entries */
+.journal-entry {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.journal-entry:last-child {
+  border-bottom: none;
+}
+
+.journal-status {
+  font-size: 0.75rem;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.journal-status.planning { background: #fff3cd; color: #856404; }
+.journal-status.in_progress { background: #cce5ff; color: #004085; }
+.journal-status.completed { background: #d4edda; color: #155724; }
+
+/* Save indicator */
+#save-indicator {
+  font-size: 0.8rem;
+}
+
+.save-saving { color: #ffc107; }
+.save-saved { color: #28a745; }
+.save-error { color: #dc3545; }
+
+/* Link items */
+.link-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.link-type-icon {
+  width: 20px;
+  text-align: center;
+  color: #4A90D9;
+}
+
+/* Mobile: sidebar becomes stacked */
+@media (max-width: 991.98px) {
+  .sticky-top {
+    position: static !important;
+  }
+}
