@@ -145,6 +145,22 @@
     } catch (e) { console.error(e); }
   });
 
+  document.getElementById('unpublish-btn').addEventListener('click', async () => {
+    if (!currentProject) return;
+    try {
+      const resp = await fetch(API + '/api/projects/' + currentProject.id, {
+        method: 'PUT', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'draft' }),
+      });
+      if (resp.ok) {
+        currentProject = await resp.json();
+        updateStatusBadge('draft');
+        showSaveStatus('saved', 'Reverted to draft');
+      }
+    } catch (e) { console.error(e); }
+  });
+
   document.getElementById('delete-btn').addEventListener('click', async () => {
     if (!currentProject) return;
     if (!confirm('Delete this project? This cannot be undone.')) return;
@@ -152,13 +168,28 @@
       await fetch(API + '/api/projects/' + currentProject.id, {
         method: 'DELETE', credentials: 'include',
       });
-      window.location.href = '/projects/';
+      window.location.href = '/projects/hub';
     } catch (e) { console.error(e); }
   });
 
   function updateStatusBadge(status) {
     statusBadge.textContent = status === 'published' ? 'Published' : 'Draft';
     statusBadge.className = 'badge ' + (status === 'published' ? 'bg-success' : 'bg-secondary');
+    const publishBtn = document.getElementById('publish-btn');
+    const unpublishBtn = document.getElementById('unpublish-btn');
+    const viewLiveBtn = document.getElementById('view-live-btn');
+    if (status === 'published') {
+      publishBtn.style.display = 'none';
+      unpublishBtn.style.display = '';
+      if (currentProject) {
+        viewLiveBtn.style.display = '';
+        viewLiveBtn.href = '/projects/view.html?id=' + currentProject.id;
+      }
+    } else {
+      publishBtn.style.display = '';
+      unpublishBtn.style.display = 'none';
+      viewLiveBtn.style.display = 'none';
+    }
   }
 
   // --- Tags ---

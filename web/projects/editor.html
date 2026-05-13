@@ -195,9 +195,11 @@ Describe what this project is about...
 
         <!-- Action buttons -->
         <div class="d-grid gap-2">
-          <button class="btn btn-primary" id="save-btn"><i class="fas fa-save me-1"></i> Save Draft</button>
+          <button class="btn btn-primary" id="save-btn"><i class="fas fa-save me-1"></i> Save</button>
           <button class="btn btn-success" id="publish-btn"><i class="fas fa-rocket me-1"></i> Publish</button>
-          <button class="btn btn-outline-danger btn-sm" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete Project</button>
+          <button class="btn btn-warning" id="unpublish-btn" style="display:none"><i class="fas fa-eye-slash me-1"></i> Revert to Draft</button>
+          <a href="#" id="view-live-btn" class="btn btn-outline-primary" style="display:none" target="_blank"><i class="fas fa-external-link-alt me-1"></i> View Live</a>
+          <button class="btn btn-outline-danger btn-sm mt-2" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete Project</button>
         </div>
       </div>
     </div>

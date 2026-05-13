@@ -87,12 +87,15 @@ thanks: false
     advanced: 'danger',
   };
 
-  // Check auth to show My Projects button
+  let myProjectIds = new Set();
+
   async function checkAuth() {
     try {
       const resp = await fetch(API + '/api/projects/my/list', { credentials: 'include' });
       if (resp.ok) {
         document.getElementById('my-projects-btn').classList.remove('d-none');
+        const myProjects = await resp.json();
+        myProjectIds = new Set(myProjects.map(p => p.id));
       }
     } catch (e) {}
   }
@@ -137,8 +140,9 @@ thanks: false
                   ${(p.tags || []).slice(0, 4).map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('')}
                 </div>
               </div>
-              <div class="card-footer bg-transparent border-0">
+              <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <small class="text-muted">by ${esc(p.author_username)} &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
+                ${myProjectIds.has(p.id) ? `<a href="/projects/editor.html?id=${p.id}" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();event.preventDefault();window.location='/projects/editor.html?id=${p.id}'"><i class="fas fa-pencil-alt"></i></a>` : ''}
               </div>
             </div>
           </a>
