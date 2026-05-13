@@ -76,25 +76,17 @@
     authRequired.innerHTML = `
       <div class="card p-3">
         <h5>Local Dev Login</h5>
-        <p class="small text-muted">Secure cookies don't work over HTTP. Log in on
-          <a href="https://www.kevsrobots.com/login" target="_blank">kevsrobots.com</a>,
-          then open browser console there and run:<br>
-          <code>document.cookie.match(/access_token=Bearer%20([^;]+)/)?.[1]</code><br>
+        <p class="small text-muted">Secure cookies don't work over HTTP. Generate a token on the server:<br>
+          <code>docker exec chatter-chatter-1 python -c "from app.utils import create_access_token; print(create_access_token({'sub': 'kev'}))"</code><br>
           Paste the token below.</p>
         <div class="input-group mb-2">
           <input type="text" id="dev-token-input" class="form-control form-control-sm" placeholder="Paste JWT token...">
-          <button class="btn btn-sm btn-primary" id="dev-token-btn">Set Token</button>
+          <button class="btn btn-sm btn-primary" onclick="(function(){ var t=document.getElementById('dev-token-input').value.trim(); if(t){localStorage.setItem('dev_jwt_token',t);location.reload();} })()">Set Token</button>
         </div>
+        <small class="text-muted">Token is saved in localStorage and persists across reloads.</small>
       </div>
     `;
     authRequired.classList.remove('d-none');
-    document.getElementById('dev-token-btn').addEventListener('click', () => {
-      const token = document.getElementById('dev-token-input').value.trim();
-      if (token) {
-        localStorage.setItem('dev_jwt_token', token);
-        location.reload();
-      }
-    });
   }
 
   // --- Load existing project ---
