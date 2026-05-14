@@ -193,6 +193,12 @@ description: View project details
   .toc-nav a.toc-h4 { padding-left: 32px; font-size: 0.78rem; }
   .toc-nav a.toc-h5,
   .toc-nav a.toc-h6 { padding-left: 40px; font-size: 0.75rem; }
+  .toc-nav a.toc-extra {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+  }
+  .toc-nav a.toc-extra:first-of-type { border-top-color: #eee; }
 
   /* Mermaid in view */
   #view-content .mermaid {
@@ -365,6 +371,8 @@ description: View project details
     const files = await resp.json();
     if (files.length === 0) return;
     document.getElementById('view-files-section').classList.remove('d-none');
+    // Rebuild TOC now that the Files section is visible
+    try { buildTOC(); } catch (e) {}
     var fileKinds = {
       py:'Python Script',cpp:'C++ Source',h:'Header',ino:'Arduino Sketch',
       md:'Markdown',txt:'Text',pdf:'PDF Document',csv:'Spreadsheet',
@@ -570,6 +578,17 @@ description: View project details
       const level = h.tagName.toLowerCase();
       links.push(`<a href="#${id}" class="toc-${level}" data-toc-target="${id}">${esc(h.textContent)}</a>`);
     });
+    // Extra non-heading anchors at the bottom (sections rendered outside the markdown)
+    const extras = [
+      { id: 'view-files-section', label: 'Files & Downloads' },
+    ];
+    extras.forEach(ex => {
+      const el = document.getElementById(ex.id);
+      if (el && !el.classList.contains('d-none')) {
+        links.push(`<a href="#${ex.id}" class="toc-h1 toc-extra" data-toc-target="${ex.id}">${esc(ex.label)}</a>`);
+      }
+    });
+
     nav.innerHTML = '<div class="toc-title">On this page</div>' + links.join('');
 
     nav.querySelectorAll('a').forEach(a => {

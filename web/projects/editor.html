@@ -80,6 +80,11 @@ description: Create or edit a project
   .toc-nav a.toc-h4 { padding-left: 32px; font-size: 0.78rem; }
   .toc-nav a.toc-h5,
   .toc-nav a.toc-h6 { padding-left: 40px; font-size: 0.75rem; }
+  .toc-nav a.toc-extra {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+  }
 </style>
 
 <div class="container-fluid py-3">
@@ -128,7 +133,7 @@ description: Create or edit a project
       </div>
 
       <!-- File Upload -->
-      <div class="card mb-4">
+      <div class="card mb-4" id="editor-files-section">
         <div class="card-header py-2">
           <i class="fas fa-paperclip me-1"></i> Files & Models
         </div>
@@ -310,18 +315,37 @@ description: Create or edit a project
     const editor = window.easyMDE || null;
     const md = editor ? editor.value() : (document.getElementById('content-editor')?.value || '');
     const headings = parseHeadings(md);
-    if (headings.length === 0) {
-      nav.innerHTML = '<div class="toc-title">On this page</div><div class="toc-empty">Add headings (#, ##) to build a table of contents</div>';
-      return;
-    }
-    const links = headings.map((h, idx) =>
+
+    const headingLinks = headings.map((h, idx) =>
       `<a class="toc-h${h.level}" data-line="${h.line}" data-idx="${idx}">${esc(h.text)}</a>`
-    ).join('');
-    nav.innerHTML = '<div class="toc-title">On this page</div>' + links;
+    );
+
+    // Extra non-markdown anchors (page sections rendered outside the editor)
+    const extraLinks = [
+      `<a class="toc-h1 toc-extra" data-scroll-to="editor-files-section">Files &amp; Models</a>`,
+    ];
+
+    let body;
+    if (headings.length === 0) {
+      body = '<div class="toc-empty">Add headings (#, ##) to build a table of contents</div>' + extraLinks.join('');
+    } else {
+      body = headingLinks.join('') + extraLinks.join('');
+    }
+    nav.innerHTML = '<div class="toc-title">On this page</div>' + body;
 
     nav.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', e => {
         e.preventDefault();
+        // Page-level scroll target (non-markdown section)
+        if (a.dataset.scrollTo) {
+          const el = document.getElementById(a.dataset.scrollTo);
+          if (el) {
+            window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+            nav.querySelectorAll('a').forEach(x => x.classList.remove('active'));
+            a.classList.add('active');
+          }
+          return;
+        }
         const line = parseInt(a.dataset.line, 10);
         if (window.easyMDE && window.easyMDE.codemirror) {
           const cm = window.easyMDE.codemirror;
