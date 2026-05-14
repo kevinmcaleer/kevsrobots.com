@@ -43,26 +43,40 @@
 }
 
 /* Side-by-side without fullscreen */
+.EasyMDEContainer.sided--no-fullscreen {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.EasyMDEContainer.sided--no-fullscreen .editor-toolbar {
+  width: 100%;
+  flex-shrink: 0;
+}
+
 .EasyMDEContainer.sided--no-fullscreen .CodeMirror {
+  position: relative !important;
   width: 50% !important;
-  display: inline-block;
+  height: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
   border-right: 1px solid #dee2e6;
+  border-radius: 0 0 0 8px;
+  min-height: 350px;
 }
 
 .EasyMDEContainer.sided--no-fullscreen .editor-preview-side {
   position: relative !important;
   width: 50% !important;
-  display: inline-block;
-  top: 0 !important;
-  left: 0 !important;
   height: auto !important;
+  top: auto !important;
+  left: auto !important;
+  display: block !important;
   min-height: 350px;
-  vertical-align: top;
-  border: none;
-}
-
-.EasyMDEContainer.sided--no-fullscreen .CodeMirror-scroll {
-  min-height: 350px;
+  padding: 12px;
+  overflow-y: auto;
+  border-radius: 0 0 8px 0;
+  background: #f8f9fa;
 }
 
 /* Hide sidebar when EasyMDE is fullscreen */

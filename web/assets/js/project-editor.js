@@ -279,27 +279,24 @@
         {
           name: 'side-by-side',
           action: function(editor) {
+            // Use EasyMDE's built-in toggle
+            EasyMDE.toggleSideBySide(editor);
+            // Then undo the fullscreen it forces
             var cm = editor.codemirror;
             var wrap = cm.getWrapperElement();
-            var preview = wrap.nextSibling;
-            if (!preview || !preview.classList.contains('editor-preview-side')) {
-              // Create preview pane if it doesn't exist
-              EasyMDE.toggleSideBySide(editor);
-              // Immediately exit fullscreen if it was triggered
-              if (cm.getOption('fullScreen')) {
-                cm.setOption('fullScreen', false);
-                wrap.closest('.EasyMDEContainer').classList.remove('CodeMirror-fullscreen');
-                document.body.classList.remove('CodeMirror-fullscreen');
-              }
-            } else {
-              preview.classList.toggle('editor-preview-active-side');
-              var container = wrap.closest('.EasyMDEContainer');
-              if (preview.classList.contains('editor-preview-active-side')) {
+            var container = wrap.closest('.EasyMDEContainer');
+            requestAnimationFrame(function() {
+              cm.setOption('fullScreen', false);
+              container.classList.remove('CodeMirror-fullscreen');
+              document.body.classList.remove('CodeMirror-fullscreen');
+              // Add our inline side-by-side class if preview is active
+              var preview = container.querySelector('.editor-preview-side');
+              if (preview && preview.classList.contains('editor-preview-active-side')) {
                 container.classList.add('sided--no-fullscreen');
               } else {
                 container.classList.remove('sided--no-fullscreen');
               }
-            }
+            });
           },
           className: 'fas fa-columns no-disable',
           title: 'Side-by-side preview',
