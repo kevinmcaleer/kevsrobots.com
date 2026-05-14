@@ -407,21 +407,48 @@
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
     const images = await resp.json();
     const gallery = document.getElementById('image-gallery');
-    gallery.innerHTML = images.map(img => `
+    const coverUrl = currentProject.cover_image || '';
+    gallery.innerHTML = images.map(img => {
+      const imgUrl = API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
+      const isCover = coverUrl === imgUrl;
+      return `
       <div class="col-4">
         <div class="image-thumb">
-          <img src="${API}/api/projects/${currentProject.id}/images/${img.id}/view" alt="${img.filename}">
+          <img src="${imgUrl}" alt="${img.filename}">
           <button class="delete-overlay" onclick="deleteImage(${img.id})"><i class="fas fa-trash"></i></button>
+          <button class="cover-overlay ${isCover ? 'is-cover' : ''}" onclick="setCover(${img.id})">${isCover ? '★ Cover' : 'Set Cover'}</button>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 
   window.deleteImage = async function(imageId) {
     await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageId, {
       method: 'DELETE', credentials: 'include',
     });
+    if (currentProject.cover_image && currentProject.cover_image.includes('/images/' + imageId + '/')) {
+      await apiFetch(API + '/api/projects/' + currentProject.id, {
+        method: 'PUT', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cover_image: null }),
+      });
+      currentProject.cover_image = null;
+    }
     loadImages();
+  };
+
+  window.setCover = async function(imageId) {
+    const coverUrl = API + '/api/projects/' + currentProject.id + '/images/' + imageId + '/view';
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cover_image: coverUrl }),
+    });
+    if (resp.ok) {
+      currentProject = await resp.json();
+      showSaveStatus('saved', 'Cover image set');
+      loadImages();
+    }
   };
 
   // --- BOM ---

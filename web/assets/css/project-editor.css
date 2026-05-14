@@ -148,8 +148,30 @@
   transition: opacity 0.2s;
 }
 
-.image-thumb:hover .delete-overlay {
+.image-thumb:hover .delete-overlay,
+.image-thumb:hover .cover-overlay {
   opacity: 1;
+}
+
+.image-thumb .cover-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(74, 144, 217, 0.85);
+  color: white;
+  border: none;
+  padding: 2px 0;
+  font-size: 0.65rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.image-thumb .cover-overlay.is-cover {
+  opacity: 1;
+  background: rgba(40, 167, 69, 0.85);
 }
 
 /* Journal entries */

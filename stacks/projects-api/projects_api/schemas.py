@@ -26,6 +26,7 @@ class ProjectUpdate(BaseModel):
     estimated_minutes: Optional[int] = Field(None, ge=1)
     code_repo_url: Optional[str] = None
     status: Optional[str] = Field(None, pattern="^(wip|completed|archived)$")
+    cover_image: Optional[str] = None
     tags: Optional[list[str]] = None
 
 
