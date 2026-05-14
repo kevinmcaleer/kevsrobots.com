@@ -196,9 +196,15 @@
   color: #4A90D9;
 }
 
+/* Sidebar sticks below the top bar, not over it */
+#editor-container .sticky-top {
+  z-index: 1000;
+  top: 70px;
+}
+
 /* Mobile: sidebar becomes stacked */
 @media (max-width: 991.98px) {
-  .sticky-top {
+  #editor-container .sticky-top {
     position: static !important;
   }
 }
