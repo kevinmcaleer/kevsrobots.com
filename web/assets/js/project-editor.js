@@ -1510,7 +1510,8 @@
   }
 
   function isReadmeFile(file) {
-    return (file.name || '').toLowerCase() === 'readme.md';
+    const n = (file.name || '').toLowerCase();
+    return n === 'readme.md' || n === 'index.md';
   }
 
   function isLicenseFile(file) {
