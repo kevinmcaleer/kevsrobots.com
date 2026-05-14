@@ -275,7 +275,36 @@
           title: 'Insert diagram',
         },
         '|',
-        'preview', 'side-by-side', 'fullscreen', '|',
+        'preview',
+        {
+          name: 'side-by-side',
+          action: function(editor) {
+            var cm = editor.codemirror;
+            var wrap = cm.getWrapperElement();
+            var preview = wrap.nextSibling;
+            if (!preview || !preview.classList.contains('editor-preview-side')) {
+              // Create preview pane if it doesn't exist
+              EasyMDE.toggleSideBySide(editor);
+              // Immediately exit fullscreen if it was triggered
+              if (cm.getOption('fullScreen')) {
+                cm.setOption('fullScreen', false);
+                wrap.closest('.EasyMDEContainer').classList.remove('CodeMirror-fullscreen');
+                document.body.classList.remove('CodeMirror-fullscreen');
+              }
+            } else {
+              preview.classList.toggle('editor-preview-active-side');
+              var container = wrap.closest('.EasyMDEContainer');
+              if (preview.classList.contains('editor-preview-active-side')) {
+                container.classList.add('sided--no-fullscreen');
+              } else {
+                container.classList.remove('sided--no-fullscreen');
+              }
+            }
+          },
+          className: 'fas fa-columns no-disable',
+          title: 'Side-by-side preview',
+        },
+        'fullscreen', '|',
         'guide',
       ],
     });
