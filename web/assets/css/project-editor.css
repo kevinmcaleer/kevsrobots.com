@@ -496,7 +496,7 @@ body:has(.CodeMirror-fullscreen) .col-lg-8 {
   position: fixed;
   inset: 0;
   z-index: 11000;
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -515,29 +515,34 @@ body:has(.CodeMirror-fullscreen) .col-lg-8 {
 }
 
 .global-dropzone__inner {
-  background: rgba(255, 255, 255, 0.98);
-  border: 3px dashed #4A90D9;
-  border-radius: 16px;
-  padding: 40px 48px;
-  max-width: 560px;
-  width: 100%;
+  background: rgba(255, 255, 255, 0.97);
+  border: 4px dashed #4A90D9;
+  border-radius: 20px;
+  padding: 5vh 4vw;
+  width: calc(100vw - 48px);
+  height: calc(100vh - 48px);
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
   pointer-events: none;
 }
 
 .global-dropzone__icon {
-  font-size: 4rem;
+  font-size: 7rem;
   color: #4A90D9;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   display: block;
 }
 
 .global-dropzone__title {
-  font-size: 1.4rem;
+  font-size: 2rem;
   font-weight: 600;
   color: #1f2937;
-  margin-bottom: 18px;
+  margin-bottom: 28px;
 }
 
 .global-dropzone__routes {
@@ -549,9 +554,9 @@ body:has(.CodeMirror-fullscreen) .col-lg-8 {
 }
 
 .global-dropzone__routes li {
-  padding: 6px 0;
+  padding: 10px 0;
   color: #374151;
-  font-size: 0.95rem;
+  font-size: 1.15rem;
 }
 
 .global-dropzone__hint {
