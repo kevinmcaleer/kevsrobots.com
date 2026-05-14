@@ -402,53 +402,94 @@
     loadImages();
   }
 
+  let imageOrder = [];
+
   async function loadImages() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
     const images = await resp.json();
+    imageOrder = images.map(img => img.id);
     const gallery = document.getElementById('image-gallery');
-    const coverUrl = currentProject.cover_image || '';
-    gallery.innerHTML = images.map(img => {
+    gallery.innerHTML = images.map((img, idx) => {
       const imgUrl = API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
-      const isCover = coverUrl === imgUrl;
       return `
-      <div class="col-4">
-        <div class="image-thumb">
+      <div class="col-4" data-image-id="${img.id}" draggable="true">
+        <div class="image-thumb ${idx === 0 ? 'is-cover' : ''}">
           <img src="${imgUrl}" alt="${img.filename}">
           <button class="delete-overlay" onclick="deleteImage(${img.id})"><i class="fas fa-trash"></i></button>
-          <button class="cover-overlay ${isCover ? 'is-cover' : ''}" onclick="setCover(${img.id})">${isCover ? '★ Cover' : 'Set Cover'}</button>
+          ${idx === 0 ? '<span class="cover-badge">★ Cover</span>' : ''}
         </div>
       </div>`;
     }).join('');
+
+    // Set cover_image from first image
+    if (images.length > 0) {
+      const firstUrl = API + '/api/projects/' + currentProject.id + '/images/' + images[0].id + '/view';
+      if (currentProject.cover_image !== firstUrl) {
+        currentProject.cover_image = firstUrl;
+        apiFetch(API + '/api/projects/' + currentProject.id, {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cover_image: firstUrl }),
+        });
+      }
+    }
+
+    // Drag-and-drop reordering
+    setupImageDrag(gallery);
+  }
+
+  function setupImageDrag(gallery) {
+    let dragId = null;
+    gallery.querySelectorAll('[draggable="true"]').forEach(el => {
+      el.addEventListener('dragstart', e => {
+        dragId = el.dataset.imageId;
+        el.style.opacity = '0.4';
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      el.addEventListener('dragend', () => {
+        el.style.opacity = '';
+        gallery.querySelectorAll('.drag-over').forEach(d => d.classList.remove('drag-over'));
+      });
+      el.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        el.querySelector('.image-thumb').classList.add('drag-over');
+      });
+      el.addEventListener('dragleave', () => {
+        el.querySelector('.image-thumb').classList.remove('drag-over');
+      });
+      el.addEventListener('drop', async e => {
+        e.preventDefault();
+        const dropId = el.dataset.imageId;
+        if (dragId && dropId && dragId !== dropId) {
+          const fromIdx = imageOrder.indexOf(parseInt(dragId));
+          const toIdx = imageOrder.indexOf(parseInt(dropId));
+          if (fromIdx > -1 && toIdx > -1) {
+            imageOrder.splice(fromIdx, 1);
+            imageOrder.splice(toIdx, 0, parseInt(dragId));
+            // Update sort_order on server
+            for (let i = 0; i < imageOrder.length; i++) {
+              await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageOrder[i], {
+                method: 'PUT', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sort_order: i }),
+              });
+            }
+            showSaveStatus('saved', 'Image order updated');
+            loadImages();
+          }
+        }
+        dragId = null;
+      });
+    });
   }
 
   window.deleteImage = async function(imageId) {
     await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageId, {
       method: 'DELETE', credentials: 'include',
     });
-    if (currentProject.cover_image && currentProject.cover_image.includes('/images/' + imageId + '/')) {
-      await apiFetch(API + '/api/projects/' + currentProject.id, {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cover_image: null }),
-      });
-      currentProject.cover_image = null;
-    }
     loadImages();
-  };
-
-  window.setCover = async function(imageId) {
-    const coverUrl = API + '/api/projects/' + currentProject.id + '/images/' + imageId + '/view';
-    const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
-      method: 'PUT', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cover_image: coverUrl }),
-    });
-    if (resp.ok) {
-      currentProject = await resp.json();
-      showSaveStatus('saved', 'Cover image set');
-      loadImages();
-    }
   };
 
   // --- BOM ---

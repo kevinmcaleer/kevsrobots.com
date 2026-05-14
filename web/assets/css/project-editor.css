@@ -148,30 +148,37 @@
   transition: opacity 0.2s;
 }
 
-.image-thumb:hover .delete-overlay,
-.image-thumb:hover .cover-overlay {
+.image-thumb:hover .delete-overlay {
   opacity: 1;
 }
 
-.image-thumb .cover-overlay {
+.image-thumb.is-cover {
+  outline: 2px solid #28a745;
+  outline-offset: -2px;
+}
+
+.image-thumb .cover-badge {
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
-  background: rgba(74, 144, 217, 0.85);
+  background: rgba(40, 167, 69, 0.9);
   color: white;
-  border: none;
-  padding: 2px 0;
-  font-size: 0.65rem;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 0.2s;
-  cursor: pointer;
+  font-size: 0.6rem;
+  padding: 1px 5px;
+  border-radius: 0 6px 0 6px;
 }
 
-.image-thumb .cover-overlay.is-cover {
-  opacity: 1;
-  background: rgba(40, 167, 69, 0.85);
+.image-thumb[draggable="true"] {
+  cursor: grab;
+}
+
+.image-thumb[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.image-thumb.drag-over {
+  outline: 2px dashed #4A90D9;
+  outline-offset: -2px;
 }
 
 /* Journal entries */

@@ -96,6 +96,31 @@ async def view_image(
     return Response(content=data, media_type=media_types.get(ext, "application/octet-stream"))
 
 
+@router.put("/{image_id}", response_model=ImageResponse)
+async def update_image(
+    project_id: int,
+    image_id: int,
+    body: dict,
+    user: str = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ImageResponse:
+    project = await session.get(Project, project_id)
+    if project is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    if project.author_username != user:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+    record = await session.get(ProjectImage, image_id)
+    if record is None or record.project_id != project_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    if "sort_order" in body:
+        record.sort_order = body["sort_order"]
+    if "caption" in body:
+        record.caption = body["caption"]
+    await session.commit()
+    await session.refresh(record)
+    return ImageResponse.model_validate(record, from_attributes=True)
+
+
 @router.delete("/{image_id}", status_code=204)
 async def delete_image(
     project_id: int,
