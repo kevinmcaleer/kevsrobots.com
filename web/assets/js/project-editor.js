@@ -333,28 +333,86 @@
     `;
     document.body.appendChild(toolbar);
 
+    function toggleWrap(marker) {
+      const sel = cm.getSelection();
+      const m = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp('^' + m + '([\\s\\S]*)' + m + '$');
+      const match = sel.match(re);
+      if (match) {
+        cm.replaceSelection(match[1]);
+      } else {
+        // Check if selection is bordered by marker outside
+        const from = cm.getCursor('from');
+        const to = cm.getCursor('to');
+        const lineFrom = cm.getLine(from.line);
+        const lineTo = cm.getLine(to.line);
+        const before = lineFrom.substring(Math.max(0, from.ch - marker.length), from.ch);
+        const after = lineTo.substring(to.ch, to.ch + marker.length);
+        if (before === marker && after === marker) {
+          cm.replaceRange('', { line: to.line, ch: to.ch }, { line: to.line, ch: to.ch + marker.length });
+          cm.replaceRange('', { line: from.line, ch: from.ch - marker.length }, { line: from.line, ch: from.ch });
+        } else {
+          cm.replaceSelection(marker + sel + marker);
+        }
+      }
+    }
+
+    function toggleLinePrefix(prefixRegex, prefixToAdd, lineMatchTest) {
+      const from = cm.getCursor('from');
+      const to = cm.getCursor('to');
+      const lines = [];
+      for (let l = from.line; l <= to.line; l++) {
+        lines.push(cm.getLine(l));
+      }
+      const allHavePrefix = lines.every(line => lineMatchTest(line));
+      const newLines = lines.map(line => {
+        if (allHavePrefix) {
+          return line.replace(prefixRegex, '');
+        } else {
+          return prefixToAdd + line.replace(prefixRegex, '');
+        }
+      });
+      cm.replaceRange(newLines.join('\n'),
+        { line: from.line, ch: 0 },
+        { line: to.line, ch: cm.getLine(to.line).length }
+      );
+    }
+
+    function cycleHeading() {
+      const from = cm.getCursor('from');
+      const line = cm.getLine(from.line);
+      const match = line.match(/^(#{1,6})\s/);
+      let newLine;
+      if (!match) {
+        newLine = '# ' + line;
+      } else if (match[1].length < 6) {
+        newLine = '#'.repeat(match[1].length + 1) + ' ' + line.substring(match[0].length);
+      } else {
+        // h6 → remove heading
+        newLine = line.substring(match[0].length);
+      }
+      cm.replaceRange(newLine, { line: from.line, ch: 0 }, { line: from.line, ch: line.length });
+    }
+
     function applyFormat(fmt) {
       const sel = cm.getSelection();
-      let wrap, prefix;
       switch (fmt) {
-        case 'bold': wrap = '**'; break;
-        case 'italic': wrap = '*'; break;
-        case 'code': wrap = '`'; break;
-        case 'heading': prefix = '## '; break;
-        case 'quote': prefix = '> '; break;
-        case 'ul': prefix = '- '; break;
-        case 'ol': prefix = '1. '; break;
+        case 'bold': toggleWrap('**'); break;
+        case 'italic': toggleWrap('*'); break;
+        case 'code': toggleWrap('`'); break;
+        case 'heading': cycleHeading(); break;
+        case 'quote':
+          toggleLinePrefix(/^> /, '> ', l => /^> /.test(l));
+          break;
+        case 'ul':
+          toggleLinePrefix(/^(- |\* |\d+\. )/, '- ', l => /^(- |\* )/.test(l));
+          break;
+        case 'ol':
+          toggleLinePrefix(/^(- |\* |\d+\. )/, '1. ', l => /^\d+\. /.test(l));
+          break;
         case 'link':
           cm.replaceSelection('[' + (sel || 'text') + '](https://)');
-          cm.focus();
-          return;
-      }
-      if (wrap) {
-        cm.replaceSelection(wrap + sel + wrap);
-      } else if (prefix) {
-        // Apply to each line
-        const lines = sel.split('\n');
-        cm.replaceSelection(lines.map(l => prefix + l).join('\n'));
+          break;
       }
       cm.focus();
     }
