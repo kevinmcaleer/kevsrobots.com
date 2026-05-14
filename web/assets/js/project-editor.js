@@ -287,6 +287,7 @@
             if (existingPreview) {
               existingPreview.remove();
               container.classList.remove('sided--no-fullscreen');
+              requestAnimationFrame(() => cm.refresh());
               return;
             }
 
@@ -301,6 +302,8 @@
             }
             updatePreview();
             cm.on('change', updatePreview);
+            // Refresh CodeMirror so click coords match the new layout
+            requestAnimationFrame(() => cm.refresh());
           },
           className: 'fas fa-columns no-disable',
           title: 'Side-by-side preview',
