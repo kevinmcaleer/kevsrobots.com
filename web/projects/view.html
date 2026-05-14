@@ -108,6 +108,11 @@ description: View project details
                   <i class="fab fa-github me-2"></i> View Code
                 </a>
               </div>
+              <div id="download-btn-container" class="mb-2 d-none">
+                <button id="download-project-btn" class="btn btn-sm btn-success w-100">
+                  <i class="fas fa-download me-2"></i> Download Project
+                </button>
+              </div>
               <div id="edit-btn-container" class="d-none">
                 <a id="edit-link" href="#" class="btn btn-sm btn-outline-primary w-100">
                   <i class="fas fa-pencil-alt me-2"></i> Edit Project
@@ -146,6 +151,7 @@ description: View project details
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="/assets/js/project-gradient.js"></script>
 <script src="/assets/js/project-auth.js"></script>
 <script src="/assets/js/image-viewer.js"></script>
@@ -272,6 +278,10 @@ description: View project details
       ProjectInteractions.loadLikes(projectUrl, document.getElementById('like-container'));
       ProjectInteractions.loadComments(projectUrl, document.getElementById('comments-container'));
 
+      // Show download button if there are files or content
+      document.getElementById('download-btn-container').classList.remove('d-none');
+      document.getElementById('download-project-btn').addEventListener('click', () => downloadProject(project));
+
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');
       document.getElementById('not-found').classList.remove('d-none');
@@ -362,6 +372,81 @@ description: View project details
         ${e.content_md ? `<div class="small mt-1">${marked.parse(e.content_md)}</div>` : ''}
       </div>
     `).join('');
+  }
+
+  async function downloadProject(project) {
+    const btn = document.getElementById('download-project-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Packaging...';
+
+    try {
+      const zip = new JSZip();
+      var slug = project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+      // README.md
+      var readme = '# ' + project.title + '\n\n';
+      if (project.short_description) readme += '*' + project.short_description + '*\n\n';
+      if (project.difficulty) readme += '**Difficulty:** ' + project.difficulty + '\n';
+      if (project.estimated_minutes) readme += '**Estimated time:** ' + project.estimated_minutes + ' minutes\n';
+      if (project.code_repo_url) readme += '**Code:** ' + project.code_repo_url + '\n';
+      readme += '\n---\n\n';
+      if (project.content_md) readme += project.content_md + '\n';
+      readme += '\n\n*Downloaded from [KevsRobots](https://www.kevsrobots.com/projects/view.html?id=' + project.id + ')*\n';
+      zip.file('README.md', readme);
+
+      // Images
+      var imgResp = await fetch(API + '/api/projects/' + project.id + '/images');
+      var images = await imgResp.json();
+      for (var img of images) {
+        try {
+          var data = await fetch(API + '/api/projects/' + project.id + '/images/' + img.id + '/view');
+          if (data.ok) {
+            var blob = await data.blob();
+            zip.file('images/' + img.filename, blob);
+          }
+        } catch (e) {}
+      }
+
+      // Files
+      var fileResp = await fetch(API + '/api/projects/' + project.id + '/files');
+      var files = await fileResp.json();
+      for (var f of files) {
+        try {
+          var data = await fetch(API + '/api/projects/' + project.id + '/files/' + f.id + '/download');
+          if (data.ok) {
+            var blob = await data.blob();
+            var ext = f.filename.split('.').pop().toLowerCase();
+            var folder = ['stl', 'obj', 'gcode', '3mf'].indexOf(ext) > -1 ? 'models/' : 'files/';
+            zip.file(folder + f.filename, blob);
+          }
+        } catch (e) {}
+      }
+
+      // BOM as CSV
+      var bomResp = await fetch(API + '/api/projects/' + project.id + '/bom');
+      var bom = await bomResp.json();
+      if (bom.length > 0) {
+        var csv = 'Part,Quantity,Unit,Unit Cost,Supplier URL\n';
+        bom.forEach(function(item) {
+          csv += '"' + (item.name||'').replace(/"/g, '""') + '",' + item.quantity + ',' + item.unit + ',' + (item.unit_cost||0) + ',"' + (item.supplier_url||'') + '"\n';
+        });
+        zip.file('bill-of-materials.csv', csv);
+      }
+
+      var content = await zip.generateAsync({ type: 'blob' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(content);
+      a.download = slug + '.zip';
+      a.click();
+      URL.revokeObjectURL(a.href);
+
+    } catch (e) {
+      console.error('Download failed:', e);
+      alert('Failed to package project. Please try again.');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-download me-2"></i> Download Project';
   }
 
   loadProject();

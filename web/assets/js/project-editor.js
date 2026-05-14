@@ -456,6 +456,37 @@
       if (gallery.querySelector('.dragging')) return;
       ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
     });
+
+    // Populate image picker dropdown
+    const pickerList = document.getElementById('image-picker-list');
+    if (pickerList) {
+      if (images.length === 0) {
+        pickerList.innerHTML = '<small class="text-muted">No images uploaded yet</small>';
+      } else {
+        pickerList.innerHTML = images.map(img => {
+          const imgUrl = API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
+          return `<div class="d-flex align-items-center gap-2 p-1 rounded image-picker-item" style="cursor:pointer" data-img-url="${imgUrl}" data-img-name="${img.filename}">
+            <img src="${imgUrl}" style="width:36px;height:36px;object-fit:cover;border-radius:4px">
+            <small class="text-truncate" style="max-width:140px">${img.filename}</small>
+          </div>`;
+        }).join('');
+        pickerList.querySelectorAll('.image-picker-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const url = item.dataset.imgUrl;
+            const name = item.dataset.imgName;
+            const ta = contentEditor;
+            const pos = ta.selectionStart;
+            const insert = '![' + name + '](' + url + ')\n';
+            ta.value = ta.value.substring(0, pos) + insert + ta.value.substring(ta.selectionEnd);
+            ta.focus();
+            ta.selectionStart = ta.selectionEnd = pos + insert.length;
+            scheduleAutoSave();
+            // Close the dropdown
+            bootstrap.Dropdown.getOrCreateInstance(item.closest('.dropdown-menu').previousElementSibling).hide();
+          });
+        });
+      }
+    }
   }
 
   function setupImageDrag(gallery) {

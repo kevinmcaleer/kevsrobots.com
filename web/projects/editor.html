@@ -49,7 +49,13 @@ description: Create or edit a project
             <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="heading" title="Heading"><i class="fas fa-heading"></i></button>
             <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="code" title="Code block"><i class="fas fa-code"></i></button>
             <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="link" title="Link (Ctrl+K)"><i class="fas fa-link"></i></button>
-            <button class="btn btn-sm btn-outline-secondary me-1 editor-tool" data-action="image" title="Image"><i class="fas fa-image"></i></button>
+            <div class="btn-group me-1">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" title="Insert image"><i class="fas fa-image"></i></button>
+              <div class="dropdown-menu p-2" id="image-picker-dropdown" style="min-width:220px;max-height:300px;overflow-y:auto">
+                <small class="text-muted d-block mb-1">Upload images first, then insert here</small>
+                <div id="image-picker-list"></div>
+              </div>
+            </div>
             <button class="btn btn-sm btn-outline-secondary editor-tool" data-action="list" title="Bullet list"><i class="fas fa-list-ul"></i></button>
           </div>
           <div class="btn-group btn-group-sm" role="group">

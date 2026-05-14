@@ -195,6 +195,11 @@
   transform: translateX(10px);
 }
 
+/* Image picker dropdown */
+.image-picker-item:hover {
+  background: #f0f4f8;
+}
+
 /* Journal entries */
 #journal-input {
   background: #f8f9fa;
