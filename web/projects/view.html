@@ -5,6 +5,7 @@ description: View project details
 ---
 
 <link rel="stylesheet" href="/assets/css/project-editor.css">
+<link rel="stylesheet" href="/assets/css/image-viewer.css">
 
 <div class="container py-4">
   <div class="mb-3">
@@ -147,6 +148,7 @@ description: View project details
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="/assets/js/project-gradient.js"></script>
 <script src="/assets/js/project-auth.js"></script>
+<script src="/assets/js/image-viewer.js"></script>
 <script src="/assets/js/project-interactions.js"></script>
 <script>
 (function() {
@@ -314,13 +316,21 @@ description: View project details
     const images = await resp.json();
     if (images.length === 0) return;
     document.getElementById('view-images-section').classList.remove('d-none');
-    document.getElementById('view-images').innerHTML = images.map(img => `
+    const viewerImages = images.map(img => ({
+      url: API + '/api/projects/' + projectId + '/images/' + img.id + '/view',
+      alt: img.filename
+    }));
+    document.getElementById('view-images').innerHTML = images.map((img, idx) => `
       <div class="col-6">
-        <a href="${API}/api/projects/${projectId}/images/${img.id}/view" target="_blank">
-          <img src="${API}/api/projects/${projectId}/images/${img.id}/view" class="img-fluid rounded" alt="${esc(img.filename)}">
-        </a>
+        <img src="${API}/api/projects/${projectId}/images/${img.id}/view"
+             class="img-fluid rounded" alt="${esc(img.filename)}"
+             style="cursor:pointer" data-view-idx="${idx}">
       </div>
     `).join('');
+    document.getElementById('view-images').addEventListener('click', e => {
+      const img = e.target.closest('[data-view-idx]');
+      if (img) ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
+    });
   }
 
   async function loadLinks() {

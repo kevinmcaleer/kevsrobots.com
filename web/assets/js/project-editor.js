@@ -188,11 +188,18 @@
   function updateStatusBadge(status) {
     statusBadge.textContent = statusLabels[status] || status;
     statusBadge.className = 'badge ' + (statusColors[status] || 'bg-secondary');
-    statusSelect.value = status;
+    if (statusSelect) statusSelect.value = status;
     const viewLiveBtn = document.getElementById('view-live-btn');
+    const viewToggle = document.getElementById('view-toggle-btn');
     if (currentProject) {
-      viewLiveBtn.style.display = '';
-      viewLiveBtn.href = '/projects/view.html?id=' + currentProject.id;
+      if (viewLiveBtn) {
+        viewLiveBtn.style.display = '';
+        viewLiveBtn.href = '/projects/view.html?id=' + currentProject.id;
+      }
+      if (viewToggle) {
+        viewToggle.classList.remove('d-none');
+        viewToggle.href = '/projects/view.html?id=' + currentProject.id;
+      }
     }
   }
 
@@ -415,8 +422,8 @@
       return `
       <div class="col-4" data-image-id="${img.id}" draggable="true">
         <div class="image-thumb ${idx === 0 ? 'is-cover' : ''}">
-          <img src="${imgUrl}" alt="${img.filename}">
-          <button class="delete-overlay" onclick="deleteImage(${img.id})"><i class="fas fa-trash"></i></button>
+          <img src="${imgUrl}" alt="${img.filename}" data-view-idx="${idx}" class="iv-clickable">
+          <button class="delete-overlay" onclick="event.stopPropagation();deleteImage(${img.id})"><i class="fas fa-trash"></i></button>
           ${idx === 0 ? '<span class="cover-badge">★ Cover</span>' : ''}
         </div>
       </div>`;
@@ -437,6 +444,18 @@
 
     // Drag-and-drop reordering
     setupImageDrag(gallery);
+
+    // Image viewer on click (only if not dragging)
+    const viewerImages = images.map(img => ({
+      url: API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view',
+      alt: img.filename
+    }));
+    gallery.addEventListener('click', e => {
+      const img = e.target.closest('.iv-clickable');
+      if (!img) return;
+      if (gallery.querySelector('.dragging')) return;
+      ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
+    });
   }
 
   function setupImageDrag(gallery) {
