@@ -302,6 +302,22 @@
             }
             updatePreview();
             cm.on('change', updatePreview);
+
+            // Sync scroll position from editor to preview
+            var syncingPreview = false;
+            function syncScroll() {
+              if (syncingPreview) return;
+              var info = cm.getScrollInfo();
+              var maxScroll = info.height - info.clientHeight;
+              if (maxScroll <= 0) return;
+              var ratio = info.top / maxScroll;
+              var previewMax = preview.scrollHeight - preview.clientHeight;
+              syncingPreview = true;
+              preview.scrollTop = previewMax * ratio;
+              setTimeout(() => { syncingPreview = false; }, 50);
+            }
+            cm.on('scroll', syncScroll);
+
             // Refresh CodeMirror so click coords match the new layout
             requestAnimationFrame(() => cm.refresh());
           },
