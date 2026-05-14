@@ -129,7 +129,7 @@ thanks: false
 
       grid.innerHTML = projects.map(p => `
         <div class="col">
-          <a href="/projects/view.html?id=${p.id}" class="text-decoration-none">
+          <a href="${myProjectIds.has(p.id) ? '/projects/editor.html?id=' + p.id : '/projects/view.html?id=' + p.id}" class="text-decoration-none">
             <div class="card h-100 border-0 shadow-sm card-hover">
               ${projectThumbnail(p, 200)}
               <div class="card-body">
@@ -144,9 +144,8 @@ thanks: false
                   ${(p.tags || []).slice(0, 4).map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('')}
                 </div>
               </div>
-              <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+              <div class="card-footer bg-transparent border-0">
                 <small class="text-muted">by ${esc(p.author_username)} &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
-                ${myProjectIds.has(p.id) ? `<a href="/projects/editor.html?id=${p.id}" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();event.preventDefault();window.location='/projects/editor.html?id=${p.id}'"><i class="fas fa-pencil-alt"></i></a>` : ''}
               </div>
             </div>
           </a>
