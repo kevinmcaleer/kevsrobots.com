@@ -333,12 +333,14 @@ description: View project details
     };
     function fKind(n){var e=(n||'').split('.').pop().toLowerCase();return fileKinds[e]||e.toUpperCase()+' File';}
     function fIcon(n){var e=(n||'').split('.').pop().toLowerCase();return fileIcons[e]||'fas fa-file';}
-    document.getElementById('view-files').innerHTML = files.map(f => `
-      <a href="${API}/api/projects/${projectId}/files/${f.id}/download" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-        <span><i class="${fIcon(f.filename)} me-2"></i>${esc(f.filename)}<br><small class="text-muted">${fKind(f.filename)}</small></span>
-        <span class="badge bg-light text-dark">${(f.file_size / 1024).toFixed(1)} KB</span>
-      </a>
-    `).join('');
+    document.getElementById('view-files').innerHTML = `<table class="table table-sm table-hover mb-0"><tbody>${files.map(f => `
+      <tr>
+        <td class="text-muted" style="width:20px"><i class="${fIcon(f.filename)}"></i></td>
+        <td><a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a></td>
+        <td class="text-muted small">${fKind(f.filename)}</td>
+        <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
+      </tr>
+    `).join('')}</tbody></table>`;
   }
 
   async function loadImages() {

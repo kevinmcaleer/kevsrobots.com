@@ -399,18 +399,16 @@
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', { credentials: 'include' });
     const files = await resp.json();
     const list = document.getElementById('file-list');
-    list.innerHTML = files.map(f => `
-      <div class="file-item">
-        <div class="file-info">
-          <i class="${fileIcon(f.filename)} text-muted"></i>
-          <div>
-            <a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download" class="d-block">${f.filename}</a>
-            <small class="text-muted">${fileKind(f.filename)} · ${(f.file_size / 1024).toFixed(1)} KB</small>
-          </div>
-        </div>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteFile(${f.id})"><i class="fas fa-trash"></i></button>
-      </div>
-    `).join('');
+    if (files.length === 0) { list.innerHTML = ''; return; }
+    list.innerHTML = `<table class="table table-sm table-hover mb-0"><tbody>${files.map(f => `
+      <tr>
+        <td class="text-muted" style="width:20px"><i class="${fileIcon(f.filename)}"></i></td>
+        <td><a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${f.filename}</a></td>
+        <td class="text-muted small">${fileKind(f.filename)}</td>
+        <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
+        <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})"><i class="fas fa-trash fa-xs"></i></button></td>
+      </tr>
+    `).join('')}</tbody></table>`;
   }
 
   window.deleteFile = async function(fileId) {
