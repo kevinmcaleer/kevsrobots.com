@@ -9,6 +9,30 @@ description: Create or edit a project
 <link rel="stylesheet" href="/assets/css/image-viewer.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 
+<!-- Global drag-and-drop overlay (issue #117) -->
+<div id="global-dropzone" class="global-dropzone d-none" aria-hidden="true">
+  <div class="global-dropzone__inner">
+    <i class="fas fa-cloud-upload-alt global-dropzone__icon"></i>
+    <h2 class="global-dropzone__title">Drop files to add them to your project</h2>
+    <ul class="global-dropzone__routes">
+      <li><i class="fas fa-image text-info me-2"></i><strong>Images</strong> &rarr; uploaded to the gallery</li>
+      <li><i class="fas fa-file-alt text-success me-2"></i><strong>README.md</strong> &rarr; loaded into the content editor</li>
+      <li><i class="fas fa-balance-scale text-warning me-2"></i><strong>LICENSE</strong> &rarr; uploaded and linked under Related Links</li>
+      <li><i class="fas fa-paperclip text-secondary me-2"></i><strong>Other files</strong> &rarr; added to Files &amp; Models</li>
+    </ul>
+    <p class="global-dropzone__hint text-muted small mb-0">Release the mouse to drop. Press Esc to cancel.</p>
+  </div>
+</div>
+
+<!-- Drop progress toast -->
+<div id="drop-progress" class="drop-progress d-none" aria-live="polite">
+  <div class="drop-progress__header">
+    <span class="drop-progress__title"><i class="fas fa-spinner fa-spin me-1"></i> Processing files...</span>
+    <button type="button" class="btn-close btn-close-white btn-sm" id="drop-progress-close" aria-label="Close"></button>
+  </div>
+  <div class="drop-progress__body"></div>
+</div>
+
 <div class="container-fluid py-3">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
