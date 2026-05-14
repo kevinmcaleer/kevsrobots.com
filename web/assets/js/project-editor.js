@@ -287,6 +287,26 @@
               editor.codemirror.refresh();
             }
             EasyMDE.togglePreview(editor);
+            // Render mermaid in the preview pane
+            setTimeout(async () => {
+              var previewEl = container.querySelector('.editor-preview-active');
+              if (!previewEl) return;
+              var blocks = previewEl.querySelectorAll('pre code.language-mermaid');
+              if (blocks.length === 0) return;
+              try {
+                var mod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+                var mermaid = mod.default;
+                mermaid.initialize({ startOnLoad: false });
+                blocks.forEach((block, i) => {
+                  var div = document.createElement('div');
+                  div.className = 'mermaid';
+                  div.id = 'mermaid-preview-' + Date.now() + '-' + i;
+                  div.textContent = block.textContent;
+                  block.parentElement.replaceWith(div);
+                });
+                await mermaid.run({ querySelector: '.editor-preview-active .mermaid' });
+              } catch (e) { /* mermaid not available */ }
+            }, 50);
           },
           className: 'fa fa-eye no-disable',
           title: 'Toggle preview',
