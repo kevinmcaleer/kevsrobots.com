@@ -519,33 +519,90 @@
   };
 
   // --- Journal ---
-  document.getElementById('add-journal-btn').addEventListener('click', async () => {
+  const journalInput = document.getElementById('journal-input');
+
+  journalInput.addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const text = journalInput.value.trim();
+    if (!text) return;
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
-    const title = prompt('Journal entry title:');
-    if (!title) return;
+    journalInput.disabled = true;
     await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, status: 'in_progress' }),
+      body: JSON.stringify({ title: text, status: 'in_progress' }),
     });
+    journalInput.value = '';
+    journalInput.disabled = false;
+    journalInput.focus();
     loadJournal();
   });
+
+  function formatTimeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return days + 'd ago';
+    return new Date(dateStr).toLocaleDateString();
+  }
 
   async function loadJournal() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', { credentials: 'include' });
     const entries = await resp.json();
-    const statusLabels = { planning: 'Planning', in_progress: 'In Progress', completed: 'Completed' };
     document.getElementById('journal-list').innerHTML = entries.map(e => `
-      <div class="journal-entry">
-        <div class="d-flex justify-content-between align-items-center">
-          <strong class="small">${e.title}</strong>
-          <span class="journal-status ${e.status}">${statusLabels[e.status]}</span>
+      <div class="journal-entry" data-entry-id="${e.id}">
+        <div class="d-flex justify-content-between align-items-start">
+          <span class="journal-text">${e.title}</span>
+          <span class="journal-actions">
+            <button class="edit-journal" onclick="editJournal(${e.id}, this)" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+            <button class="delete-journal" onclick="deleteJournal(${e.id})" title="Delete"><i class="fas fa-times"></i></button>
+          </span>
         </div>
-        <small class="text-muted">${new Date(e.created_at).toLocaleDateString()}</small>
+        <span class="journal-date">${formatTimeAgo(e.created_at)}</span>
       </div>
-    `).join('') || '<p class="text-muted small">No journal entries yet</p>';
+    `).join('');
   }
+
+  window.deleteJournal = async function(entryId) {
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/journal/' + entryId, {
+      method: 'DELETE', credentials: 'include',
+    });
+    loadJournal();
+  };
+
+  window.editJournal = function(entryId, btn) {
+    const entry = btn.closest('.journal-entry');
+    const textEl = entry.querySelector('.journal-text');
+    const current = textEl.textContent;
+    textEl.innerHTML = '<input type="text" class="journal-edit-input" value="' + current.replace(/"/g, '&quot;') + '">';
+    const input = textEl.querySelector('input');
+    input.focus();
+    input.select();
+
+    async function save() {
+      const newText = input.value.trim();
+      if (newText && newText !== current) {
+        await apiFetch(API + '/api/projects/' + currentProject.id + '/journal/' + entryId, {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: newText, status: 'in_progress' }),
+        });
+      }
+      loadJournal();
+    }
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); save(); }
+      if (e.key === 'Escape') loadJournal();
+    });
+    input.addEventListener('blur', save);
+  };
 
   // --- Auto-save on input ---
   [titleInput, descInput, contentEditor, difficultySelect, timeInput, repoInput].forEach(el => {

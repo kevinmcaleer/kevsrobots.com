@@ -184,11 +184,12 @@ Describe what this project is about...
 
         <!-- Build Journal sidebar -->
         <div class="card mb-3">
-          <div class="card-header py-2 d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-calendar-alt me-1"></i> Build Journal</span>
-            <button class="btn btn-sm btn-outline-primary" id="add-journal-btn"><i class="fas fa-plus"></i></button>
+          <div class="card-header py-2">
+            <i class="fas fa-calendar-alt me-2"></i> Build Journal
           </div>
-          <div class="card-body">
+          <div class="card-body p-2">
+            <input type="text" id="journal-input" class="form-control form-control-sm border-0 mb-2"
+                   placeholder="What did you work on? Press Enter..." autocomplete="off">
             <div id="journal-list"></div>
           </div>
         </div>

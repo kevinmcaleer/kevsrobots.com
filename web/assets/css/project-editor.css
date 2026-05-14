@@ -153,24 +153,69 @@
 }
 
 /* Journal entries */
+#journal-input {
+  background: #f8f9fa;
+  font-size: 0.85rem;
+}
+
+#journal-input:focus {
+  background: white;
+  box-shadow: none;
+  border-bottom: 2px solid #4A90D9 !important;
+}
+
 .journal-entry {
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  position: relative;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
-.journal-entry:last-child {
-  border-bottom: none;
+.journal-entry:hover {
+  background: #f8f9fa;
 }
 
-.journal-status {
+.journal-entry .journal-actions {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.journal-entry:hover .journal-actions {
+  opacity: 1;
+}
+
+.journal-entry .journal-actions button {
+  border: none;
+  background: none;
+  padding: 0 3px;
   font-size: 0.75rem;
-  padding: 1px 6px;
-  border-radius: 8px;
+  cursor: pointer;
+  color: #999;
 }
 
-.journal-status.planning { background: #fff3cd; color: #856404; }
-.journal-status.in_progress { background: #cce5ff; color: #004085; }
-.journal-status.completed { background: #d4edda; color: #155724; }
+.journal-entry .journal-actions button:hover {
+  color: #333;
+}
+
+.journal-entry .journal-actions button.delete-journal:hover {
+  color: #dc3545;
+}
+
+.journal-entry .journal-date {
+  font-size: 0.7rem;
+  color: #aaa;
+}
+
+.journal-entry .journal-edit-input {
+  font-size: 0.85rem;
+  border: none;
+  border-bottom: 1px solid #4A90D9;
+  background: transparent;
+  width: 100%;
+  padding: 0;
+  outline: none;
+}
 
 /* Save indicator */
 #save-indicator {
