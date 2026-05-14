@@ -26,18 +26,12 @@ ALLOWED_FILE_EXTENSIONS = {
 }
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 
-_nas_available: Optional[bool] = None
-
-
 def _check_nas() -> bool:
-    global _nas_available
-    if _nas_available is not None:
-        return _nas_available
+    """Check NAS connectivity. Retries every time — no caching of failures."""
 
     settings = get_settings()
     if not all([settings.nas_host, settings.nas_username, settings.nas_password]):
-        logger.warning("NAS credentials not configured, using local storage")
-        _nas_available = False
+        logger.warning("NAS credentials not configured")
         return False
 
     try:
@@ -49,12 +43,9 @@ def _check_nas() -> bool:
         sess = Session(conn, settings.nas_username, settings.nas_password)
         sess.connect()
         conn.disconnect()
-        _nas_available = True
-        logger.info("NAS connection successful")
         return True
     except Exception as e:
         logger.warning("NAS unavailable: %s", e)
-        _nas_available = False
         return False
 
 
