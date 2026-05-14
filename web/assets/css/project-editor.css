@@ -33,6 +33,8 @@
 .EasyMDEContainer .editor-toolbar button {
   display: inline-block;
   float: none !important;
+  width: auto !important;
+  min-width: 0 !important;
 }
 
 .EasyMDEContainer .editor-toolbar i.separator {
