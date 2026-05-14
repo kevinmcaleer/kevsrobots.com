@@ -267,6 +267,24 @@ body:has(.CodeMirror-fullscreen) .col-lg-8 {
   opacity: 1;
 }
 
+/* Auto-detected tags — subtler shade so they're visually distinct from
+   manually added tags but still readable. */
+.tag-badge-auto {
+  background: #f0f0f0;
+  color: #6c757d;
+  border: 1px dashed #c8c8c8;
+}
+
+.tag-badge-auto .auto-indicator {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #d9d9d9;
+  color: #555;
+  padding: 0 4px;
+  border-radius: 6px;
+}
+
 /* File list */
 .file-item {
   display: flex;

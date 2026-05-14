@@ -204,35 +204,202 @@
   }
 
   // --- Tags ---
+  // Keyword -> tag map for auto-detection. Keys are matched case-insensitively
+  // as whole words/phrases against the markdown content (with fenced/inline
+  // code blocks and URLs stripped). Extend this map as new maker topics emerge.
+  const AUTO_TAG_KEYWORDS = {
+    'arduino': 'arduino',
+    'raspberry pi': 'raspberry-pi',
+    'raspi': 'raspberry-pi',
+    'rpi': 'raspberry-pi',
+    '3d print': '3d-printing',
+    '3d-print': '3d-printing',
+    '3d printing': '3d-printing',
+    '3d printed': '3d-printing',
+    'laser cut': 'laser-cutting',
+    'laser-cut': 'laser-cutting',
+    'laser cutting': 'laser-cutting',
+    'laser cutter': 'laser-cutting',
+    'micropython': 'micropython',
+    'circuitpython': 'circuitpython',
+    'esp32': 'esp32',
+    'esp8266': 'esp8266',
+    'pico': 'raspberry-pi-pico',
+    'rp2040': 'raspberry-pi-pico',
+    'rp2350': 'raspberry-pi-pico',
+    'cnc': 'cnc',
+    'servo': 'servo',
+    'stepper': 'stepper-motor',
+    'stepper motor': 'stepper-motor',
+    'motor': 'motors',
+    'python': 'python',
+    'c++': 'cpp',
+    'cpp': 'cpp',
+    'robot': 'robotics',
+    'robotics': 'robotics',
+    'pcb': 'electronics',
+    'kicad': 'electronics',
+    'circuit': 'electronics',
+    'openscad': 'cad',
+    'fusion 360': 'cad',
+    'freecad': 'cad',
+    'oled': 'display',
+    'ssd1306': 'display',
+    'lcd': 'display',
+    'bluetooth': 'bluetooth',
+    'ble': 'bluetooth',
+    'wifi': 'wifi',
+    'wi-fi': 'wifi',
+    'i2c': 'i2c',
+    'spi': 'spi',
+    'uart': 'uart',
+    'sensor': 'sensors',
+    'lidar': 'lidar',
+    'camera': 'camera',
+    'led': 'leds',
+    'neopixel': 'neopixel',
+    'machine learning': 'machine-learning',
+    'tensorflow': 'machine-learning',
+    'opencv': 'computer-vision',
+    'computer vision': 'computer-vision',
+    'mqtt': 'mqtt',
+    'home assistant': 'home-assistant',
+    'docker': 'docker',
+    'linux': 'linux',
+    'gpio': 'gpio',
+  };
+
+  function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Pre-compile keyword regexes once. We use lookarounds rather than \b so
+  // multi-word phrases and terms with non-word chars (c++, wi-fi, 3d print)
+  // still get whole-word semantics. "scarduino" must not match "arduino".
+  const AUTO_TAG_PATTERNS = Object.entries(AUTO_TAG_KEYWORDS).map(([keyword, tag]) => ({
+    tag,
+    regex: new RegExp('(?:^|[^A-Za-z0-9])' + escapeRegex(keyword) + '(?=$|[^A-Za-z0-9])', 'i'),
+  }));
+
+  function stripCodeAndUrls(markdown) {
+    if (!markdown) return '';
+    return markdown
+      // Fenced code blocks (```...``` or ~~~...~~~)
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/~~~[\s\S]*?~~~/g, ' ')
+      // Inline code
+      .replace(/`[^`\n]*`/g, ' ')
+      // Markdown links [text](url) - keep text, drop URL
+      .replace(/\[([^\]]*)\]\(([^)]*)\)/g, '$1 ')
+      // Bare URLs
+      .replace(/https?:\/\/\S+/g, ' ')
+      .replace(/www\.\S+/g, ' ');
+  }
+
+  function detectTagsFromMarkdown(markdown) {
+    const cleaned = stripCodeAndUrls(markdown);
+    const found = new Set();
+    for (const { tag, regex } of AUTO_TAG_PATTERNS) {
+      if (regex.test(cleaned)) found.add(tag);
+    }
+    return found;
+  }
+
   function getCurrentTags() {
     return Array.from(tagsContainer.querySelectorAll('.tag-badge'))
       .map(el => el.dataset.tag);
   }
 
-  function renderTags(tags) {
-    tagsContainer.innerHTML = '';
-    tags.forEach(addTagBadge);
+  function getManualTags() {
+    return Array.from(tagsContainer.querySelectorAll('.tag-badge'))
+      .filter(el => el.dataset.auto !== 'true')
+      .map(el => el.dataset.tag);
   }
 
-  function addTagBadge(tag) {
+  function getAutoTagElements() {
+    return Array.from(tagsContainer.querySelectorAll('.tag-badge[data-auto="true"]'));
+  }
+
+  function renderTags(tags) {
+    tagsContainer.innerHTML = '';
+    // Existing project tags loaded from storage are treated as manual — we
+    // don't know which ones were originally auto-detected.
+    tags.forEach(tag => addTagBadge(tag, false));
+  }
+
+  function addTagBadge(tag, isAuto = false) {
     const el = document.createElement('span');
-    el.className = 'tag-badge';
+    el.className = 'tag-badge' + (isAuto ? ' tag-badge-auto' : '');
     el.dataset.tag = tag;
-    el.innerHTML = tag + ' <span class="remove-tag">&times;</span>';
+    if (isAuto) el.dataset.auto = 'true';
+    const autoBadge = isAuto ? ' <span class="auto-indicator" title="Auto-detected from content">auto</span>' : '';
+    el.innerHTML = tag + autoBadge + ' <span class="remove-tag">&times;</span>';
     el.querySelector('.remove-tag').addEventListener('click', () => {
       el.remove();
       scheduleAutoSave();
     });
     tagsContainer.appendChild(el);
+    return el;
+  }
+
+  // Reconcile auto-detected tags with current content:
+  //  - add new auto-tags that don't already exist (manual or auto)
+  //  - remove auto-tags whose keyword is no longer present
+  //  - never touch manual tags
+  function applyAutoDetectedTags(markdown) {
+    const detected = detectTagsFromMarkdown(markdown);
+    const manual = new Set(getManualTags());
+    let changed = false;
+
+    // Remove stale auto-tags
+    for (const el of getAutoTagElements()) {
+      if (!detected.has(el.dataset.tag)) {
+        el.remove();
+        changed = true;
+      }
+    }
+
+    // Add new auto-tags (skip ones already added manually or already auto)
+    const currentAuto = new Set(getAutoTagElements().map(el => el.dataset.tag));
+    for (const tag of detected) {
+      if (manual.has(tag) || currentAuto.has(tag)) continue;
+      addTagBadge(tag, true);
+      changed = true;
+    }
+
+    if (changed) scheduleAutoSave();
+  }
+
+  // Debounced trigger fired from the EasyMDE change handler.
+  let autoTagTimer = null;
+  function scheduleAutoTagDetection() {
+    if (autoTagTimer) clearTimeout(autoTagTimer);
+    autoTagTimer = setTimeout(() => {
+      autoTagTimer = null;
+      if (easyMDE) applyAutoDetectedTags(easyMDE.value());
+    }, 1000);
   }
 
   document.getElementById('add-tag-btn').addEventListener('click', () => {
     const tag = tagInput.value.trim().toLowerCase();
-    if (tag && !getCurrentTags().includes(tag)) {
-      addTagBadge(tag);
-      tagInput.value = '';
-      scheduleAutoSave();
+    if (!tag) return;
+    // If the same tag was previously auto-added, "promote" it to manual so
+    // it isn't removed when the keyword disappears from the content.
+    const existing = tagsContainer.querySelector(`.tag-badge[data-tag="${CSS.escape(tag)}"]`);
+    if (existing) {
+      if (existing.dataset.auto === 'true') {
+        existing.remove();
+        addTagBadge(tag, false);
+        tagInput.value = '';
+        scheduleAutoSave();
+      } else {
+        tagInput.value = '';
+      }
+      return;
     }
+    addTagBadge(tag, false);
+    tagInput.value = '';
+    scheduleAutoSave();
   });
 
   tagInput.addEventListener('keydown', (e) => {
@@ -451,7 +618,10 @@
       ],
     });
 
-    easyMDE.codemirror.on('change', scheduleAutoSave);
+    easyMDE.codemirror.on('change', () => {
+      scheduleAutoSave();
+      scheduleAutoTagDetection();
+    });
     setupFloatingToolbar(easyMDE);
     setupImageAutocomplete(easyMDE);
     // Expose for external integrations (e.g. global drop zone — issue #117)
