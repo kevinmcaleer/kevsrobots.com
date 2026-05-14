@@ -71,6 +71,7 @@ thanks: false
   </div>
 </div>
 
+<script src="/assets/js/project-gradient.js"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -125,10 +126,7 @@ thanks: false
         <div class="col">
           <a href="/projects/view.html?id=${p.id}" class="text-decoration-none">
             <div class="card h-100 border-0 shadow-sm card-hover">
-              ${p.cover_image
-                ? `<img src="${p.cover_image}" class="card-img-top" alt="${esc(p.title)}" style="height:200px;object-fit:cover">`
-                : `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px"><i class="fas fa-project-diagram fa-3x text-muted"></i></div>`
-              }
+              ${projectThumbnail(p, 200)}
               <div class="card-body">
                 <h5 class="card-title text-dark">${esc(p.title)}</h5>
                 <p class="card-text text-muted small">${esc(p.short_description || '')}</p>
