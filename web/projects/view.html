@@ -25,7 +25,10 @@ description: View project details
     <div class="row">
       <!-- LEFT: Main content -->
       <div class="col-lg-8">
-        <h1 id="view-title"></h1>
+        <div class="d-flex align-items-center gap-3 mb-1">
+          <h1 id="view-title" class="mb-0"></h1>
+          <span id="like-container"></span>
+        </div>
         <p id="view-description" class="lead text-muted"></p>
 
         <div id="view-meta-badges" class="d-flex flex-wrap gap-2 mb-4"></div>
@@ -55,6 +58,12 @@ description: View project details
         <div id="view-links-section" class="mb-4 d-none">
           <h4><i class="fas fa-link me-2"></i> Related Links</h4>
           <div id="view-links"></div>
+        </div>
+
+        <!-- Comments -->
+        <div id="comments-section" class="mb-4">
+          <h4><i class="fas fa-comments me-2"></i> Comments</h4>
+          <div id="comments-container"></div>
         </div>
       </div>
 
@@ -105,8 +114,18 @@ description: View project details
   </div>
 </div>
 
+<style>
+  .like-pulse { animation: likePulse 0.3s ease; }
+  @keyframes likePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="/assets/js/project-gradient.js"></script>
+<script src="/assets/js/project-auth.js"></script>
+<script src="/assets/js/project-interactions.js"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -176,6 +195,11 @@ description: View project details
       loadImages();
       loadLinks();
       loadJournal();
+
+      // Load interactions (likes + comments) via Chatter
+      var projectUrl = 'projects/view.html?id=' + projectId;
+      ProjectInteractions.loadLikes(projectUrl, document.getElementById('like-container'));
+      ProjectInteractions.loadComments(projectUrl, document.getElementById('comments-container'));
 
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');

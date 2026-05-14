@@ -73,6 +73,7 @@ thanks: false
 
 <script src="/assets/js/project-gradient.js"></script>
 <script src="/assets/js/project-auth.js"></script>
+<script src="/assets/js/project-interactions.js"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -163,13 +164,25 @@ thanks: false
                   ${(p.tags || []).slice(0, 4).map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('')}
                 </div>
               </div>
-              <div class="card-footer bg-transparent border-0">
+              <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <small class="text-muted">by ${esc(p.author_username)} &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
+                <small class="text-muted" id="card-likes-${p.id}"><i class="far fa-heart"></i> </small>
               </div>
             </div>
           </a>
         </div>
       `).join('');
+
+      // Fetch like counts for visible cards
+      projects.forEach(function (p) {
+        var url = 'projects/view.html?id=' + p.id;
+        ProjectInteractions.getLikeCount(url).then(function (data) {
+          var el = document.getElementById('card-likes-' + p.id);
+          if (el && data.count > 0) {
+            el.innerHTML = '<i class="far fa-heart"></i> ' + data.count;
+          }
+        });
+      });
 
     } catch (e) {
       console.error('Failed to load projects:', e);
