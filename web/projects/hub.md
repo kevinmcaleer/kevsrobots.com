@@ -176,7 +176,6 @@ thanks: false
   difficultyFilter.addEventListener('change', loadProjects);
   tagFilter.addEventListener('input', debouncedLoad);
 
-  checkAuth();
-  loadProjects();
+  checkAuth().then(() => loadProjects());
 })();
 </script>
