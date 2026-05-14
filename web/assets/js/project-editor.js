@@ -243,12 +243,29 @@
     document.getElementById('btn-preview').classList.remove('active');
   });
 
-  document.getElementById('btn-preview').addEventListener('click', () => {
+  document.getElementById('btn-preview').addEventListener('click', async () => {
     contentEditor.classList.add('d-none');
     contentPreview.classList.remove('d-none');
     contentPreview.innerHTML = marked.parse(contentEditor.value || '*No content yet*');
     document.getElementById('btn-preview').classList.add('active');
     document.getElementById('btn-write').classList.remove('active');
+
+    // Render mermaid diagrams in preview if mermaid is available
+    try {
+      const mermaidMod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+      const mermaid = mermaidMod.default;
+      mermaid.initialize({ startOnLoad: false });
+      contentPreview.querySelectorAll('pre code.language-mermaid').forEach((block) => {
+        const pre = block.parentElement;
+        const div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = block.textContent;
+        pre.replaceWith(div);
+      });
+      await mermaid.run();
+    } catch (e) {
+      /* mermaid not available — diagrams show as code blocks, which is fine */
+    }
   });
 
   // Toolbar actions
@@ -269,6 +286,8 @@
         case 'link': insert = '[' + (sel || 'link text') + '](https://)'; break;
         case 'image': insert = '![' + (sel || 'alt text') + '](image-url)'; break;
         case 'list': insert = '\n- ' + (sel || 'item') + '\n'; break;
+        case 'diagram': /* handled by dropdown */ return;
+        case 'circuit': /* handled by circuit editor launcher */ return;
       }
 
       ta.value = ta.value.substring(0, start) + insert + ta.value.substring(end);
@@ -594,6 +613,106 @@
     el.addEventListener('input', scheduleAutoSave);
     el.addEventListener('change', scheduleAutoSave);
   });
+
+  // --- Diagram toolbar dropdown & Circuit Editor integration ---
+  (function setupDiagramTools() {
+    const toolbar = document.querySelector('.card-header .editor-tool[data-action="list"]');
+    if (!toolbar) return;
+    const toolbarRow = toolbar.parentElement;
+
+    // Mermaid diagram templates
+    const mermaidTemplates = {
+      flowchart: '```mermaid\ngraph TD\n    A[Start] --> B[Step 1]\n    B --> C[Step 2]\n    C --> D[End]\n```\n',
+      sequence: '```mermaid\nsequenceDiagram\n    participant A as Device\n    participant B as Server\n    A->>B: Send data\n    B-->>A: Acknowledge\n```\n',
+      state: '```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Running: start\n    Running --> Idle: stop\n    Running --> Error: fault\n    Error --> Idle: reset\n```\n',
+      gantt: '```mermaid\ngantt\n    title Project Timeline\n    dateFormat  YYYY-MM-DD\n    section Build\n    Design           :a1, 2025-01-01, 7d\n    Assembly         :a2, after a1, 5d\n    section Test\n    Testing          :a3, after a2, 3d\n```\n',
+    };
+
+    // Insert text into the markdown editor
+    function insertAtCursor(text) {
+      const ta = contentEditor;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
+      ta.focus();
+      ta.selectionStart = ta.selectionEnd = start + text.length;
+      scheduleAutoSave();
+    }
+
+    // Build the diagram dropdown wrapper
+    const wrapper = document.createElement('span');
+    wrapper.className = 'diagram-dropdown';
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'inline-block';
+
+    // Diagram button
+    const diagramBtn = document.createElement('button');
+    diagramBtn.className = 'btn btn-sm btn-outline-secondary me-1';
+    diagramBtn.title = 'Insert diagram';
+    diagramBtn.innerHTML = '<i class="fas fa-project-diagram"></i>';
+    wrapper.appendChild(diagramBtn);
+
+    // Dropdown menu
+    const menu = document.createElement('div');
+    menu.className = 'diagram-dropdown-menu';
+    menu.innerHTML = `
+      <button data-tpl="flowchart"><i class="fas fa-sitemap"></i> Flowchart</button>
+      <button data-tpl="sequence"><i class="fas fa-exchange-alt"></i> Sequence Diagram</button>
+      <button data-tpl="state"><i class="fas fa-random"></i> State Diagram</button>
+      <button data-tpl="gantt"><i class="fas fa-tasks"></i> Gantt Chart</button>
+      <div class="dropdown-divider"></div>
+      <button data-tpl="circuit"><i class="fas fa-microchip"></i> Circuit Diagram</button>
+    `;
+    wrapper.appendChild(menu);
+
+    // Toggle dropdown on click
+    diagramBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking elsewhere
+    document.addEventListener('click', () => menu.classList.remove('show'));
+
+    // Handle template selection
+    menu.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.remove('show');
+        const tpl = btn.dataset.tpl;
+
+        if (tpl === 'circuit') {
+          // Open circuit editor
+          openCircuitEditor();
+          return;
+        }
+
+        if (mermaidTemplates[tpl]) {
+          insertAtCursor('\n' + mermaidTemplates[tpl] + '\n');
+        }
+      });
+    });
+
+    // Insert after the list button
+    toolbar.after(wrapper);
+
+    // ---- Circuit Editor integration ----
+    function openCircuitEditor() {
+      if (typeof window.CircuitEditor === 'undefined') {
+        alert('Circuit editor is still loading. Please try again in a moment.');
+        return;
+      }
+
+      const editor = new window.CircuitEditor();
+      editor.open({
+        onInsert: function (svgString) {
+          // Insert SVG as an HTML block in the markdown
+          const svgBlock = '\n\n<div class="circuit-diagram">\n' + svgString + '\n</div>\n\n';
+          insertAtCursor(svgBlock);
+        },
+      });
+    }
+  })();
 
   // --- Init ---
   async function init() {

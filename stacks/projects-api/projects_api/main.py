@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .db import create_all
-from .routers import bom, files, health, images, journal, links, projects
+from .routers import bom, files, health, images, journal, links, moderation, projects
 
 
 @asynccontextmanager
@@ -41,6 +41,7 @@ def create_app() -> FastAPI:
     app.include_router(images.router)
     app.include_router(links.router)
     app.include_router(journal.router)
+    app.include_router(moderation.router)
     return app
 
 

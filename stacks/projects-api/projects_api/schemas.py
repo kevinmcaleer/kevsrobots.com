@@ -120,3 +120,38 @@ class ImageResponse(BaseModel):
     caption: Optional[str]
     sort_order: int
     uploaded_at: datetime
+
+
+# --- Moderation schemas ---
+
+
+class ReportCreate(BaseModel):
+    reason: str = Field(..., min_length=5, max_length=1000)
+
+
+class ReportResponse(BaseModel):
+    id: int
+    project_id: int
+    reporter_username: str
+    reason: str
+    status: str
+    created_at: datetime
+    reviewed_at: Optional[datetime] = None
+    reviewed_by: Optional[str] = None
+
+
+class ReportUpdate(BaseModel):
+    status: str = Field(..., pattern="^(reviewed|dismissed)$")
+
+
+class ModerationNoteUpdate(BaseModel):
+    moderation_note: Optional[str] = None
+
+
+class BlockedProjectResponse(BaseModel):
+    id: int
+    title: str
+    author_username: str
+    is_blocked: bool
+    moderation_note: Optional[str]
+    created_at: datetime

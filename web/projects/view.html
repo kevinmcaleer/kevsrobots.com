@@ -60,6 +60,28 @@ description: View project details
           <div id="view-links"></div>
         </div>
 
+        <!-- Report -->
+        <div id="report-section" class="mb-4 d-none">
+          <a href="#" id="report-toggle" class="text-muted small text-decoration-none">
+            <i class="fas fa-flag me-1"></i> Report this project
+          </a>
+          <div id="report-form" class="d-none mt-2">
+            <div class="card border-warning">
+              <div class="card-body py-2">
+                <label class="form-label small fw-bold">Why are you reporting this project?</label>
+                <textarea id="report-reason" class="form-control form-control-sm mb-2" rows="2" maxlength="1000" placeholder="Describe the issue..."></textarea>
+                <div class="d-flex gap-2">
+                  <button id="report-submit" class="btn btn-sm btn-warning">Submit Report</button>
+                  <button id="report-cancel" class="btn btn-sm btn-outline-secondary">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="report-success" class="d-none">
+            <span class="text-success small"><i class="fas fa-check me-1"></i> Report submitted. Thank you.</span>
+          </div>
+        </div>
+
         <!-- Comments -->
         <div id="comments-section" class="mb-4">
           <h4><i class="fas fa-comments me-2"></i> Comments</h4>
@@ -145,6 +167,49 @@ description: View project details
 
   function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 
+  function setupReportForm(pid) {
+    var toggle = document.getElementById('report-toggle');
+    var form = document.getElementById('report-form');
+    var cancel = document.getElementById('report-cancel');
+    var submit = document.getElementById('report-submit');
+    var reason = document.getElementById('report-reason');
+    var success = document.getElementById('report-success');
+
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      form.classList.remove('d-none');
+      toggle.classList.add('d-none');
+    });
+    cancel.addEventListener('click', function() {
+      form.classList.add('d-none');
+      toggle.classList.remove('d-none');
+    });
+    submit.addEventListener('click', async function() {
+      var text = reason.value.trim();
+      if (text.length < 5) { alert('Please provide a reason (at least 5 characters).'); return; }
+      submit.disabled = true;
+      try {
+        var resp = await fetch(API + '/api/projects/' + pid + '/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ reason: text })
+        });
+        if (resp.status === 409) {
+          alert('You have already reported this project.');
+        } else if (!resp.ok) {
+          alert('Failed to submit report. Please try again.');
+        } else {
+          form.classList.add('d-none');
+          success.classList.remove('d-none');
+        }
+      } catch (e) {
+        alert('Network error. Please try again.');
+      }
+      submit.disabled = false;
+    });
+  }
+
   async function loadProject() {
     try {
       const resp = await fetch(API + '/api/projects/' + projectId, { credentials: 'include' });
@@ -178,14 +243,18 @@ description: View project details
         document.getElementById('view-repo-link').href = project.code_repo_url;
       }
 
-      // Edit button (check if current user is author)
+      // Edit button & report button (check if current user is author)
       try {
         const me = await fetch(API + '/api/projects/my/list', { credentials: 'include' });
         if (me.ok) {
           const myProjects = await me.json();
-          if (myProjects.some(p => p.id === project.id)) {
+          const isOwner = myProjects.some(p => p.id === project.id);
+          if (isOwner) {
             document.getElementById('edit-btn-container').classList.remove('d-none');
             document.getElementById('edit-link').href = '/projects/editor.html?id=' + project.id;
+          } else {
+            document.getElementById('report-section').classList.remove('d-none');
+            setupReportForm(project.id);
           }
         }
       } catch (e) {}

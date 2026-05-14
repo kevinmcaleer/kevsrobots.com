@@ -1,0 +1,364 @@
+/* Circuit Editor Styles — Issue #104 */
+
+/* ---- Modal overlay ---- */
+.circuit-editor-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 20px;
+}
+
+.circuit-editor-wrap {
+  background: #fff;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* ---- Top bar ---- */
+.circuit-editor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #2c3e50;
+  color: #fff;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.circuit-editor-topbar .ce-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.circuit-editor-topbar button {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: background 0.15s;
+}
+
+.circuit-editor-topbar button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.circuit-editor-topbar button.ce-btn-primary {
+  background: #4A90D9;
+  border-color: #4A90D9;
+}
+
+.circuit-editor-topbar button.ce-btn-primary:hover {
+  background: #357ABD;
+}
+
+.circuit-editor-topbar button.ce-btn-danger {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.circuit-editor-topbar button.ce-btn-danger:hover {
+  background: #e74c3c;
+  color: #fff;
+}
+
+/* ---- Body layout ---- */
+.circuit-editor-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ---- Palette (left) ---- */
+.circuit-palette {
+  width: 160px;
+  flex-shrink: 0;
+  background: #f5f6f8;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.circuit-palette .palette-category {
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.circuit-palette .palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: grab;
+  font-size: 0.82rem;
+  color: #333;
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.circuit-palette .palette-item:hover {
+  background: #e0e7ef;
+}
+
+.circuit-palette .palette-item:active {
+  cursor: grabbing;
+}
+
+.palette-item .palette-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #4A90D9;
+  flex-shrink: 0;
+}
+
+/* ---- Canvas (center) ---- */
+.circuit-canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  cursor: crosshair;
+}
+
+.circuit-canvas-area svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Grid pattern */
+.circuit-grid-line {
+  stroke: #e8e8e8;
+  stroke-width: 0.5;
+}
+
+.circuit-grid-line-major {
+  stroke: #d0d0d0;
+  stroke-width: 0.5;
+}
+
+/* Component styling */
+.circuit-component {
+  cursor: move;
+  color: #333;
+}
+
+.circuit-component:hover {
+  color: #4A90D9;
+}
+
+.circuit-component.selected {
+  color: #e67e22;
+}
+
+.circuit-component.selected rect.selection-box {
+  display: block;
+}
+
+.circuit-component rect.selection-box {
+  display: none;
+  fill: none;
+  stroke: #e67e22;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 2;
+  rx: 3;
+}
+
+/* Pins */
+.circuit-pin {
+  cursor: pointer;
+}
+
+.circuit-pin circle {
+  fill: #fff;
+  stroke: #999;
+  stroke-width: 1.5;
+  transition: fill 0.1s, stroke 0.1s;
+}
+
+.circuit-pin:hover circle {
+  fill: #4A90D9;
+  stroke: #4A90D9;
+}
+
+.circuit-pin.wiring circle {
+  fill: #e67e22;
+  stroke: #e67e22;
+}
+
+/* Wires */
+.circuit-wire {
+  stroke: #333;
+  stroke-width: 2;
+  fill: none;
+  cursor: pointer;
+}
+
+.circuit-wire:hover {
+  stroke: #e74c3c;
+  stroke-width: 3;
+}
+
+.circuit-wire.selected {
+  stroke: #e67e22;
+  stroke-width: 3;
+}
+
+/* ---- Properties panel (right) ---- */
+.circuit-props {
+  width: 200px;
+  flex-shrink: 0;
+  background: #f5f6f8;
+  border-left: 1px solid #ddd;
+  overflow-y: auto;
+  padding: 12px;
+  font-size: 0.82rem;
+}
+
+.circuit-props h6 {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.circuit-props .prop-row {
+  margin-bottom: 8px;
+}
+
+.circuit-props .prop-row label {
+  display: block;
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 2px;
+  text-transform: capitalize;
+}
+
+.circuit-props .prop-row input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.82rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.circuit-props .prop-row input:focus {
+  outline: none;
+  border-color: #4A90D9;
+}
+
+.circuit-props .prop-hint {
+  color: #aaa;
+  font-size: 0.72rem;
+  margin-top: 12px;
+}
+
+.circuit-props .rotate-btn {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.circuit-props .rotate-btn:hover {
+  background: #e8f0fe;
+  border-color: #4A90D9;
+}
+
+/* ---- Status bar ---- */
+.circuit-statusbar {
+  padding: 4px 16px;
+  font-size: 0.72rem;
+  color: #888;
+  background: #f5f6f8;
+  border-top: 1px solid #ddd;
+  flex-shrink: 0;
+  display: flex;
+  gap: 16px;
+}
+
+/* ---- Diagram dropdown menu in editor toolbar ---- */
+.diagram-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.diagram-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1050;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  min-width: 200px;
+  padding: 4px 0;
+  margin-top: 4px;
+}
+
+.diagram-dropdown-menu.show {
+  display: block;
+}
+
+.diagram-dropdown-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.diagram-dropdown-menu button:hover {
+  background: #e8f0fe;
+  color: #4A90D9;
+}
+
+.diagram-dropdown-menu button i {
+  width: 20px;
+  text-align: center;
+  margin-right: 6px;
+  color: #4A90D9;
+}
+
+.diagram-dropdown-menu .dropdown-divider {
+  height: 1px;
+  background: #eee;
+  margin: 4px 0;
+}

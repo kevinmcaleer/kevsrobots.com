@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Float,
     ForeignKey,
@@ -36,12 +37,31 @@ class Project(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="wip")
     author_username: Mapped[str] = mapped_column(String(100), nullable=False)
     cover_image: Mapped[Optional[str]] = mapped_column(Text)
+    is_blocked: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="0")
+    moderation_note: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
+
+
+class ProjectReport(Base):
+    __tablename__ = "project_reports"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    reporter_username: Mapped[str] = mapped_column(String(100), nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    reviewed_by: Mapped[Optional[str]] = mapped_column(String(100))
 
 
 class ProjectTag(Base):

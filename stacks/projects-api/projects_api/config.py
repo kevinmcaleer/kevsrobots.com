@@ -36,6 +36,14 @@ class Settings(BaseSettings):
     nas_password: Optional[str] = None
     nas_share_name: str = "chatter"
 
+    # Admin usernames (comma-separated)
+    admin_usernames: str = "kev"
+
+    @computed_field
+    @property
+    def admin_usernames_list(self) -> list[str]:
+        return [s.strip() for s in self.admin_usernames.split(",") if s.strip()]
+
     # File limits
     max_file_size: int = 25 * 1024 * 1024  # 25MB
     max_image_size: int = 10 * 1024 * 1024  # 10MB

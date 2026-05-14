@@ -1,5 +1,5 @@
 ---
-title: User Projects Hub
+title: Projects Hub
 description: Discover amazing maker projects from the community
 excerpt: Browse, search, and download complete project packages with instructions, code, and files
 layout: content

@@ -68,7 +68,10 @@ async def list_projects(
     user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> list[ProjectListItem]:
-    query = select(Project).where(Project.status != "archived")
+    query = select(Project).where(
+        Project.status != "archived",
+        Project.is_blocked == False,  # noqa: E712
+    )
     if difficulty:
         query = query.where(Project.difficulty == difficulty)
     if search:
