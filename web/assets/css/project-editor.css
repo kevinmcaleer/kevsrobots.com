@@ -25,8 +25,19 @@
 .EasyMDEContainer .editor-toolbar {
   border-radius: 8px 8px 0 0;
   border-color: #dee2e6;
-  flex-wrap: nowrap;
+  white-space: nowrap;
   overflow-x: auto;
+  padding: 4px 8px;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+  display: inline-block;
+  float: none !important;
+}
+
+.EasyMDEContainer .editor-toolbar i.separator {
+  display: inline-block;
+  float: none !important;
 }
 
 /* Hide sidebar when EasyMDE is fullscreen */
