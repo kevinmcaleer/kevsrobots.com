@@ -154,7 +154,7 @@
   document.getElementById('save-btn').addEventListener('click', saveProject);
 
   const statusSelect = document.getElementById('project-status');
-  statusSelect.addEventListener('change', async () => {
+  if (statusSelect) statusSelect.addEventListener('change', async () => {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     try {
       const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
@@ -170,7 +170,8 @@
     } catch (e) { console.error(e); }
   });
 
-  document.getElementById('delete-btn').addEventListener('click', async () => {
+  const deleteBtn = document.getElementById('delete-btn');
+  if (deleteBtn) deleteBtn.addEventListener('click', async () => {
     if (!currentProject) return;
     if (!confirm('Delete this project? This cannot be undone.')) return;
     try {
