@@ -25,6 +25,19 @@
 .EasyMDEContainer .editor-toolbar {
   border-radius: 8px 8px 0 0;
   border-color: #dee2e6;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+/* Hide sidebar when EasyMDE is fullscreen */
+.EasyMDEContainer.CodeMirror-fullscreen ~ .col-lg-4,
+body:has(.CodeMirror-fullscreen) .col-lg-4 {
+  display: none !important;
+}
+
+body:has(.CodeMirror-fullscreen) .col-lg-8 {
+  flex: 0 0 100%;
+  max-width: 100%;
 }
 
 .EasyMDEContainer .editor-preview,
