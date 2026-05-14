@@ -8,6 +8,8 @@ services:
     env_file: .env
     environment:
       - PORT=8300
+    volumes:
+      - /home/kev/projects-uploads:/tmp/projects_uploads
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8300/health"]
