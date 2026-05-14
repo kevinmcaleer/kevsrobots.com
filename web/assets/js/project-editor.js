@@ -82,7 +82,7 @@
       currentProject = await resp.json();
       titleInput.value = currentProject.title || '';
       descInput.value = currentProject.short_description || '';
-      contentEditor.value = currentProject.content_md || '';
+      setEditorValue(currentProject.content_md);
       difficultySelect.value = currentProject.difficulty || '';
       timeInput.value = currentProject.estimated_minutes || '';
       repoInput.value = currentProject.code_repo_url || '';
@@ -109,7 +109,7 @@
     const data = {
       title: titleInput.value || 'Untitled Project',
       short_description: descInput.value || null,
-      content_md: contentEditor.value || null,
+      content_md: getEditorValue() || null,
       difficulty: difficultySelect.value || null,
       estimated_minutes: timeInput.value ? parseInt(timeInput.value) : null,
       code_repo_url: repoInput.value || null,
@@ -242,83 +242,137 @@
     }
   });
 
-  // --- Markdown Editor ---
-  document.getElementById('btn-write').addEventListener('click', () => {
-    contentEditor.classList.remove('d-none');
-    contentPreview.classList.add('d-none');
-    document.getElementById('btn-write').classList.add('active');
-    document.getElementById('btn-preview').classList.remove('active');
-  });
+  // --- EasyMDE Markdown Editor ---
+  let easyMDE = null;
 
-  document.getElementById('btn-preview').addEventListener('click', async () => {
-    contentEditor.classList.add('d-none');
-    contentPreview.classList.remove('d-none');
-    contentPreview.innerHTML = marked.parse(contentEditor.value || '*No content yet*');
-    document.getElementById('btn-preview').classList.add('active');
-    document.getElementById('btn-write').classList.remove('active');
-
-    // Render mermaid diagrams in preview if mermaid is available
-    try {
-      const mermaidMod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
-      const mermaid = mermaidMod.default;
-      mermaid.initialize({ startOnLoad: false });
-      contentPreview.querySelectorAll('pre code.language-mermaid').forEach((block) => {
-        const pre = block.parentElement;
-        const div = document.createElement('div');
-        div.className = 'mermaid';
-        div.textContent = block.textContent;
-        pre.replaceWith(div);
-      });
-      await mermaid.run();
-    } catch (e) {
-      /* mermaid not available — diagrams show as code blocks, which is fine */
-    }
-  });
-
-  // Toolbar actions
-  document.querySelectorAll('.editor-tool').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const action = btn.dataset.action;
-      const ta = contentEditor;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const sel = ta.value.substring(start, end);
-      let insert = '';
-
-      switch (action) {
-        case 'bold': insert = '**' + (sel || 'bold text') + '**'; break;
-        case 'italic': insert = '*' + (sel || 'italic text') + '*'; break;
-        case 'heading': insert = '\n## ' + (sel || 'Heading') + '\n'; break;
-        case 'code': insert = '\n```python\n' + (sel || '# code here') + '\n```\n'; break;
-        case 'link': insert = '[' + (sel || 'link text') + '](https://)'; break;
-        case 'image': insert = '![' + (sel || 'alt text') + '](image-url)'; break;
-        case 'list': insert = '\n- ' + (sel || 'item') + '\n'; break;
-        case 'diagram': /* handled by dropdown */ return;
-        case 'circuit': /* handled by circuit editor launcher */ return;
-      }
-
-      ta.value = ta.value.substring(0, start) + insert + ta.value.substring(end);
-      ta.focus();
-      ta.selectionStart = ta.selectionEnd = start + insert.length;
-      scheduleAutoSave();
+  function initEditor() {
+    if (easyMDE) return;
+    easyMDE = new EasyMDE({
+      element: contentEditor,
+      spellChecker: false,
+      autofocus: false,
+      placeholder: 'Write your project content in Markdown...\n\n# Background\nDescribe what this project is about...\n\n## How to Build\n- Step 1: ...',
+      status: false,
+      minHeight: '350px',
+      renderingConfig: {
+        codeSyntaxHighlighting: true,
+      },
+      toolbar: [
+        'bold', 'italic', 'heading', '|',
+        'code', 'quote', 'unordered-list', 'ordered-list', '|',
+        'link',
+        {
+          name: 'insert-image',
+          action: function(editor) { showImagePicker(editor); },
+          className: 'fa fa-image',
+          title: 'Insert uploaded image',
+        },
+        'table', '|',
+        {
+          name: 'diagram',
+          action: function(editor) { showDiagramMenu(editor); },
+          className: 'fa fa-project-diagram',
+          title: 'Insert diagram',
+        },
+        '|',
+        'preview', 'side-by-side', 'fullscreen', '|',
+        'guide',
+      ],
     });
-  });
 
-  // Keyboard shortcuts
-  contentEditor.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-      e.preventDefault();
-      document.querySelector('[data-action="bold"]').click();
+    easyMDE.codemirror.on('change', scheduleAutoSave);
+  }
+
+  function getEditorValue() {
+    return easyMDE ? easyMDE.value() : contentEditor.value;
+  }
+
+  function setEditorValue(val) {
+    if (easyMDE) easyMDE.value(val || '');
+    else contentEditor.value = val || '';
+  }
+
+  // Image picker popover
+  function showImagePicker(editor) {
+    const existing = document.querySelector('.image-picker-popover');
+    if (existing) { existing.remove(); return; }
+
+    const pickerList = document.getElementById('image-picker-list');
+    if (!pickerList || !pickerList.innerHTML.trim()) {
+      const cm = editor.codemirror;
+      cm.replaceSelection('![alt text](image-url)');
+      cm.focus();
+      return;
     }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
-      e.preventDefault();
-      document.querySelector('[data-action="italic"]').click();
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-      e.preventDefault();
-      document.querySelector('[data-action="link"]').click();
-    }
-  });
+
+    const btn = document.querySelector('.fa-image').closest('button');
+    const rect = btn.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'image-picker-popover';
+    pop.style.cssText = 'position:fixed;z-index:10000;background:white;border:1px solid #ddd;border-radius:8px;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-height:250px;overflow-y:auto;min-width:220px;left:' + rect.left + 'px;top:' + (rect.bottom + 4) + 'px;';
+    pop.innerHTML = pickerList.innerHTML;
+    document.body.appendChild(pop);
+
+    pop.querySelectorAll('.image-picker-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const url = item.dataset.imgUrl;
+        const name = item.dataset.imgName;
+        const cm = editor.codemirror;
+        cm.replaceSelection('![' + name + '](' + url + ')\n');
+        cm.focus();
+        pop.remove();
+        scheduleAutoSave();
+      });
+    });
+
+    setTimeout(() => {
+      document.addEventListener('click', function closePicker(e) {
+        if (!pop.contains(e.target) && !btn.contains(e.target)) {
+          pop.remove();
+          document.removeEventListener('click', closePicker);
+        }
+      });
+    }, 10);
+  }
+
+  // Diagram menu
+  function showDiagramMenu(editor) {
+    const existing = document.querySelector('.diagram-menu-popover');
+    if (existing) { existing.remove(); return; }
+
+    const btn = document.querySelector('.fa-project-diagram').closest('button');
+    const rect = btn.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'diagram-menu-popover';
+    pop.style.cssText = 'position:fixed;z-index:10000;background:white;border:1px solid #ddd;border-radius:8px;padding:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);left:' + rect.left + 'px;top:' + (rect.bottom + 4) + 'px;';
+
+    const items = [
+      { label: 'Flowchart', md: '\n```mermaid\ngraph TD\n    A[Start] --> B[Step 1]\n    B --> C[Step 2]\n    C --> D[End]\n```\n' },
+      { label: 'Sequence Diagram', md: '\n```mermaid\nsequenceDiagram\n    participant A\n    participant B\n    A->>B: Hello\n    B-->>A: Hi back\n```\n' },
+      { label: 'State Diagram', md: '\n```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Running\n    Running --> Idle\n    Running --> [*]\n```\n' },
+    ];
+
+    pop.innerHTML = items.map(i => '<div class="image-picker-item p-2" style="cursor:pointer"><small>' + i.label + '</small></div>').join('');
+    document.body.appendChild(pop);
+
+    pop.querySelectorAll('.image-picker-item').forEach((item, idx) => {
+      item.addEventListener('click', () => {
+        editor.codemirror.replaceSelection(items[idx].md);
+        editor.codemirror.focus();
+        pop.remove();
+        scheduleAutoSave();
+      });
+    });
+
+    setTimeout(() => {
+      document.addEventListener('click', function closeMenu(e) {
+        if (!pop.contains(e.target) && !btn.contains(e.target)) {
+          pop.remove();
+          document.removeEventListener('click', closeMenu);
+        }
+      });
+    }, 10);
+  }
 
   // --- File Upload ---
   const fileDropzone = document.getElementById('file-dropzone');
@@ -826,115 +880,18 @@
   };
 
   // --- Auto-save on input ---
-  [titleInput, descInput, contentEditor, difficultySelect, timeInput, repoInput].forEach(el => {
-    el.addEventListener('input', scheduleAutoSave);
-    el.addEventListener('change', scheduleAutoSave);
+  [titleInput, descInput, difficultySelect, timeInput, repoInput].forEach(el => {
+    if (el) {
+      el.addEventListener('input', scheduleAutoSave);
+      el.addEventListener('change', scheduleAutoSave);
+    }
   });
-
-  // --- Diagram toolbar dropdown & Circuit Editor integration ---
-  (function setupDiagramTools() {
-    const toolbar = document.querySelector('.card-header .editor-tool[data-action="list"]');
-    if (!toolbar) return;
-    const toolbarRow = toolbar.parentElement;
-
-    // Mermaid diagram templates
-    const mermaidTemplates = {
-      flowchart: '```mermaid\ngraph TD\n    A[Start] --> B[Step 1]\n    B --> C[Step 2]\n    C --> D[End]\n```\n',
-      sequence: '```mermaid\nsequenceDiagram\n    participant A as Device\n    participant B as Server\n    A->>B: Send data\n    B-->>A: Acknowledge\n```\n',
-      state: '```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Running: start\n    Running --> Idle: stop\n    Running --> Error: fault\n    Error --> Idle: reset\n```\n',
-      gantt: '```mermaid\ngantt\n    title Project Timeline\n    dateFormat  YYYY-MM-DD\n    section Build\n    Design           :a1, 2025-01-01, 7d\n    Assembly         :a2, after a1, 5d\n    section Test\n    Testing          :a3, after a2, 3d\n```\n',
-    };
-
-    // Insert text into the markdown editor
-    function insertAtCursor(text) {
-      const ta = contentEditor;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
-      ta.focus();
-      ta.selectionStart = ta.selectionEnd = start + text.length;
-      scheduleAutoSave();
-    }
-
-    // Build the diagram dropdown wrapper
-    const wrapper = document.createElement('span');
-    wrapper.className = 'diagram-dropdown';
-    wrapper.style.position = 'relative';
-    wrapper.style.display = 'inline-block';
-
-    // Diagram button
-    const diagramBtn = document.createElement('button');
-    diagramBtn.className = 'btn btn-sm btn-outline-secondary me-1';
-    diagramBtn.title = 'Insert diagram';
-    diagramBtn.innerHTML = '<i class="fas fa-project-diagram"></i>';
-    wrapper.appendChild(diagramBtn);
-
-    // Dropdown menu
-    const menu = document.createElement('div');
-    menu.className = 'diagram-dropdown-menu';
-    menu.innerHTML = `
-      <button data-tpl="flowchart"><i class="fas fa-sitemap"></i> Flowchart</button>
-      <button data-tpl="sequence"><i class="fas fa-exchange-alt"></i> Sequence Diagram</button>
-      <button data-tpl="state"><i class="fas fa-random"></i> State Diagram</button>
-      <button data-tpl="gantt"><i class="fas fa-tasks"></i> Gantt Chart</button>
-      <div class="dropdown-divider"></div>
-      <button data-tpl="circuit"><i class="fas fa-microchip"></i> Circuit Diagram</button>
-    `;
-    wrapper.appendChild(menu);
-
-    // Toggle dropdown on click
-    diagramBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.classList.toggle('show');
-    });
-
-    // Close dropdown when clicking elsewhere
-    document.addEventListener('click', () => menu.classList.remove('show'));
-
-    // Handle template selection
-    menu.querySelectorAll('button').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.classList.remove('show');
-        const tpl = btn.dataset.tpl;
-
-        if (tpl === 'circuit') {
-          // Open circuit editor
-          openCircuitEditor();
-          return;
-        }
-
-        if (mermaidTemplates[tpl]) {
-          insertAtCursor('\n' + mermaidTemplates[tpl] + '\n');
-        }
-      });
-    });
-
-    // Insert after the list button
-    toolbar.after(wrapper);
-
-    // ---- Circuit Editor integration ----
-    function openCircuitEditor() {
-      if (typeof window.CircuitEditor === 'undefined') {
-        alert('Circuit editor is still loading. Please try again in a moment.');
-        return;
-      }
-
-      const editor = new window.CircuitEditor();
-      editor.open({
-        onInsert: function (svgString) {
-          // Insert SVG as an HTML block in the markdown
-          const svgBlock = '\n\n<div class="circuit-diagram">\n' + svgString + '\n</div>\n\n';
-          insertAtCursor(svgBlock);
-        },
-      });
-    }
-  })();
 
   // --- Init ---
   async function init() {
     const authed = await checkAuth();
     if (!authed) return;
+    initEditor();
     if (projectId) await loadProject();
     editorContainer.classList.remove('d-none');
   }

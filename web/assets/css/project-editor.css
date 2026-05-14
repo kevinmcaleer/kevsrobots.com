@@ -10,39 +10,58 @@
   background: #f8f9fa;
 }
 
-#content-editor {
-  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+/* EasyMDE overrides */
+.EasyMDEContainer {
+  border-radius: 8px;
+}
+
+.EasyMDEContainer .CodeMirror {
+  border-radius: 0 0 8px 8px;
+  min-height: 350px;
   font-size: 0.9rem;
   line-height: 1.6;
-  resize: vertical;
-  min-height: 400px;
 }
 
-#content-editor:focus {
-  box-shadow: none;
+.EasyMDEContainer .editor-toolbar {
+  border-radius: 8px 8px 0 0;
+  border-color: #dee2e6;
 }
 
-#content-preview {
+.EasyMDEContainer .editor-preview,
+.EasyMDEContainer .editor-preview-side {
   font-size: 0.95rem;
   line-height: 1.7;
-  overflow-y: auto;
-  max-height: 600px;
 }
 
-#content-preview pre {
+.EasyMDEContainer .editor-preview img,
+.EasyMDEContainer .editor-preview-side img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.EasyMDEContainer .editor-preview pre,
+.EasyMDEContainer .editor-preview-side pre {
   background: #f8f9fa;
   padding: 1rem;
   border-radius: 6px;
 }
 
-#content-preview code {
-  font-size: 0.85rem;
-}
-
-#content-preview img,
 #view-content img {
   max-width: 100%;
   border-radius: 6px;
+}
+
+/* Image picker popover */
+.image-picker-popover .image-picker-item,
+.diagram-menu-popover .image-picker-item {
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.image-picker-popover .image-picker-item:hover,
+.diagram-menu-popover .image-picker-item:hover {
+  background: #f0f4f8;
 }
 
 /* Drop zones */
