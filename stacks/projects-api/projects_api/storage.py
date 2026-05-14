@@ -21,8 +21,11 @@ LOCAL_STORAGE_PATH.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_FILE_EXTENSIONS = {
     ".py", ".cpp", ".h", ".ino", ".md", ".txt", ".pdf",
-    ".stl", ".obj", ".gcode", ".json", ".xml", ".yaml", ".yml",
-    ".zip", ".tar", ".gz",
+    ".stl", ".obj", ".gcode", ".3mf", ".step", ".stp", ".dxf", ".dwg", ".svg",
+    ".json", ".xml", ".yaml", ".yml", ".csv", ".toml",
+    ".zip", ".tar", ".gz", ".7z", ".rar",
+    ".scad", ".kicad_pcb", ".kicad_sch", ".brd", ".sch",
+    ".f3d", ".fcstd",
 }
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 
@@ -81,23 +84,29 @@ def _local_path(project_id: int, file_type: str) -> Path:
 
 
 def save_file(content: bytes, filename: str, project_id: int, file_type: str) -> Optional[str]:
-    """Save file to NAS. Returns the storage path or None on failure."""
+    """Save file to NAS, with local fallback for test/dev environments."""
 
-    if not _check_nas():
-        logger.error("NAS is not available — cannot save file")
+    if _check_nas():
+        if _save_to_nas(content, filename, project_id, file_type):
+            return f"nas:projects/{file_type}/{project_id}/{filename}"
         return None
 
-    if _save_to_nas(content, filename, project_id, file_type):
-        return f"nas:projects/{file_type}/{project_id}/{filename}"
+    if _save_to_local(content, filename, project_id, file_type):
+        logger.warning("NAS unavailable — saved to local storage")
+        return f"local:projects/{file_type}/{project_id}/{filename}"
 
     return None
 
 
 def read_file(file_path: str) -> Optional[bytes]:
-    """Read file from NAS storage."""
+    """Read file from NAS or local storage."""
 
     if file_path.startswith("nas:"):
         return _read_from_nas(file_path[4:])
+    elif file_path.startswith("local:"):
+        local = LOCAL_STORAGE_PATH / file_path[6:]
+        if local.exists():
+            return local.read_bytes()
     return None
 
 

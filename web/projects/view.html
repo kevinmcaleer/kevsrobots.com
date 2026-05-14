@@ -313,9 +313,29 @@ description: View project details
     const files = await resp.json();
     if (files.length === 0) return;
     document.getElementById('view-files-section').classList.remove('d-none');
+    var fileKinds = {
+      py:'Python Script',cpp:'C++ Source',h:'Header',ino:'Arduino Sketch',
+      md:'Markdown',txt:'Text',pdf:'PDF Document',csv:'Spreadsheet',
+      stl:'3D Model (STL)',obj:'3D Model (OBJ)',gcode:'G-Code','3mf':'3D Model (3MF)',
+      step:'CAD (STEP)',stp:'CAD (STEP)',dxf:'CAD Drawing (DXF)',dwg:'CAD Drawing (DWG)',
+      scad:'OpenSCAD',f3d:'Fusion 360',fcstd:'FreeCAD',
+      kicad_pcb:'KiCad PCB',kicad_sch:'KiCad Schematic',brd:'PCB Board',sch:'Schematic',
+      json:'JSON',xml:'XML',yaml:'YAML',yml:'YAML',
+      zip:'ZIP Archive',tar:'TAR Archive',gz:'GZIP Archive',svg:'SVG Image'
+    };
+    var fileIcons = {
+      py:'fab fa-python',pdf:'fas fa-file-pdf',md:'fas fa-file-alt',csv:'fas fa-file-csv',
+      stl:'fas fa-cube',obj:'fas fa-cube',gcode:'fas fa-cube','3mf':'fas fa-cube',
+      step:'fas fa-drafting-compass',stp:'fas fa-drafting-compass',dxf:'fas fa-drafting-compass',
+      dwg:'fas fa-drafting-compass',scad:'fas fa-drafting-compass',
+      zip:'fas fa-file-archive',tar:'fas fa-file-archive',gz:'fas fa-file-archive',
+      svg:'fas fa-image'
+    };
+    function fKind(n){var e=(n||'').split('.').pop().toLowerCase();return fileKinds[e]||e.toUpperCase()+' File';}
+    function fIcon(n){var e=(n||'').split('.').pop().toLowerCase();return fileIcons[e]||'fas fa-file';}
     document.getElementById('view-files').innerHTML = files.map(f => `
       <a href="${API}/api/projects/${projectId}/files/${f.id}/download" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-        <span><i class="fas fa-file me-2"></i>${esc(f.filename)}</span>
+        <span><i class="${fIcon(f.filename)} me-2"></i>${esc(f.filename)}<br><small class="text-muted">${fKind(f.filename)}</small></span>
         <span class="badge bg-light text-dark">${(f.file_size / 1024).toFixed(1)} KB</span>
       </a>
     `).join('');

@@ -334,11 +334,47 @@
   fileDropzone.addEventListener('drop', e => uploadFiles(e.dataTransfer.files));
   fileInput.addEventListener('change', e => uploadFiles(e.target.files));
 
+  const FILE_KINDS = {
+    py: 'Python Script', cpp: 'C++ Source', h: 'Header File', ino: 'Arduino Sketch',
+    md: 'Markdown', txt: 'Text File', pdf: 'PDF Document', csv: 'Spreadsheet',
+    stl: '3D Model (STL)', obj: '3D Model (OBJ)', gcode: 'G-Code', '3mf': '3D Model (3MF)',
+    step: 'CAD Model (STEP)', stp: 'CAD Model (STEP)', dxf: 'CAD Drawing (DXF)',
+    dwg: 'CAD Drawing (DWG)', scad: 'OpenSCAD', f3d: 'Fusion 360', fcstd: 'FreeCAD',
+    kicad_pcb: 'KiCad PCB', kicad_sch: 'KiCad Schematic', brd: 'PCB Board', sch: 'Schematic',
+    json: 'JSON Data', xml: 'XML Data', yaml: 'YAML Config', yml: 'YAML Config', toml: 'TOML Config',
+    zip: 'ZIP Archive', tar: 'TAR Archive', gz: 'GZIP Archive', '7z': '7-Zip Archive', rar: 'RAR Archive',
+    svg: 'SVG Image',
+  };
+
+  const FILE_ICONS = {
+    py: 'fa-python fab', cpp: 'fa-file-code fas', h: 'fa-file-code fas', ino: 'fa-microchip fas',
+    pdf: 'fa-file-pdf fas', md: 'fa-file-alt fas', txt: 'fa-file-alt fas', csv: 'fa-file-csv fas',
+    stl: 'fa-cube fas', obj: 'fa-cube fas', gcode: 'fa-cube fas', '3mf': 'fa-cube fas',
+    step: 'fa-drafting-compass fas', stp: 'fa-drafting-compass fas', dxf: 'fa-drafting-compass fas',
+    dwg: 'fa-drafting-compass fas', scad: 'fa-drafting-compass fas', f3d: 'fa-drafting-compass fas',
+    fcstd: 'fa-drafting-compass fas',
+    kicad_pcb: 'fa-microchip fas', kicad_sch: 'fa-microchip fas', brd: 'fa-microchip fas', sch: 'fa-microchip fas',
+    json: 'fa-file-code fas', xml: 'fa-file-code fas', yaml: 'fa-file-code fas', yml: 'fa-file-code fas',
+    zip: 'fa-file-archive fas', tar: 'fa-file-archive fas', gz: 'fa-file-archive fas',
+    svg: 'fa-image fas',
+  };
+
+  function fileKind(filename) {
+    const ext = (filename || '').split('.').pop().toLowerCase();
+    return FILE_KINDS[ext] || ext.toUpperCase() + ' File';
+  }
+
+  function fileIcon(filename) {
+    const ext = (filename || '').split('.').pop().toLowerCase();
+    return FILE_ICONS[ext] || 'fa-file fas';
+  }
+
   async function uploadFiles(fileList) {
     if (!currentProject) {
       await saveProject();
       if (!currentProject) return;
     }
+    const errors = [];
     for (const file of fileList) {
       const form = new FormData();
       form.append('file', file);
@@ -348,10 +384,12 @@
         });
         if (!resp.ok) {
           const err = await resp.json();
-          alert(err.detail || 'Upload failed');
-          continue;
+          errors.push(file.name + ': ' + (err.detail || 'failed'));
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { errors.push(file.name + ': network error'); }
+    }
+    if (errors.length > 0) {
+      alert('Some files could not be uploaded:\n\n' + errors.join('\n'));
     }
     loadFiles();
   }
@@ -364,9 +402,11 @@
     list.innerHTML = files.map(f => `
       <div class="file-item">
         <div class="file-info">
-          <i class="fas fa-file text-muted"></i>
-          <a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${f.filename}</a>
-          <span class="file-size">${(f.file_size / 1024).toFixed(1)} KB</span>
+          <i class="${fileIcon(f.filename)} text-muted"></i>
+          <div>
+            <a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download" class="d-block">${f.filename}</a>
+            <small class="text-muted">${fileKind(f.filename)} · ${(f.file_size / 1024).toFixed(1)} KB</small>
+          </div>
         </div>
         <button class="btn btn-sm btn-outline-danger" onclick="deleteFile(${f.id})"><i class="fas fa-trash"></i></button>
       </div>
