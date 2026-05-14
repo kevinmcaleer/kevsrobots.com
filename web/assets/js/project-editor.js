@@ -303,20 +303,77 @@
             updatePreview();
             cm.on('change', updatePreview);
 
-            // Sync scroll position from editor to preview
-            var syncingPreview = false;
+            // Build a map of source-line → top-level block index
+            function getBlockStarts(markdown) {
+              const lines = markdown.split('\n');
+              const starts = [];
+              let inBlock = false;
+              let inCode = false;
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.startsWith('```')) {
+                  if (!inCode) {
+                    if (!inBlock) starts.push(i);
+                    inCode = true;
+                    inBlock = true;
+                  } else {
+                    inCode = false;
+                  }
+                  continue;
+                }
+                if (inCode) continue;
+                if (line.trim() === '') {
+                  inBlock = false;
+                  continue;
+                }
+                if (!inBlock) {
+                  starts.push(i);
+                  inBlock = true;
+                }
+              }
+              return starts;
+            }
+
+            // Sync preview to editor's top visible line by mapping blocks
+            var syncing = false;
             function syncScroll() {
-              if (syncingPreview) return;
-              var info = cm.getScrollInfo();
-              var maxScroll = info.height - info.clientHeight;
-              if (maxScroll <= 0) return;
-              var ratio = info.top / maxScroll;
-              var previewMax = preview.scrollHeight - preview.clientHeight;
-              syncingPreview = true;
-              preview.scrollTop = previewMax * ratio;
-              setTimeout(() => { syncingPreview = false; }, 50);
+              if (syncing) return;
+              const blockStarts = getBlockStarts(editor.value());
+              if (blockStarts.length === 0) return;
+
+              const info = cm.getScrollInfo();
+              const topLine = cm.lineAtHeight(info.top, 'local');
+
+              // Find which block the top line belongs to
+              let blockIdx = 0;
+              for (let i = 0; i < blockStarts.length; i++) {
+                if (blockStarts[i] <= topLine) blockIdx = i;
+                else break;
+              }
+
+              const previewBlocks = Array.from(preview.children);
+              const target = previewBlocks[blockIdx];
+              if (!target) return;
+
+              // How far through the current block is the editor?
+              const blockStartLine = blockStarts[blockIdx];
+              const blockEndLine = blockIdx < blockStarts.length - 1
+                ? blockStarts[blockIdx + 1] - 1
+                : cm.lineCount() - 1;
+              const blockSize = Math.max(1, blockEndLine - blockStartLine + 1);
+              const blockProgress = Math.min(1, Math.max(0, (topLine - blockStartLine) / blockSize));
+
+              const targetRect = target.getBoundingClientRect();
+              const previewRect = preview.getBoundingClientRect();
+              const targetTop = targetRect.top - previewRect.top + preview.scrollTop;
+              const offset = targetTop + (targetRect.height * blockProgress);
+
+              syncing = true;
+              preview.scrollTop = offset;
+              setTimeout(() => { syncing = false; }, 50);
             }
             cm.on('scroll', syncScroll);
+            cm.on('cursorActivity', syncScroll);
 
             // Refresh CodeMirror so click coords match the new layout
             requestAnimationFrame(() => cm.refresh());
