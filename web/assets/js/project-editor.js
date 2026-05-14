@@ -454,6 +454,8 @@
     easyMDE.codemirror.on('change', scheduleAutoSave);
     setupFloatingToolbar(easyMDE);
     setupImageAutocomplete(easyMDE);
+    // Expose for external integrations (e.g. global drop zone — issue #117)
+    window.easyMDE = easyMDE;
   }
 
   // --- Floating toolbar on text selection ---
@@ -1314,6 +1316,289 @@
       el.addEventListener('change', scheduleAutoSave);
     }
   });
+
+  // --- Global drop zone (issue #117) ---
+  // Smart routing: images -> uploadImages(), README.md -> editor content,
+  // license files -> upload + add link, everything else -> uploadFiles().
+  const ALLOWED_FILE_EXTS = new Set([
+    'py', 'cpp', 'h', 'ino', 'md', 'txt', 'pdf',
+    'stl', 'obj', 'gcode', '3mf', 'step', 'stp', 'dxf', 'dwg', 'svg',
+    'json', 'xml', 'yaml', 'yml', 'csv', 'toml',
+    'zip', 'tar', 'gz', '7z', 'rar',
+    'scad', 'kicad_pcb', 'kicad_sch', 'brd', 'sch',
+    'f3d', 'fcstd',
+  ]);
+  const IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']);
+
+  function getExt(name) {
+    const i = (name || '').lastIndexOf('.');
+    return i === -1 ? '' : name.substring(i + 1).toLowerCase();
+  }
+
+  function isImageFile(file) {
+    if (file.type && file.type.startsWith('image/')) return true;
+    return IMAGE_EXTS.has(getExt(file.name));
+  }
+
+  function isReadmeFile(file) {
+    return (file.name || '').toLowerCase() === 'readme.md';
+  }
+
+  function isLicenseFile(file) {
+    const n = (file.name || '').toLowerCase();
+    return n === 'license' || n === 'license.md' || n === 'license.txt'
+      || n === 'licence' || n === 'licence.md' || n === 'licence.txt';
+  }
+
+  function isAcceptedFile(file) {
+    if (isImageFile(file)) return true;
+    const ext = getExt(file.name);
+    if (ALLOWED_FILE_EXTS.has(ext)) return true;
+    // LICENSE without extension
+    const bare = (file.name || '').toLowerCase();
+    if (bare === 'license' || bare === 'licence') return true;
+    return false;
+  }
+
+  // Drop progress toast
+  const dropProgressEl = document.getElementById('drop-progress');
+  const dropProgressBody = dropProgressEl && dropProgressEl.querySelector('.drop-progress__body');
+  const dropProgressTitle = dropProgressEl && dropProgressEl.querySelector('.drop-progress__title');
+  const dropProgressClose = document.getElementById('drop-progress-close');
+  if (dropProgressClose) dropProgressClose.addEventListener('click', () => dropProgressEl.classList.add('d-none'));
+
+  function showProgress() {
+    if (!dropProgressEl) return;
+    dropProgressBody.innerHTML = '';
+    dropProgressTitle.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing files...';
+    dropProgressEl.classList.remove('d-none');
+  }
+  function addProgressLine(name, status) {
+    if (!dropProgressBody) return null;
+    const row = document.createElement('div');
+    row.className = 'drop-progress__row';
+    row.innerHTML = '<span class="drop-progress__name"></span><span class="drop-progress__status"></span>';
+    row.querySelector('.drop-progress__name').textContent = name;
+    row.querySelector('.drop-progress__status').innerHTML = status || '<i class="fas fa-spinner fa-spin"></i>';
+    dropProgressBody.appendChild(row);
+    return row;
+  }
+  function updateProgressLine(row, html) {
+    if (!row) return;
+    row.querySelector('.drop-progress__status').innerHTML = html;
+  }
+  function finishProgress(summary) {
+    if (!dropProgressEl) return;
+    dropProgressTitle.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> ' + summary;
+    setTimeout(() => { dropProgressEl.classList.add('d-none'); }, 4000);
+  }
+
+  // Upload a single file via the files API and return the response JSON.
+  async function uploadSingleFile(file) {
+    const form = new FormData();
+    form.append('file', file);
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', {
+      method: 'POST', credentials: 'include', body: form,
+    });
+    if (!resp.ok) {
+      let detail = 'upload failed';
+      try { const j = await resp.json(); detail = j.detail || detail; } catch (e) {}
+      throw new Error(detail);
+    }
+    return resp.json();
+  }
+
+  // Upload a single image via the images API.
+  async function uploadSingleImage(file) {
+    const form = new FormData();
+    form.append('file', file);
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', {
+      method: 'POST', credentials: 'include', body: form,
+    });
+    if (!resp.ok) {
+      let detail = 'upload failed';
+      try { const j = await resp.json(); detail = j.detail || detail; } catch (e) {}
+      throw new Error(detail);
+    }
+    return resp.json();
+  }
+
+  async function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+      r.readAsText(file);
+    });
+  }
+
+  async function handleReadmeDrop(file, row) {
+    const text = await readFileAsText(file);
+    const current = getEditorValue() || '';
+    if (current.trim().length > 50) {
+      if (!confirm('Replace existing editor content with ' + file.name + '? Current content is ' + current.length + ' characters.')) {
+        updateProgressLine(row, '<span class="text-muted">skipped</span>');
+        return false;
+      }
+    }
+    setEditorValue(text);
+    updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> loaded into editor</span>');
+    return true;
+  }
+
+  async function handleLicenseDrop(file, row) {
+    // Upload as a regular file, then add a link pointing to its download URL.
+    const uploaded = await uploadSingleFile(file);
+    try {
+      const downloadUrl = API + '/api/projects/' + currentProject.id + '/files/' + uploaded.id + '/download';
+      await apiFetch(API + '/api/projects/' + currentProject.id + '/links', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: 'License', url: downloadUrl, link_type: 'documentation' }),
+      });
+    } catch (e) { /* link add failed — file still uploaded */ }
+    updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> uploaded &amp; linked</span>');
+  }
+
+  async function processDroppedFiles(fileList) {
+    const files = Array.from(fileList || []);
+    if (files.length === 0) return;
+
+    // Ensure project exists before uploading.
+    if (!currentProject) {
+      await saveProject();
+      if (!currentProject) {
+        alert('Please add a title and save before dropping files.');
+        return;
+      }
+    }
+
+    showProgress();
+
+    // Filter unsupported files up-front with a warning row.
+    const accepted = [];
+    for (const f of files) {
+      if (!isAcceptedFile(f)) {
+        const r = addProgressLine(f.name, '<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> unsupported type</span>');
+        continue;
+      }
+      accepted.push(f);
+    }
+
+    let imageCount = 0;
+    let fileCount = 0;
+    let readmeCount = 0;
+    let licenseCount = 0;
+    let errorCount = 0;
+    let needsImageReload = false;
+    let needsFileReload = false;
+    let needsLinksReload = false;
+
+    for (const file of accepted) {
+      const row = addProgressLine(file.name, '<i class="fas fa-spinner fa-spin"></i>');
+      try {
+        if (isReadmeFile(file)) {
+          const ok = await handleReadmeDrop(file, row);
+          if (ok) readmeCount++;
+        } else if (isLicenseFile(file)) {
+          await handleLicenseDrop(file, row);
+          licenseCount++;
+          needsFileReload = true;
+          needsLinksReload = true;
+        } else if (isImageFile(file)) {
+          await uploadSingleImage(file);
+          updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery</span>');
+          imageCount++;
+          needsImageReload = true;
+        } else {
+          await uploadSingleFile(file);
+          updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> uploaded</span>');
+          fileCount++;
+          needsFileReload = true;
+        }
+      } catch (e) {
+        updateProgressLine(row, '<span class="text-danger"><i class="fas fa-times"></i> ' + (e.message || 'failed') + '</span>');
+        errorCount++;
+      }
+    }
+
+    if (needsImageReload) loadImages();
+    if (needsFileReload) loadFiles();
+    if (needsLinksReload) loadLinks();
+
+    scheduleAutoSave();
+
+    const parts = [];
+    if (imageCount) parts.push(imageCount + ' image' + (imageCount === 1 ? '' : 's'));
+    if (fileCount) parts.push(fileCount + ' file' + (fileCount === 1 ? '' : 's'));
+    if (readmeCount) parts.push('README');
+    if (licenseCount) parts.push('license');
+    let summary = parts.length ? 'Added ' + parts.join(', ') : 'Done';
+    if (errorCount) summary += ' (' + errorCount + ' failed)';
+    finishProgress(summary);
+  }
+
+  // Set up global drag overlay using a counter pattern.
+  (function setupGlobalDropzone() {
+    const overlay = document.getElementById('global-dropzone');
+    if (!overlay) return;
+    let dragDepth = 0;
+
+    function hasFiles(e) {
+      if (!e.dataTransfer) return false;
+      const types = e.dataTransfer.types;
+      if (!types) return false;
+      for (let i = 0; i < types.length; i++) {
+        if (types[i] === 'Files' || types[i] === 'application/x-moz-file') return true;
+      }
+      return false;
+    }
+
+    document.addEventListener('dragenter', (e) => {
+      if (!hasFiles(e)) return;
+      dragDepth++;
+      overlay.classList.remove('d-none');
+      overlay.classList.add('is-active');
+    });
+
+    document.addEventListener('dragover', (e) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    });
+
+    document.addEventListener('dragleave', (e) => {
+      if (!hasFiles(e)) return;
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) {
+        overlay.classList.add('d-none');
+        overlay.classList.remove('is-active');
+      }
+    });
+
+    document.addEventListener('drop', (e) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragDepth = 0;
+      overlay.classList.add('d-none');
+      overlay.classList.remove('is-active');
+      // Don't intercept drops on the sidebar dropzones — they handle their own files.
+      const target = e.target;
+      if (target && (target.closest('#file-dropzone') || target.closest('#image-dropzone'))) {
+        return;
+      }
+      const files = e.dataTransfer && e.dataTransfer.files;
+      if (files && files.length) processDroppedFiles(files);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !overlay.classList.contains('d-none')) {
+        dragDepth = 0;
+        overlay.classList.add('d-none');
+        overlay.classList.remove('is-active');
+      }
+    });
+  })();
 
   // --- Init ---
   async function init() {
