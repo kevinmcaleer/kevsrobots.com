@@ -440,25 +440,56 @@
   }
 
   function setupImageDrag(gallery) {
+    let dragEl = null;
     let dragId = null;
+
     gallery.querySelectorAll('[draggable="true"]').forEach(el => {
       el.addEventListener('dragstart', e => {
+        dragEl = el;
         dragId = el.dataset.imageId;
-        el.style.opacity = '0.4';
         e.dataTransfer.effectAllowed = 'move';
+        // Use the thumbnail as drag image, tilted via CSS
+        requestAnimationFrame(() => {
+          el.classList.add('dragging');
+        });
       });
+
       el.addEventListener('dragend', () => {
-        el.style.opacity = '';
-        gallery.querySelectorAll('.drag-over').forEach(d => d.classList.remove('drag-over'));
+        el.classList.remove('dragging');
+        gallery.querySelectorAll('.drag-over, .drag-shift-left, .drag-shift-right').forEach(d => {
+          d.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right');
+        });
+        dragEl = null;
       });
+
       el.addEventListener('dragover', e => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        el.querySelector('.image-thumb').classList.add('drag-over');
+        if (el === dragEl) return;
+        // Clear all shift classes first
+        gallery.querySelectorAll('.drag-over, .drag-shift-left, .drag-shift-right').forEach(d => {
+          if (d !== el) d.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right');
+        });
+        el.classList.add('drag-over');
+        // Shift siblings to show where the drop will land
+        const items = Array.from(gallery.querySelectorAll('[draggable="true"]'));
+        const fromIdx = items.indexOf(dragEl);
+        const toIdx = items.indexOf(el);
+        items.forEach((item, i) => {
+          if (item === dragEl) return;
+          item.classList.remove('drag-shift-left', 'drag-shift-right');
+          if (fromIdx < toIdx && i > fromIdx && i <= toIdx) {
+            item.classList.add('drag-shift-left');
+          } else if (fromIdx > toIdx && i >= toIdx && i < fromIdx) {
+            item.classList.add('drag-shift-right');
+          }
+        });
       });
+
       el.addEventListener('dragleave', () => {
-        el.querySelector('.image-thumb').classList.remove('drag-over');
+        el.classList.remove('drag-over');
       });
+
       el.addEventListener('drop', async e => {
         e.preventDefault();
         const dropId = el.dataset.imageId;
@@ -468,7 +499,6 @@
           if (fromIdx > -1 && toIdx > -1) {
             imageOrder.splice(fromIdx, 1);
             imageOrder.splice(toIdx, 0, parseInt(dragId));
-            // Update sort_order on server
             for (let i = 0; i < imageOrder.length; i++) {
               await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageOrder[i], {
                 method: 'PUT', credentials: 'include',

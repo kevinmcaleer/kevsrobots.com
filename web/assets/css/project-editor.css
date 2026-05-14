@@ -168,17 +168,36 @@
   border-radius: 0 6px 0 6px;
 }
 
-.image-thumb[draggable="true"] {
+/* Draggable images */
+#image-gallery [draggable="true"] {
   cursor: grab;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.image-thumb[draggable="true"]:active {
+#image-gallery [draggable="true"]:active {
   cursor: grabbing;
 }
 
-.image-thumb.drag-over {
+#image-gallery [draggable="true"].dragging {
+  opacity: 0.3;
+  transform: scale(0.9) rotate(3deg);
+}
+
+#image-gallery [draggable="true"].drag-over .image-thumb {
   outline: 2px dashed #4A90D9;
   outline-offset: -2px;
+  transform: scale(1.05);
+  transition: transform 0.15s ease;
+}
+
+#image-gallery [draggable="true"].drag-shift-left {
+  transform: translateX(-8px);
+  transition: transform 0.2s ease;
+}
+
+#image-gallery [draggable="true"].drag-shift-right {
+  transform: translateX(8px);
+  transition: transform 0.2s ease;
 }
 
 /* Journal entries */
