@@ -1082,7 +1082,15 @@
     imageDropzone.addEventListener(evt, e => { e.preventDefault(); imageDropzone.classList.remove('dragover'); });
   });
 
-  imageDropzone.addEventListener('drop', e => uploadImages(e.dataTransfer.files));
+  imageDropzone.addEventListener('drop', e => {
+    // Split mixed drops: images go to the gallery, non-images get routed by
+    // the smart processor (files / README / license) so .dxf etc. don't 400.
+    const all = Array.from(e.dataTransfer.files || []);
+    const images = all.filter(isImageFile);
+    const others = all.filter(f => !isImageFile(f));
+    if (images.length) uploadImages(images);
+    if (others.length) processDroppedFiles(others);
+  });
   imageInput.addEventListener('change', e => uploadImages(e.target.files));
 
   async function uploadImages(fileList) {
