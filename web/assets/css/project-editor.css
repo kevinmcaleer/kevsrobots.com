@@ -168,36 +168,31 @@
   border-radius: 0 6px 0 6px;
 }
 
-/* Draggable images */
-#image-gallery [draggable="true"] {
+/* Draggable images — custom mouse-based drag */
+#image-gallery [data-image-id] {
   cursor: grab;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  user-select: none;
 }
 
-#image-gallery [draggable="true"]:active {
-  cursor: grabbing;
+#image-gallery [data-image-id].dragging {
+  opacity: 0.15;
+  transform: scale(0.85);
 }
 
-#image-gallery [draggable="true"].dragging {
-  opacity: 0.3;
-  transform: scale(0.9) rotate(3deg);
-}
-
-#image-gallery [draggable="true"].drag-over .image-thumb {
+#image-gallery [data-image-id].drag-over .image-thumb {
   outline: 2px dashed #4A90D9;
   outline-offset: -2px;
-  transform: scale(1.05);
+  transform: scale(1.08);
   transition: transform 0.15s ease;
 }
 
-#image-gallery [draggable="true"].drag-shift-left {
-  transform: translateX(-8px);
-  transition: transform 0.2s ease;
+#image-gallery [data-image-id].drag-shift-left {
+  transform: translateX(-10px);
 }
 
-#image-gallery [draggable="true"].drag-shift-right {
-  transform: translateX(8px);
-  transition: transform 0.2s ease;
+#image-gallery [data-image-id].drag-shift-right {
+  transform: translateX(10px);
 }
 
 /* Journal entries */

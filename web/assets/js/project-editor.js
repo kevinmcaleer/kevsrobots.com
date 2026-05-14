@@ -442,58 +442,55 @@
   function setupImageDrag(gallery) {
     let dragEl = null;
     let dragId = null;
+    let ghostEl = null;
+    let offsetX = 0, offsetY = 0;
 
-    gallery.querySelectorAll('[draggable="true"]').forEach(el => {
-      el.addEventListener('dragstart', e => {
-        dragEl = el;
-        dragId = el.dataset.imageId;
-        e.dataTransfer.effectAllowed = 'move';
-        // Use the thumbnail as drag image, tilted via CSS
-        requestAnimationFrame(() => {
-          el.classList.add('dragging');
-        });
-      });
+    function getDropTarget(x, y) {
+      const items = gallery.querySelectorAll('[data-image-id]');
+      for (const item of items) {
+        if (item === dragEl) continue;
+        const r = item.getBoundingClientRect();
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return item;
+      }
+      return null;
+    }
 
-      el.addEventListener('dragend', () => {
-        el.classList.remove('dragging');
-        gallery.querySelectorAll('.drag-over, .drag-shift-left, .drag-shift-right').forEach(d => {
-          d.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right');
-        });
-        dragEl = null;
-      });
+    function onMouseMove(e) {
+      if (!ghostEl) return;
+      ghostEl.style.left = (e.clientX - offsetX) + 'px';
+      ghostEl.style.top = (e.clientY - offsetY) + 'px';
 
-      el.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        if (el === dragEl) return;
-        // Clear all shift classes first
-        gallery.querySelectorAll('.drag-over, .drag-shift-left, .drag-shift-right').forEach(d => {
-          if (d !== el) d.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right');
-        });
-        el.classList.add('drag-over');
-        // Shift siblings to show where the drop will land
-        const items = Array.from(gallery.querySelectorAll('[draggable="true"]'));
+      const target = getDropTarget(e.clientX, e.clientY);
+      const items = Array.from(gallery.querySelectorAll('[data-image-id]'));
+      items.forEach(item => item.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right'));
+
+      if (target) {
+        target.classList.add('drag-over');
         const fromIdx = items.indexOf(dragEl);
-        const toIdx = items.indexOf(el);
+        const toIdx = items.indexOf(target);
         items.forEach((item, i) => {
           if (item === dragEl) return;
-          item.classList.remove('drag-shift-left', 'drag-shift-right');
-          if (fromIdx < toIdx && i > fromIdx && i <= toIdx) {
-            item.classList.add('drag-shift-left');
-          } else if (fromIdx > toIdx && i >= toIdx && i < fromIdx) {
-            item.classList.add('drag-shift-right');
-          }
+          if (fromIdx < toIdx && i > fromIdx && i <= toIdx) item.classList.add('drag-shift-left');
+          else if (fromIdx > toIdx && i >= toIdx && i < fromIdx) item.classList.add('drag-shift-right');
         });
+      }
+    }
+
+    async function onMouseUp(e) {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+      if (!dragEl) return;
+
+      dragEl.classList.remove('dragging');
+      gallery.querySelectorAll('.drag-over, .drag-shift-left, .drag-shift-right').forEach(d => {
+        d.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right');
       });
 
-      el.addEventListener('dragleave', () => {
-        el.classList.remove('drag-over');
-      });
-
-      el.addEventListener('drop', async e => {
-        e.preventDefault();
-        const dropId = el.dataset.imageId;
-        if (dragId && dropId && dragId !== dropId) {
+      const target = getDropTarget(e.clientX, e.clientY);
+      if (target && dragId) {
+        const dropId = target.dataset.imageId;
+        if (dropId && dragId !== dropId) {
           const fromIdx = imageOrder.indexOf(parseInt(dragId));
           const toIdx = imageOrder.indexOf(parseInt(dropId));
           if (fromIdx > -1 && toIdx > -1) {
@@ -510,7 +507,41 @@
             loadImages();
           }
         }
-        dragId = null;
+      }
+      dragEl = null;
+      dragId = null;
+    }
+
+    gallery.querySelectorAll('[data-image-id]').forEach(el => {
+      el.setAttribute('draggable', 'false');
+      el.addEventListener('mousedown', e => {
+        if (e.target.closest('button')) return;
+        e.preventDefault();
+        dragEl = el;
+        dragId = el.dataset.imageId;
+
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+
+        // Create ghost
+        ghostEl = el.cloneNode(true);
+        ghostEl.style.position = 'fixed';
+        ghostEl.style.left = (e.clientX - offsetX) + 'px';
+        ghostEl.style.top = (e.clientY - offsetY) + 'px';
+        ghostEl.style.width = rect.width + 'px';
+        ghostEl.style.zIndex = '10000';
+        ghostEl.style.pointerEvents = 'none';
+        ghostEl.style.transform = 'rotate(4deg) scale(1.05)';
+        ghostEl.style.opacity = '0.9';
+        ghostEl.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
+        ghostEl.style.borderRadius = '6px';
+        ghostEl.style.transition = 'none';
+        document.body.appendChild(ghostEl);
+
+        el.classList.add('dragging');
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
       });
     });
   }
