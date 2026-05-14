@@ -24,8 +24,13 @@ description: View project details
 
   <div id="project-view" class="d-none">
     <div class="row">
-      <!-- LEFT: Main content -->
-      <div class="col-lg-8">
+      <!-- LEFT: Table of contents -->
+      <div class="col-lg-2 d-none d-lg-block">
+        <nav id="toc-nav" class="toc-nav sticky-top" style="top:80px"></nav>
+      </div>
+
+      <!-- MIDDLE: Main content -->
+      <div class="col-lg-7">
         <div class="d-flex align-items-center gap-3 mb-1">
           <h1 id="view-title" class="mb-0"></h1>
           <span id="like-container"></span>
@@ -91,7 +96,7 @@ description: View project details
       </div>
 
       <!-- RIGHT: Sidebar -->
-      <div class="col-lg-4">
+      <div class="col-lg-3">
         <div class="sticky-top" style="top:20px">
           <!-- Author & actions -->
           <div class="card mb-3">
@@ -148,6 +153,51 @@ description: View project details
     0% { transform: scale(1); }
     50% { transform: scale(1.25); }
     100% { transform: scale(1); }
+  }
+
+  /* Table of Contents */
+  .toc-nav {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .toc-nav .toc-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .toc-nav a {
+    display: block;
+    padding: 4px 8px;
+    color: #6c757d;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .toc-nav a:hover {
+    color: #4A90D9;
+  }
+  .toc-nav a.active {
+    color: #4A90D9;
+    border-left-color: #4A90D9;
+    background: #f0f7ff;
+  }
+  .toc-nav a.toc-h2 { padding-left: 16px; }
+  .toc-nav a.toc-h3 { padding-left: 24px; font-size: 0.82rem; }
+  .toc-nav a.toc-h4 { padding-left: 32px; font-size: 0.78rem; }
+  .toc-nav a.toc-h5,
+  .toc-nav a.toc-h6 { padding-left: 40px; font-size: 0.75rem; }
+
+  /* Mermaid in view */
+  #view-content .mermaid {
+    text-align: center;
+    margin: 1.5rem 0;
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -243,6 +293,8 @@ description: View project details
       // Content
       if (project.content_md) {
         document.getElementById('view-content').innerHTML = marked.parse(project.content_md);
+        await renderMermaid();
+        buildTOC();
       }
 
       // Repo link
@@ -469,6 +521,82 @@ description: View project details
 
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-download me-2"></i> Download Project';
+  }
+
+  let mermaidLoaded = null;
+  async function renderMermaid() {
+    const blocks = document.querySelectorAll('#view-content pre code.language-mermaid');
+    if (blocks.length === 0) return;
+    if (!mermaidLoaded) {
+      mermaidLoaded = import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs').then(m => {
+        m.default.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+        return m.default;
+      });
+    }
+    const mermaid = await mermaidLoaded;
+    blocks.forEach((code, i) => {
+      const pre = code.parentElement;
+      const div = document.createElement('div');
+      div.className = 'mermaid';
+      div.id = 'mermaid-view-' + i + '-' + Date.now();
+      div.textContent = code.textContent;
+      pre.replaceWith(div);
+    });
+    try {
+      await mermaid.run({ querySelector: '#view-content .mermaid' });
+    } catch (e) { console.warn('Mermaid render error:', e); }
+  }
+
+  function slugify(text) {
+    return (text || '').toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function buildTOC() {
+    const nav = document.getElementById('toc-nav');
+    if (!nav) return;
+    const headings = document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3, #view-content h4');
+    if (headings.length < 2) { nav.innerHTML = ''; return; }
+    const used = {};
+    const links = [];
+    headings.forEach(h => {
+      let id = h.id || slugify(h.textContent);
+      if (!id) return;
+      if (used[id]) { used[id]++; id = id + '-' + used[id]; } else { used[id] = 1; }
+      h.id = id;
+      const level = h.tagName.toLowerCase();
+      links.push(`<a href="#${id}" class="toc-${level}" data-toc-target="${id}">${esc(h.textContent)}</a>`);
+    });
+    nav.innerHTML = '<div class="toc-title">On this page</div>' + links.join('');
+
+    nav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.getElementById(a.dataset.tocTarget);
+        if (target) {
+          window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+          history.replaceState(null, '', '#' + a.dataset.tocTarget);
+        }
+      });
+    });
+
+    // Scroll-spy
+    const linkMap = {};
+    nav.querySelectorAll('a').forEach(a => { linkMap[a.dataset.tocTarget] = a; });
+    let activeId = null;
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (activeId && linkMap[activeId]) linkMap[activeId].classList.remove('active');
+          activeId = entry.target.id;
+          if (linkMap[activeId]) linkMap[activeId].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+    headings.forEach(h => observer.observe(h));
   }
 
   loadProject();

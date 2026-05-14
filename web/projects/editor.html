@@ -33,6 +33,55 @@ description: Create or edit a project
   <div class="drop-progress__body"></div>
 </div>
 
+<style>
+  /* Table of Contents — mirrors view.html */
+  .toc-nav {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .toc-nav .toc-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .toc-nav .toc-empty {
+    color: #bbb;
+    font-size: 0.8rem;
+    font-style: italic;
+    padding: 4px 8px;
+  }
+  .toc-nav a {
+    display: block;
+    padding: 4px 8px;
+    color: #6c757d;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .toc-nav a:hover { color: #4A90D9; }
+  .toc-nav a.active {
+    color: #4A90D9;
+    border-left-color: #4A90D9;
+    background: #f0f7ff;
+  }
+  .toc-nav a.toc-h2 { padding-left: 16px; }
+  .toc-nav a.toc-h3 { padding-left: 24px; font-size: 0.82rem; }
+  .toc-nav a.toc-h4 { padding-left: 32px; font-size: 0.78rem; }
+  .toc-nav a.toc-h5,
+  .toc-nav a.toc-h6 { padding-left: 40px; font-size: 0.75rem; }
+</style>
+
 <div class="container-fluid py-3">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
@@ -50,8 +99,13 @@ description: Create or edit a project
   </div>
 
   <div id="editor-container" class="row d-none">
-    <!-- LEFT PANEL: Main Content -->
-    <div class="col-lg-8">
+    <!-- LEFT: Table of contents (mirrors view.html) -->
+    <div class="col-lg-2 d-none d-lg-block">
+      <nav id="editor-toc-nav" class="toc-nav sticky-top" style="top:80px"></nav>
+    </div>
+
+    <!-- MIDDLE: Main Content -->
+    <div class="col-lg-7">
       <!-- Title & Description -->
       <div class="mb-3">
         <input type="text" id="project-title" class="form-control form-control-lg border-0 fw-bold"
@@ -135,7 +189,7 @@ description: Create or edit a project
     </div>
 
     <!-- RIGHT SIDEBAR: Metadata -->
-    <div class="col-lg-4">
+    <div class="col-lg-3">
       <div class="sticky-top" style="top: 20px;">
         <div class="card mb-3">
           <div class="card-header py-2">Metadata</div>
@@ -209,7 +263,6 @@ description: Create or edit a project
 
         <!-- Action buttons -->
         <div class="d-grid gap-2">
-          <button class="btn btn-primary" id="save-btn"><i class="fas fa-save me-1"></i> Save</button>
           <a href="#" id="view-live-btn" class="btn btn-outline-primary" style="display:none" target="_blank"><i class="fas fa-external-link-alt me-1"></i> View Project</a>
           <button class="btn btn-outline-danger btn-sm mt-2" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete Project</button>
         </div>
@@ -225,3 +278,89 @@ description: Create or edit a project
 <script src="/assets/js/circuit-components.js"></script>
 <script src="/assets/js/circuit-editor.js"></script>
 <script src="/assets/js/project-editor.js"></script>
+<script>
+// Editor TOC — live-updates from markdown source as the user types
+(function() {
+  const nav = document.getElementById('editor-toc-nav');
+  if (!nav) return;
+
+  function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+
+  function parseHeadings(md) {
+    const lines = (md || '').split('\n');
+    const headings = [];
+    let inFence = false;
+    let fenceMarker = '';
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const fenceMatch = line.match(/^(```+|~~~+)/);
+      if (fenceMatch) {
+        if (!inFence) { inFence = true; fenceMarker = fenceMatch[1][0]; }
+        else if (line.startsWith(fenceMarker.repeat(3))) { inFence = false; }
+        continue;
+      }
+      if (inFence) continue;
+      const m = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+      if (m) headings.push({ level: m[1].length, text: m[2].trim(), line: i });
+    }
+    return headings;
+  }
+
+  function render() {
+    const editor = window.easyMDE || null;
+    const md = editor ? editor.value() : (document.getElementById('content-editor')?.value || '');
+    const headings = parseHeadings(md);
+    if (headings.length === 0) {
+      nav.innerHTML = '<div class="toc-title">On this page</div><div class="toc-empty">Add headings (#, ##) to build a table of contents</div>';
+      return;
+    }
+    const links = headings.map((h, idx) =>
+      `<a class="toc-h${h.level}" data-line="${h.line}" data-idx="${idx}">${esc(h.text)}</a>`
+    ).join('');
+    nav.innerHTML = '<div class="toc-title">On this page</div>' + links;
+
+    nav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const line = parseInt(a.dataset.line, 10);
+        if (window.easyMDE && window.easyMDE.codemirror) {
+          const cm = window.easyMDE.codemirror;
+          cm.focus();
+          cm.setCursor({ line: line, ch: 0 });
+          // Scroll heading to top of editor viewport
+          const coords = cm.charCoords({ line: line, ch: 0 }, 'local');
+          cm.scrollTo(null, coords.top - 20);
+          // Highlight in TOC
+          nav.querySelectorAll('a').forEach(x => x.classList.remove('active'));
+          a.classList.add('active');
+        }
+      });
+    });
+  }
+
+  // Hook in once EasyMDE is initialised (project-editor.js exposes it on window if available;
+  // otherwise we poll briefly to grab the instance from the DOM).
+  function attach() {
+    // project-editor.js keeps the instance in a closure — find it via the CodeMirror element
+    const cmEl = document.querySelector('.EasyMDEContainer .CodeMirror');
+    if (!cmEl || !cmEl.CodeMirror) {
+      setTimeout(attach, 200);
+      return;
+    }
+    const cm = cmEl.CodeMirror;
+    // Expose for click handler
+    if (!window.easyMDE) {
+      // Reconstruct a minimal interface from CodeMirror for navigation
+      window.easyMDE = { value: () => cm.getValue(), codemirror: cm };
+    }
+    cm.on('change', () => {
+      clearTimeout(render._t);
+      render._t = setTimeout(render, 150);
+    });
+    render();
+  }
+
+  document.addEventListener('DOMContentLoaded', attach);
+  if (document.readyState !== 'loading') attach();
+})();
+</script>

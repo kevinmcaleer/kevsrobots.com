@@ -150,8 +150,7 @@
     autoSaveTimer = setTimeout(saveProject, 3000);
   }
 
-  // --- Save / Status / Delete ---
-  document.getElementById('save-btn').addEventListener('click', saveProject);
+  // --- Save / Status / Delete --- (autosave only; no manual save button)
 
   const statusSelect = document.getElementById('project-status');
   if (statusSelect) statusSelect.addEventListener('change', async () => {
