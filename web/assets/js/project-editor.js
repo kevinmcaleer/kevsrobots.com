@@ -275,7 +275,22 @@
           title: 'Insert diagram',
         },
         '|',
-        'preview',
+        {
+          name: 'preview',
+          action: function(editor) {
+            // Close side-by-side first
+            var container = editor.codemirror.getWrapperElement().closest('.EasyMDEContainer');
+            var sbsPreview = container.querySelector('.editor-preview-side-custom');
+            if (sbsPreview) {
+              sbsPreview.remove();
+              container.classList.remove('sided--no-fullscreen');
+              editor.codemirror.refresh();
+            }
+            EasyMDE.togglePreview(editor);
+          },
+          className: 'fa fa-eye no-disable',
+          title: 'Toggle preview',
+        },
         {
           name: 'side-by-side',
           action: function(editor) {
@@ -283,6 +298,12 @@
             var wrap = cm.getWrapperElement();
             var container = wrap.closest('.EasyMDEContainer');
             var existingPreview = container.querySelector('.editor-preview-side-custom');
+
+            // Close regular preview if it's open
+            var regularPreview = container.querySelector('.editor-preview-active');
+            if (regularPreview) {
+              EasyMDE.togglePreview(editor);
+            }
 
             if (existingPreview) {
               existingPreview.remove();
