@@ -29,24 +29,8 @@
     || location.hostname === '0.0.0.0'
     || location.hostname === 'local.kevsrobots.com';
 
-  // In local dev, use a token from localStorage since secure cookies
-  // don't work over HTTP.
-  function getDevToken() {
-    return localStorage.getItem('dev_jwt_token');
-  }
-
-  function apiFetch(url, opts = {}) {
-    opts.credentials = 'include';
-    const token = getDevToken();
-    if (token) {
-      opts.headers = opts.headers || {};
-      if (opts.headers instanceof Headers) {
-        opts.headers.set('Authorization', 'Bearer ' + token);
-      } else {
-        opts.headers['Authorization'] = 'Bearer ' + token;
-      }
-    }
-    return fetch(url, opts);
+  function apiFetch(url, opts) {
+    return ProjectAuth.apiFetch(url, opts || {});
   }
 
   async function checkAuth() {

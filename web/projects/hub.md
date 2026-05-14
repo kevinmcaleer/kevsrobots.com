@@ -72,6 +72,7 @@ thanks: false
 </div>
 
 <script src="/assets/js/project-gradient.js"></script>
+<script src="/assets/js/project-auth.js"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -97,7 +98,7 @@ thanks: false
 
   async function checkAuth() {
     try {
-      const resp = await fetch(API + '/api/projects/my/list', { credentials: 'include' });
+      const resp = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
       if (resp.ok) {
         document.getElementById('my-projects-btn').classList.remove('d-none');
         const myProjects = await resp.json();
