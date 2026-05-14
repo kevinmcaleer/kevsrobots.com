@@ -616,6 +616,12 @@ description: View project details
       });
     }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
     headings.forEach(h => observer.observe(h));
+    // Also observe extra sections (Files & Downloads, etc.) so the scroll-spy
+    // updates the active highlight when the user scrolls or clicks them.
+    extras.forEach(ex => {
+      const el = document.getElementById(ex.id);
+      if (el && !el.classList.contains('d-none')) observer.observe(el);
+    });
   }
 
   loadProject();
