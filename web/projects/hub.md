@@ -22,9 +22,9 @@ thanks: false
       <div class="d-flex justify-content-between align-items-center">
         <h4 class="mb-0">Browse Projects</h4>
         <div>
-          <a href="/projects/my-projects.html" id="my-projects-btn" class="btn btn-outline-primary me-2 d-none">
+          <button id="my-projects-btn" class="btn btn-outline-primary me-2 d-none" onclick="toggleMyProjects()">
             <i class="fas fa-folder"></i> My Projects
-          </a>
+          </button>
           <a href="/projects/editor.html" class="btn btn-primary">
             <i class="fas fa-plus-circle"></i> Create New Project
           </a>
@@ -95,6 +95,7 @@ thanks: false
   };
 
   let myProjectIds = new Set();
+  let showingMine = false;
 
   async function checkAuth() {
     try {
@@ -106,6 +107,19 @@ thanks: false
       }
     } catch (e) {}
   }
+
+  window.toggleMyProjects = function() {
+    showingMine = !showingMine;
+    const btn = document.getElementById('my-projects-btn');
+    if (showingMine) {
+      btn.classList.remove('btn-outline-primary');
+      btn.classList.add('btn-primary');
+    } else {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-outline-primary');
+    }
+    loadProjects();
+  };
 
   async function loadProjects() {
     spinner.classList.remove('d-none');
@@ -120,8 +134,12 @@ thanks: false
     try {
       const resp = await fetch(API + '/api/projects?' + params.toString());
       if (!resp.ok) throw new Error('API error');
-      const projects = await resp.json();
+      let projects = await resp.json();
       spinner.classList.add('d-none');
+
+      if (showingMine) {
+        projects = projects.filter(p => myProjectIds.has(p.id));
+      }
 
       if (projects.length === 0) {
         noProjects.classList.remove('d-none');
