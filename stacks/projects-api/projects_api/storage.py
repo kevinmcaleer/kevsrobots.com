@@ -90,27 +90,23 @@ def _local_path(project_id: int, file_type: str) -> Path:
 
 
 def save_file(content: bytes, filename: str, project_id: int, file_type: str) -> Optional[str]:
-    """Save file to NAS or local. Returns the storage path or None on failure."""
+    """Save file to NAS. Returns the storage path or None on failure."""
 
-    if _check_nas():
-        if _save_to_nas(content, filename, project_id, file_type):
-            return f"nas:projects/{file_type}/{project_id}/{filename}"
+    if not _check_nas():
+        logger.error("NAS is not available — cannot save file")
+        return None
 
-    if _save_to_local(content, filename, project_id, file_type):
-        return f"local:projects/{file_type}/{project_id}/{filename}"
+    if _save_to_nas(content, filename, project_id, file_type):
+        return f"nas:projects/{file_type}/{project_id}/{filename}"
 
     return None
 
 
 def read_file(file_path: str) -> Optional[bytes]:
-    """Read file from storage path."""
+    """Read file from NAS storage."""
 
     if file_path.startswith("nas:"):
         return _read_from_nas(file_path[4:])
-    elif file_path.startswith("local:"):
-        local = LOCAL_STORAGE_PATH / file_path[6:]
-        if local.exists():
-            return local.read_bytes()
     return None
 
 
