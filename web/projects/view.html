@@ -64,9 +64,12 @@ description: View project details
           <!-- Author & actions -->
           <div class="card mb-3">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="mb-3">
                 <span class="text-muted">by <strong id="view-author"></strong></span>
-                <span id="view-date" class="text-muted small"></span>
+                <div class="small text-muted mt-1">
+                  <i class="fas fa-calendar-plus me-1"></i> Created <span id="view-created"></span><br>
+                  <i class="fas fa-clock me-1"></i> Updated <span id="view-updated"></span>
+                </div>
               </div>
               <div id="view-repo" class="mb-3 d-none">
                 <a id="view-repo-link" href="#" target="_blank" class="btn btn-sm btn-outline-dark w-100">
@@ -136,7 +139,8 @@ description: View project details
       document.getElementById('view-title').textContent = project.title;
       document.getElementById('view-description').textContent = project.short_description || '';
       document.getElementById('view-author').textContent = project.author_username;
-      document.getElementById('view-date').textContent = new Date(project.created_at).toLocaleDateString();
+      document.getElementById('view-created').textContent = new Date(project.created_at).toLocaleDateString();
+      document.getElementById('view-updated').textContent = new Date(project.updated_at).toLocaleDateString();
 
       // Badges
       const badges = document.getElementById('view-meta-badges');
