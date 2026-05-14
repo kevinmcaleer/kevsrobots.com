@@ -54,29 +54,50 @@
 }
 
 .EasyMDEContainer.sided--no-fullscreen .CodeMirror {
-  position: relative !important;
   width: 50% !important;
-  height: auto !important;
-  top: auto !important;
-  bottom: auto !important;
-  left: auto !important;
   border-right: 1px solid #dee2e6;
   border-radius: 0 0 0 8px;
-  min-height: 350px;
 }
 
-.EasyMDEContainer.sided--no-fullscreen .editor-preview-side {
-  position: relative !important;
-  width: 50% !important;
-  height: auto !important;
-  top: auto !important;
-  left: auto !important;
-  display: block !important;
+.editor-preview-side-custom {
+  width: 50%;
   min-height: 350px;
   padding: 12px;
   overflow-y: auto;
-  border-radius: 0 0 8px 0;
   background: #f8f9fa;
+  border-radius: 0 0 8px 0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.editor-preview-side-custom img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.editor-preview-side-custom pre {
+  background: white;
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.editor-preview-side-custom h1,
+.editor-preview-side-custom h2,
+.editor-preview-side-custom h3 {
+  margin-top: 0.5rem;
+}
+
+/* Fullscreen — push below site's fixed header */
+.CodeMirror-fullscreen,
+.editor-preview-active {
+  top: 60px !important;
+  z-index: 1000 !important;
+}
+
+.editor-toolbar.fullscreen {
+  top: 60px !important;
+  z-index: 1001 !important;
 }
 
 /* Hide sidebar when EasyMDE is fullscreen */

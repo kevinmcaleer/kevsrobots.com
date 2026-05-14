@@ -279,24 +279,28 @@
         {
           name: 'side-by-side',
           action: function(editor) {
-            // Use EasyMDE's built-in toggle
-            EasyMDE.toggleSideBySide(editor);
-            // Then undo the fullscreen it forces
             var cm = editor.codemirror;
             var wrap = cm.getWrapperElement();
             var container = wrap.closest('.EasyMDEContainer');
-            requestAnimationFrame(function() {
-              cm.setOption('fullScreen', false);
-              container.classList.remove('CodeMirror-fullscreen');
-              document.body.classList.remove('CodeMirror-fullscreen');
-              // Add our inline side-by-side class if preview is active
-              var preview = container.querySelector('.editor-preview-side');
-              if (preview && preview.classList.contains('editor-preview-active-side')) {
-                container.classList.add('sided--no-fullscreen');
-              } else {
-                container.classList.remove('sided--no-fullscreen');
-              }
-            });
+            var existingPreview = container.querySelector('.editor-preview-side-custom');
+
+            if (existingPreview) {
+              existingPreview.remove();
+              container.classList.remove('sided--no-fullscreen');
+              return;
+            }
+
+            // Create our own preview pane
+            var preview = document.createElement('div');
+            preview.className = 'editor-preview-side-custom';
+            container.appendChild(preview);
+            container.classList.add('sided--no-fullscreen');
+
+            function updatePreview() {
+              preview.innerHTML = editor.markdown(editor.value());
+            }
+            updatePreview();
+            cm.on('change', updatePreview);
           },
           className: 'fas fa-columns no-disable',
           title: 'Side-by-side preview',
