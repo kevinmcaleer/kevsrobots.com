@@ -156,7 +156,8 @@
 
 /* Fullscreen — push below site's fixed header */
 .CodeMirror-fullscreen,
-.editor-preview-active {
+.CodeMirror-fullscreen ~ .editor-preview-active,
+.CodeMirror-fullscreen ~ .editor-preview-side {
   top: 60px !important;
   z-index: 1000 !important;
 }

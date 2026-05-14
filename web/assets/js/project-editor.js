@@ -297,8 +297,32 @@
             container.appendChild(preview);
             container.classList.add('sided--no-fullscreen');
 
+            let mermaidLib = null;
+            async function renderMermaid() {
+              const blocks = preview.querySelectorAll('pre code.language-mermaid');
+              if (blocks.length === 0) return;
+              try {
+                if (!mermaidLib) {
+                  const mod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
+                  mermaidLib = mod.default;
+                  mermaidLib.initialize({ startOnLoad: false });
+                }
+                blocks.forEach((block, i) => {
+                  const div = document.createElement('div');
+                  div.className = 'mermaid';
+                  div.id = 'mermaid-' + Date.now() + '-' + i;
+                  div.textContent = block.textContent;
+                  block.parentElement.replaceWith(div);
+                });
+                await mermaidLib.run({ querySelector: '.editor-preview-side-custom .mermaid' });
+              } catch (e) { /* mermaid not available */ }
+            }
+
+            let renderTimer = null;
             function updatePreview() {
               preview.innerHTML = editor.markdown(editor.value());
+              clearTimeout(renderTimer);
+              renderTimer = setTimeout(renderMermaid, 200);
             }
             updatePreview();
             cm.on('change', updatePreview);
