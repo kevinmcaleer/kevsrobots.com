@@ -166,38 +166,22 @@
     autoSaveTimer = setTimeout(saveProject, 3000);
   }
 
-  // --- Publish / Delete ---
+  // --- Save / Status / Delete ---
   document.getElementById('save-btn').addEventListener('click', saveProject);
 
-  document.getElementById('publish-btn').addEventListener('click', async () => {
-    if (!currentProject) await saveProject();
-    if (!currentProject) return;
+  const statusSelect = document.getElementById('project-status');
+  statusSelect.addEventListener('change', async () => {
+    if (!currentProject) { await saveProject(); if (!currentProject) return; }
     try {
       const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
         method: 'PUT', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'published' }),
+        body: JSON.stringify({ status: statusSelect.value }),
       });
       if (resp.ok) {
         currentProject = await resp.json();
-        updateStatusBadge('published');
-        showSaveStatus('saved', 'Published!');
-      }
-    } catch (e) { console.error(e); }
-  });
-
-  document.getElementById('unpublish-btn').addEventListener('click', async () => {
-    if (!currentProject) return;
-    try {
-      const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'draft' }),
-      });
-      if (resp.ok) {
-        currentProject = await resp.json();
-        updateStatusBadge('draft');
-        showSaveStatus('saved', 'Reverted to draft');
+        updateStatusBadge(currentProject.status);
+        showSaveStatus('saved', 'Status updated');
       }
     } catch (e) { console.error(e); }
   });
@@ -213,23 +197,17 @@
     } catch (e) { console.error(e); }
   });
 
+  const statusLabels = { wip: 'Work in Progress', completed: 'Completed', archived: 'Archived' };
+  const statusColors = { wip: 'bg-info', completed: 'bg-success', archived: 'bg-secondary' };
+
   function updateStatusBadge(status) {
-    statusBadge.textContent = status === 'published' ? 'Published' : 'Draft';
-    statusBadge.className = 'badge ' + (status === 'published' ? 'bg-success' : 'bg-secondary');
-    const publishBtn = document.getElementById('publish-btn');
-    const unpublishBtn = document.getElementById('unpublish-btn');
+    statusBadge.textContent = statusLabels[status] || status;
+    statusBadge.className = 'badge ' + (statusColors[status] || 'bg-secondary');
+    statusSelect.value = status;
     const viewLiveBtn = document.getElementById('view-live-btn');
-    if (status === 'published') {
-      publishBtn.style.display = 'none';
-      unpublishBtn.style.display = '';
-      if (currentProject) {
-        viewLiveBtn.style.display = '';
-        viewLiveBtn.href = '/projects/view.html?id=' + currentProject.id;
-      }
-    } else {
-      publishBtn.style.display = '';
-      unpublishBtn.style.display = 'none';
-      viewLiveBtn.style.display = 'none';
+    if (currentProject) {
+      viewLiveBtn.style.display = '';
+      viewLiveBtn.href = '/projects/view.html?id=' + currentProject.id;
     }
   }
 

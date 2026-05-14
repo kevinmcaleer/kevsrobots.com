@@ -33,7 +33,7 @@ class Project(Base):
     difficulty: Mapped[Optional[str]] = mapped_column(String(20))
     estimated_minutes: Mapped[Optional[int]] = mapped_column(Integer)
     code_repo_url: Mapped[Optional[str]] = mapped_column(Text)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="wip")
     author_username: Mapped[str] = mapped_column(String(100), nullable=False)
     cover_image: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(

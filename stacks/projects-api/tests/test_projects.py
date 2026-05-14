@@ -23,7 +23,7 @@ async def test_create_project(client) -> None:
     assert response.status_code == 201
     body = response.json()
     assert body["title"] == "My Test Robot"
-    assert body["status"] == "draft"
+    assert body["status"] == "wip"
     assert body["author_username"] == "testuser"
 
 
@@ -37,43 +37,56 @@ async def test_create_project_unauthenticated(client) -> None:
 
 
 @pytest.mark.asyncio
-async def test_list_projects_empty(client) -> None:
-    response = await client.get("/api/projects")
-    assert response.status_code == 200
-    assert response.json() == []
-
-
-@pytest.mark.asyncio
-async def test_list_projects_published_only(client) -> None:
+async def test_list_projects_shows_wip(client) -> None:
     headers = make_auth_header()
     await client.post(
         "/api/projects",
-        json={"title": "Draft Project"},
+        json={"title": "WIP Project"},
         headers=headers,
     )
     response = await client.get("/api/projects")
-    assert len(response.json()) == 0  # drafts not visible
+    assert len(response.json()) == 1  # WIP projects are public
 
 
 @pytest.mark.asyncio
-async def test_publish_and_list(client) -> None:
+async def test_archived_not_listed(client) -> None:
     headers = make_auth_header()
     create = await client.post(
         "/api/projects",
-        json={"title": "Published Project", "tags": ["robotics", "python"]},
+        json={"title": "Archive Me"},
         headers=headers,
     )
     pid = create.json()["id"]
     await client.put(
         f"/api/projects/{pid}",
-        json={"status": "published"},
+        json={"status": "archived"},
+        headers=headers,
+    )
+    response = await client.get("/api/projects")
+    ids = [p["id"] for p in response.json()]
+    assert pid not in ids
+
+
+@pytest.mark.asyncio
+async def test_complete_and_list(client) -> None:
+    headers = make_auth_header()
+    create = await client.post(
+        "/api/projects",
+        json={"title": "Completed Project", "tags": ["robotics", "python"]},
+        headers=headers,
+    )
+    pid = create.json()["id"]
+    await client.put(
+        f"/api/projects/{pid}",
+        json={"status": "completed"},
         headers=headers,
     )
     response = await client.get("/api/projects")
     items = response.json()
-    assert len(items) == 1
-    assert items[0]["title"] == "Published Project"
-    assert "robotics" in items[0]["tags"]
+    assert any(p["title"] == "Completed Project" for p in items)
+    completed = [p for p in items if p["id"] == pid][0]
+    assert completed["status"] == "completed"
+    assert "robotics" in completed["tags"]
 
 
 @pytest.mark.asyncio
@@ -85,23 +98,23 @@ async def test_get_project(client) -> None:
         headers=headers,
     )
     pid = create.json()["id"]
-    await client.put(f"/api/projects/{pid}", json={"status": "published"}, headers=headers)
     response = await client.get(f"/api/projects/{pid}")
     assert response.status_code == 200
     assert response.json()["title"] == "Detail Test Project"
 
 
 @pytest.mark.asyncio
-async def test_draft_not_visible_to_others(client) -> None:
+async def test_wip_visible_to_everyone(client) -> None:
     headers = make_auth_header()
     create = await client.post(
         "/api/projects",
-        json={"title": "Secret Draft"},
+        json={"title": "Public WIP"},
         headers=headers,
     )
     pid = create.json()["id"]
+    # Access without auth
     response = await client.get(f"/api/projects/{pid}")
-    assert response.status_code == 404
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio

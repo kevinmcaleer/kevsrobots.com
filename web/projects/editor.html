@@ -193,12 +193,22 @@ Describe what this project is about...
           </div>
         </div>
 
+        <!-- Status -->
+        <div class="card mb-3">
+          <div class="card-header py-2">Project Status</div>
+          <div class="card-body">
+            <select id="project-status" class="form-select form-select-sm">
+              <option value="wip">🔨 Work in Progress</option>
+              <option value="completed">✅ Completed</option>
+              <option value="archived">📦 Archived (hidden from listing)</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Action buttons -->
         <div class="d-grid gap-2">
           <button class="btn btn-primary" id="save-btn"><i class="fas fa-save me-1"></i> Save</button>
-          <button class="btn btn-success" id="publish-btn"><i class="fas fa-rocket me-1"></i> Publish</button>
-          <button class="btn btn-warning" id="unpublish-btn" style="display:none"><i class="fas fa-eye-slash me-1"></i> Revert to Draft</button>
-          <a href="#" id="view-live-btn" class="btn btn-outline-primary" style="display:none" target="_blank"><i class="fas fa-external-link-alt me-1"></i> View Live</a>
+          <a href="#" id="view-live-btn" class="btn btn-outline-primary" style="display:none" target="_blank"><i class="fas fa-external-link-alt me-1"></i> View Project</a>
           <button class="btn btn-outline-danger btn-sm mt-2" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete Project</button>
         </div>
       </div>

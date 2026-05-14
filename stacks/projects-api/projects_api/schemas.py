@@ -25,7 +25,7 @@ class ProjectUpdate(BaseModel):
     difficulty: Optional[str] = Field(None, pattern="^(beginner|intermediate|advanced)$")
     estimated_minutes: Optional[int] = Field(None, ge=1)
     code_repo_url: Optional[str] = None
-    status: Optional[str] = Field(None, pattern="^(draft|published)$")
+    status: Optional[str] = Field(None, pattern="^(wip|completed|archived)$")
     tags: Optional[list[str]] = None
 
 

@@ -68,7 +68,7 @@ async def list_projects(
     user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> list[ProjectListItem]:
-    query = select(Project).where(Project.status == "published")
+    query = select(Project).where(Project.status != "archived")
     if difficulty:
         query = query.where(Project.difficulty == difficulty)
     if search:
@@ -119,8 +119,6 @@ async def get_project(
     project = await session.get(Project, project_id)
     if project is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
-    if project.status == "draft" and project.author_username != user:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
     return await _project_response(session, project)
 
 
@@ -137,7 +135,7 @@ async def create_project(
         difficulty=body.difficulty,
         estimated_minutes=body.estimated_minutes,
         code_repo_url=body.code_repo_url,
-        status="draft",
+        status="wip",
         author_username=user,
     )
     session.add(project)
