@@ -264,14 +264,14 @@
         {
           name: 'insert-image',
           action: function(editor) { showImagePicker(editor); },
-          className: 'fa fa-image',
+          className: 'fas fa-image no-disable',
           title: 'Insert uploaded image',
         },
         'table', '|',
         {
           name: 'diagram',
           action: function(editor) { showDiagramMenu(editor); },
-          className: 'fa fa-project-diagram',
+          className: 'fas fa-project-diagram no-disable',
           title: 'Insert diagram',
         },
         '|',
