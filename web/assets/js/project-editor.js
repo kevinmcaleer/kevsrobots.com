@@ -311,6 +311,205 @@
     });
 
     easyMDE.codemirror.on('change', scheduleAutoSave);
+    setupFloatingToolbar(easyMDE);
+    setupImageAutocomplete(easyMDE);
+  }
+
+  // --- Floating toolbar on text selection ---
+  function setupFloatingToolbar(editor) {
+    const cm = editor.codemirror;
+    let toolbar = document.createElement('div');
+    toolbar.className = 'mini-toolbar';
+    toolbar.style.display = 'none';
+    toolbar.innerHTML = `
+      <button data-fmt="bold" title="Bold"><i class="fas fa-bold"></i></button>
+      <button data-fmt="italic" title="Italic"><i class="fas fa-italic"></i></button>
+      <button data-fmt="heading" title="Heading"><i class="fas fa-heading"></i></button>
+      <button data-fmt="quote" title="Quote"><i class="fas fa-quote-right"></i></button>
+      <button data-fmt="ul" title="Bullet list"><i class="fas fa-list-ul"></i></button>
+      <button data-fmt="ol" title="Numbered list"><i class="fas fa-list-ol"></i></button>
+      <button data-fmt="code" title="Code"><i class="fas fa-code"></i></button>
+      <button data-fmt="link" title="Link"><i class="fas fa-link"></i></button>
+    `;
+    document.body.appendChild(toolbar);
+
+    function applyFormat(fmt) {
+      const sel = cm.getSelection();
+      let wrap, prefix;
+      switch (fmt) {
+        case 'bold': wrap = '**'; break;
+        case 'italic': wrap = '*'; break;
+        case 'code': wrap = '`'; break;
+        case 'heading': prefix = '## '; break;
+        case 'quote': prefix = '> '; break;
+        case 'ul': prefix = '- '; break;
+        case 'ol': prefix = '1. '; break;
+        case 'link':
+          cm.replaceSelection('[' + (sel || 'text') + '](https://)');
+          cm.focus();
+          return;
+      }
+      if (wrap) {
+        cm.replaceSelection(wrap + sel + wrap);
+      } else if (prefix) {
+        // Apply to each line
+        const lines = sel.split('\n');
+        cm.replaceSelection(lines.map(l => prefix + l).join('\n'));
+      }
+      cm.focus();
+    }
+
+    toolbar.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('mousedown', e => {
+        e.preventDefault();
+        applyFormat(btn.dataset.fmt);
+        positionToolbar();
+      });
+    });
+
+    function positionToolbar() {
+      if (!cm.somethingSelected()) {
+        toolbar.style.display = 'none';
+        return;
+      }
+      const from = cm.getCursor('from');
+      const coords = cm.cursorCoords(from, 'window');
+      toolbar.style.display = 'flex';
+      const tw = toolbar.offsetWidth;
+      let left = coords.left;
+      if (left + tw > window.innerWidth - 10) left = window.innerWidth - tw - 10;
+      toolbar.style.left = Math.max(10, left) + 'px';
+      toolbar.style.top = (coords.top - toolbar.offsetHeight - 8) + 'px';
+    }
+
+    cm.on('cursorActivity', positionToolbar);
+    cm.on('blur', () => {
+      setTimeout(() => {
+        if (!toolbar.matches(':hover')) toolbar.style.display = 'none';
+      }, 150);
+    });
+    window.addEventListener('scroll', positionToolbar, true);
+  }
+
+  // --- Image autocomplete on `![` ---
+  function setupImageAutocomplete(editor) {
+    const cm = editor.codemirror;
+    let popup = null;
+    let images = [];
+    let filteredImages = [];
+    let activeIdx = 0;
+    let startCursor = null;
+
+    function fetchImages() {
+      if (!currentProject) { images = []; return; }
+      apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' })
+        .then(r => r.json())
+        .then(imgs => {
+          images = imgs.map(img => ({
+            url: API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view',
+            name: img.filename,
+          }));
+        }).catch(() => {});
+    }
+    fetchImages();
+    // Refresh image list periodically
+    setInterval(fetchImages, 10000);
+
+    function showPopup(coords) {
+      if (!popup) {
+        popup = document.createElement('div');
+        popup.className = 'image-autocomplete-popup';
+        document.body.appendChild(popup);
+      }
+      popup.style.display = 'block';
+      popup.style.left = coords.left + 'px';
+      popup.style.top = (coords.bottom + 4) + 'px';
+      renderPopup();
+    }
+
+    function hidePopup() {
+      if (popup) popup.style.display = 'none';
+      startCursor = null;
+    }
+
+    function renderPopup() {
+      if (!popup) return;
+      if (filteredImages.length === 0) {
+        popup.innerHTML = '<div class="p-2 text-muted small">No matching images</div>';
+        return;
+      }
+      popup.innerHTML = filteredImages.map((img, i) => `
+        <div class="image-ac-item ${i === activeIdx ? 'active' : ''}" data-idx="${i}">
+          <img src="${img.url}" style="width:30px;height:30px;object-fit:cover;border-radius:3px;margin-right:6px">
+          <small>${img.name}</small>
+        </div>
+      `).join('');
+      popup.querySelectorAll('.image-ac-item').forEach(item => {
+        item.addEventListener('mousedown', e => {
+          e.preventDefault();
+          selectImage(parseInt(item.dataset.idx));
+        });
+      });
+    }
+
+    function selectImage(idx) {
+      if (!startCursor) return;
+      const img = filteredImages[idx];
+      if (!img) return;
+      const cursor = cm.getCursor();
+      cm.replaceRange('![' + img.name + '](' + img.url + ')', startCursor, cursor);
+      hidePopup();
+      cm.focus();
+      scheduleAutoSave();
+    }
+
+    cm.on('inputRead', (cm, change) => {
+      const cursor = cm.getCursor();
+      const lineText = cm.getLine(cursor.line);
+      const before = lineText.substring(0, cursor.ch);
+      const match = before.match(/!\[([^\]]*)$/);
+      if (match) {
+        if (!startCursor) {
+          startCursor = { line: cursor.line, ch: cursor.ch - match[0].length };
+          fetchImages();
+        }
+        const query = match[1].toLowerCase();
+        filteredImages = images.filter(im => im.name.toLowerCase().includes(query));
+        activeIdx = 0;
+        const coords = cm.cursorCoords(cursor, 'window');
+        showPopup(coords);
+      } else {
+        hidePopup();
+      }
+    });
+
+    cm.on('keydown', (cm, e) => {
+      if (!popup || popup.style.display === 'none') return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIdx = (activeIdx + 1) % filteredImages.length;
+        renderPopup();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIdx = (activeIdx - 1 + filteredImages.length) % filteredImages.length;
+        renderPopup();
+      } else if (e.key === 'Enter' || e.key === 'Tab') {
+        if (filteredImages.length > 0) {
+          e.preventDefault();
+          selectImage(activeIdx);
+        }
+      } else if (e.key === 'Escape') {
+        hidePopup();
+      }
+    });
+
+    cm.on('cursorActivity', () => {
+      if (!startCursor) return;
+      const cursor = cm.getCursor();
+      if (cursor.line !== startCursor.line || cursor.ch < startCursor.ch) {
+        hidePopup();
+      }
+    });
   }
 
   function getEditorValue() {
