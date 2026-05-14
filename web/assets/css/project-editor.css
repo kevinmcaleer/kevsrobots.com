@@ -39,7 +39,8 @@
   font-size: 0.85rem;
 }
 
-#content-preview img {
+#content-preview img,
+#view-content img {
   max-width: 100%;
   border-radius: 6px;
 }
