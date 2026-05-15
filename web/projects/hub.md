@@ -166,7 +166,10 @@ thanks: false
               </div>
               <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <small class="text-muted">by ${esc(p.author_username)} &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
-                <small class="text-muted" id="card-likes-${p.id}"><i class="far fa-heart"></i> </small>
+                <small class="text-muted">
+                  <span id="card-makes-${p.id}" class="me-2 d-none"><i class="fas fa-hammer"></i> <span data-count></span></span>
+                  <span id="card-likes-${p.id}"><i class="far fa-heart"></i> </span>
+                </small>
               </div>
             </div>
           </a>
@@ -182,6 +185,21 @@ thanks: false
             el.innerHTML = '<i class="far fa-heart"></i> ' + data.count;
           }
         });
+      });
+
+      // Fetch makes counts for visible cards (issue #107). Best-effort —
+      // failures just leave the badge hidden.
+      projects.forEach(function (p) {
+        fetch(API + '/api/projects/' + p.id + '/makes')
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (makes) {
+            if (!makes || makes.length === 0) return;
+            var wrap = document.getElementById('card-makes-' + p.id);
+            if (!wrap) return;
+            wrap.querySelector('[data-count]').textContent = makes.length;
+            wrap.classList.remove('d-none');
+          })
+          .catch(function () {});
       });
 
     } catch (e) {

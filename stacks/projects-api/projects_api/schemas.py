@@ -156,3 +156,33 @@ class BlockedProjectResponse(BaseModel):
     is_blocked: bool
     moderation_note: Optional[str]
     created_at: datetime
+
+
+# --- Community Makes ("I Made This!") -- issue #107 -----------------------
+
+
+class MakeCreate(BaseModel):
+    notes: Optional[str] = Field(None, max_length=5000)
+    modifications: Optional[str] = Field(None, max_length=5000)
+
+
+class MakeImageResponse(BaseModel):
+    id: int
+    filename: str
+    caption: Optional[str] = None
+    sort_order: int
+    file_size: int
+
+
+class MakeResponse(BaseModel):
+    id: int
+    project_id: int
+    user_id: str
+    created_at: datetime
+    notes: Optional[str] = None
+    modifications: Optional[str] = None
+    images: list[MakeImageResponse] = Field(default_factory=list)
+    hearted_by_author: bool = False
+    # Populated only when returning a single make (detail view); harmless
+    # when omitted from list responses.
+    project_title: Optional[str] = None
