@@ -34,6 +34,9 @@ description: View project details
         <div class="d-flex align-items-center gap-3 mb-1">
           <h1 id="view-title" class="mb-0"></h1>
           <span id="like-container"></span>
+          <a id="edit-icon" href="#" class="d-none text-muted" title="Edit this project" aria-label="Edit this project" style="font-size:1.1rem">
+            <i class="fas fa-pencil-alt"></i>
+          </a>
         </div>
         <p id="view-description" class="lead text-muted"></p>
 
@@ -319,8 +322,12 @@ description: View project details
           const myProjects = await me.json();
           const isOwner = myProjects.some(p => p.id === project.id);
           if (isOwner) {
+            const editUrl = '/projects/editor.html?id=' + project.id;
             document.getElementById('edit-btn-container').classList.remove('d-none');
-            document.getElementById('edit-link').href = '/projects/editor.html?id=' + project.id;
+            document.getElementById('edit-link').href = editUrl;
+            const editIcon = document.getElementById('edit-icon');
+            editIcon.href = editUrl;
+            editIcon.classList.remove('d-none');
           } else {
             document.getElementById('report-section').classList.remove('d-none');
             setupReportForm(project.id);
