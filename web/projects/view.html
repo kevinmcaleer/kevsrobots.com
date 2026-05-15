@@ -765,12 +765,13 @@ description: View project details
       const nameCell = i.part_id && i.part_slug
         ? `<a href="/parts/view.html?slug=${encodeURIComponent(i.part_slug)}">${esc(i.name)}</a>`
         : esc(i.name);
+      const supplierUrl = i.supplier_url || i.part_primary_supplier_url;
       return `<tr>
         <td>${nameCell}</td>
         <td>${i.quantity}</td>
         <td>${esc(i.unit)}</td>
         <td>${i.unit_cost ? '£' + i.unit_cost.toFixed(2) : '-'}</td>
-        <td>${i.supplier_url ? `<a href="${esc(i.supplier_url)}" target="_blank">Link <i class="fas fa-external-link-alt fa-xs"></i></a>` : '-'}</td>
+        <td>${supplierUrl ? `<a href="${esc(supplierUrl)}" target="_blank">Link <i class="fas fa-external-link-alt fa-xs"></i></a>` : '-'}</td>
       </tr>`;
     }).join('');
     document.getElementById('view-bom-total').textContent = '£' + total.toFixed(2);

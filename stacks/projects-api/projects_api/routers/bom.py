@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
 from ..db import get_session
-from ..models import Part, Project, ProjectBOMItem
+from ..models import Part, PartSupplier, Project, ProjectBOMItem
 from ..schemas import BOMItemCreate, BOMItemResponse
 
 router = APIRouter(prefix="/api/projects/{project_id}/bom", tags=["bom"])
@@ -31,6 +31,69 @@ async def _check_owner(session: AsyncSession, project_id: int, user: str) -> Pro
     if project.author_username != user:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not the project owner")
     return project
+
+
+async def _fetch_parts_meta(
+    session: AsyncSession, part_ids: list[int]
+) -> dict[int, tuple[Optional[str], Optional[str]]]:
+    """Batch-load (slug, primary_supplier_url) for the given part ids.
+
+    The primary supplier is the supplier with the smallest id for the
+    part. Returns a dict keyed by part_id so the caller can decorate
+    BOMItemResponse rows in O(1) per row.
+    """
+    if not part_ids:
+        return {}
+    parts = (
+        await session.scalars(
+            select(Part).where(Part.id.in_(part_ids))
+        )
+    ).all()
+    # Primary supplier per part (lowest id wins).
+    suppliers = (
+        await session.execute(
+            select(PartSupplier.part_id, func.min(PartSupplier.id))
+            .where(PartSupplier.part_id.in_(part_ids))
+            .group_by(PartSupplier.part_id)
+        )
+    ).all()
+    primary_supplier_ids = [row[1] for row in suppliers]
+    supplier_url_by_part: dict[int, str] = {}
+    if primary_supplier_ids:
+        rows = (
+            await session.execute(
+                select(PartSupplier.part_id, PartSupplier.url)
+                .where(PartSupplier.id.in_(primary_supplier_ids))
+            )
+        ).all()
+        supplier_url_by_part = {pid: url for pid, url in rows}
+    return {
+        p.id: (p.slug, supplier_url_by_part.get(p.id))
+        for p in parts
+    }
+
+
+def _to_response(
+    item: ProjectBOMItem,
+    parts_meta: dict[int, tuple[Optional[str], Optional[str]]],
+) -> BOMItemResponse:
+    """Build a BOMItemResponse, decorating with part slug / supplier."""
+    slug = None
+    primary_supplier = None
+    if item.part_id is not None:
+        slug, primary_supplier = parts_meta.get(item.part_id, (None, None))
+    return BOMItemResponse(
+        id=item.id,
+        name=item.name,
+        quantity=item.quantity,
+        unit=item.unit,
+        unit_cost=item.unit_cost,
+        supplier_url=item.supplier_url,
+        sort_order=item.sort_order,
+        part_id=item.part_id,
+        part_slug=slug,
+        part_primary_supplier_url=primary_supplier,
+    )
 
 
 async def _refresh_usage_count(session: AsyncSession, part_id: int) -> None:
@@ -62,7 +125,9 @@ async def list_bom(
             .order_by(ProjectBOMItem.sort_order)
         )
     ).all()
-    return [BOMItemResponse.model_validate(i, from_attributes=True) for i in items]
+    part_ids = [i.part_id for i in items if i.part_id is not None]
+    parts_meta = await _fetch_parts_meta(session, list(set(part_ids)))
+    return [_to_response(i, parts_meta) for i in items]
 
 
 @router.post("", response_model=BOMItemResponse, status_code=201)
@@ -90,7 +155,8 @@ async def add_bom_item(
         await _refresh_usage_count(session, part_id)
     await session.commit()
     await session.refresh(item)
-    return BOMItemResponse.model_validate(item, from_attributes=True)
+    parts_meta = await _fetch_parts_meta(session, [item.part_id] if item.part_id else [])
+    return _to_response(item, parts_meta)
 
 
 @router.put("/{item_id}", response_model=BOMItemResponse)
@@ -123,7 +189,8 @@ async def update_bom_item(
             await _refresh_usage_count(session, new_part_id)
     await session.commit()
     await session.refresh(item)
-    return BOMItemResponse.model_validate(item, from_attributes=True)
+    parts_meta = await _fetch_parts_meta(session, [item.part_id] if item.part_id else [])
+    return _to_response(item, parts_meta)
 
 
 @router.delete("/{item_id}", status_code=204)

@@ -111,6 +111,11 @@ class BOMItemResponse(BaseModel):
     supplier_url: Optional[str]
     sort_order: int
     part_id: Optional[int] = None
+    # Populated when ``part_id`` is set so the BOM row can link to
+    # ``/parts/view.html?slug=…`` and fall back to the part's catalogued
+    # supplier if the row's own ``supplier_url`` is empty.
+    part_slug: Optional[str] = None
+    part_primary_supplier_url: Optional[str] = None
 
 
 class LinkCreate(BaseModel):
