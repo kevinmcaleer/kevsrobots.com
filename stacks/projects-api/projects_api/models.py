@@ -178,6 +178,51 @@ class ProjectJournalImage(Base):
     )
 
 
+# --- Community Makes ("I Made This!") -- issue #107 -----------------------
+#
+# A `Make` is a user-submitted "I built this!" post on someone else's
+# project. It carries optional notes + modifications text and 0-5 images.
+# The project's author may "heart" individual makes; we model that with a
+# single nullable `hearted_at` column on `Make` rather than a join table
+# because hearts come from exactly one user (the project author) so a
+# many-to-many relation is overkill. If we later want multi-user hearts we
+# can promote this to a `make_hearts` table without rewriting the read
+# path (the `hearted_by_author` response field stays the same).
+
+
+class Make(Base):
+    __tablename__ = "makes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    notes: Mapped[Optional[str]] = mapped_column(Text)
+    modifications: Mapped[Optional[str]] = mapped_column(Text)
+    hearted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
+class MakeImage(Base):
+    __tablename__ = "make_images"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    make_id: Mapped[int] = mapped_column(
+        ForeignKey("makes.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    file_path: Mapped[str] = mapped_column(Text, nullable=False)
+    file_size: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    caption: Mapped[Optional[str]] = mapped_column(Text)
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    uploaded_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
 class Download(Base):
     """Tracks individual file downloads for analytics and popularity ranking.
 
