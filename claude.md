@@ -155,6 +155,12 @@ Key data files:
 - **Caching** - Cloudflare handles at edge, not nginx
 - **Health checks** - Container healthcheck uses `127.0.0.1` not `localhost` (IPv4 vs IPv6 issue)
 
+### Backend services (`stacks/projects-api`, similar FastAPI services)
+- **Schema migrations** - SQLAlchemy's `Base.metadata.create_all()` only creates *missing* tables; it never adds columns to existing tables. Any PR that adds a column to an existing model **must also ship a matching idempotent `ALTER TABLE … ADD COLUMN IF NOT EXISTS` helper** wired into the FastAPI lifespan after `create_all()`. Without it, production 500s after redeploy because the ORM references a column Postgres doesn't have, and browsers misreport the resulting CORS-header-less response as a "CORS error". See `add_remix_columns_if_missing` and `add_bom_part_id_if_missing` in `stacks/projects-api/projects_api/db.py` for the canonical pattern (Postgres-only, no-op on SQLite tests).
+- **New tables** - Adding a brand-new table is fine — `create_all` handles it. Only existing-table alterations need a helper.
+- **FK to a not-yet-created table** - If the new column's FK target may not exist yet on legacy DBs (e.g. adding `part_id` referencing `parts`), add the column first, then conditionally add the constraint only if the target table exists. `add_bom_part_id_if_missing` shows the pattern.
+- **CORS-shaped errors are usually 500s** - When a route raises, FastAPI's exception handler returns 500 but the CORS middleware doesn't get to add headers. The browser then reports "blocked by CORS policy" rather than the underlying crash. Always check `docker logs <api-container>` for a traceback when CORS errors appear.
+
 ---
 
 ## Common Development Commands
