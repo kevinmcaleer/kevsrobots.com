@@ -11,7 +11,7 @@ excerpt: >-
     Ever wondered if a McDonald's Chicken Nugget could venture into the world of gaming?
 cover: /assets/img/blog/chicken_nugget/cover.jpg
 tags: 
- - raspberry_pi
+ - raspberry pi
  - mcdonalds
  - doom
  - pimoroni

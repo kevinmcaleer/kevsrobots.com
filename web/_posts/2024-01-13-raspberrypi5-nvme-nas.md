@@ -13,7 +13,7 @@ groups:
     - raspberrypi
 tags:
     - nas
-    - raspberry_pi
+    - raspberry pi
     - samba
     - nvme
 videos:

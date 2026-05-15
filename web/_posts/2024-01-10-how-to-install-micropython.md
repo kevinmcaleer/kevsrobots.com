@@ -16,7 +16,7 @@ groups:
 tags:
     - micropython
     - microcontrollers
-    - raspberry_pi
+    - raspberry pi
     - esp32
     - esp8266
 

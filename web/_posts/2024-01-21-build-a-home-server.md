@@ -12,7 +12,7 @@ groups:
     - raspberrypi
 tags:
     - docker
-    - raspberry_pi
+    - raspberry pi
     - home_server
     - home_lab
     - clustered_pi

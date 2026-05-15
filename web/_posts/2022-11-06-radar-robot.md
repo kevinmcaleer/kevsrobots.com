@@ -9,7 +9,7 @@ author: Kevin McAleer
 excerpt: Build a robot that can scan its surroundings with sound
 cover: /assets/img/blog/radar/radar.jpg
 tags:
- - raspberry_pi_pico
+ - raspberry pi pico
  - 3d_printing
  - explora
  - radar

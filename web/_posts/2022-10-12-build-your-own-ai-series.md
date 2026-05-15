@@ -9,7 +9,7 @@ author: Kevin McAleer
 excerpt: Learn how to build your own AI Assistant using Python
 cover: /assets/img/blog/byoai/build_your_own_ai.jpg
 tags:
- - raspberry_pi
+ - raspberry pi
  - python
  - robot
  - website

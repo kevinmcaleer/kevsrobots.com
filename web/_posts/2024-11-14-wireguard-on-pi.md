@@ -12,7 +12,7 @@ cover: /assets/img/blog/wireguard-pi/cover.jpg
 hero: /assets/img/blog/wireguard-pi/hero.png
 mode: light
 tags: 
- - raspberry_pi
+ - raspberry pi
  - wireguard
  - docker
  - vpn

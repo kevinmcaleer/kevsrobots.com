@@ -14,7 +14,7 @@ mode: light
 tags:
   - arm
   - robot_arms
-  - raspberry_pi
+  - raspberry pi
   - pico
   - camera
 groups:

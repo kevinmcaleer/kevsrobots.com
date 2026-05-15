@@ -15,7 +15,7 @@ videos:
 tags:
  - waveshare
  - compute_module
- - raspberry_pi
+ - raspberry pi
 groups:
  - robots
  - raspberrypi

@@ -16,7 +16,7 @@ tags:
     - computer_vision
     - esp32cam
     - python
-    - raspberry_pi
+    - raspberry pi
 ---
 
 ![ESP32CAM](/assets/img/blog/esp32cam/cam01.jpg){:class="cover"}

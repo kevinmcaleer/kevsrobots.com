@@ -12,7 +12,7 @@ cover: /assets/img/blog/syncthing/cover.png
 hero: /assets/img/blog/syncthing/hero.png
 mode: light
 tags:
-  - raspberry_pi
+  - raspberry pi
   - file_syncing
   - syncthing
 groups:

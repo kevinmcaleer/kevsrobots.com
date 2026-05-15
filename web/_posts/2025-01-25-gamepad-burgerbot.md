@@ -13,7 +13,7 @@ cover: /assets/img/blog/gamepad_burgerbot/cover.jpg
 hero:  /assets/img/blog/gamepad_burgerbot/hero.png
 mode: light
 tags:
- - raspberry_pi
+ - raspberry pi
  - pico
  - micropython
 groups:

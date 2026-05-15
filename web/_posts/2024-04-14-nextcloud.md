@@ -12,7 +12,7 @@ cover: /assets/img/blog/nextcloud/cover.png
 hero: /assets/img/blog/nextcloud/hero.png
 mode: light
 tags:
-  - raspberry_pi
+  - raspberry pi
 groups:
   - raspberrypi
 videos:

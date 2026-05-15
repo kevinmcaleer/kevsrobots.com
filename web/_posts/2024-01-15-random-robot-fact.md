@@ -13,7 +13,7 @@ groups:
     - robots
 tags:
     - facts
-    - raspberry_pi
+    - raspberry pi
     - python
 ---
 

@@ -13,7 +13,7 @@ hero:  /assets/img/blog/kevsarcade/hero.png
 mode: light
 tags:
  - laser_cutting
- - raspberry_pi
+ - raspberry pi
  - arcade
  - retro
 groups:

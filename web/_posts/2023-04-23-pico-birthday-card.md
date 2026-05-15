@@ -12,7 +12,7 @@ excerpt: >-
    
 cover: /assets/img/blog/picard/picard.jpg
 tags: 
- - raspberry_pi_pico
+ - raspberry pi pico
  - birthday_card
  - micropython
  - 3d_printing

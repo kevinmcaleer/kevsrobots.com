@@ -9,7 +9,7 @@ author: Kevin McAleer
 excerpt: How many robots, projects, code, 3d designs did I make in 2022?
 cover: /assets/img/blog/2022_review/2022_review.jpg
 tags:
- - raspberry_pi_pico
+ - raspberry pi pico
  - micropython
  - website
 groups:

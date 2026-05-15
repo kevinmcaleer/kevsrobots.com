@@ -16,7 +16,7 @@ videos:
 tags:
   - podman
   - docker
-  - raspberry_pi
+  - raspberry pi
 groups:
   - docker
   - raspberrypi

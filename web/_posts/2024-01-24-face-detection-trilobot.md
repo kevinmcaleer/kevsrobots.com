@@ -14,7 +14,7 @@ groups:
     - ai
 tags:
     - pimoroni
-    - raspberry_pi
+    - raspberry pi
     - trilobot
     - opencv
     - face_detection

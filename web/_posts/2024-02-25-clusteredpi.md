@@ -13,7 +13,7 @@ hero: /assets/img/blog/clusteredpi/hero.png
 mode: light
 tags:
   - cluster
-  - raspberry_pi
+  - raspberry pi
   - docker
 groups:
   - raspberrypi

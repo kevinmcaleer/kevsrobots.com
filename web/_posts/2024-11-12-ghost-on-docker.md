@@ -12,7 +12,7 @@ cover: /assets/img/blog/ghost-pi/cover.jpg
 hero: /assets/img/blog/ghost-pi/hero.png
 mode: light
 tags: 
- - raspberry_pi
+ - raspberry pi
  - ghost
  - docker
  - web_hosting

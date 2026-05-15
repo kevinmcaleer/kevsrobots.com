@@ -15,7 +15,7 @@ videos:
   - CjX5USkejTI
 tags:
   - nas
-  - raspberry_pi
+  - raspberry pi
 groups:
   - raspberrypi
 stl:

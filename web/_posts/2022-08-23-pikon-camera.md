@@ -10,7 +10,7 @@ author: Kevin McAleer
 excerpt: Build your own portable Raspberry Pi Camera featuring the High Quality
 cover: /assets/img/blog/pikon/pikon.jpg
 tags:
- - raspberry_pi
+ - raspberry pi
  - pikon
  - camera
  - high_quality_camera

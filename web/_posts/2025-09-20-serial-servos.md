@@ -12,7 +12,7 @@ cover: /assets/img/blog/serial-servos/cover.jpg
 hero: /assets/img/blog/serial-servos/hero.png
 mode: light
 tags:
-  - raspberry_pi
+  - raspberry pi
   - software
   - servos
 groups:

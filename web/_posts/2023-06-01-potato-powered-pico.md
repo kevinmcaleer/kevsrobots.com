@@ -10,7 +10,7 @@ author: Kevin McAleer
 excerpt: 
 cover: /assets/img/blog/potato-power/potato.jpg
 tags: 
- - raspberry_pi
+ - raspberry pi
  - pico
  - potato
  - battery

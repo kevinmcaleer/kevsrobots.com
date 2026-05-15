@@ -12,7 +12,7 @@ cover: /assets/img/blog/motioneye-pi/cover.jpg
 hero: /assets/img/blog/motioneye-pi/hero.png
 mode: light
 tags: 
- - raspberry_pi
+ - raspberry pi
  - motioneye
  - docker
  - surveillance

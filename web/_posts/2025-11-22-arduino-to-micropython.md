@@ -15,7 +15,7 @@ tags:
  - course
  - python
  - esp32
- - raspberry_pi_pico
+ - raspberry pi pico
 ---
 
 ## Ahoy Arduino Makers!

@@ -13,7 +13,7 @@ mode: light
 videos:
   - MWBl0E1Z8Ps
 tags:
- - raspberry_pi_pico
+ - raspberry pi pico
  - touch
  - circitpython
  - micropython

@@ -12,7 +12,7 @@ cover: /assets/img/blog/20piprojects/cover.jpg
 hero:  /assets/img/blog/20piprojects/hero.png
 mode: light
 tags:
- - raspberry_pi
+ - raspberry pi
  - arcade
  - retro
 groups:

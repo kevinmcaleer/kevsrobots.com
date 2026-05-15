@@ -10,7 +10,7 @@ author: Kevin McAleer
 excerpt: Remember XEyes on the X Desktop, well its like that, but IRL
 cover: /assets/img/blog/googleyeyes/googleyeyes.jpg
 tags: 
- - raspberry_pi
+ - raspberry pi
  - python
  - opencv
  - pimoroni

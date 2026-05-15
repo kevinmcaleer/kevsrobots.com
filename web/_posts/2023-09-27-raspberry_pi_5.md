@@ -10,7 +10,7 @@ author: Kevin McAleer
 excerpt: Learn all about the new features and changes 
 cover: /assets/img/blog/raspberrypi5/raspberrypi5.jpg
 tags: 
- - raspberry_pi
+ - raspberry pi
 groups:
  - raspberrypi
 videos:

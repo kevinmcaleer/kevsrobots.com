@@ -12,7 +12,7 @@ cover: /assets/img/blog/wordpress-pi/cover.jpg
 hero: /assets/img/blog/wordpress-pi/hero.png
 mode: light
 tags: 
- - raspberry_pi
+ - raspberry pi
  - wordpress
  - docker
 groups:

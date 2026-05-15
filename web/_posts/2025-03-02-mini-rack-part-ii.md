@@ -14,7 +14,7 @@ videos:
   - fJC68N9nphA
   - qnewKGO8EOc
 tags:
- - raspberry_pi
+ - raspberry pi
  - cluster
  - mini_rack
 groups:

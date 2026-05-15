@@ -18,7 +18,7 @@ tags:
     - micropython
     - microcontrollers
     - python
-    - raspberry_pi
+    - raspberry pi
 
 ---
 

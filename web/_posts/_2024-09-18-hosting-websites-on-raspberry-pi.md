@@ -12,7 +12,7 @@ hero:  /assets/img/blog/kevsrobots/hero.png
 mode: light
 tags: 
  - website
- - raspberry_pi
+ - raspberry pi
  - docker
 groups:
  - raspberrypi
