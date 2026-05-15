@@ -1086,7 +1086,7 @@
     const files = await resp.json();
     const list = document.getElementById('file-list');
     if (files.length === 0) { list.innerHTML = ''; return; }
-    list.innerHTML = `<table class="table table-sm table-hover mb-0"><tbody>${files.map(f => `
+    list.innerHTML = `<table class="table table-narrow table-hover mb-0"><tbody>${files.map(f => `
       <tr>
         <td class="text-muted" style="width:20px"><i class="${fileIcon(f.filename)}"></i></td>
         <td><a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${f.filename}</a></td>

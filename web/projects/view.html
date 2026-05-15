@@ -56,7 +56,7 @@ description: View project details
         <!-- BOM -->
         <div id="view-bom-section" class="mb-4 d-none">
           <h4><i class="fas fa-clipboard-list me-2"></i> Bill of Materials</h4>
-          <table class="table table-sm">
+          <table class="table table-narrow">
             <thead><tr><th>Part</th><th>Qty</th><th>Unit</th><th>Cost</th><th>Supplier</th></tr></thead>
             <tbody id="view-bom"></tbody>
             <tfoot><tr class="table-light"><td colspan="3" class="text-end fw-bold">Total:</td><td id="view-bom-total" class="fw-bold"></td><td></td></tr></tfoot>
@@ -403,7 +403,7 @@ description: View project details
     };
     function fKind(n){var e=(n||'').split('.').pop().toLowerCase();return fileKinds[e]||e.toUpperCase()+' File';}
     function fIcon(n){var e=(n||'').split('.').pop().toLowerCase();return fileIcons[e]||'fas fa-file';}
-    document.getElementById('view-files').innerHTML = `<table class="table table-sm table-hover mb-0"><tbody>${files.map(f => `
+    document.getElementById('view-files').innerHTML = `<table class="table table-narrow table-hover mb-0"><tbody>${files.map(f => `
       <tr>
         <td class="text-muted" style="width:20px"><i class="${fIcon(f.filename)}"></i></td>
         <td><a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a></td>
