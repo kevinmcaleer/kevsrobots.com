@@ -9,13 +9,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
-from .db import create_all
+from .db import create_all, repair_stale_fks
 from .routers import bom, files, health, images, journal, links, moderation, projects
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await create_all()
+    await repair_stale_fks()
     yield
 
 
