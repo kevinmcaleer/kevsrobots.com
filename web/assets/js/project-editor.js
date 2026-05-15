@@ -1436,6 +1436,24 @@
   // --- Journal ---
   const journalInput = document.getElementById('journal-input');
 
+  async function postJournalEntry(text) {
+    const url = API + '/api/projects/' + currentProject.id + '/journal';
+    const body = JSON.stringify({ title: text, status: 'in_progress' });
+    const doFetch = () => apiFetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    try {
+      return await doFetch();
+    } catch (err) {
+      // Single retry on transient network failures (Failed to fetch, etc.)
+      console.warn('Journal POST failed, retrying once:', err);
+      await new Promise(r => setTimeout(r, 250));
+      return await doFetch();
+    }
+  }
+
   journalInput.addEventListener('keydown', async (e) => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
@@ -1444,21 +1462,19 @@
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     journalInput.disabled = true;
     try {
-      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: text, status: 'in_progress' }),
-      });
+      const resp = await postJournalEntry(text);
       if (!resp.ok) {
-        console.error('Journal add failed:', resp.status, await resp.text());
-        alert('Could not save journal entry (HTTP ' + resp.status + ').');
+        const bodyText = await resp.text().catch(() => '');
+        console.error('Journal add failed:', resp.status, bodyText);
+        alert('Could not save journal entry (HTTP ' + resp.status + '). ' + (bodyText || ''));
         return;
       }
       journalInput.value = '';
       loadJournal();
     } catch (err) {
       console.error('Journal add error:', err);
-      alert('Could not save journal entry: ' + err.message);
+      alert('Could not save journal entry: ' + err.message
+        + '\n\nCheck the browser console + Network tab for details.');
     } finally {
       journalInput.disabled = false;
       journalInput.focus();

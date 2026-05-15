@@ -199,18 +199,20 @@ description: Create or edit a project
         <div class="card mb-3">
           <div class="card-header py-2">Metadata</div>
           <div class="card-body">
-            <div class="mb-3">
-              <label class="form-label small text-muted">Difficulty</label>
-              <select id="project-difficulty" class="form-select form-select-sm">
-                <option value="">Select...</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small text-muted">Time to Build (minutes)</label>
-              <input type="number" id="project-time" class="form-control form-control-sm" min="1" placeholder="e.g. 60">
+            <div class="row g-2 mb-3">
+              <div class="col-7">
+                <label class="form-label small text-muted">Difficulty</label>
+                <select id="project-difficulty" class="form-select form-select-sm">
+                  <option value="">Select...</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+              <div class="col-5">
+                <label class="form-label small text-muted">Time (min)</label>
+                <input type="number" id="project-time" class="form-control form-control-sm" min="1" placeholder="e.g. 60">
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label small text-muted">Tags</label>
