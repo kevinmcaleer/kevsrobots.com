@@ -317,7 +317,7 @@ description: View project details
 
       // Edit button & report button (check if current user is author)
       try {
-        const me = await fetch(API + '/api/projects/my/list', { credentials: 'include' });
+        const me = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
         if (me.ok) {
           const myProjects = await me.json();
           const isOwner = myProjects.some(p => p.id === project.id);
