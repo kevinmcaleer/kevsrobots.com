@@ -453,10 +453,13 @@
               editor.codemirror.refresh();
             }
             EasyMDE.togglePreview(editor);
-            // Render mermaid in the preview pane
+            // Render mermaid in the preview pane + style any markdown tables
             setTimeout(async () => {
               var previewEl = container.querySelector('.editor-preview-active');
               if (!previewEl) return;
+              previewEl.querySelectorAll('table').forEach(function(t) {
+                t.classList.add('table', 'table-single', 'table-narrow');
+              });
               var blocks = previewEl.querySelectorAll('pre code.language-mermaid');
               if (blocks.length === 0) return;
               try {
@@ -528,6 +531,9 @@
             let renderTimer = null;
             function updatePreview() {
               preview.innerHTML = editor.markdown(editor.value());
+              preview.querySelectorAll('table').forEach(t => {
+                t.classList.add('table', 'table-single', 'table-narrow');
+              });
               clearTimeout(renderTimer);
               renderTimer = setTimeout(renderMermaid, 200);
             }
@@ -1086,7 +1092,7 @@
     const files = await resp.json();
     const list = document.getElementById('file-list');
     if (files.length === 0) { list.innerHTML = ''; return; }
-    list.innerHTML = `<table class="table table-narrow table-hover mb-0"><tbody>${files.map(f => `
+    list.innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${files.map(f => `
       <tr>
         <td class="text-muted" style="width:20px"><i class="${fileIcon(f.filename)}"></i></td>
         <td><a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${f.filename}</a></td>

@@ -56,7 +56,7 @@ description: View project details
         <!-- BOM -->
         <div id="view-bom-section" class="mb-4 d-none">
           <h4><i class="fas fa-clipboard-list me-2"></i> Bill of Materials</h4>
-          <table class="table table-narrow">
+          <table class="table table-single table-narrow">
             <thead><tr><th>Part</th><th>Qty</th><th>Unit</th><th>Cost</th><th>Supplier</th></tr></thead>
             <tbody id="view-bom"></tbody>
             <tfoot><tr class="table-light"><td colspan="3" class="text-end fw-bold">Total:</td><td id="view-bom-total" class="fw-bold"></td><td></td></tr></tfoot>
@@ -237,6 +237,15 @@ description: View project details
 
   function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 
+  // Apply the site's table-narrow style to every table inside a container
+  // (typically used after marked.parse has populated the element).
+  function styleMarkdownTables(containerEl) {
+    if (!containerEl) return;
+    containerEl.querySelectorAll('table').forEach(t => {
+      t.classList.add('table', 'table-single', 'table-narrow');
+    });
+  }
+
   function setupReportForm(pid) {
     var toggle = document.getElementById('report-toggle');
     var form = document.getElementById('report-form');
@@ -304,7 +313,9 @@ description: View project details
 
       // Content
       if (project.content_md) {
-        document.getElementById('view-content').innerHTML = marked.parse(project.content_md);
+        const contentEl = document.getElementById('view-content');
+        contentEl.innerHTML = marked.parse(project.content_md);
+        styleMarkdownTables(contentEl);
         await renderMermaid();
         buildTOC();
       }
@@ -403,7 +414,7 @@ description: View project details
     };
     function fKind(n){var e=(n||'').split('.').pop().toLowerCase();return fileKinds[e]||e.toUpperCase()+' File';}
     function fIcon(n){var e=(n||'').split('.').pop().toLowerCase();return fileIcons[e]||'fas fa-file';}
-    document.getElementById('view-files').innerHTML = `<table class="table table-narrow table-hover mb-0"><tbody>${files.map(f => `
+    document.getElementById('view-files').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${files.map(f => `
       <tr>
         <td class="text-muted" style="width:20px"><i class="${fIcon(f.filename)}"></i></td>
         <td><a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a></td>
@@ -464,7 +475,8 @@ description: View project details
     }
     if (!Array.isArray(entries) || entries.length === 0) return;
     document.getElementById('view-journal-section').classList.remove('d-none');
-    document.getElementById('view-journal').innerHTML = entries.map(e => `
+    const journalEl = document.getElementById('view-journal');
+    journalEl.innerHTML = entries.map(e => `
       <div class="journal-entry">
         <div class="d-flex justify-content-between align-items-center">
           <strong class="small">${esc(e.title)}</strong>
@@ -474,6 +486,7 @@ description: View project details
         ${e.content_md ? `<div class="small mt-1">${marked.parse(e.content_md)}</div>` : ''}
       </div>
     `).join('');
+    styleMarkdownTables(journalEl);
   }
 
   async function downloadProject(project) {
