@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     jwt_secret: str = "changeme"
     jwt_algorithm: str = "HS256"
 
+    # Base URL for the Chatter auth service. Used by the parts catalog
+    # account-age gate to look up `account_created_at` from `/api/me`.
+    chatter_base_url: str = "https://chatter.kevsrobots.com"
+
     # NAS storage
     nas_host: str = "192.168.1.79"
     nas_username: Optional[str] = None

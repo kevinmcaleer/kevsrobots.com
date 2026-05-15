@@ -19,6 +19,7 @@ from .routers import (
     journal,
     links,
     moderation,
+    parts,
     projects,
 )
 
@@ -57,6 +58,7 @@ def create_app() -> FastAPI:
     app.include_router(links.router)
     app.include_router(journal.router)
     app.include_router(moderation.router)
+    app.include_router(parts.router)
     return app
 
 
