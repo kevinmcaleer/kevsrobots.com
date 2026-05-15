@@ -16,6 +16,12 @@ thanks: false
 
 <!-- Project Gallery Component -->
 <div id="projects-hub">
+  <!-- Popular this month -->
+  <div id="popular-section" class="mb-4 d-none">
+    <h4 class="mb-3"><i class="fas fa-fire text-danger me-2"></i>Popular this month</h4>
+    <div id="popular-row" class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3"></div>
+  </div>
+
   <!-- Header with Create Button -->
   <div class="row mb-4">
     <div class="col">
@@ -34,8 +40,8 @@ thanks: false
   </div>
 
   <!-- Search and Filters -->
-  <div class="row mb-4">
-    <div class="col-md-6">
+  <div class="row mb-4 g-2">
+    <div class="col-md-4">
       <input type="text" id="project-search" class="form-control" placeholder="Search projects by title or tag...">
     </div>
     <div class="col-md-3">
@@ -46,8 +52,14 @@ thanks: false
         <option value="advanced">Advanced</option>
       </select>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       <input type="text" id="tag-filter" class="form-control" placeholder="Filter by tag...">
+    </div>
+    <div class="col-md-3">
+      <select id="sort-select" class="form-select" aria-label="Sort projects">
+        <option value="newest">Newest first</option>
+        <option value="downloads_30d">Most downloaded (30d)</option>
+      </select>
     </div>
   </div>
 
@@ -83,6 +95,7 @@ thanks: false
   const searchInput = document.getElementById('project-search');
   const difficultyFilter = document.getElementById('difficulty-filter');
   const tagFilter = document.getElementById('tag-filter');
+  const sortSelect = document.getElementById('sort-select');
 
   const difficultyColors = {
     beginner: 'success',
@@ -127,16 +140,37 @@ thanks: false
     noProjects.classList.add('d-none');
     grid.innerHTML = '';
 
-    const params = new URLSearchParams();
-    if (searchInput.value) params.set('search', searchInput.value);
-    if (difficultyFilter.value) params.set('difficulty', difficultyFilter.value);
-    if (tagFilter.value) params.set('tag', tagFilter.value.toLowerCase());
-
+    const sortMode = (sortSelect && sortSelect.value) || 'newest';
+    let resp;
     try {
-      const resp = await fetch(API + '/api/projects?' + params.toString());
+      if (sortMode === 'downloads_30d') {
+        // Use the popular endpoint for ordering — it already excludes
+        // archived projects and returns download_count baked in.
+        resp = await fetch(API + '/api/projects/popular?window=30d&limit=100');
+      } else {
+        const params = new URLSearchParams();
+        if (searchInput.value) params.set('search', searchInput.value);
+        if (difficultyFilter.value) params.set('difficulty', difficultyFilter.value);
+        if (tagFilter.value) params.set('tag', tagFilter.value.toLowerCase());
+        resp = await fetch(API + '/api/projects?' + params.toString());
+      }
       if (!resp.ok) throw new Error('API error');
       let projects = await resp.json();
       spinner.classList.add('d-none');
+
+      // The popular endpoint doesn't honour the search/filter inputs server-side
+      // — apply them client-side for a consistent UX.
+      if (sortMode === 'downloads_30d') {
+        const q = (searchInput.value || '').toLowerCase();
+        const diff = difficultyFilter.value;
+        const tag = (tagFilter.value || '').toLowerCase();
+        projects = projects.filter(p => {
+          if (q && !((p.title || '').toLowerCase().includes(q) || (p.short_description || '').toLowerCase().includes(q))) return false;
+          if (diff && p.difficulty !== diff) return false;
+          if (tag && !(p.tags || []).some(t => (t || '').toLowerCase() === tag)) return false;
+          return true;
+        });
+      }
 
       if (showingMine) {
         projects = projects.filter(p => myProjectIds.has(p.id));
@@ -166,9 +200,10 @@ thanks: false
               </div>
               <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <small class="text-muted">by ${esc(p.author_username)} &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
-                <small class="text-muted">
-                  <span id="card-makes-${p.id}" class="me-2 d-none"><i class="fas fa-hammer"></i> <span data-count></span></span>
+                <small class="text-muted d-flex gap-2 align-items-center">
+                  <span id="card-makes-${p.id}" class="d-none"><i class="fas fa-hammer"></i> <span data-count></span></span>
                   <span id="card-likes-${p.id}"><i class="far fa-heart"></i> </span>
+                  <span title="Total downloads"><i class="fas fa-download"></i> ${(p.download_count || 0)}</span>
                 </small>
               </div>
             </div>
@@ -224,7 +259,42 @@ thanks: false
   searchInput.addEventListener('input', debouncedLoad);
   difficultyFilter.addEventListener('change', loadProjects);
   tagFilter.addEventListener('input', debouncedLoad);
+  if (sortSelect) sortSelect.addEventListener('change', loadProjects);
 
-  checkAuth().then(() => loadProjects());
+  // Fail-closed loader for the "Popular this month" row at the top.
+  // If the API errors or returns nothing, the section stays hidden — no UX
+  // damage on a fresh install.
+  async function loadPopular() {
+    try {
+      const resp = await fetch(API + '/api/projects/popular?window=30d&limit=6');
+      if (!resp.ok) return;
+      const items = await resp.json();
+      if (!Array.isArray(items) || items.length === 0) return;
+      const row = document.getElementById('popular-row');
+      row.innerHTML = items.map(p => `
+        <div class="col">
+          <a href="/projects/view.html?id=${p.id}" class="text-decoration-none">
+            <div class="card h-100 border-0 shadow-sm card-hover">
+              ${projectThumbnail(p, 120)}
+              <div class="card-body p-2">
+                <div class="small fw-bold text-dark text-truncate" title="${esc(p.title)}">${esc(p.title)}</div>
+                <div class="small text-muted">
+                  <i class="fas fa-download"></i> ${(p.download_count || 0)}
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      `).join('');
+      document.getElementById('popular-section').classList.remove('d-none');
+    } catch (e) {
+      // Silent — popular row is non-critical.
+    }
+  }
+
+  checkAuth().then(() => {
+    loadProjects();
+    loadPopular();
+  });
 })();
 </script>

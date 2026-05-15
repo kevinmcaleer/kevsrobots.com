@@ -44,6 +44,7 @@ class ProjectResponse(BaseModel):
     tags: list[str] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
+    download_count: int = 0
 
 
 class ProjectListItem(BaseModel):
@@ -57,6 +58,7 @@ class ProjectListItem(BaseModel):
     cover_image: Optional[str]
     tags: list[str] = Field(default_factory=list)
     created_at: datetime
+    download_count: int = 0
 
 
 class BOMItemCreate(BaseModel):
@@ -66,6 +68,7 @@ class BOMItemCreate(BaseModel):
     unit_cost: Optional[float] = None
     supplier_url: Optional[str] = None
     sort_order: int = 0
+    part_id: Optional[int] = None
 
 
 class BOMItemResponse(BaseModel):
@@ -76,6 +79,7 @@ class BOMItemResponse(BaseModel):
     unit_cost: Optional[float]
     supplier_url: Optional[str]
     sort_order: int
+    part_id: Optional[int] = None
 
 
 class LinkCreate(BaseModel):
@@ -113,6 +117,7 @@ class FileResponse(BaseModel):
     file_type: str
     description: Optional[str]
     uploaded_at: datetime
+    download_count: int = 0
 
 
 class ImageResponse(BaseModel):
@@ -186,3 +191,138 @@ class MakeResponse(BaseModel):
     # Populated only when returning a single make (detail view); harmless
     # when omitted from list responses.
     project_title: Optional[str] = None
+
+
+# --- Download tracking schemas ---
+
+
+class DownloadLogResponse(BaseModel):
+    """Returned when a download is logged. ``dedup`` is True when the
+    request was within the 24h dedup window for the same identity."""
+
+    logged: bool
+    dedup: bool
+
+
+class FileDownloadStats(BaseModel):
+    file_id: int
+    filename: str
+    total: int
+    last_7d: int
+    last_30d: int
+
+
+class DailyDownloadCount(BaseModel):
+    date: str  # ISO date, YYYY-MM-DD
+    count: int
+
+
+class ProjectDownloadStats(BaseModel):
+    project_id: int
+    total: int
+    last_7d: int
+    last_30d: int
+    per_file: list[FileDownloadStats] = Field(default_factory=list)
+    daily: list[DailyDownloadCount] = Field(default_factory=list)
+
+
+class PopularProjectItem(BaseModel):
+    id: int
+    title: str
+    short_description: Optional[str]
+    difficulty: Optional[str]
+    estimated_minutes: Optional[int]
+    status: str
+    author_username: str
+    cover_image: Optional[str]
+    tags: list[str] = Field(default_factory=list)
+    created_at: datetime
+    download_count: int = 0
+
+
+# --- Parts catalog (issue #121) ---
+
+
+class PartSupplierInput(BaseModel):
+    name: Optional[str] = Field(None, max_length=120)
+    url: str = Field(..., max_length=2000)
+
+
+class PartSupplierResponse(BaseModel):
+    id: int
+    name: Optional[str] = None
+    url: str
+    last_checked_at: Optional[datetime] = None
+    last_status: Optional[str] = None
+
+
+class PartCreate(BaseModel):
+    name: str = Field(..., min_length=2, max_length=200)
+    sku: Optional[str] = Field(None, max_length=100)
+    mpn: Optional[str] = Field(None, max_length=100)
+    description_md: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=2000)
+    supplier_url: Optional[str] = Field(None, max_length=2000)
+    supplier_name: Optional[str] = Field(None, max_length=120)
+    tags: list[str] = Field(default_factory=list)
+
+
+class PartUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=2, max_length=200)
+    sku: Optional[str] = Field(None, max_length=100)
+    mpn: Optional[str] = Field(None, max_length=100)
+    description_md: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=2000)
+    tags: Optional[list[str]] = None
+    suppliers: Optional[list[PartSupplierInput]] = None
+    change_summary: str = Field(..., min_length=1, max_length=200)
+
+
+class PartSearchResult(BaseModel):
+    id: int
+    slug: str
+    name: str
+    sku: Optional[str] = None
+    status: str
+    usage_count: int
+    primary_supplier_url: Optional[str] = None
+
+
+class PartRevisionSummary(BaseModel):
+    id: int
+    author: str
+    created_at: datetime
+    change_summary: str
+
+
+class PartRevisionDetail(BaseModel):
+    id: int
+    author: str
+    created_at: datetime
+    change_summary: str
+    name: str
+    sku: Optional[str] = None
+    mpn: Optional[str] = None
+    description_md: Optional[str] = None
+    image_url: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    suppliers: list[PartSupplierInput] = Field(default_factory=list)
+
+
+class PartDetail(BaseModel):
+    id: int
+    slug: str
+    name: str
+    sku: Optional[str] = None
+    mpn: Optional[str] = None
+    description_md: Optional[str] = None
+    image_url: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    status: str
+    created_by: str
+    created_at: datetime
+    updated_at: datetime
+    current_revision_id: Optional[int] = None
+    usage_count: int
+    suppliers: list[PartSupplierResponse] = Field(default_factory=list)
+    recent_revisions: list[PartRevisionSummary] = Field(default_factory=list)

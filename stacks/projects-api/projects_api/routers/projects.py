@@ -11,13 +11,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user
 from ..db import get_session
-from ..models import Project, ProjectTag
+from ..models import Download, Project, ProjectTag
 from ..schemas import (
     ProjectCreate,
     ProjectListItem,
     ProjectResponse,
     ProjectUpdate,
 )
+
+
+async def _download_count(session: AsyncSession, project_id: int) -> int:
+    """Total downloads across all files for a project.
+
+    v1 implementation: correlated count on every read. This is fine for
+    listing pages (n+1 in the dozens, not thousands) and aggregates a
+    small indexed table. If listings start showing latency, denormalise
+    onto ``projects.download_count`` and update inside ``_log_download``.
+    """
+    result = await session.execute(
+        select(func.count(Download.id)).where(Download.project_id == project_id)
+    )
+    return int(result.scalar_one() or 0)
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -55,6 +69,7 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         tags=tags,
         created_at=project.created_at,
         updated_at=project.updated_at,
+        download_count=await _download_count(session, project.id),
     )
 
 
@@ -108,6 +123,7 @@ async def list_projects(
                 cover_image=p.cover_image,
                 tags=tags,
                 created_at=p.created_at,
+                download_count=await _download_count(session, p.id),
             )
         )
     return items
@@ -219,6 +235,7 @@ async def my_projects(
                 cover_image=p.cover_image,
                 tags=tags,
                 created_at=p.created_at,
+                download_count=await _download_count(session, p.id),
             )
         )
     return items

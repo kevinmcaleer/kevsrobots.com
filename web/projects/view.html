@@ -50,6 +50,9 @@ description: View project details
         <!-- Files -->
         <div id="view-files-section" class="mb-4 d-none">
           <h4><i class="fas fa-paperclip me-2"></i> Files & Downloads</h4>
+          <div id="view-files-total" class="small text-muted mb-2 d-none">
+            <i class="fas fa-download me-1"></i> Total downloads: <span id="view-files-total-count">0</span>
+          </div>
           <div id="view-files" class="list-group"></div>
         </div>
 
@@ -136,6 +139,11 @@ description: View project details
               <div id="edit-btn-container" class="d-none">
                 <a id="edit-link" href="#" class="btn btn-sm btn-outline-primary w-100">
                   <i class="fas fa-pencil-alt me-2"></i> Edit Project
+                </a>
+              </div>
+              <div id="analytics-btn-container" class="d-none mt-2">
+                <a id="analytics-link" href="#" class="btn btn-sm btn-outline-secondary w-100">
+                  <i class="fas fa-chart-line me-2"></i> Analytics
                 </a>
               </div>
             </div>
@@ -425,6 +433,14 @@ description: View project details
             const editIcon = document.getElementById('edit-icon');
             editIcon.href = editUrl;
             editIcon.classList.remove('d-none');
+            // Analytics dashboard link — owner-only
+            const analyticsUrl = '/projects/analytics.html?id=' + project.id;
+            const analyticsContainer = document.getElementById('analytics-btn-container');
+            const analyticsLink = document.getElementById('analytics-link');
+            if (analyticsContainer && analyticsLink) {
+              analyticsLink.href = analyticsUrl;
+              analyticsContainer.classList.remove('d-none');
+            }
           } else {
             document.getElementById('report-section').classList.remove('d-none');
             setupReportForm(project.id);
@@ -503,11 +519,18 @@ description: View project details
     };
     function fKind(n){var e=(n||'').split('.').pop().toLowerCase();return fileKinds[e]||e.toUpperCase()+' File';}
     function fIcon(n){var e=(n||'').split('.').pop().toLowerCase();return fileIcons[e]||'fas fa-file';}
+    var totalDownloads = files.reduce(function(acc, f) { return acc + (f.download_count || 0); }, 0);
+    var totalEl = document.getElementById('view-files-total');
+    if (totalEl) {
+      document.getElementById('view-files-total-count').textContent = totalDownloads;
+      totalEl.classList.remove('d-none');
+    }
     document.getElementById('view-files').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${files.map(f => `
       <tr>
         <td class="text-muted" style="width:20px"><i class="${fIcon(f.filename)}"></i></td>
         <td><a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a></td>
         <td class="text-muted small">${fKind(f.filename)}</td>
+        <td class="text-muted small text-end" style="width:90px" title="Downloads"><i class="fas fa-download"></i> ${(f.download_count || 0)}</td>
         <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
       </tr>
     `).join('')}</tbody></table>`;
