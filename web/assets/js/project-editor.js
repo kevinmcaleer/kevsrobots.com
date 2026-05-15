@@ -1443,15 +1443,26 @@
     if (!text) return;
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     journalInput.disabled = true;
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', {
-      method: 'POST', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: text, status: 'in_progress' }),
-    });
-    journalInput.value = '';
-    journalInput.disabled = false;
-    journalInput.focus();
-    loadJournal();
+    try {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: text, status: 'in_progress' }),
+      });
+      if (!resp.ok) {
+        console.error('Journal add failed:', resp.status, await resp.text());
+        alert('Could not save journal entry (HTTP ' + resp.status + ').');
+        return;
+      }
+      journalInput.value = '';
+      loadJournal();
+    } catch (err) {
+      console.error('Journal add error:', err);
+      alert('Could not save journal entry: ' + err.message);
+    } finally {
+      journalInput.disabled = false;
+      journalInput.focus();
+    }
   });
 
   function formatTimeAgo(dateStr) {

@@ -450,9 +450,19 @@ description: View project details
   }
 
   async function loadJournal() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/journal');
-    const entries = await resp.json();
-    if (entries.length === 0) return;
+    let entries = [];
+    try {
+      const resp = await ProjectAuth.apiFetch(API + '/api/projects/' + projectId + '/journal');
+      if (!resp.ok) {
+        console.error('Journal load failed:', resp.status);
+        return;
+      }
+      entries = await resp.json();
+    } catch (err) {
+      console.error('Journal load error:', err);
+      return;
+    }
+    if (!Array.isArray(entries) || entries.length === 0) return;
     document.getElementById('view-journal-section').classList.remove('d-none');
     document.getElementById('view-journal').innerHTML = entries.map(e => `
       <div class="journal-entry">
