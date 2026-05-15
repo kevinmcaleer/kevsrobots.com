@@ -71,6 +71,9 @@ description: View project details
         <!-- Files -->
         <div id="view-files-section" class="mb-4 d-none">
           <h4><i class="fas fa-paperclip me-2"></i> Files & Downloads</h4>
+          <div id="view-files-total" class="small text-muted mb-2 d-none">
+            <i class="fas fa-download me-1"></i> Total downloads: <span id="view-files-total-count">0</span>
+          </div>
           <div id="view-files" class="list-group"></div>
         </div>
 
@@ -117,6 +120,18 @@ description: View project details
           <h4><i class="fas fa-comments me-2"></i> Comments</h4>
           <div id="comments-container"></div>
         </div>
+
+        <!-- Community Makes ("I Made This!") -->
+        <div id="makes-section" class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h4 class="mb-0"><i class="fas fa-hammer me-2"></i> Community Makes <span id="makes-count" class="text-muted small fw-normal"></span></h4>
+            <button id="i-made-this-btn" class="btn btn-sm btn-primary d-none" type="button">
+              <i class="fas fa-plus-circle me-1"></i> I Made This!
+            </button>
+          </div>
+          <p id="makes-empty" class="text-muted small mb-3 d-none">No makes yet — be the first to share your build!</p>
+          <div id="makes-grid" class="row row-cols-1 row-cols-md-2 g-3"></div>
+        </div>
       </div>
 
       <!-- RIGHT: Sidebar (scrolls with main content) -->
@@ -147,6 +162,11 @@ description: View project details
                   <i class="fas fa-pencil-alt me-2"></i> Edit Project
                 </a>
               </div>
+              <div id="analytics-btn-container" class="d-none mt-2">
+                <a id="analytics-link" href="#" class="btn btn-sm btn-outline-secondary w-100">
+                  <i class="fas fa-chart-line me-2"></i> Analytics
+                </a>
+              </div>
             </div>
           </div>
 
@@ -173,6 +193,15 @@ description: View project details
             </div>
             <div class="card-body">
               <div id="view-remixes"></div>
+            </div>
+          </div>
+
+          <!-- Makes sidebar link -->
+          <div id="view-makes-sidebar" class="card mb-3 d-none">
+            <div class="card-body py-2">
+              <a href="#makes-section" id="view-makes-link" class="text-decoration-none small">
+                <i class="fas fa-hammer me-2"></i> Makes (<span id="view-makes-count">0</span>)
+              </a>
             </div>
           </div>
         </div>
@@ -214,6 +243,60 @@ description: View project details
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- "I Made This!" Modal -->
+<div id="i-made-this-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-hammer me-2"></i> Share your build</h5>
+        <button type="button" class="btn-close" data-imt-close aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="imt-error" class="alert alert-danger d-none" role="alert"></div>
+
+        <label class="form-label small fw-bold">Photos (up to 5)</label>
+        <div id="imt-dropzone" class="text-center p-3 border border-dashed rounded mb-2">
+          <small class="text-muted">
+            <label for="imt-image-input" style="cursor:pointer" class="text-primary">Click to choose images</label>
+            or drag &amp; drop here
+          </small>
+          <input type="file" id="imt-image-input" class="d-none" multiple accept="image/*">
+        </div>
+        <div id="imt-previews" class="row g-2 mb-3"></div>
+
+        <label for="imt-notes" class="form-label small fw-bold">Notes</label>
+        <textarea id="imt-notes" class="form-control mb-3" rows="3" maxlength="5000"
+                  placeholder="How did your build go? Anything you'd want others to know..."></textarea>
+
+        <label for="imt-modifications" class="form-label small fw-bold">Modifications</label>
+        <textarea id="imt-modifications" class="form-control" rows="3" maxlength="5000"
+                  placeholder="Did you change anything? List parts swaps, code tweaks, design improvements..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-imt-close>Cancel</button>
+        <button type="button" id="imt-submit" class="btn btn-primary">
+          <i class="fas fa-paper-plane me-1"></i> Post Make
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Make detail modal -->
+<div id="make-detail-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-hammer me-2"></i> <span id="make-detail-title">Make</span></h5>
+        <button type="button" class="btn-close" data-make-detail-close aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="make-detail-body"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -326,6 +409,17 @@ description: View project details
     background: #f1f3f5;
   }
   #view-remixes .remix-item a { text-decoration: none; }
+
+  /* "I Made This!" dropzone (mirrors project-editor.css dropzone styling) */
+  #imt-dropzone {
+    border-style: dashed !important;
+    border-color: #dee2e6 !important;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  #imt-dropzone.dragover {
+    background: #e8f4fd;
+    border-color: #4A90D9 !important;
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
@@ -454,6 +548,14 @@ description: View project details
             const editIcon = document.getElementById('edit-icon');
             editIcon.href = editUrl;
             editIcon.classList.remove('d-none');
+            // Analytics dashboard link — owner-only
+            const analyticsUrl = '/projects/analytics.html?id=' + project.id;
+            const analyticsContainer = document.getElementById('analytics-btn-container');
+            const analyticsLink = document.getElementById('analytics-link');
+            if (analyticsContainer && analyticsLink) {
+              analyticsLink.href = analyticsUrl;
+              analyticsContainer.classList.remove('d-none');
+            }
           } else {
             // Logged-in non-owner: show remix button & report form (issue #108).
             const remixIcon = document.getElementById('remix-icon');
@@ -475,6 +577,7 @@ description: View project details
       loadImages();
       loadLinks();
       loadJournal();
+      loadMakes(project);
 
       // Load interactions (likes + comments) via Chatter
       var projectUrl = 'projects/view.html?id=' + projectId;
@@ -694,11 +797,18 @@ description: View project details
     };
     function fKind(n){var e=(n||'').split('.').pop().toLowerCase();return fileKinds[e]||e.toUpperCase()+' File';}
     function fIcon(n){var e=(n||'').split('.').pop().toLowerCase();return fileIcons[e]||'fas fa-file';}
+    var totalDownloads = files.reduce(function(acc, f) { return acc + (f.download_count || 0); }, 0);
+    var totalEl = document.getElementById('view-files-total');
+    if (totalEl) {
+      document.getElementById('view-files-total-count').textContent = totalDownloads;
+      totalEl.classList.remove('d-none');
+    }
     document.getElementById('view-files').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${files.map(f => `
       <tr>
         <td class="text-muted" style="width:20px"><i class="${fIcon(f.filename)}"></i></td>
         <td><a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a></td>
         <td class="text-muted small">${fKind(f.filename)}</td>
+        <td class="text-muted small text-end" style="width:90px" title="Downloads"><i class="fas fa-download"></i> ${(f.download_count || 0)}</td>
         <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
       </tr>
     `).join('')}</tbody></table>`;
@@ -876,6 +986,381 @@ description: View project details
       .replace(/^-|-$/g, '');
   }
 
+  // --- Community Makes ("I Made This!") -- issue #107 ---------------------
+
+  var MAX_MAKE_IMAGES = 5;
+  var ALLOWED_IMAGE_MIME = /^image\//;
+  var imtSelectedFiles = [];
+  var imtCurrentProject = null;
+
+  function timeAgo(iso) {
+    var d = new Date(iso);
+    var s = Math.round((Date.now() - d.getTime()) / 1000);
+    if (s < 60) return s + 's ago';
+    var m = Math.round(s / 60);
+    if (m < 60) return m + 'm ago';
+    var h = Math.round(m / 60);
+    if (h < 24) return h + 'h ago';
+    var dd = Math.round(h / 24);
+    if (dd < 30) return dd + 'd ago';
+    return d.toLocaleDateString();
+  }
+
+  function openModal(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('show');
+    el.style.display = 'block';
+    el.removeAttribute('aria-hidden');
+    document.body.classList.add('modal-open');
+    if (!document.querySelector('.modal-backdrop[data-for="' + id + '"]')) {
+      var bd = document.createElement('div');
+      bd.className = 'modal-backdrop fade show';
+      bd.setAttribute('data-for', id);
+      document.body.appendChild(bd);
+    }
+  }
+  function closeModal(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('show');
+    el.style.display = 'none';
+    el.setAttribute('aria-hidden', 'true');
+    var bd = document.querySelector('.modal-backdrop[data-for="' + id + '"]');
+    if (bd) bd.parentNode.removeChild(bd);
+    if (!document.querySelector('.modal.show')) {
+      document.body.classList.remove('modal-open');
+    }
+  }
+
+  function loadMakes(project) {
+    imtCurrentProject = project;
+
+    // Show the "I Made This!" button only to logged-in users who are NOT
+    // the project author. We piggyback on the same auth check loadProject
+    // already does (it sets edit-btn-container visibility); a more direct
+    // check via ProjectAuth.apiFetch keeps this self-contained.
+    ProjectAuth.apiFetch(API + '/api/projects/my/list').then(function (resp) {
+      if (!resp.ok) return;
+      return resp.json().then(function (mine) {
+        var isAuthor = mine.some(function (p) { return p.id === project.id; });
+        if (!isAuthor) {
+          document.getElementById('i-made-this-btn').classList.remove('d-none');
+        }
+      });
+    }).catch(function () {});
+
+    setupImtModal(project);
+    fetchMakes(project);
+  }
+
+  function fetchMakes(project) {
+    fetch(API + '/api/projects/' + project.id + '/makes')
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (makes) { renderMakes(makes, project); })
+      .catch(function () { renderMakes([], project); });
+  }
+
+  function renderMakes(makes, project) {
+    var grid = document.getElementById('makes-grid');
+    var empty = document.getElementById('makes-empty');
+    var count = document.getElementById('makes-count');
+    count.textContent = makes.length > 0 ? '(' + makes.length + ')' : '';
+
+    // Sidebar link only shows when there are makes.
+    var sb = document.getElementById('view-makes-sidebar');
+    var sbCount = document.getElementById('view-makes-count');
+    if (makes.length > 0) {
+      sb.classList.remove('d-none');
+      sbCount.textContent = makes.length;
+    } else {
+      sb.classList.add('d-none');
+    }
+
+    if (makes.length === 0) {
+      empty.classList.remove('d-none');
+      grid.innerHTML = '';
+      return;
+    }
+    empty.classList.add('d-none');
+
+    var isProjectAuthor = imtCurrentProject &&
+      project.author_username &&
+      makeAuthorIs(project.author_username);
+
+    grid.innerHTML = makes.map(function (m) {
+      var thumbs = (m.images || []).slice(0, 5).map(function (img, idx) {
+        var src = API + '/api/makes/' + m.id + '/images/' + img.id + '/view';
+        return '<img src="' + src + '" class="rounded" alt="" ' +
+               'style="width:60px;height:60px;object-fit:cover;margin-right:4px;" ' +
+               'data-make-thumb data-make-id="' + m.id + '" data-img-idx="' + idx + '">';
+      }).join('');
+      var preview = (m.notes || '').slice(0, 140);
+      if ((m.notes || '').length > 140) preview += '…';
+      var heart = '';
+      if (isProjectAuthor) {
+        var heartIcon = m.hearted_by_author ? 'fas fa-heart text-danger' : 'far fa-heart text-muted';
+        heart = '<button class="btn btn-link btn-sm p-0 ms-2" data-heart-make ' +
+                'data-make-id="' + m.id + '" data-hearted="' + (m.hearted_by_author ? '1' : '0') + '" ' +
+                'title="' + (m.hearted_by_author ? 'Unheart this make' : 'Heart this make') + '">' +
+                '<i class="' + heartIcon + '"></i></button>';
+      } else if (m.hearted_by_author) {
+        heart = '<span class="ms-2 small text-danger" title="Hearted by project author"><i class="fas fa-heart"></i></span>';
+      }
+      return '' +
+        '<div class="col">' +
+          '<div class="card h-100 shadow-sm">' +
+            '<div class="card-body p-3">' +
+              '<div class="mb-2">' + (thumbs || '<span class="text-muted small">No images</span>') + '</div>' +
+              '<div class="d-flex align-items-center mb-1">' +
+                '<strong class="small">' + esc(m.user_id) + '</strong>' +
+                '<span class="text-muted small ms-2">' + timeAgo(m.created_at) + '</span>' +
+                heart +
+              '</div>' +
+              (preview ? '<div class="small text-muted">' + esc(preview) + '</div>' : '') +
+              '<button class="btn btn-link btn-sm px-0 mt-2" data-open-make="' + m.id + '">View details</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+
+    grid.querySelectorAll('[data-open-make]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        openMakeDetail(parseInt(b.getAttribute('data-open-make'), 10));
+      });
+    });
+    grid.querySelectorAll('[data-make-thumb]').forEach(function (img) {
+      img.addEventListener('click', function () {
+        var mid = parseInt(img.getAttribute('data-make-id'), 10);
+        openMakeDetail(mid);
+      });
+    });
+    grid.querySelectorAll('[data-heart-make]').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.preventDefault();
+        toggleHeart(b);
+      });
+    });
+  }
+
+  // Track whether the currently-loaded `me` matches the project author so
+  // the heart buttons render correctly. We populate this lazily.
+  var _meCache = null;
+  function makeAuthorIs(authorUsername) {
+    // The author-detection in loadProject() flips #edit-btn-container
+    // visible iff the current user owns this project. Reuse that signal.
+    return !document.getElementById('edit-btn-container').classList.contains('d-none');
+  }
+
+  function toggleHeart(btn) {
+    var makeId = btn.getAttribute('data-make-id');
+    var hearted = btn.getAttribute('data-hearted') === '1';
+    var method = hearted ? 'DELETE' : 'POST';
+    btn.disabled = true;
+    ProjectAuth.apiFetch(API + '/api/makes/' + makeId + '/heart', { method: method })
+      .then(function (r) {
+        if (!r.ok) throw new Error('heart failed');
+        return r.json();
+      })
+      .then(function (updated) {
+        btn.setAttribute('data-hearted', updated.hearted_by_author ? '1' : '0');
+        var icon = btn.querySelector('i');
+        if (updated.hearted_by_author) {
+          icon.className = 'fas fa-heart text-danger';
+          btn.title = 'Unheart this make';
+        } else {
+          icon.className = 'far fa-heart text-muted';
+          btn.title = 'Heart this make';
+        }
+      })
+      .catch(function () { alert('Could not update heart. Try again.'); })
+      .then(function () { btn.disabled = false; });
+  }
+
+  function openMakeDetail(makeId) {
+    var body = document.getElementById('make-detail-body');
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>';
+    openModal('make-detail-modal');
+    fetch(API + '/api/makes/' + makeId)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (m) {
+        if (!m) { body.innerHTML = '<p class="text-muted">Make not found.</p>'; return; }
+        document.getElementById('make-detail-title').textContent = 'Make by ' + m.user_id;
+        var imgs = m.images || [];
+        var carousel = '';
+        if (imgs.length > 0) {
+          var slides = imgs.map(function (img, idx) {
+            var src = API + '/api/makes/' + m.id + '/images/' + img.id + '/view';
+            return '<div class="carousel-item ' + (idx === 0 ? 'active' : '') + '">' +
+                   '<img src="' + src + '" class="d-block w-100 rounded" alt="" style="max-height:480px;object-fit:contain;background:#f8f9fa;">' +
+                   '</div>';
+          }).join('');
+          var controls = imgs.length > 1 ?
+            '<button class="carousel-control-prev" type="button" data-bs-target="#make-carousel-' + m.id + '" data-carousel-prev>' +
+              '<span class="carousel-control-prev-icon"></span></button>' +
+            '<button class="carousel-control-next" type="button" data-bs-target="#make-carousel-' + m.id + '" data-carousel-next>' +
+              '<span class="carousel-control-next-icon"></span></button>' : '';
+          carousel = '<div id="make-carousel-' + m.id + '" class="carousel slide mb-3">' +
+                     '<div class="carousel-inner">' + slides + '</div>' + controls + '</div>';
+        }
+        var notes = m.notes ? '<div class="mb-3"><strong>Notes</strong><div>' + marked.parse(m.notes) + '</div></div>' : '';
+        var mods = m.modifications ? '<div class="mb-3"><strong>Modifications</strong><div>' + marked.parse(m.modifications) + '</div></div>' : '';
+        var origin = '<p class="mb-0"><a href="/projects/view.html?id=' + m.project_id + '" class="text-decoration-none">' +
+                     '<i class="fas fa-arrow-up-right-from-square me-1"></i> View original project' +
+                     (m.project_title ? ': ' + esc(m.project_title) : '') + '</a></p>';
+        body.innerHTML = carousel + notes + mods + origin;
+
+        // Tiny manual carousel cycling (we don't depend on bootstrap JS).
+        var carouselEl = document.getElementById('make-carousel-' + m.id);
+        if (carouselEl) {
+          var items = carouselEl.querySelectorAll('.carousel-item');
+          function shift(delta) {
+            var idx = -1;
+            items.forEach(function (it, i) { if (it.classList.contains('active')) idx = i; });
+            if (idx < 0) return;
+            items[idx].classList.remove('active');
+            var next = (idx + delta + items.length) % items.length;
+            items[next].classList.add('active');
+          }
+          var prev = carouselEl.querySelector('[data-carousel-prev]');
+          var next = carouselEl.querySelector('[data-carousel-next]');
+          if (prev) prev.addEventListener('click', function () { shift(-1); });
+          if (next) next.addEventListener('click', function () { shift(1); });
+        }
+      });
+  }
+
+  function setupImtModal(project) {
+    var openBtn = document.getElementById('i-made-this-btn');
+    var modal = document.getElementById('i-made-this-modal');
+    var input = document.getElementById('imt-image-input');
+    var dropzone = document.getElementById('imt-dropzone');
+    var previews = document.getElementById('imt-previews');
+    var submit = document.getElementById('imt-submit');
+    var notes = document.getElementById('imt-notes');
+    var mods = document.getElementById('imt-modifications');
+    var err = document.getElementById('imt-error');
+
+    if (!openBtn || openBtn.dataset.bound === '1') return;
+    openBtn.dataset.bound = '1';
+
+    openBtn.addEventListener('click', function () {
+      imtSelectedFiles = [];
+      previews.innerHTML = '';
+      notes.value = '';
+      mods.value = '';
+      err.classList.add('d-none');
+      err.textContent = '';
+      openModal('i-made-this-modal');
+    });
+
+    modal.querySelectorAll('[data-imt-close]').forEach(function (b) {
+      b.addEventListener('click', function () { closeModal('i-made-this-modal'); });
+    });
+
+    input.addEventListener('change', function (e) {
+      addImtFiles(Array.from(e.target.files || []));
+      input.value = '';
+    });
+
+    ['dragenter', 'dragover'].forEach(function (evt) {
+      dropzone.addEventListener(evt, function (e) {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function (evt) {
+      dropzone.addEventListener(evt, function (e) {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      });
+    });
+    dropzone.addEventListener('drop', function (e) {
+      addImtFiles(Array.from((e.dataTransfer && e.dataTransfer.files) || []));
+    });
+
+    submit.addEventListener('click', function () { submitMake(project); });
+  }
+
+  function addImtFiles(files) {
+    var err = document.getElementById('imt-error');
+    err.classList.add('d-none');
+    files.forEach(function (f) {
+      if (imtSelectedFiles.length >= MAX_MAKE_IMAGES) {
+        err.textContent = 'You can upload at most ' + MAX_MAKE_IMAGES + ' images per make.';
+        err.classList.remove('d-none');
+        return;
+      }
+      if (!ALLOWED_IMAGE_MIME.test(f.type || '')) {
+        err.textContent = 'Only image files are allowed.';
+        err.classList.remove('d-none');
+        return;
+      }
+      imtSelectedFiles.push(f);
+    });
+    renderImtPreviews();
+  }
+
+  function renderImtPreviews() {
+    var previews = document.getElementById('imt-previews');
+    previews.innerHTML = imtSelectedFiles.map(function (f, idx) {
+      var url = URL.createObjectURL(f);
+      return '<div class="col-4 col-md-3">' +
+               '<div class="position-relative">' +
+                 '<img src="' + url + '" class="img-fluid rounded" style="height:96px;width:100%;object-fit:cover;">' +
+                 '<button type="button" class="btn btn-sm btn-light position-absolute top-0 end-0" ' +
+                   'style="padding:2px 6px" data-remove-imt="' + idx + '" aria-label="Remove">&times;</button>' +
+               '</div>' +
+             '</div>';
+    }).join('');
+    previews.querySelectorAll('[data-remove-imt]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = parseInt(b.getAttribute('data-remove-imt'), 10);
+        imtSelectedFiles.splice(i, 1);
+        renderImtPreviews();
+      });
+    });
+  }
+
+  function submitMake(project) {
+    var submit = document.getElementById('imt-submit');
+    var err = document.getElementById('imt-error');
+    var notes = document.getElementById('imt-notes').value.trim();
+    var mods = document.getElementById('imt-modifications').value.trim();
+
+    if (imtSelectedFiles.length === 0 && !notes && !mods) {
+      err.textContent = 'Add at least one photo, notes, or modifications.';
+      err.classList.remove('d-none');
+      return;
+    }
+
+    var fd = new FormData();
+    if (notes) fd.append('notes', notes);
+    if (mods) fd.append('modifications', mods);
+    imtSelectedFiles.forEach(function (f) { fd.append('images', f); });
+
+    submit.disabled = true;
+    submit.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Posting...';
+    ProjectAuth.apiFetch(API + '/api/projects/' + project.id + '/makes', {
+      method: 'POST',
+      body: fd
+    }).then(function (r) {
+      if (!r.ok) {
+        return r.json().then(function (j) { throw new Error(j.detail || 'Failed to post'); });
+      }
+      return r.json();
+    }).then(function () {
+      closeModal('i-made-this-modal');
+      fetchMakes(project);
+    }).catch(function (e) {
+      err.textContent = e.message || 'Failed to post make.';
+      err.classList.remove('d-none');
+    }).then(function () {
+      submit.disabled = false;
+      submit.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Post Make';
+    });
+  }
+
   function buildTOC() {
     const nav = document.getElementById('toc-nav');
     if (!nav) return;
@@ -895,6 +1380,7 @@ description: View project details
     const extras = [
       { id: 'view-bom-section', label: 'Bill of Materials' },
       { id: 'view-files-section', label: 'Files & Downloads' },
+      { id: 'makes-section', label: 'Community Makes' },
     ];
     extras.forEach(ex => {
       const el = document.getElementById(ex.id);
