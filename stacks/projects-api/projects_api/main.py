@@ -12,6 +12,7 @@ from .config import get_settings
 from .db import create_all, repair_stale_fks
 from .routers import (
     bom,
+    downloads,
     files,
     health,
     images,
@@ -46,6 +47,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(health.router)
+    # Downloads router declares /api/projects/popular and must be registered
+    # BEFORE projects.router so the more-specific path wins over the
+    # catch-all /api/projects/{project_id}.
+    app.include_router(downloads.router)
     app.include_router(projects.router)
     app.include_router(bom.router)
     app.include_router(files.router)
