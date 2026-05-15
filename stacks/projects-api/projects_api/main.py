@@ -9,14 +9,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
-from .db import create_all, repair_stale_fks
-from .routers import bom, files, health, images, journal, links, moderation, projects
+from .db import add_remix_columns_if_missing, create_all, repair_stale_fks
+from .routers import bom, files, health, images, journal, links, moderation, projects, remixes
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await create_all()
     await repair_stale_fks()
+    # Issue #108: ensure remix columns exist on legacy Postgres deployments.
+    await add_remix_columns_if_missing()
     yield
 
 
@@ -43,6 +45,8 @@ def create_app() -> FastAPI:
     app.include_router(links.router)
     app.include_router(journal.router)
     app.include_router(moderation.router)
+    # Issue #108: project remixes (fork & attribution).
+    app.include_router(remixes.router)
     return app
 
 

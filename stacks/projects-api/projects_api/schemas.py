@@ -30,6 +30,19 @@ class ProjectUpdate(BaseModel):
     tags: Optional[list[str]] = None
 
 
+class RemixedFromRef(BaseModel):
+    """Minimal reference to a parent project (issue #108).
+
+    Embedded inside :class:`ProjectResponse` when the project is a remix.
+    ``slug`` is reserved for when project slugs land — keep optional now.
+    """
+
+    id: int
+    slug: Optional[str] = None
+    title: str
+    author_username: str
+
+
 class ProjectResponse(BaseModel):
     id: int
     title: str
@@ -44,6 +57,11 @@ class ProjectResponse(BaseModel):
     tags: list[str] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
+    # Issue #108: remix / fork attribution.
+    remixed_from: Optional[RemixedFromRef] = None
+    remix_description: Optional[str] = None
+    remixes_count: int = 0
+    is_remix: bool = False
 
 
 class ProjectListItem(BaseModel):
@@ -57,6 +75,19 @@ class ProjectListItem(BaseModel):
     cover_image: Optional[str]
     tags: list[str] = Field(default_factory=list)
     created_at: datetime
+    # Issue #108: surface remix indicator on list cards.
+    is_remix: bool = False
+
+
+class ProjectRemixCreate(BaseModel):
+    """Body for ``POST /api/projects/{id}/remix`` (issue #108).
+
+    ``remix_description`` is mandatory and must be at least 10 characters
+    so the resulting attribution actually documents what changed.
+    """
+
+    title: Optional[str] = Field(None, min_length=5, max_length=200)
+    remix_description: str = Field(..., min_length=10, max_length=2000)
 
 
 class BOMItemCreate(BaseModel):

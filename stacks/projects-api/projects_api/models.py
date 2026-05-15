@@ -39,6 +39,15 @@ class Project(Base):
     cover_image: Mapped[Optional[str]] = mapped_column(Text)
     is_blocked: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="0")
     moderation_note: Mapped[Optional[str]] = mapped_column(Text)
+    # Remix/fork attribution (issue #108). remixed_from_id points at the parent
+    # project this one was remixed from. ondelete=SET NULL so deleting an
+    # original project doesn't cascade-delete its derivatives. The
+    # application layer is responsible for ensuring remix_description is
+    # populated whenever remixed_from_id is set.
+    remixed_from_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("projects.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    remix_description: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
