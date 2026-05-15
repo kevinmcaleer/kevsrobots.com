@@ -1,0 +1,151 @@
+---
+title: Parts Catalog
+layout: default
+description: Browse and search the community parts catalog
+---
+
+<link rel="stylesheet" href="/assets/css/project-editor.css">
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+      <h1 class="mb-1"><i class="fas fa-cubes me-2 text-primary"></i>Parts Catalog</h1>
+      <p class="text-muted mb-0">A shared, community-edited catalog of the parts we use in projects.</p>
+    </div>
+    <div>
+      <a href="/parts/edit.html?new=1" id="new-part-btn" class="btn btn-sm btn-outline-primary d-none">
+        <i class="fas fa-plus me-1"></i> New part
+      </a>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <label for="parts-search" class="form-label small text-muted">Search by name, SKU or MPN</label>
+      <div class="input-group">
+        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+        <input type="search" id="parts-search" class="form-control" placeholder="Start typing... e.g. SG90, motor driver, 9V battery" autocomplete="off">
+      </div>
+      <div class="form-text">Searches name, aliases, SKU and MPN. Results update as you type.</div>
+    </div>
+  </div>
+
+  <div id="parts-status" class="text-muted small mb-2"></div>
+
+  <div id="parts-results" class="list-group"></div>
+
+  <div id="parts-empty" class="text-center py-5 d-none">
+    <i class="fas fa-search fa-2x text-muted mb-2"></i>
+    <p class="text-muted">No parts match that search yet.</p>
+    <a href="/parts/edit.html?new=1" id="parts-empty-new" class="btn btn-sm btn-outline-primary d-none">
+      <i class="fas fa-plus me-1"></i> Add the first one
+    </a>
+  </div>
+</div>
+
+<script src="/assets/js/project-auth.js"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  const searchInput = document.getElementById('parts-search');
+  const statusEl = document.getElementById('parts-status');
+  const resultsEl = document.getElementById('parts-results');
+  const emptyEl = document.getElementById('parts-empty');
+  const newBtn = document.getElementById('new-part-btn');
+  const emptyNewBtn = document.getElementById('parts-empty-new');
+  let debounceTimer = null;
+  let inFlight = null;
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+
+  function statusBadge(status) {
+    if (status === 'verified') {
+      return '<span class="badge bg-success-subtle text-success"><i class="fas fa-check-circle me-1"></i>verified</span>';
+    }
+    if (status === 'under_review') {
+      return '<span class="badge bg-warning-subtle text-warning">under review</span>';
+    }
+    return '<span class="badge bg-secondary-subtle text-secondary">draft</span>';
+  }
+
+  function renderParts(parts) {
+    if (!parts || parts.length === 0) {
+      resultsEl.innerHTML = '';
+      emptyEl.classList.remove('d-none');
+      statusEl.textContent = '';
+      return;
+    }
+    emptyEl.classList.add('d-none');
+    statusEl.textContent = parts.length + ' result' + (parts.length === 1 ? '' : 's');
+    resultsEl.innerHTML = parts.map(p => `
+      <a href="/parts/view.html?slug=${encodeURIComponent(p.slug)}" class="list-group-item list-group-item-action">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div class="flex-grow-1">
+            <div class="fw-bold">${esc(p.name)}</div>
+            <div class="small text-muted">
+              ${p.sku ? '<span class="me-2"><strong>SKU:</strong> ' + esc(p.sku) + '</span>' : ''}
+              ${typeof p.usage_count === 'number' ? '<span class="me-2"><i class="fas fa-clipboard-list me-1"></i>used in ' + p.usage_count + ' project' + (p.usage_count === 1 ? '' : 's') + '</span>' : ''}
+            </div>
+          </div>
+          <div class="text-end">${statusBadge(p.status)}</div>
+        </div>
+      </a>
+    `).join('');
+  }
+
+  async function search(query) {
+    if (inFlight && inFlight.abort) { try { inFlight.abort(); } catch (_) {} }
+    inFlight = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    statusEl.textContent = 'Searching...';
+    try {
+      const opts = inFlight ? { signal: inFlight.signal } : {};
+      const resp = await fetch(API + '/api/parts?q=' + encodeURIComponent(query) + '&limit=25', opts);
+      if (!resp.ok) {
+        statusEl.textContent = 'Could not reach the parts catalog. Please try again later.';
+        resultsEl.innerHTML = '';
+        return;
+      }
+      const data = await resp.json();
+      renderParts(Array.isArray(data) ? data : []);
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      statusEl.textContent = 'Could not reach the parts catalog. Please try again later.';
+      resultsEl.innerHTML = '';
+    }
+  }
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim();
+    if (debounceTimer) clearTimeout(debounceTimer);
+    if (q.length === 0) {
+      // Empty search returns recently-edited / popular if backend allows it
+      debounceTimer = setTimeout(() => search(''), 250);
+      return;
+    }
+    if (q.length < 2) {
+      statusEl.textContent = 'Keep typing...';
+      return;
+    }
+    debounceTimer = setTimeout(() => search(q), 250);
+  });
+
+  // Show "new part" buttons if the user is logged in (server enforces age).
+  async function checkAuth() {
+    try {
+      const resp = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
+      if (resp.ok) {
+        newBtn.classList.remove('d-none');
+        emptyNewBtn.classList.remove('d-none');
+      }
+    } catch (_) {}
+  }
+  checkAuth();
+
+  // Initial load — show some results immediately
+  search('');
+})();
+</script>

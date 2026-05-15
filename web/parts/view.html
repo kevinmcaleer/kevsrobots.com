@@ -1,0 +1,221 @@
+---
+title: Part
+layout: default
+description: View a part in the catalog
+---
+
+<link rel="stylesheet" href="/assets/css/project-editor.css">
+
+<div class="container py-4">
+  <div class="mb-3">
+    <a href="/parts/" class="text-decoration-none text-muted"><i class="fas fa-arrow-left"></i> Back to Parts Catalog</a>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="not-found" class="text-center py-5 d-none">
+    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+    <h3>Part not found</h3>
+    <p class="text-muted">We couldn't find a part with that slug.</p>
+    <a href="/parts/" class="btn btn-primary mt-3">Browse parts catalog</a>
+  </div>
+
+  <div id="part-view" class="d-none">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="d-flex align-items-center gap-3 mb-1 flex-wrap">
+          <h1 id="part-name" class="mb-0"></h1>
+          <span id="part-status-badge"></span>
+        </div>
+        <div id="part-ids" class="text-muted small mb-3"></div>
+
+        <div id="part-image-wrap" class="mb-4 d-none">
+          <img id="part-image" class="img-fluid rounded" alt="">
+        </div>
+
+        <div id="part-tags" class="d-flex flex-wrap gap-2 mb-3"></div>
+
+        <hr>
+
+        <div id="part-description" class="mb-4" style="line-height:1.7"></div>
+
+        <div id="part-suppliers-section" class="mb-4 d-none">
+          <h4><i class="fas fa-truck me-2"></i> Suppliers</h4>
+          <ul id="part-suppliers" class="list-group"></ul>
+        </div>
+
+        <div id="part-revisions-section" class="mb-4 d-none">
+          <h5 class="text-muted small text-uppercase"><i class="fas fa-history me-1"></i> Recent revisions</h5>
+          <ul id="part-revisions" class="list-unstyled small"></ul>
+          <a id="part-history-link" href="#" class="small">View full history &rarr;</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="small text-muted mb-2">
+              <i class="fas fa-user me-1"></i> Created by <strong id="part-author"></strong>
+            </div>
+            <div class="small text-muted mb-2">
+              <i class="fas fa-calendar-plus me-1"></i> Added <span id="part-created"></span>
+            </div>
+            <div class="small text-muted mb-3">
+              <i class="fas fa-clock me-1"></i> Updated <span id="part-updated"></span>
+            </div>
+            <div class="mb-2">
+              <span class="badge bg-light text-dark"><i class="fas fa-clipboard-list me-1"></i> <span id="part-usage">0</span> project<span id="part-usage-plural"></span></span>
+            </div>
+            <div id="part-edit-container" class="d-grid gap-2 mt-3 d-none">
+              <a id="part-edit-link" href="#" class="btn btn-sm btn-outline-primary"><i class="fas fa-pencil-alt me-1"></i> Edit part</a>
+              <a id="part-history-btn" href="#" class="btn btn-sm btn-outline-secondary"><i class="fas fa-history me-1"></i> Revision history</a>
+            </div>
+            <div id="part-login-container" class="d-grid mt-3 d-none">
+              <a href="/login" class="btn btn-sm btn-outline-secondary"><i class="fas fa-sign-in-alt me-1"></i> Log in to edit</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/assets/js/project-auth.js"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+
+  if (!slug) {
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('not-found').classList.remove('d-none');
+    return;
+  }
+
+  function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+
+  function styleMarkdownTables(el) {
+    if (!el) return;
+    el.querySelectorAll('table').forEach(t => t.classList.add('table', 'table-single', 'table-narrow'));
+  }
+
+  function statusBadge(status) {
+    if (status === 'verified') return '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>verified</span>';
+    if (status === 'under_review') return '<span class="badge bg-warning text-dark">under review</span>';
+    return '<span class="badge bg-secondary">draft</span>';
+  }
+
+  function supplierStatusBadge(s) {
+    if (s === 'ok') return '<span class="badge bg-success-subtle text-success ms-2">link OK</span>';
+    if (s === 'broken') return '<span class="badge bg-danger-subtle text-danger ms-2">link broken</span>';
+    return '';
+  }
+
+  function fmtTime(dateStr) {
+    if (!dateStr) return 'unknown';
+    try { return new Date(dateStr).toLocaleDateString(); } catch (_) { return 'unknown'; }
+  }
+
+  async function load() {
+    let part;
+    try {
+      const resp = await fetch(API + '/api/parts/' + encodeURIComponent(slug));
+      if (!resp.ok) throw new Error('not found');
+      part = await resp.json();
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('not-found').classList.remove('d-none');
+      return;
+    }
+
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('part-view').classList.remove('d-none');
+    document.title = (part.name || 'Part') + ' — KevsRobots Parts';
+
+    document.getElementById('part-name').textContent = part.name || slug;
+    document.getElementById('part-status-badge').innerHTML = statusBadge(part.status);
+
+    const idsParts = [];
+    if (part.sku) idsParts.push(`<span class="badge bg-light text-dark me-2"><strong>SKU:</strong> ${esc(part.sku)}</span>`);
+    if (part.mpn) idsParts.push(`<span class="badge bg-light text-dark me-2"><strong>MPN:</strong> ${esc(part.mpn)}</span>`);
+    document.getElementById('part-ids').innerHTML = idsParts.join('');
+
+    if (part.image_url) {
+      document.getElementById('part-image-wrap').classList.remove('d-none');
+      const img = document.getElementById('part-image');
+      img.src = part.image_url;
+      img.alt = part.name || '';
+      img.loading = 'lazy';
+    }
+
+    const tagsEl = document.getElementById('part-tags');
+    (part.tags || []).forEach(t => {
+      tagsEl.innerHTML += `<span class="badge bg-light text-primary">${esc(t)}</span>`;
+    });
+
+    const descEl = document.getElementById('part-description');
+    if (part.description_md) {
+      descEl.innerHTML = marked.parse(part.description_md);
+      styleMarkdownTables(descEl);
+    } else {
+      descEl.innerHTML = '<p class="text-muted fst-italic">No description yet. <a href="/parts/edit.html?slug=' + encodeURIComponent(slug) + '">Help write one</a>.</p>';
+    }
+
+    if (Array.isArray(part.suppliers) && part.suppliers.length > 0) {
+      const sec = document.getElementById('part-suppliers-section');
+      sec.classList.remove('d-none');
+      document.getElementById('part-suppliers').innerHTML = part.suppliers.map(s => `
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || s.url)} <i class="fas fa-external-link-alt fa-xs text-muted"></i></a>
+            ${supplierStatusBadge(s.last_status)}
+          </div>
+          ${s.last_checked_at ? `<small class="text-muted">checked ${fmtTime(s.last_checked_at)}</small>` : ''}
+        </li>
+      `).join('');
+    }
+
+    document.getElementById('part-author').textContent = part.created_by || 'unknown';
+    document.getElementById('part-created').textContent = fmtTime(part.created_at);
+    document.getElementById('part-updated').textContent = fmtTime(part.updated_at);
+    const usage = typeof part.usage_count === 'number' ? part.usage_count : 0;
+    document.getElementById('part-usage').textContent = usage;
+    document.getElementById('part-usage-plural').textContent = usage === 1 ? '' : 's';
+
+    if (Array.isArray(part.revisions) && part.revisions.length > 0) {
+      const sec = document.getElementById('part-revisions-section');
+      sec.classList.remove('d-none');
+      document.getElementById('part-revisions').innerHTML = part.revisions.slice(0, 5).map(r => `
+        <li class="mb-1">
+          <strong>${esc(r.author || 'someone')}</strong>
+          <span class="text-muted">${fmtTime(r.created_at)}</span>
+          ${r.change_summary ? ' &mdash; ' + esc(r.change_summary) : ''}
+        </li>
+      `).join('');
+      document.getElementById('part-history-link').href = '/parts/history.html?slug=' + encodeURIComponent(slug);
+    }
+
+    // Show edit / history buttons if the user is logged in. The API enforces
+    // the 14-day account-age rule when they actually try to save, so we keep
+    // the buttons optimistically visible to logged-in users.
+    try {
+      const me = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
+      if (me.ok) {
+        document.getElementById('part-edit-container').classList.remove('d-none');
+        document.getElementById('part-edit-link').href = '/parts/edit.html?slug=' + encodeURIComponent(slug);
+        document.getElementById('part-history-btn').href = '/parts/history.html?slug=' + encodeURIComponent(slug);
+      } else {
+        document.getElementById('part-login-container').classList.remove('d-none');
+      }
+    } catch (_) {
+      document.getElementById('part-login-container').classList.remove('d-none');
+    }
+  }
+
+  load();
+})();
+</script>

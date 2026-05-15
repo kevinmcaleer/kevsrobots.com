@@ -1352,22 +1352,47 @@
     loadBOM();
   });
 
+  function escapeHtmlAttr(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
   async function loadBOM() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom', { credentials: 'include' });
     const items = await resp.json();
     const tbody = document.getElementById('bom-body');
-    tbody.innerHTML = items.map(item => `
-      <tr data-bom-id="${item.id}">
-        <td><input value="${item.name}" data-field="name" onchange="updateBOM(${item.id}, this)"></td>
+    tbody.innerHTML = items.map(item => {
+      const linked = item.part_id && item.part_slug;
+      const partPill = linked
+        ? `<a class="bom-part-pill" href="/parts/view.html?slug=${encodeURIComponent(item.part_slug)}" title="Linked to parts catalog" target="_blank"><i class="fas fa-link"></i> /parts/${escapeHtmlAttr(item.part_slug)}</a>`
+        : (item.part_id ? `<span class="bom-part-pill" title="Linked to parts catalog"><i class="fas fa-link"></i> part #${item.part_id}</span>` : '');
+      const supplierHint = item.part_id
+        ? `<small class="bom-supplier-hint">from parts catalog</small>` : '';
+      const supplierReadonly = item.part_id ? ' readonly' : '';
+      return `
+      <tr data-bom-id="${item.id}" data-part-id="${item.part_id || ''}" data-part-slug="${escapeHtmlAttr(item.part_slug || '')}">
+        <td class="bom-part-cell" style="position:relative">
+          <input class="bom-part-input" value="${escapeHtmlAttr(item.name)}" data-field="name" autocomplete="off" placeholder="Type to search parts catalog..." onchange="updateBOM(${item.id}, this)">
+          ${partPill}
+        </td>
         <td><input type="number" value="${item.quantity}" data-field="quantity" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
-        <td><input value="${item.unit}" data-field="unit" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
+        <td><input value="${escapeHtmlAttr(item.unit)}" data-field="unit" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
         <td><input type="number" step="0.01" value="${item.unit_cost || 0}" data-field="unit_cost" style="width:70px" onchange="updateBOM(${item.id}, this)"></td>
-        <td><input value="${item.supplier_url || ''}" data-field="supplier_url" onchange="updateBOM(${item.id}, this)"></td>
+        <td>
+          <input value="${escapeHtmlAttr(item.supplier_url || '')}" data-field="supplier_url"${supplierReadonly} onchange="updateBOM(${item.id}, this)">
+          ${supplierHint}
+        </td>
         <td><button class="btn btn-sm text-danger" onclick="deleteBOM(${item.id})"><i class="fas fa-times"></i></button></td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
     updateBOMTotal(items);
+    // Wire up the parts autosuggest on every Part-name input
+    tbody.querySelectorAll('.bom-part-input').forEach(setupPartsAutosuggest);
   }
 
   function updateBOMTotal(items) {
@@ -1380,16 +1405,35 @@
     const data = {};
     row.querySelectorAll('input').forEach(inp => {
       const field = inp.dataset.field;
+      if (!field) return;
       let val = inp.value;
       if (field === 'quantity') val = parseInt(val) || 1;
       else if (field === 'unit_cost') val = parseFloat(val) || 0;
       data[field] = val;
     });
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
-      method: 'PUT', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    const partId = row.dataset.partId;
+    if (partId) data.part_id = parseInt(partId);
+    let resp;
+    try {
+      resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
+        method: 'PUT', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+    } catch (e) { loadBOM(); return; }
+    // If an older backend rejects the new part_id field, retry without it so
+    // the user's edit still saves. Treat 4xx as "field rejected"; 5xx is a
+    // real server error and we just let it fall through.
+    if (!resp.ok && partId && resp.status >= 400 && resp.status < 500) {
+      delete data.part_id;
+      try {
+        await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+      } catch (_) {}
+    }
     loadBOM();
   };
 
@@ -1399,6 +1443,367 @@
     });
     loadBOM();
   };
+
+  // --- Parts catalog autosuggest ---
+  // Single shared dropdown reused across all Part-name inputs in the BOM table.
+  let partsPopup = null;
+  let partsActiveInput = null;
+  let partsActiveIdx = 0;
+  let partsResults = [];
+  let partsDebounceTimer = null;
+  let partsAbort = null;
+
+  function ensurePartsPopup() {
+    if (partsPopup) return partsPopup;
+    partsPopup = document.createElement('div');
+    partsPopup.className = 'parts-autocomplete';
+    partsPopup.style.display = 'none';
+    document.body.appendChild(partsPopup);
+    // Re-position on scroll so it tracks the input
+    window.addEventListener('scroll', () => {
+      if (partsPopup.style.display !== 'none' && partsActiveInput) positionPartsPopup(partsActiveInput);
+    }, true);
+    return partsPopup;
+  }
+
+  function positionPartsPopup(input) {
+    const rect = input.getBoundingClientRect();
+    partsPopup.style.left = rect.left + 'px';
+    partsPopup.style.top = (rect.bottom + 2) + 'px';
+    partsPopup.style.minWidth = Math.max(280, rect.width) + 'px';
+  }
+
+  function hidePartsPopup() {
+    if (partsPopup) partsPopup.style.display = 'none';
+    partsActiveInput = null;
+    partsResults = [];
+    partsActiveIdx = 0;
+  }
+
+  function renderPartsPopup(query) {
+    const popup = ensurePartsPopup();
+    const addRowHtml = `
+      <div class="parts-autocomplete-item parts-autocomplete-add" data-action="add">
+        <span><i class="fas fa-plus me-1"></i> Add as new part&hellip;${query ? ' &ldquo;' + escapeHtmlAttr(query) + '&rdquo;' : ''}</span>
+      </div>`;
+    if (!partsResults || partsResults.length === 0) {
+      popup.innerHTML = `<div class="parts-autocomplete-empty">No matches yet. Keep typing or add a new part below.</div>${addRowHtml}`;
+    } else {
+      popup.innerHTML = partsResults.map((p, i) => `
+        <div class="parts-autocomplete-item ${i === partsActiveIdx ? 'active' : ''}" data-idx="${i}">
+          <div class="parts-ac-main">
+            <div class="parts-ac-name">${escapeHtmlAttr(p.name)}</div>
+            <div class="parts-ac-meta">
+              ${p.sku ? `<span class="parts-ac-sku">${escapeHtmlAttr(p.sku)}</span>` : ''}
+              ${typeof p.usage_count === 'number' ? `<span class="parts-ac-usage" title="Used in ${p.usage_count} projects">${p.usage_count} use${p.usage_count === 1 ? '' : 's'}</span>` : ''}
+              ${p.status === 'verified' ? `<span class="parts-ac-verified"><i class="fas fa-check-circle"></i>verified</span>` : ''}
+            </div>
+          </div>
+        </div>`).join('') + addRowHtml;
+    }
+    popup.querySelectorAll('.parts-autocomplete-item').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        if (el.dataset.action === 'add') {
+          openAddPartModal(query, partsActiveInput);
+        } else {
+          selectPartsResult(parseInt(el.dataset.idx, 10));
+        }
+      });
+    });
+  }
+
+  async function fetchPartsSearch(query) {
+    if (partsAbort) partsAbort.abort();
+    partsAbort = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    try {
+      const resp = await apiFetch(
+        API + '/api/parts?q=' + encodeURIComponent(query) + '&limit=10',
+        partsAbort ? { signal: partsAbort.signal } : {}
+      );
+      if (!resp.ok) {
+        // Backend may not be live yet — fail soft, just show "add new"
+        partsResults = [];
+        renderPartsPopup(query);
+        return;
+      }
+      partsResults = await resp.json();
+      if (!Array.isArray(partsResults)) partsResults = [];
+      partsActiveIdx = 0;
+      renderPartsPopup(query);
+    } catch (e) {
+      // network/abort errors are expected — keep popup usable
+      if (e && e.name === 'AbortError') return;
+      partsResults = [];
+      renderPartsPopup(query);
+    }
+  }
+
+  function selectPartsResult(idx) {
+    if (!partsActiveInput) return;
+    const part = partsResults[idx];
+    if (!part) return;
+    const row = partsActiveInput.closest('tr');
+    if (!row) return;
+    const itemId = row.dataset.bomId;
+    row.dataset.partId = part.id;
+    row.dataset.partSlug = part.slug || '';
+    // Write the chosen part's display name back into the input
+    partsActiveInput.value = part.name || '';
+    // Auto-fill supplier URL if the part has one
+    const supplierInput = row.querySelector('input[data-field="supplier_url"]');
+    if (supplierInput && part.primary_supplier_url) supplierInput.value = part.primary_supplier_url;
+    hidePartsPopup();
+    // Persist the link via updateBOM (which now picks up dataset.partId)
+    if (itemId && supplierInput) window.updateBOM(parseInt(itemId, 10), supplierInput);
+    else if (itemId) window.updateBOM(parseInt(itemId, 10), partsActiveInput);
+  }
+
+  function setupPartsAutosuggest(input) {
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      partsActiveInput = input;
+      // Clear any previously linked part_id since the user is typing freely
+      const row = input.closest('tr');
+      if (row) {
+        row.dataset.partId = '';
+        row.dataset.partSlug = '';
+        const pill = row.querySelector('.bom-part-pill');
+        if (pill) pill.remove();
+      }
+      if (q.length < 2) {
+        hidePartsPopup();
+        return;
+      }
+      ensurePartsPopup();
+      positionPartsPopup(input);
+      partsPopup.style.display = 'block';
+      if (partsDebounceTimer) clearTimeout(partsDebounceTimer);
+      partsDebounceTimer = setTimeout(() => fetchPartsSearch(q), 250);
+    });
+
+    input.addEventListener('focus', () => {
+      if (input.value.trim().length >= 2) {
+        partsActiveInput = input;
+        ensurePartsPopup();
+        positionPartsPopup(input);
+        partsPopup.style.display = 'block';
+        renderPartsPopup(input.value.trim());
+        fetchPartsSearch(input.value.trim());
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      // Delay so a click on the popup can register first
+      setTimeout(() => {
+        if (partsPopup && !partsPopup.matches(':hover')) hidePartsPopup();
+      }, 200);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (!partsPopup || partsPopup.style.display === 'none') return;
+      const total = partsResults.length + 1; // +1 for the "add new" row
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        partsActiveIdx = (partsActiveIdx + 1) % total;
+        renderPartsPopup(input.value.trim());
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        partsActiveIdx = (partsActiveIdx - 1 + total) % total;
+        renderPartsPopup(input.value.trim());
+      } else if (e.key === 'Enter') {
+        if (partsActiveIdx === partsResults.length) {
+          e.preventDefault();
+          openAddPartModal(input.value.trim(), input);
+        } else if (partsResults[partsActiveIdx]) {
+          e.preventDefault();
+          selectPartsResult(partsActiveIdx);
+        }
+      } else if (e.key === 'Escape') {
+        hidePartsPopup();
+      }
+    });
+  }
+
+  // --- "Add new part" modal ---
+  function ensureAddPartModal() {
+    let modal = document.getElementById('add-part-modal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'add-part-modal';
+    modal.className = 'modal fade';
+    modal.tabIndex = -1;
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fas fa-plus-circle me-2 text-primary"></i>Add new part</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="add-part-error" class="alert alert-warning d-none small mb-2"></div>
+            <div class="mb-2">
+              <label class="form-label small text-muted">Part name <span class="text-danger">*</span></label>
+              <input type="text" id="add-part-name" class="form-control form-control-sm" placeholder="e.g. SG90 micro servo" maxlength="200">
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label small text-muted">SKU</label>
+                <input type="text" id="add-part-sku" class="form-control form-control-sm" placeholder="optional">
+              </div>
+              <div class="col-6">
+                <label class="form-label small text-muted">MPN</label>
+                <input type="text" id="add-part-mpn" class="form-control form-control-sm" placeholder="optional">
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small text-muted">Supplier URL</label>
+              <input type="url" id="add-part-supplier" class="form-control form-control-sm" placeholder="https://...">
+            </div>
+            <div class="mb-2">
+              <label class="form-label small text-muted">Tags (comma-separated)</label>
+              <input type="text" id="add-part-tags" class="form-control form-control-sm" placeholder="e.g. servo, motor">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-sm btn-primary" id="add-part-save">Create part</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    document.getElementById('add-part-save').addEventListener('click', submitAddPart);
+    return modal;
+  }
+
+  let addPartTargetInput = null;
+  function openAddPartModal(prefillName, targetInput) {
+    ensureAddPartModal();
+    addPartTargetInput = targetInput || null;
+    document.getElementById('add-part-name').value = prefillName || '';
+    document.getElementById('add-part-sku').value = '';
+    document.getElementById('add-part-mpn').value = '';
+    document.getElementById('add-part-supplier').value = '';
+    document.getElementById('add-part-tags').value = '';
+    const errEl = document.getElementById('add-part-error');
+    errEl.classList.add('d-none');
+    errEl.textContent = '';
+    hidePartsPopup();
+    const modalEl = document.getElementById('add-part-modal');
+    if (window.bootstrap && window.bootstrap.Modal) {
+      const m = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+      m.show();
+      setTimeout(() => document.getElementById('add-part-name').focus(), 200);
+    } else {
+      // Fallback if Bootstrap JS not loaded for some reason
+      modalEl.classList.add('show');
+      modalEl.style.display = 'block';
+    }
+  }
+
+  function closeAddPartModal() {
+    const modalEl = document.getElementById('add-part-modal');
+    if (window.bootstrap && window.bootstrap.Modal) {
+      const m = window.bootstrap.Modal.getInstance(modalEl);
+      if (m) m.hide();
+    } else if (modalEl) {
+      modalEl.classList.remove('show');
+      modalEl.style.display = 'none';
+    }
+  }
+
+  async function submitAddPart() {
+    const name = document.getElementById('add-part-name').value.trim();
+    if (!name) {
+      const errEl = document.getElementById('add-part-error');
+      errEl.textContent = 'A name is required.';
+      errEl.classList.remove('d-none');
+      return;
+    }
+    const sku = document.getElementById('add-part-sku').value.trim() || null;
+    const mpn = document.getElementById('add-part-mpn').value.trim() || null;
+    const supplier = document.getElementById('add-part-supplier').value.trim() || null;
+    const tagsRaw = document.getElementById('add-part-tags').value.trim();
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+    const body = { name };
+    if (sku) body.sku = sku;
+    if (mpn) body.mpn = mpn;
+    if (supplier) body.supplier_url = supplier;
+    if (tags.length) body.tags = tags;
+
+    const saveBtn = document.getElementById('add-part-save');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+    try {
+      const resp = await apiFetch(API + '/api/parts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (resp.status === 403) {
+        showAccountAgeAlert(await resp.json().catch(() => ({})));
+        closeAddPartModal();
+        return;
+      }
+      if (!resp.ok) {
+        let detail = 'Could not create part.';
+        try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+        const errEl = document.getElementById('add-part-error');
+        errEl.textContent = detail;
+        errEl.classList.remove('d-none');
+        return;
+      }
+      const part = await resp.json();
+      closeAddPartModal();
+      // If we were called from a BOM row, link the new part to that row
+      if (addPartTargetInput) {
+        const row = addPartTargetInput.closest('tr');
+        if (row) {
+          const itemId = row.dataset.bomId;
+          row.dataset.partId = part.id;
+          row.dataset.partSlug = part.slug || '';
+          addPartTargetInput.value = part.name || name;
+          const supplierInput = row.querySelector('input[data-field="supplier_url"]');
+          if (supplierInput && part.primary_supplier_url) supplierInput.value = part.primary_supplier_url;
+          if (itemId) window.updateBOM(parseInt(itemId, 10), addPartTargetInput);
+        }
+      }
+    } catch (e) {
+      const errEl = document.getElementById('add-part-error');
+      errEl.textContent = 'Network error. Please try again.';
+      errEl.classList.remove('d-none');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = 'Create part';
+    }
+  }
+
+  // --- Account-age (14-day) friendly error ---
+  function showAccountAgeAlert(payload) {
+    // Backend may include a date string (e.g. eligible_at) — if so, show it; otherwise generic.
+    const eligibleAt = (payload && (payload.eligible_at || payload.eligibleAt || payload.detail?.eligible_at));
+    let dateStr = '';
+    if (eligibleAt) {
+      try { dateStr = new Date(eligibleAt).toLocaleDateString(); } catch (_) {}
+    }
+    const msg = dateStr
+      ? `You need to have had an account for at least 14 days before editing parts. Try again on ${dateStr}.`
+      : `You need to have had an account for at least 14 days before editing parts. Please try again later.`;
+    let toast = document.getElementById('parts-age-alert');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'parts-age-alert';
+      toast.className = 'alert alert-warning alert-dismissible position-fixed shadow';
+      toast.style.cssText = 'top: 80px; right: 20px; z-index: 11000; max-width: 360px;';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<i class="fas fa-clock me-1"></i> ${msg}
+      <button type="button" class="btn-close" aria-label="Close"></button>`;
+    toast.querySelector('.btn-close').addEventListener('click', () => toast.remove());
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 8000);
+  }
+  window.showAccountAgeAlert = showAccountAgeAlert;
 
   // --- Links ---
   document.getElementById('add-link-btn').addEventListener('click', async () => {

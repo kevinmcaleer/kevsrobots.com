@@ -1,0 +1,238 @@
+---
+title: Part History
+layout: default
+description: Revision history for a part in the catalog
+---
+
+<link rel="stylesheet" href="/assets/css/project-editor.css">
+
+<div class="container py-4">
+  <div class="mb-3">
+    <a id="back-link" href="/parts/" class="text-decoration-none text-muted"><i class="fas fa-arrow-left"></i> Back to part</a>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="missing-slug" class="text-center py-5 d-none">
+    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+    <p class="text-muted">No part specified.</p>
+    <a href="/parts/" class="btn btn-primary mt-3">Browse parts catalog</a>
+  </div>
+
+  <div id="history-container" class="d-none">
+    <h1 class="mb-1"><i class="fas fa-history me-2 text-primary"></i>Revision history</h1>
+    <p class="text-muted" id="history-subtitle"></p>
+
+    <div id="account-age-alert" class="alert alert-warning d-none">
+      <i class="fas fa-clock me-1"></i> <span id="account-age-message"></span>
+    </div>
+
+    <div id="restore-error" class="alert alert-danger d-none"></div>
+
+    <div id="revisions-list" class="list-group mb-3"></div>
+
+    <div id="revisions-empty" class="text-muted small d-none">No revisions found.</div>
+
+    <div id="preview-section" class="card mt-4 d-none">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong><i class="fas fa-eye me-1"></i> Preview: <span id="preview-title"></span></strong>
+        <button class="btn btn-sm btn-outline-secondary" id="preview-close" type="button"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="card-body">
+        <div id="preview-body" class="small"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/assets/js/project-auth.js"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+
+  if (!slug) {
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('missing-slug').classList.remove('d-none');
+    return;
+  }
+
+  document.getElementById('back-link').href = '/parts/view.html?slug=' + encodeURIComponent(slug);
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+
+  function fmtTime(dateStr) {
+    if (!dateStr) return 'unknown';
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleString();
+    } catch (_) { return 'unknown'; }
+  }
+
+  function relTime(dateStr) {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return days + 'd ago';
+    return new Date(dateStr).toLocaleDateString();
+  }
+
+  let revisions = [];
+  let isOwnerOrEditor = false;
+
+  function renderRevisions() {
+    const listEl = document.getElementById('revisions-list');
+    const emptyEl = document.getElementById('revisions-empty');
+    if (!revisions || revisions.length === 0) {
+      listEl.innerHTML = '';
+      emptyEl.classList.remove('d-none');
+      return;
+    }
+    emptyEl.classList.add('d-none');
+    listEl.innerHTML = revisions.map((r, idx) => {
+      const isCurrent = idx === 0;
+      return `
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="flex-grow-1">
+              <div>
+                <strong>${esc(r.author || 'someone')}</strong>
+                <span class="text-muted small ms-2" title="${esc(fmtTime(r.created_at))}">${esc(relTime(r.created_at))}</span>
+                ${isCurrent ? '<span class="badge bg-primary ms-2">current</span>' : ''}
+              </div>
+              <div class="small text-muted mt-1">${r.change_summary ? esc(r.change_summary) : '<em>No summary provided</em>'}</div>
+            </div>
+            <div class="d-flex gap-1 flex-shrink-0">
+              <button class="btn btn-sm btn-outline-secondary view-rev-btn" data-rev-id="${esc(r.id)}" type="button"><i class="fas fa-eye me-1"></i>View</button>
+              ${(!isCurrent && isOwnerOrEditor) ? `<button class="btn btn-sm btn-outline-primary restore-rev-btn" data-rev-id="${esc(r.id)}" type="button"><i class="fas fa-undo me-1"></i>Restore</button>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    listEl.querySelectorAll('.view-rev-btn').forEach(b => b.addEventListener('click', () => viewRevision(b.dataset.revId)));
+    listEl.querySelectorAll('.restore-rev-btn').forEach(b => b.addEventListener('click', () => restoreRevision(b.dataset.revId)));
+  }
+
+  async function viewRevision(revId) {
+    // The base /revisions endpoint may return the snapshot inline. If not,
+    // we just render whatever metadata we have for that revision.
+    const r = revisions.find(x => String(x.id) === String(revId));
+    if (!r) return;
+    const sec = document.getElementById('preview-section');
+    document.getElementById('preview-title').textContent = (r.author || 'someone') + ' — ' + fmtTime(r.created_at);
+    const body = document.getElementById('preview-body');
+    // Use whatever snapshot fields the API gives us. Common fields:
+    //   description_md, name, sku, mpn, image_url, tags, suppliers
+    let html = '';
+    if (r.name) html += `<p><strong>Name:</strong> ${esc(r.name)}</p>`;
+    if (r.sku) html += `<p><strong>SKU:</strong> ${esc(r.sku)}</p>`;
+    if (r.mpn) html += `<p><strong>MPN:</strong> ${esc(r.mpn)}</p>`;
+    if (Array.isArray(r.tags) && r.tags.length) html += `<p><strong>Tags:</strong> ${r.tags.map(esc).join(', ')}</p>`;
+    if (Array.isArray(r.suppliers) && r.suppliers.length) {
+      html += `<p><strong>Suppliers:</strong></p><ul>` + r.suppliers.map(s => `<li>${esc(s.name || s.url || '')} — ${esc(s.url || '')}</li>`).join('') + `</ul>`;
+    }
+    if (r.description_md) {
+      html += `<hr><div>${marked.parse(r.description_md)}</div>`;
+    } else if (!html) {
+      html = '<p class="text-muted fst-italic">No snapshot fields available for this revision. Restore it to view full details on the part page.</p>';
+    }
+    body.innerHTML = html;
+    body.querySelectorAll('table').forEach(t => t.classList.add('table', 'table-single', 'table-narrow'));
+    sec.classList.remove('d-none');
+    sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  document.getElementById('preview-close').addEventListener('click', () => {
+    document.getElementById('preview-section').classList.add('d-none');
+  });
+
+  function showAccountAge(payload) {
+    const eligibleAt = payload && (payload.eligible_at || payload.eligibleAt || (payload.detail && payload.detail.eligible_at));
+    let dateStr = '';
+    if (eligibleAt) { try { dateStr = new Date(eligibleAt).toLocaleDateString(); } catch (_) {} }
+    document.getElementById('account-age-message').textContent = dateStr
+      ? `You need to have had an account for at least 14 days before editing parts. Try again on ${dateStr}.`
+      : `You need to have had an account for at least 14 days before editing parts. Please try again later.`;
+    document.getElementById('account-age-alert').classList.remove('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function restoreRevision(revId) {
+    if (!confirm('Restore this revision? A new revision will be created with these contents — your current version stays in the history.')) return;
+    document.getElementById('restore-error').classList.add('d-none');
+    document.getElementById('account-age-alert').classList.add('d-none');
+    try {
+      const resp = await ProjectAuth.apiFetch(
+        API + '/api/parts/' + encodeURIComponent(slug) + '/revisions/' + encodeURIComponent(revId) + '/restore',
+        { method: 'POST' }
+      );
+      if (resp.status === 403) {
+        let payload = {};
+        try { payload = await resp.json(); } catch (_) {}
+        showAccountAge(payload);
+        return;
+      }
+      if (!resp.ok) {
+        let detail = 'Could not restore that revision (HTTP ' + resp.status + ').';
+        try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+        const errEl = document.getElementById('restore-error');
+        errEl.textContent = detail;
+        errEl.classList.remove('d-none');
+        return;
+      }
+      window.location.href = '/parts/view.html?slug=' + encodeURIComponent(slug);
+    } catch (e) {
+      const errEl = document.getElementById('restore-error');
+      errEl.textContent = 'Network error: ' + (e.message || e);
+      errEl.classList.remove('d-none');
+    }
+  }
+
+  async function loadHistory() {
+    try {
+      // Whether the current user is logged in (we show Restore buttons to
+      // logged-in users; the API still enforces the 14-day rule).
+      try {
+        const me = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
+        isOwnerOrEditor = me.ok;
+      } catch (_) { isOwnerOrEditor = false; }
+
+      const resp = await fetch(API + '/api/parts/' + encodeURIComponent(slug) + '/revisions?limit=50');
+      if (!resp.ok) {
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('history-container').classList.remove('d-none');
+        const err = document.getElementById('restore-error');
+        err.textContent = 'Could not load revisions for this part.';
+        err.classList.remove('d-none');
+        return;
+      }
+      const data = await resp.json();
+      revisions = Array.isArray(data) ? data : (Array.isArray(data && data.revisions) ? data.revisions : []);
+      // Sort newest first (defensive — backend should already do this)
+      revisions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      document.getElementById('history-subtitle').innerHTML = 'for <a href="/parts/view.html?slug=' + encodeURIComponent(slug) + '">' + esc(slug) + '</a>';
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('history-container').classList.remove('d-none');
+      renderRevisions();
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('history-container').classList.remove('d-none');
+      const err = document.getElementById('restore-error');
+      err.textContent = 'Network error loading revisions.';
+      err.classList.remove('d-none');
+    }
+  }
+
+  loadHistory();
+})();
+</script>
