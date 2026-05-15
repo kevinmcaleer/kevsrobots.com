@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,6 +17,7 @@ from ..schemas import (
     ProjectListItem,
     ProjectResponse,
     ProjectUpdate,
+    RemixedFromRef,
 )
 
 
@@ -55,6 +56,25 @@ async def _set_tags(session: AsyncSession, project_id: int, tags: list[str]) -> 
 
 async def _project_response(session: AsyncSession, project: Project) -> ProjectResponse:
     tags = await _get_tags(session, project.id)
+
+    # Issue #108: compute remix attribution & counts.
+    remixed_from_ref: Optional[RemixedFromRef] = None
+    parent_id = getattr(project, "remixed_from_id", None)
+    if parent_id is not None:
+        parent = await session.get(Project, parent_id)
+        if parent is not None:
+            remixed_from_ref = RemixedFromRef(
+                id=parent.id,
+                title=parent.title,
+                author_username=parent.author_username,
+            )
+
+    remixes_count = (
+        await session.scalar(
+            select(func.count(Project.id)).where(Project.remixed_from_id == project.id)
+        )
+    ) or 0
+
     return ProjectResponse(
         id=project.id,
         title=project.title,
@@ -69,6 +89,10 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         tags=tags,
         created_at=project.created_at,
         updated_at=project.updated_at,
+        remixed_from=remixed_from_ref,
+        remix_description=getattr(project, "remix_description", None),
+        remixes_count=int(remixes_count),
+        is_remix=remixed_from_ref is not None,
         download_count=await _download_count(session, project.id),
     )
 
@@ -123,6 +147,7 @@ async def list_projects(
                 cover_image=p.cover_image,
                 tags=tags,
                 created_at=p.created_at,
+                is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
             )
         )
@@ -170,6 +195,7 @@ async def create_project(
 async def update_project(
     project_id: int,
     body: ProjectUpdate,
+    request: Request,
     user: str = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> ProjectResponse:
@@ -178,6 +204,25 @@ async def update_project(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
     if project.author_username != user:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not the project owner")
+
+    # Issue #108: remix attribution is permanent. Even though ProjectUpdate
+    # does not expose remixed_from_id / remix_description, defensively
+    # inspect the raw request body and reject any explicit attempt to
+    # change them. Surface as 400 with a clear message.
+    try:
+        raw_body = await request.json()
+    except Exception:  # pragma: no cover - body may not be JSON
+        raw_body = {}
+    if isinstance(raw_body, dict):
+        for forbidden in ("remixed_from_id", "remix_description"):
+            if forbidden in raw_body:
+                raise HTTPException(
+                    status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        "Remix attribution is permanent and cannot be modified. "
+                        f"Field '{forbidden}' may not be changed via PUT."
+                    ),
+                )
 
     update_data = body.model_dump(exclude_unset=True)
     tags = update_data.pop("tags", None)
@@ -235,6 +280,7 @@ async def my_projects(
                 cover_image=p.cover_image,
                 tags=tags,
                 created_at=p.created_at,
+                is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
             )
         )

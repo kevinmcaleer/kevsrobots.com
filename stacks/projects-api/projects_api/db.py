@@ -133,3 +133,51 @@ async def repair_stale_fks() -> None:
                 f'ALTER TABLE "{owning_table}" ADD CONSTRAINT "{fk_name}" '
                 f'FOREIGN KEY ("{fk_column}") REFERENCES "{live_target}" (id){cascade}'
             ))
+
+
+async def add_remix_columns_if_missing() -> None:
+    """Additive migration for issue #108 (project remixes).
+
+    Adds ``remixed_from_id`` (FK -> projects.id ON DELETE SET NULL) and
+    ``remix_description`` (TEXT) to the existing ``projects`` table when
+    they do not already exist. SQLAlchemy's ``create_all`` does not ALTER
+    existing tables, so this lightweight idempotent helper keeps existing
+    Postgres deployments in sync. Safe to run on every startup; no-op when
+    the columns are already present. Postgres-only — SQLite test runs use
+    ``create_all`` against a fresh in-memory DB which already includes the
+    new columns.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        # Check existence of the projects table first; if the DB is brand
+        # new, create_all will already have built it with these columns.
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'projects'"
+        ))
+        if table_check.first() is None:
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'projects'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "remixed_from_id" not in cols:
+            logger.warning("Adding projects.remixed_from_id column (issue #108)")
+            await conn.execute(text(
+                'ALTER TABLE "projects" ADD COLUMN "remixed_from_id" INTEGER '
+                'REFERENCES "projects" (id) ON DELETE SET NULL'
+            ))
+            await conn.execute(text(
+                'CREATE INDEX IF NOT EXISTS "ix_projects_remixed_from_id" '
+                'ON "projects" ("remixed_from_id")'
+            ))
+        if "remix_description" not in cols:
+            logger.warning("Adding projects.remix_description column (issue #108)")
+            await conn.execute(text(
+                'ALTER TABLE "projects" ADD COLUMN "remix_description" TEXT'
+            ))

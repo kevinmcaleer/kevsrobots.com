@@ -187,12 +187,15 @@ thanks: false
             <div class="card h-100 border-0 shadow-sm card-hover">
               ${projectThumbnail(p, 200)}
               <div class="card-body">
-                <h5 class="card-title text-dark">${esc(p.title)}</h5>
+                <h5 class="card-title text-dark">
+                  ${p.is_remix ? '<i class="fas fa-code-branch text-muted me-1" title="Remix of another project" data-bs-toggle="tooltip"></i>' : ''}${esc(p.title)}
+                </h5>
                 <p class="card-text text-muted small">${esc(p.short_description || '')}</p>
                 <div class="d-flex flex-wrap gap-1 mb-2">
                   ${statusBadges[p.status] || ''}
                   ${p.difficulty ? `<span class="badge bg-${difficultyColors[p.difficulty] || 'secondary'}">${p.difficulty}</span>` : ''}
                   ${p.estimated_minutes ? `<span class="badge bg-light text-dark"><i class="fas fa-clock"></i> ${p.estimated_minutes}min</span>` : ''}
+                  ${p.is_remix ? '<span class="badge bg-light text-muted"><i class="fas fa-code-branch"></i> Remix</span>' : ''}
                 </div>
                 <div class="d-flex flex-wrap gap-1">
                   ${(p.tags || []).slice(0, 4).map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('')}

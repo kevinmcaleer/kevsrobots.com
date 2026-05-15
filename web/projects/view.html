@@ -31,13 +31,34 @@ description: View project details
 
       <!-- MIDDLE: Main content -->
       <div class="col-lg-7">
+        <!-- Remix chain breadcrumb (issue #108) — hidden unless this project is a remix -->
+        <nav id="remix-chain-crumbs" class="remix-chain-crumbs small text-muted mb-2 d-none" aria-label="Remix chain"></nav>
+
         <div class="d-flex align-items-center gap-3 mb-1">
           <h1 id="view-title" class="mb-0"></h1>
           <span id="like-container"></span>
           <a id="edit-icon" href="#" class="d-none text-muted" title="Edit this project" aria-label="Edit this project" style="font-size:1.1rem">
             <i class="fas fa-pencil-alt"></i>
           </a>
+          <a id="remix-icon" href="#" class="d-none text-muted" title="Remix this project" aria-label="Remix this project" style="font-size:1.1rem" data-bs-toggle="modal" data-bs-target="#remix-modal">
+            <i class="fas fa-code-branch"></i>
+          </a>
         </div>
+
+        <!-- Remix attribution banner (issue #108) — shown when this project is a remix -->
+        <div id="remix-attribution-banner" class="alert alert-info d-none py-2 px-3 mb-3" role="note">
+          <i class="fas fa-code-branch me-2" aria-hidden="true"></i>
+          Remix of <a id="remix-attribution-link" href="#"></a>
+          by <strong id="remix-attribution-author"></strong>
+          <i class="fas fa-info-circle text-muted ms-1"
+             id="remix-attribution-tooltip"
+             tabindex="0"
+             data-bs-toggle="tooltip"
+             data-bs-placement="bottom"
+             title=""
+             aria-label="What changed in this remix"></i>
+        </div>
+
         <p id="view-description" class="lead text-muted"></p>
 
         <div id="view-meta-badges" class="d-flex flex-wrap gap-2 mb-4"></div>
@@ -165,6 +186,16 @@ description: View project details
             </div>
           </div>
 
+          <!-- Remixes (issue #108) — direct derivatives of this project -->
+          <div id="view-remixes-section" class="card mb-3 d-none">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+              <span><i class="fas fa-code-branch me-2"></i> Remixes <span id="view-remixes-count" class="badge bg-secondary"></span></span>
+            </div>
+            <div class="card-body">
+              <div id="view-remixes"></div>
+            </div>
+          </div>
+
           <!-- Makes sidebar link -->
           <div id="view-makes-sidebar" class="card mb-3 d-none">
             <div class="card-body py-2">
@@ -175,6 +206,43 @@ description: View project details
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remix creation modal (issue #108) -->
+<div class="modal fade" id="remix-modal" tabindex="-1" aria-labelledby="remix-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="remix-form">
+        <div class="modal-header">
+          <h5 class="modal-title" id="remix-modal-label"><i class="fas fa-code-branch me-2"></i> Remix this project</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted">
+            A remix creates a new project linked back to the original with attribution.
+            Tell future readers what you changed — this description is permanent.
+          </p>
+          <div class="mb-3">
+            <label for="remix-title" class="form-label">Title <span class="text-muted small">(optional)</span></label>
+            <input type="text" class="form-control" id="remix-title" maxlength="200">
+            <div class="form-text" id="remix-title-help">Defaults to "Remix of …"</div>
+          </div>
+          <div class="mb-3">
+            <label for="remix-description" class="form-label">What did you change? <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="remix-description" rows="4" minlength="10" maxlength="2000" required></textarea>
+            <div class="form-text">At least 10 characters. This stays on the remix forever.</div>
+          </div>
+          <div id="remix-error" class="alert alert-danger d-none py-2 mb-0" role="alert"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="remix-submit">
+            <i class="fas fa-code-branch me-1"></i> Create remix
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -294,6 +362,53 @@ description: View project details
     text-align: center;
     margin: 1.5rem 0;
   }
+
+  /* Remix chain breadcrumb (issue #108) */
+  .remix-chain-crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.4rem;
+    align-items: center;
+  }
+  .remix-chain-crumbs a {
+    color: #6c757d;
+    text-decoration: none;
+  }
+  .remix-chain-crumbs a:hover { color: #4A90D9; }
+  .remix-chain-crumbs .crumb-current {
+    color: #212529;
+    font-weight: 500;
+  }
+  .remix-chain-crumbs .crumb-sep {
+    color: #adb5bd;
+    font-size: 0.75rem;
+  }
+  .remix-chain-crumbs .crumb-ellipsis {
+    color: #adb5bd;
+  }
+
+  /* Remix attribution banner */
+  #remix-attribution-banner { font-size: 0.95rem; }
+  #remix-attribution-tooltip { cursor: help; }
+
+  /* Sidebar remix list */
+  #view-remixes .remix-item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  #view-remixes .remix-item:last-child { border-bottom: none; }
+  #view-remixes .remix-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+    flex: 0 0 40px;
+    background: #f1f3f5;
+  }
+  #view-remixes .remix-item a { text-decoration: none; }
 
   /* "I Made This!" dropzone (mirrors project-editor.css dropzone styling) */
   #imt-dropzone {
@@ -442,11 +557,20 @@ description: View project details
               analyticsContainer.classList.remove('d-none');
             }
           } else {
+            // Logged-in non-owner: show remix button & report form (issue #108).
+            const remixIcon = document.getElementById('remix-icon');
+            if (remixIcon) remixIcon.classList.remove('d-none');
+            setupRemixForm(project);
             document.getElementById('report-section').classList.remove('d-none');
             setupReportForm(project.id);
           }
         }
       } catch (e) {}
+
+      // Render remix attribution banner & chain crumbs (issue #108).
+      renderRemixAttribution(project);
+      loadRemixChain(project);
+      loadRemixesSidebar(project);
 
       loadBOM();
       loadFiles();
@@ -468,6 +592,160 @@ description: View project details
       document.getElementById('loading').classList.add('d-none');
       document.getElementById('not-found').classList.remove('d-none');
     }
+  }
+
+  // ---- Remix attribution (issue #108) ----------------------------------
+  function renderRemixAttribution(project) {
+    if (!project || !project.remixed_from) return;
+    const banner = document.getElementById('remix-attribution-banner');
+    const link = document.getElementById('remix-attribution-link');
+    const author = document.getElementById('remix-attribution-author');
+    const tip = document.getElementById('remix-attribution-tooltip');
+    if (!banner || !link || !author) return;
+
+    link.textContent = project.remixed_from.title;
+    link.href = '/projects/view.html?id=' + project.remixed_from.id;
+    author.textContent = project.remixed_from.author_username;
+    if (tip) {
+      const desc = project.remix_description || 'No change description provided.';
+      tip.setAttribute('title', desc);
+      tip.setAttribute('data-bs-original-title', desc);
+      // Initialise Bootstrap tooltip if available; fail silently otherwise.
+      try {
+        if (window.bootstrap && window.bootstrap.Tooltip) {
+          new window.bootstrap.Tooltip(tip);
+        }
+      } catch (e) {}
+    }
+    banner.classList.remove('d-none');
+  }
+
+  async function loadRemixChain(project) {
+    // Only render when this project is itself a remix.
+    if (!project || !project.remixed_from) return;
+    const crumbs = document.getElementById('remix-chain-crumbs');
+    if (!crumbs) return;
+    try {
+      const resp = await fetch(API + '/api/projects/' + project.id + '/remix-chain');
+      if (!resp.ok) return;
+      const chain = await resp.json();
+      if (!Array.isArray(chain) || chain.length < 2) return;
+
+      // Truncate intermediate hops if the chain is long: show first, ellipsis, last two before current.
+      let shown = chain;
+      let truncated = false;
+      if (chain.length > 5) {
+        shown = [chain[0], null, chain[chain.length - 3], chain[chain.length - 2], chain[chain.length - 1]];
+        truncated = true;
+      }
+
+      const parts = [];
+      for (let i = 0; i < shown.length; i++) {
+        if (i > 0) parts.push('<span class="crumb-sep"><i class="fas fa-angle-right"></i></span>');
+        const item = shown[i];
+        if (item === null) {
+          parts.push('<span class="crumb-ellipsis" title="' + (chain.length - 4) + ' intermediate remixes hidden">…</span>');
+          continue;
+        }
+        const isCurrent = item.id === project.id;
+        if (isCurrent) {
+          parts.push('<span class="crumb-current">' + esc(item.title) + '</span>');
+        } else {
+          parts.push('<a href="/projects/view.html?id=' + item.id + '">' + esc(item.title) + '</a>');
+        }
+      }
+      crumbs.innerHTML = '<i class="fas fa-code-branch me-1 text-muted" aria-hidden="true"></i>' + parts.join(' ');
+      crumbs.classList.remove('d-none');
+      if (truncated) {
+        crumbs.setAttribute('title', 'Full chain depth: ' + chain.length);
+      }
+    } catch (e) {
+      // Non-fatal — banner alone is still useful.
+    }
+  }
+
+  async function loadRemixesSidebar(project) {
+    if (!project) return;
+    const section = document.getElementById('view-remixes-section');
+    const countEl = document.getElementById('view-remixes-count');
+    const listEl = document.getElementById('view-remixes');
+    if (!section || !listEl) return;
+    try {
+      const resp = await fetch(API + '/api/projects/' + project.id + '/remixes');
+      if (!resp.ok) return;
+      const remixes = await resp.json();
+      if (!Array.isArray(remixes) || remixes.length === 0) return;
+      if (countEl) countEl.textContent = remixes.length;
+      listEl.innerHTML = remixes.map(function (r) {
+        var thumb = r.cover_image
+          ? '<img class="remix-thumb" loading="lazy" src="' + esc(r.cover_image) + '" alt="">'
+          : '<span class="remix-thumb d-inline-flex align-items-center justify-content-center text-muted"><i class="fas fa-code-branch"></i></span>';
+        return '<div class="remix-item">' +
+          thumb +
+          '<div class="flex-grow-1 small">' +
+            '<a href="/projects/view.html?id=' + r.id + '" class="d-block text-truncate">' + esc(r.title) + '</a>' +
+            '<span class="text-muted">by ' + esc(r.author_username) + '</span>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      section.classList.remove('d-none');
+    } catch (e) {
+      // Silent failure — sidebar tile is optional.
+    }
+  }
+
+  function setupRemixForm(project) {
+    var form = document.getElementById('remix-form');
+    var titleInput = document.getElementById('remix-title');
+    var descInput = document.getElementById('remix-description');
+    var errEl = document.getElementById('remix-error');
+    var submitBtn = document.getElementById('remix-submit');
+    var titleHelp = document.getElementById('remix-title-help');
+    if (!form || !titleInput || !descInput) return;
+    if (titleHelp) titleHelp.textContent = 'Defaults to "Remix of ' + project.title + '"';
+    titleInput.setAttribute('placeholder', 'Remix of ' + project.title);
+
+    form.addEventListener('submit', async function (ev) {
+      ev.preventDefault();
+      errEl.classList.add('d-none');
+      var desc = (descInput.value || '').trim();
+      if (desc.length < 10) {
+        errEl.textContent = 'Please describe what you changed (at least 10 characters).';
+        errEl.classList.remove('d-none');
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Creating…';
+      try {
+        var payload = { remix_description: desc };
+        var titleVal = (titleInput.value || '').trim();
+        if (titleVal.length >= 5) payload.title = titleVal;
+        var resp = await ProjectAuth.apiFetch(API + '/api/projects/' + project.id + '/remix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (resp.status === 401) {
+          errEl.textContent = 'Please log in to remix this project.';
+          errEl.classList.remove('d-none');
+        } else if (!resp.ok) {
+          var body = null;
+          try { body = await resp.json(); } catch (e) {}
+          errEl.textContent = (body && body.detail) ? body.detail : 'Failed to create remix. Please try again.';
+          errEl.classList.remove('d-none');
+        } else {
+          var newProject = await resp.json();
+          // Send the user to the editor for their new remix.
+          window.location.href = '/projects/editor.html?id=' + newProject.id;
+          return;
+        }
+      } catch (e) {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.classList.remove('d-none');
+      }
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-code-branch me-1"></i> Create remix';
+    });
   }
 
   async function loadBOM() {
