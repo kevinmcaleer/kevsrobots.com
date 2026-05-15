@@ -181,3 +181,54 @@ async def add_remix_columns_if_missing() -> None:
             await conn.execute(text(
                 'ALTER TABLE "projects" ADD COLUMN "remix_description" TEXT'
             ))
+
+
+async def add_bom_part_id_if_missing() -> None:
+    """Additive migration for issue #121 (parts catalog).
+
+    Adds ``part_id`` (FK -> parts.id ON DELETE SET NULL) to the existing
+    ``project_bom_items`` table when it does not already exist. Without
+    this, every SELECT / INSERT on the BOM table 500s after a redeploy
+    that ships the new ORM model. Idempotent — runs on every startup.
+    Postgres-only; SQLite tests use a fresh in-memory DB.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'project_bom_items'"
+        ))
+        if table_check.first() is None:
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'project_bom_items'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "part_id" not in cols:
+            logger.warning("Adding project_bom_items.part_id column (issue #121)")
+            # Add column first without FK so the migration succeeds even if
+            # the parts table hasn't been created yet (it will be by
+            # create_all on the same startup pass).
+            await conn.execute(text(
+                'ALTER TABLE "project_bom_items" ADD COLUMN "part_id" INTEGER'
+            ))
+            # Check whether parts table exists before adding the FK.
+            parts_check = await conn.execute(text(
+                "SELECT 1 FROM information_schema.tables "
+                "WHERE table_schema = current_schema() AND table_name = 'parts'"
+            ))
+            if parts_check.first() is not None:
+                await conn.execute(text(
+                    'ALTER TABLE "project_bom_items" ADD CONSTRAINT '
+                    '"fk_project_bom_items_part_id" FOREIGN KEY ("part_id") '
+                    'REFERENCES "parts" (id) ON DELETE SET NULL'
+                ))
+            await conn.execute(text(
+                'CREATE INDEX IF NOT EXISTS "ix_project_bom_items_part_id" '
+                'ON "project_bom_items" ("part_id")'
+            ))

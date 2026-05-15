@@ -9,7 +9,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
-from .db import add_remix_columns_if_missing, create_all, repair_stale_fks
+from .db import (
+    add_bom_part_id_if_missing,
+    add_remix_columns_if_missing,
+    create_all,
+    repair_stale_fks,
+)
 from .routers import (
     bom,
     downloads,
@@ -32,6 +37,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await repair_stale_fks()
     # Issue #108: ensure remix columns exist on legacy Postgres deployments.
     await add_remix_columns_if_missing()
+    # Issue #121: ensure project_bom_items.part_id column exists.
+    await add_bom_part_id_if_missing()
     yield
 
 
