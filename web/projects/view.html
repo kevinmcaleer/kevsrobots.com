@@ -372,6 +372,8 @@ description: View project details
     const items = await resp.json();
     if (items.length === 0) return;
     document.getElementById('view-bom-section').classList.remove('d-none');
+    // Rebuild TOC now that the BOM section is visible
+    try { buildTOC(); } catch (e) {}
     const tbody = document.getElementById('view-bom');
     let total = 0;
     tbody.innerHTML = items.map(i => {
@@ -613,6 +615,7 @@ description: View project details
     });
     // Extra non-heading anchors at the bottom (sections rendered outside the markdown)
     const extras = [
+      { id: 'view-bom-section', label: 'Bill of Materials' },
       { id: 'view-files-section', label: 'Files & Downloads' },
     ];
     extras.forEach(ex => {

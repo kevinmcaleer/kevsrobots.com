@@ -152,7 +152,7 @@ description: Create or edit a project
       </div>
 
       <!-- Bill of Materials -->
-      <div class="card mb-4">
+      <div class="card mb-4" id="editor-bom-section">
         <div class="card-header py-2 d-flex justify-content-between align-items-center">
           <span><i class="fas fa-clipboard-list me-1"></i> Bill of Materials</span>
           <button class="btn btn-sm btn-outline-primary" id="add-bom-btn"><i class="fas fa-plus"></i> Add Item</button>
@@ -323,9 +323,12 @@ description: Create or edit a project
     );
 
     // Extra non-markdown anchors (page sections rendered outside the editor)
-    const extraLinks = [
-      `<a class="toc-h1 toc-extra" data-scroll-to="editor-files-section">Files &amp; Models</a>`,
-    ];
+    const extraLinks = [];
+    const bomRows = document.querySelectorAll('#bom-body tr').length;
+    if (bomRows > 0) {
+      extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-bom-section">Bill of Materials</a>`);
+    }
+    extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-files-section">Files &amp; Models</a>`);
 
     let body;
     if (headings.length === 0) {
@@ -383,6 +386,15 @@ description: Create or edit a project
       clearTimeout(render._t);
       render._t = setTimeout(render, 150);
     });
+    // Re-render the TOC when the BOM table contents change, so the
+    // "Bill of Materials" entry appears/disappears with row count.
+    const bomBody = document.getElementById('bom-body');
+    if (bomBody) {
+      new MutationObserver(() => {
+        clearTimeout(render._t);
+        render._t = setTimeout(render, 50);
+      }).observe(bomBody, { childList: true });
+    }
     render();
   }
 
