@@ -1,0 +1,379 @@
+---
+title: Edit Part
+layout: default
+description: Edit a part in the catalog
+---
+
+<link rel="stylesheet" href="/assets/css/project-editor.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+
+<div class="container py-4">
+  <div class="mb-3">
+    <a href="javascript:history.back()" class="text-decoration-none text-muted"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div id="auth-required" class="alert alert-warning d-none">
+    You need to <a href="/login">log in</a> to edit parts.
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="edit-container" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 id="page-title" class="mb-0"><i class="fas fa-pencil-alt me-2 text-primary"></i><span id="page-title-text">Edit part</span></h1>
+      <a id="view-link" href="#" class="btn btn-sm btn-outline-secondary d-none"><i class="fas fa-eye me-1"></i> View</a>
+    </div>
+
+    <div id="account-age-alert" class="alert alert-warning d-none">
+      <i class="fas fa-clock me-1"></i> <span id="account-age-message"></span>
+    </div>
+
+    <div id="save-error" class="alert alert-danger d-none"></div>
+
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="mb-3">
+          <label for="part-name" class="form-label">Name <span class="text-danger">*</span></label>
+          <input type="text" id="part-name" class="form-control" maxlength="200" placeholder="e.g. SG90 micro servo">
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label for="part-sku" class="form-label">SKU</label>
+            <input type="text" id="part-sku" class="form-control" placeholder="optional">
+          </div>
+          <div class="col-md-6">
+            <label for="part-mpn" class="form-label">MPN</label>
+            <input type="text" id="part-mpn" class="form-control" placeholder="manufacturer part number">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="part-image-url" class="form-label">Image URL</label>
+          <input type="url" id="part-image-url" class="form-control" placeholder="https://...">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Tags</label>
+          <div id="part-tags-container" class="d-flex flex-wrap gap-1 mb-1"></div>
+          <div class="input-group input-group-sm">
+            <input type="text" id="part-tag-input" class="form-control" placeholder="Add a tag and press Enter">
+            <button class="btn btn-outline-secondary" id="part-add-tag-btn" type="button">Add</button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="form-label mb-0">Suppliers</label>
+            <button class="btn btn-sm btn-outline-primary" id="add-supplier-btn" type="button"><i class="fas fa-plus me-1"></i>Add supplier</button>
+          </div>
+          <div id="suppliers-list"></div>
+        </div>
+
+        <div class="mb-3">
+          <label for="part-description" class="form-label">Description (Markdown)</label>
+          <textarea id="part-description"></textarea>
+        </div>
+
+        <div class="card mb-3 bg-light">
+          <div class="card-body">
+            <label for="part-change-summary" class="form-label fw-bold">
+              <i class="fas fa-pencil-ruler me-1"></i> What changed? <span class="text-danger">*</span>
+            </label>
+            <input type="text" id="part-change-summary" class="form-control" maxlength="200" placeholder="A short summary, e.g. 'Fixed SKU and added supplier link'">
+            <div class="form-text">This message goes into the part's revision history. Max 200 characters.</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" id="save-btn">
+            <i class="fas fa-save me-1"></i> <span id="save-btn-label">Save part</span>
+          </button>
+          <a href="javascript:history.back()" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script src="/assets/js/project-auth.js"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+  const isNew = params.get('new') === '1' || !slug;
+  let easyMDE = null;
+  let currentPart = null;
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+
+  function show(el) { el.classList.remove('d-none'); }
+  function hide(el) { el.classList.add('d-none'); }
+
+  // --- Tags ---
+  const tagsContainer = document.getElementById('part-tags-container');
+  const tagInput = document.getElementById('part-tag-input');
+
+  function renderTags(tags) {
+    tagsContainer.innerHTML = '';
+    (tags || []).forEach(t => addTagBadge(t));
+  }
+  function addTagBadge(tag) {
+    const el = document.createElement('span');
+    el.className = 'tag-badge';
+    el.dataset.tag = tag;
+    el.innerHTML = esc(tag) + ' <span class="remove-tag">&times;</span>';
+    el.querySelector('.remove-tag').addEventListener('click', () => el.remove());
+    tagsContainer.appendChild(el);
+  }
+  function getTags() {
+    return Array.from(tagsContainer.querySelectorAll('.tag-badge')).map(el => el.dataset.tag);
+  }
+  document.getElementById('part-add-tag-btn').addEventListener('click', () => {
+    const t = tagInput.value.trim().toLowerCase();
+    if (!t) return;
+    if (getTags().includes(t)) { tagInput.value = ''; return; }
+    addTagBadge(t);
+    tagInput.value = '';
+  });
+  tagInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('part-add-tag-btn').click(); }
+  });
+
+  // --- Suppliers ---
+  const suppliersList = document.getElementById('suppliers-list');
+  function renderSuppliers(suppliers) {
+    suppliersList.innerHTML = '';
+    (suppliers || []).forEach(s => addSupplierRow(s.name || '', s.url || ''));
+  }
+  function addSupplierRow(name, url) {
+    const row = document.createElement('div');
+    row.className = 'row g-2 mb-2 supplier-row';
+    row.innerHTML = `
+      <div class="col-4"><input type="text" class="form-control form-control-sm supplier-name" placeholder="Supplier name" value="${esc(name)}"></div>
+      <div class="col-7"><input type="url" class="form-control form-control-sm supplier-url" placeholder="https://..." value="${esc(url)}"></div>
+      <div class="col-1 d-flex align-items-center"><button class="btn btn-sm text-danger supplier-remove" type="button" aria-label="Remove"><i class="fas fa-times"></i></button></div>
+    `;
+    row.querySelector('.supplier-remove').addEventListener('click', () => row.remove());
+    suppliersList.appendChild(row);
+  }
+  function getSuppliers() {
+    return Array.from(suppliersList.querySelectorAll('.supplier-row')).map(r => ({
+      name: r.querySelector('.supplier-name').value.trim(),
+      url: r.querySelector('.supplier-url').value.trim(),
+    })).filter(s => s.name || s.url);
+  }
+  document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', ''));
+
+  // --- Editor ---
+  function initEditor() {
+    if (easyMDE) return;
+    easyMDE = new EasyMDE({
+      element: document.getElementById('part-description'),
+      spellChecker: false,
+      placeholder: 'Describe what the part is, how it works, common pinouts, gotchas...',
+      status: false,
+      minHeight: '250px',
+      toolbar: ['bold', 'italic', 'heading', '|', 'code', 'quote', 'unordered-list', 'ordered-list', '|', 'link', 'table', '|', 'preview', 'side-by-side', 'fullscreen', '|', 'guide'],
+    });
+  }
+
+  // --- Auth check ---
+  async function checkAuth() {
+    try {
+      const resp = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
+      if (!resp.ok) {
+        hide(document.getElementById('loading'));
+        show(document.getElementById('auth-required'));
+        return false;
+      }
+      return true;
+    } catch (e) {
+      hide(document.getElementById('loading'));
+      show(document.getElementById('auth-required'));
+      return false;
+    }
+  }
+
+  // --- Load ---
+  async function loadPart() {
+    if (isNew) {
+      currentPart = null;
+      document.getElementById('page-title-text').textContent = 'New part';
+      hide(document.getElementById('view-link'));
+      hide(document.getElementById('loading'));
+      show(document.getElementById('edit-container'));
+      initEditor();
+      // Pre-fill name from ?name= so we can route here from the BOM autosuggest
+      const prefillName = params.get('name');
+      if (prefillName) document.getElementById('part-name').value = prefillName;
+      return;
+    }
+    try {
+      const resp = await fetch(API + '/api/parts/' + encodeURIComponent(slug));
+      if (!resp.ok) {
+        const err = document.getElementById('save-error');
+        err.textContent = 'Could not load this part.';
+        show(err);
+        hide(document.getElementById('loading'));
+        show(document.getElementById('edit-container'));
+        return;
+      }
+      currentPart = await resp.json();
+      document.getElementById('page-title-text').textContent = 'Edit: ' + currentPart.name;
+      const viewLink = document.getElementById('view-link');
+      viewLink.href = '/parts/view.html?slug=' + encodeURIComponent(slug);
+      show(viewLink);
+
+      document.getElementById('part-name').value = currentPart.name || '';
+      document.getElementById('part-sku').value = currentPart.sku || '';
+      document.getElementById('part-mpn').value = currentPart.mpn || '';
+      document.getElementById('part-image-url').value = currentPart.image_url || '';
+      renderTags(currentPart.tags || []);
+      renderSuppliers(currentPart.suppliers || []);
+
+      hide(document.getElementById('loading'));
+      show(document.getElementById('edit-container'));
+      initEditor();
+      // Populate the editor *after* it's been initialised
+      easyMDE.value(currentPart.description_md || '');
+    } catch (e) {
+      const err = document.getElementById('save-error');
+      err.textContent = 'Network error loading part: ' + (e.message || e);
+      show(err);
+      hide(document.getElementById('loading'));
+      show(document.getElementById('edit-container'));
+    }
+  }
+
+  // --- Save ---
+  function buildBody() {
+    return {
+      name: document.getElementById('part-name').value.trim(),
+      sku: document.getElementById('part-sku').value.trim() || null,
+      mpn: document.getElementById('part-mpn').value.trim() || null,
+      image_url: document.getElementById('part-image-url').value.trim() || null,
+      tags: getTags(),
+      suppliers: getSuppliers(),
+      description_md: easyMDE ? easyMDE.value() : '',
+      change_summary: document.getElementById('part-change-summary').value.trim(),
+    };
+  }
+
+  function showAccountAge(payload) {
+    const eligibleAt = payload && (payload.eligible_at || payload.eligibleAt || (payload.detail && payload.detail.eligible_at));
+    let dateStr = '';
+    if (eligibleAt) {
+      try { dateStr = new Date(eligibleAt).toLocaleDateString(); } catch (_) {}
+    }
+    document.getElementById('account-age-message').textContent = dateStr
+      ? `You need to have had an account for at least 14 days before editing parts. Try again on ${dateStr}.`
+      : `You need to have had an account for at least 14 days before editing parts. Please try again later.`;
+    show(document.getElementById('account-age-alert'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('save-error');
+    el.textContent = msg;
+    show(el);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function save() {
+    hide(document.getElementById('save-error'));
+    hide(document.getElementById('account-age-alert'));
+
+    const body = buildBody();
+    if (!body.name) { showError('A name is required.'); return; }
+    if (!isNew && !body.change_summary) {
+      showError('Please describe what changed in the "What changed?" field — it goes into the revision log.');
+      return;
+    }
+
+    const saveBtn = document.getElementById('save-btn');
+    const label = document.getElementById('save-btn-label');
+    saveBtn.disabled = true;
+    label.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+    try {
+      let resp;
+      if (isNew) {
+        // For POST we don't send change_summary or description_md (backend
+        // accepts a small subset). If the user wrote a description, we still
+        // send it as best-effort.
+        const createBody = { name: body.name };
+        if (body.sku) createBody.sku = body.sku;
+        if (body.mpn) createBody.mpn = body.mpn;
+        if (body.tags && body.tags.length) createBody.tags = body.tags;
+        const firstSupplier = (body.suppliers || []).find(s => s.url);
+        if (firstSupplier) {
+          createBody.supplier_url = firstSupplier.url;
+          if (firstSupplier.name) createBody.supplier_name = firstSupplier.name;
+        }
+        resp = await ProjectAuth.apiFetch(API + '/api/parts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(createBody),
+        });
+      } else {
+        resp = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(slug), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      }
+      if (resp.status === 403) {
+        let payload = {};
+        try { payload = await resp.json(); } catch (_) {}
+        showAccountAge(payload);
+        return;
+      }
+      if (!resp.ok) {
+        let detail = 'Could not save part (HTTP ' + resp.status + ').';
+        try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+        showError(detail);
+        return;
+      }
+      const saved = await resp.json();
+      // On create, the freshly-saved description (if any) didn't reach the
+      // backend because POST doesn't accept description_md. If the user wrote
+      // a description, do a follow-up PUT to persist it.
+      if (isNew && body.description_md && saved && saved.slug) {
+        try {
+          await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(saved.slug), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              description_md: body.description_md,
+              suppliers: body.suppliers,
+              image_url: body.image_url,
+              change_summary: body.change_summary || 'Initial description',
+            }),
+          });
+        } catch (_) {}
+      }
+      // Redirect to the view page on success
+      window.location.href = '/parts/view.html?slug=' + encodeURIComponent(saved.slug || slug);
+    } catch (e) {
+      showError('Network error: ' + (e.message || e));
+    } finally {
+      saveBtn.disabled = false;
+      label.textContent = 'Save part';
+    }
+  }
+
+  document.getElementById('save-btn').addEventListener('click', save);
+
+  // --- Boot ---
+  (async () => {
+    const ok = await checkAuth();
+    if (!ok) return;
+    await loadPart();
+  })();
+})();
+</script>

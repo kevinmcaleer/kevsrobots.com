@@ -378,8 +378,14 @@ description: View project details
     let total = 0;
     tbody.innerHTML = items.map(i => {
       total += i.quantity * (i.unit_cost || 0);
+      // If a part_id + slug came back with the BOM row, link the part name to
+      // its parts-catalog page. Backwards compatible: rows without part_slug
+      // stay as plain text.
+      const nameCell = i.part_id && i.part_slug
+        ? `<a href="/parts/view.html?slug=${encodeURIComponent(i.part_slug)}">${esc(i.name)}</a>`
+        : esc(i.name);
       return `<tr>
-        <td>${esc(i.name)}</td>
+        <td>${nameCell}</td>
         <td>${i.quantity}</td>
         <td>${esc(i.unit)}</td>
         <td>${i.unit_cost ? '£' + i.unit_cost.toFixed(2) : '-'}</td>
