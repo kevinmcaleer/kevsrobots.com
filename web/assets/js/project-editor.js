@@ -647,26 +647,41 @@
 
     function toggleWrap(marker) {
       const sel = cm.getSelection();
+      const from = cm.getCursor('from');
+      const to = cm.getCursor('to');
+      const mlen = marker.length;
       const m = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const re = new RegExp('^' + m + '([\\s\\S]*)' + m + '$');
       const match = sel.match(re);
       if (match) {
+        // Markers were inside the selection — strip them, re-select inner content
         cm.replaceSelection(match[1]);
-      } else {
-        // Check if selection is bordered by marker outside
-        const from = cm.getCursor('from');
-        const to = cm.getCursor('to');
-        const lineFrom = cm.getLine(from.line);
-        const lineTo = cm.getLine(to.line);
-        const before = lineFrom.substring(Math.max(0, from.ch - marker.length), from.ch);
-        const after = lineTo.substring(to.ch, to.ch + marker.length);
-        if (before === marker && after === marker) {
-          cm.replaceRange('', { line: to.line, ch: to.ch }, { line: to.line, ch: to.ch + marker.length });
-          cm.replaceRange('', { line: from.line, ch: from.ch - marker.length }, { line: from.line, ch: from.ch });
-        } else {
-          cm.replaceSelection(marker + sel + marker);
-        }
+        const newTo = cm.getCursor();
+        cm.setSelection(from, newTo);
+        return;
       }
+      const lineFrom = cm.getLine(from.line);
+      const lineTo = cm.getLine(to.line);
+      const before = lineFrom.substring(Math.max(0, from.ch - mlen), from.ch);
+      const after = lineTo.substring(to.ch, to.ch + mlen);
+      if (before === marker && after === marker) {
+        // Markers were just outside the selection — strip them, keep selection on inner content
+        cm.replaceRange('', { line: to.line, ch: to.ch }, { line: to.line, ch: to.ch + mlen });
+        cm.replaceRange('', { line: from.line, ch: from.ch - mlen }, { line: from.line, ch: from.ch });
+        const newFrom = { line: from.line, ch: from.ch - mlen };
+        const newTo = from.line === to.line
+          ? { line: to.line, ch: to.ch - mlen }
+          : { line: to.line, ch: to.ch };
+        cm.setSelection(newFrom, newTo);
+        return;
+      }
+      // Wrap selection with markers and reselect the inner (unwrapped) content
+      cm.replaceSelection(marker + sel + marker);
+      const newFrom = { line: from.line, ch: from.ch + mlen };
+      const newTo = from.line === to.line
+        ? { line: to.line, ch: to.ch + mlen }
+        : { line: to.line, ch: to.ch };
+      cm.setSelection(newFrom, newTo);
     }
 
     function toggleLinePrefix(prefixRegex, prefixToAdd, lineMatchTest) {
@@ -688,6 +703,11 @@
         { line: from.line, ch: 0 },
         { line: to.line, ch: cm.getLine(to.line).length }
       );
+      // Reselect the full affected line range so the toolbar stays visible
+      cm.setSelection(
+        { line: from.line, ch: 0 },
+        { line: to.line, ch: cm.getLine(to.line).length }
+      );
     }
 
     function cycleHeading() {
@@ -704,6 +724,11 @@
         newLine = line.substring(match[0].length);
       }
       cm.replaceRange(newLine, { line: from.line, ch: 0 }, { line: from.line, ch: line.length });
+      // Reselect the heading line so the toolbar stays visible
+      cm.setSelection(
+        { line: from.line, ch: 0 },
+        { line: from.line, ch: cm.getLine(from.line).length }
+      );
     }
 
     function applyFormat(fmt) {
@@ -722,9 +747,17 @@
         case 'ol':
           toggleLinePrefix(/^(- |\* |\d+\. )/, '1. ', l => /^\d+\. /.test(l));
           break;
-        case 'link':
-          cm.replaceSelection('[' + (sel || 'text') + '](https://)');
+        case 'link': {
+          const linkFrom = cm.getCursor('from');
+          const linkText = sel || 'text';
+          cm.replaceSelection('[' + linkText + '](https://)');
+          // Reselect the link text inside [...] so the user can tweak it
+          cm.setSelection(
+            { line: linkFrom.line, ch: linkFrom.ch + 1 },
+            { line: linkFrom.line, ch: linkFrom.ch + 1 + linkText.length }
+          );
           break;
+        }
       }
       cm.focus();
     }
