@@ -1,0 +1,224 @@
+---
+title: Project Analytics
+layout: default
+description: Download analytics for your project
+---
+
+<link rel="stylesheet" href="/assets/css/project-editor.css">
+
+<div class="container py-4">
+  <div class="mb-3">
+    <a id="back-link" href="/projects/hub" class="text-decoration-none text-muted">
+      <i class="fas fa-arrow-left"></i> Back to project
+    </a>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="error-state" class="text-center py-5 d-none">
+    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+    <h3 id="error-title">Unable to load analytics</h3>
+    <p class="text-muted" id="error-detail"></p>
+    <a href="/projects/hub" class="btn btn-primary mt-3">Back to Projects Hub</a>
+  </div>
+
+  <div id="analytics-view" class="d-none">
+    <h1 class="mb-1">Download analytics</h1>
+    <p class="text-muted" id="project-title-line">&nbsp;</p>
+
+    <!-- Top stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="text-muted small text-uppercase">Total downloads</div>
+            <div class="display-6 fw-bold" id="stat-total">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="text-muted small text-uppercase">Last 7 days</div>
+            <div class="display-6 fw-bold text-primary" id="stat-7d">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="text-muted small text-uppercase">Last 30 days</div>
+            <div class="display-6 fw-bold text-success" id="stat-30d">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily chart -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="mb-3"><i class="fas fa-chart-line me-2"></i>Downloads over the last 30 days</h5>
+        <canvas id="daily-chart" height="100"></canvas>
+      </div>
+    </div>
+
+    <!-- Per-file breakdown -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="mb-3"><i class="fas fa-file me-2"></i>Downloads by file</h5>
+        <div id="per-file-empty" class="text-muted small d-none">No file downloads recorded yet.</div>
+        <table id="per-file-table" class="table table-single table-narrow d-none">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th class="text-end">Total</th>
+              <th class="text-end">Last 7d</th>
+              <th class="text-end">Last 30d</th>
+            </tr>
+          </thead>
+          <tbody id="per-file-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/assets/js/project-auth.js"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  const params = new URLSearchParams(window.location.search);
+  const projectId = params.get('id');
+
+  function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+
+  function showError(title, detail) {
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('analytics-view').classList.add('d-none');
+    document.getElementById('error-state').classList.remove('d-none');
+    document.getElementById('error-title').textContent = title;
+    document.getElementById('error-detail').textContent = detail || '';
+  }
+
+  if (!projectId) {
+    showError('Missing project id', 'Append ?id=<project_id> to the URL.');
+    return;
+  }
+
+  document.getElementById('back-link').href = '/projects/view.html?id=' + projectId;
+
+  async function loadProjectMeta() {
+    try {
+      const r = await fetch(API + '/api/projects/' + projectId, { credentials: 'include' });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch (e) { return null; }
+  }
+
+  async function loadStats() {
+    return ProjectAuth.apiFetch(API + '/api/projects/' + projectId + '/downloads/stats');
+  }
+
+  function renderDaily(daily) {
+    const ctx = document.getElementById('daily-chart').getContext('2d');
+    const labels = daily.map(d => d.date.slice(5));  // MM-DD
+    const data = daily.map(d => d.count);
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Downloads',
+          data: data,
+          borderColor: '#4A90D9',
+          backgroundColor: 'rgba(74, 144, 217, 0.15)',
+          tension: 0.25,
+          fill: true,
+          pointRadius: 2,
+          pointHoverRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0 }
+          }
+        }
+      }
+    });
+  }
+
+  function renderPerFile(perFile) {
+    const empty = document.getElementById('per-file-empty');
+    const table = document.getElementById('per-file-table');
+    const body = document.getElementById('per-file-body');
+    if (!perFile || perFile.length === 0) {
+      empty.classList.remove('d-none');
+      return;
+    }
+    table.classList.remove('d-none');
+    body.innerHTML = perFile.map(f => `
+      <tr>
+        <td>${esc(f.filename)}</td>
+        <td class="text-end">${f.total}</td>
+        <td class="text-end">${f.last_7d}</td>
+        <td class="text-end">${f.last_30d}</td>
+      </tr>
+    `).join('');
+  }
+
+  async function init() {
+    const project = await loadProjectMeta();
+    if (project && project.title) {
+      document.title = project.title + ' — Analytics — KevsRobots';
+      document.getElementById('project-title-line').textContent = project.title;
+    }
+
+    let resp;
+    try {
+      resp = await loadStats();
+    } catch (e) {
+      showError('Unable to load analytics', 'A network error occurred. Please try again.');
+      return;
+    }
+    if (resp.status === 401) {
+      showError('Login required', 'You need to be signed in as the project owner to view analytics.');
+      return;
+    }
+    if (resp.status === 403) {
+      showError('Not authorised', 'Only the project owner can see download analytics.');
+      return;
+    }
+    if (resp.status === 404) {
+      showError('Project not found', 'The project may have been deleted.');
+      return;
+    }
+    if (!resp.ok) {
+      showError('Unable to load analytics', 'Server returned ' + resp.status + '.');
+      return;
+    }
+    const stats = await resp.json();
+
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('analytics-view').classList.remove('d-none');
+
+    document.getElementById('stat-total').textContent = stats.total || 0;
+    document.getElementById('stat-7d').textContent = stats.last_7d || 0;
+    document.getElementById('stat-30d').textContent = stats.last_30d || 0;
+
+    renderDaily(stats.daily || []);
+    renderPerFile(stats.per_file || []);
+  }
+
+  init();
+})();
+</script>

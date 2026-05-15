@@ -44,6 +44,7 @@ class ProjectResponse(BaseModel):
     tags: list[str] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
+    download_count: int = 0
 
 
 class ProjectListItem(BaseModel):
@@ -57,6 +58,7 @@ class ProjectListItem(BaseModel):
     cover_image: Optional[str]
     tags: list[str] = Field(default_factory=list)
     created_at: datetime
+    download_count: int = 0
 
 
 class BOMItemCreate(BaseModel):
@@ -113,6 +115,7 @@ class FileResponse(BaseModel):
     file_type: str
     description: Optional[str]
     uploaded_at: datetime
+    download_count: int = 0
 
 
 class ImageResponse(BaseModel):
@@ -156,3 +159,50 @@ class BlockedProjectResponse(BaseModel):
     is_blocked: bool
     moderation_note: Optional[str]
     created_at: datetime
+
+
+# --- Download tracking schemas ---
+
+
+class DownloadLogResponse(BaseModel):
+    """Returned when a download is logged. ``dedup`` is True when the
+    request was within the 24h dedup window for the same identity."""
+
+    logged: bool
+    dedup: bool
+
+
+class FileDownloadStats(BaseModel):
+    file_id: int
+    filename: str
+    total: int
+    last_7d: int
+    last_30d: int
+
+
+class DailyDownloadCount(BaseModel):
+    date: str  # ISO date, YYYY-MM-DD
+    count: int
+
+
+class ProjectDownloadStats(BaseModel):
+    project_id: int
+    total: int
+    last_7d: int
+    last_30d: int
+    per_file: list[FileDownloadStats] = Field(default_factory=list)
+    daily: list[DailyDownloadCount] = Field(default_factory=list)
+
+
+class PopularProjectItem(BaseModel):
+    id: int
+    title: str
+    short_description: Optional[str]
+    difficulty: Optional[str]
+    estimated_minutes: Optional[int]
+    status: str
+    author_username: str
+    cover_image: Optional[str]
+    tags: list[str] = Field(default_factory=list)
+    created_at: datetime
+    download_count: int = 0

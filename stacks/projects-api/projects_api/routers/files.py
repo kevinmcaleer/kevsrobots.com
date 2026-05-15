@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+import hashlib
+import logging
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
 from fastapi.responses import Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user
+from ..auth import get_current_user, get_optional_user
 from ..config import get_settings
 from ..db import get_session
-from ..models import Project, ProjectFile
+from ..models import Download, Project, ProjectFile
 from ..schemas import FileResponse
 from ..storage import (
     delete_file,
@@ -20,6 +25,72 @@ from ..storage import (
     save_file,
     validate_file,
 )
+
+logger = logging.getLogger(__name__)
+
+
+def _client_ip(request: Request) -> str:
+    """Best-effort client IP — honour standard reverse-proxy headers but
+    never expose the raw IP anywhere; it's only used to compute ip_hash."""
+    xff = request.headers.get("x-forwarded-for")
+    if xff:
+        return xff.split(",")[0].strip()
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip:
+        return real_ip.strip()
+    if request.client and request.client.host:
+        return request.client.host
+    return "unknown"
+
+
+def _hash_ip(ip: str, salt: str) -> str:
+    return hashlib.sha256(f"{ip}{salt}".encode("utf-8")).hexdigest()
+
+
+async def _log_download(
+    session: AsyncSession,
+    project_id: int,
+    file_id: int,
+    user_id: Optional[str],
+    ip_hash: Optional[str],
+) -> bool:
+    """Insert a Download row if no matching row exists in the last 24h.
+
+    Returns True when a new row was inserted, False when deduped.
+    Identity for dedup: user_id if set, otherwise ip_hash.
+    """
+    cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(hours=24)
+    query = select(Download.id).where(
+        Download.project_id == project_id,
+        Download.file_id == file_id,
+        Download.downloaded_at >= cutoff,
+    )
+    if user_id:
+        query = query.where(Download.user_id == user_id)
+    elif ip_hash:
+        query = query.where(
+            Download.user_id.is_(None),
+            Download.ip_hash == ip_hash,
+        )
+    else:
+        # No identity at all — log it but it won't dedup
+        pass
+
+    existing = (await session.execute(query.limit(1))).scalar_one_or_none()
+    if existing is not None:
+        return False
+
+    record = Download(
+        project_id=project_id,
+        file_id=file_id,
+        user_id=user_id,
+        ip_hash=ip_hash if not user_id else None,
+    )
+    session.add(record)
+    await session.commit()
+    # TODO(#106): Popular Project badge eval hook here — evaluate
+    # download-count thresholds and award badges asynchronously.
+    return True
 
 router = APIRouter(prefix="/api/projects/{project_id}/files", tags=["files"])
 
@@ -36,7 +107,31 @@ async def list_files(
             .order_by(ProjectFile.uploaded_at.desc())
         )
     ).all()
-    return [FileResponse.model_validate(i, from_attributes=True) for i in items]
+    # Per-file download counts — bulk fetch in one query to avoid n+1.
+    counts: dict[int, int] = {}
+    if items:
+        rows = (
+            await session.execute(
+                select(Download.file_id, func.count(Download.id))
+                .where(Download.file_id.in_([i.id for i in items]))
+                .group_by(Download.file_id)
+            )
+        ).all()
+        counts = {fid: int(c) for fid, c in rows}
+    out: list[FileResponse] = []
+    for i in items:
+        out.append(
+            FileResponse(
+                id=i.id,
+                filename=i.filename,
+                file_size=i.file_size,
+                file_type=i.file_type,
+                description=i.description,
+                uploaded_at=i.uploaded_at,
+                download_count=counts.get(i.id, 0),
+            )
+        )
+    return out
 
 
 @router.post("", response_model=FileResponse, status_code=201)
@@ -94,6 +189,8 @@ async def upload_file(
 async def download_file(
     project_id: int,
     file_id: int,
+    request: Request,
+    user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     record = await session.get(ProjectFile, file_id)
@@ -103,6 +200,17 @@ async def download_file(
     data = read_file(record.file_path)
     if data is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="File not found in storage")
+
+    # Log the download. Never fail the file response if logging breaks —
+    # the user came here to download, not to feed analytics.
+    try:
+        settings = get_settings()
+        ip_hash = None
+        if not user:
+            ip_hash = _hash_ip(_client_ip(request), settings.ip_hash_salt)
+        await _log_download(session, project_id, file_id, user, ip_hash)
+    except Exception:  # pragma: no cover — defensive guard
+        logger.warning("Failed to log download for file %s", file_id, exc_info=True)
 
     return Response(
         content=data,

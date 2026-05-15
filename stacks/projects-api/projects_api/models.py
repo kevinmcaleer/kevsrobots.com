@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
@@ -163,4 +164,33 @@ class ProjectJournalImage(Base):
     file_path: Mapped[str] = mapped_column(Text, nullable=False)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
+    )
+
+
+class Download(Base):
+    """Tracks individual file downloads for analytics and popularity ranking.
+
+    Anonymous downloads use `ip_hash` (sha256 of client IP + IP_HASH_SALT),
+    authenticated downloads use `user_id`. Dedup is enforced at the router
+    level: same (project_id, file_id, identity) within 24h counts once.
+    """
+
+    __tablename__ = "downloads"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
+    )
+    file_id: Mapped[int] = mapped_column(
+        ForeignKey("project_files.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[Optional[str]] = mapped_column(String(100))
+    ip_hash: Mapped[Optional[str]] = mapped_column(String(64))
+    downloaded_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("ix_downloads_project_downloaded_at", "project_id", "downloaded_at"),
+        Index("ix_downloads_file_downloaded_at", "file_id", "downloaded_at"),
     )
