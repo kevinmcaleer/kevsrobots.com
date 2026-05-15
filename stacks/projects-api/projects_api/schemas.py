@@ -66,6 +66,7 @@ class BOMItemCreate(BaseModel):
     unit_cost: Optional[float] = None
     supplier_url: Optional[str] = None
     sort_order: int = 0
+    part_id: Optional[int] = None
 
 
 class BOMItemResponse(BaseModel):
@@ -76,6 +77,7 @@ class BOMItemResponse(BaseModel):
     unit_cost: Optional[float]
     supplier_url: Optional[str]
     sort_order: int
+    part_id: Optional[int] = None
 
 
 class LinkCreate(BaseModel):
@@ -156,3 +158,91 @@ class BlockedProjectResponse(BaseModel):
     is_blocked: bool
     moderation_note: Optional[str]
     created_at: datetime
+
+
+# --- Parts catalog (issue #121) ---
+
+
+class PartSupplierInput(BaseModel):
+    name: Optional[str] = Field(None, max_length=120)
+    url: str = Field(..., max_length=2000)
+
+
+class PartSupplierResponse(BaseModel):
+    id: int
+    name: Optional[str] = None
+    url: str
+    last_checked_at: Optional[datetime] = None
+    last_status: Optional[str] = None
+
+
+class PartCreate(BaseModel):
+    name: str = Field(..., min_length=2, max_length=200)
+    sku: Optional[str] = Field(None, max_length=100)
+    mpn: Optional[str] = Field(None, max_length=100)
+    description_md: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=2000)
+    supplier_url: Optional[str] = Field(None, max_length=2000)
+    supplier_name: Optional[str] = Field(None, max_length=120)
+    tags: list[str] = Field(default_factory=list)
+
+
+class PartUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=2, max_length=200)
+    sku: Optional[str] = Field(None, max_length=100)
+    mpn: Optional[str] = Field(None, max_length=100)
+    description_md: Optional[str] = None
+    image_url: Optional[str] = Field(None, max_length=2000)
+    tags: Optional[list[str]] = None
+    suppliers: Optional[list[PartSupplierInput]] = None
+    change_summary: str = Field(..., min_length=1, max_length=200)
+
+
+class PartSearchResult(BaseModel):
+    id: int
+    slug: str
+    name: str
+    sku: Optional[str] = None
+    status: str
+    usage_count: int
+    primary_supplier_url: Optional[str] = None
+
+
+class PartRevisionSummary(BaseModel):
+    id: int
+    author: str
+    created_at: datetime
+    change_summary: str
+
+
+class PartRevisionDetail(BaseModel):
+    id: int
+    author: str
+    created_at: datetime
+    change_summary: str
+    name: str
+    sku: Optional[str] = None
+    mpn: Optional[str] = None
+    description_md: Optional[str] = None
+    image_url: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    suppliers: list[PartSupplierInput] = Field(default_factory=list)
+
+
+class PartDetail(BaseModel):
+    id: int
+    slug: str
+    name: str
+    sku: Optional[str] = None
+    mpn: Optional[str] = None
+    description_md: Optional[str] = None
+    image_url: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    status: str
+    created_by: str
+    created_at: datetime
+    updated_at: datetime
+    current_revision_id: Optional[int] = None
+    usage_count: int
+    suppliers: list[PartSupplierResponse] = Field(default_factory=list)
+    recent_revisions: list[PartRevisionSummary] = Field(default_factory=list)
