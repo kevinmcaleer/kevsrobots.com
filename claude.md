@@ -107,16 +107,16 @@ Key data files:
 
 ### Docker Builds
 - **Cache-busting depends on which Dockerfile** — they're not all the same:
-  - **`Dockerfile.fetch-generate`** (Jekyll site build, in `ClusteredPi/stacks/kevsrobots/`) — does its `git pull` inside a static `RUN`. **Add cache-busting** before that step or it serves stale assets:
+  - **Jekyll site image** — built from `~/Web/ClusteredPi/stacks/kevsrobots/dockerfile` (note: lowercase `dockerfile`, not `Dockerfile`). Standard command: `cd ~/ClusteredPi/stacks/kevsrobots && docker build -t 192.168.2.1:5000/kevsrobots:latest .` — Docker picks the lowercase file because that's all that's present (the `Dockerfile.*` variants are not used by `docker build .` since they have suffixes). Stage 1 does an `RUN git clone` inside the image, so **the layer must be cache-busted** or main updates won't appear in the image. The current dockerfile includes:
     ```dockerfile
     ADD https://api.github.com/repos/kevinmcaleer/kevsrobots.com/commits/main /tmp/main-sha.json
-    RUN git init && git pull ...
+    ARG CACHE_DATE=1   # manual override: --build-arg CACHE_DATE=$(date)
+    RUN git clone --depth=1 https://...kevsrobots.com.git ...
     ```
-    The `ADD` of a remote URL re-fetches every build; when main has new commits, the response body changes and Docker invalidates this layer plus everything after it. **Symptom of missing cache-busting:** newly-added files (e.g. `web/assets/js/*.js`) 404 in production even though they're on `main` — Docker is reusing a cached `git pull` from before the file landed.
+    The `ADD` of a remote URL re-fetches every build; when main has new commits, the response body changes and Docker invalidates this layer plus everything after it. **Symptom of missing cache-busting:** newly-added files (e.g. `web/assets/js/*.js`) 404 in production even though they're on `main` — Docker is reusing a cached `git clone` from before the file landed.
   - **`stacks/projects-api/Dockerfile`** and **`stacks/nibsy-api/Dockerfile`** — these `COPY` from the build context (the locally-checked-out repo), so they always see the latest local files. No cache-busting needed for code changes; only `requirements.txt` changes invalidate the pip-install layer (which is the desired behaviour).
 - **Avoid `--no-cache` on routine rebuilds** — it forces gem/pip reinstall (slow). Use it only as a one-shot recovery when a previous deploy missed files (and then fix the Dockerfile so it doesn't recur).
-- Build command: `docker build -t 192.168.2.1:5000/kevsrobots:latest .`
-- **Verifying assets after deploy** — `curl -sI https://www.kevsrobots.com/assets/js/<file>.js` should return `200`. A `404` with `cf-cache-status: MISS` (use `?cb=$(date +%s)` to bypass Cloudflare) means the file isn't in the deployed image — see cache-busting above.
+- **Verifying assets after deploy** — `curl -sI https://www.kevsrobots.com/assets/js/<file>.js?cb=$(date +%s)` should return `200`. The `?cb=…` bypasses Cloudflare so you see what the origin actually serves; a persistent `404` means the file isn't in the deployed image — see cache-busting above.
 
 ### Jekyll/HTML
 - **Footer must be inside `<body>` tag** - Check `_layouts/default.html`
