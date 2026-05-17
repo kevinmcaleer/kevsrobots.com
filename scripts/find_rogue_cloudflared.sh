@@ -16,7 +16,8 @@
 
 set -u
 
-NODES=(dev01 dev02 dev03 dev04)
+# Hosts to sweep. Override via env: NODES='dev01 raspberrypi.lan snaszy01.lan'
+NODES=(${NODES:-dev01 dev02 dev03 dev04})
 REMOTE_USER="${REMOTE_USER:-kev}"
 TARGET_PREFIX="${TARGET_PREFIX:-64955431940d}"  # the rogue's short ID
 
