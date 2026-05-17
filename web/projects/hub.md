@@ -83,9 +83,9 @@ thanks: false
   </div>
 </div>
 
-<script src="/assets/js/project-gradient.js"></script>
-<script src="/assets/js/project-auth.js"></script>
-<script src="/assets/js/project-interactions.js"></script>
+<script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';

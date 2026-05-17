@@ -124,6 +124,12 @@ Key data files:
 - **HTML compression** - Currently disabled in `_config.yml`, can re-enable with conservative settings
 - **Images** - Use `loading="lazy"` attribute for performance
 - **Build time** - ~60 seconds for full site rebuild
+- **Local JS / CSS includes need a cache-bust query** — nginx serves `/assets/` with `cache-control: public, max-age=31536000, immutable`, so a `<script src="/assets/js/foo.js">` reference will be served from the browser cache for a year even after the file changes. Append the Jekyll build timestamp as a query string so every site rebuild flips the URL:
+  ```html
+  <script src="/assets/js/project-editor.js?v={{ site.time | date: '%s' }}"></script>
+  <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+  ```
+  The same Liquid expression is already used in `_layouts/default.html` for `user-auth.js`. **Don't add the query for third-party CDN URLs** (e.g. `cdn.jsdelivr.net/...`) — they version themselves via the URL path. **Symptom of a missing cache-bust:** users see stack traces with line numbers that don't match the current source, or get "old behaviour" after a deploy until they hard-refresh.
 - **Icon + heading spacing** - When a Font Awesome icon precedes the text of an `<h1>`–`<h4>`, the default `me-2` (Bootstrap 0.5rem) gap is **too tight at heading sizes** — the icon visually overlaps the text. Use `me-3` and keep a literal space between `</i>` and the heading text:
   ```html
   <!-- Right -->
