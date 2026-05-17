@@ -106,10 +106,17 @@ Key data files:
 ## Important Rules
 
 ### Docker Builds
-- **NEVER use `--no-cache`** - The Dockerfile has automatic cache busting via GitHub API
+- **Cache-busting depends on which Dockerfile** — they're not all the same:
+  - **`Dockerfile.fetch-generate`** (Jekyll site build, in `ClusteredPi/stacks/kevsrobots/`) — does its `git pull` inside a static `RUN`. **Add cache-busting** before that step or it serves stale assets:
+    ```dockerfile
+    ADD https://api.github.com/repos/kevinmcaleer/kevsrobots.com/commits/main /tmp/main-sha.json
+    RUN git init && git pull ...
+    ```
+    The `ADD` of a remote URL re-fetches every build; when main has new commits, the response body changes and Docker invalidates this layer plus everything after it. **Symptom of missing cache-busting:** newly-added files (e.g. `web/assets/js/*.js`) 404 in production even though they're on `main` — Docker is reusing a cached `git pull` from before the file landed.
+  - **`stacks/projects-api/Dockerfile`** and **`stacks/nibsy-api/Dockerfile`** — these `COPY` from the build context (the locally-checked-out repo), so they always see the latest local files. No cache-busting needed for code changes; only `requirements.txt` changes invalidate the pip-install layer (which is the desired behaviour).
+- **Avoid `--no-cache` on routine rebuilds** — it forces gem/pip reinstall (slow). Use it only as a one-shot recovery when a previous deploy missed files (and then fix the Dockerfile so it doesn't recur).
 - Build command: `docker build -t 192.168.2.1:5000/kevsrobots:latest .`
-- The Dockerfile fetches latest commit hash to invalidate cache only when needed
-- This keeps gem installation and other layers cached for speed
+- **Verifying assets after deploy** — `curl -sI https://www.kevsrobots.com/assets/js/<file>.js` should return `200`. A `404` with `cf-cache-status: MISS` (use `?cb=$(date +%s)` to bypass Cloudflare) means the file isn't in the deployed image — see cache-busting above.
 
 ### Jekyll/HTML
 - **Footer must be inside `<body>` tag** - Check `_layouts/default.html`
@@ -117,6 +124,17 @@ Key data files:
 - **HTML compression** - Currently disabled in `_config.yml`, can re-enable with conservative settings
 - **Images** - Use `loading="lazy"` attribute for performance
 - **Build time** - ~60 seconds for full site rebuild
+- **Icon + heading spacing** - When a Font Awesome icon precedes the text of an `<h1>`–`<h4>`, the default `me-2` (Bootstrap 0.5rem) gap is **too tight at heading sizes** — the icon visually overlaps the text. Use `me-3` and keep a literal space between `</i>` and the heading text:
+  ```html
+  <!-- Right -->
+  <h4><i class="fas fa-comments me-3"></i> Comments</h4>
+  <h1><i class="fas fa-cubes me-3 text-primary"></i> Parts Catalog</h1>
+
+  <!-- Wrong (overlap) -->
+  <h4><i class="fas fa-comments me-2"></i>Comments</h4>
+  <h1><i class="fas fa-cubes me-2 text-primary"></i>Parts Catalog</h1>
+  ```
+  For inline icons in body text, badges, or buttons, `me-1` or `me-2` is fine — the rule is specifically about headings.
 
 ### Blog Posts
 - **File naming** - `YYYY-MM-DD-title.md` in `/web/_posts/`
