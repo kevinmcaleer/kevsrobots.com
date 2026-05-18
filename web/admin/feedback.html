@@ -1,0 +1,488 @@
+---
+title: Feedback Inbox
+layout: default
+description: Admin inbox for user feedback collected via the floating widget
+permalink: /admin/feedback/
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/feedback-widget.css?v={{ site.time | date: '%s' }}">
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+
+<style>
+  .kr-inbox-row { cursor: pointer; transition: background-color 120ms; border-left: 3px solid transparent; }
+  .kr-inbox-row:hover { background: #f8f9fa; }
+  .kr-inbox-row.is-active { background: #e7f1ff; border-left-color: var(--bs-primary, #0d6efd); }
+  .kr-inbox-row.is-unread .kr-message-preview { font-weight: 600; }
+  .kr-inbox-row.is-archived .kr-message-preview { text-decoration: line-through; color: #6c757d; }
+  .kr-sentiment-emoji { font-size: 1.6rem; line-height: 1; }
+  .kr-unread-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--bs-primary, #0d6efd); display: inline-block; }
+  .kr-filter-chip { cursor: pointer; }
+  .kr-filter-chip.is-on { background: var(--bs-primary, #0d6efd); color: #fff; }
+  .kr-detail-screenshot { max-width: 100%; cursor: zoom-in; border-radius: 0.375rem; border: 1px solid #dee2e6; }
+  .kr-metadata-table th { width: 110px; color: #6c757d; font-weight: 500; vertical-align: top; }
+  .kr-message-body { white-space: pre-wrap; word-break: break-word; }
+  .kr-bulk-bar { position: sticky; top: 0; background: #fff; z-index: 5; padding: 0.5rem 0; border-bottom: 1px solid #dee2e6; }
+</style>
+
+<div class="container-fluid py-4">
+  <h1><i class="fas fa-inbox me-2"></i> Feedback Inbox</h1>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="service-banner" class="alert alert-warning d-none mt-3" role="alert">
+    <i class="fas fa-tools me-2"></i> Feedback service is being set up — endpoints not yet live.
+  </div>
+
+  <div id="inbox" class="d-none">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+      <h5 class="mb-0" id="header-line">Feedback inbox</h5>
+    </div>
+
+    <div class="row mt-3 g-2 align-items-center">
+      <div class="col-md-6">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
+          <button type="button" class="btn btn-outline-primary kr-status-filter active" data-status="all">All</button>
+          <button type="button" class="btn btn-outline-primary kr-status-filter" data-status="unread">Unread</button>
+          <button type="button" class="btn btn-outline-primary kr-status-filter" data-status="read">Read</button>
+          <button type="button" class="btn btn-outline-primary kr-status-filter" data-status="archived">Archived</button>
+        </div>
+        <div class="d-inline-flex gap-1 ms-2">
+          <span class="badge bg-light text-dark kr-filter-chip kr-sentiment-filter" data-s="love">&#128525; Love</span>
+          <span class="badge bg-light text-dark kr-filter-chip kr-sentiment-filter" data-s="like">&#128578; Like</span>
+          <span class="badge bg-light text-dark kr-filter-chip kr-sentiment-filter" data-s="issue">&#128542; Issue</span>
+          <span class="badge bg-light text-dark kr-filter-chip kr-sentiment-filter" data-s="idea">&#128161; Idea</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <input type="text" id="search-input" class="form-control form-control-sm"
+          placeholder="Filter by page or message text...">
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-lg-5">
+        <div id="bulk-bar" class="kr-bulk-bar d-none">
+          <span class="me-2"><span id="bulk-count">0</span> selected</span>
+          <button class="btn btn-sm btn-outline-primary" id="bulk-read">Mark read</button>
+          <button class="btn btn-sm btn-outline-secondary" id="bulk-archive">Archive</button>
+          <button class="btn btn-sm btn-outline-danger" id="bulk-delete">Delete</button>
+        </div>
+        <div id="list-empty" class="text-center text-muted py-5 d-none">
+          <i class="fas fa-inbox fa-2x mb-2"></i>
+          <p class="mb-0">No feedback matches the current filters.</p>
+        </div>
+        <div id="list" class="list-group list-group-flush"></div>
+      </div>
+      <div class="col-lg-7">
+        <div id="detail-empty" class="text-center text-muted py-5">
+          <i class="fas fa-envelope-open fa-2x mb-2"></i>
+          <p class="mb-0">Select a message to see details.</p>
+        </div>
+        <div id="detail" class="d-none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const API = 'https://projects.kevsrobots.com';
+
+  function authFetch(url, opts) {
+    if (window.ProjectAuth && typeof window.ProjectAuth.apiFetch === 'function') {
+      return window.ProjectAuth.apiFetch(url, opts);
+    }
+    opts = opts || {};
+    opts.credentials = 'include';
+    return fetch(url, opts);
+  }
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+
+  function relativeTime(iso) {
+    if (!iso) return '';
+    const then = new Date(iso).getTime();
+    if (isNaN(then)) return '';
+    const diff = Date.now() - then;
+    const s = Math.floor(diff / 1000);
+    if (s < 60) return s + 's ago';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ago';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    const d = Math.floor(h / 24);
+    if (d < 30) return d + 'd ago';
+    return new Date(iso).toLocaleDateString();
+  }
+
+  const SENTIMENT_EMOJI = { love: '\u{1F60D}', like: '\u{1F642}', issue: '\u{1F61E}', idea: '\u{1F4A1}' };
+  const SENTIMENT_LABEL = { love: 'Love', like: 'Like', issue: 'Issue', idea: 'Idea' };
+
+  const state = {
+    status: 'all',
+    sentiments: new Set(),
+    q: '',
+    items: [],
+    selected: null,
+    checked: new Set(),
+    serviceDown: false
+  };
+
+  function lastPathSegment(url) {
+    try {
+      const u = new URL(url);
+      const parts = u.pathname.split('/').filter(Boolean);
+      return parts.length ? parts[parts.length - 1] : u.hostname;
+    } catch (e) {
+      return url || '';
+    }
+  }
+
+  function filterItems() {
+    return state.items.filter(function (it) {
+      if (state.status !== 'all' && it.status !== state.status) return false;
+      if (state.sentiments.size && !state.sentiments.has(it.sentiment)) return false;
+      if (state.q) {
+        const hay = ((it.message || '') + ' ' + (it.page_url || '')).toLowerCase();
+        if (hay.indexOf(state.q.toLowerCase()) === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderList() {
+    const list = document.getElementById('list');
+    const empty = document.getElementById('list-empty');
+    const items = filterItems();
+    if (!items.length) {
+      list.innerHTML = '';
+      empty.classList.remove('d-none');
+      return;
+    }
+    empty.classList.add('d-none');
+    list.innerHTML = items.map(function (it) {
+      const checked = state.checked.has(it.id) ? 'checked' : '';
+      const active = state.selected === it.id ? 'is-active' : '';
+      const statusCls = it.status === 'unread' ? 'is-unread' : (it.status === 'archived' ? 'is-archived' : '');
+      const preview = esc((it.message || '').slice(0, 80) + ((it.message || '').length > 80 ? '...' : ''));
+      let icon;
+      if (it.status === 'unread') icon = '<span class="kr-unread-dot" title="Unread"></span>';
+      else if (it.status === 'archived') icon = '<i class="fas fa-archive text-muted" title="Archived"></i>';
+      else icon = '<i class="fas fa-eye text-muted" title="Read"></i>';
+      return '<div class="list-group-item kr-inbox-row ' + active + ' ' + statusCls + '" data-id="' + it.id + '">' +
+        '<div class="d-flex gap-2 align-items-start">' +
+          '<input type="checkbox" class="form-check-input mt-2 kr-check" data-id="' + it.id + '" ' + checked + '>' +
+          '<div class="kr-sentiment-emoji" aria-label="' + esc(SENTIMENT_LABEL[it.sentiment] || it.sentiment) + '">' +
+            (SENTIMENT_EMOJI[it.sentiment] || '\u{1F4AC}') +
+          '</div>' +
+          '<div class="flex-grow-1 min-w-0">' +
+            '<div class="kr-message-preview text-truncate">' + preview + '</div>' +
+            '<div class="small text-muted text-truncate">' +
+              '@' + esc(it.username || 'anon') + ' &middot; ' +
+              esc(relativeTime(it.created_at)) + ' &middot; ' +
+              esc(lastPathSegment(it.page_url)) +
+            '</div>' +
+          '</div>' +
+          '<div class="ms-2">' + icon + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    list.querySelectorAll('.kr-inbox-row').forEach(function (row) {
+      row.addEventListener('click', function (e) {
+        if (e.target.classList.contains('kr-check') || e.target.tagName === 'INPUT') return;
+        const id = Number(row.getAttribute('data-id'));
+        selectItem(id);
+      });
+    });
+    list.querySelectorAll('.kr-check').forEach(function (cb) {
+      cb.addEventListener('click', function (e) { e.stopPropagation(); });
+      cb.addEventListener('change', function () {
+        const id = Number(cb.getAttribute('data-id'));
+        if (cb.checked) state.checked.add(id); else state.checked.delete(id);
+        refreshBulkBar();
+      });
+    });
+  }
+
+  function refreshBulkBar() {
+    const bar = document.getElementById('bulk-bar');
+    const count = state.checked.size;
+    document.getElementById('bulk-count').textContent = String(count);
+    bar.classList.toggle('d-none', count === 0);
+  }
+
+  function renderDetail() {
+    const empty = document.getElementById('detail-empty');
+    const wrap = document.getElementById('detail');
+    if (state.selected == null) {
+      empty.classList.remove('d-none');
+      wrap.classList.add('d-none');
+      wrap.innerHTML = '';
+      return;
+    }
+    const it = state.items.find(function (x) { return x.id === state.selected; });
+    if (!it) {
+      empty.classList.remove('d-none');
+      wrap.classList.add('d-none');
+      return;
+    }
+    empty.classList.add('d-none');
+    wrap.classList.remove('d-none');
+
+    const profileLink = it.username
+      ? '<a href="/profile?u=' + encodeURIComponent(it.username) + '">@' + esc(it.username) + '</a>'
+      : '@anon';
+    const emailRow = it.email
+      ? '<tr><th>Email</th><td><a href="mailto:' + esc(it.email) + '">' + esc(it.email) + '</a></td></tr>'
+      : '';
+    const screenshot = it.screenshot_url
+      ? '<div class="mb-3"><a href="' + esc(it.screenshot_url) + '" target="_blank" rel="noopener">' +
+          '<img loading="lazy" class="kr-detail-screenshot" src="' + esc(it.screenshot_url) + '" alt="Screenshot">' +
+        '</a></div>'
+      : '';
+    const created = it.created_at ? new Date(it.created_at) : null;
+    const createdAbs = created ? created.toLocaleString() : '';
+
+    const replyBody = '> ' + ((it.message || '').split('\n').join('\n> '));
+    const replySubject = 'Re: your feedback on KevsRobots';
+    const replyHref = it.email
+      ? 'mailto:' + encodeURIComponent(it.email) + '?subject=' + encodeURIComponent(replySubject) +
+        '&body=' + encodeURIComponent('\n\n' + replyBody)
+      : null;
+
+    const toggleStatusLabel = it.status === 'read' ? 'Mark unread' : 'Mark read';
+    const toggleStatusTarget = it.status === 'read' ? 'unread' : 'read';
+
+    wrap.innerHTML =
+      '<div class="card">' +
+        '<div class="card-body">' +
+          '<div class="d-flex justify-content-between align-items-start mb-3">' +
+            '<div class="d-flex align-items-center gap-2">' +
+              '<span class="kr-sentiment-emoji">' + (SENTIMENT_EMOJI[it.sentiment] || '\u{1F4AC}') + '</span>' +
+              '<div>' +
+                '<div class="fw-bold">' + esc(SENTIMENT_LABEL[it.sentiment] || it.sentiment) + '</div>' +
+                '<div class="small text-muted" title="' + esc(createdAbs) + '">' + esc(relativeTime(it.created_at)) + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<span class="badge bg-secondary">' + esc(it.status) + '</span>' +
+          '</div>' +
+
+          '<p class="kr-message-body mb-3">' + esc(it.message || '') + '</p>' +
+
+          screenshot +
+
+          '<table class="table table-sm kr-metadata-table mb-3">' +
+            '<tbody>' +
+              '<tr><th>User</th><td>' + profileLink + '</td></tr>' +
+              emailRow +
+              '<tr><th>Page</th><td><a href="' + esc(it.page_url || '#') + '" target="_blank" rel="noopener">' +
+                esc(it.page_url || '') + ' <i class="fas fa-external-link-alt small"></i></a></td></tr>' +
+              '<tr><th>Referrer</th><td>' + esc(it.referrer || '—') + '</td></tr>' +
+              '<tr><th>Browser</th><td><code>' + esc(it.user_agent || '—') + '</code></td></tr>' +
+              '<tr><th>Viewport</th><td>' + esc(it.viewport || '—') + '</td></tr>' +
+            '</tbody>' +
+          '</table>' +
+
+          '<div class="d-flex gap-2 flex-wrap">' +
+            '<button type="button" class="btn btn-sm btn-outline-primary" data-action="status" data-target="' + toggleStatusTarget + '">' +
+              '<i class="fas fa-envelope-open me-1"></i> ' + toggleStatusLabel +
+            '</button>' +
+            '<button type="button" class="btn btn-sm btn-outline-secondary" data-action="status" data-target="archived">' +
+              '<i class="fas fa-archive me-1"></i> Archive' +
+            '</button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger" data-action="delete">' +
+              '<i class="fas fa-trash me-1"></i> Delete' +
+            '</button>' +
+            (replyHref
+              ? '<a class="btn btn-sm btn-outline-success" href="' + replyHref + '">' +
+                  '<i class="fas fa-reply me-1"></i> Reply via email</a>'
+              : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    wrap.querySelectorAll('[data-action="status"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        updateStatus([it.id], btn.getAttribute('data-target'));
+      });
+    });
+    const del = wrap.querySelector('[data-action="delete"]');
+    if (del) del.addEventListener('click', function () {
+      if (confirm('Delete this feedback? This cannot be undone.')) {
+        deleteItems([it.id]);
+      }
+    });
+  }
+
+  async function selectItem(id) {
+    state.selected = id;
+    renderList();
+    // Try to refresh the single record from the server (best-effort).
+    try {
+      const r = await authFetch(API + '/api/admin/feedback/' + id);
+      if (r.ok) {
+        const fresh = await r.json();
+        const i = state.items.findIndex(function (x) { return x.id === id; });
+        if (i >= 0) state.items[i] = Object.assign({}, state.items[i], fresh);
+      }
+    } catch (e) {}
+    // Auto mark-as-read for unread items on open.
+    const it = state.items.find(function (x) { return x.id === id; });
+    if (it && it.status === 'unread') {
+      updateStatus([id], 'read', /*skipReload*/ false);
+    } else {
+      renderDetail();
+    }
+  }
+
+  async function updateStatus(ids, target, skipReload) {
+    const tasks = ids.map(function (id) {
+      return authFetch(API + '/api/admin/feedback/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: target })
+      }).catch(function () { return null; });
+    });
+    await Promise.all(tasks);
+    ids.forEach(function (id) {
+      const i = state.items.findIndex(function (x) { return x.id === id; });
+      if (i >= 0) state.items[i].status = target;
+    });
+    state.checked.clear();
+    refreshBulkBar();
+    renderList();
+    renderDetail();
+    if (!skipReload) loadCounts();
+  }
+
+  async function deleteItems(ids) {
+    const tasks = ids.map(function (id) {
+      return authFetch(API + '/api/admin/feedback/' + id, { method: 'DELETE' })
+        .catch(function () { return null; });
+    });
+    await Promise.all(tasks);
+    state.items = state.items.filter(function (x) { return ids.indexOf(x.id) === -1; });
+    if (ids.indexOf(state.selected) !== -1) state.selected = null;
+    state.checked.clear();
+    refreshBulkBar();
+    renderList();
+    renderDetail();
+    loadCounts();
+  }
+
+  async function loadCounts() {
+    try {
+      const r = await authFetch(API + '/api/admin/feedback/counts');
+      if (!r.ok) {
+        if (r.status === 404) state.serviceDown = true;
+        return;
+      }
+      const c = await r.json();
+      const unread = (c && c.unread) || 0;
+      const total = (c && c.total) || 0;
+      document.getElementById('header-line').textContent =
+        'Feedback inbox — ' + unread + ' unread of ' + total;
+    } catch (e) {}
+  }
+
+  async function loadList() {
+    try {
+      const r = await authFetch(API + '/api/admin/feedback?limit=200');
+      if (r.status === 401 || r.status === 403) {
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('access-denied').classList.remove('d-none');
+        return false;
+      }
+      if (r.status === 404) {
+        state.serviceDown = true;
+        state.items = [];
+        return true;
+      }
+      if (!r.ok) throw new Error('list failed');
+      const data = await r.json();
+      state.items = Array.isArray(data) ? data : (data.items || []);
+      return true;
+    } catch (e) {
+      state.serviceDown = true;
+      state.items = [];
+      return true;
+    }
+  }
+
+  function wireFilters() {
+    document.querySelectorAll('.kr-status-filter').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.kr-status-filter').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.status = btn.getAttribute('data-status');
+        renderList();
+      });
+    });
+    document.querySelectorAll('.kr-sentiment-filter').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        const s = chip.getAttribute('data-s');
+        if (state.sentiments.has(s)) {
+          state.sentiments.delete(s);
+          chip.classList.remove('is-on');
+          chip.classList.replace('text-white', 'text-dark');
+        } else {
+          state.sentiments.add(s);
+          chip.classList.add('is-on');
+          chip.classList.replace('text-dark', 'text-white');
+        }
+        renderList();
+      });
+    });
+    document.getElementById('search-input').addEventListener('input', function (e) {
+      state.q = e.target.value.trim();
+      renderList();
+    });
+    document.getElementById('bulk-read').addEventListener('click', function () {
+      updateStatus(Array.from(state.checked), 'read');
+    });
+    document.getElementById('bulk-archive').addEventListener('click', function () {
+      updateStatus(Array.from(state.checked), 'archived');
+    });
+    document.getElementById('bulk-delete').addEventListener('click', function () {
+      if (state.checked.size && confirm('Delete ' + state.checked.size + ' message(s)?')) {
+        deleteItems(Array.from(state.checked));
+      }
+    });
+  }
+
+  async function init() {
+    const ok = await loadList();
+    document.getElementById('loading').classList.add('d-none');
+    if (!ok) return;
+    document.getElementById('inbox').classList.remove('d-none');
+    if (state.serviceDown) {
+      document.getElementById('service-banner').classList.remove('d-none');
+    }
+    await loadCounts();
+    wireFilters();
+    renderList();
+    renderDetail();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
