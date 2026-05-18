@@ -64,6 +64,10 @@
 
         {% include nibsy-widget.html %}
 
+        {% if page.url contains '/projects/' or page.url contains '/parts/' %}
+            {% include feedback_widget.html %}
+        {% endif %}
+
         <!-- User Authentication Menu Script -->
         <script src="/assets/js/user-auth.js?v={{ site.time | date: '%s' }}"></script>
 
