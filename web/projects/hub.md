@@ -7,6 +7,8 @@ hide_likes_and_comments: true
 thanks: false
 ---
 
+{% include nav_projects.html %}
+
 # {{page.title}}
 ## {{page.description}}
 

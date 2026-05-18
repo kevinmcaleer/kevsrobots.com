@@ -4,6 +4,8 @@ description: Manage your project portfolio
 layout: content
 ---
 
+{% include nav_projects.html %}
+
 # My Projects
 
 <div id="login-required" class="alert alert-warning d-none">

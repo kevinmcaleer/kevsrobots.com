@@ -4,6 +4,8 @@ description: Share your maker project with the community
 layout: content
 ---
 
+{% include nav_projects.html %}
+
 # {{page.title}}
 
 Create and share your robotics, electronics, or maker project with the kevsrobots.com community.

@@ -1,0 +1,16 @@
+- name: Projects Hub
+  link: /projects/hub
+  icon: fas fa-folder-open
+# Search page is coming with #133 — placeholder URL for now
+- name: Search
+  link: /projects/search
+  icon: fas fa-magnifying-glass
+- name: My Projects
+  link: /projects/my-projects
+  icon: fas fa-user-gear
+- name: Create New
+  link: /projects/editor.html
+  icon: fas fa-plus-circle
+- name: Parts Catalog
+  link: /parts/
+  icon: fas fa-microchip
