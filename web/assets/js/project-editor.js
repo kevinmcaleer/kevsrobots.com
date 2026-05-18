@@ -2249,6 +2249,184 @@
     });
   })();
 
+  // --- Completeness meter (issue #137) ---
+  // Reads in-memory editor state only. No API calls. Updates on a
+  // requestAnimationFrame cadence — completely separate from the 3s autosave.
+  const COMPLETENESS_ITEMS = [
+    { key: 'title',  points: 10, label: 'Add a title',                         target: 'project-title',
+      check: () => titleInput && titleInput.value.trim().length >= 3 },
+    { key: 'desc',   points: 10, label: 'Write a short description',           target: 'project-description',
+      check: () => descInput && descInput.value.trim().length >= 10 },
+    { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'image-input',
+      check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
+    { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',     target: 'content-editor',
+      check: () => (easyMDE ? easyMDE.value().trim().length : (contentEditor ? contentEditor.value.trim().length : 0)) >= 200 },
+    { key: 'diff',   points: 5,  label: 'Set a difficulty level',              target: 'project-difficulty',
+      check: () => difficultySelect && difficultySelect.value !== '' },
+    { key: 'time',   points: 5,  label: 'Estimate build time',                 target: 'project-time',
+      check: () => !!(timeInput && timeInput.value) && Number(timeInput.value) > 0 },
+    { key: 'tags',   points: 5,  label: 'Add at least one tag',                target: 'tag-input',
+      check: () => tagsContainer && tagsContainer.querySelectorAll('.tag-badge').length > 0 },
+    { key: 'bom',    points: 10, label: 'Add at least one BOM item',           target: 'add-bom-btn',
+      check: () => document.querySelectorAll('#bom-body tr').length > 0 },
+    { key: 'repo',   points: 10, label: 'Link a code repository',              target: 'project-repo',
+      check: () => repoInput && repoInput.value.trim().length > 0 },
+    { key: 'extra',  points: 10, label: 'Add a file or a journal entry',       target: 'journal-input',
+      check: () => document.querySelectorAll('#file-list tbody tr').length > 0
+                || document.querySelectorAll('#journal-list .journal-entry').length > 0 },
+  ];
+
+  let completenessFrame = null;
+  function recomputeCompleteness() {
+    if (completenessFrame) cancelAnimationFrame(completenessFrame);
+    completenessFrame = requestAnimationFrame(() => {
+      completenessFrame = null;
+      _doRecomputeCompleteness();
+    });
+  }
+
+  function _bandClass(pct) {
+    if (pct >= 90) return 'completeness-bar-gold';
+    if (pct >= 70) return 'completeness-bar-green';
+    if (pct >= 40) return 'completeness-bar-amber';
+    return 'completeness-bar-red';
+  }
+
+  function _doRecomputeCompleteness() {
+    const scoreEl = document.getElementById('completeness-score');
+    const pointsEl = document.getElementById('completeness-points');
+    const barEl = document.getElementById('completeness-bar');
+    const nextEl = document.getElementById('completeness-next');
+    const nextLink = document.getElementById('completeness-next-link');
+    const listEl = document.getElementById('completeness-checklist');
+    const celebrateEl = document.getElementById('completeness-celebration');
+    if (!scoreEl || !barEl || !listEl) return;
+
+    let earned = 0;
+    const results = COMPLETENESS_ITEMS.map(item => {
+      let met = false;
+      try { met = !!item.check(); } catch (e) { met = false; }
+      if (met) earned += item.points;
+      return { item, met };
+    });
+    const pct = Math.round(earned);
+
+    scoreEl.textContent = pct + '%';
+    if (pointsEl) pointsEl.textContent = earned + ' / 100';
+    barEl.style.width = pct + '%';
+    barEl.setAttribute('aria-valuenow', String(pct));
+    barEl.className = 'progress-bar ' + _bandClass(pct);
+
+    if (pct >= 100) {
+      listEl.classList.add('d-none');
+      if (nextEl) nextEl.classList.add('d-none');
+      if (celebrateEl) celebrateEl.classList.remove('d-none');
+      return;
+    }
+    if (celebrateEl) celebrateEl.classList.add('d-none');
+    listEl.classList.remove('d-none');
+
+    // Next suggestion: highest-point unmet item.
+    const unmet = results.filter(r => !r.met).sort((a, b) => b.item.points - a.item.points);
+    if (unmet.length && nextEl && nextLink) {
+      const top = unmet[0].item;
+      nextLink.textContent = top.label + ' (+' + top.points + ')';
+      nextLink.dataset.target = top.target;
+      nextEl.classList.remove('d-none');
+    } else if (nextEl) {
+      nextEl.classList.add('d-none');
+    }
+
+    listEl.innerHTML = results.map(({ item, met }) => {
+      if (met) {
+        return '<li class="completeness-item completeness-item-met text-muted py-1">'
+             + '<i class="fas fa-circle-check me-2"></i>'
+             + '<span>' + item.label + '</span>'
+             + '<span class="float-end small">+' + item.points + '</span>'
+             + '</li>';
+      }
+      return '<li class="completeness-item completeness-item-unmet py-1">'
+           + '<i class="far fa-circle me-2 text-primary"></i>'
+           + '<a href="#" class="completeness-link text-decoration-none" data-target="' + item.target + '">' + item.label + '</a>'
+           + '<span class="float-end small text-primary">+' + item.points + '</span>'
+           + '</li>';
+    }).join('');
+  }
+
+  function focusCompletenessTarget(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    try {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) {
+      el.scrollIntoView();
+    }
+    // Special-case the markdown editor: focus CodeMirror, not the hidden textarea.
+    if (id === 'content-editor' && easyMDE && easyMDE.codemirror) {
+      setTimeout(() => easyMDE.codemirror.focus(), 250);
+      return;
+    }
+    setTimeout(() => { try { el.focus(); } catch (_) {} }, 250);
+  }
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('.completeness-link, #completeness-next-link');
+    if (!link) return;
+    const target = link.dataset.target;
+    if (!target) return;
+    e.preventDefault();
+    focusCompletenessTarget(target);
+  });
+
+  // Fan-in: same set as autosave, but on a separate (fast) cadence.
+  [titleInput, descInput, difficultySelect, timeInput, repoInput].forEach(el => {
+    if (el) {
+      el.addEventListener('input', recomputeCompleteness);
+      el.addEventListener('change', recomputeCompleteness);
+    }
+  });
+
+  // EasyMDE body changes
+  function _wireEasyMDEForCompleteness() {
+    if (easyMDE && easyMDE.codemirror) {
+      easyMDE.codemirror.on('change', recomputeCompleteness);
+      return true;
+    }
+    return false;
+  }
+  if (!_wireEasyMDEForCompleteness()) {
+    const _wireTimer = setInterval(() => {
+      if (_wireEasyMDEForCompleteness()) clearInterval(_wireTimer);
+    }, 200);
+  }
+
+  // Watch DOM sections we render imperatively (tags badges, BOM rows, gallery,
+  // file list, journal list). MutationObserver keeps the meter in sync without
+  // touching every render function call site.
+  function _observe(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    new MutationObserver(recomputeCompleteness).observe(el, { childList: true, subtree: true });
+  }
+  _observe('tags-container');
+  _observe('bom-body');
+  _observe('image-gallery');
+  _observe('file-list');
+  _observe('journal-list');
+
+  // Expose so loadProject() / init can trigger explicitly.
+  window._recomputeCompleteness = recomputeCompleteness;
+
+  // Initialise Bootstrap popover for the info button (if Bootstrap is present).
+  (function initCompletenessPopover() {
+    const btn = document.getElementById('completeness-info');
+    if (!btn || typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
+    new bootstrap.Popover(btn);
+  })();
+
+  // First paint so the meter shows 0% (new projects) or actual score (after load).
+  recomputeCompleteness();
+
   // --- Init ---
   async function init() {
     const authed = await checkAuth();
@@ -2256,6 +2434,7 @@
     initEditor();
     if (projectId) await loadProject();
     editorContainer.classList.remove('d-none');
+    recomputeCompleteness();
   }
 
   init();
