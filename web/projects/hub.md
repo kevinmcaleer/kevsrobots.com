@@ -9,6 +9,8 @@ thanks: false
 
 {% include nav_projects.html %}
 
+
+
 # {{page.title}}
 ## {{page.description}}
 
@@ -156,7 +158,9 @@ thanks: false
         // archived projects and returns download_count baked in.
         resp = await fetch(API + '/api/projects/popular?window=30d&limit=100');
       } else {
-        resp = await fetch(API + '/api/projects?');
+        // Issue #140: ask the API to boost followed-author projects for
+        // logged-in viewers. The flag is harmless for anonymous calls.
+        resp = await ProjectAuth.apiFetch(API + '/api/projects?boost_followed=true');
       }
       if (!resp.ok) throw new Error('API error');
       let projects = await resp.json();
@@ -199,7 +203,7 @@ thanks: false
                 </div>
               </div>
               <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
-                <small class="text-muted">by ${esc(p.author_username)}<span class="ms-1 d-none" data-author-gold="${esc(p.author_username)}"></span> &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
+                <small class="text-muted">by <span data-profile-username="${esc(p.author_username)}" class="profile-username-link">${esc(p.author_username)}</span><span class="ms-1 d-none" data-author-gold="${esc(p.author_username)}"></span> &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
                 <small class="text-muted d-flex gap-2 align-items-center">
                   <span id="card-makes-${p.id}" class="d-none"><i class="fas fa-hammer"></i> <span data-count></span></span>
                   <span id="card-likes-${p.id}"><i class="far fa-heart"></i> </span>
@@ -235,6 +239,21 @@ thanks: false
             wrap.classList.remove('d-none');
           })
           .catch(function () {});
+      });
+
+      // Issue #111: hijack clicks on author-username spans so they
+      // navigate to the user's profile instead of the project. Implemented
+      // as a click handler rather than a nested <a> because the card is
+      // already wrapped in one (invalid HTML).
+      grid.querySelectorAll('.profile-username-link').forEach(function (el) {
+        el.style.cursor = 'pointer';
+        el.classList.add('text-decoration-underline');
+        el.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          var u = el.getAttribute('data-profile-username') || '';
+          if (u) window.location.href = '/profile/?u=' + encodeURIComponent(u);
+        });
       });
 
       // Issue #106: project card adornment — when an author has any

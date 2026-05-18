@@ -38,6 +38,7 @@ from ..storage import (
     read_file,
     save_file,
 )
+from .users import log_activity  # Issue #111: profile activity feed.
 
 MAX_IMAGES_PER_MAKE = 5
 
@@ -182,6 +183,17 @@ async def create_make(
         )
         session.add(img)
         saved_images.append(img)
+
+    # Issue #111: log the make as an activity event before commit so it
+    # rolls back with the rest if anything fails downstream.
+    await log_activity(
+        session,
+        user_id=user,
+        kind="make_posted",
+        subject_id=make.id,
+        subject_title=project.title,
+        subject_url=f"/projects/view.html?id={project_id}#makes",
+    )
 
     await session.commit()
     await session.refresh(make)

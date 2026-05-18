@@ -8,6 +8,7 @@ from typing import Any, Optional
 from sqlalchemy import (
     ARRAY,
     Boolean,
+    Date,
     DateTime,
     Float,
     ForeignKey,
@@ -15,6 +16,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -53,6 +55,16 @@ class Project(Base):
         ForeignKey("projects.id", ondelete="SET NULL"), nullable=True, index=True
     )
     remix_description: Mapped[Optional[str]] = mapped_column(Text)
+    # Issue #115: Featured / Staff Pick metadata. Additive — does not change
+    # any existing query (hub still selects newest-first). When
+    # ``is_featured`` flips true, the other three are populated together;
+    # ``DELETE /api/admin/projects/{id}/feature`` clears all four.
+    is_featured: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0", index=True
+    )
+    featured_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    featured_by: Mapped[Optional[str]] = mapped_column(String(100))
+    featured_note: Mapped[Optional[str]] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
@@ -338,6 +350,95 @@ class PartSupplier(Base):
     last_status: Mapped[Optional[str]] = mapped_column(String(30))
 
 
+# --- User follows (issue #140) -------------------------------------------
+#
+# A directional social-graph row: `follower_id` follows `followee_id`.
+# Both are Chatter usernames (we don't carry our own user table — the
+# auth service is the source of truth). The pair is the PK so a duplicate
+# follow is an upsert-conditional no-op; on the API side we treat
+# "already following" as 200 OK rather than a 4xx so the UI button is
+# safely idempotent. ``created_at`` is kept so we can surface "followed
+# you N days ago" later without a schema change.
+#
+# No ALTER helper is needed — `create_all` builds this table from scratch
+# on every Postgres deployment. SQLite tests pick it up the same way.
+
+
+class UserFollow(Base):
+    __tablename__ = "user_follows"
+
+    follower_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    followee_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        # Index follower_id for "who am I following?" queries; the PK
+        # already covers (follower_id, followee_id) so we only need the
+        # reverse index for "who follows X?".
+        Index("ix_user_follows_followee_id", "followee_id"),
+    )
+
+
+# --- User profiles (issue #111) ------------------------------------------
+#
+# Identity lives in Chatter — we do not own a `users` table. To attach
+# extra profile data (bio, location, social links, featured badges) we
+# keep a lightweight `user_profiles` row keyed by Chatter username. Rows
+# are created lazily on first PUT; absent rows are returned as "no extra
+# profile data" rather than 404. This avoids a sign-up hook and keeps
+# Chatter as the source of truth for "does this user exist?".
+#
+# Migration: the table is new so `create_all` builds it on fresh
+# deployments. The companion `add_user_profile_columns_if_missing`
+# helper in db.py is a defensive ALTER for any deployment that already
+# has a partial `user_profiles` table from a preview branch.
+
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    username: Mapped[str] = mapped_column(String(100), primary_key=True)
+    bio: Mapped[Optional[str]] = mapped_column(String(500))
+    location: Mapped[Optional[str]] = mapped_column(String(120))
+    website_url: Mapped[Optional[str]] = mapped_column(String(200))
+    # social_links: {"github": "...", "twitter": "...", "youtube": "...", "mastodon": "..."}
+    social_links: Mapped[Optional[dict]] = mapped_column(JsonType)
+    # Up to 3 badge slug strings the user has pinned to the showcase.
+    featured_badge_slugs: Mapped[Optional[list]] = mapped_column(JsonType)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
+# --- User activity feed (issue #111) -------------------------------------
+#
+# Tiny event log so the profile page can show a "what they've been up to"
+# strip. Rows are emitted from existing routes when actions fire; we do
+# not backfill historical activity. `subject_url` is precomputed so the
+# renderer stays dumb.
+
+
+class UserActivity(Base):
+    __tablename__ = "user_activity"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    # kind: project_published | project_updated | comment_posted |
+    # make_posted | badge_earned | collection_created
+    kind: Mapped[str] = mapped_column(String(40), nullable=False)
+    subject_id: Mapped[Optional[int]] = mapped_column(Integer)
+    subject_title: Mapped[Optional[str]] = mapped_column(String(200))
+    subject_url: Mapped[Optional[str]] = mapped_column(String(400))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False, index=True
+    )
+
+
 class PartRevision(Base):
     __tablename__ = "part_revisions"
 
@@ -360,6 +461,61 @@ class PartRevision(Base):
     # Suppliers are denormalised into the revision row as JSON so we don't
     # need a sibling table per revision. Each entry: {name, url}.
     suppliers_json: Mapped[Optional[list]] = mapped_column(JsonType)
+
+
+# --- Staff picks (issue #115) --------------------------------------------
+#
+# Editorial collections of projects ("May 2026 Staff Picks", "Holiday Build
+# Round-up", etc.). Staff picks are independent of the per-project
+# ``is_featured`` flag — a project may be in many picks across time, or in
+# none, regardless of its featured state. The pick row itself is a draft
+# until ``is_published`` flips true.
+#
+# No migration helper is needed: ``create_all`` builds these brand-new
+# tables on every deploy. Only column-additions to existing tables need a
+# helper (see ``add_remix_columns_if_missing``).
+
+
+class StaffPick(Base):
+    __tablename__ = "staff_picks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(String(500))
+    period_start: Mapped[Optional[datetime]] = mapped_column(Date)
+    period_end: Mapped[Optional[datetime]] = mapped_column(Date)
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    is_published: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0", index=True
+    )
+    cover_image_url: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class StaffPickItem(Base):
+    __tablename__ = "staff_pick_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    staff_pick_id: Mapped[int] = mapped_column(
+        ForeignKey("staff_picks.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    editor_note: Mapped[Optional[str]] = mapped_column(String(300))
+    order_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    __table_args__ = (
+        # A project can only appear once in any given pick. The (pick, project)
+        # tuple is the natural key; ``id`` is kept as a stable handle for the
+        # admin UI's PATCH/DELETE endpoints so renaming a pick's items
+        # doesn't require composite-key URLs.
+        UniqueConstraint(
+            "staff_pick_id", "project_id", name="uq_staff_pick_items_pick_project"
+        ),
+    )
 
 
 # --- Badges & Achievements (issue #106) ----------------------------------
