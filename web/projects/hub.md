@@ -42,7 +42,7 @@ thanks: false
   <!-- Search and Filters -->
   <div class="row mb-4 g-2">
     <div class="col-md-4">
-      <input type="text" id="project-search" class="form-control" placeholder="Search projects by title or tag...">
+      <input type="text" id="project-search" class="form-control" placeholder="Search projects (opens full search)...">
     </div>
     <div class="col-md-3">
       <select id="difficulty-filter" class="form-select">
@@ -86,6 +86,7 @@ thanks: false
 <script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-search.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -97,19 +98,23 @@ thanks: false
   const tagFilter = document.getElementById('tag-filter');
   const sortSelect = document.getElementById('sort-select');
 
-  const difficultyColors = {
-    beginner: 'success',
-    intermediate: 'warning',
-    advanced: 'danger',
-  };
-
-  const statusBadges = {
-    wip: '<span class="badge bg-info">🔨 WIP</span>',
-    completed: '<span class="badge bg-success">✅ Completed</span>',
-  };
+  const difficultyColors = ProjectSearch.DIFFICULTY_COLORS;
+  const statusBadges = ProjectSearch.STATUS_BADGES;
 
   let myProjectIds = new Set();
   let showingMine = false;
+
+  // Redirect to the full search page with the user's criteria attached.
+  // Issue #133: "search results page should appear once the user types any
+  // criteria on the main projects hub page".
+  function redirectToSearch() {
+    const params = new URLSearchParams();
+    if (searchInput.value.trim()) params.set('q', searchInput.value.trim());
+    if (difficultyFilter.value) params.append('difficulty', difficultyFilter.value);
+    if (tagFilter.value.trim()) params.append('tag', tagFilter.value.trim().toLowerCase());
+    const qs = params.toString();
+    window.location.href = '/projects/search' + (qs ? '?' + qs : '');
+  }
 
   async function checkAuth() {
     try {
@@ -148,28 +153,17 @@ thanks: false
         // archived projects and returns download_count baked in.
         resp = await fetch(API + '/api/projects/popular?window=30d&limit=100');
       } else {
-        const params = new URLSearchParams();
-        if (searchInput.value) params.set('search', searchInput.value);
-        if (difficultyFilter.value) params.set('difficulty', difficultyFilter.value);
-        if (tagFilter.value) params.set('tag', tagFilter.value.toLowerCase());
-        resp = await fetch(API + '/api/projects?' + params.toString());
+        resp = await fetch(API + '/api/projects?');
       }
       if (!resp.ok) throw new Error('API error');
       let projects = await resp.json();
       spinner.classList.add('d-none');
 
-      // The popular endpoint doesn't honour the search/filter inputs server-side
-      // — apply them client-side for a consistent UX.
-      if (sortMode === 'downloads_30d') {
-        const q = (searchInput.value || '').toLowerCase();
-        const diff = difficultyFilter.value;
-        const tag = (tagFilter.value || '').toLowerCase();
-        projects = projects.filter(p => {
-          if (q && !((p.title || '').toLowerCase().includes(q) || (p.short_description || '').toLowerCase().includes(q))) return false;
-          if (diff && p.difficulty !== diff) return false;
-          if (tag && !(p.tags || []).some(t => (t || '').toLowerCase() === tag)) return false;
-          return true;
-        });
+      // Issue #133: rank newest-first so that completed projects come first,
+      // then by created_at desc, then by updated_at desc as a tiebreaker.
+      // The popular endpoint keeps its own ordering.
+      if (sortMode !== 'downloads_30d') {
+        projects = ProjectSearch.rankHubProjects(projects);
       }
 
       if (showingMine) {
@@ -253,15 +247,18 @@ thanks: false
     return div.innerHTML;
   }
 
+  // Typing into the hub's search/tag boxes (or picking a difficulty) jumps
+  // to the dedicated search page with the criteria carried in the URL.
+  // Sort stays on the hub since it isn't a "criteria".
   let debounce;
-  function debouncedLoad() {
+  function debouncedRedirect() {
     clearTimeout(debounce);
-    debounce = setTimeout(loadProjects, 300);
+    debounce = setTimeout(redirectToSearch, 400);
   }
 
-  searchInput.addEventListener('input', debouncedLoad);
-  difficultyFilter.addEventListener('change', loadProjects);
-  tagFilter.addEventListener('input', debouncedLoad);
+  searchInput.addEventListener('input', debouncedRedirect);
+  difficultyFilter.addEventListener('change', redirectToSearch);
+  tagFilter.addEventListener('input', debouncedRedirect);
   if (sortSelect) sortSelect.addEventListener('change', loadProjects);
 
   // Fail-closed loader for the "Popular this month" row at the top.
