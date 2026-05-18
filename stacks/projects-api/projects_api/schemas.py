@@ -8,6 +8,51 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+# --- Badges & Achievements (issue #106) ----------------------------------
+# Defined up here because ProjectResponse / MakeResponse reference
+# EarnedBadgeResponse in their ``newly_awarded_badges`` field.
+
+
+class BadgeDefinitionResponse(BaseModel):
+    """One row in the badge catalog. Public — exposed via /api/badges."""
+
+    id: int
+    slug: str
+    name: str
+    description: str
+    icon: str
+    category: str
+    threshold_type: str
+    threshold_value: int
+    tier: str  # "bronze" | "silver" | "gold" | "single"
+
+
+class EarnedBadgeResponse(BaseModel):
+    """A badge a user has earned. Combines the catalog row + earned_at."""
+
+    id: int
+    slug: str
+    name: str
+    description: str
+    icon: str
+    category: str
+    tier: str
+    earned_at: datetime
+
+
+class BadgeEvaluationResponse(BaseModel):
+    """Returned by POST /api/badges/evaluate/{username}.
+
+    ``newly_awarded`` is the list of badges that crossed the threshold on
+    *this* evaluation pass — callers (frontend or another API route) can
+    use it to show "you earned a new badge!" toast notifications.
+    """
+
+    username: str
+    newly_awarded: list[EarnedBadgeResponse] = Field(default_factory=list)
+    total_earned: int = 0
+
+
 class ProjectCreate(BaseModel):
     title: str = Field(..., min_length=5, max_length=200)
     short_description: Optional[str] = Field(None, max_length=500)
@@ -69,6 +114,11 @@ class ProjectResponse(BaseModel):
     featured_at: Optional[datetime] = None
     featured_by: Optional[str] = None
     featured_note: Optional[str] = None
+    # Issue #106: badges awarded as a side-effect of this request (e.g.
+    # project create crossing the "First Project" threshold). Frontend uses
+    # this to surface a toast notification. Always omitted from
+    # response bodies that didn't trigger evaluation.
+    newly_awarded_badges: list[EarnedBadgeResponse] = Field(default_factory=list)
 
 
 class ProjectListItem(BaseModel):
@@ -237,6 +287,8 @@ class MakeResponse(BaseModel):
     # Populated only when returning a single make (detail view); harmless
     # when omitted from list responses.
     project_title: Optional[str] = None
+    # Issue #106: badges awarded as a side-effect of posting this make.
+    newly_awarded_badges: list[EarnedBadgeResponse] = Field(default_factory=list)
 
 
 # --- Download tracking schemas ---
@@ -353,6 +405,137 @@ class PartRevisionDetail(BaseModel):
     image_url: Optional[str] = None
     tags: list[str] = Field(default_factory=list)
     suppliers: list[PartSupplierInput] = Field(default_factory=list)
+
+
+# --- User follows (issue #140) ---
+
+
+class FollowToggleResponse(BaseModel):
+    """Returned by POST/DELETE /api/users/{username}/follow."""
+
+    follower: str
+    followee: str
+    following: bool
+
+
+class FollowCountResponse(BaseModel):
+    username: str
+    count: int
+
+
+class FollowingListResponse(BaseModel):
+    """Returned by GET /api/users/me/following."""
+
+    follower: str
+    following: list[str] = Field(default_factory=list)
+
+
+# --- User badges (issue #140) ---
+#
+# Badges are computed on-the-fly from existing data — we do not persist
+# any earned-badge state. The catalog below is fixed; if you change the
+# rules, bump the catalog version so older browsers' caches refresh.
+
+
+class BadgeResponse(BaseModel):
+    key: str
+    name: str
+    description: str
+    icon: str  # Font Awesome class fragment, e.g. "fa-rocket"
+    color: str = "primary"  # Bootstrap colour token
+
+
+class UserBadgesResponse(BaseModel):
+    username: str
+    badges: list[BadgeResponse] = Field(default_factory=list)
+
+
+# --- User profiles (issue #111) ---
+#
+# Public profile shape. ``stats`` is an aggregated snapshot of the user's
+# activity. All fields are nullable / default-zero so the renderer can
+# rely on the schema staying consistent for users who haven't edited
+# their profile.
+
+
+class UserSocialLinks(BaseModel):
+    github: Optional[str] = None
+    twitter: Optional[str] = None
+    youtube: Optional[str] = None
+    mastodon: Optional[str] = None
+
+
+class UserProfileStats(BaseModel):
+    projects: int = 0
+    makes: int = 0
+    downloads: int = 0
+    likes: int = 0
+    followers: int = 0
+    following: int = 0
+
+
+class UserProfileResponse(BaseModel):
+    username: str
+    avatar_url: Optional[str] = None
+    bio: Optional[str] = None
+    location: Optional[str] = None
+    website_url: Optional[str] = None
+    social_links: UserSocialLinks = Field(default_factory=UserSocialLinks)
+    joined_at: Optional[datetime] = None
+    featured_badge_slugs: list[str] = Field(default_factory=list)
+    stats: UserProfileStats = Field(default_factory=UserProfileStats)
+
+
+class UserProfileUpdate(BaseModel):
+    """PUT body for ``/api/users/me/profile``.
+
+    Length / shape validation enforced server-side mirrors the client-side
+    checks in ``profile-edit.js``. URL fields must be empty or
+    ``http(s)://…`` — we validate in the route (not via ``HttpUrl``) so
+    callers can clear a field by sending an empty string.
+    """
+
+    bio: Optional[str] = Field(None, max_length=500)
+    location: Optional[str] = Field(None, max_length=120)
+    website_url: Optional[str] = Field(None, max_length=200)
+    social_links: Optional[UserSocialLinks] = None
+    featured_badge_slugs: Optional[list[str]] = Field(None, max_length=3)
+
+
+class UserActivityItem(BaseModel):
+    id: int
+    kind: str
+    subject_id: Optional[int] = None
+    subject_title: Optional[str] = None
+    subject_url: Optional[str] = None
+    created_at: datetime
+
+
+class UserActivityResponse(BaseModel):
+    username: str
+    items: list[UserActivityItem] = Field(default_factory=list)
+    limit: int
+    offset: int
+
+
+class UserListItem(BaseModel):
+    """A single user in a followers / following list."""
+
+    username: str
+
+
+class UserListResponse(BaseModel):
+    username: str
+    users: list[UserListItem] = Field(default_factory=list)
+    total: int
+    limit: int
+    offset: int
+
+
+class FollowCheckResponse(BaseModel):
+    """Returned by GET /api/users/me/follows/{username}."""
+
+    following: bool
 
 
 class PartDetail(BaseModel):

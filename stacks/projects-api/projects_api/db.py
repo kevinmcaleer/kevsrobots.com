@@ -292,3 +292,56 @@ async def add_bom_part_id_if_missing() -> None:
                 'CREATE INDEX IF NOT EXISTS "ix_project_bom_items_part_id" '
                 'ON "project_bom_items" ("part_id")'
             ))
+
+
+async def add_user_profile_columns_if_missing() -> None:
+    """Additive migration for issue #111 (public user profiles).
+
+    The ``user_profiles`` table is brand-new — on fresh deployments
+    ``create_all`` builds it with every column present. This helper is
+    defensive: if a deployment is upgraded from a preview branch that
+    shipped only a subset of the columns, the missing ones are added
+    here. Postgres-only; SQLite tests use a fresh in-memory DB so the
+    table always has the full set already.
+
+    Safe to run on every startup — no-op when nothing is missing.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'user_profiles'"
+        ))
+        if table_check.first() is None:
+            # Table doesn't exist yet — create_all in the same lifespan
+            # pass builds it with every column.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'user_profiles'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        # Column definitions: name -> SQL type. All NULLable so adding
+        # to a populated table never fails. created_at / updated_at use
+        # NOW() as a sane default for legacy rows.
+        expected: list[tuple[str, str]] = [
+            ("bio", "VARCHAR(500)"),
+            ("location", "VARCHAR(120)"),
+            ("website_url", "VARCHAR(200)"),
+            ("social_links", "JSONB"),
+            ("featured_badge_slugs", "JSONB"),
+            ("created_at", "TIMESTAMP NOT NULL DEFAULT NOW()"),
+            ("updated_at", "TIMESTAMP NOT NULL DEFAULT NOW()"),
+        ]
+        for col_name, col_type in expected:
+            if col_name not in cols:
+                logger.warning(
+                    "Adding user_profiles.%s column (issue #111)", col_name
+                )
+                await conn.execute(text(
+                    f'ALTER TABLE "user_profiles" ADD COLUMN "{col_name}" {col_type}'
+                ))

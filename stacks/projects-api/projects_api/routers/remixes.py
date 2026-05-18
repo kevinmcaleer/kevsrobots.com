@@ -22,6 +22,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
+from ..badges import evaluate_user
 from ..db import get_session
 from ..models import Project, ProjectTag
 from ..schemas import (
@@ -108,12 +109,19 @@ async def create_remix(
     if inherited_tags:
         await _set_tags(session, remix.id, inherited_tags)
 
-    # TODO(#106): Remixer badge eval hook here — when the badges service
-    # lands, fire an event so the caller can level up their Remixer tier.
-
     await session.commit()
     await session.refresh(remix)
-    return await _project_response(session, remix)
+
+    # Issue #106: evaluate the remixer's badges (Remixer tier + may also
+    # cross "Prolific Maker" if this is their nth project). Best-effort.
+    newly = []
+    try:
+        newly = await evaluate_user(session, user)
+    except Exception:  # noqa: BLE001
+        pass
+    resp = await _project_response(session, remix)
+    resp.newly_awarded_badges = newly
+    return resp
 
 
 @router.get("/{project_id}/remixes", response_model=list[ProjectListItem])

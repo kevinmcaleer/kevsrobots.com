@@ -350,6 +350,95 @@ class PartSupplier(Base):
     last_status: Mapped[Optional[str]] = mapped_column(String(30))
 
 
+# --- User follows (issue #140) -------------------------------------------
+#
+# A directional social-graph row: `follower_id` follows `followee_id`.
+# Both are Chatter usernames (we don't carry our own user table — the
+# auth service is the source of truth). The pair is the PK so a duplicate
+# follow is an upsert-conditional no-op; on the API side we treat
+# "already following" as 200 OK rather than a 4xx so the UI button is
+# safely idempotent. ``created_at`` is kept so we can surface "followed
+# you N days ago" later without a schema change.
+#
+# No ALTER helper is needed — `create_all` builds this table from scratch
+# on every Postgres deployment. SQLite tests pick it up the same way.
+
+
+class UserFollow(Base):
+    __tablename__ = "user_follows"
+
+    follower_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    followee_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        # Index follower_id for "who am I following?" queries; the PK
+        # already covers (follower_id, followee_id) so we only need the
+        # reverse index for "who follows X?".
+        Index("ix_user_follows_followee_id", "followee_id"),
+    )
+
+
+# --- User profiles (issue #111) ------------------------------------------
+#
+# Identity lives in Chatter — we do not own a `users` table. To attach
+# extra profile data (bio, location, social links, featured badges) we
+# keep a lightweight `user_profiles` row keyed by Chatter username. Rows
+# are created lazily on first PUT; absent rows are returned as "no extra
+# profile data" rather than 404. This avoids a sign-up hook and keeps
+# Chatter as the source of truth for "does this user exist?".
+#
+# Migration: the table is new so `create_all` builds it on fresh
+# deployments. The companion `add_user_profile_columns_if_missing`
+# helper in db.py is a defensive ALTER for any deployment that already
+# has a partial `user_profiles` table from a preview branch.
+
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    username: Mapped[str] = mapped_column(String(100), primary_key=True)
+    bio: Mapped[Optional[str]] = mapped_column(String(500))
+    location: Mapped[Optional[str]] = mapped_column(String(120))
+    website_url: Mapped[Optional[str]] = mapped_column(String(200))
+    # social_links: {"github": "...", "twitter": "...", "youtube": "...", "mastodon": "..."}
+    social_links: Mapped[Optional[dict]] = mapped_column(JsonType)
+    # Up to 3 badge slug strings the user has pinned to the showcase.
+    featured_badge_slugs: Mapped[Optional[list]] = mapped_column(JsonType)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
+# --- User activity feed (issue #111) -------------------------------------
+#
+# Tiny event log so the profile page can show a "what they've been up to"
+# strip. Rows are emitted from existing routes when actions fire; we do
+# not backfill historical activity. `subject_url` is precomputed so the
+# renderer stays dumb.
+
+
+class UserActivity(Base):
+    __tablename__ = "user_activity"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    # kind: project_published | project_updated | comment_posted |
+    # make_posted | badge_earned | collection_created
+    kind: Mapped[str] = mapped_column(String(40), nullable=False)
+    subject_id: Mapped[Optional[int]] = mapped_column(Integer)
+    subject_title: Mapped[Optional[str]] = mapped_column(String(200))
+    subject_url: Mapped[Optional[str]] = mapped_column(String(400))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False, index=True
+    )
+
+
 class PartRevision(Base):
     __tablename__ = "part_revisions"
 
@@ -426,4 +515,60 @@ class StaffPickItem(Base):
         UniqueConstraint(
             "staff_pick_id", "project_id", name="uq_staff_pick_items_pick_project"
         ),
+    )
+
+
+# --- Badges & Achievements (issue #106) ----------------------------------
+#
+# Two tables: ``badge_definitions`` (catalog of available badges, seeded at
+# startup) and ``user_badges`` (which users have earned which badges).
+#
+# Design decisions:
+#   * ``user_id`` on ``user_badges`` is the **username string** (matching
+#     ``Project.author_username``, ``Make.user_id``, etc.). There is no
+#     local ``users`` table in projects-api — Chatter is the source of
+#     truth. Storing the username here keeps the data model consistent with
+#     the rest of this service.
+#   * ``slug`` is the stable identifier for a badge across redeploys;
+#     ``id`` is an internal autoinc used by FK joins. We upsert seed data
+#     by slug so re-running the seeder doesn't duplicate rows.
+#   * ``tier`` values: ``"bronze" | "silver" | "gold" | "single"``. Tiered
+#     families share a slug **prefix** (e.g. ``prolific_maker_bronze``,
+#     ``prolific_maker_silver``, ``prolific_maker_gold``); the ``category``
+#     column groups them so the gallery UI can render a family card.
+
+
+class BadgeDefinition(Base):
+    __tablename__ = "badge_definitions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(80), nullable=False, unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    icon: Mapped[str] = mapped_column(String(120), nullable=False)
+    category: Mapped[str] = mapped_column(String(60), nullable=False, index=True)
+    threshold_type: Mapped[str] = mapped_column(String(60), nullable=False)
+    threshold_value: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    tier: Mapped[str] = mapped_column(String(20), nullable=False, default="single")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
+class UserBadge(Base):
+    __tablename__ = "user_badges"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    badge_id: Mapped[int] = mapped_column(
+        ForeignKey("badge_definitions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    earned_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("ux_user_badges_user_badge", "user_id", "badge_id", unique=True),
     )

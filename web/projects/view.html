@@ -55,7 +55,7 @@ description: View project details
         <div id="remix-attribution-banner" class="alert alert-info d-none py-2 px-3 mb-3" role="note">
           <i class="fas fa-code-branch me-2" aria-hidden="true"></i>
           Remix of <a id="remix-attribution-link" href="#"></a>
-          by <strong id="remix-attribution-author"></strong>
+          by <a id="remix-attribution-author" href="#" class="fw-bold text-decoration-none"></a>
           <i class="fas fa-info-circle text-muted ms-1"
              id="remix-attribution-tooltip"
              tabindex="0"
@@ -147,7 +147,7 @@ description: View project details
           <div class="card mb-3">
             <div class="card-body">
               <div class="mb-3">
-                <span class="text-muted">by <strong id="view-author"></strong></span>
+                <span class="text-muted">by <a id="view-author-link" href="#" class="text-decoration-none fw-bold" title="View profile"><strong id="view-author"></strong></a></span>
                 <div class="small text-muted mt-1">
                   <i class="fas fa-calendar-plus me-1"></i> Created <span id="view-created"></span><br>
                   <i class="fas fa-clock me-1"></i> Updated <span id="view-updated"></span>
@@ -433,6 +433,7 @@ description: View project details
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -523,6 +524,13 @@ description: View project details
       }
       document.getElementById('view-description').textContent = project.short_description || '';
       document.getElementById('view-author').textContent = project.author_username;
+      var authorLink = document.getElementById('view-author-link');
+      if (authorLink) {
+        // Issue #111: use the canonical query-string form. The
+        // /profile/<username>/ path still works (the index.html
+        // redirector forwards it), but the ?u= form skips the redirect.
+        authorLink.href = '/profile/?u=' + encodeURIComponent(project.author_username);
+      }
       document.getElementById('view-created').textContent = new Date(project.created_at).toLocaleDateString();
       document.getElementById('view-updated').textContent = new Date(project.updated_at).toLocaleDateString();
 
@@ -618,6 +626,8 @@ description: View project details
     link.textContent = project.remixed_from.title;
     link.href = '/projects/view.html?id=' + project.remixed_from.id;
     author.textContent = project.remixed_from.author_username;
+    // Issue #111: link the author to their profile.
+    author.href = '/profile/?u=' + encodeURIComponent(project.remixed_from.author_username);
     if (tip) {
       const desc = project.remix_description || 'No change description provided.';
       tip.setAttribute('title', desc);
@@ -696,7 +706,7 @@ description: View project details
           thumb +
           '<div class="flex-grow-1 small">' +
             '<a href="/projects/view.html?id=' + r.id + '" class="d-block text-truncate">' + esc(r.title) + '</a>' +
-            '<span class="text-muted">by ' + esc(r.author_username) + '</span>' +
+            '<span class="text-muted">by <a class="text-decoration-none" href="/profile/?u=' + encodeURIComponent(r.author_username) + '">' + esc(r.author_username) + '</a></span>' +
           '</div>' +
         '</div>';
       }).join('');
@@ -1368,9 +1378,12 @@ description: View project details
         return r.json().then(function (j) { throw new Error(j.detail || 'Failed to post'); });
       }
       return r.json();
-    }).then(function () {
+    }).then(function (body) {
       closeModal('i-made-this-modal');
       fetchMakes(project);
+      // Issue #106: surface any badges the poster earned (e.g. crossing
+      // a future "first make" threshold).
+      if (window.BadgeToast) BadgeToast.fromResponse(body);
     }).catch(function (e) {
       err.textContent = e.message || 'Failed to post make.';
       err.classList.remove('d-none');
