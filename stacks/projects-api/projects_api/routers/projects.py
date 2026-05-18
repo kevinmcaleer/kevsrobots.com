@@ -19,6 +19,7 @@ from ..schemas import (
     ProjectUpdate,
     RemixedFromRef,
 )
+from .users import log_activity  # Issue #111: profile activity feed.
 
 
 async def _download_count(session: AsyncSession, project_id: int) -> int:
@@ -94,6 +95,11 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         remixes_count=int(remixes_count),
         is_remix=remixed_from_ref is not None,
         download_count=await _download_count(session, project.id),
+        # Issue #115: surface featured metadata on the detail view.
+        is_featured=bool(getattr(project, "is_featured", False)),
+        featured_at=getattr(project, "featured_at", None),
+        featured_by=getattr(project, "featured_by", None),
+        featured_note=getattr(project, "featured_note", None),
     )
 
 
@@ -184,6 +190,8 @@ async def list_projects(
                 created_at=p.created_at,
                 is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
+                is_featured=bool(getattr(p, "is_featured", False)),
+                featured_note=getattr(p, "featured_note", None),
             )
         )
     return items
@@ -221,6 +229,18 @@ async def create_project(
     await session.flush()
     if body.tags:
         await _set_tags(session, project.id, body.tags)
+    # Issue #111: log create as a profile-activity event. project_updated
+    # would be wrong (no audience yet) — we use the same row to mean
+    # "started a project"; the listener treats it the same as a publish
+    # until the status flips to completed.
+    await log_activity(
+        session,
+        user_id=user,
+        kind="project_updated",
+        subject_id=project.id,
+        subject_title=project.title,
+        subject_url=f"/projects/view.html?id={project.id}",
+    )
     await session.commit()
     await session.refresh(project)
     return await _project_response(session, project)
@@ -261,12 +281,28 @@ async def update_project(
 
     update_data = body.model_dump(exclude_unset=True)
     tags = update_data.pop("tags", None)
+    previous_status = project.status
     for field, value in update_data.items():
         setattr(project, field, value)
     project.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
 
     if tags is not None:
         await _set_tags(session, project.id, tags)
+
+    # Issue #111: emit activity. A status flip from non-completed to
+    # completed is the first-time "publish" event; everything else is
+    # generic project_updated. Archived → completed is also a publish.
+    became_completed = (
+        previous_status != "completed" and project.status == "completed"
+    )
+    await log_activity(
+        session,
+        user_id=user,
+        kind="project_published" if became_completed else "project_updated",
+        subject_id=project.id,
+        subject_title=project.title,
+        subject_url=f"/projects/view.html?id={project.id}",
+    )
 
     await session.commit()
     await session.refresh(project)
@@ -317,6 +353,8 @@ async def my_projects(
                 created_at=p.created_at,
                 is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
+                is_featured=bool(getattr(p, "is_featured", False)),
+                featured_note=getattr(p, "featured_note", None),
             )
         )
     return items

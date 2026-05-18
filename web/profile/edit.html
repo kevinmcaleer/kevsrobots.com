@@ -1,0 +1,90 @@
+---
+layout: default
+title: Edit Profile
+---
+
+<link rel="stylesheet" href="/assets/css/profile.css?v={{ site.time | date: '%s' }}">
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+
+      <h1 class="mb-4"><i class="fas fa-pencil-alt me-3 text-primary"></i> Edit your profile</h1>
+
+      <!-- Auth gate. When the viewer isn't logged in, the form is hidden
+           and a sign-in prompt is shown instead. -->
+      <div id="auth-required" class="alert alert-warning d-none">
+        Please <a href="https://chatter.kevsrobots.com/login?return_to={{ site.url }}/profile/edit.html">sign in</a>
+        to edit your profile.
+      </div>
+
+      <form id="profile-edit-form" class="d-none">
+        <div class="mb-3">
+          <label for="bio" class="form-label">Bio</label>
+          <textarea id="bio" class="form-control" rows="4" maxlength="500"
+                    placeholder="A short blurb about you and the kind of robots you build."></textarea>
+          <div class="form-text d-flex justify-content-between">
+            <span>Max 500 characters.</span>
+            <span><span id="bio-count">0</span>/500</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="location" class="form-label">Location</label>
+          <input id="location" class="form-control" maxlength="120" placeholder="e.g. Glasgow, UK">
+        </div>
+
+        <div class="mb-3">
+          <label for="website_url" class="form-label">Website</label>
+          <input id="website_url" type="url" class="form-control" maxlength="200"
+                 placeholder="https://example.com">
+          <div class="form-text">Must start with <code>http://</code> or <code>https://</code>.</div>
+        </div>
+
+        <fieldset class="mb-3">
+          <legend class="h6">Social links</legend>
+          <div class="mb-2">
+            <label for="social_github" class="form-label small mb-1"><i class="fa-brands fa-github me-1"></i> GitHub</label>
+            <input id="social_github" type="url" class="form-control" maxlength="200" placeholder="https://github.com/your-handle">
+          </div>
+          <div class="mb-2">
+            <label for="social_twitter" class="form-label small mb-1"><i class="fa-brands fa-x-twitter me-1"></i> Twitter / X</label>
+            <input id="social_twitter" type="url" class="form-control" maxlength="200" placeholder="https://x.com/your-handle">
+          </div>
+          <div class="mb-2">
+            <label for="social_youtube" class="form-label small mb-1"><i class="fa-brands fa-youtube me-1"></i> YouTube</label>
+            <input id="social_youtube" type="url" class="form-control" maxlength="200" placeholder="https://youtube.com/@your-channel">
+          </div>
+          <div class="mb-2">
+            <label for="social_mastodon" class="form-label small mb-1"><i class="fa-brands fa-mastodon me-1"></i> Mastodon</label>
+            <input id="social_mastodon" type="url" class="form-control" maxlength="200" placeholder="https://mastodon.social/@your-handle">
+          </div>
+        </fieldset>
+
+        <!-- Featured badges picker. Hidden if the badges endpoint returns
+             nothing — gracefully degrades when #106 is not yet live. -->
+        <fieldset class="mb-3 d-none" id="featured-badges-fieldset">
+          <legend class="h6">Featured badges</legend>
+          <p class="form-text">Pick up to 3 badges to showcase on your profile.</p>
+          <div id="featured-badges-options" class="d-flex flex-wrap gap-2"></div>
+        </fieldset>
+
+        <div id="form-error" class="alert alert-danger d-none"></div>
+        <div id="form-success" class="alert alert-success d-none">Profile saved.</div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" id="save-btn">
+            <i class="fas fa-save me-1"></i> Save profile
+          </button>
+          <a id="view-profile-link" href="/profile/" class="btn btn-outline-secondary">
+            View profile
+          </a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/profile-edit.js?v={{ site.time | date: '%s' }}"></script>

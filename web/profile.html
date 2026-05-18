@@ -38,18 +38,17 @@ title: User Profile
 
               <p id="profile-bio" class="mb-3" style="display: none;"></p>
 
+              <div id="profile-website" class="mb-2" style="display: none;">
+                <i class="fas fa-globe me-1 text-muted"></i>
+                <a id="website-link" href="#" target="_blank" rel="noopener noreferrer nofollow"></a>
+              </div>
+
+              <div id="profile-socials" class="mb-3 d-flex flex-wrap gap-2"></div>
+
               <div class="d-flex flex-wrap gap-3 small text-muted">
                 <span>
                   <i class="fas fa-calendar me-1"></i>
                   <span id="profile-joined"></span>
-                </span>
-                <span title="Followers">
-                  <i class="fas fa-users me-1"></i>
-                  <strong id="profile-followers-count">0</strong> followers
-                </span>
-                <span title="Following">
-                  <i class="fas fa-user-friends me-1"></i>
-                  <strong id="profile-following-count">0</strong> following
                 </span>
               </div>
             </div>
@@ -57,37 +56,75 @@ title: User Profile
         </div>
       </div>
 
-      <!-- Badges -->
+      <!-- Stats Bar -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body py-3">
+          <div class="row text-center" id="profile-stats">
+            <div class="col"><div class="fw-bold" id="stat-projects">0</div><small class="text-muted">Projects</small></div>
+            <div class="col"><div class="fw-bold" id="stat-makes">0</div><small class="text-muted">Makes</small></div>
+            <div class="col"><div class="fw-bold" id="stat-downloads">0</div><small class="text-muted">Downloads</small></div>
+            <div class="col"><div class="fw-bold" id="stat-likes">0</div><small class="text-muted">Likes</small></div>
+            <div class="col">
+              <button id="stat-followers-btn" class="btn btn-link p-0 text-decoration-none">
+                <div class="fw-bold text-dark" id="stat-followers">0</div>
+                <small class="text-muted">Followers</small>
+              </button>
+            </div>
+            <div class="col">
+              <button id="stat-following-btn" class="btn btn-link p-0 text-decoration-none">
+                <div class="fw-bold text-dark" id="stat-following">0</div>
+                <small class="text-muted">Following</small>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Badges (up to 3, pinned by user) -->
       <div class="card shadow-sm mb-4 d-none" id="badges-card">
         <div class="card-header bg-light">
-          <h5 class="mb-0"><i class="fas fa-medal text-warning"></i> Badges</h5>
+          <h5 class="mb-0"><i class="fas fa-medal me-3 text-warning"></i> Featured badges</h5>
         </div>
         <div class="card-body">
           <div id="badges-list" class="d-flex flex-wrap gap-2"></div>
         </div>
       </div>
 
-      <!-- Projects -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-          <h5 class="mb-0"><i class="fas fa-cubes text-primary"></i> Projects <span class="text-muted small fw-normal" id="projects-count"></span></h5>
-        </div>
-        <div class="card-body">
+      <!-- Tabs -->
+      <ul class="nav nav-tabs mb-3" id="profile-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-projects-btn" data-bs-toggle="tab" data-bs-target="#tab-projects" type="button" role="tab">
+            <i class="fas fa-cubes me-1"></i> Projects
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-makes-btn" data-bs-toggle="tab" data-bs-target="#tab-makes" type="button" role="tab">
+            <i class="fas fa-hammer me-1"></i> Makes
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-activity-btn" data-bs-toggle="tab" data-bs-target="#tab-activity" type="button" role="tab">
+            <i class="fas fa-stream me-1"></i> Activity
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-projects" role="tabpanel">
           <div id="projects-loading" class="text-center py-3">
             <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
           </div>
           <div id="projects-empty" class="text-muted small mb-0 d-none">No public projects yet.</div>
           <div id="projects-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 d-none"></div>
         </div>
-      </div>
-
-      <!-- Recent Activity -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-          <h5 class="mb-0"><i class="fas fa-stream text-info"></i> Recent activity</h5>
+        <div class="tab-pane fade" id="tab-makes" role="tabpanel">
+          <div id="makes-loading" class="text-center py-3 d-none">
+            <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+          </div>
+          <div id="makes-empty" class="text-muted small mb-0 d-none">No makes posted yet.</div>
+          <div id="makes-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 d-none"></div>
         </div>
-        <div class="card-body">
-          <div id="activity-loading" class="text-center py-3">
+        <div class="tab-pane fade" id="tab-activity" role="tabpanel">
+          <div id="activity-loading" class="text-center py-3 d-none">
             <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
           </div>
           <ul id="activity-list" class="list-unstyled mb-0 d-none"></ul>
@@ -96,9 +133,9 @@ title: User Profile
       </div>
 
       <!-- Recent Comments (from Chatter) -->
-      <div class="card shadow-sm">
+      <div class="card shadow-sm mt-4">
         <div class="card-header bg-light">
-          <h5 class="mb-0"><i class="fas fa-comment text-success"></i> Recent comments</h5>
+          <h5 class="mb-0"><i class="fas fa-comment me-3 text-success"></i> Recent comments</h5>
         </div>
         <div class="card-body p-4">
           <div id="comments-list">
@@ -111,6 +148,25 @@ title: User Profile
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- Followers/following modal -->
+<div class="modal fade" id="user-list-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="user-list-title">Followers</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="user-list-loading" class="text-center py-3">
+          <div class="spinner-border spinner-border-sm" role="status"></div>
+        </div>
+        <ul id="user-list-list" class="list-unstyled mb-0 d-none"></ul>
+        <div id="user-list-empty" class="text-muted small mb-0 d-none">Nobody here yet.</div>
+      </div>
     </div>
   </div>
 </div>

@@ -78,8 +78,12 @@ var ProjectSearch = (function () {
               '<div class="d-flex flex-wrap gap-1">' + tagsHtml + '</div>' +
             '</div>' +
             '<div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">' +
-              '<small class="text-muted">by ' + esc(p.author_username) + ' &middot; ' +
-                new Date(p.created_at).toLocaleDateString() + '</small>' +
+              '<small class="text-muted">by ' +
+                '<span class="profile-username-link text-decoration-underline" ' +
+                'data-profile-username="' + esc(p.author_username) + '" ' +
+                'style="cursor:pointer;">' + esc(p.author_username) + '</span>' +
+                ' &middot; ' + new Date(p.created_at).toLocaleDateString() +
+              '</small>' +
               '<small class="text-muted d-flex gap-2 align-items-center">' +
                 '<span id="card-makes-' + p.id + '" class="d-none"><i class="fas fa-hammer"></i> <span data-count></span></span>' +
                 '<span id="card-likes-' + p.id + '"><i class="far fa-heart"></i> </span>' +
@@ -96,7 +100,26 @@ var ProjectSearch = (function () {
    * Attach like + makes counts to a freshly rendered list of cards.
    * Best-effort: failures leave counts hidden / at 0.
    */
+  // Issue #111: turn author-username spans into profile links. The cards
+  // are wrapped in <a>, so nesting an <a> would be invalid HTML; we wire
+  // up a click handler that stops propagation and navigates to the
+  // profile page instead.
+  function attachAuthorLinks(root) {
+    var scope = root || document;
+    scope.querySelectorAll('.profile-username-link[data-profile-username]').forEach(function (el) {
+      if (el.dataset._profileWired === '1') return;
+      el.dataset._profileWired = '1';
+      el.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        var u = el.getAttribute('data-profile-username') || '';
+        if (u) window.location.href = '/profile/?u=' + encodeURIComponent(u);
+      });
+    });
+  }
+
   function attachCounts(api, projects) {
+    attachAuthorLinks();
     if (typeof ProjectInteractions !== 'undefined') {
       projects.forEach(function (p) {
         var url = 'projects/view.html?id=' + p.id;
@@ -127,6 +150,7 @@ var ProjectSearch = (function () {
     cardHtml: cardHtml,
     rankHubProjects: rankHubProjects,
     attachCounts: attachCounts,
+    attachAuthorLinks: attachAuthorLinks,
     DIFFICULTY_COLORS: DIFFICULTY_COLORS,
     STATUS_BADGES: STATUS_BADGES
   };
