@@ -198,6 +198,38 @@ description: Create or edit a project
     <!-- RIGHT SIDEBAR: Metadata (scrolls with main content) -->
     <div class="col-lg-3">
       <div>
+        <!-- Project Completeness (issue #137) -->
+        <div class="card mb-3" id="completeness-card">
+          <div class="card-header py-2 d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-bullseye me-1"></i> Project Completeness</span>
+            <button type="button" class="btn btn-sm btn-link p-0 text-muted" id="completeness-info"
+                    data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="bottom"
+                    data-bs-html="true"
+                    data-bs-title="How completeness is scored"
+                    data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>BOM item</strong> (10) &middot; <strong>Code repo URL</strong> (10) &middot; <strong>File or journal entry</strong> (10)"
+                    aria-label="How completeness is scored">
+              <i class="fas fa-circle-question"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="d-flex align-items-baseline justify-content-between mb-2">
+              <span id="completeness-score" class="fs-3 fw-bold">0%</span>
+              <span id="completeness-points" class="small text-muted">0 / 100</span>
+            </div>
+            <div class="progress mb-3" style="height:8px">
+              <div id="completeness-bar" class="progress-bar completeness-bar-red" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div id="completeness-next" class="alert alert-light small py-2 px-2 mb-2 d-none">
+              <strong>Next:</strong> <a href="#" id="completeness-next-link"></a>
+            </div>
+            <ul id="completeness-checklist" class="list-unstyled small mb-0"></ul>
+            <div id="completeness-celebration" class="text-center py-3 d-none">
+              <div class="display-6">&#127881;</div>
+              <div class="small">This project is feature complete &mdash; great work!</div>
+            </div>
+          </div>
+        </div>
+
         <div class="card mb-3">
           <div class="card-header py-2">Metadata</div>
           <div class="card-body">

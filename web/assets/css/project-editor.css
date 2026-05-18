@@ -754,3 +754,50 @@ body:has(.CodeMirror-fullscreen) .col-lg-8 {
   margin-top: 2px;
   font-style: italic;
 }
+
+/* --- Project completeness meter (issue #137) --- */
+#completeness-card .progress {
+  background-color: #eef0f2;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#completeness-bar {
+  transition: width 0.25s ease;
+}
+
+.completeness-bar-red    { background-color: #dc3545; }
+.completeness-bar-amber  { background-color: #ffc107; }
+.completeness-bar-green  { background-color: #198754; }
+.completeness-bar-gold   { background: linear-gradient(90deg, #d4af37 0%, #f9d976 100%); }
+
+#completeness-checklist .completeness-item {
+  border-bottom: 1px solid #f1f3f5;
+}
+#completeness-checklist .completeness-item:last-child {
+  border-bottom: 0;
+}
+
+#completeness-checklist .completeness-item-met i.fa-circle-check {
+  color: #198754;
+}
+
+#completeness-checklist .completeness-item-unmet .completeness-link {
+  color: #4A90D9;
+  cursor: pointer;
+}
+#completeness-checklist .completeness-item-unmet:hover .completeness-link {
+  text-decoration: underline;
+}
+
+#completeness-info {
+  line-height: 1;
+}
+
+#completeness-next a {
+  color: #4A90D9;
+  text-decoration: none;
+}
+#completeness-next a:hover {
+  text-decoration: underline;
+}
