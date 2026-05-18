@@ -19,6 +19,17 @@ title: Edit Profile
       </div>
 
       <form id="profile-edit-form" class="d-none">
+        <!-- Profile picture is managed by Chatter (the identity backend),
+             not by projects-api. Point the user at /account where the
+             existing upload flow lives. -->
+        <div class="mb-4 d-flex align-items-center gap-3">
+          <label class="form-label fw-bold mb-0">Profile picture</label>
+          <a href="/account" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-camera me-1"></i> Change profile picture
+          </a>
+          <small class="text-muted">Manage on the Account page.</small>
+        </div>
+
         <div class="mb-3">
           <label for="bio" class="form-label">Bio</label>
           <textarea id="bio" class="form-control" rows="4" maxlength="500"

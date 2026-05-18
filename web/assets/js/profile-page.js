@@ -104,21 +104,27 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (profile) {
         var avatarDiv = document.getElementById('profile-avatar');
+        var initial = (username && username[0]) || '?';
+        var fallbackHtml =
+          '<div class="rounded-circle bg-secondary d-inline-flex align-items-center ' +
+          'justify-content-center text-white" ' +
+          'style="width:150px;height:150px;font-size:3rem;">' +
+          esc(initial.toUpperCase()) + '</div>';
         if (profile && profile.profile_picture_url) {
           var pictureUrl = profile.profile_picture_url.indexOf('http') === 0
             ? profile.profile_picture_url
             : CHATTER_API + profile.profile_picture_url;
+          // Chatter rotates the picture URL hash per profile fetch; if the
+          // image 404s (stale URL, cache mismatch, missing file) fall back
+          // to the initial-letter avatar instead of a broken-image icon.
           avatarDiv.innerHTML =
             '<img src="' + esc(pictureUrl) + '" alt="' + esc(username) + '" ' +
             'class="rounded-circle img-fluid" ' +
-            'style="max-width:150px;max-height:150px;object-fit:cover;">';
+            'style="max-width:150px;max-height:150px;object-fit:cover;" ' +
+            'onerror="this.parentNode.innerHTML=' +
+            JSON.stringify(fallbackHtml).replace(/"/g, '&quot;') + ';">';
         } else {
-          var initial = (username && username[0]) || '?';
-          avatarDiv.innerHTML =
-            '<div class="rounded-circle bg-secondary d-inline-flex align-items-center ' +
-            'justify-content-center text-white" ' +
-            'style="width:150px;height:150px;font-size:3rem;">' +
-            esc(initial.toUpperCase()) + '</div>';
+          avatarDiv.innerHTML = fallbackHtml;
         }
 
         var name = profile
