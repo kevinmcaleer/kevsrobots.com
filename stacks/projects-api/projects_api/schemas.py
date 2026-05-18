@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -63,6 +63,12 @@ class ProjectResponse(BaseModel):
     remixes_count: int = 0
     is_remix: bool = False
     download_count: int = 0
+    # Issue #115: surface featured state on the detail view so the project
+    # page can render the "Staff Pick" badge near the title.
+    is_featured: bool = False
+    featured_at: Optional[datetime] = None
+    featured_by: Optional[str] = None
+    featured_note: Optional[str] = None
 
 
 class ProjectListItem(BaseModel):
@@ -79,6 +85,10 @@ class ProjectListItem(BaseModel):
     # Issue #108: surface remix indicator on list cards.
     is_remix: bool = False
     download_count: int = 0
+    # Issue #115: surface featured indicator on list cards so the hub can
+    # render the gold ribbon without a second API call per project.
+    is_featured: bool = False
+    featured_note: Optional[str] = None
 
 
 class ProjectRemixCreate(BaseModel):
@@ -362,3 +372,115 @@ class PartDetail(BaseModel):
     usage_count: int
     suppliers: list[PartSupplierResponse] = Field(default_factory=list)
     recent_revisions: list[PartRevisionSummary] = Field(default_factory=list)
+
+
+# --- Featured projects + staff picks (issue #115) ------------------------
+
+
+class FeatureProjectRequest(BaseModel):
+    """Body for ``POST /api/admin/projects/{id}/feature``.
+
+    ``note`` is the editor's reason for featuring (e.g. "Beautifully
+    documented servo walker build"). The 200-char cap matches
+    ``Project.featured_note``; longer notes are rejected by both pydantic
+    here and SQLAlchemy at insert time.
+    """
+
+    note: Optional[str] = Field(None, max_length=200)
+
+
+class FeaturedProjectResponse(BaseModel):
+    """Returned by ``GET /api/projects/featured`` and the admin toggle.
+
+    Same shape as :class:`ProjectListItem` so the hub can render a
+    featured carousel using the same card template, plus the editorial
+    metadata. ``featured_at`` is when the admin promoted the project so
+    callers can sort "newest featured first".
+    """
+
+    id: int
+    title: str
+    short_description: Optional[str] = None
+    difficulty: Optional[str] = None
+    estimated_minutes: Optional[int] = None
+    status: str
+    author_username: str
+    cover_image: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    created_at: datetime
+    is_featured: bool = True
+    featured_at: Optional[datetime] = None
+    featured_by: Optional[str] = None
+    featured_note: Optional[str] = None
+
+
+class StaffPickCreate(BaseModel):
+    title: str = Field(..., min_length=3, max_length=200)
+    description: Optional[str] = Field(None, max_length=500)
+    period_start: Optional[date] = None
+    period_end: Optional[date] = None
+    cover_image_url: Optional[str] = Field(None, max_length=2000)
+    is_published: bool = False
+
+
+class StaffPickUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=3, max_length=200)
+    description: Optional[str] = Field(None, max_length=500)
+    period_start: Optional[date] = None
+    period_end: Optional[date] = None
+    cover_image_url: Optional[str] = Field(None, max_length=2000)
+    is_published: Optional[bool] = None
+
+
+class StaffPickItemCreate(BaseModel):
+    project_id: int
+    editor_note: Optional[str] = Field(None, max_length=300)
+    order_index: Optional[int] = Field(None, ge=0)
+
+
+class StaffPickItemUpdate(BaseModel):
+    editor_note: Optional[str] = Field(None, max_length=300)
+    order_index: Optional[int] = Field(None, ge=0)
+
+
+class StaffPickProjectRef(BaseModel):
+    """Minimal project reference embedded inside a staff pick item."""
+
+    id: int
+    title: str
+    short_description: Optional[str] = None
+    author_username: str
+    cover_image: Optional[str] = None
+    difficulty: Optional[str] = None
+    status: str
+    is_featured: bool = False
+
+
+class StaffPickItemResponse(BaseModel):
+    """An entry in a staff pick. ``project`` is denormalised so the public
+    page can render the card without a second round-trip per item."""
+
+    id: int
+    project_id: int
+    editor_note: Optional[str] = None
+    order_index: int
+    project: Optional[StaffPickProjectRef] = None
+
+
+class StaffPickResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    period_start: Optional[date] = None
+    period_end: Optional[date] = None
+    created_by: str
+    created_at: datetime
+    is_published: bool
+    cover_image_url: Optional[str] = None
+    item_count: int = 0
+
+
+class StaffPickDetail(StaffPickResponse):
+    """Single-pick view that also embeds the ordered list of items."""
+
+    items: list[StaffPickItemResponse] = Field(default_factory=list)

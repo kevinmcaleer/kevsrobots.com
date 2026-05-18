@@ -94,6 +94,11 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         remixes_count=int(remixes_count),
         is_remix=remixed_from_ref is not None,
         download_count=await _download_count(session, project.id),
+        # Issue #115: surface featured metadata on the detail view.
+        is_featured=bool(getattr(project, "is_featured", False)),
+        featured_at=getattr(project, "featured_at", None),
+        featured_by=getattr(project, "featured_by", None),
+        featured_note=getattr(project, "featured_note", None),
     )
 
 
@@ -149,6 +154,8 @@ async def list_projects(
                 created_at=p.created_at,
                 is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
+                is_featured=bool(getattr(p, "is_featured", False)),
+                featured_note=getattr(p, "featured_note", None),
             )
         )
     return items
@@ -282,6 +289,8 @@ async def my_projects(
                 created_at=p.created_at,
                 is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
+                is_featured=bool(getattr(p, "is_featured", False)),
+                featured_note=getattr(p, "featured_note", None),
             )
         )
     return items

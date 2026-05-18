@@ -183,6 +183,66 @@ async def add_remix_columns_if_missing() -> None:
             ))
 
 
+async def add_project_featured_columns_if_missing() -> None:
+    """Additive migration for issue #115 (featured projects).
+
+    Adds ``is_featured`` (BOOLEAN, default false), ``featured_at``
+    (TIMESTAMP NULL), ``featured_by`` (VARCHAR(100) NULL), and
+    ``featured_note`` (VARCHAR(200) NULL) to the existing ``projects``
+    table when they do not already exist. Also creates the
+    ``ix_projects_is_featured`` index so ``GET /api/projects/featured``
+    stays cheap. SQLAlchemy's ``create_all`` does not ALTER existing
+    tables, so this lightweight idempotent helper keeps existing Postgres
+    deployments in sync. Safe to run on every startup; no-op when the
+    columns are already present. Postgres-only — SQLite test runs use
+    ``create_all`` against a fresh in-memory DB which already includes
+    the new columns.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'projects'"
+        ))
+        if table_check.first() is None:
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'projects'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "is_featured" not in cols:
+            logger.warning("Adding projects.is_featured column (issue #115)")
+            await conn.execute(text(
+                'ALTER TABLE "projects" ADD COLUMN "is_featured" BOOLEAN '
+                "NOT NULL DEFAULT FALSE"
+            ))
+        if "featured_at" not in cols:
+            logger.warning("Adding projects.featured_at column (issue #115)")
+            await conn.execute(text(
+                'ALTER TABLE "projects" ADD COLUMN "featured_at" TIMESTAMP'
+            ))
+        if "featured_by" not in cols:
+            logger.warning("Adding projects.featured_by column (issue #115)")
+            await conn.execute(text(
+                'ALTER TABLE "projects" ADD COLUMN "featured_by" VARCHAR(100)'
+            ))
+        if "featured_note" not in cols:
+            logger.warning("Adding projects.featured_note column (issue #115)")
+            await conn.execute(text(
+                'ALTER TABLE "projects" ADD COLUMN "featured_note" VARCHAR(200)'
+            ))
+        # Always (re-)assert the index — IF NOT EXISTS makes it cheap.
+        await conn.execute(text(
+            'CREATE INDEX IF NOT EXISTS "ix_projects_is_featured" '
+            'ON "projects" ("is_featured")'
+        ))
+
+
 async def add_bom_part_id_if_missing() -> None:
     """Additive migration for issue #121 (parts catalog).
 

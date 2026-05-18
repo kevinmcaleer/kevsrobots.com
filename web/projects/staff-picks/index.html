@@ -1,0 +1,102 @@
+---
+title: Staff Picks
+layout: default
+description: Hand-picked project collections curated by the kevsrobots team
+permalink: /projects/staff-picks/
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+
+<div class="container py-4">
+  <div class="mb-3">
+    <a href="/projects/hub" class="text-decoration-none text-muted"><i class="fas fa-arrow-left"></i> Back to Projects</a>
+  </div>
+
+  <h1><i class="fas fa-star text-warning me-3"></i> Staff Picks</h1>
+  <p class="lead text-muted">
+    Hand-picked collections of outstanding builds, curated by the kevsrobots team.
+  </p>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="no-picks" class="text-center py-5 d-none">
+    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">No staff picks yet</h4>
+    <p class="text-muted">Check back soon — we publish new collections regularly.</p>
+    <a href="/projects/hub" class="btn btn-primary">Browse all projects</a>
+  </div>
+
+  <div id="picks-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 d-none"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  var API = 'https://projects.kevsrobots.com';
+
+  function esc(t) {
+    var d = document.createElement('div');
+    d.textContent = t == null ? '' : String(t);
+    return d.innerHTML;
+  }
+
+  function thumbStyle(pick) {
+    if (pick.cover_image_url) {
+      return 'background-image:url(\'' + esc(pick.cover_image_url) + '\');background-size:cover;background-position:center;';
+    }
+    var hue = ((pick.id || 0) * 71) % 360;
+    return 'background:linear-gradient(135deg,hsl(' + hue + ',70%,55%),hsl(' + ((hue + 60) % 360) + ',70%,40%));';
+  }
+
+  function formatPeriod(p) {
+    if (!p.period_start && !p.period_end) return '';
+    var s = p.period_start ? new Date(p.period_start).toLocaleDateString() : '?';
+    var e = p.period_end ? new Date(p.period_end).toLocaleDateString() : '?';
+    return s + ' → ' + e;
+  }
+
+  async function init() {
+    try {
+      var resp = await fetch(API + '/api/staff-picks?limit=40');
+      if (!resp.ok) throw new Error('failed');
+      var picks = await resp.json();
+      document.getElementById('loading').classList.add('d-none');
+      if (!Array.isArray(picks) || picks.length === 0) {
+        document.getElementById('no-picks').classList.remove('d-none');
+        return;
+      }
+      var grid = document.getElementById('picks-grid');
+      grid.classList.remove('d-none');
+      grid.innerHTML = picks.map(function(p) {
+        var period = formatPeriod(p);
+        return '<div class="col">' +
+          '<a href="/projects/staff-picks/view.html?id=' + p.id + '" class="text-decoration-none">' +
+            '<div class="card h-100 border-0 shadow-sm card-hover">' +
+              '<div class="project-thumb" style="height:180px;' + thumbStyle(p) + '"></div>' +
+              '<div class="card-body">' +
+                '<h5 class="card-title text-dark">' +
+                  '<i class="fas fa-star text-warning me-2"></i>' + esc(p.title) +
+                '</h5>' +
+                (p.description ? '<p class="card-text text-muted small">' + esc(p.description) + '</p>' : '') +
+                '<div class="d-flex justify-content-between align-items-center small text-muted">' +
+                  '<span>' + p.item_count + ' project' + (p.item_count === 1 ? '' : 's') + '</span>' +
+                  (period ? '<span>' + esc(period) + '</span>' : '') +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</a>' +
+        '</div>';
+      }).join('');
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('no-picks').classList.remove('d-none');
+    }
+  }
+
+  init();
+})();
+</script>

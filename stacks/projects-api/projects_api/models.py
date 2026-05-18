@@ -8,6 +8,7 @@ from typing import Any, Optional
 from sqlalchemy import (
     ARRAY,
     Boolean,
+    Date,
     DateTime,
     Float,
     ForeignKey,
@@ -15,6 +16,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -53,6 +55,16 @@ class Project(Base):
         ForeignKey("projects.id", ondelete="SET NULL"), nullable=True, index=True
     )
     remix_description: Mapped[Optional[str]] = mapped_column(Text)
+    # Issue #115: Featured / Staff Pick metadata. Additive — does not change
+    # any existing query (hub still selects newest-first). When
+    # ``is_featured`` flips true, the other three are populated together;
+    # ``DELETE /api/admin/projects/{id}/feature`` clears all four.
+    is_featured: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0", index=True
+    )
+    featured_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    featured_by: Mapped[Optional[str]] = mapped_column(String(100))
+    featured_note: Mapped[Optional[str]] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
@@ -360,3 +372,58 @@ class PartRevision(Base):
     # Suppliers are denormalised into the revision row as JSON so we don't
     # need a sibling table per revision. Each entry: {name, url}.
     suppliers_json: Mapped[Optional[list]] = mapped_column(JsonType)
+
+
+# --- Staff picks (issue #115) --------------------------------------------
+#
+# Editorial collections of projects ("May 2026 Staff Picks", "Holiday Build
+# Round-up", etc.). Staff picks are independent of the per-project
+# ``is_featured`` flag — a project may be in many picks across time, or in
+# none, regardless of its featured state. The pick row itself is a draft
+# until ``is_published`` flips true.
+#
+# No migration helper is needed: ``create_all`` builds these brand-new
+# tables on every deploy. Only column-additions to existing tables need a
+# helper (see ``add_remix_columns_if_missing``).
+
+
+class StaffPick(Base):
+    __tablename__ = "staff_picks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(String(500))
+    period_start: Mapped[Optional[datetime]] = mapped_column(Date)
+    period_end: Mapped[Optional[datetime]] = mapped_column(Date)
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    is_published: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0", index=True
+    )
+    cover_image_url: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class StaffPickItem(Base):
+    __tablename__ = "staff_pick_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    staff_pick_id: Mapped[int] = mapped_column(
+        ForeignKey("staff_picks.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    editor_note: Mapped[Optional[str]] = mapped_column(String(300))
+    order_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    __table_args__ = (
+        # A project can only appear once in any given pick. The (pick, project)
+        # tuple is the natural key; ``id`` is kept as a stable handle for the
+        # admin UI's PATCH/DELETE endpoints so renaming a pick's items
+        # doesn't require composite-key URLs.
+        UniqueConstraint(
+            "staff_pick_id", "project_id", name="uq_staff_pick_items_pick_project"
+        ),
+    )

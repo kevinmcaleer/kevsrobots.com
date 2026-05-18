@@ -1,0 +1,386 @@
+---
+title: Staff Picks Admin
+layout: default
+description: Curate themed collections of featured projects
+permalink: /admin/staff-picks/
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+
+<div class="container py-4">
+  <h1><i class="fas fa-star text-warning me-3"></i> Staff Picks</h1>
+  <p class="text-muted">
+    Curate themed collections of projects with editor notes. Picks stay
+    as drafts until you tick <em>Published</em>. Public visitors only see
+    published picks at <a href="/projects/staff-picks/">/projects/staff-picks/</a>.
+  </p>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="admin-content" class="d-none">
+    <!-- Create new pick -->
+    <div class="card mb-4">
+      <div class="card-header"><i class="fas fa-plus-circle me-2"></i> Create a new pick</div>
+      <div class="card-body">
+        <form id="new-pick-form" class="row g-2">
+          <div class="col-md-5">
+            <label class="form-label small mb-1">Title</label>
+            <input class="form-control" id="np-title" required minlength="3" maxlength="200" placeholder="May 2026 Staff Picks">
+          </div>
+          <div class="col-md-7">
+            <label class="form-label small mb-1">Description</label>
+            <input class="form-control" id="np-description" maxlength="500" placeholder="Optional summary">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small mb-1">Period start</label>
+            <input class="form-control" type="date" id="np-period-start">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small mb-1">Period end</label>
+            <input class="form-control" type="date" id="np-period-end">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small mb-1">Cover image URL</label>
+            <input class="form-control" id="np-cover" maxlength="2000" placeholder="https://...">
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="np-published">
+              <label class="form-check-label" for="np-published">Publish on save</label>
+            </div>
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-warning">
+              <i class="fas fa-star me-1"></i> Create pick
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Existing picks -->
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-list me-2"></i> All staff picks (drafts + published)</span>
+        <span id="picks-count" class="badge bg-secondary">0</span>
+      </div>
+      <div class="card-body">
+        <div id="picks-list"></div>
+        <div id="no-picks" class="text-center text-muted py-4 d-none">
+          <p>No staff picks yet. Create one above.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Editor modal -->
+<div class="modal fade" id="pick-editor-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Staff Pick <span id="me-id-badge" class="badge bg-secondary"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-pick-form" class="row g-2 mb-4">
+          <div class="col-md-5">
+            <label class="form-label small mb-1">Title</label>
+            <input class="form-control" id="me-title" minlength="3" maxlength="200">
+          </div>
+          <div class="col-md-7">
+            <label class="form-label small mb-1">Description</label>
+            <input class="form-control" id="me-description" maxlength="500">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small mb-1">Period start</label>
+            <input class="form-control" type="date" id="me-period-start">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small mb-1">Period end</label>
+            <input class="form-control" type="date" id="me-period-end">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small mb-1">Cover image URL</label>
+            <input class="form-control" id="me-cover" maxlength="2000">
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="me-published">
+              <label class="form-check-label" for="me-published">Published</label>
+            </div>
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Save changes</button>
+          </div>
+        </form>
+
+        <hr>
+
+        <h6 class="mb-2"><i class="fas fa-list-ol me-2"></i> Items</h6>
+        <div id="me-items" class="mb-3"></div>
+
+        <form id="add-item-form" class="row g-2 align-items-end">
+          <div class="col-md-2">
+            <label class="form-label small mb-1">Project ID</label>
+            <input class="form-control" type="number" id="ai-project-id" min="1" required>
+          </div>
+          <div class="col-md-7">
+            <label class="form-label small mb-1">Editor note</label>
+            <input class="form-control" id="ai-note" maxlength="300" placeholder="Why include this project?">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-success w-100" type="submit"><i class="fas fa-plus me-1"></i> Add to pick</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger me-auto" id="me-delete-btn"><i class="fas fa-trash me-1"></i> Delete pick</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  var API = 'https://projects.kevsrobots.com';
+  var modal; // bootstrap Modal instance
+  var currentPickId = null;
+
+  function esc(t) {
+    var d = document.createElement('div');
+    d.textContent = t == null ? '' : String(t);
+    return d.innerHTML;
+  }
+
+  async function api(path, opts) {
+    opts = opts || {};
+    opts.credentials = 'include';
+    opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    return fetch(API + path, opts);
+  }
+
+  async function init() {
+    try {
+      // Probe admin access via the unpublished-staff-picks query, which
+      // returns an empty list for non-admins and a (possibly empty) list
+      // for admins. We rely on the admin-reports endpoint to distinguish
+      // the two cases — it 403s for non-admins.
+      var probe = await api('/api/admin/reports');
+      if (probe.status === 401 || probe.status === 403) {
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('access-denied').classList.remove('d-none');
+        return;
+      }
+
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('admin-content').classList.remove('d-none');
+      modal = new bootstrap.Modal(document.getElementById('pick-editor-modal'));
+      bindForms();
+      loadPicks();
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('access-denied').classList.remove('d-none');
+    }
+  }
+
+  async function loadPicks() {
+    // We need both drafts and published. Two requests in parallel.
+    var [drafts, published] = await Promise.all([
+      api('/api/staff-picks?published=false').then(r => r.ok ? r.json() : []),
+      api('/api/staff-picks?published=true&limit=100').then(r => r.ok ? r.json() : [])
+    ]);
+    var all = drafts.concat(published);
+    // Sort newest first.
+    all.sort(function(a, b) {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+    var list = document.getElementById('picks-list');
+    document.getElementById('picks-count').textContent = all.length;
+    if (!all.length) {
+      list.innerHTML = '';
+      document.getElementById('no-picks').classList.remove('d-none');
+      return;
+    }
+    document.getElementById('no-picks').classList.add('d-none');
+    list.innerHTML = all.map(function(p) {
+      var badge = p.is_published
+        ? '<span class="badge bg-success">Published</span>'
+        : '<span class="badge bg-secondary">Draft</span>';
+      var period = (p.period_start || p.period_end)
+        ? '<span class="small text-muted ms-2">' + esc(p.period_start || '?') + ' → ' + esc(p.period_end || '?') + '</span>'
+        : '';
+      return '<div class="d-flex justify-content-between align-items-center py-2 border-bottom">' +
+        '<div>' +
+          '<strong>' + esc(p.title) + '</strong> ' + badge + period +
+          '<div class="small text-muted">' + esc(p.description || '') + '</div>' +
+          '<div class="small text-muted">' + p.item_count + ' item(s) · by ' + esc(p.created_by) +
+          ' on ' + new Date(p.created_at).toLocaleDateString() + '</div>' +
+        '</div>' +
+        '<div class="btn-group btn-group-sm">' +
+          '<a href="/projects/staff-picks/view.html?id=' + p.id + '" target="_blank" class="btn btn-outline-secondary"><i class="fas fa-eye"></i></a>' +
+          '<button class="btn btn-primary" onclick="openEditor(' + p.id + ')"><i class="fas fa-pencil-alt me-1"></i> Edit</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  window.openEditor = async function(pickId) {
+    currentPickId = pickId;
+    var resp = await api('/api/staff-picks/' + pickId);
+    if (!resp.ok) return alert('Failed to load pick.');
+    var pick = await resp.json();
+    document.getElementById('me-id-badge').textContent = '#' + pick.id;
+    document.getElementById('me-title').value = pick.title || '';
+    document.getElementById('me-description').value = pick.description || '';
+    document.getElementById('me-period-start').value = pick.period_start || '';
+    document.getElementById('me-period-end').value = pick.period_end || '';
+    document.getElementById('me-cover').value = pick.cover_image_url || '';
+    document.getElementById('me-published').checked = !!pick.is_published;
+    renderItems(pick.items || []);
+    modal.show();
+  };
+
+  function renderItems(items) {
+    var wrap = document.getElementById('me-items');
+    if (!items.length) {
+      wrap.innerHTML = '<p class="text-muted small">No projects in this pick yet.</p>';
+      return;
+    }
+    wrap.innerHTML = items.map(function(it) {
+      var proj = it.project || {};
+      var title = proj.title || ('#' + it.project_id);
+      return '<div class="d-flex justify-content-between align-items-start py-2 border-bottom">' +
+        '<div class="me-3 flex-grow-1">' +
+          '<div><strong>#' + it.project_id + '</strong> ' + esc(title) +
+          (proj.author_username ? ' <span class="small text-muted">by ' + esc(proj.author_username) + '</span>' : '') +
+          '</div>' +
+          '<input class="form-control form-control-sm mt-1" maxlength="300" ' +
+            'value="' + esc(it.editor_note || '') + '" ' +
+            'placeholder="Editor note (max 300)" ' +
+            'oninput="window._noteDirty[' + it.id + ']=this.value">' +
+        '</div>' +
+        '<div class="text-end small">' +
+          '<div class="mb-1">' +
+            '<input type="number" class="form-control form-control-sm d-inline-block" style="width:80px" ' +
+              'value="' + it.order_index + '" min="0" ' +
+              'oninput="window._orderDirty[' + it.id + ']=parseInt(this.value,10)">' +
+          '</div>' +
+          '<button class="btn btn-sm btn-outline-primary me-1" onclick="saveItem(' + it.id + ')">' +
+            '<i class="fas fa-save"></i></button>' +
+          '<button class="btn btn-sm btn-outline-danger" onclick="deleteItem(' + it.id + ')">' +
+            '<i class="fas fa-trash"></i></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  window._noteDirty = {};
+  window._orderDirty = {};
+
+  window.saveItem = async function(itemId) {
+    var body = {};
+    if (Object.prototype.hasOwnProperty.call(window._noteDirty, itemId)) {
+      body.editor_note = window._noteDirty[itemId];
+    }
+    if (Object.prototype.hasOwnProperty.call(window._orderDirty, itemId)) {
+      body.order_index = window._orderDirty[itemId];
+    }
+    if (!Object.keys(body).length) return;
+    var resp = await api('/api/admin/staff-picks/' + currentPickId + '/items/' + itemId, {
+      method: 'PATCH',
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) return alert('Failed to save item.');
+    delete window._noteDirty[itemId];
+    delete window._orderDirty[itemId];
+    openEditor(currentPickId);
+  };
+
+  window.deleteItem = async function(itemId) {
+    if (!confirm('Remove this project from the pick?')) return;
+    var resp = await api('/api/admin/staff-picks/' + currentPickId + '/items/' + itemId, {
+      method: 'DELETE'
+    });
+    if (resp.ok) openEditor(currentPickId);
+    else alert('Failed to remove item.');
+  };
+
+  function bindForms() {
+    document.getElementById('new-pick-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var body = {
+        title: document.getElementById('np-title').value.trim(),
+        description: document.getElementById('np-description').value.trim() || null,
+        period_start: document.getElementById('np-period-start').value || null,
+        period_end: document.getElementById('np-period-end').value || null,
+        cover_image_url: document.getElementById('np-cover').value.trim() || null,
+        is_published: document.getElementById('np-published').checked
+      };
+      var resp = await api('/api/admin/staff-picks', { method: 'POST', body: JSON.stringify(body) });
+      if (!resp.ok) return alert('Failed to create pick.');
+      e.target.reset();
+      loadPicks();
+    });
+
+    document.getElementById('edit-pick-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!currentPickId) return;
+      var body = {
+        title: document.getElementById('me-title').value.trim(),
+        description: document.getElementById('me-description').value.trim() || null,
+        period_start: document.getElementById('me-period-start').value || null,
+        period_end: document.getElementById('me-period-end').value || null,
+        cover_image_url: document.getElementById('me-cover').value.trim() || null,
+        is_published: document.getElementById('me-published').checked
+      };
+      var resp = await api('/api/admin/staff-picks/' + currentPickId, {
+        method: 'PUT',
+        body: JSON.stringify(body)
+      });
+      if (!resp.ok) return alert('Failed to update pick.');
+      modal.hide();
+      loadPicks();
+    });
+
+    document.getElementById('add-item-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!currentPickId) return;
+      var pid = parseInt(document.getElementById('ai-project-id').value, 10);
+      var note = document.getElementById('ai-note').value.trim();
+      if (note.length > 300) return alert('Editor note is limited to 300 characters.');
+      var resp = await api('/api/admin/staff-picks/' + currentPickId + '/items', {
+        method: 'POST',
+        body: JSON.stringify({ project_id: pid, editor_note: note || null })
+      });
+      if (resp.status === 409) return alert('That project is already in this pick.');
+      if (resp.status === 404) return alert('Project or pick not found.');
+      if (!resp.ok) return alert('Failed to add project.');
+      e.target.reset();
+      openEditor(currentPickId);
+    });
+
+    document.getElementById('me-delete-btn').addEventListener('click', async function() {
+      if (!currentPickId) return;
+      if (!confirm('Delete this staff pick and all its items? This cannot be undone.')) return;
+      var resp = await api('/api/admin/staff-picks/' + currentPickId, { method: 'DELETE' });
+      if (resp.ok) { modal.hide(); loadPicks(); }
+      else alert('Failed to delete.');
+    });
+  }
+
+  init();
+})();
+</script>

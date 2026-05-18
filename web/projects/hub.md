@@ -16,8 +16,22 @@ thanks: false
 
 ---
 
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+
 <!-- Project Gallery Component -->
 <div id="projects-hub">
+  <!-- Featured projects carousel (issue #115). Hidden by default; the
+       loader removes d-none once it has at least one featured project to
+       render — on a fresh install the whole shelf stays out of the DOM
+       flow. -->
+  <div id="featured-section" class="featured-carousel-wrap d-none">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h4 class="mb-0"><i class="fas fa-star text-warning me-3"></i> Featured Projects</h4>
+      <a href="/projects/staff-picks/" class="small text-decoration-none">Browse Staff Picks <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div id="featured-carousel" class="featured-carousel"></div>
+  </div>
+
   <!-- Popular this month -->
   <div id="popular-section" class="mb-4 d-none">
     <h4 class="mb-3"><i class="fas fa-fire text-danger me-2"></i>Popular this month</h4>
@@ -89,6 +103,7 @@ thanks: false
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-search.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -180,7 +195,8 @@ thanks: false
       grid.innerHTML = projects.map(p => `
         <div class="col">
           <a href="${myProjectIds.has(p.id) ? '/projects/editor.html?id=' + p.id : '/projects/view.html?id=' + p.id}" class="text-decoration-none">
-            <div class="card h-100 border-0 shadow-sm card-hover">
+            <div class="card h-100 border-0 shadow-sm card-hover position-relative">
+              ${p.is_featured ? FeaturedProjects.ribbon('Featured') : ''}
               ${projectThumbnail(p, 200)}
               <div class="card-body">
                 <h5 class="card-title text-dark">
@@ -263,6 +279,26 @@ thanks: false
   tagFilter.addEventListener('input', debouncedRedirect);
   if (sortSelect) sortSelect.addEventListener('change', loadProjects);
 
+  // Featured carousel (issue #115). One extra API call to
+  // /api/projects/featured. Fails closed: any error / empty list leaves
+  // the section hidden so the hub looks identical to today on a fresh
+  // install with no featured projects yet.
+  async function loadFeatured() {
+    try {
+      const items = await FeaturedProjects.load({ api: API, limit: 6 });
+      if (!Array.isArray(items) || items.length === 0) return;
+      const rendered = FeaturedProjects.mountCarousel(
+        document.getElementById('featured-carousel'),
+        items
+      );
+      if (rendered) {
+        document.getElementById('featured-section').classList.remove('d-none');
+      }
+    } catch (e) {
+      // Silent — the carousel is non-critical.
+    }
+  }
+
   // Fail-closed loader for the "Popular this month" row at the top.
   // If the API errors or returns nothing, the section stays hidden — no UX
   // damage on a fresh install.
@@ -297,6 +333,7 @@ thanks: false
   checkAuth().then(() => {
     loadProjects();
     loadPopular();
+    loadFeatured();
   });
 })();
 </script>
