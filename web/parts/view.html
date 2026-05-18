@@ -68,7 +68,13 @@ description: View a part in the catalog
               <i class="fas fa-clock me-1"></i> Updated <span id="part-updated"></span>
             </div>
             <div class="mb-2">
-              <span class="badge bg-light text-dark"><i class="fas fa-clipboard-list me-1"></i> <span id="part-usage">0</span> project<span id="part-usage-plural"></span></span>
+              <span id="part-usage-badge-wrap"><span class="badge bg-light text-dark"><i class="fas fa-clipboard-list me-1"></i> <span id="part-usage">0</span> project<span id="part-usage-plural"></span></span></span>
+            </div>
+            <div id="part-usage-empty" class="small text-muted fst-italic mb-2 d-none">
+              No projects use this yet.
+            </div>
+            <div id="part-usage-action" class="d-grid mb-2 d-none">
+              <a id="part-usage-link" href="#" class="btn btn-sm btn-primary"><i class="fas fa-clipboard-list me-1"></i> <span id="part-usage-link-label">View projects using this part</span></a>
             </div>
             <div id="part-edit-container" class="d-grid gap-2 mt-3 d-none">
               <a id="part-edit-link" href="#" class="btn btn-sm btn-outline-primary"><i class="fas fa-pencil-alt me-1"></i> Edit part</a>
@@ -187,6 +193,21 @@ description: View a part in the catalog
     const usage = typeof part.usage_count === 'number' ? part.usage_count : 0;
     document.getElementById('part-usage').textContent = usage;
     document.getElementById('part-usage-plural').textContent = usage === 1 ? '' : 's';
+
+    const searchUrl = '/projects/search?part=' + encodeURIComponent(slug);
+    if (usage > 0) {
+      const badgeWrap = document.getElementById('part-usage-badge-wrap');
+      const badgeHtml = badgeWrap.innerHTML;
+      badgeWrap.innerHTML = '<a href="' + searchUrl + '" class="text-decoration-none" title="View projects using this part">' + badgeHtml + '</a>';
+      const actionEl = document.getElementById('part-usage-action');
+      const linkEl = document.getElementById('part-usage-link');
+      linkEl.href = searchUrl;
+      document.getElementById('part-usage-link-label').textContent =
+        'View ' + usage + ' project' + (usage === 1 ? '' : 's') + ' using this part';
+      actionEl.classList.remove('d-none');
+    } else {
+      document.getElementById('part-usage-empty').classList.remove('d-none');
+    }
 
     if (Array.isArray(part.revisions) && part.revisions.length > 0) {
       const sec = document.getElementById('part-revisions-section');
