@@ -8,6 +8,8 @@ thanks: false
 permalink: /projects/search
 ---
 
+{% include nav_projects.html %}
+
 # {{page.title}}
 ## {{page.description}}
 

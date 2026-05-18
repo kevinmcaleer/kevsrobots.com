@@ -8,7 +8,7 @@ layout: none
   <title>Redirecting...</title>
   <script>
     // Extract username from path (/profile/<username>/ or /profile/<username>)
-    // and forward to /profile?u=<username>. We accept ?u= or ?username=
+    // and forward to /profile.html?u=<username>. We accept ?u= or ?username=
     // on the destination — profile-page.js looks for both.
     (function () {
       var pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -16,12 +16,12 @@ layout: none
       var existingUser = existing.get('u') || existing.get('username');
       if (existingUser) {
         // Already on /profile/?u=... — render profile.html.
-        window.location.replace('/profile?u=' + encodeURIComponent(existingUser));
+        window.location.replace('/profile.html?u=' + encodeURIComponent(existingUser));
         return;
       }
       if (pathParts.length > 1) {
         var username = decodeURIComponent(pathParts[1]);
-        window.location.replace('/profile?u=' + encodeURIComponent(username));
+        window.location.replace('/profile.html?u=' + encodeURIComponent(username));
       } else {
         // No username — fall back to homepage.
         window.location.replace('/');
