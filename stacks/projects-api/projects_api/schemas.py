@@ -8,6 +8,51 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+# --- Badges & Achievements (issue #106) ----------------------------------
+# Defined up here because ProjectResponse / MakeResponse reference
+# EarnedBadgeResponse in their ``newly_awarded_badges`` field.
+
+
+class BadgeDefinitionResponse(BaseModel):
+    """One row in the badge catalog. Public — exposed via /api/badges."""
+
+    id: int
+    slug: str
+    name: str
+    description: str
+    icon: str
+    category: str
+    threshold_type: str
+    threshold_value: int
+    tier: str  # "bronze" | "silver" | "gold" | "single"
+
+
+class EarnedBadgeResponse(BaseModel):
+    """A badge a user has earned. Combines the catalog row + earned_at."""
+
+    id: int
+    slug: str
+    name: str
+    description: str
+    icon: str
+    category: str
+    tier: str
+    earned_at: datetime
+
+
+class BadgeEvaluationResponse(BaseModel):
+    """Returned by POST /api/badges/evaluate/{username}.
+
+    ``newly_awarded`` is the list of badges that crossed the threshold on
+    *this* evaluation pass — callers (frontend or another API route) can
+    use it to show "you earned a new badge!" toast notifications.
+    """
+
+    username: str
+    newly_awarded: list[EarnedBadgeResponse] = Field(default_factory=list)
+    total_earned: int = 0
+
+
 class ProjectCreate(BaseModel):
     title: str = Field(..., min_length=5, max_length=200)
     short_description: Optional[str] = Field(None, max_length=500)
@@ -63,6 +108,11 @@ class ProjectResponse(BaseModel):
     remixes_count: int = 0
     is_remix: bool = False
     download_count: int = 0
+    # Issue #106: badges awarded as a side-effect of this request (e.g.
+    # project create crossing the "First Project" threshold). Frontend uses
+    # this to surface a toast notification. Always omitted from
+    # response bodies that didn't trigger evaluation.
+    newly_awarded_badges: list[EarnedBadgeResponse] = Field(default_factory=list)
 
 
 class ProjectListItem(BaseModel):
@@ -227,6 +277,8 @@ class MakeResponse(BaseModel):
     # Populated only when returning a single make (detail view); harmless
     # when omitted from list responses.
     project_title: Optional[str] = None
+    # Issue #106: badges awarded as a side-effect of posting this make.
+    newly_awarded_badges: list[EarnedBadgeResponse] = Field(default_factory=list)
 
 
 # --- Download tracking schemas ---
