@@ -17,13 +17,22 @@ Data sources used by the evaluator
 ----------------------------------
 
 projects-api owns ``projects``, ``makes``, ``downloads`` and remix
-attribution. It does NOT own comments or likes — those live in Chatter /
-the page-counter service. To keep this PR additive and synchronous, the
-"comments" and "likes" badges are *defined* (so the gallery shows them as
-goals) but their evaluator simply counts what we have access to; both
-return 0 today so those badges are never awarded yet. They will start
-being awarded automatically once the comments / likes data lands in
-projects-api or once we add a cross-service lookup.
+attribution. Comments and likes live in Chatter, not in projects-api.
+As of issue #142 the evaluator reads those counters from Chatter over
+HTTP via a 5-minute TTL cache (see ``badge_counter_cache``):
+
+* **likes_received** — for each non-archived project the user owns we
+  hit ``GET {chatter}/interact/likes/{encoded_url}`` (same shape the
+  frontend ``getLikeCount`` uses) and sum ``count``. Per-URL failures
+  are treated as 0; total fan-out is bounded to 5 in-flight requests.
+
+* **comments** — Chatter does NOT yet expose a per-user comment-count
+  endpoint. The counter is gated on the
+  ``CHATTER_USER_COMMENTS_ENDPOINT`` config: when empty (default) it
+  returns 0 and the Engaged Member badges remain dormant; when set to a
+  path template like ``"/api/users/{username}/comments_count"`` it
+  fetches and returns ``count`` from that endpoint. Flipping the env
+  var is the only change needed once the Chatter endpoint ships.
 
 Tiered families
 ---------------
@@ -38,15 +47,20 @@ threshold check.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Optional
+from urllib.parse import quote
 
+import httpx
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .badge_counter_cache import get_cached_counter
+from .config import get_settings
 from .models import BadgeDefinition, Download, Make, Project, UserBadge
 from .schemas import EarnedBadgeResponse
 
@@ -407,17 +421,184 @@ async def _count_remixes_created(session: AsyncSession, username: str) -> int:
     return int(val or 0)
 
 
+# Hard cap on simultaneous in-flight per-project like-count requests so a
+# user with 50+ projects doesn't fan out 50 concurrent HTTP calls during a
+# single evaluate_user() run.
+_LIKES_FETCH_CONCURRENCY = 5
+
+
+def _project_like_url_key(project_id: int) -> str:
+    """The exact string the frontend uses as the like-count key.
+
+    See ``web/assets/js/project-search.js`` (hub cards) and
+    ``web/projects/view.html`` — both build the key as
+    ``'projects/view.html?id=' + p.id`` with no leading slash and no
+    domain. Chatter stores likes against that key, so we MUST use the
+    same shape here or we'll read a different bucket and always see 0.
+    """
+    return f"projects/view.html?id={project_id}"
+
+
+async def _fetch_likes_for_url(
+    http: httpx.AsyncClient,
+    base_url: str,
+    project_url_key: str,
+) -> int:
+    """GET ``{base_url}/interact/likes/{encoded}`` and return ``count``.
+
+    Per-URL failures (HTTP 5xx, parsing, timeout) are downgraded to 0 so
+    one flaky project doesn't poison the whole sum. The caller is
+    responsible for treating a complete Chatter outage (every call
+    raises) via the cache layer's stale-on-error fallback.
+    """
+    encoded = quote(project_url_key, safe="")
+    url = f"{base_url.rstrip('/')}/interact/likes/{encoded}"
+    try:
+        resp = await http.get(url)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Chatter likes lookup failed for %s: %s", project_url_key, exc)
+        raise
+    if resp.status_code != 200:
+        logger.warning(
+            "Chatter likes lookup returned %s for %s — treating as 0",
+            resp.status_code, project_url_key,
+        )
+        return 0
+    try:
+        data = resp.json()
+    except ValueError:
+        return 0
+    if not isinstance(data, dict):
+        return 0
+    return int(data.get("count") or 0)
+
+
+async def _fetch_likes_received(session: AsyncSession, username: str) -> Optional[int]:
+    """Sum likes across all of ``username``'s non-archived projects.
+
+    Returns ``None`` if Chatter is fully unreachable (every per-project
+    call raised) — the cache layer uses ``None`` as the signal to fall
+    back to the previously-cached value. Returns an int (possibly 0)
+    otherwise.
+    """
+    project_ids = (
+        await session.scalars(
+            select(Project.id).where(
+                Project.author_username == username,
+                Project.status != "archived",
+                Project.is_blocked.is_(False),
+            )
+        )
+    ).all()
+    if not project_ids:
+        return 0
+
+    settings = get_settings()
+    base_url = settings.chatter_base_url
+    sem = asyncio.Semaphore(_LIKES_FETCH_CONCURRENCY)
+
+    async with httpx.AsyncClient(timeout=3.0) as http:
+        async def one(pid: int) -> tuple[bool, int]:
+            """Return (succeeded, count). succeeded=False if the HTTP
+            request raised so the caller can decide what 'service down'
+            means in aggregate."""
+            async with sem:
+                try:
+                    count = await _fetch_likes_for_url(
+                        http, base_url, _project_like_url_key(pid)
+                    )
+                    return True, count
+                except Exception:  # noqa: BLE001
+                    return False, 0
+
+        results = await asyncio.gather(*(one(pid) for pid in project_ids))
+
+    if not any(ok for ok, _ in results):
+        # Every single per-project call raised — treat as Chatter being
+        # fully down and signal the cache to use the stale value.
+        logger.warning(
+            "Chatter likes fully unreachable for user %s (%d projects)",
+            username, len(project_ids),
+        )
+        return None
+
+    return sum(count for _ok, count in results)
+
+
+async def _fetch_user_comments_count(username: str) -> Optional[int]:
+    """Ask Chatter how many comments ``username`` has posted overall.
+
+    Returns 0 when ``chatter_user_comments_endpoint`` is unset (the
+    default, current production state — no such endpoint exists on
+    Chatter yet). Returns the parsed integer when the endpoint is
+    configured and responds 200 with ``{"count": int}``. Returns
+    ``None`` on network failure so the cache falls back to the stale
+    value.
+    """
+    settings = get_settings()
+    template = settings.chatter_user_comments_endpoint
+    if not template:
+        # Endpoint not configured — current production reality. Engaged
+        # Member badges remain dormant by design until Chatter ships a
+        # per-user comments-count endpoint and ops sets this env var.
+        return 0
+
+    path = template.format(username=quote(username, safe=""))
+    url = f"{settings.chatter_base_url.rstrip('/')}{path}"
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as http:
+            resp = await http.get(url)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Chatter comments-count lookup failed for %s: %s", username, exc)
+        return None
+    if resp.status_code != 200:
+        logger.warning(
+            "Chatter comments-count returned %s for %s", resp.status_code, username,
+        )
+        return None
+    try:
+        data = resp.json()
+    except ValueError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    raw = data.get("count")
+    if raw is None:
+        return None
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None
+
+
 async def _count_comments(session: AsyncSession, username: str) -> int:
-    # No local comments table — comments live in Chatter. Return 0 so the
-    # Engaged Member badges are defined-but-never-awarded for now. When a
-    # comments source lands, swap this for the real count.
-    return 0
+    """Comments-posted counter for the Engaged Member badges.
+
+    Reads through the badge counter cache (5 min TTL). The underlying
+    fetch hits a Chatter endpoint whose path is configured via
+    ``chatter_user_comments_endpoint``; when unset (default) the fetch
+    returns 0 and these badges remain dormant.
+    """
+    return await get_cached_counter(
+        username,
+        "comments",
+        lambda: _fetch_user_comments_count(username),
+    )
 
 
 async def _count_likes_received(session: AsyncSession, username: str) -> int:
-    # No local likes table — likes are tracked by the page-counter service.
-    # Same treatment as comments above.
-    return 0
+    """Likes-received counter for the Well Liked badges.
+
+    Reads through the badge counter cache (5 min TTL). The underlying
+    fetch lists the user's non-archived projects from the local DB then
+    fans out (bounded concurrency) to Chatter's per-URL like-count
+    endpoint, summing the results.
+    """
+    return await get_cached_counter(
+        username,
+        "likes_received",
+        lambda: _fetch_likes_received(session, username),
+    )
 
 
 async def _consecutive_months_with_project(

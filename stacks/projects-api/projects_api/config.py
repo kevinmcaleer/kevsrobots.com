@@ -41,6 +41,19 @@ class Settings(BaseSettings):
     # account-age gate to look up `account_created_at` from `/api/me`.
     chatter_base_url: str = "https://chatter.kevsrobots.com"
 
+    # Path template (under chatter_base_url) for fetching the total number
+    # of comments a given user has posted across the community. Empty by
+    # default because Chatter does not currently expose such an endpoint
+    # (see badges.py `_count_comments`). When Chatter ships one, set this
+    # to e.g. "/api/users/{username}/comments_count" and the Engaged Member
+    # badges will start awarding automatically — no code change needed.
+    chatter_user_comments_endpoint: str = ""
+
+    # TTL (seconds) for the in-process per-(username, kind) badge counter
+    # cache that wraps external HTTP lookups. 5 minutes balances badge
+    # awarding latency against fan-out load on Chatter.
+    badge_counter_cache_ttl_seconds: int = 300
+
     # NAS storage
     nas_host: str = "192.168.1.79"
     nas_username: Optional[str] = None
