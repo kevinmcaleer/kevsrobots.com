@@ -9,6 +9,8 @@ thanks: false
 
 {% include nav_projects.html %}
 
+
+
 # {{page.title}}
 ## {{page.description}}
 
@@ -155,7 +157,9 @@ thanks: false
         // archived projects and returns download_count baked in.
         resp = await fetch(API + '/api/projects/popular?window=30d&limit=100');
       } else {
-        resp = await fetch(API + '/api/projects?');
+        // Issue #140: ask the API to boost followed-author projects for
+        // logged-in viewers. The flag is harmless for anonymous calls.
+        resp = await ProjectAuth.apiFetch(API + '/api/projects?boost_followed=true');
       }
       if (!resp.ok) throw new Error('API error');
       let projects = await resp.json();

@@ -338,6 +338,37 @@ class PartSupplier(Base):
     last_status: Mapped[Optional[str]] = mapped_column(String(30))
 
 
+# --- User follows (issue #140) -------------------------------------------
+#
+# A directional social-graph row: `follower_id` follows `followee_id`.
+# Both are Chatter usernames (we don't carry our own user table — the
+# auth service is the source of truth). The pair is the PK so a duplicate
+# follow is an upsert-conditional no-op; on the API side we treat
+# "already following" as 200 OK rather than a 4xx so the UI button is
+# safely idempotent. ``created_at`` is kept so we can surface "followed
+# you N days ago" later without a schema change.
+#
+# No ALTER helper is needed — `create_all` builds this table from scratch
+# on every Postgres deployment. SQLite tests pick it up the same way.
+
+
+class UserFollow(Base):
+    __tablename__ = "user_follows"
+
+    follower_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    followee_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        # Index follower_id for "who am I following?" queries; the PK
+        # already covers (follower_id, followee_id) so we only need the
+        # reverse index for "who follows X?".
+        Index("ix_user_follows_followee_id", "followee_id"),
+    )
+
+
 class PartRevision(Base):
     __tablename__ = "part_revisions"
 

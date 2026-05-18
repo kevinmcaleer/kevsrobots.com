@@ -19,6 +19,7 @@ from .routers import (
     bom,
     downloads,
     files,
+    follows,
     health,
     images,
     journal,
@@ -73,6 +74,8 @@ def create_app() -> FastAPI:
     app.include_router(makes.router)
     # Issue #108: project remixes (fork & attribution).
     app.include_router(remixes.router)
+    # Issue #140: user follows + badges + profile-page support.
+    app.include_router(follows.router)
     return app
 
 

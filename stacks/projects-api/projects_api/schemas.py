@@ -345,6 +345,49 @@ class PartRevisionDetail(BaseModel):
     suppliers: list[PartSupplierInput] = Field(default_factory=list)
 
 
+# --- User follows (issue #140) ---
+
+
+class FollowToggleResponse(BaseModel):
+    """Returned by POST/DELETE /api/users/{username}/follow."""
+
+    follower: str
+    followee: str
+    following: bool
+
+
+class FollowCountResponse(BaseModel):
+    username: str
+    count: int
+
+
+class FollowingListResponse(BaseModel):
+    """Returned by GET /api/users/me/following."""
+
+    follower: str
+    following: list[str] = Field(default_factory=list)
+
+
+# --- User badges (issue #140) ---
+#
+# Badges are computed on-the-fly from existing data — we do not persist
+# any earned-badge state. The catalog below is fixed; if you change the
+# rules, bump the catalog version so older browsers' caches refresh.
+
+
+class BadgeResponse(BaseModel):
+    key: str
+    name: str
+    description: str
+    icon: str  # Font Awesome class fragment, e.g. "fa-rocket"
+    color: str = "primary"  # Bootstrap colour token
+
+
+class UserBadgesResponse(BaseModel):
+    username: str
+    badges: list[BadgeResponse] = Field(default_factory=list)
+
+
 class PartDetail(BaseModel):
     id: int
     slug: str

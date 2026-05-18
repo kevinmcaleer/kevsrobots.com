@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user
 from ..db import get_session
-from ..models import Download, Project, ProjectTag
+from ..models import Download, Project, ProjectTag, UserFollow
 from ..schemas import (
     ProjectCreate,
     ProjectListItem,
@@ -102,6 +102,18 @@ async def list_projects(
     difficulty: Optional[str] = Query(None),
     tag: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
+    author: Optional[str] = Query(
+        None,
+        description="Filter to projects authored by this username (issue #140 — public profiles).",
+    ),
+    boost_followed: bool = Query(
+        False,
+        description=(
+            "Issue #140: when true and the caller is authenticated, projects "
+            "authored by users the caller follows are sorted ahead of the "
+            "general pool. Ignored for anonymous callers."
+        ),
+    ),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     user: Optional[str] = Depends(get_optional_user),
@@ -113,6 +125,8 @@ async def list_projects(
     )
     if difficulty:
         query = query.where(Project.difficulty == difficulty)
+    if author:
+        query = query.where(Project.author_username == author)
     if search:
         query = query.where(
             Project.title.ilike(f"%{search}%")
@@ -120,7 +134,7 @@ async def list_projects(
         )
     query = query.order_by(Project.created_at.desc()).limit(limit).offset(offset)
 
-    projects = (await session.scalars(query)).all()
+    projects = list((await session.scalars(query)).all())
 
     if tag:
         tagged_ids = set(
@@ -131,6 +145,27 @@ async def list_projects(
             ).scalars().all()
         )
         projects = [p for p in projects if p.id in tagged_ids]
+
+    # Issue #140: bump followed-authors when the caller asked for it.
+    # Stable sort so within-bucket order (the SQL "created_at desc") is
+    # preserved. Order: completed first → followed-authors → everyone else.
+    if boost_followed and user:
+        followed = set(
+            (
+                await session.execute(
+                    select(UserFollow.followee_id).where(
+                        UserFollow.follower_id == user
+                    )
+                )
+            ).scalars().all()
+        )
+        if followed:
+            def _bucket(p: Project) -> tuple[int, int]:
+                completed = 0 if p.status == "completed" else 1
+                followed_author = 0 if p.author_username in followed else 1
+                return (completed, followed_author)
+
+            projects.sort(key=_bucket)
 
     items = []
     for p in projects:
