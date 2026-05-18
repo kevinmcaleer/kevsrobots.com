@@ -10,6 +10,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user
+from ..badges import evaluate_user
 from ..db import get_session
 from ..models import Download, Project, ProjectTag, UserFollow
 from ..schemas import (
@@ -243,7 +244,17 @@ async def create_project(
     )
     await session.commit()
     await session.refresh(project)
-    return await _project_response(session, project)
+    # Issue #106: evaluate badges synchronously after the project row is
+    # safely persisted. evaluate_user is best-effort — wrap in a try so a
+    # badge bug can never break project creation.
+    newly = []
+    try:
+        newly = await evaluate_user(session, user)
+    except Exception:  # noqa: BLE001 — never crash project create
+        pass
+    resp = await _project_response(session, project)
+    resp.newly_awarded_badges = newly
+    return resp
 
 
 @router.put("/{project_id}", response_model=ProjectResponse)

@@ -1,0 +1,165 @@
+---
+title: Badges & Achievements
+description: Browse the full badge catalogue and track which ones you have earned.
+layout: content
+hide_likes_and_comments: true
+thanks: false
+---
+
+<link rel="stylesheet" href="/assets/css/main.css?v={{ site.time | date: '%s' }}">
+
+<div class="container">
+  <h1><i class="fa-solid fa-trophy me-3 text-warning"></i> {{ page.title }}</h1>
+  <p class="lead">{{ page.description }}</p>
+
+  <p class="text-muted">
+    Earn badges automatically by publishing projects, sharing remixes,
+    and engaging with the community. Each tiered family progresses from
+    Bronze through Silver to Gold.
+  </p>
+
+  <div id="badge-status-banner" class="alert alert-info d-none" role="status"></div>
+
+  <!-- Badge gallery; populated by JS below. -->
+  <div id="badge-gallery"></div>
+
+  <div id="badge-error" class="alert alert-warning d-none">
+    Could not load the badge catalogue right now. Please try again later.
+  </div>
+</div>
+
+<script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
+<script>
+(function () {
+  'use strict';
+  var API = 'https://projects.kevsrobots.com';
+  var gallery = document.getElementById('badge-gallery');
+  var banner = document.getElementById('badge-status-banner');
+  var errorBox = document.getElementById('badge-error');
+
+  function esc(text) {
+    var div = document.createElement('div');
+    div.textContent = text == null ? '' : String(text);
+    return div.innerHTML;
+  }
+
+  function getUsername() {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var parts = cookies[i].trim().split('=');
+      if (parts[0] === 'username' && parts[1]) {
+        return decodeURIComponent(parts[1]);
+      }
+    }
+    return null;
+  }
+
+  function tileHtml(badge, earned) {
+    var tier = badge.tier || 'single';
+    var lockedClass = earned ? '' : ' kr-badge-tile--locked';
+    var earnedHint = earned
+      ? '<div class="small text-success mt-1"><i class="fas fa-check"></i> Earned</div>'
+      : '';
+    return (
+      '<div class="col">' +
+        '<div class="kr-badge-tile' + lockedClass + '">' +
+          '<span class="kr-badge kr-badge--' + tier + ' kr-badge--lg" ' +
+                'title="' + esc(badge.name) + '">' +
+            '<i class="' + esc(badge.icon) + '"></i>' +
+          '</span>' +
+          '<div class="kr-badge-tile__name">' + esc(badge.name) + '</div>' +
+          '<div class="kr-badge-tile__desc">' + esc(badge.description) + '</div>' +
+          earnedHint +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function groupByCategory(catalog) {
+    var grouped = {};
+    catalog.forEach(function (b) {
+      var k = b.category || 'misc';
+      if (!grouped[k]) grouped[k] = [];
+      grouped[k].push(b);
+    });
+    // Order tiers within a family bronze -> silver -> gold -> single.
+    var tierOrder = { bronze: 1, silver: 2, gold: 3, single: 0 };
+    Object.keys(grouped).forEach(function (k) {
+      grouped[k].sort(function (a, b) {
+        return (tierOrder[a.tier] || 9) - (tierOrder[b.tier] || 9);
+      });
+    });
+    return grouped;
+  }
+
+  function categoryTitle(slug) {
+    // Light prettifier — turn "prolific_maker" into "Prolific Maker".
+    return slug.replace(/_/g, ' ').replace(/\b\w/g, function (c) {
+      return c.toUpperCase();
+    });
+  }
+
+  function render(catalog, earnedSlugs) {
+    var grouped = groupByCategory(catalog);
+    var html = '';
+    // Stable ordering by category name, with "first_project" pinned first
+    // since it's the welcome badge.
+    var keys = Object.keys(grouped).sort(function (a, b) {
+      if (a === 'first_project') return -1;
+      if (b === 'first_project') return 1;
+      return a.localeCompare(b);
+    });
+    keys.forEach(function (k) {
+      html += '<section class="mb-4">';
+      html += '<h3 class="h5 text-uppercase text-muted mb-3">' + esc(categoryTitle(k)) + '</h3>';
+      html += '<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">';
+      grouped[k].forEach(function (b) {
+        html += tileHtml(b, earnedSlugs.indexOf(b.slug) !== -1);
+      });
+      html += '</div>';
+      html += '</section>';
+    });
+    gallery.innerHTML = html;
+  }
+
+  function showBanner(message, kind) {
+    banner.className = 'alert alert-' + (kind || 'info');
+    banner.textContent = message;
+    banner.classList.remove('d-none');
+  }
+
+  async function load() {
+    try {
+      var catalogResp = await fetch(API + '/api/badges');
+      if (!catalogResp.ok) throw new Error('catalog fetch failed');
+      var catalog = await catalogResp.json();
+
+      var username = getUsername();
+      var earnedSlugs = [];
+      if (username) {
+        try {
+          var earnedResp = await fetch(API + '/api/users/' + encodeURIComponent(username) + '/badges');
+          if (earnedResp.ok) {
+            earnedSlugs = (await earnedResp.json()).map(function (b) { return b.slug; });
+            showBanner(
+              'You have earned ' + earnedSlugs.length + ' of ' + catalog.length + ' badges, ' + username + '.',
+              'success'
+            );
+          }
+        } catch (e) {
+          // Non-fatal — just render the catalog without earned highlights.
+        }
+      } else {
+        showBanner('Log in to track your earned badges.', 'info');
+      }
+
+      render(catalog, earnedSlugs);
+    } catch (e) {
+      console.error('Badge gallery load failed:', e);
+      errorBox.classList.remove('d-none');
+    }
+  }
+
+  load();
+})();
+</script>

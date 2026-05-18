@@ -8,15 +8,19 @@ from typing import AsyncIterator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .badges import seed_badge_definitions
 from .config import get_settings
 from .db import (
     add_bom_part_id_if_missing,
     add_remix_columns_if_missing,
     add_user_profile_columns_if_missing,
     create_all,
+    get_sessionmaker,
     repair_stale_fks,
 )
 from .routers import (
+    auth,
+    badges,
     bom,
     downloads,
     files,
@@ -45,6 +49,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Issue #111: defensive ALTER for the new user_profiles table —
     # no-op on fresh deploys where create_all built every column.
     await add_user_profile_columns_if_missing()
+    # Issue #106: seed the badge catalog (idempotent upsert by slug).
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        await seed_badge_definitions(session)
     yield
 
 
@@ -64,6 +72,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(health.router)
+    # Issue #139: /api/auth/me — login-state introspection for the frontend.
+    app.include_router(auth.router)
     # Downloads router declares /api/projects/popular and must be registered
     # BEFORE projects.router so the more-specific path wins over the
     # catch-all /api/projects/{project_id}.
@@ -85,6 +95,8 @@ def create_app() -> FastAPI:
     # Mounted after follows so this router's wider /api/users/... surface
     # coexists with the follow toggle endpoints.
     app.include_router(users.router)
+    # Issue #106: badges & achievements.
+    app.include_router(badges.router)
     return app
 
 

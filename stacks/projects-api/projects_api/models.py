@@ -516,3 +516,59 @@ class StaffPickItem(Base):
             "staff_pick_id", "project_id", name="uq_staff_pick_items_pick_project"
         ),
     )
+
+
+# --- Badges & Achievements (issue #106) ----------------------------------
+#
+# Two tables: ``badge_definitions`` (catalog of available badges, seeded at
+# startup) and ``user_badges`` (which users have earned which badges).
+#
+# Design decisions:
+#   * ``user_id`` on ``user_badges`` is the **username string** (matching
+#     ``Project.author_username``, ``Make.user_id``, etc.). There is no
+#     local ``users`` table in projects-api — Chatter is the source of
+#     truth. Storing the username here keeps the data model consistent with
+#     the rest of this service.
+#   * ``slug`` is the stable identifier for a badge across redeploys;
+#     ``id`` is an internal autoinc used by FK joins. We upsert seed data
+#     by slug so re-running the seeder doesn't duplicate rows.
+#   * ``tier`` values: ``"bronze" | "silver" | "gold" | "single"``. Tiered
+#     families share a slug **prefix** (e.g. ``prolific_maker_bronze``,
+#     ``prolific_maker_silver``, ``prolific_maker_gold``); the ``category``
+#     column groups them so the gallery UI can render a family card.
+
+
+class BadgeDefinition(Base):
+    __tablename__ = "badge_definitions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(80), nullable=False, unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    icon: Mapped[str] = mapped_column(String(120), nullable=False)
+    category: Mapped[str] = mapped_column(String(60), nullable=False, index=True)
+    threshold_type: Mapped[str] = mapped_column(String(60), nullable=False)
+    threshold_value: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    tier: Mapped[str] = mapped_column(String(20), nullable=False, default="single")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
+class UserBadge(Base):
+    __tablename__ = "user_badges"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    badge_id: Mapped[int] = mapped_column(
+        ForeignKey("badge_definitions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    earned_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("ux_user_badges_user_badge", "user_id", "badge_id", unique=True),
+    )

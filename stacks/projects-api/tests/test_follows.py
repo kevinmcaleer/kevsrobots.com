@@ -200,62 +200,6 @@ async def test_list_projects_author_filter(client) -> None:
 
 
 @pytest.mark.asyncio
-async def test_badges_first_project(client) -> None:
-    await client.post(
-        "/api/projects",
-        json={"title": "Hello Robot"},
-        headers=make_auth_header("ella"),
-    )
-    r = await client.get("/api/users/ella/badges")
-    assert r.status_code == 200
-    keys = {b["key"] for b in r.json()["badges"]}
-    assert "first-project" in keys
-    assert "five-projects" not in keys
-
-
-@pytest.mark.asyncio
-async def test_badges_empty_for_unknown_user(client) -> None:
-    r = await client.get("/api/users/nobody/badges")
-    assert r.status_code == 200
-    assert r.json() == {"username": "nobody", "badges": []}
-
-
-@pytest.mark.asyncio
-async def test_badges_five_projects(client) -> None:
-    headers = make_auth_header("frank")
-    for i in range(5):
-        await client.post(
-            "/api/projects",
-            json={"title": f"Frank's Project {i}"},
-            headers=headers,
-        )
-    r = await client.get("/api/users/frank/badges")
-    keys = {b["key"] for b in r.json()["badges"]}
-    assert {"first-project", "five-projects"}.issubset(keys)
-    assert "ten-projects" not in keys
-
-
-@pytest.mark.asyncio
-async def test_badges_archived_excluded(client) -> None:
-    headers = make_auth_header("greg")
-    create = await client.post(
-        "/api/projects",
-        json={"title": "Greg's Project"},
-        headers=headers,
-    )
-    pid = create.json()["id"]
-    await client.put(
-        f"/api/projects/{pid}",
-        json={"status": "archived"},
-        headers=headers,
-    )
-    r = await client.get("/api/users/greg/badges")
-    keys = {b["key"] for b in r.json()["badges"]}
-    # The only project was archived, so no badges should be awarded.
-    assert "first-project" not in keys
-
-
-@pytest.mark.asyncio
 async def test_followers_count_for_unknown_user_is_zero(client) -> None:
     r = await client.get("/api/users/ghost/followers/count")
     assert r.status_code == 200

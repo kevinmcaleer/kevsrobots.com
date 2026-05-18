@@ -429,6 +429,7 @@ description: View project details
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -1367,9 +1368,12 @@ description: View project details
         return r.json().then(function (j) { throw new Error(j.detail || 'Failed to post'); });
       }
       return r.json();
-    }).then(function () {
+    }).then(function (body) {
       closeModal('i-made-this-modal');
       fetchMakes(project);
+      // Issue #106: surface any badges the poster earned (e.g. crossing
+      // a future "first make" threshold).
+      if (window.BadgeToast) BadgeToast.fromResponse(body);
     }).catch(function (e) {
       err.textContent = e.message || 'Failed to post make.';
       err.classList.remove('d-none');

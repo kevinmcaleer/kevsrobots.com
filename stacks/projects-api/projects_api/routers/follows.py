@@ -25,13 +25,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
 from ..db import get_session
-from ..models import Make, Project, UserFollow
+from ..models import Project, UserFollow
 from ..schemas import (
-    BadgeResponse,
     FollowCountResponse,
     FollowingListResponse,
     FollowToggleResponse,
-    UserBadgesResponse,
 )
 
 router = APIRouter(tags=["follows"])
@@ -188,131 +186,3 @@ async def my_following(
     return FollowingListResponse(follower=user, following=list(rows))
 
 
-# --- Badges --------------------------------------------------------------
-#
-# Badge catalog (issue #140). Computed on-the-fly from the existing
-# projects / makes tables. No persisted badge state — easier to evolve
-# the rules without a migration. Keep the catalog small; if it grows
-# beyond ~10 badges, factor into a dedicated module.
-#
-# Rule reference:
-#   first-project       : >=1 non-archived, non-blocked project authored.
-#   five-projects       : >=5 non-archived, non-blocked projects authored.
-#   ten-projects        : >=10 non-archived, non-blocked projects authored.
-#   first-remix         : authored a project with remixed_from_id set.
-#   has-remixers        : someone has remixed one of your projects.
-#   community-builder   : posted >=1 "I Made This!" make on someone else's
-#                         project (i.e. has rows in `makes`).
-
-_BADGE_CATALOG: dict[str, BadgeResponse] = {
-    "first-project": BadgeResponse(
-        key="first-project",
-        name="First Project",
-        description="Published their first project",
-        icon="fa-rocket",
-        color="primary",
-    ),
-    "five-projects": BadgeResponse(
-        key="five-projects",
-        name="Five Projects",
-        description="Published five projects",
-        icon="fa-star",
-        color="warning",
-    ),
-    "ten-projects": BadgeResponse(
-        key="ten-projects",
-        name="Ten Projects",
-        description="Published ten projects",
-        icon="fa-trophy",
-        color="warning",
-    ),
-    "first-remix": BadgeResponse(
-        key="first-remix",
-        name="First Remix",
-        description="Built on top of someone else's project",
-        icon="fa-code-branch",
-        color="info",
-    ),
-    "has-remixers": BadgeResponse(
-        key="has-remixers",
-        name="Inspiration",
-        description="Someone has remixed one of their projects",
-        icon="fa-lightbulb",
-        color="success",
-    ),
-    "community-builder": BadgeResponse(
-        key="community-builder",
-        name="Community Builder",
-        description="Shared an 'I Made This!' on someone else's project",
-        icon="fa-hammer",
-        color="dark",
-    ),
-}
-
-
-@router.get(
-    "/api/users/{username}/badges",
-    response_model=UserBadgesResponse,
-)
-async def user_badges(
-    username: str,
-    session: AsyncSession = Depends(get_session),
-) -> UserBadgesResponse:
-    """Compute the badges this user has earned.
-
-    All counts exclude archived & blocked projects so a user can't farm
-    badges with junk rows. Cheap to compute — three count-only queries —
-    so it's fine to call on every profile page load.
-    """
-    # Active projects authored by this user.
-    project_count = await session.scalar(
-        select(func.count(Project.id)).where(
-            Project.author_username == username,
-            Project.status != "archived",
-            Project.is_blocked == False,  # noqa: E712
-        )
-    ) or 0
-
-    # Did they author at least one remix?
-    remix_authored = await session.scalar(
-        select(func.count(Project.id)).where(
-            Project.author_username == username,
-            Project.remixed_from_id.is_not(None),
-            Project.status != "archived",
-            Project.is_blocked == False,  # noqa: E712
-        )
-    ) or 0
-
-    # Has anyone remixed one of their projects? Count child projects
-    # whose parent is authored by `username`. Subquery keeps it readable
-    # and works on both Postgres and SQLite.
-    parent_ids_subq = (
-        select(Project.id).where(Project.author_username == username)
-    ).subquery()
-    has_remixers = await session.scalar(
-        select(func.count(Project.id)).where(
-            Project.remixed_from_id.in_(select(parent_ids_subq.c.id)),
-            Project.is_blocked == False,  # noqa: E712
-        )
-    ) or 0
-
-    # Posted any "I Made This!" makes?
-    make_count = await session.scalar(
-        select(func.count(Make.id)).where(Make.user_id == username)
-    ) or 0
-
-    earned: list[BadgeResponse] = []
-    if project_count >= 1:
-        earned.append(_BADGE_CATALOG["first-project"])
-    if project_count >= 5:
-        earned.append(_BADGE_CATALOG["five-projects"])
-    if project_count >= 10:
-        earned.append(_BADGE_CATALOG["ten-projects"])
-    if remix_authored >= 1:
-        earned.append(_BADGE_CATALOG["first-remix"])
-    if has_remixers >= 1:
-        earned.append(_BADGE_CATALOG["has-remixers"])
-    if make_count >= 1:
-        earned.append(_BADGE_CATALOG["community-builder"])
-
-    return UserBadgesResponse(username=username, badges=earned)
