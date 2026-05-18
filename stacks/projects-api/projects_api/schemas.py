@@ -301,6 +301,9 @@ class PartCreate(BaseModel):
     supplier_url: Optional[str] = Field(None, max_length=2000)
     supplier_name: Optional[str] = Field(None, max_length=120)
     tags: list[str] = Field(default_factory=list)
+    # Issue #135: optional taxonomy + family fields at create time.
+    category: Optional[str] = Field(None, max_length=60)
+    family: Optional[str] = Field(None, max_length=80)
 
 
 class PartUpdate(BaseModel):
@@ -312,6 +315,11 @@ class PartUpdate(BaseModel):
     tags: Optional[list[str]] = None
     suppliers: Optional[list[PartSupplierInput]] = None
     change_summary: str = Field(..., min_length=1, max_length=200)
+    # Issue #135: optional taxonomy + family fields. Use an explicit empty
+    # string to clear; ``None`` means "leave unchanged" (consistent with the
+    # other Optional fields above).
+    category: Optional[str] = Field(None, max_length=60)
+    family: Optional[str] = Field(None, max_length=80)
 
 
 class PartSearchResult(BaseModel):
@@ -322,6 +330,10 @@ class PartSearchResult(BaseModel):
     status: str
     usage_count: int
     primary_supplier_url: Optional[str] = None
+    # Issue #135: expose category/family on search results so the parts
+    # list / autocomplete UIs can show them without a second roundtrip.
+    category: Optional[str] = None
+    family: Optional[str] = None
 
 
 class PartRevisionSummary(BaseModel):
@@ -343,6 +355,33 @@ class PartRevisionDetail(BaseModel):
     image_url: Optional[str] = None
     tags: list[str] = Field(default_factory=list)
     suppliers: list[PartSupplierInput] = Field(default_factory=list)
+    category: Optional[str] = None
+    family: Optional[str] = None
+
+
+class PartRelatedRef(BaseModel):
+    """Minimal reference to another part (issue #135).
+
+    Used for the "Related parts" + "Same family" lists on the detail view.
+    """
+
+    id: int
+    slug: str
+    name: str
+    sku: Optional[str] = None
+    status: str
+    category: Optional[str] = None
+    family: Optional[str] = None
+
+
+class PartRelationCreate(BaseModel):
+    """Body for ``POST /api/parts/{slug}/relations`` (issue #135).
+
+    Identify the other part by slug (the UI deals in slugs) — the server
+    resolves to an id and writes the canonical ordered pair.
+    """
+
+    related_slug: str = Field(..., min_length=1, max_length=120)
 
 
 class PartDetail(BaseModel):
@@ -362,3 +401,8 @@ class PartDetail(BaseModel):
     usage_count: int
     suppliers: list[PartSupplierResponse] = Field(default_factory=list)
     recent_revisions: list[PartRevisionSummary] = Field(default_factory=list)
+    # Issue #135
+    category: Optional[str] = None
+    family: Optional[str] = None
+    related_parts: list[PartRelatedRef] = Field(default_factory=list)
+    family_parts: list[PartRelatedRef] = Field(default_factory=list)

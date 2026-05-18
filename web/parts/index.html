@@ -6,7 +6,7 @@ description: Browse and search the community parts catalog
 
 {% include nav_projects.html %}
 
-<link rel="stylesheet" href="/assets/css/project-editor.css">
+<link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
@@ -112,13 +112,28 @@ description: Browse and search the community parts catalog
     }).join('');
   }
 
+  // Issue #135: honour ?family= and ?category= query params so links from
+  // the part view page (e.g. the family chip) can pre-filter the list.
+  const urlParams = new URLSearchParams(window.location.search);
+  const familyFilter = urlParams.get('family') || '';
+  const categoryFilter = urlParams.get('category') || '';
+  if (familyFilter || categoryFilter) {
+    const filterChips = [];
+    if (familyFilter) filterChips.push('family: ' + familyFilter);
+    if (categoryFilter) filterChips.push('category: ' + categoryFilter);
+    statusEl.innerHTML = 'Filtering by ' + filterChips.map(c => `<span class="badge bg-primary-subtle text-primary-emphasis">${esc(c)}</span>`).join(' ') + ' — <a href="/parts/">clear</a>';
+  }
+
   async function search(query) {
     if (inFlight && inFlight.abort) { try { inFlight.abort(); } catch (_) {} }
     inFlight = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     statusEl.textContent = 'Searching...';
     try {
       const opts = inFlight ? { signal: inFlight.signal } : {};
-      const resp = await fetch(API + '/api/parts?q=' + encodeURIComponent(query) + '&limit=25', opts);
+      let url = API + '/api/parts?q=' + encodeURIComponent(query) + '&limit=25';
+      if (familyFilter) url += '&family=' + encodeURIComponent(familyFilter);
+      if (categoryFilter) url += '&category=' + encodeURIComponent(categoryFilter);
+      const resp = await fetch(url, opts);
       if (!resp.ok) {
         statusEl.textContent = 'Could not reach the parts catalog. Please try again later.';
         resultsEl.innerHTML = '';

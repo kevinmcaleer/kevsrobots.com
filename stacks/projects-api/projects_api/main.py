@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .db import (
     add_bom_part_id_if_missing,
+    add_part_category_family_if_missing,
     add_remix_columns_if_missing,
     create_all,
     repair_stale_fks,
@@ -39,6 +40,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await add_remix_columns_if_missing()
     # Issue #121: ensure project_bom_items.part_id column exists.
     await add_bom_part_id_if_missing()
+    # Issue #135: ensure parts.category / parts.family and the matching
+    # part_revisions snapshot columns exist on legacy Postgres deployments.
+    await add_part_category_family_if_missing()
     yield
 
 
