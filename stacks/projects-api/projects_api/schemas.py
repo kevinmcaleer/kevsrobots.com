@@ -626,17 +626,6 @@ class StaffPickItemUpdate(BaseModel):
     order_index: Optional[int] = Field(None, ge=0)
 
 
-class StaffPickItemResponse(BaseModel):
-    """An entry in a staff pick. ``project`` is denormalised so the public
-    page can render the card without a second round-trip per item."""
-
-    id: int
-    project_id: int
-    editor_note: Optional[str] = None
-    order_index: int
-    project: Optional["StaffPickProjectRef"] = None
-
-
 class StaffPickProjectRef(BaseModel):
     """Minimal project reference embedded inside a staff pick item."""
 
@@ -648,6 +637,17 @@ class StaffPickProjectRef(BaseModel):
     difficulty: Optional[str] = None
     status: str
     is_featured: bool = False
+
+
+class StaffPickItemResponse(BaseModel):
+    """An entry in a staff pick. ``project`` is denormalised so the public
+    page can render the card without a second round-trip per item."""
+
+    id: int
+    project_id: int
+    editor_note: Optional[str] = None
+    order_index: int
+    project: Optional[StaffPickProjectRef] = None
 
 
 class StaffPickResponse(BaseModel):
@@ -667,6 +667,3 @@ class StaffPickDetail(StaffPickResponse):
     """Single-pick view that also embeds the ordered list of items."""
 
     items: list[StaffPickItemResponse] = Field(default_factory=list)
-
-
-StaffPickItemResponse.model_rebuild()

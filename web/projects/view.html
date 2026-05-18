@@ -8,6 +8,8 @@ description: View project details
 
 <link rel="stylesheet" href="/assets/css/project-editor.css">
 <link rel="stylesheet" href="/assets/css/image-viewer.css">
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+<script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
 <div class="container py-4">
   <div class="mb-3">
@@ -36,8 +38,10 @@ description: View project details
         <!-- Remix chain breadcrumb (issue #108) — hidden unless this project is a remix -->
         <nav id="remix-chain-crumbs" class="remix-chain-crumbs small text-muted mb-2 d-none" aria-label="Remix chain"></nav>
 
-        <div class="d-flex align-items-center gap-3 mb-1">
+        <div class="d-flex align-items-center gap-3 mb-1 flex-wrap">
           <h1 id="view-title" class="mb-0"></h1>
+          <!-- Issue #115: Staff Pick badge — populated by view-title init. -->
+          <span id="staff-pick-badge-wrap"></span>
           <span id="like-container"></span>
           <a id="edit-icon" href="#" class="d-none text-muted" title="Edit this project" aria-label="Edit this project" style="font-size:1.1rem">
             <i class="fas fa-pencil-alt"></i>
@@ -512,6 +516,12 @@ description: View project details
       document.title = project.title + ' — KevsRobots';
 
       document.getElementById('view-title').textContent = project.title;
+      // Issue #115: Staff Pick badge near the title with the editor note
+      // as a hover tooltip.
+      if (project.is_featured && window.FeaturedProjects) {
+        const wrap = document.getElementById('staff-pick-badge-wrap');
+        if (wrap) wrap.innerHTML = FeaturedProjects.badge(project.featured_note);
+      }
       document.getElementById('view-description').textContent = project.short_description || '';
       document.getElementById('view-author').textContent = project.author_username;
       var authorLink = document.getElementById('view-author-link');
