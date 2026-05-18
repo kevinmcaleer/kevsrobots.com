@@ -73,6 +73,47 @@ def generate_filename(original: str, project_id: int) -> str:
     return f"p{project_id}_{stem}_{unique}{ext}"
 
 
+# --- Feedback screenshots (issue #138) -----------------------------------
+#
+# Screenshots aren't associated with a project, so the project_id-based
+# layout above doesn't fit. We store them under a flat ``feedback``
+# bucket (NAS or local fallback). The on-disk filename is a fresh UUID
+# with the original extension — we never trust the client filename.
+
+FEEDBACK_ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+FEEDBACK_ALLOWED_MIME_TYPES = {
+    "image/png", "image/jpeg", "image/webp", "image/gif",
+}
+FEEDBACK_MAX_SCREENSHOT_SIZE = 4 * 1024 * 1024  # 4 MB (per spec)
+
+
+def generate_feedback_filename(original: str) -> str:
+    """Build a safe, unique filename for a feedback screenshot.
+
+    Strips the original stem entirely (it's untrusted) and keeps only
+    the extension — picking ``.png`` as the fallback if nothing usable
+    is provided so we always serve back something a browser can render.
+    """
+    ext = Path(original or "").suffix.lower()
+    if ext not in FEEDBACK_ALLOWED_IMAGE_EXTENSIONS:
+        ext = ".png"
+    return f"{uuid.uuid4().hex}{ext}"
+
+
+def save_feedback_screenshot(content: bytes, filename: str) -> Optional[str]:
+    """Persist a feedback screenshot.
+
+    Returns a storage path token (``nas:feedback/<filename>`` or
+    ``local:feedback/<filename>``) compatible with :func:`read_file` /
+    :func:`delete_file`. We reuse the existing NAS/local fallback path
+    but with a ``project_id=0`` placeholder so the path layout becomes
+    ``feedback/screenshots/0/<filename>``. The leading ``0`` is harmless
+    — feedback rows never collide with real project IDs and the admin
+    delete handler uses the full storage token, not the path layout.
+    """
+    return save_file(content, filename, 0, "feedback")
+
+
 def _nas_path(project_id: int, file_type: str) -> str:
     return f"projects\\{file_type}\\{project_id}"
 

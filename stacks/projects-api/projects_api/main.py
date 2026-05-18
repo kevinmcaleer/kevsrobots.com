@@ -20,11 +20,13 @@ from .db import (
     repair_stale_fks,
 )
 from .routers import (
+    admin_feedback,
     auth,
     badges,
     bom,
     downloads,
     featured,
+    feedback,
     files,
     follows,
     health,
@@ -109,6 +111,9 @@ def create_app() -> FastAPI:
     app.include_router(users.router)
     # Issue #106: badges & achievements.
     app.include_router(badges.router)
+    # Issue #138: user feedback widget + admin inbox.
+    app.include_router(feedback.router)
+    app.include_router(admin_feedback.router)
     return app
 
 

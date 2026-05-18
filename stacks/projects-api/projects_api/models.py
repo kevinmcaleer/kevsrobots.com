@@ -572,3 +572,63 @@ class UserBadge(Base):
     __table_args__ = (
         Index("ux_user_badges_user_badge", "user_id", "badge_id", unique=True),
     )
+
+
+# --- Feedback (issue #138) -----------------------------------------------
+#
+# User-submitted feedback from the floating widget on the public site.
+# The frontend (web/assets/js/feedback-widget.js + admin inbox at
+# /admin/feedback) ships ahead of this model; the API spec lives at
+# web/feedback/API_SPEC.md and is the contract.
+#
+# Identity columns mirror the rest of this service: usernames are the
+# string source of truth (Chatter owns the real users table), and we
+# record `user_id` as the username string. We also snapshot a separate
+# `username` column for parity with the spec's response shape, even
+# though they're the same value today — keeping it lets us later
+# decouple "who submitted" from "who is currently logged-in if they
+# rename" without a schema change.
+#
+# Brand-new table — no ALTER helper needed; create_all builds it on
+# fresh deployments. Postgres CHECK constraints are intentionally
+# omitted here; the Pydantic schemas enforce sentiment/status enums and
+# the 10..2000-char message bound on the way in.
+
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # Username of the submitter (Chatter is the source of truth for the
+    # real user record). Stored as a plain string so we don't carry a
+    # local users table; matches Project.author_username / Make.user_id.
+    user_id: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    username: Mapped[str] = mapped_column(String(100), nullable=False)
+    sentiment: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    email: Mapped[Optional[str]] = mapped_column(String(320))
+    status: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="unread", server_default="unread", index=True
+    )
+    page_url: Mapped[str] = mapped_column(Text, nullable=False)
+    referrer: Mapped[Optional[str]] = mapped_column(Text)
+    user_agent: Mapped[Optional[str]] = mapped_column(Text)
+    viewport: Mapped[Optional[str]] = mapped_column(String(40))
+    # `screenshot_path` is the on-disk / NAS key returned by storage.save_file.
+    # `screenshot_url` is the long-lived public URL the admin UI can render.
+    screenshot_path: Mapped[Optional[str]] = mapped_column(Text)
+    screenshot_url: Mapped[Optional[str]] = mapped_column(Text)
+    # Admin bookkeeping for the "mark read" workflow.
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    read_by_user_id: Mapped[Optional[str]] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("ix_feedback_status_created", "status", "created_at"),
+        Index("ix_feedback_user_created", "user_id", "created_at"),
+    )

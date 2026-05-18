@@ -667,3 +667,91 @@ class StaffPickDetail(StaffPickResponse):
     """Single-pick view that also embeds the ordered list of items."""
 
     items: list[StaffPickItemResponse] = Field(default_factory=list)
+
+
+# --- Feedback (issue #138) -----------------------------------------------
+#
+# Schemas for the feedback API. The widget POSTs the create payload as
+# JSON when there's no screenshot, or as multipart/form-data when there
+# is — the router accepts both shapes and folds them into
+# :class:`FeedbackCreate` before validation. The admin response shape
+# matches what the inbox UI already renders (see
+# web/admin/feedback.html and web/feedback/API_SPEC.md).
+
+
+FEEDBACK_SENTIMENTS = ("love", "like", "issue", "idea")
+FEEDBACK_STATUSES = ("unread", "read", "archived")
+
+
+class FeedbackCreate(BaseModel):
+    """Body of POST /api/feedback (JSON variant).
+
+    Identity fields (``user_id``, ``username``) are intentionally
+    absent here — the router resolves them from the auth dependency so
+    a client can't impersonate another user by spoofing the body.
+    """
+
+    sentiment: str = Field(..., pattern=r"^(love|like|issue|idea)$")
+    message: str = Field(..., min_length=10, max_length=2000)
+    # Email is opt-in; Pydantic's EmailStr would force a dependency on
+    # email-validator, so we keep it loose and validate the shape in the
+    # router (the widget already checks client-side).
+    email: Optional[str] = Field(None, max_length=320)
+    page_url: str = Field(..., min_length=1, max_length=2048)
+    referrer: Optional[str] = Field(None, max_length=2048)
+    user_agent: Optional[str] = Field(None, max_length=500)
+    viewport: Optional[str] = Field(None, max_length=40)
+
+
+class FeedbackCreateResponse(BaseModel):
+    """Minimal 201 payload — the widget only needs id+timestamp."""
+
+    id: int
+    status: str
+    created_at: datetime
+
+
+class FeedbackResponse(BaseModel):
+    """Full row shape returned to admins."""
+
+    id: int
+    sentiment: str
+    message: str
+    email: Optional[str] = None
+    username: str
+    user_id: str
+    status: str
+    page_url: str
+    referrer: Optional[str] = None
+    user_agent: Optional[str] = None
+    viewport: Optional[str] = None
+    screenshot_url: Optional[str] = None
+    read_at: Optional[datetime] = None
+    read_by_user_id: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class FeedbackListResponse(BaseModel):
+    """Paginated list returned by GET /api/admin/feedback."""
+
+    items: list[FeedbackResponse] = Field(default_factory=list)
+    total: int = 0
+
+
+class FeedbackUpdateStatus(BaseModel):
+    """Body of PATCH /api/admin/feedback/{id}."""
+
+    status: str = Field(..., pattern=r"^(unread|read|archived)$")
+
+
+class FeedbackCountsResponse(BaseModel):
+    """Header strip for the admin inbox."""
+
+    total: int = 0
+    unread: int = 0
+    read: int = 0
+    archived: int = 0
+    by_sentiment: dict[str, int] = Field(
+        default_factory=lambda: {"love": 0, "like": 0, "issue": 0, "idea": 0}
+    )

@@ -87,6 +87,23 @@ def get_optional_user(
         return None
 
 
+def require_admin(user: str = Depends(get_current_user)) -> str:
+    """FastAPI dependency: 401 if not logged in, 403 if not in the admin list.
+
+    Mirrors the pattern in ``routers/moderation.get_admin_user`` so new
+    admin-only routers can wire admin gating with a single import. The
+    ``ADMIN_USERNAMES`` env var (comma-separated) is the source of
+    truth — see ``config.Settings.admin_usernames_list``.
+    """
+    settings = get_settings()
+    if user not in settings.admin_usernames_list:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return user
+
+
 def _extract_token(access_token: Optional[str], authorization: Optional[str]) -> Optional[str]:
     if access_token and access_token.startswith("Bearer "):
         return access_token[7:]
