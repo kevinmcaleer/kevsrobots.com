@@ -139,6 +139,12 @@
       }
       updateStatusBadge(currentProject.status);
       showSaveStatus('saved', 'Saved');
+      // Issue #106: surface any badges awarded by this save (typically
+      // only on the initial create, but the API may award one on a PUT
+      // too if e.g. setting status -> completed crosses a threshold).
+      if (window.BadgeToast && currentProject) {
+        BadgeToast.fromResponse(currentProject);
+      }
     } catch (e) {
       console.error('Save failed:', e);
       showSaveStatus('error', 'Save failed');

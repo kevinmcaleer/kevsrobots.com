@@ -8,14 +8,17 @@ from typing import AsyncIterator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .badges import seed_badge_definitions
 from .config import get_settings
 from .db import (
     add_bom_part_id_if_missing,
     add_remix_columns_if_missing,
     create_all,
+    get_sessionmaker,
     repair_stale_fks,
 )
 from .routers import (
+    badges,
     bom,
     downloads,
     files,
@@ -39,6 +42,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await add_remix_columns_if_missing()
     # Issue #121: ensure project_bom_items.part_id column exists.
     await add_bom_part_id_if_missing()
+    # Issue #106: seed the badge catalog (idempotent upsert by slug).
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        await seed_badge_definitions(session)
     yield
 
 
@@ -73,6 +80,8 @@ def create_app() -> FastAPI:
     app.include_router(makes.router)
     # Issue #108: project remixes (fork & attribution).
     app.include_router(remixes.router)
+    # Issue #106: badges & achievements.
+    app.include_router(badges.router)
     return app
 
 
