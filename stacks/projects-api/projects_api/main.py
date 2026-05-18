@@ -12,6 +12,7 @@ from .config import get_settings
 from .db import (
     add_bom_part_id_if_missing,
     add_remix_columns_if_missing,
+    add_user_disabled_columns_if_missing,
     create_all,
     repair_stale_fks,
 )
@@ -39,6 +40,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await add_remix_columns_if_missing()
     # Issue #121: ensure project_bom_items.part_id column exists.
     await add_bom_part_id_if_missing()
+    # Issue #136: ensure users.is_disabled / disabled_reason columns exist.
+    await add_user_disabled_columns_if_missing()
     yield
 
 

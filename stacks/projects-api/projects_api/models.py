@@ -360,3 +360,32 @@ class PartRevision(Base):
     # Suppliers are denormalised into the revision row as JSON so we don't
     # need a sibling table per revision. Each entry: {name, url}.
     suppliers_json: Mapped[Optional[list]] = mapped_column(JsonType)
+
+
+# --- User flags (issue #136 — mass-deletion auto-disable) -----------------
+#
+# We don't own a real user table — identity comes from the Chatter JWT. But
+# we *do* need a place to flag locally-relevant state like "this user has
+# been auto-disabled for mass-deleting wiki content". One row per username,
+# lazily inserted the first time we need to set a flag.
+#
+# `is_disabled=True` is checked by `get_current_user` and `get_optional_user`
+# in `auth.py`; any request from a disabled account 403s before reaching a
+# router.
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True, index=True
+    )
+    is_disabled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0"
+    )
+    disabled_reason: Mapped[Optional[str]] = mapped_column(Text)
+    disabled_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )

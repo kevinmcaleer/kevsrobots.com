@@ -53,6 +53,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user_aged
 from ..db import get_session
+from ..mass_deletion import (
+    check_and_handle_mass_deletion,
+    snapshot_from_inputs,
+    snapshot_from_part,
+)
 from ..models import Part, PartAlias, PartRevision, PartSupplier
 from ..schemas import (
     PartCreate,
@@ -374,6 +379,39 @@ async def update_part(
             detail="No fields changed",
         )
 
+    # Issue #136: mass-deletion guard. Done BEFORE we mutate any session
+    # state for the in-progress edit, so a triggered result can safely
+    # commit only the rollback + user-disable side effects without the
+    # destructive write tagging along. If the guard raises, the
+    # surrounding request handler returns 500 and the session is rolled
+    # back by FastAPI's get_session dependency — meaning the destructive
+    # write does NOT happen, which is the correctness guarantee we want.
+    prev_snapshot = snapshot_from_part(part, current_suppliers)
+    next_snapshot = snapshot_from_inputs(
+        name=next_name,
+        sku=next_sku,
+        mpn=next_mpn,
+        description_md=next_desc,
+        image_url=next_image,
+        tags=list(next_tags),
+        suppliers_json=next_supplier_json,
+    )
+    result = await check_and_handle_mass_deletion(
+        session, user, prev_snapshot, next_snapshot
+    )
+    if result.triggered:
+        # Commit the rollback + user-disable that the guard already
+        # added to the session. Do NOT apply the in-progress edit.
+        await session.commit()
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Mass deletion detected — your account has been disabled "
+                f"and {result.restored_count} part(s) you recently edited "
+                f"have been restored. Contact an admin to appeal."
+            ),
+        )
+
     now = _now_naive_utc()
     # Write the revision first so we have an id to point `current_revision_id` at.
     rev = PartRevision(
@@ -493,6 +531,33 @@ async def restore_revision(
     source = await session.get(PartRevision, rev_id)
     if source is None or source.part_id != part.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Revision not found")
+
+    # Issue #136: a "restore" to an empty / much-shorter old revision is
+    # equivalent to a mass-delete. Run the same guard as PUT.
+    current_suppliers = await _load_suppliers(session, part.id)
+    prev_snapshot = snapshot_from_part(part, current_suppliers)
+    next_snapshot = snapshot_from_inputs(
+        name=source.name,
+        sku=source.sku,
+        mpn=source.mpn,
+        description_md=source.description_md,
+        image_url=source.image_url,
+        tags=list(source.tags or []),
+        suppliers_json=list(source.suppliers_json or []),
+    )
+    result = await check_and_handle_mass_deletion(
+        session, user, prev_snapshot, next_snapshot
+    )
+    if result.triggered:
+        await session.commit()
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Mass deletion detected — your account has been disabled "
+                f"and {result.restored_count} part(s) you recently edited "
+                f"have been restored. Contact an admin to appeal."
+            ),
+        )
 
     now = _now_naive_utc()
     suppliers_json = list(source.suppliers_json or [])

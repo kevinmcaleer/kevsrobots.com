@@ -17,8 +17,11 @@ from typing import Optional
 import httpx
 from fastapi import Cookie, Depends, Header, HTTPException, status
 from jose import JWTError, jwt
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .config import get_settings
+from .db import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -32,24 +35,19 @@ _ACCOUNT_AGE_NEGATIVE_TTL_SECONDS = 60  # cache lookup failures briefly
 MIN_ACCOUNT_AGE_DAYS = 14
 
 
-def get_current_user(
-    access_token: Optional[str] = Cookie(default=None),
-    authorization: Optional[str] = Header(default=None),
+def _decode_username(
+    access_token: Optional[str],
+    authorization: Optional[str],
 ) -> str:
     """Extract and verify the username from a Chatter JWT token.
 
-    Checks the access_token cookie first (set by chatter with
-    domain=.kevsrobots.com), then the Authorization header.
-    Returns the username (sub claim) or raises 401.
+    Pure JWT decode — no DB access. Used internally; callers that want the
+    full live check (including ``is_disabled``) should use
+    :func:`get_current_user`.
     """
 
     settings = get_settings()
-    token = None
-
-    if access_token and access_token.startswith("Bearer "):
-        token = access_token[7:]
-    elif authorization and authorization.startswith("Bearer "):
-        token = authorization[7:]
+    token = _extract_token(access_token, authorization)
 
     if not token:
         raise HTTPException(
@@ -75,15 +73,73 @@ def get_current_user(
         )
 
 
-def get_optional_user(
-    access_token: Optional[str] = Cookie(default=None),
-    authorization: Optional[str] = Header(default=None),
-) -> Optional[str]:
-    """Like get_current_user but returns None instead of raising 401."""
+async def _is_user_disabled(
+    session: AsyncSession, username: str
+) -> tuple[bool, Optional[str]]:
+    """Look up ``(is_disabled, disabled_reason)`` for ``username``.
+
+    Returns ``(False, None)`` if there's no row for this user (never been
+    flagged) or if the lookup fails — we fail *open* on transient DB
+    errors so we don't lock everyone out of the API just because a query
+    timed out. The auto-disable path itself runs in the same transaction
+    as the mutation it's blocking, so it has stronger guarantees.
+    """
+    # Local import to avoid a circular: models -> db -> auth -> models.
+    from .models import User
 
     try:
-        return get_current_user(access_token, authorization)
-    except HTTPException:
+        row = await session.scalar(
+            select(User).where(User.username == username)
+        )
+        if row is None:
+            return False, None
+        return bool(row.is_disabled), row.disabled_reason
+    except Exception as exc:
+        logger.warning("Disabled-user lookup failed for %s: %s", username, exc)
+        return False, None
+
+
+async def get_current_user(
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+    session: AsyncSession = Depends(get_session),
+) -> str:
+    """Extract and verify the username from a Chatter JWT token.
+
+    Checks the access_token cookie first (set by chatter with
+    domain=.kevsrobots.com), then the Authorization header.
+    Returns the username (sub claim) or raises 401.
+
+    Also enforces the local ``users.is_disabled`` flag — disabled accounts
+    get 403 on every authenticated endpoint (issue #136).
+    """
+    username = _decode_username(access_token, authorization)
+    disabled, reason = await _is_user_disabled(session, username)
+    if disabled:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=reason or "Account disabled",
+        )
+    return username
+
+
+async def get_optional_user(
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+    session: AsyncSession = Depends(get_session),
+) -> Optional[str]:
+    """Like get_current_user but returns None instead of raising 401.
+
+    Disabled accounts still raise 403 — we don't want a disabled user to
+    silently drop to anonymous and keep using endpoints that vary by
+    auth state.
+    """
+
+    try:
+        return await get_current_user(access_token, authorization, session)
+    except HTTPException as exc:
+        if exc.status_code == status.HTTP_403_FORBIDDEN:
+            raise
         return None
 
 
@@ -155,6 +211,7 @@ def _clear_account_age_cache() -> None:
 async def get_current_user_aged(
     access_token: Optional[str] = Cookie(default=None),
     authorization: Optional[str] = Header(default=None),
+    session: AsyncSession = Depends(get_session),
 ) -> str:
     """Like ``get_current_user`` but also enforces a 14-day account-age gate.
 
@@ -162,7 +219,11 @@ async def get_current_user_aged(
     lookup failure we fail closed — better to ask the user to come back
     later than to let a brand-new account spam-edit the wiki.
     """
-    username = get_current_user(access_token=access_token, authorization=authorization)
+    username = await get_current_user(
+        access_token=access_token,
+        authorization=authorization,
+        session=session,
+    )
     token = _extract_token(access_token, authorization)
     if token is None:
         # get_current_user would have raised already, but be defensive.
