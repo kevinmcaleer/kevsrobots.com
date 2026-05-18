@@ -337,6 +337,25 @@ h1 {
   // color: $kevred;
 }
 
+// Heading icons: h1's negative letter-spacing collapses the gap after a
+// leading Font Awesome icon, so the title overlaps the icon even with me-3.
+// We have to match BOTH the raw <i class="fas …"> tag and the <svg
+// class="svg-inline--fa …"> element that the Font Awesome JS kit swaps in at
+// runtime — selectors that only mention .fas/.far/.fab silently miss the
+// replaced SVG on every page that loads the kit JS.
+h1, h2, h3, h4 {
+  > .fas:first-child,
+  > .far:first-child,
+  > .fab:first-child,
+  > .fa-solid:first-child,
+  > .fa-regular:first-child,
+  > .fa-brands:first-child,
+  > .svg-inline--fa:first-child {
+    letter-spacing: normal;
+    margin-right: 1.25rem !important;
+  }
+}
+
 article {
 
   h1,
