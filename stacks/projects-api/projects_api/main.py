@@ -16,6 +16,7 @@ from .db import (
     repair_stale_fks,
 )
 from .routers import (
+    auth,
     bom,
     downloads,
     files,
@@ -58,6 +59,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(health.router)
+    # Issue #139: /api/auth/me — login-state introspection for the frontend.
+    app.include_router(auth.router)
     # Downloads router declares /api/projects/popular and must be registered
     # BEFORE projects.router so the more-specific path wins over the
     # catch-all /api/projects/{project_id}.
