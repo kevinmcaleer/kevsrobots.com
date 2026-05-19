@@ -1,12 +1,12 @@
 ---
 title: Part
-layout: default
+layout: content
 description: View a part in the catalog
 ---
 
 {% include nav_projects.html %}
 
-<link rel="stylesheet" href="/assets/css/project-editor.css">
+<link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 
 <div class="container py-4">
   <div class="mb-3">
@@ -39,9 +39,23 @@ description: View a part in the catalog
 
         <div id="part-tags" class="d-flex flex-wrap gap-2 mb-3"></div>
 
+        <div id="part-taxonomy" class="d-flex flex-wrap gap-2 mb-3"></div>
+
         <hr>
 
         <div id="part-description" class="mb-4" style="line-height:1.7"></div>
+
+        <div id="part-family-section" class="mb-4 d-none">
+          <h4><i class="fas fa-sitemap me-3 text-primary"></i> Same family</h4>
+          <p class="text-muted small mb-2">Other parts in the <strong><span id="part-family-name"></span></strong> family.</p>
+          <div id="part-family-list" class="row g-2"></div>
+        </div>
+
+        <div id="part-related-section" class="mb-4 d-none">
+          <h4><i class="fas fa-link me-3 text-primary"></i> Related parts</h4>
+          <p class="text-muted small mb-2">Parts commonly used alongside this one.</p>
+          <div id="part-related-list" class="row g-2"></div>
+        </div>
 
         <div id="part-suppliers-section" class="mb-4 d-none">
           <h4><i class="fas fa-truck me-3"></i> Suppliers</h4>
@@ -165,6 +179,17 @@ description: View a part in the catalog
       tagsEl.innerHTML += `<span class="badge bg-light text-primary">${esc(t)}</span>`;
     });
 
+    // Issue #135: category + family chips.
+    const taxonomyEl = document.getElementById('part-taxonomy');
+    const taxBits = [];
+    if (part.category) {
+      taxBits.push(`<span class="badge bg-info-subtle text-info-emphasis"><i class="fas fa-tag me-1"></i>${esc(part.category)}</span>`);
+    }
+    if (part.family) {
+      taxBits.push(`<a href="/parts/?family=${encodeURIComponent(part.family)}" class="badge bg-primary-subtle text-primary-emphasis text-decoration-none"><i class="fas fa-sitemap me-1"></i>family: ${esc(part.family)}</a>`);
+    }
+    taxonomyEl.innerHTML = taxBits.join(' ');
+
     const descEl = document.getElementById('part-description');
     if (part.description_md) {
       descEl.innerHTML = marked.parse(part.description_md);
@@ -207,6 +232,43 @@ description: View a part in the catalog
       actionEl.classList.remove('d-none');
     } else {
       document.getElementById('part-usage-empty').classList.remove('d-none');
+    }
+
+    // Issue #135: render "Same family" + "Related parts" cards.
+    function renderPartCards(parts) {
+      return (parts || []).map(p => `
+        <div class="col-md-6">
+          <a href="/parts/view.html?slug=${encodeURIComponent(p.slug)}" class="d-block text-decoration-none">
+            <div class="card h-100 border">
+              <div class="card-body py-2 px-3">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                  <div>
+                    <div class="fw-semibold">${esc(p.name)}</div>
+                    <div class="small text-muted">
+                      ${p.sku ? `<span class="me-2">SKU: ${esc(p.sku)}</span>` : ''}
+                      ${p.category ? `<span class="badge bg-light text-dark">${esc(p.category)}</span>` : ''}
+                    </div>
+                  </div>
+                  <span class="small">${statusBadge(p.status)}</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      `).join('');
+    }
+
+    if (Array.isArray(part.family_parts) && part.family_parts.length > 0) {
+      const sec = document.getElementById('part-family-section');
+      sec.classList.remove('d-none');
+      document.getElementById('part-family-name').textContent = part.family || '';
+      document.getElementById('part-family-list').innerHTML = renderPartCards(part.family_parts);
+    }
+
+    if (Array.isArray(part.related_parts) && part.related_parts.length > 0) {
+      const sec = document.getElementById('part-related-section');
+      sec.classList.remove('d-none');
+      document.getElementById('part-related-list').innerHTML = renderPartCards(part.related_parts);
     }
 
     if (Array.isArray(part.revisions) && part.revisions.length > 0) {

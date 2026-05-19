@@ -1,0 +1,34 @@
+/* Public profile page — issue #140 */
+
+#profile-root .card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#profile-root .card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+}
+
+#profile-root .activity-item i {
+  width: 1.25rem;
+  text-align: center;
+}
+
+#badges-list .badge {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+#profile-actions .btn[data-following="1"] {
+  /* Subtle confirm style; flips back on hover to hint at unfollow. */
+}
+#profile-actions .btn[data-following="1"]:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+#profile-actions .btn[data-following="1"]:hover [data-follow-label]::before {
+  content: "Unfollow";
+}
+#profile-actions .btn[data-following="1"]:hover [data-follow-label] {
+  font-size: 0; /* hide "Following" text under the ::before */
+}

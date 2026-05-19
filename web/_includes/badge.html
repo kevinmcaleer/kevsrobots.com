@@ -1,0 +1,29 @@
+{% comment %}
+Reusable badge display include (issue #106).
+
+Usage:
+  {% include badge.html badge=mybadge size="md" %}
+
+Expected `badge` object shape (matches /api/badges + /api/users/{u}/badges):
+  - name           — human label, e.g. "Prolific Maker (Gold)"
+  - description    — tooltip body
+  - icon           — Font Awesome class, e.g. "fa-solid fa-trophy"
+  - tier           — "bronze" | "silver" | "gold" | "single"
+
+`size` (optional): "sm" | "md" | "lg" — controls the icon size only.
+                   Defaults to "md".
+
+This include is intentionally markup-only so the same fragment can render
+on a static profile page (Jekyll context) or be hydrated by JS — the JS
+helper in /assets/js/badge-toast.js mirrors this DOM shape.
+{% endcomment %}
+{%- assign tier = include.badge.tier | default: "single" -%}
+{%- assign size = include.size | default: "md" -%}
+<span class="kr-badge kr-badge--{{ tier }} kr-badge--{{ size }}"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      title="{{ include.badge.name | escape }} — {{ include.badge.description | escape }}"
+      aria-label="{{ include.badge.name | escape }}">
+  <i class="{{ include.badge.icon }}"></i>
+  <span class="visually-hidden">{{ include.badge.name }}</span>
+</span>

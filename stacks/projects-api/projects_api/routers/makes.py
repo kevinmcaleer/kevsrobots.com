@@ -26,6 +26,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
+from ..badges import evaluate_user
 from ..config import get_settings
 from ..db import get_session
 from ..models import Make, MakeImage, Project
@@ -37,6 +38,7 @@ from ..storage import (
     read_file,
     save_file,
 )
+from .users import log_activity  # Issue #111: profile activity feed.
 
 MAX_IMAGES_PER_MAKE = 5
 
@@ -182,15 +184,42 @@ async def create_make(
         session.add(img)
         saved_images.append(img)
 
+    # Issue #111: log the make as an activity event before commit so it
+    # rolls back with the rest if anything fails downstream.
+    await log_activity(
+        session,
+        user_id=user,
+        kind="make_posted",
+        subject_id=make.id,
+        subject_title=project.title,
+        subject_url=f"/projects/view.html?id={project_id}#makes",
+    )
+
     await session.commit()
     await session.refresh(make)
     for img in saved_images:
         await session.refresh(img)
 
-    # TODO(#106): badge eval hook — call into the badges service here with
-    # (user=make.user_id, event="make.created", make_id=make.id).
+    # Issue #106: evaluate badges for BOTH the make poster (could be
+    # crossing future "first make" thresholds — none defined today but the
+    # hook is here for symmetry) AND the project's author, who could be
+    # crossing the Community Builder tier. Best-effort.
+    poster_newly = []
+    try:
+        poster_newly = await evaluate_user(session, user)
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        # Only re-evaluate the author if they're a different user — saves a
+        # roundtrip for self-makes (which are rare but possible).
+        if project.author_username != user:
+            await evaluate_user(session, project.author_username)
+    except Exception:  # noqa: BLE001
+        pass
 
-    return _serialize_make(make, saved_images)
+    resp = _serialize_make(make, saved_images)
+    resp.newly_awarded_badges = poster_newly
+    return resp
 
 
 @router.get(
@@ -298,8 +327,9 @@ async def delete_make(
     await session.delete(make)
     await session.commit()
 
-    # TODO(#106): badge eval hook — call into the badges service here with
-    # (user=make.user_id, event="make.deleted", make_id=make_id).
+    # Note: we intentionally do NOT un-award badges on make deletion.
+    # Badges are sticky — earning one and then losing it because someone
+    # deleted a make would be a bad experience. Re-evaluation only adds.
 
 
 @router.post("/api/makes/{make_id}/heart", response_model=MakeResponse)

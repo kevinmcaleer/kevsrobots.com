@@ -10,8 +10,9 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user
+from ..badges import evaluate_user
 from ..db import get_session
-from ..models import Download, Project, ProjectTag
+from ..models import Download, Project, ProjectTag, UserFollow
 from ..schemas import (
     ProjectCreate,
     ProjectListItem,
@@ -19,6 +20,7 @@ from ..schemas import (
     ProjectUpdate,
     RemixedFromRef,
 )
+from .users import log_activity  # Issue #111: profile activity feed.
 
 
 async def _download_count(session: AsyncSession, project_id: int) -> int:
@@ -94,6 +96,11 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         remixes_count=int(remixes_count),
         is_remix=remixed_from_ref is not None,
         download_count=await _download_count(session, project.id),
+        # Issue #115: surface featured metadata on the detail view.
+        is_featured=bool(getattr(project, "is_featured", False)),
+        featured_at=getattr(project, "featured_at", None),
+        featured_by=getattr(project, "featured_by", None),
+        featured_note=getattr(project, "featured_note", None),
     )
 
 
@@ -102,6 +109,18 @@ async def list_projects(
     difficulty: Optional[str] = Query(None),
     tag: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
+    author: Optional[str] = Query(
+        None,
+        description="Filter to projects authored by this username (issue #140 — public profiles).",
+    ),
+    boost_followed: bool = Query(
+        False,
+        description=(
+            "Issue #140: when true and the caller is authenticated, projects "
+            "authored by users the caller follows are sorted ahead of the "
+            "general pool. Ignored for anonymous callers."
+        ),
+    ),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     user: Optional[str] = Depends(get_optional_user),
@@ -113,6 +132,8 @@ async def list_projects(
     )
     if difficulty:
         query = query.where(Project.difficulty == difficulty)
+    if author:
+        query = query.where(Project.author_username == author)
     if search:
         query = query.where(
             Project.title.ilike(f"%{search}%")
@@ -120,7 +141,7 @@ async def list_projects(
         )
     query = query.order_by(Project.created_at.desc()).limit(limit).offset(offset)
 
-    projects = (await session.scalars(query)).all()
+    projects = list((await session.scalars(query)).all())
 
     if tag:
         tagged_ids = set(
@@ -131,6 +152,27 @@ async def list_projects(
             ).scalars().all()
         )
         projects = [p for p in projects if p.id in tagged_ids]
+
+    # Issue #140: bump followed-authors when the caller asked for it.
+    # Stable sort so within-bucket order (the SQL "created_at desc") is
+    # preserved. Order: completed first → followed-authors → everyone else.
+    if boost_followed and user:
+        followed = set(
+            (
+                await session.execute(
+                    select(UserFollow.followee_id).where(
+                        UserFollow.follower_id == user
+                    )
+                )
+            ).scalars().all()
+        )
+        if followed:
+            def _bucket(p: Project) -> tuple[int, int]:
+                completed = 0 if p.status == "completed" else 1
+                followed_author = 0 if p.author_username in followed else 1
+                return (completed, followed_author)
+
+            projects.sort(key=_bucket)
 
     items = []
     for p in projects:
@@ -149,6 +191,8 @@ async def list_projects(
                 created_at=p.created_at,
                 is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
+                is_featured=bool(getattr(p, "is_featured", False)),
+                featured_note=getattr(p, "featured_note", None),
             )
         )
     return items
@@ -186,9 +230,31 @@ async def create_project(
     await session.flush()
     if body.tags:
         await _set_tags(session, project.id, body.tags)
+    # Issue #111: log create as a profile-activity event. project_updated
+    # would be wrong (no audience yet) — we use the same row to mean
+    # "started a project"; the listener treats it the same as a publish
+    # until the status flips to completed.
+    await log_activity(
+        session,
+        user_id=user,
+        kind="project_updated",
+        subject_id=project.id,
+        subject_title=project.title,
+        subject_url=f"/projects/view.html?id={project.id}",
+    )
     await session.commit()
     await session.refresh(project)
-    return await _project_response(session, project)
+    # Issue #106: evaluate badges synchronously after the project row is
+    # safely persisted. evaluate_user is best-effort — wrap in a try so a
+    # badge bug can never break project creation.
+    newly = []
+    try:
+        newly = await evaluate_user(session, user)
+    except Exception:  # noqa: BLE001 — never crash project create
+        pass
+    resp = await _project_response(session, project)
+    resp.newly_awarded_badges = newly
+    return resp
 
 
 @router.put("/{project_id}", response_model=ProjectResponse)
@@ -226,12 +292,28 @@ async def update_project(
 
     update_data = body.model_dump(exclude_unset=True)
     tags = update_data.pop("tags", None)
+    previous_status = project.status
     for field, value in update_data.items():
         setattr(project, field, value)
     project.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
 
     if tags is not None:
         await _set_tags(session, project.id, tags)
+
+    # Issue #111: emit activity. A status flip from non-completed to
+    # completed is the first-time "publish" event; everything else is
+    # generic project_updated. Archived → completed is also a publish.
+    became_completed = (
+        previous_status != "completed" and project.status == "completed"
+    )
+    await log_activity(
+        session,
+        user_id=user,
+        kind="project_published" if became_completed else "project_updated",
+        subject_id=project.id,
+        subject_title=project.title,
+        subject_url=f"/projects/view.html?id={project.id}",
+    )
 
     await session.commit()
     await session.refresh(project)
@@ -282,6 +364,8 @@ async def my_projects(
                 created_at=p.created_at,
                 is_remix=getattr(p, "remixed_from_id", None) is not None,
                 download_count=await _download_count(session, p.id),
+                is_featured=bool(getattr(p, "is_featured", False)),
+                featured_note=getattr(p, "featured_note", None),
             )
         )
     return items

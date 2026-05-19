@@ -12,7 +12,7 @@ from __future__ import annotations
 import logging
 import time
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 
 import httpx
 from fastapi import Cookie, Depends, Header, HTTPException, status
@@ -143,11 +143,63 @@ async def get_optional_user(
         return None
 
 
+def require_admin(user: str = Depends(get_current_user)) -> str:
+    """FastAPI dependency: 401 if not logged in, 403 if not in the admin list.
+
+    Mirrors the pattern in ``routers/moderation.get_admin_user`` so new
+    admin-only routers can wire admin gating with a single import. The
+    ``ADMIN_USERNAMES`` env var (comma-separated) is the source of
+    truth — see ``config.Settings.admin_usernames_list``.
+    """
+    settings = get_settings()
+    if user not in settings.admin_usernames_list:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return user
+
+
 def _extract_token(access_token: Optional[str], authorization: Optional[str]) -> Optional[str]:
     if access_token and access_token.startswith("Bearer "):
         return access_token[7:]
     if authorization and authorization.startswith("Bearer "):
         return authorization[7:]
+    return None
+
+
+def extract_token(
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+) -> Optional[str]:
+    """FastAPI dependency: return the raw bearer token, or None."""
+    return _extract_token(access_token, authorization)
+
+
+async def fetch_chatter_me(token: str) -> Optional[dict[str, Any]]:
+    """Fetch the raw Chatter ``/api/me`` payload for the current user.
+
+    Returns the JSON dict on success, or None on any network/parse
+    failure. Tests monkeypatch this — keep the signature stable.
+
+    We intentionally do not cache this: the payload may carry mutable
+    fields (email, avatar_url) that we don't want to serve stale.
+    Latency is bounded by the short httpx timeout.
+    """
+    settings = get_settings()
+    url = f"{settings.chatter_base_url.rstrip('/')}/api/me"
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as http:
+            resp = await http.get(
+                url,
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                if isinstance(data, dict):
+                    return data
+    except Exception as exc:  # network / parsing — best-effort
+        logger.warning("Chatter /api/me lookup failed: %s", exc)
     return None
 
 

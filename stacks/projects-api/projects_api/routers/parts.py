@@ -58,10 +58,12 @@ from ..mass_deletion import (
     snapshot_from_inputs,
     snapshot_from_part,
 )
-from ..models import Part, PartAlias, PartRevision, PartSupplier
+from ..models import Part, PartAlias, PartRelation, PartRevision, PartSupplier
 from ..schemas import (
     PartCreate,
     PartDetail,
+    PartRelatedRef,
+    PartRelationCreate,
     PartRevisionDetail,
     PartRevisionSummary,
     PartSearchResult,
@@ -69,6 +71,27 @@ from ..schemas import (
     PartSupplierResponse,
     PartUpdate,
 )
+
+
+# Curated starter list of part categories (issue #135). Kept small and
+# practical — editors can pick "other" or leave it null for parts that
+# don't fit cleanly. Order roughly matches how often they're picked.
+PART_CATEGORIES: list[str] = [
+    "microcontroller",
+    "single-board-computer",
+    "sensor",
+    "motor",
+    "motor-driver",
+    "display",
+    "actuator",
+    "power",
+    "communication",
+    "passive",
+    "connector",
+    "tool",
+    "kit",
+    "other",
+]
 
 router = APIRouter(prefix="/api/parts", tags=["parts"])
 
@@ -143,6 +166,58 @@ async def _recompute_usage_count(session: AsyncSession, part_id: int) -> int:
     return int(count or 0)
 
 
+def _to_related_ref(p: Part) -> PartRelatedRef:
+    return PartRelatedRef(
+        id=p.id,
+        slug=p.slug,
+        name=p.name,
+        sku=p.sku,
+        status=p.status,
+        category=p.category,
+        family=p.family,
+    )
+
+
+async def _load_related_parts(session: AsyncSession, part_id: int) -> list[Part]:
+    """Return parts connected via ``part_relations`` from either side.
+
+    Rows are stored with ``part_id < related_id``, but the editor may have
+    added the link from either part's perspective. We union both directions
+    so the related-parts list looks symmetric.
+    """
+    left = await session.scalars(
+        select(PartRelation.related_id).where(PartRelation.part_id == part_id)
+    )
+    right = await session.scalars(
+        select(PartRelation.part_id).where(PartRelation.related_id == part_id)
+    )
+    ids = sorted({*left.all(), *right.all()})
+    if not ids:
+        return []
+    parts = (
+        await session.scalars(
+            select(Part).where(Part.id.in_(ids)).order_by(Part.name.asc())
+        )
+    ).all()
+    return list(parts)
+
+
+async def _load_family_parts(
+    session: AsyncSession, part_id: int, family: Optional[str]
+) -> list[Part]:
+    if not family:
+        return []
+    parts = (
+        await session.scalars(
+            select(Part)
+            .where(Part.family == family, Part.id != part_id)
+            .order_by(Part.name.asc())
+            .limit(20)
+        )
+    ).all()
+    return list(parts)
+
+
 async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
     suppliers = await _load_suppliers(session, part.id)
     revs = (
@@ -153,6 +228,8 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
             .limit(10)
         )
     ).all()
+    related = await _load_related_parts(session, part.id)
+    family_parts = await _load_family_parts(session, part.id, part.family)
     return PartDetail(
         id=part.id,
         slug=part.slug,
@@ -168,6 +245,8 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         updated_at=part.updated_at,
         current_revision_id=part.current_revision_id,
         usage_count=part.usage_count,
+        category=part.category,
+        family=part.family,
         suppliers=[_supplier_response(s) for s in suppliers],
         recent_revisions=[
             PartRevisionSummary(
@@ -178,6 +257,8 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
             )
             for r in revs
         ],
+        related_parts=[_to_related_ref(p) for p in related],
+        family_parts=[_to_related_ref(p) for p in family_parts],
     )
 
 
@@ -198,41 +279,40 @@ async def _primary_supplier_url(session: AsyncSession, part_id: int) -> Optional
 async def search_parts(
     q: Optional[str] = Query(None, max_length=200),
     limit: int = Query(10, ge=1, le=50),
+    category: Optional[str] = Query(None, max_length=60),
+    family: Optional[str] = Query(None, max_length=80),
     session: AsyncSession = Depends(get_session),
 ) -> list[PartSearchResult]:
     """Substring search across name / sku / mpn / aliases.
 
     Empty or whitespace-only ``q`` returns the most-used parts so the
     BOM-editor autosuggest can show something useful on focus.
+
+    Optional ``category`` / ``family`` filters narrow the result set —
+    useful for the catalog browse page and the related-parts picker on
+    the edit screen (issue #135).
     """
-    if not q or not q.strip():
-        parts = (
-            await session.scalars(
-                select(Part).order_by(Part.usage_count.desc(), Part.name.asc()).limit(limit)
-            )
-        ).all()
-    else:
+    stmt = select(Part)
+    if q and q.strip():
         needle = f"%{q.strip().lower()}%"
-        # Match against name/sku/mpn directly, plus any alias that matches.
         alias_part_ids_subq = (
             select(PartAlias.part_id)
             .where(func.lower(PartAlias.alias).like(needle))
         )
-        parts = (
-            await session.scalars(
-                select(Part)
-                .where(
-                    or_(
-                        func.lower(Part.name).like(needle),
-                        func.lower(func.coalesce(Part.sku, "")).like(needle),
-                        func.lower(func.coalesce(Part.mpn, "")).like(needle),
-                        Part.id.in_(alias_part_ids_subq),
-                    )
-                )
-                .order_by(Part.usage_count.desc(), Part.name.asc())
-                .limit(limit)
+        stmt = stmt.where(
+            or_(
+                func.lower(Part.name).like(needle),
+                func.lower(func.coalesce(Part.sku, "")).like(needle),
+                func.lower(func.coalesce(Part.mpn, "")).like(needle),
+                Part.id.in_(alias_part_ids_subq),
             )
-        ).all()
+        )
+    if category:
+        stmt = stmt.where(Part.category == category)
+    if family:
+        stmt = stmt.where(Part.family == family)
+    stmt = stmt.order_by(Part.usage_count.desc(), Part.name.asc()).limit(limit)
+    parts = (await session.scalars(stmt)).all()
 
     results: list[PartSearchResult] = []
     for p in parts:
@@ -245,9 +325,45 @@ async def search_parts(
                 status=p.status,
                 usage_count=p.usage_count,
                 primary_supplier_url=await _primary_supplier_url(session, p.id),
+                category=p.category,
+                family=p.family,
             )
         )
     return results
+
+
+# --- categories + families metadata (issue #135) ----------------------
+
+
+@router.get("/_meta/categories", response_model=list[str])
+async def list_categories() -> list[str]:
+    """Static starter list of category slugs.
+
+    Hardcoded for v1 — editors can ask for more once we see what's missing.
+    """
+    return list(PART_CATEGORIES)
+
+
+@router.get("/_meta/families", response_model=list[str])
+async def list_families(
+    q: Optional[str] = Query(None, max_length=80),
+    limit: int = Query(20, ge=1, le=100),
+    session: AsyncSession = Depends(get_session),
+) -> list[str]:
+    """Distinct family values for autocomplete on the edit screen.
+
+    Empty ``q`` returns the most-common families. Substring matching is
+    case-insensitive.
+    """
+    stmt = select(Part.family, func.count(Part.id).label("n")).where(
+        Part.family.is_not(None), Part.family != ""
+    )
+    if q and q.strip():
+        needle = f"%{q.strip().lower()}%"
+        stmt = stmt.where(func.lower(Part.family).like(needle))
+    stmt = stmt.group_by(Part.family).order_by(func.count(Part.id).desc(), Part.family.asc()).limit(limit)
+    rows = (await session.execute(stmt)).all()
+    return [row[0] for row in rows if row[0]]
 
 
 @router.post("", response_model=PartDetail, status_code=201)
@@ -259,6 +375,8 @@ async def create_part(
     slug = await _unique_slug(session, _slugify(body.name))
     now = _now_naive_utc()
     tags = [t.strip() for t in body.tags if t and t.strip()]
+    category = (body.category or "").strip() or None
+    family = (body.family or "").strip() or None
     part = Part(
         slug=slug,
         name=body.name,
@@ -268,6 +386,8 @@ async def create_part(
         image_url=body.image_url,
         tags=tags,
         status="draft",
+        category=category,
+        family=family,
         created_by=user,
         created_at=now,
         updated_at=now,
@@ -297,6 +417,8 @@ async def create_part(
         description_md=part.description_md,
         image_url=part.image_url,
         tags=list(tags),
+        category=category,
+        family=family,
         suppliers_json=_suppliers_to_json(suppliers),
         created_at=now,
     )
@@ -307,6 +429,15 @@ async def create_part(
     await session.commit()
     await session.refresh(part)
     return await _part_detail(session, part)
+
+
+# --- related parts + family helpers ------------------------------------
+
+
+def _canonical_pair(a: int, b: int) -> tuple[int, int]:
+    """Return (small, large) so we always store the same row regardless of
+    which side the editor linked from."""
+    return (a, b) if a < b else (b, a)
 
 
 async def _get_part_by_slug(session: AsyncSession, slug: str) -> Part:
@@ -353,6 +484,18 @@ async def update_part(
     next_desc = body.description_md if body.description_md is not None else part.description_md
     next_image = body.image_url if body.image_url is not None else part.image_url
     next_tags = _normalize_tags(body.tags) if body.tags is not None else list(part.tags or [])
+    # Empty string is interpreted as "clear" for category / family — the
+    # editor sends "" when the user resets the dropdown / blanks the input.
+    if body.category is None:
+        next_category = part.category
+    else:
+        stripped = body.category.strip()
+        next_category = stripped or None
+    if body.family is None:
+        next_family = part.family
+    else:
+        stripped = body.family.strip()
+        next_family = stripped or None
 
     current_suppliers = await _load_suppliers(session, part.id)
     current_supplier_json = _suppliers_to_json(current_suppliers)
@@ -371,6 +514,8 @@ async def update_part(
         or next_desc != part.description_md
         or next_image != part.image_url
         or list(next_tags) != list(part.tags or [])
+        or next_category != part.category
+        or next_family != part.family
         or _supplier_signature(next_supplier_json) != _supplier_signature(current_supplier_json)
     )
     if not changed:
@@ -424,6 +569,8 @@ async def update_part(
         description_md=next_desc,
         image_url=next_image,
         tags=list(next_tags),
+        category=next_category,
+        family=next_family,
         suppliers_json=next_supplier_json,
         created_at=now,
     )
@@ -437,6 +584,8 @@ async def update_part(
     part.description_md = next_desc
     part.image_url = next_image
     part.tags = list(next_tags)
+    part.category = next_category
+    part.family = next_family
     part.current_revision_id = rev.id
     part.updated_at = now
 
@@ -515,6 +664,8 @@ async def get_revision(
         image_url=rev.image_url,
         tags=list(rev.tags or []),
         suppliers=suppliers,
+        category=rev.category,
+        family=rev.family,
     )
 
 
@@ -571,6 +722,8 @@ async def restore_revision(
         description_md=source.description_md,
         image_url=source.image_url,
         tags=list(source.tags or []),
+        category=source.category,
+        family=source.family,
         suppliers_json=suppliers_json,
         created_at=now,
     )
@@ -583,6 +736,8 @@ async def restore_revision(
     part.description_md = source.description_md
     part.image_url = source.image_url
     part.tags = list(source.tags or [])
+    part.category = source.category
+    part.family = source.family
     part.current_revision_id = new_rev.id
     part.updated_at = now
 
@@ -603,3 +758,107 @@ async def restore_revision(
     await session.commit()
     await session.refresh(part)
     return await _part_detail(session, part)
+
+
+# --- related parts (issue #135) ----------------------------------------
+
+
+@router.get("/{slug}/related", response_model=list[PartRelatedRef])
+async def list_related_parts(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> list[PartRelatedRef]:
+    """List all parts linked to ``slug`` via ``part_relations``."""
+    part = await _get_part_by_slug(session, slug)
+    related = await _load_related_parts(session, part.id)
+    return [_to_related_ref(p) for p in related]
+
+
+@router.post("/{slug}/related", response_model=list[PartRelatedRef], status_code=201)
+async def add_related_part(
+    slug: str,
+    body: PartRelationCreate,
+    user: str = Depends(get_current_user_aged),
+    session: AsyncSession = Depends(get_session),
+) -> list[PartRelatedRef]:
+    """Link ``slug`` to another part identified by ``related_slug``.
+
+    The 14-day account-age gate applies (via ``get_current_user_aged``).
+    Idempotent: re-adding an existing link is a no-op rather than a 409
+    so the UI can stay simple.
+    """
+    part = await _get_part_by_slug(session, slug)
+    target_slug = (body.related_slug or "").strip()
+    if not target_slug or target_slug == slug:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="related_slug must refer to a different part",
+        )
+    target = await session.scalar(select(Part).where(Part.slug == target_slug))
+    if target is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Related part not found")
+    if target.id == part.id:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="A part cannot be related to itself",
+        )
+
+    low, high = _canonical_pair(part.id, target.id)
+    existing = await session.scalar(
+        select(PartRelation.id).where(
+            PartRelation.part_id == low,
+            PartRelation.related_id == high,
+        )
+    )
+    if existing is None:
+        session.add(
+            PartRelation(
+                part_id=low,
+                related_id=high,
+                created_by=user,
+                created_at=_now_naive_utc(),
+            )
+        )
+        await session.commit()
+
+    related = await _load_related_parts(session, part.id)
+    return [_to_related_ref(p) for p in related]
+
+
+@router.delete("/{slug}/related/{related_slug}", status_code=204)
+async def remove_related_part(
+    slug: str,
+    related_slug: str,
+    user: str = Depends(get_current_user_aged),
+    session: AsyncSession = Depends(get_session),
+) -> None:
+    part = await _get_part_by_slug(session, slug)
+    target = await session.scalar(select(Part).where(Part.slug == related_slug))
+    if target is None:
+        # Treat "delete a relation to a non-existent part" as a no-op so the
+        # UI doesn't need to keep stale slugs in sync.
+        return None
+    low, high = _canonical_pair(part.id, target.id)
+    await session.execute(
+        delete(PartRelation).where(
+            PartRelation.part_id == low,
+            PartRelation.related_id == high,
+        )
+    )
+    await session.commit()
+    return None
+
+
+@router.get("/{slug}/family", response_model=list[PartRelatedRef])
+async def list_family_parts(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> list[PartRelatedRef]:
+    """Other parts that share this part's ``family`` value.
+
+    Returns ``[]`` when the part has no family set or is the only one in
+    its family.
+    """
+    part = await _get_part_by_slug(session, slug)
+    family_parts = await _load_family_parts(session, part.id, part.family)
+    return [_to_related_ref(p) for p in family_parts]
