@@ -51,7 +51,7 @@ async def update_link(
     project_id: int,
     link_id: int,
     body: LinkUpdate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> LinkResponse:
     """Partial-update a related link (issue #171).

@@ -27,7 +27,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectVideo
 from ..schemas import VideoCreate, VideoResponse, VideoUpdate
@@ -66,7 +66,7 @@ async def list_videos(
 async def add_video(
     project_id: int,
     body: VideoCreate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> VideoResponse:
     """Owner-only. The extractor raises ``ValueError`` for malformed
@@ -107,7 +107,7 @@ async def update_video(
     project_id: int,
     video_id: int,
     body: VideoUpdate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> VideoResponse:
     """Partial-update title and / or sort_order. The youtube_id is
@@ -128,7 +128,7 @@ async def update_video(
 async def delete_video(
     project_id: int,
     video_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     await _check_owner(session, project_id, user)
