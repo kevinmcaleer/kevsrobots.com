@@ -36,6 +36,12 @@ class Project(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
+    # Issue #152: URL-friendly slug, unique per author. Nullable so the
+    # column can be backfilled on legacy rows by the lifespan helper. The
+    # ``UniqueConstraint`` below enforces (author_username, slug) — username
+    # uniqueness itself is owned by Chatter (the auth service); our copy of
+    # ``author_username`` is a string FK to that identity.
+    slug: Mapped[Optional[str]] = mapped_column(String(80), nullable=True, index=True)
     short_description: Mapped[Optional[str]] = mapped_column(String(500))
     content_md: Mapped[Optional[str]] = mapped_column(Text)
     difficulty: Mapped[Optional[str]] = mapped_column(String(20))
@@ -70,6 +76,14 @@ class Project(Base):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        # Issue #152: slug is unique within an author's portfolio. Two
+        # different users can both have a "smars-walker" slug.
+        UniqueConstraint(
+            "author_username", "slug", name="uq_projects_author_slug"
+        ),
     )
 
 

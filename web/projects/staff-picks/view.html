@@ -100,7 +100,11 @@ description: View a curated collection of projects
       }
       document.getElementById('items-grid').innerHTML = items.map(function(it) {
         var proj = it.project || { id: it.project_id, title: '#' + it.project_id };
-        var href = '/projects/view.html?id=' + proj.id;
+        // Issue #152: prefer canonical /projects/<owner>/<slug> URL when
+        // the API surfaced a slug on the embedded project ref.
+        var href = (proj.slug && proj.author_username)
+          ? '/projects/' + encodeURIComponent(proj.author_username) + '/' + encodeURIComponent(proj.slug)
+          : '/projects/view.html?id=' + proj.id;
         var note = it.editor_note
           ? '<blockquote class="featured-note small fst-italic text-muted border-start ps-2 mb-2">' + esc(it.editor_note) + '</blockquote>'
           : '';

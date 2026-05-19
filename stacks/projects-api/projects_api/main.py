@@ -14,6 +14,7 @@ from .db import (
     add_bom_part_id_if_missing,
     add_part_category_family_if_missing,
     add_project_featured_columns_if_missing,
+    add_project_slug_if_missing,
     add_remix_columns_if_missing,
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
@@ -26,6 +27,7 @@ from .routers import (
     auth,
     badges,
     bom,
+    by_slug,
     downloads,
     featured,
     feedback,
@@ -63,6 +65,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await add_user_profile_columns_if_missing()
     # Issue #136: ensure users.is_disabled / disabled_reason columns exist.
     await add_user_disabled_columns_if_missing()
+    # Issue #152: add projects.slug + (author_username, slug) unique
+    # constraint + backfill legacy rows. Must run after create_all (which
+    # builds the table on fresh deploys) and before any router handles a
+    # request (the backfill happens in a separate session).
+    await add_project_slug_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
@@ -96,6 +103,10 @@ def create_app() -> FastAPI:
     # /api/projects/featured and that path must beat /api/projects/{id}.
     app.include_router(featured.router)
     app.include_router(projects.router)
+    # Issue #152: slug-based read endpoints. Mounted after projects.router
+    # because none of the by-slug paths overlap with the id-based ones
+    # (different segment counts) — ordering is for readability only.
+    app.include_router(by_slug.router)
     app.include_router(bom.router)
     app.include_router(files.router)
     app.include_router(images.router)

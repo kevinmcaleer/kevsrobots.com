@@ -50,6 +50,7 @@ async def _tags_for(session: AsyncSession, project_id: int) -> list[str]:
 def _to_response(project: Project, tags: list[str]) -> FeaturedProjectResponse:
     return FeaturedProjectResponse(
         id=project.id,
+        slug=getattr(project, "slug", None),
         title=project.title,
         short_description=project.short_description,
         difficulty=project.difficulty,

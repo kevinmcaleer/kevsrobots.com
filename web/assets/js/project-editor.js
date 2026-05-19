@@ -197,13 +197,19 @@
     const viewLiveBtn = document.getElementById('view-live-btn');
     const viewToggle = document.getElementById('view-toggle-btn');
     if (currentProject) {
+      // Issue #152: link to the canonical /projects/<owner>/<slug> URL
+      // when the loaded project has a slug; fall back to ?id= for any
+      // legacy row whose slug hasn't been backfilled yet.
+      var liveUrl = (currentProject.slug && currentProject.author_username)
+        ? '/projects/' + encodeURIComponent(currentProject.author_username) + '/' + encodeURIComponent(currentProject.slug)
+        : '/projects/view.html?id=' + currentProject.id;
       if (viewLiveBtn) {
         viewLiveBtn.style.display = '';
-        viewLiveBtn.href = '/projects/view.html?id=' + currentProject.id;
+        viewLiveBtn.href = liveUrl;
       }
       if (viewToggle) {
         viewToggle.classList.remove('d-none');
-        viewToggle.href = '/projects/view.html?id=' + currentProject.id;
+        viewToggle.href = liveUrl;
       }
     }
   }

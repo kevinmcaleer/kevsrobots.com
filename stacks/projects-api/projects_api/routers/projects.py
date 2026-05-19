@@ -20,7 +20,35 @@ from ..schemas import (
     ProjectUpdate,
     RemixedFromRef,
 )
+from ..slugs import slugify_title, unique_slug_for_author
 from .users import log_activity  # Issue #111: profile activity feed.
+
+
+async def resolve_project_id(
+    session: AsyncSession,
+    owner: str,
+    slug: str,
+) -> int:
+    """Look up a project's numeric id from its ``(owner, slug)`` URL pair.
+
+    Raises :class:`HTTPException` with 404 when no project matches.
+
+    This is the central helper for the issue #152 by-slug routes — every
+    nested resource handler (BOM, images, files, links, journal, makes)
+    wraps the existing id-based router by calling here first and then
+    forwarding to the id-based path. Keeping the lookup in one place
+    means a change to the slug-resolution rules (case-folding, alias
+    table, …) only has to happen here.
+    """
+    project_id = await session.scalar(
+        select(Project.id).where(
+            Project.author_username == owner,
+            Project.slug == slug,
+        )
+    )
+    if project_id is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
+    return int(project_id)
 
 
 async def _download_count(session: AsyncSession, project_id: int) -> int:
@@ -67,6 +95,7 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         if parent is not None:
             remixed_from_ref = RemixedFromRef(
                 id=parent.id,
+                slug=getattr(parent, "slug", None),
                 title=parent.title,
                 author_username=parent.author_username,
             )
@@ -79,6 +108,7 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
 
     return ProjectResponse(
         id=project.id,
+        slug=getattr(project, "slug", None),
         title=project.title,
         short_description=project.short_description,
         content_md=project.content_md,
@@ -180,6 +210,7 @@ async def list_projects(
         items.append(
             ProjectListItem(
                 id=p.id,
+                slug=getattr(p, "slug", None),
                 title=p.title,
                 short_description=p.short_description,
                 difficulty=p.difficulty,
@@ -216,8 +247,19 @@ async def create_project(
     user: str = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> ProjectResponse:
+    # Issue #152: auto-generate a slug from the title at create time. The
+    # slug is unique within the author's portfolio; collisions get a
+    # numeric suffix (-2, -3, …).
+    base_slug = slugify_title(body.title)
+    slug = await unique_slug_for_author(
+        session,
+        author_username=user,
+        base_slug=base_slug,
+    )
+
     project = Project(
         title=body.title,
+        slug=slug,
         short_description=body.short_description,
         content_md=body.content_md,
         difficulty=body.difficulty,
@@ -292,10 +334,24 @@ async def update_project(
 
     update_data = body.model_dump(exclude_unset=True)
     tags = update_data.pop("tags", None)
+    # Issue #152: ``regenerate_slug`` is a control flag, not a column —
+    # never assign it to the ORM row. Slug stays sticky on title rename
+    # unless the caller explicitly opts in (preserves inbound links from
+    # blogs / search engines).
+    regenerate_slug = bool(update_data.pop("regenerate_slug", False))
     previous_status = project.status
     for field, value in update_data.items():
         setattr(project, field, value)
     project.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    if regenerate_slug:
+        base = slugify_title(project.title)
+        project.slug = await unique_slug_for_author(
+            session,
+            author_username=project.author_username,
+            base_slug=base,
+            exclude_project_id=project.id,
+        )
 
     if tags is not None:
         await _set_tags(session, project.id, tags)
@@ -353,6 +409,7 @@ async def my_projects(
         items.append(
             ProjectListItem(
                 id=p.id,
+                slug=getattr(p, "slug", None),
                 title=p.title,
                 short_description=p.short_description,
                 difficulty=p.difficulty,

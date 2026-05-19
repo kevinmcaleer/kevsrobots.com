@@ -81,6 +81,7 @@ async def _load_items(session: AsyncSession, pick_id: int) -> list[StaffPickItem
         if project is not None:
             project_ref = StaffPickProjectRef(
                 id=project.id,
+                slug=getattr(project, "slug", None),
                 title=project.title,
                 short_description=project.short_description,
                 author_username=project.author_username,

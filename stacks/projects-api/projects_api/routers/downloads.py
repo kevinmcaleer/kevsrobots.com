@@ -207,6 +207,7 @@ async def popular_projects(
         items.append(
             PopularProjectItem(
                 id=project.id,
+                slug=getattr(project, "slug", None),
                 title=project.title,
                 short_description=project.short_description,
                 difficulty=project.difficulty,
