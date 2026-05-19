@@ -178,6 +178,10 @@ description: View a part in the catalog
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Issue #150: display-only currency conversion. Loaded here so that
+     when #149 adds per-supplier prices we can show them in the
+     viewer's preferred currency without touching this file again. -->
+<script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -207,6 +211,22 @@ description: View a part in the catalog
     if (s === 'ok') return '<span class="badge bg-success-subtle text-success ms-2">link OK</span>';
     if (s === 'broken') return '<span class="badge bg-danger-subtle text-danger ms-2">link broken</span>';
     return '';
+  }
+
+  // Issue #149: render a small flag + ISO code pill for the supplier's
+  // country. Uses the regional-indicator unicode trick (two letters
+  // mapped into the flag emoji range) so we don't need a flag sprite.
+  // Falls back to a neutral "globe" pill when country_code is null.
+  function countryFlagBadge(code) {
+    if (!code || typeof code !== 'string' || !/^[A-Za-z]{2}$/.test(code)) {
+      return '<span class="badge bg-light text-muted ms-2" title="Country not set"><i class="fas fa-globe"></i></span>';
+    }
+    const up = code.toUpperCase();
+    const flag = String.fromCodePoint(
+      0x1F1E6 + (up.charCodeAt(0) - 65),
+      0x1F1E6 + (up.charCodeAt(1) - 65),
+    );
+    return `<span class="badge bg-light text-dark ms-2" title="Supplier country: ${esc(up)}">${flag} ${esc(up)}</span>`;
   }
 
   function fmtTime(dateStr) {
@@ -277,6 +297,7 @@ description: View a part in the catalog
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <div>
             <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || s.url)} <i class="fas fa-external-link-alt fa-xs text-muted"></i></a>
+            ${countryFlagBadge(s.country_code)}
             ${supplierStatusBadge(s.last_status)}
           </div>
           ${s.last_checked_at ? `<small class="text-muted">checked ${fmtTime(s.last_checked_at)}</small>` : ''}

@@ -7,6 +7,9 @@
  *     image wrapper.
  *   - badge(note): returns the inline "Staff Pick" badge for the view
  *     page header. Encodes ``note`` for the tooltip safely.
+ *   - cardHtml(project): returns the inner card HTML for a single
+ *     featured project (no wrapper). Shared by the hub carousel and the
+ *     home-page widget (issue #153) so both stay in visual lock-step.
  *   - mountCarousel(container, projects): renders a scrollable shelf of
  *     featured cards into a container. Returns true when at least one
  *     card was rendered so the caller can `classList.remove('d-none')`
@@ -63,7 +66,10 @@
     return 'background:linear-gradient(135deg,hsl(' + hue + ',70%,55%),hsl(' + ((hue + 60) % 360) + ',70%,45%));';
   }
 
-  function carouselCardHtml(project) {
+  // Inner card HTML for one featured project (no outer wrapper). Shared
+  // between the hub carousel and the home-page widget (issue #153) so the
+  // visual treatment stays consistent in both surfaces.
+  function cardHtml(project) {
     // Issue #152: prefer canonical /projects/<owner>/<slug> URL when the
     // FeaturedProjectResponse surfaced a slug.
     var href = (project.slug && project.author_username)
@@ -72,20 +78,22 @@
     var note = project.featured_note ? '<div class="featured-note">' + esc(project.featured_note) + '</div>' : '';
     var author = project.author_username ? esc(project.author_username) : '';
     return (
-      '<div class="featured-carousel-card">' +
-        '<a href="' + href + '" class="text-decoration-none">' +
-          '<div class="card border-0 shadow-sm card-hover">' +
-            ribbon('Featured') +
-            '<div class="project-thumb" style="' + cardThumbStyle(project) + '"></div>' +
-            '<div class="card-body">' +
-              '<div class="fw-bold text-dark text-truncate" title="' + esc(project.title) + '">' + esc(project.title) + '</div>' +
-              (author ? '<div class="small text-muted">by ' + author + '</div>' : '') +
-              note +
-            '</div>' +
+      '<a href="' + href + '" class="text-decoration-none">' +
+        '<div class="card h-100 border-0 shadow-sm card-hover">' +
+          ribbon('Featured') +
+          '<div class="project-thumb" style="' + cardThumbStyle(project) + '"></div>' +
+          '<div class="card-body">' +
+            '<div class="fw-bold text-dark text-truncate" title="' + esc(project.title) + '">' + esc(project.title) + '</div>' +
+            (author ? '<div class="small text-muted">by ' + author + '</div>' : '') +
+            note +
           '</div>' +
-        '</a>' +
-      '</div>'
+        '</div>' +
+      '</a>'
     );
+  }
+
+  function carouselCardHtml(project) {
+    return '<div class="featured-carousel-card">' + cardHtml(project) + '</div>';
   }
 
   function mountCarousel(container, projects) {
@@ -120,6 +128,7 @@
     DEFAULT_API: DEFAULT_API,
     ribbon: ribbon,
     badge: badge,
+    cardHtml: cardHtml,
     mountCarousel: mountCarousel,
     load: load
   };

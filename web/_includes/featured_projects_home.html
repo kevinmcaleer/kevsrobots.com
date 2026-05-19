@@ -1,0 +1,53 @@
+<!-- Featured projects widget for the welcome page (issue #153).
+     Renders up to 6 admin-curated projects in a Bootstrap grid.
+     Curation lives in /admin/projects/featured/ (already shipped in
+     #115/#155); this widget is read-only and consumes the public
+     GET /api/projects/featured endpoint.
+
+     Fails closed: if the projects API is unreachable or returns an
+     empty list, the entire section stays hidden — never an empty
+     placeholder on the home page. -->
+
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+
+<section id="home-featured-section" class="row mt-3 m-0 p-3 mb-3 rounded-1 bg-light d-none">
+  <div class="col-12">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+      <div>
+        <h2 class="mb-0"><i class="fas fa-star text-warning me-3"></i>Featured Projects</h2>
+        <p class="text-muted mb-0">Hand-picked by the team.</p>
+      </div>
+      <a href="/projects/staff-picks/" class="btn btn-outline-dark btn-sm">
+        Browse Staff Picks <i class="fas fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div id="home-featured-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3"></div>
+  </div>
+</section>
+
+<script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
+<script>
+(function () {
+  'use strict';
+  var section = document.getElementById('home-featured-section');
+  var grid = document.getElementById('home-featured-grid');
+  if (!section || !grid || !window.FeaturedProjects) return;
+
+  window.FeaturedProjects.load({ limit: 6 })
+    .then(function (items) {
+      if (!Array.isArray(items) || items.length === 0) {
+        // Empty list — leave the section hidden; nothing to show.
+        return;
+      }
+      grid.innerHTML = items.map(function (p) {
+        return '<div class="col">' + window.FeaturedProjects.cardHtml(p) + '</div>';
+      }).join('');
+      section.classList.remove('d-none');
+    })
+    .catch(function () {
+      // Network / API error — keep the section hidden so a broken API
+      // never breaks the home page. Intentionally no console.error.
+    });
+})();
+</script>

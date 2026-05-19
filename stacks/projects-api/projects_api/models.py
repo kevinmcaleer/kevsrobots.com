@@ -125,6 +125,12 @@ class ProjectBOMItem(Base):
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     unit: Mapped[str] = mapped_column(String(20), nullable=False, default="qty")
     unit_cost: Mapped[Optional[float]] = mapped_column(Float)
+    # Issue #149: ISO 4217 currency code that ``unit_cost`` is denominated
+    # in (e.g. ``GBP``, ``USD``, ``EUR``). Nullable for back-compat — legacy
+    # rows pre-#149 have NULL and the frontend renders the raw number with
+    # a "currency not set" tooltip. Validated via the Pydantic ``pattern``
+    # on ``BOMItemCreate``.
+    currency_code: Mapped[Optional[str]] = mapped_column(String(3))
     supplier_url: Mapped[Optional[str]] = mapped_column(Text)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     # Optional link to a part in the shared parts catalog. When set, the
@@ -401,6 +407,11 @@ class PartSupplier(Base):
     url: Mapped[str] = mapped_column(Text, nullable=False)
     last_checked_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     last_status: Mapped[Optional[str]] = mapped_column(String(30))
+    # Issue #149: ISO 3166-1 alpha-2 country code for the supplier link
+    # (e.g. ``GB`` for Pimoroni, ``US`` for Adafruit). Nullable means
+    # "global / unknown" — legacy rows pre-#149 have NULL. Validated via
+    # the Pydantic ``pattern`` on ``PartSupplierInput``.
+    country_code: Mapped[Optional[str]] = mapped_column(String(2))
 
 
 # --- User follows (issue #140) -------------------------------------------
@@ -460,6 +471,11 @@ class UserProfile(Base):
     social_links: Mapped[Optional[dict]] = mapped_column(JsonType)
     # Up to 3 badge slug strings the user has pinned to the showcase.
     featured_badge_slugs: Mapped[Optional[list]] = mapped_column(JsonType)
+    # Issue #150: preferred display currency (ISO 4217). NULL means
+    # "auto-detect / show native". Validated against an allow-list at
+    # the API layer; we do not enforce a FK here so adding new currencies
+    # is a code-only change.
+    preferred_currency: Mapped[Optional[str]] = mapped_column(String(3))
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
