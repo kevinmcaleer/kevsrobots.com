@@ -887,11 +887,22 @@ description: View project details
     let total = 0;
     // Tally currency codes so we can label the (un-converted) total with
     // the dominant one (issue #149) — or omit the symbol entirely if rows
-    // span more than one currency.
+    // span more than one currency. Supplier-pricing feature: the
+    // *effective* code (which is the supplier's currency when the row
+    // is linked to a priced supplier) drives both the per-row display
+    // and the dominant-currency tally.
     const currencyCounts = {};
     tbody.innerHTML = items.map((i, idx) => {
-      total += i.quantity * (i.unit_cost || 0);
-      const code = (i.currency_code || '').trim().toUpperCase();
+      // Use the resolved fields the server pre-computed. Old payloads
+      // (before the supplier-pricing feature shipped) don't carry
+      // effective_*; fall back to the row's own values so this page
+      // stays back-compat with stale CDN-cached responses.
+      const cost = (i.effective_unit_cost != null)
+        ? i.effective_unit_cost
+        : i.unit_cost;
+      const ccyEffective = i.effective_currency_code || i.currency_code || null;
+      total += i.quantity * (cost || 0);
+      const code = (ccyEffective || '').trim().toUpperCase();
       if (code) currencyCounts[code] = (currencyCounts[code] || 0) + 1;
       // If a part_id + slug came back with the BOM row, link the part name to
       // its parts-catalog page. Backwards compatible: rows without part_slug
@@ -903,17 +914,22 @@ description: View project details
       // Show bare native price up-front so the page renders without
       // waiting for the FX endpoint. The async enrichment below
       // replaces this cell with a converted suffix when applicable.
-      const ccy = i.currency_code || null;
-      const priceHtml = i.unit_cost == null
+      const priceHtml = cost == null
         ? '-'
         : (window.CurrencyConvert
-            ? CurrencyConvert.formatPrice(i.unit_cost, ccy || 'GBP')
-            : ('£' + Number(i.unit_cost).toFixed(2)));
+            ? CurrencyConvert.formatPrice(cost, ccyEffective || 'GBP')
+            : ('£' + Number(cost).toFixed(2)));
+      // Supplier-pricing feature: tiny link icon flags rows whose
+      // price came from the part's supplier rather than the row's own
+      // value. Helps viewers reason about why a price changed.
+      const supplierIndicator = i.price_source === 'supplier'
+        ? ' <i title="From supplier" class="fas fa-link text-muted small"></i>'
+        : '';
       return `<tr>
         <td>${nameCell}</td>
         <td>${i.quantity}</td>
         <td>${esc(i.unit)}</td>
-        <td data-bom-price="${idx}">${priceHtml}</td>
+        <td data-bom-price="${idx}" data-bom-ccy="${esc(ccyEffective || '')}" data-bom-cost="${cost == null ? '' : esc(cost)}">${priceHtml}${supplierIndicator}</td>
         <td>${supplierUrl ? `<a href="${esc(supplierUrl)}" target="_blank">Link <i class="fas fa-external-link-alt fa-xs"></i></a>` : '-'}</td>
       </tr>`;
     }).join('');
@@ -938,15 +954,26 @@ description: View project details
     // with a formatted "native (≈ converted)" string. Graceful
     // degradation: any failure (cold cache, no preference, missing
     // currency_code) leaves the bare native price in place.
+    // Supplier-pricing feature: read the effective_* values rather
+    // than the row's own — so a row that pulls its price from a
+    // supplier converts that supplier's price (which is the one the
+    // user actually sees in the table).
     if (window.CurrencyConvert) {
       items.forEach(async (i, idx) => {
-        if (i.unit_cost == null) return;
-        const ccy = i.currency_code;
+        const cost = (i.effective_unit_cost != null)
+          ? i.effective_unit_cost
+          : i.unit_cost;
+        if (cost == null) return;
+        const ccy = i.effective_currency_code || i.currency_code;
         if (!ccy) return;
         const cell = tbody.querySelector(`[data-bom-price="${idx}"]`);
         if (!cell) return;
+        // Preserve the trailing supplier-link icon if present.
+        const indicator = i.price_source === 'supplier'
+          ? ' <i title="From supplier" class="fas fa-link text-muted small"></i>'
+          : '';
         try {
-          cell.innerHTML = await CurrencyConvert.renderPrice(i.unit_cost, ccy);
+          cell.innerHTML = (await CurrencyConvert.renderPrice(cost, ccy)) + indicator;
         } catch (_) { /* keep the native fallback */ }
       });
     }

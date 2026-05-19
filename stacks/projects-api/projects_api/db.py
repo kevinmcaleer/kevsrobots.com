@@ -534,6 +534,121 @@ async def add_supplier_country_if_missing() -> None:
             ))
 
 
+async def add_supplier_pricing_if_missing() -> None:
+    """Additive migration for the supplier-pricing feature.
+
+    Adds ``unit_cost`` (Float, nullable) + ``currency_code`` (CHAR(3),
+    nullable) to the existing ``part_suppliers`` table when they do not
+    already exist. SQLAlchemy's ``create_all`` does not ALTER existing
+    tables, so this lightweight idempotent helper keeps existing Postgres
+    deployments in sync. Safe to run on every startup; no-op when the
+    columns are already present. Postgres-only — SQLite tests use a
+    fresh in-memory DB which already includes the new columns.
+
+    Mirrors ``add_supplier_country_if_missing`` (issue #149) — both touch
+    part_suppliers and follow the same probe-then-ALTER pattern.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'part_suppliers'"
+        ))
+        if table_check.first() is None:
+            # Brand-new deployment — create_all builds the table with every
+            # column already present.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'part_suppliers'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "unit_cost" not in cols:
+            logger.warning(
+                "Adding part_suppliers.unit_cost column (supplier-pricing-feature)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "part_suppliers" ADD COLUMN "unit_cost" '
+                'DOUBLE PRECISION'
+            ))
+        if "currency_code" not in cols:
+            logger.warning(
+                "Adding part_suppliers.currency_code column (supplier-pricing-feature)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "part_suppliers" ADD COLUMN "currency_code" CHAR(3)'
+            ))
+
+
+async def add_bom_supplier_id_if_missing() -> None:
+    """Additive migration for the supplier-pricing feature.
+
+    Adds ``supplier_id`` (FK -> part_suppliers.id ON DELETE SET NULL) to
+    the existing ``project_bom_items`` table when it does not already
+    exist. Without this, every SELECT / INSERT on the BOM table 500s
+    after a redeploy that ships the new ORM model.
+
+    Two-step pattern mirrors ``add_bom_part_id_if_missing`` (issue #121):
+    add the bare column first so the migration succeeds even if
+    ``part_suppliers`` doesn't exist yet (legacy DBs where the parts
+    catalog landed in a later migration pass), then conditionally add
+    the FK constraint only if the target table is present. Idempotent —
+    safe to run on every startup. Postgres-only; SQLite tests use a
+    fresh in-memory DB built by ``create_all``.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'project_bom_items'"
+        ))
+        if table_check.first() is None:
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'project_bom_items'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "supplier_id" not in cols:
+            logger.warning(
+                "Adding project_bom_items.supplier_id column "
+                "(supplier-pricing-feature)"
+            )
+            # Step 1: bare column, no FK — succeeds even if part_suppliers
+            # hasn't been created yet on this legacy DB.
+            await conn.execute(text(
+                'ALTER TABLE "project_bom_items" ADD COLUMN "supplier_id" INTEGER'
+            ))
+            # Step 2: add the FK constraint only if the target table
+            # exists. On the same startup pass ``create_all`` will have
+            # built ``part_suppliers`` for fresh deployments, but on the
+            # legacy-without-parts case we leave the constraint off and
+            # rely on the resolver to silently treat any stale id as NULL.
+            suppliers_check = await conn.execute(text(
+                "SELECT 1 FROM information_schema.tables "
+                "WHERE table_schema = current_schema() AND table_name = 'part_suppliers'"
+            ))
+            if suppliers_check.first() is not None:
+                await conn.execute(text(
+                    'ALTER TABLE "project_bom_items" ADD CONSTRAINT '
+                    '"fk_project_bom_items_supplier_id" FOREIGN KEY '
+                    '("supplier_id") REFERENCES "part_suppliers" (id) '
+                    'ON DELETE SET NULL'
+                ))
+            await conn.execute(text(
+                'CREATE INDEX IF NOT EXISTS "ix_project_bom_items_supplier_id" '
+                'ON "project_bom_items" ("supplier_id")'
+            ))
+
+
 async def add_bom_currency_if_missing() -> None:
     """Additive migration for issue #149 (BOM currency codes).
 

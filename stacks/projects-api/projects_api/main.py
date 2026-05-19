@@ -16,6 +16,7 @@ from .config import get_settings
 from .db import (
     add_bom_currency_if_missing,
     add_bom_part_id_if_missing,
+    add_bom_supplier_id_if_missing,
     add_part_category_family_if_missing,
     add_part_status_columns_if_missing,
     add_project_featured_columns_if_missing,
@@ -23,6 +24,7 @@ from .db import (
     add_remix_columns_if_missing,
     add_supplier_country_if_missing,
     add_supplier_health_columns_if_missing,
+    add_supplier_pricing_if_missing,
     add_user_currency_preference_if_missing,
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
@@ -92,6 +94,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # existing tables (part_suppliers / project_bom_items).
     await add_supplier_country_if_missing()
     await add_bom_currency_if_missing()
+    # Supplier-pricing feature: per-supplier unit_cost + currency_code on
+    # part_suppliers, and supplier_id FK on project_bom_items. Must run
+    # after ``add_supplier_country_if_missing`` so both column-additions
+    # land in the same lifespan pass; ordering between them doesn't
+    # matter (both helpers are independent ALTERs against different
+    # columns on the same table).
+    await add_supplier_pricing_if_missing()
+    await add_bom_supplier_id_if_missing()
     # Issue #122 Phase 2: supplier link-health columns + lifecycle columns.
     await add_supplier_health_columns_if_missing()
     await add_part_status_columns_if_missing()

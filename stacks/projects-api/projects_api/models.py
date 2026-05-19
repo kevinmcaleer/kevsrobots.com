@@ -140,6 +140,21 @@ class ProjectBOMItem(Base):
     part_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("parts.id", ondelete="SET NULL"), nullable=True, index=True
     )
+    # Supplier-pricing feature: optional link to a specific PartSupplier
+    # row. When set AND the supplier has a non-NULL ``unit_cost``, the BOM
+    # ``_to_response`` enrichment treats the supplier as the live price
+    # source — ``effective_unit_cost`` / ``effective_currency_code`` come
+    # from the supplier rather than this row, and ``price_source`` is
+    # ``"supplier"``. When unset or stale (supplier deleted → SET NULL)
+    # the row's own ``unit_cost`` + ``currency_code`` are used as the
+    # fallback. Independent of ``part_id`` only insofar as supplier rows
+    # are owned by parts, but the resolver doesn't assume they agree —
+    # if they ever diverge the supplier wins for pricing.
+    supplier_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("part_suppliers.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
 
 
 class ProjectLink(Base):
@@ -440,6 +455,16 @@ class PartSupplier(Base):
     # "global / unknown" — legacy rows pre-#149 have NULL. Validated via
     # the Pydantic ``pattern`` on ``PartSupplierInput``.
     country_code: Mapped[Optional[str]] = mapped_column(String(2))
+    # Supplier-pricing feature: the price this supplier is currently
+    # advertising for the part, in ``currency_code``. Nullable for legacy
+    # rows + suppliers that haven't been priced yet. When a BOM row links
+    # to this supplier via ``ProjectBOMItem.supplier_id`` the BOM
+    # ``_to_response`` enrichment uses these two fields as the price
+    # source — see ``routers/bom.py``. Validated via the Pydantic
+    # ``unit_cost`` (>= 0) + ``currency_code`` (^[A-Z]{3}$) constraints
+    # on ``PartSupplierInput``.
+    unit_cost: Mapped[Optional[float]] = mapped_column(Float)
+    currency_code: Mapped[Optional[str]] = mapped_column(String(3))
 
 
 # --- Parts talk pages (issue #122, Phase 2) ------------------------------
