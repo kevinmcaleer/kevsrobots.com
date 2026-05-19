@@ -339,10 +339,68 @@ h1 {
 
 // Heading icons: h1's negative letter-spacing collapses the gap after a
 // leading Font Awesome icon, so the title overlaps the icon even with me-3.
-// We have to match BOTH the raw <i class="fas …"> tag and the <svg
-// class="svg-inline--fa …"> element that the Font Awesome JS kit swaps in at
-// runtime — selectors that only mention .fas/.far/.fab silently miss the
-// replaced SVG on every page that loads the kit JS.
+// The earlier "letter-spacing: normal + margin-right: 1.25rem" approach
+// still left the icon kissing the title at h1's 40pt font-size — letter-
+// spacing on the parent affects the space character between </i> and the
+// title text, and the margin-right wasn't always enough to compensate.
+//
+// Flex layout sidesteps the whole problem: `gap` is rendered exactly the
+// distance specified, regardless of any letter-spacing on the parent or
+// the size/padding of the icon glyph. Headings without a leading icon
+// fall back to normal block layout (no flex applied) because the
+// :has() guard is the only thing that opts them in.
+//
+// :has() is supported in all evergreen browsers (Safari 15.4+, Chrome
+// 105+, Firefox 121+). Older browsers fall back to the legacy margin-
+// right rule below, which still gives them more space than `me-3`.
+h1:has(> .fas:first-child),
+h1:has(> .far:first-child),
+h1:has(> .fab:first-child),
+h1:has(> .fa-solid:first-child),
+h1:has(> .fa-regular:first-child),
+h1:has(> .fa-brands:first-child),
+h1:has(> .svg-inline--fa:first-child),
+h2:has(> .fas:first-child),
+h2:has(> .far:first-child),
+h2:has(> .fab:first-child),
+h2:has(> .fa-solid:first-child),
+h2:has(> .fa-regular:first-child),
+h2:has(> .fa-brands:first-child),
+h2:has(> .svg-inline--fa:first-child),
+h3:has(> .fas:first-child),
+h3:has(> .far:first-child),
+h3:has(> .fab:first-child),
+h3:has(> .fa-solid:first-child),
+h3:has(> .fa-regular:first-child),
+h3:has(> .fa-brands:first-child),
+h3:has(> .svg-inline--fa:first-child),
+h4:has(> .fas:first-child),
+h4:has(> .far:first-child),
+h4:has(> .fab:first-child),
+h4:has(> .fa-solid:first-child),
+h4:has(> .fa-regular:first-child),
+h4:has(> .fa-brands:first-child),
+h4:has(> .svg-inline--fa:first-child) {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  // Don't let the icon shrink when the title wraps long
+  > .fas:first-child,
+  > .far:first-child,
+  > .fab:first-child,
+  > .fa-solid:first-child,
+  > .fa-regular:first-child,
+  > .fa-brands:first-child,
+  > .svg-inline--fa:first-child {
+    flex: 0 0 auto;
+    letter-spacing: normal;
+    // Reset Bootstrap's me-* utility — `gap` is doing the work now.
+    margin-right: 0 !important;
+  }
+}
+
+// Fallback for browsers without :has() support — gives them MORE space
+// than Bootstrap's me-3 by overriding the right-margin on the icon.
 h1, h2, h3, h4 {
   > .fas:first-child,
   > .far:first-child,
