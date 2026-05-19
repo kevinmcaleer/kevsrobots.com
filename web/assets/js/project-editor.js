@@ -94,6 +94,16 @@
       loadFiles();
       loadImages();
       loadJournal();
+      // Issue #178 Phase 0: bring up the instruction-builder section.
+      // Lives in its own module (project-instructions.js) to avoid
+      // piling more behaviour onto this file ahead of Phase 1's
+      // Fabric.js canvas work. isOwner is implicit here — the editor
+      // page only opens for the logged-in user, and the backend
+      // rejects non-owner writes with 403 (mirrors the other sections
+      // above, which don't track ownership client-side either).
+      if (window.ProjectInstructions && typeof window.ProjectInstructions.init === 'function') {
+        window.ProjectInstructions.init(currentProject.id, true);
+      }
     } catch (e) {
       console.error('Failed to load project:', e);
     }

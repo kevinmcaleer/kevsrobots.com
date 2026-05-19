@@ -290,6 +290,77 @@ class VideoResponse(BaseModel):
     created_at: datetime
 
 
+# --- Build instructions (issue #178) -------------------------------------
+#
+# Phase 0 ("plumbing"): an ``Instruction`` is the (currently 1:1) container
+# attached to a project, carrying a title + description and owning an
+# ordered sequence of ``InstructionStep`` rows. Fabric.js canvas state
+# rides on each step in ``canvas_json``; Phase 0 leaves it null but
+# clients may set it via the standard step PUT path.
+
+
+class InstructionStepCreate(BaseModel):
+    """Body for ``POST /api/projects/{id}/instruction/steps``.
+
+    No ``step_number`` is accepted — the server assigns ``max(existing) + 1``
+    (or 1 on the first step) so insertion order is the source of truth.
+    """
+
+    title: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+    canvas_json: Optional[str] = None
+
+
+class InstructionStepUpdate(BaseModel):
+    """Partial update — fields omitted are left untouched.
+
+    Including ``step_number`` triggers a reorder: the router moves the
+    target into the requested 1-based position and renumbers the survivors
+    so the resulting sequence is 1..N gap-free. ``step_number`` must be
+    >= 1; values larger than the current length clamp to "last".
+    """
+
+    title: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+    canvas_json: Optional[str] = None
+    step_number: Optional[int] = Field(None, ge=1)
+
+
+class InstructionStepResponse(BaseModel):
+    id: int
+    instruction_id: int
+    step_number: int
+    title: Optional[str] = None
+    description: Optional[str] = None
+    canvas_json: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class InstructionCreate(BaseModel):
+    """Empty body permitted — creates the row, frontend can update later."""
+
+    title: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+
+
+class InstructionUpdate(BaseModel):
+    """Partial — same semantics as ``InstructionStepUpdate`` (no step_number)."""
+
+    title: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+
+
+class InstructionResponse(BaseModel):
+    id: int
+    project_id: int
+    title: Optional[str] = None
+    description: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    steps: list[InstructionStepResponse] = Field(default_factory=list)
+
+
 class JournalEntryCreate(BaseModel):
     title: str = Field(..., max_length=200)
     content_md: Optional[str] = None

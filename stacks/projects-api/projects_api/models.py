@@ -20,7 +20,7 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
 from .db import Base
@@ -198,6 +198,87 @@ class ProjectVideo(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
+
+
+# --- Build instructions (issue #178) -------------------------------------
+#
+# Phase 0 ("plumbing") of the Instruction Builder epic. Each project has at
+# most ONE ``Instruction`` row — represented by the unique constraint on
+# ``project_id`` — which carries a title + description and owns an ordered
+# sequence of ``InstructionStep`` rows. The 1:1 invariant is enforced by the
+# router (POST is idempotent) and by the schema (unique FK); future phases
+# may relax this to N:1 by dropping the unique constraint.
+#
+# Step ordering: ``step_number`` is 1-based and stored verbatim. The router
+# normalises the sequence on reorder PUTs so callers can rely on
+# 1..len(steps) after a reorder, but DELETE intentionally leaves gaps —
+# renumbering survivors would invalidate any UI handles the frontend has
+# cached. Brand-new tables — ``create_all`` handles them, no ALTER helper.
+#
+# ``canvas_json`` is unused in Phase 0; Phase 1 will write Fabric.js scene
+# state into it. Nullable so text-only steps and canvas-backed steps can
+# coexist in the same instruction.
+
+
+class Instruction(Base):
+    __tablename__ = "instructions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    title: Mapped[Optional[str]] = mapped_column(String(200))
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    steps = relationship(
+        "InstructionStep",
+        back_populates="instruction",
+        cascade="all, delete-orphan",
+        order_by="InstructionStep.step_number",
+    )
+
+
+class InstructionStep(Base):
+    __tablename__ = "instruction_steps"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    instruction_id: Mapped[int] = mapped_column(
+        ForeignKey("instructions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    # 1-based step ordering. The DB does not enforce a gap-free sequence —
+    # the API normalises gaps on reorder PUTs, but DELETE leaves gaps so
+    # surviving steps keep their stable numbers / UI handles.
+    step_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    title: Mapped[Optional[str]] = mapped_column(String(200))
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    # Phase 1 will write Fabric.js canvas scene JSON here. Nullable so
+    # Phase 0 text-only steps and Phase 1+ canvas steps coexist.
+    canvas_json: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    instruction = relationship("Instruction", back_populates="steps")
 
 
 class ProjectFile(Base):
