@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,9 +16,11 @@ from .config import get_settings
 from .db import (
     add_bom_part_id_if_missing,
     add_part_category_family_if_missing,
+    add_part_status_columns_if_missing,
     add_project_featured_columns_if_missing,
     add_project_slug_if_missing,
     add_remix_columns_if_missing,
+    add_supplier_health_columns_if_missing,
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
     create_all,
@@ -24,6 +29,7 @@ from .db import (
 )
 from .routers import (
     admin_feedback,
+    admin_parts,
     auth,
     badges,
     bom,
@@ -40,11 +46,15 @@ from .routers import (
     makes,
     moderation,
     parts,
+    parts_talk,
     projects,
     remixes,
     staff_picks,
     users,
 )
+from .supplier_health import background_jobs_disabled, run_full_health_check
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -70,11 +80,38 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # builds the table on fresh deploys) and before any router handles a
     # request (the backfill happens in a separate session).
     await add_project_slug_if_missing()
+    # Issue #122 Phase 2: supplier link-health columns + lifecycle columns.
+    await add_supplier_health_columns_if_missing()
+    await add_part_status_columns_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
         await seed_badge_definitions(session)
-    yield
+
+    # Issue #122 Phase 2: daily APScheduler job that walks every supplier
+    # row and updates link-health columns. Skipped under pytest (the
+    # PYTEST_CURRENT_TEST guard in ``background_jobs_disabled``) so the
+    # test suite is hermetic and doesn't make outbound HTTP.
+    scheduler: AsyncIOScheduler | None = None
+    if not background_jobs_disabled():
+        scheduler = AsyncIOScheduler()
+        scheduler.add_job(
+            run_full_health_check,
+            trigger=IntervalTrigger(hours=24),
+            id="projects-supplier-health",
+            name="Daily supplier link health check",
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True,
+        )
+        scheduler.start()
+        logger.info("scheduled: supplier link health check every 24 hours")
+    try:
+        yield
+    finally:
+        if scheduler is not None:
+            scheduler.shutdown(wait=False)
+            logger.info("supplier health scheduler stopped")
 
 
 def create_app() -> FastAPI:
@@ -114,6 +151,9 @@ def create_app() -> FastAPI:
     app.include_router(journal.router)
     app.include_router(moderation.router)
     app.include_router(parts.router)
+    # Issue #122 Phase 2: parts talk pages + admin recheck.
+    app.include_router(parts_talk.router)
+    app.include_router(admin_parts.router)
     app.include_router(makes.router)
     # Issue #108: project remixes (fork & attribution).
     app.include_router(remixes.router)

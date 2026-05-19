@@ -59,6 +59,7 @@ from ..mass_deletion import (
     snapshot_from_part,
 )
 from ..models import Part, PartAlias, PartRelation, PartRevision, PartSupplier
+from ..parts_lifecycle import compute_part_status
 from ..schemas import (
     PartCreate,
     PartDetail,
@@ -143,6 +144,9 @@ def _supplier_response(s: PartSupplier) -> PartSupplierResponse:
         url=s.url,
         last_checked_at=s.last_checked_at,
         last_status=s.last_status,
+        last_status_code=s.last_status_code,
+        is_broken=bool(s.is_broken),
+        consecutive_failures=int(s.consecutive_failures or 0),
     )
 
 
@@ -259,6 +263,8 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         ],
         related_parts=[_to_related_ref(p) for p in related],
         family_parts=[_to_related_ref(p) for p in family_parts],
+        verified_at=part.verified_at,
+        verified_signals=int(part.verified_signals or 0),
     )
 
 
@@ -605,6 +611,10 @@ async def update_part(
 
     await session.commit()
     await session.refresh(part)
+    # Issue #122 Phase 2: a new revision is a lifecycle signal — try
+    # promoting if all the rules now pass. Safe no-op when they don't.
+    await compute_part_status(session, part, commit=True)
+    await session.refresh(part)
     return await _part_detail(session, part)
 
 
@@ -756,6 +766,9 @@ async def restore_revision(
         )
 
     await session.commit()
+    await session.refresh(part)
+    # Issue #122 Phase 2: restore is also a new-revision signal.
+    await compute_part_status(session, part, commit=True)
     await session.refresh(part)
     return await _part_detail(session, part)
 

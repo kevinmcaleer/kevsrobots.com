@@ -11,5 +11,6 @@ python-multipart
 smbprotocol
 Pillow
 httpx
+apscheduler
 pytest
 pytest-asyncio

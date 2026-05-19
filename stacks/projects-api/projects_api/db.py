@@ -353,6 +353,99 @@ async def add_user_disabled_columns_if_missing() -> None:
             ))
 
 
+async def add_supplier_health_columns_if_missing() -> None:
+    """Additive migration for issue #122 Phase 2 (supplier link health).
+
+    Adds ``last_status_code`` (INTEGER), ``is_broken`` (BOOLEAN NOT NULL
+    DEFAULT FALSE), and ``consecutive_failures`` (INTEGER NOT NULL DEFAULT
+    0) to the existing ``part_suppliers`` table when they do not already
+    exist. The pre-existing ``last_checked_at`` and ``last_status`` columns
+    are kept untouched. Idempotent — runs on every startup. Postgres-only;
+    SQLite tests use a fresh in-memory DB that already includes the new
+    columns via ``create_all``.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'part_suppliers'"
+        ))
+        if table_check.first() is None:
+            # Brand-new deployment — create_all builds the table with every
+            # column already present.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'part_suppliers'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "last_status_code" not in cols:
+            logger.warning("Adding part_suppliers.last_status_code column (issue #122)")
+            await conn.execute(text(
+                'ALTER TABLE "part_suppliers" ADD COLUMN "last_status_code" INTEGER'
+            ))
+        if "is_broken" not in cols:
+            logger.warning("Adding part_suppliers.is_broken column (issue #122)")
+            await conn.execute(text(
+                'ALTER TABLE "part_suppliers" ADD COLUMN "is_broken" BOOLEAN '
+                'NOT NULL DEFAULT FALSE'
+            ))
+        if "consecutive_failures" not in cols:
+            logger.warning("Adding part_suppliers.consecutive_failures column (issue #122)")
+            await conn.execute(text(
+                'ALTER TABLE "part_suppliers" ADD COLUMN "consecutive_failures" '
+                'INTEGER NOT NULL DEFAULT 0'
+            ))
+
+
+async def add_part_status_columns_if_missing() -> None:
+    """Additive migration for issue #122 Phase 2 (part lifecycle).
+
+    ``parts.status`` already exists from Phase 1 (issue #121), but
+    ``verified_at`` and ``verified_signals`` are new. Also (re-)asserts the
+    ``ix_parts_status`` index because Phase 1 created the column without
+    one. Idempotent — runs on every startup. Postgres-only; SQLite tests
+    use ``create_all`` against a fresh in-memory DB.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'parts'"
+        ))
+        if table_check.first() is None:
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'parts'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "verified_at" not in cols:
+            logger.warning("Adding parts.verified_at column (issue #122)")
+            await conn.execute(text(
+                'ALTER TABLE "parts" ADD COLUMN "verified_at" TIMESTAMP'
+            ))
+        if "verified_signals" not in cols:
+            logger.warning("Adding parts.verified_signals column (issue #122)")
+            await conn.execute(text(
+                'ALTER TABLE "parts" ADD COLUMN "verified_signals" INTEGER '
+                'NOT NULL DEFAULT 0'
+            ))
+        # Always (re-)assert the supporting index. Phase 1 created the
+        # column without one; ``IF NOT EXISTS`` keeps this cheap.
+        await conn.execute(text(
+            'CREATE INDEX IF NOT EXISTS "ix_parts_status" ON "parts" ("status")'
+        ))
+
+
 async def add_bom_part_id_if_missing() -> None:
     """Additive migration for issue #121 (parts catalog).
 
