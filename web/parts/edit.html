@@ -173,30 +173,61 @@ description: Edit a part in the catalog
     if (e.key === 'Enter') { e.preventDefault(); document.getElementById('part-add-tag-btn').click(); }
   });
 
-  // --- Suppliers ---
+  // --- Suppliers (issue #149: + country picker) ---
+  // Curated short-list of common supplier countries. "" maps to NULL
+  // server-side (legacy / unknown). Order matches the most common
+  // hobbyist suppliers we link to.
+  const SUPPLIER_COUNTRIES = [
+    { code: '',   label: 'Other / unknown' },
+    { code: 'GB', label: 'GB - United Kingdom' },
+    { code: 'US', label: 'US - United States' },
+    { code: 'DE', label: 'DE - Germany' },
+    { code: 'FR', label: 'FR - France' },
+    { code: 'IT', label: 'IT - Italy' },
+    { code: 'ES', label: 'ES - Spain' },
+    { code: 'NL', label: 'NL - Netherlands' },
+    { code: 'JP', label: 'JP - Japan' },
+    { code: 'AU', label: 'AU - Australia' },
+    { code: 'CA', label: 'CA - Canada' },
+  ];
+  function countryOptionsHtml(selected) {
+    const sel = (selected || '').toUpperCase();
+    return SUPPLIER_COUNTRIES.map(c =>
+      `<option value="${esc(c.code)}"${c.code === sel ? ' selected' : ''}>${esc(c.label)}</option>`
+    ).join('');
+  }
+
   const suppliersList = document.getElementById('suppliers-list');
   function renderSuppliers(suppliers) {
     suppliersList.innerHTML = '';
-    (suppliers || []).forEach(s => addSupplierRow(s.name || '', s.url || ''));
+    (suppliers || []).forEach(s => addSupplierRow(s.name || '', s.url || '', s.country_code || ''));
   }
-  function addSupplierRow(name, url) {
+  function addSupplierRow(name, url, countryCode) {
     const row = document.createElement('div');
     row.className = 'row g-2 mb-2 supplier-row';
     row.innerHTML = `
-      <div class="col-4"><input type="text" class="form-control form-control-sm supplier-name" placeholder="Supplier name" value="${esc(name)}"></div>
-      <div class="col-7"><input type="url" class="form-control form-control-sm supplier-url" placeholder="https://..." value="${esc(url)}"></div>
-      <div class="col-1 d-flex align-items-center"><button class="btn btn-sm text-danger supplier-remove" type="button" aria-label="Remove"><i class="fas fa-times"></i></button></div>
+      <div class="col-md-3"><input type="text" class="form-control form-control-sm supplier-name" placeholder="Supplier name" value="${esc(name)}"></div>
+      <div class="col-md-6"><input type="url" class="form-control form-control-sm supplier-url" placeholder="https://..." value="${esc(url)}"></div>
+      <div class="col-md-2"><select class="form-select form-select-sm supplier-country" aria-label="Supplier country">${countryOptionsHtml(countryCode)}</select></div>
+      <div class="col-md-1 d-flex align-items-center"><button class="btn btn-sm text-danger supplier-remove" type="button" aria-label="Remove"><i class="fas fa-times"></i></button></div>
     `;
     row.querySelector('.supplier-remove').addEventListener('click', () => row.remove());
     suppliersList.appendChild(row);
   }
   function getSuppliers() {
-    return Array.from(suppliersList.querySelectorAll('.supplier-row')).map(r => ({
-      name: r.querySelector('.supplier-name').value.trim(),
-      url: r.querySelector('.supplier-url').value.trim(),
-    })).filter(s => s.name || s.url);
+    return Array.from(suppliersList.querySelectorAll('.supplier-row')).map(r => {
+      const code = r.querySelector('.supplier-country').value.trim().toUpperCase();
+      return {
+        name: r.querySelector('.supplier-name').value.trim(),
+        url: r.querySelector('.supplier-url').value.trim(),
+        // Empty string -> NULL server-side. The Pydantic pattern only
+        // accepts two uppercase letters, so we omit the key entirely
+        // for the "Other / unknown" option.
+        country_code: code || null,
+      };
+    }).filter(s => s.name || s.url);
   }
-  document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', ''));
+  document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', '', ''));
 
   // --- Category dropdown + family autocomplete (issue #135) ---
   async function loadCategories() {

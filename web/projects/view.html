@@ -840,6 +840,19 @@ description: View project details
     });
   }
 
+  // Issue #149: render unit_cost with its currency_code. We do NOT
+  // convert — that's tracked separately in #150. Rows without a code
+  // render the raw number with a tooltip flagging the missing currency.
+  function fmtUnitCost(item) {
+    if (item.unit_cost == null) return '-';
+    const amount = item.unit_cost.toFixed(2);
+    const code = (item.currency_code || '').trim().toUpperCase();
+    if (code) {
+      return `<span title="${esc(code + ' ' + amount)}">${esc(code)} ${amount}</span>`;
+    }
+    return `<span class="text-muted" title="Currency not set">${amount}</span>`;
+  }
+
   async function loadBOM() {
     const resp = await fetch(API + '/api/projects/' + projectId + '/bom');
     const items = await resp.json();
@@ -849,8 +862,14 @@ description: View project details
     try { buildTOC(); } catch (e) {}
     const tbody = document.getElementById('view-bom');
     let total = 0;
+    // Tally currency codes so we can label the (un-converted) total with
+    // the dominant one — or omit the symbol entirely if rows span more
+    // than one currency.
+    const currencyCounts = {};
     tbody.innerHTML = items.map(i => {
       total += i.quantity * (i.unit_cost || 0);
+      const code = (i.currency_code || '').trim().toUpperCase();
+      if (code) currencyCounts[code] = (currencyCounts[code] || 0) + 1;
       // If a part_id + slug came back with the BOM row, link the part name to
       // its parts-catalog page. Backwards compatible: rows without part_slug
       // stay as plain text.
@@ -862,11 +881,25 @@ description: View project details
         <td>${nameCell}</td>
         <td>${i.quantity}</td>
         <td>${esc(i.unit)}</td>
-        <td>${i.unit_cost ? '£' + i.unit_cost.toFixed(2) : '-'}</td>
+        <td>${fmtUnitCost(i)}</td>
         <td>${supplierUrl ? `<a href="${esc(supplierUrl)}" target="_blank">Link <i class="fas fa-external-link-alt fa-xs"></i></a>` : '-'}</td>
       </tr>`;
     }).join('');
-    document.getElementById('view-bom-total').textContent = '£' + total.toFixed(2);
+    // Label the total with the dominant currency code when unambiguous;
+    // when rows mix currencies (or none have a code) we show just the
+    // number — automatic conversion is tracked in #150.
+    const codes = Object.keys(currencyCounts);
+    const totalEl = document.getElementById('view-bom-total');
+    if (codes.length === 1) {
+      totalEl.textContent = codes[0] + ' ' + total.toFixed(2);
+      totalEl.title = 'Total in ' + codes[0];
+    } else if (codes.length > 1) {
+      totalEl.textContent = total.toFixed(2);
+      totalEl.title = 'Mixed currencies — automatic conversion not yet supported';
+    } else {
+      totalEl.textContent = total.toFixed(2);
+      totalEl.title = 'Currency not set on any row';
+    }
   }
 
   async function loadFiles() {
@@ -1036,9 +1069,11 @@ description: View project details
       var bomResp = await fetch(API + '/api/projects/' + project.id + '/bom');
       var bom = await bomResp.json();
       if (bom.length > 0) {
-        var csv = 'Part,Quantity,Unit,Unit Cost,Supplier URL\n';
+        // Issue #149: include currency column so the CSV is parseable
+        // when prices are denominated in different currencies.
+        var csv = 'Part,Quantity,Unit,Unit Cost,Currency,Supplier URL\n';
         bom.forEach(function(item) {
-          csv += '"' + (item.name||'').replace(/"/g, '""') + '",' + item.quantity + ',' + item.unit + ',' + (item.unit_cost||0) + ',"' + (item.supplier_url||'') + '"\n';
+          csv += '"' + (item.name||'').replace(/"/g, '""') + '",' + item.quantity + ',' + item.unit + ',' + (item.unit_cost||0) + ',"' + (item.currency_code||'') + '","' + (item.supplier_url||'') + '"\n';
         });
         zip.file('bill-of-materials.csv', csv);
       }
