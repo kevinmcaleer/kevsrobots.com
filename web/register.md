@@ -108,8 +108,14 @@ description: Create a new kevsrobots.com account
 
       const result = await ChatterAPI.register(userData);
 
-      // Success! Redirect to login page
-      window.location.href = '/login?registered=success';
+      // Success! Redirect to login page. Preserve any ``return_to`` the
+      // user arrived with (e.g. from the Projects Hub T&Cs sign-in
+      // modal) so they land back on the originating page once logged in.
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('return_to');
+      const next = '/login?registered=success' +
+        (returnTo ? '&return_to=' + encodeURIComponent(returnTo) : '');
+      window.location.href = next;
     } catch (error) {
       // Hide spinner
       document.getElementById('register-spinner').style.display = 'none';
