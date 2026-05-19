@@ -182,6 +182,15 @@ class BOMItemCreate(BaseModel):
     supplier_url: Optional[str] = None
     sort_order: int = 0
     part_id: Optional[int] = None
+    # Supplier-pricing feature: optional link to a specific PartSupplier
+    # row. When set AND the supplier has a non-NULL ``unit_cost``, the
+    # supplier's price is the source of truth for the BOM row's display
+    # (see ``effective_unit_cost`` on the response). When NULL or stale
+    # the row's own ``unit_cost`` + ``currency_code`` are used. Same
+    # validate-or-drop pattern as ``part_id``: a non-existent
+    # ``supplier_id`` is silently set to NULL rather than 400ing, so the
+    # frontend can save the rest of the row.
+    supplier_id: Optional[int] = None
 
 
 class BOMItemResponse(BaseModel):
@@ -199,6 +208,18 @@ class BOMItemResponse(BaseModel):
     # supplier if the row's own ``supplier_url`` is empty.
     part_slug: Optional[str] = None
     part_primary_supplier_url: Optional[str] = None
+    # Supplier-pricing feature: the supplier the row is linked to, if
+    # any, plus the *resolved* price the frontend should render. When
+    # ``supplier_id`` points at a supplier with a non-NULL ``unit_cost``,
+    # ``effective_unit_cost`` / ``effective_currency_code`` mirror the
+    # supplier's live values and ``price_source`` is ``"supplier"``.
+    # Otherwise the row's own ``unit_cost`` / ``currency_code`` are
+    # echoed back and ``price_source`` is ``"row"``. The frontend just
+    # reads ``effective_*`` and renders — no client-side resolution.
+    supplier_id: Optional[int] = None
+    effective_unit_cost: Optional[float] = None
+    effective_currency_code: Optional[str] = None
+    price_source: str = "row"
 
 
 class LinkCreate(BaseModel):
@@ -375,6 +396,13 @@ class PartSupplierInput(BaseModel):
     # letters; the dropdown on the edit page only offers a curated list
     # plus "other / unknown" → NULL.
     country_code: Optional[str] = Field(None, pattern=r"^[A-Z]{2}$")
+    # Supplier-pricing feature: per-supplier price + currency. NULL means
+    # "no price recorded yet" — projects that link a BOM row to this
+    # supplier still fall back to the row's own unit_cost in that case.
+    # The price feeds every BOM row that points at this supplier via
+    # ``ProjectBOMItem.supplier_id``, so editing it auto-propagates.
+    unit_cost: Optional[float] = Field(None, ge=0)
+    currency_code: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
 
 
 class PartSupplierResponse(BaseModel):
@@ -390,6 +418,11 @@ class PartSupplierResponse(BaseModel):
     is_broken: bool = False
     consecutive_failures: int = 0
     country_code: Optional[str] = None
+    # Supplier-pricing feature: live price + currency. Surfaced on the
+    # public part page next to each supplier link and as the value that
+    # auto-fills BOM rows linked via ``supplier_id``.
+    unit_cost: Optional[float] = None
+    currency_code: Optional[str] = None
 
 
 class PartCreate(BaseModel):
@@ -434,6 +467,9 @@ class PartSearchResult(BaseModel):
     # list / autocomplete UIs can show them without a second roundtrip.
     category: Optional[str] = None
     family: Optional[str] = None
+    # Small thumbnail for the catalog list row. Null = no image — the list
+    # renderer falls back to a neutral icon tile so row height stays uniform.
+    image_url: Optional[str] = None
 
 
 class PartRevisionSummary(BaseModel):

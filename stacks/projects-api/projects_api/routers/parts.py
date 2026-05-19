@@ -153,17 +153,23 @@ def _supplier_response(s: PartSupplier) -> PartSupplierResponse:
         is_broken=bool(s.is_broken),
         consecutive_failures=int(s.consecutive_failures or 0),
         country_code=s.country_code,
+        unit_cost=s.unit_cost,
+        currency_code=s.currency_code,
     )
 
 
 def _suppliers_to_json(suppliers: list[PartSupplier]) -> list[dict]:
     # Issue #149: persist country_code into the denormalised revision
-    # snapshot so history stays consistent.
+    # snapshot so history stays consistent. Supplier-pricing feature:
+    # also snapshot unit_cost + currency_code so price changes show up
+    # in the next revision (and can be restored).
     return [
         {
             "name": s.supplier_name,
             "url": s.url,
             "country_code": s.country_code,
+            "unit_cost": s.unit_cost,
+            "currency_code": s.currency_code,
         }
         for s in suppliers
     ]
@@ -348,6 +354,7 @@ async def search_parts(
                 primary_supplier_url=await _primary_supplier_url(session, p.id),
                 category=p.category,
                 family=p.family,
+                image_url=p.image_url,
             )
         )
     return results
@@ -488,9 +495,20 @@ def _supplier_signature(suppliers: list[dict]) -> list[tuple]:
 
     Issue #149: include ``country_code`` so editing just the country (and
     nothing else) is recognised as a real change and writes a revision.
+
+    Supplier-pricing feature: also include ``unit_cost`` +
+    ``currency_code`` so a pure price change (no other field touched)
+    still triggers a new revision and ends up in ``suppliers_json`` for
+    the audit trail.
     """
     return [
-        (s.get("name"), s.get("url"), s.get("country_code"))
+        (
+            s.get("name"),
+            s.get("url"),
+            s.get("country_code"),
+            s.get("unit_cost"),
+            s.get("currency_code"),
+        )
         for s in suppliers
     ]
 
@@ -533,6 +551,8 @@ async def update_part(
                 "name": (s.name or None),
                 "url": s.url,
                 "country_code": (s.country_code or None),
+                "unit_cost": s.unit_cost,
+                "currency_code": (s.currency_code or None),
             }
             for s in body.suppliers
         ]
@@ -634,6 +654,8 @@ async def update_part(
                     supplier_name=entry.get("name"),
                     url=entry.get("url"),
                     country_code=entry.get("country_code"),
+                    unit_cost=entry.get("unit_cost"),
+                    currency_code=entry.get("currency_code"),
                 )
             )
 
@@ -690,6 +712,8 @@ async def get_revision(
             name=s.get("name"),
             url=s.get("url", ""),
             country_code=s.get("country_code"),
+            unit_cost=s.get("unit_cost"),
+            currency_code=s.get("currency_code"),
         )
         for s in suppliers_raw
         if s.get("url")
@@ -795,6 +819,8 @@ async def restore_revision(
                 supplier_name=entry.get("name"),
                 url=entry.get("url"),
                 country_code=entry.get("country_code"),
+                unit_cost=entry.get("unit_cost"),
+                currency_code=entry.get("currency_code"),
             )
         )
 

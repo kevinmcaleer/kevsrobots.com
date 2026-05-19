@@ -173,7 +173,8 @@ description: Edit a part in the catalog
     if (e.key === 'Enter') { e.preventDefault(); document.getElementById('part-add-tag-btn').click(); }
   });
 
-  // --- Suppliers (issue #149: + country picker) ---
+  // --- Suppliers (issue #149: + country picker;
+  //                supplier-pricing-feature: + price + currency) ---
   // Curated short-list of common supplier countries. "" maps to NULL
   // server-side (legacy / unknown). Order matches the most common
   // hobbyist suppliers we link to.
@@ -197,19 +198,52 @@ description: Edit a part in the catalog
     ).join('');
   }
 
+  // Same shortlist as the BOM editor (web/assets/js/project-editor.js).
+  // Keep these two in sync — the supplier-pricing feature reads from
+  // here and writes BOM-row labels that the project editor mirrors.
+  const SUPPLIER_CURRENCIES = [
+    { code: '',    label: '— (no price)' },
+    { code: 'GBP', label: 'GBP £' },
+    { code: 'USD', label: 'USD $' },
+    { code: 'EUR', label: 'EUR €' },
+    { code: 'JPY', label: 'JPY ¥' },
+    { code: 'AUD', label: 'AUD A$' },
+    { code: 'CAD', label: 'CAD C$' },
+  ];
+  function currencyOptionsHtml(selected) {
+    const sel = (selected || '').toUpperCase();
+    return SUPPLIER_CURRENCIES.map(c =>
+      `<option value="${esc(c.code)}"${c.code === sel ? ' selected' : ''}>${esc(c.label)}</option>`
+    ).join('');
+  }
+
   const suppliersList = document.getElementById('suppliers-list');
   function renderSuppliers(suppliers) {
     suppliersList.innerHTML = '';
-    (suppliers || []).forEach(s => addSupplierRow(s.name || '', s.url || '', s.country_code || ''));
+    (suppliers || []).forEach(s => addSupplierRow(
+      s.name || '',
+      s.url || '',
+      s.country_code || '',
+      s.unit_cost,
+      s.currency_code || ''
+    ));
   }
-  function addSupplierRow(name, url, countryCode) {
+  function addSupplierRow(name, url, countryCode, unitCost, currencyCode) {
     const row = document.createElement('div');
-    row.className = 'row g-2 mb-2 supplier-row';
+    row.className = 'supplier-row mb-3 p-2 border rounded';
+    const priceVal = (unitCost == null || unitCost === '') ? '' : Number(unitCost);
     row.innerHTML = `
-      <div class="col-md-3"><input type="text" class="form-control form-control-sm supplier-name" placeholder="Supplier name" value="${esc(name)}"></div>
-      <div class="col-md-6"><input type="url" class="form-control form-control-sm supplier-url" placeholder="https://..." value="${esc(url)}"></div>
-      <div class="col-md-2"><select class="form-select form-select-sm supplier-country" aria-label="Supplier country">${countryOptionsHtml(countryCode)}</select></div>
-      <div class="col-md-1 d-flex align-items-center"><button class="btn btn-sm text-danger supplier-remove" type="button" aria-label="Remove"><i class="fas fa-times"></i></button></div>
+      <div class="row g-2 mb-1 align-items-center">
+        <div class="col-md-3"><input type="text" class="form-control form-control-sm supplier-name" placeholder="Supplier name" value="${esc(name)}"></div>
+        <div class="col-md-6"><input type="url" class="form-control form-control-sm supplier-url" placeholder="https://..." value="${esc(url)}"></div>
+        <div class="col-md-2"><select class="form-select form-select-sm supplier-country" aria-label="Supplier country">${countryOptionsHtml(countryCode)}</select></div>
+        <div class="col-md-1 d-flex align-items-center justify-content-end"><button class="btn btn-sm text-danger supplier-remove" type="button" aria-label="Remove"><i class="fas fa-times"></i></button></div>
+      </div>
+      <div class="row g-2 align-items-center">
+        <div class="col-md-3"><input type="number" min="0" step="0.01" class="form-control form-control-sm supplier-cost" placeholder="Unit cost" value="${esc(priceVal === '' ? '' : priceVal)}" aria-label="Unit cost"></div>
+        <div class="col-md-2"><select class="form-select form-select-sm supplier-currency" aria-label="Currency">${currencyOptionsHtml(currencyCode)}</select></div>
+        <div class="col-md-7"><small class="text-muted">Used by any project that links its BOM row to this supplier — editing here auto-updates those rows.</small></div>
+      </div>
     `;
     row.querySelector('.supplier-remove').addEventListener('click', () => row.remove());
     suppliersList.appendChild(row);
@@ -217,6 +251,15 @@ description: Edit a part in the catalog
   function getSuppliers() {
     return Array.from(suppliersList.querySelectorAll('.supplier-row')).map(r => {
       const code = r.querySelector('.supplier-country').value.trim().toUpperCase();
+      const currency = r.querySelector('.supplier-currency').value.trim().toUpperCase();
+      const costRaw = r.querySelector('.supplier-cost').value.trim();
+      // Pydantic ge=0 — anything <0 is rejected server-side, so we
+      // clamp here for a friendlier UX. Empty string -> NULL.
+      let cost = null;
+      if (costRaw !== '') {
+        const parsed = parseFloat(costRaw);
+        if (!Number.isNaN(parsed) && parsed >= 0) cost = parsed;
+      }
       return {
         name: r.querySelector('.supplier-name').value.trim(),
         url: r.querySelector('.supplier-url').value.trim(),
@@ -224,10 +267,12 @@ description: Edit a part in the catalog
         // accepts two uppercase letters, so we omit the key entirely
         // for the "Other / unknown" option.
         country_code: code || null,
+        unit_cost: cost,
+        currency_code: currency || null,
       };
     }).filter(s => s.name || s.url);
   }
-  document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', '', ''));
+  document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', '', '', null, ''));
 
   // --- Category dropdown + family autocomplete (issue #135) ---
   async function loadCategories() {

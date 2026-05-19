@@ -78,6 +78,7 @@ layout: content
 
 <!-- JavaScript -->
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 // Projects live in projects-api now (was Chatter — the old /api/projects
 // endpoint returns 500 and the browser reports "Failed to fetch").
@@ -193,7 +194,6 @@ function createProjectCard(project) {
     statusBadge = '<span class="badge bg-secondary">Archived</span>';
   }
 
-  const imageUrl = project.cover_image || 'https://via.placeholder.com/400x300?text=No+Image';
   // Show the full description (truncation is handled by CSS line-clamp on
   // .kr-card-description) so we don't double-truncate.
   const description = project.short_description || '';
@@ -204,9 +204,18 @@ function createProjectCard(project) {
 
   const date = new Date(project.created_at).toLocaleDateString();
 
+  // Use the shared gradient+initials fallback when no cover image
+  // (matches the hub + profile pages). The previous static placeholder
+  // URL (via.placeholder.com) returned 404, leaving a broken image icon.
+  const thumb = (typeof projectThumbnail === 'function')
+    ? projectThumbnail(project)
+    : (project.cover_image
+        ? `<img src="${escapeHtml(project.cover_image)}" class="card-img-top" loading="lazy" alt="${escapeHtml(project.title)}">`
+        : `<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>`);
+
   col.innerHTML = `
     <div class="card kr-project-card h-100 shadow-sm">
-      <img src="${escapeHtml(imageUrl)}" class="card-img-top" loading="lazy" alt="${escapeHtml(project.title)}">
+      ${thumb}
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
           <h5 class="card-title mb-0">${escapeHtml(project.title)}</h5>
