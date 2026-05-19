@@ -284,14 +284,14 @@
   // --- Projects tab -------------------------------------------------------
 
   function renderProjectCard(p) {
-    // Match the hub's gradient-with-initials fallback when there's no cover
-    // image (see web/assets/js/project-gradient.js). Keeps the profile
-    // project tab visually consistent with /projects/ cards.
+    // Use the shared thumbnail helper; the .kr-project-card CSS wrapper
+    // pins it to 4:3 with object-fit:cover so all cards stay uniform
+    // regardless of cover image aspect.
     var thumb = typeof projectThumbnail === 'function'
-      ? projectThumbnail(p, 140)
+      ? projectThumbnail(p)
       : (p.cover_image
-          ? '<img src="' + esc(p.cover_image) + '" class="card-img-top" loading="lazy" alt="" style="height:140px;object-fit:cover;background:#f1f3f5;">'
-          : '<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height:140px;background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>');
+          ? '<img src="' + esc(p.cover_image) + '" class="card-img-top" loading="lazy" alt="">'
+          : '<div class="card-img-top d-flex align-items-center justify-content-center text-muted"><i class="fas fa-cube fa-2x"></i></div>');
     var diff = p.difficulty
       ? '<span class="badge bg-light text-dark me-1">' + esc(p.difficulty) + '</span>'
       : '';
@@ -308,15 +308,14 @@
     return '' +
       '<div class="col">' +
         '<a href="' + viewHref + '" class="text-decoration-none">' +
-          '<div class="card h-100 shadow-sm card-hover">' +
+          '<div class="card kr-project-card h-100 shadow-sm card-hover">' +
             thumb +
             '<div class="card-body p-3">' +
               '<h6 class="card-title text-dark mb-1">' + esc(p.title) + '</h6>' +
-              '<p class="card-text text-muted small mb-2">' +
-                esc((p.short_description || '').slice(0, 100)) +
-                ((p.short_description || '').length > 100 ? '…' : '') +
+              '<p class="card-text text-muted small mb-2 kr-card-description">' +
+                esc(p.short_description || '') +
               '</p>' +
-              '<div>' + status + diff + remix + '</div>' +
+              '<div class="kr-card-tags">' + status + diff + remix + '</div>' +
             '</div>' +
           '</div>' +
         '</a>' +

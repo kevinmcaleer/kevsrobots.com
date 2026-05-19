@@ -210,21 +210,21 @@ thanks: false
       grid.innerHTML = projects.map(p => `
         <div class="col">
           <a href="${myProjectIds.has(p.id) ? '/projects/editor.html?id=' + p.id : projectViewUrl(p)}" class="text-decoration-none">
-            <div class="card h-100 border-0 shadow-sm card-hover position-relative">
+            <div class="card kr-project-card h-100 border-0 shadow-sm card-hover position-relative">
               ${p.is_featured ? FeaturedProjects.ribbon('Featured') : ''}
-              ${projectThumbnail(p, 200)}
+              ${projectThumbnail(p)}
               <div class="card-body">
                 <h5 class="card-title text-dark">
                   ${p.is_remix ? '<i class="fas fa-code-branch text-muted me-1" title="Remix of another project" data-bs-toggle="tooltip"></i>' : ''}${esc(p.title)}
                 </h5>
-                <p class="card-text text-muted small">${esc(p.short_description || '')}</p>
+                <p class="card-text text-muted small kr-card-description">${esc(p.short_description || '')}</p>
                 <div class="d-flex flex-wrap gap-1 mb-2">
                   ${statusBadges[p.status] || ''}
                   ${p.difficulty ? `<span class="badge bg-${difficultyColors[p.difficulty] || 'secondary'}">${p.difficulty}</span>` : ''}
                   ${p.estimated_minutes ? `<span class="badge bg-light text-dark"><i class="fas fa-clock"></i> ${p.estimated_minutes}min</span>` : ''}
                   ${p.is_remix ? '<span class="badge bg-light text-muted"><i class="fas fa-code-branch"></i> Remix</span>' : ''}
                 </div>
-                <div class="d-flex flex-wrap gap-1">
+                <div class="d-flex flex-wrap gap-1 kr-card-tags">
                   ${(p.tags || []).slice(0, 4).map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('')}
                 </div>
               </div>
@@ -369,8 +369,8 @@ thanks: false
       row.innerHTML = items.map(p => `
         <div class="col">
           <a href="${popularUrl(p)}" class="text-decoration-none">
-            <div class="card h-100 border-0 shadow-sm card-hover">
-              ${projectThumbnail(p, 120)}
+            <div class="card kr-project-card h-100 border-0 shadow-sm card-hover">
+              ${projectThumbnail(p)}
               <div class="card-body p-2">
                 <div class="small fw-bold text-dark text-truncate" title="${esc(p.title)}">${esc(p.title)}</div>
                 <div class="small text-muted">

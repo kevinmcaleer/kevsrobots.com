@@ -394,7 +394,17 @@ description: View project details
   }
 
   /* Remix attribution banner */
-  #remix-attribution-banner { font-size: 0.95rem; }
+  #remix-attribution-banner {
+    font-size: 0.95rem;
+    /* Allow the banner to wrap onto a second line when the parent project
+       title is long, rather than overflowing its container. */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  #remix-attribution-banner a {
+    /* Long titles inside a link wrap mid-word if needed. */
+    word-break: break-word;
+  }
   #remix-attribution-tooltip { cursor: help; }
 
   /* Sidebar remix list */
@@ -413,6 +423,20 @@ description: View project details
     object-fit: cover;
     flex: 0 0 40px;
     background: #f1f3f5;
+  }
+  /* Without min-width:0 on the flex-grow child, text-truncate can't
+     clamp — long remix titles would push the container wider than the
+     sidebar and overflow visibly. Both the link and its wrapper need
+     to be shrinkable. */
+  #view-remixes .remix-item > .flex-grow-1 {
+    min-width: 0;
+  }
+  #view-remixes .remix-item a.text-truncate {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   #view-remixes .remix-item a { text-decoration: none; }
 

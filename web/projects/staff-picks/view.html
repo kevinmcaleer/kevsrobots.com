@@ -110,12 +110,12 @@ description: View a curated collection of projects
           : '';
         return '<div class="col">' +
           '<a href="' + href + '" class="text-decoration-none">' +
-            '<div class="card h-100 border-0 shadow-sm card-hover position-relative">' +
+            '<div class="card kr-project-card h-100 border-0 shadow-sm card-hover position-relative">' +
               (proj.is_featured ? '<span class="featured-ribbon"><i class="fas fa-star"></i> Featured</span>' : '') +
-              '<div class="project-thumb" style="height:160px;' + thumbStyle(proj) + '"></div>' +
+              '<div class="project-thumb" style="' + thumbStyle(proj) + '"></div>' +
               '<div class="card-body">' +
                 '<h5 class="card-title text-dark">' + esc(proj.title) + '</h5>' +
-                (proj.short_description ? '<p class="card-text small text-muted">' + esc(proj.short_description) + '</p>' : '') +
+                (proj.short_description ? '<p class="card-text small text-muted kr-card-description">' + esc(proj.short_description) + '</p>' : '') +
                 note +
                 (proj.author_username ? '<div class="small text-muted">by ' + esc(proj.author_username) + '</div>' : '') +
               '</div>' +

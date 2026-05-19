@@ -193,26 +193,27 @@ function createProjectCard(project) {
     statusBadge = '<span class="badge bg-secondary">Archived</span>';
   }
 
-  const imageUrl = project.cover_image || 'https://via.placeholder.com/400x200?text=No+Image';
-  const description = (project.short_description || '').substring(0, 100);
+  const imageUrl = project.cover_image || 'https://via.placeholder.com/400x300?text=No+Image';
+  // Show the full description (truncation is handled by CSS line-clamp on
+  // .kr-card-description) so we don't double-truncate.
+  const description = project.short_description || '';
 
-  const tagsHtml = (project.tags || []).slice(0, 3).map(tag =>
+  const tagsHtml = (project.tags || []).slice(0, 6).map(tag =>
     `<span class="badge bg-secondary me-1">${escapeHtml(tag)}</span>`
   ).join('');
 
   const date = new Date(project.created_at).toLocaleDateString();
 
   col.innerHTML = `
-    <div class="card h-100 shadow-sm">
-      <img src="${escapeHtml(imageUrl)}" class="card-img-top" alt="${escapeHtml(project.title)}"
-           style="height: 200px; object-fit: cover;">
+    <div class="card kr-project-card h-100 shadow-sm">
+      <img src="${escapeHtml(imageUrl)}" class="card-img-top" loading="lazy" alt="${escapeHtml(project.title)}">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
           <h5 class="card-title mb-0">${escapeHtml(project.title)}</h5>
           ${statusBadge}
         </div>
-        <p class="card-text text-muted small">${escapeHtml(description)}${description.length >= 100 ? '…' : ''}</p>
-        ${tagsHtml ? `<div class="mb-2">${tagsHtml}</div>` : ''}
+        <p class="card-text text-muted small kr-card-description">${escapeHtml(description)}</p>
+        ${tagsHtml ? `<div class="mb-2 kr-card-tags">${tagsHtml}</div>` : ''}
         <div class="d-flex justify-content-between align-items-center">
           <small class="text-muted">
             <i class="fas fa-download"></i> ${project.download_count || 0}

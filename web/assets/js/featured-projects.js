@@ -79,7 +79,7 @@
     var author = project.author_username ? esc(project.author_username) : '';
     return (
       '<a href="' + href + '" class="text-decoration-none">' +
-        '<div class="card h-100 border-0 shadow-sm card-hover">' +
+        '<div class="card kr-project-card h-100 border-0 shadow-sm card-hover">' +
           ribbon('Featured') +
           '<div class="project-thumb" style="' + cardThumbStyle(project) + '"></div>' +
           '<div class="card-body">' +
