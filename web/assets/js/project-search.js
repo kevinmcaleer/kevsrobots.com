@@ -47,7 +47,12 @@ var ProjectSearch = (function () {
    */
   function cardHtml(p, myProjectIds) {
     var owned = myProjectIds && myProjectIds.has(p.id);
-    var href = owned ? '/projects/editor.html?id=' + p.id : '/projects/view.html?id=' + p.id;
+    // Issue #152: prefer canonical /projects/<owner>/<slug> URL when the
+    // API surfaced a slug; fall back to ?id= for back-compat.
+    var viewHref = (p.slug && p.author_username)
+      ? '/projects/' + encodeURIComponent(p.author_username) + '/' + encodeURIComponent(p.slug)
+      : '/projects/view.html?id=' + p.id;
+    var href = owned ? '/projects/editor.html?id=' + p.id : viewHref;
     var diff = p.difficulty
       ? '<span class="badge bg-' + (DIFFICULTY_COLORS[p.difficulty] || 'secondary') + '">' + esc(p.difficulty) + '</span>'
       : '';

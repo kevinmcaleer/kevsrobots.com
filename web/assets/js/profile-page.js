@@ -293,9 +293,14 @@
     var remix = p.is_remix
       ? '<span class="badge bg-light text-muted me-1" title="Remix"><i class="fas fa-code-branch"></i></span>'
       : '';
+    // Issue #152: prefer canonical /projects/<owner>/<slug> URL when
+    // the API surfaced a slug on the list item.
+    var viewHref = (p.slug && p.author_username)
+      ? '/projects/' + encodeURIComponent(p.author_username) + '/' + encodeURIComponent(p.slug)
+      : '/projects/view.html?id=' + p.id;
     return '' +
       '<div class="col">' +
-        '<a href="/projects/view.html?id=' + p.id + '" class="text-decoration-none">' +
+        '<a href="' + viewHref + '" class="text-decoration-none">' +
           '<div class="card h-100 shadow-sm card-hover">' +
             thumb +
             '<div class="card-body p-3">' +

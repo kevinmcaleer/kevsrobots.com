@@ -197,9 +197,19 @@ thanks: false
         return;
       }
 
+      // Issue #152: prefer canonical /projects/<owner>/<slug> when the
+      // API surfaced a slug; fall back to ?id= for back-compat with any
+      // legacy ProjectListItem rows that haven't been backfilled.
+      function projectViewUrl(p) {
+        if (p && p.slug && p.author_username) {
+          return '/projects/' + encodeURIComponent(p.author_username) +
+                 '/' + encodeURIComponent(p.slug);
+        }
+        return '/projects/view.html?id=' + p.id;
+      }
       grid.innerHTML = projects.map(p => `
         <div class="col">
-          <a href="${myProjectIds.has(p.id) ? '/projects/editor.html?id=' + p.id : '/projects/view.html?id=' + p.id}" class="text-decoration-none">
+          <a href="${myProjectIds.has(p.id) ? '/projects/editor.html?id=' + p.id : projectViewUrl(p)}" class="text-decoration-none">
             <div class="card h-100 border-0 shadow-sm card-hover position-relative">
               ${p.is_featured ? FeaturedProjects.ribbon('Featured') : ''}
               ${projectThumbnail(p, 200)}
@@ -348,9 +358,17 @@ thanks: false
       const items = await resp.json();
       if (!Array.isArray(items) || items.length === 0) return;
       const row = document.getElementById('popular-row');
+      // Issue #152: emit canonical project URL when slug is available.
+      function popularUrl(p) {
+        if (p && p.slug && p.author_username) {
+          return '/projects/' + encodeURIComponent(p.author_username) +
+                 '/' + encodeURIComponent(p.slug);
+        }
+        return '/projects/view.html?id=' + p.id;
+      }
       row.innerHTML = items.map(p => `
         <div class="col">
-          <a href="/projects/view.html?id=${p.id}" class="text-decoration-none">
+          <a href="${popularUrl(p)}" class="text-decoration-none">
             <div class="card h-100 border-0 shadow-sm card-hover">
               ${projectThumbnail(p, 120)}
               <div class="card-body p-2">

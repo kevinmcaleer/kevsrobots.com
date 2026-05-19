@@ -64,7 +64,11 @@
   }
 
   function carouselCardHtml(project) {
-    var href = '/projects/view.html?id=' + encodeURIComponent(project.id);
+    // Issue #152: prefer canonical /projects/<owner>/<slug> URL when the
+    // FeaturedProjectResponse surfaced a slug.
+    var href = (project.slug && project.author_username)
+      ? '/projects/' + encodeURIComponent(project.author_username) + '/' + encodeURIComponent(project.slug)
+      : '/projects/view.html?id=' + encodeURIComponent(project.id);
     var note = project.featured_note ? '<div class="featured-note">' + esc(project.featured_note) + '</div>' : '';
     var author = project.author_username ? esc(project.author_username) : '';
     return (

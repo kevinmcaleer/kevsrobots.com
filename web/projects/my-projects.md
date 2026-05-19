@@ -225,7 +225,7 @@ function createProjectCard(project) {
           <a href="/projects/editor.html?id=${project.id}" class="btn btn-sm btn-primary">
             <i class="fas fa-pencil-alt"></i> Edit
           </a>
-          <a href="/projects/view.html?id=${project.id}" class="btn btn-sm btn-outline-primary">
+          <a href="${(project.slug && project.author_username) ? '/projects/' + encodeURIComponent(project.author_username) + '/' + encodeURIComponent(project.slug) : '/projects/view.html?id=' + project.id}" class="btn btn-sm btn-outline-primary">
             <i class="fas fa-eye"></i> View
           </a>
           <button class="btn btn-sm btn-outline-danger" onclick="deleteProject(${project.id}, '${escapeHtml(project.title).replace(/'/g, '&#39;')}')">

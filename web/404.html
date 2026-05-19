@@ -25,4 +25,30 @@ if (profileMatch && profileMatch[1]) {
   // Redirect to the correct profile page with query parameter
   window.location.replace(`/profile?username=${encodeURIComponent(username)}`);
 }
+
+// Issue #152: pretty project URLs of the form /projects/<owner>/<slug>.
+// Jekyll generates static files so these paths 404 on disk; the same
+// trick used for /profile/<username>/ above forwards them to the real
+// view.html with the lookup parameters in the query string. The view
+// page then calls /api/projects/by-slug/<owner>/<slug> and renders. We
+// must NOT match well-known sibling pages under /projects/ (hub,
+// editor, etc.) — the explicit denylist below keeps those routed to
+// their real Jekyll-generated 404 only when truly missing.
+const projectMatch = pathname.match(/^\/projects\/([^\/]+)\/([^\/]+)\/?$/);
+if (projectMatch) {
+  const KNOWN_PROJECTS_PAGES = new Set([
+    'admin', 'analytics', 'edit', 'editor', 'hub', 'index', 'my-projects',
+    'new', 'search', 'staff-picks', 'view'
+  ]);
+  const owner = projectMatch[1];
+  const slug = projectMatch[2];
+  // Reject paths whose first segment is a known sibling page or has a
+  // file extension (e.g. /projects/view.html that 404s for some other
+  // reason).
+  if (!KNOWN_PROJECTS_PAGES.has(owner) && !/\.[a-z0-9]+$/i.test(owner) && !/\.[a-z0-9]+$/i.test(slug)) {
+    const u = encodeURIComponent(owner);
+    const s = encodeURIComponent(slug);
+    window.location.replace(`/projects/view.html?owner=${u}&slug=${s}`);
+  }
+}
 </script>

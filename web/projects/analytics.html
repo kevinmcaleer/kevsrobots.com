@@ -110,6 +110,10 @@ description: Download analytics for your project
     return;
   }
 
+  // Issue #152: tentatively set the back-link to the id-based URL — the
+  // server redirect handles any inbound ?id= link transparently. We
+  // upgrade it to the canonical /projects/<owner>/<slug> in init() once
+  // the project metadata loads.
   document.getElementById('back-link').href = '/projects/view.html?id=' + projectId;
 
   async function loadProjectMeta() {
@@ -183,6 +187,13 @@ description: Download analytics for your project
     if (project && project.title) {
       document.title = project.title + ' — Analytics — KevsRobots';
       document.getElementById('project-title-line').textContent = project.title;
+      // Issue #152: upgrade the back-link to the canonical URL when we
+      // have the slug.
+      if (project.slug && project.author_username) {
+        document.getElementById('back-link').href =
+          '/projects/' + encodeURIComponent(project.author_username) +
+          '/' + encodeURIComponent(project.slug);
+      }
     }
 
     let resp;

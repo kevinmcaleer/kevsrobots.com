@@ -234,9 +234,14 @@ description: Moderation dashboard for the Projects Hub
       empty.classList.add('d-none');
       table.classList.remove('d-none');
       tbody.innerHTML = projects.map(function(p) {
+        // Issue #152: featured endpoint now surfaces slug — emit canonical
+        // URL when available; fall back to ?id= for legacy rows.
+        var viewHref = (p.slug && p.author_username)
+          ? '/projects/' + encodeURIComponent(p.author_username) + '/' + encodeURIComponent(p.slug)
+          : '/projects/view.html?id=' + p.id;
         return '<tr>' +
           '<td>' + p.id + '</td>' +
-          '<td><a href="/projects/view.html?id=' + p.id + '">' + esc(p.title) + '</a></td>' +
+          '<td><a href="' + viewHref + '">' + esc(p.title) + '</a></td>' +
           '<td>' + esc(p.author_username) + '</td>' +
           '<td><span class="small">' + esc(p.featured_note || '-') + '</span></td>' +
           '<td>' + esc(p.featured_by || '-') + '</td>' +

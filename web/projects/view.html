@@ -438,12 +438,46 @@ description: View project details
 (function() {
   const API = 'https://projects.kevsrobots.com';
   const params = new URLSearchParams(window.location.search);
-  const projectId = params.get('id');
+  // Issue #152: the page now accepts both URL shapes:
+  //   * legacy:    /projects/view.html?id=<int>
+  //   * canonical: /projects/<owner>/<slug>  (forwarded through 404.html
+  //                as /projects/view.html?owner=<owner>&slug=<slug>)
+  // We load the project via whichever pair is present; once we have the
+  // ProjectResponse back we rewrite the visible URL to the canonical
+  // form via history.replaceState so the address bar and any future
+  // bookmarks reflect the pretty URL.
+  let projectId = params.get('id');
+  const ownerParam = params.get('owner');
+  const slugParam = params.get('slug');
 
-  if (!projectId) {
+  // projectId is what every downstream API call needs (the existing
+  // id-based endpoints stay in place for back-compat). When we only
+  // have (owner, slug), we resolve it lazily inside loadProject().
+
+  if (!projectId && !(ownerParam && slugParam)) {
     document.getElementById('loading').classList.add('d-none');
     document.getElementById('not-found').classList.remove('d-none');
     return;
+  }
+
+  // Helper: canonical public URL for a loaded project.
+  function canonicalUrl(project) {
+    if (project && project.author_username && project.slug) {
+      return '/projects/' + encodeURIComponent(project.author_username) +
+             '/' + encodeURIComponent(project.slug);
+    }
+    return '/projects/view.html?id=' + (project ? project.id : projectId);
+  }
+
+  // Helper: rewrite the visible URL to the canonical form (once we know it).
+  // Preserves any existing hash (e.g. ``#makes``) so deep-linked anchors
+  // still resolve after the rewrite.
+  function rewriteUrlToCanonical(project) {
+    if (!project || !project.author_username || !project.slug) return;
+    const target = canonicalUrl(project) + (window.location.hash || '');
+    if (window.location.pathname + window.location.search + window.location.hash !== target) {
+      try { history.replaceState(null, '', target); } catch (e) {}
+    }
   }
 
   const difficultyColors = { beginner: 'success', intermediate: 'warning', advanced: 'danger' };
@@ -507,9 +541,29 @@ description: View project details
 
   async function loadProject() {
     try {
-      const resp = await fetch(API + '/api/projects/' + projectId, { credentials: 'include' });
+      // Issue #152: pick the API path that matches the inbound URL shape.
+      // ?id=<int> uses the legacy id endpoint; (owner, slug) uses the new
+      // by-slug endpoint. Either way we set ``projectId`` afterwards so
+      // every downstream id-based call (BOM, files, etc.) keeps working.
+      let fetchUrl;
+      if (projectId) {
+        fetchUrl = API + '/api/projects/' + projectId;
+      } else {
+        fetchUrl = API + '/api/projects/by-slug/' +
+                   encodeURIComponent(ownerParam) + '/' +
+                   encodeURIComponent(slugParam);
+      }
+      const resp = await fetch(fetchUrl, { credentials: 'include' });
       if (!resp.ok) throw new Error('Not found');
       const project = await resp.json();
+
+      // Backfill projectId from the response so the rest of this page
+      // (which still issues id-based API calls) just works.
+      if (!projectId) projectId = String(project.id);
+
+      // Rewrite the address bar to the canonical /projects/<owner>/<slug>
+      // URL. Skipped automatically if the URL is already canonical.
+      rewriteUrlToCanonical(project);
 
       document.getElementById('loading').classList.add('d-none');
       document.getElementById('project-view').classList.remove('d-none');
@@ -624,7 +678,15 @@ description: View project details
     if (!banner || !link || !author) return;
 
     link.textContent = project.remixed_from.title;
-    link.href = '/projects/view.html?id=' + project.remixed_from.id;
+    // Issue #152: prefer the canonical URL when the API surfaced a slug
+    // on the parent ref; fall back to ?id= for legacy responses.
+    if (project.remixed_from.slug && project.remixed_from.author_username) {
+      link.href = '/projects/' +
+                  encodeURIComponent(project.remixed_from.author_username) + '/' +
+                  encodeURIComponent(project.remixed_from.slug);
+    } else {
+      link.href = '/projects/view.html?id=' + project.remixed_from.id;
+    }
     author.textContent = project.remixed_from.author_username;
     // Issue #111: link the author to their profile.
     author.href = '/profile/?u=' + encodeURIComponent(project.remixed_from.author_username);
@@ -673,7 +735,11 @@ description: View project details
         if (isCurrent) {
           parts.push('<span class="crumb-current">' + esc(item.title) + '</span>');
         } else {
-          parts.push('<a href="/projects/view.html?id=' + item.id + '">' + esc(item.title) + '</a>');
+          // Issue #152: emit canonical URL when slug+owner are present.
+          const href = (item.slug && item.author_username)
+            ? '/projects/' + encodeURIComponent(item.author_username) + '/' + encodeURIComponent(item.slug)
+            : '/projects/view.html?id=' + item.id;
+          parts.push('<a href="' + href + '">' + esc(item.title) + '</a>');
         }
       }
       crumbs.innerHTML = '<i class="fas fa-code-branch me-1 text-muted" aria-hidden="true"></i>' + parts.join(' ');
@@ -702,10 +768,14 @@ description: View project details
         var thumb = r.cover_image
           ? '<img class="remix-thumb" loading="lazy" src="' + esc(r.cover_image) + '" alt="">'
           : '<span class="remix-thumb d-inline-flex align-items-center justify-content-center text-muted"><i class="fas fa-code-branch"></i></span>';
+        // Issue #152: prefer canonical URL when the API surfaced a slug.
+        var href = (r.slug && r.author_username)
+          ? '/projects/' + encodeURIComponent(r.author_username) + '/' + encodeURIComponent(r.slug)
+          : '/projects/view.html?id=' + r.id;
         return '<div class="remix-item">' +
           thumb +
           '<div class="flex-grow-1 small">' +
-            '<a href="/projects/view.html?id=' + r.id + '" class="d-block text-truncate">' + esc(r.title) + '</a>' +
+            '<a href="' + href + '" class="d-block text-truncate">' + esc(r.title) + '</a>' +
             '<span class="text-muted">by <a class="text-decoration-none" href="/profile/?u=' + encodeURIComponent(r.author_username) + '">' + esc(r.author_username) + '</a></span>' +
           '</div>' +
         '</div>';
@@ -925,7 +995,13 @@ description: View project details
       if (project.code_repo_url) readme += '**Code:** ' + project.code_repo_url + '\n';
       readme += '\n---\n\n';
       if (project.content_md) readme += project.content_md + '\n';
-      readme += '\n\n*Downloaded from [KevsRobots](https://www.kevsrobots.com/projects/view.html?id=' + project.id + ')*\n';
+      // Issue #152: emit the canonical project URL in the README so
+      // downloaded ZIPs link back to the SEO-friendly path. Fall back
+      // to ?id= for legacy projects whose slug hasn't backfilled yet.
+      var publicUrl = (project.author_username && project.slug)
+        ? 'https://www.kevsrobots.com/projects/' + encodeURIComponent(project.author_username) + '/' + encodeURIComponent(project.slug)
+        : 'https://www.kevsrobots.com/projects/view.html?id=' + project.id;
+      readme += '\n\n*Downloaded from [KevsRobots](' + publicUrl + ')*\n';
       zip.file('README.md', readme);
 
       // Images
