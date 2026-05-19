@@ -16,7 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_terms_accepted
 from ..db import get_session
 from ..models import Part, PartSupplier, Project, ProjectBOMItem
 from ..schemas import BOMItemCreate, BOMItemResponse
@@ -135,7 +135,7 @@ async def list_bom(
 async def add_bom_item(
     project_id: int,
     body: BOMItemCreate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> BOMItemResponse:
     await _check_owner(session, project_id, user)
@@ -165,7 +165,7 @@ async def update_bom_item(
     project_id: int,
     item_id: int,
     body: BOMItemCreate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> BOMItemResponse:
     await _check_owner(session, project_id, user)
@@ -198,7 +198,7 @@ async def update_bom_item(
 async def delete_bom_item(
     project_id: int,
     item_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     await _check_owner(session, project_id, user)

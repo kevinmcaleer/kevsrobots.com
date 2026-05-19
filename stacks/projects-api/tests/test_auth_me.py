@@ -72,6 +72,10 @@ async def test_auth_me_logged_in_returns_full_profile(
         "is_admin",
         "created_at",
         "avatar_url",
+        # terms-gate: T&Cs acceptance state exposed for the frontend gate.
+        "terms_accepted_at",
+        "terms_accepted_version",
+        "current_terms_version",
     }
     assert body["id"] == 42
     assert body["username"] == "kevin"
@@ -79,6 +83,10 @@ async def test_auth_me_logged_in_returns_full_profile(
     assert body["is_admin"] is False
     assert body["created_at"] == "2024-04-01T12:00:00Z"
     assert body["avatar_url"] is None
+    # Brand-new user with no acceptance row yet.
+    assert body["terms_accepted_at"] is None
+    assert body["terms_accepted_version"] is None
+    assert body["current_terms_version"] == "1.0"
 
     # Cache-Control: no-store is required (per-user, never cacheable).
     assert resp.headers.get("cache-control") == "no-store"

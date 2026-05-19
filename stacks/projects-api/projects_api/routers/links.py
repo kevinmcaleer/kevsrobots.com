@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectLink
 from ..schemas import LinkCreate, LinkResponse
@@ -31,7 +31,7 @@ async def list_links(
 async def add_link(
     project_id: int,
     body: LinkCreate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> LinkResponse:
     project = await session.get(Project, project_id)
@@ -50,7 +50,7 @@ async def add_link(
 async def delete_link(
     project_id: int,
     link_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     project = await session.get(Project, project_id)

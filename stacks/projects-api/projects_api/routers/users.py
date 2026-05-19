@@ -26,16 +26,19 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
+from ..config import get_settings
 from ..db import get_session
 from ..fx import SUPPORTED_CURRENCIES
 from ..models import (
     Download,
     Make,
     Project,
+    User,
     UserActivity,
     UserFollow,
     UserProfile,
@@ -136,6 +139,79 @@ async def _compute_stats(session: AsyncSession, username: str) -> UserProfileSta
         likes=0,
         followers=int(followers),
         following=int(following),
+    )
+
+
+# --- T&Cs acceptance gate (terms-gate) -----------------------------------
+#
+# ``POST /api/users/me/accept-terms`` records a user's "I agree" click.
+# This endpoint is intentionally NOT gated by ``require_terms_accepted``
+# (that would be circular) — it only requires authentication.
+#
+# We reject any version that doesn't exactly match
+# ``settings.current_terms_version``. The frontend reads the current
+# version off ``/api/auth/me`` so a stale tab can't accidentally lock in
+# an older acceptance.
+
+
+class AcceptTermsRequest(BaseModel):
+    version: str = Field(..., max_length=20)
+
+
+class AcceptTermsResponse(BaseModel):
+    accepted_at: datetime
+    version: str
+
+
+@router.post(
+    "/api/users/me/accept-terms",
+    response_model=AcceptTermsResponse,
+)
+async def accept_terms(
+    body: AcceptTermsRequest,
+    user: str = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> AcceptTermsResponse:
+    """Record the caller's acceptance of the current T&Cs version.
+
+    The request body's ``version`` must exactly match the server's
+    ``settings.current_terms_version``. Older versions are rejected with
+    400 so a stale frontend tab can't accidentally lock the user into
+    accepting an outdated copy.
+
+    The ``users`` row is created lazily on first call. Re-accepting the
+    same version is idempotent — the timestamp is refreshed.
+    """
+    settings = get_settings()
+    if body.version != settings.current_terms_version:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=(
+                f"Version {body.version!r} does not match the current "
+                f"terms version {settings.current_terms_version!r}."
+            ),
+        )
+
+    row = await session.scalar(select(User).where(User.username == user))
+    now = datetime.utcnow()
+    if row is None:
+        row = User(
+            username=user,
+            is_disabled=False,
+            terms_accepted_at=now,
+            terms_accepted_version=body.version,
+        )
+        session.add(row)
+    else:
+        row.terms_accepted_at = now
+        row.terms_accepted_version = body.version
+
+    await session.commit()
+    await session.refresh(row)
+
+    return AcceptTermsResponse(
+        accepted_at=row.terms_accepted_at or now,
+        version=row.terms_accepted_version or body.version,
     )
 
 

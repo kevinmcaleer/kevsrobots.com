@@ -12,7 +12,7 @@ from fastapi.responses import Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, get_optional_user
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Download, Project, ProjectFile
@@ -138,7 +138,7 @@ async def list_files(
 async def upload_file(
     project_id: int,
     file: UploadFile,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> FileResponse:
     project = await session.get(Project, project_id)
@@ -223,7 +223,7 @@ async def download_file(
 async def delete_file_endpoint(
     project_id: int,
     file_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     project = await session.get(Project, project_id)

@@ -26,6 +26,7 @@ from .db import (
     add_user_currency_preference_if_missing,
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
+    add_user_terms_acceptance_if_missing,
     create_all,
     get_sessionmaker,
     repair_stale_fks,
@@ -83,6 +84,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await add_user_currency_preference_if_missing()
     # Issue #136: ensure users.is_disabled / disabled_reason columns exist.
     await add_user_disabled_columns_if_missing()
+    # T&Cs acceptance gate (terms-gate): ensure terms_accepted_at +
+    # terms_accepted_version columns exist on legacy Postgres deployments.
+    await add_user_terms_acceptance_if_missing()
     # Issue #152: add projects.slug + (author_username, slug) unique
     # constraint + backfill legacy rows. Must run after create_all (which
     # builds the table on fresh deploys) and before any router handles a

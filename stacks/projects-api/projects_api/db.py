@@ -353,6 +353,53 @@ async def add_user_disabled_columns_if_missing() -> None:
             ))
 
 
+async def add_user_terms_acceptance_if_missing() -> None:
+    """Additive migration for the T&Cs acceptance gate (terms-gate).
+
+    Adds ``terms_accepted_at`` (TIMESTAMP NULL) and
+    ``terms_accepted_version`` (VARCHAR(20) NULL) to the existing
+    ``users`` table when they do not already exist. On fresh deploys
+    ``create_all`` builds the columns from the ORM definition, so this
+    helper is a no-op there. Postgres-only; SQLite tests rely on
+    ``create_all`` against a fresh in-memory DB.
+
+    Safe to run on every startup — runs an idempotent
+    ``information_schema`` probe before each ALTER.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'users'"
+        ))
+        if table_check.first() is None:
+            # Brand-new deployment — create_all on the same startup pass
+            # will build the table with every column already present.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'users'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "terms_accepted_at" not in cols:
+            logger.warning("Adding users.terms_accepted_at column (terms-gate)")
+            await conn.execute(text(
+                'ALTER TABLE "users" ADD COLUMN "terms_accepted_at" TIMESTAMP'
+            ))
+        if "terms_accepted_version" not in cols:
+            logger.warning(
+                "Adding users.terms_accepted_version column (terms-gate)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "users" ADD COLUMN "terms_accepted_version" '
+                'VARCHAR(20)'
+            ))
+
+
 async def add_supplier_health_columns_if_missing() -> None:
     """Additive migration for issue #122 Phase 2 (supplier link health).
 
