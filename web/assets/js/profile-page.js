@@ -284,9 +284,14 @@
   // --- Projects tab -------------------------------------------------------
 
   function renderProjectCard(p) {
-    var thumb = p.cover_image
-      ? '<img src="' + esc(p.cover_image) + '" class="card-img-top" loading="lazy" alt="" style="height:140px;object-fit:cover;background:#f1f3f5;">'
-      : '<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height:140px;background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>';
+    // Match the hub's gradient-with-initials fallback when there's no cover
+    // image (see web/assets/js/project-gradient.js). Keeps the profile
+    // project tab visually consistent with /projects/ cards.
+    var thumb = typeof projectThumbnail === 'function'
+      ? projectThumbnail(p, 140)
+      : (p.cover_image
+          ? '<img src="' + esc(p.cover_image) + '" class="card-img-top" loading="lazy" alt="" style="height:140px;object-fit:cover;background:#f1f3f5;">'
+          : '<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height:140px;background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>');
     var diff = p.difficulty
       ? '<span class="badge bg-light text-dark me-1">' + esc(p.difficulty) + '</span>'
       : '';
