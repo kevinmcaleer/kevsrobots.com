@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import AsyncIterator
 
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -292,6 +292,129 @@ async def add_bom_part_id_if_missing() -> None:
                 'CREATE INDEX IF NOT EXISTS "ix_project_bom_items_part_id" '
                 'ON "project_bom_items" ("part_id")'
             ))
+
+
+async def add_project_slug_if_missing() -> None:
+    """Additive migration for issue #152 (project owner/slug URLs).
+
+    Adds ``slug`` (VARCHAR(80), nullable) to the existing ``projects``
+    table when it does not already exist, creates the supporting index
+    and the ``(author_username, slug)`` unique constraint, and backfills
+    legacy rows whose slug column is NULL by deriving one from the title.
+    Idempotent — safe to run on every startup; no-op when nothing is
+    missing. Postgres-only — SQLite test runs use ``create_all`` against
+    a fresh in-memory DB which already includes the new column.
+
+    Concurrency: the backfill loop generates per-author unique slugs by
+    consulting the live ``projects`` table inside the same transaction;
+    two replicas racing to backfill the same rows is fine — the unique
+    constraint guarantees one of them rolls back on conflict.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'projects'"
+        ))
+        if table_check.first() is None:
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'projects'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "slug" not in cols:
+            logger.warning("Adding projects.slug column (issue #152)")
+            await conn.execute(text(
+                'ALTER TABLE "projects" ADD COLUMN "slug" VARCHAR(80)'
+            ))
+
+        # Always (re-)assert the supporting index — IF NOT EXISTS makes it
+        # cheap on subsequent restarts.
+        await conn.execute(text(
+            'CREATE INDEX IF NOT EXISTS "ix_projects_slug" '
+            'ON "projects" ("slug")'
+        ))
+
+        # And the (author_username, slug) unique constraint. ``ADD
+        # CONSTRAINT IF NOT EXISTS`` isn't a thing on older Postgres, so we
+        # probe information_schema first.
+        constraint_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.table_constraints "
+            "WHERE table_schema = current_schema() "
+            "  AND table_name = 'projects' "
+            "  AND constraint_name = 'uq_projects_author_slug'"
+        ))
+        if constraint_check.first() is None:
+            try:
+                await conn.execute(text(
+                    'ALTER TABLE "projects" ADD CONSTRAINT '
+                    '"uq_projects_author_slug" UNIQUE ("author_username", "slug")'
+                ))
+            except Exception as exc:  # noqa: BLE001 — log + continue
+                # If duplicate (author, slug) tuples already exist on
+                # legacy data, the constraint creation will fail. The
+                # backfill below dedupes via the suffix-loop and will
+                # succeed on the next restart.
+                logger.warning(
+                    "Could not add uq_projects_author_slug yet (will retry next boot): %s",
+                    exc,
+                )
+
+    # Backfill empty slugs from titles. Done in a separate transaction so
+    # the schema changes above commit even if the backfill is interrupted.
+    await _backfill_project_slugs()
+
+
+async def _backfill_project_slugs() -> None:
+    """Populate ``Project.slug`` for legacy rows where it's NULL.
+
+    Loads (id, author_username, title) for NULL-slug rows in a single
+    query, then writes a unique-per-author slug for each row using the
+    same algorithm as the create-path. Idempotent — re-running after a
+    crash skips already-populated rows because ``slug IS NULL`` filters
+    them out.
+    """
+    from .models import Project
+    from .slugs import slugify_title, unique_slug_for_author
+
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        rows = (
+            await session.execute(
+                select(Project.id, Project.author_username, Project.title)
+                .where(Project.slug.is_(None))
+            )
+        ).all()
+        if not rows:
+            return
+        logger.warning(
+            "Backfilling slugs for %d legacy projects (issue #152)", len(rows)
+        )
+        for pid, author, title in rows:
+            base = slugify_title(title or "")
+            try:
+                slug = await unique_slug_for_author(
+                    session,
+                    author_username=author,
+                    base_slug=base,
+                )
+                project = await session.get(Project, pid)
+                if project is None:
+                    continue
+                project.slug = slug
+                await session.flush()
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(
+                    "Failed to backfill slug for project %d: %s — skipping",
+                    pid, exc,
+                )
+                await session.rollback()
+        await session.commit()
 
 
 async def add_user_profile_columns_if_missing() -> None:

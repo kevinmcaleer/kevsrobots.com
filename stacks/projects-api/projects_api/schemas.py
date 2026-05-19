@@ -73,6 +73,12 @@ class ProjectUpdate(BaseModel):
     status: Optional[str] = Field(None, pattern="^(wip|completed|archived)$")
     cover_image: Optional[str] = None
     tags: Optional[list[str]] = None
+    # Issue #152: when ``regenerate_slug`` is true, the server picks a new
+    # slug derived from the (possibly updated) title. Existing slugs are
+    # sticky by default — renaming a project does NOT change its URL
+    # unless the user explicitly opts in. This keeps inbound links from
+    # blogs / search engines stable until the author asks for a refresh.
+    regenerate_slug: Optional[bool] = None
 
 
 class RemixedFromRef(BaseModel):
@@ -90,6 +96,10 @@ class RemixedFromRef(BaseModel):
 
 class ProjectResponse(BaseModel):
     id: int
+    # Issue #152: URL-friendly slug, unique per author. Combined with
+    # ``author_username`` forms the canonical ``/projects/<owner>/<slug>``
+    # URL on the frontend.
+    slug: Optional[str] = None
     title: str
     short_description: Optional[str]
     content_md: Optional[str]
@@ -123,6 +133,11 @@ class ProjectResponse(BaseModel):
 
 class ProjectListItem(BaseModel):
     id: int
+    # Issue #152: surface slug on list cards so the hub / search / profile
+    # pages can emit ``/projects/<owner>/<slug>`` URLs without an extra
+    # per-card fetch. Purely additive — clients that don't read it keep
+    # working.
+    slug: Optional[str] = None
     title: str
     short_description: Optional[str]
     difficulty: Optional[str]
@@ -326,6 +341,8 @@ class ProjectDownloadStats(BaseModel):
 
 class PopularProjectItem(BaseModel):
     id: int
+    # Issue #152: surface slug so the popular row can emit canonical URLs.
+    slug: Optional[str] = None
     title: str
     short_description: Optional[str]
     difficulty: Optional[str]
@@ -582,6 +599,9 @@ class FeaturedProjectResponse(BaseModel):
     """
 
     id: int
+    # Issue #152: surface slug so the featured carousel can emit canonical
+    # /projects/<owner>/<slug> URLs.
+    slug: Optional[str] = None
     title: str
     short_description: Optional[str] = None
     difficulty: Optional[str] = None
@@ -630,6 +650,9 @@ class StaffPickProjectRef(BaseModel):
     """Minimal project reference embedded inside a staff pick item."""
 
     id: int
+    # Issue #152: include slug so the staff-pick page can link to
+    # /projects/<owner>/<slug> instead of /projects/view.html?id=.
+    slug: Optional[str] = None
     title: str
     short_description: Optional[str] = None
     author_username: str

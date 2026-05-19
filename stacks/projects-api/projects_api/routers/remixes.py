@@ -42,6 +42,7 @@ MAX_CHAIN_DEPTH = 20
 def _list_item_from_project(project: Project, tags: list[str]) -> ProjectListItem:
     return ProjectListItem(
         id=project.id,
+        slug=getattr(project, "slug", None),
         title=project.title,
         short_description=project.short_description,
         difficulty=project.difficulty,
