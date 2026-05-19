@@ -190,14 +190,48 @@ hide_nibsy: true
         </div>
       </div>
 
-      <!-- Related Links -->
-      <div class="card mb-4">
+      <!-- Related Links (issue #171: BOM-style inline editable table) -->
+      <div class="card mb-4" id="editor-links-section">
         <div class="card-header py-2 d-flex justify-content-between align-items-center">
           <span><i class="fas fa-link me-1"></i> Related Links</span>
           <button class="btn btn-sm btn-outline-primary" id="add-link-btn"><i class="fas fa-plus"></i> Add Link</button>
         </div>
-        <div class="card-body">
-          <div id="links-list"></div>
+        <div class="card-body p-0">
+          <table class="table table-single table-narrow mb-0" id="links-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>URL</th>
+                <th style="width:130px">Type</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="links-body"></tbody>
+          </table>
+          <p id="links-empty" class="text-muted small p-3 mb-0 d-none">No links yet &mdash; click <strong>Add Link</strong> above.</p>
+        </div>
+      </div>
+
+      <!-- Videos (issue #171: first-class YouTube video list) -->
+      <div class="card mb-4" id="editor-videos-section">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+          <span><i class="fab fa-youtube me-1 text-danger"></i> Videos</span>
+          <button class="btn btn-sm btn-outline-primary" id="add-video-btn"><i class="fas fa-plus"></i> Add Video</button>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-single table-narrow mb-0" id="videos-table">
+            <thead>
+              <tr>
+                <th style="width:80px"></th>
+                <th>YouTube URL or ID</th>
+                <th>Title (optional)</th>
+                <th style="width:90px">Order</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="videos-body"></tbody>
+          </table>
+          <p id="videos-empty" class="text-muted small p-3 mb-0 d-none">No videos yet &mdash; paste a YouTube URL above.</p>
         </div>
       </div>
     </div>
@@ -221,7 +255,7 @@ hide_nibsy: true
                     data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="bottom"
                     data-bs-html="true"
                     data-bs-title="How completeness is scored"
-                    data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>BOM item</strong> (10) &middot; <strong>Code repo URL</strong> (10) &middot; <strong>File or journal entry</strong> (10)"
+                    data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>BOM item</strong> (10) &middot; <strong>Code repo URL</strong> (10) &middot; <strong>File, journal entry, or video</strong> (10)"
                     aria-label="How completeness is scored">
               <i class="fas fa-circle-question"></i>
             </button>
@@ -384,6 +418,12 @@ hide_nibsy: true
       extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-bom-section">Bill of Materials</a>`);
     }
     extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-files-section">Files &amp; Models</a>`);
+    // Issue #171: surface the videos card in the editor TOC when at
+    // least one video is present, mirroring the BOM behaviour.
+    const videoRows = document.querySelectorAll('#videos-body tr').length;
+    if (videoRows > 0) {
+      extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-videos-section">Videos</a>`);
+    }
 
     let body;
     if (headings.length === 0) {
@@ -449,6 +489,14 @@ hide_nibsy: true
         clearTimeout(render._t);
         render._t = setTimeout(render, 50);
       }).observe(bomBody, { childList: true });
+    }
+    // Same treatment for the Videos card (issue #171).
+    const videosBody = document.getElementById('videos-body');
+    if (videosBody) {
+      new MutationObserver(() => {
+        clearTimeout(render._t);
+        render._t = setTimeout(render, 50);
+      }).observe(videosBody, { childList: true });
     }
     render();
   }

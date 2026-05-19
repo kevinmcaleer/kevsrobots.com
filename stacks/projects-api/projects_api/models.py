@@ -169,6 +169,37 @@ class ProjectLink(Base):
     link_type: Mapped[str] = mapped_column(String(50), nullable=False, default="article")
 
 
+class ProjectVideo(Base):
+    """YouTube video attached to a project (issue #171).
+
+    First-class table so videos are queryable independently of the
+    generic ``project_links`` rows and can be embedded above the
+    description on the public view page. We store only the 11-char
+    YouTube id — the URL is reconstructed at render time
+    (``https://www.youtube.com/embed/{id}``). Brand-new table —
+    ``create_all`` handles it, no ALTER helper required.
+    """
+
+    __tablename__ = "project_videos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    # YouTube ids are exactly 11 chars today. Schema widens to 20 to
+    # leave headroom for any future id-format change without a
+    # migration; the Pydantic / extractor layer is the actual
+    # source-of-truth check.
+    youtube_id: Mapped[str] = mapped_column(String(20), nullable=False)
+    title: Mapped[Optional[str]] = mapped_column(String(200))
+    sort_order: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+
 class ProjectFile(Base):
     __tablename__ = "project_files"
 

@@ -59,6 +59,7 @@ from .routers import (
     remixes,
     staff_picks,
     users,
+    videos,
 )
 from .supplier_health import background_jobs_disabled, run_full_health_check
 
@@ -174,6 +175,9 @@ def create_app() -> FastAPI:
     app.include_router(files.router)
     app.include_router(images.router)
     app.include_router(links.router)
+    # Issue #171: YouTube videos as a first-class table, embedded above
+    # the description on the public view page.
+    app.include_router(videos.router)
     app.include_router(journal.router)
     app.include_router(moderation.router)
     # Issue #123: parts catalog moderation (reports + community merges).
