@@ -1025,17 +1025,11 @@
   }
 
   // --- File Upload ---
-  const fileDropzone = document.getElementById('file-dropzone');
+  // The sidebar's old #file-dropzone div was replaced with a click-to-pick
+  // button (issue: unify the editor's two drop targets into a single
+  // page-wide overlay). All drag-and-drop is now handled by the global
+  // overlay further down — see setupGlobalDropzone().
   const fileInput = document.getElementById('file-input');
-
-  ['dragenter', 'dragover'].forEach(evt => {
-    fileDropzone.addEventListener(evt, e => { e.preventDefault(); fileDropzone.classList.add('dragover'); });
-  });
-  ['dragleave', 'drop'].forEach(evt => {
-    fileDropzone.addEventListener(evt, e => { e.preventDefault(); fileDropzone.classList.remove('dragover'); });
-  });
-
-  fileDropzone.addEventListener('drop', e => uploadFiles(e.dataTransfer.files));
   fileInput.addEventListener('change', e => uploadFiles(e.target.files));
 
   const FILE_KINDS = {
@@ -1123,25 +1117,10 @@
   };
 
   // --- Image Upload ---
+  // Old #image-dropzone removed (replaced with a click-to-pick button).
+  // All drag-and-drop is handled by the global overlay in
+  // setupGlobalDropzone() further down.
   const imageInput = document.getElementById('image-input');
-  const imageDropzone = document.getElementById('image-dropzone');
-
-  ['dragenter', 'dragover'].forEach(evt => {
-    imageDropzone.addEventListener(evt, e => { e.preventDefault(); imageDropzone.classList.add('dragover'); });
-  });
-  ['dragleave', 'drop'].forEach(evt => {
-    imageDropzone.addEventListener(evt, e => { e.preventDefault(); imageDropzone.classList.remove('dragover'); });
-  });
-
-  imageDropzone.addEventListener('drop', e => {
-    // Split mixed drops: images go to the gallery, non-images get routed by
-    // the smart processor (files / README / license) so .dxf etc. don't 400.
-    const all = Array.from(e.dataTransfer.files || []);
-    const images = all.filter(isImageFile);
-    const others = all.filter(f => !isImageFile(f));
-    if (images.length) uploadImages(images);
-    if (others.length) processDroppedFiles(others);
-  });
   imageInput.addEventListener('change', e => uploadImages(e.target.files));
 
   async function uploadImages(fileList) {
@@ -2278,11 +2257,10 @@
       dragDepth = 0;
       overlay.classList.add('d-none');
       overlay.classList.remove('is-active');
-      // Don't intercept drops on the sidebar dropzones — they handle their own files.
-      const target = e.target;
-      if (target && (target.closest('#file-dropzone') || target.closest('#image-dropzone'))) {
-        return;
-      }
+      // No exceptions — the entire editor page is one drop target, and
+      // processDroppedFiles() routes by type: images → gallery,
+      // README/index.md → markdown editor, LICENSE → linked file,
+      // anything else in ALLOWED_FILE_EXTS → Files & Models.
       const files = e.dataTransfer && e.dataTransfer.files;
       if (files && files.length) processDroppedFiles(files);
     });

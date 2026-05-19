@@ -141,10 +141,15 @@ hide_nibsy: true
           <i class="fas fa-paperclip me-1"></i> Files & Models
         </div>
         <div class="card-body">
-          <div id="file-dropzone" class="text-center p-4 border border-dashed rounded mb-3">
-            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
-            <p class="text-muted mb-1">Drag files here or <label for="file-input" class="text-primary" style="cursor:pointer">click to choose</label></p>
-            <small class="text-muted">.py, .cpp, .ino, .stl, .pdf, .md, .json — 25MB max per file</small>
+          <!-- Drop targets unified: the entire page is the dropzone (see the
+               #global-dropzone overlay above). This area just keeps a click-
+               to-pick button for users who prefer the file dialog. -->
+          <div class="text-center mb-3">
+            <label for="file-input" class="btn btn-outline-primary btn-sm mb-1">
+              <i class="fas fa-upload me-1"></i> Choose files
+            </label>
+            <small class="text-muted d-block">or drag files anywhere on the page<br>
+              .py, .cpp, .ino, .stl, .dxf, .pdf, .md, .json, .zip … &mdash; 25MB max per file</small>
             <input type="file" id="file-input" class="d-none" multiple>
           </div>
           <div id="file-list"></div>
@@ -279,8 +284,12 @@ hide_nibsy: true
             <i class="fas fa-camera me-1"></i> Images
           </div>
           <div class="card-body">
-            <div id="image-dropzone" class="text-center p-3 border border-dashed rounded mb-2">
-              <small class="text-muted"><label for="image-input" style="cursor:pointer" class="text-primary">Upload images</label></small>
+            <!-- Click-to-pick only — the whole page is the dropzone (see
+                 #global-dropzone above). -->
+            <div class="text-center mb-2">
+              <label for="image-input" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-image me-1"></i> Choose images
+              </label>
               <input type="file" id="image-input" class="d-none" multiple accept="image/*">
             </div>
             <small class="text-muted d-block mb-2"><i class="fas fa-info-circle me-1"></i>First image is the cover. Drag to reorder.</small>
