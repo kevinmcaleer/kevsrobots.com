@@ -10,5 +10,6 @@ pyyaml
 python-dotenv
 httpx
 apscheduler
+python-jose[cryptography]
 pytest
 pytest-asyncio

@@ -204,10 +204,14 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
     settings = get_settings()
+    # ``allow_credentials=True`` so the admin portal page (served from
+    # www.kevsrobots.com) can include the Chatter cookie on its calls to
+    # nibsy.kevsrobots.com (#158). The cookie is set on the parent domain
+    # ``.kevsrobots.com`` and is required for ``require_admin``.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
-        allow_credentials=False,
+        allow_credentials=True,
         allow_methods=["GET", "POST"],
         allow_headers=["*"],
     )
