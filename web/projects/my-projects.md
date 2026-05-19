@@ -14,14 +14,14 @@ layout: content
   <a href="/login?redirect=/projects/my-projects" class="btn btn-primary">Login</a>
 </div>
 
-<div id="projects-container" class="d-none">
+<div id="projects-container">
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <p class="text-muted mb-0">Manage your draft and published projects</p>
     </div>
     <a href="/projects/new" class="btn btn-primary">
-      <i class="bi bi-plus-circle"></i> Create New Project
+      <i class="fas fa-plus-circle me-1"></i> Create New Project
     </a>
   </div>
 
@@ -33,13 +33,18 @@ layout: content
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="draft-tab" data-status="draft" onclick="filterProjects('draft')">
-        Drafts <span class="badge bg-warning ms-1" id="draft-count">0</span>
+      <button class="nav-link" id="wip-tab" data-status="wip" onclick="filterProjects('wip')">
+        In Progress <span class="badge bg-warning ms-1" id="wip-count">0</span>
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="published-tab" data-status="published" onclick="filterProjects('published')">
-        Published <span class="badge bg-success ms-1" id="published-count">0</span>
+      <button class="nav-link" id="completed-tab" data-status="completed" onclick="filterProjects('completed')">
+        Completed <span class="badge bg-success ms-1" id="completed-count">0</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="archived-tab" data-status="archived" onclick="filterProjects('archived')">
+        Archived <span class="badge bg-secondary ms-1" id="archived-count">0</span>
       </button>
     </li>
   </ul>
@@ -58,7 +63,7 @@ layout: content
 
   <!-- Empty State -->
   <div id="empty-state" class="text-center py-5 d-none">
-    <i class="bi bi-folder2-open" style="font-size: 4rem; color: #ccc;"></i>
+    <i class="fas fa-folder-open" style="font-size: 4rem; color: #ccc;"></i>
     <h5 class="mt-3">No projects yet</h5>
     <p class="text-muted">Start sharing your maker projects with the community!</p>
     <a href="/projects/new" class="btn btn-primary">Create Your First Project</a>
@@ -72,101 +77,78 @@ layout: content
 </div>
 
 <!-- JavaScript -->
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script>
-const API_BASE = 'https://chatter.kevsrobots.com/api';
-let currentUser = null;
+// Projects live in projects-api now (was Chatter — the old /api/projects
+// endpoint returns 500 and the browser reports "Failed to fetch").
+const PROJECTS_API = 'https://projects.kevsrobots.com';
 let allProjects = [];
 let currentFilter = '';
 
-// Check authentication and load user
+function authFetch(url, opts) {
+  if (window.ProjectAuth && typeof window.ProjectAuth.apiFetch === 'function') {
+    return window.ProjectAuth.apiFetch(url, opts);
+  }
+  opts = opts || {};
+  opts.credentials = 'include';
+  return fetch(url, opts);
+}
+
+// Check authentication and load projects.
+// /my/list is self-scoped — 401 if not logged in.
 async function checkAuth() {
   try {
-    const response = await fetch(`${API_BASE}/me`, {
-      credentials: 'include'
-    });
+    const response = await authFetch(`${PROJECTS_API}/api/projects/my/list`);
 
-    if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      document.getElementById('projects-container').classList.add('d-none');
       document.getElementById('login-required').classList.remove('d-none');
       return false;
     }
+    if (!response.ok) {
+      throw new Error(`Failed to load projects (${response.status})`);
+    }
 
-    currentUser = await response.json();
-    document.getElementById('projects-container').classList.remove('d-none');
-    await loadProjects();
+    allProjects = await response.json();
+    document.getElementById('loading').classList.add('d-none');
+    updateCounts();
+    displayProjects(allProjects);
     return true;
 
   } catch (error) {
-    console.error('Auth check failed:', error);
-    document.getElementById('login-required').classList.remove('d-none');
+    console.error('Failed to load my projects:', error);
+    document.getElementById('loading').classList.add('d-none');
+    const errorState = document.getElementById('error-state');
+    errorState.classList.remove('d-none');
+    document.getElementById('error-message').textContent = error.message;
     return false;
   }
 }
 
-// Load all user's projects
-async function loadProjects() {
-  const loading = document.getElementById('loading');
-  const grid = document.getElementById('projects-grid');
-  const errorState = document.getElementById('error-state');
-
-  loading.classList.remove('d-none');
-  grid.classList.add('d-none');
-  errorState.classList.add('d-none');
-
-  try {
-    // Fetch all projects by this user (both draft and published)
-    const response = await fetch(`${API_BASE}/projects?author_id=${currentUser.id}&per_page=100`, {
-      credentials: 'include'
-    });
-
-    if (!response.ok) throw new Error('Failed to load projects');
-
-    const data = await response.json();
-    allProjects = data.projects || [];
-
-    // Update counts
-    updateCounts();
-
-    // Display projects
-    displayProjects(allProjects);
-
-    loading.classList.add('d-none');
-
-  } catch (error) {
-    console.error('Error loading projects:', error);
-    loading.classList.add('d-none');
-    errorState.classList.remove('d-none');
-    document.getElementById('error-message').textContent = error.message;
-  }
-}
-
-// Update status counts
+// Update status counts. projects-api uses wip/completed/archived.
 function updateCounts() {
-  const draftCount = allProjects.filter(p => p.status === 'draft').length;
-  const publishedCount = allProjects.filter(p => p.status === 'published').length;
+  const wipCount = allProjects.filter(p => p.status === 'wip').length;
+  const completedCount = allProjects.filter(p => p.status === 'completed').length;
+  const archivedCount = allProjects.filter(p => p.status === 'archived').length;
 
   document.getElementById('all-count').textContent = allProjects.length;
-  document.getElementById('draft-count').textContent = draftCount;
-  document.getElementById('published-count').textContent = publishedCount;
+  document.getElementById('wip-count').textContent = wipCount;
+  document.getElementById('completed-count').textContent = completedCount;
+  document.getElementById('archived-count').textContent = archivedCount;
 }
 
 // Filter projects by status
 function filterProjects(status) {
   currentFilter = status;
 
-  // Update active tab
   document.querySelectorAll('#statusTabs button').forEach(btn => {
     btn.classList.remove('active');
   });
 
-  if (status === '') {
-    document.getElementById('all-tab').classList.add('active');
-  } else if (status === 'draft') {
-    document.getElementById('draft-tab').classList.add('active');
-  } else if (status === 'published') {
-    document.getElementById('published-tab').classList.add('active');
-  }
+  const tabId = status === '' ? 'all-tab' : `${status}-tab`;
+  const tabEl = document.getElementById(tabId);
+  if (tabEl) tabEl.classList.add('active');
 
-  // Filter and display
   const filtered = status === ''
     ? allProjects
     : allProjects.filter(p => p.status === status);
@@ -195,56 +177,59 @@ function displayProjects(projects) {
   });
 }
 
-// Create a project card
+// Create a project card. Field shape matches projects-api ProjectListItem:
+// id, title, short_description, difficulty, status, author_username,
+// cover_image, tags, created_at, is_remix, download_count.
 function createProjectCard(project) {
   const col = document.createElement('div');
   col.className = 'col';
 
-  const isDraft = project.status === 'draft';
-  const statusBadge = isDraft
-    ? '<span class="badge bg-warning text-dark">Draft</span>'
-    : '<span class="badge bg-success">Published</span>';
+  let statusBadge;
+  if (project.status === 'wip') {
+    statusBadge = '<span class="badge bg-warning text-dark">In Progress</span>';
+  } else if (project.status === 'completed') {
+    statusBadge = '<span class="badge bg-success">Completed</span>';
+  } else {
+    statusBadge = '<span class="badge bg-secondary">Archived</span>';
+  }
 
-  const imageUrl = project.primary_image_url || 'https://via.placeholder.com/400x200?text=No+Image';
+  const imageUrl = project.cover_image || 'https://via.placeholder.com/400x200?text=No+Image';
+  const description = (project.short_description || '').substring(0, 100);
 
   const tagsHtml = (project.tags || []).slice(0, 3).map(tag =>
     `<span class="badge bg-secondary me-1">${escapeHtml(tag)}</span>`
   ).join('');
 
-  const date = new Date(project.updated_at || project.created_at).toLocaleDateString();
+  const date = new Date(project.created_at).toLocaleDateString();
 
   col.innerHTML = `
     <div class="card h-100 shadow-sm">
-      <img src="${imageUrl}" class="card-img-top" alt="${escapeHtml(project.title)}"
+      <img src="${escapeHtml(imageUrl)}" class="card-img-top" alt="${escapeHtml(project.title)}"
            style="height: 200px; object-fit: cover;">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
           <h5 class="card-title mb-0">${escapeHtml(project.title)}</h5>
           ${statusBadge}
         </div>
-        <p class="card-text text-muted small">${escapeHtml(project.description.substring(0, 100))}...</p>
+        <p class="card-text text-muted small">${escapeHtml(description)}${description.length >= 100 ? '…' : ''}</p>
         ${tagsHtml ? `<div class="mb-2">${tagsHtml}</div>` : ''}
         <div class="d-flex justify-content-between align-items-center">
           <small class="text-muted">
-            <i class="bi bi-eye"></i> ${project.view_count || 0}
-            <i class="bi bi-heart ms-2"></i> ${project.like_count || 0}
-            <i class="bi bi-download ms-2"></i> ${project.download_count || 0}
+            <i class="fas fa-download"></i> ${project.download_count || 0}
           </small>
           <small class="text-muted">${date}</small>
         </div>
       </div>
       <div class="card-footer bg-transparent">
         <div class="btn-group w-100" role="group">
-          <a href="/projects/edit?id=${project.id}" class="btn btn-sm btn-primary">
-            <i class="bi bi-pencil"></i> Edit
+          <a href="/projects/editor.html?id=${project.id}" class="btn btn-sm btn-primary">
+            <i class="fas fa-pencil-alt"></i> Edit
           </a>
-          ${!isDraft ? `
-            <a href="/projects/view?id=${project.id}" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-eye"></i> View
-            </a>
-          ` : ''}
-          <button class="btn btn-sm btn-outline-danger" onclick="deleteProject(${project.id}, '${escapeHtml(project.title)}')">
-            <i class="bi bi-trash"></i>
+          <a href="/projects/view.html?id=${project.id}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-eye"></i> View
+          </a>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteProject(${project.id}, '${escapeHtml(project.title).replace(/'/g, '&#39;')}')">
+            <i class="fas fa-trash"></i>
           </button>
         </div>
       </div>
@@ -254,25 +239,30 @@ function createProjectCard(project) {
   return col;
 }
 
-// Delete project
+// Delete project via projects-api.
 async function deleteProject(projectId, projectTitle) {
   if (!confirm(`Are you sure you want to delete "${projectTitle}"? This cannot be undone.`)) {
     return;
   }
 
   try {
-    const response = await fetch(`${API_BASE}/projects/${projectId}`, {
-      method: 'DELETE',
-      credentials: 'include'
+    const response = await authFetch(`${PROJECTS_API}/api/projects/${projectId}`, {
+      method: 'DELETE'
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Failed to delete project');
+      let detail = `Failed to delete project (${response.status})`;
+      try {
+        const err = await response.json();
+        if (err && err.detail) detail = err.detail;
+      } catch (e) {}
+      throw new Error(detail);
     }
 
-    // Reload projects
-    await loadProjects();
+    // Drop the row from local cache and re-render rather than refetching.
+    allProjects = allProjects.filter(p => p.id !== projectId);
+    updateCounts();
+    filterProjects(currentFilter);
     showToast('Project deleted successfully');
 
   } catch (error) {
@@ -302,4 +292,3 @@ function showToast(message) {
 checkAuth();
 </script>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">

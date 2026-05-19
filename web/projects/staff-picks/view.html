@@ -1,0 +1,130 @@
+---
+title: Staff Pick
+layout: default
+description: View a curated collection of projects
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+
+<div class="container py-4">
+  <div class="mb-3">
+    <a href="/projects/staff-picks/" class="text-decoration-none text-muted"><i class="fas fa-arrow-left"></i> All Staff Picks</a>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="not-found" class="text-center py-5 d-none">
+    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+    <h3>Staff pick not found</h3>
+    <a href="/projects/staff-picks/" class="btn btn-primary mt-3">Browse all picks</a>
+  </div>
+
+  <div id="pick-view" class="d-none">
+    <h1 id="pick-title" class="mb-1"></h1>
+    <p id="pick-period" class="text-muted small mb-2"></p>
+    <p id="pick-description" class="lead"></p>
+    <p id="pick-byline" class="small text-muted"></p>
+    <hr>
+
+    <div id="items-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
+
+    <div id="no-items" class="text-center py-5 d-none">
+      <p class="text-muted">No projects in this pick yet.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  var API = 'https://projects.kevsrobots.com';
+  var params = new URLSearchParams(window.location.search);
+  var pickId = parseInt(params.get('id'), 10);
+
+  function esc(t) {
+    var d = document.createElement('div');
+    d.textContent = t == null ? '' : String(t);
+    return d.innerHTML;
+  }
+
+  function thumbStyle(project) {
+    if (project && project.cover_image) {
+      return 'background-image:url(\'' + esc(project.cover_image) + '\');background-size:cover;background-position:center;';
+    }
+    var hue = ((project && project.id) || 0) * 53 % 360;
+    return 'background:linear-gradient(135deg,hsl(' + hue + ',70%,55%),hsl(' + ((hue + 60) % 360) + ',70%,40%));';
+  }
+
+  function formatPeriod(p) {
+    if (!p.period_start && !p.period_end) return '';
+    var s = p.period_start ? new Date(p.period_start).toLocaleDateString() : '?';
+    var e = p.period_end ? new Date(p.period_end).toLocaleDateString() : '?';
+    return s + ' → ' + e;
+  }
+
+  async function init() {
+    if (!pickId) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('not-found').classList.remove('d-none');
+      return;
+    }
+    try {
+      var resp = await fetch(API + '/api/staff-picks/' + pickId, { credentials: 'include' });
+      if (resp.status === 404) {
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('not-found').classList.remove('d-none');
+        return;
+      }
+      if (!resp.ok) throw new Error('failed');
+      var pick = await resp.json();
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('pick-view').classList.remove('d-none');
+      document.title = pick.title + ' — Staff Pick — KevsRobots';
+      document.getElementById('pick-title').textContent = pick.title;
+      document.getElementById('pick-description').textContent = pick.description || '';
+      var period = formatPeriod(pick);
+      document.getElementById('pick-period').textContent = period
+        ? 'Period: ' + period
+        : '';
+      document.getElementById('pick-byline').textContent =
+        'Curated by ' + pick.created_by + ' on ' + new Date(pick.created_at).toLocaleDateString();
+
+      var items = pick.items || [];
+      if (!items.length) {
+        document.getElementById('no-items').classList.remove('d-none');
+        return;
+      }
+      document.getElementById('items-grid').innerHTML = items.map(function(it) {
+        var proj = it.project || { id: it.project_id, title: '#' + it.project_id };
+        var href = '/projects/view.html?id=' + proj.id;
+        var note = it.editor_note
+          ? '<blockquote class="featured-note small fst-italic text-muted border-start ps-2 mb-2">' + esc(it.editor_note) + '</blockquote>'
+          : '';
+        return '<div class="col">' +
+          '<a href="' + href + '" class="text-decoration-none">' +
+            '<div class="card h-100 border-0 shadow-sm card-hover position-relative">' +
+              (proj.is_featured ? '<span class="featured-ribbon"><i class="fas fa-star"></i> Featured</span>' : '') +
+              '<div class="project-thumb" style="height:160px;' + thumbStyle(proj) + '"></div>' +
+              '<div class="card-body">' +
+                '<h5 class="card-title text-dark">' + esc(proj.title) + '</h5>' +
+                (proj.short_description ? '<p class="card-text small text-muted">' + esc(proj.short_description) + '</p>' : '') +
+                note +
+                (proj.author_username ? '<div class="small text-muted">by ' + esc(proj.author_username) + '</div>' : '') +
+              '</div>' +
+            '</div>' +
+          '</a>' +
+        '</div>';
+      }).join('');
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('not-found').classList.remove('d-none');
+    }
+  }
+
+  init();
+})();
+</script>

@@ -57,6 +57,7 @@ async def session(sessionmaker_) -> AsyncIterator[AsyncSession]:
 @pytest_asyncio.fixture
 async def client(engine, sessionmaker_) -> AsyncIterator[AsyncClient]:
     from projects_api import db as db_module
+    from projects_api import main as main_module
     from projects_api.main import create_app
 
     async def _override_session() -> AsyncIterator[AsyncSession]:
@@ -69,6 +70,13 @@ async def client(engine, sessionmaker_) -> AsyncIterator[AsyncClient]:
     original_create_all = db_module.create_all
     db_module.create_all = _noop_create_all
 
+    # Issue #106: route the lifespan seeder at the test sessionmaker so
+    # the badge catalog lands in the in-memory DB the test fixture set up
+    # (instead of the global engine the seeder would otherwise grab).
+    original_get_sessionmaker = db_module.get_sessionmaker
+    db_module.get_sessionmaker = lambda: sessionmaker_
+    main_module.get_sessionmaker = lambda: sessionmaker_
+
     app = create_app()
     app.dependency_overrides[db_module.get_session] = _override_session
 
@@ -78,6 +86,8 @@ async def client(engine, sessionmaker_) -> AsyncIterator[AsyncClient]:
             yield ac
 
     db_module.create_all = original_create_all
+    db_module.get_sessionmaker = original_get_sessionmaker
+    main_module.get_sessionmaker = original_get_sessionmaker
 
 
 def make_auth_header(username: str = "testuser") -> dict:

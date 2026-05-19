@@ -180,10 +180,16 @@ var ProjectInteractions = (function () {
 
   function renderCommentThread(comment, projectUrl, depth) {
     var indent = depth > 0 ? ' ms-4 border-start ps-3' : '';
+    var authorName = comment.author_username || comment.author || 'Anonymous';
+    // Issue #111: link author to their profile when we have a username.
+    var authorHtml = comment.author_username
+      ? '<a href="/profile/?u=' + encodeURIComponent(comment.author_username) +
+        '" class="text-decoration-none"><strong class="small">' + esc(authorName) + '</strong></a>'
+      : '<strong class="small">' + esc(authorName) + '</strong>';
     var html =
       '<div class="comment-thread mb-3' + indent + '">' +
         '<div class="d-flex align-items-center mb-1">' +
-          '<strong class="small">' + esc(comment.author_username || comment.author || 'Anonymous') + '</strong>' +
+          authorHtml +
           '<span class="text-muted small ms-2">' + relativeTime(comment.created_at) + '</span>' +
         '</div>' +
         '<div class="small mb-1">' + esc(comment.content) + '</div>' +

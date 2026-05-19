@@ -9,6 +9,8 @@ thanks: false
 
 {% include nav_projects.html %}
 
+
+
 # {{page.title}}
 ## {{page.description}}
 
@@ -16,8 +18,22 @@ thanks: false
 
 ---
 
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+
 <!-- Project Gallery Component -->
 <div id="projects-hub">
+  <!-- Featured projects carousel (issue #115). Hidden by default; the
+       loader removes d-none once it has at least one featured project to
+       render — on a fresh install the whole shelf stays out of the DOM
+       flow. -->
+  <div id="featured-section" class="featured-carousel-wrap d-none">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h4 class="mb-0"><i class="fas fa-star text-warning me-3"></i> Featured Projects</h4>
+      <a href="/projects/staff-picks/" class="small text-decoration-none">Browse Staff Picks <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div id="featured-carousel" class="featured-carousel"></div>
+  </div>
+
   <!-- Popular this month -->
   <div id="popular-section" class="mb-4 d-none">
     <h4 class="mb-3"><i class="fas fa-fire text-danger me-2"></i>Popular this month</h4>
@@ -89,6 +105,8 @@ thanks: false
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-search.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -155,7 +173,9 @@ thanks: false
         // archived projects and returns download_count baked in.
         resp = await fetch(API + '/api/projects/popular?window=30d&limit=100');
       } else {
-        resp = await fetch(API + '/api/projects?');
+        // Issue #140: ask the API to boost followed-author projects for
+        // logged-in viewers. The flag is harmless for anonymous calls.
+        resp = await ProjectAuth.apiFetch(API + '/api/projects?boost_followed=true');
       }
       if (!resp.ok) throw new Error('API error');
       let projects = await resp.json();
@@ -180,7 +200,8 @@ thanks: false
       grid.innerHTML = projects.map(p => `
         <div class="col">
           <a href="${myProjectIds.has(p.id) ? '/projects/editor.html?id=' + p.id : '/projects/view.html?id=' + p.id}" class="text-decoration-none">
-            <div class="card h-100 border-0 shadow-sm card-hover">
+            <div class="card h-100 border-0 shadow-sm card-hover position-relative">
+              ${p.is_featured ? FeaturedProjects.ribbon('Featured') : ''}
               ${projectThumbnail(p, 200)}
               <div class="card-body">
                 <h5 class="card-title text-dark">
@@ -198,7 +219,7 @@ thanks: false
                 </div>
               </div>
               <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
-                <small class="text-muted">by ${esc(p.author_username)} &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
+                <small class="text-muted">by <span data-profile-username="${esc(p.author_username)}" class="profile-username-link">${esc(p.author_username)}</span><span class="ms-1 d-none" data-author-gold="${esc(p.author_username)}"></span> &middot; ${new Date(p.created_at).toLocaleDateString()}</small>
                 <small class="text-muted d-flex gap-2 align-items-center">
                   <span id="card-makes-${p.id}" class="d-none"><i class="fas fa-hammer"></i> <span data-count></span></span>
                   <span id="card-likes-${p.id}"><i class="far fa-heart"></i> </span>
@@ -236,6 +257,40 @@ thanks: false
           .catch(function () {});
       });
 
+      // Issue #111: hijack clicks on author-username spans so they
+      // navigate to the user's profile instead of the project. Implemented
+      // as a click handler rather than a nested <a> because the card is
+      // already wrapped in one (invalid HTML).
+      grid.querySelectorAll('.profile-username-link').forEach(function (el) {
+        el.style.cursor = 'pointer';
+        el.classList.add('text-decoration-underline');
+        el.addEventListener('click', function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          var u = el.getAttribute('data-profile-username') || '';
+          if (u) window.location.href = '/profile/?u=' + encodeURIComponent(u);
+        });
+      });
+
+      // Issue #106: project card adornment — when an author has any
+      // gold-tier badge, show a small trophy icon next to their name.
+      // One fetch per unique author, cached for the page lifetime.
+      var uniqueAuthors = Array.from(new Set(projects.map(function (p) { return p.author_username; })));
+      uniqueAuthors.forEach(function (author) {
+        fetch(API + '/api/users/' + encodeURIComponent(author) + '/badges')
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (badges) {
+            var goldBadge = (badges || []).find(function (b) { return b.tier === 'gold'; });
+            if (!goldBadge) return;
+            var slots = document.querySelectorAll('[data-author-gold="' + author.replace(/"/g, '\\"') + '"]');
+            slots.forEach(function (slot) {
+              slot.innerHTML = '<i class="fa-solid fa-trophy text-warning" title="' + esc(goldBadge.name) + '" data-bs-toggle="tooltip"></i>';
+              slot.classList.remove('d-none');
+            });
+          })
+          .catch(function () {});
+      });
+
     } catch (e) {
       console.error('Failed to load projects:', e);
       spinner.classList.add('d-none');
@@ -262,6 +317,26 @@ thanks: false
   difficultyFilter.addEventListener('change', redirectToSearch);
   tagFilter.addEventListener('input', debouncedRedirect);
   if (sortSelect) sortSelect.addEventListener('change', loadProjects);
+
+  // Featured carousel (issue #115). One extra API call to
+  // /api/projects/featured. Fails closed: any error / empty list leaves
+  // the section hidden so the hub looks identical to today on a fresh
+  // install with no featured projects yet.
+  async function loadFeatured() {
+    try {
+      const items = await FeaturedProjects.load({ api: API, limit: 6 });
+      if (!Array.isArray(items) || items.length === 0) return;
+      const rendered = FeaturedProjects.mountCarousel(
+        document.getElementById('featured-carousel'),
+        items
+      );
+      if (rendered) {
+        document.getElementById('featured-section').classList.remove('d-none');
+      }
+    } catch (e) {
+      // Silent — the carousel is non-critical.
+    }
+  }
 
   // Fail-closed loader for the "Popular this month" row at the top.
   // If the API errors or returns nothing, the section stays hidden — no UX
@@ -297,6 +372,7 @@ thanks: false
   checkAuth().then(() => {
     loadProjects();
     loadPopular();
+    loadFeatured();
   });
 })();
 </script>

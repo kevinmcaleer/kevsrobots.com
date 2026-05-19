@@ -4,7 +4,9 @@
 .kr-feedback-pill {
   position: fixed;
   bottom: 1.5rem;
-  right: 1.5rem;
+  /* Sit to the left of the Nibsy widget (Nibsy's collapsed show-button
+     is a 48px circle anchored at right:20px, so we offset past it). */
+  right: 5rem;
   z-index: 1040;
   display: none;
   align-items: center;
