@@ -345,12 +345,35 @@
     if (dom.addBtn) dom.addBtn.classList.add('d-none');
   }
 
+  // Insert a prominent "Open Instruction Builder" CTA at the top of the
+  // instructions card. Routes to the standalone Fabric.js page (Phase 1).
+  // Rendered here (not in editor.html) so it stays adjacent to its
+  // owning section and only shows up once the section module has
+  // initialised — keeps the editor template lean.
+  function renderOpenBuilderButton() {
+    if (!dom.section) return;
+    if (document.getElementById('open-instruction-builder')) return; // idempotent
+    if (!state.isOwner) return; // viewers shouldn't see an editor entry-point
+    var cardBody = dom.section.querySelector('.card-body');
+    if (!cardBody) return;
+    var btn = document.createElement('a');
+    btn.id = 'open-instruction-builder';
+    btn.className = 'btn btn-primary mb-3';
+    btn.href = '/projects/instructions/edit.html?id=' + encodeURIComponent(state.projectId);
+    btn.innerHTML = '<i class="fas fa-paint-brush me-2"></i>Open Instruction Builder';
+    // Place right under the lead paragraph (above the title input) so
+    // the user can dive straight into the visual editor without
+    // scrolling past the outline UI.
+    cardBody.insertBefore(btn, cardBody.firstChild);
+  }
+
   async function init(projectId, isOwner) {
     state.projectId = projectId;
     state.isOwner = isOwner !== false;  // default to owner if unspecified
     bindDom();
     if (!dom.section) return;  // page didn't render the section — nothing to do
     applyOwnerGating();
+    renderOpenBuilderButton();
     wireMetaInputs();
     wireAddButton();
 
