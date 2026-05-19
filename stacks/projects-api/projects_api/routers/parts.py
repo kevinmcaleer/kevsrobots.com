@@ -343,6 +343,7 @@ async def search_parts(
                 primary_supplier_url=await _primary_supplier_url(session, p.id),
                 category=p.category,
                 family=p.family,
+                image_url=p.image_url,
             )
         )
     return results
