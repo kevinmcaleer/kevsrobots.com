@@ -1,0 +1,180 @@
+---
+title: Instruction Builder
+layout: default
+description: Visual step-by-step instruction builder for your project
+permalink: /projects/instructions/edit.html
+hide_nibsy: true
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/instruction-builder.css?v={{ site.time | date: '%s' }}">
+
+<!-- Tag the body so site-level CSS rules (footer hide, container reset)
+     scope to this workspace only. The script is tiny and runs synchronously
+     so it doesn't fight first paint. -->
+<script>document.body.classList.add('instruction-builder-page');</script>
+
+<div class="ib-workspace" id="ib-workspace">
+  <!-- Header strip -->
+  <div class="ib-header">
+    <div class="ib-header-left">
+      <a id="ib-back-link" href="/projects/editor.html" class="text-decoration-none">
+        <i class="fas fa-arrow-left me-1"></i> Back to editor
+      </a>
+    </div>
+    <div class="ib-header-center">
+      <span class="ib-project-title" id="ib-project-title">Loading…</span>
+      <span class="ib-save-status" id="ib-save-status" aria-live="polite"></span>
+    </div>
+    <div class="ib-header-right">
+      <a id="ib-open-editor-newtab" href="/projects/editor.html" target="_blank" rel="noopener" class="text-decoration-none small">
+        <i class="fas fa-external-link-alt me-1"></i> Open editor in new tab
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading / error / not-owner states. The builder JS swaps these
+       on/off depending on the page state — only one is visible at a time. -->
+  <div class="ib-loading" id="ib-loading">
+    <i class="fas fa-spinner fa-spin me-2"></i> Loading instruction builder…
+  </div>
+
+  <div class="ib-not-owner d-none" id="ib-not-owner">
+    <div class="ib-icon"><i class="fas fa-lock"></i></div>
+    <h4>You don't own this project</h4>
+    <p class="text-muted">Only the project author can edit its build instructions.</p>
+    <a href="/projects/" class="btn btn-outline-primary mt-2">
+      <i class="fas fa-arrow-left me-1"></i> Back to projects
+    </a>
+  </div>
+
+  <div class="ib-error d-none" id="ib-error">
+    <div class="ib-icon text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+    <h4>Couldn't load this project</h4>
+    <p class="text-muted" id="ib-error-detail">The project may not exist, or you may need to log in.</p>
+    <a href="/projects/" class="btn btn-outline-primary mt-2">
+      <i class="fas fa-arrow-left me-1"></i> Back to projects
+    </a>
+  </div>
+
+  <!-- Main grid: hidden until the loader resolves -->
+  <div class="ib-main d-none" id="ib-main">
+
+    <!-- LEFT: Toolbar -->
+    <aside class="ib-toolbar" aria-label="Drawing tools">
+
+      <div class="ib-toolbar-section">
+        <h6>Background</h6>
+        <button type="button" class="ib-tool-btn is-wide w-100 mb-2" id="ib-upload-image-btn">
+          <i class="fas fa-image"></i> Upload image
+        </button>
+        <button type="button" class="ib-tool-btn is-wide w-100" id="ib-remove-image-btn" disabled>
+          <i class="fas fa-times"></i> Remove image
+        </button>
+        <input type="file" accept="image/*" class="ib-hidden-file" id="ib-image-input">
+      </div>
+
+      <div class="ib-toolbar-section">
+        <h6>Tools</h6>
+        <div class="ib-tool-grid">
+          <button type="button" class="ib-tool-btn is-active" data-tool="select" title="Select / move">
+            <i class="fas fa-mouse-pointer"></i> Select
+          </button>
+          <button type="button" class="ib-tool-btn" data-tool="arrow" title="Arrow">
+            <i class="fas fa-long-arrow-alt-right"></i> Arrow
+          </button>
+          <button type="button" class="ib-tool-btn" data-tool="text" title="Text">
+            <i class="fas fa-font"></i> Text
+          </button>
+          <button type="button" class="ib-tool-btn" data-tool="rectangle" title="Rectangle">
+            <i class="far fa-square"></i> Rect
+          </button>
+          <button type="button" class="ib-tool-btn" data-tool="circle" title="Circle">
+            <i class="far fa-circle"></i> Circle
+          </button>
+        </div>
+      </div>
+
+      <div class="ib-toolbar-section">
+        <h6>Style</h6>
+        <div class="ib-style-row">
+          <label for="ib-color">Colour</label>
+          <input type="color" id="ib-color" value="#dc3545">
+        </div>
+        <div class="ib-style-row">
+          <label for="ib-stroke">Stroke</label>
+          <input type="range" id="ib-stroke" min="1" max="10" step="1" value="3">
+          <span class="ib-stroke-value" id="ib-stroke-value">3</span>
+        </div>
+        <div class="ib-style-row">
+          <label for="ib-fontsize">Font size</label>
+          <input type="number" id="ib-fontsize" min="12" max="48" step="1" value="20">
+        </div>
+      </div>
+
+      <div class="ib-toolbar-section">
+        <h6>Edit</h6>
+        <div class="ib-edit-actions">
+          <button type="button" class="ib-tool-btn is-wide" id="ib-delete-selected" disabled>
+            <i class="fas fa-trash"></i> Delete selected
+          </button>
+          <button type="button" class="ib-tool-btn" id="ib-undo" disabled>
+            <i class="fas fa-undo"></i> Undo
+          </button>
+          <button type="button" class="ib-tool-btn" id="ib-redo" disabled>
+            <i class="fas fa-redo"></i> Redo
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTRE: Canvas -->
+    <main class="ib-canvas-area">
+      <div class="ib-canvas-header">
+        <span class="ib-step-badge" id="ib-step-badge">Step 1 of 1</span>
+        <span class="ib-canvas-hint" id="ib-active-tool-hint">Tool: Select</span>
+      </div>
+      <div class="ib-canvas-frame" id="ib-canvas-frame">
+        <canvas id="ib-canvas"></canvas>
+        <div class="ib-canvas-empty" id="ib-canvas-empty">
+          Upload an image to start, or just drop overlays on the empty canvas.
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT: Sidebar -->
+    <aside class="ib-sidebar" aria-label="Step list and metadata">
+
+      <div class="ib-sidebar-section ib-step-fields">
+        <h6>Current step</h6>
+        <input type="text" class="form-control form-control-sm mb-2" id="ib-step-title"
+               placeholder="Step title…" maxlength="200">
+        <textarea class="form-control form-control-sm" id="ib-step-description" rows="3"
+                  placeholder="Describe what happens in this step…"></textarea>
+      </div>
+
+      <div class="ib-sidebar-section">
+        <h6>Steps</h6>
+        <ol class="ib-steps-list" id="ib-steps-list"></ol>
+        <button type="button" class="btn btn-sm btn-outline-primary w-100" id="ib-add-step">
+          <i class="fas fa-plus me-1"></i> Add step
+        </button>
+        <p class="ib-reorder-hint">
+          To reorder steps, use the &uarr;&darr; buttons in the project editor's outline.
+        </p>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!--
+  Fabric.js v6 (UMD build). v6 exposes `window.fabric` for browser
+  consumers; if the global ever stops being shipped we'll need to fall
+  back to v5.3.0 (last UMD-friendly release). Tested with 6.4.0.
+-->
+<script src="https://cdn.jsdelivr.net/npm/fabric@6.4.0/dist/index.min.js"></script>
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/instruction-builder.js?v={{ site.time | date: '%s' }}"></script>
