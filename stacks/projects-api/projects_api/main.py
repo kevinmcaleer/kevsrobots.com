@@ -40,6 +40,7 @@ from .routers import (
     makes,
     moderation,
     parts,
+    parts_moderation,
     projects,
     remixes,
     staff_picks,
@@ -113,6 +114,13 @@ def create_app() -> FastAPI:
     app.include_router(links.router)
     app.include_router(journal.router)
     app.include_router(moderation.router)
+    # Issue #123: parts catalog moderation (reports + community merges).
+    # MUST be mounted BEFORE parts.router because that router's
+    # ``GET /api/parts/{slug}`` would otherwise eat
+    # ``/api/parts/merge-proposals`` (it'd resolve {slug}="merge-proposals"
+    # and 404). Mounting the moderation routes first lets FastAPI match
+    # the more-specific literal paths before the catch-all slug capture.
+    app.include_router(parts_moderation.router)
     app.include_router(parts.router)
     app.include_router(makes.router)
     # Issue #108: project remixes (fork & attribution).

@@ -618,6 +618,109 @@ class PartDetail(BaseModel):
     family_parts: list[PartRelatedRef] = Field(default_factory=list)
 
 
+# --- Parts moderation (issue #123, Phase 3) ------------------------------
+
+
+PART_REPORT_REASONS = ("spam", "wrong", "duplicate", "other")
+PART_REPORT_RESOLUTIONS = ("accepted", "dismissed")
+PART_MERGE_VOTES = ("approve", "reject")
+
+
+class PartReportCreate(BaseModel):
+    """Body of POST /api/parts/{slug}/report."""
+
+    reason: str = Field(..., pattern=r"^(spam|wrong|duplicate|other)$")
+    note: Optional[str] = Field(None, max_length=500)
+
+
+class PartReportPartRef(BaseModel):
+    """Minimal part reference embedded in admin queue rows."""
+
+    id: int
+    slug: str
+    name: str
+    status: str
+
+
+class PartReportResponse(BaseModel):
+    id: int
+    part_id: int
+    reporter_username: str
+    reason: str
+    note: Optional[str] = None
+    created_at: datetime
+    resolved_at: Optional[datetime] = None
+    resolved_by: Optional[str] = None
+    resolution: Optional[str] = None
+    # Embedded for admin queue rendering — None on the user-facing
+    # ``POST /report`` reply since the caller already knows the part.
+    part: Optional[PartReportPartRef] = None
+
+
+class PartReportListResponse(BaseModel):
+    items: list[PartReportResponse] = Field(default_factory=list)
+    total: int = 0
+
+
+class PartReportResolve(BaseModel):
+    """Body of PATCH /api/admin/parts/reports/{id}."""
+
+    resolution: str = Field(..., pattern=r"^(accepted|dismissed)$")
+
+
+class PartMergeProposalCreate(BaseModel):
+    """Body of POST /api/parts/{slug}/merge-proposal."""
+
+    target_slug: str = Field(..., min_length=1, max_length=120)
+    rationale: str = Field(..., min_length=10, max_length=2000)
+
+
+class PartMergePartRef(BaseModel):
+    """Embedded source/target on a proposal."""
+
+    id: int
+    slug: str
+    name: str
+    status: str
+
+
+class PartMergeProposalResponse(BaseModel):
+    id: int
+    proposer_username: str
+    rationale: str
+    created_at: datetime
+    resolved_at: Optional[datetime] = None
+    outcome: Optional[str] = None
+    source: PartMergePartRef
+    target: PartMergePartRef
+    approves: int = 0
+    rejects: int = 0
+
+
+class PartMergeProposalListResponse(BaseModel):
+    items: list[PartMergeProposalResponse] = Field(default_factory=list)
+    total: int = 0
+
+
+class PartMergeVoteCreate(BaseModel):
+    """Body of POST /api/parts/merge-proposals/{id}/vote."""
+
+    vote: str = Field(..., pattern=r"^(approve|reject)$")
+
+
+class PartMergeVoteResponse(BaseModel):
+    proposal_id: int
+    voter_username: str
+    vote: str
+    approves: int
+    rejects: int
+    # When auto-merge fires on this vote, the proposal flips to
+    # ``outcome=merged`` and we surface that in the response so the UI can
+    # show a "merged!" toast without polling.
+    outcome: Optional[str] = None
+    resolved_at: Optional[datetime] = None
+
+
 # --- Featured projects + staff picks (issue #115) ------------------------
 
 

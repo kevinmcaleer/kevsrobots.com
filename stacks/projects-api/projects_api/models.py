@@ -492,6 +492,111 @@ class UserActivity(Base):
     )
 
 
+# --- Parts moderation: reports + merge proposals (issue #123, Phase 3) ---
+#
+# Two parallel community-moderation surfaces sit on top of the Phase 1/2
+# catalog:
+#
+#   * ``part_reports`` — anyone logged-in can flag a part as wrong / spam /
+#     duplicate / other. An admin works through the queue at
+#     ``/admin/parts/`` and accepts or dismisses each report. There is no
+#     account-age gate on reporting: we'd rather see noise from new
+#     accounts than miss spam they're trying to flag. The
+#     ``(part_id, resolved_at)`` index makes the "open reports for this
+#     part" and "queue of unresolved reports" queries cheap.
+#
+#   * ``part_merge_proposals`` + ``part_merge_votes`` — anyone with a
+#     14-day-old account can propose merging part A into part B, and any
+#     14-day-old account can vote approve / reject on the proposal. Auto-
+#     merge fires when the thresholds in
+#     ``routers/parts_moderation._check_merge_threshold`` are met. The
+#     proposer can withdraw their own proposal; admins can withdraw any.
+#     One open proposal per (source, target) pair is enforced at the
+#     application layer (the obvious partial-unique-index on
+#     ``WHERE resolved_at IS NULL`` is Postgres-only; we keep the gate in
+#     Python so SQLite tests behave identically).
+#
+# Brand-new tables — no ALTER helper needed; ``create_all`` builds them
+# on every Postgres deployment. SQLite tests pick them up the same way.
+
+
+class PartReport(Base):
+    __tablename__ = "part_reports"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    part_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    reporter_username: Mapped[str] = mapped_column(String(100), nullable=False)
+    # reason: "spam" | "wrong" | "duplicate" | "other"
+    reason: Mapped[str] = mapped_column(String(20), nullable=False)
+    note: Mapped[Optional[str]] = mapped_column(String(500))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    resolved_by: Mapped[Optional[str]] = mapped_column(String(100))
+    # resolution: "accepted" | "dismissed" (NULL while open)
+    resolution: Mapped[Optional[str]] = mapped_column(String(20))
+
+    __table_args__ = (
+        # Speeds up both the admin queue (open reports: resolved_at IS NULL)
+        # and the per-part "do I have an open report against this?" probe.
+        Index("ix_part_reports_part_resolved", "part_id", "resolved_at"),
+    )
+
+
+class PartMergeProposal(Base):
+    __tablename__ = "part_merge_proposals"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    source_part_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    target_part_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    proposer_username: Mapped[str] = mapped_column(String(100), nullable=False)
+    rationale: Mapped[str] = mapped_column(String(2000), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    resolved_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    # outcome: "merged" | "rejected" | "withdrawn" (NULL while open)
+    outcome: Mapped[Optional[str]] = mapped_column(String(20))
+
+    __table_args__ = (
+        # Sort the open-proposals list newest-first; the same index covers
+        # "all resolved proposals, recent first" too.
+        Index("ix_part_merge_proposals_resolved_created", "resolved_at", "created_at"),
+    )
+
+
+class PartMergeVote(Base):
+    __tablename__ = "part_merge_votes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    proposal_id: Mapped[int] = mapped_column(
+        ForeignKey("part_merge_proposals.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    voter_username: Mapped[str] = mapped_column(String(100), nullable=False)
+    # vote: "approve" | "reject"
+    vote: Mapped[str] = mapped_column(String(10), nullable=False)
+    voted_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        # One vote per voter per proposal — changing your mind UPDATEs the
+        # existing row (handled in the router).
+        UniqueConstraint(
+            "proposal_id", "voter_username", name="uq_part_merge_votes_proposal_voter"
+        ),
+    )
+
+
 class PartRevision(Base):
     __tablename__ = "part_revisions"
 
