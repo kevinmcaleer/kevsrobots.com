@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pytest
 
+from .conftest import make_admin_header
+
 
 @pytest.mark.asyncio
 async def test_related_returns_results(client) -> None:
@@ -55,7 +57,10 @@ async def test_trending_content_type_filter(client) -> None:
 
 @pytest.mark.asyncio
 async def test_recompute_trending(client) -> None:
-    response = await client.post("/api/admin/recompute-trending")
+    # /api/admin/* requires admin auth after #158.
+    response = await client.post(
+        "/api/admin/recompute-trending", headers=make_admin_header()
+    )
     assert response.status_code == 200
     body = response.json()
     assert "computed" in body

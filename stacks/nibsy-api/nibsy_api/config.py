@@ -32,7 +32,7 @@ class Settings(BaseSettings):
 
     # Comma-separated allowed origins for CORS. Stored as a plain string
     # so pydantic-settings doesn't try to JSON-parse it.
-    cors_origins: str = "http://localhost:4000"
+    cors_origins: str = "https://www.kevsrobots.com,http://localhost:4000"
 
     @computed_field
     @property
@@ -56,6 +56,26 @@ class Settings(BaseSettings):
     # Production default is 14 days; tests/dev can shorten it via env var.
     # Set to 0 or negative to disable the scheduler entirely.
     recommendation_refresh_days: int = 14
+
+    # ---- Auth / admin (#158) --------------------------------------------
+    # Chatter signs every access_token with this secret. Must match the
+    # value in chatter's SECRET_KEY (and the JWT_SECRET in projects-api)
+    # so all three services trust the same tokens.
+    jwt_secret: str = "changeme"
+    jwt_algorithm: str = "HS256"
+
+    # Base URL for the Chatter auth service. Reserved for endpoints that
+    # need to read the full /api/me payload (avatar, account_created_at,
+    # etc.). The default admin gating only needs to verify the JWT.
+    chatter_base_url: str = "https://chatter.kevsrobots.com"
+
+    # Comma-separated allow-list of usernames that may hit /api/admin/*.
+    admin_usernames: str = "kev"
+
+    @computed_field
+    @property
+    def admin_usernames_list(self) -> list[str]:
+        return [s.strip() for s in self.admin_usernames.split(",") if s.strip()]
 
 
 def get_settings() -> Settings:

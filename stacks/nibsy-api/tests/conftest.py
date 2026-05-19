@@ -37,6 +37,27 @@ def _env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("NIBSY_DATA_DIR", str(FIXTURES_DIR))
     # Unique in-memory DB per worker; the fixture below overrides the engine.
     monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+    # Admin auth (#158): give existing tests a known admin so the
+    # auth-gated /api/admin/* routes still resolve. The test-secret here
+    # matches the helper below; ``test_admin_auth.py`` re-asserts the
+    # gating logic explicitly.
+    monkeypatch.setenv("JWT_SECRET", "test-secret")
+    monkeypatch.setenv("ADMIN_USERNAMES", "kev")
+
+
+def make_admin_header(username: str = "kev") -> dict[str, str]:
+    """Sign a JWT for ``username`` so tests can hit /api/admin/* routes.
+
+    Mirrors ``stacks/projects-api/tests/conftest.make_auth_header``. The
+    signing key is fixed to ``test-secret`` (the value the ``_env``
+    fixture writes into ``JWT_SECRET``) so signature verification works
+    end-to-end inside the async client.
+    """
+
+    from jose import jwt
+
+    token = jwt.encode({"sub": username}, "test-secret", algorithm="HS256")
+    return {"Authorization": f"Bearer {token}"}
 
 
 @pytest_asyncio.fixture

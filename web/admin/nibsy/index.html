@@ -1,0 +1,321 @@
+---
+title: Nibsy admin
+layout: default
+description: Trigger Nibsy recommendation regeneration, trending recompute, and remote ingest
+permalink: /admin/nibsy/
+---
+
+{% include nav_admin.html %}
+
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+
+<style>
+  .nibsy-action-card { transition: box-shadow 120ms ease; }
+  .nibsy-action-card:hover { box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.06); }
+  .nibsy-output {
+    background: #0d1117;
+    color: #c9d1d9;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+    max-height: 320px;
+    overflow: auto;
+    margin-top: 0.75rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .nibsy-output.is-error { background: #2c0b0e; color: #f8d7da; }
+  .nibsy-stat { font-size: 1.5rem; font-weight: 600; }
+  .nibsy-stat-label { font-size: 0.8rem; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; }
+</style>
+
+<div class="container py-4">
+  <h1><i class="fas fa-robot me-3 text-success"></i> Nibsy</h1>
+  <p class="text-muted">
+    Trigger Nibsy recommendation operations. These endpoints are admin-only and the same actions run on a schedule inside the service.
+  </p>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Checking access...</span>
+    </div>
+  </div>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="nibsy-content" class="d-none">
+
+    <div class="card nibsy-action-card mt-3">
+      <div class="card-body">
+        <h4 class="mb-3"><i class="fas fa-database me-2 text-secondary"></i> Status</h4>
+        <div id="status-loading" class="text-muted small">
+          <span class="spinner-border spinner-border-sm me-2"></span> Loading status...
+        </div>
+        <div id="status-error" class="alert alert-warning d-none mb-0">
+          <i class="fas fa-triangle-exclamation me-2"></i>
+          <span id="status-error-msg">Failed to load status.</span>
+        </div>
+        <div id="status-body" class="row g-3 d-none">
+          <div class="col-sm-4">
+            <div class="border rounded p-3 h-100">
+              <div class="nibsy-stat-label">Content rows</div>
+              <div class="nibsy-stat" id="stat-content">—</div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 h-100">
+              <div class="nibsy-stat-label">Recommendation rows</div>
+              <div class="nibsy-stat" id="stat-recs">—</div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="border rounded p-3 h-100">
+              <div class="nibsy-stat-label">Last generated</div>
+              <div class="nibsy-stat" id="stat-last" title="">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-status">
+            <i class="fas fa-arrows-rotate me-1"></i> Refresh status
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mt-3">
+      <div class="col-md-6 col-lg-4">
+        <div class="card nibsy-action-card h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><i class="fas fa-wand-magic-sparkles me-2 text-primary"></i> Regenerate recommendations</h5>
+            <p class="card-text text-muted small">
+              Recomputes the precomputed top-N recommendations for every source URL. Takes a few seconds.
+            </p>
+            <button type="button" class="btn btn-primary mt-auto kr-action" data-action="regenerate">
+              <span class="btn-label"><i class="fas fa-play me-1"></i> Run</span>
+              <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-1"></span> Running...</span>
+            </button>
+            <pre class="nibsy-output d-none" id="out-regenerate"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card nibsy-action-card h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><i class="fas fa-chart-line me-2 text-warning"></i> Recompute trending</h5>
+            <p class="card-text text-muted small">
+              Refreshes the trending score table from click and pagecount data.
+            </p>
+            <button type="button" class="btn btn-warning mt-auto kr-action" data-action="trending">
+              <span class="btn-label"><i class="fas fa-play me-1"></i> Run</span>
+              <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-1"></span> Running...</span>
+            </button>
+            <pre class="nibsy-output d-none" id="out-trending"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card nibsy-action-card h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><i class="fas fa-cloud-arrow-down me-2 text-info"></i> Ingest from remote site</h5>
+            <p class="card-text text-muted small">
+              Pulls the latest content from <code>www.kevsrobots.com</code> and updates the Nibsy index. Slow.
+            </p>
+            <button type="button" class="btn btn-info text-white mt-auto kr-action" data-action="ingest-remote">
+              <span class="btn-label"><i class="fas fa-play me-1"></i> Run</span>
+              <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-1"></span> Running...</span>
+            </button>
+            <pre class="nibsy-output d-none" id="out-ingest-remote"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var PROJECTS_API = 'https://projects.kevsrobots.com';
+  var NIBSY_API = 'https://nibsy.kevsrobots.com';
+
+  // Action -> API path. The endpoint shape on Nibsy returns JSON for all
+  // three (IngestStats / dict / GenerationStats) — we just dump it.
+  var ENDPOINTS = {
+    'regenerate':     '/api/admin/regenerate-recommendations',
+    'trending':       '/api/admin/recompute-trending',
+    'ingest-remote':  '/api/admin/ingest-remote'
+  };
+
+  function authFetch(url, opts) {
+    if (window.ProjectAuth && typeof window.ProjectAuth.apiFetch === 'function') {
+      return window.ProjectAuth.apiFetch(url, opts);
+    }
+    opts = opts || {};
+    opts.credentials = 'include';
+    return fetch(url, opts);
+  }
+
+  function showDenied(msg) {
+    document.getElementById('loading').classList.add('d-none');
+    var d = document.getElementById('access-denied');
+    if (msg) d.querySelector('span') || (d.innerHTML += ' <small class="text-muted">' + msg + '</small>');
+    d.classList.remove('d-none');
+  }
+
+  function setOutput(action, data, isError) {
+    var pre = document.getElementById('out-' + action);
+    if (!pre) return;
+    pre.classList.remove('d-none', 'is-error');
+    if (isError) pre.classList.add('is-error');
+    if (typeof data === 'string') {
+      pre.textContent = data;
+    } else {
+      try { pre.textContent = JSON.stringify(data, null, 2); }
+      catch (e) { pre.textContent = String(data); }
+    }
+  }
+
+  function setLoading(btn, on) {
+    var label = btn.querySelector('.btn-label');
+    var spinner = btn.querySelector('.btn-spinner');
+    btn.disabled = !!on;
+    if (on) {
+      label && label.classList.add('d-none');
+      spinner && spinner.classList.remove('d-none');
+    } else {
+      label && label.classList.remove('d-none');
+      spinner && spinner.classList.add('d-none');
+    }
+  }
+
+  async function runAction(btn) {
+    var action = btn.getAttribute('data-action');
+    var path = ENDPOINTS[action];
+    if (!path) return;
+    setLoading(btn, true);
+    setOutput(action, 'Running...', false);
+    try {
+      var r = await authFetch(NIBSY_API + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      var text = '';
+      try { text = await r.text(); } catch (e) { text = ''; }
+      var body;
+      try { body = text ? JSON.parse(text) : {}; } catch (e) { body = text; }
+
+      if (r.status === 401) {
+        setOutput(action, 'Not authenticated (401). Sign in to Chatter and try again.', true);
+      } else if (r.status === 403) {
+        setOutput(action, 'Not authorised (403). Your account is not in ADMIN_USERNAMES.', true);
+      } else if (!r.ok) {
+        setOutput(action, 'HTTP ' + r.status + '\n' + (typeof body === 'string' ? body : JSON.stringify(body, null, 2)), true);
+      } else {
+        setOutput(action, body, false);
+        // Status numbers may have changed — refresh.
+        loadStatus();
+      }
+    } catch (e) {
+      setOutput(action, 'Network error: ' + (e && e.message ? e.message : String(e)), true);
+    } finally {
+      setLoading(btn, false);
+    }
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return 'never';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    var diffMs = Date.now() - d.getTime();
+    var s = Math.floor(diffMs / 1000);
+    if (s < 60) return s + 's ago';
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ago';
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    var days = Math.floor(h / 24);
+    return days + 'd ago';
+  }
+
+  async function loadStatus() {
+    var loading = document.getElementById('status-loading');
+    var err = document.getElementById('status-error');
+    var errMsg = document.getElementById('status-error-msg');
+    var body = document.getElementById('status-body');
+    loading.classList.remove('d-none');
+    err.classList.add('d-none');
+    body.classList.add('d-none');
+    try {
+      var r = await authFetch(NIBSY_API + '/api/admin/status');
+      if (r.status === 401 || r.status === 403) {
+        loading.classList.add('d-none');
+        errMsg.textContent = 'Not authorised to read Nibsy status (HTTP ' + r.status + ').';
+        err.classList.remove('d-none');
+        return;
+      }
+      if (!r.ok) {
+        loading.classList.add('d-none');
+        errMsg.textContent = 'Nibsy returned HTTP ' + r.status + '.';
+        err.classList.remove('d-none');
+        return;
+      }
+      var data = await r.json();
+      document.getElementById('stat-content').textContent =
+        (data.content_count != null ? data.content_count : '—');
+      document.getElementById('stat-recs').textContent =
+        (data.recommendation_count != null ? data.recommendation_count : '—');
+      var lastEl = document.getElementById('stat-last');
+      lastEl.textContent = fmtDate(data.last_generated_at);
+      lastEl.title = data.last_generated_at || '';
+      loading.classList.add('d-none');
+      body.classList.remove('d-none');
+    } catch (e) {
+      loading.classList.add('d-none');
+      errMsg.textContent = 'Network error: ' + (e && e.message ? e.message : String(e));
+      err.classList.remove('d-none');
+    }
+  }
+
+  async function init() {
+    try {
+      var r = await authFetch(PROJECTS_API + '/api/auth/me');
+      if (r.status === 401 || r.status === 403 || !r.ok) {
+        showDenied();
+        return;
+      }
+      var me = await r.json();
+      if (!me || me.is_admin !== true) {
+        showDenied();
+        return;
+      }
+    } catch (e) {
+      showDenied();
+      return;
+    }
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('nibsy-content').classList.remove('d-none');
+
+    // Wire action buttons.
+    document.querySelectorAll('.kr-action').forEach(function (btn) {
+      btn.addEventListener('click', function () { runAction(btn); });
+    });
+    document.getElementById('refresh-status').addEventListener('click', loadStatus);
+
+    loadStatus();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

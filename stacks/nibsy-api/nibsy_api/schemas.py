@@ -57,3 +57,15 @@ class RecommendationsResponse(BaseModel):
     recommendations: list[RecommendationItem] = Field(default_factory=list)
     generated_at: Optional[datetime] = None
     generator_version: Optional[str] = None
+
+
+class AdminStatus(BaseModel):
+    """Summary for the admin portal Nibsy panel (#158).
+
+    Cheap counts + last-generated timestamp so the admin page can show
+    "what state is the recommender in?" without paging through tables.
+    """
+
+    content_count: int = 0
+    recommendation_count: int = 0
+    last_generated_at: Optional[datetime] = None

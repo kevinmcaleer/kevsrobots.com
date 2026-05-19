@@ -16,3 +16,6 @@
 - name: Feedback inbox
   link: /admin/feedback/
   icon: fas fa-inbox
+- name: Nibsy
+  link: /admin/nibsy/
+  icon: fas fa-robot
