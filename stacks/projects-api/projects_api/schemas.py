@@ -228,11 +228,66 @@ class LinkCreate(BaseModel):
     link_type: str = Field("article", pattern="^(article|video|tutorial|documentation|other)$")
 
 
+class LinkUpdate(BaseModel):
+    """Partial-update body for ``PUT /api/projects/{id}/links/{link_id}``
+    (issue #171). Every field is optional so an inline edit can save a
+    single column without touching the others — mirrors the
+    ``BOMItemCreate`` semantics used by the BOM editor."""
+
+    title: Optional[str] = Field(None, max_length=200)
+    url: Optional[str] = None
+    link_type: Optional[str] = Field(
+        None, pattern="^(article|video|tutorial|documentation|other)$"
+    )
+
+
 class LinkResponse(BaseModel):
     id: int
     title: str
     url: str
     link_type: str
+
+
+# --- YouTube videos (issue #171) -----------------------------------------
+#
+# Videos are first-class (separate from generic project_links rows) so the
+# public view page can embed them above the description and the editor
+# can offer a paste-a-URL UX with auto-extracted ids.
+
+
+class VideoCreate(BaseModel):
+    """Body for ``POST /api/projects/{id}/videos``.
+
+    ``url_or_id`` is any of the four supported YouTube URL shapes (watch,
+    youtu.be, embed, shorts) or a bare 11-char id. The router extracts
+    the id server-side and 422s on malformed input. We keep validation
+    here loose (just non-empty) — the extractor is the source of truth
+    so the error message stays consistent for tests + frontend.
+    """
+
+    url_or_id: str = Field(..., min_length=1, max_length=2048)
+    title: Optional[str] = Field(None, max_length=200)
+
+
+class VideoUpdate(BaseModel):
+    """Body for ``PUT /api/projects/{id}/videos/{video_id}``.
+
+    The YouTube id itself is immutable — to swap a video for a different
+    one the user deletes + adds. Only the human-facing title and the
+    sort order are mutable post-creation.
+    """
+
+    title: Optional[str] = Field(None, max_length=200)
+    sort_order: Optional[int] = Field(None, ge=0)
+
+
+class VideoResponse(BaseModel):
+    id: int
+    project_id: int
+    youtube_id: str
+    title: Optional[str] = None
+    sort_order: int
+    created_at: datetime
 
 
 class JournalEntryCreate(BaseModel):
