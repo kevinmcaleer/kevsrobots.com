@@ -9,15 +9,6 @@ permalink: /projects-hub-terms/
 
 <small>Version 1.0 — effective 2026-05-19</small>
 
-<div class="alert alert-warning my-3" role="alert">
-  <strong><i class="fas fa-exclamation-triangle me-2"></i>DRAFT — pending legal review.</strong>
-  This is a starter draft of the Projects Hub content terms. It is published
-  here so the technical implementation of the acceptance flow can be tested,
-  but it has <em>not</em> yet been reviewed by a solicitor. Before this draft
-  is treated as the live, binding licence please get a UK lawyer to review it
-  against current ICO / IP guidance and finalise the wording.
-</div>
-
 ## TL;DR
 
 You keep ownership of what you upload. You give us permission to display
