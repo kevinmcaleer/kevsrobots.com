@@ -47,6 +47,12 @@ description: View project details
           </a>
         </div>
 
+        <!-- YouTube videos (issue #171) — embedded above the description.
+             Hidden until loadVideos() finds at least one row. Single
+             video: one 16:9 iframe. Multiple videos: Bootstrap carousel
+             with indicators + prev/next controls. -->
+        <div id="view-videos-section" class="mb-4 d-none"></div>
+
         <!-- Remix attribution banner (issue #108) — shown when this project is a remix -->
         <div id="remix-attribution-banner" class="alert alert-info d-none py-2 px-3 mb-3" role="note">
           <i class="fas fa-code-branch me-2" aria-hidden="true"></i>
@@ -673,6 +679,7 @@ description: View project details
       loadFiles();
       loadImages();
       loadLinks();
+      loadVideos();
       loadJournal();
       loadMakes(project);
 
@@ -1043,6 +1050,67 @@ description: View project details
       const img = e.target.closest('[data-view-idx]');
       if (img) ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
     });
+  }
+
+  // Issue #171: render embedded YouTube videos above the description.
+  // Single video → one 16:9 iframe full-width. Multiple → Bootstrap
+  // carousel with indicators + prev/next controls, first slide active.
+  // Iframe markup mirrors _layouts/showcase.html so a project page's
+  // video block feels consistent with the existing showcase layout.
+  async function loadVideos() {
+    let videos = [];
+    try {
+      const resp = await fetch(API + '/api/projects/' + projectId + '/videos');
+      if (!resp.ok) return;
+      videos = await resp.json();
+    } catch (_) { return; }
+    if (!Array.isArray(videos) || videos.length === 0) return;
+    const section = document.getElementById('view-videos-section');
+    if (!section) return;
+    section.classList.remove('d-none');
+    if (videos.length === 1) {
+      const v = videos[0];
+      section.innerHTML = `
+        <div class="ratio ratio-16x9 mb-2">
+          <iframe class="rounded-1" src="https://www.youtube.com/embed/${encodeURIComponent(v.youtube_id)}"
+                  title="${esc(v.title || 'Project video')}"
+                  frameborder="0" allowfullscreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+        ${v.title ? `<p class="small text-muted mb-0">${esc(v.title)}</p>` : ''}`;
+      return;
+    }
+    // Carousel — give the element a stable id derived from the project
+    // so Bootstrap's data-bs-target selectors don't collide if the page
+    // ever renders two of these (it doesn't today, but cheap insurance).
+    const cid = 'project-videos-carousel';
+    const slides = videos.map((v, i) => `
+      <div class="carousel-item${i === 0 ? ' active' : ''}">
+        <div class="ratio ratio-16x9">
+          <iframe class="rounded-1" src="https://www.youtube.com/embed/${encodeURIComponent(v.youtube_id)}"
+                  title="${esc(v.title || 'Project video ' + (i + 1))}"
+                  frameborder="0" allowfullscreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+        ${v.title ? `<p class="small text-muted mt-2 mb-0 text-center">${esc(v.title)}</p>` : ''}
+      </div>`).join('');
+    const indicators = videos.map((_, i) => `
+      <button type="button" data-bs-target="#${cid}" data-bs-slide-to="${i}"
+              ${i === 0 ? 'class="active" aria-current="true"' : ''}
+              aria-label="Slide ${i + 1}"></button>`).join('');
+    section.innerHTML = `
+      <div id="${cid}" class="carousel slide" data-bs-ride="false">
+        <div class="carousel-indicators">${indicators}</div>
+        <div class="carousel-inner">${slides}</div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#${cid}" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#${cid}" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>`;
   }
 
   async function loadLinks() {

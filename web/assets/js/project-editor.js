@@ -90,6 +90,7 @@
       renderTags(currentProject.tags || []);
       loadBOM();
       loadLinks();
+      loadVideos();
       loadFiles();
       loadImages();
       loadJournal();
@@ -1912,18 +1913,37 @@
   }
   window.showAccountAgeAlert = showAccountAgeAlert;
 
-  // --- Links ---
+  // --- Links (issue #171: BOM-style inline editable table) ---
+  //
+  // The old flow used three prompt() dialogs in sequence to add a link —
+  // cancelling at any step lost the entered data, and there was no way
+  // to edit a saved link without deleting and re-creating it. The new
+  // table mirrors the BOM editor: "Add Link" POSTs an empty row, then
+  // each <input>/<select> onchange PUTs to the new partial-update
+  // endpoint added in this same change.
+  const LINK_TYPES = [
+    { value: 'article',       label: 'Article' },
+    { value: 'video',         label: 'Video' },
+    { value: 'tutorial',      label: 'Tutorial' },
+    { value: 'documentation', label: 'Docs' },
+    { value: 'other',         label: 'Other' },
+  ];
+  function linkTypeOptions(selected) {
+    return LINK_TYPES.map(t =>
+      `<option value="${t.value}"${t.value === selected ? ' selected' : ''}>${t.label}</option>`
+    ).join('');
+  }
+
   document.getElementById('add-link-btn').addEventListener('click', async () => {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
-    const title = prompt('Link title:');
-    if (!title) return;
-    const url = prompt('URL:');
-    if (!url) return;
-    const type = prompt('Type (article/video/tutorial/documentation/other):', 'article') || 'article';
+    // Empty placeholder row — the user fills in the cells inline. We
+    // need a non-empty url to satisfy the LinkCreate schema (it's
+    // required), so seed it with a blank-ish placeholder the user
+    // will overwrite immediately.
     await apiFetch(API + '/api/projects/' + currentProject.id + '/links', {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, url, link_type: type }),
+      body: JSON.stringify({ title: '', url: 'https://', link_type: 'article' }),
     });
     loadLinks();
   });
@@ -1932,23 +1952,210 @@
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/links', { credentials: 'include' });
     const links = await resp.json();
-    const typeIcons = { article: 'fa-newspaper', video: 'fa-play-circle', tutorial: 'fa-graduation-cap', documentation: 'fa-book', other: 'fa-external-link-alt' };
-    document.getElementById('links-list').innerHTML = links.map(l => `
-      <div class="link-item">
-        <div>
-          <span class="link-type-icon"><i class="fas ${typeIcons[l.link_type] || typeIcons.other}"></i></span>
-          <a href="${l.url}" target="_blank">${l.title}</a>
-        </div>
-        <button class="btn btn-sm text-danger" onclick="deleteLink(${l.id})"><i class="fas fa-times"></i></button>
-      </div>
-    `).join('') || '<p class="text-muted small">No links yet</p>';
+    const tbody = document.getElementById('links-body');
+    const empty = document.getElementById('links-empty');
+    if (!tbody) return;
+    if (links.length === 0) {
+      tbody.innerHTML = '';
+      if (empty) empty.classList.remove('d-none');
+      return;
+    }
+    if (empty) empty.classList.add('d-none');
+    tbody.innerHTML = links.map(l => `
+      <tr data-link-id="${l.id}">
+        <td><input class="form-control form-control-sm" data-field="title" value="${escapeHtmlAttr(l.title)}" maxlength="200" placeholder="Link title" onchange="updateLink(${l.id}, this)"></td>
+        <td><input class="form-control form-control-sm" data-field="url" type="url" value="${escapeHtmlAttr(l.url)}" placeholder="https://..." onchange="updateLink(${l.id}, this)"></td>
+        <td>
+          <select class="form-select form-select-sm" data-field="link_type" onchange="updateLink(${l.id}, this)">
+            ${linkTypeOptions(l.link_type)}
+          </select>
+        </td>
+        <td><button class="btn btn-sm text-danger" onclick="deleteLink(${l.id})" title="Delete link"><i class="fas fa-times"></i></button></td>
+      </tr>
+    `).join('');
   }
+
+  // Track in-flight PUTs per row so a fast-typer doesn't fire ten
+  // overlapping requests — we serialise per-row by chaining onto the
+  // previous promise. Same idea as the BOM autosave debouncer.
+  const _linkSavePending = {};
+  window.updateLink = async function(linkId, input) {
+    const field = input.dataset.field;
+    if (!field) return;
+    const payload = { [field]: input.value };
+    const prev = _linkSavePending[linkId] || Promise.resolve();
+    const next = prev.then(async () => {
+      try {
+        await apiFetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch (_) {
+        // Network blip or 4xx — fall back to reloading so the UI
+        // reflects what's actually in the DB rather than showing
+        // stale local edits.
+        loadLinks();
+      }
+    });
+    _linkSavePending[linkId] = next;
+  };
 
   window.deleteLink = async function(linkId) {
     await apiFetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
       method: 'DELETE', credentials: 'include',
     });
     loadLinks();
+  };
+
+  // --- Videos (issue #171) ---
+  //
+  // First-class YouTube video list. Pasting a URL extracts the 11-char
+  // id client-side so the thumbnail flips immediately; the backend
+  // re-validates server-side and 422s on anything malformed.
+  //
+  // Same shape as the backend extractor in projects_api/youtube.py —
+  // keep the two in sync. Case is preserved (YouTube ids are
+  // case-sensitive).
+  const YT_ID_RE = /^[A-Za-z0-9_-]{11}$/;
+  function extractYouTubeId(s) {
+    if (!s) return null;
+    const trimmed = String(s).trim();
+    if (!trimmed) return null;
+    if (YT_ID_RE.test(trimmed)) return trimmed;
+    let url;
+    try { url = new URL(trimmed.includes('://') ? trimmed : 'https://' + trimmed); }
+    catch (_) { return null; }
+    let host = url.hostname.toLowerCase();
+    if (host.startsWith('www.')) host = host.slice(4);
+    let candidate = null;
+    if (host === 'youtu.be') {
+      candidate = url.pathname.replace(/^\//, '').split('/', 1)[0];
+    } else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
+      const p = url.pathname || '';
+      if (p === '/watch' || p.startsWith('/watch/')) {
+        candidate = url.searchParams.get('v');
+      } else if (p.startsWith('/embed/')) {
+        candidate = p.slice('/embed/'.length).split('/', 1)[0];
+      } else if (p.startsWith('/shorts/')) {
+        candidate = p.slice('/shorts/'.length).split('/', 1)[0];
+      } else if (p.startsWith('/v/')) {
+        candidate = p.slice('/v/'.length).split('/', 1)[0];
+      }
+    }
+    return (candidate && YT_ID_RE.test(candidate)) ? candidate : null;
+  }
+
+  document.getElementById('add-video-btn').addEventListener('click', async () => {
+    if (!currentProject) { await saveProject(); if (!currentProject) return; }
+    const input = prompt('Paste a YouTube URL (or 11-char video ID):');
+    if (input === null) return;
+    const trimmed = String(input || '').trim();
+    if (!trimmed) return;
+    const id = extractYouTubeId(trimmed);
+    if (!id) {
+      alert('That doesn\'t look like a YouTube URL. Try one of:\n\nhttps://www.youtube.com/watch?v=…\nhttps://youtu.be/…\nhttps://www.youtube.com/embed/…\nhttps://www.youtube.com/shorts/…\n\nOr paste the 11-character video ID directly.');
+      return;
+    }
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/videos', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url_or_id: trimmed }),
+    });
+    if (!resp.ok) {
+      let detail = 'Failed to add video.';
+      try { const body = await resp.json(); detail = body.detail || detail; } catch (_) {}
+      alert(detail);
+      return;
+    }
+    loadVideos();
+  });
+
+  async function loadVideos() {
+    if (!currentProject) return;
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/videos', { credentials: 'include' });
+    const videos = await resp.json();
+    const tbody = document.getElementById('videos-body');
+    const empty = document.getElementById('videos-empty');
+    if (!tbody) return;
+    if (videos.length === 0) {
+      tbody.innerHTML = '';
+      if (empty) empty.classList.remove('d-none');
+      return;
+    }
+    if (empty) empty.classList.add('d-none');
+    tbody.innerHTML = videos.map(v => `
+      <tr data-video-id="${v.id}">
+        <td>
+          <a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.youtube_id)}" target="_blank" rel="noopener" title="${escapeHtmlAttr(v.youtube_id)}">
+            <img src="https://img.youtube.com/vi/${encodeURIComponent(v.youtube_id)}/default.jpg" alt="" loading="lazy" style="width:72px;height:auto;border-radius:3px">
+          </a>
+        </td>
+        <td><code class="small">${escapeHtmlAttr(v.youtube_id)}</code></td>
+        <td><input class="form-control form-control-sm" data-field="title" value="${escapeHtmlAttr(v.title || '')}" maxlength="200" placeholder="Optional title" onchange="updateVideo(${v.id}, this)"></td>
+        <td>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Reorder">
+            <button class="btn btn-outline-secondary" onclick="moveVideo(${v.id}, -1)" title="Move up"><i class="fas fa-arrow-up"></i></button>
+            <button class="btn btn-outline-secondary" onclick="moveVideo(${v.id}, 1)" title="Move down"><i class="fas fa-arrow-down"></i></button>
+          </div>
+        </td>
+        <td><button class="btn btn-sm text-danger" onclick="deleteVideo(${v.id})" title="Delete video"><i class="fas fa-times"></i></button></td>
+      </tr>
+    `).join('');
+    // Stash the loaded list so moveVideo() can compute neighbour
+    // sort_orders without a re-fetch.
+    window._videosCache = videos;
+  }
+
+  const _videoSavePending = {};
+  window.updateVideo = async function(videoId, input) {
+    const field = input.dataset.field;
+    if (!field) return;
+    const payload = { [field]: input.value };
+    const prev = _videoSavePending[videoId] || Promise.resolve();
+    const next = prev.then(async () => {
+      try {
+        await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + videoId, {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch (_) { loadVideos(); }
+    });
+    _videoSavePending[videoId] = next;
+  };
+
+  window.moveVideo = async function(videoId, delta) {
+    const list = (window._videosCache || []);
+    const idx = list.findIndex(v => v.id === videoId);
+    if (idx < 0) return;
+    const target = idx + delta;
+    if (target < 0 || target >= list.length) return;
+    // Swap sort_order with the neighbour. Two sequential PUTs are fine
+    // here — the list is tiny in practice and the backend has no
+    // uniqueness constraint on sort_order so a transient duplicate is
+    // harmless.
+    const mine = list[idx];
+    const neighbour = list[target];
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + mine.id, {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sort_order: neighbour.sort_order }),
+    });
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + neighbour.id, {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sort_order: mine.sort_order }),
+    });
+    loadVideos();
+  };
+
+  window.deleteVideo = async function(videoId) {
+    if (!confirm('Remove this video from the project?')) return;
+    await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + videoId, {
+      method: 'DELETE', credentials: 'include',
+    });
+    loadVideos();
   };
 
   // --- Journal ---
@@ -2377,9 +2584,12 @@
       check: () => document.querySelectorAll('#bom-body tr').length > 0 },
     { key: 'repo',   points: 10, label: 'Link a code repository',              target: 'project-repo',
       check: () => repoInput && repoInput.value.trim().length > 0 },
-    { key: 'extra',  points: 10, label: 'Add a file or a journal entry',       target: 'journal-input',
+    // Issue #171: a YouTube video counts toward "extra content" too —
+    // it's just as much a doc artefact as a file or a journal entry.
+    { key: 'extra',  points: 10, label: 'Add a file, journal entry, or video', target: 'journal-input',
       check: () => document.querySelectorAll('#file-list tbody tr').length > 0
-                || document.querySelectorAll('#journal-list .journal-entry').length > 0 },
+                || document.querySelectorAll('#journal-list .journal-entry').length > 0
+                || document.querySelectorAll('#videos-body tr').length > 0 },
   ];
 
   let completenessFrame = null;
@@ -2525,6 +2735,8 @@
   _observe('image-gallery');
   _observe('file-list');
   _observe('journal-list');
+  // Issue #171: re-score the completeness meter when a video lands.
+  _observe('videos-body');
 
   // Expose so loadProject() / init can trigger explicitly.
   window._recomputeCompleteness = recomputeCompleteness;
