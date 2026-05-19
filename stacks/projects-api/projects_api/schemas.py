@@ -467,6 +467,9 @@ class PartSearchResult(BaseModel):
     # list / autocomplete UIs can show them without a second roundtrip.
     category: Optional[str] = None
     family: Optional[str] = None
+    # Small thumbnail for the catalog list row. Null = no image — the list
+    # renderer falls back to a neutral icon tile so row height stays uniform.
+    image_url: Optional[str] = None
 
 
 class PartRevisionSummary(BaseModel):

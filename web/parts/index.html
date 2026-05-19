@@ -93,13 +93,26 @@ description: Browse and search the community parts catalog
       const countBadge = count > 0
         ? `<a href="${searchUrl}" class="badge bg-light text-dark text-decoration-none" title="View projects using ${esc(p.name)}"><i class="fas fa-clipboard-list me-1"></i>${count} project${count === 1 ? '' : 's'}</a>`
         : `<span class="badge bg-light text-muted"><i class="fas fa-clipboard-list me-1"></i>0 projects</span>`;
+      // 48px square thumbnail, or a neutral icon tile when image_url is null
+      // so every row keeps the same height.
+      const thumb = p.image_url
+        ? `<img src="${esc(p.image_url)}" alt="" loading="lazy"
+                class="rounded flex-shrink-0"
+                style="width:48px;height:48px;object-fit:cover;background:#f1f3f5;">`
+        : `<div class="rounded flex-shrink-0 d-flex align-items-center justify-content-center text-muted"
+                style="width:48px;height:48px;background:#f1f3f5;">
+             <i class="fas fa-cube"></i>
+           </div>`;
       return `
       <div class="list-group-item p-0">
         <div class="d-flex justify-content-between align-items-start gap-3">
-          <a href="${partUrl}" class="flex-grow-1 text-decoration-none text-reset p-3 list-group-item-action">
-            <div class="fw-bold">${esc(p.name)}</div>
-            <div class="small text-muted">
-              ${p.sku ? '<span class="me-2"><strong>SKU:</strong> ' + esc(p.sku) + '</span>' : ''}
+          <a href="${partUrl}" class="flex-grow-1 text-decoration-none text-reset p-3 list-group-item-action d-flex align-items-center gap-3">
+            ${thumb}
+            <div class="flex-grow-1 min-w-0">
+              <div class="fw-bold text-truncate">${esc(p.name)}</div>
+              <div class="small text-muted">
+                ${p.sku ? '<span class="me-2"><strong>SKU:</strong> ' + esc(p.sku) + '</span>' : ''}
+              </div>
             </div>
           </a>
           <div class="text-end d-flex flex-column align-items-end gap-1 p-3">
