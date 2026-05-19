@@ -15,6 +15,7 @@ from .db import (
     add_part_category_family_if_missing,
     add_project_featured_columns_if_missing,
     add_remix_columns_if_missing,
+    add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
     create_all,
     get_sessionmaker,
@@ -60,6 +61,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Issue #111: defensive ALTER for the new user_profiles table —
     # no-op on fresh deploys where create_all built every column.
     await add_user_profile_columns_if_missing()
+    # Issue #136: ensure users.is_disabled / disabled_reason columns exist.
+    await add_user_disabled_columns_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

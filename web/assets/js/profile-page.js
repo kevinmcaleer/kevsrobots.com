@@ -273,18 +273,25 @@
     if (!viewer.authed) return;
     if (viewer.username && viewer.username !== username) return;
     // Show the edit link. If we don't know the viewer's username we still
-    // show it — the edit page itself will redirect if not auth'd.
+    // show it — /account itself requires auth and will bounce to /login.
+    // All profile editing now lives on /account (issue #151 consolidation);
+    // /profile/edit.html is a redirect stub kept only for legacy bookmarks.
     document.getElementById('edit-profile-button').innerHTML =
-      '<a href="/profile/edit.html" class="btn btn-outline-secondary btn-sm">' +
+      '<a href="/account" class="btn btn-outline-secondary btn-sm">' +
       '<i class="fas fa-pencil-alt me-1"></i>Edit profile</a>';
   }
 
   // --- Projects tab -------------------------------------------------------
 
   function renderProjectCard(p) {
-    var thumb = p.cover_image
-      ? '<img src="' + esc(p.cover_image) + '" class="card-img-top" loading="lazy" alt="" style="height:140px;object-fit:cover;background:#f1f3f5;">'
-      : '<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height:140px;background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>';
+    // Match the hub's gradient-with-initials fallback when there's no cover
+    // image (see web/assets/js/project-gradient.js). Keeps the profile
+    // project tab visually consistent with /projects/ cards.
+    var thumb = typeof projectThumbnail === 'function'
+      ? projectThumbnail(p, 140)
+      : (p.cover_image
+          ? '<img src="' + esc(p.cover_image) + '" class="card-img-top" loading="lazy" alt="" style="height:140px;object-fit:cover;background:#f1f3f5;">'
+          : '<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height:140px;background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>');
     var diff = p.difficulty
       ? '<span class="badge bg-light text-dark me-1">' + esc(p.difficulty) + '</span>'
       : '';
