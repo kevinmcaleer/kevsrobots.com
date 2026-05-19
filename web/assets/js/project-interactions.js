@@ -41,11 +41,18 @@ var ProjectInteractions = (function () {
 
   function loadLikes(projectUrl, container) {
     if (!container) return;
-    chatterFetch('/interact/likes/' + encodeURIComponent(projectUrl))
+    // Chatter's `/interact/likes/<key>` returns `{like_count}` only —
+    // anonymous-safe but no user_has_liked. Use `/interact/like-status/`
+    // which returns both `{like_count, user_has_liked}` in one call so the
+    // heart renders in the right state on first paint.
+    chatterFetch('/interact/like-status/' + encodeURIComponent(projectUrl))
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data) return;
-        renderLikeButton(container, projectUrl, data.count || 0, !!data.user_liked);
+        var count = (data.like_count != null) ? data.like_count : (data.count || 0);
+        var liked = (data.user_has_liked != null) ? data.user_has_liked
+                  : (data.liked != null) ? data.liked : !!data.user_liked;
+        renderLikeButton(container, projectUrl, count, liked);
       })
       .catch(function () {
         // Chatter unreachable — show a static heart with 0
@@ -193,10 +200,14 @@ var ProjectInteractions = (function () {
 
   function renderCommentThread(comment, projectUrl, depth) {
     var indent = depth > 0 ? ' ms-4 border-start ps-3' : '';
-    var authorName = comment.author_username || comment.author || 'Anonymous';
+    // Chatter returns `username` (not `author_username`) on its
+    // /interact/comments response. Accept both shapes so this works if
+    // Chatter ever standardises the field name.
+    var who = comment.username || comment.author_username || comment.author;
+    var authorName = who || 'Anonymous';
     // Issue #111: link author to their profile when we have a username.
-    var authorHtml = comment.author_username
-      ? '<a href="/profile/?u=' + encodeURIComponent(comment.author_username) +
+    var authorHtml = who
+      ? '<a href="/profile/?u=' + encodeURIComponent(who) +
         '" class="text-decoration-none"><strong class="small">' + esc(authorName) + '</strong></a>'
       : '<strong class="small">' + esc(authorName) + '</strong>';
     var html =
