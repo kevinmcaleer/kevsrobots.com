@@ -73,15 +73,75 @@ async def _fetch_parts_meta(
     }
 
 
+async def _fetch_supplier_pricing(
+    session: AsyncSession, supplier_ids: list[int]
+) -> dict[int, tuple[Optional[float], Optional[str]]]:
+    """Batch-load (unit_cost, currency_code) for the given supplier ids.
+
+    Returns a dict keyed by supplier_id; missing keys mean the supplier
+    no longer exists (ON DELETE SET NULL would normally clear the FK,
+    but the resolver is defensive in case the row is stale for any
+    other reason). The caller folds this into ``_to_response`` so the
+    BOM list endpoint stays at O(1) extra query per request regardless
+    of how many rows reference suppliers — important because a project
+    with 50 BOM rows each linked to a different supplier must not
+    issue 50 separate SELECTs (N+1).
+
+    SQL pattern: a single ``WHERE id IN (:ids)`` against
+    ``part_suppliers`` is one round-trip and uses the PK index. The
+    cost is bounded by ``len(supplier_ids)`` regardless of which
+    project we're loading.
+    """
+    if not supplier_ids:
+        return {}
+    rows = (
+        await session.execute(
+            select(
+                PartSupplier.id, PartSupplier.unit_cost, PartSupplier.currency_code
+            ).where(PartSupplier.id.in_(supplier_ids))
+        )
+    ).all()
+    return {sid: (cost, code) for sid, cost, code in rows}
+
+
 def _to_response(
     item: ProjectBOMItem,
     parts_meta: dict[int, tuple[Optional[str], Optional[str]]],
+    supplier_pricing: dict[int, tuple[Optional[float], Optional[str]]],
 ) -> BOMItemResponse:
-    """Build a BOMItemResponse, decorating with part slug / supplier."""
+    """Build a BOMItemResponse, decorating with part slug / supplier.
+
+    Resolution order for the effective price (supplier-pricing feature):
+
+      1. If the row has a ``supplier_id`` AND the supplier still exists
+         AND the supplier has a non-NULL ``unit_cost``: use the
+         supplier's live values. ``price_source = "supplier"``.
+      2. Otherwise (no supplier link, supplier deleted under us, or
+         supplier has no price recorded): fall back to the row's own
+         ``unit_cost`` + ``currency_code``. ``price_source = "row"``.
+
+    A stale ``supplier_id`` pointing at a deleted supplier behaves
+    identically to having no link at all — ON DELETE SET NULL on the FK
+    will eventually NULL it out, but until then the resolver silently
+    falls through to the row values rather than 500ing.
+    """
     slug = None
     primary_supplier = None
     if item.part_id is not None:
         slug, primary_supplier = parts_meta.get(item.part_id, (None, None))
+
+    effective_unit_cost: Optional[float] = item.unit_cost
+    effective_currency_code: Optional[str] = item.currency_code
+    price_source = "row"
+    if item.supplier_id is not None:
+        sup_cost, sup_currency = supplier_pricing.get(
+            item.supplier_id, (None, None)
+        )
+        if sup_cost is not None:
+            effective_unit_cost = sup_cost
+            effective_currency_code = sup_currency
+            price_source = "supplier"
+
     return BOMItemResponse(
         id=item.id,
         name=item.name,
@@ -94,6 +154,10 @@ def _to_response(
         part_id=item.part_id,
         part_slug=slug,
         part_primary_supplier_url=primary_supplier,
+        supplier_id=item.supplier_id,
+        effective_unit_cost=effective_unit_cost,
+        effective_currency_code=effective_currency_code,
+        price_source=price_source,
     )
 
 
@@ -128,7 +192,32 @@ async def list_bom(
     ).all()
     part_ids = [i.part_id for i in items if i.part_id is not None]
     parts_meta = await _fetch_parts_meta(session, list(set(part_ids)))
-    return [_to_response(i, parts_meta) for i in items]
+    # Batch-load supplier prices in one round-trip — see
+    # ``_fetch_supplier_pricing`` for the N+1 mitigation rationale. A
+    # 50-row BOM linked to 50 different suppliers still issues exactly
+    # one extra SELECT, not 50.
+    supplier_ids = [i.supplier_id for i in items if i.supplier_id is not None]
+    supplier_pricing = await _fetch_supplier_pricing(
+        session, list(set(supplier_ids))
+    )
+    return [_to_response(i, parts_meta, supplier_pricing) for i in items]
+
+
+async def _validate_supplier_id(
+    session: AsyncSession, supplier_id: Optional[int]
+) -> Optional[int]:
+    """Return ``supplier_id`` if the supplier exists, else None.
+
+    Same validate-or-drop pattern as ``part_id`` on the BOM endpoints —
+    a stale or unknown id shouldn't make the request 4xx because the
+    user might be saving other field changes at the same time. The
+    resolver in ``_to_response`` is also defensive against this case so
+    the row stays useful even if the supplier disappears mid-edit.
+    """
+    if supplier_id is None:
+        return None
+    existing = await session.get(PartSupplier, supplier_id)
+    return supplier_id if existing is not None else None
 
 
 @router.post("", response_model=BOMItemResponse, status_code=201)
@@ -149,6 +238,9 @@ async def add_bom_item(
         if existing is None:
             payload["part_id"] = None
             part_id = None
+    payload["supplier_id"] = await _validate_supplier_id(
+        session, payload.get("supplier_id")
+    )
     item = ProjectBOMItem(project_id=project_id, **payload)
     session.add(item)
     await session.flush()
@@ -157,7 +249,10 @@ async def add_bom_item(
     await session.commit()
     await session.refresh(item)
     parts_meta = await _fetch_parts_meta(session, [item.part_id] if item.part_id else [])
-    return _to_response(item, parts_meta)
+    supplier_pricing = await _fetch_supplier_pricing(
+        session, [item.supplier_id] if item.supplier_id else []
+    )
+    return _to_response(item, parts_meta, supplier_pricing)
 
 
 @router.put("/{item_id}", response_model=BOMItemResponse)
@@ -180,6 +275,9 @@ async def update_bom_item(
         if existing is None:
             payload["part_id"] = None
             new_part_id = None
+    payload["supplier_id"] = await _validate_supplier_id(
+        session, payload.get("supplier_id")
+    )
     for field, value in payload.items():
         setattr(item, field, value)
     await session.flush()
@@ -191,7 +289,10 @@ async def update_bom_item(
     await session.commit()
     await session.refresh(item)
     parts_meta = await _fetch_parts_meta(session, [item.part_id] if item.part_id else [])
-    return _to_response(item, parts_meta)
+    supplier_pricing = await _fetch_supplier_pricing(
+        session, [item.supplier_id] if item.supplier_id else []
+    )
+    return _to_response(item, parts_meta, supplier_pricing)
 
 
 @router.delete("/{item_id}", status_code=204)
