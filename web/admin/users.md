@@ -1,18 +1,21 @@
 ---
 layout: content
-title: Admin Panel
-description: Manage users and system settings
+title: User Management
+description: Manage user accounts, password resets and admin privileges
+permalink: /admin/users/
 ---
 
-# Admin Panel
+{% include nav_admin.html %}
+
+# User Management
 
 <div class="container mt-4">
   <div class="row">
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>User Management</h2>
-        <a href="/account" class="btn btn-secondary">
-          <i class="fa-solid fa-arrow-left me-2"></i>Back to Account
+        <a href="/admin/" class="btn btn-secondary">
+          <i class="fa-solid fa-arrow-left me-2"></i>Back to Admin
         </a>
       </div>
 
@@ -70,7 +73,7 @@ description: Manage users and system settings
 <script>
   // Check if user is authenticated and is admin
   if (!ChatterAPI.isAuthenticated()) {
-    window.location.href = '/login?return_to=/admin';
+    window.location.href = '/login?return_to=/admin/users/';
   }
 
   // Format date helper

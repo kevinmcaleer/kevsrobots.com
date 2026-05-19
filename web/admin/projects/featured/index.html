@@ -1,0 +1,191 @@
+---
+title: Featured Projects Admin
+layout: default
+description: Toggle featured projects and manage the Projects Hub carousel
+permalink: /admin/projects/featured/
+---
+
+{% include nav_admin.html %}
+
+<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+
+<div class="container py-4">
+  <h1><i class="fas fa-star text-warning me-3"></i> Featured Projects</h1>
+  <p class="text-muted">
+    Toggle a project's featured state. Currently featured projects appear in
+    the carousel at the top of <a href="/projects/hub.html">the Projects Hub</a>.
+    For themed collections see <a href="/admin/staff-picks/">Staff picks</a>.
+  </p>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="admin-content" class="d-none">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-star text-warning me-2"></i> Feature a project</span>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-3">
+          Find a project by ID below and toggle its featured state.
+        </p>
+
+        <div class="row g-2 mb-4 align-items-end admin-feature-row">
+          <div class="col-md-2">
+            <label for="feature-project-id" class="form-label small mb-1">Project ID</label>
+            <input type="number" class="form-control" id="feature-project-id" min="1" placeholder="e.g. 42">
+          </div>
+          <div class="col-md-7">
+            <label for="feature-note-input" class="form-label small mb-1">Editor note (optional, max 200 chars)</label>
+            <input type="text" class="form-control feature-note-input" id="feature-note-input" maxlength="200" placeholder="Why is this project being featured?">
+          </div>
+          <div class="col-md-3">
+            <button type="button" class="btn btn-warning w-100" id="feature-btn">
+              <i class="fas fa-star me-1"></i> Feature project
+            </button>
+          </div>
+        </div>
+
+        <h6 class="mb-2">Currently featured</h6>
+        <div id="no-featured" class="text-muted small py-2 d-none">No featured projects yet.</div>
+        <div class="table-responsive">
+          <table id="featured-table" class="table table-sm table-hover mb-0 d-none">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Note</th>
+                <th>Featured by</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="featured-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+
+  function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t || '';
+    return d.innerHTML;
+  }
+
+  async function init() {
+    // Probe admin access via the reports endpoint, which 403s for non-admins.
+    try {
+      const resp = await fetch(API + '/api/admin/reports', { credentials: 'include' });
+      document.getElementById('loading').classList.add('d-none');
+      if (resp.status === 403 || resp.status === 401) {
+        document.getElementById('access-denied').classList.remove('d-none');
+        return;
+      }
+      if (!resp.ok) throw new Error('Failed');
+      document.getElementById('admin-content').classList.remove('d-none');
+      loadFeatured();
+      setupFeatureButton();
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('access-denied').classList.remove('d-none');
+    }
+  }
+
+  async function loadFeatured() {
+    try {
+      const resp = await fetch(API + '/api/projects/featured?limit=50', { credentials: 'include' });
+      if (!resp.ok) return;
+      const projects = await resp.json();
+      const tbody = document.getElementById('featured-body');
+      const table = document.getElementById('featured-table');
+      const empty = document.getElementById('no-featured');
+      if (!projects.length) {
+        table.classList.add('d-none');
+        empty.classList.remove('d-none');
+        return;
+      }
+      empty.classList.add('d-none');
+      table.classList.remove('d-none');
+      tbody.innerHTML = projects.map(function(p) {
+        return '<tr>' +
+          '<td>' + p.id + '</td>' +
+          '<td><a href="/projects/view.html?id=' + p.id + '">' + esc(p.title) + '</a></td>' +
+          '<td>' + esc(p.author_username) + '</td>' +
+          '<td><span class="small">' + esc(p.featured_note || '-') + '</span></td>' +
+          '<td>' + esc(p.featured_by || '-') + '</td>' +
+          '<td>' +
+            '<button class="btn btn-sm btn-outline-secondary" onclick="unfeatureProject(' + p.id + ')">' +
+              '<i class="far fa-star me-1"></i> Unfeature' +
+            '</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    } catch (e) {}
+  }
+
+  function setupFeatureButton() {
+    var btn = document.getElementById('feature-btn');
+    if (!btn) return;
+    btn.addEventListener('click', async function() {
+      var idInput = document.getElementById('feature-project-id');
+      var noteInput = document.getElementById('feature-note-input');
+      var pid = parseInt(idInput.value, 10);
+      if (!pid || pid < 1) {
+        alert('Enter a valid project ID.');
+        return;
+      }
+      var note = (noteInput.value || '').trim();
+      if (note.length > 200) {
+        alert('Editor note is limited to 200 characters.');
+        return;
+      }
+      try {
+        var resp = await fetch(API + '/api/admin/projects/' + pid + '/feature', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ note: note || null })
+        });
+        if (resp.status === 404) {
+          alert('Project not found.');
+          return;
+        }
+        if (!resp.ok) {
+          alert('Failed to feature project.');
+          return;
+        }
+        idInput.value = '';
+        noteInput.value = '';
+        loadFeatured();
+      } catch (e) { alert('Network error.'); }
+    });
+  }
+
+  window.unfeatureProject = async function(projectId) {
+    if (!confirm('Unfeature this project? It will be removed from the hub carousel.')) return;
+    try {
+      var resp = await fetch(API + '/api/admin/projects/' + projectId + '/feature', {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (resp.ok) loadFeatured();
+      else alert('Failed to unfeature.');
+    } catch (e) { alert('Network error.'); }
+  };
+
+  init();
+})();
+</script>
