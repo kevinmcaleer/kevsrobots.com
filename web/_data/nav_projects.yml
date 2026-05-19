@@ -5,6 +5,9 @@
 - name: Search
   link: /projects/search
   icon: fas fa-magnifying-glass
+- name: Staff Picks
+  link: /projects/staff-picks/
+  icon: fas fa-star
 - name: My Projects
   link: /projects/my-projects
   icon: fas fa-user-gear

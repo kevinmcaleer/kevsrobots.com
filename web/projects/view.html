@@ -714,7 +714,11 @@ description: View project details
         const tRow = document.getElementById('view-tags-row');
         const tEl = document.getElementById('view-tags');
         if (tRow && tEl) {
-          tEl.innerHTML = project.tags.map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('');
+          tEl.innerHTML = project.tags.map(t => {
+            const safe = esc(t);
+            const url = '/projects/search?tag=' + encodeURIComponent(String(t).toLowerCase());
+            return `<a href="${url}" class="badge bg-light text-primary text-decoration-none">${safe}</a>`;
+          }).join('');
           tRow.classList.remove('d-none');
           anyMeta = true;
         }
