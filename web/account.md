@@ -243,12 +243,33 @@ description: Manage your kevsrobots.com account
           </div>
         </div>
       </div>
+
+      <!-- Content & Acceptance (terms-gate) -->
+      <div class="card mb-4" id="terms-card">
+        <div class="card-body">
+          <h3 class="card-title mb-3"><i class="fas fa-file-signature me-2 text-primary"></i>Content &amp; Acceptance</h3>
+          <p class="text-muted small">
+            Uploading projects, images, BOMs, comments, parts edits, or other
+            content to the Projects Hub requires accepting our content terms.
+          </p>
+          <p class="mb-1"><strong>Status:</strong> <span id="terms-status-text" class="text-muted">Loading…</span></p>
+          <p class="mb-1"><strong>Accepted version:</strong> <span id="terms-accepted-version" class="font-monospace text-muted">—</span></p>
+          <p class="mb-3"><strong>Current version:</strong> <span id="terms-current-version" class="font-monospace text-muted">—</span></p>
+          <a href="/projects-hub-terms/" class="btn btn-outline-secondary btn-sm me-1" target="_blank" rel="noopener">
+            <i class="fas fa-external-link-alt me-1"></i>View full terms
+          </a>
+          <button type="button" class="btn btn-primary btn-sm" id="terms-accept-btn" style="display:none;">
+            <i class="fas fa-check me-1"></i>Accept terms
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="/assets/js/chatter-api.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
 <script>
   let currentUser = null;
   // Cached projects-api profile (the source of truth for public profile fields).
@@ -761,6 +782,61 @@ description: Manage your kevsrobots.com account
     }
   });
 
+  // --- Terms acceptance card (terms-gate) ---------------------------------
+  // Renders the user's current acceptance status next to the Activity card,
+  // and exposes an "Accept terms" button when the user hasn't accepted the
+  // current version (either never accepted, or accepted an older version).
+  async function loadTermsStatus() {
+    if (typeof TermsGate === 'undefined') return;
+    try {
+      const r = await ProjectAuth.apiFetch(`${PROJECTS_API}/api/auth/me`);
+      if (!r.ok) return;
+      const me = await r.json();
+      const statusEl = document.getElementById('terms-status-text');
+      const acceptedVersionEl = document.getElementById('terms-accepted-version');
+      const currentVersionEl = document.getElementById('terms-current-version');
+      const btn = document.getElementById('terms-accept-btn');
+
+      const accepted =
+        me.terms_accepted_version &&
+        me.terms_accepted_at &&
+        me.terms_accepted_version === me.current_terms_version;
+
+      currentVersionEl.textContent = me.current_terms_version || '—';
+
+      if (accepted) {
+        const date = new Date(me.terms_accepted_at);
+        statusEl.innerHTML = '<span class="badge bg-success">Accepted</span> ' +
+          'on ' + date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        acceptedVersionEl.textContent = me.terms_accepted_version;
+        acceptedVersionEl.classList.remove('text-muted');
+        btn.style.display = 'none';
+      } else if (me.terms_accepted_version) {
+        statusEl.innerHTML = '<span class="badge bg-warning text-dark">Update required</span> ' +
+          'Please re-accept the latest version to keep uploading.';
+        acceptedVersionEl.textContent = me.terms_accepted_version + ' (outdated)';
+        btn.style.display = 'inline-block';
+      } else {
+        statusEl.innerHTML = '<span class="badge bg-secondary">Not yet accepted</span> ' +
+          'Please accept to upload content.';
+        acceptedVersionEl.textContent = '—';
+        btn.style.display = 'inline-block';
+      }
+    } catch (_) {
+      // Defensive — the card just stays in its loading state.
+    }
+  }
+
+  const termsBtn = document.getElementById('terms-accept-btn');
+  if (termsBtn) {
+    termsBtn.addEventListener('click', function () {
+      TermsGate.showModal().then(function (ok) {
+        if (ok) loadTermsStatus();
+      });
+    });
+  }
+
   // Load data on page load
   loadUserData();
+  loadTermsStatus();
 </script>

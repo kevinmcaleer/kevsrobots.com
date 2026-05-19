@@ -334,6 +334,7 @@ hide_nibsy: true
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/circuit-components.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/circuit-editor.js?v={{ site.time | date: '%s' }}"></script>
@@ -454,5 +455,47 @@ hide_nibsy: true
 
   document.addEventListener('DOMContentLoaded', attach);
   if (document.readyState !== 'loading') attach();
+})();
+</script>
+
+<!-- Terms-gate (terms-gate): blocks the editor until the logged-in user
+     has accepted the current version of the Projects Hub T&Cs. The check
+     runs on page load and pops the standard TermsGate modal if needed.
+     Once accepted the modal closes and the editor unblocks. -->
+<script>
+(function () {
+  if (typeof TermsGate === 'undefined') return;
+  document.addEventListener('DOMContentLoaded', function () {
+    TermsGate.check().then(function (accepted) {
+      if (accepted) return;
+      // Pause autosave while the gate is open so a half-typed draft
+      // doesn't try to save through a 403.
+      if (window.projectEditorAutosave && window.projectEditorAutosave.pause) {
+        try { window.projectEditorAutosave.pause(); } catch (e) {}
+      }
+      var banner = document.createElement('div');
+      banner.className = 'alert alert-warning text-center my-3';
+      banner.innerHTML =
+        '<strong><i class="fas fa-lock me-2"></i>Accept the Projects Hub terms to continue editing.</strong> ' +
+        '<button type="button" class="btn btn-sm btn-primary ms-2" id="terms-gate-banner-btn">' +
+        'Review and accept</button>';
+      var host = document.querySelector('.container') ||
+                 document.querySelector('main') || document.body;
+      host.insertBefore(banner, host.firstChild);
+      document.getElementById('terms-gate-banner-btn').addEventListener(
+        'click',
+        function () { TermsGate.showModal().then(reloadIfAccepted); }
+      );
+      // Auto-pop on load too.
+      TermsGate.showModal().then(reloadIfAccepted);
+
+      function reloadIfAccepted(ok) {
+        if (!ok) return;
+        // Easiest reliable re-init path — reload the page so the editor
+        // boots fresh under the accepted state.
+        window.location.reload();
+      }
+    });
+  });
 })();
 </script>
