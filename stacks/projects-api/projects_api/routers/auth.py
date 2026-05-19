@@ -18,9 +18,13 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, Response
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import extract_token, fetch_chatter_me, get_current_user
 from ..config import get_settings
+from ..db import get_session
+from ..models import User
 
 router = APIRouter(tags=["auth"])
 
@@ -59,12 +63,17 @@ async def auth_me(
     response: Response,
     username: str = Depends(get_current_user),
     token: Optional[str] = Depends(extract_token),
+    session: AsyncSession = Depends(get_session),
 ) -> dict[str, Any]:
     """Return the authenticated user's profile.
 
     Raises 401 (via :func:`get_current_user`) if no valid session token
     is present. On success, enriches the local view (username,
     is_admin) with Chatter's ``/api/me`` payload when available.
+
+    Also exposes the T&Cs acceptance state (terms-gate) so the frontend
+    can decide upfront whether to block uploads — no need to wait for a
+    write to 403 with ``terms_not_accepted`` first.
     """
     response.headers["Cache-Control"] = "no-store"
 
@@ -96,6 +105,17 @@ async def auth_me(
     if not isinstance(avatar_url, str):
         avatar_url = None
 
+    # T&Cs acceptance — read the local users row (lazy; null when missing).
+    terms_accepted_at: Optional[str] = None
+    terms_accepted_version: Optional[str] = None
+    user_row = await session.scalar(select(User).where(User.username == username))
+    if user_row is not None:
+        if user_row.terms_accepted_at is not None:
+            terms_accepted_at = user_row.terms_accepted_at.strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            )
+        terms_accepted_version = user_row.terms_accepted_version
+
     return {
         "id": user_id,
         "username": username,
@@ -103,4 +123,7 @@ async def auth_me(
         "is_admin": is_admin,
         "created_at": created_at,
         "avatar_url": avatar_url,
+        "terms_accepted_at": terms_accepted_at,
+        "terms_accepted_version": terms_accepted_version,
+        "current_terms_version": settings.current_terms_version,
     }

@@ -143,6 +143,102 @@ async def get_optional_user(
         return None
 
 
+async def _check_terms_accepted(session: AsyncSession, user: str) -> None:
+    """Raise 403 ``terms_not_accepted`` if ``user`` hasn't accepted the
+    current T&Cs version.
+
+    Lazily creates a ``users`` row with ``is_disabled=False`` and
+    ``terms_accepted_at=None`` when none exists yet, so the subsequent
+    ``POST /api/users/me/accept-terms`` call can update it in place.
+
+    Shared by :func:`require_terms_accepted` and
+    :func:`require_terms_accepted_aged` so the gate behaviour is identical
+    regardless of which auth dependency the route uses.
+    """
+    # Local import to avoid the models -> db -> auth -> models cycle.
+    from .models import User
+
+    settings = get_settings()
+    current_version = settings.current_terms_version
+
+    row = await session.scalar(select(User).where(User.username == user))
+    if row is None:
+        # Lazily create the row so accept-terms can update it later.
+        row = User(username=user, is_disabled=False)
+        session.add(row)
+        try:
+            await session.commit()
+        except Exception:  # noqa: BLE001 — racing duplicate insert is fine
+            await session.rollback()
+            row = await session.scalar(
+                select(User).where(User.username == user)
+            )
+
+    accepted = (
+        row is not None
+        and row.terms_accepted_at is not None
+        and row.terms_accepted_version == current_version
+    )
+    if not accepted:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "detail": "terms_not_accepted",
+                "current_version": current_version,
+            },
+        )
+
+
+async def require_terms_accepted(
+    user: str = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> str:
+    """FastAPI dependency: 403 when the user hasn't accepted the current T&Cs.
+
+    The shape of the 403 body is a stable contract the frontend depends on
+    to detect "this is a terms-acceptance problem, not a generic auth
+    error"::
+
+        {"detail": "terms_not_accepted", "current_version": "1.0"}
+
+    A user is considered "accepted" when their ``users`` row has a non-null
+    ``terms_accepted_at`` AND ``terms_accepted_version`` exactly matches
+    ``settings.current_terms_version``. Older versions are treated as not
+    accepted so a version bump forces everyone to re-agree.
+
+    Edge case: if the ``users`` row doesn't exist yet (first write from a
+    brand-new account), we auto-create it with ``is_disabled=False`` and
+    ``terms_accepted_at=None`` and THEN raise the 403. This keeps the row
+    available for the subsequent ``POST /api/users/me/accept-terms`` call.
+    """
+    await _check_terms_accepted(session, user)
+    return user
+
+
+async def require_terms_accepted_aged(
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+    session: AsyncSession = Depends(get_session),
+) -> str:
+    """Combined dependency: 14-day account-age gate + T&Cs acceptance gate.
+
+    Used by parts-catalog mutation endpoints (POST/PUT/restore) and the
+    parts-moderation merge endpoints — they already required
+    :func:`get_current_user_aged`, this wrapper layers the terms-acceptance
+    check on top so both gates fire in the right order (auth -> disabled
+    -> age -> terms). The 403 ``terms_not_accepted`` payload shape matches
+    :func:`require_terms_accepted` so the frontend's gate-handling path
+    works regardless of which dependency raised it.
+    """
+    username = await get_current_user_aged(
+        access_token=access_token,
+        authorization=authorization,
+        session=session,
+    )
+    await _check_terms_accepted(session, username)
+    return username
+
+
 def require_admin(user: str = Depends(get_current_user)) -> str:
     """FastAPI dependency: 401 if not logged in, 403 if not in the admin list.
 

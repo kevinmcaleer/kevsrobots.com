@@ -73,6 +73,13 @@ class Settings(BaseSettings):
     max_image_size: int = 10 * 1024 * 1024  # 10MB
     max_project_storage: int = 50 * 1024 * 1024  # 50MB total per project
 
+    # T&Cs acceptance gate (terms-gate). Bumping this value forces every
+    # already-accepted user to re-accept on their next upload attempt; the
+    # frontend reads ``current_terms_version`` from ``/api/auth/me`` and
+    # compares it with the user's stored ``terms_accepted_version``. Keep
+    # the format short (e.g. "1.0", "1.1") — the column is ``String(20)``.
+    current_terms_version: str = "1.0"
+
     # IP hashing for download dedup — never expose raw IPs in API responses.
     # In production, set this via env (e.g. IP_HASH_SALT=...) to a long random
     # value so hashes are not predictable. Default is a per-process random

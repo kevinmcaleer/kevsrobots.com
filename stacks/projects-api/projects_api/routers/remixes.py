@@ -21,7 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..db import get_session
 from ..models import Project, ProjectTag
@@ -64,7 +64,7 @@ def _list_item_from_project(project: Project, tags: list[str]) -> ProjectListIte
 async def create_remix(
     project_id: int,
     body: ProjectRemixCreate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> ProjectResponse:
     """Create a remix of an existing project.

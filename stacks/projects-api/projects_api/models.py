@@ -807,6 +807,15 @@ class User(Base):
     )
     disabled_reason: Mapped[Optional[str]] = mapped_column(Text)
     disabled_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    # T&Cs acceptance gate for the Projects Hub (issue: terms-gate).
+    # ``terms_accepted_at`` is the UTC timestamp at which the user clicked
+    # "I agree" in the modal; ``terms_accepted_version`` records WHICH
+    # version of the T&Cs they signed off on. Both nullable for back-compat
+    # with users who pre-date the gate — the runtime check treats null as
+    # "needs to accept". When ``settings.current_terms_version`` is bumped
+    # the user gets re-prompted to accept the new version.
+    terms_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    terms_accepted_version: Mapped[Optional[str]] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )

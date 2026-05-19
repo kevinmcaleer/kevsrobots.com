@@ -15,13 +15,18 @@ This router implements:
                                           restore (writes a new revision
                                           whose snapshot equals rev_id).
 
-Account-age gate
-----------------
-Mutating endpoints depend on :func:`get_current_user_aged` which calls
-:func:`fetch_account_created_at` against Chatter's ``/api/me``. If Chatter
-is unreachable or omits the ``account_created_at`` field, the gate fails
-closed (HTTP 403 "Account age cannot be verified"). Tests monkeypatch
-``fetch_account_created_at`` directly.
+Account-age + T&Cs gate
+-----------------------
+Mutating endpoints depend on :func:`require_terms_accepted_aged` which
+layers the T&Cs acceptance gate (terms-gate) on top of
+:func:`get_current_user_aged`. The age gate calls
+:func:`fetch_account_created_at` against Chatter's ``/api/me``; if Chatter
+is unreachable or omits the ``account_created_at`` field, it fails closed
+(HTTP 403 "Account age cannot be verified"). The T&Cs gate raises a 403
+with ``detail: terms_not_accepted`` until the user has POSTed the current
+version to ``/api/users/me/accept-terms``. Tests monkeypatch
+``fetch_account_created_at`` directly and the test client bypasses the
+T&Cs gate by default (see ``tests/conftest.py``).
 
 Usage-count semantics
 ---------------------
@@ -51,7 +56,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user_aged
+from ..auth import require_terms_accepted_aged
 from ..db import get_session
 from ..mass_deletion import (
     check_and_handle_mass_deletion,
@@ -392,7 +397,7 @@ async def list_families(
 @router.post("", response_model=PartDetail, status_code=201)
 async def create_part(
     body: PartCreate,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> PartDetail:
     slug = await _unique_slug(session, _slugify(body.name))
@@ -512,7 +517,7 @@ def _supplier_signature(suppliers: list[dict]) -> list[tuple]:
 async def update_part(
     slug: str,
     body: PartUpdate,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> PartDetail:
     part = await _get_part_by_slug(session, slug)
@@ -734,7 +739,7 @@ async def get_revision(
 async def restore_revision(
     slug: str,
     rev_id: int,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> PartDetail:
     """Non-destructive restore: write a NEW revision whose snapshot
@@ -845,7 +850,7 @@ async def list_related_parts(
 async def add_related_part(
     slug: str,
     body: PartRelationCreate,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> list[PartRelatedRef]:
     """Link ``slug`` to another part identified by ``related_slug``.
@@ -896,7 +901,7 @@ async def add_related_part(
 async def remove_related_part(
     slug: str,
     related_slug: str,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     part = await _get_part_by_slug(session, slug)

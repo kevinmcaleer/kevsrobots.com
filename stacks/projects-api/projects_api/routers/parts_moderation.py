@@ -70,7 +70,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import and_, delete, func, or_, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, get_current_user_aged, require_admin
+from ..auth import (
+    get_current_user,
+    require_admin,
+    require_terms_accepted_aged,
+)
 from ..db import get_session
 from ..models import (
     Part,
@@ -403,12 +407,12 @@ async def resolve_part_report(
 async def propose_merge(
     slug: str,
     body: PartMergeProposalCreate,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> PartMergeProposalResponse:
     """Propose merging the part identified by URL slug INTO ``target_slug``.
 
-    14-day account-age gate (via :func:`get_current_user_aged`). The
+    14-day account-age gate + T&Cs gate (via :func:`require_terms_accepted_aged`). The
     source part is identified by the URL slug, target by the body field.
     """
     source = await _get_part_by_slug(session, slug)
@@ -522,7 +526,7 @@ async def get_merge_proposal(
 async def vote_on_merge_proposal(
     proposal_id: int,
     body: PartMergeVoteCreate,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> PartMergeVoteResponse:
     """Approve or reject — re-POSTing flips the existing vote in place.

@@ -7,7 +7,7 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Project, ProjectImage
@@ -42,7 +42,7 @@ async def list_images(
 async def upload_image(
     project_id: int,
     file: UploadFile,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> ImageResponse:
     project = await session.get(Project, project_id)
@@ -101,7 +101,7 @@ async def update_image(
     project_id: int,
     image_id: int,
     body: dict,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> ImageResponse:
     project = await session.get(Project, project_id)
@@ -125,7 +125,7 @@ async def update_image(
 async def delete_image(
     project_id: int,
     image_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     project = await session.get(Project, project_id)

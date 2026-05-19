@@ -29,7 +29,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, get_current_user_aged
+from ..auth import (
+    require_terms_accepted,
+    require_terms_accepted_aged,
+)
 from ..config import get_settings
 from ..db import get_session
 from ..models import Part, PartTalkPost, PartTalkThread
@@ -133,7 +136,7 @@ async def list_threads(
 async def create_thread(
     slug: str,
     body: PartTalkThreadCreate,
-    user: str = Depends(get_current_user_aged),
+    user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> PartTalkThreadDetail:
     """Open a new discussion thread on a part.
@@ -232,7 +235,7 @@ async def add_post(
     slug: str,
     thread_id: int,
     body: PartTalkPostCreate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> PartTalkPostResponse:
     """Append a post to a thread.
@@ -271,7 +274,7 @@ async def update_thread(
     slug: str,
     thread_id: int,
     body: PartTalkThreadUpdate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> PartTalkThreadDetail:
     """Toggle the closed state on a thread.
@@ -328,7 +331,7 @@ async def update_post(
     thread_id: int,
     post_id: int,
     body: PartTalkPostUpdate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> PartTalkPostResponse:
     """Edit a post — original author OR admin only.
