@@ -540,6 +540,8 @@ class UserProfileResponse(BaseModel):
     joined_at: Optional[datetime] = None
     featured_badge_slugs: list[str] = Field(default_factory=list)
     stats: UserProfileStats = Field(default_factory=UserProfileStats)
+    # Issue #150: ISO 4217 code or None ("auto-detect / show native").
+    preferred_currency: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
 
 
 class UserProfileUpdate(BaseModel):
@@ -556,6 +558,10 @@ class UserProfileUpdate(BaseModel):
     website_url: Optional[str] = Field(None, max_length=200)
     social_links: Optional[UserSocialLinks] = None
     featured_badge_slugs: Optional[list[str]] = Field(None, max_length=3)
+    # Issue #150: preferred display currency. ``None`` means "clear"
+    # (back to auto-detect). Must be a 3-letter ISO 4217 alpha code.
+    # The route validates the value is in the supported allow-list.
+    preferred_currency: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
 
 
 class UserActivityItem(BaseModel):
