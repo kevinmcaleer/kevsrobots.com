@@ -172,6 +172,13 @@ class BOMItemCreate(BaseModel):
     quantity: int = Field(1, ge=1)
     unit: str = Field("qty", max_length=20)
     unit_cost: Optional[float] = None
+    # Issue #149: ISO 4217 currency code (e.g. ``GBP``, ``USD``, ``EUR``).
+    # Optional for back-compat — legacy rows without a code render as a
+    # raw number on the frontend with a "currency not set" tooltip. The
+    # pattern is strict (exactly three uppercase letters); the dropdown
+    # in the editor only offers a handful of common codes plus
+    # "other / unknown" → NULL.
+    currency_code: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
     supplier_url: Optional[str] = None
     sort_order: int = 0
     part_id: Optional[int] = None
@@ -183,6 +190,7 @@ class BOMItemResponse(BaseModel):
     quantity: int
     unit: str
     unit_cost: Optional[float]
+    currency_code: Optional[str] = None
     supplier_url: Optional[str]
     sort_order: int
     part_id: Optional[int] = None
@@ -361,6 +369,12 @@ class PopularProjectItem(BaseModel):
 class PartSupplierInput(BaseModel):
     name: Optional[str] = Field(None, max_length=120)
     url: str = Field(..., max_length=2000)
+    # Issue #149: ISO 3166-1 alpha-2 country code for the supplier (e.g.
+    # ``GB`` for Pimoroni, ``US`` for Adafruit). Optional — NULL means
+    # "global / unknown". The pattern enforces exactly two uppercase
+    # letters; the dropdown on the edit page only offers a curated list
+    # plus "other / unknown" → NULL.
+    country_code: Optional[str] = Field(None, pattern=r"^[A-Z]{2}$")
 
 
 class PartSupplierResponse(BaseModel):
@@ -369,6 +383,7 @@ class PartSupplierResponse(BaseModel):
     url: str
     last_checked_at: Optional[datetime] = None
     last_status: Optional[str] = None
+    country_code: Optional[str] = None
 
 
 class PartCreate(BaseModel):
