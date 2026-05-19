@@ -111,21 +111,21 @@
       '          </a>' +
       '          &middot; current version: <span id="' + MODAL_ID + '-version" class="font-monospace">…</span>' +
       '        </p>' +
-      '        <div class="form-check">' +
-      '          <input class="form-check-input" type="checkbox" id="terms-accept">' +
-      '          <label class="form-check-label" for="terms-accept">' +
-      '            I have read and agree to the Projects Hub terms.' +
-      '          </label>' +
-      '        </div>' +
       '        <div id="' + MODAL_ID + '-error" class="alert alert-danger mt-3 d-none" role="alert"></div>' +
       '      </div>' +
-      '      <div class="modal-footer">' +
+      '      <div class="modal-footer flex-wrap gap-2 align-items-center" style="background:#fff8e1; border-top:2px solid #ffc107;">' +
+      '        <div class="form-check me-auto fs-6 mb-0">' +
+      '          <input class="form-check-input" type="checkbox" id="terms-accept" style="width:1.25em; height:1.25em;">' +
+      '          <label class="form-check-label fw-semibold" for="terms-accept">' +
+      '            I have read and agree to the Projects Hub terms' +
+      '          </label>' +
+      '        </div>' +
       '        <button type="button" class="btn btn-secondary" id="' + MODAL_ID + '-cancel">' +
       '          Cancel' +
       '        </button>' +
       '        <button type="button" class="btn btn-primary" id="' + MODAL_ID + '-confirm" disabled>' +
       '          <span id="' + MODAL_ID + '-confirm-spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>' +
-      '          I have read and agree' +
+      '          I agree' +
       '        </button>' +
       '      </div>' +
       '    </div>' +
