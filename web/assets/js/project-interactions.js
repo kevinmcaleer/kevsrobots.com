@@ -27,11 +27,13 @@ var ProjectInteractions = (function () {
   function chatterFetch(path, opts) {
     opts = opts || {};
     opts.credentials = 'include';
-    var token = (typeof ProjectAuth !== 'undefined') ? ProjectAuth.getDevToken() : null;
-    if (token) {
-      opts.headers = opts.headers || {};
-      opts.headers['Authorization'] = 'Bearer ' + token;
-    }
+    // DO NOT add `Authorization: Bearer <ProjectAuth.getDevToken()>` here.
+    // That token is signed with the projects-api secret, not Chatter's, so
+    // Chatter rejects it as an invalid Authorization header and (worse)
+    // doesn't fall back to the session cookie — comments end up saved as
+    // anonymous instead of the logged-in user. The Chatter cookie set on
+    // .kevsrobots.com is the only identity Chatter accepts; cookies travel
+    // via `credentials: 'include'` already.
     return fetch(CHATTER + path, opts);
   }
 
