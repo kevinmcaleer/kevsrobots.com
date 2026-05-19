@@ -11,11 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from .badges import seed_badge_definitions
 from .config import get_settings
 from .db import (
+    add_bom_currency_if_missing,
     add_bom_part_id_if_missing,
     add_part_category_family_if_missing,
     add_project_featured_columns_if_missing,
     add_project_slug_if_missing,
     add_remix_columns_if_missing,
+    add_supplier_country_if_missing,
     add_user_currency_preference_if_missing,
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
@@ -75,6 +77,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # builds the table on fresh deploys) and before any router handles a
     # request (the backfill happens in a separate session).
     await add_project_slug_if_missing()
+    # Issue #149: supplier country_code + BOM currency_code columns on
+    # existing tables (part_suppliers / project_bom_items).
+    await add_supplier_country_if_missing()
+    await add_bom_currency_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

@@ -843,6 +843,19 @@ description: View project details
     });
   }
 
+  // Issue #149: render unit_cost with its currency_code. We do NOT
+  // convert — that's tracked separately in #150. Rows without a code
+  // render the raw number with a tooltip flagging the missing currency.
+  function fmtUnitCost(item) {
+    if (item.unit_cost == null) return '-';
+    const amount = item.unit_cost.toFixed(2);
+    const code = (item.currency_code || '').trim().toUpperCase();
+    if (code) {
+      return `<span title="${esc(code + ' ' + amount)}">${esc(code)} ${amount}</span>`;
+    }
+    return `<span class="text-muted" title="Currency not set">${amount}</span>`;
+  }
+
   async function loadBOM() {
     const resp = await fetch(API + '/api/projects/' + projectId + '/bom');
     const items = await resp.json();
@@ -852,13 +865,17 @@ description: View project details
     try { buildTOC(); } catch (e) {}
     const tbody = document.getElementById('view-bom');
     let total = 0;
-    // Issue #150: prefer the row's currency_code (added by #149); fall
-    // back to GBP for legacy rows that pre-date the column. The total
-    // is still computed in native currency — converting line-by-line
-    // and summing would compound rounding errors and is misleading
-    // when rows mix currencies.
+    // Tally currency codes so we can label the (un-converted) total with
+    // the dominant one (issue #149) — or omit the symbol entirely if rows
+    // span more than one currency.
+    const currencyCounts = {};
     tbody.innerHTML = items.map((i, idx) => {
       total += i.quantity * (i.unit_cost || 0);
+      const code = (i.currency_code || '').trim().toUpperCase();
+      if (code) currencyCounts[code] = (currencyCounts[code] || 0) + 1;
+      // If a part_id + slug came back with the BOM row, link the part name to
+      // its parts-catalog page. Backwards compatible: rows without part_slug
+      // stay as plain text.
       const nameCell = i.part_id && i.part_slug
         ? `<a href="/parts/view.html?slug=${encodeURIComponent(i.part_slug)}">${esc(i.name)}</a>`
         : esc(i.name);
@@ -880,20 +897,27 @@ description: View project details
         <td>${supplierUrl ? `<a href="${esc(supplierUrl)}" target="_blank">Link <i class="fas fa-external-link-alt fa-xs"></i></a>` : '-'}</td>
       </tr>`;
     }).join('');
-    // Show the native-currency total. Use the first row's currency as
-    // the symbol (mixed-currency BOMs sum naively and that's fine —
-    // editors who care will normalise their rows).
-    const firstCcy = (items.find(i => i.currency_code) || {}).currency_code || 'GBP';
-    document.getElementById('view-bom-total').textContent =
-      (window.CurrencyConvert
-        ? CurrencyConvert.symbolFor(firstCcy) + total.toFixed(2)
-        : '£' + total.toFixed(2));
+    // Label the total with the dominant currency code when unambiguous;
+    // when rows mix currencies (or none have a code) we show just the
+    // number — async FX enrichment (issue #150) runs on each row below.
+    const codes = Object.keys(currencyCounts);
+    const totalEl = document.getElementById('view-bom-total');
+    if (codes.length === 1) {
+      totalEl.textContent = codes[0] + ' ' + total.toFixed(2);
+      totalEl.title = 'Total in ' + codes[0];
+    } else if (codes.length > 1) {
+      totalEl.textContent = total.toFixed(2);
+      totalEl.title = 'Mixed currencies — automatic conversion not yet supported';
+    } else {
+      totalEl.textContent = total.toFixed(2);
+      totalEl.title = 'Currency not set on any row';
+    }
 
-    // Async pass: if the viewer has a preferred currency and it
-    // differs from the row's currency, replace each price cell with a
-    // formatted "native (≈ converted)" string. Graceful degradation:
-    // any failure (cold cache, no preference, missing currency_code)
-    // leaves the bare native price in place.
+    // Async pass (issue #150): if the viewer has a preferred currency
+    // and it differs from the row's currency, replace each price cell
+    // with a formatted "native (≈ converted)" string. Graceful
+    // degradation: any failure (cold cache, no preference, missing
+    // currency_code) leaves the bare native price in place.
     if (window.CurrencyConvert) {
       items.forEach(async (i, idx) => {
         if (i.unit_cost == null) return;
@@ -1075,9 +1099,11 @@ description: View project details
       var bomResp = await fetch(API + '/api/projects/' + project.id + '/bom');
       var bom = await bomResp.json();
       if (bom.length > 0) {
-        var csv = 'Part,Quantity,Unit,Unit Cost,Supplier URL\n';
+        // Issue #149: include currency column so the CSV is parseable
+        // when prices are denominated in different currencies.
+        var csv = 'Part,Quantity,Unit,Unit Cost,Currency,Supplier URL\n';
         bom.forEach(function(item) {
-          csv += '"' + (item.name||'').replace(/"/g, '""') + '",' + item.quantity + ',' + item.unit + ',' + (item.unit_cost||0) + ',"' + (item.supplier_url||'') + '"\n';
+          csv += '"' + (item.name||'').replace(/"/g, '""') + '",' + item.quantity + ',' + item.unit + ',' + (item.unit_cost||0) + ',"' + (item.currency_code||'') + '","' + (item.supplier_url||'') + '"\n';
         });
         zip.file('bill-of-materials.csv', csv);
       }

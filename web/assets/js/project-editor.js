@@ -1373,6 +1373,26 @@
       .replace(/>/g, '&gt;');
   }
 
+  // Issue #149: short curated list of currencies the editor offers.
+  // Empty value -> NULL server-side ("Other / unknown" — render as a
+  // raw number on the public view). The Pydantic pattern only accepts
+  // three uppercase letters so anything else is rejected with 422.
+  const BOM_CURRENCIES = [
+    { code: '',    label: '—' },
+    { code: 'GBP', label: 'GBP £' },
+    { code: 'USD', label: 'USD $' },
+    { code: 'EUR', label: 'EUR €' },
+    { code: 'JPY', label: 'JPY ¥' },
+    { code: 'AUD', label: 'AUD A$' },
+    { code: 'CAD', label: 'CAD C$' },
+  ];
+  function bomCurrencyOptions(selected) {
+    const sel = (selected || '').toUpperCase();
+    return BOM_CURRENCIES.map(c =>
+      `<option value="${escapeHtmlAttr(c.code)}"${c.code === sel ? ' selected' : ''}>${escapeHtmlAttr(c.label)}</option>`
+    ).join('');
+  }
+
   async function loadBOM() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom', { credentials: 'include' });
@@ -1396,6 +1416,11 @@
         <td><input value="${escapeHtmlAttr(item.unit)}" data-field="unit" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
         <td><input type="number" step="0.01" value="${item.unit_cost || 0}" data-field="unit_cost" style="width:70px" onchange="updateBOM(${item.id}, this)"></td>
         <td>
+          <select class="form-select form-select-sm" data-field="currency_code" style="width:90px" onchange="updateBOM(${item.id}, this)" title="Currency for this unit cost">
+            ${bomCurrencyOptions(item.currency_code)}
+          </select>
+        </td>
+        <td>
           <input value="${escapeHtmlAttr(item.supplier_url || '')}" data-field="supplier_url"${supplierReadonly} onchange="updateBOM(${item.id}, this)">
           ${supplierHint}
         </td>
@@ -1415,12 +1440,19 @@
   window.updateBOM = async function(itemId, input) {
     const row = input.closest('tr');
     const data = {};
-    row.querySelectorAll('input').forEach(inp => {
+    // Issue #149: read both <input> and <select> fields so the currency
+    // dropdown is included in the PUT body.
+    row.querySelectorAll('input, select').forEach(inp => {
       const field = inp.dataset.field;
       if (!field) return;
       let val = inp.value;
       if (field === 'quantity') val = parseInt(val) || 1;
       else if (field === 'unit_cost') val = parseFloat(val) || 0;
+      else if (field === 'currency_code') {
+        const code = String(val || '').trim().toUpperCase();
+        // Empty -> null so the server-side pattern doesn't fire on "".
+        val = code || null;
+      }
       data[field] = val;
     });
     const partId = row.dataset.partId;
@@ -1433,16 +1465,19 @@
         body: JSON.stringify(data),
       });
     } catch (e) { loadBOM(); return; }
-    // If an older backend rejects the new part_id field, retry without it so
-    // the user's edit still saves. Treat 4xx as "field rejected"; 5xx is a
-    // real server error and we just let it fall through.
-    if (!resp.ok && partId && resp.status >= 400 && resp.status < 500) {
-      delete data.part_id;
+    // If an older backend rejects the new part_id or currency_code field,
+    // retry without those so the user's edit still saves. Treat 4xx as
+    // "field rejected"; 5xx is a real server error and we just let it
+    // fall through.
+    if (!resp.ok && resp.status >= 400 && resp.status < 500 && (partId || 'currency_code' in data)) {
+      const retryData = Object.assign({}, data);
+      delete retryData.part_id;
+      delete retryData.currency_code;
       try {
         await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
           method: 'PUT', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(retryData),
         });
       } catch (_) {}
     }

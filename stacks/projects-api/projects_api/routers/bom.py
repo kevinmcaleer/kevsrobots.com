@@ -88,6 +88,7 @@ def _to_response(
         quantity=item.quantity,
         unit=item.unit,
         unit_cost=item.unit_cost,
+        currency_code=item.currency_code,
         supplier_url=item.supplier_url,
         sort_order=item.sort_order,
         part_id=item.part_id,
