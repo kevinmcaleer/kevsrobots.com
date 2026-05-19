@@ -62,7 +62,14 @@
         {% include socials_bar.html %}
         {% include footer.html %}
 
-        {% include nibsy-widget.html %}
+        {% comment %}
+          Pages can opt out of the Nibsy widget by setting `hide_nibsy: true`
+          in their frontmatter. Used on workspaces where the floating mascot
+          would steal focus from the task (e.g. the project editor).
+        {% endcomment %}
+        {% unless page.hide_nibsy %}
+          {% include nibsy-widget.html %}
+        {% endunless %}
 
         {% if page.url contains '/projects/' or page.url contains '/parts/' %}
             {% include feedback_widget.html %}

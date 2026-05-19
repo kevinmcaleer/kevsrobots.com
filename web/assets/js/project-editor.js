@@ -2340,6 +2340,7 @@
   }
 
   function _doRecomputeCompleteness() {
+    const cardEl = document.getElementById('completeness-card');
     const scoreEl = document.getElementById('completeness-score');
     const pointsEl = document.getElementById('completeness-points');
     const barEl = document.getElementById('completeness-bar');
@@ -2347,6 +2348,8 @@
     const nextLink = document.getElementById('completeness-next-link');
     const listEl = document.getElementById('completeness-checklist');
     const celebrateEl = document.getElementById('completeness-celebration');
+    const completeBadge = document.getElementById('completeness-complete-badge');
+    const cardBody = cardEl && cardEl.querySelector('.card-body');
     if (!scoreEl || !barEl || !listEl) return;
 
     let earned = 0;
@@ -2364,21 +2367,26 @@
     barEl.setAttribute('aria-valuenow', String(pct));
     barEl.className = 'progress-bar ' + _bandClass(pct);
 
+    // At 100%, collapse the card body to just the header. The header gets
+    // a small "Complete" pill so the user can still see status at a glance
+    // without the whole checklist taking up sidebar space.
     if (pct >= 100) {
-      listEl.classList.add('d-none');
-      if (nextEl) nextEl.classList.add('d-none');
-      if (celebrateEl) celebrateEl.classList.remove('d-none');
+      if (cardBody) cardBody.classList.add('d-none');
+      if (completeBadge) completeBadge.classList.remove('d-none');
       return;
     }
+    if (cardBody) cardBody.classList.remove('d-none');
+    if (completeBadge) completeBadge.classList.add('d-none');
     if (celebrateEl) celebrateEl.classList.add('d-none');
     listEl.classList.remove('d-none');
 
-    // Next suggestion: highest-point unmet item.
+    // Next suggestion: highest-point unmet item — still ordered by point
+    // value internally (biggest wins surfaced first) but no "+N" suffix
+    // shown in the UI, per design feedback that the numbers cluttered.
     const unmet = results.filter(r => !r.met).sort((a, b) => b.item.points - a.item.points);
     if (unmet.length && nextEl && nextLink) {
-      const top = unmet[0].item;
-      nextLink.textContent = top.label + ' (+' + top.points + ')';
-      nextLink.dataset.target = top.target;
+      nextLink.textContent = unmet[0].item.label;
+      nextLink.dataset.target = unmet[0].item.target;
       nextEl.classList.remove('d-none');
     } else if (nextEl) {
       nextEl.classList.add('d-none');
@@ -2389,13 +2397,11 @@
         return '<li class="completeness-item completeness-item-met text-muted py-1">'
              + '<i class="fas fa-circle-check me-2"></i>'
              + '<span>' + item.label + '</span>'
-             + '<span class="float-end small">+' + item.points + '</span>'
              + '</li>';
       }
       return '<li class="completeness-item completeness-item-unmet py-1">'
            + '<i class="far fa-circle me-2 text-primary"></i>'
            + '<a href="#" class="completeness-link text-decoration-none" data-target="' + item.target + '">' + item.label + '</a>'
-           + '<span class="float-end small text-primary">+' + item.points + '</span>'
            + '</li>';
     }).join('');
   }
