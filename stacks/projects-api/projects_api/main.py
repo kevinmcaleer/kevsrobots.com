@@ -12,9 +12,11 @@ from .badges import seed_badge_definitions
 from .config import get_settings
 from .db import (
     add_bom_part_id_if_missing,
+    add_part_category_family_if_missing,
     add_project_featured_columns_if_missing,
     add_project_slug_if_missing,
     add_remix_columns_if_missing,
+    add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
     create_all,
     get_sessionmaker,
@@ -53,11 +55,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await add_remix_columns_if_missing()
     # Issue #121: ensure project_bom_items.part_id column exists.
     await add_bom_part_id_if_missing()
+    # Issue #135: ensure parts.category / parts.family and the matching
+    # part_revisions snapshot columns exist on legacy Postgres deployments.
+    await add_part_category_family_if_missing()
     # Issue #115: ensure projects.is_featured + sibling columns exist.
     await add_project_featured_columns_if_missing()
     # Issue #111: defensive ALTER for the new user_profiles table —
     # no-op on fresh deploys where create_all built every column.
     await add_user_profile_columns_if_missing()
+    # Issue #136: ensure users.is_disabled / disabled_reason columns exist.
+    await add_user_disabled_columns_if_missing()
     # Issue #152: add projects.slug + (author_username, slug) unique
     # constraint + backfill legacy rows. Must run after create_all (which
     # builds the table on fresh deploys) and before any router handles a

@@ -1,0 +1,172 @@
+---
+title: Admin
+layout: default
+description: Admin landing page - hub for all administrative tools
+permalink: /admin/
+---
+
+{% include nav_admin.html %}
+
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+
+<style>
+  .admin-card {
+    transition: transform 120ms ease, box-shadow 120ms ease;
+    height: 100%;
+  }
+  .admin-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  }
+  .admin-card a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .admin-card .card-icon {
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+</style>
+
+<div class="container py-4">
+  <h1><i class="fas fa-user-shield me-3"></i> Admin</h1>
+  <p class="text-muted">
+    Manage users, content, and site feedback. Pick a section below or use the sub-nav above to jump between admin pages.
+  </p>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Checking access...</span>
+    </div>
+  </div>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="admin-content" class="d-none">
+    <div class="row g-4 mt-1">
+      <div class="col-md-6 col-lg-4">
+        <div class="card admin-card">
+          <a href="/admin/users/" class="d-block h-100">
+            <div class="card-body">
+              <div class="card-icon text-primary mb-2"><i class="fas fa-users"></i></div>
+              <h5 class="card-title">Users</h5>
+              <p class="card-text text-muted small mb-0">
+                Manage user accounts, generate password reset codes and force password resets.
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card admin-card">
+          <a href="/admin/projects/moderation/" class="d-block h-100">
+            <div class="card-body">
+              <div class="card-icon text-danger mb-2"><i class="fas fa-shield-halved"></i></div>
+              <h5 class="card-title">Project moderation</h5>
+              <p class="card-text text-muted small mb-0">
+                Review user-flagged projects, block or unblock content from the public hub.
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card admin-card">
+          <a href="/admin/projects/featured/" class="d-block h-100">
+            <div class="card-body">
+              <div class="card-icon text-warning mb-2"><i class="fas fa-star"></i></div>
+              <h5 class="card-title">Featured projects</h5>
+              <p class="card-text text-muted small mb-0">
+                Toggle the featured flag for projects to surface them in the hub carousel.
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card admin-card">
+          <a href="/admin/staff-picks/" class="d-block h-100">
+            <div class="card-body">
+              <div class="card-icon text-warning mb-2"><i class="fas fa-award"></i></div>
+              <h5 class="card-title">Staff picks</h5>
+              <p class="card-text text-muted small mb-0">
+                Curate themed collections of projects with editor notes for the staff-picks page.
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card admin-card">
+          <a href="/admin/feedback/" class="d-block h-100">
+            <div class="card-body">
+              <div class="card-icon text-info mb-2"><i class="fas fa-inbox"></i></div>
+              <h5 class="card-title">Feedback inbox</h5>
+              <p class="card-text text-muted small mb-0">
+                Read and triage feedback submitted via the floating widget across the site.
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://projects.kevsrobots.com';
+
+  function authFetch(url, opts) {
+    if (window.ProjectAuth && typeof window.ProjectAuth.apiFetch === 'function') {
+      return window.ProjectAuth.apiFetch(url, opts);
+    }
+    opts = opts || {};
+    opts.credentials = 'include';
+    return fetch(url, opts);
+  }
+
+  async function init() {
+    try {
+      var r = await authFetch(API + '/api/auth/me');
+      if (r.status === 401 || r.status === 403) {
+        showDenied();
+        return;
+      }
+      if (!r.ok) {
+        showDenied();
+        return;
+      }
+      var me = await r.json();
+      if (!me || me.is_admin !== true) {
+        showDenied();
+        return;
+      }
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('admin-content').classList.remove('d-none');
+    } catch (e) {
+      showDenied();
+    }
+  }
+
+  function showDenied() {
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('access-denied').classList.remove('d-none');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

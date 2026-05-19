@@ -317,6 +317,16 @@ class Part(Base):
     image_url: Mapped[Optional[str]] = mapped_column(Text)
     tags: Mapped[Optional[list]] = mapped_column(TagsType)
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="draft")
+    # Issue #135: high-level category bucket (e.g. "microcontroller",
+    # "sensor", "motor-driver"). Free string with a curated starter list in
+    # the editor; null on legacy rows. Kept as a string rather than a FK so
+    # we can extend the taxonomy without schema migrations — if it
+    # eventually justifies a categories table we can promote it later.
+    category: Mapped[Optional[str]] = mapped_column(String(60), index=True)
+    # Issue #135: product family grouping (e.g. "raspberry-pi-pico" covers
+    # Pico / Pico W / Pico 2 / Pico 2W). Free string with autocomplete
+    # against existing values. Same FK-vs-string trade-off as `category`.
+    family: Mapped[Optional[str]] = mapped_column(String(80), index=True)
     created_by: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
@@ -332,6 +342,35 @@ class Part(Base):
         nullable=True,
     )
     usage_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+
+
+class PartRelation(Base):
+    """Symmetric many-to-many "related parts" links (issue #135).
+
+    Each user-facing link writes a SINGLE row with ``part_id < related_id``
+    (canonical ordering) so we never store both (A,B) and (B,A) and the
+    unique constraint catches duplicates regardless of which side the
+    editor came from. Router code is responsible for swapping the ids
+    before writing. Reads union both directions.
+    """
+
+    __tablename__ = "part_relations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    part_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    related_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("ix_part_relations_unique_pair", "part_id", "related_id", unique=True),
+    )
 
 
 class PartAlias(Base):
@@ -472,9 +511,43 @@ class PartRevision(Base):
     description_md: Mapped[Optional[str]] = mapped_column(Text)
     image_url: Mapped[Optional[str]] = mapped_column(Text)
     tags: Mapped[Optional[list]] = mapped_column(TagsType)
+    # Issue #135: snapshot category + family in the revision history so we
+    # can roll them back along with the other editable fields. Older
+    # revision rows pre-dating #135 will have NULLs here, which is fine.
+    category: Mapped[Optional[str]] = mapped_column(String(60))
+    family: Mapped[Optional[str]] = mapped_column(String(80))
     # Suppliers are denormalised into the revision row as JSON so we don't
     # need a sibling table per revision. Each entry: {name, url}.
     suppliers_json: Mapped[Optional[list]] = mapped_column(JsonType)
+
+
+# --- User flags (issue #136 — mass-deletion auto-disable) -----------------
+#
+# We don't own a real user table — identity comes from the Chatter JWT. But
+# we *do* need a place to flag locally-relevant state like "this user has
+# been auto-disabled for mass-deleting wiki content". One row per username,
+# lazily inserted the first time we need to set a flag.
+#
+# `is_disabled=True` is checked by `get_current_user` and `get_optional_user`
+# in `auth.py`; any request from a disabled account 403s before reaching a
+# router.
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(
+        String(100), nullable=False, unique=True, index=True
+    )
+    is_disabled: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0"
+    )
+    disabled_reason: Mapped[Optional[str]] = mapped_column(Text)
+    disabled_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
 
 
 # --- Staff picks (issue #115) --------------------------------------------

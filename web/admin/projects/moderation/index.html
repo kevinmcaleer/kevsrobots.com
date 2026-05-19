@@ -1,17 +1,18 @@
 ---
-layout: none
-sitemap: false
+title: Projects Moderation
+layout: default
+description: Moderation dashboard for the Projects Hub
+permalink: /admin/projects/moderation/
 ---
-<<<<<<< HEAD
 
-{% include nav_projects.html %}
-
-<link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+{% include nav_admin.html %}
 
 <div class="container py-4">
-  <h1><i class="fas fa-shield-alt me-3"></i> Projects Moderation</h1>
+  <h1><i class="fas fa-shield-halved me-3"></i> Projects Moderation</h1>
   <p class="text-muted">
-    Manage flagged content and curate the hub. Use <a href="/admin/staff-picks/">Staff Picks</a> for themed collections.
+    Review user-flagged content and manage blocked projects. To curate which
+    projects appear in the hub carousel, use <a href="/admin/projects/featured/">Featured projects</a>;
+    for themed collections see <a href="/admin/staff-picks/">Staff picks</a>.
   </p>
 
   <div id="access-denied" class="d-none">
@@ -80,53 +81,6 @@ sitemap: false
         </div>
       </div>
     </div>
-
-    <!-- Featured projects (issue #115) -->
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="fas fa-star text-warning me-2"></i> Feature Projects</span>
-        <a href="/admin/staff-picks/" class="small text-decoration-none">Manage staff picks <i class="fas fa-arrow-right"></i></a>
-      </div>
-      <div class="card-body">
-        <p class="text-muted small mb-3">
-          Find a project by ID below and toggle its featured state. Currently featured projects appear in the carousel at the top of <a href="/projects/hub.html">the Projects Hub</a>.
-        </p>
-
-        <div class="row g-2 mb-4 align-items-end admin-feature-row">
-          <div class="col-md-2">
-            <label for="feature-project-id" class="form-label small mb-1">Project ID</label>
-            <input type="number" class="form-control" id="feature-project-id" min="1" placeholder="e.g. 42">
-          </div>
-          <div class="col-md-7">
-            <label for="feature-note-input" class="form-label small mb-1">Editor note (optional, max 200 chars)</label>
-            <input type="text" class="form-control feature-note-input" id="feature-note-input" maxlength="200" placeholder="Why is this project being featured?">
-          </div>
-          <div class="col-md-3">
-            <button type="button" class="btn btn-warning w-100" id="feature-btn">
-              <i class="fas fa-star me-1"></i> Feature project
-            </button>
-          </div>
-        </div>
-
-        <h6 class="mb-2">Currently featured</h6>
-        <div id="no-featured" class="text-muted small py-2 d-none">No featured projects yet.</div>
-        <div class="table-responsive">
-          <table id="featured-table" class="table table-sm table-hover mb-0 d-none">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Note</th>
-                <th>Featured by</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="featured-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -154,8 +108,6 @@ sitemap: false
       const reports = await resp.json();
       renderReports(reports);
       loadBlocked();
-      loadFeatured();
-      setupFeatureButton();
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');
       document.getElementById('access-denied').classList.remove('d-none');
@@ -218,93 +170,6 @@ sitemap: false
     } catch (e) {}
   }
 
-  async function loadFeatured() {
-    try {
-      const resp = await fetch(API + '/api/projects/featured?limit=50', { credentials: 'include' });
-      if (!resp.ok) return;
-      const projects = await resp.json();
-      const tbody = document.getElementById('featured-body');
-      const table = document.getElementById('featured-table');
-      const empty = document.getElementById('no-featured');
-      if (!projects.length) {
-        table.classList.add('d-none');
-        empty.classList.remove('d-none');
-        return;
-      }
-      empty.classList.add('d-none');
-      table.classList.remove('d-none');
-      tbody.innerHTML = projects.map(function(p) {
-        // Issue #152: featured endpoint now surfaces slug — emit canonical
-        // URL when available; fall back to ?id= for legacy rows.
-        var viewHref = (p.slug && p.author_username)
-          ? '/projects/' + encodeURIComponent(p.author_username) + '/' + encodeURIComponent(p.slug)
-          : '/projects/view.html?id=' + p.id;
-        return '<tr>' +
-          '<td>' + p.id + '</td>' +
-          '<td><a href="' + viewHref + '">' + esc(p.title) + '</a></td>' +
-          '<td>' + esc(p.author_username) + '</td>' +
-          '<td><span class="small">' + esc(p.featured_note || '-') + '</span></td>' +
-          '<td>' + esc(p.featured_by || '-') + '</td>' +
-          '<td>' +
-            '<button class="btn btn-sm btn-outline-secondary" onclick="unfeatureProject(' + p.id + ')">' +
-              '<i class="far fa-star me-1"></i> Unfeature' +
-            '</button>' +
-          '</td>' +
-        '</tr>';
-      }).join('');
-    } catch (e) {}
-  }
-
-  function setupFeatureButton() {
-    var btn = document.getElementById('feature-btn');
-    if (!btn) return;
-    btn.addEventListener('click', async function() {
-      var idInput = document.getElementById('feature-project-id');
-      var noteInput = document.getElementById('feature-note-input');
-      var pid = parseInt(idInput.value, 10);
-      if (!pid || pid < 1) {
-        alert('Enter a valid project ID.');
-        return;
-      }
-      var note = (noteInput.value || '').trim();
-      if (note.length > 200) {
-        alert('Editor note is limited to 200 characters.');
-        return;
-      }
-      try {
-        var resp = await fetch(API + '/api/admin/projects/' + pid + '/feature', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ note: note || null })
-        });
-        if (resp.status === 404) {
-          alert('Project not found.');
-          return;
-        }
-        if (!resp.ok) {
-          alert('Failed to feature project.');
-          return;
-        }
-        idInput.value = '';
-        noteInput.value = '';
-        loadFeatured();
-      } catch (e) { alert('Network error.'); }
-    });
-  }
-
-  window.unfeatureProject = async function(projectId) {
-    if (!confirm('Unfeature this project? It will be removed from the hub carousel.')) return;
-    try {
-      var resp = await fetch(API + '/api/admin/projects/' + projectId + '/feature', {
-        method: 'DELETE',
-        credentials: 'include'
-      });
-      if (resp.ok) loadFeatured();
-      else alert('Failed to unfeature.');
-    } catch (e) { alert('Network error.'); }
-  };
-
   window.updateReport = async function(reportId, newStatus) {
     try {
       const resp = await fetch(API + '/api/admin/reports/' + reportId, {
@@ -345,24 +210,3 @@ sitemap: false
   init();
 })();
 </script>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Redirecting...</title>
-  <link rel="canonical" href="/admin/projects/moderation/">
-  <meta http-equiv="refresh" content="0; url=/admin/projects/moderation/">
-  <script>
-    // Project moderation moved to /admin/projects/moderation/ as part of the
-    // admin consolidation (issue #155). Featured-projects management is now
-    // a separate page at /admin/projects/featured/.
-    window.location.replace('/admin/projects/moderation/');
-  </script>
-</head>
-<body>
-  <p>Project moderation has moved. Redirecting to
-    <a href="/admin/projects/moderation/">/admin/projects/moderation/</a>...</p>
-</body>
-</html>
->>>>>>> origin/main

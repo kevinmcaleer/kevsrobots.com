@@ -1,0 +1,18 @@
+- name: Overview
+  link: /admin/
+  icon: fas fa-gauge-high
+- name: Users
+  link: /admin/users/
+  icon: fas fa-users
+- name: Project moderation
+  link: /admin/projects/moderation/
+  icon: fas fa-shield-halved
+- name: Featured projects
+  link: /admin/projects/featured/
+  icon: fas fa-star
+- name: Staff picks
+  link: /admin/staff-picks/
+  icon: fas fa-award
+- name: Feedback inbox
+  link: /admin/feedback/
+  icon: fas fa-inbox

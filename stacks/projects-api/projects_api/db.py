@@ -183,6 +183,68 @@ async def add_remix_columns_if_missing() -> None:
             ))
 
 
+async def add_part_category_family_if_missing() -> None:
+    """Additive migration for issue #135 (related parts + category + family).
+
+    Adds ``category`` and ``family`` columns to the existing ``parts``
+    table, and the matching snapshot columns to ``part_revisions``, when
+    they do not already exist. Also indexes the two new ``parts`` columns
+    so filtering by family / category is cheap. Idempotent — safe to run
+    on every startup. Postgres-only; SQLite tests use a fresh in-memory
+    DB and ``create_all`` already includes the new columns.
+
+    The new ``part_relations`` table is handled by ``create_all`` and
+    therefore does NOT need a helper here.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        for table_name, cols_to_add in (
+            (
+                "parts",
+                [
+                    ("category", 'VARCHAR(60)'),
+                    ("family", 'VARCHAR(80)'),
+                ],
+            ),
+            (
+                "part_revisions",
+                [
+                    ("category", 'VARCHAR(60)'),
+                    ("family", 'VARCHAR(80)'),
+                ],
+            ),
+        ):
+            table_check = await conn.execute(text(
+                "SELECT 1 FROM information_schema.tables "
+                "WHERE table_schema = current_schema() AND table_name = :t"
+            ), {"t": table_name})
+            if table_check.first() is None:
+                continue
+
+            existing = await conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = current_schema() AND table_name = :t"
+            ), {"t": table_name})
+            cols = {row[0] for row in existing.fetchall()}
+
+            for col_name, col_type in cols_to_add:
+                if col_name in cols:
+                    continue
+                logger.warning(
+                    "Adding %s.%s column (issue #135)", table_name, col_name
+                )
+                await conn.execute(text(
+                    f'ALTER TABLE "{table_name}" ADD COLUMN "{col_name}" {col_type}'
+                ))
+                if table_name == "parts":
+                    await conn.execute(text(
+                        f'CREATE INDEX IF NOT EXISTS "ix_parts_{col_name}" '
+                        f'ON "parts" ("{col_name}")'
+                    ))
+
+
 async def add_project_featured_columns_if_missing() -> None:
     """Additive migration for issue #115 (featured projects).
 
@@ -241,6 +303,54 @@ async def add_project_featured_columns_if_missing() -> None:
             'CREATE INDEX IF NOT EXISTS "ix_projects_is_featured" '
             'ON "projects" ("is_featured")'
         ))
+
+
+async def add_user_disabled_columns_if_missing() -> None:
+    """Additive migration for issue #136 (mass-deletion auto-disable).
+
+    The ``users`` table is brand-new in this PR — ``create_all`` will build
+    it from scratch on fresh databases with ``is_disabled`` and
+    ``disabled_reason`` already in place. This helper handles the
+    (theoretical) case where an older deployment created the table without
+    these columns, e.g. via a partial schema rollout. Idempotent — runs on
+    every startup and is a no-op when everything is already in sync.
+    Postgres-only; SQLite tests rely on ``create_all`` against a fresh DB.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'users'"
+        ))
+        if table_check.first() is None:
+            # Table doesn't exist yet — create_all on the same startup pass
+            # will build it with the new columns. Nothing to ALTER.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'users'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        if "is_disabled" not in cols:
+            logger.warning("Adding users.is_disabled column (issue #136)")
+            await conn.execute(text(
+                'ALTER TABLE "users" ADD COLUMN "is_disabled" BOOLEAN '
+                'NOT NULL DEFAULT FALSE'
+            ))
+        if "disabled_reason" not in cols:
+            logger.warning("Adding users.disabled_reason column (issue #136)")
+            await conn.execute(text(
+                'ALTER TABLE "users" ADD COLUMN "disabled_reason" TEXT'
+            ))
+        if "disabled_at" not in cols:
+            logger.warning("Adding users.disabled_at column (issue #136)")
+            await conn.execute(text(
+                'ALTER TABLE "users" ADD COLUMN "disabled_at" TIMESTAMP'
+            ))
 
 
 async def add_bom_part_id_if_missing() -> None:
