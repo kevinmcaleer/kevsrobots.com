@@ -48,6 +48,7 @@ from .routers import (
     fx,
     health,
     images,
+    instructions,
     journal,
     links,
     makes,
@@ -182,6 +183,9 @@ def create_app() -> FastAPI:
     # Issue #171: YouTube videos as a first-class table, embedded above
     # the description on the public view page.
     app.include_router(videos.router)
+    # Issue #178 Phase 0: build instructions (step-by-step outlines).
+    # Phase 1 will layer a Fabric.js canvas on top of these rows.
+    app.include_router(instructions.router)
     app.include_router(journal.router)
     app.include_router(moderation.router)
     # Issue #123: parts catalog moderation (reports + community merges).

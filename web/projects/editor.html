@@ -10,7 +10,7 @@ hide_nibsy: true
 
 {% include nav_projects.html %}
 
-<link rel="stylesheet" href="/assets/css/project-editor.css">
+<link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/circuit-editor.css">
 <link rel="stylesheet" href="/assets/css/image-viewer.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
@@ -132,6 +132,38 @@ hide_nibsy: true
         <textarea id="content-editor"></textarea>
         <div id="image-picker-container" class="d-none">
           <div id="image-picker-list"></div>
+        </div>
+      </div>
+
+      <!-- Build Instructions (issue #178, Phase 0 — data plumbing only) -->
+      <div class="card mb-4" id="editor-instructions-section">
+        <div class="card-header py-2">
+          <i class="fas fa-list-ol me-1"></i> Build Instructions
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">
+            Outline the build steps for your project. In this phase you can
+            add step titles and descriptions. The visual canvas &mdash;
+            overlays, arrows, photo annotations &mdash; is coming next.
+          </p>
+
+          <div id="instructions-meta" class="mb-3">
+            <label for="instruction-title" class="form-label fw-semibold small text-muted">Instruction set title</label>
+            <input type="text" class="form-control form-control-sm mb-2" id="instruction-title"
+                   placeholder="e.g. Assembling the SMARS chassis" maxlength="200">
+            <label for="instruction-description" class="form-label fw-semibold small text-muted">Description</label>
+            <textarea class="form-control form-control-sm" id="instruction-description" rows="2"
+                      placeholder="Optional. One-line summary shown above the steps."></textarea>
+            <div id="instruction-meta-saved" class="text-success small mt-1 d-none"><i class="fas fa-check me-1"></i>Saved</div>
+          </div>
+
+          <h6 class="mt-4 mb-2 text-muted text-uppercase small">Steps</h6>
+          <div id="instruction-steps-list">
+            <!-- Populated by project-instructions.js -->
+          </div>
+          <button id="add-instruction-step" type="button" class="btn btn-outline-primary btn-sm mt-2">
+            <i class="fas fa-plus me-1"></i> Add step
+          </button>
         </div>
       </div>
 
@@ -373,6 +405,10 @@ hide_nibsy: true
 <script src="/assets/js/circuit-components.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/circuit-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Issue #178 Phase 0: instruction-section module. Loaded BEFORE
+     project-editor.js so the latter's boot flow can call
+     ProjectInstructions.init(projectId, isOwner). -->
+<script src="/assets/js/project-instructions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 // Editor TOC — live-updates from markdown source as the user types
@@ -413,6 +449,11 @@ hide_nibsy: true
 
     // Extra non-markdown anchors (page sections rendered outside the editor)
     const extraLinks = [];
+    // Issue #178 Phase 0: surface the Build Instructions card. Always
+    // present (unlike BOM / videos which appear only when populated)
+    // because the card itself is always rendered and the user-facing
+    // flow is "scroll here to start outlining the build".
+    extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-instructions-section">Build Instructions</a>`);
     const bomRows = document.querySelectorAll('#bom-body tr').length;
     if (bomRows > 0) {
       extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-bom-section">Bill of Materials</a>`);
