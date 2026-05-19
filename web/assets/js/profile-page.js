@@ -273,9 +273,11 @@
     if (!viewer.authed) return;
     if (viewer.username && viewer.username !== username) return;
     // Show the edit link. If we don't know the viewer's username we still
-    // show it — the edit page itself will redirect if not auth'd.
+    // show it — /account itself requires auth and will bounce to /login.
+    // All profile editing now lives on /account (issue #151 consolidation);
+    // /profile/edit.html is a redirect stub kept only for legacy bookmarks.
     document.getElementById('edit-profile-button').innerHTML =
-      '<a href="/profile/edit.html" class="btn btn-outline-secondary btn-sm">' +
+      '<a href="/account" class="btn btn-outline-secondary btn-sm">' +
       '<i class="fas fa-pencil-alt me-1"></i>Edit profile</a>';
   }
 
