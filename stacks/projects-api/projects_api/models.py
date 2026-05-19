@@ -322,7 +322,24 @@ class Part(Base):
     description_md: Mapped[Optional[str]] = mapped_column(Text)
     image_url: Mapped[Optional[str]] = mapped_column(Text)
     tags: Mapped[Optional[list]] = mapped_column(TagsType)
-    status: Mapped[str] = mapped_column(String(30), nullable=False, default="draft")
+    # Issue #122 (Phase 2): lifecycle status. Values: ``draft`` (initial,
+    # set on creation), ``verified`` (auto-promoted when the heuristic
+    # rules in ``parts_lifecycle.compute_part_status`` all pass), or
+    # ``disputed`` (auto-demoted when an open Phase 3 report flags it as
+    # wrong/duplicate). Indexed because the catalog browse page filters by
+    # status. The legacy ``under_review`` value is still tolerated on read
+    # for back-compat with Phase 1 deployments.
+    status: Mapped[str] = mapped_column(String(30), nullable=False, default="draft", index=True)
+    # Issue #122: timestamp the part was promoted to "verified". Null
+    # while in draft / disputed. Reset to null on demotion to disputed.
+    verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    # Issue #122: monotonically incrementing "trust counter" so future
+    # phases can reason about how strong the verification signal is
+    # without re-running the heuristic. Bumped every time a promotion
+    # rule passes; never decremented.
+    verified_signals: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
     # Issue #135: high-level category bucket (e.g. "microcontroller",
     # "sensor", "motor-driver"). Free string with a curated starter list in
     # the editor; null on legacy rows. Kept as a string rather than a FK so
@@ -407,11 +424,79 @@ class PartSupplier(Base):
     url: Mapped[str] = mapped_column(Text, nullable=False)
     last_checked_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     last_status: Mapped[Optional[str]] = mapped_column(String(30))
+    # Issue #122 (Phase 2): supplier link health check fields. The daily
+    # APScheduler job populates ``last_status_code`` after each HEAD-check
+    # pass. ``is_broken`` flips true only after ``consecutive_failures``
+    # crosses 3 — a single transient 5xx will not mark a supplier broken.
+    last_status_code: Mapped[Optional[int]] = mapped_column(Integer)
+    is_broken: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0"
+    )
+    consecutive_failures: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
     # Issue #149: ISO 3166-1 alpha-2 country code for the supplier link
     # (e.g. ``GB`` for Pimoroni, ``US`` for Adafruit). Nullable means
     # "global / unknown" — legacy rows pre-#149 have NULL. Validated via
     # the Pydantic ``pattern`` on ``PartSupplierInput``.
     country_code: Mapped[Optional[str]] = mapped_column(String(2))
+
+
+# --- Parts talk pages (issue #122, Phase 2) ------------------------------
+#
+# Wikipedia-style discussion attached to each Part. One Part may have many
+# threads; each thread is an append-only sequence of posts. We deliberately
+# do NOT model nested replies — threads stay flat to keep the renderer
+# trivial. Editing tracks ``edited_at`` only; we don't store edit history
+# for talk content (unlike revisions on the part itself, which DO have
+# full snapshot history). Closing a thread is a soft state flag; closed
+# threads remain readable but stop accepting new posts.
+#
+# New tables — ``create_all`` handles them. No ALTER helper needed.
+
+
+class PartTalkThread(Base):
+    __tablename__ = "part_talk_threads"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    part_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    closed: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0"
+    )
+    closed_by: Mapped[Optional[str]] = mapped_column(String(100))
+    closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    __table_args__ = (
+        # Listing query orders by updated_at desc within a part.
+        Index("ix_part_talk_threads_part_updated", "part_id", "updated_at"),
+    )
+
+
+class PartTalkPost(Base):
+    __tablename__ = "part_talk_posts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    thread_id: Mapped[int] = mapped_column(
+        ForeignKey("part_talk_threads.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    author_username: Mapped[str] = mapped_column(String(100), nullable=False)
+    content_md: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    edited_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
 
 # --- User follows (issue #140) -------------------------------------------

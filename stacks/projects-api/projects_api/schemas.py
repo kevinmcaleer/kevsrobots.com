@@ -383,6 +383,12 @@ class PartSupplierResponse(BaseModel):
     url: str
     last_checked_at: Optional[datetime] = None
     last_status: Optional[str] = None
+    # Issue #122 Phase 2: link-health fields. ``is_broken`` is the bool
+    # the frontend pivots on for the warning pill; ``last_status_code``
+    # and ``consecutive_failures`` are exposed for transparency / debug.
+    last_status_code: Optional[int] = None
+    is_broken: bool = False
+    consecutive_failures: int = 0
     country_code: Optional[str] = None
 
 
@@ -637,6 +643,79 @@ class PartDetail(BaseModel):
     family: Optional[str] = None
     related_parts: list[PartRelatedRef] = Field(default_factory=list)
     family_parts: list[PartRelatedRef] = Field(default_factory=list)
+    # Issue #122 Phase 2: auto-verify lifecycle fields.
+    verified_at: Optional[datetime] = None
+    verified_signals: int = 0
+
+
+# --- Parts talk pages (issue #122 Phase 2) -------------------------------
+
+
+class PartTalkThreadCreate(BaseModel):
+    """Body for ``POST /api/parts/{slug}/talk``.
+
+    The opening post is written atomically with the thread so the API can
+    enforce "every thread has at least one post" without a follow-up call.
+    """
+
+    title: str = Field(..., min_length=3, max_length=200)
+    opening_post_content_md: str = Field(..., min_length=1, max_length=4000)
+
+
+class PartTalkPostCreate(BaseModel):
+    """Body for ``POST /api/parts/{slug}/talk/{thread_id}/posts``."""
+
+    content_md: str = Field(..., min_length=1, max_length=4000)
+
+
+class PartTalkPostUpdate(BaseModel):
+    """Body for ``PATCH …/posts/{post_id}`` — edit content only."""
+
+    content_md: str = Field(..., min_length=1, max_length=4000)
+
+
+class PartTalkThreadUpdate(BaseModel):
+    """Body for ``PATCH …/talk/{thread_id}`` — toggle closed state."""
+
+    closed: bool
+
+
+class PartTalkPostResponse(BaseModel):
+    id: int
+    thread_id: int
+    author_username: str
+    content_md: str
+    created_at: datetime
+    edited_at: Optional[datetime] = None
+
+
+class PartTalkThreadSummary(BaseModel):
+    """One row in the listing on ``/api/parts/{slug}/talk``."""
+
+    id: int
+    title: str
+    created_by: str
+    created_at: datetime
+    updated_at: datetime
+    closed: bool = False
+    post_count: int = 0
+    last_poster: Optional[str] = None
+
+
+class PartTalkThreadDetail(BaseModel):
+    """Full thread + all posts in created_at order."""
+
+    id: int
+    part_id: int
+    part_slug: str
+    title: str
+    created_by: str
+    created_at: datetime
+    updated_at: datetime
+    closed: bool = False
+    closed_by: Optional[str] = None
+    closed_at: Optional[datetime] = None
+    posts: list[PartTalkPostResponse] = Field(default_factory=list)
 
 
 # --- Parts moderation (issue #123, Phase 3) ------------------------------

@@ -1,0 +1,387 @@
+---
+title: Part discussion
+layout: content
+description: Discussion threads for a part in the catalog
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+
+<div class="container py-4">
+  <div class="mb-3">
+    <a id="back-link" href="/parts/" class="text-decoration-none text-muted"><i class="fas fa-arrow-left"></i> Back to part</a>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="not-found" class="text-center py-5 d-none">
+    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+    <h3>Part not found</h3>
+    <a href="/parts/" class="btn btn-primary mt-3">Browse parts catalog</a>
+  </div>
+
+  <div id="talk-view" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <h1 class="mb-0"><i class="fas fa-comments me-3 text-primary"></i> Discussion: <span id="part-name"></span></h1>
+      <a id="part-view-link" href="#" class="btn btn-sm btn-outline-secondary"><i class="fas fa-cube me-1"></i> View part</a>
+    </div>
+    <p class="text-muted">Wiki-style talk page. Open a thread to ask a question, propose a change, or share notes.</p>
+
+    <div class="row">
+      <div class="col-lg-8">
+        <div id="threads-list-card" class="card mb-4">
+          <div class="card-header">
+            <strong>Threads (<span id="thread-count">0</span>)</strong>
+          </div>
+          <ul id="threads-list" class="list-group list-group-flush">
+          </ul>
+          <div id="threads-empty" class="card-body text-muted fst-italic d-none">
+            No discussion threads yet. Start the first one below.
+          </div>
+        </div>
+
+        <div id="thread-detail" class="d-none mb-4">
+          <button class="btn btn-sm btn-link mb-2" id="back-to-threads">&larr; All threads</button>
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <h4 class="mb-1" id="thread-title"></h4>
+                <div class="small text-muted">Started by <strong id="thread-author"></strong> on <span id="thread-created"></span></div>
+              </div>
+              <div id="thread-status" class="text-end"></div>
+            </div>
+            <div class="card-body">
+              <div id="posts-list"></div>
+
+              <div id="reply-section" class="mt-4">
+                <label for="reply-content" class="form-label fw-bold">Reply</label>
+                <textarea id="reply-content" class="form-control" rows="4" maxlength="4000" placeholder="Markdown supported. Be friendly!"></textarea>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                  <small class="text-muted">Markdown supported. Max 4000 characters.</small>
+                  <button class="btn btn-primary btn-sm" id="post-reply-btn"><i class="fas fa-paper-plane me-1"></i> Post reply</button>
+                </div>
+                <div id="reply-error" class="alert alert-danger mt-2 d-none"></div>
+              </div>
+
+              <div id="reply-login" class="alert alert-info mt-3 d-none">
+                <a href="/login">Log in</a> to join the discussion.
+              </div>
+
+              <div id="reply-closed" class="alert alert-secondary mt-3 d-none">
+                This thread is closed.
+                <button class="btn btn-sm btn-outline-secondary ms-2 d-none" id="reopen-thread-btn">Reopen</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card mb-3" id="new-thread-card">
+          <div class="card-header"><strong><i class="fas fa-plus me-1"></i> Start a new thread</strong></div>
+          <div class="card-body">
+            <div id="new-thread-login" class="alert alert-info mb-0 d-none">
+              <a href="/login">Log in</a> to start a thread (accounts must be at least 14 days old).
+            </div>
+            <div id="new-thread-form" class="d-none">
+              <div class="mb-2">
+                <label for="new-thread-title" class="form-label small">Title</label>
+                <input type="text" id="new-thread-title" class="form-control form-control-sm" maxlength="200" placeholder="e.g. Pinout question">
+              </div>
+              <div class="mb-2">
+                <label for="new-thread-body" class="form-label small">Opening post (Markdown)</label>
+                <textarea id="new-thread-body" class="form-control form-control-sm" rows="4" maxlength="4000" placeholder="Describe your question or proposal"></textarea>
+              </div>
+              <div id="new-thread-error" class="alert alert-danger small d-none"></div>
+              <button class="btn btn-primary btn-sm w-100" id="create-thread-btn"><i class="fas fa-paper-plane me-1"></i> Create thread</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+
+  if (!slug) {
+    document.getElementById('loading').classList.add('d-none');
+    document.getElementById('not-found').classList.remove('d-none');
+    return;
+  }
+
+  function esc(t) { const d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
+  function fmtTime(dateStr) { if (!dateStr) return ''; try { return new Date(dateStr).toLocaleString(); } catch (_) { return ''; } }
+  function show(el) { el.classList.remove('d-none'); }
+  function hide(el) { el.classList.add('d-none'); }
+
+  let currentUser = null;
+  let isAdmin = false;
+  let currentThread = null;
+  let currentPart = null;
+
+  async function fetchPart() {
+    const r = await fetch(API + '/api/parts/' + encodeURIComponent(slug));
+    if (!r.ok) return null;
+    return await r.json();
+  }
+
+  async function fetchThreads() {
+    const r = await fetch(API + '/api/parts/' + encodeURIComponent(slug) + '/talk');
+    if (!r.ok) return [];
+    return await r.json();
+  }
+
+  async function fetchMe() {
+    try {
+      const r = await ProjectAuth.apiFetch(API + '/api/auth/me');
+      if (!r.ok) return null;
+      return await r.json();
+    } catch (_) { return null; }
+  }
+
+  function renderThreads(threads) {
+    const list = document.getElementById('threads-list');
+    document.getElementById('thread-count').textContent = threads.length;
+    if (threads.length === 0) {
+      list.innerHTML = '';
+      show(document.getElementById('threads-empty'));
+      return;
+    }
+    hide(document.getElementById('threads-empty'));
+    list.innerHTML = threads.map(t => `
+      <li class="list-group-item list-group-item-action" style="cursor:pointer" data-thread-id="${t.id}">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <div class="fw-semibold">${esc(t.title)} ${t.closed ? '<span class="badge bg-secondary ms-1">closed</span>' : ''}</div>
+            <div class="small text-muted">
+              Started by <strong>${esc(t.created_by)}</strong> &middot;
+              <span title="${esc(t.updated_at)}">last activity ${fmtTime(t.updated_at)}</span>
+              ${t.last_poster ? ' &middot; last reply by <strong>' + esc(t.last_poster) + '</strong>' : ''}
+            </div>
+          </div>
+          <div class="small text-nowrap"><i class="fas fa-comment me-1"></i> ${t.post_count}</div>
+        </div>
+      </li>
+    `).join('');
+    list.querySelectorAll('[data-thread-id]').forEach(li => {
+      li.addEventListener('click', () => openThread(Number(li.dataset.threadId)));
+    });
+  }
+
+  function renderPosts(thread) {
+    document.getElementById('thread-title').textContent = thread.title;
+    document.getElementById('thread-author').textContent = thread.created_by;
+    document.getElementById('thread-created').textContent = fmtTime(thread.created_at);
+    const statusEl = document.getElementById('thread-status');
+    statusEl.innerHTML = '';
+    if (thread.closed) {
+      statusEl.innerHTML = '<span class="badge bg-secondary">closed</span>';
+    }
+    if (currentUser && (currentUser === thread.created_by || isAdmin)) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-sm btn-outline-secondary ms-2';
+      btn.innerHTML = thread.closed ? '<i class="fas fa-lock-open me-1"></i>Reopen' : '<i class="fas fa-lock me-1"></i>Close';
+      btn.addEventListener('click', () => toggleClosed(!thread.closed));
+      statusEl.appendChild(btn);
+    }
+
+    const html = (thread.posts || []).map(p => `
+      <div class="mb-3 pb-3 border-bottom">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+          <div>
+            <strong>${esc(p.author_username)}</strong>
+            <small class="text-muted ms-2">${fmtTime(p.created_at)}${p.edited_at ? ' (edited ' + fmtTime(p.edited_at) + ')' : ''}</small>
+          </div>
+          ${currentUser && (currentUser === p.author_username || isAdmin) ? `<button class="btn btn-sm btn-outline-secondary edit-post-btn" data-post-id="${p.id}"><i class="fas fa-pencil-alt"></i></button>` : ''}
+        </div>
+        <div class="post-body" data-post-id="${p.id}">${marked.parse(p.content_md || '')}</div>
+      </div>
+    `).join('');
+    document.getElementById('posts-list').innerHTML = html;
+
+    document.querySelectorAll('.edit-post-btn').forEach(btn => {
+      btn.addEventListener('click', () => startEditPost(btn.dataset.postId));
+    });
+
+    // Reply UI visibility
+    if (thread.closed) {
+      hide(document.getElementById('reply-section'));
+      hide(document.getElementById('reply-login'));
+      show(document.getElementById('reply-closed'));
+    } else if (!currentUser) {
+      hide(document.getElementById('reply-section'));
+      show(document.getElementById('reply-login'));
+      hide(document.getElementById('reply-closed'));
+    } else {
+      show(document.getElementById('reply-section'));
+      hide(document.getElementById('reply-login'));
+      hide(document.getElementById('reply-closed'));
+    }
+  }
+
+  function startEditPost(postId) {
+    const bodyEl = document.querySelector('.post-body[data-post-id="' + postId + '"]');
+    if (!bodyEl) return;
+    const original = (currentThread.posts.find(p => p.id == postId) || {}).content_md || '';
+    bodyEl.innerHTML = `
+      <textarea class="form-control mb-2 edit-textarea" rows="4" maxlength="4000">${esc(original)}</textarea>
+      <button class="btn btn-sm btn-primary save-edit-btn" data-post-id="${postId}">Save</button>
+      <button class="btn btn-sm btn-link cancel-edit-btn">Cancel</button>
+      <div class="edit-error alert alert-danger mt-2 d-none"></div>
+    `;
+    bodyEl.querySelector('.save-edit-btn').addEventListener('click', async () => {
+      const newContent = bodyEl.querySelector('.edit-textarea').value;
+      const errEl = bodyEl.querySelector('.edit-error');
+      try {
+        const r = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/talk/' + currentThread.id + '/posts/' + postId, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content_md: newContent }),
+        });
+        if (!r.ok) {
+          let detail = 'Save failed (' + r.status + ')';
+          try { const j = await r.json(); if (j.detail) detail = j.detail; } catch (_) {}
+          errEl.textContent = detail;
+          errEl.classList.remove('d-none');
+          return;
+        }
+        await openThread(currentThread.id);
+      } catch (e) {
+        errEl.textContent = 'Network error: ' + (e.message || e);
+        errEl.classList.remove('d-none');
+      }
+    });
+    bodyEl.querySelector('.cancel-edit-btn').addEventListener('click', () => openThread(currentThread.id));
+  }
+
+  async function toggleClosed(closed) {
+    try {
+      const r = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/talk/' + currentThread.id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ closed: closed }),
+      });
+      if (!r.ok) return;
+      await openThread(currentThread.id);
+    } catch (_) {}
+  }
+
+  async function openThread(threadId) {
+    const r = await fetch(API + '/api/parts/' + encodeURIComponent(slug) + '/talk/' + threadId);
+    if (!r.ok) return;
+    currentThread = await r.json();
+    hide(document.getElementById('threads-list-card'));
+    hide(document.getElementById('new-thread-card'));
+    show(document.getElementById('thread-detail'));
+    renderPosts(currentThread);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('back-to-threads').addEventListener('click', async () => {
+    currentThread = null;
+    hide(document.getElementById('thread-detail'));
+    show(document.getElementById('threads-list-card'));
+    show(document.getElementById('new-thread-card'));
+    const threads = await fetchThreads();
+    renderThreads(threads);
+  });
+
+  document.getElementById('post-reply-btn').addEventListener('click', async () => {
+    const ta = document.getElementById('reply-content');
+    const errEl = document.getElementById('reply-error');
+    hide(errEl);
+    const content = (ta.value || '').trim();
+    if (!content) { errEl.textContent = 'Write something first.'; show(errEl); return; }
+    try {
+      const r = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/talk/' + currentThread.id + '/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_md: content }),
+      });
+      if (!r.ok) {
+        let detail = 'Could not post reply (' + r.status + ').';
+        try { const j = await r.json(); if (j.detail) detail = j.detail; } catch (_) {}
+        errEl.textContent = detail;
+        show(errEl);
+        return;
+      }
+      ta.value = '';
+      await openThread(currentThread.id);
+    } catch (e) {
+      errEl.textContent = 'Network error: ' + (e.message || e);
+      show(errEl);
+    }
+  });
+
+  document.getElementById('create-thread-btn').addEventListener('click', async () => {
+    const titleEl = document.getElementById('new-thread-title');
+    const bodyEl = document.getElementById('new-thread-body');
+    const errEl = document.getElementById('new-thread-error');
+    hide(errEl);
+    const title = (titleEl.value || '').trim();
+    const body = (bodyEl.value || '').trim();
+    if (title.length < 3) { errEl.textContent = 'Title must be at least 3 characters.'; show(errEl); return; }
+    if (!body) { errEl.textContent = 'Opening post is required.'; show(errEl); return; }
+    try {
+      const r = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/talk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title, opening_post_content_md: body }),
+      });
+      if (!r.ok) {
+        let detail = 'Could not create thread (' + r.status + ').';
+        try { const j = await r.json(); if (j.detail) detail = j.detail; } catch (_) {}
+        errEl.textContent = detail;
+        show(errEl);
+        return;
+      }
+      titleEl.value = '';
+      bodyEl.value = '';
+      const created = await r.json();
+      await openThread(created.id);
+    } catch (e) {
+      errEl.textContent = 'Network error: ' + (e.message || e);
+      show(errEl);
+    }
+  });
+
+  async function boot() {
+    currentPart = await fetchPart();
+    if (!currentPart) {
+      hide(document.getElementById('loading'));
+      show(document.getElementById('not-found'));
+      return;
+    }
+    document.getElementById('part-name').textContent = currentPart.name || slug;
+    document.getElementById('part-view-link').href = '/parts/view.html?slug=' + encodeURIComponent(slug);
+    document.getElementById('back-link').href = '/parts/view.html?slug=' + encodeURIComponent(slug);
+    document.title = 'Discussion: ' + (currentPart.name || slug) + ' — KevsRobots Parts';
+
+    const me = await fetchMe();
+    if (me && me.username) {
+      currentUser = me.username;
+      isAdmin = !!me.is_admin;
+      show(document.getElementById('new-thread-form'));
+    } else {
+      show(document.getElementById('new-thread-login'));
+    }
+
+    const threads = await fetchThreads();
+    renderThreads(threads);
+    hide(document.getElementById('loading'));
+    show(document.getElementById('talk-view'));
+  }
+
+  boot();
+})();
+</script>

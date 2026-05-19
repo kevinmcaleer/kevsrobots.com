@@ -33,6 +33,13 @@ description: View a part in the catalog
         </div>
         <div id="part-ids" class="text-muted small mb-3"></div>
 
+        <!-- Issue #122 Phase 2: lifecycle banners -->
+        <div id="part-disputed-banner" class="alert alert-warning d-none">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>This part is currently disputed.</strong>
+          Community members have flagged the metadata as wrong or duplicating another entry. Help resolve it on the <a href="#" id="part-disputed-talk-link">discussion page</a>.
+        </div>
+
         <div id="part-image-wrap" class="mb-4 d-none">
           <img id="part-image" class="img-fluid rounded" alt="">
         </div>
@@ -60,6 +67,19 @@ description: View a part in the catalog
         <div id="part-suppliers-section" class="mb-4 d-none">
           <h4><i class="fas fa-truck me-3"></i> Suppliers</h4>
           <ul id="part-suppliers" class="list-group"></ul>
+        </div>
+
+        <!-- Issue #122 Phase 2: discussion link -->
+        <div id="part-talk-section" class="mb-4">
+          <div class="card">
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div>
+                <h5 class="mb-1"><i class="fas fa-comments me-3 text-primary"></i> Discussion</h5>
+                <div class="small text-muted" id="part-talk-summary">Talk about this part, propose changes, or ask questions.</div>
+              </div>
+              <a id="part-talk-link" class="btn btn-outline-primary" href="#"><i class="fas fa-comments me-1"></i> Open discussion</a>
+            </div>
+          </div>
         </div>
 
         <div id="part-revisions-section" class="mb-4 d-none">
@@ -203,6 +223,7 @@ description: View a part in the catalog
 
   function statusBadge(status) {
     if (status === 'verified') return '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>verified</span>';
+    if (status === 'disputed') return '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i>disputed</span>';
     if (status === 'under_review') return '<span class="badge bg-warning text-dark">under review</span>';
     return '<span class="badge bg-secondary">draft</span>';
   }
@@ -210,6 +231,15 @@ description: View a part in the catalog
   function supplierStatusBadge(s) {
     if (s === 'ok') return '<span class="badge bg-success-subtle text-success ms-2">link OK</span>';
     if (s === 'broken') return '<span class="badge bg-danger-subtle text-danger ms-2">link broken</span>';
+    return '';
+  }
+
+  function supplierBrokenPill(supplier) {
+    // Issue #122 Phase 2: prominent "link reported broken" pill alongside
+    // the supplier link when the daily health check has marked it broken.
+    if (supplier && supplier.is_broken) {
+      return '<span class="badge bg-danger ms-2" title="The supplier URL has failed our daily link-check 3 times in a row."><i class="fas fa-exclamation-triangle me-1"></i> link reported broken</span>';
+    }
     return '';
   }
 
@@ -297,12 +327,20 @@ description: View a part in the catalog
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <div>
             <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || s.url)} <i class="fas fa-external-link-alt fa-xs text-muted"></i></a>
+            ${supplierBrokenPill(s)}
             ${countryFlagBadge(s.country_code)}
             ${supplierStatusBadge(s.last_status)}
           </div>
           ${s.last_checked_at ? `<small class="text-muted">checked ${fmtTime(s.last_checked_at)}</small>` : ''}
         </li>
       `).join('');
+    }
+
+    // Issue #122 Phase 2: wire the discussion card link.
+    document.getElementById('part-talk-link').href = '/parts/talk.html?slug=' + encodeURIComponent(slug);
+    if (part.status === 'disputed') {
+      document.getElementById('part-disputed-banner').classList.remove('d-none');
+      document.getElementById('part-disputed-talk-link').href = '/parts/talk.html?slug=' + encodeURIComponent(slug);
     }
 
     document.getElementById('part-author').textContent = part.created_by || 'unknown';
