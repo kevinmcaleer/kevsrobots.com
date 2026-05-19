@@ -431,6 +431,9 @@ description: View project details
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Issue #150: display-only currency conversion. Loads after
+     project-auth so getPreferredCurrency can use ProjectAuth.apiFetch. -->
+<script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
@@ -863,10 +866,10 @@ description: View project details
     const tbody = document.getElementById('view-bom');
     let total = 0;
     // Tally currency codes so we can label the (un-converted) total with
-    // the dominant one — or omit the symbol entirely if rows span more
-    // than one currency.
+    // the dominant one (issue #149) — or omit the symbol entirely if rows
+    // span more than one currency.
     const currencyCounts = {};
-    tbody.innerHTML = items.map(i => {
+    tbody.innerHTML = items.map((i, idx) => {
       total += i.quantity * (i.unit_cost || 0);
       const code = (i.currency_code || '').trim().toUpperCase();
       if (code) currencyCounts[code] = (currencyCounts[code] || 0) + 1;
@@ -877,17 +880,26 @@ description: View project details
         ? `<a href="/parts/view.html?slug=${encodeURIComponent(i.part_slug)}">${esc(i.name)}</a>`
         : esc(i.name);
       const supplierUrl = i.supplier_url || i.part_primary_supplier_url;
+      // Show bare native price up-front so the page renders without
+      // waiting for the FX endpoint. The async enrichment below
+      // replaces this cell with a converted suffix when applicable.
+      const ccy = i.currency_code || null;
+      const priceHtml = i.unit_cost == null
+        ? '-'
+        : (window.CurrencyConvert
+            ? CurrencyConvert.formatPrice(i.unit_cost, ccy || 'GBP')
+            : ('£' + Number(i.unit_cost).toFixed(2)));
       return `<tr>
         <td>${nameCell}</td>
         <td>${i.quantity}</td>
         <td>${esc(i.unit)}</td>
-        <td>${fmtUnitCost(i)}</td>
+        <td data-bom-price="${idx}">${priceHtml}</td>
         <td>${supplierUrl ? `<a href="${esc(supplierUrl)}" target="_blank">Link <i class="fas fa-external-link-alt fa-xs"></i></a>` : '-'}</td>
       </tr>`;
     }).join('');
     // Label the total with the dominant currency code when unambiguous;
     // when rows mix currencies (or none have a code) we show just the
-    // number — automatic conversion is tracked in #150.
+    // number — async FX enrichment (issue #150) runs on each row below.
     const codes = Object.keys(currencyCounts);
     const totalEl = document.getElementById('view-bom-total');
     if (codes.length === 1) {
@@ -899,6 +911,24 @@ description: View project details
     } else {
       totalEl.textContent = total.toFixed(2);
       totalEl.title = 'Currency not set on any row';
+    }
+
+    // Async pass (issue #150): if the viewer has a preferred currency
+    // and it differs from the row's currency, replace each price cell
+    // with a formatted "native (≈ converted)" string. Graceful
+    // degradation: any failure (cold cache, no preference, missing
+    // currency_code) leaves the bare native price in place.
+    if (window.CurrencyConvert) {
+      items.forEach(async (i, idx) => {
+        if (i.unit_cost == null) return;
+        const ccy = i.currency_code;
+        if (!ccy) return;
+        const cell = tbody.querySelector(`[data-bom-price="${idx}"]`);
+        if (!cell) return;
+        try {
+          cell.innerHTML = await CurrencyConvert.renderPrice(i.unit_cost, ccy);
+        } catch (_) { /* keep the native fallback */ }
+      });
     }
   }
 

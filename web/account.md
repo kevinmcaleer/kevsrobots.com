@@ -129,6 +129,24 @@ description: Manage your kevsrobots.com account
               </div>
             </fieldset>
 
+            <!-- Issue #150: Display currency. ``Auto-detect from browser``
+                 saves null on the server, which the parts/projects pages
+                 treat as "show native". The supported list matches the
+                 SUPPORTED_CURRENCIES allow-list in projects-api/fx.py. -->
+            <div class="mb-3">
+              <label for="preferred_currency" class="form-label fw-bold">Display currency</label>
+              <select class="form-select" id="preferred_currency" name="preferred_currency">
+                <option value="">Auto-detect from browser</option>
+                <option value="GBP">GBP — British Pound (&pound;)</option>
+                <option value="USD">USD — US Dollar ($)</option>
+                <option value="EUR">EUR — Euro (&euro;)</option>
+                <option value="JPY">JPY — Japanese Yen (&yen;)</option>
+                <option value="AUD">AUD — Australian Dollar (A$)</option>
+                <option value="CAD">CAD — Canadian Dollar (C$)</option>
+              </select>
+              <small class="text-muted">Used to show converted prices on parts and projects. Source prices remain in the original currency.</small>
+            </div>
+
             <!-- Featured badges picker. Hidden if the badges endpoint returns
                  nothing — gracefully degrades when #106 is not yet live. -->
             <fieldset class="mb-3 d-none" id="featured-badges-fieldset">
@@ -355,6 +373,12 @@ description: Manage your kevsrobots.com account
     document.getElementById('social_twitter').value = social.twitter || '';
     document.getElementById('social_youtube').value = social.youtube || '';
     document.getElementById('social_mastodon').value = social.mastodon || '';
+
+    // Issue #150: preferred display currency. Empty string = "auto-detect".
+    const ccyEl = document.getElementById('preferred_currency');
+    if (ccyEl) {
+      ccyEl.value = (projectsProfile && projectsProfile.preferred_currency) || '';
+    }
 
     if (needsBackfill) {
       document.getElementById('backfill-prompt').classList.remove('d-none');
@@ -681,6 +705,11 @@ description: Manage your kevsrobots.com account
 
     let payload;
     try {
+      // Issue #150: empty string from the "Auto-detect" option becomes
+      // null on the wire, which clears the stored preference.
+      const ccyRaw = (document.getElementById('preferred_currency').value || '').trim();
+      const preferredCurrency = ccyRaw === '' ? null : ccyRaw.toUpperCase();
+
       payload = {
         bio: bio,
         location: (document.getElementById('location').value || '').trim(),
@@ -691,7 +720,8 @@ description: Manage your kevsrobots.com account
           youtube: validateUrl(document.getElementById('social_youtube').value, 'YouTube URL'),
           mastodon: validateUrl(document.getElementById('social_mastodon').value, 'Mastodon URL')
         },
-        featured_badge_slugs: pickedSlugs.slice(0, 3)
+        featured_badge_slugs: pickedSlugs.slice(0, 3),
+        preferred_currency: preferredCurrency
       };
     } catch (err) {
       ChatterAPI.displayError('error-message', err.message);

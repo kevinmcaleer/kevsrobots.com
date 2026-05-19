@@ -18,6 +18,7 @@ from .db import (
     add_project_slug_if_missing,
     add_remix_columns_if_missing,
     add_supplier_country_if_missing,
+    add_user_currency_preference_if_missing,
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
     create_all,
@@ -35,6 +36,7 @@ from .routers import (
     feedback,
     files,
     follows,
+    fx,
     health,
     images,
     journal,
@@ -65,6 +67,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Issue #111: defensive ALTER for the new user_profiles table —
     # no-op on fresh deploys where create_all built every column.
     await add_user_profile_columns_if_missing()
+    # Issue #150: defensive ALTER for user_profiles.preferred_currency.
+    # No-op on fresh deploys; only runs ALTER on legacy Postgres.
+    await add_user_currency_preference_if_missing()
     # Issue #136: ensure users.is_disabled / disabled_reason columns exist.
     await add_user_disabled_columns_if_missing()
     # Issue #152: add projects.slug + (author_username, slug) unique
@@ -138,6 +143,8 @@ def create_app() -> FastAPI:
     # Issue #138: user feedback widget + admin inbox.
     app.include_router(feedback.router)
     app.include_router(admin_feedback.router)
+    # Issue #150: public FX conversion endpoint.
+    app.include_router(fx.router)
     return app
 
 

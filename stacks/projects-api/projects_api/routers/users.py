@@ -31,6 +31,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
 from ..db import get_session
+from ..fx import SUPPORTED_CURRENCIES
 from ..models import (
     Download,
     Make,
@@ -181,6 +182,7 @@ async def get_profile(
         joined_at=profile.created_at if profile else None,
         featured_badge_slugs=featured,
         stats=stats,
+        preferred_currency=(profile.preferred_currency if profile else None),
     )
 
 
@@ -233,6 +235,27 @@ async def update_my_profile(
         if location == "":
             location = None
 
+    # Issue #150: validate preferred_currency against the supported
+    # allow-list. Empty string from the form (= "Auto-detect from
+    # browser") is normalised to None. Bogus codes 422 via the pattern;
+    # we only reject *valid 3-letter* codes that aren't in our list.
+    preferred_currency: Optional[str] = None
+    if "preferred_currency" in body.model_fields_set:
+        raw = body.preferred_currency
+        if raw is None or (isinstance(raw, str) and raw.strip() == ""):
+            preferred_currency = None
+        else:
+            normalised = raw.strip().upper()
+            if normalised not in SUPPORTED_CURRENCIES:
+                raise HTTPException(
+                    status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=(
+                        "preferred_currency must be one of "
+                        f"{sorted(SUPPORTED_CURRENCIES)}"
+                    ),
+                )
+            preferred_currency = normalised
+
     # Validate featured_badge_slugs: at most 3, each ≤80 chars,
     # case-insensitive uniqueness preserved in insertion order.
     featured: Optional[list[str]] = None
@@ -267,6 +290,7 @@ async def update_my_profile(
             website_url=website,
             social_links=social,
             featured_badge_slugs=featured,
+            preferred_currency=preferred_currency,
             created_at=now,
             updated_at=now,
         )
@@ -285,6 +309,8 @@ async def update_my_profile(
             profile.social_links = social
         if "featured_badge_slugs" in sent:
             profile.featured_badge_slugs = featured
+        if "preferred_currency" in sent:
+            profile.preferred_currency = preferred_currency
         profile.updated_at = now
 
     await session.commit()

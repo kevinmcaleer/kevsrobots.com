@@ -648,3 +648,49 @@ async def add_user_profile_columns_if_missing() -> None:
                 await conn.execute(text(
                     f'ALTER TABLE "user_profiles" ADD COLUMN "{col_name}" {col_type}'
                 ))
+
+
+async def add_user_currency_preference_if_missing() -> None:
+    """Additive migration for issue #150 (preferred display currency).
+
+    Adds ``user_profiles.preferred_currency`` as a nullable CHAR(3) on
+    legacy Postgres deployments where the table already exists. On fresh
+    deploys ``create_all`` builds the column from the ORM definition, so
+    this helper is a no-op.
+
+    Independent of #149 — does not touch ``part_suppliers.country_code``
+    or ``project_bom_items.currency_code``. Those columns are added by
+    their own helpers when #149 lands. #150 can ship before, after, or
+    alongside #149.
+
+    Postgres-only; SQLite tests use a fresh in-memory DB so the column
+    is always present.
+
+    Safe to run on every startup — no-op when nothing is missing.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'user_profiles'"
+        ))
+        if table_check.first() is None:
+            # Table doesn't exist yet — create_all in the same lifespan
+            # pass builds it with every column.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'user_profiles' "
+            "AND column_name = 'preferred_currency'"
+        ))
+        if existing.first() is None:
+            logger.warning(
+                "Adding user_profiles.preferred_currency column (issue #150)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "user_profiles" '
+                'ADD COLUMN "preferred_currency" CHAR(3)'
+            ))

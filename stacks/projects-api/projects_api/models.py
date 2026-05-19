@@ -471,6 +471,11 @@ class UserProfile(Base):
     social_links: Mapped[Optional[dict]] = mapped_column(JsonType)
     # Up to 3 badge slug strings the user has pinned to the showcase.
     featured_badge_slugs: Mapped[Optional[list]] = mapped_column(JsonType)
+    # Issue #150: preferred display currency (ISO 4217). NULL means
+    # "auto-detect / show native". Validated against an allow-list at
+    # the API layer; we do not enforce a FK here so adding new currencies
+    # is a code-only change.
+    preferred_currency: Mapped[Optional[str]] = mapped_column(String(3))
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
