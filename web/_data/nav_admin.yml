@@ -7,6 +7,9 @@
 - name: Project moderation
   link: /admin/projects/moderation/
   icon: fas fa-shield-halved
+- name: Parts moderation
+  link: /admin/parts/
+  icon: fas fa-flag
 - name: Featured projects
   link: /admin/projects/featured/
   icon: fas fa-star

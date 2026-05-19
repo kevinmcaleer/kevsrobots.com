@@ -97,8 +97,80 @@ description: View a part in the catalog
             <div id="part-login-container" class="d-grid mt-3 d-none">
               <a href="/login" class="btn btn-sm btn-outline-secondary"><i class="fas fa-sign-in-alt me-1"></i> Log in to edit</a>
             </div>
+            <hr id="part-mod-divider" class="d-none my-3">
+            <div id="part-mod-container" class="d-grid gap-2 d-none">
+              <button type="button" id="propose-merge-btn" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#merge-modal"><i class="fas fa-code-merge me-1"></i> Propose merge</button>
+              <button type="button" id="report-part-btn" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#report-modal"><i class="fas fa-flag me-1"></i> Report this part</button>
+              <a href="/parts/merges.html" class="small text-muted text-decoration-none mt-1"><i class="fas fa-list me-1"></i> View all merge proposals</a>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report modal (issue #123) -->
+<div class="modal fade" id="report-modal" tabindex="-1" aria-labelledby="report-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="report-modal-label"><i class="fas fa-flag me-2 text-danger"></i> Report part</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="small text-muted">Help us keep the catalog clean. Reports go to a moderator queue.</p>
+        <div id="report-error" class="alert alert-danger d-none"></div>
+        <div id="report-success" class="alert alert-success d-none">Thanks &mdash; a moderator will review your report.</div>
+        <div class="mb-3">
+          <label for="report-reason" class="form-label">Reason</label>
+          <select id="report-reason" class="form-select">
+            <option value="wrong">Wrong information</option>
+            <option value="duplicate">Duplicate of another part</option>
+            <option value="spam">Spam or vandalism</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="report-note" class="form-label">Note (optional)</label>
+          <textarea id="report-note" class="form-control" rows="3" maxlength="500" placeholder="Anything that helps the moderator..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="report-submit"><i class="fas fa-flag me-1"></i> Submit report</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Merge proposal modal (issue #123) -->
+<div class="modal fade" id="merge-modal" tabindex="-1" aria-labelledby="merge-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="merge-modal-label"><i class="fas fa-code-merge me-2 text-warning"></i> Propose merge</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="small text-muted">Propose merging <strong id="merge-source-name"></strong> into another part. The community votes &mdash; if 5+ approvals come in with strong support after 48 hours, the merge runs automatically and BOM links repoint to the target.</p>
+        <div id="merge-error" class="alert alert-danger d-none"></div>
+        <div id="merge-success" class="alert alert-success d-none">Proposal submitted &mdash; <a id="merge-success-link" href="/parts/merges.html">view it on the merge proposals page</a>.</div>
+        <div class="mb-3 position-relative">
+          <label for="merge-target-input" class="form-label">Merge into</label>
+          <input type="text" id="merge-target-input" class="form-control" placeholder="Search by name or SKU..." autocomplete="off">
+          <div id="merge-target-results" class="list-group position-absolute w-100 d-none" style="top:100%;left:0;z-index:1000;max-height:240px;overflow-y:auto;"></div>
+          <div id="merge-target-picked" class="form-text d-none">Picked: <strong id="merge-target-name"></strong> <a href="#" id="merge-target-clear" class="ms-2 small">change</a></div>
+        </div>
+        <div class="mb-3">
+          <label for="merge-rationale" class="form-label">Rationale</label>
+          <textarea id="merge-rationale" class="form-control" rows="3" minlength="10" maxlength="2000" placeholder="Why should these merge? e.g. 'Same chip, different vendor SKU.'"></textarea>
+          <div class="form-text">10&ndash;2000 characters.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="merge-submit"><i class="fas fa-code-merge me-1"></i> Submit proposal</button>
       </div>
     </div>
   </div>
@@ -314,6 +386,12 @@ description: View a part in the catalog
         document.getElementById('part-edit-container').classList.remove('d-none');
         document.getElementById('part-edit-link').href = '/parts/edit.html?slug=' + encodeURIComponent(slug);
         document.getElementById('part-history-btn').href = '/parts/history.html?slug=' + encodeURIComponent(slug);
+        // Issue #123: show report + propose-merge actions to logged-in users.
+        // The API enforces the 14-day gate on merge proposals; reports work
+        // for any logged-in user.
+        document.getElementById('part-mod-divider').classList.remove('d-none');
+        document.getElementById('part-mod-container').classList.remove('d-none');
+        document.getElementById('merge-source-name').textContent = part.name || slug;
       } else {
         document.getElementById('part-login-container').classList.remove('d-none');
       }
@@ -322,6 +400,157 @@ description: View a part in the catalog
     }
   }
 
+  // --- Issue #123: Report modal wiring -------------------------------
+  function setupReportModal() {
+    const submitBtn = document.getElementById('report-submit');
+    if (!submitBtn) return;
+    submitBtn.addEventListener('click', async () => {
+      const errEl = document.getElementById('report-error');
+      const okEl = document.getElementById('report-success');
+      errEl.classList.add('d-none');
+      okEl.classList.add('d-none');
+      const reason = document.getElementById('report-reason').value;
+      const note = document.getElementById('report-note').value.trim();
+      submitBtn.disabled = true;
+      try {
+        const resp = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason, note: note || null }),
+        });
+        if (resp.status === 201) {
+          okEl.classList.remove('d-none');
+          document.getElementById('report-note').value = '';
+          return;
+        }
+        let detail = 'Could not file report (HTTP ' + resp.status + ').';
+        try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+        errEl.textContent = detail;
+        errEl.classList.remove('d-none');
+      } catch (e) {
+        errEl.textContent = 'Network error: ' + (e.message || e);
+        errEl.classList.remove('d-none');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // --- Issue #123: Merge proposal modal wiring -----------------------
+  function setupMergeModal() {
+    const input = document.getElementById('merge-target-input');
+    const resultsEl = document.getElementById('merge-target-results');
+    const pickedEl = document.getElementById('merge-target-picked');
+    const pickedName = document.getElementById('merge-target-name');
+    const clearLink = document.getElementById('merge-target-clear');
+    const submitBtn = document.getElementById('merge-submit');
+    if (!submitBtn) return;
+
+    let targetSlug = null;
+    let searchTimer = null;
+
+    function clearPick() {
+      targetSlug = null;
+      pickedEl.classList.add('d-none');
+      pickedName.textContent = '';
+      input.value = '';
+      input.classList.remove('d-none');
+    }
+
+    clearLink && clearLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      clearPick();
+      input.focus();
+    });
+
+    function renderResults(hits) {
+      const filtered = (hits || []).filter(h => h.slug !== slug);
+      if (filtered.length === 0) {
+        resultsEl.innerHTML = '<div class="list-group-item small text-muted">No matches.</div>';
+        resultsEl.classList.remove('d-none');
+        return;
+      }
+      resultsEl.innerHTML = filtered.slice(0, 10).map(h => `
+        <button type="button" class="list-group-item list-group-item-action small" data-slug="${esc(h.slug)}" data-name="${esc(h.name)}">
+          <strong>${esc(h.name)}</strong>
+          ${h.sku ? `<span class="text-muted ms-2">${esc(h.sku)}</span>` : ''}
+        </button>
+      `).join('');
+      resultsEl.querySelectorAll('button').forEach(b => {
+        b.addEventListener('click', () => {
+          targetSlug = b.dataset.slug;
+          pickedName.textContent = b.dataset.name;
+          pickedEl.classList.remove('d-none');
+          input.classList.add('d-none');
+          resultsEl.classList.add('d-none');
+        });
+      });
+      resultsEl.classList.remove('d-none');
+    }
+
+    input.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      const q = input.value.trim();
+      if (!q) { resultsEl.classList.add('d-none'); return; }
+      searchTimer = setTimeout(async () => {
+        try {
+          const resp = await fetch(API + '/api/parts?q=' + encodeURIComponent(q) + '&limit=12');
+          if (!resp.ok) return;
+          renderResults(await resp.json());
+        } catch (_) {}
+      }, 200);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!resultsEl.contains(e.target) && e.target !== input) {
+        resultsEl.classList.add('d-none');
+      }
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const errEl = document.getElementById('merge-error');
+      const okEl = document.getElementById('merge-success');
+      errEl.classList.add('d-none');
+      okEl.classList.add('d-none');
+      const rationale = document.getElementById('merge-rationale').value.trim();
+      if (!targetSlug) {
+        errEl.textContent = 'Pick a target part first.';
+        errEl.classList.remove('d-none');
+        return;
+      }
+      if (rationale.length < 10) {
+        errEl.textContent = 'Rationale must be at least 10 characters.';
+        errEl.classList.remove('d-none');
+        return;
+      }
+      submitBtn.disabled = true;
+      try {
+        const resp = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/merge-proposal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_slug: targetSlug, rationale }),
+        });
+        if (resp.status === 201) {
+          okEl.classList.remove('d-none');
+          document.getElementById('merge-rationale').value = '';
+          clearPick();
+          return;
+        }
+        let detail = 'Could not submit proposal (HTTP ' + resp.status + ').';
+        try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+        errEl.textContent = detail;
+        errEl.classList.remove('d-none');
+      } catch (e) {
+        errEl.textContent = 'Network error: ' + (e.message || e);
+        errEl.classList.remove('d-none');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  setupReportModal();
+  setupMergeModal();
   load();
 })();
 </script>

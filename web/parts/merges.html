@@ -1,0 +1,215 @@
+---
+title: Parts merge proposals
+layout: content
+description: Open community proposals to merge duplicate parts in the catalog
+permalink: /parts/merges
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+      <h1 class="mb-1"><i class="fas fa-code-merge me-3 text-warning"></i> Merge proposals</h1>
+      <p class="text-muted mb-0">Community-driven proposals to merge duplicate parts. Five approvals with a 2:1 ratio after 48 hours triggers the merge automatically.</p>
+    </div>
+    <div>
+      <a href="/parts/" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Back to catalog</a>
+    </div>
+  </div>
+
+  <ul class="nav nav-pills mb-3" id="status-tabs" role="tablist">
+    <li class="nav-item"><button type="button" class="nav-link active" data-status="open">Open</button></li>
+    <li class="nav-item"><button type="button" class="nav-link" data-status="resolved">Resolved</button></li>
+  </ul>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="empty" class="text-center py-5 d-none">
+    <i class="fas fa-circle-check fa-3x text-success mb-3"></i>
+    <h4>No proposals here</h4>
+    <p class="text-muted">Open a proposal from any part's page using the &ldquo;Propose merge&rdquo; button.</p>
+  </div>
+
+  <div id="proposals-list" class="vstack gap-3 d-none"></div>
+</div>
+
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script>
+(function () {
+  const API = 'https://projects.kevsrobots.com';
+  let isLoggedIn = false;
+  let currentUser = null;
+  let currentStatus = 'open';
+
+  function esc(t) { const d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
+  function fmtTime(s) { try { return new Date(s).toLocaleString(); } catch (_) { return ''; } }
+
+  function statusBadge(status) {
+    if (status === 'verified') return '<span class="badge bg-success ms-1">verified</span>';
+    if (status === 'draft') return '<span class="badge bg-secondary ms-1">draft</span>';
+    return '';
+  }
+
+  function outcomeBadge(outcome) {
+    if (outcome === 'merged') return '<span class="badge bg-success">merged</span>';
+    if (outcome === 'rejected') return '<span class="badge bg-danger">rejected</span>';
+    if (outcome === 'withdrawn') return '<span class="badge bg-secondary">withdrawn</span>';
+    return '<span class="badge bg-info text-dark">open</span>';
+  }
+
+  function ageHours(createdAt) {
+    if (!createdAt) return 0;
+    try {
+      const ms = Date.now() - new Date(createdAt).getTime();
+      return Math.max(0, Math.floor(ms / 3_600_000));
+    } catch (_) { return 0; }
+  }
+
+  function renderCard(p) {
+    const age = ageHours(p.created_at);
+    const ageBadge = age >= 48
+      ? `<span class="badge bg-light text-dark">${age}h old &middot; 48h gate cleared</span>`
+      : `<span class="badge bg-light text-dark">${age}h old &middot; ${48 - age}h until 48h gate</span>`;
+    const isOpen = !p.resolved_at;
+    const isProposer = currentUser && p.proposer_username === currentUser;
+    const actions = isOpen && isLoggedIn ? `
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <button type="button" class="btn btn-sm btn-success vote-btn" data-id="${p.id}" data-vote="approve"><i class="fas fa-thumbs-up me-1"></i> Approve</button>
+        <button type="button" class="btn btn-sm btn-outline-danger vote-btn" data-id="${p.id}" data-vote="reject"><i class="fas fa-thumbs-down me-1"></i> Reject</button>
+        ${isProposer ? `<button type="button" class="btn btn-sm btn-outline-secondary withdraw-btn" data-id="${p.id}"><i class="fas fa-times me-1"></i> Withdraw</button>` : ''}
+        <span class="form-text ms-auto small">Voting requires a 14-day-old account.</span>
+      </div>` : '';
+    return `
+      <div class="card" data-proposal-id="${p.id}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <a href="/parts/view.html?slug=${encodeURIComponent(p.source.slug)}" class="fw-semibold text-decoration-none">${esc(p.source.name)}</a>${statusBadge(p.source.status)}
+              <i class="fas fa-long-arrow-alt-right text-muted"></i>
+              <a href="/parts/view.html?slug=${encodeURIComponent(p.target.slug)}" class="fw-semibold text-decoration-none">${esc(p.target.name)}</a>${statusBadge(p.target.status)}
+            </div>
+            <div>${outcomeBadge(p.outcome)}</div>
+          </div>
+          <div class="small text-muted mb-2">
+            <i class="fas fa-user me-1"></i> ${esc(p.proposer_username)} &middot;
+            <i class="fas fa-calendar me-1"></i> ${fmtTime(p.created_at)}
+          </div>
+          <div class="mb-2" style="white-space:pre-wrap;">${esc(p.rationale)}</div>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-success-subtle text-success-emphasis"><i class="fas fa-thumbs-up me-1"></i> ${p.approves} approve</span>
+            <span class="badge bg-danger-subtle text-danger-emphasis"><i class="fas fa-thumbs-down me-1"></i> ${p.rejects} reject</span>
+            ${isOpen ? ageBadge : ''}
+          </div>
+          ${actions}
+          <div class="vote-feedback small mt-2"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function loadList() {
+    const loadEl = document.getElementById('loading');
+    const emptyEl = document.getElementById('empty');
+    const listEl = document.getElementById('proposals-list');
+    loadEl.classList.remove('d-none');
+    emptyEl.classList.add('d-none');
+    listEl.classList.add('d-none');
+    listEl.innerHTML = '';
+    try {
+      const resp = await fetch(API + '/api/parts/merge-proposals?status=' + currentStatus + '&limit=100');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const body = await resp.json();
+      loadEl.classList.add('d-none');
+      if (!body.items || body.items.length === 0) {
+        emptyEl.classList.remove('d-none');
+        return;
+      }
+      listEl.innerHTML = body.items.map(renderCard).join('');
+      listEl.classList.remove('d-none');
+      wireCardActions(body.items);
+    } catch (e) {
+      loadEl.classList.add('d-none');
+      emptyEl.classList.remove('d-none');
+      document.querySelector('#empty h4').textContent = 'Could not load proposals';
+      document.querySelector('#empty p').textContent = e.message || String(e);
+    }
+  }
+
+  function wireCardActions() {
+    document.querySelectorAll('.vote-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const vote = btn.dataset.vote;
+        const card = btn.closest('[data-proposal-id]');
+        const fb = card.querySelector('.vote-feedback');
+        fb.textContent = '';
+        try {
+          const resp = await ProjectAuth.apiFetch(API + '/api/parts/merge-proposals/' + id + '/vote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vote }),
+          });
+          if (!resp.ok) {
+            let detail = 'HTTP ' + resp.status;
+            try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+            fb.innerHTML = '<span class="text-danger">' + esc(detail) + '</span>';
+            return;
+          }
+          const body = await resp.json();
+          fb.innerHTML = '<span class="text-success">Vote recorded.</span>';
+          if (body.outcome === 'merged') {
+            fb.innerHTML += ' <span class="badge bg-success ms-2">This proposal just auto-merged!</span>';
+          }
+          // Refresh the row's tally.
+          setTimeout(loadList, 600);
+        } catch (e) {
+          fb.innerHTML = '<span class="text-danger">Network error: ' + esc(e.message || e) + '</span>';
+        }
+      });
+    });
+    document.querySelectorAll('.withdraw-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!window.confirm('Withdraw this proposal? It will be closed and cannot be reopened.')) return;
+        const id = btn.dataset.id;
+        try {
+          const resp = await ProjectAuth.apiFetch(API + '/api/parts/merge-proposals/' + id, { method: 'DELETE' });
+          if (resp.status === 204) {
+            loadList();
+          } else {
+            alert('Could not withdraw (HTTP ' + resp.status + ').');
+          }
+        } catch (e) {
+          alert('Network error: ' + (e.message || e));
+        }
+      });
+    });
+  }
+
+  document.querySelectorAll('#status-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#status-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentStatus = btn.dataset.status;
+      loadList();
+    });
+  });
+
+  async function init() {
+    try {
+      const me = await ProjectAuth.apiFetch(API + '/api/auth/me');
+      if (me.ok) {
+        const body = await me.json();
+        isLoggedIn = true;
+        currentUser = body && body.username ? body.username : null;
+      }
+    } catch (_) {}
+    loadList();
+  }
+  init();
+})();
+</script>
