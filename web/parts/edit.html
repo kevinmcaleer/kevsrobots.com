@@ -6,7 +6,7 @@ description: Edit a part in the catalog
 
 {% include nav_projects.html %}
 
-<link rel="stylesheet" href="/assets/css/project-editor.css">
+<link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 
 <div class="container py-4">
@@ -52,9 +52,36 @@ description: Edit a part in the catalog
           </div>
         </div>
 
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label for="part-category" class="form-label">Category</label>
+            <select id="part-category" class="form-select">
+              <option value="">— Uncategorised —</option>
+            </select>
+            <div class="form-text">Best-fit bucket. Pick "other" if nothing fits.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="part-family" class="form-label">Family</label>
+            <input type="text" id="part-family" class="form-control" list="part-family-options" placeholder="e.g. raspberry-pi-pico" maxlength="80">
+            <datalist id="part-family-options"></datalist>
+            <div class="form-text">Groups variants (e.g. Pico, Pico W, Pico 2 share the <code>raspberry-pi-pico</code> family).</div>
+          </div>
+        </div>
+
         <div class="mb-3">
           <label for="part-image-url" class="form-label">Image URL</label>
           <input type="url" id="part-image-url" class="form-control" placeholder="https://...">
+        </div>
+
+        <div id="related-parts-section" class="mb-3 d-none">
+          <label class="form-label">Related parts</label>
+          <div class="form-text mb-2">Parts that are commonly used alongside this one. Save the part first to start adding links.</div>
+          <div id="related-parts-list" class="d-flex flex-wrap gap-2 mb-2"></div>
+          <div class="input-group input-group-sm position-relative">
+            <input type="text" id="related-search-input" class="form-control" placeholder="Search parts by name or SKU..." autocomplete="off">
+            <button class="btn btn-outline-secondary" id="related-clear-btn" type="button" title="Clear">&times;</button>
+            <div id="related-search-results" class="list-group position-absolute w-100 d-none" style="top:100%;left:0;z-index:1000;max-height:240px;overflow-y:auto;"></div>
+          </div>
         </div>
 
         <div class="mb-3">
@@ -171,6 +198,157 @@ description: Edit a part in the catalog
   }
   document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', ''));
 
+  // --- Category dropdown + family autocomplete (issue #135) ---
+  async function loadCategories() {
+    try {
+      const resp = await fetch(API + '/api/parts/_meta/categories');
+      if (!resp.ok) return;
+      const cats = await resp.json();
+      const sel = document.getElementById('part-category');
+      cats.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        sel.appendChild(opt);
+      });
+    } catch (_) {}
+  }
+  async function loadFamilies() {
+    try {
+      const resp = await fetch(API + '/api/parts/_meta/families?limit=50');
+      if (!resp.ok) return;
+      const fams = await resp.json();
+      const dl = document.getElementById('part-family-options');
+      fams.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f;
+        dl.appendChild(opt);
+      });
+    } catch (_) {}
+  }
+
+  // --- Related parts (issue #135) ---
+  const relatedListEl = document.getElementById('related-parts-list');
+  const relatedSearchInput = document.getElementById('related-search-input');
+  const relatedResultsEl = document.getElementById('related-search-results');
+  let relatedDebounce = null;
+  let currentRelated = [];  // [{slug, name, sku, status, category, family}]
+
+  function renderRelatedList() {
+    if (currentRelated.length === 0) {
+      relatedListEl.innerHTML = '<span class="text-muted fst-italic small">No related parts linked yet.</span>';
+      return;
+    }
+    relatedListEl.innerHTML = currentRelated.map(p => `
+      <span class="badge bg-light text-dark d-inline-flex align-items-center gap-1 py-2 px-2">
+        <a href="/parts/view.html?slug=${encodeURIComponent(p.slug)}" target="_blank" class="text-decoration-none text-dark">${esc(p.name)}</a>
+        <button type="button" class="btn-close btn-close-sm ms-1" aria-label="Remove" data-slug="${esc(p.slug)}"></button>
+      </span>
+    `).join('');
+    relatedListEl.querySelectorAll('.btn-close').forEach(btn => {
+      btn.addEventListener('click', () => removeRelated(btn.dataset.slug));
+    });
+  }
+
+  async function addRelated(slug) {
+    if (!currentPart) return;
+    try {
+      const resp = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(currentPart.slug) + '/related', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ related_slug: slug }),
+      });
+      if (resp.status === 403) {
+        let payload = {};
+        try { payload = await resp.json(); } catch (_) {}
+        showAccountAge(payload);
+        return;
+      }
+      if (!resp.ok) {
+        let detail = 'Could not add related part (HTTP ' + resp.status + ').';
+        try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+        showError(detail);
+        return;
+      }
+      currentRelated = await resp.json();
+      renderRelatedList();
+      relatedSearchInput.value = '';
+      relatedResultsEl.classList.add('d-none');
+    } catch (e) {
+      showError('Network error linking part: ' + (e.message || e));
+    }
+  }
+
+  async function removeRelated(slug) {
+    if (!currentPart) return;
+    try {
+      const resp = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(currentPart.slug) + '/related/' + encodeURIComponent(slug), {
+        method: 'DELETE',
+      });
+      if (resp.status === 403) {
+        let payload = {};
+        try { payload = await resp.json(); } catch (_) {}
+        showAccountAge(payload);
+        return;
+      }
+      if (resp.status !== 204 && !resp.ok) {
+        showError('Could not remove related part (HTTP ' + resp.status + ').');
+        return;
+      }
+      currentRelated = currentRelated.filter(p => p.slug !== slug);
+      renderRelatedList();
+    } catch (e) {
+      showError('Network error: ' + (e.message || e));
+    }
+  }
+
+  function renderRelatedSearchResults(hits) {
+    const existing = new Set(currentRelated.map(p => p.slug));
+    const filtered = hits.filter(h => h.slug !== (currentPart && currentPart.slug) && !existing.has(h.slug));
+    if (filtered.length === 0) {
+      relatedResultsEl.innerHTML = '<div class="list-group-item small text-muted">No matches.</div>';
+      relatedResultsEl.classList.remove('d-none');
+      return;
+    }
+    relatedResultsEl.innerHTML = filtered.slice(0, 12).map(h => `
+      <button type="button" class="list-group-item list-group-item-action small" data-slug="${esc(h.slug)}">
+        <strong>${esc(h.name)}</strong>
+        ${h.sku ? `<span class="text-muted ms-2">${esc(h.sku)}</span>` : ''}
+        ${h.category ? `<span class="badge bg-light text-dark ms-2">${esc(h.category)}</span>` : ''}
+      </button>
+    `).join('');
+    relatedResultsEl.querySelectorAll('button').forEach(b => {
+      b.addEventListener('click', () => addRelated(b.dataset.slug));
+    });
+    relatedResultsEl.classList.remove('d-none');
+  }
+
+  async function searchRelatedParts(q) {
+    try {
+      const resp = await fetch(API + '/api/parts?q=' + encodeURIComponent(q) + '&limit=12');
+      if (!resp.ok) return;
+      const hits = await resp.json();
+      renderRelatedSearchResults(hits);
+    } catch (_) {}
+  }
+
+  relatedSearchInput && relatedSearchInput.addEventListener('input', () => {
+    clearTimeout(relatedDebounce);
+    const q = relatedSearchInput.value.trim();
+    if (!q) { relatedResultsEl.classList.add('d-none'); return; }
+    relatedDebounce = setTimeout(() => searchRelatedParts(q), 200);
+  });
+  document.getElementById('related-clear-btn') && document.getElementById('related-clear-btn').addEventListener('click', () => {
+    relatedSearchInput.value = '';
+    relatedResultsEl.classList.add('d-none');
+  });
+  document.addEventListener('click', (e) => {
+    if (!relatedResultsEl) return;
+    if (!relatedResultsEl.contains(e.target) && e.target !== relatedSearchInput) {
+      relatedResultsEl.classList.add('d-none');
+    }
+  });
+
   // --- Editor ---
   function initEditor() {
     if (easyMDE) return;
@@ -235,8 +413,15 @@ description: Edit a part in the catalog
       document.getElementById('part-sku').value = currentPart.sku || '';
       document.getElementById('part-mpn').value = currentPart.mpn || '';
       document.getElementById('part-image-url').value = currentPart.image_url || '';
+      document.getElementById('part-category').value = currentPart.category || '';
+      document.getElementById('part-family').value = currentPart.family || '';
       renderTags(currentPart.tags || []);
       renderSuppliers(currentPart.suppliers || []);
+
+      // Issue #135: show related-parts UI when editing (not on new).
+      currentRelated = Array.isArray(currentPart.related_parts) ? currentPart.related_parts.slice() : [];
+      document.getElementById('related-parts-section').classList.remove('d-none');
+      renderRelatedList();
 
       hide(document.getElementById('loading'));
       show(document.getElementById('edit-container'));
@@ -259,6 +444,9 @@ description: Edit a part in the catalog
       sku: document.getElementById('part-sku').value.trim() || null,
       mpn: document.getElementById('part-mpn').value.trim() || null,
       image_url: document.getElementById('part-image-url').value.trim() || null,
+      // Issue #135: send empty string to clear, the API treats "" as "clear".
+      category: document.getElementById('part-category').value || '',
+      family: document.getElementById('part-family').value.trim(),
       tags: getTags(),
       suppliers: getSuppliers(),
       description_md: easyMDE ? easyMDE.value() : '',
@@ -311,6 +499,8 @@ description: Edit a part in the catalog
         const createBody = { name: body.name };
         if (body.sku) createBody.sku = body.sku;
         if (body.mpn) createBody.mpn = body.mpn;
+        if (body.category) createBody.category = body.category;
+        if (body.family) createBody.family = body.family;
         if (body.tags && body.tags.length) createBody.tags = body.tags;
         const firstSupplier = (body.suppliers || []).find(s => s.url);
         if (firstSupplier) {
@@ -354,6 +544,8 @@ description: Edit a part in the catalog
               description_md: body.description_md,
               suppliers: body.suppliers,
               image_url: body.image_url,
+              category: body.category,
+              family: body.family,
               change_summary: body.change_summary || 'Initial description',
             }),
           });
@@ -375,6 +567,9 @@ description: Edit a part in the catalog
   (async () => {
     const ok = await checkAuth();
     if (!ok) return;
+    // Issue #135: load category dropdown + family autocomplete first so they
+    // are populated by the time loadPart() sets their selected value.
+    await Promise.all([loadCategories(), loadFamilies()]);
     await loadPart();
   })();
 })();
