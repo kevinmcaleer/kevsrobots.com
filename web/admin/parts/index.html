@@ -1,0 +1,178 @@
+---
+title: Parts moderation
+layout: default
+description: Admin queue for community-reported parts (issue #123)
+permalink: /admin/parts/
+---
+
+{% include nav_admin.html %}
+
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+
+<style>
+  .kr-report-row { border-left: 3px solid transparent; }
+  .kr-report-row.is-spam      { border-left-color: #dc3545; }
+  .kr-report-row.is-wrong     { border-left-color: #ffc107; }
+  .kr-report-row.is-duplicate { border-left-color: #0dcaf0; }
+  .kr-report-row.is-other     { border-left-color: #6c757d; }
+  .kr-reason-pill { font-size: 0.75rem; }
+</style>
+
+<div class="container-fluid py-4">
+  <h1><i class="fas fa-flag me-3 text-danger"></i> Parts moderation</h1>
+  <p class="text-muted">Community-flagged parts. Accept to acknowledge the report (the part can then be edited or deleted by hand), or dismiss if the flag was unfounded.</p>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="content" class="d-none">
+    <ul class="nav nav-pills mb-3" id="status-tabs">
+      <li class="nav-item"><button type="button" class="nav-link active" data-status="open">Open <span class="badge bg-light text-dark ms-1" id="badge-open">0</span></button></li>
+      <li class="nav-item"><button type="button" class="nav-link" data-status="resolved">Resolved</button></li>
+    </ul>
+
+    <div id="empty" class="text-center py-5 d-none">
+      <i class="fas fa-circle-check fa-3x text-success mb-3"></i>
+      <h4>Inbox zero</h4>
+      <p class="text-muted">There are no open reports right now.</p>
+    </div>
+
+    <div id="list" class="vstack gap-3"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const API = 'https://projects.kevsrobots.com';
+  let currentStatus = 'open';
+
+  function esc(t) { const d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
+  function fmtTime(s) { try { return new Date(s).toLocaleString(); } catch (_) { return ''; } }
+
+  function reasonBadgeClass(reason) {
+    switch (reason) {
+      case 'spam': return 'bg-danger';
+      case 'wrong': return 'bg-warning text-dark';
+      case 'duplicate': return 'bg-info text-dark';
+      default: return 'bg-secondary';
+    }
+  }
+
+  function renderRow(r) {
+    const partLink = r.part
+      ? `<a href="/parts/view.html?slug=${encodeURIComponent(r.part.slug)}" target="_blank" class="fw-semibold text-decoration-none">${esc(r.part.name)}</a>`
+      : `<span class="text-muted fst-italic">part #${r.part_id} (deleted)</span>`;
+    const isResolved = !!r.resolved_at;
+    return `
+      <div class="card kr-report-row is-${esc(r.reason)}" data-id="${r.id}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              ${partLink}
+              <span class="badge ${reasonBadgeClass(r.reason)} kr-reason-pill">${esc(r.reason)}</span>
+            </div>
+            <div class="small text-muted">
+              ${isResolved ? `<span class="badge bg-${r.resolution === 'accepted' ? 'success' : 'secondary'} me-1">${esc(r.resolution || 'resolved')}</span>` : ''}
+              ${fmtTime(r.created_at)}
+            </div>
+          </div>
+          <div class="small text-muted mb-2">
+            Reporter: <strong>${esc(r.reporter_username)}</strong>
+            ${isResolved ? ` &middot; resolved by <strong>${esc(r.resolved_by || '')}</strong> on ${fmtTime(r.resolved_at)}` : ''}
+          </div>
+          ${r.note ? `<div class="border-start ps-2 mb-2" style="white-space:pre-wrap;">${esc(r.note)}</div>` : '<div class="text-muted fst-italic small mb-2">No note provided.</div>'}
+          ${isResolved ? '' : `
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-sm btn-success resolve-btn" data-id="${r.id}" data-resolution="accepted"><i class="fas fa-check me-1"></i> Accept</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary resolve-btn" data-id="${r.id}" data-resolution="dismissed"><i class="fas fa-times me-1"></i> Dismiss</button>
+            </div>
+            <div class="resolve-feedback small mt-2"></div>
+          `}
+        </div>
+      </div>
+    `;
+  }
+
+  async function loadList() {
+    const listEl = document.getElementById('list');
+    const emptyEl = document.getElementById('empty');
+    emptyEl.classList.add('d-none');
+    listEl.innerHTML = '';
+    try {
+      const resp = await ProjectAuth.apiFetch(API + '/api/admin/parts/reports?status=' + currentStatus + '&limit=200');
+      if (resp.status === 401 || resp.status === 403) {
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('content').classList.add('d-none');
+        document.getElementById('access-denied').classList.remove('d-none');
+        return;
+      }
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const body = await resp.json();
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('content').classList.remove('d-none');
+      if (currentStatus === 'open') {
+        document.getElementById('badge-open').textContent = body.total || 0;
+      }
+      if (!body.items || body.items.length === 0) {
+        emptyEl.classList.remove('d-none');
+        return;
+      }
+      listEl.innerHTML = body.items.map(renderRow).join('');
+      wireActions();
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('content').classList.remove('d-none');
+      emptyEl.classList.remove('d-none');
+      document.querySelector('#empty h4').textContent = 'Could not load reports';
+      document.querySelector('#empty p').textContent = e.message || String(e);
+    }
+  }
+
+  function wireActions() {
+    document.querySelectorAll('.resolve-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const resolution = btn.dataset.resolution;
+        const card = btn.closest('[data-id]');
+        const fb = card.querySelector('.resolve-feedback');
+        fb.textContent = '';
+        try {
+          const resp = await ProjectAuth.apiFetch(API + '/api/admin/parts/reports/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ resolution }),
+          });
+          if (!resp.ok) {
+            let detail = 'HTTP ' + resp.status;
+            try { const err = await resp.json(); if (err && err.detail) detail = err.detail; } catch (_) {}
+            fb.innerHTML = '<span class="text-danger">' + esc(detail) + '</span>';
+            return;
+          }
+          // Optimistic: refresh the queue.
+          loadList();
+        } catch (e) {
+          fb.innerHTML = '<span class="text-danger">Network error: ' + esc(e.message || e) + '</span>';
+        }
+      });
+    });
+  }
+
+  document.querySelectorAll('#status-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#status-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentStatus = btn.dataset.status;
+      loadList();
+    });
+  });
+
+  loadList();
+})();
+</script>

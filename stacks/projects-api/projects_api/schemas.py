@@ -172,6 +172,13 @@ class BOMItemCreate(BaseModel):
     quantity: int = Field(1, ge=1)
     unit: str = Field("qty", max_length=20)
     unit_cost: Optional[float] = None
+    # Issue #149: ISO 4217 currency code (e.g. ``GBP``, ``USD``, ``EUR``).
+    # Optional for back-compat — legacy rows without a code render as a
+    # raw number on the frontend with a "currency not set" tooltip. The
+    # pattern is strict (exactly three uppercase letters); the dropdown
+    # in the editor only offers a handful of common codes plus
+    # "other / unknown" → NULL.
+    currency_code: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
     supplier_url: Optional[str] = None
     sort_order: int = 0
     part_id: Optional[int] = None
@@ -183,6 +190,7 @@ class BOMItemResponse(BaseModel):
     quantity: int
     unit: str
     unit_cost: Optional[float]
+    currency_code: Optional[str] = None
     supplier_url: Optional[str]
     sort_order: int
     part_id: Optional[int] = None
@@ -361,6 +369,12 @@ class PopularProjectItem(BaseModel):
 class PartSupplierInput(BaseModel):
     name: Optional[str] = Field(None, max_length=120)
     url: str = Field(..., max_length=2000)
+    # Issue #149: ISO 3166-1 alpha-2 country code for the supplier (e.g.
+    # ``GB`` for Pimoroni, ``US`` for Adafruit). Optional — NULL means
+    # "global / unknown". The pattern enforces exactly two uppercase
+    # letters; the dropdown on the edit page only offers a curated list
+    # plus "other / unknown" → NULL.
+    country_code: Optional[str] = Field(None, pattern=r"^[A-Z]{2}$")
 
 
 class PartSupplierResponse(BaseModel):
@@ -375,6 +389,7 @@ class PartSupplierResponse(BaseModel):
     last_status_code: Optional[int] = None
     is_broken: bool = False
     consecutive_failures: int = 0
+    country_code: Optional[str] = None
 
 
 class PartCreate(BaseModel):
@@ -546,6 +561,8 @@ class UserProfileResponse(BaseModel):
     joined_at: Optional[datetime] = None
     featured_badge_slugs: list[str] = Field(default_factory=list)
     stats: UserProfileStats = Field(default_factory=UserProfileStats)
+    # Issue #150: ISO 4217 code or None ("auto-detect / show native").
+    preferred_currency: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
 
 
 class UserProfileUpdate(BaseModel):
@@ -562,6 +579,10 @@ class UserProfileUpdate(BaseModel):
     website_url: Optional[str] = Field(None, max_length=200)
     social_links: Optional[UserSocialLinks] = None
     featured_badge_slugs: Optional[list[str]] = Field(None, max_length=3)
+    # Issue #150: preferred display currency. ``None`` means "clear"
+    # (back to auto-detect). Must be a 3-letter ISO 4217 alpha code.
+    # The route validates the value is in the supported allow-list.
+    preferred_currency: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
 
 
 class UserActivityItem(BaseModel):
@@ -695,6 +716,109 @@ class PartTalkThreadDetail(BaseModel):
     closed_by: Optional[str] = None
     closed_at: Optional[datetime] = None
     posts: list[PartTalkPostResponse] = Field(default_factory=list)
+
+
+# --- Parts moderation (issue #123, Phase 3) ------------------------------
+
+
+PART_REPORT_REASONS = ("spam", "wrong", "duplicate", "other")
+PART_REPORT_RESOLUTIONS = ("accepted", "dismissed")
+PART_MERGE_VOTES = ("approve", "reject")
+
+
+class PartReportCreate(BaseModel):
+    """Body of POST /api/parts/{slug}/report."""
+
+    reason: str = Field(..., pattern=r"^(spam|wrong|duplicate|other)$")
+    note: Optional[str] = Field(None, max_length=500)
+
+
+class PartReportPartRef(BaseModel):
+    """Minimal part reference embedded in admin queue rows."""
+
+    id: int
+    slug: str
+    name: str
+    status: str
+
+
+class PartReportResponse(BaseModel):
+    id: int
+    part_id: int
+    reporter_username: str
+    reason: str
+    note: Optional[str] = None
+    created_at: datetime
+    resolved_at: Optional[datetime] = None
+    resolved_by: Optional[str] = None
+    resolution: Optional[str] = None
+    # Embedded for admin queue rendering — None on the user-facing
+    # ``POST /report`` reply since the caller already knows the part.
+    part: Optional[PartReportPartRef] = None
+
+
+class PartReportListResponse(BaseModel):
+    items: list[PartReportResponse] = Field(default_factory=list)
+    total: int = 0
+
+
+class PartReportResolve(BaseModel):
+    """Body of PATCH /api/admin/parts/reports/{id}."""
+
+    resolution: str = Field(..., pattern=r"^(accepted|dismissed)$")
+
+
+class PartMergeProposalCreate(BaseModel):
+    """Body of POST /api/parts/{slug}/merge-proposal."""
+
+    target_slug: str = Field(..., min_length=1, max_length=120)
+    rationale: str = Field(..., min_length=10, max_length=2000)
+
+
+class PartMergePartRef(BaseModel):
+    """Embedded source/target on a proposal."""
+
+    id: int
+    slug: str
+    name: str
+    status: str
+
+
+class PartMergeProposalResponse(BaseModel):
+    id: int
+    proposer_username: str
+    rationale: str
+    created_at: datetime
+    resolved_at: Optional[datetime] = None
+    outcome: Optional[str] = None
+    source: PartMergePartRef
+    target: PartMergePartRef
+    approves: int = 0
+    rejects: int = 0
+
+
+class PartMergeProposalListResponse(BaseModel):
+    items: list[PartMergeProposalResponse] = Field(default_factory=list)
+    total: int = 0
+
+
+class PartMergeVoteCreate(BaseModel):
+    """Body of POST /api/parts/merge-proposals/{id}/vote."""
+
+    vote: str = Field(..., pattern=r"^(approve|reject)$")
+
+
+class PartMergeVoteResponse(BaseModel):
+    proposal_id: int
+    voter_username: str
+    vote: str
+    approves: int
+    rejects: int
+    # When auto-merge fires on this vote, the proposal flips to
+    # ``outcome=merged`` and we surface that in the response so the UI can
+    # show a "merged!" toast without polling.
+    outcome: Optional[str] = None
+    resolved_at: Optional[datetime] = None
 
 
 # --- Featured projects + staff picks (issue #115) ------------------------

@@ -114,11 +114,15 @@ async def _has_open_disputed_report(
         # Unknown dialect — be conservative and skip the check.
         return False
 
+    # #123's PartReport tracks open state via `resolved_at IS NULL`
+    # rather than a separate `status` column. Tolerate both shapes by
+    # using the column-existence check via `OR` so this works for any
+    # legacy snapshot that still has the older `status` column.
     row = await session.scalar(
         text(
             "SELECT 1 FROM part_reports "
             "WHERE part_id = :pid "
-            "  AND status = 'open' "
+            "  AND resolved_at IS NULL "
             "  AND reason IN ('wrong', 'duplicate') "
             "LIMIT 1"
         ),

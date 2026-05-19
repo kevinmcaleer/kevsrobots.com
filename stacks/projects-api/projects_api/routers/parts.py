@@ -147,11 +147,21 @@ def _supplier_response(s: PartSupplier) -> PartSupplierResponse:
         last_status_code=s.last_status_code,
         is_broken=bool(s.is_broken),
         consecutive_failures=int(s.consecutive_failures or 0),
+        country_code=s.country_code,
     )
 
 
 def _suppliers_to_json(suppliers: list[PartSupplier]) -> list[dict]:
-    return [{"name": s.supplier_name, "url": s.url} for s in suppliers]
+    # Issue #149: persist country_code into the denormalised revision
+    # snapshot so history stays consistent.
+    return [
+        {
+            "name": s.supplier_name,
+            "url": s.url,
+            "country_code": s.country_code,
+        }
+        for s in suppliers
+    ]
 
 
 async def _recompute_usage_count(session: AsyncSession, part_id: int) -> int:
@@ -469,8 +479,15 @@ def _normalize_tags(tags: Optional[list[str]]) -> list[str]:
 
 
 def _supplier_signature(suppliers: list[dict]) -> list[tuple]:
-    """Hashable view of suppliers for change detection (order matters)."""
-    return [(s.get("name"), s.get("url")) for s in suppliers]
+    """Hashable view of suppliers for change detection (order matters).
+
+    Issue #149: include ``country_code`` so editing just the country (and
+    nothing else) is recognised as a real change and writes a revision.
+    """
+    return [
+        (s.get("name"), s.get("url"), s.get("country_code"))
+        for s in suppliers
+    ]
 
 
 @router.put("/{slug}", response_model=PartDetail)
@@ -507,7 +524,12 @@ async def update_part(
     current_supplier_json = _suppliers_to_json(current_suppliers)
     if body.suppliers is not None:
         next_supplier_json = [
-            {"name": (s.name or None), "url": s.url} for s in body.suppliers
+            {
+                "name": (s.name or None),
+                "url": s.url,
+                "country_code": (s.country_code or None),
+            }
+            for s in body.suppliers
         ]
     else:
         next_supplier_json = current_supplier_json
@@ -606,6 +628,7 @@ async def update_part(
                     part_id=part.id,
                     supplier_name=entry.get("name"),
                     url=entry.get("url"),
+                    country_code=entry.get("country_code"),
                 )
             )
 
@@ -658,7 +681,11 @@ async def get_revision(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Revision not found")
     suppliers_raw = rev.suppliers_json or []
     suppliers = [
-        PartSupplierInput(name=s.get("name"), url=s.get("url", ""))
+        PartSupplierInput(
+            name=s.get("name"),
+            url=s.get("url", ""),
+            country_code=s.get("country_code"),
+        )
         for s in suppliers_raw
         if s.get("url")
     ]
@@ -762,6 +789,7 @@ async def restore_revision(
                 part_id=part.id,
                 supplier_name=entry.get("name"),
                 url=entry.get("url"),
+                country_code=entry.get("country_code"),
             )
         )
 
