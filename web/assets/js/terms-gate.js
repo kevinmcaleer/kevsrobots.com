@@ -189,10 +189,122 @@
   }
 
   /**
+   * Build the "sign in or sign up" modal shown when a logged-out user
+   * triggers a gated action. Returns the modal node. Built once and
+   * cached. The user picks an auth path; both options redirect with
+   * ``return_to`` so they come back to the page they were on.
+   */
+  function _ensureSigninModal() {
+    var id = MODAL_ID + '-signin';
+    var existing = document.getElementById(id);
+    if (existing) return existing;
+
+    var html =
+      '<div class="modal fade" id="' + id + '" tabindex="-1" ' +
+      '  aria-labelledby="' + id + '-label" aria-hidden="true" ' +
+      '  data-bs-backdrop="static" data-bs-keyboard="false">' +
+      '  <div class="modal-dialog modal-dialog-centered">' +
+      '    <div class="modal-content">' +
+      '      <div class="modal-header">' +
+      '        <h5 class="modal-title" id="' + id + '-label">' +
+      '          <i class="fas fa-user-lock me-2 text-primary"></i>' +
+      '          Sign in to continue' +
+      '        </h5>' +
+      '      </div>' +
+      '      <div class="modal-body">' +
+      '        <p class="mb-3">' +
+      '          You need a kevsrobots.com account to upload to the ' +
+      '          Projects Hub, post comments, or edit parts. It only ' +
+      '          takes a moment.' +
+      '        </p>' +
+      '        <p class="text-muted small mb-0">' +
+      '          Already have an account? Sign in. New here? Create one — ' +
+      '          you can accept the Projects Hub terms straight after.' +
+      '        </p>' +
+      '      </div>' +
+      '      <div class="modal-footer flex-wrap gap-2">' +
+      '        <button type="button" class="btn btn-link me-auto" id="' + id + '-cancel">' +
+      '          Not now' +
+      '        </button>' +
+      '        <button type="button" class="btn btn-outline-primary" id="' + id + '-signup">' +
+      '          <i class="fas fa-user-plus me-2"></i>Create account' +
+      '        </button>' +
+      '        <button type="button" class="btn btn-primary" id="' + id + '-signin">' +
+      '          <i class="fas fa-sign-in-alt me-2"></i>Sign in' +
+      '        </button>' +
+      '      </div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>';
+
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    var node = wrap.firstElementChild;
+    document.body.appendChild(node);
+    return node;
+  }
+
+  /**
+   * Show the signin-required modal. Resolves false on cancel; on
+   * sign-in / sign-up the page navigates away so the promise never
+   * resolves (caller's then() is replaced by full-page nav).
+   */
+  function _showSigninModal() {
+    var node = _ensureSigninModal();
+    var modal = null;
+    if (window.bootstrap && window.bootstrap.Modal) {
+      modal = window.bootstrap.Modal.getOrCreateInstance(node);
+      modal.show();
+    } else {
+      node.classList.add('show');
+      node.style.display = 'block';
+    }
+
+    var signinBtn = node.querySelector('#' + MODAL_ID + '-signin-signin');
+    var signupBtn = node.querySelector('#' + MODAL_ID + '-signin-signup');
+    var cancelBtn = node.querySelector('#' + MODAL_ID + '-signin-cancel');
+
+    return new Promise(function (resolve) {
+      var returnTo = window.location.pathname + window.location.search +
+                     window.location.hash;
+      var q = '?return_to=' + encodeURIComponent(returnTo);
+
+      function cleanup(result) {
+        signinBtn.removeEventListener('click', onSignin);
+        signupBtn.removeEventListener('click', onSignup);
+        cancelBtn.removeEventListener('click', onCancel);
+        if (modal) {
+          modal.hide();
+        } else {
+          node.classList.remove('show');
+          node.style.display = 'none';
+        }
+        resolve(result);
+      }
+
+      function onSignin() { window.location.href = '/login' + q; }
+      function onSignup() { window.location.href = '/register' + q; }
+      function onCancel() { cleanup(false); }
+
+      signinBtn.addEventListener('click', onSignin);
+      signupBtn.addEventListener('click', onSignup);
+      cancelBtn.addEventListener('click', onCancel);
+    });
+  }
+
+  /**
    * Show the modal and resolve on accept or cancel.
+   *
+   * If the user is logged out (401 from /api/auth/me), the accept-terms
+   * modal would only frustrate them — the POST to /accept-terms would
+   * return 401 with "Not authenticated". So we pop the sign-in / sign-up
+   * modal instead and let them authenticate first.
    */
   function showModal() {
     return _fetchMe(true).then(function (me) {
+      if (!me || me._httpStatus === 401 || me._httpStatus === 403) {
+        return _showSigninModal();
+      }
       var node = _ensureModal();
       _setVersion(me && me.current_terms_version);
 
