@@ -69,7 +69,14 @@ var ProjectInteractions = (function () {
       btn.disabled = true;
       btn.classList.add('like-pulse');
     }
-    chatterFetch('/interact/likes/' + encodeURIComponent(projectUrl), { method: 'POST' })
+    // Chatter's toggle endpoint is POST /interact/like (singular) with the
+    // URL in the JSON body — NOT POST /interact/likes/<key>, which only
+    // accepts GET and returns 405 on POST.
+    chatterFetch('/interact/like', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: projectUrl })
+    })
       .then(function (r) {
         if (r.status === 401 || r.status === 403) {
           alert('Please log in to like projects.');
@@ -79,7 +86,11 @@ var ProjectInteractions = (function () {
       })
       .then(function (data) {
         if (!data) { if (btn) btn.disabled = false; return; }
-        renderLikeButton(container, projectUrl, data.count || 0, !!data.user_liked);
+        // Chatter returns { like_count, liked } — accept the older
+        // { count, user_liked } shape too in case anything else uses it.
+        var count = (data.like_count != null) ? data.like_count : (data.count || 0);
+        var liked = (data.liked != null) ? data.liked : !!data.user_liked;
+        renderLikeButton(container, projectUrl, count, liked);
       })
       .catch(function () { if (btn) btn.disabled = false; });
   }
@@ -225,7 +236,9 @@ var ProjectInteractions = (function () {
   function postComment(projectUrl, content, parentId) {
     var body = { url: projectUrl, content: content };
     if (parentId) body.parent_comment_id = parentId;
-    return chatterFetch('/interact/comments', {
+    // Chatter accepts POST /interact/comment (singular) — the plural form
+    // /interact/comments is GET-only (used for listing).
+    return chatterFetch('/interact/comment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
