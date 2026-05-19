@@ -1372,8 +1372,43 @@
     ).join('');
   }
 
+  // Supplier-pricing feature: cache part detail responses so a BOM
+  // table with N rows linked to the same part doesn't re-fetch the
+  // part N times. Cleared on every BOM reload so price edits land.
+  let partSuppliersCache = {};
+
+  async function fetchPartSuppliers(slug) {
+    if (!slug) return [];
+    if (partSuppliersCache[slug]) return partSuppliersCache[slug];
+    try {
+      const resp = await fetch(API + '/api/parts/' + encodeURIComponent(slug));
+      if (!resp.ok) return [];
+      const part = await resp.json();
+      const suppliers = Array.isArray(part.suppliers) ? part.suppliers : [];
+      partSuppliersCache[slug] = suppliers;
+      return suppliers;
+    } catch (_) { return []; }
+  }
+
+  function supplierSelectOptions(suppliers, selectedId) {
+    // The "— manual price —" option unlinks the row; selecting it
+    // re-enables the manual unit_cost + currency inputs.
+    const opts = ['<option value="">— manual price —</option>'];
+    suppliers.forEach(s => {
+      const priceHint = (s.unit_cost != null)
+        ? ` (${(s.currency_code || '').trim() ? s.currency_code + ' ' : ''}${Number(s.unit_cost).toFixed(2)})`
+        : '';
+      const sel = String(s.id) === String(selectedId) ? ' selected' : '';
+      opts.push(
+        `<option value="${escapeHtmlAttr(s.id)}"${sel}>${escapeHtmlAttr((s.name || s.url) + priceHint)}</option>`
+      );
+    });
+    return opts.join('');
+  }
+
   async function loadBOM() {
     if (!currentProject) return;
+    partSuppliersCache = {};  // force-refresh prices on every load
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom', { credentials: 'include' });
     const items = await resp.json();
     const tbody = document.getElementById('bom-body');
@@ -1382,33 +1417,69 @@
       const partPill = linked
         ? `<a class="bom-part-pill" href="/parts/view.html?slug=${encodeURIComponent(item.part_slug)}" title="Linked to parts catalog" target="_blank"><i class="fas fa-link"></i> /parts/${escapeHtmlAttr(item.part_slug)}</a>`
         : (item.part_id ? `<span class="bom-part-pill" title="Linked to parts catalog"><i class="fas fa-link"></i> part #${item.part_id}</span>` : '');
-      const supplierHint = item.part_id
-        ? `<small class="bom-supplier-hint">from parts catalog</small>` : '';
-      const supplierReadonly = item.part_id ? ' readonly' : '';
+      // Supplier-pricing feature: when the row links to a supplier
+      // that has a non-NULL price, ``price_source`` is ``"supplier"``
+      // and the row's own unit_cost / currency inputs are disabled —
+      // the supplier is the source of truth. Selecting "— manual
+      // price —" re-enables them.
+      const supplierLocked = item.price_source === 'supplier';
+      const costDisabled = supplierLocked ? ' disabled' : '';
+      const currencyDisabled = supplierLocked ? ' disabled' : '';
+      // The cost cell shows the effective price (so the user sees what
+      // the project page will render) but the underlying field
+      // remains unit_cost — when the supplier is unlinked we still
+      // round-trip the row's own value.
+      const displayCost = supplierLocked
+        ? (item.effective_unit_cost != null ? item.effective_unit_cost : 0)
+        : (item.unit_cost != null ? item.unit_cost : 0);
+      const displayCurrency = supplierLocked
+        ? (item.effective_currency_code || '')
+        : (item.currency_code || '');
+      const supplierAutoBadge = supplierLocked
+        ? `<small class="text-success ms-1"><i class="fas fa-link"></i> Auto</small>`
+        : '';
+      // The supplier cell switches shape based on whether the row is
+      // linked to a part. Linked → <select> populated from the part's
+      // suppliers (async-filled below). Unlinked → free-form URL
+      // input (the legacy behaviour).
+      const supplierCell = linked
+        ? `<select class="form-select form-select-sm bom-supplier-select" data-field="supplier_id" data-current-supplier-id="${escapeHtmlAttr(item.supplier_id || '')}" onchange="updateBOM(${item.id}, this)" title="Pick a supplier from the parts catalog">
+             <option value="">— loading suppliers… —</option>
+           </select>
+           <small class="bom-supplier-hint">price comes from chosen supplier</small>`
+        : `<input value="${escapeHtmlAttr(item.supplier_url || '')}" data-field="supplier_url" onchange="updateBOM(${item.id}, this)">`;
       return `
-      <tr data-bom-id="${item.id}" data-part-id="${item.part_id || ''}" data-part-slug="${escapeHtmlAttr(item.part_slug || '')}">
+      <tr data-bom-id="${item.id}" data-part-id="${item.part_id || ''}" data-part-slug="${escapeHtmlAttr(item.part_slug || '')}" data-supplier-id="${escapeHtmlAttr(item.supplier_id || '')}" data-price-source="${escapeHtmlAttr(item.price_source || 'row')}">
         <td class="bom-part-cell" style="position:relative">
           <input class="bom-part-input" value="${escapeHtmlAttr(item.name)}" data-field="name" autocomplete="off" placeholder="Type to search parts catalog..." onchange="updateBOM(${item.id}, this)">
           ${partPill}
         </td>
         <td><input type="number" value="${item.quantity}" data-field="quantity" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
         <td><input value="${escapeHtmlAttr(item.unit)}" data-field="unit" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
-        <td><input type="number" step="0.01" value="${item.unit_cost || 0}" data-field="unit_cost" style="width:70px" onchange="updateBOM(${item.id}, this)"></td>
+        <td><input type="number" step="0.01" value="${displayCost}" data-field="unit_cost" style="width:70px"${costDisabled} onchange="updateBOM(${item.id}, this)">${supplierAutoBadge}</td>
         <td>
-          <select class="form-select form-select-sm" data-field="currency_code" style="width:90px" onchange="updateBOM(${item.id}, this)" title="Currency for this unit cost">
-            ${bomCurrencyOptions(item.currency_code)}
+          <select class="form-select form-select-sm" data-field="currency_code" style="width:90px"${currencyDisabled} onchange="updateBOM(${item.id}, this)" title="Currency for this unit cost">
+            ${bomCurrencyOptions(displayCurrency)}
           </select>
         </td>
-        <td>
-          <input value="${escapeHtmlAttr(item.supplier_url || '')}" data-field="supplier_url"${supplierReadonly} onchange="updateBOM(${item.id}, this)">
-          ${supplierHint}
-        </td>
+        <td>${supplierCell}</td>
         <td><button class="btn btn-sm text-danger" onclick="deleteBOM(${item.id})"><i class="fas fa-times"></i></button></td>
       </tr>`;
     }).join('');
     updateBOMTotal(items);
     // Wire up the parts autosuggest on every Part-name input
     tbody.querySelectorAll('.bom-part-input').forEach(setupPartsAutosuggest);
+    // Async-fill the supplier <select>s for linked rows. Promises are
+    // independent per row and deduped via partSuppliersCache.
+    tbody.querySelectorAll('tr[data-part-slug]').forEach(async (row) => {
+      const slug = row.dataset.partSlug;
+      if (!slug) return;
+      const sel = row.querySelector('.bom-supplier-select');
+      if (!sel) return;
+      const suppliers = await fetchPartSuppliers(slug);
+      const currentId = sel.dataset.currentSupplierId || '';
+      sel.innerHTML = supplierSelectOptions(suppliers, currentId);
+    });
   }
 
   function updateBOMTotal(items) {
@@ -1420,7 +1491,8 @@
     const row = input.closest('tr');
     const data = {};
     // Issue #149: read both <input> and <select> fields so the currency
-    // dropdown is included in the PUT body.
+    // dropdown is included in the PUT body. Supplier-pricing feature:
+    // also pick up the supplier_id <select> when the row is linked.
     row.querySelectorAll('input, select').forEach(inp => {
       const field = inp.dataset.field;
       if (!field) return;
@@ -1431,6 +1503,13 @@
         const code = String(val || '').trim().toUpperCase();
         // Empty -> null so the server-side pattern doesn't fire on "".
         val = code || null;
+      }
+      else if (field === 'supplier_id') {
+        // Empty string means "— manual price —"; send null so the
+        // backend clears the FK and the row falls back to its own
+        // unit_cost + currency_code.
+        const num = parseInt(val);
+        val = Number.isFinite(num) ? num : null;
       }
       data[field] = val;
     });
@@ -1444,14 +1523,16 @@
         body: JSON.stringify(data),
       });
     } catch (e) { loadBOM(); return; }
-    // If an older backend rejects the new part_id or currency_code field,
-    // retry without those so the user's edit still saves. Treat 4xx as
-    // "field rejected"; 5xx is a real server error and we just let it
-    // fall through.
-    if (!resp.ok && resp.status >= 400 && resp.status < 500 && (partId || 'currency_code' in data)) {
+    // If an older backend rejects the new part_id / currency_code /
+    // supplier_id field, retry without those so the user's edit
+    // still saves. Treat 4xx as "field rejected"; 5xx is a real
+    // server error and we just let it fall through.
+    const newFields = partId || 'currency_code' in data || 'supplier_id' in data;
+    if (!resp.ok && resp.status >= 400 && resp.status < 500 && newFields) {
       const retryData = Object.assign({}, data);
       delete retryData.part_id;
       delete retryData.currency_code;
+      delete retryData.supplier_id;
       try {
         await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
           method: 'PUT', credentials: 'include',

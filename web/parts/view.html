@@ -259,6 +259,21 @@ description: View a part in the catalog
     return `<span class="badge bg-light text-dark ms-2" title="Supplier country: ${esc(up)}">${flag} ${esc(up)}</span>`;
   }
 
+  // Supplier-pricing feature: render a small "GBP 12.50"-style pill
+  // next to the supplier link when a price is set. Suppressed entirely
+  // when unit_cost is null so suppliers without recorded prices look
+  // unchanged.
+  function supplierPriceBadge(supplier) {
+    if (!supplier || supplier.unit_cost == null) return '';
+    const amount = Number(supplier.unit_cost).toFixed(2);
+    const code = (supplier.currency_code || '').trim().toUpperCase();
+    const label = code ? `${code} ${amount}` : amount;
+    const title = code
+      ? `Supplier price: ${code} ${amount}`
+      : `Supplier price: ${amount} (currency not set)`;
+    return `<span class="badge bg-success-subtle text-success ms-2" title="${esc(title)}"><i class="fas fa-tag me-1"></i>${esc(label)}</span>`;
+  }
+
   function fmtTime(dateStr) {
     if (!dateStr) return 'unknown';
     try { return new Date(dateStr).toLocaleDateString(); } catch (_) { return 'unknown'; }
@@ -327,6 +342,7 @@ description: View a part in the catalog
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <div>
             <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || s.url)} <i class="fas fa-external-link-alt fa-xs text-muted"></i></a>
+            ${supplierPriceBadge(s)}
             ${supplierBrokenPill(s)}
             ${countryFlagBadge(s.country_code)}
             ${supplierStatusBadge(s.last_status)}
