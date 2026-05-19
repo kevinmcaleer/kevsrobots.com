@@ -6,8 +6,8 @@ description: View project details
 
 {% include nav_projects.html %}
 
-<link rel="stylesheet" href="/assets/css/project-editor.css">
-<link rel="stylesheet" href="/assets/css/image-viewer.css">
+<link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/image-viewer.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
@@ -31,8 +31,18 @@ description: View project details
 
       <!-- MIDDLE: Main content -->
       <div class="col-lg-7">
-        <!-- Remix chain breadcrumb (issue #108) — hidden unless this project is a remix -->
-        <nav id="remix-chain-crumbs" class="remix-chain-crumbs small text-muted mb-2 d-none" aria-label="Remix chain"></nav>
+        <!-- Showcase-style breadcrumbs above the title. Rendered in JS once
+             the project loads so we can include the project title (and, for
+             remixes, the parent project) as the final crumb(s). The legacy
+             #remix-chain-crumbs node is gone — its data feeds the breadcrumb
+             strip instead, so we have a single canonical location. -->
+        <nav id="project-breadcrumbs" class="project-breadcrumbs" aria-label="breadcrumb">
+          <ol class="breadcrumb my-2 m-0 small">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/projects/hub">Projects</a></li>
+            <li id="breadcrumb-current" class="breadcrumb-item active" aria-current="page">&hellip;</li>
+          </ol>
+        </nav>
 
         <div class="d-flex align-items-center gap-3 mb-1 flex-wrap">
           <h1 id="view-title" class="mb-0"></h1>
@@ -45,6 +55,29 @@ description: View project details
           <a id="remix-icon" href="#" class="d-none text-muted" title="Remix this project" aria-label="Remix this project" style="font-size:1.1rem" data-bs-toggle="modal" data-bs-target="#remix-modal">
             <i class="fas fa-code-branch"></i>
           </a>
+        </div>
+
+        <!-- Showcase-style metadata strip: date | reading time | by author | share icons.
+             Wraps gracefully on narrow viewports. Populated in JS once project + Chatter
+             profile load. -->
+        <div id="view-meta-strip" class="project-meta-strip text-muted small d-flex flex-wrap align-items-center gap-2 mt-2 mb-3">
+          <span class="meta-date"><i class="fa-regular fa-calendar me-1"></i> <span id="meta-date-text">&hellip;</span></span>
+          <span class="meta-sep" aria-hidden="true">|</span>
+          <span class="meta-readtime"><i class="fa-solid fa-book-open-reader me-1"></i> <span id="meta-readtime-text">1 minute read</span></span>
+          <span class="meta-sep" aria-hidden="true">|</span>
+          <span class="meta-author">
+            <i class="fa-regular fa-user me-1"></i> By
+            <a id="meta-author-link" href="#" class="text-decoration-none fw-semibold"><span id="meta-author-name">&hellip;</span></a>
+          </span>
+          <span class="meta-sep" aria-hidden="true">|</span>
+          <span class="meta-share">
+            Share
+            <a id="share-mastodon" href="#" target="_blank" rel="noopener noreferrer" class="ms-1 text-decoration-none" data-bs-toggle="tooltip" title="Share on Mastodon" aria-label="Share on Mastodon"><i class="fab fa-mastodon"></i></a>
+            <a id="share-twitter" href="#" target="_blank" rel="noopener noreferrer" class="ms-1 text-decoration-none" data-bs-toggle="tooltip" title="Share on X/Twitter" aria-label="Share on X/Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+            <a id="share-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="ms-1 text-decoration-none" data-bs-toggle="tooltip" title="Share on LinkedIn" aria-label="Share on LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+            <a id="share-reddit" href="#" target="_blank" rel="noopener noreferrer" class="ms-1 text-decoration-none" data-bs-toggle="tooltip" title="Share on Reddit" aria-label="Share on Reddit"><i class="fa-brands fa-reddit"></i></a>
+            <a id="share-copy" href="#" class="ms-1 text-decoration-none" data-bs-toggle="tooltip" title="Copy link" aria-label="Copy link"><i class="fa-regular fa-copy"></i></a>
+          </span>
         </div>
 
         <!-- YouTube videos (issue #171) — embedded above the description.
@@ -68,8 +101,6 @@ description: View project details
         </div>
 
         <p id="view-description" class="lead text-muted"></p>
-
-        <div id="view-meta-badges" class="d-flex flex-wrap gap-2 mb-4"></div>
 
         <hr>
 
@@ -145,6 +176,27 @@ description: View project details
       <!-- RIGHT: Sidebar (scrolls with main content) -->
       <div class="col-lg-3">
         <div>
+          <!-- Project metadata: tags + difficulty + estimated time. Moved out
+               of the main content column (showcase-style — metadata lives in
+               the sidebar, not under the description). Hidden until at least
+               one field populates. -->
+          <div id="view-meta-card" class="card mb-3 d-none">
+            <div class="card-body py-3">
+              <div id="view-difficulty-row" class="mb-2 d-none">
+                <span class="small text-muted d-block mb-1">Difficulty</span>
+                <span id="view-difficulty"></span>
+              </div>
+              <div id="view-estimated-row" class="mb-2 d-none">
+                <span class="small text-muted d-block mb-1">Estimated time</span>
+                <span id="view-estimated"></span>
+              </div>
+              <div id="view-tags-row" class="d-none">
+                <span class="small text-muted d-block mb-1">Tags</span>
+                <div id="view-tags" class="d-flex flex-wrap gap-1"></div>
+              </div>
+            </div>
+          </div>
+
           <!-- Author & actions -->
           <div class="card mb-3">
             <div class="card-body">
@@ -371,28 +423,46 @@ description: View project details
     margin: 1.5rem 0;
   }
 
-  /* Remix chain breadcrumb (issue #108) */
-  .remix-chain-crumbs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.4rem;
-    align-items: center;
+  /* Showcase-style breadcrumbs above the title */
+  .project-breadcrumbs .breadcrumb {
+    --bs-breadcrumb-divider: '\203A';
+    padding: 0;
+    background: transparent;
   }
-  .remix-chain-crumbs a {
+  .project-breadcrumbs .breadcrumb-item a {
     color: #6c757d;
     text-decoration: none;
   }
-  .remix-chain-crumbs a:hover { color: #4A90D9; }
-  .remix-chain-crumbs .crumb-current {
+  .project-breadcrumbs .breadcrumb-item a:hover {
+    color: #4A90D9;
+  }
+  .project-breadcrumbs .breadcrumb-item.active {
     color: #212529;
     font-weight: 500;
   }
-  .remix-chain-crumbs .crumb-sep {
-    color: #adb5bd;
-    font-size: 0.75rem;
+
+  /* Showcase-style metadata strip under the title */
+  .project-meta-strip {
+    font-size: 0.9rem;
+    line-height: 1.6;
   }
-  .remix-chain-crumbs .crumb-ellipsis {
+  .project-meta-strip .meta-sep {
     color: #adb5bd;
+  }
+  .project-meta-strip a {
+    color: inherit;
+  }
+  .project-meta-strip a:hover {
+    color: #4A90D9;
+  }
+  .project-meta-strip .meta-share a {
+    margin-left: 0.35rem;
+  }
+  /* Hide separators that immediately follow another separator (when an
+     adjacent segment is collapsed via .d-none — keeps the strip tidy). */
+  .project-meta-strip .meta-sep + .meta-sep,
+  .project-meta-strip .d-none + .meta-sep {
+    display: none;
   }
 
   /* Remix attribution banner */
@@ -617,11 +687,50 @@ description: View project details
       document.getElementById('view-created').textContent = new Date(project.created_at).toLocaleDateString();
       document.getElementById('view-updated').textContent = new Date(project.updated_at).toLocaleDateString();
 
-      // Badges
-      const badges = document.getElementById('view-meta-badges');
-      if (project.difficulty) badges.innerHTML += `<span class="badge bg-${difficultyColors[project.difficulty]}">${project.difficulty}</span>`;
-      if (project.estimated_minutes) badges.innerHTML += `<span class="badge bg-light text-dark"><i class="fas fa-clock"></i> ${project.estimated_minutes} min</span>`;
-      (project.tags || []).forEach(t => { badges.innerHTML += `<span class="badge bg-light text-primary">${esc(t)}</span>`; });
+      // Showcase-style metadata moved to the sidebar (tags + difficulty +
+      // estimated time). Mirror the hub card badge styles for visual
+      // continuity.
+      const metaCard = document.getElementById('view-meta-card');
+      let anyMeta = false;
+      if (project.difficulty) {
+        const dRow = document.getElementById('view-difficulty-row');
+        const dEl = document.getElementById('view-difficulty');
+        if (dRow && dEl) {
+          dEl.innerHTML = `<span class="badge bg-${difficultyColors[project.difficulty] || 'secondary'}">${esc(project.difficulty)}</span>`;
+          dRow.classList.remove('d-none');
+          anyMeta = true;
+        }
+      }
+      if (project.estimated_minutes) {
+        const eRow = document.getElementById('view-estimated-row');
+        const eEl = document.getElementById('view-estimated');
+        if (eRow && eEl) {
+          eEl.innerHTML = `<span class="badge bg-light text-dark"><i class="fas fa-clock me-1"></i>${project.estimated_minutes} min</span>`;
+          eRow.classList.remove('d-none');
+          anyMeta = true;
+        }
+      }
+      if (project.tags && project.tags.length) {
+        const tRow = document.getElementById('view-tags-row');
+        const tEl = document.getElementById('view-tags');
+        if (tRow && tEl) {
+          tEl.innerHTML = project.tags.map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('');
+          tRow.classList.remove('d-none');
+          anyMeta = true;
+        }
+      }
+      if (anyMeta && metaCard) metaCard.classList.remove('d-none');
+
+      // Showcase-style header: breadcrumbs, metadata strip, share links.
+      renderBreadcrumbs(project);
+      renderMetaStrip(project);
+      // Fire-and-forget: upgrade the byline to the full name once Chatter
+      // resolves. Safe on failure — the username remains in place.
+      resolveAuthorFullName(project.author_username).then(function (fullName) {
+        if (!fullName) return;
+        const nameEl = document.getElementById('meta-author-name');
+        if (nameEl) nameEl.textContent = fullName;
+      });
 
       // Content
       if (project.content_md) {
@@ -670,9 +779,10 @@ description: View project details
         }
       } catch (e) {}
 
-      // Render remix attribution banner & chain crumbs (issue #108).
+      // Render remix attribution banner (issue #108). The remix chain
+      // now feeds the showcase-style breadcrumb above the title via
+      // renderBreadcrumbs() — no separate crumb nav.
       renderRemixAttribution(project);
-      loadRemixChain(project);
       loadRemixesSidebar(project);
 
       loadBOM();
@@ -695,6 +805,151 @@ description: View project details
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');
       document.getElementById('not-found').classList.remove('d-none');
+    }
+  }
+
+  // ---- Showcase-style header helpers -----------------------------------
+
+  // Chatter profile cache (per-username, page lifetime). Stores the
+  // resolved full name (or empty string when Chatter has no name on
+  // file). The cache is keyed by lowercased username; the value is a
+  // Promise so concurrent callers share a single fetch.
+  const CHATTER_API = 'https://chatter.kevsrobots.com';
+  const _chatterNameCache = {};
+
+  function resolveAuthorFullName(username) {
+    if (!username) return Promise.resolve('');
+    const key = String(username).toLowerCase();
+    if (_chatterNameCache[key]) return _chatterNameCache[key];
+    const p = fetch(CHATTER_API + '/profile/' + encodeURIComponent(username), {
+      credentials: 'include'
+    }).then(function (r) {
+      if (!r.ok) return '';
+      return r.json().then(function (profile) {
+        if (!profile) return '';
+        const parts = [profile.firstname, profile.lastname]
+          .map(function (s) { return (s || '').trim(); })
+          .filter(Boolean);
+        return parts.join(' ');
+      }).catch(function () { return ''; });
+    }).catch(function () { return ''; });
+    _chatterNameCache[key] = p;
+    return p;
+  }
+
+  // Render the showcase-style breadcrumbs above the title. For remixes
+  // we attempt to chain the parent project into the breadcrumb (so the
+  // crumbs read: Home > Projects > <parent> > <this>). If the parent
+  // ref isn't available the breadcrumb stays at the three-crumb default.
+  function renderBreadcrumbs(project) {
+    const ol = document.querySelector('#project-breadcrumbs .breadcrumb');
+    const current = document.getElementById('breadcrumb-current');
+    if (!ol || !current) return;
+    current.textContent = project.title || 'Project';
+
+    // If this project is a remix and we have parent metadata, splice the
+    // parent in as a clickable crumb just before the current item.
+    if (project.remixed_from && project.remixed_from.title) {
+      const parent = project.remixed_from;
+      const href = (parent.slug && parent.author_username)
+        ? '/projects/' + encodeURIComponent(parent.author_username) + '/' + encodeURIComponent(parent.slug)
+        : '/projects/view.html?id=' + parent.id;
+      const li = document.createElement('li');
+      li.className = 'breadcrumb-item';
+      const a = document.createElement('a');
+      a.href = href;
+      a.textContent = parent.title;
+      li.appendChild(a);
+      ol.insertBefore(li, current);
+    }
+  }
+
+  // Render the metadata strip under the title: date, read time, author,
+  // share icons. The author renders as the username up-front; the
+  // Chatter lookup upgrades it asynchronously when it resolves.
+  function renderMetaStrip(project) {
+    // Published date (created_at). Format: "12 May 2026".
+    const dateEl = document.getElementById('meta-date-text');
+    if (dateEl && project.created_at) {
+      try {
+        const d = new Date(project.created_at);
+        dateEl.textContent = d.toLocaleDateString(undefined, {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+      } catch (_) {
+        dateEl.textContent = (project.created_at || '').slice(0, 10);
+      }
+    }
+
+    // Read time. Word count from content_md / 200 wpm, floor at "1 minute".
+    const rtEl = document.getElementById('meta-readtime-text');
+    if (rtEl) {
+      const md = project.content_md || '';
+      const words = md.trim() ? md.trim().split(/\s+/).length : 0;
+      const minutes = Math.max(1, Math.round(words / 200));
+      rtEl.textContent = minutes + ' minute read';
+    }
+
+    // Author byline — username initially, full name once Chatter responds.
+    const nameEl = document.getElementById('meta-author-name');
+    const linkEl = document.getElementById('meta-author-link');
+    if (nameEl) nameEl.textContent = project.author_username || '';
+    if (linkEl && project.author_username) {
+      linkEl.href = '/profile/?u=' + encodeURIComponent(project.author_username);
+    }
+
+    // Share URLs — use the canonical public URL when we have one,
+    // otherwise the current location. URL-encode title + URL.
+    const shareUrl = (project.author_username && project.slug)
+      ? 'https://www.kevsrobots.com/projects/' +
+        encodeURIComponent(project.author_username) + '/' +
+        encodeURIComponent(project.slug)
+      : window.location.href;
+    const shareTitle = project.title || 'KevsRobots project';
+    const encUrl = encodeURIComponent(shareUrl);
+    const encTitle = encodeURIComponent(shareTitle);
+    const tw = document.getElementById('share-twitter');
+    if (tw) tw.href = 'https://twitter.com/intent/tweet?text=' + encTitle + '&url=' + encUrl + '&hashtags=robotics';
+    const mt = document.getElementById('share-mastodon');
+    if (mt) mt.href = 'https://mastodon.social/share?text=' + encTitle + '%20' + encUrl;
+    const li = document.getElementById('share-linkedin');
+    if (li) li.href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encUrl;
+    const rd = document.getElementById('share-reddit');
+    if (rd) rd.href = 'https://www.reddit.com/submit?url=' + encUrl + '&title=' + encTitle;
+    const cp = document.getElementById('share-copy');
+    if (cp && !cp.dataset.bound) {
+      cp.dataset.bound = '1';
+      cp.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        const text = shareUrl;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            const prev = cp.getAttribute('title') || 'Copy link';
+            cp.setAttribute('title', 'Copied!');
+            if (window.bootstrap && window.bootstrap.Tooltip) {
+              const t = window.bootstrap.Tooltip.getInstance(cp);
+              if (t) { t.setContent({ '.tooltip-inner': 'Copied!' }); }
+            }
+            setTimeout(function () {
+              cp.setAttribute('title', prev);
+              if (window.bootstrap && window.bootstrap.Tooltip) {
+                const t = window.bootstrap.Tooltip.getInstance(cp);
+                if (t) { t.setContent({ '.tooltip-inner': prev }); }
+              }
+            }, 1500);
+          }).catch(function () { /* silent */ });
+        }
+      });
+    }
+
+    // Initialise Bootstrap tooltips on the share icons (idempotent).
+    if (window.bootstrap && window.bootstrap.Tooltip) {
+      document.querySelectorAll('#view-meta-strip [data-bs-toggle="tooltip"]').forEach(function (el) {
+        if (!el.dataset.tooltipInit) {
+          el.dataset.tooltipInit = '1';
+          try { new window.bootstrap.Tooltip(el); } catch (_) {}
+        }
+      });
     }
   }
 
@@ -732,54 +987,6 @@ description: View project details
       } catch (e) {}
     }
     banner.classList.remove('d-none');
-  }
-
-  async function loadRemixChain(project) {
-    // Only render when this project is itself a remix.
-    if (!project || !project.remixed_from) return;
-    const crumbs = document.getElementById('remix-chain-crumbs');
-    if (!crumbs) return;
-    try {
-      const resp = await fetch(API + '/api/projects/' + project.id + '/remix-chain');
-      if (!resp.ok) return;
-      const chain = await resp.json();
-      if (!Array.isArray(chain) || chain.length < 2) return;
-
-      // Truncate intermediate hops if the chain is long: show first, ellipsis, last two before current.
-      let shown = chain;
-      let truncated = false;
-      if (chain.length > 5) {
-        shown = [chain[0], null, chain[chain.length - 3], chain[chain.length - 2], chain[chain.length - 1]];
-        truncated = true;
-      }
-
-      const parts = [];
-      for (let i = 0; i < shown.length; i++) {
-        if (i > 0) parts.push('<span class="crumb-sep"><i class="fas fa-angle-right"></i></span>');
-        const item = shown[i];
-        if (item === null) {
-          parts.push('<span class="crumb-ellipsis" title="' + (chain.length - 4) + ' intermediate remixes hidden">…</span>');
-          continue;
-        }
-        const isCurrent = item.id === project.id;
-        if (isCurrent) {
-          parts.push('<span class="crumb-current">' + esc(item.title) + '</span>');
-        } else {
-          // Issue #152: emit canonical URL when slug+owner are present.
-          const href = (item.slug && item.author_username)
-            ? '/projects/' + encodeURIComponent(item.author_username) + '/' + encodeURIComponent(item.slug)
-            : '/projects/view.html?id=' + item.id;
-          parts.push('<a href="' + href + '">' + esc(item.title) + '</a>');
-        }
-      }
-      crumbs.innerHTML = '<i class="fas fa-code-branch me-1 text-muted" aria-hidden="true"></i>' + parts.join(' ');
-      crumbs.classList.remove('d-none');
-      if (truncated) {
-        crumbs.setAttribute('title', 'Full chain depth: ' + chain.length);
-      }
-    } catch (e) {
-      // Non-fatal — banner alone is still useful.
-    }
   }
 
   async function loadRemixesSidebar(project) {
