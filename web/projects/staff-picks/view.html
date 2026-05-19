@@ -106,7 +106,7 @@ description: View a curated collection of projects
           ? '/projects/' + encodeURIComponent(proj.author_username) + '/' + encodeURIComponent(proj.slug)
           : '/projects/view.html?id=' + proj.id;
         var note = it.editor_note
-          ? '<blockquote class="featured-note small fst-italic text-muted border-start ps-2 mb-2">' + esc(it.editor_note) + '</blockquote>'
+          ? '<blockquote class="featured-note small fst-italic mb-2 p-2 rounded" style="background:#f8f9fa;color:#495057;border-left:3px solid #ffc107;">' + esc(it.editor_note) + '</blockquote>'
           : '';
         return '<div class="col">' +
           '<a href="' + href + '" class="text-decoration-none">' +
