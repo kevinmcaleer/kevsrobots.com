@@ -183,6 +183,68 @@ async def add_remix_columns_if_missing() -> None:
             ))
 
 
+async def add_part_category_family_if_missing() -> None:
+    """Additive migration for issue #135 (related parts + category + family).
+
+    Adds ``category`` and ``family`` columns to the existing ``parts``
+    table, and the matching snapshot columns to ``part_revisions``, when
+    they do not already exist. Also indexes the two new ``parts`` columns
+    so filtering by family / category is cheap. Idempotent — safe to run
+    on every startup. Postgres-only; SQLite tests use a fresh in-memory
+    DB and ``create_all`` already includes the new columns.
+
+    The new ``part_relations`` table is handled by ``create_all`` and
+    therefore does NOT need a helper here.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        for table_name, cols_to_add in (
+            (
+                "parts",
+                [
+                    ("category", 'VARCHAR(60)'),
+                    ("family", 'VARCHAR(80)'),
+                ],
+            ),
+            (
+                "part_revisions",
+                [
+                    ("category", 'VARCHAR(60)'),
+                    ("family", 'VARCHAR(80)'),
+                ],
+            ),
+        ):
+            table_check = await conn.execute(text(
+                "SELECT 1 FROM information_schema.tables "
+                "WHERE table_schema = current_schema() AND table_name = :t"
+            ), {"t": table_name})
+            if table_check.first() is None:
+                continue
+
+            existing = await conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = current_schema() AND table_name = :t"
+            ), {"t": table_name})
+            cols = {row[0] for row in existing.fetchall()}
+
+            for col_name, col_type in cols_to_add:
+                if col_name in cols:
+                    continue
+                logger.warning(
+                    "Adding %s.%s column (issue #135)", table_name, col_name
+                )
+                await conn.execute(text(
+                    f'ALTER TABLE "{table_name}" ADD COLUMN "{col_name}" {col_type}'
+                ))
+                if table_name == "parts":
+                    await conn.execute(text(
+                        f'CREATE INDEX IF NOT EXISTS "ix_parts_{col_name}" '
+                        f'ON "parts" ("{col_name}")'
+                    ))
+
+
 async def add_project_featured_columns_if_missing() -> None:
     """Additive migration for issue #115 (featured projects).
 

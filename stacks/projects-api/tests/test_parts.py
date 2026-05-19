@@ -309,6 +309,213 @@ async def test_bom_part_switch_moves_usage_count(client) -> None:
     assert b_after.json()["usage_count"] == 1
 
 
+# --- category + family + related parts (issue #135) ------------------
+
+
+@pytest.mark.asyncio
+async def test_create_part_with_category_and_family(client) -> None:
+    headers = make_auth_header()
+    resp = await client.post(
+        "/api/parts",
+        json={
+            "name": "Raspberry Pi Pico",
+            "sku": "PICO",
+            "category": "microcontroller",
+            "family": "raspberry-pi-pico",
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 201, resp.text
+    data = resp.json()
+    assert data["category"] == "microcontroller"
+    assert data["family"] == "raspberry-pi-pico"
+
+
+@pytest.mark.asyncio
+async def test_update_can_change_category_and_family(client) -> None:
+    headers = make_auth_header()
+    create = await client.post(
+        "/api/parts",
+        json={"name": "Widget"},
+        headers=headers,
+    )
+    slug = create.json()["slug"]
+    upd = await client.put(
+        f"/api/parts/{slug}",
+        json={
+            "category": "sensor",
+            "family": "bmp",
+            "change_summary": "Categorise widget",
+        },
+        headers=headers,
+    )
+    assert upd.status_code == 200, upd.text
+    assert upd.json()["category"] == "sensor"
+    assert upd.json()["family"] == "bmp"
+
+
+@pytest.mark.asyncio
+async def test_family_endpoint_groups_siblings(client) -> None:
+    headers = make_auth_header()
+    for name in ("Pico", "Pico W", "Pico 2"):
+        resp = await client.post(
+            "/api/parts",
+            json={"name": name, "family": "raspberry-pi-pico"},
+            headers=headers,
+        )
+        assert resp.status_code == 201
+
+    detail = await client.get("/api/parts/pico")
+    body = detail.json()
+    assert body["family"] == "raspberry-pi-pico"
+    family_names = {p["name"] for p in body["family_parts"]}
+    assert family_names == {"Pico W", "Pico 2"}
+
+    sib = await client.get("/api/parts/pico/family")
+    assert sib.status_code == 200
+    assert {p["name"] for p in sib.json()} == {"Pico W", "Pico 2"}
+
+
+@pytest.mark.asyncio
+async def test_meta_categories_returns_starter_list(client) -> None:
+    resp = await client.get("/api/parts/_meta/categories")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "microcontroller" in data
+    assert "sensor" in data
+
+
+@pytest.mark.asyncio
+async def test_meta_families_returns_distinct_values(client) -> None:
+    headers = make_auth_header()
+    for name, family in (("Pico", "raspberry-pi-pico"), ("Pico W", "raspberry-pi-pico"), ("ESP32", "esp32")):
+        await client.post(
+            "/api/parts",
+            json={"name": name, "family": family},
+            headers=headers,
+        )
+    resp = await client.get("/api/parts/_meta/families")
+    assert resp.status_code == 200
+    fams = resp.json()
+    assert "raspberry-pi-pico" in fams
+    assert "esp32" in fams
+    # most common first
+    assert fams[0] == "raspberry-pi-pico"
+
+
+@pytest.mark.asyncio
+async def test_add_and_remove_related_part(client) -> None:
+    headers = make_auth_header()
+    a = await client.post("/api/parts", json={"name": "Servo"}, headers=headers)
+    b = await client.post("/api/parts", json={"name": "Servo Driver"}, headers=headers)
+    slug_a = a.json()["slug"]
+    slug_b = b.json()["slug"]
+
+    add = await client.post(
+        f"/api/parts/{slug_a}/related",
+        json={"related_slug": slug_b},
+        headers=headers,
+    )
+    assert add.status_code == 201, add.text
+    names = {p["name"] for p in add.json()}
+    assert "Servo Driver" in names
+
+    # Symmetric: same link visible from B as well.
+    from_b = await client.get(f"/api/parts/{slug_b}/related")
+    assert any(p["slug"] == slug_a for p in from_b.json())
+
+    # Idempotent: adding again doesn't duplicate the link.
+    add2 = await client.post(
+        f"/api/parts/{slug_a}/related",
+        json={"related_slug": slug_b},
+        headers=headers,
+    )
+    assert add2.status_code == 201
+    assert len(add2.json()) == 1
+
+    # Detail view surfaces it under related_parts.
+    detail = await client.get(f"/api/parts/{slug_a}")
+    assert any(p["slug"] == slug_b for p in detail.json()["related_parts"])
+
+    # Remove the link.
+    rm = await client.delete(
+        f"/api/parts/{slug_a}/related/{slug_b}",
+        headers=headers,
+    )
+    assert rm.status_code == 204
+    after = await client.get(f"/api/parts/{slug_a}/related")
+    assert after.json() == []
+
+
+@pytest.mark.asyncio
+async def test_cannot_relate_part_to_itself(client) -> None:
+    headers = make_auth_header()
+    p = await client.post("/api/parts", json={"name": "Lonely"}, headers=headers)
+    slug = p.json()["slug"]
+    resp = await client.post(
+        f"/api/parts/{slug}/related",
+        json={"related_slug": slug},
+        headers=headers,
+    )
+    assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_relate_unknown_slug_404(client) -> None:
+    headers = make_auth_header()
+    p = await client.post("/api/parts", json={"name": "Widget"}, headers=headers)
+    slug = p.json()["slug"]
+    resp = await client.post(
+        f"/api/parts/{slug}/related",
+        json={"related_slug": "does-not-exist"},
+        headers=headers,
+    )
+    assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_related_endpoint_enforces_account_age_gate(client, monkeypatch) -> None:
+    headers = make_auth_header()
+    a = await client.post("/api/parts", json={"name": "Part A"}, headers=headers)
+    b = await client.post("/api/parts", json={"name": "Part B"}, headers=headers)
+    slug_a = a.json()["slug"]
+    slug_b = b.json()["slug"]
+
+    from projects_api import auth as auth_module
+
+    async def _young(username: str, token: str) -> Optional[datetime]:
+        return datetime.utcnow() - timedelta(days=3)
+
+    monkeypatch.setattr(auth_module, "fetch_account_created_at", _young)
+    auth_module._clear_account_age_cache()
+
+    resp = await client.post(
+        f"/api/parts/{slug_a}/related",
+        json={"related_slug": slug_b},
+        headers=headers,
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_search_filter_by_category(client) -> None:
+    headers = make_auth_header()
+    await client.post(
+        "/api/parts",
+        json={"name": "BMP280", "category": "sensor"},
+        headers=headers,
+    )
+    await client.post(
+        "/api/parts",
+        json={"name": "Pico", "category": "microcontroller"},
+        headers=headers,
+    )
+    resp = await client.get("/api/parts", params={"category": "sensor"})
+    assert resp.status_code == 200
+    names = {p["name"] for p in resp.json()}
+    assert names == {"BMP280"}
+
+
 @pytest.mark.asyncio
 async def test_usage_count_counts_distinct_projects(client) -> None:
     """Two BOM rows for the same part within a single project = 1, not 2."""
