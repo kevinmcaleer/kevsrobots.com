@@ -25,7 +25,7 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..config import get_settings
 from ..db import get_session
@@ -109,7 +109,7 @@ async def create_make(
     notes: Optional[str] = Form(default=None),
     modifications: Optional[str] = Form(default=None),
     images: list[UploadFile] = [],  # noqa: B006 — FastAPI handles default
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> MakeResponse:
     project = await session.get(Project, project_id)
@@ -301,7 +301,7 @@ async def get_make(
 @router.delete("/api/makes/{make_id}", status_code=204)
 async def delete_make(
     make_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     make = await session.get(Make, make_id)
@@ -335,7 +335,7 @@ async def delete_make(
 @router.post("/api/makes/{make_id}/heart", response_model=MakeResponse)
 async def heart_make(
     make_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> MakeResponse:
     make = await session.get(Make, make_id)
@@ -361,7 +361,7 @@ async def heart_make(
 @router.delete("/api/makes/{make_id}/heart", response_model=MakeResponse)
 async def unheart_make(
     make_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> MakeResponse:
     make = await session.get(Make, make_id)

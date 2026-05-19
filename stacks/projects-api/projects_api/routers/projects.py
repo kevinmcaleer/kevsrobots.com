@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, get_optional_user
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..db import get_session
 from ..models import Download, Project, ProjectTag, UserFollow
@@ -244,7 +244,7 @@ async def get_project(
 @router.post("", response_model=ProjectResponse, status_code=201)
 async def create_project(
     body: ProjectCreate,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> ProjectResponse:
     # Issue #152: auto-generate a slug from the title at create time. The
@@ -304,7 +304,7 @@ async def update_project(
     project_id: int,
     body: ProjectUpdate,
     request: Request,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> ProjectResponse:
     project = await session.get(Project, project_id)
@@ -379,7 +379,7 @@ async def update_project(
 @router.delete("/{project_id}", status_code=204)
 async def delete_project(
     project_id: int,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> None:
     project = await session.get(Project, project_id)

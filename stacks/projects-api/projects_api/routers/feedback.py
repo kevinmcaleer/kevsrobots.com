@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.datastructures import UploadFile
 from starlette.formparsers import MultiPartException
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_terms_accepted
 from ..db import get_session
 from ..models import Feedback
 from ..schemas import FeedbackCreate, FeedbackCreateResponse
@@ -62,7 +62,7 @@ def _coerce_optional_str(value: object) -> Optional[str]:
 )
 async def create_feedback(
     request: Request,
-    user: str = Depends(get_current_user),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> FeedbackCreateResponse:
     """Create a new feedback row.

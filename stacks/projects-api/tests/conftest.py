@@ -56,6 +56,7 @@ async def session(sessionmaker_) -> AsyncIterator[AsyncSession]:
 
 @pytest_asyncio.fixture
 async def client(engine, sessionmaker_) -> AsyncIterator[AsyncClient]:
+    from projects_api import auth as auth_module
     from projects_api import db as db_module
     from projects_api import main as main_module
     from projects_api.main import create_app
@@ -79,6 +80,17 @@ async def client(engine, sessionmaker_) -> AsyncIterator[AsyncClient]:
 
     app = create_app()
     app.dependency_overrides[db_module.get_session] = _override_session
+
+    # Terms-gate (terms-gate): bypass the T&Cs acceptance check in the
+    # default test client so the ~290 existing tests don't need to first
+    # POST to /api/users/me/accept-terms. ``test_terms.py`` opts back IN
+    # to the real gate by deleting these overrides on its own client.
+    app.dependency_overrides[auth_module.require_terms_accepted] = (
+        auth_module.get_current_user
+    )
+    app.dependency_overrides[auth_module.require_terms_accepted_aged] = (
+        auth_module.get_current_user_aged
+    )
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
