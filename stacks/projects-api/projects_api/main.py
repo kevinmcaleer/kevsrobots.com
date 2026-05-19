@@ -57,6 +57,7 @@ from .routers import (
     parts_talk,
     projects,
     remixes,
+    social_og,
     staff_picks,
     users,
     videos,
@@ -171,6 +172,9 @@ def create_app() -> FastAPI:
     # because none of the by-slug paths overlap with the id-based ones
     # (different segment counts) — ordering is for readability only.
     app.include_router(by_slug.router)
+    # Social-card OG endpoint (GET /og/<owner>/<slug>). HTML output for
+    # crawlers; sits outside the /api/ prefix because it's not JSON.
+    app.include_router(social_og.router)
     app.include_router(bom.router)
     app.include_router(files.router)
     app.include_router(images.router)
