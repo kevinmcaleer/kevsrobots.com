@@ -53,6 +53,10 @@
     filmstripCollapsed: false,
     showGrid: false,
     density: 'roomy',
+    // C1: ids of BOM rows expanded into their asset drawer. Persisted so
+    // re-opening the pane (or the page) restores the expansion. Multiple
+    // rows can be expanded simultaneously (no accordion).
+    bomExpandedRowIds: [],
   };
 
   // Filenames that look like camera captures get the camera badge in the
@@ -93,6 +97,13 @@
     uiState: null,            // hydrated from localStorage in init()
     backgroundPhotoIds: {},   // photo id -> true, for the ★ badge
     railShortcutsBound: false,
+    // C1 — BOM pane
+    bomItems: null,           // list of BOMItemResponse, null = not loaded yet
+    bomItemsLoading: false,
+    bomItemsError: null,
+    bomItemsLoaded: false,    // true once a successful fetch has populated bomItems
+    bomPartAssets: {},        // part_id -> Asset[] (derived from /api/parts/{slug})
+    bomPartAssetsPending: {}, // part_id -> Promise (de-dupe in-flight fetches)
   };
 
   // Camera capture modal — built lazily on first open.
@@ -169,8 +180,11 @@
     dom.stepTitle = document.getElementById('ib-step-title');
     dom.stepDescription = document.getElementById('ib-step-description');
 
-    // BOM pane stub
+    // BOM pane (C1)
     dom.bomOpenEditor = document.getElementById('ib-bom-open-editor');
+    dom.bomList = document.getElementById('ib-bom-list');
+    dom.bomBody = document.getElementById('ib-bom-body');
+    dom.bomRefresh = document.getElementById('ib-bom-refresh');
 
     // Layers pane
     dom.layersList = document.getElementById('ib-layers-list');
@@ -1557,6 +1571,10 @@
     // is visible before we measure / draw into it.
     if (name === 'photos') refreshProjectImages();
     if (name === 'layers') renderLayersList();
+    // C1: lazy first-render of the BOM pane. We refresh on demand
+    // (refresh button), not on every pane switch, because the BOM rarely
+    // changes within a single editor session.
+    if (name === 'bom' && !state.bomItemsLoaded) loadBomItems();
 
     if (opts.persist !== false && state.uiState) {
       state.uiState.activeRailPane = name;
@@ -1983,6 +2001,13 @@
         await dropPhotosOnCanvas([{ id: payload.id, src: payload.src }], e);
       } else if (payload.kind === 'photos' && Array.isArray(payload.items)) {
         await dropPhotosOnCanvas(payload.items, e);
+      } else if (payload.kind === 'asset' && payload.src) {
+        // C1: BOM asset chip (or whole row) dropped onto the canvas.
+        // For now, drop it as a regular movable image — same path as a
+        // photo. Once the canvas object kind 'asset' (BOM-linked) lands
+        // in the schema, this can branch on `assetId` and place an
+        // asset-typed Fabric object instead of a generic image.
+        await dropPhotosOnCanvas([{ id: null, src: payload.src }], e);
       }
     });
   }
@@ -2040,6 +2065,376 @@
     scheduleSnapshot();
     updateEmptyState();
     renderLayersList();
+  }
+
+  // ====================================================================
+  // 17.5 BOM PANE (C1) — expandable rows + draggable asset chips
+  //
+  // The BOM secondary pane is a *secondary view* on the project's
+  // Bill of Materials. Source of truth lives in the project editor —
+  // here authors only browse what's already linked and drag rows /
+  // assets onto the canvas to illustrate steps.
+  //
+  // Data model (today):
+  //   GET /api/projects/{id}/bom returns BOMItemResponse[] with fields
+  //   { id, name, quantity, part_id, part_slug, ... }. The schema does
+  //   NOT yet ship a per-part "assets" list — that's blocked on the
+  //   parts-catalog asset graphics feature + the Symbol designer. So we
+  //   derive a fallback asset list for each part from its catalog
+  //   ``image_url`` (one photo-kind asset, or zero if the part has no
+  //   image set). When the API grows a real assets[] field, swap the
+  //   derivation for the schema-supplied list — the rest of the pane
+  //   (chips, drag, drawer) works unchanged.
+  // ====================================================================
+
+  function loadBomItems(opts) {
+    opts = opts || {};
+    if (!state.projectId) return;
+    if (state.bomItemsLoading) return;
+    state.bomItemsLoading = true;
+    state.bomItemsError = null;
+    if (!opts.silent) renderBomPane();
+    apiFetch(API + '/api/projects/' + state.projectId + '/bom')
+      .then(function (resp) {
+        if (!resp.ok) throw new Error('BOM HTTP ' + resp.status);
+        return resp.json();
+      })
+      .then(function (items) {
+        state.bomItems = Array.isArray(items) ? items : [];
+        state.bomItemsLoaded = true;
+        state.bomItemsLoading = false;
+        renderBomPane();
+        // Kick off asset fetches for rows that have a part_slug — these
+        // run in parallel and re-render each row as they land.
+        state.bomItems.forEach(function (item) {
+          if (item.part_id && item.part_slug) {
+            ensurePartAssets(item.part_id, item.part_slug);
+          }
+        });
+      })
+      .catch(function (err) {
+        state.bomItemsLoading = false;
+        state.bomItemsError = err && err.message ? err.message : 'Failed to load BOM';
+        renderBomPane();
+      });
+  }
+
+  // Fetch the part's catalog detail once and cache its derived asset
+  // list. Today this is just `[{ id, label, kind: 'photo', src }]` if
+  // the part has an image_url, or `[]` otherwise. The BOM row's
+  // asset-count chip + drawer re-render when this lands.
+  function ensurePartAssets(partId, partSlug) {
+    if (!partId || !partSlug) return Promise.resolve([]);
+    if (state.bomPartAssets[partId] !== undefined) {
+      return Promise.resolve(state.bomPartAssets[partId]);
+    }
+    if (state.bomPartAssetsPending[partId]) {
+      return state.bomPartAssetsPending[partId];
+    }
+    var p = apiFetch(API + '/api/parts/' + encodeURIComponent(partSlug))
+      .then(function (resp) {
+        if (!resp.ok) throw new Error('Part HTTP ' + resp.status);
+        return resp.json();
+      })
+      .then(function (part) {
+        var assets = [];
+        if (part && part.image_url) {
+          assets.push({
+            id: 'part-' + partId + '-image',
+            label: 'Photo',
+            kind: 'photo',
+            src: part.image_url,
+          });
+        }
+        state.bomPartAssets[partId] = assets;
+        delete state.bomPartAssetsPending[partId];
+        // Re-render only the affected row (or full pane if simpler).
+        renderBomPane();
+        return assets;
+      })
+      .catch(function () {
+        // Treat fetch failures as "no assets" rather than blocking the
+        // whole pane. The drawer shows the empty-state hint.
+        state.bomPartAssets[partId] = [];
+        delete state.bomPartAssetsPending[partId];
+        renderBomPane();
+        return [];
+      });
+    state.bomPartAssetsPending[partId] = p;
+    return p;
+  }
+
+  function assetsForBomItem(item) {
+    if (!item) return [];
+    // Future-proofing: if the schema ever ships an inline assets[] field
+    // on a BOM row, prefer it.
+    if (Array.isArray(item.assets)) return item.assets;
+    if (item.part_id && state.bomPartAssets[item.part_id]) {
+      return state.bomPartAssets[item.part_id];
+    }
+    return [];
+  }
+
+  function bomExpandedSet() {
+    var ui = state.uiState || {};
+    var arr = Array.isArray(ui.bomExpandedRowIds) ? ui.bomExpandedRowIds : [];
+    var set = {};
+    arr.forEach(function (id) { set[String(id)] = true; });
+    return set;
+  }
+
+  function toggleBomRowExpanded(rowId) {
+    if (!state.uiState) return;
+    var ids = Array.isArray(state.uiState.bomExpandedRowIds)
+      ? state.uiState.bomExpandedRowIds.slice() : [];
+    var key = String(rowId);
+    var idx = -1;
+    for (var i = 0; i < ids.length; i++) {
+      if (String(ids[i]) === key) { idx = i; break; }
+    }
+    if (idx >= 0) ids.splice(idx, 1);
+    else ids.push(rowId);
+    state.uiState.bomExpandedRowIds = ids;
+    saveUiState();
+    renderBomPane();
+  }
+
+  function renderBomPane() {
+    if (!dom.bomList) return;
+
+    if (state.bomItemsLoading && !state.bomItemsLoaded) {
+      dom.bomList.innerHTML =
+        '<div class="ib-bom-loading">' +
+        '<i class="fas fa-circle-notch fa-spin me-1"></i> Loading BOM…' +
+        '</div>';
+      return;
+    }
+
+    if (state.bomItemsError) {
+      dom.bomList.innerHTML =
+        '<div class="ib-bom-error">' +
+        '<p>Couldn\'t load the BOM.</p>' +
+        '<button type="button" class="btn btn-sm btn-outline-primary" id="ib-bom-retry">' +
+        '<i class="fas fa-rotate-right me-1"></i> Retry</button>' +
+        '</div>';
+      var retry = document.getElementById('ib-bom-retry');
+      if (retry) retry.addEventListener('click', function () { loadBomItems(); });
+      return;
+    }
+
+    var items = state.bomItems || [];
+    if (items.length === 0) {
+      dom.bomList.innerHTML =
+        '<div class="ib-bom-empty">' +
+        '<div class="ib-bom-empty-icon"><i class="fas fa-receipt"></i></div>' +
+        '<p>This project has no Bill of Materials yet.</p>' +
+        '<p class="small text-muted">Add parts in the project editor\'s BOM section.</p>' +
+        '<a class="btn btn-sm btn-outline-primary" href="' +
+        escapeHtml('/projects/editor.html?id=' + encodeURIComponent(state.projectId) +
+                   '#editor-bom-section') +
+        '"><i class="fas fa-external-link-alt me-1"></i> Open BOM in editor</a>' +
+        '</div>';
+      return;
+    }
+
+    var expanded = bomExpandedSet();
+    var html = items.map(function (item) { return renderBomRowHtml(item, expanded); }).join('');
+    dom.bomList.innerHTML = html;
+
+    // Wire each row's DnD + click handlers.
+    Array.prototype.forEach.call(
+      dom.bomList.querySelectorAll('.ib-bom-row'),
+      function (rowEl) { wireBomRow(rowEl); }
+    );
+  }
+
+  function renderBomRowHtml(item, expanded) {
+    var rowId = item.id;
+    var qty = item.quantity != null ? item.quantity : 1;
+    var name = item.name || 'Unnamed part';
+    var assets = assetsForBomItem(item);
+    var count = assets.length;
+    var loading = !!(item.part_id && item.part_slug &&
+                     state.bomPartAssets[item.part_id] === undefined);
+    var isExpanded = !!expanded[String(rowId)];
+    var chipText = loading
+      ? '<i class="fas fa-circle-notch fa-spin"></i>'
+      : escapeHtml(String(count)) + ' <i class="far fa-images"></i>';
+    var chipTitle = loading
+      ? 'Loading assets…'
+      : (count + ' asset' + (count === 1 ? '' : 's') + ' attached');
+
+    return '' +
+      '<div class="ib-bom-row' + (isExpanded ? ' is-expanded' : '') + '"' +
+      ' data-bom-row-id="' + escapeHtml(String(rowId)) + '"' +
+      ' draggable="true">' +
+        '<div class="ib-bom-row-head" role="button" tabindex="0"' +
+        ' aria-expanded="' + (isExpanded ? 'true' : 'false') + '">' +
+          '<span class="ib-bom-qty" aria-label="Quantity ' +
+          escapeHtml(String(qty)) + '">×&nbsp;' + escapeHtml(String(qty)) + '</span>' +
+          '<span class="ib-bom-name" title="' + escapeHtml(name) + '">' +
+          escapeHtml(name) + '</span>' +
+          '<span class="ib-bom-asset-chip" title="' + escapeHtml(chipTitle) + '">' +
+          chipText + '</span>' +
+          '<button type="button" class="ib-bom-row-menu" aria-label="More actions" tabindex="-1"' +
+          ' title="More actions (coming soon)">' +
+            '<i class="fas fa-ellipsis-vertical"></i>' +
+          '</button>' +
+          '<button type="button" class="ib-bom-row-toggle" aria-label="' +
+          (isExpanded ? 'Collapse' : 'Expand') + '" tabindex="-1">' +
+            '<i class="fas fa-chevron-' + (isExpanded ? 'up' : 'down') + '"></i>' +
+          '</button>' +
+        '</div>' +
+        (isExpanded
+          ? '<div class="ib-bom-row-drawer">' + renderBomDrawerHtml(item, assets, loading) + '</div>'
+          : '') +
+      '</div>';
+  }
+
+  function renderBomDrawerHtml(item, assets, loading) {
+    if (loading) {
+      return '<div class="ib-bom-drawer-loading">' +
+        '<i class="fas fa-circle-notch fa-spin me-1"></i> Loading assets…' +
+        '</div>';
+    }
+    if (!assets || assets.length === 0) {
+      return '<div class="ib-bom-drawer-empty">' +
+        'No assets attached yet — add an image to this part in the ' +
+        '<a href="' +
+        (item.part_slug
+          ? escapeHtml('/parts/view.html?slug=' + encodeURIComponent(item.part_slug))
+          : '#') +
+        '" target="_blank" rel="noopener">Parts Catalog</a>. ' +
+        '<span class="text-muted">Schematic symbols (⌗) come from the Symbol designer (coming soon).</span>' +
+        '</div>';
+    }
+    return '<div class="ib-bom-assets">' + assets.map(function (a) {
+      var safeSrc = escapeHtml(a.src || '');
+      var safeLabel = escapeHtml(a.label || 'Asset');
+      var safeKind = escapeHtml(a.kind || 'photo');
+      return '<div class="ib-bom-asset" draggable="true"' +
+        ' data-asset-src="' + safeSrc + '"' +
+        ' data-asset-label="' + safeLabel + '"' +
+        ' data-asset-kind="' + safeKind + '"' +
+        ' title="' + safeLabel + ' — drag onto canvas">' +
+          '<div class="ib-bom-asset-thumb">' +
+            (a.src
+              ? '<img src="' + safeSrc + '" alt="' + safeLabel + '" loading="lazy">'
+              : '<i class="far fa-image"></i>') +
+          '</div>' +
+          '<div class="ib-bom-asset-label">' + safeLabel + '</div>' +
+        '</div>';
+    }).join('') + '</div>';
+  }
+
+  function wireBomRow(rowEl) {
+    var rowId = rowEl.getAttribute('data-bom-row-id');
+    var head = rowEl.querySelector('.ib-bom-row-head');
+    var toggleBtn = rowEl.querySelector('.ib-bom-row-toggle');
+    var menuBtn = rowEl.querySelector('.ib-bom-row-menu');
+
+    // Click on head (anywhere except the buttons) toggles drawer.
+    if (head) {
+      head.addEventListener('click', function (e) {
+        var t = e.target;
+        // Ignore clicks on the menu / toggle buttons — they have their
+        // own handlers (toggle re-uses the same path).
+        if (t && (t.closest('.ib-bom-row-menu') || t.closest('.ib-bom-row-toggle'))) return;
+        toggleBomRowExpanded(rowId);
+      });
+      head.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleBomRowExpanded(rowId);
+        }
+      });
+    }
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleBomRowExpanded(rowId);
+      });
+    }
+    if (menuBtn) {
+      menuBtn.addEventListener('click', function (e) {
+        // Inert placeholder — future home for `✎ design symbol` etc.
+        // Block bubbling so the row doesn't toggle on click.
+        e.stopPropagation();
+      });
+    }
+
+    // Drag the row itself → default asset (first in list, photo today).
+    rowEl.addEventListener('dragstart', function (e) {
+      var item = (state.bomItems || []).find(function (b) {
+        return String(b.id) === String(rowId);
+      });
+      var assets = assetsForBomItem(item);
+      var firstAsset = assets.length > 0 ? assets[0] : null;
+      if (!firstAsset) {
+        // No default asset — abort the drag so the canvas drop is a no-op,
+        // and show a hint. We still allow dragstart but with no payload,
+        // so the drop handler silently ignores it.
+        e.preventDefault();
+        setSaveStatus('error', 'No assets yet for this part. Add an image in the Parts Catalog.');
+        setTimeout(function () { setSaveStatus(null); }, 2500);
+        return;
+      }
+      try {
+        e.dataTransfer.effectAllowed = 'copy';
+        var payload = {
+          kind: 'asset',
+          src: firstAsset.src,
+          label: firstAsset.label,
+          assetKind: firstAsset.kind,
+          bomRowId: rowId,
+        };
+        e.dataTransfer.setData('application/json', JSON.stringify(payload));
+        e.dataTransfer.setData('text/plain', firstAsset.src || '');
+      } catch (_) { /* setData can throw in some sandboxes */ }
+    });
+
+    // Per-chip drag handlers (only present when row is expanded).
+    Array.prototype.forEach.call(
+      rowEl.querySelectorAll('.ib-bom-asset'),
+      function (chip) {
+        chip.addEventListener('dragstart', function (e) {
+          // Stop the wrapping row's dragstart from also firing (it would
+          // overwrite the chip's payload with the row default).
+          e.stopPropagation();
+          var src = chip.getAttribute('data-asset-src') || '';
+          var label = chip.getAttribute('data-asset-label') || 'Asset';
+          var kind = chip.getAttribute('data-asset-kind') || 'photo';
+          if (!src) { e.preventDefault(); return; }
+          try {
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('application/json', JSON.stringify({
+              kind: 'asset',
+              src: src,
+              label: label,
+              assetKind: kind,
+              bomRowId: rowId,
+            }));
+            e.dataTransfer.setData('text/plain', src);
+          } catch (_) {}
+        });
+      }
+    );
+  }
+
+  function wireBomPane() {
+    if (dom.bomRefresh) {
+      dom.bomRefresh.addEventListener('click', function () {
+        // Hard refresh — clear the per-part asset cache too so the
+        // drawers re-pick up any newly-added catalog images.
+        state.bomPartAssets = {};
+        state.bomPartAssetsPending = {};
+        state.bomItemsLoaded = false;
+        loadBomItems();
+      });
+    }
+    // The "project editor's BOM section" link's href is set in init()
+    // alongside the other project-id-bearing URLs. No click handler
+    // needed — let the browser navigate naturally.
   }
 
   // ====================================================================
@@ -4382,6 +4777,7 @@
     wireRail();
     wireSecondaryResize();
     wirePhotosPane();
+    wireBomPane();
     wireFilmstrip();
     wireSettings();
     wireHudToggle();

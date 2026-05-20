@@ -308,18 +308,25 @@ hide_nibsy: true
         </div>
       </section>
 
-      <!-- BOM pane (stub) -->
+      <!-- BOM pane (C1 — expandable rows) -->
       <section class="ib-pane" data-pane="bom">
-        <header class="ib-pane-header">
-          <h6 class="ib-pane-title"><i class="fas fa-receipt me-2"></i>BOM</h6>
+        <header class="ib-pane-header ib-bom-header">
+          <h6 class="ib-pane-title">
+            <i class="fas fa-receipt me-2"></i>Bill of Materials
+          </h6>
+          <button type="button" class="ib-bom-refresh" id="ib-bom-refresh"
+                  title="Reload BOM" aria-label="Reload BOM">
+            <i class="fas fa-rotate-right"></i>
+          </button>
         </header>
-        <div class="ib-pane-body">
-          <div class="ib-pane-stub">
-            <div class="ib-pane-stub-icon"><i class="fas fa-receipt"></i></div>
-            <p>Bill of Materials and Assets coming soon. Connect parts in the project editor's BOM section, and they'll appear here as draggable assets.</p>
-            <a class="btn btn-sm btn-outline-primary" id="ib-bom-open-editor" href="#">
-              <i class="fas fa-external-link-alt me-1"></i> Open BOM in editor
-            </a>
+        <div class="ib-pane-body" id="ib-bom-body">
+          <p class="ib-bom-hint">
+            Drag a row or asset chip onto the canvas. Manage parts and quantities
+            in the
+            <a href="#" id="ib-bom-open-editor">project editor's BOM section</a>.
+          </p>
+          <div class="ib-bom-list" id="ib-bom-list" aria-live="polite">
+            <!-- rows rendered dynamically by JS -->
           </div>
         </div>
       </section>
