@@ -260,6 +260,13 @@ async def add_step(
         title=body.title,
         description=body.description,
         canvas_json=body.canvas_json,
+        # B3: type discriminator + per-type fields. ``step_type`` defaults
+        # to "photo" at the schema layer so legacy clients (which don't
+        # send these fields) get the existing behaviour for free.
+        step_type=body.step_type,
+        body=body.body,
+        video_url=body.video_url,
+        schematic_id=body.schematic_id,
     )
     session.add(step)
     await session.commit()
@@ -364,6 +371,16 @@ async def delete_step(
 # a headless canvas runtime server-side) and POSTs the array here. We
 # stitch the PNGs into a layout-aware PDF with ReportLab and stream the
 # binary back.
+#
+# B3: with the new step types (text / video / schematic / blank) the
+# server doesn't actually know how to render anything other than a PNG
+# dataURL. That's deliberate — the export endpoints below stay
+# step_type-agnostic and render whatever PNG the frontend sends. The
+# frontend is responsible for pre-rendering text steps to a PNG of the
+# rendered text, video steps to a poster frame placeholder, blank steps
+# to an empty canvas, and schematic steps to a placeholder card. If a
+# future spec wants per-type server-side rendering it can layer on top
+# without changing this contract.
 #
 # Owner-only for now. A future Phase 2d could surface a public PDF on
 # view.html, but that requires server-side canvas rendering (e.g.

@@ -303,6 +303,37 @@ class InstructionStep(Base):
     # Phase 1 will write Fabric.js canvas scene JSON here. Nullable so
     # Phase 0 text-only steps and Phase 1+ canvas steps coexist.
     canvas_json: Mapped[Optional[str]] = mapped_column(Text)
+    # B3: Step type discriminator. Values:
+    #   * ``photo``     — Fabric canvas with a drawn-on background image
+    #                     (the legacy default; existing rows backfill here).
+    #   * ``schematic`` — embedded project schematic (full editor lands in E2).
+    #   * ``text``      — rich-ish markdown body, no canvas.
+    #   * ``video``     — YouTube id or raw video URL.
+    #   * ``blank``     — empty canvas, annotations only.
+    # Validated at the Pydantic layer via a ``Literal[...]`` so a bad value
+    # 422s before reaching the DB. The default is preserved both at the
+    # ORM layer (``default=``) and at the SQL layer (``server_default=``)
+    # so legacy rows without the column backfill to ``"photo"``.
+    step_type: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="photo",
+        default="photo",
+    )
+    # Text step body. We deliberately store the raw markdown / plaintext
+    # here — server-side rendering is out of scope for B3, the frontend
+    # is responsible for any markdown rendering / sanitisation.
+    body: Mapped[Optional[str]] = mapped_column(Text)
+    # Video step URL — either a YouTube link / id or a raw video URL
+    # (e.g. an MP4 reachable via HTTPS). The frontend is responsible for
+    # extracting an embed id where applicable; we store whatever the
+    # client posted so changing the renderer doesn't require a migration.
+    video_url: Mapped[Optional[str]] = mapped_column(String(500))
+    # Schematic step — FK to the project's future schematic (E2). For B3
+    # the column lives but the FK constraint waits: SQLAlchemy treats a
+    # bare Integer column without ``ForeignKey`` as a plain int, which is
+    # what we want until the ``schematics`` table is introduced.
+    schematic_id: Mapped[Optional[int]] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

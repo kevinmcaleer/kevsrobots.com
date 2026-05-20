@@ -300,3 +300,65 @@
     font-size: 1.1rem;
   }
 }
+
+/* --- B3: step type slot styles ------------------------------------
+   Text / video / schematic step types render via DOM elements inside
+   the same stage slot the photo step uses, so they pick up the
+   surrounding chrome (prev / next / dots / fullscreen) for free.
+   ------------------------------------------------------------------ */
+
+.iv-text-card {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 32px;
+  overflow: auto;
+}
+.iv-text-body {
+  max-width: 720px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #212529;
+}
+.iv-text-empty {
+  color: #adb5bd;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.iv-video-wrap {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.iv-video-iframe,
+.iv-video-el {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border: 0;
+}
+
+.iv-schematic-card {
+  width: 100%;
+  height: 100%;
+  background: #f0f4f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+  color: #495057;
+}
+.iv-schematic-icon { font-size: 3rem; color: #6c757d; margin-bottom: 12px; }
+.iv-schematic-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
+.iv-schematic-desc { max-width: 480px; color: #6c757d; font-size: 0.95rem; }

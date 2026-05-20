@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -309,6 +309,12 @@ class InstructionStepCreate(BaseModel):
     title: Optional[str] = Field(None, max_length=200)
     description: Optional[str] = None
     canvas_json: Optional[str] = None
+    # B3: step type discriminator. Defaults to "photo" to preserve the
+    # legacy single-type behaviour for clients that don't set it.
+    step_type: Literal["photo", "schematic", "text", "video", "blank"] = "photo"
+    body: Optional[str] = None
+    video_url: Optional[str] = Field(None, max_length=500)
+    schematic_id: Optional[int] = None
 
 
 class InstructionStepUpdate(BaseModel):
@@ -318,12 +324,24 @@ class InstructionStepUpdate(BaseModel):
     target into the requested 1-based position and renumbers the survivors
     so the resulting sequence is 1..N gap-free. ``step_number`` must be
     >= 1; values larger than the current length clamp to "last".
+
+    B3: ``step_type`` is validated against the allowed set via
+    ``Literal[...]``. Passing an unrecognised value 422s before reaching
+    the DB; omitting the field leaves the current type untouched, which
+    keeps the partial-update semantics intact for callers only changing
+    title / description / canvas_json.
     """
 
     title: Optional[str] = Field(None, max_length=200)
     description: Optional[str] = None
     canvas_json: Optional[str] = None
     step_number: Optional[int] = Field(None, ge=1)
+    step_type: Optional[
+        Literal["photo", "schematic", "text", "video", "blank"]
+    ] = None
+    body: Optional[str] = None
+    video_url: Optional[str] = Field(None, max_length=500)
+    schematic_id: Optional[int] = None
 
 
 class InstructionStepResponse(BaseModel):
@@ -333,6 +351,13 @@ class InstructionStepResponse(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     canvas_json: Optional[str] = None
+    # B3: type-specific fields. ``step_type`` always populated (NOT NULL
+    # in the DB, defaults to "photo"); the other three are nullable and
+    # only meaningful when ``step_type`` matches.
+    step_type: str = "photo"
+    body: Optional[str] = None
+    video_url: Optional[str] = None
+    schematic_id: Optional[int] = None
     created_at: datetime
     updated_at: datetime
 
