@@ -714,15 +714,324 @@ body.instruction-builder-page > .container-fluid {
 }
 .ib-canvas-empty.d-none { display: none; }
 
-/* ---- Inspector HUD slot (PR 2 will populate) ------------------------ */
+/* ---- Inspector HUD — floating dark panel ---------------------------- */
 
 .ib-inspector-hud {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 18px;
+  right: 18px;
   width: 240px;
-  /* No content / no chrome in this PR — PR 2 styles the dark panel. */
+  background: #3a3a3a;
+  color: #f4f1ea;
+  border: 1.75px solid #111;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 #111, 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 20;
+  font-size: 0.78rem;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  /* The JS toggles `hidden` to show/hide; CSS keeps the standard
+     attribute hidden behaviour. */
 }
+.ib-inspector-hud[hidden] { display: none; }
+
+.ib-hud-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #2a2a2a;
+  border-bottom: 1px solid #111;
+  border-radius: 6px 6px 0 0;
+  cursor: grab;
+}
+.ib-hud-header.is-dragging { cursor: grabbing; }
+
+.ib-hud-grip {
+  flex: 0 0 auto;
+  color: #9a948a;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.ib-hud-title {
+  flex: 1;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #cdc6ba;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ib-hud-icon-btn {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 0;
+  color: #cdc6ba;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.1s, color 0.1s;
+}
+.ib-hud-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.ib-hud-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ib-inspector-hud.is-minimized .ib-hud-body { display: none; }
+
+.ib-hud-empty {
+  color: #9a948a;
+  font-size: 0.78rem;
+  font-style: italic;
+  text-align: center;
+  padding: 8px 4px;
+}
+
+.ib-hud-name {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #cdc6ba;
+  margin: 0;
+}
+
+/* Numeric inputs grid (X / Y / W / H, Rot° / Z) */
+.ib-hud-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.ib-hud-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #2a2a2a;
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+.ib-hud-field:focus-within {
+  border-color: #4f8ad9;
+}
+
+.ib-hud-field-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9a948a;
+  flex: 0 0 auto;
+  min-width: 14px;
+}
+
+.ib-hud-field input[type="number"] {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #f4f1ea;
+  font-size: 0.78rem;
+  font-family: inherit;
+  padding: 0;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.ib-hud-field input[type="number"]::-webkit-outer-spin-button,
+.ib-hud-field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Opacity slider */
+.ib-hud-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ib-hud-slider-row label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9a948a;
+  flex: 0 0 auto;
+  min-width: 48px;
+  margin: 0;
+}
+.ib-hud-slider-row input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: #c8312a;
+  background: transparent;
+}
+.ib-hud-slider-row .ib-hud-slider-value {
+  font-size: 0.72rem;
+  color: #f4f1ea;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* Colour row — swatches + custom picker */
+.ib-hud-colors {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ib-hud-swatch {
+  flex: 1;
+  height: 22px;
+  border-radius: 4px;
+  border: 1.5px solid #1a1a1a;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.08s, border-color 0.1s;
+}
+.ib-hud-swatch:hover { transform: scale(1.05); }
+.ib-hud-swatch.is-active {
+  border-color: #f4f1ea;
+  box-shadow: 0 0 0 1px #1a1a1a;
+}
+.ib-hud-swatch-custom {
+  position: relative;
+  flex: 0 0 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1.5px solid #1a1a1a;
+  background:
+    conic-gradient(from 0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+}
+.ib-hud-swatch-custom input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+}
+
+/* Action icons row — rotate-90, flip H/V, delete */
+.ib-hud-actions {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.ib-hud-action {
+  background: #2a2a2a;
+  border: 1px solid #1a1a1a;
+  color: #f4f1ea;
+  border-radius: 4px;
+  height: 26px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.ib-hud-action:hover {
+  background: #444;
+  border-color: #555;
+}
+.ib-hud-action.is-danger:hover {
+  background: #c8312a;
+  border-color: #c8312a;
+  color: #fff;
+}
+
+/* ---- Image-context floating toolbar -------------------------------- */
+
+.ib-image-toolbar {
+  position: absolute;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 999px;
+  padding: 4px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  /* `top` / `left` set by JS so it tracks the selected image. */
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+}
+.ib-image-toolbar[hidden] { display: none; }
+
+.ib-image-toolbar-btn {
+  background: transparent;
+  border: 0;
+  color: #495057;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.1s, color 0.1s;
+}
+.ib-image-toolbar-btn:hover {
+  background: #f1f3f5;
+  color: #212529;
+}
+.ib-image-toolbar-btn.is-active {
+  background: var(--bs-primary, #0d6efd);
+  color: #fff;
+}
+.ib-image-toolbar-btn.is-danger:hover {
+  background: #c8312a;
+  color: #fff;
+}
+.ib-image-toolbar-btn.is-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.ib-image-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  background: #dee2e6;
+  margin: 0 2px;
+}
+
+.ib-image-toolbar-progress {
+  font-size: 0.74rem;
+  color: #495057;
+  padding: 0 6px;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-image-toolbar-progress.is-error { color: #c8312a; }
 
 /* ---- Zone F: Filmstrip ---------------------------------------------- */
 
@@ -1119,4 +1428,5 @@ body.instruction-builder-page > .container-fluid {
   .ib-secondary-resize { display: none; }
   .ib-canvas-area { min-height: 480px; }
   .ib-inspector-hud { display: none !important; }
+  .ib-image-toolbar { display: none !important; }
 }
