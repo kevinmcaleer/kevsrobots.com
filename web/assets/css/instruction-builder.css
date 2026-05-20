@@ -987,23 +987,23 @@ body.instruction-builder-page {
   height: 32px;
   font-size: 14px;
   cursor: pointer;
-  /* CSS grid + place-items: center is the most reliable way to
-     centre a single child on both axes — flex-align had a residual
-     FA-baseline offset that nudge-padding couldn't fully fix. */
-  display: grid;
-  place-items: center;
+  /* Block-level with text-align: center + line-height matching the
+     container height is the reliable way to centre an icon-font glyph
+     in a fixed-height button. Grid + place-items doesn't account for
+     FA's baseline-positioning of the visible glyph within the
+     line-height box, which left icons floating ~7px too high. */
+  display: block;
+  text-align: center;
   padding: 0;
-  line-height: 1;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 .ib-hud-action i {
-  display: block;
   font-size: 14px;
-  line-height: 1;
-  /* FontAwesome glyphs have an intrinsic descender area, so the
-     visible ink sits in the upper portion of the line box. Lift the
-     line box down a hair so the optical centre lands on the centre. */
-  transform: translateY(1px);
+  /* Line-height = button height: the FA glyph's ascent + descent
+     centre inside the line box, which now fills the full button. */
+  line-height: 32px;
+  display: inline-block;
+  vertical-align: top;
 }
 .ib-hud-action:hover {
   background: #444;
