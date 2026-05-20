@@ -1472,3 +1472,174 @@ body.instruction-builder-page > .container-fluid {
   .ib-inspector-hud { display: none !important; }
   .ib-image-toolbar { display: none !important; }
 }
+
+/* ====================================================================
+   B3: step types — picker radios + canvas-area alt views + filmstrip
+   badges. Designed to slot into the existing Schematic pane (formerly
+   "Circuit") without changing the rail layout.
+   ==================================================================== */
+
+/* Step-type radios in the Schematic pane. Each radio is a full-width
+   pill-ish row with an icon + label + small description. */
+.ib-step-type-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ib-step-type-radio {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 6px;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: border-color 0.1s, background 0.1s;
+  margin: 0;
+}
+.ib-step-type-radio:hover { background: #fff; border-color: #adb5bd; }
+.ib-step-type-radio input[type="radio"] { margin-top: 3px; flex: 0 0 auto; }
+.ib-step-type-radio:has(input:checked) {
+  border-color: var(--bs-primary, #c8312a);
+  background: #fff;
+}
+.ib-step-type-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  text-align: center;
+  color: #495057;
+}
+.ib-step-type-radio:has(input:checked) .ib-step-type-icon {
+  color: var(--bs-primary, #c8312a);
+}
+.ib-step-type-label {
+  flex: 1;
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+.ib-step-type-label small { font-size: 0.7rem; }
+
+/* Schematic placeholder card in the Schematic pane. */
+.ib-step-schematic-card {
+  padding: 14px 12px;
+  background: #f0f4f9;
+  border: 1.5px dashed #adb5bd;
+  border-radius: 6px;
+  text-align: center;
+}
+.ib-step-schematic-icon {
+  font-size: 1.6rem;
+  color: #6c757d;
+  margin-bottom: 6px;
+}
+
+/* Text-step body input in the Schematic pane. */
+.ib-step-body-input { resize: vertical; font-family: inherit; font-size: 0.85rem; }
+
+/* Video-step URL input + preview in the Schematic pane. */
+.ib-step-video-preview { min-height: 0; }
+.ib-step-video-preview iframe.ib-step-video-iframe,
+.ib-step-video-preview video.ib-step-video-el {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: #000;
+}
+
+/* Canvas-area alt views — same outer shape as ib-canvas-frame so the
+   slideshow / canvas region keeps a stable footprint. */
+.ib-canvas-text,
+.ib-canvas-video,
+.ib-canvas-schematic {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: auto;
+}
+.ib-canvas-text-inner {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 24px 28px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.ib-canvas-text-empty {
+  text-align: center;
+  color: #adb5bd;
+  font-size: 1rem;
+}
+.ib-canvas-text-empty i { display: block; font-size: 1.6rem; }
+.ib-canvas-text-body {
+  /* Preserve line breaks from the raw body without re-implementing
+     markdown. textContent + this CSS = readable plain-text steps. */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #212529;
+}
+
+.ib-canvas-video-inner {
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ib-canvas-video-iframe,
+.ib-canvas-video-el {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.ib-canvas-video-empty {
+  color: #adb5bd;
+  text-align: center;
+}
+.ib-canvas-video-empty i { display: block; font-size: 1.6rem; margin-bottom: 6px; }
+
+.ib-canvas-schematic-inner {
+  text-align: center;
+  background: #fff;
+  border: 1.5px dashed #adb5bd;
+  border-radius: 8px;
+  padding: 36px 32px;
+  max-width: 480px;
+}
+.ib-canvas-schematic-icon {
+  font-size: 2.4rem;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+/* Filmstrip thumb type badges — small pill top-right of each tile. */
+.ib-step-tile-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 999px;
+  color: #6c757d;
+  font-size: 0.6rem;
+  pointer-events: none;
+}
+.ib-step-tile.is-active .ib-step-tile-badge {
+  border-color: var(--bs-primary, #c8312a);
+  color: var(--bs-primary, #c8312a);
+}

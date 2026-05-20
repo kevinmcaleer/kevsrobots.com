@@ -951,6 +951,86 @@ async def add_user_currency_preference_if_missing() -> None:
             ))
 
 
+async def add_instruction_step_type_if_missing() -> None:
+    """Additive migration for B3 (instruction step types).
+
+    Adds ``step_type`` / ``body`` / ``video_url`` / ``schematic_id`` columns
+    to ``instruction_steps``. Postgres only; no-op on SQLite test DB which
+    is recreated from Base.metadata.create_all per test.
+
+    Each ALTER is independently IF NOT EXISTS so re-runs are safe.
+    The step_type default is ``'photo'`` so existing rows backfill
+    correctly under both NOT NULL and the default clause.
+
+    Idempotent: probing ``information_schema.columns`` before each ALTER
+    means calling this helper a second time is a cheap series of SELECTs
+    with no writes — see ``test_step_type_migration_helper_is_idempotent``
+    in ``tests/test_instructions.py``.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'instruction_steps'"
+        ))
+        if table_check.first() is None:
+            # Brand-new deployment — create_all on the same startup pass
+            # will build the table with every column already present.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'instruction_steps'"
+        ))
+        cols = {row[0] for row in existing.fetchall()}
+
+        # Each ALTER in its own try block so a failure on one doesn't
+        # abort the others. The NOT NULL + default on step_type means
+        # legacy rows without the column backfill to 'photo' atomically
+        # as part of the ALTER.
+        if "step_type" not in cols:
+            try:
+                logger.warning("Adding instruction_steps.step_type column (B3)")
+                await conn.execute(text(
+                    'ALTER TABLE "instruction_steps" ADD COLUMN IF NOT EXISTS '
+                    '"step_type" VARCHAR(20) NOT NULL DEFAULT \'photo\''
+                ))
+            except Exception as exc:  # noqa: BLE001 — log + continue
+                logger.warning("Failed to add instruction_steps.step_type: %s", exc)
+        if "body" not in cols:
+            try:
+                logger.warning("Adding instruction_steps.body column (B3)")
+                await conn.execute(text(
+                    'ALTER TABLE "instruction_steps" ADD COLUMN IF NOT EXISTS '
+                    '"body" TEXT'
+                ))
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Failed to add instruction_steps.body: %s", exc)
+        if "video_url" not in cols:
+            try:
+                logger.warning("Adding instruction_steps.video_url column (B3)")
+                await conn.execute(text(
+                    'ALTER TABLE "instruction_steps" ADD COLUMN IF NOT EXISTS '
+                    '"video_url" VARCHAR(500)'
+                ))
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Failed to add instruction_steps.video_url: %s", exc)
+        if "schematic_id" not in cols:
+            try:
+                logger.warning("Adding instruction_steps.schematic_id column (B3)")
+                # No FK constraint here — the ``schematics`` table doesn't
+                # exist yet (lands in E2). The column lives so the API can
+                # round-trip values; the FK will be added by E2's helper.
+                await conn.execute(text(
+                    'ALTER TABLE "instruction_steps" ADD COLUMN IF NOT EXISTS '
+                    '"schematic_id" INTEGER'
+                ))
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Failed to add instruction_steps.schematic_id: %s", exc)
+
+
 async def add_project_file_description_if_missing() -> None:
     """Additive migration for issue #187 (per-file descriptions).
 

@@ -106,11 +106,21 @@
           return (a.step_number || 0) - (b.step_number || 0);
         });
         state.steps = sorted.map(function (s, i) {
+          // B3: carry through the step_type discriminator + per-type
+          // fields so the slideshow renderer can swap behaviour. Unknown
+          // / missing types default to 'photo' (the legacy behaviour).
+          var stepType = s.step_type;
+          if (['photo', 'schematic', 'text', 'video', 'blank'].indexOf(stepType) < 0) {
+            stepType = 'photo';
+          }
           return {
             step_number: s.step_number || (i + 1),
             title: s.title || ('Step ' + (s.step_number || (i + 1))),
             description: s.description || '',
             canvas_json: s.canvas_json || null,
+            step_type: stepType,
+            body: s.body || '',
+            video_url: s.video_url || '',
             image: null,
           };
         });
@@ -187,14 +197,27 @@
     }
   }
 
+  // B3: photo + blank steps want a canvas pre-render to PNG. The other
+  // types (text / video / schematic) render inline via DOM elements at
+  // showStep time, so they don't need Fabric. This helper centralises
+  // the decision so prerenderAll + renderStep agree on what gets
+  // pre-rendered.
+  function stepNeedsCanvasPrerender(step) {
+    if (step.step_type === 'text' || step.step_type === 'video' || step.step_type === 'schematic') {
+      return false;
+    }
+    // photo + blank — pre-render iff there's actual canvas content. A
+    // blank step with no annotations falls through to the placeholder.
+    return parseCanvasJson(step.canvas_json) !== null;
+  }
+
   // Pre-render each step to a PNG dataURL. We lazy-load Fabric here
   // because everything before this point can be done without it.
   function prerenderAll() {
     // Are there any steps that actually need Fabric? If every step is
-    // text-only we don't need to fetch the library at all.
-    var needsFabric = state.steps.some(function (s) {
-      return parseCanvasJson(s.canvas_json) !== null;
-    });
+    // text / video / schematic / placeholder-blank we don't need to
+    // fetch the library at all.
+    var needsFabric = state.steps.some(stepNeedsCanvasPrerender);
 
     if (!needsFabric) {
       // All steps are placeholder-only — image stays null on each.
@@ -246,6 +269,11 @@
   }
 
   function renderStep(off, step) {
+    // B3: non-canvas types skip pre-render entirely — they render via
+    // DOM elements at showStep time.
+    if (!stepNeedsCanvasPrerender(step)) {
+      return Promise.resolve(null);
+    }
     var parsed = parseCanvasJson(step.canvas_json);
     if (!parsed) {
       // Text-only step — leave image=null; the slideshow renders the
@@ -307,6 +335,106 @@
 
   // -------- Slideshow render ---------------------------------------------
 
+  // B3: extract the YouTube video id from any of the common URL shapes;
+  // returns null for non-YouTube URLs (which render via <video controls>).
+  function extractYouTubeId(url) {
+    if (!url) return null;
+    var m = String(url).match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
+    return m ? m[1] : null;
+  }
+
+  // Build the stage content for a given step. The slideshow controls
+  // (prev / next / dots / keyboard / swipe / fullscreen) are shared
+  // across step types — only the stage child element changes.
+  function buildStageContent(step) {
+    var stepType = step.step_type || 'photo';
+
+    if (stepType === 'text') {
+      var card = document.createElement('div');
+      card.className = 'iv-text-card';
+      var body = (step.body || '').trim();
+      if (body) {
+        // Plain-text rendering for B3 — preserve line breaks via
+        // white-space: pre-wrap CSS rather than re-implementing
+        // markdown server-side. textContent + CSS is enough.
+        var pre = document.createElement('div');
+        pre.className = 'iv-text-body';
+        pre.textContent = body;
+        card.appendChild(pre);
+      } else {
+        // No body — render the step title as the only content so the
+        // slideshow shows *something* for this step.
+        var t = document.createElement('div');
+        t.className = 'iv-text-empty';
+        t.textContent = step.title || ('Step ' + step.step_number);
+        card.appendChild(t);
+      }
+      return card;
+    }
+
+    if (stepType === 'video') {
+      var wrap = document.createElement('div');
+      wrap.className = 'iv-video-wrap';
+      var url = (step.video_url || '').trim();
+      var ytId = extractYouTubeId(url);
+      if (ytId) {
+        var iframe = document.createElement('iframe');
+        iframe.className = 'iv-video-iframe';
+        iframe.src = 'https://www.youtube.com/embed/' + encodeURIComponent(ytId);
+        iframe.title = step.title || ('Step ' + step.step_number);
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute(
+          'allow',
+          'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+        );
+        iframe.setAttribute('allowfullscreen', '');
+        wrap.appendChild(iframe);
+      } else if (url) {
+        var video = document.createElement('video');
+        video.className = 'iv-video-el';
+        video.controls = true;
+        video.preload = 'metadata';
+        video.src = url;
+        wrap.appendChild(video);
+      } else {
+        var empty = document.createElement('div');
+        empty.className = 'iv-placeholder';
+        empty.textContent = 'No video set for this step.';
+        wrap.appendChild(empty);
+      }
+      return wrap;
+    }
+
+    if (stepType === 'schematic') {
+      var sch = document.createElement('div');
+      sch.className = 'iv-schematic-card';
+      sch.innerHTML =
+        '<i class="fas fa-diagram-project iv-schematic-icon"></i>' +
+        '<div class="iv-schematic-title">Embedded schematic</div>' +
+        '<div class="iv-schematic-desc">' +
+          'This step embeds the project schematic — visible once the schematic editor ships.' +
+        '</div>';
+      return sch;
+    }
+
+    // photo / blank — pre-rendered to PNG; if pre-render dropped (no
+    // canvas content), fall through to the placeholder panel.
+    if (step.image) {
+      var img = document.createElement('img');
+      img.src = step.image;
+      img.alt = step.title || ('Step ' + step.step_number);
+      img.loading = 'lazy';
+      return img;
+    }
+    var ph = document.createElement('div');
+    ph.className = 'iv-placeholder';
+    var phTitle = document.createElement('div');
+    phTitle.className = 'iv-placeholder-title';
+    phTitle.textContent = step.title || ('Step ' + step.step_number);
+    ph.appendChild(phTitle);
+    return ph;
+  }
+
   function showStep(idx) {
     if (idx < 0 || idx >= state.steps.length) return;
     state.activeIdx = idx;
@@ -314,26 +442,10 @@
     var total = state.steps.length;
 
     // Wipe whatever's in the stage and rebuild it for this step. The
-    // stage is small (one <img> or one placeholder div) so re-creating
-    // is cheaper than tracking which mode was previously rendered.
+    // stage is small (one DOM element) so re-creating is cheaper than
+    // tracking which mode was previously rendered.
     while (dom.stage.firstChild) dom.stage.removeChild(dom.stage.firstChild);
-
-    if (step.image) {
-      var img = document.createElement('img');
-      img.src = step.image;
-      img.alt = step.title || ('Step ' + step.step_number);
-      img.loading = 'lazy';
-      dom.stage.appendChild(img);
-    } else {
-      // Placeholder panel — step has no canvas content (text-only).
-      var ph = document.createElement('div');
-      ph.className = 'iv-placeholder';
-      var title = document.createElement('div');
-      title.className = 'iv-placeholder-title';
-      title.textContent = step.title || ('Step ' + step.step_number);
-      ph.appendChild(title);
-      dom.stage.appendChild(ph);
-    }
+    dom.stage.appendChild(buildStageContent(step));
 
     // Badge + meta + dots.
     if (dom.badge) {

@@ -17,6 +17,7 @@ from .db import (
     add_bom_currency_if_missing,
     add_bom_part_id_if_missing,
     add_bom_supplier_id_if_missing,
+    add_instruction_step_type_if_missing,
     add_part_category_family_if_missing,
     add_part_status_columns_if_missing,
     add_project_featured_columns_if_missing,
@@ -116,6 +117,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Issue #187: ensure project_files.description column exists on legacy
     # Postgres deployments. No-op on fresh deploys / SQLite tests.
     await add_project_file_description_if_missing()
+    # B3 (issue #178): ensure instruction_steps.step_type / body /
+    # video_url / schematic_id columns exist on legacy Postgres
+    # deployments. No-op on fresh deploys / SQLite tests.
+    await add_instruction_step_type_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

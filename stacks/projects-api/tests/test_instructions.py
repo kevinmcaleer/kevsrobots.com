@@ -418,3 +418,167 @@ async def test_write_without_terms_acceptance_returns_403(client) -> None:
         assert detail.get("detail") == "terms_not_accepted"
     finally:
         monkeypatch.undo()
+
+
+# --- B3: step types ------------------------------------------------------
+#
+# Step types are a discriminator field on InstructionStep that swaps the
+# editor's canvas area for different rendering modes (photo / schematic /
+# text / video / blank). The backend's job is to round-trip the type +
+# the per-type fields (``body``, ``video_url``, ``schematic_id``) and
+# 422 invalid types.
+
+
+@pytest.mark.asyncio
+async def test_step_default_type_is_photo(client, project_id) -> None:
+    """A newly created step has step_type='photo' so legacy clients that
+    don't send the field get the existing behaviour for free."""
+    headers = make_auth_header()
+    await _create_instruction(client, project_id)
+    resp = await client.post(
+        f"/api/projects/{project_id}/instruction/steps",
+        json={"title": "no type sent"},
+        headers=headers,
+    )
+    assert resp.status_code == 201, resp.text
+    body = resp.json()
+    assert body["step_type"] == "photo"
+    # The other type-specific fields default to None.
+    assert body["body"] is None
+    assert body["video_url"] is None
+    assert body["schematic_id"] is None
+
+
+@pytest.mark.asyncio
+async def test_step_put_step_type_text_round_trips(client, project_id) -> None:
+    """PUT step_type='text' → response shows the new type; GET confirms
+    persistence across requests."""
+    headers = make_auth_header()
+    await _create_instruction(client, project_id)
+    create = await client.post(
+        f"/api/projects/{project_id}/instruction/steps",
+        json={"title": "starts as photo"},
+        headers=headers,
+    )
+    step_id = create.json()["id"]
+    assert create.json()["step_type"] == "photo"
+
+    resp = await client.put(
+        f"/api/projects/{project_id}/instruction/steps/{step_id}",
+        json={"step_type": "text"},
+        headers=headers,
+    )
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["step_type"] == "text"
+
+    # Re-GET to confirm the change was persisted, not just echoed.
+    steps = (
+        await client.get(f"/api/projects/{project_id}/instruction/steps")
+    ).json()
+    assert steps[0]["step_type"] == "text"
+
+
+@pytest.mark.asyncio
+async def test_step_put_step_type_invalid_returns_422(
+    client, project_id
+) -> None:
+    """An unrecognised step_type 422s at the Pydantic layer before
+    reaching the DB. Without this guard a typo would silently persist a
+    bogus value that the frontend wouldn't know how to render."""
+    headers = make_auth_header()
+    await _create_instruction(client, project_id)
+    create = await client.post(
+        f"/api/projects/{project_id}/instruction/steps",
+        json={"title": "one"},
+        headers=headers,
+    )
+    step_id = create.json()["id"]
+
+    resp = await client.put(
+        f"/api/projects/{project_id}/instruction/steps/{step_id}",
+        json={"step_type": "invalid"},
+        headers=headers,
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_step_put_body_round_trips_and_partial_update(
+    client, project_id
+) -> None:
+    """Setting ``body`` persists it; a subsequent PUT that omits body
+    leaves it untouched (partial-update semantics)."""
+    headers = make_auth_header()
+    await _create_instruction(client, project_id)
+    create = await client.post(
+        f"/api/projects/{project_id}/instruction/steps",
+        json={"title": "text step"},
+        headers=headers,
+    )
+    step_id = create.json()["id"]
+
+    # First PUT: set body.
+    resp = await client.put(
+        f"/api/projects/{project_id}/instruction/steps/{step_id}",
+        json={"step_type": "text", "body": "# Hello"},
+        headers=headers,
+    )
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["body"] == "# Hello"
+
+    # Second PUT: omit body — value should be unchanged.
+    resp = await client.put(
+        f"/api/projects/{project_id}/instruction/steps/{step_id}",
+        json={"title": "renamed"},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["title"] == "renamed"
+    assert body["body"] == "# Hello"
+
+
+@pytest.mark.asyncio
+async def test_step_put_video_url_updates(client, project_id) -> None:
+    """PUT video_url updates the field. The server stores the raw URL —
+    the frontend is responsible for any youtube-id extraction."""
+    headers = make_auth_header()
+    await _create_instruction(client, project_id)
+    create = await client.post(
+        f"/api/projects/{project_id}/instruction/steps",
+        json={"title": "video step"},
+        headers=headers,
+    )
+    step_id = create.json()["id"]
+
+    url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    resp = await client.put(
+        f"/api/projects/{project_id}/instruction/steps/{step_id}",
+        json={"step_type": "video", "video_url": url},
+        headers=headers,
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["step_type"] == "video"
+    assert body["video_url"] == url
+
+
+@pytest.mark.asyncio
+async def test_step_type_migration_helper_is_idempotent() -> None:
+    """The migration helper is callable twice in a row without side
+    effects. The second invocation is a no-op (every column already
+    exists when the table has been freshly built by ``create_all``).
+
+    Postgres-only behaviour, but the SQLite short-circuit is part of the
+    contract: calling the helper from the lifespan must be safe on every
+    dialect we run against (Postgres in prod, SQLite in tests).
+    """
+    from projects_api.db import add_instruction_step_type_if_missing
+
+    # Two calls back-to-back — the helper guards each ALTER behind an
+    # ``information_schema`` probe, so the second call walks the same
+    # probes and does no writes. We can't easily assert "no writes
+    # happened" but we *can* assert "no exception raised", which is the
+    # contract the lifespan relies on.
+    await add_instruction_step_type_if_missing()
+    await add_instruction_step_type_if_missing()

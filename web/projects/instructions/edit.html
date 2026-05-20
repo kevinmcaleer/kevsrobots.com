@@ -127,10 +127,14 @@ hide_nibsy: true
         <span class="ib-rail-icon"><i class="fas fa-puzzle-piece"></i></span>
         <span class="ib-rail-label">Assets</span>
       </button>
+      <!-- B3: the Schematic rail item is the step-type picker (the future
+           full schematic editor lands in E2). The label is "Schematic"
+           but the data-rail-pane key stays "circuit" for back-compat
+           with persisted UI state (kr-instructions-ui-state-v1). -->
       <button type="button" class="ib-rail-btn" data-rail-pane="circuit"
-              title="Circuit (Cmd/Ctrl+5)">
-        <span class="ib-rail-icon"><i class="fas fa-bolt"></i></span>
-        <span class="ib-rail-label">Circuit</span>
+              title="Schematic / step type (Cmd/Ctrl+5)">
+        <span class="ib-rail-icon"><i class="fas fa-diagram-project"></i></span>
+        <span class="ib-rail-label">Schematic</span>
       </button>
       <button type="button" class="ib-rail-btn" data-rail-pane="layers"
               title="Layers (Cmd/Ctrl+6)">
@@ -336,18 +340,113 @@ hide_nibsy: true
         </div>
       </section>
 
-      <!-- Circuit pane (stub) -->
+      <!-- Schematic / step-type pane (B3) — was the Circuit stub. The
+           pane key stays "circuit" so persisted UI state (which records
+           the active rail key in localStorage) keeps working. The
+           visible label + content are the step-type picker for the
+           currently-active step. -->
       <section class="ib-pane" data-pane="circuit">
         <header class="ib-pane-header">
-          <h6 class="ib-pane-title"><i class="fas fa-bolt me-2"></i>Circuit</h6>
+          <h6 class="ib-pane-title"><i class="fas fa-diagram-project me-2"></i>Schematic</h6>
         </header>
         <div class="ib-pane-body">
-          <div class="ib-pane-stub">
-            <div class="ib-pane-stub-icon"><i class="fas fa-bolt"></i></div>
-            <p>Circuit designer mode — separate handoff (issue #180).</p>
-            <p class="small text-muted">
-              Track progress at
-              <a href="https://github.com/kevinmcaleer/kevsrobots.com/issues/180" target="_blank" rel="noopener">issue #180</a>.
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Type — for this step</h6>
+            <div class="ib-step-type-radios" id="ib-step-type-radios" role="radiogroup"
+                 aria-label="Step type">
+              <label class="ib-step-type-radio">
+                <input type="radio" name="ib-step-type" value="photo" checked>
+                <span class="ib-step-type-icon"><i class="fas fa-image"></i></span>
+                <span class="ib-step-type-label">
+                  <strong>Photo</strong>
+                  <small class="text-muted d-block">Drawn-on background image (default).</small>
+                </span>
+              </label>
+              <label class="ib-step-type-radio">
+                <input type="radio" name="ib-step-type" value="schematic">
+                <span class="ib-step-type-icon"><i class="fas fa-diagram-project"></i></span>
+                <span class="ib-step-type-label">
+                  <strong>Schematic</strong>
+                  <small class="text-muted d-block">Embed the project schematic (E2).</small>
+                </span>
+              </label>
+              <label class="ib-step-type-radio">
+                <input type="radio" name="ib-step-type" value="text">
+                <span class="ib-step-type-icon"><i class="fas fa-pen-to-square"></i></span>
+                <span class="ib-step-type-label">
+                  <strong>Text</strong>
+                  <small class="text-muted d-block">Plain text, no canvas.</small>
+                </span>
+              </label>
+              <label class="ib-step-type-radio">
+                <input type="radio" name="ib-step-type" value="video">
+                <span class="ib-step-type-icon"><i class="fas fa-video"></i></span>
+                <span class="ib-step-type-label">
+                  <strong>Video</strong>
+                  <small class="text-muted d-block">YouTube / MP4 embed.</small>
+                </span>
+              </label>
+              <label class="ib-step-type-radio">
+                <input type="radio" name="ib-step-type" value="blank">
+                <span class="ib-step-type-icon"><i class="far fa-square"></i></span>
+                <span class="ib-step-type-label">
+                  <strong>Blank</strong>
+                  <small class="text-muted d-block">Empty canvas, annotations only.</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Per-type config — JS shows / hides the matching subsection
+               in sync with the radio selection. -->
+          <div class="ib-pane-section ib-step-type-config" data-config="photo">
+            <h6 class="ib-pane-section-title">Photo</h6>
+            <p class="ib-pane-hint text-muted small mb-0">
+              Upload or pick a background in the <strong>Photos</strong> pane.
+            </p>
+          </div>
+
+          <div class="ib-pane-section ib-step-type-config d-none" data-config="schematic">
+            <h6 class="ib-pane-section-title">Schematic</h6>
+            <div class="ib-step-schematic-card">
+              <div class="ib-step-schematic-icon"><i class="fas fa-diagram-project"></i></div>
+              <p class="mb-2"><strong>Embedded schematic</strong> — full editor (E2) coming soon.</p>
+              <p class="small text-muted mb-2">
+                The schematic linked to this project will appear here once the editor ships.
+              </p>
+              <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+                <i class="fas fa-pencil me-1"></i> open editor
+              </button>
+            </div>
+          </div>
+
+          <div class="ib-pane-section ib-step-type-config d-none" data-config="text">
+            <h6 class="ib-pane-section-title">Text</h6>
+            <textarea class="form-control form-control-sm ib-step-body-input"
+                      id="ib-step-body-input"
+                      rows="8"
+                      placeholder="Write the body of this text step…"></textarea>
+            <p class="ib-pane-hint text-muted small mt-2 mb-0">
+              Saved when you click outside the field. Markdown / plain text both work — the public viewer renders it as-is.
+            </p>
+          </div>
+
+          <div class="ib-pane-section ib-step-type-config d-none" data-config="video">
+            <h6 class="ib-pane-section-title">Video</h6>
+            <input type="url" class="form-control form-control-sm ib-step-video-input"
+                   id="ib-step-video-input"
+                   placeholder="YouTube URL or MP4 link…"
+                   maxlength="500">
+            <div class="ib-step-video-preview mt-2" id="ib-step-video-preview"></div>
+            <p class="ib-pane-hint text-muted small mt-2 mb-0">
+              YouTube watch links and short links are auto-extracted. Raw MP4 URLs play in a native video element.
+            </p>
+          </div>
+
+          <div class="ib-pane-section ib-step-type-config d-none" data-config="blank">
+            <h6 class="ib-pane-section-title">Blank</h6>
+            <p class="ib-pane-hint text-muted small mb-0">
+              Empty canvas — drop annotations only. All the drawing tools still work.
             </p>
           </div>
         </div>
@@ -381,6 +480,44 @@ hide_nibsy: true
         <canvas id="ib-canvas"></canvas>
         <div class="ib-canvas-empty" id="ib-canvas-empty">
           Drop a photo here, or pick a tool from the secondary pane.
+        </div>
+      </div>
+
+      <!-- B3: alternate canvas-area views — JS shows exactly one of
+           these or the Fabric canvas frame above based on the active
+           step's step_type. -->
+      <div class="ib-canvas-text d-none" id="ib-canvas-text">
+        <div class="ib-canvas-text-inner">
+          <div class="ib-canvas-text-empty" id="ib-canvas-text-empty">
+            <i class="fas fa-pen-to-square mb-2"></i>
+            <p class="mb-0">Write this step's body in the <strong>Schematic</strong> pane.</p>
+          </div>
+          <div class="ib-canvas-text-body" id="ib-canvas-text-body"></div>
+        </div>
+      </div>
+
+      <div class="ib-canvas-video d-none" id="ib-canvas-video">
+        <div class="ib-canvas-video-inner" id="ib-canvas-video-inner">
+          <div class="ib-canvas-video-empty">
+            <i class="fas fa-video mb-2"></i>
+            <p class="mb-0">Paste a YouTube or MP4 URL in the <strong>Schematic</strong> pane.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ib-canvas-schematic d-none" id="ib-canvas-schematic">
+        <div class="ib-canvas-schematic-inner">
+          <div class="ib-canvas-schematic-icon">
+            <i class="fas fa-diagram-project"></i>
+          </div>
+          <h5 class="mb-2">Embedded schematic</h5>
+          <p class="text-muted mb-3">
+            View in the Schematic Editor (coming soon).<br>
+            The project schematic will render here once the editor ships.
+          </p>
+          <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+            <i class="fas fa-pencil me-1"></i> open editor
+          </button>
         </div>
       </div>
 

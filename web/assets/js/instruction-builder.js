@@ -180,6 +180,20 @@
     dom.canvasEl = document.getElementById('ib-canvas');
     dom.canvasFrame = document.getElementById('ib-canvas-frame');
     dom.canvasEmpty = document.getElementById('ib-canvas-empty');
+    // B3: alternate canvas-area views, one per non-photo step type.
+    dom.canvasText = document.getElementById('ib-canvas-text');
+    dom.canvasTextEmpty = document.getElementById('ib-canvas-text-empty');
+    dom.canvasTextBody = document.getElementById('ib-canvas-text-body');
+    dom.canvasVideo = document.getElementById('ib-canvas-video');
+    dom.canvasVideoInner = document.getElementById('ib-canvas-video-inner');
+    dom.canvasSchematic = document.getElementById('ib-canvas-schematic');
+
+    // Schematic pane (step-type picker)
+    dom.stepTypeRadios = document.querySelectorAll('input[name="ib-step-type"]');
+    dom.stepTypeConfigs = document.querySelectorAll('.ib-step-type-config');
+    dom.stepBodyInput = document.getElementById('ib-step-body-input');
+    dom.stepVideoInput = document.getElementById('ib-step-video-input');
+    dom.stepVideoPreview = document.getElementById('ib-step-video-preview');
     dom.inspectorHud = document.getElementById('ib-inspector-hud');
     dom.hudHeader = document.getElementById('ib-hud-header');
     dom.hudBody = document.getElementById('ib-hud-body');
@@ -976,6 +990,302 @@
               });
             })
             .catch(function () { setSaveStatus('error', 'Description save failed'); });
+        });
+      });
+    }
+  }
+
+  // ====================================================================
+  // 10b. STEP TYPES (B3) — type picker + canvas-area swap + per-type
+  //      body / video URL persistence. Lives next to wireStepFields
+  //      because it shares the autosave + step-undo plumbing.
+  // ====================================================================
+
+  // The five valid step types. Anything not in this set is treated as
+  // 'photo' (the legacy default + back-end fall-through).
+  var STEP_TYPES = ['photo', 'schematic', 'text', 'video', 'blank'];
+
+  // Track focus values for the body / video inputs so we only push a
+  // step-undo entry when the field actually changed. Mirrors the
+  // existing stepFieldFocusValues pattern for title / description.
+  var stepTypeFocusValues = { body: null, videoUrl: null, stepId: null };
+
+  function currentStepTypeOf(step) {
+    if (!step) return 'photo';
+    var t = step.step_type;
+    return STEP_TYPES.indexOf(t) >= 0 ? t : 'photo';
+  }
+
+  function activeStepObject() {
+    if (!state.activeStepId) return null;
+    return state.steps.find(function (s) { return s.id === state.activeStepId; });
+  }
+
+  // Extract a YouTube video id from any of the common URL shapes; null
+  // for non-YouTube URLs (which renders as a raw <video controls>).
+  function extractYouTubeId(url) {
+    if (!url) return null;
+    var m = String(url).match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
+    return m ? m[1] : null;
+  }
+
+  // Update the canvas area's visibility per step type. The Fabric
+  // canvas frame stays in the DOM in every case (so the rest of the
+  // builder still has something to reference) — we just hide it for
+  // text / video / schematic and show the corresponding alt panel.
+  function applyCanvasAreaForType(stepType) {
+    var fabricVisible = (stepType === 'photo' || stepType === 'blank');
+    if (dom.canvasFrame) dom.canvasFrame.classList.toggle('d-none', !fabricVisible);
+    if (dom.canvasText) dom.canvasText.classList.toggle('d-none', stepType !== 'text');
+    if (dom.canvasVideo) dom.canvasVideo.classList.toggle('d-none', stepType !== 'video');
+    if (dom.canvasSchematic) dom.canvasSchematic.classList.toggle('d-none', stepType !== 'schematic');
+    // Fabric tracks the CSS size of the canvas; if we just toggled
+    // visibility, give it a moment to settle and re-measure so pointer
+    // events map to the right scene coords.
+    if (fabricVisible) setTimeout(syncCanvasDisplaySize, 50);
+  }
+
+  // Apply the text-step body to the read-only preview slot in the
+  // canvas area. Plain-text rendering for B3 — markdown is acceptable
+  // for a follow-up. We render via textContent on a <pre>-ish element
+  // so we don't have to sanitise.
+  function renderCanvasTextBody(step) {
+    if (!dom.canvasTextBody || !dom.canvasTextEmpty) return;
+    var body = (step && step.body) || '';
+    if (!body.trim()) {
+      dom.canvasTextEmpty.classList.remove('d-none');
+      dom.canvasTextBody.classList.add('d-none');
+      dom.canvasTextBody.textContent = '';
+    } else {
+      dom.canvasTextEmpty.classList.add('d-none');
+      dom.canvasTextBody.classList.remove('d-none');
+      // Plain-text body for B3 — preserve line breaks via white-space CSS.
+      dom.canvasTextBody.textContent = body;
+    }
+  }
+
+  // Build the video embed inside the canvas area for video steps.
+  // YouTube → iframe, raw URLs → <video controls>, empty / unrecognised
+  // → empty-state placeholder.
+  function renderCanvasVideo(step) {
+    if (!dom.canvasVideoInner) return;
+    var url = (step && step.video_url) || '';
+    if (!url) {
+      dom.canvasVideoInner.innerHTML =
+        '<div class="ib-canvas-video-empty">' +
+        '  <i class="fas fa-video mb-2"></i>' +
+        '  <p class="mb-0">Paste a YouTube or MP4 URL in the <strong>Schematic</strong> pane.</p>' +
+        '</div>';
+      return;
+    }
+    var ytId = extractYouTubeId(url);
+    if (ytId) {
+      dom.canvasVideoInner.innerHTML =
+        '<iframe class="ib-canvas-video-iframe" ' +
+        '        src="https://www.youtube.com/embed/' + encodeURIComponent(ytId) + '" ' +
+        '        title="YouTube video" ' +
+        '        frameborder="0" ' +
+        '        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' +
+        '        allowfullscreen></iframe>';
+    } else {
+      dom.canvasVideoInner.innerHTML =
+        '<video class="ib-canvas-video-el" controls preload="metadata" src="' + escapeHtml(url) + '"></video>';
+    }
+  }
+
+  // Build the small video preview inside the Schematic pane (below the
+  // URL input). Same id-extraction as the canvas-area renderer but
+  // styled smaller. Empty for an empty URL.
+  function renderVideoPreview(url) {
+    if (!dom.stepVideoPreview) return;
+    url = (url || '').trim();
+    if (!url) {
+      dom.stepVideoPreview.innerHTML = '';
+      return;
+    }
+    var ytId = extractYouTubeId(url);
+    if (ytId) {
+      dom.stepVideoPreview.innerHTML =
+        '<iframe class="ib-step-video-iframe" ' +
+        '        src="https://www.youtube.com/embed/' + encodeURIComponent(ytId) + '" ' +
+        '        title="YouTube preview" ' +
+        '        frameborder="0" allowfullscreen></iframe>';
+    } else if (/\.(mp4|webm|ogg)(\?|$)/i.test(url)) {
+      dom.stepVideoPreview.innerHTML =
+        '<video class="ib-step-video-el" controls preload="metadata" src="' + escapeHtml(url) + '"></video>';
+    } else {
+      dom.stepVideoPreview.innerHTML =
+        '<p class="small text-muted mb-0"><i class="fas fa-info-circle me-1"></i>' +
+        'URL doesn\'t look like a YouTube link or a video file — saved verbatim.</p>';
+    }
+  }
+
+  // Sync the type-picker pane's controls to the currently-active step.
+  // Called whenever the active step changes (switchToStep, init, etc.).
+  function syncStepTypePane() {
+    var step = activeStepObject();
+    var stepType = currentStepTypeOf(step);
+
+    // Radios
+    Array.prototype.forEach.call(dom.stepTypeRadios || [], function (input) {
+      input.checked = (input.value === stepType);
+    });
+
+    // Per-type config sections
+    Array.prototype.forEach.call(dom.stepTypeConfigs || [], function (section) {
+      section.classList.toggle('d-none', section.dataset.config !== stepType);
+    });
+
+    // Text body input
+    if (dom.stepBodyInput) {
+      dom.stepBodyInput.value = (step && step.body) || '';
+    }
+
+    // Video URL input + preview
+    if (dom.stepVideoInput) {
+      dom.stepVideoInput.value = (step && step.video_url) || '';
+    }
+    renderVideoPreview(step && step.video_url);
+
+    // Canvas area visibility
+    applyCanvasAreaForType(stepType);
+    if (stepType === 'text') renderCanvasTextBody(step);
+    if (stepType === 'video') renderCanvasVideo(step);
+  }
+
+  async function onStepTypeChange(newType) {
+    if (STEP_TYPES.indexOf(newType) < 0) return;
+    var step = activeStepObject();
+    if (!step) return;
+    var stepId = step.id;
+    var priorType = currentStepTypeOf(step);
+    if (priorType === newType) return;
+
+    setSaveStatus('saving', 'Saving…');
+    try {
+      // NB: we intentionally don't clear canvas_json when switching to
+      // text / video / schematic — flipping back to photo or blank
+      // restores any overlays the user had drawn. Same goes for body /
+      // video_url across the other direction.
+      var updated = await putStep(stepId, { step_type: newType });
+      // Update local cache.
+      step.step_type = updated.step_type;
+      setSaveStatus('saved');
+      syncStepTypePane();
+      renderFilmstrip();
+      pushStepUndo({
+        type: 'change-step-type',
+        apply: async function () {
+          var reverted = await putStep(stepId, { step_type: priorType });
+          var s = state.steps.find(function (x) { return x.id === stepId; });
+          if (s) s.step_type = reverted.step_type;
+          if (state.activeStepId === stepId) syncStepTypePane();
+          renderFilmstrip();
+          return 'Undid: changed step type';
+        },
+      });
+    } catch (_) {
+      setSaveStatus('error', 'Change step type failed');
+    }
+  }
+
+  function wireStepTypePane() {
+    // Radios — change fires immediately (no debounce; type switch is a
+    // single coarse-grained user action, not a stream of inputs).
+    Array.prototype.forEach.call(dom.stepTypeRadios || [], function (input) {
+      input.addEventListener('change', function () {
+        if (!input.checked) return;
+        onStepTypeChange(input.value);
+      });
+    });
+
+    // Text body — autosave on blur (debounce 500ms so a quick blur into
+    // a re-focus doesn't fire a save). Mirrors the existing
+    // wireStepFields pattern for title / description.
+    if (dom.stepBodyInput) {
+      dom.stepBodyInput.addEventListener('focus', function () {
+        stepTypeFocusValues.stepId = state.activeStepId;
+        stepTypeFocusValues.body = dom.stepBodyInput.value || '';
+      });
+      dom.stepBodyInput.addEventListener('blur', function () {
+        if (!state.activeStepId) return;
+        debounce('step-body', 500, function () {
+          var stepId = state.activeStepId;
+          var value = dom.stepBodyInput.value || null;
+          var prior = stepTypeFocusValues.stepId === stepId
+            ? stepTypeFocusValues.body
+            : null;
+          if ((prior || '') === (value || '')) return;
+          setSaveStatus('saving', 'Saving…');
+          putStep(stepId, { body: value })
+            .then(function (updated) {
+              var s = state.steps.find(function (x) { return x.id === stepId; });
+              if (s) s.body = updated.body;
+              if (state.activeStepId === stepId) renderCanvasTextBody(s);
+              setSaveStatus('saved');
+              pushStepUndo({
+                type: 'edit-body',
+                apply: async function () {
+                  await putStep(stepId, { body: prior || null });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.body = prior || null;
+                  if (state.activeStepId === stepId && dom.stepBodyInput) {
+                    dom.stepBodyInput.value = prior || '';
+                  }
+                  if (state.activeStepId === stepId) renderCanvasTextBody(s2);
+                  return 'Undid: edited body';
+                },
+              });
+            })
+            .catch(function () { setSaveStatus('error', 'Body save failed'); });
+        });
+      });
+    }
+
+    // Video URL — same blur-save pattern; also re-renders the preview
+    // live on input so the user gets visual feedback before saving.
+    if (dom.stepVideoInput) {
+      dom.stepVideoInput.addEventListener('input', function () {
+        renderVideoPreview(dom.stepVideoInput.value);
+      });
+      dom.stepVideoInput.addEventListener('focus', function () {
+        stepTypeFocusValues.stepId = state.activeStepId;
+        stepTypeFocusValues.videoUrl = dom.stepVideoInput.value || '';
+      });
+      dom.stepVideoInput.addEventListener('blur', function () {
+        if (!state.activeStepId) return;
+        debounce('step-video', 500, function () {
+          var stepId = state.activeStepId;
+          var value = dom.stepVideoInput.value || null;
+          var prior = stepTypeFocusValues.stepId === stepId
+            ? stepTypeFocusValues.videoUrl
+            : null;
+          if ((prior || '') === (value || '')) return;
+          setSaveStatus('saving', 'Saving…');
+          putStep(stepId, { video_url: value })
+            .then(function (updated) {
+              var s = state.steps.find(function (x) { return x.id === stepId; });
+              if (s) s.video_url = updated.video_url;
+              if (state.activeStepId === stepId) renderCanvasVideo(s);
+              setSaveStatus('saved');
+              pushStepUndo({
+                type: 'edit-video-url',
+                apply: async function () {
+                  await putStep(stepId, { video_url: prior || null });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.video_url = prior || null;
+                  if (state.activeStepId === stepId && dom.stepVideoInput) {
+                    dom.stepVideoInput.value = prior || '';
+                  }
+                  if (state.activeStepId === stepId) {
+                    renderVideoPreview(prior);
+                    renderCanvasVideo(s2);
+                  }
+                  return 'Undid: edited video URL';
+                },
+              });
+            })
+            .catch(function () { setSaveStatus('error', 'Video URL save failed'); });
         });
       });
     }
@@ -1856,16 +2166,37 @@
   // 19. FILMSTRIP — step thumbnails, reorder, add, collapse
   // ====================================================================
 
+  // B3: per-type badge for the filmstrip thumb. Returns an HTML snippet
+  // (the icon-only pill) or empty string for the blank type, which is
+  // unbadged by design (it's the same as photo-without-bg visually).
+  function stepTypeBadgeHtml(stepType) {
+    var iconMap = {
+      photo: 'fa-image',
+      schematic: 'fa-diagram-project',
+      text: 'fa-pen-to-square',
+      video: 'fa-video',
+    };
+    var icon = iconMap[stepType];
+    if (!icon) return '';  // blank or unknown → no badge
+    return (
+      '<span class="ib-step-tile-badge" title="' + escapeHtml(stepType) + '">' +
+      '<i class="fas ' + icon + '"></i>' +
+      '</span>'
+    );
+  }
+
   function renderFilmstrip() {
     if (!dom.filmstripTrack) return;
     var html = state.steps.map(function (s) {
       var isActive = (s.id === state.activeStepId);
       var caption = (s.title && s.title.trim()) ? s.title : 'Untitled';
+      var badge = stepTypeBadgeHtml(currentStepTypeOf(s));
       return (
         '<div class="ib-step-tile' + (isActive ? ' is-active' : '') + '"' +
         '     draggable="true"' +
         '     data-step-id="' + s.id + '">' +
         '  <div class="ib-step-tile-num">' + s.step_number + '</div>' +
+        badge +
         '  <div class="ib-step-tile-preview">' +
         '    <span>step ' + s.step_number + '</span>' +
         '  </div>' +
@@ -1992,6 +2323,8 @@
     if (dom.stepDescription) dom.stepDescription.value = step.description || '';
 
     await loadCanvasFromStep(step);
+    // B3: refresh the step-type pane + canvas-area swap for this step.
+    syncStepTypePane();
     renderFilmstrip();
     renderLayersList();
   }
@@ -4042,6 +4375,9 @@
     initCanvas();
     wireToolbar();
     wireStepFields();
+    // B3: step-type picker + per-type field handlers. Lives next to
+    // wireStepFields because it shares the autosave + step-undo paths.
+    wireStepTypePane();
     wireExportMenu();
     wireRail();
     wireSecondaryResize();
@@ -4070,6 +4406,8 @@
     if (dom.stepDescription) dom.stepDescription.value = state.steps[0].description || '';
     renderFilmstrip();
     await loadCanvasFromStep(state.steps[0]);
+    // B3: apply the initial step's type to the picker pane + canvas area.
+    syncStepTypePane();
 
     // Prime the Photos pane content even if it isn't visible — the first
     // user click into it should feel instant.
