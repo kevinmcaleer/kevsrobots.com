@@ -949,3 +949,44 @@ async def add_user_currency_preference_if_missing() -> None:
                 'ALTER TABLE "user_profiles" '
                 'ADD COLUMN "preferred_currency" CHAR(3)'
             ))
+
+
+async def add_project_file_description_if_missing() -> None:
+    """Additive migration for issue #187 (per-file descriptions).
+
+    Adds ``description`` (TEXT, nullable) to the existing ``project_files``
+    table when it does not already exist. SQLAlchemy's ``create_all`` does
+    not ALTER existing tables, so this lightweight idempotent helper keeps
+    existing Postgres deployments in sync. Safe to run on every startup;
+    no-op when the column is already present. Postgres-only — SQLite test
+    runs use a fresh in-memory DB which already includes the new column
+    via ``create_all``.
+
+    Mirrors ``add_bom_part_id_if_missing`` / ``add_remix_columns_if_missing``
+    — same probe-then-ALTER pattern.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'project_files'"
+        ))
+        if table_check.first() is None:
+            # Brand-new deployment — create_all on the same startup pass
+            # will build the table with the new column already present.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'project_files' "
+            "AND column_name = 'description'"
+        ))
+        if existing.first() is None:
+            logger.warning(
+                "Adding project_files.description column (issue #187)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "project_files" ADD COLUMN "description" TEXT'
+            ))

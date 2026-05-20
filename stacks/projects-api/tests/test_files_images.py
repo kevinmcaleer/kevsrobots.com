@@ -130,3 +130,138 @@ async def test_list_images(client, project_id) -> None:
     resp = await client.get(f"/api/projects/{project_id}/images")
     assert resp.status_code == 200
     assert isinstance(resp.json(), list)
+
+
+# --- Per-file descriptions (issue #187) ----------------------------------
+#
+# Partial-update semantics chosen here:
+#   * ``description: null`` from the client means "field omitted" (we don't
+#     touch the existing value). Pydantic only puts fields the client
+#     actually included in ``model_dump(exclude_unset=True)``.
+#   * ``description: ""`` (explicit empty string) clears the description
+#     to the empty string rather than NULL. The frontend treats both null
+#     and "" as "no description" so the user-visible behaviour is
+#     identical, but the backend keeps the distinction so an empty-string
+#     clear can't accidentally re-pull a previously-cleared description.
+#   * Omitting the key entirely leaves the row unchanged.
+
+
+@pytest.fixture
+async def uploaded_file(client, project_id):
+    """A single file upload, returns the file_id."""
+    headers = make_auth_header()
+    resp = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("blueprint.pdf", b"%PDF-1.4 fake pdf", "application/pdf")},
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    return resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_uploaded_file_description_defaults_to_none(
+    client, project_id, uploaded_file
+) -> None:
+    resp = await client.get(f"/api/projects/{project_id}/files")
+    assert resp.status_code == 200
+    rows = resp.json()
+    assert len(rows) == 1
+    assert rows[0]["id"] == uploaded_file
+    assert rows[0]["description"] is None
+
+
+@pytest.mark.asyncio
+async def test_set_file_description_persists(
+    client, project_id, uploaded_file
+) -> None:
+    headers = make_auth_header()
+    resp = await client.put(
+        f"/api/projects/{project_id}/files/{uploaded_file}",
+        json={"description": "Pin diagram for v1.0"},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["description"] == "Pin diagram for v1.0"
+    # And it persists on a subsequent GET.
+    get_resp = await client.get(f"/api/projects/{project_id}/files")
+    assert get_resp.json()[0]["description"] == "Pin diagram for v1.0"
+
+
+@pytest.mark.asyncio
+async def test_empty_string_clears_file_description(
+    client, project_id, uploaded_file
+) -> None:
+    headers = make_auth_header()
+    # First set a description.
+    await client.put(
+        f"/api/projects/{project_id}/files/{uploaded_file}",
+        json={"description": "Initial description"},
+        headers=headers,
+    )
+    # Now clear it with an explicit empty string.
+    resp = await client.put(
+        f"/api/projects/{project_id}/files/{uploaded_file}",
+        json={"description": ""},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    # Spec: empty string clears to "" (not None) — locking the semantic in
+    # so a future refactor can't silently flip behaviour.
+    assert resp.json()["description"] == ""
+
+
+@pytest.mark.asyncio
+async def test_omitting_description_leaves_existing_value_untouched(
+    client, project_id, uploaded_file
+) -> None:
+    headers = make_auth_header()
+    # Set an initial value.
+    await client.put(
+        f"/api/projects/{project_id}/files/{uploaded_file}",
+        json={"description": "Wiring guide"},
+        headers=headers,
+    )
+    # PUT an empty body — no field included means no change.
+    resp = await client.put(
+        f"/api/projects/{project_id}/files/{uploaded_file}",
+        json={},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["description"] == "Wiring guide"
+
+
+@pytest.mark.asyncio
+async def test_non_owner_cannot_update_file_description(
+    client, project_id, uploaded_file
+) -> None:
+    other = make_auth_header("intruder")
+    resp = await client.put(
+        f"/api/projects/{project_id}/files/{uploaded_file}",
+        json={"description": "Hijacked!"},
+        headers=other,
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_public_list_surfaces_file_description(
+    client, project_id, uploaded_file
+) -> None:
+    """Anonymous GET of the file list shows the description for files that
+    have one set — the public view page reads exactly this response."""
+    headers = make_auth_header()
+    await client.put(
+        f"/api/projects/{project_id}/files/{uploaded_file}",
+        json={"description": "Drill template (PDF)"},
+        headers=headers,
+    )
+    # No auth header — same shape the public view page hits.
+    resp = await client.get(f"/api/projects/{project_id}/files")
+    assert resp.status_code == 200
+    rows = resp.json()
+    assert any(
+        r["id"] == uploaded_file and r["description"] == "Drill template (PDF)"
+        for r in rows
+    )

@@ -1279,7 +1279,10 @@ description: View project details
     document.getElementById('view-files').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${files.map(f => `
       <tr>
         <td class="text-muted" style="width:20px"><i class="${fIcon(f.filename)}"></i></td>
-        <td><a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a></td>
+        <td>
+          <a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a>
+          ${f.description ? `<small class="text-muted d-block">${esc(f.description)}</small>` : ''}
+        </td>
         <td class="text-muted small">${fKind(f.filename)}</td>
         <td class="text-muted small text-end" style="width:90px" title="Downloads"><i class="fas fa-download"></i> ${(f.download_count || 0)}</td>
         <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
