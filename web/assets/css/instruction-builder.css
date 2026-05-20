@@ -179,7 +179,9 @@ body.instruction-builder-page {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 8px 4px;
+  /* Tight horizontal padding so "Schematic" / "Layers" / "Photos" all
+     fit at 10 px font + 0.02em tracking inside the 54 px rail. */
+  padding: 8px 2px;
   background: #fafafa;
   border-right: 1px solid #dee2e6;
   overflow: hidden;
@@ -230,6 +232,12 @@ body.instruction-builder-page {
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.02em;
+  /* Belt-and-braces: any future label longer than the rail width
+     gracefully ellipsizes rather than clipping mid-character. */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .ib-rail-spacer { flex: 1; }
 .ib-rail-settings { margin-top: 0; }
@@ -977,13 +985,21 @@ body.instruction-builder-page {
   color: #f4f1ea;
   border-radius: 4px;
   height: 26px;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  /* Browser default button line-height (~1.5) plus FA's intrinsic
+     top-whitespace makes glyphs render high. Pin to 1 and force the
+     inner <i> to inline-block so the icon centers on the flex axis. */
+  line-height: 1;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.ib-hud-action i {
+  display: inline-block;
+  line-height: 1;
 }
 .ib-hud-action:hover {
   background: #444;

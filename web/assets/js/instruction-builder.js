@@ -782,7 +782,7 @@
     try {
       var resp = await uploadImage(file);
       var url = projectImageViewUrl(resp.id);
-      await addBackgroundImage(url);
+      await addBackgroundImage(url, file.name);
       setSaveStatus('saved', 'Image added');
       flushCanvasSave();
       // Refresh the Photos pane so the new image shows up there too.
@@ -794,7 +794,7 @@
     }
   }
 
-  async function addBackgroundImage(url) {
+  async function addBackgroundImage(url, filename) {
     removeBackgroundImage();
 
     var img;
@@ -818,6 +818,7 @@
       // toJSON's propertiesToInclude — we do that in serializeCanvas.
       ibRole: 'background',
       ibSourceUrl: url,
+      ibFilename: filename || '',
     });
     state.canvas.add(img);
     state.canvas.sendObjectToBack(img);
@@ -858,8 +859,10 @@
   function serializeCanvas() {
     // toJSON with our custom 'ibRole' key so background-image flagging
     // survives a round-trip, plus ibSourceUrl so we can detect which
-    // photo a step uses as a background (drives the ★ badge in Photos).
-    return state.canvas.toJSON(['ibRole', 'ibSourceUrl']);
+    // photo a step uses as a background (drives the ★ badge in Photos),
+    // plus ibFilename so the Layers pane keeps showing the friendly
+    // filename per image after a reload.
+    return state.canvas.toJSON(['ibRole', 'ibSourceUrl', 'ibFilename']);
   }
 
   function loadCanvasFromStep(step) {
@@ -1982,11 +1985,16 @@
           } else {
             ids = [id];
           }
-          // Resolve to {id, src} pairs.
+          // Resolve to {id, src, filename} triples so the dropped image
+          // can surface a meaningful label in the Layers pane.
           var items = ids.map(function (pid) {
             var match = state.projectImages.find(function (im) { return im.id === pid; });
             if (!match) return null;
-            return { id: pid, src: projectImageViewUrl(pid) };
+            return {
+              id: pid,
+              src: projectImageViewUrl(pid),
+              filename: match.filename || match.caption || ''
+            };
           }).filter(Boolean);
 
           var payload = (items.length === 1)
@@ -2357,6 +2365,7 @@
           evented: true,
           ibRole: 'photo',
           ibSourceUrl: items[i].src,
+          ibFilename: items[i].filename || '',
         });
         state.canvas.add(img);
         if (i === items.length - 1) state.canvas.setActiveObject(img);
@@ -2882,10 +2891,20 @@
 
   function objectKindLabel(o) {
     if (!o) return { icon: 'fas fa-question', label: 'Object' };
-    if (o.ibRole === 'background') return { icon: 'fas fa-image', label: 'Background image' };
-    if (o.ibRole === 'stl') return { icon: 'fas fa-cube', label: 'STL view' };
-    if (o.ibRole === 'photo' || o.ibRole === 'project-image') return { icon: 'fas fa-image', label: 'Image' };
-    if (o.type === 'image' || (o.isType && o.isType('image'))) return { icon: 'fas fa-image', label: 'Image' };
+    // For image objects, prefer the source filename when we have one —
+    // a stack of "Image, Image, Image" is useless on a step with several
+    // photos / project-images dropped in.
+    var fname = (o.ibFilename || '').trim();
+    if (o.ibRole === 'background') {
+      return { icon: 'fas fa-image', label: fname ? ('Background: ' + fname) : 'Background image' };
+    }
+    if (o.ibRole === 'stl') return { icon: 'fas fa-cube', label: fname ? ('STL: ' + fname) : 'STL view' };
+    if (o.ibRole === 'photo' || o.ibRole === 'project-image') {
+      return { icon: 'fas fa-image', label: fname || 'Image' };
+    }
+    if (o.type === 'image' || (o.isType && o.isType('image'))) {
+      return { icon: 'fas fa-image', label: fname || 'Image' };
+    }
     if (o.type === 'i-text' || (o.isType && o.isType('i-text'))) {
       var txt = (o.text || '').trim().slice(0, 24);
       return { icon: 'fas fa-font', label: txt ? ('Text: ' + txt) : 'Text' };
@@ -4194,9 +4213,11 @@
     var html = images.map(function (img) {
       var src = projectImageViewUrl(img.id);
       var caption = img.caption && img.caption.trim() ? img.caption : (img.filename || 'image');
+      var fname = img.filename || img.caption || '';
       return (
         '<button type="button" class="ib-picker-tile" data-image-id="' + img.id + '" ' +
         '        data-image-src="' + escapeHtml(src) + '" ' +
+        '        data-image-filename="' + escapeHtml(fname) + '" ' +
         '        title="' + escapeHtml(caption) + '">' +
         '  <img src="' + escapeHtml(src) + '" alt="" loading="lazy">' +
         '  <span class="ib-picker-tile-label">' + escapeHtml(caption) + '</span>' +
@@ -4209,9 +4230,10 @@
       function (tile) {
         tile.addEventListener('click', function () {
           var src = tile.dataset.imageSrc;
+          var filename = tile.dataset.imageFilename || '';
           if (!src) return;
           try { pickerModal.bsModal.hide(); } catch (_) {}
-          placeProjectImageOnCanvas(src).catch(function () {
+          placeProjectImageOnCanvas(src, filename).catch(function () {
             setSaveStatus('error', 'Failed to add image');
           });
         });
@@ -4241,7 +4263,7 @@
     }
   }
 
-  async function placeProjectImageOnCanvas(url) {
+  async function placeProjectImageOnCanvas(url, filename) {
     if (!state.canvas) return;
     var img;
     try {
@@ -4265,6 +4287,7 @@
       evented: true,
       ibRole: 'project-image',
       ibSourceUrl: url,
+      ibFilename: filename || '',
     });
     state.canvas.add(img);
     state.canvas.setActiveObject(img);
