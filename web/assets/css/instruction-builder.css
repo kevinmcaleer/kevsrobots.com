@@ -813,10 +813,15 @@ body.instruction-builder-page > .container-fluid {
   margin: 0;
 }
 
-/* Numeric inputs grid (X / Y / W / H, Rot° / Z) */
+/* Numeric inputs grid (X / Y / W / H, Rot° / Z).
+   `minmax(0, 1fr)` rather than `1fr` so the grid columns can actually
+   shrink below their content's intrinsic width — otherwise the right
+   column overflows the 240px HUD when the value is 4+ digits (e.g. a
+   1200px-wide image). The min-width:0 + box-sizing:border-box on the
+   input itself completes the chain so the input shrinks with the cell. */
 .ib-hud-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 6px;
 }
 
@@ -827,7 +832,9 @@ body.instruction-builder-page > .container-fluid {
   background: #2a2a2a;
   border: 1px solid #1a1a1a;
   border-radius: 4px;
-  padding: 3px 6px;
+  padding: 2px 6px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .ib-hud-field:focus-within {
   border-color: #4f8ad9;
@@ -845,7 +852,9 @@ body.instruction-builder-page > .container-fluid {
 
 .ib-hud-field input[type="number"] {
   flex: 1;
+  width: 100%;
   min-width: 0;
+  box-sizing: border-box;
   background: transparent;
   border: 0;
   outline: 0;
@@ -855,6 +864,7 @@ body.instruction-builder-page > .container-fluid {
   padding: 0;
   appearance: textfield;
   -moz-appearance: textfield;
+  -webkit-appearance: none;
 }
 .ib-hud-field input[type="number"]::-webkit-outer-spin-button,
 .ib-hud-field input[type="number"]::-webkit-inner-spin-button {
@@ -1378,6 +1388,38 @@ body.instruction-builder-page > .container-fluid {
 
 @media (max-width: 575px) {
   .ib-stl-render-area { width: 100%; height: 320px; }
+}
+
+/* ---- Step-level undo toast ----------------------------------------- */
+/* Brief bottom-centred snackbar that confirms a step-level undo. The
+   change might be subtle (a description revert), so the user needs to
+   see what happened. Auto-dismisses after ~2s via JS. */
+
+.ib-undo-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: #212529;
+  color: #f8f9fa;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  z-index: 1080;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  max-width: min(420px, 90vw);
+  text-align: center;
+}
+.ib-undo-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.ib-undo-toast i {
+  margin-right: 6px;
+  color: #c8312a;
 }
 
 /* ---- Responsive fallback -------------------------------------------- */

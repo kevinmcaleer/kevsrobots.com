@@ -895,13 +895,27 @@
     }
   }
 
+  // Per-field "value at focus" snapshot — we only push a step-undo entry
+  // if the field actually changed between focus and blur, otherwise
+  // tabbing through fields would litter the undo stack with no-ops.
+  var stepFieldFocusValues = { title: null, description: null, stepId: null };
+
   function wireStepFields() {
     if (dom.stepTitle) {
+      dom.stepTitle.addEventListener('focus', function () {
+        stepFieldFocusValues.stepId = state.activeStepId;
+        stepFieldFocusValues.title = dom.stepTitle.value || '';
+      });
       dom.stepTitle.addEventListener('blur', function () {
         if (!state.activeStepId) return;
         debounce('step-title', 100, function () {
           var stepId = state.activeStepId;
           var value = dom.stepTitle.value || null;
+          var prior = stepFieldFocusValues.stepId === stepId
+            ? stepFieldFocusValues.title
+            : null;
+          // No-op if unchanged
+          if ((prior || '') === (value || '')) return;
           setSaveStatus('saving', 'Saving…');
           putStep(stepId, { title: value })
             .then(function (updated) {
@@ -909,23 +923,57 @@
               if (s) s.title = updated.title;
               renderFilmstrip();
               setSaveStatus('saved');
+              // Inverse: restore the prior title.
+              pushStepUndo({
+                type: 'edit-title',
+                apply: async function () {
+                  await putStep(stepId, { title: prior || null });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.title = prior || null;
+                  if (state.activeStepId === stepId && dom.stepTitle) {
+                    dom.stepTitle.value = prior || '';
+                  }
+                  renderFilmstrip();
+                  return 'Undid: renamed step';
+                },
+              });
             })
             .catch(function () { setSaveStatus('error', 'Title save failed'); });
         });
       });
     }
     if (dom.stepDescription) {
+      dom.stepDescription.addEventListener('focus', function () {
+        stepFieldFocusValues.stepId = state.activeStepId;
+        stepFieldFocusValues.description = dom.stepDescription.value || '';
+      });
       dom.stepDescription.addEventListener('blur', function () {
         if (!state.activeStepId) return;
         debounce('step-desc', 100, function () {
           var stepId = state.activeStepId;
           var value = dom.stepDescription.value || null;
+          var prior = stepFieldFocusValues.stepId === stepId
+            ? stepFieldFocusValues.description
+            : null;
+          if ((prior || '') === (value || '')) return;
           setSaveStatus('saving', 'Saving…');
           putStep(stepId, { description: value })
             .then(function (updated) {
               var s = state.steps.find(function (x) { return x.id === stepId; });
               if (s) s.description = updated.description;
               setSaveStatus('saved');
+              pushStepUndo({
+                type: 'edit-description',
+                apply: async function () {
+                  await putStep(stepId, { description: prior || null });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.description = prior || null;
+                  if (state.activeStepId === stepId && dom.stepDescription) {
+                    dom.stepDescription.value = prior || '';
+                  }
+                  return 'Undid: edited description';
+                },
+              });
             })
             .catch(function () { setSaveStatus('error', 'Description save failed'); });
         });
@@ -985,8 +1033,111 @@
   }
 
   function updateUndoRedoButtons() {
-    if (dom.undoBtn) dom.undoBtn.disabled = state.undoStack.length === 0;
+    if (dom.undoBtn) {
+      // The undo button reflects either stack — if either has content,
+      // Cmd/Ctrl+Z (and the button) will do *something*. Canvas undo
+      // wins when both are populated (see onUndoShortcut).
+      dom.undoBtn.disabled = state.undoStack.length === 0 &&
+        stepUndoStack.length === 0;
+    }
     if (dom.redoBtn) dom.redoBtn.disabled = state.redoStack.length === 0;
+  }
+
+  // ====================================================================
+  // 11b. STEP-LEVEL UNDO
+  // ====================================================================
+  //
+  // The canvas undo stack (`state.undoStack`, above) is per-step and gets
+  // wiped when the user switches steps. That's correct for canvas-object
+  // edits, but the user's "undo to all operations" intent reasonably
+  // includes step CRUD too. So we keep a *separate* page-level stack of
+  // inverse operations for: step add, step delete, step reorder, step
+  // title change, step description change.
+  //
+  // Design choice: a separate stack (rather than a unified mixed stack
+  // with a `scope: 'canvas' | 'step'` discriminator) keeps the diff small
+  // — the existing canvas-undo code stays untouched, and the new step
+  // ops never need to interleave with the canvas snapshots inside a
+  // single step. Cmd/Ctrl+Z runs canvas undo first; only when the canvas
+  // stack is empty does it fall back to step undo. This matches how most
+  // editors handle it — local edits get undone before "scene-level" ones.
+  //
+  // Entries are stored as { type, payload, label } where `payload` is
+  // whatever the inverse handler needs (an id + prior value, usually).
+  // We do NOT persist this stack to localStorage — replaying server
+  // mutations after a reload (or in another tab) is too risky.
+  //
+  // No redo for step-level ops in this iteration (not asked for; the
+  // existing Redo button only handles the canvas stack).
+
+  var stepUndoStack = [];
+  var STEP_UNDO_LIMIT = 50;
+
+  function pushStepUndo(entry) {
+    if (!entry || !entry.type || typeof entry.apply !== 'function') return;
+    stepUndoStack.push(entry);
+    if (stepUndoStack.length > STEP_UNDO_LIMIT) stepUndoStack.shift();
+    updateUndoRedoButtons();
+  }
+
+  async function popStepUndo() {
+    if (stepUndoStack.length === 0) return false;
+    var entry = stepUndoStack.pop();
+    updateUndoRedoButtons();
+    try {
+      var label = await entry.apply();
+      showUndoToast(label || ('Undid: ' + entry.type));
+    } catch (e) {
+      console.warn('Step undo failed', e);
+      setSaveStatus('error', "Undo failed");
+    }
+    return true;
+  }
+
+  // ====================================================================
+  // 11c. STEP-UNDO TOAST
+  // ====================================================================
+  //
+  // Brief bottom-centred snackbar that confirms a step-level undo. The
+  // change might be subtle (a description revert), so the user needs to
+  // see what happened. Auto-dismisses after ~2s.
+
+  var undoToastNode = null;
+  var undoToastTimer = null;
+
+  function ensureUndoToast() {
+    if (undoToastNode) return undoToastNode;
+    undoToastNode = document.createElement('div');
+    undoToastNode.className = 'ib-undo-toast';
+    undoToastNode.setAttribute('role', 'status');
+    undoToastNode.setAttribute('aria-live', 'polite');
+    document.body.appendChild(undoToastNode);
+    return undoToastNode;
+  }
+
+  function showUndoToast(msg) {
+    var node = ensureUndoToast();
+    node.innerHTML = '<i class="fas fa-undo"></i>' + escapeHtml(msg);
+    node.classList.add('is-visible');
+    if (undoToastTimer) clearTimeout(undoToastTimer);
+    undoToastTimer = setTimeout(function () {
+      node.classList.remove('is-visible');
+      undoToastTimer = null;
+    }, 2000);
+  }
+
+  // Shortcut entrypoint. Runs canvas undo first (more recent / more
+  // local); falls back to step undo when the canvas stack is empty.
+  function onUndoShortcut() {
+    if (state.undoStack.length > 0) {
+      onUndoClick();
+      return;
+    }
+    if (stepUndoStack.length > 0) {
+      popStepUndo();
+    }
+    // If both stacks are empty, the shortcut is a no-op — caller already
+    // preventDefault'd the keystroke so the browser doesn't intercept.
   }
 
   // ====================================================================
@@ -1794,6 +1945,7 @@
     var fromStep = state.steps.find(function (s) { return s.id === fromId; });
     var toStep = state.steps.find(function (s) { return s.id === toId; });
     if (!fromStep || !toStep) return;
+    var previousStepNumber = fromStep.step_number;
     setSaveStatus('saving', 'Reordering steps…');
     try {
       await putStep(fromId, { step_number: toStep.step_number });
@@ -1801,6 +1953,18 @@
       if (fresh && fresh.steps) state.steps = fresh.steps;
       renderFilmstrip();
       setSaveStatus('saved');
+      // Inverse: PUT step_number back to the previous value. The other
+      // steps' numbers get re-balanced by the server.
+      pushStepUndo({
+        type: 'reorder-step',
+        apply: async function () {
+          await putStep(fromId, { step_number: previousStepNumber });
+          var fresh2 = await fetchInstruction();
+          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          renderFilmstrip();
+          return 'Undid: reordered step';
+        },
+      });
     } catch (_) {
       setSaveStatus('error', 'Reorder failed');
     }
@@ -1843,8 +2007,32 @@
       } else {
         state.steps.push(step);
       }
+      var previousActiveId = state.activeStepId;
       await switchToStep(step.id);
       setSaveStatus('saved');
+      // Record inverse: delete this newly-created step + restore the
+      // previously-active step.
+      pushStepUndo({
+        type: 'add-step',
+        apply: async function () {
+          try {
+            await deleteStep(step.id);
+            var fresh2 = await fetchInstruction();
+            if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+            else state.steps = state.steps.filter(function (s) { return s.id !== step.id; });
+            if (previousActiveId && state.steps.some(function (s) { return s.id === previousActiveId; })) {
+              await switchToStep(previousActiveId);
+            } else if (state.steps.length > 0) {
+              await switchToStep(state.steps[0].id);
+            }
+            renderFilmstrip();
+            return 'Undid: added step';
+          } catch (err) {
+            console.warn('Undo add-step failed', err);
+            throw err;
+          }
+        },
+      });
     } catch (e) {
       setSaveStatus('error', 'Add step failed');
     } finally {
@@ -3328,6 +3516,8 @@
       '<span class="ib-image-toolbar-sep"></span>' +
       '<button type="button" class="ib-image-toolbar-btn" data-img-action="rotate"' +
       '        title="Rotate 90&deg;"><i class="fas fa-rotate-right"></i></button>' +
+      '<button type="button" class="ib-image-toolbar-btn" data-img-action="aspect-reset"' +
+      '        title="Reset aspect ratio"><i class="fas fa-expand"></i></button>' +
       '<button type="button" class="ib-image-toolbar-btn is-danger" data-img-action="delete"' +
       '        title="Delete image"><i class="fas fa-trash"></i></button>' +
       '<span class="ib-image-toolbar-progress" data-img-progress hidden></span>';
@@ -3372,12 +3562,34 @@
     var greyBtn = dom.imageToolbar.querySelector('[data-img-action="greyscale"]');
     var rectBtn = dom.imageToolbar.querySelector('[data-img-action="crop-rect"]');
     var circleBtn = dom.imageToolbar.querySelector('[data-img-action="crop-circle"]');
+    var aspectBtn = dom.imageToolbar.querySelector('[data-img-action="aspect-reset"]');
     if (outlineBtn) outlineBtn.classList.toggle('is-active', hasOutline);
     if (greyBtn) greyBtn.classList.toggle('is-active', hasGrey);
     if (rectBtn) rectBtn.classList.toggle('is-active',
       hasCrop && img.clipPath && img.clipPath.type === 'rect');
     if (circleBtn) circleBtn.classList.toggle('is-active',
       hasCrop && img.clipPath && img.clipPath.type === 'circle');
+    // Aspect-reset needs the underlying HTMLImageElement's natural
+    // dimensions; if the image hasn't finished loading or is cross-origin
+    // tainted we can't read them, so disable the button.
+    if (aspectBtn) {
+      var dims = imageNaturalDims(img);
+      aspectBtn.disabled = !dims;
+      aspectBtn.classList.toggle('is-disabled', !dims);
+    }
+  }
+
+  // Returns { w, h } from the underlying HTMLImageElement, or null if
+  // the natural dimensions can't be read (still loading, cross-origin
+  // without anonymous CORS, etc.).
+  function imageNaturalDims(img) {
+    if (!img) return null;
+    var el = img._originalElement || img._element;
+    if (!el) return null;
+    var nw = el.naturalWidth || 0;
+    var nh = el.naturalHeight || 0;
+    if (!nw || !nh) return null;
+    return { w: nw, h: nh };
   }
 
   function positionImageToolbar(img) {
@@ -3446,6 +3658,32 @@
       positionImageToolbar(img);
       return;
     }
+    if (action === 'aspect-reset') {
+      // Reset aspect ratio leaves the image's *width* on screen unchanged
+      // and adjusts the height to restore the natural w/h ratio, undoing
+      // any uneven stretch the user applied via the HUD W/H or by dragging
+      // a side handle. Hidden / disabled for the locked background.
+      if (img.ibRole === 'background') return;
+      var nat = imageNaturalDims(img);
+      if (!nat) {
+        setImageToolbarProgress("Image dimensions not available — try again.", 'error');
+        setTimeout(function () { setImageToolbarProgress(null); }, 3000);
+        return;
+      }
+      // For Fabric Images whose width/height equal the natural
+      // dimensions, this collapses to scaleY = scaleX. The general form
+      // here handles the rare case where Fabric's `width`/`height` were
+      // overridden (e.g. by a crop).
+      var sx = img.scaleX || 1;
+      var newScaleY = sx * (nat.w / (img.width || nat.w)) *
+        ((img.height || nat.h) / nat.h);
+      img.set('scaleY', newScaleY);
+      img.setCoords();
+      state.canvas.requestRenderAll();
+      state.canvas.fire('object:modified', { target: img });
+      positionImageToolbar(img);
+      return;
+    }
     if (action === 'crop-rect') {
       // Default to "tap to confirm full bounds" — apply a rect clipPath
       // matching the image's intrinsic size. Re-click removes it.
@@ -3507,6 +3745,9 @@
       }
       try {
         var p = img.applyFilters();
+        // Fabric doesn't auto-fire object:modified after applyFilters —
+        // emit so undo + autosave snapshot the new (greyed / un-greyed)
+        // state. v6 returns a promise; v5 was synchronous; we tolerate both.
         if (p && typeof p.then === 'function') {
           p.then(function () {
             state.canvas.requestRenderAll();
@@ -3611,6 +3852,8 @@
       }
       img.dirty = true;
       state.canvas.requestRenderAll();
+      // Fabric doesn't auto-fire object:modified after async setSrc — emit
+      // so undo + autosave snapshot the new state.
       state.canvas.fire('object:modified', { target: img });
       setImageToolbarProgress('Background removed', null);
       setTimeout(function () { setImageToolbarProgress(null); }, 1500);
@@ -3647,7 +3890,9 @@
     if (dom.removeImageBtn) dom.removeImageBtn.addEventListener('click', onRemoveImageClick);
     if (dom.addStlBtn) dom.addStlBtn.addEventListener('click', onAddStlClick);
     if (dom.deleteSelected) dom.deleteSelected.addEventListener('click', onDeleteSelected);
-    if (dom.undoBtn) dom.undoBtn.addEventListener('click', onUndoClick);
+    // The Undo button mirrors Cmd/Ctrl+Z: canvas stack first, then
+    // step-level. Redo stays canvas-only (no redo for step ops this PR).
+    if (dom.undoBtn) dom.undoBtn.addEventListener('click', onUndoShortcut);
     if (dom.redoBtn) dom.redoBtn.addEventListener('click', onRedoClick);
 
     if (dom.rotation) dom.rotation.addEventListener('change', onRotationInputChange);
@@ -3658,8 +3903,10 @@
     if (dom.sendBackward) dom.sendBackward.addEventListener('click', function () { arrangeActive('backward'); });
     if (dom.sendToBack) dom.sendToBack.addEventListener('click', function () { arrangeActive('back'); });
 
-    // Keyboard shortcuts: Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z = redo,
-    // Delete/Backspace = delete selected.
+    // Keyboard shortcuts: Cmd/Ctrl+Z = undo (canvas first, then
+    // step-level), Cmd/Ctrl+Shift+Z = redo (canvas-only — step-level
+    // redo isn't supported this iteration), Delete/Backspace = delete
+    // selected.
     document.addEventListener('keydown', function (e) {
       var tag = (e.target && e.target.tagName) || '';
       var typing = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT');
@@ -3669,7 +3916,8 @@
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
         if (typing || editingText) return;
         e.preventDefault();
-        if (e.shiftKey) onRedoClick(); else onUndoClick();
+        if (e.shiftKey) onRedoClick();
+        else onUndoShortcut();
       } else if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && !editingText) {
         if (state.canvas && state.canvas.getActiveObject()) {
           e.preventDefault();
@@ -3694,8 +3942,11 @@
       if (stroke) active.set({ strokeWidth: stroke });
     }
     state.canvas.requestRenderAll();
-    scheduleAutosave();
-    scheduleSnapshot();
+    // Fire object:modified so the change goes through the canonical
+    // change-event pipe (snapshot + autosave). Without this the audit
+    // would have two divergent paths for "object mutated", which makes
+    // future maintenance easier to get wrong.
+    state.canvas.fire('object:modified', { target: active });
   }
 
   // ====================================================================
