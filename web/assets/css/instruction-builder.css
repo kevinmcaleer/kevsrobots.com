@@ -16,10 +16,15 @@
 
 /* Site-level: hide the footer/socials on this workspace so the builder
    uses the full viewport. Site header / nav stay so the user can get
-   out via normal navigation. */
-body.instruction-builder-page #footer,
-body.instruction-builder-page .socials-bar,
-body.instruction-builder-page footer {
+   out via normal navigation.
+
+   IMPORTANT: select only direct children of body — the filmstrip is a
+   <footer class="ib-filmstrip"> nested inside .ib-workspace, and a bare
+   `body footer` selector would hide it too (this regression cost us
+   half an afternoon on Nov 24 2025). */
+body.instruction-builder-page > #footer,
+body.instruction-builder-page > .socials-bar,
+body.instruction-builder-page > footer {
   display: none !important;
 }
 
