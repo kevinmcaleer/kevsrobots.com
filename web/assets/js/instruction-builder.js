@@ -923,6 +923,10 @@
   async function flushCanvasSave(isRetry) {
     if (!state.activeStepId) return;
     var json = JSON.stringify(serializeCanvas());
+    // Keep the in-memory step copy in sync so the filmstrip's
+    // background-thumb regen reads fresh data.
+    var activeStep = state.steps.find(function (s) { return s.id === state.activeStepId; });
+    if (activeStep) activeStep.canvas_json = json;
     setSaveStatus('saving', 'Saving…');
     try {
       await putStep(state.activeStepId, { canvas_json: json });
@@ -931,6 +935,9 @@
       // have shifted; recompute so the ★ badge updates.
       recomputeBackgroundPhotoIds();
       renderPhotosGrid();
+      // Refresh the active step's filmstrip thumb so it shows what's
+      // actually on the canvas.
+      refreshActiveStepThumb();
     } catch (e) {
       setSaveStatus('error', isRetry ? 'Save failed again' : 'Save failed');
     }
@@ -3080,6 +3087,11 @@
     );
   }
 
+  // Step-thumbnail cache: stepId → dataURL (or null = "rendered, empty").
+  // Filled lazily by renderStepThumbsLater(). renderFilmstrip uses it to
+  // paint a real mini canvas preview into each tile's .preview slot.
+  if (!state.stepThumbs) state.stepThumbs = {};
+
   function renderFilmstrip() {
     if (!dom.filmstripTrack) return;
     // The delete control is disabled (still rendered) on the only-step
@@ -3103,6 +3115,17 @@
         '<i class="fas fa-xmark"></i>' +
         '</button>'
       );
+      // Preview content: either a cached thumbnail dataURL drawn as a
+      // background image, or a step-type icon + fallback label.
+      var thumb = state.stepThumbs[s.id];
+      var previewInner;
+      var previewStyle = '';
+      if (thumb) {
+        previewStyle = ' style="background-image:url(\'' + thumb + '\');"';
+        previewInner = '';
+      } else {
+        previewInner = '<span>step ' + s.step_number + '</span>';
+      }
       return (
         '<div class="ib-step-tile' + (isActive ? ' is-active' : '') + '"' +
         '     draggable="true"' +
@@ -3110,10 +3133,10 @@
         '  <div class="ib-step-tile-num">' + s.step_number + '</div>' +
         badge +
         deleteBtn +
-        '  <div class="ib-step-tile-preview">' +
-        '    <span>step ' + s.step_number + '</span>' +
-        '  </div>' +
-        '  <div class="ib-step-tile-caption" title="' + escapeHtml(caption) + '">' +
+        '  <div class="ib-step-tile-preview' + (thumb ? ' has-thumb' : '') + '"' +
+              previewStyle + '>' + previewInner + '</div>' +
+        '  <div class="ib-step-tile-caption" title="' + escapeHtml(caption) +
+              '" data-step-id="' + s.id + '">' +
                 escapeHtml(caption) +
         '</div>' +
         '</div>'
@@ -3180,6 +3203,214 @@
         btn.addEventListener('mousedown', function (ev) { ev.stopPropagation(); });
         btn.addEventListener('dragstart', function (ev) { ev.preventDefault(); ev.stopPropagation(); });
       });
+
+    // Inline rename: double-click the caption to edit. Saves on blur or
+    // Enter; Escape reverts. Single-click on the tile body still
+    // switches steps via the tile-level click handler above.
+    Array.prototype.forEach.call(
+      dom.filmstripTrack.querySelectorAll('.ib-step-tile-caption'),
+      function (cap) {
+        cap.addEventListener('dblclick', function (ev) {
+          ev.stopPropagation();
+          ev.preventDefault();
+          startStepCaptionEdit(cap);
+        });
+      });
+  }
+
+  // Replace a caption span with an inline input, save on blur / Enter,
+  // cancel on Escape. Mirrors the title autosave from the right-side
+  // settings pane, just at the filmstrip surface.
+  function startStepCaptionEdit(captionEl) {
+    var stepId = parseInt(captionEl.dataset.stepId, 10);
+    if (!stepId) return;
+    var step = state.steps.find(function (s) { return s.id === stepId; });
+    if (!step) return;
+    var original = (step.title && step.title.trim()) ? step.title : '';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'ib-step-tile-caption-input';
+    input.value = original;
+    input.placeholder = 'Untitled';
+    input.maxLength = 200;
+    captionEl.replaceWith(input);
+    input.focus();
+    input.select();
+
+    var done = false;
+    function finish(saveIt) {
+      if (done) return;
+      done = true;
+      var next = saveIt ? input.value.trim() : original;
+      // Restore the span before any await — keeps the strip stable.
+      var span = document.createElement('div');
+      span.className = 'ib-step-tile-caption';
+      span.dataset.stepId = String(stepId);
+      span.title = next || 'Untitled';
+      span.textContent = next || 'Untitled';
+      span.addEventListener('dblclick', function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        startStepCaptionEdit(span);
+      });
+      input.replaceWith(span);
+      if (saveIt && next !== original) {
+        renameStepFromFilmstrip(step, next);
+      }
+    }
+    input.addEventListener('blur', function () { finish(true); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+      else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    });
+    // Clicking the input shouldn't switch steps.
+    input.addEventListener('click', function (ev) { ev.stopPropagation(); });
+    input.addEventListener('mousedown', function (ev) { ev.stopPropagation(); });
+  }
+
+  async function renameStepFromFilmstrip(step, newTitle) {
+    var oldTitle = step.title || '';
+    step.title = newTitle;
+    setSaveStatus('saving', 'Saving title…');
+    try {
+      await putStep(step.id, { title: newTitle });
+      setSaveStatus('saved');
+      // If this is the active step, sync the right-side settings input
+      // so it doesn't show the stale value.
+      if (step.id === state.activeStepId && dom.stepTitle) {
+        dom.stepTitle.value = newTitle;
+      }
+      pushStepUndo({
+        type: 'rename-step',
+        label: 'renamed step',
+        apply: function () {
+          step.title = oldTitle;
+          if (step.id === state.activeStepId && dom.stepTitle) dom.stepTitle.value = oldTitle;
+          renderFilmstrip();
+          return putStep(step.id, { title: oldTitle });
+        },
+        invert: function () {
+          step.title = newTitle;
+          if (step.id === state.activeStepId && dom.stepTitle) dom.stepTitle.value = newTitle;
+          renderFilmstrip();
+          return putStep(step.id, { title: newTitle });
+        },
+      });
+    } catch (_) {
+      step.title = oldTitle;
+      setSaveStatus('error', 'Title save failed');
+    }
+    renderFilmstrip();
+  }
+
+  // ---- Filmstrip step-thumbnail generator ------------------------------
+  //
+  // Renders each step's canvas_json to a tiny PNG via an off-screen
+  // fabric.StaticCanvas and stashes the dataURL in state.stepThumbs.
+  // Re-renders happen on save (active step) and on initial filmstrip
+  // paint.
+
+  var STEP_THUMB_W = 140;
+  var STEP_THUMB_H = Math.round(STEP_THUMB_W * (CANVAS_H / CANVAS_W));
+  var _stepThumbCanvas = null;
+  var _stepThumbBusy = false;
+  var _stepThumbQueued = false;
+
+  function _ensureThumbCanvas() {
+    if (_stepThumbCanvas) return _stepThumbCanvas;
+    if (typeof fabric === 'undefined' || !fabric.StaticCanvas) return null;
+    _stepThumbCanvas = new fabric.StaticCanvas(null, {
+      width: CANVAS_W,
+      height: CANVAS_H,
+      enableRetinaScaling: false,
+    });
+    _stepThumbCanvas.backgroundColor = '#ffffff';
+    return _stepThumbCanvas;
+  }
+
+  function _renderOneStepThumb(canvasJsonString) {
+    return new Promise(function (resolve) {
+      var c = _ensureThumbCanvas();
+      if (!c) return resolve(null);
+      if (!canvasJsonString) {
+        c.clear();
+        c.backgroundColor = '#ffffff';
+        c.renderAll();
+        try {
+          resolve(c.toDataURL({
+            format: 'png',
+            multiplier: STEP_THUMB_W / CANVAS_W,
+          }));
+        } catch (_) { resolve(null); }
+        return;
+      }
+      try {
+        c.loadFromJSON(canvasJsonString, function () {
+          c.backgroundColor = '#ffffff';
+          c.renderAll();
+          try {
+            resolve(c.toDataURL({
+              format: 'png',
+              multiplier: STEP_THUMB_W / CANVAS_W,
+            }));
+          } catch (_) { resolve(null); }
+        });
+      } catch (_) { resolve(null); }
+    });
+  }
+
+  async function rebuildAllStepThumbs() {
+    if (_stepThumbBusy) { _stepThumbQueued = true; return; }
+    _stepThumbBusy = true;
+    try {
+      for (var i = 0; i < state.steps.length; i++) {
+        var s = state.steps[i];
+        // For non-photo/blank steps we don't have a canvas to render —
+        // fall back to null (tile shows the type icon + label).
+        var t = s.step_type || 'photo';
+        if (t !== 'photo' && t !== 'blank') {
+          state.stepThumbs[s.id] = null;
+          continue;
+        }
+        // Active step's most recent canvas_json may be ahead of what's
+        // on the server — but autosave normally flushes before this
+        // runs, so canvas_json is good enough. We refresh the active
+        // step explicitly after each save via refreshActiveStepThumb.
+        var url = await _renderOneStepThumb(s.canvas_json);
+        state.stepThumbs[s.id] = url;
+      }
+      renderFilmstrip();
+    } finally {
+      _stepThumbBusy = false;
+      if (_stepThumbQueued) { _stepThumbQueued = false; rebuildAllStepThumbs(); }
+    }
+  }
+
+  async function refreshActiveStepThumb() {
+    if (!state.canvas || !state.activeStepId) return;
+    if (typeof fabric === 'undefined' || !fabric.StaticCanvas) return;
+    try {
+      var json = JSON.stringify(serializeCanvas());
+      var url = await _renderOneStepThumb(json);
+      state.stepThumbs[state.activeStepId] = url;
+      // Update only the active step's preview slot in place — avoids a
+      // full filmstrip re-render with all the event-handler rebinding.
+      var tile = dom.filmstripTrack &&
+        dom.filmstripTrack.querySelector('.ib-step-tile[data-step-id="' + state.activeStepId + '"]');
+      if (tile) {
+        var preview = tile.querySelector('.ib-step-tile-preview');
+        if (preview) {
+          if (url) {
+            preview.style.backgroundImage = "url('" + url + "')";
+            preview.classList.add('has-thumb');
+            preview.innerHTML = '';
+          } else {
+            preview.style.backgroundImage = '';
+            preview.classList.remove('has-thumb');
+          }
+        }
+      }
+    } catch (_) { /* swallow — non-fatal */ }
   }
 
   function updateFilmstripToggleLabel() {
@@ -4926,6 +5157,14 @@
       '        title="Reset aspect ratio"><i class="fas fa-expand"></i></button>' +
       '<button type="button" class="ib-image-toolbar-btn is-danger" data-img-action="delete"' +
       '        title="Delete image"><i class="fas fa-trash"></i></button>' +
+      // Crop-mode-only confirm/cancel — hidden by default; revealed by
+      // the .is-crop-mode class on the toolbar.
+      '<button type="button" class="ib-image-toolbar-btn is-crop-only is-confirm"' +
+      '        data-img-action="crop-apply" title="Apply crop (Enter)">' +
+      '<i class="fas fa-check"></i></button>' +
+      '<button type="button" class="ib-image-toolbar-btn is-crop-only is-danger"' +
+      '        data-img-action="crop-cancel" title="Cancel crop (Esc)">' +
+      '<i class="fas fa-xmark"></i></button>' +
       '<span class="ib-image-toolbar-progress" data-img-progress hidden></span>';
     dom.imageToolbar.dataset.built = '1';
 
@@ -4983,6 +5222,104 @@
       aspectBtn.disabled = !dims;
       aspectBtn.classList.toggle('is-disabled', !dims);
     }
+  }
+
+  // ---- Interactive crop ------------------------------------------------
+  //
+  // Enter crop mode: the active image becomes non-selectable, a Fabric
+  // Rect overlay with black corner handles appears over it, and the
+  // toolbar swaps to Apply / Cancel. Dragging the rect handles defines
+  // the crop region; Apply sets the image's clipPath to that region;
+  // Cancel discards. Esc / Enter shortcuts mirror the buttons.
+  //
+  // The rect's bounds are in canvas-pixel space; clipPath lives in the
+  // image's local coordinate space (relative to its centre, in the
+  // image's natural-pixel units), so we divide by scaleX / scaleY when
+  // committing.
+
+  function enterCropMode(imgObj) {
+    if (!state.canvas || !imgObj) return;
+    if (state.cropping) return;
+    var bound = imgObj.getBoundingRect(true, true);  // canvas coords
+    var overlay = new fabric.Rect({
+      left: bound.left,
+      top: bound.top,
+      width: bound.width,
+      height: bound.height,
+      originX: 'left',
+      originY: 'top',
+      fill: 'rgba(255,255,255,0)',
+      stroke: '#000',
+      strokeWidth: 1,
+      strokeUniform: true,
+      strokeDashArray: [5, 4],
+      cornerColor: '#000',
+      cornerStrokeColor: '#000',
+      transparentCorners: false,
+      cornerSize: 10,
+      borderColor: '#000',
+      borderDashArray: [5, 4],
+      hasRotatingPoint: false,
+      lockRotation: true,
+      lockScalingFlip: true,
+      // Tag so it survives Fabric mutations / wouldn't be persisted in
+      // canvas_json on the off-chance the toJSON allowlist catches it.
+      ibRole: 'crop-overlay',
+    });
+    state.cropping = { image: imgObj, overlay: overlay };
+    imgObj.selectable = false;
+    imgObj.evented = false;
+    state.canvas.add(overlay);
+    state.canvas.setActiveObject(overlay);
+    if (dom.imageToolbar) {
+      dom.imageToolbar.classList.add('is-crop-mode');
+      positionImageToolbar(overlay);
+    }
+    state.canvas.requestRenderAll();
+  }
+
+  function exitCropMode(apply) {
+    if (!state.cropping) return;
+    var imgObj = state.cropping.image;
+    var overlay = state.cropping.overlay;
+
+    if (apply) {
+      var oBound = overlay.getBoundingRect(true, true);  // canvas coords
+      var sx = imgObj.scaleX || 1;
+      var sy = imgObj.scaleY || 1;
+      // imgObj has originX/Y = 'center', so .left / .top is the image's
+      // visual centre on the canvas.
+      var oCx = oBound.left + oBound.width / 2;
+      var oCy = oBound.top + oBound.height / 2;
+      var localCx = (oCx - imgObj.left) / sx;
+      var localCy = (oCy - imgObj.top) / sy;
+      var localW = oBound.width / sx;
+      var localH = oBound.height / sy;
+      imgObj.set('clipPath', new fabric.Rect({
+        left: localCx,
+        top: localCy,
+        width: localW,
+        height: localH,
+        originX: 'center',
+        originY: 'center',
+      }));
+      imgObj.dirty = true;
+    }
+
+    state.canvas.remove(overlay);
+    imgObj.selectable = true;
+    imgObj.evented = true;
+    state.canvas.setActiveObject(imgObj);
+    state.cropping = null;
+    if (dom.imageToolbar) {
+      dom.imageToolbar.classList.remove('is-crop-mode');
+    }
+    state.canvas.requestRenderAll();
+    if (apply) {
+      state.canvas.fire('object:modified', { target: imgObj });
+    }
+    reflectImageToolbarState(imgObj);
+    positionImageToolbar(imgObj);
   }
 
   // Returns { w, h } from the underlying HTMLImageElement, or null if
@@ -5091,22 +5428,27 @@
       return;
     }
     if (action === 'crop-rect') {
-      // Default to "tap to confirm full bounds" — apply a rect clipPath
-      // matching the image's intrinsic size. Re-click removes it.
+      // If a rect clip is already applied, clicking removes it.
+      // Otherwise enter interactive crop mode: a draggable overlay
+      // appears over the image, the image becomes non-selectable, and
+      // the toolbar swaps to Apply / Cancel.
+      if (state.cropping) return;
       if (img.clipPath && img.clipPath.type === 'rect') {
         img.set('clipPath', null);
-      } else {
-        img.set('clipPath', new fabric.Rect({
-          left: 0, top: 0,
-          width: img.width,
-          height: img.height,
-          originX: 'center',
-          originY: 'center',
-        }));
+        state.canvas.requestRenderAll();
+        state.canvas.fire('object:modified', { target: img });
+        reflectImageToolbarState(img);
+        return;
       }
-      state.canvas.requestRenderAll();
-      state.canvas.fire('object:modified', { target: img });
-      reflectImageToolbarState(img);
+      enterCropMode(img);
+      return;
+    }
+    if (action === 'crop-apply') {
+      exitCropMode(true);
+      return;
+    }
+    if (action === 'crop-cancel') {
+      exitCropMode(false);
       return;
     }
     if (action === 'crop-circle') {
@@ -5320,6 +5662,12 @@
       var editingText = state.canvas && state.canvas.getActiveObject() &&
         state.canvas.getActiveObject().isType && state.canvas.getActiveObject().isType('i-text') &&
         state.canvas.getActiveObject().isEditing;
+      // Crop mode commits with Enter and bails with Escape. Highest
+      // priority so they don't trigger an Undo or step-rename instead.
+      if (state.cropping && !typing && !editingText) {
+        if (e.key === 'Enter') { e.preventDefault(); exitCropMode(true); return; }
+        if (e.key === 'Escape') { e.preventDefault(); exitCropMode(false); return; }
+      }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
         if (typing || editingText) return;
         e.preventDefault();
@@ -5513,6 +5861,11 @@
     if (dom.stepDescription) dom.stepDescription.value = state.steps[0].description || '';
     renderFilmstrip();
     await loadCanvasFromStep(state.steps[0]);
+    // Generate filmstrip thumbnails for every step in the background —
+    // doesn't block the canvas opening, and updates each tile when the
+    // off-screen render completes. Bypasses if Fabric isn't loaded yet
+    // (impossible at this point, but defensive).
+    setTimeout(function () { rebuildAllStepThumbs(); }, 0);
     // B3: apply the initial step's type to the picker pane + canvas area.
     syncStepTypePane();
 

@@ -1066,6 +1066,21 @@ body.instruction-builder-page {
   opacity: 0.7;
 }
 
+/* Crop-mode toolbar swap: regular buttons + separators hide, crop-only
+   Apply / Cancel buttons appear. */
+.ib-image-toolbar-btn.is-crop-only { display: none; }
+.ib-image-toolbar.is-crop-mode .ib-image-toolbar-btn:not(.is-crop-only),
+.ib-image-toolbar.is-crop-mode .ib-image-toolbar-sep { display: none; }
+.ib-image-toolbar.is-crop-mode .ib-image-toolbar-btn.is-crop-only {
+  display: inline-flex;
+}
+.ib-image-toolbar-btn.is-confirm {
+  background: #198754;
+  color: #fff;
+  border: 0;
+}
+.ib-image-toolbar-btn.is-confirm:hover { background: #146c43; color: #fff; }
+
 .ib-image-toolbar-sep {
   width: 1px;
   height: 18px;
@@ -1174,7 +1189,10 @@ body.instruction-builder-page {
   background: #fff;
 }
 .ib-step-tile.is-active {
-  border-color: var(--bs-primary, #c8312a);
+  /* Hardcoded brand red — Bootstrap's --bs-primary resolves to blue
+     site-wide, which made the active tile pick up a blue border / num
+     bubble that looked off-brand against the rest of the editor. */
+  border-color: #c8312a;
   background: #fff;
   box-shadow: 2px 2px 0 rgba(200, 49, 42, 0.25);
 }
@@ -1200,9 +1218,9 @@ body.instruction-builder-page {
   color: #495057;
 }
 .ib-step-tile.is-active .ib-step-tile-num {
-  background: var(--bs-primary, #c8312a);
+  background: #c8312a;
   color: #fff;
-  border-color: var(--bs-primary, #c8312a);
+  border-color: #c8312a;
 }
 .ib-step-tile-preview {
   flex: 1;
@@ -1214,6 +1232,14 @@ body.instruction-builder-page {
   justify-content: center;
   color: #adb5bd;
   font-size: 0.76rem;
+  /* When the JS thumbnail generator drops a dataURL in here as a
+     background-image, fit it cleanly inside the preview slot. */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.ib-step-tile-preview.has-thumb {
+  background-color: #fff;
 }
 .ib-step-tile-caption {
   font-size: 0.72rem;
@@ -1221,6 +1247,18 @@ body.instruction-builder-page {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: text;
+}
+.ib-step-tile-caption-input {
+  width: 100%;
+  font-size: 0.72rem;
+  padding: 1px 4px;
+  border: 1px solid #c8312a;
+  border-radius: 3px;
+  background: #fff;
+  color: #212529;
+  outline: none;
+  box-sizing: border-box;
 }
 
 .ib-filmstrip-add {
@@ -1694,9 +1732,10 @@ body.instruction-builder-page {
   position: absolute;
   top: 4px;
   right: 26px;  /* badge takes right:4..22, gap 4 → start here */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  /* Block + text-align: center + line-height-matches-height is the
+     reliable centring pattern for FA glyphs inside a small button. */
+  display: block;
+  text-align: center;
   width: 18px;
   height: 18px;
   padding: 0;
@@ -1704,12 +1743,16 @@ body.instruction-builder-page {
   border: 1px solid #dee2e6;
   border-radius: 999px;
   color: #6c757d;
-  font-size: 0.65rem;
-  line-height: 1;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.1s, background 0.1s, color 0.1s, border-color 0.1s;
   z-index: 2;
+}
+.ib-step-tile-delete i {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 10px;
+  line-height: 16px;  /* button = 18 - 2 (border) = 16 inner */
 }
 /* Tiles without a type badge (step_type=blank) should still position the
    delete control at the visual top-right rather than awkwardly inset.
