@@ -222,6 +222,29 @@ body.schematic-editor-page > .container-fluid {
 .se-symbol-meta { display: flex; flex-direction: column; line-height: 1.2; }
 .se-symbol-name { font-weight: 500; }
 .se-symbol-sub { font-size: 0.72rem; }
+
+/* "Custom" badge — appended to a symbol-item name when the entry
+   came from /api/projects/{id}/symbols (i.e. designed in the Symbol
+   Designer). Distinguishes user-designed symbols from the built-in
+   stub library at a glance. */
+.se-symbol-item.is-custom .se-symbol-thumb {
+  background: rgba(200, 49, 42, 0.08);
+  color: var(--se-brand-red);
+  border-color: rgba(200, 49, 42, 0.25);
+}
+.se-symbol-custom-badge {
+  display: inline-block;
+  background: var(--se-brand-red);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
 .se-tools-secondary-btn {
   width: 100%;
   background: transparent;

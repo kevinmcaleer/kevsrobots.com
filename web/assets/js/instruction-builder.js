@@ -104,6 +104,12 @@
     bomItemsLoaded: false,    // true once a successful fetch has populated bomItems
     bomPartAssets: {},        // part_id -> Asset[] (derived from /api/parts/{slug})
     bomPartAssetsPending: {}, // part_id -> Promise (de-dupe in-flight fetches)
+    // Symbol Designer integration: user-designed symbols (one row per
+    // /api/projects/{id}/symbols entry). When a symbol's bom_item_id
+    // matches a BOM row, the symbol surfaces as a `⌗` chip in that
+    // row's asset drawer. Loaded once alongside the BOM list.
+    projectSymbols: [],
+    projectSymbolsLoaded: false,
   };
 
   // Camera capture modal — built lazily on first open.
@@ -2082,8 +2088,124 @@
         // in the schema, this can branch on `assetId` and place an
         // asset-typed Fabric object instead of a generic image.
         await dropPhotosOnCanvas([{ id: null, src: payload.src }], e);
+      } else if (payload.kind === 'symbol' && payload.symbolId) {
+        // Symbol Designer integration: rasterise the symbol_data off-
+        // screen and drop the resulting PNG dataURL onto the canvas.
+        // The drop behaves exactly like any other asset image from
+        // there — selectable, resizable, deletable.
+        var symSrc = await rasteriseSymbolToDataUrl(payload.symbolId);
+        if (symSrc) {
+          await dropPhotosOnCanvas([{ id: null, src: symSrc }], e);
+        }
       }
     });
+  }
+
+  // Off-screen Fabric canvas → PNG dataURL. Mirrors the visual idiom of
+  // the schematic editor's symbol rendering (body rect + sticks +
+  // labels) but doesn't import the editor module — duplicating a
+  // ~50-line render is cheaper than coupling the two pages. Same idea
+  // the slideshow viewer uses for its render-to-png snapshots.
+  async function rasteriseSymbolToDataUrl(symbolId) {
+    var row = (state.projectSymbols || []).find(function (s) {
+      return s && s.id === symbolId;
+    });
+    if (!row || !row.symbol_data) return null;
+    var doc;
+    try { doc = JSON.parse(row.symbol_data); } catch (_) { return null; }
+    if (!doc || typeof doc !== 'object') return null;
+    var shapes = Array.isArray(doc.bodyShapes) ? doc.bodyShapes : [];
+    var pins = Array.isArray(doc.pins) ? doc.pins : [];
+    // Bounding box (centred coords) — with generous padding so labels
+    // and pin sticks don't get clipped.
+    var xs = [], ys = [];
+    pins.forEach(function (p) { xs.push(p.x || 0); ys.push(p.y || 0); });
+    shapes.forEach(function (s) {
+      if (s.kind === 'rect') {
+        xs.push(s.x); xs.push(s.x + s.w);
+        ys.push(s.y); ys.push(s.y + s.h);
+      } else if (s.kind === 'line') {
+        xs.push(s.x1); xs.push(s.x2);
+        ys.push(s.y1); ys.push(s.y2);
+      }
+    });
+    if (xs.length === 0) { xs = [-32, 32]; ys = [-24, 24]; }
+    var pad = 32;
+    var minX = Math.min.apply(null, xs) - pad;
+    var minY = Math.min.apply(null, ys) - pad;
+    var maxX = Math.max.apply(null, xs) + pad;
+    var maxY = Math.max.apply(null, ys) + pad;
+    var W = Math.max(maxX - minX, 64);
+    var H = Math.max(maxY - minY, 64);
+    var off = document.createElement('canvas');
+    off.width = W;
+    off.height = H;
+    var ctx = off.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+    // Body rect — bounding box of shapes (so the symbol reads as a
+    // single "chip"). Light stroke, white fill.
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 1.5;
+    ctx.fillStyle = '#ffffff';
+    // Body backdrop — uses the *unpadded* bounding box so the white
+    // fill sits behind shapes but not behind labels / pin sticks (those
+    // extend into the padded margin around the body).
+    var sMinX = Math.min.apply(null, xs);
+    var sMinY = Math.min.apply(null, ys);
+    var sMaxX = Math.max.apply(null, xs);
+    var sMaxY = Math.max.apply(null, ys);
+    ctx.fillRect(sMinX - minX, sMinY - minY,
+                 sMaxX - sMinX, sMaxY - sMinY);
+    ctx.strokeRect(sMinX - minX, sMinY - minY,
+                   sMaxX - sMinX, sMaxY - sMinY);
+    // Body shapes
+    shapes.forEach(function (s) {
+      if (s.kind === 'rect') {
+        ctx.strokeRect(s.x - minX, s.y - minY, s.w, s.h);
+      } else if (s.kind === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(s.x1 - minX, s.y1 - minY);
+        ctx.lineTo(s.x2 - minX, s.y2 - minY);
+        ctx.stroke();
+      }
+    });
+    // Pins: short stick + label.
+    ctx.font = '11px system-ui, -apple-system, "Segoe UI", sans-serif';
+    ctx.fillStyle = '#222';
+    pins.forEach(function (p) {
+      var px = p.x - minX, py = p.y - minY;
+      var stickLen = 12;
+      var ex = px, ey = py;
+      switch (p.side) {
+        case 'left':   ex = px + stickLen; break;
+        case 'right':  ex = px - stickLen; break;
+        case 'top':    ey = py + stickLen; break;
+        case 'bottom': ey = py - stickLen; break;
+      }
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+      // Dot
+      ctx.beginPath();
+      ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.stroke();
+      // Label
+      var label = (p.number || '') + (p.name ? ' ' + p.name : '');
+      if (label.trim()) {
+        ctx.fillStyle = '#222';
+        ctx.textBaseline = 'middle';
+        switch (p.side) {
+          case 'left':   ctx.textAlign = 'left';   ctx.fillText(label, ex + 3, ey); break;
+          case 'right':  ctx.textAlign = 'right';  ctx.fillText(label, ex - 3, ey); break;
+          case 'top':    ctx.textAlign = 'center'; ctx.fillText(label, ex, ey + 8); break;
+          case 'bottom': ctx.textAlign = 'center'; ctx.fillText(label, ex, ey - 8); break;
+        }
+      }
+    });
+    return off.toDataURL('image/png');
   }
 
   // Convert a canvas-frame mouse drop position into Fabric internal
@@ -2185,11 +2307,42 @@
             ensurePartAssets(item.part_id, item.part_slug);
           }
         });
+        // Symbol Designer integration: pull the project's symbols once
+        // so any with bom_item_id can surface as ⌗ chips in their
+        // matching BOM row's asset drawer.
+        loadProjectSymbols();
       })
       .catch(function (err) {
         state.bomItemsLoading = false;
         state.bomItemsError = err && err.message ? err.message : 'Failed to load BOM';
         renderBomPane();
+      });
+  }
+
+  // Fetch the project's user-designed symbols (one row per Symbol
+  // Designer entry). On success any matching BOM row's drawer picks up
+  // a ⌗ chip via assetsForBomItem(); on failure the chips just don't
+  // appear (the BOM pane itself still works).
+  function loadProjectSymbols() {
+    if (!state.projectId) return;
+    if (state.projectSymbolsLoaded) {
+      renderBomPane();
+      return;
+    }
+    apiFetch(API + '/api/projects/' + state.projectId + '/symbols')
+      .then(function (resp) {
+        if (!resp.ok) throw new Error('Symbols HTTP ' + resp.status);
+        return resp.json();
+      })
+      .then(function (rows) {
+        state.projectSymbols = Array.isArray(rows) ? rows : [];
+        state.projectSymbolsLoaded = true;
+        renderBomPane();
+      })
+      .catch(function () {
+        // Silent — no chips, but the BOM pane is unaffected.
+        state.projectSymbols = [];
+        state.projectSymbolsLoaded = true;
       });
   }
 
@@ -2240,13 +2393,43 @@
 
   function assetsForBomItem(item) {
     if (!item) return [];
-    // Future-proofing: if the schema ever ships an inline assets[] field
-    // on a BOM row, prefer it.
-    if (Array.isArray(item.assets)) return item.assets;
-    if (item.part_id && state.bomPartAssets[item.part_id]) {
-      return state.bomPartAssets[item.part_id];
+    // Combine inline + part-derived assets with any Symbol Designer
+    // chips for this BOM row. Symbol chips are prepended so they read
+    // first in the drawer — they're the most-specific "this part is
+    // wired in this way" affordance.
+    var baseAssets;
+    if (Array.isArray(item.assets)) {
+      baseAssets = item.assets;
+    } else if (item.part_id && state.bomPartAssets[item.part_id]) {
+      baseAssets = state.bomPartAssets[item.part_id];
+    } else {
+      baseAssets = [];
     }
-    return [];
+    var symbolChips = symbolChipsForBomItem(item);
+    if (symbolChips.length === 0) return baseAssets;
+    return symbolChips.concat(baseAssets);
+  }
+
+  // Find project symbols whose bom_item_id matches this BOM row's id,
+  // and convert each into an Asset-shaped object the drawer renderer
+  // already knows how to lay out. The ``kind: 'symbol'`` flag is the
+  // distinguishing field — chip rendering and the drag payload both
+  // branch on it.
+  function symbolChipsForBomItem(item) {
+    if (!item || !item.id || !Array.isArray(state.projectSymbols)) return [];
+    var out = [];
+    state.projectSymbols.forEach(function (sym) {
+      if (sym && sym.bom_item_id === item.id) {
+        out.push({
+          id: 'symbol-' + sym.id,
+          symbolId: sym.id,
+          label: sym.name || ('Symbol #' + sym.id),
+          kind: 'symbol',
+          chip: '⌗',  // ⌗
+        });
+      }
+    });
+    return out;
   }
 
   function bomExpandedSet() {
@@ -2338,6 +2521,13 @@
       ? 'Loading assets…'
       : (count + ' asset' + (count === 1 ? '' : 's') + ' attached');
 
+    // Build the deep-link URL for "design symbol" before encoding into
+    // the dropdown markup. ``new=true`` so the symbol designer creates
+    // a fresh row pre-linked to this BOM item via ``bom_item_id``.
+    var designSymbolUrl = '/projects/symbol/edit.html?project_id=' +
+      encodeURIComponent(state.projectId) +
+      '&new=true&bom_item_id=' + encodeURIComponent(rowId);
+
     return '' +
       '<div class="ib-bom-row' + (isExpanded ? ' is-expanded' : '') + '"' +
       ' data-bom-row-id="' + escapeHtml(String(rowId)) + '"' +
@@ -2350,10 +2540,30 @@
           escapeHtml(name) + '</span>' +
           '<span class="ib-bom-asset-chip" title="' + escapeHtml(chipTitle) + '">' +
           chipText + '</span>' +
-          '<button type="button" class="ib-bom-row-menu" aria-label="More actions" tabindex="-1"' +
-          ' title="More actions (coming soon)">' +
-            '<i class="fas fa-ellipsis-vertical"></i>' +
-          '</button>' +
+          // Bootstrap dropdown for the ⋮ menu — was an inert button in
+          // the C1 merge; gaining "design symbol" links + a placeholder
+          // for future actions.
+          '<div class="dropdown ib-bom-row-menu-wrap">' +
+            '<button type="button" class="ib-bom-row-menu" aria-label="More actions"' +
+            ' tabindex="-1" data-bs-toggle="dropdown" data-bs-auto-close="true"' +
+            ' aria-expanded="false" title="More actions">' +
+              '<i class="fas fa-ellipsis-vertical"></i>' +
+            '</button>' +
+            '<ul class="dropdown-menu dropdown-menu-end ib-bom-row-menu-list">' +
+              '<li>' +
+                '<a class="dropdown-item ib-bom-menu-design-symbol" href="' +
+                escapeHtml(designSymbolUrl) + '">' +
+                  '<span class="ib-bom-menu-glyph">&#x270E;</span> design symbol&hellip;' +
+                '</a>' +
+              '</li>' +
+              '<li>' +
+                '<span class="dropdown-item disabled ib-bom-menu-disabled"' +
+                ' aria-disabled="true" title="Use the project editor\'s BOM section">' +
+                  '<i class="fas fa-trash me-2"></i>remove from BOM' +
+                '</span>' +
+              '</li>' +
+            '</ul>' +
+          '</div>' +
           '<button type="button" class="ib-bom-row-toggle" aria-label="' +
           (isExpanded ? 'Collapse' : 'Expand') + '" tabindex="-1">' +
             '<i class="fas fa-chevron-' + (isExpanded ? 'up' : 'down') + '"></i>' +
@@ -2378,14 +2588,34 @@
         (item.part_slug
           ? escapeHtml('/parts/view.html?slug=' + encodeURIComponent(item.part_slug))
           : '#') +
-        '" target="_blank" rel="noopener">Parts Catalog</a>. ' +
-        '<span class="text-muted">Schematic symbols (⌗) come from the Symbol designer (coming soon).</span>' +
+        '" target="_blank" rel="noopener">Parts Catalog</a>, or ' +
+        '<a href="' +
+        escapeHtml('/projects/symbol/edit.html?project_id=' +
+          encodeURIComponent(state.projectId) + '&new=true&bom_item_id=' +
+          encodeURIComponent(item.id)) +
+        '">design a <code>&#x2317;</code> symbol</a> for it.' +
         '</div>';
     }
     return '<div class="ib-bom-assets">' + assets.map(function (a) {
-      var safeSrc = escapeHtml(a.src || '');
       var safeLabel = escapeHtml(a.label || 'Asset');
       var safeKind = escapeHtml(a.kind || 'photo');
+      // Symbol-kind chips show a `⌗` glyph instead of an image thumb
+      // and carry a different drag payload (no src; the canvas drop
+      // handler rasterises the symbol_data at drop time).
+      if (a.kind === 'symbol') {
+        var safeSymId = escapeHtml(String(a.symbolId || ''));
+        return '<div class="ib-bom-asset ib-bom-asset-symbol" draggable="true"' +
+          ' data-asset-kind="symbol"' +
+          ' data-asset-label="' + safeLabel + '"' +
+          ' data-symbol-id="' + safeSymId + '"' +
+          ' title="' + safeLabel + ' — drag onto canvas to place a schematic symbol">' +
+            '<div class="ib-bom-asset-thumb ib-bom-asset-symbol-thumb">' +
+              '<span class="ib-bom-symbol-glyph">&#x2317;</span>' +
+            '</div>' +
+            '<div class="ib-bom-asset-label">' + safeLabel + '</div>' +
+          '</div>';
+      }
+      var safeSrc = escapeHtml(a.src || '');
       return '<div class="ib-bom-asset" draggable="true"' +
         ' data-asset-src="' + safeSrc + '"' +
         ' data-asset-label="' + safeLabel + '"' +
@@ -2407,13 +2637,14 @@
     var toggleBtn = rowEl.querySelector('.ib-bom-row-toggle');
     var menuBtn = rowEl.querySelector('.ib-bom-row-menu');
 
-    // Click on head (anywhere except the buttons) toggles drawer.
+    // Click on head (anywhere except the buttons / dropdown) toggles drawer.
     if (head) {
       head.addEventListener('click', function (e) {
         var t = e.target;
-        // Ignore clicks on the menu / toggle buttons — they have their
-        // own handlers (toggle re-uses the same path).
-        if (t && (t.closest('.ib-bom-row-menu') || t.closest('.ib-bom-row-toggle'))) return;
+        // Ignore clicks on the menu / toggle buttons / dropdown items —
+        // they each have their own handlers.
+        if (t && (t.closest('.ib-bom-row-menu-wrap') ||
+                  t.closest('.ib-bom-row-toggle'))) return;
         toggleBomRowExpanded(rowId);
       });
       head.addEventListener('keydown', function (e) {
@@ -2430,12 +2661,18 @@
       });
     }
     if (menuBtn) {
-      menuBtn.addEventListener('click', function (e) {
-        // Inert placeholder — future home for `✎ design symbol` etc.
-        // Block bubbling so the row doesn't toggle on click.
-        e.stopPropagation();
-      });
+      // Bootstrap handles open/close via data-bs-toggle. We just stop
+      // propagation so the row doesn't toggle on the same click.
+      menuBtn.addEventListener('click', function (e) { e.stopPropagation(); });
     }
+    // Keep dropdown-item clicks from bubbling into the row (which would
+    // toggle the drawer mid-navigation).
+    Array.prototype.forEach.call(
+      rowEl.querySelectorAll('.ib-bom-row-menu-list .dropdown-item'),
+      function (a) {
+        a.addEventListener('click', function (e) { e.stopPropagation(); });
+      }
+    );
 
     // Drag the row itself → default asset (first in list, photo today).
     rowEl.addEventListener('dragstart', function (e) {
@@ -2475,9 +2712,29 @@
           // Stop the wrapping row's dragstart from also firing (it would
           // overwrite the chip's payload with the row default).
           e.stopPropagation();
-          var src = chip.getAttribute('data-asset-src') || '';
           var label = chip.getAttribute('data-asset-label') || 'Asset';
           var kind = chip.getAttribute('data-asset-kind') || 'photo';
+          // Symbol-kind chips: payload carries a symbolId rather than a
+          // src; the canvas drop handler rasterises the symbol_data
+          // off-screen into a PNG and places it like any other asset.
+          // This is the "rasterised symbol on a photo step" path the
+          // design handoff README references.
+          if (kind === 'symbol') {
+            var symbolId = parseInt(chip.getAttribute('data-symbol-id'), 10);
+            if (!symbolId) { e.preventDefault(); return; }
+            try {
+              e.dataTransfer.effectAllowed = 'copy';
+              e.dataTransfer.setData('application/json', JSON.stringify({
+                kind: 'symbol',
+                symbolId: symbolId,
+                label: label,
+                bomRowId: rowId,
+              }));
+              e.dataTransfer.setData('text/plain', label);
+            } catch (_) {}
+            return;
+          }
+          var src = chip.getAttribute('data-asset-src') || '';
           if (!src) { e.preventDefault(); return; }
           try {
             e.dataTransfer.effectAllowed = 'copy';

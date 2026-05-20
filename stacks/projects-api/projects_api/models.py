@@ -1180,3 +1180,61 @@ class ProjectSchematic(Base):
         onupdate=func.now(),
         nullable=False,
     )
+
+
+class ProjectSymbol(Base):
+    """A user-designed schematic symbol scoped to a project.
+
+    Body shapes + pin layout are stored as a JSON document in
+    ``symbol_data``; the shape is the frontend's source of truth — see
+    ``web/assets/js/symbol-designer.js`` for the schema. The symbol
+    designer extends the hard-coded stub library in the schematic editor
+    (E2) at runtime with these per-project entries, and links one to a
+    ``project_bom_items`` row via ``bom_item_id`` so a custom symbol
+    surfaces as a ``⌗`` chip in that BOM row's asset drawer (C1).
+
+    Brand-new table — no migration helper needed (per CLAUDE.md
+    "Backend services" guidance, only existing-table alterations need
+    the idempotent ALTER helper pattern).
+    """
+
+    __tablename__ = "project_symbols"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    # Reference-designator prefix shown in the schematic editor (U, R,
+    # C, D, …). Defaults to ``U`` for generic ICs because that's the
+    # most-common case in maker projects.
+    ref_des_prefix: Mapped[str] = mapped_column(
+        String(8), nullable=False, server_default="U", default="U"
+    )
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    # Optional link to a BOM item (``project_bom_items.id``). When set,
+    # the symbol shows up as a ``⌗`` chip in that BOM row's asset drawer
+    # in the instruction builder (C1). SET NULL on delete so the symbol
+    # survives BOM churn — the chip just stops appearing.
+    bom_item_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("project_bom_items.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    # JSON document with the shape ``{ bodyShapes: Shape[], pins:
+    # PinDef[] }`` — see ``web/assets/js/symbol-designer.js``. Stored
+    # opaquely; the server doesn't parse it. Practical upper bound for
+    # v1 is ~1 MB (covered by ``test_symbols`` round-tripping a 1 MB
+    # payload).
+    symbol_data: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )

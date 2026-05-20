@@ -1,0 +1,285 @@
+---
+title: Symbol Designer
+layout: default
+description: Design schematic symbols for your project
+permalink: /projects/symbol/edit.html
+hide_nibsy: true
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/symbol-designer.css?v={{ site.time | date: '%s' }}">
+
+<!-- Tag the body so site-level CSS rules (footer hide, container reset)
+     scope to this workspace only — same trick as the schematic editor. -->
+<script>document.body.classList.add('symbol-designer-page');</script>
+
+<div class="sd-workspace" id="sd-workspace">
+
+  <!-- ===========================================================
+       Title bar — Back / centred title + save status
+       =========================================================== -->
+  <div class="sd-titlebar" id="sd-titlebar">
+    <div class="sd-titlebar-left">
+      <a id="sd-back-link" href="/projects/instructions/edit.html" class="sd-titlebar-link">
+        <i class="fas fa-arrow-left me-1"></i> Back to project editor
+      </a>
+    </div>
+    <div class="sd-titlebar-center">
+      <span class="sd-project-title" id="sd-project-title">Loading&hellip;</span>
+      <span class="sd-save-status" id="sd-save-status" aria-live="polite"></span>
+    </div>
+    <div class="sd-titlebar-right">
+      <a id="sd-open-schematic" class="sd-titlebar-btn" href="#"
+         title="Open the schematic editor for this project">
+        <i class="fas fa-diagram-project me-1"></i> Open schematic
+      </a>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       Loading / not-owner / error states
+       =========================================================== -->
+  <div class="sd-loading" id="sd-loading">
+    <i class="fas fa-spinner fa-spin me-2"></i> Loading symbol designer&hellip;
+  </div>
+
+  <div class="sd-not-owner d-none" id="sd-not-owner">
+    <div class="sd-icon"><i class="fas fa-lock"></i></div>
+    <h4><i class="fas fa-lock me-3"></i> You don't own this project</h4>
+    <p class="text-muted">Only the project author can design symbols.</p>
+    <a href="/projects/" class="btn btn-outline-primary mt-2">
+      <i class="fas fa-arrow-left me-1"></i> Back to projects
+    </a>
+  </div>
+
+  <div class="sd-error d-none" id="sd-error">
+    <div class="sd-icon text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+    <h4><i class="fas fa-exclamation-triangle me-3 text-danger"></i> Couldn't load this project</h4>
+    <p class="text-muted" id="sd-error-detail">The project may not exist, or you may need to log in.</p>
+    <a href="/projects/" class="btn btn-outline-primary mt-2">
+      <i class="fas fa-arrow-left me-1"></i> Back to projects
+    </a>
+  </div>
+
+  <!-- ===========================================================
+       Main editor shell — hidden until loader resolves
+       =========================================================== -->
+  <div class="sd-main d-none" id="sd-main">
+
+    <!-- Library list (left, 240px) -->
+    <aside class="sd-library" id="sd-library" aria-label="Symbol library">
+      <header class="sd-library-header">
+        <h6 class="sd-library-title">
+          <i class="fas fa-shapes me-2"></i> Library
+        </h6>
+        <button type="button" class="sd-library-new-btn" id="sd-library-new"
+                title="Create a new symbol">
+          <i class="fas fa-plus me-1"></i> New
+        </button>
+      </header>
+      <div class="sd-library-search">
+        <input type="search" class="form-control form-control-sm" id="sd-library-search"
+               placeholder="Search&hellip;" aria-label="Search symbols">
+      </div>
+      <ul class="sd-library-list" id="sd-library-list" role="listbox"
+          aria-label="Project symbols">
+        <!-- Populated by JS. -->
+      </ul>
+      <footer class="sd-library-footer">
+        <button type="button" class="sd-library-action-btn" id="sd-library-duplicate"
+                disabled title="Duplicate the selected symbol">
+          <i class="fas fa-clone me-1"></i> Duplicate
+        </button>
+        <button type="button" class="sd-library-action-btn sd-library-action-danger"
+                id="sd-library-delete" disabled title="Delete the selected symbol">
+          <i class="fas fa-trash me-1"></i> Delete
+        </button>
+      </footer>
+    </aside>
+
+    <!-- Canvas column -->
+    <main class="sd-canvas-col" id="sd-canvas-col" aria-label="Symbol canvas">
+
+      <!-- Toolbox (above canvas) -->
+      <div class="sd-toolbox" id="sd-toolbox" role="toolbar"
+           aria-label="Drawing tools">
+        <button type="button" class="sd-tool-btn is-active" data-tool="select"
+                title="Select / move">
+          <i class="fas fa-mouse-pointer"></i><span>Select</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="pin"
+                title="Place a pin on a side rail">
+          <i class="fas fa-circle-dot"></i><span>Pin</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="net"
+                title="Net (coming soon)">
+          <i class="fas fa-bolt"></i><span>Net</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="name"
+                title="Name (coming soon)">
+          <i class="fas fa-i-cursor"></i><span>Name</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="label"
+                title="Label (coming soon)">
+          <i class="fas fa-tag"></i><span>Label</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="line"
+                title="Draw a body line (click two endpoints)">
+          <i class="fas fa-slash"></i><span>Line</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="rect"
+                title="Draw a body rectangle (click and drag)">
+          <i class="far fa-square"></i><span>Rect</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="circle"
+                title="Circle (coming soon)">
+          <i class="far fa-circle"></i><span>Circle</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="text"
+                title="Text (coming soon)">
+          <i class="fas fa-font"></i><span>Text</span>
+        </button>
+        <span class="sd-toolbox-sep" aria-hidden="true"></span>
+        <button type="button" class="sd-tool-btn" data-tool="rotate-ccw"
+                title="Rotate -90&deg;">
+          <i class="fas fa-rotate-left"></i><span>-90&deg;</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="rotate-cw"
+                title="Rotate +90&deg;">
+          <i class="fas fa-rotate-right"></i><span>+90&deg;</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="flip-h"
+                title="Flip horizontally">
+          <i class="fas fa-arrows-left-right"></i><span>Flip H</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="flip-v"
+                title="Flip vertically">
+          <i class="fas fa-arrows-up-down"></i><span>Flip V</span>
+        </button>
+      </div>
+
+      <!-- Canvas wrapper -->
+      <div class="sd-canvas-wrap" id="sd-canvas-wrap">
+        <canvas id="sd-canvas"></canvas>
+        <div class="sd-canvas-empty" id="sd-canvas-empty">
+          <i class="fas fa-shapes fa-3x mb-3"></i>
+          <p>No symbol selected.</p>
+          <p class="text-muted small">Pick one from the library, or click
+            <strong>+ New</strong> to start a fresh symbol.</p>
+        </div>
+        <div class="sd-toast" id="sd-toast" role="status" aria-live="polite"></div>
+      </div>
+    </main>
+
+    <!-- Properties panel (right, 260px) -->
+    <aside class="sd-props" id="sd-props" aria-label="Properties panel">
+      <section class="sd-props-section" id="sd-props-symbol-section">
+        <h6 class="sd-props-section-title">Symbol</h6>
+        <div class="sd-props-field">
+          <label for="sd-prop-name">Name</label>
+          <input type="text" id="sd-prop-name" class="form-control form-control-sm"
+                 maxlength="200" placeholder="MyChip">
+        </div>
+        <div class="sd-props-field">
+          <label for="sd-prop-refdes">RefDes prefix</label>
+          <input type="text" id="sd-prop-refdes" class="form-control form-control-sm"
+                 maxlength="8" placeholder="U">
+        </div>
+        <div class="sd-props-field">
+          <label for="sd-prop-desc">Description</label>
+          <textarea id="sd-prop-desc" class="form-control form-control-sm"
+                    rows="2" placeholder="What is this symbol?"></textarea>
+        </div>
+        <div class="sd-props-field">
+          <label>Pin count</label>
+          <div class="sd-props-readonly" id="sd-prop-pin-count">0</div>
+        </div>
+        <div class="sd-props-field">
+          <label for="sd-prop-bom">Linked BOM part</label>
+          <select id="sd-prop-bom" class="form-select form-select-sm">
+            <option value="">(none)</option>
+          </select>
+          <small class="sd-props-hint">When set, this symbol appears as a
+            <code>&#x2317;</code> chip in that BOM row's asset drawer.</small>
+        </div>
+      </section>
+
+      <section class="sd-props-section d-none" id="sd-props-pin-section">
+        <h6 class="sd-props-section-title">Selected pin</h6>
+        <div class="sd-props-field">
+          <label for="sd-pin-number">Pin number</label>
+          <input type="text" id="sd-pin-number" class="form-control form-control-sm"
+                 maxlength="8">
+        </div>
+        <div class="sd-props-field">
+          <label for="sd-pin-name">Pin name</label>
+          <input type="text" id="sd-pin-name" class="form-control form-control-sm"
+                 maxlength="32">
+        </div>
+        <div class="sd-props-field">
+          <label>Type</label>
+          <div class="sd-props-radio-grid" id="sd-pin-type">
+            <label><input type="radio" name="sd-pin-type" value="IN"><span>IN</span></label>
+            <label><input type="radio" name="sd-pin-type" value="OUT"><span>OUT</span></label>
+            <label><input type="radio" name="sd-pin-type" value="I/O"><span>I/O</span></label>
+            <label><input type="radio" name="sd-pin-type" value="PWR"><span>PWR</span></label>
+            <label><input type="radio" name="sd-pin-type" value="GND"><span>GND</span></label>
+            <label><input type="radio" name="sd-pin-type" value="NC"><span>NC</span></label>
+          </div>
+        </div>
+        <div class="sd-props-field">
+          <label>Side</label>
+          <div class="sd-props-radio-grid sd-props-radio-grid-4" id="sd-pin-side">
+            <label><input type="radio" name="sd-pin-side" value="left"><span>Left</span></label>
+            <label><input type="radio" name="sd-pin-side" value="right"><span>Right</span></label>
+            <label><input type="radio" name="sd-pin-side" value="top"><span>Top</span></label>
+            <label><input type="radio" name="sd-pin-side" value="bottom"><span>Bottom</span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="sd-props-section d-none" id="sd-props-shape-section">
+        <h6 class="sd-props-section-title">Selected shape</h6>
+        <div class="sd-props-field" data-shape-kind="rect">
+          <label>Rectangle</label>
+          <div class="sd-props-grid-2">
+            <label class="sd-props-inline">x <input type="number" id="sd-shape-rect-x"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">y <input type="number" id="sd-shape-rect-y"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">w <input type="number" id="sd-shape-rect-w"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">h <input type="number" id="sd-shape-rect-h"
+                   class="form-control form-control-sm" step="16"></label>
+          </div>
+        </div>
+        <div class="sd-props-field" data-shape-kind="line">
+          <label>Line</label>
+          <div class="sd-props-grid-2">
+            <label class="sd-props-inline">x1 <input type="number" id="sd-shape-line-x1"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">y1 <input type="number" id="sd-shape-line-y1"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">x2 <input type="number" id="sd-shape-line-x2"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">y2 <input type="number" id="sd-shape-line-y2"
+                   class="form-control form-control-sm" step="16"></label>
+          </div>
+        </div>
+        <button type="button" class="sd-props-delete-btn" id="sd-shape-delete">
+          <i class="fas fa-trash me-1"></i> Delete shape
+        </button>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<!--
+  Fabric.js v6 (UMD build). Pinned to 6.4.0 to match the schematic editor
+  and instruction builder so the three pages share the same engine.
+-->
+<script src="https://cdn.jsdelivr.net/npm/fabric@6.4.0/dist/index.min.js"></script>
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/symbol-designer.js?v={{ site.time | date: '%s' }}"></script>

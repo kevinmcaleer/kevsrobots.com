@@ -187,6 +187,82 @@
     return null;
   }
 
+  // Convert a Symbol Designer document (``{ bodyShapes, pins }`` in
+  // symbol-space coords centred on (0,0)) into the editor's stub-library
+  // shape (``{ bodyWidth, bodyHeight, pins: [{ side, offset, ... }] }``).
+  // The pin x/y coords from the designer come in centred-at-origin
+  // space; the editor's ``pinLocalPos`` expects pins to live on the
+  // body's edge with an ``offset`` from the top-left corner along the
+  // relevant axis. The bounding box is computed from the union of pin
+  // coords + body shapes so each user-designed symbol stays compact.
+  function symbolDefFromCustom(row) {
+    if (!row || !row.symbol_data) return null;
+    var doc;
+    try { doc = JSON.parse(row.symbol_data); }
+    catch (_) { return null; }
+    if (!doc || typeof doc !== 'object') return null;
+    var pins = Array.isArray(doc.pins) ? doc.pins : [];
+    var shapes = Array.isArray(doc.bodyShapes) ? doc.bodyShapes : [];
+
+    // Bounding box from pins + shapes (centred coords).
+    var xs = [], ys = [];
+    pins.forEach(function (p) { xs.push(p.x || 0); ys.push(p.y || 0); });
+    shapes.forEach(function (s) {
+      if (s.kind === 'rect') {
+        xs.push(s.x); xs.push(s.x + s.w);
+        ys.push(s.y); ys.push(s.y + s.h);
+      } else if (s.kind === 'line') {
+        xs.push(s.x1); xs.push(s.x2);
+        ys.push(s.y1); ys.push(s.y2);
+      }
+    });
+    if (xs.length === 0) { xs = [-32, 32]; ys = [-24, 24]; }
+    var minX = Math.min.apply(null, xs);
+    var maxX = Math.max.apply(null, xs);
+    var minY = Math.min.apply(null, ys);
+    var maxY = Math.max.apply(null, ys);
+
+    // Pad slightly so pins stick out of the body rather than sitting on
+    // its corners — feels like a real symbol.
+    var pad = 8;
+    minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+    var bodyWidth = Math.max(maxX - minX, 32);
+    var bodyHeight = Math.max(maxY - minY, 32);
+
+    // Convert each pin's centred coord into a (side, offset) the editor
+    // can render. ``offset`` is measured from the top-left of the body
+    // box, along the axis that runs parallel to that side.
+    var convertedPins = pins.map(function (p, i) {
+      var offset = (p.side === 'left' || p.side === 'right')
+        ? (p.y - minY)
+        : (p.x - minX);
+      return {
+        number: p.number || String(i + 1),
+        name: p.name || (p.number || String(i + 1)),
+        side: p.side || 'left',
+        offset: Math.max(0, Math.round(offset)),
+        type: p.type || 'I/O',
+      };
+    });
+
+    return {
+      id: 'custom-' + row.id,
+      name: row.name || ('Custom #' + row.id),
+      refDesPrefix: row.ref_des_prefix || 'U',
+      bodyWidth: bodyWidth,
+      bodyHeight: bodyHeight,
+      pins: convertedPins,
+      isCustom: true,
+      customId: row.id,
+      // Optional body shapes the designer drew — kept so the renderer
+      // could overlay them later. For v1 the editor uses the bounding
+      // box only (mirrors the stub library look).
+      _bodyShapes: shapes,
+      _minX: minX,
+      _minY: minY,
+    };
+  }
+
   // ====================================================================
   // 3. STATE
   // ====================================================================
@@ -1333,12 +1409,21 @@
     if (!dom.symbolList) return;
     var html = '';
     SYMBOL_LIBRARY.forEach(function (sym) {
+      var customBadge = sym.isCustom
+        ? '<span class="se-symbol-custom-badge" title="Designed in the Symbol Designer">Custom</span>'
+        : '';
       html +=
-        '<li class="se-symbol-item" data-symbol-id="' + escapeHtml(sym.id) + '" ' +
+        '<li class="se-symbol-item' + (sym.isCustom ? ' is-custom' : '') +
+            '" data-symbol-id="' + escapeHtml(sym.id) + '" ' +
             'role="option" tabindex="0">' +
-          '<span class="se-symbol-thumb"><i class="fas fa-microchip"></i></span>' +
+          '<span class="se-symbol-thumb">' +
+            (sym.isCustom
+              ? '<i class="fas fa-shapes"></i>'
+              : '<i class="fas fa-microchip"></i>') +
+          '</span>' +
           '<span class="se-symbol-meta">' +
-            '<span class="se-symbol-name">' + escapeHtml(sym.name) + '</span>' +
+            '<span class="se-symbol-name">' + escapeHtml(sym.name) +
+              customBadge + '</span>' +
             '<span class="se-symbol-sub small text-muted">' +
               escapeHtml(sym.refDesPrefix) + ' &middot; ' +
               sym.pins.length + ' pins' +
@@ -1347,6 +1432,31 @@
         '</li>';
     });
     dom.symbolList.innerHTML = html;
+  }
+
+  // ------------------------------------------------------------------
+  // Symbol Designer integration
+  // ------------------------------------------------------------------
+  //
+  // The schematic editor ships with the SYMBOL_LIBRARY array at the top
+  // of this file (Pico + R + C + LED + GND + V+ + generic IC). The
+  // Symbol Designer page (/projects/symbol/edit.html) grows that
+  // library project-by-project: each row in /api/projects/{id}/symbols
+  // is converted into a stub-shaped def via symbolDefFromCustom() and
+  // appended here. Failures are silent (the editor still works with
+  // just the built-in symbols).
+
+  async function loadCustomSymbolsIntoLibrary() {
+    try {
+      var r = await apiFetch(API + '/api/projects/' + STATE.projectId + '/symbols');
+      if (!r.ok) return;
+      var rows = await r.json();
+      if (!Array.isArray(rows)) return;
+      rows.forEach(function (row) {
+        var def = symbolDefFromCustom(row);
+        if (def) SYMBOL_LIBRARY.push(def);
+      });
+    } catch (_) { /* silent — built-in library still works */ }
   }
 
   function onSymbolItemClick(ev) {
@@ -1656,12 +1766,28 @@
       STATE.schematic = schematic;
       loadGraphFromSchematic(schematic);
 
+      // Symbol Designer integration: pull the project's user-designed
+      // symbols and append them to SYMBOL_LIBRARY so they show up in
+      // the tools-pane symbol list alongside the built-in stubs.
+      await loadCustomSymbolsIntoLibrary();
+
       wireUi();
       initCanvas();
       renderSymbolList();
       setActiveTool('select');
       renderGraph();
       setSaveStatus('saved');
+
+      // Enable the "+ open Symbol Designer" button now that the page
+      // ships (was disabled in the E2 merge).
+      if (dom.openSymDesigner) {
+        dom.openSymDesigner.disabled = false;
+        dom.openSymDesigner.removeAttribute('title');
+        dom.openSymDesigner.addEventListener('click', function () {
+          window.location.href = '/projects/symbol/edit.html?project_id=' +
+            encodeURIComponent(STATE.projectId) + '&new=true';
+        });
+      }
 
       showOnly(dom.main);
       // Re-fit after the layout settles.
