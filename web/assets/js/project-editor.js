@@ -148,6 +148,13 @@
       if (!projectId) {
         history.replaceState(null, '', '?id=' + currentProject.id);
       }
+      // Issue #190: a title save can change the slug, so refresh the
+      // "View live" / view-toggle links from the (possibly new) slug.
+      // updateStatusBadge already reads currentProject.slug to rebuild
+      // both hrefs, so a single call here keeps the displayed public
+      // URL in sync silently — no page reload required. The editor's
+      // own URL stays at /projects/editor.html?id=<id>, so we do NOT
+      // history.replaceState anything slug-shaped here.
       updateStatusBadge(currentProject.status);
       showSaveStatus('saved', 'Saved');
       // Issue #106: surface any badges awarded by this save (typically

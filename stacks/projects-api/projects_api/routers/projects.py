@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..db import get_session
-from ..models import Download, Project, ProjectTag, UserFollow
+from ..models import Download, Project, ProjectSlugHistory, ProjectTag, UserFollow
 from ..schemas import (
     ProjectCreate,
     ProjectListItem,
@@ -33,12 +33,21 @@ async def resolve_project_id(
 
     Raises :class:`HTTPException` with 404 when no project matches.
 
+    Issue #190: if the (owner, slug) doesn't match a *current* project we
+    fall back to ``project_slug_history`` so old shared links resolve
+    silently. The fallback is silent here because every machine-facing
+    nested-resource route (BOM, images, files, links, journal, makes)
+    calls this helper — those callers don't need a redirect, they just
+    need the row. Page-facing routes that want to nudge the browser
+    toward the canonical URL call :func:`resolve_project_id_with_redirect`
+    instead.
+
     This is the central helper for the issue #152 by-slug routes — every
     nested resource handler (BOM, images, files, links, journal, makes)
     wraps the existing id-based router by calling here first and then
     forwarding to the id-based path. Keeping the lookup in one place
     means a change to the slug-resolution rules (case-folding, alias
-    table, …) only has to happen here.
+    table, history fallback, …) only has to happen here.
     """
     project_id = await session.scalar(
         select(Project.id).where(
@@ -46,9 +55,73 @@ async def resolve_project_id(
             Project.slug == slug,
         )
     )
-    if project_id is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
-    return int(project_id)
+    if project_id is not None:
+        return int(project_id)
+
+    # Issue #190: fall back to the slug-history table. A project may have
+    # used this slug in the past and been renamed; we still want the link
+    # to resolve. Scope by author via a join on ``projects`` so a slug
+    # retired under one user doesn't bleed across to another's namespace.
+    historical_id = await session.scalar(
+        select(ProjectSlugHistory.project_id)
+        .join(Project, Project.id == ProjectSlugHistory.project_id)
+        .where(
+            Project.author_username == owner,
+            ProjectSlugHistory.slug == slug,
+        )
+        .order_by(ProjectSlugHistory.retired_at.desc())
+        .limit(1)
+    )
+    if historical_id is not None:
+        return int(historical_id)
+
+    raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
+
+
+async def resolve_project_id_with_redirect(
+    session: AsyncSession,
+    owner: str,
+    slug: str,
+) -> tuple[int, Optional[str]]:
+    """Like :func:`resolve_project_id` but signals whether the caller's
+    slug is historical.
+
+    Returns ``(project_id, canonical_slug)`` where ``canonical_slug`` is:
+
+    * ``None`` when the supplied slug IS the project's current slug (no
+      redirect needed).
+    * the project's current slug when the supplied slug matched only via
+      the ``project_slug_history`` fallback — the caller should respond
+      with a 301 to the canonical ``(owner, canonical_slug)`` URL.
+
+    Used by the public-facing GET routes in ``by_slug.py`` so browsers
+    update their URL bar and SEO consolidates onto the latest slug.
+    """
+    current = await session.execute(
+        select(Project.id, Project.slug).where(
+            Project.author_username == owner,
+            Project.slug == slug,
+        )
+    )
+    row = current.first()
+    if row is not None:
+        return int(row[0]), None
+
+    historical = await session.execute(
+        select(Project.id, Project.slug)
+        .join(ProjectSlugHistory, ProjectSlugHistory.project_id == Project.id)
+        .where(
+            Project.author_username == owner,
+            ProjectSlugHistory.slug == slug,
+        )
+        .order_by(ProjectSlugHistory.retired_at.desc())
+        .limit(1)
+    )
+    hrow = historical.first()
+    if hrow is not None:
+        return int(hrow[0]), hrow[1]
+
+    raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
 
 
 async def _download_count(session: AsyncSession, project_id: int) -> int:
@@ -334,24 +407,47 @@ async def update_project(
 
     update_data = body.model_dump(exclude_unset=True)
     tags = update_data.pop("tags", None)
-    # Issue #152: ``regenerate_slug`` is a control flag, not a column —
-    # never assign it to the ORM row. Slug stays sticky on title rename
-    # unless the caller explicitly opts in (preserves inbound links from
-    # blogs / search engines).
-    regenerate_slug = bool(update_data.pop("regenerate_slug", False))
+    # Issue #152 / #190: ``regenerate_slug`` started life as the explicit
+    # opt-in for re-slugifying on rename. As of #190 a title change ALWAYS
+    # regenerates the slug — the old slug is preserved in
+    # ``project_slug_history`` so inbound links keep working via a 301
+    # redirect. We still pop the flag so it never lands on the ORM row;
+    # callers that pass ``regenerate_slug: true`` without a new title get
+    # the same auto-regen against the existing title (a no-op when the
+    # computed slug already matches).
+    explicit_regen = bool(update_data.pop("regenerate_slug", False))
+    title_changed = "title" in update_data and update_data["title"] != project.title
     previous_status = project.status
+    previous_slug = project.slug
     for field, value in update_data.items():
         setattr(project, field, value)
     project.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
 
-    if regenerate_slug:
+    # Issue #190: regenerate the slug whenever the title actually changed.
+    # The legacy ``regenerate_slug=true`` opt-in still forces a refresh so
+    # callers can re-slugify after a slugify_title rule change without
+    # editing the title.
+    if title_changed or explicit_regen:
         base = slugify_title(project.title)
-        project.slug = await unique_slug_for_author(
+        new_slug = await unique_slug_for_author(
             session,
             author_username=project.author_username,
             base_slug=base,
             exclude_project_id=project.id,
         )
+        if new_slug != previous_slug:
+            # Stash the OLD slug so historic links keep resolving via
+            # ``project_slug_history`` and 301 to the canonical URL.
+            # No-op when ``previous_slug`` is None (legacy rows that
+            # have never had a slug have nothing worth archiving).
+            if previous_slug:
+                session.add(
+                    ProjectSlugHistory(
+                        project_id=project.id,
+                        slug=previous_slug,
+                    )
+                )
+            project.slug = new_slug
 
     if tags is not None:
         await _set_tags(session, project.id, tags)
