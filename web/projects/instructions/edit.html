@@ -417,11 +417,12 @@ hide_nibsy: true
             <h6 class="ib-pane-section-title">Schematic</h6>
             <div class="ib-step-schematic-card">
               <div class="ib-step-schematic-icon"><i class="fas fa-diagram-project"></i></div>
-              <p class="mb-2"><strong>Embedded schematic</strong> — full editor (E2) coming soon.</p>
+              <p class="mb-2"><strong>Embedded schematic</strong></p>
               <p class="small text-muted mb-2">
-                The schematic linked to this project will appear here once the editor ships.
+                The full schematic editor opens in a new tab. Edits propagate live to every step that embeds this schematic.
               </p>
-              <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+              <button type="button" class="btn btn-sm btn-outline-primary"
+                      id="ib-open-schematic-editor-pane">
                 <i class="fas fa-pencil me-1"></i> open editor
               </button>
             </div>
@@ -519,10 +520,11 @@ hide_nibsy: true
           </div>
           <h5 class="mb-2">Embedded schematic</h5>
           <p class="text-muted mb-3">
-            View in the Schematic Editor (coming soon).<br>
-            The project schematic will render here once the editor ships.
+            Edit the schematic in the full Schematic Editor.<br>
+            Changes here propagate live to every step that embeds it.
           </p>
-          <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+          <button type="button" class="btn btn-sm btn-outline-primary"
+                  id="ib-open-schematic-editor-canvas">
             <i class="fas fa-pencil me-1"></i> open editor
           </button>
         </div>

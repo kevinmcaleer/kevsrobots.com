@@ -208,6 +208,10 @@
     dom.stepBodyInput = document.getElementById('ib-step-body-input');
     dom.stepVideoInput = document.getElementById('ib-step-video-input');
     dom.stepVideoPreview = document.getElementById('ib-step-video-preview');
+    // E2: full-schematic-editor "open" CTAs (one in the schematic-step
+    // pane card, one in the canvas-area placeholder).
+    dom.openSchematicEditorPane = document.getElementById('ib-open-schematic-editor-pane');
+    dom.openSchematicEditorCanvas = document.getElementById('ib-open-schematic-editor-canvas');
     dom.inspectorHud = document.getElementById('ib-inspector-hud');
     dom.hudHeader = document.getElementById('ib-hud-header');
     dom.hudBody = document.getElementById('ib-hud-body');
@@ -1167,6 +1171,36 @@
     if (stepType === 'video') renderCanvasVideo(step);
   }
 
+  // E2: cache the project's single schematic id once it's known. The
+  // first POST to /schematic is idempotent so flipping a step to
+  // ``step_type=schematic`` can call it without checking first.
+  var schematicIdCache = null;
+
+  async function ensureProjectSchematicId() {
+    if (schematicIdCache) return schematicIdCache;
+    try {
+      var resp = await apiFetchWithTermsRetry(
+        API + '/api/projects/' + state.projectId + '/schematic',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        }
+      );
+      if (!resp.ok) return null;
+      var body = await resp.json();
+      schematicIdCache = body.id;
+      return schematicIdCache;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function schematicEditorUrl() {
+    return '/projects/schematic/edit.html?id=' +
+      encodeURIComponent(state.projectId || '');
+  }
+
   async function onStepTypeChange(newType) {
     if (STEP_TYPES.indexOf(newType) < 0) return;
     var step = activeStepObject();
@@ -1184,6 +1218,26 @@
       var updated = await putStep(stepId, { step_type: newType });
       // Update local cache.
       step.step_type = updated.step_type;
+
+      // E2: when the step becomes a schematic step, ensure the project
+      // has a schematic record and link this step to it. The POST is
+      // idempotent so re-calling it for each step is safe — the
+      // schematicIdCache means we hit the network at most once per
+      // session.
+      if (newType === 'schematic') {
+        var schematicId = await ensureProjectSchematicId();
+        if (schematicId && step.schematic_id !== schematicId) {
+          try {
+            var stepResp = await putStep(stepId, { schematic_id: schematicId });
+            step.schematic_id = stepResp.schematic_id;
+          } catch (_) {
+            // Linkage failure is non-fatal — the editor still opens via the
+            // ?id=projectId URL; the step just won't carry the schematic_id
+            // until the next type-switch.
+          }
+        }
+      }
+
       setSaveStatus('saved');
       syncStepTypePane();
       renderFilmstrip();
@@ -1302,6 +1356,26 @@
             .catch(function () { setSaveStatus('error', 'Video URL save failed'); });
         });
       });
+    }
+
+    // E2: full schematic editor "open" CTAs (pane card + canvas-area
+    // placeholder). Both navigate to the new full-screen editor; the
+    // link is computed at click-time because state.projectId isn't
+    // populated until init() runs.
+    function openSchematicEditor(ev) {
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+      // Ensure the schematic exists (idempotent) so the link lands on
+      // an editor that already has its row. The await is fire-and-
+      // forget — even if the POST is in-flight when we navigate, the
+      // editor itself will POST again on load.
+      ensureProjectSchematicId();
+      window.open(schematicEditorUrl(), '_blank', 'noopener');
+    }
+    if (dom.openSchematicEditorPane) {
+      dom.openSchematicEditorPane.addEventListener('click', openSchematicEditor);
+    }
+    if (dom.openSchematicEditorCanvas) {
+      dom.openSchematicEditorCanvas.addEventListener('click', openSchematicEditor);
     }
   }
 

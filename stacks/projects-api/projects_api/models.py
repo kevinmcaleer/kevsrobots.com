@@ -1137,3 +1137,46 @@ class Feedback(Base):
         Index("ix_feedback_status_created", "status", "created_at"),
         Index("ix_feedback_user_created", "user_id", "created_at"),
     )
+
+
+# --- Project schematic (issue #178 Phase E2) ----------------------------
+#
+# One schematic per project for v1. The schematic graph (symbol instances,
+# nets, labels) is stored as a single JSON document in ``schematic_data``
+# rather than a normalised set of tables — there are no server-side
+# queries on the graph (the editor is purely client-side) so the simpler
+# blob storage is sufficient. The shape of the JSON is the frontend's
+# source of truth — see ``web/assets/js/schematic-editor.js`` for the
+# schema.
+#
+# Brand-new table — ``create_all`` handles it on fresh deploys; no ALTER
+# helper needed because no existing table is being mutated.
+
+
+class ProjectSchematic(Base):
+    __tablename__ = "project_schematics"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    name: Mapped[Optional[str]] = mapped_column(String(200))
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    # JSON-serialised schematic graph. Stored as Text rather than JSONB so
+    # the column accepts an opaque blob without round-tripping through
+    # Postgres' JSON parser — the API just stores and returns whatever
+    # string the frontend POSTs / PUTs. Practical upper bound for v1 is
+    # ~2 MB (covered by ``test_schematics`` round-tripping a 1 MB payload).
+    schematic_data: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
