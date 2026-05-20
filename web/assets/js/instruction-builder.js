@@ -29,6 +29,28 @@
   var UNDO_DEBOUNCE_MS = 200;
   var UNDO_STACK_LIMIT = 50;
 
+  // Phase 3a — STL viewer (lazy-loaded on first "Add STL" click).
+  //
+  // Pinned to Three.js v0.147. Two CDN paths are needed and they must
+  // line up with each other:
+  //
+  //   * THREE_CDN — UMD-style build that still exposes a global `THREE`.
+  //     The spec'd version (0.160) DOES still ship `build/three.min.js`
+  //     with the global, but the matching `examples/js/loaders/STLLoader.js`
+  //     was removed somewhere around 0.148 (verified: 404 on jsdelivr for
+  //     0.148–0.160; 200 on 0.147 and 0.146). Pinning the whole pair to
+  //     0.147 keeps the spec's "global THREE + global THREE.STLLoader"
+  //     pattern intact without the loader having to be ESM.
+  //   * STL_LOADER_CDN — classic-script STLLoader from the same release
+  //     so it attaches to the right `THREE` global.
+  //
+  // ~600KB combined; only fetched once and never on pageload.
+  var THREE_CDN = 'https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js';
+  var STL_LOADER_CDN = 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/STLLoader.js';
+  var STL_MAX_BYTES = 50 * 1024 * 1024; // 50 MB
+  var STL_VIEW_SIZE = 400;              // square render area, in CSS pixels
+  var STL_SCENE_BG = 0xE1F5EE;          // light blue, LEGO-style
+
   // -------- Module state ---------------------------------------------
 
   var state = {
@@ -67,6 +89,7 @@
     dom.uploadImageBtn = document.getElementById('ib-upload-image-btn');
     dom.removeImageBtn = document.getElementById('ib-remove-image-btn');
     dom.imageInput = document.getElementById('ib-image-input');
+    dom.addStlBtn = document.getElementById('ib-add-stl-btn');
     dom.color = document.getElementById('ib-color');
     dom.stroke = document.getElementById('ib-stroke');
     dom.strokeValue = document.getElementById('ib-stroke-value');
@@ -1129,6 +1152,555 @@
     });
   }
 
+  // -------- STL viewer (Phase 3a) -----------------------------------
+  //
+  // STL flow vs. "Upload image" flow — important distinction:
+  //
+  //   * "Upload image" uploads to the server, gets a stable URL back,
+  //     and places the image as a LOCKED BACKGROUND (selectable: false,
+  //     evented: false, sent to back). It IS the canvas background.
+  //   * "Add STL" parses the STL entirely in the browser (no server),
+  //     renders it with Three.js, captures the WebGL view as a PNG, and
+  //     places that PNG on the Fabric canvas as a REGULAR MOVABLE OBJECT
+  //     (selectable: true, evented: true). It sits ON TOP of whatever
+  //     background is already there — typically a photo of the
+  //     assembly — and the user can drag / resize / rotate it.
+  //
+  // The STL file itself isn't persisted. If the owner wants a different
+  // angle later they re-upload — the modal makes this explicit.
+
+  // Module-level state for the STL modal. Created on first click,
+  // reused thereafter (same pattern as terms-gate's _ensureModal).
+  var stl = {
+    modalNode: null,
+    bsModal: null,
+    libsPromise: null,    // cached Promise for the Three.js + STLLoader lazy-load
+    fileInput: null,
+    renderArea: null,
+    statusText: null,
+    errorBox: null,
+    useBtn: null,
+    cancelBtn: null,
+    viewButtons: null,
+    renderer: null,
+    scene: null,
+    camera: null,
+    mesh: null,
+    light: null,
+    dirLight: null,
+    cameraDistance: 2.6,  // initial isometric distance (matches (1.5,1.5,1.5))
+    sceneReady: false,
+    hasModel: false,
+    // Spherical coordinates for drag-rotate (radians)
+    spherical: { theta: Math.PI / 4, phi: Math.PI / 3 },
+    drag: null,           // { lastX, lastY } while pointer is down
+  };
+
+  // Lazy-load Three.js + STLLoader. Returns a Promise that resolves
+  // when both globals are present. Re-uses an existing in-flight load
+  // if called again. Rejects with a single error message on any failure
+  // so the modal can show a friendly "couldn't load the 3D viewer" line.
+  function loadStlLibs() {
+    if (stl.libsPromise) return stl.libsPromise;
+    stl.libsPromise = new Promise(function (resolve, reject) {
+      function loadScript(src, marker) {
+        return new Promise(function (res, rej) {
+          var existing = document.querySelector('script[data-ib-stl="' + marker + '"]');
+          if (existing) {
+            // Already in flight or done — hook into its lifecycle.
+            if (existing.dataset.loaded === '1') { res(); return; }
+            existing.addEventListener('load', function () { res(); });
+            existing.addEventListener('error', function () { rej(new Error('Load failed: ' + src)); });
+            return;
+          }
+          var s = document.createElement('script');
+          s.src = src;
+          s.async = true;
+          s.setAttribute('data-ib-stl', marker);
+          s.onload = function () { s.dataset.loaded = '1'; res(); };
+          s.onerror = function () { rej(new Error('Load failed: ' + src)); };
+          document.head.appendChild(s);
+        });
+      }
+      loadScript(THREE_CDN, 'three')
+        .then(function () {
+          if (typeof window.THREE === 'undefined') {
+            throw new Error('THREE global missing');
+          }
+          return loadScript(STL_LOADER_CDN, 'stlloader');
+        })
+        .then(function () {
+          if (typeof window.THREE === 'undefined' || !window.THREE.STLLoader) {
+            throw new Error('STLLoader missing');
+          }
+          resolve();
+        })
+        .catch(function (err) {
+          // Reset so the next attempt re-tries the network — a CDN blip
+          // shouldn't permanently disable the feature.
+          stl.libsPromise = null;
+          reject(err);
+        });
+    });
+    return stl.libsPromise;
+  }
+
+  // Build the STL modal once and cache it. Modal markup mirrors the
+  // Bootstrap structure used elsewhere on the site (terms-gate / project
+  // editor) so the existing Bootstrap CSS handles centring + backdrop.
+  function ensureStlModal() {
+    if (stl.modalNode) return stl.modalNode;
+    var modalId = 'ib-stl-modal';
+    var html =
+      '<div class="modal fade ib-stl-modal" id="' + modalId + '" tabindex="-1" ' +
+      '  aria-labelledby="' + modalId + '-label" aria-hidden="true" ' +
+      '  data-bs-backdrop="static" data-bs-keyboard="true">' +
+      '  <div class="modal-dialog modal-dialog-centered">' +
+      '    <div class="modal-content">' +
+      '      <div class="modal-header">' +
+      '        <h5 class="modal-title" id="' + modalId + '-label">' +
+      '          <i class="fas fa-cube me-2 text-primary"></i>Add 3D model (STL)' +
+      '        </h5>' +
+      '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+      '      </div>' +
+      '      <div class="modal-body">' +
+      '        <div class="mb-3">' +
+      '          <input type="file" class="form-control form-control-sm" accept=".stl" id="ib-stl-file">' +
+      '        </div>' +
+      '        <div class="ib-stl-render-area" id="ib-stl-render-area">' +
+      '          <div class="ib-stl-status text-muted small" id="ib-stl-status">' +
+      '            Choose an STL file to preview it here.' +
+      '          </div>' +
+      '          <div class="ib-stl-error alert alert-danger d-none" id="ib-stl-error" role="alert"></div>' +
+      '        </div>' +
+      '        <div class="ib-stl-views mt-3">' +
+      '          <button type="button" class="ib-stl-view-btn" data-stl-view="top">Top</button>' +
+      '          <button type="button" class="ib-stl-view-btn" data-stl-view="front">Front</button>' +
+      '          <button type="button" class="ib-stl-view-btn" data-stl-view="side">Side</button>' +
+      '          <button type="button" class="ib-stl-view-btn is-active" data-stl-view="iso">Isometric</button>' +
+      '        </div>' +
+      '        <p class="ib-stl-help text-muted small mt-2 mb-0">' +
+      '          Drag to rotate &middot; Scroll to zoom &middot; Large files may take a moment to load.' +
+      '        </p>' +
+      '        <p class="ib-stl-note text-muted small mt-1 mb-0">' +
+      '          <i class="fas fa-info-circle me-1"></i>' +
+      '          Only the rendered view is saved to the step — re-upload to change the angle later.' +
+      '        </p>' +
+      '      </div>' +
+      '      <div class="modal-footer">' +
+      '        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="ib-stl-cancel">Cancel</button>' +
+      '        <button type="button" class="btn btn-primary" id="ib-stl-use" disabled>Use this view</button>' +
+      '      </div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>';
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    var node = wrap.firstElementChild;
+    document.body.appendChild(node);
+
+    stl.modalNode = node;
+    stl.fileInput = node.querySelector('#ib-stl-file');
+    stl.renderArea = node.querySelector('#ib-stl-render-area');
+    stl.statusText = node.querySelector('#ib-stl-status');
+    stl.errorBox = node.querySelector('#ib-stl-error');
+    stl.useBtn = node.querySelector('#ib-stl-use');
+    stl.cancelBtn = node.querySelector('#ib-stl-cancel');
+    stl.viewButtons = node.querySelectorAll('.ib-stl-view-btn');
+
+    stl.fileInput.addEventListener('change', onStlFilePicked);
+    stl.useBtn.addEventListener('click', onStlUseView);
+    Array.prototype.forEach.call(stl.viewButtons, function (btn) {
+      btn.addEventListener('click', function () {
+        onStlViewButton(btn.dataset.stlView);
+      });
+    });
+
+    // Bootstrap modal instance — we let Bootstrap manage backdrop /
+    // focus etc., we just call .show() / .hide().
+    if (window.bootstrap && window.bootstrap.Modal) {
+      stl.bsModal = new window.bootstrap.Modal(node);
+    } else {
+      // Bootstrap not present — synthesise minimal show/hide via the
+      // 'show' class so the page still works. Unlikely on this site
+      // (Bootstrap is loaded globally) but defensive against any
+      // future config change.
+      stl.bsModal = {
+        show: function () { node.classList.add('show'); node.style.display = 'block'; },
+        hide: function () { node.classList.remove('show'); node.style.display = 'none'; },
+      };
+    }
+
+    // Reset state when the modal is dismissed — clear the file input
+    // and any model so the next open starts fresh.
+    node.addEventListener('hidden.bs.modal', function () {
+      try { stl.fileInput.value = ''; } catch (_) {}
+      stlClearError();
+      stl.hasModel = false;
+      stl.useBtn.disabled = true;
+      stl.statusText.textContent = 'Choose an STL file to preview it here.';
+      stl.statusText.classList.remove('d-none');
+      if (stl.scene && stl.mesh) {
+        try { stl.scene.remove(stl.mesh); } catch (_) {}
+        if (stl.mesh.geometry) { try { stl.mesh.geometry.dispose(); } catch (_) {} }
+        if (stl.mesh.material) { try { stl.mesh.material.dispose(); } catch (_) {} }
+        stl.mesh = null;
+      }
+      if (stl.renderer) {
+        try { stl.renderer.clear(); } catch (_) {}
+      }
+    });
+
+    return node;
+  }
+
+  function stlShowError(msg) {
+    if (!stl.errorBox) return;
+    stl.errorBox.textContent = msg;
+    stl.errorBox.classList.remove('d-none');
+  }
+  function stlClearError() {
+    if (stl.errorBox) {
+      stl.errorBox.textContent = '';
+      stl.errorBox.classList.add('d-none');
+    }
+  }
+
+  // Build the Three.js scene once per modal lifetime — we reuse it
+  // across multiple file picks. Returns true on success, false if the
+  // libs aren't loaded yet (caller should retry after loadStlLibs).
+  function initStlScene() {
+    if (stl.sceneReady) return true;
+    var THREE = window.THREE;
+    if (!THREE) return false;
+
+    // Renderer — preserveDrawingBuffer is REQUIRED so toDataURL() can
+    // read the framebuffer back. Without it, Chrome happily renders to
+    // screen but toDataURL returns a blank PNG.
+    stl.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    stl.renderer.setPixelRatio(window.devicePixelRatio || 1);
+    stl.renderer.setSize(STL_VIEW_SIZE, STL_VIEW_SIZE, false);
+    stl.renderer.setClearColor(STL_SCENE_BG, 1);
+
+    // Attach the renderer's canvas inside the render area, replacing
+    // the status text wrapper but keeping the error overlay alongside.
+    stl.renderer.domElement.classList.add('ib-stl-canvas');
+    stl.renderArea.appendChild(stl.renderer.domElement);
+
+    stl.scene = new THREE.Scene();
+    stl.scene.background = new THREE.Color(STL_SCENE_BG);
+
+    stl.camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    setStlView('iso'); // also positions camera
+
+    stl.light = new THREE.HemisphereLight(0xffffff, 0x444466, 1.0);
+    stl.scene.add(stl.light);
+
+    stl.dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    stl.dirLight.position.copy(stl.camera.position);
+    stl.scene.add(stl.dirLight);
+
+    // Pointer / wheel input on the renderer canvas
+    var el = stl.renderer.domElement;
+    el.addEventListener('mousedown', onStlPointerDown);
+    el.addEventListener('wheel', onStlWheel, { passive: false });
+    el.addEventListener('touchstart', onStlTouchStart, { passive: false });
+    el.addEventListener('touchmove', onStlTouchMove, { passive: false });
+    el.addEventListener('touchend', onStlTouchEnd);
+
+    stl.sceneReady = true;
+    return true;
+  }
+
+  // Position camera + look-at for one of the four preset views.
+  // Updates `cameraDistance` / `spherical` so subsequent drag-rotate /
+  // zoom interactions start from the right baseline.
+  function setStlView(name) {
+    if (!stl.camera) return;
+    var THREE = window.THREE;
+    var pos;
+    if (name === 'top') {
+      // Tiny non-zero z so up vector resolves (camera-looks-straight-down
+      // is degenerate for the default up axis).
+      pos = new THREE.Vector3(0, 2, 0.001);
+    } else if (name === 'front') {
+      pos = new THREE.Vector3(0, 0, 2);
+    } else if (name === 'side') {
+      pos = new THREE.Vector3(2, 0, 0);
+    } else {
+      pos = new THREE.Vector3(1.5, 1.5, 1.5);
+    }
+    stl.camera.position.copy(pos);
+    stl.camera.lookAt(0, 0, 0);
+    stl.cameraDistance = pos.length();
+    // Update spherical coords from new position so drag continues smoothly.
+    stl.spherical.theta = Math.atan2(pos.x, pos.z);
+    stl.spherical.phi = Math.acos(Math.max(-1, Math.min(1, pos.y / stl.cameraDistance)));
+
+    if (stl.dirLight) stl.dirLight.position.copy(stl.camera.position);
+
+    // Toggle button highlights
+    if (stl.viewButtons) {
+      Array.prototype.forEach.call(stl.viewButtons, function (b) {
+        b.classList.toggle('is-active', b.dataset.stlView === name);
+      });
+    }
+    renderStlScene();
+  }
+
+  function renderStlScene() {
+    if (stl.renderer && stl.scene && stl.camera) {
+      stl.renderer.render(stl.scene, stl.camera);
+    }
+  }
+
+  // Apply current spherical coords -> camera position. Used by
+  // drag-rotate and scroll-zoom. Both call renderStlScene afterwards.
+  function applyStlSpherical() {
+    if (!stl.camera) return;
+    var r = stl.cameraDistance;
+    var phi = Math.max(0.05, Math.min(Math.PI - 0.05, stl.spherical.phi));
+    stl.spherical.phi = phi;
+    stl.camera.position.x = r * Math.sin(phi) * Math.sin(stl.spherical.theta);
+    stl.camera.position.y = r * Math.cos(phi);
+    stl.camera.position.z = r * Math.sin(phi) * Math.cos(stl.spherical.theta);
+    stl.camera.lookAt(0, 0, 0);
+    if (stl.dirLight) stl.dirLight.position.copy(stl.camera.position);
+  }
+
+  function onStlPointerDown(e) {
+    if (!stl.hasModel) return;
+    e.preventDefault();
+    stl.drag = { lastX: e.clientX, lastY: e.clientY };
+    window.addEventListener('mousemove', onStlPointerMove);
+    window.addEventListener('mouseup', onStlPointerUp);
+  }
+  function onStlPointerMove(e) {
+    if (!stl.drag) return;
+    var dx = e.clientX - stl.drag.lastX;
+    var dy = e.clientY - stl.drag.lastY;
+    stl.drag.lastX = e.clientX;
+    stl.drag.lastY = e.clientY;
+    // Convert pixel deltas to radians. Tuning: 0.005 rad/px feels
+    // about right at the modal's 400px size.
+    stl.spherical.theta -= dx * 0.005;
+    stl.spherical.phi -= dy * 0.005;
+    applyStlSpherical();
+    renderStlScene();
+  }
+  function onStlPointerUp() {
+    stl.drag = null;
+    window.removeEventListener('mousemove', onStlPointerMove);
+    window.removeEventListener('mouseup', onStlPointerUp);
+  }
+  function onStlWheel(e) {
+    if (!stl.hasModel) return;
+    e.preventDefault();
+    var delta = Math.sign(e.deltaY);
+    stl.cameraDistance = Math.max(0.5, Math.min(5.0, stl.cameraDistance + delta * 0.15));
+    applyStlSpherical();
+    renderStlScene();
+  }
+  function onStlTouchStart(e) {
+    if (!stl.hasModel || e.touches.length !== 1) return;
+    e.preventDefault();
+    stl.drag = { lastX: e.touches[0].clientX, lastY: e.touches[0].clientY };
+  }
+  function onStlTouchMove(e) {
+    if (!stl.drag || e.touches.length !== 1) return;
+    e.preventDefault();
+    var t = e.touches[0];
+    var dx = t.clientX - stl.drag.lastX;
+    var dy = t.clientY - stl.drag.lastY;
+    stl.drag.lastX = t.clientX;
+    stl.drag.lastY = t.clientY;
+    stl.spherical.theta -= dx * 0.005;
+    stl.spherical.phi -= dy * 0.005;
+    applyStlSpherical();
+    renderStlScene();
+  }
+  function onStlTouchEnd() {
+    stl.drag = null;
+  }
+
+  function onAddStlClick() {
+    var node = ensureStlModal();
+    stlClearError();
+    stl.bsModal.show();
+
+    // Kick off the lib load now (even before a file is chosen) so the
+    // network round-trip overlaps with the user picking a file.
+    loadStlLibs()
+      .then(function () {
+        // Build the scene as soon as libs are ready — input file will
+        // populate it. If a previous instance is already built, this
+        // is a no-op.
+        initStlScene();
+      })
+      .catch(function () {
+        stlShowError("Couldn't load the 3D viewer. Please try again or check your connection.");
+        // Disable the file input so the user can't pick a file we'd
+        // fail to parse anyway. Cancel still works.
+        if (stl.fileInput) stl.fileInput.disabled = true;
+      });
+  }
+
+  function onStlFilePicked(evt) {
+    var file = evt.target.files && evt.target.files[0];
+    if (!file) return;
+    if (file.size > STL_MAX_BYTES) {
+      stlShowError('STL is too large. Please use a file under 50 MB.');
+      evt.target.value = '';
+      return;
+    }
+    stlClearError();
+    stl.statusText.textContent = 'Loading…';
+    stl.statusText.classList.remove('d-none');
+    stl.useBtn.disabled = true;
+
+    // Make sure libs are loaded + scene is up before we parse.
+    loadStlLibs()
+      .then(function () {
+        if (!initStlScene()) {
+          throw new Error('Scene init failed');
+        }
+        return file.arrayBuffer();
+      })
+      .then(function (buffer) {
+        var THREE = window.THREE;
+        var loader = new THREE.STLLoader();
+        var geometry;
+        try {
+          geometry = loader.parse(buffer);
+        } catch (_) {
+          stlShowError("Couldn't parse this STL. Make sure it's a valid binary or ASCII STL.");
+          stl.statusText.textContent = '';
+          return;
+        }
+        if (!geometry) {
+          stlShowError("Couldn't parse this STL. Make sure it's a valid binary or ASCII STL.");
+          stl.statusText.textContent = '';
+          return;
+        }
+        // Centre + normalise scale so the longest dimension is 1 unit.
+        // STLs in the wild vary from millimetres to "blender unit"
+        // arbitrary scale — normalising keeps the camera distance sane.
+        geometry.computeBoundingBox();
+        var bb = geometry.boundingBox;
+        var cx = (bb.min.x + bb.max.x) / 2;
+        var cy = (bb.min.y + bb.max.y) / 2;
+        var cz = (bb.min.z + bb.max.z) / 2;
+        geometry.translate(-cx, -cy, -cz);
+        var sx = bb.max.x - bb.min.x;
+        var sy = bb.max.y - bb.min.y;
+        var sz = bb.max.z - bb.min.z;
+        var longest = Math.max(sx, sy, sz) || 1;
+        var scale = 1 / longest;
+        geometry.scale(scale, scale, scale);
+        if (geometry.computeVertexNormals) geometry.computeVertexNormals();
+
+        // Replace any existing mesh
+        if (stl.mesh) {
+          stl.scene.remove(stl.mesh);
+          if (stl.mesh.geometry) { try { stl.mesh.geometry.dispose(); } catch (_) {} }
+          if (stl.mesh.material) { try { stl.mesh.material.dispose(); } catch (_) {} }
+        }
+        var material = new THREE.MeshStandardMaterial({
+          color: 0xb3c8d0,
+          metalness: 0.1,
+          roughness: 0.5,
+        });
+        stl.mesh = new THREE.Mesh(geometry, material);
+        stl.scene.add(stl.mesh);
+        stl.hasModel = true;
+        stl.useBtn.disabled = false;
+        stl.statusText.textContent = '';
+        stl.statusText.classList.add('d-none');
+        renderStlScene();
+      })
+      .catch(function () {
+        stlShowError("Couldn't parse this STL. Make sure it's a valid binary or ASCII STL.");
+        stl.statusText.textContent = '';
+      });
+  }
+
+  function onStlViewButton(name) {
+    if (!stl.sceneReady) return;
+    setStlView(name);
+  }
+
+  // Capture the current Three.js render as a PNG, close the modal, and
+  // place the PNG on the Fabric canvas as a regular movable object.
+  function onStlUseView() {
+    if (!stl.hasModel || !stl.renderer) return;
+    // Ensure the latest scene state is in the framebuffer before we
+    // read it back. preserveDrawingBuffer keeps the pixels around but
+    // a fresh render guarantees we capture the current camera pose.
+    renderStlScene();
+    var dataUrl;
+    try {
+      dataUrl = stl.renderer.domElement.toDataURL('image/png');
+    } catch (_) {
+      stlShowError("Couldn't capture the view. Please try a different angle.");
+      return;
+    }
+    if (!dataUrl || dataUrl.length < 100) {
+      stlShowError("Couldn't capture the view. Please try a different angle.");
+      return;
+    }
+    // Close first so the user sees the result land on the canvas.
+    try { stl.bsModal.hide(); } catch (_) {}
+
+    placeStlPngOnCanvas(dataUrl).catch(function (e) {
+      setSaveStatus('error', 'Failed to add STL view');
+      console.warn('STL place failed', e);
+    });
+  }
+
+  // Add a PNG dataURL to the Fabric canvas as a regular movable image.
+  // Distinct from addBackgroundImage: this is NOT a locked background.
+  async function placeStlPngOnCanvas(dataUrl) {
+    if (!state.canvas) return;
+    var img;
+    try {
+      // v6: fabric.Image.fromURL accepts dataURLs and returns a Promise.
+      img = await fabric.Image.fromURL(dataUrl);
+    } catch (e) {
+      throw new Error('Failed to load STL view into canvas');
+    }
+    if (!img) throw new Error('STL image returned empty');
+
+    // Place at canvas centre, scaled so the longest dim fits within
+    // 50% of canvas width — leaves the user room to add overlays
+    // around it.
+    var targetMax = CANVAS_W * 0.5;
+    var longest = Math.max(img.width, img.height) || 1;
+    var scale = targetMax / longest;
+    img.set({
+      originX: 'center',
+      originY: 'center',
+      left: CANVAS_W / 2,
+      top: CANVAS_H / 2,
+      scaleX: scale,
+      scaleY: scale,
+      // Regular movable object — NOT a background. The user can drag,
+      // resize, rotate, and (via Delete-selected) remove it.
+      selectable: true,
+      evented: true,
+      ibRole: 'stl',
+    });
+    state.canvas.add(img);
+    state.canvas.setActiveObject(img);
+    state.canvas.requestRenderAll();
+
+    // Trigger autosave so canvas_json captures the new object — the
+    // object:added listener also schedules one, but calling explicitly
+    // here belt-and-braces it against any future suppressEvents quirks.
+    scheduleAutosave();
+    scheduleSnapshot();
+    updateEmptyState();
+  }
+
   // -------- Init flow ------------------------------------------------
 
   async function init() {
@@ -1257,6 +1829,7 @@
     if (dom.uploadImageBtn) dom.uploadImageBtn.addEventListener('click', onUploadClick);
     if (dom.imageInput) dom.imageInput.addEventListener('change', onImagePicked);
     if (dom.removeImageBtn) dom.removeImageBtn.addEventListener('click', onRemoveImageClick);
+    if (dom.addStlBtn) dom.addStlBtn.addEventListener('click', onAddStlClick);
     if (dom.deleteSelected) dom.deleteSelected.addEventListener('click', onDeleteSelected);
     if (dom.undoBtn) dom.undoBtn.addEventListener('click', onUndoClick);
     if (dom.redoBtn) dom.redoBtn.addEventListener('click', onRedoClick);
