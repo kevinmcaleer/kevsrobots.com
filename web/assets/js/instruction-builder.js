@@ -60,6 +60,17 @@
   // upload assigns) counts.
   var CAM_FILENAME_PREFIX = 'cam_';
 
+  // Inspector HUD — brand swatches. The four swatches match the design
+  // sketch (`design_handoff_instructions_builder/`). A "custom" tile next
+  // to them opens the native colour picker.
+  var HUD_SWATCHES = ['#c8312a', '#ffffff', '#222222', '#33aa88'];
+
+  // @imgly/background-removal — lazy-loaded ESM bundle for the
+  // image-context toolbar's "Cutout" action. jsdelivr serves browser-
+  // compatible ESM via the `/+esm` path; the library is ~25MB including
+  // its WASM model and only loads on first cutout click.
+  var IMGLY_BG_REMOVAL_URL = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm';
+
   var state = {
     projectId: null,
     project: null,
@@ -170,6 +181,11 @@
     dom.canvasFrame = document.getElementById('ib-canvas-frame');
     dom.canvasEmpty = document.getElementById('ib-canvas-empty');
     dom.inspectorHud = document.getElementById('ib-inspector-hud');
+    dom.hudHeader = document.getElementById('ib-hud-header');
+    dom.hudBody = document.getElementById('ib-hud-body');
+    dom.hudMinimize = document.getElementById('ib-hud-minimize');
+    dom.hudClose = document.getElementById('ib-hud-close');
+    dom.imageToolbar = document.getElementById('ib-image-toolbar');
 
     // Filmstrip
     dom.filmstrip = document.getElementById('ib-filmstrip');
@@ -305,12 +321,9 @@
     if (dom.secondary && typeof ui.secondaryPaneWidth === 'number') {
       dom.secondary.style.width = Math.max(200, Math.min(400, ui.secondaryPaneWidth)) + 'px';
     }
-    // HUD toggle visual — the panel itself is empty in this PR.
-    if (dom.hudToggle) {
-      dom.hudToggle.setAttribute('aria-pressed', ui.hudVisible ? 'true' : 'false');
-      dom.hudToggle.classList.toggle('is-active', !!ui.hudVisible);
-    }
-    document.body.classList.toggle('hud-visible', !!ui.hudVisible);
+    // HUD: title-bar button reflects visibility + panel is shown/hidden.
+    // The panel content is rendered selection-aware by renderHudBody.
+    applyHudVisibility(!!ui.hudVisible);
     // Filmstrip collapsed
     if (dom.filmstrip) dom.filmstrip.classList.toggle('is-collapsed', !!ui.filmstripCollapsed);
     updateFilmstripToggleLabel();
@@ -453,6 +466,20 @@
     c.on('object:rotating', onObjectRotating);
     c.on('object:modified', onSelectionChanged);
 
+    // PR 2 — Inspector HUD + image-context toolbar follow the active
+    // object as it moves / scales / rotates. The refresh helpers are
+    // focus-aware (HUD inputs in focus aren't overwritten) and
+    // visibility-aware (no-ops when nothing's selected).
+    var liveEvents = ['object:moving', 'object:scaling', 'object:rotating',
+                      'object:skewing', 'object:modified'];
+    liveEvents.forEach(function (evt) {
+      c.on(evt, function () {
+        refreshHudInputsFromCanvas();
+        var img = activeImageOrNull();
+        if (img) positionImageToolbar(img);
+      });
+    });
+
     // Autosave + undo snapshot triggers + layers list re-render.
     var changeEvents = ['object:added', 'object:modified', 'object:removed'];
     changeEvents.forEach(function (evt) {
@@ -536,6 +563,12 @@
     if (dom.bringForward) dom.bringForward.disabled = !canTransform;
     if (dom.sendBackward) dom.sendBackward.disabled = !canTransform;
     if (dom.sendToBack) dom.sendToBack.disabled = !canTransform;
+
+    // PR 2 — keep the HUD body + image-context toolbar in sync with the
+    // current selection. Both are no-ops when the HUD is hidden / there
+    // isn't a relevant single-object selection.
+    if (state.uiState && state.uiState.hudVisible) renderHudBody();
+    refreshImageToolbar();
   }
 
   function onObjectRotating(opt) {
@@ -2770,12 +2803,824 @@
     dom.hudToggle.addEventListener('click', function () {
       if (!state.uiState) return;
       state.uiState.hudVisible = !state.uiState.hudVisible;
-      dom.hudToggle.setAttribute('aria-pressed', state.uiState.hudVisible ? 'true' : 'false');
-      dom.hudToggle.classList.toggle('is-active', state.uiState.hudVisible);
-      document.body.classList.toggle('hud-visible', state.uiState.hudVisible);
-      // PR 2: also show/hide the #ib-inspector-hud panel content.
+      applyHudVisibility(state.uiState.hudVisible);
       saveUiState();
     });
+  }
+
+  // ====================================================================
+  // 24b. INSPECTOR HUD — selection-aware floating panel
+  // ====================================================================
+  //
+  // The HUD lives over the canvas (`#ib-inspector-hud`). It listens to
+  // Fabric selection events and reflects / writes the active object's
+  // position, size, rotation, z-index, opacity, colour and a handful of
+  // actions. Position is persisted to localStorage under uiState.hudPos.
+  //
+  // Focus-aware input refresh: while the user is typing in an HUD input,
+  // canvas events (e.g. an `object:moving` triggered by a drag) must not
+  // overwrite the input's value. We check `document.activeElement` before
+  // each write — if it matches the input we're about to update, we skip
+  // it. The `data-hud-field` attribute on each input identifies which
+  // field a given DOM node represents.
+
+  // Set true while we're programmatically mutating the active Fabric
+  // object from an HUD input — so the resulting `object:modified` event
+  // doesn't loop back and stomp the input we're editing.
+  var hudWriting = false;
+  // Set true while we're programmatically mutating an HUD input from the
+  // canvas — so the input event the form would otherwise fire doesn't
+  // bounce back into Fabric.
+  var hudRendering = false;
+
+  function applyHudVisibility(visible) {
+    if (dom.hudToggle) {
+      dom.hudToggle.setAttribute('aria-pressed', visible ? 'true' : 'false');
+      dom.hudToggle.classList.toggle('is-active', !!visible);
+    }
+    document.body.classList.toggle('hud-visible', !!visible);
+    if (dom.inspectorHud) {
+      if (visible) {
+        dom.inspectorHud.removeAttribute('hidden');
+        // Re-position to the last-saved coordinates (or default) and
+        // re-render the body so the user sees content immediately.
+        applyHudPosition();
+        renderHudBody();
+      } else {
+        dom.inspectorHud.setAttribute('hidden', '');
+      }
+    }
+  }
+
+  // Clamp + apply the stored HUD position. If no position is stored
+  // (first load or after a "close" + reopen), fall back to the default
+  // top-right.
+  function applyHudPosition() {
+    if (!dom.inspectorHud || !dom.canvasArea) return;
+    var stored = state.uiState && state.uiState.hudPos;
+    if (!stored || stored.x === null || stored.x === undefined ||
+        stored.y === null || stored.y === undefined) {
+      // Default: 18px from top, 18px from right of the canvas area.
+      dom.inspectorHud.style.top = '18px';
+      dom.inspectorHud.style.right = '18px';
+      dom.inspectorHud.style.left = '';
+      return;
+    }
+    var area = dom.canvasArea.getBoundingClientRect();
+    var hud = dom.inspectorHud.getBoundingClientRect();
+    var w = hud.width || 240;
+    var h = hud.height || 100;
+    var x = Math.max(0, Math.min(area.width - w, stored.x));
+    var y = Math.max(0, Math.min(area.height - h, stored.y));
+    dom.inspectorHud.style.left = x + 'px';
+    dom.inspectorHud.style.top = y + 'px';
+    dom.inspectorHud.style.right = '';
+  }
+
+  // Classify a Fabric object into an HUD display name. Backgrounds and
+  // multi-selections get filtered out before this is called.
+  function hudObjectName(o) {
+    if (!o) return 'Object';
+    if (o.ibRole === 'background') return 'Background';
+    var t = o.type || '';
+    if (t === 'image' || (o.isType && o.isType('image'))) return 'Image';
+    if (t === 'i-text' || t === 'text' || t === 'textbox') return 'Text';
+    if (t === 'rect') return 'Rectangle';
+    if (t === 'ellipse' || t === 'circle') return 'Circle';
+    if (t === 'group') return 'Arrow';
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  // What Fabric "colour" property does this object expose? Images don't
+  // expose a meaningful colour for the HUD — return null to hide the row.
+  function hudColorProperty(o) {
+    if (!o) return null;
+    if (o.type === 'image' || (o.isType && o.isType('image'))) return null;
+    if (o.isType && o.isType('i-text')) return 'fill';
+    if (o.type === 'i-text' || o.type === 'text' || o.type === 'textbox') return 'fill';
+    return 'stroke';
+  }
+
+  function hudReadColor(o) {
+    var prop = hudColorProperty(o);
+    if (!prop) return null;
+    return o.get ? o.get(prop) : o[prop];
+  }
+
+  function hudApplyColor(o, color) {
+    var prop = hudColorProperty(o);
+    if (!prop) return;
+    var changes = {};
+    changes[prop] = color;
+    if (o.set) o.set(changes); else o[prop] = color;
+    // Arrow groups need the colour propagated to their children (line +
+    // triangle head), otherwise the visible colour doesn't change.
+    if (o.type === 'group' && typeof o.forEachObject === 'function') {
+      o.forEachObject(function (child) {
+        if (child.type === 'triangle') child.set('fill', color);
+        else if (child.set) child.set('stroke', color);
+      });
+    }
+  }
+
+  // Read the displayed (post-scale) width/height of a Fabric object in
+  // its local coordinate system. Used for the W/H inputs.
+  function hudDimensions(o) {
+    if (!o) return { w: 0, h: 0 };
+    var w = (o.width || 0) * (o.scaleX || 1);
+    var h = (o.height || 0) * (o.scaleY || 1);
+    return { w: Math.round(w), h: Math.round(h) };
+  }
+
+  // Set the displayed (post-scale) width/height by re-computing scaleX
+  // / scaleY against the object's intrinsic width/height. Falls back to
+  // 1px if the intrinsic dim is zero.
+  function hudSetWidth(o, newW) {
+    if (!o || !o.width || newW <= 0) return;
+    o.set('scaleX', newW / o.width);
+  }
+  function hudSetHeight(o, newH) {
+    if (!o || !o.height || newH <= 0) return;
+    o.set('scaleY', newH / o.height);
+  }
+
+  // Build the HUD body for the given active object. Returns true if the
+  // HUD has selection content; false if it's showing the empty state.
+  function renderHudBody() {
+    if (!dom.hudBody) return false;
+    var active = state.canvas ? state.canvas.getActiveObject() : null;
+    var isMulti = active && active.type === 'activeSelection';
+    // Treat background and multi-select as "no useful single object".
+    if (!active || isMulti || active.ibRole === 'background') {
+      dom.hudBody.innerHTML =
+        '<div class="ib-hud-empty">Select an object to edit its properties.</div>';
+      return false;
+    }
+
+    var name = hudObjectName(active);
+    var dims = hudDimensions(active);
+    var left = Math.round(active.left || 0);
+    var top = Math.round(active.top || 0);
+    var rot = Math.round(((active.angle || 0) % 360 + 360) % 360);
+    if (rot > 180) rot -= 360;
+    var zIdx = state.canvas.getObjects().indexOf(active);
+    var op = Math.round((active.opacity == null ? 1 : active.opacity) * 100);
+    var color = hudReadColor(active);
+    var showColor = !!hudColorProperty(active);
+
+    var swatchesHtml = '';
+    if (showColor) {
+      swatchesHtml = '<div class="ib-hud-colors" data-hud-field-group="color">';
+      HUD_SWATCHES.forEach(function (c) {
+        var isActive = color && c.toLowerCase() === String(color).toLowerCase();
+        swatchesHtml +=
+          '<button type="button" class="ib-hud-swatch' + (isActive ? ' is-active' : '') + '"' +
+          ' style="background:' + c + '" data-hud-swatch="' + c + '"' +
+          ' title="' + c + '"></button>';
+      });
+      swatchesHtml +=
+        '<label class="ib-hud-swatch-custom" title="Custom colour">' +
+        '<input type="color" data-hud-field="color"' +
+        ' value="' + (color ? String(color) : '#c8312a') + '">' +
+        '</label>';
+      swatchesHtml += '</div>';
+    }
+
+    dom.hudBody.innerHTML =
+      '<h6 class="ib-hud-name">' + escapeHtml(name) + '</h6>' +
+      '<div class="ib-hud-grid">' +
+      '  <div class="ib-hud-field">' +
+      '    <span class="ib-hud-field-label">X</span>' +
+      '    <input type="number" data-hud-field="x" value="' + left + '" step="1">' +
+      '  </div>' +
+      '  <div class="ib-hud-field">' +
+      '    <span class="ib-hud-field-label">Y</span>' +
+      '    <input type="number" data-hud-field="y" value="' + top + '" step="1">' +
+      '  </div>' +
+      '  <div class="ib-hud-field">' +
+      '    <span class="ib-hud-field-label">W</span>' +
+      '    <input type="number" data-hud-field="w" value="' + dims.w + '" step="1" min="1">' +
+      '  </div>' +
+      '  <div class="ib-hud-field">' +
+      '    <span class="ib-hud-field-label">H</span>' +
+      '    <input type="number" data-hud-field="h" value="' + dims.h + '" step="1" min="1">' +
+      '  </div>' +
+      '</div>' +
+      '<div class="ib-hud-grid">' +
+      '  <div class="ib-hud-field">' +
+      '    <span class="ib-hud-field-label">Rot&deg;</span>' +
+      '    <input type="number" data-hud-field="rot" value="' + rot +
+      '" step="1" min="-180" max="180">' +
+      '  </div>' +
+      '  <div class="ib-hud-field">' +
+      '    <span class="ib-hud-field-label">Z</span>' +
+      '    <input type="number" data-hud-field="z" value="' + zIdx + '" step="1" min="0">' +
+      '  </div>' +
+      '</div>' +
+      '<div class="ib-hud-slider-row">' +
+      '  <label for="ib-hud-opacity">Opacity</label>' +
+      '  <input type="range" id="ib-hud-opacity" data-hud-field="opacity"' +
+      '         min="0" max="100" step="1" value="' + op + '">' +
+      '  <span class="ib-hud-slider-value" data-hud-field-display="opacity">' + op + '%</span>' +
+      '</div>' +
+      swatchesHtml +
+      '<div class="ib-hud-actions">' +
+      '  <button type="button" class="ib-hud-action" data-hud-action="rotate-ccw"' +
+      '          title="Rotate -90&deg;"><i class="fas fa-rotate-left"></i></button>' +
+      '  <button type="button" class="ib-hud-action" data-hud-action="rotate-cw"' +
+      '          title="Rotate +90&deg;"><i class="fas fa-rotate-right"></i></button>' +
+      '  <button type="button" class="ib-hud-action" data-hud-action="flip-h"' +
+      '          title="Flip horizontal"><i class="fas fa-arrows-left-right"></i></button>' +
+      '  <button type="button" class="ib-hud-action" data-hud-action="flip-v"' +
+      '          title="Flip vertical"><i class="fas fa-arrows-up-down"></i></button>' +
+      '  <button type="button" class="ib-hud-action is-danger" data-hud-action="delete"' +
+      '          title="Delete"><i class="fas fa-trash"></i></button>' +
+      '</div>';
+
+    wireHudBody(active);
+    return true;
+  }
+
+  // Wire the (just-rendered) HUD body to its current active object.
+  // Re-runs each time the body is re-rendered.
+  function wireHudBody(active) {
+    if (!dom.hudBody || !state.canvas) return;
+
+    function fireModified() {
+      try {
+        state.canvas.fire('object:modified', { target: active });
+      } catch (_) { /* harmless if Fabric is mid-frame */ }
+    }
+
+    // Numeric inputs (X/Y/W/H, Rot°, Z) — write on `input` so dragging
+    // the spinner / typing reflects live, but the hudWriting flag stops
+    // us echoing back to ourselves.
+    var numericFields = dom.hudBody.querySelectorAll('input[data-hud-field]');
+    Array.prototype.forEach.call(numericFields, function (inp) {
+      var field = inp.dataset.hudField;
+      var handler = function () {
+        if (hudRendering) return;
+        var raw = parseFloat(inp.value);
+        if (isNaN(raw)) return;
+        hudWriting = true;
+        try {
+          if (field === 'x') active.set('left', raw);
+          else if (field === 'y') active.set('top', raw);
+          else if (field === 'w') hudSetWidth(active, Math.max(1, raw));
+          else if (field === 'h') hudSetHeight(active, Math.max(1, raw));
+          else if (field === 'rot') {
+            var deg = ((raw % 360) + 360) % 360;
+            active.set('angle', deg);
+          } else if (field === 'z') {
+            var objs = state.canvas.getObjects();
+            var target = Math.max(0, Math.min(objs.length - 1, Math.round(raw)));
+            if (state.canvas.moveObjectTo) state.canvas.moveObjectTo(active, target);
+            else moveObjectToFallback(active, target);
+            reanchorBackground();
+          } else if (field === 'opacity') {
+            active.set('opacity', raw / 100);
+            var disp = dom.hudBody.querySelector('[data-hud-field-display="opacity"]');
+            if (disp) disp.textContent = Math.round(raw) + '%';
+          } else if (field === 'color') {
+            // Native colour picker — applies live as the user picks.
+            hudApplyColor(active, inp.value);
+            highlightHudSwatch(inp.value);
+          }
+          active.setCoords();
+          state.canvas.requestRenderAll();
+        } finally {
+          hudWriting = false;
+        }
+      };
+
+      // Opacity + color fire constantly; debounce the modified event so
+      // we don't generate undo snapshots per pixel of slider movement.
+      if (field === 'opacity' || field === 'color') {
+        inp.addEventListener('input', handler);
+        inp.addEventListener('change', function () { fireModified(); });
+      } else {
+        inp.addEventListener('input', handler);
+        inp.addEventListener('change', fireModified);
+      }
+    });
+
+    // Brand swatches — single-click apply.
+    Array.prototype.forEach.call(
+      dom.hudBody.querySelectorAll('[data-hud-swatch]'),
+      function (btn) {
+        btn.addEventListener('click', function () {
+          var c = btn.dataset.hudSwatch;
+          hudWriting = true;
+          try {
+            hudApplyColor(active, c);
+            state.canvas.requestRenderAll();
+            highlightHudSwatch(c);
+            var picker = dom.hudBody.querySelector('input[data-hud-field="color"]');
+            if (picker) picker.value = (c[0] === '#' && c.length === 7) ? c : picker.value;
+          } finally {
+            hudWriting = false;
+          }
+          fireModified();
+        });
+      }
+    );
+
+    // Action icons — rotate / flip / delete.
+    Array.prototype.forEach.call(
+      dom.hudBody.querySelectorAll('[data-hud-action]'),
+      function (btn) {
+        btn.addEventListener('click', function () {
+          var act = btn.dataset.hudAction;
+          if (act === 'delete') {
+            state.canvas.remove(active);
+            state.canvas.discardActiveObject();
+            state.canvas.requestRenderAll();
+            renderHudBody();
+            return;
+          }
+          hudWriting = true;
+          try {
+            if (act === 'rotate-ccw') {
+              active.set('angle', (((active.angle || 0) - 90) % 360 + 360) % 360);
+            } else if (act === 'rotate-cw') {
+              active.set('angle', (((active.angle || 0) + 90) % 360 + 360) % 360);
+            } else if (act === 'flip-h') {
+              active.set('flipX', !active.flipX);
+            } else if (act === 'flip-v') {
+              active.set('flipY', !active.flipY);
+            }
+            active.setCoords();
+            state.canvas.requestRenderAll();
+          } finally {
+            hudWriting = false;
+          }
+          fireModified();
+          renderHudBody();
+        });
+      }
+    );
+  }
+
+  function highlightHudSwatch(color) {
+    if (!dom.hudBody) return;
+    var lower = color ? String(color).toLowerCase() : '';
+    Array.prototype.forEach.call(
+      dom.hudBody.querySelectorAll('[data-hud-swatch]'),
+      function (sw) {
+        sw.classList.toggle('is-active',
+          sw.dataset.hudSwatch.toLowerCase() === lower);
+      }
+    );
+  }
+
+  // Refresh the HUD numeric inputs in response to canvas-driven changes
+  // (drag / scale / rotate). Skips inputs that the user is currently
+  // focused on — so typing in W doesn't get clobbered while another
+  // dimension updates.
+  function refreshHudInputsFromCanvas() {
+    if (!dom.hudBody || hudWriting) return;
+    var active = state.canvas ? state.canvas.getActiveObject() : null;
+    if (!active || active.type === 'activeSelection' || active.ibRole === 'background') {
+      return;
+    }
+    var focused = document.activeElement;
+    function setField(name, value) {
+      var inp = dom.hudBody.querySelector('input[data-hud-field="' + name + '"]');
+      if (!inp || inp === focused) return;
+      hudRendering = true;
+      try { inp.value = String(value); } finally { hudRendering = false; }
+    }
+    var dims = hudDimensions(active);
+    setField('x', Math.round(active.left || 0));
+    setField('y', Math.round(active.top || 0));
+    setField('w', dims.w);
+    setField('h', dims.h);
+    var rot = Math.round(((active.angle || 0) % 360 + 360) % 360);
+    if (rot > 180) rot -= 360;
+    setField('rot', rot);
+    setField('z', state.canvas.getObjects().indexOf(active));
+    var op = Math.round((active.opacity == null ? 1 : active.opacity) * 100);
+    setField('opacity', op);
+    var disp = dom.hudBody.querySelector('[data-hud-field-display="opacity"]');
+    if (disp) disp.textContent = op + '%';
+  }
+
+  function wireHudDragAndButtons() {
+    if (!dom.inspectorHud) return;
+
+    // Close: hides the HUD and persists the state (mirroring the title-
+    // bar HUD button's "off" state).
+    if (dom.hudClose) {
+      dom.hudClose.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!state.uiState) return;
+        state.uiState.hudVisible = false;
+        applyHudVisibility(false);
+        saveUiState();
+      });
+    }
+
+    // Minimize: collapse to header-only.
+    if (dom.hudMinimize) {
+      dom.hudMinimize.addEventListener('click', function (e) {
+        e.stopPropagation();
+        dom.inspectorHud.classList.toggle('is-minimized');
+      });
+    }
+
+    // Header drag.
+    if (!dom.hudHeader) return;
+    var drag = null;
+    dom.hudHeader.addEventListener('mousedown', function (e) {
+      // Ignore drags that start on the icon buttons.
+      if (e.target.closest('.ib-hud-icon-btn')) return;
+      var hudRect = dom.inspectorHud.getBoundingClientRect();
+      var areaRect = dom.canvasArea.getBoundingClientRect();
+      drag = {
+        startX: e.clientX,
+        startY: e.clientY,
+        // Offset of mouse within HUD, in canvas-area coordinates.
+        offsetX: e.clientX - hudRect.left,
+        offsetY: e.clientY - hudRect.top,
+        areaRect: areaRect,
+        hudW: hudRect.width,
+        hudH: hudRect.height,
+      };
+      dom.hudHeader.classList.add('is-dragging');
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (!drag) return;
+      var x = e.clientX - drag.areaRect.left - drag.offsetX;
+      var y = e.clientY - drag.areaRect.top - drag.offsetY;
+      // Clamp so the HUD stays fully inside the canvas area.
+      x = Math.max(0, Math.min(drag.areaRect.width - drag.hudW, x));
+      y = Math.max(0, Math.min(drag.areaRect.height - drag.hudH, y));
+      dom.inspectorHud.style.left = x + 'px';
+      dom.inspectorHud.style.top = y + 'px';
+      dom.inspectorHud.style.right = '';
+      // Debounce the persist write.
+      debounce('hud-pos-save', 200, function () {
+        if (!state.uiState) return;
+        state.uiState.hudPos = { x: x, y: y };
+        saveUiState();
+      });
+    });
+
+    document.addEventListener('mouseup', function () {
+      if (!drag) return;
+      drag = null;
+      dom.hudHeader.classList.remove('is-dragging');
+      document.body.style.userSelect = '';
+    });
+  }
+
+  // ====================================================================
+  // 24c. IMAGE-CONTEXT TOOLBAR — pill above selected images
+  // ====================================================================
+  //
+  // Visible only when the active selection is a single non-background
+  // image. Anchored to the image's top-centre and re-positioned on
+  // every `object:moving|scaling|rotating` so it tracks the image.
+  // Buttons: crop-rect, crop-circle, cutout (AI bg-remove), outline
+  // toggle, greyscale toggle, rotate-90, delete.
+
+  // imgly lazy-load — null until first cutout click. Module promise so
+  // concurrent clicks don't double-load.
+  var imglyModulePromise = null;
+
+  function loadImgly() {
+    if (imglyModulePromise) return imglyModulePromise;
+    imglyModulePromise = import(IMGLY_BG_REMOVAL_URL).catch(function (err) {
+      imglyModulePromise = null;
+      throw err;
+    });
+    return imglyModulePromise;
+  }
+
+  function activeImageOrNull() {
+    if (!state.canvas) return null;
+    var active = state.canvas.getActiveObject();
+    if (!active) return null;
+    if (active.type === 'activeSelection') return null;
+    if (active.ibRole === 'background') return null;
+    var isImg = (active.type === 'image') ||
+      (active.isType && active.isType('image'));
+    return isImg ? active : null;
+  }
+
+  function buildImageToolbar() {
+    if (!dom.imageToolbar || dom.imageToolbar.dataset.built === '1') return;
+    dom.imageToolbar.innerHTML =
+      '<button type="button" class="ib-image-toolbar-btn" data-img-action="crop-rect"' +
+      '        title="Rectangular crop"><i class="fas fa-crop"></i></button>' +
+      '<button type="button" class="ib-image-toolbar-btn" data-img-action="crop-circle"' +
+      '        title="Circular crop"><i class="fas fa-circle"></i></button>' +
+      '<span class="ib-image-toolbar-sep"></span>' +
+      '<button type="button" class="ib-image-toolbar-btn" data-img-action="cutout"' +
+      '        title="Remove background"><i class="fas fa-wand-magic-sparkles"></i></button>' +
+      '<button type="button" class="ib-image-toolbar-btn" data-img-action="outline"' +
+      '        title="Toggle outline"><i class="fas fa-border-style"></i></button>' +
+      '<button type="button" class="ib-image-toolbar-btn" data-img-action="greyscale"' +
+      '        title="Toggle greyscale"><i class="fas fa-circle-half-stroke"></i></button>' +
+      '<span class="ib-image-toolbar-sep"></span>' +
+      '<button type="button" class="ib-image-toolbar-btn" data-img-action="rotate"' +
+      '        title="Rotate 90&deg;"><i class="fas fa-rotate-right"></i></button>' +
+      '<button type="button" class="ib-image-toolbar-btn is-danger" data-img-action="delete"' +
+      '        title="Delete image"><i class="fas fa-trash"></i></button>' +
+      '<span class="ib-image-toolbar-progress" data-img-progress hidden></span>';
+    dom.imageToolbar.dataset.built = '1';
+
+    Array.prototype.forEach.call(
+      dom.imageToolbar.querySelectorAll('[data-img-action]'),
+      function (btn) {
+        btn.addEventListener('click', function () {
+          var img = activeImageOrNull();
+          if (!img) return;
+          runImageToolbarAction(btn.dataset.imgAction, img, btn);
+        });
+      }
+    );
+  }
+
+  function setImageToolbarProgress(msg, kind) {
+    var el = dom.imageToolbar && dom.imageToolbar.querySelector('[data-img-progress]');
+    if (!el) return;
+    if (!msg) {
+      el.hidden = true;
+      el.textContent = '';
+      el.classList.remove('is-error');
+      return;
+    }
+    el.hidden = false;
+    el.textContent = msg;
+    el.classList.toggle('is-error', kind === 'error');
+  }
+
+  function reflectImageToolbarState(img) {
+    if (!dom.imageToolbar || !img) return;
+    // Reflect: outline (has stroke), greyscale (has Grayscale filter).
+    var hasOutline = !!(img.stroke && img.strokeWidth);
+    var hasGrey = Array.isArray(img.filters) && img.filters.some(function (f) {
+      return f && (f.type === 'Grayscale' ||
+        (fabric.filters && f instanceof fabric.filters.Grayscale));
+    });
+    var hasCrop = !!img.clipPath;
+    var outlineBtn = dom.imageToolbar.querySelector('[data-img-action="outline"]');
+    var greyBtn = dom.imageToolbar.querySelector('[data-img-action="greyscale"]');
+    var rectBtn = dom.imageToolbar.querySelector('[data-img-action="crop-rect"]');
+    var circleBtn = dom.imageToolbar.querySelector('[data-img-action="crop-circle"]');
+    if (outlineBtn) outlineBtn.classList.toggle('is-active', hasOutline);
+    if (greyBtn) greyBtn.classList.toggle('is-active', hasGrey);
+    if (rectBtn) rectBtn.classList.toggle('is-active',
+      hasCrop && img.clipPath && img.clipPath.type === 'rect');
+    if (circleBtn) circleBtn.classList.toggle('is-active',
+      hasCrop && img.clipPath && img.clipPath.type === 'circle');
+  }
+
+  function positionImageToolbar(img) {
+    if (!dom.imageToolbar || !dom.canvasArea || !dom.canvasFrame || !img) return;
+    // Get the image's bounding rect in canvas pixels, then translate to
+    // canvas-area coordinates (where the toolbar is positioned).
+    var br;
+    try { br = img.getBoundingRect(true, true); }
+    catch (_) { br = img.getBoundingRect(); }
+    if (!br) return;
+
+    // Translate from internal canvas coordinates to CSS pixels by the
+    // current display scale.
+    var frameRect = dom.canvasFrame.getBoundingClientRect();
+    var areaRect = dom.canvasArea.getBoundingClientRect();
+    if (frameRect.width <= 0 || frameRect.height <= 0) return;
+    var sx = frameRect.width / CANVAS_W;
+    var sy = frameRect.height / CANVAS_H;
+
+    // The image's top-centre in the canvas frame's CSS pixel space.
+    var topCx = br.left + br.width / 2;
+    var topCy = br.top;
+    // Frame is positioned relative to the canvas-area; offset accordingly.
+    var x = (frameRect.left - areaRect.left) + topCx * sx;
+    var y = (frameRect.top - areaRect.top) + topCy * sy - 10; // 10px gap
+    // Clamp so the toolbar pill stays inside the canvas area — the
+    // transform offsets by translate(-50%, -100%) so the anchor is the
+    // bottom-centre of the pill.
+    var tbRect = dom.imageToolbar.getBoundingClientRect();
+    var tbH = tbRect.height || 36;
+    if (y < tbH) y = tbH; // never overlap above the area's top edge
+
+    dom.imageToolbar.style.left = x + 'px';
+    dom.imageToolbar.style.top = y + 'px';
+  }
+
+  function refreshImageToolbar() {
+    if (!dom.imageToolbar) return;
+    var img = activeImageOrNull();
+    if (!img) {
+      dom.imageToolbar.hidden = true;
+      setImageToolbarProgress(null);
+      return;
+    }
+    buildImageToolbar();
+    dom.imageToolbar.hidden = false;
+    reflectImageToolbarState(img);
+    positionImageToolbar(img);
+  }
+
+  function runImageToolbarAction(action, img, btn) {
+    if (!state.canvas) return;
+    if (action === 'delete') {
+      state.canvas.remove(img);
+      state.canvas.discardActiveObject();
+      state.canvas.requestRenderAll();
+      refreshImageToolbar();
+      renderHudBody();
+      return;
+    }
+    if (action === 'rotate') {
+      img.set('angle', (((img.angle || 0) + 90) % 360 + 360) % 360);
+      img.setCoords();
+      state.canvas.requestRenderAll();
+      state.canvas.fire('object:modified', { target: img });
+      positionImageToolbar(img);
+      return;
+    }
+    if (action === 'crop-rect') {
+      // Default to "tap to confirm full bounds" — apply a rect clipPath
+      // matching the image's intrinsic size. Re-click removes it.
+      if (img.clipPath && img.clipPath.type === 'rect') {
+        img.set('clipPath', null);
+      } else {
+        img.set('clipPath', new fabric.Rect({
+          left: 0, top: 0,
+          width: img.width,
+          height: img.height,
+          originX: 'center',
+          originY: 'center',
+        }));
+      }
+      state.canvas.requestRenderAll();
+      state.canvas.fire('object:modified', { target: img });
+      reflectImageToolbarState(img);
+      return;
+    }
+    if (action === 'crop-circle') {
+      if (img.clipPath && img.clipPath.type === 'circle') {
+        img.set('clipPath', null);
+      } else {
+        var r = Math.min(img.width, img.height) / 2;
+        img.set('clipPath', new fabric.Circle({
+          radius: r,
+          originX: 'center',
+          originY: 'center',
+        }));
+      }
+      state.canvas.requestRenderAll();
+      state.canvas.fire('object:modified', { target: img });
+      reflectImageToolbarState(img);
+      return;
+    }
+    if (action === 'outline') {
+      if (img.stroke && img.strokeWidth) {
+        img.set({ stroke: null, strokeWidth: 0 });
+      } else {
+        img.set({ stroke: '#000000', strokeWidth: 4, strokeUniform: true });
+      }
+      state.canvas.requestRenderAll();
+      state.canvas.fire('object:modified', { target: img });
+      reflectImageToolbarState(img);
+      return;
+    }
+    if (action === 'greyscale') {
+      var hasGrey = Array.isArray(img.filters) && img.filters.some(function (f) {
+        return f && (f.type === 'Grayscale' ||
+          (fabric.filters && f instanceof fabric.filters.Grayscale));
+      });
+      if (hasGrey) {
+        img.filters = (img.filters || []).filter(function (f) {
+          return !(f && (f.type === 'Grayscale' ||
+            (fabric.filters && f instanceof fabric.filters.Grayscale)));
+        });
+      } else {
+        img.filters = (img.filters || []).concat([new fabric.filters.Grayscale()]);
+      }
+      try {
+        var p = img.applyFilters();
+        if (p && typeof p.then === 'function') {
+          p.then(function () {
+            state.canvas.requestRenderAll();
+            state.canvas.fire('object:modified', { target: img });
+          });
+        } else {
+          state.canvas.requestRenderAll();
+          state.canvas.fire('object:modified', { target: img });
+        }
+      } catch (_) {
+        state.canvas.requestRenderAll();
+        state.canvas.fire('object:modified', { target: img });
+      }
+      reflectImageToolbarState(img);
+      return;
+    }
+    if (action === 'cutout') {
+      runCutout(img, btn);
+      return;
+    }
+  }
+
+  async function runCutout(img, btn) {
+    if (!img || !btn) return;
+    if (btn.classList.contains('is-loading')) return;
+    btn.classList.add('is-loading');
+    setImageToolbarProgress('Loading background-removal library…');
+
+    var imgly;
+    try {
+      imgly = await loadImgly();
+    } catch (err) {
+      console.warn('imgly load failed', err);
+      btn.classList.remove('is-loading');
+      setImageToolbarProgress(
+        "Couldn't load the background-removal library. Check your connection.",
+        'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
+      return;
+    }
+
+    setImageToolbarProgress('Removing background…');
+
+    // Get the image's pixel data as a Blob. Use _originalElement (the
+    // underlying HTMLImageElement) so we keep the original resolution
+    // for the model — the on-canvas display scale is irrelevant.
+    var sourceEl = img._originalElement || img._element;
+    if (!sourceEl) {
+      btn.classList.remove('is-loading');
+      setImageToolbarProgress("Couldn't read image pixels.", 'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
+      return;
+    }
+
+    var w = sourceEl.naturalWidth || sourceEl.width || img.width;
+    var h = sourceEl.naturalHeight || sourceEl.height || img.height;
+    var off = document.createElement('canvas');
+    off.width = w;
+    off.height = h;
+    var ctx = off.getContext('2d');
+    try {
+      ctx.drawImage(sourceEl, 0, 0, w, h);
+    } catch (_) {
+      btn.classList.remove('is-loading');
+      setImageToolbarProgress(
+        "Couldn't read image pixels (cross-origin?).", 'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
+      return;
+    }
+
+    var inputBlob = await new Promise(function (resolve) {
+      off.toBlob(function (b) { resolve(b); }, 'image/png');
+    });
+    if (!inputBlob) {
+      btn.classList.remove('is-loading');
+      setImageToolbarProgress("Couldn't encode image for processing.", 'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
+      return;
+    }
+
+    var resultBlob;
+    try {
+      var remove = imgly && (imgly.removeBackground ||
+        (imgly.default && imgly.default.removeBackground));
+      if (!remove) throw new Error('removeBackground not found');
+      resultBlob = await remove(inputBlob);
+    } catch (err) {
+      console.warn('cutout failed', err);
+      btn.classList.remove('is-loading');
+      setImageToolbarProgress(
+        "Background removal failed. Try a smaller image or check WebGL/WASM support.",
+        'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
+      return;
+    }
+
+    var resultUrl = URL.createObjectURL(resultBlob);
+    try {
+      if (img.setSrc && img.setSrc.length >= 1) {
+        // Fabric v6: setSrc returns a Promise.
+        await img.setSrc(resultUrl, { crossOrigin: 'anonymous' });
+      }
+      img.dirty = true;
+      state.canvas.requestRenderAll();
+      state.canvas.fire('object:modified', { target: img });
+      setImageToolbarProgress('Background removed', null);
+      setTimeout(function () { setImageToolbarProgress(null); }, 1500);
+    } catch (err) {
+      console.warn('setSrc failed', err);
+      setImageToolbarProgress("Couldn't apply cutout result.", 'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
+    } finally {
+      btn.classList.remove('is-loading');
+    }
   }
 
   // ====================================================================
@@ -2953,6 +3798,17 @@
     wireFilmstrip();
     wireSettings();
     wireHudToggle();
+    wireHudDragAndButtons();
+    buildImageToolbar();
+
+    // Re-position the image-context toolbar on window resize / secondary
+    // pane drag — both change the canvas frame's CSS layout.
+    window.addEventListener('resize', function () {
+      var img = activeImageOrNull();
+      if (img) positionImageToolbar(img);
+      // Also re-clamp HUD position so it doesn't end up off-screen.
+      applyHudPosition();
+    });
 
     // Apply persisted UI state (density / grid / pane / filmstrip / etc.).
     applyUiStateToDom();

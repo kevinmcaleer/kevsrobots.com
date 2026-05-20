@@ -384,9 +384,34 @@ hide_nibsy: true
         </div>
       </div>
 
-      <!-- Floating HUD slot — empty in this PR.
-           PR 2: render the dark Inspector panel here. -->
-      <div id="ib-inspector-hud" class="ib-inspector-hud" hidden></div>
+      <!-- Floating Inspector HUD — dark draggable panel.
+           Header drag persists position to kr-instructions-ui-state-v1;
+           the title-bar HUD button toggles visibility. Body is
+           re-rendered by the JS in response to selection changes. -->
+      <div id="ib-inspector-hud" class="ib-inspector-hud" hidden>
+        <header class="ib-hud-header" id="ib-hud-header">
+          <span class="ib-hud-grip" aria-hidden="true">
+            <i class="fas fa-grip-vertical"></i>
+          </span>
+          <span class="ib-hud-title">HUD &middot; Inspector</span>
+          <button type="button" class="ib-hud-icon-btn" id="ib-hud-minimize"
+                  title="Minimize" aria-label="Minimize HUD">
+            <i class="fas fa-window-minimize"></i>
+          </button>
+          <button type="button" class="ib-hud-icon-btn" id="ib-hud-close"
+                  title="Close" aria-label="Close HUD">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </header>
+        <div class="ib-hud-body" id="ib-hud-body">
+          <div class="ib-hud-empty">Select an object to edit its properties.</div>
+        </div>
+      </div>
+
+      <!-- Image-context floating toolbar — pill above selected images.
+           JS positions / shows / hides based on the active selection. -->
+      <div id="ib-image-toolbar" class="ib-image-toolbar" hidden role="toolbar"
+           aria-label="Image actions"></div>
     </main>
 
     <!-- =========================================================
