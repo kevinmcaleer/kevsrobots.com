@@ -88,6 +88,9 @@ hide_nibsy: true
         <button type="button" class="ib-tool-btn is-wide w-100 mb-2" id="ib-upload-image-btn">
           <i class="fas fa-image"></i> Upload image
         </button>
+        <button type="button" class="ib-tool-btn is-wide w-100 mb-2" id="ib-pick-project-image-btn">
+          <i class="fas fa-images"></i> Add from project images
+        </button>
         <button type="button" class="ib-tool-btn is-wide w-100" id="ib-remove-image-btn" disabled>
           <i class="fas fa-times"></i> Remove image
         </button>
@@ -136,6 +139,40 @@ hide_nibsy: true
         <div class="ib-style-row">
           <label for="ib-fontsize">Font size</label>
           <input type="number" id="ib-fontsize" min="12" max="48" step="1" value="20">
+        </div>
+      </div>
+
+      <div class="ib-toolbar-section">
+        <h6>Transform</h6>
+        <div class="ib-style-row">
+          <label for="ib-rotation">Rotation</label>
+          <input type="number" id="ib-rotation" min="0" max="360" step="1" value="0" disabled>
+          <span class="ib-rotation-unit">&deg;</span>
+        </div>
+        <button type="button" class="ib-tool-btn is-wide w-100" id="ib-reset-transforms" disabled>
+          <i class="fas fa-undo-alt"></i> Reset transforms
+        </button>
+      </div>
+
+      <div class="ib-toolbar-section">
+        <h6>Arrange</h6>
+        <div class="ib-arrange-actions">
+          <button type="button" class="ib-tool-btn" id="ib-bring-to-front" disabled
+                  title="Bring to front">
+            <i class="fas fa-angle-double-up"></i> To front
+          </button>
+          <button type="button" class="ib-tool-btn" id="ib-bring-forward" disabled
+                  title="Bring forward">
+            <i class="fas fa-angle-up"></i> Forward
+          </button>
+          <button type="button" class="ib-tool-btn" id="ib-send-backward" disabled
+                  title="Send backward">
+            <i class="fas fa-angle-down"></i> Backward
+          </button>
+          <button type="button" class="ib-tool-btn" id="ib-send-to-back" disabled
+                  title="Send to back">
+            <i class="fas fa-angle-double-down"></i> To back
+          </button>
         </div>
       </div>
 

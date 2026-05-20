@@ -87,6 +87,7 @@
     dom.projectTitle = document.getElementById('ib-project-title');
     dom.saveStatus = document.getElementById('ib-save-status');
     dom.uploadImageBtn = document.getElementById('ib-upload-image-btn');
+    dom.pickProjectImageBtn = document.getElementById('ib-pick-project-image-btn');
     dom.removeImageBtn = document.getElementById('ib-remove-image-btn');
     dom.imageInput = document.getElementById('ib-image-input');
     dom.addStlBtn = document.getElementById('ib-add-stl-btn');
@@ -94,6 +95,12 @@
     dom.stroke = document.getElementById('ib-stroke');
     dom.strokeValue = document.getElementById('ib-stroke-value');
     dom.fontSize = document.getElementById('ib-fontsize');
+    dom.rotation = document.getElementById('ib-rotation');
+    dom.resetTransforms = document.getElementById('ib-reset-transforms');
+    dom.bringToFront = document.getElementById('ib-bring-to-front');
+    dom.bringForward = document.getElementById('ib-bring-forward');
+    dom.sendBackward = document.getElementById('ib-send-backward');
+    dom.sendToBack = document.getElementById('ib-send-to-back');
     dom.deleteSelected = document.getElementById('ib-delete-selected');
     dom.undoBtn = document.getElementById('ib-undo');
     dom.redoBtn = document.getElementById('ib-redo');
@@ -299,6 +306,12 @@
     c.on('selection:updated', onSelectionChanged);
     c.on('selection:cleared', onSelectionChanged);
 
+    // Live-update the rotation input as the user drags the corner handle.
+    c.on('object:rotating', onObjectRotating);
+    // After a translate / resize the active object's transform may have
+    // changed without `selection:updated` firing — re-sync controls.
+    c.on('object:modified', onSelectionChanged);
+
     // Autosave + undo snapshot triggers. The suppressEvents flag is
     // toggled while loadFromJSON is replaying so loading a step doesn't
     // immediately push a fresh snapshot back onto the undo stack.
@@ -367,8 +380,42 @@
 
   function onSelectionChanged() {
     if (!state.canvas) return;
-    var hasSel = !!state.canvas.getActiveObject();
+    var active = state.canvas.getActiveObject();
+    var hasSel = !!active;
+    // Locked background images stay anchored at the bottom of the stack
+    // and shouldn't be re-arranged, rotated, or reset by the user. Tag
+    // the selection so Transform/Arrange controls disable on them.
+    var isBg = !!(active && active.ibRole === 'background');
+    var canTransform = hasSel && !isBg;
     if (dom.deleteSelected) dom.deleteSelected.disabled = !hasSel;
+    if (dom.rotation) {
+      dom.rotation.disabled = !canTransform;
+      if (canTransform) {
+        // Normalise to 0–359; Fabric's `angle` can be any number.
+        var a = ((active.angle || 0) % 360 + 360) % 360;
+        dom.rotation.value = String(Math.round(a));
+      } else {
+        dom.rotation.value = '0';
+      }
+    }
+    if (dom.resetTransforms) dom.resetTransforms.disabled = !canTransform;
+    if (dom.bringToFront) dom.bringToFront.disabled = !canTransform;
+    if (dom.bringForward) dom.bringForward.disabled = !canTransform;
+    if (dom.sendBackward) dom.sendBackward.disabled = !canTransform;
+    if (dom.sendToBack) dom.sendToBack.disabled = !canTransform;
+  }
+
+  // Keep the rotation input in sync while the user drags the rotation
+  // handle on the canvas — Fabric fires `object:rotating` continuously
+  // and `object:modified` when the drag ends. We listen to both so the
+  // number ticks live, but only the `modified` event triggers autosave +
+  // an undo snapshot (already wired in initCanvas).
+  function onObjectRotating(opt) {
+    if (!dom.rotation || dom.rotation.disabled) return;
+    var t = opt && opt.target;
+    if (!t) return;
+    var a = ((t.angle || 0) % 360 + 360) % 360;
+    dom.rotation.value = String(Math.round(a));
   }
 
   // -------- Pointer handlers (arrow / rect / circle / text) ----------
@@ -789,6 +836,74 @@
   function updateUndoRedoButtons() {
     if (dom.undoBtn) dom.undoBtn.disabled = state.undoStack.length === 0;
     if (dom.redoBtn) dom.redoBtn.disabled = state.redoStack.length === 0;
+  }
+
+  // -------- Transform controls (rotation, reset) ---------------------
+
+  function onRotationInputChange() {
+    if (!state.canvas || !dom.rotation) return;
+    var active = state.canvas.getActiveObject();
+    if (!active || active.ibRole === 'background') return;
+    var raw = parseInt(dom.rotation.value, 10);
+    if (isNaN(raw)) return;
+    // Normalise to 0–359 so wrap-around (e.g. -10 → 350) feels natural.
+    var deg = ((raw % 360) + 360) % 360;
+    active.set('angle', deg);
+    active.setCoords();
+    state.canvas.requestRenderAll();
+    // Manually fire `object:modified` so autosave + undo snapshot pick
+    // up the change — `set('angle', …)` doesn't emit that on its own.
+    state.canvas.fire('object:modified', { target: active });
+  }
+
+  function onResetTransformsClick() {
+    if (!state.canvas) return;
+    var active = state.canvas.getActiveObject();
+    if (!active || active.ibRole === 'background') return;
+    // Reset scale / rotation / skew to identity. We deliberately leave
+    // `left` / `top` alone — we don't remember the object's first-placed
+    // position, and snapping it to the canvas origin would feel jarring.
+    // The user can drag it back if they want.
+    active.set({
+      scaleX: 1,
+      scaleY: 1,
+      angle: 0,
+      skewX: 0,
+      skewY: 0,
+      flipX: false,
+      flipY: false,
+    });
+    active.setCoords();
+    state.canvas.requestRenderAll();
+    if (dom.rotation) dom.rotation.value = '0';
+    // Fire `object:modified` so autosave + undo snapshot capture it.
+    state.canvas.fire('object:modified', { target: active });
+  }
+
+  // -------- Arrange / layer ordering ---------------------------------
+
+  // After any layer reorder, re-pin the locked background to the very
+  // bottom of the stack so the user can't accidentally bury it.
+  function reanchorBackground() {
+    var bg = findBackgroundImage();
+    if (bg) state.canvas.sendObjectToBack(bg);
+  }
+
+  function arrangeActive(op) {
+    if (!state.canvas) return;
+    var active = state.canvas.getActiveObject();
+    if (!active || active.ibRole === 'background') return;
+    // Fabric v6 renamed v5's `bringToFront(obj)` style to methods on
+    // the canvas that take the object: `bringObjectToFront`,
+    // `bringObjectForward`, `sendObjectBackwards`, `sendObjectToBack`.
+    if (op === 'front') state.canvas.bringObjectToFront(active);
+    else if (op === 'forward') state.canvas.bringObjectForward(active);
+    else if (op === 'backward') state.canvas.sendObjectBackwards(active);
+    else if (op === 'back') state.canvas.sendObjectToBack(active);
+    reanchorBackground();
+    state.canvas.requestRenderAll();
+    // Fire `object:modified` so autosave + undo snapshot trigger.
+    state.canvas.fire('object:modified', { target: active });
   }
 
   // -------- Delete selected ------------------------------------------
@@ -1757,6 +1872,192 @@
     updateEmptyState();
   }
 
+  // -------- Project-images picker (issue #184) -----------------------
+  //
+  // Lets the owner add an image that's ALREADY been uploaded to this
+  // project (via the project editor's image gallery) without having to
+  // re-upload it. Distinct from the "Upload image" flow:
+  //
+  //   * "Upload image" → uploads a new image and places it as a LOCKED
+  //     BACKGROUND (selectable: false, evented: false, sent to back).
+  //     One per step; replaces any existing background.
+  //   * "Add from project images" → places the picked image as a
+  //     REGULAR MOVABLE OBJECT (selectable: true, evented: true), at
+  //     canvas centre, scaled to ~50% width. Multiple per step are fine
+  //     and they layer above any background. This is for additive
+  //     composition — the user can keep stacking project images, STL
+  //     views, arrows, etc.
+  //
+  // Modal markup is built lazily on first click and reused thereafter
+  // (same pattern as the STL modal above).
+
+  var pickerModal = {
+    node: null,
+    bsModal: null,
+    grid: null,
+    empty: null,
+    loading: null,
+  };
+
+  function ensurePickerModal() {
+    if (pickerModal.node) return pickerModal.node;
+    var modalId = 'ib-image-picker-modal';
+    var html =
+      '<div class="modal fade ib-picker-modal" id="' + modalId + '" tabindex="-1" ' +
+      '  aria-labelledby="' + modalId + '-label" aria-hidden="true" ' +
+      '  data-bs-backdrop="static" data-bs-keyboard="true">' +
+      '  <div class="modal-dialog modal-dialog-centered modal-lg">' +
+      '    <div class="modal-content">' +
+      '      <div class="modal-header">' +
+      '        <h5 class="modal-title" id="' + modalId + '-label">' +
+      '          <i class="fas fa-images me-2 text-primary"></i>Add from project images' +
+      '        </h5>' +
+      '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+      '      </div>' +
+      '      <div class="modal-body">' +
+      '        <div class="ib-picker-loading text-muted small" id="ib-picker-loading">' +
+      '          <i class="fas fa-circle-notch fa-spin me-1"></i> Loading images…' +
+      '        </div>' +
+      '        <div class="ib-picker-empty text-muted small d-none" id="ib-picker-empty">' +
+      "          No images uploaded yet. Use <strong>Upload image</strong> to add one, or upload images from the project editor's image gallery." +
+      '        </div>' +
+      '        <div class="ib-picker-grid d-none" id="ib-picker-grid"></div>' +
+      '      </div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>';
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    var node = wrap.firstElementChild;
+    document.body.appendChild(node);
+
+    pickerModal.node = node;
+    pickerModal.grid = node.querySelector('#ib-picker-grid');
+    pickerModal.empty = node.querySelector('#ib-picker-empty');
+    pickerModal.loading = node.querySelector('#ib-picker-loading');
+
+    if (window.bootstrap && window.bootstrap.Modal) {
+      pickerModal.bsModal = new window.bootstrap.Modal(node);
+    } else {
+      pickerModal.bsModal = {
+        show: function () { node.classList.add('show'); node.style.display = 'block'; },
+        hide: function () { node.classList.remove('show'); node.style.display = 'none'; },
+      };
+    }
+    return node;
+  }
+
+  function setPickerView(view) {
+    if (!pickerModal.node) return;
+    pickerModal.loading.classList.toggle('d-none', view !== 'loading');
+    pickerModal.empty.classList.toggle('d-none', view !== 'empty');
+    pickerModal.grid.classList.toggle('d-none', view !== 'grid');
+  }
+
+  function renderPickerGrid(images) {
+    if (!pickerModal.grid) return;
+    var html = images.map(function (img) {
+      var src = API + '/api/projects/' + state.projectId + '/images/' + img.id + '/view';
+      var caption = img.caption && img.caption.trim() ? img.caption : (img.filename || 'image');
+      return (
+        '<button type="button" class="ib-picker-tile" data-image-id="' + img.id + '" ' +
+        '        data-image-src="' + escapeHtml(src) + '" ' +
+        '        title="' + escapeHtml(caption) + '">' +
+        '  <img src="' + escapeHtml(src) + '" alt="" loading="lazy">' +
+        '  <span class="ib-picker-tile-label">' + escapeHtml(caption) + '</span>' +
+        '</button>'
+      );
+    }).join('');
+    pickerModal.grid.innerHTML = html;
+    Array.prototype.forEach.call(
+      pickerModal.grid.querySelectorAll('.ib-picker-tile'),
+      function (tile) {
+        tile.addEventListener('click', function () {
+          var src = tile.dataset.imageSrc;
+          if (!src) return;
+          try { pickerModal.bsModal.hide(); } catch (_) {}
+          placeProjectImageOnCanvas(src).catch(function () {
+            setSaveStatus('error', 'Failed to add image');
+          });
+        });
+      }
+    );
+  }
+
+  // Default "no images" copy, separated so the error branch can swap to
+  // it and the next open resets back to the friendly version.
+  var PICKER_EMPTY_HTML =
+    "No images uploaded yet. Use <strong>Upload image</strong> to add one, " +
+    "or upload images from the project editor's image gallery.";
+
+  async function onPickProjectImageClick() {
+    ensurePickerModal();
+    // Reset empty-state copy so a previous transient failure doesn't
+    // persist as the user's first impression on re-open.
+    if (pickerModal.empty) pickerModal.empty.innerHTML = PICKER_EMPTY_HTML;
+    setPickerView('loading');
+    try { pickerModal.bsModal.show(); } catch (_) {}
+    try {
+      var resp = await apiFetch(API + '/api/projects/' + state.projectId + '/images');
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      var images = await resp.json();
+      if (!Array.isArray(images) || images.length === 0) {
+        setPickerView('empty');
+        return;
+      }
+      renderPickerGrid(images);
+      setPickerView('grid');
+    } catch (_) {
+      // Reuse the empty state for the failure path — the message tells
+      // the user how to recover (re-upload from the editor) and avoids a
+      // separate error UI just for this transient case.
+      if (pickerModal.empty) {
+        pickerModal.empty.innerHTML = "Couldn't load your project images. Please try again in a moment.";
+      }
+      setPickerView('empty');
+    }
+  }
+
+  // Add an existing project image to the Fabric canvas as a regular
+  // movable object (NOT a locked background — picker is for additive
+  // layering, distinct from the "Upload image" background flow).
+  async function placeProjectImageOnCanvas(url) {
+    if (!state.canvas) return;
+    var img;
+    try {
+      img = await fabric.Image.fromURL(url, { crossOrigin: 'anonymous' });
+    } catch (e) {
+      throw new Error('Failed to load image into canvas');
+    }
+    if (!img) throw new Error('Project image returned empty');
+
+    // Centre, scaled so the longest dim fits ~50% of canvas width —
+    // same placement convention as the STL flow so multiple
+    // additive layers feel consistent.
+    var targetMax = CANVAS_W * 0.5;
+    var longest = Math.max(img.width, img.height) || 1;
+    var scale = targetMax / longest;
+    img.set({
+      originX: 'center',
+      originY: 'center',
+      left: CANVAS_W / 2,
+      top: CANVAS_H / 2,
+      scaleX: scale,
+      scaleY: scale,
+      selectable: true,
+      evented: true,
+      // Tag so we can tell this apart from background / STL objects if
+      // a future feature needs to (e.g. relinking to the source image).
+      ibRole: 'project-image',
+    });
+    state.canvas.add(img);
+    state.canvas.setActiveObject(img);
+    state.canvas.requestRenderAll();
+    scheduleAutosave();
+    scheduleSnapshot();
+    updateEmptyState();
+  }
+
   // -------- Init flow ------------------------------------------------
 
   async function init() {
@@ -1883,12 +2184,29 @@
       dom.fontSize.addEventListener('input', applyStyleToSelection);
     }
     if (dom.uploadImageBtn) dom.uploadImageBtn.addEventListener('click', onUploadClick);
+    if (dom.pickProjectImageBtn) dom.pickProjectImageBtn.addEventListener('click', onPickProjectImageClick);
     if (dom.imageInput) dom.imageInput.addEventListener('change', onImagePicked);
     if (dom.removeImageBtn) dom.removeImageBtn.addEventListener('click', onRemoveImageClick);
     if (dom.addStlBtn) dom.addStlBtn.addEventListener('click', onAddStlClick);
     if (dom.deleteSelected) dom.deleteSelected.addEventListener('click', onDeleteSelected);
     if (dom.undoBtn) dom.undoBtn.addEventListener('click', onUndoClick);
     if (dom.redoBtn) dom.redoBtn.addEventListener('click', onRedoClick);
+
+    // Transform controls — only fire when there's an active non-background
+    // selection (controls are disabled otherwise, but bind regardless so
+    // re-enable + change works without re-wiring).
+    if (dom.rotation) {
+      dom.rotation.addEventListener('change', onRotationInputChange);
+    }
+    if (dom.resetTransforms) {
+      dom.resetTransforms.addEventListener('click', onResetTransformsClick);
+    }
+
+    // Arrange controls — bring-to-front / forward / backward / to-back.
+    if (dom.bringToFront) dom.bringToFront.addEventListener('click', function () { arrangeActive('front'); });
+    if (dom.bringForward) dom.bringForward.addEventListener('click', function () { arrangeActive('forward'); });
+    if (dom.sendBackward) dom.sendBackward.addEventListener('click', function () { arrangeActive('backward'); });
+    if (dom.sendToBack) dom.sendToBack.addEventListener('click', function () { arrangeActive('back'); });
 
     // Keyboard shortcuts: Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z = redo,
     // Delete/Backspace = delete selected (but NOT while typing in a
