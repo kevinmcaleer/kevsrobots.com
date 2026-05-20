@@ -33,6 +33,7 @@ from reportlab.platypus import (
     Spacer,
 )
 
+from .instructions_branding import render_made_with_slide
 from .schemas import InstructionExportRequest, InstructionExportStep
 
 # A4 minus 15mm margins on every side. Recomputed once here so the
@@ -291,6 +292,14 @@ def _make_doc(buffer: io.BytesIO, steps_per_page: int) -> BaseDocTemplate:
     )
     cover_template = PageTemplate(id="Cover", frames=[cover_frame])
 
+    # The Made-with / "branding" template reuses the cover frame layout
+    # (single full-page frame, no page number) so the final slide reads
+    # like a closing-credits card rather than a numbered content page.
+    branding_frame = Frame(
+        _MARGIN, _MARGIN, _CONTENT_W, _CONTENT_H, id="branding", showBoundary=0
+    )
+    branding_template = PageTemplate(id="Branding", frames=[branding_frame])
+
     if steps_per_page == 4:
         cell_w = (_CONTENT_W - 6 * mm) / 2
         cell_h = (_CONTENT_H - 6 * mm) / 2
@@ -314,7 +323,7 @@ def _make_doc(buffer: io.BytesIO, steps_per_page: int) -> BaseDocTemplate:
     content_template = PageTemplate(
         id="Content", frames=content_frames, onPage=_draw_page_number
     )
-    doc.addPageTemplates([cover_template, content_template])
+    doc.addPageTemplates([cover_template, content_template, branding_template])
     return doc
 
 
@@ -372,6 +381,26 @@ def render_instructions_pdf(
         flowables.extend(_two_per_page(request.steps, styles))
     else:  # 4
         flowables.extend(_four_per_page(request.steps, styles))
+
+    # Phase 3b/3c: append the "Made with kevsrobots.com/projects" slide
+    # as a final page. The slide is a PNG generated server-side via
+    # Pillow (see ``instructions_branding``) and embedded as a single
+    # proportional Image flowable that fills the printable area.
+    #
+    # We switch the template to the dedicated "Branding" page so the
+    # page-number callback doesn't fire — the closing card stays clean
+    # like the cover.
+    flowables.append(_NextPageTemplate("Branding"))
+    flowables.append(PageBreak())
+    slide_png = render_made_with_slide(project_title=request.project_title)
+    slide_buf = io.BytesIO(slide_png)
+    slide_img = Image(
+        slide_buf,
+        width=_CONTENT_W,
+        height=_CONTENT_H,
+        kind="proportional",
+    )
+    flowables.append(slide_img)
 
     doc.build(flowables)
     return buffer.getvalue()

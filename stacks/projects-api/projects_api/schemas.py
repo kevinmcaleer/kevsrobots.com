@@ -384,18 +384,29 @@ class InstructionExportStep(BaseModel):
 
 
 class InstructionExportRequest(BaseModel):
-    """Body of POST /api/projects/{id}/instruction/export/pdf.
+    """Body of POST /api/projects/{id}/instruction/export/{pdf,gif,mp4}.
 
     ``steps_per_page`` must be 1, 2, or 4 — anything else is 422'd in
     the route. ``project_title`` is supplied by the client because the
     export endpoint doesn't otherwise load the project body, and the
     title page wants something better than "Instructions" by default.
+
+    ``frame_seconds`` / ``final_slide_seconds`` are only meaningful for
+    GIF / MP4 — the PDF route ignores them. Defaults match the spec
+    (2s per step, 3s closing slide hold) so the frontend doesn't need
+    to send these to get sensible behaviour.
     """
 
     steps: list[InstructionExportStep]
     steps_per_page: int = 1
     include_title_page: bool = True
     project_title: Optional[str] = None
+    # Phase 3b/3c — video timing knobs. Bounds are intentionally generous;
+    # the frontend doesn't expose either today but a future "Speed: slow /
+    # normal / fast" toggle could ride on the same field without a new
+    # schema bump.
+    frame_seconds: float = Field(2.0, ge=0.5, le=10.0)
+    final_slide_seconds: float = Field(3.0, ge=1.0, le=10.0)
 
 
 class JournalEntryCreate(BaseModel):
