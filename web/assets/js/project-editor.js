@@ -1116,16 +1116,151 @@
     const files = await resp.json();
     const list = document.getElementById('file-list');
     if (files.length === 0) { list.innerHTML = ''; return; }
-    list.innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${files.map(f => `
-      <tr>
-        <td class="text-muted" style="width:20px"><i class="${fileIcon(f.filename)}"></i></td>
-        <td><a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${f.filename}</a></td>
-        <td class="text-muted small">${fileKind(f.filename)}</td>
-        <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
-        <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})"><i class="fas fa-trash fa-xs"></i></button></td>
-      </tr>
-    `).join('')}</tbody></table>`;
+    // Issue #187: render a Description column with an inline-editable
+    // cell. Click the muted placeholder ("Add a description…") or the
+    // existing text to flip into an input; Enter / blur saves; Escape
+    // cancels. Long descriptions wrap in the column via the
+    // .file-description CSS rule (max-width + word-break).
+    list.innerHTML = `<table class="table table-single table-narrow table-hover mb-0">
+      <thead>
+        <tr>
+          <th style="width:20px"></th>
+          <th>File</th>
+          <th>Description</th>
+          <th class="text-muted small">Kind</th>
+          <th class="text-muted small text-end" style="width:70px">Size</th>
+          <th style="width:30px"></th>
+        </tr>
+      </thead>
+      <tbody>${files.map(f => `
+        <tr data-file-id="${f.id}">
+          <td class="text-muted" style="width:20px"><i class="${fileIcon(f.filename)}"></i></td>
+          <td><a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${escapeHtmlAttr(f.filename)}</a></td>
+          <td class="file-description" data-file-id="${f.id}">${renderFileDescription(f.description)}</td>
+          <td class="text-muted small">${fileKind(f.filename)}</td>
+          <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
+          <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})"><i class="fas fa-trash fa-xs"></i></button></td>
+        </tr>
+      `).join('')}</tbody></table>`;
   }
+
+  // Render the description cell's "view" state — a span the user clicks
+  // to edit. Empty values get a muted placeholder so the affordance is
+  // discoverable; non-empty values render the description verbatim.
+  function renderFileDescription(desc) {
+    const hasText = desc != null && String(desc).length > 0;
+    if (hasText) {
+      return `<span class="kr-file-desc" tabindex="0" role="button"
+        title="Click to edit description">${escapeHtmlAttr(desc)}</span>`;
+    }
+    return `<span class="kr-file-desc text-muted fst-italic" tabindex="0"
+      role="button" title="Click to add a description"
+      data-empty="1">Add a description…</span>`;
+  }
+
+  // Track in-flight PUTs per row so a fast typer doesn't fire overlapping
+  // requests — serialise per-row by chaining onto the previous promise.
+  // Same idea as the BOM / links autosave debouncer.
+  const _fileDescSavePending = {};
+
+  async function saveFileDescription(fileId, newValue) {
+    if (!currentProject) return null;
+    const prev = _fileDescSavePending[fileId] || Promise.resolve();
+    const next = prev.then(async () => {
+      const resp = await apiFetch(
+        API + '/api/projects/' + currentProject.id + '/files/' + fileId,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ description: newValue }),
+        }
+      );
+      if (!resp.ok) throw new Error('save failed: ' + resp.status);
+      return resp.json();
+    });
+    _fileDescSavePending[fileId] = next;
+    return next;
+  }
+
+  // Inline-edit handler: wired via event delegation on #file-list so it
+  // survives loadFiles() re-renders without re-binding listeners.
+  function setupFileDescriptionEditing() {
+    const list = document.getElementById('file-list');
+    if (!list || list.dataset.descBound === '1') return;
+    list.dataset.descBound = '1';
+
+    list.addEventListener('click', e => {
+      const span = e.target.closest('.kr-file-desc');
+      if (!span) return;
+      // Already editing? Don't re-enter.
+      if (span.dataset.editing === '1') return;
+      beginFileDescriptionEdit(span);
+    });
+    list.addEventListener('keydown', e => {
+      const span = e.target.closest('.kr-file-desc');
+      if (!span || span.dataset.editing === '1') return;
+      // Enter / Space activates the editor for keyboard users.
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        beginFileDescriptionEdit(span);
+      }
+    });
+  }
+
+  function beginFileDescriptionEdit(span) {
+    const cell = span.closest('.file-description');
+    if (!cell) return;
+    const fileId = parseInt(cell.dataset.fileId, 10);
+    if (!Number.isFinite(fileId)) return;
+    const original = span.dataset.empty === '1' ? '' : (span.textContent || '');
+    span.dataset.editing = '1';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'form-control form-control-sm kr-file-desc-input';
+    input.value = original;
+    input.maxLength = 2000;
+    input.placeholder = 'Describe this file…';
+    cell.innerHTML = '';
+    cell.appendChild(input);
+    input.focus();
+    input.select();
+
+    let finished = false;
+    const finish = async (commit) => {
+      if (finished) return;
+      finished = true;
+      if (!commit) {
+        cell.innerHTML = renderFileDescription(original || null);
+        return;
+      }
+      const next = input.value;
+      if (next === original) {
+        cell.innerHTML = renderFileDescription(original || null);
+        return;
+      }
+      // Optimistic re-render with the new value; if the save fails the
+      // reload at the end of the catch reconciles with the server.
+      cell.innerHTML = renderFileDescription(next || null);
+      try {
+        await saveFileDescription(fileId, next);
+      } catch (_) {
+        loadFiles();
+      }
+    };
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+      else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    });
+    input.addEventListener('blur', () => finish(true));
+  }
+
+  // Bind the delegated handler once at module init — the file-list
+  // element exists from page load even before any files have been
+  // uploaded.
+  setupFileDescriptionEditing();
 
   window.deleteFile = async function(fileId) {
     await apiFetch(API + '/api/projects/' + currentProject.id + '/files/' + fileId, {

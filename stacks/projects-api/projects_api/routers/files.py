@@ -16,7 +16,7 @@ from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Download, Project, ProjectFile
-from ..schemas import FileResponse
+from ..schemas import FileResponse, FileUpdate
 from ..storage import (
     delete_file,
     generate_filename,
@@ -216,6 +216,60 @@ async def download_file(
         content=data,
         media_type="application/octet-stream",
         headers={"Content-Disposition": f'attachment; filename="{record.filename}"'},
+    )
+
+
+@router.put("/{file_id}", response_model=FileResponse)
+async def update_file(
+    project_id: int,
+    file_id: int,
+    body: FileUpdate,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> FileResponse:
+    """Partial-update an uploaded file's metadata (issue #187).
+
+    Owner-only. Today only ``description`` is mutable — the file itself is
+    immutable post-upload (filename/size/type are stamped at write time).
+    Partial-update semantics match ``LinkUpdate``: fields omitted from the
+    body (``exclude_unset``) are left untouched; an explicit empty string
+    clears the description; ``None`` is treated as "don't touch" (because
+    Pydantic only sets fields the client actually included in the JSON).
+    """
+    project = await session.get(Project, project_id)
+    if project is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    if project.author_username != user:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+
+    record = await session.get(ProjectFile, file_id)
+    if record is None or record.project_id != project_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    # ``exclude_unset`` so a missing field stays missing rather than being
+    # patched to None — partial-update semantics. An explicit "" still
+    # comes through and clears the description.
+    payload = body.model_dump(exclude_unset=True)
+    for field, value in payload.items():
+        setattr(record, field, value)
+    await session.commit()
+    await session.refresh(record)
+
+    download_count = int(
+        (
+            await session.execute(
+                select(func.count(Download.id)).where(Download.file_id == record.id)
+            )
+        ).scalar_one()
+    )
+    return FileResponse(
+        id=record.id,
+        filename=record.filename,
+        file_size=record.file_size,
+        file_type=record.file_type,
+        description=record.description,
+        uploaded_at=record.uploaded_at,
+        download_count=download_count,
     )
 
 

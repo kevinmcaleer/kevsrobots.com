@@ -830,3 +830,31 @@ body:has(.CodeMirror-fullscreen) .col-lg-8 {
   gap: 0.25rem;
 }
 
+/* Issue #187: per-file descriptions in the Files & Models table.
+ * The cell wraps long text instead of stretching the column, and the
+ * clickable affordance gets a subtle hover state so users discover the
+ * inline-edit interaction. */
+#editor-files-section .file-description {
+  white-space: normal;
+  word-break: break-word;
+  max-width: 24em;
+}
+
+#editor-files-section .file-description .kr-file-desc {
+  display: inline-block;
+  min-width: 8em;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  cursor: text;
+}
+
+#editor-files-section .file-description .kr-file-desc:hover,
+#editor-files-section .file-description .kr-file-desc:focus {
+  background-color: rgba(13, 110, 253, 0.08);
+  outline: none;
+}
+
+#editor-files-section .file-description .kr-file-desc-input {
+  width: 100%;
+}
+
