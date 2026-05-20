@@ -33,9 +33,14 @@ body.instruction-builder-page > .container-fluid {
 .ib-workspace {
   display: flex;
   flex-direction: column;
-  /* Site top_bar + navigation are roughly 56px each. */
-  height: calc(100vh - 56px);
-  min-height: 600px;
+  /* Sized precisely at runtime by adjustWorkspaceHeight() in
+     instruction-builder.js — measures the actual top offset
+     (site top_bar + navigation + searchbar + nav_projects all
+     contribute and vary by viewport width). The CSS fallback
+     below is a defensive worst-case so the filmstrip isn't
+     pushed off-screen before the JS runs. */
+  height: calc(100vh - 220px);
+  min-height: 500px;
   background: #f8f9fa;
   color: #212529;
   overflow: hidden;

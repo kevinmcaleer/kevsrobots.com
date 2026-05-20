@@ -5012,8 +5012,34 @@
   // 26. INIT FLOW
   // ====================================================================
 
+  /**
+   * Size the workspace to exactly fill from its current top offset down
+   * to the viewport bottom. The CSS fallback uses calc(100vh - 220px),
+   * but the actual chrome stack (top_bar + navigation + searchbar +
+   * nav_projects) varies by viewport width — measure it instead.
+   *
+   * Symptom of getting this wrong: the filmstrip at the bottom of the
+   * workspace's grid gets pushed below the fold and looks "missing".
+   */
+  function adjustWorkspaceHeight() {
+    var ws = document.getElementById('ib-workspace');
+    if (!ws) return;
+    var top = ws.getBoundingClientRect().top;
+    var avail = Math.max(500, window.innerHeight - top);
+    ws.style.height = avail + 'px';
+  }
+
   async function init() {
     bindDom();
+
+    // Size the workspace before first paint of the editor content.
+    adjustWorkspaceHeight();
+    window.addEventListener('resize', adjustWorkspaceHeight);
+    // Page chrome (top_bar / nav / searchbar) can shift after lazy-loaded
+    // images settle, so re-measure once everything is loaded.
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', adjustWorkspaceHeight, { once: true });
+    }
 
     // Hydrate UI state from localStorage before we touch the DOM so the
     // first paint already reflects the user's saved preferences.
