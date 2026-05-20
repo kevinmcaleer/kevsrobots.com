@@ -28,22 +28,29 @@ remain valid.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from ..auth import require_terms_accepted
 from ..db import get_session
+from ..instructions_pdf import render_instructions_pdf
 from ..models import Instruction, InstructionStep, Project
 from ..schemas import (
     InstructionCreate,
+    InstructionExportRequest,
     InstructionResponse,
     InstructionStepCreate,
     InstructionStepResponse,
     InstructionStepUpdate,
     InstructionUpdate,
 )
+
+# Hard cap on the PNG dataURL payload — 50 MB. With multiplier:2 the
+# typical step PNG is ~500KB so even a 50-step instruction comes in
+# under 30 MB; the cap is defence against runaway clients or abuse.
+_MAX_EXPORT_PAYLOAD_BYTES = 50 * 1024 * 1024
 
 router = APIRouter(prefix="/api/projects/{project_id}/instruction", tags=["instructions"])
 
@@ -345,3 +352,79 @@ async def delete_step(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Step not found")
     await session.delete(step)
     await session.commit()
+
+
+# --- Export (issue #178, Phase 2b) --------------------------------------
+#
+# Hybrid pipeline: the browser renders each step's Fabric.js canvas to a
+# PNG dataURL (using its own copy of Fabric — much simpler than running
+# a headless canvas runtime server-side) and POSTs the array here. We
+# stitch the PNGs into a layout-aware PDF with ReportLab and stream the
+# binary back.
+#
+# Owner-only for now. A future Phase 2d could surface a public PDF on
+# view.html, but that requires server-side canvas rendering (e.g.
+# node-canvas) which is out of scope for this slice.
+
+
+@router.post("/export/pdf")
+async def export_pdf(
+    project_id: int,
+    body: InstructionExportRequest,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """Render the supplied step PNGs to a PDF and return as a download."""
+    await _check_owner(session, project_id, user)
+
+    # Validate the layout choice first — saves us decoding any PNGs if
+    # the client sent garbage.
+    if body.steps_per_page not in (1, 2, 4):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="steps_per_page must be 1, 2, or 4",
+        )
+    if not body.steps:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="steps must be non-empty",
+        )
+
+    # Defensive PNG prefix check. The client always sends PNG dataURLs
+    # via fabric.Canvas.toDataURL but we don't want a malformed payload
+    # to crash deep inside ReportLab.
+    for step in body.steps:
+        if not step.image_data_url.startswith("data:image/png;base64,"):
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="each image_data_url must start with 'data:image/png;base64,'",
+            )
+
+    # Cheap-ish payload cap: the parsed model already exists, so we
+    # estimate its size from the dataURL strings themselves. Base64 is
+    # ~4/3 the original byte size; counting the strings directly is a
+    # close-enough upper bound.
+    payload_size = sum(len(s.image_data_url) for s in body.steps)
+    if payload_size > _MAX_EXPORT_PAYLOAD_BYTES:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="export payload too large",
+        )
+
+    try:
+        pdf_bytes = render_instructions_pdf(body, project_id)
+    except ValueError as exc:
+        # render_instructions_pdf re-validates the inputs as a belt-and-braces
+        # check; surface its messages as 422s rather than 500s.
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
+
+    filename = f"instructions-{project_id}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )

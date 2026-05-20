@@ -84,6 +84,9 @@
     dom.stepsList = document.getElementById('ib-steps-list');
     dom.addStepBtn = document.getElementById('ib-add-step');
     dom.toolButtons = document.querySelectorAll('.ib-tool-btn[data-tool]');
+    // Export (Phase 2b / 2c)
+    dom.exportProgress = document.getElementById('ib-export-progress');
+    dom.exportMenuItems = document.querySelectorAll('.ib-export-menu [data-export]');
   }
 
   // -------- Helpers --------------------------------------------------
@@ -868,6 +871,264 @@
     }
   }
 
+  // -------- Export (Phase 2b PDF / Phase 2c ZIP) ---------------------
+  //
+  // Both paths share a single "render every step to a PNG dataURL"
+  // helper: the PDF path POSTs the array to the API and downloads the
+  // server response; the ZIP path bundles them client-side with JSZip
+  // (no backend involvement).
+  //
+  // The render helper mirrors the off-screen StaticCanvas pattern used
+  // by ``instruction-viewer.js`` — duplicated rather than shared since
+  // the two pages don't currently bundle code together. If a future
+  // phase extracts a shared canvas module both files can dedupe.
+
+  function setExportProgress(msg, kind) {
+    if (!dom.exportProgress) return;
+    dom.exportProgress.classList.remove('d-none', 'is-error');
+    if (kind === 'error') dom.exportProgress.classList.add('is-error');
+    if (msg) {
+      dom.exportProgress.textContent = msg;
+    } else {
+      dom.exportProgress.classList.add('d-none');
+      dom.exportProgress.textContent = '';
+    }
+  }
+
+  function hideExportProgress(delay) {
+    if (!dom.exportProgress) return;
+    setTimeout(function () { setExportProgress(null); }, delay || 0);
+  }
+
+  // Parse a canvas_json blob defensively. Same shape as the viewer's
+  // helper — accept legitimate scenes, reject empty/garbage so the
+  // off-screen render skips them rather than producing a blank PNG.
+  function parseCanvasJsonForExport(raw) {
+    if (!raw) return null;
+    var trimmed = String(raw).trim();
+    if (!trimmed) return null;
+    if (trimmed === '{}' || trimmed === '[]' || trimmed === 'null') return null;
+    try {
+      var parsed = JSON.parse(trimmed);
+      if (!parsed) return null;
+      var objs = Array.isArray(parsed.objects) ? parsed.objects : [];
+      if (objs.length === 0 && !parsed.backgroundImage && !parsed.background) {
+        return null;
+      }
+      return parsed;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Render one step into a PNG dataURL using the supplied off-screen
+  // canvas. ``multiplier: 2`` produces a higher-res image than the
+  // builder's on-screen rendering — better for print + downstream tools.
+  // Returns a placeholder blank-PNG dataURL when the step has no canvas
+  // content so the export still has one image per step.
+  function renderStepToDataUrl(off, step) {
+    return new Promise(function (resolve) {
+      var parsed = parseCanvasJsonForExport(step.canvas_json);
+      function blankDataUrl() {
+        // Render an empty white canvas at multiplier 2.
+        try {
+          off.clear();
+          off.backgroundColor = '#ffffff';
+          off.renderAll();
+          resolve(off.toDataURL({ format: 'png', multiplier: 2 }));
+        } catch (_) {
+          // 1x1 transparent PNG as the absolute fallback.
+          resolve('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+        }
+      }
+      if (!parsed) { blankDataUrl(); return; }
+      try {
+        off.loadFromJSON(parsed, function () {
+          try {
+            off.renderAll();
+            var url = off.toDataURL({ format: 'png', multiplier: 2 });
+            resolve(url);
+          } catch (_) {
+            resolve(null);
+          }
+          try { off.clear(); off.backgroundColor = '#ffffff'; } catch (_) {}
+        });
+      } catch (_) {
+        blankDataUrl();
+      }
+    });
+  }
+
+  // Flush any pending canvas autosave so the next API read sees the
+  // latest state. Mirrors the inline flush in ``switchToStep`` but
+  // exposed as a helper so the export flow can call it without
+  // duplicating the timer handling.
+  async function flushPendingCanvasSave() {
+    if (_debounces['canvas-autosave']) {
+      clearTimeout(_debounces['canvas-autosave']);
+      delete _debounces['canvas-autosave'];
+      try { await flushCanvasSave(); } catch (_) { /* surfaced on indicator */ }
+    }
+  }
+
+  // Pull the canonical step list from the API after the autosave flush.
+  // The returned list is what the export pipeline renders — so any
+  // unsaved title / description / canvas state has to make it through
+  // autosave first.
+  async function loadStepsForExport() {
+    var instruction = await fetchInstruction();
+    if (!instruction || !Array.isArray(instruction.steps) || instruction.steps.length === 0) {
+      throw new Error('No steps to export');
+    }
+    var sorted = instruction.steps.slice().sort(function (a, b) {
+      return (a.step_number || 0) - (b.step_number || 0);
+    });
+    return sorted;
+  }
+
+  // Render every step to a PNG dataURL. Reuses a single off-screen
+  // StaticCanvas across all steps to keep the cost down.
+  async function renderAllStepsToDataUrls(steps) {
+    if (typeof fabric === 'undefined' || !fabric.StaticCanvas) {
+      throw new Error('Fabric.js is not loaded');
+    }
+    var offEl = document.createElement('canvas');
+    offEl.width = CANVAS_W;
+    offEl.height = CANVAS_H;
+    var off = new fabric.StaticCanvas(offEl, {
+      width: CANVAS_W,
+      height: CANVAS_H,
+      backgroundColor: '#ffffff',
+      enableRetinaScaling: false,
+    });
+    var out = [];
+    try {
+      for (var i = 0; i < steps.length; i++) {
+        setExportProgress('Rendering step ' + (i + 1) + ' of ' + steps.length + '…');
+        var url = await renderStepToDataUrl(off, steps[i]);
+        out.push(url);
+      }
+    } finally {
+      try { off.dispose(); } catch (_) {}
+    }
+    return out;
+  }
+
+  function triggerDownload(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Defer revoke so Safari has a moment to start the download.
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  async function exportPdf(layout) {
+    setExportProgress('Preparing export…');
+    try {
+      await flushPendingCanvasSave();
+      var steps = await loadStepsForExport();
+      var dataUrls = await renderAllStepsToDataUrls(steps);
+
+      setExportProgress('Building PDF…');
+      var payload = {
+        steps: steps.map(function (s, i) {
+          return {
+            step_number: s.step_number || (i + 1),
+            title: s.title || null,
+            description: s.description || null,
+            image_data_url: dataUrls[i],
+          };
+        }),
+        steps_per_page: layout,
+        include_title_page: true,
+        project_title: (state.project && state.project.title) || null,
+      };
+      var resp = await apiFetchWithTermsRetry(
+        API + '/api/projects/' + state.projectId + '/instruction/export/pdf',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      if (!resp.ok) {
+        throw new Error('Server returned HTTP ' + resp.status);
+      }
+      var blob = await resp.blob();
+      setExportProgress('Downloading…');
+      triggerDownload(blob, 'instructions-' + state.projectId + '.pdf');
+      hideExportProgress(1500);
+    } catch (e) {
+      setExportProgress('Export failed — please try again', 'error');
+      hideExportProgress(4000);
+    }
+  }
+
+  async function exportZip() {
+    if (typeof window.JSZip === 'undefined') {
+      setExportProgress('ZIP library failed to load — try the PDF option instead', 'error');
+      hideExportProgress(4000);
+      return;
+    }
+    setExportProgress('Preparing export…');
+    try {
+      await flushPendingCanvasSave();
+      var steps = await loadStepsForExport();
+      var dataUrls = await renderAllStepsToDataUrls(steps);
+
+      setExportProgress('Building ZIP…');
+      var zip = new window.JSZip();
+      var prefix = 'data:image/png;base64,';
+      var metadata = { steps: [] };
+      for (var i = 0; i < steps.length; i++) {
+        var url = dataUrls[i];
+        var idx = String(i + 1).padStart(3, '0');
+        var name = 'step-' + idx + '.png';
+        if (url && url.indexOf(prefix) === 0) {
+          zip.file(name, url.substring(prefix.length), { base64: true });
+        }
+        metadata.steps.push({
+          step_number: steps[i].step_number || (i + 1),
+          title: steps[i].title || null,
+          description: steps[i].description || null,
+          filename: name,
+        });
+      }
+      metadata.project_title = (state.project && state.project.title) || null;
+      metadata.project_id = state.projectId;
+      metadata.exported_at = new Date().toISOString();
+      zip.file('metadata.json', JSON.stringify(metadata, null, 2));
+
+      var blob = await zip.generateAsync({ type: 'blob' });
+      setExportProgress('Downloading…');
+      triggerDownload(blob, 'instructions-' + state.projectId + '.zip');
+      hideExportProgress(1500);
+    } catch (e) {
+      setExportProgress('Export failed — please try again', 'error');
+      hideExportProgress(4000);
+    }
+  }
+
+  function wireExportMenu() {
+    if (!dom.exportMenuItems) return;
+    Array.prototype.forEach.call(dom.exportMenuItems, function (item) {
+      item.addEventListener('click', function (e) {
+        e.preventDefault();
+        var kind = item.dataset.export;
+        if (kind === 'pdf') {
+          var layout = parseInt(item.dataset.layout, 10) || 1;
+          exportPdf(layout);
+        } else if (kind === 'zip') {
+          exportZip();
+        }
+      });
+    });
+  }
+
   // -------- Init flow ------------------------------------------------
 
   async function init() {
@@ -957,6 +1218,7 @@
     initCanvas();
     wireToolbar();
     wireStepFields();
+    wireExportMenu();
     if (dom.addStepBtn) dom.addStepBtn.addEventListener('click', onAddStep);
 
     // Render the steps list and load the first step's canvas

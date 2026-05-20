@@ -361,6 +361,43 @@ class InstructionResponse(BaseModel):
     steps: list[InstructionStepResponse] = Field(default_factory=list)
 
 
+# --- Build instructions export (issue #178, Phase 2b) --------------------
+#
+# Hybrid PDF pipeline: the browser renders each Fabric.js canvas to a
+# PNG dataURL client-side (so the server doesn't need a headless canvas
+# runtime) and POSTs the array here. The server stitches them into a
+# layout-aware PDF via ReportLab.
+
+
+class InstructionExportStep(BaseModel):
+    """One step in an export payload.
+
+    ``image_data_url`` is the canvas rendered to PNG by the browser
+    (``data:image/png;base64,<base64>``). The route validates the prefix;
+    actual base64 decoding happens during PDF assembly.
+    """
+
+    step_number: int
+    title: Optional[str] = None
+    description: Optional[str] = None
+    image_data_url: str
+
+
+class InstructionExportRequest(BaseModel):
+    """Body of POST /api/projects/{id}/instruction/export/pdf.
+
+    ``steps_per_page`` must be 1, 2, or 4 — anything else is 422'd in
+    the route. ``project_title`` is supplied by the client because the
+    export endpoint doesn't otherwise load the project body, and the
+    title page wants something better than "Instructions" by default.
+    """
+
+    steps: list[InstructionExportStep]
+    steps_per_page: int = 1
+    include_title_page: bool = True
+    project_title: Optional[str] = None
+
+
 class JournalEntryCreate(BaseModel):
     title: str = Field(..., max_length=200)
     content_md: Optional[str] = None
