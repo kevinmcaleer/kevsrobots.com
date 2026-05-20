@@ -2894,19 +2894,40 @@
   // 18. LAYERS PANE
   // ====================================================================
 
-  // Backfill: pre-fix canvases stored `ibSourceUrl` but not `ibFilename`.
-  // Recover a friendly name from the project-image list when the source
-  // URL matches one of its IDs, so the Layers pane labels work for
-  // legacy steps without a re-edit.
-  function filenameFromSourceUrl(url) {
+  // Resolve a friendly filename for an image-type Fabric object.
+  // Pre-fix canvases lack ibFilename AND sometimes ibRole/ibSourceUrl,
+  // so this walks every signal we have:
+  //   1. The canonical ibFilename property we set on placement.
+  //   2. ibSourceUrl → look up in state.projectImages by image id
+  //      embedded in the URL (gives the real upload filename).
+  //   3. Fabric's underlying HTMLImageElement.src — what the browser
+  //      actually loaded — falls back to the last URL path segment.
+  function filenameForFabricImage(o) {
+    if (!o) return '';
+    var fname = (o.ibFilename || '').trim();
+    if (fname) return fname;
+    var url = o.ibSourceUrl || '';
+    if (!url && typeof o.getSrc === 'function') {
+      try { url = o.getSrc(); } catch (_) {}
+    }
+    if (!url && o._element && o._element.src) url = o._element.src;
     if (!url) return '';
+    // Project-images URL → look up the friendly filename.
     var m = /\/api\/projects\/\d+\/images\/(\d+)\/view/.exec(url);
-    if (!m) return '';
-    var id = parseInt(m[1], 10);
-    if (!id || !state.projectImages) return '';
-    var match = state.projectImages.find(function (im) { return im.id === id; });
-    if (!match) return '';
-    return match.filename || match.caption || '';
+    if (m) {
+      var id = parseInt(m[1], 10);
+      if (id && state.projectImages) {
+        var match = state.projectImages.find(function (im) { return im.id === id; });
+        if (match) return match.filename || match.caption || '';
+      }
+    }
+    // Last resort: the last URL path segment if it looks like a filename.
+    try {
+      var u = new URL(url, window.location.origin);
+      var last = u.pathname.split('/').filter(Boolean).pop();
+      if (last && last.indexOf('.') > 0) return decodeURIComponent(last);
+    } catch (_) {}
+    return '';
   }
 
   function objectKindLabel(o) {
@@ -2915,7 +2936,7 @@
     // a stack of "Image, Image, Image" is useless on a step with several
     // photos / project-images dropped in. Falls back to a Photos-pane
     // lookup for legacy canvases written before ibFilename was a thing.
-    var fname = (o.ibFilename || '').trim() || filenameFromSourceUrl(o.ibSourceUrl);
+    var fname = filenameForFabricImage(o);
     if (o.ibRole === 'background') {
       return { icon: 'fas fa-image', label: fname ? ('Background: ' + fname) : 'Background image' };
     }
