@@ -10,6 +10,7 @@ python-jose[cryptography]
 python-multipart
 smbprotocol
 Pillow
+reportlab
 httpx
 apscheduler
 pytest

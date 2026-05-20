@@ -28,6 +28,21 @@ hide_nibsy: true
       <span class="ib-save-status" id="ib-save-status" aria-live="polite"></span>
     </div>
     <div class="ib-header-right">
+      <span class="ib-export-progress d-none" id="ib-export-progress" aria-live="polite"></span>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
+                id="ib-export-btn" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-file-download me-2"></i>Export
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end ib-export-menu" aria-labelledby="ib-export-btn">
+          <li><h6 class="dropdown-header">PDF</h6></li>
+          <li><a class="dropdown-item" href="#" data-export="pdf" data-layout="1">1 step per page</a></li>
+          <li><a class="dropdown-item" href="#" data-export="pdf" data-layout="2">2 steps per page</a></li>
+          <li><a class="dropdown-item" href="#" data-export="pdf" data-layout="4">4 steps per page</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" data-export="zip">Image series (ZIP)</a></li>
+        </ul>
+      </div>
       <a id="ib-open-editor-newtab" href="/projects/editor.html" target="_blank" rel="noopener" class="text-decoration-none small">
         <i class="fas fa-external-link-alt me-1"></i> Open editor in new tab
       </a>
@@ -175,6 +190,12 @@ hide_nibsy: true
   back to v5.3.0 (last UMD-friendly release). Tested with 6.4.0.
 -->
 <script src="https://cdn.jsdelivr.net/npm/fabric@6.4.0/dist/index.min.js"></script>
+<!--
+  JSZip — used by Phase 2c (image-series export). Pinned to 3.10.1; CDN
+  URLs version themselves via the path so we don't need the `?v=` cache
+  bust here.
+-->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/instruction-builder.js?v={{ site.time | date: '%s' }}"></script>

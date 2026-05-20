@@ -85,6 +85,26 @@ body.instruction-builder-page > .container-fluid {
 .ib-save-status.is-saved { color: #198754; }
 .ib-save-status.is-error { color: #dc3545; }
 
+/* ---- Export dropdown + progress (Phase 2b / 2c) --------------------- */
+
+.ib-export-progress {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #6c757d;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-export-progress.is-error {
+  color: #dc3545;
+}
+
+.ib-export-menu {
+  min-width: 14rem;
+}
+
 /* ---- Main grid (toolbar / canvas / sidebar) -------------------------- */
 
 .ib-main {
