@@ -15,24 +15,37 @@ hide_nibsy: true
      so it doesn't fight first paint. -->
 <script>document.body.classList.add('instruction-builder-page');</script>
 
-<div class="ib-workspace" id="ib-workspace">
-  <!-- Header strip -->
-  <div class="ib-header">
-    <div class="ib-header-left">
-      <a id="ib-back-link" href="/projects/editor.html" class="text-decoration-none">
+<div class="ib-workspace" id="ib-workspace" data-density="roomy">
+
+  <!-- ===========================================================
+       Zone E — Project title bar (top)
+       Back / centered title + save status / HUD toggle / Export /
+       Open editor in new tab.
+       =========================================================== -->
+  <div class="ib-titlebar" id="ib-titlebar">
+    <div class="ib-titlebar-left">
+      <a id="ib-back-link" href="/projects/editor.html" class="ib-titlebar-link">
         <i class="fas fa-arrow-left me-1"></i> Back to editor
       </a>
     </div>
-    <div class="ib-header-center">
+    <div class="ib-titlebar-center">
       <span class="ib-project-title" id="ib-project-title">Loading…</span>
       <span class="ib-save-status" id="ib-save-status" aria-live="polite"></span>
     </div>
-    <div class="ib-header-right">
+    <div class="ib-titlebar-right">
       <span class="ib-export-progress d-none" id="ib-export-progress" aria-live="polite"></span>
+
+      <!-- HUD toggle — clickable but the HUD panel itself ships in PR 2. -->
+      <button type="button" class="ib-titlebar-btn" id="ib-hud-toggle"
+              title="Toggle Inspector HUD" aria-pressed="false">
+        <i class="fas fa-window-restore me-1"></i> HUD
+      </button>
+
+      <!-- Export dropdown — relocated from the old header strip. -->
       <div class="dropdown">
-        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
+        <button class="ib-titlebar-btn dropdown-toggle" type="button"
                 id="ib-export-btn" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fas fa-file-download me-2"></i>Export
+          <i class="fas fa-file-download me-1"></i> Export
         </button>
         <ul class="dropdown-menu dropdown-menu-end ib-export-menu" aria-labelledby="ib-export-btn">
           <li><h6 class="dropdown-header">PDF</h6></li>
@@ -47,21 +60,26 @@ hide_nibsy: true
           <li><a class="dropdown-item" href="#" data-export="zip">Image series (ZIP)</a></li>
         </ul>
       </div>
-      <a id="ib-open-editor-newtab" href="/projects/editor.html" target="_blank" rel="noopener" class="text-decoration-none small">
-        <i class="fas fa-external-link-alt me-1"></i> Open editor in new tab
+
+      <a id="ib-open-editor-newtab" href="/projects/editor.html" target="_blank" rel="noopener"
+         class="ib-titlebar-link" title="Open editor in new tab">
+        <i class="fas fa-external-link-alt me-1"></i> New tab
       </a>
     </div>
   </div>
 
-  <!-- Loading / error / not-owner states. The builder JS swaps these
-       on/off depending on the page state — only one is visible at a time. -->
+  <!-- ===========================================================
+       Loading / error / not-owner states. The builder JS swaps
+       these on/off depending on the page state — only one (and
+       optionally #ib-main) is visible at a time.
+       =========================================================== -->
   <div class="ib-loading" id="ib-loading">
     <i class="fas fa-spinner fa-spin me-2"></i> Loading instruction builder…
   </div>
 
   <div class="ib-not-owner d-none" id="ib-not-owner">
     <div class="ib-icon"><i class="fas fa-lock"></i></div>
-    <h4>You don't own this project</h4>
+    <h4><i class="fas fa-lock me-3"></i> You don't own this project</h4>
     <p class="text-muted">Only the project author can edit its build instructions.</p>
     <a href="/projects/" class="btn btn-outline-primary mt-2">
       <i class="fas fa-arrow-left me-1"></i> Back to projects
@@ -70,166 +88,394 @@ hide_nibsy: true
 
   <div class="ib-error d-none" id="ib-error">
     <div class="ib-icon text-danger"><i class="fas fa-exclamation-triangle"></i></div>
-    <h4>Couldn't load this project</h4>
+    <h4><i class="fas fa-exclamation-triangle me-3 text-danger"></i> Couldn't load this project</h4>
     <p class="text-muted" id="ib-error-detail">The project may not exist, or you may need to log in.</p>
     <a href="/projects/" class="btn btn-outline-primary mt-2">
       <i class="fas fa-arrow-left me-1"></i> Back to projects
     </a>
   </div>
 
-  <!-- Main grid: hidden until the loader resolves -->
+  <!-- ===========================================================
+       Main shell — hidden until the loader resolves.
+       Layout: rail | secondary pane | canvas, then filmstrip
+       at the bottom spanning all three columns.
+       =========================================================== -->
   <div class="ib-main d-none" id="ib-main">
 
-    <!-- LEFT: Toolbar -->
-    <aside class="ib-toolbar" aria-label="Drawing tools">
+    <!-- =========================================================
+         Zone A — Activity rail (54px wide)
+         6 panes + settings pinned to the bottom.
+         ========================================================= -->
+    <nav class="ib-rail" id="ib-rail" aria-label="Workspace panes">
+      <button type="button" class="ib-rail-btn is-active" data-rail-pane="photos"
+              title="Photos (Cmd/Ctrl+1)">
+        <span class="ib-rail-icon"><i class="fas fa-image"></i></span>
+        <span class="ib-rail-label">Photos</span>
+      </button>
+      <button type="button" class="ib-rail-btn" data-rail-pane="tools"
+              title="Tools (Cmd/Ctrl+2)">
+        <span class="ib-rail-icon"><i class="fas fa-toolbox"></i></span>
+        <span class="ib-rail-label">Tools</span>
+      </button>
+      <button type="button" class="ib-rail-btn" data-rail-pane="bom"
+              title="BOM (Cmd/Ctrl+3)">
+        <span class="ib-rail-icon"><i class="fas fa-receipt"></i></span>
+        <span class="ib-rail-label">BOM</span>
+      </button>
+      <button type="button" class="ib-rail-btn" data-rail-pane="assets"
+              title="Assets (Cmd/Ctrl+4)">
+        <span class="ib-rail-icon"><i class="fas fa-puzzle-piece"></i></span>
+        <span class="ib-rail-label">Assets</span>
+      </button>
+      <button type="button" class="ib-rail-btn" data-rail-pane="circuit"
+              title="Circuit (Cmd/Ctrl+5)">
+        <span class="ib-rail-icon"><i class="fas fa-bolt"></i></span>
+        <span class="ib-rail-label">Circuit</span>
+      </button>
+      <button type="button" class="ib-rail-btn" data-rail-pane="layers"
+              title="Layers (Cmd/Ctrl+6)">
+        <span class="ib-rail-icon"><i class="fas fa-layer-group"></i></span>
+        <span class="ib-rail-label">Layers</span>
+      </button>
 
-      <div class="ib-toolbar-section">
-        <h6>Background</h6>
-        <button type="button" class="ib-tool-btn is-wide w-100 mb-2" id="ib-upload-image-btn">
-          <i class="fas fa-image"></i> Upload image
-        </button>
-        <button type="button" class="ib-tool-btn is-wide w-100 mb-2" id="ib-pick-project-image-btn">
-          <i class="fas fa-images"></i> Add from project images
-        </button>
-        <button type="button" class="ib-tool-btn is-wide w-100" id="ib-remove-image-btn" disabled>
-          <i class="fas fa-times"></i> Remove image
-        </button>
-        <input type="file" accept="image/*" class="ib-hidden-file" id="ib-image-input">
-      </div>
+      <div class="ib-rail-spacer"></div>
 
-      <div class="ib-toolbar-section">
-        <h6>3D model</h6>
-        <button type="button" class="ib-tool-btn is-wide w-100" id="ib-add-stl-btn">
-          <i class="fas fa-cube"></i> Add STL
-        </button>
-      </div>
+      <button type="button" class="ib-rail-btn ib-rail-settings"
+              id="ib-rail-settings" title="Tweaks">
+        <span class="ib-rail-icon"><i class="fas fa-gear"></i></span>
+        <span class="ib-rail-label">Settings</span>
+      </button>
+    </nav>
 
-      <div class="ib-toolbar-section">
-        <h6>Tools</h6>
-        <div class="ib-tool-grid">
-          <button type="button" class="ib-tool-btn is-active" data-tool="select" title="Select / move">
-            <i class="fas fa-mouse-pointer"></i> Select
-          </button>
-          <button type="button" class="ib-tool-btn" data-tool="arrow" title="Arrow">
-            <i class="fas fa-long-arrow-alt-right"></i> Arrow
-          </button>
-          <button type="button" class="ib-tool-btn" data-tool="text" title="Text">
-            <i class="fas fa-font"></i> Text
-          </button>
-          <button type="button" class="ib-tool-btn" data-tool="rectangle" title="Rectangle">
-            <i class="far fa-square"></i> Rect
-          </button>
-          <button type="button" class="ib-tool-btn" data-tool="circle" title="Circle">
-            <i class="far fa-circle"></i> Circle
-          </button>
-        </div>
-      </div>
+    <!-- =========================================================
+         Zone B — Secondary pane (240px default, resizable)
+         Content swaps per active rail item.
+         ========================================================= -->
+    <aside class="ib-secondary" id="ib-secondary" aria-label="Pane content"
+           style="width: 240px;">
 
-      <div class="ib-toolbar-section">
-        <h6>Style</h6>
-        <div class="ib-style-row">
-          <label for="ib-color">Colour</label>
-          <input type="color" id="ib-color" value="#dc3545">
-        </div>
-        <div class="ib-style-row">
-          <label for="ib-stroke">Stroke</label>
-          <input type="range" id="ib-stroke" min="1" max="10" step="1" value="3">
-          <span class="ib-stroke-value" id="ib-stroke-value">3</span>
-        </div>
-        <div class="ib-style-row">
-          <label for="ib-fontsize">Font size</label>
-          <input type="number" id="ib-fontsize" min="12" max="48" step="1" value="20">
-        </div>
-      </div>
+      <!-- Photos pane (default) -->
+      <section class="ib-pane is-active" data-pane="photos">
+        <header class="ib-pane-header">
+          <h6 class="ib-pane-title"><i class="fas fa-image me-2"></i>Photos</h6>
+        </header>
+        <div class="ib-pane-body">
+          <div class="ib-photos-actions">
+            <button type="button" class="ib-pane-btn" id="ib-photos-upload">
+              <i class="fas fa-upload me-1"></i> Upload
+            </button>
+            <button type="button" class="ib-pane-btn" id="ib-photos-camera">
+              <i class="fas fa-camera me-1"></i> Camera
+            </button>
+            <input type="file" accept="image/*" multiple class="ib-hidden-file"
+                   id="ib-photos-input">
+          </div>
 
-      <div class="ib-toolbar-section">
-        <h6>Transform</h6>
-        <div class="ib-style-row">
-          <label for="ib-rotation">Rotation</label>
-          <input type="number" id="ib-rotation" min="0" max="360" step="1" value="0" disabled>
-          <span class="ib-rotation-unit">&deg;</span>
-        </div>
-        <button type="button" class="ib-tool-btn is-wide w-100" id="ib-reset-transforms" disabled>
-          <i class="fas fa-undo-alt"></i> Reset transforms
-        </button>
-      </div>
+          <div class="ib-photos-grid" id="ib-photos-grid">
+            <div class="ib-photos-loading text-muted small">
+              <i class="fas fa-circle-notch fa-spin me-1"></i> Loading photos…
+            </div>
+          </div>
 
-      <div class="ib-toolbar-section">
-        <h6>Arrange</h6>
-        <div class="ib-arrange-actions">
-          <button type="button" class="ib-tool-btn" id="ib-bring-to-front" disabled
-                  title="Bring to front">
-            <i class="fas fa-angle-double-up"></i> To front
-          </button>
-          <button type="button" class="ib-tool-btn" id="ib-bring-forward" disabled
-                  title="Bring forward">
-            <i class="fas fa-angle-up"></i> Forward
-          </button>
-          <button type="button" class="ib-tool-btn" id="ib-send-backward" disabled
-                  title="Send backward">
-            <i class="fas fa-angle-down"></i> Backward
-          </button>
-          <button type="button" class="ib-tool-btn" id="ib-send-to-back" disabled
-                  title="Send to back">
-            <i class="fas fa-angle-double-down"></i> To back
-          </button>
+          <p class="ib-pane-hint text-muted small mb-0">
+            Drag a photo onto the canvas. Shift-click to drag multiple. <i class="fas fa-star ib-star-mini"></i> = step background.
+          </p>
         </div>
-      </div>
+      </section>
 
-      <div class="ib-toolbar-section">
-        <h6>Edit</h6>
-        <div class="ib-edit-actions">
-          <button type="button" class="ib-tool-btn is-wide" id="ib-delete-selected" disabled>
-            <i class="fas fa-trash"></i> Delete selected
-          </button>
-          <button type="button" class="ib-tool-btn" id="ib-undo" disabled>
-            <i class="fas fa-undo"></i> Undo
-          </button>
-          <button type="button" class="ib-tool-btn" id="ib-redo" disabled>
-            <i class="fas fa-redo"></i> Redo
-          </button>
+      <!-- Tools pane -->
+      <section class="ib-pane" data-pane="tools">
+        <header class="ib-pane-header">
+          <h6 class="ib-pane-title"><i class="fas fa-toolbox me-2"></i>Tools</h6>
+        </header>
+        <div class="ib-pane-body">
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Background</h6>
+            <button type="button" class="ib-tool-btn is-wide w-100 mb-2" id="ib-upload-image-btn">
+              <i class="fas fa-image"></i> Upload image
+            </button>
+            <button type="button" class="ib-tool-btn is-wide w-100 mb-2" id="ib-pick-project-image-btn">
+              <i class="fas fa-images"></i> Add from project images
+            </button>
+            <button type="button" class="ib-tool-btn is-wide w-100" id="ib-remove-image-btn" disabled>
+              <i class="fas fa-times"></i> Remove image
+            </button>
+            <input type="file" accept="image/*" class="ib-hidden-file" id="ib-image-input">
+          </div>
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">3D model</h6>
+            <button type="button" class="ib-tool-btn is-wide w-100" id="ib-add-stl-btn">
+              <i class="fas fa-cube"></i> Add STL
+            </button>
+          </div>
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Draw</h6>
+            <div class="ib-tool-grid">
+              <button type="button" class="ib-tool-btn is-active" data-tool="select" title="Select / move">
+                <i class="fas fa-mouse-pointer"></i> Select
+              </button>
+              <button type="button" class="ib-tool-btn" data-tool="arrow" title="Arrow">
+                <i class="fas fa-long-arrow-alt-right"></i> Arrow
+              </button>
+              <button type="button" class="ib-tool-btn" data-tool="text" title="Text">
+                <i class="fas fa-font"></i> Text
+              </button>
+              <button type="button" class="ib-tool-btn" data-tool="rectangle" title="Rectangle">
+                <i class="far fa-square"></i> Rect
+              </button>
+              <button type="button" class="ib-tool-btn" data-tool="circle" title="Circle">
+                <i class="far fa-circle"></i> Circle
+              </button>
+            </div>
+          </div>
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Style</h6>
+            <div class="ib-style-row">
+              <label for="ib-color">Colour</label>
+              <input type="color" id="ib-color" value="#dc3545">
+            </div>
+            <div class="ib-style-row">
+              <label for="ib-stroke">Stroke</label>
+              <input type="range" id="ib-stroke" min="1" max="10" step="1" value="3">
+              <span class="ib-stroke-value" id="ib-stroke-value">3</span>
+            </div>
+            <div class="ib-style-row">
+              <label for="ib-fontsize">Font size</label>
+              <input type="number" id="ib-fontsize" min="12" max="48" step="1" value="20">
+            </div>
+          </div>
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Transform</h6>
+            <div class="ib-style-row">
+              <label for="ib-rotation">Rotation</label>
+              <input type="number" id="ib-rotation" min="0" max="360" step="1" value="0" disabled>
+              <span class="ib-rotation-unit">&deg;</span>
+            </div>
+            <button type="button" class="ib-tool-btn is-wide w-100" id="ib-reset-transforms" disabled>
+              <i class="fas fa-undo-alt"></i> Reset transforms
+            </button>
+          </div>
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Arrange</h6>
+            <div class="ib-arrange-actions">
+              <button type="button" class="ib-tool-btn" id="ib-bring-to-front" disabled title="Bring to front">
+                <i class="fas fa-angle-double-up"></i> To front
+              </button>
+              <button type="button" class="ib-tool-btn" id="ib-bring-forward" disabled title="Bring forward">
+                <i class="fas fa-angle-up"></i> Forward
+              </button>
+              <button type="button" class="ib-tool-btn" id="ib-send-backward" disabled title="Send backward">
+                <i class="fas fa-angle-down"></i> Backward
+              </button>
+              <button type="button" class="ib-tool-btn" id="ib-send-to-back" disabled title="Send to back">
+                <i class="fas fa-angle-double-down"></i> To back
+              </button>
+            </div>
+          </div>
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Edit</h6>
+            <div class="ib-edit-actions">
+              <button type="button" class="ib-tool-btn is-wide" id="ib-delete-selected" disabled>
+                <i class="fas fa-trash"></i> Delete selected
+              </button>
+              <button type="button" class="ib-tool-btn" id="ib-undo" disabled>
+                <i class="fas fa-undo"></i> Undo
+              </button>
+              <button type="button" class="ib-tool-btn" id="ib-redo" disabled>
+                <i class="fas fa-redo"></i> Redo
+              </button>
+            </div>
+          </div>
+
+          <div class="ib-pane-section">
+            <h6 class="ib-pane-section-title">Current step</h6>
+            <input type="text" class="form-control form-control-sm mb-2" id="ib-step-title"
+                   placeholder="Step title…" maxlength="200">
+            <textarea class="form-control form-control-sm" id="ib-step-description" rows="3"
+                      placeholder="Describe what happens in this step…"></textarea>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <!-- BOM pane (stub) -->
+      <section class="ib-pane" data-pane="bom">
+        <header class="ib-pane-header">
+          <h6 class="ib-pane-title"><i class="fas fa-receipt me-2"></i>BOM</h6>
+        </header>
+        <div class="ib-pane-body">
+          <div class="ib-pane-stub">
+            <div class="ib-pane-stub-icon"><i class="fas fa-receipt"></i></div>
+            <p>Bill of Materials and Assets coming soon. Connect parts in the project editor's BOM section, and they'll appear here as draggable assets.</p>
+            <a class="btn btn-sm btn-outline-primary" id="ib-bom-open-editor" href="#">
+              <i class="fas fa-external-link-alt me-1"></i> Open BOM in editor
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Assets pane (stub) -->
+      <section class="ib-pane" data-pane="assets">
+        <header class="ib-pane-header">
+          <h6 class="ib-pane-title"><i class="fas fa-puzzle-piece me-2"></i>Assets</h6>
+        </header>
+        <div class="ib-pane-body">
+          <div class="ib-pane-stub">
+            <div class="ib-pane-stub-icon"><i class="fas fa-puzzle-piece"></i></div>
+            <p>Assets are component graphics linked from the BOM. This pane will be populated as the Parts Catalog Assets feature lands.</p>
+            <p class="small text-muted">
+              Watch <a href="https://github.com/kevinmcaleer/kevsrobots.com/issues/180" target="_blank" rel="noopener">issue #180 (Circuit Diagrammer)</a> and related issues for progress.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Circuit pane (stub) -->
+      <section class="ib-pane" data-pane="circuit">
+        <header class="ib-pane-header">
+          <h6 class="ib-pane-title"><i class="fas fa-bolt me-2"></i>Circuit</h6>
+        </header>
+        <div class="ib-pane-body">
+          <div class="ib-pane-stub">
+            <div class="ib-pane-stub-icon"><i class="fas fa-bolt"></i></div>
+            <p>Circuit designer mode — separate handoff (issue #180).</p>
+            <p class="small text-muted">
+              Track progress at
+              <a href="https://github.com/kevinmcaleer/kevsrobots.com/issues/180" target="_blank" rel="noopener">issue #180</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Layers pane -->
+      <section class="ib-pane" data-pane="layers">
+        <header class="ib-pane-header">
+          <h6 class="ib-pane-title"><i class="fas fa-layer-group me-2"></i>Layers</h6>
+        </header>
+        <div class="ib-pane-body">
+          <ol class="ib-layers-list" id="ib-layers-list"></ol>
+          <p class="ib-pane-hint text-muted small mb-0">
+            Drag rows to reorder. Click a row to select that object on the canvas.
+          </p>
+        </div>
+      </section>
+
+      <!-- Resize handle on the right edge -->
+      <div class="ib-secondary-resize" id="ib-secondary-resize"
+           role="separator" aria-orientation="vertical"
+           title="Drag to resize"></div>
     </aside>
 
-    <!-- CENTRE: Canvas -->
-    <main class="ib-canvas-area">
-      <div class="ib-canvas-header">
-        <span class="ib-step-badge" id="ib-step-badge">Step 1 of 1</span>
-        <span class="ib-canvas-hint" id="ib-active-tool-hint">Tool: Select</span>
-      </div>
+    <!-- =========================================================
+         Zone C — Canvas (flex 1)
+         Fabric.js canvas plus an empty HUD slot (PR 2).
+         ========================================================= -->
+    <main class="ib-canvas-area" id="ib-canvas-area" aria-label="Canvas">
       <div class="ib-canvas-frame" id="ib-canvas-frame">
         <canvas id="ib-canvas"></canvas>
         <div class="ib-canvas-empty" id="ib-canvas-empty">
-          Upload an image to start, or just drop overlays on the empty canvas.
+          Drop a photo here, or pick a tool from the secondary pane.
         </div>
       </div>
+
+      <!-- Floating HUD slot — empty in this PR.
+           PR 2: render the dark Inspector panel here. -->
+      <div id="ib-inspector-hud" class="ib-inspector-hud" hidden></div>
     </main>
 
-    <!-- RIGHT: Sidebar -->
-    <aside class="ib-sidebar" aria-label="Step list and metadata">
-
-      <div class="ib-sidebar-section ib-step-fields">
-        <h6>Current step</h6>
-        <input type="text" class="form-control form-control-sm mb-2" id="ib-step-title"
-               placeholder="Step title…" maxlength="200">
-        <textarea class="form-control form-control-sm" id="ib-step-description" rows="3"
-                  placeholder="Describe what happens in this step…"></textarea>
-      </div>
-
-      <div class="ib-sidebar-section">
-        <h6>Steps</h6>
-        <ol class="ib-steps-list" id="ib-steps-list"></ol>
-        <button type="button" class="btn btn-sm btn-outline-primary w-100" id="ib-add-step">
-          <i class="fas fa-plus me-1"></i> Add step
+    <!-- =========================================================
+         Zone F — Filmstrip (spans rail + secondary + canvas)
+         Step thumbnails, drag-to-reorder, +add, collapse toggle.
+         ========================================================= -->
+    <footer class="ib-filmstrip" id="ib-filmstrip" aria-label="Steps">
+      <div class="ib-filmstrip-header">
+        <span class="ib-filmstrip-title">
+          <i class="fas fa-film me-2"></i>Steps
+          <span class="ib-filmstrip-count" id="ib-filmstrip-count"></span>
+        </span>
+        <button type="button" class="ib-filmstrip-toggle" id="ib-filmstrip-toggle"
+                title="Hide steps">
+          <i class="fas fa-chevron-down"></i> hide
         </button>
-        <p class="ib-reorder-hint">
-          To reorder steps, use the &uarr;&darr; buttons in the project editor's outline.
-        </p>
       </div>
-    </aside>
-
+      <div class="ib-filmstrip-body" id="ib-filmstrip-body">
+        <div class="ib-filmstrip-track" id="ib-filmstrip-track"></div>
+        <button type="button" class="ib-filmstrip-add" id="ib-filmstrip-add"
+                title="Add step">
+          <i class="fas fa-plus"></i><span>add step</span>
+        </button>
+      </div>
+    </footer>
   </div>
+
+  <!-- ===========================================================
+       Settings (Tweaks) popover — anchored to the gear in the rail
+       =========================================================== -->
+  <div class="ib-settings-pop" id="ib-settings-pop" hidden>
+    <div class="ib-settings-pop-inner">
+      <h6 class="ib-pane-section-title">Tweaks</h6>
+
+      <label class="ib-settings-row">
+        <input type="checkbox" id="ib-settings-grid">
+        <span>Show grid</span>
+      </label>
+
+      <div class="ib-settings-row ib-settings-radio-row">
+        <span class="ib-settings-label">Density</span>
+        <label class="ib-settings-radio">
+          <input type="radio" name="ib-density" value="roomy" checked>
+          <span>Roomy</span>
+        </label>
+        <label class="ib-settings-radio">
+          <input type="radio" name="ib-density" value="compact">
+          <span>Compact</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       Camera modal — getUserMedia preview + capture.
+       Built as a Bootstrap 5 modal so we get the same chrome as
+       the existing STL + image-picker modals.
+       =========================================================== -->
+  <div class="modal fade ib-camera-modal" id="ib-camera-modal" tabindex="-1"
+       aria-labelledby="ib-camera-modal-label" aria-hidden="true"
+       data-bs-backdrop="static" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ib-camera-modal-label">
+            <i class="fas fa-camera me-2 text-primary"></i>Camera capture
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="ib-camera-preview" id="ib-camera-preview">
+            <video id="ib-camera-video" autoplay playsinline muted></video>
+            <div class="ib-camera-status text-muted small" id="ib-camera-status">
+              Waiting for camera permission…
+            </div>
+          </div>
+          <div class="ib-camera-error alert alert-warning d-none mt-3" id="ib-camera-error" role="alert">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="ib-camera-capture" disabled>
+            <i class="fas fa-camera me-1"></i> Capture
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!--

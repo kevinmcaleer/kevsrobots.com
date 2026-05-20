@@ -1,26 +1,31 @@
 /**
- * Instruction Builder — Phase 1 (issue #178).
+ * Instruction Builder — A5 Activity-Rail layout (design_handoff_instructions_builder/).
  *
- * Standalone full-screen page (web/projects/instructions/edit.html). Loads a
- * project's instruction + steps from the Projects API, then lets the owner
- * draw on a per-step Fabric.js canvas (image background + arrow / text /
- * rectangle / circle overlays). Autosaves canvas_json back to the
- * existing PUT /steps/{step_id} endpoint.
+ * Foundation pass: zone structure + photos pane + tools pane + layers
+ * pane + BOM/Assets/Circuit stubs + filmstrip + camera capture + tweaks
+ * settings popover. The floating Inspector HUD and the image-context
+ * toolbar above selected images are scoped to a follow-up PR.
  *
- * Pinned to Fabric.js v6.4.0 (UMD build on jsdelivr exposes window.fabric).
- * If a future v6 release stops shipping a global, switch the CDN URL to
- * fabric@5.3.0 — its surface is close enough that only the
- * fabric.Image.fromURL call needs to migrate from a Promise back to a
- * callback.
+ * Engine carry-overs from the previous (three-column) implementation:
+ *   - Fabric.js v6.4.0 canvas (CDN UMD, exposes window.fabric)
+ *   - Per-step canvas_json persisted via PUT /steps/{id}
+ *   - Step CRUD + autosave (800ms debounce) + undo/redo (50 snapshots,
+ *     per-step memory)
+ *   - T&Cs gate retry via window.TermsGate.handleResponse
+ *   - Owner check / login redirect
+ *   - STL viewer modal (Three.js v0.147 lazy-loaded)
+ *   - Existing image-picker modal ("Add from project images")
+ *   - Export pipeline (PDF 1/2/4 per page, GIF, MP4, ZIP)
  *
- * Out of scope for Phase 1 (defer to later phases): tablet / mobile
- * polish, callout presets, STL viewer, export pipeline, public viewer,
- * drag-to-reorder steps in this sidebar, multi-image / image series.
+ * The functions named in those bullets keep their semantics intact; only
+ * the surrounding chrome (DOM bindings, layout, new pane wiring) is new.
  */
 (function () {
   'use strict';
 
-  // -------- Constants & config ---------------------------------------
+  // ====================================================================
+  // 1. CONSTANTS & MODULE STATE
+  // ====================================================================
 
   var API = 'https://projects.kevsrobots.com';
   var CANVAS_W = 1200;
@@ -29,29 +34,31 @@
   var UNDO_DEBOUNCE_MS = 200;
   var UNDO_STACK_LIMIT = 50;
 
-  // Phase 3a — STL viewer (lazy-loaded on first "Add STL" click).
-  //
-  // Pinned to Three.js v0.147. Two CDN paths are needed and they must
-  // line up with each other:
-  //
-  //   * THREE_CDN — UMD-style build that still exposes a global `THREE`.
-  //     The spec'd version (0.160) DOES still ship `build/three.min.js`
-  //     with the global, but the matching `examples/js/loaders/STLLoader.js`
-  //     was removed somewhere around 0.148 (verified: 404 on jsdelivr for
-  //     0.148–0.160; 200 on 0.147 and 0.146). Pinning the whole pair to
-  //     0.147 keeps the spec's "global THREE + global THREE.STLLoader"
-  //     pattern intact without the loader having to be ESM.
-  //   * STL_LOADER_CDN — classic-script STLLoader from the same release
-  //     so it attaches to the right `THREE` global.
-  //
-  // ~600KB combined; only fetched once and never on pageload.
+  // STL viewer (Phase 3a) — Three.js v0.147 keeps the global + classic-
+  // script STLLoader contract intact; later versions broke that.
   var THREE_CDN = 'https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js';
   var STL_LOADER_CDN = 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/STLLoader.js';
-  var STL_MAX_BYTES = 50 * 1024 * 1024; // 50 MB
-  var STL_VIEW_SIZE = 400;              // square render area, in CSS pixels
-  var STL_SCENE_BG = 0xE1F5EE;          // light blue, LEGO-style
+  var STL_MAX_BYTES = 50 * 1024 * 1024;
+  var STL_VIEW_SIZE = 400;
+  var STL_SCENE_BG = 0xE1F5EE;
 
-  // -------- Module state ---------------------------------------------
+  // UI state — persisted to localStorage under this key. Bumped to v1 so
+  // future schema changes can migrate cleanly.
+  var UI_STATE_KEY = 'kr-instructions-ui-state-v1';
+  var UI_STATE_DEFAULT = {
+    activeRailPane: 'photos',
+    secondaryPaneWidth: 240,
+    hudVisible: true,
+    hudPos: { x: null, y: null },
+    filmstripCollapsed: false,
+    showGrid: false,
+    density: 'roomy',
+  };
+
+  // Filenames that look like camera captures get the camera badge in the
+  // Photos pane. Anything starting with `cam_` (the name our capture
+  // upload assigns) counts.
+  var CAM_FILENAME_PREFIX = 'cam_';
 
   var state = {
     projectId: null,
@@ -59,33 +66,76 @@
     me: null,
     isOwner: false,
     instructionId: null,
-    steps: [],          // ordered list from the API
-    activeStepId: null, // null until first step is loaded
+    steps: [],
+    activeStepId: null,
     activeTool: 'select',
     canvas: null,
-    drawing: null,     // in-progress drag-shape: { type, obj, startX, startY }
-    suppressEvents: false, // true while loadFromJSON is replaying
-    // Per-step undo / redo stacks. Cleared when the active step changes
-    // — there's no point in undoing into someone else's snapshot.
+    drawing: null,
+    suppressEvents: false,
     undoStack: [],
     redoStack: [],
-    lastSnapshot: null, // most recent canvas JSON string we accepted
+    lastSnapshot: null,
+    // A5 additions
+    projectImages: [],        // Cached project images list (Photos pane)
+    selectedPhotoIds: {},     // id -> true, for shift-click multi-select
+    activeRailPane: 'photos', // mirrors uiState.activeRailPane
+    uiState: null,            // hydrated from localStorage in init()
+    backgroundPhotoIds: {},   // photo id -> true, for the ★ badge
+    railShortcutsBound: false,
   };
 
-  // -------- DOM handles ----------------------------------------------
+  // Camera capture modal — built lazily on first open.
+  var cam = {
+    modalNode: null,
+    bsModal: null,
+    video: null,
+    statusText: null,
+    errorBox: null,
+    captureBtn: null,
+    stream: null,
+  };
+
+  // ====================================================================
+  // 2. DOM HANDLES
+  // ====================================================================
 
   var dom = {};
   function bindDom() {
+    // Title bar
     dom.workspace = document.getElementById('ib-workspace');
+    dom.titlebar = document.getElementById('ib-titlebar');
+    dom.backLink = document.getElementById('ib-back-link');
+    dom.openEditorNewTab = document.getElementById('ib-open-editor-newtab');
+    dom.projectTitle = document.getElementById('ib-project-title');
+    dom.saveStatus = document.getElementById('ib-save-status');
+    dom.exportProgress = document.getElementById('ib-export-progress');
+    dom.exportMenuItems = document.querySelectorAll('.ib-export-menu [data-export]');
+    dom.hudToggle = document.getElementById('ib-hud-toggle');
+
+    // Top-level state regions
     dom.loading = document.getElementById('ib-loading');
     dom.notOwner = document.getElementById('ib-not-owner');
     dom.error = document.getElementById('ib-error');
     dom.errorDetail = document.getElementById('ib-error-detail');
     dom.main = document.getElementById('ib-main');
-    dom.backLink = document.getElementById('ib-back-link');
-    dom.openEditorNewTab = document.getElementById('ib-open-editor-newtab');
-    dom.projectTitle = document.getElementById('ib-project-title');
-    dom.saveStatus = document.getElementById('ib-save-status');
+
+    // Rail
+    dom.rail = document.getElementById('ib-rail');
+    dom.railButtons = document.querySelectorAll('.ib-rail-btn[data-rail-pane]');
+    dom.railSettings = document.getElementById('ib-rail-settings');
+
+    // Secondary pane shell
+    dom.secondary = document.getElementById('ib-secondary');
+    dom.secondaryResize = document.getElementById('ib-secondary-resize');
+    dom.panes = document.querySelectorAll('.ib-pane[data-pane]');
+
+    // Photos pane
+    dom.photosUpload = document.getElementById('ib-photos-upload');
+    dom.photosCamera = document.getElementById('ib-photos-camera');
+    dom.photosInput = document.getElementById('ib-photos-input');
+    dom.photosGrid = document.getElementById('ib-photos-grid');
+
+    // Tools pane — preserved from previous implementation
     dom.uploadImageBtn = document.getElementById('ib-upload-image-btn');
     dom.pickProjectImageBtn = document.getElementById('ib-pick-project-image-btn');
     dom.removeImageBtn = document.getElementById('ib-remove-image-btn');
@@ -104,22 +154,39 @@
     dom.deleteSelected = document.getElementById('ib-delete-selected');
     dom.undoBtn = document.getElementById('ib-undo');
     dom.redoBtn = document.getElementById('ib-redo');
+    dom.toolButtons = document.querySelectorAll('.ib-tool-btn[data-tool]');
+    dom.stepTitle = document.getElementById('ib-step-title');
+    dom.stepDescription = document.getElementById('ib-step-description');
+
+    // BOM pane stub
+    dom.bomOpenEditor = document.getElementById('ib-bom-open-editor');
+
+    // Layers pane
+    dom.layersList = document.getElementById('ib-layers-list');
+
+    // Canvas
+    dom.canvasArea = document.getElementById('ib-canvas-area');
     dom.canvasEl = document.getElementById('ib-canvas');
     dom.canvasFrame = document.getElementById('ib-canvas-frame');
     dom.canvasEmpty = document.getElementById('ib-canvas-empty');
-    dom.stepBadge = document.getElementById('ib-step-badge');
-    dom.activeToolHint = document.getElementById('ib-active-tool-hint');
-    dom.stepTitle = document.getElementById('ib-step-title');
-    dom.stepDescription = document.getElementById('ib-step-description');
-    dom.stepsList = document.getElementById('ib-steps-list');
-    dom.addStepBtn = document.getElementById('ib-add-step');
-    dom.toolButtons = document.querySelectorAll('.ib-tool-btn[data-tool]');
-    // Export (Phase 2b / 2c)
-    dom.exportProgress = document.getElementById('ib-export-progress');
-    dom.exportMenuItems = document.querySelectorAll('.ib-export-menu [data-export]');
+    dom.inspectorHud = document.getElementById('ib-inspector-hud');
+
+    // Filmstrip
+    dom.filmstrip = document.getElementById('ib-filmstrip');
+    dom.filmstripTrack = document.getElementById('ib-filmstrip-track');
+    dom.filmstripCount = document.getElementById('ib-filmstrip-count');
+    dom.filmstripToggle = document.getElementById('ib-filmstrip-toggle');
+    dom.filmstripAdd = document.getElementById('ib-filmstrip-add');
+
+    // Settings popover
+    dom.settingsPop = document.getElementById('ib-settings-pop');
+    dom.settingsGrid = document.getElementById('ib-settings-grid');
+    dom.settingsDensity = document.querySelectorAll('input[name="ib-density"]');
   }
 
-  // -------- Helpers --------------------------------------------------
+  // ====================================================================
+  // 3. GENERIC HELPERS
+  // ====================================================================
 
   function escapeHtml(s) {
     if (s === null || s === undefined) return '';
@@ -198,7 +265,62 @@
     }, ms);
   }
 
-  // -------- Backend calls --------------------------------------------
+  // ====================================================================
+  // 4. UI STATE (localStorage)
+  // ====================================================================
+
+  function loadUiState() {
+    try {
+      var raw = window.localStorage.getItem(UI_STATE_KEY);
+      if (!raw) return Object.assign({}, UI_STATE_DEFAULT);
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return Object.assign({}, UI_STATE_DEFAULT);
+      return Object.assign({}, UI_STATE_DEFAULT, parsed);
+    } catch (_) {
+      return Object.assign({}, UI_STATE_DEFAULT);
+    }
+  }
+
+  function saveUiState() {
+    if (!state.uiState) return;
+    debounce('ui-state-save', 250, function () {
+      try {
+        window.localStorage.setItem(UI_STATE_KEY, JSON.stringify(state.uiState));
+      } catch (_) { /* localStorage may be unavailable / full; non-fatal */ }
+    });
+  }
+
+  function applyUiStateToDom() {
+    var ui = state.uiState;
+    if (!ui) return;
+    // Density
+    if (dom.workspace) dom.workspace.setAttribute('data-density', ui.density || 'roomy');
+    Array.prototype.forEach.call(dom.settingsDensity || [], function (radio) {
+      radio.checked = (radio.value === ui.density);
+    });
+    // Grid
+    if (dom.settingsGrid) dom.settingsGrid.checked = !!ui.showGrid;
+    if (dom.canvasFrame) dom.canvasFrame.classList.toggle('is-grid', !!ui.showGrid);
+    // Secondary pane width
+    if (dom.secondary && typeof ui.secondaryPaneWidth === 'number') {
+      dom.secondary.style.width = Math.max(200, Math.min(400, ui.secondaryPaneWidth)) + 'px';
+    }
+    // HUD toggle visual — the panel itself is empty in this PR.
+    if (dom.hudToggle) {
+      dom.hudToggle.setAttribute('aria-pressed', ui.hudVisible ? 'true' : 'false');
+      dom.hudToggle.classList.toggle('is-active', !!ui.hudVisible);
+    }
+    document.body.classList.toggle('hud-visible', !!ui.hudVisible);
+    // Filmstrip collapsed
+    if (dom.filmstrip) dom.filmstrip.classList.toggle('is-collapsed', !!ui.filmstripCollapsed);
+    updateFilmstripToggleLabel();
+    // Active rail pane
+    setActiveRailPane(ui.activeRailPane || 'photos', { persist: false });
+  }
+
+  // ====================================================================
+  // 5. BACKEND CALLS (preserved verbatim)
+  // ====================================================================
 
   async function fetchMe() {
     var resp = await apiFetch(API + '/api/auth/me');
@@ -266,9 +388,23 @@
     return resp.json();
   }
 
-  async function uploadImage(file) {
+  async function deleteStep(stepId) {
+    var resp = await apiFetchWithTermsRetry(
+      API + '/api/projects/' + state.projectId + '/instruction/steps/' + stepId,
+      { method: 'DELETE' }
+    );
+    if (!resp.ok && resp.status !== 204) throw new Error('Delete step HTTP ' + resp.status);
+    return true;
+  }
+
+  async function uploadImage(file, filename) {
     var fd = new FormData();
-    fd.append('file', file);
+    if (filename) {
+      // Re-wrap the blob so the server sees the override filename.
+      fd.append('file', file, filename);
+    } else {
+      fd.append('file', file);
+    }
     var resp = await apiFetchWithTermsRetry(
       API + '/api/projects/' + state.projectId + '/images',
       { method: 'POST', body: fd }
@@ -277,12 +413,22 @@
     return resp.json();
   }
 
-  // -------- Canvas setup ---------------------------------------------
+  async function listProjectImages() {
+    var resp = await apiFetch(API + '/api/projects/' + state.projectId + '/images');
+    if (!resp.ok) throw new Error('List images HTTP ' + resp.status);
+    var images = await resp.json();
+    return Array.isArray(images) ? images : [];
+  }
+
+  function projectImageViewUrl(imageId) {
+    return API + '/api/projects/' + state.projectId + '/images/' + imageId + '/view';
+  }
+
+  // ====================================================================
+  // 6. CANVAS INIT + TOOL DISPATCH (preserved)
+  // ====================================================================
 
   function initCanvas() {
-    // v6 UMD exposes window.fabric. Bail loudly if it isn't there — the
-    // page is useless without it and the user deserves to see the
-    // problem rather than a silent blank canvas.
     if (typeof fabric === 'undefined' || !fabric.Canvas) {
       throw new Error('Fabric.js failed to load');
     }
@@ -296,8 +442,6 @@
 
     var c = state.canvas;
 
-    // Tool dispatch — Fabric handles select/drag for free in 'select'
-    // mode, so we only intercept while another tool is active.
     c.on('mouse:down', onCanvasMouseDown);
     c.on('mouse:move', onCanvasMouseMove);
     c.on('mouse:up', onCanvasMouseUp);
@@ -306,15 +450,10 @@
     c.on('selection:updated', onSelectionChanged);
     c.on('selection:cleared', onSelectionChanged);
 
-    // Live-update the rotation input as the user drags the corner handle.
     c.on('object:rotating', onObjectRotating);
-    // After a translate / resize the active object's transform may have
-    // changed without `selection:updated` firing — re-sync controls.
     c.on('object:modified', onSelectionChanged);
 
-    // Autosave + undo snapshot triggers. The suppressEvents flag is
-    // toggled while loadFromJSON is replaying so loading a step doesn't
-    // immediately push a fresh snapshot back onto the undo stack.
+    // Autosave + undo snapshot triggers + layers list re-render.
     var changeEvents = ['object:added', 'object:modified', 'object:removed'];
     changeEvents.forEach(function (evt) {
       c.on(evt, function () {
@@ -322,13 +461,20 @@
         scheduleAutosave();
         scheduleSnapshot();
         updateEmptyState();
+        renderLayersList();
       });
     });
+    // Layers list also reacts to selection changes (so the active row
+    // highlights correctly).
+    c.on('selection:created', renderLayersList);
+    c.on('selection:updated', renderLayersList);
+    c.on('selection:cleared', renderLayersList);
 
-    // Resize handling — Fabric needs setDimensions in CSS-pixel space
-    // so the hit area matches the visible scaled canvas.
     syncCanvasDisplaySize();
     window.addEventListener('resize', syncCanvasDisplaySize);
+
+    // Drag-and-drop from the Photos pane onto the canvas.
+    wireCanvasDropZone();
   }
 
   // Fabric's internal coordinate space is fixed (CANVAS_W × CANVAS_H),
@@ -354,21 +500,12 @@
     }
   }
 
-  // -------- Tool selection -------------------------------------------
-
   function setActiveTool(tool) {
     state.activeTool = tool;
     Array.prototype.forEach.call(dom.toolButtons, function (btn) {
       btn.classList.toggle('is-active', btn.dataset.tool === tool);
     });
-    if (dom.activeToolHint) {
-      var label = tool.charAt(0).toUpperCase() + tool.slice(1);
-      dom.activeToolHint.textContent = 'Tool: ' + label;
-    }
     if (state.canvas) {
-      // Lock Fabric's own object selection while a drawing tool is
-      // active so the click-drag below doesn't fight with Fabric's
-      // group-select rectangle.
       state.canvas.selection = (tool === 'select');
       state.canvas.discardActiveObject();
       state.canvas.getObjects().forEach(function (o) {
@@ -382,16 +519,12 @@
     if (!state.canvas) return;
     var active = state.canvas.getActiveObject();
     var hasSel = !!active;
-    // Locked background images stay anchored at the bottom of the stack
-    // and shouldn't be re-arranged, rotated, or reset by the user. Tag
-    // the selection so Transform/Arrange controls disable on them.
     var isBg = !!(active && active.ibRole === 'background');
     var canTransform = hasSel && !isBg;
     if (dom.deleteSelected) dom.deleteSelected.disabled = !hasSel;
     if (dom.rotation) {
       dom.rotation.disabled = !canTransform;
       if (canTransform) {
-        // Normalise to 0–359; Fabric's `angle` can be any number.
         var a = ((active.angle || 0) % 360 + 360) % 360;
         dom.rotation.value = String(Math.round(a));
       } else {
@@ -405,11 +538,6 @@
     if (dom.sendToBack) dom.sendToBack.disabled = !canTransform;
   }
 
-  // Keep the rotation input in sync while the user drags the rotation
-  // handle on the canvas — Fabric fires `object:rotating` continuously
-  // and `object:modified` when the drag ends. We listen to both so the
-  // number ticks live, but only the `modified` event triggers autosave +
-  // an undo snapshot (already wired in initCanvas).
   function onObjectRotating(opt) {
     if (!dom.rotation || dom.rotation.disabled) return;
     var t = opt && opt.target;
@@ -418,11 +546,11 @@
     dom.rotation.value = String(Math.round(a));
   }
 
-  // -------- Pointer handlers (arrow / rect / circle / text) ----------
+  // ====================================================================
+  // 7. POINTER HANDLERS — arrow / rect / circle / text (preserved)
+  // ====================================================================
 
   function getPointer(opt) {
-    // Fabric returns canvas-coordinate-space pointer regardless of CSS
-    // scaling, which is what we want here.
     return state.canvas.getPointer(opt.e);
   }
 
@@ -445,10 +573,7 @@
       });
       state.canvas.add(text);
       state.canvas.setActiveObject(text);
-      // Fabric v6: enterEditing puts the IText in inline-edit mode.
       try { text.enterEditing(); text.selectAll(); } catch (_) { /* harmless */ }
-      // Snap back to select once placed so the next click doesn't keep
-      // adding new text boxes.
       setActiveTool('select');
       return;
     }
@@ -522,15 +647,9 @@
     var canvas = state.canvas;
 
     if (d.type === 'arrow') {
-      // Replace the temporary line with a Group(line + triangle head).
-      // Doing the swap on mouse-up keeps the in-progress drag cheap
-      // (just a single line) and means the arrow head only ever needs
-      // to be positioned once.
       var x1 = d.obj.x1, y1 = d.obj.y1, x2 = d.obj.x2, y2 = d.obj.y2;
       canvas.remove(d.obj);
       if (Math.abs(x2 - x1) < 2 && Math.abs(y2 - y1) < 2) {
-        // Treat a near-zero drag as a cancel — don't litter the canvas
-        // with invisible 0-length arrows.
         state.drawing = null;
         setActiveTool('select');
         return;
@@ -539,8 +658,6 @@
       canvas.add(arrow);
       canvas.setActiveObject(arrow);
     } else {
-      // Make the new shape selectable now that drawing is finished, and
-      // re-add it so Fabric's selection layer picks it up cleanly.
       d.obj.set({ selectable: true, evented: true });
       canvas.setActiveObject(d.obj);
     }
@@ -550,8 +667,6 @@
     canvas.requestRenderAll();
   }
 
-  // Build an arrow as a Group(line + triangle) so the user can drag /
-  // rotate / resize the whole thing as a single object.
   function makeArrow(x1, y1, x2, y2, color, stroke) {
     var dx = x2 - x1;
     var dy = y2 - y1;
@@ -572,7 +687,7 @@
       width: headSize,
       height: headSize,
       fill: color,
-      angle: angle + 90, // Triangle's default points up; rotate to match line
+      angle: angle + 90,
     });
 
     return new fabric.Group([line, head], {
@@ -581,7 +696,9 @@
     });
   }
 
-  // -------- Image upload ---------------------------------------------
+  // ====================================================================
+  // 8. IMAGE UPLOAD + BACKGROUND IMAGE (preserved)
+  // ====================================================================
 
   function onUploadClick() {
     if (dom.imageInput) dom.imageInput.click();
@@ -593,24 +710,22 @@
     setSaveStatus('saving', 'Uploading image…');
     try {
       var resp = await uploadImage(file);
-      var url = API + '/api/projects/' + state.projectId + '/images/' + resp.id + '/view';
+      var url = projectImageViewUrl(resp.id);
       await addBackgroundImage(url);
       setSaveStatus('saved', 'Image added');
       flushCanvasSave();
+      // Refresh the Photos pane so the new image shows up there too.
+      refreshProjectImages();
     } catch (e) {
       setSaveStatus('error', 'Image upload failed');
     } finally {
-      // Reset the input so picking the same file twice still fires change.
       evt.target.value = '';
     }
   }
 
   async function addBackgroundImage(url) {
-    // Drop any previous background image first — Phase 1 supports one
-    // background per step.
     removeBackgroundImage();
 
-    // v6: fabric.Image.fromURL returns a Promise. (v5 used a callback.)
     var img;
     try {
       img = await fabric.Image.fromURL(url, { crossOrigin: 'anonymous' });
@@ -619,9 +734,6 @@
     }
     if (!img) throw new Error('Image returned empty');
 
-    // Fit-into-canvas: scale so the longer side fills the canvas, then
-    // centre it. Don't crop — leave a bit of empty space if the aspect
-    // ratio mismatches.
     var scale = Math.min(CANVAS_W / img.width, CANVAS_H / img.height);
     img.set({
       left: (CANVAS_W - img.width * scale) / 2,
@@ -634,6 +746,7 @@
       // Fabric persists custom keys through toJSON if we list them in
       // toJSON's propertiesToInclude — we do that in serializeCanvas.
       ibRole: 'background',
+      ibSourceUrl: url,
     });
     state.canvas.add(img);
     state.canvas.sendObjectToBack(img);
@@ -667,12 +780,15 @@
     updateEmptyState();
   }
 
-  // -------- Step serialization / loading -----------------------------
+  // ====================================================================
+  // 9. STEP SERIALIZATION / LOADING (preserved)
+  // ====================================================================
 
   function serializeCanvas() {
     // toJSON with our custom 'ibRole' key so background-image flagging
-    // survives a round-trip.
-    return state.canvas.toJSON(['ibRole']);
+    // survives a round-trip, plus ibSourceUrl so we can detect which
+    // photo a step uses as a background (drives the ★ badge in Photos).
+    return state.canvas.toJSON(['ibRole', 'ibSourceUrl']);
   }
 
   function loadCanvasFromStep(step) {
@@ -688,17 +804,14 @@
     return new Promise(function (resolve) {
       function done() {
         state.suppressEvents = false;
-        // Reset selectable flags so the active tool re-applies cleanly.
         setActiveTool(state.activeTool);
-        // Background button reflects current state
         if (dom.removeImageBtn) dom.removeImageBtn.disabled = !findBackgroundImage();
-        // Re-snapshot baseline — undo from here should land on the
-        // freshly-loaded state, not on whatever the previous step had.
         state.undoStack = [];
         state.redoStack = [];
         state.lastSnapshot = JSON.stringify(serializeCanvas());
         updateUndoRedoButtons();
         updateEmptyState();
+        renderLayersList();
         resolve();
       }
 
@@ -724,7 +837,9 @@
     });
   }
 
-  // -------- Autosave (canvas) ----------------------------------------
+  // ====================================================================
+  // 10. AUTOSAVE — canvas + step title/description (preserved)
+  // ====================================================================
 
   function scheduleAutosave() {
     if (!state.activeStepId) return;
@@ -738,12 +853,14 @@
     try {
       await putStep(state.activeStepId, { canvas_json: json });
       setSaveStatus('saved');
+      // The set of "photos used as backgrounds across all steps" may
+      // have shifted; recompute so the ★ badge updates.
+      recomputeBackgroundPhotoIds();
+      renderPhotosGrid();
     } catch (e) {
       setSaveStatus('error', isRetry ? 'Save failed again' : 'Save failed');
     }
   }
-
-  // -------- Step title / description autosave ------------------------
 
   function wireStepFields() {
     if (dom.stepTitle) {
@@ -755,10 +872,9 @@
           setSaveStatus('saving', 'Saving…');
           putStep(stepId, { title: value })
             .then(function (updated) {
-              // Reflect in the steps-list label without re-fetching.
               var s = state.steps.find(function (x) { return x.id === stepId; });
               if (s) s.title = updated.title;
-              renderStepsList();
+              renderFilmstrip();
               setSaveStatus('saved');
             })
             .catch(function () { setSaveStatus('error', 'Title save failed'); });
@@ -784,7 +900,9 @@
     }
   }
 
-  // -------- Undo / redo ----------------------------------------------
+  // ====================================================================
+  // 11. UNDO / REDO (preserved)
+  // ====================================================================
 
   function scheduleSnapshot() {
     debounce('undo-snapshot', UNDO_DEBOUNCE_MS, function () { takeSnapshot(); });
@@ -798,7 +916,6 @@
       if (state.undoStack.length > UNDO_STACK_LIMIT) state.undoStack.shift();
     }
     state.lastSnapshot = snap;
-    // Any new edit invalidates the redo branch — standard undo state machine.
     state.redoStack = [];
     updateUndoRedoButtons();
   }
@@ -815,6 +932,7 @@
       if (dom.removeImageBtn) dom.removeImageBtn.disabled = !findBackgroundImage();
       updateEmptyState();
       updateUndoRedoButtons();
+      renderLayersList();
       scheduleAutosave();
     });
   }
@@ -838,7 +956,9 @@
     if (dom.redoBtn) dom.redoBtn.disabled = state.redoStack.length === 0;
   }
 
-  // -------- Transform controls (rotation, reset) ---------------------
+  // ====================================================================
+  // 12. TRANSFORM + ARRANGE (preserved)
+  // ====================================================================
 
   function onRotationInputChange() {
     if (!state.canvas || !dom.rotation) return;
@@ -846,13 +966,10 @@
     if (!active || active.ibRole === 'background') return;
     var raw = parseInt(dom.rotation.value, 10);
     if (isNaN(raw)) return;
-    // Normalise to 0–359 so wrap-around (e.g. -10 → 350) feels natural.
     var deg = ((raw % 360) + 360) % 360;
     active.set('angle', deg);
     active.setCoords();
     state.canvas.requestRenderAll();
-    // Manually fire `object:modified` so autosave + undo snapshot pick
-    // up the change — `set('angle', …)` doesn't emit that on its own.
     state.canvas.fire('object:modified', { target: active });
   }
 
@@ -860,10 +977,6 @@
     if (!state.canvas) return;
     var active = state.canvas.getActiveObject();
     if (!active || active.ibRole === 'background') return;
-    // Reset scale / rotation / skew to identity. We deliberately leave
-    // `left` / `top` alone — we don't remember the object's first-placed
-    // position, and snapping it to the canvas origin would feel jarring.
-    // The user can drag it back if they want.
     active.set({
       scaleX: 1,
       scaleY: 1,
@@ -876,14 +989,9 @@
     active.setCoords();
     state.canvas.requestRenderAll();
     if (dom.rotation) dom.rotation.value = '0';
-    // Fire `object:modified` so autosave + undo snapshot capture it.
     state.canvas.fire('object:modified', { target: active });
   }
 
-  // -------- Arrange / layer ordering ---------------------------------
-
-  // After any layer reorder, re-pin the locked background to the very
-  // bottom of the stack so the user can't accidentally bury it.
   function reanchorBackground() {
     var bg = findBackgroundImage();
     if (bg) state.canvas.sendObjectToBack(bg);
@@ -893,28 +1001,20 @@
     if (!state.canvas) return;
     var active = state.canvas.getActiveObject();
     if (!active || active.ibRole === 'background') return;
-    // Fabric v6 renamed v5's `bringToFront(obj)` style to methods on
-    // the canvas that take the object: `bringObjectToFront`,
-    // `bringObjectForward`, `sendObjectBackwards`, `sendObjectToBack`.
     if (op === 'front') state.canvas.bringObjectToFront(active);
     else if (op === 'forward') state.canvas.bringObjectForward(active);
     else if (op === 'backward') state.canvas.sendObjectBackwards(active);
     else if (op === 'back') state.canvas.sendObjectToBack(active);
     reanchorBackground();
     state.canvas.requestRenderAll();
-    // Fire `object:modified` so autosave + undo snapshot trigger.
     state.canvas.fire('object:modified', { target: active });
   }
-
-  // -------- Delete selected ------------------------------------------
 
   function onDeleteSelected() {
     if (!state.canvas) return;
     var active = state.canvas.getActiveObjects();
     if (!active || active.length === 0) return;
     active.forEach(function (o) {
-      // Don't let the user delete the background via the toolbar —
-      // they should use "Remove image" so the button state stays sane.
       if (o.ibRole === 'background') return;
       state.canvas.remove(o);
     });
@@ -923,47 +1023,759 @@
     onSelectionChanged();
   }
 
-  // -------- Step list / switching ------------------------------------
+  // ====================================================================
+  // 13. ACTIVITY RAIL — pane switching + Cmd/Ctrl+1..6 shortcuts
+  // ====================================================================
 
-  function renderStepsList() {
-    if (!dom.stepsList) return;
-    if (state.steps.length === 0) {
-      dom.stepsList.innerHTML =
-        '<li class="text-muted small fst-italic" style="cursor:default;background:transparent">' +
-        'No steps yet — click <strong>Add step</strong> below.</li>';
+  function setActiveRailPane(name, opts) {
+    opts = opts || {};
+    // Clicking the currently-active pane collapses the secondary pane.
+    if (state.activeRailPane === name && opts.toggleable) {
+      var collapsed = dom.secondary.classList.toggle('is-collapsed');
+      // Persist as "no active pane while collapsed" by leaving
+      // activeRailPane unchanged so re-clicking the same button reopens
+      // to the same content.
+      if (collapsed) {
+        // Mirror collapsed state on the rail buttons (none visually active)
+        Array.prototype.forEach.call(dom.railButtons, function (btn) {
+          btn.classList.remove('is-active');
+        });
+      } else {
+        Array.prototype.forEach.call(dom.railButtons, function (btn) {
+          btn.classList.toggle('is-active', btn.dataset.railPane === name);
+        });
+      }
+      // Recompute Fabric's CSS size now that the column reflowed.
+      setTimeout(syncCanvasDisplaySize, 50);
       return;
     }
-    var html = state.steps.map(function (s) {
-      var isActive = (s.id === state.activeStepId);
-      var label = s.title && s.title.trim() ? s.title : 'Untitled step';
+
+    state.activeRailPane = name;
+    if (dom.secondary) dom.secondary.classList.remove('is-collapsed');
+    Array.prototype.forEach.call(dom.railButtons, function (btn) {
+      btn.classList.toggle('is-active', btn.dataset.railPane === name);
+    });
+    Array.prototype.forEach.call(dom.panes, function (pane) {
+      pane.classList.toggle('is-active', pane.dataset.pane === name);
+    });
+
+    // Some panes need a refresh on switch — defer one frame so the pane
+    // is visible before we measure / draw into it.
+    if (name === 'photos') refreshProjectImages();
+    if (name === 'layers') renderLayersList();
+
+    if (opts.persist !== false && state.uiState) {
+      state.uiState.activeRailPane = name;
+      saveUiState();
+    }
+    setTimeout(syncCanvasDisplaySize, 50);
+  }
+
+  function wireRail() {
+    Array.prototype.forEach.call(dom.railButtons, function (btn) {
+      btn.addEventListener('click', function () {
+        setActiveRailPane(btn.dataset.railPane, { toggleable: true });
+      });
+    });
+
+    // Settings gear opens the popover (Tweaks).
+    if (dom.railSettings) {
+      dom.railSettings.addEventListener('click', toggleSettingsPop);
+    }
+
+    // Keyboard shortcuts (Cmd/Ctrl+1..6) — bound once, ignored when
+    // focus is in an input / textarea / contenteditable.
+    if (state.railShortcutsBound) return;
+    state.railShortcutsBound = true;
+    document.addEventListener('keydown', function (e) {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      var tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.target && e.target.isContentEditable) return;
+      var map = ['photos', 'tools', 'bom', 'assets', 'circuit', 'layers'];
+      var idx = parseInt(e.key, 10);
+      if (idx >= 1 && idx <= 6) {
+        e.preventDefault();
+        setActiveRailPane(map[idx - 1]);
+      }
+    });
+  }
+
+  // ====================================================================
+  // 14. SECONDARY PANE RESIZE
+  // ====================================================================
+
+  function wireSecondaryResize() {
+    if (!dom.secondaryResize || !dom.secondary) return;
+    var dragging = false;
+    var startX = 0;
+    var startWidth = 240;
+
+    dom.secondaryResize.addEventListener('mousedown', function (e) {
+      dragging = true;
+      startX = e.clientX;
+      startWidth = dom.secondary.getBoundingClientRect().width;
+      dom.secondaryResize.classList.add('is-dragging');
+      // Disable text selection during drag.
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      var w = startWidth + (e.clientX - startX);
+      w = Math.max(200, Math.min(400, w));
+      dom.secondary.style.width = w + 'px';
+      syncCanvasDisplaySize();
+    });
+
+    document.addEventListener('mouseup', function () {
+      if (!dragging) return;
+      dragging = false;
+      dom.secondaryResize.classList.remove('is-dragging');
+      document.body.style.userSelect = '';
+      // Persist
+      if (state.uiState) {
+        var w = dom.secondary.getBoundingClientRect().width;
+        state.uiState.secondaryPaneWidth = Math.round(w);
+        saveUiState();
+      }
+    });
+  }
+
+  // ====================================================================
+  // 15. PHOTOS PANE — list / upload / camera / drag-to-canvas
+  // ====================================================================
+
+  async function refreshProjectImages() {
+    if (!dom.photosGrid) return;
+    try {
+      state.projectImages = await listProjectImages();
+      recomputeBackgroundPhotoIds();
+      renderPhotosGrid();
+    } catch (_) {
+      dom.photosGrid.innerHTML =
+        '<div class="ib-photos-empty">Couldn\'t load your photos. Refresh to try again.</div>';
+    }
+  }
+
+  // Scan the existing steps' canvas_json for objects tagged as
+  // backgrounds and remember which photo each one came from so the
+  // Photos grid can show the ★ badge.
+  function recomputeBackgroundPhotoIds() {
+    var found = {};
+    var byId = {};
+    (state.projectImages || []).forEach(function (img) {
+      var url = projectImageViewUrl(img.id);
+      byId[url] = img.id;
+    });
+
+    (state.steps || []).forEach(function (step) {
+      var raw = step && step.canvas_json;
+      if (!raw) return;
+      try {
+        var parsed = JSON.parse(raw);
+        var objs = (parsed && parsed.objects) || [];
+        objs.forEach(function (o) {
+          if (o && o.ibRole === 'background' && o.ibSourceUrl && byId[o.ibSourceUrl]) {
+            found[byId[o.ibSourceUrl]] = true;
+          }
+        });
+      } catch (_) { /* skip malformed */ }
+    });
+    state.backgroundPhotoIds = found;
+  }
+
+  function renderPhotosGrid() {
+    if (!dom.photosGrid) return;
+    var imgs = state.projectImages || [];
+
+    if (imgs.length === 0) {
+      dom.photosGrid.innerHTML =
+        '<div class="ib-photos-empty">' +
+        'No photos yet. Use <strong>Upload</strong> or <strong>Camera</strong>, ' +
+        'or add images from the project editor.' +
+        '</div>' +
+        '<button type="button" class="ib-photo-add" id="ib-photo-add-empty" title="Upload">' +
+        '<i class="fas fa-plus"></i></button>';
+      var add = document.getElementById('ib-photo-add-empty');
+      if (add) add.addEventListener('click', function () {
+        if (dom.photosInput) dom.photosInput.click();
+      });
+      return;
+    }
+
+    var html = imgs.map(function (img) {
+      var url = projectImageViewUrl(img.id);
+      var caption = img.caption && img.caption.trim() ? img.caption :
+        (img.filename || 'image');
+      var fname = String(img.filename || img.caption || '');
+      var isCam = fname.toLowerCase().indexOf(CAM_FILENAME_PREFIX) === 0;
+      var isBg = !!state.backgroundPhotoIds[img.id];
+      var isSelected = !!state.selectedPhotoIds[img.id];
+
+      var badges = '';
+      if (isBg) {
+        badges += '<span class="ib-photo-tile-badge is-star" title="Used as step background">' +
+          '<i class="fas fa-star"></i></span>';
+      }
+      if (isCam) {
+        badges += '<span class="ib-photo-tile-badge" title="Camera capture">' +
+          '<i class="fas fa-camera"></i></span>';
+      }
+
       return (
-        '<li data-step-id="' + s.id + '" class="' + (isActive ? 'is-active' : '') + '">' +
-          '<span class="ib-step-num">' + s.step_number + '</span>' +
-          '<span class="ib-step-label">' + escapeHtml(label) + '</span>' +
-        '</li>'
+        '<div class="ib-photo-tile' + (isSelected ? ' is-selected' : '') + '"' +
+        '     draggable="true"' +
+        '     data-photo-id="' + img.id + '"' +
+        '     data-photo-src="' + escapeHtml(url) + '"' +
+        '     title="' + escapeHtml(caption) + '">' +
+        '  <img src="' + escapeHtml(url) + '" alt="" loading="lazy">' +
+        (badges ? '<div class="ib-photo-tile-badges">' + badges + '</div>' : '') +
+        '  <div class="ib-photo-tile-caption">' + escapeHtml(caption) + '</div>' +
+        '</div>'
       );
     }).join('');
-    dom.stepsList.innerHTML = html;
+
+    // Trailing + tile to trigger upload.
+    html +=
+      '<button type="button" class="ib-photo-add" id="ib-photo-add-trailing" title="Upload">' +
+      '<i class="fas fa-plus"></i></button>';
+
+    dom.photosGrid.innerHTML = html;
+
+    var trailing = document.getElementById('ib-photo-add-trailing');
+    if (trailing) trailing.addEventListener('click', function () {
+      if (dom.photosInput) dom.photosInput.click();
+    });
+
+    // Wire each tile: click to (de)select, shift-click to toggle in
+    // multi-select, drag to canvas.
     Array.prototype.forEach.call(
-      dom.stepsList.querySelectorAll('li[data-step-id]'),
-      function (li) {
-        li.addEventListener('click', function () {
-          var id = parseInt(li.dataset.stepId, 10);
-          if (id && id !== state.activeStepId) switchToStep(id);
+      dom.photosGrid.querySelectorAll('.ib-photo-tile'),
+      function (tile) {
+        tile.addEventListener('click', function (e) {
+          var id = parseInt(tile.dataset.photoId, 10);
+          if (e.shiftKey) {
+            state.selectedPhotoIds[id] = !state.selectedPhotoIds[id];
+            if (!state.selectedPhotoIds[id]) delete state.selectedPhotoIds[id];
+            tile.classList.toggle('is-selected');
+          } else {
+            // Single click clears multi-select.
+            state.selectedPhotoIds = {};
+            Array.prototype.forEach.call(
+              dom.photosGrid.querySelectorAll('.ib-photo-tile.is-selected'),
+              function (t) { t.classList.remove('is-selected'); }
+            );
+          }
+        });
+
+        tile.addEventListener('dragstart', function (e) {
+          var id = parseInt(tile.dataset.photoId, 10);
+          var src = tile.dataset.photoSrc;
+          var ids = [];
+          // If this tile is part of a multi-select, drag all selected.
+          if (state.selectedPhotoIds[id]) {
+            Object.keys(state.selectedPhotoIds).forEach(function (k) {
+              ids.push(parseInt(k, 10));
+            });
+          } else {
+            ids = [id];
+          }
+          // Resolve to {id, src} pairs.
+          var items = ids.map(function (pid) {
+            var match = state.projectImages.find(function (im) { return im.id === pid; });
+            if (!match) return null;
+            return { id: pid, src: projectImageViewUrl(pid) };
+          }).filter(Boolean);
+
+          var payload = (items.length === 1)
+            ? { kind: 'photo', id: id, src: src }
+            : { kind: 'photos', items: items };
+          try {
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('application/json', JSON.stringify(payload));
+            // Fallback for browsers that strip custom types (Firefox is fine
+            // with application/json, but text/plain is universal).
+            e.dataTransfer.setData('text/plain', src || '');
+          } catch (_) { /* setData can throw in some sandboxes */ }
         });
       }
     );
+  }
 
-    // Update step badge ("Step N of M")
-    if (dom.stepBadge) {
-      var idx = state.steps.findIndex(function (s) { return s.id === state.activeStepId; });
-      if (idx >= 0) {
-        dom.stepBadge.textContent = 'Step ' + (idx + 1) + ' of ' + state.steps.length;
-      } else if (state.steps.length === 0) {
-        dom.stepBadge.textContent = 'No steps';
+  function wirePhotosPane() {
+    if (dom.photosUpload) dom.photosUpload.addEventListener('click', function () {
+      if (dom.photosInput) dom.photosInput.click();
+    });
+    if (dom.photosInput) dom.photosInput.addEventListener('change', onPhotosInputChange);
+    if (dom.photosCamera) dom.photosCamera.addEventListener('click', onCameraButtonClick);
+  }
+
+  async function onPhotosInputChange(evt) {
+    var files = evt.target.files;
+    if (!files || files.length === 0) return;
+    setSaveStatus('saving', 'Uploading photos…');
+    var ok = 0, fail = 0;
+    for (var i = 0; i < files.length; i++) {
+      try {
+        await uploadImage(files[i]);
+        ok++;
+      } catch (_) {
+        fail++;
       }
     }
+    if (ok > 0) setSaveStatus('saved', ok + ' photo' + (ok === 1 ? '' : 's') + ' added');
+    if (fail > 0 && ok === 0) setSaveStatus('error', 'Photo upload failed');
+    evt.target.value = '';
+    await refreshProjectImages();
   }
+
+  // ====================================================================
+  // 16. CAMERA CAPTURE MODAL — getUserMedia preview + capture
+  // ====================================================================
+
+  function ensureCameraModal() {
+    if (cam.modalNode) return cam.modalNode;
+    cam.modalNode = document.getElementById('ib-camera-modal');
+    if (!cam.modalNode) return null;
+    cam.video = document.getElementById('ib-camera-video');
+    cam.statusText = document.getElementById('ib-camera-status');
+    cam.errorBox = document.getElementById('ib-camera-error');
+    cam.captureBtn = document.getElementById('ib-camera-capture');
+
+    if (cam.captureBtn) cam.captureBtn.addEventListener('click', onCameraCapture);
+
+    if (window.bootstrap && window.bootstrap.Modal) {
+      cam.bsModal = new window.bootstrap.Modal(cam.modalNode);
+    } else {
+      cam.bsModal = {
+        show: function () { cam.modalNode.classList.add('show'); cam.modalNode.style.display = 'block'; },
+        hide: function () { cam.modalNode.classList.remove('show'); cam.modalNode.style.display = 'none'; },
+      };
+    }
+
+    // Tear down the stream when the modal closes.
+    cam.modalNode.addEventListener('hidden.bs.modal', stopCameraStream);
+    return cam.modalNode;
+  }
+
+  function stopCameraStream() {
+    if (cam.stream) {
+      try {
+        cam.stream.getTracks().forEach(function (t) { t.stop(); });
+      } catch (_) {}
+      cam.stream = null;
+    }
+    if (cam.video) cam.video.srcObject = null;
+    if (cam.captureBtn) cam.captureBtn.disabled = true;
+  }
+
+  function showCameraError(msg) {
+    if (!cam.errorBox) return;
+    cam.errorBox.innerHTML = escapeHtml(msg) +
+      ' <button type="button" class="btn btn-sm btn-outline-primary ms-2" id="ib-camera-fallback">' +
+      '<i class="fas fa-upload me-1"></i> Use Upload instead</button>';
+    cam.errorBox.classList.remove('d-none');
+    if (cam.statusText) cam.statusText.classList.add('d-none');
+    var fallback = document.getElementById('ib-camera-fallback');
+    if (fallback) fallback.addEventListener('click', function () {
+      try { cam.bsModal.hide(); } catch (_) {}
+      if (dom.photosInput) dom.photosInput.click();
+    });
+  }
+
+  function clearCameraError() {
+    if (!cam.errorBox) return;
+    cam.errorBox.classList.add('d-none');
+    cam.errorBox.textContent = '';
+  }
+
+  async function onCameraButtonClick() {
+    var node = ensureCameraModal();
+    if (!node) return;
+    clearCameraError();
+    if (cam.statusText) {
+      cam.statusText.classList.remove('d-none');
+      cam.statusText.textContent = 'Waiting for camera permission…';
+    }
+    if (cam.captureBtn) cam.captureBtn.disabled = true;
+    try { cam.bsModal.show(); } catch (_) {}
+
+    // Kick off getUserMedia.
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showCameraError("Camera isn't available in this browser.");
+      return;
+    }
+    try {
+      cam.stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
+        audio: false,
+      });
+      cam.video.srcObject = cam.stream;
+      try { await cam.video.play(); } catch (_) {}
+      if (cam.statusText) cam.statusText.classList.add('d-none');
+      if (cam.captureBtn) cam.captureBtn.disabled = false;
+    } catch (e) {
+      showCameraError("Couldn't access the camera. Check the browser's permission, or use Upload instead.");
+    }
+  }
+
+  function onCameraCapture() {
+    if (!cam.stream || !cam.video) return;
+    var w = cam.video.videoWidth || 1280;
+    var h = cam.video.videoHeight || 960;
+    var off = document.createElement('canvas');
+    off.width = w;
+    off.height = h;
+    var ctx = off.getContext('2d');
+    try {
+      ctx.drawImage(cam.video, 0, 0, w, h);
+    } catch (_) {
+      showCameraError("Couldn't capture the frame. Try again.");
+      return;
+    }
+
+    off.toBlob(async function (blob) {
+      if (!blob) {
+        showCameraError("Couldn't encode the captured frame.");
+        return;
+      }
+      var iso = new Date().toISOString().replace(/[:.]/g, '-');
+      var filename = CAM_FILENAME_PREFIX + iso + '.jpg';
+      setSaveStatus('saving', 'Uploading capture…');
+      try {
+        await uploadImage(blob, filename);
+        setSaveStatus('saved', 'Capture uploaded');
+        try { cam.bsModal.hide(); } catch (_) {}
+        await refreshProjectImages();
+      } catch (_) {
+        setSaveStatus('error', 'Capture upload failed');
+      }
+    }, 'image/jpeg', 0.92);
+  }
+
+  // ====================================================================
+  // 17. CANVAS DROP ZONE — receive photo drags from the Photos pane
+  // ====================================================================
+
+  function wireCanvasDropZone() {
+    if (!dom.canvasFrame) return;
+    dom.canvasFrame.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      dom.canvasFrame.classList.add('is-dropping');
+    });
+    dom.canvasFrame.addEventListener('dragleave', function () {
+      dom.canvasFrame.classList.remove('is-dropping');
+    });
+    dom.canvasFrame.addEventListener('drop', async function (e) {
+      e.preventDefault();
+      dom.canvasFrame.classList.remove('is-dropping');
+      var raw = '';
+      try { raw = e.dataTransfer.getData('application/json') || ''; } catch (_) {}
+      if (!raw) {
+        try { raw = e.dataTransfer.getData('text/plain') || ''; } catch (_) {}
+        if (raw) {
+          // Bare URL — treat as a single photo drop.
+          await dropPhotosOnCanvas([{ id: null, src: raw }], e);
+        }
+        return;
+      }
+      var payload;
+      try { payload = JSON.parse(raw); } catch (_) { return; }
+      if (!payload) return;
+      if (payload.kind === 'photo') {
+        await dropPhotosOnCanvas([{ id: payload.id, src: payload.src }], e);
+      } else if (payload.kind === 'photos' && Array.isArray(payload.items)) {
+        await dropPhotosOnCanvas(payload.items, e);
+      }
+    });
+  }
+
+  // Convert a canvas-frame mouse drop position into Fabric internal
+  // coordinates (CANVAS_W × CANVAS_H logical, scaled to the rendered
+  // size via CSS).
+  function frameDropToCanvasXY(e) {
+    var rect = dom.canvasFrame.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return { x: CANVAS_W / 2, y: CANVAS_H / 2 };
+    var sx = CANVAS_W / rect.width;
+    var sy = CANVAS_H / rect.height;
+    return {
+      x: (e.clientX - rect.left) * sx,
+      y: (e.clientY - rect.top) * sy,
+    };
+  }
+
+  async function dropPhotosOnCanvas(items, e) {
+    if (!state.canvas || !items || items.length === 0) return;
+    var base = frameDropToCanvasXY(e);
+    for (var i = 0; i < items.length; i++) {
+      try {
+        var img = await fabric.Image.fromURL(items[i].src, { crossOrigin: 'anonymous' });
+        if (!img) continue;
+        // Cascade 20px per item so a multi-drop is visually distinct.
+        var ox = base.x + i * 20;
+        var oy = base.y + i * 20;
+        // Scale so the longest dim is ~50% of canvas width — same
+        // convention used by the existing "Add from project images"
+        // flow so regular movable images feel consistent.
+        var targetMax = CANVAS_W * 0.5;
+        var longest = Math.max(img.width, img.height) || 1;
+        var scale = targetMax / longest;
+        img.set({
+          originX: 'center',
+          originY: 'center',
+          left: ox,
+          top: oy,
+          scaleX: scale,
+          scaleY: scale,
+          selectable: true,
+          evented: true,
+          ibRole: 'photo',
+          ibSourceUrl: items[i].src,
+        });
+        state.canvas.add(img);
+        if (i === items.length - 1) state.canvas.setActiveObject(img);
+      } catch (err) {
+        console.warn('Drop failed for', items[i].src, err);
+      }
+    }
+    state.canvas.requestRenderAll();
+    scheduleAutosave();
+    scheduleSnapshot();
+    updateEmptyState();
+    renderLayersList();
+  }
+
+  // ====================================================================
+  // 18. LAYERS PANE
+  // ====================================================================
+
+  function objectKindLabel(o) {
+    if (!o) return { icon: 'fas fa-question', label: 'Object' };
+    if (o.ibRole === 'background') return { icon: 'fas fa-image', label: 'Background image' };
+    if (o.ibRole === 'stl') return { icon: 'fas fa-cube', label: 'STL view' };
+    if (o.ibRole === 'photo' || o.ibRole === 'project-image') return { icon: 'fas fa-image', label: 'Image' };
+    if (o.type === 'image' || (o.isType && o.isType('image'))) return { icon: 'fas fa-image', label: 'Image' };
+    if (o.type === 'i-text' || (o.isType && o.isType('i-text'))) {
+      var txt = (o.text || '').trim().slice(0, 24);
+      return { icon: 'fas fa-font', label: txt ? ('Text: ' + txt) : 'Text' };
+    }
+    if (o.type === 'rect' || (o.isType && o.isType('rect'))) return { icon: 'far fa-square', label: 'Rectangle' };
+    if (o.type === 'ellipse' || (o.isType && o.isType('ellipse'))) return { icon: 'far fa-circle', label: 'Ellipse' };
+    if (o.type === 'group' || (o.isType && o.isType('group'))) return { icon: 'fas fa-long-arrow-alt-right', label: 'Arrow' };
+    return { icon: 'fas fa-shapes', label: o.type || 'Object' };
+  }
+
+  function renderLayersList() {
+    if (!dom.layersList) return;
+    if (!state.canvas) {
+      dom.layersList.innerHTML = '';
+      return;
+    }
+    var objs = state.canvas.getObjects();
+    if (objs.length === 0) {
+      dom.layersList.innerHTML =
+        '<li class="ib-layers-list-empty">No objects on this step yet.</li>';
+      return;
+    }
+    var active = state.canvas.getActiveObject();
+    // Render top-to-bottom (the topmost canvas object first) so the
+    // visual order matches what's on screen.
+    var html = objs.slice().reverse().map(function (o, displayIdx) {
+      var k = objectKindLabel(o);
+      var isActive = (active === o);
+      // We use the canvas object's index in the underlying array for
+      // drop-target math, not the reversed display index.
+      var realIdx = objs.indexOf(o);
+      return (
+        '<li class="' + (isActive ? 'is-active' : '') + '"' +
+        '    draggable="true"' +
+        '    data-layer-index="' + realIdx + '">' +
+        '  <span class="ib-layer-icon"><i class="' + k.icon + '"></i></span>' +
+        '  <span class="ib-layer-label">' + escapeHtml(k.label) + '</span>' +
+        '</li>'
+      );
+    }).join('');
+    dom.layersList.innerHTML = html;
+
+    Array.prototype.forEach.call(dom.layersList.querySelectorAll('li[data-layer-index]'),
+      function (li) {
+        li.addEventListener('click', function () {
+          var idx = parseInt(li.dataset.layerIndex, 10);
+          var target = state.canvas.getObjects()[idx];
+          if (!target) return;
+          state.canvas.setActiveObject(target);
+          state.canvas.requestRenderAll();
+        });
+
+        // Drag-to-reorder.
+        li.addEventListener('dragstart', function (e) {
+          e.dataTransfer.effectAllowed = 'move';
+          try { e.dataTransfer.setData('text/x-ib-layer', li.dataset.layerIndex); } catch (_) {}
+          li.classList.add('is-dragging');
+        });
+        li.addEventListener('dragend', function () { li.classList.remove('is-dragging'); });
+        li.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          li.classList.add('is-dragover');
+        });
+        li.addEventListener('dragleave', function () { li.classList.remove('is-dragover'); });
+        li.addEventListener('drop', function (e) {
+          e.preventDefault();
+          li.classList.remove('is-dragover');
+          var fromIdx;
+          try { fromIdx = parseInt(e.dataTransfer.getData('text/x-ib-layer'), 10); } catch (_) {}
+          var toIdx = parseInt(li.dataset.layerIndex, 10);
+          if (isNaN(fromIdx) || isNaN(toIdx) || fromIdx === toIdx) return;
+          reorderLayerInStack(fromIdx, toIdx);
+        });
+      });
+  }
+
+  // Move the object currently at `fromIdx` to `toIdx` in the Fabric
+  // stack. Implemented via repeated bring/send-forward calls so the
+  // background's locked position at the bottom stays intact (we re-anchor
+  // it explicitly afterwards).
+  function reorderLayerInStack(fromIdx, toIdx) {
+    if (!state.canvas) return;
+    var objs = state.canvas.getObjects();
+    var obj = objs[fromIdx];
+    if (!obj || obj.ibRole === 'background') return;
+    state.canvas.moveObjectTo
+      ? state.canvas.moveObjectTo(obj, toIdx)
+      : moveObjectToFallback(obj, toIdx);
+    reanchorBackground();
+    state.canvas.requestRenderAll();
+    state.canvas.fire('object:modified', { target: obj });
+    // The list will re-render via the object:modified handler.
+  }
+
+  // Fabric v6 exposes canvas.moveObjectTo; if a future minor renames or
+  // removes it we fall back to nudging the object one slot at a time.
+  function moveObjectToFallback(obj, target) {
+    if (!state.canvas) return;
+    var cur = state.canvas.getObjects().indexOf(obj);
+    if (cur < 0) return;
+    while (cur < target) {
+      state.canvas.bringObjectForward(obj);
+      cur++;
+    }
+    while (cur > target) {
+      state.canvas.sendObjectBackwards(obj);
+      cur--;
+    }
+  }
+
+  // ====================================================================
+  // 19. FILMSTRIP — step thumbnails, reorder, add, collapse
+  // ====================================================================
+
+  function renderFilmstrip() {
+    if (!dom.filmstripTrack) return;
+    var html = state.steps.map(function (s) {
+      var isActive = (s.id === state.activeStepId);
+      var caption = (s.title && s.title.trim()) ? s.title : 'Untitled';
+      return (
+        '<div class="ib-step-tile' + (isActive ? ' is-active' : '') + '"' +
+        '     draggable="true"' +
+        '     data-step-id="' + s.id + '">' +
+        '  <div class="ib-step-tile-num">' + s.step_number + '</div>' +
+        '  <div class="ib-step-tile-preview">' +
+        '    <span>step ' + s.step_number + '</span>' +
+        '  </div>' +
+        '  <div class="ib-step-tile-caption" title="' + escapeHtml(caption) + '">' +
+                escapeHtml(caption) +
+        '</div>' +
+        '</div>'
+      );
+    }).join('');
+    dom.filmstripTrack.innerHTML = html;
+    if (dom.filmstripCount) {
+      dom.filmstripCount.textContent = state.steps.length === 1
+        ? '· 1 step'
+        : '· ' + state.steps.length + ' steps';
+    }
+
+    Array.prototype.forEach.call(dom.filmstripTrack.querySelectorAll('.ib-step-tile'),
+      function (tile) {
+        tile.addEventListener('click', function () {
+          var id = parseInt(tile.dataset.stepId, 10);
+          if (id && id !== state.activeStepId) switchToStep(id);
+        });
+        // Drag-to-reorder — drop fires a PUT step_number.
+        tile.addEventListener('dragstart', function (e) {
+          e.dataTransfer.effectAllowed = 'move';
+          try { e.dataTransfer.setData('text/x-ib-step', tile.dataset.stepId); } catch (_) {}
+          tile.classList.add('is-dragging');
+        });
+        tile.addEventListener('dragend', function () { tile.classList.remove('is-dragging'); });
+        tile.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          tile.classList.add('is-dragover');
+        });
+        tile.addEventListener('dragleave', function () { tile.classList.remove('is-dragover'); });
+        tile.addEventListener('drop', function (e) {
+          e.preventDefault();
+          tile.classList.remove('is-dragover');
+          var fromId;
+          try { fromId = parseInt(e.dataTransfer.getData('text/x-ib-step'), 10); } catch (_) {}
+          var toId = parseInt(tile.dataset.stepId, 10);
+          if (!fromId || !toId || fromId === toId) return;
+          reorderStep(fromId, toId);
+        });
+      });
+  }
+
+  function updateFilmstripToggleLabel() {
+    if (!dom.filmstripToggle) return;
+    var collapsed = dom.filmstrip && dom.filmstrip.classList.contains('is-collapsed');
+    if (collapsed) {
+      dom.filmstripToggle.innerHTML = '<i class="fas fa-chevron-up"></i> show';
+      dom.filmstripToggle.title = 'Show steps';
+    } else {
+      dom.filmstripToggle.innerHTML = '<i class="fas fa-chevron-down"></i> hide';
+      dom.filmstripToggle.title = 'Hide steps';
+    }
+  }
+
+  function wireFilmstrip() {
+    if (dom.filmstripAdd) dom.filmstripAdd.addEventListener('click', onAddStep);
+    if (dom.filmstripToggle) {
+      dom.filmstripToggle.addEventListener('click', function () {
+        if (!dom.filmstrip) return;
+        dom.filmstrip.classList.toggle('is-collapsed');
+        updateFilmstripToggleLabel();
+        if (state.uiState) {
+          state.uiState.filmstripCollapsed = dom.filmstrip.classList.contains('is-collapsed');
+          saveUiState();
+        }
+        // Canvas reflows when the filmstrip collapses — resync Fabric.
+        setTimeout(syncCanvasDisplaySize, 50);
+      });
+    }
+  }
+
+  async function reorderStep(fromId, toId) {
+    var fromStep = state.steps.find(function (s) { return s.id === fromId; });
+    var toStep = state.steps.find(function (s) { return s.id === toId; });
+    if (!fromStep || !toStep) return;
+    setSaveStatus('saving', 'Reordering steps…');
+    try {
+      await putStep(fromId, { step_number: toStep.step_number });
+      var fresh = await fetchInstruction();
+      if (fresh && fresh.steps) state.steps = fresh.steps;
+      renderFilmstrip();
+      setSaveStatus('saved');
+    } catch (_) {
+      setSaveStatus('error', 'Reorder failed');
+    }
+  }
+
+  // ====================================================================
+  // 20. STEP SWITCHING + ADD
+  // ====================================================================
 
   async function switchToStep(stepId) {
     // Flush any pending canvas save for the OUTGOING step before we
@@ -979,21 +1791,19 @@
     var step = state.steps.find(function (s) { return s.id === stepId; });
     if (!step) return;
 
-    // Reset field values for the new step
     if (dom.stepTitle) dom.stepTitle.value = step.title || '';
     if (dom.stepDescription) dom.stepDescription.value = step.description || '';
 
     await loadCanvasFromStep(step);
-    renderStepsList();
+    renderFilmstrip();
+    renderLayersList();
   }
 
   async function onAddStep() {
-    dom.addStepBtn.disabled = true;
+    if (dom.filmstripAdd) dom.filmstripAdd.disabled = true;
     setSaveStatus('saving', 'Adding step…');
     try {
       var step = await postStep();
-      // Refetch the canonical list so step_number reordering (if any)
-      // stays consistent with the backend.
       var fresh = await fetchInstruction();
       if (fresh && fresh.steps) {
         state.steps = fresh.steps;
@@ -1005,21 +1815,13 @@
     } catch (e) {
       setSaveStatus('error', 'Add step failed');
     } finally {
-      dom.addStepBtn.disabled = false;
+      if (dom.filmstripAdd) dom.filmstripAdd.disabled = false;
     }
   }
 
-  // -------- Export (Phase 2b PDF / Phase 2c ZIP) ---------------------
-  //
-  // Both paths share a single "render every step to a PNG dataURL"
-  // helper: the PDF path POSTs the array to the API and downloads the
-  // server response; the ZIP path bundles them client-side with JSZip
-  // (no backend involvement).
-  //
-  // The render helper mirrors the off-screen StaticCanvas pattern used
-  // by ``instruction-viewer.js`` — duplicated rather than shared since
-  // the two pages don't currently bundle code together. If a future
-  // phase extracts a shared canvas module both files can dedupe.
+  // ====================================================================
+  // 21. EXPORT (PDF / GIF / MP4 / ZIP) — preserved verbatim
+  // ====================================================================
 
   function setExportProgress(msg, kind) {
     if (!dom.exportProgress) return;
@@ -1038,9 +1840,6 @@
     setTimeout(function () { setExportProgress(null); }, delay || 0);
   }
 
-  // Parse a canvas_json blob defensively. Same shape as the viewer's
-  // helper — accept legitimate scenes, reject empty/garbage so the
-  // off-screen render skips them rather than producing a blank PNG.
   function parseCanvasJsonForExport(raw) {
     if (!raw) return null;
     var trimmed = String(raw).trim();
@@ -1059,23 +1858,16 @@
     }
   }
 
-  // Render one step into a PNG dataURL using the supplied off-screen
-  // canvas. ``multiplier: 2`` produces a higher-res image than the
-  // builder's on-screen rendering — better for print + downstream tools.
-  // Returns a placeholder blank-PNG dataURL when the step has no canvas
-  // content so the export still has one image per step.
   function renderStepToDataUrl(off, step) {
     return new Promise(function (resolve) {
       var parsed = parseCanvasJsonForExport(step.canvas_json);
       function blankDataUrl() {
-        // Render an empty white canvas at multiplier 2.
         try {
           off.clear();
           off.backgroundColor = '#ffffff';
           off.renderAll();
           resolve(off.toDataURL({ format: 'png', multiplier: 2 }));
         } catch (_) {
-          // 1x1 transparent PNG as the absolute fallback.
           resolve('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
         }
       }
@@ -1098,9 +1890,8 @@
   }
 
   // Flush any pending canvas autosave so the next API read sees the
-  // latest state. Mirrors the inline flush in ``switchToStep`` but
-  // exposed as a helper so the export flow can call it without
-  // duplicating the timer handling.
+  // latest state. Mirrors the inline flush in `switchToStep` but exposed
+  // as a helper for the export flow.
   async function flushPendingCanvasSave() {
     if (_debounces['canvas-autosave']) {
       clearTimeout(_debounces['canvas-autosave']);
@@ -1109,10 +1900,6 @@
     }
   }
 
-  // Pull the canonical step list from the API after the autosave flush.
-  // The returned list is what the export pipeline renders — so any
-  // unsaved title / description / canvas state has to make it through
-  // autosave first.
   async function loadStepsForExport() {
     var instruction = await fetchInstruction();
     if (!instruction || !Array.isArray(instruction.steps) || instruction.steps.length === 0) {
@@ -1124,8 +1911,6 @@
     return sorted;
   }
 
-  // Render every step to a PNG dataURL. Reuses a single off-screen
-  // StaticCanvas across all steps to keep the cost down.
   async function renderAllStepsToDataUrls(steps) {
     if (typeof fabric === 'undefined' || !fabric.StaticCanvas) {
       throw new Error('Fabric.js is not loaded');
@@ -1160,7 +1945,6 @@
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    // Defer revoke so Safari has a moment to start the download.
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
@@ -1206,11 +1990,6 @@
     }
   }
 
-  // Phase 3b/3c — Animated GIF / MP4 video export. Same render-then-POST
-  // pipeline as the PDF path; the server runs FFmpeg over the supplied
-  // PNG sequence + branded closing slide. ``format`` is either 'gif' or
-  // 'mp4' and chooses the endpoint suffix + filename extension +
-  // download MIME type.
   async function exportVideo(format) {
     var label = (format === 'mp4') ? 'MP4 video' : 'animated GIF';
     setExportProgress('Preparing export…');
@@ -1219,12 +1998,6 @@
       var steps = await loadStepsForExport();
       var dataUrls = await renderAllStepsToDataUrls(steps);
 
-      // Video encodes take noticeably longer than PDFs (FFmpeg + a
-      // two-pass GIF palettegen or an H.264 single pass) — keep the
-      // user informed so they don't think the page is hung. The
-      // backend caps each FFmpeg invocation at 120s; the frontend
-      // doesn't set its own fetch timeout — we let the server be the
-      // source of truth on "too long".
       setExportProgress('Encoding ' + label + '… this can take a minute');
       var payload = {
         steps: steps.map(function (s, i) {
@@ -1323,29 +2096,14 @@
     });
   }
 
-  // -------- STL viewer (Phase 3a) -----------------------------------
-  //
-  // STL flow vs. "Upload image" flow — important distinction:
-  //
-  //   * "Upload image" uploads to the server, gets a stable URL back,
-  //     and places the image as a LOCKED BACKGROUND (selectable: false,
-  //     evented: false, sent to back). It IS the canvas background.
-  //   * "Add STL" parses the STL entirely in the browser (no server),
-  //     renders it with Three.js, captures the WebGL view as a PNG, and
-  //     places that PNG on the Fabric canvas as a REGULAR MOVABLE OBJECT
-  //     (selectable: true, evented: true). It sits ON TOP of whatever
-  //     background is already there — typically a photo of the
-  //     assembly — and the user can drag / resize / rotate it.
-  //
-  // The STL file itself isn't persisted. If the owner wants a different
-  // angle later they re-upload — the modal makes this explicit.
+  // ====================================================================
+  // 22. STL VIEWER (Phase 3a — preserved verbatim)
+  // ====================================================================
 
-  // Module-level state for the STL modal. Created on first click,
-  // reused thereafter (same pattern as terms-gate's _ensureModal).
   var stl = {
     modalNode: null,
     bsModal: null,
-    libsPromise: null,    // cached Promise for the Three.js + STLLoader lazy-load
+    libsPromise: null,
     fileInput: null,
     renderArea: null,
     statusText: null,
@@ -1359,18 +2117,13 @@
     mesh: null,
     light: null,
     dirLight: null,
-    cameraDistance: 2.6,  // initial isometric distance (matches (1.5,1.5,1.5))
+    cameraDistance: 2.6,
     sceneReady: false,
     hasModel: false,
-    // Spherical coordinates for drag-rotate (radians)
     spherical: { theta: Math.PI / 4, phi: Math.PI / 3 },
-    drag: null,           // { lastX, lastY } while pointer is down
+    drag: null,
   };
 
-  // Lazy-load Three.js + STLLoader. Returns a Promise that resolves
-  // when both globals are present. Re-uses an existing in-flight load
-  // if called again. Rejects with a single error message on any failure
-  // so the modal can show a friendly "couldn't load the 3D viewer" line.
   function loadStlLibs() {
     if (stl.libsPromise) return stl.libsPromise;
     stl.libsPromise = new Promise(function (resolve, reject) {
@@ -1378,7 +2131,6 @@
         return new Promise(function (res, rej) {
           var existing = document.querySelector('script[data-ib-stl="' + marker + '"]');
           if (existing) {
-            // Already in flight or done — hook into its lifecycle.
             if (existing.dataset.loaded === '1') { res(); return; }
             existing.addEventListener('load', function () { res(); });
             existing.addEventListener('error', function () { rej(new Error('Load failed: ' + src)); });
@@ -1407,8 +2159,6 @@
           resolve();
         })
         .catch(function (err) {
-          // Reset so the next attempt re-tries the network — a CDN blip
-          // shouldn't permanently disable the feature.
           stl.libsPromise = null;
           reject(err);
         });
@@ -1416,9 +2166,6 @@
     return stl.libsPromise;
   }
 
-  // Build the STL modal once and cache it. Modal markup mirrors the
-  // Bootstrap structure used elsewhere on the site (terms-gate / project
-  // editor) so the existing Bootstrap CSS handles centring + backdrop.
   function ensureStlModal() {
     if (stl.modalNode) return stl.modalNode;
     var modalId = 'ib-stl-modal';
@@ -1487,23 +2234,15 @@
       });
     });
 
-    // Bootstrap modal instance — we let Bootstrap manage backdrop /
-    // focus etc., we just call .show() / .hide().
     if (window.bootstrap && window.bootstrap.Modal) {
       stl.bsModal = new window.bootstrap.Modal(node);
     } else {
-      // Bootstrap not present — synthesise minimal show/hide via the
-      // 'show' class so the page still works. Unlikely on this site
-      // (Bootstrap is loaded globally) but defensive against any
-      // future config change.
       stl.bsModal = {
         show: function () { node.classList.add('show'); node.style.display = 'block'; },
         hide: function () { node.classList.remove('show'); node.style.display = 'none'; },
       };
     }
 
-    // Reset state when the modal is dismissed — clear the file input
-    // and any model so the next open starts fresh.
     node.addEventListener('hidden.bs.modal', function () {
       try { stl.fileInput.value = ''; } catch (_) {}
       stlClearError();
@@ -1537,24 +2276,16 @@
     }
   }
 
-  // Build the Three.js scene once per modal lifetime — we reuse it
-  // across multiple file picks. Returns true on success, false if the
-  // libs aren't loaded yet (caller should retry after loadStlLibs).
   function initStlScene() {
     if (stl.sceneReady) return true;
     var THREE = window.THREE;
     if (!THREE) return false;
 
-    // Renderer — preserveDrawingBuffer is REQUIRED so toDataURL() can
-    // read the framebuffer back. Without it, Chrome happily renders to
-    // screen but toDataURL returns a blank PNG.
     stl.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     stl.renderer.setPixelRatio(window.devicePixelRatio || 1);
     stl.renderer.setSize(STL_VIEW_SIZE, STL_VIEW_SIZE, false);
     stl.renderer.setClearColor(STL_SCENE_BG, 1);
 
-    // Attach the renderer's canvas inside the render area, replacing
-    // the status text wrapper but keeping the error overlay alongside.
     stl.renderer.domElement.classList.add('ib-stl-canvas');
     stl.renderArea.appendChild(stl.renderer.domElement);
 
@@ -1562,7 +2293,7 @@
     stl.scene.background = new THREE.Color(STL_SCENE_BG);
 
     stl.camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-    setStlView('iso'); // also positions camera
+    setStlView('iso');
 
     stl.light = new THREE.HemisphereLight(0xffffff, 0x444466, 1.0);
     stl.scene.add(stl.light);
@@ -1571,7 +2302,6 @@
     stl.dirLight.position.copy(stl.camera.position);
     stl.scene.add(stl.dirLight);
 
-    // Pointer / wheel input on the renderer canvas
     var el = stl.renderer.domElement;
     el.addEventListener('mousedown', onStlPointerDown);
     el.addEventListener('wheel', onStlWheel, { passive: false });
@@ -1583,16 +2313,11 @@
     return true;
   }
 
-  // Position camera + look-at for one of the four preset views.
-  // Updates `cameraDistance` / `spherical` so subsequent drag-rotate /
-  // zoom interactions start from the right baseline.
   function setStlView(name) {
     if (!stl.camera) return;
     var THREE = window.THREE;
     var pos;
     if (name === 'top') {
-      // Tiny non-zero z so up vector resolves (camera-looks-straight-down
-      // is degenerate for the default up axis).
       pos = new THREE.Vector3(0, 2, 0.001);
     } else if (name === 'front') {
       pos = new THREE.Vector3(0, 0, 2);
@@ -1604,13 +2329,11 @@
     stl.camera.position.copy(pos);
     stl.camera.lookAt(0, 0, 0);
     stl.cameraDistance = pos.length();
-    // Update spherical coords from new position so drag continues smoothly.
     stl.spherical.theta = Math.atan2(pos.x, pos.z);
     stl.spherical.phi = Math.acos(Math.max(-1, Math.min(1, pos.y / stl.cameraDistance)));
 
     if (stl.dirLight) stl.dirLight.position.copy(stl.camera.position);
 
-    // Toggle button highlights
     if (stl.viewButtons) {
       Array.prototype.forEach.call(stl.viewButtons, function (b) {
         b.classList.toggle('is-active', b.dataset.stlView === name);
@@ -1625,8 +2348,6 @@
     }
   }
 
-  // Apply current spherical coords -> camera position. Used by
-  // drag-rotate and scroll-zoom. Both call renderStlScene afterwards.
   function applyStlSpherical() {
     if (!stl.camera) return;
     var r = stl.cameraDistance;
@@ -1652,8 +2373,6 @@
     var dy = e.clientY - stl.drag.lastY;
     stl.drag.lastX = e.clientX;
     stl.drag.lastY = e.clientY;
-    // Convert pixel deltas to radians. Tuning: 0.005 rad/px feels
-    // about right at the modal's 400px size.
     stl.spherical.theta -= dx * 0.005;
     stl.spherical.phi -= dy * 0.005;
     applyStlSpherical();
@@ -1699,19 +2418,10 @@
     stlClearError();
     stl.bsModal.show();
 
-    // Kick off the lib load now (even before a file is chosen) so the
-    // network round-trip overlaps with the user picking a file.
     loadStlLibs()
-      .then(function () {
-        // Build the scene as soon as libs are ready — input file will
-        // populate it. If a previous instance is already built, this
-        // is a no-op.
-        initStlScene();
-      })
+      .then(function () { initStlScene(); })
       .catch(function () {
         stlShowError("Couldn't load the 3D viewer. Please try again or check your connection.");
-        // Disable the file input so the user can't pick a file we'd
-        // fail to parse anyway. Cancel still works.
         if (stl.fileInput) stl.fileInput.disabled = true;
       });
   }
@@ -1729,7 +2439,6 @@
     stl.statusText.classList.remove('d-none');
     stl.useBtn.disabled = true;
 
-    // Make sure libs are loaded + scene is up before we parse.
     loadStlLibs()
       .then(function () {
         if (!initStlScene()) {
@@ -1753,9 +2462,6 @@
           stl.statusText.textContent = '';
           return;
         }
-        // Centre + normalise scale so the longest dimension is 1 unit.
-        // STLs in the wild vary from millimetres to "blender unit"
-        // arbitrary scale — normalising keeps the camera distance sane.
         geometry.computeBoundingBox();
         var bb = geometry.boundingBox;
         var cx = (bb.min.x + bb.max.x) / 2;
@@ -1770,7 +2476,6 @@
         geometry.scale(scale, scale, scale);
         if (geometry.computeVertexNormals) geometry.computeVertexNormals();
 
-        // Replace any existing mesh
         if (stl.mesh) {
           stl.scene.remove(stl.mesh);
           if (stl.mesh.geometry) { try { stl.mesh.geometry.dispose(); } catch (_) {} }
@@ -1800,13 +2505,8 @@
     setStlView(name);
   }
 
-  // Capture the current Three.js render as a PNG, close the modal, and
-  // place the PNG on the Fabric canvas as a regular movable object.
   function onStlUseView() {
     if (!stl.hasModel || !stl.renderer) return;
-    // Ensure the latest scene state is in the framebuffer before we
-    // read it back. preserveDrawingBuffer keeps the pixels around but
-    // a fresh render guarantees we capture the current camera pose.
     renderStlScene();
     var dataUrl;
     try {
@@ -1819,7 +2519,6 @@
       stlShowError("Couldn't capture the view. Please try a different angle.");
       return;
     }
-    // Close first so the user sees the result land on the canvas.
     try { stl.bsModal.hide(); } catch (_) {}
 
     placeStlPngOnCanvas(dataUrl).catch(function (e) {
@@ -1828,22 +2527,16 @@
     });
   }
 
-  // Add a PNG dataURL to the Fabric canvas as a regular movable image.
-  // Distinct from addBackgroundImage: this is NOT a locked background.
   async function placeStlPngOnCanvas(dataUrl) {
     if (!state.canvas) return;
     var img;
     try {
-      // v6: fabric.Image.fromURL accepts dataURLs and returns a Promise.
       img = await fabric.Image.fromURL(dataUrl);
     } catch (e) {
       throw new Error('Failed to load STL view into canvas');
     }
     if (!img) throw new Error('STL image returned empty');
 
-    // Place at canvas centre, scaled so the longest dim fits within
-    // 50% of canvas width — leaves the user room to add overlays
-    // around it.
     var targetMax = CANVAS_W * 0.5;
     var longest = Math.max(img.width, img.height) || 1;
     var scale = targetMax / longest;
@@ -1854,8 +2547,6 @@
       top: CANVAS_H / 2,
       scaleX: scale,
       scaleY: scale,
-      // Regular movable object — NOT a background. The user can drag,
-      // resize, rotate, and (via Delete-selected) remove it.
       selectable: true,
       evented: true,
       ibRole: 'stl',
@@ -1864,32 +2555,14 @@
     state.canvas.setActiveObject(img);
     state.canvas.requestRenderAll();
 
-    // Trigger autosave so canvas_json captures the new object — the
-    // object:added listener also schedules one, but calling explicitly
-    // here belt-and-braces it against any future suppressEvents quirks.
     scheduleAutosave();
     scheduleSnapshot();
     updateEmptyState();
   }
 
-  // -------- Project-images picker (issue #184) -----------------------
-  //
-  // Lets the owner add an image that's ALREADY been uploaded to this
-  // project (via the project editor's image gallery) without having to
-  // re-upload it. Distinct from the "Upload image" flow:
-  //
-  //   * "Upload image" → uploads a new image and places it as a LOCKED
-  //     BACKGROUND (selectable: false, evented: false, sent to back).
-  //     One per step; replaces any existing background.
-  //   * "Add from project images" → places the picked image as a
-  //     REGULAR MOVABLE OBJECT (selectable: true, evented: true), at
-  //     canvas centre, scaled to ~50% width. Multiple per step are fine
-  //     and they layer above any background. This is for additive
-  //     composition — the user can keep stacking project images, STL
-  //     views, arrows, etc.
-  //
-  // Modal markup is built lazily on first click and reused thereafter
-  // (same pattern as the STL modal above).
+  // ====================================================================
+  // 23. PROJECT-IMAGES PICKER MODAL (issue #184 — preserved)
+  // ====================================================================
 
   var pickerModal = {
     node: null,
@@ -1957,7 +2630,7 @@
   function renderPickerGrid(images) {
     if (!pickerModal.grid) return;
     var html = images.map(function (img) {
-      var src = API + '/api/projects/' + state.projectId + '/images/' + img.id + '/view';
+      var src = projectImageViewUrl(img.id);
       var caption = img.caption && img.caption.trim() ? img.caption : (img.filename || 'image');
       return (
         '<button type="button" class="ib-picker-tile" data-image-id="' + img.id + '" ' +
@@ -1984,33 +2657,21 @@
     );
   }
 
-  // Default "no images" copy, separated so the error branch can swap to
-  // it and the next open resets back to the friendly version.
   var PICKER_EMPTY_HTML =
     "No images uploaded yet. Use <strong>Upload image</strong> to add one, " +
     "or upload images from the project editor's image gallery.";
 
   async function onPickProjectImageClick() {
     ensurePickerModal();
-    // Reset empty-state copy so a previous transient failure doesn't
-    // persist as the user's first impression on re-open.
     if (pickerModal.empty) pickerModal.empty.innerHTML = PICKER_EMPTY_HTML;
     setPickerView('loading');
     try { pickerModal.bsModal.show(); } catch (_) {}
     try {
-      var resp = await apiFetch(API + '/api/projects/' + state.projectId + '/images');
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      var images = await resp.json();
-      if (!Array.isArray(images) || images.length === 0) {
-        setPickerView('empty');
-        return;
-      }
+      var images = await listProjectImages();
+      if (images.length === 0) { setPickerView('empty'); return; }
       renderPickerGrid(images);
       setPickerView('grid');
     } catch (_) {
-      // Reuse the empty state for the failure path — the message tells
-      // the user how to recover (re-upload from the editor) and avoids a
-      // separate error UI just for this transient case.
       if (pickerModal.empty) {
         pickerModal.empty.innerHTML = "Couldn't load your project images. Please try again in a moment.";
       }
@@ -2018,9 +2679,6 @@
     }
   }
 
-  // Add an existing project image to the Fabric canvas as a regular
-  // movable object (NOT a locked background — picker is for additive
-  // layering, distinct from the "Upload image" background flow).
   async function placeProjectImageOnCanvas(url) {
     if (!state.canvas) return;
     var img;
@@ -2031,9 +2689,6 @@
     }
     if (!img) throw new Error('Project image returned empty');
 
-    // Centre, scaled so the longest dim fits ~50% of canvas width —
-    // same placement convention as the STL flow so multiple
-    // additive layers feel consistent.
     var targetMax = CANVAS_W * 0.5;
     var longest = Math.max(img.width, img.height) || 1;
     var scale = targetMax / longest;
@@ -2046,9 +2701,8 @@
       scaleY: scale,
       selectable: true,
       evented: true,
-      // Tag so we can tell this apart from background / STL objects if
-      // a future feature needs to (e.g. relinking to the source image).
       ibRole: 'project-image',
+      ibSourceUrl: url,
     });
     state.canvas.add(img);
     state.canvas.setActiveObject(img);
@@ -2056,12 +2710,161 @@
     scheduleAutosave();
     scheduleSnapshot();
     updateEmptyState();
+    renderLayersList();
   }
 
-  // -------- Init flow ------------------------------------------------
+  // ====================================================================
+  // 24. SETTINGS POPOVER (Tweaks)
+  // ====================================================================
+
+  function toggleSettingsPop() {
+    if (!dom.settingsPop) return;
+    var open = !dom.settingsPop.hasAttribute('hidden');
+    if (open) {
+      dom.settingsPop.setAttribute('hidden', '');
+    } else {
+      dom.settingsPop.removeAttribute('hidden');
+      // Click-outside-to-close.
+      setTimeout(function () {
+        document.addEventListener('click', closeOnOutsideClick, { once: true });
+      }, 0);
+    }
+  }
+
+  function closeOnOutsideClick(e) {
+    if (!dom.settingsPop) return;
+    if (dom.settingsPop.contains(e.target)) {
+      // Click was inside the popover — keep it open and re-arm.
+      document.addEventListener('click', closeOnOutsideClick, { once: true });
+      return;
+    }
+    if (dom.railSettings && dom.railSettings.contains(e.target)) {
+      // The toggle handler will close/open; don't double-close.
+      return;
+    }
+    dom.settingsPop.setAttribute('hidden', '');
+  }
+
+  function wireSettings() {
+    if (dom.settingsGrid) {
+      dom.settingsGrid.addEventListener('change', function () {
+        if (!state.uiState) return;
+        state.uiState.showGrid = !!dom.settingsGrid.checked;
+        if (dom.canvasFrame) dom.canvasFrame.classList.toggle('is-grid', state.uiState.showGrid);
+        saveUiState();
+      });
+    }
+    Array.prototype.forEach.call(dom.settingsDensity || [], function (radio) {
+      radio.addEventListener('change', function () {
+        if (!radio.checked || !state.uiState) return;
+        state.uiState.density = radio.value;
+        if (dom.workspace) dom.workspace.setAttribute('data-density', radio.value);
+        saveUiState();
+        setTimeout(syncCanvasDisplaySize, 50);
+      });
+    });
+  }
+
+  function wireHudToggle() {
+    if (!dom.hudToggle) return;
+    dom.hudToggle.addEventListener('click', function () {
+      if (!state.uiState) return;
+      state.uiState.hudVisible = !state.uiState.hudVisible;
+      dom.hudToggle.setAttribute('aria-pressed', state.uiState.hudVisible ? 'true' : 'false');
+      dom.hudToggle.classList.toggle('is-active', state.uiState.hudVisible);
+      document.body.classList.toggle('hud-visible', state.uiState.hudVisible);
+      // PR 2: also show/hide the #ib-inspector-hud panel content.
+      saveUiState();
+    });
+  }
+
+  // ====================================================================
+  // 25. TOOLBAR / KEYBOARD WIRING
+  // ====================================================================
+
+  function wireToolbar() {
+    Array.prototype.forEach.call(dom.toolButtons, function (btn) {
+      btn.addEventListener('click', function () {
+        setActiveTool(btn.dataset.tool);
+      });
+    });
+    if (dom.stroke) {
+      dom.stroke.addEventListener('input', function () {
+        if (dom.strokeValue) dom.strokeValue.textContent = dom.stroke.value;
+        applyStyleToSelection();
+      });
+    }
+    if (dom.color) dom.color.addEventListener('input', applyStyleToSelection);
+    if (dom.fontSize) dom.fontSize.addEventListener('input', applyStyleToSelection);
+    if (dom.uploadImageBtn) dom.uploadImageBtn.addEventListener('click', onUploadClick);
+    if (dom.pickProjectImageBtn) dom.pickProjectImageBtn.addEventListener('click', onPickProjectImageClick);
+    if (dom.imageInput) dom.imageInput.addEventListener('change', onImagePicked);
+    if (dom.removeImageBtn) dom.removeImageBtn.addEventListener('click', onRemoveImageClick);
+    if (dom.addStlBtn) dom.addStlBtn.addEventListener('click', onAddStlClick);
+    if (dom.deleteSelected) dom.deleteSelected.addEventListener('click', onDeleteSelected);
+    if (dom.undoBtn) dom.undoBtn.addEventListener('click', onUndoClick);
+    if (dom.redoBtn) dom.redoBtn.addEventListener('click', onRedoClick);
+
+    if (dom.rotation) dom.rotation.addEventListener('change', onRotationInputChange);
+    if (dom.resetTransforms) dom.resetTransforms.addEventListener('click', onResetTransformsClick);
+
+    if (dom.bringToFront) dom.bringToFront.addEventListener('click', function () { arrangeActive('front'); });
+    if (dom.bringForward) dom.bringForward.addEventListener('click', function () { arrangeActive('forward'); });
+    if (dom.sendBackward) dom.sendBackward.addEventListener('click', function () { arrangeActive('backward'); });
+    if (dom.sendToBack) dom.sendToBack.addEventListener('click', function () { arrangeActive('back'); });
+
+    // Keyboard shortcuts: Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z = redo,
+    // Delete/Backspace = delete selected.
+    document.addEventListener('keydown', function (e) {
+      var tag = (e.target && e.target.tagName) || '';
+      var typing = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT');
+      var editingText = state.canvas && state.canvas.getActiveObject() &&
+        state.canvas.getActiveObject().isType && state.canvas.getActiveObject().isType('i-text') &&
+        state.canvas.getActiveObject().isEditing;
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        if (typing || editingText) return;
+        e.preventDefault();
+        if (e.shiftKey) onRedoClick(); else onUndoClick();
+      } else if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && !editingText) {
+        if (state.canvas && state.canvas.getActiveObject()) {
+          e.preventDefault();
+          onDeleteSelected();
+        }
+      }
+    });
+  }
+
+  function applyStyleToSelection() {
+    if (!state.canvas) return;
+    var active = state.canvas.getActiveObject();
+    if (!active) return;
+    var color = dom.color ? dom.color.value : null;
+    var stroke = dom.stroke ? parseInt(dom.stroke.value, 10) : null;
+    var fontSize = dom.fontSize ? parseInt(dom.fontSize.value, 10) : null;
+    if (active.isType && active.isType('i-text')) {
+      if (color) active.set({ fill: color });
+      if (fontSize) active.set({ fontSize: fontSize });
+    } else {
+      if (color) active.set({ stroke: color });
+      if (stroke) active.set({ strokeWidth: stroke });
+    }
+    state.canvas.requestRenderAll();
+    scheduleAutosave();
+    scheduleSnapshot();
+  }
+
+  // ====================================================================
+  // 26. INIT FLOW
+  // ====================================================================
 
   async function init() {
     bindDom();
+
+    // Hydrate UI state from localStorage before we touch the DOM so the
+    // first paint already reflects the user's saved preferences.
+    state.uiState = loadUiState();
+    state.activeRailPane = state.uiState.activeRailPane || 'photos';
+
     var params = new URLSearchParams(window.location.search);
     state.projectId = params.get('id');
 
@@ -2075,14 +2878,13 @@
     // Update back / new-tab links with the project id
     if (dom.backLink) dom.backLink.href = '/projects/editor.html?id=' + encodeURIComponent(state.projectId);
     if (dom.openEditorNewTab) dom.openEditorNewTab.href = '/projects/editor.html?id=' + encodeURIComponent(state.projectId);
+    if (dom.bomOpenEditor) dom.bomOpenEditor.href = '/projects/editor.html?id=' + encodeURIComponent(state.projectId) + '#editor-bom-section';
 
     // Auth probe
     try {
       state.me = await fetchMe();
     } catch (_) { state.me = null; }
     if (!state.me || !state.me.username) {
-      // Not logged in — bounce to login with a return-to so we can come
-      // straight back after sign-in.
       var ret = encodeURIComponent(window.location.pathname + window.location.search);
       window.location.href = '/login?return_to=' + ret;
       return;
@@ -2127,9 +2929,6 @@
       state.steps = [];
     }
 
-    // If there are no steps yet, create the first one for the user so the
-    // page has something to render. This mirrors what we'd want a fresh
-    // visitor to see — a usable canvas, not an empty void.
     if (state.steps.length === 0) {
       try {
         var first = await postStep();
@@ -2141,115 +2940,36 @@
       }
     }
 
-    // Page is good to render
+    // Page is good to render.
     showOnly(dom.main);
 
     initCanvas();
     wireToolbar();
     wireStepFields();
     wireExportMenu();
-    if (dom.addStepBtn) dom.addStepBtn.addEventListener('click', onAddStep);
+    wireRail();
+    wireSecondaryResize();
+    wirePhotosPane();
+    wireFilmstrip();
+    wireSettings();
+    wireHudToggle();
 
-    // Render the steps list and load the first step's canvas
+    // Apply persisted UI state (density / grid / pane / filmstrip / etc.).
+    applyUiStateToDom();
+
+    // Render the steps list and load the first step's canvas.
     state.activeStepId = state.steps[0].id;
     if (dom.stepTitle) dom.stepTitle.value = state.steps[0].title || '';
     if (dom.stepDescription) dom.stepDescription.value = state.steps[0].description || '';
-    renderStepsList();
+    renderFilmstrip();
     await loadCanvasFromStep(state.steps[0]);
+
+    // Prime the Photos pane content even if it isn't visible — the first
+    // user click into it should feel instant.
+    refreshProjectImages();
 
     // Final layout pass once the panels have settled.
     setTimeout(syncCanvasDisplaySize, 50);
-  }
-
-  function wireToolbar() {
-    // Tool buttons
-    Array.prototype.forEach.call(dom.toolButtons, function (btn) {
-      btn.addEventListener('click', function () {
-        setActiveTool(btn.dataset.tool);
-      });
-    });
-    // Style controls — live updates only matter for the next-drawn
-    // object; existing selection is also re-styled in real time so the
-    // user can pick a shape and recolour it.
-    if (dom.stroke) {
-      dom.stroke.addEventListener('input', function () {
-        if (dom.strokeValue) dom.strokeValue.textContent = dom.stroke.value;
-        applyStyleToSelection();
-      });
-    }
-    if (dom.color) {
-      dom.color.addEventListener('input', applyStyleToSelection);
-    }
-    if (dom.fontSize) {
-      dom.fontSize.addEventListener('input', applyStyleToSelection);
-    }
-    if (dom.uploadImageBtn) dom.uploadImageBtn.addEventListener('click', onUploadClick);
-    if (dom.pickProjectImageBtn) dom.pickProjectImageBtn.addEventListener('click', onPickProjectImageClick);
-    if (dom.imageInput) dom.imageInput.addEventListener('change', onImagePicked);
-    if (dom.removeImageBtn) dom.removeImageBtn.addEventListener('click', onRemoveImageClick);
-    if (dom.addStlBtn) dom.addStlBtn.addEventListener('click', onAddStlClick);
-    if (dom.deleteSelected) dom.deleteSelected.addEventListener('click', onDeleteSelected);
-    if (dom.undoBtn) dom.undoBtn.addEventListener('click', onUndoClick);
-    if (dom.redoBtn) dom.redoBtn.addEventListener('click', onRedoClick);
-
-    // Transform controls — only fire when there's an active non-background
-    // selection (controls are disabled otherwise, but bind regardless so
-    // re-enable + change works without re-wiring).
-    if (dom.rotation) {
-      dom.rotation.addEventListener('change', onRotationInputChange);
-    }
-    if (dom.resetTransforms) {
-      dom.resetTransforms.addEventListener('click', onResetTransformsClick);
-    }
-
-    // Arrange controls — bring-to-front / forward / backward / to-back.
-    if (dom.bringToFront) dom.bringToFront.addEventListener('click', function () { arrangeActive('front'); });
-    if (dom.bringForward) dom.bringForward.addEventListener('click', function () { arrangeActive('forward'); });
-    if (dom.sendBackward) dom.sendBackward.addEventListener('click', function () { arrangeActive('backward'); });
-    if (dom.sendToBack) dom.sendToBack.addEventListener('click', function () { arrangeActive('back'); });
-
-    // Keyboard shortcuts: Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z = redo,
-    // Delete/Backspace = delete selected (but NOT while typing in a
-    // text overlay or sidebar input).
-    document.addEventListener('keydown', function (e) {
-      var tag = (e.target && e.target.tagName) || '';
-      var typing = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT');
-      var editingText = state.canvas && state.canvas.getActiveObject() &&
-        state.canvas.getActiveObject().isType && state.canvas.getActiveObject().isType('i-text') &&
-        state.canvas.getActiveObject().isEditing;
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
-        if (typing || editingText) return;
-        e.preventDefault();
-        if (e.shiftKey) onRedoClick(); else onUndoClick();
-      } else if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && !editingText) {
-        if (state.canvas && state.canvas.getActiveObject()) {
-          e.preventDefault();
-          onDeleteSelected();
-        }
-      }
-    });
-  }
-
-  function applyStyleToSelection() {
-    if (!state.canvas) return;
-    var active = state.canvas.getActiveObject();
-    if (!active) return;
-    var color = dom.color ? dom.color.value : null;
-    var stroke = dom.stroke ? parseInt(dom.stroke.value, 10) : null;
-    var fontSize = dom.fontSize ? parseInt(dom.fontSize.value, 10) : null;
-    // Text objects use `fill` for colour and `fontSize` for size;
-    // shapes use `stroke` + `strokeWidth`. Apply whichever is relevant.
-    if (active.isType && active.isType('i-text')) {
-      if (color) active.set({ fill: color });
-      if (fontSize) active.set({ fontSize: fontSize });
-    } else {
-      if (color) active.set({ stroke: color });
-      if (stroke) active.set({ strokeWidth: stroke });
-    }
-    state.canvas.requestRenderAll();
-    // Treat this as an edit so it autosaves + ends up in the undo stack.
-    scheduleAutosave();
-    scheduleSnapshot();
   }
 
   // Kick off once Fabric + DOM are both ready.
