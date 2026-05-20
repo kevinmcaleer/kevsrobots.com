@@ -5308,12 +5308,13 @@
     var ws = document.getElementById('ib-workspace');
     if (!ws) return;
     var top = ws.getBoundingClientRect().top;
-    // Floor at 320 so we don't end up with a 0-height workspace on
-    // pathological measurements, but no higher — on tight viewports
-    // (devtools docked, small laptop, narrow window) we'd rather have
-    // a cramped layout with the filmstrip visible than a roomy one
-    // with the filmstrip pushed below the fold.
-    var avail = Math.max(320, window.innerHeight - top);
+    // Workspace fills exactly from its top offset to the viewport
+    // bottom. No floor: on tight viewports we'd rather a cramped canvas
+    // with the filmstrip visible than a roomy one that overflows the
+    // viewport and triggers a body scrollbar (or worse, hides the
+    // filmstrip entirely). Body has overflow: hidden on this page, so
+    // any positive value here always fits without scrolling.
+    var avail = Math.max(120, window.innerHeight - top);
     ws.style.height = avail + 'px';
   }
 

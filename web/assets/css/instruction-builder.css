@@ -28,6 +28,16 @@ body.instruction-builder-page > .container-fluid {
   margin: 0 !important;
 }
 
+/* Lock the page to viewport height with no scrolling. The workspace
+   below is sized at runtime to fill exactly the remaining space below
+   the site chrome (top_bar + nav + searchbar + nav_projects). Locking
+   body overflow guarantees the filmstrip at the bottom of the workspace
+   grid can never be pushed below the fold by a stray ~10–20 px of
+   chrome that shifts after first paint (e.g. fonts loading). */
+body.instruction-builder-page {
+  overflow: hidden;
+}
+
 /* ---- Workspace shell -------------------------------------------------- */
 
 .ib-workspace {
@@ -36,11 +46,12 @@ body.instruction-builder-page > .container-fluid {
   /* Sized precisely at runtime by adjustWorkspaceHeight() in
      instruction-builder.js — measures the actual top offset
      (site top_bar + navigation + searchbar + nav_projects all
-     contribute and vary by viewport width). No CSS min-height
-     here — on small viewports the workspace shrinks to fit
-     rather than overflowing and hiding the filmstrip. */
+     contribute and vary by viewport width). The calc fallback is
+     a defensive worst-case for the brief moment before JS runs.
+     No CSS min-height — body has overflow: hidden on this page, so
+     a too-large value here would clip the filmstrip rather than
+     allow it to scroll into view. Match the JS measurement exactly. */
   height: calc(100vh - 220px);
-  min-height: 320px;
   background: #f8f9fa;
   color: #212529;
   overflow: hidden;
