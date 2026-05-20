@@ -226,6 +226,78 @@ body.instruction-builder-page > .container-fluid {
   grid-column: span 2;
 }
 
+/* ---- Transform + Arrange sections (issues #184 / #183) ---- */
+
+.ib-rotation-unit {
+  font-size: 0.8rem;
+  color: #6c757d;
+  min-width: 12px;
+  text-align: left;
+}
+.ib-style-row input[type="number"]:disabled {
+  background: #f1f3f5;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.ib-arrange-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.ib-arrange-actions .ib-tool-btn {
+  font-size: 0.78rem;
+  padding: 6px 4px;
+}
+
+/* ---- Project images picker modal (issue #184) ---- */
+
+.ib-picker-modal .modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.ib-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+.ib-picker-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.1s, border-color 0.1s, transform 0.05s;
+}
+.ib-picker-tile:hover {
+  background: #e9ecef;
+  border-color: #0d6efd;
+}
+.ib-picker-tile:active {
+  transform: scale(0.98);
+}
+.ib-picker-tile img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #fff;
+  display: block;
+}
+.ib-picker-tile-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.74rem;
+  color: #495057;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---- Canvas area ----------------------------------------------------- */
 
 .ib-canvas-area {
