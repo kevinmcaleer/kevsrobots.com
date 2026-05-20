@@ -9,6 +9,7 @@ description: View project details
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/image-viewer.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/instruction-viewer.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
 <div class="container py-4">
@@ -114,6 +115,44 @@ description: View project details
             <i class="fas fa-download me-1"></i> Total downloads: <span id="view-files-total-count">0</span>
           </div>
           <div id="view-files" class="list-group"></div>
+        </div>
+
+        <!-- Build Instructions (issue #178, Phase 2a) — read-only slideshow.
+             Hidden by default; instruction-viewer.js fetches the public
+             /api/projects/{id}/instruction endpoint and reveals the shell
+             only once an instruction with at least one step is confirmed.
+             The slideshow itself is just <img> swapping (each step's
+             canvas_json is pre-rendered to a PNG at init time). -->
+        <div id="instruction-slideshow-section" class="mb-4 d-none">
+          <h4><i class="fas fa-list-ol me-3 text-primary"></i> Build Instructions</h4>
+          <div id="iv-frame" class="iv-frame">
+            <div id="iv-step-badge" class="iv-step-badge">Step 1 of 1</div>
+            <button type="button" id="iv-fullscreen" class="iv-fullscreen-btn"
+                    aria-label="View fullscreen" title="View fullscreen">
+              <i class="fas fa-expand"></i>
+            </button>
+            <button type="button" id="iv-prev" class="iv-nav-btn iv-nav-prev"
+                    aria-label="Previous step" title="Previous step">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button type="button" id="iv-next" class="iv-nav-btn iv-nav-next"
+                    aria-label="Next step" title="Next step">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <div id="iv-stage" class="iv-stage"></div>
+            <div id="iv-spinner" class="iv-spinner">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading instructions&hellip;</span>
+              </div>
+              <div class="small">Preparing slideshow&hellip;</div>
+            </div>
+          </div>
+          <div id="iv-dots" class="iv-dots" role="tablist" aria-label="Instruction steps"></div>
+          <div id="iv-step-meta" class="iv-step-meta">
+            <h4 id="iv-step-title"></h4>
+            <p id="iv-step-description" class="iv-step-description d-none"></p>
+          </div>
+          <div id="iv-fallback" class="iv-fallback-list d-none"></div>
         </div>
 
         <!-- BOM -->
@@ -533,6 +572,7 @@ description: View project details
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/instruction-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -796,6 +836,12 @@ description: View project details
       loadVideos();
       loadJournal();
       loadMakes(project);
+
+      // Issue #178 Phase 2a — public read-only slideshow viewer for
+      // build instructions. Self-hides if no instruction / no steps.
+      if (window.InstructionViewer && typeof window.InstructionViewer.init === 'function') {
+        try { window.InstructionViewer.init(project.id); } catch (_) {}
+      }
 
       // Load interactions (likes + comments) via Chatter
       var projectUrl = 'projects/view.html?id=' + projectId;

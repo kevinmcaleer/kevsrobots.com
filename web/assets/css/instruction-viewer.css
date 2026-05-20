@@ -1,0 +1,302 @@
+/*
+ * Instruction Viewer — Phase 2a (issue #178).
+ *
+ * Read-only slideshow shown inline on the project view page. Each step
+ * is pre-rendered to a PNG dataURL at init time, so this stylesheet
+ * styles a sequence of <img> elements (one visible at a time) plus
+ * navigation controls — there's no Fabric.js runtime in the viewer DOM.
+ */
+
+#instruction-slideshow-section {
+  margin-bottom: 1.5rem;
+}
+
+#instruction-slideshow-section h4 {
+  margin-bottom: 0.75rem;
+}
+
+.iv-frame {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 900px;
+}
+
+.iv-stage {
+  position: relative;
+  width: 100%;
+  /* 1200x900 canvas → 4:3 aspect ratio */
+  aspect-ratio: 4 / 3;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.iv-stage img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Soft grey panel for steps with no canvas_json (text-only) — keeps the
+   slideshow shell consistent while making it clear there's no diagram. */
+.iv-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  background: #f1f3f5;
+  color: #495057;
+}
+
+.iv-placeholder-title {
+  font-size: 1.4rem;
+  font-weight: 500;
+  max-width: 80%;
+}
+
+/* "Step N of M" badge — top-left corner of the frame. */
+.iv-step-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(33, 37, 41, 0.85);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Fullscreen toggle — top-right corner. */
+.iv-fullscreen-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #495057;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.15s, color 0.15s;
+}
+
+.iv-fullscreen-btn:hover {
+  background: #ffffff;
+  color: #212529;
+}
+
+/* Prev / Next arrow buttons — overlaid on the left/right edges of the
+   frame, vertically centred. */
+.iv-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #dee2e6;
+  background: rgba(255, 255, 255, 0.9);
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.iv-nav-btn:hover {
+  background: #ffffff;
+  color: #212529;
+}
+
+.iv-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.iv-nav-prev { left: 10px; }
+.iv-nav-next { right: 10px; }
+
+/* Loading spinner overlay while pre-rendering. */
+.iv-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #f8f9fa;
+  color: #6c757d;
+  z-index: 3;
+}
+
+/* Dot indicators below the frame — one per step. */
+.iv-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 0.75rem auto 0;
+  max-width: 900px;
+  padding: 0 0.5rem;
+}
+
+.iv-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: #ced4da;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.iv-dot:hover {
+  background: #adb5bd;
+}
+
+.iv-dot.is-active {
+  background: #4A90D9;
+  transform: scale(1.2);
+}
+
+/* Step title + description under the slideshow. */
+.iv-step-meta {
+  max-width: 900px;
+  margin: 1rem auto 0;
+  padding: 0 0.25rem;
+}
+
+.iv-step-meta h4 {
+  margin-bottom: 0.35rem;
+  color: #212529;
+}
+
+.iv-step-meta .iv-step-description {
+  color: #495057;
+  margin-bottom: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Text-only fallback list (Fabric failed to load). */
+.iv-fallback-list {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+}
+
+.iv-fallback-list ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.iv-fallback-list li {
+  margin-bottom: 0.75rem;
+}
+
+.iv-fallback-list li:last-child {
+  margin-bottom: 0;
+}
+
+.iv-fallback-list .iv-fallback-desc {
+  display: block;
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 0.15rem;
+  white-space: pre-wrap;
+}
+
+/* Fullscreen mode — dark backdrop, canvas centred and scaled to viewport. */
+.iv-frame:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  border-radius: 0;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.iv-frame:fullscreen .iv-stage {
+  aspect-ratio: 4 / 3;
+  width: auto;
+  height: 100%;
+  max-width: calc(100vh * 4 / 3);
+  max-height: 100%;
+  background: #ffffff;
+  border-radius: 4px;
+}
+
+.iv-frame:fullscreen .iv-step-badge {
+  top: 24px;
+  left: 24px;
+  font-size: 1rem;
+  padding: 6px 14px;
+}
+
+.iv-frame:fullscreen .iv-fullscreen-btn {
+  top: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+}
+
+.iv-frame:fullscreen .iv-nav-btn {
+  width: 48px;
+  height: 48px;
+}
+
+/* Safari / older WebKit fullscreen vendor variant. */
+.iv-frame:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  background: #1a1a1a;
+}
+
+@media (max-width: 575px) {
+  .iv-nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .iv-step-badge {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+  }
+  .iv-step-meta h4 {
+    font-size: 1.1rem;
+  }
+}
