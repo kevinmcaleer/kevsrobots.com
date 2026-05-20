@@ -131,8 +131,13 @@ async def test_get_by_slug_404_for_unknown(client) -> None:
 
 
 @pytest.mark.asyncio
-async def test_update_title_does_not_regenerate_slug_by_default(client) -> None:
-    """Renaming a project leaves the slug alone so inbound links stay live."""
+async def test_update_title_auto_regenerates_slug(client) -> None:
+    """Issue #190: a title change automatically refreshes the slug.
+
+    Inbound links to the old slug still work via the
+    ``project_slug_history`` fallback + 301 redirect — see
+    ``test_old_slug_redirects_to_canonical`` below.
+    """
     headers = make_auth_header()
     created = await client.post(
         "/api/projects",
@@ -149,7 +154,7 @@ async def test_update_title_does_not_regenerate_slug_by_default(client) -> None:
         headers=headers,
     )
     assert response.status_code == 200
-    assert response.json()["slug"] == "old-title"
+    assert response.json()["slug"] == "brand-new-title"
 
 
 @pytest.mark.asyncio

@@ -87,6 +87,41 @@ class Project(Base):
     )
 
 
+# --- Project slug history (issue #190) -----------------------------------
+#
+# Every slug a project has ever used. When a project's title (and therefore
+# its slug) changes we insert a row here so the OLD slug keeps resolving via
+# the by-slug lookup — the route emits a 301 to the canonical URL so shared
+# links / search results don't break the moment an owner renames.
+#
+# Composite (author_username, slug) would in practice be unique most of the
+# time, but we deliberately DO NOT enforce uniqueness: if a project is
+# renamed back to a previous title, the history just gains another row and
+# the most-recent retirement timestamp wins. The router resolves by slug
+# alone (scoped by author via the FK join), so duplicates don't break the
+# lookup.
+#
+# Brand-new table — ``create_all`` handles it, no ALTER helper required.
+
+
+class ProjectSlugHistory(Base):
+    __tablename__ = "project_slug_history"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    # The slug that USED to point at this project. Indexed for the
+    # by-slug-fallback lookup ("does any historical row claim this slug?").
+    slug: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+    # Captured at the time the slug stopped being canonical.
+    retired_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
 class ProjectReport(Base):
     __tablename__ = "project_reports"
 

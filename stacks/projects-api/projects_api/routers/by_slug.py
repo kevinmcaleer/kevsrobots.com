@@ -28,6 +28,7 @@ from __future__ import annotations
 from typing import Optional
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_optional_user
@@ -48,7 +49,7 @@ from . import journal as journal_router_module
 from . import links as links_router_module
 from . import makes as makes_router_module
 from . import projects as projects_router_module
-from .projects import resolve_project_id
+from .projects import resolve_project_id, resolve_project_id_with_redirect
 
 router = APIRouter(prefix="/api/projects", tags=["projects-by-slug"])
 
@@ -62,14 +63,29 @@ async def get_project_by_slug(
     slug: str,
     user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
-) -> ProjectResponse:
+):
     """Look up a project by ``(owner, slug)``.
 
     Returned shape matches the id-based ``GET /api/projects/{id}`` so
     the frontend can call either endpoint and converge on the same
     rendering code.
+
+    Issue #190: if ``slug`` is a historical (retired) slug the response
+    is a 301 redirect to the project's canonical ``(owner, current_slug)``
+    URL so browsers update the URL bar and SEO consolidates on the
+    latest slug. The nested-resource endpoints below intentionally do
+    NOT redirect — they're called server-to-server by the public view
+    page after it has already followed the redirect on the parent
+    resource, so a second redirect would be wasted work.
     """
-    project_id = await resolve_project_id(session, owner, slug)
+    project_id, canonical_slug = await resolve_project_id_with_redirect(
+        session, owner, slug
+    )
+    if canonical_slug is not None and canonical_slug != slug:
+        return RedirectResponse(
+            url=f"/api/projects/by-slug/{owner}/{canonical_slug}",
+            status_code=301,
+        )
     return await projects_router_module.get_project(
         project_id=project_id, user=user, session=session
     )
