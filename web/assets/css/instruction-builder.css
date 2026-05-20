@@ -3,7 +3,7 @@
  *
  * Five zones in a single grid:
  *   E. Title bar (top, full-width)
- *   A. Activity rail (54px, left)
+ *   A. Activity rail (64px, left)
  *   B. Secondary pane (240px, resizable)
  *   C. Canvas (flex)
  *   F. Filmstrip (bottom, collapsible)
@@ -163,7 +163,7 @@ body.instruction-builder-page {
 .ib-main {
   flex: 1;
   display: grid;
-  grid-template-columns: 54px auto 1fr;
+  grid-template-columns: 64px auto 1fr;
   grid-template-rows: 1fr auto;
   grid-template-areas:
     "rail secondary canvas"
@@ -984,22 +984,24 @@ body.instruction-builder-page {
   border: 1px solid #1a1a1a;
   color: #f4f1ea;
   border-radius: 4px;
-  height: 26px;
-  font-size: 0.86rem;
+  height: 30px;
+  font-size: 0.95rem;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  /* Browser default button line-height (~1.5) plus FA's intrinsic
-     top-whitespace makes glyphs render high. Pin to 1 and force the
-     inner <i> to inline-block so the icon centers on the flex axis. */
+  /* Slight padding-top compensates for FA glyphs whose visible centre
+     sits a hair above their flex-cell centre. Without this the icons
+     visibly overlap the top of the button. */
+  padding: 2px 0 0 0;
   line-height: 1;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 .ib-hud-action i {
-  display: inline-block;
+  display: block;
   line-height: 1;
+  /* FA glyph baseline ↔ flex centre nudge. */
+  vertical-align: middle;
 }
 .ib-hud-action:hover {
   background: #444;

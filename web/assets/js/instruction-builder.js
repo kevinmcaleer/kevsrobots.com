@@ -1856,6 +1856,11 @@
       state.projectImages = await listProjectImages();
       recomputeBackgroundPhotoIds();
       renderPhotosGrid();
+      // Layer labels for pre-fix legacy images rely on a lookup by
+      // ibSourceUrl into state.projectImages — re-render now that the
+      // list is populated so the names appear without needing a step
+      // switch.
+      renderLayersList();
     } catch (_) {
       dom.photosGrid.innerHTML =
         '<div class="ib-photos-empty">Couldn\'t load your photos. Refresh to try again.</div>';
@@ -2889,12 +2894,28 @@
   // 18. LAYERS PANE
   // ====================================================================
 
+  // Backfill: pre-fix canvases stored `ibSourceUrl` but not `ibFilename`.
+  // Recover a friendly name from the project-image list when the source
+  // URL matches one of its IDs, so the Layers pane labels work for
+  // legacy steps without a re-edit.
+  function filenameFromSourceUrl(url) {
+    if (!url) return '';
+    var m = /\/api\/projects\/\d+\/images\/(\d+)\/view/.exec(url);
+    if (!m) return '';
+    var id = parseInt(m[1], 10);
+    if (!id || !state.projectImages) return '';
+    var match = state.projectImages.find(function (im) { return im.id === id; });
+    if (!match) return '';
+    return match.filename || match.caption || '';
+  }
+
   function objectKindLabel(o) {
     if (!o) return { icon: 'fas fa-question', label: 'Object' };
     // For image objects, prefer the source filename when we have one —
     // a stack of "Image, Image, Image" is useless on a step with several
-    // photos / project-images dropped in.
-    var fname = (o.ibFilename || '').trim();
+    // photos / project-images dropped in. Falls back to a Photos-pane
+    // lookup for legacy canvases written before ibFilename was a thing.
+    var fname = (o.ibFilename || '').trim() || filenameFromSourceUrl(o.ibSourceUrl);
     if (o.ibRole === 'background') {
       return { icon: 'fas fa-image', label: fname ? ('Background: ' + fname) : 'Background image' };
     }
