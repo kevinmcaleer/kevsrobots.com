@@ -62,7 +62,13 @@ description: Download analytics for your project
     <div class="card border-0 shadow-sm mb-4">
       <div class="card-body">
         <h5 class="mb-3"><i class="fas fa-chart-line me-2"></i>Downloads over the last 30 days</h5>
-        <canvas id="daily-chart" height="100"></canvas>
+        <!-- Fixed-height relative wrapper so Chart.js's responsive resize
+             can't grow the canvas indefinitely. With maintainAspectRatio:
+             false the canvas fills its parent; without a constrained
+             parent it grows on every redraw. -->
+        <div style="position: relative; height: 320px;">
+          <canvas id="daily-chart"></canvas>
+        </div>
       </div>
     </div>
 
