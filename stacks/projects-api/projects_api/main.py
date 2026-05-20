@@ -60,6 +60,7 @@ from .routers import (
     parts_talk,
     projects,
     remixes,
+    schematics,
     social_og,
     staff_picks,
     users,
@@ -195,6 +196,9 @@ def create_app() -> FastAPI:
     # Issue #178 Phase 0: build instructions (step-by-step outlines).
     # Phase 1 will layer a Fabric.js canvas on top of these rows.
     app.include_router(instructions.router)
+    # Issue #178 Phase E2: per-project schematic (one schematic per
+    # project for v1; opaque JSON blob stored in project_schematics).
+    app.include_router(schematics.router)
     app.include_router(journal.router)
     app.include_router(moderation.router)
     # Issue #123: parts catalog moderation (reports + community merges).

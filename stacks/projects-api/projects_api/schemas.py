@@ -386,6 +386,40 @@ class InstructionResponse(BaseModel):
     steps: list[InstructionStepResponse] = Field(default_factory=list)
 
 
+# --- Project schematic (issue #178 Phase E2) ----------------------------
+#
+# One schematic per project for v1. The graph (symbol instances + nets +
+# labels) is an opaque JSON blob in ``schematic_data`` — the server
+# stores and returns it verbatim, the frontend owns the shape. Mirrors
+# ``Instruction{Create,Update,Response}`` for surface consistency.
+
+
+class ProjectSchematicCreate(BaseModel):
+    """Empty body permitted — creates the row, frontend can update later."""
+
+    name: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+    schematic_data: Optional[str] = None
+
+
+class ProjectSchematicUpdate(BaseModel):
+    """Partial — fields omitted are left untouched."""
+
+    name: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+    schematic_data: Optional[str] = None
+
+
+class ProjectSchematicResponse(BaseModel):
+    id: int
+    project_id: int
+    name: Optional[str] = None
+    description: Optional[str] = None
+    schematic_data: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
 # --- Build instructions export (issue #178, Phase 2b) --------------------
 #
 # Hybrid PDF pipeline: the browser renders each Fabric.js canvas to a

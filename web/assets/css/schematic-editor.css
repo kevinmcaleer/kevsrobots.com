@@ -1,0 +1,397 @@
+/*
+ * Schematic Editor — issue #178 Phase E2.
+ *
+ * Three-region layout:
+ *   - Title bar  (top, full-width)
+ *   - Tools pane (left, 240px)
+ *   - Canvas + connections table (centre column; canvas on top,
+ *     table beneath, both flex children of the same column)
+ *
+ * The page is desktop-first; small viewports fall back to a stacked
+ * single-column scroll via the media query at the bottom.
+ */
+
+/* Site chrome: hide the footer / social bar so the editor uses the
+   full viewport. Site header / nav stay so the user can navigate
+   out normally. */
+body.schematic-editor-page #footer,
+body.schematic-editor-page .socials-bar,
+body.schematic-editor-page footer {
+  display: none !important;
+}
+body.schematic-editor-page > .container-fluid {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ---------- Workspace shell ---------- */
+
+.se-workspace {
+  --se-titlebar-h: 48px;
+  --se-tools-w: 240px;
+  --se-table-h: 240px;
+  --se-ink: #222;
+  --se-brand-red: #c8312a;
+  --se-bg: #f7f8fa;
+  --se-panel: #ffffff;
+  --se-border: #e2e6ea;
+  --se-muted: #7a8087;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px); /* approx site nav height; close enough */
+  background: var(--se-bg);
+  color: var(--se-ink);
+  font-size: 0.92rem;
+}
+
+/* ---------- Title bar ---------- */
+
+.se-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: var(--se-titlebar-h);
+  padding: 0 1rem;
+  background: var(--se-panel);
+  border-bottom: 1px solid var(--se-border);
+  flex: 0 0 auto;
+}
+.se-titlebar-left, .se-titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.se-titlebar-center {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+.se-project-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.se-save-status {
+  font-size: 0.85rem;
+  color: var(--se-muted);
+}
+.se-titlebar-link {
+  color: var(--se-ink);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.se-titlebar-link:hover { color: var(--se-brand-red); }
+.se-titlebar-btn {
+  border: 1px solid var(--se-border);
+  background: var(--se-panel);
+  color: var(--se-ink);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.se-titlebar-btn:hover {
+  border-color: var(--se-brand-red);
+  color: var(--se-brand-red);
+}
+
+/* ---------- Loading / not-owner / error states ---------- */
+
+.se-loading,
+.se-not-owner,
+.se-error {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: var(--se-muted);
+}
+.se-not-owner .se-icon,
+.se-error .se-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--se-muted);
+}
+.se-error .se-icon { color: var(--se-brand-red); }
+
+/* ---------- Main shell: tools | (canvas / table) ---------- */
+
+.se-main {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: var(--se-tools-w) 1fr;
+  min-height: 0;
+}
+
+/* ---------- Tools pane ---------- */
+
+.se-tools {
+  background: var(--se-panel);
+  border-right: 1px solid var(--se-border);
+  overflow-y: auto;
+  padding: 0.75rem 0.75rem 1.5rem;
+}
+.se-tools-section { margin-bottom: 1rem; }
+.se-tools-section-title {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  color: var(--se-muted);
+  margin: 0.25rem 0 0.5rem;
+  font-weight: 600;
+}
+.se-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem;
+}
+.se-tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background: #fbfbfc;
+  border: 1px solid var(--se-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.25rem;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--se-ink);
+  transition: border-color 0.1s, background 0.1s;
+}
+.se-tool-btn i { font-size: 1rem; }
+.se-tool-btn:hover {
+  border-color: var(--se-brand-red);
+  background: #fff;
+}
+.se-tool-btn.is-active {
+  background: var(--se-brand-red);
+  color: #fff;
+  border-color: var(--se-brand-red);
+}
+
+/* ---------- Symbol list (place-symbol library) ---------- */
+
+.se-symbol-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--se-border);
+  border-radius: 6px;
+  background: #fbfbfc;
+}
+.se-symbol-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--se-border);
+  font-size: 0.85rem;
+}
+.se-symbol-item:last-child { border-bottom: none; }
+.se-symbol-item:hover { background: #fff; }
+.se-symbol-item.is-pending {
+  background: rgba(200, 49, 42, 0.08);
+  border-left: 3px solid var(--se-brand-red);
+  padding-left: calc(0.5rem - 3px);
+}
+.se-symbol-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid var(--se-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--se-muted);
+  font-size: 0.9rem;
+  flex: 0 0 auto;
+}
+.se-symbol-meta { display: flex; flex-direction: column; line-height: 1.2; }
+.se-symbol-name { font-weight: 500; }
+.se-symbol-sub { font-size: 0.72rem; }
+.se-tools-secondary-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--se-border);
+  color: var(--se-muted);
+  border-radius: 6px;
+  padding: 0.4rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.se-tools-secondary-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.se-tools-help { margin-top: 1.25rem; }
+.se-tools-hint {
+  font-size: 0.78rem;
+  color: var(--se-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ---------- Canvas area ---------- */
+
+.se-canvas-area {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.se-canvas-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  background: var(--se-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+.se-canvas-wrap canvas {
+  background: #fff;
+  border: 1px solid var(--se-border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* The Fabric.js wrapper div Fabric inserts around the canvas — we
+   want our positioning rules to apply to it instead of just the
+   inner element. Fabric assigns the canvas-container class to it. */
+.se-canvas-wrap .canvas-container {
+  margin: 0 auto;
+}
+
+/* ---------- Symbol HUD (rotate / flip / delete) ---------- */
+
+.se-symbol-hud {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  background: #3a3a3a;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%);
+}
+.se-hud-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+.se-hud-btn:hover { background: rgba(255,255,255,0.12); }
+.se-hud-btn-danger:hover { background: var(--se-brand-red); }
+
+/* ---------- Connections table ---------- */
+
+.se-table-wrap {
+  flex: 0 0 var(--se-table-h);
+  background: var(--se-panel);
+  border-top: 1px solid var(--se-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.se-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--se-border);
+  background: #fbfbfc;
+}
+.se-table-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.se-table-count {
+  font-size: 0.85rem;
+  color: var(--se-muted);
+  margin-left: 0.35rem;
+  font-weight: 400;
+}
+.se-table-hint { margin: 0; }
+
+.se-table-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+.se-table { margin-bottom: 0; }
+.se-table thead th {
+  position: sticky;
+  top: 0;
+  background: #fbfbfc;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--se-muted);
+  border-bottom: 1px solid var(--se-border);
+  z-index: 1;
+}
+.se-th-net,  .se-td-net  { width: 16%; }
+.se-th-from, .se-td-from { width: 22%; }
+.se-th-to,   .se-td-to   { width: 22%; }
+.se-th-desc, .se-td-desc { width: 40%; }
+.se-td-net, .se-td-from, .se-td-to { font-family: ui-monospace, SFMono-Regular, monospace; }
+.se-table-row { cursor: pointer; }
+.se-table-row:hover { background: #fafbfc; }
+.se-table-row.is-selected {
+  background: rgba(200, 49, 42, 0.07);
+  border-left: 3px solid var(--se-brand-red);
+}
+.se-table-row.is-selected td:first-child { padding-left: calc(0.5rem - 3px); }
+
+.se-desc-input {
+  font-size: 0.85rem;
+  border-color: transparent;
+  background: transparent;
+  padding: 0.15rem 0.4rem;
+}
+.se-desc-input:focus {
+  background: #fff;
+  border-color: var(--se-brand-red);
+}
+
+/* ---------- Mobile fallback ---------- */
+
+@media (max-width: 768px) {
+  .se-workspace { height: auto; min-height: calc(100vh - 56px); }
+  .se-main {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .se-tools {
+    border-right: none;
+    border-bottom: 1px solid var(--se-border);
+    max-height: 240px;
+  }
+  .se-canvas-area { min-height: 60vh; }
+  .se-table-wrap { flex: 0 0 auto; max-height: 320px; }
+  .se-titlebar { flex-wrap: wrap; height: auto; padding: 0.4rem 0.6rem; }
+  .se-titlebar-center { flex: 1 1 100%; justify-content: flex-start; }
+}

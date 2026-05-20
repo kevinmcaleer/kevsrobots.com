@@ -1,0 +1,199 @@
+---
+title: Schematic Editor
+layout: default
+description: Edit the schematic for your project
+permalink: /projects/schematic/edit.html
+hide_nibsy: true
+---
+
+{% include nav_projects.html %}
+
+<link rel="stylesheet" href="/assets/css/schematic-editor.css?v={{ site.time | date: '%s' }}">
+
+<!-- Tag the body so site-level CSS rules (footer hide, container reset)
+     scope to this workspace only. -->
+<script>document.body.classList.add('schematic-editor-page');</script>
+
+<div class="se-workspace" id="se-workspace">
+
+  <!-- ===========================================================
+       Title bar — Back / centred title + save status / exports
+       =========================================================== -->
+  <div class="se-titlebar" id="se-titlebar">
+    <div class="se-titlebar-left">
+      <a id="se-back-link" href="/projects/instructions/edit.html" class="se-titlebar-link">
+        <i class="fas fa-arrow-left me-1"></i> Back to project editor
+      </a>
+    </div>
+    <div class="se-titlebar-center">
+      <span class="se-project-title" id="se-project-title">Loading&hellip;</span>
+      <span class="se-save-status" id="se-save-status" aria-live="polite"></span>
+    </div>
+    <div class="se-titlebar-right">
+      <button type="button" class="se-titlebar-btn" id="se-export-csv"
+              title="Download the connections table as CSV">
+        <i class="fas fa-file-csv me-1"></i> Export CSV
+      </button>
+      <button type="button" class="se-titlebar-btn" id="se-export-png"
+              title="Download the schematic as a PNG image">
+        <i class="fas fa-file-image me-1"></i> Export PNG
+      </button>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       Loading / not-owner / error states
+       =========================================================== -->
+  <div class="se-loading" id="se-loading">
+    <i class="fas fa-spinner fa-spin me-2"></i> Loading schematic editor&hellip;
+  </div>
+
+  <div class="se-not-owner d-none" id="se-not-owner">
+    <div class="se-icon"><i class="fas fa-lock"></i></div>
+    <h4><i class="fas fa-lock me-3"></i> You don't own this project</h4>
+    <p class="text-muted">Only the project author can edit the schematic.</p>
+    <a href="/projects/" class="btn btn-outline-primary mt-2">
+      <i class="fas fa-arrow-left me-1"></i> Back to projects
+    </a>
+  </div>
+
+  <div class="se-error d-none" id="se-error">
+    <div class="se-icon text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+    <h4><i class="fas fa-exclamation-triangle me-3 text-danger"></i> Couldn't load this project</h4>
+    <p class="text-muted" id="se-error-detail">The project may not exist, or you may need to log in.</p>
+    <a href="/projects/" class="btn btn-outline-primary mt-2">
+      <i class="fas fa-arrow-left me-1"></i> Back to projects
+    </a>
+  </div>
+
+  <!-- ===========================================================
+       Main editor shell — hidden until loader resolves
+       =========================================================== -->
+  <div class="se-main d-none" id="se-main">
+
+    <!-- Tools pane (left, 240px) -->
+    <aside class="se-tools" id="se-tools" aria-label="Schematic tools">
+
+      <section class="se-tools-section">
+        <h6 class="se-tools-section-title">Tools</h6>
+        <div class="se-tool-grid">
+          <button type="button" class="se-tool-btn is-active" data-tool="select" title="Select / move">
+            <i class="fas fa-mouse-pointer"></i><span>Select</span>
+          </button>
+          <button type="button" class="se-tool-btn" data-tool="net" title="Draw net (wire)">
+            <i class="fas fa-bolt"></i><span>Net</span>
+          </button>
+          <button type="button" class="se-tool-btn" data-tool="symbol" title="Place symbol (pick one below)">
+            <i class="fas fa-microchip"></i><span>Symbol</span>
+          </button>
+          <button type="button" class="se-tool-btn" data-tool="label" title="Net label">
+            <i class="fas fa-tag"></i><span>Label</span>
+          </button>
+          <button type="button" class="se-tool-btn" data-tool="gnd" title="Place GND symbol">
+            <i class="fas fa-arrow-down"></i><span>GND</span>
+          </button>
+          <button type="button" class="se-tool-btn" data-tool="vplus" title="Place V+ rail">
+            <i class="fas fa-plug"></i><span>V+</span>
+          </button>
+          <button type="button" class="se-tool-btn" data-tool="rotate" title="Rotate selected symbol 90&deg;">
+            <i class="fas fa-rotate-right"></i><span>Rotate</span>
+          </button>
+          <button type="button" class="se-tool-btn" data-tool="move" title="Pan / move mode">
+            <i class="fas fa-arrows-up-down-left-right"></i><span>Move</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="se-tools-section">
+        <h6 class="se-tools-section-title">Place symbol</h6>
+        <ul class="se-symbol-list" id="se-symbol-list" role="listbox" aria-label="Symbol library">
+          <!-- Populated by JS from SYMBOL_LIBRARY -->
+        </ul>
+        <button type="button" class="se-tools-secondary-btn" id="se-open-symbol-designer" disabled
+                title="Coming in the next release">
+          <i class="fas fa-plus me-1"></i> open Symbol Designer
+        </button>
+      </section>
+
+      <section class="se-tools-section se-tools-help">
+        <p class="se-tools-hint">
+          Click a symbol above, then click on the canvas to place it.<br>
+          With the <strong>Net</strong> tool, click a pin then click another pin to draw a wire.
+        </p>
+      </section>
+    </aside>
+
+    <!-- Canvas + connections table column -->
+    <main class="se-canvas-area" id="se-canvas-area" aria-label="Schematic canvas">
+      <div class="se-canvas-wrap" id="se-canvas-wrap">
+        <canvas id="se-canvas"></canvas>
+
+        <!-- Floating mini-HUD above selected symbols (rotate, flip, delete) -->
+        <div id="se-symbol-hud" class="se-symbol-hud" hidden role="toolbar"
+             aria-label="Selected symbol actions">
+          <button type="button" class="se-hud-btn" data-hud-action="rotate-ccw"
+                  title="Rotate -90&deg;">
+            <i class="fas fa-rotate-left"></i>
+          </button>
+          <button type="button" class="se-hud-btn" data-hud-action="rotate-cw"
+                  title="Rotate +90&deg;">
+            <i class="fas fa-rotate-right"></i>
+          </button>
+          <button type="button" class="se-hud-btn" data-hud-action="flip-h"
+                  title="Flip horizontally">
+            <i class="fas fa-arrows-left-right"></i>
+          </button>
+          <button type="button" class="se-hud-btn" data-hud-action="flip-v"
+                  title="Flip vertically">
+            <i class="fas fa-arrows-up-down"></i>
+          </button>
+          <button type="button" class="se-hud-btn se-hud-btn-danger"
+                  data-hud-action="delete" title="Delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="se-table-wrap" id="se-table-wrap">
+        <header class="se-table-header">
+          <h6 class="se-table-title">
+            <i class="fas fa-table me-3"></i> Connections
+            <span class="se-table-count" id="se-table-count"></span>
+          </h6>
+          <span class="se-table-hint text-muted small">
+            Auto-derived from the net graph. <em>Description</em> is editable.
+          </span>
+        </header>
+        <div class="se-table-scroll">
+          <table class="table table-sm table-hover se-table" id="se-table">
+            <thead>
+              <tr>
+                <th class="se-th-net">Net</th>
+                <th class="se-th-from">From</th>
+                <th class="se-th-to">To</th>
+                <th class="se-th-desc">Description</th>
+              </tr>
+            </thead>
+            <tbody id="se-table-body">
+              <tr class="se-table-empty">
+                <td colspan="4" class="text-muted text-center py-3">
+                  No connections yet &mdash; draw a wire between two pins to start.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!--
+  Fabric.js v6 (UMD build). v6 exposes window.fabric for browser
+  consumers; pinned to 6.4.0 to match the instruction builder so the two
+  pages share the same engine.
+-->
+<script src="https://cdn.jsdelivr.net/npm/fabric@6.4.0/dist/index.min.js"></script>
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/schematic-editor.js?v={{ site.time | date: '%s' }}"></script>
