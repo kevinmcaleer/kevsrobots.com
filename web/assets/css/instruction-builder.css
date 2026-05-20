@@ -1,10 +1,17 @@
 /*
- * Instruction Builder — Phase 1 (issue #178).
+ * Instruction Builder — A5 Activity-Rail layout (design_handoff_instructions_builder/).
  *
- * Full-screen three-panel workspace: left toolbar / centre canvas /
- * right step sidebar. Desktop only for this phase — tablet and mobile
- * fall back to a vertical scroll of the three panels, which is
- * readable but not optimised (Phase 1b polishes that).
+ * Five zones in a single grid:
+ *   E. Title bar (top, full-width)
+ *   A. Activity rail (54px, left)
+ *   B. Secondary pane (240px, resizable)
+ *   C. Canvas (flex)
+ *   F. Filmstrip (bottom, collapsible)
+ *
+ * Density: data-density="roomy" (default) | "compact" tweaks padding,
+ * filmstrip height, and thumbnail size. Set on .ib-workspace.
+ * The 5-zone shell is desktop-first; tablet/mobile fall back to a
+ * single-column scroll layout via the media query at the bottom.
  */
 
 /* Site-level: hide the footer/socials on this workspace so the builder
@@ -16,8 +23,6 @@ body.instruction-builder-page footer {
   display: none !important;
 }
 
-/* The default layout wraps everything in .container-fluid — kill its
-   bottom padding so the workspace meets the viewport edge. */
 body.instruction-builder-page > .container-fluid {
   padding: 0 !important;
   margin: 0 !important;
@@ -28,9 +33,7 @@ body.instruction-builder-page > .container-fluid {
 .ib-workspace {
   display: flex;
   flex-direction: column;
-  /* Site top_bar + navigation are roughly 56px each = ~112px. Subtract
-     that so the builder fills the rest of the viewport. Approximate is
-     fine — overflow is handled by the inner panels. */
+  /* Site top_bar + navigation are roughly 56px each. */
   height: calc(100vh - 56px);
   min-height: 600px;
   background: #f8f9fa;
@@ -38,33 +41,68 @@ body.instruction-builder-page > .container-fluid {
   overflow: hidden;
 }
 
-.ib-header {
-  flex: 0 0 52px;
+/* ---- Zone E: Title bar ----------------------------------------------- */
+
+.ib-titlebar {
+  flex: 0 0 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 0 14px;
   background: #fff;
   border-bottom: 1px solid #dee2e6;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
-.ib-header .ib-header-left,
-.ib-header .ib-header-right {
+.ib-titlebar-left,
+.ib-titlebar-right {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 260px;
+  gap: 10px;
+  min-width: 240px;
 }
-.ib-header .ib-header-right { justify-content: flex-end; }
+.ib-titlebar-right { justify-content: flex-end; }
 
-.ib-header .ib-header-center {
+.ib-titlebar-center {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   min-width: 0;
+}
+
+.ib-titlebar-link {
+  color: #495057;
+  text-decoration: none;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.ib-titlebar-link:hover { color: #0d6efd; }
+
+.ib-titlebar-btn {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  padding: 5px 10px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.ib-titlebar-btn:hover {
+  background: #f1f3f5;
+  border-color: #ced4da;
+}
+.ib-titlebar-btn.is-active,
+.ib-titlebar-btn[aria-pressed="true"] {
+  background: var(--bs-primary, #0d6efd);
+  border-color: var(--bs-primary, #0d6efd);
+  color: #fff;
 }
 
 .ib-project-title {
@@ -76,7 +114,7 @@ body.instruction-builder-page > .container-fluid {
 }
 
 .ib-save-status {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #6c757d;
   min-width: 110px;
   text-align: left;
@@ -85,62 +123,336 @@ body.instruction-builder-page > .container-fluid {
 .ib-save-status.is-saved { color: #198754; }
 .ib-save-status.is-error { color: #dc3545; }
 
-/* ---- Export dropdown + progress (Phase 2b / 2c) --------------------- */
-
 .ib-export-progress {
   display: inline-flex;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #6c757d;
   white-space: nowrap;
   max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.ib-export-progress.is-error {
-  color: #dc3545;
-}
+.ib-export-progress.is-error { color: #dc3545; }
 
-.ib-export-menu {
-  min-width: 14rem;
-}
+.ib-export-menu { min-width: 14rem; }
 
-/* ---- Main grid (toolbar / canvas / sidebar) -------------------------- */
+/* ---- Main grid: rail | secondary | canvas + filmstrip ---------------- */
 
 .ib-main {
   flex: 1;
   display: grid;
-  grid-template-columns: 280px 1fr 280px;
-  min-height: 0; /* allow children to scroll */
+  grid-template-columns: 54px auto 1fr;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "rail secondary canvas"
+    "film film       film";
+  min-height: 0;
+  overflow: hidden;
 }
 
-.ib-toolbar,
-.ib-sidebar {
+/* ---- Zone A: Activity rail ------------------------------------------- */
+
+.ib-rail {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 4px;
+  background: #fafafa;
+  border-right: 1px solid #dee2e6;
+  overflow: hidden;
+}
+
+.ib-rail-btn {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  padding: 6px 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #495057;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+.ib-rail-btn:hover {
+  background: #f1f3f5;
+  color: #212529;
+}
+.ib-rail-btn.is-active {
+  background: #fff;
+  border-color: #e9ecef;
+  color: var(--bs-primary, #0d6efd);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+}
+.ib-rail-btn.is-active::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--bs-primary, #c8312a);
+}
+.ib-rail-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.ib-rail-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.ib-rail-spacer { flex: 1; }
+.ib-rail-settings { margin-top: 0; }
+
+/* ---- Zone B: Secondary pane (resizable) ------------------------------ */
+
+.ib-secondary {
+  grid-area: secondary;
+  position: relative;
   background: #fff;
   border-right: 1px solid #dee2e6;
-  overflow-y: auto;
-  padding: 12px;
-}
-.ib-sidebar {
-  border-right: none;
-  border-left: 1px solid #dee2e6;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  max-width: 400px;
 }
 
-.ib-toolbar-section {
-  margin-bottom: 16px;
+.ib-secondary.is-collapsed {
+  width: 0 !important;
+  min-width: 0;
+  border-right: none;
 }
-.ib-toolbar-section + .ib-toolbar-section {
-  border-top: 1px solid #f1f3f5;
+.ib-secondary.is-collapsed .ib-pane,
+.ib-secondary.is-collapsed .ib-secondary-resize {
+  display: none;
+}
+
+.ib-secondary-resize {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -3px;
+  width: 6px;
+  cursor: ew-resize;
+  z-index: 5;
+  background: transparent;
+}
+.ib-secondary-resize:hover,
+.ib-secondary-resize.is-dragging {
+  background: linear-gradient(to right, transparent 40%, rgba(13, 110, 253, 0.3) 50%, transparent 60%);
+}
+
+.ib-pane {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.ib-pane.is-active {
+  display: flex;
+}
+
+.ib-pane-header {
+  flex: 0 0 auto;
+  padding: 10px 12px 6px;
+  border-bottom: 1px solid #f1f3f5;
+}
+.ib-pane-title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #212529;
+  display: flex;
+  align-items: center;
+}
+
+.ib-pane-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+}
+
+[data-density="compact"] .ib-pane-header { padding: 6px 10px 4px; }
+[data-density="compact"] .ib-pane-body { padding: 6px 10px 10px; }
+
+.ib-pane-section {
+  margin-bottom: 14px;
+}
+.ib-pane-section + .ib-pane-section {
   padding-top: 12px;
+  border-top: 1px solid #f1f3f5;
 }
-.ib-toolbar-section h6 {
-  font-size: 0.7rem;
+.ib-pane-section-title {
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #868e96;
   font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.ib-pane-hint {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.ib-pane-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: #495057;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.ib-pane-btn:hover {
+  background: #e9ecef;
+}
+.ib-pane-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Stub panes (BOM / Assets / Circuit) */
+.ib-pane-stub {
+  text-align: center;
+  color: #495057;
+  font-size: 0.85rem;
+  padding: 20px 6px;
+}
+.ib-pane-stub-icon {
+  font-size: 2rem;
+  color: #adb5bd;
+  margin-bottom: 10px;
+}
+.ib-pane-stub p { margin-bottom: 10px; line-height: 1.4; }
+
+/* ---- Photos pane ---------------------------------------------------- */
+
+.ib-photos-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.ib-photos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   margin-bottom: 8px;
 }
+[data-density="compact"] .ib-photos-grid { gap: 6px; }
+
+.ib-photos-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px 6px;
+}
+.ib-photos-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px 8px;
+  color: #6c757d;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.ib-photo-tile {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1.5px solid #dee2e6;
+  background: #f8f9fa;
+  cursor: grab;
+  transition: border-color 0.1s, transform 0.05s;
+}
+.ib-photo-tile:hover { border-color: #adb5bd; }
+.ib-photo-tile:active { cursor: grabbing; transform: scale(0.98); }
+.ib-photo-tile.is-selected {
+  outline: 2px solid var(--bs-primary, #0d6efd);
+  outline-offset: -2px;
+}
+.ib-photo-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ib-photo-tile-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3px 5px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+  color: #fff;
+  font-size: 0.66rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-photo-tile-badges {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: flex;
+  gap: 3px;
+}
+.ib-photo-tile-badge {
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 0.62rem;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ib-photo-tile-badge.is-star { background: #f0ad4e; }
+
+.ib-photo-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  border: 1.5px dashed #ced4da;
+  background: #fbfbfc;
+  color: #adb5bd;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.ib-photo-add:hover {
+  background: #f1f3f5;
+  border-color: #adb5bd;
+  color: #495057;
+}
+
+.ib-star-mini { color: #f0ad4e; }
+
+/* ---- Tools pane palette --------------------------------------------- */
 
 .ib-tool-grid {
   display: grid;
@@ -161,9 +473,7 @@ body.instruction-builder-page > .container-fluid {
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
-.ib-tool-btn:hover {
-  background: #e9ecef;
-}
+.ib-tool-btn:hover { background: #e9ecef; }
 .ib-tool-btn.is-active {
   background: #0d6efd;
   border-color: #0d6efd;
@@ -182,13 +492,13 @@ body.instruction-builder-page > .container-fluid {
   gap: 8px;
 }
 .ib-style-row label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #495057;
   margin: 0;
 }
 .ib-style-row input[type="color"] {
   width: 40px;
-  height: 28px;
+  height: 26px;
   border: 1px solid #dee2e6;
   border-radius: 4px;
   padding: 0;
@@ -197,36 +507,22 @@ body.instruction-builder-page > .container-fluid {
 }
 .ib-style-row input[type="range"] {
   flex: 1;
-  max-width: 130px;
+  max-width: 110px;
 }
 .ib-style-row input[type="number"] {
-  width: 72px;
-  font-size: 0.85rem;
-  padding: 4px 6px;
+  width: 64px;
+  font-size: 0.82rem;
+  padding: 3px 6px;
   border: 1px solid #dee2e6;
   border-radius: 4px;
 }
 .ib-stroke-value {
   font-variant-numeric: tabular-nums;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: #6c757d;
-  min-width: 28px;
+  min-width: 24px;
   text-align: right;
 }
-
-.ib-edit-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-.ib-edit-actions .ib-tool-btn {
-  grid-column: span 1;
-}
-.ib-edit-actions .ib-tool-btn.is-wide {
-  grid-column: span 2;
-}
-
-/* ---- Transform + Arrange sections (issues #184 / #183) ---- */
 
 .ib-rotation-unit {
   font-size: 0.8rem;
@@ -246,16 +542,72 @@ body.instruction-builder-page > .container-fluid {
   gap: 6px;
 }
 .ib-arrange-actions .ib-tool-btn {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   padding: 6px 4px;
 }
 
-/* ---- Project images picker modal (issue #184) ---- */
-
-.ib-picker-modal .modal-body {
-  max-height: 60vh;
-  overflow-y: auto;
+.ib-edit-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
 }
+.ib-edit-actions .ib-tool-btn { grid-column: span 1; }
+.ib-edit-actions .ib-tool-btn.is-wide { grid-column: span 2; }
+
+/* ---- Layers pane list ----------------------------------------------- */
+
+.ib-layers-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+.ib-layers-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border: 1px solid #f1f3f5;
+  border-radius: 5px;
+  background: #f8f9fa;
+  cursor: pointer;
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+  user-select: none;
+}
+.ib-layers-list li:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+.ib-layers-list li.is-active {
+  background: #cfe2ff;
+  border-color: #0d6efd;
+  color: #084298;
+}
+.ib-layers-list li.is-dragover {
+  border-top: 2px solid var(--bs-primary, #0d6efd);
+}
+.ib-layers-list .ib-layer-icon {
+  width: 20px;
+  text-align: center;
+  color: #6c757d;
+}
+.ib-layers-list .ib-layer-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-layers-list-empty {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #868e96;
+  padding: 16px 4px;
+  font-style: italic;
+}
+
+/* ---- Image picker modal grid (project images modal) ----------------- */
+
+.ib-picker-modal .modal-body { max-height: 60vh; overflow-y: auto; }
 .ib-picker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -277,9 +629,7 @@ body.instruction-builder-page > .container-fluid {
   background: #e9ecef;
   border-color: #0d6efd;
 }
-.ib-picker-tile:active {
-  transform: scale(0.98);
-}
+.ib-picker-tile:active { transform: scale(0.98); }
 .ib-picker-tile img {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -298,40 +648,20 @@ body.instruction-builder-page > .container-fluid {
   text-overflow: ellipsis;
 }
 
-/* ---- Canvas area ----------------------------------------------------- */
+/* ---- Zone C: Canvas area -------------------------------------------- */
 
 .ib-canvas-area {
+  grid-area: canvas;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background: #e9ecef;
-  padding: 16px;
+  padding: 14px;
   min-width: 0;
   min-height: 0;
   overflow: auto;
-}
-
-.ib-canvas-header {
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.ib-step-badge {
-  background: #0d6efd;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-.ib-canvas-hint {
-  font-size: 0.8rem;
-  color: #6c757d;
 }
 
 .ib-canvas-frame {
@@ -340,16 +670,18 @@ body.instruction-builder-page > .container-fluid {
   border: 1px solid #ced4da;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  max-width: 100%;
   width: 100%;
   max-width: 1200px;
-  /* 4:3 aspect ratio matches the logical canvas (1200x900). */
   aspect-ratio: 4 / 3;
 }
 
-/* The Fabric canvas itself is positioned absolutely inside the frame
-   so the CSS aspect-ratio drives the on-screen size and Fabric handles
-   the device-pixel ratio internally. */
+.ib-canvas-frame.is-grid {
+  background-image:
+    radial-gradient(circle, rgba(0, 0, 0, 0.12) 1px, transparent 1.5px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+}
+
 .ib-canvas-frame .canvas-container {
   position: absolute !important;
   inset: 0;
@@ -363,6 +695,11 @@ body.instruction-builder-page > .container-fluid {
   border-radius: 6px;
 }
 
+.ib-canvas-frame.is-dropping {
+  outline: 2px dashed var(--bs-primary, #0d6efd);
+  outline-offset: -6px;
+}
+
 .ib-canvas-empty {
   position: absolute;
   inset: 0;
@@ -372,85 +709,261 @@ body.instruction-builder-page > .container-fluid {
   text-align: center;
   color: #adb5bd;
   font-size: 0.95rem;
-  pointer-events: none; /* never block tool clicks on the canvas */
+  pointer-events: none;
   padding: 16px;
 }
 .ib-canvas-empty.d-none { display: none; }
 
-/* ---- Right sidebar (steps list, current step fields) ---------------- */
+/* ---- Inspector HUD slot (PR 2 will populate) ------------------------ */
 
-.ib-sidebar-section {
-  margin-bottom: 18px;
+.ib-inspector-hud {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 240px;
+  /* No content / no chrome in this PR — PR 2 styles the dark panel. */
 }
-.ib-sidebar-section h6 {
+
+/* ---- Zone F: Filmstrip ---------------------------------------------- */
+
+.ib-filmstrip {
+  grid-area: film;
+  background: #fff;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+}
+
+.ib-filmstrip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px;
+  border-bottom: 1px solid #f1f3f5;
+  background: #fafafa;
+}
+.ib-filmstrip-title {
+  font-size: 0.78rem;
+  color: #495057;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+}
+.ib-filmstrip-count {
+  margin-left: 8px;
+  color: #868e96;
+  font-weight: 400;
+}
+.ib-filmstrip-toggle {
+  background: transparent;
+  border: 0;
+  color: #6c757d;
+  font-size: 0.76rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.ib-filmstrip-toggle:hover {
+  background: #f1f3f5;
+  color: #212529;
+}
+
+.ib-filmstrip-body {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 110px;
+}
+[data-density="compact"] .ib-filmstrip-body { height: 86px; padding: 6px 10px; }
+
+.ib-filmstrip.is-collapsed .ib-filmstrip-body {
+  display: none;
+}
+.ib-filmstrip.is-collapsed .ib-filmstrip-header {
+  border-bottom: none;
+}
+
+.ib-filmstrip-track {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.ib-step-tile {
+  position: relative;
+  flex: 0 0 auto;
+  width: 130px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 6px;
+  background: #f8f9fa;
+  cursor: pointer;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.1s, background 0.1s, transform 0.05s;
+}
+[data-density="compact"] .ib-step-tile { width: 110px; padding: 4px 6px; }
+
+.ib-step-tile:hover {
+  border-color: #adb5bd;
+  background: #fff;
+}
+.ib-step-tile.is-active {
+  border-color: var(--bs-primary, #c8312a);
+  background: #fff;
+  box-shadow: 2px 2px 0 rgba(200, 49, 42, 0.25);
+}
+.ib-step-tile.is-dragover {
+  border-color: var(--bs-primary, #0d6efd);
+  border-style: dashed;
+}
+.ib-step-tile.is-dragging {
+  opacity: 0.5;
+}
+
+.ib-step-tile-num {
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  width: 22px;
+  height: 22px;
+  color: #495057;
+}
+.ib-step-tile.is-active .ib-step-tile-num {
+  background: var(--bs-primary, #c8312a);
+  color: #fff;
+  border-color: var(--bs-primary, #c8312a);
+}
+.ib-step-tile-preview {
+  flex: 1;
+  min-height: 30px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #e7eef7, #f5f7fb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 0.76rem;
+}
+.ib-step-tile-caption {
+  font-size: 0.72rem;
+  color: #495057;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ib-filmstrip-add {
+  flex: 0 0 auto;
+  width: 64px;
+  border-radius: 6px;
+  border: 1.5px dashed #ced4da;
+  background: #fbfbfc;
+  color: #adb5bd;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 0.72rem;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.ib-filmstrip-add:hover {
+  background: #f1f3f5;
+  border-color: #adb5bd;
+  color: #495057;
+}
+.ib-filmstrip-add i { font-size: 1rem; }
+
+/* ---- Settings popover ----------------------------------------------- */
+
+.ib-settings-pop {
+  position: fixed;
+  left: 64px;
+  bottom: 120px;
+  width: 220px;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  z-index: 30;
+  padding: 12px 14px;
+}
+.ib-settings-pop[hidden] { display: none; }
+
+.ib-settings-pop-inner > .ib-pane-section-title { margin-bottom: 8px; }
+
+.ib-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: #212529;
+  cursor: pointer;
+}
+.ib-settings-row input[type="checkbox"] { margin: 0; }
+.ib-settings-radio-row { flex-wrap: wrap; }
+.ib-settings-label {
+  flex-basis: 100%;
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #868e96;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+}
+.ib-settings-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: #212529;
+  margin-right: 8px;
+  cursor: pointer;
 }
 
-.ib-step-fields input,
-.ib-step-fields textarea {
-  font-size: 0.88rem;
-}
+/* ---- Camera modal --------------------------------------------------- */
 
-.ib-steps-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 8px 0;
-}
-.ib-steps-list li {
+.ib-camera-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  border-radius: 6px;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.86rem;
-  margin-bottom: 4px;
-  background: #f8f9fa;
+  justify-content: center;
 }
-.ib-steps-list li:hover {
-  background: #e9ecef;
+.ib-camera-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.ib-steps-list li.is-active {
-  background: #cfe2ff;
-  border-color: #0d6efd;
-  color: #084298;
-  font-weight: 500;
-}
-.ib-steps-list li .ib-step-num {
-  background: #fff;
-  border: 1px solid #ced4da;
-  border-radius: 999px;
-  min-width: 22px;
+.ib-camera-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  font-size: 0.74rem;
-  font-weight: 600;
-  padding: 1px 6px;
-  color: #495057;
+  color: #f8f9fa;
+  padding: 12px;
+  pointer-events: none;
 }
-.ib-steps-list li.is-active .ib-step-num {
-  background: #0d6efd;
-  color: #fff;
-  border-color: #0d6efd;
-}
-.ib-steps-list li .ib-step-label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-}
-
-.ib-reorder-hint {
-  font-size: 0.75rem;
-  color: #868e96;
-  font-style: italic;
-  margin-top: 4px;
-}
+.ib-camera-status.d-none { display: none; }
 
 /* ---- States --------------------------------------------------------- */
 
@@ -461,7 +974,8 @@ body.instruction-builder-page > .container-fluid {
   text-align: center;
   color: #495057;
 }
-.ib-not-owner .ib-icon {
+.ib-not-owner .ib-icon,
+.ib-error .ib-icon {
   font-size: 2.5rem;
   color: #adb5bd;
   margin-bottom: 12px;
@@ -476,7 +990,7 @@ body.instruction-builder-page > .container-fluid {
   opacity: 0;
 }
 
-/* ---- STL modal (Phase 3a) ------------------------------------------ */
+/* ---- STL modal (preserved from Phase 3a) --------------------------- */
 
 .ib-stl-render-area {
   position: relative;
@@ -538,9 +1052,7 @@ body.instruction-builder-page > .container-fluid {
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
 }
-.ib-stl-view-btn:hover {
-  background: #e9ecef;
-}
+.ib-stl-view-btn:hover { background: #e9ecef; }
 .ib-stl-view-btn.is-active {
   background: #0d6efd;
   border-color: #0d6efd;
@@ -548,9 +1060,7 @@ body.instruction-builder-page > .container-fluid {
 }
 
 .ib-stl-help,
-.ib-stl-note {
-  text-align: center;
-}
+.ib-stl-note { text-align: center; }
 
 .ib-stl-modal .btn-primary:disabled {
   opacity: 0.55;
@@ -558,13 +1068,10 @@ body.instruction-builder-page > .container-fluid {
 }
 
 @media (max-width: 575px) {
-  .ib-stl-render-area {
-    width: 100%;
-    height: 320px;
-  }
+  .ib-stl-render-area { width: 100%; height: 320px; }
 }
 
-/* ---- Responsive fallback (Phase 1b will replace this) --------------- */
+/* ---- Responsive fallback -------------------------------------------- */
 @media (max-width: 991px) {
   .ib-workspace {
     height: auto;
@@ -572,15 +1079,44 @@ body.instruction-builder-page > .container-fluid {
   }
   .ib-main {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "rail"
+      "secondary"
+      "canvas"
+      "film";
   }
-  .ib-toolbar,
-  .ib-sidebar {
+  .ib-rail {
+    flex-direction: row;
+    flex-wrap: wrap;
     border-right: none;
-    border-left: none;
     border-bottom: 1px solid #dee2e6;
-    max-height: none;
   }
-  .ib-canvas-area {
-    min-height: 480px;
+  .ib-rail-btn {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 6px 10px;
+    flex-direction: row;
+    gap: 6px;
   }
+  .ib-rail-btn.is-active::before {
+    left: 4px;
+    right: 4px;
+    top: -3px;
+    bottom: auto;
+    height: 3px;
+    width: auto;
+  }
+  .ib-rail-spacer { display: none; }
+  .ib-secondary {
+    width: 100% !important;
+    max-width: none;
+    min-width: 0;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+    max-height: 360px;
+  }
+  .ib-secondary-resize { display: none; }
+  .ib-canvas-area { min-height: 480px; }
+  .ib-inspector-hud { display: none !important; }
 }
