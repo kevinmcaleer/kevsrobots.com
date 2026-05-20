@@ -420,6 +420,52 @@ class ProjectSchematicResponse(BaseModel):
     updated_at: datetime
 
 
+# --- Project symbols (Symbol Designer) -----------------------------------
+#
+# Per-project user-designed schematic symbols. The body-shape and pin
+# layout live in the opaque ``symbol_data`` JSON blob — the server stores
+# and returns it verbatim; the shape is owned by the frontend (see
+# ``web/assets/js/symbol-designer.js``). One symbol can be linked to a
+# BOM row via ``bom_item_id`` so it surfaces as a ``⌗`` chip in that
+# row's asset drawer in the instruction builder.
+
+
+class ProjectSymbolCreate(BaseModel):
+    """Required: ``name``. Everything else optional with defaults."""
+
+    name: str = Field(..., min_length=1, max_length=200)
+    ref_des_prefix: Optional[str] = Field(None, max_length=8)
+    description: Optional[str] = None
+    bom_item_id: Optional[int] = None
+    symbol_data: Optional[str] = None
+
+
+class ProjectSymbolUpdate(BaseModel):
+    """Partial — fields omitted are left untouched.
+
+    ``bom_item_id`` can be set to ``null`` explicitly to clear the link;
+    fields excluded from the request body are not touched (standard
+    ``exclude_unset`` semantics on the route)."""
+
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    ref_des_prefix: Optional[str] = Field(None, max_length=8)
+    description: Optional[str] = None
+    bom_item_id: Optional[int] = None
+    symbol_data: Optional[str] = None
+
+
+class ProjectSymbolResponse(BaseModel):
+    id: int
+    project_id: int
+    name: str
+    ref_des_prefix: str
+    description: Optional[str] = None
+    bom_item_id: Optional[int] = None
+    symbol_data: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
 # --- Build instructions export (issue #178, Phase 2b) --------------------
 #
 # Hybrid PDF pipeline: the browser renders each Fabric.js canvas to a
