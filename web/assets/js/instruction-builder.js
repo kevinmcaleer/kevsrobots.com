@@ -5308,7 +5308,12 @@
     var ws = document.getElementById('ib-workspace');
     if (!ws) return;
     var top = ws.getBoundingClientRect().top;
-    var avail = Math.max(500, window.innerHeight - top);
+    // Floor at 320 so we don't end up with a 0-height workspace on
+    // pathological measurements, but no higher — on tight viewports
+    // (devtools docked, small laptop, narrow window) we'd rather have
+    // a cramped layout with the filmstrip visible than a roomy one
+    // with the filmstrip pushed below the fold.
+    var avail = Math.max(320, window.innerHeight - top);
     ws.style.height = avail + 'px';
   }
 

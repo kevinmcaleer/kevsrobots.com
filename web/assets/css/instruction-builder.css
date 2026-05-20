@@ -36,11 +36,11 @@ body.instruction-builder-page > .container-fluid {
   /* Sized precisely at runtime by adjustWorkspaceHeight() in
      instruction-builder.js — measures the actual top offset
      (site top_bar + navigation + searchbar + nav_projects all
-     contribute and vary by viewport width). The CSS fallback
-     below is a defensive worst-case so the filmstrip isn't
-     pushed off-screen before the JS runs. */
+     contribute and vary by viewport width). No CSS min-height
+     here — on small viewports the workspace shrinks to fit
+     rather than overflowing and hiding the filmstrip. */
   height: calc(100vh - 220px);
-  min-height: 500px;
+  min-height: 320px;
   background: #f8f9fa;
   color: #212529;
   overflow: hidden;
