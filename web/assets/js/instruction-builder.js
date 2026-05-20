@@ -961,9 +961,12 @@
               if (s) s.title = updated.title;
               renderFilmstrip();
               setSaveStatus('saved');
-              // Inverse: restore the prior title.
+              // Inverse: restore the prior title. Redo restores the new
+              // value — captured in closure as `value` so the redo entry
+              // mirrors the original op exactly.
               pushStepUndo({
                 type: 'edit-title',
+                label: 'renamed step',
                 apply: async function () {
                   await putStep(stepId, { title: prior || null });
                   var s2 = state.steps.find(function (x) { return x.id === stepId; });
@@ -972,7 +975,15 @@
                     dom.stepTitle.value = prior || '';
                   }
                   renderFilmstrip();
-                  return 'Undid: renamed step';
+                },
+                invert: async function () {
+                  await putStep(stepId, { title: value });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.title = value;
+                  if (state.activeStepId === stepId && dom.stepTitle) {
+                    dom.stepTitle.value = value || '';
+                  }
+                  renderFilmstrip();
                 },
               });
             })
@@ -1002,6 +1013,7 @@
               setSaveStatus('saved');
               pushStepUndo({
                 type: 'edit-description',
+                label: 'edited description',
                 apply: async function () {
                   await putStep(stepId, { description: prior || null });
                   var s2 = state.steps.find(function (x) { return x.id === stepId; });
@@ -1009,7 +1021,14 @@
                   if (state.activeStepId === stepId && dom.stepDescription) {
                     dom.stepDescription.value = prior || '';
                   }
-                  return 'Undid: edited description';
+                },
+                invert: async function () {
+                  await putStep(stepId, { description: value });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.description = value;
+                  if (state.activeStepId === stepId && dom.stepDescription) {
+                    dom.stepDescription.value = value || '';
+                  }
                 },
               });
             })
@@ -1249,13 +1268,20 @@
       renderFilmstrip();
       pushStepUndo({
         type: 'change-step-type',
+        label: 'changed step type',
         apply: async function () {
           var reverted = await putStep(stepId, { step_type: priorType });
           var s = state.steps.find(function (x) { return x.id === stepId; });
           if (s) s.step_type = reverted.step_type;
           if (state.activeStepId === stepId) syncStepTypePane();
           renderFilmstrip();
-          return 'Undid: changed step type';
+        },
+        invert: async function () {
+          var reapplied = await putStep(stepId, { step_type: newType });
+          var s = state.steps.find(function (x) { return x.id === stepId; });
+          if (s) s.step_type = reapplied.step_type;
+          if (state.activeStepId === stepId) syncStepTypePane();
+          renderFilmstrip();
         },
       });
     } catch (_) {
@@ -1299,6 +1325,7 @@
               setSaveStatus('saved');
               pushStepUndo({
                 type: 'edit-body',
+                label: 'edited body',
                 apply: async function () {
                   await putStep(stepId, { body: prior || null });
                   var s2 = state.steps.find(function (x) { return x.id === stepId; });
@@ -1307,7 +1334,15 @@
                     dom.stepBodyInput.value = prior || '';
                   }
                   if (state.activeStepId === stepId) renderCanvasTextBody(s2);
-                  return 'Undid: edited body';
+                },
+                invert: async function () {
+                  await putStep(stepId, { body: value });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.body = value;
+                  if (state.activeStepId === stepId && dom.stepBodyInput) {
+                    dom.stepBodyInput.value = value || '';
+                  }
+                  if (state.activeStepId === stepId) renderCanvasTextBody(s2);
                 },
               });
             })
@@ -1344,6 +1379,7 @@
               setSaveStatus('saved');
               pushStepUndo({
                 type: 'edit-video-url',
+                label: 'edited video URL',
                 apply: async function () {
                   await putStep(stepId, { video_url: prior || null });
                   var s2 = state.steps.find(function (x) { return x.id === stepId; });
@@ -1355,7 +1391,18 @@
                     renderVideoPreview(prior);
                     renderCanvasVideo(s2);
                   }
-                  return 'Undid: edited video URL';
+                },
+                invert: async function () {
+                  await putStep(stepId, { video_url: value });
+                  var s2 = state.steps.find(function (x) { return x.id === stepId; });
+                  if (s2) s2.video_url = value;
+                  if (state.activeStepId === stepId && dom.stepVideoInput) {
+                    dom.stepVideoInput.value = value || '';
+                  }
+                  if (state.activeStepId === stepId) {
+                    renderVideoPreview(value);
+                    renderCanvasVideo(s2);
+                  }
                 },
               });
             })
@@ -1444,43 +1491,57 @@
       dom.undoBtn.disabled = state.undoStack.length === 0 &&
         stepUndoStack.length === 0;
     }
-    if (dom.redoBtn) dom.redoBtn.disabled = state.redoStack.length === 0;
+    if (dom.redoBtn) {
+      // Same symmetry for redo — canvas redo first, step redo as fall-
+      // through. Either stack populated => button enabled.
+      dom.redoBtn.disabled = state.redoStack.length === 0 &&
+        stepRedoStack.length === 0;
+    }
   }
 
   // ====================================================================
-  // 11b. STEP-LEVEL UNDO
+  // 11b. STEP-LEVEL UNDO / REDO
   // ====================================================================
   //
   // The canvas undo stack (`state.undoStack`, above) is per-step and gets
   // wiped when the user switches steps. That's correct for canvas-object
   // edits, but the user's "undo to all operations" intent reasonably
-  // includes step CRUD too. So we keep a *separate* page-level stack of
-  // inverse operations for: step add, step delete, step reorder, step
-  // title change, step description change.
+  // includes step CRUD too. So we keep a *separate* page-level pair of
+  // stacks (undo + redo) for: step add, step delete, step reorder, step
+  // title change, step description change, step body/video/type changes.
   //
-  // Design choice: a separate stack (rather than a unified mixed stack
-  // with a `scope: 'canvas' | 'step'` discriminator) keeps the diff small
-  // — the existing canvas-undo code stays untouched, and the new step
-  // ops never need to interleave with the canvas snapshots inside a
+  // Design choice: a separate pair of stacks (rather than a unified mixed
+  // stack with a `scope: 'canvas' | 'step'` discriminator) keeps the diff
+  // small — the existing canvas-undo code stays untouched, and the new
+  // step ops never need to interleave with the canvas snapshots inside a
   // single step. Cmd/Ctrl+Z runs canvas undo first; only when the canvas
-  // stack is empty does it fall back to step undo. This matches how most
-  // editors handle it — local edits get undone before "scene-level" ones.
+  // stack is empty does it fall back to step undo. Cmd/Ctrl+Shift+Z does
+  // the symmetric thing for redo. This matches how most editors handle
+  // it — local edits get undone before "scene-level" ones.
   //
-  // Entries are stored as { type, payload, label } where `payload` is
-  // whatever the inverse handler needs (an id + prior value, usually).
-  // We do NOT persist this stack to localStorage — replaying server
+  // Entries are stored as { type, label, apply, invert } where:
+  //   - apply():  the undo direction (reverts the op).
+  //   - invert(): the redo direction (re-applies the op).
+  // Both are async; either can return an optional string to override the
+  // default toast label ("Undid: <label>" or "Redid: <label>").
+  //
+  // Linear-undo semantics: any *new* step op (via pushStepUndo) clears
+  // stepRedoStack — once the user diverges from the undone branch, the
+  // redo history is gone.
+  //
+  // We do NOT persist either stack to localStorage — replaying server
   // mutations after a reload (or in another tab) is too risky.
-  //
-  // No redo for step-level ops in this iteration (not asked for; the
-  // existing Redo button only handles the canvas stack).
 
   var stepUndoStack = [];
+  var stepRedoStack = [];
   var STEP_UNDO_LIMIT = 50;
 
   function pushStepUndo(entry) {
     if (!entry || !entry.type || typeof entry.apply !== 'function') return;
     stepUndoStack.push(entry);
     if (stepUndoStack.length > STEP_UNDO_LIMIT) stepUndoStack.shift();
+    // A fresh op always invalidates the redo branch.
+    stepRedoStack = [];
     updateUndoRedoButtons();
   }
 
@@ -1489,8 +1550,18 @@
     var entry = stepUndoStack.pop();
     updateUndoRedoButtons();
     try {
-      var label = await entry.apply();
-      showUndoToast(label || ('Undid: ' + entry.type));
+      var ret = await entry.apply();
+      var msg = (typeof ret === 'string' && ret)
+        ? ret
+        : ('Undid: ' + (entry.label || entry.type));
+      showStepToast(msg);
+      // Only entries with a working invert() participate in redo. Skip
+      // legacy entries that pre-date this PR (none in tree, but defensive).
+      if (typeof entry.invert === 'function') {
+        stepRedoStack.push(entry);
+        if (stepRedoStack.length > STEP_UNDO_LIMIT) stepRedoStack.shift();
+      }
+      updateUndoRedoButtons();
     } catch (e) {
       console.warn('Step undo failed', e);
       setSaveStatus('error', "Undo failed");
@@ -1498,35 +1569,58 @@
     return true;
   }
 
-  // ====================================================================
-  // 11c. STEP-UNDO TOAST
-  // ====================================================================
-  //
-  // Brief bottom-centred snackbar that confirms a step-level undo. The
-  // change might be subtle (a description revert), so the user needs to
-  // see what happened. Auto-dismisses after ~2s.
-
-  var undoToastNode = null;
-  var undoToastTimer = null;
-
-  function ensureUndoToast() {
-    if (undoToastNode) return undoToastNode;
-    undoToastNode = document.createElement('div');
-    undoToastNode.className = 'ib-undo-toast';
-    undoToastNode.setAttribute('role', 'status');
-    undoToastNode.setAttribute('aria-live', 'polite');
-    document.body.appendChild(undoToastNode);
-    return undoToastNode;
+  async function popStepRedo() {
+    if (stepRedoStack.length === 0) return false;
+    var entry = stepRedoStack.pop();
+    updateUndoRedoButtons();
+    try {
+      var ret = await entry.invert();
+      var msg = (typeof ret === 'string' && ret)
+        ? ret
+        : ('Redid: ' + (entry.label || entry.type));
+      showStepToast(msg, 'redo');
+      // Mirror: redoing puts the entry back onto the undo stack so a
+      // subsequent Cmd/Ctrl+Z reverts it again.
+      stepUndoStack.push(entry);
+      if (stepUndoStack.length > STEP_UNDO_LIMIT) stepUndoStack.shift();
+      updateUndoRedoButtons();
+    } catch (e) {
+      console.warn('Step redo failed', e);
+      setSaveStatus('error', "Redo failed");
+    }
+    return true;
   }
 
-  function showUndoToast(msg) {
-    var node = ensureUndoToast();
-    node.innerHTML = '<i class="fas fa-undo"></i>' + escapeHtml(msg);
+  // ====================================================================
+  // 11c. STEP-LEVEL TOAST
+  // ====================================================================
+  //
+  // Brief bottom-centred snackbar that confirms a step-level undo or
+  // redo. The change might be subtle (a description revert), so the user
+  // needs to see what happened. Auto-dismisses after ~2s.
+
+  var stepToastNode = null;
+  var stepToastTimer = null;
+
+  function ensureStepToast() {
+    if (stepToastNode) return stepToastNode;
+    stepToastNode = document.createElement('div');
+    stepToastNode.className = 'ib-undo-toast';
+    stepToastNode.setAttribute('role', 'status');
+    stepToastNode.setAttribute('aria-live', 'polite');
+    document.body.appendChild(stepToastNode);
+    return stepToastNode;
+  }
+
+  function showStepToast(msg, kind) {
+    var node = ensureStepToast();
+    var icon = kind === 'redo' ? 'fa-redo' : 'fa-undo';
+    node.innerHTML = '<i class="fas ' + icon + '"></i>' + escapeHtml(msg);
     node.classList.add('is-visible');
-    if (undoToastTimer) clearTimeout(undoToastTimer);
-    undoToastTimer = setTimeout(function () {
+    if (stepToastTimer) clearTimeout(stepToastTimer);
+    stepToastTimer = setTimeout(function () {
       node.classList.remove('is-visible');
-      undoToastTimer = null;
+      stepToastTimer = null;
     }, 2000);
   }
 
@@ -1542,6 +1636,20 @@
     }
     // If both stacks are empty, the shortcut is a no-op — caller already
     // preventDefault'd the keystroke so the browser doesn't intercept.
+  }
+
+  // Symmetric redo entrypoint. Canvas redo wins when populated; step
+  // redo handles the fall-through. Same priority logic as undo so the
+  // two stacks stay aligned: a user who undoes a string of canvas ops
+  // then a string of step ops can redo them in the same order.
+  function onRedoShortcut() {
+    if (state.redoStack.length > 0) {
+      onRedoClick();
+      return;
+    }
+    if (stepRedoStack.length > 0) {
+      popStepRedo();
+    }
   }
 
   // ====================================================================
@@ -2913,16 +3021,34 @@
 
   function renderFilmstrip() {
     if (!dom.filmstripTrack) return;
+    // The delete control is disabled (still rendered) on the only-step
+    // case — that way the user sees the affordance and gets a hint via
+    // the title attribute / toast rather than the button silently
+    // disappearing.
+    var isOnlyStep = state.steps.length === 1;
     var html = state.steps.map(function (s) {
       var isActive = (s.id === state.activeStepId);
       var caption = (s.title && s.title.trim()) ? s.title : 'Untitled';
       var badge = stepTypeBadgeHtml(currentStepTypeOf(s));
+      var deleteTitle = isOnlyStep
+        ? "Can't delete the only step"
+        : 'Delete step ' + s.step_number;
+      var deleteBtn = (
+        '<button type="button" class="ib-step-tile-delete"' +
+        '        data-step-id="' + s.id + '"' +
+        '        aria-label="' + escapeHtml(deleteTitle) + '"' +
+        '        title="' + escapeHtml(deleteTitle) + '"' +
+                (isOnlyStep ? ' disabled' : '') + '>' +
+        '<i class="fas fa-xmark"></i>' +
+        '</button>'
+      );
       return (
         '<div class="ib-step-tile' + (isActive ? ' is-active' : '') + '"' +
         '     draggable="true"' +
         '     data-step-id="' + s.id + '">' +
         '  <div class="ib-step-tile-num">' + s.step_number + '</div>' +
         badge +
+        deleteBtn +
         '  <div class="ib-step-tile-preview">' +
         '    <span>step ' + s.step_number + '</span>' +
         '  </div>' +
@@ -2941,7 +3067,12 @@
 
     Array.prototype.forEach.call(dom.filmstripTrack.querySelectorAll('.ib-step-tile'),
       function (tile) {
-        tile.addEventListener('click', function () {
+        tile.addEventListener('click', function (ev) {
+          // Don't fire step-switch when the click landed on the delete
+          // button — that has its own handler below.
+          if (ev.target && ev.target.closest && ev.target.closest('.ib-step-tile-delete')) {
+            return;
+          }
           var id = parseInt(tile.dataset.stepId, 10);
           if (id && id !== state.activeStepId) switchToStep(id);
         });
@@ -2966,6 +3097,27 @@
           if (!fromId || !toId || fromId === toId) return;
           reorderStep(fromId, toId);
         });
+      });
+
+    // Wire the per-tile delete buttons. Bound separately so the click
+    // doesn't bubble into the tile's switchToStep handler.
+    Array.prototype.forEach.call(
+      dom.filmstripTrack.querySelectorAll('.ib-step-tile-delete'),
+      function (btn) {
+        btn.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          ev.preventDefault();
+          if (btn.disabled) {
+            showStepToast("Can't delete the only step — add a new step first.");
+            return;
+          }
+          var id = parseInt(btn.dataset.stepId, 10);
+          if (id) onDeleteStepClick(id);
+        });
+        // Drag events on the tile shouldn't start when the user is
+        // mousing down on the delete button.
+        btn.addEventListener('mousedown', function (ev) { ev.stopPropagation(); });
+        btn.addEventListener('dragstart', function (ev) { ev.preventDefault(); ev.stopPropagation(); });
       });
   }
 
@@ -3003,23 +3155,31 @@
     var toStep = state.steps.find(function (s) { return s.id === toId; });
     if (!fromStep || !toStep) return;
     var previousStepNumber = fromStep.step_number;
+    var newStepNumber = toStep.step_number;
     setSaveStatus('saving', 'Reordering steps…');
     try {
-      await putStep(fromId, { step_number: toStep.step_number });
+      await putStep(fromId, { step_number: newStepNumber });
       var fresh = await fetchInstruction();
       if (fresh && fresh.steps) state.steps = fresh.steps;
       renderFilmstrip();
       setSaveStatus('saved');
       // Inverse: PUT step_number back to the previous value. The other
-      // steps' numbers get re-balanced by the server.
+      // steps' numbers get re-balanced by the server. Redo restores the
+      // new target position.
       pushStepUndo({
         type: 'reorder-step',
+        label: 'reordered step',
         apply: async function () {
           await putStep(fromId, { step_number: previousStepNumber });
           var fresh2 = await fetchInstruction();
           if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
           renderFilmstrip();
-          return 'Undid: reordered step';
+        },
+        invert: async function () {
+          await putStep(fromId, { step_number: newStepNumber });
+          var fresh2 = await fetchInstruction();
+          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          renderFilmstrip();
         },
       });
     } catch (_) {
@@ -3070,32 +3230,154 @@
       await switchToStep(step.id);
       setSaveStatus('saved');
       // Record inverse: delete this newly-created step + restore the
-      // previously-active step.
+      // previously-active step. Redo POSTs a fresh empty step (the user
+      // hadn't filled anything in yet — any subsequent edits would have
+      // pushed their own undo entries on top).
+      var addedStepRef = step;
       pushStepUndo({
         type: 'add-step',
+        label: 'added step',
         apply: async function () {
           try {
-            await deleteStep(step.id);
+            await deleteStep(addedStepRef.id);
             var fresh2 = await fetchInstruction();
             if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
-            else state.steps = state.steps.filter(function (s) { return s.id !== step.id; });
+            else state.steps = state.steps.filter(function (s) { return s.id !== addedStepRef.id; });
             if (previousActiveId && state.steps.some(function (s) { return s.id === previousActiveId; })) {
               await switchToStep(previousActiveId);
             } else if (state.steps.length > 0) {
               await switchToStep(state.steps[0].id);
             }
             renderFilmstrip();
-            return 'Undid: added step';
           } catch (err) {
             console.warn('Undo add-step failed', err);
             throw err;
           }
+        },
+        invert: async function () {
+          var newStep = await postStep();
+          addedStepRef = newStep;
+          var fresh2 = await fetchInstruction();
+          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          else state.steps.push(newStep);
+          await switchToStep(newStep.id);
+          renderFilmstrip();
         },
       });
     } catch (e) {
       setSaveStatus('error', 'Add step failed');
     } finally {
       if (dom.filmstripAdd) dom.filmstripAdd.disabled = false;
+    }
+  }
+
+  // Delete a step from the filmstrip. Confirms, snapshots the full
+  // pre-delete state for undo (recreate via POST + PUT-all-fields), and
+  // switches to a sensible neighbour. The last remaining step can't be
+  // deleted (the button is disabled) — the click handler in
+  // renderFilmstrip catches the disabled case before this is reached.
+  async function onDeleteStepClick(stepId) {
+    var step = state.steps.find(function (s) { return s.id === stepId; });
+    if (!step) return;
+    if (state.steps.length <= 1) {
+      // Belt-and-braces: the button is disabled in this state but a
+      // programmatic call could still get here.
+      showStepToast("Can't delete the only step — add a new step first.");
+      return;
+    }
+    var confirmed = window.confirm(
+      'Delete this step? Its overlays will be lost — use Cmd/Ctrl+Z to undo.'
+    );
+    if (!confirmed) return;
+
+    // Capture the full pre-delete state so the undo can recreate it
+    // verbatim. We grab from the in-memory copy (which is in sync with
+    // the server thanks to the autosave plumbing). If the user is mid-
+    // edit, flushCanvasSave will run when switchToStep fires on the
+    // neighbour selection, but for the *current* step we capture the
+    // last-saved canvas_json — anything later than that wouldn't have
+    // landed on the server and so wouldn't survive a refresh anyway.
+    var savedState = {
+      title: step.title || null,
+      description: step.description || null,
+      step_type: step.step_type || 'photo',
+      body: step.body || null,
+      video_url: step.video_url || null,
+      schematic_id: step.schematic_id || null,
+      canvas_json: step.canvas_json || null,
+      step_number: step.step_number,
+    };
+    var deletedStepNumber = step.step_number;
+    // If we're deleting the active step we need to switch elsewhere
+    // first. Prefer the previous step; fall back to the new first step
+    // (which the renumbered list will surface).
+    var wasActive = (state.activeStepId === stepId);
+
+    setSaveStatus('saving', 'Deleting step…');
+    try {
+      await deleteStep(stepId);
+      var fresh = await fetchInstruction();
+      if (fresh && fresh.steps) {
+        state.steps = fresh.steps;
+      } else {
+        state.steps = state.steps.filter(function (s) { return s.id !== stepId; });
+      }
+      if (wasActive && state.steps.length > 0) {
+        // Pick the step that now occupies (deletedStepNumber - 1), or
+        // step 1 if we just removed step 1.
+        var targetIdx = Math.max(0, deletedStepNumber - 2);
+        if (targetIdx >= state.steps.length) targetIdx = state.steps.length - 1;
+        await switchToStep(state.steps[targetIdx].id);
+      } else {
+        renderFilmstrip();
+      }
+      setSaveStatus('saved');
+      showStepToast('Deleted step ' + deletedStepNumber + ' · Cmd/Ctrl+Z to undo');
+
+      // Undo: recreate the step (new id), restore all fields, slot back
+      // into the original step_number, and re-activate it if it was
+      // active. Redo: delete the freshly-recreated step again.
+      var recreatedRef = { id: null };
+      pushStepUndo({
+        type: 'delete-step',
+        label: 'deleted step ' + deletedStepNumber,
+        apply: async function () {
+          var created = await postStep();
+          // PUT everything back. step_number is part of the same PUT so
+          // the server re-balances neighbours into position.
+          var updated = await putStep(created.id, {
+            title: savedState.title,
+            description: savedState.description,
+            step_type: savedState.step_type,
+            body: savedState.body,
+            video_url: savedState.video_url,
+            schematic_id: savedState.schematic_id,
+            canvas_json: savedState.canvas_json,
+            step_number: savedState.step_number,
+          });
+          recreatedRef.id = updated.id;
+          var fresh2 = await fetchInstruction();
+          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          await switchToStep(updated.id);
+          renderFilmstrip();
+        },
+        invert: async function () {
+          if (!recreatedRef.id) return;
+          await deleteStep(recreatedRef.id);
+          var fresh2 = await fetchInstruction();
+          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          else state.steps = state.steps.filter(function (s) { return s.id !== recreatedRef.id; });
+          if (state.activeStepId === recreatedRef.id && state.steps.length > 0) {
+            var targetIdx = Math.max(0, deletedStepNumber - 2);
+            if (targetIdx >= state.steps.length) targetIdx = state.steps.length - 1;
+            await switchToStep(state.steps[targetIdx].id);
+          } else {
+            renderFilmstrip();
+          }
+        },
+      });
+    } catch (e) {
+      setSaveStatus('error', 'Delete step failed');
     }
   }
 
@@ -4949,10 +5231,11 @@
     if (dom.removeImageBtn) dom.removeImageBtn.addEventListener('click', onRemoveImageClick);
     if (dom.addStlBtn) dom.addStlBtn.addEventListener('click', onAddStlClick);
     if (dom.deleteSelected) dom.deleteSelected.addEventListener('click', onDeleteSelected);
-    // The Undo button mirrors Cmd/Ctrl+Z: canvas stack first, then
-    // step-level. Redo stays canvas-only (no redo for step ops this PR).
+    // The Undo / Redo buttons mirror their Cmd/Ctrl+Z[+Shift] shortcuts:
+    // canvas stack first, then step-level. Routing both through the same
+    // entrypoints keeps button and shortcut behaviour in lockstep.
     if (dom.undoBtn) dom.undoBtn.addEventListener('click', onUndoShortcut);
-    if (dom.redoBtn) dom.redoBtn.addEventListener('click', onRedoClick);
+    if (dom.redoBtn) dom.redoBtn.addEventListener('click', onRedoShortcut);
 
     if (dom.rotation) dom.rotation.addEventListener('change', onRotationInputChange);
     if (dom.resetTransforms) dom.resetTransforms.addEventListener('click', onResetTransformsClick);
@@ -4963,9 +5246,9 @@
     if (dom.sendToBack) dom.sendToBack.addEventListener('click', function () { arrangeActive('back'); });
 
     // Keyboard shortcuts: Cmd/Ctrl+Z = undo (canvas first, then
-    // step-level), Cmd/Ctrl+Shift+Z = redo (canvas-only — step-level
-    // redo isn't supported this iteration), Delete/Backspace = delete
-    // selected.
+    // step-level), Cmd/Ctrl+Shift+Z = redo (canvas first, then
+    // step-level — symmetric with undo), Delete/Backspace = delete
+    // selected canvas object.
     document.addEventListener('keydown', function (e) {
       var tag = (e.target && e.target.tagName) || '';
       var typing = (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT');
@@ -4975,7 +5258,7 @@
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
         if (typing || editingText) return;
         e.preventDefault();
-        if (e.shiftKey) onRedoClick();
+        if (e.shiftKey) onRedoShortcut();
         else onUndoShortcut();
       } else if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && !editingText) {
         if (state.canvas && state.canvas.getActiveObject()) {
