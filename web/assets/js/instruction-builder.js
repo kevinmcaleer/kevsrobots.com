@@ -1091,6 +1091,60 @@
     }
   }
 
+  // Phase 3b/3c — Animated GIF / MP4 video export. Same render-then-POST
+  // pipeline as the PDF path; the server runs FFmpeg over the supplied
+  // PNG sequence + branded closing slide. ``format`` is either 'gif' or
+  // 'mp4' and chooses the endpoint suffix + filename extension +
+  // download MIME type.
+  async function exportVideo(format) {
+    var label = (format === 'mp4') ? 'MP4 video' : 'animated GIF';
+    setExportProgress('Preparing export…');
+    try {
+      await flushPendingCanvasSave();
+      var steps = await loadStepsForExport();
+      var dataUrls = await renderAllStepsToDataUrls(steps);
+
+      // Video encodes take noticeably longer than PDFs (FFmpeg + a
+      // two-pass GIF palettegen or an H.264 single pass) — keep the
+      // user informed so they don't think the page is hung. The
+      // backend caps each FFmpeg invocation at 120s; the frontend
+      // doesn't set its own fetch timeout — we let the server be the
+      // source of truth on "too long".
+      setExportProgress('Encoding ' + label + '… this can take a minute');
+      var payload = {
+        steps: steps.map(function (s, i) {
+          return {
+            step_number: s.step_number || (i + 1),
+            title: s.title || null,
+            description: s.description || null,
+            image_data_url: dataUrls[i],
+          };
+        }),
+        steps_per_page: 1,
+        include_title_page: false,
+        project_title: (state.project && state.project.title) || null,
+      };
+      var resp = await apiFetchWithTermsRetry(
+        API + '/api/projects/' + state.projectId + '/instruction/export/' + format,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      if (!resp.ok) {
+        throw new Error('Server returned HTTP ' + resp.status);
+      }
+      var blob = await resp.blob();
+      setExportProgress('Downloading…');
+      triggerDownload(blob, 'instructions-' + state.projectId + '.' + format);
+      hideExportProgress(1500);
+    } catch (e) {
+      setExportProgress('Export failed — please try again', 'error');
+      hideExportProgress(4000);
+    }
+  }
+
   async function exportZip() {
     if (typeof window.JSZip === 'undefined') {
       setExportProgress('ZIP library failed to load — try the PDF option instead', 'error');
@@ -1145,6 +1199,8 @@
         if (kind === 'pdf') {
           var layout = parseInt(item.dataset.layout, 10) || 1;
           exportPdf(layout);
+        } else if (kind === 'gif' || kind === 'mp4') {
+          exportVideo(kind);
         } else if (kind === 'zip') {
           exportZip();
         }

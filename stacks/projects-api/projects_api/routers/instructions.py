@@ -28,6 +28,8 @@ remain valid.
 
 from __future__ import annotations
 
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,6 +38,7 @@ from sqlalchemy.orm import selectinload
 from ..auth import require_terms_accepted
 from ..db import get_session
 from ..instructions_pdf import render_instructions_pdf
+from ..instructions_video import render_instructions_video
 from ..models import Instruction, InstructionStep, Project
 from ..schemas import (
     InstructionCreate,
@@ -424,6 +427,114 @@ async def export_pdf(
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )
+
+
+# --- GIF / MP4 export (issue #178, Phase 3b/3c) ---------------------------
+#
+# Same shape as the PDF endpoint — same payload, same auth/T&Cs/owner
+# gate, same per-step PNG dataURL validation. The output binary is
+# assembled by FFmpeg via subprocess (see ``instructions_video.py``); the
+# blocking subprocess call is offloaded to a thread so the FastAPI event
+# loop stays responsive for other requests while a 10-60s render runs.
+
+
+def _validate_video_payload(body: InstructionExportRequest) -> None:
+    """Mirror the PDF endpoint's payload checks for the video routes."""
+    if not body.steps:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="steps must be non-empty",
+        )
+    for step in body.steps:
+        if not step.image_data_url.startswith("data:image/png;base64,"):
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="each image_data_url must start with 'data:image/png;base64,'",
+            )
+    payload_size = sum(len(s.image_data_url) for s in body.steps)
+    if payload_size > _MAX_EXPORT_PAYLOAD_BYTES:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="export payload too large",
+        )
+
+
+async def _render_video_threaded(
+    body: InstructionExportRequest,
+    project_id: int,
+    output_format: str,
+) -> bytes:
+    """``render_instructions_video`` lifted onto a worker thread.
+
+    FFmpeg subprocess.run blocks for the entire encode duration —
+    keeping it out of the event loop matters when multiple users
+    export at once.
+    """
+    try:
+        return await asyncio.to_thread(
+            render_instructions_video,
+            body,
+            project_id,
+            output_format,
+        )
+    except ValueError as exc:
+        # ValueError comes from the renderer's own input validation
+        # (bad dataURL prefix, empty steps, …). Surface as 422 so the
+        # frontend behaves consistently across the three export
+        # formats.
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
+    except RuntimeError as exc:
+        # FFmpeg failure / timeout / missing binary. Don't leak the
+        # underlying message to the client — the renderer already
+        # logged the stderr.
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Video generation failed.",
+        ) from exc
+
+
+@router.post("/export/gif")
+async def export_gif(
+    project_id: int,
+    body: InstructionExportRequest,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """Render the supplied step PNGs to an animated GIF + closing slide."""
+    await _check_owner(session, project_id, user)
+    _validate_video_payload(body)
+    gif_bytes = await _render_video_threaded(body, project_id, "gif")
+    filename = f"instructions-{project_id}.gif"
+    return Response(
+        content=gif_bytes,
+        media_type="image/gif",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )
+
+
+@router.post("/export/mp4")
+async def export_mp4(
+    project_id: int,
+    body: InstructionExportRequest,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """Render the supplied step PNGs to an H.264 MP4 + closing slide."""
+    await _check_owner(session, project_id, user)
+    _validate_video_payload(body)
+    mp4_bytes = await _render_video_threaded(body, project_id, "mp4")
+    filename = f"instructions-{project_id}.mp4"
+    return Response(
+        content=mp4_bytes,
+        media_type="video/mp4",
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"',
         },
