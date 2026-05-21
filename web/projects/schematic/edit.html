@@ -11,8 +11,19 @@ hide_nibsy: true
 <link rel="stylesheet" href="/assets/css/schematic-editor.css?v={{ site.time | date: '%s' }}">
 
 <!-- Tag the body so site-level CSS rules (footer hide, container reset)
-     scope to this workspace only. -->
-<script>document.body.classList.add('schematic-editor-page');</script>
+     scope to this workspace only. When loaded inside the instruction
+     builder's schematic-type step iframe (?embedded=1), also add
+     `is-embedded` so the CSS hides every site chrome element and the
+     editor fills the iframe edge-to-edge. -->
+<script>
+  document.body.classList.add('schematic-editor-page');
+  try {
+    var qs = new URLSearchParams(window.location.search);
+    if (qs.get('embedded') === '1') {
+      document.body.classList.add('is-embedded');
+    }
+  } catch (_) {}
+</script>
 
 <div class="se-workspace" id="se-workspace">
 
