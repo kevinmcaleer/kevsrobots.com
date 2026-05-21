@@ -229,12 +229,32 @@ hide_nibsy: true
           </div>
         </div>
         <div class="sd-props-field">
-          <label>Side</label>
-          <div class="sd-props-radio-grid sd-props-radio-grid-4" id="sd-pin-side">
-            <label><input type="radio" name="sd-pin-side" value="left"><span>Left</span></label>
-            <label><input type="radio" name="sd-pin-side" value="right"><span>Right</span></label>
-            <label><input type="radio" name="sd-pin-side" value="top"><span>Top</span></label>
-            <label><input type="radio" name="sd-pin-side" value="bottom"><span>Bottom</span></label>
+          <label>Direction</label>
+          <!-- The pin's line points in this direction. The schematic
+               editor's net router uses this so the first segment of a
+               wire from this pin runs colinear with the line. -->
+          <div class="sd-props-radio-grid sd-props-radio-grid-4" id="sd-pin-rotation">
+            <label><input type="radio" name="sd-pin-rotation" value="0"><span>Right</span></label>
+            <label><input type="radio" name="sd-pin-rotation" value="90"><span>Down</span></label>
+            <label><input type="radio" name="sd-pin-rotation" value="180"><span>Left</span></label>
+            <label><input type="radio" name="sd-pin-rotation" value="270"><span>Up</span></label>
+          </div>
+        </div>
+        <div class="sd-props-field">
+          <label>Quick actions</label>
+          <div class="sd-props-action-row">
+            <button type="button" class="sd-props-action-btn" id="sd-pin-rotate-cw"
+                    title="Rotate clockwise 90° (R)">
+              <i class="fas fa-rotate-right"></i>
+            </button>
+            <button type="button" class="sd-props-action-btn" id="sd-pin-rotate-ccw"
+                    title="Rotate counter-clockwise 90° (Shift+R)">
+              <i class="fas fa-rotate-left"></i>
+            </button>
+            <button type="button" class="sd-props-action-btn" id="sd-pin-flip"
+                    title="Flip direction 180°">
+              <i class="fas fa-arrows-left-right"></i>
+            </button>
           </div>
         </div>
       </section>

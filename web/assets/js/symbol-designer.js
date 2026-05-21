@@ -352,17 +352,40 @@
     return String(max + 1);
   }
 
-  function addPin(sx, sy, side) {
+  // Default-direction heuristic: a pin in the right half points right,
+  // left half points left, etc. Clicks on the central body get a
+  // sensible "outward" direction based on which quadrant is closest
+  // to the edge.
+  function defaultRotationFor(sx, sy) {
+    var halfW = SCENE_W / 2;
+    var halfH = SCENE_H / 2;
+    var dLeft   = sx + halfW;
+    var dRight  = halfW - sx;
+    var dTop    = sy + halfH;
+    var dBottom = halfH - sy;
+    var min = Math.min(dLeft, dRight, dTop, dBottom);
+    if (min === dRight)  return 0;     // points right
+    if (min === dBottom) return 90;    // points down
+    if (min === dLeft)   return 180;   // points left
+    return 270;                        // points up
+  }
+
+  function addPin(sx, sy, rotation) {
     if (!STATE.activeSymbol) return;
-    var snapped = snapPinToSide(sx, sy, side);
+    var grid = { x: snap(sx), y: snap(sy) };
+    var rot = normaliseRotation(rotation);
     var pin = {
       id: nextId('p'),
       number: autoPinNumber(),
       name: '',
       type: DEFAULT_PIN_TYPE,
-      side: side,
-      x: snapped.x,
-      y: snapped.y,
+      rotation: rot,
+      // Legacy `side` written alongside the new `rotation` so the
+      // schematic editor's symbolDefFromCustom (which still reads
+      // `side`) keeps working without a coordinated update.
+      side: rotationToSide(rot),
+      x: grid.x,
+      y: grid.y,
     };
     STATE.activeSymbol.pins.push(pin);
     STATE.selectedPinId = pin.id;
@@ -370,6 +393,49 @@
     renderCanvas();
     renderPropertiesPanel();
     scheduleAutosave();
+  }
+
+  function normaliseRotation(r) {
+    var n = parseInt(r, 10);
+    if (isNaN(n)) return 0;
+    n = ((n % 360) + 360) % 360;
+    // Snap to one of the four cardinal directions.
+    if (n < 45 || n >= 315) return 0;
+    if (n < 135) return 90;
+    if (n < 225) return 180;
+    return 270;
+  }
+
+  function rotationToSide(rot) {
+    switch (normaliseRotation(rot)) {
+      case 0:   return 'right';
+      case 90:  return 'bottom';
+      case 180: return 'left';
+      case 270: return 'top';
+    }
+    return 'right';
+  }
+
+  function sideToRotation(side) {
+    switch (side) {
+      case 'right':  return 0;
+      case 'bottom': return 90;
+      case 'left':   return 180;
+      case 'top':    return 270;
+    }
+    return 0;
+  }
+
+  function pinRotation(pin) {
+    // Tolerate legacy pins that only have `side`.
+    if (pin && typeof pin.rotation === 'number') return normaliseRotation(pin.rotation);
+    if (pin && pin.side) return sideToRotation(pin.side);
+    return 0;
+  }
+
+  function setPinRotation(pin, rot) {
+    pin.rotation = normaliseRotation(rot);
+    pin.side = rotationToSide(pin.rotation);
   }
 
   function addRectShape(x0, y0, x1, y1) {
@@ -525,8 +591,9 @@
     STATE.canvas.clear();
     applyGridBackground();
 
-    // Side rails first (visual hint for the Pin tool).
-    buildSideRails().forEach(function (r) { STATE.canvas.add(r); });
+    // (Side rails removed — pins can be placed anywhere now, so the
+    // rail strips are misleading. The grid alone is enough of a visual
+    // anchor for placement.)
 
     if (!STATE.activeSymbol) {
       // No symbol — just origin + rails so the empty state reads "this
@@ -595,51 +662,50 @@
   }
 
   function drawPin(pin) {
+    // Fusion-360-ish pin: line from the pin centre extending 2 GRID
+    // units in the pin's direction, a small circle terminator at the
+    // outer end of the line (where wires connect), and the pin name +
+    // number past the terminator.
     var pos = s2c(pin.x, pin.y);
-    var stickLen = 12;
-    var ex = pos.x, ey = pos.y;
-    var labelDx = 0, labelDy = 0;
+    var sel = (pin.id === STATE.selectedPinId);
+    var lineLen = 2 * GRID;
+    var rot = pinRotation(pin);
+    var dx = 0, dy = 0;
     var labelAnchorX = 'left';
     var labelAnchorY = 'center';
-    switch (pin.side) {
-      case 'left':
-        ex = pos.x + stickLen;
-        labelDx = stickLen + 4;
-        labelAnchorX = 'left';
-        break;
-      case 'right':
-        ex = pos.x - stickLen;
-        labelDx = -(stickLen + 4);
-        labelAnchorX = 'right';
-        break;
-      case 'top':
-        ey = pos.y + stickLen;
-        labelDy = stickLen + 4;
-        labelAnchorY = 'top';
-        break;
-      case 'bottom':
-        ey = pos.y - stickLen;
-        labelDy = -(stickLen + 4);
-        labelAnchorY = 'bottom';
-        break;
+    var labelPadX = 0, labelPadY = 0;
+    switch (rot) {
+      case 0:    // points right
+        dx = 1; labelAnchorX = 'left';   labelAnchorY = 'center'; labelPadX = 6;  break;
+      case 90:   // points down
+        dy = 1; labelAnchorX = 'center'; labelAnchorY = 'top';    labelPadY = 6;  break;
+      case 180:  // points left
+        dx = -1; labelAnchorX = 'right'; labelAnchorY = 'center'; labelPadX = -6; break;
+      case 270:  // points up
+        dy = -1; labelAnchorX = 'center'; labelAnchorY = 'bottom';labelPadY = -6; break;
     }
-    var sel = (pin.id === STATE.selectedPinId);
-    // Stick
-    var stick = new fabric.Line([pos.x, pos.y, ex, ey], {
+    var endX = pos.x + dx * lineLen;
+    var endY = pos.y + dy * lineLen;
+
+    // Line — pin's wire-attachment direction.
+    var stick = new fabric.Line([pos.x, pos.y, endX, endY], {
       stroke: sel ? BRAND_RED : INK,
       strokeWidth: sel ? 2 : 1.5,
       selectable: false,
       evented: false,
     });
     STATE.canvas.add(stick);
-    // Endpoint dot — the click target.
+
+    // Circle terminator at the OUTER end of the line — the actual
+    // wire-attachment point. Click target lives here too so users
+    // grab the visually most-prominent piece.
     var dot = new fabric.Circle({
-      left: pos.x,
-      top: pos.y,
-      radius: 5,
+      left: endX,
+      top: endY,
+      radius: 4,
       fill: sel ? BRAND_RED : '#fff',
       stroke: sel ? BRAND_RED : INK,
-      strokeWidth: 1.2,
+      strokeWidth: 1.4,
       originX: 'center',
       originY: 'center',
       selectable: false,
@@ -648,12 +714,16 @@
     });
     dot.data = { kind: 'pin', id: pin.id };
     STATE.canvas.add(dot);
-    // Label
-    var label = (pin.number || '') + (pin.name ? ' ' + pin.name : '');
+
+    // Label past the circle: "P$1 GP0" style. Pin number first (so
+    // it lines up with the schematic editor's connection labels),
+    // followed by an optional user-set name.
+    var label = (pin.number ? 'P$' + pin.number : '') +
+                (pin.name ? ' ' + pin.name : '');
     if (label.trim()) {
       var txt = new fabric.Text(label, {
-        left: ex + labelDx,
-        top: ey + labelDy,
+        left: endX + labelPadX,
+        top: endY + labelPadY,
         fontSize: 11,
         fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
         fill: INK,
@@ -684,12 +754,10 @@
 
     switch (STATE.activeTool) {
       case 'pin': {
-        var side = classifyPinSide(sxy.x, sxy.y);
-        if (!side) {
-          showToast('Click closer to an edge to place a pin.');
-          return;
-        }
-        addPin(sxy.x, sxy.y, side);
+        // Pins go anywhere now — no side-rail gate. Pick a sensible
+        // default direction based on which body quadrant the click
+        // landed in so most placements come out facing outward.
+        addPin(sxy.x, sxy.y, defaultRotationFor(sxy.x, sxy.y));
         return;
       }
       case 'rect': {
@@ -843,9 +911,10 @@
         dom.pinTypeRadios,
         function (r) { r.checked = (r.value === (pin.type || DEFAULT_PIN_TYPE)); }
       );
+      var currentRot = String(pinRotation(pin));
       Array.prototype.forEach.call(
-        dom.pinSideRadios,
-        function (r) { r.checked = (r.value === pin.side); }
+        dom.pinRotationRadios,
+        function (r) { r.checked = (r.value === currentRot); }
       );
     }
 
@@ -1034,9 +1103,19 @@
     try {
       var parsed = JSON.parse(s);
       if (parsed && typeof parsed === 'object') {
+        var pins = Array.isArray(parsed.pins) ? parsed.pins : [];
+        // Backfill rotation on legacy pins that only carry the old
+        // `side` field. New pins write both; old pins get the same
+        // treatment on next save.
+        pins.forEach(function (p) {
+          if (typeof p.rotation !== 'number') {
+            p.rotation = sideToRotation(p.side || 'right');
+          }
+          if (!p.side) p.side = rotationToSide(p.rotation);
+        });
         return {
           bodyShapes: Array.isArray(parsed.bodyShapes) ? parsed.bodyShapes : [],
-          pins: Array.isArray(parsed.pins) ? parsed.pins : [],
+          pins: pins,
         };
       }
     } catch (_) { /* fall through to empty */ }
@@ -1282,7 +1361,10 @@
     dom.pinNumber      = document.getElementById('sd-pin-number');
     dom.pinName        = document.getElementById('sd-pin-name');
     dom.pinTypeRadios  = document.querySelectorAll('input[name="sd-pin-type"]');
-    dom.pinSideRadios  = document.querySelectorAll('input[name="sd-pin-side"]');
+    dom.pinRotationRadios = document.querySelectorAll('input[name="sd-pin-rotation"]');
+    dom.pinRotateCw    = document.getElementById('sd-pin-rotate-cw');
+    dom.pinRotateCcw   = document.getElementById('sd-pin-rotate-ccw');
+    dom.pinFlip        = document.getElementById('sd-pin-flip');
 
     dom.shapeSection   = document.getElementById('sd-props-shape-section');
     dom.shapeRectX     = document.getElementById('sd-shape-rect-x');
@@ -1389,17 +1471,36 @@
         scheduleAutosave();
       });
     });
-    Array.prototype.forEach.call(dom.pinSideRadios, function (r) {
+    Array.prototype.forEach.call(dom.pinRotationRadios, function (r) {
       r.addEventListener('change', function () {
         var pin = STATE.selectedPinId && findPin(STATE.selectedPinId);
         if (!pin || !r.checked) return;
-        pin.side = r.value;
-        // Re-snap the pin to its new side's rail axis.
-        var snapped = snapPinToSide(pin.x, pin.y, r.value);
-        pin.x = snapped.x; pin.y = snapped.y;
+        setPinRotation(pin, parseInt(r.value, 10));
         renderCanvas();
         scheduleAutosave();
       });
+    });
+    function rotateSelectedPinBy(delta) {
+      var pin = STATE.selectedPinId && findPin(STATE.selectedPinId);
+      if (!pin) return;
+      setPinRotation(pin, pinRotation(pin) + delta);
+      renderCanvas();
+      renderPropertiesPanel();
+      scheduleAutosave();
+    }
+    if (dom.pinRotateCw)  dom.pinRotateCw.addEventListener('click', function () { rotateSelectedPinBy(90); });
+    if (dom.pinRotateCcw) dom.pinRotateCcw.addEventListener('click', function () { rotateSelectedPinBy(-90); });
+    if (dom.pinFlip)      dom.pinFlip.addEventListener('click', function () { rotateSelectedPinBy(180); });
+    // R / Shift+R keyboard shortcut: rotate selected pin while not in
+    // a text input. Mirrors KiCad / Fusion 360 muscle memory.
+    document.addEventListener('keydown', function (e) {
+      if (document.activeElement &&
+          /input|textarea|select/i.test(document.activeElement.tagName)) return;
+      if ((e.key === 'r' || e.key === 'R') && !e.metaKey && !e.ctrlKey) {
+        if (!STATE.selectedPinId) return;
+        e.preventDefault();
+        rotateSelectedPinBy(e.shiftKey ? -90 : 90);
+      }
     });
 
     // Shape fields — only edit by typing in the inputs.
