@@ -97,6 +97,12 @@
     uiState: null,            // hydrated from localStorage in init()
     backgroundPhotoIds: {},   // photo id -> true, for the ★ badge
     railShortcutsBound: false,
+    // Canvas viewport zoom/pan. userZoom = 1 = "fit to view". Pan is
+    // additive offset in CSS pixels applied on top of the auto-centred
+    // viewport transform.
+    userZoom: 1,
+    panX: 0,
+    panY: 0,
     // C1 — BOM pane
     bomItems: null,           // list of BOMItemResponse, null = not loaded yet
     bomItemsLoading: false,
@@ -137,6 +143,10 @@
     dom.projectTitle = document.getElementById('ib-project-title');
     dom.saveStatus = document.getElementById('ib-save-status');
     dom.exportProgress = document.getElementById('ib-export-progress');
+    dom.zoomIn         = document.getElementById('ib-zoom-in');
+    dom.zoomOut        = document.getElementById('ib-zoom-out');
+    dom.zoomReset      = document.getElementById('ib-zoom-reset');
+    dom.zoomPct        = document.getElementById('ib-zoom-pct');
     dom.exportMenuItems = document.querySelectorAll('.ib-export-menu [data-export]');
     dom.hudToggle = document.getElementById('ib-hud-toggle');
 
@@ -543,17 +553,81 @@
     wireCanvasDropZone();
   }
 
-  // Fabric's internal coordinate space is fixed (CANVAS_W × CANVAS_H),
-  // but the visible canvas resizes with the panel. Tell Fabric what the
-  // current CSS size is so pointer events map correctly.
+  // Canvas viewport: internal canvas pixel dims = CSS dims = frame
+  // dims. A viewportTransform applies the auto-fit scale (so the whole
+  // scene lands inside the frame at default zoom) plus user zoom and
+  // pan offsets. Scene coords stay fixed (CANVAS_W × CANVAS_H); only
+  // the rendering scale changes.
   function syncCanvasDisplaySize() {
     if (!state.canvas || !dom.canvasFrame) return;
     var rect = dom.canvasFrame.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    state.canvas.setDimensions(
-      { width: rect.width, height: rect.height },
-      { cssOnly: true }
-    );
+    var w = Math.max(1, Math.floor(rect.width));
+    var h = Math.max(1, Math.floor(rect.height));
+    state.canvas.setDimensions({ width: w, height: h });
+    applyCanvasViewport();
+  }
+
+  function fitScale() {
+    if (!state.canvas) return 1;
+    var w = state.canvas.getWidth();
+    var h = state.canvas.getHeight();
+    var s = Math.min(w / CANVAS_W, h / CANVAS_H);
+    return s > 0 ? s : 1;
+  }
+
+  function effectiveScale() {
+    return fitScale() * (state.userZoom || 1);
+  }
+
+  function applyCanvasViewport() {
+    if (!state.canvas) return;
+    var w = state.canvas.getWidth();
+    var h = state.canvas.getHeight();
+    var s = effectiveScale();
+    var tx = (w - CANVAS_W * s) / 2 + state.panX;
+    var ty = (h - CANVAS_H * s) / 2 + state.panY;
+    state.canvas.setViewportTransform([s, 0, 0, s, tx, ty]);
+    // After a viewport change, anything that's anchored to a scene
+    // position via CSS — image-context toolbar, HUD when tracking a
+    // moving object — needs to be re-laid out.
+    var img = activeImageOrNull();
+    if (img) positionImageToolbar(img);
+    refreshHudInputsFromCanvas();
+    updateZoomPctLabel();
+  }
+
+  function zoomCanvasBy(factor, focal) {
+    var prev = state.userZoom || 1;
+    var next = Math.max(0.2, Math.min(6, prev * factor));
+    if (next === prev) return;
+    if (focal && state.canvas) {
+      // Keep the point under the cursor fixed across the zoom step.
+      var vt = state.canvas.viewportTransform;
+      var sceneX = (focal.x - vt[4]) / vt[0];
+      var sceneY = (focal.y - vt[5]) / vt[3];
+      state.userZoom = next;
+      var s = effectiveScale();
+      var w = state.canvas.getWidth();
+      var h = state.canvas.getHeight();
+      state.panX = focal.x - sceneX * s - (w - CANVAS_W * s) / 2;
+      state.panY = focal.y - sceneY * s - (h - CANVAS_H * s) / 2;
+    } else {
+      state.userZoom = next;
+    }
+    applyCanvasViewport();
+  }
+
+  function resetCanvasZoom() {
+    state.userZoom = 1;
+    state.panX = 0;
+    state.panY = 0;
+    applyCanvasViewport();
+  }
+
+  function updateZoomPctLabel() {
+    if (!dom.zoomPct) return;
+    dom.zoomPct.textContent = Math.round((state.userZoom || 1) * 100) + '%';
   }
 
   function updateEmptyState() {
@@ -5377,34 +5451,30 @@
   }
 
   function positionImageToolbar(img) {
-    if (!dom.imageToolbar || !dom.canvasArea || !dom.canvasFrame || !img) return;
-    // Get the image's bounding rect in canvas pixels, then translate to
-    // canvas-area coordinates (where the toolbar is positioned).
+    if (!dom.imageToolbar || !dom.canvasArea || !state.canvas || !img) return;
+    // The image's bounding rect in SCENE coords. We then run that
+    // through the canvas viewport transform to get canvas-element
+    // pixel coords, and offset by the canvas element's position
+    // within the canvas-area (where the toolbar is positioned absolute).
     var br;
-    try { br = img.getBoundingRect(true, true); }
-    catch (_) { br = img.getBoundingRect(); }
+    try { br = img.getBoundingRect(); }
+    catch (_) { return; }
     if (!br) return;
 
-    // Translate from internal canvas coordinates to CSS pixels by the
-    // current display scale.
-    var frameRect = dom.canvasFrame.getBoundingClientRect();
-    var areaRect = dom.canvasArea.getBoundingClientRect();
-    if (frameRect.width <= 0 || frameRect.height <= 0) return;
-    var sx = frameRect.width / CANVAS_W;
-    var sy = frameRect.height / CANVAS_H;
+    var vt = state.canvas.viewportTransform || [1, 0, 0, 1, 0, 0];
+    // Scene → canvas-element CSS pixels.
+    var topCx = (br.left + br.width / 2) * vt[0] + vt[4];
+    var topCy = br.top * vt[3] + vt[5];
 
-    // The image's top-centre in the canvas frame's CSS pixel space.
-    var topCx = br.left + br.width / 2;
-    var topCy = br.top;
-    // Frame is positioned relative to the canvas-area; offset accordingly.
-    var x = (frameRect.left - areaRect.left) + topCx * sx;
-    var y = (frameRect.top - areaRect.top) + topCy * sy - 10; // 10px gap
-    // Clamp so the toolbar pill stays inside the canvas area — the
-    // transform offsets by translate(-50%, -100%) so the anchor is the
-    // bottom-centre of the pill.
+    var canvasEl = state.canvas.lowerCanvasEl;
+    var canvasRect = canvasEl.getBoundingClientRect();
+    var areaRect = dom.canvasArea.getBoundingClientRect();
+    var x = (canvasRect.left - areaRect.left) + topCx;
+    var y = (canvasRect.top - areaRect.top) + topCy - 10; // 10 px gap
+
     var tbRect = dom.imageToolbar.getBoundingClientRect();
     var tbH = tbRect.height || 36;
-    if (y < tbH) y = tbH; // never overlap above the area's top edge
+    if (y < tbH) y = tbH;
 
     dom.imageToolbar.style.left = x + 'px';
     dom.imageToolbar.style.top = y + 'px';
@@ -5709,6 +5779,19 @@
         if (e.key === 'Enter') { e.preventDefault(); exitCropMode(true); return; }
         if (e.key === 'Escape') { e.preventDefault(); exitCropMode(false); return; }
       }
+      // Canvas zoom — Cmd/Ctrl + / - / 0 (zoom to fit). Match the
+      // schematic editor's shortcut set so muscle memory transfers.
+      if ((e.metaKey || e.ctrlKey) && !typing && !editingText) {
+        if (e.key === '+' || e.key === '=') {
+          e.preventDefault(); zoomCanvasBy(1.25, null); return;
+        }
+        if (e.key === '-' || e.key === '_') {
+          e.preventDefault(); zoomCanvasBy(1 / 1.25, null); return;
+        }
+        if (e.key === '0') {
+          e.preventDefault(); resetCanvasZoom(); return;
+        }
+      }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
         if (typing || editingText) return;
         e.preventDefault();
@@ -5721,6 +5804,24 @@
         }
       }
     });
+
+    // Zoom button handlers + Ctrl/Cmd + wheel zoom over the canvas
+    // frame. Focal point follows the cursor so what's under the mouse
+    // stays under the mouse across the zoom step.
+    if (dom.zoomIn)    dom.zoomIn.addEventListener('click', function () { zoomCanvasBy(1.25, null); });
+    if (dom.zoomOut)   dom.zoomOut.addEventListener('click', function () { zoomCanvasBy(1 / 1.25, null); });
+    if (dom.zoomReset) dom.zoomReset.addEventListener('click', resetCanvasZoom);
+    if (dom.canvasFrame) {
+      dom.canvasFrame.addEventListener('wheel', function (e) {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        if (!state.canvas) return;
+        e.preventDefault();
+        var rect = state.canvas.lowerCanvasEl.getBoundingClientRect();
+        var focal = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        var factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        zoomCanvasBy(factor, focal);
+      }, { passive: false });
+    }
   }
 
   function applyStyleToSelection() {

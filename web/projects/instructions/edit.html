@@ -35,6 +35,22 @@ hide_nibsy: true
     <div class="ib-titlebar-right">
       <span class="ib-export-progress d-none" id="ib-export-progress" aria-live="polite"></span>
 
+      <!-- Canvas zoom: out / fit (click resets to 100%) / in. -->
+      <div class="ib-zoom-group" role="group" aria-label="Canvas zoom">
+        <button type="button" class="ib-titlebar-btn ib-zoom-btn" id="ib-zoom-out"
+                title="Zoom out (Ctrl/Cmd -)">
+          <i class="fas fa-magnifying-glass-minus"></i>
+        </button>
+        <button type="button" class="ib-titlebar-btn ib-zoom-btn" id="ib-zoom-reset"
+                title="Zoom to fit (Ctrl/Cmd 0)">
+          <span id="ib-zoom-pct">100%</span>
+        </button>
+        <button type="button" class="ib-titlebar-btn ib-zoom-btn" id="ib-zoom-in"
+                title="Zoom in (Ctrl/Cmd +)">
+          <i class="fas fa-magnifying-glass-plus"></i>
+        </button>
+      </div>
+
       <!-- HUD toggle — clickable but the HUD panel itself ships in PR 2. -->
       <button type="button" class="ib-titlebar-btn" id="ib-hud-toggle"
               title="Toggle Inspector HUD" aria-pressed="false">
