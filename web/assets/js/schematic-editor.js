@@ -72,6 +72,7 @@
     {
       id: 'rpi-pico',
       name: 'Raspberry Pi Pico',
+      category: 'Microcontrollers',
       refDesPrefix: 'U',
       bodyWidth: 160,
       bodyHeight: 320,
@@ -103,6 +104,7 @@
     {
       id: 'ic-14',
       name: 'Generic 14-pin IC',
+      category: 'Microcontrollers',
       refDesPrefix: 'U',
       bodyWidth: 128,
       bodyHeight: 224,
@@ -126,6 +128,7 @@
     {
       id: 'resistor',
       name: 'Resistor',
+      category: 'Passive',
       refDesPrefix: 'R',
       bodyWidth: 64,
       bodyHeight: 32,
@@ -137,6 +140,7 @@
     {
       id: 'capacitor',
       name: 'Capacitor',
+      category: 'Passive',
       refDesPrefix: 'C',
       bodyWidth: 64,
       bodyHeight: 32,
@@ -148,6 +152,7 @@
     {
       id: 'led',
       name: 'LED',
+      category: 'Discrete',
       refDesPrefix: 'D',
       bodyWidth: 64,
       bodyHeight: 48,
@@ -159,6 +164,7 @@
     {
       id: 'gnd',
       name: 'GND',
+      category: 'Power',
       refDesPrefix: 'GND',
       bodyWidth: 48,
       bodyHeight: 32,
@@ -171,6 +177,7 @@
     {
       id: 'vplus',
       name: 'V+ rail',
+      category: 'Power',
       refDesPrefix: 'V',
       bodyWidth: 48,
       bodyHeight: 32,
@@ -248,6 +255,7 @@
     return {
       id: 'custom-' + row.id,
       name: row.name || ('Custom #' + row.id),
+      category: 'Custom',
       refDesPrefix: row.ref_des_prefix || 'U',
       bodyWidth: bodyWidth,
       bodyHeight: bodyHeight,
@@ -1528,33 +1536,163 @@
     renderGraph();
   }
 
+  // Symbol-library search/group state. ``query`` is the lower-cased
+  // search string from the input; matches against name + refDes prefix.
+  // ``collapsedCategories`` is a Set of category names the user has
+  // folded; persists in localStorage so the panel comes back the way
+  // they left it.
+  var SYMBOL_LIBRARY_UI = {
+    query: '',
+    collapsedCategories: null,
+  };
+
+  var SYMBOL_COLLAPSE_KEY = 'kr-schematic-symbol-categories-collapsed';
+
+  function getCollapsedCategories() {
+    if (SYMBOL_LIBRARY_UI.collapsedCategories) return SYMBOL_LIBRARY_UI.collapsedCategories;
+    var set = new Set();
+    try {
+      var stored = JSON.parse(localStorage.getItem(SYMBOL_COLLAPSE_KEY) || '[]');
+      if (Array.isArray(stored)) stored.forEach(function (k) { set.add(k); });
+    } catch (_) {}
+    SYMBOL_LIBRARY_UI.collapsedCategories = set;
+    return set;
+  }
+
+  function persistCollapsedCategories() {
+    try {
+      var arr = Array.from(getCollapsedCategories());
+      localStorage.setItem(SYMBOL_COLLAPSE_KEY, JSON.stringify(arr));
+    } catch (_) {}
+  }
+
+  // Stable category display order — built-ins first, Custom last. Any
+  // unknown categories get appended in alphabetical order at the end.
+  var SYMBOL_CATEGORY_ORDER = ['Microcontrollers', 'Passive', 'Discrete', 'Power', 'Custom'];
+
+  function symbolMatchesQuery(sym, q) {
+    if (!q) return true;
+    var hay = ((sym.name || '') + ' ' + (sym.refDesPrefix || '') + ' ' + (sym.category || '')).toLowerCase();
+    return hay.indexOf(q) !== -1;
+  }
+
+  function groupSymbolsByCategory(symbols) {
+    var groups = {};
+    symbols.forEach(function (sym) {
+      var cat = sym.category || (sym.isCustom ? 'Custom' : 'Other');
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(sym);
+    });
+    // Order: predefined order first, then any extras alphabetically.
+    var keys = Object.keys(groups);
+    keys.sort(function (a, b) {
+      var ai = SYMBOL_CATEGORY_ORDER.indexOf(a);
+      var bi = SYMBOL_CATEGORY_ORDER.indexOf(b);
+      if (ai === -1 && bi === -1) return a.localeCompare(b);
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
+    return keys.map(function (cat) { return { category: cat, symbols: groups[cat] }; });
+  }
+
   function renderSymbolList() {
     if (!dom.symbolList) return;
+    var q = (SYMBOL_LIBRARY_UI.query || '').trim().toLowerCase();
+    var filtered = SYMBOL_LIBRARY.filter(function (sym) { return symbolMatchesQuery(sym, q); });
+    if (filtered.length === 0) {
+      dom.symbolList.innerHTML =
+        '<li class="se-symbol-empty">No symbols match "' + escapeHtml(q) + '".</li>';
+      return;
+    }
+    var collapsed = getCollapsedCategories();
+    var groups = groupSymbolsByCategory(filtered);
+    // When searching, expand every category — otherwise hits inside a
+    // collapsed group would be invisible.
+    var anyQuery = !!q;
+
     var html = '';
-    SYMBOL_LIBRARY.forEach(function (sym) {
-      var customBadge = sym.isCustom
-        ? '<span class="se-symbol-custom-badge" title="Designed in the Symbol Designer">Custom</span>'
-        : '';
+    groups.forEach(function (g) {
+      var isCollapsed = !anyQuery && collapsed.has(g.category);
       html +=
-        '<li class="se-symbol-item' + (sym.isCustom ? ' is-custom' : '') +
-            '" data-symbol-id="' + escapeHtml(sym.id) + '" ' +
-            'role="option" tabindex="0">' +
-          '<span class="se-symbol-thumb">' +
-            (sym.isCustom
-              ? '<i class="fas fa-shapes"></i>'
-              : '<i class="fas fa-microchip"></i>') +
-          '</span>' +
-          '<span class="se-symbol-meta">' +
-            '<span class="se-symbol-name">' + escapeHtml(sym.name) +
-              customBadge + '</span>' +
-            '<span class="se-symbol-sub small text-muted">' +
-              escapeHtml(sym.refDesPrefix) + ' &middot; ' +
-              sym.pins.length + ' pins' +
-            '</span>' +
-          '</span>' +
+        '<li class="se-symbol-group' + (isCollapsed ? ' is-collapsed' : '') +
+            '" data-symbol-group="' + escapeHtml(g.category) + '" role="presentation">' +
+          '<i class="fas fa-chevron-down se-symbol-group-chev"></i>' +
+          '<span>' + escapeHtml(g.category) + '</span>' +
+          '<span class="se-symbol-group-count">' + g.symbols.length + '</span>' +
         '</li>';
+      g.symbols.forEach(function (sym) {
+        var customBadge = sym.isCustom
+          ? '<span class="se-symbol-custom-badge" title="Designed in the Symbol Designer">Custom</span>'
+          : '';
+        html +=
+          '<li class="se-symbol-item' + (sym.isCustom ? ' is-custom' : '') +
+              (isCollapsed ? ' is-hidden' : '') +
+              '" data-symbol-id="' + escapeHtml(sym.id) + '"' +
+              ' data-symbol-category="' + escapeHtml(g.category) + '"' +
+              ' role="option" tabindex="0">' +
+            '<span class="se-symbol-thumb">' +
+              (sym.isCustom
+                ? '<i class="fas fa-shapes"></i>'
+                : '<i class="fas fa-microchip"></i>') +
+            '</span>' +
+            '<span class="se-symbol-meta">' +
+              '<span class="se-symbol-name">' + escapeHtml(sym.name) +
+                customBadge + '</span>' +
+              '<span class="se-symbol-sub small text-muted">' +
+                escapeHtml(sym.refDesPrefix) + ' &middot; ' +
+                sym.pins.length + ' pins' +
+              '</span>' +
+            '</span>' +
+          '</li>';
+      });
     });
     dom.symbolList.innerHTML = html;
+  }
+
+  function wireSymbolSearch() {
+    if (!dom.symbolSearch) return;
+    dom.symbolSearch.addEventListener('input', function () {
+      SYMBOL_LIBRARY_UI.query = dom.symbolSearch.value || '';
+      renderSymbolList();
+      if (dom.symbolSearchClear) {
+        dom.symbolSearchClear.hidden = !SYMBOL_LIBRARY_UI.query;
+      }
+    });
+    if (dom.symbolSearchClear) {
+      dom.symbolSearchClear.addEventListener('click', function () {
+        dom.symbolSearch.value = '';
+        SYMBOL_LIBRARY_UI.query = '';
+        dom.symbolSearchClear.hidden = true;
+        renderSymbolList();
+        dom.symbolSearch.focus();
+      });
+    }
+    // Esc clears the search when the input is focused.
+    dom.symbolSearch.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && SYMBOL_LIBRARY_UI.query) {
+        e.preventDefault();
+        e.stopPropagation();
+        dom.symbolSearch.value = '';
+        SYMBOL_LIBRARY_UI.query = '';
+        if (dom.symbolSearchClear) dom.symbolSearchClear.hidden = true;
+        renderSymbolList();
+      }
+    });
+    // Group-header clicks (delegated) collapse/expand a category.
+    if (dom.symbolList) {
+      dom.symbolList.addEventListener('click', function (e) {
+        var hdr = e.target.closest('.se-symbol-group');
+        if (!hdr) return;
+        var cat = hdr.dataset.symbolGroup;
+        if (!cat) return;
+        var set = getCollapsedCategories();
+        if (set.has(cat)) set.delete(cat);
+        else set.add(cat);
+        persistCollapsedCategories();
+        renderSymbolList();
+      });
+    }
   }
 
   // ------------------------------------------------------------------
@@ -1892,6 +2030,8 @@
     dom.main           = document.getElementById('se-main');
     dom.tools          = document.getElementById('se-tools');
     dom.symbolList     = document.getElementById('se-symbol-list');
+    dom.symbolSearch   = document.getElementById('se-symbol-search');
+    dom.symbolSearchClear = document.getElementById('se-symbol-search-clear');
     dom.openSymDesigner = document.getElementById('se-open-symbol-designer');
     dom.canvasArea     = document.getElementById('se-canvas-area');
     dom.canvasWrap     = document.getElementById('se-canvas-wrap');
@@ -1917,6 +2057,8 @@
     if (dom.symbolList) {
       dom.symbolList.addEventListener('click', onSymbolItemClick);
     }
+    // Search box + category-header collapse handlers.
+    wireSymbolSearch();
 
     // Table interactions (delegated)
     if (dom.tableBody) {

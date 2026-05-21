@@ -283,17 +283,96 @@ body.schematic-editor-page {
   border-color: var(--se-brand-red);
 }
 
-/* ---------- Symbol list (place-symbol library) ---------- */
+/* ---------- Symbol search + library ---------- */
+
+.se-symbol-search-wrap {
+  position: relative;
+  margin-bottom: 0.4rem;
+}
+.se-symbol-search-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--se-muted);
+  font-size: 0.78rem;
+  pointer-events: none;
+}
+.se-symbol-search {
+  padding-left: 26px;
+  padding-right: 24px;
+  font-size: 0.85rem;
+}
+.se-symbol-search-clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--se-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.se-symbol-search-clear:hover { color: var(--se-ink); background: #f1f3f5; }
 
 .se-symbol-list {
   list-style: none;
   padding: 0;
   margin: 0 0 0.5rem;
-  max-height: 280px;
+  max-height: 320px;
   overflow-y: auto;
   border: 1px solid var(--se-border);
   border-radius: 6px;
   background: #fbfbfc;
+}
+
+/* Category headers — collapsible group dividers between symbols. */
+.se-symbol-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  background: #f1f3f5;
+  border-bottom: 1px solid var(--se-border);
+  border-top: 1px solid var(--se-border);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--se-muted);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+.se-symbol-group:first-child { border-top: 0; }
+.se-symbol-group .se-symbol-group-chev {
+  font-size: 0.7rem;
+  width: 10px;
+  transition: transform 0.15s;
+}
+.se-symbol-group.is-collapsed .se-symbol-group-chev { transform: rotate(-90deg); }
+.se-symbol-group-count {
+  margin-left: auto;
+  color: var(--se-muted);
+  font-weight: 400;
+  font-size: 0.68rem;
+}
+.se-symbol-group.is-collapsed + .se-symbol-item,
+.se-symbol-group.is-collapsed ~ .se-symbol-item:not(.se-symbol-group ~ .se-symbol-item) {
+  /* Sibling selector flake — actual hide is done by JS toggling a
+     `is-collapsed` data attr on each item belonging to the group. */
+}
+.se-symbol-item.is-hidden { display: none; }
+
+.se-symbol-empty {
+  padding: 0.75rem;
+  text-align: center;
+  color: var(--se-muted);
+  font-size: 0.82rem;
 }
 .se-symbol-item {
   display: flex;

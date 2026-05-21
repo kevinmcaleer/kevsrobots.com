@@ -132,8 +132,21 @@ hide_nibsy: true
 
       <section class="se-tools-section">
         <h6 class="se-tools-section-title">Place symbol</h6>
+        <!-- Search box + categorised list. JS in renderSymbolList()
+             filters by the query (matches name + refDes prefix) and
+             groups remaining symbols by their category. Collapsible
+             headers let the user fold whole categories away when the
+             library grows. -->
+        <div class="se-symbol-search-wrap">
+          <i class="fas fa-search se-symbol-search-icon" aria-hidden="true"></i>
+          <input type="search" class="form-control form-control-sm se-symbol-search"
+                 id="se-symbol-search" placeholder="Search symbols…"
+                 aria-label="Search symbols" autocomplete="off">
+          <button type="button" class="se-symbol-search-clear" id="se-symbol-search-clear"
+                  hidden aria-label="Clear search">&times;</button>
+        </div>
         <ul class="se-symbol-list" id="se-symbol-list" role="listbox" aria-label="Symbol library">
-          <!-- Populated by JS from SYMBOL_LIBRARY -->
+          <!-- Populated by JS from SYMBOL_LIBRARY, grouped by category -->
         </ul>
         <button type="button" class="se-tools-secondary-btn" id="se-open-symbol-designer" disabled
                 title="Coming in the next release">
