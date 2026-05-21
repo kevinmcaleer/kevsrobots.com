@@ -1306,16 +1306,28 @@
     // ----- Selection (default) -----
     if (obj && obj.data) {
       if (obj.data.kind === 'instance') {
+        var hadNet = STATE.selectedNetId;
         STATE.selectedInstanceId = obj.data.instanceId;
         STATE.selectedNetId = null;
+        // Don't re-render the whole graph on instance selection — that
+        // would wipe `obj` (the very group the user just mouse-down'd
+        // on) and replace it with a fresh group, killing Fabric's drag
+        // initiation mid-click. The instance's red border already
+        // comes from Fabric's selection state. Only re-render if a
+        // *net* was previously selected, so its highlight clears.
+        if (hadNet) {
+          renderGraph();
+        } else {
+          renderConnectionsTable();
+          updateSymbolHud();
+        }
       } else if (obj.data.kind === 'net') {
         STATE.selectedNetId = obj.data.netId;
         STATE.selectedInstanceId = null;
+        renderGraph();
       } else {
         clearSelection();
-        return;
       }
-      renderGraph();
       return;
     }
     clearSelection();
