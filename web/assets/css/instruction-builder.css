@@ -1646,9 +1646,14 @@ body.instruction-builder-page {
   overflow: auto;
 }
 /* Schematic step embeds the full editor iframe — fill the canvas area
-   edge-to-edge without padding so it gets every available pixel. */
+   edge-to-edge without padding so it gets every available pixel.
+   align-self: stretch overrides the parent's align-items: center
+   (which would otherwise size this child to content width and leave
+   the iframe rendered at a mobile-ish ~300 px wide). */
 .ib-canvas-schematic {
   flex: 1;
+  align-self: stretch;
+  width: 100%;
   display: flex;
   padding: 0;
   overflow: hidden;
@@ -1658,8 +1663,19 @@ body.instruction-builder-page {
   flex: 1;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   border: 0;
   display: block;
+}
+/* When the schematic step is active, drop the canvas-area padding +
+   centering so the iframe truly fills the area. Reverts cleanly when
+   another step type is selected (the alt views toggle `d-none`). */
+.ib-canvas-area:has(.ib-canvas-schematic:not(.d-none)) {
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden;
 }
 .ib-canvas-text-inner {
   width: 100%;
