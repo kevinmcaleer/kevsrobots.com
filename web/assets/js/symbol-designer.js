@@ -516,6 +516,50 @@
   // schematic page" — the schematic editor already supports per-
   // instance rotate / flip on its instances).
 
+  // Rotate or flip a single shape (rect or line) around its centre.
+  // Used by the Transform section when a shape is selected.
+  function rotateOrFlipShape(shape, kind) {
+    if (!shape) return;
+    if (shape.kind === 'rect') {
+      if (kind === 'rotate-cw' || kind === 'rotate-ccw') {
+        // 90° rotation around the rect's centre — swap w/h and
+        // recompute top-left so the centre stays put.
+        var cx = shape.x + shape.w / 2;
+        var cy = shape.y + shape.h / 2;
+        var nw = shape.h;
+        var nh = shape.w;
+        shape.w = nw;
+        shape.h = nh;
+        shape.x = snap(cx - nw / 2);
+        shape.y = snap(cy - nh / 2);
+      }
+      // Flip on a rectangle is a visual no-op (rects are symmetric)
+      // but we still schedule a save so the action feels responsive.
+    } else if (shape.kind === 'line') {
+      var midX = (shape.x1 + shape.x2) / 2;
+      var midY = (shape.y1 + shape.y2) / 2;
+      if (kind === 'rotate-cw' || kind === 'rotate-ccw') {
+        var sign = kind === 'rotate-cw' ? 1 : -1;
+        // 90° rotation around midpoint: (dx, dy) → (-sign*dy, sign*dx)
+        var dx1 = shape.x1 - midX, dy1 = shape.y1 - midY;
+        var dx2 = shape.x2 - midX, dy2 = shape.y2 - midY;
+        shape.x1 = snap(midX + (-sign * dy1));
+        shape.y1 = snap(midY + (sign * dx1));
+        shape.x2 = snap(midX + (-sign * dy2));
+        shape.y2 = snap(midY + (sign * dx2));
+      } else if (kind === 'flip-h') {
+        shape.x1 = snap(2 * midX - shape.x1);
+        shape.x2 = snap(2 * midX - shape.x2);
+      } else if (kind === 'flip-v') {
+        shape.y1 = snap(2 * midY - shape.y1);
+        shape.y2 = snap(2 * midY - shape.y2);
+      }
+    }
+    renderCanvas();
+    renderPropertiesPanel();
+    scheduleAutosave();
+  }
+
   function rotateAll(deg) {
     if (!STATE.activeSymbol) return;
     var rad = deg * Math.PI / 180;
@@ -618,9 +662,16 @@
           fill: s.fill || 'rgba(255,255,255,0.01)',
           stroke: sel ? BRAND_RED : (s.stroke || INK),
           strokeWidth: sel ? 2.5 : 1.5,
-          selectable: false,
-          evented: true,
-          hoverCursor: 'pointer',
+          // Draggable to move; no resize / rotate handles. Use the
+          // properties panel for explicit x/y/w/h tweaks.
+          selectable: true,
+          hasControls: false,
+          hasBorders: sel,
+          lockRotation: true,
+          lockScalingX: true,
+          lockScalingY: true,
+          lockScalingFlip: true,
+          hoverCursor: 'move',
           objectCaching: false,
         });
         rect.data = { kind: 'shape', id: s.id };
@@ -631,9 +682,14 @@
         var line = new fabric.Line([a.x, a.y, b.x, b.y], {
           stroke: sel ? BRAND_RED : (s.stroke || INK),
           strokeWidth: sel ? 2.5 : 1.5,
-          selectable: false,
-          evented: true,
-          hoverCursor: 'pointer',
+          selectable: true,
+          hasControls: false,
+          hasBorders: sel,
+          lockRotation: true,
+          lockScalingX: true,
+          lockScalingY: true,
+          lockScalingFlip: true,
+          hoverCursor: 'move',
           perPixelTargetFind: true,
           objectCaching: false,
         });
@@ -687,18 +743,22 @@
     var endX = pos.x + dx * lineLen;
     var endY = pos.y + dy * lineLen;
 
-    // Line — pin's wire-attachment direction.
+    // Line — pin's wire-attachment direction. Tagged with the pin id
+    // so the drag handler can find + move it as the user drags the
+    // dot terminator.
     var stick = new fabric.Line([pos.x, pos.y, endX, endY], {
       stroke: sel ? BRAND_RED : INK,
       strokeWidth: sel ? 2 : 1.5,
       selectable: false,
       evented: false,
     });
+    stick.data = { kind: 'pin-part', id: pin.id };
     STATE.canvas.add(stick);
 
     // Circle terminator at the OUTER end of the line — the actual
-    // wire-attachment point. Click target lives here too so users
-    // grab the visually most-prominent piece.
+    // wire-attachment point AND the drag handle. The line + label
+    // (added below) track its motion via the canvas object:moving
+    // listener so the whole pin moves as one.
     var dot = new fabric.Circle({
       left: endX,
       top: endY,
@@ -708,11 +768,23 @@
       strokeWidth: 1.4,
       originX: 'center',
       originY: 'center',
-      selectable: false,
-      evented: true,
-      hoverCursor: 'pointer',
+      // Draggable handle: no scale controls, no rotate handle, locked
+      // scaling so the user can only translate.
+      selectable: true,
+      hasControls: false,
+      hasBorders: false,
+      lockRotation: true,
+      lockScalingX: true,
+      lockScalingY: true,
+      lockScalingFlip: true,
+      hoverCursor: 'move',
     });
     dot.data = { kind: 'pin', id: pin.id };
+    // Stash a snapshot of the drag-handle's starting position so the
+    // object:moving handler can compute per-tick deltas to push into
+    // the linked line + label.
+    dot._lastLeft = dot.left;
+    dot._lastTop = dot.top;
     STATE.canvas.add(dot);
 
     // Label past the circle: "P$1 GP0" style. Pin number first (so
@@ -732,6 +804,7 @@
         selectable: false,
         evented: false,
       });
+      txt.data = { kind: 'pin-part', id: pin.id };
       STATE.canvas.add(txt);
     }
   }
@@ -788,7 +861,12 @@
             STATE.selectedShapeId = obj.data.id;
             STATE.selectedPinId = null;
           }
-          renderCanvas();
+          // Don't renderCanvas here — that would wipe the very object
+          // the user just mouse-down'd on and Fabric would lose its
+          // drag-initiation target (the same bug the schematic editor
+          // hit). The Fabric default selection border shows
+          // immediately; the next render-on-modify swap in the red
+          // brand highlight is fine to wait for.
           renderPropertiesPanel();
           return;
         }
@@ -872,6 +950,21 @@
     var hasSymbol = !!STATE.activeSymbol;
     var pin = STATE.selectedPinId ? findPin(STATE.selectedPinId) : null;
     var shape = STATE.selectedShapeId ? findShape(STATE.selectedShapeId) : null;
+
+    // Transform-section target hint + button enabled state.
+    if (dom.transformTarget) {
+      if (pin)        dom.transformTarget.textContent = '— selected pin';
+      else if (shape) dom.transformTarget.textContent = '— selected shape';
+      else if (hasSymbol) dom.transformTarget.textContent = '— whole symbol';
+      else            dom.transformTarget.textContent = '— select an item';
+    }
+    var canTransform = !!(pin || shape || hasSymbol);
+    [dom.transformRotateCw, dom.transformRotateCcw, dom.transformFlipH, dom.transformFlipV].forEach(function (b) {
+      if (b) {
+        b.disabled = !canTransform;
+        b.classList.toggle('is-disabled', !canTransform);
+      }
+    });
 
     // Symbol-level section
     if (dom.symbolSection) {
@@ -1267,6 +1360,77 @@
     c.on('mouse:move', onCanvasMouseMove);
     c.on('mouse:up',   onCanvasMouseUp);
 
+    // Pin drag — the dot is the only selectable part. As it moves we
+    // ferry the same delta into the line + label so the whole pin
+    // visually tracks the cursor. On modified (mouseup) we snap and
+    // commit to STATE, then renderCanvas() rebuilds everything fresh.
+    c.on('object:moving', function (e) {
+      var obj = e.target;
+      if (!obj || !obj.data || obj.data.kind !== 'pin') return;
+      var dx = obj.left - (obj._lastLeft != null ? obj._lastLeft : obj.left);
+      var dy = obj.top  - (obj._lastTop  != null ? obj._lastTop  : obj.top);
+      obj._lastLeft = obj.left;
+      obj._lastTop = obj.top;
+      // Find the line + label that belong to this pin.
+      var others = c.getObjects().filter(function (o) {
+        return o.data && o.data.kind === 'pin-part' && o.data.id === obj.data.id;
+      });
+      others.forEach(function (o) {
+        if (o.type === 'line') {
+          o.set({ x1: o.x1 + dx, y1: o.y1 + dy, x2: o.x2 + dx, y2: o.y2 + dy });
+        } else {
+          o.set({ left: o.left + dx, top: o.top + dy });
+        }
+        o.setCoords();
+      });
+    });
+
+    c.on('object:modified', function (e) {
+      var obj = e.target;
+      if (!obj || !obj.data) return;
+      if (obj.data.kind === 'pin') {
+        var pin = findPin(obj.data.id);
+        if (!pin) return;
+        // Snap dot's final position to grid, then back out the pin
+        // centre (which is 2*GRID inward from the dot terminator).
+        var snapped = snapCanvasXY(obj.left, obj.top);
+        var rot = pinRotation(pin);
+        var dx = 0, dy = 0;
+        switch (rot) {
+          case 0:   dx = 1;  break;
+          case 90:  dy = 1;  break;
+          case 180: dx = -1; break;
+          case 270: dy = -1; break;
+        }
+        var sceneEnd = c2s(snapped.x, snapped.y);
+        pin.x = sceneEnd.x - dx * 2 * GRID;
+        pin.y = sceneEnd.y - dy * 2 * GRID;
+        renderCanvas();
+        scheduleAutosave();
+      } else if (obj.data.kind === 'shape') {
+        var shape = findShape(obj.data.id);
+        if (!shape) return;
+        if (shape.kind === 'rect') {
+          var snapped2 = snapCanvasXY(obj.left, obj.top);
+          var scene = c2s(snapped2.x, snapped2.y);
+          shape.x = scene.x;
+          shape.y = scene.y;
+        } else if (shape.kind === 'line') {
+          // Line drag updates obj.left/top as an offset relative to
+          // its original x1/y1/x2/y2 coords. Pull the delta out and
+          // apply to the stored scene-space endpoints.
+          var dxL = obj.left || 0;
+          var dyL = obj.top  || 0;
+          shape.x1 = snap(shape.x1 + dxL);
+          shape.y1 = snap(shape.y1 + dyL);
+          shape.x2 = snap(shape.x2 + dxL);
+          shape.y2 = snap(shape.y2 + dyL);
+        }
+        renderCanvas();
+        scheduleAutosave();
+      }
+    });
+
     syncCanvasDisplaySize();
     window.addEventListener('resize', syncCanvasDisplaySize);
 
@@ -1299,26 +1463,77 @@
     });
   }
 
+  // Viewport state — matches the pattern used in the schematic editor
+  // + instruction builder. Internal canvas pixels = wrap CSS pixels;
+  // a viewportTransform applies the auto-fit scale (so the whole scene
+  // fits in the wrap) multiplied by userZoom and offset by pan.
+  STATE.userZoom = STATE.userZoom || 1;
+  STATE.panX = STATE.panX || 0;
+  STATE.panY = STATE.panY || 0;
+
   function syncCanvasDisplaySize() {
     if (!STATE.canvas || !dom.canvasWrap) return;
     var rect = dom.canvasWrap.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    var scale = Math.min(rect.width / SCENE_W, rect.height / SCENE_H, 1.6);
-    if (scale < 0.1) scale = 0.1;
-    // Set CSS dimensions only; internal canvas pixels stay at SCENE_W
-    // × SCENE_H so scene coords map 1:1 to canvas pixels. Browser
-    // scales the rendered bitmap to the CSS box. Do NOT also call
-    // setZoom() — combining cssOnly + setZoom double-scales: objects
-    // render at (scene × zoom) internal pixels, then the browser
-    // scales those down by (CSS/internal), so the visible scene ends
-    // up at scale² of intended, tucked into the upper-left and
-    // invisible at typical scales (the exact bug the schematic editor
-    // hit).
-    STATE.canvas.setDimensions(
-      { width: SCENE_W * scale, height: SCENE_H * scale },
-      { cssOnly: true }
-    );
-    if (STATE.canvas.getZoom() !== 1) STATE.canvas.setZoom(1);
+    var w = Math.max(1, Math.floor(rect.width));
+    var h = Math.max(1, Math.floor(rect.height));
+    STATE.canvas.setDimensions({ width: w, height: h });
+    applyViewport();
+  }
+
+  function sdFitScale() {
+    if (!STATE.canvas) return 1;
+    var w = STATE.canvas.getWidth();
+    var h = STATE.canvas.getHeight();
+    var s = Math.min(w / SCENE_W, h / SCENE_H);
+    return s > 0 ? s : 1;
+  }
+
+  function sdEffectiveScale() {
+    return sdFitScale() * (STATE.userZoom || 1);
+  }
+
+  function applyViewport() {
+    if (!STATE.canvas) return;
+    var w = STATE.canvas.getWidth();
+    var h = STATE.canvas.getHeight();
+    var s = sdEffectiveScale();
+    var tx = (w - SCENE_W * s) / 2 + STATE.panX;
+    var ty = (h - SCENE_H * s) / 2 + STATE.panY;
+    STATE.canvas.setViewportTransform([s, 0, 0, s, tx, ty]);
+    updateZoomPctLabel();
+  }
+
+  function zoomBy(factor, focal) {
+    var prev = STATE.userZoom || 1;
+    var next = Math.max(0.25, Math.min(6, prev * factor));
+    if (next === prev) return;
+    if (focal && STATE.canvas) {
+      var vt = STATE.canvas.viewportTransform;
+      var sceneX = (focal.x - vt[4]) / vt[0];
+      var sceneY = (focal.y - vt[5]) / vt[3];
+      STATE.userZoom = next;
+      var s = sdEffectiveScale();
+      var w = STATE.canvas.getWidth();
+      var h = STATE.canvas.getHeight();
+      STATE.panX = focal.x - sceneX * s - (w - SCENE_W * s) / 2;
+      STATE.panY = focal.y - sceneY * s - (h - SCENE_H * s) / 2;
+    } else {
+      STATE.userZoom = next;
+    }
+    applyViewport();
+  }
+
+  function resetZoom() {
+    STATE.userZoom = 1;
+    STATE.panX = 0;
+    STATE.panY = 0;
+    applyViewport();
+  }
+
+  function updateZoomPctLabel() {
+    if (!dom.zoomPct) return;
+    dom.zoomPct.textContent = Math.round((STATE.userZoom || 1) * 100) + '%';
   }
 
   // ====================================================================
@@ -1362,9 +1577,18 @@
     dom.pinName        = document.getElementById('sd-pin-name');
     dom.pinTypeRadios  = document.querySelectorAll('input[name="sd-pin-type"]');
     dom.pinRotationRadios = document.querySelectorAll('input[name="sd-pin-rotation"]');
-    dom.pinRotateCw    = document.getElementById('sd-pin-rotate-cw');
-    dom.pinRotateCcw   = document.getElementById('sd-pin-rotate-ccw');
-    dom.pinFlip        = document.getElementById('sd-pin-flip');
+    // Transform section (top of right pane) — operates on selected
+    // pin or shape.
+    dom.transformRotateCw  = document.getElementById('sd-transform-rotate-cw');
+    dom.transformRotateCcw = document.getElementById('sd-transform-rotate-ccw');
+    dom.transformFlipH     = document.getElementById('sd-transform-flip-h');
+    dom.transformFlipV     = document.getElementById('sd-transform-flip-v');
+    dom.transformTarget    = document.getElementById('sd-transform-target');
+    // Zoom group
+    dom.zoomIn         = document.getElementById('sd-zoom-in');
+    dom.zoomOut        = document.getElementById('sd-zoom-out');
+    dom.zoomReset      = document.getElementById('sd-zoom-reset');
+    dom.zoomPct        = document.getElementById('sd-zoom-pct');
 
     dom.shapeSection   = document.getElementById('sd-props-shape-section');
     dom.shapeRectX     = document.getElementById('sd-shape-rect-x');
@@ -1488,9 +1712,59 @@
       renderPropertiesPanel();
       scheduleAutosave();
     }
-    if (dom.pinRotateCw)  dom.pinRotateCw.addEventListener('click', function () { rotateSelectedPinBy(90); });
-    if (dom.pinRotateCcw) dom.pinRotateCcw.addEventListener('click', function () { rotateSelectedPinBy(-90); });
-    if (dom.pinFlip)      dom.pinFlip.addEventListener('click', function () { rotateSelectedPinBy(180); });
+    // Transform section (top of right pane). Acts on the selected
+    // pin or shape, or — when nothing is selected — falls back to
+    // the whole-symbol transforms.
+    function transformAction(kind) {
+      var pin = STATE.selectedPinId && findPin(STATE.selectedPinId);
+      var shape = STATE.selectedShapeId && findShape(STATE.selectedShapeId);
+      if (pin) {
+        if (kind === 'rotate-cw')      rotateSelectedPinBy(90);
+        else if (kind === 'rotate-ccw') rotateSelectedPinBy(-90);
+        else if (kind === 'flip-h' || kind === 'flip-v') rotateSelectedPinBy(180);
+      } else if (shape) {
+        // For shapes, rotate-cw / rotate-ccw means "rotate the
+        // shape's geometry around its centre by 90°" — and flip-h/v
+        // mirrors. Implemented for rects via swap-and-recentre;
+        // lines via swap endpoints. Not the deepest transform but
+        // covers the common cases.
+        rotateOrFlipShape(shape, kind);
+      } else if (STATE.activeSymbol) {
+        // Whole-symbol fallback (kept from the old toolbox).
+        if (kind === 'rotate-cw')       rotateAll(90);
+        else if (kind === 'rotate-ccw') rotateAll(-90);
+        else if (kind === 'flip-h')     flipAll('h');
+        else if (kind === 'flip-v')     flipAll('v');
+      }
+    }
+    if (dom.transformRotateCw)  dom.transformRotateCw.addEventListener('click', function () { transformAction('rotate-cw'); });
+    if (dom.transformRotateCcw) dom.transformRotateCcw.addEventListener('click', function () { transformAction('rotate-ccw'); });
+    if (dom.transformFlipH)     dom.transformFlipH.addEventListener('click', function () { transformAction('flip-h'); });
+    if (dom.transformFlipV)     dom.transformFlipV.addEventListener('click', function () { transformAction('flip-v'); });
+
+    // Zoom buttons + Ctrl+wheel + Cmd/Ctrl + / - / 0.
+    if (dom.zoomIn)    dom.zoomIn.addEventListener('click', function () { zoomBy(1.25, null); });
+    if (dom.zoomOut)   dom.zoomOut.addEventListener('click', function () { zoomBy(1 / 1.25, null); });
+    if (dom.zoomReset) dom.zoomReset.addEventListener('click', resetZoom);
+    if (dom.canvasWrap) {
+      dom.canvasWrap.addEventListener('wheel', function (e) {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        if (!STATE.canvas) return;
+        e.preventDefault();
+        var rect = STATE.canvas.lowerCanvasEl.getBoundingClientRect();
+        var focal = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        var factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        zoomBy(factor, focal);
+      }, { passive: false });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      if (document.activeElement &&
+          /input|textarea|select/i.test(document.activeElement.tagName)) return;
+      if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomBy(1.25, null); }
+      else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomBy(1 / 1.25, null); }
+      else if (e.key === '0') { e.preventDefault(); resetZoom(); }
+    });
     // R / Shift+R keyboard shortcut: rotate selected pin while not in
     // a text input. Mirrors KiCad / Fusion 360 muscle memory.
     document.addEventListener('keydown', function (e) {

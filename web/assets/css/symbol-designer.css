@@ -476,8 +476,8 @@ body.symbol-designer-page > .container-fluid {
   gap: 0.3rem;
 }
 .sd-props-action-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--sd-border);
   background: #fff;
   border-radius: 4px;
@@ -486,11 +486,53 @@ body.symbol-designer-page > .container-fluid {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 .sd-props-action-btn:hover {
   border-color: var(--sd-brand-red);
   color: var(--sd-brand-red);
+}
+.sd-props-action-btn:disabled,
+.sd-props-action-btn.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.sd-props-section-hint {
+  font-weight: 400;
+  margin-left: 0.4rem;
+  font-size: 0.7rem;
+}
+
+/* Canvas zoom group in title bar — mirrors the schematic editor's
+   `.se-zoom-group` styling. */
+.sd-zoom-group {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--sd-border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-right: 0.4rem;
+}
+.sd-zoom-group .sd-zoom-btn {
+  border: 0;
+  border-radius: 0;
+  padding: 0 0.55rem;
+  background: #fff;
+  color: var(--sd-ink);
+  font-size: 0.85rem;
+  line-height: 1;
+  min-width: 0;
+}
+.sd-zoom-group .sd-zoom-btn + .sd-zoom-btn {
+  border-left: 1px solid var(--sd-border);
+}
+.sd-zoom-group .sd-zoom-btn:hover { background: #f3f4f6; }
+#sd-zoom-pct {
+  display: inline-block;
+  min-width: 3em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
 }
 
 /* Shape-properties grid (rect / line) */

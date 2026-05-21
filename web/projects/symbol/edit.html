@@ -30,6 +30,23 @@ hide_nibsy: true
       <span class="sd-save-status" id="sd-save-status" aria-live="polite"></span>
     </div>
     <div class="sd-titlebar-right">
+      <!-- Canvas zoom — minus / fit% / plus, matching the schematic
+           editor + instruction builder. Ctrl+wheel over the canvas
+           zooms toward the cursor. Cmd/Ctrl + / - / 0 keyboard. -->
+      <div class="sd-zoom-group" role="group" aria-label="Canvas zoom">
+        <button type="button" class="sd-titlebar-btn sd-zoom-btn" id="sd-zoom-out"
+                title="Zoom out (Ctrl/Cmd -)">
+          <i class="fas fa-magnifying-glass-minus"></i>
+        </button>
+        <button type="button" class="sd-titlebar-btn sd-zoom-btn" id="sd-zoom-reset"
+                title="Zoom to fit (Ctrl/Cmd 0)">
+          <span id="sd-zoom-pct">100%</span>
+        </button>
+        <button type="button" class="sd-titlebar-btn sd-zoom-btn" id="sd-zoom-in"
+                title="Zoom in (Ctrl/Cmd +)">
+          <i class="fas fa-magnifying-glass-plus"></i>
+        </button>
+      </div>
       <a id="sd-open-schematic" class="sd-titlebar-btn" href="#"
          title="Open the schematic editor for this project">
         <i class="fas fa-diagram-project me-1"></i> Open schematic
@@ -140,23 +157,11 @@ hide_nibsy: true
                 title="Text (coming soon)">
           <i class="fas fa-font"></i><span>Text</span>
         </button>
-        <span class="sd-toolbox-sep" aria-hidden="true"></span>
-        <button type="button" class="sd-tool-btn" data-tool="rotate-ccw"
-                title="Rotate -90&deg;">
-          <i class="fas fa-rotate-left"></i><span>-90&deg;</span>
-        </button>
-        <button type="button" class="sd-tool-btn" data-tool="rotate-cw"
-                title="Rotate +90&deg;">
-          <i class="fas fa-rotate-right"></i><span>+90&deg;</span>
-        </button>
-        <button type="button" class="sd-tool-btn" data-tool="flip-h"
-                title="Flip horizontally">
-          <i class="fas fa-arrows-left-right"></i><span>Flip H</span>
-        </button>
-        <button type="button" class="sd-tool-btn" data-tool="flip-v"
-                title="Flip vertically">
-          <i class="fas fa-arrows-up-down"></i><span>Flip V</span>
-        </button>
+        <!-- Rotate / Flip buttons moved into the Transform section of
+             the right-hand properties panel; the toolbox ones rotated
+             the WHOLE symbol, which read as "rotate the canvas" and
+             clobbered selection state. The new pane buttons act on
+             the currently-selected pin or shape. -->
       </div>
 
       <!-- Canvas wrapper -->
@@ -174,6 +179,35 @@ hide_nibsy: true
 
     <!-- Properties panel (right, 260px) -->
     <aside class="sd-props" id="sd-props" aria-label="Properties panel">
+      <!-- Transform — sits at the very top so it's always one click
+           away. Operates on the currently selected pin (rotates pin
+           direction) or, when nothing is selected, applies to the
+           whole symbol. Disabled state is reflected via .is-disabled
+           on each button. -->
+      <section class="sd-props-section" id="sd-props-transform-section">
+        <h6 class="sd-props-section-title">Transform
+          <span class="sd-props-section-hint text-muted small" id="sd-transform-target">— select an item</span>
+        </h6>
+        <div class="sd-props-action-row">
+          <button type="button" class="sd-props-action-btn" id="sd-transform-rotate-ccw"
+                  title="Rotate -90° (Shift+R)">
+            <i class="fas fa-rotate-left"></i>
+          </button>
+          <button type="button" class="sd-props-action-btn" id="sd-transform-rotate-cw"
+                  title="Rotate +90° (R)">
+            <i class="fas fa-rotate-right"></i>
+          </button>
+          <button type="button" class="sd-props-action-btn" id="sd-transform-flip-h"
+                  title="Flip horizontally">
+            <i class="fas fa-arrows-left-right"></i>
+          </button>
+          <button type="button" class="sd-props-action-btn" id="sd-transform-flip-v"
+                  title="Flip vertically">
+            <i class="fas fa-arrows-up-down"></i>
+          </button>
+        </div>
+      </section>
+
       <section class="sd-props-section" id="sd-props-symbol-section">
         <h6 class="sd-props-section-title">Symbol</h6>
         <div class="sd-props-field">
@@ -240,23 +274,10 @@ hide_nibsy: true
             <label><input type="radio" name="sd-pin-rotation" value="270"><span>Up</span></label>
           </div>
         </div>
-        <div class="sd-props-field">
-          <label>Quick actions</label>
-          <div class="sd-props-action-row">
-            <button type="button" class="sd-props-action-btn" id="sd-pin-rotate-cw"
-                    title="Rotate clockwise 90° (R)">
-              <i class="fas fa-rotate-right"></i>
-            </button>
-            <button type="button" class="sd-props-action-btn" id="sd-pin-rotate-ccw"
-                    title="Rotate counter-clockwise 90° (Shift+R)">
-              <i class="fas fa-rotate-left"></i>
-            </button>
-            <button type="button" class="sd-props-action-btn" id="sd-pin-flip"
-                    title="Flip direction 180°">
-              <i class="fas fa-arrows-left-right"></i>
-            </button>
-          </div>
-        </div>
+        <!-- Rotation / flip moved to the Transform section at the top
+             of the properties panel so it's reachable for both pins
+             and shapes without scrolling. -->
+
       </section>
 
       <section class="sd-props-section d-none" id="sd-props-shape-section">
