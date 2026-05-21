@@ -383,10 +383,18 @@ body.schematic-editor-page {
   height: 28px;
   border-radius: 4px;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
+  /* Same line-height-matches-height centring pattern as the
+     instruction-builder HUD action buttons. FA glyphs sit high
+     inside a flex-centred line box. */
+  display: block;
+  text-align: center;
+  padding: 0;
+}
+.se-hud-btn i {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 14px;
+  line-height: 28px;
 }
 .se-hud-btn:hover { background: rgba(255,255,255,0.12); }
 .se-hud-btn-danger:hover { background: var(--se-brand-red); }
