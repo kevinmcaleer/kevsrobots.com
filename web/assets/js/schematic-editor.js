@@ -855,7 +855,12 @@
       var line = new fabric.Line([seg.x1, seg.y1, seg.x2, seg.y2], {
         stroke: selected ? BRAND_RED : (net.color || INK),
         strokeWidth: selected ? NET_STROKE_SELECTED : NET_STROKE,
-        selectable: true,
+        // selectable: false keeps the wire out of rubber-band group
+        // selections; the existing onCanvasMouseDown handler still
+        // catches a direct click via evented: true and toggles
+        // STATE.selectedNetId itself.
+        selectable: false,
+        evented: true,
         hasControls: false,
         hasBorders: false,
         hoverCursor: 'pointer',
@@ -1178,9 +1183,20 @@
   }
 
   function clearSelection() {
+    var hadNet = !!STATE.selectedNetId;
     STATE.selectedInstanceId = null;
     STATE.selectedNetId = null;
-    renderGraph();
+    // Only renderGraph if a net's highlight needs to clear. Otherwise
+    // a click-on-empty just to start a rubber-band drag would wipe
+    // the canvas inside Fabric's mouse:down — same family of bug as
+    // the schematic editor's "click selects but kills drag" issue.
+    if (hadNet) {
+      renderGraph();
+    } else {
+      renderConnectionsTable();
+      renderProps();
+      updateSymbolHud();
+    }
   }
 
   // ====================================================================
@@ -1482,7 +1498,51 @@
 
   function onCanvasObjectModified(opt) {
     var obj = opt.target;
-    if (!obj || !obj.data || obj.data.kind !== 'instance') return;
+    if (!obj) return;
+
+    // Multi-symbol drop. When the user has 2+ symbols rubber-band /
+    // shift-click selected, Fabric wraps them in an ActiveSelection
+    // and dragging moves them as a unit. We iterate the children,
+    // pull each one's now-canvas-space left/top, and update the
+    // corresponding instance in STATE.
+    if (obj.type === 'activeselection' || obj.type === 'activeSelection') {
+      var asMatrix = obj.calcTransformMatrix
+        ? obj.calcTransformMatrix()
+        : null;
+      (obj.getObjects ? obj.getObjects() : []).forEach(function (child) {
+        if (!child.data || child.data.kind !== 'instance') return;
+        var inst = findInstance(child.data.instanceId);
+        if (!inst) return;
+        // Child positions inside an AS are stored relative to the AS
+        // origin. Transform (child.left, child.top) through the AS
+        // matrix to get canvas-space coords.
+        var pt;
+        if (asMatrix && fabric.util && fabric.util.transformPoint) {
+          pt = fabric.util.transformPoint(
+            { x: child.left, y: child.top },
+            asMatrix
+          );
+        } else {
+          // Fallback: use the bounding-rect centre, accepting the small
+          // refLabel-offset bias rather than failing.
+          var br = child.getBoundingRect ? child.getBoundingRect() : null;
+          pt = br
+            ? { x: br.left + br.width / 2, y: br.top + br.height / 2 }
+            : { x: inst.x, y: inst.y };
+        }
+        inst.x = snap(pt.x);
+        inst.y = snap(pt.y);
+        rerouteNetsFor(inst.id);
+      });
+      requestAnimationFrame(function () {
+        if (STATE.canvas) STATE.canvas.discardActiveObject();
+        renderGraph();
+      });
+      scheduleAutosave();
+      return;
+    }
+
+    if (!obj.data || obj.data.kind !== 'instance') return;
     var inst = findInstance(obj.data.instanceId);
     if (!inst) return;
     inst.x = obj.left;
@@ -1526,6 +1586,10 @@
         btn.classList.toggle('is-active', btn.dataset.tool === tool);
       }
     );
+    // Multi-select / rubber-band is only meaningful in Select mode —
+    // every other tool needs raw mouse:down events to drive placement
+    // / net drawing without Fabric grabbing them first.
+    if (STATE.canvas) STATE.canvas.selection = (tool === 'select');
     if (tool !== 'symbol') {
       STATE.pendingSymbolId = null;
       Array.prototype.forEach.call(

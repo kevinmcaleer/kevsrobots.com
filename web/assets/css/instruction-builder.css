@@ -1787,17 +1787,23 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   position: absolute;
   top: 4px;
   right: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 18px;
   height: 18px;
   background: #fff;
   border: 1px solid #dee2e6;
   border-radius: 999px;
   color: #6c757d;
-  font-size: 0.6rem;
   pointer-events: none;
+  /* Same line-height-matches-height pattern as the HUD action buttons
+     so the FA glyph sits centred — flex-align leaves it too high. */
+  display: block;
+  text-align: center;
+}
+.ib-step-tile-badge i {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 9px;
+  line-height: 16px;  /* badge height - 2px border */
 }
 .ib-step-tile.is-active .ib-step-tile-badge {
   border-color: var(--bs-primary, #c8312a);

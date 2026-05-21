@@ -396,12 +396,18 @@ body.schematic-editor-page {
   border-radius: 4px;
   background: #fff;
   border: 1px solid var(--se-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: var(--se-muted);
-  font-size: 0.9rem;
   flex: 0 0 auto;
+  /* Block + line-height-matches-height — same pattern as the HUD
+     action buttons; flex-align leaves the FA glyph too high. */
+  display: block;
+  text-align: center;
+}
+.se-symbol-thumb i {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 14px;
+  line-height: 26px;  /* thumb height - 2px border */
 }
 .se-symbol-meta { display: flex; flex-direction: column; line-height: 1.2; }
 .se-symbol-name { font-weight: 500; }

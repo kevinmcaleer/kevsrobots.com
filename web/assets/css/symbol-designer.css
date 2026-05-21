@@ -492,10 +492,18 @@ body.symbol-designer-page.is-embedded .sd-titlebar {
   border-radius: 4px;
   color: var(--sd-ink);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.95rem;
+  /* Block + text-align + line-height-matches-height — same FA glyph
+     centring pattern as the HUD action buttons. flex-align leaves the
+     glyph sitting high. */
+  display: block;
+  text-align: center;
+  padding: 0;
+}
+.sd-props-action-btn i {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 16px;
+  line-height: 34px;  /* button height - 2px border */
 }
 .sd-props-action-btn:hover {
   border-color: var(--sd-brand-red);
