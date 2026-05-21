@@ -1136,11 +1136,14 @@
     var symbolDef = symbolDefById(inst.symbolId);
     if (!symbolDef) { dom.symbolHud.hidden = true; return; }
     dom.symbolHud.hidden = false;
-    // Position above the symbol. Fabric coords are scene coords; we
-    // convert to CSS pixel coords via the canvas viewport.
-    var zoom = STATE.canvas.getZoom();
-    var cssTop = (inst.y - symbolHeight(symbolDef, inst.rotation) / 2) * zoom;
-    var cssLeft = inst.x * zoom;
+    // Position above the symbol. Scene coords map 1:1 to internal canvas
+    // pixels (zoom stays at 1 — see syncCanvasDisplaySize), and the
+    // browser scales the internal bitmap down to the CSS box. So convert
+    // scene → CSS via the canvas's actual CSS/internal ratio.
+    var cssEl = STATE.canvas.lowerCanvasEl;
+    var cssScale = (cssEl.clientWidth || SCENE_W) / SCENE_W;
+    var cssTop = (inst.y - symbolHeight(symbolDef, inst.rotation) / 2) * cssScale;
+    var cssLeft = inst.x * cssScale;
     dom.symbolHud.style.left = cssLeft + 'px';
     dom.symbolHud.style.top = (cssTop - 32) + 'px';
   }
@@ -1598,17 +1601,25 @@
     var rect = dom.canvasWrap.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
     // Compute a uniform scale that fits SCENE_W × SCENE_H inside the
-    // wrap, with a small margin. The canvas internal dimensions stay
-    // SCENE_W × SCENE_H so all scene math stays simple.
+    // wrap. The canvas's INTERNAL pixel dimensions stay at SCENE_W ×
+    // SCENE_H, and we set CSS dimensions to the scaled size — the
+    // browser then scales the rendered bitmap down to fit the CSS box.
+    //
+    // We do NOT call setZoom() here on top: setZoom + cssOnly is double
+    // scaling — objects would render at (scene × zoom) internal pixels,
+    // then the browser would scale those down by (CSS/internal), so the
+    // visible scene ends up at scale² of what was intended (tucked into
+    // the upper-left at quarter size, invisible at typical scales).
+    // Leaving zoom at 1 means scene coords map directly to internal
+    // pixels and the browser handles the visual scale.
     var scale = Math.min(rect.width / SCENE_W, rect.height / SCENE_H);
-    // Guard against pathological tiny wraps that would render the
-    // scene effectively invisible (white-on-white symptom).
     if (scale < 0.05) scale = 0.05;
     STATE.canvas.setDimensions(
       { width: SCENE_W * scale, height: SCENE_H * scale },
       { cssOnly: true }
     );
-    STATE.canvas.setZoom(scale);
+    // Zoom stays at 1 — see comment above.
+    if (STATE.canvas.getZoom() !== 1) STATE.canvas.setZoom(1);
     updateSymbolHud();
   }
 
