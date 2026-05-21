@@ -1388,11 +1388,19 @@
     c.on('object:modified', function (e) {
       var obj = e.target;
       if (!obj || !obj.data) return;
+      // STATE update runs synchronously, but the renderCanvas() that
+      // would wipe + rebuild the canvas waits one animation frame.
+      // Calling it inline-of-object:modified leaves Fabric's mouseup
+      // cleanup holding a dangling reference to the now-deleted Group
+      // / object, and the next mousemove keeps "dragging" the ghost —
+      // i.e. the symbol velcroes to the cursor (same root cause we
+      // hit in the schematic editor — fix mirrors that one).
+      var deferRender = function () {
+        requestAnimationFrame(function () { renderCanvas(); });
+      };
       if (obj.data.kind === 'pin') {
         var pin = findPin(obj.data.id);
         if (!pin) return;
-        // Snap dot's final position to grid, then back out the pin
-        // centre (which is 2*GRID inward from the dot terminator).
         var snapped = snapCanvasXY(obj.left, obj.top);
         var rot = pinRotation(pin);
         var dx = 0, dy = 0;
@@ -1405,7 +1413,7 @@
         var sceneEnd = c2s(snapped.x, snapped.y);
         pin.x = sceneEnd.x - dx * 2 * GRID;
         pin.y = sceneEnd.y - dy * 2 * GRID;
-        renderCanvas();
+        deferRender();
         scheduleAutosave();
       } else if (obj.data.kind === 'shape') {
         var shape = findShape(obj.data.id);
@@ -1416,9 +1424,6 @@
           shape.x = scene.x;
           shape.y = scene.y;
         } else if (shape.kind === 'line') {
-          // Line drag updates obj.left/top as an offset relative to
-          // its original x1/y1/x2/y2 coords. Pull the delta out and
-          // apply to the stored scene-space endpoints.
           var dxL = obj.left || 0;
           var dyL = obj.top  || 0;
           shape.x1 = snap(shape.x1 + dxL);
@@ -1426,7 +1431,7 @@
           shape.x2 = snap(shape.x2 + dxL);
           shape.y2 = snap(shape.y2 + dyL);
         }
-        renderCanvas();
+        deferRender();
         scheduleAutosave();
       }
     });
