@@ -38,6 +38,15 @@ body.symbol-designer-page > .container-fluid {
   margin: 0 !important;
 }
 
+/* Embedded mode — opened inside the builder's iframe (e.g. via the
+   schematic editor's "open Symbol Designer" link while the editor
+   was itself embedded). Hide the Symbol Designer's own title bar so
+   the builder's title bar is the only header on screen. Zoom / save
+   proxy through postMessage. */
+body.symbol-designer-page.is-embedded .sd-titlebar {
+  display: none !important;
+}
+
 /* ---------- Workspace shell ---------- */
 
 .sd-workspace {

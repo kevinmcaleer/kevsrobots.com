@@ -12,7 +12,21 @@ hide_nibsy: true
 
 <!-- Tag the body so site-level CSS rules (footer hide, container reset)
      scope to this workspace only — same trick as the schematic editor. -->
-<script>document.body.classList.add('symbol-designer-page');</script>
+<script>
+  document.body.classList.add('symbol-designer-page');
+  try {
+    var qs = new URLSearchParams(window.location.search);
+    if (qs.get('embedded') === '1') {
+      // When opened inside the instruction builder's iframe (e.g.
+      // via the schematic editor's "open Symbol Designer" link
+      // while it was itself embedded), strip the Symbol Designer's
+      // own title bar so the builder's title bar is the only header
+      // on screen. Zoom + save proxied through postMessage — see the
+      // bridge in symbol-designer.js.
+      document.body.classList.add('is-embedded');
+    }
+  } catch (_) {}
+</script>
 
 <div class="sd-workspace" id="sd-workspace">
 

@@ -1843,6 +1843,33 @@
     } catch (_) { return []; }
   }
 
+  // Embedded-mode postMessage bridge — mirrors the schematic editor's
+  // protocol so the instruction builder's title-bar zoom controls
+  // drive whichever editor is currently loaded in the iframe.
+  function isEmbedded() {
+    return document.body.classList.contains('is-embedded');
+  }
+  function postToParent(payload) {
+    if (!isEmbedded() || !window.parent || window.parent === window) return;
+    try { window.parent.postMessage(payload, '*'); } catch (_) {}
+  }
+  function postZoomToParent() {
+    postToParent({ kr_se_event: 'zoom', percent: Math.round((STATE.userZoom || 1) * 100) });
+  }
+  function wireParentBridge() {
+    if (!isEmbedded()) return;
+    window.addEventListener('message', function (e) {
+      var msg = e && e.data;
+      if (!msg || msg.kr_se_action == null) return;
+      switch (msg.kr_se_action) {
+        case 'zoom-in':    zoomBy(1.25, null); postZoomToParent(); break;
+        case 'zoom-out':   zoomBy(1 / 1.25, null); postZoomToParent(); break;
+        case 'zoom-reset': resetZoom();   postZoomToParent(); break;
+      }
+    });
+    postZoomToParent();
+  }
+
   async function init() {
     cacheDom();
     var params = new URLSearchParams(window.location.search);
@@ -1917,6 +1944,9 @@
 
       showOnly(dom.main);
       setTimeout(syncCanvasDisplaySize, 50);
+      // Embedded? Wire the parent-frame postMessage bridge so the
+      // builder's title-bar zoom controls drive this canvas.
+      wireParentBridge();
     } catch (e) {
       if (e && e.status === 404 && dom.errorDetail) {
         dom.errorDetail.textContent = 'Project not found.';

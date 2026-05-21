@@ -2234,8 +2234,13 @@
         dom.openSymDesigner.disabled = false;
         dom.openSymDesigner.removeAttribute('title');
         dom.openSymDesigner.addEventListener('click', function () {
-          window.location.href = '/projects/symbol/edit.html?project_id=' +
-            encodeURIComponent(STATE.projectId) + '&new=true';
+          // Propagate embedded=1 when we're embedded ourselves so the
+          // Symbol Designer (which navigates into the same iframe)
+          // also strips its title bar and the user keeps seeing the
+          // builder's single header.
+          var qs = '?project_id=' + encodeURIComponent(STATE.projectId) + '&new=true';
+          if (isEmbedded()) qs += '&embedded=1';
+          window.location.href = '/projects/symbol/edit.html' + qs;
         });
       }
 
