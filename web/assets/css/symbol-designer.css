@@ -329,12 +329,19 @@ body.symbol-designer-page > .container-fluid {
   overflow: hidden;
   padding: 0.5rem;
 }
-.sd-canvas-wrap canvas {
+/* Style the Fabric wrapper div, NOT the bare canvas elements. Fabric
+   inserts two stacked canvases — `background: #fff` on a `canvas`
+   selector would paint the upper (interaction) canvas opaque white
+   and mask every object rendered on the lower canvas behind it.
+   That's exactly the bug the schematic editor hit. */
+.sd-canvas-wrap .canvas-container {
+  margin: 0 auto;
   background: #fff;
   border: 1px solid var(--sd-border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
-.sd-canvas-wrap .canvas-container { margin: 0 auto; }
+.sd-canvas-wrap .lower-canvas,
+.sd-canvas-wrap .upper-canvas { background: transparent !important; }
 
 /* Pin side rails — a faint colored strip on each edge of the canvas
    so the user can see exactly where the Pin tool will accept a click.

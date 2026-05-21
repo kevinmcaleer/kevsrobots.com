@@ -1226,11 +1226,20 @@
     if (rect.width <= 0 || rect.height <= 0) return;
     var scale = Math.min(rect.width / SCENE_W, rect.height / SCENE_H, 1.6);
     if (scale < 0.1) scale = 0.1;
+    // Set CSS dimensions only; internal canvas pixels stay at SCENE_W
+    // × SCENE_H so scene coords map 1:1 to canvas pixels. Browser
+    // scales the rendered bitmap to the CSS box. Do NOT also call
+    // setZoom() — combining cssOnly + setZoom double-scales: objects
+    // render at (scene × zoom) internal pixels, then the browser
+    // scales those down by (CSS/internal), so the visible scene ends
+    // up at scale² of intended, tucked into the upper-left and
+    // invisible at typical scales (the exact bug the schematic editor
+    // hit).
     STATE.canvas.setDimensions(
       { width: SCENE_W * scale, height: SCENE_H * scale },
       { cssOnly: true }
     );
-    STATE.canvas.setZoom(scale);
+    if (STATE.canvas.getZoom() !== 1) STATE.canvas.setZoom(1);
   }
 
   // ====================================================================
