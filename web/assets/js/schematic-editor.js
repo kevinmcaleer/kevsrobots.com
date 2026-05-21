@@ -1795,6 +1795,7 @@
     dom.zoomOut        = document.getElementById('se-zoom-out');
     dom.zoomReset      = document.getElementById('se-zoom-reset');
     dom.zoomPct        = document.getElementById('se-zoom-pct');
+    dom.tableToggle    = document.getElementById('se-table-toggle');
     dom.loading        = document.getElementById('se-loading');
     dom.notOwner       = document.getElementById('se-not-owner');
     dom.error          = document.getElementById('se-error');
@@ -1867,7 +1868,38 @@
       else if (k === '0') { e.preventDefault(); resetZoom(); updateZoomPctLabel(); }
     });
 
+    // Connections-panel collapse toggle. Persist the collapsed state in
+    // localStorage so each user sees the panel they last left.
+    var TABLE_COLLAPSE_KEY = 'kr-schematic-table-collapsed';
+    if (dom.tableToggle && dom.main) {
+      var initiallyCollapsed = false;
+      try {
+        initiallyCollapsed = localStorage.getItem(TABLE_COLLAPSE_KEY) === '1';
+      } catch (_) {}
+      if (initiallyCollapsed) dom.main.classList.add('is-table-collapsed');
+      updateTableToggleAria();
+      dom.tableToggle.addEventListener('click', function () {
+        dom.main.classList.toggle('is-table-collapsed');
+        var collapsed = dom.main.classList.contains('is-table-collapsed');
+        try { localStorage.setItem(TABLE_COLLAPSE_KEY, collapsed ? '1' : '0'); } catch (_) {}
+        updateTableToggleAria();
+        // Grid column widths changed — re-fit the canvas to fill the
+        // new width.
+        syncCanvasDisplaySize();
+      });
+    }
+
     wireSymbolHud();
+  }
+
+  function updateTableToggleAria() {
+    if (!dom.tableToggle || !dom.main) return;
+    var collapsed = dom.main.classList.contains('is-table-collapsed');
+    dom.tableToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    dom.tableToggle.title = collapsed
+      ? 'Expand connections panel'
+      : 'Collapse connections panel';
+    dom.tableToggle.setAttribute('aria-label', dom.tableToggle.title);
   }
 
   function updateZoomPctLabel() {

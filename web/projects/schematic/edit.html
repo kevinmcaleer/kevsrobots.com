@@ -48,7 +48,7 @@ hide_nibsy: true
           <i class="fas fa-magnifying-glass-minus"></i>
         </button>
         <button type="button" class="se-titlebar-btn se-zoom-btn" id="se-zoom-reset"
-                title="Reset zoom (Ctrl/Cmd 0)">
+                title="Zoom to fit (Ctrl/Cmd 0)">
           <span id="se-zoom-pct">100%</span>
         </button>
         <button type="button" class="se-titlebar-btn se-zoom-btn" id="se-zoom-in"
@@ -180,7 +180,20 @@ hide_nibsy: true
         </div>
       </div>
 
-      <div class="se-table-wrap" id="se-table-wrap">
+    </main>
+
+    <!-- Connections panel now lives on the right of .se-main, not below
+         the canvas. Collapsible via the chevron button — when collapsed,
+         only a thin rail with the toggle + a vertical "Connections"
+         label remains, giving the canvas almost the full width. -->
+    <aside class="se-table-wrap" id="se-table-wrap">
+      <button type="button" class="se-table-toggle" id="se-table-toggle"
+              title="Collapse connections panel"
+              aria-label="Collapse connections panel"
+              aria-controls="se-table-wrap" aria-expanded="true">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <div class="se-table-body">
         <header class="se-table-header">
           <h6 class="se-table-title">
             <i class="fas fa-table me-3"></i> Connections
@@ -210,7 +223,9 @@ hide_nibsy: true
           </table>
         </div>
       </div>
-    </main>
+      <!-- Vertical label only shown when collapsed. -->
+      <div class="se-table-rail-label">CONNECTIONS</div>
+    </aside>
   </div>
 </div>
 
