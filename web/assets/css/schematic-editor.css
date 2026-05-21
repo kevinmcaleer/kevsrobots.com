@@ -349,17 +349,26 @@ body.schematic-editor-page {
   overflow: hidden;
   padding: 0.5rem;
 }
-.se-canvas-wrap canvas {
+
+/* The Fabric.js wrapper div around the canvas. Fabric inserts two
+   sibling <canvas> elements inside (lower-canvas for object render,
+   upper-canvas for interaction overlay). Style the WRAPPER for visual
+   chrome — NOT the canvases themselves, because a `background: #fff`
+   on a bare `canvas` rule would also apply to the upper canvas, which
+   sits on top of the lower one and would mask every rendered object
+   behind an opaque white sheet. That was the root cause of the
+   "white-on-white symbols are invisible" report. */
+.se-canvas-wrap .canvas-container {
+  margin: 0 auto;
   background: #fff;
   border: 1px solid var(--se-border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
-
-/* The Fabric.js wrapper div Fabric inserts around the canvas — we
-   want our positioning rules to apply to it instead of just the
-   inner element. Fabric assigns the canvas-container class to it. */
-.se-canvas-wrap .canvas-container {
-  margin: 0 auto;
+.se-canvas-wrap .lower-canvas {
+  background: transparent !important;
+}
+.se-canvas-wrap .upper-canvas {
+  background: transparent !important;
 }
 
 /* ---------- Symbol HUD (rotate / flip / delete) ---------- */

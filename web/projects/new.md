@@ -32,9 +32,10 @@ Create and share your robotics, electronics, or maker project with the kevsrobot
         <!-- Title -->
         <div class="mb-3">
           <label for="project-title" class="form-label">Project Title *</label>
-          <input type="text" class="form-control" id="project-title" required maxlength="255"
+          <input type="text" class="form-control" id="project-title" required
+                 minlength="5" maxlength="200"
                  placeholder="e.g., Arduino Robot Arm">
-          <div class="form-text">Choose a clear, descriptive title for your project</div>
+          <div class="form-text">5–200 characters. Choose a clear, descriptive title for your project.</div>
         </div>
 
         <!-- Description -->
@@ -168,13 +169,18 @@ document.getElementById('project-form').addEventListener('submit', async (e) => 
     const tagsInput = document.getElementById('project-tags').value;
     const tags = tagsInput ? tagsInput.split(',').map(t => t.trim().toLowerCase()).filter(t => t) : [];
 
-    // Build project data
+    // Build project data — field names must match the projects-api
+    // ProjectCreate schema. The form's "Short Description" maps to
+    // `short_description`; the "Background" textarea (the long-form
+    // markdown body) maps to `content_md`; "Code Repository" maps to
+    // `code_repo_url`. Sending `description` / `background` / `code_link`
+    // produced 422s because Pydantic doesn't know those keys.
     const projectData = {
       title: document.getElementById('project-title').value,
-      description: document.getElementById('project-description').value,
+      short_description: document.getElementById('project-description').value,
       tags: tags,
-      background: document.getElementById('project-background').value || null,
-      code_link: document.getElementById('project-code-link').value || null
+      content_md: document.getElementById('project-background').value || null,
+      code_repo_url: document.getElementById('project-code-link').value || null
     };
 
     // Create project
