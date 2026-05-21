@@ -41,6 +41,21 @@ hide_nibsy: true
       <span class="se-save-status" id="se-save-status" aria-live="polite"></span>
     </div>
     <div class="se-titlebar-right">
+      <!-- Zoom controls -->
+      <div class="se-zoom-group" role="group" aria-label="Zoom">
+        <button type="button" class="se-titlebar-btn se-zoom-btn" id="se-zoom-out"
+                title="Zoom out (Ctrl/Cmd -)">
+          <i class="fas fa-magnifying-glass-minus"></i>
+        </button>
+        <button type="button" class="se-titlebar-btn se-zoom-btn" id="se-zoom-reset"
+                title="Reset zoom (Ctrl/Cmd 0)">
+          <span id="se-zoom-pct">100%</span>
+        </button>
+        <button type="button" class="se-titlebar-btn se-zoom-btn" id="se-zoom-in"
+                title="Zoom in (Ctrl/Cmd +)">
+          <i class="fas fa-magnifying-glass-plus"></i>
+        </button>
+      </div>
       <button type="button" class="se-titlebar-btn" id="se-export-csv"
               title="Download the connections table as CSV">
         <i class="fas fa-file-csv me-1"></i> Export CSV

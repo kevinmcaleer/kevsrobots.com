@@ -290,6 +290,14 @@
 
     saveStatus: 'saved',
     autosaveTimer: null,
+
+    // Viewport state: multiplier on top of the auto-fit scale. 1 = "fit
+    // the whole scene into the wrap". > 1 zooms in, < 1 zooms out.
+    // Pan offsets accumulate in CSS pixel units relative to the
+    // auto-centred default.
+    userZoom: 1,
+    panX: 0,
+    panY: 0,
   };
 
   function emptyGraph() {
@@ -1136,16 +1144,21 @@
     var symbolDef = symbolDefById(inst.symbolId);
     if (!symbolDef) { dom.symbolHud.hidden = true; return; }
     dom.symbolHud.hidden = false;
-    // Position above the symbol. Scene coords map 1:1 to internal canvas
-    // pixels (zoom stays at 1 — see syncCanvasDisplaySize), and the
-    // browser scales the internal bitmap down to the CSS box. So convert
-    // scene → CSS via the canvas's actual CSS/internal ratio.
-    var cssEl = STATE.canvas.lowerCanvasEl;
-    var cssScale = (cssEl.clientWidth || SCENE_W) / SCENE_W;
-    var cssTop = (inst.y - symbolHeight(symbolDef, inst.rotation) / 2) * cssScale;
-    var cssLeft = inst.x * cssScale;
-    dom.symbolHud.style.left = cssLeft + 'px';
-    dom.symbolHud.style.top = (cssTop - 32) + 'px';
+    // Position above the symbol. The HUD is positioned absolute inside
+    // .se-canvas-wrap. Convert scene → CSS by running the scene point
+    // through Fabric's viewport transform (which gives canvas-element
+    // pixel coords), then add the canvas element's offset within the
+    // wrap (it's centered in the flex layout, plus padding).
+    var vt = STATE.canvas.viewportTransform;
+    var canvasPxX = inst.x * vt[0] + vt[4];
+    var canvasPxY = (inst.y - symbolHeight(symbolDef, inst.rotation) / 2) * vt[3] + vt[5];
+    var canvasEl = STATE.canvas.lowerCanvasEl;
+    var canvasRect = canvasEl.getBoundingClientRect();
+    var wrapRect = dom.canvasWrap.getBoundingClientRect();
+    var offsetX = canvasRect.left - wrapRect.left;
+    var offsetY = canvasRect.top - wrapRect.top;
+    dom.symbolHud.style.left = (offsetX + canvasPxX) + 'px';
+    dom.symbolHud.style.top = (offsetY + canvasPxY - 36) + 'px';
   }
 
   function rotateSelected(deltaDeg) {
@@ -1380,7 +1393,15 @@
     inst.x = obj.left;
     inst.y = obj.top;
     rerouteNetsFor(inst.id);
-    renderGraph();
+    // Defer renderGraph one tick. renderGraph wipes the canvas and
+    // re-adds objects; if we do that synchronously inside the
+    // mouse:up → object:modified pipeline, Fabric's drag-cleanup
+    // (which runs AFTER our handler) still holds a reference to the
+    // now-deleted Fabric group as the active "transformed" target,
+    // and the next mousemove keeps "dragging" the ghost — the symbol
+    // ends up velcroed to the cursor. Letting Fabric finish first
+    // and re-rendering on the next tick fixes it.
+    requestAnimationFrame(function () { renderGraph(); });
     scheduleAutosave();
   }
 
@@ -1608,31 +1629,81 @@
     });
   }
 
+  // Re-fit the canvas to the wrap. Strategy:
+  //   1. Set the Fabric canvas's internal AND CSS dimensions to the
+  //      wrap's pixel size (no cssOnly trick). Internal = CSS = wrap.
+  //   2. Compute the auto-fit scale that lands the whole scene inside
+  //      the canvas while preserving aspect ratio.
+  //   3. Apply effectiveScale = fitScale * userZoom to the viewport
+  //      transform, centring the scene + applying any pan offset.
+  // The browser does no extra scaling — what Fabric renders is what
+  // you see. User zoom buttons / Ctrl+wheel adjust STATE.userZoom and
+  // call applyViewport().
   function syncCanvasDisplaySize() {
     if (!STATE.canvas || !dom.canvasWrap) return;
     var rect = dom.canvasWrap.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    // Compute a uniform scale that fits SCENE_W × SCENE_H inside the
-    // wrap. The canvas's INTERNAL pixel dimensions stay at SCENE_W ×
-    // SCENE_H, and we set CSS dimensions to the scaled size — the
-    // browser then scales the rendered bitmap down to fit the CSS box.
-    //
-    // We do NOT call setZoom() here on top: setZoom + cssOnly is double
-    // scaling — objects would render at (scene × zoom) internal pixels,
-    // then the browser would scale those down by (CSS/internal), so the
-    // visible scene ends up at scale² of what was intended (tucked into
-    // the upper-left at quarter size, invisible at typical scales).
-    // Leaving zoom at 1 means scene coords map directly to internal
-    // pixels and the browser handles the visual scale.
-    var scale = Math.min(rect.width / SCENE_W, rect.height / SCENE_H);
-    if (scale < 0.05) scale = 0.05;
-    STATE.canvas.setDimensions(
-      { width: SCENE_W * scale, height: SCENE_H * scale },
-      { cssOnly: true }
-    );
-    // Zoom stays at 1 — see comment above.
-    if (STATE.canvas.getZoom() !== 1) STATE.canvas.setZoom(1);
+    var w = Math.max(1, Math.floor(rect.width));
+    var h = Math.max(1, Math.floor(rect.height));
+    STATE.canvas.setDimensions({ width: w, height: h });
+    applyViewport();
+  }
+
+  function fitScale() {
+    if (!STATE.canvas) return 1;
+    var w = STATE.canvas.getWidth();
+    var h = STATE.canvas.getHeight();
+    var s = Math.min(w / SCENE_W, h / SCENE_H);
+    return s > 0 ? s : 1;
+  }
+
+  function effectiveScale() {
+    return fitScale() * (STATE.userZoom || 1);
+  }
+
+  function applyViewport() {
+    if (!STATE.canvas) return;
+    var w = STATE.canvas.getWidth();
+    var h = STATE.canvas.getHeight();
+    var s = effectiveScale();
+    // Centre the scene at its midpoint, plus the user's pan offset.
+    var tx = (w - SCENE_W * s) / 2 + STATE.panX;
+    var ty = (h - SCENE_H * s) / 2 + STATE.panY;
+    STATE.canvas.setViewportTransform([s, 0, 0, s, tx, ty]);
     updateSymbolHud();
+  }
+
+  function zoomBy(factor, focal) {
+    // Multiplicative zoom around an optional focal point (CSS coords
+    // relative to the canvas top-left). The focal point stays under
+    // the cursor across the zoom step.
+    var prev = STATE.userZoom || 1;
+    var next = Math.max(0.2, Math.min(6, prev * factor));
+    if (next === prev) return;
+    if (focal && STATE.canvas) {
+      var vt = STATE.canvas.viewportTransform;
+      var sceneX = (focal.x - vt[4]) / vt[0];
+      var sceneY = (focal.y - vt[5]) / vt[3];
+      STATE.userZoom = next;
+      var s = effectiveScale();
+      var w = STATE.canvas.getWidth();
+      var h = STATE.canvas.getHeight();
+      // Solve for pan that keeps (sceneX, sceneY) at the same screen
+      // (focal.x, focal.y):
+      //   focal.x = sceneX * s + (w - SCENE_W * s)/2 + panX
+      STATE.panX = focal.x - sceneX * s - (w - SCENE_W * s) / 2;
+      STATE.panY = focal.y - sceneY * s - (h - SCENE_H * s) / 2;
+    } else {
+      STATE.userZoom = next;
+    }
+    applyViewport();
+  }
+
+  function resetZoom() {
+    STATE.userZoom = 1;
+    STATE.panX = 0;
+    STATE.panY = 0;
+    applyViewport();
   }
 
   // Match the instruction builder's runtime workspace sizing — the CSS
@@ -1720,6 +1791,10 @@
     dom.saveStatus     = document.getElementById('se-save-status');
     dom.exportCsvBtn   = document.getElementById('se-export-csv');
     dom.exportPngBtn   = document.getElementById('se-export-png');
+    dom.zoomIn         = document.getElementById('se-zoom-in');
+    dom.zoomOut        = document.getElementById('se-zoom-out');
+    dom.zoomReset      = document.getElementById('se-zoom-reset');
+    dom.zoomPct        = document.getElementById('se-zoom-pct');
     dom.loading        = document.getElementById('se-loading');
     dom.notOwner       = document.getElementById('se-not-owner');
     dom.error          = document.getElementById('se-error');
@@ -1763,7 +1838,41 @@
     if (dom.exportCsvBtn) dom.exportCsvBtn.addEventListener('click', exportCSV);
     if (dom.exportPngBtn) dom.exportPngBtn.addEventListener('click', exportPNG);
 
+    // Zoom controls
+    if (dom.zoomIn)    dom.zoomIn.addEventListener('click', function () { zoomBy(1.25, null); updateZoomPctLabel(); });
+    if (dom.zoomOut)   dom.zoomOut.addEventListener('click', function () { zoomBy(1 / 1.25, null); updateZoomPctLabel(); });
+    if (dom.zoomReset) dom.zoomReset.addEventListener('click', function () { resetZoom(); updateZoomPctLabel(); });
+    // Ctrl/Cmd + wheel zoom — focal point follows the cursor so what's
+    // under the mouse stays under the mouse across the zoom step.
+    if (dom.canvasWrap) {
+      dom.canvasWrap.addEventListener('wheel', function (e) {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        e.preventDefault();
+        var rect = STATE.canvas.lowerCanvasEl.getBoundingClientRect();
+        var focal = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        var factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+        zoomBy(factor, focal);
+        updateZoomPctLabel();
+      }, { passive: false });
+    }
+    // Keyboard shortcuts: Ctrl/Cmd + / - / 0
+    document.addEventListener('keydown', function (e) {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      // Ignore when typing in inputs.
+      if (document.activeElement &&
+          /input|textarea/i.test(document.activeElement.tagName)) return;
+      var k = e.key;
+      if (k === '+' || k === '=') { e.preventDefault(); zoomBy(1.25, null); updateZoomPctLabel(); }
+      else if (k === '-' || k === '_') { e.preventDefault(); zoomBy(1 / 1.25, null); updateZoomPctLabel(); }
+      else if (k === '0') { e.preventDefault(); resetZoom(); updateZoomPctLabel(); }
+    });
+
     wireSymbolHud();
+  }
+
+  function updateZoomPctLabel() {
+    if (!dom.zoomPct) return;
+    dom.zoomPct.textContent = Math.round((STATE.userZoom || 1) * 100) + '%';
   }
 
   async function init() {

@@ -148,6 +148,39 @@ body.schematic-editor-page {
   font-size: 0.9rem;
 }
 .se-titlebar-link:hover { color: var(--se-brand-red); }
+/* Zoom button group — small, tight pill set sitting in the title bar. */
+.se-zoom-group {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--se-border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-right: 0.4rem;
+}
+.se-zoom-group .se-zoom-btn {
+  border: 0;
+  border-radius: 0;
+  padding: 0 0.55rem;
+  background: #fff;
+  color: var(--se-ink);
+  font-size: 0.85rem;
+  line-height: 1;
+  min-width: 0;
+}
+.se-zoom-group .se-zoom-btn + .se-zoom-btn {
+  border-left: 1px solid var(--se-border);
+}
+.se-zoom-group .se-zoom-btn:hover {
+  background: #f3f4f6;
+}
+#se-zoom-pct {
+  display: inline-block;
+  min-width: 3em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+}
+
 .se-titlebar-btn {
   border: 1px solid var(--se-border);
   background: var(--se-panel);
