@@ -88,12 +88,20 @@
     pin: true,
     line: true,
     rect: true,
+    text: true,
+    name: true,
+    label: true,
     // Side-effect toolbox buttons (apply to selection, then revert).
     'rotate-ccw': true,
     'rotate-cw': true,
     'flip-h': true,
     'flip-v': true,
   };
+
+  // Monospace stack with sensible PCB-style fallbacks. No external
+  // webfont — Courier New is universally available; ui-monospace +
+  // SF Mono pick up the platform's native programmer font on Mac.
+  var TEXT_FONT_STACK = '"Courier New", "Source Code Pro", ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 
   // ====================================================================
   // 2. STATE
@@ -463,6 +471,27 @@
     scheduleAutosave();
   }
 
+  function addTextShape(sx, sy, text, kind) {
+    if (!STATE.activeSymbol) return;
+    var role = kind || 'text';
+    var shape = {
+      id: nextId('s'),
+      kind: 'text',
+      role: role,                    // 'text' | 'name' | 'label'
+      x: snap(sx),
+      y: snap(sy),
+      text: text || 'Text',
+      fontSize: role === 'name' ? 14 : 12,
+      bold: role === 'name',
+    };
+    STATE.activeSymbol.bodyShapes.push(shape);
+    STATE.selectedShapeId = shape.id;
+    STATE.selectedPinId = null;
+    renderCanvas();
+    renderPropertiesPanel();
+    scheduleAutosave();
+  }
+
   function addLineShape(x1, y1, x2, y2) {
     if (!STATE.activeSymbol) return;
     if (x1 === x2 && y1 === y2) return;
@@ -662,20 +691,65 @@
           fill: s.fill || 'rgba(255,255,255,0.01)',
           stroke: sel ? BRAND_RED : (s.stroke || INK),
           strokeWidth: sel ? 2.5 : 1.5,
-          // Draggable to move; no resize / rotate handles. Use the
-          // properties panel for explicit x/y/w/h tweaks.
+          // Resizable: corner + side handles drag the rect's extents.
+          // Rotation is locked because the Transform pane handles 90°
+          // increments; freehand rotation isn't useful for a grid-snap
+          // body shape.
+          selectable: true,
+          hasControls: true,
+          hasBorders: true,
+          lockRotation: true,
+          lockScalingFlip: true,
+          cornerColor: BRAND_RED,
+          cornerStrokeColor: BRAND_RED,
+          cornerStyle: 'rect',
+          cornerSize: 8,
+          transparentCorners: false,
+          borderColor: BRAND_RED,
+          // No rotation handle when there's no rotation to do.
+          hoverCursor: 'move',
+          objectCaching: false,
+        });
+        rect.setControlsVisibility({ mtr: false });
+        rect.data = { kind: 'shape', id: s.id };
+        STATE.canvas.add(rect);
+      } else if (s.kind === 'text') {
+        // Inline-editable text shape. Monospace by default — Courier
+        // New base with platform programmer-font + Source Code Pro
+        // fallbacks for a PCB-silkscreen feel. Double-click enters
+        // edit mode.
+        var tp = s2c(s.x, s.y);
+        var ftxt = new fabric.IText(s.text || '', {
+          left: tp.x,
+          top: tp.y,
+          fontSize: s.fontSize || 12,
+          fontFamily: TEXT_FONT_STACK,
+          fontWeight: s.bold ? 'bold' : 'normal',
+          fill: sel ? BRAND_RED : (s.stroke || INK),
+          // Editable + selectable + draggable. Lock scale + rotation
+          // — font size changes happen via the properties panel.
+          editable: true,
           selectable: true,
           hasControls: false,
-          hasBorders: sel,
+          hasBorders: true,
           lockRotation: true,
           lockScalingX: true,
           lockScalingY: true,
           lockScalingFlip: true,
-          hoverCursor: 'move',
+          borderColor: BRAND_RED,
           objectCaching: false,
         });
-        rect.data = { kind: 'shape', id: s.id };
-        STATE.canvas.add(rect);
+        ftxt.data = { kind: 'shape', id: s.id };
+        // Sync the text back to STATE on edit exit so renderCanvas
+        // rebuilds with the new string.
+        ftxt.on('editing:exited', function () {
+          var st = findShape(s.id);
+          if (st) {
+            st.text = ftxt.text;
+            scheduleAutosave();
+          }
+        });
+        STATE.canvas.add(ftxt);
       } else if (s.kind === 'line') {
         var a = s2c(s.x1, s.y1);
         var b = s2c(s.x2, s.y2);
@@ -683,16 +757,24 @@
           stroke: sel ? BRAND_RED : (s.stroke || INK),
           strokeWidth: sel ? 2.5 : 1.5,
           selectable: true,
-          hasControls: false,
-          hasBorders: sel,
+          // Lines get end-grip controls — fabric's mt/ml/mr/mb keep
+          // the endpoints draggable so users can lengthen / re-aim
+          // the line after placing it.
+          hasControls: true,
+          hasBorders: true,
           lockRotation: true,
-          lockScalingX: true,
-          lockScalingY: true,
           lockScalingFlip: true,
+          cornerColor: BRAND_RED,
+          cornerStrokeColor: BRAND_RED,
+          cornerStyle: 'rect',
+          cornerSize: 8,
+          transparentCorners: false,
+          borderColor: BRAND_RED,
           hoverCursor: 'move',
           perPixelTargetFind: true,
           objectCaching: false,
         });
+        line.setControlsVisibility({ mtr: false });
         line.data = { kind: 'shape', id: s.id };
         STATE.canvas.add(line);
       }
@@ -849,6 +931,22 @@
           STATE.linePending = null;
           renderCanvas();
         }
+        return;
+      }
+      case 'text':
+      case 'name':
+      case 'label': {
+        // Seed text per tool variant so each places something
+        // meaningful — user edits inline by double-clicking the
+        // text afterwards.
+        var seed = STATE.activeTool === 'name'  ? '<name>'
+                 : STATE.activeTool === 'label' ? 'Label'
+                 :                                'Text';
+        addTextShape(sxy.x, sxy.y, seed, STATE.activeTool);
+        // Revert to select so the user can immediately position /
+        // edit the new text rather than dropping another one on
+        // the next click.
+        setActiveTool('select');
         return;
       }
       case 'select':
@@ -1327,6 +1425,9 @@
       }
       STATE.linePending = null;
     }
+    // Rubber-band selection only meaningful in Select mode; every
+    // other tool needs the raw mouse:down (Pin / Rect / Line / etc.).
+    if (STATE.canvas) STATE.canvas.selection = (tool === 'select');
     paintActiveToolButton();
     renderCanvas();
   }
@@ -1387,17 +1488,76 @@
 
     c.on('object:modified', function (e) {
       var obj = e.target;
-      if (!obj || !obj.data) return;
-      // STATE update runs synchronously, but the renderCanvas() that
-      // would wipe + rebuild the canvas waits one animation frame.
-      // Calling it inline-of-object:modified leaves Fabric's mouseup
-      // cleanup holding a dangling reference to the now-deleted Group
-      // / object, and the next mousemove keeps "dragging" the ghost —
-      // i.e. the symbol velcroes to the cursor (same root cause we
-      // hit in the schematic editor — fix mirrors that one).
+      if (!obj) return;
       var deferRender = function () {
         requestAnimationFrame(function () { renderCanvas(); });
       };
+
+      // Multi-symbol drop — ActiveSelection wrapping several pins
+      // and/or shapes. Iterate children, transform each by the AS
+      // matrix to recover canvas-space coords, then dispatch to the
+      // single-item code per child.
+      if (obj.type === 'activeselection' || obj.type === 'activeSelection') {
+        var asMatrix = obj.calcTransformMatrix
+          ? obj.calcTransformMatrix()
+          : null;
+        var kids = obj.getObjects ? obj.getObjects() : [];
+        kids.forEach(function (child) {
+          if (!child.data) return;
+          var pt = (asMatrix && fabric.util && fabric.util.transformPoint)
+            ? fabric.util.transformPoint(
+                { x: child.left, y: child.top }, asMatrix)
+            : { x: child.left, y: child.top };
+          if (child.data.kind === 'pin') {
+            var pin = findPin(child.data.id);
+            if (!pin) return;
+            var snapped = snapCanvasXY(pt.x, pt.y);
+            var rot = pinRotation(pin);
+            var dx = 0, dy = 0;
+            switch (rot) {
+              case 0:   dx = 1;  break;
+              case 90:  dy = 1;  break;
+              case 180: dx = -1; break;
+              case 270: dy = -1; break;
+            }
+            var sceneEnd = c2s(snapped.x, snapped.y);
+            pin.x = sceneEnd.x - dx * 2 * GRID;
+            pin.y = sceneEnd.y - dy * 2 * GRID;
+          } else if (child.data.kind === 'shape') {
+            var shape = findShape(child.data.id);
+            if (!shape) return;
+            // Multi-select drag only translates (no per-child resize),
+            // so just shift each shape's stored coords by the delta
+            // from the child's prior canvas position.
+            if (shape.kind === 'rect') {
+              var snapped2 = snapCanvasXY(pt.x, pt.y);
+              var scene = c2s(snapped2.x, snapped2.y);
+              shape.x = scene.x;
+              shape.y = scene.y;
+            } else if (shape.kind === 'line') {
+              // The line's local (x1,y1)→(x2,y2) length stays put;
+              // we shift it so (x1,y1) ends up at the new top-left.
+              var sceneTL = c2s(pt.x, pt.y);
+              var origMinX = Math.min(shape.x1, shape.x2);
+              var origMinY = Math.min(shape.y1, shape.y2);
+              var dxL = snap(sceneTL.x) - origMinX;
+              var dyL = snap(sceneTL.y) - origMinY;
+              shape.x1 = shape.x1 + dxL;
+              shape.y1 = shape.y1 + dyL;
+              shape.x2 = shape.x2 + dxL;
+              shape.y2 = shape.y2 + dyL;
+            }
+          }
+        });
+        requestAnimationFrame(function () {
+          if (STATE.canvas) STATE.canvas.discardActiveObject();
+          renderCanvas();
+        });
+        scheduleAutosave();
+        return;
+      }
+
+      if (!obj.data) return;
       if (obj.data.kind === 'pin') {
         var pin = findPin(obj.data.id);
         if (!pin) return;
@@ -1419,17 +1579,58 @@
         var shape = findShape(obj.data.id);
         if (!shape) return;
         if (shape.kind === 'rect') {
-          var snapped2 = snapCanvasXY(obj.left, obj.top);
-          var scene = c2s(snapped2.x, snapped2.y);
-          shape.x = scene.x;
-          shape.y = scene.y;
+          // Bake any scale into width/height so the next render
+          // round-trips cleanly. obj.scaleX/Y are 1 when the user
+          // only translated; > 1 when they grabbed a corner / side
+          // handle and resized.
+          var newW = Math.max(GRID, Math.round((obj.width * obj.scaleX) / GRID) * GRID);
+          var newH = Math.max(GRID, Math.round((obj.height * obj.scaleY) / GRID) * GRID);
+          var snappedTL = snapCanvasXY(obj.left, obj.top);
+          var sceneTL = c2s(snappedTL.x, snappedTL.y);
+          shape.x = sceneTL.x;
+          shape.y = sceneTL.y;
+          shape.w = newW;
+          shape.h = newH;
+        } else if (shape.kind === 'text') {
+          // Text shapes translate only — no resize. Sync position +
+          // the text content (in case the user edited it inline
+          // via fabric.IText editing).
+          var snTxt = snapCanvasXY(obj.left, obj.top);
+          var scTxt = c2s(snTxt.x, snTxt.y);
+          shape.x = scTxt.x;
+          shape.y = scTxt.y;
+          if (typeof obj.text === 'string') shape.text = obj.text;
         } else if (shape.kind === 'line') {
-          var dxL = obj.left || 0;
-          var dyL = obj.top  || 0;
-          shape.x1 = snap(shape.x1 + dxL);
-          shape.y1 = snap(shape.y1 + dyL);
-          shape.x2 = snap(shape.x2 + dxL);
-          shape.y2 = snap(shape.y2 + dyL);
+          // Lines may have been moved OR resized via end-grips.
+          // Fabric stores line endpoints in the object's local space
+          // (x1/y1/x2/y2) and applies left/top + scale on top. The
+          // simplest correct recovery is to read the two endpoints
+          // off the object in canvas space via fabric.util and
+          // re-snap them to the grid.
+          var m = obj.calcTransformMatrix
+            ? obj.calcTransformMatrix()
+            : null;
+          if (m && fabric.util && fabric.util.transformPoint) {
+            var p1c = fabric.util.transformPoint(
+              { x: -obj.width / 2, y: -obj.height / 2 }, m);
+            var p2c = fabric.util.transformPoint(
+              { x:  obj.width / 2, y:  obj.height / 2 }, m);
+            // The line's stored x1/y1 → x2/y2 isn't guaranteed to map
+            // to "top-left → bottom-right" — work out which canvas
+            // point each endpoint actually corresponds to by checking
+            // sign of (x1 - x2).
+            var aIsTL = (obj.x1 < obj.x2) === (p1c.x < p2c.x);
+            var aIsTLY = (obj.y1 < obj.y2) === (p1c.y < p2c.y);
+            var aIsTLBoth = aIsTL && aIsTLY;
+            var a = aIsTLBoth ? p1c : p2c;
+            var b = aIsTLBoth ? p2c : p1c;
+            var a_s = c2s(a.x, a.y);
+            var b_s = c2s(b.x, b.y);
+            shape.x1 = snap(a_s.x);
+            shape.y1 = snap(a_s.y);
+            shape.x2 = snap(b_s.x);
+            shape.y2 = snap(b_s.y);
+          }
         }
         deferRender();
         scheduleAutosave();
