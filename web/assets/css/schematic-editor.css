@@ -40,10 +40,19 @@ body.schematic-editor-page > .container-fluid {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 56px); /* approx site nav height; close enough */
+  /* Sized precisely at runtime by adjustWorkspaceHeight() in
+     schematic-editor.js — measures the actual top offset (site
+     top_bar + navigation + searchbar + nav_projects). Calc fallback
+     is a defensive worst-case so canvas isn't pushed off-screen
+     before the JS runs. */
+  height: calc(100vh - 220px);
+  min-height: 320px;
   background: var(--se-bg);
   color: var(--se-ink);
   font-size: 0.92rem;
+}
+body.schematic-editor-page {
+  overflow: hidden;
 }
 
 /* ---------- Title bar ---------- */

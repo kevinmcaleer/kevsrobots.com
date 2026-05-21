@@ -1601,12 +1601,29 @@
     // wrap, with a small margin. The canvas internal dimensions stay
     // SCENE_W × SCENE_H so all scene math stays simple.
     var scale = Math.min(rect.width / SCENE_W, rect.height / SCENE_H);
+    // Guard against pathological tiny wraps that would render the
+    // scene effectively invisible (white-on-white symptom).
+    if (scale < 0.05) scale = 0.05;
     STATE.canvas.setDimensions(
       { width: SCENE_W * scale, height: SCENE_H * scale },
       { cssOnly: true }
     );
     STATE.canvas.setZoom(scale);
     updateSymbolHud();
+  }
+
+  // Match the instruction builder's runtime workspace sizing — the CSS
+  // fallback can't know the real chrome height, so measure and lock to
+  // viewport.
+  function adjustSchematicWorkspaceHeight() {
+    var ws = dom.workspace || document.getElementById('se-workspace');
+    if (!ws) return;
+    var top = ws.getBoundingClientRect().top;
+    var avail = Math.max(320, window.innerHeight - top);
+    ws.style.height = avail + 'px';
+    // The wrap inside took its size from the workspace flex layout;
+    // re-sync the Fabric viewport so the canvas matches the new wrap.
+    syncCanvasDisplaySize();
   }
 
   // ====================================================================
@@ -1790,8 +1807,25 @@
       }
 
       showOnly(dom.main);
-      // Re-fit after the layout settles.
-      setTimeout(syncCanvasDisplaySize, 50);
+      // Re-fit after the layout settles. Two-stage:
+      //   1. Immediate adjustWorkspaceHeight so the workspace fits the
+      //      viewport (it's the wrong size from CSS fallback alone).
+      //   2. A microtask later, re-render the graph in case symbols
+      //      were placed at scene coords that fell off-screen when the
+      //      wrap was at fallback dimensions.
+      adjustSchematicWorkspaceHeight();
+      window.addEventListener('resize', adjustSchematicWorkspaceHeight);
+      if (document.readyState !== 'complete') {
+        window.addEventListener('load', adjustSchematicWorkspaceHeight, { once: true });
+      }
+      requestAnimationFrame(function () {
+        adjustSchematicWorkspaceHeight();
+        renderGraph();
+      });
+      setTimeout(function () {
+        adjustSchematicWorkspaceHeight();
+        renderGraph();
+      }, 100);
     } catch (e) {
       if (e && e.status === 404) {
         if (dom.errorDetail) dom.errorDetail.textContent = 'Project not found.';

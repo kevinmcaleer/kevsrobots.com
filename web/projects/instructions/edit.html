@@ -415,17 +415,9 @@ hide_nibsy: true
 
           <div class="ib-pane-section ib-step-type-config d-none" data-config="schematic">
             <h6 class="ib-pane-section-title">Schematic</h6>
-            <div class="ib-step-schematic-card">
-              <div class="ib-step-schematic-icon"><i class="fas fa-diagram-project"></i></div>
-              <p class="mb-2"><strong>Embedded schematic</strong></p>
-              <p class="small text-muted mb-2">
-                The full schematic editor opens in a new tab. Edits propagate live to every step that embeds this schematic.
-              </p>
-              <button type="button" class="btn btn-sm btn-outline-primary"
-                      id="ib-open-schematic-editor-pane">
-                <i class="fas fa-pencil me-1"></i> open editor
-              </button>
-            </div>
+            <p class="ib-pane-hint text-muted small mb-0">
+              The full schematic editor is embedded in the canvas to the right. Edits propagate live to every step that embeds this schematic.
+            </p>
           </div>
 
           <div class="ib-pane-section ib-step-type-config d-none" data-config="text">
@@ -514,20 +506,19 @@ hide_nibsy: true
       </div>
 
       <div class="ib-canvas-schematic d-none" id="ib-canvas-schematic">
-        <div class="ib-canvas-schematic-inner">
-          <div class="ib-canvas-schematic-icon">
-            <i class="fas fa-diagram-project"></i>
-          </div>
-          <h5 class="mb-2">Embedded schematic</h5>
-          <p class="text-muted mb-3">
-            Edit the schematic in the full Schematic Editor.<br>
-            Changes here propagate live to every step that embeds it.
-          </p>
-          <button type="button" class="btn btn-sm btn-outline-primary"
-                  id="ib-open-schematic-editor-canvas">
-            <i class="fas fa-pencil me-1"></i> open editor
-          </button>
-        </div>
+        <!-- Schematic-type steps embed the full Schematic Editor inline
+             instead of linking out: the iframe loads the same page at
+             /projects/schematic/edit.html and sits flush with the
+             canvas area. The iframe is mounted lazily by the builder
+             (instruction-builder.js → mountSchematicIframe) once the
+             user actually opens a schematic-type step, so projects
+             that never use schematics don't pay the load cost. -->
+        <iframe
+          id="ib-canvas-schematic-iframe"
+          class="ib-canvas-schematic-iframe"
+          title="Schematic editor"
+          loading="lazy"
+          referrerpolicy="same-origin"></iframe>
       </div>
 
       <!-- Floating Inspector HUD — dark draggable panel.
@@ -577,10 +568,34 @@ hide_nibsy: true
       </div>
       <div class="ib-filmstrip-body" id="ib-filmstrip-body">
         <div class="ib-filmstrip-track" id="ib-filmstrip-track"></div>
-        <button type="button" class="ib-filmstrip-add" id="ib-filmstrip-add"
-                title="Add step">
-          <i class="fas fa-plus"></i><span>add step</span>
-        </button>
+        <!-- Bootstrap dropdown: click the +add tile, pick a step type.
+             Each option calls onAddStep(stepType) so the new step is
+             created with the chosen type pre-set (no second PUT needed). -->
+        <div class="dropdown ib-filmstrip-add-wrap">
+          <button type="button" class="ib-filmstrip-add" id="ib-filmstrip-add"
+                  data-bs-toggle="dropdown" aria-expanded="false"
+                  title="Add step">
+            <i class="fas fa-plus"></i><span>add step</span>
+          </button>
+          <ul class="dropdown-menu ib-filmstrip-add-menu" aria-labelledby="ib-filmstrip-add">
+            <li><h6 class="dropdown-header">New step type</h6></li>
+            <li><a class="dropdown-item" href="#" data-add-step-type="photo">
+              <i class="fas fa-image me-2"></i>Photo step
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-add-step-type="schematic">
+              <i class="fas fa-diagram-project me-2"></i>Schematic step
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-add-step-type="text">
+              <i class="fas fa-pen-to-square me-2"></i>Text step
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-add-step-type="video">
+              <i class="fas fa-video me-2"></i>Video step
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-add-step-type="blank">
+              <i class="fas fa-square me-2"></i>Blank step
+            </a></li>
+          </ul>
+        </div>
       </div>
     </footer>
   </div>

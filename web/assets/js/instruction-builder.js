@@ -412,14 +412,15 @@
     return body.id;
   }
 
-  async function postStep() {
+  async function postStep(initialFields) {
     await ensureInstruction();
+    var body = Object.assign({ title: '', description: '' }, initialFields || {});
     var resp = await apiFetchWithTermsRetry(
       API + '/api/projects/' + state.projectId + '/instruction/steps',
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: '', description: '' }),
+        body: JSON.stringify(body),
       }
     );
     if (!resp.ok) throw new Error('Add step HTTP ' + resp.status);
@@ -1092,10 +1093,31 @@
     if (dom.canvasText) dom.canvasText.classList.toggle('d-none', stepType !== 'text');
     if (dom.canvasVideo) dom.canvasVideo.classList.toggle('d-none', stepType !== 'video');
     if (dom.canvasSchematic) dom.canvasSchematic.classList.toggle('d-none', stepType !== 'schematic');
+    // Schematic steps mount the full editor as an iframe inside the
+    // canvas area — lazy-load on first switch so projects that never
+    // use schematics don't pay the request.
+    if (stepType === 'schematic') mountSchematicIframe();
     // Fabric tracks the CSS size of the canvas; if we just toggled
     // visibility, give it a moment to settle and re-measure so pointer
     // events map to the right scene coords.
     if (fabricVisible) setTimeout(syncCanvasDisplaySize, 50);
+  }
+
+  // Lazy-mount the schematic editor iframe. Idempotent — sets the src
+  // once and re-uses the iframe on subsequent step switches. We point
+  // at the same standalone editor page; embedding it via iframe means
+  // the user's experience inside the schematic step matches the full-
+  // screen route without a Refactor of schematic-editor.js.
+  function mountSchematicIframe() {
+    var iframe = document.getElementById('ib-canvas-schematic-iframe');
+    if (!iframe || !state.projectId) return;
+    if (iframe.dataset.mounted === '1') return;
+    // The standalone editor's own logic (ensureSchematic) creates the
+    // schematic row idempotently, so we don't need to call
+    // ensureProjectSchematicId() here.
+    iframe.src = '/projects/schematic/edit.html?id=' +
+      encodeURIComponent(state.projectId) + '&embedded=1';
+    iframe.dataset.mounted = '1';
   }
 
   // Apply the text-step body to the read-only preview slot in the
@@ -3426,7 +3448,22 @@
   }
 
   function wireFilmstrip() {
-    if (dom.filmstripAdd) dom.filmstripAdd.addEventListener('click', onAddStep);
+    // The +add tile is now a Bootstrap dropdown toggle — clicking it
+    // shows the step-type menu. Each menu item is wired below to call
+    // onAddStep(type). Bootstrap handles the open/close animation via
+    // data-bs-toggle="dropdown".
+    var addMenu = document.querySelector('.ib-filmstrip-add-menu');
+    if (addMenu) {
+      Array.prototype.forEach.call(
+        addMenu.querySelectorAll('[data-add-step-type]'),
+        function (item) {
+          item.addEventListener('click', function (ev) {
+            ev.preventDefault();
+            onAddStep(item.dataset.addStepType);
+          });
+        }
+      );
+    }
     if (dom.filmstripToggle) {
       dom.filmstripToggle.addEventListener('click', function () {
         if (!dom.filmstrip) return;
@@ -3507,11 +3544,15 @@
     renderLayersList();
   }
 
-  async function onAddStep() {
+  async function onAddStep(stepType) {
     if (dom.filmstripAdd) dom.filmstripAdd.disabled = true;
     setSaveStatus('saving', 'Adding step…');
     try {
-      var step = await postStep();
+      // Validate before sending — server's Literal type also rejects, but
+      // catching here gives a cleaner failure mode.
+      var allowed = { photo:1, schematic:1, text:1, video:1, blank:1 };
+      var initial = (stepType && allowed[stepType]) ? { step_type: stepType } : {};
+      var step = await postStep(initial);
       var fresh = await fetchInstruction();
       if (fresh && fresh.steps) {
         state.steps = fresh.steps;
