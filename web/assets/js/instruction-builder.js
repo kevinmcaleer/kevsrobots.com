@@ -1167,6 +1167,19 @@
     if (dom.canvasText) dom.canvasText.classList.toggle('d-none', stepType !== 'text');
     if (dom.canvasVideo) dom.canvasVideo.classList.toggle('d-none', stepType !== 'video');
     if (dom.canvasSchematic) dom.canvasSchematic.classList.toggle('d-none', stepType !== 'schematic');
+    // Body class drives CSS rules that swap title-bar affordances per
+    // step type — e.g. hide the HUD toggle on schematic steps where
+    // the HUD has nothing to inspect.
+    document.body.dataset.activeStepType = stepType || 'photo';
+    // Sync the title-bar zoom label to whichever canvas now owns the
+    // viewport. Schematic-step zoom comes back over postMessage when
+    // the iframe is ready; until then show "—". For Fabric-backed
+    // step types reflect state.userZoom directly.
+    if (stepType === 'schematic') {
+      if (dom.zoomPct) dom.zoomPct.textContent = '—';
+    } else {
+      updateZoomPctLabel();
+    }
     // Schematic steps mount the full editor as an iframe inside the
     // canvas area — lazy-load on first switch so projects that never
     // use schematics don't pay the request.
@@ -4060,6 +4073,18 @@
           exportVideo(kind);
         } else if (kind === 'zip') {
           exportZip();
+        } else if (kind === 'schematic-csv' || kind === 'schematic-png') {
+          // Forward into the embedded schematic editor via postMessage.
+          // Only meaningful when the active step is a schematic step;
+          // otherwise show a brief toast hint.
+          if (currentActiveStepType() !== 'schematic') {
+            setSaveStatus('error', 'Switch to a schematic step first');
+            return;
+          }
+          var action = kind === 'schematic-csv' ? 'export-csv' : 'export-png';
+          if (!postToSchematicIframe(action)) {
+            setSaveStatus('error', 'Schematic editor not ready yet');
+          }
         }
       });
     });
@@ -5805,12 +5830,13 @@
       }
     });
 
-    // Zoom button handlers + Ctrl/Cmd + wheel zoom over the canvas
-    // frame. Focal point follows the cursor so what's under the mouse
-    // stays under the mouse across the zoom step.
-    if (dom.zoomIn)    dom.zoomIn.addEventListener('click', function () { zoomCanvasBy(1.25, null); });
-    if (dom.zoomOut)   dom.zoomOut.addEventListener('click', function () { zoomCanvasBy(1 / 1.25, null); });
-    if (dom.zoomReset) dom.zoomReset.addEventListener('click', resetCanvasZoom);
+    // Zoom buttons branch based on the active step type. On a
+    // schematic-type step the embedded iframe owns the canvas — forward
+    // the zoom action via postMessage. Otherwise drive the builder's
+    // own Fabric canvas.
+    if (dom.zoomIn)    dom.zoomIn.addEventListener('click', function () { zoomActiveCanvasBy(1.25); });
+    if (dom.zoomOut)   dom.zoomOut.addEventListener('click', function () { zoomActiveCanvasBy(1 / 1.25); });
+    if (dom.zoomReset) dom.zoomReset.addEventListener('click', resetActiveCanvasZoom);
     if (dom.canvasFrame) {
       dom.canvasFrame.addEventListener('wheel', function (e) {
         if (!(e.ctrlKey || e.metaKey)) return;
@@ -5821,6 +5847,52 @@
         var factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
         zoomCanvasBy(factor, focal);
       }, { passive: false });
+    }
+
+    // Listen for the embedded schematic editor announcing its zoom
+    // level so the title-bar percent stays accurate when the user
+    // zooms via the iframe (Ctrl+wheel inside the schematic canvas).
+    window.addEventListener('message', function (e) {
+      var msg = e && e.data;
+      if (!msg || msg.kr_se_event !== 'zoom') return;
+      if (currentActiveStepType() !== 'schematic') return;
+      if (dom.zoomPct && typeof msg.percent === 'number') {
+        dom.zoomPct.textContent = msg.percent + '%';
+      }
+    });
+  }
+
+  // Helpers that branch between "builder's own Fabric canvas" and
+  // "embedded schematic editor iframe" based on the active step's
+  // type. Keeps the title-bar zoom buttons working uniformly.
+  function currentActiveStepType() {
+    if (!state.activeStepId) return 'photo';
+    var s = state.steps && state.steps.find(function (x) { return x.id === state.activeStepId; });
+    return (s && s.step_type) || 'photo';
+  }
+
+  function postToSchematicIframe(action) {
+    var iframe = document.getElementById('ib-canvas-schematic-iframe');
+    if (!iframe || !iframe.contentWindow) return false;
+    try {
+      iframe.contentWindow.postMessage({ kr_se_action: action }, '*');
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function zoomActiveCanvasBy(factor) {
+    if (currentActiveStepType() === 'schematic') {
+      postToSchematicIframe(factor >= 1 ? 'zoom-in' : 'zoom-out');
+    } else {
+      zoomCanvasBy(factor, null);
+    }
+  }
+
+  function resetActiveCanvasZoom() {
+    if (currentActiveStepType() === 'schematic') {
+      postToSchematicIframe('zoom-reset');
+    } else {
+      resetCanvasZoom();
     }
   }
 

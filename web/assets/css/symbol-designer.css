@@ -12,12 +12,26 @@
  * tool family.
  */
 
-/* ---------- Site chrome ---------- */
-
-body.symbol-designer-page #footer,
-body.symbol-designer-page .socials-bar,
-body.symbol-designer-page footer {
+/* ---------- Site chrome (always stripped) ----------
+   The symbol designer is a dedicated full-workspace editor — the page
+   navigates here from other workspaces (project editor, BOM row,
+   schematic editor) and back out again via its own title bar's "Back"
+   link. Showing the regular site top_bar / navigation / searchbar /
+   nav_projects on top would compress the editor into a thin sliver
+   and break the "this is an editor, not a content page" affordance.
+   Hide every direct child of body except .container-fluid, then
+   inside the container hide every direct child except .sd-workspace.
+   Same pattern the schematic editor uses for ?embedded=1. */
+body.symbol-designer-page > *:not(.container-fluid) {
   display: none !important;
+}
+body.symbol-designer-page > .container-fluid > *:not(.sd-workspace):not(script):not(style):not(link) {
+  display: none !important;
+}
+body.symbol-designer-page {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 body.symbol-designer-page > .container-fluid {
   padding: 0 !important;
@@ -42,7 +56,10 @@ body.symbol-designer-page > .container-fluid {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 56px);
+  /* Site chrome is fully hidden on this page — workspace fills the
+     viewport. */
+  height: 100vh;
+  min-height: 320px;
   background: var(--sd-bg);
   color: var(--sd-ink);
   font-size: 0.92rem;

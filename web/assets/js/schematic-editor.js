@@ -1907,6 +1907,43 @@
     dom.zoomPct.textContent = Math.round((STATE.userZoom || 1) * 100) + '%';
   }
 
+  // Embedded-mode postMessage bridge: the instruction builder hides the
+  // schematic editor's title bar entirely when embedding the editor in a
+  // schematic-type step (?embedded=1). Zoom / export / save-status are
+  // proxied through postMessage so the builder's own title bar acts as
+  // the single header for all step types.
+  function isEmbedded() {
+    return document.body.classList.contains('is-embedded');
+  }
+
+  function postToParent(payload) {
+    if (!isEmbedded() || !window.parent || window.parent === window) return;
+    try { window.parent.postMessage(payload, '*'); } catch (_) {}
+  }
+
+  function wireParentBridge() {
+    if (!isEmbedded()) return;
+    window.addEventListener('message', function (e) {
+      var msg = e && e.data;
+      if (!msg || msg.kr_se_action == null) return;
+      switch (msg.kr_se_action) {
+        case 'zoom-in':    zoomBy(1.25, null); postZoom(); break;
+        case 'zoom-out':   zoomBy(1 / 1.25, null); postZoom(); break;
+        case 'zoom-reset': resetZoom(); postZoom(); break;
+        case 'export-csv': exportCSV(); break;
+        case 'export-png': exportPNG(); break;
+      }
+    });
+    // Initial handshake — let the parent know we're ready + current
+    // zoom %. Re-emit on subsequent zoom changes so the parent's
+    // percent label stays in sync.
+    postZoom();
+  }
+
+  function postZoom() {
+    postToParent({ kr_se_event: 'zoom', percent: Math.round((STATE.userZoom || 1) * 100) });
+  }
+
   async function init() {
     cacheDom();
     var params = new URLSearchParams(window.location.search);
@@ -1958,6 +1995,7 @@
       setActiveTool('select');
       renderGraph();
       setSaveStatus('saved');
+      wireParentBridge();
 
       // Enable the "+ open Symbol Designer" button now that the page
       // ships (was disabled in the E2 merge).

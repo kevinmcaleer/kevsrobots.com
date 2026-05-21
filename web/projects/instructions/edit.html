@@ -74,6 +74,13 @@ hide_nibsy: true
           <li><a class="dropdown-item" href="#" data-export="mp4">MP4 video</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="#" data-export="zip">Image series (ZIP)</a></li>
+          <!-- Schematic-only items — visible always, action only when
+               the active step is a schematic step (forwarded into the
+               embedded schematic editor via postMessage). -->
+          <li><hr class="dropdown-divider"></li>
+          <li><h6 class="dropdown-header">Schematic (active step only)</h6></li>
+          <li><a class="dropdown-item" href="#" data-export="schematic-csv">Schematic connections (CSV)</a></li>
+          <li><a class="dropdown-item" href="#" data-export="schematic-png">Schematic (PNG)</a></li>
         </ul>
       </div>
 
@@ -586,8 +593,11 @@ hide_nibsy: true
         <div class="ib-filmstrip-track" id="ib-filmstrip-track"></div>
         <!-- Bootstrap dropdown: click the +add tile, pick a step type.
              Each option calls onAddStep(stepType) so the new step is
-             created with the chosen type pre-set (no second PUT needed). -->
-        <div class="dropdown ib-filmstrip-add-wrap">
+             created with the chosen type pre-set (no second PUT needed).
+             Uses `dropup` because the +add tile lives in the filmstrip
+             at the bottom of the workspace — a downward menu would
+             spill below the viewport. -->
+        <div class="dropup ib-filmstrip-add-wrap">
           <button type="button" class="ib-filmstrip-add" id="ib-filmstrip-add"
                   data-bs-toggle="dropdown" aria-expanded="false"
                   title="Add step">

@@ -72,9 +72,13 @@ body.schematic-editor-page.is-embedded .se-workspace {
     padding: 0 0.6rem;
   }
 }
-/* In embedded mode hide the "Back to project editor" link in the
-   title bar — the builder is the parent context already. */
-body.schematic-editor-page.is-embedded #se-back-link {
+/* In embedded mode the builder's own title bar is the single source
+   of truth for zoom / exports / save status / navigation — hide the
+   schematic editor's title bar entirely so the iframe shows just the
+   tools / canvas / connections panel. The builder's title-bar zoom
+   buttons postMessage their actions over to the iframe; same for the
+   Schematic CSV / PNG entries in the builder's export dropdown. */
+body.schematic-editor-page.is-embedded .se-titlebar {
   display: none !important;
 }
 
