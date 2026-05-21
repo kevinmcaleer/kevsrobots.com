@@ -194,6 +194,23 @@ hide_nibsy: true
         <i class="fas fa-chevron-right"></i>
       </button>
       <div class="se-table-body">
+        <!-- Properties panel — shows fields for the currently selected
+             instance (refDes + friendly label). Empty state when no
+             selection. The JS in renderProps() repopulates this section
+             on every selection change. -->
+        <section class="se-props-section" id="se-props-section">
+          <header class="se-props-header">
+            <h6 class="se-props-title">
+              <i class="fas fa-sliders me-3"></i> Properties
+            </h6>
+          </header>
+          <div class="se-props-body" id="se-props-body">
+            <div class="se-props-empty text-muted small">
+              Select a component on the canvas to see its properties.
+            </div>
+          </div>
+        </section>
+
         <header class="se-table-header">
           <h6 class="se-table-title">
             <i class="fas fa-table me-3"></i> Connections

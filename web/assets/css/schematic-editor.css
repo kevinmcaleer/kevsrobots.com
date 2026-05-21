@@ -518,6 +518,59 @@ body.schematic-editor-page {
 .se-main.is-table-collapsed .se-table-toggle i {
   transform: rotate(180deg);
 }
+/* Properties panel — sits above the connections table inside the
+   collapsible right pane. */
+.se-props-section {
+  border-bottom: 1px solid var(--se-border);
+  background: #fbfbfc;
+  flex: 0 0 auto;
+}
+.se-props-header {
+  padding: 0.5rem 1rem 0.25rem;
+}
+.se-props-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.se-props-body {
+  padding: 0.25rem 1rem 0.75rem;
+  background: var(--se-panel);
+}
+.se-props-empty {
+  padding: 0.25rem 0;
+}
+.se-props-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 0.5rem;
+}
+.se-props-field-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--se-muted);
+  font-weight: 600;
+}
+.se-props-field-value {
+  font-size: 0.88rem;
+  color: var(--se-ink);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+.se-props-input {
+  font-size: 0.88rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--se-border);
+  border-radius: 4px;
+  background: #fff;
+  outline: none;
+}
+.se-props-input:focus {
+  border-color: var(--se-brand-red);
+  box-shadow: 0 0 0 2px rgba(200, 49, 42, 0.15);
+}
+
 .se-table-header {
   display: flex;
   align-items: center;

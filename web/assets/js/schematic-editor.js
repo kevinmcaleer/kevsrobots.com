@@ -754,9 +754,14 @@
     });
     pieces.push(body);
 
-    // refDes + name label, anchored above the body.
+    // refDes + name label, anchored above the body. When the user has
+    // set a friendly name on the instance, prefer that over the
+    // generic symbol-type name (e.g. "U1 · Main controller" rather
+    // than "U1 · Raspberry Pi 5").
+    var friendly = (instance.label && instance.label.trim()) ? instance.label.trim() : null;
+    var displayName = friendly || symbolDef.name;
     var refLabel = new fabric.Text(
-      (instance.refDes || '') + ' · ' + symbolDef.name,
+      (instance.refDes || '') + ' · ' + displayName,
       {
         left: 0,
         top: -h / 2 - 22,
@@ -950,6 +955,7 @@
 
     STATE.canvas.requestRenderAll();
     renderConnectionsTable();
+    renderProps();
     updateSymbolHud();
   }
 
@@ -999,6 +1005,86 @@
     });
     return rows;
   }
+
+  // ====================================================================
+  // 10b. PROPERTIES PANEL (right pane, above the connections table)
+  // ====================================================================
+
+  function renderProps() {
+    if (!dom.propsBody) return;
+    var inst = findInstance(STATE.selectedInstanceId);
+    if (!inst) {
+      dom.propsBody.innerHTML =
+        '<div class="se-props-empty text-muted small">' +
+        'Select a component on the canvas to see its properties.' +
+        '</div>';
+      return;
+    }
+    var symbolDef = symbolDefById(inst.symbolId);
+    var symbolTypeName = symbolDef ? symbolDef.name : '(unknown)';
+    var refDes = inst.refDes || '';
+    var label = inst.label || '';
+    dom.propsBody.innerHTML =
+      '<div class="se-props-field">' +
+      '  <span class="se-props-field-label">Symbol type</span>' +
+      '  <span class="se-props-field-value">' + escapeHtml(symbolTypeName) + '</span>' +
+      '</div>' +
+      '<div class="se-props-field">' +
+      '  <label class="se-props-field-label" for="se-props-refdes">Reference</label>' +
+      '  <input class="se-props-input" id="se-props-refdes" type="text"' +
+      '         value="' + escapeHtml(refDes) + '"' +
+      '         placeholder="U1" maxlength="20"' +
+      '         data-instance-id="' + inst.id + '">' +
+      '</div>' +
+      '<div class="se-props-field">' +
+      '  <label class="se-props-field-label" for="se-props-label">Friendly name</label>' +
+      '  <input class="se-props-input" id="se-props-label" type="text"' +
+      '         value="' + escapeHtml(label) + '"' +
+      '         placeholder="e.g. Main controller" maxlength="60"' +
+      '         data-instance-id="' + inst.id + '">' +
+      '</div>';
+
+    var refInput = document.getElementById('se-props-refdes');
+    var labelInput = document.getElementById('se-props-label');
+    if (refInput) {
+      refInput.addEventListener('change', function () { onPropsRefDesChange(inst.id, refInput.value); });
+      refInput.addEventListener('blur',   function () { onPropsRefDesChange(inst.id, refInput.value); });
+      refInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); refInput.blur(); }
+      });
+    }
+    if (labelInput) {
+      labelInput.addEventListener('change', function () { onPropsLabelChange(inst.id, labelInput.value); });
+      labelInput.addEventListener('blur',   function () { onPropsLabelChange(inst.id, labelInput.value); });
+      labelInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); labelInput.blur(); }
+      });
+    }
+  }
+
+  function onPropsRefDesChange(instanceId, value) {
+    var inst = findInstance(instanceId);
+    if (!inst) return;
+    var next = (value || '').trim();
+    if (next === (inst.refDes || '')) return;
+    inst.refDes = next;
+    renderGraph();
+    scheduleAutosave();
+  }
+
+  function onPropsLabelChange(instanceId, value) {
+    var inst = findInstance(instanceId);
+    if (!inst) return;
+    var next = (value || '').trim();
+    if (next === (inst.label || '')) return;
+    inst.label = next;
+    renderGraph();
+    scheduleAutosave();
+  }
+
+  // ====================================================================
+  // 11. CONNECTIONS TABLE
+  // ====================================================================
 
   function renderConnectionsTable() {
     if (!dom.tableBody) return;
@@ -1332,6 +1418,7 @@
           renderGraph();
         } else {
           renderConnectionsTable();
+          renderProps();
           updateSymbolHud();
         }
       } else if (obj.data.kind === 'net') {
@@ -1796,6 +1883,8 @@
     dom.zoomReset      = document.getElementById('se-zoom-reset');
     dom.zoomPct        = document.getElementById('se-zoom-pct');
     dom.tableToggle    = document.getElementById('se-table-toggle');
+    dom.propsSection   = document.getElementById('se-props-section');
+    dom.propsBody      = document.getElementById('se-props-body');
     dom.loading        = document.getElementById('se-loading');
     dom.notOwner       = document.getElementById('se-not-owner');
     dom.error          = document.getElementById('se-error');
