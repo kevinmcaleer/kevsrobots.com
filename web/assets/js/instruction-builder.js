@@ -1462,25 +1462,51 @@
         return;
       }
 
+      // Allow remote images (uploaded photos, STL renders, etc.) to
+      // load CORS-clean. Without this, Fabric requests them without
+      // the CORS header and a tainted canvas blocks the eventual
+      // PNG export from the builder. Also: a single image that
+      // errors during enlivenObjects() can reject the whole
+      // loadFromJSON promise on Fabric v6, so failures here can
+      // cascade into a blank-canvas symptom unless we recover.
       try {
-        // Fabric v6: loadFromJSON returns a Promise; the 2nd arg is
-        // a per-object reviver (not a completion callback). Using the
-        // old v5 callback shape fired ``done()`` once per object and
-        // left ``state.suppressEvents`` cleared mid-load — which
-        // surfaced as "click tile → blank canvas" in the wild.
+        if (fabric && fabric.Image && fabric.Image.prototype) {
+          fabric.Image.prototype.crossOrigin = 'anonymous';
+        }
+      } catch (_) {}
+
+      // Fabric v6: loadFromJSON returns a Promise; the 2nd arg is
+      // a per-object reviver (not a completion callback). Using the
+      // old v5 callback shape fired ``done()`` once per object and
+      // left ``state.suppressEvents`` cleared mid-load — which
+      // surfaced as "click tile → blank canvas" in the wild.
+      //
+      // Recovery: if loadFromJSON rejects part-way (e.g. one photo
+      // 404s or hits a CORS block), DO NOT clear() the canvas —
+      // that wipes objects + background. Instead restore the bg
+      // colour from the parsed JSON and keep whatever objects did
+      // finish loading. Worst case, the user sees a step minus
+      // the broken image, not a blank slide.
+      var savedBg = (parsed && (parsed.background || parsed.backgroundColor)) || '#ffffff';
+      try {
         var result = state.canvas.loadFromJSON(parsed);
         Promise.resolve(result).then(function () {
+          if (!state.canvas.backgroundColor) {
+            state.canvas.backgroundColor = savedBg;
+          }
           state.canvas.requestRenderAll();
           done();
         }).catch(function (e) {
-          console.warn('loadFromJSON failed, falling back to blank canvas', e);
-          state.canvas.clear();
+          console.warn('loadFromJSON rejected — keeping partial state', e);
+          // Manually restore bg colour so a single failed image
+          // doesn't strip the slide's background as well.
+          state.canvas.backgroundColor = savedBg;
           state.canvas.requestRenderAll();
           done();
         });
       } catch (e) {
-        console.warn('loadFromJSON failed, falling back to blank canvas', e);
-        state.canvas.clear();
+        console.warn('loadFromJSON threw synchronously', e);
+        state.canvas.backgroundColor = savedBg;
         state.canvas.requestRenderAll();
         done();
       }
