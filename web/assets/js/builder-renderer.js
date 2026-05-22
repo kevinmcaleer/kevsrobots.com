@@ -189,7 +189,8 @@
     if (!slots.length) return;
     var fabric;
     try { fabric = await loadFabric(); }
-    catch (_) {
+    catch (e) {
+      console.warn('[builder-renderer] Fabric.js failed to load:', e);
       slots.forEach(function (slot) {
         slot.innerHTML =
           '<div class="alert alert-light border text-center small text-muted">' +
@@ -198,6 +199,23 @@
       });
       return;
     }
+    // Set crossOrigin globally so Fabric's image loader requests
+    // remote images with the CORS header dance — otherwise the
+    // first photo from a different origin taints the canvas and
+    // every subsequent toDataURL() throws SecurityError.
+    // Images served without CORS headers will simply fail to draw;
+    // we accept that trade-off so the rest of the canvas still
+    // renders. The fallback render below catches any remaining
+    // SecurityError just in case.
+    try {
+      if (fabric.Image && fabric.Image.prototype) {
+        fabric.Image.prototype.crossOrigin = 'anonymous';
+      }
+      if (fabric.config && typeof fabric.config.configure === 'function') {
+        fabric.config.configure({ crossOrigin: 'anonymous' });
+      }
+    } catch (_) {}
+
     // One reusable off-screen StaticCanvas — no event wiring, no
     // selection, no DOM presence. We re-use the same canvas across
     // steps to avoid allocating N×1200×900 buffers.
@@ -224,10 +242,28 @@
       }
       try {
         fcanvas.clear();
-        // Fabric v6: loadFromJSON returns a Promise.
+        // Fabric v6: loadFromJSON returns a Promise; resolves after
+        // ALL Image/Path async loads complete. We wrap in
+        // Promise.resolve() so a sync return (theoretical, but
+        // belt-and-braces) still awaits cleanly.
         // eslint-disable-next-line no-await-in-loop
         await Promise.resolve(fcanvas.loadFromJSON(parsed));
-        fcanvas.requestRenderAll();
+        // clear() wipes backgroundColor; loadFromJSON restores the
+        // saved one if present, but if the step never set one we
+        // want white (not transparent → black PNG). Belt-and-braces:
+        // force #ffffff when the loaded canvas reports nothing.
+        if (!fcanvas.backgroundColor) {
+          fcanvas.backgroundColor = '#ffffff';
+        }
+        // Synchronous render so the next toDataURL sees the finished
+        // frame. requestRenderAll defers to rAF which doesn't fire
+        // until the event loop yields — and we're inside a sync
+        // loop, so we never get there before toDataURL.
+        if (typeof fcanvas.renderAll === 'function') {
+          fcanvas.renderAll();
+        } else {
+          fcanvas.requestRenderAll();
+        }
         var dataUrl = fcanvas.toDataURL({
           format: 'png',
           multiplier: 1,
@@ -236,9 +272,20 @@
         slot.innerHTML =
           '<img class="builder-step-canvas-img" alt="" src="' + dataUrl + '">';
       } catch (e) {
+        // SecurityError = tainted canvas. Most other errors are
+        // structural (malformed canvas_json, unsupported object
+        // type). Log so devs can see which case fired — the user
+        // just sees the generic placeholder.
+        var isCors = e && (e.name === 'SecurityError' ||
+          /tainted|cross[- ]origin/i.test(String(e.message || '')));
+        console.warn('[builder-renderer] Canvas render failed' +
+          (isCors ? ' (CORS-tainted canvas)' : '') + ':', e);
         slot.innerHTML =
           '<div class="alert alert-light border text-center small text-muted">' +
-          '<i class="fas fa-image me-1"></i> Canvas preview failed to render.' +
+          '<i class="fas fa-image me-1"></i> ' +
+            (isCors
+              ? 'Canvas contains images from another origin without CORS headers.'
+              : 'Canvas preview failed to render.') +
           '</div>';
       }
     }
