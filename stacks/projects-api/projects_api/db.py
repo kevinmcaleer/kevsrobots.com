@@ -1070,3 +1070,48 @@ async def add_project_file_description_if_missing() -> None:
             await conn.execute(text(
                 'ALTER TABLE "project_files" ADD COLUMN "description" TEXT'
             ))
+
+
+async def add_project_content_mode_if_missing() -> None:
+    """Additive migration for the editor content-surface toggle.
+
+    Adds ``content_mode`` (VARCHAR(20) NOT NULL DEFAULT 'markdown') to
+    the existing ``projects`` table when it does not already exist. The
+    column drives the project editor's "Markdown vs Builder" toggle —
+    legacy rows backfill to ``markdown`` via the column default so
+    existing projects keep their EasyMDE editor.
+
+    SQLAlchemy's ``create_all`` does not ALTER existing tables, so this
+    idempotent helper keeps Postgres deployments in sync. Safe to run
+    on every startup; no-op when the column is already present.
+    Postgres-only — SQLite test runs use a fresh in-memory DB which
+    already includes the new column via ``create_all``.
+
+    Mirrors ``add_project_file_description_if_missing`` — same
+    probe-then-ALTER pattern.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'projects'"
+        ))
+        if table_check.first() is None:
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'projects' "
+            "AND column_name = 'content_mode'"
+        ))
+        if existing.first() is None:
+            logger.warning(
+                "Adding projects.content_mode column (editor content-surface toggle)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "projects" '
+                "ADD COLUMN \"content_mode\" VARCHAR(20) "
+                "NOT NULL DEFAULT 'markdown'"
+            ))

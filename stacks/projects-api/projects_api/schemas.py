@@ -57,6 +57,7 @@ class ProjectCreate(BaseModel):
     title: str = Field(..., min_length=5, max_length=200)
     short_description: Optional[str] = Field(None, max_length=500)
     content_md: Optional[str] = None
+    content_mode: Optional[str] = Field(None, pattern="^(markdown|builder)$")
     difficulty: Optional[str] = Field(None, pattern="^(beginner|intermediate|advanced)$")
     estimated_minutes: Optional[int] = Field(None, ge=1)
     code_repo_url: Optional[str] = None
@@ -67,6 +68,11 @@ class ProjectUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=5, max_length=200)
     short_description: Optional[str] = Field(None, max_length=500)
     content_md: Optional[str] = None
+    # Authors toggle the editor's content surface via this field —
+    # ``markdown`` shows the EasyMDE pane, ``builder`` shows the
+    # Instruction Builder. Optional on update so PATCHing other fields
+    # doesn't reset the mode.
+    content_mode: Optional[str] = Field(None, pattern="^(markdown|builder)$")
     difficulty: Optional[str] = Field(None, pattern="^(beginner|intermediate|advanced)$")
     estimated_minutes: Optional[int] = Field(None, ge=1)
     code_repo_url: Optional[str] = None
@@ -103,6 +109,10 @@ class ProjectResponse(BaseModel):
     title: str
     short_description: Optional[str]
     content_md: Optional[str]
+    # Author's chosen content surface for the editor. Default
+    # "markdown" so legacy projects (whose DB row has the server_default
+    # applied) keep showing the markdown editor.
+    content_mode: str = "markdown"
     difficulty: Optional[str]
     estimated_minutes: Optional[int]
     code_repo_url: Optional[str]
@@ -462,6 +472,70 @@ class ProjectSymbolResponse(BaseModel):
     description: Optional[str] = None
     bom_item_id: Optional[int] = None
     symbol_data: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
+# --- Library symbols (admin-curated, global) ----------------------------
+# Mirrors the ProjectSymbol shape with category validation + audit
+# fields. The Literal type rejects unknown categories at the schema
+# layer; the model uses plain String so we can add categories later
+# without a migration.
+
+LibrarySymbolCategory = Literal[
+    "Passive", "Active", "Power", "Sensor", "Module", "Connector", "Custom"
+]
+
+
+class LibrarySymbolCreate(BaseModel):
+    """Required: ``name``. Category defaults to ``Custom``."""
+
+    name: str = Field(..., min_length=1, max_length=200)
+    category: Optional[LibrarySymbolCategory] = "Custom"
+    ref_des_prefix: Optional[str] = Field(None, max_length=8)
+    description: Optional[str] = None
+    symbol_data: Optional[str] = None
+
+
+class LibrarySymbolUpdate(BaseModel):
+    """Partial update — omitted fields untouched."""
+
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    category: Optional[LibrarySymbolCategory] = None
+    ref_des_prefix: Optional[str] = Field(None, max_length=8)
+    description: Optional[str] = None
+    symbol_data: Optional[str] = None
+
+
+class LibrarySymbolPromoteRequest(BaseModel):
+    """Body for POST /api/library/symbols/promote-from-project.
+
+    The route reads the source ProjectSymbol, deep-copies its
+    ``symbol_data`` / ``ref_des_prefix`` / ``description`` into a new
+    LibrarySymbol row, then applies any overrides the curator passed
+    in (e.g. a tidied-up name or a different category). The original
+    ProjectSymbol stays untouched (copy semantics).
+    """
+
+    project_symbol_id: int
+    # Curator can override these at promotion time. Otherwise the
+    # values from the project symbol are used (with ``Custom`` as the
+    # category default since project symbols don't have one).
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    category: Optional[LibrarySymbolCategory] = None
+    ref_des_prefix: Optional[str] = Field(None, max_length=8)
+    description: Optional[str] = None
+
+
+class LibrarySymbolResponse(BaseModel):
+    id: int
+    name: str
+    category: str
+    ref_des_prefix: str
+    description: Optional[str] = None
+    symbol_data: Optional[str] = None
+    created_by_username: Optional[str] = None
+    updated_by_username: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

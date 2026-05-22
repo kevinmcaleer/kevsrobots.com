@@ -20,6 +20,7 @@ from .db import (
     add_instruction_step_type_if_missing,
     add_part_category_family_if_missing,
     add_part_status_columns_if_missing,
+    add_project_content_mode_if_missing,
     add_project_featured_columns_if_missing,
     add_project_file_description_if_missing,
     add_project_slug_if_missing,
@@ -60,6 +61,7 @@ from .routers import (
     parts_talk,
     projects,
     remixes,
+    library_symbols,
     schematics,
     social_og,
     staff_picks,
@@ -123,6 +125,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # video_url / schematic_id columns exist on legacy Postgres
     # deployments. No-op on fresh deploys / SQLite tests.
     await add_instruction_step_type_if_missing()
+    # Editor content-surface toggle: ensure projects.content_mode column
+    # exists on legacy Postgres deployments (defaults to 'markdown').
+    await add_project_content_mode_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
@@ -205,6 +210,10 @@ def create_app() -> FastAPI:
     # runtime; one symbol can be linked to a BOM row via ``bom_item_id``
     # so it surfaces as a ``⌗`` chip in C1's asset drawer.
     app.include_router(symbols.router)
+    # Admin-curated global symbol library — promoted from project
+    # symbols so every project's schematic editor can use them.
+    # Writes gated by ``require_admin`` (ADMIN_USERNAMES env var).
+    app.include_router(library_symbols.router)
     app.include_router(journal.router)
     app.include_router(moderation.router)
     # Issue #123: parts catalog moderation (reports + community merges).

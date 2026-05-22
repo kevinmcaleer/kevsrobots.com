@@ -130,6 +130,24 @@ Key data files:
   <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
   ```
   The same Liquid expression is already used in `_layouts/default.html` for `user-auth.js`. **Don't add the query for third-party CDN URLs** (e.g. `cdn.jsdelivr.net/...`) — they version themselves via the URL path. **Symptom of a missing cache-bust:** users see stack traces with line numbers that don't match the current source, or get "old behaviour" after a deploy until they hard-refresh.
+- **FA icon centering inside a fixed-size button/badge** — Font Awesome glyphs sit visually high in their line-box, so `display: flex; align-items: center` leaves them ~2-3px above the visual centre of a small (24–32px) container. This bug has been re-fixed at least four times across `ib-hud-action`, `ib-image-toolbar`, schematic editor action buttons, and the symbol designer's library icon. The **canonical fix** is:
+  ```css
+  /* Container: block + text-align + line-height = container height */
+  .my-icon-container {
+    width: 24px;
+    height: 24px;
+    display: block;
+    text-align: center;
+    line-height: 22px;   /* container height minus 1px border each side */
+  }
+  /* Child <i>: inline-block + vertical-align: top + inherit line-height */
+  .my-icon-container > i {
+    display: inline-block;
+    vertical-align: top;
+    line-height: inherit;
+  }
+  ```
+  **Symptom:** the icon appears 1–3px too high inside its container. **Do NOT use** flex/grid centring for FA glyphs inside fixed-size containers under ~40px — flex centres the line-box, not the glyph's optical centre, and FA glyphs have non-symmetric metrics. The block-and-line-height pattern works because setting `line-height` equal to the container height makes the inline box exactly fill the container, putting the glyph at its natural baseline (which IS the visual centre). Flex alignment can be used for *layout-level* centring (e.g. centring a row of icons inside a wide bar) but not for the icon's vertical position inside its own small container. Sub-tip: if the container has a `border`, subtract 2×border-width from the line-height so the glyph centres inside the content box, not the border box.
 - **Icon + heading spacing** - When a Font Awesome icon precedes the text of an `<h1>`–`<h4>`, the default `me-2` (Bootstrap 0.5rem) gap is **too tight at heading sizes** — the icon visually overlaps the text. Use `me-3` and keep a literal space between `</i>` and the heading text:
   ```html
   <!-- Right -->

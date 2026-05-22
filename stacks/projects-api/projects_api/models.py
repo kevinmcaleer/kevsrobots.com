@@ -44,6 +44,13 @@ class Project(Base):
     slug: Mapped[Optional[str]] = mapped_column(String(80), nullable=True, index=True)
     short_description: Mapped[Optional[str]] = mapped_column(String(500))
     content_md: Mapped[Optional[str]] = mapped_column(Text)
+    # Author's choice of content surface: ``markdown`` shows the EasyMDE
+    # markdown editor; ``builder`` swaps in the Instruction Builder. The
+    # opposite surface is hidden in the editor UI but its data is
+    # preserved server-side so flipping back-and-forth doesn't lose work.
+    content_mode: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="markdown", server_default="markdown"
+    )
     difficulty: Mapped[Optional[str]] = mapped_column(String(20))
     estimated_minutes: Mapped[Optional[int]] = mapped_column(Integer)
     code_repo_url: Mapped[Optional[str]] = mapped_column(Text)
@@ -1229,6 +1236,71 @@ class ProjectSymbol(Base):
     # v1 is ~1 MB (covered by ``test_symbols`` round-tripping a 1 MB
     # payload).
     symbol_data: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+# --- Library symbols (admin-curated, global) -------------------------------
+# Promoted from per-project ProjectSymbol rows so they show up in every
+# project's schematic editor library. Writes are admin-only (the API
+# checks the authenticated username against the configured admin list);
+# reads are public so non-owners viewing a project still see the full
+# library.
+#
+# This is a brand-new table — no idempotent ALTER helper needed per the
+# CLAUDE.md backend guidance.
+LIBRARY_SYMBOL_CATEGORIES: tuple[str, ...] = (
+    "Passive",
+    "Active",
+    "Power",
+    "Sensor",
+    "Module",
+    "Connector",
+    "Custom",
+)
+
+
+class LibrarySymbol(Base):
+    """An admin-curated schematic symbol available across every project.
+
+    Same JSON shape as :class:`ProjectSymbol` — ``symbol_data`` holds the
+    ``{ bodyShapes, pins }`` document the frontend renders. The category
+    field constrains the library list into the seven groups defined in
+    :data:`LIBRARY_SYMBOL_CATEGORIES` (validated at the schema layer, not
+    via a DB CHECK constraint so adding new categories later doesn't need
+    a migration).
+    """
+
+    __tablename__ = "library_symbols"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    category: Mapped[str] = mapped_column(
+        String(32), nullable=False, server_default="Custom", default="Custom",
+        index=True,
+    )
+    ref_des_prefix: Mapped[str] = mapped_column(
+        String(8), nullable=False, server_default="U", default="U"
+    )
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    # Same opaque JSON payload as ProjectSymbol.symbol_data.
+    symbol_data: Mapped[Optional[str]] = mapped_column(Text)
+    # Audit trail — who promoted / last edited. Stored as the chatter
+    # username string (mirrors how Project.author_username works) so we
+    # don't need a join just to display the curator's name.
+    created_by_username: Mapped[Optional[str]] = mapped_column(
+        String(80), nullable=True
+    )
+    updated_by_username: Mapped[Optional[str]] = mapped_column(
+        String(80), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
