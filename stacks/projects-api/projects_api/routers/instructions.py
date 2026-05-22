@@ -382,20 +382,25 @@ async def delete_step(
 # future spec wants per-type server-side rendering it can layer on top
 # without changing this contract.
 #
-# Owner-only for now. A future Phase 2d could surface a public PDF on
-# view.html, but that requires server-side canvas rendering (e.g.
-# node-canvas) which is out of scope for this slice.
+# Public: any visitor can post pre-rendered step PNGs and receive a
+# PDF. The data being rendered is already public (steps + canvases
+# show on /projects/view.html); the PDF is just another presentation
+# of it. Used by the "Download Project" ZIP flow so the build PDF
+# ships alongside README/images/files.
 
 
 @router.post("/export/pdf")
 async def export_pdf(
     project_id: int,
     body: InstructionExportRequest,
-    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
-    """Render the supplied step PNGs to a PDF and return as a download."""
-    await _check_owner(session, project_id, user)
+    """Render the supplied step PNGs to a PDF and return as a download.
+
+    Public — the PNGs come from the client, so this is effectively a
+    stateless PDF builder. The project_id is only used to embed the
+    project id in the filename and for traceability.
+    """
 
     # Validate the layout choice first — saves us decoding any PNGs if
     # the client sent garbage.

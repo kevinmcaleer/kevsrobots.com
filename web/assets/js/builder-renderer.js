@@ -375,5 +375,138 @@
     renderInto(containerEl, instr);
   }
 
-  window.BuilderRenderer = { render: render, renderInto: renderInto };
+  // ---------------------------------------------------------------
+  // Export helper — rasterise every step's canvas_json to a PNG
+  // data URL and post the bundle to the projects-api PDF endpoint.
+  // The viewer's "Download Project" ZIP flow uses this so a PDF of
+  // the build instructions ships alongside README / images / files.
+  //
+  // Text / video / schematic steps don't have a canvas_json so they
+  // render as a plain white frame for now (same limitation as the
+  // instruction builder's own PDF exporter). A future pass could
+  // pre-render those types client-side; out of scope for the ZIP
+  // bundling work.
+  // ---------------------------------------------------------------
+  async function exportInstructionsPdf(projectId, opts) {
+    opts = opts || {};
+    var resp = await fetch(
+      apiBase() + '/api/projects/' + projectId + '/instruction',
+      { credentials: 'omit' }
+    );
+    if (!resp.ok) {
+      if (resp.status === 404) return null;
+      throw new Error('Fetch instruction HTTP ' + resp.status);
+    }
+    var instr = await resp.json();
+    if (!instr || !Array.isArray(instr.steps) || instr.steps.length === 0) {
+      return null;
+    }
+    var steps = instr.steps.slice().sort(function (a, b) {
+      return (a.step_number || 0) - (b.step_number || 0);
+    });
+    var fabric;
+    try { fabric = await loadFabric(); }
+    catch (e) {
+      throw new Error('Fabric.js failed to load for PDF export: ' + e.message);
+    }
+    try {
+      if (fabric.Image && fabric.Image.prototype) {
+        fabric.Image.prototype.crossOrigin = 'anonymous';
+      }
+    } catch (_) {}
+
+    var off = document.createElement('canvas');
+    off.width = CANVAS_W; off.height = CANVAS_H;
+    var fcanvas = new fabric.StaticCanvas(off, {
+      width: CANVAS_W, height: CANVAS_H,
+      backgroundColor: '#ffffff',
+      enableRetinaScaling: false,
+      renderOnAddRemove: false,
+    });
+
+    var rendered = [];
+    try {
+      for (var i = 0; i < steps.length; i++) {
+        var s = steps[i];
+        var dataUrl = await _rasteriseStepFor(s, fcanvas);
+        rendered.push({
+          step_number: s.step_number || (i + 1),
+          title: s.title || null,
+          description: s.description || null,
+          image_data_url: dataUrl,
+        });
+        if (typeof opts.onProgress === 'function') {
+          try { opts.onProgress(i + 1, steps.length); } catch (_) {}
+        }
+      }
+    } finally {
+      try { fcanvas.dispose(); } catch (_) {}
+    }
+
+    var payload = {
+      steps: rendered,
+      steps_per_page: opts.steps_per_page || 1,
+      include_title_page: opts.include_title_page !== false,
+      project_title: opts.project_title || null,
+    };
+    var pdfResp = await fetch(
+      apiBase() + '/api/projects/' + projectId + '/instruction/export/pdf',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!pdfResp.ok) {
+      throw new Error('PDF export HTTP ' + pdfResp.status);
+    }
+    return pdfResp.blob();
+  }
+
+  // Single-step rasteriser — handles missing canvas_json by returning
+  // a blank-white PNG so the PDF endpoint always gets a valid image.
+  async function _rasteriseStepFor(step, fcanvas) {
+    function blankDataUrl() {
+      try {
+        fcanvas.clear();
+        fcanvas.backgroundColor = '#ffffff';
+        fcanvas.renderAll();
+        return fcanvas.toDataURL({
+          format: 'png',
+          multiplier: 2,
+          enableRetinaScaling: false,
+        });
+      } catch (_) {
+        // 1×1 transparent fallback so the endpoint's data:image/png
+        // prefix check still passes.
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+      }
+    }
+    var parsed = null;
+    if (step && step.canvas_json) {
+      try { parsed = JSON.parse(step.canvas_json); } catch (_) {}
+    }
+    if (!parsed) return blankDataUrl();
+    var savedBg = parsed.background || parsed.backgroundColor || '#ffffff';
+    try {
+      fcanvas.clear();
+      await Promise.resolve(fcanvas.loadFromJSON(parsed));
+      if (!fcanvas.backgroundColor) fcanvas.backgroundColor = savedBg;
+      fcanvas.renderAll();
+      return fcanvas.toDataURL({
+        format: 'png',
+        multiplier: 2,
+        enableRetinaScaling: false,
+      });
+    } catch (e) {
+      console.warn('[builder-renderer] step rasterise failed; using blank', e);
+      return blankDataUrl();
+    }
+  }
+
+  window.BuilderRenderer = {
+    render: render,
+    renderInto: renderInto,
+    exportInstructionsPdf: exportInstructionsPdf,
+  };
 })();

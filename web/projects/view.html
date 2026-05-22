@@ -960,9 +960,15 @@ description: View project details
       loadJournal();
       loadMakes(project);
 
-      // Issue #178 Phase 2a — public read-only slideshow viewer for
-      // build instructions. Self-hides if no instruction / no steps.
-      if (window.InstructionViewer && typeof window.InstructionViewer.init === 'function') {
+      // Issue #178 Phase 2a — legacy slideshow viewer for build
+      // instructions. In builder mode the inline step renderer above
+      // already shows the same content (and richer — type-specific
+      // bodies, TOC, anchors), so we skip the slideshow to avoid
+      // duplicating it at the bottom of the page. Markdown-mode
+      // projects keep the slideshow as the only surface for any
+      // instructions they may have authored via the lite stepper.
+      if (viewMode !== 'builder' &&
+          window.InstructionViewer && typeof window.InstructionViewer.init === 'function') {
         try { window.InstructionViewer.init(project.id); } catch (_) {}
       }
 
@@ -1604,6 +1610,39 @@ description: View project details
           csv += '"' + (item.name||'').replace(/"/g, '""') + '",' + item.quantity + ',' + item.unit + ',' + (item.unit_cost||0) + ',"' + (item.currency_code||'') + '","' + (item.supplier_url||'') + '"\n';
         });
         zip.file('bill-of-materials.csv', csv);
+      }
+
+      // Build Instructions PDF — only if the project has authored
+      // any steps. Uses the same builder-renderer that powers the
+      // public viewer's per-step previews; rasterises each step to
+      // a PNG client-side then posts the bundle to the projects-api
+      // PDF endpoint. Failures don't abort the ZIP — we just skip
+      // the PDF and surface a console warning.
+      if (window.BuilderRenderer &&
+          typeof window.BuilderRenderer.exportInstructionsPdf === 'function') {
+        try {
+          btn.innerHTML =
+            '<i class="fas fa-spinner fa-spin me-2"></i> Rendering instructions PDF…';
+          var pdfBlob = await window.BuilderRenderer.exportInstructionsPdf(
+            project.id,
+            {
+              project_title: project.title,
+              steps_per_page: 1,
+              include_title_page: true,
+              onProgress: function (done, total) {
+                btn.innerHTML =
+                  '<i class="fas fa-spinner fa-spin me-2"></i>' +
+                  ' Rendering step ' + done + ' of ' + total + '…';
+              },
+            }
+          );
+          if (pdfBlob) {
+            zip.file('instructions.pdf', pdfBlob);
+          }
+        } catch (e) {
+          console.warn('[ZIP] PDF export skipped:', e);
+        }
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Packaging…';
       }
 
       var content = await zip.generateAsync({ type: 'blob' });
