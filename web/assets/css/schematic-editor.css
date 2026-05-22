@@ -465,6 +465,67 @@ body.schematic-editor-page {
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+  /* Anchor for the floating toolbar that sits above the canvas. */
+  position: relative;
+}
+
+/* ---------- Floating drawing-tool toolbar (above the canvas) ----- */
+
+.se-floating-toolbar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;             /* sits above the canvas + symbol HUD (z=5) */
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--se-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.se-floating-toolbar-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--se-border);
+  margin: 2px 2px;
+}
+.se-floating-tool-btn {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #495057;
+  cursor: pointer;
+  /* FA-icon-safe centring — same pattern documented in CLAUDE.md. */
+  display: block;
+  text-align: center;
+  line-height: 30px;       /* container height minus 1px border each side */
+  padding: 0;
+  transition: background 0.1s, color 0.1s;
+}
+.se-floating-tool-btn > i {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 14px;
+  line-height: inherit;
+}
+.se-floating-tool-btn:hover {
+  background: #f1f3f5;
+  color: var(--se-brand-red);
+}
+.se-floating-tool-btn.is-active {
+  background: var(--se-brand-red);
+  color: #fff;
+}
+.se-floating-tool-btn.is-active:hover {
+  background: var(--se-brand-red);
+  color: #fff;
 }
 .se-canvas-wrap {
   position: relative;
@@ -474,7 +535,9 @@ body.schematic-editor-page {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 0.5rem;
+  /* Extra top padding so the floating drawing-tool toolbar (~40px
+     high at top:10px) doesn't overlap the visible canvas area. */
+  padding: 56px 0.5rem 0.5rem;
 }
 
 /* The Fabric.js wrapper div around the canvas. Fabric inserts two
@@ -555,9 +618,13 @@ body.schematic-editor-page {
   top: 8px;
   width: 24px;
   height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* FA-glyph-safe centring (see CLAUDE.md "FA icon centering").
+     flex centres the line-box, but FA glyphs sit visually high in
+     theirs and end up offset upward in small fixed-size buttons. */
+  display: block;
+  text-align: center;
+  line-height: 26px;       /* container height minus 1px border top + bottom */
+  padding: 0;
   background: var(--se-panel);
   border: 1px solid var(--se-border);
   border-left: none;
@@ -566,6 +633,11 @@ body.schematic-editor-page {
   cursor: pointer;
   z-index: 2;
   font-size: 0.78rem;
+}
+.se-table-toggle > i {
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
 }
 .se-table-toggle:hover { color: var(--se-ink); }
 .se-table-body {
@@ -700,6 +772,19 @@ body.schematic-editor-page {
 .se-th-from, .se-td-from { width: 22%; }
 .se-th-to,   .se-td-to   { width: 22%; }
 .se-th-desc, .se-td-desc { width: 40%; }
+
+/* "Hide description column" toggle. The .is-desc-hidden modifier on
+   .se-table collapses the Description column completely — both header
+   cell and per-row cells. Net / From / To redistribute to fill the
+   freed space. Flip back by removing the class. */
+.se-table.is-desc-hidden .se-th-desc,
+.se-table.is-desc-hidden .se-td-desc { display: none; }
+.se-table.is-desc-hidden .se-th-net,
+.se-table.is-desc-hidden .se-td-net { width: 28%; }
+.se-table.is-desc-hidden .se-th-from,
+.se-table.is-desc-hidden .se-td-from,
+.se-table.is-desc-hidden .se-th-to,
+.se-table.is-desc-hidden .se-td-to { width: 36%; }
 .se-td-net, .se-td-from, .se-td-to { font-family: ui-monospace, SFMono-Regular, monospace; }
 .se-table-row { cursor: pointer; }
 .se-table-row:hover { background: #fafbfc; }

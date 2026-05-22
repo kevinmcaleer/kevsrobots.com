@@ -1,0 +1,434 @@
+---
+title: Admin · Symbol Library
+layout: default
+description: Curate the global schematic-symbol library — promote, edit, categorise, delete.
+permalink: /admin/symbols/
+---
+
+{% include nav_admin.html %}
+
+<script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+
+<style>
+  .lib-symbols-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .lib-symbols-toolbar .form-control,
+  .lib-symbols-toolbar .form-select {
+    max-width: 240px;
+  }
+  .lib-symbols-table th {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+  }
+  .lib-symbols-table td.category {
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: #495057;
+  }
+  .lib-symbols-table td.name {
+    font-weight: 600;
+  }
+  .lib-symbols-table td.ref-des {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #495057;
+  }
+  .lib-symbols-table .row-actions {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: flex-end;
+  }
+  .lib-symbols-empty {
+    border: 1px dashed #dee2e6;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
+  }
+</style>
+
+<div class="container py-4">
+  <nav class="small text-muted mb-2" aria-label="breadcrumb">
+    <a href="/admin/" class="text-decoration-none">Admin</a>
+    <span class="mx-1">&rsaquo;</span>
+    Symbol library
+  </nav>
+  <h1><i class="fas fa-microchip me-3 text-primary"></i> Symbol Library</h1>
+  <p class="text-muted">
+    The admin-curated global library is loaded into every project's schematic editor
+    alongside its own user-designed symbols. Edits propagate to all projects on the
+    next schematic-editor load.
+  </p>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Checking access&hellip;</span>
+    </div>
+  </div>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="admin-content" class="d-none">
+
+    <div class="lib-symbols-toolbar">
+      <input type="search"
+             class="form-control"
+             id="lib-search"
+             placeholder="Search by name or ref des prefix&hellip;"
+             aria-label="Search library symbols">
+      <select class="form-select" id="lib-category-filter" aria-label="Filter by category">
+        <option value="">All categories</option>
+      </select>
+      <span class="text-muted small ms-auto" id="lib-count"></span>
+    </div>
+
+    <div id="lib-table-wrap">
+      <table class="table table-hover lib-symbols-table align-middle">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Ref des</th>
+            <th>Updated by</th>
+            <th>Updated</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="lib-table-body"></tbody>
+      </table>
+      <div id="lib-empty" class="lib-symbols-empty d-none">
+        <i class="fas fa-microchip fa-2x text-muted mb-2"></i>
+        <div>No symbols in the global library yet.</div>
+        <div class="small mt-1">
+          Open a project's Symbol Designer and use <strong>Promote to global library</strong>
+          on any symbol you want to share across every project.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Edit modal — name / category / ref-des-prefix / description. The
+     pin layout + body shapes are edited in the Symbol Designer itself
+     (see Edit-design action), this modal is for metadata only. -->
+<div class="modal fade" id="lib-edit-modal" tabindex="-1" aria-labelledby="lib-edit-modal-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="lib-edit-modal-title">Edit symbol</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="lib-edit-name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="lib-edit-name" maxlength="200">
+        </div>
+        <div class="row g-2">
+          <div class="col">
+            <label for="lib-edit-category" class="form-label">Category</label>
+            <select class="form-select" id="lib-edit-category"></select>
+          </div>
+          <div class="col">
+            <label for="lib-edit-refdes" class="form-label">Ref des prefix</label>
+            <input type="text" class="form-control" id="lib-edit-refdes" maxlength="8">
+          </div>
+        </div>
+        <div class="mb-3 mt-3">
+          <label for="lib-edit-desc" class="form-label">Description (optional)</label>
+          <textarea class="form-control" id="lib-edit-desc" rows="2"></textarea>
+        </div>
+        <div class="alert alert-light small mb-0">
+          <i class="fas fa-info-circle me-1"></i>
+          To change the pin layout or body shapes, use <strong>Edit design</strong> — it opens
+          the Symbol Designer pre-loaded with this library symbol.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="lib-edit-save">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://projects.kevsrobots.com';
+
+  function authFetch(url, opts) {
+    if (window.ProjectAuth && typeof window.ProjectAuth.apiFetch === 'function') {
+      return window.ProjectAuth.apiFetch(url, opts);
+    }
+    opts = opts || {};
+    opts.credentials = 'include';
+    return fetch(url, opts);
+  }
+
+  // ---- DOM refs (after init) ----
+  var dom = {};
+  // ---- State ----
+  var state = {
+    symbols: [],
+    categories: [],
+    editingId: null,
+    filterCategory: '',
+    searchQuery: '',
+  };
+
+  function bindDom() {
+    dom.loading       = document.getElementById('loading');
+    dom.denied        = document.getElementById('access-denied');
+    dom.content       = document.getElementById('admin-content');
+    dom.search        = document.getElementById('lib-search');
+    dom.catFilter     = document.getElementById('lib-category-filter');
+    dom.count         = document.getElementById('lib-count');
+    dom.tableBody     = document.getElementById('lib-table-body');
+    dom.empty         = document.getElementById('lib-empty');
+    dom.editName      = document.getElementById('lib-edit-name');
+    dom.editCategory  = document.getElementById('lib-edit-category');
+    dom.editRefDes    = document.getElementById('lib-edit-refdes');
+    dom.editDesc      = document.getElementById('lib-edit-desc');
+    dom.editSave      = document.getElementById('lib-edit-save');
+    dom.editModalEl   = document.getElementById('lib-edit-modal');
+    dom.editModalTitle = document.getElementById('lib-edit-modal-title');
+  }
+
+  function showDenied() {
+    dom.loading.classList.add('d-none');
+    dom.denied.classList.remove('d-none');
+  }
+  function showContent() {
+    dom.loading.classList.add('d-none');
+    dom.content.classList.remove('d-none');
+  }
+
+  async function init() {
+    bindDom();
+    // Auth + admin gate
+    try {
+      var r = await authFetch(API + '/api/auth/me');
+      if (!r.ok) return showDenied();
+      var me = await r.json();
+      if (!me || me.is_admin !== true) return showDenied();
+    } catch (_) { return showDenied(); }
+    showContent();
+
+    await Promise.all([fetchCategories(), fetchSymbols()]);
+    wireUi();
+    renderTable();
+  }
+
+  async function fetchCategories() {
+    try {
+      var r = await authFetch(API + '/api/library/symbols/categories');
+      if (r.ok) state.categories = await r.json();
+    } catch (_) {}
+    if (!Array.isArray(state.categories) || state.categories.length === 0) {
+      state.categories =
+        ['Passive', 'Active', 'Power', 'Sensor', 'Module', 'Connector', 'Custom'];
+    }
+    // Populate the filter dropdown + the edit-modal category select.
+    state.categories.forEach(function (cat) {
+      var opt1 = document.createElement('option');
+      opt1.value = cat; opt1.textContent = cat;
+      dom.catFilter.appendChild(opt1);
+      var opt2 = document.createElement('option');
+      opt2.value = cat; opt2.textContent = cat;
+      dom.editCategory.appendChild(opt2);
+    });
+  }
+
+  async function fetchSymbols() {
+    try {
+      var r = await authFetch(API + '/api/library/symbols');
+      if (!r.ok) {
+        state.symbols = [];
+        return;
+      }
+      state.symbols = await r.json();
+    } catch (_) {
+      state.symbols = [];
+    }
+  }
+
+  function wireUi() {
+    dom.search.addEventListener('input', function () {
+      state.searchQuery = (dom.search.value || '').trim().toLowerCase();
+      renderTable();
+    });
+    dom.catFilter.addEventListener('change', function () {
+      state.filterCategory = dom.catFilter.value;
+      renderTable();
+    });
+    dom.tableBody.addEventListener('click', onTableClick);
+    dom.editSave.addEventListener('click', onEditSave);
+  }
+
+  function filteredSymbols() {
+    var q = state.searchQuery;
+    var cat = state.filterCategory;
+    return state.symbols.filter(function (s) {
+      if (cat && s.category !== cat) return false;
+      if (!q) return true;
+      var hay = (s.name + ' ' + (s.ref_des_prefix || '')).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+  }
+
+  function esc(t) {
+    var d = document.createElement('div');
+    d.textContent = (t == null) ? '' : String(t);
+    return d.innerHTML;
+  }
+
+  function fmtDate(s) {
+    if (!s) return '';
+    try {
+      var d = new Date(s);
+      return d.toLocaleDateString() + ' ' +
+        d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (_) { return s; }
+  }
+
+  function renderTable() {
+    var rows = filteredSymbols();
+    dom.count.textContent = rows.length === 1
+      ? '1 symbol'
+      : rows.length + ' symbols';
+    if (rows.length === 0) {
+      dom.tableBody.innerHTML = '';
+      dom.empty.classList.remove('d-none');
+      return;
+    }
+    dom.empty.classList.add('d-none');
+    var html = rows.map(function (s) {
+      var editHref = '/projects/symbol/edit.html?library_id=' + encodeURIComponent(s.id);
+      return (
+        '<tr data-id="' + s.id + '">' +
+        '  <td class="name">' + esc(s.name) + '</td>' +
+        '  <td class="category">' + esc(s.category || 'Custom') + '</td>' +
+        '  <td class="ref-des">' + esc(s.ref_des_prefix || 'U') + '</td>' +
+        '  <td class="small text-muted">' + esc(s.updated_by_username || '—') + '</td>' +
+        '  <td class="small text-muted">' + esc(fmtDate(s.updated_at)) + '</td>' +
+        '  <td class="row-actions">' +
+        '    <a href="' + editHref + '" class="btn btn-sm btn-outline-secondary" title="Edit pin layout / body shapes">' +
+        '      <i class="fas fa-pen-ruler me-1"></i> Edit design' +
+        '    </a>' +
+        '    <button type="button" class="btn btn-sm btn-outline-primary" data-act="edit-meta" title="Edit name / category / ref des">' +
+        '      <i class="fas fa-tag me-1"></i> Metadata' +
+        '    </button>' +
+        '    <button type="button" class="btn btn-sm btn-outline-danger" data-act="delete" title="Remove from library">' +
+        '      <i class="fas fa-trash"></i>' +
+        '    </button>' +
+        '  </td>' +
+        '</tr>'
+      );
+    }).join('');
+    dom.tableBody.innerHTML = html;
+  }
+
+  function onTableClick(ev) {
+    var tr = ev.target.closest('tr[data-id]');
+    if (!tr) return;
+    var id = parseInt(tr.dataset.id, 10);
+    var btn = ev.target.closest('button[data-act]');
+    if (!btn) return;
+    if (btn.dataset.act === 'delete') return onDelete(id);
+    if (btn.dataset.act === 'edit-meta') return onEditMeta(id);
+  }
+
+  function onEditMeta(id) {
+    var sym = state.symbols.find(function (s) { return s.id === id; });
+    if (!sym) return;
+    state.editingId = id;
+    dom.editName.value     = sym.name || '';
+    dom.editCategory.value = sym.category || 'Custom';
+    dom.editRefDes.value   = sym.ref_des_prefix || 'U';
+    dom.editDesc.value     = sym.description || '';
+    dom.editModalTitle.textContent = 'Edit · ' + (sym.name || ('Symbol #' + id));
+    var modal = window.bootstrap && window.bootstrap.Modal
+      ? window.bootstrap.Modal.getOrCreateInstance(dom.editModalEl)
+      : null;
+    if (modal) modal.show();
+  }
+
+  async function onEditSave() {
+    if (state.editingId == null) return;
+    var body = {
+      name: (dom.editName.value || '').trim(),
+      category: dom.editCategory.value || 'Custom',
+      ref_des_prefix: (dom.editRefDes.value || 'U').trim().toUpperCase() || 'U',
+      description: (dom.editDesc.value || '').trim() || null,
+    };
+    if (!body.name) {
+      alert('Name is required.');
+      return;
+    }
+    try {
+      var r = await authFetch(API + '/api/library/symbols/' + state.editingId, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) {
+        alert('Save failed (HTTP ' + r.status + ').');
+        return;
+      }
+      var updated = await r.json();
+      var idx = state.symbols.findIndex(function (s) { return s.id === updated.id; });
+      if (idx >= 0) state.symbols[idx] = updated;
+      var modal = window.bootstrap && window.bootstrap.Modal
+        ? window.bootstrap.Modal.getInstance(dom.editModalEl)
+        : null;
+      if (modal) modal.hide();
+      renderTable();
+    } catch (e) {
+      alert('Save failed: ' + (e && e.message || 'network error'));
+    }
+  }
+
+  async function onDelete(id) {
+    var sym = state.symbols.find(function (s) { return s.id === id; });
+    if (!sym) return;
+    if (!confirm('Remove "' + sym.name + '" from the global library?\n' +
+                 'Projects that already used it keep their placed copies; ' +
+                 'no new schematics can pick it from the library after this.')) {
+      return;
+    }
+    try {
+      var r = await authFetch(API + '/api/library/symbols/' + id, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!r.ok && r.status !== 204) {
+        alert('Delete failed (HTTP ' + r.status + ').');
+        return;
+      }
+      state.symbols = state.symbols.filter(function (s) { return s.id !== id; });
+      renderTable();
+    } catch (e) {
+      alert('Delete failed: ' + (e && e.message || 'network error'));
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

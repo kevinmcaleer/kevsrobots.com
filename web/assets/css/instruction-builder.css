@@ -43,6 +43,58 @@ body.instruction-builder-page {
   overflow: hidden;
 }
 
+/* Embedded mode — when the page is iframed inside another editor
+   (e.g. the project editor's Instruction Builder pane). We can't
+   enumerate every site-chrome wrapper individually because the
+   includes use ad-hoc class names (e.g. top_bar is a
+   .container-fluid.bg-dark, socials_bar is the same shape), so the
+   safe bullet-proof rule is: hide every direct child of <body>
+   EXCEPT the .container-fluid that wraps the {{ content }} block.
+   Inside that container, the back link, anything not part of the
+   workspace, and Nibsy are hidden too.
+   The Jekyll layout puts content in `<div class="container-fluid p-0 m-0">`
+   so we target that specifically — the top_bar uses
+   .container-fluid.bg-dark which would otherwise match the same
+   selector. */
+body.instruction-builder-page.is-embedded > *:not(.container-fluid):not(script):not(style) {
+  display: none !important;
+}
+body.instruction-builder-page.is-embedded > .container-fluid.bg-dark,
+body.instruction-builder-page.is-embedded > .container-fluid.navbar {
+  display: none !important;
+}
+body.instruction-builder-page.is-embedded #ib-back-link,
+body.instruction-builder-page.is-embedded nibsy-widget,
+body.instruction-builder-page.is-embedded #nibsy-widget {
+  display: none !important;
+}
+
+body.instruction-builder-page.is-embedded {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #f8f9fa;
+  /* Prevent horizontal scroll inside the iframe — the workspace
+     should fill the full iframe width exactly. */
+  overflow: hidden;
+}
+
+body.instruction-builder-page.is-embedded > .container-fluid {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Workspace fills the full iframe height in embedded mode — no
+   chrome above so the runtime height calc would otherwise leave a
+   small gap. Override with 100vh / 100% so the workspace + filmstrip
+   sit edge-to-edge inside the iframe. */
+body.instruction-builder-page.is-embedded .ib-workspace {
+  height: 100vh !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 /* ---- Workspace shell -------------------------------------------------- */
 
 .ib-workspace {
@@ -112,7 +164,10 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   display: none !important;
 }
 
-/* Canvas zoom group: minus / fit% / plus pill in the title bar. */
+/* Canvas zoom group: minus / fit% / plus pill in the title bar.
+   Sized to match .ib-titlebar-btn (5px 10px padding × 0.82rem font)
+   so the outline lines up vertically with the HUD / export buttons
+   sitting next to it. */
 .ib-zoom-group {
   display: inline-flex;
   align-items: stretch;
@@ -124,12 +179,15 @@ body[data-active-step-type="video"] #ib-hud-toggle {
 .ib-zoom-group .ib-zoom-btn {
   border: 0;
   border-radius: 0;
-  padding: 0 0.55rem;
+  padding: 5px 0.6rem;
   background: #fff;
   color: #495057;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   line-height: 1;
   min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .ib-zoom-group .ib-zoom-btn + .ib-zoom-btn {
   border-left: 1px solid #dee2e6;
@@ -628,6 +686,54 @@ body[data-active-step-type="video"] #ib-hud-toggle {
 
 /* ---- Layers pane list ----------------------------------------------- */
 
+/* Canvas background colour picker on the Layers pane. */
+.ib-canvas-bg-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #f1f3f5;
+  border-radius: 5px;
+  background: #f8f9fa;
+}
+.ib-canvas-bg-label {
+  flex: 1 1 auto;
+  font-size: 0.82rem;
+  color: #495057;
+  margin: 0;
+}
+.ib-canvas-bg-input {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #fff;
+}
+.ib-canvas-bg-clear {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: #fff;
+  color: #495057;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  line-height: 26px;        /* container height minus 1px border each side */
+  padding: 0;
+  font-size: 0.78rem;
+}
+.ib-canvas-bg-clear > i {
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
+}
+.ib-canvas-bg-clear:hover { background: #f1f3f5; color: #212529; }
+
 .ib-layers-list {
   list-style: none;
   padding: 0;
@@ -727,13 +833,25 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  /* Use flex-start + margin auto on the frame so the frame centres
+     when it fits AND remains scrollable when it overflows. Combining
+     `justify-content: center` with a larger-than-container flex
+     child traps the overflow on both sides and prevents the user
+     from scrolling to the start — classic flex-scroll bug. */
+  align-items: flex-start;
+  justify-content: flex-start;
   background: #e9ecef;
   padding: 14px;
   min-width: 0;
   min-height: 0;
   overflow: auto;
+}
+.ib-canvas-area > .ib-canvas-frame {
+  /* Centre the frame in the area when it's smaller than the visible
+     space; when the frame grows past the area's size, margin:auto
+     collapses and the frame sits at the start with native scroll
+     handling the overflow. */
+  margin: auto;
 }
 
 .ib-canvas-frame {
@@ -742,9 +860,12 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   border: 1px solid #ced4da;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 1200px;
-  aspect-ratio: 4 / 3;
+  /* The JS layer (`applyCanvasFrameSize`) owns the width/height so
+     the FRAME itself scales with userZoom — PowerPoint-style. The
+     base (zoom=1) size is computed from the available canvas-area,
+     and zoom in/out multiplies that base. Don't set width / height
+     here — JS would have to fight CSS otherwise. */
+  flex: 0 0 auto;
 }
 
 .ib-canvas-frame.is-grid {
@@ -785,6 +906,32 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   padding: 16px;
 }
 .ib-canvas-empty.d-none { display: none; }
+
+/* Slide-number overlay painted on top of any objects on the canvas.
+   Lives inside .ib-canvas-frame (absolute-positioned at top-left of
+   the frame) so it scrolls / scales with the frame. Empty content
+   collapses it; JS fills the text via textContent. */
+.ib-canvas-step-num {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  z-index: 4;            /* above the canvas, below floating overlays */
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 900;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: rgba(33, 37, 41, 0.45);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  user-select: none;
+}
+.ib-canvas-step-num:empty { display: none; }
+/* Hide on non-canvas step types — the alt views (text editor, schematic
+   iframe, video player) provide their own affordances. */
+body[data-active-step-type="text"]      .ib-canvas-step-num,
+body[data-active-step-type="schematic"] .ib-canvas-step-num,
+body[data-active-step-type="video"]     .ib-canvas-step-num { display: none; }
 
 /* ---- Inspector HUD — floating dark panel ---------------------------- */
 
@@ -874,6 +1021,120 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   font-style: italic;
   text-align: center;
   padding: 8px 4px;
+}
+
+/* Canvas-background section painted in the HUD when nothing's
+   selected. Sits in the same dark-panel skin as the rest of the HUD. */
+.ib-hud-bg-color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 8px;
+}
+.ib-hud-bg-color-input {
+  flex: 1 1 auto;
+  height: 28px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #1a1a1a;
+  padding: 0;
+  cursor: pointer;
+}
+.ib-hud-bg-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 8px;
+  border: 1px dashed #6a6a6a;
+  border-radius: 5px;
+  background: #2a2a2a;
+  color: #f4f1ea;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 0.1s, color 0.1s;
+}
+.ib-hud-bg-add:hover { border-color: #b9b3a6; color: #fff; }
+.ib-hud-bg-image {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background: #1a1a1a;
+}
+.ib-hud-bg-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+}
+.ib-hud-bg-thumb.is-empty { background: #333; }
+.ib-hud-bg-meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ib-hud-bg-filename {
+  font-size: 0.74rem;
+  color: #f4f1ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-hud-bg-buttons {
+  display: flex;
+  gap: 4px;
+}
+.ib-hud-bg-buttons .ib-hud-action.is-danger { color: #ff8a82; }
+
+/* Background-picker modal — image list. */
+.ib-bg-picker-tabs .nav-link { font-size: 0.85rem; padding: 0.4rem 0.6rem; }
+.ib-bg-picker-list {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: #fbfbfc;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.ib-bg-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  padding: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.1s, background 0.1s;
+}
+.ib-bg-picker-item:hover { border-color: #0d6efd; background: #eef4ff; }
+.ib-bg-picker-thumb {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 3px;
+  background: #f1f3f5;
+  display: block;
+}
+.ib-bg-picker-name {
+  margin-top: 4px;
+  font-size: 0.74rem;
+  color: #495057;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ib-hud-name {
@@ -1199,11 +1460,20 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   align-items: stretch;
   gap: 8px;
   padding: 8px 12px;
+  /* Body scrolls horizontally so the +add tile travels with the
+     step list as more steps are added. The +add dropdown escapes
+     the overflow context via Popper's `strategy: 'fixed'` (set on
+     the dropdown trigger in HTML) — that renders the menu as
+     position:fixed so the parent's overflow can't clip it. */
   overflow-x: auto;
   overflow-y: hidden;
-  height: 110px;
+  /* Sized to fit a 4:3 preview at 140 px wide (105 px tall) + the
+     tile header + gaps + a little breathing room. Was 110 px — too
+     short for the new aspect-ratio-locked preview slot which was
+     getting clipped. */
+  height: 156px;
 }
-[data-density="compact"] .ib-filmstrip-body { height: 86px; padding: 6px 10px; }
+[data-density="compact"] .ib-filmstrip-body { height: 124px; padding: 6px 10px; }
 
 .ib-filmstrip.is-collapsed .ib-filmstrip-body {
   display: none;
@@ -1216,12 +1486,21 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   display: flex;
   gap: 8px;
   align-items: stretch;
+  flex: 0 0 auto;
+}
+/* The +add button sits AFTER the track inside .ib-filmstrip-body so
+   it stays visually attached to the right side of the step list and
+   scrolls along with it when there are many steps. */
+.ib-filmstrip-add-wrap {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
 }
 
 .ib-step-tile {
   position: relative;
   flex: 0 0 auto;
-  width: 130px;
+  width: 150px;
   border: 1.5px solid #dee2e6;
   border-radius: 6px;
   background: #f8f9fa;
@@ -1232,7 +1511,197 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   gap: 4px;
   transition: border-color 0.1s, background 0.1s, transform 0.05s;
 }
-[data-density="compact"] .ib-step-tile { width: 110px; padding: 4px 6px; }
+[data-density="compact"] .ib-step-tile { width: 130px; padding: 4px 6px; }
+
+/* New header row: num-pip + … menu, no title (moved into menu).
+   The title still appears on hover via the data-tooltip rule below. */
+.ib-step-tile-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* ---- Custom colour-picker popover (Safari-style presets) ---------- */
+.ib-color-popover {
+  position: fixed;
+  z-index: 10010;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  padding: 8px;
+  width: 232px;
+}
+.ib-color-popover-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.ib-color-popover-swatch {
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.05s, border-color 0.1s, box-shadow 0.1s;
+}
+.ib-color-popover-swatch:hover {
+  transform: scale(1.08);
+  border-color: #0d6efd;
+}
+.ib-color-popover-swatch.is-active {
+  border: 2px solid #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.18);
+}
+.ib-color-popover-footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ib-color-popover-custom-btn {
+  flex: 1 1 auto;
+  background: #f1f3f5;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: #212529;
+  cursor: pointer;
+  text-align: left;
+}
+.ib-color-popover-custom-btn:hover { background: #e9ecef; border-color: #adb5bd; }
+.ib-color-popover-native {
+  /* Hidden — the Custom… button drives it via .click(). Keep
+     pixel-sized so the OS dialog still anchors to it cleanly. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hover tooltip for filmstrip tiles. Painted via a single JS-
+   managed div that lives at <body> root so the filmstrip body's
+   overflow can't clip it (a pseudo-element ::after is trapped
+   inside its parent and got chopped at the strip's top edge).
+   The dark palette mirrors the inspector-HUD's mini-toolbars. */
+.ib-tile-tooltip {
+  position: fixed;
+  background: #2a2a2a;
+  color: #f4f1ea;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #111;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10001;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.ib-tile-tooltip.is-visible { opacity: 1; }
+
+/* Title + step-type inside the … menu header. */
+.ib-step-tile-menu-head {
+  padding: 6px 12px 4px;
+}
+.ib-step-tile-menu-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #212529;
+  cursor: text;
+  padding: 2px 4px;
+  margin: 0 -4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-step-tile-menu-title:hover {
+  background: rgba(13, 110, 253, 0.08);
+}
+.ib-step-tile-menu-type {
+  font-size: 0.74rem;
+  color: #6c757d;
+  margin-top: 2px;
+  padding: 0 0;
+}
+
+/* … menu — hidden until hover / active / focus / dropdown open. */
+.ib-step-tile-menu {
+  flex: 0 0 auto;
+  position: relative;
+}
+.ib-step-tile-menu-btn {
+  width: 22px;
+  height: 22px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  line-height: 20px;       /* container - 1px border each side */
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.1s, background 0.1s;
+}
+.ib-step-tile-menu-btn > i {
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
+  font-size: 0.78rem;
+}
+.ib-step-tile:hover .ib-step-tile-menu-btn,
+.ib-step-tile.is-active .ib-step-tile-menu-btn,
+.ib-step-tile:focus-within .ib-step-tile-menu-btn,
+.ib-step-tile-menu.show .ib-step-tile-menu-btn {
+  opacity: 1;
+}
+.ib-step-tile-menu-btn:hover {
+  background: #e9ecef;
+  border-color: #ced4da;
+  color: #212529;
+}
+.ib-step-tile-menu-list {
+  font-size: 0.82rem;
+  min-width: 11rem;
+  /* The dropdown is rendered via Popper with strategy: 'fixed' so it
+     escapes the filmstrip body's overflow context, but the canvas
+     area + other layout siblings (image toolbar, HUD, etc.) can sit
+     at higher stacking levels. Bootstrap also drops an inline z-index
+     when computing Popper positions, so we use !important to win
+     over both. Sitting at 10000 keeps the menu clear of every other
+     editor surface (modals are still higher at 1055/1080 by spec,
+     but those use position: fixed in their own backdrop and won't
+     conflict with the filmstrip menu). */
+  z-index: 10000 !important;
+}
+/* Background-colour menu item: layout the label + colour swatch
+   side-by-side. Native <input type=color> sits at the right edge. */
+.ib-step-tile-bg-item {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.ib-step-tile-bg-input {
+  margin-left: auto;
+  width: 26px;
+  height: 22px;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  padding: 0;
+  background: #fff;
+  cursor: pointer;
+}
 
 .ib-step-tile:hover {
   border-color: #adb5bd;
@@ -1273,8 +1742,13 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   border-color: #c8312a;
 }
 .ib-step-tile-preview {
-  flex: 1;
-  min-height: 30px;
+  flex: 0 0 auto;
+  /* Lock the preview slot's aspect ratio to the canvas (CANVAS_W /
+     CANVAS_H = 1200 / 900 = 4:3) so the thumbnail is a true mini
+     of the page rather than a cropped fragment. The tile's overall
+     height adjusts to the preview height + header. */
+  aspect-ratio: 4 / 3;
+  width: 100%;
   border-radius: 4px;
   background: linear-gradient(135deg, #e7eef7, #f5f7fb);
   display: flex;
@@ -1282,9 +1756,10 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   justify-content: center;
   color: #adb5bd;
   font-size: 0.76rem;
-  /* When the JS thumbnail generator drops a dataURL in here as a
-     background-image, fit it cleanly inside the preview slot. */
-  background-size: cover;
+  /* `contain` (not `cover`) so the full canvas content is visible —
+     nothing gets cropped. The thumb generator paints at the same
+     4:3 aspect so the preview fills the slot edge-to-edge. */
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -1333,6 +1808,14 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   color: #495057;
 }
 .ib-filmstrip-add i { font-size: 1rem; }
+
+/* Dropdown menu for the +add button. Sits above the filmstrip via
+   `dropup`. Lifted z-index so it draws over the canvas / right-pane
+   chrome rather than being painted beneath them. */
+.ib-filmstrip-add-menu {
+  z-index: 1080;
+  min-width: 12rem;
+}
 
 /* ---- Settings popover ----------------------------------------------- */
 
@@ -1514,6 +1997,36 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+/* Source-tab styling for Upload vs Project picker. */
+.ib-stl-source-tabs .nav-link {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.6rem;
+}
+.ib-stl-project-list {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: #fbfbfc;
+  padding: 4px;
+}
+.ib-stl-project-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+.ib-stl-project-item + .ib-stl-project-item { margin-top: 2px; }
+.ib-stl-project-item:hover { background: #eef4ff; }
+.ib-stl-project-name { flex: 1 1 auto; }
+.ib-stl-project-size { flex: 0 0 auto; }
 
 @media (max-width: 575px) {
   .ib-stl-render-area { width: 100%; height: 320px; }
@@ -1720,29 +2233,87 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   justify-content: stretch;
   overflow: hidden;
 }
-.ib-canvas-text-inner {
+/* Text-step "pages" container. Each ``.ib-canvas-text-page`` is one
+   editable A5-ish surface; horizontal dashed lines drawn via the
+   CodeMirror background show where future pages would split for
+   PNG/PDF/GIF export. */
+.ib-canvas-text {
+  /* Top-aligned so the editor doesn't bounce up/down as content grows
+     past one page. */
+  align-items: flex-start;
+  overflow: auto;
+  /* --ib-text-bg is set by JS from the step's canvas_json.background
+     so the text canvas matches the user-chosen page colour. Falls
+     back to white when not set. */
+  background-color: var(--ib-text-bg, #ffffff);
+}
+.ib-canvas-text-pages {
   width: 100%;
   max-width: 720px;
-  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* Centre horizontally inside the wider canvas-area. */
+  margin: 0 auto;
+}
+.ib-canvas-text-page {
+  position: relative;
+  background: var(--ib-text-bg, #ffffff);
   border: 1px solid #dee2e6;
   border-radius: 8px;
-  padding: 24px 28px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 24px 28px 36px;
 }
-.ib-canvas-text-empty {
-  text-align: center;
+.ib-canvas-text-pagecount {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  font-size: 0.72rem;
   color: #adb5bd;
-  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  pointer-events: none;
 }
-.ib-canvas-text-empty i { display: block; font-size: 1.6rem; }
-.ib-canvas-text-body {
-  /* Preserve line breaks from the raw body without re-implementing
-     markdown. textContent + this CSS = readable plain-text steps. */
-  white-space: pre-wrap;
-  word-wrap: break-word;
+/* Style the EasyMDE container so it lives flush inside the page card —
+   the page card supplies the visual border + shadow, and EasyMDE's
+   own border + toolbar pill blends in. */
+.ib-canvas-text-page .EasyMDEContainer {
+  /* Allow it to grow tall with content rather than constrain to a
+     fixed editor height. */
+  border: 0;
+  background: transparent;
+}
+.ib-canvas-text-page .EasyMDEContainer .editor-toolbar {
+  border: 0;
+  border-bottom: 1px solid #f1f3f5;
+  border-radius: 0;
+  background: transparent;
+  margin-bottom: 6px;
+  padding: 4px 0;
+}
+.ib-canvas-text-page .EasyMDEContainer .CodeMirror {
+  border: 0;
+  background: transparent;
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.55;
   color: #212529;
+  /* Page-break visualisation: a faint horizontal dashed line every
+     PAGE_HEIGHT pixels marks the boundary where the next "page"
+     starts. PAGE_HEIGHT is set from JS via the --ib-text-page-h CSS
+     variable so the same constant drives the page count + the line
+     positions. */
+  --ib-text-page-h: 880px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--ib-text-page-h) - 1px),
+    rgba(220, 53, 69, 0.18) calc(var(--ib-text-page-h) - 1px),
+    rgba(220, 53, 69, 0.18) var(--ib-text-page-h)
+  );
+}
+.ib-canvas-text-page .EasyMDEContainer .CodeMirror-scroll {
+  min-height: 240px;
 }
 
 .ib-canvas-video-inner {
@@ -1782,88 +2353,13 @@ body[data-active-step-type="video"] #ib-hud-toggle {
   margin-bottom: 8px;
 }
 
-/* Filmstrip thumb type badges — small pill top-right of each tile. */
-.ib-step-tile-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 999px;
-  color: #6c757d;
-  pointer-events: none;
-  /* Same line-height-matches-height pattern as the HUD action buttons
-     so the FA glyph sits centred — flex-align leaves it too high. */
-  display: block;
-  text-align: center;
-}
-.ib-step-tile-badge i {
-  display: inline-block;
-  vertical-align: top;
-  font-size: 9px;
-  line-height: 16px;  /* badge height - 2px border */
-}
-.ib-step-tile.is-active .ib-step-tile-badge {
-  border-color: var(--bs-primary, #c8312a);
-  color: var(--bs-primary, #c8312a);
-}
-
-/* Filmstrip thumb delete control — sits top-right, immediately to the
-   left of the type badge so the two don't overlap. The step number pill
-   is top-left in the flex flow, so we deliberately avoid that side.
-   Mostly invisible until the user hovers the tile; that keeps the strip
-   uncluttered when the project has lots of steps. */
-.ib-step-tile-delete {
-  position: absolute;
-  top: 4px;
-  right: 26px;  /* badge takes right:4..22, gap 4 → start here */
-  /* Block + text-align: center + line-height-matches-height is the
-     reliable centring pattern for FA glyphs inside a small button. */
-  display: block;
-  text-align: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 999px;
-  color: #6c757d;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.1s, background 0.1s, color 0.1s, border-color 0.1s;
-  z-index: 2;
-}
-.ib-step-tile-delete i {
-  display: inline-block;
-  vertical-align: top;
-  font-size: 10px;
-  line-height: 16px;  /* button = 18 - 2 (border) = 16 inner */
-}
-/* Tiles without a type badge (step_type=blank) should still position the
-   delete control at the visual top-right rather than awkwardly inset.
-   The :not selector keys off the badge's presence in the DOM. */
-.ib-step-tile:not(:has(.ib-step-tile-badge)) .ib-step-tile-delete {
-  right: 4px;
-}
-.ib-step-tile:hover .ib-step-tile-delete,
-.ib-step-tile.is-active .ib-step-tile-delete,
-.ib-step-tile-delete:focus {
-  opacity: 1;
-}
-.ib-step-tile-delete:hover:not(:disabled) {
-  background: #c8312a;
-  border-color: #c8312a;
-  color: #fff;
-}
-.ib-step-tile-delete:disabled {
-  cursor: not-allowed;
-  opacity: 0.35;
-}
-.ib-step-tile:hover .ib-step-tile-delete:disabled {
-  opacity: 0.35;
-}
+/* Filmstrip step-type badge + corner-X delete were both retired
+   when the per-tile `…` menu landed (title / type / background /
+   delete now all live inside the dropdown). The selectors are kept
+   here as a no-op block in case any cached HTML still references
+   them — but the visual rules are gone so they don't fight the
+   new dropdown rendering (the corner-X rules had position:absolute
+   + opacity:0, which was hiding the Delete item inside the menu). */
 
 /* ---- BOM pane (C1 — expandable rows) ------------------------------- */
 

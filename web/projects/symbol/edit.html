@@ -35,8 +35,14 @@ hide_nibsy: true
        =========================================================== -->
   <div class="sd-titlebar" id="sd-titlebar">
     <div class="sd-titlebar-left">
-      <a id="sd-back-link" href="/projects/instructions/edit.html" class="sd-titlebar-link">
-        <i class="fas fa-arrow-left me-1"></i> Back to project editor
+      <!-- One-step back: returns to the schematic editor (the page
+           the user normally arrives from). Styled as a prominent
+           button so the exit path is obvious even at a glance. JS
+           fills in ?id=<project> at runtime; the href below is a
+           working fallback if the script doesn't run. -->
+      <a id="sd-back-link" href="/projects/schematic/edit.html"
+         class="sd-titlebar-btn sd-titlebar-btn-primary">
+        <i class="fas fa-arrow-left me-1"></i> Back to schematic
       </a>
     </div>
     <div class="sd-titlebar-center">
@@ -53,7 +59,7 @@ hide_nibsy: true
           <i class="fas fa-magnifying-glass-minus"></i>
         </button>
         <button type="button" class="sd-titlebar-btn sd-zoom-btn" id="sd-zoom-reset"
-                title="Zoom to fit (Ctrl/Cmd 0)">
+                title="Toggle zoom-to-fit / 100% (Ctrl/Cmd 0)">
           <span id="sd-zoom-pct">100%</span>
         </button>
         <button type="button" class="sd-titlebar-btn sd-zoom-btn" id="sd-zoom-in"
@@ -61,10 +67,6 @@ hide_nibsy: true
           <i class="fas fa-magnifying-glass-plus"></i>
         </button>
       </div>
-      <a id="sd-open-schematic" class="sd-titlebar-btn" href="#"
-         title="Open the schematic editor for this project">
-        <i class="fas fa-diagram-project me-1"></i> Open schematic
-      </a>
     </div>
   </div>
 
@@ -122,6 +124,14 @@ hide_nibsy: true
                 disabled title="Duplicate the selected symbol">
           <i class="fas fa-clone me-1"></i> Duplicate
         </button>
+        <!-- Admin-only: promote this project symbol into the global
+             library so every project's schematic editor can use it.
+             Hidden by default; JS reveals when the current user is
+             in the ADMIN_USERNAMES allow-list. -->
+        <button type="button" class="sd-library-action-btn d-none" id="sd-library-promote"
+                disabled title="Promote this symbol to the global admin library">
+          <i class="fas fa-arrow-up-from-bracket me-1"></i> Promote
+        </button>
         <button type="button" class="sd-library-action-btn sd-library-action-danger"
                 id="sd-library-delete" disabled title="Delete the selected symbol">
           <i class="fas fa-trash me-1"></i> Delete
@@ -138,6 +148,10 @@ hide_nibsy: true
         <button type="button" class="sd-tool-btn is-active" data-tool="select"
                 title="Select / move">
           <i class="fas fa-mouse-pointer"></i><span>Select</span>
+        </button>
+        <button type="button" class="sd-tool-btn" data-tool="pan"
+                title="Pan the canvas (drag the view)">
+          <i class="fas fa-hand"></i><span>Pan</span>
         </button>
         <button type="button" class="sd-tool-btn" data-tool="pin"
                 title="Place a pin on a side rail">
@@ -320,6 +334,23 @@ hide_nibsy: true
                    class="form-control form-control-sm" step="16"></label>
             <label class="sd-props-inline">y2 <input type="number" id="sd-shape-line-y2"
                    class="form-control form-control-sm" step="16"></label>
+          </div>
+        </div>
+        <div class="sd-props-field" data-shape-kind="text">
+          <label for="sd-shape-text-value">Text</label>
+          <input type="text" id="sd-shape-text-value" class="form-control form-control-sm"
+                 maxlength="80" placeholder="Type label text…">
+          <div class="sd-props-grid-2 mt-2">
+            <label class="sd-props-inline">x <input type="number" id="sd-shape-text-x"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">y <input type="number" id="sd-shape-text-y"
+                   class="form-control form-control-sm" step="16"></label>
+            <label class="sd-props-inline">size <input type="number" id="sd-shape-text-size"
+                   class="form-control form-control-sm" min="8" max="48" step="1"></label>
+            <label class="sd-props-inline">
+              <input type="checkbox" id="sd-shape-text-bold" class="form-check-input me-1">
+              bold
+            </label>
           </div>
         </div>
         <button type="button" class="sd-props-delete-btn" id="sd-shape-delete">

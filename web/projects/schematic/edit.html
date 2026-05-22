@@ -48,7 +48,7 @@ hide_nibsy: true
           <i class="fas fa-magnifying-glass-minus"></i>
         </button>
         <button type="button" class="se-titlebar-btn se-zoom-btn" id="se-zoom-reset"
-                title="Zoom to fit (Ctrl/Cmd 0)">
+                title="Toggle zoom-to-fit / 100% (Ctrl/Cmd 0)">
           <span id="se-zoom-pct">100%</span>
         </button>
         <button type="button" class="se-titlebar-btn se-zoom-btn" id="se-zoom-in"
@@ -97,37 +97,19 @@ hide_nibsy: true
        =========================================================== -->
   <div class="se-main d-none" id="se-main">
 
-    <!-- Tools pane (left, 240px) -->
+    <!-- Tools pane (left, 240px) -- now hosts the symbol library only;
+         the drawing tools moved into a small floating toolbar above
+         the canvas (#se-floating-toolbar) to reclaim vertical space. -->
     <aside class="se-tools" id="se-tools" aria-label="Schematic tools">
 
+      <!-- Open Symbol Designer sits at the top of the left rail so
+           creating / editing custom symbols is the first action a
+           user sees, ahead of placing existing symbols. -->
       <section class="se-tools-section">
-        <h6 class="se-tools-section-title">Tools</h6>
-        <div class="se-tool-grid">
-          <button type="button" class="se-tool-btn is-active" data-tool="select" title="Select / move">
-            <i class="fas fa-mouse-pointer"></i><span>Select</span>
-          </button>
-          <button type="button" class="se-tool-btn" data-tool="net" title="Draw net (wire)">
-            <i class="fas fa-bolt"></i><span>Net</span>
-          </button>
-          <button type="button" class="se-tool-btn" data-tool="symbol" title="Place symbol (pick one below)">
-            <i class="fas fa-microchip"></i><span>Symbol</span>
-          </button>
-          <button type="button" class="se-tool-btn" data-tool="label" title="Net label">
-            <i class="fas fa-tag"></i><span>Label</span>
-          </button>
-          <button type="button" class="se-tool-btn" data-tool="gnd" title="Place GND symbol">
-            <i class="fas fa-arrow-down"></i><span>GND</span>
-          </button>
-          <button type="button" class="se-tool-btn" data-tool="vplus" title="Place V+ rail">
-            <i class="fas fa-plug"></i><span>V+</span>
-          </button>
-          <button type="button" class="se-tool-btn" data-tool="rotate" title="Rotate selected symbol 90&deg;">
-            <i class="fas fa-rotate-right"></i><span>Rotate</span>
-          </button>
-          <button type="button" class="se-tool-btn" data-tool="move" title="Pan / move mode">
-            <i class="fas fa-arrows-up-down-left-right"></i><span>Move</span>
-          </button>
-        </div>
+        <button type="button" class="se-tools-secondary-btn" id="se-open-symbol-designer" disabled
+                title="Coming in the next release">
+          <i class="fas fa-plus me-1"></i> open Symbol Designer
+        </button>
       </section>
 
       <section class="se-tools-section">
@@ -148,10 +130,6 @@ hide_nibsy: true
         <ul class="se-symbol-list" id="se-symbol-list" role="listbox" aria-label="Symbol library">
           <!-- Populated by JS from SYMBOL_LIBRARY, grouped by category -->
         </ul>
-        <button type="button" class="se-tools-secondary-btn" id="se-open-symbol-designer" disabled
-                title="Coming in the next release">
-          <i class="fas fa-plus me-1"></i> open Symbol Designer
-        </button>
       </section>
 
       <section class="se-tools-section se-tools-help">
@@ -164,6 +142,49 @@ hide_nibsy: true
 
     <!-- Canvas + connections table column -->
     <main class="se-canvas-area" id="se-canvas-area" aria-label="Schematic canvas">
+      <!-- Floating drawing-tool toolbar — sits above the top edge of
+           the canvas wrap (absolutely positioned, centered). Mirrors
+           the image-context toolbar pattern from the instruction
+           builder so users get a familiar small pill of icons. The
+           drawing-tool grid that used to live in .se-tools moved
+           here to reclaim vertical space on the left rail. -->
+      <div class="se-floating-toolbar" id="se-floating-toolbar" role="toolbar"
+           aria-label="Schematic drawing tools">
+        <button type="button" class="se-floating-tool-btn is-active"
+                data-tool="select" title="Select / move (V)">
+          <i class="fas fa-mouse-pointer"></i>
+        </button>
+        <button type="button" class="se-floating-tool-btn"
+                data-tool="pan" title="Pan the canvas (H)">
+          <i class="fas fa-hand"></i>
+        </button>
+        <div class="se-floating-toolbar-divider" aria-hidden="true"></div>
+        <button type="button" class="se-floating-tool-btn"
+                data-tool="net" title="Draw net / wire (N)">
+          <i class="fas fa-bolt"></i>
+        </button>
+        <button type="button" class="se-floating-tool-btn"
+                data-tool="symbol" title="Place symbol (pick from the library)">
+          <i class="fas fa-microchip"></i>
+        </button>
+        <button type="button" class="se-floating-tool-btn"
+                data-tool="label" title="Net label (L)">
+          <i class="fas fa-tag"></i>
+        </button>
+        <button type="button" class="se-floating-tool-btn"
+                data-tool="gnd" title="Place GND symbol">
+          <i class="fas fa-arrow-down"></i>
+        </button>
+        <button type="button" class="se-floating-tool-btn"
+                data-tool="vplus" title="Place V+ rail">
+          <i class="fas fa-plug"></i>
+        </button>
+        <div class="se-floating-toolbar-divider" aria-hidden="true"></div>
+        <button type="button" class="se-floating-tool-btn"
+                data-tool="rotate" title="Rotate selected symbol 90° (R)">
+          <i class="fas fa-rotate-right"></i>
+        </button>
+      </div>
       <div class="se-canvas-wrap" id="se-canvas-wrap">
         <canvas id="se-canvas"></canvas>
 
@@ -230,11 +251,14 @@ hide_nibsy: true
             <span class="se-table-count" id="se-table-count"></span>
           </h6>
           <span class="se-table-hint text-muted small">
-            Auto-derived from the net graph. <em>Description</em> is editable.
+            Auto-derived from the net graph.
           </span>
         </header>
         <div class="se-table-scroll">
-          <table class="table table-sm table-hover se-table" id="se-table">
+          <!-- Description column is hidden via .is-desc-hidden for now —
+               the data still flows through the JS, but the th/td are
+               display:none so the table reads as Net / From / To. -->
+          <table class="table table-sm table-hover se-table is-desc-hidden" id="se-table">
             <thead>
               <tr>
                 <th class="se-th-net">Net</th>

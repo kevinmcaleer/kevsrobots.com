@@ -127,16 +127,70 @@ hide_nibsy: true
 
       <hr>
 
+      <!-- Content-mode toggle: pick between the long-form Markdown
+           editor and the visual Instruction Builder. The choice is
+           persisted on the project (projects.content_mode) and only
+           reveals one of the two surfaces at a time so the page
+           stays focused. -->
+      <div class="content-mode-toggle mb-4" id="content-mode-toggle" role="tablist"
+           aria-label="Content editor mode">
+        <button type="button" class="content-mode-btn is-active"
+                id="content-mode-btn-markdown"
+                data-content-mode="markdown" role="tab" aria-selected="true">
+          <i class="fas fa-pen-to-square me-2"></i>
+          <span class="content-mode-btn-label">Markdown</span>
+          <span class="content-mode-btn-sub">Write the project as long-form text</span>
+        </button>
+        <button type="button" class="content-mode-btn"
+                id="content-mode-btn-builder"
+                data-content-mode="builder" role="tab" aria-selected="false">
+          <i class="fas fa-list-ol me-2"></i>
+          <span class="content-mode-btn-label">Instruction Builder</span>
+          <span class="content-mode-btn-sub">Build steps with photos, schematics &amp; video</span>
+        </button>
+      </div>
+
       <!-- Markdown Editor (EasyMDE) -->
-      <div class="mb-4">
+      <div class="mb-4" id="content-mode-pane-markdown">
         <textarea id="content-editor"></textarea>
         <div id="image-picker-container" class="d-none">
           <div id="image-picker-list"></div>
         </div>
       </div>
 
+      <!-- Instruction Builder pane — shows the same rendered output
+           that the public viewer renders, with the "Open in focused
+           workspace" button up top so authors can jump into the full
+           builder UI in one click. The pane never embeds the builder
+           interface itself; the focused workspace is where authoring
+           happens. -->
+      <div class="content-mode-builder-pane d-none" id="content-mode-pane-builder">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="mb-1">
+              <i class="fas fa-list-ol me-2 text-primary"></i>
+              Instruction Builder &mdash; preview
+            </h5>
+            <p class="text-muted small mb-0">
+              This is what visitors will see. Click the button to author or edit steps.
+            </p>
+          </div>
+          <a id="open-instruction-builder"
+             class="btn btn-primary"
+             href="#">
+            <i class="fas fa-arrow-up-right-from-square me-1"></i>
+            Open in focused workspace
+          </a>
+        </div>
+        <div class="builder-preview-surface" id="builder-preview-surface">
+          <div class="text-muted small">
+            <i class="fas fa-spinner fa-spin me-1"></i> Loading preview&hellip;
+          </div>
+        </div>
+      </div>
+
       <!-- Build Instructions (issue #178, Phase 0 — data plumbing only) -->
-      <div class="card mb-4" id="editor-instructions-section">
+      <div class="card mb-4 d-none" id="editor-instructions-section">
         <div class="card-header py-2">
           <i class="fas fa-list-ol me-1"></i> Build Instructions
         </div>
@@ -405,6 +459,11 @@ hide_nibsy: true
 <script src="/assets/js/circuit-components.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/circuit-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Builder-mode renderer — shared with /projects/view.html so the
+     editor's preview surface and the public page render the same
+     output. Loaded before project-editor.js so applyContentMode can
+     call BuilderRenderer.render() when the user picks Builder. -->
+<script src="/assets/js/builder-renderer.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #178 Phase 0: instruction-section module. Loaded BEFORE
      project-editor.js so the latter's boot flow can call
      ProjectInstructions.init(projectId, isOwner). -->

@@ -236,19 +236,51 @@
     var bodyWidth = Math.max(maxX - minX, 32);
     var bodyHeight = Math.max(maxY - minY, 32);
 
-    // Convert each pin's centred coord into a (side, offset) the editor
-    // can render. ``offset`` is measured from the top-left of the body
-    // box, along the axis that runs parallel to that side.
+    // Convert each pin's centred coord into the editor's local-frame
+    // (top-left origin) coords AND a (side, offset) fallback. The
+    // designer now allows pins anywhere on the canvas, so we preserve
+    // the exact (localX, localY) rather than forcing each pin onto a
+    // body edge by side — which was the source of the symbol looking
+    // horizontally flipped when pins didn't sit precisely on the
+    // computed body bbox.
+    //
+    // ``side`` is still computed because the stick (and pin label
+    // anchor) extend outward in that direction. We prefer the
+    // designer's stored ``side``; fall back to picking the closest
+    // edge of the bbox to the pin's anchor.
+    function sideFromAnchor(p) {
+      if (p.side === 'left' || p.side === 'right' ||
+          p.side === 'top'  || p.side === 'bottom') return p.side;
+      // Pick whichever bbox edge the pin sits closest to.
+      var px = p.x || 0, py = p.y || 0;
+      var dL = Math.abs(px - minX);
+      var dR = Math.abs(maxX - px);
+      var dT = Math.abs(py - minY);
+      var dB = Math.abs(maxY - py);
+      var m = Math.min(dL, dR, dT, dB);
+      if (m === dR) return 'right';
+      if (m === dL) return 'left';
+      if (m === dT) return 'top';
+      return 'bottom';
+    }
     var convertedPins = pins.map(function (p, i) {
-      var offset = (p.side === 'left' || p.side === 'right')
-        ? (p.y - minY)
-        : (p.x - minX);
+      var px = (typeof p.x === 'number') ? p.x : 0;
+      var py = (typeof p.y === 'number') ? p.y : 0;
+      var side = sideFromAnchor(p);
+      var offset = (side === 'left' || side === 'right')
+        ? (py - minY)
+        : (px - minX);
       return {
         number: p.number || String(i + 1),
         name: p.name || (p.number || String(i + 1)),
-        side: p.side || 'left',
+        side: side,
         offset: Math.max(0, Math.round(offset)),
         type: p.type || 'I/O',
+        // Body-relative (0,0 = top-left) coords for the renderer.
+        // pinLocalPos prefers these when present so designer pins
+        // land at the exact spot the user placed them.
+        localX: Math.round(px - minX),
+        localY: Math.round(py - minY),
       };
     });
 
@@ -262,6 +294,10 @@
       pins: convertedPins,
       isCustom: true,
       customId: row.id,
+      // Pass-through of the symbol row's BOM link so placement code
+      // can auto-add the matching BOM item (qty +1) when the user
+      // drops the symbol on the schematic.
+      bomItemId: row.bom_item_id || null,
       // Optional body shapes the designer drew — kept so the renderer
       // could overlay them later. For v1 the editor uses the bounding
       // box only (mirrors the stub library look).
@@ -269,6 +305,32 @@
       _minX: minX,
       _minY: minY,
     };
+  }
+
+  // Same shape conversion as symbolDefFromCustom, but tagged for the
+  // global library (admin-curated, no project_id). The id is
+  // ``lib-<id>`` so it never collides with project symbol ids
+  // (``custom-<id>``) or built-ins (no prefix). Category comes from
+  // the row's curated value rather than being forced to ``Custom``.
+  function symbolDefFromLibrary(row) {
+    if (!row) return null;
+    // Reuse the per-pin / shape geometry calc by faking a custom row;
+    // we just override id / category / name at the end.
+    var def = symbolDefFromCustom({
+      id: row.id,
+      name: row.name,
+      ref_des_prefix: row.ref_des_prefix,
+      symbol_data: row.symbol_data,
+      bom_item_id: null, // library symbols don't carry a per-project BOM link
+    });
+    if (!def) return null;
+    def.id = 'lib-' + row.id;
+    def.category = row.category || 'Custom';
+    def.isLibrary = true;
+    def.libraryId = row.id;
+    delete def.isCustom;
+    delete def.customId;
+    return def;
   }
 
   // ====================================================================
@@ -408,7 +470,14 @@
 
   // Compute a pin's position in the symbol's *unrotated*, *unflipped*
   // local frame (origin = top-left of bodyWidth × bodyHeight rect).
+  // Custom symbols built by the Symbol Designer pass through the
+  // exact ``localX``/``localY`` the user designed (so pins land
+  // anywhere — not just on the four body edges). Built-in stub
+  // symbols still use the older ``(side, offset)`` form.
   function pinLocalPos(symbolDef, pin) {
+    if (typeof pin.localX === 'number' && typeof pin.localY === 'number') {
+      return { x: pin.localX, y: pin.localY };
+    }
     switch (pin.side) {
       case 'left':   return { x: 0,                       y: pin.offset };
       case 'right':  return { x: symbolDef.bodyWidth,     y: pin.offset };
@@ -440,11 +509,81 @@
     return { x: instance.x + rx, y: instance.y + ry };
   }
 
+  // The pin's wire-attachment point in scene coords — i.e. the outer
+  // end of the stick where the visible terminator sits, NOT the body
+  // edge. This is what users see and click on, so highlights, hotspots
+  // and net endpoints all anchor here. Built-in stub symbols use the
+  // same 8 px stick as buildInstanceFabric; custom symbols use 32 px to
+  // match the symbol designer.
   function pinScenePos(instance, pin) {
     var symbolDef = symbolDefById(instance.symbolId);
     if (!symbolDef) return { x: instance.x, y: instance.y };
     var local = pinLocalPos(symbolDef, pin);
-    return localToScene(instance, symbolDef, local.x, local.y);
+    var stickLen = symbolDef.isCustom ? 32 : 8;
+    var lx = local.x, ly = local.y;
+    switch (pin.side) {
+      case 'left':   lx -= stickLen; break;
+      case 'right':  lx += stickLen; break;
+      case 'top':    ly -= stickLen; break;
+      case 'bottom': ly += stickLen; break;
+    }
+    return localToScene(instance, symbolDef, lx, ly);
+  }
+
+  // Effective wire-exit direction for a pin. Uses pin.side to pick the
+  // axis (horizontal for left/right, vertical for top/bottom), then
+  // picks the SIGN by looking at where the pin's wire-attachment sits
+  // relative to the body centre. For "reverse" designs (anchor outside
+  // the body, terminator at the body edge — like the Pico's left-
+  // column pins where pin.side='right' but the body sits to the
+  // right of the circle), the wire should exit OPPOSITE to pin.side,
+  // not along it.
+  //
+  // When ``instance`` is provided, the at-rest side is further
+  // transformed by the instance's flipH/flipV/rotation so the
+  // returned side reflects the pin's actual SCREEN direction after
+  // any user-applied rotation or flip. Without this, rotating a GND
+  // 180° (so the glyph points up and the pin sits below the body)
+  // would still tell the router "wire enters from above going down"
+  // and the wire would route to the wrong spot.
+  function effectivePinSide(symbolDef, pin, instance) {
+    var local = pinLocalPos(symbolDef, pin);
+    var stickLen = symbolDef.isCustom ? 32 : 8;
+    var lx = local.x, ly = local.y;
+    switch (pin.side) {
+      case 'left':   lx -= stickLen; break;
+      case 'right':  lx += stickLen; break;
+      case 'top':    ly -= stickLen; break;
+      case 'bottom': ly += stickLen; break;
+    }
+    // Wire-attachment in body-CENTRED coords (body centre = 0,0).
+    var tx = lx - symbolDef.bodyWidth / 2;
+    var ty = ly - symbolDef.bodyHeight / 2;
+    var horizontal = (pin.side === 'left' || pin.side === 'right');
+    var side;
+    if (horizontal) side = tx >= 0 ? 'right' : 'left';
+    else            side = ty >= 0 ? 'bottom' : 'top';
+    if (!instance) return side;
+    // Apply flip first, then rotation — same order Fabric uses on the
+    // group's render transform.
+    if (instance.flipH) {
+      if (side === 'left') side = 'right';
+      else if (side === 'right') side = 'left';
+    }
+    if (instance.flipV) {
+      if (side === 'top') side = 'bottom';
+      else if (side === 'bottom') side = 'top';
+    }
+    var rot = ((instance.rotation || 0) % 360 + 360) % 360;
+    var steps = Math.floor(rot / 90);
+    if (steps > 0) {
+      // 90° clockwise progression in y-down screen coords:
+      // top → right → bottom → left → top
+      var cwOrder = ['top', 'right', 'bottom', 'left'];
+      var idx = cwOrder.indexOf(side);
+      if (idx >= 0) side = cwOrder[(idx + steps) % 4];
+    }
+    return side;
   }
 
   function findInstance(id) {
@@ -517,7 +656,116 @@
     STATE.graph.instances.push(instance);
     renderGraph();
     scheduleAutosave();
+    // Side effect: ensure a matching row in the project BOM. Power
+    // glyphs (GND / V+) and wires aren't real components so skip them.
+    autoAddSymbolToBom(symbolDef);
     return instance;
+  }
+
+  // BOM ids of items already incremented by the auto-add helper this
+  // session — used to coalesce rapid placements before the GET-after-
+  // POST can pick up the row. Keys are either the BOM row id (after
+  // we've POSTed once) or "name:" + lowercase name (before the row
+  // exists on the server).
+  var _autoBomPending = {};
+
+  function autoAddSymbolToBom(symbolDef) {
+    if (!symbolDef) return;
+    if (symbolDef.id === 'gnd' || symbolDef.id === 'vplus') return;
+    if (!STATE.projectId) return;
+    var displayName = (symbolDef.name || '').trim();
+    if (!displayName) return;
+    // Fire-and-forget — failures shouldn't block the user's placement
+    // and the indicator stays "saved" since this is a side effect of
+    // the schematic save (which has its own status).
+    (async function () {
+      try {
+        var resp = await apiFetch(
+          API + '/api/projects/' + STATE.projectId + '/bom',
+          { credentials: 'include' }
+        );
+        if (!resp.ok) return;
+        var rows = await resp.json();
+        if (!Array.isArray(rows)) return;
+        var lowerName = displayName.toLowerCase();
+        // Match priority: explicit bom_item_id link → exact name (case-
+        // insensitive). Skip rows with mismatched names just to be
+        // safe even when bom_item_id matches.
+        var match = null;
+        if (symbolDef.bomItemId) {
+          for (var i = 0; i < rows.length; i++) {
+            if (rows[i].id === symbolDef.bomItemId) { match = rows[i]; break; }
+          }
+        }
+        if (!match) {
+          for (var j = 0; j < rows.length; j++) {
+            if ((rows[j].name || '').trim().toLowerCase() === lowerName) {
+              match = rows[j]; break;
+            }
+          }
+        }
+        if (match) {
+          // Coalesce: if a placement is already in flight for this
+          // row, just inc the local cached qty so back-to-back drops
+          // don't lose qty.
+          var key = 'id:' + match.id;
+          var pendingDelta = (_autoBomPending[key] || 0) + 1;
+          _autoBomPending[key] = pendingDelta;
+          var nextQty = (match.quantity || 1) + 1;
+          try {
+            await apiFetch(
+              API + '/api/projects/' + STATE.projectId + '/bom/' + match.id,
+              {
+                method: 'PUT',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: match.name,
+                  quantity: nextQty,
+                  unit: match.unit || 'qty',
+                  unit_cost: match.unit_cost,
+                  currency_code: match.currency_code,
+                  supplier_url: match.supplier_url,
+                  sort_order: match.sort_order || 0,
+                  part_id: match.part_id,
+                  supplier_id: match.supplier_id,
+                }),
+              }
+            );
+          } finally {
+            delete _autoBomPending[key];
+          }
+        } else {
+          var nameKey = 'name:' + lowerName;
+          if (_autoBomPending[nameKey]) {
+            // Another POST is in flight for the same name — skip to
+            // avoid duplicates; that POST will create the row with
+            // qty 1 and future placements will hit the existing-row
+            // path.
+            return;
+          }
+          _autoBomPending[nameKey] = true;
+          try {
+            await apiFetch(
+              API + '/api/projects/' + STATE.projectId + '/bom',
+              {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: displayName,
+                  quantity: 1,
+                  unit: 'qty',
+                  sort_order: rows.length,
+                }),
+              }
+            );
+          } finally {
+            delete _autoBomPending[nameKey];
+          }
+        }
+      } catch (_) { /* silent — auto-BOM is best-effort */ }
+    })();
   }
 
   // ====================================================================
@@ -584,19 +832,105 @@
   // is left/right for the bulk of our library) — the connection feels
   // right for most layouts. A future router could choose corner
   // direction dynamically.
-  function lShapedSegments(x1, y1, x2, y2) {
-    x1 = snap(x1); y1 = snap(y1);
-    x2 = snap(x2); y2 = snap(y2);
+  // Orthogonal wire router between two scene points. Honours the
+  // outgoing direction of each endpoint's pin (``fromSide`` /
+  // ``toSide``) so the wire exits the source pin in the direction
+  // its stick points and enters the destination pin in the direction
+  // ITS stick points. Endpoints are kept exact (no snap-to-grid) so
+  // wires meet the visible terminator pixel-for-pixel.
+  //
+  // Cases:
+  //   1. Aligned (same x or same y) → straight line.
+  //   2. Perpendicular axes (one H pin, one V pin) → single L-bend
+  //      with the corner placed so both ends arrive in the correct
+  //      direction (corner = (toX, fromY) for from-H/to-V, or
+  //      (fromX, toY) for from-V/to-H). When the geometry forces the
+  //      wrong arrival direction (the corner sits on the wrong side
+  //      of the destination), upgrade to a Z-bend that loops past so
+  //      the wire still enters the destination from its natural side.
+  //   3. Same axis (both H or both V) → Z-bend with the
+  //      perpendicular middle leg at the midpoint.
+  function lShapedSegments(x1, y1, x2, y2, fromSide, toSide) {
     if (x1 === x2 && y1 === y2) return [];
     if (x1 === x2 || y1 === y2) {
-      // Straight line — no corner.
       return [{ x1: x1, y1: y1, x2: x2, y2: y2 }];
     }
-    var cornerX = x2;
-    var cornerY = y1;
+    var fromH = (fromSide === 'left' || fromSide === 'right');
+    var toH   = (toSide   === 'left' || toSide   === 'right');
+
+    // Outward direction along each pin's stick (the way the wire
+    // leaves the source / approaches the destination from outside).
+    var SIDE_DX = { left: -1, right: 1, top: 0, bottom: 0 };
+    var SIDE_DY = { left: 0,  right: 0, top: -1, bottom: 1 };
+    var fromDx = SIDE_DX[fromSide] || 0;
+    var fromDy = SIDE_DY[fromSide] || 0;
+    var toDx   = SIDE_DX[toSide]   || 0;
+    var toDy   = SIDE_DY[toSide]   || 0;
+
+    function single(cornerX, cornerY) {
+      return [
+        { x1: x1, y1: y1, x2: cornerX, y2: cornerY },
+        { x1: cornerX, y1: cornerY, x2: x2, y2: y2 },
+      ];
+    }
+
+    // Helper: does the single-L corner respect a given endpoint's
+    // outward direction? "Respect" = the wire leaves / arrives in the
+    // direction the pin's stick points.
+    function legGoesInDir(fromX, fromY, toX, toY, dx, dy) {
+      // The leg is axis-aligned (one of dx/dy is 0). Check that the
+      // movement matches the requested direction.
+      if (dx !== 0) return Math.sign(toX - fromX) === dx;
+      if (dy !== 0) return Math.sign(toY - fromY) === dy;
+      return true;
+    }
+
+    if (fromH !== toH && fromSide && toSide) {
+      // Perpendicular axes.
+      var cornerX = fromH ? x2 : x1;
+      var cornerY = fromH ? y1 : y2;
+      var leg1Ok = legGoesInDir(x1, y1, cornerX, cornerY, fromDx, fromDy);
+      var leg2Ok = legGoesInDir(cornerX, cornerY, x2, y2, -toDx, -toDy);
+      if (leg1Ok && leg2Ok) return single(cornerX, cornerY);
+      // Geometry forces wrong direction at one end → loop around with
+      // a Z-bend so each end arrives in its natural direction.
+      var STUB = 16;
+      var sx = x1 + fromDx * STUB;
+      var sy = y1 + fromDy * STUB;
+      var tx = x2 + toDx * STUB;
+      var ty = y2 + toDy * STUB;
+      if (fromH) {
+        // From-H → To-V: stub-H, mid-V, stub-H, stub-V.
+        // After merging collinear: 3 segments.
+        return [
+          { x1: x1, y1: y1, x2: sx, y2: y1 },   // out from source
+          { x1: sx, y1: y1, x2: sx, y2: ty },   // vertical bridge
+          { x1: sx, y1: ty, x2: tx, y2: ty },   // across to target's column
+          { x1: tx, y1: ty, x2: x2, y2: y2 },   // into target
+        ];
+      }
+      return [
+        { x1: x1, y1: y1, x2: x1, y2: sy },
+        { x1: x1, y1: sy, x2: tx, y2: sy },
+        { x1: tx, y1: sy, x2: tx, y2: ty },
+        { x1: tx, y1: ty, x2: x2, y2: y2 },
+      ];
+    }
+
+    // Same-axis OR no side info → Z-bend with midpoint perpendicular.
+    if (fromH || (!fromSide && !toSide && Math.abs(x2 - x1) >= Math.abs(y2 - y1))) {
+      var midX = (x1 + x2) / 2;
+      return [
+        { x1: x1,   y1: y1, x2: midX, y2: y1 },
+        { x1: midX, y1: y1, x2: midX, y2: y2 },
+        { x1: midX, y1: y2, x2: x2,   y2: y2 },
+      ];
+    }
+    var midY = (y1 + y2) / 2;
     return [
-      { x1: x1, y1: y1, x2: cornerX, y2: cornerY },
-      { x1: cornerX, y1: cornerY, x2: x2, y2: y2 },
+      { x1: x1, y1: y1,   x2: x1, y2: midY },
+      { x1: x1, y1: midY, x2: x2, y2: midY },
+      { x1: x2, y1: midY, x2: x2, y2: y2 },
     ];
   }
 
@@ -655,7 +989,13 @@
       var dup = target.endpoints.some(function (t) { return endpointsMatch(t, ep); });
       if (!dup) target.endpoints.push(ep);
     });
-    lShapedSegments(fromXY.x, fromXY.y, toXY.x, toXY.y).forEach(function (s) {
+    var fromDef = symbolDefById(fromInst.symbolId);
+    var toDef   = symbolDefById(toInst.symbolId);
+    var fromSide = fromPin && fromDef ? effectivePinSide(fromDef, fromPin, fromInst) : (fromPin && fromPin.side);
+    var toSide   = toPin   && toDef   ? effectivePinSide(toDef,   toPin,   toInst)   : (toPin   && toPin.side);
+    lShapedSegments(
+      fromXY.x, fromXY.y, toXY.x, toXY.y, fromSide, toSide
+    ).forEach(function (s) {
       target.segments.push(s);
     });
 
@@ -746,21 +1086,122 @@
     var h = symbolDef.bodyHeight;
     var pieces = [];
 
-    // Body
-    var body = new fabric.Rect({
-      left: -w / 2,
-      top: -h / 2,
-      width: w,
-      height: h,
-      fill: '#ffffff',
-      stroke: INK,
-      strokeWidth: 1.5,
-      rx: 4,
-      ry: 4,
-      originX: 'left',
-      originY: 'top',
-    });
-    pieces.push(body);
+    // Body. Most symbols render as a rounded rectangle; specific
+    // power symbols (GND, V+) get their conventional schematic glyph
+    // instead so the schematic reads at a glance.
+    if (symbolDef.id === 'gnd') {
+      // Standard GND symbol: a short vertical stub dropping from the
+      // top-centre pin, then three horizontal bars decreasing in width
+      // (widest at top, narrowest at bottom).
+      var topY  = -h / 2;            // pin attaches here (top centre)
+      var stubBottomY = topY + 6;    // short connector line ends here
+      var bar1Y = stubBottomY;       // widest bar
+      var bar2Y = bar1Y + 6;
+      var bar3Y = bar2Y + 6;
+      var halfWide = w * 0.40;       // bar widths
+      var halfMid  = w * 0.24;
+      var halfNarrow = w * 0.10;
+      pieces.push(new fabric.Line([0, topY, 0, stubBottomY], {
+        stroke: INK, strokeWidth: 1.5,
+      }));
+      pieces.push(new fabric.Line(
+        [-halfWide, bar1Y, halfWide, bar1Y],
+        { stroke: INK, strokeWidth: 1.8 }));
+      pieces.push(new fabric.Line(
+        [-halfMid, bar2Y, halfMid, bar2Y],
+        { stroke: INK, strokeWidth: 1.8 }));
+      pieces.push(new fabric.Line(
+        [-halfNarrow, bar3Y, halfNarrow, bar3Y],
+        { stroke: INK, strokeWidth: 1.8 }));
+    } else if (symbolDef.id === 'vplus') {
+      // V+ rail: an upward-pointing arrow ('^') at the top of the
+      // symbol with a vertical connector line dropping straight down
+      // to the bottom-centre pin (which extends further down via its
+      // own pin stick to where wires attach).
+      var arrowTipY = -h / 2;         // tip of the ^ at the symbol's top
+      var arrowBaseY = arrowTipY + 8; // where the wings end / vertical begins
+      var bodyBottomY = h / 2;        // pin anchor (stick continues below)
+      var armHalf = w * 0.30;         // wing half-width
+      // Left wing: tip down-and-left
+      pieces.push(new fabric.Line(
+        [0, arrowTipY, -armHalf, arrowBaseY],
+        { stroke: INK, strokeWidth: 1.8 }));
+      // Right wing: tip down-and-right
+      pieces.push(new fabric.Line(
+        [0, arrowTipY, armHalf, arrowBaseY],
+        { stroke: INK, strokeWidth: 1.8 }));
+      // Vertical connector line from the arrow's centre down to the
+      // pin anchor at the body bottom.
+      pieces.push(new fabric.Line(
+        [0, arrowTipY, 0, bodyBottomY],
+        { stroke: INK, strokeWidth: 1.5 }));
+    } else if (symbolDef.isCustom && Array.isArray(symbolDef._bodyShapes) &&
+               symbolDef._bodyShapes.length > 0) {
+      // Custom symbol — render the user-designed body shapes (rects,
+      // lines, text) at their actual designer positions instead of an
+      // auto-generated bounding rectangle. _minX / _minY were captured
+      // by symbolDefFromCustom AFTER the bbox-pad, so subtracting them
+      // gives body-local (top-left = 0,0) coords; then shift to
+      // body-centred coords for the group children.
+      var sMinX = symbolDef._minX;
+      var sMinY = symbolDef._minY;
+      var halfW = w / 2;
+      var halfH = h / 2;
+      function toLocalX(x) { return (x - sMinX) - halfW; }
+      function toLocalY(y) { return (y - sMinY) - halfH; }
+      symbolDef._bodyShapes.forEach(function (s) {
+        if (!s || !s.kind) return;
+        if (s.kind === 'rect') {
+          pieces.push(new fabric.Rect({
+            left: toLocalX(s.x),
+            top: toLocalY(s.y),
+            width: s.w,
+            height: s.h,
+            fill: 'transparent',
+            stroke: s.stroke || INK,
+            strokeWidth: 1.5,
+            originX: 'left',
+            originY: 'top',
+          }));
+        } else if (s.kind === 'line') {
+          pieces.push(new fabric.Line(
+            [toLocalX(s.x1), toLocalY(s.y1),
+             toLocalX(s.x2), toLocalY(s.y2)],
+            { stroke: s.stroke || INK, strokeWidth: 1.5 }
+          ));
+        } else if (s.kind === 'text') {
+          // Text shapes from the designer — preserve the role-based
+          // styling so name/label/text variants read the same as in
+          // the designer.
+          var monoStack = '"Courier New", "Source Code Pro", ui-monospace, monospace';
+          pieces.push(new fabric.Text(s.text || '', {
+            left: toLocalX(s.x),
+            top: toLocalY(s.y),
+            fontSize: s.fontSize || 12,
+            fontFamily: monoStack,
+            fontWeight: (s.role === 'name' || s.bold) ? 'bold' : 'normal',
+            fill: s.stroke || INK,
+            originX: 'left',
+            originY: 'top',
+          }));
+        }
+      });
+    } else {
+      var body = new fabric.Rect({
+        left: -w / 2,
+        top: -h / 2,
+        width: w,
+        height: h,
+        fill: '#ffffff',
+        stroke: INK,
+        strokeWidth: 1.5,
+        rx: 4,
+        ry: 4,
+        originX: 'left',
+        originY: 'top',
+      });
+      pieces.push(body);
+    }
 
     // refDes + name label, anchored above the body. When the user has
     // set a friendly name on the instance, prefer that over the
@@ -782,13 +1223,20 @@
     );
     pieces.push(refLabel);
 
-    // Pins: a short stick + a pin-name label.
+    // Pins: a stick + a pin-name label. Custom symbols (designed in
+    // the Symbol Designer) mirror the designer's pin geometry exactly
+    // — a longer 2-grid stick plus a circle terminator at the outer
+    // end where wires attach — so the placed instance reads as the
+    // same drawing the user just designed. Built-in stub symbols
+    // keep the shorter v1 stick.
+    var isCustom = !!symbolDef.isCustom;
+    var stickLen = isCustom ? 32 : 8;          // 2 * symbol-designer GRID
+    var terminatorR = isCustom ? 4 : 0;        // 0 → no terminator drawn
     symbolDef.pins.forEach(function (pin) {
       var local = pinLocalPos(symbolDef, pin);
       // Translate from "0..bodyWidth" coords to body-centred coords.
       var px = local.x - w / 2;
       var py = local.y - h / 2;
-      var stickLen = 8;
       var sx2 = px, sy2 = py;
       switch (pin.side) {
         case 'left':   sx2 = px - stickLen; sy2 = py; break;
@@ -800,32 +1248,147 @@
         stroke: INK,
         strokeWidth: 1.5,
       });
+      // Tag with the pin number so the net-snap highlighter can find
+      // this exact line + its terminator + label and recolour them.
+      stick.data = { kind: 'pin-piece', pinNumber: pin.number, role: 'stick' };
       pieces.push(stick);
-
-      // Pin label — anchored just inside the body, away from the stick.
-      var lx = px, ly = py;
-      var anchorX = 'left', anchorY = 'center';
-      var pad = 4;
-      switch (pin.side) {
-        case 'left':   lx = px + pad;  ly = py - 6; anchorX = 'left';   anchorY = 'top'; break;
-        case 'right':  lx = px - pad;  ly = py - 6; anchorX = 'right';  anchorY = 'top'; break;
-        case 'top':    lx = px - 6;    ly = py + pad; anchorX = 'right'; anchorY = 'top'; break;
-        case 'bottom': lx = px - 6;    ly = py - pad; anchorX = 'right'; anchorY = 'bottom'; break;
+      // Circle terminator at the outer end — the wire-attachment
+      // point. Mirrors the symbol designer's Fusion-360-style pin.
+      if (terminatorR > 0) {
+        var term = new fabric.Circle({
+          left: sx2,
+          top: sy2,
+          radius: terminatorR,
+          fill: '#fff',
+          stroke: INK,
+          strokeWidth: 1.4,
+          originX: 'center',
+          originY: 'center',
+        });
+        term.data = { kind: 'pin-piece', pinNumber: pin.number, role: 'terminator' };
+        pieces.push(term);
       }
-      pieces.push(new fabric.Text(pin.name || pin.number, {
-        left: lx,
-        top: ly,
-        fontSize: 9,
-        fill: INK,
-        fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
-        originX: anchorX,
-        originY: anchorY,
-      }));
+
+      // Pin label — placed past the OUTER end of the pin's line, in
+      // the direction away from the symbol's centre. For standard
+      // pins (anchor at body edge, terminator outside) this puts the
+      // label past the terminator (outside the symbol). For "reverse"
+      // designs (anchor outside the body, terminator at body edge —
+      // e.g. your Pico where you drew the body rect to the right of
+      // the pin anchors), it puts the label past the anchor, still
+      // OUTSIDE the body.
+      //
+      // The trick: compare |px| vs |sx2| (or |py| vs |sy2| for
+      // vertical pins). The endpoint with the larger absolute value
+      // is furthest from the symbol's centre — that's "outside" — so
+      // the label goes past it, extending further outward.
+      //
+      // Skip for power symbols (GND / V+): their glyph already
+      // identifies them and an extra label would be visual noise.
+      if (symbolDef.id !== 'gnd' && symbolDef.id !== 'vplus') {
+        var lx, ly, anchorX, anchorY;
+        var pad = 4;
+        var horizontal = (pin.side === 'left' || pin.side === 'right');
+        if (horizontal) {
+          var outerX = (Math.abs(px) >= Math.abs(sx2)) ? px : sx2;
+          var dirX = (outerX >= 0) ? 1 : -1;
+          lx = outerX + dirX * pad;
+          ly = py;
+          anchorX = (dirX > 0) ? 'left' : 'right';
+          anchorY = 'center';
+        } else {
+          var outerY = (Math.abs(py) >= Math.abs(sy2)) ? py : sy2;
+          var dirY = (outerY >= 0) ? 1 : -1;
+          lx = px;
+          ly = outerY + dirY * pad;
+          anchorX = 'center';
+          anchorY = (dirY > 0) ? 'top' : 'bottom';
+        }
+        var pinLabel = new fabric.Text(pin.name || pin.number, {
+          left: lx,
+          top: ly,
+          fontSize: 9,
+          fill: INK,
+          fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+          originX: anchorX,
+          originY: anchorY,
+        });
+        pinLabel.data = { kind: 'pin-piece', pinNumber: pin.number, role: 'label' };
+        pieces.push(pinLabel);
+      }
     });
 
     // Origin cross (small red "+")
     pieces.push(new fabric.Line([-6, 0, 6, 0], { stroke: BRAND_RED, strokeWidth: 1 }));
     pieces.push(new fabric.Line([0, -6, 0, 6], { stroke: BRAND_RED, strokeWidth: 1 }));
+
+    // Transparent balancing rectangle. fabric.Group with
+    // originX/Y='center' positions itself by its CHILDREN'S bbox
+    // centre — any asymmetry (refLabel above the body, designer
+    // text/shapes outside the bbox, wide pin labels extending past
+    // a terminator) shifts every child to compensate, so the wire
+    // endpoint (computed via pinScenePos from body coords) lands
+    // offset from the visible terminator.
+    //
+    // To cancel this, compute the actual bounding extents of every
+    // piece we just added, then push a transparent rect that makes
+    // the bbox symmetric around (0, 0). This works regardless of
+    // what the designer drew — text/shapes/labels can extend in any
+    // direction and we'll catch them.
+    var minPX = Infinity, maxPX = -Infinity;
+    var minPY = Infinity, maxPY = -Infinity;
+    function _bumpBounds(b) {
+      if (!b) return;
+      if (b.left   < minPX) minPX = b.left;
+      if (b.right  > maxPX) maxPX = b.right;
+      if (b.top    < minPY) minPY = b.top;
+      if (b.bottom > maxPY) maxPY = b.bottom;
+    }
+    function _pieceBounds(p) {
+      var l = p.left || 0;
+      var t = p.top  || 0;
+      var w = 0, h = 0;
+      if (p.type === 'rect') {
+        w = p.width  || 0;
+        h = p.height || 0;
+      } else if (p.type === 'line') {
+        var a = Math.min(p.x1, p.x2);
+        var b = Math.min(p.y1, p.y2);
+        var c = Math.max(p.x1, p.x2);
+        var d = Math.max(p.y1, p.y2);
+        return { left: a, top: b, right: c, bottom: d };
+      } else if (p.type === 'text' || p.type === 'i-text' || p.type === 'IText') {
+        // Approximate: char width ≈ 0.6 × fontSize, height ≈ 1.4 ×.
+        // Fabric also sets p.width/p.height after construction, prefer
+        // them when present.
+        w = p.width  || ((p.text || '').length * (p.fontSize || 12) * 0.6);
+        h = p.height || ((p.fontSize || 12) * 1.4);
+      } else if (p.type === 'circle') {
+        var r = p.radius || 0;
+        w = h = 2 * r;
+      } else {
+        return null;
+      }
+      // Adjust for origin (default is 'left'/'top').
+      if (p.originX === 'center') l -= w / 2;
+      else if (p.originX === 'right') l -= w;
+      if (p.originY === 'center') t -= h / 2;
+      else if (p.originY === 'bottom') t -= h;
+      return { left: l, top: t, right: l + w, bottom: t + h };
+    }
+    pieces.forEach(function (p) { _bumpBounds(_pieceBounds(p)); });
+    if (isFinite(minPX) && isFinite(minPY)) {
+      var symX = Math.max(Math.abs(minPX), Math.abs(maxPX));
+      var symY = Math.max(Math.abs(minPY), Math.abs(maxPY));
+      // Add a tiny margin so anti-aliasing doesn't shave a pixel.
+      symX += 1; symY += 1;
+      pieces.push(new fabric.Rect({
+        left: -symX, top: -symY,
+        width: symX * 2, height: symY * 2,
+        fill: 'transparent', stroke: null,
+        selectable: false, evented: false,
+      }));
+    }
 
     var group = new fabric.Group(pieces, {
       left: instance.x,
@@ -870,6 +1433,42 @@
       line.data = { kind: 'net', netId: net.id };
       objs.push(line);
     });
+    // Net label — anchored at the midpoint of the longest segment so
+    // it sits in a readable spot regardless of which segment was
+    // clicked. Only renders when the net has a non-empty name set
+    // (via the Label tool or auto-power-net detection).
+    if (net.name && net.segments.length > 0) {
+      var longest = net.segments[0];
+      var bestLen = Math.hypot(longest.x2 - longest.x1, longest.y2 - longest.y1);
+      for (var i = 1; i < net.segments.length; i++) {
+        var s = net.segments[i];
+        var ln = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+        if (ln > bestLen) { bestLen = ln; longest = s; }
+      }
+      var midX = (longest.x1 + longest.x2) / 2;
+      var midY = (longest.y1 + longest.y2) / 2;
+      var horizontal = (longest.y1 === longest.y2);
+      // Position the label just above a horizontal run, or just right
+      // of a vertical run, so it doesn't sit on top of the wire.
+      var lblX = horizontal ? midX : midX + 6;
+      var lblY = horizontal ? midY - 4 : midY;
+      var anchorX = horizontal ? 'center' : 'left';
+      var anchorY = horizontal ? 'bottom' : 'center';
+      var label = new fabric.Text(net.name, {
+        left: lblX,
+        top: lblY,
+        fontSize: 11,
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+        fontWeight: '600',
+        fill: selected ? BRAND_RED : '#0d6efd',
+        originX: anchorX,
+        originY: anchorY,
+        selectable: false,
+        evented: false,
+      });
+      label.data = { kind: 'net-label', netId: net.id };
+      objs.push(label);
+    }
     return objs;
   }
 
@@ -931,7 +1530,16 @@
     STATE.canvas.clear();
     applyGridBackground();
 
-    // Nets first so symbols sit on top.
+    // Symbols first, then nets on top — so wires don't disappear
+    // behind a body when their route gets close to a symbol. Wires
+    // are the user's primary edit target so they need to be visible
+    // even where they overlap a symbol's body.
+    STATE.graph.instances.forEach(function (inst) {
+      var g = buildInstanceFabric(inst);
+      if (g) STATE.canvas.add(g);
+    });
+
+    // Nets above symbols.
     STATE.graph.nets.forEach(function (net) {
       var selected = (net.id === STATE.selectedNetId);
       buildNetFabric(net, selected).forEach(function (line) {
@@ -939,13 +1547,7 @@
       });
     });
 
-    // Symbols
-    STATE.graph.instances.forEach(function (inst) {
-      var g = buildInstanceFabric(inst);
-      if (g) STATE.canvas.add(g);
-    });
-
-    // Junctions
+    // Junctions above nets so the dot is always visible.
     computeJunctions().forEach(function (j) {
       STATE.canvas.add(buildJunctionFabric(j));
     });
@@ -1025,11 +1627,46 @@
 
   function renderProps() {
     if (!dom.propsBody) return;
+    // Net selected → show the net name editor so users can rename
+    // wires (e.g. SDA, SCL, 3V3) without using the Label tool prompt.
+    if (STATE.selectedNetId) {
+      var selNet = STATE.graph.nets.find(function (n) { return n.id === STATE.selectedNetId; });
+      if (selNet) {
+        dom.propsBody.innerHTML =
+          '<div class="se-props-field">' +
+          '  <span class="se-props-field-label">Net</span>' +
+          '  <span class="se-props-field-value">' + escapeHtml(selNet.name || '(unnamed)') + '</span>' +
+          '</div>' +
+          '<div class="se-props-field">' +
+          '  <label class="se-props-field-label" for="se-props-net-name">Name</label>' +
+          '  <input class="se-props-input" id="se-props-net-name" type="text"' +
+          '         value="' + escapeHtml(selNet.name || '') + '"' +
+          '         placeholder="e.g. SDA, SCL, 3V3" maxlength="40"' +
+          '         data-net-id="' + escapeHtml(selNet.id) + '">' +
+          '</div>';
+        var nameInput = document.getElementById('se-props-net-name');
+        if (nameInput) {
+          var commit = function () {
+            var next = (nameInput.value || '').trim();
+            if (next === (selNet.name || '')) return;
+            selNet.name = next || null;
+            renderGraph();
+            scheduleAutosave();
+          };
+          nameInput.addEventListener('change', commit);
+          nameInput.addEventListener('blur', commit);
+          nameInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); nameInput.blur(); }
+          });
+        }
+        return;
+      }
+    }
     var inst = findInstance(STATE.selectedInstanceId);
     if (!inst) {
       dom.propsBody.innerHTML =
         '<div class="se-props-empty text-muted small">' +
-        'Select a component on the canvas to see its properties.' +
+        'Select a component or net on the canvas to see its properties.' +
         '</div>';
       return;
     }
@@ -1234,6 +1871,10 @@
       );
       if (!resp.ok) throw new Error('PUT schematic HTTP ' + resp.status);
       setSaveStatus('saved');
+      // Let the embedding instruction-builder know the schematic
+      // content just changed so it can re-snapshot the thumbnail
+      // without polling.
+      postToParent({ kr_se_event: 'content-changed' });
     } catch (e) {
       setSaveStatus('error', 'Save failed');
     }
@@ -1271,47 +1912,137 @@
     dom.symbolHud.style.top = (offsetY + canvasPxY - 36) + 'px';
   }
 
+  // Collect the instance IDs that are currently selected. Single-pick
+  // → [selectedInstanceId]. Multi-pick (Fabric ActiveSelection) →
+  // every child group's .data.instanceId. This drives the rotate /
+  // flip handlers so they operate on every selected instance.
+  function selectedInstanceIds() {
+    var active = STATE.canvas && STATE.canvas.getActiveObject
+      ? STATE.canvas.getActiveObject()
+      : null;
+    if (active &&
+        (active.type === 'activeselection' || active.type === 'activeSelection') &&
+        active.getObjects) {
+      var ids = [];
+      active.getObjects().forEach(function (child) {
+        if (child && child.data && child.data.kind === 'instance') {
+          ids.push(child.data.instanceId);
+        }
+      });
+      if (ids.length > 0) return ids;
+    }
+    return STATE.selectedInstanceId ? [STATE.selectedInstanceId] : [];
+  }
+
+  // Rebuild an ActiveSelection over the Fabric instance-groups whose
+  // `data.instanceId` matches any of the supplied ids. Used after a
+  // rotate / flip so the user's multi-selection survives the
+  // renderGraph() rebuild and they can chain transforms (e.g. press
+  // rotate four times to get 360°).
+  function restoreInstanceSelection(ids) {
+    if (!STATE.canvas || !ids || ids.length === 0) return;
+    var byId = {};
+    STATE.canvas.getObjects().forEach(function (o) {
+      if (o && o.data && o.data.kind === 'instance') {
+        byId[o.data.instanceId] = o;
+      }
+    });
+    var fresh = [];
+    ids.forEach(function (id) {
+      if (byId[id]) fresh.push(byId[id]);
+    });
+    if (fresh.length === 0) return;
+    if (fresh.length === 1) {
+      STATE.canvas.setActiveObject(fresh[0]);
+    } else if (typeof fabric !== 'undefined' && fabric.ActiveSelection) {
+      var sel = new fabric.ActiveSelection(fresh, { canvas: STATE.canvas });
+      STATE.canvas.setActiveObject(sel);
+    }
+    STATE.canvas.requestRenderAll();
+  }
+
   function rotateSelected(deltaDeg) {
-    var inst = findInstance(STATE.selectedInstanceId);
-    if (!inst) return;
-    inst.rotation = (((inst.rotation || 0) + deltaDeg) % 360 + 360) % 360;
-    rerouteNetsFor(inst.id);
+    var ids = selectedInstanceIds();
+    if (ids.length === 0) return;
+    // Per-instance rotation: each instance rotates IN PLACE about its
+    // own origin (instance.x / instance.y). The user gets every
+    // selected symbol spinning around its own anchor — what
+    // "rotate the selection in place" actually means here.
+    ids.forEach(function (id) {
+      var inst = findInstance(id);
+      if (!inst) return;
+      inst.rotation = (((inst.rotation || 0) + deltaDeg) % 360 + 360) % 360;
+      rerouteNetsFor(inst.id);
+    });
+    // Drop the stale AS, re-render with the new rotations, then
+    // re-build the AS over the fresh group objects so the user's
+    // selection survives the operation (and they can keep clicking
+    // rotate to spin the selection further).
+    if (STATE.canvas && STATE.canvas.discardActiveObject) {
+      STATE.canvas.discardActiveObject();
+    }
     renderGraph();
+    restoreInstanceSelection(ids);
     scheduleAutosave();
   }
 
   function flipSelected(axis) {
-    var inst = findInstance(STATE.selectedInstanceId);
-    if (!inst) return;
-    if (axis === 'h') inst.flipH = !inst.flipH;
-    if (axis === 'v') inst.flipV = !inst.flipV;
-    rerouteNetsFor(inst.id);
+    var ids = selectedInstanceIds();
+    if (ids.length === 0) return;
+    ids.forEach(function (id) {
+      var inst = findInstance(id);
+      if (!inst) return;
+      if (axis === 'h') inst.flipH = !inst.flipH;
+      if (axis === 'v') inst.flipV = !inst.flipV;
+      rerouteNetsFor(inst.id);
+    });
+    if (STATE.canvas && STATE.canvas.discardActiveObject) {
+      STATE.canvas.discardActiveObject();
+    }
     renderGraph();
+    restoreInstanceSelection(ids);
     scheduleAutosave();
   }
 
   function deleteSelected() {
-    if (STATE.selectedInstanceId) {
-      var id = STATE.selectedInstanceId;
+    // Gather instance ids from single-select OR Fabric's multi-select
+    // (ActiveSelection). selectedInstanceIds() returns [] when nothing
+    // is selected.
+    var instanceIds = selectedInstanceIds();
+    if (instanceIds.length > 0) {
+      var idSet = {};
+      instanceIds.forEach(function (id) { idSet[id] = true; });
+      // Drop the instances themselves.
       STATE.graph.instances = STATE.graph.instances.filter(function (i) {
-        return i.id !== id;
+        return !idSet[i.id];
       });
-      // Strip net endpoints that referenced this instance. Nets that
-      // become endpoint-less are removed entirely.
-      STATE.graph.nets = STATE.graph.nets.map(function (n) {
-        n.endpoints = n.endpoints.filter(function (ep) {
-          return ep.instanceId !== id;
+      // For every net: drop endpoints that pointed at any removed
+      // instance, then DROP THE NET ENTIRELY if it no longer has at
+      // least two endpoints — a net with 0 or 1 endpoints is an
+      // orphan (segments hanging off nothing). This is what the user
+      // saw before: nets staying behind as ghost wires after deleting
+      // the symbols they connected.
+      STATE.graph.nets = STATE.graph.nets
+        .map(function (n) {
+          n.endpoints = n.endpoints.filter(function (ep) {
+            return !idSet[ep.instanceId];
+          });
+          return n;
+        })
+        .filter(function (n) {
+          return n.endpoints.length >= 2;
         });
-        return n;
-      }).filter(function (n) {
-        return n.endpoints.length > 0 || n.segments.length > 0;
-      });
       STATE.selectedInstanceId = null;
+      if (STATE.canvas && STATE.canvas.discardActiveObject) {
+        STATE.canvas.discardActiveObject();
+      }
     } else if (STATE.selectedNetId) {
       STATE.graph.nets = STATE.graph.nets.filter(function (n) {
         return n.id !== STATE.selectedNetId;
       });
       STATE.selectedNetId = null;
+    } else {
+      return;
     }
     renderGraph();
     scheduleAutosave();
@@ -1345,7 +2076,13 @@
         var pin = inst && findPin(inst, ep.pinNumber);
         if (!inst || !pin) continue;
         var xy = pinScenePos(inst, pin);
-        lShapedSegments(anchorXY.x, anchorXY.y, xy.x, xy.y).forEach(function (s) {
+        var anchorDef = symbolDefById(anchorInst.symbolId);
+        var pinDef    = symbolDefById(inst.symbolId);
+        var aSide = anchorPin && anchorDef ? effectivePinSide(anchorDef, anchorPin, anchorInst) : (anchorPin && anchorPin.side);
+        var pSide = pin       && pinDef    ? effectivePinSide(pinDef,    pin,       inst)       : (pin       && pin.side);
+        lShapedSegments(
+          anchorXY.x, anchorXY.y, xy.x, xy.y, aSide, pSide
+        ).forEach(function (s) {
           newSegs.push(s);
         });
       }
@@ -1384,26 +2121,52 @@
 
     // ----- Net-drawing mode -----
     if (STATE.activeTool === 'net') {
+      // Resolve the click to a pin: first try Fabric's direct hit
+      // (clicked exactly on the hotspot), then fall back to the
+      // nearest-pin scan within NET_PIN_SNAP_RADIUS. The fallback is
+      // what gives custom symbols their forgiving snap — the user
+      // doesn't have to land exactly on the small terminator dot.
+      var hitData = null;
       if (obj && obj.data && obj.data.kind === 'pin-hotspot') {
-        var ep = {
+        hitData = {
           instanceId: obj.data.instanceId,
-          pinNumber: obj.data.pinNumber,
+          pinNumber:  obj.data.pinNumber,
+          x: obj.data.x,
+          y: obj.data.y,
         };
-        if (!STATE.netDrawingFrom) {
-          STATE.netDrawingFrom = {
-            instanceId: ep.instanceId,
-            pinNumber: ep.pinNumber,
-            x: obj.data.x,
-            y: obj.data.y,
+      } else {
+        var near = findNearestPin(p.x, p.y);
+        if (near) {
+          hitData = {
+            instanceId: near.instance.id,
+            pinNumber:  near.pin.number,
+            x: near.x,
+            y: near.y,
           };
+        }
+      }
+      if (hitData) {
+        if (!STATE.netDrawingFrom) {
+          STATE.netDrawingFrom = hitData;
+          // Light up the source pin immediately so the user knows
+          // which pin they just picked, even before they move the
+          // mouse to pick a second pin.
+          var srcInst = findInstance(hitData.instanceId);
+          var srcPin  = srcInst && findPin(srcInst, hitData.pinNumber);
+          if (srcInst && srcPin) {
+            updateNetPinHighlight({ instance: srcInst, pin: srcPin });
+          }
         } else {
-          // Commit the net.
           var fromEp = {
             instanceId: STATE.netDrawingFrom.instanceId,
-            pinNumber: STATE.netDrawingFrom.pinNumber,
+            pinNumber:  STATE.netDrawingFrom.pinNumber,
           };
-          var net = commitNetSegment(fromEp, ep);
+          var net = commitNetSegment(fromEp, {
+            instanceId: hitData.instanceId,
+            pinNumber:  hitData.pinNumber,
+          });
           STATE.netDrawingFrom = null;
+          clearNetPinHighlight();
           if (STATE.netPreviewObj) {
             STATE.canvas.remove(STATE.netPreviewObj);
             STATE.netPreviewObj = null;
@@ -1417,11 +2180,40 @@
       // Click empty space mid-draw: abort.
       if (STATE.netDrawingFrom) {
         STATE.netDrawingFrom = null;
+        clearNetPinHighlight();
         if (STATE.netPreviewObj) {
           STATE.canvas.remove(STATE.netPreviewObj);
           STATE.netPreviewObj = null;
           STATE.canvas.requestRenderAll();
         }
+      }
+      return;
+    }
+
+    // ----- Label-tool mode -----
+    // Click a wire to name the net it belongs to. The name shows as a
+    // small label at the midpoint of the net's longest segment (e.g.
+    // "SDA", "SCL", "3V3"). Cancel = no change.
+    if (STATE.activeTool === 'label') {
+      if (obj && obj.data && obj.data.kind === 'net') {
+        var lblNetId = obj.data.netId;
+        var lblNet = STATE.graph.nets.find(function (n) { return n.id === lblNetId; });
+        if (lblNet) {
+          var current = lblNet.name || '';
+          var input = window.prompt(
+            'Net name (e.g. SDA, SCL, 3V3) — leave blank to clear:',
+            current
+          );
+          if (input !== null) {
+            var trimmed = input.trim();
+            lblNet.name = trimmed || null;
+            STATE.selectedNetId = lblNetId;
+            renderGraph();
+            scheduleAutosave();
+          }
+        }
+        // Drop back to select tool so the user can continue editing.
+        setActiveTool('select');
       }
       return;
     }
@@ -1454,31 +2246,224 @@
       }
       return;
     }
+    // ActiveSelection (multi-select) — let Fabric drag the group.
+    if (obj && (obj.type === 'activeselection' || obj.type === 'activeSelection')) {
+      return;
+    }
+    // Pan tool: empty-canvas drag pans the viewport. Track screen
+    // position + base pan offset so each mouse:move computes an
+    // absolute delta (no drift).
+    if (STATE.activeTool === 'pan') {
+      STATE.isPanning = true;
+      STATE.panStartScreenX = opt.e ? opt.e.clientX : 0;
+      STATE.panStartScreenY = opt.e ? opt.e.clientY : 0;
+      STATE.panStartPanX = STATE.panX || 0;
+      STATE.panStartPanY = STATE.panY || 0;
+      if (STATE.canvas) {
+        STATE.canvas.defaultCursor = 'grabbing';
+        STATE.canvas.setCursor('grabbing');
+      }
+      return;
+    }
     clearSelection();
   }
 
-  function onCanvasMouseMove(opt) {
-    if (STATE.activeTool !== 'net' || !STATE.netDrawingFrom) return;
-    var p = pointerScene(opt);
-    var from = STATE.netDrawingFrom;
-    var segs = lShapedSegments(from.x, from.y, p.x, p.y);
-    if (STATE.netPreviewObj) {
-      STATE.canvas.remove(STATE.netPreviewObj);
-      STATE.netPreviewObj = null;
-    }
-    if (segs.length === 0) { STATE.canvas.requestRenderAll(); return; }
-    var pts = [{ x: segs[0].x1, y: segs[0].y1 }];
-    segs.forEach(function (s) { pts.push({ x: s.x2, y: s.y2 }); });
-    STATE.netPreviewObj = new fabric.Polyline(pts, {
-      stroke: BRAND_RED,
-      strokeWidth: NET_STROKE,
-      fill: '',
-      strokeDashArray: [4, 4],
-      selectable: false,
-      evented: false,
+  // Net-drawing snap radius — when the cursor is within this many
+  // scene-space pixels of a pin, the pin gets highlighted and a click
+  // snaps the net endpoint exactly to the pin's wire-attachment point.
+  // Generous enough to make pin picking forgiving on small symbols.
+  var NET_PIN_SNAP_RADIUS = 24;
+
+  // Find the pin closest to (sx, sy) in scene coordinates, within
+  // NET_PIN_SNAP_RADIUS. Returns { instance, pin, x, y } or null.
+  function findNearestPin(sx, sy) {
+    var best = null;
+    var bestDist2 = NET_PIN_SNAP_RADIUS * NET_PIN_SNAP_RADIUS;
+    STATE.graph.instances.forEach(function (inst) {
+      var def = symbolDefById(inst.symbolId);
+      if (!def) return;
+      def.pins.forEach(function (pin) {
+        var p = pinScenePos(inst, pin);
+        var dx = p.x - sx;
+        var dy = p.y - sy;
+        var d2 = dx * dx + dy * dy;
+        if (d2 <= bestDist2) {
+          bestDist2 = d2;
+          best = { instance: inst, pin: pin, x: p.x, y: p.y };
+        }
+      });
     });
-    STATE.canvas.add(STATE.netPreviewObj);
+    return best;
+  }
+
+  // Recolour the actual stick + terminator + label of pins to brand
+  // red so the user can see which pins are involved in net drawing:
+  //  - the SOURCE pin stays lit from the moment they click it until
+  //    they click the destination (so they know which pin they're
+  //    drawing from)
+  //  - the cursor's NEAREST pin lights up under the mouse so they
+  //    see where a click will snap to
+  // Both can be lit simultaneously (different pins) or collapse to
+  // one entry (when the cursor is over the source pin).
+  //
+  // ``STATE.netPinHighlights`` is the current set: an array of
+  //   { instanceId, pinNumber, restore: [{child, prop, orig}] }
+  // entries. updateNetPinHighlight(hit) diffs the desired set against
+  // it and applies only the deltas.
+  function _desiredHighlights(hit) {
+    var list = [];
+    var seen = {};
+    function add(instanceId, pinNumber) {
+      if (instanceId == null || pinNumber == null) return;
+      var key = instanceId + ':' + pinNumber;
+      if (seen[key]) return;
+      seen[key] = true;
+      list.push({ instanceId: instanceId, pinNumber: pinNumber });
+    }
+    // While drawing, keep the source pin lit until the user clicks the
+    // destination (or cancels).
+    if (STATE.netDrawingFrom) {
+      add(STATE.netDrawingFrom.instanceId, STATE.netDrawingFrom.pinNumber);
+    }
+    if (hit) add(hit.instance.id, hit.pin.number);
+    return list;
+  }
+  function _applyHighlightTo(instanceId, pinNumber) {
+    // Find the Fabric instance group and recolour the matching pieces.
+    // Returns the restore-list (empty if not found).
+    var group = null;
+    STATE.canvas.getObjects().forEach(function (o) {
+      if (o && o.data && o.data.kind === 'instance' &&
+          o.data.instanceId === instanceId) {
+        group = o;
+      }
+    });
+    if (!group || !group.getObjects) return [];
+    var restore = [];
+    group.getObjects().forEach(function (child) {
+      if (!child.data || child.data.kind !== 'pin-piece') return;
+      if (child.data.pinNumber !== pinNumber) return;
+      if (child.data.role === 'label') {
+        restore.push({ child: child, prop: 'fill', orig: child.fill });
+        child.set('fill', BRAND_RED);
+      } else if (child.data.role === 'terminator') {
+        restore.push({ child: child, prop: 'stroke', orig: child.stroke });
+        restore.push({ child: child, prop: 'fill',   orig: child.fill });
+        child.set('stroke', BRAND_RED);
+        child.set('fill',   BRAND_RED);
+      } else {
+        restore.push({ child: child, prop: 'stroke',      orig: child.stroke });
+        restore.push({ child: child, prop: 'strokeWidth', orig: child.strokeWidth });
+        child.set('stroke', BRAND_RED);
+        child.set('strokeWidth', 2);
+      }
+    });
+    group.dirty = true;
+    return restore;
+  }
+  function _restoreEntry(entry) {
+    entry.restore.forEach(function (r) { r.child.set(r.prop, r.orig); });
+  }
+  function updateNetPinHighlight(hit) {
+    if (!STATE.canvas) return;
+    var desired = _desiredHighlights(hit);
+    var current = STATE.netPinHighlights || [];
+    var desiredKey = function (d) { return d.instanceId + ':' + d.pinNumber; };
+    var have = {};
+    current.forEach(function (c) { have[desiredKey(c)] = c; });
+    var want = {};
+    desired.forEach(function (d) { want[desiredKey(d)] = d; });
+    var changed = false;
+    // Restore highlights that should no longer be active.
+    current.forEach(function (c) {
+      if (!want[desiredKey(c)]) {
+        _restoreEntry(c);
+        changed = true;
+      }
+    });
+    // Apply highlights that aren't currently active.
+    var next = [];
+    desired.forEach(function (d) {
+      var existing = have[desiredKey(d)];
+      if (existing) {
+        next.push(existing);
+        return;
+      }
+      var restore = _applyHighlightTo(d.instanceId, d.pinNumber);
+      if (restore.length > 0) {
+        next.push({
+          instanceId: d.instanceId,
+          pinNumber:  d.pinNumber,
+          restore:    restore,
+        });
+        changed = true;
+      }
+    });
+    STATE.netPinHighlights = next;
+    if (changed) STATE.canvas.requestRenderAll();
+  }
+  function clearNetPinHighlight() {
+    if (!STATE.canvas) return;
+    (STATE.netPinHighlights || []).forEach(_restoreEntry);
+    STATE.netPinHighlights = [];
     STATE.canvas.requestRenderAll();
+  }
+
+  function onCanvasMouseMove(opt) {
+    // Pan-in-progress overrides everything else so panning works
+    // regardless of which tool is selected.
+    if (STATE.isPanning && opt.e) {
+      var dx = opt.e.clientX - STATE.panStartScreenX;
+      var dy = opt.e.clientY - STATE.panStartScreenY;
+      STATE.panX = STATE.panStartPanX + dx;
+      STATE.panY = STATE.panStartPanY + dy;
+      applyViewport();
+      return;
+    }
+    // Net tool active — always look for the nearest pin so the user
+    // sees which pin a click will snap to (both before and after the
+    // first endpoint is placed).
+    if (STATE.activeTool === 'net') {
+      var pm = pointerScene(opt);
+      var hit = findNearestPin(pm.x, pm.y);
+      updateNetPinHighlight(hit);
+      if (!STATE.netDrawingFrom) return;
+      // Mid-drag: route the preview to either the snapped pin or the
+      // raw cursor position. Use the geometry-derived effective pin
+      // side for both endpoints so wires exit/enter in the actual
+      // outward direction (not just pin.side, which is wrong for
+      // "reverse" designs where the body is opposite to pin.side).
+      var endX = hit ? hit.x : pm.x;
+      var endY = hit ? hit.y : pm.y;
+      var from = STATE.netDrawingFrom;
+      var fromInst = findInstance(from.instanceId);
+      var fromPin  = fromInst && findPin(fromInst, from.pinNumber);
+      var fromDef  = fromInst && symbolDefById(fromInst.symbolId);
+      var fromSide = (fromPin && fromDef) ? effectivePinSide(fromDef, fromPin, fromInst) : (fromPin && fromPin.side);
+      var toDef    = hit && hit.instance && symbolDefById(hit.instance.symbolId);
+      var toSide   = (hit && hit.pin && toDef) ? effectivePinSide(toDef, hit.pin, hit.instance) : (hit && hit.pin && hit.pin.side);
+      var segs = lShapedSegments(from.x, from.y, endX, endY, fromSide, toSide);
+      if (STATE.netPreviewObj) {
+        STATE.canvas.remove(STATE.netPreviewObj);
+        STATE.netPreviewObj = null;
+      }
+      if (segs.length === 0) { STATE.canvas.requestRenderAll(); return; }
+      var pts = [{ x: segs[0].x1, y: segs[0].y1 }];
+      segs.forEach(function (s) { pts.push({ x: s.x2, y: s.y2 }); });
+      STATE.netPreviewObj = new fabric.Polyline(pts, {
+        stroke: BRAND_RED,
+        strokeWidth: NET_STROKE,
+        fill: '',
+        strokeDashArray: [4, 4],
+        selectable: false,
+        evented: false,
+      });
+      STATE.canvas.add(STATE.netPreviewObj);
+      STATE.canvas.requestRenderAll();
+      return;
+    }
+    // Any non-net tool: make sure no stale highlight lingers.
+    if (STATE.netPinHighlight) clearNetPinHighlight();
   }
 
   function onCanvasObjectMoving(opt) {
@@ -1574,6 +2559,8 @@
         STATE.netPreviewObj = null;
       }
     }
+    // Leaving Net mode → drop any pin-snap highlight ring.
+    if (tool !== 'net') clearNetPinHighlight();
     // The Rotate tool is a one-shot — apply to the selection then revert.
     if (tool === 'rotate') {
       rotateSelected(90);
@@ -1581,15 +2568,28 @@
       tool = 'select';
     }
     Array.prototype.forEach.call(
-      document.querySelectorAll('.se-tool-btn'),
+      document.querySelectorAll('.se-tool-btn, .se-floating-tool-btn'),
       function (btn) {
         btn.classList.toggle('is-active', btn.dataset.tool === tool);
       }
     );
-    // Multi-select / rubber-band is only meaningful in Select mode —
-    // every other tool needs raw mouse:down events to drive placement
-    // / net drawing without Fabric grabbing them first.
-    if (STATE.canvas) STATE.canvas.selection = (tool === 'select');
+    // Tool → cursor / selection mode:
+    //   select → rubber-band lasso enabled (default), regular pointer
+    //   pan    → drag-to-pan the viewport, grab cursor
+    //   any other (net, symbol, …) → crosshair, lasso off
+    if (STATE.canvas) {
+      STATE.canvas.selection = (tool === 'select');
+      if (tool === 'pan') {
+        STATE.canvas.defaultCursor = 'grab';
+        STATE.canvas.hoverCursor   = 'grab';
+      } else if (tool === 'select') {
+        STATE.canvas.defaultCursor = 'default';
+        STATE.canvas.hoverCursor   = 'move';
+      } else {
+        STATE.canvas.defaultCursor = 'crosshair';
+        STATE.canvas.hoverCursor   = 'crosshair';
+      }
+    }
     if (tool !== 'symbol') {
       STATE.pendingSymbolId = null;
       Array.prototype.forEach.call(
@@ -1630,9 +2630,18 @@
     } catch (_) {}
   }
 
-  // Stable category display order — built-ins first, Custom last. Any
-  // unknown categories get appended in alphabetical order at the end.
-  var SYMBOL_CATEGORY_ORDER = ['Microcontrollers', 'Passive', 'Discrete', 'Power', 'Custom'];
+  // Stable category display order — built-ins first, library
+  // categories interleaved next, Custom last. Any unknown categories
+  // get appended in alphabetical order at the end. Library categories
+  // (Active, Sensor, Module, Connector) come from the admin-curated
+  // global library; the order here lines up Passive/Active/Power as
+  // a natural grouping with sensors/modules below.
+  var SYMBOL_CATEGORY_ORDER = [
+    'Microcontrollers',
+    'Passive', 'Active', 'Discrete', 'Power',
+    'Sensor', 'Module', 'Connector',
+    'Custom',
+  ];
 
   function symbolMatchesQuery(sym, q) {
     if (!q) return true;
@@ -1784,6 +2793,23 @@
     } catch (_) { /* silent — built-in library still works */ }
   }
 
+  // Admin-curated global library — every project's editor pulls these
+  // in alongside the project-scoped symbols + the built-in stubs.
+  // Failures are silent (offline / API down → editor still works with
+  // the local + built-in symbols).
+  async function loadLibrarySymbolsIntoLibrary() {
+    try {
+      var r = await apiFetch(API + '/api/library/symbols');
+      if (!r.ok) return;
+      var rows = await r.json();
+      if (!Array.isArray(rows)) return;
+      rows.forEach(function (row) {
+        var def = symbolDefFromLibrary(row);
+        if (def) SYMBOL_LIBRARY.push(def);
+      });
+    } catch (_) { /* silent */ }
+  }
+
   function onSymbolItemClick(ev) {
     var li = ev.target.closest('.se-symbol-item');
     if (!li) return;
@@ -1848,6 +2874,51 @@
     document.body.removeChild(a);
   }
 
+  // Capture a tightly-cropped PNG of the schematic content, framed
+  // to the bbox of all on-canvas objects with a small margin. Used
+  // by the embedded postMessage bridge so the instruction builder
+  // can overlay the schematic onto a filmstrip thumbnail / step
+  // canvas without showing the empty area around the diagram.
+  // ``multiplier`` controls supersampling (default 2 = retina-ish).
+  function captureSchematicPng(multiplier) {
+    if (!STATE.canvas) return null;
+    var mult = multiplier || 2;
+    var objs = STATE.canvas.getObjects();
+    if (!objs || objs.length === 0) {
+      // Nothing on the canvas yet — return a transparent dot so the
+      // caller has *something* to draw (caller may choose to skip).
+      return STATE.canvas.toDataURL({
+        format: 'png',
+        multiplier: 1,
+        enableRetinaScaling: false,
+      });
+    }
+    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    objs.forEach(function (o) {
+      try {
+        var r = o.getBoundingRect(true, true);
+        if (!r) return;
+        if (r.left < minX) minX = r.left;
+        if (r.top < minY) minY = r.top;
+        if (r.left + r.width > maxX) maxX = r.left + r.width;
+        if (r.top + r.height > maxY) maxY = r.top + r.height;
+      } catch (_) {}
+    });
+    if (!isFinite(minX)) return null;
+    var margin = 20;
+    var left   = Math.max(0, minX - margin);
+    var top    = Math.max(0, minY - margin);
+    var width  = Math.min(STATE.canvas.getWidth(),  maxX + margin) - left;
+    var height = Math.min(STATE.canvas.getHeight(), maxY + margin) - top;
+    if (width <= 0 || height <= 0) return null;
+    return STATE.canvas.toDataURL({
+      format: 'png',
+      multiplier: mult,
+      enableRetinaScaling: false,
+      left: left, top: top, width: width, height: height,
+    });
+  }
+
   // ====================================================================
   // 18. SYMBOL-HUD WIRING
   // ====================================================================
@@ -1887,8 +2958,20 @@
     var c = STATE.canvas;
     c.on('mouse:down', onCanvasMouseDown);
     c.on('mouse:move', onCanvasMouseMove);
+    c.on('mouse:up', function () {
+      if (STATE.isPanning) {
+        STATE.isPanning = false;
+        if (STATE.canvas) {
+          // Restore the pan tool's idle cursor (grab); other tools
+          // never enter the pan path so their cursors are unaffected.
+          STATE.canvas.defaultCursor = 'grab';
+          STATE.canvas.setCursor('grab');
+        }
+      }
+    });
     c.on('object:moving',   onCanvasObjectMoving);
     c.on('object:modified', onCanvasObjectModified);
+
 
     syncCanvasDisplaySize();
     window.addEventListener('resize', syncCanvasDisplaySize);
@@ -1898,6 +2981,7 @@
       if (e.key === 'Escape') {
         if (STATE.netDrawingFrom) {
           STATE.netDrawingFrom = null;
+          clearNetPinHighlight();
           if (STATE.netPreviewObj) {
             STATE.canvas.remove(STATE.netPreviewObj);
             STATE.netPreviewObj = null;
@@ -1992,6 +3076,108 @@
     STATE.userZoom = 1;
     STATE.panX = 0;
     STATE.panY = 0;
+    applyViewport();
+  }
+
+  // Toggle the zoom-reset button between zoom-to-fit and 100 %. Lives
+  // here (not in the click closure) so the same toggle drives both
+  // the local button AND the parent-bridge zoom-reset message from
+  // the instruction builder when the schematic is embedded.
+  var _zoomResetMode = 'fit';
+  function toggleZoomReset() {
+    if (_zoomResetMode === 'fit') {
+      zoomToFit();
+      _zoomResetMode = 'reset';
+    } else {
+      resetZoom();
+      _zoomResetMode = 'fit';
+    }
+  }
+
+  // Compute the bbox of every placed instance (including each pin's
+  // outermost reach) and every net segment, then choose userZoom +
+  // pan so that bbox fits comfortably inside the visible canvas.
+  // Used on initial schematic load so the user sees their work
+  // framed instead of staring at empty scene space.
+  function zoomToFit() {
+    if (!STATE.canvas) return;
+    var minX = Infinity, maxX = -Infinity;
+    var minY = Infinity, maxY = -Infinity;
+    function bump(x, y) {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+    // Instances: include each pin's wire-attach point so the frame
+    // covers the full pin extents, not just the body centre.
+    STATE.graph.instances.forEach(function (inst) {
+      var def = symbolDefById(inst.symbolId);
+      if (!def) {
+        bump(inst.x, inst.y);
+        return;
+      }
+      // Body bbox corners in scene coords.
+      var halfW = def.bodyWidth / 2;
+      var halfH = def.bodyHeight / 2;
+      [[-halfW, -halfH], [halfW, -halfH], [halfW, halfH], [-halfW, halfH]]
+        .forEach(function (c) {
+          // localToScene wants body-local (top-left origin) coords.
+          var lx = c[0] + halfW;
+          var ly = c[1] + halfH;
+          var p = localToScene(inst, def, lx, ly);
+          bump(p.x, p.y);
+        });
+      // Pin wire-attach extents.
+      def.pins.forEach(function (pin) {
+        var p = pinScenePos(inst, pin);
+        bump(p.x, p.y);
+      });
+    });
+    // Net segments.
+    STATE.graph.nets.forEach(function (net) {
+      net.segments.forEach(function (s) {
+        bump(s.x1, s.y1);
+        bump(s.x2, s.y2);
+      });
+    });
+    // Nothing on the canvas? Fall back to a 1× reset so we don't
+    // divide by zero. Adding the user's first symbol later will be
+    // visible at the default scale.
+    if (!isFinite(minX) || !isFinite(maxX) ||
+        !isFinite(minY) || !isFinite(maxY) ||
+        maxX <= minX || maxY <= minY) {
+      resetZoom();
+      return;
+    }
+    var contentW = Math.max(1, maxX - minX);
+    var contentH = Math.max(1, maxY - minY);
+    var cw = STATE.canvas.getWidth();
+    var ch = STATE.canvas.getHeight();
+    // Leave a 10 % margin on each side so the bbox isn't kissing the
+    // viewport edge.
+    var margin = 0.9;
+    var sFit = fitScale();
+    // The viewport's effective scale is sFit * userZoom, and the
+    // scene is rendered at scale × content size. Solve for the
+    // userZoom that makes scale × contentDim = margin × viewportDim.
+    var zX = (cw * margin) / (sFit * contentW);
+    var zY = (ch * margin) / (sFit * contentH);
+    var z  = Math.min(zX, zY);
+    z = Math.max(0.1, Math.min(8, z));
+    STATE.userZoom = z;
+    // Centre the content. The viewport transform places SCENE_W/2,
+    // SCENE_H/2 at (cw/2 - panX, ch/2 - panY) at scale `s`. We want
+    // the content centre (midX, midY) at the viewport centre, so:
+    //   midX × s + tx = cw/2
+    //   tx = (cw - SCENE_W × s) / 2 + panX
+    //   => panX = midX × s - SCENE_W/2 × s = (midX - SCENE_W/2) × s
+    // but with the opposite sign so the content moves INTO view.
+    var s = sFit * z;
+    var midX = (minX + maxX) / 2;
+    var midY = (minY + maxY) / 2;
+    STATE.panX = -(midX - SCENE_W / 2) * s;
+    STATE.panY = -(midY - SCENE_H / 2) * s;
     applyViewport();
   }
 
@@ -2107,9 +3293,12 @@
   }
 
   function wireUi() {
-    // Tool buttons
+    // Tool buttons — both the legacy left-rail grid (.se-tool-btn,
+    // still in place in case any deployment is mid-rollout) AND the
+    // new floating toolbar above the canvas (.se-floating-tool-btn).
+    // Both share the same data-tool contract.
     Array.prototype.forEach.call(
-      document.querySelectorAll('.se-tool-btn'),
+      document.querySelectorAll('.se-tool-btn, .se-floating-tool-btn'),
       function (btn) {
         btn.addEventListener('click', function () {
           setActiveTool(btn.dataset.tool);
@@ -2137,7 +3326,12 @@
     // Zoom controls
     if (dom.zoomIn)    dom.zoomIn.addEventListener('click', function () { zoomBy(1.25, null); updateZoomPctLabel(); });
     if (dom.zoomOut)   dom.zoomOut.addEventListener('click', function () { zoomBy(1 / 1.25, null); updateZoomPctLabel(); });
-    if (dom.zoomReset) dom.zoomReset.addEventListener('click', function () { resetZoom(); updateZoomPctLabel(); });
+    if (dom.zoomReset) {
+      dom.zoomReset.addEventListener('click', function () {
+        toggleZoomReset();
+        updateZoomPctLabel();
+      });
+    }
     // Ctrl/Cmd + wheel zoom — focal point follows the cursor so what's
     // under the mouse stays under the mouse across the zoom step.
     if (dom.canvasWrap) {
@@ -2224,9 +3418,23 @@
       switch (msg.kr_se_action) {
         case 'zoom-in':    zoomBy(1.25, null); postZoom(); break;
         case 'zoom-out':   zoomBy(1 / 1.25, null); postZoom(); break;
-        case 'zoom-reset': resetZoom(); postZoom(); break;
+        case 'zoom-reset': toggleZoomReset(); postZoom(); break;
         case 'export-csv': exportCSV(); break;
         case 'export-png': exportPNG(); break;
+        case 'png-snapshot': {
+          // Parent requested a content-framed PNG of the schematic
+          // for use as a step thumbnail / canvas overlay. Echo back
+          // the requestId so the builder can correlate the reply
+          // with the originating step id.
+          var url = null;
+          try { url = captureSchematicPng(msg.multiplier || 2); } catch (_) {}
+          postToParent({
+            kr_se_event: 'png-snapshot',
+            requestId: msg.requestId || null,
+            dataUrl: url,
+          });
+          break;
+        }
       }
     });
     // Initial handshake — let the parent know we're ready + current
@@ -2264,6 +3472,36 @@
       }
 
       if (!STATE.isOwner) {
+        // Embedded mode supports a read-only snapshot path: load the
+        // schematic, render it to the canvas, broadcast ``ready`` so
+        // the parent can request a png-snapshot, then stop. This is
+        // what the builder-renderer (used by /projects/view.html) and
+        // the project editor's preview surface rely on so non-owner
+        // visitors still see the diagram on the public page.
+        if (isEmbedded()) {
+          try {
+            var roSchematic = await fetchSchematic();
+            if (roSchematic) {
+              STATE.schematic = roSchematic;
+              loadGraphFromSchematic(roSchematic);
+              await loadCustomSymbolsIntoLibrary();
+              await loadLibrarySymbolsIntoLibrary();
+              initCanvas();
+              renderGraph();
+              wireParentBridge();
+              showOnly(dom.main);
+              requestAnimationFrame(function () {
+                zoomToFit();
+                postToParent({ kr_se_event: 'ready' });
+              });
+            } else {
+              postToParent({ kr_se_event: 'ready' });
+            }
+          } catch (_) {
+            postToParent({ kr_se_event: 'ready' });
+          }
+          return;
+        }
         showOnly(dom.notOwner);
         return;
       }
@@ -2281,8 +3519,11 @@
 
       // Symbol Designer integration: pull the project's user-designed
       // symbols and append them to SYMBOL_LIBRARY so they show up in
-      // the tools-pane symbol list alongside the built-in stubs.
+      // the tools-pane symbol list alongside the built-in stubs. Then
+      // pull the admin-curated global library on top so promoted
+      // symbols are always available too.
       await loadCustomSymbolsIntoLibrary();
+      await loadLibrarySymbolsIntoLibrary();
 
       wireUi();
       initCanvas();
@@ -2298,11 +3539,13 @@
         dom.openSymDesigner.disabled = false;
         dom.openSymDesigner.removeAttribute('title');
         dom.openSymDesigner.addEventListener('click', function () {
-          // Propagate embedded=1 when we're embedded ourselves so the
-          // Symbol Designer (which navigates into the same iframe)
-          // also strips its title bar and the user keeps seeing the
-          // builder's single header.
-          var qs = '?project_id=' + encodeURIComponent(STATE.projectId) + '&new=true';
+          // Open the Symbol Designer on whatever the user already has
+          // for this project — do NOT pass ``new=true``; that flag
+          // makes the designer create a blank symbol on every load,
+          // which silently spammed the library each time the user
+          // bounced between the two editors. Users create a new
+          // symbol explicitly via the designer's "+ New" button.
+          var qs = '?project_id=' + encodeURIComponent(STATE.projectId);
           if (isEmbedded()) qs += '&embedded=1';
           window.location.href = '/projects/symbol/edit.html' + qs;
         });
@@ -2327,6 +3570,16 @@
       setTimeout(function () {
         adjustSchematicWorkspaceHeight();
         renderGraph();
+        // Default-frame the schematic to whatever the user has on it
+        // so they don't open to empty scene space. Run AFTER the
+        // workspace height settles + the graph renders so the canvas
+        // dimensions are final.
+        zoomToFit();
+        // Tell the embedding instruction-builder we're ready to
+        // serve png-snapshot requests. The parent listens for this
+        // before firing its first capture so it doesn't race the
+        // canvas init.
+        postToParent({ kr_se_event: 'ready' });
       }, 100);
     } catch (e) {
       if (e && e.status === 404) {

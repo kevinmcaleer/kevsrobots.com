@@ -129,6 +129,19 @@ body.symbol-designer-page.is-embedded .sd-titlebar {
   text-decoration: none;
 }
 
+/* Primary exit action — "Back to schematic". Brand-red filled
+   button to surface it as the main return-to-workflow path. */
+.sd-titlebar-btn-primary {
+  background: var(--sd-brand-red);
+  border-color: var(--sd-brand-red);
+  color: #fff;
+}
+.sd-titlebar-btn-primary:hover {
+  background: #a4271f;
+  border-color: #a4271f;
+  color: #fff;
+}
+
 /* ---------- Loading / not-owner / error states ---------- */
 
 .sd-loading,
@@ -223,12 +236,22 @@ body.symbol-designer-page.is-embedded .sd-titlebar {
   border-radius: 4px;
   background: #fff;
   border: 1px solid var(--sd-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* FA-glyph-safe centring (see CLAUDE.md "FA icon centering"). The
+     flex-align pattern centres the *line-box*, but FA glyphs sit
+     visually high in their box and end up looking offset upward.
+     Use block + text-align + line-height = container height so the
+     glyph centres correctly. */
+  display: block;
+  text-align: center;
+  line-height: 22px;        /* container height minus 1px border each side */
   color: var(--sd-muted);
   font-size: 0.78rem;
   flex: 0 0 auto;
+}
+.sd-library-item-icon > i {
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
 }
 .sd-library-item-name {
   flex: 1 1 auto;

@@ -39,8 +39,12 @@
   var THREE_CDN = 'https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js';
   var STL_LOADER_CDN = 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/STLLoader.js';
   var STL_MAX_BYTES = 50 * 1024 * 1024;
-  var STL_VIEW_SIZE = 400;
-  var STL_SCENE_BG = 0xE1F5EE;
+  // Modal preview is rendered at this size on screen, but the actual
+  // PNG captured on "Use this view" uses STL_EXPORT_SIZE so the result
+  // dropped onto the Fabric canvas is sharp at typical zoom levels.
+  var STL_VIEW_SIZE   = 400;
+  var STL_EXPORT_SIZE = 1600;
+  var STL_SCENE_BG    = 0xE1F5EE;  // preview-only — captured PNGs are transparent
 
   // UI state — persisted to localStorage under this key. Bumped to v1 so
   // future schema changes can migrate cleanly.
@@ -204,6 +208,9 @@
 
     // Layers pane
     dom.layersList = document.getElementById('ib-layers-list');
+    dom.canvasBgInput = document.getElementById('ib-canvas-bg-color');
+    dom.canvasBgClear = document.getElementById('ib-canvas-bg-clear');
+    dom.canvasStepNum = document.getElementById('ib-canvas-step-num');
 
     // Canvas
     dom.canvasArea = document.getElementById('ib-canvas-area');
@@ -212,8 +219,12 @@
     dom.canvasEmpty = document.getElementById('ib-canvas-empty');
     // B3: alternate canvas-area views, one per non-photo step type.
     dom.canvasText = document.getElementById('ib-canvas-text');
-    dom.canvasTextEmpty = document.getElementById('ib-canvas-text-empty');
-    dom.canvasTextBody = document.getElementById('ib-canvas-text-body');
+    // ib-canvas-text-empty / -body were replaced by the in-canvas
+    // EasyMDE editor (#ib-canvas-text-editor) plus the
+    // #ib-canvas-text-pagecount badge. The renderCanvasTextBody helper
+    // now drives those directly via the cached EasyMDE instance, so we
+    // don't need handles on the removed nodes.
+    dom.canvasTextEditor = document.getElementById('ib-canvas-text-editor');
     dom.canvasVideo = document.getElementById('ib-canvas-video');
     dom.canvasVideoInner = document.getElementById('ib-canvas-video-inner');
     dom.canvasSchematic = document.getElementById('ib-canvas-schematic');
@@ -549,8 +560,106 @@
     syncCanvasDisplaySize();
     window.addEventListener('resize', syncCanvasDisplaySize);
 
+    // Double-click on a placed STL image → reopen the STL modal in
+    // edit mode so the user can change the view / rotation.
+    c.on('mouse:dblclick', function (opt) {
+      var t = opt && opt.target;
+      if (t && t.ibRole === 'stl') openStlModalForEdit(t);
+    });
+
+    // Background image — clamp its position while moving so it always
+    // fully covers the canvas (user pans to choose framing, can't
+    // reveal the empty canvas underneath).
+    c.on('object:moving', function (opt) {
+      var t = opt && opt.target;
+      if (t && t.ibRole === 'background') clampBackgroundPosition(t);
+    });
+    c.on('object:modified', function (opt) {
+      var t = opt && opt.target;
+      if (t && t.ibRole === 'background') clampBackgroundPosition(t);
+    });
+    // Pin the background to z=0 whenever any other object joins the
+    // canvas (drawing tools, image drops, etc.). Without this the
+    // newly-added object would slot in above whatever was at the top
+    // already and a fresh shape could end up below the bg.
+    c.on('object:added', function (opt) {
+      if (state.suppressEvents) return;
+      var added = opt && opt.target;
+      if (!added || added.ibRole === 'background') return;
+      var bg = findBackgroundImage();
+      if (bg && c.sendObjectToBack) c.sendObjectToBack(bg);
+    });
+
     // Drag-and-drop from the Photos pane onto the canvas.
     wireCanvasDropZone();
+  }
+
+  // Open the STL modal pre-loaded with the placed image's source +
+  // camera view. On "Use this view" the modal will REPLACE this
+  // image (handled by onStlUseView → placeStlPngOnCanvas's replace
+  // path, gated by stl.editingImage).
+  async function openStlModalForEdit(img) {
+    var src = img && img.ibStlSource;
+    var view = img && img.ibStlView;
+    if (!src) {
+      // Local-upload sources can't be re-loaded once the page is
+      // closed. Tell the user how to recover.
+      setSaveStatus('error', 'No source on this STL — re-add it via Add STL.');
+      return;
+    }
+    ensureStlModal();
+    stl.editingImage = img;
+    try { stl.bsModal.show(); } catch (_) {}
+    // Default the camera + active view to whatever the placed image
+    // remembered. Will be applied after the buffer loads into the
+    // scene so the camera is actually present.
+    var restore = function () {
+      if (view) {
+        if (view.viewName) stl.pendingViewName = view.viewName;
+        if (typeof view.theta === 'number') stl.spherical.theta = view.theta;
+        if (typeof view.phi   === 'number') stl.spherical.phi   = view.phi;
+        if (typeof view.distance === 'number') stl.cameraDistance = view.distance;
+      }
+      applyStlSphericalToCamera();
+    };
+    if (src.kind === 'project-file' && src.fileId) {
+      stl.pendingSource = JSON.parse(JSON.stringify(src));
+      // Switch the modal to the project-files tab so the source
+      // context is visible.
+      var projectTab = stl.modalNode && stl.modalNode.querySelector('[data-stl-source="project"]');
+      if (projectTab) projectTab.click();
+      try {
+        var resp = await apiFetch(
+          API + '/api/projects/' + state.projectId + '/files/' + src.fileId + '/download',
+          { credentials: 'include' }
+        );
+        if (!resp.ok) throw new Error('download HTTP ' + resp.status);
+        var buffer = await resp.arrayBuffer();
+        loadStlBufferIntoPreview(buffer);
+        // The preview load is async (loadStlLibs + parse); poll for
+        // hasModel and then restore the camera.
+        var tries = 0;
+        var poll = setInterval(function () {
+          tries++;
+          if (stl.hasModel) {
+            clearInterval(poll);
+            restore();
+          } else if (tries > 60) {
+            clearInterval(poll);
+          }
+        }, 50);
+      } catch (_) {
+        stlShowError("Couldn't reload that STL from the project's files.");
+      }
+    } else {
+      // Local upload — can't re-load buffer; let the user pick a
+      // file again. Pre-set the pending source so the new render
+      // still goes through the same path.
+      stl.pendingSource = JSON.parse(JSON.stringify(src));
+      stl.statusText.textContent =
+        'Re-upload "' + (src.filename || 'this STL') + '" to edit its view.';
+      stl.statusText.classList.remove('d-none');
+    }
   }
 
   // Canvas viewport: internal canvas pixel dims = CSS dims = frame
@@ -562,67 +671,167 @@
     if (!state.canvas || !dom.canvasFrame) return;
     var rect = dom.canvasFrame.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    var w = Math.max(1, Math.floor(rect.width));
-    var h = Math.max(1, Math.floor(rect.height));
-    state.canvas.setDimensions({ width: w, height: h });
-    applyCanvasViewport();
+    applyCanvasFrameSize();
   }
 
-  function fitScale() {
-    if (!state.canvas) return 1;
-    var w = state.canvas.getWidth();
-    var h = state.canvas.getHeight();
-    var s = Math.min(w / CANVAS_W, h / CANVAS_H);
-    return s > 0 ? s : 1;
+  // Compute the "base fit" scale that makes the canvas fully fit
+  // the visible canvas-area at userZoom=1. Multiplied by userZoom
+  // to give the actual on-screen scale.
+  function baseFitScale() {
+    if (!dom.canvasArea) return 1;
+    var ar = dom.canvasArea.getBoundingClientRect();
+    // .ib-canvas-area's CSS padding (14px) reduces usable area on
+    // each side. Match the rule so the frame doesn't overflow when
+    // zoom == 1.
+    var availW = Math.max(1, ar.width  - 28);
+    var availH = Math.max(1, ar.height - 28);
+    return Math.min(availW / CANVAS_W, availH / CANVAS_H);
   }
-
   function effectiveScale() {
-    return fitScale() * (state.userZoom || 1);
+    return baseFitScale() * (state.userZoom || 1);
   }
 
-  function applyCanvasViewport() {
-    if (!state.canvas) return;
-    var w = state.canvas.getWidth();
-    var h = state.canvas.getHeight();
+  // PowerPoint-style sizing: the canvas FRAME itself scales with
+  // userZoom — the white "page" grows / shrinks and the user scrolls
+  // the canvas-area when the frame exceeds the viewport. Pan tool
+  // drives canvas-area.scrollLeft/scrollTop (set in the pointer
+  // handlers); panX/panY in state are no longer used by this path
+  // (legacy from the previous fixed-frame model).
+  function applyCanvasFrameSize() {
+    if (!state.canvas || !dom.canvasFrame) return;
     var s = effectiveScale();
-    var tx = (w - CANVAS_W * s) / 2 + state.panX;
-    var ty = (h - CANVAS_H * s) / 2 + state.panY;
-    state.canvas.setViewportTransform([s, 0, 0, s, tx, ty]);
-    // After a viewport change, anything that's anchored to a scene
-    // position via CSS — image-context toolbar, HUD when tracking a
-    // moving object — needs to be re-laid out.
+    var pxW = Math.max(1, Math.round(CANVAS_W * s));
+    var pxH = Math.max(1, Math.round(CANVAS_H * s));
+    dom.canvasFrame.style.width  = pxW + 'px';
+    dom.canvasFrame.style.height = pxH + 'px';
+    state.canvas.setDimensions({ width: pxW, height: pxH });
+    // The viewport transform is pure scale — no pan offset. Native
+    // scroll on .ib-canvas-area handles "panning" the larger-than-
+    // viewport frame.
+    state.canvas.setViewportTransform([s, 0, 0, s, 0, 0]);
     var img = activeImageOrNull();
     if (img) positionImageToolbar(img);
     refreshHudInputsFromCanvas();
     updateZoomPctLabel();
   }
 
+  // Kept as a thin alias so existing callers don't break — the new
+  // single source of truth is applyCanvasFrameSize().
+  function applyCanvasViewport() { applyCanvasFrameSize(); }
+
   function zoomCanvasBy(factor, focal) {
     var prev = state.userZoom || 1;
     var next = Math.max(0.2, Math.min(6, prev * factor));
     if (next === prev) return;
-    if (focal && state.canvas) {
-      // Keep the point under the cursor fixed across the zoom step.
-      var vt = state.canvas.viewportTransform;
-      var sceneX = (focal.x - vt[4]) / vt[0];
-      var sceneY = (focal.y - vt[5]) / vt[3];
-      state.userZoom = next;
-      var s = effectiveScale();
-      var w = state.canvas.getWidth();
-      var h = state.canvas.getHeight();
-      state.panX = focal.x - sceneX * s - (w - CANVAS_W * s) / 2;
-      state.panY = focal.y - sceneY * s - (h - CANVAS_H * s) / 2;
-    } else {
-      state.userZoom = next;
+    // Capture the point under the cursor in scene coords BEFORE the
+    // resize so we can scroll the canvas-area to keep it under the
+    // cursor afterwards.
+    var sceneX = null, sceneY = null;
+    if (focal && state.canvas && dom.canvasFrame && dom.canvasArea) {
+      var rect = dom.canvasFrame.getBoundingClientRect();
+      var preScale = effectiveScale();
+      sceneX = (focal.x - rect.left) / preScale;
+      sceneY = (focal.y - rect.top)  / preScale;
     }
-    applyCanvasViewport();
+    state.userZoom = next;
+    applyCanvasFrameSize();
+    // Restore the focal point under the cursor by adjusting scroll.
+    if (sceneX != null && dom.canvasArea && dom.canvasFrame) {
+      var newScale = effectiveScale();
+      var newRect = dom.canvasFrame.getBoundingClientRect();
+      var targetX = focal.x;     // we want sceneX to land here
+      var targetY = focal.y;
+      var currentX = newRect.left + sceneX * newScale;
+      var currentY = newRect.top  + sceneY * newScale;
+      dom.canvasArea.scrollLeft += (currentX - targetX);
+      dom.canvasArea.scrollTop  += (currentY - targetY);
+    }
   }
 
   function resetCanvasZoom() {
     state.userZoom = 1;
+    // Clear legacy pan offsets (no longer used).
     state.panX = 0;
     state.panY = 0;
-    applyCanvasViewport();
+    applyCanvasFrameSize();
+    // Centre the frame inside the area.
+    if (dom.canvasArea) {
+      dom.canvasArea.scrollLeft = (dom.canvasArea.scrollWidth  - dom.canvasArea.clientWidth)  / 2;
+      dom.canvasArea.scrollTop  = (dom.canvasArea.scrollHeight - dom.canvasArea.clientHeight) / 2;
+    }
+  }
+
+  // Frame every object on the canvas inside the visible canvas-area
+  // at ~90 % margin. With the PowerPoint-style scaling frame, this
+  // means: pick the userZoom that makes the content bbox fit the
+  // canvas-area, then scroll the area so the bbox centre lines up
+  // with the area centre.
+  function zoomCanvasToFit() {
+    if (!state.canvas) return;
+    var objs = state.canvas.getObjects();
+    if (!objs || objs.length === 0) { resetCanvasZoom(); return; }
+    var minX = Infinity, maxX = -Infinity;
+    var minY = Infinity, maxY = -Infinity;
+    objs.forEach(function (o) {
+      // Skip transient overlays — Fabric's `excludeFromExport` is the
+      // canonical hint that the object isn't part of the user's work.
+      if (o.excludeFromExport) return;
+      var r = o.getBoundingRect ? o.getBoundingRect(true, true) : null;
+      if (!r) return;
+      if (r.left < minX) minX = r.left;
+      if (r.top  < minY) minY = r.top;
+      if (r.left + r.width  > maxX) maxX = r.left + r.width;
+      if (r.top  + r.height > maxY) maxY = r.top  + r.height;
+    });
+    if (!isFinite(minX) || maxX <= minX || maxY <= minY) {
+      resetCanvasZoom();
+      return;
+    }
+    var contentW = Math.max(1, maxX - minX);
+    var contentH = Math.max(1, maxY - minY);
+    if (!dom.canvasArea) return;
+    var areaRect = dom.canvasArea.getBoundingClientRect();
+    var availW = Math.max(1, areaRect.width  - 28);
+    var availH = Math.max(1, areaRect.height - 28);
+    var margin = 0.9;
+    // We want: contentW * effectiveScale === availW * margin (or
+    // contentH * effectiveScale === availH * margin), whichever is
+    // tighter. effectiveScale = baseFitScale * userZoom.
+    var baseS = baseFitScale();
+    if (baseS <= 0) baseS = 1;
+    var zX = (availW * margin) / (baseS * contentW);
+    var zY = (availH * margin) / (baseS * contentH);
+    var z  = Math.max(0.1, Math.min(8, Math.min(zX, zY)));
+    state.userZoom = z;
+    applyCanvasFrameSize();
+    // Scroll the area so the content bbox's centre lines up with the
+    // area's centre.
+    var s = effectiveScale();
+    var midX = (minX + maxX) / 2;
+    var midY = (minY + maxY) / 2;
+    // The frame is centred horizontally by the area's flex layout
+    // (justify-content: center). Its left edge in scroll-pixel space
+    // is therefore (scrollWidth - frame.width) / 2 — we want to
+    // scroll so (midX * s) within the frame lands at the area's
+    // centre.
+    var frameX = (dom.canvasArea.scrollWidth  - dom.canvasFrame.offsetWidth)  / 2;
+    var frameY = (dom.canvasArea.scrollHeight - dom.canvasFrame.offsetHeight) / 2;
+    dom.canvasArea.scrollLeft = frameX + midX * s - dom.canvasArea.clientWidth  / 2;
+    dom.canvasArea.scrollTop  = frameY + midY * s - dom.canvasArea.clientHeight / 2;
+  }
+
+  // Toggle between zoom-to-fit and 100 %. Mirrors the schematic
+  // editor + symbol designer behaviour — used by both the local
+  // zoom-reset button AND keyboard shortcut.
+  var _ibZoomResetMode = 'fit';
+  function toggleCanvasZoomReset() {
+    if (_ibZoomResetMode === 'fit') {
+      zoomCanvasToFit();
+      _ibZoomResetMode = 'reset';
+    } else {
+      resetCanvasZoom();
+      _ibZoomResetMode = 'fit';
+    }
   }
 
   function updateZoomPctLabel() {
@@ -646,7 +855,21 @@
       btn.classList.toggle('is-active', btn.dataset.tool === tool);
     });
     if (state.canvas) {
+      // Tool → selection / cursor mode:
+      //   select → rubber-band lasso ON (default), regular pointer
+      //   pan    → drag-to-pan the viewport, grab cursor
+      //   any other (arrow, text, …) → crosshair, lasso OFF
       state.canvas.selection = (tool === 'select');
+      if (tool === 'pan') {
+        state.canvas.defaultCursor = 'grab';
+        state.canvas.hoverCursor   = 'grab';
+      } else if (tool === 'select') {
+        state.canvas.defaultCursor = 'default';
+        state.canvas.hoverCursor   = 'move';
+      } else {
+        state.canvas.defaultCursor = 'crosshair';
+        state.canvas.hoverCursor   = 'crosshair';
+      }
       state.canvas.discardActiveObject();
       state.canvas.getObjects().forEach(function (o) {
         o.selectable = (tool === 'select') && !o.lockMovementX;
@@ -703,6 +926,22 @@
   function onCanvasMouseDown(opt) {
     var tool = state.activeTool;
     if (tool === 'select') return;
+    if (tool === 'pan') {
+      // Pan tool: scroll the canvas-area natively while dragging so
+      // the PowerPoint-style frame slides under the cursor. Track
+      // start screen position + base scroll so each mouse:move
+      // computes an absolute delta.
+      state.isPanning = true;
+      state.panStartScreenX = opt.e ? opt.e.clientX : 0;
+      state.panStartScreenY = opt.e ? opt.e.clientY : 0;
+      state.panStartScrollX = dom.canvasArea ? dom.canvasArea.scrollLeft : 0;
+      state.panStartScrollY = dom.canvasArea ? dom.canvasArea.scrollTop  : 0;
+      if (state.canvas) {
+        state.canvas.defaultCursor = 'grabbing';
+        state.canvas.setCursor('grabbing');
+      }
+      return;
+    }
     var p = getPointer(opt);
     var color = (dom.color && dom.color.value) || '#dc3545';
     var stroke = parseInt((dom.stroke && dom.stroke.value) || '3', 10);
@@ -760,6 +999,17 @@
   }
 
   function onCanvasMouseMove(opt) {
+    if (state.isPanning && opt.e) {
+      // Reverse-direction (grab-and-drag): cursor moves right → frame
+      // moves right under it → scroll-left decreases.
+      var dx = opt.e.clientX - state.panStartScreenX;
+      var dy = opt.e.clientY - state.panStartScreenY;
+      if (dom.canvasArea) {
+        dom.canvasArea.scrollLeft = state.panStartScrollX - dx;
+        dom.canvasArea.scrollTop  = state.panStartScrollY - dy;
+      }
+      return;
+    }
     if (!state.drawing) return;
     var p = getPointer(opt);
     var d = state.drawing;
@@ -788,6 +1038,16 @@
   }
 
   function onCanvasMouseUp() {
+    if (state.isPanning) {
+      state.isPanning = false;
+      if (state.canvas) {
+        // Pan-tool idle cursor; setActiveTool puts the right cursor
+        // on for other tools, so we don't need to branch here.
+        state.canvas.defaultCursor = 'grab';
+        state.canvas.setCursor('grab');
+      }
+      return;
+    }
     if (!state.drawing) return;
     var d = state.drawing;
     var canvas = state.canvas;
@@ -869,6 +1129,185 @@
     }
   }
 
+  // Lazy-built modal for picking a background image. Two tabs:
+  // Upload (file input → POST as a project image, then set as bg)
+  // From project files (lists existing image files attached to the
+  // project). Mirrors the STL picker's UX.
+  var bgPicker = { node: null, bsModal: null };
+  function ensureBgPickerModal() {
+    if (bgPicker.node) return bgPicker.node;
+    var modalId = 'ib-bg-picker-modal';
+    var html =
+      '<div class="modal fade ib-bg-picker-modal" id="' + modalId + '" tabindex="-1" ' +
+      '  aria-labelledby="' + modalId + '-label" aria-hidden="true" ' +
+      '  data-bs-backdrop="static" data-bs-keyboard="true">' +
+      '  <div class="modal-dialog modal-dialog-centered">' +
+      '    <div class="modal-content">' +
+      '      <div class="modal-header">' +
+      '        <h5 class="modal-title" id="' + modalId + '-label">' +
+      '          <i class="fas fa-image me-2 text-primary"></i>Background image' +
+      '        </h5>' +
+      '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+      '      </div>' +
+      '      <div class="modal-body">' +
+      '        <ul class="nav nav-pills nav-fill mb-3 ib-bg-picker-tabs" role="tablist">' +
+      '          <li class="nav-item">' +
+      '            <button type="button" class="nav-link active" data-bg-source="upload">Upload file</button>' +
+      '          </li>' +
+      '          <li class="nav-item">' +
+      '            <button type="button" class="nav-link" data-bg-source="project">From project files</button>' +
+      '          </li>' +
+      '        </ul>' +
+      '        <div class="ib-bg-picker-pane" data-bg-pane="upload">' +
+      '          <input type="file" class="form-control form-control-sm" accept="image/*"' +
+      '                 id="ib-bg-picker-file">' +
+      '          <p class="text-muted small mt-2 mb-0">' +
+      '            Image is uploaded to the project + set as this step\'s background.' +
+      '          </p>' +
+      '        </div>' +
+      '        <div class="ib-bg-picker-pane d-none" data-bg-pane="project">' +
+      '          <div class="ib-bg-picker-list" id="ib-bg-picker-list">' +
+      '            <p class="text-muted small mb-0">Loading project files…</p>' +
+      '          </div>' +
+      '        </div>' +
+      '      </div>' +
+      '      <div class="modal-footer">' +
+      '        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>' +
+      '      </div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>';
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    var node = wrap.firstElementChild;
+    document.body.appendChild(node);
+    bgPicker.node = node;
+    bgPicker.list = node.querySelector('#ib-bg-picker-list');
+    if (window.bootstrap && window.bootstrap.Modal) {
+      bgPicker.bsModal = new window.bootstrap.Modal(node);
+    } else {
+      bgPicker.bsModal = {
+        show: function () { node.classList.add('show'); node.style.display = 'block'; },
+        hide: function () { node.classList.remove('show'); node.style.display = 'none'; },
+      };
+    }
+    // Tab switching.
+    var tabs = node.querySelectorAll('.ib-bg-picker-tabs .nav-link');
+    var panes = node.querySelectorAll('.ib-bg-picker-pane');
+    Array.prototype.forEach.call(tabs, function (tab) {
+      tab.addEventListener('click', function () {
+        var src = tab.dataset.bgSource;
+        Array.prototype.forEach.call(tabs, function (t) {
+          t.classList.toggle('active', t === tab);
+        });
+        Array.prototype.forEach.call(panes, function (p) {
+          p.classList.toggle('d-none', p.dataset.bgPane !== src);
+        });
+        if (src === 'project') refreshBgPickerProjectList();
+      });
+    });
+    // Upload handler — same flow as the project editor's image upload
+    // path, then sets as background.
+    var fileIn = node.querySelector('#ib-bg-picker-file');
+    if (fileIn) {
+      fileIn.addEventListener('change', async function () {
+        var file = fileIn.files && fileIn.files[0];
+        if (!file) return;
+        try {
+          setSaveStatus('saving', 'Uploading…');
+          var fd = new FormData();
+          fd.append('file', file);
+          var resp = await apiFetch(
+            API + '/api/projects/' + state.projectId + '/images',
+            { method: 'POST', credentials: 'include', body: fd }
+          );
+          if (!resp.ok) throw new Error('Upload HTTP ' + resp.status);
+          var uploaded = await resp.json();
+          setSaveStatus('saved');
+          try { bgPicker.bsModal.hide(); } catch (_) {}
+          await addBackgroundImage(uploaded.url, uploaded.filename || file.name);
+          scheduleAutosave();
+          scheduleSnapshot();
+          refreshProjectImages();
+          renderHudCanvasBackground();
+        } catch (e) {
+          setSaveStatus('error', 'Background upload failed');
+        } finally {
+          try { fileIn.value = ''; } catch (_) {}
+        }
+      });
+    }
+    return node;
+  }
+  async function refreshBgPickerProjectList() {
+    if (!bgPicker.list) return;
+    if (!state.projectId) {
+      bgPicker.list.innerHTML =
+        '<p class="text-muted small mb-0">No project loaded.</p>';
+      return;
+    }
+    bgPicker.list.innerHTML =
+      '<p class="text-muted small mb-0">Loading project images…</p>';
+    try {
+      var resp = await apiFetch(
+        API + '/api/projects/' + state.projectId + '/images',
+        { credentials: 'include' }
+      );
+      if (!resp.ok) throw new Error('images HTTP ' + resp.status);
+      var imgs = await resp.json();
+      var rows = (imgs || []).filter(function (i) {
+        return /\.(jpe?g|png|gif|webp|bmp|avif)$/i.test(i.filename || '');
+      });
+      if (rows.length === 0) {
+        bgPicker.list.innerHTML =
+          '<p class="text-muted small mb-0">' +
+          'No images attached to this project yet. Upload one above or via ' +
+          'the project editor.</p>';
+        return;
+      }
+      bgPicker.list.innerHTML = rows.map(function (it) {
+        return (
+          '<button type="button" class="ib-bg-picker-item"' +
+          '        data-img-url="' + escapeHtml(it.url) + '"' +
+          '        data-img-name="' + escapeHtml(it.filename || '') + '">' +
+          '  <img alt="" class="ib-bg-picker-thumb" src="' + escapeHtml(it.url) + '">' +
+          '  <span class="ib-bg-picker-name">' + escapeHtml(it.filename || '') + '</span>' +
+          '</button>'
+        );
+      }).join('');
+      Array.prototype.forEach.call(
+        bgPicker.list.querySelectorAll('.ib-bg-picker-item'),
+        function (btn) {
+          btn.addEventListener('click', async function () {
+            try {
+              await addBackgroundImage(btn.dataset.imgUrl, btn.dataset.imgName);
+              try { bgPicker.bsModal.hide(); } catch (_) {}
+              scheduleAutosave();
+              scheduleSnapshot();
+              renderHudCanvasBackground();
+            } catch (e) { /* swallow */ }
+          });
+        }
+      );
+    } catch (_) {
+      bgPicker.list.innerHTML =
+        '<p class="text-danger small mb-0">Couldn\'t load project images.</p>';
+    }
+  }
+  function openBgImagePicker() {
+    ensureBgPickerModal();
+    // Reset to upload tab on each open.
+    var tabs = bgPicker.node.querySelectorAll('.ib-bg-picker-tabs .nav-link');
+    Array.prototype.forEach.call(tabs, function (t) {
+      t.classList.toggle('active', t.dataset.bgSource === 'upload');
+    });
+    var panes = bgPicker.node.querySelectorAll('.ib-bg-picker-pane');
+    Array.prototype.forEach.call(panes, function (p) {
+      p.classList.toggle('d-none', p.dataset.bgPane !== 'upload');
+    });
+    try { bgPicker.bsModal.show(); } catch (_) {}
+  }
+
   async function addBackgroundImage(url, filename) {
     removeBackgroundImage();
 
@@ -880,17 +1319,38 @@
     }
     if (!img) throw new Error('Image returned empty');
 
-    var scale = Math.min(CANVAS_W / img.width, CANVAS_H / img.height);
+    // COVER scaling — the image fills the entire canvas. Whichever
+    // dimension is larger after scaling gets cropped (or panned into
+    // view via the move handle, since the bg is selectable and
+    // movement-constrained below).
+    var scale = Math.max(CANVAS_W / img.width, CANVAS_H / img.height);
     img.set({
+      originX: 'left',
+      originY: 'top',
+      // Default to centred so any cropping is symmetric. User can
+      // drag-reposition afterwards within the clamp range.
       left: (CANVAS_W - img.width * scale) / 2,
-      top: (CANVAS_H - img.height * scale) / 2,
+      top:  (CANVAS_H - img.height * scale) / 2,
       scaleX: scale,
       scaleY: scale,
-      selectable: false,
-      evented: false,
-      // Tag as the background object so we can find / remove it later.
-      // Fabric persists custom keys through toJSON if we list them in
-      // toJSON's propertiesToInclude — we do that in serializeCanvas.
+      // Movable but not transformable. No corner / rotation handles;
+      // a subtle border shows what's currently the background when
+      // it's clicked. Locks prevent resize, rotation, and skew.
+      selectable: true,
+      evented: true,
+      hasControls: false,
+      hasBorders: true,
+      borderColor: 'rgba(13, 110, 253, 0.6)',
+      lockScalingX: true,
+      lockScalingY: true,
+      lockScalingFlip: true,
+      lockRotation: true,
+      lockSkewingX: true,
+      lockSkewingY: true,
+      // Tag as the background object so we can find / remove it
+      // later AND pin it to z=0 via object:added below. Fabric
+      // persists custom keys through toJSON if listed in
+      // serializeCanvas's propertiesToInclude.
       ibRole: 'background',
       ibSourceUrl: url,
       ibFilename: filename || '',
@@ -899,6 +1359,29 @@
     state.canvas.sendObjectToBack(img);
     if (dom.removeImageBtn) dom.removeImageBtn.disabled = false;
     state.canvas.requestRenderAll();
+  }
+
+  // Constrain the background image's translation so the image always
+  // fully covers the canvas — the user can pan to choose which part
+  // of an aspect-ratio mismatch is visible, but can never reveal the
+  // empty canvas underneath. Called from the object:moving listener.
+  function clampBackgroundPosition(img) {
+    if (!img) return;
+    var w = (img.width  || 0) * (img.scaleX || 1);
+    var h = (img.height || 0) * (img.scaleY || 1);
+    // For an image with origin top-left: image covers canvas iff
+    //   left ≤ 0   AND   left + w ≥ CANVAS_W
+    //   top  ≤ 0   AND   top  + h ≥ CANVAS_H
+    // → left ∈ [CANVAS_W - w, 0],  top ∈ [CANVAS_H - h, 0]
+    // If the image is smaller than the canvas in some dimension
+    // (shouldn't happen with cover-scale, but be defensive) the
+    // range collapses and we pin to 0.
+    var minLeft = Math.min(0, CANVAS_W - w);
+    var minTop  = Math.min(0, CANVAS_H - h);
+    if (img.left > 0)       img.left = 0;
+    if (img.left < minLeft) img.left = minLeft;
+    if (img.top  > 0)       img.top  = 0;
+    if (img.top  < minTop)  img.top  = minTop;
   }
 
   function findBackgroundImage() {
@@ -937,7 +1420,12 @@
     // photo a step uses as a background (drives the ★ badge in Photos),
     // plus ibFilename so the Layers pane keeps showing the friendly
     // filename per image after a reload.
-    return state.canvas.toJSON(['ibRole', 'ibSourceUrl', 'ibFilename']);
+    return state.canvas.toJSON([
+      'ibRole', 'ibSourceUrl', 'ibFilename',
+      // STL view-state so a double-click can reopen the modal with
+      // the previous source + camera angle / view preserved.
+      'ibStlSource', 'ibStlView',
+    ]);
   }
 
   function loadCanvasFromStep(step) {
@@ -961,6 +1449,8 @@
         updateUndoRedoButtons();
         updateEmptyState();
         renderLayersList();
+        // Reflect the just-loaded step's background colour in the picker.
+        syncCanvasBgPicker();
         resolve();
       }
 
@@ -973,7 +1463,18 @@
       }
 
       try {
-        state.canvas.loadFromJSON(parsed, function () {
+        // Fabric v6: loadFromJSON returns a Promise; the 2nd arg is
+        // a per-object reviver (not a completion callback). Using the
+        // old v5 callback shape fired ``done()`` once per object and
+        // left ``state.suppressEvents`` cleared mid-load — which
+        // surfaced as "click tile → blank canvas" in the wild.
+        var result = state.canvas.loadFromJSON(parsed);
+        Promise.resolve(result).then(function () {
+          state.canvas.requestRenderAll();
+          done();
+        }).catch(function (e) {
+          console.warn('loadFromJSON failed, falling back to blank canvas', e);
+          state.canvas.clear();
           state.canvas.requestRenderAll();
           done();
         });
@@ -1046,6 +1547,8 @@
               if (s) s.title = updated.title;
               renderFilmstrip();
               setSaveStatus('saved');
+              // Non-canvas tiles include the title in their badge — refresh.
+              refreshNonCanvasStepThumb(stepId);
               // Inverse: restore the prior title. Redo restores the new
               // value — captured in closure as `value` so the redo entry
               // mirrors the original op exactly.
@@ -1207,23 +1710,158 @@
     iframe.dataset.mounted = '1';
   }
 
-  // Apply the text-step body to the read-only preview slot in the
-  // canvas area. Plain-text rendering for B3 — markdown is acceptable
-  // for a follow-up. We render via textContent on a <pre>-ish element
-  // so we don't have to sanitise.
+  // Apply the text-step body to the in-canvas markdown editor.
+  // First call lazily instantiates EasyMDE; subsequent calls just set
+  // the editor's value and refresh the page count.
+  //
+  // PAGE_HEIGHT (px) defines what counts as "one page" in the canvas
+  // — every PAGE_HEIGHT vertical pixels of rendered text bumps the
+  // page count by one. The CSS draws a dashed marker at the same
+  // intervals so the user sees where future PNG/PDF/GIF exports will
+  // split the content into separate images.
+  var TEXT_PAGE_HEIGHT = 880;
   function renderCanvasTextBody(step) {
-    if (!dom.canvasTextBody || !dom.canvasTextEmpty) return;
     var body = (step && step.body) || '';
-    if (!body.trim()) {
-      dom.canvasTextEmpty.classList.remove('d-none');
-      dom.canvasTextBody.classList.add('d-none');
-      dom.canvasTextBody.textContent = '';
-    } else {
-      dom.canvasTextEmpty.classList.add('d-none');
-      dom.canvasTextBody.classList.remove('d-none');
-      // Plain-text body for B3 — preserve line breaks via white-space CSS.
-      dom.canvasTextBody.textContent = body;
+    var editor = ensureTextCanvasEditor();
+    if (!editor) return;
+    // Suppress the change handler so loading a step's body doesn't
+    // ricochet back into the autosave path.
+    state.suppressTextEditorChange = true;
+    try {
+      if (editor.value() !== body) editor.value(body);
+    } finally {
+      state.suppressTextEditorChange = false;
     }
+    updateTextCanvasPageCount();
+    // Apply the step's bg colour to the text canvas area so the
+    // text "slide" reads with the same backdrop the user sees
+    // everywhere else (filmstrip thumb, future PDF/PNG export).
+    applyTextCanvasBgColor(step);
+    // CodeMirror needs a refresh after being shown (it was hidden via
+    // d-none until applyCanvasAreaForType swapped it in). Without
+    // this the editor renders zero-width on first activation.
+    setTimeout(function () {
+      if (editor.codemirror) editor.codemirror.refresh();
+      updateTextCanvasPageCount();
+    }, 30);
+  }
+
+  // Paint the step's canvas background colour onto the live text-
+  // canvas-area surface (the white "page" containing the EasyMDE
+  // editor). The colour comes from the step's canvas_json
+  // background field, set via the Layers / HUD / tile-menu pickers.
+  function applyTextCanvasBgColor(step) {
+    if (!dom.canvasText) return;
+    var bg = _stepBgColor(step, '#ffffff');
+    // The outer canvas-text container = page bg. CSS-var lets the
+    // inner page card / editor surface inherit cleanly.
+    dom.canvasText.style.setProperty('--ib-text-bg', bg);
+  }
+
+  // Lazy EasyMDE construction. Returns the live instance (cached on
+  // state.textCanvasEditor) or null if EasyMDE didn't load.
+  function ensureTextCanvasEditor() {
+    if (state.textCanvasEditor) return state.textCanvasEditor;
+    if (typeof window.EasyMDE === 'undefined') return null;
+    var textarea = document.getElementById('ib-canvas-text-editor');
+    if (!textarea) return null;
+    var mde = new window.EasyMDE({
+      element: textarea,
+      autofocus: false,
+      spellChecker: false,
+      status: false,
+      minHeight: '240px',
+      placeholder: textarea.getAttribute('placeholder') || '',
+      // Match the toolbar the project editor uses, trimmed for the
+      // smaller canvas-area surface.
+      toolbar: [
+        'bold', 'italic', 'heading', '|',
+        'unordered-list', 'ordered-list', 'quote', '|',
+        'link', 'image', 'code', '|',
+        'preview', 'guide',
+      ],
+    });
+    state.textCanvasEditor = mde;
+    // Live save: debounce 500ms after the last change, then PUT
+    // step.body. Mirrors the legacy stepBodyInput blur-save pattern
+    // but fires while the user is still typing so the page-count
+    // indicator stays accurate without waiting for blur.
+    mde.codemirror.on('change', function () {
+      if (state.suppressTextEditorChange) return;
+      updateTextCanvasPageCount();
+      if (!state.activeStepId) return;
+      debounce('canvas-text-body', 500, function () {
+        var stepId = state.activeStepId;
+        if (!stepId) return;
+        var value = mde.value() || null;
+        // Keep the legacy schematic-pane textarea in sync so a switch
+        // back to the secondary pane shows the latest content.
+        if (dom.stepBodyInput) dom.stepBodyInput.value = value || '';
+        var s = state.steps.find(function (x) { return x.id === stepId; });
+        var prior = (s && s.body) || null;
+        if ((prior || '') === (value || '')) return;
+        setSaveStatus('saving', 'Saving…');
+        putStep(stepId, { body: value })
+          .then(function (updated) {
+            var s2 = state.steps.find(function (x) { return x.id === stepId; });
+            if (s2) s2.body = updated.body;
+            setSaveStatus('saved');
+            // Refresh the filmstrip thumb so the tile preview keeps
+            // up with what the user typed.
+            refreshNonCanvasStepThumb(stepId);
+          })
+          .catch(function () { setSaveStatus('error', 'Body save failed'); });
+      });
+    });
+    return mde;
+  }
+
+  // Refresh a single non-canvas step's filmstrip thumbnail (text /
+  // schematic / video). Reads the step record from state.steps to
+  // pick up the latest body / video_url / etc., re-renders the
+  // type-badge thumb, and updates the tile in place — same pattern
+  // as refreshActiveStepThumb but for steps where the source of
+  // truth isn't the Fabric canvas.
+  async function refreshNonCanvasStepThumb(stepId) {
+    if (typeof fabric === 'undefined' || !fabric.StaticCanvas) return;
+    var step = state.steps.find(function (s) { return s.id === stepId; });
+    if (!step) return;
+    var type = step.step_type || 'photo';
+    if (type === 'photo' || type === 'blank') return;  // handled elsewhere
+    try {
+      var url = await _renderTypeBadgeThumb(step);
+      state.stepThumbs[stepId] = url;
+      var tile = dom.filmstripTrack &&
+        dom.filmstripTrack.querySelector('.ib-step-tile[data-step-id="' + stepId + '"]');
+      if (tile) {
+        var preview = tile.querySelector('.ib-step-tile-preview');
+        if (preview) {
+          if (url) {
+            preview.style.backgroundImage = "url('" + url + "')";
+            preview.classList.add('has-thumb');
+            preview.innerHTML = '';
+          } else {
+            preview.style.backgroundImage = '';
+            preview.classList.remove('has-thumb');
+          }
+        }
+      }
+    } catch (_) { /* swallow — non-fatal */ }
+  }
+
+  // Compute the rendered editor height and translate it to a page
+  // count via TEXT_PAGE_HEIGHT. The CSS background-image already draws
+  // the page-break markers at the same interval; this label tells the
+  // user the running total.
+  function updateTextCanvasPageCount() {
+    var mde = state.textCanvasEditor;
+    if (!mde || !mde.codemirror) return;
+    var scroller = mde.codemirror.getScrollerElement();
+    var label = document.querySelector('#ib-canvas-text-pagecount .ib-canvas-text-pagecount-label');
+    if (!scroller || !label) return;
+    var contentHeight = scroller.scrollHeight;
+    var pages = Math.max(1, Math.ceil(contentHeight / TEXT_PAGE_HEIGHT));
+    label.textContent = 'Page 1 of ' + pages;
   }
 
   // Build the video embed inside the canvas area for video steps.
@@ -1496,6 +2134,7 @@
               if (s) s.video_url = updated.video_url;
               if (state.activeStepId === stepId) renderCanvasVideo(s);
               setSaveStatus('saved');
+              refreshNonCanvasStepThumb(stepId);
               pushStepUndo({
                 type: 'edit-video-url',
                 label: 'edited video URL',
@@ -3073,6 +3712,237 @@
     return { icon: 'fas fa-shapes', label: o.type || 'Object' };
   }
 
+  // Refresh the canvas-area's slide-number overlay to show the active
+  // step's step_number. Called from switchToStep + the initial-load
+  // path so the overlay always matches what's on the canvas.
+  function refreshCanvasStepNum() {
+    if (!dom.canvasStepNum) return;
+    if (!state.activeStepId) { dom.canvasStepNum.textContent = ''; return; }
+    var s = state.steps.find(function (x) { return x.id === state.activeStepId; });
+    dom.canvasStepNum.textContent = (s && s.step_number != null)
+      ? String(s.step_number)
+      : '';
+  }
+
+  // -----------------------------------------------------------------
+  // Custom colour-picker popover (Safari-style preset swatches +
+  // Custom… fallback to the native input). Chrome's built-in colour
+  // picker doesn't show presets, so we render our own popover and
+  // intercept clicks on the wired <input type=color> elements.
+  // -----------------------------------------------------------------
+  var COLOR_PRESETS = [
+    // Greys + mono
+    '#ffffff', '#f8f9fa', '#dee2e6', '#adb5bd', '#6c757d', '#212529', '#000000',
+    // Reds / pinks
+    '#ffd1d1', '#ff7a7a', '#c8312a', '#821812',
+    // Oranges / yellows
+    '#ffe1b3', '#ffb347', '#d97706', '#fff3b0', '#ffdf3f', '#e5b800',
+    // Greens
+    '#c8f5cf', '#5ec075', '#2c8a3f',
+    // Blues
+    '#b3def7', '#4a90d9', '#0d6efd', '#1e63a3',
+    // Purples
+    '#d5c8f5', '#8e6bd9', '#fdcef2', '#d957bd',
+  ];
+  var _colorPopover = {
+    node: null, grid: null, native: null,
+    currentTrigger: null, onChange: null,
+  };
+  function _ensureColorPopover() {
+    if (_colorPopover.node) return _colorPopover.node;
+    var node = document.createElement('div');
+    node.className = 'ib-color-popover';
+    node.style.display = 'none';
+    node.innerHTML =
+      '<div class="ib-color-popover-grid"></div>' +
+      '<div class="ib-color-popover-footer">' +
+      '  <button type="button" class="ib-color-popover-custom-btn">' +
+      '    <i class="fas fa-droplet me-1"></i>Custom…' +
+      '  </button>' +
+      '</div>' +
+      '<input type="color" class="ib-color-popover-native" value="#ffffff">';
+    document.body.appendChild(node);
+    _colorPopover.node      = node;
+    _colorPopover.grid      = node.querySelector('.ib-color-popover-grid');
+    _colorPopover.native    = node.querySelector('.ib-color-popover-native');
+    _colorPopover.customBtn = node.querySelector('.ib-color-popover-custom-btn');
+    // Build the grid once.
+    _colorPopover.grid.innerHTML = COLOR_PRESETS.map(function (hex) {
+      return (
+        '<button type="button" class="ib-color-popover-swatch"' +
+        ' style="background:' + hex + '" data-color="' + hex + '"' +
+        ' title="' + hex + '"></button>'
+      );
+    }).join('');
+    _colorPopover.grid.addEventListener('click', function (e) {
+      var sw = e.target.closest('.ib-color-popover-swatch');
+      if (!sw) return;
+      _commitColorPopover(sw.dataset.color, true);
+    });
+    _colorPopover.native.addEventListener('input', function () {
+      _commitColorPopover(_colorPopover.native.value, false);
+    });
+    _colorPopover.native.addEventListener('change', function () {
+      _commitColorPopover(_colorPopover.native.value, true);
+    });
+    _colorPopover.customBtn.addEventListener('click', function () {
+      _colorPopover.native.click();
+    });
+    // Outside-click + Esc.
+    document.addEventListener('mousedown', function (e) {
+      if (!_colorPopover.node || _colorPopover.node.style.display === 'none') return;
+      if (_colorPopover.node.contains(e.target)) return;
+      if (_colorPopover.currentTrigger && _colorPopover.currentTrigger.contains(e.target)) return;
+      closeColorPopover();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && _colorPopover.node &&
+          _colorPopover.node.style.display !== 'none') {
+        closeColorPopover();
+      }
+    });
+    return node;
+  }
+  function _commitColorPopover(color, closeAfter) {
+    if (_colorPopover.onChange) {
+      try { _colorPopover.onChange(color); } catch (_) {}
+    }
+    if (closeAfter) closeColorPopover();
+  }
+  function closeColorPopover() {
+    if (_colorPopover.node) _colorPopover.node.style.display = 'none';
+    _colorPopover.currentTrigger = null;
+    _colorPopover.onChange = null;
+  }
+  function openColorPopover(triggerEl, initialColor, onChange) {
+    var node = _ensureColorPopover();
+    _colorPopover.currentTrigger = triggerEl;
+    _colorPopover.onChange = onChange;
+    var hex = _toHex6(initialColor);
+    _colorPopover.native.value = hex;
+    Array.prototype.forEach.call(
+      node.querySelectorAll('.ib-color-popover-swatch'),
+      function (sw) {
+        sw.classList.toggle('is-active',
+          sw.dataset.color.toLowerCase() === hex);
+      });
+    node.style.display = 'block';
+    // Position next to trigger; flip above if no room below.
+    var rect = triggerEl.getBoundingClientRect();
+    var popRect = node.getBoundingClientRect();
+    var x = rect.left;
+    var y = rect.bottom + 6;
+    if (y + popRect.height > window.innerHeight - 8) {
+      y = rect.top - popRect.height - 6;
+    }
+    if (x + popRect.width > window.innerWidth - 8) {
+      x = window.innerWidth - popRect.width - 8;
+    }
+    node.style.left = Math.max(8, x) + 'px';
+    node.style.top  = Math.max(8, y) + 'px';
+  }
+  // Helper: replace the native picker on a given <input type=color>
+  // with the custom popover. Intercepts clicks (preventDefault so
+  // the OS dialog doesn't open) and proxies value-changes through
+  // the existing input/change listeners by mutating .value and
+  // dispatching events on the input.
+  function wireSwatchPicker(input) {
+    if (!input || input.dataset.ibSwatch === '1') return;
+    input.dataset.ibSwatch = '1';
+    input.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      openColorPopover(input, input.value, function (color) {
+        input.value = color;
+        input.dispatchEvent(new Event('input',  { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+  }
+
+  // Convert any CSS colour string (rgb / rgba / #rgb / #rrggbb /
+  // #rrggbbaa / named via a temp DOM probe) to a 7-character #rrggbb
+  // hex so native <input type=color> accepts it. Falls back to
+  // white for anything we can't parse.
+  function _toHex6(color) {
+    if (!color) return '#ffffff';
+    color = String(color).trim();
+    if (/^#[0-9a-f]{6}$/i.test(color)) return color.toLowerCase();
+    if (/^#[0-9a-f]{8}$/i.test(color)) return color.slice(0, 7).toLowerCase();
+    if (/^#[0-9a-f]{3}$/i.test(color)) {
+      return ('#' + color[1] + color[1] + color[2] + color[2] +
+              color[3] + color[3]).toLowerCase();
+    }
+    var m = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+    if (m) {
+      var toHex = function (n) {
+        var h = Math.max(0, Math.min(255, parseInt(n, 10))).toString(16);
+        return h.length === 1 ? '0' + h : h;
+      };
+      return ('#' + toHex(m[1]) + toHex(m[2]) + toHex(m[3])).toLowerCase();
+    }
+    // Named colour or anything else — probe via a DOM element.
+    try {
+      var probe = document.createElement('div');
+      probe.style.color = color;
+      document.body.appendChild(probe);
+      var resolved = getComputedStyle(probe).color;
+      document.body.removeChild(probe);
+      var rm = resolved.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+      if (rm) {
+        var h = function (n) {
+          var v = Math.max(0, Math.min(255, parseInt(n, 10))).toString(16);
+          return v.length === 1 ? '0' + v : v;
+        };
+        return ('#' + h(rm[1]) + h(rm[2]) + h(rm[3])).toLowerCase();
+      }
+    } catch (_) {}
+    return '#ffffff';
+  }
+
+  // Sync EVERY visible bg-colour input to the live canvas background.
+  // Called from renderLayersList, loadCanvasFromStep, and every
+  // bg-change writer so the Layers pane + HUD + active tile's menu
+  // input all agree on what the canvas actually shows. Without this
+  // the Layers pane could show white even after a yellow was set
+  // via the HUD or per-tile menu.
+  function syncCanvasBgPicker() {
+    if (!state.canvas) return;
+    var hex = _toHex6(state.canvas.backgroundColor);
+    if (dom.canvasBgInput) dom.canvasBgInput.value = hex;
+    // HUD input (when rendered).
+    var hudInput = document.getElementById('ib-hud-bg-color');
+    if (hudInput) hudInput.value = hex;
+    // Active step's tile-menu input (when rendered + open).
+    if (state.activeStepId) {
+      var tileInput = document.getElementById('ib-step-bg-' + state.activeStepId);
+      if (tileInput) tileInput.value = hex;
+    }
+  }
+
+  function onCanvasBgChange() {
+    if (!state.canvas || !dom.canvasBgInput) return;
+    var hex = dom.canvasBgInput.value || '#ffffff';
+    state.canvas.backgroundColor = hex;
+    state.canvas.requestRenderAll();
+    // Mirror the new colour to the HUD's bg input and the active
+    // step's tile-menu input so all three pickers stay in step
+    // regardless of which one the user changed.
+    syncCanvasBgPicker();
+    // Background changes are part of canvas state — autosave + undo
+    // snapshot so the step's saved canvas_json keeps the new colour.
+    scheduleAutosave();
+    scheduleSnapshot();
+  }
+
+  function onCanvasBgClear() {
+    if (!state.canvas || !dom.canvasBgInput) return;
+    state.canvas.backgroundColor = '#ffffff';
+    state.canvas.requestRenderAll();
+    syncCanvasBgPicker();
+    scheduleAutosave();
+    scheduleSnapshot();
+  }
+
   function renderLayersList() {
     if (!dom.layersList) return;
     if (!state.canvas) {
@@ -3201,29 +4071,103 @@
   // paint a real mini canvas preview into each tile's .preview slot.
   if (!state.stepThumbs) state.stepThumbs = {};
 
+  // Single shared body-level tooltip element used by .ib-step-tile
+  // hover. Lives at <body> root so the filmstrip body's overflow
+  // can't clip it. Lazily created on first hover.
+  var _tileTooltipEl = null;
+  var _tileTooltipShowTimer = null;
+  function _ensureTileTooltipEl() {
+    if (_tileTooltipEl) return _tileTooltipEl;
+    var el = document.createElement('div');
+    el.className = 'ib-tile-tooltip';
+    document.body.appendChild(el);
+    _tileTooltipEl = el;
+    return el;
+  }
+  function showTileTooltip(tile) {
+    // If the tile's … menu is open, skip the tooltip so they don't
+    // overlap.
+    var menu = tile.querySelector('.ib-step-tile-menu');
+    if (menu && menu.classList.contains('show')) return;
+    var text = tile.getAttribute('data-tooltip');
+    if (!text) return;
+    var el = _ensureTileTooltipEl();
+    el.textContent = text;
+    // Position above the tile, centred. Measure after the textContent
+    // is set so width is accurate.
+    var tRect = tile.getBoundingClientRect();
+    // Briefly add to body invisibly to read width/height.
+    el.style.left = '-9999px';
+    el.style.top  = '-9999px';
+    el.classList.remove('is-visible');
+    // Force reflow then read dimensions.
+    void el.offsetWidth;
+    var ttRect = el.getBoundingClientRect();
+    var x = tRect.left + (tRect.width  - ttRect.width)  / 2;
+    var y = tRect.top  - ttRect.height - 6;
+    // Clamp within viewport so the tooltip doesn't paint offscreen
+    // when the tile is near the edge of the strip.
+    x = Math.max(4, Math.min(window.innerWidth  - ttRect.width  - 4, x));
+    y = Math.max(4, y);
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    if (_tileTooltipShowTimer) clearTimeout(_tileTooltipShowTimer);
+    _tileTooltipShowTimer = setTimeout(function () {
+      el.classList.add('is-visible');
+    }, 200);
+  }
+  function hideTileTooltip() {
+    if (_tileTooltipShowTimer) {
+      clearTimeout(_tileTooltipShowTimer);
+      _tileTooltipShowTimer = null;
+    }
+    if (_tileTooltipEl) _tileTooltipEl.classList.remove('is-visible');
+  }
+
+  // Pretty labels for step types, shown under the editable title on
+  // each filmstrip tile. Keys are step_type values; unknown / blank
+  // collapses to "Blank".
+  var STEP_TYPE_LABEL = {
+    photo:     'Photo',
+    schematic: 'Schematic',
+    text:      'Text',
+    video:     'Video',
+    blank:     'Blank',
+  };
+  function stepTypeIcon(stepType) {
+    return ({
+      photo:     'fa-image',
+      schematic: 'fa-diagram-project',
+      text:      'fa-pen-to-square',
+      video:     'fa-video',
+    })[stepType] || 'fa-square';
+  }
+
   function renderFilmstrip() {
     if (!dom.filmstripTrack) return;
-    // The delete control is disabled (still rendered) on the only-step
-    // case — that way the user sees the affordance and gets a hint via
-    // the title attribute / toast rather than the button silently
-    // disappearing.
+    // Delete is disabled (but still rendered in the menu) on the
+    // only-step case so the user sees the affordance and gets a hint
+    // via the title attribute / toast rather than a silent omission.
     var isOnlyStep = state.steps.length === 1;
     var html = state.steps.map(function (s) {
       var isActive = (s.id === state.activeStepId);
-      var caption = (s.title && s.title.trim()) ? s.title : 'Untitled';
-      var badge = stepTypeBadgeHtml(currentStepTypeOf(s));
+      var stepType = currentStepTypeOf(s);
+      var typeLabel = STEP_TYPE_LABEL[stepType] || 'Blank';
+      var typeIcon  = stepTypeIcon(stepType);
+      var title = (s.title && s.title.trim()) ? s.title : 'Untitled';
       var deleteTitle = isOnlyStep
         ? "Can't delete the only step"
         : 'Delete step ' + s.step_number;
-      var deleteBtn = (
-        '<button type="button" class="ib-step-tile-delete"' +
-        '        data-step-id="' + s.id + '"' +
-        '        aria-label="' + escapeHtml(deleteTitle) + '"' +
-        '        title="' + escapeHtml(deleteTitle) + '"' +
-                (isOnlyStep ? ' disabled' : '') + '>' +
-        '<i class="fas fa-xmark"></i>' +
-        '</button>'
-      );
+      // Read the current bg colour off the step's stored canvas_json
+      // so the colour input opens already pointing at the right hex.
+      var bgHex = '#ffffff';
+      if (s.canvas_json) {
+        try {
+          var parsed = JSON.parse(s.canvas_json);
+          var bg = parsed && parsed.background;
+          if (typeof bg === 'string' && /^#[0-9a-f]{6}$/i.test(bg)) bgHex = bg;
+        } catch (_) {}
+      }
       // Preview content: either a cached thumbnail dataURL drawn as a
       // background image, or a step-type icon + fallback label.
       var thumb = state.stepThumbs[s.id];
@@ -3235,19 +4179,69 @@
       } else {
         previewInner = '<span>step ' + s.step_number + '</span>';
       }
+      // Per-tile … menu. Bootstrap dropdown with data-bs-auto-close=
+      // "outside" so clicking the editable title inside the menu
+      // doesn't immediately close it. The button itself is hidden
+      // via CSS until tile hover / active / focus / menu-open.
+      var menu = (
+        '<div class="ib-step-tile-menu dropdown">' +
+        '  <button type="button" class="ib-step-tile-menu-btn"' +
+        '          data-bs-toggle="dropdown" data-bs-strategy="fixed"' +
+        '          data-bs-auto-close="outside"' +
+        '          aria-expanded="false" aria-label="Step actions"' +
+        '          title="Step actions">' +
+        '    <i class="fas fa-ellipsis"></i>' +
+        '  </button>' +
+        '  <ul class="dropdown-menu dropdown-menu-end ib-step-tile-menu-list">' +
+        '    <li class="ib-step-tile-menu-head">' +
+        '      <div class="ib-step-tile-menu-title"' +
+        '           data-step-id="' + s.id + '"' +
+        '           title="Click to rename">' +
+                  escapeHtml(title) +
+        '      </div>' +
+        '      <div class="ib-step-tile-menu-type">' +
+        '        <i class="fas ' + typeIcon + ' me-1"></i>' + typeLabel +
+        '      </div>' +
+        '    </li>' +
+        '    <li><hr class="dropdown-divider"></li>' +
+        '    <li>' +
+        '      <label class="dropdown-item ib-step-tile-bg-item" ' +
+        '             for="ib-step-bg-' + s.id + '">' +
+        '        <i class="fas fa-fill-drip me-2"></i>Background colour…' +
+        '        <input type="color" id="ib-step-bg-' + s.id + '" ' +
+        '               class="ib-step-tile-bg-input"' +
+        '               value="' + bgHex + '"' +
+        '               data-step-id="' + s.id + '">' +
+        '      </label>' +
+        '    </li>' +
+        '    <li><hr class="dropdown-divider"></li>' +
+        '    <li>' +
+        '      <button type="button"' +
+        '              class="dropdown-item text-danger ib-step-tile-delete"' +
+        '              data-step-id="' + s.id + '"' +
+        '              title="' + escapeHtml(deleteTitle) + '"' +
+        (isOnlyStep ? ' disabled' : '') + '>' +
+        '        <i class="fas fa-trash me-2"></i>Delete step' +
+        '      </button>' +
+        '    </li>' +
+        '  </ul>' +
+        '</div>'
+      );
+      // Tile body: num pip + … menu in the header, preview below.
+      // Title + type are surfaced in the popup menu (above) AND via
+      // the hover tooltip painted via ::after using data-tooltip.
+      var tooltipText = title + ' · ' + typeLabel;
       return (
         '<div class="ib-step-tile' + (isActive ? ' is-active' : '') + '"' +
         '     draggable="true"' +
-        '     data-step-id="' + s.id + '">' +
-        '  <div class="ib-step-tile-num">' + s.step_number + '</div>' +
-        badge +
-        deleteBtn +
+        '     data-step-id="' + s.id + '"' +
+        '     data-tooltip="' + escapeHtml(tooltipText) + '">' +
+        '  <header class="ib-step-tile-head">' +
+        '    <div class="ib-step-tile-num">' + s.step_number + '</div>' +
+                menu +
+        '  </header>' +
         '  <div class="ib-step-tile-preview' + (thumb ? ' has-thumb' : '') + '"' +
               previewStyle + '>' + previewInner + '</div>' +
-        '  <div class="ib-step-tile-caption" title="' + escapeHtml(caption) +
-              '" data-step-id="' + s.id + '">' +
-                escapeHtml(caption) +
-        '</div>' +
         '</div>'
       );
     }).join('');
@@ -3261,13 +4255,21 @@
     Array.prototype.forEach.call(dom.filmstripTrack.querySelectorAll('.ib-step-tile'),
       function (tile) {
         tile.addEventListener('click', function (ev) {
-          // Don't fire step-switch when the click landed on the delete
-          // button — that has its own handler below.
-          if (ev.target && ev.target.closest && ev.target.closest('.ib-step-tile-delete')) {
+          // Clicks inside the … menu or any input should not also
+          // trigger a step-switch.
+          if (ev.target && ev.target.closest && (
+              ev.target.closest('.ib-step-tile-menu') ||
+              ev.target.closest('input'))) {
             return;
           }
           var id = parseInt(tile.dataset.stepId, 10);
           if (id && id !== state.activeStepId) switchToStep(id);
+        });
+        tile.addEventListener('mouseenter', function () {
+          showTileTooltip(tile);
+        });
+        tile.addEventListener('mouseleave', function () {
+          hideTileTooltip();
         });
         // Drag-to-reorder — drop fires a PUT step_number.
         tile.addEventListener('dragstart', function (e) {
@@ -3292,8 +4294,52 @@
         });
       });
 
-    // Wire the per-tile delete buttons. Bound separately so the click
-    // doesn't bubble into the tile's switchToStep handler.
+    // Initialise each tile's … dropdown with Popper's `fixed`
+    // strategy so the menu escapes the filmstrip body's overflow
+    // context.
+    //
+    // We ALSO portal the menu element into document.body on show
+    // (and back to its original parent on hide). The filmstrip body
+    // has `overflow-x: auto; overflow-y: hidden` and some browsers
+    // still clip a position:fixed descendant when an ancestor has
+    // overflow set — the bullet-proof fix is rehoming the menu to
+    // the root so no ancestor can clip it.
+    Array.prototype.forEach.call(
+      dom.filmstripTrack.querySelectorAll('.ib-step-tile-menu-btn'),
+      function (btn) {
+        if (window.bootstrap && window.bootstrap.Dropdown) {
+          window.bootstrap.Dropdown.getOrCreateInstance(btn, {
+            popperConfig: function (defaultBsPopperConfig) {
+              defaultBsPopperConfig.strategy = 'fixed';
+              return defaultBsPopperConfig;
+            },
+          });
+        }
+        btn.addEventListener('click', function (ev) { ev.stopPropagation(); });
+        btn.addEventListener('mousedown', function (ev) { ev.stopPropagation(); });
+        btn.addEventListener('dragstart', function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        // Portal-on-show: move the menu element to <body> right
+        // before Bootstrap positions it, then move it back when it
+        // closes so the next open still finds it next to its trigger.
+        var menuEl = btn.parentElement &&
+          btn.parentElement.querySelector('.ib-step-tile-menu-list');
+        if (menuEl) {
+          var originalParent = btn.parentElement;
+          btn.addEventListener('show.bs.dropdown', function () {
+            document.body.appendChild(menuEl);
+          });
+          btn.addEventListener('hidden.bs.dropdown', function () {
+            if (originalParent && originalParent.isConnected) {
+              originalParent.appendChild(menuEl);
+            }
+          });
+        }
+      });
+
+    // Per-tile Delete menu item (now inside the … dropdown).
     Array.prototype.forEach.call(
       dom.filmstripTrack.querySelectorAll('.ib-step-tile-delete'),
       function (btn) {
@@ -3307,24 +4353,107 @@
           var id = parseInt(btn.dataset.stepId, 10);
           if (id) onDeleteStepClick(id);
         });
-        // Drag events on the tile shouldn't start when the user is
-        // mousing down on the delete button.
-        btn.addEventListener('mousedown', function (ev) { ev.stopPropagation(); });
-        btn.addEventListener('dragstart', function (ev) { ev.preventDefault(); ev.stopPropagation(); });
       });
 
-    // Inline rename: double-click the caption to edit. Saves on blur or
-    // Enter; Escape reverts. Single-click on the tile body still
-    // switches steps via the tile-level click handler above.
+    // Per-tile Background colour menu item — native <input type=color>
+    // inside a label that's the dropdown item. Clicking the label
+    // opens the OS colour picker; on `input` events we set the live
+    // canvas (if this is the active step) and persist to the step's
+    // canvas_json on `change` so non-active steps update too.
     Array.prototype.forEach.call(
-      dom.filmstripTrack.querySelectorAll('.ib-step-tile-caption'),
-      function (cap) {
-        cap.addEventListener('dblclick', function (ev) {
-          ev.stopPropagation();
-          ev.preventDefault();
-          startStepCaptionEdit(cap);
+      dom.filmstripTrack.querySelectorAll('.ib-step-tile-bg-input'),
+      function (input) {
+        // Don't switch steps when the label is clicked.
+        input.addEventListener('click', function (ev) { ev.stopPropagation(); });
+        // Open the preset-swatch popover instead of the bare OS picker.
+        wireSwatchPicker(input);
+        input.addEventListener('input', function () {
+          var sid = parseInt(input.dataset.stepId, 10);
+          if (sid && sid === state.activeStepId && state.canvas) {
+            state.canvas.backgroundColor = input.value;
+            state.canvas.requestRenderAll();
+            syncCanvasBgPicker();
+            scheduleAutosave();
+            scheduleSnapshot();
+          }
+        });
+        input.addEventListener('change', function () {
+          var sid = parseInt(input.dataset.stepId, 10);
+          if (!sid) return;
+          if (sid === state.activeStepId) {
+            // Live state has already been updated by the input handler;
+            // the autosave debounce will PUT canvas_json with the new bg.
+            return;
+          }
+          // Non-active step: update canvas_json directly and PUT.
+          setStepBackgroundColor(sid, input.value);
         });
       });
+
+    // Per-tile editable title — now lives inside the … menu's
+    // header. Click swaps the static text for an input; Enter / blur
+    // saves; Escape reverts. data-bs-auto-close="outside" on the
+    // dropdown keeps the menu open while editing.
+    Array.prototype.forEach.call(
+      dom.filmstripTrack.querySelectorAll('.ib-step-tile-menu-title'),
+      function (titleEl) {
+        titleEl.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          ev.preventDefault();
+          startStepCaptionEdit(titleEl);
+        });
+      });
+
+    // The background-colour label needs explicit stopPropagation on
+    // its own clicks so Bootstrap's outside-close logic doesn't see
+    // them as outside-click candidates. for="…" still fires the
+    // native colour picker on the input below.
+    Array.prototype.forEach.call(
+      dom.filmstripTrack.querySelectorAll('.ib-step-tile-bg-item'),
+      function (lbl) {
+        lbl.addEventListener('click', function (ev) { ev.stopPropagation(); });
+      });
+  }
+
+  // Update a step's canvas_json background colour without going
+  // through the live Fabric canvas — used by the per-tile colour
+  // picker when the picked step isn't the active one.
+  async function setStepBackgroundColor(stepId, hex) {
+    var step = state.steps.find(function (s) { return s.id === stepId; });
+    if (!step) return;
+    var parsed;
+    try { parsed = step.canvas_json ? JSON.parse(step.canvas_json) : {}; }
+    catch (_) { parsed = {}; }
+    parsed.background = hex;
+    var nextJson = JSON.stringify(parsed);
+    step.canvas_json = nextJson;
+    try {
+      setSaveStatus('saving', 'Saving…');
+      await putStep(stepId, { canvas_json: nextJson });
+      setSaveStatus('saved');
+      // Refresh that step's thumbnail so the new bg shows in the strip.
+      refreshNonCanvasStepThumb(stepId);
+      // For photo/blank, regenerate the rasterised thumb.
+      var t = step.step_type || 'photo';
+      if (t === 'photo' || t === 'blank') {
+        try {
+          var url = await _renderOneStepThumb(nextJson, step.step_number);
+          state.stepThumbs[stepId] = url;
+          var tile = dom.filmstripTrack &&
+            dom.filmstripTrack.querySelector('.ib-step-tile[data-step-id="' + stepId + '"]');
+          if (tile) {
+            var preview = tile.querySelector('.ib-step-tile-preview');
+            if (preview && url) {
+              preview.style.backgroundImage = "url('" + url + "')";
+              preview.classList.add('has-thumb');
+              preview.innerHTML = '';
+            }
+          }
+        } catch (_) {}
+      }
+    } catch (_) {
+      setSaveStatus('error', 'Background save failed');
+    }
   }
 
   // Replace a caption span with an inline input, save on blur / Enter,
@@ -3351,18 +4480,34 @@
       if (done) return;
       done = true;
       var next = saveIt ? input.value.trim() : original;
-      // Restore the span before any await — keeps the strip stable.
+      // Restore the menu-header title div. New click handler mirrors
+      // the one bound in renderFilmstrip so the rebuilt node behaves
+      // identically (click → re-enter edit). The tile's hover tooltip
+      // also gets the new title.
       var span = document.createElement('div');
-      span.className = 'ib-step-tile-caption';
+      span.className = 'ib-step-tile-menu-title';
       span.dataset.stepId = String(stepId);
-      span.title = next || 'Untitled';
+      span.title = 'Click to rename';
       span.textContent = next || 'Untitled';
-      span.addEventListener('dblclick', function (ev) {
+      span.addEventListener('click', function (ev) {
         ev.stopPropagation();
         ev.preventDefault();
         startStepCaptionEdit(span);
       });
       input.replaceWith(span);
+      // Also refresh the tile's hover-tooltip text so the dark popup
+      // reflects the new name without waiting for a full re-render.
+      var tile = dom.filmstripTrack &&
+        dom.filmstripTrack.querySelector(
+          '.ib-step-tile[data-step-id="' + stepId + '"]');
+      if (tile && step) {
+        var stepType = currentStepTypeOf(step);
+        var typeLabel = STEP_TYPE_LABEL[stepType] || 'Blank';
+        tile.setAttribute(
+          'data-tooltip',
+          (next || 'Untitled') + ' · ' + typeLabel
+        );
+      }
       if (saveIt && next !== original) {
         renameStepFromFilmstrip(step, next);
       }
@@ -3437,33 +4582,424 @@
     return _stepThumbCanvas;
   }
 
-  function _renderOneStepThumb(canvasJsonString) {
+  // Render a 1:1 mini of the photo/blank canvas — including its
+  // background colour AND any placed background image — and stamp
+  // the current step number on top-left so the strip reads like
+  // PowerPoint's slide thumbnails. The step number is passed in so
+  // it can renumber freely when steps are added/deleted/reordered.
+  function _renderOneStepThumb(canvasJsonString, stepNumber) {
     return new Promise(function (resolve) {
       var c = _ensureThumbCanvas();
       if (!c) return resolve(null);
       if (!canvasJsonString) {
         c.clear();
+        // No saved JSON yet — start with a white surface and stamp
+        // the step number so the tile is still recognisable.
         c.backgroundColor = '#ffffff';
-        c.renderAll();
-        try {
-          resolve(c.toDataURL({
-            format: 'png',
-            multiplier: STEP_THUMB_W / CANVAS_W,
-          }));
-        } catch (_) { resolve(null); }
-        return;
+        _paintStepNumberOnThumb(c, stepNumber);
+        return _exportThumb(c, resolve);
       }
       try {
-        c.loadFromJSON(canvasJsonString, function () {
-          c.backgroundColor = '#ffffff';
-          c.renderAll();
-          try {
-            resolve(c.toDataURL({
-              format: 'png',
-              multiplier: STEP_THUMB_W / CANVAS_W,
-            }));
-          } catch (_) { resolve(null); }
+        // Fabric v6's loadFromJSON returns a Promise; the 2nd
+        // argument is a PER-OBJECT reviver, NOT a completion
+        // callback. Passing a function there made our paint+export
+        // fire ONCE PER LOADED OBJECT, racing across thumb renders
+        // and producing the "step 1 shows step 4's preview" swap
+        // bug. Use the returned Promise so we only paint + export
+        // when EVERY object on the saved canvas is fully loaded.
+        var result = c.loadFromJSON(canvasJsonString);
+        Promise.resolve(result).then(function () {
+          // KEEP the loaded backgroundColor (was previously hard-set
+          // to '#ffffff' here, which stomped the user's chosen bg).
+          // If the saved JSON had no background field, Fabric falls
+          // back to its default which is white.
+          _paintStepNumberOnThumb(c, stepNumber);
+          _exportThumb(c, resolve);
+        }).catch(function () { resolve(null); });
+      } catch (_) { resolve(null); }
+    });
+  }
+
+  // Stamp the step number on top-left of the thumb canvas. Drawn at
+  // the same proportional size + opacity as the editor's
+  // .ib-canvas-step-num overlay so the thumb mirrors what the user
+  // sees while editing.
+  function _paintStepNumberOnThumb(c, stepNumber) {
+    if (stepNumber == null) return;
+    var label = String(stepNumber);
+    // ~7 % of canvas width per character so multi-digit numbers stay
+    // readable. Min 100 px so single digits still feel substantial.
+    var fontSize = Math.max(100, CANVAS_W * 0.10);
+    c.add(new fabric.Text(label, {
+      left: 36,
+      top:  20,
+      fontSize: fontSize,
+      fill: 'rgba(33, 37, 41, 0.55)',
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+      fontWeight: '900',
+      originX: 'left',
+      originY: 'top',
+      selectable: false, evented: false,
+      // Mark as excluded-from-export so it isn't picked up by any
+      // future "export this step's canvas" path — the number is a
+      // UI label, not part of the artwork.
+      excludeFromExport: true,
+    }));
+  }
+
+  // Render a "type-badge" thumbnail for non-canvas step types
+  // (schematic, text, video). Each gets a coloured background, a
+  // large type indicator and a snippet of the step's content so the
+  // user can tell tiles apart at a glance.
+  function _renderTypeBadgeThumb(step) {
+    return new Promise(function (resolve) {
+      var c = _ensureThumbCanvas();
+      if (!c) return resolve(null);
+      try { c.clear(); } catch (_) {}
+      var type = (step && step.step_type) || 'blank';
+      // New 1:1-canvas-preview path: text → rendered body, video →
+      // YouTube poster + play button, schematic → grid + icon hint,
+      // anything else → bg colour + title. Output is the FULL
+      // CANVAS_W × CANVAS_H scene at scaled-down size so the tile
+      // (aspect-ratio: 4 / 3, background-size: contain) gets a
+      // pixel-accurate mini.
+      // Each painter handles its own bg/content; the step-number
+      // overlay is stamped LAST by _exportThumb so it sits on top of
+      // every type's content (mirrors the editor's overlay).
+      var stepNumber = step && step.step_number;
+      if (type === 'text') {
+        _paintTextThumb(c, step);
+        _paintStepNumberOnThumb(c, stepNumber);
+        return _exportThumb(c, resolve);
+      }
+      if (type === 'video') {
+        return _paintVideoThumb(c, step, function () {
+          _paintStepNumberOnThumb(c, stepNumber);
+          _exportThumb(c, resolve);
         });
+      }
+      if (type === 'schematic') {
+        _paintSchematicThumb(c, step);
+        _paintStepNumberOnThumb(c, stepNumber);
+        return _exportThumb(c, resolve);
+      }
+      _paintBlankThumb(c, step);
+      _paintStepNumberOnThumb(c, stepNumber);
+      return _exportThumb(c, resolve);
+    });
+  }
+
+  // Helper: render the StaticCanvas + emit a downscaled PNG.
+  function _exportThumb(c, resolve) {
+    c.renderAll();
+    try {
+      resolve(c.toDataURL({
+        format: 'png',
+        multiplier: STEP_THUMB_W / CANVAS_W,
+      }));
+    } catch (_) { resolve(null); }
+  }
+
+  // Text step → light card with the first few lines of the body
+  // painted in the same Courier-ish font the live editor uses.
+  // Read the step's canvas_json background colour (set via the
+  // Layers pane / HUD / per-tile menu) so non-canvas previews
+  // (text, schematic) match the user-set page colour.
+  function _stepBgColor(step, fallback) {
+    if (!step) return fallback;
+    if (step.canvas_json) {
+      try {
+        var parsed = JSON.parse(step.canvas_json);
+        if (parsed && typeof parsed.background === 'string') {
+          return parsed.background;
+        }
+      } catch (_) {}
+    }
+    return fallback;
+  }
+
+  function _paintTextThumb(c, step) {
+    // Honour the step's canvas background colour — was hard-set to
+    // a fixed light-grey, ignoring the user's per-step choice.
+    c.backgroundColor = _stepBgColor(step, '#f4f6f8');
+    var pad = 80;
+    var pageW = CANVAS_W - pad * 2;
+    var pageH = CANVAS_H - pad * 2;
+    c.add(new fabric.Rect({
+      left: pad, top: pad, width: pageW, height: pageH,
+      fill: '#ffffff', stroke: '#dee2e6', strokeWidth: 3,
+      rx: 16, ry: 16,
+      selectable: false, evented: false,
+    }));
+    var body = (step && step.body) || '';
+    if (body.trim()) {
+      var raw = String(body).replace(/\r/g, '');
+      var lines = raw.split('\n').slice(0, 14);
+      var preview = lines.map(function (l) {
+        return l.length > 64 ? l.slice(0, 62) + '…' : l;
+      }).join('\n');
+      c.add(new fabric.Text(preview, {
+        left: pad + 32, top: pad + 32,
+        fontSize: 30, fill: '#212529',
+        fontFamily: '"Courier New", "Source Code Pro", ui-monospace, monospace',
+        originX: 'left', originY: 'top',
+        selectable: false, evented: false,
+      }));
+    } else {
+      c.add(new fabric.Text("Write this step's text…", {
+        left: CANVAS_W / 2, top: CANVAS_H / 2,
+        fontSize: 56, fill: '#adb5bd',
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+        originX: 'center', originY: 'center',
+        selectable: false, evented: false,
+      }));
+    }
+  }
+
+  // Video step → black backdrop + YouTube poster (when extractable)
+  // + play triangle on top. URL hint when not YouTube.
+  function _paintVideoThumb(c, step, done) {
+    c.backgroundColor = '#000000';
+    var url = (step && step.video_url) || '';
+    var ytId = typeof extractYouTubeId === 'function' ? extractYouTubeId(url) : null;
+    function paintPlayBtn() {
+      c.add(new fabric.Triangle({
+        left: CANVAS_W / 2, top: CANVAS_H / 2,
+        width: 240, height: 220,
+        fill: 'rgba(255,255,255,0.9)',
+        angle: 90,
+        originX: 'center', originY: 'center',
+        selectable: false, evented: false,
+      }));
+      if (url) {
+        var shortUrl = url.length > 60 ? url.slice(0, 58) + '…' : url;
+        c.add(new fabric.Text(shortUrl, {
+          left: CANVAS_W / 2, top: CANVAS_H - 80,
+          fontSize: 26, fill: '#dee2e6',
+          fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+          originX: 'center', originY: 'top',
+          selectable: false, evented: false,
+        }));
+      }
+    }
+    if (ytId) {
+      var posterUrl = 'https://img.youtube.com/vi/' +
+        encodeURIComponent(ytId) + '/hqdefault.jpg';
+      var loader = fabric.Image.fromURL(posterUrl, { crossOrigin: 'anonymous' });
+      Promise.resolve(loader).then(function (img) {
+        if (!img) { paintPlayBtn(); done(); return; }
+        var scale = Math.max(CANVAS_W / img.width, CANVAS_H / img.height);
+        img.set({
+          left: (CANVAS_W - img.width  * scale) / 2,
+          top:  (CANVAS_H - img.height * scale) / 2,
+          scaleX: scale, scaleY: scale,
+          selectable: false, evented: false,
+        });
+        c.add(img);
+        c.add(new fabric.Triangle({
+          left: CANVAS_W / 2, top: CANVAS_H / 2,
+          width: 200, height: 180,
+          fill: 'rgba(255,255,255,0.85)',
+          angle: 90,
+          originX: 'center', originY: 'center',
+          selectable: false, evented: false,
+        }));
+        done();
+      }).catch(function () { paintPlayBtn(); done(); });
+      return;
+    }
+    paintPlayBtn();
+    done();
+  }
+
+  // Schematic step → use the cached PNG snapshot of the schematic
+  // iframe (requested over postMessage on mount + after every save).
+  // Until the snapshot arrives, fall back to a dot-grid placeholder.
+  // The schematic editor is iframed so the parent can't rasterise it
+  // directly — captureSchematicPng() on the editor side does the
+  // heavy lifting and posts the data URL back.
+  function _paintSchematicThumb(c, step) {
+    c.backgroundColor = _stepBgColor(step, '#f8f9fa');
+    var snap = state.schematicSnapshotImg;
+    if (snap && snap.width > 0 && snap.height > 0) {
+      // Fit the schematic into the thumb with a small margin so it
+      // doesn't bleed to the edges. Use Fabric.Image with the raw
+      // <img> element so we don't repeat the network/decode.
+      var pad = 60;
+      var availW = CANVAS_W - pad * 2;
+      var availH = CANVAS_H - pad * 2 - 70; // leave room for step #
+      var scale = Math.min(availW / snap.width, availH / snap.height);
+      var w = snap.width * scale, h = snap.height * scale;
+      var fImg = new fabric.Image(snap, {
+        left: CANVAS_W / 2,
+        top:  pad + 70 + (availH / 2),
+        originX: 'center', originY: 'center',
+        scaleX: scale, scaleY: scale,
+        selectable: false, evented: false,
+      });
+      c.add(fImg);
+      return;
+    }
+    // Fallback: dot grid + "Schematic" caption while we wait for the
+    // first snapshot to arrive from the iframe.
+    var stepPx = 80;
+    for (var y = stepPx / 2; y < CANVAS_H; y += stepPx) {
+      for (var x = stepPx / 2; x < CANVAS_W; x += stepPx) {
+        c.add(new fabric.Circle({
+          left: x, top: y, radius: 2,
+          fill: '#c8cdd2',
+          originX: 'center', originY: 'center',
+          selectable: false, evented: false,
+        }));
+      }
+    }
+    c.add(new fabric.Text('Schematic', {
+      left: CANVAS_W / 2, top: CANVAS_H / 2,
+      fontSize: 80, fill: '#495057',
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+      fontWeight: '600',
+      originX: 'center', originY: 'center',
+      selectable: false, evented: false,
+    }));
+  }
+
+  // Fallback for unknown / blank-without-canvas: solid bg + title.
+  function _paintBlankThumb(c, step) {
+    c.backgroundColor = '#ffffff';
+    var title = (step && step.title && step.title.trim()) ||
+      ('Step ' + (step && step.step_number != null ? step.step_number : ''));
+    c.add(new fabric.Text(title, {
+      left: CANVAS_W / 2, top: CANVAS_H / 2,
+      fontSize: 64, fill: '#adb5bd',
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+      originX: 'center', originY: 'center',
+      selectable: false, evented: false,
+    }));
+  }
+
+  // Old palette-based renderer kept ONLY for reference; the dispatch
+  // above bypasses it. Leaving it here would dead-code the file —
+  // remove by deleting from the `var palette = {` line through the
+  // end of the original function. We comment-disable instead via an
+  // immediately-aborting block so the old code is dropped at
+  // run-time.
+  function _renderTypeBadgeThumb_OLD_UNUSED(step) {
+    return new Promise(function (resolve) {
+      var c = _ensureThumbCanvas();
+      if (!c) return resolve(null);
+      try { c.clear(); } catch (_) {}
+      var type = (step && step.step_type) || 'blank';
+      var palette = {
+        schematic: { bg: '#eef4ff', accent: '#0d6efd', label: 'SCHEMATIC' },
+        text:      { bg: '#fff8e8', accent: '#b58105', label: 'TEXT' },
+        video:     { bg: '#f5edff', accent: '#7b3ff2', label: 'VIDEO' },
+      };
+      var theme = palette[type] || { bg: '#fafafa', accent: '#6c757d', label: type.toUpperCase() };
+      c.backgroundColor = theme.bg;
+
+      // Font Awesome unicode glyphs — same icons the tile and HUD
+      // use, so the thumb is instantly recognisable per step type.
+      // Requires the FA webfont loaded on the page (it is via the
+      // site's default layout). Falls back to a coloured square if
+      // the font isn't ready.
+      var FA_GLYPH = {
+        schematic: '',  // fa-diagram-project
+        text:      '',  // fa-pen-to-square
+        video:     '',  // fa-video
+      };
+      var glyph = FA_GLYPH[type];
+      if (glyph) {
+        c.add(new fabric.Text(glyph, {
+          left: CANVAS_W / 2,
+          top: CANVAS_H / 2 - 60,
+          fontSize: 240,
+          fill: theme.accent,
+          opacity: 0.55,
+          // Font Awesome 6 Free Solid — the solid (900) weight is the
+          // one most FA glyphs use, including all of the above.
+          fontFamily: '"Font Awesome 6 Free", "FontAwesome", sans-serif',
+          fontWeight: '900',
+          originX: 'center',
+          originY: 'center',
+          selectable: false, evented: false,
+        }));
+      }
+      // Type label under the icon — solid colour so it reads even if
+      // the FA glyph above can't load.
+      c.add(new fabric.Text(theme.label, {
+        left: CANVAS_W / 2,
+        top: CANVAS_H / 2 + 80,
+        fontSize: 64,
+        fill: theme.accent,
+        opacity: 0.75,
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+        fontWeight: '700',
+        originX: 'center',
+        originY: 'center',
+        selectable: false, evented: false,
+      }));
+
+      // For text steps, draw the first ~4 lines of the body as a
+      // monospace preview so the tile actually shows what's in the
+      // step (not just the type).
+      if (type === 'text' && step.body) {
+        var raw = String(step.body).replace(/\r/g, '');
+        var lines = raw.split('\n').slice(0, 4);
+        var preview = lines.map(function (l) {
+          return l.length > 36 ? l.slice(0, 34) + '…' : l;
+        }).join('\n');
+        c.add(new fabric.Text(preview, {
+          left: 60,
+          top: 80,
+          fontSize: 40,
+          fill: '#212529',
+          fontFamily: '"Courier New", "Source Code Pro", ui-monospace, monospace',
+          originX: 'left',
+          originY: 'top',
+          selectable: false, evented: false,
+        }));
+      }
+
+      // For video steps, surface a hint of the URL so the tile shows
+      // which clip it points at.
+      if (type === 'video' && step.video_url) {
+        var url = String(step.video_url);
+        if (url.length > 40) url = url.slice(0, 38) + '…';
+        c.add(new fabric.Text(url, {
+          left: CANVAS_W / 2,
+          top: CANVAS_H / 2 + 80,
+          fontSize: 26,
+          fill: '#495057',
+          fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+          originX: 'center',
+          originY: 'top',
+          selectable: false, evented: false,
+        }));
+      }
+
+      // Step title in the bottom band (acts as a caption).
+      var title = (step && step.title && step.title.trim())
+        ? step.title.trim()
+        : ('Step ' + (step && step.step_number != null ? step.step_number : ''));
+      if (title.length > 36) title = title.slice(0, 34) + '…';
+      c.add(new fabric.Text(title, {
+        left: CANVAS_W / 2,
+        top: CANVAS_H - 70,
+        fontSize: 36,
+        fill: '#212529',
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+        fontWeight: '600',
+        originX: 'center',
+        originY: 'top',
+        selectable: false, evented: false,
+      }));
+
+      c.renderAll();
+      try {
+        resolve(c.toDataURL({
+          format: 'png',
+          multiplier: STEP_THUMB_W / CANVAS_W,
+        }));
       } catch (_) { resolve(null); }
     });
   }
@@ -3472,21 +5008,31 @@
     if (_stepThumbBusy) { _stepThumbQueued = true; return; }
     _stepThumbBusy = true;
     try {
-      for (var i = 0; i < state.steps.length; i++) {
-        var s = state.steps[i];
-        // For non-photo/blank steps we don't have a canvas to render —
-        // fall back to null (tile shows the type icon + label).
-        var t = s.step_type || 'photo';
-        if (t !== 'photo' && t !== 'blank') {
-          state.stepThumbs[s.id] = null;
-          continue;
+      // Snapshot the step list up front so we don't race against
+      // state.steps mutating during the awaits below (delete, reorder,
+      // add). Each entry is the full step row — the id is what the
+      // resulting thumbnail gets stored under.
+      var batch = state.steps.map(function (s) {
+        return {
+          id: s.id,
+          step: s,
+          type: s.step_type || 'photo',
+          json: s.canvas_json,
+          stepNumber: s.step_number,
+        };
+      });
+      for (var i = 0; i < batch.length; i++) {
+        var item = batch[i];
+        var url;
+        if (item.type === 'photo' || item.type === 'blank') {
+          url = await _renderOneStepThumb(item.json, item.stepNumber);
+        } else {
+          // Schematic / text / video → render a styled type-badge
+          // thumbnail with a content snippet (body for text, URL for
+          // video, just the title for schematic).
+          url = await _renderTypeBadgeThumb(item.step);
         }
-        // Active step's most recent canvas_json may be ahead of what's
-        // on the server — but autosave normally flushes before this
-        // runs, so canvas_json is good enough. We refresh the active
-        // step explicitly after each save via refreshActiveStepThumb.
-        var url = await _renderOneStepThumb(s.canvas_json);
-        state.stepThumbs[s.id] = url;
+        state.stepThumbs[item.id] = url;
       }
       renderFilmstrip();
     } finally {
@@ -3499,13 +5045,38 @@
     if (!state.canvas || !state.activeStepId) return;
     if (typeof fabric === 'undefined' || !fabric.StaticCanvas) return;
     try {
+      // CAPTURE the active step + its canvas state synchronously, BEFORE
+      // any await. _renderOneStepThumb yields to the event loop while it
+      // rasterises, and the user can click a different step during that
+      // window — if we read state.activeStepId again after the await,
+      // we'd store the in-flight (old-step) thumbnail under the
+      // newly-selected step's id, producing the "wrong thumbnail" bug.
+      var capturedStepId = state.activeStepId;
+      // If the active step isn't a photo/blank, its thumb belongs to
+      // the type-badge renderer (text body / video URL / etc.) — the
+      // Fabric photo canvas is empty for these types and would
+      // overwrite the badge thumb with a blank image. Delegate to
+      // refreshNonCanvasStepThumb instead.
+      var capturedStep = state.steps.find(function (s) { return s.id === capturedStepId; });
+      var capturedType = (capturedStep && capturedStep.step_type) || 'photo';
+      if (capturedType !== 'photo' && capturedType !== 'blank') {
+        refreshNonCanvasStepThumb(capturedStepId);
+        return;
+      }
       var json = JSON.stringify(serializeCanvas());
-      var url = await _renderOneStepThumb(json);
-      state.stepThumbs[state.activeStepId] = url;
-      // Update only the active step's preview slot in place — avoids a
-      // full filmstrip re-render with all the event-handler rebinding.
+      var url = await _renderOneStepThumb(
+        json,
+        capturedStep ? capturedStep.step_number : null
+      );
+      // The thumbnail belongs to the step that was active when we
+      // serialised — store it there regardless of whether the user
+      // has since switched away.
+      state.stepThumbs[capturedStepId] = url;
+      // Update the DOM tile for the step the thumb belongs to (which
+      // may no longer be the active one — that's fine, we still want
+      // the tile to show the right preview).
       var tile = dom.filmstripTrack &&
-        dom.filmstripTrack.querySelector('.ib-step-tile[data-step-id="' + state.activeStepId + '"]');
+        dom.filmstripTrack.querySelector('.ib-step-tile[data-step-id="' + capturedStepId + '"]');
       if (tile) {
         var preview = tile.querySelector('.ib-step-tile-preview');
         if (preview) {
@@ -3539,6 +5110,19 @@
     // shows the step-type menu. Each menu item is wired below to call
     // onAddStep(type). Bootstrap handles the open/close animation via
     // data-bs-toggle="dropdown".
+    //
+    // Initialise the dropdown explicitly with `popperConfig.strategy =
+    // 'fixed'` so the menu renders via position:fixed and escapes the
+    // filmstrip body's `overflow-x: auto` clipping context. Without
+    // this, the dropup is hidden behind the strip's top edge.
+    if (dom.filmstripAdd && window.bootstrap && window.bootstrap.Dropdown) {
+      window.bootstrap.Dropdown.getOrCreateInstance(dom.filmstripAdd, {
+        popperConfig: function (defaultBsPopperConfig) {
+          defaultBsPopperConfig.strategy = 'fixed';
+          return defaultBsPopperConfig;
+        },
+      });
+    }
     var addMenu = document.querySelector('.ib-filmstrip-add-menu');
     if (addMenu) {
       Array.prototype.forEach.call(
@@ -3576,8 +5160,11 @@
     try {
       await putStep(fromId, { step_number: newStepNumber });
       var fresh = await fetchInstruction();
-      if (fresh && fresh.steps) state.steps = fresh.steps;
+      if (fresh && fresh.steps) { state.steps = fresh.steps; resequenceStepNumbers(); }
       renderFilmstrip();
+      // Renumbering propagated by the server → regenerate thumbs so
+      // every tile's stamped step number matches the new order.
+      rebuildAllStepThumbs();
       setSaveStatus('saved');
       // Inverse: PUT step_number back to the previous value. The other
       // steps' numbers get re-balanced by the server. Redo restores the
@@ -3588,13 +5175,13 @@
         apply: async function () {
           await putStep(fromId, { step_number: previousStepNumber });
           var fresh2 = await fetchInstruction();
-          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          if (fresh2 && fresh2.steps) { state.steps = fresh2.steps; resequenceStepNumbers(); }
           renderFilmstrip();
         },
         invert: async function () {
           await putStep(fromId, { step_number: newStepNumber });
           var fresh2 = await fetchInstruction();
-          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          if (fresh2 && fresh2.steps) { state.steps = fresh2.steps; resequenceStepNumbers(); }
           renderFilmstrip();
         },
       });
@@ -3617,9 +5204,27 @@
       try { await flushCanvasSave(); } catch (_) { /* user can retry from indicator */ }
     }
 
-    state.activeStepId = stepId;
     var step = state.steps.find(function (s) { return s.id === stepId; });
-    if (!step) return;
+    if (!step) {
+      // The clicked tile points at an id that's no longer in
+      // state.steps — usually means the in-memory list went stale
+      // after a delete / reorder. Re-fetch and try once more before
+      // bailing so a stale tile-click doesn't silently no-op.
+      try {
+        var fresh = await fetchInstruction();
+        if (fresh && fresh.steps) {
+          state.steps = fresh.steps;
+          resequenceStepNumbers();
+          step = state.steps.find(function (s) { return s.id === stepId; });
+        }
+      } catch (_) {}
+      if (!step) {
+        console.warn('switchToStep: step id', stepId, 'not found in state.steps');
+        renderFilmstrip();
+        return;
+      }
+    }
+    state.activeStepId = stepId;
 
     if (dom.stepTitle) dom.stepTitle.value = step.title || '';
     if (dom.stepDescription) dom.stepDescription.value = step.description || '';
@@ -3629,6 +5234,33 @@
     syncStepTypePane();
     renderFilmstrip();
     renderLayersList();
+    refreshCanvasStepNum();
+  }
+
+  // Ensure state.steps has sequential step_number values 1..N.
+  // The server is supposed to renumber on delete / reorder but we
+  // saw the UI showing gaps and broken tile-clicks, so this is a
+  // defensive belt-and-braces guard that runs after every list
+  // mutation. Returns true if any number changed.
+  function resequenceStepNumbers() {
+    if (!state.steps || state.steps.length === 0) return false;
+    // Sort by current step_number first so the order matches what
+    // the server intended; ties broken by id to stay deterministic.
+    state.steps.sort(function (a, b) {
+      var an = (a.step_number == null) ? 1e9 : a.step_number;
+      var bn = (b.step_number == null) ? 1e9 : b.step_number;
+      if (an !== bn) return an - bn;
+      return (a.id || 0) - (b.id || 0);
+    });
+    var changed = false;
+    state.steps.forEach(function (s, idx) {
+      var expected = idx + 1;
+      if (s.step_number !== expected) {
+        s.step_number = expected;
+        changed = true;
+      }
+    });
+    return changed;
   }
 
   async function onAddStep(stepType) {
@@ -3643,6 +5275,7 @@
       var fresh = await fetchInstruction();
       if (fresh && fresh.steps) {
         state.steps = fresh.steps;
+        resequenceStepNumbers();
       } else {
         state.steps.push(step);
       }
@@ -3661,7 +5294,7 @@
           try {
             await deleteStep(addedStepRef.id);
             var fresh2 = await fetchInstruction();
-            if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+            if (fresh2 && fresh2.steps) { state.steps = fresh2.steps; resequenceStepNumbers(); }
             else state.steps = state.steps.filter(function (s) { return s.id !== addedStepRef.id; });
             if (previousActiveId && state.steps.some(function (s) { return s.id === previousActiveId; })) {
               await switchToStep(previousActiveId);
@@ -3678,7 +5311,7 @@
           var newStep = await postStep();
           addedStepRef = newStep;
           var fresh2 = await fetchInstruction();
-          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          if (fresh2 && fresh2.steps) { state.steps = fresh2.steps; resequenceStepNumbers(); }
           else state.steps.push(newStep);
           await switchToStep(newStep.id);
           renderFilmstrip();
@@ -3739,8 +5372,10 @@
       var fresh = await fetchInstruction();
       if (fresh && fresh.steps) {
         state.steps = fresh.steps;
+        resequenceStepNumbers();
       } else {
         state.steps = state.steps.filter(function (s) { return s.id !== stepId; });
+        resequenceStepNumbers();
       }
       if (wasActive && state.steps.length > 0) {
         // Pick the step that now occupies (deletedStepNumber - 1), or
@@ -3751,6 +5386,10 @@
       } else {
         renderFilmstrip();
       }
+      // The remaining steps were renumbered by the server — regenerate
+      // every thumb so the stamped step number on each tile reflects
+      // the new ordering.
+      rebuildAllStepThumbs();
       setSaveStatus('saved');
       showStepToast('Deleted step ' + deletedStepNumber + ' · Cmd/Ctrl+Z to undo');
 
@@ -3777,7 +5416,7 @@
           });
           recreatedRef.id = updated.id;
           var fresh2 = await fetchInstruction();
-          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          if (fresh2 && fresh2.steps) { state.steps = fresh2.steps; resequenceStepNumbers(); }
           await switchToStep(updated.id);
           renderFilmstrip();
         },
@@ -3785,7 +5424,7 @@
           if (!recreatedRef.id) return;
           await deleteStep(recreatedRef.id);
           var fresh2 = await fetchInstruction();
-          if (fresh2 && fresh2.steps) state.steps = fresh2.steps;
+          if (fresh2 && fresh2.steps) { state.steps = fresh2.steps; resequenceStepNumbers(); }
           else state.steps = state.steps.filter(function (s) { return s.id !== recreatedRef.id; });
           if (state.activeStepId === recreatedRef.id && state.steps.length > 0) {
             var targetIdx = Math.max(0, deletedStepNumber - 2);
@@ -4116,6 +5755,21 @@
     hasModel: false,
     spherical: { theta: Math.PI / 4, phi: Math.PI / 3 },
     drag: null,
+    // Source descriptor for the currently-loaded STL — set by the
+    // file-upload / project-file paths so the placed Fabric image
+    // can remember where it came from. Shape:
+    //   { kind: 'upload',       filename, buffer }
+    //   { kind: 'project-file', fileId,   filename }
+    pendingSource: null,
+    // Selected view button (top / front / side / iso) at time of
+    // capture. Lets the modal restore the highlight when a placed
+    // STL image is re-opened for editing.
+    pendingViewName: 'iso',
+    // When the modal is opened to EDIT an existing placed image
+    // (via double-click), this holds the Fabric.Image so onStlUseView
+    // can REPLACE it instead of adding a new one — preserving the
+    // user's position / scale / angle.
+    editingImage: null,
   };
 
   function loadStlLibs() {
@@ -4176,8 +5830,23 @@
       '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
       '      </div>' +
       '      <div class="modal-body">' +
-      '        <div class="mb-3">' +
+      '        <ul class="nav nav-pills nav-fill mb-3 ib-stl-source-tabs" role="tablist">' +
+      '          <li class="nav-item">' +
+      '            <button type="button" class="nav-link active" id="ib-stl-tab-upload"' +
+      '                    data-stl-source="upload">Upload file</button>' +
+      '          </li>' +
+      '          <li class="nav-item">' +
+      '            <button type="button" class="nav-link" id="ib-stl-tab-project"' +
+      '                    data-stl-source="project">From project files</button>' +
+      '          </li>' +
+      '        </ul>' +
+      '        <div class="mb-3 ib-stl-source-pane" data-stl-pane="upload">' +
       '          <input type="file" class="form-control form-control-sm" accept=".stl" id="ib-stl-file">' +
+      '        </div>' +
+      '        <div class="mb-3 ib-stl-source-pane d-none" data-stl-pane="project">' +
+      '          <div class="ib-stl-project-list" id="ib-stl-project-list">' +
+      '            <p class="text-muted small mb-0">Loading project files…</p>' +
+      '          </div>' +
       '        </div>' +
       '        <div class="ib-stl-render-area" id="ib-stl-render-area">' +
       '          <div class="ib-stl-status text-muted small" id="ib-stl-status">' +
@@ -4228,6 +5897,25 @@
       });
     });
 
+    // Source tabs: Upload file ↔ From project files. Switching to the
+    // project pane lazily populates the list with .stl files attached
+    // to this project so the user can pick one without re-uploading.
+    stl.projectList = node.querySelector('#ib-stl-project-list');
+    var sourceTabs = node.querySelectorAll('.ib-stl-source-tabs .nav-link');
+    var sourcePanes = node.querySelectorAll('.ib-stl-source-pane');
+    Array.prototype.forEach.call(sourceTabs, function (tab) {
+      tab.addEventListener('click', function () {
+        var source = tab.dataset.stlSource;
+        Array.prototype.forEach.call(sourceTabs, function (t) {
+          t.classList.toggle('active', t === tab);
+        });
+        Array.prototype.forEach.call(sourcePanes, function (p) {
+          p.classList.toggle('d-none', p.dataset.stlPane !== source);
+        });
+        if (source === 'project') refreshStlProjectList();
+      });
+    });
+
     if (window.bootstrap && window.bootstrap.Modal) {
       stl.bsModal = new window.bootstrap.Modal(node);
     } else {
@@ -4275,9 +5963,22 @@
     var THREE = window.THREE;
     if (!THREE) return false;
 
-    stl.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    // alpha:true → the WebGL canvas has a transparent background, so
+    // the "Use this view" capture produces a PNG with no fill behind
+    // the mesh. The canvas itself (and the per-step background colour
+    // picker on the Layers pane) provides whatever backdrop the user
+    // wants.
+    stl.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      preserveDrawingBuffer: true,
+      alpha: true,
+    });
     stl.renderer.setPixelRatio(window.devicePixelRatio || 1);
     stl.renderer.setSize(STL_VIEW_SIZE, STL_VIEW_SIZE, false);
+    // Preview uses the pastel STL_SCENE_BG so the modal isn't a
+    // confusing checker-pattern of nothing; clearAlpha=1 is set only
+    // for the on-screen preview. The capture path swaps to a fully
+    // transparent clear before grabbing the PNG (see onStlUseView).
     stl.renderer.setClearColor(STL_SCENE_BG, 1);
 
     stl.renderer.domElement.classList.add('ib-stl-canvas');
@@ -4325,12 +6026,36 @@
     stl.cameraDistance = pos.length();
     stl.spherical.theta = Math.atan2(pos.x, pos.z);
     stl.spherical.phi = Math.acos(Math.max(-1, Math.min(1, pos.y / stl.cameraDistance)));
+    // Remember the named view so the placed image's stored view-state
+    // can highlight the right button when re-opened for editing.
+    stl.pendingViewName = name;
 
     if (stl.dirLight) stl.dirLight.position.copy(stl.camera.position);
 
     if (stl.viewButtons) {
       Array.prototype.forEach.call(stl.viewButtons, function (b) {
         b.classList.toggle('is-active', b.dataset.stlView === name);
+      });
+    }
+    renderStlScene();
+  }
+
+  // Re-apply spherical coords (theta/phi) + distance directly to the
+  // three.js camera. Used when re-opening the modal for a placed STL
+  // so the camera lands exactly where the user left it last time.
+  function applyStlSphericalToCamera() {
+    if (!stl.camera) return;
+    var r = stl.cameraDistance;
+    var phi = Math.max(0.05, Math.min(Math.PI - 0.05, stl.spherical.phi));
+    stl.spherical.phi = phi;
+    stl.camera.position.x = r * Math.sin(phi) * Math.sin(stl.spherical.theta);
+    stl.camera.position.y = r * Math.cos(phi);
+    stl.camera.position.z = r * Math.sin(phi) * Math.cos(stl.spherical.theta);
+    stl.camera.lookAt(0, 0, 0);
+    if (stl.dirLight) stl.dirLight.position.copy(stl.camera.position);
+    if (stl.viewButtons) {
+      Array.prototype.forEach.call(stl.viewButtons, function (b) {
+        b.classList.toggle('is-active', b.dataset.stlView === stl.pendingViewName);
       });
     }
     renderStlScene();
@@ -4369,6 +6094,13 @@
     stl.drag.lastY = e.clientY;
     stl.spherical.theta -= dx * 0.005;
     stl.spherical.phi -= dy * 0.005;
+    // User-driven rotation → clear the active view button (custom angle).
+    stl.pendingViewName = null;
+    if (stl.viewButtons) {
+      Array.prototype.forEach.call(stl.viewButtons, function (b) {
+        b.classList.remove('is-active');
+      });
+    }
     applyStlSpherical();
     renderStlScene();
   }
@@ -4428,17 +6160,119 @@
       evt.target.value = '';
       return;
     }
+    file.arrayBuffer().then(function (buf) {
+      // Source = local upload; no re-loadable handle, so editing
+      // later only works while this tab is open. (Re-uploading the
+      // same file from another session is on the user.)
+      stl.pendingSource = { kind: 'upload', filename: file.name };
+      loadStlBufferIntoPreview(buf);
+    }).catch(function () {
+      stlShowError("Couldn't read that file.");
+    });
+  }
+
+  // Fetch the project's file list, filter to .stl, and render a click-
+  // to-load list inside the "From project files" pane of the STL
+  // modal. Loads the picked STL via the same buffer path the upload
+  // pane uses.
+  async function refreshStlProjectList() {
+    if (!stl.projectList) return;
+    var projectId = state.projectId;
+    if (!projectId) {
+      stl.projectList.innerHTML =
+        '<p class="text-muted small mb-0">No project loaded.</p>';
+      return;
+    }
+    stl.projectList.innerHTML =
+      '<p class="text-muted small mb-0">Loading project files…</p>';
+    try {
+      var resp = await apiFetch(API + '/api/projects/' + projectId + '/files',
+        { credentials: 'include' });
+      if (!resp.ok) throw new Error('files HTTP ' + resp.status);
+      var files = await resp.json();
+      var stls = (files || []).filter(function (f) {
+        return /\.stl$/i.test(f.filename || '');
+      });
+      if (stls.length === 0) {
+        stl.projectList.innerHTML =
+          '<p class="text-muted small mb-0">' +
+          'No STL files attached to this project yet. Upload one in the ' +
+          '<strong>Files &amp; Models</strong> section of the project editor.' +
+          '</p>';
+        return;
+      }
+      stl.projectList.innerHTML = stls.map(function (f) {
+        var sizeKb = f.file_size ? (f.file_size / 1024).toFixed(1) + ' KB' : '';
+        return (
+          '<button type="button" class="ib-stl-project-item"' +
+          '        data-file-id="' + f.id + '"' +
+          '        data-file-name="' + escapeHtml(f.filename) + '">' +
+          '  <i class="fas fa-cube me-2 text-primary"></i>' +
+          '  <span class="ib-stl-project-name">' + escapeHtml(f.filename) + '</span>' +
+          '  <span class="ib-stl-project-size text-muted small ms-2">' + sizeKb + '</span>' +
+          '</button>'
+        );
+      }).join('');
+      Array.prototype.forEach.call(
+        stl.projectList.querySelectorAll('.ib-stl-project-item'),
+        function (btn) {
+          btn.addEventListener('click', function () {
+            loadProjectStlFile(btn.dataset.fileId, btn.dataset.fileName);
+          });
+        }
+      );
+    } catch (e) {
+      stl.projectList.innerHTML =
+        '<p class="text-danger small mb-0">Couldn\'t load project files.</p>';
+    }
+  }
+
+  // Fetch a single STL file from the project's files API and feed it
+  // into the modal's 3D preview pipeline.
+  async function loadProjectStlFile(fileId, filename) {
+    stlClearError();
+    stl.statusText.textContent = 'Loading ' + (filename || 'STL') + '…';
+    stl.statusText.classList.remove('d-none');
+    stl.useBtn.disabled = true;
+    try {
+      var resp = await apiFetch(
+        API + '/api/projects/' + state.projectId + '/files/' + fileId + '/download',
+        { credentials: 'include' }
+      );
+      if (!resp.ok) throw new Error('download HTTP ' + resp.status);
+      var buffer = await resp.arrayBuffer();
+      if (buffer.byteLength > STL_MAX_BYTES) {
+        stlShowError('STL is too large. Please use a file under 50 MB.');
+        return;
+      }
+      // Remember the source so the placed image can be re-loaded
+      // later (double-click → edit view).
+      stl.pendingSource = {
+        kind: 'project-file',
+        fileId: parseInt(fileId, 10),
+        filename: filename || '',
+      };
+      loadStlBufferIntoPreview(buffer);
+    } catch (_) {
+      stlShowError("Couldn't load that STL from the project's files.");
+      stl.statusText.textContent = '';
+    }
+  }
+
+  // Load an STL ArrayBuffer into the modal's 3D preview. Used by both
+  // the file-picker (local upload) AND the project-files picker so
+  // STL processing only lives in one place.
+  function loadStlBufferIntoPreview(buffer) {
     stlClearError();
     stl.statusText.textContent = 'Loading…';
     stl.statusText.classList.remove('d-none');
     stl.useBtn.disabled = true;
-
     loadStlLibs()
       .then(function () {
         if (!initStlScene()) {
           throw new Error('Scene init failed');
         }
-        return file.arrayBuffer();
+        return Promise.resolve(buffer);
       })
       .then(function (buffer) {
         var THREE = window.THREE;
@@ -4501,27 +6335,66 @@
 
   function onStlUseView() {
     if (!stl.hasModel || !stl.renderer) return;
-    renderStlScene();
+    // High-res capture path: resize the renderer to STL_EXPORT_SIZE,
+    // swap to a transparent clear + null scene background, render
+    // once, grab the PNG, then restore the on-screen preview sizing
+    // and background so the modal still looks right after the export.
+    var THREE = window.THREE;
+    var prevBg = stl.scene.background;
     var dataUrl;
     try {
+      stl.scene.background = null;
+      stl.renderer.setClearColor(0x000000, 0);
+      stl.renderer.setSize(STL_EXPORT_SIZE, STL_EXPORT_SIZE, false);
+      stl.renderer.render(stl.scene, stl.camera);
       dataUrl = stl.renderer.domElement.toDataURL('image/png');
     } catch (_) {
       stlShowError("Couldn't capture the view. Please try a different angle.");
+      // Restore preview state before bailing.
+      try { stl.renderer.setSize(STL_VIEW_SIZE, STL_VIEW_SIZE, false); } catch (__) {}
+      try { stl.scene.background = prevBg; } catch (__) {}
+      try { stl.renderer.setClearColor(STL_SCENE_BG, 1); } catch (__) {}
+      try { renderStlScene(); } catch (__) {}
       return;
     }
+    // Restore preview rendering size + pastel background.
+    try { stl.renderer.setSize(STL_VIEW_SIZE, STL_VIEW_SIZE, false); } catch (_) {}
+    try { stl.scene.background = prevBg; } catch (_) {}
+    try { stl.renderer.setClearColor(STL_SCENE_BG, 1); } catch (_) {}
+    try { renderStlScene(); } catch (_) {}
+
     if (!dataUrl || dataUrl.length < 100) {
       stlShowError("Couldn't capture the view. Please try a different angle.");
       return;
     }
     try { stl.bsModal.hide(); } catch (_) {}
 
-    placeStlPngOnCanvas(dataUrl).catch(function (e) {
-      setSaveStatus('error', 'Failed to add STL view');
-      console.warn('STL place failed', e);
-    });
+    // Snapshot the source + view state so the placed image can
+    // remember where it came from / what angle it was captured at.
+    // Double-clicking the image later re-opens the modal with these
+    // values pre-loaded.
+    var sourceMeta = stl.pendingSource
+      ? JSON.parse(JSON.stringify(stl.pendingSource))
+      : null;
+    // Strip the buffer from the saved meta — it's a transient runtime
+    // value and can't (and shouldn't) round-trip through canvas_json.
+    if (sourceMeta && sourceMeta.buffer) delete sourceMeta.buffer;
+    var viewMeta = {
+      theta: stl.spherical.theta,
+      phi:   stl.spherical.phi,
+      distance: stl.cameraDistance,
+      viewName: stl.pendingViewName || null,
+    };
+    var replaceTarget = stl.editingImage;
+    stl.editingImage = null;
+    placeStlPngOnCanvas(dataUrl, sourceMeta, viewMeta, replaceTarget)
+      .catch(function (e) {
+        setSaveStatus('error', 'Failed to add STL view');
+        console.warn('STL place failed', e);
+      });
   }
 
-  async function placeStlPngOnCanvas(dataUrl) {
+  async function placeStlPngOnCanvas(dataUrl, sourceMeta, viewMeta, replaceTarget) {
     if (!state.canvas) return;
     var img;
     try {
@@ -4530,6 +6403,43 @@
       throw new Error('Failed to load STL view into canvas');
     }
     if (!img) throw new Error('STL image returned empty');
+
+    // Replace-mode: a placed STL is being edited (double-click flow).
+    // Copy position / scale / angle / flip from the existing image so
+    // the user's manual transforms survive the swap.
+    if (replaceTarget) {
+      img.set({
+        originX: replaceTarget.originX || 'center',
+        originY: replaceTarget.originY || 'center',
+        left:    replaceTarget.left,
+        top:     replaceTarget.top,
+        // The new PNG and old PNG may have different pixel widths if
+        // the user picked a different view (e.g. top vs iso). Scale
+        // the new image so its current displayed width matches what
+        // the old one was, anchored at the same centre.
+        scaleX:  (replaceTarget.getScaledWidth ? replaceTarget.getScaledWidth() : (replaceTarget.width * replaceTarget.scaleX)) / (img.width || 1),
+        scaleY:  (replaceTarget.getScaledHeight ? replaceTarget.getScaledHeight() : (replaceTarget.height * replaceTarget.scaleY)) / (img.height || 1),
+        angle:   replaceTarget.angle || 0,
+        flipX:   !!replaceTarget.flipX,
+        flipY:   !!replaceTarget.flipY,
+        selectable: true,
+        evented: true,
+        ibRole: 'stl',
+        ibStlSource: sourceMeta || replaceTarget.ibStlSource || null,
+        ibStlView:   viewMeta   || replaceTarget.ibStlView   || null,
+      });
+      // Insert at the same z-index slot as the old image.
+      var idx = state.canvas.getObjects().indexOf(replaceTarget);
+      state.canvas.remove(replaceTarget);
+      state.canvas.add(img);
+      if (idx >= 0 && img.moveTo) { try { img.moveTo(idx); } catch (_) {} }
+      state.canvas.setActiveObject(img);
+      state.canvas.requestRenderAll();
+      scheduleAutosave();
+      scheduleSnapshot();
+      updateEmptyState();
+      return;
+    }
 
     var targetMax = CANVAS_W * 0.5;
     var longest = Math.max(img.width, img.height) || 1;
@@ -4544,6 +6454,8 @@
       selectable: true,
       evented: true,
       ibRole: 'stl',
+      ibStlSource: sourceMeta || null,
+      ibStlView:   viewMeta   || null,
     });
     state.canvas.add(img);
     state.canvas.setActiveObject(img);
@@ -4911,14 +6823,116 @@
 
   // Build the HUD body for the given active object. Returns true if the
   // HUD has selection content; false if it's showing the empty state.
+  // Paint the HUD with canvas-background controls — colour picker
+  // and (if a bg image is placed) a thumb + Change / Remove buttons.
+  // Used when no single object is selected so the HUD always has
+  // something useful to show.
+  function renderHudCanvasBackground() {
+    if (!dom.hudBody || !state.canvas) return;
+    var bgColor = state.canvas.backgroundColor;
+    var bgHex = '#ffffff';
+    if (typeof bgColor === 'string' && /^#[0-9a-f]{6}$/i.test(bgColor)) bgHex = bgColor;
+    var bgImg = findBackgroundImage();
+    var imgRowHtml;
+    if (bgImg) {
+      var thumbSrc =
+        (bgImg.toDataURL && bgImg.toDataURL({ format: 'png', multiplier: 0.18 })) ||
+        (bgImg.ibSourceUrl) || '';
+      var filename = bgImg.ibFilename || '';
+      imgRowHtml =
+        '<div class="ib-hud-bg-image">' +
+        (thumbSrc
+          ? '<img class="ib-hud-bg-thumb" alt="" src="' + escapeHtml(thumbSrc) + '">'
+          : '<div class="ib-hud-bg-thumb is-empty"></div>') +
+        '  <div class="ib-hud-bg-meta">' +
+        '    <div class="ib-hud-bg-filename" title="' + escapeHtml(filename) + '">' +
+                  escapeHtml(filename || 'Background image') + '</div>' +
+        '    <div class="ib-hud-bg-buttons">' +
+        '      <button type="button" class="ib-hud-action" id="ib-hud-bg-change"' +
+        '              title="Change background image">' +
+        '        <i class="fas fa-image"></i>' +
+        '      </button>' +
+        '      <button type="button" class="ib-hud-action is-danger" id="ib-hud-bg-remove"' +
+        '              title="Remove background image">' +
+        '        <i class="fas fa-trash"></i>' +
+        '      </button>' +
+        '    </div>' +
+        '  </div>' +
+        '</div>';
+    } else {
+      imgRowHtml =
+        '<button type="button" class="ib-hud-bg-add" id="ib-hud-bg-change">' +
+        '  <i class="fas fa-image me-2"></i>Set background image…' +
+        '</button>';
+    }
+    dom.hudBody.innerHTML =
+      '<h6 class="ib-hud-name">Canvas background</h6>' +
+      '<div class="ib-hud-bg-color-row">' +
+      '  <span class="ib-hud-field-label">Colour</span>' +
+      '  <input type="color" id="ib-hud-bg-color"' +
+      '         class="ib-hud-bg-color-input" value="' + bgHex + '">' +
+      '  <button type="button" class="ib-hud-action" id="ib-hud-bg-color-reset"' +
+      '          title="Reset to white">' +
+      '    <i class="fas fa-rotate-left"></i>' +
+      '  </button>' +
+      '</div>' +
+      imgRowHtml;
+
+    var colorInput = document.getElementById('ib-hud-bg-color');
+    var colorReset = document.getElementById('ib-hud-bg-color-reset');
+    var changeBtn  = document.getElementById('ib-hud-bg-change');
+    var removeBtn  = document.getElementById('ib-hud-bg-remove');
+    if (colorInput) {
+      var commitColor = function () {
+        state.canvas.backgroundColor = colorInput.value;
+        state.canvas.requestRenderAll();
+        syncCanvasBgPicker();
+        scheduleAutosave();
+        scheduleSnapshot();
+      };
+      colorInput.addEventListener('input', commitColor);
+      colorInput.addEventListener('change', commitColor);
+      wireSwatchPicker(colorInput);
+    }
+    if (colorReset) {
+      colorReset.addEventListener('click', function () {
+        state.canvas.backgroundColor = '#ffffff';
+        state.canvas.requestRenderAll();
+        syncCanvasBgPicker();
+        scheduleAutosave();
+        scheduleSnapshot();
+      });
+    }
+    if (changeBtn) {
+      changeBtn.addEventListener('click', openBgImagePicker);
+    }
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function () {
+        removeBackgroundImage();
+        if (dom.removeImageBtn) dom.removeImageBtn.disabled = !findBackgroundImage();
+        scheduleAutosave();
+        scheduleSnapshot();
+        renderHudCanvasBackground();
+      });
+    }
+  }
+
   function renderHudBody() {
     if (!dom.hudBody) return false;
     var active = state.canvas ? state.canvas.getActiveObject() : null;
     var isMulti = active && active.type === 'activeSelection';
-    // Treat background and multi-select as "no useful single object".
-    if (!active || isMulti || active.ibRole === 'background') {
-      dom.hudBody.innerHTML =
-        '<div class="ib-hud-empty">Select an object to edit its properties.</div>';
+    // No-single-selection case: show the canvas background controls
+    // (bg colour + bg image swap) so the HUD is always useful.
+    if (!active || isMulti) {
+      renderHudCanvasBackground();
+      return false;
+    }
+    // Background-image is its own special case in the HUD — show
+    // the same canvas-background controls (since editing the placed
+    // bg image's transform belongs to the canvas, not arbitrary
+    // shape props).
+    if (active.ibRole === 'background') {
+      renderHudCanvasBackground();
       return false;
     }
 
@@ -5842,8 +7856,9 @@
         if (!(e.ctrlKey || e.metaKey)) return;
         if (!state.canvas) return;
         e.preventDefault();
-        var rect = state.canvas.lowerCanvasEl.getBoundingClientRect();
-        var focal = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        // zoomCanvasBy expects the focal point in VIEWPORT coords —
+        // it computes the frame-relative scene point itself.
+        var focal = { x: e.clientX, y: e.clientY };
         var factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
         zoomCanvasBy(factor, focal);
       }, { passive: false });
@@ -5852,13 +7867,99 @@
     // Listen for the embedded schematic editor announcing its zoom
     // level so the title-bar percent stays accurate when the user
     // zooms via the iframe (Ctrl+wheel inside the schematic canvas).
+    // Also handles the schematic-snapshot bridge that lets us paint
+    // a high-res image of the schematic onto its filmstrip thumb.
     window.addEventListener('message', function (e) {
       var msg = e && e.data;
-      if (!msg || msg.kr_se_event !== 'zoom') return;
-      if (currentActiveStepType() !== 'schematic') return;
-      if (dom.zoomPct && typeof msg.percent === 'number') {
-        dom.zoomPct.textContent = msg.percent + '%';
+      if (!msg || !msg.kr_se_event) return;
+      switch (msg.kr_se_event) {
+        case 'zoom':
+          if (currentActiveStepType() !== 'schematic') return;
+          if (dom.zoomPct && typeof msg.percent === 'number') {
+            dom.zoomPct.textContent = msg.percent + '%';
+          }
+          return;
+        case 'ready':
+        case 'content-changed':
+          // Schematic iframe is up (or content just changed) — kick
+          // off a fresh PNG capture so every schematic-type step's
+          // thumbnail can show the actual diagram.
+          requestSchematicSnapshot();
+          return;
+        case 'png-snapshot':
+          handleSchematicSnapshot(msg);
+          return;
       }
+    });
+  }
+
+  // ===================================================================
+  // Schematic snapshot bridge — kept here next to wireSchematicBridge
+  // so the message listener + cache helpers live together.
+  //
+  // All schematic-type steps in a project share the same underlying
+  // schematic (one per project), so a single cached PNG covers every
+  // schematic step's thumbnail.
+  // ===================================================================
+  function requestSchematicSnapshot() {
+    var iframe = document.getElementById('ib-canvas-schematic-iframe');
+    if (!iframe || !iframe.contentWindow) return;
+    try {
+      iframe.contentWindow.postMessage({
+        kr_se_action: 'png-snapshot',
+        requestId: Date.now(),
+        multiplier: 3,
+      }, '*');
+    } catch (_) {}
+  }
+
+  function handleSchematicSnapshot(msg) {
+    if (!msg || !msg.dataUrl) return;
+    state.schematicSnapshotUrl = msg.dataUrl;
+    // Pre-decode into an Image so painters can draw it synchronously.
+    var img = new Image();
+    img.onload = function () {
+      state.schematicSnapshotImg = img;
+      // Re-paint thumbs for every schematic step now that we have the
+      // image. We can't just call rebuildAllStepThumbs (that would
+      // re-trigger another snapshot request) — repaint only the
+      // schematic tiles.
+      repaintSchematicThumbs();
+    };
+    img.src = msg.dataUrl;
+  }
+
+  function repaintSchematicThumbs() {
+    if (!dom.filmstripTrack || !state.steps) return;
+    state.steps.forEach(function (s) {
+      if ((s.step_type || 'photo') !== 'schematic') return;
+      var tile = dom.filmstripTrack.querySelector(
+        '.ib-step-tile[data-step-id="' + s.id + '"]');
+      if (!tile) return;
+      var imgEl = tile.querySelector('img.ib-step-tile-thumb');
+      if (!imgEl) return;
+      // Compose: bg colour + schematic image fitted with margin +
+      // stamped step number. Reuses the same painter shape that the
+      // type-badge thumbnails use so the look is consistent.
+      var c = document.createElement('canvas');
+      c.width = 320; c.height = 240;
+      var ctx = c.getContext('2d');
+      var bg = _stepBgColor(s, '#ffffff');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, c.width, c.height);
+      var src = state.schematicSnapshotImg;
+      if (src && src.width > 0 && src.height > 0) {
+        var pad = 18;
+        var availW = c.width - pad * 2;
+        var availH = c.height - pad * 2 - 16; // leave room for step num
+        var scale = Math.min(availW / src.width, availH / src.height);
+        var w = src.width * scale, h = src.height * scale;
+        var x = (c.width - w) / 2;
+        var y = pad + 16 + ((availH - h) / 2);
+        ctx.drawImage(src, x, y, w, h);
+      }
+      _paintStepNumberOnThumb(c, s.step_number);
+      imgEl.src = c.toDataURL('image/png');
     });
   }
 
@@ -5890,9 +7991,12 @@
 
   function resetActiveCanvasZoom() {
     if (currentActiveStepType() === 'schematic') {
+      // Schematic iframe already toggles fit ↔ 100 % on its own side
+      // (see toggleZoomReset in schematic-editor.js).
       postToSchematicIframe('zoom-reset');
     } else {
-      resetCanvasZoom();
+      // Photo canvas — toggle between zoom-to-fit and 100 %.
+      toggleCanvasZoomReset();
     }
   }
 
@@ -6022,6 +8126,7 @@
     if (instruction) {
       state.instructionId = instruction.id;
       state.steps = instruction.steps || [];
+      resequenceStepNumbers();
     } else {
       state.steps = [];
     }
@@ -6057,6 +8162,21 @@
     wireHudDragAndButtons();
     buildImageToolbar();
 
+    // Canvas background colour picker on the Layers pane. `input` fires
+    // live while the user drags inside the colour wheel, so the
+    // canvas updates immediately; the autosave debouncer collapses the
+    // burst into a single PUT when they release.
+    if (dom.canvasBgInput) {
+      dom.canvasBgInput.addEventListener('input', onCanvasBgChange);
+      dom.canvasBgInput.addEventListener('change', onCanvasBgChange);
+      // Replace Chrome's bare colour-wheel with the preset-swatch
+      // popover so the picker matches Safari's UX cross-browser.
+      wireSwatchPicker(dom.canvasBgInput);
+    }
+    if (dom.canvasBgClear) {
+      dom.canvasBgClear.addEventListener('click', onCanvasBgClear);
+    }
+
     // Re-position the image-context toolbar on window resize / secondary
     // pane drag — both change the canvas frame's CSS layout.
     window.addEventListener('resize', function () {
@@ -6075,6 +8195,7 @@
     if (dom.stepDescription) dom.stepDescription.value = state.steps[0].description || '';
     renderFilmstrip();
     await loadCanvasFromStep(state.steps[0]);
+    refreshCanvasStepNum();
     // Generate filmstrip thumbnails for every step in the background —
     // doesn't block the canvas opening, and updates each tile when the
     // off-screen render completes. Bypasses if Fabric isn't loaded yet
@@ -6082,6 +8203,13 @@
     setTimeout(function () { rebuildAllStepThumbs(); }, 0);
     // B3: apply the initial step's type to the picker pane + canvas area.
     syncStepTypePane();
+    // If any step is a schematic, pre-mount the iframe early so its
+    // PNG snapshot arrives before the user switches to it — that way
+    // every schematic tile shows a real preview, not the dot-grid
+    // placeholder.
+    if (state.steps.some(function (s) { return s.step_type === 'schematic'; })) {
+      mountSchematicIframe();
+    }
 
     // Prime the Photos pane content even if it isn't visible — the first
     // user click into it should feel instant.

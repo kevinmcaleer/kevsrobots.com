@@ -85,6 +85,7 @@
   // produces a "coming soon" toast.
   var IMPLEMENTED_TOOLS = {
     select: true,
+    pan: true,
     pin: true,
     line: true,
     rect: true,
@@ -534,6 +535,96 @@
     }
   }
 
+  // Duplicate the currently selected pin(s) and/or shape(s). Clones
+  // are offset by one grid cell (down + right) so they aren't stacked
+  // on top of the originals and become the new selection so the user
+  // can press Cmd+D again to keep cloning. Handles both single-select
+  // (STATE.selectedPinId / selectedShapeId) and Fabric's multi-select
+  // ActiveSelection.
+  function duplicateSelected() {
+    if (!STATE.activeSymbol) return;
+    var offset = GRID;
+
+    // Build a list of {kind, id} pairs covering whatever is selected.
+    var selection = [];
+    var active = STATE.canvas && STATE.canvas.getActiveObjects
+      ? (STATE.canvas.getActiveObjects() || [])
+      : [];
+    active.forEach(function (o) {
+      if (!o || !o.data) return;
+      if (o.data.kind === 'pin')   selection.push({ kind: 'pin',   id: o.data.id });
+      else if (o.data.kind === 'shape') selection.push({ kind: 'shape', id: o.data.id });
+    });
+    // Fall back to STATE single-selection if Fabric had nothing.
+    if (selection.length === 0) {
+      if (STATE.selectedPinId)   selection.push({ kind: 'pin',   id: STATE.selectedPinId });
+      if (STATE.selectedShapeId) selection.push({ kind: 'shape', id: STATE.selectedShapeId });
+    }
+    if (selection.length === 0) return;
+
+    // Deduplicate (an item could theoretically appear twice if Fabric
+    // and STATE disagree about what's selected).
+    var seen = {};
+    selection = selection.filter(function (s) {
+      var k = s.kind + ':' + s.id;
+      if (seen[k]) return false;
+      seen[k] = true;
+      return true;
+    });
+
+    var newIds = [];
+    selection.forEach(function (sel) {
+      if (sel.kind === 'pin') {
+        var src = findPin(sel.id);
+        if (!src) return;
+        var clone = {
+          id: nextId('p'),
+          number: autoPinNumber(),
+          name: src.name || '',
+          type: src.type,
+          rotation: src.rotation,
+          side: src.side,
+          x: src.x + offset,
+          y: src.y + offset,
+        };
+        STATE.activeSymbol.pins.push(clone);
+        newIds.push({ kind: 'pin', id: clone.id });
+      } else if (sel.kind === 'shape') {
+        var s = findShape(sel.id);
+        if (!s) return;
+        var c = JSON.parse(JSON.stringify(s));
+        c.id = nextId('s');
+        if (c.kind === 'rect' || c.kind === 'text') {
+          c.x = (c.x || 0) + offset;
+          c.y = (c.y || 0) + offset;
+        } else if (c.kind === 'line') {
+          c.x1 += offset; c.y1 += offset;
+          c.x2 += offset; c.y2 += offset;
+        }
+        STATE.activeSymbol.bodyShapes.push(c);
+        newIds.push({ kind: 'shape', id: c.id });
+      }
+    });
+    if (newIds.length === 0) return;
+
+    // Make the new clones the active selection so chained Cmd+D keeps
+    // duplicating the fresh items (and the user sees what landed).
+    if (newIds.length === 1) {
+      if (newIds[0].kind === 'pin')   { STATE.selectedPinId = newIds[0].id;   STATE.selectedShapeId = null; }
+      else                            { STATE.selectedShapeId = newIds[0].id; STATE.selectedPinId = null; }
+    } else {
+      STATE.selectedPinId = null;
+      STATE.selectedShapeId = null;
+    }
+    if (STATE.canvas && STATE.canvas.discardActiveObject) {
+      STATE.canvas.discardActiveObject();
+    }
+    renderCanvas();
+    restoreActiveSelection(newIds);
+    renderPropertiesPanel();
+    scheduleAutosave();
+  }
+
   // ====================================================================
   // 7. WHOLE-SYMBOL TRANSFORMS
   // ====================================================================
@@ -547,12 +638,130 @@
 
   // Rotate or flip a single shape (rect or line) around its centre.
   // Used by the Transform section when a shape is selected.
-  function rotateOrFlipShape(shape, kind) {
+  // Walk every Fabric object on the canvas and recolour it based on
+  // whether Fabric considers it selected. Called from selection:*
+  // event handlers AND at the tail of renderCanvas() so that any
+  // surviving selection keeps its red highlight after a full rebuild.
+  //
+  // Colour rules mirror what renderCanvas() draws fresh:
+  //   - Pin dot (circle): stroke + fill toggle (white → red)
+  //   - Pin line/label   (pin-part): stroke / fill follow parent pin
+  //   - Shape rect / line: stroke toggle
+  //   - Shape text       (IText): fill toggle
+  function applyFabricSelectionStyle() {
+    if (!STATE.canvas) return;
+    var active = STATE.canvas.getActiveObjects
+      ? (STATE.canvas.getActiveObjects() || [])
+      : [];
+    var selectedPinIds = {};
+    var selectedShapeIds = {};
+    active.forEach(function (o) {
+      if (!o || !o.data) return;
+      if (o.data.kind === 'pin') selectedPinIds[o.data.id] = true;
+      else if (o.data.kind === 'shape') selectedShapeIds[o.data.id] = true;
+    });
+    // Also include STATE's single-selection so single-click-without-
+    // -Fabric-active (e.g. a programmatic pin-select while Fabric's
+    // active object got discarded by a render) still paints red.
+    if (STATE.selectedPinId)   selectedPinIds[STATE.selectedPinId] = true;
+    if (STATE.selectedShapeId) selectedShapeIds[STATE.selectedShapeId] = true;
+    STATE.canvas.getObjects().forEach(function (o) {
+      if (!o || !o.data) return;
+      var k = o.data.kind;
+      var isSel = false;
+      if (k === 'pin' || k === 'pin-part') {
+        // Pin-parts share the dot's id and inherit its selection.
+        isSel = !!selectedPinIds[o.data.id];
+      } else if (k === 'shape') {
+        isSel = !!selectedShapeIds[o.data.id];
+      } else {
+        return;
+      }
+      colourFabricObject(o, isSel);
+    });
+    STATE.canvas.requestRenderAll();
+  }
+
+  function colourFabricObject(o, isSel) {
+    var redStroke = BRAND_RED;
+    var blackStroke = INK;
+    // Pin dot — the only filled circle on the canvas tagged 'pin'.
+    if (o.data.kind === 'pin' && o.type === 'circle') {
+      o.set({
+        fill: isSel ? BRAND_RED : '#fff',
+        stroke: isSel ? redStroke : blackStroke,
+        strokeWidth: isSel ? 2 : 1.4,
+      });
+      return;
+    }
+    if (o.data.kind === 'pin-part') {
+      if (o.type === 'line') {
+        o.set({
+          stroke: isSel ? redStroke : blackStroke,
+          strokeWidth: isSel ? 2 : 1.5,
+        });
+      } else {
+        // Pin label (text) — fill recolours.
+        o.set({ fill: isSel ? redStroke : blackStroke });
+      }
+      return;
+    }
+    if (o.data.kind === 'shape') {
+      // Branch on Fabric type since shapes cover rect / line / text.
+      if (o.type === 'line' || o.type === 'rect') {
+        o.set({
+          stroke: isSel ? redStroke : blackStroke,
+          strokeWidth: isSel ? 2.5 : 1.5,
+        });
+      } else if (o.type === 'i-text' || o.type === 'text' || o.type === 'IText') {
+        o.set({ fill: isSel ? redStroke : blackStroke });
+      }
+    }
+  }
+
+  // After renderCanvas() rebuilds every Fabric object, the old
+  // ActiveSelection's child references are stale. This helper takes a
+  // list of {kind, id} entries (snapshotted before the render) and
+  // assembles a fresh ActiveSelection over the matching new objects.
+  // Single-id input falls back to setActiveObject so we don't wrap a
+  // lone item in an AS unnecessarily.
+  function restoreActiveSelection(idList) {
+    if (!STATE.canvas || !idList || idList.length === 0) return;
+    // Pins are rendered as multiple Fabric objects (line + circle
+    // terminator + label) all tagged with the SAME pin id, but only
+    // the circle has kind 'pin' (the line + label are 'pin-part').
+    // Use the 'pin' object as the selectable handle for a pin, and
+    // the 'shape' object for shapes.
+    var byKey = {};
+    STATE.canvas.getObjects().forEach(function (o) {
+      if (!o.data) return;
+      // 'pin' is the draggable dot; 'shape' is the rect / line / text.
+      if (o.data.kind !== 'pin' && o.data.kind !== 'shape') return;
+      byKey[o.data.kind + ':' + o.data.id] = o;
+    });
+    var fresh = [];
+    idList.forEach(function (entry) {
+      var hit = byKey[entry.kind + ':' + entry.id];
+      if (hit) fresh.push(hit);
+    });
+    if (fresh.length === 0) return;
+    if (fresh.length === 1) {
+      STATE.canvas.setActiveObject(fresh[0]);
+    } else if (typeof fabric !== 'undefined' && fabric.ActiveSelection) {
+      var sel = new fabric.ActiveSelection(fresh, { canvas: STATE.canvas });
+      STATE.canvas.setActiveObject(sel);
+    }
+    STATE.canvas.requestRenderAll();
+  }
+
+  // Mutate `shape` in-place to apply rotate-cw / rotate-ccw / flip-h /
+  // flip-v about the shape's own centre or midpoint. No side effects —
+  // callers handle renderCanvas + autosave (so batch callers like
+  // the multi-select transform path don't re-render per item).
+  function rotateOrFlipShapeInPlace(shape, kind) {
     if (!shape) return;
     if (shape.kind === 'rect') {
       if (kind === 'rotate-cw' || kind === 'rotate-ccw') {
-        // 90° rotation around the rect's centre — swap w/h and
-        // recompute top-left so the centre stays put.
         var cx = shape.x + shape.w / 2;
         var cy = shape.y + shape.h / 2;
         var nw = shape.h;
@@ -562,14 +771,12 @@
         shape.x = snap(cx - nw / 2);
         shape.y = snap(cy - nh / 2);
       }
-      // Flip on a rectangle is a visual no-op (rects are symmetric)
-      // but we still schedule a save so the action feels responsive.
+      // Flip on a rectangle is a visual no-op (rects are symmetric).
     } else if (shape.kind === 'line') {
       var midX = (shape.x1 + shape.x2) / 2;
       var midY = (shape.y1 + shape.y2) / 2;
       if (kind === 'rotate-cw' || kind === 'rotate-ccw') {
         var sign = kind === 'rotate-cw' ? 1 : -1;
-        // 90° rotation around midpoint: (dx, dy) → (-sign*dy, sign*dx)
         var dx1 = shape.x1 - midX, dy1 = shape.y1 - midY;
         var dx2 = shape.x2 - midX, dy2 = shape.y2 - midY;
         shape.x1 = snap(midX + (-sign * dy1));
@@ -583,7 +790,18 @@
         shape.y1 = snap(2 * midY - shape.y1);
         shape.y2 = snap(2 * midY - shape.y2);
       }
+    } else if (shape.kind === 'text') {
+      // Text shapes have no geometry to rotate yet (they're rendered
+      // axis-aligned); flips are a visual no-op. Leaving them as a
+      // no-op is fine until we support rotated/mirrored text.
     }
+  }
+
+  // Single-item entry point (used when one shape is selected). Wraps
+  // rotateOrFlipShapeInPlace + the per-action side effects.
+  function rotateOrFlipShape(shape, kind) {
+    if (!shape) return;
+    rotateOrFlipShapeInPlace(shape, kind);
     renderCanvas();
     renderPropertiesPanel();
     scheduleAutosave();
@@ -747,7 +965,20 @@
           if (st) {
             st.text = ftxt.text;
             scheduleAutosave();
+            // Sync the side-pane input if this text shape is the
+            // currently-selected one — keeps the two edit paths in
+            // step.
+            if (STATE.selectedShapeId === s.id && dom.shapeTextValue) {
+              dom.shapeTextValue.value = st.text;
+            }
           }
+        });
+        // Selecting via double-click → edit mode also counts as a
+        // shape selection so the properties pane updates.
+        ftxt.on('selected', function () {
+          STATE.selectedShapeId = s.id;
+          STATE.selectedPinId = null;
+          renderPropertiesPanel();
         });
         STATE.canvas.add(ftxt);
       } else if (s.kind === 'line') {
@@ -796,6 +1027,13 @@
       STATE.canvas.add(STATE.linePending.previewObj);
     }
 
+    // Re-apply Fabric's selection-derived red highlight in case an
+    // ActiveSelection survived this render (the transform flow drops
+    // and re-creates it inside restoreActiveSelection, which runs
+    // after renderCanvas — but selection-via-click paths leave the
+    // AS in place and we still want fresh objects to reflect it).
+    applyFabricSelectionStyle();
+
     STATE.canvas.requestRenderAll();
   }
 
@@ -803,27 +1041,48 @@
     // Fusion-360-ish pin: line from the pin centre extending 2 GRID
     // units in the pin's direction, a small circle terminator at the
     // outer end of the line (where wires connect), and the pin name +
-    // number past the terminator.
+    // number positioned past the line's OUTER endpoint (relative to
+    // the symbol's origin) — matches the schematic editor's label
+    // placement so symbols read the same in both views.
     var pos = s2c(pin.x, pin.y);
     var sel = (pin.id === STATE.selectedPinId);
     var lineLen = 2 * GRID;
     var rot = pinRotation(pin);
     var dx = 0, dy = 0;
-    var labelAnchorX = 'left';
-    var labelAnchorY = 'center';
-    var labelPadX = 0, labelPadY = 0;
     switch (rot) {
-      case 0:    // points right
-        dx = 1; labelAnchorX = 'left';   labelAnchorY = 'center'; labelPadX = 6;  break;
-      case 90:   // points down
-        dy = 1; labelAnchorX = 'center'; labelAnchorY = 'top';    labelPadY = 6;  break;
-      case 180:  // points left
-        dx = -1; labelAnchorX = 'right'; labelAnchorY = 'center'; labelPadX = -6; break;
-      case 270:  // points up
-        dy = -1; labelAnchorX = 'center'; labelAnchorY = 'bottom';labelPadY = -6; break;
+      case 0:    dx = 1;  break;   // points right
+      case 90:   dy = 1;  break;   // points down
+      case 180:  dx = -1; break;   // points left
+      case 270:  dy = -1; break;   // points up
     }
     var endX = pos.x + dx * lineLen;
     var endY = pos.y + dy * lineLen;
+    // Label position derived from which endpoint of the pin's line
+    // (anchor or terminator) is further from the SCENE origin. The
+    // label sits past that endpoint, extending outward — same rule as
+    // the schematic editor's buildInstanceFabric, so a symbol's pin
+    // names render identically in the designer and the schematic.
+    var horizontal = (rot === 0 || rot === 180);
+    var labelPad = 6;
+    var labelAnchorX = 'center';
+    var labelAnchorY = 'center';
+    var labelSceneX = pin.x, labelSceneY = pin.y;
+    if (horizontal) {
+      var termSceneX = pin.x + dx * lineLen;
+      var outerX = (Math.abs(pin.x) >= Math.abs(termSceneX)) ? pin.x : termSceneX;
+      var dirX = (outerX >= 0) ? 1 : -1;
+      labelSceneX = outerX + dirX * labelPad;
+      labelSceneY = pin.y;
+      labelAnchorX = (dirX > 0) ? 'left' : 'right';
+    } else {
+      var termSceneY = pin.y + dy * lineLen;
+      var outerY = (Math.abs(pin.y) >= Math.abs(termSceneY)) ? pin.y : termSceneY;
+      var dirY = (outerY >= 0) ? 1 : -1;
+      labelSceneX = pin.x;
+      labelSceneY = outerY + dirY * labelPad;
+      labelAnchorY = (dirY > 0) ? 'top' : 'bottom';
+    }
+    var labelCanvas = s2c(labelSceneX, labelSceneY);
 
     // Line — pin's wire-attachment direction. Tagged with the pin id
     // so the drag handler can find + move it as the user drags the
@@ -876,8 +1135,8 @@
                 (pin.name ? ' ' + pin.name : '');
     if (label.trim()) {
       var txt = new fabric.Text(label, {
-        left: endX + labelPadX,
-        top: endY + labelPadY,
+        left: labelCanvas.x,
+        top: labelCanvas.y,
         fontSize: 11,
         fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
         fill: INK,
@@ -949,6 +1208,21 @@
         setActiveTool('select');
         return;
       }
+      case 'pan': {
+        // Pan tool — empty-canvas drag pans the viewport. Track the
+        // starting screen pos + base pan so each mouse:move computes
+        // an absolute delta (no drift).
+        STATE.isPanning = true;
+        STATE.panStartScreenX = opt.e ? opt.e.clientX : 0;
+        STATE.panStartScreenY = opt.e ? opt.e.clientY : 0;
+        STATE.panStartPanX = STATE.panX || 0;
+        STATE.panStartPanY = STATE.panY || 0;
+        if (STATE.canvas) {
+          STATE.canvas.defaultCursor = 'grabbing';
+          STATE.canvas.setCursor('grabbing');
+        }
+        return;
+      }
       case 'select':
       default: {
         if (obj && obj.data) {
@@ -962,23 +1236,50 @@
           // Don't renderCanvas here — that would wipe the very object
           // the user just mouse-down'd on and Fabric would lose its
           // drag-initiation target (the same bug the schematic editor
-          // hit). The Fabric default selection border shows
-          // immediately; the next render-on-modify swap in the red
-          // brand highlight is fine to wait for.
+          // hit). Instead, repaint colours directly so the new
+          // selection turns red and the previous one drops back to
+          // black — we can't rely on Fabric's selection:updated event
+          // to fire reliably for every click-to-click swap.
+          applyFabricSelectionStyle();
           renderPropertiesPanel();
           return;
         }
-        // Empty-canvas click clears the selection.
+        // ActiveSelection (multi-select) has no .data — the user is
+        // about to drag the whole group. Don't touch the canvas; let
+        // Fabric handle the drag.
+        if (obj &&
+            (obj.type === 'activeselection' || obj.type === 'activeSelection')) {
+          return;
+        }
+        // Empty-canvas click — Fabric handles the rubber-band lasso
+        // itself (canvas.selection is true in select mode). Clear the
+        // previous selection so the properties pane updates AND the
+        // formerly-selected item drops back to black.
+        var hadSel = !!(STATE.selectedPinId || STATE.selectedShapeId);
         STATE.selectedPinId = null;
         STATE.selectedShapeId = null;
-        renderCanvas();
-        renderPropertiesPanel();
+        if (hadSel) {
+          applyFabricSelectionStyle();
+          renderPropertiesPanel();
+        }
         return;
       }
     }
   }
 
   function onCanvasMouseMove(opt) {
+    // Pan-in-progress overrides every tool's preview rendering so
+    // panning works regardless of which tool is selected (handy if a
+    // user starts to pan while a draw tool is active and decides to
+    // navigate before placing).
+    if (STATE.isPanning && opt.e) {
+      var dx = opt.e.clientX - STATE.panStartScreenX;
+      var dy = opt.e.clientY - STATE.panStartScreenY;
+      STATE.panX = STATE.panStartPanX + dx;
+      STATE.panY = STATE.panStartPanY + dy;
+      applyViewport();
+      return;
+    }
     if (!STATE.activeSymbol) return;
     if (STATE.activeTool === 'rect' && STATE.rectDrawing) {
       var p = pointerScene(opt);
@@ -1030,6 +1331,16 @@
   }
 
   function onCanvasMouseUp(opt) {
+    if (STATE.isPanning) {
+      STATE.isPanning = false;
+      if (STATE.canvas) {
+        // Pan tool idle cursor; setActiveTool puts the right cursor
+        // on for every other tool.
+        STATE.canvas.defaultCursor = 'grab';
+        STATE.canvas.setCursor('grab');
+      }
+      return;
+    }
     if (STATE.activeTool === 'rect' && STATE.rectDrawing) {
       var p = pointerScene(opt);
       var snapped = snapCanvasXY(p.x, p.y);
@@ -1091,11 +1402,32 @@
     if (dom.pinSection) {
       dom.pinSection.classList.toggle('d-none', !pin);
     }
+    if (!pin) {
+      // Selection cleared / not a pin — reset the tracker so the
+      // next pin click is treated as a fresh selection (force-update).
+      STATE._lastRenderedPinId = null;
+    }
     if (pin) {
-      if (dom.pinNumber && document.activeElement !== dom.pinNumber) {
+      // Track the last-rendered pin id. When the user clicks a
+      // DIFFERENT pin we force-overwrite the input values even if
+      // focus is currently in one of them — otherwise the previous
+      // pin's number/name stays in the field and the user thinks
+      // the selection didn't update. The activeElement check still
+      // protects in-progress typing across autosave-triggered
+      // re-renders (which keep the same selectedPinId).
+      var pinChanged = STATE._lastRenderedPinId !== pin.id;
+      STATE._lastRenderedPinId = pin.id;
+      // Drop focus from a stale field on a pin swap so subsequent
+      // keystrokes don't land in the wrong input.
+      if (pinChanged && document.activeElement &&
+          (document.activeElement === dom.pinNumber ||
+           document.activeElement === dom.pinName)) {
+        document.activeElement.blur();
+      }
+      if (dom.pinNumber && (pinChanged || document.activeElement !== dom.pinNumber)) {
         dom.pinNumber.value = pin.number || '';
       }
-      if (dom.pinName && document.activeElement !== dom.pinName) {
+      if (dom.pinName && (pinChanged || document.activeElement !== dom.pinName)) {
         dom.pinName.value = pin.name || '';
       }
       Array.prototype.forEach.call(
@@ -1131,6 +1463,18 @@
         if (dom.shapeLineY1) dom.shapeLineY1.value = shape.y1;
         if (dom.shapeLineX2) dom.shapeLineX2.value = shape.x2;
         if (dom.shapeLineY2) dom.shapeLineY2.value = shape.y2;
+      } else if (shape.kind === 'text') {
+        if (dom.shapeTextValue && document.activeElement !== dom.shapeTextValue) {
+          dom.shapeTextValue.value = shape.text || '';
+        }
+        if (dom.shapeTextX) dom.shapeTextX.value = shape.x;
+        if (dom.shapeTextY) dom.shapeTextY.value = shape.y;
+        if (dom.shapeTextSize) {
+          dom.shapeTextSize.value = shape.fontSize || 12;
+        }
+        if (dom.shapeTextBold) {
+          dom.shapeTextBold.checked = (shape.role === 'name') || !!shape.bold;
+        }
       }
     }
   }
@@ -1192,6 +1536,50 @@
     var hasActive = !!getActiveSymbolRow();
     if (dom.libraryDuplicate) dom.libraryDuplicate.disabled = !hasActive;
     if (dom.libraryDelete) dom.libraryDelete.disabled = !hasActive;
+    // Admin-only Promote button — visible only when the current
+    // user is in the ADMIN_USERNAMES allow-list (the server enforces
+    // too; this is just a UI affordance to keep the chrome clean
+    // for everyone else).
+    if (dom.libraryPromote) {
+      var canPromote = !!(STATE.me && STATE.me.is_admin && hasActive && !STATE.libraryMode);
+      dom.libraryPromote.classList.toggle('d-none', !(STATE.me && STATE.me.is_admin));
+      dom.libraryPromote.disabled = !canPromote;
+    }
+  }
+
+  async function onPromoteClick() {
+    var row = getActiveSymbolRow();
+    if (!row) return;
+    // Quick prompt for the category — could be a fancier modal,
+    // but a confirm + prompt round-trip is enough for the curator
+    // who is on this page intentionally to promote one symbol.
+    var cats = ['Passive', 'Active', 'Power', 'Sensor', 'Module', 'Connector', 'Custom'];
+    var picked = window.prompt(
+      'Pick a category for "' + (row.name || 'this symbol') + '":\n' +
+      cats.join(', '),
+      'Custom'
+    );
+    if (picked == null) return; // cancelled
+    picked = String(picked).trim();
+    if (cats.indexOf(picked) === -1) {
+      alert('Unknown category. Pick one of: ' + cats.join(', '));
+      return;
+    }
+    // Make sure the latest design lands on the server before we
+    // promote — otherwise the library copy would lag the on-screen
+    // version by whatever's still in the autosave debounce window.
+    try { await flushAutosave(); } catch (_) {}
+    setSaveStatus('saving', 'Promoting…');
+    try {
+      var promoted = await promoteSymbolToLibrary(row, { category: picked });
+      setSaveStatus('saved');
+      alert('Promoted "' + (promoted.name || row.name) + '" to the ' +
+            promoted.category + ' category.\n' +
+            'Open /admin/symbols/ to manage the global library.');
+    } catch (e) {
+      setSaveStatus('error', 'Promote failed');
+      alert('Could not promote: ' + (e && e.message || 'unknown error'));
+    }
   }
 
   function countSymbolPins(s) {
@@ -1236,6 +1624,58 @@
     }, AUTOSAVE_MS);
   }
 
+  // Cancel any debounced timer and fire the PUT immediately, returning
+  // the promise so callers (e.g. the back-link click handler) can
+  // await save completion before navigating away. Without this the
+  // schematic editor would re-fetch /symbols before the latest edit
+  // landed, showing an older version of the symbol.
+  function flushAutosave() {
+    if (STATE.autosaveTimer) {
+      clearTimeout(STATE.autosaveTimer);
+      STATE.autosaveTimer = null;
+    }
+    if (STATE.activeSymbolId == null) return Promise.resolve();
+    return doAutosave();
+  }
+  // Expose for the back-link click handler below.
+  STATE._flushAutosave = flushAutosave;
+
+  // Pagehide / beforeunload safety net: if the user closes the tab,
+  // refreshes, or hits the browser back button while an autosave is
+  // still pending, fire a synchronous-ish PUT via `keepalive: true`
+  // so the request survives page tear-down. Modern browsers buffer
+  // up to ~64 KB of keepalive bodies; a symbol document is well
+  // under that ceiling.
+  window.addEventListener('pagehide', function () {
+    if (!STATE.autosaveTimer && STATE.activeSymbolId == null) return;
+    if (STATE.autosaveTimer) {
+      clearTimeout(STATE.autosaveTimer);
+      STATE.autosaveTimer = null;
+    }
+    var row = getActiveSymbolRow();
+    if (!row) return;
+    var payload = {
+      name: row.name,
+      ref_des_prefix: row.ref_des_prefix || 'U',
+      description: row.description || null,
+      symbol_data: JSON.stringify(STATE.activeSymbol || emptySymbolDoc()),
+    };
+    if (STATE.libraryMode) {
+      payload.category = row.category || 'Custom';
+    } else {
+      payload.bom_item_id = (row.bom_item_id == null) ? null : row.bom_item_id;
+    }
+    try {
+      fetch(symbolPutUrl(row.id), {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      });
+    } catch (_) { /* best-effort, no UI for failure here */ }
+  });
+
   async function doAutosave() {
     var row = getActiveSymbolRow();
     if (!row) return;
@@ -1243,12 +1683,19 @@
       name: row.name,
       ref_des_prefix: row.ref_des_prefix || 'U',
       description: row.description || null,
-      bom_item_id: row.bom_item_id == null ? null : row.bom_item_id,
       symbol_data: JSON.stringify(STATE.activeSymbol || emptySymbolDoc()),
     };
+    // Mode-specific fields. Pydantic ignores unknowns so it's safe to
+    // send both shapes to either endpoint, but tidier to send only
+    // what the target route accepts.
+    if (STATE.libraryMode) {
+      payload.category = row.category || 'Custom';
+    } else {
+      payload.bom_item_id = (row.bom_item_id == null) ? null : row.bom_item_id;
+    }
     try {
       var resp = await apiFetchWithTermsRetry(
-        API + '/api/projects/' + STATE.projectId + '/symbols/' + row.id,
+        symbolPutUrl(row.id),
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -1425,9 +1872,23 @@
       }
       STATE.linePending = null;
     }
-    // Rubber-band selection only meaningful in Select mode; every
-    // other tool needs the raw mouse:down (Pin / Rect / Line / etc.).
-    if (STATE.canvas) STATE.canvas.selection = (tool === 'select');
+    // Tool → selection / cursor mode:
+    //   select → rubber-band lasso ON (default), regular pointer
+    //   pan    → drag-to-pan the viewport, grab cursor
+    //   any other (pin, rect, line, …) → crosshair, lasso OFF
+    if (STATE.canvas) {
+      STATE.canvas.selection = (tool === 'select');
+      if (tool === 'pan') {
+        STATE.canvas.defaultCursor = 'grab';
+        STATE.canvas.hoverCursor   = 'grab';
+      } else if (tool === 'select') {
+        STATE.canvas.defaultCursor = 'default';
+        STATE.canvas.hoverCursor   = 'move';
+      } else {
+        STATE.canvas.defaultCursor = 'crosshair';
+        STATE.canvas.hoverCursor   = 'crosshair';
+      }
+    }
     paintActiveToolButton();
     renderCanvas();
   }
@@ -1461,22 +1922,32 @@
     c.on('mouse:move', onCanvasMouseMove);
     c.on('mouse:up',   onCanvasMouseUp);
 
+    // Selection styling — every time Fabric's selection changes
+    // (single click, lasso, shift-pick, deselect), re-colour the
+    // affected canvas objects so the user gets consistent visual
+    // feedback: selected = brand red, unselected = INK black. Without
+    // this, multi-selected items render via STATE.selectedPinId /
+    // selectedShapeId which only track single-selection, so the
+    // colours fall out of sync with what Fabric thinks is picked.
+    c.on('selection:created', applyFabricSelectionStyle);
+    c.on('selection:updated', applyFabricSelectionStyle);
+    c.on('selection:cleared', applyFabricSelectionStyle);
+
     // Pin drag — the dot is the only selectable part. As it moves we
     // ferry the same delta into the line + label so the whole pin
     // visually tracks the cursor. On modified (mouseup) we snap and
     // commit to STATE, then renderCanvas() rebuilds everything fresh.
-    c.on('object:moving', function (e) {
-      var obj = e.target;
-      if (!obj || !obj.data || obj.data.kind !== 'pin') return;
-      var dx = obj.left - (obj._lastLeft != null ? obj._lastLeft : obj.left);
-      var dy = obj.top  - (obj._lastTop  != null ? obj._lastTop  : obj.top);
-      obj._lastLeft = obj.left;
-      obj._lastTop = obj.top;
-      // Find the line + label that belong to this pin.
-      var others = c.getObjects().filter(function (o) {
-        return o.data && o.data.kind === 'pin-part' && o.data.id === obj.data.id;
-      });
-      others.forEach(function (o) {
+    //
+    // Same logic applies to ActiveSelection drags (multi-pin pick):
+    // the AS wraps the *dots* but the line/label pin-parts aren't
+    // selectable so they sit OUTSIDE the AS. Without ferrying their
+    // positions every frame, the user sees only the circles travel
+    // and the lines + labels stay frozen at the original spot until
+    // mouseup, which reads as a glitch.
+    function ferryPinParts(idSet, dx, dy) {
+      c.getObjects().forEach(function (o) {
+        if (!o.data || o.data.kind !== 'pin-part') return;
+        if (!idSet[o.data.id]) return;
         if (o.type === 'line') {
           o.set({ x1: o.x1 + dx, y1: o.y1 + dy, x2: o.x2 + dx, y2: o.y2 + dy });
         } else {
@@ -1484,6 +1955,41 @@
         }
         o.setCoords();
       });
+    }
+    c.on('object:moving', function (e) {
+      var obj = e.target;
+      if (!obj) return;
+
+      // Multi-pin drag — ActiveSelection wraps the selected dots
+      // and/or shapes; the line + label objects sit OUTSIDE the AS
+      // because they're not selectable. Move them by the AS's frame
+      // delta so the whole pin tracks the cursor live.
+      if (obj.type === 'activeselection' || obj.type === 'activeSelection') {
+        var dxs = obj.left - (obj._lastLeft != null ? obj._lastLeft : obj.left);
+        var dys = obj.top  - (obj._lastTop  != null ? obj._lastTop  : obj.top);
+        obj._lastLeft = obj.left;
+        obj._lastTop  = obj.top;
+        if (dxs === 0 && dys === 0) return;
+        var kids = obj.getObjects ? obj.getObjects() : [];
+        var idSet = {};
+        kids.forEach(function (child) {
+          if (child && child.data && child.data.kind === 'pin') {
+            idSet[child.data.id] = true;
+          }
+        });
+        if (Object.keys(idSet).length > 0) ferryPinParts(idSet, dxs, dys);
+        return;
+      }
+
+      // Single pin drag — the dragged target is the pin dot itself.
+      if (!obj.data || obj.data.kind !== 'pin') return;
+      var dx = obj.left - (obj._lastLeft != null ? obj._lastLeft : obj.left);
+      var dy = obj.top  - (obj._lastTop  != null ? obj._lastTop  : obj.top);
+      obj._lastLeft = obj.left;
+      obj._lastTop  = obj.top;
+      var single = {};
+      single[obj.data.id] = true;
+      ferryPinParts(single, dx, dy);
     });
 
     c.on('object:modified', function (e) {
@@ -1534,6 +2040,11 @@
               var scene = c2s(snapped2.x, snapped2.y);
               shape.x = scene.x;
               shape.y = scene.y;
+            } else if (shape.kind === 'text') {
+              var snT = snapCanvasXY(pt.x, pt.y);
+              var scT = c2s(snT.x, snT.y);
+              shape.x = scT.x;
+              shape.y = scT.y;
             } else if (shape.kind === 'line') {
               // The line's local (x1,y1)→(x2,y2) length stays put;
               // we shift it so (x1,y1) ends up at the new top-left.
@@ -1737,6 +2248,77 @@
     applyViewport();
   }
 
+  // Frame the active symbol's pins + body shapes inside the visible
+  // canvas at ~90 % margin. Used by the zoom-reset button's toggle
+  // (alongside resetZoom) so the user can flip between 100 % and
+  // fitted views.
+  function zoomToFit() {
+    if (!STATE.canvas || !STATE.activeSymbol) { resetZoom(); return; }
+    var pins = STATE.activeSymbol.pins || [];
+    var shapes = STATE.activeSymbol.bodyShapes || [];
+    var minX = Infinity, maxX = -Infinity;
+    var minY = Infinity, maxY = -Infinity;
+    function bump(x, y) {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+    pins.forEach(function (p) {
+      // Pin's anchor + stick + terminator extents (lineLen = 2*GRID).
+      var lineLen = 2 * GRID;
+      var rot = pinRotation(p);
+      var dx = 0, dy = 0;
+      switch (rot) {
+        case 0:   dx = 1;  break;
+        case 90:  dy = 1;  break;
+        case 180: dx = -1; break;
+        case 270: dy = -1; break;
+      }
+      bump(p.x, p.y);
+      bump(p.x + dx * lineLen, p.y + dy * lineLen);
+    });
+    shapes.forEach(function (s) {
+      if (s.kind === 'rect') {
+        bump(s.x, s.y);
+        bump(s.x + s.w, s.y + s.h);
+      } else if (s.kind === 'line') {
+        bump(s.x1, s.y1);
+        bump(s.x2, s.y2);
+      } else if (s.kind === 'text') {
+        // Approximate text bbox — char width ≈ 0.6 × fontSize.
+        var fs = s.fontSize || 12;
+        var w = (s.text || '').length * fs * 0.6;
+        var h = fs * 1.4;
+        bump(s.x, s.y);
+        bump(s.x + w, s.y + h);
+      }
+    });
+    if (!isFinite(minX) || maxX <= minX || maxY <= minY) {
+      resetZoom();
+      return;
+    }
+    var contentW = Math.max(1, maxX - minX);
+    var contentH = Math.max(1, maxY - minY);
+    var cw = STATE.canvas.getWidth();
+    var ch = STATE.canvas.getHeight();
+    var margin = 0.9;
+    var sFit = sdFitScale();
+    var zX = (cw * margin) / (sFit * contentW);
+    var zY = (ch * margin) / (sFit * contentH);
+    var z  = Math.max(0.25, Math.min(6, Math.min(zX, zY)));
+    STATE.userZoom = z;
+    var s = sdEffectiveScale();
+    var midX = (minX + maxX) / 2;
+    var midY = (minY + maxY) / 2;
+    // Scene coords are centred on (0, 0) — convert content midpoint
+    // (which is already in scene coords) to a pan that places it at
+    // the viewport centre.
+    STATE.panX = -midX * s;
+    STATE.panY = -midY * s;
+    applyViewport();
+  }
+
   function updateZoomPctLabel() {
     if (!dom.zoomPct) return;
     dom.zoomPct.textContent = Math.round((STATE.userZoom || 1) * 100) + '%';
@@ -1750,7 +2332,9 @@
     dom.workspace      = document.getElementById('sd-workspace');
     dom.titlebar       = document.getElementById('sd-titlebar');
     dom.backLink       = document.getElementById('sd-back-link');
-    dom.openSchematic  = document.getElementById('sd-open-schematic');
+    // sd-open-schematic was removed — the back link now goes
+    // directly to the schematic editor, no separate primary button
+    // needed.
     dom.projectTitle   = document.getElementById('sd-project-title');
     dom.saveStatus     = document.getElementById('sd-save-status');
     dom.loading        = document.getElementById('sd-loading');
@@ -1763,6 +2347,7 @@
     dom.libraryNew     = document.getElementById('sd-library-new');
     dom.libraryDuplicate = document.getElementById('sd-library-duplicate');
     dom.libraryDelete  = document.getElementById('sd-library-delete');
+    dom.libraryPromote = document.getElementById('sd-library-promote');
     dom.librarySearch  = document.getElementById('sd-library-search');
 
     dom.canvasCol      = document.getElementById('sd-canvas-col');
@@ -1805,6 +2390,11 @@
     dom.shapeLineY1    = document.getElementById('sd-shape-line-y1');
     dom.shapeLineX2    = document.getElementById('sd-shape-line-x2');
     dom.shapeLineY2    = document.getElementById('sd-shape-line-y2');
+    dom.shapeTextValue = document.getElementById('sd-shape-text-value');
+    dom.shapeTextX     = document.getElementById('sd-shape-text-x');
+    dom.shapeTextY     = document.getElementById('sd-shape-text-y');
+    dom.shapeTextSize  = document.getElementById('sd-shape-text-size');
+    dom.shapeTextBold  = document.getElementById('sd-shape-text-bold');
     dom.shapeDelete    = document.getElementById('sd-shape-delete');
   }
 
@@ -1842,6 +2432,9 @@
     }
     if (dom.libraryDelete) {
       dom.libraryDelete.addEventListener('click', deleteActive);
+    }
+    if (dom.libraryPromote) {
+      dom.libraryPromote.addEventListener('click', onPromoteClick);
     }
     if (dom.librarySearch) {
       dom.librarySearch.addEventListener('input', function () {
@@ -1918,10 +2511,78 @@
       renderPropertiesPanel();
       scheduleAutosave();
     }
-    // Transform section (top of right pane). Acts on the selected
-    // pin or shape, or — when nothing is selected — falls back to
-    // the whole-symbol transforms.
+    // Apply rotate/flip to a single pin in-place. A pin's origin IS
+    // its anchor (x, y) — rotating the pin just bumps its direction
+    // field; the anchor doesn't move. flip-h/flip-v rotate 180° so a
+    // pin facing right after a flip-h faces left, matching what the
+    // user expects "mirror this pin in place" to mean.
+    function applyTransformToPin(pin, kind) {
+      if (!pin) return;
+      if (kind === 'rotate-cw')        setPinRotation(pin, pinRotation(pin) + 90);
+      else if (kind === 'rotate-ccw')  setPinRotation(pin, pinRotation(pin) - 90);
+      else if (kind === 'flip-h' || kind === 'flip-v') {
+        setPinRotation(pin, pinRotation(pin) + 180);
+      }
+    }
+    // Transform section (top of right pane). Acts on whatever is
+    // currently selected: a single pin/shape, a multi-select
+    // (ActiveSelection) of pins and shapes, or — when nothing is
+    // selected — falls back to the whole-symbol transforms.
+    //
+    // For multi-select we transform each child IN-PLACE about its own
+    // origin rather than rotating the whole group as a unit. That's
+    // what the user expects when they shift-pick four pins + a body
+    // line and hit "rotate 90°": each pin's direction flips, the
+    // line spins around its own midpoint, etc. — no positions move.
     function transformAction(kind) {
+      // Check Fabric's active object first — that's what tells us
+      // whether the user picked one or many items.
+      var active = STATE.canvas && STATE.canvas.getActiveObject
+        ? STATE.canvas.getActiveObject()
+        : null;
+      var isMulti = active &&
+        (active.type === 'activeselection' || active.type === 'activeSelection');
+
+      if (isMulti) {
+        // Iterate the ActiveSelection's children, pull each one's
+        // STATE pin/shape via the `data.id` we tagged at render time,
+        // and apply the same per-item transform that the single-item
+        // path uses.
+        var kids = active.getObjects ? active.getObjects() : [];
+        var touchedAny = false;
+        // Snapshot the selected IDs BEFORE we render — renderCanvas
+        // rebuilds every Fabric object from scratch, so the existing
+        // AS holds stale references. We re-create an AS over the new
+        // objects matching these ids so the user's selection stays
+        // intact for the next rotate / flip click.
+        var preservedIds = kids
+          .filter(function (c) { return c && c.data && (c.data.kind === 'pin' || c.data.kind === 'shape'); })
+          .map(function (c) { return { kind: c.data.kind, id: c.data.id }; });
+        kids.forEach(function (child) {
+          if (!child || !child.data) return;
+          if (child.data.kind === 'pin') {
+            var p = findPin(child.data.id);
+            if (p) { applyTransformToPin(p, kind); touchedAny = true; }
+          } else if (child.data.kind === 'shape') {
+            var s = findShape(child.data.id);
+            if (s) { rotateOrFlipShapeInPlace(s, kind); touchedAny = true; }
+          }
+        });
+        if (touchedAny) {
+          // Discard the AS so Fabric drops its now-stale references
+          // before we render fresh objects. The selection comes back
+          // immediately via restoreActiveSelection below.
+          if (STATE.canvas && STATE.canvas.discardActiveObject) {
+            STATE.canvas.discardActiveObject();
+          }
+          renderCanvas();
+          restoreActiveSelection(preservedIds);
+          renderPropertiesPanel();
+          scheduleAutosave();
+        }
+        return;
+      }
+
       var pin = STATE.selectedPinId && findPin(STATE.selectedPinId);
       var shape = STATE.selectedShapeId && findShape(STATE.selectedShapeId);
       if (pin) {
@@ -1951,7 +2612,19 @@
     // Zoom buttons + Ctrl+wheel + Cmd/Ctrl + / - / 0.
     if (dom.zoomIn)    dom.zoomIn.addEventListener('click', function () { zoomBy(1.25, null); });
     if (dom.zoomOut)   dom.zoomOut.addEventListener('click', function () { zoomBy(1 / 1.25, null); });
-    if (dom.zoomReset) dom.zoomReset.addEventListener('click', resetZoom);
+    // Zoom-reset toggles between zoom-to-fit and 100 %.
+    if (dom.zoomReset) {
+      var _sdZoomResetMode = 'fit';
+      dom.zoomReset.addEventListener('click', function () {
+        if (_sdZoomResetMode === 'fit') {
+          zoomToFit();
+          _sdZoomResetMode = 'reset';
+        } else {
+          resetZoom();
+          _sdZoomResetMode = 'fit';
+        }
+      });
+    }
     if (dom.canvasWrap) {
       dom.canvasWrap.addEventListener('wheel', function (e) {
         if (!(e.ctrlKey || e.metaKey)) return;
@@ -1983,6 +2656,20 @@
       }
     });
 
+    // Cmd/Ctrl+D — duplicate the currently selected pin(s) / shape(s).
+    // Clones are offset by one grid cell so the new item is visible
+    // and not stacked exactly on top of the original. The new items
+    // become the selection so the user can chain duplicates.
+    document.addEventListener('keydown', function (e) {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      if (document.activeElement &&
+          /input|textarea|select/i.test(document.activeElement.tagName)) return;
+      if (e.key !== 'd' && e.key !== 'D') return;
+      e.preventDefault();
+      duplicateSelected();
+    });
+
+
     // Shape fields — only edit by typing in the inputs.
     function wireShapeNumeric(el, prop) {
       if (!el) return;
@@ -2004,6 +2691,40 @@
     wireShapeNumeric(dom.shapeLineY1, 'y1');
     wireShapeNumeric(dom.shapeLineX2, 'x2');
     wireShapeNumeric(dom.shapeLineY2, 'y2');
+    wireShapeNumeric(dom.shapeTextX, 'x');
+    wireShapeNumeric(dom.shapeTextY, 'y');
+
+    // Text value — live update while typing (no snap).
+    if (dom.shapeTextValue) {
+      dom.shapeTextValue.addEventListener('input', function () {
+        var shape = STATE.selectedShapeId && findShape(STATE.selectedShapeId);
+        if (!shape || shape.kind !== 'text') return;
+        shape.text = dom.shapeTextValue.value;
+        renderCanvas();
+        scheduleAutosave();
+      });
+    }
+    if (dom.shapeTextSize) {
+      dom.shapeTextSize.addEventListener('change', function () {
+        var shape = STATE.selectedShapeId && findShape(STATE.selectedShapeId);
+        if (!shape || shape.kind !== 'text') return;
+        var n = Math.max(8, Math.min(48,
+          parseInt(dom.shapeTextSize.value, 10) || 12));
+        shape.fontSize = n;
+        dom.shapeTextSize.value = n;
+        renderCanvas();
+        scheduleAutosave();
+      });
+    }
+    if (dom.shapeTextBold) {
+      dom.shapeTextBold.addEventListener('change', function () {
+        var shape = STATE.selectedShapeId && findShape(STATE.selectedShapeId);
+        if (!shape || shape.kind !== 'text') return;
+        shape.bold = dom.shapeTextBold.checked;
+        renderCanvas();
+        scheduleAutosave();
+      });
+    }
 
     if (dom.shapeDelete) {
       dom.shapeDelete.addEventListener('click', deleteSelected);
@@ -2034,6 +2755,63 @@
     var r = await apiFetch(API + '/api/projects/' + STATE.projectId + '/symbols');
     if (!r.ok) throw new Error('Symbols HTTP ' + r.status);
     return r.json();
+  }
+
+  // Returns the URL the designer should PUT to when autosaving the
+  // currently-active symbol. In project mode it's the per-project
+  // /symbols/<id> route; in library mode (admin-only ?library_id=N
+  // entry point) it's the global /api/library/symbols/<id> route.
+  // Centralised here so flushAutosave + the pagehide handler stay
+  // in sync.
+  function symbolPutUrl(rowId) {
+    if (STATE.libraryMode) {
+      return API + '/api/library/symbols/' + rowId;
+    }
+    return API + '/api/projects/' + STATE.projectId + '/symbols/' + rowId;
+  }
+
+  // Promote the current project symbol to the global admin library.
+  // Returns the new LibrarySymbol row on success, throws on failure.
+  // Only callable when the current user is in the admin list (the
+  // server enforces this; the UI just hides the trigger button for
+  // non-admins).
+  async function promoteSymbolToLibrary(row, overrides) {
+    if (!row || row.id == null) throw new Error('No symbol to promote');
+    var body = Object.assign({
+      project_symbol_id: row.id,
+      name: row.name,
+      ref_des_prefix: row.ref_des_prefix || 'U',
+      description: row.description || null,
+      category: 'Custom',
+    }, overrides || {});
+    var resp = await apiFetchWithTermsRetry(
+      API + '/api/library/symbols/promote-from-project',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }
+    );
+    if (!resp.ok) throw new Error('Promote HTTP ' + resp.status);
+    return resp.json();
+  }
+
+  async function fetchLibrarySymbol(libraryId) {
+    var r = await apiFetch(API + '/api/library/symbols/' + libraryId);
+    if (!r.ok) {
+      var err = new Error('Library symbol HTTP ' + r.status);
+      err.status = r.status;
+      throw err;
+    }
+    return r.json();
+  }
+
+  async function fetchLibraryCategories() {
+    try {
+      var r = await apiFetch(API + '/api/library/symbols/categories');
+      if (!r.ok) return [];
+      return r.json();
+    } catch (_) { return []; }
   }
   async function fetchBom() {
     try {
@@ -2074,6 +2852,17 @@
   async function init() {
     cacheDom();
     var params = new URLSearchParams(window.location.search);
+    // ``?library_id=N`` opens the designer in admin library-edit
+    // mode: load a single LibrarySymbol, edit metadata + design,
+    // PUT goes to the global library route. Bypasses the
+    // project-id requirement entirely.
+    var libraryIdParam = params.get('library_id');
+    if (libraryIdParam) {
+      STATE.libraryMode = true;
+      STATE.libraryId = parseInt(libraryIdParam, 10);
+      await initLibraryMode();
+      return;
+    }
     // Accept both ``project_id`` (the spec's name) and ``id`` (the
     // shorter form the schematic editor uses) so the C1 / E2 deep
     // links can hit this page either way.
@@ -2088,13 +2877,31 @@
       return;
     }
     if (dom.backLink) {
-      dom.backLink.href = '/projects/instructions/edit.html?id=' +
+      // One-step back: schematic editor for this project (the page
+      // the user usually arrives from). If they entered via the
+      // project editor instead, they can use the browser back button
+      // or the schematic editor's own "Back to project editor" link.
+      dom.backLink.href = '/projects/schematic/edit.html?id=' +
         encodeURIComponent(STATE.projectId);
+      // Intercept clicks so any pending autosave fires AND completes
+      // before we navigate. Without this the user can edit a symbol,
+      // hit Back within the 500 ms autosave debounce window, and
+      // arrive in the schematic editor showing the pre-edit version
+      // of the symbol.
+      dom.backLink.addEventListener('click', async function (e) {
+        // Plain left-click only — let middle/cmd/ctrl-click open in a
+        // new tab without intercept (the new tab will re-fetch on
+        // load, so the user gets the latest version anyway).
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var href = dom.backLink.getAttribute('href');
+        if (!href) return;
+        e.preventDefault();
+        try { await flushAutosave(); } catch (_) {}
+        window.location.href = href;
+      });
     }
-    if (dom.openSchematic) {
-      dom.openSchematic.href = '/projects/schematic/edit.html?id=' +
-        encodeURIComponent(STATE.projectId);
-    }
+    // The redundant sd-open-schematic button was removed from the
+    // title bar — the back link above is now the single exit path.
 
     try {
       var me = await fetchMe();
@@ -2154,6 +2961,86 @@
       }
       showOnly(dom.error);
     }
+  }
+
+  // ---------------------------------------------------------------
+  // Library-edit mode (admin only). The Symbol Designer normally
+  // works per-project; this path loads a single LibrarySymbol so
+  // admins can refine the design without going via a project.
+  // ---------------------------------------------------------------
+  async function initLibraryMode() {
+    if (!Number.isFinite(STATE.libraryId)) {
+      if (dom.errorDetail) dom.errorDetail.textContent = 'Bad library_id in URL.';
+      showOnly(dom.error);
+      return;
+    }
+    // Back link goes to the admin symbols page, not a schematic.
+    if (dom.backLink) {
+      dom.backLink.href = '/admin/symbols/';
+      dom.backLink.innerHTML =
+        '<i class="fas fa-arrow-left me-1"></i> Back to library';
+      dom.backLink.addEventListener('click', async function (e) {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var href = dom.backLink.getAttribute('href');
+        if (!href) return;
+        e.preventDefault();
+        try { await flushAutosave(); } catch (_) {}
+        window.location.href = href;
+      });
+    }
+    try {
+      // Admin gate. The server enforces too; this is just a friendly
+      // early-return for non-admins.
+      var me = await fetchMe();
+      STATE.me = me;
+      if (!me || me.is_admin !== true) {
+        showOnly(dom.notOwner);
+        return;
+      }
+      var sym = await fetchLibrarySymbol(STATE.libraryId);
+      if (dom.projectTitle) {
+        dom.projectTitle.textContent =
+          'Library symbol · ' + (sym.name || ('#' + sym.id));
+      }
+      // Adapt the single library row into the same in-memory shape
+      // the rest of the designer expects (it walks STATE.symbols and
+      // uses ``id`` / ``name`` / ``symbol_data``). The category field
+      // is preserved on the row so doAutosave can include it.
+      STATE.symbols = [sym];
+      STATE.bomItems = []; // library symbols don't link to a BOM
+      wireUi();
+      initCanvas();
+      // Hide the BOM dropdown + the library list rail — neither
+      // applies in library-edit mode.
+      hideLibraryModeUiBits();
+      setSaveStatus('saved');
+      activateSymbol(sym.id);
+      showOnly(dom.main);
+      setTimeout(syncCanvasDisplaySize, 50);
+    } catch (e) {
+      if (e && e.status === 404 && dom.errorDetail) {
+        dom.errorDetail.textContent = 'Library symbol not found.';
+      }
+      showOnly(dom.error);
+    }
+  }
+
+  // Trim the chrome that doesn't apply to library editing. Library
+  // symbols don't link to a BOM and aren't grouped into a per-
+  // project list, so the BOM dropdown + the symbols list rail get
+  // hidden. We keep the canvas + properties pane + toolbar intact.
+  function hideLibraryModeUiBits() {
+    var hideIds = [
+      'sd-bom-section',         // BOM dropdown row
+      'sd-library-list',        // left-rail symbol list
+      'sd-library-section',     // its containing card / section
+      'sd-new-symbol-btn',      // "+ New" — single-symbol edit only
+      'sd-delete-symbol-btn',   // deletion happens via /admin/symbols
+    ];
+    hideIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
   }
 
   if (document.readyState === 'loading') {

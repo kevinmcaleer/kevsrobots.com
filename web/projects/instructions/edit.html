@@ -9,11 +9,25 @@ hide_nibsy: true
 {% include nav_projects.html %}
 
 <link rel="stylesheet" href="/assets/css/instruction-builder.css?v={{ site.time | date: '%s' }}">
+<!-- EasyMDE — markdown editor for text-step canvases (matches the
+     project editor's writing surface). -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
 
 <!-- Tag the body so site-level CSS rules (footer hide, container reset)
      scope to this workspace only. The script is tiny and runs synchronously
-     so it doesn't fight first paint. -->
-<script>document.body.classList.add('instruction-builder-page');</script>
+     so it doesn't fight first paint. ``?embedded=1`` adds `is-embedded`
+     so the page can be iframed inside the project editor with all site
+     chrome (nav, footer, project sub-nav, titlebar) hidden — the host
+     page's editor surface acts as the single frame. -->
+<script>
+  document.body.classList.add('instruction-builder-page');
+  try {
+    var qs = new URLSearchParams(window.location.search);
+    if (qs.get('embedded') === '1') {
+      document.body.classList.add('is-embedded');
+    }
+  } catch (_) {}
+</script>
 
 <div class="ib-workspace" id="ib-workspace" data-density="roomy">
 
@@ -42,7 +56,7 @@ hide_nibsy: true
           <i class="fas fa-magnifying-glass-minus"></i>
         </button>
         <button type="button" class="ib-titlebar-btn ib-zoom-btn" id="ib-zoom-reset"
-                title="Zoom to fit (Ctrl/Cmd 0)">
+                title="Toggle zoom-to-fit / 100% (Ctrl/Cmd 0)">
           <span id="ib-zoom-pct">100%</span>
         </button>
         <button type="button" class="ib-titlebar-btn ib-zoom-btn" id="ib-zoom-in"
@@ -243,6 +257,9 @@ hide_nibsy: true
             <div class="ib-tool-grid">
               <button type="button" class="ib-tool-btn is-active" data-tool="select" title="Select / move">
                 <i class="fas fa-mouse-pointer"></i> Select
+              </button>
+              <button type="button" class="ib-tool-btn" data-tool="pan" title="Pan the canvas (drag the view)">
+                <i class="fas fa-hand"></i> Pan
               </button>
               <button type="button" class="ib-tool-btn" data-tool="arrow" title="Arrow">
                 <i class="fas fa-long-arrow-alt-right"></i> Arrow
@@ -481,6 +498,21 @@ hide_nibsy: true
           <h6 class="ib-pane-title"><i class="fas fa-layer-group me-2"></i>Layers</h6>
         </header>
         <div class="ib-pane-body">
+          <!-- Background colour for the active step's canvas. Saved
+               into canvas_json's `background` so it persists per step
+               and exports along with the rest of the artwork. -->
+          <div class="ib-canvas-bg-row mb-2">
+            <label class="ib-canvas-bg-label" for="ib-canvas-bg-color">
+              Canvas background
+            </label>
+            <input type="color" id="ib-canvas-bg-color"
+                   class="ib-canvas-bg-input" value="#ffffff"
+                   title="Set the active step's canvas background colour">
+            <button type="button" id="ib-canvas-bg-clear"
+                    class="ib-canvas-bg-clear" title="Reset to white">
+              <i class="fas fa-rotate-left"></i>
+            </button>
+          </div>
           <ol class="ib-layers-list" id="ib-layers-list"></ol>
           <p class="ib-pane-hint text-muted small mb-0">
             Drag rows to reorder. Click a row to select that object on the canvas.
@@ -500,6 +532,13 @@ hide_nibsy: true
          ========================================================= -->
     <main class="ib-canvas-area" id="ib-canvas-area" aria-label="Canvas">
       <div class="ib-canvas-frame" id="ib-canvas-frame">
+        <!-- Slide-number overlay — the active step's step_number,
+             painted on top of the Fabric canvas (and any objects on
+             it) at the top-left of the visible frame. JS populates the
+             text from state.activeStepId / state.steps when switching
+             steps. Hidden on non-photo/blank step types via the
+             body[data-active-step-type] rule in CSS. -->
+        <div class="ib-canvas-step-num" id="ib-canvas-step-num" aria-hidden="true"></div>
         <canvas id="ib-canvas"></canvas>
         <div class="ib-canvas-empty" id="ib-canvas-empty">
           Drop a photo here, or pick a tool from the secondary pane.
@@ -510,12 +549,22 @@ hide_nibsy: true
            these or the Fabric canvas frame above based on the active
            step's step_type. -->
       <div class="ib-canvas-text d-none" id="ib-canvas-text">
-        <div class="ib-canvas-text-inner">
-          <div class="ib-canvas-text-empty" id="ib-canvas-text-empty">
-            <i class="fas fa-pen-to-square mb-2"></i>
-            <p class="mb-0">Write this step's body in the <strong>Schematic</strong> pane.</p>
+        <div class="ib-canvas-text-pages" id="ib-canvas-text-pages">
+          <!-- One A5-ish "page" surface containing the markdown editor.
+               When the rendered preview height exceeds a page, extra
+               page-divider lines appear and ib-canvas-text-pagecount
+               surfaces the total page count (used by future PNG/PDF/GIF
+               export to split the rendered output into discrete images). -->
+          <div class="ib-canvas-text-page">
+            <div class="ib-canvas-text-pagecount" id="ib-canvas-text-pagecount">
+              <span class="ib-canvas-text-pagecount-label">Page 1 of 1</span>
+            </div>
+            <textarea id="ib-canvas-text-editor"
+                      placeholder="Write this step's text here. Markdown supported.
+
+Use **bold**, *italic*, `code`, lists, links, and images. The canvas
+will add new pages automatically as your text gets longer."></textarea>
           </div>
-          <div class="ib-canvas-text-body" id="ib-canvas-text-body"></div>
         </div>
       </div>
 
@@ -598,6 +647,10 @@ hide_nibsy: true
              at the bottom of the workspace — a downward menu would
              spill below the viewport. -->
         <div class="dropup ib-filmstrip-add-wrap">
+          <!-- Bootstrap dropdown trigger. The Popper config is set up
+               in JS (wireFilmstrip) to use `strategy: 'fixed'` so the
+               menu escapes the filmstrip body's overflow context and
+               doesn't get clipped above the strip. -->
           <button type="button" class="ib-filmstrip-add" id="ib-filmstrip-add"
                   data-bs-toggle="dropdown" aria-expanded="false"
                   title="Add step">
@@ -702,6 +755,9 @@ hide_nibsy: true
   bust here.
 -->
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<!-- EasyMDE — markdown editor for text-step canvases. Must load before
+     instruction-builder.js so the canvas editor can construct against it. -->
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/instruction-builder.js?v={{ site.time | date: '%s' }}"></script>

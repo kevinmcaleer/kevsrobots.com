@@ -456,10 +456,105 @@ description: View project details
   }
   .toc-nav a.toc-extra:first-of-type { border-top-color: #eee; }
 
+  /* Step-aware TOC entries (builder-mode projects). Slight emphasis
+     on the "Step N" prefix via tabular-nums so the column lines up
+     when N spans 1–10+ steps. */
+  .toc-nav a.toc-builder-step {
+    padding-left: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .toc-nav a.toc-builder-step.active {
+    border-left-color: var(--bs-primary, #0d6efd);
+  }
+
   /* Mermaid in view */
   #view-content .mermaid {
     text-align: center;
     margin: 1.5rem 0;
+  }
+
+  /* Instruction Builder steps shown in the viewer when the project's
+     content_mode is "builder". The step number is a circular pip
+     beside the step title, matching the editor's filmstrip tile so
+     the viewer mirrors the author's mental model. */
+  .builder-step {
+    border-left: 3px solid #e9ecef;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+  }
+  .builder-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--bs-primary, #0d6efd);
+    color: #fff;
+    font-weight: 700;
+    margin-right: 0.75rem;
+    padding: 0 0.5rem;
+  }
+  .builder-step-title {
+    color: #212529;
+  }
+  .builder-step-desc {
+    margin-left: 2.75rem;
+    margin-bottom: 0.75rem;
+  }
+  .builder-step-body {
+    margin-left: 2.75rem;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+  .builder-step-body img,
+  .builder-step-body video,
+  .builder-step-body iframe,
+  .builder-step-body table {
+    max-width: 100%;
+    height: auto;
+  }
+  .builder-step-body pre,
+  .builder-step-body code {
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    word-break: break-word;
+  }
+  .builder-step-text { line-height: 1.7; }
+  .builder-step-text > *:first-child { margin-top: 0; }
+  .builder-step-text > *:last-child  { margin-bottom: 0; }
+  .builder-view-header {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 0.75rem;
+  }
+  .builder-step-canvas-preview,
+  .builder-step-schematic-preview {
+    width: 100%;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background: #f8f9fa;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .builder-step-canvas-img,
+  .builder-step-schematic-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #ffffff;
+  }
+  .builder-step-loading {
+    text-align: center;
+    padding: 1rem;
+  }
+  .builder-step-canvas-empty {
+    margin-bottom: 0;
   }
 
   /* Showcase-style breadcrumbs above the title */
@@ -573,6 +668,9 @@ description: View project details
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/instruction-viewer.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Builder-mode renderer — shared with the project editor's
+     preview pane so the two surfaces emit identical markup. -->
+<script src="/assets/js/builder-renderer.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -633,6 +731,23 @@ description: View project details
     containerEl.querySelectorAll('table').forEach(t => {
       t.classList.add('table', 'table-single', 'table-narrow');
     });
+  }
+
+  // Render the project as Instruction Builder steps when the author
+  // opted into ``content_mode: builder``. Delegates to the shared
+  // BuilderRenderer module so /projects/editor.html's preview pane
+  // and this public viewer emit identical markup.
+  async function renderBuilderInstructions(project) {
+    const contentEl = document.getElementById('view-content');
+    if (!contentEl) return;
+    if (window.BuilderRenderer && typeof window.BuilderRenderer.render === 'function') {
+      await window.BuilderRenderer.render(contentEl, project.id);
+    } else {
+      contentEl.innerHTML =
+        '<div class="alert alert-warning small">' +
+        '  Preview library failed to load — refresh the page to retry.' +
+        '</div>';
+    }
   }
 
   function setupReportForm(pid) {
@@ -776,8 +891,16 @@ description: View project details
         if (nameEl) nameEl.textContent = fullName;
       });
 
-      // Content
-      if (project.content_md) {
+      // Content — the project author picks between long-form Markdown
+      // and the visual Instruction Builder. content_mode persists that
+      // choice; the viewer mirrors it so what gets published matches
+      // what got authored.
+      const viewMode = (project.content_mode === 'builder') ? 'builder' : 'markdown';
+      if (viewMode === 'builder') {
+        await renderBuilderInstructions(project);
+        // Build the step-aware TOC now that the sections are in the DOM.
+        buildTOC();
+      } else if (project.content_md) {
         const contentEl = document.getElementById('view-content');
         contentEl.innerHTML = marked.parse(project.content_md);
         styleMarkdownTables(contentEl);
@@ -1909,9 +2032,86 @@ description: View project details
     });
   }
 
+  // Step-aware TOC for builder-mode projects. Reads the structured
+  // step list rendered by builder-renderer.js (each section has
+  // ``id="step-N"`` + data attributes) instead of scanning headings,
+  // so the TOC labels read "Step N · Title" with no slug-collision
+  // dance and no dependency on what the author put in the h3.
+  function buildBuilderTOC(nav, sections) {
+    const links = [];
+    sections.forEach(sec => {
+      const num   = sec.dataset.stepNum;
+      const title = sec.dataset.stepTitle || '';
+      const label = title
+        ? ('Step ' + num + ' &middot; ' + esc(title))
+        : ('Step ' + num);
+      links.push(
+        '<a href="#' + sec.id + '" class="toc-h3 toc-builder-step" ' +
+        'data-toc-target="' + sec.id + '">' + label + '</a>'
+      );
+    });
+    // Same extras the heading-scan TOC appends (Bill of Materials,
+    // Files, Community Makes) so the structure feels consistent.
+    const extras = [
+      { id: 'view-bom-section',   label: 'Bill of Materials' },
+      { id: 'view-files-section', label: 'Files & Downloads' },
+      { id: 'makes-section',      label: 'Community Makes' },
+    ];
+    extras.forEach(ex => {
+      const el = document.getElementById(ex.id);
+      if (el && !el.classList.contains('d-none')) {
+        links.push(
+          '<a href="#' + ex.id + '" class="toc-h1 toc-extra" ' +
+          'data-toc-target="' + ex.id + '">' + esc(ex.label) + '</a>'
+        );
+      }
+    });
+    nav.innerHTML = '<div class="toc-title">Build steps</div>' + links.join('');
+
+    nav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.getElementById(a.dataset.tocTarget);
+        if (target) {
+          window.scrollTo({
+            top: target.getBoundingClientRect().top + window.scrollY - 80,
+            behavior: 'smooth'
+          });
+          history.replaceState(null, '', '#' + a.dataset.tocTarget);
+        }
+      });
+    });
+
+    const linkMap = {};
+    nav.querySelectorAll('a').forEach(a => { linkMap[a.dataset.tocTarget] = a; });
+    let activeId = null;
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (activeId && linkMap[activeId]) linkMap[activeId].classList.remove('active');
+          activeId = entry.target.id;
+          if (linkMap[activeId]) linkMap[activeId].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+    sections.forEach(s => observer.observe(s));
+    extras.forEach(ex => {
+      const el = document.getElementById(ex.id);
+      if (el && !el.classList.contains('d-none')) observer.observe(el);
+    });
+  }
+
   function buildTOC() {
     const nav = document.getElementById('toc-nav');
     if (!nav) return;
+    // Builder-mode pages get a step-aware TOC. The renderer stamps
+    // each <section> with id="step-N" and a data-step-title attr so
+    // we can build "Step N: Title" entries without re-parsing the
+    // h3 textContent. Falls through to the heading-scan otherwise.
+    const builderSteps = document.querySelectorAll('#view-content .builder-step[data-step-num]');
+    if (builderSteps.length > 0) {
+      return buildBuilderTOC(nav, builderSteps);
+    }
     const headings = document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3, #view-content h4');
     if (headings.length < 2) { nav.innerHTML = ''; return; }
     const used = {};
