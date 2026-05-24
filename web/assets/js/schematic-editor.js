@@ -333,7 +333,15 @@
     def.category = row.category || 'Custom';
     def.isLibrary = true;
     def.libraryId = row.id;
-    delete def.isCustom;
+    // Keep ``isCustom: true`` so the renderer still treats this as a
+    // user-designed symbol (custom body shapes, pin stick length, pin
+    // terminator dot). Without this, every render-branch fall-through
+    // skipped _bodyShapes / stickLen / terminatorR and library
+    // symbols came out as a featureless rounded-corner rectangle on
+    // the schematic — even though their geometry was perfectly fine.
+    // The library-vs-project-custom distinction lives in ``isLibrary``
+    // / ``libraryId``; ``isCustom`` simply means "renders from
+    // _bodyShapes" and applies to both.
     delete def.customId;
     return def;
   }
@@ -822,7 +830,13 @@
     var net = {
       id: nextId('net'),
       name: name,
-      color: INK,
+      // Leave colour unset so the renderer's default (NET_INK = blue)
+      // applies. Storing an explicit hex here would pin every new
+      // net to that hex regardless of future palette changes — and
+      // when we changed the default from black to blue, every
+      // pre-existing schematic kept the old black because the colour
+      // had been baked into the saved net data.
+      color: null,
       description: '',
       endpoints: [],
       segments: [],
@@ -1419,9 +1433,20 @@
     // multi-segment Path when we want individual segments to be
     // hit-testable.
     var objs = [];
+    // Auto-upgrade legacy schematics: nets saved before the
+    // black→blue palette change have ``color: '#222222'`` (the
+    // old INK constant) hardcoded into their JSON. Treat that
+    // exact value as "no override" so existing schematics pick up
+    // NET_INK on next load. User-set custom colours (anything
+    // other than the old INK) are preserved.
+    var hasCustomColour = net.color &&
+      net.color !== INK && net.color !== '#222' && net.color !== 'black';
+    var resolvedStroke = selected
+      ? BRAND_RED
+      : (hasCustomColour ? net.color : NET_INK);
     net.segments.forEach(function (seg) {
       var line = new fabric.Line([seg.x1, seg.y1, seg.x2, seg.y2], {
-        stroke: selected ? BRAND_RED : (net.color || NET_INK),
+        stroke: resolvedStroke,
         strokeWidth: selected ? NET_STROKE_SELECTED : NET_STROKE,
         // selectable: false keeps the wire out of rubber-band group
         // selections; the existing onCanvasMouseDown handler still
