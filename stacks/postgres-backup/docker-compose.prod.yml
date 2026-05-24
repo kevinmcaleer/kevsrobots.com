@@ -1,0 +1,99 @@
+# postgres-backup — Docker Swarm stack that runs scheduled backups of
+# the kevsrobots_cms database to an NFS-mounted directory on the NAS.
+#
+# Deploy with:
+#   sudo docker stack deploy -c docker-compose.prod.yml postgres-backup
+#
+# Update / restart:
+#   sudo docker service update --force postgres-backup_backup
+#
+# View live logs:
+#   sudo docker service logs -f postgres-backup_backup
+#
+# ──────────────────────────────────────────────────────────────────────
+# REQUIRED CHANGES BEFORE DEPLOY
+# ──────────────────────────────────────────────────────────────────────
+# 1. Set NAS_IP, NAS_EXPORT to your NAS's NFS share.
+# 2. Confirm POSTGRES_NETWORK is the right overlay network name
+#    (run `docker network ls` — usually `postgres_default`).
+# 3. The same two secrets the postgres service uses
+#    (postgres_user, postgres_password) must already exist on the
+#    swarm. They do — they were created with the postgres stack.
+
+version: "3.9"
+
+services:
+  backup:
+    image: postgres:16-alpine
+    # Custom command runs our script — kept on the swarm as a config
+    # so we don't have to build / push a custom image just for a 100-
+    # line shell script. Edit backup.sh and re-deploy to update.
+    command: ["/bin/sh", "/usr/local/bin/backup.sh"]
+    environment:
+      POSTGRES_HOST: postgres_primary
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: kevsrobots_cms
+      # Retention knobs — override if you change cadence later.
+      DAILY_KEEP: "28"
+      WEEKLY_KEEP: "4"
+    secrets:
+      - postgres_user
+      - postgres_password
+    configs:
+      - source: backup_script
+        target: /usr/local/bin/backup.sh
+        mode: 0755
+    volumes:
+      - backups_nas:/backups
+    networks:
+      - postgres
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 30s
+        # Don't cap attempts — we want this to come back forever.
+      # No placement constraint — backups can run from any node that
+      # can reach postgres_primary over the overlay network and the
+      # NAS over the LAN.
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+
+configs:
+  backup_script:
+    file: ./backup.sh
+
+secrets:
+  postgres_user:
+    external: true
+  postgres_password:
+    external: true
+
+volumes:
+  backups_nas:
+    driver: local
+    driver_opts:
+      type: nfs
+      # ``soft,timeo=600`` keeps the container responsive when the
+      # NAS is briefly unreachable (no infinite hang on writes).
+      # ``nfsvers=4`` requires NFSv4 on the NAS — drop the version
+      # arg if your NAS only speaks v3.
+      o: "addr=NAS_IP,nfsvers=4,rw,soft,timeo=600"
+      # The path on the NAS that holds the backups, in NFS-export
+      # syntax. The leading colon is required by Docker for NFS
+      # volumes. Example for Synology:  :/volume1/backups/postgres
+      device: ":NAS_EXPORT_PATH"
+
+networks:
+  # Join the SAME overlay network the postgres service runs on so
+  # we can dial it via its swarm DNS alias ``postgres_primary``.
+  # If your postgres stack uses a different network name (e.g.
+  # ``postgres_default`` if it was created by ``docker stack deploy
+  # postgres``), update the ``name:`` field below.
+  postgres:
+    external: true
+    name: postgres_default
