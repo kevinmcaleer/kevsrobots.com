@@ -216,49 +216,57 @@
       }
     } catch (_) {}
 
-    // One reusable off-screen StaticCanvas — no event wiring, no
-    // selection, no DOM presence. We re-use the same canvas across
-    // steps to avoid allocating N×1200×900 buffers.
-    var off = document.createElement('canvas');
-    off.width = CANVAS_W; off.height = CANVAS_H;
-    var fcanvas = new fabric.StaticCanvas(off, {
-      width: CANVAS_W, height: CANVAS_H,
-      backgroundColor: '#ffffff',
-      renderOnAddRemove: false,
-    });
+    // Allocate a fresh StaticCanvas per step. We used to share one
+    // across all steps for memory reasons, but a single bad
+    // canvas_json (CORS-tainted image, unrecognised object type,
+    // partial loadFromJSON) leaves the shared canvas in a broken
+    // state and every subsequent step then renders as "failed to
+    // render" — even ones whose own JSON is fine. Per-step canvas
+    // sidesteps that cascade.
+    function makeCanvas() {
+      var el = document.createElement('canvas');
+      el.width = CANVAS_W; el.height = CANVAS_H;
+      return new fabric.StaticCanvas(el, {
+        width: CANVAS_W, height: CANVAS_H,
+        backgroundColor: '#ffffff',
+        renderOnAddRemove: false,
+      });
+    }
+
     for (var i = 0; i < slots.length; i++) {
       var slot = slots[i];
       var idx = parseInt(slot.dataset.stepIdx, 10);
       var step = steps[idx];
       if (!step || !step.canvas_json) continue;
       var parsed = null;
-      try { parsed = JSON.parse(step.canvas_json); } catch (_) {}
+      var parseErr = null;
+      try { parsed = JSON.parse(step.canvas_json); }
+      catch (e) { parseErr = e; }
       if (!parsed) {
+        console.warn('[builder-renderer] step ' +
+          (step.step_number || idx + 1) + ' canvas_json parse failed:',
+          parseErr);
         slot.innerHTML =
-          '<div class="alert alert-light border text-center small text-muted">' +
+          '<div class="alert alert-light border text-center small text-muted"' +
+          ' title="' + esc(String(parseErr && parseErr.message || 'parse error')) + '">' +
           '<i class="fas fa-image me-1"></i> Canvas data unreadable.' +
           '</div>';
         continue;
       }
+      var fcanvas = makeCanvas();
       try {
-        fcanvas.clear();
         // Fabric v6: loadFromJSON returns a Promise; resolves after
-        // ALL Image/Path async loads complete. We wrap in
-        // Promise.resolve() so a sync return (theoretical, but
-        // belt-and-braces) still awaits cleanly.
+        // ALL Image / Path async loads complete.
         // eslint-disable-next-line no-await-in-loop
         await Promise.resolve(fcanvas.loadFromJSON(parsed));
-        // clear() wipes backgroundColor; loadFromJSON restores the
-        // saved one if present, but if the step never set one we
-        // want white (not transparent → black PNG). Belt-and-braces:
-        // force #ffffff when the loaded canvas reports nothing.
+        // loadFromJSON restores backgroundColor when present; force
+        // white otherwise so transparent doesn't export as black.
         if (!fcanvas.backgroundColor) {
           fcanvas.backgroundColor = '#ffffff';
         }
-        // Synchronous render so the next toDataURL sees the finished
-        // frame. requestRenderAll defers to rAF which doesn't fire
-        // until the event loop yields — and we're inside a sync
-        // loop, so we never get there before toDataURL.
+        // Synchronous render so the toDataURL captures the finished
+        // frame. requestRenderAll defers to rAF, which doesn't fire
+        // before toDataURL inside a tight sync loop.
         if (typeof fcanvas.renderAll === 'function') {
           fcanvas.renderAll();
         } else {
@@ -272,24 +280,30 @@
         slot.innerHTML =
           '<img class="builder-step-canvas-img" alt="" src="' + dataUrl + '">';
       } catch (e) {
-        // SecurityError = tainted canvas. Most other errors are
-        // structural (malformed canvas_json, unsupported object
-        // type). Log so devs can see which case fired — the user
-        // just sees the generic placeholder.
+        var msg = String(e && e.message || e || 'unknown error');
         var isCors = e && (e.name === 'SecurityError' ||
-          /tainted|cross[- ]origin/i.test(String(e.message || '')));
-        console.warn('[builder-renderer] Canvas render failed' +
+          /tainted|cross[- ]origin/i.test(msg));
+        // Console.warn so devs can find the underlying cause; the
+        // placeholder also gets a tooltip with the real message so
+        // it's debuggable without opening DevTools.
+        console.warn('[builder-renderer] step ' +
+          (step.step_number || idx + 1) + ' render failed' +
           (isCors ? ' (CORS-tainted canvas)' : '') + ':', e);
         slot.innerHTML =
-          '<div class="alert alert-light border text-center small text-muted">' +
+          '<div class="alert alert-light border text-center small text-muted"' +
+          ' title="' + esc(msg) + '">' +
           '<i class="fas fa-image me-1"></i> ' +
             (isCors
               ? 'Canvas contains images from another origin without CORS headers.'
               : 'Canvas preview failed to render.') +
           '</div>';
+      } finally {
+        // Tear the canvas down to free its element + GC the cached
+        // object refs. Without this we'd accumulate ~50 MB per long
+        // project.
+        try { fcanvas.dispose(); } catch (_) {}
       }
     }
-    try { fcanvas.dispose(); } catch (_) {}
   }
 
   // ---------------------------------------------------------------

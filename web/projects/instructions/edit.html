@@ -41,6 +41,19 @@ hide_nibsy: true
       <a id="ib-back-link" href="/projects/editor.html" class="ib-titlebar-link">
         <i class="fas fa-arrow-left me-1"></i> Back to editor
       </a>
+      <!-- Save-status cloud — sits right of the back link, same size
+           as the rest of the titlebar icons.
+             • fa-cloud-check (green) when the autosave has settled.
+             • fa-cloud-arrow-up while a PUT is in flight.
+             • fa-cloud-xmark (red) when the last save errored.
+           setSaveStatus() in instruction-builder.js flips the
+           `data-state` attr; CSS does the rest. -->
+      <span class="ib-save-cloud" id="ib-save-cloud"
+            data-state="saved"
+            aria-live="polite" aria-atomic="true"
+            title="Saved">
+        <i class="fas fa-cloud-check" aria-hidden="true"></i>
+      </span>
     </div>
     <div class="ib-titlebar-center">
       <span class="ib-project-title" id="ib-project-title">Loading…</span>

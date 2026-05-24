@@ -155,6 +155,38 @@ body.instruction-builder-page.is-embedded .ib-workspace {
 }
 .ib-titlebar-link:hover { color: #0d6efd; }
 
+/* Save-status cloud — sits right of the back link, same visual size
+   as .ib-titlebar-btn so the row reads as one consistent strip.
+   States are driven by data-state on the wrapper; setSaveStatus() in
+   instruction-builder.js flips it on every PUT lifecycle:
+     saved   → green tick     (fa-cloud-check)
+     saving  → blue uploading (fa-cloud-arrow-up, gently pulsing)
+     error   → red xmark      (fa-cloud-xmark) */
+.ib-save-cloud {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 1rem;
+  line-height: 1;
+  color: #6c757d;
+  border-radius: 4px;
+  transition: color 120ms ease, background-color 120ms ease;
+  cursor: default;
+}
+.ib-save-cloud[data-state="saved"]  { color: #2c8a3f; }
+.ib-save-cloud[data-state="saving"] {
+  color: #0d6efd;
+  animation: ib-cloud-pulse 1.2s ease-in-out infinite;
+}
+.ib-save-cloud[data-state="error"]  { color: #c8312a; }
+.ib-save-cloud[data-state="idle"]   { color: #adb5bd; }
+@keyframes ib-cloud-pulse {
+  0%, 100% { opacity: 1;   transform: translateY(0); }
+  50%      { opacity: 0.6; transform: translateY(-1px); }
+}
+
 /* Title-bar affordances that swap per step type:
    - HUD toggle is only meaningful for photo/blank steps that use the
      Fabric canvas. Hide it on schematic / text / video. */

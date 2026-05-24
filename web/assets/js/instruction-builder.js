@@ -300,6 +300,11 @@
   }
 
   function setSaveStatus(kind, msg) {
+    // Also flip the cloud-icon indicator next to the back link.
+    // It survives across the same kinds (saving / saved / error /
+    // idle) and is the persistent visual cue — the text indicator
+    // self-clears after a couple of seconds.
+    setSaveCloud(kind, msg);
     if (!dom.saveStatus) return;
     dom.saveStatus.classList.remove('is-saving', 'is-saved', 'is-error');
     if (kind === 'saving') {
@@ -327,6 +332,36 @@
     } else {
       dom.saveStatus.textContent = '';
     }
+  }
+
+  // Cloud icon in the titlebar — single source of truth for the
+  // user's "is my work saved?" question. Stays put after every save
+  // so a long-idle user can glance up and see green-tick rather than
+  // a faded-out text indicator.
+  function setSaveCloud(kind, msg) {
+    var el = document.getElementById('ib-save-cloud');
+    if (!el) return;
+    var state, icon, title;
+    if (kind === 'saving') {
+      state = 'saving';
+      icon  = 'fa-cloud-arrow-up';
+      title = msg || 'Saving…';
+    } else if (kind === 'error') {
+      state = 'error';
+      icon  = 'fa-cloud-xmark';
+      title = msg || 'Save failed — click Retry below';
+    } else if (kind === 'saved' || !kind) {
+      state = 'saved';
+      icon  = 'fa-cloud-check';
+      title = msg || 'Saved';
+    } else {
+      state = 'idle';
+      icon  = 'fa-cloud';
+      title = msg || '';
+    }
+    el.dataset.state = state;
+    el.setAttribute('title', title);
+    el.innerHTML = '<i class="fas ' + icon + '" aria-hidden="true"></i>';
   }
 
   // Generic debouncer keyed by string id — keeps separate timers for
@@ -1425,6 +1460,11 @@
       // STL view-state so a double-click can reopen the modal with
       // the previous source + camera angle / view preserved.
       'ibStlSource', 'ibStlView',
+      // Background-removal original src so the "restore" toggle
+      // works after a step reload. The image's current src is the
+      // cut-out (a blob URL won't survive a reload, but if the
+      // original was a stable URL we can re-load from it on revert).
+      'ibBgRemovedFrom',
     ]);
   }
 
@@ -7383,17 +7423,29 @@
         (fabric.filters && f instanceof fabric.filters.Grayscale));
     });
     var hasCrop = !!img.clipPath;
+    // Background removal: the cutout button doubles as a toggle.
+    // When ibBgRemovedFrom is set, the bg has been removed and the
+    // next click will restore the original — reflect that visually
+    // (is-active) and in the tooltip.
+    var bgRemoved = !!img.ibBgRemovedFrom;
     var outlineBtn = dom.imageToolbar.querySelector('[data-img-action="outline"]');
     var greyBtn = dom.imageToolbar.querySelector('[data-img-action="greyscale"]');
     var rectBtn = dom.imageToolbar.querySelector('[data-img-action="crop-rect"]');
     var circleBtn = dom.imageToolbar.querySelector('[data-img-action="crop-circle"]');
     var aspectBtn = dom.imageToolbar.querySelector('[data-img-action="aspect-reset"]');
+    var cutoutBtn = dom.imageToolbar.querySelector('[data-img-action="cutout"]');
     if (outlineBtn) outlineBtn.classList.toggle('is-active', hasOutline);
     if (greyBtn) greyBtn.classList.toggle('is-active', hasGrey);
     if (rectBtn) rectBtn.classList.toggle('is-active',
       hasCrop && img.clipPath && img.clipPath.type === 'rect');
     if (circleBtn) circleBtn.classList.toggle('is-active',
       hasCrop && img.clipPath && img.clipPath.type === 'circle');
+    if (cutoutBtn) {
+      cutoutBtn.classList.toggle('is-active', bgRemoved);
+      cutoutBtn.title = bgRemoved
+        ? 'Restore original (background was removed)'
+        : 'Remove background';
+    }
     // Aspect-reset needs the underlying HTMLImageElement's natural
     // dimensions; if the image hasn't finished loading or is cross-origin
     // tainted we can't read them, so disable the button.
@@ -7689,8 +7741,46 @@
       return;
     }
     if (action === 'cutout') {
-      runCutout(img, btn);
+      // Toggle: if the image already has its bg removed, this click
+      // restores the original photo instead of running the AI again.
+      if (img.ibBgRemovedFrom) {
+        restoreOriginalFromBgRemoval(img);
+      } else {
+        runCutout(img, btn);
+      }
       return;
+    }
+  }
+
+  // Put the original (pre-cutout) src back. The user gets a fast revert
+  // with no second call to the imgly model. After restore the toolbar
+  // button drops its is-active state so a subsequent click runs cutout
+  // afresh on the now-restored image.
+  async function restoreOriginalFromBgRemoval(img) {
+    if (!img || !img.ibBgRemovedFrom) return;
+    var originalSrc = img.ibBgRemovedFrom;
+    setImageToolbarProgress('Restoring original…');
+    try {
+      if (img.setSrc && img.setSrc.length >= 1) {
+        await img.setSrc(originalSrc, { crossOrigin: 'anonymous' });
+      }
+      // Free the blob URL the cutout produced (kept around so the
+      // intermediate src wasn't GC'd while in use).
+      if (img.ibBgRemovedBlobUrl) {
+        try { URL.revokeObjectURL(img.ibBgRemovedBlobUrl); } catch (_) {}
+        img.ibBgRemovedBlobUrl = null;
+      }
+      img.ibBgRemovedFrom = null;
+      img.dirty = true;
+      state.canvas.requestRenderAll();
+      state.canvas.fire('object:modified', { target: img });
+      reflectImageToolbarState(img);
+      setImageToolbarProgress('Original restored', null);
+      setTimeout(function () { setImageToolbarProgress(null); }, 1500);
+    } catch (err) {
+      console.warn('restore failed', err);
+      setImageToolbarProgress("Couldn't restore the original.", 'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
     }
   }
 
@@ -7769,16 +7859,30 @@
     }
 
     var resultUrl = URL.createObjectURL(resultBlob);
+    // Stash the original src BEFORE swapping, so the user can flip
+    // back to the un-cut-out photo via the same toolbar button. Prefer
+    // the underlying element's src (the actual URL the image was
+    // loaded from); fall back to whatever Fabric reports if that's
+    // not available. Saved alongside as a step canvas_json field so
+    // it survives a reload — see serializeCanvas() toJSON allowlist.
+    var origSrc = (img._originalElement && img._originalElement.src) ||
+      (img._element && img._element.src) ||
+      (typeof img.getSrc === 'function' ? img.getSrc() : null);
     try {
       if (img.setSrc && img.setSrc.length >= 1) {
         // Fabric v6: setSrc returns a Promise.
         await img.setSrc(resultUrl, { crossOrigin: 'anonymous' });
+      }
+      if (origSrc) {
+        img.ibBgRemovedFrom = origSrc;
+        img.ibBgRemovedBlobUrl = resultUrl;
       }
       img.dirty = true;
       state.canvas.requestRenderAll();
       // Fabric doesn't auto-fire object:modified after async setSrc — emit
       // so undo + autosave snapshot the new state.
       state.canvas.fire('object:modified', { target: img });
+      reflectImageToolbarState(img);
       setImageToolbarProgress('Background removed', null);
       setTimeout(function () { setImageToolbarProgress(null); }, 1500);
     } catch (err) {

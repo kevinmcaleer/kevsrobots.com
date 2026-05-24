@@ -2883,16 +2883,18 @@
   function captureSchematicPng(multiplier) {
     if (!STATE.canvas) return null;
     var mult = multiplier || 2;
-    var objs = STATE.canvas.getObjects();
+    var canvas = STATE.canvas;
+    var objs = canvas.getObjects();
     if (!objs || objs.length === 0) {
       // Nothing on the canvas yet — return a transparent dot so the
       // caller has *something* to draw (caller may choose to skip).
-      return STATE.canvas.toDataURL({
+      return canvas.toDataURL({
         format: 'png',
         multiplier: 1,
         enableRetinaScaling: false,
       });
     }
+    // Compute the bbox of every object in absolute (scene) coords.
     var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     objs.forEach(function (o) {
       try {
@@ -2906,17 +2908,34 @@
     });
     if (!isFinite(minX)) return null;
     var margin = 20;
-    var left   = Math.max(0, minX - margin);
-    var top    = Math.max(0, minY - margin);
-    var width  = Math.min(STATE.canvas.getWidth(),  maxX + margin) - left;
-    var height = Math.min(STATE.canvas.getHeight(), maxY + margin) - top;
-    if (width <= 0 || height <= 0) return null;
-    return STATE.canvas.toDataURL({
-      format: 'png',
-      multiplier: mult,
-      enableRetinaScaling: false,
-      left: left, top: top, width: width, height: height,
-    });
+
+    // Snapshot at zoom-to-fit regardless of the editor's current zoom
+    // or pan. Two things were clipping the bottom of the diagram
+    // before:
+    //   1. The crop was clamped to the canvas's W/H, so any object
+    //      past the visible viewport was dropped.
+    //   2. ``toDataURL`` applies the canvas's viewportTransform
+    //      during rendering, so a zoomed-in / scrolled view would
+    //      bake that crop into the PNG.
+    // Fix: reset viewportTransform to identity around the capture,
+    // and use the actual content bbox (with negative left/top
+    // allowed) so the off-screen render covers everything.
+    var savedVPT = canvas.viewportTransform;
+    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    try {
+      return canvas.toDataURL({
+        format: 'png',
+        multiplier: mult,
+        enableRetinaScaling: false,
+        left:   minX - margin,
+        top:    minY - margin,
+        width:  (maxX - minX) + margin * 2,
+        height: (maxY - minY) + margin * 2,
+      });
+    } finally {
+      canvas.viewportTransform = savedVPT;
+      canvas.requestRenderAll();
+    }
   }
 
   // ====================================================================
