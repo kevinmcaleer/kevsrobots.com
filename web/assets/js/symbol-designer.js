@@ -1057,29 +1057,31 @@
     }
     var endX = pos.x + dx * lineLen;
     var endY = pos.y + dy * lineLen;
-    // Label position derived from which endpoint of the pin's line
-    // (anchor or terminator) is further from the SCENE origin. The
-    // label sits past that endpoint, extending outward — same rule as
-    // the schematic editor's buildInstanceFabric, so a symbol's pin
-    // names render identically in the designer and the schematic.
+    // Label position: pick whichever endpoint of the pin (anchor or
+    // terminator) is CLOSER to the scene origin — that's "inner" —
+    // and place the label past it, extending TOWARD the origin.
+    // Matches the schematic editor's buildInstanceFabric so a
+    // symbol reads the same in both views. The pad is generous
+    // enough that the label doesn't visually touch the pin
+    // terminator circle.
     var horizontal = (rot === 0 || rot === 180);
-    var labelPad = 6;
+    var labelPad = 12;
     var labelAnchorX = 'center';
     var labelAnchorY = 'center';
     var labelSceneX = pin.x, labelSceneY = pin.y;
     if (horizontal) {
       var termSceneX = pin.x + dx * lineLen;
-      var outerX = (Math.abs(pin.x) >= Math.abs(termSceneX)) ? pin.x : termSceneX;
-      var dirX = (outerX >= 0) ? 1 : -1;
-      labelSceneX = outerX + dirX * labelPad;
+      var innerX = (Math.abs(pin.x) <= Math.abs(termSceneX)) ? pin.x : termSceneX;
+      var dirX = (innerX < 0) ? 1 : -1;
+      labelSceneX = innerX + dirX * labelPad;
       labelSceneY = pin.y;
       labelAnchorX = (dirX > 0) ? 'left' : 'right';
     } else {
       var termSceneY = pin.y + dy * lineLen;
-      var outerY = (Math.abs(pin.y) >= Math.abs(termSceneY)) ? pin.y : termSceneY;
-      var dirY = (outerY >= 0) ? 1 : -1;
+      var innerY = (Math.abs(pin.y) <= Math.abs(termSceneY)) ? pin.y : termSceneY;
+      var dirY = (innerY < 0) ? 1 : -1;
       labelSceneX = pin.x;
-      labelSceneY = outerY + dirY * labelPad;
+      labelSceneY = innerY + dirY * labelPad;
       labelAnchorY = (dirY > 0) ? 'top' : 'bottom';
     }
     var labelCanvas = s2c(labelSceneX, labelSceneY);

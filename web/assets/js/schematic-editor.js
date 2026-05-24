@@ -1336,7 +1336,11 @@
       // identifies them and an extra label would be visual noise.
       if (symbolDef.id !== 'gnd' && symbolDef.id !== 'vplus') {
         var lx, ly, anchorX, anchorY;
-        var pad = 4;
+        // Generous gap so the label doesn't visually touch the
+        // pin's terminator circle or the body edge it sits next
+        // to. Matches the Symbol Designer's labelPad so the two
+        // views render identically.
+        var pad = 12;
         var horizontal = (pin.side === 'left' || pin.side === 'right');
         if (horizontal) {
           // Endpoint closer to centre = inner.
