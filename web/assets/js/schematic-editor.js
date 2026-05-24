@@ -39,7 +39,12 @@
   var AUTOSAVE_MS = 800;
 
   // Brand colours
-  var INK = '#222222';            // default symbol + net colour
+  var INK = '#222222';            // default symbol body + pin labels
+  // Nets render in a saturated blue so they're clearly distinguishable
+  // from pin name text (which stays INK / near-black). Without this,
+  // a net crossing a pin name made the name unreadable. Matches the
+  // convention in EAGLE / KiCad schematic exports.
+  var NET_INK = '#1d4ed8';
   var BRAND_RED = '#c8312a';      // selected net highlight + selection border
   var BG = '#ffffff';
   var GRID_DOT = '#cfd3d8';       // colour of the background dot grid
@@ -1416,7 +1421,7 @@
     var objs = [];
     net.segments.forEach(function (seg) {
       var line = new fabric.Line([seg.x1, seg.y1, seg.x2, seg.y2], {
-        stroke: selected ? BRAND_RED : (net.color || INK),
+        stroke: selected ? BRAND_RED : (net.color || NET_INK),
         strokeWidth: selected ? NET_STROKE_SELECTED : NET_STROKE,
         // selectable: false keeps the wire out of rubber-band group
         // selections; the existing onCanvasMouseDown handler still
@@ -2797,12 +2802,36 @@
   // in alongside the project-scoped symbols + the built-in stubs.
   // Failures are silent (offline / API down → editor still works with
   // the local + built-in symbols).
+  //
+  // De-dup rule: when a library symbol has the same name as a
+  // hardcoded built-in (Resistor, Capacitor, etc.), the LIBRARY
+  // version wins — the built-in is removed from SYMBOL_LIBRARY so
+  // the user doesn't see two entries for "Resistor" in the rail.
+  // This way once an admin runs /admin/symbols/ → "Seed built-ins"
+  // the editor automatically switches over to the editable library
+  // versions and the hardcoded ones disappear.
   async function loadLibrarySymbolsIntoLibrary() {
     try {
       var r = await apiFetch(API + '/api/library/symbols');
       if (!r.ok) return;
       var rows = await r.json();
       if (!Array.isArray(rows)) return;
+      // First pass: build the set of names the library claims.
+      var libraryNames = {};
+      rows.forEach(function (row) {
+        if (row && row.name) libraryNames[row.name] = true;
+      });
+      // Drop any built-in (non-custom, non-library) whose name is now
+      // owned by the library. Walk the array backwards so splice
+      // doesn't shift the iteration index.
+      for (var i = SYMBOL_LIBRARY.length - 1; i >= 0; i--) {
+        var existing = SYMBOL_LIBRARY[i];
+        if (existing.isCustom || existing.isLibrary) continue;
+        if (libraryNames[existing.name]) {
+          SYMBOL_LIBRARY.splice(i, 1);
+        }
+      }
+      // Second pass: enliven each library row + append.
       rows.forEach(function (row) {
         var def = symbolDefFromLibrary(row);
         if (def) SYMBOL_LIBRARY.push(def);

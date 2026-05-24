@@ -90,6 +90,11 @@ permalink: /admin/symbols/
       <select class="form-select" id="lib-category-filter" aria-label="Filter by category">
         <option value="">All categories</option>
       </select>
+      <button type="button" class="btn btn-sm btn-outline-primary"
+              id="lib-seed-builtins"
+              title="Insert the schematic editor's hardcoded built-in symbols (Pico, Resistor, Capacitor, LED, GND, V+, generic IC) into the library so they can be edited like any other symbol. Idempotent — safe to click multiple times.">
+        <i class="fas fa-seedling me-1"></i> Seed built-ins
+      </button>
       <span class="text-muted small ms-auto" id="lib-count"></span>
     </div>
 
@@ -204,6 +209,7 @@ permalink: /admin/symbols/
     dom.editSave      = document.getElementById('lib-edit-save');
     dom.editModalEl   = document.getElementById('lib-edit-modal');
     dom.editModalTitle = document.getElementById('lib-edit-modal-title');
+    dom.seedBtn       = document.getElementById('lib-seed-builtins');
   }
 
   function showDenied() {
@@ -275,6 +281,40 @@ permalink: /admin/symbols/
     });
     dom.tableBody.addEventListener('click', onTableClick);
     dom.editSave.addEventListener('click', onEditSave);
+    if (dom.seedBtn) dom.seedBtn.addEventListener('click', onSeedBuiltins);
+  }
+
+  async function onSeedBuiltins() {
+    if (!confirm(
+        'Seed the schematic editor\'s built-in symbols (Pico, ' +
+        'Resistor, Capacitor, LED, GND, V+, IC) into the library?\n\n' +
+        'This is safe to run repeatedly — symbols that already ' +
+        'exist by name will not be duplicated.')) {
+      return;
+    }
+    var prevLabel = dom.seedBtn.innerHTML;
+    dom.seedBtn.disabled = true;
+    dom.seedBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Seeding…';
+    try {
+      var r = await authFetch(API + '/api/library/symbols/seed-builtins', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!r.ok) {
+        alert('Seed failed (HTTP ' + r.status + ').');
+        return;
+      }
+      // Refresh the table so the newly-seeded rows appear.
+      await fetchSymbols();
+      renderTable();
+      alert('Built-in symbols are now in the library — open any row\'s ' +
+            '"Edit design" to refine them.');
+    } catch (e) {
+      alert('Seed failed: ' + (e && e.message || 'network error'));
+    } finally {
+      dom.seedBtn.disabled = false;
+      dom.seedBtn.innerHTML = prevLabel;
+    }
   }
 
   function filteredSymbols() {

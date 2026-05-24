@@ -82,10 +82,16 @@ body.symbol-designer-page.is-embedded .sd-titlebar {
   justify-content: space-between;
   gap: 1rem;
   height: var(--sd-titlebar-h);
+  min-height: var(--sd-titlebar-h);
   padding: 0 1rem;
   background: var(--sd-panel);
   border-bottom: 1px solid var(--sd-border);
   flex: 0 0 auto;
+  /* Defensive: keep the titlebar above any state-overlay or
+     z-stacked canvas hud. Without this the brand-red back button
+     can vanish under a stacking-context sibling on some browsers. */
+  position: relative;
+  z-index: 100;
 }
 .sd-titlebar-left, .sd-titlebar-right {
   display: flex;
@@ -129,12 +135,26 @@ body.symbol-designer-page.is-embedded .sd-titlebar {
   text-decoration: none;
 }
 
-/* Primary exit action — "Back to schematic". Brand-red filled
-   button to surface it as the main return-to-workflow path. */
+/* Primary exit action — "Back to schematic" (project mode) or
+   "Back to library" (admin library-edit mode). Brand-red filled
+   button to surface it as the main return-to-workflow path.
+   Bumped padding + font weight so the button reads at a glance
+   and can't visually collapse on narrow screens. */
 .sd-titlebar-btn-primary {
   background: var(--sd-brand-red);
   border-color: var(--sd-brand-red);
   color: #fff;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.sd-titlebar-btn-primary:focus-visible {
+  outline: 2px solid #c8312a;
+  outline-offset: 2px;
 }
 .sd-titlebar-btn-primary:hover {
   background: #a4271f;

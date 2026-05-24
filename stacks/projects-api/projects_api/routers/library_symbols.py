@@ -21,6 +21,8 @@ as ProjectSymbol.symbol_data (``{ bodyShapes, pins }``).
 
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,6 +36,89 @@ from ..schemas import (
     LibrarySymbolResponse,
     LibrarySymbolUpdate,
 )
+
+
+# Canonical geometry for the schematic editor's built-in symbol set.
+# This is the source of truth for the symbols that ship out of the box
+# (Pico, generic IC, R/C/LED, GND, V+). The schematic editor has a
+# hardcoded list with the same data for backwards compat, but once an
+# admin runs the seed endpoint below they land in library_symbols and
+# the editor de-dupes by name so the editable library versions win.
+#
+# symbol_data shape matches what the Symbol Designer expects:
+#   { bodyShapes: [{kind: 'rect', x, y, w, h}], pins: [{x, y, side, name, number}] }
+# Coords are centred (0,0 = body centre).
+def _builtin_rect_body(w: int, h: int) -> dict:
+    return {"kind": "rect", "x": -w // 2, "y": -h // 2, "w": w, "h": h}
+
+
+def _pin_from_side(side: str, offset: int, w: int, h: int,
+                   name: str, number: str) -> dict:
+    """Convert an (edge, offset-from-top-or-left) pin into the centred
+    (x, y) coords the Symbol Designer authors with."""
+    if side == "left":
+        x, y = -w // 2, -h // 2 + offset
+    elif side == "right":
+        x, y = w // 2, -h // 2 + offset
+    elif side == "top":
+        x, y = -w // 2 + offset, -h // 2
+    else:  # bottom
+        x, y = -w // 2 + offset, h // 2
+    return {"x": x, "y": y, "side": side, "name": name, "number": number}
+
+
+_BUILTIN_PICO_PINS = [
+    ("1",  "GP0",    "left",  32),  ("2",  "GP1",    "left",  64),
+    ("3",  "GND",    "left",  96),  ("4",  "GP2",    "left",  128),
+    ("5",  "GP3",    "left",  160), ("6",  "GP4",    "left",  192),
+    ("7",  "GP5",    "left",  224), ("8",  "GND",    "left",  256),
+    ("9",  "GP6",    "left",  288),
+    ("36", "3V3",    "right", 32),  ("37", "3V3_EN", "right", 64),
+    ("38", "GND",    "right", 96),  ("39", "VSYS",   "right", 128),
+    ("40", "VBUS",   "right", 160), ("34", "GP28",   "right", 192),
+    ("33", "GND",    "right", 224), ("32", "GP27",   "right", 256),
+    ("31", "GP26",   "right", 288),
+]
+
+_BUILTIN_DEFINITIONS = [
+    # name, category, ref_des_prefix, w, h, pins[(number, name, side, offset)]
+    ("Raspberry Pi Pico", "Module",    "U",   160, 320, _BUILTIN_PICO_PINS),
+    ("Generic 14-pin IC", "Active",    "U",   128, 224, [
+        ("1", "1", "left",  32),  ("2", "2", "left",  64),
+        ("3", "3", "left",  96),  ("4", "4", "left",  128),
+        ("5", "5", "left",  160), ("6", "6", "left",  192),
+        ("7", "GND", "left", 192),
+        ("14", "VCC", "right", 32),  ("13", "13", "right", 64),
+        ("12", "12", "right", 96),   ("11", "11", "right", 128),
+        ("10", "10", "right", 160),  ("9",  "9",  "right", 192),
+        ("8",  "8",  "right", 192),
+    ]),
+    ("Resistor",          "Passive",   "R",   64,  32,  [
+        ("1", "1", "left",  16), ("2", "2", "right", 16),
+    ]),
+    ("Capacitor",         "Passive",   "C",   64,  32,  [
+        ("1", "+", "left",  16), ("2", "-", "right", 16),
+    ]),
+    ("LED",               "Active",    "D",   64,  48,  [
+        ("1", "A", "left",  24), ("2", "K", "right", 24),
+    ]),
+    ("GND",               "Power",     "GND", 48,  32,  [
+        ("1", "GND", "top", 24),
+    ]),
+    ("V+ rail",           "Power",     "V",   48,  32,  [
+        ("1", "V+", "bottom", 24),
+    ]),
+]
+
+
+def _builtin_symbol_data_json(w: int, h: int, pins_spec) -> str:
+    return json.dumps({
+        "bodyShapes": [_builtin_rect_body(w, h)],
+        "pins": [
+            _pin_from_side(side, off, w, h, name, num)
+            for (num, name, side, off) in pins_spec
+        ],
+    })
 
 router = APIRouter(prefix="/api/library/symbols", tags=["library-symbols"])
 
@@ -141,6 +226,63 @@ async def delete_library_symbol(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Library symbol not found")
     await session.delete(sym)
     await session.commit()
+
+
+@router.post(
+    "/seed-builtins",
+    response_model=list[LibrarySymbolResponse],
+    status_code=201,
+)
+async def seed_builtin_symbols(
+    user: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> list[LibrarySymbolResponse]:
+    """Insert the canonical built-in symbol set into library_symbols.
+
+    Idempotent — runs an existence check by name before insert, so
+    calling it twice doesn't duplicate. Once seeded, the schematic
+    editor de-dupes by name so the editable library versions shadow
+    the hardcoded built-in list. Admins can then edit each via
+    /admin/symbols/ → Edit design like any other library symbol.
+
+    Returns the full list of seeded symbols (whether newly created
+    or already present), so the admin UI can refresh in one shot.
+    """
+    existing = (await session.scalars(
+        select(LibrarySymbol).where(
+            LibrarySymbol.name.in_([d[0] for d in _BUILTIN_DEFINITIONS])
+        )
+    )).all()
+    existing_names = {s.name for s in existing}
+
+    created: list[LibrarySymbol] = []
+    for (name, category, refdes, w, h, pins_spec) in _BUILTIN_DEFINITIONS:
+        if name in existing_names:
+            continue
+        sym = LibrarySymbol(
+            name=name,
+            category=category,
+            ref_des_prefix=refdes,
+            description=f"Built-in {name} symbol",
+            symbol_data=_builtin_symbol_data_json(w, h, pins_spec),
+            created_by_username=user,
+            updated_by_username=user,
+        )
+        session.add(sym)
+        created.append(sym)
+    if created:
+        await session.commit()
+        for sym in created:
+            await session.refresh(sym)
+
+    # Return ALL canonical built-ins (newly created + already existing)
+    # so the UI sees the full set in one response.
+    all_builtins = (await session.scalars(
+        select(LibrarySymbol)
+        .where(LibrarySymbol.name.in_([d[0] for d in _BUILTIN_DEFINITIONS]))
+        .order_by(LibrarySymbol.name.asc())
+    )).all()
+    return [_to_response(s) for s in all_builtins]
 
 
 @router.post(
