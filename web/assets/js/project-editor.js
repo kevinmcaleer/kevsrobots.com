@@ -82,6 +82,49 @@
         '  Preview library failed to load — refresh the page to retry.' +
         '</div>';
     }
+    // Refresh the cached instruction so the completeness check sees
+    // the latest steps. The renderer fetches independently for its
+    // own draw, but we need the data here in JS scope too.
+    refreshBuilderInstructionCache();
+  }
+
+  // ----- Builder-mode instruction cache for completeness check -----
+  // The completeness meter runs on a rAF cadence and needs sync
+  // access to "is there a text step with 200+ chars?". Refetching
+  // the instruction on every check would be wasteful, so we cache
+  // here and refresh on the key lifecycle events:
+  //   - loadProject() / project change
+  //   - switch into builder content_mode
+  //   - return from the focused workspace (pageshow with bfcache)
+  let builderInstruction = null;
+  let builderInstructionPromise = null;
+  async function refreshBuilderInstructionCache() {
+    if (!currentProject || !currentProject.id) return null;
+    // Coalesce in-flight fetches so a flurry of mode-switch /
+    // pageshow events doesn't fire N parallel requests.
+    if (builderInstructionPromise) return builderInstructionPromise;
+    builderInstructionPromise = (async function () {
+      try {
+        var r = await apiFetch(
+          API + '/api/projects/' + currentProject.id + '/instruction',
+          { credentials: 'include' });
+        if (r.ok) {
+          builderInstruction = await r.json();
+        } else if (r.status === 404) {
+          // No instruction yet — that's fine, completeness check
+          // treats absence as "no builder content".
+          builderInstruction = { steps: [] };
+        }
+      } catch (_) {
+        // Network blip — leave the cache as-is rather than blanking it.
+      } finally {
+        builderInstructionPromise = null;
+      }
+      // Re-run completeness now that the cache has fresh data.
+      try { recomputeCompleteness(); } catch (_) {}
+      return builderInstruction;
+    })();
+    return builderInstructionPromise;
   }
 
   async function persistContentMode(mode) {
@@ -2853,7 +2896,26 @@
     { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'image-input',
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
     { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',     target: 'content-editor',
-      check: () => (easyMDE ? easyMDE.value().trim().length : (contentEditor ? contentEditor.value.trim().length : 0)) >= 200 },
+      // Passes either way:
+      //   • markdown mode → ≥200 chars in the EasyMDE editor (legacy).
+      //   • builder mode  → at least one step of step_type 'text' whose
+      //     body has ≥200 chars after trimming. Builder authors don't
+      //     write into the markdown editor — their long-form content
+      //     lives in text steps, so the check needs to look there too
+      //     or builder projects can never score full marks.
+      check: () => {
+        var mdLen = easyMDE
+          ? easyMDE.value().trim().length
+          : (contentEditor ? contentEditor.value.trim().length : 0);
+        if (mdLen >= 200) return true;
+        var inBuilder = currentProject && currentProject.content_mode === 'builder';
+        if (!inBuilder) return false;
+        if (!builderInstruction || !Array.isArray(builderInstruction.steps)) return false;
+        return builderInstruction.steps.some(function (s) {
+          return s && s.step_type === 'text' &&
+                 String(s.body || '').trim().length >= 200;
+        });
+      } },
     { key: 'diff',   points: 5,  label: 'Set a difficulty level',              target: 'project-difficulty',
       check: () => difficultySelect && difficultySelect.value !== '' },
     { key: 'time',   points: 5,  label: 'Estimate build time',                 target: 'project-time',
