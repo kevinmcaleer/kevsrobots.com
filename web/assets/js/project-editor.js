@@ -2895,7 +2895,15 @@
       check: () => descInput && descInput.value.trim().length >= 10 },
     { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'image-input',
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
-    { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',     target: 'content-editor',
+    { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',
+      // Target varies by mode: markdown authors get the EasyMDE
+      // surface; builder authors get the "Open in focused workspace"
+      // link (which then navigates them into the step editor). The
+      // renderer resolves this on every recompute so the link's
+      // destination stays in sync with whichever mode is active.
+      target: () => (currentProject && currentProject.content_mode === 'builder')
+        ? 'open-instruction-builder'
+        : 'content-editor',
       // Passes either way:
       //   • markdown mode → ≥200 chars in the EasyMDE editor (legacy).
       //   • builder mode  → at least one step of step_type 'text' whose
@@ -2991,13 +2999,21 @@
     if (celebrateEl) celebrateEl.classList.add('d-none');
     listEl.classList.remove('d-none');
 
+    // Resolve target. Items can declare ``target`` as a string OR as
+    // a function — the function form lets an item swap its target
+    // based on live state (e.g. content_mode = builder vs markdown).
+    function resolveTarget(item) {
+      var t = item.target;
+      return (typeof t === 'function') ? t() : t;
+    }
+
     // Next suggestion: highest-point unmet item — still ordered by point
     // value internally (biggest wins surfaced first) but no "+N" suffix
     // shown in the UI, per design feedback that the numbers cluttered.
     const unmet = results.filter(r => !r.met).sort((a, b) => b.item.points - a.item.points);
     if (unmet.length && nextEl && nextLink) {
       nextLink.textContent = unmet[0].item.label;
-      nextLink.dataset.target = unmet[0].item.target;
+      nextLink.dataset.target = resolveTarget(unmet[0].item);
       nextEl.classList.remove('d-none');
     } else if (nextEl) {
       nextEl.classList.add('d-none');
@@ -3012,7 +3028,7 @@
       }
       return '<li class="completeness-item completeness-item-unmet py-1">'
            + '<i class="far fa-circle me-2 text-primary"></i>'
-           + '<a href="#" class="completeness-link text-decoration-none" data-target="' + item.target + '">' + item.label + '</a>'
+           + '<a href="#" class="completeness-link text-decoration-none" data-target="' + resolveTarget(item) + '">' + item.label + '</a>'
            + '</li>';
     }).join('');
   }
@@ -3020,6 +3036,14 @@
   function focusCompletenessTarget(id) {
     const el = document.getElementById(id);
     if (!el) return;
+    // Special-case the "Open in focused workspace" link: instead of
+    // just focusing it, navigate. The user wanted that item — the
+    // whole point is to land them in the step editor, not to scroll
+    // them to a button they'd then have to click themselves.
+    if (id === 'open-instruction-builder' && el.tagName === 'A' && el.href) {
+      window.location.href = el.href;
+      return;
+    }
     try {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (e) {
