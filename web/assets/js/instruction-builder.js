@@ -1461,10 +1461,12 @@
       // the previous source + camera angle / view preserved.
       'ibStlSource', 'ibStlView',
       // Background-removal original src so the "restore" toggle
-      // works after a step reload. The image's current src is the
-      // cut-out (a blob URL won't survive a reload, but if the
-      // original was a stable URL we can re-load from it on revert).
+      // works after a step reload. The image's current src after
+      // a cutout is a project-image view URL (we upload the result
+      // to the project's image store), so both directions of the
+      // toggle survive a reload cleanly.
       'ibBgRemovedFrom',
+      'ibBgRemovedToUrl',
     ]);
   }
 
@@ -7752,10 +7754,13 @@
     }
   }
 
-  // Put the original (pre-cutout) src back. The user gets a fast revert
-  // with no second call to the imgly model. After restore the toolbar
-  // button drops its is-active state so a subsequent click runs cutout
-  // afresh on the now-restored image.
+  // Put the original (pre-cutout) src back. The user gets a fast
+  // revert with no second call to the imgly model — both srcs
+  // (original + cutout) are stable URLs on the project's image
+  // store, so flipping between them is a plain setSrc roundtrip.
+  // After restore the toolbar button drops its is-active state so
+  // a subsequent click runs cutout afresh on the now-restored
+  // image.
   async function restoreOriginalFromBgRemoval(img) {
     if (!img || !img.ibBgRemovedFrom) return;
     var originalSrc = img.ibBgRemovedFrom;
@@ -7764,13 +7769,9 @@
       if (img.setSrc && img.setSrc.length >= 1) {
         await img.setSrc(originalSrc, { crossOrigin: 'anonymous' });
       }
-      // Free the blob URL the cutout produced (kept around so the
-      // intermediate src wasn't GC'd while in use).
-      if (img.ibBgRemovedBlobUrl) {
-        try { URL.revokeObjectURL(img.ibBgRemovedBlobUrl); } catch (_) {}
-        img.ibBgRemovedBlobUrl = null;
-      }
       img.ibBgRemovedFrom = null;
+      img.ibBgRemovedToUrl = null;
+      img.ibSourceUrl = originalSrc;
       img.dirty = true;
       state.canvas.requestRenderAll();
       state.canvas.fire('object:modified', { target: img });
@@ -7858,7 +7859,6 @@
       return;
     }
 
-    var resultUrl = URL.createObjectURL(resultBlob);
     // Stash the original src BEFORE swapping, so the user can flip
     // back to the un-cut-out photo via the same toolbar button. Prefer
     // the underlying element's src (the actual URL the image was
@@ -7868,6 +7868,46 @@
     var origSrc = (img._originalElement && img._originalElement.src) ||
       (img._element && img._element.src) ||
       (typeof img.getSrc === 'function' ? img.getSrc() : null);
+
+    // Upload the cutout result to the project's image store so the
+    // new src is a stable URL — a raw blob: URL would die the next
+    // time the page reloads (browsers invalidate blob URLs on
+    // navigation), so an unmounted-then-reopened step would show a
+    // broken image. The upload also means the cutout lands in the
+    // project's image gallery, where the user can re-use it
+    // elsewhere if they want.
+    //
+    // Filename: derive a friendly hint from the original so the
+    // gallery row isn't an opaque hash. ``cutout-<base>.png`` —
+    // the .png is mandatory (imgly always outputs PNG with
+    // transparency).
+    setImageToolbarProgress('Uploading cutout…');
+    var cutoutFilename = (function () {
+      var base = 'image';
+      try {
+        if (origSrc) {
+          // Last path segment, strip query/hash, strip extension.
+          var tail = String(origSrc).split('?')[0].split('#')[0]
+            .split('/').pop() || base;
+          base = tail.replace(/\.[^.]+$/, '') || base;
+        }
+      } catch (_) {}
+      return 'cutout-' + base + '.png';
+    })();
+    var uploaded;
+    try {
+      uploaded = await uploadImage(resultBlob, cutoutFilename);
+    } catch (err) {
+      console.warn('cutout upload failed', err);
+      btn.classList.remove('is-loading');
+      setImageToolbarProgress(
+        "Background removed but couldn't save — try again.",
+        'error');
+      setTimeout(function () { setImageToolbarProgress(null); }, 4500);
+      return;
+    }
+    var resultUrl = projectImageViewUrl(uploaded.id);
+
     try {
       if (img.setSrc && img.setSrc.length >= 1) {
         // Fabric v6: setSrc returns a Promise.
@@ -7875,7 +7915,10 @@
       }
       if (origSrc) {
         img.ibBgRemovedFrom = origSrc;
-        img.ibBgRemovedBlobUrl = resultUrl;
+        // Cache the new (stable) URL too so the layer list / future
+        // exports can identify this as a cutout result.
+        img.ibBgRemovedToUrl = resultUrl;
+        img.ibSourceUrl = resultUrl;     // for ★ background-photo badge
       }
       img.dirty = true;
       state.canvas.requestRenderAll();
@@ -7883,6 +7926,9 @@
       // so undo + autosave snapshot the new state.
       state.canvas.fire('object:modified', { target: img });
       reflectImageToolbarState(img);
+      // Refresh the photos pane in case the user has it open — the
+      // newly-uploaded cutout should show up alongside the original.
+      try { refreshProjectImages(); } catch (_) {}
       setImageToolbarProgress('Background removed', null);
       setTimeout(function () { setImageToolbarProgress(null); }, 1500);
     } catch (err) {
