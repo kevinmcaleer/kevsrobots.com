@@ -304,11 +304,48 @@ A few notes on what's happening:
 
   Then *never* commit that file to GitHub. The cloud code below imports from it, so anything you keep in here stays out of your scripts (and out of screen recordings, screenshots, copy-paste mishaps…). Future-you will thank you.
 - **Five packages, one shot.** You only have to run this script once per fresh Pico. After that, the libraries live in `/lib` on the flash and `import` will find them every time.
-- **Then `arduino-iot-cloud` itself.** With the dependencies in place, install the client either via the same MIP approach (add `"arduino-iot-cloud"` to the list above), or via Thonny's **Tools → Manage Packages** dialog if you prefer a GUI — both end up in the same place.
 
 If you skip this step, the next code block will crash on its very first `import` with something like `ImportError: no module named 'cbor2'`. The fix is always the same — run `install_requirements.py` first.
 
 > The full script lives in the [companion repo](https://www.github.com/kevinmcaleer/working_with_wifi) alongside the rest of this episode's code.
+
+### Copy the Arduino Cloud client onto the Pico
+
+MIP can fetch the *dependencies* you just installed, but the **`arduino_iot_cloud` library itself isn't on the MicroPython package index**. That sounds annoying — it isn't. It just means you copy the folder onto the Pico manually, once, and you're done.
+
+In the companion repo there's a folder called `arduino_iot_cloud/` containing four files:
+
+```
+arduino_iot_cloud/
+├── __init__.py     # the ArduinoCloudClient class you import
+├── ucloud.py       # state-syncing engine
+├── umqtt.py        # MQTT plumbing tweaked for this client
+└── ussl.py         # TLS helpers
+```
+
+Copy that **whole folder** into `/lib/` on the Pico. There are three flavours of "copy" depending on the tool you like:
+
+- **Thonny** — open the Files panel (View → Files), navigate into `/lib` on the Pico side (create it if it doesn't exist), then drag the `arduino_iot_cloud` folder over from your computer.
+- **`mpremote`** (command line, my favourite) — `mpremote cp -r arduino_iot_cloud :/lib/`
+- **`rshell`** — `rsync arduino_iot_cloud /pyboard/lib/arduino_iot_cloud`
+
+Either way, when you're done your Pico's filesystem should look something like:
+
+```
+/
+├── main.py
+├── secrets.py
+├── bme280_float.py
+├── install_requirements.py
+└── lib/
+    ├── arduino_iot_cloud/   ← the folder you just copied
+    ├── cbor2/               ← installed by MIP
+    ├── senml/               ← installed by MIP
+    ├── umqtt/               ← installed by MIP
+    └── logging.py           ← installed by MIP
+```
+
+`/lib` is on MicroPython's import path by default, so `from arduino_iot_cloud import ArduinoCloudClient` in your next script will Just Work.
 
 ### The code
 
