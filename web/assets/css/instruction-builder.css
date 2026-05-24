@@ -163,17 +163,26 @@ body.instruction-builder-page.is-embedded .ib-workspace {
      saving  → blue uploading (fa-cloud-arrow-up, gently pulsing)
      error   → red xmark      (fa-cloud-xmark) */
 .ib-save-cloud {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  /* Canonical FA-glyph-centring pattern: block + text-align +
+     line-height = container height. Flex/grid centring leaves FA
+     glyphs ~2-3 px above the optical centre on small containers
+     because the inline box doesn't match the glyph's centre. See
+     CLAUDE.md "FA icon centering" section. */
+  display: inline-block;
+  text-align: center;
   width: 28px;
   height: 28px;
+  line-height: 28px;
   font-size: 1rem;
-  line-height: 1;
   color: #6c757d;
   border-radius: 4px;
   transition: color 120ms ease, background-color 120ms ease;
   cursor: default;
+}
+.ib-save-cloud > i {
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
 }
 .ib-save-cloud[data-state="saved"]  { color: #2c8a3f; }
 .ib-save-cloud[data-state="pending"] { color: #d97706; }
