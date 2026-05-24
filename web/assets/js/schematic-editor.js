@@ -1547,16 +1547,131 @@
     return autoNetColour(net);
   }
 
-  function buildNetFabric(net, selected) {
+  // Compute a perpendicular offset for every segment in the scene so
+  // segments that share a "lane" (same orientation + same axis-
+  // perp position + overlapping range) get rendered as parallel
+  // rails instead of a single overlapping line. Returns a Map keyed
+  // by segment ref → {dx, dy}.
+  //
+  // Algorithm:
+  //   1. Group segments by (orientation, axis-perp value rounded
+  //      to a few px so near-coincident lanes share a bucket).
+  //   2. Within each bucket, find segments whose overlap range is
+  //      non-empty and assign offsets [-LANE_GAP, 0, +LANE_GAP,
+  //      -2*LANE_GAP, +2*LANE_GAP, ...] in a stable order.
+  //   3. Segments that don't overlap any sibling get offset 0.
+  //
+  // Deterministic ordering (by net.id + segment index) so a given
+  // schematic always renders the same way across reloads.
+  var LANE_GAP = 4;
+  function computeSegmentOffsets() {
+    var offsets = new Map();
+    if (!STATE.graph || !Array.isArray(STATE.graph.nets)) return offsets;
+    // (1) bucket every segment by lane.
+    var buckets = {}; // key 'h:200' or 'v:300' → [{ seg, net }, ...]
+    STATE.graph.nets.forEach(function (net) {
+      if (!Array.isArray(net.segments)) return;
+      net.segments.forEach(function (seg) {
+        var key;
+        if (seg.y1 === seg.y2) {
+          key = 'h:' + seg.y1;
+        } else if (seg.x1 === seg.x2) {
+          key = 'v:' + seg.x1;
+        } else {
+          return; // diagonals don't share lanes with rectilinear runs
+        }
+        (buckets[key] = buckets[key] || []).push({ seg: seg, net: net });
+      });
+    });
+    // (2) per-lane overlap check + offset assignment.
+    Object.keys(buckets).forEach(function (k) {
+      var entries = buckets[k];
+      if (entries.length < 2) return;
+      var horizontal = (k[0] === 'h');
+      // For each pair, decide if they overlap.
+      function rangeOf(seg) {
+        return horizontal
+          ? [Math.min(seg.x1, seg.x2), Math.max(seg.x1, seg.x2)]
+          : [Math.min(seg.y1, seg.y2), Math.max(seg.y1, seg.y2)];
+      }
+      // Group entries that all share at least some range with each
+      // other (transitive closure). Each cluster gets distinct
+      // offsets; singletons stay at 0.
+      var clusters = [];
+      entries.forEach(function (entry) {
+        var r = rangeOf(entry.seg);
+        var joined = null;
+        clusters.forEach(function (cl) {
+          // Overlap = ranges intersect (open ends count as touching).
+          if (cl.range[0] <= r[1] && cl.range[1] >= r[0]) {
+            joined = cl;
+          }
+        });
+        if (joined) {
+          joined.members.push(entry);
+          joined.range[0] = Math.min(joined.range[0], r[0]);
+          joined.range[1] = Math.max(joined.range[1], r[1]);
+        } else {
+          clusters.push({ members: [entry], range: [r[0], r[1]] });
+        }
+      });
+      clusters.forEach(function (cl) {
+        if (cl.members.length < 2) return;
+        // Stable order by net.id + segment index so colour
+        // assignments are deterministic across reloads.
+        cl.members.sort(function (a, b) {
+          var an = String(a.net.id || ''); var bn = String(b.net.id || '');
+          return an < bn ? -1 : an > bn ? 1 : 0;
+        });
+        // Offsets centred around 0: -1, +1, -2, +2, ... so the
+        // bundle of N parallel lines is symmetric about the lane.
+        cl.members.forEach(function (entry, i) {
+          var rank = Math.floor((i + 1) / 2);
+          var sign = (i % 2 === 0) ? -1 : 1;
+          var off = rank * LANE_GAP * sign;
+          // Skip writing 0-offsets — saves the Map lookup later for
+          // segments that don't need any shift.
+          if (off === 0) return;
+          if (horizontal) {
+            offsets.set(entry.seg, { dx: 0, dy: off });
+          } else {
+            offsets.set(entry.seg, { dx: off, dy: 0 });
+          }
+        });
+      });
+    });
+    return offsets;
+  }
+
+  function buildNetFabric(net, selected, segOffsets) {
     // One Polyline per segment — cheaper than building a single
     // multi-segment Path when we want individual segments to be
     // hit-testable.
     var objs = [];
     var resolvedStroke = resolveNetStroke(net, selected);
     net.segments.forEach(function (seg) {
-      var line = new fabric.Line([seg.x1, seg.y1, seg.x2, seg.y2], {
+      // Apply the precomputed lane-offset so two nets that share a
+      // run render as parallel rails rather than one overlapping
+      // line. Map lookup → {dx, dy}; default to 0 if not in the
+      // map (segment doesn't share its lane with anything).
+      var off = (segOffsets && segOffsets.get(seg)) || null;
+      var dx = off ? off.dx : 0;
+      var dy = off ? off.dy : 0;
+      var line = new fabric.Line(
+        [seg.x1 + dx, seg.y1 + dy, seg.x2 + dx, seg.y2 + dy],
+        {
         stroke: resolvedStroke,
         strokeWidth: selected ? NET_STROKE_SELECTED : NET_STROKE,
+        // ``strokeLineCap: 'square'`` extends the line by half its
+        // stroke-width past each endpoint. At an L-bend, two
+        // perpendicular segments share a corner point; with squared
+        // caps each line's end fills the corner from both sides so
+        // the join reads as a clean sharp angle rather than a
+        // hairline gap. The cap also extends past the net's outer
+        // endpoints by the same amount, but those endpoints sit at
+        // pin terminators (radius-4 circles) which visually mask
+        // the small overshoot.
+        strokeLineCap: 'square',
         // selectable: false keeps the wire out of rubber-band group
         // selections; the existing onCanvasMouseDown handler still
         // catches a direct click via evented: true and toggles
@@ -1654,10 +1769,14 @@
       if (g) STATE.canvas.add(g);
     });
 
-    // Nets above symbols.
+    // Nets above symbols. Pre-compute lane offsets once for the
+    // whole scene so segments that overlap on a shared run get
+    // rendered as parallel rails. Passed through to buildNetFabric.
+    var segOffsets = computeSegmentOffsets();
+
     STATE.graph.nets.forEach(function (net) {
       var selected = (net.id === STATE.selectedNetId);
-      buildNetFabric(net, selected).forEach(function (line) {
+      buildNetFabric(net, selected, segOffsets).forEach(function (line) {
         STATE.canvas.add(line);
       });
     });
@@ -3048,31 +3167,45 @@
     if (!isFinite(minX)) return null;
     var margin = 20;
 
-    // Snapshot at zoom-to-fit regardless of the editor's current zoom
-    // or pan. Two things were clipping the bottom of the diagram
-    // before:
-    //   1. The crop was clamped to the canvas's W/H, so any object
-    //      past the visible viewport was dropped.
-    //   2. ``toDataURL`` applies the canvas's viewportTransform
-    //      during rendering, so a zoomed-in / scrolled view would
-    //      bake that crop into the PNG.
-    // Fix: reset viewportTransform to identity around the capture,
-    // and use the actual content bbox (with negative left/top
-    // allowed) so the off-screen render covers everything.
+    // Robust crop: ``toDataURL`` only captures pixels that EXIST on
+    // the source canvas; objects whose scene coords land outside
+    // (0,0)–(canvas.width, canvas.height) get clipped at the canvas
+    // edge regardless of what we pass to left/top/width/height.
+    // Steps that authored content past the canvas extent then read
+    // back cropped on the next snapshot.
+    //
+    // Fix: temporarily expand the canvas to fit the full content
+    // bbox + margin AND shift the viewportTransform so (minX-margin,
+    // minY-margin) maps to (0,0). Render to that expanded canvas,
+    // capture, then restore the original dimensions + transform.
+    var savedW   = canvas.getWidth();
+    var savedH   = canvas.getHeight();
     var savedVPT = canvas.viewportTransform;
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+
+    var pad = margin;
+    var contentW = Math.max(1, Math.ceil((maxX - minX) + pad * 2));
+    var contentH = Math.max(1, Math.ceil((maxY - minY) + pad * 2));
+
     try {
+      canvas.setDimensions({ width: contentW, height: contentH });
+      // Translate scene-space so (minX - pad, minY - pad) lands at
+      // canvas origin. Pure translate; no scale, since multiplier
+      // handles supersampling at the toDataURL level.
+      canvas.viewportTransform = [
+        1, 0, 0, 1,
+        -(minX - pad),
+        -(minY - pad),
+      ];
+      canvas.calcOffset();
       return canvas.toDataURL({
         format: 'png',
         multiplier: mult,
         enableRetinaScaling: false,
-        left:   minX - margin,
-        top:    minY - margin,
-        width:  (maxX - minX) + margin * 2,
-        height: (maxY - minY) + margin * 2,
       });
     } finally {
+      canvas.setDimensions({ width: savedW, height: savedH });
       canvas.viewportTransform = savedVPT;
+      canvas.calcOffset();
       canvas.requestRenderAll();
     }
   }
