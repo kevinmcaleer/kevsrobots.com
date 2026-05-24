@@ -1547,134 +1547,97 @@
     return autoNetColour(net);
   }
 
-  // Compute a perpendicular offset for every segment in the scene so
-  // segments that share a "lane" (same orientation + same axis-
-  // perp position + overlapping range) get rendered as parallel
-  // rails instead of a single overlapping line. Returns a Map keyed
-  // by segment ref → {dx, dy}.
+  // Stitch a net's segments into one or more continuous polylines so
+  // each net renders as a single Fabric.Polyline. This buys us:
+  //   - sharp L-bend corners via strokeLineJoin: 'miter' (no
+  //     hairline gaps between adjacent Line objects)
+  //   - rounded endpoint caps that meet pin terminators cleanly
+  //   - no per-segment offset → no gaps/overshoots at corners
   //
-  // Algorithm:
-  //   1. Group segments by (orientation, axis-perp value rounded
-  //      to a few px so near-coincident lanes share a bucket).
-  //   2. Within each bucket, find segments whose overlap range is
-  //      non-empty and assign offsets [-LANE_GAP, 0, +LANE_GAP,
-  //      -2*LANE_GAP, +2*LANE_GAP, ...] in a stable order.
-  //   3. Segments that don't overlap any sibling get offset 0.
+  // Most nets are 2-endpoint chains (an L-bend = 2 segments forming
+  // one path). For nets with junctions (3+ segments meeting at one
+  // point) we walk the segment graph and emit one polyline per
+  // branch chain — branches still render with mitre joins inside
+  // each chain.
   //
-  // Deterministic ordering (by net.id + segment index) so a given
-  // schematic always renders the same way across reloads.
-  var LANE_GAP = 4;
-  function computeSegmentOffsets() {
-    var offsets = new Map();
-    if (!STATE.graph || !Array.isArray(STATE.graph.nets)) return offsets;
-    // (1) bucket every segment by lane.
-    var buckets = {}; // key 'h:200' or 'v:300' → [{ seg, net }, ...]
-    STATE.graph.nets.forEach(function (net) {
-      if (!Array.isArray(net.segments)) return;
-      net.segments.forEach(function (seg) {
-        var key;
-        if (seg.y1 === seg.y2) {
-          key = 'h:' + seg.y1;
-        } else if (seg.x1 === seg.x2) {
-          key = 'v:' + seg.x1;
-        } else {
-          return; // diagonals don't share lanes with rectilinear runs
-        }
-        (buckets[key] = buckets[key] || []).push({ seg: seg, net: net });
-      });
+  // Returns an array of point-arrays.
+  function netPathsFromSegments(segments) {
+    if (!segments || segments.length === 0) return [];
+    if (segments.length === 1) {
+      var s0 = segments[0];
+      return [[{ x: s0.x1, y: s0.y1 }, { x: s0.x2, y: s0.y2 }]];
+    }
+    function key(x, y) { return x + ',' + y; }
+    var adj = {};                      // endpointKey → [{ to, idx }]
+    var remaining = new Set();
+    segments.forEach(function (s, i) {
+      var k1 = key(s.x1, s.y1), k2 = key(s.x2, s.y2);
+      (adj[k1] = adj[k1] || []).push({ to: k2, idx: i });
+      (adj[k2] = adj[k2] || []).push({ to: k1, idx: i });
+      remaining.add(i);
     });
-    // (2) per-lane overlap check + offset assignment.
-    Object.keys(buckets).forEach(function (k) {
-      var entries = buckets[k];
-      if (entries.length < 2) return;
-      var horizontal = (k[0] === 'h');
-      // For each pair, decide if they overlap.
-      function rangeOf(seg) {
-        return horizontal
-          ? [Math.min(seg.x1, seg.x2), Math.max(seg.x1, seg.x2)]
-          : [Math.min(seg.y1, seg.y2), Math.max(seg.y1, seg.y2)];
+
+    var paths = [];
+    while (remaining.size > 0) {
+      // Prefer a degree-1 node (a leaf of the chain) as start so the
+      // walked path goes leaf → leaf. Otherwise pick any endpoint
+      // touching an un-walked segment.
+      var startKey = null;
+      var fallback = null;
+      for (var k in adj) {
+        var liveEdges = adj[k].filter(function (e) { return remaining.has(e.idx); });
+        if (liveEdges.length === 0) continue;
+        if (!fallback) fallback = k;
+        if (liveEdges.length === 1) { startKey = k; break; }
       }
-      // Group entries that all share at least some range with each
-      // other (transitive closure). Each cluster gets distinct
-      // offsets; singletons stay at 0.
-      var clusters = [];
-      entries.forEach(function (entry) {
-        var r = rangeOf(entry.seg);
-        var joined = null;
-        clusters.forEach(function (cl) {
-          // Overlap = ranges intersect (open ends count as touching).
-          if (cl.range[0] <= r[1] && cl.range[1] >= r[0]) {
-            joined = cl;
-          }
-        });
-        if (joined) {
-          joined.members.push(entry);
-          joined.range[0] = Math.min(joined.range[0], r[0]);
-          joined.range[1] = Math.max(joined.range[1], r[1]);
-        } else {
-          clusters.push({ members: [entry], range: [r[0], r[1]] });
+      if (!startKey) startKey = fallback;
+      if (!startKey) break;
+
+      var path = [];
+      var current = startKey;
+      var cParts = current.split(',');
+      path.push({ x: parseFloat(cParts[0]), y: parseFloat(cParts[1]) });
+      while (true) {
+        var edges = adj[current] || [];
+        var next = null;
+        for (var i = 0; i < edges.length; i++) {
+          if (remaining.has(edges[i].idx)) { next = edges[i]; break; }
         }
-      });
-      clusters.forEach(function (cl) {
-        if (cl.members.length < 2) return;
-        // Stable order by net.id + segment index so colour
-        // assignments are deterministic across reloads.
-        cl.members.sort(function (a, b) {
-          var an = String(a.net.id || ''); var bn = String(b.net.id || '');
-          return an < bn ? -1 : an > bn ? 1 : 0;
-        });
-        // Offsets centred around 0: -1, +1, -2, +2, ... so the
-        // bundle of N parallel lines is symmetric about the lane.
-        cl.members.forEach(function (entry, i) {
-          var rank = Math.floor((i + 1) / 2);
-          var sign = (i % 2 === 0) ? -1 : 1;
-          var off = rank * LANE_GAP * sign;
-          // Skip writing 0-offsets — saves the Map lookup later for
-          // segments that don't need any shift.
-          if (off === 0) return;
-          if (horizontal) {
-            offsets.set(entry.seg, { dx: 0, dy: off });
-          } else {
-            offsets.set(entry.seg, { dx: off, dy: 0 });
-          }
-        });
-      });
-    });
-    return offsets;
+        if (!next) break;
+        remaining.delete(next.idx);
+        current = next.to;
+        var nParts = current.split(',');
+        path.push({ x: parseFloat(nParts[0]), y: parseFloat(nParts[1]) });
+      }
+      paths.push(path);
+    }
+    return paths;
   }
 
-  function buildNetFabric(net, selected, segOffsets) {
-    // One Polyline per segment — cheaper than building a single
-    // multi-segment Path when we want individual segments to be
-    // hit-testable.
+  function buildNetFabric(net, selected) {
+    // Render each net as one or more Fabric.Polyline objects — one
+    // per "branch chain" through the segment graph (most nets are a
+    // single chain). The polyline gives us:
+    //   - sharp mitre corners between adjacent segments (no
+    //     hairline gap)
+    //   - rounded endpoint caps that sit neatly inside pin
+    //     terminator circles without overshooting
     var objs = [];
     var resolvedStroke = resolveNetStroke(net, selected);
-    net.segments.forEach(function (seg) {
-      // Apply the precomputed lane-offset so two nets that share a
-      // run render as parallel rails rather than one overlapping
-      // line. Map lookup → {dx, dy}; default to 0 if not in the
-      // map (segment doesn't share its lane with anything).
-      var off = (segOffsets && segOffsets.get(seg)) || null;
-      var dx = off ? off.dx : 0;
-      var dy = off ? off.dy : 0;
-      var line = new fabric.Line(
-        [seg.x1 + dx, seg.y1 + dy, seg.x2 + dx, seg.y2 + dy],
-        {
+    var sw = selected ? NET_STROKE_SELECTED : NET_STROKE;
+    var paths = netPathsFromSegments(net.segments);
+    paths.forEach(function (pts) {
+      if (!pts || pts.length < 2) return;
+      var poly = new fabric.Polyline(pts, {
         stroke: resolvedStroke,
-        strokeWidth: selected ? NET_STROKE_SELECTED : NET_STROKE,
-        // ``strokeLineCap: 'square'`` extends the line by half its
-        // stroke-width past each endpoint. At an L-bend, two
-        // perpendicular segments share a corner point; with squared
-        // caps each line's end fills the corner from both sides so
-        // the join reads as a clean sharp angle rather than a
-        // hairline gap. The cap also extends past the net's outer
-        // endpoints by the same amount, but those endpoints sit at
-        // pin terminators (radius-4 circles) which visually mask
-        // the small overshoot.
-        strokeLineCap: 'square',
+        strokeWidth: sw,
+        fill: '',
+        strokeLineCap: 'round',
+        strokeLineJoin: 'miter',
+        strokeMiterLimit: 4,
         // selectable: false keeps the wire out of rubber-band group
-        // selections; the existing onCanvasMouseDown handler still
-        // catches a direct click via evented: true and toggles
+        // selections; the canvas mouse-down handler still catches
+        // a direct click via evented: true and toggles
         // STATE.selectedNetId itself.
         selectable: false,
         evented: true,
@@ -1684,21 +1647,12 @@
         perPixelTargetFind: true,
         objectCaching: false,
       });
-      line.data = { kind: 'net', netId: net.id };
-      objs.push(line);
+      poly.data = { kind: 'net', netId: net.id };
+      objs.push(poly);
     });
-    // Net label — anchored at the midpoint of the longest segment so
-    // it sits in a readable spot regardless of which segment was
-    // Net names are intentionally NOT drawn on the canvas. The
-    // information is still available — every net's name shows up
-    // in the right-rail Properties panel when its wire is selected,
-    // and in the Connections table below. Floating "Net-1 / Net-2
-    // / GND" labels in the middle of the diagram add clutter without
-    // adding value (especially now that GND/PWR colour-codes black
-    // and red, and signal nets each get their own auto-palette
-    // colour). If a future use-case wants a visible net tag on the
-    // canvas, re-introduce as an opt-in toggle rather than
-    // unconditionally.
+    // Net names intentionally NOT drawn on the canvas — see
+    // earlier commit that removed them. Their info is still
+    // available in the Properties panel + Connections table.
     return objs;
   }
 
@@ -1769,14 +1723,12 @@
       if (g) STATE.canvas.add(g);
     });
 
-    // Nets above symbols. Pre-compute lane offsets once for the
-    // whole scene so segments that overlap on a shared run get
-    // rendered as parallel rails. Passed through to buildNetFabric.
-    var segOffsets = computeSegmentOffsets();
-
+    // Nets above symbols. Each net renders as a single polyline
+    // (or per-branch polylines for junctioned nets) — sharp
+    // corners + rounded endpoint caps, no per-segment offsets.
     STATE.graph.nets.forEach(function (net) {
       var selected = (net.id === STATE.selectedNetId);
-      buildNetFabric(net, selected, segOffsets).forEach(function (line) {
+      buildNetFabric(net, selected).forEach(function (line) {
         STATE.canvas.add(line);
       });
     });
