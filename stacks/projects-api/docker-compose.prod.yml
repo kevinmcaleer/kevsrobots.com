@@ -19,7 +19,13 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     network_mode: host
-    command: tunnel --no-autoupdate run
+    # ``--edge-ip-version 4`` forces the QUIC socket to IPv4 only.
+    # Without it, cloudflared binds a dual-stack [::] socket; after
+    # a Pi power-cut IPv6 can come up without a working default
+    # route, and every send fails with "sendmsg: network is
+    # unreachable" indefinitely. v4-only keeps the tunnel working
+    # regardless of host IPv6 state.
+    command: tunnel --no-autoupdate --edge-ip-version 4 run
     environment:
       - TUNNEL_TOKEN=${PROJECTS_TUNNEL_TOKEN}
     restart: unless-stopped
