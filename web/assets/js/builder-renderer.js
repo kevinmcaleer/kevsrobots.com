@@ -156,6 +156,38 @@
     }
   }
 
+  // Sanitise a parsed canvas_json document so loadFromJSON doesn't
+  // reject the whole render on a single dead image. Any image object
+  // whose src is a transient ``blob:`` URL (which the browser
+  // invalidates on every page navigation) gets stripped — the image
+  // simply won't appear in the rendered preview. Fixed-URL image
+  // failures (404s on persistent URLs) still propagate; those are
+  // worth surfacing because they indicate a real broken link.
+  //
+  // The bg-removal "cutout" feature used to setSrc() a blob: URL
+  // directly; since we now upload the cutout to /api/projects/.../images,
+  // newer dumps don't have blob URLs in them. This sanitiser only
+  // matters for steps saved BEFORE that fix landed.
+  function sanitiseCanvasJson(parsed) {
+    if (!parsed || !Array.isArray(parsed.objects)) return parsed;
+    var dropped = 0;
+    parsed.objects = parsed.objects.filter(function (obj) {
+      if (!obj) return false;
+      var type = String(obj.type || '').toLowerCase();
+      if (type === 'image' && typeof obj.src === 'string' &&
+          obj.src.indexOf('blob:') === 0) {
+        dropped++;
+        return false;
+      }
+      return true;
+    });
+    if (dropped) {
+      console.warn('[builder-renderer] dropped ' + dropped +
+        ' image object(s) with stale blob: URLs');
+    }
+    return parsed;
+  }
+
   // ---------------------------------------------------------------
   // Canvas (photo / blank) rasterisation — lazy-load Fabric.js once,
   // replay each step's canvas_json into an off-screen canvas, then
@@ -253,6 +285,7 @@
           '</div>';
         continue;
       }
+      parsed = sanitiseCanvasJson(parsed);
       var fcanvas = makeCanvas();
       try {
         // Fabric v6: loadFromJSON returns a Promise; resolves after
@@ -501,6 +534,7 @@
       try { parsed = JSON.parse(step.canvas_json); } catch (_) {}
     }
     if (!parsed) return blankDataUrl();
+    parsed = sanitiseCanvasJson(parsed);
     var savedBg = parsed.background || parsed.backgroundColor || '#ffffff';
     try {
       fcanvas.clear();

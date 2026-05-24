@@ -1470,6 +1470,33 @@
     ]);
   }
 
+  // Drop image objects whose src is a transient ``blob:`` URL — those
+  // are invalidated by the browser on every page navigation, so steps
+  // saved before the cutout-upload fix landed (commit 943689ee) have
+  // dead URLs in their canvas_json. Without this filter, Fabric v6's
+  // enlivenObjects rejects the whole loadFromJSON Promise on the
+  // first dead image and the entire step renders blank. Stripping
+  // the broken object leaves a gap on the canvas instead.
+  function sanitiseStaleImages(parsed) {
+    if (!parsed || !Array.isArray(parsed.objects)) return parsed;
+    var dropped = 0;
+    parsed.objects = parsed.objects.filter(function (obj) {
+      if (!obj) return false;
+      var type = String(obj.type || '').toLowerCase();
+      if (type === 'image' && typeof obj.src === 'string' &&
+          obj.src.indexOf('blob:') === 0) {
+        dropped++;
+        return false;
+      }
+      return true;
+    });
+    if (dropped) {
+      console.warn('loadCanvasFromStep: dropped ' + dropped +
+        ' image object(s) with stale blob: URLs');
+    }
+    return parsed;
+  }
+
   function loadCanvasFromStep(step) {
     state.suppressEvents = true;
     var raw = (step && step.canvas_json) || '';
@@ -1479,6 +1506,7 @@
         console.warn('Step canvas_json is not valid JSON — starting blank');
       }
     }
+    if (parsed) parsed = sanitiseStaleImages(parsed);
 
     return new Promise(function (resolve) {
       function done() {
