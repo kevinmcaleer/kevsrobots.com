@@ -26,6 +26,8 @@ groups:
   - electronics
 videos:
   - Wwhmy9AqCbE
+repo:
+  - https://www.github.com/kevinmcaleer/working_with_wifi
 ---
 
 Ahoy there makers! Welcome to **Part 3** of our **From Code to Creation** series. So far we've talked to a sensor over I2C and shown its readings on a tiny OLED screen. That's brilliant — until you walk into the next room and can't see the display anymore.
