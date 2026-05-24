@@ -176,6 +176,7 @@ body.instruction-builder-page.is-embedded .ib-workspace {
   cursor: default;
 }
 .ib-save-cloud[data-state="saved"]  { color: #2c8a3f; }
+.ib-save-cloud[data-state="pending"] { color: #d97706; }
 .ib-save-cloud[data-state="saving"] {
   color: #0d6efd;
   animation: ib-cloud-pulse 1.2s ease-in-out infinite;

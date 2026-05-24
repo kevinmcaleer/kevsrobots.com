@@ -338,6 +338,14 @@
   // user's "is my work saved?" question. Stays put after every save
   // so a long-idle user can glance up and see green-tick rather than
   // a faded-out text indicator.
+  //
+  // States:
+  //   saved   → green tick   (fa-cloud-check)  — at rest, all in sync
+  //   pending → amber cloud  (fa-cloud)        — edits made, not yet
+  //                                              flushed to server
+  //                                              (debounce window)
+  //   saving  → blue arrow   (fa-cloud-arrow-up, pulsing) — PUT in flight
+  //   error   → red xmark    (fa-cloud-xmark)  — last save failed
   function setSaveCloud(kind, msg) {
     var el = document.getElementById('ib-save-cloud');
     if (!el) return;
@@ -346,6 +354,10 @@
       state = 'saving';
       icon  = 'fa-cloud-arrow-up';
       title = msg || 'Saving…';
+    } else if (kind === 'pending') {
+      state = 'pending';
+      icon  = 'fa-cloud';
+      title = msg || 'Unsaved changes';
     } else if (kind === 'error') {
       state = 'error';
       icon  = 'fa-cloud-xmark';
@@ -362,6 +374,17 @@
     el.dataset.state = state;
     el.setAttribute('title', title);
     el.innerHTML = '<i class="fas ' + icon + '" aria-hidden="true"></i>';
+  }
+
+  // Mark the editor as having unsaved changes — fires the moment a
+  // debounce is armed, NOT when the PUT actually goes out. The user
+  // gets immediate visual feedback that their last edit hasn't been
+  // synced yet, rather than waiting up to AUTOSAVE_MS for setSaveStatus
+  // ('saving') to fire when the debounce settles. Cloud-only update —
+  // doesn't touch the text status indicator (kept quiet for "pending"
+  // so a flurry of edits doesn't paint a Saving… line for each one).
+  function markSavePending() {
+    setSaveCloud('pending');
   }
 
   // Generic debouncer keyed by string id — keeps separate timers for
@@ -1589,6 +1612,11 @@
 
   function scheduleAutosave() {
     if (!state.activeStepId) return;
+    // Flip the cloud to "pending" immediately so the user sees that
+    // their last edit hasn't been synced yet. The 'saving' state
+    // (and corresponding cloud-arrow-up) takes over once the
+    // debounce settles and flushCanvasSave starts its PUT.
+    markSavePending();
     debounce('canvas-autosave', AUTOSAVE_MS, function () { flushCanvasSave(); });
   }
 
@@ -1626,6 +1654,10 @@
         stepFieldFocusValues.stepId = state.activeStepId;
         stepFieldFocusValues.title = dom.stepTitle.value || '';
       });
+      // Mark pending as the user is typing in the title, so the
+      // cloud icon reacts immediately — the actual PUT still waits
+      // for blur (when the field's final value is known).
+      dom.stepTitle.addEventListener('input', markSavePending);
       dom.stepTitle.addEventListener('blur', function () {
         if (!state.activeStepId) return;
         debounce('step-title', 100, function () {
@@ -1680,6 +1712,7 @@
         stepFieldFocusValues.stepId = state.activeStepId;
         stepFieldFocusValues.description = dom.stepDescription.value || '';
       });
+      dom.stepDescription.addEventListener('input', markSavePending);
       dom.stepDescription.addEventListener('blur', function () {
         if (!state.activeStepId) return;
         debounce('step-desc', 100, function () {
