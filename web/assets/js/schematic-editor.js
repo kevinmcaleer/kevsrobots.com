@@ -60,8 +60,35 @@
 
   // Selected net highlight stroke width. Slightly thicker than the
   // default so the selection is obvious without re-laying-out.
-  var NET_STROKE = 2;
-  var NET_STROKE_SELECTED = 3.5;
+  var NET_STROKE = 3;
+  var NET_STROKE_SELECTED = 5;
+
+  // Electrical-role overrides for net colour resolution. GND nets
+  // are always black, power nets are always brand-red — the
+  // auto-palette below DOESN'T include these two so they stay
+  // unambiguous in dense schematics where the user is scanning for
+  // power rails specifically.
+  var NET_INK_GND = '#000000';
+  var NET_INK_PWR = BRAND_RED;
+
+  // Auto-assigned colours for signal nets. Every net gets a stable
+  // colour from this palette, picked from a hash of net.id so the
+  // colours don't shuffle on every reload. Red and black are
+  // deliberately absent so the GND / PWR overrides above remain
+  // visually distinct from any signal net the auto-palette might
+  // assign. Selection state still wins → BRAND_RED is drawn on top.
+  var NET_AUTO_PALETTE = [
+    '#1d4ed8', // blue
+    '#15803d', // green
+    '#7c3aed', // purple
+    '#d97706', // amber / orange
+    '#0e7490', // teal
+    '#be185d', // magenta
+    '#4338ca', // indigo
+    '#0f766e', // dark teal
+    '#a16207', // dark amber
+    '#86198f', // dark magenta
+  ];
 
   // ====================================================================
   // 2. SYMBOL LIBRARY (stub — Symbol Designer ships next)
@@ -1428,22 +1455,92 @@
     return group;
   }
 
+  // ----- Net colour resolution -----------------------------------
+  // Precedence:
+  //   1. Selection state → BRAND_RED (always wins so the user can
+  //      see what's selected)
+  //   2. GND pin attached to the net → black
+  //   3. Power pin attached to the net → red
+  //   4. User-set custom colour (anything not the legacy black)
+  //   5. Auto-palette colour, stable per net.id
+  //
+  // Pin role inference checks pin.type first (set explicitly via the
+  // Symbol Designer's pin-type radio), then falls back to a name
+  // pattern so legacy / built-in symbols whose pins don't carry a
+  // type field still get the right behaviour.
+  function inferPinRole(pin) {
+    if (!pin) return null;
+    if (pin.type === 'GND') return 'GND';
+    if (pin.type === 'PWR') return 'PWR';
+    var n = String(pin.name || '').trim().toUpperCase();
+    if (n === 'GND' || n === 'VSS' || n === '0V') return 'GND';
+    if (/^(VCC|VDD|V\+|VEE|3V3|3\.3V|5V|VSYS|VBUS|VIN)\b/.test(n)) return 'PWR';
+    return null;
+  }
+
+  function getNetElectricalRole(net) {
+    if (!net || !Array.isArray(net.endpoints)) return null;
+    var sawPwr = false;
+    for (var i = 0; i < net.endpoints.length; i++) {
+      var ep = net.endpoints[i];
+      var inst = findInstance(ep.instanceId);
+      if (!inst) continue;
+      var pin = findPin(inst, ep.pinNumber);
+      var role = inferPinRole(pin);
+      // Treat the GND / V+ rail symbols themselves as a GND / PWR
+      // signal — their refDes prefix encodes the intent even when
+      // the pin name doesn't (e.g. a Symbol-Designer-authored GND
+      // symbol whose pin is just labelled "1").
+      if (!role && inst.refDes) {
+        var rd = String(inst.refDes).toUpperCase();
+        if (rd.indexOf('GND') === 0) role = 'GND';
+        // V+ rail refDes is "V<digit>" / "V+" — match exactly that
+        // so genuine power rails light up red but voltage regulators
+        // (VR1), via stitches (VIA), etc. don't get mis-classified.
+        else if (/^V[\d+]/.test(rd)) role = 'PWR';
+      }
+      if (role === 'GND') return 'GND'; // GND wins immediately
+      if (role === 'PWR') sawPwr = true;
+    }
+    return sawPwr ? 'PWR' : null;
+  }
+
+  // Stable per-net auto-colour. Hashes the net's id (or name as
+  // fallback) into a palette index — the same net gets the same
+  // colour on every reload, and adding/removing other nets doesn't
+  // disturb existing ones.
+  function autoNetColour(net) {
+    var key = String((net && (net.id || net.name)) || '');
+    var h = 0;
+    for (var i = 0; i < key.length; i++) {
+      h = ((h << 5) - h) + key.charCodeAt(i);
+      h |= 0; // force 32-bit
+    }
+    return NET_AUTO_PALETTE[Math.abs(h) % NET_AUTO_PALETTE.length];
+  }
+
+  function resolveNetStroke(net, selected) {
+    if (selected) return BRAND_RED;
+    var role = getNetElectricalRole(net);
+    if (role === 'GND') return NET_INK_GND;
+    if (role === 'PWR') return NET_INK_PWR;
+    // Legacy auto-upgrade: '#222222' (old INK) was hardcoded into
+    // every saved net by newNet() pre-palette-change. Treat those
+    // as "no override" so existing schematics pick up the new
+    // auto-colour. Real user-set colours pass through unchanged.
+    var hasCustom = net.color &&
+      net.color !== INK && net.color !== '#222' && net.color !== 'black' &&
+      net.color !== NET_INK;
+    if (hasCustom) return net.color;
+    return autoNetColour(net);
+  }
+
   function buildNetFabric(net, selected) {
     // One Polyline per segment — cheaper than building a single
     // multi-segment Path when we want individual segments to be
     // hit-testable.
     var objs = [];
-    // Auto-upgrade legacy schematics: nets saved before the
-    // black→blue palette change have ``color: '#222222'`` (the
-    // old INK constant) hardcoded into their JSON. Treat that
-    // exact value as "no override" so existing schematics pick up
-    // NET_INK on next load. User-set custom colours (anything
-    // other than the old INK) are preserved.
-    var hasCustomColour = net.color &&
-      net.color !== INK && net.color !== '#222' && net.color !== 'black';
-    var resolvedStroke = selected
-      ? BRAND_RED
-      : (hasCustomColour ? net.color : NET_INK);
+    var resolvedStroke = resolveNetStroke(net, selected);
     net.segments.forEach(function (seg) {
       var line = new fabric.Line([seg.x1, seg.y1, seg.x2, seg.y2], {
         stroke: resolvedStroke,
