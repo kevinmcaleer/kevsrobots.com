@@ -26,7 +26,7 @@ groups:
   - electronics
 videos:
   - Wwhmy9AqCbE
-repo:
+code:
   - https://www.github.com/kevinmcaleer/working_with_wifi
 ---
 
