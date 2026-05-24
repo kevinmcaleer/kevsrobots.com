@@ -9,8 +9,8 @@ mode: light
 date: 2026-05-22
 author: Kevin McAleer
 difficulty: intermediate
-cover: /assets/img/blog/going-wireless-pico-w/cover.jpg
-hero: /assets/img/blog/going-wireless-pico-w/hero.png
+cover: /assets/img/blog/working_with_wifi/cover.jpg
+hero: /assets/img/blog/working_with_wifi/hero.png
 tags:
   - micropython
   - pico w
