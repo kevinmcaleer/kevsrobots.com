@@ -1315,19 +1315,22 @@
         pieces.push(term);
       }
 
-      // Pin label — placed past the OUTER end of the pin's line, in
-      // the direction away from the symbol's centre. For standard
-      // pins (anchor at body edge, terminator outside) this puts the
-      // label past the terminator (outside the symbol). For "reverse"
-      // designs (anchor outside the body, terminator at body edge —
-      // e.g. your Pico where you drew the body rect to the right of
-      // the pin anchors), it puts the label past the anchor, still
-      // OUTSIDE the body.
+      // Pin label — placed past the INNER end of the pin's line, in
+      // the direction TOWARD the symbol's centre. This puts the
+      // label inside the body, away from where wires attach, so a
+      // wire entering the pin can't visually run over the label.
       //
-      // The trick: compare |px| vs |sx2| (or |py| vs |sy2| for
-      // vertical pins). The endpoint with the larger absolute value
-      // is furthest from the symbol's centre — that's "outside" — so
-      // the label goes past it, extending further outward.
+      // For standard pins (anchor at body edge, terminator outside)
+      // the inner end is the anchor (px) — label goes inside body.
+      // For "reverse" designs (anchor outside, terminator at body
+      // edge — e.g. a Pico where the body rect sits to the right of
+      // the pin anchors), the inner end is the terminator (sx2) —
+      // again, label lands inside the body.
+      //
+      // The trick: pick whichever endpoint has the SMALLER absolute
+      // value (closer to the symbol centre = "inside"). Then the
+      // pad direction is opposite of that endpoint's sign — moving
+      // toward centre.
       //
       // Skip for power symbols (GND / V+): their glyph already
       // identifies them and an extra label would be visual noise.
@@ -1336,17 +1339,22 @@
         var pad = 4;
         var horizontal = (pin.side === 'left' || pin.side === 'right');
         if (horizontal) {
-          var outerX = (Math.abs(px) >= Math.abs(sx2)) ? px : sx2;
-          var dirX = (outerX >= 0) ? 1 : -1;
-          lx = outerX + dirX * pad;
+          // Endpoint closer to centre = inner.
+          var innerX = (Math.abs(px) <= Math.abs(sx2)) ? px : sx2;
+          // Move TOWARD centre: if inner is negative (left of centre),
+          // step right (+1); if positive (right of centre), step left.
+          var dirX = (innerX < 0) ? 1 : -1;
+          lx = innerX + dirX * pad;
           ly = py;
+          // Text extends toward the body centre; anchor on the side
+          // facing away from centre so growth runs centreward.
           anchorX = (dirX > 0) ? 'left' : 'right';
           anchorY = 'center';
         } else {
-          var outerY = (Math.abs(py) >= Math.abs(sy2)) ? py : sy2;
-          var dirY = (outerY >= 0) ? 1 : -1;
+          var innerY = (Math.abs(py) <= Math.abs(sy2)) ? py : sy2;
+          var dirY = (innerY < 0) ? 1 : -1;
           lx = px;
-          ly = outerY + dirY * pad;
+          ly = innerY + dirY * pad;
           anchorX = 'center';
           anchorY = (dirY > 0) ? 'top' : 'bottom';
         }
@@ -1562,40 +1570,16 @@
     });
     // Net label — anchored at the midpoint of the longest segment so
     // it sits in a readable spot regardless of which segment was
-    // clicked. Only renders when the net has a non-empty name set
-    // (via the Label tool or auto-power-net detection).
-    if (net.name && net.segments.length > 0) {
-      var longest = net.segments[0];
-      var bestLen = Math.hypot(longest.x2 - longest.x1, longest.y2 - longest.y1);
-      for (var i = 1; i < net.segments.length; i++) {
-        var s = net.segments[i];
-        var ln = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
-        if (ln > bestLen) { bestLen = ln; longest = s; }
-      }
-      var midX = (longest.x1 + longest.x2) / 2;
-      var midY = (longest.y1 + longest.y2) / 2;
-      var horizontal = (longest.y1 === longest.y2);
-      // Position the label just above a horizontal run, or just right
-      // of a vertical run, so it doesn't sit on top of the wire.
-      var lblX = horizontal ? midX : midX + 6;
-      var lblY = horizontal ? midY - 4 : midY;
-      var anchorX = horizontal ? 'center' : 'left';
-      var anchorY = horizontal ? 'bottom' : 'center';
-      var label = new fabric.Text(net.name, {
-        left: lblX,
-        top: lblY,
-        fontSize: 11,
-        fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
-        fontWeight: '600',
-        fill: selected ? BRAND_RED : '#0d6efd',
-        originX: anchorX,
-        originY: anchorY,
-        selectable: false,
-        evented: false,
-      });
-      label.data = { kind: 'net-label', netId: net.id };
-      objs.push(label);
-    }
+    // Net names are intentionally NOT drawn on the canvas. The
+    // information is still available — every net's name shows up
+    // in the right-rail Properties panel when its wire is selected,
+    // and in the Connections table below. Floating "Net-1 / Net-2
+    // / GND" labels in the middle of the diagram add clutter without
+    // adding value (especially now that GND/PWR colour-codes black
+    // and red, and signal nets each get their own auto-palette
+    // colour). If a future use-case wants a visible net tag on the
+    // canvas, re-introduce as an opt-in toggle rather than
+    // unconditionally.
     return objs;
   }
 
