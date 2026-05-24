@@ -4512,10 +4512,13 @@
           if (sid === state.activeStepId) {
             // Live state has already been updated by the input handler;
             // the autosave debounce will PUT canvas_json with the new bg.
-            return;
+          } else {
+            // Non-active step: update canvas_json directly and PUT.
+            setStepBackgroundColor(sid, input.value);
           }
-          // Non-active step: update canvas_json directly and PUT.
-          setStepBackgroundColor(sid, input.value);
+          // Colour committed — close the dropdown so the user gets
+          // their canvas back instead of a lingering popup.
+          hideStepTileMenu(sid);
         });
       });
 
@@ -4588,6 +4591,26 @@
   // Replace a caption span with an inline input, save on blur / Enter,
   // cancel on Escape. Mirrors the title autosave from the right-side
   // settings pane, just at the filmstrip surface.
+  // Programmatically close the `…` dropdown menu for a given step's
+  // filmstrip tile. Used after title-rename and bg-colour commits so
+  // the menu doesn't linger after the user has clearly finished with
+  // it. Bootstrap's data-bs-auto-close="outside" keeps the menu open
+  // while the user is interacting with its inputs (good — they're
+  // still inside the dropdown). But once the commit fires the user
+  // is done with this menu, so we hide explicitly.
+  function hideStepTileMenu(stepId) {
+    if (!stepId || !dom.filmstripTrack) return;
+    var tile = dom.filmstripTrack.querySelector(
+      '.ib-step-tile[data-step-id="' + stepId + '"]');
+    if (!tile) return;
+    var btn = tile.querySelector('.ib-step-tile-menu-btn');
+    if (!btn) return;
+    if (window.bootstrap && window.bootstrap.Dropdown) {
+      var inst = window.bootstrap.Dropdown.getInstance(btn);
+      if (inst && typeof inst.hide === 'function') inst.hide();
+    }
+  }
+
   function startStepCaptionEdit(captionEl) {
     var stepId = parseInt(captionEl.dataset.stepId, 10);
     if (!stepId) return;
@@ -4640,6 +4663,10 @@
       if (saveIt && next !== original) {
         renameStepFromFilmstrip(step, next);
       }
+      // Title is settled — close the menu so it doesn't linger.
+      // Slight delay so the click-away that triggered the blur
+      // doesn't race the Bootstrap hide animation.
+      setTimeout(function () { hideStepTileMenu(stepId); }, 0);
     }
     input.addEventListener('blur', function () { finish(true); });
     input.addEventListener('keydown', function (e) {
