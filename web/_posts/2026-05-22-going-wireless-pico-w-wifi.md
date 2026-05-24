@@ -251,9 +251,64 @@ Head over to [cloud.arduino.cc](https://cloud.arduino.cc/), sign in, and:
 
 > **Heads-up:** keep that secret key out of any screen recordings, GitHub commits, or screenshots. Treat it like a password.
 
-### Install the library
+### Install the prerequisites with MIP
 
-In Thonny, go to **Tools → Manage Packages**, search for `arduino-iot-cloud`, and install it onto your Pico W.
+The `arduino-iot-cloud` client is a small library that leans on a handful of *other* libraries to do the heavy lifting — talking MQTT, packing data efficiently for the wire, and so on. We have to install those onto the Pico first.
+
+The tool for that is **MIP** — *MicroPython Install Package*. Think of it as `pip` but trimmed down to work on a tiny microcontroller. It runs on the Pico itself, fetches packages from the MicroPython library index over WiFi, and drops them into `/lib`.
+
+Crucially, **MIP needs the Pico to be on WiFi first**, because it has to download the packages. So a one-shot installer script that connects, then installs, is the cleanest pattern. Save this as `install_requirements.py` on your Pico and run it once:
+
+```python
+import network, time
+from secrets import WIFI_SSID, WIFI_PASSWORD
+
+# WiFi must be up before MIP can fetch anything
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+while not wlan.isconnected():
+    time.sleep(1)
+    print("Connecting...")
+print("Connected:", wlan.ifconfig())
+
+def install_packages():
+    import mip
+    packages = [
+        "logging",        # standard logging API the cloud client uses
+        "cbor2",          # compact binary format for sending values
+        "senml",          # the data schema Arduino Cloud expects
+        "umqtt.simple",   # the actual MQTT client
+        "umqtt.robust",   # adds reconnect logic on top of umqtt.simple
+    ]
+    for pkg in packages:
+        try:
+            print(f"Installing {pkg}...")
+            mip.install(pkg)
+        except Exception as e:
+            print(f"  Failed: {e}")
+
+install_packages()
+```
+
+A few notes on what's happening:
+
+- **`secrets.py`** — keep your SSID, password, and Arduino Cloud creds in a tiny `secrets.py` file on the Pico:
+
+  ```python
+  WIFI_SSID     = "..."
+  WIFI_PASSWORD = "..."
+  DEVICE_ID     = "..."   # from the Arduino Cloud Thing
+  SECRET_KEY    = "..."   # only shown once when you make the device
+  ```
+
+  Then *never* commit that file to GitHub. The cloud code below imports from it, so anything you keep in here stays out of your scripts (and out of screen recordings, screenshots, copy-paste mishaps…). Future-you will thank you.
+- **Five packages, one shot.** You only have to run this script once per fresh Pico. After that, the libraries live in `/lib` on the flash and `import` will find them every time.
+- **Then `arduino-iot-cloud` itself.** With the dependencies in place, install the client either via the same MIP approach (add `"arduino-iot-cloud"` to the list above), or via Thonny's **Tools → Manage Packages** dialog if you prefer a GUI — both end up in the same place.
+
+If you skip this step, the next code block will crash on its very first `import` with something like `ImportError: no module named 'cbor2'`. The fix is always the same — run `install_requirements.py` first.
+
+> The full script lives in the [companion repo](https://www.github.com/kevinmcaleer/working_with_wifi) alongside the rest of this episode's code.
 
 ### The code
 
@@ -262,11 +317,12 @@ import network, time
 from machine import Pin, I2C
 from bme280 import BME280
 from arduino_iot_cloud import ArduinoCloudClient
+from secrets import WIFI_SSID, WIFI_PASSWORD, DEVICE_ID, SECRET_KEY
 
 # WiFi
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.connect('YOUR_SSID', 'YOUR_PASSWORD')
+wlan.connect(WIFI_SSID, WIFI_PASSWORD)
 while not wlan.isconnected():
     time.sleep(1)
 
@@ -275,9 +331,9 @@ bme = BME280(i2c=I2C(0, scl=Pin(1), sda=Pin(0)))
 
 # Cloud
 client = ArduinoCloudClient(
-    device_id=b'YOUR_DEVICE_ID',
-    username=b'YOUR_DEVICE_ID',
-    password=b'YOUR_SECRET_KEY',
+    device_id=DEVICE_ID.encode(),
+    username=DEVICE_ID.encode(),
+    password=SECRET_KEY.encode(),
 )
 
 def on_temp(c):  return bme.temperature
