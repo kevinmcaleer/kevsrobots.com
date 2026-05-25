@@ -345,6 +345,43 @@ async def update_bom_item(
     return _to_response(item, parts_meta, supplier_pricing)
 
 
+@router.post("/{item_id}/upgrade-revision", response_model=BOMItemResponse)
+async def upgrade_bom_item_revision(
+    project_id: int,
+    item_id: int,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> BOMItemResponse:
+    """Versioning Phase 4: re-pin a BOM row to its part's CURRENT revision.
+
+    The "take the update" action behind the row's update-available badge.
+    The server knows the current revision, so the client doesn't need to —
+    it just calls this. No-op-safe: re-pinning an already-current row is
+    harmless. 400 if the row isn't linked to a part."""
+    await _check_owner(session, project_id, user)
+    item = await session.get(ProjectBOMItem, item_id)
+    if item is None or item.project_id != project_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="BOM item not found")
+    if item.part_id is None:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="BOM item is not linked to a part",
+        )
+    part = await session.get(Part, item.part_id)
+    if part is None:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="Linked part no longer exists"
+        )
+    item.part_revision_id = part.current_revision_id
+    await session.commit()
+    await session.refresh(item)
+    parts_meta = await _fetch_parts_meta(session, [item.part_id])
+    supplier_pricing = await _fetch_supplier_pricing(
+        session, [item.supplier_id] if item.supplier_id else []
+    )
+    return _to_response(item, parts_meta, supplier_pricing)
+
+
 @router.delete("/{item_id}", status_code=204)
 async def delete_bom_item(
     project_id: int,

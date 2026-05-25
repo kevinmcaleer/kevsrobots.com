@@ -132,6 +132,36 @@ async def test_unrelated_edit_preserves_pin(client, project_id) -> None:
 
 
 @pytest.mark.asyncio
+async def test_upgrade_revision_repins_to_current(client, project_id) -> None:
+    part = await _make_part(client, "Upgradable Part")
+    rev1 = part["current_revision_id"]
+    item = await _add_bom(client, project_id, part_id=part["id"])
+    updated = await _edit_part(client, part["slug"])      # rev2 is current now
+    rev2 = updated["current_revision_id"]
+
+    # Outdated before upgrade.
+    rows = (await client.get(f"/api/projects/{project_id}/bom")).json()
+    assert next(r for r in rows if r["id"] == item["id"])["part_revision_outdated"] is True
+
+    resp = await client.post(
+        f"/api/projects/{project_id}/bom/{item['id']}/upgrade-revision", headers=H
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["part_revision_id"] == rev2 != rev1
+    assert body["part_revision_outdated"] is False
+
+
+@pytest.mark.asyncio
+async def test_upgrade_revision_requires_a_part(client, project_id) -> None:
+    item = await _add_bom(client, project_id, name="freeform")
+    resp = await client.post(
+        f"/api/projects/{project_id}/bom/{item['id']}/upgrade-revision", headers=H
+    )
+    assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
 async def test_backfill_pins_legacy_rows(client, project_id, sessionmaker_) -> None:
     """A pre-Phase-3 row (part linked, no pin) gets pinned to the part's
     current revision by the startup backfill."""

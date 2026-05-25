@@ -1741,6 +1741,11 @@
       const partPill = linked
         ? `<a class="bom-part-pill" href="/parts/view.html?slug=${encodeURIComponent(item.part_slug)}" title="Linked to parts catalog" target="_blank"><i class="fas fa-link"></i> /parts/${escapeHtmlAttr(item.part_slug)}</a>`
         : (item.part_id ? `<span class="bom-part-pill" title="Linked to parts catalog"><i class="fas fa-link"></i> part #${item.part_id}</span>` : '');
+      // Versioning Phase 4: this row is pinned to an older part revision than
+      // the catalog's latest. Offer a one-click upgrade (re-pins to current).
+      const updateBadge = item.part_revision_outdated
+        ? ` <button type="button" class="btn btn-warning py-0 px-1 ms-1 bom-update-pill" style="font-size:0.7rem;line-height:1.4" onclick="upgradeBomRevision(${item.id})" title="A newer revision of this part is available — click to update this BOM row to the latest."><i class="fas fa-arrow-up me-1"></i>update</button>`
+        : '';
       // Supplier-pricing feature: when the row links to a supplier
       // that has a non-NULL price, ``price_source`` is ``"supplier"``
       // and the row's own unit_cost / currency inputs are disabled —
@@ -1776,7 +1781,7 @@
       <tr data-bom-id="${item.id}" data-part-id="${item.part_id || ''}" data-part-slug="${escapeHtmlAttr(item.part_slug || '')}" data-supplier-id="${escapeHtmlAttr(item.supplier_id || '')}" data-price-source="${escapeHtmlAttr(item.price_source || 'row')}">
         <td class="bom-part-cell" style="position:relative">
           <input class="bom-part-input" value="${escapeHtmlAttr(item.name)}" data-field="name" autocomplete="off" placeholder="Type to search parts catalog..." onchange="updateBOM(${item.id}, this)">
-          ${partPill}
+          ${partPill}${updateBadge}
         </td>
         <td><input type="number" value="${item.quantity}" data-field="quantity" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
         <td><input value="${escapeHtmlAttr(item.unit)}" data-field="unit" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
@@ -1872,6 +1877,19 @@
     await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/' + itemId, {
       method: 'DELETE', credentials: 'include',
     });
+    loadBOM();
+  };
+
+  // Versioning Phase 4: re-pin a BOM row to its part's current revision
+  // (the "update" badge's action). The server resolves the current
+  // revision, so we just POST and reload.
+  window.upgradeBomRevision = async function(itemId) {
+    try {
+      const resp = await apiFetch(
+        API + '/api/projects/' + currentProject.id + '/bom/' + itemId + '/upgrade-revision',
+        { method: 'POST', credentials: 'include' });
+      if (!resp.ok) { console.error('Revision upgrade failed:', resp.status); return; }
+    } catch (e) { console.error('Revision upgrade error:', e); }
     loadBOM();
   };
 
