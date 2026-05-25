@@ -1115,3 +1115,130 @@ async def add_project_content_mode_if_missing() -> None:
                 "ADD COLUMN \"content_mode\" VARCHAR(20) "
                 "NOT NULL DEFAULT 'markdown'"
             ))
+
+
+# --- Versioning Phase 1: library-symbol revisions -------------------------
+#
+# Parts already have a revision chain (part_revisions +
+# parts.current_revision_id). Library symbols did not, so Phase 1 adds the
+# same shape: a brand-new ``library_symbol_revisions`` table (create_all
+# provisions it) plus a ``current_revision_id`` column on the existing
+# ``library_symbols`` table (needs the idempotent ALTER below), then a
+# backfill that snapshots every existing symbol as revision 1.
+
+
+async def add_library_symbol_current_revision_if_missing() -> None:
+    """Add ``library_symbols.current_revision_id`` if absent (Postgres).
+
+    No-op on SQLite (tests get the column via ``create_all``). Safe to
+    run every startup. Mirrors ``add_project_content_mode_if_missing``.
+    The FK to ``library_symbol_revisions`` is intentionally NOT added
+    here — SQLAlchemy's ``use_alter`` FK is created by ``create_all``
+    when the revisions table exists; we only need the bare column on
+    legacy DBs so the ORM's reference resolves.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() "
+            "AND table_name = 'library_symbols'"
+        ))
+        if table_check.first() is None:
+            return
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() "
+            "AND table_name = 'library_symbols' "
+            "AND column_name = 'current_revision_id'"
+        ))
+        if existing.first() is None:
+            logger.warning(
+                "Adding library_symbols.current_revision_id column (versioning Phase 1)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "library_symbols" '
+                'ADD COLUMN "current_revision_id" INTEGER'
+            ))
+
+
+async def backfill_library_symbol_revisions() -> None:
+    """Snapshot every library symbol that lacks a current revision as
+    revision 1, and point ``current_revision_id`` at it. Idempotent —
+    rows that already have a revision are skipped, so re-running after a
+    partial run (or on every boot) is safe.
+    """
+    from .models import LibrarySymbol, LibrarySymbolRevision
+
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        symbols = (
+            await session.execute(
+                select(LibrarySymbol).where(LibrarySymbol.current_revision_id.is_(None))
+            )
+        ).scalars().all()
+        if not symbols:
+            return
+        logger.warning(
+            "Backfilling revision 1 for %d library symbols (versioning Phase 1)",
+            len(symbols),
+        )
+        for sym in symbols:
+            rev = LibrarySymbolRevision(
+                symbol_id=sym.id,
+                author=sym.updated_by_username or sym.created_by_username or "system",
+                change_summary="Initial version (backfill)",
+                name=sym.name,
+                category=sym.category or "Custom",
+                ref_des_prefix=sym.ref_des_prefix or "U",
+                description=sym.description,
+                symbol_data=sym.symbol_data,
+            )
+            session.add(rev)
+            await session.flush()  # assigns rev.id
+            sym.current_revision_id = rev.id
+        await session.commit()
+
+
+async def backfill_part_revisions_if_missing() -> None:
+    """Defensive backfill: snapshot any part WITHOUT a current revision
+    as revision 1. The parts router writes a revision on every create
+    and edit, so this should be a no-op on a healthy DB — it only
+    covers legacy rows that pre-date the revision system.
+    """
+    from .models import Part, PartRevision
+
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        parts = (
+            await session.execute(
+                select(Part).where(Part.current_revision_id.is_(None))
+            )
+        ).scalars().all()
+        if not parts:
+            return
+        logger.warning(
+            "Backfilling revision 1 for %d legacy parts (versioning Phase 1)",
+            len(parts),
+        )
+        for part in parts:
+            rev = PartRevision(
+                part_id=part.id,
+                author=part.created_by or "system",
+                change_summary="Initial version (backfill)",
+                name=part.name,
+                sku=part.sku,
+                mpn=part.mpn,
+                description_md=part.description_md,
+                image_url=part.image_url,
+                tags=part.tags,
+                category=part.category,
+                family=part.family,
+                suppliers_json=None,
+            )
+            session.add(rev)
+            await session.flush()
+            part.current_revision_id = rev.id
+        await session.commit()

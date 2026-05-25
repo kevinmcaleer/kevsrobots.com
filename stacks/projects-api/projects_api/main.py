@@ -18,6 +18,7 @@ from .db import (
     add_bom_part_id_if_missing,
     add_bom_supplier_id_if_missing,
     add_instruction_step_type_if_missing,
+    add_library_symbol_current_revision_if_missing,
     add_part_category_family_if_missing,
     add_part_status_columns_if_missing,
     add_project_content_mode_if_missing,
@@ -32,6 +33,8 @@ from .db import (
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
     add_user_terms_acceptance_if_missing,
+    backfill_library_symbol_revisions,
+    backfill_part_revisions_if_missing,
     create_all,
     get_sessionmaker,
     repair_stale_fks,
@@ -128,6 +131,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Editor content-surface toggle: ensure projects.content_mode column
     # exists on legacy Postgres deployments (defaults to 'markdown').
     await add_project_content_mode_if_missing()
+    # Versioning Phase 1: library-symbol revision chain. Add the
+    # current_revision_id column (legacy Postgres), then snapshot every
+    # existing library symbol + any revision-less legacy part as
+    # revision 1. All idempotent — no-ops once backfilled. Order:
+    # ALTER first so the column exists before the backfill writes it.
+    await add_library_symbol_current_revision_if_missing()
+    await backfill_library_symbol_revisions()
+    await backfill_part_revisions_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

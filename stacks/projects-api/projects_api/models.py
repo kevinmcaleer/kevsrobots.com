@@ -1310,3 +1310,57 @@ class LibrarySymbol(Base):
         onupdate=func.now(),
         nullable=False,
     )
+    # Versioning (Phase 1): points at the latest immutable revision in
+    # ``library_symbol_revisions``. Mirrors the parts catalog's
+    # ``parts.current_revision_id`` pattern. ``use_alter`` because the
+    # revision row is written first, then this column is patched — same
+    # circular-FK handling as parts. Nullable for back-compat; the
+    # backfill in db.py fills it for every existing row on startup.
+    current_revision_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey(
+            "library_symbol_revisions.id",
+            ondelete="SET NULL",
+            use_alter=True,
+            name="fk_library_symbols_current_revision",
+        ),
+        nullable=True,
+    )
+
+
+class LibrarySymbolRevision(Base):
+    """Immutable snapshot of a library symbol's editable fields at a
+    point in time. Mirrors :class:`PartRevision` for the parts catalog.
+
+    A diagram can pin a specific revision id so later edits to the
+    symbol don't alter diagrams that referenced an earlier revision
+    (Phase 3). ``library_symbols.current_revision_id`` points at the
+    most recent revision — i.e. what an unpinned consumer sees.
+
+    Brand-new table — ``create_all`` provisions it; only the
+    ``current_revision_id`` column added to the existing
+    ``library_symbols`` table needs an idempotent ALTER helper.
+    """
+
+    __tablename__ = "library_symbol_revisions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    symbol_id: Mapped[int] = mapped_column(
+        ForeignKey("library_symbols.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    author: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    change_summary: Mapped[str] = mapped_column(String(200), nullable=False)
+    # Snapshot of the editable fields at the time of the revision.
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    category: Mapped[str] = mapped_column(
+        String(32), nullable=False, server_default="Custom", default="Custom"
+    )
+    ref_des_prefix: Mapped[str] = mapped_column(
+        String(8), nullable=False, server_default="U", default="U"
+    )
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    symbol_data: Mapped[Optional[str]] = mapped_column(Text)

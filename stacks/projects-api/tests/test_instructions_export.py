@@ -213,40 +213,45 @@ async def test_export_pdf_jpeg_prefix_returns_422(client, project_id) -> None:
     assert resp.status_code == 422
 
 
-# --- Auth + ownership ------------------------------------------------
+# --- Public access ---------------------------------------------------
+#
+# /export/pdf was made PUBLIC so the viewer's "Download Project" ZIP
+# can bundle the instructions PDF for any visitor (the steps it renders
+# are already public, and the PNGs come from the client). The endpoint
+# is now effectively a stateless PDF builder, so non-owner / anonymous /
+# terms-less requests all succeed. These tests pin that contract so a
+# future accidental re-gating is caught.
 
 
 @pytest.mark.asyncio
-async def test_export_pdf_non_owner_returns_403(client, project_id) -> None:
+async def test_export_pdf_non_owner_succeeds(client, project_id) -> None:
     other = make_auth_header(username="someoneelse")
     resp = await client.post(
         f"/api/projects/{project_id}/instruction/export/pdf",
         json=_one_step_payload(),
         headers=other,
     )
-    assert resp.status_code == 403
+    assert resp.status_code == 200, resp.text
+    assert resp.headers["content-type"] == "application/pdf"
+    assert resp.content.startswith(b"%PDF-")
 
 
 @pytest.mark.asyncio
-async def test_export_pdf_anonymous_returns_401(client, project_id) -> None:
-    """No auth header at all — the auth dep should reject before
-    the route runs."""
+async def test_export_pdf_anonymous_succeeds(client, project_id) -> None:
+    """No auth header at all — the endpoint is public, so it renders."""
     resp = await client.post(
         f"/api/projects/{project_id}/instruction/export/pdf",
         json=_one_step_payload(),
     )
-    assert resp.status_code == 401
-
-
-# --- Terms gate ------------------------------------------------------
-#
-# Mirrors the gate test in ``test_instructions.py`` — opt back into the
-# real ``require_terms_accepted`` dependency and confirm an export
-# attempt without acceptance hits 403.
+    assert resp.status_code == 200, resp.text
+    assert resp.content.startswith(b"%PDF-")
 
 
 @pytest.mark.asyncio
-async def test_export_pdf_without_terms_acceptance_returns_403(client) -> None:
+async def test_export_pdf_no_terms_gate(client) -> None:
+    """The PDF export is NOT terms-gated (public endpoint). Even with a
+    stale terms acceptance the export still renders — the gate was
+    removed along with the owner check."""
     from projects_api import auth as auth_module
 
     app = client._transport.app
@@ -258,7 +263,6 @@ async def test_export_pdf_without_terms_acceptance_returns_403(client) -> None:
 
     headers = make_auth_header("alice")
 
-    # Accept current terms so the project create can succeed.
     acc = await client.post(
         "/api/users/me/accept-terms",
         json={"version": "1.0"},
@@ -273,8 +277,8 @@ async def test_export_pdf_without_terms_acceptance_returns_403(client) -> None:
     assert proj.status_code == 201, proj.text
     pid = proj.json()["id"]
 
-    # Now bump the current terms version so alice's old acceptance
-    # goes stale.
+    # Bump the current terms version so alice's acceptance goes stale —
+    # an export should STILL succeed because /export/pdf isn't gated.
     from projects_api import config as config_module
     from projects_api.routers import users as users_router
 
@@ -293,9 +297,7 @@ async def test_export_pdf_without_terms_acceptance_returns_403(client) -> None:
             json=_one_step_payload(),
             headers=headers,
         )
-        assert resp.status_code == 403
-        detail = resp.json().get("detail")
-        assert isinstance(detail, dict)
-        assert detail.get("detail") == "terms_not_accepted"
+        assert resp.status_code == 200, resp.text
+        assert resp.content.startswith(b"%PDF-")
     finally:
         monkeypatch.undo()
