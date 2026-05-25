@@ -2440,11 +2440,33 @@
     var symbolTypeName = symbolDef ? symbolDef.name : '(unknown)';
     var refDes = inst.refDes || '';
     var label = inst.label || '';
+    // Versioning Phase 4: for a library-symbol instance with a pinned
+    // revision, show it — and when the library symbol has moved on, offer a
+    // one-click upgrade (re-stamp the pin to current; pure client-side since
+    // the pin lives in the graph blob).
+    var revField = '';
+    if (symbolDef && symbolDef.isLibrary && inst.symbolRevisionId != null) {
+      var curRev = symbolDef.symbolRevisionId;
+      var outdated = (curRev != null && inst.symbolRevisionId !== curRev);
+      revField =
+        '<div class="se-props-field">' +
+        '  <span class="se-props-field-label">Symbol revision</span>' +
+        '  <span class="se-props-field-value">rev #' + escapeHtml(String(inst.symbolRevisionId)) +
+        (outdated
+          ? ' <button type="button" id="se-props-upgrade" class="btn btn-warning btn-sm py-0 px-1 ms-1"' +
+            '   style="font-size:0.7rem;line-height:1.4" data-instance-id="' + inst.id + '"' +
+            '   title="A newer revision of this symbol is available — update this instance">' +
+            '<i class="fas fa-arrow-up me-1"></i>update to rev #' + escapeHtml(String(curRev)) + '</button>'
+          : ' <span class="text-success small">latest</span>') +
+        '  </span>' +
+        '</div>';
+    }
     dom.propsBody.innerHTML =
       '<div class="se-props-field">' +
       '  <span class="se-props-field-label">Symbol type</span>' +
       '  <span class="se-props-field-value">' + escapeHtml(symbolTypeName) + '</span>' +
       '</div>' +
+      revField +
       '<div class="se-props-field">' +
       '  <label class="se-props-field-label" for="se-props-refdes">Reference</label>' +
       '  <input class="se-props-input" id="se-props-refdes" type="text"' +
@@ -2459,6 +2481,11 @@
       '         placeholder="e.g. Main controller" maxlength="60"' +
       '         data-instance-id="' + inst.id + '">' +
       '</div>';
+
+    var upgradeBtn = document.getElementById('se-props-upgrade');
+    if (upgradeBtn) {
+      upgradeBtn.addEventListener('click', function () { onPropsUpgradeSymbol(inst.id); });
+    }
 
     var refInput = document.getElementById('se-props-refdes');
     var labelInput = document.getElementById('se-props-label');
@@ -2476,6 +2503,20 @@
         if (e.key === 'Enter') { e.preventDefault(); labelInput.blur(); }
       });
     }
+  }
+
+  // Versioning Phase 4: re-pin an instance to its library symbol's current
+  // revision. Pure client-side — the pin lives in the graph blob, so we
+  // just update the field, autosave, and refresh the panel.
+  function onPropsUpgradeSymbol(instanceId) {
+    var inst = findInstance(instanceId);
+    if (!inst) return;
+    var def = symbolDefById(inst.symbolId);
+    if (!def || def.symbolRevisionId == null) return;
+    if (inst.symbolRevisionId === def.symbolRevisionId) return;
+    inst.symbolRevisionId = def.symbolRevisionId;
+    scheduleAutosave();
+    renderProps();
   }
 
   function onPropsRefDesChange(instanceId, value) {
