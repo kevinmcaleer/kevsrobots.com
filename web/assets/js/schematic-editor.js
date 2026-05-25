@@ -1060,35 +1060,43 @@
     return out;
   }
 
-  // Turn the raw obstacle list into route-ready rects. Endpoint
-  // components (the from / to instances of THIS wire) are inset so
-  // only deep crossings count; everything else (including a same-
-  // component opposite-side route, where from===to) is padded.
-  function routeRectsFor(fromInstId, toInstId) {
+  // For each component, return BOTH:
+  //   - ``detect``: the rect used to decide whether a route is
+  //     blocked. Endpoint components (this wire's from/to instances)
+  //     are INSET so a wire grazing the body edge near its own pin
+  //     doesn't false-trigger; only a deep crossing counts. Third-
+  //     party components (and same-component routes, from===to) use
+  //     the padded body.
+  //   - ``full``: the padded body rect used to build the detour's
+  //     keep-out box, so when we DO route around a component the
+  //     wire clears the WHOLE body — not the shrunk core. (Using the
+  //     shrunk rect here was making detours cut across the top.)
+  // ``detect`` may be null when an endpoint body is too small to
+  // have a core worth avoiding.
+  function routeShapesFor(fromInstId, toInstId) {
     var sameComp = (fromInstId != null && fromInstId === toInstId);
-    var rects = [];
+    var shapes = [];
     routeObstacles().forEach(function (o) {
+      var full = {
+        left:   o.left   - ROUTE_BODY_PAD,
+        top:    o.top    - ROUTE_BODY_PAD,
+        right:  o.right  + ROUTE_BODY_PAD,
+        bottom: o.bottom + ROUTE_BODY_PAD,
+      };
+      var detect = full;
       var isEndpoint = (o.instId === fromInstId || o.instId === toInstId);
       if (isEndpoint && !sameComp) {
-        var r = {
+        var d = {
           left:   o.left   + ROUTE_ENDPOINT_INSET,
           top:    o.top    + ROUTE_ENDPOINT_INSET,
           right:  o.right  - ROUTE_ENDPOINT_INSET,
           bottom: o.bottom - ROUTE_ENDPOINT_INSET,
         };
-        // Drop if the inset collapsed the rect (small body → no core
-        // worth avoiding).
-        if (r.right > r.left && r.bottom > r.top) rects.push(r);
-      } else {
-        rects.push({
-          left:   o.left   - ROUTE_BODY_PAD,
-          top:    o.top    - ROUTE_BODY_PAD,
-          right:  o.right  + ROUTE_BODY_PAD,
-          bottom: o.bottom + ROUTE_BODY_PAD,
-        });
+        detect = (d.right > d.left && d.bottom > d.top) ? d : null;
       }
+      shapes.push({ detect: detect, full: full });
     });
-    return rects;
+    return shapes;
   }
 
   // Build a detour that routes AROUND a keep-out box (the union of
@@ -1187,29 +1195,37 @@
   //      the source detours downward because that path is shorter.
   function routeNet(x1, y1, x2, y2, fromSide, toSide, fromInstId, toInstId) {
     var direct = lShapedSegments(x1, y1, x2, y2, fromSide, toSide);
-    var obstacles = routeRectsFor(fromInstId, toInstId);
-    if (obstacles.length === 0) return direct;
+    var shapes = routeShapesFor(fromInstId, toInstId);
+    if (shapes.length === 0) return direct;
 
-    function hitsOf(segs) {
-      var h = [];
+    // Returns the FULL rects of the components whose DETECT rect any
+    // segment crosses. Detection uses the (possibly shrunk) detect
+    // rect so a wire grazing its own endpoint near a pin doesn't
+    // count; the returned FULL rects feed the detour keep-out box so
+    // the go-around clears the entire body.
+    function blockersOf(segs) {
+      var out = [];
       segs.forEach(function (seg) {
-        obstacles.forEach(function (r) {
-          if (segHitsRect(seg, r) && h.indexOf(r) === -1) h.push(r);
+        shapes.forEach(function (sh) {
+          if (sh.detect && segHitsRect(seg, sh.detect) &&
+              out.indexOf(sh.full) === -1) {
+            out.push(sh.full);
+          }
         });
       });
-      return h;
+      return out;
     }
 
     // Clear line of sight → shortest path, no detour.
-    if (hitsOf(direct).length === 0) return direct;
+    if (blockersOf(direct).length === 0) return direct;
 
     // Grow a detour on a given side until it clears (or stops
     // finding new blockers). Returns { segs, clear }.
     function buildDetour(side) {
-      var blockers = hitsOf(direct).slice();
+      var blockers = blockersOf(direct).slice();
       var segs = routeAround(x1, y1, x2, y2, fromSide, toSide, blockers, side);
       for (var iter = 0; iter < 5; iter++) {
-        var dh = hitsOf(segs);
+        var dh = blockersOf(segs);
         if (dh.length === 0) return { segs: segs, clear: true };
         var grew = false;
         dh.forEach(function (r) {
@@ -1218,7 +1234,7 @@
         if (!grew) break;
         segs = routeAround(x1, y1, x2, y2, fromSide, toSide, blockers, side);
       }
-      return { segs: segs, clear: hitsOf(segs).length === 0 };
+      return { segs: segs, clear: blockersOf(segs).length === 0 };
     }
 
     var over  = buildDetour('top');
