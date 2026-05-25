@@ -980,6 +980,143 @@
     ];
   }
 
+  // Spread overlapping "middle legs" so the perpendicular connector
+  // runs of different nets don't stack on top of each other. The
+  // L/Z-bend router places every connector leg at the midpoint, so
+  // a column of nets routing from one symbol to another all bend at
+  // the same x (or y) — their vertical (or horizontal) legs overlap
+  // into a single line and you can't tell them apart.
+  //
+  // This post-pass:
+  //   1. Finds "middle legs" — axis-aligned segments whose BOTH
+  //      endpoints are shared with another segment of the same net
+  //      (i.e. interior corners, not the pin-terminal segments).
+  //   2. Groups them by exact axis position (x for verticals, y for
+  //      horizontals) where their perpendicular ranges overlap.
+  //   3. Spreads each group's legs by BEND_GAP px, centred on the
+  //      original position, and drags the connecting neighbour
+  //      segments' shared endpoints along so corners stay joined.
+  //
+  // Idempotent: once spread, the legs sit at distinct positions so
+  // the exact-position grouping finds singletons and does nothing.
+  // A reroute (symbol move) collapses them back to the midpoint,
+  // and the next pass re-spreads.
+  var BEND_GAP = 12;
+  function staggerNetBends() {
+    if (!STATE.graph || !Array.isArray(STATE.graph.nets)) return;
+
+    function endpointMatches(seg, x, y) {
+      return (seg.x1 === x && seg.y1 === y) ||
+             (seg.x2 === x && seg.y2 === y);
+    }
+
+    // (1) collect interior middle legs across all nets.
+    var legs = []; // { net, seg, vertical }
+    STATE.graph.nets.forEach(function (net) {
+      if (!Array.isArray(net.segments) || net.segments.length < 3) return;
+      net.segments.forEach(function (seg, idx) {
+        var vertical = (seg.x1 === seg.x2 && seg.y1 !== seg.y2);
+        var horizontal = (seg.y1 === seg.y2 && seg.x1 !== seg.x2);
+        if (!vertical && !horizontal) return;
+        var e1Shared = false, e2Shared = false;
+        net.segments.forEach(function (other, j) {
+          if (j === idx) return;
+          if (endpointMatches(other, seg.x1, seg.y1)) e1Shared = true;
+          if (endpointMatches(other, seg.x2, seg.y2)) e2Shared = true;
+        });
+        if (e1Shared && e2Shared) legs.push({ net: net, seg: seg, vertical: vertical });
+      });
+    });
+    if (legs.length < 2) return;
+
+    // (2) group by orientation + exact axis position.
+    var groups = {}; // key 'v:300' | 'h:200' → [leg, ...]
+    legs.forEach(function (leg) {
+      var pos = leg.vertical ? leg.seg.x1 : leg.seg.y1;
+      var key = (leg.vertical ? 'v:' : 'h:') + pos;
+      (groups[key] = groups[key] || []).push(leg);
+    });
+
+    Object.keys(groups).forEach(function (key) {
+      var members = groups[key];
+      if (members.length < 2) return;
+      var vertical = (key[0] === 'v');
+
+      // Sub-cluster members whose perpendicular ranges overlap —
+      // only those actually stack and need spreading.
+      function rangeOf(leg) {
+        return vertical
+          ? [Math.min(leg.seg.y1, leg.seg.y2), Math.max(leg.seg.y1, leg.seg.y2)]
+          : [Math.min(leg.seg.x1, leg.seg.x2), Math.max(leg.seg.x1, leg.seg.x2)];
+      }
+      var clusters = [];
+      members.forEach(function (leg) {
+        var r = rangeOf(leg);
+        var joined = null;
+        clusters.forEach(function (cl) {
+          if (cl.range[0] <= r[1] && cl.range[1] >= r[0]) joined = cl;
+        });
+        if (joined) {
+          joined.members.push(leg);
+          joined.range[0] = Math.min(joined.range[0], r[0]);
+          joined.range[1] = Math.max(joined.range[1], r[1]);
+        } else {
+          clusters.push({ members: [leg], range: [r[0], r[1]] });
+        }
+      });
+
+      clusters.forEach(function (cl) {
+        if (cl.members.length < 2) return;
+        // Deterministic order so the same schematic spreads the
+        // same way every reload.
+        cl.members.sort(function (a, b) {
+          var an = String(a.net.id || ''); var bn = String(b.net.id || '');
+          return an < bn ? -1 : an > bn ? 1 : 0;
+        });
+        var n = cl.members.length;
+        cl.members.forEach(function (leg, i) {
+          // Spread centred on the original position: for n legs the
+          // offsets run from -(n-1)/2 to +(n-1)/2 times BEND_GAP.
+          var delta = (i - (n - 1) / 2) * BEND_GAP;
+          if (delta === 0) return;
+          var seg = leg.seg;
+          if (leg.vertical) {
+            var oldX = seg.x1;
+            var newX = oldX + delta;
+            // Drag every endpoint of this net sitting on the leg's
+            // two corner points to the new x so the connecting
+            // horizontal legs follow.
+            moveNetCornerX(leg.net, oldX, seg.y1, newX);
+            moveNetCornerX(leg.net, oldX, seg.y2, newX);
+          } else {
+            var oldY = seg.y1;
+            var newY = oldY + delta;
+            moveNetCornerY(leg.net, seg.x1, oldY, newY);
+            moveNetCornerY(leg.net, seg.x2, oldY, newY);
+          }
+        });
+      });
+    });
+  }
+
+  // Move every segment endpoint in ``net`` that sits exactly at the
+  // corner (cornerX, cornerY) to a new x — used by staggerNetBends to
+  // drag the connecting horizontal legs along when a vertical leg is
+  // shifted. Endpoints are matched exactly (corners are integer-ish
+  // grid points so no tolerance needed).
+  function moveNetCornerX(net, cornerX, cornerY, newX) {
+    net.segments.forEach(function (s) {
+      if (s.x1 === cornerX && s.y1 === cornerY) s.x1 = newX;
+      if (s.x2 === cornerX && s.y2 === cornerY) s.x2 = newX;
+    });
+  }
+  function moveNetCornerY(net, cornerX, cornerY, newY) {
+    net.segments.forEach(function (s) {
+      if (s.x1 === cornerX && s.y1 === cornerY) s.y1 = newY;
+      if (s.x2 === cornerX && s.y2 === cornerY) s.y2 = newY;
+    });
+  }
+
   function mergeNets(target, source) {
     // Append source's endpoints (deduped) and segments into target,
     // then drop source from STATE.graph.nets.
@@ -1713,6 +1850,13 @@
     STATE.canvas.discardActiveObject();
     STATE.canvas.clear();
     applyGridBackground();
+
+    // Spread overlapping connector legs before drawing so a column
+    // of nets bending at the same midpoint don't stack their
+    // vertical (or horizontal) legs into one line. Idempotent — runs
+    // cheaply every render; once spread, the legs sit at distinct
+    // positions and the pass finds nothing more to do.
+    staggerNetBends();
 
     // Symbols first, then nets on top — so wires don't disappear
     // behind a body when their route gets close to a symbol. Wires
