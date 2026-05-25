@@ -1053,19 +1053,17 @@
     return out;
   }
 
-  // Build the "up and over the top" detour. Both pins escape outward
-  // along their stick, then the wire routes around a KEEP-OUT box —
-  // the union of the blocked bodies inflated by ROUTE_DETOUR_MARGIN
-  // on all sides — so the up-leg, the top run and the down-leg each
-  // stand clear of the part rather than hugging it.
-  function routeOverTop(x1, y1, x2, y2, fromSide, toSide, blockers) {
+  // Build a detour that routes AROUND a keep-out box (the union of
+  // the blocked bodies inflated by ROUTE_DETOUR_MARGIN). ``side`` is
+  // 'top' to go over the top or 'bottom' to go under the bottom —
+  // the caller tries both and keeps the shorter clear one, so a
+  // target below the source detours DOWNWARD rather than always up.
+  function routeAround(x1, y1, x2, y2, fromSide, toSide, blockers, side) {
     var SIDE_DX = { left: -1, right: 1, top: 0, bottom: 0 };
     var SIDE_DY = { left: 0,  right: 0, top: -1, bottom: 1 };
     var fdx = SIDE_DX[fromSide] || 0, fdy = SIDE_DY[fromSide] || 0;
     var tdx = SIDE_DX[toSide]   || 0, tdy = SIDE_DY[toSide]   || 0;
 
-    // Keep-out box = union of blockers (already ROUTE_BODY_PAD-
-    // inflated) grown by the detour margin on every side.
     var ko = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
     blockers.forEach(function (r) {
       ko.left   = Math.min(ko.left,   r.left);
@@ -1078,41 +1076,44 @@
     ko.right  += ROUTE_DETOUR_MARGIN;
     ko.bottom += ROUTE_DETOUR_MARGIN;
 
-    // Escape points: one stub outward from each pin.
     var ax = x1 + fdx * ROUTE_STUB, ay = y1 + fdy * ROUTE_STUB;
     var bx = x2 + tdx * ROUTE_STUB, by = y2 + tdy * ROUTE_STUB;
 
-    // Vertical up/down legs must sit OUTSIDE the keep-out box. Push
-    // each to the keep-out edge on its pin's side (left if the pin
-    // escapes left, right if it escapes right; for top/bottom pins,
-    // whichever side the escape point already favours). max()/min()
-    // keep a leg that already clears the box where it is.
     function clearX(px, dirx) {
       if (dirx < 0) return Math.min(px, ko.left);
       if (dirx > 0) return Math.max(px, ko.right);
-      // Vertical pin (top/bottom): pick the nearer keep-out side.
       var mid = (ko.left + ko.right) / 2;
       return (px <= mid) ? Math.min(px, ko.left) : Math.max(px, ko.right);
     }
-    var upX   = clearX(ax, fdx);
-    var downX = clearX(bx, tdx);
+    var legX1 = clearX(ax, fdx);
+    var legX2 = clearX(bx, tdx);
 
-    // Top run sits above the keep-out box (and above both escape
-    // points so the up/down legs always travel upward into it).
-    var runY = Math.min(ko.top, ay, by);
+    // Run sits above (top) or below (bottom) the keep-out box, and
+    // beyond both escape points so the side legs always travel
+    // toward the run.
+    var runY = (side === 'bottom')
+      ? Math.max(ko.bottom, ay, by)
+      : Math.min(ko.top, ay, by);
 
-    // Assemble. The two "shift to the lane" jogs (ax→upX at ay,
-    // downX→bx at by) collapse to nothing when the escape point
-    // already lined up with the leg. mergeColinear cleans those up.
     return mergeColinear([
       { x1: x1,    y1: y1,   x2: ax,    y2: ay },    // out of source pin
-      { x1: ax,    y1: ay,   x2: upX,   y2: ay },    // jog to up-lane
-      { x1: upX,   y1: ay,   x2: upX,   y2: runY },  // up the side
-      { x1: upX,   y1: runY, x2: downX, y2: runY },  // across the top
-      { x1: downX, y1: runY, x2: downX, y2: by },    // down the far side
-      { x1: downX, y1: by,   x2: bx,    y2: by },    // jog to dest escape
+      { x1: ax,    y1: ay,   x2: legX1, y2: ay },    // jog to first lane
+      { x1: legX1, y1: ay,   x2: legX1, y2: runY },  // along the side
+      { x1: legX1, y1: runY, x2: legX2, y2: runY },  // across the run
+      { x1: legX2, y1: runY, x2: legX2, y2: by },    // along the far side
+      { x1: legX2, y1: by,   x2: bx,    y2: by },    // jog to dest escape
       { x1: bx,    y1: by,   x2: x2,    y2: y2 },    // into dest pin
     ]);
+  }
+
+  // Total length of a segment list — used to pick the shortest of
+  // several candidate routes.
+  function pathLength(segs) {
+    var total = 0;
+    segs.forEach(function (s) {
+      total += Math.abs(s.x2 - s.x1) + Math.abs(s.y2 - s.y1);
+    });
+    return total;
   }
 
   // Drop zero-length segments and fuse consecutive colinear ones so
@@ -1138,8 +1139,14 @@
     return out;
   }
 
-  // Public router: try the direct L/Z route; if it slices through
-  // any component body, detour up and over the top instead.
+  // Public router. Strategy:
+  //   1. The direct L/Z route — if it's collision-free, use it
+  //      (shortest sensible path; no needless detour).
+  //   2. Otherwise build BOTH an over-the-top and an under-the-
+  //      bottom detour (each iteratively grown until it clears the
+  //      blockers), and return the SHORTER collision-free one. This
+  //      is what stops the router always going up: a target beneath
+  //      the source detours downward because that path is shorter.
   function routeNet(x1, y1, x2, y2, fromSide, toSide) {
     var direct = lShapedSegments(x1, y1, x2, y2, fromSide, toSide);
     var obstacles = routeObstacles();
@@ -1155,31 +1162,37 @@
       return h;
     }
 
-    var directHits = hitsOf(direct);
-    if (directHits.length === 0) return direct;
+    // Clear line of sight → shortest path, no detour.
+    if (hitsOf(direct).length === 0) return direct;
 
-    // Iteratively grow the blocker set: route over the top of the
-    // blockers we know about, see what the detour NEWLY hits, fold
-    // those in, and re-route higher. Each iteration's top-run only
-    // rises (the blocker union grows), so this converges — and we
-    // never fall back to the cutting direct route. If after a few
-    // passes the detour still grazes something (e.g. an obstacle
-    // sitting directly under one of the drop legs), we return the
-    // best detour we have, which is still far better than slicing
-    // straight through the body.
-    var blockers = directHits.slice();
-    var detour = routeOverTop(x1, y1, x2, y2, fromSide, toSide, blockers);
-    for (var iter = 0; iter < 5; iter++) {
-      var dh = hitsOf(detour);
-      if (dh.length === 0) return detour;
-      var grew = false;
-      dh.forEach(function (r) {
-        if (blockers.indexOf(r) === -1) { blockers.push(r); grew = true; }
-      });
-      if (!grew) break; // no new blockers — raising further won't help
-      detour = routeOverTop(x1, y1, x2, y2, fromSide, toSide, blockers);
+    // Grow a detour on a given side until it clears (or stops
+    // finding new blockers). Returns { segs, clear }.
+    function buildDetour(side) {
+      var blockers = hitsOf(direct).slice();
+      var segs = routeAround(x1, y1, x2, y2, fromSide, toSide, blockers, side);
+      for (var iter = 0; iter < 5; iter++) {
+        var dh = hitsOf(segs);
+        if (dh.length === 0) return { segs: segs, clear: true };
+        var grew = false;
+        dh.forEach(function (r) {
+          if (blockers.indexOf(r) === -1) { blockers.push(r); grew = true; }
+        });
+        if (!grew) break;
+        segs = routeAround(x1, y1, x2, y2, fromSide, toSide, blockers, side);
+      }
+      return { segs: segs, clear: hitsOf(segs).length === 0 };
     }
-    return detour;
+
+    var over  = buildDetour('top');
+    var under = buildDetour('bottom');
+
+    // Prefer a clear detour; among clear ones, the shorter. If
+    // neither fully clears (densely packed), still take the shorter
+    // — it goes around the bodies, far better than through them.
+    var clear = [over, under].filter(function (d) { return d.clear; });
+    var pool = clear.length ? clear : [over, under];
+    pool.sort(function (a, b) { return pathLength(a.segs) - pathLength(b.segs); });
+    return pool[0].segs;
   }
 
   // Spread overlapping "middle legs" so the perpendicular connector
