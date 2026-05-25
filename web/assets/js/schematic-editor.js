@@ -1185,68 +1185,223 @@
     return out;
   }
 
-  // Public router. Strategy:
-  //   1. The direct L/Z route — if it's collision-free, use it
-  //      (shortest sensible path; no needless detour).
-  //   2. Otherwise build BOTH an over-the-top and an under-the-
-  //      bottom detour (each iteratively grown until it clears the
-  //      blockers), and return the SHORTER collision-free one. This
-  //      is what stops the router always going up: a target beneath
-  //      the source detours downward because that path is shorter.
-  function routeNet(x1, y1, x2, y2, fromSide, toSide, fromInstId, toInstId) {
-    var direct = lShapedSegments(x1, y1, x2, y2, fromSide, toSide);
-    var shapes = routeShapesFor(fromInstId, toInstId);
-    if (shapes.length === 0) return direct;
-
-    // Returns the FULL rects of the components whose DETECT rect any
-    // segment crosses. Detection uses the (possibly shrunk) detect
-    // rect so a wire grazing its own endpoint near a pin doesn't
-    // count; the returned FULL rects feed the detour keep-out box so
-    // the go-around clears the entire body.
-    function blockersOf(segs) {
-      var out = [];
-      segs.forEach(function (seg) {
-        shapes.forEach(function (sh) {
-          if (sh.detect && segHitsRect(seg, sh.detect) &&
-              out.indexOf(sh.full) === -1) {
-            out.push(sh.full);
-          }
-        });
-      });
-      return out;
+  // Tiny binary min-heap keyed by node.f — A*'s open set. Plenty
+  // fast for schematic-scale grids.
+  function MinHeap() { this.a = []; }
+  MinHeap.prototype.isEmpty = function () { return this.a.length === 0; };
+  MinHeap.prototype.push = function (n) {
+    var a = this.a; a.push(n);
+    var i = a.length - 1;
+    while (i > 0) {
+      var p = (i - 1) >> 1;
+      if (a[p].f <= a[i].f) break;
+      var t = a[p]; a[p] = a[i]; a[i] = t; i = p;
     }
-
-    // Clear line of sight → shortest path, no detour.
-    if (blockersOf(direct).length === 0) return direct;
-
-    // Grow a detour on a given side until it clears (or stops
-    // finding new blockers). Returns { segs, clear }.
-    function buildDetour(side) {
-      var blockers = blockersOf(direct).slice();
-      var segs = routeAround(x1, y1, x2, y2, fromSide, toSide, blockers, side);
-      for (var iter = 0; iter < 5; iter++) {
-        var dh = blockersOf(segs);
-        if (dh.length === 0) return { segs: segs, clear: true };
-        var grew = false;
-        dh.forEach(function (r) {
-          if (blockers.indexOf(r) === -1) { blockers.push(r); grew = true; }
-        });
-        if (!grew) break;
-        segs = routeAround(x1, y1, x2, y2, fromSide, toSide, blockers, side);
+  };
+  MinHeap.prototype.pop = function () {
+    var a = this.a, top = a[0], last = a.pop();
+    if (a.length) {
+      a[0] = last;
+      var i = 0, n = a.length;
+      while (true) {
+        var l = 2 * i + 1, r = 2 * i + 2, m = i;
+        if (l < n && a[l].f < a[m].f) m = l;
+        if (r < n && a[r].f < a[m].f) m = r;
+        if (m === i) break;
+        var t = a[m]; a[m] = a[i]; a[i] = t; i = m;
       }
-      return { segs: segs, clear: blockersOf(segs).length === 0 };
+    }
+    return top;
+  };
+
+  // ----- A* grid router -------------------------------------------
+  // Routes an orthogonal wire on a coarse grid, avoiding component
+  // bodies. Replaces the hand-rolled L/Z + detour heuristics: every
+  // case (adjacent pins, far side, third component in the way) is
+  // just "find the cheapest grid path", so there's no special-casing
+  // to get wrong.
+  //
+  // Cost model:
+  //   - each grid step costs 1
+  //   - changing axis (a corner) costs ASTAR_TURN_COST extra, so the
+  //     router prefers straight runs and few bends
+  //   - stepping on a cell already occupied by another net costs
+  //     ASTAR_NET_COST extra, so routes avoid overlapping each other
+  //     when there's a free alternative
+  var ASTAR_CELL = GRID;          // 16px routing grid
+  var ASTAR_TURN_COST = 3;        // bend penalty (grid units)
+  var ASTAR_NET_COST = 4;         // soft penalty for overlapping another net
+  var ASTAR_MARGIN = 10;          // body inflation for blocked cells
+  var ASTAR_PAD_CELLS = 6;        // search-region padding (cells)
+  var ASTAR_MAX_EXPAND = 40000;   // safety cap on nodes expanded
+
+  function routeNet(x1, y1, x2, y2, fromSide, toSide, fromInstId, toInstId) {
+    var path = aStarRoute(x1, y1, x2, y2, fromSide, toSide);
+    if (path && path.length) return path;
+    // A* couldn't find a path (fully boxed in, degenerate grid) —
+    // fall back to the plain L/Z route so a wire still appears.
+    return lShapedSegments(x1, y1, x2, y2, fromSide, toSide);
+  }
+
+  function aStarRoute(x1, y1, x2, y2, fromSide, toSide) {
+    var SIDE_DX = { left: -1, right: 1, top: 0, bottom: 0 };
+    var SIDE_DY = { left: 0,  right: 0, top: -1, bottom: 1 };
+    var fdx = SIDE_DX[fromSide] || 0, fdy = SIDE_DY[fromSide] || 0;
+    var tdx = SIDE_DX[toSide]   || 0, tdy = SIDE_DY[toSide]   || 0;
+
+    function gi(v) { return Math.round(v / ASTAR_CELL); } // scene→cell index
+    function gs(c) { return c * ASTAR_CELL; }             // cell index→scene
+
+    // Blocked rects = all component bodies inflated by ASTAR_MARGIN.
+    var blocked = [];
+    STATE.graph.instances.forEach(function (inst) {
+      var b = instanceBodyBounds(inst);
+      if (!b) return;
+      blocked.push({
+        left: b.left - ASTAR_MARGIN, top: b.top - ASTAR_MARGIN,
+        right: b.right + ASTAR_MARGIN, bottom: b.bottom + ASTAR_MARGIN,
+      });
+    });
+    function cellBlocked(gx, gy) {
+      var sx = gs(gx), sy = gs(gy);
+      for (var i = 0; i < blocked.length; i++) {
+        var r = blocked[i];
+        if (sx > r.left && sx < r.right && sy > r.top && sy < r.bottom) return true;
+      }
+      return false;
     }
 
-    var over  = buildDetour('top');
-    var under = buildDetour('bottom');
+    // Soft net-occupancy: cells lying on an existing net segment cost
+    // extra so new routes avoid running on top of them.
+    var netCells = {};
+    STATE.graph.nets.forEach(function (net) {
+      (net.segments || []).forEach(function (s) {
+        var ax = gi(s.x1), ay = gi(s.y1), bx = gi(s.x2), by = gi(s.y2);
+        if (ax === bx) {
+          var lo = Math.min(ay, by), hi = Math.max(ay, by);
+          for (var gy = lo; gy <= hi; gy++) netCells[ax + ',' + gy] = 1;
+        } else if (ay === by) {
+          var lo2 = Math.min(ax, bx), hi2 = Math.max(ax, bx);
+          for (var gx = lo2; gx <= hi2; gx++) netCells[gx + ',' + ay] = 1;
+        }
+      });
+    });
 
-    // Prefer a clear detour; among clear ones, the shorter. If
-    // neither fully clears (densely packed), still take the shorter
-    // — it goes around the bodies, far better than through them.
-    var clear = [over, under].filter(function (d) { return d.clear; });
-    var pool = clear.length ? clear : [over, under];
-    pool.sort(function (a, b) { return pathLength(a.segs) - pathLength(b.segs); });
-    return pool[0].segs;
+    // Escape cells: step outward from each pin until on a free cell.
+    function escapeCell(px, py, dx, dy) {
+      var gx = gi(px), gy = gi(py);
+      for (var k = 0; k < 8; k++) {
+        if (!cellBlocked(gx, gy)) return { gx: gx, gy: gy };
+        gx += dx; gy += dy;
+      }
+      return { gx: gx, gy: gy };
+    }
+    var start = escapeCell(x1, y1, fdx, fdy);
+    var goal  = escapeCell(x2, y2, tdx, tdy);
+
+    // Bounded search window so A* stays fast on big canvases.
+    var minGX = Math.min(start.gx, goal.gx), maxGX = Math.max(start.gx, goal.gx);
+    var minGY = Math.min(start.gy, goal.gy), maxGY = Math.max(start.gy, goal.gy);
+    blocked.forEach(function (r) {
+      minGX = Math.min(minGX, gi(r.left));  maxGX = Math.max(maxGX, gi(r.right));
+      minGY = Math.min(minGY, gi(r.top));   maxGY = Math.max(maxGY, gi(r.bottom));
+    });
+    minGX -= ASTAR_PAD_CELLS; minGY -= ASTAR_PAD_CELLS;
+    maxGX += ASTAR_PAD_CELLS; maxGY += ASTAR_PAD_CELLS;
+    function inBounds(gx, gy) {
+      return gx >= minGX && gx <= maxGX && gy >= minGY && gy <= maxGY;
+    }
+
+    // A*. Node identity includes the arrival axis (0=H, 1=V, -1=start)
+    // so the turn penalty is accounted for correctly.
+    var DIRS = [ { dx: 1, dy: 0, axis: 0 }, { dx: -1, dy: 0, axis: 0 },
+                { dx: 0, dy: 1, axis: 1 }, { dx: 0, dy: -1, axis: 1 } ];
+    function key(gx, gy, axis) { return gx + ',' + gy + ',' + axis; }
+    function h(gx, gy) { return Math.abs(gx - goal.gx) + Math.abs(gy - goal.gy); }
+
+    var heap = new MinHeap();
+    var gScore = {};
+    var came = {};
+    var startK = key(start.gx, start.gy, -1);
+    gScore[startK] = 0;
+    heap.push({ gx: start.gx, gy: start.gy, axis: -1, f: h(start.gx, start.gy) });
+
+    var expanded = 0;
+    var goalNode = null;
+    while (!heap.isEmpty()) {
+      var cur = heap.pop();
+      var curK = key(cur.gx, cur.gy, cur.axis);
+      if (cur.gx === goal.gx && cur.gy === goal.gy) { goalNode = cur; break; }
+      if (++expanded > ASTAR_MAX_EXPAND) break;
+      var curG = gScore[curK];
+      if (curG === undefined) continue;
+      for (var d = 0; d < DIRS.length; d++) {
+        var nx = cur.gx + DIRS[d].dx, ny = cur.gy + DIRS[d].dy;
+        if (!inBounds(nx, ny) || cellBlocked(nx, ny)) continue;
+        var step = 1;
+        if (cur.axis !== -1 && cur.axis !== DIRS[d].axis) step += ASTAR_TURN_COST;
+        if (netCells[nx + ',' + ny]) step += ASTAR_NET_COST;
+        var nK = key(nx, ny, DIRS[d].axis);
+        var tentative = curG + step;
+        if (gScore[nK] === undefined || tentative < gScore[nK]) {
+          gScore[nK] = tentative;
+          came[nK] = { gx: cur.gx, gy: cur.gy, axis: cur.axis };
+          heap.push({ gx: nx, gy: ny, axis: DIRS[d].axis,
+                      f: tentative + h(nx, ny) });
+        }
+      }
+    }
+    if (!goalNode) return null;
+
+    // Reconstruct the cell path (goal → start), then flip.
+    var cells = [];
+    var node = goalNode;
+    while (node) {
+      cells.push({ x: gs(node.gx), y: gs(node.gy) });
+      var pk = key(node.gx, node.gy, node.axis);
+      node = came[pk] || null;
+    }
+    cells.reverse();
+
+    // Attach the exact pin terminators at both ends (the grid path
+    // starts/ends at the snapped escape cells; the terminators may be
+    // a few px off-grid). Insert an orthogonal corner if a terminal
+    // hop would otherwise be diagonal, turning first along the pin's
+    // own axis.
+    var pts = cells.slice();
+    pts.unshift({ x: x1, y: y1 });
+    pts.push({ x: x2, y: y2 });
+    pts = orthogonalise(pts, fdx, fdy, tdx, tdy);
+
+    // Points → segments, fusing colinear runs.
+    var segs = [];
+    for (var i = 0; i < pts.length - 1; i++) {
+      var a = pts[i], b = pts[i + 1];
+      if (a.x === b.x && a.y === b.y) continue;
+      segs.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y });
+    }
+    return mergeColinear(segs);
+  }
+
+  // Ensure consecutive points are axis-aligned by inserting a corner
+  // where a hop is diagonal. The first hop turns along the source
+  // pin's axis, the last along the dest pin's axis, so the wire
+  // leaves / enters in the pin's direction; interior diagonals (rare)
+  // just corner horizontally-first.
+  function orthogonalise(pts, fdx, fdy, tdx, tdy) {
+    var out = [pts[0]];
+    for (var i = 1; i < pts.length; i++) {
+      var a = out[out.length - 1], b = pts[i];
+      if (a.x !== b.x && a.y !== b.y) {
+        var horizFirst;
+        if (i === 1) horizFirst = (fdx !== 0);          // leave along source axis
+        else if (i === pts.length - 1) horizFirst = (tdx === 0); // enter along dest axis
+        else horizFirst = true;
+        out.push(horizFirst ? { x: b.x, y: a.y } : { x: a.x, y: b.y });
+      }
+      out.push(b);
+    }
+    return out;
   }
 
   // Spread overlapping "middle legs" so the perpendicular connector
@@ -3043,11 +3198,12 @@
       var fromSide = (fromPin && fromDef) ? effectivePinSide(fromDef, fromPin, fromInst) : (fromPin && fromPin.side);
       var toDef    = hit && hit.instance && symbolDefById(hit.instance.symbolId);
       var toSide   = (hit && hit.pin && toDef) ? effectivePinSide(toDef, hit.pin, hit.instance) : (hit && hit.pin && hit.pin.side);
-      // Use the obstacle-aware router for the preview too, so the
-      // dashed wire the user sees while dragging matches the route
-      // that'll be committed (over-the-top detour appears live).
-      var segs = routeNet(from.x, from.y, endX, endY, fromSide, toSide,
-        fromInst && fromInst.id, (hit && hit.instance && hit.instance.id) || null);
+      // Preview uses the cheap straight L/Z router (runs on every
+      // mousemove). The committed route — computed by connectPins on
+      // release — runs the full A* obstacle-avoiding router, so the
+      // wire may snap to a cleaner path when the user lets go. A* per
+      // mousemove would risk lag on dense schematics.
+      var segs = lShapedSegments(from.x, from.y, endX, endY, fromSide, toSide);
       if (STATE.netPreviewObj) {
         STATE.canvas.remove(STATE.netPreviewObj);
         STATE.netPreviewObj = null;
