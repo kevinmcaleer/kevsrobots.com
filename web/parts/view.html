@@ -27,6 +27,7 @@ description: View a part in the catalog
   <div id="part-view" class="d-none">
     <div class="row">
       <div class="col-lg-8">
+        <!-- Header — always visible above the tabs -->
         <div class="d-flex align-items-center gap-3 mb-1 flex-wrap">
           <h1 id="part-name" class="mb-0"></h1>
           <span id="part-status-badge"></span>
@@ -40,52 +41,138 @@ description: View a part in the catalog
           Community members have flagged the metadata as wrong or duplicating another entry. Help resolve it on the <a href="#" id="part-disputed-talk-link">discussion page</a>.
         </div>
 
-        <div id="part-image-wrap" class="mb-4 d-none">
-          <img id="part-image" class="img-fluid rounded" alt="">
-        </div>
+        <!-- Part hub tabs. Overview is the home; enhancement (edit /
+             photo / symbol) is front-and-centre on it. Talk is tucked
+             behind its own tab — a secondary, sought-out activity. -->
+        <ul class="nav nav-tabs mb-3" id="part-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-overview-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-overview" type="button" role="tab">
+              <i class="fas fa-circle-info me-1"></i> Overview
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-symbol-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-symbol" type="button" role="tab">
+              <i class="fas fa-microchip me-1"></i> Symbol
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-photos-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-photos" type="button" role="tab">
+              <i class="fas fa-image me-1"></i> Photos
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-versions-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-versions" type="button" role="tab">
+              <i class="fas fa-history me-1"></i> Versions
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-talk-btn" data-bs-toggle="tab"
+                    data-bs-target="#tab-talk" type="button" role="tab">
+              <i class="fas fa-comments me-1"></i> Talk
+            </button>
+          </li>
+        </ul>
 
-        <div id="part-tags" class="d-flex flex-wrap gap-2 mb-3"></div>
+        <div class="tab-content">
+          <!-- ===== Overview ===== -->
+          <div class="tab-pane fade show active" id="tab-overview" role="tabpanel"
+               aria-labelledby="tab-overview-btn">
+            <!-- "Improve this part" — prominent contribution CTAs. -->
+            <div class="d-flex flex-wrap gap-2 mb-3" id="part-improve-cta">
+              <a id="part-improve-edit" href="#" class="btn btn-sm btn-primary d-none">
+                <i class="fas fa-pencil-alt me-1"></i> Edit details
+              </a>
+              <a id="part-improve-photo" href="#" class="btn btn-sm btn-outline-primary d-none">
+                <i class="fas fa-image me-1"></i> Add a photo
+              </a>
+              <button type="button" id="part-improve-symbol"
+                      class="btn btn-sm btn-outline-primary d-none"
+                      title="Link a schematic symbol to this part (coming soon)" disabled>
+                <i class="fas fa-microchip me-1"></i> Edit symbol
+              </button>
+            </div>
 
-        <div id="part-taxonomy" class="d-flex flex-wrap gap-2 mb-3"></div>
+            <div id="part-image-wrap" class="mb-4 d-none">
+              <img id="part-image" class="img-fluid rounded" alt="">
+            </div>
 
-        <hr>
+            <div id="part-tags" class="d-flex flex-wrap gap-2 mb-3"></div>
+            <div id="part-taxonomy" class="d-flex flex-wrap gap-2 mb-3"></div>
 
-        <div id="part-description" class="mb-4" style="line-height:1.7"></div>
+            <hr>
 
-        <div id="part-family-section" class="mb-4 d-none">
-          <h4><i class="fas fa-sitemap me-3 text-primary"></i> Same family</h4>
-          <p class="text-muted small mb-2">Other parts in the <strong><span id="part-family-name"></span></strong> family.</p>
-          <div id="part-family-list" class="row g-2"></div>
-        </div>
+            <div id="part-description" class="mb-4" style="line-height:1.7"></div>
 
-        <div id="part-related-section" class="mb-4 d-none">
-          <h4><i class="fas fa-link me-3 text-primary"></i> Related parts</h4>
-          <p class="text-muted small mb-2">Parts commonly used alongside this one.</p>
-          <div id="part-related-list" class="row g-2"></div>
-        </div>
+            <div id="part-family-section" class="mb-4 d-none">
+              <h4><i class="fas fa-sitemap me-3 text-primary"></i> Same family</h4>
+              <p class="text-muted small mb-2">Other parts in the <strong><span id="part-family-name"></span></strong> family.</p>
+              <div id="part-family-list" class="row g-2"></div>
+            </div>
 
-        <div id="part-suppliers-section" class="mb-4 d-none">
-          <h4><i class="fas fa-truck me-3"></i> Suppliers</h4>
-          <ul id="part-suppliers" class="list-group"></ul>
-        </div>
+            <div id="part-related-section" class="mb-4 d-none">
+              <h4><i class="fas fa-link me-3 text-primary"></i> Related parts</h4>
+              <p class="text-muted small mb-2">Parts commonly used alongside this one.</p>
+              <div id="part-related-list" class="row g-2"></div>
+            </div>
 
-        <!-- Issue #122 Phase 2: discussion link -->
-        <div id="part-talk-section" class="mb-4">
-          <div class="card">
-            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <div>
-                <h5 class="mb-1"><i class="fas fa-comments me-3 text-primary"></i> Discussion</h5>
-                <div class="small text-muted" id="part-talk-summary">Talk about this part, propose changes, or ask questions.</div>
-              </div>
-              <a id="part-talk-link" class="btn btn-outline-primary" href="#"><i class="fas fa-comments me-1"></i> Open discussion</a>
+            <div id="part-suppliers-section" class="mb-4 d-none">
+              <h4><i class="fas fa-truck me-3"></i> Suppliers</h4>
+              <ul id="part-suppliers" class="list-group"></ul>
             </div>
           </div>
-        </div>
 
-        <div id="part-revisions-section" class="mb-4 d-none">
-          <h5 class="text-muted small text-uppercase"><i class="fas fa-history me-1"></i> Recent revisions</h5>
-          <ul id="part-revisions" class="list-unstyled small"></ul>
-          <a id="part-history-link" href="#" class="small">View full history &rarr;</a>
+          <!-- ===== Symbol (stub until part↔symbol link exists) ===== -->
+          <div class="tab-pane fade" id="tab-symbol" role="tabpanel"
+               aria-labelledby="tab-symbol-btn">
+            <div class="text-center text-muted py-5">
+              <i class="fas fa-microchip fa-2x mb-2"></i>
+              <p class="mb-1">This part's schematic symbol will live here.</p>
+              <p class="small mb-0">Soon you'll be able to link or design a symbol so this
+                part can be dropped straight into a schematic.</p>
+            </div>
+          </div>
+
+          <!-- ===== Photos ===== -->
+          <div class="tab-pane fade" id="tab-photos" role="tabpanel"
+               aria-labelledby="tab-photos-btn">
+            <div id="part-photos-gallery" class="row g-2 mb-3"></div>
+            <div id="part-photos-empty" class="text-muted small fst-italic mb-3 d-none">
+              No photos yet — be the first to add one.
+            </div>
+            <a id="part-photos-add" href="#" class="btn btn-sm btn-outline-primary d-none">
+              <i class="fas fa-image me-1"></i> Add a photo
+            </a>
+            <p class="small text-muted mt-2 mb-0">Photos help others recognise the part in
+              diagrams and builds.</p>
+          </div>
+
+          <!-- ===== Versions ===== -->
+          <div class="tab-pane fade" id="tab-versions" role="tabpanel"
+               aria-labelledby="tab-versions-btn">
+            <div id="part-revisions-section">
+              <ul id="part-revisions" class="list-unstyled small"></ul>
+              <a id="part-history-link" href="#" class="small">View full history &rarr;</a>
+            </div>
+            <div id="part-revisions-empty" class="text-muted small fst-italic">
+              No revision history yet.
+            </div>
+          </div>
+
+          <!-- ===== Talk (secondary — behind a tab) ===== -->
+          <div class="tab-pane fade" id="tab-talk" role="tabpanel"
+               aria-labelledby="tab-talk-btn">
+            <div id="part-talk-section">
+              <p class="text-muted" id="part-talk-summary">Talk about this part, propose
+                changes, or ask questions.</p>
+              <a id="part-talk-link" class="btn btn-outline-primary" href="#">
+                <i class="fas fa-comments me-1"></i> Open discussion
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -309,6 +396,16 @@ description: View a part in the catalog
       img.src = part.image_url;
       img.alt = part.name || '';
       img.loading = 'lazy';
+      // Mirror the cover image into the Photos tab. A proper multi-photo
+      // gallery is a backend job; for now the single image_url is the gallery.
+      document.getElementById('part-photos-gallery').innerHTML = `
+        <div class="col-6 col-md-4">
+          <a href="${esc(part.image_url)}" target="_blank" rel="noopener">
+            <img src="${esc(part.image_url)}" class="img-fluid rounded" loading="lazy" alt="${esc(part.name || '')}">
+          </a>
+        </div>`;
+    } else {
+      document.getElementById('part-photos-empty').classList.remove('d-none');
     }
 
     const tagsEl = document.getElementById('part-tags');
@@ -419,8 +516,7 @@ description: View a part in the catalog
     }
 
     if (Array.isArray(part.revisions) && part.revisions.length > 0) {
-      const sec = document.getElementById('part-revisions-section');
-      sec.classList.remove('d-none');
+      document.getElementById('part-revisions-empty').classList.add('d-none');
       document.getElementById('part-revisions').innerHTML = part.revisions.slice(0, 5).map(r => `
         <li class="mb-1">
           <strong>${esc(r.author || 'someone')}</strong>
@@ -429,6 +525,8 @@ description: View a part in the catalog
         </li>
       `).join('');
       document.getElementById('part-history-link').href = '/parts/history.html?slug=' + encodeURIComponent(slug);
+    } else {
+      document.getElementById('part-revisions-section').classList.add('d-none');
     }
 
     // Show edit / history buttons if the user is logged in. The API enforces
@@ -438,8 +536,22 @@ description: View a part in the catalog
       const me = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
       if (me.ok) {
         document.getElementById('part-edit-container').classList.remove('d-none');
-        document.getElementById('part-edit-link').href = '/parts/edit.html?slug=' + encodeURIComponent(slug);
+        const editUrl = '/parts/edit.html?slug=' + encodeURIComponent(slug);
+        document.getElementById('part-edit-link').href = editUrl;
         document.getElementById('part-history-btn').href = '/parts/history.html?slug=' + encodeURIComponent(slug);
+        // Prominent "improve this part" CTAs on the Overview tab. Edit +
+        // Add-photo both route to the edit form (which owns image_url);
+        // Edit-symbol stays disabled until the part↔symbol link lands.
+        const improveEdit = document.getElementById('part-improve-edit');
+        improveEdit.href = editUrl;
+        improveEdit.classList.remove('d-none');
+        const improvePhoto = document.getElementById('part-improve-photo');
+        improvePhoto.href = editUrl;
+        improvePhoto.classList.remove('d-none');
+        document.getElementById('part-improve-symbol').classList.remove('d-none');
+        const photosAdd = document.getElementById('part-photos-add');
+        photosAdd.href = editUrl;
+        photosAdd.classList.remove('d-none');
         // Issue #123: show report + propose-merge actions to logged-in users.
         // The API enforces the 14-day gate on merge proposals; reports work
         // for any logged-in user.
