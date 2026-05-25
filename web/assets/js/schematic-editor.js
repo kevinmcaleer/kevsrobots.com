@@ -991,6 +991,12 @@
   var ROUTE_BODY_PAD = 6;     // obstacle inflation (px) — interior test
   var ROUTE_CLEARANCE = 16;   // gap above the obstacle for the top run
   var ROUTE_STUB = 16;        // escape stub out of each pin
+  // Breathing room the detour keeps around the component it's
+  // routing past. Applied on ALL four sides of the obstacle's
+  // keep-out box so the up-leg, top run and down-leg each clear the
+  // body by this much rather than hugging it. Bumping this gives the
+  // whole detour a wider, cleaner bow around the part.
+  var ROUTE_DETOUR_MARGIN = 24;
 
   // Body bbox of an instance in scene coords (accounts for rotation
   // swapping width/height). Origin is the instance centre.
@@ -1048,34 +1054,64 @@
   }
 
   // Build the "up and over the top" detour. Both pins escape outward
-  // along their stick, the wire rises above the union of obstacles
-  // it must clear, runs across, then drops to the destination escape
-  // point and stubs into the pin.
+  // along their stick, then the wire routes around a KEEP-OUT box —
+  // the union of the blocked bodies inflated by ROUTE_DETOUR_MARGIN
+  // on all sides — so the up-leg, the top run and the down-leg each
+  // stand clear of the part rather than hugging it.
   function routeOverTop(x1, y1, x2, y2, fromSide, toSide, blockers) {
     var SIDE_DX = { left: -1, right: 1, top: 0, bottom: 0 };
     var SIDE_DY = { left: 0,  right: 0, top: -1, bottom: 1 };
     var fdx = SIDE_DX[fromSide] || 0, fdy = SIDE_DY[fromSide] || 0;
     var tdx = SIDE_DX[toSide]   || 0, tdy = SIDE_DY[toSide]   || 0;
 
-    // Escape points: one stub outward from each pin so we start /
-    // end clear of the bodies.
+    // Keep-out box = union of blockers (already ROUTE_BODY_PAD-
+    // inflated) grown by the detour margin on every side.
+    var ko = { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity };
+    blockers.forEach(function (r) {
+      ko.left   = Math.min(ko.left,   r.left);
+      ko.top    = Math.min(ko.top,    r.top);
+      ko.right  = Math.max(ko.right,  r.right);
+      ko.bottom = Math.max(ko.bottom, r.bottom);
+    });
+    ko.left   -= ROUTE_DETOUR_MARGIN;
+    ko.top    -= ROUTE_DETOUR_MARGIN;
+    ko.right  += ROUTE_DETOUR_MARGIN;
+    ko.bottom += ROUTE_DETOUR_MARGIN;
+
+    // Escape points: one stub outward from each pin.
     var ax = x1 + fdx * ROUTE_STUB, ay = y1 + fdy * ROUTE_STUB;
     var bx = x2 + tdx * ROUTE_STUB, by = y2 + tdy * ROUTE_STUB;
 
-    // Top run y: above every blocker AND above both escape points,
-    // minus the clearance gap.
-    var topMost = Math.min(ay, by);
-    blockers.forEach(function (r) { topMost = Math.min(topMost, r.top); });
-    var runY = topMost - ROUTE_CLEARANCE;
+    // Vertical up/down legs must sit OUTSIDE the keep-out box. Push
+    // each to the keep-out edge on its pin's side (left if the pin
+    // escapes left, right if it escapes right; for top/bottom pins,
+    // whichever side the escape point already favours). max()/min()
+    // keep a leg that already clears the box where it is.
+    function clearX(px, dirx) {
+      if (dirx < 0) return Math.min(px, ko.left);
+      if (dirx > 0) return Math.max(px, ko.right);
+      // Vertical pin (top/bottom): pick the nearer keep-out side.
+      var mid = (ko.left + ko.right) / 2;
+      return (px <= mid) ? Math.min(px, ko.left) : Math.max(px, ko.right);
+    }
+    var upX   = clearX(ax, fdx);
+    var downX = clearX(bx, tdx);
 
-    // Assemble: stub-out, up, across, down, stub-in. Collinear /
-    // zero-length pieces collapse in mergeColinear below.
+    // Top run sits above the keep-out box (and above both escape
+    // points so the up/down legs always travel upward into it).
+    var runY = Math.min(ko.top, ay, by);
+
+    // Assemble. The two "shift to the lane" jogs (ax→upX at ay,
+    // downX→bx at by) collapse to nothing when the escape point
+    // already lined up with the leg. mergeColinear cleans those up.
     return mergeColinear([
-      { x1: x1, y1: y1, x2: ax,   y2: ay },     // out of source pin
-      { x1: ax, y1: ay, x2: ax,   y2: runY },   // up to the top lane
-      { x1: ax, y1: runY, x2: bx, y2: runY },   // across the top
-      { x1: bx, y1: runY, x2: bx, y2: by },     // down to dest escape
-      { x1: bx, y1: by, x2: x2,   y2: y2 },     // into dest pin
+      { x1: x1,    y1: y1,   x2: ax,    y2: ay },    // out of source pin
+      { x1: ax,    y1: ay,   x2: upX,   y2: ay },    // jog to up-lane
+      { x1: upX,   y1: ay,   x2: upX,   y2: runY },  // up the side
+      { x1: upX,   y1: runY, x2: downX, y2: runY },  // across the top
+      { x1: downX, y1: runY, x2: downX, y2: by },    // down the far side
+      { x1: downX, y1: by,   x2: bx,    y2: by },    // jog to dest escape
+      { x1: bx,    y1: by,   x2: x2,    y2: y2 },    // into dest pin
     ]);
   }
 
