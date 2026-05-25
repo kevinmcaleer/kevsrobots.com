@@ -16,6 +16,7 @@ from .config import get_settings
 from .db import (
     add_bom_currency_if_missing,
     add_bom_part_id_if_missing,
+    add_bom_part_revision_id_if_missing,
     add_bom_supplier_id_if_missing,
     add_instruction_step_type_if_missing,
     add_library_symbol_current_revision_if_missing,
@@ -36,6 +37,7 @@ from .db import (
     add_user_disabled_columns_if_missing,
     add_user_profile_columns_if_missing,
     add_user_terms_acceptance_if_missing,
+    backfill_bom_part_revisions,
     backfill_library_symbol_revisions,
     backfill_part_revisions_if_missing,
     create_all,
@@ -153,6 +155,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Re-case legacy slug categories to the curated human labels so the
     # now self-organising category vocabulary doesn't fragment. Idempotent.
     await recanonicalize_part_categories()
+    # Versioning Phase 3: pin BOM rows to a part revision. Add the column
+    # (legacy Postgres), then backfill existing rows to their part's current
+    # revision — must run AFTER backfill_part_revisions_if_missing so every
+    # part has a current revision to pin to. Both idempotent.
+    await add_bom_part_revision_id_if_missing()
+    await backfill_bom_part_revisions()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

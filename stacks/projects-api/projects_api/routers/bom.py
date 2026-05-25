@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, require_terms_accepted
 from ..db import get_session
-from ..models import Part, PartSupplier, Project, ProjectBOMItem
+from ..models import Part, PartRevision, PartSupplier, Project, ProjectBOMItem
 from ..schemas import BOMItemCreate, BOMItemResponse
 
 router = APIRouter(prefix="/api/projects/{project_id}/bom", tags=["bom"])
@@ -35,11 +35,13 @@ async def _check_owner(session: AsyncSession, project_id: int, user: str) -> Pro
 
 async def _fetch_parts_meta(
     session: AsyncSession, part_ids: list[int]
-) -> dict[int, tuple[Optional[str], Optional[str]]]:
-    """Batch-load (slug, primary_supplier_url) for the given part ids.
+) -> dict[int, tuple[Optional[str], Optional[str], Optional[int]]]:
+    """Batch-load (slug, primary_supplier_url, current_revision_id) per part.
 
     The primary supplier is the supplier with the smallest id for the
-    part. Returns a dict keyed by part_id so the caller can decorate
+    part. ``current_revision_id`` lets ``_to_response`` flag a row whose
+    pinned revision is behind the part's latest (versioning Phase 3).
+    Returns a dict keyed by part_id so the caller can decorate
     BOMItemResponse rows in O(1) per row.
     """
     if not part_ids:
@@ -68,7 +70,7 @@ async def _fetch_parts_meta(
         ).all()
         supplier_url_by_part = {pid: url for pid, url in rows}
     return {
-        p.id: (p.slug, supplier_url_by_part.get(p.id))
+        p.id: (p.slug, supplier_url_by_part.get(p.id), p.current_revision_id)
         for p in parts
     }
 
@@ -127,8 +129,18 @@ def _to_response(
     """
     slug = None
     primary_supplier = None
+    current_revision_id = None
     if item.part_id is not None:
-        slug, primary_supplier = parts_meta.get(item.part_id, (None, None))
+        slug, primary_supplier, current_revision_id = parts_meta.get(
+            item.part_id, (None, None, None)
+        )
+    # "Newer version available": the row is pinned to an older revision than
+    # the part's latest. Only meaningful when both ids are known.
+    outdated = (
+        item.part_revision_id is not None
+        and current_revision_id is not None
+        and item.part_revision_id != current_revision_id
+    )
 
     effective_unit_cost: Optional[float] = item.unit_cost
     effective_currency_code: Optional[str] = item.currency_code
@@ -154,6 +166,8 @@ def _to_response(
         part_id=item.part_id,
         part_slug=slug,
         part_primary_supplier_url=primary_supplier,
+        part_revision_id=item.part_revision_id,
+        part_revision_outdated=outdated,
         supplier_id=item.supplier_id,
         effective_unit_cost=effective_unit_cost,
         effective_currency_code=effective_currency_code,
@@ -220,6 +234,18 @@ async def _validate_supplier_id(
     return supplier_id if existing is not None else None
 
 
+async def _resolve_part_revision(
+    session: AsyncSession, part: Part, requested: Optional[int]
+) -> Optional[int]:
+    """Pin to a valid requested revision (must belong to ``part``), else the
+    part's current revision. Used on create and on a part-change in update."""
+    if requested is not None:
+        rev = await session.get(PartRevision, requested)
+        if rev is not None and rev.part_id == part.id:
+            return requested
+    return part.current_revision_id
+
+
 @router.post("", response_model=BOMItemResponse, status_code=201)
 async def add_bom_item(
     project_id: int,
@@ -229,15 +255,23 @@ async def add_bom_item(
 ) -> BOMItemResponse:
     await _check_owner(session, project_id, user)
     payload = body.model_dump()
+    requested_rev = payload.pop("part_revision_id", None)
     part_id: Optional[int] = payload.get("part_id")
+    part_obj: Optional[Part] = None
     if part_id is not None:
         # Validate the part exists; if not, drop the link rather than 400.
         # (BOM creation shouldn't blow up because the catalog row was
         # deleted out from under us.)
-        existing = await session.get(Part, part_id)
-        if existing is None:
+        part_obj = await session.get(Part, part_id)
+        if part_obj is None:
             payload["part_id"] = None
             part_id = None
+    # Versioning Phase 3: pin to the requested revision (if valid) or the
+    # part's current revision; null when no part is linked.
+    payload["part_revision_id"] = (
+        await _resolve_part_revision(session, part_obj, requested_rev)
+        if part_obj is not None else None
+    )
     payload["supplier_id"] = await _validate_supplier_id(
         session, payload.get("supplier_id")
     )
@@ -268,11 +302,14 @@ async def update_bom_item(
     if item is None or item.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="BOM item not found")
     old_part_id = item.part_id
+    old_rev = item.part_revision_id
     payload = body.model_dump()
+    requested_rev = payload.pop("part_revision_id", None)
     new_part_id: Optional[int] = payload.get("part_id")
+    part_obj: Optional[Part] = None
     if new_part_id is not None:
-        existing = await session.get(Part, new_part_id)
-        if existing is None:
+        part_obj = await session.get(Part, new_part_id)
+        if part_obj is None:
             payload["part_id"] = None
             new_part_id = None
     payload["supplier_id"] = await _validate_supplier_id(
@@ -280,6 +317,19 @@ async def update_bom_item(
     )
     for field, value in payload.items():
         setattr(item, field, value)
+    # Versioning Phase 3: resolve the revision pin. An explicit request, or a
+    # part change, (re)pins; an unrelated edit (same part, no request) keeps
+    # the existing pin so saving the row doesn't silently bump it to latest.
+    if part_obj is None:
+        item.part_revision_id = None
+    elif requested_rev is not None:
+        item.part_revision_id = await _resolve_part_revision(
+            session, part_obj, requested_rev
+        )
+    elif new_part_id == old_part_id and old_rev is not None:
+        item.part_revision_id = old_rev
+    else:
+        item.part_revision_id = part_obj.current_revision_id
     await session.flush()
     if old_part_id != new_part_id:
         if old_part_id is not None:

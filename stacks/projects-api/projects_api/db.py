@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import AsyncIterator
+from typing import AsyncIterator, Optional
 
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import (
@@ -542,6 +542,88 @@ async def add_bom_part_id_if_missing() -> None:
                 'CREATE INDEX IF NOT EXISTS "ix_project_bom_items_part_id" '
                 'ON "project_bom_items" ("part_id")'
             ))
+
+
+async def add_bom_part_revision_id_if_missing() -> None:
+    """Versioning Phase 3: add ``part_revision_id`` (FK -> part_revisions.id
+    ON DELETE SET NULL) to ``project_bom_items`` on legacy Postgres
+    deployments. Column first, then the FK only if part_revisions exists
+    (same defensive pattern as ``add_bom_part_id_if_missing``). Idempotent;
+    no-op on SQLite (create_all builds it).
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'project_bom_items'"
+        ))
+        if table_check.first() is None:
+            return
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'project_bom_items' "
+            "AND column_name = 'part_revision_id'"
+        ))
+        if existing.first() is not None:
+            return
+        logger.warning(
+            "Adding project_bom_items.part_revision_id column (versioning Phase 3)"
+        )
+        await conn.execute(text(
+            'ALTER TABLE "project_bom_items" ADD COLUMN "part_revision_id" INTEGER'
+        ))
+        rev_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'part_revisions'"
+        ))
+        if rev_check.first() is not None:
+            await conn.execute(text(
+                'ALTER TABLE "project_bom_items" ADD CONSTRAINT '
+                '"fk_project_bom_items_part_revision_id" FOREIGN KEY ("part_revision_id") '
+                'REFERENCES "part_revisions" (id) ON DELETE SET NULL'
+            ))
+
+
+async def backfill_bom_part_revisions() -> None:
+    """Versioning Phase 3: pin existing BOM rows that link a part but have
+    no ``part_revision_id`` to that part's current revision — freezing them
+    at what they currently show so later part edits don't change historical
+    BOMs. Idempotent (only NULL-pinned rows with a part are touched) and
+    dialect-agnostic; no-op on a fresh/empty DB.
+    """
+    from .models import Part, ProjectBOMItem
+
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        items = (
+            await session.execute(
+                select(ProjectBOMItem).where(
+                    ProjectBOMItem.part_id.is_not(None),
+                    ProjectBOMItem.part_revision_id.is_(None),
+                )
+            )
+        ).scalars().all()
+        if not items:
+            return
+        # Cache part → current_revision_id so a big BOM doesn't issue N gets.
+        rev_by_part: dict[int, Optional[int]] = {}
+        changed = 0
+        for item in items:
+            if item.part_id not in rev_by_part:
+                part = await session.get(Part, item.part_id)
+                rev_by_part[item.part_id] = part.current_revision_id if part else None
+            rev = rev_by_part[item.part_id]
+            if rev is not None:
+                item.part_revision_id = rev
+                changed += 1
+        if changed:
+            logger.warning(
+                "Pinned %d legacy BOM rows to their part's current revision "
+                "(versioning Phase 3)", changed
+            )
+            await session.commit()
 
 
 async def add_part_symbol_id_if_missing() -> None:

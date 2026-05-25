@@ -182,6 +182,19 @@ class ProjectBOMItem(Base):
     part_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("parts.id", ondelete="SET NULL"), nullable=True, index=True
     )
+    # Versioning Phase 3: the specific part revision this BOM row is PINNED
+    # to. Set to the part's current revision when the part is linked, so a
+    # later edit to the part doesn't silently change what this project's BOM
+    # shows — ``pinned != parts.current_revision_id`` is the "newer version
+    # available" signal (surfaced as part_revision_outdated). Independent of
+    # the schematic symbol pin (parts + symbols version separately). SET NULL
+    # on revision delete so the row survives history pruning; NULL also means
+    # "unpinned / follows latest" for legacy rows the backfill missed.
+    part_revision_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("part_revisions.id", ondelete="SET NULL", use_alter=True,
+                   name="fk_project_bom_items_part_revision_id"),
+        nullable=True,
+    )
     # Supplier-pricing feature: optional link to a specific PartSupplier
     # row. When set AND the supplier has a non-NULL ``unit_cost``, the BOM
     # ``_to_response`` enrichment treats the supplier as the live price

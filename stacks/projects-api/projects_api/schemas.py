@@ -192,6 +192,12 @@ class BOMItemCreate(BaseModel):
     supplier_url: Optional[str] = None
     sort_order: int = 0
     part_id: Optional[int] = None
+    # Versioning Phase 3: pin this row to a specific part revision. Usually
+    # omitted — the server pins to the part's current revision when the part
+    # is linked. An explicit value (must belong to the linked part) lets a
+    # caller pin/upgrade to a chosen revision (Phase 4); an invalid one
+    # falls back to current rather than 400ing. Ignored when part_id is null.
+    part_revision_id: Optional[int] = None
     # Supplier-pricing feature: optional link to a specific PartSupplier
     # row. When set AND the supplier has a non-NULL ``unit_cost``, the
     # supplier's price is the source of truth for the BOM row's display
@@ -218,6 +224,11 @@ class BOMItemResponse(BaseModel):
     # supplier if the row's own ``supplier_url`` is empty.
     part_slug: Optional[str] = None
     part_primary_supplier_url: Optional[str] = None
+    # Versioning Phase 3: the part revision this row is pinned to, plus a
+    # derived flag — true when the linked part has a newer revision than the
+    # pin (the "update available" signal Phase 4's badge/picker will use).
+    part_revision_id: Optional[int] = None
+    part_revision_outdated: bool = False
     # Supplier-pricing feature: the supplier the row is linked to, if
     # any, plus the *resolved* price the frontend should render. When
     # ``supplier_id`` points at a supplier with a non-NULL ``unit_cost``,
