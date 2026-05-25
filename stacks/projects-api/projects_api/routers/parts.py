@@ -273,6 +273,39 @@ async def _validate_symbol_id(session: AsyncSession, symbol_id: int) -> None:
         )
 
 
+def _photo_cover_url(photo: PartPhoto, slug: str) -> str:
+    """Render-ready URL for a photo used as a part cover: external URL as-is,
+    uploaded → the /view path (frontend prefixes the API base)."""
+    if photo.external_url:
+        return photo.external_url
+    return f"/api/parts/{slug}/photos/{photo.id}/view"
+
+
+async def first_photo_cover_urls(
+    session: AsyncSession, parts_by_id: dict[int, str]
+) -> dict[int, str]:
+    """Batched first-photo cover URL per part id (keyed by id; value is the
+    render-ready URL). ``parts_by_id`` maps part_id -> slug. One query for the
+    whole set — used by the catalog search + BOM list to avoid N+1."""
+    if not parts_by_id:
+        return {}
+    rows = (
+        await session.scalars(
+            select(PartPhoto)
+            .where(PartPhoto.part_id.in_(parts_by_id.keys()))
+            .order_by(PartPhoto.part_id.asc(), PartPhoto.sort_order.asc(), PartPhoto.id.asc())
+        )
+    ).all()
+    out: dict[int, str] = {}
+    for p in rows:
+        if p.part_id in out:
+            continue  # first (lowest sort_order) wins
+        slug = parts_by_id.get(p.part_id)
+        if slug:
+            out[p.part_id] = _photo_cover_url(p, slug)
+    return out
+
+
 async def _load_photos(session: AsyncSession, part: Part) -> list[PartPhotoResponse]:
     """Part gallery photos, ordered. ``url`` is render-ready — the /view
     route for uploads, the external URL for links (matched in parts_photos)."""
@@ -403,6 +436,7 @@ async def search_parts(
     stmt = stmt.order_by(Part.usage_count.desc(), Part.name.asc()).limit(limit)
     parts = (await session.scalars(stmt)).all()
 
+    covers = await first_photo_cover_urls(session, {p.id: p.slug for p in parts})
     results: list[PartSearchResult] = []
     for p in parts:
         results.append(
@@ -417,6 +451,7 @@ async def search_parts(
                 category=p.category,
                 family=p.family,
                 image_url=p.image_url,
+                cover_url=covers.get(p.id) or p.image_url,
             )
         )
     return results

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import AsyncIterator, Optional
 
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -1447,6 +1447,67 @@ async def backfill_part_revisions_if_missing() -> None:
             await session.flush()
             part.current_revision_id = rev.id
         await session.commit()
+
+
+async def backfill_part_image_url_to_photos() -> None:
+    """Migrate the legacy ``parts.image_url`` cover into ``part_photos`` as
+    the first photo, so uploaded photos become the single image source.
+
+    Postgres-only and reads ``image_url`` via raw SQL (not the ORM) so it
+    keeps working after the column is unmapped from the Part model — the
+    column stays physically present but dormant. Idempotent: a part that
+    already has a photo with that external_url is skipped. The migrated
+    cover is inserted *first* (sort_order = min(existing) - 1, or 0).
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    from .models import PartPhoto
+
+    async with engine.begin() as conn:
+        col = await conn.execute(text(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'parts' "
+            "AND column_name = 'image_url'"
+        ))
+        if col.first() is None:
+            return  # legacy column already gone — nothing to migrate
+        rows = (await conn.execute(text(
+            "SELECT id, slug, image_url FROM parts "
+            "WHERE image_url IS NOT NULL AND image_url <> ''"
+        ))).fetchall()
+    if not rows:
+        return
+
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        migrated = 0
+        for pid, _slug, image_url in rows:
+            already = await session.scalar(
+                select(PartPhoto.id).where(
+                    PartPhoto.part_id == pid,
+                    PartPhoto.external_url == image_url,
+                )
+            )
+            if already is not None:
+                continue
+            min_sort = await session.scalar(
+                select(func.min(PartPhoto.sort_order)).where(PartPhoto.part_id == pid)
+            )
+            sort_order = (min_sort - 1) if min_sort is not None else 0
+            session.add(PartPhoto(
+                part_id=pid,
+                external_url=image_url,
+                title=None,
+                sort_order=sort_order,
+                created_by="system",
+            ))
+            migrated += 1
+        if migrated:
+            logger.warning(
+                "Migrated %d legacy part image_url(s) into part_photos", migrated
+            )
+            await session.commit()
 
 
 async def recanonicalize_part_categories() -> None:

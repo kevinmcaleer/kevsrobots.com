@@ -140,3 +140,27 @@ async def test_non_uploader_cannot_delete(client) -> None:
 async def test_photos_for_unknown_part_404(client) -> None:
     resp = await client.get("/api/parts/does-not-exist/photos")
     assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_search_cover_url_from_first_photo(client) -> None:
+    """Catalog search surfaces the first photo as cover_url (external as-is)."""
+    slug = await _make_part(client, "Cover Search Part")
+    await client.post(
+        f"/api/parts/{slug}/photos/link",
+        json={"external_url": "https://example.com/cover.jpg"},
+        headers=make_auth_header(),
+    )
+    results = (await client.get("/api/parts", params={"q": "Cover Search Part"})).json()
+    row = next(r for r in results if r["slug"] == slug)
+    assert row["cover_url"] == "https://example.com/cover.jpg"
+
+
+@pytest.mark.asyncio
+async def test_search_cover_url_uploaded_is_view_path(client) -> None:
+    """An uploaded first photo resolves to its /view path (frontend prefixes API)."""
+    slug = await _make_part(client, "Uploaded Cover Part")
+    pid = (await _upload(client, slug)).json()["id"]
+    results = (await client.get("/api/parts", params={"q": "Uploaded Cover Part"})).json()
+    row = next(r for r in results if r["slug"] == slug)
+    assert row["cover_url"] == f"/api/parts/{slug}/photos/{pid}/view"

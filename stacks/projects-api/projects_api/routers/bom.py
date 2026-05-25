@@ -20,6 +20,7 @@ from ..auth import get_current_user, require_terms_accepted
 from ..db import get_session
 from ..models import Part, PartRevision, PartSupplier, Project, ProjectBOMItem
 from ..schemas import BOMItemCreate, BOMItemResponse
+from .parts import first_photo_cover_urls
 
 router = APIRouter(prefix="/api/projects/{project_id}/bom", tags=["bom"])
 
@@ -106,10 +107,19 @@ async def _fetch_supplier_pricing(
     return {sid: (cost, code) for sid, cost, code in rows}
 
 
+async def _covers_for(session: AsyncSession, parts_meta) -> dict[int, str]:
+    """First-photo cover URL per part id, derived from parts_meta (which
+    carries the slug). Batched — one query for the whole BOM."""
+    return await first_photo_cover_urls(
+        session, {pid: m[0] for pid, m in parts_meta.items() if m[0]}
+    )
+
+
 def _to_response(
     item: ProjectBOMItem,
-    parts_meta: dict[int, tuple[Optional[str], Optional[str]]],
+    parts_meta: dict[int, tuple[Optional[str], Optional[str], Optional[int]]],
     supplier_pricing: dict[int, tuple[Optional[float], Optional[str]]],
+    covers: Optional[dict[int, str]] = None,
 ) -> BOMItemResponse:
     """Build a BOMItemResponse, decorating with part slug / supplier.
 
@@ -172,6 +182,7 @@ def _to_response(
         effective_unit_cost=effective_unit_cost,
         effective_currency_code=effective_currency_code,
         price_source=price_source,
+        cover_url=(covers or {}).get(item.part_id) if item.part_id is not None else None,
     )
 
 
@@ -214,7 +225,8 @@ async def list_bom(
     supplier_pricing = await _fetch_supplier_pricing(
         session, list(set(supplier_ids))
     )
-    return [_to_response(i, parts_meta, supplier_pricing) for i in items]
+    covers = await _covers_for(session, parts_meta)
+    return [_to_response(i, parts_meta, supplier_pricing, covers) for i in items]
 
 
 async def _validate_supplier_id(
@@ -286,7 +298,8 @@ async def add_bom_item(
     supplier_pricing = await _fetch_supplier_pricing(
         session, [item.supplier_id] if item.supplier_id else []
     )
-    return _to_response(item, parts_meta, supplier_pricing)
+    covers = await _covers_for(session, parts_meta)
+    return _to_response(item, parts_meta, supplier_pricing, covers)
 
 
 @router.put("/{item_id}", response_model=BOMItemResponse)
@@ -342,7 +355,8 @@ async def update_bom_item(
     supplier_pricing = await _fetch_supplier_pricing(
         session, [item.supplier_id] if item.supplier_id else []
     )
-    return _to_response(item, parts_meta, supplier_pricing)
+    covers = await _covers_for(session, parts_meta)
+    return _to_response(item, parts_meta, supplier_pricing, covers)
 
 
 @router.post("/{item_id}/upgrade-revision", response_model=BOMItemResponse)
@@ -379,7 +393,8 @@ async def upgrade_bom_item_revision(
     supplier_pricing = await _fetch_supplier_pricing(
         session, [item.supplier_id] if item.supplier_id else []
     )
-    return _to_response(item, parts_meta, supplier_pricing)
+    covers = await _covers_for(session, parts_meta)
+    return _to_response(item, parts_meta, supplier_pricing, covers)
 
 
 @router.delete("/{item_id}", status_code=204)

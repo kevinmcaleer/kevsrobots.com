@@ -241,6 +241,10 @@ class BOMItemResponse(BaseModel):
     effective_unit_cost: Optional[float] = None
     effective_currency_code: Optional[str] = None
     price_source: str = "row"
+    # Render-ready cover image for the linked part — its first photo
+    # (external URL as-is, uploaded → /api/parts/{slug}/photos/{id}/view,
+    # which the frontend prefixes with the API base). Null when no photo.
+    cover_url: Optional[str] = None
 
 
 class LinkCreate(BaseModel):
@@ -896,6 +900,10 @@ class PartSearchResult(BaseModel):
     # Small thumbnail for the catalog list row. Null = no image — the list
     # renderer falls back to a neutral icon tile so row height stays uniform.
     image_url: Optional[str] = None
+    # Render-ready cover (first photo) — supersedes image_url as the image
+    # source. External URL as-is; uploaded → /api/parts/{slug}/photos/{id}/view
+    # (frontend prefixes the API base). Null when the part has no photo.
+    cover_url: Optional[str] = None
 
 
 class PartRevisionSummary(BaseModel):

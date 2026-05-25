@@ -184,6 +184,20 @@ async def test_backfill_pins_legacy_rows(client, project_id, sessionmaker_) -> N
 
 
 @pytest.mark.asyncio
+async def test_bom_row_exposes_part_cover(client, project_id) -> None:
+    part = await _make_part(client, "BOM Cover Part")
+    await client.post(
+        f"/api/parts/{part['slug']}/photos/link",
+        json={"external_url": "https://example.com/bom-cover.jpg"},
+        headers=H,
+    )
+    item = await _add_bom(client, project_id, part_id=part["id"])
+    rows = (await client.get(f"/api/projects/{project_id}/bom")).json()
+    row = next(r for r in rows if r["id"] == item["id"])
+    assert row["cover_url"] == "https://example.com/bom-cover.jpg"
+
+
+@pytest.mark.asyncio
 async def test_changing_part_repins_to_new_current(client, project_id) -> None:
     a = await _make_part(client, "Part A")
     b = await _make_part(client, "Part B")

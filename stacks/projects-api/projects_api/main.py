@@ -39,6 +39,7 @@ from .db import (
     add_user_terms_acceptance_if_missing,
     backfill_bom_part_revisions,
     backfill_library_symbol_revisions,
+    backfill_part_image_url_to_photos,
     backfill_part_revisions_if_missing,
     create_all,
     recanonicalize_part_categories,
@@ -166,6 +167,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # after backfill_part_revisions_if_missing so every part has a current
     # revision to pin to.
     await backfill_bom_part_revisions()
+    # Migrate the legacy parts.image_url cover into part_photos (first photo)
+    # so uploaded photos are the single image source. Postgres-only,
+    # idempotent; the column stays dormant after the code stops using it.
+    await backfill_part_image_url_to_photos()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
