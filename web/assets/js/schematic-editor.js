@@ -1103,29 +1103,47 @@
   }
 
   // Public router: try the direct L/Z route; if it slices through
-  // any component body, detour over the top instead.
+  // any component body, detour up and over the top instead.
   function routeNet(x1, y1, x2, y2, fromSide, toSide) {
     var direct = lShapedSegments(x1, y1, x2, y2, fromSide, toSide);
     var obstacles = routeObstacles();
     if (obstacles.length === 0) return direct;
 
-    var blocked = [];
-    direct.forEach(function (seg) {
-      obstacles.forEach(function (r) {
-        if (segHitsRect(seg, r)) blocked.push(r);
+    function hitsOf(segs) {
+      var h = [];
+      segs.forEach(function (seg) {
+        obstacles.forEach(function (r) {
+          if (segHitsRect(seg, r) && h.indexOf(r) === -1) h.push(r);
+        });
       });
-    });
-    if (blocked.length === 0) return direct;
+      return h;
+    }
 
-    // Route over the top, clearing every blocker the direct route
-    // would have hit. If the detour STILL hits something (rare —
-    // a tall obstacle directly above), fall back to the direct
-    // route rather than loop forever.
-    var detour = routeOverTop(x1, y1, x2, y2, fromSide, toSide, blocked);
-    var stillBlocked = detour.some(function (seg) {
-      return obstacles.some(function (r) { return segHitsRect(seg, r); });
-    });
-    return stillBlocked ? direct : detour;
+    var directHits = hitsOf(direct);
+    if (directHits.length === 0) return direct;
+
+    // Iteratively grow the blocker set: route over the top of the
+    // blockers we know about, see what the detour NEWLY hits, fold
+    // those in, and re-route higher. Each iteration's top-run only
+    // rises (the blocker union grows), so this converges — and we
+    // never fall back to the cutting direct route. If after a few
+    // passes the detour still grazes something (e.g. an obstacle
+    // sitting directly under one of the drop legs), we return the
+    // best detour we have, which is still far better than slicing
+    // straight through the body.
+    var blockers = directHits.slice();
+    var detour = routeOverTop(x1, y1, x2, y2, fromSide, toSide, blockers);
+    for (var iter = 0; iter < 5; iter++) {
+      var dh = hitsOf(detour);
+      if (dh.length === 0) return detour;
+      var grew = false;
+      dh.forEach(function (r) {
+        if (blockers.indexOf(r) === -1) { blockers.push(r); grew = true; }
+      });
+      if (!grew) break; // no new blockers — raising further won't help
+      detour = routeOverTop(x1, y1, x2, y2, fromSide, toSide, blockers);
+    }
+    return detour;
   }
 
   // Spread overlapping "middle legs" so the perpendicular connector
