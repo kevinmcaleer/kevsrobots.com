@@ -513,13 +513,40 @@ description: Edit a part in the catalog
       <div class="col-6 col-md-3">
         <div class="border rounded p-1 h-100 position-relative">
           <img src="${esc(photoSrc(p))}" class="img-fluid rounded" loading="lazy" alt="${esc(p.title || '')}" style="aspect-ratio:1;object-fit:cover;width:100%;">
-          <div class="small text-truncate mt-1" title="${esc(p.title || '')}">${esc(p.title || '—')}</div>
+          <input type="text" class="form-control form-control-sm mt-1 photo-title" data-id="${p.id}" value="${esc(p.title || '')}" placeholder="Add a title…" maxlength="200" title="Edit title (e.g. orientation)">
           <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 py-0 px-1 photo-del" data-id="${p.id}" title="Delete photo">&times;</button>
         </div>
       </div>`).join('');
     wrap.querySelectorAll('.photo-del').forEach(btn => {
       btn.addEventListener('click', () => deletePhoto(btn.dataset.id));
     });
+    // Inline title edit: save on blur, or on Enter (which also blurs).
+    wrap.querySelectorAll('.photo-title').forEach(inp => {
+      inp.dataset.orig = inp.value;
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
+      inp.addEventListener('blur', () => savePhotoTitle(inp));
+    });
+  }
+
+  async function savePhotoTitle(inp) {
+    clearPhotoError();
+    if (!currentPart) return;
+    const title = inp.value.trim();
+    if (title === (inp.dataset.orig || '')) return;  // unchanged — no-op
+    try {
+      const resp = await ProjectAuth.apiFetch(
+        API + '/api/parts/' + encodeURIComponent(currentPart.slug) + '/photos/' + encodeURIComponent(inp.dataset.id),
+        { method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: title || null }) });
+      if (!resp.ok) {
+        let d = 'Could not save title (HTTP ' + resp.status + ').';
+        try { const j = await resp.json(); if (j.detail) d = j.detail; } catch (_) {}
+        showPhotoError(d);
+        inp.value = inp.dataset.orig || '';  // revert on failure
+        return;
+      }
+      inp.dataset.orig = title;  // commit the new baseline
+    } catch (e) { showPhotoError('Network error: ' + (e.message || e)); }
   }
 
   async function loadPhotos() {
