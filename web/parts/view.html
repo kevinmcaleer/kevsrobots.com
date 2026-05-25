@@ -472,9 +472,8 @@ description: View a part in the catalog
     const photoSrc = (p) => p.is_external ? p.url : (API + p.url);
     const photos = Array.isArray(part.photos) ? part.photos : [];
 
-    // Cover image on Overview — the first photo (now the single image source;
-    // legacy image_url kept only as a transitional fallback).
-    const coverUrl = photos.length ? photoSrc(photos[0]) : (part.image_url || '');
+    // Cover image on Overview — the part's first photo (the single image source).
+    const coverUrl = photos.length ? photoSrc(photos[0]) : '';
     if (coverUrl) {
       document.getElementById('part-image-wrap').classList.remove('d-none');
       const img = document.getElementById('part-image');
@@ -484,7 +483,7 @@ description: View a part in the catalog
     }
 
     // Photos tab — the multi-photo gallery, each with its optional title
-    // (e.g. an orientation note). Falls back to image_url, then empty state.
+    // (e.g. an orientation note), else the empty state.
     if (photos.length) {
       document.getElementById('part-photos-gallery').innerHTML = photos.map(p => `
         <div class="col-6 col-md-4">
@@ -493,13 +492,6 @@ description: View a part in the catalog
           </a>
           ${p.title ? `<div class="small text-muted mt-1 text-center">${esc(p.title)}</div>` : ''}
         </div>`).join('');
-    } else if (part.image_url) {
-      document.getElementById('part-photos-gallery').innerHTML = `
-        <div class="col-6 col-md-4">
-          <a href="${esc(part.image_url)}" target="_blank" rel="noopener" class="d-block">
-            <img src="${esc(part.image_url)}" class="img-fluid rounded" loading="lazy" alt="${esc(part.name || '')}">
-          </a>
-        </div>`;
     } else {
       document.getElementById('part-photos-empty').classList.remove('d-none');
     }
@@ -657,8 +649,8 @@ description: View a part in the catalog
         document.getElementById('part-edit-link').href = editUrl;
         document.getElementById('part-history-btn').href = '/parts/history.html?slug=' + encodeURIComponent(slug);
         // Prominent "improve this part" CTAs on the Overview tab. Edit +
-        // Add-photo both route to the edit form (which owns image_url);
-        // Edit-symbol stays disabled until the part↔symbol link lands.
+        // Add-photo both route to the edit form (which owns photos);
+        // Edit-symbol jumps to the Symbol tab.
         const improveEdit = document.getElementById('part-improve-edit');
         improveEdit.href = editUrl;
         improveEdit.classList.remove('d-none');

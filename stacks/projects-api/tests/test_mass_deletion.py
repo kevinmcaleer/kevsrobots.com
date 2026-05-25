@@ -138,15 +138,15 @@ async def test_clearing_three_structured_fields_trips_guard(client) -> None:
     part = await _create_populated_part(client)
     slug = part["slug"]
 
-    # Clear sku, mpn, and image_url — three structured fields, but
-    # description stays intact so the content-fraction rule wouldn't
-    # fire on its own.
+    # Clear sku, mpn, and tags — three structured fields, but description
+    # stays intact so the content-fraction rule wouldn't fire on its own.
+    # (image_url was retired as a settable field; tags clearing replaces it.)
     resp = await client.put(
         f"/api/parts/{slug}",
         json={
             "sku": "",
             "mpn": "",
-            "image_url": "",
+            "tags": [],
             "change_summary": "tidy",
         },
         headers=make_auth_header(),

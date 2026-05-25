@@ -68,11 +68,6 @@ description: Edit a part in the catalog
         </div>
 
         <div class="mb-3">
-          <label for="part-image-url" class="form-label">Image URL</label>
-          <input type="url" id="part-image-url" class="form-control" placeholder="https://...">
-        </div>
-
-        <div class="mb-3">
           <label for="part-symbol-select" class="form-label">Schematic symbol</label>
           <select id="part-symbol-select" class="form-select">
             <option value="">— No symbol —</option>
@@ -702,7 +697,6 @@ description: Edit a part in the catalog
       document.getElementById('part-name').value = currentPart.name || '';
       document.getElementById('part-sku').value = currentPart.sku || '';
       document.getElementById('part-mpn').value = currentPart.mpn || '';
-      document.getElementById('part-image-url').value = currentPart.image_url || '';
       document.getElementById('part-category').value = currentPart.category || '';
       document.getElementById('part-family').value = currentPart.family || '';
       document.getElementById('part-symbol-select').value = currentPart.symbol_id ? String(currentPart.symbol_id) : '';
@@ -739,7 +733,6 @@ description: Edit a part in the catalog
       name: document.getElementById('part-name').value.trim(),
       sku: document.getElementById('part-sku').value.trim() || null,
       mpn: document.getElementById('part-mpn').value.trim() || null,
-      image_url: document.getElementById('part-image-url').value.trim() || null,
       // Issue #135: send empty string to clear, the API treats "" as "clear".
       category: document.getElementById('part-category').value || '',
       family: document.getElementById('part-family').value.trim(),
@@ -842,7 +835,6 @@ description: Edit a part in the catalog
             body: JSON.stringify({
               description_md: body.description_md,
               suppliers: body.suppliers,
-              image_url: body.image_url,
               category: body.category,
               family: body.family,
               change_summary: body.change_summary || 'Initial description',

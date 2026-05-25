@@ -853,7 +853,6 @@ class PartCreate(BaseModel):
     sku: Optional[str] = Field(None, max_length=100)
     mpn: Optional[str] = Field(None, max_length=100)
     description_md: Optional[str] = None
-    image_url: Optional[str] = Field(None, max_length=2000)
     supplier_url: Optional[str] = Field(None, max_length=2000)
     supplier_name: Optional[str] = Field(None, max_length=120)
     tags: list[str] = Field(default_factory=list)
@@ -869,7 +868,6 @@ class PartUpdate(BaseModel):
     sku: Optional[str] = Field(None, max_length=100)
     mpn: Optional[str] = Field(None, max_length=100)
     description_md: Optional[str] = None
-    image_url: Optional[str] = Field(None, max_length=2000)
     tags: Optional[list[str]] = None
     suppliers: Optional[list[PartSupplierInput]] = None
     change_summary: str = Field(..., min_length=1, max_length=200)
@@ -897,12 +895,10 @@ class PartSearchResult(BaseModel):
     # list / autocomplete UIs can show them without a second roundtrip.
     category: Optional[str] = None
     family: Optional[str] = None
-    # Small thumbnail for the catalog list row. Null = no image — the list
-    # renderer falls back to a neutral icon tile so row height stays uniform.
-    image_url: Optional[str] = None
-    # Render-ready cover (first photo) — supersedes image_url as the image
-    # source. External URL as-is; uploaded → /api/parts/{slug}/photos/{id}/view
-    # (frontend prefixes the API base). Null when the part has no photo.
+    # Render-ready cover (the part's first photo). External URL as-is;
+    # uploaded → /api/parts/{slug}/photos/{id}/view (frontend prefixes the
+    # API base). Null when the part has no photo — the list renderer falls
+    # back to a neutral icon tile so row height stays uniform.
     cover_url: Optional[str] = None
 
 
@@ -922,7 +918,6 @@ class PartRevisionDetail(BaseModel):
     sku: Optional[str] = None
     mpn: Optional[str] = None
     description_md: Optional[str] = None
-    image_url: Optional[str] = None
     tags: list[str] = Field(default_factory=list)
     suppliers: list[PartSupplierInput] = Field(default_factory=list)
     category: Optional[str] = None
@@ -1117,7 +1112,6 @@ class PartDetail(BaseModel):
     sku: Optional[str] = None
     mpn: Optional[str] = None
     description_md: Optional[str] = None
-    image_url: Optional[str] = None
     tags: list[str] = Field(default_factory=list)
     status: str
     created_by: str
@@ -1140,7 +1134,7 @@ class PartDetail(BaseModel):
     symbol_id: Optional[int] = None
     symbol: Optional[PartSymbolRef] = None
     # Part-hub: photo gallery (ordered by sort_order). Empty when the part
-    # has no photos — the view falls back to ``image_url``.
+    # has no photos — the view shows the empty state.
     photos: list["PartPhotoResponse"] = Field(default_factory=list)
 
 

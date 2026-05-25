@@ -134,7 +134,7 @@ description: Revision history for a part in the catalog
     document.getElementById('preview-title').textContent = (r.author || 'someone') + ' — ' + fmtTime(r.created_at);
     const body = document.getElementById('preview-body');
     // Use whatever snapshot fields the API gives us. Common fields:
-    //   description_md, name, sku, mpn, image_url, tags, suppliers
+    //   description_md, name, sku, mpn, tags, suppliers
     let html = '';
     if (r.name) html += `<p><strong>Name:</strong> ${esc(r.name)}</p>`;
     if (r.sku) html += `<p><strong>SKU:</strong> ${esc(r.sku)}</p>`;

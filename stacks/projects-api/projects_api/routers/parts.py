@@ -349,7 +349,6 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         sku=part.sku,
         mpn=part.mpn,
         description_md=part.description_md,
-        image_url=part.image_url,
         tags=list(part.tags or []),
         status=part.status,
         created_by=part.created_by,
@@ -450,7 +449,6 @@ async def search_parts(
                 primary_supplier_url=await _primary_supplier_url(session, p.id),
                 category=p.category,
                 family=p.family,
-                image_url=p.image_url,
                 cover_url=covers.get(p.id) or p.image_url,
             )
         )
@@ -528,7 +526,6 @@ async def create_part(
         sku=body.sku or None,
         mpn=body.mpn or None,
         description_md=body.description_md,
-        image_url=body.image_url,
         tags=tags,
         status="draft",
         category=category,
@@ -647,7 +644,9 @@ async def update_part(
     next_sku = body.sku if body.sku is not None else part.sku
     next_mpn = body.mpn if body.mpn is not None else part.mpn
     next_desc = body.description_md if body.description_md is not None else part.description_md
-    next_image = body.image_url if body.image_url is not None else part.image_url
+    # image_url is retired (images now live in part_photos). Carry the dormant
+    # value through unchanged so revision snapshots / the guard stay stable.
+    next_image = part.image_url
     next_tags = _normalize_tags(body.tags) if body.tags is not None else list(part.tags or [])
     # Empty string is interpreted as "clear" for category / family — the
     # editor sends "" when the user resets the dropdown / blanks the input.
@@ -697,7 +696,6 @@ async def update_part(
         or next_sku != part.sku
         or next_mpn != part.mpn
         or next_desc != part.description_md
-        or next_image != part.image_url
         or list(next_tags) != list(part.tags or [])
         or next_category != part.category
         or next_family != part.family
@@ -862,7 +860,6 @@ async def get_revision(
         sku=rev.sku,
         mpn=rev.mpn,
         description_md=rev.description_md,
-        image_url=rev.image_url,
         tags=list(rev.tags or []),
         suppliers=suppliers,
         category=rev.category,
