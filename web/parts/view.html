@@ -425,17 +425,35 @@ description: View a part in the catalog
     if (part.mpn) idsParts.push(`<span class="badge bg-light text-dark me-2"><strong>MPN:</strong> ${esc(part.mpn)}</span>`);
     document.getElementById('part-ids').innerHTML = idsParts.join('');
 
-    if (part.image_url) {
+    // Photo src resolver: uploaded photos are served by the API (relative
+    // /view path), external links are absolute URLs.
+    const photoSrc = (p) => p.is_external ? p.url : (API + p.url);
+    const photos = Array.isArray(part.photos) ? part.photos : [];
+
+    // Cover image on Overview — prefer the legacy image_url, else the first photo.
+    const coverUrl = part.image_url || (photos.length ? photoSrc(photos[0]) : '');
+    if (coverUrl) {
       document.getElementById('part-image-wrap').classList.remove('d-none');
       const img = document.getElementById('part-image');
-      img.src = part.image_url;
+      img.src = coverUrl;
       img.alt = part.name || '';
       img.loading = 'lazy';
-      // Mirror the cover image into the Photos tab. A proper multi-photo
-      // gallery is a backend job; for now the single image_url is the gallery.
+    }
+
+    // Photos tab — the multi-photo gallery, each with its optional title
+    // (e.g. an orientation note). Falls back to image_url, then empty state.
+    if (photos.length) {
+      document.getElementById('part-photos-gallery').innerHTML = photos.map(p => `
+        <div class="col-6 col-md-4">
+          <a href="${esc(photoSrc(p))}" target="_blank" rel="noopener" class="d-block">
+            <img src="${esc(photoSrc(p))}" class="img-fluid rounded" loading="lazy" alt="${esc(p.title || part.name || '')}">
+          </a>
+          ${p.title ? `<div class="small text-muted mt-1 text-center">${esc(p.title)}</div>` : ''}
+        </div>`).join('');
+    } else if (part.image_url) {
       document.getElementById('part-photos-gallery').innerHTML = `
         <div class="col-6 col-md-4">
-          <a href="${esc(part.image_url)}" target="_blank" rel="noopener">
+          <a href="${esc(part.image_url)}" target="_blank" rel="noopener" class="d-block">
             <img src="${esc(part.image_url)}" class="img-fluid rounded" loading="lazy" alt="${esc(part.name || '')}">
           </a>
         </div>`;

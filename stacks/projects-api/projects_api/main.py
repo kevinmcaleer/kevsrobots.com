@@ -65,6 +65,7 @@ from .routers import (
     moderation,
     parts,
     parts_moderation,
+    parts_photos,
     parts_talk,
     projects,
     remixes,
@@ -248,6 +249,7 @@ def create_app() -> FastAPI:
     # the more-specific literal paths before the catch-all slug capture.
     app.include_router(parts_moderation.router)
     app.include_router(parts.router)
+    app.include_router(parts_photos.router)
     # Issue #122 Phase 2: parts talk pages + admin recheck.
     app.include_router(parts_talk.router)
     app.include_router(admin_parts.router)

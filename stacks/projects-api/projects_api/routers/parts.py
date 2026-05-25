@@ -67,6 +67,7 @@ from ..models import (
     LibrarySymbol,
     Part,
     PartAlias,
+    PartPhoto,
     PartRelation,
     PartRevision,
     PartSupplier,
@@ -82,6 +83,7 @@ from ..schemas import (
     PartRevisionSummary,
     PartSearchResult,
     PartSupplierInput,
+    PartPhotoResponse,
     PartSupplierResponse,
     PartSymbolRef,
     PartUpdate,
@@ -271,6 +273,30 @@ async def _validate_symbol_id(session: AsyncSession, symbol_id: int) -> None:
         )
 
 
+async def _load_photos(session: AsyncSession, part: Part) -> list[PartPhotoResponse]:
+    """Part gallery photos, ordered. ``url`` is render-ready — the /view
+    route for uploads, the external URL for links (matched in parts_photos)."""
+    photos = (
+        await session.scalars(
+            select(PartPhoto)
+            .where(PartPhoto.part_id == part.id)
+            .order_by(PartPhoto.sort_order.asc(), PartPhoto.id.asc())
+        )
+    ).all()
+    out: list[PartPhotoResponse] = []
+    for p in photos:
+        if p.external_url:
+            url, is_external = p.external_url, True
+        else:
+            url = f"/api/parts/{part.slug}/photos/{p.id}/view"
+            is_external = False
+        out.append(PartPhotoResponse(
+            id=p.id, title=p.title, url=url, is_external=is_external,
+            sort_order=p.sort_order, created_by=p.created_by, created_at=p.created_at,
+        ))
+    return out
+
+
 async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
     suppliers = await _load_suppliers(session, part.id)
     revs = (
@@ -316,6 +342,7 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         verified_signals=int(part.verified_signals or 0),
         symbol_id=part.symbol_id,
         symbol=_symbol_ref(await _resolve_symbol(session, part.symbol_id)),
+        photos=await _load_photos(session, part),
     )
 
 

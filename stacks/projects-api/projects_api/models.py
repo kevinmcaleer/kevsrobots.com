@@ -957,6 +957,47 @@ class PartRevision(Base):
     )
 
 
+class PartPhoto(Base):
+    """A photo attached to a part — multiple per part, each with an optional
+    title (e.g. an orientation note like "top view" or "pin-1 side").
+
+    Two sources, exactly one populated per row:
+      * uploaded → ``file_path`` holds a storage token from
+        ``storage.save_file`` (NAS with local fallback, same as
+        ``ProjectImage``); bytes are served back via the ``/view`` route.
+      * linked → ``external_url`` points at an off-site image.
+
+    This reduces reliance on external links (uploads are first-class) while
+    still letting authors paste a URL. Brand-new table — ``create_all``
+    provisions it on every dialect, so no idempotent ALTER helper is needed.
+    """
+
+    __tablename__ = "part_photos"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    part_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    title: Mapped[Optional[str]] = mapped_column(String(200))
+    # Storage token for an uploaded photo (mutually exclusive with external_url).
+    file_path: Mapped[Optional[str]] = mapped_column(Text)
+    # Off-site image URL (mutually exclusive with file_path).
+    external_url: Mapped[Optional[str]] = mapped_column(Text)
+    # Original filename for uploads — used to pick the served MIME type.
+    filename: Mapped[Optional[str]] = mapped_column(String(255))
+    sort_order: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    created_by: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("ix_part_photos_part_sort", "part_id", "sort_order"),
+    )
+
+
 # --- User flags (issue #136 — mass-deletion auto-disable) -----------------
 #
 # We don't own a real user table — identity comes from the Chatter JWT. But

@@ -1120,6 +1120,43 @@ class PartDetail(BaseModel):
     # raw FK; ``symbol`` is the resolved summary for rendering the Symbol tab.
     symbol_id: Optional[int] = None
     symbol: Optional[PartSymbolRef] = None
+    # Part-hub: photo gallery (ordered by sort_order). Empty when the part
+    # has no photos — the view falls back to ``image_url``.
+    photos: list["PartPhotoResponse"] = Field(default_factory=list)
+
+
+# --- Part photos (part-hub gallery) --------------------------------------
+
+
+class PartPhotoResponse(BaseModel):
+    """One photo in a part's gallery. ``url`` is ready to drop into an
+    <img src>: the /view route for uploads, or the external URL for links."""
+
+    id: int
+    title: Optional[str] = None
+    url: str
+    is_external: bool
+    sort_order: int = 0
+    created_by: str
+    created_at: datetime
+
+
+class PartPhotoLinkCreate(BaseModel):
+    """Body for linking an off-site image (POST …/photos/link)."""
+
+    external_url: str = Field(..., min_length=4, max_length=2000)
+    title: Optional[str] = Field(None, max_length=200)
+
+
+class PartPhotoUpdate(BaseModel):
+    """Edit a photo's title and/or position (PUT …/photos/{id})."""
+
+    title: Optional[str] = Field(None, max_length=200)
+    sort_order: Optional[int] = None
+
+
+# Resolve PartDetail's forward reference to PartPhotoResponse (defined above).
+PartDetail.model_rebuild()
 
 
 # --- Parts talk pages (issue #122 Phase 2) -------------------------------

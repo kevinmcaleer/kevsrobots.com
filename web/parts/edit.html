@@ -91,6 +91,28 @@ description: Edit a part in the catalog
           </div>
         </div>
 
+        <div id="part-photos-section" class="mb-3 d-none">
+          <label class="form-label">Photos</label>
+          <div class="form-text mb-2">Add multiple photos — upload a file or link an image — each with a title to note the orientation (e.g. "top view", "pin-1 corner"). Save the part first to manage photos.</div>
+          <div id="part-photos-edit-list" class="row g-2 mb-2"></div>
+          <div class="row g-2 align-items-center">
+            <div class="col-12 col-sm">
+              <input type="text" id="photo-title-input" class="form-control form-control-sm" placeholder="Title (optional, e.g. top view)" maxlength="200">
+            </div>
+            <div class="col-12 col-sm-auto">
+              <input type="file" id="photo-file-input" class="form-control form-control-sm" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml">
+            </div>
+            <div class="col-auto">
+              <button type="button" id="photo-upload-btn" class="btn btn-sm btn-primary"><i class="fas fa-upload me-1"></i>Upload</button>
+            </div>
+          </div>
+          <div class="input-group input-group-sm mt-2">
+            <input type="url" id="photo-url-input" class="form-control" placeholder="…or paste an image URL">
+            <button type="button" id="photo-link-btn" class="btn btn-outline-primary"><i class="fas fa-link me-1"></i>Add link</button>
+          </div>
+          <div id="photo-error" class="text-danger small mt-1 d-none"></div>
+        </div>
+
         <div class="mb-3">
           <label class="form-label">Tags</label>
           <div id="part-tags-container" class="d-flex flex-wrap gap-1 mb-1"></div>
@@ -459,6 +481,115 @@ description: Edit a part in the catalog
     }
   });
 
+  // --- Photos (part-hub gallery) ---
+  // Photos are separate resources: each add/delete hits the API immediately
+  // (like related parts), so the part must already exist. ``photoSrc``
+  // resolves uploaded photos (relative /view path) vs external links.
+  const photoSrc = (p) => p.is_external ? p.url : (API + p.url);
+
+  function showPhotoError(msg) {
+    const el = document.getElementById('photo-error');
+    el.textContent = msg;
+    el.classList.remove('d-none');
+  }
+  function clearPhotoError() {
+    document.getElementById('photo-error').classList.add('d-none');
+  }
+
+  function renderPhotoList(photos) {
+    const wrap = document.getElementById('part-photos-edit-list');
+    if (!photos || photos.length === 0) {
+      wrap.innerHTML = '<div class="col-12"><span class="text-muted fst-italic small">No photos yet — add the first one below.</span></div>';
+      return;
+    }
+    wrap.innerHTML = photos.map(p => `
+      <div class="col-6 col-md-3">
+        <div class="border rounded p-1 h-100 position-relative">
+          <img src="${esc(photoSrc(p))}" class="img-fluid rounded" loading="lazy" alt="${esc(p.title || '')}" style="aspect-ratio:1;object-fit:cover;width:100%;">
+          <div class="small text-truncate mt-1" title="${esc(p.title || '')}">${esc(p.title || '—')}</div>
+          <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 py-0 px-1 photo-del" data-id="${p.id}" title="Delete photo">&times;</button>
+        </div>
+      </div>`).join('');
+    wrap.querySelectorAll('.photo-del').forEach(btn => {
+      btn.addEventListener('click', () => deletePhoto(btn.dataset.id));
+    });
+  }
+
+  async function loadPhotos() {
+    if (!currentPart) return;
+    try {
+      const resp = await fetch(API + '/api/parts/' + encodeURIComponent(currentPart.slug) + '/photos');
+      if (!resp.ok) return;
+      renderPhotoList(await resp.json());
+    } catch (_) {}
+  }
+
+  async function uploadPhoto() {
+    clearPhotoError();
+    if (!currentPart) return;
+    const fileInput = document.getElementById('photo-file-input');
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) { showPhotoError('Choose an image file to upload.'); return; }
+    const fd = new FormData();
+    fd.append('file', file);
+    const title = document.getElementById('photo-title-input').value.trim();
+    if (title) fd.append('title', title);
+    try {
+      const resp = await ProjectAuth.apiFetch(
+        API + '/api/parts/' + encodeURIComponent(currentPart.slug) + '/photos',
+        { method: 'POST', body: fd });
+      if (!resp.ok) {
+        let d = 'Upload failed (HTTP ' + resp.status + ').';
+        try { const j = await resp.json(); if (j.detail) d = j.detail; } catch (_) {}
+        showPhotoError(d); return;
+      }
+      fileInput.value = '';
+      document.getElementById('photo-title-input').value = '';
+      await loadPhotos();
+    } catch (e) { showPhotoError('Network error: ' + (e.message || e)); }
+  }
+
+  async function linkPhoto() {
+    clearPhotoError();
+    if (!currentPart) return;
+    const url = document.getElementById('photo-url-input').value.trim();
+    if (!url) { showPhotoError('Paste an image URL.'); return; }
+    const title = document.getElementById('photo-title-input').value.trim();
+    try {
+      const resp = await ProjectAuth.apiFetch(
+        API + '/api/parts/' + encodeURIComponent(currentPart.slug) + '/photos/link',
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ external_url: url, title: title || null }) });
+      if (!resp.ok) {
+        let d = 'Could not add link (HTTP ' + resp.status + ').';
+        try { const j = await resp.json(); if (j.detail) d = j.detail; } catch (_) {}
+        showPhotoError(d); return;
+      }
+      document.getElementById('photo-url-input').value = '';
+      document.getElementById('photo-title-input').value = '';
+      await loadPhotos();
+    } catch (e) { showPhotoError('Network error: ' + (e.message || e)); }
+  }
+
+  async function deletePhoto(id) {
+    clearPhotoError();
+    if (!currentPart) return;
+    try {
+      const resp = await ProjectAuth.apiFetch(
+        API + '/api/parts/' + encodeURIComponent(currentPart.slug) + '/photos/' + encodeURIComponent(id),
+        { method: 'DELETE' });
+      if (!resp.ok && resp.status !== 204) {
+        let d = 'Could not delete (HTTP ' + resp.status + ').';
+        try { const j = await resp.json(); if (j.detail) d = j.detail; } catch (_) {}
+        showPhotoError(d); return;
+      }
+      await loadPhotos();
+    } catch (e) { showPhotoError('Network error: ' + (e.message || e)); }
+  }
+
+  document.getElementById('photo-upload-btn').addEventListener('click', uploadPhoto);
+  document.getElementById('photo-link-btn').addEventListener('click', linkPhoto);
+
   // --- Editor ---
   function initEditor() {
     if (easyMDE) return;
@@ -533,6 +664,11 @@ description: Edit a part in the catalog
       currentRelated = Array.isArray(currentPart.related_parts) ? currentPart.related_parts.slice() : [];
       document.getElementById('related-parts-section').classList.remove('d-none');
       renderRelatedList();
+
+      // Photos manager (existing parts only — needs a slug to attach to).
+      document.getElementById('part-photos-section').classList.remove('d-none');
+      renderPhotoList(currentPart.photos || []);
+      loadPhotos();
 
       hide(document.getElementById('loading'));
       show(document.getElementById('edit-container'));
