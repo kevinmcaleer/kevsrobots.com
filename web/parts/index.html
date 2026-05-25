@@ -93,10 +93,15 @@ description: Browse and search the community parts catalog
       const countBadge = count > 0
         ? `<a href="${searchUrl}" class="badge bg-light text-dark text-decoration-none" title="View projects using ${esc(p.name)}"><i class="fas fa-clipboard-list me-1"></i>${count} project${count === 1 ? '' : 's'}</a>`
         : `<span class="badge bg-light text-muted"><i class="fas fa-clipboard-list me-1"></i>0 projects</span>`;
-      // 48px square thumbnail, or a neutral icon tile when image_url is null
-      // so every row keeps the same height.
-      const thumb = p.image_url
-        ? `<img src="${esc(p.image_url)}" alt="" loading="lazy"
+      // 48px square thumbnail from the part's first photo (cover_url), or a
+      // neutral icon tile when it has no photo, so every row keeps height.
+      // cover_url is render-ready: external URLs are absolute; uploaded
+      // photos come back as a relative /api/…/view path → prefix the API base.
+      const coverSrc = p.cover_url
+        ? (/^https?:\/\//.test(p.cover_url) ? p.cover_url : API + p.cover_url)
+        : '';
+      const thumb = coverSrc
+        ? `<img src="${esc(coverSrc)}" alt="" loading="lazy"
                 class="rounded flex-shrink-0"
                 style="width:48px;height:48px;object-fit:cover;background:#f1f3f5;">`
         : `<div class="rounded flex-shrink-0 d-flex align-items-center justify-content-center text-muted"

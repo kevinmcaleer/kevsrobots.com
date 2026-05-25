@@ -2679,9 +2679,9 @@
       var tag = (e.target && e.target.tagName) || '';
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if (e.target && e.target.isContentEditable) return;
-      var map = ['photos', 'tools', 'bom', 'assets', 'circuit', 'layers'];
+      var map = ['photos', 'tools', 'bom', 'circuit', 'layers'];
       var idx = parseInt(e.key, 10);
-      if (idx >= 1 && idx <= 6) {
+      if (idx >= 1 && idx <= map.length) {
         e.preventDefault();
         setActiveRailPane(map[idx - 1]);
       }
@@ -3279,14 +3279,11 @@
   //
   // Data model (today):
   //   GET /api/projects/{id}/bom returns BOMItemResponse[] with fields
-  //   { id, name, quantity, part_id, part_slug, ... }. The schema does
-  //   NOT yet ship a per-part "assets" list — that's blocked on the
-  //   parts-catalog asset graphics feature + the Symbol designer. So we
-  //   derive a fallback asset list for each part from its catalog
-  //   ``image_url`` (one photo-kind asset, or zero if the part has no
-  //   image set). When the API grows a real assets[] field, swap the
-  //   derivation for the schema-supplied list — the rest of the pane
-  //   (chips, drag, drawer) works unchanged.
+  //   { id, name, quantity, part_id, part_slug, ... }. Per-part assets are
+  //   derived by fetching the part's catalog detail (ensurePartAssets) and
+  //   building a chip per gallery photo plus the linked schematic symbol
+  //   (rendered to an SVG data URL). The rest of the pane (chips, drag,
+  //   drawer) is agnostic to where the asset list comes from.
   // ====================================================================
 
   function loadBomItems(opts) {
@@ -3352,10 +3349,48 @@
       });
   }
 
-  // Fetch the part's catalog detail once and cache its derived asset
-  // list. Today this is just `[{ id, label, kind: 'photo', src }]` if
-  // the part has an image_url, or `[]` otherwise. The BOM row's
-  // asset-count chip + drawer re-render when this lands.
+  // Render a library symbol's { bodyShapes, pins } doc (centred on origin)
+  // to an SVG data URL so a linked symbol can be dragged onto the canvas as
+  // a vector graphic. '' when the data is unusable.
+  function symbolToDataUrl(dataJson) {
+    if (!dataJson) return '';
+    var doc;
+    try { doc = JSON.parse(dataJson); } catch (_) { return ''; }
+    if (!doc || typeof doc !== 'object') return '';
+    var shapes = Array.isArray(doc.bodyShapes) ? doc.bodyShapes : [];
+    var pins = Array.isArray(doc.pins) ? doc.pins : [];
+    if (!shapes.length && !pins.length) return '';
+    var STUB = 14;
+    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    function fit(x, y) { if (x < minX) minX = x; if (y < minY) minY = y; if (x > maxX) maxX = x; if (y > maxY) maxY = y; }
+    function pinEnd(p) {
+      var x = +p.x || 0, y = +p.y || 0;
+      if (p.side === 'left') return [x - STUB, y];
+      if (p.side === 'right') return [x + STUB, y];
+      if (p.side === 'top') return [x, y - STUB];
+      return [x, y + STUB];
+    }
+    shapes.forEach(function (s) { var x = +s.x || 0, y = +s.y || 0; fit(x, y); fit(x + (+s.w || 0), y + (+s.h || 0)); });
+    pins.forEach(function (p) { fit(+p.x || 0, +p.y || 0); var e = pinEnd(p); fit(e[0], e[1]); });
+    if (!isFinite(minX)) return '';
+    var pad = 16; minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+    var body = shapes.map(function (s) {
+      return '<rect x="' + (+s.x || 0) + '" y="' + (+s.y || 0) + '" width="' + (+s.w || 0) + '" height="' + (+s.h || 0) + '" rx="4" fill="#ffffff" stroke="#0d6efd" stroke-width="2"/>';
+    }).join('');
+    var pinEls = pins.map(function (p) {
+      var x = +p.x || 0, y = +p.y || 0, e = pinEnd(p);
+      return '<line x1="' + x + '" y1="' + y + '" x2="' + e[0] + '" y2="' + e[1] + '" stroke="#0d6efd" stroke-width="2"/><circle cx="' + e[0] + '" cy="' + e[1] + '" r="2.5" fill="#0d6efd"/>';
+    }).join('');
+    var w = maxX - minX, h = maxY - minY;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + minX + ' ' + minY + ' ' + w + ' ' + h + '" width="' + w + '" height="' + h + '">' + body + pinEls + '</svg>';
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  }
+
+  // Fetch the part's catalog detail once and cache its derived asset list:
+  // one 'photo' asset per gallery photo (uploaded → API-prefixed /view path,
+  // external → as-is) plus the linked schematic symbol as a vector asset.
+  // [] if the part has neither. The BOM row's asset chip + drawer re-render
+  // when this lands.
   function ensurePartAssets(partId, partSlug) {
     if (!partId || !partSlug) return Promise.resolve([]);
     if (state.bomPartAssets[partId] !== undefined) {
@@ -3371,13 +3406,28 @@
       })
       .then(function (part) {
         var assets = [];
-        if (part && part.image_url) {
-          assets.push({
-            id: 'part-' + partId + '-image',
-            label: 'Photo',
-            kind: 'photo',
-            src: part.image_url,
+        if (part && Array.isArray(part.photos)) {
+          part.photos.forEach(function (ph, i) {
+            if (!ph || !ph.url) return;
+            var src = /^https?:\/\//.test(ph.url) ? ph.url : (API + ph.url);
+            assets.push({
+              id: 'part-' + partId + '-photo-' + ph.id,
+              label: ph.title || ('Photo ' + (i + 1)),
+              kind: 'photo',
+              src: src,
+            });
           });
+        }
+        if (part && part.symbol && part.symbol.symbol_data) {
+          var symSrc = symbolToDataUrl(part.symbol.symbol_data);
+          if (symSrc) {
+            assets.push({
+              id: 'part-' + partId + '-symbol',
+              label: part.symbol.name || 'Symbol',
+              kind: 'symbol',
+              src: symSrc,
+            });
+          }
         }
         state.bomPartAssets[partId] = assets;
         delete state.bomPartAssetsPending[partId];

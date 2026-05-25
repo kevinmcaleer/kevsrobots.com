@@ -472,8 +472,9 @@ description: View a part in the catalog
     const photoSrc = (p) => p.is_external ? p.url : (API + p.url);
     const photos = Array.isArray(part.photos) ? part.photos : [];
 
-    // Cover image on Overview — prefer the legacy image_url, else the first photo.
-    const coverUrl = part.image_url || (photos.length ? photoSrc(photos[0]) : '');
+    // Cover image on Overview — the first photo (now the single image source;
+    // legacy image_url kept only as a transitional fallback).
+    const coverUrl = photos.length ? photoSrc(photos[0]) : (part.image_url || '');
     if (coverUrl) {
       document.getElementById('part-image-wrap').classList.remove('d-none');
       const img = document.getElementById('part-image');

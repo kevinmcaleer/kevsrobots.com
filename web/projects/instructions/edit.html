@@ -172,22 +172,17 @@ hide_nibsy: true
         <span class="ib-rail-icon"><i class="fas fa-receipt"></i></span>
         <span class="ib-rail-label">BOM</span>
       </button>
-      <button type="button" class="ib-rail-btn" data-rail-pane="assets"
-              title="Assets (Cmd/Ctrl+4)">
-        <span class="ib-rail-icon"><i class="fas fa-puzzle-piece"></i></span>
-        <span class="ib-rail-label">Assets</span>
-      </button>
       <!-- B3: the Schematic rail item is the step-type picker (the future
            full schematic editor lands in E2). The label is "Schematic"
            but the data-rail-pane key stays "circuit" for back-compat
            with persisted UI state (kr-instructions-ui-state-v1). -->
       <button type="button" class="ib-rail-btn" data-rail-pane="circuit"
-              title="Schematic / step type (Cmd/Ctrl+5)">
+              title="Schematic / step type (Cmd/Ctrl+4)">
         <span class="ib-rail-icon"><i class="fas fa-diagram-project"></i></span>
         <span class="ib-rail-label">Schematic</span>
       </button>
       <button type="button" class="ib-rail-btn" data-rail-pane="layers"
-              title="Layers (Cmd/Ctrl+6)">
+              title="Layers (Cmd/Ctrl+5)">
         <span class="ib-rail-icon"><i class="fas fa-layer-group"></i></span>
         <span class="ib-rail-label">Layers</span>
       </button>
@@ -380,22 +375,6 @@ hide_nibsy: true
           </p>
           <div class="ib-bom-list" id="ib-bom-list" aria-live="polite">
             <!-- rows rendered dynamically by JS -->
-          </div>
-        </div>
-      </section>
-
-      <!-- Assets pane (stub) -->
-      <section class="ib-pane" data-pane="assets">
-        <header class="ib-pane-header">
-          <h6 class="ib-pane-title"><i class="fas fa-puzzle-piece me-2"></i>Assets</h6>
-        </header>
-        <div class="ib-pane-body">
-          <div class="ib-pane-stub">
-            <div class="ib-pane-stub-icon"><i class="fas fa-puzzle-piece"></i></div>
-            <p>Assets are component graphics linked from the BOM. This pane will be populated as the Parts Catalog Assets feature lands.</p>
-            <p class="small text-muted">
-              Watch <a href="https://github.com/kevinmcaleer/kevsrobots.com/issues/180" target="_blank" rel="noopener">issue #180 (Circuit Diagrammer)</a> and related issues for progress.
-            </p>
           </div>
         </div>
       </section>

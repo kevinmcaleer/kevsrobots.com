@@ -1741,6 +1741,14 @@
       const partPill = linked
         ? `<a class="bom-part-pill" href="/parts/view.html?slug=${encodeURIComponent(item.part_slug)}" title="Linked to parts catalog" target="_blank"><i class="fas fa-link"></i> /parts/${escapeHtmlAttr(item.part_slug)}</a>`
         : (item.part_id ? `<span class="bom-part-pill" title="Linked to parts catalog"><i class="fas fa-link"></i> part #${item.part_id}</span>` : '');
+      // Part cover thumbnail (first photo) — cover_url is render-ready:
+      // external absolute, uploaded → relative /view path needing the API base.
+      const coverSrc = item.cover_url
+        ? (/^https?:\/\//.test(item.cover_url) ? item.cover_url : API + item.cover_url)
+        : '';
+      const coverThumb = coverSrc
+        ? `<img src="${escapeHtmlAttr(coverSrc)}" alt="" loading="lazy" class="bom-cover-thumb" style="width:26px;height:26px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:6px;background:#f1f3f5;">`
+        : '';
       // Versioning Phase 4: this row is pinned to an older part revision than
       // the catalog's latest. Offer a one-click upgrade (re-pins to current).
       const updateBadge = item.part_revision_outdated
@@ -1781,7 +1789,7 @@
       <tr data-bom-id="${item.id}" data-part-id="${item.part_id || ''}" data-part-slug="${escapeHtmlAttr(item.part_slug || '')}" data-supplier-id="${escapeHtmlAttr(item.supplier_id || '')}" data-price-source="${escapeHtmlAttr(item.price_source || 'row')}">
         <td class="bom-part-cell" style="position:relative">
           <input class="bom-part-input" value="${escapeHtmlAttr(item.name)}" data-field="name" autocomplete="off" placeholder="Type to search parts catalog..." onchange="updateBOM(${item.id}, this)">
-          ${partPill}${updateBadge}
+          ${coverThumb}${partPill}${updateBadge}
         </td>
         <td><input type="number" value="${item.quantity}" data-field="quantity" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>
         <td><input value="${escapeHtmlAttr(item.unit)}" data-field="unit" style="width:50px" onchange="updateBOM(${item.id}, this)"></td>

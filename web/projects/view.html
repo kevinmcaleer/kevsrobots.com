@@ -1300,9 +1300,18 @@ description: View project details
       // If a part_id + slug came back with the BOM row, link the part name to
       // its parts-catalog page. Backwards compatible: rows without part_slug
       // stay as plain text.
-      const nameCell = i.part_id && i.part_slug
+      // Part cover thumbnail (first photo) prefixed onto the name cell.
+      // cover_url is render-ready: external absolute, uploaded → relative
+      // /view path needing the API base.
+      const coverSrc = i.cover_url
+        ? (/^https?:\/\//.test(i.cover_url) ? i.cover_url : API + i.cover_url)
+        : '';
+      const coverThumb = coverSrc
+        ? `<img src="${esc(coverSrc)}" alt="" loading="lazy" style="width:24px;height:24px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:6px;background:#f1f3f5;">`
+        : '';
+      const nameCell = (i.part_id && i.part_slug
         ? `<a href="/parts/view.html?slug=${encodeURIComponent(i.part_slug)}">${esc(i.name)}</a>`
-        : esc(i.name);
+        : esc(i.name));
       const supplierUrl = i.supplier_url || i.part_primary_supplier_url;
       // Show bare native price up-front so the page renders without
       // waiting for the FX endpoint. The async enrichment below
@@ -1319,7 +1328,7 @@ description: View project details
         ? ' <i title="From supplier" class="fas fa-link text-muted small"></i>'
         : '';
       return `<tr>
-        <td>${nameCell}</td>
+        <td>${coverThumb}${nameCell}</td>
         <td>${i.quantity}</td>
         <td>${esc(i.unit)}</td>
         <td data-bom-price="${idx}" data-bom-ccy="${esc(ccyEffective || '')}" data-bom-cost="${cost == null ? '' : esc(cost)}">${priceHtml}${supplierIndicator}</td>
