@@ -63,7 +63,14 @@ from ..mass_deletion import (
     snapshot_from_inputs,
     snapshot_from_part,
 )
-from ..models import Part, PartAlias, PartRelation, PartRevision, PartSupplier
+from ..models import (
+    LibrarySymbol,
+    Part,
+    PartAlias,
+    PartRelation,
+    PartRevision,
+    PartSupplier,
+)
 from ..parts_lifecycle import compute_part_status
 from ..schemas import (
     PartCreate,
@@ -75,6 +82,7 @@ from ..schemas import (
     PartSearchResult,
     PartSupplierInput,
     PartSupplierResponse,
+    PartSymbolRef,
     PartUpdate,
 )
 
@@ -243,6 +251,42 @@ async def _load_family_parts(
     return list(parts)
 
 
+async def _resolve_symbol(
+    session: AsyncSession, symbol_id: Optional[int]
+) -> Optional[LibrarySymbol]:
+    """Look up a library symbol by id, or None when unset / missing.
+
+    A stale ``symbol_id`` (symbol deleted out from under the part) reads
+    back as no link rather than erroring — the FK is ON DELETE SET NULL so
+    this should be rare, but we degrade gracefully either way.
+    """
+    if not symbol_id:
+        return None
+    return await session.get(LibrarySymbol, symbol_id)
+
+
+def _symbol_ref(sym: Optional[LibrarySymbol]) -> Optional[PartSymbolRef]:
+    if sym is None:
+        return None
+    return PartSymbolRef(
+        id=sym.id,
+        name=sym.name,
+        category=sym.category or "Custom",
+        ref_des_prefix=sym.ref_des_prefix or "U",
+        current_revision_id=sym.current_revision_id,
+        symbol_data=sym.symbol_data,
+    )
+
+
+async def _validate_symbol_id(session: AsyncSession, symbol_id: int) -> None:
+    """Reject a link to a non-existent library symbol with a clean 400."""
+    if await session.get(LibrarySymbol, symbol_id) is None:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=f"Library symbol {symbol_id} not found",
+        )
+
+
 async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
     suppliers = await _load_suppliers(session, part.id)
     revs = (
@@ -286,6 +330,8 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         family_parts=[_to_related_ref(p) for p in family_parts],
         verified_at=part.verified_at,
         verified_signals=int(part.verified_signals or 0),
+        symbol_id=part.symbol_id,
+        symbol=_symbol_ref(await _resolve_symbol(session, part.symbol_id)),
     )
 
 
@@ -405,6 +451,8 @@ async def create_part(
     tags = [t.strip() for t in body.tags if t and t.strip()]
     category = (body.category or "").strip() or None
     family = (body.family or "").strip() or None
+    if body.symbol_id is not None:
+        await _validate_symbol_id(session, body.symbol_id)
     part = Part(
         slug=slug,
         name=body.name,
@@ -416,6 +464,7 @@ async def create_part(
         status="draft",
         category=category,
         family=family,
+        symbol_id=body.symbol_id,
         created_by=user,
         created_at=now,
         updated_at=now,
@@ -447,6 +496,7 @@ async def create_part(
         tags=list(tags),
         category=category,
         family=family,
+        symbol_id=part.symbol_id,
         suppliers_json=_suppliers_to_json(suppliers),
         created_at=now,
     )
@@ -543,6 +593,16 @@ async def update_part(
         stripped = body.family.strip()
         next_family = stripped or None
 
+    # Part↔symbol link: omitted → unchanged; present (incl. null) → set.
+    # ``model_fields_set`` is what lets ``null`` mean "clear" rather than
+    # being indistinguishable from the field's default.
+    if "symbol_id" in body.model_fields_set:
+        next_symbol_id = body.symbol_id
+        if next_symbol_id is not None and next_symbol_id != part.symbol_id:
+            await _validate_symbol_id(session, next_symbol_id)
+    else:
+        next_symbol_id = part.symbol_id
+
     current_suppliers = await _load_suppliers(session, part.id)
     current_supplier_json = _suppliers_to_json(current_suppliers)
     if body.suppliers is not None:
@@ -569,6 +629,7 @@ async def update_part(
         or list(next_tags) != list(part.tags or [])
         or next_category != part.category
         or next_family != part.family
+        or next_symbol_id != part.symbol_id
         or _supplier_signature(next_supplier_json) != _supplier_signature(current_supplier_json)
     )
     if not changed:
@@ -624,6 +685,7 @@ async def update_part(
         tags=list(next_tags),
         category=next_category,
         family=next_family,
+        symbol_id=next_symbol_id,
         suppliers_json=next_supplier_json,
         created_at=now,
     )
@@ -639,6 +701,7 @@ async def update_part(
     part.tags = list(next_tags)
     part.category = next_category
     part.family = next_family
+    part.symbol_id = next_symbol_id
     part.current_revision_id = rev.id
     part.updated_at = now
 
@@ -732,6 +795,7 @@ async def get_revision(
         suppliers=suppliers,
         category=rev.category,
         family=rev.family,
+        symbol_id=rev.symbol_id,
     )
 
 
@@ -790,6 +854,7 @@ async def restore_revision(
         tags=list(source.tags or []),
         category=source.category,
         family=source.family,
+        symbol_id=source.symbol_id,
         suppliers_json=suppliers_json,
         created_at=now,
     )
@@ -804,6 +869,7 @@ async def restore_revision(
     part.tags = list(source.tags or [])
     part.category = source.category
     part.family = source.family
+    part.symbol_id = source.symbol_id
     part.current_revision_id = new_rev.id
     part.updated_at = now
 

@@ -22,6 +22,7 @@ from .db import (
     add_library_symbol_fork_columns_if_missing,
     add_part_category_family_if_missing,
     add_part_status_columns_if_missing,
+    add_part_symbol_id_if_missing,
     add_project_content_mode_if_missing,
     add_project_featured_columns_if_missing,
     add_project_file_description_if_missing,
@@ -141,6 +142,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await add_library_symbol_fork_columns_if_missing()
     await backfill_library_symbol_revisions()
     await backfill_part_revisions_if_missing()
+    # Part↔symbol link (part-hub UX): adds parts.symbol_id +
+    # part_revisions.symbol_id. Runs after create_all (which builds
+    # library_symbols) so the FK target always exists. Idempotent.
+    await add_part_symbol_id_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

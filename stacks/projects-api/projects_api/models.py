@@ -564,6 +564,18 @@ class Part(Base):
         ForeignKey("part_revisions.id", ondelete="SET NULL", use_alter=True, name="fk_parts_current_revision"),
         nullable=True,
     )
+    # Part↔symbol link (part-hub UX): optional pointer to a curated
+    # library-symbol LINEAGE (``library_symbols.id``), NOT a pinned
+    # revision — diagram-level revision pinning is a Phase-3 concern.
+    # Many parts may share one symbol (e.g. a generic resistor symbol),
+    # so the FK lives on the part, not the symbol. SET NULL on symbol
+    # delete so the part survives; ``use_alter`` because library_symbols
+    # is defined later in this module.
+    symbol_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("library_symbols.id", ondelete="SET NULL", use_alter=True,
+                   name="fk_parts_symbol_id"),
+        nullable=True, index=True,
+    )
     usage_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
 
 
@@ -935,6 +947,14 @@ class PartRevision(Base):
     # Suppliers are denormalised into the revision row as JSON so we don't
     # need a sibling table per revision. Each entry: {name, url}.
     suppliers_json: Mapped[Optional[list]] = mapped_column(JsonType)
+    # Snapshot the part↔symbol link so rolling back a revision also
+    # restores the symbol association. Null on revisions pre-dating the
+    # link (and on parts with no symbol).
+    symbol_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("library_symbols.id", ondelete="SET NULL", use_alter=True,
+                   name="fk_part_revisions_symbol_id"),
+        nullable=True,
+    )
 
 
 # --- User flags (issue #136 — mass-deletion auto-disable) -----------------

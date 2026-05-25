@@ -544,6 +544,63 @@ async def add_bom_part_id_if_missing() -> None:
             ))
 
 
+async def add_part_symbol_id_if_missing() -> None:
+    """Additive migration for the part↔symbol link (part-hub UX).
+
+    Adds ``symbol_id`` (FK -> library_symbols.id ON DELETE SET NULL) to
+    both ``parts`` and ``part_revisions`` when missing. Mirrors the
+    ``add_bom_part_id_if_missing`` pattern: add the column first (so the
+    migration succeeds even if library_symbols hasn't been created yet),
+    then add the FK only if the target table exists. Idempotent; runs on
+    every startup. Postgres-only — SQLite tests build the column via
+    create_all.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        lib_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'library_symbols'"
+        ))
+        lib_exists = lib_check.first() is not None
+
+        for table, fk_name, with_index in (
+            ("parts", "fk_parts_symbol_id", True),
+            ("part_revisions", "fk_part_revisions_symbol_id", False),
+        ):
+            table_check = await conn.execute(text(
+                "SELECT 1 FROM information_schema.tables "
+                "WHERE table_schema = current_schema() AND table_name = :t"
+            ), {"t": table})
+            if table_check.first() is None:
+                continue
+
+            existing = await conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = current_schema() AND table_name = :t "
+                "AND column_name = 'symbol_id'"
+            ), {"t": table})
+            if existing.first() is not None:
+                continue
+
+            logger.warning("Adding %s.symbol_id column (part↔symbol link)", table)
+            await conn.execute(text(
+                'ALTER TABLE "%s" ADD COLUMN "symbol_id" INTEGER' % table
+            ))
+            if lib_exists:
+                await conn.execute(text(
+                    'ALTER TABLE "%s" ADD CONSTRAINT "%s" FOREIGN KEY ("symbol_id") '
+                    'REFERENCES "library_symbols" (id) ON DELETE SET NULL'
+                    % (table, fk_name)
+                ))
+            if with_index:
+                await conn.execute(text(
+                    'CREATE INDEX IF NOT EXISTS "ix_%s_symbol_id" '
+                    'ON "%s" ("symbol_id")' % (table, table)
+                ))
+
+
 async def add_supplier_country_if_missing() -> None:
     """Additive migration for issue #149 (supplier country tags).
 

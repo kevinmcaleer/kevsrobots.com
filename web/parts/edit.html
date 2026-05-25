@@ -73,6 +73,14 @@ description: Edit a part in the catalog
           <input type="url" id="part-image-url" class="form-control" placeholder="https://...">
         </div>
 
+        <div class="mb-3">
+          <label for="part-symbol-select" class="form-label">Schematic symbol</label>
+          <select id="part-symbol-select" class="form-select">
+            <option value="">— No symbol —</option>
+          </select>
+          <div class="form-text">Link a library symbol so this part can be dropped straight into a schematic. Design new ones in the <a href="/projects/symbol/edit.html" target="_blank" rel="noopener">Symbol Designer</a>.</div>
+        </div>
+
         <div id="related-parts-section" class="mb-3 d-none">
           <label class="form-label">Related parts</label>
           <div class="form-text mb-2">Parts that are commonly used alongside this one. Save the part first to start adding links.</div>
@@ -303,6 +311,34 @@ description: Edit a part in the catalog
     } catch (_) {}
   }
 
+  // --- Symbol picker (part↔symbol link) ---
+  // The library is a bounded, curated list, so a single <select> grouped
+  // by category is plenty — no typeahead needed. Options are loaded once
+  // at boot; loadPart() sets the selected value after they're present.
+  async function loadSymbols() {
+    try {
+      const resp = await fetch(API + '/api/library/symbols');
+      if (!resp.ok) return;
+      const symbols = await resp.json();
+      const sel = document.getElementById('part-symbol-select');
+      // Group by category so long lists stay scannable.
+      const byCat = {};
+      symbols.forEach(s => { (byCat[s.category || 'Custom'] ||= []).push(s); });
+      Object.keys(byCat).sort().forEach(cat => {
+        const group = document.createElement('optgroup');
+        group.label = cat;
+        byCat[cat].sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+          .forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = String(s.id);
+            opt.textContent = s.name + (s.ref_des_prefix ? ' (' + s.ref_des_prefix + ')' : '');
+            group.appendChild(opt);
+          });
+        sel.appendChild(group);
+      });
+    } catch (_) {}
+  }
+
   // --- Related parts (issue #135) ---
   const relatedListEl = document.getElementById('related-parts-list');
   const relatedSearchInput = document.getElementById('related-search-input');
@@ -491,6 +527,7 @@ description: Edit a part in the catalog
       document.getElementById('part-image-url').value = currentPart.image_url || '';
       document.getElementById('part-category').value = currentPart.category || '';
       document.getElementById('part-family').value = currentPart.family || '';
+      document.getElementById('part-symbol-select').value = currentPart.symbol_id ? String(currentPart.symbol_id) : '';
       renderTags(currentPart.tags || []);
       renderSuppliers(currentPart.suppliers || []);
 
@@ -527,6 +564,9 @@ description: Edit a part in the catalog
       suppliers: getSuppliers(),
       description_md: easyMDE ? easyMDE.value() : '',
       change_summary: document.getElementById('part-change-summary').value.trim(),
+      // Part↔symbol link. Always sent (so it lands in model_fields_set on the
+      // API): a value links/relinks, empty string → null clears it.
+      symbol_id: (document.getElementById('part-symbol-select').value || '') ? parseInt(document.getElementById('part-symbol-select').value, 10) : null,
     };
   }
 
@@ -645,7 +685,7 @@ description: Edit a part in the catalog
     if (!ok) return;
     // Issue #135: load category dropdown + family autocomplete first so they
     // are populated by the time loadPart() sets their selected value.
-    await Promise.all([loadCategories(), loadFamilies()]);
+    await Promise.all([loadCategories(), loadFamilies(), loadSymbols()]);
     await loadPart();
   })();
 })();

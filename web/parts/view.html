@@ -125,14 +125,49 @@ description: View a part in the catalog
             </div>
           </div>
 
-          <!-- ===== Symbol (stub until part↔symbol link exists) ===== -->
+          <!-- ===== Symbol ===== -->
           <div class="tab-pane fade" id="tab-symbol" role="tabpanel"
                aria-labelledby="tab-symbol-btn">
-            <div class="text-center text-muted py-5">
+            <!-- Linked: show the symbol card. Populated by JS from part.symbol. -->
+            <div id="part-symbol-linked" class="d-none">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-start gap-3 flex-wrap">
+                    <div class="part-symbol-preview border rounded d-flex align-items-center justify-content-center text-secondary"
+                         style="width:96px;height:96px;flex:0 0 auto;">
+                      <i class="fas fa-microchip fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h5 class="mb-1" id="part-symbol-name"></h5>
+                      <div class="small text-muted mb-2">
+                        <span class="badge bg-light text-dark" id="part-symbol-category"></span>
+                        <span class="badge bg-light text-dark">Ref <span id="part-symbol-ref"></span></span>
+                        <span class="badge bg-light text-dark d-none" id="part-symbol-version"></span>
+                      </div>
+                      <p class="small text-muted mb-0">This symbol can be dropped straight into a
+                        schematic for this part.</p>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-wrap gap-2 mt-3" id="part-symbol-actions">
+                    <a id="part-symbol-open" href="/projects/symbol/edit.html"
+                       class="btn btn-sm btn-outline-primary">
+                      <i class="fas fa-pen-ruler me-1"></i> Open Symbol Designer
+                    </a>
+                    <a id="part-symbol-change" href="#" class="btn btn-sm btn-outline-secondary d-none">
+                      <i class="fas fa-rotate me-1"></i> Change / unlink
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Not linked: empty state + link CTA (revealed for logged-in users). -->
+            <div id="part-symbol-empty" class="text-center text-muted py-5 d-none">
               <i class="fas fa-microchip fa-2x mb-2"></i>
-              <p class="mb-1">This part's schematic symbol will live here.</p>
-              <p class="small mb-0">Soon you'll be able to link or design a symbol so this
-                part can be dropped straight into a schematic.</p>
+              <p class="mb-1">No schematic symbol linked yet.</p>
+              <p class="small mb-3">Link a symbol so this part can be dropped straight into a schematic.</p>
+              <a id="part-symbol-link" href="#" class="btn btn-sm btn-primary d-none">
+                <i class="fas fa-link me-1"></i> Link a symbol
+              </a>
             </div>
           </div>
 
@@ -529,6 +564,23 @@ description: View a part in the catalog
       document.getElementById('part-revisions-section').classList.add('d-none');
     }
 
+    // --- Symbol tab: render the linked library symbol, or the empty state.
+    // Visible to everyone; the link/change/edit CTAs are revealed only for
+    // logged-in users in the auth block below.
+    if (part.symbol) {
+      document.getElementById('part-symbol-linked').classList.remove('d-none');
+      document.getElementById('part-symbol-name').textContent = part.symbol.name || 'Symbol';
+      document.getElementById('part-symbol-category').textContent = part.symbol.category || 'Custom';
+      document.getElementById('part-symbol-ref').textContent = part.symbol.ref_des_prefix || 'U';
+      if (part.symbol.current_revision_id) {
+        const ver = document.getElementById('part-symbol-version');
+        ver.textContent = 'rev #' + part.symbol.current_revision_id;
+        ver.classList.remove('d-none');
+      }
+    } else {
+      document.getElementById('part-symbol-empty').classList.remove('d-none');
+    }
+
     // Show edit / history buttons if the user is logged in. The API enforces
     // the 14-day account-age rule when they actually try to save, so we keep
     // the buttons optimistically visible to logged-in users.
@@ -548,10 +600,26 @@ description: View a part in the catalog
         const improvePhoto = document.getElementById('part-improve-photo');
         improvePhoto.href = editUrl;
         improvePhoto.classList.remove('d-none');
-        document.getElementById('part-improve-symbol').classList.remove('d-none');
         const photosAdd = document.getElementById('part-photos-add');
         photosAdd.href = editUrl;
         photosAdd.classList.remove('d-none');
+        // Edit-symbol CTA: jump to the Symbol tab (linking/unlinking itself
+        // happens in the edit form, reachable from there).
+        const improveSymbol = document.getElementById('part-improve-symbol');
+        improveSymbol.disabled = false;
+        improveSymbol.removeAttribute('title');
+        improveSymbol.classList.remove('d-none');
+        improveSymbol.addEventListener('click', () => {
+          document.getElementById('tab-symbol-btn').click();
+        });
+        // Symbol tab CTAs: link (when none) / change (when linked) both go
+        // to the edit form where the picker lives.
+        const symLink = document.getElementById('part-symbol-link');
+        symLink.href = editUrl;
+        symLink.classList.remove('d-none');
+        const symChange = document.getElementById('part-symbol-change');
+        symChange.href = editUrl;
+        symChange.classList.remove('d-none');
         // Issue #123: show report + propose-merge actions to logged-in users.
         // The API enforces the 14-day gate on merge proposals; reports work
         // for any logged-in user.

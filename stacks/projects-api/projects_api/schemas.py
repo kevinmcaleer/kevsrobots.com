@@ -839,6 +839,8 @@ class PartCreate(BaseModel):
     # Issue #135: optional taxonomy + family fields at create time.
     category: Optional[str] = Field(None, max_length=60)
     family: Optional[str] = Field(None, max_length=80)
+    # Part-hub: optionally link a curated library symbol at create time.
+    symbol_id: Optional[int] = None
 
 
 class PartUpdate(BaseModel):
@@ -855,6 +857,11 @@ class PartUpdate(BaseModel):
     # other Optional fields above).
     category: Optional[str] = Field(None, max_length=60)
     family: Optional[str] = Field(None, max_length=80)
+    # Part-hub: link/unlink a library symbol. Distinguished by presence in
+    # ``model_fields_set`` — omit to leave unchanged, send ``null`` to
+    # clear the link, send an id to (re)link. (None as the default can't
+    # mean "clear" on its own, hence the fields-set check in the router.)
+    symbol_id: Optional[int] = None
 
 
 class PartSearchResult(BaseModel):
@@ -895,6 +902,8 @@ class PartRevisionDetail(BaseModel):
     suppliers: list[PartSupplierInput] = Field(default_factory=list)
     category: Optional[str] = None
     family: Optional[str] = None
+    # Part-hub: the symbol link as it stood at this revision (for rollback).
+    symbol_id: Optional[int] = None
 
 
 class PartRelatedRef(BaseModel):
@@ -910,6 +919,23 @@ class PartRelatedRef(BaseModel):
     status: str
     category: Optional[str] = None
     family: Optional[str] = None
+
+
+class PartSymbolRef(BaseModel):
+    """Minimal reference to a part's linked library symbol (part-hub).
+
+    Carries just enough for the Symbol tab to render a label + deep-link
+    into the symbol designer without a second roundtrip. ``current_revision_id``
+    lets the UI show which version is current (full diagram-level pinning
+    is a later phase). ``symbol_data`` is the JSON the canvas renders.
+    """
+
+    id: int
+    name: str
+    category: str
+    ref_des_prefix: str
+    current_revision_id: Optional[int] = None
+    symbol_data: Optional[str] = None
 
 
 class PartRelationCreate(BaseModel):
@@ -1084,6 +1110,10 @@ class PartDetail(BaseModel):
     # Issue #122 Phase 2: auto-verify lifecycle fields.
     verified_at: Optional[datetime] = None
     verified_signals: int = 0
+    # Part-hub: linked library symbol (null when none). ``symbol_id`` is the
+    # raw FK; ``symbol`` is the resolved summary for rendering the Symbol tab.
+    symbol_id: Optional[int] = None
+    symbol: Optional[PartSymbolRef] = None
 
 
 # --- Parts talk pages (issue #122 Phase 2) -------------------------------
