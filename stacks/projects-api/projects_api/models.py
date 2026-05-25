@@ -1359,6 +1359,19 @@ class LibrarySymbol(Base):
                    use_alter=True, name="fk_library_symbols_forked_rev"),
         nullable=True,
     )
+    # Power model: marks a symbol as a power port / net flag (GND, V+,
+    # +5V, +3V3, VBUS) rather than a buyable component. Power ports are
+    # connect-by-name net references — every GND port on a sheet is the
+    # same net — so they must NEVER generate a BOM line. The (paused)
+    # BOM-from-schematic derivation skips any instance whose symbol has
+    # this set. A *power source* (battery, USB bank, regulator) is a
+    # normal component symbol with is_power_port=False and a linked part.
+    # Treated as an immutable classification — set at create/seed time,
+    # not part of the editable wiki content, so it isn't snapshotted into
+    # LibrarySymbolRevision.
+    is_power_port: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0", index=True
+    )
 
 
 class LibrarySymbolRevision(Base):

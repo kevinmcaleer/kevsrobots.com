@@ -1221,6 +1221,39 @@ async def add_library_symbol_current_revision_if_missing() -> None:
             ))
 
 
+async def add_library_symbol_power_port_if_missing() -> None:
+    """Add the ``is_power_port`` flag to ``library_symbols`` on legacy
+    Postgres deployments. No-op on SQLite (create_all includes it).
+    Idempotent — probes information_schema. Defaults to false so existing
+    symbols stay BOM-eligible components.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() "
+            "AND table_name = 'library_symbols'"
+        ))
+        if table_check.first() is None:
+            return
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() "
+            "AND table_name = 'library_symbols' "
+            "AND column_name = 'is_power_port'"
+        ))
+        if existing.first() is None:
+            logger.warning(
+                "Adding library_symbols.is_power_port column (power model)"
+            )
+            await conn.execute(text(
+                'ALTER TABLE "library_symbols" ADD COLUMN "is_power_port" '
+                'BOOLEAN NOT NULL DEFAULT FALSE'
+            ))
+
+
 async def add_library_symbol_fork_columns_if_missing() -> None:
     """Add the Phase 2 fork-provenance columns to ``library_symbols``
     (``forked_from_symbol_id`` / ``forked_from_revision_id``) on legacy

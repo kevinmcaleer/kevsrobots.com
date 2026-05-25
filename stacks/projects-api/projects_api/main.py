@@ -20,6 +20,7 @@ from .db import (
     add_instruction_step_type_if_missing,
     add_library_symbol_current_revision_if_missing,
     add_library_symbol_fork_columns_if_missing,
+    add_library_symbol_power_port_if_missing,
     add_part_category_family_if_missing,
     add_part_status_columns_if_missing,
     add_part_symbol_id_if_missing,
@@ -141,6 +142,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # ALTER first so the column exists before the backfill writes it.
     await add_library_symbol_current_revision_if_missing()
     await add_library_symbol_fork_columns_if_missing()
+    await add_library_symbol_power_port_if_missing()
     await backfill_library_symbol_revisions()
     await backfill_part_revisions_if_missing()
     # Part↔symbol link (part-hub UX): adds parts.symbol_id +

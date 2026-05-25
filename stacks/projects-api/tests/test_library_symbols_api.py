@@ -115,3 +115,38 @@ async def test_get_specific_revision(client):
     full = (await client.get(
         f"/api/library/symbols/{sid}/revisions/{oldest['id']}")).json()
     assert full["symbol_data"] == '{"v":1}'
+
+
+# --- Power model: is_power_port flag -----------------------------------
+
+
+@pytest.mark.asyncio
+async def test_create_defaults_to_component(client):
+    """A normal symbol is BOM-eligible (is_power_port False by default)."""
+    sym = await _create(client, name="Resistor", category="Passive", ref="R")
+    assert sym["is_power_port"] is False
+
+
+@pytest.mark.asyncio
+async def test_create_power_port(client):
+    resp = await client.post(
+        "/api/library/symbols",
+        json={"name": "GND", "category": "Power", "ref_des_prefix": "GND",
+              "symbol_data": "{}", "is_power_port": True},
+        headers=ADMIN,
+    )
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["is_power_port"] is True
+
+
+@pytest.mark.asyncio
+async def test_seed_flags_power_ports(client):
+    resp = await client.post("/api/library/symbols/seed-builtins", headers=ADMIN)
+    assert resp.status_code in (200, 201), resp.text
+    by_name = {s["name"]: s for s in resp.json()}
+    # Rails / net flags are power ports — never a BOM line.
+    for rail in ("GND", "V+ rail", "+5V", "+3V3", "VBUS"):
+        assert by_name[rail]["is_power_port"] is True, rail
+    # A buyable component is not.
+    assert by_name["Resistor"]["is_power_port"] is False
+    assert by_name["Raspberry Pi Pico"]["is_power_port"] is False

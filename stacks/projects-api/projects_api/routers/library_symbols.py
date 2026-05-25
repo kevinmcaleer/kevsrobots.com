@@ -140,7 +140,21 @@ _BUILTIN_DEFINITIONS = [
     ("V+ rail",           "Power",     "V",   48,  32,  [
         ("1", "V+", "bottom", 24),
     ]),
+    ("+5V",               "Power",     "V",   48,  32,  [
+        ("1", "+5V", "bottom", 24),
+    ]),
+    ("+3V3",              "Power",     "V",   48,  32,  [
+        ("1", "+3V3", "bottom", 24),
+    ]),
+    ("VBUS",              "Power",     "V",   48,  32,  [
+        ("1", "VBUS", "bottom", 24),
+    ]),
 ]
+
+# Power model: built-in symbols that are net flags / rails (connect-by-name,
+# never a BOM line) rather than buyable components. Matched by name in the
+# seed so the positional ``_BUILTIN_DEFINITIONS`` tuples stay tidy.
+_POWER_PORT_NAMES: set[str] = {"GND", "V+ rail", "+5V", "+3V3", "VBUS"}
 
 
 def _builtin_symbol_data_json(w: int, h: int, pins_spec) -> str:
@@ -170,6 +184,7 @@ def _to_response(sym: LibrarySymbol) -> LibrarySymbolResponse:
         current_revision_id=sym.current_revision_id,
         forked_from_symbol_id=sym.forked_from_symbol_id,
         forked_from_revision_id=sym.forked_from_revision_id,
+        is_power_port=bool(sym.is_power_port),
     )
 
 
@@ -238,6 +253,7 @@ async def create_library_symbol(
         ref_des_prefix=(body.ref_des_prefix or "U"),
         description=body.description,
         symbol_data=body.symbol_data,
+        is_power_port=body.is_power_port,
         created_by_username=user,
         updated_by_username=user,
     )
@@ -411,6 +427,7 @@ async def seed_builtin_symbols(
             ref_des_prefix=refdes,
             description=f"Built-in {name} symbol",
             symbol_data=_builtin_symbol_data_json(w, h, pins_spec),
+            is_power_port=name in _POWER_PORT_NAMES,
             created_by_username=user,
             updated_by_username=user,
         )

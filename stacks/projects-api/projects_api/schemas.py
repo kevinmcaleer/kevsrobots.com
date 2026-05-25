@@ -495,6 +495,9 @@ class LibrarySymbolCreate(BaseModel):
     ref_des_prefix: Optional[str] = Field(None, max_length=8)
     description: Optional[str] = None
     symbol_data: Optional[str] = None
+    # Power model: a power port / net flag (GND, V+) rather than a buyable
+    # component. Power ports never generate a BOM line.
+    is_power_port: bool = False
 
 
 class LibrarySymbolUpdate(BaseModel):
@@ -551,6 +554,9 @@ class LibrarySymbolResponse(BaseModel):
     current_revision_id: Optional[int] = None
     forked_from_symbol_id: Optional[int] = None
     forked_from_revision_id: Optional[int] = None
+    # Power model: true for net-flag symbols (GND, V+, +5V…). Consumers
+    # (BOM derivation) skip these — they never produce a BOM line.
+    is_power_port: bool = False
 
 
 class LibrarySymbolRevisionSummary(BaseModel):
