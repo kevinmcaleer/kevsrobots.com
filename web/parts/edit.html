@@ -161,6 +161,13 @@ description: Edit a part in the catalog
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
+  // Local dev hits the prod API over HTTP, where the auth cookie can't be
+  // set — so we offer a paste-a-token box (same mechanism as the project
+  // editor). The token is shared via localStorage on this origin, so once
+  // it's set here OR on /projects/editor.html it works on both.
+  const IS_LOCAL = location.hostname === 'localhost'
+    || location.hostname === '0.0.0.0'
+    || location.hostname === 'local.kevsrobots.com';
   const params = new URLSearchParams(window.location.search);
   const slug = params.get('slug');
   const isNew = params.get('new') === '1' || !slug;
@@ -604,19 +611,34 @@ description: Edit a part in the catalog
   }
 
   // --- Auth check ---
+  function showDevLogin() {
+    document.getElementById('auth-required').innerHTML = `
+      <h5>Local Dev Login</h5>
+      <p class="small text-muted">Secure cookies don't work over HTTP. Paste a token signed with the <strong>production</strong> projects-api secret (the page talks to the prod API even locally).</p>
+      <p class="small text-muted mb-1"><strong>Long-lived token (30 days, survives Jekyll rebuilds):</strong><br>
+        <code>docker exec chatter-chatter-1 python -c "from datetime import timedelta; from app.utils import create_access_token; print(create_access_token({'sub': 'kev'}, expires_delta=timedelta(days=30)))"</code>
+      </p>
+      <div class="input-group input-group-sm mb-2" style="max-width:640px">
+        <input type="text" id="dev-token-input" class="form-control" placeholder="Paste JWT token...">
+        <button class="btn btn-primary" type="button" onclick="(function(){ var t=document.getElementById('dev-token-input').value.trim(); if(t){localStorage.setItem('dev_jwt_token',t);location.reload();} })()">Set Token</button>
+      </div>
+      <small class="text-muted">Saved in localStorage for this origin — shared with <a href="/projects/editor.html">/projects/editor.html</a>. If it still 401s, the token is expired or signed with the wrong secret.</small>`;
+    show(document.getElementById('auth-required'));
+  }
+
   async function checkAuth() {
+    const fail = () => {
+      hide(document.getElementById('loading'));
+      if (IS_LOCAL) showDevLogin();
+      else show(document.getElementById('auth-required'));
+      return false;
+    };
     try {
       const resp = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
-      if (!resp.ok) {
-        hide(document.getElementById('loading'));
-        show(document.getElementById('auth-required'));
-        return false;
-      }
+      if (!resp.ok) return fail();
       return true;
     } catch (e) {
-      hide(document.getElementById('loading'));
-      show(document.getElementById('auth-required'));
-      return false;
+      return fail();
     }
   }
 
