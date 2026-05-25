@@ -27,15 +27,47 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import require_admin
+from ..auth import get_optional_user, require_admin, require_terms_accepted
+from ..config import get_settings
 from ..db import get_session
-from ..models import LIBRARY_SYMBOL_CATEGORIES, LibrarySymbol, ProjectSymbol
+from ..models import (
+    LIBRARY_SYMBOL_CATEGORIES,
+    LibrarySymbol,
+    LibrarySymbolRevision,
+    ProjectSymbol,
+)
 from ..schemas import (
     LibrarySymbolCreate,
     LibrarySymbolPromoteRequest,
     LibrarySymbolResponse,
+    LibrarySymbolRevisionResponse,
+    LibrarySymbolRevisionSummary,
     LibrarySymbolUpdate,
 )
+
+
+def _is_admin(user: str) -> bool:
+    return user in get_settings().admin_usernames_list
+
+
+async def _write_revision(session, sym, author, change_summary):
+    """Snapshot the symbol's CURRENT (already-mutated) field values as a
+    new immutable revision and point current_revision_id at it. Caller
+    must have applied the edits to ``sym`` first."""
+    rev = LibrarySymbolRevision(
+        symbol_id=sym.id,
+        author=author,
+        change_summary=change_summary or "Updated",
+        name=sym.name,
+        category=sym.category or "Custom",
+        ref_des_prefix=sym.ref_des_prefix or "U",
+        description=sym.description,
+        symbol_data=sym.symbol_data,
+    )
+    session.add(rev)
+    await session.flush()
+    sym.current_revision_id = rev.id
+    return rev
 
 
 # Canonical geometry for the schematic editor's built-in symbol set.
@@ -135,21 +167,39 @@ def _to_response(sym: LibrarySymbol) -> LibrarySymbolResponse:
         updated_by_username=sym.updated_by_username,
         created_at=sym.created_at,
         updated_at=sym.updated_at,
+        current_revision_id=sym.current_revision_id,
+        forked_from_symbol_id=sym.forked_from_symbol_id,
+        forked_from_revision_id=sym.forked_from_revision_id,
     )
 
 
 @router.get("", response_model=list[LibrarySymbolResponse])
 async def list_library_symbols(
     category: str | None = Query(default=None, max_length=32),
+    mine: bool = Query(default=False),
     session: AsyncSession = Depends(get_session),
+    user: str | None = Depends(get_optional_user),
 ) -> list[LibrarySymbolResponse]:
-    """Public list. ``?category=Sensor`` filters; omitted = all.
+    """List library symbols. ``?category=Sensor`` filters by category.
 
-    Ordered by category then name so the frontend can render a stable
-    grouping without an extra sort pass."""
+    Forks are excluded from the curated global list by default so one
+    user's tweaks don't clutter everyone's library. ``?mine=1`` (for a
+    logged-in user) additionally includes that user's own forks, so the
+    schematic editor can offer a user their personal variants.
+
+    Ordered by category then name for stable grouping."""
     stmt = select(LibrarySymbol)
     if category:
         stmt = stmt.where(LibrarySymbol.category == category)
+    # Curated set = original lineages (not forks). Optionally union the
+    # caller's own forks.
+    if mine and user:
+        stmt = stmt.where(
+            (LibrarySymbol.forked_from_symbol_id.is_(None))
+            | (LibrarySymbol.created_by_username == user)
+        )
+    else:
+        stmt = stmt.where(LibrarySymbol.forked_from_symbol_id.is_(None))
     stmt = stmt.order_by(LibrarySymbol.category.asc(), LibrarySymbol.name.asc())
     rows = (await session.scalars(stmt)).all()
     return [_to_response(r) for r in rows]
@@ -179,6 +229,9 @@ async def create_library_symbol(
     user: str = Depends(require_admin),
     session: AsyncSession = Depends(get_session),
 ) -> LibrarySymbolResponse:
+    """Create a new curated library symbol (admin only — the global
+    library stays curated; ordinary users make project symbols or fork
+    an existing library symbol via PUT). Writes revision 1 inline."""
     sym = LibrarySymbol(
         name=body.name,
         category=body.category or "Custom",
@@ -189,6 +242,8 @@ async def create_library_symbol(
         updated_by_username=user,
     )
     session.add(sym)
+    await session.flush()  # assign sym.id
+    await _write_revision(session, sym, user, "Initial version")
     await session.commit()
     await session.refresh(sym)
     return _to_response(sym)
@@ -198,21 +253,112 @@ async def create_library_symbol(
 async def update_library_symbol(
     symbol_id: int,
     body: LibrarySymbolUpdate,
-    user: str = Depends(require_admin),
+    user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> LibrarySymbolResponse:
+    """Edit a library symbol (any logged-in user).
+
+    - **Owner or admin** → appends a new immutable revision to this
+      lineage and advances ``current_revision_id``. The edit is what
+      everyone (unpinned) now sees.
+    - **Anyone else** → FORKS: creates a new lineage owned by the
+      editor with the edits applied as its revision 1, recording
+      ``forked_from_*`` provenance. The original is untouched.
+
+    The client detects a fork by comparing the requested id to the
+    returned ``id`` (they differ on a fork).
+    """
     sym = await session.get(LibrarySymbol, symbol_id)
     if sym is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Library symbol not found")
-    # exclude_unset so an omitted field stays untouched (matches the
-    # project-symbol PUT semantics).
+
     data = body.model_dump(exclude_unset=True)
-    for field, value in data.items():
-        setattr(sym, field, value)
-    sym.updated_by_username = user
+    change_summary = data.pop("change_summary", None)
+    owner = sym.created_by_username
+    may_append = (owner == user) or _is_admin(user)
+
+    if may_append:
+        # Append a revision to this lineage.
+        for field, value in data.items():
+            setattr(sym, field, value)
+        sym.updated_by_username = user
+        await _write_revision(session, sym, user, change_summary or "Updated")
+        await session.commit()
+        await session.refresh(sym)
+        return _to_response(sym)
+
+    # Fork into a new lineage owned by the editor. Start from the
+    # source's current field values, apply the edits on top.
+    fork = LibrarySymbol(
+        name=data.get("name", sym.name),
+        category=data.get("category", sym.category) or "Custom",
+        ref_des_prefix=data.get("ref_des_prefix", sym.ref_des_prefix) or "U",
+        description=data.get("description", sym.description),
+        symbol_data=data.get("symbol_data", sym.symbol_data),
+        created_by_username=user,
+        updated_by_username=user,
+        forked_from_symbol_id=sym.id,
+        forked_from_revision_id=sym.current_revision_id,
+    )
+    session.add(fork)
+    await session.flush()
+    await _write_revision(
+        session, fork, user,
+        change_summary or ("Forked from #%d" % sym.id),
+    )
     await session.commit()
-    await session.refresh(sym)
-    return _to_response(sym)
+    await session.refresh(fork)
+    return _to_response(fork)
+
+
+@router.get(
+    "/{symbol_id}/revisions",
+    response_model=list[LibrarySymbolRevisionSummary],
+)
+async def list_library_symbol_revisions(
+    symbol_id: int,
+    session: AsyncSession = Depends(get_session),
+) -> list[LibrarySymbolRevisionSummary]:
+    """Public revision history for a symbol, newest first. ``is_current``
+    flags the one ``current_revision_id`` points at."""
+    sym = await session.get(LibrarySymbol, symbol_id)
+    if sym is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Library symbol not found")
+    revs = (await session.scalars(
+        select(LibrarySymbolRevision)
+        .where(LibrarySymbolRevision.symbol_id == symbol_id)
+        .order_by(LibrarySymbolRevision.id.desc())
+    )).all()
+    return [
+        LibrarySymbolRevisionSummary(
+            id=r.id, symbol_id=r.symbol_id, author=r.author,
+            change_summary=r.change_summary, created_at=r.created_at,
+            is_current=(r.id == sym.current_revision_id),
+        )
+        for r in revs
+    ]
+
+
+@router.get(
+    "/{symbol_id}/revisions/{revision_id}",
+    response_model=LibrarySymbolRevisionResponse,
+)
+async def get_library_symbol_revision(
+    symbol_id: int,
+    revision_id: int,
+    session: AsyncSession = Depends(get_session),
+) -> LibrarySymbolRevisionResponse:
+    """Full immutable snapshot of one revision — what a diagram pinned
+    to this revision id renders (Phase 3)."""
+    rev = await session.get(LibrarySymbolRevision, revision_id)
+    if rev is None or rev.symbol_id != symbol_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Revision not found")
+    return LibrarySymbolRevisionResponse(
+        id=rev.id, symbol_id=rev.symbol_id, author=rev.author,
+        change_summary=rev.change_summary, created_at=rev.created_at,
+        name=rev.name, category=rev.category, ref_des_prefix=rev.ref_des_prefix,
+        description=rev.description, symbol_data=rev.symbol_data,
+    )
 
 
 @router.delete("/{symbol_id}", status_code=204)
@@ -271,6 +417,9 @@ async def seed_builtin_symbols(
         session.add(sym)
         created.append(sym)
     if created:
+        await session.flush()
+        for sym in created:
+            await _write_revision(session, sym, user, "Initial version (seed)")
         await session.commit()
         for sym in created:
             await session.refresh(sym)
@@ -317,6 +466,8 @@ async def promote_from_project(
         updated_by_username=user,
     )
     session.add(sym)
+    await session.flush()
+    await _write_revision(session, sym, user, "Promoted from project symbol")
     await session.commit()
     await session.refresh(sym)
     return _to_response(sym)

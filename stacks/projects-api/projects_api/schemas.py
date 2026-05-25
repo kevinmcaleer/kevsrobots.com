@@ -498,13 +498,19 @@ class LibrarySymbolCreate(BaseModel):
 
 
 class LibrarySymbolUpdate(BaseModel):
-    """Partial update — omitted fields untouched."""
+    """Partial update — omitted fields untouched.
+
+    Phase 2: every accepted update writes a new immutable revision.
+    Owner/admin → appends to the symbol's lineage; any other logged-in
+    user → forks a new lineage they own. ``change_summary`` labels the
+    revision (defaults to a generic note if omitted)."""
 
     name: Optional[str] = Field(None, min_length=1, max_length=200)
     category: Optional[LibrarySymbolCategory] = None
     ref_des_prefix: Optional[str] = Field(None, max_length=8)
     description: Optional[str] = None
     symbol_data: Optional[str] = None
+    change_summary: Optional[str] = Field(None, max_length=200)
 
 
 class LibrarySymbolPromoteRequest(BaseModel):
@@ -538,6 +544,37 @@ class LibrarySymbolResponse(BaseModel):
     updated_by_username: Optional[str] = None
     created_at: datetime
     updated_at: datetime
+    # Versioning: the latest revision id (what an unpinned consumer
+    # sees) + fork provenance. ``forked_from_symbol_id`` is non-null on
+    # a fork; the client compares the requested id to the returned id
+    # to detect that an edit forked rather than appended.
+    current_revision_id: Optional[int] = None
+    forked_from_symbol_id: Optional[int] = None
+    forked_from_revision_id: Optional[int] = None
+
+
+class LibrarySymbolRevisionSummary(BaseModel):
+    """One row in a symbol's revision history list."""
+    id: int
+    symbol_id: int
+    author: str
+    change_summary: str
+    created_at: datetime
+    is_current: bool = False
+
+
+class LibrarySymbolRevisionResponse(BaseModel):
+    """Full immutable snapshot of a single revision."""
+    id: int
+    symbol_id: int
+    author: str
+    change_summary: str
+    created_at: datetime
+    name: str
+    category: str
+    ref_des_prefix: str
+    description: Optional[str] = None
+    symbol_data: Optional[str] = None
 
 
 # --- Build instructions export (issue #178, Phase 2b) --------------------

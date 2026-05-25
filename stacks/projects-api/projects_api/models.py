@@ -1325,6 +1325,20 @@ class LibrarySymbol(Base):
         ),
         nullable=True,
     )
+    # Versioning (Phase 2): fork provenance. When a non-owner edits a
+    # symbol, instead of appending to someone else's lineage we create
+    # a NEW lineage owned by the editor, recording which symbol +
+    # revision it branched from. Null on original (non-fork) lineages.
+    forked_from_symbol_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("library_symbols.id", ondelete="SET NULL", use_alter=True,
+                   name="fk_library_symbols_forked_from"),
+        nullable=True, index=True,
+    )
+    forked_from_revision_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("library_symbol_revisions.id", ondelete="SET NULL",
+                   use_alter=True, name="fk_library_symbols_forked_rev"),
+        nullable=True,
+    )
 
 
 class LibrarySymbolRevision(Base):

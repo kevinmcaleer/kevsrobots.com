@@ -19,6 +19,7 @@ from .db import (
     add_bom_supplier_id_if_missing,
     add_instruction_step_type_if_missing,
     add_library_symbol_current_revision_if_missing,
+    add_library_symbol_fork_columns_if_missing,
     add_part_category_family_if_missing,
     add_part_status_columns_if_missing,
     add_project_content_mode_if_missing,
@@ -137,6 +138,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # revision 1. All idempotent — no-ops once backfilled. Order:
     # ALTER first so the column exists before the backfill writes it.
     await add_library_symbol_current_revision_if_missing()
+    await add_library_symbol_fork_columns_if_missing()
     await backfill_library_symbol_revisions()
     await backfill_part_revisions_if_missing()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).

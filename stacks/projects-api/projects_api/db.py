@@ -1164,6 +1164,39 @@ async def add_library_symbol_current_revision_if_missing() -> None:
             ))
 
 
+async def add_library_symbol_fork_columns_if_missing() -> None:
+    """Add the Phase 2 fork-provenance columns to ``library_symbols``
+    (``forked_from_symbol_id`` / ``forked_from_revision_id``) on legacy
+    Postgres deployments. No-op on SQLite (create_all includes them).
+    Idempotent — probes information_schema per column.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() "
+            "AND table_name = 'library_symbols'"
+        ))
+        if table_check.first() is None:
+            return
+        for col in ("forked_from_symbol_id", "forked_from_revision_id"):
+            existing = await conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = current_schema() "
+                "AND table_name = 'library_symbols' "
+                "AND column_name = :c"
+            ), {"c": col})
+            if existing.first() is None:
+                logger.warning(
+                    "Adding library_symbols.%s column (versioning Phase 2)", col
+                )
+                await conn.execute(text(
+                    'ALTER TABLE "library_symbols" ADD COLUMN "%s" INTEGER' % col
+                ))
+
+
 async def backfill_library_symbol_revisions() -> None:
     """Snapshot every library symbol that lacks a current revision as
     revision 1, and point ``current_revision_id`` at it. Idempotent —
