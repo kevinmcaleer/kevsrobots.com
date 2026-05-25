@@ -197,14 +197,10 @@ body.instruction-builder-page.is-embedded .ib-workspace {
   50%      { opacity: 0.6; transform: translateY(-1px); }
 }
 
-/* Title-bar affordances that swap per step type:
-   - HUD toggle is only meaningful for photo/blank steps that use the
-     Fabric canvas. Hide it on schematic / text / video. */
-body[data-active-step-type="schematic"] #ib-hud-toggle,
-body[data-active-step-type="text"] #ib-hud-toggle,
-body[data-active-step-type="video"] #ib-hud-toggle {
-  display: none !important;
-}
+/* HUD toggle stays visible on every step type so the user can
+   show/hide the inspector from any slide. (It used to be hidden on
+   schematic / text / video steps — but users expect a consistent
+   title-bar control regardless of slide type.) */
 
 /* Canvas zoom group: minus / fit% / plus pill in the title bar.
    Sized to match .ib-titlebar-btn (5px 10px padding × 0.82rem font)
