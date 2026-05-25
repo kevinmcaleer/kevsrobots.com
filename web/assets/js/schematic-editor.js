@@ -360,6 +360,12 @@
     def.category = row.category || 'Custom';
     def.isLibrary = true;
     def.libraryId = row.id;
+    // Versioning Phase 3: the symbol's latest revision id. Instances placed
+    // from this def pin this value so a later edit to the library symbol
+    // doesn't silently change diagrams that referenced an earlier revision.
+    // (Parts + symbols version independently — this is the symbol pin.)
+    def.symbolRevisionId = (row.current_revision_id != null)
+      ? row.current_revision_id : null;
     // Keep ``isCustom: true`` so the renderer still treats this as a
     // user-designed symbol (custom body shapes, pin stick length, pin
     // terminator dot). Without this, every render-branch fall-through
@@ -693,6 +699,11 @@
       flipH: false,
       flipV: false,
     };
+    // Versioning Phase 3: pin the symbol revision at placement time. Only
+    // library symbols are versioned (built-ins / project symbols aren't).
+    if (symbolDef.isLibrary && symbolDef.symbolRevisionId != null) {
+      instance.symbolRevisionId = symbolDef.symbolRevisionId;
+    }
     STATE.graph.instances.push(instance);
     renderGraph();
     scheduleAutosave();
@@ -4077,6 +4088,26 @@
     rebuildNetCounter();
   }
 
+  // Versioning Phase 3: lazily pin any library-symbol instance that doesn't
+  // yet carry a symbolRevisionId to the symbol's current revision. Must run
+  // AFTER the library defs are loaded (they carry symbolRevisionId). For a
+  // legacy unpinned instance we pin to the current revision — we can't
+  // recover which revision it was originally drawn with, matching the BOM
+  // backfill. Persists via a single autosave only when something changed,
+  // so already-pinned graphs don't trigger a spurious save on every load.
+  function pinLibrarySymbolRevisions() {
+    var changed = false;
+    STATE.graph.instances.forEach(function (inst) {
+      if (inst.symbolRevisionId != null) return;  // already pinned
+      var def = symbolDefById(inst.symbolId);
+      if (def && def.isLibrary && def.symbolRevisionId != null) {
+        inst.symbolRevisionId = def.symbolRevisionId;
+        changed = true;
+      }
+    });
+    if (changed) scheduleAutosave();
+  }
+
   function cacheDom() {
     dom.workspace      = document.getElementById('se-workspace');
     dom.titlebar       = document.getElementById('se-titlebar');
@@ -4343,6 +4374,9 @@
       // symbols are always available too.
       await loadCustomSymbolsIntoLibrary();
       await loadLibrarySymbolsIntoLibrary();
+      // Versioning Phase 3: now the library defs are loaded, pin/backfill
+      // each library-symbol instance's revision (see fn for rationale).
+      pinLibrarySymbolRevisions();
 
       wireUi();
       initCanvas();
