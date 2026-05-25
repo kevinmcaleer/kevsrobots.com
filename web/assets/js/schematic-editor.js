@@ -980,6 +980,154 @@
     ];
   }
 
+  // ----- Obstacle-aware routing -----------------------------------
+  // The bare lShapedSegments router cuts straight through component
+  // bodies. When a pin needs to reach the far side of a component
+  // (most commonly two pins on opposite edges of the SAME chip), we
+  // detour the wire up over the top of the obstructing body, extend
+  // slightly past the destination, then drop down to enter the pin
+  // with clearance — instead of slicing through the body.
+
+  var ROUTE_BODY_PAD = 6;     // obstacle inflation (px) — interior test
+  var ROUTE_CLEARANCE = 16;   // gap above the obstacle for the top run
+  var ROUTE_STUB = 16;        // escape stub out of each pin
+
+  // Body bbox of an instance in scene coords (accounts for rotation
+  // swapping width/height). Origin is the instance centre.
+  function instanceBodyBounds(inst) {
+    var def = symbolDefById(inst.symbolId);
+    if (!def) return null;
+    var w = symbolWidth(def, inst.rotation || 0);
+    var h = symbolHeight(def, inst.rotation || 0);
+    return {
+      left:   inst.x - w / 2,
+      top:    inst.y - h / 2,
+      right:  inst.x + w / 2,
+      bottom: inst.y + h / 2,
+    };
+  }
+
+  // Does an axis-aligned segment pass through a rect's INTERIOR?
+  // Strict inequalities so a wire merely grazing the body edge (or
+  // a pin terminator sitting just outside it) doesn't count as a
+  // collision.
+  function segHitsRect(seg, r) {
+    if (seg.y1 === seg.y2) { // horizontal
+      var y = seg.y1;
+      if (y <= r.top || y >= r.bottom) return false;
+      var xa = Math.min(seg.x1, seg.x2), xb = Math.max(seg.x1, seg.x2);
+      return xa < r.right && xb > r.left;
+    }
+    if (seg.x1 === seg.x2) { // vertical
+      var x = seg.x1;
+      if (x <= r.left || x >= r.right) return false;
+      var ya = Math.min(seg.y1, seg.y2), yb = Math.max(seg.y1, seg.y2);
+      return ya < r.bottom && yb > r.top;
+    }
+    return false; // diagonals: not produced by the router
+  }
+
+  // Collect padded body rects for every instance. The optional
+  // ``ignore`` set holds instance ids whose bodies should NOT block
+  // (rarely needed — the outward stubs already clear the endpoint
+  // pins' own bodies, and we WANT same-body opposite-side routes to
+  // detour, so by default nothing is ignored).
+  function routeObstacles() {
+    var out = [];
+    STATE.graph.instances.forEach(function (inst) {
+      var b = instanceBodyBounds(inst);
+      if (!b) return;
+      out.push({
+        left:   b.left   - ROUTE_BODY_PAD,
+        top:    b.top    - ROUTE_BODY_PAD,
+        right:  b.right  + ROUTE_BODY_PAD,
+        bottom: b.bottom + ROUTE_BODY_PAD,
+      });
+    });
+    return out;
+  }
+
+  // Build the "up and over the top" detour. Both pins escape outward
+  // along their stick, the wire rises above the union of obstacles
+  // it must clear, runs across, then drops to the destination escape
+  // point and stubs into the pin.
+  function routeOverTop(x1, y1, x2, y2, fromSide, toSide, blockers) {
+    var SIDE_DX = { left: -1, right: 1, top: 0, bottom: 0 };
+    var SIDE_DY = { left: 0,  right: 0, top: -1, bottom: 1 };
+    var fdx = SIDE_DX[fromSide] || 0, fdy = SIDE_DY[fromSide] || 0;
+    var tdx = SIDE_DX[toSide]   || 0, tdy = SIDE_DY[toSide]   || 0;
+
+    // Escape points: one stub outward from each pin so we start /
+    // end clear of the bodies.
+    var ax = x1 + fdx * ROUTE_STUB, ay = y1 + fdy * ROUTE_STUB;
+    var bx = x2 + tdx * ROUTE_STUB, by = y2 + tdy * ROUTE_STUB;
+
+    // Top run y: above every blocker AND above both escape points,
+    // minus the clearance gap.
+    var topMost = Math.min(ay, by);
+    blockers.forEach(function (r) { topMost = Math.min(topMost, r.top); });
+    var runY = topMost - ROUTE_CLEARANCE;
+
+    // Assemble: stub-out, up, across, down, stub-in. Collinear /
+    // zero-length pieces collapse in mergeColinear below.
+    return mergeColinear([
+      { x1: x1, y1: y1, x2: ax,   y2: ay },     // out of source pin
+      { x1: ax, y1: ay, x2: ax,   y2: runY },   // up to the top lane
+      { x1: ax, y1: runY, x2: bx, y2: runY },   // across the top
+      { x1: bx, y1: runY, x2: bx, y2: by },     // down to dest escape
+      { x1: bx, y1: by, x2: x2,   y2: y2 },     // into dest pin
+    ]);
+  }
+
+  // Drop zero-length segments and fuse consecutive colinear ones so
+  // the over-top route doesn't leave stray 0px stubs (e.g. when a
+  // pin's escape x already equals the top-run x).
+  function mergeColinear(segs) {
+    var out = [];
+    segs.forEach(function (s) {
+      if (s.x1 === s.x2 && s.y1 === s.y2) return; // zero-length
+      var prev = out[out.length - 1];
+      if (prev) {
+        var prevH = (prev.y1 === prev.y2), curH = (s.y1 === s.y2);
+        var prevV = (prev.x1 === prev.x2), curV = (s.x1 === s.x2);
+        if (prevH && curH && prev.y2 === s.y1 && prev.x2 === s.x1) {
+          prev.x2 = s.x2; return;
+        }
+        if (prevV && curV && prev.x2 === s.x1 && prev.y2 === s.y1) {
+          prev.y2 = s.y2; return;
+        }
+      }
+      out.push({ x1: s.x1, y1: s.y1, x2: s.x2, y2: s.y2 });
+    });
+    return out;
+  }
+
+  // Public router: try the direct L/Z route; if it slices through
+  // any component body, detour over the top instead.
+  function routeNet(x1, y1, x2, y2, fromSide, toSide) {
+    var direct = lShapedSegments(x1, y1, x2, y2, fromSide, toSide);
+    var obstacles = routeObstacles();
+    if (obstacles.length === 0) return direct;
+
+    var blocked = [];
+    direct.forEach(function (seg) {
+      obstacles.forEach(function (r) {
+        if (segHitsRect(seg, r)) blocked.push(r);
+      });
+    });
+    if (blocked.length === 0) return direct;
+
+    // Route over the top, clearing every blocker the direct route
+    // would have hit. If the detour STILL hits something (rare —
+    // a tall obstacle directly above), fall back to the direct
+    // route rather than loop forever.
+    var detour = routeOverTop(x1, y1, x2, y2, fromSide, toSide, blocked);
+    var stillBlocked = detour.some(function (seg) {
+      return obstacles.some(function (r) { return segHitsRect(seg, r); });
+    });
+    return stillBlocked ? direct : detour;
+  }
+
   // Spread overlapping "middle legs" so the perpendicular connector
   // runs of different nets don't stack on top of each other. The
   // L/Z-bend router places every connector leg at the midpoint, so
@@ -1176,7 +1324,7 @@
     var toDef   = symbolDefById(toInst.symbolId);
     var fromSide = fromPin && fromDef ? effectivePinSide(fromDef, fromPin, fromInst) : (fromPin && fromPin.side);
     var toSide   = toPin   && toDef   ? effectivePinSide(toDef,   toPin,   toInst)   : (toPin   && toPin.side);
-    lShapedSegments(
+    routeNet(
       fromXY.x, fromXY.y, toXY.x, toXY.y, fromSide, toSide
     ).forEach(function (s) {
       target.segments.push(s);
@@ -2410,7 +2558,7 @@
         var pinDef    = symbolDefById(inst.symbolId);
         var aSide = anchorPin && anchorDef ? effectivePinSide(anchorDef, anchorPin, anchorInst) : (anchorPin && anchorPin.side);
         var pSide = pin       && pinDef    ? effectivePinSide(pinDef,    pin,       inst)       : (pin       && pin.side);
-        lShapedSegments(
+        routeNet(
           anchorXY.x, anchorXY.y, xy.x, xy.y, aSide, pSide
         ).forEach(function (s) {
           newSegs.push(s);
@@ -2772,7 +2920,10 @@
       var fromSide = (fromPin && fromDef) ? effectivePinSide(fromDef, fromPin, fromInst) : (fromPin && fromPin.side);
       var toDef    = hit && hit.instance && symbolDefById(hit.instance.symbolId);
       var toSide   = (hit && hit.pin && toDef) ? effectivePinSide(toDef, hit.pin, hit.instance) : (hit && hit.pin && hit.pin.side);
-      var segs = lShapedSegments(from.x, from.y, endX, endY, fromSide, toSide);
+      // Use the obstacle-aware router for the preview too, so the
+      // dashed wire the user sees while dragging matches the route
+      // that'll be committed (over-the-top detour appears live).
+      var segs = routeNet(from.x, from.y, endX, endY, fromSide, toSide);
       if (STATE.netPreviewObj) {
         STATE.canvas.remove(STATE.netPreviewObj);
         STATE.netPreviewObj = null;
