@@ -133,8 +133,8 @@ description: View a part in the catalog
               <div class="card">
                 <div class="card-body">
                   <div class="d-flex align-items-start gap-3 flex-wrap">
-                    <div class="part-symbol-preview border rounded d-flex align-items-center justify-content-center text-secondary"
-                         style="width:96px;height:96px;flex:0 0 auto;">
+                    <div id="part-symbol-preview" class="part-symbol-preview border rounded d-flex align-items-center justify-content-center text-secondary bg-white"
+                         style="width:140px;height:140px;flex:0 0 auto;">
                       <i class="fas fa-microchip fa-2x"></i>
                     </div>
                     <div class="flex-grow-1">
@@ -149,10 +149,6 @@ description: View a part in the catalog
                     </div>
                   </div>
                   <div class="d-flex flex-wrap gap-2 mt-3" id="part-symbol-actions">
-                    <a id="part-symbol-open" href="/projects/symbol/edit.html"
-                       class="btn btn-sm btn-outline-primary">
-                      <i class="fas fa-pen-ruler me-1"></i> Open Symbol Designer
-                    </a>
                     <a id="part-symbol-change" href="#" class="btn btn-sm btn-outline-secondary d-none">
                       <i class="fas fa-rotate me-1"></i> Change / unlink
                     </a>
@@ -337,6 +333,52 @@ description: View a part in the catalog
   }
 
   function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+
+  // Render a library symbol's { bodyShapes, pins } document (coords centred
+  // on origin, same shape the Symbol Designer authors) as a compact,
+  // self-contained SVG. Returns '' when the data is missing/unusable so the
+  // caller keeps the placeholder icon. Pure geometry — no Fabric needed.
+  function renderSymbolSvg(dataJson) {
+    if (!dataJson) return '';
+    let doc;
+    try { doc = JSON.parse(dataJson); } catch (_) { return ''; }
+    if (!doc || typeof doc !== 'object') return '';
+    const shapes = Array.isArray(doc.bodyShapes) ? doc.bodyShapes : [];
+    const pins = Array.isArray(doc.pins) ? doc.pins : [];
+    if (!shapes.length && !pins.length) return '';
+    const STUB = 14;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    const fit = (x, y) => { minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); };
+    const pinEnd = (p) => {
+      const x = +p.x || 0, y = +p.y || 0;
+      if (p.side === 'left') return [x - STUB, y];
+      if (p.side === 'right') return [x + STUB, y];
+      if (p.side === 'top') return [x, y - STUB];
+      return [x, y + STUB];
+    };
+    shapes.forEach(s => { const x = +s.x || 0, y = +s.y || 0; fit(x, y); fit(x + (+s.w || 0), y + (+s.h || 0)); });
+    pins.forEach(p => { fit(+p.x || 0, +p.y || 0); const e = pinEnd(p); fit(e[0], e[1]); });
+    if (!isFinite(minX)) return '';
+    const pad = 16;
+    minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+    const body = shapes.map(s =>
+      `<rect x="${+s.x || 0}" y="${+s.y || 0}" width="${+s.w || 0}" height="${+s.h || 0}" rx="4" fill="#f8f9fa" stroke="#0d6efd" stroke-width="2"/>`
+    ).join('');
+    const pinEls = pins.map(p => {
+      const x = +p.x || 0, y = +p.y || 0, e = pinEnd(p);
+      const line = `<line x1="${x}" y1="${y}" x2="${e[0]}" y2="${e[1]}" stroke="#0d6efd" stroke-width="2"/>`;
+      const dot = `<circle cx="${e[0]}" cy="${e[1]}" r="2.5" fill="#0d6efd"/>`;
+      const nm = esc(p.name || p.number || '');
+      let tx = x, ty = y + 4, anchor = 'middle';
+      if (p.side === 'left') { tx = x + 5; anchor = 'start'; }
+      else if (p.side === 'right') { tx = x - 5; anchor = 'end'; }
+      else if (p.side === 'top') { ty = y + 13; }
+      else { ty = y - 8; }
+      const label = nm ? `<text x="${tx}" y="${ty}" font-size="11" fill="#6c757d" text-anchor="${anchor}">${nm}</text>` : '';
+      return line + dot + label;
+    }).join('');
+    return `<svg viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="display:block">${body}${pinEls}</svg>`;
+  }
 
   function styleMarkdownTables(el) {
     if (!el) return;
@@ -595,6 +637,10 @@ description: View a part in the catalog
         ver.textContent = 'rev #' + part.symbol.current_revision_id;
         ver.classList.remove('d-none');
       }
+      // Render the actual symbol geometry from symbol_data (falls back to
+      // the placeholder icon if the data is missing/unparseable).
+      const svg = renderSymbolSvg(part.symbol.symbol_data);
+      if (svg) document.getElementById('part-symbol-preview').innerHTML = svg;
     } else {
       document.getElementById('part-symbol-empty').classList.remove('d-none');
     }
