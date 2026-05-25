@@ -1033,24 +1033,62 @@
     return false; // diagonals: not produced by the router
   }
 
-  // Collect padded body rects for every instance. The optional
-  // ``ignore`` set holds instance ids whose bodies should NOT block
-  // (rarely needed — the outward stubs already clear the endpoint
-  // pins' own bodies, and we WANT same-body opposite-side routes to
-  // detour, so by default nothing is ignored).
+  // How far the two components a wire actually connects to get their
+  // collision rect SHRUNK by. The wire legitimately attaches to its
+  // own endpoints, so grazing the body edge near a pin must NOT count
+  // as a collision (that was forcing a giant detour when two facing
+  // pins sat close enough that their sticks crossed). Only a route
+  // crossing DEEP through an endpoint body — e.g. reaching a pin on
+  // the component's far side — still trips the (shrunk) rect and
+  // triggers a detour. Third-party components keep the full padded
+  // rect so the router still goes around them.
+  var ROUTE_ENDPOINT_INSET = 18;
+
+  // Raw body bounds (+ instId) for every instance. Padding / inset is
+  // applied per-route in routeNet so endpoint components can be
+  // treated differently from third-party obstacles.
   function routeObstacles() {
     var out = [];
     STATE.graph.instances.forEach(function (inst) {
       var b = instanceBodyBounds(inst);
       if (!b) return;
       out.push({
-        left:   b.left   - ROUTE_BODY_PAD,
-        top:    b.top    - ROUTE_BODY_PAD,
-        right:  b.right  + ROUTE_BODY_PAD,
-        bottom: b.bottom + ROUTE_BODY_PAD,
+        left: b.left, top: b.top, right: b.right, bottom: b.bottom,
+        instId: inst.id,
       });
     });
     return out;
+  }
+
+  // Turn the raw obstacle list into route-ready rects. Endpoint
+  // components (the from / to instances of THIS wire) are inset so
+  // only deep crossings count; everything else (including a same-
+  // component opposite-side route, where from===to) is padded.
+  function routeRectsFor(fromInstId, toInstId) {
+    var sameComp = (fromInstId != null && fromInstId === toInstId);
+    var rects = [];
+    routeObstacles().forEach(function (o) {
+      var isEndpoint = (o.instId === fromInstId || o.instId === toInstId);
+      if (isEndpoint && !sameComp) {
+        var r = {
+          left:   o.left   + ROUTE_ENDPOINT_INSET,
+          top:    o.top    + ROUTE_ENDPOINT_INSET,
+          right:  o.right  - ROUTE_ENDPOINT_INSET,
+          bottom: o.bottom - ROUTE_ENDPOINT_INSET,
+        };
+        // Drop if the inset collapsed the rect (small body → no core
+        // worth avoiding).
+        if (r.right > r.left && r.bottom > r.top) rects.push(r);
+      } else {
+        rects.push({
+          left:   o.left   - ROUTE_BODY_PAD,
+          top:    o.top    - ROUTE_BODY_PAD,
+          right:  o.right  + ROUTE_BODY_PAD,
+          bottom: o.bottom + ROUTE_BODY_PAD,
+        });
+      }
+    });
+    return rects;
   }
 
   // Build a detour that routes AROUND a keep-out box (the union of
@@ -1147,9 +1185,9 @@
   //      blockers), and return the SHORTER collision-free one. This
   //      is what stops the router always going up: a target beneath
   //      the source detours downward because that path is shorter.
-  function routeNet(x1, y1, x2, y2, fromSide, toSide) {
+  function routeNet(x1, y1, x2, y2, fromSide, toSide, fromInstId, toInstId) {
     var direct = lShapedSegments(x1, y1, x2, y2, fromSide, toSide);
-    var obstacles = routeObstacles();
+    var obstacles = routeRectsFor(fromInstId, toInstId);
     if (obstacles.length === 0) return direct;
 
     function hitsOf(segs) {
@@ -1392,7 +1430,8 @@
     var fromSide = fromPin && fromDef ? effectivePinSide(fromDef, fromPin, fromInst) : (fromPin && fromPin.side);
     var toSide   = toPin   && toDef   ? effectivePinSide(toDef,   toPin,   toInst)   : (toPin   && toPin.side);
     routeNet(
-      fromXY.x, fromXY.y, toXY.x, toXY.y, fromSide, toSide
+      fromXY.x, fromXY.y, toXY.x, toXY.y, fromSide, toSide,
+      fromInst.id, toInst.id
     ).forEach(function (s) {
       target.segments.push(s);
     });
@@ -2626,7 +2665,8 @@
         var aSide = anchorPin && anchorDef ? effectivePinSide(anchorDef, anchorPin, anchorInst) : (anchorPin && anchorPin.side);
         var pSide = pin       && pinDef    ? effectivePinSide(pinDef,    pin,       inst)       : (pin       && pin.side);
         routeNet(
-          anchorXY.x, anchorXY.y, xy.x, xy.y, aSide, pSide
+          anchorXY.x, anchorXY.y, xy.x, xy.y, aSide, pSide,
+          anchorInst.id, inst.id
         ).forEach(function (s) {
           newSegs.push(s);
         });
@@ -2990,7 +3030,8 @@
       // Use the obstacle-aware router for the preview too, so the
       // dashed wire the user sees while dragging matches the route
       // that'll be committed (over-the-top detour appears live).
-      var segs = routeNet(from.x, from.y, endX, endY, fromSide, toSide);
+      var segs = routeNet(from.x, from.y, endX, endY, fromSide, toSide,
+        fromInst && fromInst.id, (hit && hit.instance && hit.instance.id) || null);
       if (STATE.netPreviewObj) {
         STATE.canvas.remove(STATE.netPreviewObj);
         STATE.netPreviewObj = null;
