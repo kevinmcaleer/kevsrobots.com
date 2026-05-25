@@ -3679,19 +3679,16 @@
         enableRetinaScaling: false,
       });
     }
-    // Compute the bbox of every object in absolute (scene) coords.
-    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    objs.forEach(function (o) {
-      try {
-        var r = o.getBoundingRect(true, true);
-        if (!r) return;
-        if (r.left < minX) minX = r.left;
-        if (r.top < minY) minY = r.top;
-        if (r.left + r.width > maxX) maxX = r.left + r.width;
-        if (r.top + r.height > maxY) maxY = r.top + r.height;
-      } catch (_) {}
-    });
-    if (!isFinite(minX)) return null;
+    // Content bbox in SCENE coords from the data model — independent
+    // of the canvas's current zoom/pan. (Using Fabric's
+    // getBoundingRect here gave viewport-relative numbers, so when
+    // the embedded read-only editor had called zoomToFit() before
+    // the snapshot the crop came out wrong — the "zoom to fit isn't
+    // working" symptom.)
+    var bounds = contentBoundsScene();
+    if (!bounds) return null;
+    var minX = bounds.minX, minY = bounds.minY,
+        maxX = bounds.maxX, maxY = bounds.maxY;
     var margin = 20;
 
     // Robust crop: ``toDataURL`` only captures pixels that EXIST on
@@ -3917,8 +3914,14 @@
   // pan so that bbox fits comfortably inside the visible canvas.
   // Used on initial schematic load so the user sees their work
   // framed instead of staring at empty scene space.
-  function zoomToFit() {
-    if (!STATE.canvas) return;
+  // Bounding box of all schematic content in SCENE coords, computed
+  // from the data model (instance bodies + pin extents + net
+  // segments) — NOT from Fabric's getBoundingRect, which in v6 is
+  // viewport-relative and would give wrong numbers whenever the
+  // canvas is zoomed/panned. Both zoomToFit and captureSchematicPng
+  // use this so they always agree. Returns null when the canvas is
+  // empty.
+  function contentBoundsScene() {
     var minX = Infinity, maxX = -Infinity;
     var minY = Infinity, maxY = -Infinity;
     function bump(x, y) {
@@ -3927,47 +3930,45 @@
       if (y < minY) minY = y;
       if (y > maxY) maxY = y;
     }
-    // Instances: include each pin's wire-attach point so the frame
-    // covers the full pin extents, not just the body centre.
     STATE.graph.instances.forEach(function (inst) {
       var def = symbolDefById(inst.symbolId);
-      if (!def) {
-        bump(inst.x, inst.y);
-        return;
-      }
-      // Body bbox corners in scene coords.
+      if (!def) { bump(inst.x, inst.y); return; }
       var halfW = def.bodyWidth / 2;
       var halfH = def.bodyHeight / 2;
       [[-halfW, -halfH], [halfW, -halfH], [halfW, halfH], [-halfW, halfH]]
         .forEach(function (c) {
-          // localToScene wants body-local (top-left origin) coords.
-          var lx = c[0] + halfW;
-          var ly = c[1] + halfH;
+          var lx = c[0] + halfW, ly = c[1] + halfH;
           var p = localToScene(inst, def, lx, ly);
           bump(p.x, p.y);
         });
-      // Pin wire-attach extents.
       def.pins.forEach(function (pin) {
         var p = pinScenePos(inst, pin);
         bump(p.x, p.y);
       });
     });
-    // Net segments.
     STATE.graph.nets.forEach(function (net) {
       net.segments.forEach(function (s) {
         bump(s.x1, s.y1);
         bump(s.x2, s.y2);
       });
     });
-    // Nothing on the canvas? Fall back to a 1× reset so we don't
-    // divide by zero. Adding the user's first symbol later will be
-    // visible at the default scale.
     if (!isFinite(minX) || !isFinite(maxX) ||
         !isFinite(minY) || !isFinite(maxY) ||
         maxX <= minX || maxY <= minY) {
-      resetZoom();
-      return;
+      return null;
     }
+    return { minX: minX, minY: minY, maxX: maxX, maxY: maxY };
+  }
+
+  function zoomToFit() {
+    if (!STATE.canvas) return;
+    var bounds = contentBoundsScene();
+    // Nothing on the canvas? Fall back to a 1× reset so we don't
+    // divide by zero. Adding the user's first symbol later will be
+    // visible at the default scale.
+    if (!bounds) { resetZoom(); return; }
+    var minX = bounds.minX, minY = bounds.minY,
+        maxX = bounds.maxX, maxY = bounds.maxY;
     var contentW = Math.max(1, maxX - minX);
     var contentH = Math.max(1, maxY - minY);
     var cw = STATE.canvas.getWidth();
