@@ -39,7 +39,12 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run
+    # ``--edge-ip-version 4`` forces the QUIC socket to IPv4 only. Without
+    # it, cloudflared binds a dual-stack [::] socket; after a Pi power-cut
+    # IPv6 can come up without a working default route and every send fails
+    # with "sendmsg: network is unreachable" indefinitely. Keep in sync with
+    # docker-compose.prod.yml.
+    command: tunnel --no-autoupdate --edge-ip-version 4 run
     environment:
       - TUNNEL_TOKEN=${NIBSY_TUNNEL_TOKEN}
     deploy:
