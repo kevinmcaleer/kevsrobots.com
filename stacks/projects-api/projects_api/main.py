@@ -138,28 +138,33 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Editor content-surface toggle: ensure projects.content_mode column
     # exists on legacy Postgres deployments (defaults to 'markdown').
     await add_project_content_mode_if_missing()
-    # Versioning Phase 1: library-symbol revision chain. Add the
-    # current_revision_id column (legacy Postgres), then snapshot every
-    # existing library symbol + any revision-less legacy part as
-    # revision 1. All idempotent — no-ops once backfilled. Order:
-    # ALTER first so the column exists before the backfill writes it.
+    # Versioning migrations. CRITICAL ORDERING: every column-adding ALTER
+    # must run BEFORE any backfill, because the backfills issue full-model
+    # ORM SELECTs (e.g. ``select(Part)``) that reference EVERY mapped column
+    # — including newly-added ones like ``parts.symbol_id``. If a backfill
+    # runs before its column's ALTER, Postgres raises UndefinedColumnError
+    # and startup aborts (SQLite tests don't catch this — create_all builds
+    # all columns up front). So: ALTERs first, backfills second.
+    #
+    # --- ALTERs (idempotent column adds) ---
     await add_library_symbol_current_revision_if_missing()
     await add_library_symbol_fork_columns_if_missing()
     await add_library_symbol_power_port_if_missing()
+    # Part↔symbol link: parts.symbol_id + part_revisions.symbol_id. After
+    # create_all (which builds library_symbols) so the FK target exists.
+    await add_part_symbol_id_if_missing()
+    # Phase 3: project_bom_items.part_revision_id.
+    await add_bom_part_revision_id_if_missing()
+    #
+    # --- Backfills (issue full-model SELECTs — must follow the ALTERs) ---
     await backfill_library_symbol_revisions()
     await backfill_part_revisions_if_missing()
-    # Part↔symbol link (part-hub UX): adds parts.symbol_id +
-    # part_revisions.symbol_id. Runs after create_all (which builds
-    # library_symbols) so the FK target always exists. Idempotent.
-    await add_part_symbol_id_if_missing()
-    # Re-case legacy slug categories to the curated human labels so the
-    # now self-organising category vocabulary doesn't fragment. Idempotent.
+    # Re-case legacy slug categories so the self-organising category
+    # vocabulary doesn't fragment (selects Part → needs symbol_id present).
     await recanonicalize_part_categories()
-    # Versioning Phase 3: pin BOM rows to a part revision. Add the column
-    # (legacy Postgres), then backfill existing rows to their part's current
-    # revision — must run AFTER backfill_part_revisions_if_missing so every
-    # part has a current revision to pin to. Both idempotent.
-    await add_bom_part_revision_id_if_missing()
+    # Phase 3: pin existing BOM rows to their part's current revision. Runs
+    # after backfill_part_revisions_if_missing so every part has a current
+    # revision to pin to.
     await backfill_bom_part_revisions()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
