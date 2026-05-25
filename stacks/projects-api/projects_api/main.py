@@ -38,6 +38,7 @@ from .db import (
     backfill_library_symbol_revisions,
     backfill_part_revisions_if_missing,
     create_all,
+    recanonicalize_part_categories,
     get_sessionmaker,
     repair_stale_fks,
 )
@@ -146,6 +147,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # part_revisions.symbol_id. Runs after create_all (which builds
     # library_symbols) so the FK target always exists. Idempotent.
     await add_part_symbol_id_if_missing()
+    # Re-case legacy slug categories to the curated human labels so the
+    # now self-organising category vocabulary doesn't fragment. Idempotent.
+    await recanonicalize_part_categories()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

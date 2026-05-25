@@ -72,6 +72,7 @@ from ..models import (
     PartSupplier,
 )
 from ..parts_lifecycle import compute_part_status
+from ..parts_taxonomy import canonicalize, merge_for_suggestions
 from ..schemas import (
     PartCreate,
     PartDetail,
@@ -87,25 +88,8 @@ from ..schemas import (
 )
 
 
-# Curated starter list of part categories (issue #135). Kept small and
-# practical — editors can pick "other" or leave it null for parts that
-# don't fit cleanly. Order roughly matches how often they're picked.
-PART_CATEGORIES: list[str] = [
-    "microcontroller",
-    "single-board-computer",
-    "sensor",
-    "motor",
-    "motor-driver",
-    "display",
-    "actuator",
-    "power",
-    "communication",
-    "passive",
-    "connector",
-    "tool",
-    "kit",
-    "other",
-]
+# Part categories are a small, self-organising vocabulary — the curated
+# starter list + canonicalisation rules live in ``parts_taxonomy``.
 
 router = APIRouter(prefix="/api/parts", tags=["parts"])
 
@@ -381,7 +365,12 @@ async def search_parts(
             )
         )
     if category:
-        stmt = stmt.where(Part.category == category)
+        # Canonicalise the filter so ?category=sensor / single-board-computer
+        # matches the stored canonical label ("Sensor", "Single Board
+        # Computer") regardless of the caller's casing / slug style.
+        canon = canonicalize(category, await _distinct_categories_by_usage(session))
+        if canon:
+            stmt = stmt.where(Part.category == canon)
     if family:
         stmt = stmt.where(Part.family == family)
     stmt = stmt.order_by(Part.usage_count.desc(), Part.name.asc()).limit(limit)
@@ -409,13 +398,31 @@ async def search_parts(
 # --- categories + families metadata (issue #135) ----------------------
 
 
-@router.get("/_meta/categories", response_model=list[str])
-async def list_categories() -> list[str]:
-    """Static starter list of category slugs.
+async def _distinct_categories_by_usage(session: AsyncSession) -> list[str]:
+    """Distinct ``parts.category`` values, most-used first."""
+    rows = (
+        await session.execute(
+            select(Part.category, func.count(Part.id))
+            .where(Part.category.is_not(None), Part.category != "")
+            .group_by(Part.category)
+            .order_by(func.count(Part.id).desc(), Part.category.asc())
+        )
+    ).all()
+    return [row[0] for row in rows if row[0]]
 
-    Hardcoded for v1 — editors can ask for more once we see what's missing.
+
+@router.get("/_meta/categories", response_model=list[str])
+async def list_categories(
+    session: AsyncSession = Depends(get_session),
+) -> list[str]:
+    """Autocomplete vocabulary for the category field.
+
+    Curated starter labels first (canonical order), then any categories
+    users have actually coined, ranked by usage — so the list both seeds
+    an empty catalog and converges on real usage as it grows. Deduped
+    case/format-insensitively so slug + label variants don't double up.
     """
-    return list(PART_CATEGORIES)
+    return merge_for_suggestions(await _distinct_categories_by_usage(session))
 
 
 @router.get("/_meta/families", response_model=list[str])
@@ -449,7 +456,7 @@ async def create_part(
     slug = await _unique_slug(session, _slugify(body.name))
     now = _now_naive_utc()
     tags = [t.strip() for t in body.tags if t and t.strip()]
-    category = (body.category or "").strip() or None
+    category = canonicalize(body.category, await _distinct_categories_by_usage(session))
     family = (body.family or "").strip() or None
     if body.symbol_id is not None:
         await _validate_symbol_id(session, body.symbol_id)
@@ -582,11 +589,14 @@ async def update_part(
     next_tags = _normalize_tags(body.tags) if body.tags is not None else list(part.tags or [])
     # Empty string is interpreted as "clear" for category / family — the
     # editor sends "" when the user resets the dropdown / blanks the input.
+    # Category is canonicalised (converging slug/casing variants onto one
+    # label); ``None`` means "leave unchanged".
     if body.category is None:
         next_category = part.category
     else:
-        stripped = body.category.strip()
-        next_category = stripped or None
+        next_category = canonicalize(
+            body.category, await _distinct_categories_by_usage(session)
+        )
     if body.family is None:
         next_family = part.family
     else:

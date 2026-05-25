@@ -327,7 +327,8 @@ async def test_create_part_with_category_and_family(client) -> None:
     )
     assert resp.status_code == 201, resp.text
     data = resp.json()
-    assert data["category"] == "microcontroller"
+    # Category is canonicalised to the curated human label; family is free text.
+    assert data["category"] == "Microcontroller"
     assert data["family"] == "raspberry-pi-pico"
 
 
@@ -350,7 +351,7 @@ async def test_update_can_change_category_and_family(client) -> None:
         headers=headers,
     )
     assert upd.status_code == 200, upd.text
-    assert upd.json()["category"] == "sensor"
+    assert upd.json()["category"] == "Sensor"
     assert upd.json()["family"] == "bmp"
 
 
@@ -381,8 +382,50 @@ async def test_meta_categories_returns_starter_list(client) -> None:
     resp = await client.get("/api/parts/_meta/categories")
     assert resp.status_code == 200
     data = resp.json()
-    assert "microcontroller" in data
-    assert "sensor" in data
+    # Human-readable curated labels.
+    assert "Microcontroller" in data
+    assert "Sensor" in data
+    assert "Single Board Computer" in data
+
+
+@pytest.mark.asyncio
+async def test_category_canonicalises_slug_and_casing(client) -> None:
+    """Variants of a curated category converge onto one canonical label."""
+    headers = make_auth_header()
+    # Slug-cased + odd-cased inputs all land on "Single Board Computer".
+    for name, raw in (("Pi 5", "single-board-computer"),
+                      ("Pi 4", "Single Board Computer"),
+                      ("Pi 3", "SINGLE BOARD COMPUTER")):
+        r = await client.post(
+            "/api/parts", json={"name": name, "category": raw}, headers=headers
+        )
+        assert r.status_code == 201, r.text
+        assert r.json()["category"] == "Single Board Computer"
+    # The autocomplete list shows it exactly once (deduped by key).
+    cats = (await client.get("/api/parts/_meta/categories")).json()
+    assert cats.count("Single Board Computer") == 1
+
+
+@pytest.mark.asyncio
+async def test_user_coined_category_is_kept_and_suggested(client) -> None:
+    """A category outside the curated list is stored as typed and offered
+    for reuse via the autocomplete vocabulary."""
+    headers = make_auth_header()
+    r = await client.post(
+        "/api/parts",
+        json={"name": "Mystery Widget", "category": "Flux Capacitor"},
+        headers=headers,
+    )
+    assert r.json()["category"] == "Flux Capacitor"
+    cats = (await client.get("/api/parts/_meta/categories")).json()
+    assert "Flux Capacitor" in cats
+    # A later casing variant reuses the first-writer's label.
+    r2 = await client.post(
+        "/api/parts",
+        json={"name": "Another Widget", "category": "flux capacitor"},
+        headers=headers,
+    )
+    assert r2.json()["category"] == "Flux Capacitor"
 
 
 @pytest.mark.asyncio

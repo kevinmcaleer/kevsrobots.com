@@ -1332,3 +1332,36 @@ async def backfill_part_revisions_if_missing() -> None:
             await session.flush()
             part.current_revision_id = rev.id
         await session.commit()
+
+
+async def recanonicalize_part_categories() -> None:
+    """One-time data fix: re-case legacy slug categories
+    ("single-board-computer") to their curated display labels
+    ("Single Board Computer") so they don't fragment the now
+    human-labelled vocabulary. Idempotent — only rows whose canonical key
+    maps to a curated label AND differ from it are touched. Dialect-
+    agnostic; no-op on a fresh/empty DB. Revision snapshots are left as
+    historical record.
+    """
+    from .models import Part
+    from .parts_taxonomy import PART_CATEGORIES, canon_key
+
+    curated_by_key = {canon_key(c): c for c in PART_CATEGORIES}
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        parts = (
+            await session.execute(
+                select(Part).where(Part.category.is_not(None), Part.category != "")
+            )
+        ).scalars().all()
+        changed = 0
+        for part in parts:
+            label = curated_by_key.get(canon_key(part.category))
+            if label and label != part.category:
+                part.category = label
+                changed += 1
+        if changed:
+            logger.warning(
+                "Re-cased %d legacy part categories to curated labels", changed
+            )
+            await session.commit()

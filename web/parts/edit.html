@@ -55,10 +55,9 @@ description: Edit a part in the catalog
         <div class="row g-2 mb-3">
           <div class="col-md-6">
             <label for="part-category" class="form-label">Category</label>
-            <select id="part-category" class="form-select">
-              <option value="">— Uncategorised —</option>
-            </select>
-            <div class="form-text">Best-fit bucket. Pick "other" if nothing fits.</div>
+            <input type="text" id="part-category" class="form-control" list="part-category-options" placeholder="e.g. Single Board Computer" maxlength="60" autocomplete="off">
+            <datalist id="part-category-options"></datalist>
+            <div class="form-text">The type of part. Pick an existing one where you can, or add a new category — leave blank if none fits.</div>
           </div>
           <div class="col-md-6">
             <label for="part-family" class="form-label">Family</label>
@@ -288,12 +287,11 @@ description: Edit a part in the catalog
       const resp = await fetch(API + '/api/parts/_meta/categories');
       if (!resp.ok) return;
       const cats = await resp.json();
-      const sel = document.getElementById('part-category');
+      const dl = document.getElementById('part-category-options');
       cats.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c;
-        opt.textContent = c;
-        sel.appendChild(opt);
+        dl.appendChild(opt);
       });
     } catch (_) {}
   }
