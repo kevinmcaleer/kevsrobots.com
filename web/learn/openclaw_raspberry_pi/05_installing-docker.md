@@ -9,7 +9,7 @@ previous: 04_preparing-your-pi.html
 next: 06_docker-compose-setup.html
 description: Install Docker and Docker Compose on your Raspberry Pi.
 percent: 30
-duration: 3
+duration: 2
 navigation:
 - name: OpenClaw on Raspberry Pi
 - content:

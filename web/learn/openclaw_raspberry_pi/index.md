@@ -8,7 +8,7 @@ date: 2026-01-31
 next: 01_what-is-openclaw.html
 description: Welcome to the OpenClaw on Raspberry Pi course.
 percent: 5
-duration: 3
+duration: 2
 navigation:
 - name: OpenClaw on Raspberry Pi
 - content:
