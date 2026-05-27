@@ -1,0 +1,3618 @@
+[
+  {
+    "slug": "arduino_to_python",
+    "name": "Arduino to MicroPython - A Quick Start Guide",
+    "description": "Transition from Arduino C++ to MicroPython quickly and easily. Learn Python syntax with side-by-side comparisons, control hardware, and build IoT and robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-11-20",
+    "groups": [
+      "micropython",
+      "arduino",
+      "electronics",
+      "python"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Getting Started",
+        "url": "/learn/arduino_to_python/00_intro.html"
+      },
+      {
+        "file": "01_why_micropython.md",
+        "section": "Getting Started",
+        "url": "/learn/arduino_to_python/01_why_micropython.html"
+      },
+      {
+        "file": "02_syntax_basics.md",
+        "section": "Language Fundamentals",
+        "url": "/learn/arduino_to_python/02_syntax_basics.html"
+      },
+      {
+        "file": "03_control_flow.md",
+        "section": "Language Fundamentals",
+        "url": "/learn/arduino_to_python/03_control_flow.html"
+      },
+      {
+        "file": "04_functions.md",
+        "section": "Language Fundamentals",
+        "url": "/learn/arduino_to_python/04_functions.html"
+      },
+      {
+        "file": "05_pin_control.md",
+        "section": "Language Fundamentals",
+        "url": "/learn/arduino_to_python/05_pin_control.html"
+      },
+      {
+        "file": "06_analog_pwm.md",
+        "section": "Hardware Basics",
+        "url": "/learn/arduino_to_python/06_analog_pwm.html"
+      },
+      {
+        "file": "07_timing.md",
+        "section": "Hardware Basics",
+        "url": "/learn/arduino_to_python/07_timing.html"
+      },
+      {
+        "file": "08_serial_basics.md",
+        "section": "Hardware Basics",
+        "url": "/learn/arduino_to_python/08_serial_basics.html"
+      },
+      {
+        "file": "09_iot_project.md",
+        "section": "Practical Projects",
+        "url": "/learn/arduino_to_python/09_iot_project.html"
+      },
+      {
+        "file": "10_robot_project.md",
+        "section": "Practical Projects",
+        "url": "/learn/arduino_to_python/10_robot_project.html"
+      },
+      {
+        "file": "11_next_steps.md",
+        "section": "Practical Projects",
+        "url": "/learn/arduino_to_python/11_next_steps.html"
+      }
+    ]
+  },
+  {
+    "slug": "bottango",
+    "name": "Bottango Basics",
+    "description": "Learn how to bring characters and props to life using Bottango, a powerful no-code motion tool for animating servos and creating interactive scenes.  This course walks you through installing Bottango, wiring servos, programming boards, and creating expressive motion sequences.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-05-10",
+    "groups": [
+      "animation",
+      "robotics",
+      "arduino"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/bottango/00_intro.html"
+      },
+      {
+        "file": "01_install.md",
+        "section": "Getting Started",
+        "url": "/learn/bottango/01_install.html"
+      },
+      {
+        "file": "02_setup_board.md",
+        "section": "Getting Started",
+        "url": "/learn/bottango/02_setup_board.html"
+      },
+      {
+        "file": "03_wiring.md",
+        "section": "Wiring and Configuration",
+        "url": "/learn/bottango/03_wiring.html"
+      },
+      {
+        "file": "04_configure_bottango.md",
+        "section": "Wiring and Configuration",
+        "url": "/learn/bottango/04_configure_bottango.html"
+      },
+      {
+        "file": "05_create_motion.md",
+        "section": "Creating Animations",
+        "url": "/learn/bottango/05_create_motion.html"
+      },
+      {
+        "file": "06_triggers.md",
+        "section": "Creating Animations",
+        "url": "/learn/bottango/06_triggers.html"
+      },
+      {
+        "file": "07_sync_music.md",
+        "section": "Creating Animations",
+        "url": "/learn/bottango/07_sync_music.html"
+      },
+      {
+        "file": "08_arduino_mode.md",
+        "section": "Advanced Projects",
+        "url": "/learn/bottango/08_arduino_mode.html"
+      },
+      {
+        "file": "09_use_with_gamepad.md",
+        "section": "Advanced Projects",
+        "url": "/learn/bottango/09_use_with_gamepad.html"
+      },
+      {
+        "file": "10_summary.md",
+        "section": "Summary",
+        "url": "/learn/bottango/10_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "brachiograph",
+    "name": "BrachioGraph Tutorial",
+    "description": "Learn how to build your own BrachioGraph, a simple drawing robot that uses two stepper motors to create beautiful drawings.  This course covers the essential steps from assembling the robot, installing the software, and creating your first drawing.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-07-26",
+    "groups": [
+      "robot arm",
+      "python",
+      "raspberry pi"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/brachiograph/00_intro.html"
+      },
+      {
+        "file": "01_build.md",
+        "section": "Build the plotter",
+        "url": "/learn/brachiograph/01_build.html"
+      },
+      {
+        "file": "02_wire.md",
+        "section": "Build the plotter",
+        "url": "/learn/brachiograph/02_wire.html"
+      },
+      {
+        "file": "03_setup_pi.md",
+        "section": "Programming",
+        "url": "/learn/brachiograph/03_setup_pi.html"
+      },
+      {
+        "file": "04_code.md",
+        "section": "Programming",
+        "url": "/learn/brachiograph/04_code.html"
+      },
+      {
+        "file": "05_draw.md",
+        "section": "Programming",
+        "url": "/learn/brachiograph/05_draw.html"
+      },
+      {
+        "file": "06_vectorize.md",
+        "section": "Programming",
+        "url": "/learn/brachiograph/06_vectorize.html"
+      },
+      {
+        "file": "07_summary.md",
+        "section": "Summary",
+        "url": "/learn/brachiograph/07_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "burgerbot",
+    "name": "Build your own BurgerBot",
+    "description": "Build a simple round robot powered by Raspberry Pi Pico",
+    "cover": "assets/burgerbot.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-04-27",
+    "groups": [
+      "robotics",
+      "micropython",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/burgerbot/00_intro.html"
+      },
+      {
+        "file": "01_why_video.md",
+        "section": "Overview",
+        "url": "/learn/burgerbot/01_why_video.html"
+      },
+      {
+        "file": "01_what_is_burger_bot.md",
+        "section": "Overview",
+        "url": "/learn/burgerbot/01_what_is_burger_bot.html"
+      },
+      {
+        "file": "02_assembly.md",
+        "section": "Assembling the parts",
+        "url": "/learn/burgerbot/02_assembly.html"
+      },
+      {
+        "file": "02_video.md",
+        "section": "Assembling the parts",
+        "url": "/learn/burgerbot/02_video.html"
+      },
+      {
+        "file": "03_getting_the_code.md",
+        "section": "Installing the code",
+        "url": "/learn/burgerbot/03_getting_the_code.html"
+      },
+      {
+        "file": "04_loading_the_code.md",
+        "section": "Installing the code",
+        "url": "/learn/burgerbot/04_loading_the_code.html"
+      },
+      {
+        "file": "05_basic_movement.md",
+        "section": "Programming in MicroPython",
+        "url": "/learn/burgerbot/05_basic_movement.html"
+      },
+      {
+        "file": "06_measuring_distance.md",
+        "section": "Programming in MicroPython",
+        "url": "/learn/burgerbot/06_measuring_distance.html"
+      },
+      {
+        "file": "07_object_avoidance.md",
+        "section": "Programming in MicroPython",
+        "url": "/learn/burgerbot/07_object_avoidance.html"
+      },
+      {
+        "file": "08_video.md",
+        "section": "Upgrades",
+        "url": "/learn/burgerbot/08_video.html"
+      },
+      {
+        "file": "08_line_following.md",
+        "section": "Upgrades",
+        "url": "/learn/burgerbot/08_line_following.html"
+      },
+      {
+        "file": "08_line_following_code.md",
+        "section": "Upgrades",
+        "url": "/learn/burgerbot/08_line_following_code.html"
+      },
+      {
+        "file": "09_camera.md",
+        "section": "Upgrades",
+        "url": "/learn/burgerbot/09_camera.html"
+      }
+    ]
+  },
+  {
+    "slug": "c_pico",
+    "name": "Getting Started with C on the Raspberry Pi Pico",
+    "description": "Learn how to program the Raspberry Pi Pico using the C programming language.  This beginner-friendly course covers the fundamentals of C, how to set up your development environment,  and how to write simple programs that run on real hardware. By the end of the course, you'll have a  solid grasp of programming basics and will create your first hardware project; a blinking LED.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-06-16",
+    "groups": [
+      "raspberrypi",
+      "pico",
+      "c-programming",
+      "beginner"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction",
+        "url": "/learn/c_pico/01_intro.html"
+      },
+      {
+        "file": "02_what_is_c.md",
+        "section": "Programming Fundamentals",
+        "url": "/learn/c_pico/02_what_is_c.html"
+      },
+      {
+        "file": "03_variables_and_types.md",
+        "section": "Programming Fundamentals",
+        "url": "/learn/c_pico/03_variables_and_types.html"
+      },
+      {
+        "file": "04_conditionals_and_loops.md",
+        "section": "Programming Fundamentals",
+        "url": "/learn/c_pico/04_conditionals_and_loops.html"
+      },
+      {
+        "file": "05_functions.md",
+        "section": "Programming Fundamentals",
+        "url": "/learn/c_pico/05_functions.html"
+      },
+      {
+        "file": "06_setting_up_toolchain.md",
+        "section": "Raspberry Pi Pico Setup",
+        "url": "/learn/c_pico/06_setting_up_toolchain.html"
+      },
+      {
+        "file": "07_first_program.md",
+        "section": "Raspberry Pi Pico Setup",
+        "url": "/learn/c_pico/07_first_program.html"
+      },
+      {
+        "file": "08_gpio_basics.md",
+        "section": "GPIO Basics",
+        "url": "/learn/c_pico/08_gpio_basics.html"
+      },
+      {
+        "file": "09_blinking_led.md",
+        "section": "GPIO Basics",
+        "url": "/learn/c_pico/09_blinking_led.html"
+      },
+      {
+        "file": "10_summary.md",
+        "section": "Summary and Next Steps",
+        "url": "/learn/c_pico/10_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "cvzone",
+    "name": "Computer Vision on Raspberry Pi with CVZone",
+    "description": "Computer Vision on Raspberry Pi with CVZone",
+    "cover": "assets/computer_vision.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-10-07",
+    "groups": [
+      "computer vision",
+      "python",
+      "cvzone"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/cvzone/00_intro.html"
+      },
+      {
+        "file": "00_video.md",
+        "section": "Overview",
+        "url": "/learn/cvzone/00_video.html"
+      },
+      {
+        "file": "01_install.md",
+        "section": "Getting Started",
+        "url": "/learn/cvzone/01_install.html"
+      },
+      {
+        "file": "02_face.md",
+        "section": "Face, Hand and Posture Detection",
+        "url": "/learn/cvzone/02_face.html"
+      },
+      {
+        "file": "03_hand.md",
+        "section": "Face, Hand and Posture Detection",
+        "url": "/learn/cvzone/03_hand.html"
+      },
+      {
+        "file": "04_posture.md",
+        "section": "Face, Hand and Posture Detection",
+        "url": "/learn/cvzone/04_posture.html"
+      },
+      {
+        "file": "05_advanced.md",
+        "section": "Face, Hand and Posture Detection",
+        "url": "/learn/cvzone/05_advanced.html"
+      }
+    ]
+  },
+  {
+    "slug": "docker",
+    "name": "Docker",
+    "description": "Learn how to use Docker to build and deploy applications in a containerised environment.",
+    "cover": "assets/docker.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-01-21",
+    "groups": [
+      "docker"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/docker/00_intro.html"
+      },
+      {
+        "file": "01_what-is-docker.md",
+        "section": "Overview",
+        "url": "/learn/docker/01_what-is-docker.html"
+      },
+      {
+        "file": "02_installing-docker.md",
+        "section": "Overview",
+        "url": "/learn/docker/02_installing-docker.html"
+      },
+      {
+        "file": "03_basics.md",
+        "section": "Images and Containers",
+        "url": "/learn/docker/03_basics.html"
+      },
+      {
+        "file": "04_building.md",
+        "section": "Images and Containers",
+        "url": "/learn/docker/04_building.html"
+      },
+      {
+        "file": "05_managing.md",
+        "section": "Images and Containers",
+        "url": "/learn/docker/05_managing.html"
+      },
+      {
+        "file": "06_networking.md",
+        "section": "Images and Containers",
+        "url": "/learn/docker/06_networking.html"
+      },
+      {
+        "file": "07_volumes.md",
+        "section": "Images and Containers",
+        "url": "/learn/docker/07_volumes.html"
+      },
+      {
+        "file": "08_docker-compose.md",
+        "section": "Docker Compose",
+        "url": "/learn/docker/08_docker-compose.html"
+      },
+      {
+        "file": "09_dockerise.md",
+        "section": "Docker Compose",
+        "url": "/learn/docker/09_dockerise.html"
+      },
+      {
+        "file": "10_conclusion.md",
+        "section": "Docker Compose",
+        "url": "/learn/docker/10_conclusion.html"
+      }
+    ]
+  },
+  {
+    "slug": "docker_swarm",
+    "name": "Raspberry Pi 5 Cluster with Docker Swarm",
+    "description": "This course guides beginners through the process of setting up a Raspberry Pi 5 cluster and deploying applications using Docker Swarm. Learn to build, manage, and scale a mini-computing cluster for various projects.",
+    "cover": "assets/docker_swarm.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-02-03",
+    "groups": [
+      "docker",
+      "raspberry pi"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/docker_swarm/00_intro.html"
+      },
+      {
+        "file": "01_planning-the-cluster.md",
+        "section": "Building the Cluster",
+        "url": "/learn/docker_swarm/01_planning-the-cluster.html"
+      },
+      {
+        "file": "02_cloning-raspberry-pi-os.md",
+        "section": "Building the Cluster",
+        "url": "/learn/docker_swarm/02_cloning-raspberry-pi-os.html"
+      },
+      {
+        "file": "03_initializing-docker-swarm.md",
+        "section": "Building the Cluster",
+        "url": "/learn/docker_swarm/03_initializing-docker-swarm.html"
+      },
+      {
+        "file": "04_adding-worker-nodes.md",
+        "section": "Building the Cluster",
+        "url": "/learn/docker_swarm/04_adding-worker-nodes.html"
+      },
+      {
+        "file": "05_verifying-cluster-setup.md",
+        "section": "Building the Cluster",
+        "url": "/learn/docker_swarm/05_verifying-cluster-setup.html"
+      },
+      {
+        "file": "06_docker-compose-and-swarm-stacks.md",
+        "section": "Deploying Applications",
+        "url": "/learn/docker_swarm/06_docker-compose-and-swarm-stacks.html"
+      },
+      {
+        "file": "07_writing-a-docker-compose-file.md",
+        "section": "Deploying Applications",
+        "url": "/learn/docker_swarm/07_writing-a-docker-compose-file.html"
+      },
+      {
+        "file": "08_deploying-a-stack.md",
+        "section": "Deploying Applications",
+        "url": "/learn/docker_swarm/08_deploying-a-stack.html"
+      },
+      {
+        "file": "09_managing-and-scaling-services.md",
+        "section": "Deploying Applications",
+        "url": "/learn/docker_swarm/09_managing-and-scaling-services.html"
+      },
+      {
+        "file": "09_rebalancing.md",
+        "section": "Deploying Applications",
+        "url": "/learn/docker_swarm/09_rebalancing.html"
+      },
+      {
+        "file": "10_monitoring-tools.md",
+        "section": "Monitoring and Maintenance",
+        "url": "/learn/docker_swarm/10_monitoring-tools.html"
+      },
+      {
+        "file": "11_cluster-maintenance.md",
+        "section": "Monitoring and Maintenance",
+        "url": "/learn/docker_swarm/11_cluster-maintenance.html"
+      },
+      {
+        "file": "12_backup-and-recovery.md",
+        "section": "Monitoring and Maintenance",
+        "url": "/learn/docker_swarm/12_backup-and-recovery.html"
+      },
+      {
+        "file": "13_project-ideas.md",
+        "section": "Conclusion",
+        "url": "/learn/docker_swarm/13_project-ideas.html"
+      },
+      {
+        "file": "14_further-resources.md",
+        "section": "Conclusion",
+        "url": "/learn/docker_swarm/14_further-resources.html"
+      }
+    ]
+  },
+  {
+    "slug": "duckdb",
+    "name": "DuckDB - Fast, free analytics",
+    "description": "Learn how to use DuckDB, the fast, free, and embeddable database designed for analytics.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-09-04",
+    "groups": [
+      "databases",
+      "python",
+      "raspberry pi"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/duckdb/00_intro.html"
+      },
+      {
+        "file": "quickstart.md",
+        "section": "Introduction",
+        "url": "/learn/duckdb/quickstart.html"
+      },
+      {
+        "file": "troubleshooting.md",
+        "section": "Introduction",
+        "url": "/learn/duckdb/troubleshooting.html"
+      },
+      {
+        "file": "01_installing.md",
+        "section": "Getting Started with DuckDB",
+        "url": "/learn/duckdb/01_installing.html"
+      },
+      {
+        "file": "02_basic_queries.md",
+        "section": "Getting Started with DuckDB",
+        "url": "/learn/duckdb/02_basic_queries.html"
+      },
+      {
+        "file": "03_advanced_features.md",
+        "section": "Getting Started with DuckDB",
+        "url": "/learn/duckdb/03_advanced_features.html"
+      },
+      {
+        "file": "04_python_integration.md",
+        "section": "Integrating DuckDB with Python",
+        "url": "/learn/duckdb/04_python_integration.html"
+      },
+      {
+        "file": "05_data_analysis.md",
+        "section": "Integrating DuckDB with Python",
+        "url": "/learn/duckdb/05_data_analysis.html"
+      },
+      {
+        "file": "06_datalakes.md",
+        "section": "Datalakes, Parquet, and Performance",
+        "url": "/learn/duckdb/06_datalakes.html"
+      },
+      {
+        "file": "07_parquet.md",
+        "section": "Datalakes, Parquet, and Performance",
+        "url": "/learn/duckdb/07_parquet.html"
+      },
+      {
+        "file": "08_performance_tuning.md",
+        "section": "Datalakes, Parquet, and Performance",
+        "url": "/learn/duckdb/08_performance_tuning.html"
+      },
+      {
+        "file": "09_conclusion.md",
+        "section": "Conclusion and Next Steps",
+        "url": "/learn/duckdb/09_conclusion.html"
+      },
+      {
+        "file": "10_additional_resources.md",
+        "section": "Conclusion and Next Steps",
+        "url": "/learn/duckdb/10_additional_resources.html"
+      },
+      {
+        "file": "11_mini_capstone.md",
+        "section": "Conclusion and Next Steps",
+        "url": "/learn/duckdb/11_mini_capstone.html"
+      }
+    ]
+  },
+  {
+    "slug": "eye_mechanism",
+    "name": "Robot Eye Mechanism",
+    "description": "Robot Eye Mechanism, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.",
+    "cover": "assets/eye_mechanism.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-01-29",
+    "groups": [
+      "robotics",
+      "fusion 360"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/eye_mechanism/00_intro.html"
+      },
+      {
+        "file": "01_create_component.md",
+        "section": "Initial Design",
+        "url": "/learn/eye_mechanism/01_create_component.html"
+      },
+      {
+        "file": "02_create_sketch.md",
+        "section": "Initial Design",
+        "url": "/learn/eye_mechanism/02_create_sketch.html"
+      },
+      {
+        "file": "03_revolve.md",
+        "section": "Initial Design",
+        "url": "/learn/eye_mechanism/03_revolve.html"
+      },
+      {
+        "file": "04_create_hinges.md",
+        "section": "Refine the Top Eyelid detail",
+        "url": "/learn/eye_mechanism/04_create_hinges.html"
+      },
+      {
+        "file": "05_hinge.md",
+        "section": "Refine the Top Eyelid detail",
+        "url": "/learn/eye_mechanism/05_hinge.html"
+      },
+      {
+        "file": "06_lower_eyelid_sketch.md",
+        "section": "Create the Lower Eyelid",
+        "url": "/learn/eye_mechanism/06_lower_eyelid_sketch.html"
+      },
+      {
+        "file": "07_create_lower_sketch.md",
+        "section": "Create the Lower Eyelid",
+        "url": "/learn/eye_mechanism/07_create_lower_sketch.html"
+      },
+      {
+        "file": "08_hinge.md",
+        "section": "Create the Lower Eyelid",
+        "url": "/learn/eye_mechanism/08_hinge.html"
+      }
+    ]
+  },
+  {
+    "slug": "fastapi",
+    "name": "Building User Authentication for Static Sites with FastAPI",
+    "description": "This course teaches you how to build a user authentication system using Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll learn to implement features like registration, login, and user management, integrating these with a frontend built with Jekyll.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-03-28",
+    "groups": [
+      "fastapi",
+      "python"
+    ],
+    "lessons": [
+      {
+        "file": "01_course_overview.md",
+        "section": "Introduction to User Authentication",
+        "url": "/learn/fastapi/01_course_overview.html"
+      },
+      {
+        "file": "02_setting_up_the_environment.md",
+        "section": "Introduction to User Authentication",
+        "url": "/learn/fastapi/02_setting_up_the_environment.html"
+      },
+      {
+        "file": "03_fastapi_intro.md",
+        "section": "FastAPI and User Authentication Basics",
+        "url": "/learn/fastapi/03_fastapi_intro.html"
+      },
+      {
+        "file": "04_user_authentication_flow.md",
+        "section": "FastAPI and User Authentication Basics",
+        "url": "/learn/fastapi/04_user_authentication_flow.html"
+      },
+      {
+        "file": "05_creating_user_models.md",
+        "section": "Building the Authentication API",
+        "url": "/learn/fastapi/05_creating_user_models.html"
+      },
+      {
+        "file": "06_implementing_registration_and_login.md",
+        "section": "Building the Authentication API",
+        "url": "/learn/fastapi/06_implementing_registration_and_login.html"
+      },
+      {
+        "file": "07_user_management_apis.md",
+        "section": "Building the Authentication API",
+        "url": "/learn/fastapi/07_user_management_apis.html"
+      },
+      {
+        "file": "08_integrating_with_jekyll.md",
+        "section": "Integrating with a Jekyll Site",
+        "url": "/learn/fastapi/08_integrating_with_jekyll.html"
+      },
+      {
+        "file": "09_deploying_the_solution.md",
+        "section": "Integrating with a Jekyll Site",
+        "url": "/learn/fastapi/09_deploying_the_solution.html"
+      }
+    ]
+  },
+  {
+    "slug": "freecad",
+    "name": "Introduction to FreeCAD for Beginners",
+    "description": "This beginner's course on FreeCAD teaches you the essentials of 3D modeling with this powerful, open-source tool. From basic shapes to more complex designs, learn the fundamentals of CAD software and how to apply them in your own projects.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-04-17",
+    "groups": [
+      "freecad",
+      "3d modeling"
+    ],
+    "lessons": [
+      {
+        "file": "01_introduction_to_freecad.md",
+        "section": "Getting Started with FreeCAD",
+        "url": "/learn/freecad/01_introduction_to_freecad.html"
+      },
+      {
+        "file": "02_installing_freecad.md",
+        "section": "Getting Started with FreeCAD",
+        "url": "/learn/freecad/02_installing_freecad.html"
+      },
+      {
+        "file": "03_user_interface_overview.md",
+        "section": "Getting Started with FreeCAD",
+        "url": "/learn/freecad/03_user_interface_overview.html"
+      },
+      {
+        "file": "04_creating_basic_shapes.md",
+        "section": "Basic Modeling Techniques",
+        "url": "/learn/freecad/04_creating_basic_shapes.html"
+      },
+      {
+        "file": "05_modifying_objects.md",
+        "section": "Basic Modeling Techniques",
+        "url": "/learn/freecad/05_modifying_objects.html"
+      },
+      {
+        "file": "06_boolean_operations.md",
+        "section": "Basic Modeling Techniques",
+        "url": "/learn/freecad/06_boolean_operations.html"
+      },
+      {
+        "file": "07_assembly_design.md",
+        "section": "Advanced Design and Assembly",
+        "url": "/learn/freecad/07_assembly_design.html"
+      },
+      {
+        "file": "08_creating_drawings.md",
+        "section": "Advanced Design and Assembly",
+        "url": "/learn/freecad/08_creating_drawings.html"
+      },
+      {
+        "file": "09_exporting_models.md",
+        "section": "Advanced Design and Assembly",
+        "url": "/learn/freecad/09_exporting_models.html"
+      },
+      {
+        "file": "10_practical_examples.md",
+        "section": "Real-World Applications and Best Practices",
+        "url": "/learn/freecad/10_practical_examples.html"
+      },
+      {
+        "file": "11_tips_and_tricks.md",
+        "section": "Real-World Applications and Best Practices",
+        "url": "/learn/freecad/11_tips_and_tricks.html"
+      }
+    ]
+  },
+  {
+    "slug": "freecad_smars",
+    "name": "Building SMARS with FreeCAD",
+    "description": "Learn to design a complete 3D-printable robot chassis from scratch using FreeCAD. This hands-on course teaches parametric CAD design, professional modeling techniques, and design-for-manufacturing principles while building the iconic SMARS robot base. Perfect for makers who want to design their own robot parts.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-12-12",
+    "groups": [
+      "freecad",
+      "3d modeling",
+      "robots"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Getting Started",
+        "url": "/learn/freecad_smars/00_intro.html"
+      },
+      {
+        "file": "01_navigation.md",
+        "section": "Getting Started",
+        "url": "/learn/freecad_smars/01_navigation.html"
+      },
+      {
+        "file": "02_creating_the_base.md",
+        "section": "Designing the SMARS Base",
+        "url": "/learn/freecad_smars/02_creating_the_base.html"
+      },
+      {
+        "file": "03_shell_and_fillet.md",
+        "section": "Designing the SMARS Base",
+        "url": "/learn/freecad_smars/03_shell_and_fillet.html"
+      },
+      {
+        "file": "04_sides_and_holes.md",
+        "section": "Designing the SMARS Base",
+        "url": "/learn/freecad_smars/04_sides_and_holes.html"
+      },
+      {
+        "file": "05_front_rear_profiles.md",
+        "section": "Designing the SMARS Base",
+        "url": "/learn/freecad_smars/05_front_rear_profiles.html"
+      },
+      {
+        "file": "06_arduino_slots.md",
+        "section": "Designing the SMARS Base",
+        "url": "/learn/freecad_smars/06_arduino_slots.html"
+      },
+      {
+        "file": "07_wheel_stubs.md",
+        "section": "Designing the SMARS Base",
+        "url": "/learn/freecad_smars/07_wheel_stubs.html"
+      },
+      {
+        "file": "08_motor_holder.md",
+        "section": "Designing the SMARS Base",
+        "url": "/learn/freecad_smars/08_motor_holder.html"
+      },
+      {
+        "file": "09_save_as_stl.md",
+        "section": "Exporting for 3D Printing",
+        "url": "/learn/freecad_smars/09_save_as_stl.html"
+      },
+      {
+        "file": "10_summary.md",
+        "section": "Summary",
+        "url": "/learn/freecad_smars/10_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "how_to_install_micropython",
+    "name": "How to install MicroPython",
+    "description": "Install MicroPython on your Raspberry Pi Pico.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-08-10",
+    "groups": [
+      "micropython",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction",
+        "url": "/learn/how_to_install_micropython/01_intro.html"
+      },
+      {
+        "file": "02_types.md",
+        "section": "Raspberry Pi Pico",
+        "url": "/learn/how_to_install_micropython/02_types.html"
+      },
+      {
+        "file": "03_install.md",
+        "section": "Raspberry Pi Pico",
+        "url": "/learn/how_to_install_micropython/03_install.html"
+      },
+      {
+        "file": "04_next_steps.md",
+        "section": "Where to go from here",
+        "url": "/learn/how_to_install_micropython/04_next_steps.html"
+      }
+    ]
+  },
+  {
+    "slug": "i2c_spi",
+    "name": "Talking to the World - Working with I2C and SPI",
+    "description": "Master I2C and SPI communication protocols on Raspberry Pi Pico. Learn to connect sensors, scan for devices, read datasheets, and build real-world projects with practical hands-on examples using the BME280 sensor.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-01-15",
+    "groups": [
+      "micropython",
+      "electronics",
+      "raspberrypi"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/i2c_spi/00_intro.html"
+      },
+      {
+        "file": "13_course-video.md",
+        "section": "Introduction",
+        "url": "/learn/i2c_spi/13_course-video.html"
+      },
+      {
+        "file": "01_what-is-i2c.md",
+        "section": "Understanding I2C",
+        "url": "/learn/i2c_spi/01_what-is-i2c.html"
+      },
+      {
+        "file": "02_i2c-hardware-setup.md",
+        "section": "Understanding I2C",
+        "url": "/learn/i2c_spi/02_i2c-hardware-setup.html"
+      },
+      {
+        "file": "03_scanning-i2c-devices.md",
+        "section": "Understanding I2C",
+        "url": "/learn/i2c_spi/03_scanning-i2c-devices.html"
+      },
+      {
+        "file": "04_reading-i2c-sensor.md",
+        "section": "Understanding I2C",
+        "url": "/learn/i2c_spi/04_reading-i2c-sensor.html"
+      },
+      {
+        "file": "05_demystifying-datasheets.md",
+        "section": "Working with Datasheets",
+        "url": "/learn/i2c_spi/05_demystifying-datasheets.html"
+      },
+      {
+        "file": "06_bme280-deep-dive.md",
+        "section": "Working with Datasheets",
+        "url": "/learn/i2c_spi/06_bme280-deep-dive.html"
+      },
+      {
+        "file": "07_what-is-spi.md",
+        "section": "Understanding SPI",
+        "url": "/learn/i2c_spi/07_what-is-spi.html"
+      },
+      {
+        "file": "08_spi-hardware-setup.md",
+        "section": "Understanding SPI",
+        "url": "/learn/i2c_spi/08_spi-hardware-setup.html"
+      },
+      {
+        "file": "09_spi-sensor-example.md",
+        "section": "Understanding SPI",
+        "url": "/learn/i2c_spi/09_spi-sensor-example.html"
+      },
+      {
+        "file": "10_i2c-vs-spi.md",
+        "section": "Choosing and Troubleshooting",
+        "url": "/learn/i2c_spi/10_i2c-vs-spi.html"
+      },
+      {
+        "file": "11_common-issues.md",
+        "section": "Choosing and Troubleshooting",
+        "url": "/learn/i2c_spi/11_common-issues.html"
+      },
+      {
+        "file": "12_final-project.md",
+        "section": "Choosing and Troubleshooting",
+        "url": "/learn/i2c_spi/12_final-project.html"
+      }
+    ]
+  },
+  {
+    "slug": "intermediate_micropython",
+    "name": "Intermediate level MicroPython",
+    "description": "This course is designed to take you from a beginner to an intermediate level of MicroPython programming. It covers the basics of Object Oriented Programming,  Modules and Packages, DocStrings, Interrupts and Timers, and MP Remote.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-07-07",
+    "groups": [
+      "micropython",
+      "python",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction",
+        "url": "/learn/intermediate_micropython/01_intro.html"
+      },
+      {
+        "file": "02_oop.md",
+        "section": "Object Oriented Programming",
+        "url": "/learn/intermediate_micropython/02_oop.html"
+      },
+      {
+        "file": "02a_classes.md",
+        "section": "Object Oriented Programming",
+        "url": "/learn/intermediate_micropython/02a_classes.html"
+      },
+      {
+        "file": "03_abstraction.md",
+        "section": "Object Oriented Programming",
+        "url": "/learn/intermediate_micropython/03_abstraction.html"
+      },
+      {
+        "file": "04_inheritance.md",
+        "section": "Object Oriented Programming",
+        "url": "/learn/intermediate_micropython/04_inheritance.html"
+      },
+      {
+        "file": "05_encapsulation.md",
+        "section": "Object Oriented Programming",
+        "url": "/learn/intermediate_micropython/05_encapsulation.html"
+      },
+      {
+        "file": "06_polymorphism.md",
+        "section": "Object Oriented Programming",
+        "url": "/learn/intermediate_micropython/06_polymorphism.html"
+      },
+      {
+        "file": "06a_decorators.md",
+        "section": "Decorators",
+        "url": "/learn/intermediate_micropython/06a_decorators.html"
+      },
+      {
+        "file": "07_modules.md",
+        "section": "Modules and Packages",
+        "url": "/learn/intermediate_micropython/07_modules.html"
+      },
+      {
+        "file": "08_packages.md",
+        "section": "Modules and Packages",
+        "url": "/learn/intermediate_micropython/08_packages.html"
+      },
+      {
+        "file": "09_pypi.md",
+        "section": "Modules and Packages",
+        "url": "/learn/intermediate_micropython/09_pypi.html"
+      },
+      {
+        "file": "10_docstrings.md",
+        "section": "DocStrings",
+        "url": "/learn/intermediate_micropython/10_docstrings.html"
+      },
+      {
+        "file": "11_interrupts.md",
+        "section": "Interrupts and Timers",
+        "url": "/learn/intermediate_micropython/11_interrupts.html"
+      },
+      {
+        "file": "12_timers.md",
+        "section": "Interrupts and Timers",
+        "url": "/learn/intermediate_micropython/12_timers.html"
+      },
+      {
+        "file": "13_mp_remote.md",
+        "section": "MP Remote",
+        "url": "/learn/intermediate_micropython/13_mp_remote.html"
+      },
+      {
+        "file": "14_summary.md",
+        "section": "Conclusion",
+        "url": "/learn/intermediate_micropython/14_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "jekyll",
+    "name": "Building Websites with Jekyll",
+    "description": "Learn how to build static websites using Jekyll, from basic setup to advanced features.",
+    "cover": "assets/jekyll.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-01-24",
+    "groups": [
+      "jekyll",
+      "website development"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction to Jekyll and Static Sites",
+        "url": "/learn/jekyll/01_intro.html"
+      },
+      {
+        "file": "02_install.md",
+        "section": "Introduction to Jekyll and Static Sites",
+        "url": "/learn/jekyll/02_install.html"
+      },
+      {
+        "file": "03_content.md",
+        "section": "Introduction to Jekyll and Static Sites",
+        "url": "/learn/jekyll/03_content.html"
+      },
+      {
+        "file": "04_customizing.md",
+        "section": "Introduction to Jekyll and Static Sites",
+        "url": "/learn/jekyll/04_customizing.html"
+      },
+      {
+        "file": "05_advanced.md",
+        "section": "Advanced Jekyll",
+        "url": "/learn/jekyll/05_advanced.html"
+      },
+      {
+        "file": "06_deploy.md",
+        "section": "Advanced Jekyll",
+        "url": "/learn/jekyll/06_deploy.html"
+      },
+      {
+        "file": "07_realworld.md",
+        "section": "Advanced Jekyll",
+        "url": "/learn/jekyll/07_realworld.html"
+      },
+      {
+        "file": "08_bonus.md",
+        "section": "Bonus",
+        "url": "/learn/jekyll/08_bonus.html"
+      }
+    ]
+  },
+  {
+    "slug": "k3s",
+    "name": "Running K3s on Raspberry Pi",
+    "description": "Learn how to build your own lightweight Kubernetes cluster using K3s and Raspberry Pi. This hands-on course will guide you through setup, configuration, networking, persistent storage, and deploying real workloads \u2014 all on affordable single-board computers. Ideal for homelabbers, IoT developers, and anyone curious about Kubernetes at the edge.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-06-01",
+    "groups": [
+      "docker",
+      "raspberrypi"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction",
+        "url": "/learn/k3s/01_intro.html"
+      },
+      {
+        "file": "02_hardware_requirements.md",
+        "section": "Preparing Your Raspberry Pi Cluster",
+        "url": "/learn/k3s/02_hardware_requirements.html"
+      },
+      {
+        "file": "03_os_installation.md",
+        "section": "Preparing Your Raspberry Pi Cluster",
+        "url": "/learn/k3s/03_os_installation.html"
+      },
+      {
+        "file": "04_cluster_networking.md",
+        "section": "Preparing Your Raspberry Pi Cluster",
+        "url": "/learn/k3s/04_cluster_networking.html"
+      },
+      {
+        "file": "05_installing_k3s.md",
+        "section": "Installing K3s",
+        "url": "/learn/k3s/05_installing_k3s.html"
+      },
+      {
+        "file": "06_adding_nodes.md",
+        "section": "Installing K3s",
+        "url": "/learn/k3s/06_adding_nodes.html"
+      },
+      {
+        "file": "07_troubleshooting_install.md",
+        "section": "Installing K3s",
+        "url": "/learn/k3s/07_troubleshooting_install.html"
+      },
+      {
+        "file": "08_kubectl_basics.md",
+        "section": "Using Your K3s Cluster",
+        "url": "/learn/k3s/08_kubectl_basics.html"
+      },
+      {
+        "file": "09_dashboard_and_monitoring.md",
+        "section": "Using Your K3s Cluster",
+        "url": "/learn/k3s/09_dashboard_and_monitoring.html"
+      },
+      {
+        "file": "10_storage_and_volumes.md",
+        "section": "Using Your K3s Cluster",
+        "url": "/learn/k3s/10_storage_and_volumes.html"
+      },
+      {
+        "file": "11_ingress_and_services.md",
+        "section": "Using Your K3s Cluster",
+        "url": "/learn/k3s/11_ingress_and_services.html"
+      },
+      {
+        "file": "12_deploying_apps.md",
+        "section": "Real-World Deployments",
+        "url": "/learn/k3s/12_deploying_apps.html"
+      },
+      {
+        "file": "13_using_helm.md",
+        "section": "Real-World Deployments",
+        "url": "/learn/k3s/13_using_helm.html"
+      },
+      {
+        "file": "14_ci_cd_on_k3s.md",
+        "section": "Real-World Deployments",
+        "url": "/learn/k3s/14_ci_cd_on_k3s.html"
+      },
+      {
+        "file": "15_custom_cni.md",
+        "section": "Advanced Topics",
+        "url": "/learn/k3s/15_custom_cni.html"
+      },
+      {
+        "file": "16_securing_your_cluster.md",
+        "section": "Advanced Topics",
+        "url": "/learn/k3s/16_securing_your_cluster.html"
+      },
+      {
+        "file": "17_final_project.md",
+        "section": "Final Project",
+        "url": "/learn/k3s/17_final_project.html"
+      },
+      {
+        "file": "18_summary.md",
+        "section": "Summary",
+        "url": "/learn/k3s/18_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "learn_ros",
+    "name": "Learn ROS with me",
+    "description": "Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.",
+    "cover": "assets/learn_ros.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-01-07",
+    "groups": [
+      "ros",
+      "raspberry pi",
+      "robotics"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/learn_ros/00_intro.html"
+      },
+      {
+        "file": "01_what_is_ros.md",
+        "section": "Overview",
+        "url": "/learn/learn_ros/01_what_is_ros.html"
+      },
+      {
+        "file": "02_pi_setup.md",
+        "section": "Setting up the Raspberry Pi 4 environment",
+        "url": "/learn/learn_ros/02_pi_setup.html"
+      },
+      {
+        "file": "03_install_updates.md",
+        "section": "Setting up the Raspberry Pi 4 environment",
+        "url": "/learn/learn_ros/03_install_updates.html"
+      },
+      {
+        "file": "04_docker_install.md",
+        "section": "Setting Docker for ROS",
+        "url": "/learn/learn_ros/04_docker_install.html"
+      },
+      {
+        "file": "05_get_cubie.md",
+        "section": "Setting Docker for ROS",
+        "url": "/learn/learn_ros/05_get_cubie.html"
+      },
+      {
+        "file": "06_clone_images.md",
+        "section": "Setting Docker for ROS",
+        "url": "/learn/learn_ros/06_clone_images.html"
+      },
+      {
+        "file": "07_build_container.md",
+        "section": "Build the ROS2 Container",
+        "url": "/learn/learn_ros/07_build_container.html"
+      },
+      {
+        "file": "08_vscode_setup.md",
+        "section": "Setting up VSCode",
+        "url": "/learn/learn_ros/08_vscode_setup.html"
+      },
+      {
+        "file": "09_first_ros_program.md",
+        "section": "First ROS2 Program",
+        "url": "/learn/learn_ros/09_first_ros_program.html"
+      },
+      {
+        "file": "10_listener.md",
+        "section": "First ROS2 Program",
+        "url": "/learn/learn_ros/10_listener.html"
+      },
+      {
+        "file": "11_create_py_package.md",
+        "section": "ROS2 Python Packages",
+        "url": "/learn/learn_ros/11_create_py_package.html"
+      },
+      {
+        "file": "12_create_publisher.md",
+        "section": "ROS2 Python Packages",
+        "url": "/learn/learn_ros/12_create_publisher.html"
+      },
+      {
+        "file": "13_create_subscriber.md",
+        "section": "ROS2 Python Packages",
+        "url": "/learn/learn_ros/13_create_subscriber.html"
+      },
+      {
+        "file": "14_docker_x11.md",
+        "section": "Docker and X11",
+        "url": "/learn/learn_ros/14_docker_x11.html"
+      },
+      {
+        "file": "15_rviz.md",
+        "section": "RViz2",
+        "url": "/learn/learn_ros/15_rviz.html"
+      },
+      {
+        "file": "16_rviz_displays.md",
+        "section": "RViz2",
+        "url": "/learn/learn_ros/16_rviz_displays.html"
+      },
+      {
+        "file": "17_tf2.md",
+        "section": "RViz2",
+        "url": "/learn/learn_ros/17_tf2.html"
+      },
+      {
+        "file": "18_laserscan.md",
+        "section": "RViz2",
+        "url": "/learn/learn_ros/18_laserscan.html"
+      }
+    ]
+  },
+  {
+    "slug": "learning_platform",
+    "name": "How to use the Learning Platform",
+    "description": "Learn how to use the new Learning Platform",
+    "cover": "assets/learn.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2022-12-04",
+    "groups": [
+      "learning platform"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/learning_platform/00_intro.html"
+      },
+      {
+        "file": "01_how_to_use.md",
+        "section": "Overview",
+        "url": "/learn/learning_platform/01_how_to_use.html"
+      },
+      {
+        "file": "02_navigate_content.md",
+        "section": "Navigating Content",
+        "url": "/learn/learning_platform/02_navigate_content.html"
+      },
+      {
+        "file": "03_download_content.md",
+        "section": "Navigating Content",
+        "url": "/learn/learning_platform/03_download_content.html"
+      }
+    ]
+  },
+  {
+    "slug": "linux_intro",
+    "name": "Introduction to the Linux Command Line on Raspberry Pi OS",
+    "description": "Learn the fundamentals of using the Linux command line on Raspberry Pi OS. This course covers essential topics including navigation, file management, software installation, system monitoring, networking, and basic scripting.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-08-23",
+    "groups": [
+      "linux"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro_terminal.md",
+        "section": "Getting Started with the Command Line",
+        "url": "/learn/linux_intro/01_intro_terminal.html"
+      },
+      {
+        "file": "01a_man.md",
+        "section": "Getting Started with the Command Line",
+        "url": "/learn/linux_intro/01a_man.html"
+      },
+      {
+        "file": "02_basic_navigation.md",
+        "section": "Getting Started with the Command Line",
+        "url": "/learn/linux_intro/02_basic_navigation.html"
+      },
+      {
+        "file": "02a_user.md",
+        "section": "Getting Started with the Command Line",
+        "url": "/learn/linux_intro/02a_user.html"
+      },
+      {
+        "file": "03_working_with_files.md",
+        "section": "Managing Files and Directories",
+        "url": "/learn/linux_intro/03_working_with_files.html"
+      },
+      {
+        "file": "04_working_with_directories.md",
+        "section": "Managing Files and Directories",
+        "url": "/learn/linux_intro/04_working_with_directories.html"
+      },
+      {
+        "file": "05_file_permissions.md",
+        "section": "Managing Files and Directories",
+        "url": "/learn/linux_intro/05_file_permissions.html"
+      },
+      {
+        "file": "06_installing_software.md",
+        "section": "Managing Software",
+        "url": "/learn/linux_intro/06_installing_software.html"
+      },
+      {
+        "file": "07_managing_software.md",
+        "section": "Managing Software",
+        "url": "/learn/linux_intro/07_managing_software.html"
+      },
+      {
+        "file": "08_monitoring_performance.md",
+        "section": "System Monitoring and Management",
+        "url": "/learn/linux_intro/08_monitoring_performance.html"
+      },
+      {
+        "file": "09_managing_processes.md",
+        "section": "System Monitoring and Management",
+        "url": "/learn/linux_intro/09_managing_processes.html"
+      },
+      {
+        "file": "10_networking_commands.md",
+        "section": "Networking Basics",
+        "url": "/learn/linux_intro/10_networking_commands.html"
+      },
+      {
+        "file": "11_transferring_files.md",
+        "section": "Networking Basics",
+        "url": "/learn/linux_intro/11_transferring_files.html"
+      },
+      {
+        "file": "12_intro_scripting.md",
+        "section": "Scripting Basics",
+        "url": "/learn/linux_intro/12_intro_scripting.html"
+      },
+      {
+        "file": "13_basic_scripting_constructs.md",
+        "section": "Scripting Basics",
+        "url": "/learn/linux_intro/13_basic_scripting_constructs.html"
+      },
+      {
+        "file": "14_intro_git.md",
+        "section": "Working with Git (Optional Advanced Topic)",
+        "url": "/learn/linux_intro/14_intro_git.html"
+      },
+      {
+        "file": "15_basic_git_commands.md",
+        "section": "Working with Git (Optional Advanced Topic)",
+        "url": "/learn/linux_intro/15_basic_git_commands.html"
+      },
+      {
+        "file": "16_final_project_overview.md",
+        "section": "Final Project: Building a Simple Command Line Application",
+        "url": "/learn/linux_intro/16_final_project_overview.html"
+      },
+      {
+        "file": "17_final_project_steps.md",
+        "section": "Final Project: Building a Simple Command Line Application",
+        "url": "/learn/linux_intro/17_final_project_steps.html"
+      },
+      {
+        "file": "18_resources_next_steps.md",
+        "section": "Resources and Next Steps",
+        "url": "/learn/linux_intro/18_resources_next_steps.html"
+      },
+      {
+        "file": "19_cheatsheet.md",
+        "section": "Resources and Next Steps",
+        "url": "/learn/linux_intro/19_cheatsheet.html"
+      }
+    ]
+  },
+  {
+    "slug": "markdown",
+    "name": "Mastering Markdown for Documentation with Jekyll",
+    "description": "This comprehensive course is designed to teach you how to effectively use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll. From the basics of Markdown to deploying your site, you'll learn everything you need to get started.",
+    "cover": "assets/markdown.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-03-21",
+    "groups": [
+      "markdown",
+      "jekyll",
+      "documentation"
+    ],
+    "lessons": [
+      {
+        "file": "01_overview.md",
+        "section": "Introduction to Markdown and Jekyll",
+        "url": "/learn/markdown/01_overview.html"
+      },
+      {
+        "file": "02_markdown_basics.md",
+        "section": "Introduction to Markdown and Jekyll",
+        "url": "/learn/markdown/02_markdown_basics.html"
+      },
+      {
+        "file": "03_setup_environment.md",
+        "section": "Introduction to Markdown and Jekyll",
+        "url": "/learn/markdown/03_setup_environment.html"
+      },
+      {
+        "file": "04_writing_content_in_markdown.md",
+        "section": "Creating Content with Markdown and Jekyll",
+        "url": "/learn/markdown/04_writing_content_in_markdown.html"
+      },
+      {
+        "file": "05_working_with_layouts_and_includes.md",
+        "section": "Creating Content with Markdown and Jekyll",
+        "url": "/learn/markdown/05_working_with_layouts_and_includes.html"
+      },
+      {
+        "file": "06_managing_static_assets.md",
+        "section": "Creating Content with Markdown and Jekyll",
+        "url": "/learn/markdown/06_managing_static_assets.html"
+      },
+      {
+        "file": "07_using_liquid_templating.md",
+        "section": "Enhancing Your Site",
+        "url": "/learn/markdown/07_using_liquid_templating.html"
+      },
+      {
+        "file": "08_customizing_themes_and_plugins.md",
+        "section": "Enhancing Your Site",
+        "url": "/learn/markdown/08_customizing_themes_and_plugins.html"
+      },
+      {
+        "file": "09_building_and_testing_locally.md",
+        "section": "Publishing Your Site",
+        "url": "/learn/markdown/09_building_and_testing_locally.html"
+      },
+      {
+        "file": "10_deploying_to_github_pages.md",
+        "section": "Publishing Your Site",
+        "url": "/learn/markdown/10_deploying_to_github_pages.html"
+      }
+    ]
+  },
+  {
+    "slug": "micropython",
+    "name": "Learn MicroPython - The basics",
+    "description": "Get started with MicroPython, What Python is, where to download it and which software to use to develop MicroPython code",
+    "cover": "assets/micropython.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2022-12-04",
+    "groups": [
+      "micropython",
+      "python",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/micropython/00_intro.html"
+      },
+      {
+        "file": "00_videos.md",
+        "section": "Overview",
+        "url": "/learn/micropython/00_videos.html"
+      },
+      {
+        "file": "01_why_is_it_called_micropython.md",
+        "section": "Introduction",
+        "url": "/learn/micropython/01_why_is_it_called_micropython.html"
+      },
+      {
+        "file": "02_where_to_get_micropython.md",
+        "section": "Introduction",
+        "url": "/learn/micropython/02_where_to_get_micropython.html"
+      },
+      {
+        "file": "03_installing_micropython.md",
+        "section": "Introduction",
+        "url": "/learn/micropython/03_installing_micropython.html"
+      },
+      {
+        "file": "04_why_use_micropython.md",
+        "section": "Introduction",
+        "url": "/learn/micropython/04_why_use_micropython.html"
+      },
+      {
+        "file": "05_ides.md",
+        "section": "Introduction",
+        "url": "/learn/micropython/05_ides.html"
+      },
+      {
+        "file": "06_our_first_program.md",
+        "section": "Introduction",
+        "url": "/learn/micropython/06_our_first_program.html"
+      },
+      {
+        "file": "07_hello_world.md",
+        "section": "Introduction",
+        "url": "/learn/micropython/07_hello_world.html"
+      },
+      {
+        "file": "08_variables.md",
+        "section": "Variables and Reserved Words",
+        "url": "/learn/micropython/08_variables.html"
+      },
+      {
+        "file": "09_example02.md",
+        "section": "Variables and Reserved Words",
+        "url": "/learn/micropython/09_example02.html"
+      },
+      {
+        "file": "10_values_and_variable_types.md",
+        "section": "Variables and Reserved Words",
+        "url": "/learn/micropython/10_values_and_variable_types.html"
+      },
+      {
+        "file": "11_reserved_words.md",
+        "section": "Variables and Reserved Words",
+        "url": "/learn/micropython/11_reserved_words.html"
+      },
+      {
+        "file": "12_if_elif_else.md",
+        "section": "Controlling the Flow",
+        "url": "/learn/micropython/12_if_elif_else.html"
+      },
+      {
+        "file": "13_loops.md",
+        "section": "Controlling the Flow",
+        "url": "/learn/micropython/13_loops.html"
+      },
+      {
+        "file": "14_operators.md",
+        "section": "Controlling the Flow",
+        "url": "/learn/micropython/14_operators.html"
+      },
+      {
+        "file": "15_functions.md",
+        "section": "Functions and Modules",
+        "url": "/learn/micropython/15_functions.html"
+      },
+      {
+        "file": "16_repl.md",
+        "section": "Functions and Modules",
+        "url": "/learn/micropython/16_repl.html"
+      },
+      {
+        "file": "17_modules.md",
+        "section": "Functions and Modules",
+        "url": "/learn/micropython/17_modules.html"
+      },
+      {
+        "file": "18_summary.md",
+        "section": "Summary and Review",
+        "url": "/learn/micropython/18_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "micropython_gpio",
+    "name": "Raspberry Pi Pico with MicroPython - GPIO Mastery",
+    "description": "Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython. Learn about various types of pins, their functions, and how to work with them in real-world projects.",
+    "cover": "assets/raspberry_pi_pico_gpio.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-04-14",
+    "groups": [
+      "micropython",
+      "gpio",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/micropython_gpio/00_intro.html"
+      },
+      {
+        "file": "01_gpio_pin_types.md",
+        "section": "Introduction to GPIO Pins",
+        "url": "/learn/micropython_gpio/01_gpio_pin_types.html"
+      },
+      {
+        "file": "02_pin_numbering.md",
+        "section": "Introduction to GPIO Pins",
+        "url": "/learn/micropython_gpio/02_pin_numbering.html"
+      },
+      {
+        "file": "03_voltage_levels.md",
+        "section": "Introduction to GPIO Pins",
+        "url": "/learn/micropython_gpio/03_voltage_levels.html"
+      },
+      {
+        "file": "04_digital_io.md",
+        "section": "Digital I/O and PWM",
+        "url": "/learn/micropython_gpio/04_digital_io.html"
+      },
+      {
+        "file": "05_pwm.md",
+        "section": "Digital I/O and PWM",
+        "url": "/learn/micropython_gpio/05_pwm.html"
+      },
+      {
+        "file": "06_leds.md",
+        "section": "Digital I/O and PWM",
+        "url": "/learn/micropython_gpio/06_leds.html"
+      },
+      {
+        "file": "07_motors.md",
+        "section": "Digital I/O and PWM",
+        "url": "/learn/micropython_gpio/07_motors.html"
+      },
+      {
+        "file": "08_adc.md",
+        "section": "Analog I/O (ADC)",
+        "url": "/learn/micropython_gpio/08_adc.html"
+      },
+      {
+        "file": "09_potentiometers.md",
+        "section": "Analog I/O (ADC)",
+        "url": "/learn/micropython_gpio/09_potentiometers.html"
+      },
+      {
+        "file": "10_temperature_sensors.md",
+        "section": "Analog I/O (ADC)",
+        "url": "/learn/micropython_gpio/10_temperature_sensors.html"
+      },
+      {
+        "file": "11_uart.md",
+        "section": "UART, I2C, and SPI",
+        "url": "/learn/micropython_gpio/11_uart.html"
+      },
+      {
+        "file": "12_i2c.md",
+        "section": "UART, I2C, and SPI",
+        "url": "/learn/micropython_gpio/12_i2c.html"
+      },
+      {
+        "file": "13_spi.md",
+        "section": "UART, I2C, and SPI",
+        "url": "/learn/micropython_gpio/13_spi.html"
+      },
+      {
+        "file": "14_servos.md",
+        "section": "Interfacing with Servos and Ultrasonic Range Finders",
+        "url": "/learn/micropython_gpio/14_servos.html"
+      },
+      {
+        "file": "15_ultrasonic_range_finders.md",
+        "section": "Interfacing with Servos and Ultrasonic Range Finders",
+        "url": "/learn/micropython_gpio/15_ultrasonic_range_finders.html"
+      },
+      {
+        "file": "16_ground_pins.md",
+        "section": "Ground Pins",
+        "url": "/learn/micropython_gpio/16_ground_pins.html"
+      },
+      {
+        "file": "17_summary.md",
+        "section": "Summary and Review",
+        "url": "/learn/micropython_gpio/17_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "micropython_robotics",
+    "name": "MicroPython Robotics Projects with the Raspberry Pi Pico",
+    "description": "Learn how to build simple yet powerful robots using the Raspberry Pi Pico and MicroPython.  This hands-on course guides you through controlling motors, reading sensors, and combining hardware to create autonomous and remotely controlled robots.  Perfect for makers ready to go beyond GPIO and start building real-world robotics projects.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-05-20",
+    "groups": [
+      "robotics",
+      "micropython",
+      "raspberrypi"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction",
+        "url": "/learn/micropython_robotics/01_intro.html"
+      },
+      {
+        "file": "02_dc_motors.md",
+        "section": "Motors and Movement",
+        "url": "/learn/micropython_robotics/02_dc_motors.html"
+      },
+      {
+        "file": "03_hbridge_control.md",
+        "section": "Motors and Movement",
+        "url": "/learn/micropython_robotics/03_hbridge_control.html"
+      },
+      {
+        "file": "04_line_following.md",
+        "section": "Sensors and Input",
+        "url": "/learn/micropython_robotics/04_line_following.html"
+      },
+      {
+        "file": "05_ultrasonic_sensor.md",
+        "section": "Sensors and Input",
+        "url": "/learn/micropython_robotics/05_ultrasonic_sensor.html"
+      },
+      {
+        "file": "06_build_robot.md",
+        "section": "Robot Assembly",
+        "url": "/learn/micropython_robotics/06_build_robot.html"
+      },
+      {
+        "file": "07_servo_scanning.md",
+        "section": "Robot Assembly",
+        "url": "/learn/micropython_robotics/07_servo_scanning.html"
+      },
+      {
+        "file": "08_bluetooth_control.md",
+        "section": "Remote Control",
+        "url": "/learn/micropython_robotics/08_bluetooth_control.html"
+      },
+      {
+        "file": "09_wifi_control.md",
+        "section": "Remote Control",
+        "url": "/learn/micropython_robotics/09_wifi_control.html"
+      },
+      {
+        "file": "10_autonomous_robot.md",
+        "section": "Autonomous Behavior",
+        "url": "/learn/micropython_robotics/10_autonomous_robot.html"
+      },
+      {
+        "file": "11_final_project.md",
+        "section": "Final Project",
+        "url": "/learn/micropython_robotics/11_final_project.html"
+      },
+      {
+        "file": "12_summary.md",
+        "section": "Summary",
+        "url": "/learn/micropython_robotics/12_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "mini_rack",
+    "name": "Mini-Rack 3D Design Tutorial",
+    "description": "Design a 3D printable 10\" mini-rack for your Raspberry Pi home lab.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-02-16",
+    "groups": [
+      "raspberrypi",
+      "3ddesign",
+      "stands_and_cases"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/mini_rack/00_intro.html"
+      },
+      {
+        "file": "01_components.md",
+        "section": "Overview",
+        "url": "/learn/mini_rack/01_components.html"
+      },
+      {
+        "file": "02_2u_design.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/02_2u_design.html"
+      },
+      {
+        "file": "03_bottom.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/03_bottom.html"
+      },
+      {
+        "file": "04_top.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/04_top.html"
+      },
+      {
+        "file": "05_handle.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/05_handle.html"
+      },
+      {
+        "file": "06_panel.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/06_panel.html"
+      },
+      {
+        "file": "07_pi_tray.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/07_pi_tray.html"
+      },
+      {
+        "file": "08_top_panel.md",
+        "section": "Part Designs",
+        "url": "/learn/mini_rack/08_top_panel.html"
+      },
+      {
+        "file": "07_print.md",
+        "section": "Printing",
+        "url": "/learn/mini_rack/07_print.html"
+      }
+    ]
+  },
+  {
+    "slug": "object_model",
+    "name": "Building Object Detection Models with Raspberry Pi AI Camera",
+    "description": "Learn how to build custom object detection models using the Raspberry Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment, and run real-time detection on Raspberry Pi hardware. Complete hands-on course from dataset creation to production deployment.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-12-04",
+    "groups": [
+      "python",
+      "ai",
+      "raspberry_pi",
+      "computer_vision"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Getting Started",
+        "url": "/learn/object_model/00_intro.html"
+      },
+      {
+        "file": "01_setup.md",
+        "section": "Getting Started",
+        "url": "/learn/object_model/01_setup.html"
+      },
+      {
+        "file": "02_dataset_prep.md",
+        "section": "Dataset Preparation",
+        "url": "/learn/object_model/02_dataset_prep.html"
+      },
+      {
+        "file": "03_training.md",
+        "section": "Model Training",
+        "url": "/learn/object_model/03_training.html"
+      },
+      {
+        "file": "04_onnx_conversion.md",
+        "section": "Model Training",
+        "url": "/learn/object_model/04_onnx_conversion.html"
+      },
+      {
+        "file": "05_deployment.md",
+        "section": "Deployment",
+        "url": "/learn/object_model/05_deployment.html"
+      },
+      {
+        "file": "06_realtime_detection.md",
+        "section": "Deployment",
+        "url": "/learn/object_model/06_realtime_detection.html"
+      },
+      {
+        "file": "07_troubleshooting.md",
+        "section": "Advanced Topics",
+        "url": "/learn/object_model/07_troubleshooting.html"
+      },
+      {
+        "file": "08_summary.md",
+        "section": "Advanced Topics",
+        "url": "/learn/object_model/08_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "obsidian",
+    "name": "Obsidian",
+    "description": "Learn how to use Obsidian for note-taking and knowledge management.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-08-24",
+    "groups": [
+      "obsidian",
+      "raspberrypi"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/obsidian/00_intro.html"
+      },
+      {
+        "file": "01_installing.md",
+        "section": "Getting Started with Obsidian",
+        "url": "/learn/obsidian/01_installing.html"
+      },
+      {
+        "file": "02_first_vault.md",
+        "section": "Getting Started with Obsidian",
+        "url": "/learn/obsidian/02_first_vault.html"
+      },
+      {
+        "file": "03_creating_notes.md",
+        "section": "Taking Notes and Organization",
+        "url": "/learn/obsidian/03_creating_notes.html"
+      },
+      {
+        "file": "04_tagging_notes.md",
+        "section": "Taking Notes and Organization",
+        "url": "/learn/obsidian/04_tagging_notes.html"
+      },
+      {
+        "file": "05_linking_notes.md",
+        "section": "Taking Notes and Organization",
+        "url": "/learn/obsidian/05_linking_notes.html"
+      },
+      {
+        "file": "06_canvas.md",
+        "section": "Advanced Features",
+        "url": "/learn/obsidian/06_canvas.html"
+      },
+      {
+        "file": "07_tasks.md",
+        "section": "Advanced Features",
+        "url": "/learn/obsidian/07_tasks.html"
+      },
+      {
+        "file": "08_dataview_and_bases.md",
+        "section": "Advanced Features",
+        "url": "/learn/obsidian/08_dataview_and_bases.html"
+      },
+      {
+        "file": "09_properties.md",
+        "section": "Advanced Features",
+        "url": "/learn/obsidian/09_properties.html"
+      },
+      {
+        "file": "12_graph_view.md",
+        "section": "Advanced Features",
+        "url": "/learn/obsidian/12_graph_view.html"
+      },
+      {
+        "file": "10_markdown_in_obsidian.md",
+        "section": "Markdown in Obsidian",
+        "url": "/learn/obsidian/10_markdown_in_obsidian.html"
+      },
+      {
+        "file": "11_markdown_course_link.md",
+        "section": "Markdown in Obsidian",
+        "url": "/learn/obsidian/11_markdown_course_link.html"
+      }
+    ]
+  },
+  {
+    "slug": "octapi",
+    "name": "OctaPi",
+    "description": "Learn how to use Crack the Enigma code using a Cluster of Raspberry Pis and Python.",
+    "cover": "assets/octapi.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-02-18",
+    "groups": [
+      "octapi",
+      "python",
+      "clusters"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/octapi/00_intro.html"
+      },
+      {
+        "file": "01_lesson01.md",
+        "section": "Introduction to Enigma",
+        "url": "/learn/octapi/01_lesson01.html"
+      },
+      {
+        "file": "02_lesson02.md",
+        "section": "Introduction to Enigma",
+        "url": "/learn/octapi/02_lesson02.html"
+      },
+      {
+        "file": "03_lesson03.md",
+        "section": "Bruteforce attack",
+        "url": "/learn/octapi/03_lesson03.html"
+      },
+      {
+        "file": "04_lesson04.md",
+        "section": "Bruteforce attack",
+        "url": "/learn/octapi/04_lesson04.html"
+      },
+      {
+        "file": "05_dispy.md",
+        "section": "Build OctaPi",
+        "url": "/learn/octapi/05_dispy.html"
+      },
+      {
+        "file": "06_octapi.md",
+        "section": "Build OctaPi",
+        "url": "/learn/octapi/06_octapi.html"
+      }
+    ]
+  },
+  {
+    "slug": "openclaw_raspberry_pi",
+    "name": "OpenClaw on Raspberry Pi",
+    "description": "Learn how to set up and run OpenClaw, a powerful AI agent framework, on your Raspberry Pi using Docker.  This course covers installation, configuration, management, and production best practices for running  local AI agents on your own hardware.",
+    "cover": "assets/openclaw.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-01-31",
+    "groups": [
+      "openclaw",
+      "raspberry-pi",
+      "docker",
+      "ai"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Getting Started",
+        "url": "/learn/openclaw_raspberry_pi/00_intro.html"
+      },
+      {
+        "file": "01_what-is-openclaw.md",
+        "section": "Getting Started",
+        "url": "/learn/openclaw_raspberry_pi/01_what-is-openclaw.html"
+      },
+      {
+        "file": "02_hardware-requirements.md",
+        "section": "Getting Started",
+        "url": "/learn/openclaw_raspberry_pi/02_hardware-requirements.html"
+      },
+      {
+        "file": "03_why-docker.md",
+        "section": "Getting Started",
+        "url": "/learn/openclaw_raspberry_pi/03_why-docker.html"
+      },
+      {
+        "file": "04_preparing-your-pi.md",
+        "section": "Installation & Setup",
+        "url": "/learn/openclaw_raspberry_pi/04_preparing-your-pi.html"
+      },
+      {
+        "file": "05_installing-docker.md",
+        "section": "Installation & Setup",
+        "url": "/learn/openclaw_raspberry_pi/05_installing-docker.html"
+      },
+      {
+        "file": "06_docker-compose-setup.md",
+        "section": "Installation & Setup",
+        "url": "/learn/openclaw_raspberry_pi/06_docker-compose-setup.html"
+      },
+      {
+        "file": "07_first-access.md",
+        "section": "Installation & Setup",
+        "url": "/learn/openclaw_raspberry_pi/07_first-access.html"
+      },
+      {
+        "file": "08_configuring-openclaw.md",
+        "section": "Configuration & Usage",
+        "url": "/learn/openclaw_raspberry_pi/08_configuring-openclaw.html"
+      },
+      {
+        "file": "09_first-agent.md",
+        "section": "Configuration & Usage",
+        "url": "/learn/openclaw_raspberry_pi/09_first-agent.html"
+      },
+      {
+        "file": "10_understanding-skills.md",
+        "section": "Configuration & Usage",
+        "url": "/learn/openclaw_raspberry_pi/10_understanding-skills.html"
+      },
+      {
+        "file": "11_managing-containers.md",
+        "section": "Management & Troubleshooting",
+        "url": "/learn/openclaw_raspberry_pi/11_managing-containers.html"
+      },
+      {
+        "file": "12_monitoring-resources.md",
+        "section": "Management & Troubleshooting",
+        "url": "/learn/openclaw_raspberry_pi/12_monitoring-resources.html"
+      },
+      {
+        "file": "13_troubleshooting.md",
+        "section": "Management & Troubleshooting",
+        "url": "/learn/openclaw_raspberry_pi/13_troubleshooting.html"
+      },
+      {
+        "file": "14_security.md",
+        "section": "Advanced Topics",
+        "url": "/learn/openclaw_raspberry_pi/14_security.html"
+      },
+      {
+        "file": "15_backup-and-recovery.md",
+        "section": "Advanced Topics",
+        "url": "/learn/openclaw_raspberry_pi/15_backup-and-recovery.html"
+      },
+      {
+        "file": "16_updates-and-upgrades.md",
+        "section": "Advanced Topics",
+        "url": "/learn/openclaw_raspberry_pi/16_updates-and-upgrades.html"
+      },
+      {
+        "file": "17_production-setup.md",
+        "section": "Advanced Topics",
+        "url": "/learn/openclaw_raspberry_pi/17_production-setup.html"
+      },
+      {
+        "file": "18_next-steps.md",
+        "section": "Summary",
+        "url": "/learn/openclaw_raspberry_pi/18_next-steps.html"
+      }
+    ]
+  },
+  {
+    "slug": "pandas_and_numpy",
+    "name": "Data Manipulation with Pandas and Numpy",
+    "description": "Learn how to manipulate data using Pandas and Numpy",
+    "cover": "assets/pandas.png",
+    "author": "Kevin McAleer",
+    "date_published": "2023-11-14",
+    "groups": [
+      "pandas & numpy"
+    ],
+    "lessons": [
+      {
+        "file": "01_overview.md",
+        "section": "Overview",
+        "url": "/learn/pandas_and_numpy/01_overview.html"
+      },
+      {
+        "file": "02_intro.md",
+        "section": "Introduction to Pandas",
+        "url": "/learn/pandas_and_numpy/02_intro.html"
+      },
+      {
+        "file": "03_installing.md",
+        "section": "Introduction to Pandas",
+        "url": "/learn/pandas_and_numpy/03_installing.html"
+      },
+      {
+        "file": "04_dataframes.md",
+        "section": "Pandas",
+        "url": "/learn/pandas_and_numpy/04_dataframes.html"
+      },
+      {
+        "file": "05_basics.md",
+        "section": "Pandas",
+        "url": "/learn/pandas_and_numpy/05_basics.html"
+      },
+      {
+        "file": "06_import_export.md",
+        "section": "Pandas",
+        "url": "/learn/pandas_and_numpy/06_import_export.html"
+      },
+      {
+        "file": "07_cleansing.md",
+        "section": "Pandas",
+        "url": "/learn/pandas_and_numpy/07_cleansing.html"
+      },
+      {
+        "file": "08_analysis.md",
+        "section": "Pandas",
+        "url": "/learn/pandas_and_numpy/08_analysis.html"
+      },
+      {
+        "file": "09_advanced.md",
+        "section": "Pandas",
+        "url": "/learn/pandas_and_numpy/09_advanced.html"
+      },
+      {
+        "file": "10_visualisation.md",
+        "section": "MatPlotLib",
+        "url": "/learn/pandas_and_numpy/10_visualisation.html"
+      },
+      {
+        "file": "11_case_studies.md",
+        "section": "MatPlotLib",
+        "url": "/learn/pandas_and_numpy/11_case_studies.html"
+      },
+      {
+        "file": "12_recap.md",
+        "section": "Conclusion",
+        "url": "/learn/pandas_and_numpy/12_recap.html"
+      }
+    ]
+  },
+  {
+    "slug": "pca9685",
+    "name": "Building a Robot Arm with Raspberry Pi and PCA9685",
+    "description": "Dive into the exciting world of robotics by learning how to control a robot arm using a Raspberry Pi, Python, and the PCA9685 board. This course covers everything from setting up your Raspberry Pi, understanding the PCA9685 board, programming with Python, to constructing and controlling a 4-servo robot arm. Perfect for beginners and enthusiasts alike, this course will guide you through each step with practical examples and hands-on projects.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-04-06",
+    "groups": [
+      "robotics",
+      "raspberry pi",
+      "pca9685"
+    ],
+    "lessons": [
+      {
+        "file": "01_course_introduction.md",
+        "section": "Getting Started with Raspberry Pi and Python",
+        "url": "/learn/pca9685/01_course_introduction.html"
+      },
+      {
+        "file": "02_raspberry_pi_setup.md",
+        "section": "Getting Started with Raspberry Pi and Python",
+        "url": "/learn/pca9685/02_raspberry_pi_setup.html"
+      },
+      {
+        "file": "03_python_basics_for_robotics.md",
+        "section": "Getting Started with Raspberry Pi and Python",
+        "url": "/learn/pca9685/03_python_basics_for_robotics.html"
+      },
+      {
+        "file": "04_introduction_to_pca9685.md",
+        "section": "Understanding the PCA9685 Servo Driver",
+        "url": "/learn/pca9685/04_introduction_to_pca9685.html"
+      },
+      {
+        "file": "05_setting_up_the_pca9685_with_raspberry_pi.md",
+        "section": "Understanding the PCA9685 Servo Driver",
+        "url": "/learn/pca9685/05_setting_up_the_pca9685_with_raspberry_pi.html"
+      },
+      {
+        "file": "06_designing_your_robot_arm.md",
+        "section": "Building the Robot Arm",
+        "url": "/learn/pca9685/06_designing_your_robot_arm.html"
+      },
+      {
+        "file": "07_assembling_the_robot_arm.md",
+        "section": "Building the Robot Arm",
+        "url": "/learn/pca9685/07_assembling_the_robot_arm.html"
+      },
+      {
+        "file": "08_controlling_servos_with_python.md",
+        "section": "Programming the Robot Arm",
+        "url": "/learn/pca9685/08_controlling_servos_with_python.html"
+      },
+      {
+        "file": "09_creating_basic_arm_movements.md",
+        "section": "Programming the Robot Arm",
+        "url": "/learn/pca9685/09_creating_basic_arm_movements.html"
+      },
+      {
+        "file": "10_advanced_arm_control_and_automation.md",
+        "section": "Programming the Robot Arm",
+        "url": "/learn/pca9685/10_advanced_arm_control_and_automation.html"
+      },
+      {
+        "file": "11_project_ideas.md",
+        "section": "Project Challenges and Ideas",
+        "url": "/learn/pca9685/11_project_ideas.html"
+      },
+      {
+        "file": "12_troubleshooting_common_issues.md",
+        "section": "Project Challenges and Ideas",
+        "url": "/learn/pca9685/12_troubleshooting_common_issues.html"
+      }
+    ]
+  },
+  {
+    "slug": "pico_temp_sensor",
+    "name": "Using the Raspberry Pi Pico's Built-in Temperature Sensor",
+    "description": "Learn how to use the Raspberry Pi Pico's built-in temperature sensor to measure and display temperature readings  in the Thonny console. This course is designed for beginners and covers the fundamentals of MicroPython programming,  understanding the Pico's ADC, and creating your first temperature monitoring project.  Through step-by-step tutorials and practical examples, you'll gain the skills to confidently use the Pico for sensor-based projects.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-11-22",
+    "groups": [
+      "pico",
+      "micropython"
+    ],
+    "lessons": [
+      {
+        "file": "01_course_introduction.md",
+        "section": "Introduction to the Raspberry Pi Pico and MicroPython",
+        "url": "/learn/pico_temp_sensor/01_course_introduction.html"
+      },
+      {
+        "file": "02_setting_up_thonny.md",
+        "section": "Introduction to the Raspberry Pi Pico and MicroPython",
+        "url": "/learn/pico_temp_sensor/02_setting_up_thonny.html"
+      },
+      {
+        "file": "03_installing_micropython_on_pico.md",
+        "section": "Introduction to the Raspberry Pi Pico and MicroPython",
+        "url": "/learn/pico_temp_sensor/03_installing_micropython_on_pico.html"
+      },
+      {
+        "file": "04_overview_of_pico_temperature_sensor.md",
+        "section": "Understanding the Built-in Temperature Sensor",
+        "url": "/learn/pico_temp_sensor/04_overview_of_pico_temperature_sensor.html"
+      },
+      {
+        "file": "05_how_the_temperature_sensor_works.md",
+        "section": "Understanding the Built-in Temperature Sensor",
+        "url": "/learn/pico_temp_sensor/05_how_the_temperature_sensor_works.html"
+      },
+      {
+        "file": "06_reading_temperature_with_adc.md",
+        "section": "Writing Your First Temperature Sensor Script",
+        "url": "/learn/pico_temp_sensor/06_reading_temperature_with_adc.html"
+      },
+      {
+        "file": "07_displaying_temperature_in_thonny_console.md",
+        "section": "Writing Your First Temperature Sensor Script",
+        "url": "/learn/pico_temp_sensor/07_displaying_temperature_in_thonny_console.html"
+      },
+      {
+        "file": "08_formatting_temperature_readings.md",
+        "section": "Writing Your First Temperature Sensor Script",
+        "url": "/learn/pico_temp_sensor/08_formatting_temperature_readings.html"
+      },
+      {
+        "file": "09_converting_adc_to_temperature.md",
+        "section": "Enhancing Your Temperature Monitoring Project",
+        "url": "/learn/pico_temp_sensor/09_converting_adc_to_temperature.html"
+      },
+      {
+        "file": "10_creating_a_temperature_alert_system.md",
+        "section": "Enhancing Your Temperature Monitoring Project",
+        "url": "/learn/pico_temp_sensor/10_creating_a_temperature_alert_system.html"
+      },
+      {
+        "file": "11_project_ideas_and_extensions.md",
+        "section": "Project Challenges and Next Steps",
+        "url": "/learn/pico_temp_sensor/11_project_ideas_and_extensions.html"
+      },
+      {
+        "file": "12_troubleshooting_temperature_readings.md",
+        "section": "Project Challenges and Next Steps",
+        "url": "/learn/pico_temp_sensor/12_troubleshooting_temperature_readings.html"
+      }
+    ]
+  },
+  {
+    "slug": "podman",
+    "name": "From Docker to Podman",
+    "description": "Learn how to transition from Docker to Podman and unlock better container workflows  with rootless and daemonless architecture. This hands-on course covers everything from  architectural differences and CLI compatibility to unique Podman features like systemd integration  and Kubernetes support. Perfect for developers and DevOps professionals looking to modernize  their container workflows.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2025-05-24",
+    "groups": [
+      "raspberrypi",
+      "docker"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro_to_podman.md",
+        "section": "Getting Started",
+        "url": "/learn/podman/01_intro_to_podman.html"
+      },
+      {
+        "file": "01_video.md",
+        "section": "Getting Started",
+        "url": "/learn/podman/01_video.html"
+      },
+      {
+        "file": "02_docker_vs_podman_architecture.md",
+        "section": "Getting Started",
+        "url": "/learn/podman/02_docker_vs_podman_architecture.html"
+      },
+      {
+        "file": "03_installing_podman.md",
+        "section": "Getting Started",
+        "url": "/learn/podman/03_installing_podman.html"
+      },
+      {
+        "file": "04_cli_compatibility_and_commands.md",
+        "section": "Core Usage",
+        "url": "/learn/podman/04_cli_compatibility_and_commands.html"
+      },
+      {
+        "file": "05_podman_unique_features.md",
+        "section": "Core Usage",
+        "url": "/learn/podman/05_podman_unique_features.html"
+      },
+      {
+        "file": "06_managing_containers_and_images.md",
+        "section": "Core Usage",
+        "url": "/learn/podman/06_managing_containers_and_images.html"
+      },
+      {
+        "file": "07_working_with_pods.md",
+        "section": "Advanced Concepts",
+        "url": "/learn/podman/07_working_with_pods.html"
+      },
+      {
+        "file": "08_docker_compose_vs_podman_compose.md",
+        "section": "Advanced Concepts",
+        "url": "/learn/podman/08_docker_compose_vs_podman_compose.html"
+      },
+      {
+        "file": "09_podman_and_kubernetes.md",
+        "section": "Advanced Concepts",
+        "url": "/learn/podman/09_podman_and_kubernetes.html"
+      },
+      {
+        "file": "10_podman_in_production.md",
+        "section": "Real-World Usage",
+        "url": "/learn/podman/10_podman_in_production.html"
+      },
+      {
+        "file": "11_troubleshooting_and_debugging.md",
+        "section": "Real-World Usage",
+        "url": "/learn/podman/11_troubleshooting_and_debugging.html"
+      },
+      {
+        "file": "12_migration_project.md",
+        "section": "Migration Lab",
+        "url": "/learn/podman/12_migration_project.html"
+      },
+      {
+        "file": "13_wrap_up_and_future.md",
+        "section": "Summary",
+        "url": "/learn/podman/13_wrap_up_and_future.html"
+      }
+    ]
+  },
+  {
+    "slug": "pydantic",
+    "name": "Mastering Pydantic for Robust Data Validation",
+    "description": "This in-depth course is designed to teach you how to leverage Pydantic for data validation and settings management in Python applications. From understanding Pydantic's basics to integrating it with FastAPI for web development, you'll master everything needed to use Pydantic effectively.",
+    "cover": "assets/pydantic.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-03-23",
+    "groups": [
+      "pydantic",
+      "data validation",
+      "fastapi"
+    ],
+    "lessons": [
+      {
+        "file": "01_overview_of_pydantic.md",
+        "section": "Introduction to Pydantic",
+        "url": "/learn/pydantic/01_overview_of_pydantic.html"
+      },
+      {
+        "file": "02_setting_up_your_development_environment.md",
+        "section": "Introduction to Pydantic",
+        "url": "/learn/pydantic/02_setting_up_your_development_environment.html"
+      },
+      {
+        "file": "03_basic_data_models.md",
+        "section": "Introduction to Pydantic",
+        "url": "/learn/pydantic/03_basic_data_models.html"
+      },
+      {
+        "file": "04_advanced_validation_techniques.md",
+        "section": "Advanced Data Validation with Pydantic",
+        "url": "/learn/pydantic/04_advanced_validation_techniques.html"
+      },
+      {
+        "file": "05_custom_data_types.md",
+        "section": "Advanced Data Validation with Pydantic",
+        "url": "/learn/pydantic/05_custom_data_types.html"
+      },
+      {
+        "file": "06_recursive_models.md",
+        "section": "Advanced Data Validation with Pydantic",
+        "url": "/learn/pydantic/06_recursive_models.html"
+      },
+      {
+        "file": "07_integrating_pydantic_with_fastapi.md",
+        "section": "Pydantic with FastAPI",
+        "url": "/learn/pydantic/07_integrating_pydantic_with_fastapi.html"
+      },
+      {
+        "file": "08_request_validation_and_serialization.md",
+        "section": "Pydantic with FastAPI",
+        "url": "/learn/pydantic/08_request_validation_and_serialization.html"
+      },
+      {
+        "file": "09_building_a_crud_application.md",
+        "section": "Pydantic with FastAPI",
+        "url": "/learn/pydantic/09_building_a_crud_application.html"
+      },
+      {
+        "file": "10_pydantic_best_practices.md",
+        "section": "Best Practices and Real-world Applications",
+        "url": "/learn/pydantic/10_pydantic_best_practices.html"
+      },
+      {
+        "file": "11_performance_optimization_tips.md",
+        "section": "Best Practices and Real-world Applications",
+        "url": "/learn/pydantic/11_performance_optimization_tips.html"
+      },
+      {
+        "file": "12_case_studies_and_real_world_applications.md",
+        "section": "Best Practices and Real-world Applications",
+        "url": "/learn/pydantic/12_case_studies_and_real_world_applications.html"
+      }
+    ]
+  },
+  {
+    "slug": "python",
+    "name": "Python for beginners",
+    "description": "Get started with Python programming, learn why you should  learn Python and how to setup your Python environment.",
+    "cover": "assets/python.png",
+    "author": "Kevin McAleer",
+    "date_published": "2023-07-20",
+    "groups": [
+      "python"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction",
+        "url": "/learn/python/01_intro.html"
+      },
+      {
+        "file": "02_basics.md",
+        "section": "Introduction",
+        "url": "/learn/python/02_basics.html"
+      },
+      {
+        "file": "03_data_structures.md",
+        "section": "Introduction",
+        "url": "/learn/python/03_data_structures.html"
+      },
+      {
+        "file": "04_flow.md",
+        "section": "Introduction",
+        "url": "/learn/python/04_flow.html"
+      },
+      {
+        "file": "05_files.md",
+        "section": "Introduction",
+        "url": "/learn/python/05_files.html"
+      },
+      {
+        "file": "06_errors.md",
+        "section": "Introduction",
+        "url": "/learn/python/06_errors.html"
+      },
+      {
+        "file": "07_libraries.md",
+        "section": "Introduction",
+        "url": "/learn/python/07_libraries.html"
+      },
+      {
+        "file": "08_oop.md",
+        "section": "Introduction",
+        "url": "/learn/python/08_oop.html"
+      },
+      {
+        "file": "09_data.md",
+        "section": "Introduction",
+        "url": "/learn/python/09_data.html"
+      },
+      {
+        "file": "10_webscraping.md",
+        "section": "Real world Python",
+        "url": "/learn/python/10_webscraping.html"
+      },
+      {
+        "file": "11_data_visualisation.md",
+        "section": "Real world Python",
+        "url": "/learn/python/11_data_visualisation.html"
+      },
+      {
+        "file": "12_ml.md",
+        "section": "Real world Python",
+        "url": "/learn/python/12_ml.html"
+      },
+      {
+        "file": "13_deep_learning.md",
+        "section": "Real world Python",
+        "url": "/learn/python/13_deep_learning.html"
+      },
+      {
+        "file": "14_automation.md",
+        "section": "Real world Python",
+        "url": "/learn/python/14_automation.html"
+      },
+      {
+        "file": "15_databases.md",
+        "section": "Real world Python",
+        "url": "/learn/python/15_databases.html"
+      },
+      {
+        "file": "16_advanced.md",
+        "section": "Real world Python",
+        "url": "/learn/python/16_advanced.html"
+      },
+      {
+        "file": "17_apps.md",
+        "section": "Real world Python",
+        "url": "/learn/python/17_apps.html"
+      },
+      {
+        "file": "18_tips_and_tricks.md",
+        "section": "Real world Python",
+        "url": "/learn/python/18_tips_and_tricks.html"
+      }
+    ]
+  },
+  {
+    "slug": "redis",
+    "name": "Using Redis with Python",
+    "description": "Learn how to use Redis with Python to build fast, scalable applications.",
+    "cover": "assets/redis-cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-04-12",
+    "groups": [
+      "redis",
+      "python",
+      "databases"
+    ],
+    "lessons": [
+      {
+        "file": "01_introduction.md",
+        "section": "Introduction to Redis",
+        "url": "/learn/redis/01_introduction.html"
+      },
+      {
+        "file": "02_redis_basics.md",
+        "section": "Introduction to Redis",
+        "url": "/learn/redis/02_redis_basics.html"
+      },
+      {
+        "file": "03_data_types.md",
+        "section": "Working with data",
+        "url": "/learn/redis/03_data_types.html"
+      },
+      {
+        "file": "04_commands_and_transactions.md",
+        "section": "Working with data",
+        "url": "/learn/redis/04_commands_and_transactions.html"
+      },
+      {
+        "file": "05_redis_lists.md",
+        "section": "Working with data",
+        "url": "/learn/redis/05_redis_lists.html"
+      },
+      {
+        "file": "06_redis_sets.md",
+        "section": "Sets, Hashes and Sorted Sets",
+        "url": "/learn/redis/06_redis_sets.html"
+      },
+      {
+        "file": "07_redis_hashes.md",
+        "section": "Sets, Hashes and Sorted Sets",
+        "url": "/learn/redis/07_redis_hashes.html"
+      },
+      {
+        "file": "08_redis_sorted_sets.md",
+        "section": "Sets, Hashes and Sorted Sets",
+        "url": "/learn/redis/08_redis_sorted_sets.html"
+      },
+      {
+        "file": "09_redis_pub_sub.md",
+        "section": "Publish and Subscribe",
+        "url": "/learn/redis/09_redis_pub_sub.html"
+      },
+      {
+        "file": "10_summary.md",
+        "section": "Conclusion",
+        "url": "/learn/redis/10_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "robotics_101",
+    "name": "Robotics 101",
+    "description": "Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.",
+    "cover": "assets/basics_101.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-01-17",
+    "groups": [
+      "robotics",
+      "raspberry pi",
+      "ros"
+    ],
+    "lessons": [
+      {
+        "file": "00_overview.md",
+        "section": "Overview",
+        "url": "/learn/robotics_101/00_overview.html"
+      },
+      {
+        "file": "lesson_01.md",
+        "section": "Robotics 101",
+        "url": "/learn/robotics_101/lesson_01.html"
+      },
+      {
+        "file": "lesson_02.md",
+        "section": "Robotics 101",
+        "url": "/learn/robotics_101/lesson_02.html"
+      },
+      {
+        "file": "lesson_03.md",
+        "section": "Robotics 101",
+        "url": "/learn/robotics_101/lesson_03.html"
+      },
+      {
+        "file": "lesson_04.md",
+        "section": "Robotics 101",
+        "url": "/learn/robotics_101/lesson_04.html"
+      },
+      {
+        "file": "lesson_05.md",
+        "section": "Robotics 101",
+        "url": "/learn/robotics_101/lesson_05.html"
+      }
+    ]
+  },
+  {
+    "slug": "rust",
+    "name": "Introduction to Rust",
+    "description": "Learning Rust with me, is a course that will teach you how to use Rust on Raspberry Pi.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-03-09",
+    "groups": [
+      "rust",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Overview",
+        "url": "/learn/rust/01_intro.html"
+      },
+      {
+        "file": "02_rust_and_python.md",
+        "section": "Setting Up a Rust Environment",
+        "url": "/learn/rust/02_rust_and_python.html"
+      },
+      {
+        "file": "03_rust_basics.md",
+        "section": "Basics",
+        "url": "/learn/rust/03_rust_basics.html"
+      },
+      {
+        "file": "04_ownership_and_borrowing.md",
+        "section": "Basics",
+        "url": "/learn/rust/04_ownership_and_borrowing.html"
+      },
+      {
+        "file": "05_structs_and_enums.md",
+        "section": "Basics",
+        "url": "/learn/rust/05_structs_and_enums.html"
+      },
+      {
+        "file": "06_error_handling.md",
+        "section": "Basics",
+        "url": "/learn/rust/06_error_handling.html"
+      },
+      {
+        "file": "07_common_collections.md",
+        "section": "Basics",
+        "url": "/learn/rust/07_common_collections.html"
+      },
+      {
+        "file": "08_concurrency.md",
+        "section": "Tools and Ecosystem",
+        "url": "/learn/rust/08_concurrency.html"
+      },
+      {
+        "file": "09_ecosystem_and_tools.md",
+        "section": "Tools and Ecosystem",
+        "url": "/learn/rust/09_ecosystem_and_tools.html"
+      },
+      {
+        "file": "10_example.md",
+        "section": "Tools and Ecosystem",
+        "url": "/learn/rust/10_example.html"
+      },
+      {
+        "file": "11_rust_for_pico.md",
+        "section": "Rust for Pico",
+        "url": "/learn/rust/11_rust_for_pico.html"
+      },
+      {
+        "file": "12_summary_and_resources.md",
+        "section": "Rust for Pico",
+        "url": "/learn/rust/12_summary_and_resources.html"
+      },
+      {
+        "file": "13_cargo.md",
+        "section": "Rust for Pico",
+        "url": "/learn/rust/13_cargo.html"
+      }
+    ]
+  },
+  {
+    "slug": "scrawly_wally",
+    "name": "Wall Drawing Robot Tutorial",
+    "description": "Learn how to build your own wall drawing robot using a Raspberry Pi Zero 2 W, stepper motors, and a gondola with a marker.  This course covers the essential steps from assembling the robot, installing the software, and creating your first drawing.",
+    "cover": "/assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2024-08-02",
+    "groups": [
+      "raspberry pi",
+      "robotics",
+      "robot arm"
+    ],
+    "lessons": [
+      {
+        "file": "01_intro.md",
+        "section": "Introduction",
+        "url": "/learn/scrawly_wally/01_intro.html"
+      },
+      {
+        "file": "02_components.md",
+        "section": "Build the Robot",
+        "url": "/learn/scrawly_wally/02_components.html"
+      },
+      {
+        "file": "03_assembly.md",
+        "section": "Build the Robot",
+        "url": "/learn/scrawly_wally/03_assembly.html"
+      },
+      {
+        "file": "04_wiring.md",
+        "section": "Build the Robot",
+        "url": "/learn/scrawly_wally/04_wiring.html"
+      },
+      {
+        "file": "05_setup_pi.md",
+        "section": "Programming",
+        "url": "/learn/scrawly_wally/05_setup_pi.html"
+      },
+      {
+        "file": "06_software.md",
+        "section": "Programming",
+        "url": "/learn/scrawly_wally/06_software.html"
+      },
+      {
+        "file": "07_control.md",
+        "section": "Programming",
+        "url": "/learn/scrawly_wally/07_control.html"
+      },
+      {
+        "file": "08_positioning.md",
+        "section": "Programming",
+        "url": "/learn/scrawly_wally/08_positioning.html"
+      },
+      {
+        "file": "09_draw.md",
+        "section": "Programming",
+        "url": "/learn/scrawly_wally/09_draw.html"
+      },
+      {
+        "file": "10_vectorize.md",
+        "section": "Programming",
+        "url": "/learn/scrawly_wally/10_vectorize.html"
+      },
+      {
+        "file": "11_summary.md",
+        "section": "Summary",
+        "url": "/learn/scrawly_wally/11_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "smars",
+    "name": "SMARS",
+    "description": "Learn how to 3d print, build and program a SMARS robot",
+    "cover": "assets/how_to_build_a_smars.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-02-19",
+    "groups": [
+      "smars",
+      "robotics",
+      "arduino"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/smars/00_intro.html"
+      },
+      {
+        "file": "smars01.md",
+        "section": "Print Parts",
+        "url": "/learn/smars/smars01.html"
+      },
+      {
+        "file": "smars02.md",
+        "section": "Assemble Robot",
+        "url": "/learn/smars/smars02.html"
+      },
+      {
+        "file": "smars03.md",
+        "section": "Assemble Robot",
+        "url": "/learn/smars/smars03.html"
+      },
+      {
+        "file": "smars04.md",
+        "section": "Assemble Robot",
+        "url": "/learn/smars/smars04.html"
+      },
+      {
+        "file": "smars05.md",
+        "section": "Assemble Robot",
+        "url": "/learn/smars/smars05.html"
+      },
+      {
+        "file": "smars06.md",
+        "section": "Assemble Robot",
+        "url": "/learn/smars/smars06.html"
+      },
+      {
+        "file": "smars07.md",
+        "section": "Assemble Robot",
+        "url": "/learn/smars/smars07.html"
+      },
+      {
+        "file": "smars08.md",
+        "section": "Wiring up the Robot",
+        "url": "/learn/smars/smars08.html"
+      },
+      {
+        "file": "smars09.md",
+        "section": "Wiring up the Robot",
+        "url": "/learn/smars/smars09.html"
+      },
+      {
+        "file": "smars10.md",
+        "section": "Wiring up the Robot",
+        "url": "/learn/smars/smars10.html"
+      },
+      {
+        "file": "smars11.md",
+        "section": "Wiring up the Robot",
+        "url": "/learn/smars/smars11.html"
+      },
+      {
+        "file": "smars12.md",
+        "section": "Code",
+        "url": "/learn/smars/smars12.html"
+      },
+      {
+        "file": "smars13.md",
+        "section": "Code",
+        "url": "/learn/smars/smars13.html"
+      },
+      {
+        "file": "summary.md",
+        "section": "Summary",
+        "url": "/learn/smars/summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "smars_code",
+    "name": "Learn how to program SMARS with Arduino",
+    "description": "Learn how to program SMARS with Arduino",
+    "cover": "assets/program_smars.png",
+    "author": "Kevin McAleer",
+    "date_published": "2023-09-10",
+    "groups": [
+      "smars",
+      "robotics",
+      "arduino"
+    ],
+    "lessons": [
+      {
+        "file": "01_lesson_01.md",
+        "section": "Movement",
+        "url": "/learn/smars_code/01_lesson_01.html"
+      },
+      {
+        "file": "02_lesson_02.md",
+        "section": "Movement",
+        "url": "/learn/smars_code/02_lesson_02.html"
+      },
+      {
+        "file": "03_lesson_03.md",
+        "section": "Sensing",
+        "url": "/learn/smars_code/03_lesson_03.html"
+      },
+      {
+        "file": "04_lesson_04.md",
+        "section": "Sensing",
+        "url": "/learn/smars_code/04_lesson_04.html"
+      },
+      {
+        "file": "05_lesson_05.md",
+        "section": "Control",
+        "url": "/learn/smars_code/05_lesson_05.html"
+      },
+      {
+        "file": "06_lesson_06.md",
+        "section": "Control",
+        "url": "/learn/smars_code/06_lesson_06.html"
+      },
+      {
+        "file": "07_lesson_07.md",
+        "section": "Control",
+        "url": "/learn/smars_code/07_lesson_07.html"
+      }
+    ]
+  },
+  {
+    "slug": "smars_fusion360",
+    "name": "Build a SMARS Robot in Fusion 360",
+    "description": "Learn how to design a robot in 3d using Fusion 360",
+    "cover": "assets/smars_fusion360.png",
+    "author": "Kevin McAleer",
+    "date_published": "2023-07-20",
+    "groups": [
+      "smars",
+      "robotics",
+      "fusion 360"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/smars_fusion360/00_intro.html"
+      },
+      {
+        "file": "01_base.md",
+        "section": "Create the Base",
+        "url": "/learn/smars_fusion360/01_base.html"
+      },
+      {
+        "file": "02_extrude_base.md",
+        "section": "Create the Base",
+        "url": "/learn/smars_fusion360/02_extrude_base.html"
+      },
+      {
+        "file": "03_shell.md",
+        "section": "Create the Base",
+        "url": "/learn/smars_fusion360/03_shell.html"
+      },
+      {
+        "file": "04_fillet.md",
+        "section": "Create the Base",
+        "url": "/learn/smars_fusion360/04_fillet.html"
+      },
+      {
+        "file": "05_thin.md",
+        "section": "Create the Base",
+        "url": "/learn/smars_fusion360/05_thin.html"
+      },
+      {
+        "file": "06_front.md",
+        "section": "Refine",
+        "url": "/learn/smars_fusion360/06_front.html"
+      },
+      {
+        "file": "07_cut.md",
+        "section": "Refine",
+        "url": "/learn/smars_fusion360/07_cut.html"
+      },
+      {
+        "file": "08_side.md",
+        "section": "Refine",
+        "url": "/learn/smars_fusion360/08_side.html"
+      },
+      {
+        "file": "09_sidecut.md",
+        "section": "Refine",
+        "url": "/learn/smars_fusion360/09_sidecut.html"
+      },
+      {
+        "file": "10_fillet.md",
+        "section": "Refine",
+        "url": "/learn/smars_fusion360/10_fillet.html"
+      },
+      {
+        "file": "11_back.md",
+        "section": "Refine",
+        "url": "/learn/smars_fusion360/11_back.html"
+      },
+      {
+        "file": "12_back.md",
+        "section": "Refine",
+        "url": "/learn/smars_fusion360/12_back.html"
+      },
+      {
+        "file": "13_wheel.md",
+        "section": "Wheels",
+        "url": "/learn/smars_fusion360/13_wheel.html"
+      },
+      {
+        "file": "14_cut.md",
+        "section": "Wheels",
+        "url": "/learn/smars_fusion360/14_cut.html"
+      },
+      {
+        "file": "15_slots.md",
+        "section": "Wheels",
+        "url": "/learn/smars_fusion360/15_slots.html"
+      },
+      {
+        "file": "16_cut.md",
+        "section": "Wheels",
+        "url": "/learn/smars_fusion360/16_cut.html"
+      },
+      {
+        "file": "17_motor.md",
+        "section": "Motor Holders",
+        "url": "/learn/smars_fusion360/17_motor.html"
+      },
+      {
+        "file": "18_extrude.md",
+        "section": "Motor Holders",
+        "url": "/learn/smars_fusion360/18_extrude.html"
+      },
+      {
+        "file": "19_nub.md",
+        "section": "Motor Holders",
+        "url": "/learn/smars_fusion360/19_nub.html"
+      },
+      {
+        "file": "20_extrude.md",
+        "section": "Motor Holders",
+        "url": "/learn/smars_fusion360/20_extrude.html"
+      },
+      {
+        "file": "21_chamfer.md",
+        "section": "Motor Holders",
+        "url": "/learn/smars_fusion360/21_chamfer.html"
+      },
+      {
+        "file": "22_front.md",
+        "section": "Front",
+        "url": "/learn/smars_fusion360/22_front.html"
+      },
+      {
+        "file": "23_cut.md",
+        "section": "Front",
+        "url": "/learn/smars_fusion360/23_cut.html"
+      },
+      {
+        "file": "24_stub.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/24_stub.html"
+      },
+      {
+        "file": "25_cut.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/25_cut.html"
+      },
+      {
+        "file": "26_stub.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/26_stub.html"
+      },
+      {
+        "file": "27_stub.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/27_stub.html"
+      },
+      {
+        "file": "28_revolve.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/28_revolve.html"
+      },
+      {
+        "file": "29_cut.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/29_cut.html"
+      },
+      {
+        "file": "30_extrude.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/30_extrude.html"
+      },
+      {
+        "file": "31_slots.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/31_slots.html"
+      },
+      {
+        "file": "32_cut.md",
+        "section": "Wheel",
+        "url": "/learn/smars_fusion360/32_cut.html"
+      },
+      {
+        "file": "33_final.md",
+        "section": "Final Design",
+        "url": "/learn/smars_fusion360/33_final.html"
+      }
+    ]
+  },
+  {
+    "slug": "smars_quad",
+    "name": "SMARS Quad",
+    "description": "Learn how to 3d print, build and program a SMARS Quad robot",
+    "cover": "assets/how_to_build_a_quad.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-03-04",
+    "groups": [
+      "smars",
+      "robotics",
+      "arduino"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/smars_quad/00_intro.html"
+      },
+      {
+        "file": "quad_01.md",
+        "section": "Print parts",
+        "url": "/learn/smars_quad/quad_01.html"
+      },
+      {
+        "file": "quad_02.md",
+        "section": "Print parts",
+        "url": "/learn/smars_quad/quad_02.html"
+      },
+      {
+        "file": "quad_03.md",
+        "section": "Print parts",
+        "url": "/learn/smars_quad/quad_03.html"
+      },
+      {
+        "file": "quad_04.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_04.html"
+      },
+      {
+        "file": "quad_05.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_05.html"
+      },
+      {
+        "file": "quad_06.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_06.html"
+      },
+      {
+        "file": "quad_07.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_07.html"
+      },
+      {
+        "file": "quad_08.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_08.html"
+      },
+      {
+        "file": "quad_09.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_09.html"
+      },
+      {
+        "file": "quad_10.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_10.html"
+      },
+      {
+        "file": "quad_11.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_11.html"
+      },
+      {
+        "file": "quad_12.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_12.html"
+      },
+      {
+        "file": "quad_13.md",
+        "section": "Assemble robot",
+        "url": "/learn/smars_quad/quad_13.html"
+      }
+    ]
+  },
+  {
+    "slug": "sql",
+    "name": "Getting Started with SQL",
+    "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2024-11-01",
+    "groups": [
+      "databases"
+    ],
+    "lessons": [
+      {
+        "file": "00_course_overview.md",
+        "section": "Introduction",
+        "url": "/learn/sql/00_course_overview.html"
+      },
+      {
+        "file": "01_introduction_to_sql.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/01_introduction_to_sql.html"
+      },
+      {
+        "file": "02_setting_up_environment.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/02_setting_up_environment.html"
+      },
+      {
+        "file": "03_basic_sql_commands.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/03_basic_sql_commands.html"
+      },
+      {
+        "file": "04_working_with_tables.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/04_working_with_tables.html"
+      },
+      {
+        "file": "05_data_insertion_and_modification.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/05_data_insertion_and_modification.html"
+      },
+      {
+        "file": "06_querying_data_with_select.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/06_querying_data_with_select.html"
+      },
+      {
+        "file": "07_advanced_filtering.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/07_advanced_filtering.html"
+      },
+      {
+        "file": "08_working_with_joins.md",
+        "section": "SQL Basics",
+        "url": "/learn/sql/08_working_with_joins.html"
+      },
+      {
+        "file": "09_grouping_and_aggregating_data.md",
+        "section": "Intermediate Concepts",
+        "url": "/learn/sql/09_grouping_and_aggregating_data.html"
+      },
+      {
+        "file": "10_introduction_to_normalization.md",
+        "section": "Intermediate Concepts",
+        "url": "/learn/sql/10_introduction_to_normalization.html"
+      },
+      {
+        "file": "11_boyce_codd_normal_form.md",
+        "section": "Intermediate Concepts",
+        "url": "/learn/sql/11_boyce_codd_normal_form.html"
+      },
+      {
+        "file": "12_subqueries_and_nested_queries.md",
+        "section": "Intermediate Concepts",
+        "url": "/learn/sql/12_subqueries_and_nested_queries.html"
+      },
+      {
+        "file": "13_views_and_indexes.md",
+        "section": "Intermediate Concepts",
+        "url": "/learn/sql/13_views_and_indexes.html"
+      },
+      {
+        "file": "14_sql_functions_and_expressions.md",
+        "section": "Intermediate Concepts",
+        "url": "/learn/sql/14_sql_functions_and_expressions.html"
+      },
+      {
+        "file": "15_wrap_up_and_final_project.md",
+        "section": "Conclusion",
+        "url": "/learn/sql/15_wrap_up_and_final_project.html"
+      }
+    ]
+  },
+  {
+    "slug": "sqlite3",
+    "name": "Create Databases with Python and SQLite3",
+    "description": "Learn how to create databases in Python with sqlite3",
+    "cover": "assets/database.png",
+    "author": "Kevin McAleer",
+    "date_published": "2023-07-15",
+    "groups": [
+      "python",
+      "sqlite3",
+      "databases"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/sqlite3/00_intro.html"
+      },
+      {
+        "file": "01_introduction_to_databases.md",
+        "section": "Getting Started",
+        "url": "/learn/sqlite3/01_introduction_to_databases.html"
+      },
+      {
+        "file": "02_getting_started_with_sqlite3.md",
+        "section": "Getting Started",
+        "url": "/learn/sqlite3/02_getting_started_with_sqlite3.html"
+      },
+      {
+        "file": "03_creating_tables_and_schema.md",
+        "section": "Getting Started",
+        "url": "/learn/sqlite3/03_creating_tables_and_schema.html"
+      },
+      {
+        "file": "04.inserting_and_retrieving_data.md",
+        "section": "Getting Started",
+        "url": "/learn/sqlite3/04.inserting_and_retrieving_data.html"
+      },
+      {
+        "file": "05_updating_and_deleting_data.md",
+        "section": "Getting Started",
+        "url": "/learn/sqlite3/05_updating_and_deleting_data.html"
+      },
+      {
+        "file": "06_querying_and_joining_tables.md",
+        "section": "Advanced topics",
+        "url": "/learn/sqlite3/06_querying_and_joining_tables.html"
+      },
+      {
+        "file": "07_advanced_queries.md",
+        "section": "Advanced topics",
+        "url": "/learn/sqlite3/07_advanced_queries.html"
+      },
+      {
+        "file": "08_transations_and_error_handling.md",
+        "section": "Advanced topics",
+        "url": "/learn/sqlite3/08_transations_and_error_handling.html"
+      },
+      {
+        "file": "09_indexes_and_performance.md",
+        "section": "Advanced topics",
+        "url": "/learn/sqlite3/09_indexes_and_performance.html"
+      },
+      {
+        "file": "10_securing_and_backing_up.md",
+        "section": "Advanced topics",
+        "url": "/learn/sqlite3/10_securing_and_backing_up.html"
+      },
+      {
+        "file": "11_summary.md",
+        "section": "Summary and Conclusion",
+        "url": "/learn/sqlite3/11_summary.html"
+      },
+      {
+        "file": "13_1nf.md",
+        "section": "bonus",
+        "url": "/learn/sqlite3/13_1nf.html"
+      },
+      {
+        "file": "14_2nf.md",
+        "section": "bonus",
+        "url": "/learn/sqlite3/14_2nf.html"
+      },
+      {
+        "file": "15_3nf.md",
+        "section": "bonus",
+        "url": "/learn/sqlite3/15_3nf.html"
+      },
+      {
+        "file": "12_boyce_codd_normal_form.md",
+        "section": "bonus",
+        "url": "/learn/sqlite3/12_boyce_codd_normal_form.html"
+      },
+      {
+        "file": "16_demo_program.md",
+        "section": "bonus",
+        "url": "/learn/sqlite3/16_demo_program.html"
+      },
+      {
+        "file": "17_tools.md",
+        "section": "bonus",
+        "url": "/learn/sqlite3/17_tools.html"
+      }
+    ]
+  }
+]
