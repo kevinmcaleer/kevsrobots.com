@@ -25,14 +25,14 @@ groups:
   - arduino
   - ai
 videos:
-  - TBD
+  - PK5TOwhgrV8
 ---
 
 Ahoy there Makers,
 
-I've been running an AI agent on a small board at my desk for a few weeks now. Not a Raspberry Pi — an Arduino Uno Q. Four gigabytes of RAM, a Qualcomm AI chip, costs about fifty-three euros. And the agent running on it remembers everything. It learns from every session. It builds its own skills as it goes.
+I've been running an AI agent on a small board at my desk for a few weeks now. Not a Raspberry Pi — an [Arduino Uno Q](https://www.arduino.cc/product-uno-q/). Four gigabytes of RAM, a Qualcomm AI chip, costs about fifty-three euros. And the agent running on it remembers everything. It learns from every session. It builds its own skills as it goes.
 
-If you've watched my [OpenClaw video](#), you know I've been deep into self-hosted AI agents. This is the next step. In this post I want to explain why I moved from OpenClaw to a tool called **Hermes Agent**, why the Arduino Uno Q is the right hardware for it, and walk through the full setup so you can do the same.
+If you've watched my [OpenClaw video](https://www.youtube.com/watch?v=7JtSxb7wB8c), you know I've been deep into self-hosted AI agents. This is the next step. In this post I want to explain why I moved from OpenClaw to a tool called **Hermes Agent**, why the Arduino Uno Q is the right hardware for it, and walk through the full setup so you can do the same.
 
 ---
 
@@ -81,6 +81,10 @@ With Hermes, the skills your agent builds come from your own sessions. Generated
 The Arduino Uno Q 4GB version costs around **€53**. The 2GB version is €39. Compare that to a Raspberry Pi 5 with 4GB — you're looking at around £60–70 by the time you add a case, power supply, and SD card. The Uno Q comes with **32GB of eMMC storage built in**. No SD card needed. Faster and more reliable.
 
 Under the hood it's got a Qualcomm Dragonwing QRB2210 processor — that's the MPU side, the Linux system. And it's got an STM32 microcontroller built in as well. Two computers on one board. The Linux side runs Python, runs Hermes, connects to the network. The microcontroller side handles sensors, motors, and real-time tasks. That split is useful if you're also building robots or automation projects.
+
+{% include gallery.html images="/assets/img/blog/hermes_uno_q/benchmark.jpg" description="Benchmark results for the Arduino Uno Q" titles="Benchmark Results" cols="1" %}
+
+---
 
 In benchmarks, the Uno Q sits at around **40,000** sysbench single-thread score. A Raspberry Pi 4 is about 68,000. A Pi 500 is around 105,000. The Pi is faster in raw compute — but for an agent that's mostly waiting on API calls and doing file operations, raw CPU speed isn't the bottleneck.
 
