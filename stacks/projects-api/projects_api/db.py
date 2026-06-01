@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import AsyncIterator, Optional
 
-from sqlalchemy import func, select, text
+from sqlalchemy import delete, func, select, text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -1539,5 +1539,54 @@ async def recanonicalize_part_categories() -> None:
         if changed:
             logger.warning(
                 "Re-cased %d legacy part categories to curated labels", changed
+            )
+            await session.commit()
+
+
+async def migrate_image_files_to_images() -> None:
+    """Move image uploads that landed in ``project_files`` into ``project_images``.
+
+    Before the files upload handler routed images to the gallery, a
+    ``.png`` / ``.jpg`` / … uploaded through the "Files & Downloads" section
+    was recorded as a :class:`~.models.ProjectFile` — so it showed up in the
+    downloads list — even though the bytes were already stored under
+    ``projects/images/…`` on the NAS. This walks ``project_files`` for rows
+    whose filename has an image extension, recreates each as a
+    :class:`~.models.ProjectImage` (the stored ``file_path`` is copied
+    verbatim — the physical file does NOT move, and the image ``/view`` route
+    serves purely off that token), removes any download-log rows referencing
+    the file id, then deletes the ``ProjectFile``.
+
+    Idempotent: once moved, no image-extension rows remain in
+    ``project_files`` so re-runs are no-ops. Dialect-agnostic (pure ORM) so it
+    runs under both Postgres and the SQLite test DB. Must run AFTER
+    ``add_project_file_description_if_missing`` because the full-model
+    ``select(ProjectFile)`` references every mapped column.
+    """
+    from .models import Download, ProjectFile, ProjectImage
+    from .storage import is_image
+
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        files = (await session.execute(select(ProjectFile))).scalars().all()
+        moved = 0
+        for f in files:
+            if not is_image(f.filename):
+                continue
+            session.add(ProjectImage(
+                project_id=f.project_id,
+                filename=f.filename,
+                file_path=f.file_path,
+            ))
+            # The file is leaving project_files; drop its download-log rows
+            # explicitly rather than relying on the FK's ON DELETE CASCADE
+            # (SQLite only enforces that with PRAGMA foreign_keys=ON).
+            await session.execute(delete(Download).where(Download.file_id == f.id))
+            await session.delete(f)
+            moved += 1
+        if moved:
+            logger.warning(
+                "Moved %d image file(s) from project_files into project_images",
+                moved,
             )
             await session.commit()

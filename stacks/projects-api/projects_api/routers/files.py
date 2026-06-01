@@ -15,8 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
-from ..models import Download, Project, ProjectFile
-from ..schemas import FileResponse, FileUpdate
+from ..models import Download, Project, ProjectFile, ProjectImage
+from ..schemas import FileResponse, FileUpdate, ImageResponse
 from ..storage import (
     delete_file,
     generate_filename,
@@ -134,13 +134,13 @@ async def list_files(
     return out
 
 
-@router.post("", response_model=FileResponse, status_code=201)
+@router.post("", response_model=FileResponse | ImageResponse, status_code=201)
 async def upload_file(
     project_id: int,
     file: UploadFile,
     user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
-) -> FileResponse:
+) -> FileResponse | ImageResponse:
     project = await session.get(Project, project_id)
     if project is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
@@ -166,8 +166,30 @@ async def upload_file(
         )
 
     filename = generate_filename(file.filename, project_id)
-    file_type = "images" if is_image(file.filename) else "files"
-    path = save_file(content, filename, project_id, file_type)
+
+    # An image uploaded through the Files & Downloads section belongs in the
+    # Images gallery, not the downloads list. Detect it by extension and
+    # persist it as a ProjectImage (stored under projects/images/…) so it
+    # surfaces in the right place. The dedup-free single-row insert mirrors
+    # images.upload_image; the response is an ImageResponse so callers can
+    # tell where the upload landed. The one-off backfill in
+    # db.migrate_image_files_to_images relocates rows uploaded before this
+    # routing existed.
+    if is_image(file.filename):
+        path = save_file(content, filename, project_id, "images")
+        if path is None:
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save file")
+        image = ProjectImage(
+            project_id=project_id,
+            filename=file.filename,
+            file_path=path,
+        )
+        session.add(image)
+        await session.commit()
+        await session.refresh(image)
+        return ImageResponse.model_validate(image, from_attributes=True)
+
+    path = save_file(content, filename, project_id, "files")
     if path is None:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save file")
 
