@@ -54,6 +54,12 @@ class Settings(BaseSettings):
     # awarding latency against fan-out load on Chatter.
     badge_counter_cache_ttl_seconds: int = 300
 
+    # Public base URL this API is served from. Used to build absolute
+    # ``cover_image`` URLs (``…/api/projects/{id}/images/{id}/view``) the same
+    # way the frontend editor does, e.g. when the image backfill migration
+    # derives a cover for a project that has none. Override per-environment.
+    public_base_url: str = "https://projects.kevsrobots.com"
+
     # NAS storage
     nas_host: str = "192.168.1.79"
     nas_username: Optional[str] = None

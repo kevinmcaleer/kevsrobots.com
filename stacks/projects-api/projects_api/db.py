@@ -1557,36 +1557,83 @@ async def migrate_image_files_to_images() -> None:
     serves purely off that token), removes any download-log rows referencing
     the file id, then deletes the ``ProjectFile``.
 
+    Moved images append to the END of any existing gallery (sort_order =
+    max + 1) so they don't displace the project's current first image — and
+    therefore can't silently change its cover on the next editor load. For a
+    project that gains images but has no ``cover_image`` set, a cover is
+    derived using the same rule the editor uses (first image by sort_order);
+    an existing cover is never overwritten.
+
     Idempotent: once moved, no image-extension rows remain in
     ``project_files`` so re-runs are no-ops. Dialect-agnostic (pure ORM) so it
     runs under both Postgres and the SQLite test DB. Must run AFTER
     ``add_project_file_description_if_missing`` because the full-model
     ``select(ProjectFile)`` references every mapped column.
     """
-    from .models import Download, ProjectFile, ProjectImage
+    from .config import get_settings
+    from .models import Download, Project, ProjectFile, ProjectImage
     from .storage import is_image
 
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
         files = (await session.execute(select(ProjectFile))).scalars().all()
+        # Per-project running sort_order so moved images append to the end of
+        # the gallery instead of all landing at 0.
+        next_sort: dict[int, int] = {}
+        touched: set[int] = set()
         moved = 0
         for f in files:
             if not is_image(f.filename):
                 continue
+            pid = f.project_id
+            if pid not in next_sort:
+                cur_max = await session.scalar(
+                    select(func.max(ProjectImage.sort_order))
+                    .where(ProjectImage.project_id == pid)
+                )
+                next_sort[pid] = (cur_max + 1) if cur_max is not None else 0
             session.add(ProjectImage(
-                project_id=f.project_id,
+                project_id=pid,
                 filename=f.filename,
                 file_path=f.file_path,
+                sort_order=next_sort[pid],
             ))
+            next_sort[pid] += 1
             # The file is leaving project_files; drop its download-log rows
             # explicitly rather than relying on the FK's ON DELETE CASCADE
             # (SQLite only enforces that with PRAGMA foreign_keys=ON).
             await session.execute(delete(Download).where(Download.file_id == f.id))
             await session.delete(f)
+            touched.add(pid)
             moved += 1
-        if moved:
-            logger.warning(
-                "Moved %d image file(s) from project_files into project_images",
-                moved,
+        if not moved:
+            return
+        # Flush so the new ProjectImage rows have ids before we build cover URLs.
+        await session.flush()
+
+        # Backfill a cover for any touched project that still has none, using
+        # the editor's rule (first image by sort_order). Never clobbers an
+        # existing cover.
+        base = get_settings().public_base_url.rstrip("/")
+        covered = 0
+        for pid in touched:
+            project = await session.get(Project, pid)
+            if project is None or project.cover_image:
+                continue
+            first = await session.scalar(
+                select(ProjectImage)
+                .where(ProjectImage.project_id == pid)
+                .order_by(ProjectImage.sort_order, ProjectImage.id)
+                .limit(1)
             )
-            await session.commit()
+            if first is None:
+                continue
+            project.cover_image = f"{base}/api/projects/{pid}/images/{first.id}/view"
+            covered += 1
+
+        logger.warning(
+            "Moved %d image file(s) from project_files into project_images%s",
+            moved,
+            f"; set cover on {covered} project(s)" if covered else "",
+        )
+        await session.commit()

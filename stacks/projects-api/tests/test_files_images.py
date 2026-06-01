@@ -257,6 +257,14 @@ async def test_migrate_image_files_to_images_moves_existing_rows(
         # file_path is preserved verbatim — the physical file never moved.
         assert images[0].file_path == "nas:projects/images/1/old-photo.jpg"
         assert images[0].project_id == project_id
+
+        # The project had no cover — the moved image becomes it (editor's rule:
+        # first image by sort_order), stored as an absolute /view URL.
+        project = await s.get(Project, project_id)
+        assert project.cover_image == (
+            f"https://projects.kevsrobots.com/api/projects/{project_id}"
+            f"/images/{images[0].id}/view"
+        )
         # The orphaned download-log row was cleaned up.
         assert downloads == []
 
@@ -267,6 +275,66 @@ async def test_migrate_image_files_to_images_moves_existing_rows(
 
         images = (await s.execute(select(ProjectImage))).scalars().all()
         assert len(images) == 1
+
+
+@pytest.mark.asyncio
+async def test_migrate_appends_and_preserves_existing_cover(
+    sessionmaker_, monkeypatch
+) -> None:
+    """A project that already has gallery images + a chosen cover keeps that
+    cover, and the moved image lands at the END of the gallery (so it can't
+    steal the cover slot on the next editor load)."""
+    from projects_api import db as db_module
+    from projects_api.models import Project, ProjectFile, ProjectImage
+
+    monkeypatch.setattr(db_module, "get_sessionmaker", lambda: sessionmaker_)
+
+    async with sessionmaker_() as s:
+        project = Project(
+            title="Has Cover",
+            author_username="kev",
+            cover_image="https://projects.kevsrobots.com/api/projects/9/images/1/view",
+        )
+        s.add(project)
+        await s.flush()
+        # An existing gallery image at sort_order 0...
+        s.add(ProjectImage(
+            project_id=project.id,
+            filename="hero.jpg",
+            file_path="nas:projects/images/9/hero.jpg",
+            sort_order=0,
+        ))
+        # ...and a stray image still in project_files.
+        s.add(ProjectFile(
+            project_id=project.id,
+            filename="stray.png",
+            file_path="nas:projects/images/9/stray.png",
+            file_size=10,
+            file_type="png",
+        ))
+        await s.commit()
+        pid = project.id
+        original_cover = project.cover_image
+
+    await db_module.migrate_image_files_to_images()
+
+    async with sessionmaker_() as s:
+        from sqlalchemy import select
+
+        project = await s.get(Project, pid)
+        # Existing cover untouched.
+        assert project.cover_image == original_cover
+
+        images = (
+            await s.execute(
+                select(ProjectImage)
+                .where(ProjectImage.project_id == pid)
+                .order_by(ProjectImage.sort_order)
+            )
+        ).scalars().all()
+        # Moved image appended AFTER the existing one.
+        assert [i.filename for i in images] == ["hero.jpg", "stray.png"]
+        assert images[1].sort_order == 1
 
 
 # --- Per-file descriptions (issue #187) ----------------------------------

@@ -179,10 +179,17 @@ async def upload_file(
         path = save_file(content, filename, project_id, "images")
         if path is None:
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save file")
+        # Append to the end of the gallery so an image dropped on the files
+        # uploader doesn't displace the project's current cover (first image).
+        max_sort = await session.scalar(
+            select(func.max(ProjectImage.sort_order))
+            .where(ProjectImage.project_id == project_id)
+        )
         image = ProjectImage(
             project_id=project_id,
             filename=file.filename,
             file_path=path,
+            sort_order=(max_sort + 1) if max_sort is not None else 0,
         )
         session.add(image)
         await session.commit()
