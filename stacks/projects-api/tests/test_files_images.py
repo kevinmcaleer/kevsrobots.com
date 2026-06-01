@@ -132,6 +132,211 @@ async def test_list_images(client, project_id) -> None:
     assert isinstance(resp.json(), list)
 
 
+# --- Image routing: images uploaded via the Files & Downloads section -----
+#
+# A .png/.jpg/etc. dropped on the Files & Downloads uploader should land in
+# the Images gallery, not the downloads list — the backend detects it by
+# extension and creates a ProjectImage instead of a ProjectFile.
+
+_PNG_1X1 = (
+    b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01"
+    b"\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00"
+    b"\x00\x00\x0cIDATx\x9cc\xf8\x0f\x00\x00\x01\x01\x00"
+    b"\x05\x18\xd8N\x00\x00\x00\x00IEND\xaeB`\x82"
+)
+
+
+@pytest.mark.asyncio
+async def test_image_uploaded_via_files_endpoint_lands_in_images(
+    client, project_id
+) -> None:
+    headers = make_auth_header()
+    resp = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("diagram.png", _PNG_1X1, "image/png")},
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    body = resp.json()
+    # Image-shaped response: has sort_order, not the file_type/file_size of a
+    # download row — this is the signal the frontend uses to refresh the
+    # gallery.
+    assert body["filename"] == "diagram.png"
+    assert "file_type" not in body
+    assert "sort_order" in body
+
+    # It shows up in the Images list...
+    images = await client.get(f"/api/projects/{project_id}/images")
+    assert [i["filename"] for i in images.json()] == ["diagram.png"]
+
+    # ...and NOT in the Files & Downloads list.
+    files = await client.get(f"/api/projects/{project_id}/files")
+    assert files.json() == []
+
+
+@pytest.mark.asyncio
+async def test_non_image_uploaded_via_files_endpoint_stays_a_file(
+    client, project_id
+) -> None:
+    headers = make_auth_header()
+    resp = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("firmware.bin", b"\x00\x01\x02", "application/octet-stream")},
+        headers=headers,
+    )
+    # .bin isn't an allowed extension, so use a real file type instead.
+    if resp.status_code == 400:
+        resp = await client.post(
+            f"/api/projects/{project_id}/files",
+            files={"file": ("notes.txt", b"hello", "text/plain")},
+            headers=headers,
+        )
+    assert resp.status_code == 201
+    assert resp.json()["file_type"] in {"txt", "bin"}
+    files = await client.get(f"/api/projects/{project_id}/files")
+    assert len(files.json()) == 1
+    images = await client.get(f"/api/projects/{project_id}/images")
+    assert images.json() == []
+
+
+@pytest.mark.asyncio
+async def test_migrate_image_files_to_images_moves_existing_rows(
+    sessionmaker_, monkeypatch
+) -> None:
+    """The backfill relocates image rows already sitting in project_files
+    (uploaded before the routing existed) into project_images, drops their
+    download-log rows, and is idempotent."""
+    from projects_api import db as db_module
+    from projects_api.models import (
+        Download,
+        Project,
+        ProjectFile,
+        ProjectImage,
+    )
+
+    monkeypatch.setattr(db_module, "get_sessionmaker", lambda: sessionmaker_)
+
+    async with sessionmaker_() as s:
+        project = Project(title="Legacy Project", author_username="testuser")
+        s.add(project)
+        await s.flush()
+        # A stray image + a genuine download, both in project_files.
+        img = ProjectFile(
+            project_id=project.id,
+            filename="old-photo.jpg",
+            file_path="nas:projects/images/1/old-photo.jpg",
+            file_size=123,
+            file_type="jpg",
+        )
+        doc = ProjectFile(
+            project_id=project.id,
+            filename="schematic.pdf",
+            file_path="nas:projects/files/1/schematic.pdf",
+            file_size=456,
+            file_type="pdf",
+        )
+        s.add_all([img, doc])
+        await s.flush()
+        s.add(Download(project_id=project.id, file_id=img.id, user_id="someone"))
+        await s.commit()
+        project_id = project.id
+
+    await db_module.migrate_image_files_to_images()
+
+    async with sessionmaker_() as s:
+        from sqlalchemy import select
+
+        files = (await s.execute(select(ProjectFile))).scalars().all()
+        images = (await s.execute(select(ProjectImage))).scalars().all()
+        downloads = (await s.execute(select(Download))).scalars().all()
+
+        # The image moved; the PDF stayed.
+        assert [f.filename for f in files] == ["schematic.pdf"]
+        assert len(images) == 1
+        assert images[0].filename == "old-photo.jpg"
+        # file_path is preserved verbatim — the physical file never moved.
+        assert images[0].file_path == "nas:projects/images/1/old-photo.jpg"
+        assert images[0].project_id == project_id
+
+        # The project had no cover — the moved image becomes it (editor's rule:
+        # first image by sort_order), stored as an absolute /view URL.
+        project = await s.get(Project, project_id)
+        assert project.cover_image == (
+            f"https://projects.kevsrobots.com/api/projects/{project_id}"
+            f"/images/{images[0].id}/view"
+        )
+        # The orphaned download-log row was cleaned up.
+        assert downloads == []
+
+    # Idempotent — a second pass moves nothing.
+    await db_module.migrate_image_files_to_images()
+    async with sessionmaker_() as s:
+        from sqlalchemy import select
+
+        images = (await s.execute(select(ProjectImage))).scalars().all()
+        assert len(images) == 1
+
+
+@pytest.mark.asyncio
+async def test_migrate_appends_and_preserves_existing_cover(
+    sessionmaker_, monkeypatch
+) -> None:
+    """A project that already has gallery images + a chosen cover keeps that
+    cover, and the moved image lands at the END of the gallery (so it can't
+    steal the cover slot on the next editor load)."""
+    from projects_api import db as db_module
+    from projects_api.models import Project, ProjectFile, ProjectImage
+
+    monkeypatch.setattr(db_module, "get_sessionmaker", lambda: sessionmaker_)
+
+    async with sessionmaker_() as s:
+        project = Project(
+            title="Has Cover",
+            author_username="kev",
+            cover_image="https://projects.kevsrobots.com/api/projects/9/images/1/view",
+        )
+        s.add(project)
+        await s.flush()
+        # An existing gallery image at sort_order 0...
+        s.add(ProjectImage(
+            project_id=project.id,
+            filename="hero.jpg",
+            file_path="nas:projects/images/9/hero.jpg",
+            sort_order=0,
+        ))
+        # ...and a stray image still in project_files.
+        s.add(ProjectFile(
+            project_id=project.id,
+            filename="stray.png",
+            file_path="nas:projects/images/9/stray.png",
+            file_size=10,
+            file_type="png",
+        ))
+        await s.commit()
+        pid = project.id
+        original_cover = project.cover_image
+
+    await db_module.migrate_image_files_to_images()
+
+    async with sessionmaker_() as s:
+        from sqlalchemy import select
+
+        project = await s.get(Project, pid)
+        # Existing cover untouched.
+        assert project.cover_image == original_cover
+
+        images = (
+            await s.execute(
+                select(ProjectImage)
+                .where(ProjectImage.project_id == pid)
+                .order_by(ProjectImage.sort_order)
+            )
+        ).scalars().all()
+        # Moved image appended AFTER the existing one.
+        assert [i.filename for i in images] == ["hero.jpg", "stray.png"]
+        assert images[1].sort_order == 1
+
+
 # --- Per-file descriptions (issue #187) ----------------------------------
 #
 # Partial-update semantics chosen here:

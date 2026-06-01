@@ -42,6 +42,7 @@ from .db import (
     backfill_part_image_url_to_photos,
     backfill_part_revisions_if_missing,
     create_all,
+    migrate_image_files_to_images,
     recanonicalize_part_categories,
     get_sessionmaker,
     repair_stale_fks,
@@ -171,6 +172,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # so uploaded photos are the single image source. Postgres-only,
     # idempotent; the column stays dormant after the code stops using it.
     await backfill_part_image_url_to_photos()
+    # Relocate images that were uploaded through the Files & Downloads section
+    # before the upload handler learned to route images to the gallery. Runs
+    # after add_project_file_description_if_missing (above) because it issues a
+    # full-model select(ProjectFile).
+    await migrate_image_files_to_images()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

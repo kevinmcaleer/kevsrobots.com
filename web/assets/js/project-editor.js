@@ -1262,6 +1262,10 @@
       if (!currentProject) return;
     }
     const errors = [];
+    // The backend routes image uploads to the Images gallery (returning an
+    // image-shaped body with `sort_order` instead of `file_type`), so refresh
+    // that list too when any upload landed there.
+    let movedToImages = false;
     for (const file of fileList) {
       const form = new FormData();
       form.append('file', file);
@@ -1272,6 +1276,9 @@
         if (!resp.ok) {
           const err = await resp.json();
           errors.push(file.name + ': ' + (err.detail || 'failed'));
+        } else {
+          const saved = await resp.json().catch(() => null);
+          if (saved && saved.file_type === undefined) movedToImages = true;
         }
       } catch (e) { errors.push(file.name + ': network error'); }
     }
@@ -1279,6 +1286,7 @@
       alert('Some files could not be uploaded:\n\n' + errors.join('\n'));
     }
     loadFiles();
+    if (movedToImages) loadImages();
   }
 
   async function loadFiles() {
