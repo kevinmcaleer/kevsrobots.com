@@ -26,26 +26,88 @@ import httpx
 from .config import Settings
 from .db import insert_check, utcnow_iso
 
-# Force IPv4 outbound DNS — same Pi has the IPv6-no-default-route problem
-# that wedged cloudflared (fixed there with ``--edge-ip-version 4``).
-# Without this, every probe to a hostname with an AAAA record (Cloudflare
-# gives all of them both A + AAAA) fails with ``ConnectError``
-# (``ENETUNREACH``) before httpx ever sees an HTTP response. We filter
-# AAAA results out of ``socket.getaddrinfo`` at the module level so every
-# httpx client in the process sees IPv4-only resolutions. The fallback to
-# the original result list when there are no A records keeps the door
-# open to IPv6-only hosts if anyone ever adds one. Disable with
-# ``STATUS_FORCE_IPV4=0`` if the Pi ever gets a working IPv6 default
-# route and you want dual-stack happy-eyeballs back.
+# Monkeypatched ``socket.getaddrinfo`` that does TWO things the status
+# service needs to probe services honestly from the outside-world's POV:
+#
+# 1. Query EXTERNAL DNS directly (``STATUS_DNS_SERVER``, default 1.1.1.1)
+#    instead of the system resolver. Home/lab networks often run a local
+#    DNS (Pi-hole, router, dnsmasq) that maps ``*.kevsrobots.com`` to a
+#    LAN IP — split-horizon DNS. From inside the Pi, every probe would
+#    then hit a local IP that might not even be running the service
+#    (e.g. a retired load balancer) and report green/red based on the
+#    wrong target. Querying 1.1.1.1 directly bypasses that, so the
+#    probes see what the public internet sees — which is the whole point
+#    of a status page.
+#
+# 2. Force IPv4 records. Same Pi has the IPv6-no-default-route trap
+#    we already fixed for cloudflared with ``--edge-ip-version 4``.
+#    With AAAA records in the resolved set, httpx's async backend tries
+#    IPv6 first and fails fast with ``ENETUNREACH`` before even trying
+#    IPv4. Filtering to A records side-steps this.
+#
+# IP literals and reverse lookups fall through to the system resolver,
+# and any failure of the external query falls back too — so the service
+# stays reachable in edge cases. Override with ``STATUS_DNS_SERVER`` /
+# ``STATUS_DISABLE_EXTERNAL_DNS=1``.
+
+import ipaddress
+
+try:
+    import dns.resolver as _dns_resolver  # dnspython
+except ImportError:  # pragma: no cover — dnspython is in requirements.txt
+    _dns_resolver = None
+
+_DNS_SERVER = os.environ.get("STATUS_DNS_SERVER", "1.1.1.1")
+_DISABLE_EXTERNAL_DNS = os.environ.get("STATUS_DISABLE_EXTERNAL_DNS", "0") == "1"
+
+_external_resolver = None
+if _dns_resolver is not None and _DNS_SERVER and not _DISABLE_EXTERNAL_DNS:
+    _external_resolver = _dns_resolver.Resolver(configure=False)
+    _external_resolver.nameservers = [_DNS_SERVER]
+    _external_resolver.timeout = 3
+    _external_resolver.lifetime = 5
+
+_original_getaddrinfo = socket.getaddrinfo
+
+
+def _patched_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    # IP literal — system resolver is fine (no actual lookup happens).
+    if host:
+        try:
+            ipaddress.ip_address(host)
+            return _original_getaddrinfo(host, port, family, type, proto, flags)
+        except ValueError:
+            pass
+
+    # Hostname — query external DNS (bypasses local rewrites).
+    if _external_resolver is not None and host:
+        try:
+            answers = _external_resolver.resolve(host, "A")
+            socktype = type or socket.SOCK_STREAM
+            sockproto = proto or socket.IPPROTO_TCP
+            results = [
+                (
+                    socket.AF_INET, socktype, sockproto, "",
+                    (str(rdata.address), port or 0),
+                )
+                for rdata in answers
+            ]
+            if results:
+                return results
+        except Exception as exc:  # noqa: BLE001 — log + fall back
+            logger.warning(
+                "external DNS lookup for %s via %s failed (%s); "
+                "falling back to system resolver", host, _DNS_SERVER, exc,
+            )
+
+    # Fallback — system resolver, filtered to IPv4 only.
+    results = _original_getaddrinfo(host, port, family, type, proto, flags)
+    v4_only = [r for r in results if r[0] == socket.AF_INET]
+    return v4_only or results
+
+
 if os.environ.get("STATUS_FORCE_IPV4", "1") != "0":
-    _original_getaddrinfo = socket.getaddrinfo
-
-    def _ipv4_only_getaddrinfo(host, *args, **kwargs):
-        results = _original_getaddrinfo(host, *args, **kwargs)
-        v4_only = [r for r in results if r[0] == socket.AF_INET]
-        return v4_only or results  # fall back if the host is v6-only
-
-    socket.getaddrinfo = _ipv4_only_getaddrinfo
+    socket.getaddrinfo = _patched_getaddrinfo
 
 logger = logging.getLogger(__name__)
 

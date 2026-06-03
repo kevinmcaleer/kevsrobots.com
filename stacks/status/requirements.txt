@@ -4,6 +4,7 @@ aiosqlite
 pydantic
 pydantic-settings
 httpx
+dnspython
 apscheduler
 jinja2
 pytest
