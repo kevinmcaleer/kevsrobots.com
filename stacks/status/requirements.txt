@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+aiosqlite
+pydantic
+pydantic-settings
+httpx
+apscheduler
+jinja2
+pytest
+pytest-asyncio
