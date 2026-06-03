@@ -1,0 +1,12 @@
+# Local SQLite DB used by ``uvicorn --reload`` or ``docker compose up``.
+status.db
+status.db-*
+data/
+
+# Test/dev virtualenvs
+.venv/
+__pycache__/
+*.pyc
+
+# Local secrets — keep .env.example committed.
+.env

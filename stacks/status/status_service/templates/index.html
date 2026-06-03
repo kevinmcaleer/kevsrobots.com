@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>kevsrobots status</title>
+    <meta name="description" content="Public status page for kevsrobots.com web services." />
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/static/dashboard.css" />
+</head>
+<body class="bg-light">
+
+<header class="py-4 mb-4 border-bottom bg-white">
+    <div class="container">
+        <h1 class="h3 mb-1">kevsrobots status</h1>
+        <p class="text-muted small mb-0">
+            Live health of every kevsrobots web service. Updated every 15 minutes.
+        </p>
+    </div>
+</header>
+
+<main class="container pb-5">
+
+    <div id="overall-banner" class="overall overall-unknown mb-4" role="status" aria-live="polite">
+        <div class="overall-label">checking&hellip;</div>
+        <div class="overall-meta small">Loading current status&hellip;</div>
+    </div>
+
+    <h2 class="h5 mb-3">Services (last {{ retention_days }} days)</h2>
+
+    <div id="services" class="services">
+        {% for name in services %}
+        <article class="service" data-service="{{ name }}">
+            <div class="service-head">
+                <div>
+                    <div class="service-name">{{ name }}</div>
+                    <div class="service-meta small text-muted">—</div>
+                </div>
+                <span class="pill pill-unknown">…</span>
+            </div>
+            <div class="timeline" aria-label="30-day timeline for {{ name }}"></div>
+        </article>
+        {% endfor %}
+    </div>
+
+    <p class="text-muted small mt-4">
+        Each row shows a 30-day uptime strip, with one cell per 15-minute window.
+        Green = healthy 200 response.
+        Amber = slow or unexpected response.
+        Red = timeout / connection refused / 5xx.
+        Grey = no data for that window.
+    </p>
+
+</main>
+
+<footer class="border-top py-3 bg-white">
+    <div class="container small text-muted d-flex justify-content-between flex-wrap gap-2">
+        <span>kevsrobots.com &middot; status service</span>
+        <span><a href="/api/status">JSON API</a></span>
+    </div>
+</footer>
+
+<script>
+const CELLS_PER_DAY = {{ timeline_cells_per_day }};
+const RETENTION_DAYS = {{ retention_days }};
+const CELL_MINUTES = Math.floor((24 * 60) / CELLS_PER_DAY);
+const TOTAL_CELLS = CELLS_PER_DAY * RETENTION_DAYS;
+
+function parseUtc(ts) {
+    if (!ts) return null;
+    // SQLite stores 'YYYY-MM-DDTHH:MM:SS' (no zone). Force UTC.
+    return new Date(ts.endsWith('Z') ? ts : ts + 'Z');
+}
+
+function pillFor(status) {
+    return `pill pill-${status || 'unknown'}`;
+}
+
+function formatLatency(ms) {
+    if (ms == null) return '—';
+    if (ms < 1000) return `${ms} ms`;
+    return `${(ms / 1000).toFixed(2)} s`;
+}
+
+function relativeAgo(ts) {
+    const d = parseUtc(ts);
+    if (!d) return '';
+    const secs = Math.max(0, Math.floor((Date.now() - d.getTime()) / 1000));
+    if (secs < 60) return `${secs}s ago`;
+    if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
+    if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
+    return `${Math.floor(secs / 86400)}d ago`;
+}
+
+async function fetchJson(path) {
+    const r = await fetch(path);
+    if (!r.ok) throw new Error(`${path} returned ${r.status}`);
+    return r.json();
+}
+
+function buildEmptyTimeline(el) {
+    el.innerHTML = '';
+    for (let i = 0; i < TOTAL_CELLS; i++) {
+        const cell = document.createElement('span');
+        cell.className = 'cell cell-empty';
+        el.appendChild(cell);
+    }
+}
+
+function applyIncidentsToTimeline(el, incidents, windowStart) {
+    // Each incident -> mark cells from started_at..ended_at(or now) with peak status
+    const now = Date.now();
+    incidents.forEach(inc => {
+        const start = parseUtc(inc.started_at);
+        const end = inc.ended_at ? parseUtc(inc.ended_at) : new Date(now);
+        if (!start || !end) return;
+        const firstIdx = Math.max(
+            0,
+            Math.floor((start.getTime() - windowStart) / (CELL_MINUTES * 60 * 1000))
+        );
+        const lastIdx = Math.min(
+            TOTAL_CELLS - 1,
+            Math.floor((end.getTime() - windowStart) / (CELL_MINUTES * 60 * 1000))
+        );
+        for (let i = firstIdx; i <= lastIdx; i++) {
+            const cell = el.children[i];
+            if (!cell) continue;
+            const cls = `cell cell-${inc.peak_status}`;
+            // Don't downgrade a red cell back to amber.
+            if (cell.classList.contains('cell-red') && inc.peak_status === 'amber') continue;
+            cell.className = cls;
+        }
+    });
+}
+
+async function refresh() {
+    const banner = document.getElementById('overall-banner');
+    let status, incidents;
+    try {
+        status = await fetchJson('/api/status');
+        incidents = await fetchJson('/api/incidents?days=' + RETENTION_DAYS);
+    } catch (e) {
+        banner.className = 'overall overall-red mb-4';
+        banner.querySelector('.overall-label').textContent = 'unable to load';
+        banner.querySelector('.overall-meta').textContent = e.message;
+        return;
+    }
+
+    banner.className = 'overall overall-' + status.overall + ' mb-4';
+    banner.querySelector('.overall-label').textContent =
+        status.overall === 'green' ? 'all systems normal'
+        : status.overall === 'amber' ? 'some services degraded'
+        : status.overall === 'red' ? 'service disruption'
+        : 'status unknown';
+    banner.querySelector('.overall-meta').textContent =
+        'updated ' + new Date().toLocaleString();
+
+    const windowStart = Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
+    document.querySelectorAll('.service').forEach(card => {
+        const name = card.dataset.service;
+        const entry = status.services[name] || {
+            status: 'unknown', latency_ms: null, last_checked_at: null, message: ''
+        };
+        card.querySelector('.pill').className = pillFor(entry.status);
+        card.querySelector('.pill').textContent = entry.status;
+        const metaParts = [];
+        metaParts.push(formatLatency(entry.latency_ms));
+        if (entry.last_checked_at) metaParts.push(relativeAgo(entry.last_checked_at));
+        if (entry.message && entry.message !== 'ok') metaParts.push(entry.message);
+        card.querySelector('.service-meta').textContent = metaParts.join(' · ');
+
+        const tl = card.querySelector('.timeline');
+        buildEmptyTimeline(tl);
+        const mine = incidents.incidents.filter(i => i.service === name);
+        applyIncidentsToTimeline(tl, mine, windowStart);
+    });
+}
+
+refresh();
+setInterval(refresh, 60 * 1000);
+</script>
+
+</body>
+</html>
