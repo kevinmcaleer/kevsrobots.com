@@ -283,7 +283,7 @@ def create_app() -> FastAPI:
         # first positional arg; the old (name, context) shape silently
         # passes the context dict as ``name`` and crashes with
         # ``TypeError: unhashable type: 'dict'`` deep inside Jinja's cache.
-        return _TEMPLATES.TemplateResponse(
+        resp = _TEMPLATES.TemplateResponse(
             request,
             "index.html",
             {
@@ -293,6 +293,12 @@ def create_app() -> FastAPI:
                 "cache_bust": _CACHE_BUST,
             },
         )
+        # The dashboard is a thin shell — all real data comes from the JSON
+        # API every 60s. Tell browsers (and any cache between us) to never
+        # hold onto the HTML, so a dashboard JS change can't be invisible
+        # behind a stale cached page after a redeploy.
+        resp.headers["Cache-Control"] = "no-store, max-age=0"
+        return resp
 
     return app
 
