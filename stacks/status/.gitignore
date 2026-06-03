@@ -10,3 +10,4 @@ __pycache__/
 
 # Local secrets — keep .env.example committed.
 .env
+.pytest*

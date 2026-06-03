@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncIterator, Optional
 
@@ -85,7 +86,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             max_instances=1,
             coalesce=True,
             replace_existing=True,
-            next_run_time=None,  # first run on the interval, not immediately
+            # Fire the first poll IMMEDIATELY at startup so the dashboard
+            # has real data within seconds instead of showing "unknown"
+            # for the whole first 15-minute interval (every restart).
+            next_run_time=datetime.now(timezone.utc),
         )
         scheduler.add_job(
             _scheduled_vacuum,
