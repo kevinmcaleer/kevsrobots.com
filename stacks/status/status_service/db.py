@@ -190,6 +190,76 @@ async def history_since(
     return [dict(r) for r in rows]
 
 
+async def cell_status_strings(
+    db_path: str,
+    *,
+    services: list[str],
+    cell_seconds: int,
+    cells: int,
+) -> dict[str, str]:
+    """Return one compact status string per service for timeline rendering.
+
+    Each char represents one ``cell_seconds`` window:
+      ``g`` = green, ``a`` = amber, ``r`` = red, ``_`` = no check landed.
+
+    The string is left-to-right oldest→newest, length ``cells`` — i.e.
+    index 0 is ``cells * cell_seconds`` seconds ago, index ``cells-1`` is
+    the current cell. The frontend renders one ``<span>`` per char.
+
+    When multiple checks land in the same cell, the WORST status wins
+    (red > amber > green) — a single bad probe in a 15-minute window is
+    enough to colour that cell.
+    """
+
+    if not services or cells <= 0:
+        return {s: "_" * cells for s in services}
+
+    # SQLite math: ``cell_age`` = how many cell-windows ago the check
+    # happened, relative to "now". 0 = current cell, ``cells-1`` = oldest.
+    # ``worst_rank`` exploits MIN() to pick the worst status per bucket
+    # (red < amber < green < other).
+    sql = (
+        "SELECT service, "
+        "  CAST("
+        "    (CAST(strftime('%s','now') AS INTEGER) "
+        "     - CAST(strftime('%s', checked_at) AS INTEGER)) / ? "
+        "  AS INTEGER) AS cell_age, "
+        "  MIN(CASE status "
+        "        WHEN 'red'   THEN 1 "
+        "        WHEN 'amber' THEN 2 "
+        "        WHEN 'green' THEN 3 "
+        "        ELSE 4 END) AS worst_rank "
+        "FROM health_checks "
+        "WHERE checked_at >= datetime('now', ?) "
+        "  AND service IN (" + ",".join("?" * len(services)) + ") "
+        "GROUP BY service, cell_age"
+    )
+    params: tuple = (
+        cell_seconds,
+        f"-{cells * cell_seconds} seconds",
+        *services,
+    )
+
+    cells_by_service: dict[str, list[str]] = {s: ["_"] * cells for s in services}
+    rank_to_char = {1: "r", 2: "a", 3: "g"}
+
+    async with connect(db_path) as db:
+        async with db.execute(sql, params) as cur:
+            async for row in cur:
+                service = row["service"]
+                cell_age = int(row["cell_age"])
+                rank = int(row["worst_rank"])
+                if service not in cells_by_service:
+                    continue
+                if cell_age < 0 or cell_age >= cells:
+                    continue
+                # cell_age 0 → rightmost (now); cell_age = cells-1 → leftmost.
+                idx = cells - 1 - cell_age
+                cells_by_service[service][idx] = rank_to_char.get(rank, "_")
+
+    return {s: "".join(chars) for s, chars in cells_by_service.items()}
+
+
 async def vacuum_old_rows(db_path: str, *, retention_days: int) -> int:
     """Delete rows older than ``retention_days`` then run VACUUM.
 

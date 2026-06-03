@@ -29,7 +29,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import Settings, get_settings, scheduler_disabled
-from .db import init_schema, latest_per_service, vacuum_old_rows
+from .db import (
+    cell_status_strings,
+    init_schema,
+    latest_per_service,
+    vacuum_old_rows,
+)
 from .incidents import incidents_for_window, uptime_for_window
 from .polling import overall_status, poll_once
 
@@ -239,6 +244,35 @@ def create_app() -> FastAPI:
                 name, {"total": 0, "green": 0, "uptime_pct": None}
             )
         return {"days": days, "services": per_service}
+
+    @app.get("/api/timeline")
+    async def api_timeline(days: int = 30) -> dict:
+        """One compact status string per service for the dashboard timeline.
+
+        Each char = one cell (default 15 min): ``g`` green, ``a`` amber,
+        ``r`` red, ``_`` no data. Strings are oldest-on-the-left,
+        ``cells-1`` is the current cell — so the rightmost cell updates
+        every poll and everything shifts left."""
+        settings = get_settings()
+        if days < 1:
+            days = 1
+        if days > settings.retention_days:
+            days = settings.retention_days
+        cells_per_day = settings.timeline_cells_per_day
+        cell_seconds = (24 * 60 * 60) // cells_per_day
+        total_cells = days * cells_per_day
+        services_data = await cell_status_strings(
+            settings.status_db_path,
+            services=settings.service_names,
+            cell_seconds=cell_seconds,
+            cells=total_cells,
+        )
+        return {
+            "days": days,
+            "cells": total_cells,
+            "cell_seconds": cell_seconds,
+            "services": services_data,
+        }
 
     @app.get("/")
     async def dashboard(request: Request):

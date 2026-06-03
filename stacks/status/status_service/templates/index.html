@@ -85,45 +85,29 @@ async function fetchJson(path) {
     return r.json();
 }
 
-function buildEmptyTimeline(el) {
+const CHAR_TO_CLASS = { g: 'cell-green', a: 'cell-amber', r: 'cell-red', _: 'cell-empty' };
+
+function paintTimeline(el, seq) {
+    // ``seq`` is a compact status string from /api/timeline — one char per
+    // cell, oldest on the left, rightmost char = the current cell. Every
+    // refresh the server's ``now`` advances, so the right edge updates
+    // and everything shifts visually left as cells fall out the back.
     el.innerHTML = '';
+    seq = seq || '';
     for (let i = 0; i < TOTAL_CELLS; i++) {
+        const ch = seq[i] || '_';
         const cell = document.createElement('span');
-        cell.className = 'cell cell-empty';
+        cell.className = 'cell ' + (CHAR_TO_CLASS[ch] || 'cell-empty');
         el.appendChild(cell);
     }
 }
 
-function applyIncidentsToTimeline(el, incidents, windowStart) {
-    const now = Date.now();
-    incidents.forEach(inc => {
-        const start = parseUtc(inc.started_at);
-        const end = inc.ended_at ? parseUtc(inc.ended_at) : new Date(now);
-        if (!start || !end) return;
-        const firstIdx = Math.max(
-            0,
-            Math.floor((start.getTime() - windowStart) / (CELL_MINUTES * 60 * 1000))
-        );
-        const lastIdx = Math.min(
-            TOTAL_CELLS - 1,
-            Math.floor((end.getTime() - windowStart) / (CELL_MINUTES * 60 * 1000))
-        );
-        for (let i = firstIdx; i <= lastIdx; i++) {
-            const cell = el.children[i];
-            if (!cell) continue;
-            // Don't downgrade a red cell back to amber.
-            if (cell.classList.contains('cell-red') && inc.peak_status === 'amber') continue;
-            cell.className = `cell cell-${inc.peak_status}`;
-        }
-    });
-}
-
 async function refresh() {
     const banner = document.getElementById('overall-banner');
-    let status, incidents;
+    let status, timeline;
     try {
         status = await fetchJson('/api/status');
-        incidents = await fetchJson('/api/incidents?days=' + RETENTION_DAYS);
+        timeline = await fetchJson('/api/timeline?days=' + RETENTION_DAYS);
     } catch (e) {
         banner.className = 'overall overall-red';
         banner.querySelector('.overall-label').textContent = 'unable to load';
@@ -139,8 +123,6 @@ async function refresh() {
         : 'status unknown';
     banner.querySelector('.overall-meta').textContent =
         'updated ' + new Date().toLocaleTimeString();
-
-    const windowStart = Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
     document.querySelectorAll('.service').forEach(card => {
         const name = card.dataset.service;
@@ -160,9 +142,8 @@ async function refresh() {
         card.setAttribute('title', metaParts.join(' · '));
 
         const tl = card.querySelector('.timeline');
-        buildEmptyTimeline(tl);
-        const mine = incidents.incidents.filter(i => i.service === name);
-        applyIncidentsToTimeline(tl, mine, windowStart);
+        const seq = (timeline.services && timeline.services[name]) || '';
+        paintTimeline(tl, seq);
     });
 }
 
