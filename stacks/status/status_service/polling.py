@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+import socket
 import time
 from typing import Iterable, Optional, Tuple
 
@@ -23,6 +25,27 @@ import httpx
 
 from .config import Settings
 from .db import insert_check, utcnow_iso
+
+# Force IPv4 outbound DNS — same Pi has the IPv6-no-default-route problem
+# that wedged cloudflared (fixed there with ``--edge-ip-version 4``).
+# Without this, every probe to a hostname with an AAAA record (Cloudflare
+# gives all of them both A + AAAA) fails with ``ConnectError``
+# (``ENETUNREACH``) before httpx ever sees an HTTP response. We filter
+# AAAA results out of ``socket.getaddrinfo`` at the module level so every
+# httpx client in the process sees IPv4-only resolutions. The fallback to
+# the original result list when there are no A records keeps the door
+# open to IPv6-only hosts if anyone ever adds one. Disable with
+# ``STATUS_FORCE_IPV4=0`` if the Pi ever gets a working IPv6 default
+# route and you want dual-stack happy-eyeballs back.
+if os.environ.get("STATUS_FORCE_IPV4", "1") != "0":
+    _original_getaddrinfo = socket.getaddrinfo
+
+    def _ipv4_only_getaddrinfo(host, *args, **kwargs):
+        results = _original_getaddrinfo(host, *args, **kwargs)
+        v4_only = [r for r in results if r[0] == socket.AF_INET]
+        return v4_only or results  # fall back if the host is v6-only
+
+    socket.getaddrinfo = _ipv4_only_getaddrinfo
 
 logger = logging.getLogger(__name__)
 

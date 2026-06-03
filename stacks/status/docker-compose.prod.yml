@@ -12,6 +12,12 @@
 
 services:
   status:
+    # ``build:`` makes ``docker compose -f docker-compose.prod.yml build``
+    # rebuild from this directory directly — same tag as the registry
+    # image, so the same compose file pulls if you're deploying without
+    # local sources, and builds if you are. (docker-stack.yml leaves
+    # build: out — Swarm only pulls.)
+    build: .
     image: 192.168.2.1:5000/status:latest
     network_mode: host
     env_file: .env
