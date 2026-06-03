@@ -235,10 +235,14 @@ def create_app() -> FastAPI:
         """The public dashboard. All data fetched client-side."""
 
         settings = get_settings()
+        # Starlette ≥0.29 changed TemplateResponse to take ``request`` as the
+        # first positional arg; the old (name, context) shape silently
+        # passes the context dict as ``name`` and crashes with
+        # ``TypeError: unhashable type: 'dict'`` deep inside Jinja's cache.
         return _TEMPLATES.TemplateResponse(
+            request,
             "index.html",
             {
-                "request": request,
                 "services": settings.service_names,
                 "timeline_cells_per_day": settings.timeline_cells_per_day,
                 "retention_days": settings.retention_days,
