@@ -14,6 +14,14 @@ RUN apt-get update \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Cache-bust the source COPY when main has new commits, so a routine
+# rebuild on the Pi picks up code changes without needing --no-cache.
+# The atom feed body changes on every commit → ADD re-fetches the remote
+# URL on every build → if it changed, this layer + everything after it
+# invalidate. Use github.com (NOT api.github.com — rate-limited; see
+# CLAUDE.md's "Cache-busting depends on which Dockerfile" note).
+ADD https://github.com/kevinmcaleer/kevsrobots.com/commits/main.atom /tmp/cache-bust.xml
+
 COPY . .
 
 ENV PORT=8210
