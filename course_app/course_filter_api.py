@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 import sqlite3
 from typing import List, Optional
 
@@ -21,6 +22,27 @@ def get_db_connection():
     print(f"Opened database successfully {DATABASE_FILE}")
     conn.row_factory = sqlite3.Row  # This allows us to return dictionary-like rows
     return conn
+
+
+@app.get("/health", response_class=PlainTextResponse)
+def health() -> str:
+    """Liveness probe for the status dashboard and Cloudflare healthchecks.
+
+    Returns plain text ``ok`` with 200 when the courses DB is readable, or
+    503 when sqlite can't open ``courses.db`` / the ``courses`` table is
+    missing — so a broken deploy shows up red on status.kevsrobots.com
+    rather than silently being "up". Matches the convention used by
+    chatter / nibsy / projects / status / random_robot_facts."""
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        try:
+            conn.execute("SELECT 1 FROM courses LIMIT 1")
+        finally:
+            conn.close()
+    except Exception:
+        raise HTTPException(status_code=503, detail="courses db unavailable")
+    return "ok"
+
 
 # Route to fetch all courses with optional tag filtering
 @app.get("/courses/")
