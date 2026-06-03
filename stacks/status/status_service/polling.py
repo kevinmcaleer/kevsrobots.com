@@ -71,18 +71,24 @@ _original_getaddrinfo = socket.getaddrinfo
 
 
 def _patched_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    # anyio / asyncio pass hostnames as ASCII bytes (for IDNA round-trips).
+    # dnspython expects ``str``; decode for the external query but keep the
+    # original ``host`` for the system-resolver fallback so we don't change
+    # its semantics.
+    host_str = host.decode("ascii") if isinstance(host, (bytes, bytearray)) else host
+
     # IP literal — system resolver is fine (no actual lookup happens).
-    if host:
+    if host_str:
         try:
-            ipaddress.ip_address(host)
+            ipaddress.ip_address(host_str)
             return _original_getaddrinfo(host, port, family, type, proto, flags)
         except ValueError:
             pass
 
     # Hostname — query external DNS (bypasses local rewrites).
-    if _external_resolver is not None and host:
+    if _external_resolver is not None and host_str:
         try:
-            answers = _external_resolver.resolve(host, "A")
+            answers = _external_resolver.resolve(host_str, "A")
             socktype = type or socket.SOCK_STREAM
             sockproto = proto or socket.IPPROTO_TCP
             results = [
