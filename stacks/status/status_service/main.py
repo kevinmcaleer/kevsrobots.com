@@ -14,6 +14,7 @@ incident windows, uptime percentages. No URLs, no secrets, no usernames.
 from __future__ import annotations
 
 import logging
+import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -36,6 +37,11 @@ logger = logging.getLogger(__name__)
 
 _HERE = Path(__file__).resolve().parent
 _TEMPLATES = Jinja2Templates(directory=str(_HERE / "templates"))
+# Cache-bust the dashboard CSS link with the process start time so a
+# container restart (i.e. a rebuild + redeploy) automatically invalidates
+# the browser's cached stylesheet. Otherwise an old dashboard.css can
+# linger in the browser even after the server is serving the new one.
+_CACHE_BUST = str(int(time.time()))
 
 
 async def _scheduled_poll() -> None:
@@ -250,6 +256,7 @@ def create_app() -> FastAPI:
                 "services": settings.service_names,
                 "timeline_cells_per_day": settings.timeline_cells_per_day,
                 "retention_days": settings.retention_days,
+                "cache_bust": _CACHE_BUST,
             },
         )
 
