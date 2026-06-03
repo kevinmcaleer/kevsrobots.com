@@ -33,4 +33,11 @@ VOLUME ["/data"]
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f http://127.0.0.1:8210/health || exit 1
 
-CMD ["uvicorn", "status_service.main:app", "--host", "0.0.0.0", "--port", "8210"]
+# ``--loop asyncio`` forces uvicorn onto the stdlib event loop instead
+# of uvloop. Why: uvloop ships its own DNS resolver (c-ares) that does
+# NOT call socket.getaddrinfo, so our STATUS_FORCE_IPV4 monkeypatch in
+# polling.py is silently bypassed in the async path and every probe
+# fails with ConnectError on this Pi (IPv6 has no working default
+# route — see also cloudflared's --edge-ip-version 4). The status
+# service does 9 probes / 15 min, so uvloop's perf gain is irrelevant.
+CMD ["uvicorn", "status_service.main:app", "--host", "0.0.0.0", "--port", "8210", "--loop", "asyncio"]
