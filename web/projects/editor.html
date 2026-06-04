@@ -115,6 +115,17 @@ hide_nibsy: true
     <!-- MIDDLE: Main Content -->
     <div class="col-lg-7">
       <!-- Title & Description -->
+      <!-- Issue: early-adopter projects all shipped as "Untitled Project".
+           Show a prominent warning when the title is empty or still the
+           default, so the editor nudges the author to give it a real name.
+           We can't BLOCK saving (autosave is on) — this is the heavy nudge. -->
+      <div id="title-needs-attention" class="alert alert-warning d-flex align-items-center mb-2 py-2 px-3 small d-none" role="alert">
+        <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+        <div class="flex-grow-1">
+          <strong>This project needs a title.</strong>
+          The placeholder "Untitled Project" hides it from search, the hub, and your visitors. Type a memorable name in the field below.
+        </div>
+      </div>
       <div class="mb-3">
         <input type="text" id="project-title" class="form-control form-control-lg border-0 fw-bold"
                placeholder="Project title..." maxlength="200">

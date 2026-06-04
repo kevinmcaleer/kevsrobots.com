@@ -25,6 +25,17 @@ layout: content
     </a>
   </div>
 
+  <!-- Issue: early adopters' projects all autosaved as "Untitled Project".
+       Surface them at the top so the user knows which ones need renaming
+       before they go anywhere on the site. JS reveals when the count > 0. -->
+  <div id="untitled-alert" class="alert alert-warning d-none align-items-start" role="alert">
+    <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+    <div class="flex-grow-1">
+      <strong><span id="untitled-count">0</span> of your projects need a title.</strong>
+      They're showing up as "Untitled Project" — invisible in search and on the hub. Click <em>Edit</em> on the highlighted cards below to give them a real name.
+    </div>
+  </div>
+
   <!-- Filter Tabs -->
   <ul class="nav nav-tabs mb-4" id="statusTabs" role="tablist">
     <li class="nav-item" role="presentation">
@@ -113,6 +124,7 @@ async function checkAuth() {
     allProjects = await response.json();
     document.getElementById('loading').classList.add('d-none');
     updateCounts();
+    updateUntitledAlert(allProjects);
     displayProjects(allProjects);
     return true;
 
@@ -157,6 +169,25 @@ function filterProjects(status) {
   displayProjects(filtered);
 }
 
+// Issue: surface projects whose title is empty or still the literal
+// "Untitled Project" so the user can see them at a glance. Defaults to
+// case-insensitive comparison since the editor lower-cased the check.
+function isUntitled(project) {
+  const t = (project && project.title ? String(project.title) : '').trim().toLowerCase();
+  return !t || t === 'untitled project';
+}
+
+function updateUntitledAlert(projects) {
+  const alert = document.getElementById('untitled-alert');
+  const countEl = document.getElementById('untitled-count');
+  if (!alert || !countEl) return;
+  const n = projects.filter(isUntitled).length;
+  if (n === 0) { alert.classList.add('d-none'); return; }
+  countEl.textContent = n;
+  alert.classList.remove('d-none');
+  alert.classList.add('d-flex');
+}
+
 // Display projects in grid
 function displayProjects(projects) {
   const grid = document.getElementById('projects-grid');
@@ -194,6 +225,20 @@ function createProjectCard(project) {
     statusBadge = '<span class="badge bg-secondary">Archived</span>';
   }
 
+  // Untitled-project decoration: italicise the title in muted red, swap
+  // in a "Needs a title" badge before the status one, and outline the
+  // whole card so it's impossible to miss.
+  const untitled = isUntitled(project);
+  const titleHtml = untitled
+    ? `<span class="text-danger fst-italic">${escapeHtml(project.title || 'Untitled Project')}</span>`
+    : escapeHtml(project.title);
+  const needsTitleBadge = untitled
+    ? '<span class="badge bg-danger me-1" title="This project needs a title before it goes anywhere"><i class="fas fa-exclamation-triangle me-1"></i>Needs a title</span>'
+    : '';
+  const cardClasses = untitled
+    ? 'card kr-project-card h-100 shadow-sm border-2 border-danger'
+    : 'card kr-project-card h-100 shadow-sm';
+
   // Show the full description (truncation is handled by CSS line-clamp on
   // .kr-card-description) so we don't double-truncate.
   const description = project.short_description || '';
@@ -214,12 +259,12 @@ function createProjectCard(project) {
         : `<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>`);
 
   col.innerHTML = `
-    <div class="card kr-project-card h-100 shadow-sm">
+    <div class="${cardClasses}">
       ${thumb}
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
-          <h5 class="card-title mb-0">${escapeHtml(project.title)}</h5>
-          ${statusBadge}
+          <h5 class="card-title mb-0">${titleHtml}</h5>
+          <div class="d-flex flex-wrap gap-1 justify-content-end">${needsTitleBadge}${statusBadge}</div>
         </div>
         <p class="card-text text-muted small kr-card-description">${escapeHtml(description)}</p>
         ${tagsHtml ? `<div class="mb-2 kr-card-tags">${tagsHtml}</div>` : ''}

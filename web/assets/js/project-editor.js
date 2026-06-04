@@ -13,7 +13,30 @@
   const editorContainer = document.getElementById('editor-container');
   const authRequired = document.getElementById('auth-required');
   const titleInput = document.getElementById('project-title');
+  const titleWarningEl = document.getElementById('title-needs-attention');
   const descInput = document.getElementById('project-description');
+
+  // Issue: early-adopter projects all defaulted to "Untitled Project".
+  // Show the warning banner + flag the input whenever the title is empty
+  // or still the literal default. Called on load + every input change so
+  // the nudge disappears the moment they start typing a real name.
+  function updateTitleWarning() {
+    if (!titleInput || !titleWarningEl) return;
+    const v = (titleInput.value || '').trim();
+    const needsWork = !v || v.toLowerCase() === 'untitled project';
+    titleWarningEl.classList.toggle('d-none', !needsWork);
+    titleInput.classList.toggle('border-warning', needsWork);
+    titleInput.classList.toggle('border-2', needsWork);
+    if (needsWork) {
+      titleInput.setAttribute('aria-invalid', 'true');
+    } else {
+      titleInput.removeAttribute('aria-invalid');
+    }
+  }
+  if (titleInput) {
+    titleInput.addEventListener('input', updateTitleWarning);
+  }
+
   const contentEditor = document.getElementById('content-editor');
   const contentPreview = document.getElementById('content-preview');
   const difficultySelect = document.getElementById('project-difficulty');
@@ -239,6 +262,7 @@
       if (!resp.ok) return;
       currentProject = await resp.json();
       titleInput.value = currentProject.title || '';
+      updateTitleWarning();
       descInput.value = currentProject.short_description || '';
       setEditorValue(currentProject.content_md);
       difficultySelect.value = currentProject.difficulty || '';

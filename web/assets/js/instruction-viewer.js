@@ -281,21 +281,36 @@
       return Promise.resolve(null);
     }
     return new Promise(function (resolve) {
+      // Fabric v6 changed loadFromJSON: in v5 the 2nd arg was a "done"
+      // callback (which is how this used to be written and why every
+      // builder-mode slideshow hung at "Preparing slideshow…"). In v6
+      // it's a per-object REVIVER and the function returns a Promise.
+      // Use the returned Promise as the completion signal.
+      var p;
       try {
-        off.loadFromJSON(parsed, function () {
-          try {
-            off.renderAll();
-            var url = off.toDataURL({ format: 'png', multiplier: 1 });
-            resolve(url);
-          } catch (e) {
-            resolve(null);
-          }
-          // Clear the canvas so the next step starts from a clean slate.
-          try { off.clear(); off.backgroundColor = '#ffffff'; } catch (_) {}
-        });
+        p = off.loadFromJSON(parsed);
       } catch (_) {
         resolve(null);
+        return;
       }
+      if (!p || typeof p.then !== 'function') {
+        // Defensive: very old Fabric loaded somehow — bail rather than hang.
+        resolve(null);
+        return;
+      }
+      p.then(function () {
+        try {
+          off.renderAll();
+          var url = off.toDataURL({ format: 'png', multiplier: 1 });
+          resolve(url);
+        } catch (_) {
+          resolve(null);
+        }
+        // Clear the canvas so the next step starts from a clean slate.
+        try { off.clear(); off.backgroundColor = '#ffffff'; } catch (_) {}
+      }).catch(function () {
+        resolve(null);
+      });
     });
   }
 
