@@ -2321,11 +2321,16 @@
     // need a non-empty url to satisfy the LinkCreate schema (it's
     // required), so seed it with a blank-ish placeholder the user
     // will overwrite immediately.
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/links', {
-      method: 'POST', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: '', url: 'https://', link_type: 'article' }),
-    });
+    try {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/links', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: '', url: 'https://', link_type: 'article' }),
+      });
+      if (!resp.ok) showSaveStatus('error', 'Add link failed');
+    } catch (_) {
+      showSaveStatus('error', 'Add link failed');
+    }
     loadLinks();
   });
 
@@ -2367,15 +2372,25 @@
     const prev = _linkSavePending[linkId] || Promise.resolve();
     const next = prev.then(async () => {
       try {
-        await apiFetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
+        const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
           method: 'PUT', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
+        // fetch resolves on 4xx/5xx — without this check a rejected
+        // save (expired session, server error) left the UI showing the
+        // new value while the DB kept the old one, so edits looked
+        // saved and silently reverted on the next reload.
+        if (!resp.ok) {
+          showSaveStatus('error', 'Link save failed');
+          loadLinks();
+          return;
+        }
+        showSaveStatus('saved', 'Saved');
       } catch (_) {
-        // Network blip or 4xx — fall back to reloading so the UI
-        // reflects what's actually in the DB rather than showing
-        // stale local edits.
+        // Network blip — reload so the UI reflects what's actually in
+        // the DB rather than showing stale local edits.
+        showSaveStatus('error', 'Link save failed');
         loadLinks();
       }
     });
@@ -2383,9 +2398,16 @@
   };
 
   window.deleteLink = async function(linkId) {
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
-      method: 'DELETE', credentials: 'include',
-    });
+    try {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/links/' + linkId, {
+        method: 'DELETE', credentials: 'include',
+      });
+      if (!resp.ok && resp.status !== 404) {
+        showSaveStatus('error', 'Delete failed');
+      }
+    } catch (_) {
+      showSaveStatus('error', 'Delete failed');
+    }
     loadLinks();
   };
 

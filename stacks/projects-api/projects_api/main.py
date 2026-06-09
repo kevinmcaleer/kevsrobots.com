@@ -42,6 +42,7 @@ from .db import (
     backfill_part_image_url_to_photos,
     backfill_part_revisions_if_missing,
     create_all,
+    drop_legacy_link_type_check_if_present,
     migrate_image_files_to_images,
     recanonicalize_part_categories,
     get_sessionmaker,
@@ -140,6 +141,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Editor content-surface toggle: ensure projects.content_mode column
     # exists on legacy Postgres deployments (defaults to 'markdown').
     await add_project_content_mode_if_missing()
+    # Related-links Type dropdown: the chatter-era project_links table
+    # carries a CHECK allowing only the legacy link_type vocabulary, so
+    # saving tutorial/documentation/other 500s. Drop it — validation
+    # lives in schemas.LinkUpdate.
+    await drop_legacy_link_type_check_if_present()
     # Versioning migrations. CRITICAL ORDERING: every column-adding ALTER
     # must run BEFORE any backfill, because the backfills issue full-model
     # ORM SELECTs (e.g. ``select(Part)``) that reference EVERY mapped column

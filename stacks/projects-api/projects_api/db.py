@@ -135,6 +135,52 @@ async def repair_stale_fks() -> None:
             ))
 
 
+async def drop_legacy_link_type_check_if_present() -> None:
+    """Drop the chatter-era CHECK constraint on ``project_links.link_type``.
+
+    Chatter migration 016 created the table (as ``project_link``) with
+    ``CHECK (link_type IN ('resource','video','course','article',
+    'related_project'))``; migration 019 renamed the table to
+    ``project_links`` and the constraint survived the rename under its
+    original auto-generated name. The current editor vocabulary is
+    ``article|video|tutorial|documentation|other`` (schemas.LinkUpdate),
+    so any PUT setting tutorial/documentation/other raised
+    CheckViolationError → 500 and the Type dropdown never persisted —
+    while article/video happened to overlap the legacy set and saved
+    fine, making the bug look intermittent. ``create_all`` never alters
+    existing tables, and the SQLite test schema is built from models.py
+    (which defines no CHECK), so the test suite cannot catch this.
+
+    Enumerates ``pg_constraint`` for any CHECK on ``project_links``
+    whose definition mentions ``link_type`` (the name predates the
+    table rename, so matching by name alone is fragile). Validation of
+    allowed values lives in the API schema layer, not the DB.
+    Idempotent — no-op once dropped. Postgres-only.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        rows = await conn.execute(text(
+            "SELECT con.conname "
+            "FROM pg_constraint con "
+            "JOIN pg_class rel ON rel.oid = con.conrelid "
+            "JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace "
+            "WHERE nsp.nspname = current_schema() "
+            "  AND rel.relname = 'project_links' "
+            "  AND con.contype = 'c' "
+            "  AND pg_get_constraintdef(con.oid) ILIKE '%link_type%'"
+        ))
+        for (conname,) in rows.fetchall():
+            logger.warning(
+                "Dropping legacy CHECK constraint %s on project_links.link_type",
+                conname,
+            )
+            await conn.execute(text(
+                f'ALTER TABLE "project_links" DROP CONSTRAINT "{conname}"'
+            ))
+
+
 async def add_remix_columns_if_missing() -> None:
     """Additive migration for issue #108 (project remixes).
 

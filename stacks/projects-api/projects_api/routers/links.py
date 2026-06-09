@@ -21,7 +21,9 @@ async def list_links(
 ) -> list[LinkResponse]:
     items = (
         await session.scalars(
-            select(ProjectLink).where(ProjectLink.project_id == project_id)
+            select(ProjectLink)
+            .where(ProjectLink.project_id == project_id)
+            .order_by(ProjectLink.id)
         )
     ).all()
     return [LinkResponse.model_validate(i, from_attributes=True) for i in items]
