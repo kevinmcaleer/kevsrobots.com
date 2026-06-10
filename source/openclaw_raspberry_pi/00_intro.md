@@ -3,10 +3,10 @@ title: Course Overview
 description: Welcome to the OpenClaw on Raspberry Pi course.
 layout: lesson
 type: page
-cover: /learn/openclaw-raspberry-pi/assets/openclaw.jpg
+cover: /learn/openclaw_raspberry_pi/assets/openclaw.jpg
 ---
 
-![OpenClaw cover artwork](/learn/openclaw-raspberry-pi/assets/openclaw.jpg){:class="cover"}
+![OpenClaw cover artwork]({{page.cover}}){:class="cover"}
 
 ## Welcome to OpenClaw on Raspberry Pi
 

@@ -1,29 +1,311 @@
----
-- name: Ardiuno
-  title: Ar
-  description: The starting place for many people creating their first robot.
-  link: https://www.arduino.cc
-  color: blue 
-- name: Python
-  title: Py
-  description: Python programming language
-  link: https://www.python.org
-  color: blue
-- name: Tiny 2040
-  code: Ti
-  title: Ti
-  description: A postage stamp sized RP2040 development board with a USB-C connection, perfect for portable projects, wearables, and embedding into stuff.
-  link: https://shop.pimoroni.com/products/tiny-2040
-  image: https://drive.google.com/open?id=1AEe6S4RQByX2QOABdVaBD7qI1vM-megE
-  author: Jonathan Williamson
-  date: 2022-02-08
-- name: Raspberry Pi
-  title: RP
-  description: The Raspberry Pi is a series of small single-board computers developed in the United Kingdom by the Raspberry Pi Foundation to promote the teaching of basic computer science in schools and in developing countries.
-  link: https://www.raspberrypi.org
-  color: blue
-- name: MicroPython
-  title: MP
-  description: MicroPython is a lean and efficient implementation of the Python 3 programming language that includes a small subset of the Python standard library and is optimised to run on microcontrollers and in constrained environments.
-  link: https://micropython.org
-  color: blue
+# The Periodic Table of Robotics
+# ------------------------------
+# Drives /periodic-table/ (the table grid) and the per-element pages in
+# /web/_ptor/. Each element's `code` is its unique two-character symbol;
+# `slug` is the lowercase code and must match the markdown filename in
+# _ptor/. `row`/`col` place the tile on the 18-column grid (chemistry
+# layout). `number` is the atomic number (reading order, bottom row last).
+# `tags` feed the related-articles matcher in the ptor layout — keep them
+# aligned with real blog-post tags and group names.
+
+categories:
+  - key: foundations
+    label: Electronics Foundations
+    color: "#e63946"
+  - key: code
+    label: Code & Software
+    color: "#457b9d"
+  - key: boards
+    label: Boards & Brains
+    color: "#7b2cbf"
+  - key: signals
+    label: Signals & Comms
+    color: "#2a9d8f"
+  - key: power
+    label: Power & Motion
+    color: "#f4a261"
+  - key: sensors
+    label: Sensors
+    color: "#e9c46a"
+  - key: intelligence
+    label: Robot Intelligence
+    color: "#ef476f"
+  - key: making
+    label: Making & Design
+    color: "#38b000"
+  - key: robots
+    label: Robots & Builds
+    color: "#8d99ae"
+
+elements:
+  # --- Period 1 ------------------------------------------------------
+  - { number: 1,  code: Oh, slug: oh, name: Ohm's Law,        category: foundations,  row: 1, col: 1,
+      blurb: "V = I × R — the one equation every roboticist needs.",
+      tags: [electronics] }
+  - { number: 2,  code: Ai, slug: ai, name: Artificial Intelligence, category: intelligence, row: 1, col: 18,
+      blurb: "Giving robots the smarts to perceive, decide and act.",
+      tags: [ai, machine learning] }
+
+  # --- Period 2 ------------------------------------------------------
+  - { number: 3,  code: El, slug: el, name: Electronics,      category: foundations,  row: 2, col: 1,
+      blurb: "The flow of electrons that brings every robot to life.",
+      tags: [electronics] }
+  - { number: 4,  code: Ci, slug: ci, name: Circuits,         category: foundations,  row: 2, col: 2,
+      blurb: "Complete the loop — how components connect into working systems.",
+      tags: [electronics, pcb] }
+  - { number: 5,  code: Py, slug: py, name: Python,           category: code,         row: 2, col: 13,
+      blurb: "The friendliest language in robotics, from Pi to PC.",
+      tags: [python] }
+  - { number: 6,  code: Mp, slug: mp, name: MicroPython,      category: code,         row: 2, col: 14,
+      blurb: "Python, shrunk to fit on a microcontroller.",
+      tags: [micropython, pico] }
+  - { number: 7,  code: Cp, slug: cp, name: C/C++,            category: code,         row: 2, col: 15,
+      blurb: "The fast, close-to-the-metal language behind Arduino and more.",
+      tags: [arduino, c] }
+  - { number: 8,  code: Js, slug: js, name: JavaScript,       category: code,         row: 2, col: 16,
+      blurb: "From dashboards to Johnny-Five — robots speak browser too.",
+      tags: [javascript, website] }
+  - { number: 9,  code: Sc, slug: sc, name: Scratch,          category: code,         row: 2, col: 17,
+      blurb: "Drag-and-drop blocks — the gateway to programming robots.",
+      tags: [scratch, education] }
+  - { number: 10, code: Ru, slug: ru, name: Rust,             category: code,         row: 2, col: 18,
+      blurb: "Memory-safe speed for serious robot firmware.",
+      tags: [rust] }
+
+  # --- Period 3 ------------------------------------------------------
+  - { number: 11, code: Br, slug: br, name: Breadboard,       category: foundations,  row: 3, col: 1,
+      blurb: "Prototype circuits with no soldering required.",
+      tags: [electronics] }
+  - { number: 12, code: So, slug: so, name: Soldering,        category: foundations,  row: 3, col: 2,
+      blurb: "Join metal to metal — the maker's rite of passage.",
+      tags: [electronics, tips] }
+  - { number: 13, code: Li, slug: li, name: Linux,            category: code,         row: 3, col: 13,
+      blurb: "The operating system that powers most robot brains.",
+      tags: [linux, raspberry pi] }
+  - { number: 14, code: Gi, slug: gi, name: Git,              category: code,         row: 3, col: 14,
+      blurb: "Version control — undo for your whole robot project.",
+      tags: [git, software] }
+  - { number: 15, code: Do, slug: do, name: Docker,           category: code,         row: 3, col: 15,
+      blurb: "Ship your robot software in tidy, repeatable containers.",
+      tags: [docker] }
+  - { number: 16, code: Sq, slug: sq, name: SQL & Data,       category: code,         row: 3, col: 16,
+      blurb: "Store and query everything your robot senses.",
+      tags: [sql, data] }
+  - { number: 17, code: Si, slug: si, name: Simulation,       category: code,         row: 3, col: 17,
+      blurb: "Crash a thousand virtual robots before you build one real one.",
+      tags: [simulation, ros] }
+  - { number: 18, code: Os, slug: os, name: Open Source,      category: code,         row: 3, col: 18,
+      blurb: "Shared designs and code — the reason hobby robotics exists.",
+      tags: [open source, software] }
+
+  # --- Period 4 ------------------------------------------------------
+  - { number: 19, code: Re, slug: re, name: Resistors,        category: foundations,  row: 4, col: 1,
+      blurb: "The humble component that keeps current in check.",
+      tags: [electronics] }
+  - { number: 20, code: Ca, slug: ca, name: Capacitors,       category: foundations,  row: 4, col: 2,
+      blurb: "Tiny reservoirs of charge that smooth and store.",
+      tags: [electronics] }
+  - { number: 21, code: Ar, slug: ar, name: Arduino,          category: boards,       row: 4, col: 3,
+      blurb: "The board that launched a million robots.",
+      tags: [arduino] }
+  - { number: 22, code: Rp, slug: rp, name: Raspberry Pi,     category: boards,       row: 4, col: 4,
+      blurb: "A full Linux computer the size of a credit card.",
+      tags: [raspberry pi, raspberrypi] }
+  - { number: 23, code: Pi, slug: pi, name: Raspberry Pi Pico, category: boards,      row: 4, col: 5,
+      blurb: "The £4 microcontroller that changed everything.",
+      tags: [pico, raspberry pi pico] }
+  - { number: 24, code: Es, slug: es, name: ESP32,            category: boards,       row: 4, col: 6,
+      blurb: "WiFi and Bluetooth built in, pennies to buy.",
+      tags: [esp32] }
+  - { number: 25, code: Mb, slug: mb, name: micro:bit,        category: boards,       row: 4, col: 7,
+      blurb: "The pocket-sized board that teaches a generation to code.",
+      tags: [microbit, education] }
+  - { number: 26, code: Io, slug: io, name: GPIO,             category: signals,      row: 4, col: 8,
+      blurb: "General-purpose pins — where code meets the real world.",
+      tags: [pico, micropython, raspberry pi] }
+  - { number: 27, code: Pw, slug: pw, name: PWM,              category: signals,      row: 4, col: 9,
+      blurb: "Fake an analogue signal by switching really, really fast.",
+      tags: [micropython, electronics] }
+  - { number: 28, code: Ba, slug: ba, name: Batteries,        category: power,        row: 4, col: 10,
+      blurb: "Untether your robot — chemistry in service of motion.",
+      tags: [electronics, power] }
+  - { number: 29, code: Dc, slug: dc, name: DC Motors,        category: power,        row: 4, col: 11,
+      blurb: "Spin! The simplest way to make a robot move.",
+      tags: [motors, robot] }
+  - { number: 30, code: Sv, slug: sv, name: Servos,           category: power,        row: 4, col: 12,
+      blurb: "Motors that know where they're pointing.",
+      tags: [servo, robot] }
+  - { number: 31, code: Us, slug: us, name: Ultrasonic,       category: sensors,      row: 4, col: 13,
+      blurb: "Echolocation for robots — distance sensing on a budget.",
+      tags: [sensors, smars] }
+  - { number: 32, code: Ir, slug: ir, name: Infrared,         category: sensors,      row: 4, col: 14,
+      blurb: "Invisible light for line-following and obstacle detection.",
+      tags: [sensors] }
+  - { number: 33, code: Cm, slug: cm, name: Cameras,          category: sensors,      row: 4, col: 15,
+      blurb: "Give your robot eyes — from webcams to AI cameras.",
+      tags: [camera, computer vision] }
+  - { number: 34, code: Ld, slug: ld, name: LiDAR,            category: sensors,      row: 4, col: 16,
+      blurb: "Laser-sharp distance maps, thousands of times a second.",
+      tags: [lidar, sensors] }
+  - { number: 35, code: Im, slug: im, name: IMU,              category: sensors,      row: 4, col: 17,
+      blurb: "Accelerometers and gyros — your robot's inner ear.",
+      tags: [sensors, micropython] }
+  - { number: 36, code: Gs, slug: gs, name: GPS,              category: sensors,      row: 4, col: 18,
+      blurb: "Where in the world is your robot?",
+      tags: [gps, sensors] }
+
+  # --- Period 5 ------------------------------------------------------
+  - { number: 37, code: Tr, slug: tr, name: Transistors,      category: foundations,  row: 5, col: 1,
+      blurb: "The electronic switch that makes computing possible.",
+      tags: [electronics] }
+  - { number: 38, code: Pb, slug: pb, name: PCB Design,       category: foundations,  row: 5, col: 2,
+      blurb: "From breadboard tangle to professional printed circuit.",
+      tags: [pcb, electronics] }
+  - { number: 39, code: I2, slug: i2, name: I2C,              category: signals,      row: 5, col: 3,
+      blurb: "Two wires, dozens of devices — the maker's favourite bus.",
+      tags: [i2c, micropython] }
+  - { number: 40, code: Sp, slug: sp, name: SPI,              category: signals,      row: 5, col: 4,
+      blurb: "The high-speed serial bus for displays and SD cards.",
+      tags: [spi, micropython] }
+  - { number: 41, code: Ua, slug: ua, name: UART,             category: signals,      row: 5, col: 5,
+      blurb: "Good old serial — still the debugging lifeline.",
+      tags: [electronics, micropython] }
+  - { number: 42, code: Wi, slug: wi, name: WiFi,             category: signals,      row: 5, col: 6,
+      blurb: "Put your robot on the network and control it from anywhere.",
+      tags: [pico_w, wifi] }
+  - { number: 43, code: Bl, slug: bl, name: Bluetooth,        category: signals,      row: 5, col: 7,
+      blurb: "Short-range wireless for controllers and telemetry.",
+      tags: [bluetooth] }
+  - { number: 44, code: Mq, slug: mq, name: MQTT,             category: signals,      row: 5, col: 8,
+      blurb: "The lightweight messaging glue of the Internet of Things.",
+      tags: [mqtt, iot] }
+  - { number: 45, code: St, slug: st, name: Stepper Motors,   category: power,        row: 5, col: 9,
+      blurb: "Move in precise steps — the motor behind 3D printers.",
+      tags: [motors, 3d_printing] }
+  - { number: 46, code: Hb, slug: hb, name: H-Bridge,         category: power,        row: 5, col: 10,
+      blurb: "Drive motors forwards AND backwards with four clever switches.",
+      tags: [motors, electronics] }
+  - { number: 47, code: Gr, slug: gr, name: Gears,            category: making,       row: 5, col: 11,
+      blurb: "Trade speed for torque — mechanical advantage made simple.",
+      tags: [3d_printing, mechanical] }
+  - { number: 48, code: Wh, slug: wh, name: Wheels,           category: making,       row: 5, col: 12,
+      blurb: "The original locomotion solution, still unbeaten.",
+      tags: [robot, 3d_printing] }
+  - { number: 49, code: Cv, slug: cv, name: Computer Vision,  category: intelligence, row: 5, col: 13,
+      blurb: "Teach your robot to actually see what it's looking at.",
+      tags: [computer vision, ai, camera] }
+  - { number: 50, code: Ml, slug: ml, name: Machine Learning, category: intelligence, row: 5, col: 14,
+      blurb: "Programs that learn from data instead of rules.",
+      tags: [machine learning, ai] }
+  - { number: 51, code: Ro, slug: ro, name: ROS,              category: intelligence, row: 5, col: 15,
+      blurb: "The Robot Operating System — plumbing for serious robots.",
+      tags: [ros] }
+  - { number: 52, code: Sl, slug: sl, name: SLAM,             category: intelligence, row: 5, col: 16,
+      blurb: "Mapping a place while figuring out where you are in it.",
+      tags: [slam, lidar, ros] }
+  - { number: 53, code: Pd, slug: pd, name: PID Control,      category: intelligence, row: 5, col: 17,
+      blurb: "The feedback loop that keeps robots smooth and steady.",
+      tags: [control, robotics] }
+  - { number: 54, code: Ik, slug: ik, name: Inverse Kinematics, category: intelligence, row: 5, col: 18,
+      blurb: "Work backwards from where you want the hand to be.",
+      tags: [robotics, robotarms] }
+
+  # --- Period 6 ------------------------------------------------------
+  - { number: 55, code: Mm, slug: mm, name: Multimeter,       category: foundations,  row: 6, col: 1,
+      blurb: "The first tool to reach for when nothing works.",
+      tags: [electronics, tips] }
+  - { number: 56, code: To, slug: to, name: Tools,            category: foundations,  row: 6, col: 2,
+      blurb: "Screwdrivers to scopes — kit out your robot workshop.",
+      tags: [tips, workshop] }
+  - { number: 57, code: Pr, slug: pr, name: 3D Printing,      category: making,       row: 6, col: 3,
+      blurb: "Turn filament into robot parts, one layer at a time.",
+      tags: [3d_printing, 3dprinting] }
+  - { number: 58, code: Cd, slug: cd, name: CAD,              category: making,       row: 6, col: 4,
+      blurb: "Design parts in 3D before they exist.",
+      tags: [3ddesign, fusion_360, freecad] }
+  - { number: 59, code: Fu, slug: fu, name: Fusion 360,       category: making,       row: 6, col: 5,
+      blurb: "Professional parametric CAD, free for makers.",
+      tags: [fusion_360, 3ddesign] }
+  - { number: 60, code: Fc, slug: fc, name: FreeCAD,          category: making,       row: 6, col: 6,
+      blurb: "Fully open-source CAD with no strings attached.",
+      tags: [freecad, 3ddesign] }
+  - { number: 61, code: Lc, slug: lc, name: Laser Cutting,    category: making,       row: 6, col: 7,
+      blurb: "Precision parts from flat sheets, cut with light.",
+      tags: [lasercutting, laser_cutting] }
+  - { number: 62, code: Ch, slug: ch, name: Chassis Design,   category: making,       row: 6, col: 8,
+      blurb: "The skeleton that holds your whole robot together.",
+      tags: [3d_printing, robot] }
+  - { number: 63, code: Tk, slug: tk, name: Tank Tracks,      category: making,       row: 6, col: 9,
+      blurb: "All-terrain grip for robots that go anywhere.",
+      tags: [smars, robot] }
+  - { number: 64, code: Le, slug: le, name: LEGO Robotics,    category: making,       row: 6, col: 10,
+      blurb: "Snap-together engineering — robotics without the soldering iron.",
+      tags: [lego] }
+  - { number: 65, code: We, slug: we, name: Wearables,        category: making,       row: 6, col: 11,
+      blurb: "Electronics you can wear — cosplay meets circuitry.",
+      tags: [wearable] }
+  - { number: 66, code: Rc, slug: rc, name: Radio Control,    category: signals,      row: 6, col: 12,
+      blurb: "Pilot your builds with gamepads and RC transmitters.",
+      tags: [bluetooth, robot] }
+  - { number: 67, code: Nv, slug: nv, name: Navigation,       category: intelligence, row: 6, col: 13,
+      blurb: "Getting from A to B without hitting C.",
+      tags: [slam, ros, robotics] }
+  - { number: 68, code: Au, slug: au, name: Autonomy,         category: intelligence, row: 6, col: 14,
+      blurb: "Robots that decide for themselves — no joystick required.",
+      tags: [ai, robotics] }
+  - { number: 69, code: Sw, slug: sw, name: Swarm Robotics,   category: intelligence, row: 6, col: 15,
+      blurb: "Many simple robots, one emergent intelligence.",
+      tags: [robotics, ai] }
+  - { number: 70, code: Nn, slug: nn, name: Neural Networks,  category: intelligence, row: 6, col: 16,
+      blurb: "Layers of artificial neurons that learn to recognise the world.",
+      tags: [machine learning, ai] }
+  - { number: 71, code: Lm, slug: lm, name: LLMs,             category: intelligence, row: 6, col: 17,
+      blurb: "Large language models — give your robot a voice and a brain.",
+      tags: [ai, llm] }
+  - { number: 72, code: Et, slug: et, name: Robot Ethics,     category: intelligence, row: 6, col: 18,
+      blurb: "Asimov had rules. We need answers.",
+      tags: [ai, robotics] }
+
+  # --- The Botinoids (detached bottom row) ----------------------------
+  - { number: 73, code: Sm, slug: sm, name: SMARS,            category: robots,       row: 8, col: 3,
+      blurb: "The Screwless Modular Assemblable Robotic System — print one today.",
+      tags: [smars] }
+  - { number: 74, code: Bb, slug: bb, name: BurgerBot,        category: robots,       row: 8, col: 4,
+      blurb: "A delicious little robot you can build yourself.",
+      tags: [burgerbot, robot] }
+  - { number: 75, code: Pc, slug: pc, name: PicoCat,          category: robots,       row: 8, col: 5,
+      blurb: "An open-source robot cat powered by the Pico.",
+      tags: [picocat, pets] }
+  - { number: 76, code: Dw, slug: dw, name: Drawing Robots,   category: robots,       row: 8, col: 6,
+      blurb: "Plotters and scribblers — robots with artistic licence.",
+      tags: [robot, python] }
+  - { number: 77, code: Ra, slug: ra, name: Robot Arms,       category: robots,       row: 8, col: 7,
+      blurb: "Pick, place, wave — articulated arms for your desk.",
+      tags: [robotarms, servo] }
+  - { number: 78, code: Rv, slug: rv, name: Rovers,           category: robots,       row: 8, col: 8,
+      blurb: "Wheeled explorers, from Mars to your living room.",
+      tags: [robot, pico] }
+  - { number: 79, code: Dr, slug: dr, name: Drones,           category: robots,       row: 8, col: 9,
+      blurb: "Robotics takes flight.",
+      tags: [drone, robot] }
+  - { number: 80, code: Hu, slug: hu, name: Humanoids,        category: robots,       row: 8, col: 10,
+      blurb: "Robots built in our own image — the grand challenge.",
+      tags: [robot, ai] }
+  - { number: 81, code: Qd, slug: qd, name: Quadrupeds,       category: robots,       row: 8, col: 11,
+      blurb: "Four legs good — robot dogs and cats that walk.",
+      tags: [picocat, robot] }
+  - { number: 82, code: Hx, slug: hx, name: Hexapods,         category: robots,       row: 8, col: 12,
+      blurb: "Six legs, eighteen servos, infinite skittering charm.",
+      tags: [robot, servo] }
+  - { number: 83, code: Pe, slug: pe, name: Pet Robots,       category: robots,       row: 8, col: 13,
+      blurb: "Companion bots with personality — no feeding required.",
+      tags: [pets, robot] }
+  - { number: 84, code: Cb, slug: cb, name: Combat Robots,    category: robots,       row: 8, col: 14,
+      blurb: "Spinners, flippers and armour — robotics as a contact sport.",
+      tags: [robot] }
+  - { number: 85, code: Rt, slug: rt, name: Retro Robots,     category: robots,       row: 8, col: 15,
+      blurb: "Vintage tin toys and classic kits that started it all.",
+      tags: [retro] }
+  - { number: 86, code: Ho, slug: ho, name: Halloween Robots, category: robots,       row: 8, col: 16,
+      blurb: "Animatronic skulls, spooky eyes and screaming pumpkins.",
+      tags: [halloween, seasonal] }

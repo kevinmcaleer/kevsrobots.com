@@ -1,24 +1,21 @@
-{% assign items = site.data.ptor %}
-<div class="container">
-    <div class="row row-cols-12 g-1 m-0 p-0">
-    {% for item in items %}
-  
-        <div class="col-1">
-            <a href="{{item.url}}" class="text-decoration-none">
-            <div class="card border-0 shadow-lg">
-                <div class="card card-body">
-                    <h2 class="text-decoration-none black">{{ item.code }}</h2>
-                    <p class="text-decoration-none small">{{ item.title }}</p>
-                    <!-- <p>{{ item.description }}</p> -->
-                    <!-- <p class="card-link"><a href="{{ item.link }}">{{ item.link }}</a></p> -->
-                </div>
-                <!-- <div class="card-footer">
-                    <a href="{{ item.title}}" class="btn btn-primary">Read</a>
-                </div> -->
-            </div>
-            </a>
-        </div>
+{% assign pt = site.data.periodic_table %}
+<ul class="ptor-legend">
+  {% for cat in pt.categories %}
+  <li class="ptor-cat-{{ cat.key }}"><span class="ptor-swatch"></span>{{ cat.label }}</li>
+  {% endfor %}
+</ul>
 
+<div class="ptor-scroll">
+  <div class="ptor-grid">
+    {% for el in pt.elements %}
+    <a href="/periodic-table/{{ el.slug }}.html"
+       class="ptor-tile ptor-cat-{{ el.category }}"
+       style="grid-row: {{ el.row }}; grid-column: {{ el.col }};"
+       title="{{ el.name }} — {{ el.blurb }}">
+      <span class="ptor-number">{{ el.number }}</span>
+      <span class="ptor-code">{{ el.code }}</span>
+      <span class="ptor-name">{{ el.name }}</span>
+    </a>
     {% endfor %}
-</div>
+  </div>
 </div>

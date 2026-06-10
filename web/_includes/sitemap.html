@@ -172,5 +172,22 @@
     </div>
 </div>
     </div>
+    <div class="col-sm-4 col-md-3 col-lg-2 mt-4">
+        <div class="card bg-transparent border-0 h-100">
+            <div class="card-body">
+        <h5 class="">Periodic Table</h5>
+        <div class="ptor-footer-tiles mb-2">
+        {% assign pt_footer = "ar,py,mp,rp,pi,sm" | split: "," %}
+        {% for slug in pt_footer %}
+            {% assign el = site.data.periodic_table.elements | where: "slug", slug | first %}
+            {% if el %}<a class="ptor-cat-{{ el.category }}" href="/periodic-table/{{ el.slug }}.html" title="{{ el.name }}">{{ el.code }}</a>{% endif %}
+        {% endfor %}
+        </div>
+    </div>
+    <div class="card-footer bg-transparent">
+    <a href="/periodic-table/" class="text-nowrap text-truncate"><i class="fa-solid fa-atom"></i> Full table >></a>
+    </div>
+</div>
+    </div>
 </div>
 </div>

@@ -45,7 +45,7 @@ collections:
     permalink: /museum/:collection/:name
   ptor:
     output: true
-    permalink: /ptor/:name.html
+    permalink: /periodic-table/:name.html
   # robots:
   #   output: true
   #   permalink: /robots/:name.html

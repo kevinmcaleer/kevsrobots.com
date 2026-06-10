@@ -1,0 +1,331 @@
+/* ==========================================================================
+   The Periodic Table of Robotics — table grid + element pages
+   ========================================================================== */
+
+/* --- Category palette (single source of truth lives in
+       _data/periodic_table.yml; keep these in sync) ----------------------- */
+.ptor-cat-foundations  { --ptor-color: #e63946; --ptor-text: #fff; }
+.ptor-cat-code         { --ptor-color: #457b9d; --ptor-text: #fff; }
+.ptor-cat-boards       { --ptor-color: #7b2cbf; --ptor-text: #fff; }
+.ptor-cat-signals      { --ptor-color: #2a9d8f; --ptor-text: #fff; }
+.ptor-cat-power        { --ptor-color: #f4a261; --ptor-text: #212529; }
+.ptor-cat-sensors      { --ptor-color: #e9c46a; --ptor-text: #212529; }
+.ptor-cat-intelligence { --ptor-color: #ef476f; --ptor-text: #fff; }
+.ptor-cat-making       { --ptor-color: #38b000; --ptor-text: #fff; }
+.ptor-cat-robots       { --ptor-color: #8d99ae; --ptor-text: #212529; }
+
+/* --- The table grid ----------------------------------------------------- */
+.ptor-scroll {
+  overflow-x: auto;
+  padding: 0.5rem 0 1.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ptor-grid {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(52px, 1fr));
+  gap: 5px;
+  min-width: 1020px;
+}
+
+/* Row 7 is intentionally empty — it's the visual gap between the main
+   table and the detached "Botinoids" row, like the lanthanides. */
+.ptor-grid::after {
+  content: "";
+  grid-row: 7;
+  grid-column: 1;
+  height: 14px;
+}
+
+.ptor-tile {
+  position: relative;
+  aspect-ratio: 1 / 1.08;
+  background: var(--ptor-color);
+  color: var(--ptor-text);
+  border-radius: 6px;
+  padding: 4px 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  overflow: hidden;
+}
+
+.ptor-tile:hover,
+.ptor-tile:focus-visible {
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.07);
+  z-index: 2;
+  color: var(--ptor-text);
+}
+
+.ptor-tile .ptor-number {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-size: 0.55rem;
+  opacity: 0.85;
+  line-height: 1;
+}
+
+.ptor-tile .ptor-code {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.ptor-tile .ptor-name {
+  font-size: 0.5rem;
+  text-align: center;
+  line-height: 1.15;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- Legend -------------------------------------------------------------- */
+.ptor-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  margin: 0.75rem 0 0.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ptor-legend li {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.ptor-legend .ptor-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+  background: var(--ptor-color);
+  margin-right: 0.4rem;
+  flex: 0 0 auto;
+}
+
+/* --- Element page hero --------------------------------------------------- */
+.ptor-hero {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.5rem;
+}
+
+.ptor-hero-tile {
+  flex: 0 0 auto;
+  width: 168px;
+  height: 180px;
+  background: var(--ptor-color);
+  color: var(--ptor-text);
+  border-radius: 14px;
+  padding: 10px 14px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+}
+
+.ptor-hero-tile .ptor-number {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.ptor-hero-tile .ptor-code {
+  font-size: 3.6rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.ptor-hero-tile .ptor-name {
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.2;
+}
+
+.ptor-hero-meta h1 {
+  margin-bottom: 0.25rem;
+}
+
+.ptor-category-badge {
+  display: inline-block;
+  background: var(--ptor-color);
+  color: var(--ptor-text);
+  border-radius: 999px;
+  padding: 0.15rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a.ptor-category-badge:hover { color: var(--ptor-text); filter: brightness(1.1); }
+
+/* --- Related element chips ----------------------------------------------- */
+.ptor-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0.5rem 0 1rem;
+  list-style: none;
+}
+
+.ptor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-radius: 8px;
+  padding: 0.25rem 0.7rem 0.25rem 0.25rem;
+  font-size: 0.85rem;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.ptor-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.ptor-chip .ptor-chip-code {
+  background: var(--ptor-color);
+  color: var(--ptor-text);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  width: 2rem;
+  height: 2rem;
+  display: block;
+  text-align: center;
+  line-height: 2rem;
+  flex: 0 0 auto;
+}
+
+/* --- Element page nav (prev / next) -------------------------------------- */
+.ptor-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0 1rem;
+}
+
+.ptor-pager a { text-decoration: none; }
+
+/* --- Share row ------------------------------------------------------------ */
+.ptor-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ptor-share .btn i { pointer-events: none; }
+
+/* ==========================================================================
+   Feature banner — promo block used on the homepage + /learn/ header
+   (include: _includes/ptor_feature.html). Reuses the .ptor-cat-* palette.
+   ========================================================================== */
+.ptor-feature {
+  background: linear-gradient(135deg, #12161e 0%, #1d2433 60%, #2a1a3e 100%);
+  color: #fff;
+  overflow: hidden;
+}
+
+.ptor-feature h2 { color: #fff; font-weight: 700; }
+.ptor-feature .ptor-feature-lead { color: #c9d2e3; }
+
+.ptor-feature .btn-light { font-weight: 600; }
+
+/* Teaser grid of mini element tiles */
+.ptor-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 575.98px) {
+  .ptor-feature-grid { grid-template-columns: repeat(6, 1fr); gap: 4px; }
+}
+
+.ptor-feature-tile {
+  aspect-ratio: 1 / 1.05;
+  background: var(--ptor-color);
+  color: var(--ptor-text);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.ptor-feature-tile:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.08);
+  color: var(--ptor-text);
+  z-index: 2;
+}
+
+.ptor-feature-tile .ptor-feature-code {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.ptor-feature-tile .ptor-feature-name {
+  font-size: 0.42rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+  opacity: 0.9;
+  text-align: center;
+  padding: 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Footer mini-promo (sitemap card) tiles */
+.ptor-footer-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ptor-footer-tiles a {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 5px;
+  background: var(--ptor-color);
+  color: var(--ptor-text);
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.ptor-footer-tiles a:hover { filter: brightness(1.12); color: var(--ptor-text); }

@@ -3,7 +3,7 @@ layout: lesson
 title: Course Overview
 author: Kevin McAleer
 type: page
-cover: /learn/openclaw-raspberry-pi/assets/openclaw.jpg
+cover: /learn/openclaw_raspberry_pi/assets/openclaw.jpg
 date: 2026-01-31
 next: 01_what-is-openclaw.html
 description: Welcome to the OpenClaw on Raspberry Pi course.
@@ -65,7 +65,7 @@ navigation:
 ---
 
 
-![OpenClaw cover artwork](/learn/openclaw-raspberry-pi/assets/openclaw.jpg){:class="cover"}
+![OpenClaw cover artwork]({{page.cover}}){:class="cover"}
 
 ## Welcome to OpenClaw on Raspberry Pi
 

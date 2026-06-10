@@ -1,0 +1,40 @@
+{% comment %}
+  Periodic Table of Robotics — promo banner.
+  Reusable on the homepage and the /learn/ header. Shows a curated teaser
+  strip of element tiles (looked up from the data file so codes/colours
+  stay in sync) plus a heading and CTA. ptor.css is loaded globally
+  (default.html). Optional param: include.compact (tighter header padding).
+{% endcomment %}
+{% assign pt = site.data.periodic_table %}
+{% assign teaser = "ar,py,mp,rp,pi,cv,oh,pr,ro,sm,ra,dr" | split: "," %}
+
+<div class="ptor-feature rounded-3 {% if include.compact %}p-3 my-2{% else %}p-4 my-3{% endif %}">
+  <div class="row align-items-center g-3">
+    <div class="col-lg-7">
+      <p class="mb-1 text-uppercase small" style="letter-spacing:1px;opacity:.7">Discover robotics, one element at a time</p>
+      <h2 class="mb-2">The Periodic Table of Robotics</h2>
+      <p class="ptor-feature-lead {% unless include.compact %}lead{% endunless %} mb-3">
+        Every topic, skill and area of robotics — 86 elements arranged like
+        the chemistry table. Tap an element to learn what it is and find the
+        courses, projects and articles to take you further.
+      </p>
+      <a href="/periodic-table/" class="btn btn-light {% unless include.compact %}btn-lg{% endunless %}">
+        <i class="fas fa-atom me-2"></i>Explore the table
+      </a>
+    </div>
+    <div class="col-lg-5">
+      <div class="ptor-feature-grid">
+        {% for slug in teaser %}
+          {% assign el = pt.elements | where: "slug", slug | first %}
+          {% if el %}
+          <a class="ptor-feature-tile ptor-cat-{{ el.category }}"
+             href="/periodic-table/{{ el.slug }}.html" title="{{ el.name }}">
+            <span class="ptor-feature-code">{{ el.code }}</span>
+            <span class="ptor-feature-name">{{ el.name }}</span>
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

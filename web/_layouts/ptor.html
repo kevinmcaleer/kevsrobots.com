@@ -1,12 +1,187 @@
 ---
-layout: default
+layout: content
 ---
+{% comment %} ptor.css is loaded globally in default.html {% endcomment %}
 
 {% include breadcrumbs.html %}
 
-<h1>{{page.title}}</h1>
-<h2>{{page.name}}</h2>
-<h5>{{page.author}} | {{ page.date | date:"%d %B %y"}}</h5>
-<hr />
+{% assign pt = site.data.periodic_table %}
+{% assign all_elements = pt.elements %}
+{% assign this_el = all_elements | where: "slug", page.slug | first %}
+{% assign cat = pt.categories | where: "key", page.category | first %}
 
-{{content}}
+<div class="ptor-hero ptor-cat-{{ page.category }}">
+  <div class="ptor-hero-tile">
+    <span class="ptor-number">{{ page.number }}</span>
+    <span class="ptor-code">{{ page.code }}</span>
+    <span class="ptor-name">{{ page.name }}</span>
+  </div>
+  <div class="ptor-hero-meta">
+    <p class="mb-1 text-muted small">Element {{ page.number }} of {{ all_elements | size }} — <a href="/periodic-table/">The Periodic Table of Robotics</a></p>
+    <h1>{{ page.name }}</h1>
+    <p class="mb-2"><span class="ptor-category-badge">{{ cat.label }}</span></p>
+    <p class="lead mb-1">{{ page.description }}</p>
+    {% if page.external_link %}
+    <p class="mb-0 small"><i class="fas fa-external-link-alt me-1"></i> <a href="{{ page.external_link }}" target="_blank" rel="noopener">{{ page.external_label | default: page.external_link }}</a></p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="ptor-body">
+{{ content }}
+</div>
+
+{% if page.related and page.related.size > 0 %}
+<h4 class="mt-4"><i class="fas fa-atom me-3"></i> Reacts well with</h4>
+<ul class="ptor-chips">
+  {% for rel_slug in page.related %}
+    {% assign rel = all_elements | where: "slug", rel_slug | first %}
+    {% if rel %}
+    <li><a class="ptor-chip ptor-cat-{{ rel.category }}" href="/periodic-table/{{ rel.slug }}.html">
+      <span class="ptor-chip-code">{{ rel.code }}</span>{{ rel.name }}</a></li>
+    {% endif %}
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% assign siblings = all_elements | where: "category", page.category %}
+{% if siblings.size > 1 %}
+<h4 class="mt-4"><i class="fas fa-layer-group me-3"></i> More {{ cat.label }}</h4>
+<ul class="ptor-chips">
+  {% for sib in siblings %}
+    {% unless sib.slug == page.slug %}
+    <li><a class="ptor-chip ptor-cat-{{ sib.category }}" href="/periodic-table/{{ sib.slug }}.html">
+      <span class="ptor-chip-code">{{ sib.code }}</span>{{ sib.name }}</a></li>
+    {% endunless %}
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% comment %}
+  Related content, matched on page.tags. Courses match on their `groups`
+  (lowercase, same vocabulary as element tags); posts match on `tags`.
+  Both vocabularies are lowercase so a direct `contains` works. Projects
+  (_data/projects.yml) use Title-Case tags, so they need a case-insensitive
+  whole-tag match (downcase + pipe-delimit so "ai" can't match "maintain").
+  Rendered with the shared card.html component for a rich, consistent look.
+{% endcomment %}
+{% assign related_courses = "" | split: "" %}
+{% for tag in page.tags %}
+  {% assign cmatches = site.data.courses | where_exp: "c", "c.groups contains tag" %}
+  {% assign related_courses = related_courses | concat: cmatches %}
+{% endfor %}
+{% assign related_courses = related_courses | uniq | sort: "date_published" | reverse %}
+
+{% assign related_posts = "" | split: "" %}
+{% for tag in page.tags %}
+  {% assign matches = site.posts | where_exp: "p", "p.tags contains tag" %}
+  {% assign related_posts = related_posts | concat: matches %}
+{% endfor %}
+{% assign related_posts = related_posts | uniq | sort: "date" | reverse %}
+{% assign related_post_urls = related_posts | map: "url" | join: "|" %}
+
+{% comment %} Projects: case-insensitive whole-tag match, deduped against the posts above. {% endcomment %}
+{% assign proj_cards = "" %}
+{% assign proj_count = 0 %}
+{% for project in site.data.projects %}
+  {% if proj_count >= 6 %}{% break %}{% endif %}
+  {% unless related_post_urls contains project.link %}
+    {% capture ptags %}|{{ project.tags | join: "|" | downcase }}|{% endcapture %}
+    {% assign hit = false %}
+    {% for tag in page.tags %}
+      {% capture needle %}|{{ tag }}|{% endcapture %}
+      {% if ptags contains needle %}{% assign hit = true %}{% break %}{% endif %}
+    {% endfor %}
+    {% if hit %}
+      {% capture card %}{% include card.html cardtitle=project.name img=project.cover link=project.link description=project.description date=project.date bg_color="bg-card-green" small_title=true tl="2" dl="3" noborder=true %}{% endcapture %}
+      {% assign proj_cards = proj_cards | append: card %}
+      {% assign proj_count = proj_count | plus: 1 %}
+    {% endif %}
+  {% endunless %}
+{% endfor %}
+
+{% if related_courses.size > 0 or related_posts.size > 0 or proj_count > 0 %}
+<h4 class="mt-4"><i class="fas fa-book-open me-3"></i> Learn more on KevsRobots</h4>
+
+{% if related_courses.size > 0 %}
+<h6 class="text-muted mt-3"><i class="fas fa-graduation-cap me-2"></i> Courses</h6>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 mb-2">
+  {% for course in related_courses limit: 4 %}
+    {% include card.html cardtitle=course.name img=course.cover link=course.link description=course.description date=course.date_published duration=course.duration type="course" bg_color="bg-card-blue" small_title=true tl="2" dl="3" noborder=true %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if proj_count > 0 %}
+<h6 class="text-muted mt-3"><i class="fas fa-screwdriver-wrench me-2"></i> Projects to build</h6>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-2">
+  {{ proj_cards }}
+</div>
+{% endif %}
+
+{% if related_posts.size > 0 %}
+<h6 class="text-muted mt-3"><i class="fas fa-newspaper me-2"></i> Articles to read</h6>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 mb-2">
+  {% for post in related_posts limit: 8 %}
+    {% include card.html cardtitle=post.title img=post.cover link=post.url description=post.description date=post.date author=post.author type="blog" bg_color="bg-card-red" small_title=true tl="2" dl="3" noborder=true %}
+  {% endfor %}
+</div>
+{% endif %}
+{% endif %}
+
+{% capture share_url %}{{ site.url }}{{ page.url }}{% endcapture %}
+{% capture share_text %}{{ page.code }} is for {{ page.name }} — The Periodic Table of Robotics{% endcapture %}
+<h4 class="mt-4"><i class="fas fa-share-alt me-3"></i> Share this element</h4>
+<div class="ptor-share">
+  <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+     href="https://twitter.com/intent/tweet?text={{ share_text | url_encode }}&url={{ share_url | url_encode }}"><i class="fab fa-x-twitter"></i> Post</a>
+  <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+     href="https://bsky.app/intent/compose?text={{ share_text | append: ' ' | append: share_url | url_encode }}"><i class="fab fa-bluesky"></i> Bluesky</a>
+  <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+     href="https://www.facebook.com/sharer/sharer.php?u={{ share_url | url_encode }}"><i class="fab fa-facebook"></i> Facebook</a>
+  <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+     href="https://www.reddit.com/submit?url={{ share_url | url_encode }}&title={{ share_text | url_encode }}"><i class="fab fa-reddit"></i> Reddit</a>
+  <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+     href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_url | url_encode }}"><i class="fab fa-linkedin"></i> LinkedIn</a>
+  <button class="btn btn-sm btn-outline-secondary" id="ptor-copy-link" data-url="{{ share_url }}"><i class="fas fa-link"></i> Copy link</button>
+</div>
+<script>
+  (function () {
+    // Markdown tables in the element body render as bare <table> elements.
+    // Apply the site's canonical thin-outline style (table table-single
+    // table-narrow) — the same combo the project editor/viewer use — so
+    // every current and future table in these pages is styled consistently.
+    document.querySelectorAll('.ptor-body table').forEach(function (t) {
+      t.classList.add('table', 'table-single', 'table-narrow');
+    });
+
+    var btn = document.getElementById('ptor-copy-link');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(btn.dataset.url).then(function () {
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(function () {
+          btn.innerHTML = '<i class="fas fa-link"></i> Copy link';
+        }, 2000);
+      });
+    });
+  })();
+</script>
+
+{% assign prev_num = page.number | minus: 1 %}
+{% assign next_num = page.number | plus: 1 %}
+{% assign prev_el = all_elements | where: "number", prev_num | first %}
+{% assign next_el = all_elements | where: "number", next_num | first %}
+<div class="ptor-pager">
+  <span>
+    {% if prev_el %}
+    <a href="/periodic-table/{{ prev_el.slug }}.html">&larr; {{ prev_el.code }} &middot; {{ prev_el.name }}</a>
+    {% endif %}
+  </span>
+  <span><a href="/periodic-table/">&uarr; The full table</a></span>
+  <span>
+    {% if next_el %}
+    <a href="/periodic-table/{{ next_el.slug }}.html">{{ next_el.code }} &middot; {{ next_el.name }} &rarr;</a>
+    {% endif %}
+  </span>
+</div>
