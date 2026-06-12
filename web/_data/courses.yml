@@ -464,6 +464,21 @@
   link: /learn/redis/01_introduction.html
   name: Using Redis with Python
 - author: Kevin McAleer
+  cover: /learn/reinforcement_learning/assets/cover.jpg
+  date_published: 2026-06-13
+  description: "Teach your robot to learn \u2014 instead of hardcoding every behaviour,\
+    \ use tabular Q-learning to let it discover through trial and error how to navigate\
+    \ obstacles on its own. Train a policy in a pure-Python grid-world simulation\
+    \ on your laptop, then export the frozen Q-table as JSON and deploy it to a Pico-powered\
+    \ differential-drive robot running MicroPython."
+  duration: 1h 45m
+  groups:
+  - robotics
+  - micropython
+  - ai
+  link: /learn/reinforcement_learning/00_intro.html
+  name: Reinforcement Learning for Beginners
+- author: Kevin McAleer
   cover: /learn/robotics_101/assets/basics_101.jpg
   date_published: 2023-01-17
   description: Learning ROS with me, is a course that will teach you how to use ROS2

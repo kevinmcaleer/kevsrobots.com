@@ -2814,6 +2814,101 @@
     ]
   },
   {
+    "slug": "reinforcement_learning",
+    "name": "Reinforcement Learning for Beginners",
+    "description": "Teach your robot to learn \u2014 instead of hardcoding every behaviour, use tabular Q-learning to let it discover through trial and error how to navigate obstacles on its own. Train a policy in a pure-Python grid-world simulation on your laptop, then export the frozen Q-table as JSON and deploy it to a Pico-powered differential-drive robot running MicroPython.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-06-13",
+    "groups": [
+      "robotics",
+      "micropython",
+      "ai"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/reinforcement_learning/00_intro.html"
+      },
+      {
+        "file": "01_beyond_predefined_steps.md",
+        "section": "The Paradigm Shift",
+        "url": "/learn/reinforcement_learning/01_beyond_predefined_steps.html"
+      },
+      {
+        "file": "02_anatomy_of_robotic_rl.md",
+        "section": "The Paradigm Shift",
+        "url": "/learn/reinforcement_learning/02_anatomy_of_robotic_rl.html"
+      },
+      {
+        "file": "03_designing_the_reward_function.md",
+        "section": "The Paradigm Shift",
+        "url": "/learn/reinforcement_learning/03_designing_the_reward_function.html"
+      },
+      {
+        "file": "04_mapping_the_robots_world.md",
+        "section": "The Framework of Decisions",
+        "url": "/learn/reinforcement_learning/04_mapping_the_robots_world.html"
+      },
+      {
+        "file": "05_markov_decision_processes.md",
+        "section": "The Framework of Decisions",
+        "url": "/learn/reinforcement_learning/05_markov_decision_processes.html"
+      },
+      {
+        "file": "06_looking_into_the_future.md",
+        "section": "The Framework of Decisions",
+        "url": "/learn/reinforcement_learning/06_looking_into_the_future.html"
+      },
+      {
+        "file": "07_the_q_table.md",
+        "section": "Tabular Q-Learning from Scratch",
+        "url": "/learn/reinforcement_learning/07_the_q_table.html"
+      },
+      {
+        "file": "08_exploration_vs_exploitation.md",
+        "section": "Tabular Q-Learning from Scratch",
+        "url": "/learn/reinforcement_learning/08_exploration_vs_exploitation.html"
+      },
+      {
+        "file": "09_coding_the_learning_loop.md",
+        "section": "Tabular Q-Learning from Scratch",
+        "url": "/learn/reinforcement_learning/09_coding_the_learning_loop.html"
+      },
+      {
+        "file": "10_training_in_simulation.md",
+        "section": "Tabular Q-Learning from Scratch",
+        "url": "/learn/reinforcement_learning/10_training_in_simulation.html"
+      },
+      {
+        "file": "11_the_sim_to_real_gap.md",
+        "section": "Bringing It to the Real World",
+        "url": "/learn/reinforcement_learning/11_the_sim_to_real_gap.html"
+      },
+      {
+        "file": "12_discretizing_real_sensors.md",
+        "section": "Bringing It to the Real World",
+        "url": "/learn/reinforcement_learning/12_discretizing_real_sensors.html"
+      },
+      {
+        "file": "13_deploying_the_brain.md",
+        "section": "Bringing It to the Real World",
+        "url": "/learn/reinforcement_learning/13_deploying_the_brain.html"
+      },
+      {
+        "file": "14_scaling_up_to_deep_rl.md",
+        "section": "Bringing It to the Real World",
+        "url": "/learn/reinforcement_learning/14_scaling_up_to_deep_rl.html"
+      },
+      {
+        "file": "15_summary.md",
+        "section": "Bringing It to the Real World",
+        "url": "/learn/reinforcement_learning/15_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "robotics_101",
     "name": "Robotics 101",
     "description": "Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.",

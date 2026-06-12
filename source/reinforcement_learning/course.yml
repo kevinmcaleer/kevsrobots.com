@@ -1,0 +1,47 @@
+- name: Reinforcement Learning for Beginners
+  author: Kevin McAleer
+  date_created: 2026-06-13
+  date_published: 2026-06-13
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - robotics
+      - micropython
+      - ai
+  description: >-
+    Teach your robot to learn — instead of hardcoding every behaviour, use tabular Q-learning
+    to let it discover through trial and error how to navigate obstacles on its own.
+    Train a policy in a pure-Python grid-world simulation on your laptop, then export the
+    frozen Q-table as JSON and deploy it to a Pico-powered differential-drive robot running MicroPython.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 00_intro.md
+    - section:
+        name: The Paradigm Shift
+        content:
+          - 01_beyond_predefined_steps.md
+          - 02_anatomy_of_robotic_rl.md
+          - 03_designing_the_reward_function.md
+    - section:
+        name: The Framework of Decisions
+        content:
+          - 04_mapping_the_robots_world.md
+          - 05_markov_decision_processes.md
+          - 06_looking_into_the_future.md
+    - section:
+        name: Tabular Q-Learning from Scratch
+        content:
+          - 07_the_q_table.md
+          - 08_exploration_vs_exploitation.md
+          - 09_coding_the_learning_loop.md
+          - 10_training_in_simulation.md
+    - section:
+        name: Bringing It to the Real World
+        content:
+          - 11_the_sim_to_real_gap.md
+          - 12_discretizing_real_sensors.md
+          - 13_deploying_the_brain.md
+          - 14_scaling_up_to_deep_rl.md
+          - 15_summary.md
