@@ -65,6 +65,7 @@ A **Markov Decision Process (MDP)** is the mathematical framework that formalise
 | Set of actions | A | {forward, turn_left, turn_right, stop} |
 | Transition function | T(s, a, s') | Which state follows when you take action a in state s |
 | Reward function | R(s, a, s') | The reward received for that transition |
+{:class="table table-single"}
 
 In a known environment, T and R are given as tables. In **model-free reinforcement learning** (which is what Q-learning is), the agent doesn't know T or R in advance — it discovers them through experience.
 

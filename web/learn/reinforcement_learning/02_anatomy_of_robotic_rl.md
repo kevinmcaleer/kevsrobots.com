@@ -198,6 +198,7 @@ Here's how the abstract concepts map to the physical BurgerBot:
 | Action | Motor commands (forward, turn left, turn right, stop) |
 | Reward | Computed after each move (collision = negative, progress = positive) |
 | Episode | One power-on navigation run until goal or crash |
+{:class="table table-single"}
 
 In simulation, all of these exist as Python objects. The only difference on the real robot is that `env.step()` sends actual voltage to motors and reads actual ultrasound — the agent code stays almost identical.
 

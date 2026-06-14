@@ -133,6 +133,8 @@ This is a genuine paradigm shift. Let's be concrete about the difference:
 | Debugging is adding more if-statements | Debugging is adjusting rewards |
 | Fast to implement for simple tasks | Takes longer to set up, scales further |
 | Transparent: you can read the logic | Interpretable via the Q-table |
+{:class="table table-single"}
+
 
 For simple, well-defined environments, hardcoded logic is often the right choice — don't reach for RL when a `if distance < 20: turn_right()` genuinely solves the problem. But once the environment gets complicated enough that you're managing dozens of rules and still seeing failures, it's worth learning a better tool.
 

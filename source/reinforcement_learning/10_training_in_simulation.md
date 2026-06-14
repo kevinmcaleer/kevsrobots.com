@@ -442,6 +442,7 @@ If your curve doesn't look like the above, here's what the common shapes mean:
 | Shoots up fast then drops | Epsilon decaying too fast | Slow down `decay_rate` to 0.999 |
 | Never improves at all | Bug in update_q or reward function | Print (state, action, reward) for first 20 steps |
 | Reaches ~20 then plateaus | Good but not optimal policy | Increase `NUM_EPISODES` to 1000 |
+{:class="table table-single"}
 
 ---
 

@@ -186,6 +186,7 @@ Each numbered step corresponds to a specific phase:
 | 5. Check done | `terminated or truncated` ends the episode |
 | 6. Reset | New episode begins, RNG advances |
 | 7. Close | Releases rendering resources and file handles |
+{:class="table table-single"}
 
 ## Why env.close() Matters
 

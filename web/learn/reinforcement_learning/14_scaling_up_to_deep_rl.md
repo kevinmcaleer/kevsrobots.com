@@ -168,6 +168,7 @@ DQN was a landmark, but the field has kept moving:
 | PPO | Policy gradient instead of Q-learning | Continuous actions |
 | SAC | Off-policy + entropy bonus for exploration | Robotics with continuous control |
 | AlphaGo/MuZero | Model-based: learns to plan using a learned world model | Complex strategy |
+{:class="table table-single"}
 
 For robotics tasks with **continuous action spaces** (e.g. direct torque control of servo motors rather than "turn left / turn right"), policy gradient methods like **PPO** (Proximal Policy Optimisation) and **SAC** (Soft Actor-Critic) generally work better than DQN-style methods.
 

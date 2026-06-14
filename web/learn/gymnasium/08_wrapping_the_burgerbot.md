@@ -313,6 +313,7 @@ Here is a side-by-side of the key differences between the hand-rolled GridWorld 
 | Episode end signal | Single `done` bool | Two separate flags |
 | Space declaration | None (implicit) | `observation_space`, `action_space` |
 | Interchangeable? | No | Yes — works with any Gymnasium-compatible library |
+{:class="table table-single"}
 
 The underlying physics — the grid, the obstacles, the sensor, the rewards — are exactly the same. Only the interface changed.
 

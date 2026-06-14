@@ -80,6 +80,7 @@ For this course, use the same pin assignments as the MicroPython Robotics course
 | GND | GND |
 | TRIG | GP8 |
 | ECHO | GP9 (via voltage divider if using 5V sensor) |
+{:class="table table-single"}
 
 **Voltage divider for 5V ECHO (protects the Pico):**
 
@@ -187,6 +188,7 @@ Each grid cell in our simulation represents roughly one robot-body-length. For a
 | "near"   (≤ 1 cell) | < 15 cm |
 | "medium" (≤ 3 cells) | 15–40 cm |
 | "far"    (> 3 cells) | > 40 cm |
+{:class="table table-single"}
 
 ```python
 def discretize_distance(distance_cm):
