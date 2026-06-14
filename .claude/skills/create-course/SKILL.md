@@ -63,6 +63,16 @@ date_updated: YYYY-MM-DD
 
 - Start the body with `![Cover](assets/cover.jpg){:class="cover"}` followed by `---`.
 - Do **not** add manual previous/next breadcrumb links — the build system generates navigation.
+- **Every markdown table must be followed by `{:class="table table-single"}`** on the line immediately after the table's last row — no blank line between. This is a Kramdown IAL that applies the site's table styling; without it tables render unstyled. Example:
+
+  ```markdown
+  | Hardcoded approach | Learned approach |
+  |---|---|
+  | You write the rules | The robot discovers the rules |
+  {:class="table table-single"}
+  ```
+
+  (A `table table-single table-narrow` variant exists for narrow tables, but default to `table table-single`.) After writing, sanity-check that the count of table separator rows equals the count of `table-single` tags.
 
 ## Content rules
 
