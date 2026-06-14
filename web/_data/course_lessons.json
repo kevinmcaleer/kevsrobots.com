@@ -906,6 +906,96 @@
     ]
   },
   {
+    "slug": "gymnasium",
+    "name": "Reinforcement Learning with Gymnasium",
+    "description": "Take your Q-learning skills to the industry-standard Gymnasium API and Stable-Baselines3. You will wrap the BurgerBot grid-world as a proper Gymnasium environment, discretize CartPole with your own binning code, and train neural-network agents that export a policy table you can drop straight onto a Pico.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-06-14",
+    "groups": [
+      "ai",
+      "python",
+      "robotics"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/gymnasium/00_intro.html"
+      },
+      {
+        "file": "01_from_handbuilt_to_standard.md",
+        "section": "Why Gymnasium",
+        "url": "/learn/gymnasium/01_from_handbuilt_to_standard.html"
+      },
+      {
+        "file": "02_first_environment.md",
+        "section": "Why Gymnasium",
+        "url": "/learn/gymnasium/02_first_environment.html"
+      },
+      {
+        "file": "03_terminated_vs_truncated.md",
+        "section": "Why Gymnasium",
+        "url": "/learn/gymnasium/03_terminated_vs_truncated.html"
+      },
+      {
+        "file": "04_spaces.md",
+        "section": "The Gymnasium API in Depth",
+        "url": "/learn/gymnasium/04_spaces.html"
+      },
+      {
+        "file": "05_qlearning_on_gymnasium.md",
+        "section": "The Gymnasium API in Depth",
+        "url": "/learn/gymnasium/05_qlearning_on_gymnasium.html"
+      },
+      {
+        "file": "06_seeding_and_lifecycle.md",
+        "section": "The Gymnasium API in Depth",
+        "url": "/learn/gymnasium/06_seeding_and_lifecycle.html"
+      },
+      {
+        "file": "07_anatomy_of_custom_env.md",
+        "section": "Building Your Own Environment",
+        "url": "/learn/gymnasium/07_anatomy_of_custom_env.html"
+      },
+      {
+        "file": "08_wrapping_the_burgerbot.md",
+        "section": "Building Your Own Environment",
+        "url": "/learn/gymnasium/08_wrapping_the_burgerbot.html"
+      },
+      {
+        "file": "09_registering_and_rendering.md",
+        "section": "Building Your Own Environment",
+        "url": "/learn/gymnasium/09_registering_and_rendering.html"
+      },
+      {
+        "file": "10_wrappers.md",
+        "section": "Building Your Own Environment",
+        "url": "/learn/gymnasium/10_wrappers.html"
+      },
+      {
+        "file": "11_vectorized_envs.md",
+        "section": "Scaling Up to Neural Networks",
+        "url": "/learn/gymnasium/11_vectorized_envs.html"
+      },
+      {
+        "file": "12_meet_stable_baselines3.md",
+        "section": "Scaling Up to Neural Networks",
+        "url": "/learn/gymnasium/12_meet_stable_baselines3.html"
+      },
+      {
+        "file": "13_train_evaluate_export.md",
+        "section": "Scaling Up to Neural Networks",
+        "url": "/learn/gymnasium/13_train_evaluate_export.html"
+      },
+      {
+        "file": "14_summary.md",
+        "section": "Scaling Up to Neural Networks",
+        "url": "/learn/gymnasium/14_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "how_to_install_micropython",
     "name": "How to install MicroPython",
     "description": "Install MicroPython on your Raspberry Pi Pico.",

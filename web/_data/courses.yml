@@ -165,6 +165,20 @@
   link: /learn/freecad_smars/00_intro.html
   name: Building SMARS with FreeCAD
 - author: Kevin McAleer
+  cover: /learn/gymnasium/assets/cover.jpg
+  date_published: 2026-06-14
+  description: Take your Q-learning skills to the industry-standard Gymnasium API
+    and Stable-Baselines3. You will wrap the BurgerBot grid-world as a proper Gymnasium
+    environment, discretize CartPole with your own binning code, and train neural-network
+    agents that export a policy table you can drop straight onto a Pico.
+  duration: 1h 23m
+  groups:
+  - ai
+  - python
+  - robotics
+  link: /learn/gymnasium/00_intro.html
+  name: Reinforcement Learning with Gymnasium
+- author: Kevin McAleer
   cover: /learn/how_to_install_micropython/assets/cover.jpg
   date_published: 2024-08-10
   description: Install MicroPython on your Raspberry Pi Pico.

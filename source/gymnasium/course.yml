@@ -1,0 +1,47 @@
+- name: Reinforcement Learning with Gymnasium
+  author: Kevin McAleer
+  date_created: 2026-06-14
+  date_published: 2026-06-14
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - ai
+      - python
+      - robotics
+  description: >-
+    Take your Q-learning skills to the industry-standard Gymnasium API and
+    Stable-Baselines3. You will wrap the BurgerBot grid-world as a proper
+    Gymnasium environment, discretize CartPole with your own binning code,
+    and train neural-network agents that export a policy table you can drop
+    straight onto a Pico.
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 00_intro.md
+    - section:
+        name: Why Gymnasium
+        content:
+          - 01_from_handbuilt_to_standard.md
+          - 02_first_environment.md
+          - 03_terminated_vs_truncated.md
+    - section:
+        name: The Gymnasium API in Depth
+        content:
+          - 04_spaces.md
+          - 05_qlearning_on_gymnasium.md
+          - 06_seeding_and_lifecycle.md
+    - section:
+        name: Building Your Own Environment
+        content:
+          - 07_anatomy_of_custom_env.md
+          - 08_wrapping_the_burgerbot.md
+          - 09_registering_and_rendering.md
+          - 10_wrappers.md
+    - section:
+        name: Scaling Up to Neural Networks
+        content:
+          - 11_vectorized_envs.md
+          - 12_meet_stable_baselines3.md
+          - 13_train_evaluate_export.md
+          - 14_summary.md
