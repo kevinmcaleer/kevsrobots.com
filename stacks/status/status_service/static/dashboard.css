@@ -1,169 +1,72 @@
-/* Public status dashboard. Compact single-page layout: every service is
-   one grid row (name | timeline | pill) so the full set fits without
-   scrolling. Per-row metadata (latency, last-checked, error message)
-   lives in the row's title tooltip. */
+/* Kev's Robots — System Status dashboard.
+   Imported from the Claude Design handoff (project "Kevsrobots service
+   status page"). The page shell lives in templates/index.html; data comes
+   from /status.json every 60s. Brand red #d92027; status colours are the
+   CSS vars below — change them in one place. */
 
 :root {
-    --status-green:        #1f8a3a;
-    --status-green-bg:     #d8f1de;
-    --status-amber:        #b86c00;
-    --status-amber-bg:     #fbe5c4;
-    --status-red:          #b8332a;
-    --status-red-bg:       #f5c8c3;
-    --status-unknown:      #888;
-    --status-unknown-bg:   #e6e6e6;
-    --row-separator:       #ececec;
-    --page-bg:             #fafafa;
-    --surface-bg:          #fff;
+  --ink: #1f2430;
+  --muted: #6b7280;
+  --faint: #9aa1ad;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --border: #e6e8ec;
+  --brand: #d92027;
+  --up: #22a06b;      --up-tint: #e7f6ee;
+  --partial: #e6a817; --partial-tint: #fbf2da;
+  --down: #e5484d;    --down-tint: #fbe3e4;
 }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font-family: 'Mulish', system-ui, sans-serif; -webkit-font-smoothing: antialiased; padding-bottom: 56px; }
+@keyframes krpulse { 0% { box-shadow: 0 0 0 0 rgba(34,160,107,.5);} 70% { box-shadow: 0 0 0 6px rgba(34,160,107,0);} 100% { box-shadow: 0 0 0 0 rgba(34,160,107,0);} }
 
-html, body { background: var(--page-bg); }
-body { margin: 0; }
+header { background: var(--card); border-bottom: 1px solid var(--border); }
+.bar { max-width: 1040px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand img { height: 42px; width: auto; display: block; }
+.brand .name { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; line-height: 1.1; }
+.brand .sub { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--brand); }
+.meta { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--faint); }
+.live { display: inline-flex; align-items: center; gap: 7px; }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--up); display: inline-block; animation: krpulse 2s infinite; }
 
-/* ------- Header: title + overall pill on one line ------- */
-.status-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: .55rem .9rem;
-    background: var(--surface-bg);
-    border-bottom: 1px solid var(--row-separator);
-}
-.status-title {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-}
+main { max-width: 1040px; margin: 0 auto; padding: 28px 24px 0; }
+.banner { display: flex; align-items: center; gap: 18px; border-radius: 16px; padding: 22px 24px; border: 1px solid; }
+.banner .badge { width: 46px; height: 46px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; flex: none; font-family: 'Poppins', sans-serif; }
+.banner .title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.15; }
+.banner .desc { font-size: 14px; color: var(--muted); margin-top: 3px; }
 
-/* ------- Overall pill (inline in the header) ------- */
-.overall {
-    display: inline-flex;
-    align-items: baseline;
-    gap: .55rem;
-    padding: .22rem .75rem;
-    border-radius: 999px;
-    color: #fff;
-    font-size: .82rem;
-    line-height: 1.2;
-}
-.overall-label {
-    font-weight: 600;
-    text-transform: capitalize;
-}
-.overall-meta {
-    opacity: 0.85;
-    font-size: .76rem;
-}
-.overall-green   { background: var(--status-green); }
-.overall-amber   { background: var(--status-amber); }
-.overall-red     { background: var(--status-red); }
-.overall-unknown { background: var(--status-unknown); }
+.summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 22px 2px 16px; flex-wrap: wrap; font-size: 13px; color: #8a92a0; }
+.summary b { font-weight: 700; }
+.divider { color: #cfd4db; margin: 0 8px; }
 
-/* ------- Main + service rows ------- */
-.status-main {
-    padding: .25rem .9rem .9rem;
-}
-.services {
-    background: var(--surface-bg);
-    border: 1px solid var(--row-separator);
-    border-radius: 6px;
-    overflow: hidden;
-}
-.service {
-    display: grid;
-    grid-template-columns: 130px 1fr 78px;
-    align-items: center;
-    gap: .9rem;
-    padding: .35rem .65rem;
-    border-bottom: 1px solid var(--row-separator);
-    min-height: 32px;
-}
-.service:last-child { border-bottom: 0; }
-.service-name {
-    font-weight: 600;
-    text-transform: capitalize;
-    font-size: .9rem;
-    line-height: 1.1;
-}
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 14px; padding: 13px 18px; border-bottom: 1px solid #f0f1f4; }
+.row:last-child { border-bottom: none; }
+.dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.svc { width: 160px; flex: none; min-width: 0; }
+.svc .n { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.svc .h { font-size: 11px; color: #aab0bb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bars { flex: 1; display: flex; gap: 1.5px; align-items: flex-end; height: 22px; min-width: 0; }
+.bars span { flex: 1 1 0; min-width: 0; height: 22px; border-radius: 1px; transition: transform .12s ease; }
+.bars span:hover { transform: scaleY(1.18); }
+.pct { width: 62px; flex: none; text-align: right; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 12.5px; color: var(--muted); }
+.pill { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 11.5px; padding: 4px 11px; border-radius: 999px; white-space: nowrap; flex: none; }
 
-/* ------- Status pill (right-hand column) ------- */
-.pill {
-    display: inline-block;
-    padding: .14rem .55rem;
-    border-radius: 999px;
-    font-size: .72rem;
-    font-weight: 600;
-    text-transform: lowercase;
-    color: #fff;
-    text-align: center;
-    min-width: 64px;
-}
-.pill-green   { background: var(--status-green); }
-.pill-amber   { background: var(--status-amber); }
-.pill-red     { background: var(--status-red); }
-.pill-unknown { background: var(--status-unknown); }
+.legend { display: flex; align-items: center; gap: 18px; margin-top: 22px; padding: 0 2px; font-size: 12px; color: var(--faint); flex-wrap: wrap; }
+.legend span { display: flex; align-items: center; gap: 7px; }
+.legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.legend a { color: var(--faint); text-decoration: underline; }
+.legend a:hover { color: var(--muted); }
 
-/* ------- 30-day timeline strip (middle column) ------- */
-.timeline {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(2px, 1fr));
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(2px, 1fr);
-    gap: 1px;
-    height: 18px;
-    border-radius: 3px;
-    overflow: hidden;
-    background: var(--status-unknown-bg);
-}
-.cell {
-    display: block;
-    height: 100%;
-    background: var(--status-unknown-bg);
-}
-.cell-empty { background: var(--status-unknown-bg); }
-.cell-green { background: var(--status-green); }
-.cell-amber { background: var(--status-amber); }
-.cell-red   { background: var(--status-red); }
-
-/* ------- Legend (slim footer-ish strip under the rows) ------- */
-.legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .55rem 1rem;
-    align-items: center;
-    padding: .45rem .25rem 0;
-    font-size: .72rem;
-    color: #6c757d;
-}
-.legend a { color: inherit; text-decoration: underline; }
-.legend-sep { opacity: .5; }
-.legend .dot {
-    display: inline-block;
-    width: .55rem;
-    height: .55rem;
-    border-radius: 2px;
-    margin-right: .25rem;
-    vertical-align: middle;
-}
-.legend .dot-green { background: var(--status-green); }
-.legend .dot-amber { background: var(--status-amber); }
-.legend .dot-red   { background: var(--status-red); }
-.legend .dot-empty { background: var(--status-unknown-bg); border: 1px solid #ccc; }
-
-/* ------- Narrow viewports ------- */
-@media (max-width: 540px) {
-    .status-header {
-        flex-wrap: wrap;
-        gap: .4rem;
-    }
-    .service {
-        grid-template-columns: 90px 1fr 60px;
-        gap: .5rem;
-        padding: .3rem .45rem;
-    }
-    .service-name { font-size: .82rem; }
-    .pill { min-width: 50px; padding: .12rem .4rem; }
-    .status-main { padding: .25rem .45rem .55rem; }
+/* Narrow viewports: drop the per-service host line and tighten columns so
+   the bar strip keeps as much width as possible. */
+@media (max-width: 560px) {
+  .bar { padding: 12px 16px; }
+  main { padding: 20px 16px 0; }
+  .svc { width: 104px; }
+  .svc .h { display: none; }
+  .pct { width: 50px; }
+  .pill { padding: 4px 8px; }
 }
