@@ -52,7 +52,10 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 24px 0; }
 .bars span { flex: 1 1 0; min-width: 0; height: 22px; border-radius: 1px; transition: transform .12s ease; }
 .bars span:hover { transform: scaleY(1.18); }
 .pct { width: 62px; flex: none; text-align: right; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 12.5px; color: var(--muted); }
-.pill { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 11.5px; padding: 4px 11px; border-radius: 999px; white-space: nowrap; flex: none; }
+/* Fixed footprint so every row leaves the flex .bars strip the same width
+   (otherwise a wider label like "Major Outage" squeezes its bar strip
+   narrower than the "Operational" rows and the columns stop lining up). */
+.pill { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 11.5px; padding: 4px 11px; border-radius: 999px; white-space: nowrap; flex: none; min-width: 124px; text-align: center; }
 
 .legend { display: flex; align-items: center; gap: 18px; margin-top: 22px; padding: 0 2px; font-size: 12px; color: var(--faint); flex-wrap: wrap; }
 .legend span { display: flex; align-items: center; gap: 7px; }
@@ -68,5 +71,5 @@ main { max-width: 1040px; margin: 0 auto; padding: 28px 24px 0; }
   .svc { width: 104px; }
   .svc .h { display: none; }
   .pct { width: 50px; }
-  .pill { padding: 4px 8px; }
+  .pill { padding: 4px 8px; min-width: 96px; }
 }

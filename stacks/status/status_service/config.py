@@ -18,14 +18,25 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 # The nine services named in the issue (in canonical display order). These
-# are best-guess URLs — adjust in ``.env`` if any host differs in production.
+# are the confirmed production URLs (kept in sync with ``.env.example``);
+# override any of them in ``.env`` if a host changes. Notes on the
+# non-obvious ones:
+#   * ``stats`` answers on ``/api/health`` (not ``/health``).
+#   * ``page_count`` is deployed under the *underscored* subdomain
+#     ``page_count.kevsrobots.com`` — the hyphenated host 404s, which the
+#     poller would report as amber/"degraded".
+#   * ``status`` self-polls on loopback so the default works before the
+#     public tunnel is up; ``.env`` swaps in the public hostname to
+#     exercise the full Cloudflare chain.
+#   * ``random_facts`` is the random_robot_facts container, served at
+#     ``facts.kevsrobots.com`` (its public tunnel hostname).
 DEFAULT_SERVICES = (
-    "search=https://www.kevsrobots.com/search.json,"
-    "stats=https://stats.kevsrobots.com/health,"
-    "page_count=https://page-count.kevsrobots.com/health,"
-    "random_facts=https://random-facts.kevsrobots.com/health,"
+    "search=https://search.kevsrobots.com/health,"
+    "stats=https://stats.kevsrobots.com/api/health,"
+    "page_count=https://page_count.kevsrobots.com/health,"
+    "random_facts=https://facts.kevsrobots.com/health,"
     "nibsy=https://nibsy.kevsrobots.com/health,"
-    "courses=https://www.kevsrobots.com/learn/index.html,"
+    "courses=https://courses.kevsrobots.com/health,"
     "chatter=https://chatter.kevsrobots.com/health,"
     "projects=https://projects.kevsrobots.com/health,"
     "status=http://127.0.0.1:8210/health"
