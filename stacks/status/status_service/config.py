@@ -28,14 +28,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 #   * ``status`` self-polls on loopback so the default works before the
 #     public tunnel is up; ``.env`` swaps in the public hostname to
 #     exercise the full Cloudflare chain.
-#   * ``random_facts`` currently does NOT resolve (no DNS for any host
-#     variant) — it will read red until the service is renamed or removed
-#     from this list. Pending a decommission/rename decision.
+#   * ``random_facts`` is the random_robot_facts container, served at
+#     ``facts.kevsrobots.com`` (its public tunnel hostname).
 DEFAULT_SERVICES = (
     "search=https://search.kevsrobots.com/health,"
     "stats=https://stats.kevsrobots.com/api/health,"
     "page_count=https://page_count.kevsrobots.com/health,"
-    "random_facts=https://random-facts.kevsrobots.com/health,"
+    "random_facts=https://facts.kevsrobots.com/health,"
     "nibsy=https://nibsy.kevsrobots.com/health,"
     "courses=https://courses.kevsrobots.com/health,"
     "chatter=https://chatter.kevsrobots.com/health,"
