@@ -19,18 +19,20 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncIterator, Optional
+from urllib.parse import urlsplit
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import Settings, get_settings, scheduler_disabled
 from .db import (
     cell_status_strings,
+    daily_uptime,
     init_schema,
     latest_per_service,
     vacuum_old_rows,
@@ -128,6 +130,26 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if scheduler is not None:
             scheduler.shutdown(wait=False)
             logger.info("scheduler stopped")
+
+
+def _display_name(key: str) -> str:
+    """Humanise a service key for the status page (``page_count`` → ``Page
+    Count``). The configured keys are short snake_case identifiers; the
+    public page wants a readable, title-cased label."""
+
+    return key.replace("_", " ").replace("-", " ").strip().title()
+
+
+def _public_host(url: str) -> str:
+    """The public hostname to show under a service name, e.g.
+    ``search.kevsrobots.com``. Returns ``""`` for loopback/local URLs (the
+    status service's own self-check) so we never surface an internal
+    address — the page just omits the host line when it's blank."""
+
+    host = (urlsplit(url).hostname or "").strip().lower()
+    if not host or host in {"localhost", "127.0.0.1", "::1"}:
+        return ""
+    return host
 
 
 def _serialise_service_entry(
@@ -273,6 +295,40 @@ def create_app() -> FastAPI:
             "cell_seconds": cell_seconds,
             "services": services_data,
         }
+
+    @app.get("/status.json")
+    async def status_json() -> JSONResponse:
+        """The status page's data feed, shaped like the design handoff's
+        ``status.json``: one entry per service with up to
+        ``retention_days`` of per-day uptime history (oldest→newest). The
+        page derives each service's current dot/pill and the overall
+        banner from the LAST history entry, so there's no separate
+        'current status' field here.
+        """
+
+        settings = get_settings()
+        days = settings.retention_days
+        history = await daily_uptime(
+            settings.status_db_path,
+            services=settings.service_names,
+            days=days,
+        )
+        services = [
+            {
+                "name": _display_name(name),
+                "host": _public_host(url),
+                "history": history.get(name, []),
+            }
+            for name, url in settings.services_list
+        ]
+        payload = {
+            "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "services": services,
+        }
+        # Live data — never let a cache hold a stale snapshot.
+        return JSONResponse(
+            payload, headers={"Cache-Control": "no-store, max-age=0"}
+        )
 
     @app.get("/")
     async def dashboard(request: Request):

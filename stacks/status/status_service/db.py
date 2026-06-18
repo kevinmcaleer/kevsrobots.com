@@ -260,6 +260,63 @@ async def cell_status_strings(
     return {s: "".join(chars) for s, chars in cells_by_service.items()}
 
 
+async def daily_uptime(
+    db_path: str,
+    *,
+    services: list[str],
+    days: int,
+) -> dict[str, list[dict]]:
+    """Per-service, per-day uptime percentage for the status page.
+
+    Returns ``{service: [{"date": "YYYY-MM-DD", "uptime": 0..100}, ...]}``
+    with entries oldest→newest. Days on which a service was never polled
+    are simply absent (the page pads missing days with grey "no data"
+    bars), so a service with only 12 days of history yields 12 entries.
+
+    Each check contributes a weighted score to its day —
+    ``green = 1.0``, ``amber = 0.5``, ``red = 0.0`` — and the day's
+    uptime is ``100 * sum(score) / count``. Weighting amber at a half
+    means a fully-degraded day lands at 50% (the page's amber band:
+    50–99.5% amber, ≥99.5% green, <50% red) rather than being
+    misreported as a total outage.
+    """
+
+    if not services or days <= 0:
+        return {s: [] for s in services}
+
+    placeholders = ",".join("?" for _ in services)
+    sql = (
+        "SELECT service, date(checked_at) AS day, "
+        "  COUNT(*) AS total, "
+        "  SUM(CASE status "
+        "        WHEN 'green' THEN 1.0 "
+        "        WHEN 'amber' THEN 0.5 "
+        "        ELSE 0.0 END) AS score "
+        "FROM health_checks "
+        "WHERE checked_at >= datetime('now', ?) "
+        f"  AND service IN ({placeholders}) "
+        "GROUP BY service, day "
+        "ORDER BY service, day"
+    )
+    params: tuple = (f"-{days} days", *services)
+
+    out: dict[str, list[dict]] = {s: [] for s in services}
+    async with connect(db_path) as db:
+        async with db.execute(sql, params) as cur:
+            async for row in cur:
+                svc = row["service"]
+                if svc not in out:
+                    continue
+                total = int(row["total"] or 0)
+                if total <= 0:
+                    continue
+                score = float(row["score"] or 0.0)
+                out[svc].append(
+                    {"date": row["day"], "uptime": round(100.0 * score / total, 2)}
+                )
+    return out
+
+
 async def vacuum_old_rows(db_path: str, *, retention_days: int) -> int:
     """Delete rows older than ``retention_days`` then run VACUUM.
 
