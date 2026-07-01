@@ -101,6 +101,21 @@ async def test_post_feedback_anonymous_disabled_by_default_returns_401(client) -
 
 
 @pytest.mark.asyncio
+async def test_post_feedback_accepts_large_message(client, monkeypatch) -> None:
+    """The message cap is large enough for a Snakie report's diagnostics block +
+    opt-in console output (raised well above the old 2000)."""
+    monkeypatch.setenv("SNAKIE_FEEDBACK_KEY", "s3cr3t-app-key")
+    big = "_SNAKIE_ crash on connect\n\n" + ("console output line\n" * 800)  # ~15k chars
+    assert len(big) > 2000
+    resp = await client.post(
+        "/api/feedback",
+        json=_valid_payload(sentiment="issue", message=big),
+        headers={"X-Snakie-Key": "s3cr3t-app-key"},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
 async def test_post_feedback_missing_required_field_returns_400(client) -> None:
     """Pydantic surfaces a 400 via our handler (not the default 422)."""
     headers = make_auth_header("alice")

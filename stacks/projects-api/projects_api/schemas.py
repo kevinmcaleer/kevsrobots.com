@@ -1486,7 +1486,10 @@ class FeedbackCreate(BaseModel):
     """
 
     sentiment: str = Field(..., pattern=r"^(love|like|issue|idea)$")
-    message: str = Field(..., min_length=10, max_length=2000)
+    # Larger cap so a Snakie bug report can carry its diagnostics block + the
+    # (opt-in) console output. The DB column is Text; the website widget still
+    # caps its textarea client-side, so this doesn't change widget behaviour.
+    message: str = Field(..., min_length=10, max_length=20000)
     # Email is opt-in; Pydantic's EmailStr would force a dependency on
     # email-validator, so we keep it loose and validate the shape in the
     # router (the widget already checks client-side).
