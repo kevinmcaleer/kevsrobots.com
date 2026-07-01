@@ -65,6 +65,57 @@ async def test_post_feedback_unauthenticated_returns_401(client) -> None:
 
 
 @pytest.mark.asyncio
+async def test_post_feedback_anonymous_with_app_key_returns_201(
+    client, monkeypatch
+) -> None:
+    """A trusted first-party app (Snakie) can submit anonymously with the shared
+    X-Snakie-Key header — no Chatter session required (issue #206)."""
+    monkeypatch.setenv("SNAKIE_FEEDBACK_KEY", "s3cr3t-app-key")
+    resp = await client.post(
+        "/api/feedback",
+        json=_valid_payload(sentiment="issue", message="_SNAKIE_ crash on connect"),
+        headers={"X-Snakie-Key": "s3cr3t-app-key"},
+    )
+    assert resp.status_code == 201
+    assert isinstance(resp.json()["id"], int)
+
+
+@pytest.mark.asyncio
+async def test_post_feedback_wrong_app_key_returns_401(client, monkeypatch) -> None:
+    """A bad key with no session falls through to the auth gate → 401."""
+    monkeypatch.setenv("SNAKIE_FEEDBACK_KEY", "s3cr3t-app-key")
+    resp = await client.post(
+        "/api/feedback", json=_valid_payload(), headers={"X-Snakie-Key": "wrong"}
+    )
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_post_feedback_anonymous_disabled_by_default_returns_401(client) -> None:
+    """With no SNAKIE_FEEDBACK_KEY configured the anonymous path is OFF, so even a
+    presented key falls through to auth → 401 (secure default)."""
+    resp = await client.post(
+        "/api/feedback", json=_valid_payload(), headers={"X-Snakie-Key": "anything"}
+    )
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_post_feedback_accepts_large_message(client, monkeypatch) -> None:
+    """The message cap is large enough for a Snakie report's diagnostics block +
+    opt-in console output (raised well above the old 2000)."""
+    monkeypatch.setenv("SNAKIE_FEEDBACK_KEY", "s3cr3t-app-key")
+    big = "_SNAKIE_ crash on connect\n\n" + ("console output line\n" * 800)  # ~15k chars
+    assert len(big) > 2000
+    resp = await client.post(
+        "/api/feedback",
+        json=_valid_payload(sentiment="issue", message=big),
+        headers={"X-Snakie-Key": "s3cr3t-app-key"},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
 async def test_post_feedback_missing_required_field_returns_400(client) -> None:
     """Pydantic surfaces a 400 via our handler (not the default 422)."""
     headers = make_auth_header("alice")
