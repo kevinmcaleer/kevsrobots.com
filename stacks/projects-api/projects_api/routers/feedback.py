@@ -12,17 +12,19 @@ impersonate someone else by spoofing fields.
 
 from __future__ import annotations
 
+import hmac
 import logging
 import re
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, status
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.datastructures import UploadFile
 from starlette.formparsers import MultiPartException
 
-from ..auth import get_current_user, require_terms_accepted
+from ..auth import _check_terms_accepted, get_current_user
+from ..config import get_settings
 from ..db import get_session
 from ..models import Feedback
 from ..schemas import FeedbackCreate, FeedbackCreateResponse
@@ -55,6 +57,49 @@ def _coerce_optional_str(value: object) -> Optional[str]:
     return None
 
 
+# Identity recorded for anonymous first-party app submissions (the Snakie desktop
+# app, authorised via X-Snakie-Key). A sentinel — never a real Chatter username —
+# so anonymous reports are clearly attributable + filterable and can't be used to
+# impersonate a real user.
+ANON_REPORTER = "_snakie_anon"
+
+
+def _is_snakie_app(x_snakie_key: Optional[str]) -> bool:
+    """True when a trusted first-party app presents the configured ``X-Snakie-Key``.
+
+    Constant-time compared. Returns False when no key is configured, so the
+    anonymous path is DISABLED by default (the endpoint stays authenticated-only).
+    """
+    key = get_settings().snakie_feedback_key
+    return bool(key and x_snakie_key and hmac.compare_digest(x_snakie_key, key))
+
+
+async def feedback_reporter(
+    x_snakie_key: Optional[str] = Header(default=None, alias="X-Snakie-Key"),
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+    session: AsyncSession = Depends(get_session),
+) -> str:
+    """Resolve the feedback reporter's identity.
+
+    Two accepted callers:
+
+    * a trusted FIRST-PARTY app (the Snakie desktop app) presenting the shared
+      ``X-Snakie-Key`` header — recorded ANONYMOUSLY as :data:`ANON_REPORTER`.
+      Gated by the key and only enabled when ``snakie_feedback_key`` is
+      configured, so the endpoint is never an open write surface by default;
+    * an authenticated, terms-accepted Chatter user (the website widget), whose
+      username is taken from the session — never from the body — so a client
+      can't impersonate another user.
+    """
+    if _is_snakie_app(x_snakie_key):
+        return ANON_REPORTER
+    # Otherwise require the normal authenticated + terms-accepted user.
+    username = await get_current_user(access_token, authorization, session)
+    await _check_terms_accepted(session, username)
+    return username
+
+
 @router.post(
     "/api/feedback",
     response_model=FeedbackCreateResponse,
@@ -62,7 +107,7 @@ def _coerce_optional_str(value: object) -> Optional[str]:
 )
 async def create_feedback(
     request: Request,
-    user: str = Depends(require_terms_accepted),
+    user: str = Depends(feedback_reporter),
     session: AsyncSession = Depends(get_session),
 ) -> FeedbackCreateResponse:
     """Create a new feedback row.

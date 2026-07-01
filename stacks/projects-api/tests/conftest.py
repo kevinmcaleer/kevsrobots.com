@@ -92,6 +92,27 @@ async def client(engine, sessionmaker_) -> AsyncIterator[AsyncClient]:
         auth_module.get_current_user_aged
     )
 
+    # feedback_reporter (#206) bundles the T&Cs gate with an anonymous
+    # X-Snakie-Key path. Bypass its terms gate for the default client (like the
+    # require_terms_accepted override above) while still exercising the REAL app-key
+    # check, so authed-feedback tests pass and the anonymous-key tests are honest.
+    from fastapi import Cookie, Depends, Header
+    from projects_api.routers import feedback as feedback_module
+
+    async def _feedback_reporter_no_terms(
+        x_snakie_key: str | None = Header(default=None, alias="X-Snakie-Key"),
+        access_token: str | None = Cookie(default=None),
+        authorization: str | None = Header(default=None),
+        session: AsyncSession = Depends(db_module.get_session),
+    ) -> str:
+        if feedback_module._is_snakie_app(x_snakie_key):
+            return feedback_module.ANON_REPORTER
+        return await auth_module.get_current_user(access_token, authorization, session)
+
+    app.dependency_overrides[feedback_module.feedback_reporter] = (
+        _feedback_reporter_no_terms
+    )
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         async with app.router.lifespan_context(app):
