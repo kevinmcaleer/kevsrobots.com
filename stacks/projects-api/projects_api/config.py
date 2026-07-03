@@ -37,6 +37,14 @@ class Settings(BaseSettings):
     jwt_secret: str = "changeme"
     jwt_algorithm: str = "HS256"
 
+    # Shared app key that lets a trusted first-party client — the Snakie desktop
+    # app — POST feedback ANONYMOUSLY (no Chatter session) by sending it as the
+    # `X-Snakie-Key` header (see routers/feedback.py). Anonymous reports are
+    # recorded under a sentinel user so they're clearly attributable + filterable.
+    # Empty (the default) DISABLES the anonymous path, so the endpoint stays
+    # authenticated-only unless a key is configured. Rotate the key if abused.
+    snakie_feedback_key: str = ""
+
     # Base URL for the Chatter auth service. Used by the parts catalog
     # account-age gate to look up `account_created_at` from `/api/me`.
     chatter_base_url: str = "https://chatter.kevsrobots.com"
