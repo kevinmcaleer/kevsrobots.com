@@ -91,6 +91,21 @@ async def test_post_feedback_wrong_app_key_returns_401(client, monkeypatch) -> N
 
 
 @pytest.mark.asyncio
+async def test_post_feedback_nonascii_app_key_returns_401(client, monkeypatch) -> None:
+    """A non-ASCII key must fail cleanly (401), not crash hmac.compare_digest with
+    a TypeError → 500 ('comparing strings with non-ASCII characters'). HTTP header
+    bytes are decoded latin-1 by ASGI, so send raw latin-1 bytes to mimic a real
+    non-ASCII header reaching the app."""
+    monkeypatch.setenv("SNAKIE_FEEDBACK_KEY", "s3cr3t-app-key")
+    resp = await client.post(
+        "/api/feedback",
+        json=_valid_payload(),
+        headers={"X-Snakie-Key": "wröngkéy".encode("latin-1")},
+    )
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_post_feedback_anonymous_disabled_by_default_returns_401(client) -> None:
     """With no SNAKIE_FEEDBACK_KEY configured the anonymous path is OFF, so even a
     presented key falls through to auth → 401 (secure default)."""

@@ -67,11 +67,16 @@ ANON_REPORTER = "_snakie_anon"
 def _is_snakie_app(x_snakie_key: Optional[str]) -> bool:
     """True when a trusted first-party app presents the configured ``X-Snakie-Key``.
 
-    Constant-time compared. Returns False when no key is configured, so the
-    anonymous path is DISABLED by default (the endpoint stays authenticated-only).
+    Constant-time compared on the UTF-8 bytes — ``hmac.compare_digest`` raises
+    ``TypeError`` for ``str`` inputs containing non-ASCII characters, so a client
+    sending a non-ASCII ``X-Snakie-Key`` would otherwise 500 instead of cleanly
+    failing. Returns False when no key is configured, so the anonymous path is
+    DISABLED by default (the endpoint stays authenticated-only).
     """
     key = get_settings().snakie_feedback_key
-    return bool(key and x_snakie_key and hmac.compare_digest(x_snakie_key, key))
+    if not key or not x_snakie_key:
+        return False
+    return hmac.compare_digest(x_snakie_key.encode("utf-8"), key.encode("utf-8"))
 
 
 async def feedback_reporter(
