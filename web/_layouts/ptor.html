@@ -10,20 +10,36 @@ layout: content
 {% assign this_el = all_elements | where: "slug", page.slug | first %}
 {% assign cat = pt.categories | where: "key", page.category | first %}
 
-<div class="ptor-hero ptor-cat-{{ page.category }}">
-  <div class="ptor-hero-tile">
-    <span class="ptor-number">{{ page.number }}</span>
-    <span class="ptor-code">{{ page.code }}</span>
-    <span class="ptor-name">{{ page.name }}</span>
+<div class="ptor-top">
+  <div class="ptor-hero ptor-cat-{{ page.category }}">
+    <div class="ptor-hero-tile">
+      <span class="ptor-number">{{ page.number }}</span>
+      <span class="ptor-code">{{ page.code }}</span>
+      <span class="ptor-name">{{ page.name }}</span>
+    </div>
+    <div class="ptor-hero-meta">
+      <p class="mb-1 text-muted small">Element {{ page.number }} of {{ all_elements | size }} — <a href="/periodic-table/">The Periodic Table of Robotics</a></p>
+      <h1>{{ page.name }}</h1>
+      <p class="mb-2"><span class="ptor-category-badge">{{ cat.label }}</span></p>
+      <p class="lead mb-1">{{ page.description }}</p>
+      {% if page.external_link %}
+      <p class="mb-0 small"><i class="fas fa-external-link-alt me-1"></i> <a href="{{ page.external_link }}" target="_blank" rel="noopener">{{ page.external_label | default: page.external_link }}</a></p>
+      {% endif %}
+    </div>
   </div>
-  <div class="ptor-hero-meta">
-    <p class="mb-1 text-muted small">Element {{ page.number }} of {{ all_elements | size }} — <a href="/periodic-table/">The Periodic Table of Robotics</a></p>
-    <h1>{{ page.name }}</h1>
-    <p class="mb-2"><span class="ptor-category-badge">{{ cat.label }}</span></p>
-    <p class="lead mb-1">{{ page.description }}</p>
-    {% if page.external_link %}
-    <p class="mb-0 small"><i class="fas fa-external-link-alt me-1"></i> <a href="{{ page.external_link }}" target="_blank" rel="noopener">{{ page.external_label | default: page.external_link }}</a></p>
-    {% endif %}
+
+  <div class="ptor-mini">
+    <p class="ptor-mini-cap"><i class="fas fa-location-dot me-2"></i> <strong>{{ page.name }}</strong> in the table</p>
+    <div class="ptor-mini-scroll">
+      <div class="ptor-mini-grid">
+        {% for el in all_elements %}
+        <a href="/periodic-table/{{ el.slug }}.html"
+           class="ptor-mini-tile ptor-cat-{{ el.category }}{% if el.slug == page.slug %} is-current{% endif %}"
+           style="grid-row: {{ el.row }}; grid-column: {{ el.col }};"
+           title="{{ el.code }} — {{ el.name }}"{% if el.slug == page.slug %} aria-current="page"{% endif %}>{{ el.code }}</a>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </div>
 
@@ -172,16 +188,63 @@ layout: content
 {% assign next_num = page.number | plus: 1 %}
 {% assign prev_el = all_elements | where: "number", prev_num | first %}
 {% assign next_el = all_elements | where: "number", next_num | first %}
-<div class="ptor-pager">
-  <span>
-    {% if prev_el %}
-    <a href="/periodic-table/{{ prev_el.slug }}.html">&larr; {{ prev_el.code }} &middot; {{ prev_el.name }}</a>
-    {% endif %}
-  </span>
-  <span><a href="/periodic-table/">&uarr; The full table</a></span>
-  <span>
-    {% if next_el %}
-    <a href="/periodic-table/{{ next_el.slug }}.html">{{ next_el.code }} &middot; {{ next_el.name }} &rarr;</a>
-    {% endif %}
-  </span>
-</div>
+<nav class="ptor-pager" aria-label="Previous and next element">
+  {% if prev_el %}
+  <a class="ptor-pager-btn ptor-pager-prev" href="/periodic-table/{{ prev_el.slug }}.html" rel="prev" title="Previous element — press the &larr; key">
+    <i class="fas fa-chevron-left ptor-pager-arrow" aria-hidden="true"></i>
+    <span class="ptor-pager-text">
+      <span class="ptor-pager-dir">Previous</span>
+      <span class="ptor-pager-el">
+        <span class="ptor-pager-code ptor-cat-{{ prev_el.category }}">{{ prev_el.code }}</span>
+        <span class="ptor-pager-elname">{{ prev_el.name }}</span>
+      </span>
+    </span>
+  </a>
+  {% else %}
+  <span class="ptor-pager-btn is-empty" aria-hidden="true"></span>
+  {% endif %}
+
+  <a class="ptor-pager-full" href="/periodic-table/"><i class="fas fa-table-cells me-2"></i>Full table</a>
+
+  {% if next_el %}
+  <a class="ptor-pager-btn ptor-pager-next" href="/periodic-table/{{ next_el.slug }}.html" rel="next" title="Next element — press the &rarr; key">
+    <span class="ptor-pager-text">
+      <span class="ptor-pager-dir">Next</span>
+      <span class="ptor-pager-el">
+        <span class="ptor-pager-elname">{{ next_el.name }}</span>
+        <span class="ptor-pager-code ptor-cat-{{ next_el.category }}">{{ next_el.code }}</span>
+      </span>
+    </span>
+    <i class="fas fa-chevron-right ptor-pager-arrow" aria-hidden="true"></i>
+  </a>
+  {% else %}
+  <span class="ptor-pager-btn is-empty" aria-hidden="true"></span>
+  {% endif %}
+</nav>
+
+<script>
+  (function () {
+    // Keyboard shortcuts: Left arrow -> previous element, Right arrow -> next.
+    // Reads the hrefs straight off the pager links so there's a single source
+    // of truth. At the ends of the table the missing side is an .is-empty
+    // <span> (no .ptor-pager-prev/next anchor), so that direction is a no-op.
+    var prev = document.querySelector('.ptor-pager-prev');
+    var next = document.querySelector('.ptor-pager-next');
+    if (!prev && !next) return;
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      // Don't hijack typing or browser/OS shortcuts (e.g. Alt+Arrow = history).
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      var a = document.activeElement;
+      if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' ||
+                a.tagName === 'SELECT' || a.isContentEditable)) return;
+
+      var link = e.key === 'ArrowLeft' ? prev : next;
+      if (link && link.href) {
+        e.preventDefault();
+        window.location.href = link.href;
+      }
+    });
+  })();
+</script>
