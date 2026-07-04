@@ -465,3 +465,116 @@ async def test_admin_counts_requires_admin(client, monkeypatch) -> None:
     assert resp.status_code == 403
     resp = await client.get("/api/admin/feedback/counts")
     assert resp.status_code == 401
+
+
+# ----- Desktop admin key (X-Snakie-Admin-Key) — Snakie Bug Tracker (#206) -
+
+
+async def _seed_snakie(client, *, message: str, sentiment: str = "issue") -> int:
+    """Submit an anonymous Snakie-app report (user_id == _snakie_anon)."""
+    resp = await client.post(
+        "/api/feedback",
+        json=_valid_payload(sentiment=sentiment, message=f"_SNAKIE_ {message}"),
+        headers={"X-Snakie-Key": "s3cr3t-app-key"},
+    )
+    assert resp.status_code == 201
+    return resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_admin_key_lists_without_chatter_session(client, monkeypatch) -> None:
+    """The maintainer's desktop app can list feedback with only the admin key —
+    no Chatter session, no ADMIN_USERNAMES membership."""
+    monkeypatch.setenv("SNAKIE_FEEDBACK_KEY", "s3cr3t-app-key")
+    monkeypatch.setenv("SNAKIE_ADMIN_KEY", "admin-s3cr3t")
+    await _seed_snakie(client, message="crash on connect")
+
+    resp = await client.get(
+        "/api/admin/feedback?user_id=_snakie_anon",
+        headers={"X-Snakie-Admin-Key": "admin-s3cr3t"},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] >= 1
+    assert all(item["user_id"] == "_snakie_anon" for item in body["items"])
+
+
+@pytest.mark.asyncio
+async def test_admin_key_disabled_by_default_returns_401(client) -> None:
+    """With no SNAKIE_ADMIN_KEY configured, presenting the header falls through
+    to the Chatter auth gate → 401 (secure default, inbox stays admin-only)."""
+    resp = await client.get(
+        "/api/admin/feedback", headers={"X-Snakie-Admin-Key": "anything"}
+    )
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_admin_wrong_key_returns_401(client, monkeypatch) -> None:
+    monkeypatch.setenv("SNAKIE_ADMIN_KEY", "admin-s3cr3t")
+    resp = await client.get(
+        "/api/admin/feedback", headers={"X-Snakie-Admin-Key": "wrong"}
+    )
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_admin_nonascii_key_returns_401(client, monkeypatch) -> None:
+    """A non-ASCII admin key must fail cleanly (401), not 500 via
+    hmac.compare_digest's ASCII restriction. HTTP headers are latin-1."""
+    monkeypatch.setenv("SNAKIE_ADMIN_KEY", "admin-s3cr3t")
+    resp = await client.get(
+        "/api/admin/feedback",
+        headers={"X-Snakie-Admin-Key": "wröngkéy".encode("latin-1")},
+    )
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_admin_key_patch_notes_and_close(client, monkeypatch) -> None:
+    """Via the admin key: add notes without touching status, then close
+    (archived) without touching notes."""
+    monkeypatch.setenv("SNAKIE_FEEDBACK_KEY", "s3cr3t-app-key")
+    monkeypatch.setenv("SNAKIE_ADMIN_KEY", "admin-s3cr3t")
+    hdr = {"X-Snakie-Admin-Key": "admin-s3cr3t"}
+    fid = await _seed_snakie(client, message="scope trace flickers")
+
+    # Notes only — status stays unread.
+    r1 = await client.patch(
+        f"/api/admin/feedback/{fid}", json={"admin_notes": "repro'd on RP2350"}, headers=hdr
+    )
+    assert r1.status_code == 200
+    assert r1.json()["admin_notes"] == "repro'd on RP2350"
+    assert r1.json()["status"] == "unread"
+
+    # Close only — notes stay.
+    r2 = await client.patch(
+        f"/api/admin/feedback/{fid}", json={"status": "archived"}, headers=hdr
+    )
+    assert r2.status_code == 200
+    assert r2.json()["status"] == "archived"
+    assert r2.json()["admin_notes"] == "repro'd on RP2350"
+
+    # Clear notes with an explicit null.
+    r3 = await client.patch(
+        f"/api/admin/feedback/{fid}", json={"admin_notes": None}, headers=hdr
+    )
+    assert r3.status_code == 200
+    assert r3.json()["admin_notes"] is None
+
+
+@pytest.mark.asyncio
+async def test_admin_notes_via_chatter_admin_still_works(client, monkeypatch) -> None:
+    """The website admin (Chatter) path keeps working and now carries notes."""
+    monkeypatch.setenv("ADMIN_USERNAMES", "boss")
+    fid = await _seed(client, user="alice", sentiment="idea", message="add dark mode please")
+    resp = await client.patch(
+        f"/api/admin/feedback/{fid}",
+        json={"status": "read", "admin_notes": "good idea, tracked"},
+        headers=make_auth_header("boss"),
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["status"] == "read"
+    assert body["admin_notes"] == "good idea, tracked"
+    assert body["read_by_user_id"] == "boss"

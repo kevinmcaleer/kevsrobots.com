@@ -16,7 +16,7 @@ from fastapi.responses import Response
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import require_admin
+from ..auth import require_feedback_admin
 from ..db import get_session
 from ..models import Feedback
 from ..schemas import (
@@ -59,6 +59,7 @@ def _row_to_response(row: Feedback) -> FeedbackResponse:
         screenshot_url=screenshot_url,
         read_at=row.read_at,
         read_by_user_id=row.read_by_user_id,
+        admin_notes=row.admin_notes,
         created_at=row.created_at,
         updated_at=row.updated_at,
     )
@@ -94,17 +95,22 @@ async def list_feedback(
     status_filter: Optional[str] = Query(default=None, alias="status"),
     sentiment: list[str] = Query(default_factory=list),
     q: Optional[str] = Query(default=None),
+    user_id: Optional[str] = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
-    admin: str = Depends(require_admin),
+    admin: str = Depends(require_feedback_admin),
     session: AsyncSession = Depends(get_session),
 ) -> FeedbackListResponse:
     """List feedback rows, newest-first.
 
     Sentiment may be repeated or comma-separated. The ``q`` filter is a
-    case-insensitive substring on either ``message`` or ``page_url``.
+    case-insensitive substring on either ``message`` or ``page_url``. The
+    ``user_id`` filter narrows to one reporter — e.g. ``_snakie_anon`` for
+    reports raised from the Snakie desktop app (its Bug Tracker uses this).
     """
     base_filters = []
+    if user_id:
+        base_filters.append(Feedback.user_id == user_id)
     if status_filter:
         if status_filter not in FEEDBACK_STATUSES:
             raise HTTPException(
@@ -155,7 +161,7 @@ async def list_feedback(
     response_model=FeedbackCountsResponse,
 )
 async def feedback_counts(
-    admin: str = Depends(require_admin),
+    admin: str = Depends(require_feedback_admin),
     session: AsyncSession = Depends(get_session),
 ) -> FeedbackCountsResponse:
     """Aggregate counts for the inbox header strip."""
@@ -197,7 +203,7 @@ async def feedback_counts(
 )
 async def get_feedback(
     feedback_id: int,
-    admin: str = Depends(require_admin),
+    admin: str = Depends(require_feedback_admin),
     session: AsyncSession = Depends(get_session),
 ) -> FeedbackResponse:
     row = await session.get(Feedback, feedback_id)
@@ -216,10 +222,15 @@ async def get_feedback(
 async def update_feedback_status(
     feedback_id: int,
     body: FeedbackUpdateStatus,
-    admin: str = Depends(require_admin),
+    admin: str = Depends(require_feedback_admin),
     session: AsyncSession = Depends(get_session),
 ) -> FeedbackResponse:
-    """Transition feedback status.
+    """Update a feedback row's status and/or the maintainer's private notes.
+
+    Only fields PRESENT in the request body are applied (via
+    ``model_fields_set``), so a Bug-Tracker "Close" sends ``{"status":
+    "archived"}`` and a notes save sends ``{"admin_notes": "..."}`` without
+    disturbing the other. Sending neither is a harmless no-op.
 
     When transitioning *into* ``read``, we stamp ``read_at`` and
     ``read_by_user_id`` so the admin UI can show "marked read 5m ago by
@@ -233,19 +244,29 @@ async def update_feedback_status(
             detail="Feedback not found",
         )
 
-    previous = row.status
-    row.status = body.status
-    row.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    sent = body.model_fields_set
+    changed = False
 
-    if body.status == "read" and previous != "read":
-        row.read_at = row.updated_at
-        row.read_by_user_id = admin
-    # Note: we intentionally do NOT clear read_at / read_by when
-    # transitioning back to unread or archived — that history is useful
-    # in the audit trail.
+    if "status" in sent and body.status is not None:
+        previous = row.status
+        row.status = body.status
+        if body.status == "read" and previous != "read":
+            # read_at / read_by are stamped now; we intentionally do NOT clear
+            # them on a later transition back to unread/archived — that history
+            # is useful in the audit trail.
+            row.read_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            row.read_by_user_id = admin
+        changed = True
 
-    await session.commit()
-    await session.refresh(row)
+    if "admin_notes" in sent:
+        # May be None to clear the notes.
+        row.admin_notes = body.admin_notes
+        changed = True
+
+    if changed:
+        row.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        await session.commit()
+        await session.refresh(row)
     return _row_to_response(row)
 
 
@@ -255,7 +276,7 @@ async def update_feedback_status(
 )
 async def delete_feedback(
     feedback_id: int,
-    admin: str = Depends(require_admin),
+    admin: str = Depends(require_feedback_admin),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     """Hard delete a row and any associated screenshot file."""
@@ -283,7 +304,7 @@ async def delete_feedback(
 @router.get("/api/admin/feedback/{feedback_id}/screenshot")
 async def view_feedback_screenshot(
     feedback_id: int,
-    admin: str = Depends(require_admin),
+    admin: str = Depends(require_feedback_admin),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
     """Serve back the screenshot bytes for an admin viewer.

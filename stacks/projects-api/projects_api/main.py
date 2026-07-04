@@ -18,6 +18,7 @@ from .db import (
     add_bom_part_id_if_missing,
     add_bom_part_revision_id_if_missing,
     add_bom_supplier_id_if_missing,
+    add_feedback_admin_notes_if_missing,
     add_instruction_step_type_if_missing,
     add_library_symbol_current_revision_if_missing,
     add_library_symbol_fork_columns_if_missing,
@@ -141,6 +142,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Editor content-surface toggle: ensure projects.content_mode column
     # exists on legacy Postgres deployments (defaults to 'markdown').
     await add_project_content_mode_if_missing()
+    # Issue #206: ensure feedback.admin_notes column exists on legacy Postgres
+    # deployments (the Snakie dev-mode Bug Tracker's triage notes).
+    await add_feedback_admin_notes_if_missing()
     # Related-links Type dropdown: the chatter-era project_links table
     # carries a CHECK allowing only the legacy link_type vocabulary, so
     # saving tutorial/documentation/other 500s. Drop it — validation

@@ -1257,6 +1257,45 @@ async def add_project_file_description_if_missing() -> None:
             ))
 
 
+async def add_feedback_admin_notes_if_missing() -> None:
+    """Additive migration for the Snakie dev-mode Bug Tracker (issue #206).
+
+    Adds ``admin_notes`` (TEXT, nullable) to the existing ``feedback`` table
+    when it does not already exist — the maintainer's private triage notes.
+    SQLAlchemy's ``create_all`` does not ALTER existing tables, so this
+    idempotent helper keeps Postgres deployments in sync. Safe to run on every
+    startup; no-op when the column is already present. Postgres-only — SQLite
+    test runs use a fresh in-memory DB which already includes the new column
+    via ``create_all``.
+
+    Mirrors ``add_project_file_description_if_missing`` — same
+    probe-then-ALTER pattern.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'feedback'"
+        ))
+        if table_check.first() is None:
+            # Brand-new deployment — create_all on the same startup pass
+            # will build the table with the new column already present.
+            return
+
+        existing = await conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = current_schema() AND table_name = 'feedback' "
+            "AND column_name = 'admin_notes'"
+        ))
+        if existing.first() is None:
+            logger.warning("Adding feedback.admin_notes column (issue #206)")
+            await conn.execute(text(
+                'ALTER TABLE "feedback" ADD COLUMN "admin_notes" TEXT'
+            ))
+
+
 async def add_project_content_mode_if_missing() -> None:
     """Additive migration for the editor content-surface toggle.
 

@@ -1207,6 +1207,9 @@ class Feedback(Base):
     # Admin bookkeeping for the "mark read" workflow.
     read_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     read_by_user_id: Mapped[Optional[str]] = mapped_column(String(100))
+    # Maintainer's private notes on a report (Snakie dev-mode Bug Tracker).
+    # Never shown to the reporter — internal triage only.
+    admin_notes: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )

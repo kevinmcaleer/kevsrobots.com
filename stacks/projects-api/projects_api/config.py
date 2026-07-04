@@ -45,6 +45,15 @@ class Settings(BaseSettings):
     # authenticated-only unless a key is configured. Rotate the key if abused.
     snakie_feedback_key: str = ""
 
+    # Shared ADMIN key that lets the maintainer's Snakie desktop app (its
+    # dev-mode Bug Tracker) READ + MANAGE feedback without a Chatter session,
+    # by sending it as the `X-Snakie-Admin-Key` header (see auth.require_feedback_admin).
+    # Unlike `snakie_feedback_key` (a write-only key baked into every build), this
+    # is a READ/MANAGE key that must ONLY live on the maintainer's machine — never
+    # baked into a shipped build. Empty (the default) DISABLES the desktop admin
+    # path, so the feedback inbox stays Chatter-admin-only unless configured.
+    snakie_admin_key: str = ""
+
     # Base URL for the Chatter auth service. Used by the parts catalog
     # account-age gate to look up `account_created_at` from `/api/me`.
     chatter_base_url: str = "https://chatter.kevsrobots.com"

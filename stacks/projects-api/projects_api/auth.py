@@ -9,6 +9,7 @@ so tests can monkeypatch it without spinning up an HTTP mock.
 
 from __future__ import annotations
 
+import hmac
 import logging
 import time
 from datetime import datetime, timezone
@@ -254,6 +255,56 @@ def require_admin(user: str = Depends(get_current_user)) -> str:
             detail="Admin access required",
         )
     return user
+
+
+# Sentinel admin identity recorded when a request authenticates via the
+# first-party desktop admin key rather than a real Chatter admin account — so
+# "read/closed by" audit fields are clearly attributable (never a real username).
+SNAKIE_ADMIN = "_snakie_admin"
+
+
+def _is_snakie_admin(x_snakie_admin_key: Optional[str]) -> bool:
+    """True when the maintainer's desktop app presents the configured
+    ``X-Snakie-Admin-Key``.
+
+    Constant-time compared on UTF-8 bytes (``hmac.compare_digest`` rejects
+    ``str`` inputs with non-ASCII characters, which would otherwise 500). Returns
+    False when no key is configured, so the desktop admin path is DISABLED by
+    default and the inbox stays Chatter-admin-only.
+    """
+    key = get_settings().snakie_admin_key
+    if not key or not x_snakie_admin_key:
+        return False
+    return hmac.compare_digest(x_snakie_admin_key.encode("utf-8"), key.encode("utf-8"))
+
+
+async def require_feedback_admin(
+    x_snakie_admin_key: Optional[str] = Header(default=None, alias="X-Snakie-Admin-Key"),
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+    session: AsyncSession = Depends(get_session),
+) -> str:
+    """Admin gate for the feedback inbox accepting EITHER auth path:
+
+    * the maintainer's FIRST-PARTY desktop app (Snakie's dev-mode Bug Tracker)
+      presenting the shared ``X-Snakie-Admin-Key`` — returns :data:`SNAKIE_ADMIN`.
+      Gated by ``snakie_admin_key`` so it's off unless configured;
+    * a logged-in Chatter ADMIN (the website inbox) — same rule as
+      :func:`require_admin`.
+
+    Returns the resolved admin identity. 401 when neither auth is present, 403
+    when a Chatter user isn't an admin.
+    """
+    if _is_snakie_admin(x_snakie_admin_key):
+        return SNAKIE_ADMIN
+    username = await get_current_user(access_token, authorization, session)
+    settings = get_settings()
+    if username not in settings.admin_usernames_list:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return username
 
 
 def _extract_token(access_token: Optional[str], authorization: Optional[str]) -> Optional[str]:

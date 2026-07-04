@@ -1525,6 +1525,7 @@ class FeedbackResponse(BaseModel):
     screenshot_url: Optional[str] = None
     read_at: Optional[datetime] = None
     read_by_user_id: Optional[str] = None
+    admin_notes: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -1537,9 +1538,16 @@ class FeedbackListResponse(BaseModel):
 
 
 class FeedbackUpdateStatus(BaseModel):
-    """Body of PATCH /api/admin/feedback/{id}."""
+    """Body of PATCH /api/admin/feedback/{id}.
 
-    status: str = Field(..., pattern=r"^(unread|read|archived)$")
+    Both fields are optional so the caller can update the status, the notes, or
+    both. Only fields actually present in the request body are applied (the
+    router inspects ``model_fields_set``), so PATCHing ``{"admin_notes": null}``
+    clears the notes while omitting the key leaves them untouched.
+    """
+
+    status: Optional[str] = Field(default=None, pattern=r"^(unread|read|archived)$")
+    admin_notes: Optional[str] = Field(default=None, max_length=20000)
 
 
 class FeedbackCountsResponse(BaseModel):
