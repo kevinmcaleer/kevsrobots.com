@@ -36,7 +36,7 @@ Ahoy there Makers,
 
 Here's a question I keep coming back to: if building robots with code was actually easy, what would that even look like? What does an IDE even look like, in a post-code era?
 
-Well — I built the answer. It's called Snakie, and this post is the full, standalone write-up: the editor itself, the features, the real code you'll actually type, the parts on my desk while I filmed the demo, and the gotchas that didn't fit in the video. If you want the tour with sound effects and a live drone wobble, [watch the video]({{confirm video URL}}) — but everything you need to actually go and use this lives here.
+Well — I built the answer. It's called Snakie, and this post is the full, standalone write-up: the editor itself, the features, the real code you'll actually type, the parts on my desk while I filmed the demo, and the gotchas that didn't fit in the video. If you want the tour with sound effects and a live drone wobble, but everything you need to actually go and use this lives here.
 
 ---
 
