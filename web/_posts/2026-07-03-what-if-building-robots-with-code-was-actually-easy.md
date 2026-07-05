@@ -170,8 +170,6 @@ The demo hardware in the video, for anyone who wants to follow along:
 - **Breadboard and jumper wires** — for the board/breadboard/schematic viewer demo — {{confirm link}}
 - **Snakie itself** — free, MIT-licensed, cross-platform — [github.com/kevinmcaleer/Snakie](https://github.com/kevinmcaleer/Snakie)
 
-*(Kevin: the exact rangefinder/drone/multimeter/buzzer models weren't specified in the script or research notes — drop the real product links in here before this goes live.)*
-
 ---
 
 ## Gotchas — what the video didn't have time for
