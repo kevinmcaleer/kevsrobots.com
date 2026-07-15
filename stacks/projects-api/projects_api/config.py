@@ -26,7 +26,9 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./projects.db"
     port: int = 8300
 
-    cors_origins: str = "https://www.kevsrobots.com,http://localhost:4000"
+    # app.snakie.org posts anonymous Snakie bug reports (X-Snakie-Key) from the
+    # browser, so it needs CORS — keep it in the server's CORS_ORIGINS env too.
+    cors_origins: str = "https://www.kevsrobots.com,https://app.snakie.org,http://localhost:4000"
 
     @computed_field
     @property
