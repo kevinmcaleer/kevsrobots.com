@@ -1,10 +1,20 @@
+import os
+import sys
+
 import requests
 import yaml
 import time
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Cloudflare API Settings
-CLOUDFLARE_API_TOKEN = "K_F7Ab3rtoE-6wdjKKTNrovLqFBVNf-3jCFB39a8"
-ZONE_ID = "e06ab6d949dd97494778641a47a50c6b"  # Get this from Cloudflare Dashboard
+CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
+ZONE_ID = os.getenv("CLOUDFLARE_ZONE_ID")  # Get this from Cloudflare Dashboard
+
+if not CLOUDFLARE_API_TOKEN or not ZONE_ID:
+    sys.exit("Error: set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID in the environment or a .env file")
 
 # Headers for the request
 HEADERS = {
