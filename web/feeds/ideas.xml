@@ -13,7 +13,7 @@
 		<sy:updateFrequency>{{ site.feed_update_frequency | default: 1 | xml_escape }}</sy:updateFrequency>
 		<link>{{ site.url }}</link>
 		<atom:link href="{{ site.url }}/{{ page.path }}" rel="self" type="application/rss+xml" />
-		<lastBuildDate>{% for post in site.posts limit:1 %}{{ post.published | date_to_rfc822 }}{% endfor %}</lastBuildDate>
+		<lastBuildDate>{% for post in site.posts limit:1 %}{{ post.date | date_to_rfc822 }}{% endfor %}</lastBuildDate>
 
 		{% for post in site.posts %}
 		{% if post.groups %}
@@ -27,7 +27,7 @@
 				{% else %}
 					<description>{{ post.content | xml_escape }}</description>
 				{% endif %}
-				<pubDate>{{ post.published | date_to_rfc822 }}</pubDate>
+				<pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
 				<link>https://youtu.be/{{ post.video_id }}</link>
 				<guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
 			</item>
