@@ -43,7 +43,7 @@ include_likes - include like comment summary if true
     <a href="{{include.link}}" class="text-decoration-none">
         <div class="card h-100 card-hover shadow-hover {% if include.bg_color %}{{ include.bg_color }}{% else %}bg-light{% endif %} rounded-3 {% if include.noborder %}border-0{% endif %}">
             {% if include.img != None %}
-            <img src="{{include.img}}" class="card-img-top" alt="{{include.cardtitle}}">
+            <img src="{{include.img}}" class="card-img-top" alt="{{include.cardtitle | escape}}">
             {% endif %}
             <div class="card-body">
               {% if include.small_title %}
