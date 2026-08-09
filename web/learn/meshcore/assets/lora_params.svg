@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" width="1200" height="470" role="img" aria-label="The three LoRa dials: spreading factor, bandwidth and coding rate, and what each trades away">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .card{fill:#1f2c3a;stroke:#2f4157;stroke-width:2}
+      .h{font:700 24px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .k{font:700 15px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .t{font:400 16px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#c7d6e5}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .foot{font:700 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#16202b}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="470"/>
+  <text class="title" x="40" y="52">The three dials that set your range</text>
+  <text class="sub" x="40" y="84">Every one of them trades airtime for reach. Airtime is the scarce resource.</text>
+
+  <g transform="translate(40,112)">
+    <rect class="card" width="360" height="250" rx="14"/>
+    <text class="h" x="24" y="48">Spreading Factor</text>
+    <text class="k" x="24" y="80">SF7 — SF12</text>
+    <line x1="24" y1="104" x2="336" y2="104" stroke="#2f4157" stroke-width="2"/>
+    <text class="t" x="24" y="138">Each step up roughly</text>
+    <text class="t" x="24" y="162">doubles time on air</text>
+    <text class="t" x="24" y="186">and buys ~2.5 dB.</text>
+    <rect x="24" y="206" width="312" height="10" rx="5" fill="#2f4157"/>
+    <rect x="24" y="206" width="120" height="10" rx="5" fill="#4cc9f0"/>
+    <text class="k" x="24" y="238" fill="#4cc9f0">UK preset: SF8</text>
+  </g>
+
+  <g transform="translate(420,112)">
+    <rect class="card" width="360" height="250" rx="14"/>
+    <text class="h" x="24" y="48">Bandwidth</text>
+    <text class="k" x="24" y="80">62.5 / 125 / 250 kHz</text>
+    <line x1="24" y1="104" x2="336" y2="104" stroke="#2f4157" stroke-width="2"/>
+    <text class="t" x="24" y="138">Halving bandwidth</text>
+    <text class="t" x="24" y="162">halves the data rate</text>
+    <text class="t" x="24" y="186">and gains ~3 dB.</text>
+    <rect x="24" y="206" width="312" height="10" rx="5" fill="#2f4157"/>
+    <rect x="24" y="206" width="80" height="10" rx="5" fill="#f7b32b"/>
+    <text class="k" x="24" y="238" fill="#f7b32b">UK preset: 62.5 kHz</text>
+  </g>
+
+  <g transform="translate(800,112)">
+    <rect class="card" width="360" height="250" rx="14"/>
+    <text class="h" x="24" y="48">Coding Rate</text>
+    <text class="k" x="24" y="80">CR5 — CR8</text>
+    <line x1="24" y1="104" x2="336" y2="104" stroke="#2f4157" stroke-width="2"/>
+    <text class="t" x="24" y="138">More error correction</text>
+    <text class="t" x="24" y="162">survives interference,</text>
+    <text class="t" x="24" y="186">costs transmit time.</text>
+    <rect x="24" y="206" width="312" height="10" rx="5" fill="#2f4157"/>
+    <rect x="24" y="206" width="260" height="10" rx="5" fill="#b58cff"/>
+    <text class="k" x="24" y="238" fill="#b58cff">UK preset: CR8</text>
+  </g>
+
+  <rect x="40" y="386" width="1120" height="52" rx="12" fill="#7ee787"/>
+  <text class="foot" x="64" y="418">Frequency, bandwidth and spreading factor must match EXACTLY on every node that needs to hear you.</text>
+</svg>

@@ -1,0 +1,42 @@
+- name: MeshCore Room Servers and Sensors
+  author: Kevin McAleer
+  date_created: 2026-08-05
+  date_published: 2026-08-05
+  layout: course
+  cover: assets/cover.png
+  groups:
+      - electronics
+      - lora
+      - meshcore
+  description: >-
+     Part 2 of the MeshCore series. Build the other two node types - a room server that stores messages for people who were out of range, and a sensor node that reports temperature, battery and tank levels across kilometres.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_beyond_repeaters.md
+      - 02_hardware.md
+  - section:
+      name: The Room Server
+      content:
+      - 03_what_is_a_room_server.md
+      - 04_flashing_the_room_server.md
+      - 05_room_server_config.md
+      - 06_joining_a_room.md
+      - 07_permissions.md
+      - 08_room_operations.md
+  - section:
+      name: The Sensor Node
+      content:
+      - 09_what_is_a_sensor_node.md
+      - 10_flashing_the_sensor.md
+      - 11_environment_sensor.md
+      - 12_battery_telemetry.md
+      - 13_contact_and_level.md
+      - 14_reading_telemetry.md
+  - section:
+      name: Going Further
+      content:
+      - 15_troubleshooting.md
+      - 16_next_steps.md

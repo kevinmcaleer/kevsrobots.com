@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" width="1200" height="500" role="img" aria-label="Two identical Heltec V3 boards, one flashed as a repeater and one as a companion client paired to a phone">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .h{font:700 24px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .t{font:400 16px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .oled{font:700 12px ui-monospace,Menlo,Consolas,monospace;fill:#0d1620}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .panel{fill:#1f2c3a;stroke:#2f4157;stroke-width:2}
+      .pcb{fill:#1b3a2e;stroke:#2f6b52;stroke-width:2}
+      .chip{fill:#0f1a24}
+      .tag{font:700 13px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#16202b}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="500"/>
+  <text class="title" x="40" y="52">Two identical boards, two different jobs</text>
+  <text class="sub" x="40" y="84">Heltec WiFi LoRa 32 V3, 868 MHz, about £15 each. The firmware is the only difference.</text>
+
+  <g transform="translate(40,112)">
+    <rect class="panel" width="545" height="350" rx="14"/>
+    <rect x="24" y="24" width="104" height="26" rx="13" fill="#f7b32b"/>
+    <text class="tag" x="38" y="42">NODE 1</text>
+    <text class="h" x="140" y="46">Repeater</text>
+
+    <g transform="translate(60,110)">
+      <rect class="pcb" x="0" y="0" width="290" height="140" rx="8"/>
+      <rect x="18" y="18" width="120" height="58" rx="4" fill="#dfe9f2"/>
+      <text class="oled" x="26" y="38">Kev-Loft-01</text>
+      <text class="oled" x="26" y="56">up 3d 04h</text>
+      <text class="oled" x="26" y="72">rx1482 tx391</text>
+      <rect class="chip" x="160" y="18" width="60" height="46" rx="4"/>
+      <rect class="chip" x="160" y="76" width="60" height="42" rx="4"/>
+      <rect x="240" y="26" width="34" height="18" rx="4" fill="#8fa3b5"/>
+      <path d="M262,26 L262,-26" stroke="#f7b32b" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="262" cy="-31" r="5" fill="#f7b32b"/>
+      <rect x="18" y="96" width="46" height="22" rx="4" fill="#8fa3b5"/>
+    </g>
+
+    <text class="t" x="60" y="284">Firmware: Repeater</text>
+    <text class="t" x="60" y="310">Set up over the USB console, then over the air</text>
+    <text class="t" x="60" y="336">Lives high up, on mains power, no phone</text>
+  </g>
+
+  <g transform="translate(615,112)">
+    <rect class="panel" width="545" height="350" rx="14"/>
+    <rect x="24" y="24" width="104" height="26" rx="13" fill="#4cc9f0"/>
+    <text class="tag" x="38" y="42">NODE 2</text>
+    <text class="h" x="140" y="46">Companion</text>
+
+    <g transform="translate(40,110)">
+      <rect class="pcb" x="0" y="0" width="250" height="140" rx="8"/>
+      <rect x="18" y="18" width="112" height="58" rx="4" fill="#dfe9f2"/>
+      <text class="oled" x="26" y="38">Kev-Handheld</text>
+      <text class="oled" x="26" y="56">BLE ready</text>
+      <text class="oled" x="26" y="72">869.618 SF8</text>
+      <rect class="chip" x="150" y="18" width="54" height="46" rx="4"/>
+      <rect class="chip" x="150" y="76" width="54" height="42" rx="4"/>
+      <rect x="214" y="26" width="30" height="18" rx="4" fill="#8fa3b5"/>
+      <path d="M232,26 L232,-26" stroke="#4cc9f0" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="232" cy="-31" r="5" fill="#4cc9f0"/>
+    </g>
+
+    <g transform="translate(360,94)">
+      <rect x="0" y="0" width="110" height="180" rx="14" fill="#0f1a24" stroke="#4cc9f0" stroke-width="2.5"/>
+      <rect x="10" y="18" width="90" height="146" rx="6" fill="#16202b"/>
+      <rect x="18" y="30" width="60" height="18" rx="9" fill="#2f4157"/>
+      <rect x="18" y="58" width="74" height="18" rx="9" fill="#4cc9f0" opacity="0.85"/>
+      <rect x="30" y="86" width="62" height="18" rx="9" fill="#2f4157"/>
+      <rect x="18" y="114" width="50" height="18" rx="9" fill="#4cc9f0" opacity="0.85"/>
+      <circle cx="55" cy="172" r="4" fill="#4cc9f0"/>
+    </g>
+    <g stroke="#4cc9f0" stroke-width="2.5" fill="none" opacity="0.85">
+      <path d="M312,168 q16,-14 32,0"/>
+      <path d="M308,184 q20,-20 40,0"/>
+    </g>
+    <text class="t" x="304" y="210" fill="#4cc9f0">BLE</text>
+
+    <text class="t" x="40" y="284">Firmware: Companion (BLE)</text>
+    <text class="t" x="40" y="310">Set up from the MeshCore phone app</text>
+    <text class="t" x="40" y="336">Goes in your pocket. Never repeats.</text>
+  </g>
+</svg>

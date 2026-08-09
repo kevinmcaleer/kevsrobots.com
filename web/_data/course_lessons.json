@@ -1694,6 +1694,201 @@
     ]
   },
   {
+    "slug": "meshcore",
+    "name": "Off-Grid Messaging with MeshCore",
+    "description": "Build your own off-grid LoRa mesh network with MeshCore and two cheap Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal, no subscription.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2026-08-05",
+    "groups": [
+      "electronics",
+      "lora",
+      "meshcore"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/meshcore/00_intro.html"
+      },
+      {
+        "file": "01_what_is_meshcore.md",
+        "section": "Overview",
+        "url": "/learn/meshcore/01_what_is_meshcore.html"
+      },
+      {
+        "file": "02_how_lora_works.md",
+        "section": "Overview",
+        "url": "/learn/meshcore/02_how_lora_works.html"
+      },
+      {
+        "file": "03_the_hardware.md",
+        "section": "Hardware",
+        "url": "/learn/meshcore/03_the_hardware.html"
+      },
+      {
+        "file": "04_antennas_and_the_law.md",
+        "section": "Hardware",
+        "url": "/learn/meshcore/04_antennas_and_the_law.html"
+      },
+      {
+        "file": "05_flashing.md",
+        "section": "Flashing the Firmware",
+        "url": "/learn/meshcore/05_flashing.html"
+      },
+      {
+        "file": "06_radio_settings.md",
+        "section": "Flashing the Firmware",
+        "url": "/learn/meshcore/06_radio_settings.html"
+      },
+      {
+        "file": "07_repeater_setup.md",
+        "section": "Build the Repeater",
+        "url": "/learn/meshcore/07_repeater_setup.html"
+      },
+      {
+        "file": "08_repeater_placement.md",
+        "section": "Build the Repeater",
+        "url": "/learn/meshcore/08_repeater_placement.html"
+      },
+      {
+        "file": "09_client_setup.md",
+        "section": "Build the Client",
+        "url": "/learn/meshcore/09_client_setup.html"
+      },
+      {
+        "file": "10_first_contact.md",
+        "section": "Build the Client",
+        "url": "/learn/meshcore/10_first_contact.html"
+      },
+      {
+        "file": "11_channels.md",
+        "section": "Using Your Mesh",
+        "url": "/learn/meshcore/11_channels.html"
+      },
+      {
+        "file": "12_paths_and_routing.md",
+        "section": "Using Your Mesh",
+        "url": "/learn/meshcore/12_paths_and_routing.html"
+      },
+      {
+        "file": "13_remote_admin.md",
+        "section": "Using Your Mesh",
+        "url": "/learn/meshcore/13_remote_admin.html"
+      },
+      {
+        "file": "14_troubleshooting.md",
+        "section": "Going Further",
+        "url": "/learn/meshcore/14_troubleshooting.html"
+      },
+      {
+        "file": "15_next_steps.md",
+        "section": "Going Further",
+        "url": "/learn/meshcore/15_next_steps.html"
+      }
+    ]
+  },
+  {
+    "slug": "meshcore_rooms_sensors",
+    "name": "MeshCore Room Servers and Sensors",
+    "description": "Part 2 of the MeshCore series. Build the other two node types - a room server that stores messages for people who were out of range, and a sensor node that reports temperature, battery and tank levels across kilometres.",
+    "cover": "assets/cover.png",
+    "author": "Kevin McAleer",
+    "date_published": "2026-08-05",
+    "groups": [
+      "electronics",
+      "lora",
+      "meshcore"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/meshcore_rooms_sensors/00_intro.html"
+      },
+      {
+        "file": "01_beyond_repeaters.md",
+        "section": "Overview",
+        "url": "/learn/meshcore_rooms_sensors/01_beyond_repeaters.html"
+      },
+      {
+        "file": "02_hardware.md",
+        "section": "Overview",
+        "url": "/learn/meshcore_rooms_sensors/02_hardware.html"
+      },
+      {
+        "file": "03_what_is_a_room_server.md",
+        "section": "The Room Server",
+        "url": "/learn/meshcore_rooms_sensors/03_what_is_a_room_server.html"
+      },
+      {
+        "file": "04_flashing_the_room_server.md",
+        "section": "The Room Server",
+        "url": "/learn/meshcore_rooms_sensors/04_flashing_the_room_server.html"
+      },
+      {
+        "file": "05_room_server_config.md",
+        "section": "The Room Server",
+        "url": "/learn/meshcore_rooms_sensors/05_room_server_config.html"
+      },
+      {
+        "file": "06_joining_a_room.md",
+        "section": "The Room Server",
+        "url": "/learn/meshcore_rooms_sensors/06_joining_a_room.html"
+      },
+      {
+        "file": "07_permissions.md",
+        "section": "The Room Server",
+        "url": "/learn/meshcore_rooms_sensors/07_permissions.html"
+      },
+      {
+        "file": "08_room_operations.md",
+        "section": "The Room Server",
+        "url": "/learn/meshcore_rooms_sensors/08_room_operations.html"
+      },
+      {
+        "file": "09_what_is_a_sensor_node.md",
+        "section": "The Sensor Node",
+        "url": "/learn/meshcore_rooms_sensors/09_what_is_a_sensor_node.html"
+      },
+      {
+        "file": "10_flashing_the_sensor.md",
+        "section": "The Sensor Node",
+        "url": "/learn/meshcore_rooms_sensors/10_flashing_the_sensor.html"
+      },
+      {
+        "file": "11_environment_sensor.md",
+        "section": "The Sensor Node",
+        "url": "/learn/meshcore_rooms_sensors/11_environment_sensor.html"
+      },
+      {
+        "file": "12_battery_telemetry.md",
+        "section": "The Sensor Node",
+        "url": "/learn/meshcore_rooms_sensors/12_battery_telemetry.html"
+      },
+      {
+        "file": "13_contact_and_level.md",
+        "section": "The Sensor Node",
+        "url": "/learn/meshcore_rooms_sensors/13_contact_and_level.html"
+      },
+      {
+        "file": "14_reading_telemetry.md",
+        "section": "The Sensor Node",
+        "url": "/learn/meshcore_rooms_sensors/14_reading_telemetry.html"
+      },
+      {
+        "file": "15_troubleshooting.md",
+        "section": "Going Further",
+        "url": "/learn/meshcore_rooms_sensors/15_troubleshooting.html"
+      },
+      {
+        "file": "16_next_steps.md",
+        "section": "Going Further",
+        "url": "/learn/meshcore_rooms_sensors/16_next_steps.html"
+      }
+    ]
+  },
+  {
     "slug": "micropython",
     "name": "Learn MicroPython - The basics",
     "description": "Get started with MicroPython, What Python is, where to download it and which software to use to develop MicroPython code",

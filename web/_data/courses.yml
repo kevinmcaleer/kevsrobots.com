@@ -286,6 +286,32 @@
   link: /learn/markdown/01_overview.html
   name: Mastering Markdown for Documentation with Jekyll
 - author: Kevin McAleer
+  cover: /learn/meshcore/assets/cover.png
+  date_published: 2026-08-05
+  description: Build your own off-grid LoRa mesh network with MeshCore and two cheap
+    Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal,
+    no subscription.
+  duration: 1h 17m
+  groups:
+  - electronics
+  - lora
+  - meshcore
+  link: /learn/meshcore/00_intro.html
+  name: Off-Grid Messaging with MeshCore
+- author: Kevin McAleer
+  cover: /learn/meshcore_rooms_sensors/assets/cover.png
+  date_published: 2026-08-05
+  description: Part 2 of the MeshCore series. Build the other two node types - a room
+    server that stores messages for people who were out of range, and a sensor node
+    that reports temperature, battery and tank levels across kilometres.
+  duration: 1h 37m
+  groups:
+  - electronics
+  - lora
+  - meshcore
+  link: /learn/meshcore_rooms_sensors/00_intro.html
+  name: MeshCore Room Servers and Sensors
+- author: Kevin McAleer
   cover: /learn/micropython/assets/micropython.jpg
   date_published: 2022-12-04
   description: Get started with MicroPython, What Python is, where to download it

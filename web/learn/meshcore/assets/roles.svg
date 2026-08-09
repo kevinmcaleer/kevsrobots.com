@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="1200" height="480" role="img" aria-label="The four MeshCore device roles: Companion, Repeater, Room Server and Sensor">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .card{fill:#1f2c3a;stroke:#2f4157;stroke-width:2;rx:14}
+      .h{font:700 26px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .t{font:400 17px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .tag{font:700 13px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#16202b}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="480"/>
+  <text class="title" x="40" y="56">The four MeshCore roles</text>
+  <text class="sub" x="40" y="88">Same board, same price — the firmware decides what it becomes</text>
+
+  <g transform="translate(40,120)">
+    <rect class="card" width="270" height="320"/>
+    <rect x="20" y="22" width="132" height="26" rx="13" fill="#4cc9f0"/>
+    <text class="tag" x="34" y="40">THIS COURSE</text>
+    <text class="h" x="20" y="90">Companion</text>
+    <text class="t" x="20" y="128">Pairs to your phone</text>
+    <text class="t" x="20" y="154">over Bluetooth LE.</text>
+    <text class="t" x="20" y="196">Sends and receives</text>
+    <text class="t" x="20" y="222">your messages.</text>
+    <text class="t" x="20" y="264" fill="#ff9a9a">Never repeats</text>
+    <text class="t" x="20" y="290" fill="#ff9a9a">other traffic.</text>
+  </g>
+
+  <g transform="translate(330,120)">
+    <rect class="card" width="270" height="320"/>
+    <rect x="20" y="22" width="132" height="26" rx="13" fill="#4cc9f0"/>
+    <text class="tag" x="34" y="40">THIS COURSE</text>
+    <text class="h" x="20" y="90">Repeater</text>
+    <text class="t" x="20" y="128">Sits high up with</text>
+    <text class="t" x="20" y="154">power, no phone.</text>
+    <text class="t" x="20" y="196">Forwards packets</text>
+    <text class="t" x="20" y="222">selectively — not</text>
+    <text class="t" x="20" y="248">everything it hears.</text>
+    <text class="t" x="20" y="290" fill="#7ee787">Full remote CLI.</text>
+  </g>
+
+  <g transform="translate(620,120)">
+    <rect class="card" width="270" height="320"/>
+    <text class="h" x="20" y="90">Room Server</text>
+    <text class="t" x="20" y="128">A bulletin board</text>
+    <text class="t" x="20" y="154">for the mesh.</text>
+    <text class="t" x="20" y="196">Keeps a rolling</text>
+    <text class="t" x="20" y="222">buffer of recent</text>
+    <text class="t" x="20" y="248">posts.</text>
+    <text class="t" x="20" y="290" fill="#f7b32b">Catch up later.</text>
+  </g>
+
+  <g transform="translate(910,120)">
+    <rect class="card" width="250" height="320"/>
+    <text class="h" x="20" y="90">Sensor</text>
+    <text class="t" x="20" y="128">Reports telemetry</text>
+    <text class="t" x="20" y="154">into the mesh.</text>
+    <text class="t" x="20" y="196">Temperature,</text>
+    <text class="t" x="20" y="222">humidity, battery.</text>
+    <text class="t" x="20" y="290" fill="#b58cff">Long-range IoT.</text>
+  </g>
+</svg>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" width="1200" height="470" role="img" aria-label="Push versus pull telemetry: MeshCore sensors stay asleep and answer only when asked">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .panel{fill:#1f2c3a;stroke:#2f4157;stroke-width:2}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .h{font:700 23px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .t{font:400 16px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .sm{font:400 14px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+    </style>
+    <marker id="p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ff7a7a"/>
+    </marker>
+    <marker id="p2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4cc9f0"/>
+    </marker>
+    <marker id="p3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="470"/>
+  <text class="title" x="40" y="52">Push versus pull</text>
+  <text class="sub" x="40" y="84">MeshCore sensors sleep until somebody asks. That is the whole power budget.</text>
+
+  <!-- push -->
+  <g transform="translate(40,112)">
+    <rect class="panel" width="545" height="318" rx="14"/>
+    <text class="h" x="24" y="46">Typical IoT sensor — push</text>
+    <text class="t" x="24" y="76">Transmits on a timer whether anyone wants it or not</text>
+
+    <g transform="translate(40,120)">
+      <rect x="0" y="0" width="90" height="66" rx="9" fill="#16202b" stroke="#ff7a7a" stroke-width="2.5"/>
+      <text x="16" y="40" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#ff9a9a">sensor</text>
+    </g>
+    <g stroke="#ff7a7a" stroke-width="3" fill="none">
+      <path d="M140,140 L410,140" marker-end="url(#p1)"/>
+      <path d="M140,166 L410,166" marker-end="url(#p1)"/>
+      <path d="M140,192 L410,192" marker-end="url(#p1)"/>
+      <path d="M140,218 L410,218" marker-end="url(#p1)"/>
+    </g>
+    <text class="sm" x="150" y="132" fill="#ff9a9a">every 5 min, forever</text>
+    <g transform="translate(420,140)">
+      <rect x="0" y="0" width="90" height="80" rx="9" fill="#16202b" stroke="#3d5570" stroke-width="2.5"/>
+      <text x="14" y="46" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#8296ab">nobody</text>
+    </g>
+    <text class="t" x="24" y="272" fill="#ff9a9a">Constant airtime. Constant battery drain.</text>
+    <text class="t" x="24" y="296" fill="#ff9a9a">Most transmissions nobody reads.</text>
+  </g>
+
+  <!-- pull -->
+  <g transform="translate(615,112)">
+    <rect class="panel" width="545" height="318" rx="14"/>
+    <text class="h" x="24" y="46">MeshCore sensor — pull</text>
+    <text class="t" x="24" y="76">Dormant until a client requests telemetry</text>
+
+    <g transform="translate(40,140)">
+      <rect x="0" y="0" width="90" height="66" rx="9" fill="#16202b" stroke="#7ee787" stroke-width="2.5"/>
+      <text x="20" y="40" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#7ee787">client</text>
+    </g>
+    <path d="M140,158 L400,158" stroke="#4cc9f0" stroke-width="3.5" fill="none" marker-end="url(#p2)"/>
+    <text class="sm" x="176" y="148" fill="#4cc9f0">"telemetry please"</text>
+    <path d="M400,196 L140,196" stroke="#7ee787" stroke-width="3.5" fill="none" marker-end="url(#p3)"/>
+    <text class="sm" x="176" y="222" fill="#7ee787">4.2°C · 78% · 3.9V — CayenneLPP</text>
+
+    <g transform="translate(410,140)">
+      <rect x="0" y="0" width="90" height="66" rx="9" fill="#16202b" stroke="#7ee787" stroke-width="2.5"/>
+      <text x="12" y="40" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#7ee787">sensor</text>
+    </g>
+    <text class="t" x="24" y="272" fill="#7ee787">Silence is the normal state.</text>
+    <text class="t" x="24" y="296" fill="#7ee787">Months on a battery instead of days.</text>
+  </g>
+</svg>

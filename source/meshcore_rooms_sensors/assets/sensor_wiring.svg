@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-label="Wiring a BME280 breakout to a Heltec V3: VCC to 3V3, GND to GND, SDA to GPIO17, SCL to GPIO18">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .pcb{fill:#1b3a2e;stroke:#2f6b52;stroke-width:2}
+      .bmepcb{fill:#3a1b2e;stroke:#6b2f52;stroke-width:2}
+      .chip{fill:#0f1a24}
+      .pin{font:700 15px ui-monospace,Menlo,Consolas,monospace;fill:#e8eef5}
+      .lbl{font:700 19px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sm{font:400 15px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .warn{font:700 16px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#16202b}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="520"/>
+  <text class="title" x="40" y="52">Four wires, no soldering</text>
+  <text class="sub" x="40" y="84">BME280 breakout to Heltec WiFi LoRa 32 V3</text>
+
+  <!-- wires drawn first so the boards sit on top -->
+  <g fill="none" stroke-width="4" stroke-linecap="round">
+    <path d="M392,180 C 560,180 700,204 852,204" stroke="#f7b32b"/>
+    <path d="M392,226 C 560,226 700,242 852,242" stroke="#8296ab"/>
+    <path d="M392,272 C 560,272 700,280 852,280" stroke="#4cc9f0"/>
+    <path d="M392,318 C 560,318 700,316 852,316" stroke="#b58cff"/>
+  </g>
+
+  <!-- heltec board -->
+  <g transform="translate(70,140)">
+    <rect class="pcb" x="0" y="0" width="330" height="230" rx="10"/>
+    <rect x="22" y="24" width="150" height="70" rx="5" fill="#dfe9f2"/>
+    <text x="32" y="52" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#0d1620">Greenhouse</text>
+    <text x="32" y="72" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#0d1620">869.618 SF8</text>
+    <rect class="chip" x="22" y="112" width="86" height="48" rx="5"/>
+    <rect class="chip" x="22" y="170" width="86" height="40" rx="5"/>
+    <rect x="196" y="24" width="30" height="18" rx="4" fill="#8fa3b5"/>
+    <path d="M211,24 L211,-30" stroke="#4cc9f0" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="211" cy="-35" r="5" fill="#4cc9f0"/>
+
+    <!-- pin column on the right edge -->
+    <g>
+      <text class="pin" x="304" y="46" text-anchor="end">3V3</text>
+      <circle cx="322" cy="40" r="9" fill="#f7b32b"/>
+      <text class="pin" x="304" y="92" text-anchor="end">GND</text>
+      <circle cx="322" cy="86" r="9" fill="#8296ab"/>
+      <text class="pin" x="304" y="138" text-anchor="end">GPIO33</text>
+      <circle cx="322" cy="132" r="9" fill="#4cc9f0"/>
+      <text class="pin" x="304" y="184" text-anchor="end">GPIO34</text>
+      <circle cx="322" cy="178" r="9" fill="#b58cff"/>
+    </g>
+  </g>
+  <text class="lbl" x="70" y="410" fill="#7ee787">Heltec V3</text>
+  <text class="sm" x="70" y="434">GPIO33 = SDA · GPIO34 = SCL — the sensor bus, not the OLED&#39;s</text>
+
+  <!-- bme280 -->
+  <g transform="translate(830,170)">
+    <rect class="bmepcb" x="0" y="0" width="250" height="176" rx="10"/>
+    <rect class="chip" x="150" y="52" width="60" height="60" rx="6"/>
+    <circle cx="180" cy="82" r="7" fill="#3a1b2e" stroke="#b58cff" stroke-width="2"/>
+    <text x="142" y="140" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#d9a8c8">vent hole</text>
+    <g>
+      <circle cx="22" cy="34" r="9" fill="#f7b32b"/><text class="pin" x="42" y="40">VCC</text>
+      <circle cx="22" cy="72" r="9" fill="#8296ab"/><text class="pin" x="42" y="78">GND</text>
+      <circle cx="22" cy="110" r="9" fill="#4cc9f0"/><text class="pin" x="42" y="116">SDA</text>
+      <circle cx="22" cy="146" r="9" fill="#b58cff"/><text class="pin" x="42" y="152">SCL</text>
+    </g>
+  </g>
+  <text class="lbl" x="830" y="384" fill="#d9a8c8">BME280</text>
+  <text class="sm" x="830" y="408">Temperature · humidity · pressure · about £5</text>
+
+  <rect x="70" y="456" width="1060" height="42" rx="11" fill="#f7b32b"/>
+  <text class="warn" x="94" y="483">Not GPIO17/18 — those are the OLED bus. Wire VCC to 3V3, never 5V.</text>
+</svg>

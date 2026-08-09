@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-label="A repeater placed high extends the range between two client nodes that cannot hear each other directly">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .lbl{font:700 20px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sm{font:400 15px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .node{fill:#1f2c3a;stroke:#4cc9f0;stroke-width:3}
+      .rep{fill:#1f2c3a;stroke:#f7b32b;stroke-width:3}
+    </style>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="520"/>
+  <text class="title" x="40" y="52">Why you need a repeater</text>
+  <text class="sub" x="40" y="84">Two clients on the ground cannot see each other. One board on a roof fixes it.</text>
+
+  <rect x="0" y="430" width="1200" height="90" fill="#22303f"/>
+  <path d="M420,430 L520,300 L700,300 L800,430 Z" fill="#2b3b4d"/>
+
+  <!-- repeater on the roof -->
+  <g transform="translate(610,268)">
+    <rect class="rep" x="-42" y="-30" width="84" height="60" rx="10"/>
+    <rect x="-26" y="-16" width="52" height="20" rx="4" fill="#f7b32b" opacity="0.9"/>
+    <path d="M0,-30 L0,-92" stroke="#f7b32b" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="0" cy="-97" r="5" fill="#f7b32b"/>
+  </g>
+  <text class="lbl" x="700" y="152" fill="#f7b32b">Repeater</text>
+  <text class="sm" x="700" y="178">Node 1 — high up, mains powered</text>
+  <text class="sm" x="700" y="200">Forwards packets. No phone attached.</text>
+
+  <!-- blocked direct link -->
+  <path d="M150,398 L1050,398" stroke="#ff7a7a" stroke-width="3" stroke-dasharray="11 9" fill="none"/>
+  <g transform="translate(610,398)">
+    <circle r="21" fill="#16202b" stroke="#ff7a7a" stroke-width="3"/>
+    <path d="M-8,-8 L8,8 M8,-8 L-8,8" stroke="#ff7a7a" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <text class="sm" x="470" y="368" fill="#ff9a9a">blocked — no direct path</text>
+
+  <!-- hops -->
+  <path d="M180,362 C 330,300 460,262 560,252" stroke="#7ee787" stroke-width="4" fill="none" marker-end="url(#arw)"/>
+  <path d="M660,252 C 780,268 900,310 1018,362" stroke="#7ee787" stroke-width="4" fill="none" marker-end="url(#arw)"/>
+  <text class="sm" x="270" y="292" fill="#7ee787">hop 1</text>
+  <text class="sm" x="880" y="300" fill="#7ee787">hop 2</text>
+
+  <!-- clients -->
+  <g transform="translate(150,398)">
+    <rect class="node" x="-40" y="-28" width="80" height="56" rx="9"/>
+    <rect x="-24" y="-14" width="48" height="18" rx="4" fill="#4cc9f0" opacity="0.9"/>
+    <path d="M0,-28 L0,-72" stroke="#4cc9f0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <text class="lbl" x="100" y="478" fill="#4cc9f0">Client A</text>
+  <text class="sm" x="100" y="502">Node 2 + phone</text>
+
+  <g transform="translate(1050,398)">
+    <rect class="node" x="-40" y="-28" width="80" height="56" rx="9"/>
+    <rect x="-24" y="-14" width="48" height="18" rx="4" fill="#4cc9f0" opacity="0.9"/>
+    <path d="M0,-28 L0,-72" stroke="#4cc9f0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <text class="lbl" x="1000" y="478" fill="#4cc9f0">Client B</text>
+  <text class="sm" x="1000" y="502">a friend's node</text>
+</svg>

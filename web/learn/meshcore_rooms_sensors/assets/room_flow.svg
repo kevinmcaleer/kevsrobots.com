@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-label="Store and forward: a post is kept by the room server and delivered when the offline user logs back in">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .h{font:700 19px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sm{font:400 15px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .step{font:700 15px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#16202b}
+      .lane{fill:#1b2732}
+    </style>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/>
+    </marker>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4cc9f0"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="520"/>
+  <text class="title" x="40" y="52">Store and forward</text>
+  <text class="sub" x="40" y="84">The room server holds what you missed until you log back in</text>
+
+  <rect class="lane" x="40" y="120" width="1120" height="90" rx="10"/>
+  <rect class="lane" x="40" y="230" width="1120" height="110" rx="10"/>
+  <rect class="lane" x="40" y="360" width="1120" height="120" rx="10"/>
+
+  <text class="h" x="62" y="152">Alice</text>
+  <text class="sm" x="62" y="176">in range</text>
+
+  <text class="h" x="62" y="266">Room server</text>
+  <text class="sm" x="62" y="290">always on</text>
+
+  <text class="h" x="62" y="398">Bob</text>
+  <text class="sm" x="62" y="422">out of range</text>
+
+  <!-- timeline markers -->
+  <g stroke="#2f4157" stroke-width="2" stroke-dasharray="6 7">
+    <path d="M420,120 L420,480"/>
+    <path d="M700,120 L700,480"/>
+    <path d="M960,120 L960,480"/>
+  </g>
+  <text class="sm" x="300" y="112" fill="#6f8299">09:00</text>
+  <text class="sm" x="590" y="112" fill="#6f8299">09:01</text>
+  <text class="sm" x="820" y="112" fill="#6f8299">all day</text>
+  <text class="sm" x="1010" y="112" fill="#6f8299">17:00</text>
+
+  <!-- step 1: alice posts -->
+  <circle cx="300" cy="162" r="16" fill="#7ee787"/>
+  <text class="step" x="295" y="168">1</text>
+  <text class="sm" x="326" y="152" fill="#7ee787">Alice posts</text>
+  <text class="sm" x="326" y="174">"footpath flooded"</text>
+  <path d="M310,182 L310,246" stroke="#7ee787" stroke-width="3.5" fill="none" marker-end="url(#a1)"/>
+
+  <!-- step 2: stored -->
+  <circle cx="540" cy="272" r="16" fill="#7ee787"/>
+  <text class="step" x="535" y="278">2</text>
+  <text class="sm" x="566" y="264" fill="#7ee787">Written into the buffer</text>
+  <text class="sm" x="566" y="286">32 recent posts, in RAM</text>
+
+  <!-- buffer visual -->
+  <g transform="translate(818,248)">
+    <rect x="0" y="0" width="150" height="52" rx="8" fill="#16202b" stroke="#7ee787" stroke-width="2"/>
+    <rect x="10" y="10" width="90" height="8" rx="4" fill="#7ee787"/>
+    <rect x="10" y="23" width="120" height="8" rx="4" fill="#3d5570"/>
+    <rect x="10" y="36" width="70" height="8" rx="4" fill="#3d5570"/>
+  </g>
+
+  <!-- bob offline -->
+  <g transform="translate(420,420)">
+    <circle r="20" fill="#16202b" stroke="#ff7a7a" stroke-width="3"/>
+    <path d="M-8,-8 L8,8 M8,-8 L-8,8" stroke="#ff7a7a" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <text class="sm" x="450" y="414" fill="#ff9a9a">Bob hears nothing.</text>
+  <text class="sm" x="450" y="436" fill="#ff9a9a">On a plain mesh, the post is gone forever.</text>
+
+  <!-- step 3: bob returns -->
+  <circle cx="1000" cy="420" r="16" fill="#4cc9f0"/>
+  <text class="step" x="995" y="426">3</text>
+  <text class="sm" x="1026" y="426" fill="#4cc9f0">Bob logs in</text>
+  <path d="M1000,398 L1000,306" stroke="#4cc9f0" stroke-width="3.5" fill="none" marker-end="url(#a2)"/>
+  <path d="M1040,306 L1040,398" stroke="#4cc9f0" stroke-width="3.5" fill="none" marker-end="url(#a2)"/>
+  <text class="sm" x="1058" y="356" fill="#4cc9f0">sync</text>
+</svg>

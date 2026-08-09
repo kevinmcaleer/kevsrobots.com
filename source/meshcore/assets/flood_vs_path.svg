@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" width="1200" height="500" role="img" aria-label="Flood routing rebroadcasts through every repeater, path routing uses only the repeaters named in the stored path">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .h{font:700 24px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .t{font:400 16px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .n{font:700 14px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .panel{fill:#1f2c3a;stroke:#2f4157;stroke-width:2}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="500"/>
+  <text class="title" x="40" y="52">Flood once, then follow the path</text>
+  <text class="sub" x="40" y="84">MeshCore floods to find a contact, then reuses the route it learned</text>
+
+  <!-- left panel -->
+  <g transform="translate(40,110)">
+    <rect class="panel" width="545" height="350" rx="14"/>
+    <text class="h" x="24" y="44">1. First message — flood</text>
+    <text class="t" x="24" y="72">Every repeater rebroadcasts. Finds anyone, costs everyone.</text>
+
+    <g stroke="#ff7a7a" stroke-width="2.5" fill="none" opacity="0.9">
+      <path d="M90,210 L215,150"/><path d="M90,210 L215,215"/><path d="M90,210 L215,285"/>
+      <path d="M215,150 L360,140"/><path d="M215,150 L360,215"/>
+      <path d="M215,215 L360,140"/><path d="M215,215 L360,215"/><path d="M215,215 L360,285"/>
+      <path d="M215,285 L360,215"/><path d="M215,285 L360,285"/>
+      <path d="M360,140 L470,215"/><path d="M360,215 L470,215"/><path d="M360,285 L470,215"/>
+    </g>
+    <g>
+      <circle cx="90" cy="210" r="20" fill="#1f2c3a" stroke="#4cc9f0" stroke-width="3"/><text class="n" x="83" y="216">A</text>
+      <circle cx="215" cy="150" r="17" fill="#1f2c3a" stroke="#ff7a7a" stroke-width="3"/>
+      <circle cx="215" cy="215" r="17" fill="#1f2c3a" stroke="#ff7a7a" stroke-width="3"/>
+      <circle cx="215" cy="285" r="17" fill="#1f2c3a" stroke="#ff7a7a" stroke-width="3"/>
+      <circle cx="360" cy="140" r="17" fill="#1f2c3a" stroke="#ff7a7a" stroke-width="3"/>
+      <circle cx="360" cy="215" r="17" fill="#1f2c3a" stroke="#ff7a7a" stroke-width="3"/>
+      <circle cx="360" cy="285" r="17" fill="#1f2c3a" stroke="#ff7a7a" stroke-width="3"/>
+      <circle cx="470" cy="215" r="20" fill="#1f2c3a" stroke="#4cc9f0" stroke-width="3"/><text class="n" x="463" y="221">B</text>
+    </g>
+    <text class="t" x="24" y="330" fill="#ff9a9a">13 transmissions to deliver 1 message</text>
+  </g>
+
+  <!-- right panel -->
+  <g transform="translate(615,110)">
+    <rect class="panel" width="545" height="350" rx="14"/>
+    <text class="h" x="24" y="44">2. Every message after — path</text>
+    <text class="t" x="24" y="72">B replies with the route it heard. Only those repeaters forward.</text>
+
+    <g stroke="#2f4157" stroke-width="2" fill="none" stroke-dasharray="5 6">
+      <path d="M90,210 L215,150"/><path d="M90,210 L215,285"/>
+      <path d="M215,150 L360,140"/><path d="M215,285 L360,285"/>
+      <path d="M360,140 L470,215"/><path d="M360,285 L470,215"/>
+    </g>
+    <g stroke="#7ee787" stroke-width="4" fill="none">
+      <path d="M90,210 L215,215"/><path d="M215,215 L360,215"/><path d="M360,215 L470,215"/>
+    </g>
+    <g>
+      <circle cx="90" cy="210" r="20" fill="#1f2c3a" stroke="#4cc9f0" stroke-width="3"/><text class="n" x="83" y="216">A</text>
+      <circle cx="215" cy="150" r="17" fill="#1f2c3a" stroke="#2f4157" stroke-width="3"/>
+      <circle cx="215" cy="215" r="17" fill="#1f2c3a" stroke="#7ee787" stroke-width="3"/>
+      <circle cx="215" cy="285" r="17" fill="#1f2c3a" stroke="#2f4157" stroke-width="3"/>
+      <circle cx="360" cy="140" r="17" fill="#1f2c3a" stroke="#2f4157" stroke-width="3"/>
+      <circle cx="360" cy="215" r="17" fill="#1f2c3a" stroke="#7ee787" stroke-width="3"/>
+      <circle cx="360" cy="285" r="17" fill="#1f2c3a" stroke="#2f4157" stroke-width="3"/>
+      <circle cx="470" cy="215" r="20" fill="#1f2c3a" stroke="#4cc9f0" stroke-width="3"/><text class="n" x="463" y="221">B</text>
+    </g>
+    <text class="t" x="24" y="330" fill="#7ee787">3 transmissions — the rest of the mesh stays quiet</text>
+  </g>
+</svg>

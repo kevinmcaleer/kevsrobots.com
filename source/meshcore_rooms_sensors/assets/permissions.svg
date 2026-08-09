@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440" role="img" aria-label="The three MeshCore permission tiers: read-only, guest and admin">
+  <defs>
+    <style>
+      .bg{fill:#16202b}
+      .card{fill:#1f2c3a;stroke:#2f4157;stroke-width:2}
+      .title{font:700 30px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .sub{font:400 18px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .h{font:700 24px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#e8eef5}
+      .k{font:700 14px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#9fb3c8}
+      .t{font:400 16px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#c7d6e5}
+      .foot{font:700 17px Inter,Segoe UI,Helvetica,Arial,sans-serif;fill:#16202b}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="440"/>
+  <text class="title" x="40" y="52">Who can do what</text>
+  <text class="sub" x="40" y="84">Three tiers, two passwords. The same model on room servers and sensors.</text>
+
+  <g transform="translate(40,112)">
+    <rect class="card" width="360" height="228" rx="14"/>
+    <circle cx="44" cy="52" r="18" fill="#3d5570"/>
+    <text class="h" x="76" y="60">Read-only</text>
+    <text class="k" x="24" y="98">NO PASSWORD</text>
+    <line x1="24" y1="112" x2="336" y2="112" stroke="#2f4157" stroke-width="2"/>
+    <text class="t" x="24" y="146">Read posts</text>
+    <text class="t" x="24" y="174" fill="#8296ab">Cannot post</text>
+    <text class="t" x="24" y="202" fill="#8296ab">Cannot configure</text>
+  </g>
+
+  <g transform="translate(420,112)">
+    <rect class="card" width="360" height="228" rx="14"/>
+    <circle cx="44" cy="52" r="18" fill="#4cc9f0"/>
+    <text class="h" x="76" y="60">Guest</text>
+    <text class="k" x="24" y="98" fill="#4cc9f0">GUEST PASSWORD · default "hello"</text>
+    <line x1="24" y1="112" x2="336" y2="112" stroke="#2f4157" stroke-width="2"/>
+    <text class="t" x="24" y="146">Read posts</text>
+    <text class="t" x="24" y="174">Post to the room</text>
+    <text class="t" x="24" y="202" fill="#8296ab">Cannot configure</text>
+  </g>
+
+  <g transform="translate(800,112)">
+    <rect class="card" width="360" height="228" rx="14"/>
+    <circle cx="44" cy="52" r="18" fill="#f7b32b"/>
+    <text class="h" x="76" y="60">Admin</text>
+    <text class="k" x="24" y="98" fill="#f7b32b">ADMIN PASSWORD · default "password"</text>
+    <line x1="24" y1="112" x2="336" y2="112" stroke="#2f4157" stroke-width="2"/>
+    <text class="t" x="24" y="146">Read posts</text>
+    <text class="t" x="24" y="174">Post to the room</text>
+    <text class="t" x="24" y="202">Reconfigure the node</text>
+  </g>
+
+  <rect x="40" y="364" width="1120" height="46" rx="12" fill="#ff9a9a"/>
+  <text class="foot" x="64" y="393">Both defaults are published in the official docs. Change them before the node goes on air.</text>
+</svg>
