@@ -95,6 +95,19 @@ description: Regular livestream schedule for KevsRobots - join us for live build
   z-index: 10;
 }
 
+.mini-calendar-day.has-video {
+  background: #0d6efd;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+}
+
+.mini-calendar-day.has-video:hover {
+  transform: scale(1.1);
+  transition: transform 0.1s ease;
+  z-index: 10;
+}
+
 .event-list {
   max-width: 1200px;
   margin: 2rem auto;
@@ -169,6 +182,11 @@ description: Regular livestream schedule for KevsRobots - join us for live build
   background: #dc3545;
   border-color: #dc3545;
 }
+
+.legend-circle.video {
+  background: #0d6efd;
+  border-color: #0d6efd;
+}
 </style>
 
 {% include nav_videos.html %}
@@ -190,6 +208,16 @@ This page provides a list of upcoming shows, a calendar view of scheduled events
     {% for date in show.next_dates %}
       {% assign event_dates = event_dates | push: date %}
     {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{% comment %}Build video date lookup from youtube.yml - upcoming releases only{% endcomment %}
+{% assign today = "now" | date: "%Y-%m-%d" %}
+{% assign video_dates = "" | split: "" %}
+{% for video in site.data.youtube %}
+  {% assign vid_date = video.published | date: "%Y-%m-%d" %}
+  {% if vid_date >= today %}
+    {% assign video_dates = video_dates | push: vid_date %}
   {% endif %}
 {% endfor %}
 
@@ -246,10 +274,14 @@ This page provides a list of upcoming shows, a calendar view of scheduled events
         {% assign current_date = target_month | date: "%Y-%m-" | append: day_str %}
         {% assign today = "now" | date: "%Y-%m-%d" %}
 
-        {% comment %}Check if this day has an event{% endcomment %}
+        {% comment %}Check if this day has a show or a video release{% endcomment %}
         {% assign has_event = false %}
         {% if event_dates contains current_date %}
           {% assign has_event = true %}
+        {% endif %}
+        {% assign has_video = false %}
+        {% if video_dates contains current_date %}
+          {% assign has_video = true %}
         {% endif %}
 
         {% assign day_class = "mini-calendar-day current-month" %}
@@ -258,6 +290,8 @@ This page provides a list of upcoming shows, a calendar view of scheduled events
         {% endif %}
         {% if has_event %}
           {% assign day_class = day_class | append: " has-event" %}
+        {% elsif has_video %}
+          {% assign day_class = day_class | append: " has-video" %}
         {% endif %}
 
         <div class="{{ day_class }}" title="{{ current_date | date: '%B %-d, %Y' }}">
@@ -288,28 +322,44 @@ This page provides a list of upcoming shows, a calendar view of scheduled events
     <div class="legend-circle event"></div>
     <span>Scheduled Show</span>
   </div>
+  <div class="legend-item">
+    <div class="legend-circle video"></div>
+    <span>Video Release</span>
+  </div>
 </div>
 
 ---
 
-## Upcoming Shows
+## Upcoming Shows and Videos
 
 <div class="event-list">
 
 {% comment %}
-Sort all events by date and display chronologically
+Combine scheduled shows with upcoming video releases from youtube.yml,
+sort by date and display chronologically.
+Each entry is a pipe-delimited string:
+date|name|description|time|duration|category|link|source
+where source is "show" (schedule.yml) or "yt" (youtube.yml)
 {% endcomment %}
 {% assign sorted_events = "" | split: "" %}
 {% for show in site.data.schedule %}
   {% if show.status == "active" %}
     {% for date in show.next_dates %}
-      {% assign date_timestamp = date | date: "%s" %}
-      {% assign today_timestamp = "now" | date: "%s" %}
-      {% if date_timestamp >= today_timestamp %}
-        {% assign event_data = date | append: "|" | append: show.name | append: "|" | append: show.description | append: "|" | append: show.time | append: "|" | append: show.duration | append: "|" | append: show.category | append: "|" | append: show.youtube_channel %}
+      {% if date >= today %}
+        {% assign event_data = date | append: "|" | append: show.name | append: "|" | append: show.description | append: "|" | append: show.time | append: "|" | append: show.duration | append: "|" | append: show.category | append: "|" | append: show.youtube_channel | append: "|show" %}
         {% assign sorted_events = sorted_events | push: event_data %}
       {% endif %}
     {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{% for video in site.data.youtube %}
+  {% assign vid_date = video.published | date: "%Y-%m-%d" %}
+  {% if vid_date >= today %}
+    {% assign vid_type = video.type | default: "video" %}
+    {% assign vid_link = "https://www.youtube.com/watch?v=" | append: video.video_id %}
+    {% assign event_data = vid_date | append: "|" | append: video.title | append: "|||" | append: "|" | append: vid_type | append: "|" | append: vid_link | append: "|yt" %}
+    {% assign sorted_events = sorted_events | push: event_data %}
   {% endif %}
 {% endfor %}
 
@@ -324,22 +374,29 @@ Sort all events by date and display chronologically
   {% assign event_duration = event_parts[4] %}
   {% assign event_category = event_parts[5] %}
   {% assign event_youtube = event_parts[6] %}
+  {% assign event_source = event_parts[7] %}
 
-  <div class="event-item">
+  <div class="event-item" {% if event_source == "yt" %}style="border-left-color: #0d6efd;"{% endif %}>
     <div class="event-date">
       <i class="fa-regular fa-calendar"></i>
       {{ event_date | date: "%A, %B %-d, %Y" }}
     </div>
     <div class="event-title">{{ event_name }}</div>
-    <div class="mb-2">{{ event_desc }}</div>
+    {% if event_desc != "" %}<div class="mb-2">{{ event_desc }}</div>{% endif %}
     <div class="event-meta">
+      {% if event_source == "yt" %}
+      <span class="badge bg-primary">{{ event_category }}</span>
+      <span class="mx-2">•</span>
+      <a href="{{ event_youtube }}" target="_blank"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
+      {% else %}
       <i class="fa-regular fa-clock"></i> {{ event_time }} ({{ site.site_timezone }})
       <span class="mx-2">•</span>
       <i class="fa-solid fa-hourglass-half"></i> {{ event_duration }}
       <span class="mx-2">•</span>
-      <span class="badge bg-primary">{{ event_category }}</span>
+      <span class="badge bg-danger">{{ event_category }}</span>
       <span class="mx-2">•</span>
       <a href="{{ event_youtube }}" target="_blank"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
+      {% endif %}
     </div>
   </div>
 {% endfor %}
