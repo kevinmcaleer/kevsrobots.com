@@ -76,5 +76,28 @@ SEQUENCE:0
 END:VEVENT
 {% endfor -%}
 {%- endif -%}
+{%- endfor -%}
+{%- assign today = "now" | date: "%Y-%m-%d" -%}
+{%- for video in site.data.youtube -%}
+{%- assign vid_date = video.published | date: "%Y-%m-%d" -%}
+{%- if vid_date >= today -%}
+{%- assign vid_type = video.type | default: "video" -%}
+{%- assign vid_start = video.published | date: "%Y%m%d" -%}
+{%- assign vid_end = video.published | date: "%s" | plus: 86400 | date: "%Y%m%d" -%}
+{%- assign vid_title = video.title | replace: ";", "\;" | replace: ",", "\," %}
+BEGIN:VEVENT
+UID:video-{{ video.video_id }}@kevsrobots.com
+DTSTAMP:{{ site.time | date: "%Y%m%dT%H%M%SZ" }}
+DTSTART;VALUE=DATE:{{ vid_start }}
+DTEND;VALUE=DATE:{{ vid_end }}
+SUMMARY:New {{ vid_type }}: {{ vid_title }}
+DESCRIPTION:Watch: https://www.youtube.com/watch?v={{ video.video_id }}
+URL:https://www.youtube.com/watch?v={{ video.video_id }}
+CATEGORIES:{{ vid_type | upcase }}
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+{%- endif -%}
 {%- endfor %}
 END:VCALENDAR
