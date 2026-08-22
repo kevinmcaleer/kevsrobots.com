@@ -181,11 +181,17 @@ document.querySelectorAll("[data-copy-target]").forEach((button) => {
 
 const initialAt = body.dataset.at;
 if (initialAt) {
-  const target = new Date(initialAt);
+  const dateOnly = body.dataset.dateOnly === "true";
+  let target;
+  if (dateOnly && /^\d{4}-\d{2}-\d{2}$/.test(initialAt)) {
+    const [year, month, day] = initialAt.split("-").map(Number);
+    target = new Date(year, month - 1, day);
+  } else {
+    target = new Date(initialAt);
+  }
   if (!Number.isNaN(target.getTime())) {
     const description = body.dataset.description || "";
     const image = body.dataset.image || "";
-    const dateOnly = body.dataset.dateOnly === "true";
     descriptionInput.value = description;
     imageInput.value = image;
     dateInput.value = localDateValue(target);

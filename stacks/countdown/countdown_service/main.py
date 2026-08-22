@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -13,14 +13,20 @@ _HERE = Path(__file__).resolve().parent
 _TEMPLATES = Jinja2Templates(directory=str(_HERE / "templates"))
 
 
-def _valid_timestamp(value: str) -> bool:
+def _timestamp_kind(value: str) -> str | None:
     if not value:
-        return False
+        return None
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        pass
+    else:
+        return "date"
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
-        return False
-    return parsed.tzinfo is not None
+        return None
+    return "datetime" if parsed.tzinfo is not None else None
 
 
 def _valid_image_url(value: str) -> bool:
@@ -71,9 +77,13 @@ def create_app() -> FastAPI:
         date_only: bool = Query(default=False),
     ):
         error = ""
-        if at and not _valid_timestamp(at):
-            error = "The shared countdown date is invalid. Please create a new one."
-            at = ""
+        if at:
+            timestamp_kind = _timestamp_kind(at)
+            if timestamp_kind is None:
+                error = "The shared countdown date is invalid. Please create a new one."
+                at = ""
+            elif timestamp_kind == "date":
+                date_only = True
         if image and not _valid_image_url(image):
             error = "The image must use a valid http:// or https:// URL."
             image = ""
