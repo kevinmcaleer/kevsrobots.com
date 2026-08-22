@@ -68,6 +68,7 @@ def create_app() -> FastAPI:
         at: str = Query(default="", max_length=40),
         description: str = Query(default="", max_length=280),
         image: str = Query(default="", max_length=2048),
+        date_only: bool = Query(default=False),
     ):
         error = ""
         if at and not _valid_timestamp(at):
@@ -84,6 +85,7 @@ def create_app() -> FastAPI:
                 "at": at,
                 "description": description,
                 "image": image,
+                "date_only": date_only,
                 "error": error,
             },
         )

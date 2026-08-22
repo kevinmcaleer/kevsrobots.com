@@ -32,9 +32,12 @@ function localDateValue(date) {
 
 dateInput.min = localDateValue(new Date());
 
-function eventUrl(target, description, image) {
+function eventUrl(target, description, image, dateOnly) {
   const url = new URL(window.location.pathname, window.location.origin);
   url.searchParams.set("at", target.toISOString());
+  if (dateOnly) {
+    url.searchParams.set("date_only", "1");
+  }
   if (description) {
     url.searchParams.set("description", description);
   }
@@ -62,10 +65,12 @@ function updateShareDetails(url, description) {
     'style="border:0;border-radius:16px" loading="lazy"></iframe>';
 }
 
-function renderCountdown(target) {
+function renderCountdown(target, dateOnly) {
   const remaining = Math.max(0, target.getTime() - Date.now());
   const totalSeconds = Math.floor(remaining / 1000);
-  const days = Math.floor(totalSeconds / 86400);
+  const days = dateOnly
+    ? Math.ceil(remaining / 86400000)
+    : Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
@@ -84,7 +89,7 @@ function renderCountdown(target) {
   }
 }
 
-function showEvent(target, description, image) {
+function showEvent(target, description, image, dateOnly) {
   if (timerId !== null) {
     window.clearInterval(timerId);
   }
@@ -92,10 +97,12 @@ function showEvent(target, description, image) {
   creatorView.hidden = true;
   eventView.hidden = false;
   eventDescription.textContent = description || "Your event";
-  eventDate.textContent = new Intl.DateTimeFormat(undefined, {
-    dateStyle: "full",
-    timeStyle: "short",
-  }).format(target);
+  const dateFormat = { dateStyle: "full" };
+  if (!dateOnly) {
+    dateFormat.timeStyle = "short";
+  }
+  eventDate.textContent = new Intl.DateTimeFormat(undefined, dateFormat).format(target);
+  document.querySelector("#countdown").classList.toggle("days-only", dateOnly);
 
   imagePanel.hidden = !image;
   eventView.classList.toggle("has-image", Boolean(image));
@@ -107,11 +114,11 @@ function showEvent(target, description, image) {
   }
 
   finishedMessage.hidden = true;
-  const url = eventUrl(target, description, image);
+  const url = eventUrl(target, description, image, dateOnly);
   updateShareDetails(url, description);
   window.history.replaceState({}, "", url);
-  renderCountdown(target);
-  timerId = window.setInterval(() => renderCountdown(target), 1000);
+  renderCountdown(target, dateOnly);
+  timerId = window.setInterval(() => renderCountdown(target, dateOnly), 1000);
 }
 
 eventImage.addEventListener("error", () => {
@@ -130,6 +137,7 @@ form.addEventListener("submit", (event) => {
   }
 
   const [year, month, day] = dateInput.value.split("-").map(Number);
+  const dateOnly = !timeInput.value;
   const [hour, minute] = (timeInput.value || "00:00").split(":").map(Number);
   const target = new Date(year, month - 1, day, hour, minute);
 
@@ -143,6 +151,7 @@ form.addEventListener("submit", (event) => {
     target,
     descriptionInput.value.trim(),
     imageInput.value.trim(),
+    dateOnly,
   );
 });
 
@@ -176,11 +185,14 @@ if (initialAt) {
   if (!Number.isNaN(target.getTime())) {
     const description = body.dataset.description || "";
     const image = body.dataset.image || "";
+    const dateOnly = body.dataset.dateOnly === "true";
     descriptionInput.value = description;
     imageInput.value = image;
     dateInput.value = localDateValue(target);
-    timeInput.value = `${pad(target.getHours())}:${pad(target.getMinutes())}`;
-    showEvent(target, description, image);
+    timeInput.value = dateOnly
+      ? ""
+      : `${pad(target.getHours())}:${pad(target.getMinutes())}`;
+    showEvent(target, description, image, dateOnly);
   }
 }
 
