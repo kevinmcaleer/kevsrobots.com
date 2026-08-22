@@ -65,20 +65,98 @@ function updateShareDetails(url, description) {
     'style="border:0;border-radius:16px" loading="lazy"></iframe>';
 }
 
+function daysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function addCalendarMonths(date, months) {
+  const result = new Date(date.getFullYear(), date.getMonth() + months, 1);
+  result.setDate(
+    Math.min(date.getDate(), daysInMonth(result.getFullYear(), result.getMonth())),
+  );
+  return result;
+}
+
+function calendarDaysBetween(start, end) {
+  const startUtc = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
+  const endUtc = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+  return Math.floor((endUtc - startUtc) / 86400000);
+}
+
+function setCountdownUnits(values, units, padValues) {
+  const valueElements = ["days", "hours", "minutes", "seconds"];
+  valueElements.forEach((id, index) => {
+    const value = values[index];
+    document.querySelector(`#${id}`).textContent =
+      padValues ? pad(value) : String(value);
+    document.querySelector(`#${id}-label`).textContent =
+      value === 1 ? units[index].slice(0, -1) : units[index];
+  });
+}
+
+function renderDateCountdown(target) {
+  const today = new Date();
+  const cursorStart = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  if (target <= cursorStart) {
+    setCountdownUnits([0, 0, 0, 0], ["years", "months", "weeks", "days"], false);
+    return true;
+  }
+
+  let years = target.getFullYear() - cursorStart.getFullYear();
+  let cursor = addCalendarMonths(cursorStart, years * 12);
+  if (cursor > target) {
+    years -= 1;
+    cursor = addCalendarMonths(cursorStart, years * 12);
+  }
+
+  let months =
+    (target.getFullYear() - cursor.getFullYear()) * 12 +
+    target.getMonth() -
+    cursor.getMonth();
+  let monthCursor = addCalendarMonths(cursor, months);
+  if (monthCursor > target) {
+    months -= 1;
+    monthCursor = addCalendarMonths(cursor, months);
+  }
+
+  const remainingDays = calendarDaysBetween(monthCursor, target);
+  const weeks = Math.floor(remainingDays / 7);
+  const days = remainingDays % 7;
+  setCountdownUnits(
+    [years, months, weeks, days],
+    ["years", "months", "weeks", "days"],
+    false,
+  );
+  return false;
+}
+
 function renderCountdown(target, dateOnly) {
+  if (dateOnly) {
+    const finished = renderDateCountdown(target);
+    finishedMessage.hidden = !finished;
+    if (finished && timerId !== null) {
+      window.clearInterval(timerId);
+      timerId = null;
+    }
+    return;
+  }
+
   const remaining = Math.max(0, target.getTime() - Date.now());
   const totalSeconds = Math.floor(remaining / 1000);
-  const days = dateOnly
-    ? Math.ceil(remaining / 86400000)
-    : Math.floor(totalSeconds / 86400);
+  const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  document.querySelector("#days").textContent = String(days);
-  document.querySelector("#hours").textContent = pad(hours);
-  document.querySelector("#minutes").textContent = pad(minutes);
-  document.querySelector("#seconds").textContent = pad(seconds);
+  setCountdownUnits(
+    [days, hours, minutes, seconds],
+    ["days", "hours", "minutes", "seconds"],
+    true,
+  );
 
   if (remaining === 0) {
     finishedMessage.hidden = false;
@@ -102,7 +180,6 @@ function showEvent(target, description, image, dateOnly) {
     dateFormat.timeStyle = "short";
   }
   eventDate.textContent = new Intl.DateTimeFormat(undefined, dateFormat).format(target);
-  document.querySelector("#countdown").classList.toggle("days-only", dateOnly);
 
   imagePanel.hidden = !image;
   eventView.classList.toggle("has-image", Boolean(image));
@@ -118,7 +195,10 @@ function showEvent(target, description, image, dateOnly) {
   updateShareDetails(url, description);
   window.history.replaceState({}, "", url);
   renderCountdown(target, dateOnly);
-  timerId = window.setInterval(() => renderCountdown(target, dateOnly), 1000);
+  timerId = window.setInterval(
+    () => renderCountdown(target, dateOnly),
+    dateOnly ? 60000 : 1000,
+  );
 }
 
 eventImage.addEventListener("error", () => {
