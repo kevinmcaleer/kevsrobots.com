@@ -1,0 +1,8 @@
+services:
+  countdown:
+    build: .
+    ports:
+      - "8220:8220"
+    volumes:
+      - .:/usr/src/app
+    restart: unless-stopped
