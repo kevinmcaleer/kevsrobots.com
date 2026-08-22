@@ -145,6 +145,19 @@ h1 {
   gap: 0.75rem;
 }
 
+.countdown.days-only {
+  grid-template-columns: minmax(10rem, 18rem);
+  justify-content: center;
+}
+
+.countdown.days-only .time-block:not(:first-child) {
+  display: none;
+}
+
+.countdown.days-only .time-block strong {
+  font-size: clamp(3rem, 12vw, 7rem);
+}
+
 .time-block {
   min-width: 0;
   padding: clamp(0.8rem, 2.5vw, 1.3rem) 0.45rem;
