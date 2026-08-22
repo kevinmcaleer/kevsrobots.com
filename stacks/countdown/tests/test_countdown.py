@@ -54,6 +54,22 @@ async def test_date_only_countdown_mode_is_rendered(client) -> None:
 
 
 @pytest.mark.asyncio
+async def test_iso_date_infers_date_only_mode(client) -> None:
+    response = await client.get(
+        "/",
+        params={
+            "at": "2026-10-31",
+            "description": "Halloween",
+        },
+    )
+
+    assert response.status_code == 200
+    assert 'data-at="2026-10-31"' in response.text
+    assert 'data-date-only="true"' in response.text
+    assert "shared countdown date is invalid" not in response.text
+
+
+@pytest.mark.asyncio
 async def test_invalid_timestamp_returns_creator_with_error(client) -> None:
     response = await client.get("/", params={"at": "tomorrow"})
 
