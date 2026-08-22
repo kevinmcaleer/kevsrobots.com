@@ -34,10 +34,10 @@ dateInput.min = localDateValue(new Date());
 
 function eventUrl(target, description, image, dateOnly) {
   const url = new URL(window.location.pathname, window.location.origin);
-  url.searchParams.set("at", target.toISOString());
-  if (dateOnly) {
-    url.searchParams.set("date_only", "1");
-  }
+  url.searchParams.set(
+    "at",
+    dateOnly ? localDateValue(target) : target.toISOString(),
+  );
   if (description) {
     url.searchParams.set("description", description);
   }
