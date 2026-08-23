@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="description" content="Create and share a countdown to any date.">
+    <title>Countdown | KevsRobots</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/countdown.css') }}">
+  </head>
+  <body
+    data-at="{{ at }}"
+    data-description="{{ description }}"
+    data-image="{{ image }}"
+    data-date-only="{{ 'true' if date_only else 'false' }}"
+    data-error="{{ error }}"
+  >
+    <main class="page-shell">
+      <article class="countdown-card">
+        <section id="event-view" class="event-view" hidden>
+          <div id="image-panel" class="image-panel" hidden>
+            <img id="event-image" alt="" referrerpolicy="no-referrer">
+          </div>
+
+          <div class="event-content">
+            <p class="eyebrow">Counting down to</p>
+            <h1 id="event-description">Your event</h1>
+            <p id="event-date" class="event-date"></p>
+
+            <div id="countdown" class="countdown" aria-live="polite">
+              <div class="time-block">
+                <strong id="days">0</strong>
+                <span id="days-label">days</span>
+              </div>
+              <div class="time-block">
+                <strong id="hours">00</strong>
+                <span id="hours-label">hours</span>
+              </div>
+              <div class="time-block">
+                <strong id="minutes">00</strong>
+                <span id="minutes-label">minutes</span>
+              </div>
+              <div class="time-block">
+                <strong id="seconds">00</strong>
+                <span id="seconds-label">seconds</span>
+              </div>
+            </div>
+
+            <p id="finished-message" class="finished-message" hidden>
+              The moment has arrived!
+            </p>
+
+            <div class="actions">
+              <details class="share-panel">
+                <summary>Share or embed</summary>
+                <div class="share-content">
+                  <label for="share-url">Share link</label>
+                  <div class="copy-row">
+                    <input id="share-url" type="text" readonly>
+                    <button type="button" data-copy-target="share-url">Copy</button>
+                  </div>
+
+                  <label for="embed-code">Embed HTML</label>
+                  <div class="copy-row copy-row-code">
+                    <textarea id="embed-code" rows="4" readonly></textarea>
+                    <button type="button" data-copy-target="embed-code">Copy</button>
+                  </div>
+                  <p id="copy-status" class="copy-status" aria-live="polite"></p>
+                </div>
+              </details>
+
+              <button id="new-countdown" class="secondary-button" type="button">
+                Create another countdown
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section id="creator-view" class="creator-view">
+          <p class="eyebrow">KevsRobots Countdown</p>
+          <h1>Make every second count.</h1>
+          <p class="intro">
+            Choose a date, add an optional time, description, and image, then
+            share your countdown anywhere.
+          </p>
+
+          <p id="form-error" class="form-error" role="alert" hidden></p>
+
+          <form id="countdown-form">
+            <div class="form-grid">
+              <label>
+                Date
+                <input id="event-date-input" name="date" type="date" required>
+              </label>
+              <label>
+                Time <span>(optional)</span>
+                <input id="event-time-input" name="time" type="time">
+              </label>
+            </div>
+
+            <label>
+              Description <span>(optional)</span>
+              <input
+                id="description-input"
+                name="description"
+                type="text"
+                maxlength="280"
+                placeholder="Launch day"
+              >
+            </label>
+
+            <label>
+              Encoded image URL <span>(optional)</span>
+              <input
+                id="image-input"
+                name="image"
+                type="url"
+                maxlength="2048"
+                placeholder="https://example.com/image.jpg"
+              >
+            </label>
+
+            <button class="primary-button" type="submit">Start countdown</button>
+          </form>
+        </section>
+      </article>
+    </main>
+
+    <script src="{{ url_for('static', path='/countdown.js') }}"></script>
+  </body>
+</html>

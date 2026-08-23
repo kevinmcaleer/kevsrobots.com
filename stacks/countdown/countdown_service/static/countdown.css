@@ -1,0 +1,374 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bg: #07111f;
+  --card: rgba(12, 27, 47, 0.94);
+  --card-light: #10243d;
+  --text: #f6f8fb;
+  --muted: #a9b7c8;
+  --accent: #6ee7d8;
+  --accent-dark: #163f43;
+  --line: rgba(255, 255, 255, 0.13);
+  --danger: #ffb4b4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(29, 127, 126, 0.36), transparent 36rem),
+    radial-gradient(circle at 85% 85%, rgba(41, 79, 150, 0.3), transparent 34rem),
+    var(--bg);
+  color: var(--text);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.page-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.countdown-card {
+  width: min(1080px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 2rem;
+  background: var(--card);
+  box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(18px);
+}
+
+.event-view {
+  min-height: min(760px, calc(100vh - 2rem));
+  grid-template-columns: minmax(0, 0.9fr) minmax(24rem, 1.1fr);
+}
+
+.event-view:not([hidden]) {
+  display: grid;
+}
+
+.image-panel {
+  position: relative;
+  min-height: 22rem;
+  background: var(--card-light);
+}
+
+.image-panel:not([hidden]) {
+  display: block;
+}
+
+.image-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 60%, rgba(12, 27, 47, 0.9));
+  pointer-events: none;
+}
+
+.image-panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-content,
+.creator-view {
+  padding: clamp(2rem, 6vw, 5rem);
+}
+
+.event-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.event-view:not(.has-image) {
+  grid-template-columns: 1fr;
+}
+
+.event-view:not(.has-image) .event-content {
+  width: min(850px, 100%);
+  margin: auto;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 6vw, 4.8rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.event-date,
+.intro {
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.65;
+}
+
+.event-date {
+  margin: 1.15rem 0 2.2rem;
+}
+
+.intro {
+  max-width: 42rem;
+  margin: 1.25rem 0 2.25rem;
+}
+
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.time-block {
+  min-width: 0;
+  padding: clamp(0.8rem, 2.5vw, 1.3rem) 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.045);
+  text-align: center;
+}
+
+.time-block strong {
+  display: block;
+  overflow: hidden;
+  font-size: clamp(1.7rem, 5vw, 3.4rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.time-block span {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.finished-message {
+  margin: 1.5rem 0 0;
+  color: var(--accent);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
+.share-panel {
+  flex: 1 1 20rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  text-align: left;
+}
+
+.share-panel summary {
+  padding: 0.85rem 1rem;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.share-content {
+  padding: 0 1rem 1rem;
+}
+
+.share-content label,
+form label {
+  display: block;
+  margin: 1rem 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+label span {
+  font-weight: 400;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  outline: none;
+  background: rgba(1, 8, 17, 0.62);
+  color: var(--text);
+}
+
+input {
+  min-height: 3.1rem;
+  padding: 0 0.9rem;
+}
+
+textarea {
+  padding: 0.75rem 0.9rem;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(110, 231, 216, 0.12);
+}
+
+.copy-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.copy-row input,
+.copy-row textarea {
+  min-width: 0;
+}
+
+.copy-row button,
+.secondary-button,
+.primary-button {
+  border: 0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.copy-row button {
+  padding: 0.6rem 0.9rem;
+  background: var(--accent-dark);
+  color: var(--accent);
+}
+
+.primary-button {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--accent);
+  color: #062322;
+}
+
+.secondary-button {
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: var(--muted);
+}
+
+.copy-status {
+  min-height: 1.2em;
+  margin: 0.7rem 0 0;
+  color: var(--accent);
+  font-size: 0.82rem;
+}
+
+.creator-view {
+  width: min(760px, 100%);
+  margin: auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-error {
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(255, 180, 180, 0.4);
+  border-radius: 0.75rem;
+  background: rgba(120, 24, 24, 0.2);
+  color: var(--danger);
+}
+
+body.is-embedded .page-shell {
+  padding: 0;
+}
+
+body.is-embedded .countdown-card {
+  min-height: 100vh;
+  border: 0;
+  border-radius: 0;
+}
+
+body.is-embedded .secondary-button {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .page-shell {
+    padding: 0;
+  }
+
+  .countdown-card {
+    min-height: 100vh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .event-view:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .image-panel {
+    min-height: 30vh;
+    max-height: 42vh;
+  }
+
+  .image-panel::after {
+    background: linear-gradient(180deg, transparent 65%, var(--card));
+  }
+
+  .event-content,
+  .creator-view {
+    padding: 2rem 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+@media (max-width: 440px) {
+  .countdown {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .copy-row {
+    flex-direction: column;
+  }
+
+  .copy-row button {
+    align-self: flex-end;
+  }
+}

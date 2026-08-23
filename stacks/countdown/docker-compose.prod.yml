@@ -1,0 +1,30 @@
+# Production deployment:
+#   cp .env.example .env
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# In Cloudflare Zero Trust, configure the countdown tunnel's public hostname
+# countdown.kevsrobots.com to forward to http://localhost:8220.
+
+services:
+  countdown:
+    build: .
+    image: 192.168.2.1:5000/countdown:latest
+    network_mode: host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8220/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    network_mode: host
+    command: tunnel --no-autoupdate --edge-ip-version 4 run
+    environment:
+      - TUNNEL_TOKEN=${COUNTDOWN_TUNNEL_TOKEN}
+    depends_on:
+      countdown:
+        condition: service_healthy
+    restart: unless-stopped
