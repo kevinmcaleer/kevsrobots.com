@@ -2389,6 +2389,121 @@
     ]
   },
   {
+    "slug": "obsidian_rag",
+    "name": "Build a RAG for Your Obsidian Vault",
+    "description": "Build Ask My Vault - a Python tool that indexes your Obsidian notes into ChromaDB and answers questions about them, with citations back to the original note. Learn embeddings, chunking, vector search and grounded generation by building the whole pipeline yourself.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-08-23",
+    "groups": [
+      "ai",
+      "python",
+      "productivity"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/obsidian_rag/00_intro.html"
+      },
+      {
+        "file": "01_what_is_rag.md",
+        "section": "Overview",
+        "url": "/learn/obsidian_rag/01_what_is_rag.html"
+      },
+      {
+        "file": "02_embeddings_and_vectors.md",
+        "section": "Overview",
+        "url": "/learn/obsidian_rag/02_embeddings_and_vectors.html"
+      },
+      {
+        "file": "03_project_setup.md",
+        "section": "Setting Up",
+        "url": "/learn/obsidian_rag/03_project_setup.html"
+      },
+      {
+        "file": "04_meet_chromadb.md",
+        "section": "Setting Up",
+        "url": "/learn/obsidian_rag/04_meet_chromadb.html"
+      },
+      {
+        "file": "05_reading_the_vault.md",
+        "section": "Reading Your Vault",
+        "url": "/learn/obsidian_rag/05_reading_the_vault.html"
+      },
+      {
+        "file": "06_parsing_notes.md",
+        "section": "Reading Your Vault",
+        "url": "/learn/obsidian_rag/06_parsing_notes.html"
+      },
+      {
+        "file": "07_chunking_notes.md",
+        "section": "Reading Your Vault",
+        "url": "/learn/obsidian_rag/07_chunking_notes.html"
+      },
+      {
+        "file": "08_building_the_index.md",
+        "section": "Building the Index",
+        "url": "/learn/obsidian_rag/08_building_the_index.html"
+      },
+      {
+        "file": "09_incremental_indexing.md",
+        "section": "Building the Index",
+        "url": "/learn/obsidian_rag/09_incremental_indexing.html"
+      },
+      {
+        "file": "10_querying_the_index.md",
+        "section": "Retrieval",
+        "url": "/learn/obsidian_rag/10_querying_the_index.html"
+      },
+      {
+        "file": "11_metadata_filters.md",
+        "section": "Retrieval",
+        "url": "/learn/obsidian_rag/11_metadata_filters.html"
+      },
+      {
+        "file": "12_improving_retrieval.md",
+        "section": "Retrieval",
+        "url": "/learn/obsidian_rag/12_improving_retrieval.html"
+      },
+      {
+        "file": "13_generating_answers.md",
+        "section": "Generating Answers",
+        "url": "/learn/obsidian_rag/13_generating_answers.html"
+      },
+      {
+        "file": "14_citations_and_grounding.md",
+        "section": "Generating Answers",
+        "url": "/learn/obsidian_rag/14_citations_and_grounding.html"
+      },
+      {
+        "file": "15_the_cli.md",
+        "section": "The Finished Tool",
+        "url": "/learn/obsidian_rag/15_the_cli.html"
+      },
+      {
+        "file": "16_keeping_it_fresh.md",
+        "section": "The Finished Tool",
+        "url": "/learn/obsidian_rag/16_keeping_it_fresh.html"
+      },
+      {
+        "file": "17_evaluating_your_rag.md",
+        "section": "The Finished Tool",
+        "url": "/learn/obsidian_rag/17_evaluating_your_rag.html"
+      },
+      {
+        "file": "18_troubleshooting.md",
+        "section": "Wrapping Up",
+        "url": "/learn/obsidian_rag/18_troubleshooting.html"
+      },
+      {
+        "file": "19_summary.md",
+        "section": "Wrapping Up",
+        "url": "/learn/obsidian_rag/19_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "octapi",
     "name": "OctaPi",
     "description": "Learn how to use Crack the Enigma code using a Cluster of Raspberry Pis and Python.",

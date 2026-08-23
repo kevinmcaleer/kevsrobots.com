@@ -27,6 +27,7 @@ Every course you create or review MUST adhere to these KevsRobots.com standards:
 - Use descriptive hyphenated names: `01_understanding-servos.md`
 - Create `course.yml` with complete metadata
 - Place images in course `assets/` folder
+- Every lesson gets its own generated header banner in `assets/banners/` — see "Header banners" below
 
 **Mandatory Sections in `00_intro.md`:**
 ```markdown
@@ -124,8 +125,33 @@ Every lesson must include:
 - Use images, diagrams, and photos to illustrate concepts
 - Optimize images (<300KB, use `loading="lazy"`)
 - Include code examples that actually run
-- Add breadcrumb navigation in lessons
 - Link to related courses and resources
+- Do **not** hand-write previous/next breadcrumb links — `build.py` generates lesson navigation from `course.yml`
+
+#### Header banners
+
+Every lesson opens with its own generated geometric banner, so a course does not read as twenty identical walls of formatted text. Do not draw these by hand and do not reuse the course cover across lessons.
+
+After the lessons exist and `course.yml` lists them, run from the repo root:
+
+```bash
+python3 generate_banners.py <course-slug>
+```
+
+That writes one banner per lesson into `source/<slug>/assets/banners/`, sets each lesson's frontmatter `cover:` to the absolute `/learn/<slug>/assets/banners/<stem>.jpg` path, and normalises the top of each lesson body to:
+
+```markdown
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+```
+
+While drafting, any `cover:` value will do — the script rewrites it. It is idempotent, so re-run it whenever you add a lesson.
+
+Two rules if you ever touch the banner artwork itself:
+
+- **Never put text or a focal point in a banner.** The `.cover` class is 200px tall at full column width, so the image is centre-cropped hard. Banners are textures, not illustrations — the lesson title already renders directly beneath.
+- **Colour loud, geometry quiet.** A saturated ground with tone-on-tone shapes, matching the house style. Muddy desaturated mid-tones are wrong.
 
 ### 6. Project-Based Learning
 
@@ -186,6 +212,7 @@ Before considering a course complete:
 - [ ] Troubleshooting guidance for complex topics
 - [ ] Clear progression from beginner to working project
 - [ ] Images optimized and properly referenced
+- [ ] `python3 generate_banners.py <slug>` has been run, and every lesson has a distinct header banner
 - [ ] Links to prerequisite/follow-up courses
 - [ ] Consistent friendly, maker-focused tone throughout
 

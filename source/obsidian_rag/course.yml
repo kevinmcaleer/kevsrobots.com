@@ -1,0 +1,60 @@
+- name: Build a RAG for Your Obsidian Vault
+  author: Kevin McAleer
+  date_created: 2026-08-23
+  date_published: 2026-08-23
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - ai
+      - python
+      - productivity
+  description: >-
+    Build Ask My Vault - a Python tool that indexes your Obsidian notes into
+    ChromaDB and answers questions about them, with citations back to the
+    original note. Learn embeddings, chunking, vector search and grounded
+    generation by building the whole pipeline yourself.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_what_is_rag.md
+      - 02_embeddings_and_vectors.md
+  - section:
+      name: Setting Up
+      content:
+      - 03_project_setup.md
+      - 04_meet_chromadb.md
+  - section:
+      name: Reading Your Vault
+      content:
+      - 05_reading_the_vault.md
+      - 06_parsing_notes.md
+      - 07_chunking_notes.md
+  - section:
+      name: Building the Index
+      content:
+      - 08_building_the_index.md
+      - 09_incremental_indexing.md
+  - section:
+      name: Retrieval
+      content:
+      - 10_querying_the_index.md
+      - 11_metadata_filters.md
+      - 12_improving_retrieval.md
+  - section:
+      name: Generating Answers
+      content:
+      - 13_generating_answers.md
+      - 14_citations_and_grounding.md
+  - section:
+      name: The Finished Tool
+      content:
+      - 15_the_cli.md
+      - 16_keeping_it_fresh.md
+      - 17_evaluating_your_rag.md
+  - section:
+      name: Wrapping Up
+      content:
+      - 18_troubleshooting.md
+      - 19_summary.md

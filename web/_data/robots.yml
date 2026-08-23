@@ -1,3 +1,9 @@
+- name: Modulino SMARS
+  link: /blog/modulino-smars.html
+  cover: /assets/img/blog/modulino_smars/cover.jpg
+  description: "Modulino SMARS - a modular robot that can be built with Arduino Modulinos"
+  date: 2026/08/23
+  hero: /assets/img/blog/modulino_smars/hero.png
 - name: Eye Mech
   link: /blog/eyemech.html
   cover: /assets/img/blog/eyemech/cover.jpg

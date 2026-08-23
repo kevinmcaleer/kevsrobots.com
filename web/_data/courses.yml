@@ -388,6 +388,20 @@
   link: /learn/obsidian/00_intro.html
   name: Obsidian
 - author: Kevin McAleer
+  cover: /learn/obsidian_rag/assets/cover.jpg
+  date_published: 2026-08-23
+  description: Build Ask My Vault - a Python tool that indexes your Obsidian notes
+    into ChromaDB and answers questions about them, with citations back to the original
+    note. Learn embeddings, chunking, vector search and grounded generation by building
+    the whole pipeline yourself.
+  duration: 2h 14m
+  groups:
+  - ai
+  - python
+  - productivity
+  link: /learn/obsidian_rag/00_intro.html
+  name: Build a RAG for Your Obsidian Vault
+- author: Kevin McAleer
   cover: /learn/octapi/assets/octapi.jpg
   date_published: 2024-02-18
   description: Learn how to use Crack the Enigma code using a Cluster of Raspberry
