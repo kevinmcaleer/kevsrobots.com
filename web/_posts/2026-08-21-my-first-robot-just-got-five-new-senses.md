@@ -236,7 +236,7 @@ Every one of the five senses on this robot got its driver installed exactly the 
 
 - [Snakie](https://www.snakie.org) — free, open-source MicroPython editor ([GitHub](https://github.com/kevinmcaleer/Snakie))
 - [Arduino Modulino MicroPython library](https://github.com/arduino/arduino-modulino-mpy) — installed automatically via Snakie
-- Standard Qwiic/STEMMA QT 4-pin cables — one per module, no soldering — buy link `{{confirm link}}`
+- Standard Qwiic/STEMMA QT 4-pin cables — one per module, no soldering
 - SMARS repo — [github.com/kevinmcaleer/smars](https://github.com/kevinmcaleer/smars)
 
 ---
