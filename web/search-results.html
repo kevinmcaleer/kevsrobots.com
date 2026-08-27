@@ -15,7 +15,10 @@ title: Search Results
 
     <p id="search-query-display">About <span id="total_count"></span> results (<span id="search-time"></span>)</p>
 
-    <p class="text-muted small mb-3" id="mcp-invite">
+    <!-- Hidden until the API confirms it actually serves MCP. This page and the
+         search API ship in separate images and deploy independently, so the
+         invite must not promise an endpoint that is not there yet. -->
+    <p class="text-muted small mb-3" id="mcp-invite" style="display:none;">
         <i class="fas fa-plug me-1"></i>
         Using an AI assistant? <a href="/mcp.html">Connect KevsRobots search to it</a> so it can cite these pages directly.
     </p>
@@ -314,15 +317,45 @@ title: Search Results
     }
 
     // --- Fetch ---
+    //
+    // The semantic engine lives in a SEPARATE Docker image to this page, and
+    // the two deploy independently. This page can therefore be newer than the
+    // API it is talking to, in which case /search/semantic does not exist yet
+    // and returns 404 with a JSON body. Keyword search must keep working
+    // through that, so every failure mode below falls back rather than
+    // rendering nothing:
+    //
+    //   - non-2xx status (404 when the API predates the semantic endpoint)
+    //   - a body that is not JSON
+    //   - a 200 whose payload has no results array
+    //   - the API reporting its own vector index as unavailable
+    //
+    // Once semantic has failed we stop asking for the rest of the session, so
+    // a stale API costs one wasted request rather than one per search.
+    var semanticAvailable = true;
+
+    // Only offer the MCP connector once the API says it is mounted. Checked
+    // once per page load, and silently skipped on any failure - an unavailable
+    // connector should be invisible, never a broken promise.
+    (function checkMcp() {
+        fetch('https://search.kevsrobots.com/health')
+            .then(function(response) { return response.ok ? response.json() : null; })
+            .then(function(health) {
+                if (health && health.mcp === 'mounted') {
+                    var invite = document.getElementById('mcp-invite');
+                    if (invite) invite.style.display = '';
+                }
+            })
+            .catch(function() { /* leave the invite hidden */ });
+    })();
+
     function fetchResults(query, page, sort) {
         if (!query) return;
 
         document.getElementById('results-container').innerHTML = '<p class="text-muted">Searching...</p>';
 
-        // "Most Recent" is a date sort, which only the FTS engine does. For
-        // relevance we use the semantic engine, falling back to FTS if the
-        // vector index is unavailable on the node that answered.
-        var useSemantic = (sort !== 'recent');
+        // "Most Recent" is a date sort, which only the keyword engine does.
+        var useSemantic = semanticAvailable && (sort !== 'recent');
         var rawTypes = activeRawTypes();
 
         function buildUrl(endpoint) {
@@ -332,31 +365,55 @@ title: Search Results
             return u;
         }
 
-        function render(data) {
-            renderFilterBar(data.facets || {});
-            displayResults(data.results);
-            document.getElementById('total_count').textContent = data.total_count;
-            document.getElementById('search-time').textContent = data.execution_time + ' seconds';
-            createPagination(data.total_count, data.page_size, data.page, query, sort);
+        function isUsable(data) {
+            return data && Array.isArray(data.results) && !data.error &&
+                   data.engine !== 'unavailable';
         }
 
-        var primary = useSemantic ? '/search/semantic' : '/search/';
-
-        fetch(buildUrl(primary))
-            .then(response => response.json())
-            .then(data => {
-                if (useSemantic && (data.engine === 'unavailable' || data.error)) {
-                    return fetch(buildUrl('/search/'))
-                        .then(r => r.json())
-                        .then(render);
-                }
-                return render(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('results-container').innerHTML =
-                    '<p class="text-danger">Something went wrong with the search. Please try again.</p>';
+        function request(endpoint) {
+            return fetch(buildUrl(endpoint)).then(function(response) {
+                if (!response.ok) throw new Error(endpoint + ' returned HTTP ' + response.status);
+                return response.json();
             });
+        }
+
+        function render(data) {
+            renderFilterBar(data.facets || {});
+            displayResults(data.results || []);
+            document.getElementById('total_count').textContent = data.total_count || 0;
+            document.getElementById('search-time').textContent = (data.execution_time || 0) + ' seconds';
+            createPagination(data.total_count || 0, data.page_size || 10, data.page || 1, query, sort);
+        }
+
+        function keywordSearch() {
+            return request('/search/').then(function(data) {
+                if (!isUsable(data)) throw new Error('keyword search returned no usable payload');
+                render(data);
+            });
+        }
+
+        function showError(error) {
+            console.error('Search failed:', error);
+            document.getElementById('results-container').innerHTML =
+                '<p class="text-danger">Something went wrong with the search. Please try again.</p>';
+        }
+
+        if (!useSemantic) {
+            keywordSearch().catch(showError);
+            return;
+        }
+
+        request('/search/semantic')
+            .then(function(data) {
+                if (!isUsable(data)) throw new Error('semantic engine unavailable');
+                render(data);
+            })
+            .catch(function(error) {
+                console.warn('Falling back to keyword search:', error.message);
+                semanticAvailable = false;
+                return keywordSearch();
+            })
+            .catch(showError);
     }
 
     // --- Search box ---

@@ -100,6 +100,13 @@ def _site_metadata() -> dict:
     """
     path = SITE_ROOT / "search-metadata.json"
     if not path.is_file():
+        # A site image built before search-metadata.json existed. Indexing
+        # still works, but every page loses its course, tags and rating, so
+        # say so loudly rather than shipping a quietly worse index.
+        print(
+            f"WARNING: no search-metadata.json at {path}. Course and tag "
+            "enrichment will be empty - rebuild the site image from current main."
+        )
         return {}
     try:
         import json

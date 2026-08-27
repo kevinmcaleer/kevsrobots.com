@@ -14,6 +14,21 @@ content and redeploying is all it takes for search to be current.
 
 ---
 
+## Deploy order is not optional
+
+The search page ships in the **site** image; the semantic API ships in the
+**search** image. They deploy independently, so either can be newer than the
+other. Both directions are now handled — the page falls back to keyword search
+when the semantic endpoint is absent, and hides the MCP invite until the API
+confirms it serves one — but deploy in the order below anyway, or users get
+keyword-quality results until the search image lands.
+
+**This bit once.** The site image went out with a page calling
+`/search/semantic`, the search image did not follow, and the old API answered
+404 with a JSON body. The fallback checked only for a structured "unavailable"
+reply, so it never fired and the page rendered nothing at all, with no error.
+`tests/frontend/test_fallback.js` now covers that and four related failure modes.
+
 ## Deploy: the whole flow
 
 The site image is the source of the content, so it must be built **first**.

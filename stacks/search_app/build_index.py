@@ -36,6 +36,10 @@ def cmd_stats() -> int:
     print(f"Vector index: {info['chunks']} chunks across {info['pages']} pages")
     for page_type, count in list(info.get("page_types", {}).items())[:12]:
         print(f"    {page_type:>16}: {count}")
+
+    if not (config.SITE_ROOT / "search-metadata.json").is_file():
+        print("\nWARNING: search-metadata.json absent - no course/tag enrichment")
+
     return 0 if info["chunks"] else 1
 
 
@@ -75,6 +79,19 @@ def cmd_build(full: bool, verbose: bool, skip_fts: bool, skip_vector: bool) -> i
         print(f"Index now holds {info['chunks']} chunks across {info['pages']} pages")
         if info["chunks"] == 0:
             print("ERROR: vector index is empty after build", file=sys.stderr)
+            return 1
+
+        # Enrichment being empty means the site image predates
+        # search-metadata.json. Search works without it, but filtering by
+        # course or tag silently returns nothing - fail the build rather than
+        # ship that.
+        if not (config.SITE_ROOT / "search-metadata.json").is_file():
+            print(
+                "ERROR: search-metadata.json missing from the site image, so no "
+                "page has course or tag metadata. Rebuild and push the site "
+                "image from current main, then rebuild this one.",
+                file=sys.stderr,
+            )
             return 1
 
     return 0
