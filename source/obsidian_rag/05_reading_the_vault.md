@@ -80,6 +80,7 @@ class Note:
 ## Loading one note
 
 ```python
+# vault_rag/vault.py  (add below the Note class)
 def load_note(path: Path, vault_path: Path) -> Note:
     """Read and parse one markdown file."""
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -104,6 +105,7 @@ Two small details doing real work:
 ## Walking the whole vault
 
 ```python
+# vault_rag/vault.py  (add below load_note)
 def iter_notes(vault_path: Path):
     """Yield every indexable note in the vault, in a stable order."""
     vault_path = Path(vault_path).expanduser()
@@ -136,6 +138,7 @@ Four decisions in nine lines:
 Point it at your real vault:
 
 ```python
+# try_it.py - a scratch script in the project root, next to vault_rag/
 from vault_rag.config import VAULT_PATH
 from vault_rag.vault import iter_notes
 

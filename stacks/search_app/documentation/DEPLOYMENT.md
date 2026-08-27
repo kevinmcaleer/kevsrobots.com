@@ -34,7 +34,7 @@ This guide covers deploying the KevsRobots Search API to production using Docker
 # On build server
 cd ~
 git clone https://github.com/kevinmcaleer/kevsrobots.com.git
-cd kevsrobots.com/search_app
+cd kevsrobots.com/stacks/search_app
 ```
 
 ### 2. Configure Environment Variables
@@ -164,7 +164,7 @@ CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ```bash
 # On build server
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Build for ARM64 (Raspberry Pi)
 docker build --platform linux/arm64 -t search-api:latest .
@@ -617,7 +617,7 @@ services:
 
 ```bash
 # 1. Build new image
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 git pull
 docker build --platform linux/arm64 -t search-api:latest .
 docker tag search-api:latest 192.168.2.1:5000/search-api:latest

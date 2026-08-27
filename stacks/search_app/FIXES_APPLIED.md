@@ -108,19 +108,19 @@
 
 ### Rebuild Docker Image
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./build_app.sh
 ```
 
 ### Migrate Historical Logs
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 python3 migrate_logs_to_postgres.py
 ```
 
 ### Rebuild Search Index
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 ```
 
@@ -215,7 +215,7 @@ scp search.db pi@dev01:~/search_app/
 
 1. **Deploy to Production**
    ```bash
-   cd ~/kevsrobots.com/search_app
+   cd ~/kevsrobots.com/stacks/search_app
    ./build_app.sh
    # Then deploy to each Pi node
    ```

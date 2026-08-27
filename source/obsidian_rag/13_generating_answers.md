@@ -77,6 +77,7 @@ Every line of that is load bearing.
 ## Formatting the sources
 
 ```python
+# vault_rag/answer.py  (add below SYSTEM_PROMPT)
 def format_sources(hits: list[Hit]) -> str:
     """Number the retrieved chunks so the model can cite them."""
     blocks = []
@@ -129,6 +130,7 @@ Readable, unambiguous, and small. That whole prompt is a few hundred tokens rath
 ## Making the call
 
 ```python
+# vault_rag/answer.py  (add below build_prompt)
 def answer(question: str, hits: list[Hit], client=None, model: str = ANSWER_MODEL) -> str:
     """Send the grounded prompt to Claude and return the text of the reply."""
     if not hits:
@@ -165,6 +167,7 @@ Points worth pausing on:
 A grounded answer takes a few seconds. Watching a blank terminal for a few seconds feels much longer than watching words appear, so stream it:
 
 ```python
+# vault_rag/answer.py  (add below answer)
 def stream_answer(question: str, hits: list[Hit], client=None, model: str = ANSWER_MODEL):
     """Same thing, but yield the answer as it is generated."""
     if not hits:
@@ -187,6 +190,7 @@ def stream_answer(question: str, hits: list[Hit], client=None, model: str = ANSW
 `stream.text_stream` yields text as it arrives, and the context manager cleans up the connection. Printing it is a one-liner:
 
 ```python
+# how you call it - this ends up in cmd_ask in vault_rag/cli.py in lesson 15
 for piece in stream_answer(question, hits):
     print(piece, end="", flush=True)
 ```
@@ -200,6 +204,7 @@ for piece in stream_answer(question, hits):
 You do not need an API key to test the prompt building, and you should not need one to run your tests:
 
 ```python
+# test_answer.py - a scratch script in the project root
 from types import SimpleNamespace
 from vault_rag.answer import answer
 from vault_rag.retrieve import search

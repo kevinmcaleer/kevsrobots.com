@@ -32,7 +32,16 @@ class SearchLogger:
             'user': unquote(db_user) if db_user else None,
             'password': unquote(db_password) if db_password else None
         }
-        self.initialize_table()
+        # Query logging is analytics, not a core feature. If Postgres is
+        # unreachable (a dev machine, a network blip, a test run) the search
+        # API must still serve results rather than refusing to start, so the
+        # logger degrades to a no-op instead of raising.
+        self.enabled = True
+        try:
+            self.initialize_table()
+        except Exception as error:
+            self.enabled = False
+            print(f"Search logging disabled - could not reach the log database: {error}")
 
     def get_connection(self):
         """
@@ -121,6 +130,8 @@ class SearchLogger:
         Returns:
             int: The ID of the inserted log entry, or None if failed
         """
+        if not self.enabled:
+            return None
         try:
             conn = self.get_connection()
             cursor = conn.cursor()

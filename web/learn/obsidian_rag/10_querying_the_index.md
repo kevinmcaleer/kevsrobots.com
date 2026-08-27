@@ -124,6 +124,7 @@ Do **not** rank by `score` and do not filter on it. Chroma already returned the 
 ## The search function
 
 ```python
+# vault_rag/retrieve.py  (add below the Hit class)
 def search(question: str, top_k: int = TOP_K, db_path: Path = DB_PATH,
            where: dict | None = None, oversample: int = 3) -> list[Hit]:
     """Find the chunks most similar to the question."""
@@ -190,6 +191,7 @@ Six slots, one note. Technically these *are* the six closest chunks. But your bu
 The fix is a cap per note:
 
 ```python
+# vault_rag/retrieve.py  (add below search)
 def diversify(hits: list[Hit], limit: int, per_note: int = MAX_CHUNKS_PER_NOTE) -> list[Hit]:
     """Stop one chatty note from filling every slot."""
     kept: list[Hit] = []
@@ -226,6 +228,7 @@ Six slots, five notes, and the build log made it in. Much better material for th
 ## Trying it out
 
 ```python
+# try_it.py - a scratch script in the project root
 from vault_rag.retrieve import search
 
 for number, hit in enumerate(search("which GPIO pins drive the motors?", db_path="testdb"), 1):
@@ -257,6 +260,7 @@ This is why absolute thresholds do not work. A rule like "reject anything under 
 Sometimes, yes - but do it *relative* to the best hit, not against a fixed number:
 
 ```python
+# vault_rag/retrieve.py  (optional - add below diversify)
 def drop_stragglers(hits: list[Hit], ratio: float = 0.5) -> list[Hit]:
     """Keep hits that are at least `ratio` as good as the best one."""
     if not hits:

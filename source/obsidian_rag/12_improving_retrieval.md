@@ -26,7 +26,7 @@ The reason it matters so much is that a chunk gets exactly one vector, and that 
 The same logic extends further. Consider also prepending:
 
 ```python
-# In chunk_note, a richer prefix
+# vault_rag/chunker.py  (inside chunk_note, instead of the plain breadcrumb prefix)
 context = f"{section}\nTags: {', '.join(note.tags)}"
 text = f"{context}\n\n{piece.strip()}"
 ```
@@ -44,6 +44,7 @@ Embeddings are terrible at exact identifiers. Search for `TB6612FNG` and you get
 The fix is to run a keyword search alongside the vector search and merge the results:
 
 ```python
+# vault_rag/retrieve.py  (add `import re` at the top, then these below search)
 def looks_like_identifier(term: str) -> bool:
     """Part numbers, error codes and the like - digits mixed with letters."""
     return (
@@ -91,6 +92,7 @@ Three things to note.
 Then merge, de-duplicating on chunk identity:
 
 ```python
+# vault_rag/retrieve.py  (add below keyword_hits)
 def merge_hits(vector_hits: list[Hit], exact_hits: list[Hit], limit: int) -> list[Hit]:
     """Exact matches first, then the semantic ones, no duplicates."""
     merged: list[Hit] = []
@@ -117,6 +119,7 @@ Retrieval quality depends enormously on the question, and short questions are we
 You cannot make users write better questions, but you can pad short ones:
 
 ```python
+# vault_rag/retrieve.py  (optional - add below merge_hits)
 def expand_query(question: str) -> str:
     """Give a very short question more to work with."""
     if len(question.split()) >= 6:
@@ -133,6 +136,7 @@ Crude, and it genuinely helps on one and two word queries. A more powerful versi
 A chunk boundary can land right before the sentence that answers the question. Since chunk ids are sequential within a note - `smars.md::3`, `smars.md::4` - you can pull in the neighbours of a strong hit:
 
 ```python
+# vault_rag/retrieve.py  (optional - add below expand_query)
 def with_neighbours(collection, hit: Hit, index: int) -> list[str]:
     """Fetch the chunks either side of this one from the same note."""
     wanted = [f"{hit.path}::{i}" for i in (index - 1, index + 1) if i >= 0]

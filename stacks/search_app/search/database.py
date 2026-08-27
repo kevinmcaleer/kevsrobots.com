@@ -37,6 +37,18 @@ def insert_document(title, content, url, cover_image, page_title, description, d
     conn.close()
 
 
+def document_count():
+    """How many documents the FTS index holds. 0 means the index is empty."""
+    try:
+        conn = get_db_connection()
+        count = conn.execute("SELECT COUNT(*) FROM documents_fts").fetchone()[0]
+        conn.close()
+        return count
+    except Exception as error:
+        print(f"Error counting documents: {error}")
+        return 0
+
+
 def sanitize_fts5_query(query):
     """Sanitize a user query for safe use with FTS5 MATCH.
 

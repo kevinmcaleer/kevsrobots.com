@@ -265,7 +265,7 @@ logger = get_search_logger()
 Run the database module to initialize:
 
 ```bash
-cd search_app
+cd stacks/search_app
 python -c "from search.database import initialize_database; initialize_database()"
 ```
 

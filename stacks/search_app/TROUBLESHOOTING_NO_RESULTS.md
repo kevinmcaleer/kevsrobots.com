@@ -104,7 +104,7 @@ Python results: 1041
 **Fix**:
 ```bash
 # On local machine where database works
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 python3 verify_database.py  # Verify local DB has data
 
 # Copy to production
@@ -189,7 +189,7 @@ cd ~/kevsrobots.com/stacks
 docker-compose restart jekyll-serve
 
 # Rebuild search index
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 
 # Verify
@@ -205,7 +205,7 @@ scp search.db pi@dev01:~/search_app/
 
 ### 1. Verify Local Database
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 python3 verify_database.py
 ```
 

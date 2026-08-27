@@ -37,6 +37,7 @@ We already have the fingerprint - `Note.content_hash` from lesson 5, stored as `
 ## Reading back what we know
 
 ```python
+# vault_rag/index.py  (add below write_chunks)
 def indexed_note_hashes(collection) -> dict[str, str]:
     """Map every indexed note path to the hash it was indexed at."""
     stored = collection.get(include=["metadatas"])
@@ -71,6 +72,7 @@ We still *store* `mtime` as metadata, because "notes I touched this month" is a 
 ## The incremental run
 
 ```python
+# vault_rag/index.py  (replaces the index_vault you wrote in lesson 8)
 def index_vault(vault_path: Path = VAULT_PATH, db_path: Path = DB_PATH,
                 full: bool = False, verbose: bool = True) -> IndexStats:
     """Index the vault, skipping notes whose content has not changed."""

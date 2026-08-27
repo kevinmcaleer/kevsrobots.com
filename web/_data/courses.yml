@@ -394,7 +394,7 @@
     into ChromaDB and answers questions about them, with citations back to the original
     note. Learn embeddings, chunking, vector search and grounded generation by building
     the whole pipeline yourself.
-  duration: 2h 14m
+  duration: 2h 17m
   groups:
   - ai
   - python

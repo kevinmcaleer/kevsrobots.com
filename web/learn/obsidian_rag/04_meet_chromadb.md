@@ -97,6 +97,7 @@ That is genuinely it.
 ## Your first collection
 
 ```python
+# scratch_chroma.py - a throwaway script for exploring the API
 import chromadb
 
 client = chromadb.PersistentClient(path="./scratch_db")
@@ -122,6 +123,7 @@ Three things worth pausing on:
 ## Adding documents
 
 ```python
+# scratch_chroma.py (continued)
 collection.upsert(
     ids=["note1-0", "note2-0", "note3-0"],
     documents=[
@@ -148,6 +150,7 @@ Chroma has an `add()` method too. Use `upsert()` instead, always.
 The difference bites in a way you will not notice until it has cost you an hour:
 
 ```python
+# scratch_chroma.py (continued)
 collection.add(ids=["note1-0"], documents=["Completely different text"])
 print(collection.get(ids=["note1-0"], include=["documents"])["documents"])
 # ['The Pico W has a CYW43439 wireless chip and runs MicroPython.']
@@ -162,6 +165,7 @@ print(collection.get(ids=["note1-0"], include=["documents"])["documents"])
 ## Querying
 
 ```python
+# scratch_chroma.py (continued)
 results = collection.query(
     query_texts=["which board has wifi?"],
     n_results=2,
@@ -186,6 +190,7 @@ Those double brackets trip up everyone. `query_texts` is a **list** - you can as
 We only ever ask one thing at a time, so you will see `[0]` all over our code:
 
 ```python
+# scratch_chroma.py (continued)
 for document, metadata, distance in zip(
     results["documents"][0],
     results["metadatas"][0],
@@ -205,6 +210,7 @@ for document, metadata, distance in zip(
 This is where Chroma earns its keep. You can constrain the search *before* the similarity comparison happens:
 
 ```python
+# scratch_chroma.py (continued)
 results = collection.query(
     query_texts=["motors"],
     n_results=5,
@@ -235,6 +241,7 @@ A bare `{"folder": "robots"}` is shorthand for `{"folder": {"$eq": "robots"}}`.
 Separately from metadata, you can filter on the chunk text itself:
 
 ```python
+# scratch_chroma.py (continued)
 collection.query(
     query_texts=["anything"],
     n_results=5,
@@ -257,6 +264,7 @@ We will use this in lesson 12 to rescue searches for exact part numbers, which i
 `get()` is the non-semantic sibling of `query()` - no question, no ranking, just "give me the rows matching this filter":
 
 ```python
+# scratch_chroma.py (continued)
 collection.get(where={"note": "Pico.md"}, include=["metadatas"])
 collection.get(ids=["note1-0"])
 collection.get()                       # everything
@@ -265,6 +273,7 @@ collection.get()                       # everything
 `delete()` takes the same arguments:
 
 ```python
+# scratch_chroma.py (continued)
 collection.delete(where={"note": "Bread.md"})
 collection.delete(ids=["note1-0"])
 ```

@@ -5,7 +5,7 @@
 ### 1. Migrate Historical Logs to PostgreSQL
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Test timestamp preservation (optional but recommended)
 python3 test_timestamp_preservation.py
@@ -43,7 +43,7 @@ Success rate: 100.0%
 ### 2. Rebuild Search Index
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Make sure Jekyll site is built first
 cd ../stacks
@@ -51,7 +51,7 @@ docker-compose ps  # Check if running
 # If not running: docker-compose up -d
 
 # Rebuild the search index
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 ```
 
@@ -85,7 +85,7 @@ KevsRobots Search Index Rebuild
 
 ```bash
 # Start the API (if not already running)
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 uvicorn app:app --reload --host 0.0.0.0 --port 8000
 
 # In another terminal, test:
@@ -122,7 +122,7 @@ SELECT query, COUNT(*) FROM search_logs GROUP BY query ORDER BY COUNT(*) DESC LI
 ## Verify Search Index
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Check database exists and size
 ls -lh search.db
@@ -141,7 +141,7 @@ sqlite3 search.db "SELECT url, page_title FROM documents_fts WHERE documents_fts
 ### Step 1: Build New Docker Image
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./build_app.sh
 ```
 
@@ -184,7 +184,7 @@ curl "http://localhost:8000/search/?query=robot"
 
 **No .env file**
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 cp .env.example .env
 nano .env  # Add your database credentials
 ```
@@ -238,7 +238,7 @@ chown $USER:$USER search.db
 ### Monthly
 - Rebuild search index (after content updates)
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 ```
 

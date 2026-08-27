@@ -80,7 +80,7 @@ Indexing Summary:
 Run the rebuild to verify it works:
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 ```
 

@@ -117,6 +117,7 @@ Notice `answer` is **not** imported here. It gets imported inside `cmd_ask`, bec
 ## The index command
 
 ```python
+# vault_rag/cli.py  (add below the imports)
 def cmd_index(args) -> int:
     print(f"Indexing {args.vault}")
     start = time.time()
@@ -132,6 +133,7 @@ Each command returns an exit code. `0` for success, non-zero for failure - so `a
 ## The search command
 
 ```python
+# vault_rag/cli.py  (add below cmd_index)
 def cmd_search(args) -> int:
     where = build_filter(tag=args.tag, folder=args.folder)
     hits = search(args.question, top_k=args.top_k, db_path=args.db, where=where)
@@ -153,6 +155,7 @@ def cmd_search(args) -> int:
 ## The ask command
 
 ```python
+# vault_rag/cli.py  (add below cmd_search)
 def cmd_ask(args) -> int:
     from .answer import check_citations, stream_answer
 
@@ -186,6 +189,7 @@ We collect the streamed pieces into a list as well as printing them, so the cita
 ## Stats, and the parser
 
 ```python
+# vault_rag/cli.py  (add below cmd_ask)
 def cmd_stats(args) -> int:
     info = collection_stats(args.db)
     print(f"Database: {info['path']}")
@@ -235,6 +239,7 @@ def build_parser() -> argparse.ArgumentParser:
 ## Main
 
 ```python
+# vault_rag/cli.py  (add at the bottom of the file)
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     try:
@@ -263,6 +268,7 @@ if __name__ == "__main__":
 Right now you run it as `python -m vault_rag.cli`. Let's shorten that. Create `pyproject.toml` in the project root:
 
 ```toml
+# pyproject.toml - in the project root, next to vault_rag/
 [project]
 name = "ask-my-vault"
 version = "1.0.0"

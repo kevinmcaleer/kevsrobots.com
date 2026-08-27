@@ -36,7 +36,8 @@ The Pico W adds a CYW43439 wireless chip...
 That block must come out of the body before we embed anything. Leave it in and every chunk from that note carries `created: 2026-03-14` along with it, which is noise the embedding model will happily average into the meaning.
 
 ```python
-# vault_rag/vault.py  (add to the imports)
+# vault_rag/vault.py  (the two imports go at the top of the file,
+#                      the rest below the Note class)
 import re
 import yaml
 
@@ -94,6 +95,7 @@ Printed the new chassis today. #petg #worked-first-time
 Frontmatter tags can be a list, or a single string, or a comma separated string, depending on which Obsidian version wrote them and whether a human hand-edited it. Inline tags are `#word` anywhere in the body.
 
 ```python
+# vault_rag/vault.py  (add below split_frontmatter)
 INLINE_TAG_RE = re.compile(r"(?:^|\s)#([A-Za-z][\w/-]*)")
 CODE_FENCE_RE = re.compile(r"```.*?```", re.DOTALL)
 
@@ -136,6 +138,7 @@ The details that matter:
 ## Extracting wikilinks
 
 ```python
+# vault_rag/vault.py  (add below extract_tags)
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)")
 
 
@@ -160,6 +163,7 @@ We are storing links mainly so they are there when you want them - a natural ext
 ## Wiring it into load_note
 
 ```python
+# vault_rag/vault.py  (replaces the load_note you wrote in lesson 5)
 def load_note(path: Path, vault_path: Path) -> Note:
     """Read and parse one markdown file."""
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -184,6 +188,7 @@ def load_note(path: Path, vault_path: Path) -> Note:
 ## Try it Yourself
 
 ```python
+# try_it.py - a scratch script in the project root
 from vault_rag.config import VAULT_PATH
 from vault_rag.vault import iter_notes
 

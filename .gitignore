@@ -25,3 +25,9 @@ Totals.csv
 .claude/.credentials.json
 .claude/worktrees/
 
+
+# Search index — build artifact, baked into the search image at build time (#230)
+stacks/search_app/search.db
+stacks/search_app/search.db.backup.*
+stacks/search_app/chroma/
+stacks/search_app/.venv/

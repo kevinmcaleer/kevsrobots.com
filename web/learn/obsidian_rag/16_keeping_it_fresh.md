@@ -10,7 +10,7 @@ next: 17_evaluating_your_rag.html
 description: Re-index on a schedule, watch the vault for changes, and decide which
   approach suits how you actually work
 percent: 85
-duration: 6
+duration: 7
 date_updated: 2026-08-23
 navigation:
 - name: Build a RAG for Your Obsidian Vault
@@ -102,11 +102,14 @@ Start at the top. Move down only when the one above stops being good enough.
 The simplest thing that works. Add a flag:
 
 ```python
+# vault_rag/cli.py  (in build_parser - give ask its own subparser rather than
+# building it in the shared loop, so only ask gets this flag)
 ask_parser.add_argument("--fresh", action="store_true",
                         help="Re-index before answering")
 ```
 
 ```python
+# vault_rag/cli.py  (add these lines to the top of cmd_ask)
 def cmd_ask(args) -> int:
     from .answer import check_citations, stream_answer
 
@@ -223,6 +226,7 @@ def watch(vault_path: Path = VAULT_PATH, db_path: Path = DB_PATH):
 Add it as a command:
 
 ```python
+# vault_rag/cli.py  (add below cmd_stats, and add a `watch` subparser in build_parser)
 def cmd_watch(args) -> int:
     from .watch import watch
     watch(args.vault, args.db)
@@ -237,6 +241,7 @@ On macOS, a launch agent at `~/Library/LaunchAgents/com.kevsrobots.amv.plist`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- ~/Library/LaunchAgents/com.kevsrobots.amv.plist -->
 <plist version="1.0">
 <dict>
     <key>Label</key>
@@ -263,6 +268,7 @@ launchctl load ~/Library/LaunchAgents/com.kevsrobots.amv.plist
 On Linux, a systemd user unit at `~/.config/systemd/user/amv.service`:
 
 ```ini
+# ~/.config/systemd/user/amv.service
 [Unit]
 Description=Ask My Vault indexer
 

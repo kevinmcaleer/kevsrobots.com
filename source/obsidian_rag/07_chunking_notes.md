@@ -100,6 +100,7 @@ The `or [("", body.strip())]` at the end handles a note with no headings at all 
 A section under one heading can still run to thousands of characters. Window it:
 
 ```python
+# vault_rag/chunker.py  (add below split_by_headings)
 def split_long_text(text: str, size: int, overlap: int) -> list[str]:
     """Window a long section into overlapping pieces, breaking on paragraphs."""
     if len(text) <= size:
@@ -173,6 +174,7 @@ Now "SMARS" is in the embedded text and the chunk ranks properly. This one chang
 There is a wrinkle. Most Obsidian notes open with an H1 that repeats the filename, so the naive breadcrumb reads `SMARS Robot > SMARS > Motor wiring` - the same thing twice. Collapse it:
 
 ```python
+# vault_rag/chunker.py  (add below split_long_text)
 def breadcrumb(title: str, heading: str) -> str:
     """Join the note title and heading trail, without repeating anything.
 
@@ -192,6 +194,7 @@ def breadcrumb(title: str, heading: str) -> str:
 ## Putting it together
 
 ```python
+# vault_rag/chunker.py  (add below breadcrumb)
 def chunk_note(note: Note, size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[Chunk]:
     """Turn one note into a list of chunks with full metadata."""
     chunks: list[Chunk] = []
@@ -241,6 +244,7 @@ The `or ["untagged"]` and `or ["none"]` matter more than they look. Chroma rejec
 ## Try it Yourself
 
 ```python
+# try_it.py - a scratch script in the project root
 from vault_rag.config import VAULT_PATH
 from vault_rag.vault import iter_notes
 from vault_rag.chunker import chunk_note

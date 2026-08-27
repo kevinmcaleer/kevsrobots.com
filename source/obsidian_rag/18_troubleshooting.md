@@ -24,6 +24,7 @@ When an answer is bad, check in this order. Each step is quick and each one elim
 **1. Is the note indexed at all?**
 
 ```python
+# check_index.py - a scratch script in the project root
 from vault_rag.index import get_collection
 
 collection = get_collection("~/.ask-my-vault/chroma")
@@ -36,6 +37,7 @@ Zero chunks means the problem is in reading, not searching. Check `SKIP_DIRS`, c
 **2. Is the right chunk in there?**
 
 ```python
+# check_index.py (continued)
 for document in result["documents"]:
     print(repr(document[:120]))
 ```

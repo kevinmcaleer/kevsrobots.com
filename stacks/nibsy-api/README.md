@@ -182,7 +182,7 @@ caches when the scoring evolves.
 
 ## Conventions
 
-Mirrors `search_app/` where applicable:
+Mirrors `stacks/search_app/` where applicable:
 * Python 3.12 base image
 * `curl -f /health` healthcheck
 * No Alembic — `Base.metadata.create_all` on startup

@@ -100,6 +100,7 @@ Your prompt should now show `(.venv)`. If it does not, the activate step did not
 Three packages, and that is the lot:
 
 ```
+# requirements.txt
 chromadb>=1.5.0
 anthropic>=1.0.0
 pyyaml>=6.0

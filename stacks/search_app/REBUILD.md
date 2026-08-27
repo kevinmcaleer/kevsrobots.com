@@ -11,7 +11,7 @@
 ### Option 1: Using Build Script (Recommended)
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Make script executable (if needed)
 chmod +x build_app.sh
@@ -23,7 +23,7 @@ chmod +x build_app.sh
 ### Option 2: Manual Build
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Build for ARM64 (Raspberry Pi)
 docker build --platform linux/arm64 -t 192.168.2.1:5000/search:latest .
@@ -105,7 +105,7 @@ docker exec search-api ls -la /usr/src/app/.env
 
 **Verify your credentials are decoded correctly**:
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 python3 decode_credentials.py
 ```
 

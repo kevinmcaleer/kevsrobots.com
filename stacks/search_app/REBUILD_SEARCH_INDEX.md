@@ -25,7 +25,7 @@ docker-compose up -d
 docker-compose logs -f jekyll-serve
 
 # Go back to search_app
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Run the indexer
 python3 index.py
@@ -36,7 +36,7 @@ python3 index.py
 I've created a convenience script that does everything:
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 ```
 
@@ -94,7 +94,7 @@ ls -la ~/kevsrobots.com/web/_site/
 ### Step 2: Clear Old Index (Optional)
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 
 # Backup existing database
 cp search.db search.db.backup.$(date +%Y%m%d)
@@ -106,14 +106,14 @@ rm search.db
 ### Step 3: Initialize New Database
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 python3 -c "from search.database import initialize_database; initialize_database()"
 ```
 
 ### Step 4: Run Indexer
 
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 python3 index.py
 ```
 
@@ -249,7 +249,7 @@ chmod 644 search.db
 
 **Solution**: Run from correct directory
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 python3 index.py
 ```
 
@@ -307,7 +307,7 @@ Rebuild nightly at 2 AM:
 crontab -e
 
 # Add this line:
-0 2 * * * cd /home/user/kevsrobots.com/search_app && ./rebuild_search_index.sh >> /tmp/search_rebuild.log 2>&1
+0 2 * * * cd /home/user/kevsrobots.com/stacks/search_app && ./rebuild_search_index.sh >> /tmp/search_rebuild.log 2>&1
 ```
 
 ### Option 2: After Jekyll Build
@@ -326,7 +326,7 @@ docker-compose up -d
 sleep 30
 
 # Rebuild search index
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 
 # Deploy (your deployment steps here)
@@ -415,7 +415,7 @@ fi
 
 **To rebuild**:
 ```bash
-cd ~/kevsrobots.com/search_app
+cd ~/kevsrobots.com/stacks/search_app
 ./rebuild_search_index.sh
 ```
 

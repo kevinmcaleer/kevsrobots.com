@@ -42,12 +42,12 @@ def _run(cmd: list[str], cwd: Path | None = None) -> str:
 
 @mcp.tool()
 def rebuild_search_database() -> str:
-    """Rebuild the site search database by running search_app/rebuild.sh.
+    """Rebuild the site search database by running stacks/search_app/rebuild.sh.
 
     Deletes the old search.db index and re-indexes all content.
     """
-    script = REPO_ROOT / "search_app" / "rebuild.sh"
-    return _run(["bash", str(script)], cwd=REPO_ROOT / "search_app")
+    script = REPO_ROOT / "stacks" / "search_app" / "rebuild.sh"
+    return _run(["bash", str(script)], cwd=REPO_ROOT / "stacks" / "search_app")
 
 
 @mcp.tool()
@@ -157,7 +157,7 @@ def rebuild_all() -> str:
         ("Posts YAML", [sys.executable, "post_yaml_builder.py"], REPO_ROOT),
         ("Courses", [sys.executable, "build.py"], REPO_ROOT),
         ("Courses DB", [sys.executable, str(REPO_ROOT / "course_app" / "build_database.py")], REPO_ROOT / "course_app"),
-        ("Search DB", ["bash", str(REPO_ROOT / "search_app" / "rebuild.sh")], REPO_ROOT / "search_app"),
+        ("Search DB", ["bash", str(REPO_ROOT / "stacks" / "search_app" / "rebuild.sh")], REPO_ROOT / "stacks" / "search_app"),
         ("Optimize Images", [sys.executable, "optimize_images.py"], REPO_ROOT),
         ("Popular Videos", [sys.executable, "popular_vids.py"], REPO_ROOT),
         ("Post Calendar", [sys.executable, "post_calendar.py"], REPO_ROOT),

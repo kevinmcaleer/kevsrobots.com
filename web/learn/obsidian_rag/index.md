@@ -164,12 +164,27 @@ Each lesson builds one piece of the tool. Code appears in blocks like this:
 print("Hello, vault")
 ```
 
-When a block belongs in a specific file, the first line is a comment telling you which one:
+**Every code block tells you where it goes.** The first line is a comment naming the file, so you are never left guessing:
 
 ```python
 # vault_rag/config.py
 CHUNK_SIZE = 1200
 ```
+
+When a block adds to a file you already started, the comment says where to put it - and when it replaces something from an earlier lesson, it says that too:
+
+```python
+# vault_rag/vault.py  (add below the Note class)
+# vault_rag/vault.py  (replaces the load_note you wrote in lesson 5)
+```
+
+Some blocks are throwaway experiments rather than part of the tool. Those name a scratch file instead, which you can delete afterwards:
+
+```python
+# try_it.py - a scratch script in the project root
+```
+
+Blocks with no file comment are either shell commands or short fragments illustrating a point.
 
 Most lessons finish with a **Try it Yourself** section - small experiments that show you the behaviour rather than just telling you about it - and a **Common Issues** section for the things that trip people up.
 

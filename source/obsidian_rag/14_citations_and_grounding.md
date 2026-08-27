@@ -32,6 +32,7 @@ Without those markers you have a paragraph that might be a faithful summary of y
 Our CLI prints the answer, then the sources it was given:
 
 ```python
+# a preview of cmd_ask - it lands in vault_rag/cli.py in lesson 15
 for piece in stream_answer(question, hits):
     print(piece, end="", flush=True)
 
@@ -58,6 +59,7 @@ Note that we list **everything we sent**, not only what got cited. That is delib
 The model can hallucinate a citation number. It is rare with a clear prompt, but "rare" is not "never", and this is cheap to check:
 
 ```python
+# vault_rag/answer.py  (add `import re` at the top, then this at the bottom)
 import re
 
 CITATION_RE = re.compile(r"\[(\d+)\]")
@@ -73,6 +75,7 @@ def check_citations(text: str, hit_count: int) -> tuple[set[int], set[int]]:
 Wire it in after the answer arrives:
 
 ```python
+# also destined for cmd_ask in vault_rag/cli.py (lesson 15)
 cited, invalid = check_citations(answer_text, len(hits))
 
 if invalid:
@@ -111,6 +114,7 @@ There is a fourth trick that is easy to miss: **let weak results through**. It i
 Do not assume it works. Test it:
 
 ```python
+# try_it.py - a scratch script in the project root
 questions = [
     "what did I write about the Voyager 2 mission?",      # not in the vault
     "what is the capital of France?",                      # general knowledge

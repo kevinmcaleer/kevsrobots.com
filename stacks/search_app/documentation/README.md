@@ -64,7 +64,7 @@ The KevsRobots Search API is a FastAPI-based full-text search service with compr
 1. **Clone repository**:
 ```bash
 git clone https://github.com/kevinmcaleer/kevsrobots.com.git
-cd kevsrobots.com/search_app
+cd kevsrobots.com/stacks/search_app
 ```
 
 2. **Create virtual environment**:

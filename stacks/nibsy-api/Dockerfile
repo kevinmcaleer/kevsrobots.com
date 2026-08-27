@@ -1,4 +1,4 @@
-# Mirrors search_app/dockerfile shape; uvicorn on port 8200 per #70.
+# Mirrors stacks/search_app/dockerfile shape; uvicorn on port 8200 per #70.
 FROM python:3.12.1-slim
 
 WORKDIR /usr/src/app

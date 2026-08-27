@@ -145,6 +145,7 @@ It is not the most accurate embedding model in the world. It is, however, free, 
 Here is what it looks like in practice:
 
 ```python
+# embed_demo.py - a scratch script, run on its own (not part of the tool we build later)
 from chromadb.utils import embedding_functions
 
 embed = embedding_functions.DefaultEmbeddingFunction()
@@ -167,6 +168,7 @@ Run that and you get `Each vector has 384 dimensions`. The first time it runs it
 Cosine distance is easy to compute by hand, and doing it once makes the whole idea concrete:
 
 ```python
+# cosine_demo.py - another scratch script
 import math
 from chromadb.utils import embedding_functions
 

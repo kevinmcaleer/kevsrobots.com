@@ -1,5 +1,8 @@
 import os
 from datetime import datetime, timezone
+
+# Path to the built Jekyll site, relative to this directory (stacks/search_app/)
+SITE_ROOT = os.environ.get('SITE_ROOT', '../../web/_site')
 from bs4 import BeautifulSoup
 from search.database import insert_document  # Replace with your actual module
 
@@ -24,7 +27,7 @@ def parse_html_file(file_path):
         title = soup.title.string if soup.title else 'No Title'
         content = soup.get_text()
 
-        url = file_path.replace('web/_site/', '', 1).replace('../', '', 1)
+        url = os.path.relpath(file_path, SITE_ROOT)
 
         og_image_tag = soup.find('meta', {'property': 'og:image'})
         cover_image = og_image_tag['content'] if og_image_tag and 'content' in og_image_tag.attrs else 'DefaultImagePath'
@@ -93,7 +96,7 @@ def main():
 
     # Count total files first
     html_files = []
-    for root, dirs, files in os.walk('../web/_site'):
+    for root, dirs, files in os.walk(SITE_ROOT):
         for file in files:
             if file.endswith('.html'):
                 html_files.append(os.path.join(root, file))

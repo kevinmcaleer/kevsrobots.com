@@ -56,6 +56,7 @@ Every other module calls this one function to get at the database. When you late
 ## Writing chunks in batches
 
 ```python
+# vault_rag/index.py  (add below get_collection)
 def write_chunks(collection, chunks) -> int:
     """Upsert chunks in batches so we never blow the max batch size."""
     for start in range(0, len(chunks), BATCH_SIZE):
@@ -105,6 +106,7 @@ Two rules Chroma enforces that will bite you:
 ## The indexing run
 
 ```python
+# vault_rag/index.py  (add below write_chunks)
 @dataclass
 class IndexStats:
     """What the last indexing run actually did."""
@@ -126,6 +128,7 @@ class IndexStats:
 Then the simplest possible version of the run - index everything, every time:
 
 ```python
+# vault_rag/index.py  (add below IndexStats)
 def index_vault(vault_path: Path = VAULT_PATH, db_path: Path = DB_PATH,
                 verbose: bool = True) -> IndexStats:
     """Index the whole vault. (We make this incremental in the next lesson.)"""
@@ -145,6 +148,7 @@ def index_vault(vault_path: Path = VAULT_PATH, db_path: Path = DB_PATH,
 Run it:
 
 ```python
+# try_it.py - a scratch script in the project root
 from vault_rag.index import index_vault
 
 stats = index_vault("testvault", "testdb")
@@ -166,6 +170,7 @@ That is a working index. You can query it right now.
 ## Checking your work
 
 ```python
+# vault_rag/index.py  (add below index_vault)
 def collection_stats(db_path: Path = DB_PATH) -> dict:
     """Quick health check on the index."""
     collection = get_collection(db_path)

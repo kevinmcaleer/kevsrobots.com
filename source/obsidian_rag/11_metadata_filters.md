@@ -30,6 +30,7 @@ Which is exactly what you want, and occasionally surprising: filter hard enough 
 ## Building the clause
 
 ```python
+# vault_rag/retrieve.py  (add below diversify)
 def build_filter(tag: str | None = None, folder: str | None = None,
                  since: float | None = None) -> dict | None:
     """Turn CLI options into a Chroma `where` clause."""
@@ -96,6 +97,7 @@ where = {
 Here is a friendlier "since" than a raw Unix timestamp:
 
 ```python
+# vault_rag/retrieve.py  (import time at the top, days_ago below build_filter)
 import time
 
 def days_ago(days: int) -> float:
@@ -110,6 +112,7 @@ where = build_filter(tag="robots", since=days_ago(90))
 ## Seeing it work
 
 ```python
+# try_it.py - a scratch script in the project root
 from vault_rag.retrieve import build_filter, search
 
 # Unfiltered - the whole vault competes

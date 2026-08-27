@@ -27,8 +27,8 @@ echo "✅ Dependencies OK"
 echo ""
 
 # Step 1: Check if Jekyll site exists
-if [ ! -d "../web/_site" ]; then
-    echo "❌ ERROR: Jekyll site not found at ../web/_site"
+if [ ! -d "../../web/_site" ]; then
+    echo "❌ ERROR: Jekyll site not found at ../../web/_site"
     echo ""
     echo "Build the Jekyll site first:"
     echo "  cd ~/kevsrobots.com/stacks"
@@ -38,7 +38,7 @@ if [ ! -d "../web/_site" ]; then
 fi
 
 # Step 2: Count HTML files
-HTML_COUNT=$(find ../web/_site -name "*.html" | wc -l | tr -d ' ')
+HTML_COUNT=$(find ../../web/_site -name "*.html" | wc -l | tr -d ' ')
 echo "📄 Found $HTML_COUNT HTML files to index"
 echo ""
 
