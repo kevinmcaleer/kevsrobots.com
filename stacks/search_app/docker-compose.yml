@@ -1,12 +1,33 @@
-version: '3.8'
+# Local testing of the built search image.
+#
+# There is deliberately NO bind mount of the source directory here. Both search
+# indexes (search.db and chroma/) are built INTO the image and do not exist on
+# the host - they are gitignored build artifacts. Mounting the source over
+# /usr/src/app shadows them, and the container comes up answering every request
+# with "no such table: documents_fts" and a 503, which looks like a broken
+# image when the image is fine.
+#
+#   docker compose up -d --build
+#   curl -s localhost:8000/health | jq
+#
+# For production use ClusteredPi/stacks/search/docker-compose.prod.yml, which
+# pulls the pushed image and adds the cloudflared sidecar.
 
 services:
-  fastapi-app:
+  search:
     build: .
+    image: kevsrobots-search:local
     ports:
       - "8000:8000"
     environment:
       - PORT=8000
-    volumes:
-      - .:/usr/src/app
-    restart: always
+      # Postgres query logging is optional; without it the API logs a warning
+      # and carries on. Point at a real host to enable it.
+      - DB_HOST=${DB_HOST:-}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 45s
+      retries: 3
