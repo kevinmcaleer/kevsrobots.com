@@ -39,7 +39,7 @@ Ahoy there makers!
 
 This is SMARS — the screwless, tracked chassis that's been part of this channel since the very beginning. Six years and six previous rebuilds later, it just did five things it was never built to do: it stopped itself in front of an obstacle, played a tune, drove itself across the bench, flashed an expression on a tiny LED face, and reacted to being tilted by hand. No soldering iron came anywhere near it. About €55 in parts, all of which I already owned. And the board actually running all of it isn't even made by the same company that made the sensors.
 
-This post is the standalone write-up: the parts, the two 3D-printed pieces that made it possible, the real code behind every sense (including the one extra step a non-Arduino board needs that the video only has time to show once), the wiring for the one connection that genuinely isn't click-together, and a proper gotchas section. If you want the demo with sound and a face reacting in real time, [watch the video]({{confirm video url}}) — everything you need to build this yourself lives here.
+This post is the standalone write-up: the parts, the two 3D-printed pieces that made it possible, the real code behind every sense (including the one extra step a non-Arduino board needs that the video only has time to show once), the wiring for the one connection that genuinely isn't click-together, and a proper gotchas section. If you want the demo with sound and a face reacting in real time, [watch the video](https://www.youtube.com/watch?v=1K1A1YGcOEE) — everything you need to build this yourself lives here.
 
 ## SMARS is a test bed, not a comeback
 
@@ -257,6 +257,6 @@ Every one of the five senses on this robot got its driver installed exactly the 
 
 The one thing worth taking from all of this: a robot doesn't need a new chassis to feel brand new. It needs senses that click into place, and a brain that doesn't care who made them. SMARS has had a new brain every year or two for six years now — this is just the newest one.
 
-So — what should it get next? Tell me in the comments; the best idea might be the next version. And if you want to see it happen, [the full build is on YouTube]({{confirm video url}}), with the whole demo running start to finish.
+So — what should it get next? Tell me in the comments; the best idea might be the next version. And if you want to see it happen, [the full build is on YouTube](https://www.youtube.com/watch?v=1K1A1YGcOEE), with the whole demo running start to finish.
 
 I hope you enjoyed this one, and I shall see you next time. Bye for now.
