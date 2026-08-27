@@ -90,7 +90,48 @@ class Page:
 # ---------------------------------------------------------------------------
 
 
+@lru_cache(maxsize=1)
+def _site_metadata() -> dict:
+    """Metadata Jekyll rendered into the built site.
+
+    Preferred over reading _data directly, because _data does not exist inside
+    the search container - the index is built from the site image, which
+    carries this file but not the Jekyll sources.
+    """
+    path = SITE_ROOT / "search-metadata.json"
+    if not path.is_file():
+        return {}
+    try:
+        import json
+
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as error:
+        print(f"Warning: could not read search-metadata.json: {error}")
+        return {}
+
+
+# Map our internal names onto the keys used in search-metadata.json.
+_METADATA_KEYS = {
+    "courses.yml": "courses",
+    "projects.yml": "projects",
+    "robots.yml": "robots",
+    "reviews.yml": "reviews",
+    "glossary.yml": "glossary",
+}
+
+
 def _load_yaml(name: str):
+    """Load a data file, preferring the site-embedded JSON over raw _data.
+
+    Both shapes are lists of dicts with the same field names, so callers do not
+    care which source answered.
+    """
+    key = _METADATA_KEYS.get(name)
+    if key:
+        embedded = _site_metadata().get(key)
+        if embedded:
+            return embedded
+
     path = DATA_ROOT / name
     if not path.is_file():
         return None

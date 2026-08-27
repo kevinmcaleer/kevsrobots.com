@@ -1,0 +1,56 @@
+---
+layout: null
+sitemap: false
+---
+{% comment %}
+Machine-readable metadata for the search indexer.
+
+The RAG pipeline enriches each indexed page with its course, tags and rating.
+That data lives in _data/*.yml, which Jekyll does not copy into _site - so the
+search container, which builds its index from the built site, could not see it.
+
+Emitting it here means the metadata ships inside the site image alongside the
+HTML it describes, and cannot drift out of sync with the pages it annotates.
+{% endcomment %}
+{
+  "generated": "{{ site.time | date_to_xmlschema }}",
+  "courses": [
+    {% for course in site.data.courses %}{
+      "link": {{ course.link | jsonify }},
+      "name": {{ course.name | jsonify }},
+      "author": {{ course.author | jsonify }},
+      "groups": {{ course.groups | default: empty_array | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "projects": [
+    {% for project in site.data.projects %}{
+      "link": {{ project.link | jsonify }},
+      "name": {{ project.name | jsonify }},
+      "tags": {{ project.tags | default: empty_array | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "robots": [
+    {% for robot in site.data.robots %}{
+      "link": {{ robot.link | jsonify }},
+      "name": {{ robot.name | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "reviews": [
+    {% for review in site.data.reviews %}{
+      "link": {{ review.link | jsonify }},
+      "title": {{ review.title | jsonify }},
+      "rating": {{ review.rating | default: 0 | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "glossary": [
+    {% for term in site.data.glossary %}{% if term.link %}{
+      "link": {{ term.link | jsonify }},
+      "term": {{ term.term | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endif %}{% endfor %}
+  ]
+}

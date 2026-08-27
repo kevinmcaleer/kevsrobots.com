@@ -33,6 +33,12 @@ MIN_CHUNK_SIZE = 80
 # Headings we split on. h5/h6 are usually inline emphasis rather than structure.
 HEADING_TAGS = ("h1", "h2", "h3", "h4")
 
+# Prepend the course name to each chunk's embedded text as well as the
+# breadcrumb. A lesson on the Q-learning update rule never says the words
+# "reinforcement learning", so without this a query paraphrasing the course
+# subject cannot reach its own lessons. Measured with eval/evaluate.py.
+INCLUDE_COURSE_IN_TEXT = os.environ.get("INCLUDE_COURSE_IN_TEXT", "1") != "0"
+
 # Retrieval -------------------------------------------------------------------
 
 TOP_K = 10
@@ -94,3 +100,28 @@ CONTENT_SELECTORS = (
     "div.content",
     "div.container-fluid",
 )
+
+
+# MCP transport ---------------------------------------------------------------
+
+# Host headers the MCP endpoint will accept. DNS-rebinding protection rejects
+# anything else with a 421, so the production hostname must be listed here.
+# Override with MCP_ALLOWED_HOSTS as a comma-separated list.
+MCP_ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get(
+        "MCP_ALLOWED_HOSTS",
+        "search.kevsrobots.com,www.kevsrobots.com,localhost,localhost:8000,"
+        "127.0.0.1,127.0.0.1:8000,testserver",
+    ).split(",")
+    if h.strip()
+]
+
+MCP_ALLOWED_ORIGINS = [
+    o.strip()
+    for o in os.environ.get(
+        "MCP_ALLOWED_ORIGINS",
+        "https://search.kevsrobots.com,https://www.kevsrobots.com,https://claude.ai",
+    ).split(",")
+    if o.strip()
+]

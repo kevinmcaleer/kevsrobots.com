@@ -1,5 +1,14 @@
 # Rebuild Search Index Guide
 
+> **Superseded.** Since the RAG search rebuild, both indexes are built into the
+> Docker image automatically — see [REBUILD.md](REBUILD.md) for the current
+> deploy flow. This document describes the older manual index rebuild, kept as a
+> fallback for debugging a node by hand. Paths have moved to
+> `stacks/search_app/`, and the manual path builds only the keyword index, not
+> the vector index that powers semantic search and the MCP endpoint.
+
+
+
 ## Problem
 
 Search returns no results because the SQLite FTS (Full-Text Search) database is empty or outdated.

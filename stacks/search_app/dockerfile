@@ -1,33 +1,104 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12.1-slim
+# syntax=docker/dockerfile:1.4
+#
+# KevsRobots Search API - keyword (SQLite FTS5) + semantic (ChromaDB) search.
+#
+# Both indexes are built INTO the image from the freshly-built Jekyll site, so
+# every node ships with its own local index: no shared database, no runtime
+# indexing step, nothing to keep in sync. Publishing content and redeploying is
+# all it takes for search to be current.
+#
+# Build order matters - the site image is the source of the content:
+#   1. Build and push the site image first (ClusteredPi/stacks/kevsrobots)
+#   2. docker pull 192.168.2.1:5000/kevsrobots:latest    # if not just built here
+#   3. docker build -t 192.168.2.1:5000/search:latest .
+#   4. docker push 192.168.2.1:5000/search:latest
+#
+# See REBUILD.md for the full deploy flow.
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+ARG SITE_IMAGE=192.168.2.1:5000/kevsrobots:latest
 
-# Install system dependencies for psycopg2, lxml, and other packages
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    gcc \
-    curl \
-    libxml2-dev \
-    libxslt1-dev \
+# ---------------------------------------------------------------------------
+# Stage 1: the built site, straight out of the production site image
+# ---------------------------------------------------------------------------
+FROM ${SITE_IMAGE} AS site
+
+# ---------------------------------------------------------------------------
+# Stage 2: build both search indexes
+# ---------------------------------------------------------------------------
+FROM python:3.12-slim AS indexer
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq-dev gcc libxml2-dev libxslt1-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the current directory contents into the container at /usr/src/app
-COPY . .
-
-# Install any needed packages specified in requirements.txt
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Define environment variable
-ENV PORT=8000
+# The Jekyll site nginx serves from. It carries search-metadata.json, which is
+# where the course/tag/rating enrichment comes from - so no part of the Jekyll
+# source tree needs to be in this build context.
+COPY --from=site /www/data /site
 
-# Expose port
+COPY rag/ ./rag/
+COPY search/ ./search/
+COPY index.py build_index.py ./
+
+ENV SITE_ROOT=/site \
+    CHROMA_PATH=/build/chroma
+
+# Warm the embedding model into the image. Without this the first container to
+# start would download ~80MB of ONNX model at runtime - slow, and a hard
+# failure on a node with no outbound network.
+RUN python -c "\
+from chromadb.utils import embedding_functions as ef; \
+fn = ef.ONNXMiniLM_L6_V2(); \
+fn(['warm the model cache so runtime never has to download it']); \
+print('embedding model cached')"
+
+# Build both indexes. --full because an image build always starts from nothing,
+# so there is no prior state worth an incremental comparison.
+RUN python build_index.py --full --quiet
+
+# Fail the build rather than shipping an image that answers every query with
+# "no results" - an empty index looks healthy from the outside.
+RUN python build_index.py --stats
+
+# ---------------------------------------------------------------------------
+# Stage 3: the runtime image
+# ---------------------------------------------------------------------------
+FROM python:3.12-slim
+
+WORKDIR /usr/src/app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq-dev curl libxml2 libxslt1.1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+# The built indexes and the warmed model cache.
+COPY --from=indexer /build/search.db ./search.db
+COPY --from=indexer /build/chroma ./chroma
+COPY --from=indexer /root/.cache/chroma /root/.cache/chroma
+
+ENV PORT=8000 \
+    CHROMA_PATH=/usr/src/app/chroma \
+    ANONYMIZED_TELEMETRY=False
+
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+# The healthcheck returns 503 when either index is empty, so a bad build shows
+# up as an unhealthy container rather than a silently useless one.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://127.0.0.1:8000/health || exit 1
 
-# Run app.py when the container launches
+LABEL maintainer="kevinmcaleer@gmail.com"
+LABEL description="KevsRobots search API - hybrid semantic + keyword search with MCP endpoint"
+LABEL version="3.0"
+
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,9 @@
+.venv/
+chroma/
+search.db
+search.db.backup.*
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+.env

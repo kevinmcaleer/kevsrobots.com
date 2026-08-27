@@ -1,0 +1,89 @@
+# Golden questions for measuring retrieval quality.
+#
+# Written the way people actually type: short, lowercase, a bit lazy. An
+# evaluation set of beautifully phrased questions measures a tool nobody uses.
+#
+# `expect` is a URL prefix - a hit counts if any returned URL starts with it,
+# so a course-level answer counts wherever in that course it lands.
+# `expect: null` means the site genuinely cannot answer; a good result is
+# nothing useful coming back.
+#
+# Deliberately includes questions whose wording shares no keywords with the
+# target page - those are the ones that separate semantic search from BM25.
+
+# --- Semantic: different words to the page ----------------------------------
+- question: robot that draws pictures on a wall
+  expect: learn/scrawly_wally/
+  note: the page says "plotter" and "drawing robot", not "draws pictures"
+
+- question: machine that makes burgers
+  expect: learn/burgerbot/
+
+- question: how do I put my notes into an AI so it can answer questions about them
+  expect: learn/obsidian_rag/
+
+- question: run containers on a pi
+  expect: learn/docker/
+
+- question: teach a computer to learn by trial and error
+  expect: learn/reinforcement_learning/
+
+- question: how do I read how hot the chip is
+  expect: learn/pico_temp_sensor/
+
+- question: mesh networking off the grid
+  expect: learn/meshcore/
+
+# --- Exact identifiers: what embeddings are worst at -------------------------
+- question: PCA9685
+  expect: learn/pca9685/
+
+- question: DRV8833 wiring
+  expect: null
+  note: appears across several pages - any is fine, so not scored on one URL
+
+- question: what is a GPIO pin
+  expect: learn/micropython_gpio/
+
+# --- Course discovery --------------------------------------------------------
+- question: learn micropython from scratch
+  expect: learn/micropython/
+
+- question: beginner python course
+  expect: learn/python/
+
+- question: getting started with rust
+  expect: learn/rust/
+
+- question: sqlite database tutorial
+  expect: learn/sqlite3/
+
+- question: pandas and numpy for data
+  expect: learn/pandas_and_numpy/
+
+# --- Specific technique questions --------------------------------------------
+- question: how do I control a servo with a pico
+  expect: learn/micropython_gpio/
+
+- question: split notes into chunks for embedding
+  expect: learn/obsidian_rag/
+
+- question: what is retrieval augmented generation
+  expect: learn/obsidian_rag/
+
+- question: build a robot arm
+  expect: learn/
+
+- question: 3d print a robot chassis
+  expect: null
+  note: covered across many pages, no single canonical answer
+
+# --- Should find nothing useful ----------------------------------------------
+- question: what did I have for breakfast
+  expect: null
+
+- question: how do I file my tax return
+  expect: null
+
+- question: capital city of france
+  expect: null

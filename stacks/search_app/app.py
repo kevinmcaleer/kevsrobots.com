@@ -31,6 +31,32 @@ app = FastAPI(
 # Initialize search logger
 search_logger = get_search_logger()
 
+# Mount the MCP server so LLM clients can use the index as a knowledge source.
+# Streamable HTTP transport at /mcp, sharing this container's index and tunnel.
+MCP_AVAILABLE = False
+MCP_IMPORT_ERROR = None
+if RAG_AVAILABLE:
+    try:
+        from contextlib import asynccontextmanager
+
+        from rag.mcp_server import http_app as mcp_http_app
+
+        _mcp_app = mcp_http_app()
+
+        # A mounted sub-app's lifespan is NOT run by the parent, so the MCP
+        # session manager would never start. Delegate to it explicitly.
+        @asynccontextmanager
+        async def _lifespan(_app):
+            async with _mcp_app.router.lifespan_context(_mcp_app):
+                yield
+
+        app.router.lifespan_context = _lifespan
+        app.mount("/mcp", _mcp_app)
+        MCP_AVAILABLE = True
+    except Exception as _mcp_error:  # pragma: no cover - depends on deploy state
+        MCP_IMPORT_ERROR = str(_mcp_error)
+        print(f"MCP server not mounted: {_mcp_error}")
+
 
 def get_client_ip(request: Request) -> str:
     """
@@ -407,6 +433,7 @@ async def health_check(response: Response):
         "version": "3.0.0",
         "fts_documents": fts_count,
         "vector_chunks": vector_count,
+        "mcp": "mounted" if MCP_AVAILABLE else f"unavailable: {MCP_IMPORT_ERROR}",
         "problems": problems,
         "timestamp": datetime.now().isoformat(),
     }

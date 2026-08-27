@@ -12,7 +12,7 @@ Two ideas do most of the work here:
 import re
 from dataclasses import dataclass
 
-from .config import CHUNK_OVERLAP, CHUNK_SIZE, MIN_CHUNK_SIZE
+from .config import CHUNK_OVERLAP, CHUNK_SIZE, INCLUDE_COURSE_IN_TEXT, MIN_CHUNK_SIZE
 from .content import Page
 
 
@@ -103,6 +103,19 @@ def _clean_metadata(metadata: dict) -> dict:
     return clean
 
 
+def _embedded_prefix(page: Page, crumb: str) -> str:
+    """The context line that gets embedded along with the chunk body.
+
+    The breadcrumb alone leaves a chunk unable to be found by its own subject:
+    a lesson on the Q-learning update rule never writes "reinforcement
+    learning", so a query using the course's own topic words misses it
+    entirely. Naming the course closes that gap.
+    """
+    if INCLUDE_COURSE_IN_TEXT and page.course and page.course.lower() not in crumb.lower():
+        return f"{page.course} > {crumb}"
+    return crumb
+
+
 def chunk_page(
     page: Page, size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP
 ) -> list[Chunk]:
@@ -112,11 +125,24 @@ def chunk_page(
 
     for section in page.sections:
         for piece in split_long_text(section.text, size, overlap):
-            if len(piece.strip()) < MIN_CHUNK_SIZE:
+            piece = piece.strip()
+            if not piece:
                 continue
 
             crumb = breadcrumb(page.title, section.trail)
-            text = f"{crumb}\n\n{piece.strip()}"
+            prefix = _embedded_prefix(page, crumb)
+
+            if len(piece) < MIN_CHUNK_SIZE:
+                # Too small to stand alone as a chunk - a one-line section, a
+                # stray "TODO", the tail of a split. Rather than dropping it
+                # (which loses real facts: "Left motor: GP6 and GP7" is short
+                # and is exactly what someone searches for), fold it into the
+                # previous chunk, keeping its heading so the context survives.
+                if chunks and len(chunks[-1].text) + len(piece) < size * 1.4:
+                    chunks[-1].text += f"\n\n{crumb.rsplit(' > ', 1)[-1]}: {piece}"
+                continue
+
+            text = f"{prefix}\n\n{piece}"
 
             metadata = _clean_metadata(
                 {

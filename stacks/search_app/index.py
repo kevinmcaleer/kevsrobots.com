@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 # Path to the built Jekyll site, relative to this directory (stacks/search_app/)
 SITE_ROOT = os.environ.get('SITE_ROOT', '../../web/_site')
 from bs4 import BeautifulSoup
-from search.database import insert_document  # Replace with your actual module
+from search.database import initialize_database, insert_document
 
 def parse_html_file(file_path):
     try:
@@ -92,6 +92,12 @@ def main():
     skipped_files = 0
     error_files = 0
 
+    # Create the FTS5 table if it does not exist. Without this, a fresh
+    # environment (a Docker build, a new clone) indexes every page into a
+    # table that was never created and silently ships an empty index -
+    # every insert fails with "no such table: documents_fts".
+    initialize_database()
+
     print("Scanning for HTML files...")
 
     # Count total files first
@@ -127,6 +133,12 @@ def main():
         print(f"\n  Note: {error_files} files had encoding or parsing errors")
         print(f"        Check warnings above for details")
     print(f"{'='*60}\n")
+
+    if processed_files == 0:
+        raise SystemExit(
+            "ERROR: no documents were indexed - check SITE_ROOT points at a built site"
+        )
+
 
 if __name__ == "__main__":
     main()

@@ -15,6 +15,11 @@ title: Search Results
 
     <p id="search-query-display">About <span id="total_count"></span> results (<span id="search-time"></span>)</p>
 
+    <p class="text-muted small mb-3" id="mcp-invite">
+        <i class="fas fa-plug me-1"></i>
+        Using an AI assistant? <a href="/mcp.html">Connect KevsRobots search to it</a> so it can cite these pages directly.
+    </p>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="btn-group" role="group" aria-label="Sort results" id="sort-toggle">
             <button type="button" class="btn btn-outline-secondary active" data-sort="relevance">Relevance</button>
@@ -314,19 +319,38 @@ title: Search Results
 
         document.getElementById('results-container').innerHTML = '<p class="text-muted">Searching...</p>';
 
-        var url = 'https://search.kevsrobots.com/search/?query=' + encodeURIComponent(query) + '&page=' + page + '&sort=' + sort;
+        // "Most Recent" is a date sort, which only the FTS engine does. For
+        // relevance we use the semantic engine, falling back to FTS if the
+        // vector index is unavailable on the node that answered.
+        var useSemantic = (sort !== 'recent');
         var rawTypes = activeRawTypes();
-        if (rawTypes) url += '&page_types=' + encodeURIComponent(rawTypes.join(','));
 
-        fetch(url)
+        function buildUrl(endpoint) {
+            var u = 'https://search.kevsrobots.com' + endpoint + '?query=' + encodeURIComponent(query) +
+                    '&page=' + page + '&sort=' + sort;
+            if (rawTypes) u += '&page_types=' + encodeURIComponent(rawTypes.join(','));
+            return u;
+        }
+
+        function render(data) {
+            renderFilterBar(data.facets || {});
+            displayResults(data.results);
+            document.getElementById('total_count').textContent = data.total_count;
+            document.getElementById('search-time').textContent = data.execution_time + ' seconds';
+            createPagination(data.total_count, data.page_size, data.page, query, sort);
+        }
+
+        var primary = useSemantic ? '/search/semantic' : '/search/';
+
+        fetch(buildUrl(primary))
             .then(response => response.json())
             .then(data => {
-                // Always render filter bar from unfiltered facets
-                renderFilterBar(data.facets || {});
-                displayResults(data.results);
-                document.getElementById('total_count').textContent = data.total_count;
-                document.getElementById('search-time').textContent = data.execution_time + ' seconds';
-                createPagination(data.total_count, data.page_size, data.page, query, sort);
+                if (useSemantic && (data.engine === 'unavailable' || data.error)) {
+                    return fetch(buildUrl('/search/'))
+                        .then(r => r.json())
+                        .then(render);
+                }
+                return render(data);
             })
             .catch(error => {
                 console.error('Error:', error);

@@ -302,18 +302,46 @@ def search(
     return diversify(merged, top_k)
 
 
+def _url_variants(url: str) -> list[str]:
+    """Other URLs that might hold the same content.
+
+    Pages published at two URLs are deduplicated at index time, keeping the
+    canonical one. A caller holding the other URL - an old link, or a guess
+    from an LLM - should still get the page rather than a bare "not found".
+    """
+    variants = [url]
+    if url.endswith("/"):
+        variants.append(url + "index.html")
+    if "/" in url and not url.endswith("index.html"):
+        variants.append(url.rsplit("/", 1)[0] + "/index.html")
+    if url.endswith("/index.html"):
+        base = url[: -len("index.html")]
+        variants.extend(base + name for name in ("00_intro.html", "01_intro.html"))
+    if not url.endswith(".html"):
+        variants.extend([url + ".html", url.rstrip("/") + "/index.html"])
+    seen, unique = set(), []
+    for variant in variants:
+        if variant and variant not in seen:
+            seen.add(variant)
+            unique.append(variant)
+    return unique
+
+
 def get_page_chunks(url: str, db_path: Path = CHROMA_PATH) -> list[dict]:
     """Every indexed chunk for one page, in document order.
 
-    Used by the MCP `get_page` tool so an LLM can read a whole page after a
-    search surfaces one paragraph of it.
+    Used by the MCP `get_kevsrobots_page` tool so an LLM can read a whole page
+    after a search surfaces one paragraph of it.
     """
     collection = get_collection(db_path)
-    result = collection.get(
-        where={"url": url}, include=["documents", "metadatas"]
-    )
-    rows = list(
-        zip(result.get("documents") or [], result.get("metadatas") or [])
-    )
-    rows.sort(key=lambda row: (row[1] or {}).get("chunk_index", 0))
-    return [{"text": document, "metadata": metadata} for document, metadata in rows]
+
+    for candidate in _url_variants(url):
+        result = collection.get(
+            where={"url": candidate}, include=["documents", "metadatas"]
+        )
+        rows = list(zip(result.get("documents") or [], result.get("metadatas") or []))
+        if rows:
+            rows.sort(key=lambda row: (row[1] or {}).get("chunk_index", 0))
+            return [{"text": doc, "metadata": meta} for doc, meta in rows]
+
+    return []
