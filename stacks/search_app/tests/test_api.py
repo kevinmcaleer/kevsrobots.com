@@ -196,6 +196,48 @@ class TestMCP:
         }, request_id=8).json()
         assert "No indexed content" in body["result"]["content"][0]["text"]
 
+    def test_allowlist_accepts_any_port(self):
+        """A real MCP client sends Host with the port it dialled.
+
+        Without port wildcards the allowlist only matches the default port, so
+        running on any other port returns 421 - which looks like a broken
+        endpoint rather than a security control. Caught by an actual
+        `claude mcp add` against a container on :8099.
+        """
+        from rag.config import MCP_ALLOWED_HOSTS
+        from mcp.server.transport_security import (
+            TransportSecurityMiddleware,
+            TransportSecuritySettings,
+        )
+
+        middleware = TransportSecurityMiddleware(
+            TransportSecuritySettings(
+                enable_dns_rebinding_protection=True,
+                allowed_hosts=MCP_ALLOWED_HOSTS,
+                allowed_origins=[],
+            )
+        )
+        for host in ("search.kevsrobots.com", "127.0.0.1:8099",
+                     "localhost:8000", "search.kevsrobots.com:443"):
+            assert middleware._validate_host(host), f"{host} should be allowed"
+
+    def test_allowlist_still_rejects_unknown_hosts(self):
+        from rag.config import MCP_ALLOWED_HOSTS
+        from mcp.server.transport_security import (
+            TransportSecurityMiddleware,
+            TransportSecuritySettings,
+        )
+
+        middleware = TransportSecurityMiddleware(
+            TransportSecuritySettings(
+                enable_dns_rebinding_protection=True,
+                allowed_hosts=MCP_ALLOWED_HOSTS,
+                allowed_origins=[],
+            )
+        )
+        for host in ("evil.example.com", "kevsrobots.com.evil.net", ""):
+            assert not middleware._validate_host(host), f"{host} should be rejected"
+
     def test_placeholders_never_reach_the_model(self, client):
         # Empty metadata is stored as the string "none" for Chroma's sake; the
         # model must never be told the course is literally called "none".

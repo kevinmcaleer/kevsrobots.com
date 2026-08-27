@@ -105,23 +105,41 @@ CONTENT_SELECTORS = (
 # MCP transport ---------------------------------------------------------------
 
 # Host headers the MCP endpoint will accept. DNS-rebinding protection rejects
-# anything else with a 421, so the production hostname must be listed here.
+# anything else with a 421 - which reads as a broken endpoint rather than a
+# security control, so the list has to be right.
+#
+# Each entry is listed twice: bare, and with the library's ":*" wildcard so any
+# port matches. Without the wildcard an entry only matches the default port,
+# and running the container on any other port (a local test on 8099, a second
+# instance, a port change on a node) fails with a 421 that looks like a bug.
+#
 # Override with MCP_ALLOWED_HOSTS as a comma-separated list.
-MCP_ALLOWED_HOSTS = [
+def _with_port_wildcards(hosts: list[str]) -> list[str]:
+    expanded: list[str] = []
+    for host in hosts:
+        if not host:
+            continue
+        expanded.append(host)
+        if ":" not in host:
+            expanded.append(f"{host}:*")
+    return expanded
+
+
+MCP_ALLOWED_HOSTS = _with_port_wildcards([
     h.strip()
     for h in os.environ.get(
         "MCP_ALLOWED_HOSTS",
-        "search.kevsrobots.com,www.kevsrobots.com,localhost,localhost:8000,"
-        "127.0.0.1,127.0.0.1:8000,testserver",
+        "search.kevsrobots.com,www.kevsrobots.com,localhost,127.0.0.1,testserver",
     ).split(",")
     if h.strip()
-]
+])
 
-MCP_ALLOWED_ORIGINS = [
+MCP_ALLOWED_ORIGINS = _with_port_wildcards([
     o.strip()
     for o in os.environ.get(
         "MCP_ALLOWED_ORIGINS",
-        "https://search.kevsrobots.com,https://www.kevsrobots.com,https://claude.ai",
+        "https://search.kevsrobots.com,https://www.kevsrobots.com,"
+        "https://claude.ai,http://localhost,http://127.0.0.1",
     ).split(",")
     if o.strip()
-]
+])

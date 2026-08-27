@@ -76,7 +76,12 @@ docker build --build-arg SITE_IMAGE=192.168.2.1:5000/kevsrobots:some-tag -t ... 
    empty** — better a failed build than an image that answers every query with
    "no results" while looking perfectly healthy
 
-Expect roughly 3-5 minutes on a Pi 5, most of it embedding.
+Expect **5-15 minutes on a Pi 5**, almost all of it embedding ~9,400 chunks.
+
+The ARM64 layers are verified: all wheels install from prebuilt binaries (no
+source builds, no Rust toolchain needed), and the ONNX embedding model runs on
+aarch64. Throughput was only measured under QEMU emulation, which is several
+times slower than native — hence the wide range.
 
 ---
 
@@ -142,5 +147,10 @@ thing to try, every time.
 **Build fails at the `FROM ${SITE_IMAGE}` line** — the registry is unreachable
 or the tag does not exist. `docker pull 192.168.2.1:5000/kevsrobots:latest`.
 
-**MCP returns 421** — the `Host` header is not in `MCP_ALLOWED_HOSTS`. Set that
-env var (comma-separated) if serving on a new hostname.
+**MCP returns 421 / `Invalid Host header`** — the `Host` header is not in
+`MCP_ALLOWED_HOSTS`. The defaults cover `search.kevsrobots.com`, `localhost` and
+`127.0.0.1` on any port. Serving on a new hostname needs that env var set
+(comma-separated); entries without a port automatically match any port.
+
+Note that `curl` will not reproduce this if you pass `-H 'Host: ...'` yourself —
+test with a real client, or omit the header so curl sends the host you dialled.
