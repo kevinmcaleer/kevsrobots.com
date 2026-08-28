@@ -17,6 +17,11 @@ services:
   search:
     build: .
     image: kevsrobots-search:local
+    # Mirrors production: with a cloudflared sidecar sharing this container's
+    # network namespace, the hostname must be set here rather than on the
+    # sidecar, which cannot set its own. It is what shows up in Cloudflare's
+    # tunnel Connectors list.
+    hostname: ${NODE_NAME:-kevsrobots-search}
     ports:
       - "8000:8000"
     environment:
