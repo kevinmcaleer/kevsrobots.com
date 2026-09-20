@@ -31,3 +31,4 @@ stacks/search_app/search.db
 stacks/search_app/search.db.backup.*
 stacks/search_app/chroma/
 stacks/search_app/.venv/
+stacks/search_app/data/

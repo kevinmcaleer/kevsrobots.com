@@ -11,3 +11,4 @@ __pycache__/
 # Local secrets — keep .env.example committed.
 .env
 .pytest*
+stacks/search_app/data/*
