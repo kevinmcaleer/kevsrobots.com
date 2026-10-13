@@ -25,9 +25,9 @@
     });
 
     if ('IntersectionObserver' in window) {
-      // Show the list only once the hero and spec strip have scrolled away,
+      // Show the list only once the hero, video and spec strip have scrolled away,
       // and hide it again when the reader reaches the end of the article.
-      var top = [document.querySelector('.kr-hero'), document.querySelector('.kr-specs')].filter(Boolean);
+      var top = [document.querySelector('.kr-hero'), document.querySelector('.kr-watch'), document.querySelector('.kr-specs')].filter(Boolean);
       var topInView = new Set(top);
       var proseInView = false;
       var update = function () { toc.classList.toggle('is-visible', proseInView && topInView.size === 0); };
