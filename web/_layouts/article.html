@@ -1,0 +1,87 @@
+---
+layout: default
+---
+{% comment %}
+  Photo-led article layout. Opt in with `layout: article`.
+
+  Front matter:
+    hero:        image for the top of the page (defaults to `cover`)
+    hero_style:  overlay (title on the photo, default), split (title beside the photo) or plain (no photo)
+    specs:       label/value pairs shown in a strip under the hero, e.g. `Brains: Pico + Pi 4`
+    difficulty:  beginner, intermediate or advanced
+    toc:         false hides the "On this page" list
+
+  Layout blocks for the Markdown body live in _plugins/article_blocks.rb;
+  docs/article_layout.md has the cheat sheet.
+{% endcomment %}
+{% assign hero = page.hero | default: page.cover %}
+{% assign hero_style = page.hero_style | default: 'overlay' %}
+{% unless hero %}{% assign hero_style = 'plain' %}{% endunless %}
+{% if hero_style != 'overlay' and hero_style != 'split' %}{% assign hero_style = 'plain' %}{% endif %}
+{% assign words = content | strip_html | number_of_words %}
+{% assign minutes = words | divided_by: 200 | at_least: 1 %}
+{% assign url_parts = page.url | split: '/' %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="/assets/css/article.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/image-viewer.css?v={{ site.time | date: '%s' }}">
+
+<article class="kr-article">
+  <header class="kr-hero kr-hero-{{ hero_style }}">
+    {% if hero_style == 'overlay' %}
+    <img class="kr-hero-img" src="{{ hero }}" alt="" fetchpriority="high">
+    {% endif %}
+    <div class="kr-hero-inner">
+      <div class="kr-hero-text">
+        <nav class="kr-crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          {% if page.collection == 'posts' %} / <a href="/blog/">Blog</a>
+          {% elsif url_parts.size > 2 %} / <a href="/{{ url_parts[1] }}/">{{ url_parts[1] | replace: '_', ' ' | capitalize }}</a>{% endif %}
+        </nav>
+        <h1>{{ page.title }}</h1>
+        {% if page.description %}<p class="kr-lede">{{ page.description }}</p>{% endif %}
+        <div class="kr-meta">
+          {% if page.author %}<span><i class="fa-regular fa-user"></i>{{ page.author }}</span>{% endif %}
+          {% if page.date %}<span><i class="fa-regular fa-calendar"></i>{{ page.date | date: "%-d %B %Y" }}</span>{% endif %}
+          <span><i class="fa-solid fa-book-open-reader"></i>{{ minutes }} minute read</span>
+          {% if page.date_updated %}<span>Updated {{ page.date_updated | date: "%-d %B %Y" }}</span>{% endif %}
+        </div>
+        {% if page.difficulty or page.tags.size > 0 %}
+        <div class="kr-tags">
+          {% if page.difficulty %}<span class="kr-chip kr-chip-level">{{ page.difficulty | capitalize }}</span>{% endif %}
+          {% for tag in page.tags %}<a class="kr-chip" href="/tags/{{ tag | slugify }}/">{{ tag | replace: '_', ' ' }}</a>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% if hero_style == 'split' %}
+      <figure class="kr-hero-figure"><img src="{{ hero }}" alt="" fetchpriority="high"></figure>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if page.specs %}
+  <dl class="kr-specs">
+    {% for spec in page.specs %}<div><dt>{{ spec[0] }}</dt><dd>{{ spec[1] }}</dd></div>{% endfor %}
+  </dl>
+  {% endif %}
+
+  {% unless page.toc == false %}
+  <nav class="kr-toc" aria-label="On this page"><p>On this page</p><ol></ol></nav>
+  {% endunless %}
+
+  <div class="kr-prose">
+    {{ content }}
+  </div>
+
+  <footer class="kr-article-footer">
+    {% unless page.hide_likes_and_comments %}
+    <hr />
+    <p>Enjoyed this article? Show some love!</p>
+    {% include like-comment.html %}
+    {% endunless %}
+    {% include related_articles.html %}
+  </footer>
+</article>
+
+<script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/article.js?v={{ site.time | date: '%s' }}"></script>
