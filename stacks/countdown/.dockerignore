@@ -2,3 +2,8 @@
 .pytest_cache
 __pycache__
 tests
+.venv
+__pycache__
+*.pyc
+*.db
+docker-compose*.yml

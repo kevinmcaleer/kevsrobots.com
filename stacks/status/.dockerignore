@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+.pytest_cache
+.venv
+.env
+tests
+*.db
+data
+README.md
+pytest.ini
+docker-compose*.yml
+docker-stack.yml

@@ -16,7 +16,8 @@ stacks/nibsy-api/
 ├── tests/            # pytest + aiosqlite + fixtures
 ├── Dockerfile        # python:3.12.1-slim, uvicorn on 8200
 ├── docker-compose.yml
-└── requirements.txt
+├── requirements.txt
+└── requirements-dev.txt   # pytest etc., not installed in the image
 ```
 
 ## Running locally
@@ -60,7 +61,7 @@ curl -X POST http://127.0.0.1:8200/api/admin/regenerate-recommendations
 
 ```bash
 cd stacks/nibsy-api
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 pytest
 ```
 

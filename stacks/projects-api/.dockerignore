@@ -6,3 +6,8 @@ __pycache__
 tests
 *.db
 .git
+tests
+docs
+*.md
+pytest.ini
+docker-compose*.yml

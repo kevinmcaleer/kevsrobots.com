@@ -15,3 +15,8 @@ tests
 .git
 .gitignore
 README.md
+tests
+README.md
+pytest.ini
+docker-compose*.yml
+docker-stack.yml
