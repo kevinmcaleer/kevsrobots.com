@@ -7,3 +7,11 @@ __pycache__/
 .pytest_cache/
 *.log
 .env
+tests
+eval
+design
+documentation
+*.md
+docker-compose*.yml
+docker-stack.yml
+*.sh

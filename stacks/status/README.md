@@ -63,7 +63,7 @@ conftest setting `STATUS_DISABLE_SCHEDULER=1`.
 
 ```bash
 cd stacks/status
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 pytest -q
 ```
 
