@@ -10,6 +10,9 @@ layout: default
     specs:       label/value pairs shown in a strip under the hero, e.g. `Brains: Pico + Pi 4`
     difficulty:  beginner, intermediate or advanced
     toc:         false hides the "On this page" list
+    videos:      YouTube video IDs; the first is featured right under the hero
+    code:        GitHub repository link (or a list of links)
+    stl, dxf:    downloadable files, each with name, link and (stl) description
 
   Layout blocks for the Markdown body live in _plugins/article_blocks.rb;
   docs/article_layout.md has the cheat sheet.
@@ -46,6 +49,9 @@ layout: default
           <span><i class="fa-solid fa-book-open-reader"></i>{{ minutes }} minute read</span>
           {% if page.date_updated %}<span>Updated {{ page.date_updated | date: "%-d %B %Y" }}</span>{% endif %}
         </div>
+        {% if page.videos %}
+        <a class="kr-hero-watch" href="#watch"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch the video</a>
+        {% endif %}
         {% if page.difficulty or page.tags.size > 0 %}
         <div class="kr-tags">
           {% if page.difficulty %}<span class="kr-chip kr-chip-level">{{ page.difficulty | capitalize }}</span>{% endif %}
@@ -58,6 +64,34 @@ layout: default
       {% endif %}
     </div>
   </header>
+
+  {% if page.videos %}
+  {% assign main_video = page.videos | first %}
+  <section class="kr-watch" id="watch" aria-label="Video">
+    <div class="kr-watch-inner">
+      <a class="kr-watch-main" href="https://www.youtube.com/watch?v={{ main_video }}" target="_blank" rel="noopener">
+        <img src="https://img.youtube.com/vi/{{ main_video }}/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/{{ main_video }}/hqdefault.jpg'" alt="Watch {{ page.title | escape }} on YouTube">
+        <span class="kr-play" aria-hidden="true"></span>
+      </a>
+      <div class="kr-watch-text">
+        <p class="kr-watch-eyebrow">Watch the video</p>
+        <p class="kr-watch-title">{{ page.title }}</p>
+        <p>See it built and running on YouTube.{% if page.videos.size > 1 %} This project has {{ page.videos.size }} videos.{% endif %}</p>
+        <div class="kr-watch-actions">
+          <a class="kr-btn kr-btn-red" href="https://www.youtube.com/watch?v={{ main_video }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch on YouTube</a>
+          <a class="kr-btn kr-btn-ghost" href="https://www.youtube.com/@kevinmcaleer28?sub_confirmation=1" target="_blank" rel="noopener">Subscribe</a>
+        </div>
+        {% if page.videos.size > 1 %}
+        <div class="kr-watch-more">
+          {% for video in page.videos offset: 1 %}
+          <a href="https://www.youtube.com/watch?v={{ video }}" target="_blank" rel="noopener"><img src="https://img.youtube.com/vi/{{ video }}/mqdefault.jpg" alt="Watch part {{ forloop.index | plus: 1 }} on YouTube" loading="lazy"><span class="kr-play kr-play-sm" aria-hidden="true"></span></a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
 
   {% if page.specs %}
   <dl class="kr-specs">
@@ -72,6 +106,30 @@ layout: default
   <div class="kr-prose">
     {{ content }}
   </div>
+
+  {% if page.code or page.stl or page.dxf %}
+  <section class="kr-resources" aria-labelledby="kr-resources-title">
+    <h2 id="kr-resources-title">Build files</h2>
+    {% if page.code %}
+    {% assign code_links = page.code | join: ',' | split: ',' %}
+    <ul class="kr-files">
+      {% for link in code_links %}<li><i class="fa-brands fa-github" aria-hidden="true"></i><a href="{{ link | strip }}">{{ link | strip | remove: 'https://' | remove: 'www.' }}</a><span>Code on GitHub</span></li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% if page.stl %}
+    <h3>3D models</h3>
+    <ul class="kr-files">
+      {% for stl in page.stl %}{% assign filename = stl.link | split: '/' | last %}<li><i class="fa-solid fa-cube" aria-hidden="true"></i><a href="{{ stl.link }}" download>{{ filename }}</a><span>{{ stl.name }}{% if stl.description %}: {{ stl.description }}{% endif %}</span></li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% if page.dxf %}
+    <h3>DXF files</h3>
+    <ul class="kr-files">
+      {% for dxf in page.dxf %}{% assign filename = dxf.link | split: '/' | last %}<li><i class="fa-solid fa-file" aria-hidden="true"></i><a href="{{ dxf.link }}" download>{{ filename }}</a><span>{{ dxf.name }}</span></li>{% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+  {% endif %}
 
   <footer class="kr-article-footer">
     {% unless page.hide_likes_and_comments %}

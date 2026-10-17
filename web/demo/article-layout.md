@@ -12,6 +12,22 @@ specs:
   Servos: 3 × DS-929MG
   Camera: Pi Camera 3 Wide
   Parts cost: £151.59
+videos:
+  - eDvpRmfa6nU
+  - TBoCBz7QOYk
+  - JbWKsdy5iOk
+  - OJAPQOc1RV0
+code: https://github.com/kevinmcaleer/bubo-2t
+stl:
+  - name: Face
+    link: /assets/stl/bubo/face.stl
+    description: Front of the head
+  - name: Body
+    link: /assets/stl/bubo/body.stl
+    description: Main body
+  - name: Eye piece
+    link: /assets/stl/bubo/eye_piece.stl
+    description: Eye piece
 tags:
   - robot
   - steampunk
