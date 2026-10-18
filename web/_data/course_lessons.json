@@ -2249,6 +2249,110 @@
     ]
   },
   {
+    "slug": "mongodb",
+    "name": "MongoDB - Your First Database",
+    "description": "Never made a database before? Start here. Learn what a database is, install MongoDB, and store, find, update and organise your data - then build Parts Bin, a Python app that keeps track of every servo, sensor and screw in your workshop.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-10-18",
+    "groups": [
+      "python",
+      "raspberrypi"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/mongodb/00_intro.html"
+      },
+      {
+        "file": "01_what_is_a_database.md",
+        "section": "Database Basics",
+        "url": "/learn/mongodb/01_what_is_a_database.html"
+      },
+      {
+        "file": "02_documents_and_collections.md",
+        "section": "Database Basics",
+        "url": "/learn/mongodb/02_documents_and_collections.html"
+      },
+      {
+        "file": "03_installing_mongodb.md",
+        "section": "Database Basics",
+        "url": "/learn/mongodb/03_installing_mongodb.html"
+      },
+      {
+        "file": "04_first_steps_in_mongosh.md",
+        "section": "Your First Database",
+        "url": "/learn/mongodb/04_first_steps_in_mongosh.html"
+      },
+      {
+        "file": "05_inserting_documents.md",
+        "section": "Your First Database",
+        "url": "/learn/mongodb/05_inserting_documents.html"
+      },
+      {
+        "file": "06_finding_documents.md",
+        "section": "Your First Database",
+        "url": "/learn/mongodb/06_finding_documents.html"
+      },
+      {
+        "file": "07_query_operators.md",
+        "section": "Your First Database",
+        "url": "/learn/mongodb/07_query_operators.html"
+      },
+      {
+        "file": "08_updating_documents.md",
+        "section": "Changing Data",
+        "url": "/learn/mongodb/08_updating_documents.html"
+      },
+      {
+        "file": "09_deleting_documents.md",
+        "section": "Changing Data",
+        "url": "/learn/mongodb/09_deleting_documents.html"
+      },
+      {
+        "file": "10_nested_documents_and_arrays.md",
+        "section": "Shaping Your Data",
+        "url": "/learn/mongodb/10_nested_documents_and_arrays.html"
+      },
+      {
+        "file": "11_designing_your_data.md",
+        "section": "Shaping Your Data",
+        "url": "/learn/mongodb/11_designing_your_data.html"
+      },
+      {
+        "file": "12_aggregation_basics.md",
+        "section": "Shaping Your Data",
+        "url": "/learn/mongodb/12_aggregation_basics.html"
+      },
+      {
+        "file": "13_indexes.md",
+        "section": "Shaping Your Data",
+        "url": "/learn/mongodb/13_indexes.html"
+      },
+      {
+        "file": "14_python_and_pymongo.md",
+        "section": "MongoDB and Python",
+        "url": "/learn/mongodb/14_python_and_pymongo.html"
+      },
+      {
+        "file": "15_building_the_parts_bin_app.md",
+        "section": "MongoDB and Python",
+        "url": "/learn/mongodb/15_building_the_parts_bin_app.html"
+      },
+      {
+        "file": "16_keeping_your_data_safe.md",
+        "section": "Wrapping Up",
+        "url": "/learn/mongodb/16_keeping_your_data_safe.html"
+      },
+      {
+        "file": "17_summary.md",
+        "section": "Wrapping Up",
+        "url": "/learn/mongodb/17_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "object_model",
     "name": "Building Object Detection Models with Raspberry Pi AI Camera",
     "description": "Learn how to build custom object detection models using the Raspberry Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment, and run real-time detection on Raspberry Pi hardware. Complete hands-on course from dataset creation to production deployment.",
