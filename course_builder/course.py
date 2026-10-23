@@ -137,6 +137,7 @@ class Course:
             self.date_created = manifest["date_created"]
             self.date_published = manifest["date_published"]
             self.content = manifest["content"]
+            self.level = manifest.get("level", "beginner")
             cover_folder = self.course_folder.replace("source", "/learn")
             self.cover = cover_folder + "/" + manifest["cover"]
             self.cover = self.cover.replace("//learn", "/learn")
@@ -363,4 +364,6 @@ class Course:
             "author": self.author,
             "groups": self.groups,
             "date_published": self.date_published,
+            "level": self.level,
+            "lessons": self.no_of_lessons,
         }

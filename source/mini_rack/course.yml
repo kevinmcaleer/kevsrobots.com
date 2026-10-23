@@ -2,11 +2,12 @@
   author: Kevin McAleer
   date_created: 2025-02-16
   date_published: 2025-02-16
+  level: beginner
   layout: course
   cover: assets/cover.jpg
   groups:
-      - raspberrypi
-      - 3ddesign
+      - raspberry pi
+      - 3d modeling
       - stands_and_cases
   description: >- 
      Design a 3D printable 10" mini-rack for your Raspberry Pi home lab.

@@ -1,3 +1,14 @@
+{% comment %}
+  Course index for /learn/. Every course card is rendered here at build time
+  from site.data.courses (written by build.py), so new courses appear on the
+  next site build and search engines can see the links. The script at the
+  bottom only shows/hides cards: tag checkboxes (a course must match every
+  ticked tag), level, a text search and sort order. No backend needed.
+{% endcomment %}
+{% assign courses_sorted = site.data.courses | sort: "date_published" | reverse %}
+{% assign all_tags = "" | split: "" %}
+{% for course in courses_sorted %}{% assign all_tags = all_tags | concat: course.groups %}{% endfor %}
+{% assign all_tags = all_tags | uniq | sort %}
 <div class="container-fluid">
     <div class="row">
         <!-- Learn sidebar -->
@@ -9,9 +20,27 @@
             <div class="mb-1 p-3 bg-light rounded-1">
             <p><b>Filters</b></p>
             <p class="card-text mute small">Check or uncheck the boxes to filter the courses</p>
+            <input type="search" id="course-search" class="form-control form-control-sm mb-2" placeholder="Search courses" aria-label="Search courses">
+            <select id="course-level" class="form-select form-select-sm mb-2" aria-label="Level">
+                <option value="">All levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+            <select id="course-sort" class="form-select form-select-sm mb-2" aria-label="Sort courses">
+                <option value="newest">Newest first</option>
+                <option value="name">A to Z</option>
+                <option value="shortest">Shortest first</option>
+            </select>
+            <button type="button" id="course-clear" class="btn btn-sm btn-outline-secondary w-100">Clear filters</button>
             </div>
             <div id="filters" class="list-group-flush">
-                <!-- Filters will be dynamically inserted here -->
+                {% for tag in all_tags %}
+                <div class="list-group-item" data-tag="{{ tag | escape }}">
+                    <input type="checkbox" class="form-check-input me-1" value="{{ tag | escape }}" id="filter-{{ tag | slugify }}">
+                    <label class="form-check-label small orange" for="filter-{{ tag | slugify }}">{{ tag }}</label>
+                </div>
+                {% endfor %}
             </div>
             {% include boards_sidenav.html %}
         </div>
@@ -21,10 +50,36 @@
             <h2>{{page.description}}</h2>
             <hr>
             <div class="container-fluid bg-ocre rounded-3 pt-3">
-            <p><b>Courses</b></p>
-            <div id="courses" class="row animate-on-scroll">
-                <!-- Course cards will be dynamically inserted here -->
-                 <p>Loading courses, please wait...</p>
+            <p><b>Courses</b> <span id="course-count" class="small grey">{{ courses_sorted.size }} courses</span></p>
+            <div id="courses" class="row">
+                {% for course in courses_sorted %}
+                {% assign dur = course.duration | split: " " %}
+                {% assign hours = dur[0] | remove: "h" | plus: 0 %}
+                {% assign mins = dur[1] | remove: "m" | plus: 0 %}
+                {% assign total_mins = hours | times: 60 | plus: mins %}
+                {% assign tag_text = course.groups | join: " " %}
+                <div class="col-md-6 mb-4 col-sm-6 col-lg-3 course-card"
+                     data-name="{{ course.name | downcase | escape }}"
+                     data-search="{{ course.name | append: ' ' | append: course.description | append: ' ' | append: tag_text | downcase | escape }}"
+                     data-tags="{{ course.groups | join: '|' | escape }}"
+                     data-level="{{ course.level | default: 'beginner' }}"
+                     data-date="{{ course.date_published }}"
+                     data-minutes="{{ total_mins }}">
+                <a href="{{ course.link }}" class="text-decoration-none">
+                    <div class="card border-0 card-hover card-shadown h-100">
+                        <img src="{{ course.cover }}" class="card-img-top" alt="{{ course.name | escape }}" loading="lazy">
+                        <div class="card-body">
+                            <h5 class="card-title black">{{ course.name }}</h5>
+                            <p class="card-text small grey"><i class="fa-sharp fa-regular fa-clock"></i> {{ course.duration | remove: "0h " }}
+                            | {{ course.author }}</p>
+                            <p class="card-text small"><span class="badge bg-secondary text-capitalize">{{ course.level | default: "beginner" }}</span>
+                            {% for tag in course.groups %}<span class="badge bg-primary">{{ tag }}</span> {% endfor %}</p>
+                        </div>
+                    </div>
+                </a>
+                </div>
+                {% endfor %}
+                <p id="no-courses" class="small" hidden>No courses match those filters.</p>
             </div>
             </div>
         </div>
@@ -32,128 +87,114 @@
 </div>
 
 <script>
-    const apiBaseUrl = 'https://courses.kevsrobots.com'; // Base URL for your FastAPI
+(function () {
+    const coursesDiv = document.getElementById('courses');
+    const cards = Array.from(coursesDiv.querySelectorAll('.course-card'));
+    const filterItems = Array.from(document.querySelectorAll('#filters [data-tag]'));
+    const checkboxes = Array.from(document.querySelectorAll('#filters input[type="checkbox"]'));
+    const search = document.getElementById('course-search');
+    const level = document.getElementById('course-level');
+    const sort = document.getElementById('course-sort');
+    const count = document.getElementById('course-count');
+    const empty = document.getElementById('no-courses');
 
-    // Function to fetch and render filters
-    async function fetchAndRenderFilters(allTags, selectedTags) {
-        const filtersDiv = document.getElementById('filters');
-        filtersDiv.innerHTML = ''; // Clear previous filters
+    // Restore state from the URL so filtered views can be linked, e.g. /learn/?tag=micropython&level=beginner
+    const params = new URLSearchParams(window.location.search);
+    const urlTags = params.getAll('tag');
+    checkboxes.forEach(cb => { cb.checked = urlTags.includes(cb.value); });
+    if (params.get('level')) level.value = params.get('level');
+    if (params.get('q')) search.value = params.get('q');
+    if (params.get('sort')) sort.value = params.get('sort');
 
-        // Sort the tags alphabetically
-        allTags.sort((a, b) => a.localeCompare(b));
+    function selectedTags() {
+        return checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+    }
 
-        allTags.forEach(tag => {
-            const filterItem = document.createElement('div');
-            filterItem.classList.add('list-group-item');
-            filterItem.innerHTML = `
-                <input type="checkbox" class="form-check-input me-1" value="${tag}" id="filter-${tag}">
-                <label class="form-check-label small orange" for="filter-${tag}">${tag}</label>
-            `;
-            filtersDiv.appendChild(filterItem);
+    function updateUrl(tags) {
+        const p = new URLSearchParams();
+        tags.forEach(t => p.append('tag', t));
+        if (level.value) p.set('level', level.value);
+        if (search.value.trim()) p.set('q', search.value.trim());
+        if (sort.value !== 'newest') p.set('sort', sort.value);
+        const qs = p.toString();
+        history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : ''));
+    }
+
+    function sortCards() {
+        const by = sort.value;
+        const sorted = cards.slice().sort((a, b) => {
+            if (by === 'name') return a.dataset.name.localeCompare(b.dataset.name);
+            if (by === 'shortest') return Number(a.dataset.minutes) - Number(b.dataset.minutes);
+            return b.dataset.date.localeCompare(a.dataset.date);
         });
+        sorted.forEach(card => coursesDiv.insertBefore(card, empty));
+    }
 
-        // Reapply the checked state for selected tags
-        selectedTags.forEach(tag => {
-            const checkbox = document.getElementById(`filter-${tag}`);
-            if (checkbox) {
-                checkbox.checked = true;
+    function apply() {
+        const tags = selectedTags();
+        const q = search.value.trim().toLowerCase();
+        const lvl = level.value;
+        const visibleTags = new Set();
+        let shown = 0;
+
+        cards.forEach(card => {
+            const cardTags = card.dataset.tags ? card.dataset.tags.split('|') : [];
+            const match = tags.every(t => cardTags.includes(t))
+                && (!lvl || card.dataset.level === lvl)
+                && (!q || card.dataset.search.includes(q));
+            card.hidden = !match;
+            if (match) {
+                shown++;
+                cardTags.forEach(t => visibleTags.add(t));
             }
         });
 
-        // Add event listeners to checkboxes
-        document.querySelectorAll('#filters input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', fetchAndRenderCourses);
-        });
-    }
-
-    // Function to fetch and render courses
-    async function fetchAndRenderCourses() {
-        const selectedTags = Array.from(document.querySelectorAll('#filters input[type="checkbox"]:checked')).map(cb => cb.value);
-        let url = `${apiBaseUrl}/courses/`;
-
-        if (selectedTags.length > 0) {
-            const params = selectedTags.map(tag => `tags=${encodeURIComponent(tag)}`).join('&');
-            url += `?${params}`;
-        }
-
-        const response = await fetch(url);
-        const courses = await response.json();
-
-        const coursesDiv = document.getElementById('courses');
-        coursesDiv.innerHTML = ''; // Clear previous courses
-
-        const allTags = new Set();
-
-        courses.forEach(course => {
-            const courseCard = document.createElement('div');
-            courseCard.classList.add('col-md-6', 'mb-4', 'col-sm-6', 'col-lg-3');
-            courseCard.innerHTML = `
-            <a href="${course.course_url}" class="text-decoration-none">
-                <div class="card border-0 card-hover card-shadown h-100">
-                    <img src="${course.course_cover}" class="card-img-top" alt="${course.course_name}">
-                    <div class="card-body">
-                        <h5 class="card-title black">${course.course_name}</h5>
-                        <p class="card-text small grey "><i class="fa-sharp fa-regular fa-clock"></i> ${course.course_duration.replace('0h ', '')} 
-                        | ${ course.course_author }</p>
-                        <p class="card-text small ">Tags: ${course.course_tags.map(tag => `<span class="badge bg-primary">${tag}</span>`).join(' ')}</p>
-                        
-                    </div>
-                </div>
-            </a>
-            `;
-            coursesDiv.appendChild(courseCard);
-
-            // Collect all tags from the filtered courses, not just the selected ones
-            course.course_tags.forEach(tag => {
-                allTags.add(tag);
-            });
+        // Only offer tags that would still return courses, but keep ticked ones visible
+        filterItems.forEach(item => {
+            item.hidden = !(visibleTags.has(item.dataset.tag) || tags.includes(item.dataset.tag));
         });
 
-        // Update the filter options based on all tags from filtered courses, preserving the checked state
-        fetchAndRenderFilters(Array.from(allTags), selectedTags);
-
-        // Use Intersection Observer for per-row animation as cards scroll into view
-        setTimeout(() => {
-            const cards = coursesDiv.querySelectorAll('.col-md-6');
-
-            const cardObserver = new IntersectionObserver((entries) => {
-                // Group entries that are intersecting by their top position (same row)
-                const rowGroups = {};
-
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const rect = entry.target.getBoundingClientRect();
-                        // Round to nearest 10px to group cards in same row
-                        const rowKey = Math.round(rect.top / 10) * 10;
-
-                        if (!rowGroups[rowKey]) {
-                            rowGroups[rowKey] = [];
-                        }
-                        rowGroups[rowKey].push(entry.target);
-                        cardObserver.unobserve(entry.target);
-                    }
-                });
-
-                // Animate each row with staggered delays
-                Object.values(rowGroups).forEach(rowCards => {
-                    // Sort by horizontal position (left to right)
-                    rowCards.sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
-
-                    rowCards.forEach((card, index) => {
-                        card.style.transitionDelay = `${index * 0.1}s`;
-                        card.classList.add('in-view');
-                    });
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -30px 0px'
-            });
-
-            // Observe all course cards
-            cards.forEach(card => cardObserver.observe(card));
-        }, 50);
+        count.textContent = shown + (shown === 1 ? ' course' : ' courses');
+        empty.hidden = shown > 0;
+        updateUrl(tags);
     }
 
-    // Initial fetch and render of courses
-    fetchAndRenderCourses();
+    checkboxes.forEach(cb => cb.addEventListener('change', apply));
+    level.addEventListener('change', apply);
+    search.addEventListener('input', apply);
+    sort.addEventListener('change', () => { sortCards(); apply(); });
+    document.getElementById('course-clear').addEventListener('click', () => {
+        checkboxes.forEach(cb => { cb.checked = false; });
+        level.value = '';
+        search.value = '';
+        apply();
+    });
+
+    sortCards();
+    apply();
+
+    // Fade cards in row by row as they scroll into view. The class is added
+    // here rather than in the HTML so cards stay visible if JS is off.
+    if ('IntersectionObserver' in window) {
+        coursesDiv.classList.add('animate-on-scroll');
+        const cardObserver = new IntersectionObserver((entries) => {
+            const rowGroups = {};
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const rowKey = Math.round(entry.target.getBoundingClientRect().top / 10) * 10;
+                    (rowGroups[rowKey] = rowGroups[rowKey] || []).push(entry.target);
+                    cardObserver.unobserve(entry.target);
+                }
+            });
+            Object.values(rowGroups).forEach(rowCards => {
+                rowCards.sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+                rowCards.forEach((card, index) => {
+                    card.style.transitionDelay = `${index * 0.1}s`;
+                    card.classList.add('in-view');
+                });
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+        cards.forEach(card => cardObserver.observe(card));
+    }
+})();
 </script>
