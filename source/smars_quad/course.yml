@@ -1,4 +1,4 @@
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
   author: Kevin McAleer
   date_created: 2022-02-19
   date_published: 2023-03-04
@@ -8,9 +8,12 @@
   groups:
       - smars
       - robotics
-      - arduino
+      - raspberry pi
+      - python
   description: >- 
-     Learn how to 3d print, build and program a SMARS Quad robot
+     3D print, assemble and wire up the SMARS Quad, a four-legged walking robot with
+     eight SG90 servos, a PCA9685 servo board and a Raspberry Pi Zero, then make it
+     walk with Python.
   content:
   - section:
       name: Overview
@@ -33,5 +36,9 @@
       - quad_09.md
       - quad_10.md
       - quad_11.md
+  - section:
+      name: Wire and code
+      content:
       - quad_12.md
       - quad_13.md
+      - quad_14.md

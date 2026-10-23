@@ -6,7 +6,7 @@ layout: lesson
 
 ## 8 Attach the other servo holders to the frame
 
-Insert the servo horn onto the servo and screw in securely to the servo arm.
+Fit the remaining servo holders into the frame in the same way, so there is one at each corner.
 
 ![Attach the other servo holders to the frame](assets/instruction08.png){:class="img-fluid w-25"}
 

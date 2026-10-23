@@ -6,7 +6,7 @@ layout: lesson
 
 ## 12 Download the python code
 
-Download the python library and test program from github from your raspberry pi zero by typing:
+Download the Python library and test program from GitHub onto your Raspberry Pi Zero by typing:
 
 ```bash
 git clone https://github.com/kevinmcaleer/smarslab
