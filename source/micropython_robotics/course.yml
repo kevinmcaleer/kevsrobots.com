@@ -2,12 +2,13 @@
   author: Kevin McAleer
   date_created: 2025-05-10
   date_published: 2025-05-20
+  level: intermediate
   layout: course
   cover: assets/cover.jpg
   groups:
       - robotics
       - micropython
-      - raspberrypi
+      - raspberry pi
   description: >-
     Learn how to build simple yet powerful robots using the Raspberry Pi Pico and MicroPython. 
     This hands-on course guides you through controlling motors, reading sensors, and combining hardware to create autonomous and remotely controlled robots. 

@@ -2,6 +2,7 @@
   author: Kevin McAleer
   date_created: 2026-01-15
   date_published: 2026-01-15
+  level: intermediate
   layout: course
   cover: assets/cover.jpg
   description: >-
@@ -9,7 +10,7 @@
   groups:
     - micropython
     - electronics
-    - raspberrypi
+    - raspberry pi
   content:
   - section:
       name: Introduction

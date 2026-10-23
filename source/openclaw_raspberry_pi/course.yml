@@ -2,6 +2,7 @@
   author: Kevin McAleer
   date_created: 2026-01-31
   date_published: 2026-01-31
+  level: intermediate
   layout: course
   cover: assets/openclaw.jpg
   description: >-
@@ -10,7 +11,7 @@
     local AI agents on your own hardware.
   groups:
     - openclaw
-    - raspberry-pi
+    - raspberry pi
     - docker
     - ai
   content:

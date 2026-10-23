@@ -293,10 +293,9 @@
     "author": "Kevin McAleer",
     "date_published": "2025-06-16",
     "groups": [
-      "raspberrypi",
+      "raspberry pi",
       "pico",
-      "c-programming",
-      "beginner"
+      "c-programming"
     ],
     "lessons": [
       {
@@ -845,7 +844,7 @@
     "groups": [
       "freecad",
       "3d modeling",
-      "robots"
+      "robotics"
     ],
     "lessons": [
       {
@@ -1039,7 +1038,7 @@
     "groups": [
       "micropython",
       "electronics",
-      "raspberrypi"
+      "raspberry pi"
     ],
     "lessons": [
       {
@@ -1272,7 +1271,7 @@
     "date_published": "2025-06-01",
     "groups": [
       "docker",
-      "raspberrypi"
+      "raspberry pi"
     ],
     "lessons": [
       {
@@ -2118,7 +2117,7 @@
     "groups": [
       "robotics",
       "micropython",
-      "raspberrypi"
+      "raspberry pi"
     ],
     "lessons": [
       {
@@ -2191,8 +2190,8 @@
     "author": "Kevin McAleer",
     "date_published": "2025-02-16",
     "groups": [
-      "raspberrypi",
-      "3ddesign",
+      "raspberry pi",
+      "3d modeling",
       "stands_and_cases"
     ],
     "lessons": [
@@ -2258,7 +2257,7 @@
     "groups": [
       "python",
       "ai",
-      "raspberry_pi",
+      "raspberry pi",
       "computer vision"
     ],
     "lessons": [
@@ -2318,7 +2317,7 @@
     "date_published": "2025-08-24",
     "groups": [
       "obsidian",
-      "raspberrypi"
+      "raspberry pi"
     ],
     "lessons": [
       {
@@ -2562,7 +2561,7 @@
     "date_published": "2026-01-31",
     "groups": [
       "openclaw",
-      "raspberry-pi",
+      "raspberry pi",
       "docker",
       "ai"
     ],
@@ -2894,7 +2893,7 @@
     "author": "Kevin McAleer",
     "date_published": "2025-05-24",
     "groups": [
-      "raspberrypi",
+      "raspberry pi",
       "docker"
     ],
     "lessons": [
