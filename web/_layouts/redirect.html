@@ -1,15 +1,15 @@
-<html>
+{% comment %} jekyll-redirect-from passes page.redirect as {from, to}; plain string kept for older pages {% endcomment %}{% assign target = page.redirect.to | default: page.redirect %}<html>
     <head>
         <meta charset="utf-8"/>
-        <meta http-equiv="refresh" content="0;url={{ page.redirect }}"/>
-        <link rel="canonical" href="{{ page.redirect }}"/>
+        <meta http-equiv="refresh" content="0;url={{ target }}"/>
+        <link rel="canonical" href="{{ target }}"/>
         <script type="text/javascript">
-                window.location.href = "{{ page.redirect }}"
+                window.location.href = "{{ target }}"
         </script>
         <title>Page Redirection</title>
     </head>
     <body>
-    If you are not redirected automatically, follow <a href='{{ page.redirect }}'>this link</a>.
-    <script>location='{{ page.redirect }}'</script>
+    If you are not redirected automatically, follow <a href='{{ target }}'>this link</a>.
+    <script>location='{{ target }}'</script>
     </body>
     </html>

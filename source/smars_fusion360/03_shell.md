@@ -4,7 +4,7 @@ description: Hollow out the chassis
 layout: lesson
 ---
 
-Next a shell is applied to the extruded base cube, making it more into the familar shape, if not a little blocky.
+Next a shell is applied to the extruded base cube, making it more into the familiar shape, if not a little blocky.
 
 * Shell thickness = 3mm
 

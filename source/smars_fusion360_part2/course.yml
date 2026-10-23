@@ -1,0 +1,51 @@
+- name: Design a SMARS Robot in Fusion 360 - Part 2, Motor Holders and Stub Wheels
+  author: Kevin McAleer
+  date_created: 2022-07-20
+  date_published: 2023-07-20
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - smars
+      - robotics
+      - fusion 360
+  description: >-
+     Finish the SMARS robot chassis in Fusion 360. In Part 2 you add the motor holders
+     and nubs, the front cut, the unpowered stub wheels and the motor holder slots, ready
+     to export and 3D print.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Motor Holders
+      content:
+      - 01_motor.md
+      - 02_extrude.md
+      - 03_nub.md
+      - 04_extrude.md
+      - 05_chamfer.md
+  - section:
+      name: Front Cut
+      content:
+      - 06_front.md
+      - 07_cut.md
+  - section:
+      name: Stub Wheels
+      content:
+      - 08_stub.md
+      - 09_cut.md
+      - 10_stub.md
+      - 11_stub.md
+      - 12_revolve.md
+      - 13_cut.md
+      - 14_extrude.md
+  - section:
+      name: Motor Holder Slots
+      content:
+      - 15_slots.md
+      - 16_cut.md
+  - section:
+      name: Final Design
+      content:
+      - 17_final.md
