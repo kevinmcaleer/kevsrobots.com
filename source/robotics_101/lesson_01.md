@@ -20,3 +20,19 @@ To understand that definition we need to look at the different parts of a robot:
 ![Machine diagram](assets/machine.png)
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Which part of a robot takes measurements and passes readings to the machine?
+- [ ] Controls
+- [x] Sensors
+- [ ] The program
+> Sensors measure the world (distance, light, temperature) and feed those readings to the machine so it can decide what to do.
+
+? What is the program in a robot?
+- [x] A list of instructions the machine carries out
+- [ ] The battery that powers the motors
+- [ ] The frame that holds everything together
+> The program is the "complex series of actions" from the definition, written as instructions for the machine.
+{% endquiz %}

@@ -10,6 +10,7 @@ next: lesson_05.html
 description: The Anatomy of a Robot
 percent: 80
 duration: 3
+quiz_total: 11
 navigation:
 - name: Robotics 101
 - content:
@@ -142,3 +143,25 @@ SMARS uses motorshield to power and control the motors
 ![Motorshield](assets/parts_07.jpg){:class="img-fluid w-25"}
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why does a robot need a motor driver (motorshield)?
+- [ ] To store the program
+- [x] Motors need much more power than the brain can supply directly
+- [ ] To measure distance
+> The brain's pins can only supply a tiny current. The motor driver switches the bigger current the motors need.
+
+? How does a two-wheeled robot like SMARS turn on the spot?
+- [ ] By turning both motors in the same direction
+- [x] By turning the motors in opposite directions
+- [ ] By stopping both motors
+> Same direction moves it forward or backward. Opposite directions spin it around.
+
+? What does SMARS use to "see"?
+- [ ] A camera
+- [ ] A microphone
+- [x] An ultrasonic range finder
+> The ultrasonic sensor sends out a pulse of sound and times the echo to work out how far away things are.
+{% endquiz %}

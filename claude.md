@@ -445,6 +445,15 @@ total = speed + 10  # TypeError!
 Add to each lesson:
 
 ```markdown
+## Check your understanding
+
+{% quiz %}
+? A question about the lesson
+- [ ] A believable wrong answer
+- [x] The right answer
+> Why it's right (shown after answering)
+{% endquiz %}
+
 ## Try it Yourself
 
 1. Modify the code to...
@@ -525,6 +534,7 @@ Before publishing a course:
 - [ ] Images optimized (<300KB)
 - [ ] Real-world examples for each concept
 - [ ] "Try it Yourself" sections included
+- [ ] A short `{% quiz %}` at the end of each lesson (see `docs/course_quizzes.md`)
 - [ ] Troubleshooting sections for complex topics
 - [ ] Clear progression from beginner to project
 - [ ] Links to prerequisite/next courses

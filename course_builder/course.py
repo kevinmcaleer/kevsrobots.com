@@ -3,10 +3,14 @@
 # October 2022
 
 import os
+import re
 import shutil
 import yaml
 from math import ceil
 from pathlib import Path
+
+
+QUIZ_BLOCK = re.compile(r"{%-?\s*quiz\s*-?%}(.*?){%-?\s*endquiz\s*-?%}", re.S)
 
 
 class Course:
@@ -109,6 +113,19 @@ class Course:
 
         words = len(body_text.split())
         return ceil(words / 200)
+
+    def _get_quiz_questions(self, filename):
+        """Count the quiz questions (`?` lines inside {% quiz %} blocks) in a lesson."""
+        _, body_text, _ = self._read_lesson_file(filename)
+        count = 0
+        for block in QUIZ_BLOCK.findall(body_text):
+            count += sum(1 for line in block.splitlines() if line.strip().startswith("?"))
+        return count
+
+    @property
+    def quiz_total(self):
+        """Total quiz questions across the whole course."""
+        return sum(self._get_quiz_questions(item) for item in self.lessons)
 
     def calculate_duration(self):
         """Calculate total course duration from all lessons."""
@@ -288,6 +305,7 @@ class Course:
         nav_yaml = self.build_navigation()
 
         page_count = 1
+        quiz_total = self.quiz_total
 
         for section in self.content:
             section_data = section["section"]
@@ -323,6 +341,8 @@ class Course:
                 front_matter += f"description: {self.description}\n"
                 front_matter += f"percent: {item_percentage}\n"
                 front_matter += f"duration: {lesson_duration}\n"
+                if quiz_total:
+                    front_matter += f"quiz_total: {quiz_total}\n"
                 front_matter += "---\n"
 
                 # Read lesson file content (from cache)

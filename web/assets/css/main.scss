@@ -1293,6 +1293,97 @@ table .w-30 {
   color: black;
 }
 
+// Lessons the reader has opened (set by assets/js/course-progress.js)
+.course-nav-item.visited::after {
+  content: "\2713";
+  color: #198754;
+  margin-left: 0.4em;
+  font-size: 0.85em;
+}
+
+// ----------------------------------------------------------------------
+// Lesson quizzes (quiz block tag, _plugins/quiz.rb)
+// ----------------------------------------------------------------------
+.kr-quiz {
+  margin: 1.5rem 0;
+}
+
+.kr-quiz-q {
+  border: 1px solid #e3e3e3;
+  border-left: 4px solid orangered;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  background: #fffaf7;
+}
+
+.kr-quiz-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: orangered;
+  margin-bottom: 0.25rem;
+}
+
+.kr-quiz-question {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.kr-quiz-options {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.kr-quiz-option {
+  text-align: left;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: orangered;
+    background: #fff3ee;
+  }
+
+  &:disabled {
+    cursor: default;
+    color: inherit;
+  }
+
+  &.correct {
+    border-color: #198754;
+    background: #e8f5ee;
+  }
+
+  &.wrong {
+    border-color: #dc3545;
+    background: #fcebec;
+  }
+}
+
+.kr-quiz-feedback {
+  margin: 0.75rem 0 0;
+  font-weight: 600;
+
+  &:empty {
+    display: none;
+  }
+
+  &.is-right { color: #198754; }
+  &.is-wrong { color: #b02a37; }
+}
+
+.kr-quiz-explain {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #444;
+}
+
 .course-nav-link:hover {
   color: black !important;
   // font-weight: 500;

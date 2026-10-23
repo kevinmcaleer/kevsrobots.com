@@ -620,7 +620,7 @@
   date_published: 2023-01-17
   description: Learning ROS with me, is a course that will teach you how to use ROS2
     on Raspberry Pi 4.
-  duration: 0h 11m
+  duration: 0h 14m
   groups:
   - robotics
   - raspberry pi
@@ -687,8 +687,10 @@
 - author: Kevin McAleer
   cover: /learn/smars_fusion360/assets/smars_fusion360.png
   date_published: 2023-07-20
-  description: Learn how to design a robot in 3d using Fusion 360
-  duration: 0h 34m
+  description: Design the SMARS robot chassis in Fusion 360, step by step. In Part
+    1 you sketch and extrude the base, shell it, shape the classic SMARS sides and
+    cut the wheel holes and Arduino slots.
+  duration: 0h 20m
   groups:
   - smars
   - robotics
@@ -696,7 +698,20 @@
   lessons: 34
   level: beginner
   link: /learn/smars_fusion360/00_intro.html
-  name: Build a SMARS Robot in Fusion 360
+  name: Design a SMARS Robot in Fusion 360 - Part 1, The Chassis Shell
+- author: Kevin McAleer
+  cover: /learn/smars_fusion360_part2/assets/cover.jpg
+  date_published: 2023-07-20
+  description: Finish the SMARS robot chassis in Fusion 360. In Part 2 you add the
+    motor holders and nubs, the front cut, the unpowered stub wheels and the motor
+    holder slots, ready to export and 3D print.
+  duration: 0h 20m
+  groups:
+  - smars
+  - robotics
+  - fusion 360
+  link: /learn/smars_fusion360_part2/00_intro.html
+  name: Design a SMARS Robot in Fusion 360 - Part 2, Motor Holders and Stub Wheels
 - author: Kevin McAleer
   cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
   date_published: 2023-03-04

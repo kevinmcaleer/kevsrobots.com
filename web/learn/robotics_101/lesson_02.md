@@ -10,7 +10,8 @@ next: lesson_03.html
 description: Learn about the term 'Robot', who the Father of robotics is, and examples
   from the early age of robotics
 percent: 48
-duration: 4
+duration: 5
+quiz_total: 11
 navigation:
 - name: Robotics 101
 - content:
@@ -200,6 +201,30 @@ A robot must protect its own existence as long as such protection does not confl
 
 ---
 
+## Check your understanding
+
+{% quiz %}
+? The word "robot" comes from the Czech word *robota*. What does it mean?
+- [ ] Machine
+- [x] Forced labour
+- [ ] Clockwork
+> *Robota* was the compulsory work peasants owed under the feudal system, which fitted Čapek's story about manufactured workers.
+
+? Who is often called the father of robotics?
+- [ ] Isaac Asimov
+- [ ] Pierre Jaquet-Droz
+- [x] Ismail al-Jazari
+> Al-Jazari designed programmable automata, such as a drum machine using pegs and cams, in the 12th century.
+
+? Who coined the word "robotics"?
+- [x] Isaac Asimov
+- [ ] Karel Čapek
+- [ ] Westinghouse Electric
+> Asimov first used "robotics" in 1941, and set out his Three Laws of Robotics in the 1942 story "Runaround".
+{% endquiz %}
+
+---
+
 ## Footnotes
 
 [^1]: By A. Konby (?) - Internet Archive, Public Domain, https://commons.wikimedia.org/w/index.php?curid=793187
@@ -211,3 +236,4 @@ A robot must protect its own existence as long as such protection does not confl
 [^7]: By Korea Institute of Industrial Technology (한국생산기술연구원) - http://news.naver.com/main/read.nhn?mode=LSD&amp;mid=sec&amp;sid1=102&amp;oid=020&amp;aid=0000371339, Attribution, https://commons.wikimedia.org/w/index.php?curid=4362293
 
 ---
+
