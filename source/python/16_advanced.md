@@ -13,6 +13,14 @@ Python is a rich language with many advanced features. This lesson will introduc
 
 ---
 
+## Watch the video
+
+{% include youtubeplayer.html id="uRNsqHZEzUM" %}
+
+In this livestream I go beyond the basics with Python for robotics.
+
+---
+
 ## Learning Objectives
 
 - Understand what decorators are and how to use them.
@@ -40,11 +48,33 @@ def say_hello():
 say_hello()  # prints: Before function call, Hello!, After function call
 ```
 
+That `wrapper()` only works for functions with no arguments. A more general decorator passes everything through and keeps the original function's name with `functools.wraps`:
+
+```python
+import functools
+import time
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} took {time.perf_counter() - start:.3f}s")
+        return result
+    return wrapper
+
+@timer
+def add(a, b):
+    return a + b
+
+print(add(2, 3))
+```
+
 ---
 
 ### Python Generators
 
-Generators are a type of iterable, like lists or tuples. Unlike lists, they don't allow indexing with arbitrary indices, but they can still be iterated through with for loops.
+Generators are a type of iterable, like lists or tuples. Unlike lists, they produce values one at a time, only when asked, so they use very little memory even for huge sequences. You can't index them, but you can loop over them.
 
 ```python
 def simple_generator():
@@ -67,6 +97,22 @@ with open('file.txt', 'r') as f:
     file_contents = f.read()
 # the file is automatically closed outside of the with block
 ```
+
+---
+
+{% quiz %}
+? What keyword turns a function into a generator?
+- [ ] `return`
+- [x] `yield`
+- [ ] `generate`
+> A function containing `yield` hands back values one at a time.
+
+? What does the `@timer` line above a function do?
+- [x] Wraps the function with the `timer` decorator
+- [ ] Runs the function on a schedule
+- [ ] Makes the function private
+> `@timer` is shorthand for `add = timer(add)`.
+{% endquiz %}
 
 ---
 
