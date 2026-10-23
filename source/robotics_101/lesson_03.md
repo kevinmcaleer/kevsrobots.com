@@ -65,3 +65,19 @@ SMARS uses off-the-shelf components, so is easy to wire up
 ![SMARS robot](assets/smars.jpg){:class="img-fluid w-25"}
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Which three skill areas come together when you build a robot?
+- [ ] Drawing, music and maths
+- [x] Design, programming and electronics
+- [ ] Welding, painting and soldering
+> Design builds the body, programming gives it instructions, and electronics connects the brain to its sensors and motors.
+
+? Which of these is an electronics protocol a robot might use to talk to a sensor?
+- [ ] HTML
+- [x] I2C
+- [ ] PLA
+> I2C (along with SPI and UART) is a common way for a microcontroller to talk to sensors and other chips. PLA is a 3D printing filament!
+{% endquiz %}

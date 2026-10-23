@@ -29,3 +29,13 @@ A BBC micro:bit; Visit <https://www.microbit.org> for more about this amazing de
 [![BBC micro:bit](assets/bbc_microbit.jpg){:class="img-fluid w-25"}](https://www.microbit.org)
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Which of these is a microcontroller that could be a robot's brain?
+- [x] Raspberry Pi Pico
+- [ ] An ultrasonic sensor
+- [ ] A 9V battery
+> The Pico, BBC micro:bit, Arduino Uno and ESP8266 are all popular robot brains.
+{% endquiz %}

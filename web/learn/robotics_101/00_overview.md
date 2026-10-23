@@ -9,6 +9,7 @@ next: lesson_01.html
 description: Get started with Robotics
 percent: 16
 duration: 1
+quiz_total: 11
 navigation:
 - name: Robotics 101
 - content:

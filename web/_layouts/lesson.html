@@ -22,9 +22,11 @@ thanks: false
                     <h5>{{nav[0].name}}</h5>
                     
                     <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: {{page.percent}}%" aria-valuenow="{{nav.progress}}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar" role="progressbar" data-course-progress-bar style="width: {{page.percent}}%" aria-valuenow="{{page.percent}}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                    <p class="text-small">{{page.percent}}% Percent Complete</p>
+                    <p class="text-small mb-1" data-course-progress-text>{{page.percent}}% complete</p>
+                    <p class="text-small mb-1" data-quiz-score data-quiz-total="{{ page.quiz_total | default: 0 }}" hidden><i class="fa-solid fa-trophy"></i>&nbsp; Quiz score <b data-quiz-score-text></b></p>
+                    <a href="#" class="text-small grey" data-course-reset>Reset my progress</a>
                 </div>
             </div>
             </div>  
@@ -98,6 +100,7 @@ thanks: false
         <p class="text-center">
         <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
         </p>
+        <script src="/assets/js/course-progress.js?v={{ site.time | date: '%s' }}"></script>
         {% unless page.hide_likes_and_comments %}
         <hr />
         {% include like-comment.html %}
