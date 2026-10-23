@@ -22,6 +22,16 @@ specs:                     # optional strip of key facts under the hero
   Servos: 3 × DS-929MG
   Parts cost: £151.59
 toc: false                 # optional: hide the "On this page" list
+videos:                    # YouTube IDs; the first is featured right under the hero
+  - eDvpRmfa6nU
+code: https://github.com/kevinmcaleer/bubo-2t   # or a list of links
+stl:                       # optional downloads, listed under "Build files"
+  - name: Face
+    link: /assets/stl/bubo/face.stl
+    description: Front of the head
+dxf:
+  - name: Base plate
+    link: /assets/dxf/example.dxf
 tags:
   - robot
 ---
@@ -32,6 +42,10 @@ tags:
 | `overlay` | Full-width photo with the title on top of it |
 | `split` | Title on the left, photo on the right, on a dark background |
 | `plain` | No photo, light background (used automatically when there's no `hero` or `cover`) |
+
+When a post has `videos`, a red **Watch the video** button sits in the hero and the first video is featured in a band straight underneath, with Watch on YouTube and Subscribe buttons. Any other videos show as smaller thumbnails beside it. Every thumbnail opens the video on YouTube.
+
+`code`, `stl` and `dxf` are listed in a **Build files** section after the article.
 
 The "On this page" list is built from your `##` headings and appears on wide screens once the reader scrolls into the article.
 
