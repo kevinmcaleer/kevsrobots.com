@@ -6,7 +6,8 @@
   layout: course
   cover: assets/eye_mechanism.jpg
   description: >- 
-     Robot Eye Mechanism, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.
+     Design a 3D-printable robot eye mechanism in Fusion 360, with upper and lower eyelids
+     that open and close around a central eyeball on a single servo.
   groups:
     - robotics
     - fusion 360
@@ -32,3 +33,7 @@
       - 06_lower_eyelid_sketch.md
       - 07_create_lower_sketch.md
       - 08_hinge.md
+  - section:
+      name: Joints and Export
+      content:
+      - 09_joint_and_export.md
