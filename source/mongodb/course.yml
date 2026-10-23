@@ -1,0 +1,53 @@
+- name: MongoDB - Your First Database
+  author: Kevin McAleer
+  date_created: 2026-10-18
+  date_published: 2026-10-18
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - python
+      - raspberrypi
+  description: >-
+    Never made a database before? Start here. Learn what a database is, install
+    MongoDB, and store, find, update and organise your data - then build Parts Bin,
+    a Python app that keeps track of every servo, sensor and screw in your workshop.
+  content:
+  - section:
+      name: Introduction
+      content:
+      - 00_intro.md
+  - section:
+      name: Database Basics
+      content:
+      - 01_what_is_a_database.md
+      - 02_documents_and_collections.md
+      - 03_installing_mongodb.md
+  - section:
+      name: Your First Database
+      content:
+      - 04_first_steps_in_mongosh.md
+      - 05_inserting_documents.md
+      - 06_finding_documents.md
+      - 07_query_operators.md
+  - section:
+      name: Changing Data
+      content:
+      - 08_updating_documents.md
+      - 09_deleting_documents.md
+  - section:
+      name: Shaping Your Data
+      content:
+      - 10_nested_documents_and_arrays.md
+      - 11_designing_your_data.md
+      - 12_aggregation_basics.md
+      - 13_indexes.md
+  - section:
+      name: MongoDB and Python
+      content:
+      - 14_python_and_pymongo.md
+      - 15_building_the_parts_bin_app.md
+  - section:
+      name: Wrapping Up
+      content:
+      - 16_keeping_your_data_safe.md
+      - 17_summary.md

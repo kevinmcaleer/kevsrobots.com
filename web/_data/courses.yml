@@ -420,6 +420,18 @@
   link: /learn/mini_rack/00_intro.html
   name: Mini-Rack 3D Design Tutorial
 - author: Kevin McAleer
+  cover: /learn/mongodb/assets/cover.jpg
+  date_published: 2026-10-18
+  description: Never made a database before? Start here. Learn what a database is,
+    install MongoDB, and store, find, update and organise your data - then build Parts
+    Bin, a Python app that keeps track of every servo, sensor and screw in your workshop.
+  duration: 2h 42m
+  groups:
+  - python
+  - raspberrypi
+  link: /learn/mongodb/00_intro.html
+  name: MongoDB - Your First Database
+- author: Kevin McAleer
   cover: /learn/object_model/assets/cover.jpg
   date_published: 2025-12-04
   description: Learn how to build custom object detection models using the Raspberry
