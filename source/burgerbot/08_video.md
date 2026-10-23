@@ -8,5 +8,6 @@ video_id: jnPR6XAuJ2U
 duration: 44
 ---
 
+In this livestream, BurgerBot gets an upgrade. The next lessons cover the add-ons you can build: a pen, a line sensor and a camera.
 
 ---

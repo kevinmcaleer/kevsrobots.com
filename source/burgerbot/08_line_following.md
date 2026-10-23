@@ -21,11 +21,11 @@ Step | Detail
 
 ## Download the 3d printable Line following sensor holder
 
-Click here to download the 3d pinrtable parts:
+Click here to download the 3D printable parts:
 
 * [`line_sensor_holder.stl`](/assets/stl/burgerbot_v2/line_sensor_holder.stl) - 40 minute print time
 
-You will also need 2 M3 screws and and 2 M3 Nuts.
+You will also need 2 M3 screws and 2 M3 nuts.
 
 ---
 

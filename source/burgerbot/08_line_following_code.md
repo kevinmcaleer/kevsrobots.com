@@ -7,7 +7,7 @@ type: page
 
 ## Wiring up the Line sensor
 
-Attach the following wires to the pico
+Attach the following wires to the Pico:
 
 Pico GPIO Pin | Line Sensor | Comments
 --------------|------------|---
@@ -20,10 +20,43 @@ GPIO 17       | Signal| Solder the end of a female dupont cable to GPIO 17 on th
 
 ## MicroPython code
 
-Using a line following sensor is fun and simple! After you attach the special wires (called Dupont connectors) to your robot, you can make it work with some cool code.
+The TCRT5000 shines infrared light at the floor and measures how much bounces back. A black line reflects much less than white paper, so the sensor's output changes when it's over the line. The library reads this for you with `bot.line_detected`.
 
-Remember, we need to slow down our robot's `speed` so it doesn't go too fast and miss the line it's trying to follow. Also, we want our robot to check the line very often, so it can stay on track while moving along the line.
+With one sensor, the trick is to follow the *edge* of the line: turn one way while you can see the line, and the other way when you can't. The robot wiggles along the edge.
 
-<script src="https://gist.github.com/kevinmcaleer/088f8409d03e0b5cbdeb09dd9dfad086.js"></script>
+```python
+from burgerbot import Burgerbot
+
+bot = Burgerbot()
+bot.speed = 0.25          # go slowly so we don't overshoot the line
+
+while True:
+    if bot.line_detected:
+        bot.left_motor(bot.speed)    # on the line: curve right, off it
+        bot.right_motor(0)
+    else:
+        bot.left_motor(0)            # off the line: curve left, back onto it
+        bot.right_motor(bot.speed)
+```
+
+We slow the robot down so it doesn't go too fast and miss the line, and the loop checks the sensor as often as it can.
+
+> ## Wrong way round?
+>
+> Depending on your sensor, `line_detected` may be `True` over white instead of black. If the robot spins in circles, swap the two halves of the `if`.
+
+---
+
+## Try it yourself
+
+Try different values for `bot.speed`. What's the fastest your BurgerBot can go and still stay on the line? Most TCRT5000 modules also have a small potentiometer for adjusting sensitivity.
+
+{% quiz %}
+? How does a single-sensor line follower stay on track?
+- [ ] It drives straight and stops when it loses the line
+- [x] It follows the edge, turning one way on the line and the other way off it
+- [ ] It uses the range finder to see the line
+> One sensor can only tell 'on' from 'off', so the robot zig-zags along the edge of the line.
+{% endquiz %}
 
 ---
