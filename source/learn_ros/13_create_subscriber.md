@@ -2,12 +2,12 @@
 layout: lesson
 title: Create a ROS2 Python Subscriber
 type: page
-description: Lets create a new Python Subscriber program
+description: Let's create a new Python Subscriber program
 ---
 
 ## Create a new Python file called sub.py
 
-* **Create a new Python file** - from the docker terminal type:
+* **Create a new Python file** - from the docker terminal, inside the `/ros2/my_py_pkg` folder, type:
 
 ```bash
 touch my_py_pkg/sub.py
@@ -32,7 +32,7 @@ class Listener(Node):
     def __init__(self):
         super().__init__("node_test")
         self.counter_ = 0
-        # create_subscriber needs 3 parameters: Msg Type, topic name, the callback, and queue size buffer
+        # create_subscription needs 4 parameters: message type, topic name, the callback, and queue size
         self.subscriber = self.create_subscription(String, "Hello", self.callback_hello, 10)
         self.get_logger().info("Subscribed to Hello topic")
 
@@ -53,9 +53,9 @@ if __name__ == "__main__":
 
 ## Add the entry_point to setup.py
 
-We now need to update `setup.py` to include the entry_point for our code. An `entry point` is the name of the python scripts that are available to run from with the package, and are shown in the list when you type `ros2 run my_py_pkg`.
+We now need to update `setup.py` to include the entry_point for our code. An `entry point` is the name of the python scripts that are available to run from within the package, and are shown in the list when you type `ros2 run my_py_pkg`.
 
-* **Update setup.py** - From the VS Code open setup.py from with `my_py_pkg` folder
+* **Update setup.py** - From the VS Code open setup.py from within `my_py_pkg` folder
 * **Add the entry points** - add the following lines to the entry point list:
 
 ```python
@@ -72,9 +72,9 @@ entry_points={
 
 ## Build the package
 
-We can now build out package using `colcon build`. Do this from the root of the workspace (in this case `/ros2/my_py_pkg`):
+We can now build our package using `colcon build`. Do this from the package folder (`/ros2/my_py_pkg`):
 
-* **change to the root of the workspace**- From the docker terminal type:
+* **Change to the package folder** - From the docker terminal type:
 
 ```bash
 cd /ros2/my_py_pkg
@@ -88,3 +88,48 @@ source install/setup.bash
 ```
 
 ---
+
+## Run the publisher and subscriber together
+
+You'll need two terminals connected to the container (run `docker compose exec ros2 bash` in a second terminal, then `cd /ros2/my_py_pkg && source install/setup.bash`).
+
+* **Terminal 1** - start the publisher:
+
+```bash
+ros2 run my_py_pkg pub
+```
+
+* **Terminal 2** - start the subscriber:
+
+```bash
+ros2 run my_py_pkg listener
+```
+
+The listener prints `Hello World` twice a second. Two separate programs are now talking to each other through the `Hello` topic!
+
+> ## Topics, publishers and subscribers
+>
+> A **topic** is a named channel for messages. A **publisher** sends messages to a topic and a **subscriber** receives them. Neither needs to know the other exists, so you can add, remove or swap nodes without changing the rest of the robot.
+{:class="bg-blue"}
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What is a ROS **topic**?
+- [ ] A Python file
+- [x] A named channel that nodes publish messages to and subscribe to
+- [ ] A type of package
+> In our example the topic is called `Hello` and carries `String` messages.
+
+? Which command shows the messages on a topic from the command line?
+- [x] `ros2 topic echo Hello`
+- [ ] `ros2 pkg create Hello`
+- [ ] `colcon build Hello`
+
+? You added a new entry point to `setup.py`. What must you do before `ros2 run` can find it?
+- [ ] Restart the Raspberry Pi
+- [x] Run `colcon build` and `source install/setup.bash` again
+- [ ] Nothing
+{% endquiz %}

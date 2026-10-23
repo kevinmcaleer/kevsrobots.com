@@ -14,7 +14,7 @@ description: Update and Upgrade the OS to the latest patch level
 
 ```bash
 sudo apt update
-sudo apt upgrade
+sudo apt upgrade -y
 ```
 
 ### Alternatively you can use the Raspberry Pi Update menu to install updates.

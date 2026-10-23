@@ -7,6 +7,12 @@ description: How to setup a Raspberry Pi 4
 
 ![Screenshot of the imager tool](assets/rpi_desktop.jpg){:class="cover"}
 
+## Watch the video
+
+{% include youtubeplayer.html id="03wKo-riJlA" %}
+
+---
+
 ## 64bit Raspberry Pi OS image
 
 You will need to use the 64bit version of the Raspberry Pi OS to use ROS2 within docker. Follow the steps below to install it on your Raspberry Pi.
@@ -25,7 +31,7 @@ You will need to use the 64bit version of the Raspberry Pi OS to use ROS2 within
 
 ![Screenshot of the imager tool - choose os page](assets/rpi_imager02.png){:class="img-fluid w-50 shadow-lg"}
 
-* **Advanced Options** - Click the Cog icon (the `Advanced` button) and complete the details; add your Wi-Fi SSID and password, and set a default username and password, and ensure that the `enable SSH` option is selcted; this will enable you to remotely connect to the Raspberry Pi.
+* **Advanced Options** - Click the Cog icon (the `Advanced` button; in newer versions of Imager, click `Edit Settings` when asked about OS customisation) and complete the details; add your Wi-Fi SSID and password, and set a default username and password, and ensure that the `enable SSH` option is selected; this will enable you to remotely connect to the Raspberry Pi.
 
 ![Screenshot of the imager tool - choose os page](assets/rpi_imager04.png){:class="img-fluid w-50 shadow-lg"}
 
