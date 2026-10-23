@@ -6,12 +6,12 @@ type: page
 cover: /learn/smars_fusion360/assets/smars_fusion360.png
 date: 2023-07-20
 previous: 15_slots.html
-next: 17_motor.html
 description: Cut the slots out
-percent: 34
-duration: 1
+percent: 100
+duration: 2
+quiz_total: 7
 navigation:
-- name: Build a SMARS Robot in Fusion 360
+- name: Design a SMARS Robot in Fusion 360 - Part 1, The Chassis Shell
 - content:
   - section: Overview
     content:
@@ -29,7 +29,7 @@ navigation:
       link: 04_fillet.html
     - name: Thin the Front and Back sides
       link: 05_thin.html
-  - section: Refine
+  - section: Refine the Shape
     content:
     - name: Front Cutout Profile
       link: 06_front.html
@@ -45,7 +45,7 @@ navigation:
       link: 11_back.html
     - name: Back profile cut
       link: 12_back.html
-  - section: Wheels
+  - section: Wheel Holes and Arduino Slots
     content:
     - name: Chassis Wheel hole profile
       link: 13_wheel.html
@@ -55,57 +55,42 @@ navigation:
       link: 15_slots.html
     - name: Arduino slot cut
       link: 16_cut.html
-  - section: Motor Holders
-    content:
-    - name: Motor holder profile
-      link: 17_motor.html
-    - name: Motor holder profile extruded
-      link: 18_extrude.html
-    - name: Motor nub profile
-      link: 19_nub.html
-    - name: Motor nub extrude
-      link: 20_extrude.html
-    - name: Motor holder and nub chamfer
-      link: 21_chamfer.html
-  - section: Front
-    content:
-    - name: Front profile
-      link: 22_front.html
-    - name: Front cut
-      link: 23_cut.html
-  - section: Wheel
-    content:
-    - name: Unpowered wheel stub profile
-      link: 24_stub.html
-    - name: Stub extrude profile
-      link: 25_cut.html
-    - name: Stub extrude
-      link: 26_stub.html
-    - name: Stub wheel profile
-      link: 27_stub.html
-    - name: Stub wheel revolve
-      link: 28_revolve.html
-    - name: Stub wheel cutout profile
-      link: 29_cut.html
-    - name: Stub wheel cutout
-      link: 30_extrude.html
-    - name: Motor holder slots profile
-      link: 31_slots.html
-    - name: Motor holder slot extrude-cut
-      link: 32_cut.html
-  - section: Final Design
-    content:
-    - name: Final view
-      link: 33_final.html
 ---
 
 
-The [Arduino slot profile](15_slots) created previously is used to extrude a cut into the body, to a depth of 0.5mm.
+The [Arduino slot profile](15_slots.html) created previously is used to extrude a cut into the body, to a depth of 0.5mm.
 
 * Arduino slot depth 0.5mm
 
 This feature is mirrored across to the other side of the chassis.
 
-![Chassis Arduinio slot cut Cad Drawing](assets/chassis_arduino_slot_cut.png){:class="img-fluid w-75 m-3"}
+![Chassis Arduino slot cut Cad Drawing](assets/chassis_arduino_slot_cut.png){:class="img-fluid w-75 m-3"}
 
----
+## Where you've got to
+
+That's the outer shell finished! You now have the base, the shaped sides, the wheel holes and the slots the Arduino slides into. Save your design, because Part 2 builds on it.
+
+## Check your understanding
+
+{% quiz %}
+? Why is the wheel hole 4.5mm across when the motor spindle is only 3mm?
+- [x] To give the spindle plenty of clearance so it turns freely
+- [ ] To make the chassis lighter
+- [ ] So the wheel can push through the hole
+> 3D prints aren't perfectly accurate, so holes need some clearance. 4.5mm leaves room for the 3mm spindle.
+
+? You cut a slot on one side of the chassis. What's the quickest way to get the same slot on the other side?
+- [ ] Sketch and cut it again
+- [x] **Mirror** the feature across the middle of the chassis
+- [ ] Use the Shell tool
+> Mirror copies a feature across a plane, so both sides stay identical, even if you change the original later.
+{% endquiz %}
+
+## Try it yourself
+
+1. Change the shell thickness from 3mm to 2.5mm in the timeline and watch the whole design update.
+2. Measure your Arduino Uno board: will it slide into the slots you've cut?
+
+## What's next
+
+Carry on with [Part 2: Motor Holders and Stub Wheels](/learn/smars_fusion360_part2/) to finish the chassis.

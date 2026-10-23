@@ -3644,8 +3644,8 @@
   },
   {
     "slug": "smars_fusion360",
-    "name": "Build a SMARS Robot in Fusion 360",
-    "description": "Learn how to design a robot in 3d using Fusion 360",
+    "name": "Design a SMARS Robot in Fusion 360 - Part 1, The Chassis Shell",
+    "description": "Design the SMARS robot chassis in Fusion 360, step by step. In Part 1 you sketch and extrude the base, shell it, shape the classic SMARS sides and cut the wheel holes and Arduino slots.",
     "cover": "assets/smars_fusion360.png",
     "author": "Kevin McAleer",
     "date_published": "2023-07-20",
@@ -3687,143 +3687,163 @@
       },
       {
         "file": "06_front.md",
-        "section": "Refine",
+        "section": "Refine the Shape",
         "url": "/learn/smars_fusion360/06_front.html"
       },
       {
         "file": "07_cut.md",
-        "section": "Refine",
+        "section": "Refine the Shape",
         "url": "/learn/smars_fusion360/07_cut.html"
       },
       {
         "file": "08_side.md",
-        "section": "Refine",
+        "section": "Refine the Shape",
         "url": "/learn/smars_fusion360/08_side.html"
       },
       {
         "file": "09_sidecut.md",
-        "section": "Refine",
+        "section": "Refine the Shape",
         "url": "/learn/smars_fusion360/09_sidecut.html"
       },
       {
         "file": "10_fillet.md",
-        "section": "Refine",
+        "section": "Refine the Shape",
         "url": "/learn/smars_fusion360/10_fillet.html"
       },
       {
         "file": "11_back.md",
-        "section": "Refine",
+        "section": "Refine the Shape",
         "url": "/learn/smars_fusion360/11_back.html"
       },
       {
         "file": "12_back.md",
-        "section": "Refine",
+        "section": "Refine the Shape",
         "url": "/learn/smars_fusion360/12_back.html"
       },
       {
         "file": "13_wheel.md",
-        "section": "Wheels",
+        "section": "Wheel Holes and Arduino Slots",
         "url": "/learn/smars_fusion360/13_wheel.html"
       },
       {
         "file": "14_cut.md",
-        "section": "Wheels",
+        "section": "Wheel Holes and Arduino Slots",
         "url": "/learn/smars_fusion360/14_cut.html"
       },
       {
         "file": "15_slots.md",
-        "section": "Wheels",
+        "section": "Wheel Holes and Arduino Slots",
         "url": "/learn/smars_fusion360/15_slots.html"
       },
       {
         "file": "16_cut.md",
-        "section": "Wheels",
+        "section": "Wheel Holes and Arduino Slots",
         "url": "/learn/smars_fusion360/16_cut.html"
+      }
+    ]
+  },
+  {
+    "slug": "smars_fusion360_part2",
+    "name": "Design a SMARS Robot in Fusion 360 - Part 2, Motor Holders and Stub Wheels",
+    "description": "Finish the SMARS robot chassis in Fusion 360. In Part 2 you add the motor holders and nubs, the front cut, the unpowered stub wheels and the motor holder slots, ready to export and 3D print.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2023-07-20",
+    "groups": [
+      "smars",
+      "robotics",
+      "fusion 360"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/smars_fusion360_part2/00_intro.html"
       },
       {
-        "file": "17_motor.md",
+        "file": "01_motor.md",
         "section": "Motor Holders",
-        "url": "/learn/smars_fusion360/17_motor.html"
+        "url": "/learn/smars_fusion360_part2/01_motor.html"
       },
       {
-        "file": "18_extrude.md",
+        "file": "02_extrude.md",
         "section": "Motor Holders",
-        "url": "/learn/smars_fusion360/18_extrude.html"
+        "url": "/learn/smars_fusion360_part2/02_extrude.html"
       },
       {
-        "file": "19_nub.md",
+        "file": "03_nub.md",
         "section": "Motor Holders",
-        "url": "/learn/smars_fusion360/19_nub.html"
+        "url": "/learn/smars_fusion360_part2/03_nub.html"
       },
       {
-        "file": "20_extrude.md",
+        "file": "04_extrude.md",
         "section": "Motor Holders",
-        "url": "/learn/smars_fusion360/20_extrude.html"
+        "url": "/learn/smars_fusion360_part2/04_extrude.html"
       },
       {
-        "file": "21_chamfer.md",
+        "file": "05_chamfer.md",
         "section": "Motor Holders",
-        "url": "/learn/smars_fusion360/21_chamfer.html"
+        "url": "/learn/smars_fusion360_part2/05_chamfer.html"
       },
       {
-        "file": "22_front.md",
-        "section": "Front",
-        "url": "/learn/smars_fusion360/22_front.html"
+        "file": "06_front.md",
+        "section": "Front Cut",
+        "url": "/learn/smars_fusion360_part2/06_front.html"
       },
       {
-        "file": "23_cut.md",
-        "section": "Front",
-        "url": "/learn/smars_fusion360/23_cut.html"
+        "file": "07_cut.md",
+        "section": "Front Cut",
+        "url": "/learn/smars_fusion360_part2/07_cut.html"
       },
       {
-        "file": "24_stub.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/24_stub.html"
+        "file": "08_stub.md",
+        "section": "Stub Wheels",
+        "url": "/learn/smars_fusion360_part2/08_stub.html"
       },
       {
-        "file": "25_cut.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/25_cut.html"
+        "file": "09_cut.md",
+        "section": "Stub Wheels",
+        "url": "/learn/smars_fusion360_part2/09_cut.html"
       },
       {
-        "file": "26_stub.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/26_stub.html"
+        "file": "10_stub.md",
+        "section": "Stub Wheels",
+        "url": "/learn/smars_fusion360_part2/10_stub.html"
       },
       {
-        "file": "27_stub.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/27_stub.html"
+        "file": "11_stub.md",
+        "section": "Stub Wheels",
+        "url": "/learn/smars_fusion360_part2/11_stub.html"
       },
       {
-        "file": "28_revolve.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/28_revolve.html"
+        "file": "12_revolve.md",
+        "section": "Stub Wheels",
+        "url": "/learn/smars_fusion360_part2/12_revolve.html"
       },
       {
-        "file": "29_cut.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/29_cut.html"
+        "file": "13_cut.md",
+        "section": "Stub Wheels",
+        "url": "/learn/smars_fusion360_part2/13_cut.html"
       },
       {
-        "file": "30_extrude.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/30_extrude.html"
+        "file": "14_extrude.md",
+        "section": "Stub Wheels",
+        "url": "/learn/smars_fusion360_part2/14_extrude.html"
       },
       {
-        "file": "31_slots.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/31_slots.html"
+        "file": "15_slots.md",
+        "section": "Motor Holder Slots",
+        "url": "/learn/smars_fusion360_part2/15_slots.html"
       },
       {
-        "file": "32_cut.md",
-        "section": "Wheel",
-        "url": "/learn/smars_fusion360/32_cut.html"
+        "file": "16_cut.md",
+        "section": "Motor Holder Slots",
+        "url": "/learn/smars_fusion360_part2/16_cut.html"
       },
       {
-        "file": "33_final.md",
+        "file": "17_final.md",
         "section": "Final Design",
-        "url": "/learn/smars_fusion360/33_final.html"
+        "url": "/learn/smars_fusion360_part2/17_final.html"
       }
     ]
   },

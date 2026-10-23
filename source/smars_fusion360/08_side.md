@@ -1,10 +1,10 @@
 ---
 title: Side Profile
-description: create the side profile
+description: Create the side profile
 layout: lesson
 ---
 
-The profile for the side cutout is created next. This is a inverted trapesium shape, with three main dimensions:
+The profile for the side cutout is created next. This is an inverted trapezium shape, with three main dimensions:
 
 * Top width = 28mm
 * Bottom width = 16mm

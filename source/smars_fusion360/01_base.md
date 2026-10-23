@@ -1,10 +1,10 @@
 ---
 title: The Chassis Base
-description:
+description: Sketch the rectangle the whole chassis is built from
 layout: lesson
 ---
 
-The Chassis Base is made of up 2 dimensions:
+The Chassis Base is a rectangle with 2 dimensions:
 
 * Length = 70mm
 * Width = 58mm

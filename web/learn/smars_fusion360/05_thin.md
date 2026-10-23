@@ -8,10 +8,11 @@ date: 2023-07-20
 previous: 04_fillet.html
 next: 06_front.html
 description: Adjust the wall thickness
-percent: 12
-duration: 1
+percent: 30
+duration: 2
+quiz_total: 7
 navigation:
-- name: Build a SMARS Robot in Fusion 360
+- name: Design a SMARS Robot in Fusion 360 - Part 1, The Chassis Shell
 - content:
   - section: Overview
     content:
@@ -29,7 +30,7 @@ navigation:
       link: 04_fillet.html
     - name: Thin the Front and Back sides
       link: 05_thin.html
-  - section: Refine
+  - section: Refine the Shape
     content:
     - name: Front Cutout Profile
       link: 06_front.html
@@ -45,7 +46,7 @@ navigation:
       link: 11_back.html
     - name: Back profile cut
       link: 12_back.html
-  - section: Wheels
+  - section: Wheel Holes and Arduino Slots
     content:
     - name: Chassis Wheel hole profile
       link: 13_wheel.html
@@ -55,48 +56,6 @@ navigation:
       link: 15_slots.html
     - name: Arduino slot cut
       link: 16_cut.html
-  - section: Motor Holders
-    content:
-    - name: Motor holder profile
-      link: 17_motor.html
-    - name: Motor holder profile extruded
-      link: 18_extrude.html
-    - name: Motor nub profile
-      link: 19_nub.html
-    - name: Motor nub extrude
-      link: 20_extrude.html
-    - name: Motor holder and nub chamfer
-      link: 21_chamfer.html
-  - section: Front
-    content:
-    - name: Front profile
-      link: 22_front.html
-    - name: Front cut
-      link: 23_cut.html
-  - section: Wheel
-    content:
-    - name: Unpowered wheel stub profile
-      link: 24_stub.html
-    - name: Stub extrude profile
-      link: 25_cut.html
-    - name: Stub extrude
-      link: 26_stub.html
-    - name: Stub wheel profile
-      link: 27_stub.html
-    - name: Stub wheel revolve
-      link: 28_revolve.html
-    - name: Stub wheel cutout profile
-      link: 29_cut.html
-    - name: Stub wheel cutout
-      link: 30_extrude.html
-    - name: Motor holder slots profile
-      link: 31_slots.html
-    - name: Motor holder slot extrude-cut
-      link: 32_cut.html
-  - section: Final Design
-    content:
-    - name: Final view
-      link: 33_final.html
 ---
 
 
@@ -104,4 +63,24 @@ The Front and Back sides are currently the case thickness from the shell we appl
 
 ![Chassis Front and Back sides Cad Drawing](assets/chassis_thinned.png){:class="img-fluid w-75 m-3"}
 
----
+## Check your understanding
+
+{% quiz %}
+? What does the **Shell** tool do to the extruded base?
+- [ ] Rounds off the corners
+- [x] Hollows it out, leaving walls of a set thickness
+- [ ] Copies it to the other side
+> Shell removes the inside of a solid and leaves walls 3mm thick, giving us the open box shape of the chassis.
+
+? How big is the chassis base sketch?
+- [x] 70mm long and 58mm wide
+- [ ] 58mm long and 32mm wide
+- [ ] 100mm long and 70mm wide
+> The base is 70mm by 58mm, then extruded 32mm high.
+
+? Why do we add a 4mm fillet to the bottom edges and corners?
+- [ ] To make the walls thinner
+- [ ] So the Arduino fits
+- [x] To round the edges so the chassis looks and feels better
+> Fillets round sharp edges. On a 3D print they also make corners stronger and nicer to handle.
+{% endquiz %}
