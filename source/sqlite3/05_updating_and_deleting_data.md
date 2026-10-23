@@ -13,7 +13,8 @@ To modify existing data in a SQLite table, we use the SQL `UPDATE` statement. Th
 
 ```python
 # Update a record in the table
-connection.execute("UPDATE books SET title = ? WHERE id = ?", ("New Title", 1))
+with connection:
+    connection.execute("UPDATE books SET title = ? WHERE id = ?", ("New Title", 1))
 ```
 
 In this example, we update the title of a book with an ID of 1 in the "books" table.
@@ -24,10 +25,15 @@ To remove data from a SQLite table, we use the SQL `DELETE` statement. This stat
 
 ```python
 # Delete records from the table
-connection.execute("DELETE FROM books WHERE author = ?", ("F. Scott Fitzgerald",))
+with connection:
+    connection.execute("DELETE FROM books WHERE author = ?", ("F. Scott Fitzgerald",))
 ```
 
 In this example, we delete records from the "books" table where the author is "F. Scott Fitzgerald."
+
+> ## Don't forget the WHERE
+>
+> `UPDATE` or `DELETE` without a `WHERE` clause changes **every** row in the table. Run the same `WHERE` with a `SELECT` first to check which rows will be affected.
 
 ### Batch Updates and Deletes
 
@@ -36,7 +42,8 @@ SQLite allows us to perform batch updates and deletes using the `executemany()` 
 ```python
 # Batch update
 data = [("New Title 1", 1), ("New Title 2", 2), ("New Title 3", 3)]
-connection.executemany("UPDATE books SET title = ? WHERE id = ?", data)
+with connection:
+    connection.executemany("UPDATE books SET title = ? WHERE id = ?", data)
 ```
 
 In this example, we perform a batch update on the "books" table, updating the titles of multiple books based on their IDs.
@@ -45,17 +52,23 @@ In this example, we perform a batch update on the "books" table, updating the ti
 
 SQLite supports referential integrity, which means that you can define relationships between tables using foreign keys. When a record in a parent table is deleted, you can specify the desired behavior for associated records in child tables.
 
+SQLite only enforces foreign keys when you switch them on, once per connection:
+
+```python
+connection.execute("PRAGMA foreign_keys = ON")
+```
+
 ```python
 # Create tables with foreign key relationship
 connection.execute('''
-    CREATE TABLE artists (
+    CREATE TABLE IF NOT EXISTS artists (
         id INTEGER PRIMARY KEY,
         name TEXT
     )
 ''')
 
 connection.execute('''
-    CREATE TABLE albums (
+    CREATE TABLE IF NOT EXISTS albums (
         id INTEGER PRIMARY KEY,
         title TEXT,
         artist_id INTEGER,
@@ -64,8 +77,24 @@ connection.execute('''
 ''')
 ```
 
-In this example, we create two tables: "artists" and "albums." The "albums" table has a foreign key relationship with the "artists" table. The `ON DELETE CASCADE` clause ensures that when an artist is deleted, all associated albums are also deleted.
+In this example, we create two tables: "artists" and "albums." The "albums" table has a foreign key relationship with the "artists" table. The `ON DELETE CASCADE` clause ensures that when an artist is deleted, all associated albums are also deleted. With foreign keys switched on, SQLite also refuses to add an album for an artist that doesn't exist.
 
 By understanding how to update and delete data, as well as handle cascading deletes and referential integrity, you will have the tools to effectively modify and manage data in SQLite tables.
+
+---
+
+{% quiz %}
+? What does `DELETE FROM books` (with no WHERE) do?
+- [ ] Deletes the first book
+- [x] Deletes every row in the table
+- [ ] Deletes the table itself
+> Without `WHERE`, the statement applies to every row. `DROP TABLE` is what removes the table.
+
+? Why might `ON DELETE CASCADE` seem to do nothing in SQLite?
+- [x] Foreign keys are off until you run `PRAGMA foreign_keys = ON`
+- [ ] SQLite doesn't support foreign keys
+- [ ] It only works on tables with fewer than 100 rows
+> SQLite checks foreign keys only when they're switched on for the connection.
+{% endquiz %}
 
 ---
