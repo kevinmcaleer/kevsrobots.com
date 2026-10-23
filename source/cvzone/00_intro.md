@@ -6,6 +6,7 @@ layout: lesson
 type: page
 cover: /learn/cvzone/assets/computer_vision.jpg
 date_updated: 2026-10-23
+duration: 62
 redirect_from:
   - /learn/cvzone/00_video.html
 ---
