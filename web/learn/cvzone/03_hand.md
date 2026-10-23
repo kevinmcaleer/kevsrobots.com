@@ -7,10 +7,11 @@ cover: /learn/cvzone/assets/hand.png
 date: 2023-10-07
 previous: 02_face.html
 next: 04_posture.html
-description: This lesson will guide you through capturing and analyzing video feed
-  to highlight and track hands effectively
-percent: 70
-duration: 2
+description: Track hands in a live video feed with CVZone and count how many fingers
+  are raised
+percent: 64
+duration: 3
+quiz_total: 10
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
@@ -18,74 +19,109 @@ navigation:
     content:
     - name: Computer Vision with CVZone
       link: 00_intro.html
-    - name: Watch the demonstration
-      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone
       link: 01_install.html
-  - section: Face, Hand and Posture Detection
+  - section: Face, Hand and Pose Detection
     content:
     - name: Face Detection
       link: 02_face.html
     - name: Hand Detection
       link: 03_hand.html
-    - name: Posture Detection
+    - name: Pose Detection
       link: 04_posture.html
-    - name: Advanced Visualization with CVZone
+    - name: Annotating Your Video
       link: 05_advanced.html
 ---
 
 
 ![Cover Image]({{page.cover}}){:class="cover"}
 
-## Hand Detection
+## Hand detection
 
-Hand detection is the computer vision technique of identifying and locating hands in images or videos. Recognizing hands can serve as a basis for gesture recognition, touchless control systems, and more. In this lesson, we'll utilize CVZone to perform hand detection in real time.
-
-1. **Capture video from the camera:**
-
-   As with the face detection lesson, we'll be using the OpenCV library to capture live video feed from the camera. If you've followed the face detection lesson, this step should be familiar.
-
-   ```python
-   import cv2
-   cap = cv2.VideoCapture(0)
-   ```
-
-2. **Use CVZone for hand detection:**
-
-   ```python
-   hand_detector = cvzone.HandDetector(detectionCon=0.8)
-
-   while True:
-       success, img = cap.read()
-       img, list_hands = hand_detector.findHands(img)
-       cv2.imshow("Hand Detection", img)
-       if cv2.waitKey(1) & 0xFF == ord('q'):
-           break
-   ```
-
-   Here's a breakdown of the code:
-   - We initialize the hand detection module from CVZone with a detection confidence threshold of `0.8`. This means the algorithm will only consider detections with a confidence of 80% or higher.
-   - We then continuously read frames from our camera.
-   - Process each frame to detect hands using `hand_detector.findHands(img)`.
-   - The detected hands are highlighted in the frame which is then displayed using `cv2.imshow()`.
-   - As before, pressing the 'q' key will exit the program.
+Hand detection finds hands in images or video. MediaPipe goes further and finds 21 **landmarks** on each hand: the wrist and the joints and tips of every finger. That's enough to recognise gestures, which makes hands a great way to control robots and games without touching anything.
 
 ---
 
-## Expanding Your Horizons
+## The code
 
-- **Gesture Recognition:** Build upon hand detection to recognize specific hand gestures which can be used to control applications, games, or devices without physical contact.
+```python
+import cv2
+from cvzone.HandTrackingModule import HandDetector
 
-- **Customize Visuals:** Play with the visual feedback. Adjust the color, size, and annotations displayed around detected hands.
+cap = cv2.VideoCapture(0)
+detector = HandDetector(detectionCon=0.8, maxHands=2)
 
-- **Landmark Detection:** Many hand detection systems also provide hand landmarks – specific points on a hand, like fingertip or wrist. Explore how these can be used for more detailed analysis or interaction.
+while True:
+    success, img = cap.read()
+    if not success:
+        break
 
-- **Performance Tweaks:** If running on a Raspberry Pi, consider optimizations such as frame resizing or adjusting detection parameters to ensure real-time performance.
+    hands, img = detector.findHands(img)
+
+    if hands:
+        hand = hands[0]
+        fingers = detector.fingersUp(hand)
+        print(hand["type"], "hand, fingers up:", fingers, "count:", fingers.count(1))
+
+    cv2.imshow("Hand Detection", img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+```
+
+> ## Watch the order
+>
+> `findHands()` returns `hands, img`, the other way round from `findFaces()`. Mixing them up gives a confusing error the first time you use the result.
 
 ---
 
-Through this lesson, you'll have the foundational knowledge needed to explore more complex applications of hand detection. The sky's the limit when it comes to building upon these basics!
+## How it works
+
+- `HandDetector(detectionCon=0.8, maxHands=2)` only accepts hands it's at least 80% sure about, and tracks up to two
+- `detector.findHands(img)` draws the hand skeleton and returns a list of hands plus the image
+- Each hand is a dictionary with:
+  - `lmList` - the 21 landmarks, each `[x, y, z]`. Landmark 0 is the wrist and 8 is the tip of the index finger
+  - `bbox` and `center` - the box around the hand
+  - `type` - `"Left"` or `"Right"`
+- `detector.fingersUp(hand)` returns five numbers, thumb first, with `1` for a raised finger and `0` for a folded one. So `[0, 1, 1, 0, 0]` is a peace sign
+
+---
+
+## Measuring a pinch
+
+The distance between two landmarks makes a handy control. Add this inside the `if hands:` block:
+
+```python
+        thumb_tip = hand["lmList"][4][0:2]
+        index_tip = hand["lmList"][8][0:2]
+        length, info, img = detector.findDistance(thumb_tip, index_tip, img)
+        print("Pinch distance:", int(length))
+```
+
+`findDistance()` draws a line between the two points and returns the distance in pixels. Pinch your fingers together and apart to watch it change. You could use this as a volume knob or to set a robot's speed.
+
+---
+
+## Try it yourself
+
+Show a number from 0 to 5 with your fingers and print it in big letters. Then make the program print "Rock", "Paper" or "Scissors" from your hand shape.
+
+{% quiz %}
+? What does `fingersUp()` return for an open hand with all fingers spread?
+- [ ] `5`
+- [x] `[1, 1, 1, 1, 1]`
+- [ ] `[0, 0, 0, 0, 0]`
+> It returns one value per finger, thumb first, with 1 for each raised finger.
+
+? How many landmarks does MediaPipe find on each hand?
+- [ ] 5
+- [x] 21
+- [ ] 33
+> 21 points: the wrist plus four on each finger. (33 is the number of body landmarks in the next lesson.)
+{% endquiz %}
 
 ---

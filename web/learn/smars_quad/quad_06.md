@@ -8,10 +8,11 @@ date: 2023-03-04
 previous: quad_05.html
 next: quad_07.html
 description: 6 Mount the servo holder in the servo arm
-percent: 49
+percent: 42
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -43,16 +44,20 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 
 ## 6 Mount the servo holder in the servo arm
 
-Insert the servo horn onto the servo and screw in securely to the servo arm
+Push the servo horn onto the servo, then screw it securely to the servo arm.
 
 ![6 Mount the servo holder in the servo arm](assets/instruction06.png){:class="img-fluid w-25"}
 

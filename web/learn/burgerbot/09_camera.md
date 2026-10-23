@@ -8,7 +8,8 @@ date: 2023-04-27
 previous: 08_line_following_code.html
 description: Learn how to upgrade your BurgerBot with a camera.
 percent: 100
-duration: 1
+duration: 2
+quiz_total: 11
 navigation:
 - name: Build your own BurgerBot
 - content:
@@ -44,6 +45,8 @@ navigation:
     content:
     - name: BurgerBot Upgrades video
       link: 08_video.html
+    - name: Drawing with a Pen
+      link: 08_pen.html
     - name: Line Following
       link: 08_line_following.html
     - name: Line Following Code
@@ -55,7 +58,7 @@ navigation:
 
 ## Vision
 
-Another fun upgrade for your Burgerbot is a camera. The ESP32-Cam module is a cheap and easy to use camera module that can be powered from the Pico's `5v` and `GND` pins. The Camera module hosts its own webserver and can stream the video over Wi-Fi to a browser.
+Another fun upgrade for your Burgerbot is a camera. The ESP32-Cam module is a cheap and easy to use camera module that can be powered from the Pico's `VBUS` (5V) and `GND` pins. The Camera module hosts its own webserver and can stream the video over Wi-Fi to a browser.
 
 [![Camera Module](assets/camera_module.jpg){:class="img-fluid w-100"}](assets/camera_module.jpg)
 
@@ -63,16 +66,26 @@ Another fun upgrade for your Burgerbot is a camera. The ESP32-Cam module is a ch
 
 ## Setting up the camera
 
-The first time you plug in the camera it will broadcast its own Wi-Fi hotspot ID that you will need to connect to. You can then connect it to your local Wi-Fi hotspot with the password too. The next time it restarts it will remember these settings and connect up. You will need to check the devices connected to your router to find the IP address of the camera, however once you have this you can type that into your browser and being viewing what the robot can see.
+The first time you plug in the camera it will broadcast its own Wi-Fi hotspot ID that you will need to connect to. You can then connect it to your local Wi-Fi hotspot with the password too. The next time it restarts it will remember these settings and connect up. You will need to check the devices connected to your router to find the IP address of the camera, however once you have this you can type that into your browser and begin viewing what the robot can see.
 
 ---
 
 ## The Camera holder 3D Printable part
 
-The camera module requires the existing BurgerBot range finder holder is replaced with a new 3d printable part.
+The camera module needs the existing BurgerBot range finder holder to be replaced with a new 3d printable part.
 
 Click here to download the new Camera holder:
 
 * [`camera_holder.stl`](/assets/stl/burgerbot_v2/camera_holder.stl) - The Camera Holder
+
+---
+
+## What's next?
+
+Congratulations, you've built, programmed and upgraded your own robot! Here's where to go next:
+
+- [Raspberry Pi Pico with MicroPython - GPIO Mastery](/learn/micropython_gpio/) - understand the pins and signals behind BurgerBot
+- [MicroPython Robotics Projects with the Raspberry Pi Pico](/learn/micropython_robotics/) - more robot projects for the Pico
+- [Build a SMARS Robot](/learn/smars/) - a tracked robot you can build and program
 
 ---

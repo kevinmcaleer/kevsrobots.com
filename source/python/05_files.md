@@ -99,6 +99,22 @@ with open("test.txt", "r") as f:
 
 ---
 
+{% quiz %}
+? Which mode adds to the end of an existing file without deleting what's there?
+- [ ] `'w'`
+- [x] `'a'`
+- [ ] `'r'`
+> `'w'` empties the file first. `'a'` appends.
+
+? Why is `with open(...) as f:` preferred?
+- [ ] It's faster
+- [x] It closes the file automatically, even if an error happens
+- [ ] It's the only way to read binary files
+> The `with` statement guarantees the file gets closed when the block ends.
+{% endquiz %}
+
+---
+
 ## Summary
 
 You've learned how to work with files in Python, including opening and closing files, reading from and writing to text and binary files, and using the `with` statement for better file handling.

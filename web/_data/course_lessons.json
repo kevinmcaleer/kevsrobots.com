@@ -203,7 +203,7 @@
   {
     "slug": "burgerbot",
     "name": "Build your own BurgerBot",
-    "description": "Build a simple round robot powered by Raspberry Pi Pico",
+    "description": "Build, program and upgrade BurgerBot, a simple 3D printed robot powered by a Raspberry Pi Pico and MicroPython",
     "cover": "assets/burgerbot.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-04-27",
@@ -267,6 +267,11 @@
         "file": "08_video.md",
         "section": "Upgrades",
         "url": "/learn/burgerbot/08_video.html"
+      },
+      {
+        "file": "08_pen.md",
+        "section": "Upgrades",
+        "url": "/learn/burgerbot/08_pen.html"
       },
       {
         "file": "08_line_following.md",
@@ -353,7 +358,7 @@
   {
     "slug": "cvzone",
     "name": "Computer Vision on Raspberry Pi with CVZone",
-    "description": "Computer Vision on Raspberry Pi with CVZone",
+    "description": "Detect faces, hands and body poses in real time on a Raspberry Pi with Python, OpenCV and CVZone",
     "cover": "assets/computer_vision.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-10-07",
@@ -369,33 +374,28 @@
         "url": "/learn/cvzone/00_intro.html"
       },
       {
-        "file": "00_video.md",
-        "section": "Overview",
-        "url": "/learn/cvzone/00_video.html"
-      },
-      {
         "file": "01_install.md",
         "section": "Getting Started",
         "url": "/learn/cvzone/01_install.html"
       },
       {
         "file": "02_face.md",
-        "section": "Face, Hand and Posture Detection",
+        "section": "Face, Hand and Pose Detection",
         "url": "/learn/cvzone/02_face.html"
       },
       {
         "file": "03_hand.md",
-        "section": "Face, Hand and Posture Detection",
+        "section": "Face, Hand and Pose Detection",
         "url": "/learn/cvzone/03_hand.html"
       },
       {
         "file": "04_posture.md",
-        "section": "Face, Hand and Posture Detection",
+        "section": "Face, Hand and Pose Detection",
         "url": "/learn/cvzone/04_posture.html"
       },
       {
         "file": "05_advanced.md",
-        "section": "Face, Hand and Posture Detection",
+        "section": "Face, Hand and Pose Detection",
         "url": "/learn/cvzone/05_advanced.html"
       }
     ]
@@ -650,7 +650,7 @@
   {
     "slug": "eye_mechanism",
     "name": "Robot Eye Mechanism",
-    "description": "Robot Eye Mechanism, is a course that will teach you how to use Fusion 360 to create a Servo controled Robot eye mechanism.",
+    "description": "Design a 3D-printable robot eye mechanism in Fusion 360, with upper and lower eyelids that open and close around a central eyeball on a single servo.",
     "cover": "assets/eye_mechanism.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-01-29",
@@ -703,6 +703,11 @@
         "file": "08_hinge.md",
         "section": "Create the Lower Eyelid",
         "url": "/learn/eye_mechanism/08_hinge.html"
+      },
+      {
+        "file": "09_joint_and_export.md",
+        "section": "Joints and Export",
+        "url": "/learn/eye_mechanism/09_joint_and_export.html"
       }
     ]
   },
@@ -1369,7 +1374,7 @@
   {
     "slug": "learn_ros",
     "name": "Learn ROS with me",
-    "description": "Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.",
+    "description": "Learn ROS 2, the Robot Operating System, on a Raspberry Pi: run it in Docker, write Python nodes that publish and subscribe to topics, and visualise LiDAR scans in RViz2.",
     "cover": "assets/learn_ros.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-01-07",
@@ -1473,6 +1478,11 @@
         "file": "18_laserscan.md",
         "section": "RViz2",
         "url": "/learn/learn_ros/18_laserscan.html"
+      },
+      {
+        "file": "19_summary.md",
+        "section": "RViz2",
+        "url": "/learn/learn_ros/19_summary.html"
       }
     ]
   },
@@ -3414,7 +3424,7 @@
   {
     "slug": "robotics_101",
     "name": "Robotics 101",
-    "description": "Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.",
+    "description": "A friendly first look at robots: what a robot is, a quick history from ancient automata to today, the skills you need to build one, and the parts that make a robot work.",
     "cover": "assets/basics_101.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-01-17",
@@ -3607,8 +3617,8 @@
   },
   {
     "slug": "smars",
-    "name": "SMARS",
-    "description": "Learn how to 3d print, build and program a SMARS robot",
+    "name": "Build a SMARS Robot",
+    "description": "Learn how to 3D print, assemble, wire up and program the original SMARS robot, a small tracked robot powered by an Arduino Uno and a motor shield.",
     "cover": "assets/how_to_build_a_smars.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-02-19",
@@ -3698,7 +3708,7 @@
   {
     "slug": "smars_code",
     "name": "Learn how to program SMARS with Arduino",
-    "description": "Learn how to program SMARS with Arduino",
+    "description": "Program your SMARS robot in Arduino C++: drive it around, avoid obstacles with an ultrasonic sensor, sense its position, control it over Bluetooth, move servos and follow a line.",
     "cover": "assets/program_smars.png",
     "author": "Kevin McAleer",
     "date_published": "2023-09-10",
@@ -3708,6 +3718,11 @@
       "arduino"
     ],
     "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/smars_code/00_intro.html"
+      },
       {
         "file": "01_lesson_01.md",
         "section": "Movement",
@@ -3952,15 +3967,16 @@
   },
   {
     "slug": "smars_quad",
-    "name": "SMARS Quad",
-    "description": "Learn how to 3d print, build and program a SMARS Quad robot",
+    "name": "Build a SMARS Quad Walking Robot",
+    "description": "3D print, assemble and wire up the SMARS Quad, a four-legged walking robot with eight SG90 servos, a PCA9685 servo board and a Raspberry Pi Zero, then make it walk with Python.",
     "cover": "assets/how_to_build_a_quad.jpg",
     "author": "Kevin McAleer",
     "date_published": "2023-03-04",
     "groups": [
       "smars",
       "robotics",
-      "arduino"
+      "raspberry pi",
+      "python"
     ],
     "lessons": [
       {
@@ -4025,13 +4041,18 @@
       },
       {
         "file": "quad_12.md",
-        "section": "Assemble robot",
+        "section": "Wire and code",
         "url": "/learn/smars_quad/quad_12.html"
       },
       {
         "file": "quad_13.md",
-        "section": "Assemble robot",
+        "section": "Wire and code",
         "url": "/learn/smars_quad/quad_13.html"
+      },
+      {
+        "file": "quad_14.md",
+        "section": "Wire and code",
+        "url": "/learn/smars_quad/quad_14.html"
       }
     ]
   },

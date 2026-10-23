@@ -22,20 +22,33 @@ Step | Detail
 
 ## Wiring and general assembly notes
 
-1. Begin by soldering the Pico lipo shim to the Pico. Apply some flux to make the soldering process easier.
+1. Begin by soldering the Pico LiPo SHIM to the Pico. Apply some flux to make the soldering process easier.
 1. Solder the red cable to the 5 volt on the Pico. Take note of the captive nuts where the battery will be placed.
-1. Screw the battery in place. Be sure to screw only the left-hand side so that the Lipo shim can be placed on top.
+1. Screw the battery in place. Be sure to screw only the left-hand side so that the LiPo SHIM can be placed on top.
 1. Connect the battery from the other side and press the button to check if the connection is working well.
 1. Screw the assembly onto the base, using screws and captive nuts to make a secure connection.
-1. Add the Pimroni motors and screw them into place. Use pliers to squish the nuts and secure them.
+1. Add the Pimoroni motors and screw them into place. Use pliers to squish the nuts and secure them.
 1. Install the rangefinder and screw it into place. It has captive nuts that make it easy to screw.
-1. Add the thin Moon Boogie Wheels.
-1. Install the servo holder. It has captive knots that make it easy to put into place and secure.
+1. Add the thin Moon Buggy wheels.
+1. If you're adding the pen upgrade, install the servo holder. It has captive nuts that make it easy to put into place and secure.
 1. Add the pen holder and the cog that goes against it.
 1. Test fit the Sharpie to ensure it fits snugly.
 1. Add the motor cables. If you forgot to do this before, you can undo the motor holders and then re-screw them back into place.
 1. Crimp some female to male Dupont cables and connect the servo to the pins on the back of the Pico.
-1. Check your connections and run some code to test your Burger bot.
-1. By following these steps, you can build your own Burger bot just like the one in the [video](https://youtu.be/5G6psAuTYT4).
+1. Check your connections and run some code to test your BurgerBot.
+
+By following these steps, you can build your own BurgerBot just like the one in the [build video](02_video.html).
+
+---
+
+## Common Issues
+
+- **Problem**: The wheels wobble or slip on the motor shafts
+- **Solution**: Line up the flat side of the D-shaped hole with the flat on the motor shaft, then push firmly
+- **Why**: The flat is what transfers the motor's turning force to the wheel
+
+- **Problem**: Nuts keep falling out of the captive nut holes
+- **Solution**: Press them in with the tip of a screwdriver, or use pliers to squeeze them home
+- **Why**: Printed holes are deliberately tight, so the nut needs a firm push to seat
 
 ---

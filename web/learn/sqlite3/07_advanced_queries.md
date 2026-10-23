@@ -9,7 +9,8 @@ previous: 06_querying_and_joining_tables.html
 next: 08_transations_and_error_handling.html
 description: Module 7 delves into advanced SQL queries in SQLite
 percent: 40
-duration: 3
+duration: 4
+quiz_total: 24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -64,6 +65,8 @@ navigation:
 
 Module 7 delves into advanced SQL queries in SQLite. You will learn about aggregating data, using grouping and filtering conditions, and working with subqueries and nested queries.
 
+The examples use the `library.db` tables from the previous module.
+
 ### Aggregating Data with GROUP BY
 
 The `GROUP BY` clause allows us to group rows based on specific columns and perform aggregate functions on those groups.
@@ -73,9 +76,9 @@ The `GROUP BY` clause allows us to group rows based on specific columns and perf
 ```python
 # Grouping data example
 query = '''
-    SELECT genre, COUNT(*) AS count
+    SELECT genre_id, COUNT(*) AS count
     FROM books
-    GROUP BY genre
+    GROUP BY genre_id
 '''
 result = connection.execute(query)
 data = result.fetchall()
@@ -92,16 +95,16 @@ The `HAVING` clause allows us to filter groups based on specific conditions afte
 ```python
 # Filtering grouped data example
 query = '''
-    SELECT genre, COUNT(*) AS count
+    SELECT genre_id, COUNT(*) AS count
     FROM books
-    GROUP BY genre
-    HAVING COUNT(*) > 5
+    GROUP BY genre_id
+    HAVING COUNT(*) > 2
 '''
 result = connection.execute(query)
 data = result.fetchall()
 ```
 
-In this example, we retrieve genres with more than 5 books by using the `HAVING` clause to filter the groups.
+In this example, we retrieve genres with more than 2 books by using the `HAVING` clause to filter the groups. `WHERE` filters rows *before* grouping; `HAVING` filters the groups *after*.
 
 ### Using Built-in Functions and Expressions
 
@@ -130,19 +133,18 @@ Subqueries, also known as nested queries, allow us to use the result of one quer
 ```python
 # Subquery example
 query = '''
-    SELECT title, author
+    SELECT title, year
     FROM books
-    WHERE genre IN (
-        SELECT genre
+    WHERE price > (
+        SELECT AVG(price)
         FROM books
-        WHERE year > 2000
     )
 '''
 result = connection.execute(query)
 data = result.fetchall()
 ```
 
-In this example, we retrieve the titles and authors of books that belong to genres found in a subquery. The subquery selects genres of books published after 2000.
+In this example, the subquery works out the average price, and the outer query returns the books that cost more than that.
 
 ### Advanced SQL Techniques
 
@@ -152,14 +154,63 @@ SQLite supports advanced SQL techniques, including views, common table expressio
 
 Views are virtual tables based on the result of a query. They allow us to simplify complex queries and reuse query logic.
 
+```python
+with connection:
+    connection.execute('''
+        CREATE VIEW IF NOT EXISTS book_details AS
+        SELECT b.title, a.name AS author, b.year
+        FROM books AS b LEFT JOIN authors AS a ON b.author_id = a.id
+    ''')
+
+print(connection.execute("SELECT * FROM book_details WHERE year > 2000").fetchall())
+```
+
 #### Common Table Expressions (CTEs)
 
 CTEs are named temporary result sets that we can reference within a query. They provide a convenient way to break down complex queries into smaller, more manageable parts.
+
+```python
+query = '''
+    WITH recent AS (
+        SELECT * FROM books WHERE year > 2000
+    )
+    SELECT COUNT(*), AVG(price) FROM recent
+'''
+print(connection.execute(query).fetchone())
+```
 
 #### Window Functions
 
 Window functions perform calculations across a set of rows in a query result. They allow us to perform calculations such as ranking, row numbering, and cumulative sums.
 
+```python
+query = '''
+    SELECT title, price,
+           RANK() OVER (ORDER BY price DESC) AS price_rank
+    FROM books
+'''
+for row in connection.execute(query):
+    print(row)
+```
+
+Unlike `GROUP BY`, a window function keeps every row and adds the calculated value alongside it.
+
 By mastering advanced SQL queries and techniques, you will have the skills to perform complex data analysis and manipulation within SQLite databases.
+
+---
+
+{% quiz %}
+? What's the difference between `WHERE` and `HAVING`?
+- [x] `WHERE` filters rows before grouping, `HAVING` filters groups after
+- [ ] They're the same
+- [ ] `HAVING` only works with text columns
+> Use `HAVING` for conditions on aggregates like `COUNT(*)`.
+
+? Which of these returns one row per book with a ranking alongside it?
+- [ ] `GROUP BY price`
+- [x] `RANK() OVER (ORDER BY price DESC)`
+- [ ] `MAX(price)`
+> Window functions keep every row and add the calculated value.
+{% endquiz %}
 
 ---

@@ -7,18 +7,14 @@ type: page
 
 ## Ultrasonic Range Finder
 
-Burgerbot includes a simple range finder sensor at the front of the robot.
-
-![Line folllow animation](assets/line_follow_animation.gif)
-
-Ultrasonic range finders are versatile and widely used devices that measure distance by utilizing the principles of sound wave propagation. These handy gadgets have found their way into a plethora of applications, from robotics and automation to obstacle detection and parking assistance. 
+BurgerBot has an ultrasonic range finder at the front of the robot: those are the two 'eyes'. Ultrasonic range finders measure distance using sound, and they're used everywhere from robots to car parking sensors.
 
 ---
 ## How Ultrasonic Range Finders Work
 
 Ultrasonic range finders operate using the basic principles of echolocation, a technique employed by animals such as bats and dolphins to navigate and locate objects. Here's a step-by-step explanation of the process:
 
-**Transmitter**: The range finder consists of a transmitter that emits ultrasonic sound waves, typically at frequencies between 20 kHz and 200 kHz. These frequencies are higher than the audible range for humans, which is why they're called `"ultrasonic"`.
+**Transmitter**: The range finder consists of a transmitter that emits ultrasonic sound waves, at 40 kHz for the HC-SR04. These frequencies are higher than the audible range for humans, which is why they're called `"ultrasonic"`.
 
 **Sound Wave Propagation**: The emitted sound waves travel through the air and eventually reach an object or surface in their path.
 
@@ -33,6 +29,22 @@ Ultrasonic range finders operate using the basic principles of echolocation, a t
 Distance = (Time of Flight x Speed of Sound) / 2
 
 The division by 2 accounts for the fact that the sound waves travel to the object and back, covering twice the actual distance.
+
+---
+
+## Wiring the range finder
+
+Range finder | Pico
+---|---
+VCC | 3V3 (physical pin 36)
+Trig | GP0 (physical pin 1)
+Echo | GP1 (physical pin 2)
+GND | GND
+{:class="table table-code-fit"}
+
+> ## Use the 3.3V version
+>
+> Use an HC-SR04P or another 3.3V range finder. A standard 5V HC-SR04 sends a 5V echo signal, which can damage the Pico. See [Voltage Levels](/learn/micropython_gpio/03_voltage_levels.html) for why.
 
 ---
 
@@ -56,8 +68,8 @@ print(f"Distance to object: {distance} cm")
 
 - `bot.distance` triggers the rangefinder to send ultrasonic pulses
 - The sensor measures time-of-flight automatically
-- Returns the distance in centimeters as a number
-- If no object is detected, returns a very large value (like 400cm)
+- Returns the distance as a number
+- The HC-SR04 works from about 2cm to 4m. Readings outside that range aren't reliable
 
 ---
 
@@ -122,7 +134,7 @@ else:
 ## Common Issues
 
 - **Problem**: `bot.distance` always returns 0
-- **Solution**: Check that the rangefinder Trigger pin and Echo pin are properly connected to the Pico GPIO pins. Verify wiring matches the Motor SHIM documentation
+- **Solution**: Check that Trig is connected to GP0 and Echo to GP1, and that VCC and GND are connected
 - **Why**: The rangefinder needs both pins connected to send pulses (Trigger) and receive echoes (Echo)
 
 - **Problem**: Distance readings are erratic or jump between values
@@ -137,9 +149,9 @@ else:
 - **Solution**: Use objects with flat, hard surfaces for testing. Angled surfaces reflect sound away from the sensor
 - **Why**: Soft materials absorb ultrasonic waves, and angles cause waves to bounce away rather than back to the sensor
 
-- **Problem**: Getting very large numbers (like 400cm) when nothing is nearby
-- **Solution**: This is normal - it means no object was detected within range. The sensor has a maximum detection range of about 4 meters
-- **Why**: When no echo returns within the timeout period, the sensor returns its maximum value
+- **Problem**: The program freezes when reading `bot.distance`
+- **Solution**: Check the Echo wire. If the sensor never sends an echo pulse, the library waits for one forever
+- **Why**: The library loops until the Echo pin changes, so a loose wire stops the program
 
 ---
 
@@ -159,6 +171,22 @@ Now that you can measure distance, let's practice:
 4. **Movement speed controller**: Combine distance measurement with movement - make the robot speed up when far from objects and slow down when close.
 
 **Advanced Challenge**: Create a "parking assistant" - move the robot forward until it's exactly 10cm from a wall, then stop. The robot should slow down as it approaches the target distance!
+
+---
+
+{% quiz %}
+? Why does the distance formula divide by 2?
+- [ ] The sensor has two transducers
+- [x] The sound travels to the object and back again
+- [ ] Sound is twice as fast in air
+> The time of flight covers the round trip, so the distance to the object is half of it.
+
+? Which pins does the BurgerBot library use for the range finder?
+- [x] GP0 for Trig and GP1 for Echo
+- [ ] GP16 and GP17
+- [ ] GP5 and GP6
+> GP16 and GP17 are the pen servo and line sensor, and GP5/GP6 drive the left motor.
+{% endquiz %}
 
 ---
 

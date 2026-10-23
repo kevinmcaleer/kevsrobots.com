@@ -1,15 +1,8 @@
 ---
 layout: lesson
 title: Raspberry Pi Setup
-author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
-date: 2023-01-07
-previous: 01_what_is_ros.html
-next: 03_install_updates.html
 description: How to setup a Raspberry Pi 4
-percent: 15
-duration: 2
 navigation:
 - name: Learn ROS with me
 - content:
@@ -69,10 +62,18 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
 ![Screenshot of the imager tool](assets/rpi_desktop.jpg){:class="cover"}
+
+## Watch the video
+
+{% include youtubeplayer.html id="03wKo-riJlA" %}
+
+---
 
 ## 64bit Raspberry Pi OS image
 
@@ -92,7 +93,7 @@ You will need to use the 64bit version of the Raspberry Pi OS to use ROS2 within
 
 ![Screenshot of the imager tool - choose os page](assets/rpi_imager02.png){:class="img-fluid w-50 shadow-lg"}
 
-* **Advanced Options** - Click the Cog icon (the `Advanced` button) and complete the details; add your Wi-Fi SSID and password, and set a default username and password, and ensure that the `enable SSH` option is selcted; this will enable you to remotely connect to the Raspberry Pi.
+* **Advanced Options** - Click the Cog icon (the `Advanced` button; in newer versions of Imager, click `Edit Settings` when asked about OS customisation) and complete the details; add your Wi-Fi SSID and password, and set a default username and password, and ensure that the `enable SSH` option is selected; this will enable you to remotely connect to the Raspberry Pi.
 
 ![Screenshot of the imager tool - choose os page](assets/rpi_imager04.png){:class="img-fluid w-50 shadow-lg"}
 

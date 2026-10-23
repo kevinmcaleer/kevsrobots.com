@@ -1,107 +1,109 @@
 ---
-title: Posture Detection
+title: Pose Detection
 description: >-
-    This lesson provides a deep dive into pose estimation, highlighting key body landmarks and explaining how to interpret them to assess posture.
+    Find 33 body landmarks with CVZone's PoseDetector and measure the angles between them
 layout: lesson
+type: page
 ---
 
-## Posture Detection
+## Pose detection
 
-The ability to detect and assess posture has a multitude of applications ranging from health tech to gaming. While many libraries offer solutions for facial and hand detection, for full-body posture detection, a combination of tools like CVZone's PoseModule and the `mediapipe` library often provides more comprehensive results. Specifically, CVZone's PoseModule leverages the capabilities of `mediapipe` for pose estimation.
+Pose detection finds the position of a person's body: their head, shoulders, elbows, hips, knees and feet. It's used in fitness apps, motion capture and games. CVZone's `PoseDetector` uses MediaPipe's pose model, which finds **33 landmarks** on the body.
 
-![Post Estimation Landmarks](assets/pose.jpg){:class="img-fluid w-75"}
+![Pose Estimation Landmarks](assets/pose.jpg){:class="img-fluid w-75"}
 
----
+Some useful landmark numbers:
 
-1. **Install mediapipe:**
-
-   To harness the capabilities of `mediapipe`, you'll first need to install it. Run the following command in your terminal or command prompt:
-
-   ```bash
-   pip3 install mediapipe
-   ```
-
-2. **Capture video and detect posture:**
-
-   ```python
-   from cvzone.PoseModule import PoseDetector
-   import cv2
-
-   # Initialize the webcam to the default camera (index 0)
-   cap = cv2.VideoCapture(0)
-
-   # Initialize the PoseDetector class. Here, we're using default parameters. For a deep dive into what each parameter signifies, consider checking the documentation.
-   detector = PoseDetector(staticMode=False,
-                           modelComplexity=1,
-                           smoothLandmarks=True,
-                           enableSegmentation=False,
-                           smoothSegmentation=True,
-                           detectionCon=0.5,
-                           trackCon=0.5)
-
-   # Loop to continuously get frames from the webcam
-   while True:
-       # Capture each frame from the webcam
-       success, img = cap.read()
-
-       # Detect human pose in the frame
-       img = detector.findPose(img)
-
-       # Extract body landmarks and possibly a bounding box 
-       # Set draw=True to visualize landmarks and bounding box on the image
-       lmList, bboxInfo = detector.findPosition(img, draw=True, bboxWithHands=False)
-
-       # If body landmarks are detected
-       if lmList:
-           # Extract the center of the bounding box around the detected pose
-           center = bboxInfo["center"]
-
-           # Visualize the center of the bounding box
-           cv2.circle(img, center, 5, (255, 0, 255), cv2.FILLED)
-
-           # Calculate the distance between landmarks 11 and 15 and visualize it
-           length, img, info = detector.findDistance(lmList[11][0:2],
-                                                     lmList[15][0:2],
-                                                     img=img,
-                                                     color=(255, 0, 0),
-                                                     scale=10)
-
-           # Calculate and visualize the angle formed by landmarks 11, 13, and 15
-           # This can be used as an illustrative example of how posture might be inferred from body landmarks.
-           angle, img = detector.findAngle(lmList[11][0:2],
-                                           lmList[13][0:2],
-                                           lmList[15][0:2],
-                                           img=img,
-                                           color=(0, 0, 255),
-                                           scale=10)
-
-           # Check if the calculated angle is close to a reference angle of 50 degrees (with a leeway of 10 degrees)
-           isCloseAngle50 = detector.angleCheck(myAngle=angle,
-                                                targetAngle=50,
-                                                offset=10)
-
-           # Print the result of the angle comparison
-           print(isCloseAngle50)
-
-       # Display the processed frame
-       cv2.imshow("Image", img)
-
-       # Introduce a brief pause of 1 millisecond between frames
-       cv2.waitKey(1)
-   ```
-
-### Deepening Your Understanding:
-
-- **Visualizing Landmarks:** To get a clearer grasp of what's being detected, consider drawing lines connecting the landmarks. This can help visualize the skeletal structure detected by the PoseModule.
-
-- **Analyzing Posture:** By computing angles between specific landmarks (e.g., the angle between the hip, knee, and ankle), you can discern certain postures like slouching or leaning.
-
-- **Real-time Feedback:** Innovate by developing a system that alerts users in real-time if they adopt an incorrect posture.
-
-- **Integration with IoT:** Envision a future where smart chairs adjust automatically based on a user's posture or devices that offer gentle reminders to adjust one's seating position. The possibilities are vast!
+Landmark | Body part
+---|---
+0 | Nose
+11, 12 | Left and right shoulder
+13, 14 | Left and right elbow
+15, 16 | Left and right wrist
+23, 24 | Left and right hip
+25, 26 | Left and right knee
+{:class="table table-code-fit"}
 
 ---
 
-This lesson lays the foundation for posture detection and assessment. The real charm in computer vision emerges when you amalgamate techniques and integrate systems to tackle real-world challenges.
+## The code
+
+MediaPipe was installed in the first lesson, so you're ready to go.
+
+```python
+import cv2
+from cvzone.PoseModule import PoseDetector
+
+cap = cv2.VideoCapture(0)
+detector = PoseDetector(detectionCon=0.5, trackCon=0.5)
+
+while True:
+    success, img = cap.read()
+    if not success:
+        break
+
+    img = detector.findPose(img)
+    lmList, bboxInfo = detector.findPosition(img, draw=True, bboxWithHands=False)
+
+    if lmList:
+        # Mark the centre of the body
+        cv2.circle(img, bboxInfo["center"], 5, (255, 0, 255), cv2.FILLED)
+
+        # Distance from the left shoulder (11) to the left wrist (15)
+        length, img, info = detector.findDistance(lmList[11][0:2], lmList[15][0:2],
+                                                  img=img, color=(255, 0, 0), scale=10)
+
+        # Angle at the left elbow: shoulder (11), elbow (13), wrist (15)
+        angle, img = detector.findAngle(lmList[11][0:2], lmList[13][0:2], lmList[15][0:2],
+                                        img=img, color=(0, 0, 255), scale=10)
+
+        # Is the elbow bent to about 50 degrees, give or take 10?
+        print(int(angle), detector.angleCheck(myAngle=angle, targetAngle=50, offset=10))
+
+    cv2.imshow("Pose Detection", img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+```
+
+---
+
+## How it works
+
+- `detector.findPose(img)` runs the pose model and draws the skeleton on the image
+- `detector.findPosition(img)` returns `lmList`, a list of 33 `[x, y, z]` landmarks, and `bboxInfo`, the box around the body. `lmList` is empty when nobody is in view
+- `lmList[11][0:2]` takes just the `x, y` of landmark 11, the left shoulder
+- `findDistance()` measures the distance between two points in pixels and draws it
+- `findAngle()` measures the angle at the middle point. With shoulder, elbow and wrist, that's how bent the elbow is
+- `angleCheck()` returns `True` if the angle is within `offset` degrees of the target
+
+> ## Which side is left?
+>
+> Landmark 11 is the person's **own** left shoulder. If you're facing the camera, it appears on the right of the picture.
+
+---
+
+## Going further
+
+- **Exercise counter:** count a bicep curl each time the elbow angle drops below 50 degrees and then goes back above 150
+- **Posture check:** the angle between ear (7), shoulder (11) and hip (23) changes when you slouch at a desk. Try it from the side
+- **Robot control:** raise your left or right arm to steer a robot
+
+---
+
+{% quiz %}
+? Which three landmarks measure how bent the left elbow is?
+- [ ] 0, 11 and 12
+- [x] 11, 13 and 15
+- [ ] 23, 25 and 27
+> Shoulder (11), elbow (13) and wrist (15). The angle is measured at the middle point, the elbow.
+
+? What does `detector.angleCheck(myAngle=angle, targetAngle=90, offset=15)` return when the angle is 100?
+- [x] `True`
+- [ ] `False`
+> 100 is within 15 degrees of 90, so the check passes.
+{% endquiz %}
 
 ---

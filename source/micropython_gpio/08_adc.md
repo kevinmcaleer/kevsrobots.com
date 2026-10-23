@@ -7,65 +7,78 @@ description: Learn about analog input and the ADC on the Raspberry Pi Pico using
 
 ## Overview
 
-Welcome to Lesson 8 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will explore analog input and the Analog-to-Digital Converter (ADC) on the Raspberry Pi Pico using MicroPython.
+Digital pins only see on or off. Many sensors give you a voltage that can be anywhere in between. In this lesson you'll learn how the Pico's Analog-to-Digital Converter (ADC) turns a voltage into a number.
 
 ---
 
-## Course Content
+## Analog input and ADC
 
-In this lesson, you will learn:
+An analog signal can have any value in a range, like the position of a dial or the amount of light in a room. The ADC measures the voltage on a pin and turns it into a number your code can use.
 
-* What analog input is and the role of ADC
-* How to configure Raspberry Pi Pico pins for analog input
-* How to read analog values using MicroPython
+The Pico's ADC is available on three pins:
+
+| ADC channel | GP pin | Physical pin |
+|-------------|--------|--------------|
+| ADC0 | GP26 | 31 |
+| ADC1 | GP27 | 32 |
+| ADC2 | GP28 | 34 |
+| ADC4 | - | Internal temperature sensor |
+{:class="table table-striped"}
+
+The input must stay between 0V and 3.3V.
 
 ---
 
-## Analog Input and ADC
-
-Analog input is used to measure the continuous range of values of a physical quantity, such as light, sound, or temperature. In contrast, digital signals represent values in binary format (0s and 1s).
-
-Raspberry Pi Pico uses ADC to convert the continuous analog signal to a discrete digital signal that can be processed by the computer.
-
-## Configuring Raspberry Pi Pico Pins for Analog Input
-
-To use a pin on the Raspberry Pi Pico for analog input, you need to configure it for analog to digital conversion (ADC). This is done using the `ADC` class in MicroPython. To configure a pin for ADC, you can use the following code:
+## Configuring a pin for analog input
 
 ```python
-from machine import ADC, Pin
+from machine import ADC
 
-# Configure pin 0 for analog input
-adc = ADC(Pin(0))
+adc = ADC(26)   # GP26, ADC0
 ```
 
+You can also write `ADC(Pin(26))`. Either way, only GP26, GP27 and GP28 will work.
+
 ---
 
-## Reading Analog Values
-
-Once a pin has been configured for analog input, you can read analog values from it. To read the value of an analog input pin, you can use the `read_u16()` method of the `ADC` class. This method returns the value of the analog input pin as a 16-bit unsigned integer between `0` and `65535`. For example:
+## Reading analog values
 
 ```python
-from machine import ADC, Pin
-
-# Configure pin 0 for analog input
-adc = ADC(Pin(0))
-
-# Read the value of the analog input pin
 value = adc.read_u16()
+print(value)
 ```
 
-The `value` variable will contain the value of the analog input pin.
+`read_u16()` returns a number from `0` (0V) to `65535` (3.3V).
+
+To turn it into a voltage:
+
+```python
+voltage = value * 3.3 / 65535
+print(f"{voltage:.2f} V")
+```
+
+> ## Resolution
+>
+> The Pico's ADC is really 12-bit (0 to 4095). MicroPython scales it up to 16 bits so that `read_u16()` gives the same range on every board.
 
 ---
 
-## Conclusion
+## Try it yourself
 
-In this lesson, you learned about analog input, the role of ADC (Analog to Digital Converter), how to configure Raspberry Pi Pico pins for analog input, and how to read analog values using MicroPython. You can use this knowledge to measure physical quantities, such as light, sound, or temperature, and process them in your Raspberry Pi Pico projects.
+Connect GP26 to 3V3, then to GND, and print the reading each time. What do you get when the pin is connected to nothing?
 
----
+{% quiz %}
+? Which of these will work as an ADC input?
+- [ ] `ADC(0)` on GP0
+- [x] `ADC(26)` on GP26
+- [ ] `ADC(15)` on GP15
+> Only GP26, GP27 and GP28 are connected to the ADC.
 
-## Key Results
-
-After you have completed this lesson, you will have a solid understanding of analog input and the ADC on the Raspberry Pi Pico using MicroPython. You will be able to configure pins for analog input, read analog values from sensors, and process them in your MicroPython programs.
+? `read_u16()` returns 32768. Roughly what voltage is on the pin?
+- [ ] 0.33V
+- [x] 1.65V
+- [ ] 3.3V
+> 32768 is half of 65535, so the voltage is about half of 3.3V.
+{% endquiz %}
 
 ---

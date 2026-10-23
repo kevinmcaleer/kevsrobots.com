@@ -7,11 +7,12 @@ cover: /learn/smars/assets/how_to_build_a_smars.jpg
 date: 2023-02-19
 previous: smars01.html
 next: smars03.html
-description: Build Instructions for standard SMARS
+description: Solder power wires onto the two N20 motors
 percent: 18
 duration: 1
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:
@@ -58,6 +59,14 @@ navigation:
 ---
 
 
+## Watch the video
+
+The assembly video covers soldering and putting the robot together (lessons 2 to 7).
+
+{% include youtubeplayer.html id="t8yl0TS4qHA" %}
+
+---
+
 ## Preparation
 
 Prep the motor by:
@@ -81,6 +90,10 @@ Prep the motor by:
 ---
 
 ![solder wires](assets/soldered_motor.jpg){:class="img-fluid w-50"}
+
+> ## Safety first
+>
+> Soldering irons get hot enough to burn you instantly. Use a stand, work in a ventilated area, and wash your hands after handling solder.
 
 After soldering, twist the red and black wires to secure them further. It also makes the wires easier to manage.
 

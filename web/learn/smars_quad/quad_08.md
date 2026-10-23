@@ -8,10 +8,11 @@ date: 2023-03-04
 previous: quad_07.html
 next: quad_09.html
 description: Attach the other servo holders to the frame
-percent: 63
+percent: 54
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -43,16 +44,20 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 
 ## 8 Attach the other servo holders to the frame
 
-Insert the servo horn onto the servo and screw in securely to the servo arm.
+Fit the remaining servo holders into the frame in the same way, so there is one at each corner.
 
 ![Attach the other servo holders to the frame](assets/instruction08.png){:class="img-fluid w-25"}
 

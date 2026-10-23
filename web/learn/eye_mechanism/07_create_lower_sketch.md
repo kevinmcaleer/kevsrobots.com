@@ -7,9 +7,10 @@ cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 date: 2023-01-29
 previous: 06_lower_eyelid_sketch.html
 next: 08_hinge.html
-description: Lets create the lower eyelid, similar to the upper eyelid
-percent: 88
+description: Let's create the lower eyelid, similar to the upper eyelid
+percent: 80
 duration: 3
+quiz_total: 9
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -39,6 +40,10 @@ navigation:
       link: 07_create_lower_sketch.html
     - name: Create Hinge from Profile
       link: 08_hinge.html
+  - section: Joints and Export
+    content:
+    - name: Joints and Export
+      link: 09_joint_and_export.html
 ---
 
 
@@ -55,7 +60,7 @@ This next step is similar to creating the profile for the upper eyelid. Now that
   * 44mm for the outer circle
   * 40mm for the inner circle
 
-This is the same sketch you created in [Lesson 2](02_create_sketch#create-a-sketch). 
+This is the same sketch you created in [Lesson 2](02_create_sketch.html#create-a-sketch). 
 
 ---
 
@@ -63,7 +68,7 @@ This is the same sketch you created in [Lesson 2](02_create_sketch#create-a-sket
 
 ---
 
-* **Rotate - 180** - Simliar to Lesson 2, but this time we will use the revolve tool to rotate the profile -180.
+* **Rotate - 180** - Similar to Lesson 2, but this time we will use the revolve tool to rotate the profile -180.
 
 ![Eyelid sketch](assets/eye50.jpg){:class="img-fluid w-100"}
 
@@ -71,7 +76,7 @@ This is the same sketch you created in [Lesson 2](02_create_sketch#create-a-sket
 
 ## Create the hinges
 
-Lets create the hinges similar to in [lesson 4](04_create_hinges#).
+Let's create the hinges similar to in [lesson 4](04_create_hinges.html).
 
 ---
 
@@ -81,13 +86,13 @@ Lets create the hinges similar to in [lesson 4](04_create_hinges#).
 
 ---
 
-* **Select the `YZ` plane** - select the `YZ` plane, this is th eone that is facing the right side of our model.
+* **Select the `YZ` plane** - select the `YZ` plane, this is the one that is facing the right side of our model.
 
 ![Offset plane](assets/eye23.jpg){:class="img-fluid w-50"}
 
 ---
 
-* **Click on the point side the eyelid** - Click on the point thats highlighted in the image below. The new plane should then be offset by `20mm` from the `YZ` plane.
+* **Click on the point side the eyelid** - Click on the point that's highlighted in the image below. The new plane should then be offset by `20mm` from the `YZ` plane.
 
 ![Offset plane](assets/eye24.jpg){:class="img-fluid w-100"}
 
@@ -112,12 +117,12 @@ Lets create the hinges similar to in [lesson 4](04_create_hinges#).
 
 ---
 
-* **Create a square** - Use the rectangle drawing mode by pressing `r`. Start the rectangle at the origin, and drag it until the bottom line is touches the bottom of the circle, and the leftmost side touches the left side of the circle. You can also use the Tangent tool to ensure the line and circles are aligned.
+* **Create a square** - Use the rectangle drawing mode by pressing `r`. Start the rectangle at the origin, and drag it until the bottom line touches the bottom of the circle, and the leftmost side touches the left side of the circle. You can also use the Tangent tool to ensure the line and circles are aligned.
 
 ![Offset plane](assets/eye51.jpg){:class="img-fluid w-50"}
 
 ---
 
-* Finish Sketch**** - Click `the Finish Sketch` button
+* **Finish Sketch** - Click the `Finish Sketch` button
 
 ---

@@ -11,6 +11,7 @@ description: Throughout this course, you have gained a solid foundation in worki
   with databases using Python and SQLite3
 percent: 60
 duration: 3
+quiz_total: 24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -63,7 +64,7 @@ navigation:
 ---
 
 
-Congratulations! You have completed the "Creating Databases with Python and SQLite3 for Beginners" course. Throughout this course, you have gained a solid foundation in working with databases using Python and SQLite3. Let's summarize what we have covered:
+Congratulations! You have completed the `Create Databases with Python and SQLite3` course. Throughout this course, you have gained a solid foundation in working with databases using Python and SQLite3. Let's summarize what we have covered:
 
 ### Module 1: Introduction to Databases
 
@@ -121,8 +122,8 @@ Congratulations! You have completed the "Creating Databases with Python and SQLi
 
 ### Module 10: Securing and Backing Up SQLite Databases
 
-- Securing databases with password protection and access controls
-- Implementing backup strategies: file copy, SQL dump, database snapshots
+- Securing databases with file permissions, access controls and encryption options
+- Implementing backup strategies: file copy, the backup API, SQL dump, database snapshots
 - Testing and restoring backups, disaster recovery planning
 
 ## Course Conclusion
@@ -141,5 +142,14 @@ Databases are a fundamental part of modern applications, and with the skills you
 Remember, practice is key to mastering these concepts. Continue exploring and experimenting with databases to reinforce your understanding and further enhance your skills.
 
 Best of luck with your future endeavors in database development!
+
+---
+
+## What's next?
+
+- The bonus lessons that follow cover database design (normal forms), a complete demo program and desktop tools
+- [Getting Started with SQL](/learn/sql/) - more practice with the SQL language
+- [Using Redis with Python](/learn/redis/) - a super-fast in-memory data store for caching and messaging
+- [Data Manipulation with Pandas and Numpy](/learn/pandas_and_numpy/) - analyse your data. `pandas.read_sql()` can load a query straight into a DataFrame
 
 ---

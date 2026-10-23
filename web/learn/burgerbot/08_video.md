@@ -6,10 +6,11 @@ type: video
 cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
 previous: 07_object_avoidance.html
-next: 08_line_following.html
+next: 08_pen.html
 description: Learn how to upgrade your BurgerBot with a new feature.
-percent: 77
+percent: 66
 duration: 44
+quiz_total: 11
 video_id: jnPR6XAuJ2U
 navigation:
 - name: Build your own BurgerBot
@@ -46,6 +47,8 @@ navigation:
     content:
     - name: BurgerBot Upgrades video
       link: 08_video.html
+    - name: Drawing with a Pen
+      link: 08_pen.html
     - name: Line Following
       link: 08_line_following.html
     - name: Line Following Code
@@ -55,5 +58,6 @@ navigation:
 ---
 
 
+In this livestream, BurgerBot gets an upgrade. The next lessons cover the add-ons you can build: a pen, a line sensor and a camera.
 
 ---

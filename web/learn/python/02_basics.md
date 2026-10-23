@@ -10,7 +10,8 @@ next: 03_data_structures.html
 description: Dive into the basics of Python, including variables, data types, syntax,
   comments, and operators.
 percent: 10
-duration: 3
+duration: 4
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -138,9 +139,12 @@ print("Hello, World!")  # This is an inline comment
 
 """
 This is a
-multi-line comment
+multi-line string,
+often used as a comment
 """
 ```
+
+Python doesn't have a true multi-line comment. A triple-quoted string that isn't assigned to anything is ignored, so people often use one as a comment. You can also just start each line with `#`.
 
 ---
 
@@ -183,6 +187,22 @@ is_student = True
 if age > 18 and is_student:
     print("You are an adult student.")
 ```
+
+---
+
+{% quiz %}
+? What is `7 // 2` in Python?
+- [ ] 3.5
+- [x] 3
+- [ ] 1
+> `//` is floor division: it divides and rounds down to a whole number. `7 % 2` would give the remainder, 1.
+
+? What data type is `True`?
+- [ ] String
+- [ ] Integer
+- [x] Boolean
+> Booleans are either `True` or `False`, with a capital letter.
+{% endquiz %}
 
 ---
 

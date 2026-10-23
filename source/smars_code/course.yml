@@ -10,8 +10,14 @@
       - robotics
       - arduino
   description: >- 
-     Learn how to program SMARS with Arduino
+     Program your SMARS robot in Arduino C++: drive it around, avoid obstacles with an
+     ultrasonic sensor, sense its position, control it over Bluetooth, move servos
+     and follow a line.
   content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
   - section:
       name: Movement
       content:

@@ -1,15 +1,8 @@
 ---
 layout: lesson
 title: Get Cubie-1 files
-author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
-date: 2023-01-07
-previous: 04_docker_install.html
-next: 06_clone_images.html
 description: Download the Cubie-1 example files
-percent: 30
-duration: 1
 navigation:
 - name: Learn ROS with me
 - content:
@@ -69,6 +62,8 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
@@ -76,7 +71,7 @@ navigation:
 
 ## Example files
 
-This course has some example files that you can use to follow along. Lets grab these and continue with the container build.
+This course has some example files that you can use to follow along. Let's grab these and continue with the container build.
 
 ---
 

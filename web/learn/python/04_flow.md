@@ -11,6 +11,7 @@ description: Understand how to control the flow of your Python programs using co
   statements, loops, and functions.
 percent: 20
 duration: 2
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -125,6 +126,26 @@ def greet(name):
 message = greet("Alice")
 print(message)  # Prints "Hello, Alice!"
 ```
+
+---
+
+## Try it yourself
+
+Write a function `is_even(n)` that returns `True` for even numbers. Then use a `for` loop to print every even number from 1 to 20.
+
+{% quiz %}
+? What does `range(5)` produce in a `for` loop?
+- [ ] 1, 2, 3, 4, 5
+- [x] 0, 1, 2, 3, 4
+- [ ] 0, 1, 2, 3, 4, 5
+> `range(5)` starts at 0 and stops before 5.
+
+? When does a `while` loop stop?
+- [x] When its condition becomes `False`
+- [ ] After five repeats
+- [ ] When it reaches the end of the file
+> A `while` loop repeats as long as its condition is true, so make sure something changes inside the loop.
+{% endquiz %}
 
 ---
 

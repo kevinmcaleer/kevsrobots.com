@@ -67,6 +67,22 @@ if x < 0:
 
 ---
 
+{% quiz %}
+? When does a `finally` block run?
+- [ ] Only when there's an error
+- [ ] Only when there's no error
+- [x] Every time, error or not
+> `finally` is for clean-up code that must always run.
+
+? What does `int("hello")` raise?
+- [x] `ValueError`
+- [ ] `ZeroDivisionError`
+- [ ] `FileNotFoundError`
+> The string can't be turned into a number, so Python raises a `ValueError`.
+{% endquiz %}
+
+---
+
 ## Summary
 
 In this lesson, you've learned about handling errors and exceptions in Python. You now know how to catch exceptions using try/except blocks and how to raise exceptions in your code. These tools are crucial for building robust Python applications that can withstand unexpected input and recover from errors gracefully.

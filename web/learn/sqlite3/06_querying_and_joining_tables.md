@@ -10,7 +10,8 @@ next: 07_advanced_queries.html
 description: Module 6 focuses on more advanced querying techniques in SQLite, including
   working with multiple tables and performing joins
 percent: 35
-duration: 3
+duration: 5
+quiz_total: 24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -83,7 +84,35 @@ Understanding these relationships allows us to retrieve related data effectively
 
 ### Joining Tables
 
-To combine data from multiple tables, we use SQL join operations. SQLite supports several types of joins, including inner joins, outer joins, left joins, and right joins.
+To combine data from multiple tables, we use SQL join operations. SQLite supports inner joins and left outer joins, and since version 3.39 (2022) also right and full outer joins. Check your version with `print(sqlite3.sqlite_version)`.
+
+The examples below use three related tables. Run this first to create them, in a new database file so it doesn't clash with the earlier `books` table:
+
+```python
+import sqlite3
+
+connection = sqlite3.connect('library.db')
+with connection:
+    connection.executescript('''
+        CREATE TABLE IF NOT EXISTS authors (id INTEGER PRIMARY KEY, name TEXT);
+        CREATE TABLE IF NOT EXISTS genres (id INTEGER PRIMARY KEY, genre_name TEXT);
+        CREATE TABLE IF NOT EXISTS books (
+            id INTEGER PRIMARY KEY, title TEXT, year INTEGER, price REAL,
+            author_id INTEGER REFERENCES authors(id),
+            genre_id INTEGER REFERENCES genres(id)
+        );
+        DELETE FROM books; DELETE FROM authors; DELETE FROM genres;
+        INSERT INTO authors VALUES (1, 'Andy Weir'), (2, 'Frank Herbert'), (3, 'Ada Lovelace');
+        INSERT INTO genres VALUES (1, 'Science fiction'), (2, 'Non-fiction');
+        INSERT INTO books VALUES
+            (1, 'The Martian', 2011, 9.99, 1, 1),
+            (2, 'Project Hail Mary', 2021, 12.99, 1, 1),
+            (3, 'Dune', 1965, 8.99, 2, 1),
+            (4, 'Mystery Book', 2005, 5.99, NULL, 2);
+    ''')
+```
+
+`executescript()` runs several SQL statements in one go. Notice that *Mystery Book* has no author, and Ada Lovelace has no books: that will matter for the joins.
 
 ![Join Types](assets/join_types.jpg){:class="img-fluid w-100"}
 
@@ -104,7 +133,7 @@ result = connection.execute(query)
 data = result.fetchall()
 ```
 
-In this example, we join the "books" and "authors" tables based on the common column "author_id" and retrieve the book titles along with the corresponding author names.
+In this example, we join the "books" and "authors" tables, matching each book's `author_id` to an author's `id`, and retrieve the book titles along with the author names. *Mystery Book* is left out, because it has no matching author.
 
 #### Outer Join
 
@@ -121,7 +150,7 @@ result = connection.execute(query)
 data = result.fetchall()
 ```
 
-In this example, we perform a left outer join between the "books" and "authors" tables, retrieving all books and the corresponding author names. If there is no matching author, NULL is returned for the author name.
+In this example, we perform a left outer join between the "books" and "authors" tables, retrieving all books and the corresponding author names. *Mystery Book* is included this time, with `None` (SQL's `NULL`) for the author name.
 
 ### Joining Multiple Tables
 
@@ -159,5 +188,24 @@ data = result.fetchall()
 In this example, we use the aliases "b" and "a" for the "books" and "authors" tables, respectively, to simplify the query.
 
 By understanding how to work with multiple tables and perform joins, you will be able to retrieve and combine data from various sources, providing more comprehensive insights from your databases.
+
+---
+
+## Try it yourself
+
+Write a query that lists every author and how many books they have, including Ada Lovelace with 0. Hint: start `FROM authors` and use a `LEFT JOIN` to books, then look ahead to `GROUP BY` in the next module.
+
+{% quiz %}
+? A book has no matching author. Which join still includes it?
+- [ ] `INNER JOIN` from books to authors
+- [x] `LEFT JOIN` from books to authors
+> A left join keeps every row from the left table, filling in NULL where there's no match.
+
+? What does `FROM books AS b` do?
+- [ ] Creates a copy of the table called b
+- [x] Gives the table a short alias to use in the rest of the query
+- [ ] Renames the table permanently
+> Aliases only last for that query.
+{% endquiz %}
 
 ---

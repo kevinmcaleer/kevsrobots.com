@@ -10,7 +10,8 @@ next: 09_data.html
 description: Introduction to object-oriented programming in Python, including classes,
   objects, methods, and inheritance.
 percent: 40
-duration: 2
+duration: 3
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -134,6 +135,26 @@ class Car(Vehicle):
 my_car = Car('red', 'Toyota')
 print(my_car.honk())  # Prints 'Honk honk!'
 ```
+
+---
+
+## Try it yourself
+
+Create a `Robot` class with a `name` and a `battery` level, and a `drive()` method that reduces the battery by 10 and prints a message. Then make a `FlyingRobot` that inherits from `Robot` and adds a `fly()` method.
+
+{% quiz %}
+? What does `self` refer to inside a method?
+- [ ] The class itself
+- [x] The particular object the method was called on
+- [ ] The parent class
+> `self` is the instance, so `self.color` is that object's own colour.
+
+? What does `super().__init__(color)` do in the `Car` class?
+- [x] Runs the parent class's `__init__` so the `color` is set up
+- [ ] Creates a new `Vehicle` object
+- [ ] Deletes the parent class
+> `super()` gives you access to the parent class, so `Car` can reuse `Vehicle`'s setup.
+{% endquiz %}
 
 ---
 

@@ -17,14 +17,15 @@ In this final lesson, we will review what we have learned in this course and pro
 
 In this course, we covered:
 
-* [Redis basics](02_redis_basics#redis-basics)
-* [Strings and key-value pairs](03_data_types#string-data-type)
-* [Lists](05_redis_lists#adding-and-retrieving-list-elements)
-* [Sets](06_redis_sets#adding-and-retrieving-set-elements)
-* [Hashes](07_redis_hashes#adding-and-retrieving-hash-elements)
-* [Sorted sets](08_redis_sorted_sets#adding-and-retrieving-sorted-set-elements)
-* [Pub/sub messaging](09_redis_pub_sub#publishing-messages-to-channels)
-* [Using Redis with Python](02_redis_basics#using-redis-with-python)
+* [Redis basics](02_redis_basics.html#redis-basics)
+* [Strings and key-value pairs](03_data_types.html#string-data-type)
+* [Lists](05_redis_lists.html#adding-and-retrieving-list-elements)
+* [Sets](06_redis_sets.html#adding-and-retrieving-set-elements)
+* [Hashes](07_redis_hashes.html#adding-and-retrieving-hash-elements)
+* [Sorted sets](08_redis_sorted_sets.html#adding-and-retrieving-sorted-set-elements)
+* [Pub/sub messaging](09_redis_pub_sub.html#publishing-messages-to-channels)
+* [Transactions and pipelines](04_commands_and_transactions.html#redis-transactions-in-python)
+* [Using Redis with Python](02_redis_basics.html#using-redis-with-python)
 
 ---
 
@@ -42,10 +43,34 @@ By the end of this course, you should have a solid understanding of the basics o
 
 If you want to learn more about Redis and how to use it with Python, here are some additional resources to check out:
 
-* Redis documentation: <https://redis.io/documentation>
+* Redis documentation: <https://redis.io/docs/latest/>
+* Redis command reference: <https://redis.io/docs/latest/commands/>
 * Redis Python library documentation: <https://redis-py.readthedocs.io/en/stable/>
-* Redis University: <https://university.redislabs.com/>
-* RedisLabs Blog: <https://redislabs.com/blog/>
+* Redis University (free courses): <https://university.redis.io/>
+* Valkey, the open source fork: <https://valkey.io>
+
+---
+
+{% quiz %}
+? You want to cache a web page for five minutes. Which call fits best?
+- [x] `set('page', html, ex=300)`
+- [ ] `lpush('page', html)`
+- [ ] `publish('page', html)`
+> `ex=300` makes the key expire after 300 seconds, so stale pages clear themselves.
+
+? Which Redis feature would you use to send live sensor readings to several programs at once?
+- [ ] Sorted sets
+- [ ] Transactions
+- [x] Pub/sub
+> Every subscriber to a channel receives each published message.
+{% endquiz %}
+
+---
+
+### What's next?
+
+* [Create Databases with Python and SQLite3](/learn/sqlite3/) - for data that needs to be kept on disk and queried with SQL
+* [Docker](/learn/docker/) - run Redis alongside your own apps in containers
 
 ---
 

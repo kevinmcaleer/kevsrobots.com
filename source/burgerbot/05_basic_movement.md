@@ -12,8 +12,8 @@ BurgerBot uses **differential drive** - a system where two wheels are controlled
 **How it works:**
 - **Forward**: Both motors spin forward at the same speed
 - **Backward**: Both motors spin backward at the same speed
-- **Left turn**: Right motor spins forward, left motor stops (or spins backward for sharper turns)
-- **Right turn**: Left motor spins forward, right motor stops (or spins backward for sharper turns)
+- **Turning on the spot**: One motor spins forward and the other spins backward
+- **Gentle curve**: One motor spins faster than the other
 
 ---
 
@@ -25,7 +25,6 @@ BurgerBot uses **differential drive** - a system where two wheels are controlled
 
 ```python
 from burgerbot import Burgerbot
-import time
 
 bot = Burgerbot()
 
@@ -38,8 +37,8 @@ bot.stop()
 
 - `from burgerbot import Burgerbot` imports the BurgerBot library
 - `bot = Burgerbot()` creates a new robot object
-- `bot.forward(2)` moves the robot forward for 2 seconds
-- `bot.stop()` stops both motors
+- `bot.forward(2)` starts both motors and waits 2 seconds
+- `bot.stop()` stops both motors. Without it, the robot would keep going!
 
 **Why this matters:** Forward movement is the foundation of robot navigation. Understanding how to control movement duration helps you create precise navigation patterns.
 
@@ -82,7 +81,7 @@ from burgerbot import Burgerbot
 bot = Burgerbot()
 
 # Turn left for 1 second
-bot.left(1)
+bot.turn_left(1)
 bot.stop()
 
 # Wait a moment
@@ -90,17 +89,42 @@ import time
 time.sleep(0.5)
 
 # Turn right for 1 second
-bot.right(1)
+bot.turn_right(1)
 bot.stop()
 ```
 
 **How it works:**
 
-- `bot.left(1)` spins the robot counterclockwise by running the right motor forward and left motor backward
-- `bot.right(1)` spins the robot clockwise by running the left motor forward and right motor backward
+- `bot.turn_left(1)` spins the robot on the spot by running one motor forward and the other backward
+- `bot.turn_right(1)` does the same with the motors swapped
 - The duration (1 second) controls how far the robot rotates
 
-**Tip:** A 1-second turn typically rotates the robot about 90 degrees, but this varies based on battery charge and surface friction. Experiment to find the right timing for your robot!
+**Tip:** Turn time depends on speed. At the default speed of 0.5, try about half a second for a 90-degree turn, but this varies based on battery charge and surface friction. Experiment to find the right timing for your robot!
+
+---
+
+## Changing speed
+
+`bot.speed` sets how fast the motors run, from 0 (stopped) to 1 (full speed):
+
+```python
+from burgerbot import Burgerbot
+
+bot = Burgerbot()
+
+bot.speed = 0.3   # slow
+bot.forward(2)
+bot.speed = 1     # fast
+bot.forward(1)
+bot.stop()
+```
+
+You can also drive each wheel separately with `bot.left_motor()` and `bot.right_motor()`. Different speeds make the robot curve:
+
+```python
+bot.left_motor(0.6)
+bot.right_motor(0.3)   # the slower right wheel makes the robot curve right
+```
 
 ---
 
@@ -119,7 +143,7 @@ for i in range(4):
     bot.forward(2)    # Forward for 2 seconds
     bot.stop()
     time.sleep(0.2)   # Brief pause
-    bot.right(1)      # Turn 90 degrees
+    bot.turn_right(0.5)  # Turn about 90 degrees
     bot.stop()
     time.sleep(0.2)
 
@@ -145,7 +169,7 @@ print("Square complete!")
 - **Why**: Low voltage or loose connections prevent motors from running
 
 - **Problem**: Turns are not 90 degrees
-- **Solution**: Adjust the turn duration. More time = bigger turn. Start with `bot.left(0.8)` or `bot.left(1.2)` and fine-tune
+- **Solution**: Adjust the turn duration. More time = bigger turn. Start with `bot.turn_left(0.4)` or `bot.turn_left(0.6)` and fine-tune
 - **Why**: Turn angle depends on motor speed, battery charge, and surface friction - it requires calibration
 
 - **Problem**: Robot jerks or stutters during movement
@@ -167,6 +191,22 @@ Congratulations! Your BurgerBot is moving! Now let's practice:
 4. **Obstacle course**: Set up some boxes and navigate your robot around them using only forward, backward, and turn commands.
 
 **Challenge**: Write a function called `move_distance(centimeters)` that calculates the correct duration to move a specific distance. You'll need to measure how far your robot travels in 1 second, then use that to calculate duration.
+
+---
+
+{% quiz %}
+? How does BurgerBot turn on the spot?
+- [ ] Both motors spin forward
+- [x] One motor spins forward and the other spins backward
+- [ ] Both motors stop
+> Spinning the wheels in opposite directions rotates the robot around its centre.
+
+? What does `bot.speed = 0.25` do?
+- [x] Sets the motors to a quarter of full speed for the next movements
+- [ ] Moves the robot forward for 0.25 seconds
+- [ ] Turns the robot 25 degrees
+> `speed` ranges from -1 to 1. Movement methods use it until you change it.
+{% endquiz %}
 
 ---
 

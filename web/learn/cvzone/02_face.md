@@ -7,10 +7,11 @@ cover: /learn/cvzone/assets/face.jpg
 date: 2023-10-07
 previous: 01_install.html
 next: 03_hand.html
-description: This lesson breaks down the process step-by-step, from capturing live
-  video feeds to processing and displaying detected faces in real-time
-percent: 56
-duration: 2
+description: Detect faces in a live video feed with CVZone, and use their position
+  and size in your own code
+percent: 48
+duration: 3
+quiz_total: 10
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
@@ -18,76 +19,98 @@ navigation:
     content:
     - name: Computer Vision with CVZone
       link: 00_intro.html
-    - name: Watch the demonstration
-      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone
       link: 01_install.html
-  - section: Face, Hand and Posture Detection
+  - section: Face, Hand and Pose Detection
     content:
     - name: Face Detection
       link: 02_face.html
     - name: Hand Detection
       link: 03_hand.html
-    - name: Posture Detection
+    - name: Pose Detection
       link: 04_posture.html
-    - name: Advanced Visualization with CVZone
+    - name: Annotating Your Video
       link: 05_advanced.html
 ---
 
 
 ![Cover Image]({{page.cover}}){:class="cover"}
 
-## Face Detection
+## Face detection
 
-Face detection is the process of identifying and locating faces in images or videos. In this lesson, we'll harness the power of CVZone, a computer vision library, to detect faces in real-time using a Raspberry Pi.
-
-1. **Capture video from the camera:**
-
-   ```python
-   import cv2
-   cap = cv2.VideoCapture(0)
-   ```
-
-   Here, we're utilizing the OpenCV (cv2) library to capture live video feed from the default camera (indexed as `0`). The `VideoCapture` function initializes the camera and prepares it to stream frames.
-
-2. **Use CVZone to detect face:**
-
-   ```python
-   import cvzone
-   from cvzone import FaceDetectionModule
-   face_detector = FaceDetectionModule.FaceDetector()
-
-   while True:
-       success, img = cap.read()
-       img, list_faces = face_detector.findFaces(img)
-       cv2.imshow("Face Detection", img)
-       if cv2.waitKey(1) & 0xFF == ord('q'):
-           break
-   ```
-
-   In this section, we:
-   - Initialize the face detection module from CVZone.
-   - Continuously read frames from our camera using the `cap.read()` method.
-   - Process each frame to detect faces using `face_detector.findFaces(img)`.
-   - Display the processed frame with marked faces using `cv2.imshow()`.
-   - Allow the user to break out of the loop and end the program by pressing the 'q' key.
+Face detection is the process of finding faces in images or video and working out where they are. (It doesn't tell you *who* someone is: that's face *recognition*.) In this lesson we'll detect faces in real time with CVZone.
 
 ---
 
-## Going Beyond
+## The code
 
-- **Multiple Face Detection:** The provided code can detect multiple faces in a frame. The `list_faces` variable contains details about all detected faces.
+```python
+import cv2
+from cvzone.FaceDetectionModule import FaceDetector
 
-- **Enhance Visualization:** You can further customize the appearance by adjusting the color, thickness, and style of bounding boxes around detected faces.
+cap = cv2.VideoCapture(0)
+detector = FaceDetector(minDetectionCon=0.5)
 
-- **Integrate with Other Modules:** Once a face is detected, you can integrate it with other functionalities such as face recognition, emotion detection, or facial landmarks detection to add more depth to your application.
+while True:
+    success, img = cap.read()
+    if not success:
+        break
 
-- **Optimization:** To improve performance on Raspberry Pi, consider reducing the frame size or using a lower resolution camera, optimizing the model parameters, or integrating with other acceleration techniques.
+    img, faces = detector.findFaces(img)
+
+    if faces:
+        face = faces[0]
+        print("Centre:", face["center"], "Size:", face["bbox"][2], "x", face["bbox"][3])
+
+    cv2.imshow("Face Detection", img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+```
 
 ---
 
-Remember, the beauty of computer vision lies in its vast potential for customization and integration. Take the basics you learn here and let your creativity drive your projects!
+## How it works
+
+- `FaceDetector(minDetectionCon=0.5)` loads MediaPipe's face model. Faces it's less than 50% sure about are ignored
+- `detector.findFaces(img)` finds every face, draws a box and a confidence score on the image, and returns the image and a list of faces
+- Each face in the list is a dictionary:
+  - `bbox` - the box around the face as `(x, y, width, height)`
+  - `center` - the middle of the box as `(x, y)`
+  - `score` - how confident the model is
+- Pass `draw=False` to `findFaces()` if you want the data without the drawings
+
+---
+
+## Going further
+
+- **Multiple faces:** `faces` holds every face in the frame, so `len(faces)` counts people
+- **Follow a face:** compare `face["center"][0]` with the middle of the image to tell whether someone is to the left or right. A robot or a pan-tilt camera could turn to follow them
+- **How close is it?** A bigger box means the face is closer to the camera
+- **Speed things up:** a smaller frame is much quicker to process. Add `cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)` and `cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)` after opening the camera
+
+---
+
+## Try it yourself
+
+Print "Left", "Right" or "Centre" depending on where the face is in the picture. The image width is `img.shape[1]`.
+
+{% quiz %}
+? What's the difference between face detection and face recognition?
+- [x] Detection finds where faces are, recognition works out whose face it is
+- [ ] They're the same thing
+- [ ] Recognition only works on photos
+> This lesson finds faces. Telling people apart needs a recognition model.
+
+? In CVZone, what does `face["bbox"]` contain?
+- [ ] The face's name
+- [x] x, y, width and height of the box around the face
+- [ ] A list of facial landmarks
+> `bbox` is the bounding box. `center` gives you its middle point.
+{% endquiz %}
 
 ---

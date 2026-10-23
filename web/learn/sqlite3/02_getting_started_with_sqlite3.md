@@ -11,7 +11,8 @@ description: We will cover the initial steps to set up Python and SQLite3, estab
   a connection to a database, and perform basic operations using Python's sqlite3
   module
 percent: 15
-duration: 3
+duration: 5
+quiz_total: 24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -103,7 +104,9 @@ After we finish working with the database, it's important to close the connectio
 connection.close()
 ```
 
-By closing the connection, we ensure that any changes made to the database are properly saved.
+> ## Commit before you close
+>
+> Closing the connection does **not** save your changes. Changes are only saved when you call `connection.commit()`. If you close without committing, anything you inserted, updated or deleted since the last commit is thrown away. We'll see how to commit below.
 
 ### Executing SQL Statements
 
@@ -116,7 +119,7 @@ To create a table in a SQLite database, we use the `execute()` method and provid
 ```python
 # Create a table
 connection.execute('''
-    CREATE TABLE books (
+    CREATE TABLE IF NOT EXISTS books (
         id INTEGER PRIMARY KEY,
         title TEXT,
         author TEXT,
@@ -136,7 +139,28 @@ To insert data into a table, we use the `execute()` method with an SQL `INSERT` 
 connection.execute("INSERT INTO books (title, author, year) VALUES (?, ?, ?)", ("The Great Gatsby", "F. Scott Fitzgerald", 1925))
 ```
 
-In this example, we insert a record into the `books` table, providing values for the `title`, `author`, and `year` columns.
+In this example, we insert a record into the `books` table, providing values for the `title`, `author`, and `year` columns. The `?` placeholders are filled in with the values from the tuple, in order.
+
+#### Saving changes
+
+To save the insert to the database file, commit it:
+
+```python
+connection.commit()
+```
+
+An easier way is to use the connection in a `with` block. It commits automatically when the block finishes, or rolls back if there's an error:
+
+```python
+with connection:
+    connection.execute("INSERT INTO books (title, author, year) VALUES (?, ?, ?)", ("Dune", "Frank Herbert", 1965))
+```
+
+The `with` block doesn't close the connection, so you can keep using it afterwards.
+
+> ## Never build SQL with f-strings
+>
+> Always pass values with `?` placeholders, never by pasting them into the SQL string. Placeholders stop odd characters in your data, or deliberately malicious input (called SQL injection), from breaking your query.
 
 #### Querying Data
 
@@ -160,14 +184,32 @@ When working with databases, it's essential to handle potential errors and excep
 
 ```python
 try:
-    # Database operations
-    connection.execute("...")
-    # ...
+    connection.execute("SELECT * FROM no_such_table")
 except sqlite3.Error as e:
     # Handle the exception
     print(f"An error occurred: {e}")
 ```
 
-By incorporating exception handling, we can provide informative error messages and take appropriate actions in case of any issues.
+By incorporating exception handling, we can provide informative error messages and take appropriate actions in case of any issues. This example prints `An error occurred: no such table: no_such_table`.
+
+---
+
+## Try it yourself
+
+Put it all together in one script: connect, create the `books` table (use `CREATE TABLE IF NOT EXISTS` so you can run it more than once), insert three of your favourite books, commit, print them, and close. Run it, then open the `.db` file with one of the tools in the [Tools](17_tools.html) lesson to see your data.
+
+{% quiz %}
+? You insert some rows and call `connection.close()` without `commit()`. What happens to the rows?
+- [ ] They're saved
+- [x] They're lost
+- [ ] SQLite raises an error
+> Only committed changes are saved. Use `commit()` or a `with connection:` block.
+
+? Why use `?` placeholders in SQL?
+- [ ] They make the SQL shorter
+- [x] They safely insert values and prevent SQL injection
+- [ ] SQLite requires them for every query
+> The database handles the quoting, so your data can never be mistaken for SQL.
+{% endquiz %}
 
 ---

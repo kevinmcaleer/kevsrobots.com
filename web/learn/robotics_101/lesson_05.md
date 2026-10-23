@@ -1,15 +1,8 @@
 ---
 layout: lesson
 title: How does a Robot think?
-author: Kevin McAleer
-type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
-date: 2023-01-17
-previous: lesson_04.html
 description: The Robot Brain
-percent: 100
-duration: 1
-quiz_total: 11
+type: page
 navigation:
 - name: Robotics 101
 - content:
@@ -34,7 +27,7 @@ navigation:
 
 ## Video
 
-This video explains what a robot is, and the examples of early robots.
+This video explains what a robot is, with examples of early robots. If you watched it at the start of the course, skip ahead to the robot brain.
 
 {% include youtubeplayer.html id="bHOi_JGL0QE" %}
 
@@ -51,7 +44,15 @@ This video explains what a robot is, and the examples of early robots.
   - Arduino Uno
   - NodeMCU (ESP8266)
 
-A BBC micro:bit; Visit <https://www.microbit.org> for more about this amazing device.
+A robot "thinks" by running its program in a loop, over and over, many times a second:
+
+1. **Sense**: read the sensors (how far away is that wall?)
+2. **Think**: decide what to do (it's close, so turn)
+3. **Act**: drive the motors
+
+This sense, think, act loop is at the heart of almost every robot, from a SMARS to a self-driving car.
+
+A BBC micro:bit. Visit <https://www.microbit.org> for more about this amazing device.
 
 [![BBC micro:bit](assets/bbc_microbit.jpg){:class="img-fluid w-25"}](https://www.microbit.org)
 
@@ -60,9 +61,25 @@ A BBC micro:bit; Visit <https://www.microbit.org> for more about this amazing de
 ## Check your understanding
 
 {% quiz %}
+? What are the three steps of the loop a robot runs to "think"?
+- [ ] Charge, drive, stop
+- [x] Sense, think, act
+- [ ] Print, build, code
+> The robot reads its sensors, decides what to do, then drives its motors, over and over.
+
 ? Which of these is a microcontroller that could be a robot's brain?
 - [x] Raspberry Pi Pico
 - [ ] An ultrasonic sensor
 - [ ] A 9V battery
 > The Pico, BBC micro:bit, Arduino Uno and ESP8266 are all popular robot brains.
 {% endquiz %}
+
+---
+
+## What's next
+
+Congratulations on finishing Robotics 101! Now build your first robot:
+
+- [Build a SMARS Robot](/learn/smars/): a 3D-printed tracked robot
+- [Build your own BurgerBot](/learn/burgerbot/): a Raspberry Pi Pico robot you program in MicroPython
+- [Learn MicroPython - The basics](/learn/micropython/)

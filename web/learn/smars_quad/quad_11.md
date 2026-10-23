@@ -8,10 +8,11 @@ date: 2023-03-04
 previous: quad_10.html
 next: quad_12.html
 description: Check the servo rotation
-percent: 84
+percent: 72
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -43,10 +44,14 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 
@@ -60,3 +65,18 @@ You can check the precise angle of these later using the `test.py` program. The 
 ![Check the servo rotation](assets/instruction11.png){:class="img-fluid  w-25"}
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why check the servo can move equally in both directions before screwing on the horn?
+- [x] So the leg can swing the same amount forwards and backwards
+- [ ] To test the battery
+- [ ] Servos only work in one direction
+> If the horn goes on off-centre, the leg will run out of movement on one side.
+
+? Between which angles should each foot be able to rotate?
+- [ ] 0 and 30 degrees
+- [x] 50 and 150 degrees
+- [ ] 0 and 360 degrees
+{% endquiz %}

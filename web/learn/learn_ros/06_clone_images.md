@@ -1,16 +1,9 @@
 ---
 layout: lesson
 title: Clone Docker Images
-author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
-date: 2023-01-07
-previous: 05_get_cubie.html
-next: 07_build_container.html
 description: Download the official docker images for ROS from the Open Source Robotics
   Foundation (OSRF)
-percent: 35
-duration: 1
 navigation:
 - name: Learn ROS with me
 - content:
@@ -70,6 +63,8 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
@@ -77,7 +72,7 @@ navigation:
 
 ## Open Source Robotics Foundation Official Docker files
 
-The Open Source Robotics Foundation (OSRF) maintain a suite of official Docker container definitions. Lets grab these so that we can build our own container.
+The Open Source Robotics Foundation (OSRF) maintain a suite of official Docker container definitions. Let's grab these so that we can build our own container.
 
 ---
 

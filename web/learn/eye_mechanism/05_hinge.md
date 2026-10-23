@@ -8,8 +8,9 @@ date: 2023-01-29
 previous: 04_create_hinges.html
 next: 06_lower_eyelid_sketch.html
 description: Create the hinge from the profile and join it to the eyelid
-percent: 66
+percent: 60
 duration: 3
+quiz_total: 9
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -39,6 +40,10 @@ navigation:
       link: 07_create_lower_sketch.html
     - name: Create Hinge from Profile
       link: 08_hinge.html
+  - section: Joints and Export
+    content:
+    - name: Joints and Export
+      link: 09_joint_and_export.html
 ---
 
 
@@ -82,7 +87,7 @@ This will cutout the screw hole in both directions.
 
 ---
 
-> To make this next step easier, move the camera so you can see the outside edge of the eyelide. Use the [viewcube](04_create_hinges#the-viewcube) to move the camera.
+> To make this next step easier, move the camera so you can see the outside edge of the eyelid. Use the [viewcube](04_create_hinges.html#the-viewcube) to move the camera.
 {:class="bg-blue"}
 
 * **Extrude Cut** - Select the square shape along with the rest of the profile from the sketch, press `e` to enter Extrude mode, and set the:
@@ -104,7 +109,7 @@ The finished result:
 
 > ## Mirror function
 >
-> We can mirror `bodies`, `components`, `features` and `faces` using the `Mirror` function. This is a huge timesaver, especially when parts need to be symmertical; we can build one half and mirror the rest.
+> We can mirror `bodies`, `components`, `features` and `faces` using the `Mirror` function. This is a huge timesaver, especially when parts need to be symmetrical; we can build one half and mirror the rest.
 >
 > ![Extrude](assets/eye39.jpg){:class="img-fluid w-100"}
 
@@ -118,10 +123,25 @@ The finished result:
 
 * **Select the Mirror Plane** - Click the `Mirror Plane` option from the `Edit Feature` Dialog box and then click the `YZ` Origin plane.
 
-* **Click Ok** - Click `Ok` to complete the mirror operaiton.
+* **Click Ok** - Click `Ok` to complete the mirror operation.
 
 The Eyelid Model should look like this:
 
 ![Extrude](assets/eye40.jpg){:class="img-fluid w-100"}
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? What does **Slice** in the Sketch Palette do?
+- [ ] Cuts the model in half permanently
+- [x] Temporarily hides the part of the model between you and the sketch so you can see inside
+- [ ] Splits a line into pieces
+> Slice only changes the view while you're sketching. Nothing is removed from the model.
+
+? Why do we **Mirror** the hinge features?
+- [ ] To make them bigger
+- [x] So the other side of the eyelid gets an identical hinge without drawing it again
+- [ ] To turn them into construction lines
+{% endquiz %}

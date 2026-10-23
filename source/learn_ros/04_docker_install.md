@@ -46,15 +46,15 @@ sudo apt-get purge docker-ce docker-ce-cli containerd.io -y
 
 ## Fix permissions
 
-Docker can run commands from a regular user account, but first we need to fix the permissions
+Docker can run commands from a regular user account, but first we need to add our user to the `docker` group
 
-* **Make pi user execute docker commands** - From the terminal, type:
+* **Let your user run docker commands** - From the terminal, type:
 
 ```bash
-sudo usermod -aG docker pi
+sudo usermod -aG docker $USER
 ```
 
-*Where `Pi` is the user account you created when [setting up the Pi](02_pi_setup#setup-the-sd-card-using-raspberry-pi-imager)*
+*`$USER` is filled in automatically with the user account you created when [setting up the Pi](02_pi_setup.html#setup-the-sd-card-using-raspberry-pi-imager)*
 
 ---
 
@@ -66,19 +66,10 @@ sudo systemctl unmask docker
 
 ---
 
-* **Fix permissions** - From the terminal, type:
-
-```bash
-sudo chmod 666 /var/run/docker.sock
-```
-
----
-
-* **install docker-compose** - From the terminal, type:
-
-```bash
- pip3 -v install docker-compose
-```
+> ## Docker Compose
+>
+> The Docker install script also installs **Docker Compose**, which we'll use to start our ROS container. It's run as `docker compose` (with a space). Older guides use `docker-compose` with a hyphen, which was a separate program you no longer need.
+{:class="bg-blue"}
 
 ---
 
@@ -97,3 +88,18 @@ sudo init 6
 ```
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why add your user to the `docker` group?
+- [ ] To make Docker run faster
+- [x] So you can run `docker` commands without typing `sudo` every time
+- [ ] To install Docker Compose
+> The change takes effect after you log out and back in, which is why we reboot.
+
+? How is a Docker container different from a virtual machine?
+- [x] Containers share the host's operating system kernel, so they're much lighter
+- [ ] Containers emulate a whole computer, including the hardware
+- [ ] There is no difference
+{% endquiz %}

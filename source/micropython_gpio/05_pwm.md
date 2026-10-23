@@ -7,59 +7,69 @@ description: Learn about Pulse Width Modulation (PWM) and controlling devices li
 
 ## Overview
 
-Welcome to Lesson 5 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will explore Pulse Width Modulation (PWM) and how to control devices like LEDs and motors using the Raspberry Pi Pico with MicroPython.
-
----
-
-## Course Content
-
-In this lesson, you will learn:
-
-* What Pulse Width Modulation (PWM) is and how it works
-* How to configure Raspberry Pi Pico pins for PWM
-* How to control devices like LEDs and motors using PWM and MicroPython
+The Pico can't output "half" a voltage from a GPIO pin, but it can fake it. In this lesson you'll learn how Pulse Width Modulation works and how to set it up in MicroPython.
 
 ---
 
 ## Pulse Width Modulation
 
-Pulse Width Modulation (PWM) is a technique used to control the amount of power delivered to a device, such as an LED or a motor. PWM works by rapidly turning the device on and off at a specific frequency, and varying the duty cycle (the percentage of time the device is on) to control the amount of power delivered to the device.
+PWM switches a pin on and off very quickly. Two numbers describe the signal:
 
-## Configuring Raspberry Pi Pico Pins for PWM
+- **Frequency** - how many on/off cycles happen per second, in hertz (Hz)
+- **Duty cycle** - the percentage of each cycle that the pin is on
 
-To use a pin on the Raspberry Pi Pico for PWM, you need to configure it for PWM. This is done using the `PWM` class in MicroPython. To configure a pin for PWM, you can use the following code:
+At 50% duty the pin is on half the time, so an LED looks half as bright and a motor gets about half the power. The switching is so fast that you don't see the flicker.
+
+---
+
+## Configuring a pin for PWM
 
 ```python
 from machine import Pin, PWM
 
-# Configure pin 0 for PWM with a frequency of 1000 Hz
-pwm = PWM(Pin(0), freq=1000)
+pwm = PWM(Pin(15))
+pwm.freq(1000)        # 1000 Hz
 ```
 
-## Controlling Devices Using PWM
+---
 
-To control the amount of power delivered to a device using PWM, you can use the `duty()` method of the PWM class. The `duty()` method takes a value between 0 (device off) and 1023 (device fully on) to set the duty cycle of the PWM signal. For example, to set the LED brightness to 50%, you can use the following code:
+## Setting the duty cycle
+
+On the Pico you set the duty cycle with `duty_u16()`, which takes a number from `0` (always off) to `65535` (always on):
 
 ```python
-from machine import Pin, PWM
-
-# Configure pin 0 for PWM with a frequency of 1000 Hz
-pwm = PWM(Pin(0), freq=1000)
-
-# Set the LED brightness to 50%
-pwm.duty(512)
+pwm.duty_u16(32768)   # about 50%
+pwm.duty_u16(16384)   # about 25%
+pwm.duty_u16(0)       # off
 ```
 
+To turn a percentage into a duty value, multiply by 65535 and divide by 100:
+
+```python
+def set_percent(pwm, percent):
+    pwm.duty_u16(int(percent * 65535 / 100))
+```
+
+When you're finished with a PWM pin, call `pwm.deinit()` to turn the signal off.
+
+> ## Why not `duty()`?
+>
+> You may see `pwm.duty(512)` in ESP32 or older examples, with a range of 0 to 1023. The Pico's MicroPython uses `duty_u16()` with a range of 0 to 65535 instead.
+
 ---
 
-## Conclusion
+{% quiz %}
+? What does a 25% duty cycle mean?
+- [ ] The pin outputs 0.825V all the time
+- [x] The pin is on for a quarter of each cycle
+- [ ] The signal repeats 25 times per second
+> Duty cycle is the share of each cycle the pin is on. The voltage is still either 0V or 3.3V.
 
-In this lesson, you learned about Pulse Width Modulation (PWM), how to configure Raspberry Pi Pico pins for PWM, and how to control devices like LEDs and motors using PWM and MicroPython. You can use this knowledge to create dynamic and interactive projects with your Raspberry Pi Pico board.
-
----
-
-## Key Results
-
-After you have completed this lesson, you will have a solid understanding of Pulse Width Modulation (PWM) and how to control devices like LEDs and motors using the Raspberry Pi Pico with MicroPython. You will be able to configure pins for PWM, generate PWM signals, and control devices that require PWM input.
+? Which call sets roughly 50% duty on a Pico?
+- [ ] `pwm.duty(512)`
+- [x] `pwm.duty_u16(32768)`
+- [ ] `pwm.freq(50)`
+> The Pico uses `duty_u16()` with values from 0 to 65535, so half is about 32768.
+{% endquiz %}
 
 ---

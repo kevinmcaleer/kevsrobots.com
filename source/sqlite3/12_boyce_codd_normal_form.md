@@ -5,30 +5,74 @@ description: >-
 layout: lesson
 ---
 
-> **Aside: "The Truth, the Whole Truth, and Nothing but the Truth, So Help Me Codd"**
+> **Aside: "The key, the whole key, and nothing but the key, so help me Codd"**
 >
-> "The truth, the whole truth, and nothing but the truth, so help me Codd" is a phrase often used in the context of database management. It is a playful reference to the principles set forth by Edgar F. Codd, the father of the relational model of databases.
+> This is a well-known way to remember the normal forms, in the style of a courtroom oath. In a well-designed table, every column should depend on:
 >
-> Edgar F. Codd revolutionized the field of database management with his groundbreaking work on relational databases in the 1970s. He emphasized the importance of data integrity and consistency within a database system.
+> - **the key** (First Normal Form: each row is identified by a key, with no repeating groups)
+> - **the whole key** (Second Normal Form: not just part of a composite key)
+> - **and nothing but the key** (Third Normal Form: not on some other column)
 >
-> By stating "the truth, the whole truth, and nothing but the truth," Codd emphasized the need for databases to accurately and faithfully represent the real-world entities they model. It signifies the commitment to maintain the accuracy and completeness of data stored within a database.
->
-> "So help me Codd" is a humorous addition, drawing inspiration from the oath sworn by witnesses in courtrooms to tell the truth. It highlights the significance of adhering to Codd's principles and best practices in the realm of database management.
->
-> The phrase serves as a reminder of the core principles of database design, including maintaining data integrity, eliminating data redundancy, and ensuring consistency and accuracy. Following these principles helps create reliable and trustworthy databases that accurately reflect the information they store.
+> "So help me Codd" is a nod to Edgar F. Codd, who invented the relational model of databases in 1970.
 
 ---
 
-Boyce-Codd Normal Form (BCNF) is an important concept in database organization. It was developed by Raymond F. Boyce and Edgar F. Codd in the 1970s. BCNF helps reduce data duplication and ensures accurate data storage in relational databases.
+Boyce-Codd Normal Form (BCNF) is a slightly stricter version of Third Normal Form. It was developed by Raymond F. Boyce and Edgar F. Codd in 1974.
 
-BCNF is an advanced level of organizing data in databases. It builds upon the ideas of a previous organization level called the Third Normal Form (3NF). BCNF focuses on how data attributes are related to each other.
+The rule is: **for every dependency in the table, the column (or columns) doing the determining must be a key**. If knowing column A tells you column B, then A must be able to identify the whole row.
 
-In BCNF, a table is considered properly organized if each attribute uniquely determines another attribute in the table. This means that the values in one column determine the values in another column. BCNF helps prevent errors when updating, inserting, or deleting data by strictly defining these relationships.
+Most tables in 3NF are already in BCNF. The difference only shows up in tables with more than one possible key that overlap.
 
-BCNF is important because it reduces data duplication and keeps data consistent in a relational database. By following BCNF, databases can store data efficiently, ensure accuracy, and make it easier to search for specific information.
+---
 
-However, achieving BCNF may make the database structure more complex and require more processing power. It's important to balance the benefits of BCNF with the practical needs of the database.
+## Example
 
-Database designers and developers should aim to understand and apply BCNF principles when organizing relational databases. By following BCNF, they can create well-structured databases that minimize duplication and maintain consistent and reliable data.
+A college runs tutorials. Each tutor teaches only one subject, but a subject can have several tutors. Each student has one tutor per subject:
+
+| Student | Subject | Tutor   |
+|---------|---------|---------|
+| Alice   | Maths   | Mr Khan |
+| Alice   | Physics | Ms Lee  |
+| Bob     | Maths   | Mr Khan |
+| Charlie | Maths   | Ms Patel|
+{:class="table"}
+
+The key is (Student, Subject). The table is in 3NF, but Tutor → Subject (each tutor teaches one subject), and Tutor isn't a key. So it breaks BCNF. If Mr Khan switched to teaching Physics, we'd have to update several rows, and could get it wrong.
+
+The fix is to split it:
+
+**Tutors**
+
+| Tutor    | Subject |
+|----------|---------|
+| Mr Khan  | Maths   |
+| Ms Lee   | Physics |
+| Ms Patel | Maths   |
+{:class="table"}
+
+**Tutorials**
+
+| Student | Tutor    |
+|---------|----------|
+| Alice   | Mr Khan  |
+| Alice   | Ms Lee   |
+| Bob     | Mr Khan  |
+| Charlie | Ms Patel |
+{:class="table"}
+
+Now each tutor's subject is stored once.
+
+> ## Don't overdo it
+>
+> Normalising further means more tables and more joins. For most projects, aiming for 3NF is plenty, and BCNF is worth knowing for the cases where 3NF still leaves duplication.
+
+---
+
+{% quiz %}
+? Complete the saying: "The key, the whole key, and nothing but the key..."
+- [x] "...so help me Codd"
+- [ ] "...so help me SQL"
+> A memory aid for 1NF, 2NF and 3NF, named after Edgar F. Codd.
+{% endquiz %}
 
 ---

@@ -2,7 +2,7 @@
 layout: lesson
 title: Rviz2 Displays
 type: page
-description: Lets learn about RViz2 Displays and setting it up for Laser scans
+description: Let's learn about RViz2 Displays and setting it up for Laser scans
 cover: /learn/learn_ros/assets/rviz03.jpg
 ---
 
@@ -12,7 +12,7 @@ cover: /learn/learn_ros/assets/rviz03.jpg
 
 ## RViz2 Screen Layout
 
-RViz has 3 main panel by default, and you can add additonal panels to suit your needs (its very flexible).
+RViz has 3 main panels by default, and you can add additional panels to suit your needs (it's very flexible).
 
 ![RViz2 Screen Layout](assets/rviz03.jpg){:class="img-fluid w-100 shadow-lg"}
 
@@ -27,36 +27,39 @@ In the screenshot above you can see the main areas of the screen:
 > ## RPLidar Laser scanner
 >
 > The SlamTec RPLidar A1 is an affordable laser scanner, ideal for use with robotics, and costs less than £99. We will use this in our tutorial.
-> ![RPLidar factsheet](/assets/img/how_it_works/lidar01.jpg){:class="img-fluid w-100 shadown-lg"}
+> ![RPLidar factsheet](/assets/img/how_it_works/lidar01.jpg){:class="img-fluid w-100 shadow-lg"}
 >
 
 ---
 
-## Adding out LiDAR Laser Scan
+## Adding our LiDAR Laser Scan
 
 To view our LiDAR data in Rviz2 we need to do a couple of actions:
 
-* Download and complile the RPLidar_ros code
+* Download and compile the RPLidar_ros code
 * Start the RPLidar node
-* Start a tranformation node to translate the `laser_scan` coordinates to the `World` coordinates
+* Start a transformation node to translate the `laser_scan` coordinates to the `World` coordinates
 * Start `rviz2` and add the laser_scan display
 
 ---
 
-## Download and complile the RPLidar_ros code
+## Download and compile the RPLidar_ros code
 
-* **Download RPLidar code** - From the Raspberry terminal, type:
+* **Download RPLidar code** - From the Raspberry Pi terminal, type:
 
 ```bash
+cd ~/cubie-1
 git clone https://github.com/babakhani/rplidar_ros2
 ```
 
-> The `rplidar_ros2` folder needs to be inside the cubie-1 folder, so make sure this is in the correct place by draging this into the 
-> Cubie-1 folder
+> Slamtec now maintain their own ROS 2 driver, [sllidar_ros2](https://github.com/Slamtec/sllidar_ros2), which also supports their newer LiDARs. It's started with `ros2 launch sllidar_ros2 view_sllidar_a1_launch.py`.
 
-* **Compile the RPLidar code** - From the docker-full_ros2_1 container, type:
+> The `rplidar_ros2` folder needs to be inside the `cubie-1` folder, which appears as `/ros2` inside the container.
+
+* **Compile the RPLidar code** - From the container, type:
 
 ```bash
+cd /ros2/rplidar_ros2
 colcon build
 source install/setup.bash
 ```
@@ -70,15 +73,16 @@ We can now start the Laser scanner node.
 * **Start a new container terminal session** - from the Raspberry Pi terminal, type:
 
 ```bash
-docker exec -it docker-full_ros2_1 bash
+cd ~/cubie-1/docker-full
+docker compose exec ros2 bash
 ```
 
 ---
 
-* **Start the Laser Scanner** - from the docker-desktop_ros2_1 container, type:
+* **Start the Laser Scanner** - from the container, type:
 
 ```bash
-cd ros2/rplidar_ros2
+cd /ros2/rplidar_ros2
 source install/setup.bash
 ros2 run rplidar_ros rplidar_composition
 ```
@@ -89,15 +93,16 @@ The RPLidar will momentarily stop and then restart, and you will see some output
 
 ## Check the scan data topic exists
 
-We can check that the `/scan` topic exists by using the `ros2 topic list` command. Lets open a new terminal and check we can see it.
+We can check that the `/scan` topic exists by using the `ros2 topic list` command. Let's open a new terminal and check we can see it.
 
 * **Start a new container terminal session** - from the Raspberry Pi terminal, type:
 
 ```bash
-docker exec -it docker-full_ros2_1 bash
+cd ~/cubie-1/docker-full
+docker compose exec ros2 bash
 ```
 
-* **Ros2 topic list** - from the docker-desktop_ros2_1 container, type:
+* **Ros2 topic list** - from the container, type:
 
 ```bash
 ros2 topic list
@@ -117,9 +122,9 @@ If the `/scan` topic is visible, this means the LiDAR is successfully sending da
 
 ## Start RViz2
 
-Lets start RViz2.
+Let's start RViz2.
 
-* **Start RViz2** - from the docker-desktop_ros2_1 container, type:
+* **Start RViz2** - from the container, type:
 
 ```bash
 rviz2

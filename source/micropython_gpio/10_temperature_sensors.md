@@ -5,110 +5,119 @@ type: page
 description: Learn how to use temperature sensors with the Raspberry Pi Pico and MicroPython.
 ---
 
-<!-- ![Cover photo of a temperature sensor connected to a Raspberry Pi Pico board](assets/raspberry_pi_pico_temperature_sensor.jpg){:class="cover"} -->
-
 ## Overview
 
-Welcome to Lesson 10 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will learn how to use temperature sensors with the Raspberry Pi Pico and MicroPython.
-
-## Course Content
-
-In this lesson, you will learn:
-
-* What temperature sensors are and how they work
-* How to connect a temperature sensor to the Raspberry Pi Pico
-* How to write MicroPython code to read temperature sensor values
-
----
-
-## Key Results
-
-After you have completed this lesson, you will know how to use temperature sensors with the Raspberry Pi Pico and MicroPython. You will be able to connect a temperature sensor to the Pico, write MicroPython code to read temperature sensor values, and understand the basics of temperature sensor operation.
+In this lesson you'll read temperatures three ways: with the sensor built into the Pico, a DS18B20 digital probe and a DHT11 temperature and humidity sensor.
 
 ---
 
 ## What you'll need
 
-To follow this lesson, you will need:
-
-* A computer, tablet, or phone to read the lesson material from
-* A Raspberry Pi Pico board
-* A temperature sensor (such as a DS18B20 or more commonly [DHT11](/resources/glossary#dht11)), jumper wires, and a breadboard for hands-on practice
-
----
-
-## What are Temperature Sensors?
-
-Temperature sensors are electronic devices that measure the temperature of the surrounding environment. There are many different types of temperature sensors, including thermistors, thermocouples, and digital temperature sensors.
+* A Raspberry Pi Pico
+* Optional: a DS18B20 sensor and a 4.7kΩ resistor
+* Optional: a [DHT11](/resources/glossary#dht11) sensor (modules usually include the pull-up resistor)
+* A breadboard and jumper wires
 
 ---
 
-## Connecting a Temperature Sensor to Raspberry Pi Pico
+## What are temperature sensors?
 
-To connect a temperature sensor to your Raspberry Pi Pico board, follow these steps:
-
-1. Identify the type of temperature sensor you are using and its pinout.
-2. Connect the temperature sensor's pins to the appropriate GPIO pins on the Raspberry Pi Pico board.
-3. If necessary, connect a pull-up or pull-down resistor to the temperature sensor's output pin.
+Temperature sensors measure how hot or cold something is. Some, like thermistors, give an analog voltage. Others, like the DS18B20 and DHT11, do the measuring themselves and send the result as digital data.
 
 ---
 
-## Reading Temperature Sensor Values with MicroPython
+## The built-in sensor
 
-To read temperature sensor values using MicroPython, you will need to use a library specific to your temperature sensor. Here is an example of reading temperature values from a DS18B20 digital temperature sensor using the `onewire` and `ds18x20` modules:
+The RP2040 chip has a temperature sensor on ADC channel 4. It measures the chip's temperature, so it reads a little warmer than the room, but it needs no wiring at all:
+
+```python
+from machine import ADC
+from time import sleep
+
+sensor = ADC(4)
+
+while True:
+    voltage = sensor.read_u16() * 3.3 / 65535
+    temperature = 27 - (voltage - 0.706) / 0.001721
+    print(f"{temperature:.1f} C")
+    sleep(1)
+```
+
+The formula comes from the RP2040 datasheet. There's a whole course on it: [Using the Raspberry Pi Pico's Built-in Temperature Sensor](/learn/pico_temp_sensor/).
+
+---
+
+## DS18B20 example
+
+The DS18B20 uses the 1-Wire bus. Connect its `VDD` to `3V3`, `GND` to `GND` and `DQ` (data) to `GP4`, with a 4.7kΩ resistor between `DQ` and `3V3`.
 
 ```python
 from machine import Pin
+from time import sleep_ms
 import onewire, ds18x20
 
-# Set up the 1-wire bus
-one_wire_bus = Pin(4)
-ds_sensor = ds18x20.DS18X20(onewire.OneWire(one_wire_bus))
+sensor = ds18x20.DS18X20(onewire.OneWire(Pin(4)))
+roms = sensor.scan()
+print("Found sensors:", roms)
 
-# Scan for temperature sensors on the bus
-ds_sensor.scan()
-
-# Read the temperature value
-ds_sensor.convert_temp()
-temperature = ds_sensor.read_temp(roms[0])
-
-# Print the temperature value
-print("Temperature: {:.2f} degrees C".format(temperature))
+while True:
+    sensor.convert_temp()
+    sleep_ms(750)                     # the sensor needs time to measure
+    for rom in roms:
+        print(f"{sensor.read_temp(rom):.2f} C")
 ```
+
+- `scan()` returns a list with the address of every DS18B20 on the bus. You can connect several to the same pin
+- `convert_temp()` asks every sensor to take a reading, which takes up to 750ms
+- `read_temp(rom)` reads the result from one sensor
 
 ---
 
 ## DHT11 example
 
+Connect the DHT11's `VCC` to `3V3`, `GND` to `GND` and its data pin to `GP15`.
+
 ```python
-import machine
+from machine import Pin
+from time import sleep
 import dht
 
-# Initialize the DHT11 sensor on pin 15
-d = dht.DHT11(machine.Pin(15))
+sensor = dht.DHT11(Pin(15))
 
-# Read the temperature and humidity values from the sensor
-d.measure()
-
-# Print the temperature and humidity values
-print("Temperature: {} C".format(d.temperature()))
-print("Humidity: {} %".format(d.humidity()))
+while True:
+    sensor.measure()
+    print(f"Temperature: {sensor.temperature()} C, Humidity: {sensor.humidity()} %")
+    sleep(2)
 ```
 
-In this example code, we first import the `machine` module and the `dht` module, which provides support for the DHT11 sensor.
-
-We then initialize the DHT11 sensor by creating an instance of the `dht.DHT11` class with the GPIO pin number of the data pin connected to the sensor. In this case, we have connected the data pin of the sensor to GPIO pin 15.
-
-Next, we use the `measure()` method of the `DHT11` class to read the temperature and humidity values from the sensor. This method updates the internal state of the `DHT11` instance with the latest sensor data.
-
-Finally, we print the temperature and humidity values using the `temperature()` and `humidity()` methods of the `DHT11` instance, respectively.
-
-Note that the DHT11 sensor requires a pull-up resistor on the data pin, so it is recommended to use a breadboard or other prototyping board to connect the sensor to the Raspberry Pi Pico. Also, the DHT11 sensor is known to be relatively slow to respond to commands, so it may take several seconds to read the temperature and humidity values after calling the `measure()` method.
+`measure()` takes a reading, then `temperature()` and `humidity()` return the values. The DHT11 can only take one reading every second or so, which is why we wait two seconds between readings.
 
 ---
 
-## Conclusion
+## Common issues
 
-In this lesson, you learned how to use temperature sensors to measure the temperature in your environment, and how to read temperature sensor values using MicroPython. You can use this knowledge to create a variety of projects with your Raspberry Pi Pico board.
+**Problem:** The DS18B20 `scan()` returns an empty list.
+**Solution:** Check the 4.7kΩ pull-up resistor between data and 3V3.
+**Why:** The 1-Wire bus relies on the pull-up to hold the line high between messages.
+
+**Problem:** The DHT11 raises `OSError: [Errno 110] ETIMEDOUT`.
+**Solution:** Check the data wire and wait at least a second between readings.
+**Why:** The sensor didn't reply in time, usually because of wiring or reading too often.
+
+---
+
+{% quiz %}
+? How long should you wait after `convert_temp()` before reading a DS18B20?
+- [ ] No time at all
+- [ ] 10 microseconds
+- [x] Up to 750 milliseconds
+> At full resolution the sensor takes up to 750ms to finish a measurement.
+
+? Which ADC channel is the Pico's built-in temperature sensor on?
+- [ ] ADC0
+- [ ] ADC2
+- [x] ADC4
+> ADC0 to ADC2 are GP26 to GP28. ADC4 is wired to the on-chip temperature sensor.
+{% endquiz %}
 
 ---

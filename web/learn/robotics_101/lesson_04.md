@@ -1,16 +1,8 @@
 ---
 layout: lesson
 title: What are the different parts of a Robot?
-author: Kevin McAleer
-type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
-date: 2023-01-17
-previous: lesson_03.html
-next: lesson_05.html
 description: The Anatomy of a Robot
-percent: 80
-duration: 3
-quiz_total: 11
+type: page
 navigation:
 - name: Robotics 101
 - content:
@@ -33,9 +25,9 @@ navigation:
 ---
 
 
-Robots is made up of lots of different parts, for example:
+Robots are made up of lots of different parts, for example:
 
-- A [brain](#the-brain-(processor)) (Processor)
+- A [brain](#the-brain-processor) (Processor)
 - A [body](#the-body) (Chassis)
 - A [power source, or battery](#the-battery)
 - [Sensors](#the-sensors)
@@ -50,7 +42,7 @@ Robots is made up of lots of different parts, for example:
 
 Houses all the parts
 
-Robots need somewhere to house the different parts, and prevent dust or other particulates getting into inside of the robot:
+Robots need somewhere to house the different parts, and keep dust and dirt out of the inside of the robot:
 
 - The Brain
 - The Power source
@@ -65,13 +57,13 @@ Robots need somewhere to house the different parts, and prevent dust or other pa
 
 Provides power, when the robot is not connected to an external power supply.
 
-Robots needs a battery to power the electronics including:
+Robots need a battery to power the electronics including:
 
 - **The Brain**, so it can ‘think’ and run programs
 - **The Motors**, so it can move and react
 - **The Sensors**, so it can feel, see and hear
 
-SMARS is powered by a 9v Battery
+SMARS is powered by a 9V battery
 
 ![Battery](assets/parts_03.jpg){:class="img-fluid w-25"}
 
@@ -93,7 +85,7 @@ Runs programs, connects to sensors and motors
 
 ![Brain](assets/parts_04.jpg){:class="img-fluid w-25"}
 
-  ---
+---
 
 ### The Sensors
 
@@ -120,7 +112,7 @@ Provides information about the outside world to the Robot:
 Enable the robot to move around
 
 - Robots use outputs, such as Motors to move around and interact with their environment
-- Motors rotate a set speed and direction
+- Motors rotate at a set speed and direction
 - Turning the motors in the same direction moves the robot forward or backward
 - Turning the motors in opposite directions rotates the robot
 
@@ -132,13 +124,13 @@ SMARS uses two motors to move about
 
 ### The Motorshield
 
-Also known as a Motor driver; Enable the robot to power the motors:
+Also known as a motor driver; it enables the robot to power the motors:
 
 - A Motorshield routes power to the motors - they need much more power than the brain
 - Motorshields can also bring extra outputs such as a buzzer
 - The motorshield sits on top of the Arduino and the connector pins push into the header pins on the Arduino
 
-SMARS uses motorshield to power and control the motors
+SMARS uses a motorshield to power and control the motors
 
 ![Motorshield](assets/parts_07.jpg){:class="img-fluid w-25"}
 

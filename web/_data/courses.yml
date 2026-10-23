@@ -49,13 +49,14 @@
 - author: Kevin McAleer
   cover: /learn/burgerbot/assets/burgerbot.jpg
   date_published: 2023-04-27
-  description: Build a simple round robot powered by Raspberry Pi Pico
-  duration: 2h 17m
+  description: Build, program and upgrade BurgerBot, a simple 3D printed robot powered
+    by a Raspberry Pi Pico and MicroPython
+  duration: 2h 26m
   groups:
   - robotics
   - micropython
   - pico
-  lessons: 14
+  lessons: 15
   level: beginner
   link: /learn/burgerbot/00_intro.html
   name: Build your own BurgerBot
@@ -79,13 +80,14 @@
 - author: Kevin McAleer
   cover: /learn/cvzone/assets/computer_vision.jpg
   date_published: 2023-10-07
-  description: Computer Vision on Raspberry Pi with CVZone
-  duration: 1h 13m
+  description: Detect faces, hands and body poses in real time on a Raspberry Pi with
+    Python, OpenCV and CVZone
+  duration: 1h 19m
   groups:
   - computer vision
   - python
   - cvzone
-  lessons: 7
+  lessons: 6
   level: intermediate
   link: /learn/cvzone/00_intro.html
   name: Computer Vision on Raspberry Pi with CVZone
@@ -132,13 +134,13 @@
 - author: Kevin McAleer
   cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
   date_published: 2023-01-29
-  description: Robot Eye Mechanism, is a course that will teach you how to use Fusion
-    360 to create a Servo controled Robot eye mechanism.
-  duration: 0h 19m
+  description: Design a 3D-printable robot eye mechanism in Fusion 360, with upper
+    and lower eyelids that open and close around a central eyeball on a single servo.
+  duration: 0h 25m
   groups:
   - robotics
   - fusion 360
-  lessons: 9
+  lessons: 10
   level: intermediate
   link: /learn/eye_mechanism/00_intro.html
   name: Robot Eye Mechanism
@@ -279,14 +281,15 @@
 - author: Kevin McAleer
   cover: /learn/learn_ros/assets/learn_ros.jpg
   date_published: 2023-01-07
-  description: Learning ROS with me, is a course that will teach you how to use ROS2
-    on Raspberry Pi 4.
-  duration: 0h 36m
+  description: 'Learn ROS 2, the Robot Operating System, on a Raspberry Pi: run it
+    in Docker, write Python nodes that publish and subscribe to topics, and visualise
+    LiDAR scans in RViz2.'
+  duration: 0h 45m
   groups:
   - ros
   - raspberry pi
   - robotics
-  lessons: 19
+  lessons: 20
   level: intermediate
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
@@ -380,7 +383,7 @@
   description: Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython.
     Learn about various types of pins, their functions, and how to work with them
     in real-world projects.
-  duration: 0h 51m
+  duration: 0h 46m
   groups:
   - micropython
   - gpio
@@ -429,6 +432,8 @@
   groups:
   - python
   - raspberrypi
+  lessons: 18
+  level: beginner
   link: /learn/mongodb/00_intro.html
   name: MongoDB - Your First Database
 - author: Kevin McAleer
@@ -511,7 +516,7 @@
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
   description: Learn how to manipulate data using Pandas and Numpy
-  duration: 0h 28m
+  duration: 0h 37m
   groups:
   - pandas & numpy
   lessons: 12
@@ -590,7 +595,7 @@
   date_published: 2023-07-20
   description: Get started with Python programming, learn why you should  learn Python
     and how to setup your Python environment.
-  duration: 0h 40m
+  duration: 0h 52m
   groups:
   - python
   lessons: 18
@@ -601,7 +606,7 @@
   cover: /learn/redis/assets/redis-cover.jpg
   date_published: 2023-04-12
   description: Learn how to use Redis with Python to build fast, scalable applications.
-  duration: 0h 30m
+  duration: 0h 37m
   groups:
   - redis
   - python
@@ -630,9 +635,10 @@
 - author: Kevin McAleer
   cover: /learn/robotics_101/assets/basics_101.jpg
   date_published: 2023-01-17
-  description: Learning ROS with me, is a course that will teach you how to use ROS2
-    on Raspberry Pi 4.
-  duration: 0h 14m
+  description: 'A friendly first look at robots: what a robot is, a quick history
+    from ancient automata to today, the skills you need to build one, and the parts
+    that make a robot work.'
+  duration: 0h 15m
   groups:
   - robotics
   - raspberry pi
@@ -673,8 +679,9 @@
 - author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19
-  description: Learn how to 3d print, build and program a SMARS robot
-  duration: 0h 19m
+  description: Learn how to 3D print, assemble, wire up and program the original SMARS
+    robot, a small tracked robot powered by an Arduino Uno and a motor shield.
+  duration: 0h 22m
   groups:
   - smars
   - robotics
@@ -682,19 +689,21 @@
   lessons: 15
   level: beginner
   link: /learn/smars/00_intro.html
-  name: SMARS
+  name: Build a SMARS Robot
 - author: Kevin McAleer
   cover: /learn/smars_code/assets/program_smars.png
   date_published: 2023-09-10
-  description: Learn how to program SMARS with Arduino
-  duration: 0h 40m
+  description: 'Program your SMARS robot in Arduino C++: drive it around, avoid obstacles
+    with an ultrasonic sensor, sense its position, control it over Bluetooth, move
+    servos and follow a line.'
+  duration: 0h 42m
   groups:
   - smars
   - robotics
   - arduino
-  lessons: 7
+  lessons: 8
   level: beginner
-  link: /learn/smars_code/01_lesson_01.html
+  link: /learn/smars_code/00_intro.html
   name: Learn how to program SMARS with Arduino
 - author: Kevin McAleer
   cover: /learn/smars_fusion360/assets/smars_fusion360.png
@@ -707,7 +716,7 @@
   - smars
   - robotics
   - fusion 360
-  lessons: 34
+  lessons: 17
   level: beginner
   link: /learn/smars_fusion360/00_intro.html
   name: Design a SMARS Robot in Fusion 360 - Part 1, The Chassis Shell
@@ -722,21 +731,26 @@
   - smars
   - robotics
   - fusion 360
+  lessons: 18
+  level: beginner
   link: /learn/smars_fusion360_part2/00_intro.html
   name: Design a SMARS Robot in Fusion 360 - Part 2, Motor Holders and Stub Wheels
 - author: Kevin McAleer
   cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
   date_published: 2023-03-04
-  description: Learn how to 3d print, build and program a SMARS Quad robot
-  duration: 0h 14m
+  description: 3D print, assemble and wire up the SMARS Quad, a four-legged walking
+    robot with eight SG90 servos, a PCA9685 servo board and a Raspberry Pi Zero, then
+    make it walk with Python.
+  duration: 0h 17m
   groups:
   - smars
   - robotics
-  - arduino
-  lessons: 14
+  - raspberry pi
+  - python
+  lessons: 15
   level: intermediate
   link: /learn/smars_quad/00_intro.html
-  name: SMARS Quad
+  name: Build a SMARS Quad Walking Robot
 - author: Kevin McAleer
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
@@ -753,7 +767,7 @@
   cover: /learn/sqlite3/assets/database.png
   date_published: 2023-07-15
   description: Learn how to create databases in Python with sqlite3
-  duration: 0h 54m
+  duration: 1h 8m
   groups:
   - python
   - sqlite3

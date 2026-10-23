@@ -11,6 +11,7 @@ description: Learn about ground pins on the Raspberry Pi Pico and how to use the
   in your projects.
 percent: 85
 duration: 2
+quiz_total: 33
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -71,56 +72,48 @@ navigation:
 
 ## Overview
 
-Welcome to Lesson 16 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will learn about ground pins on the Raspberry Pi Pico and how to use them in your projects.
-
----
-
-## Course Content
-
-In this lesson, you will learn:
-
-* What ground pins are and how they work
-* How to identify ground pins on the Raspberry Pi Pico
-* How to use ground pins in your circuits
-
----
-
-## Key Results
-
-After you have completed this lesson, you will understand the basics of ground pins and how to use them in your circuits. You will be able to identify ground pins on the Raspberry Pi Pico and use them to connect components to your board.
-
----
-
-## What you'll need
-
-To follow this lesson, you will need:
-
-* A computer, tablet, or phone to read the lesson material from
-* A Raspberry Pi Pico board
-* Jumper wires and a breadboard for hands-on practice
+Ground pins don't do anything clever, but every circuit needs them and a missing ground is behind a lot of "it doesn't work" moments. This short lesson explains why.
 
 ---
 
 ## What are ground pins?
 
-Ground pins are a type of GPIO pin that is used to complete an electrical circuit. They provide a low-resistance path for electrical current to flow back to the power source, such as a battery or power supply. Without ground pins, circuits would not work properly or at all.
+Ground (`GND`) is the 0V reference that every other voltage in your circuit is measured against. It's also the return path that lets current flow back to the power supply and complete the circuit.
+
+Ground pins aren't GPIO pins: you can't switch them on or off from code. They're always 0V.
 
 ---
 
-## Identifying ground pins on the Raspberry Pi Pico
+## Identifying ground pins on the Pico
 
-The Raspberry Pi Pico has several ground pins that are labeled `GND`. These pins are usually black or brown and are often grouped together with other ground pins. It is important to use the correct ground pins when connecting components to the Pico to ensure proper circuit operation.
+The Pico has eight ground pins, at physical pins **3, 8, 13, 18, 23, 28, 33 and 38**. They're spread out so there's always one near the pins you're using. On the board they have square pads rather than round ones.
+
+Pin 33 is labelled `AGND`. It's the ground for the analog circuitry, so use it with potentiometers and analog sensors for the cleanest ADC readings.
+
+All the ground pins are connected together, so you can use whichever is closest.
 
 ---
 
 ## Using ground pins in your circuits
 
-To use ground pins in your circuits, simply connect one end of your component (such as an LED or a resistor) to a GPIO pin and the other end to a ground pin. This will complete the circuit and allow electrical current to flow through the component.
+* **Every circuit needs a ground.** An LED goes from a GPIO pin, through a resistor, to GND
+* **Share grounds between power supplies.** When a motor or servo has its own battery, connect the battery's negative to the Pico's GND. Without a shared ground the Pico's signals have nothing to be measured against, and things behave strangely or not at all
+* **Use the breadboard rail.** Run one wire from a GND pin to the breadboard's blue (`-`) rail, then connect everything else to the rail
 
 ---
 
-## Summary
+{% quiz %}
+? A servo has its own battery pack and twitches randomly. What's the most likely fix?
+- [ ] Use a faster PWM frequency
+- [x] Connect the battery's negative to the Pico's GND
+- [ ] Move the signal wire to an ADC pin
+> Without a shared ground, the servo can't read the Pico's signal reliably.
 
-In this lesson, you will learn about ground pins on the Raspberry Pi Pico and how to use them in your projects. You will be able to identify ground pins on the board and use them to connect components to your circuits.
+? Which ground pin is best for analog sensors?
+- [ ] Pin 3
+- [x] Pin 33, AGND
+- [ ] It must be a GPIO pin set to 0
+> AGND is the reference for the ADC, so it gives the cleanest readings.
+{% endquiz %}
 
 ---

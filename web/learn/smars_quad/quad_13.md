@@ -6,11 +6,13 @@ type: page
 cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
 date: 2023-03-04
 previous: quad_12.html
+next: quad_14.html
 description: Wiring the SMARS Quad robot
-percent: 100
+percent: 84
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -42,10 +44,14 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 
@@ -76,9 +82,13 @@ PCA9685 Pin | Quad Limb
 PCA9685 | Raspberry Pi
 :------:|:-----------:
   GND   |   6 (GND)
-  VCC   |   2 (VCC)
-  SCL   |   5 (SDL)
+  VCC   |   1 (3.3V)
+  SCL   |   5 (SCL)
   SDA   |   3 (SDA)
 {:class="table table-striped "}
+
+> ## Power the servos separately
+>
+> `VCC` only powers the PCA9685's chip, so connect it to 3.3V to keep the I2C signals safe for the Pi. Eight servos need far more current than the Pi can give, so connect a separate 5V supply or battery pack to the screw terminal (`V+` and `GND`) on the PCA9685.
 
 ---
