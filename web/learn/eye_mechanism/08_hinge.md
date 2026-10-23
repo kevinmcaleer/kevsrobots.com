@@ -6,9 +6,11 @@ type: page
 cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 date: 2023-01-29
 previous: 07_create_lower_sketch.html
-description: Lets create the lower eyelid hinge from the new profile
-percent: 100
-duration: 1
+next: 09_joint_and_export.html
+description: Let's create the lower eyelid hinge from the new profile
+percent: 90
+duration: 2
+quiz_total: 9
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -38,6 +40,10 @@ navigation:
       link: 07_create_lower_sketch.html
     - name: Create Hinge from Profile
       link: 08_hinge.html
+  - section: Joints and Export
+    content:
+    - name: Joints and Export
+      link: 09_joint_and_export.html
 ---
 
 
@@ -83,8 +89,23 @@ Fusion has a handy feature for this in the extrude dialog box in the extent type
 
 ## Mirror
 
-Lets mirror this new feature.
+Let's mirror this new feature.
 
 * **Mirror** - Click on the `CREATE` and Mirror function, then select the 4 features that have just been created and the origin as the mirror plane.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why is the lower eyelid made as a separate **component**?
+- [ ] Fusion 360 can only have one body per component
+- [x] So the eyelids can be joined later and move independently
+- [ ] To make the file smaller
+> Joints connect components, so each moving part needs its own component.
+
+? The lower eyelid hinge has a 10mm circle as well. Why is it bigger than the upper hinge?
+- [x] It fits over the outside of the upper eyelid's hinge
+- [ ] It holds the servo
+- [ ] To make the eyelid heavier
+{% endquiz %}

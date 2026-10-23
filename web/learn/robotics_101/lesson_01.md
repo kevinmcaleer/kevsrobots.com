@@ -1,16 +1,8 @@
 ---
 layout: lesson
 title: What is a Robot - a Definition
-author: Kevin McAleer
 type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
-date: 2023-01-17
-previous: 00_overview.html
-next: lesson_02.html
 description: Learn about the different parts of a robot
-percent: 32
-duration: 2
-quiz_total: 11
 navigation:
 - name: Robotics 101
 - content:
@@ -33,7 +25,7 @@ navigation:
 ---
 
 
-> *"A Robot is a machine, especially one programmable by a computer, capable of carrying out a  complex series of actions automatically.*
+> *"A Robot is a machine, especially one programmable by a computer, capable of carrying out a complex series of actions automatically.*
 > *Robots can be guided by an external control device or the control may be embedded within."*
 
 ## But what does this mean?

@@ -11,6 +11,7 @@ description: Consolidate your learning journey in data manipulation with Pandas 
   analysis skills.
 percent: 100
 duration: 2
+quiz_total: 17
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
@@ -92,11 +93,28 @@ Welcome to the final lesson of our `Data Manipulation with Pandas and NumPy` cou
 
 - Deepen your understanding of Pandas and NumPy through advanced tutorials and documentation.
 - Explore other Python libraries like SciPy and Seaborn for extended functionalities.
+- Store your data in a database with [Create Databases with Python and SQLite3](/learn/sqlite3/), or learn the language of databases with [Getting Started with SQL](/learn/sql/).
 
 ### Projects
 
 - Apply your skills to personal or open-source projects.
 - Analyze datasets from different domains to gain diverse experience.
+
+{% quiz %}
+? Which method would you use to fill gaps in a smoothly changing sensor reading?
+- [ ] `dropna()`
+- [x] `interpolate()`
+- [ ] `drop_duplicates()`
+> Interpolation estimates each missing value from its neighbours.
+
+? Which method gives you count, mean, min, max and percentiles in one go?
+- [x] `describe()`
+- [ ] `info()`
+- [ ] `value_counts()`
+> `describe()` summarises every numeric column.
+{% endquiz %}
+
+---
 
 ## Conclusion
 

@@ -10,8 +10,9 @@ next: smars11.html
 description: Add the power wires to the robot
 percent: 66
 duration: 1
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:
@@ -60,7 +61,9 @@ navigation:
 
 ## Insert Wires
 
-Insert the power wires into the connector, and the motor wires into the respective connectors.
+Insert the battery wires into the power connector on the motor shield (red to `+`, black to `-`), and each motor's wires into the motor A and motor B connectors.
+
+If a motor turns the wrong way later on, just swap its two wires over.
 
 ![Insert Wires](assets/motor-shield.png){:class="img-fluid w-50"}
 

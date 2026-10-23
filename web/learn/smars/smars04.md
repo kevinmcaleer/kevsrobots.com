@@ -10,8 +10,9 @@ next: smars05.html
 description: Fit the Battery to the chassis
 percent: 30
 duration: 1
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:

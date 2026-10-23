@@ -1,15 +1,8 @@
 ---
 layout: lesson
 title: Create a ROS2 Python Publisher
-author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
-date: 2023-01-07
-previous: 11_create_py_package.html
-next: 13_create_subscriber.html
-description: Lets create a new Python Publisher program
-percent: 65
-duration: 2
+description: Let's create a new Python Publisher program
 navigation:
 - name: Learn ROS with me
 - content:
@@ -69,19 +62,21 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
 ## Create a new Python file called pub.py
 
-* **Create a new Python file** - from the docker terminal type:
+* **Create a new Python file** - from the docker terminal, inside the `/ros2/my_py_pkg` folder, type:
 
 ```bash
 touch my_py_pkg/pub.py
 chmod -R 777 my_py_pkg
 ```
 
-This will create the new empty file, and fix the permissions so we can write to it from VS Code.
+This will create the new empty file inside the inner `my_py_pkg` folder (where the package's Python code lives), and fix the permissions so we can write to it from VS Code.
 
 ---
 
@@ -99,7 +94,7 @@ class Talker(Node):
     def __init__(self):
         super().__init__("node_test")
         self.counter_ = 0
-        # create_publisher needs 3 parameters: Msg Type, message, and buffer size
+        # create_publisher needs 3 parameters: message type, topic name, and queue size
         self.publisher = self.create_publisher(String, "Hello", 10)
         self._timer = self.create_timer(0.5, self.publish_hello)
         self.get_logger().info("publishing message")
@@ -123,9 +118,9 @@ if __name__ == "__main__":
 
 ## Add the entry_point to setup.py
 
-We now need to update `setup.py` to include the entry_point for our code. An `entry point` is the name of the python scripts that are available to run from with the package, and are shown in the list when you type `ros2 run my_py_pkg`.
+We now need to update `setup.py` to include the entry_point for our code. An `entry point` is the name of the python scripts that are available to run from within the package, and are shown in the list when you type `ros2 run my_py_pkg`.
 
-* **Update setup.py** - From the VS Code open setup.py from with `my_py_pkg` folder
+* **Update setup.py** - From the VS Code open setup.py from within `my_py_pkg` folder
 * **Add the entry points** - add the following lines to the entry point list:
 
 ```python
@@ -137,13 +132,15 @@ entry_points={
 },
 ```
 
+*The `talker` entry expects a `talker.py` in the same folder as `pub.py`: copy the talker code from the [previous lesson](10_listener.html) into `my_py_pkg/talker.py` so `ros2 run my_py_pkg talker` works too.*
+
 ---
 
 ## Build the package
 
-We can now build out package using `colcon build`. Do this from the root of the workspace (in this case `/ros2/my_py_pkg`):
+We can now build our package using `colcon build`. Do this from the package folder (`/ros2/my_py_pkg`):
 
-* **change to the root of the workspace**- From the docker terminal type:
+* **Change to the package folder** - From the docker terminal type:
 
 ```bash
 cd /ros2/my_py_pkg
@@ -159,7 +156,7 @@ colcon build
 
 ## Testing the publisher works
 
-Lets test out our code so far...
+Let's test out our code so far...
 
 * **Source install/setup.bash** - From the docker terminal type:
 
@@ -173,7 +170,7 @@ source install/setup.bash
 ros2 run my_py_pkg pub 
 ```
 
-The package should now run and you iwll see the logger message `[INFO] [1673801367.468008815] [node_test]: publishing message`.
+The package should now run and you will see the logger message `[INFO] [1673801367.468008815] [node_test]: publishing message`.
 
 You can also see the messages themselves by querying the ROS2 topic, via the commandline:
 
@@ -183,6 +180,6 @@ You can also see the messages themselves by querying the ROS2 topic, via the com
 ros2 topic echo Hello
 ```
 
-This will show the output from the ROS2 topic `Hello`, which is the topic we are publishing too.
+This will show the output from the ROS2 topic `Hello`, which is the topic we are publishing to.
 
 ---

@@ -1,15 +1,9 @@
 ---
 layout: lesson
 title: Getting Rviz2 and RQT to work in docker
-author: Kevin McAleer
 type: page
+description: Let's learn how to redirect our X11 Display
 cover: /learn/learn_ros/assets/x11cover.jpg
-date: 2023-01-07
-previous: 13_create_subscriber.html
-next: 15_rviz.html
-description: Lets learn how to redirect our X11 Display
-percent: 75
-duration: 2
 navigation:
 - name: Learn ROS with me
 - content:
@@ -69,6 +63,8 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
@@ -82,10 +78,10 @@ To get the ROS visualisation tool `rviz2` to work in our docker container we nee
 
 `X11` is a software package developed by the Massachusetts Institute of Technology (MIT) in the 1980s that enables graphical user interfaces (GUIs) to be created and used on Unix-based systems.
 It works by using a network protocol called the X Window System Protocol to communicate between the server and the client.
-The server is responsible for managing the user interface, while the client is responsible for displaying the user interface.
-The X11 protocol is used to send commands from the server to the client, which are then interpreted by the client and used to generate the output.
+The **X server** runs on the computer with the screen, keyboard and mouse, and draws everything. The **clients** are the applications, such as RViz2, which send drawing commands to the server.
+Because it's a network protocol, an application running in one place (like our Docker container) can draw windows on a screen somewhere else (like the Raspberry Pi desktop).
 
-X11 is used by many popular operating systems, including Linux, Mac OS X, and Windows.
+X11 is the traditional display system on Linux, and X servers are available for macOS and Windows too. (Newer Raspberry Pi OS releases use Wayland, but still run X11 applications through XWayland.)
 
 ![X11 example desktop](assets/x11.jpg){:class="img-fluid w-100"}
 
@@ -93,7 +89,7 @@ X11 is used by many popular operating systems, including Linux, Mac OS X, and Wi
 
 ## Redirecting the X11 Display to the host
 
-To redirect any X11 display commnds from within the docker container runnign ROS2, to outside the container (our Raspberry Pi 4 OS), we need to do two things:
+To redirect any X11 display commands from within the docker container running ROS2, to outside the container (our Raspberry Pi 4 OS), we need to do two things:
 
 1. Use `xhost` to enable other processes to access the X11 server (this isn't exactly secure, but for now it works)
 1. `export` the `DISPLAY` environment variable - this will complete the plumbing so we can run [RViz2](/resources/glossary#rviz2).
@@ -108,8 +104,10 @@ xhost local:root
 
 ```yaml
 environment:
-  - display
+  - DISPLAY
 ```
+
+*We also add `network_mode: host` so the container shares the Pi's network, which ROS 2 needs to find nodes running outside the container.*
 
 The full docker-compose.yml file should now look like this:
 
@@ -135,12 +133,12 @@ services:
 
 Now that we have updated our docker-compose file we need to bring the new container online; docker-compose has a simple command for this called `up`:
 
-* **docker-compose up -d** - from the Raspberry Pis terminal, in the folder where the updated docker-compose.yml is, type:
+* **docker compose up -d** - from the Raspberry Pi's terminal, in the folder where the updated docker-compose.yml is, type:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-**Note** the `-d` parameter means run the container disconected. If you don't include this, the terminal will run the container and all the container output will display on this terminal, but it will also quick should the terminal session end.
+**Note** the `-d` parameter means run the container detached (in the background). If you don't include it, all the container output will display on this terminal, and the container will stop when the terminal session ends.
 
 ---

@@ -11,6 +11,7 @@ description: Discover the primary data structures in Python, including strings, 
   tuples, dictionaries, and sets.
 percent: 15
 duration: 3
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -75,7 +76,7 @@ Data structures in Python are containers that organize and group data types toge
 
 `Strings` are sequences of characters, and they are created by enclosing characters in quotes. Python treats single quotes the same as double quotes[^1].
 
-[^1]: It's best practice to use double quotes, as these anticipate punctuation used in strings such as appostrophies. It's also part of the [Black](18_tips_and_tricks#pep-8-and-the-black-code-formatter) Python coding best practice
+[^1]: Many people prefer double quotes, because then you can use apostrophes inside a string without escaping them, like `"It's here"`. The [Black](18_tips_and_tricks.html#pep-8-and-the-black-code-formatter) code formatter uses double quotes too.
 
 ```python
 # A string in Python
@@ -132,7 +133,7 @@ print(x_coordinate)  # Prints '10.0'
 
 ### Dictionaries
 
-`Dictionaries` are unordered collections of key-value pairs. They are mutable and indexed by keys.
+`Dictionaries` are collections of key-value pairs. They are mutable and indexed by keys, and since Python 3.7 they remember the order you added items in.
 
 ```python
 # Creating a dictionary
@@ -168,6 +169,26 @@ print(fruits)  # May print "{'cherry', 'orange', 'banana', 'apple'}"
 fruits.remove('apple')
 print(fruits)  # May print "{'cherry', 'orange', 'banana'}"
 ```
+
+---
+
+## Try it yourself
+
+Make a dictionary describing your favourite robot, with keys for its `name`, `wheels` and `sensors` (a list). Print how many sensors it has with `len()`.
+
+{% quiz %}
+? Which data structure can't be changed after it's created?
+- [ ] List
+- [x] Tuple
+- [ ] Dictionary
+> Tuples are immutable. Lists, dictionaries and sets can all be changed.
+
+? What happens if you add `'apple'` to a set that already contains `'apple'`?
+- [x] Nothing, the set still has one `'apple'`
+- [ ] The set now has two `'apple'` items
+- [ ] Python raises an error
+> Sets only hold unique values, so adding a duplicate has no effect.
+{% endquiz %}
 
 ---
 

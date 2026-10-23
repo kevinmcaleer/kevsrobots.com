@@ -5,11 +5,12 @@ author: Kevin McAleer
 type: page
 cover: /learn/burgerbot/assets/burgerbot.jpg
 date: 2023-04-27
-previous: 08_video.html
+previous: 08_pen.html
 next: 08_line_following_code.html
 description: Learn how to make BurgerBot follow a line using a line sensor.
-percent: 84
+percent: 78
 duration: 1
+quiz_total: 11
 navigation:
 - name: Build your own BurgerBot
 - content:
@@ -45,6 +46,8 @@ navigation:
     content:
     - name: BurgerBot Upgrades video
       link: 08_video.html
+    - name: Drawing with a Pen
+      link: 08_pen.html
     - name: Line Following
       link: 08_line_following.html
     - name: Line Following Code
@@ -70,11 +73,11 @@ Step | Detail
 
 ## Download the 3d printable Line following sensor holder
 
-Click here to download the 3d pinrtable parts:
+Click here to download the 3D printable parts:
 
 * [`line_sensor_holder.stl`](/assets/stl/burgerbot_v2/line_sensor_holder.stl) - 40 minute print time
 
-You will also need 2 M3 screws and and 2 M3 Nuts.
+You will also need 2 M3 screws and 2 M3 nuts.
 
 ---
 

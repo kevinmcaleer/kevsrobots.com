@@ -9,7 +9,8 @@ previous: 00_intro.html
 next: 02_getting_started_with_sqlite3.html
 description: What are databases and why do we need them?
 percent: 10
-duration: 7
+duration: 8
+quiz_total: 24
 navigation:
 - name: Create Databases with Python and SQLite3
 - content:
@@ -92,17 +93,17 @@ Data can be stored in databases or represented in tables, graphs, or charts to m
 
 ## Data, Information, Knowledge, Wisdom
 
-You can think of data as a hierachy of meaning.
+You can think of data as a hierarchy of meaning.
 
 `Data`, Starting with raw data we might capture values from a sensor, such as a temperature sensor and store this in our database.
 
-`Information` is data that has been processed and has a known meaning associated with it. The raw data `21` could mean anything until we assign it meaning, such as `21 degrees celcius`. This is now information that can be used and understood.
+`Information` is data that has been processed and has a known meaning associated with it. The raw data `21` could mean anything until we assign it meaning, such as `21 degrees Celsius`. This is now information that can be used and understood.
 
-`Knowledge` is the information with added context; we might look at the temperature information and understand that this is hot or cold given a context such as room temperature (its getting warm), or oven temperature - its cold.
+`Knowledge` is the information with added context; we might look at the temperature information and understand that this is hot or cold given a context such as room temperature (it's getting warm), or oven temperature (it's cold).
 
 `Wisdom` is the application of knowledge and experience to make sound judgements and decisions; the oven will take 10 minutes to warm up from 21 degrees, I better put that on in 20 minutes time ready for cooking a meal.
 
-![Heirachy](assets/dikw.png){:class="img-fluid w-75"}
+![Hierarchy](assets/dikw.png){:class="img-fluid w-75"}
 
 ---
 
@@ -225,8 +226,8 @@ Type          | Description                                                     
 **Integer**   | Whole numbers without decimal places                                     | `0`, `1`, `2` ,`3`
 **Text**      | Alphanumeric characters and strings                                      | `"Robots"`
 **Real**      | Floating-point numbers                                                   | `3.14`
-**Date/Time** | Dates and times                                                          | `2023-07-14 23:02:01`
-**Blob**      | Binary large objects, used for storing binary data (e.g., images, files) | `[0x00,0x01,x010]`
+**Date/Time** | Dates and times. SQLite stores these as text or numbers                  | `2023-07-14 23:02:01`
+**Blob**      | Binary large objects, used for storing binary data (e.g., images, files) | `x'000102'`
 {:class="table table-striped"}
 
 Columns can also have constraints that define additional rules for the data they store. Constraints include:
@@ -237,5 +238,21 @@ Columns can also have constraints that define additional rules for the data they
 - **PRIMARY KEY**: Identifies a column or set of columns that uniquely identifies each record in the table.
 
 Understanding these concepts is crucial for designing effective database schemas and manipulating data efficiently.
+
+---
+
+{% quiz %}
+? What is a primary key?
+- [ ] The first column in every table
+- [x] A column (or columns) that uniquely identifies each row
+- [ ] A password that protects the database
+> No two rows can share the same primary key value.
+
+? Why is SQLite called "serverless"?
+- [x] The database is a single file your program reads and writes directly
+- [ ] It only runs in the cloud
+- [ ] It doesn't need any storage
+> There's no separate database server to install or run.
+{% endquiz %}
 
 ---

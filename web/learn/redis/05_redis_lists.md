@@ -9,7 +9,8 @@ previous: 04_commands_and_transactions.html
 next: 06_redis_sets.html
 description: Learn about Redis lists and how to use them with Python.
 percent: 50
-duration: 3
+duration: 4
+quiz_total: 14
 navigation:
 - name: Using Redis with Python
 - content:
@@ -67,7 +68,7 @@ In this lesson, we will cover:
 
 ### Redis Lists
 
-Redis lists are a data type that can be used to store an ordered collection of strings. Lists in Redis are implemented as linked lists, which means that adding or removing elements from the beginning or end of a list is very fast, but accessing elements in the middle of a list can be slow.
+Redis lists are a data type that can be used to store an ordered collection of strings. Lists in Redis behave like linked lists, which means that adding or removing elements from the beginning or end of a list is very fast, even with millions of elements, but accessing elements in the middle of a long list is slower. That makes lists great for queues and for keeping the latest few items.
 
 ---
 
@@ -103,6 +104,7 @@ In addition to adding and retrieving list elements, Redis provides several comma
 * `lpop`: Remove and return the first element of a list
 * `rpop`: Remove and return the last element of a list
 * `ltrim`: Trim a list to the specified range of elements
+* `llen`: Get the length of a list
 
 ---
 
@@ -113,7 +115,7 @@ To use Redis lists in Python, you can use the `list` methods of the Redis Python
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379)
+redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 # Add elements to the end of a list
 redis_client.rpush('mylist', 'element1', 'element2')
@@ -132,6 +134,32 @@ last_element = redis_client.rpop('mylist')
 ```
 
 In this example, we use the Redis Python library to add elements to a list using the rpush and lpush methods, retrieve a range of elements from the list using the lrange method, and remove and return elements from the list using the lpop and rpop methods.
+
+---
+
+### Example: keep the last 10 sensor readings
+
+```python
+def log_reading(value):
+    redis_client.lpush('readings', value)   # newest first
+    redis_client.ltrim('readings', 0, 9)     # keep only 10
+
+for v in range(15):
+    log_reading(v)
+
+print(redis_client.lrange('readings', 0, -1))
+# ['14', '13', '12', '11', '10', '9', '8', '7', '6', '5']
+```
+
+---
+
+{% quiz %}
+? What does `lrange mylist 0 -1` return?
+- [ ] The first element
+- [x] Every element in the list
+- [ ] The last element
+> `-1` means the last element, so 0 to -1 is the whole list.
+{% endquiz %}
 
 ---
 

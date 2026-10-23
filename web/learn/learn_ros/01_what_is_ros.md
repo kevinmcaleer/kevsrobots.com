@@ -1,15 +1,8 @@
 ---
 layout: lesson
 title: What is ROS
-author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
-date: 2023-01-07
-previous: 00_intro.html
-next: 02_pi_setup.html
 description: Learn about ROS, the different versions and what it does
-percent: 10
-duration: 2
 navigation:
 - name: Learn ROS with me
 - content:
@@ -69,6 +62,8 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
@@ -84,21 +79,21 @@ Here is the definition from the creators of ROS - <https://ros.org/>
 
 There are two versions of ROS:
 
-* **ROS** - The original version of ROS
-* **ROS2** - The latest version of ROS - this is what we will be using, as the older version is depreciated.
+* **ROS 1** - The original version of ROS. Its last release, Noetic, reached end of life in May 2025.
+* **ROS 2** - The current version of ROS, and what we will be using in this course.
 
 ---
 
 ## Releases & Distros
 
-ROS2 has several releases, as of the writing of this the **Iron Irwini**, however this is only supported up to Nov 2024,  **Humble Hawksbill** is the release version with Long term support (LTS):
+ROS 2 has a new release (called a *distro*) every May. The releases in even years are Long Term Support (LTS) releases with five years of updates. This course uses **Humble Hawksbill**, which is supported until May 2027 and is what the example Docker files are built on. If you're starting a new project, check the [list of ROS 2 distributions](https://docs.ros.org/en/rolling/Releases.html) for the newest LTS release; the code in this course works the same way.
 
 Distro              |     Release date |   End Of Life date
 :-------------------|-----------------:|------------------:
-**Iron Irwini**     | **May 23, 2023** |       **Nov 2024**
-Humble Hawksbill    |   May 23rd, 2022 |           May 2027
-Galactic Geochelone |   May 23rd, 2021 | December 9th, 2022
-Foxy Fitzroy        |   June 5th, 2020 |           May 2023
+Jazzy Jalisco (LTS) |     May 23, 2024 |           May 2029
+Iron Irwini         |     May 23, 2023 |      December 2024
+**Humble Hawksbill (LTS)** | **May 23, 2022** | **May 2027**
+Foxy Fitzroy        |     June 5, 2020 |           May 2023
 {:class="table table-striped"}
 
 ---
@@ -108,3 +103,18 @@ Foxy Fitzroy        |   June 5th, 2020 |           May 2023
 ROS2 Supports both `C++` and `Python` out of the box (and I'm sure there are other languages adapted to use it too), however for this course we will be focusing on `Python`.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Which ROS 2 distro does this course use?
+- [ ] Foxy Fitzroy
+- [x] Humble Hawksbill
+- [ ] Iron Irwini
+> Humble is a Long Term Support release, supported until May 2027.
+
+? Which two programming languages does ROS 2 support out of the box?
+- [x] C++ and Python
+- [ ] Java and JavaScript
+- [ ] Rust and Go
+{% endquiz %}

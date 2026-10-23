@@ -8,10 +8,11 @@ date: 2023-03-04
 previous: quad_08.html
 next: quad_10.html
 description: Print the feet x4
-percent: 70
+percent: 60
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -43,10 +44,14 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 

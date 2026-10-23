@@ -8,8 +8,9 @@ date: 2023-01-29
 previous: 01_create_component.html
 next: 03_revolve.html
 description: Creating the initial Sketch
-percent: 33
+percent: 30
 duration: 4
+quiz_total: 9
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -39,6 +40,10 @@ navigation:
       link: 07_create_lower_sketch.html
     - name: Create Hinge from Profile
       link: 08_hinge.html
+  - section: Joints and Export
+    content:
+    - name: Joints and Export
+      link: 09_joint_and_export.html
 ---
 
 
@@ -62,7 +67,7 @@ navigation:
 
 ---
 
-* **Click the origin point and drag out the circle** - move the mouse over the origin point; its the point where the the axis cross and has a little `puck` at the center, and then drag the circle outline out, clicking again to release the circle drawing mode.
+* **Click the origin point and drag out the circle** - move the mouse over the origin point; it's the point where the axis cross and has a little `puck` at the center, and then drag the circle outline out, clicking again to release the circle drawing mode.
 
 You can set the circle diameter next, so don't worry about getting this just right now.
 
@@ -70,7 +75,7 @@ You can set the circle diameter next, so don't worry about getting this just rig
 
 * **Press D to enter Dimension mode** - Press `d` on the keyboard to enter `dimension` mode. You can use this to set the dimension of a line, diameter of a circle or distance between two points.
 
-* **Set the Dimension** - Click on the blue circle and type `44` to set the diameter of the circle to `44mm`. The circle will turn `black` once the dimension is set; this incidates the sketch is fully defined, locked into place, and cannot float about the canvas.
+* **Set the Dimension** - Click on the blue circle and type `44` to set the diameter of the circle to `44mm`. The circle will turn `black` once the dimension is set; this indicates the sketch is fully defined, locked into place, and cannot float about the canvas.
 
 ![Fusion full screen](assets/eye07.jpg){:class="img-fluid w-50"}
 
@@ -86,7 +91,7 @@ You can set the circle diameter next, so don't worry about getting this just rig
 
 * **Press D to enter Dimension mode** - Press `d` on the keyboard to enter `dimension` mode.
 
-* **Set the second circle Dimension** - Click on the blue circle and then click the original circle, you can now set the distance between the two; type `2` to set the diameter of the circle to `2mm`. The circle will turn `black` as it is now fully defined.
+* **Set the second circle Dimension** - Click on the blue circle and then click the original circle, you can now set the distance between the two; type `2` to set the gap between the circles to `2mm` (so the inner circle is 40mm across). The circle will turn `black` as it is now fully defined.
 
 ![Fusion full screen](assets/eye08.jpg){:class="img-fluid w-50"}
 
@@ -102,13 +107,13 @@ You can set the circle diameter next, so don't worry about getting this just rig
 
 ---
 
-* **Draw a verticle line** - Draw a verticle line from the origin point to the top of the circle. The line will snap to the circle geometry. The line will also snap to 90° from horitonal.
+* **Draw a vertical line** - Draw a vertical line from the origin point to the top of the circle. The line will snap to the circle geometry. The line will also snap to 90° from horizontal.
 
 ![Fusion full screen](assets/eye09.jpg){:class="img-fluid w-50"}
 
 ---
 
-* **Draw a horizonal line** - Draw a horizontal line from the origin point to the right edge of the circle. The line will snap to the circle geometry. The line will also snap to 90° from verticle.
+* **Draw a horizontal line** - Draw a horizontal line from the origin point to the right edge of the circle. The line will snap to the circle geometry. The line will also snap to 90° from vertical.
 
 ![Fusion full screen](assets/eye10.jpg){:class="img-fluid w-50"}
 
@@ -125,15 +130,15 @@ You can set the circle diameter next, so don't worry about getting this just rig
 
 ---
 
-* **Break the circle line** - Click `Break` from the `Modify` menu and then click on the left and side of the larger circle.
+* **Break the circle line** - Click `Break` from the `Modify` menu and then click on the left hand side of the larger circle.
 
-You will see two red `x`'s appear where the horizontal and verticle lines intersect the larger circle.
+You will see two red `x`'s appear where the horizontal and vertical lines intersect the larger circle.
 
 ![Fusion full screen](assets/eye12.jpg){:class="img-fluid w-50"}
 
 ---
 
-* **Break the smaller circle** - Click `Break` again and then click on the left and side of the smaller circle.
+* **Break the smaller circle** - Click `Break` again and then click on the left hand side of the smaller circle.
 
 ---
 
@@ -143,13 +148,13 @@ You will see two red `x`'s appear where the horizontal and verticle lines inters
 
 ---
 
-* **Close the top of the circle** - Press `l` to enter line drawing mode, and the draw a verticle line between the larger and smaller circle sections.
+* **Close the top of the circle** - Press `l` to enter line drawing mode, and then draw a vertical line between the larger and smaller circle sections.
 
 ![Fusion full screen](assets/eye14.jpg){:class="img-fluid w-50"}
 
 ---
 
-* **Draw a profile and dimension** - Draw the profile shown below, and use the dimension tool (press 'd') to set the dimensions accourdingly.
+* **Draw a profile and dimension** - Draw the profile shown below, and use the dimension tool (press 'd') to set the dimensions accordingly.
 
 ![Fusion full screen](assets/eye15.jpg){:class="img-fluid w-50"}
 
@@ -157,7 +162,7 @@ You will see two red `x`'s appear where the horizontal and verticle lines inters
 
 ---
 
-* **Finish Sketch** -Click on the finish Sketch button
+* **Finish Sketch** - Click on the `Finish Sketch` button
 
 ![Fusion full screen](assets/eye17.jpg){:class="img-fluid w-50"}
 

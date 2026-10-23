@@ -9,8 +9,9 @@ previous: smars13.html
 description: A summary of what you have learned so far
 percent: 100
 duration: 1
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:
@@ -57,36 +58,42 @@ navigation:
 ---
 
 
-## SUMMARY OF LEARNING
+![SMARS](assets/heroshot.jpg){:class="cover"}
 
-Let’s review the things you’ve learned in this course.
+## Summary of learning
 
----
+Congratulations, you've built a robot! Let's review what you've learned in this course.
 
-### Printing the Parts
+### Printing the parts
 
-In this lesson we learned where to download the parts from, and what the parts are.
+You learned where to download the SMARS files, which parts to print and what electronics you need.
 
----
+### Assembling the robot
 
-### Assembling the Robot
+You soldered wires to the motors, then fitted the motors, battery, motor holders and wheels, and tested the motors.
 
-In this section we learned how to assemble the robot parts including the Soldering the motors, fitting the motors, battery and motor holder. Adding the wheels and then testing the motors.
+### Wiring up the robot
 
----
-
-### Wiring up the Robot
-
-In this section we added the Arduino and Motorshield, attaching the wires from the motors, battery and range finder.
-
----
+You added the Arduino and motor shield, connected the motor and battery wires, and fitted the tracks.
 
 ### Code
 
-In the final section we look at adding the tracks and a couple of reources for programming your SMARS robot, and controlling it with bluetooth.
-
-### Next Steps
-
-First of all, congratulations for completing this course, now lets get building some more programs for SMARS and extent it with additional components.
+You loaded code onto the Arduino and controlled your SMARS over Bluetooth.
 
 ---
+
+## Watch: next steps and recap
+
+{% include youtubeplayer.html id="pkXVYTFFwkU" %}
+
+Having trouble? This video covers the five most common SMARS problems and how to fix them.
+
+{% include youtubeplayer.html id="10nd4tk_KhM" %}
+
+---
+
+## What's next
+
+- [Learn how to program SMARS with Arduino](/learn/smars_code/): make your SMARS avoid obstacles with the range finder
+- [Build a SMARS Quad](/learn/smars_quad/): a four-legged walking SMARS
+- [Design a SMARS Robot in Fusion 360](/learn/smars_fusion360/): design the chassis yourself

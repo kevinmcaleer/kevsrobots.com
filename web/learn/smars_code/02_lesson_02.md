@@ -1,18 +1,14 @@
 ---
-layout: lesson
 title: Lesson 02 - Turning
-author: Kevin McAleer
-type: page
-cover: /learn/smars_code/assets/program_smars.png
-date: 2023-09-10
-previous: 01_lesson_01.html
-next: 03_lesson_03.html
 description: Learn how to make your robot turn left and right
-percent: 28
-duration: 5
+layout: lesson
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:
+  - section: Overview
+    content:
+    - name: Overview
+      link: 00_intro.html
   - section: Movement
     content:
     - name: Lesson 01 - Movement
@@ -45,28 +41,28 @@ You can download the completed code from [GitHub - www.github.com/kevinmcaleer/l
 
 ---
 
-## Things's you'll needs
+## What you'll need
 
 Before you begin, you'll need to make sure you have a couple of things before you start this lesson:
 
 * A [SMARS robot](/learn/smars/)
 * A USB Cable to connect to your computer
-* A Computer that can run the [Arduino IDE](https://create.arduino.cc/editor)
-* The code from [Lesson 01 - Movement](01_lesson_01)
+* A Computer that can run the [Arduino IDE](https://www.arduino.cc/en/software)
+* The code from [Lesson 01 - Movement](01_lesson_01.html)
 
 ---
 
 ## Preparation
 
 1. Connect the SMARS to the USB cable, and the USB Cable to your computer
-1. Launch the [Arduino IDE](https://create.arduino.cc/editor) on your computer
+1. Launch the [Arduino IDE](https://www.arduino.cc/en/software) on your computer
 1. Create a new Sketch, by clicking the `New Sketch` button
 
 ---
 
-## Lets code
+## Let's code
 
-We are going to create 3 more functions, almost identical to the function we made in [lesson 01](01_lesson_01), but with slightly different parameters for the direction of the motors.
+We are going to create 3 more functions, almost identical to the function we made in [lesson 01](01_lesson_01.html), but with slightly different parameters for the direction of the motors.
 
 ---
 
@@ -101,7 +97,7 @@ void backward() {
 // turn left
 void turnLeft() {
 
-  // set the direction to backward
+  // set both motors the same direction to spin on the spot
   digitalWrite(motor_A, LOW);
   digitalWrite(motor_B, LOW);
 
@@ -126,7 +122,7 @@ void turnLeft() {
 // turn right
 void turnRight() {
 
-  // set the direction to backward
+  // set both motors the same direction to spin on the spot
   digitalWrite(motor_A, HIGH);
   digitalWrite(motor_B, HIGH);
 
@@ -147,14 +143,14 @@ void turnRight() {
 
 ## What the code means
 
-The code in each of these functions is virtually identical, apart from these line:
+The code in each of these functions is virtually identical, apart from these lines:
 
 ``` c
 digitalWrite(motor_A, HIGH);
-digitalWrite(motor_B, HIGH;
+digitalWrite(motor_B, HIGH);
 ```
 
-These lines tell the motor-shield to set motor A and motor B to either rotate in different directions to move either backwards or forwards, or in the same direction to turn the SMARS either left or right. The reason for this is that the motors on the SMARS are facing opposite directions and therefore need to rotate in opposite directions to move the SMARS in a single direction. Rotating the motors in opposite directions has the affect of turning the body either left or right.
+These lines tell the motor shield which way to spin motor A and motor B. Because the motors on the SMARS face opposite directions, setting them to *different* values (`LOW`/`HIGH`) makes the robot drive forwards or backwards, and setting them to the *same* value makes the robot spin left or right on the spot.
 
 ---
 
@@ -171,7 +167,7 @@ To make the SMARS controllable from the keyboard, we can use the Arduino Serial 
 
 We will do this by reading in characters from the Serial interface, and then running either the `forward()`, `backward()`, `turnLeft()`, or `turnRight()` functions.
 
-We will change the code in the `void loop()` section to looks like this:
+We will change the code in the `void loop()` section to look like this. Make sure your `setup()` function also starts the serial port with `Serial.begin(9600);`, otherwise nothing will arrive from the keyboard.
 
 ``` c
 while (Serial.available()) {
@@ -206,7 +202,7 @@ while (Serial.available()) {
   delay(2000);
 ```
 
-We can now open the Serial monitor from the Tools menu, and being typing any of the four direction commands 'w','s','a','d' and return to move the SMARS in any of the four directions.
+We can now open the Serial monitor from the Tools menu, and begin typing any of the four direction commands 'w','s','a','d' and return to move the SMARS in any of the four directions.
 
 ![Serial Monitor Menu Screenshot](assets/serial_monitor_menu.png){:class="img-fluid w-50"}
 
@@ -237,7 +233,29 @@ case 'w':
 The first line is a comment (as denoted by the '//' characters).
 The second line says, in the `case` of the value of `c` being `w` then execute the lines below.
 The third line says, write the string `Moving Forward` to the `Serial` monitor.
-The fouth line executes the `forward()` function.
+The fourth line executes the `forward()` function.
 The last line `break;` means stop running through the `case` statements.
 
 ---
+
+## Try it yourself
+
+1. Change `wait_in_milliseconds` to `250` so each key press moves the robot a shorter distance.
+2. Add a new key, `x`, that stops the robot.
+3. Challenge: add `q` and `e` keys that turn the robot by a smaller amount.
+
+## Check your understanding
+
+{% quiz %}
+? How do you make SMARS spin on the spot?
+- [ ] Set both motor speeds to 0
+- [x] Set both motor direction pins to the same value
+- [ ] Set the motor direction pins to opposite values
+> Same direction values make the motors push the robot round in a circle. Opposite values drive it forwards or backwards.
+
+? In a `switch` statement, what does `break;` do?
+- [x] Stops checking the remaining `case`s
+- [ ] Stops the robot
+- [ ] Restarts the Arduino
+> Without `break;` the code would carry on into the next `case` as well.
+{% endquiz %}

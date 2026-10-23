@@ -11,6 +11,7 @@ description: Learn how Python can be used to automate tasks such as file manipul
   and web browsing.
 percent: 70
 duration: 2
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -104,20 +105,23 @@ shutil.copy('source.txt', 'destination.txt')
 
 The `selenium` library is a powerful tool for controlling a web browser through the program. It can automate real user behaviors such as clicking and scrolling.
 
+Install it with `pip install selenium`. Recent versions download the right browser driver for you.
+
 ```python
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-# Create a new instance of the Firefox driver
+# Open a Firefox window controlled by Python
 driver = webdriver.Firefox()
 
 # Go to a webpage
-driver.get("http://www.google.com")
+driver.get("https://duckduckgo.com")
 
 # Find the search box element
-search_box = driver.find_element_by_name('q')
+search_box = driver.find_element(By.NAME, "q")
 
 # Type into the search box
-search_box.send_keys('Python')
+search_box.send_keys("Python")
 
 # Submit the form
 search_box.submit()
@@ -125,6 +129,20 @@ search_box.submit()
 # Close the browser
 driver.quit()
 ```
+
+> ## Older tutorials
+>
+> Methods like `find_element_by_name()` were removed in Selenium 4. Use `find_element(By.NAME, ...)` instead.
+
+---
+
+{% quiz %}
+? Which built-in module copies files?
+- [ ] `os`
+- [x] `shutil`
+- [ ] `selenium`
+> `shutil` handles high-level file operations like copying and moving.
+{% endquiz %}
 
 ---
 

@@ -9,7 +9,8 @@ next: 02_basics.html
 description: Understand the fundamentals of Python, install it, and write your first
   program.
 percent: 5
-duration: 3
+duration: 4
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -64,6 +65,16 @@ navigation:
 
 ---
 
+## About this course
+
+This course takes you from your very first line of Python to building small applications. The first half covers the core language: variables, data structures, control flow, files, errors, modules and classes. The second half is a tour of what people do with Python in the real world, from web scraping and charts to machine learning, automation and databases.
+
+Each lesson explains one topic with short examples you can run yourself, and most end with a quick quiz. Your progress and quiz score are saved in your browser and shown in the sidebar.
+
+**What you'll need:** a computer running Windows, macOS or Linux (a Raspberry Pi is perfect), and an internet connection to download Python.
+
+---
+
 ## Learning Objectives
 
 - Understand why Python is a beneficial programming language to learn.
@@ -89,7 +100,11 @@ Before you can start coding in Python, you need to install the Python interprete
 
 1. Visit the [official Python website](https://www.python.org/downloads/).
 1. Download the latest version available for your operating system.
-1. Run the installer and follow the prompts to install Python. Make sure to check the box that says "Add Python to PATH" before completing the installation.
+1. Run the installer and follow the prompts to install Python. On Windows, make sure to check the box that says "Add python.exe to PATH" before completing the installation.
+
+> ## Already installed?
+>
+> macOS and Linux (including Raspberry Pi OS) usually come with Python 3. Open a terminal and type `python3 --version` to check.
 
 ---
 
@@ -114,9 +129,29 @@ To run this program:
 1. Save the file with a `.py` extension, such as `hello_world.py`.
 1. Open a terminal/command prompt.
 1. Navigate to the directory where you saved `hello_world.py`.
-1. Type `python hello_world.py` and press enter to run the program.
+1. Type `python hello_world.py` and press enter to run the program. On macOS and Linux, use `python3 hello_world.py`.
 
 You should see `Hello, World!` printed in the terminal.
+
+---
+
+## Try it yourself
+
+Change the message to print your own name, then add a second `print()` line. Each `print()` starts a new line.
+
+{% quiz %}
+? Which of these prints a message in Python?
+- [ ] `echo("Hello")`
+- [x] `print("Hello")`
+- [ ] `console.log("Hello")`
+> `print()` is Python's built-in function for showing text. The others come from other languages.
+
+? What file extension do Python programs use?
+- [ ] `.txt`
+- [x] `.py`
+- [ ] `.pyc`
+> Python source files end in `.py`.
+{% endquiz %}
 
 ---
 

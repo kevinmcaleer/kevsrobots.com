@@ -1,18 +1,14 @@
 ---
-layout: lesson
 title: Lesson 03 - Ultrasonic distance sensor
-author: Kevin McAleer
-type: page
-cover: /learn/smars_code/assets/program_smars.png
-date: 2023-09-10
-previous: 02_lesson_02.html
-next: 04_lesson_04.html
 description: Learn how to detect distance using an ultrasonic sensor
-percent: 42
-duration: 8
+layout: lesson
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:
+  - section: Overview
+    content:
+    - name: Overview
+      link: 00_intro.html
   - section: Movement
     content:
     - name: Lesson 01 - Movement
@@ -36,7 +32,7 @@ navigation:
 ---
 
 
-## LiveStream video
+## Watch the livestream
 
 {% include youtubeplayer.html id="ZinPFHsna2c" %}
 
@@ -44,17 +40,17 @@ navigation:
 
 ## What you'll learn
 
-In this lesson you will learn how to detect distances using a HC-SR04 ultrasonic distance sensor. In the second part of the tutorial we will use this sensing code, and code from [lesson 02](02_lessons_02) to avoid obstacles.
+In this lesson you will learn how to detect distances using a HC-SR04 ultrasonic distance sensor. In the second part of the tutorial we will use this sensing code, and code from [lesson 02](02_lesson_02.html) to avoid obstacles.
 
 ---
 
-## Things's you'll needs
+## What you'll need
 
 Before you begin, you'll need to make sure you have a couple of things before you start this lesson:
 
 * A [SMARS robot](/learn/smars/)
 * A USB Cable to connect to your computer
-* A Computer that can run the [Arduino IDE](https://create.arduino.cc/editor)
+* A Computer that can run the [Arduino IDE](https://www.arduino.cc/en/software)
 * A HC-SR04 [ultrasonic sensor](/resources/glossary#ultrasonic)
 
 ---
@@ -62,14 +58,24 @@ Before you begin, you'll need to make sure you have a couple of things before yo
 ## Preparation
 
 1. Connect the SMARS to the USB cable, and the USB Cable to your computer
-1. Launch the [Arduino IDE](https://create.arduino.cc/editor) on your computer
+1. Launch the [Arduino IDE](https://www.arduino.cc/en/software) on your computer
 1. Create a new Sketch, by clicking the `New Sketch` button
 
 ---
 
-## Lets code
+## Let's code
 
-You can download the code below from [GitHub](https://www.github.com/kevinmcaleer/lesson_03_sensors), but its better to type it in yourself line by line, as you will get to understand what each line means.
+You can download the code below from [GitHub](https://www.github.com/kevinmcaleer/lesson_03_sensors), but it's better to type it in yourself line by line, as you will get to understand what each line means.
+
+## Wiring
+
+| HC-SR04 pin | Arduino pin |
+| --- | --- |
+| VCC | 5V |
+| Trig | D7 |
+| Echo | D8 |
+| GND | GND |
+{:class="table table-striped"}
 
 ## The Range Finder program
 
@@ -89,7 +95,7 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   Serial.begin(9600);
-  Serial.println("Ultrasonic Sensor HC-SR07");
+  Serial.println("Ultrasonic Sensor HC-SR04");
   Serial.println("with Arduino UNO R3");
 }
 
@@ -130,11 +136,11 @@ After the first couple of comments is our first real line of code:
 #define trigPin 7  
 ```
 
-These two lines define the constants `echoPin` and `trigPin` which correspond to the Echo and Trigger pins on the [HC-SR07](/resources/glossary#ultrasonic) range finder.
+These two lines define the constants `echoPin` and `trigPin` which correspond to the Echo and Trigger pins on the [HC-SR04](/resources/glossary#ultrasonic) range finder.
 
-The Range finder has an ultrasonic speaker and an ultrasonic microphone. The Trigger is the speaker or output, and the echo is the microphone or input. We can output to the Triger by making the pin `HIGH` and stopping it sending out a signal by sending a `LOW` to the pin.
+The Range finder has an ultrasonic speaker and an ultrasonic microphone. The Trigger is the speaker or output, and the echo is the microphone or input. We can output to the trigger by making the pin `HIGH` and stopping it sending out a signal by sending a `LOW` to the pin.
 
-We can then read in the time taken for the echo pin to receive back the sound of the trigger pin by setting the pin `HIGH` on the echo pin and then reading in the value using the `pulseIn` function. This will return the time taken for the ping to bounce of any objects within range.
+We can then read in the time taken for the echo pin to receive back the sound of the trigger pin by setting the pin `HIGH` on the echo pin and then reading in the value using the `pulseIn` function. This will return the time taken for the ping to bounce off any objects within range.
 
 Next is:
 
@@ -185,11 +191,11 @@ void loop() {
 
 ---
 
-The important lines here are the the `digitalWrite(trigPin, LOW)` - which resets the range finder, and the `delayMicroseconds(2)` which allows the reset to occur.
+The important lines here are the `digitalWrite(trigPin, LOW)` - which resets the range finder, and the `delayMicroseconds(2)` which allows the reset to occur.
 
-Next the trigger pin is set high for 10 seconds using the three lines: `digitalWrite(trigPin, HIGH); delayMicroseconds(10); digitalWrite(trigPin, LOW);`
+Next the trigger pin is set high for 10 microseconds using the three lines: `digitalWrite(trigPin, HIGH); delayMicroseconds(10); digitalWrite(trigPin, LOW);`
 
-We then read in the time take for the ping signal to bounce of any objects using the `duration = pulseIn(echoPin, HIGH)` statement. The distance is then worked out by multiplying this distance by 0.034 and dividing that by 2 - `distance = duration * 0.034 / 2;`. The speed of sound is 340 m/s or 0.034 cm/µ and we have to divide it by two as the sound wave has to travel to the object, and then back again.
+We then read in the time taken for the ping signal to bounce off any objects using the `duration = pulseIn(echoPin, HIGH)` statement. The distance is then worked out by multiplying this duration by 0.034 and dividing that by 2 - `distance = duration * 0.034 / 2;`. The speed of sound is 340 m/s or 0.034 cm/µs and we have to divide it by two as the sound wave has to travel to the object, and then back again.
 
 Finally we print out the distance to the serial monitor using the last three lines.
 
@@ -209,15 +215,15 @@ Click the upload button to upload the code to the SMARS robot.
 
 ## Roving Robot
 
-We can now combine the code from [lesson 02](02_lesson_02) with the range finder code above to form an obstacle avoidance program.
+We can now combine the code from [lesson 02](02_lesson_02.html) with the range finder code above to form an obstacle avoidance program.
 
-The code essensially works like this:
+The code essentially works like this:
 
 ### Loop
 
 * ping the ultrasonic sensor & measure the distance to any objects
 * if its all clear then move forward
-* if there is an object less than 10 cmm away then go backwards then turn right
+* if there is an object less than 10 cm away, go backwards, then turn right
 
 Here is the code for the avoid program:
 
@@ -234,7 +240,7 @@ int motor_A_speed = 10;
 int motor_B_speed = 11;
 
 // set the time between motor on and motor off
-int wait_in_milliseconds = 1000;
+int wait_in_milliseconds = 500;
 
 // set the Rangefinder pins
 #define echoPin 8 
@@ -285,8 +291,8 @@ int ping(){
 void forward() {
 
   // set the direction to forward
-  digitalWrite(motor_A, HIGH);
-  digitalWrite(motor_B, LOW);
+  digitalWrite(motor_A, LOW);
+  digitalWrite(motor_B, HIGH);
 
   // set to full speed
   analogWrite(motor_A_speed, 255);
@@ -304,27 +310,8 @@ void forward() {
 void backward() {
 
   // set the direction to backward
-  digitalWrite(motor_A, LOW);
-  digitalWrite(motor_B, HIGH);
-
-  // set to full speed
-  analogWrite(motor_A_speed, 255);
-  analogWrite(motor_B_speed, 255);
-
-  // wait
-  delay(wait_in_milliseconds);
-
-  // stop
-  analogWrite(motor_A_speed, 0);
-  analogWrite(motor_B_speed, 0);
-}
-
-// turn left
-void turnLeft() {
-
-  // set the direction to backward
   digitalWrite(motor_A, HIGH);
-  digitalWrite(motor_B, HIGH);
+  digitalWrite(motor_B, LOW);
 
   // set to full speed
   analogWrite(motor_A_speed, 255);
@@ -341,9 +328,9 @@ void turnLeft() {
 // turn right
 void turnRight() {
 
-  // set the direction to backward
-  digitalWrite(motor_A, LOW);
-  digitalWrite(motor_B, LOW);
+  // set both motors the same direction to spin on the spot
+  digitalWrite(motor_A, HIGH);
+  digitalWrite(motor_B, HIGH);
 
   // set to full speed
   analogWrite(motor_A_speed, 255);
@@ -358,19 +345,17 @@ void turnRight() {
 }
 
 // the main program loop
-void loop(){
-  while (true) {
+void loop() {
+  int dist = ping();
 
-   int dist = ping();
-   if (dist < 5) {
-     turnLeft();
-   }
-   else {
-     forward();
-     // wait 
-    delay(wait_in_milliseconds);
-   }
-    
+  if (dist < 10) {
+    // something is in the way: back up, then turn away
+    backward();
+    turnRight();
+  }
+  else {
+    // all clear
+    forward();
   }
 }
 ```
@@ -379,12 +364,33 @@ void loop(){
 
 ## Congratulations
 
-You now have a real robot, that can take inputs from sensors in the real work and then act upon those readings.
+You now have a real robot, that can take inputs from sensors in the real world and then act upon those readings.
 
 ---
 
 ## Extra credit
 
-What other types of avoidance steps can you take other than go backwards and turn right? These are called algorithms, and there are many types of obstacle avoidance algorithms to choose from.
+What other ways of avoiding obstacles can you think of, other than going backwards and turning right? These are called algorithms, and there are many types of obstacle avoidance algorithms to choose from.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why do we divide by 2 when working out the distance?
+- [ ] Because there are two pins
+- [x] The sound travels to the object and back again, so it covers the distance twice
+- [ ] To convert millimetres to centimetres
+> The echo time is for the round trip, so half of it is the time to reach the object.
+
+? Which pin does the Arduino set `HIGH` for 10 microseconds to send out a ping?
+- [x] Trig
+- [ ] Echo
+- [ ] VCC
+> Trig sends the ping. Echo goes high while the sensor waits for the sound to come back.
+
+? In the avoid program, what does the robot do when something is closer than 10 cm?
+- [ ] Stops and waits
+- [ ] Speeds up
+- [x] Backs up, then turns right
+{% endquiz %}

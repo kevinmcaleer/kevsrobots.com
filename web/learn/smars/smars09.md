@@ -10,8 +10,9 @@ next: smars10.html
 description: Add Motor Shield to the Arduino
 percent: 60
 duration: 1
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:

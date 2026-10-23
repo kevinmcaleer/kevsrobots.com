@@ -9,7 +9,8 @@ previous: 17_apps.html
 description: Discover various Python tips, tricks, and best practices, such as writing
   Pythonic code, following PEP 8 style guide, and using the Black code formatter.
 percent: 100
-duration: 2
+duration: 3
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -88,16 +89,32 @@ for i in range(10):
 squares = [i * i for i in range(10)]
 ```
 
-- Use built-in functions and libraries:
+- Loop over items directly, and use `enumerate()` when you need the position too:
 
 ```python
+fruits = ["apple", "banana", "cherry"]
+
 # Non-Pythonic
-def reverse_string(s):
-    return s[::-1]
-    
+for i in range(len(fruits)):
+    print(i, fruits[i])
+
 # Pythonic
-from operator import itemgetter
-reverse_string = itemgetter(slice(None, None, -1))
+for i, fruit in enumerate(fruits):
+    print(i, fruit)
+```
+
+- Use built-in functions like `sum()`, `max()` and `sorted()` instead of writing your own loops:
+
+```python
+scores = [7, 3, 9]
+
+# Non-Pythonic
+total = 0
+for s in scores:
+    total += s
+
+# Pythonic
+total = sum(scores)
 ```
 
 ---
@@ -124,7 +141,7 @@ Here are some resources for further learning:
 
 - [Python Documentation](https://docs.python.org/3/): Official Python documentation and tutorials.
 - [Real Python](https://realpython.com/): Offers Python tutorials, articles, and other educational content.
-- [PyBites](https://codechalleng.es/): Python code challenges and exercises.
+- [PyBites](https://pybit.es/): Python code challenges and exercises.
 - [Project Euler](https://projecteuler.net/): A series of challenging mathematical/computer programming problems.
 
 ---
@@ -132,5 +149,23 @@ Here are some resources for further learning:
 ## Summary
 
 In this lesson, you've learned about Python best practices, such as writing Pythonic code, following the PEP 8 style guide, and using the Black code formatter. We've also shared some resources for further learning. Keep exploring and practicing Python to further enhance your skills.
+
+---
+
+{% quiz %}
+? Which is the most Pythonic way to add up a list called `scores`?
+- [ ] A `while` loop with a counter
+- [ ] `for i in range(len(scores))`
+- [x] `sum(scores)`
+> Built-in functions are shorter, clearer and usually faster.
+{% endquiz %}
+
+---
+
+## What's next?
+
+- [Data Manipulation with Pandas and Numpy](/learn/pandas_and_numpy/) - work with real data
+- [Create Databases with Python and SQLite3](/learn/sqlite3/) - store your data properly
+- [Learn MicroPython - The basics](/learn/micropython/) - use your Python skills to control electronics and robots
 
 ---

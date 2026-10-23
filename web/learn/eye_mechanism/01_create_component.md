@@ -7,9 +7,10 @@ cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
 date: 2023-01-29
 previous: 00_intro.html
 next: 02_create_sketch.html
-description: Creating the initial Compoent
-percent: 22
+description: Creating the initial Component
+percent: 20
 duration: 1
+quiz_total: 9
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -39,6 +40,10 @@ navigation:
       link: 07_create_lower_sketch.html
     - name: Create Hinge from Profile
       link: 08_hinge.html
+  - section: Joints and Export
+    content:
+    - name: Joints and Export
+      link: 09_joint_and_export.html
 ---
 
 
@@ -54,7 +59,7 @@ It will open on a fresh new blank design
 
 ## Create a Component
 
-* **Click Assemble** - Click on the Assemble drowdown button on the toolbar
+* **Click Assemble** - Click on the Assemble dropdown button on the toolbar
 
 ![Fusion full screen](assets/eye00.jpg){:class="img-fluid w-100"}
 
@@ -68,7 +73,7 @@ It will open on a fresh new blank design
 
 ---
 
-* **Look at the Browser** - Check that the new component has been created in the brwoser on the left hand side of the screen
+* **Look at the Browser** - Check that the new component has been created in the browser on the left hand side of the screen
 
 ![Create Component Dialog](assets/eye02.jpg){:class="img-fluid w-50"}
 

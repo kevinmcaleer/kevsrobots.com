@@ -10,7 +10,8 @@ next: 06_import_export.html
 description: Master the fundamental operations with Data Frames in Pandas, including
   data selection, filtering, sorting, and basic computations.
 percent: 40
-duration: 2
+duration: 3
+quiz_total: 17
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
@@ -55,7 +56,19 @@ navigation:
 
 ## Overview
 
-Welcome to the lesson on Basic Operations with Data Frames in Pandas. Data Frames are central to data manipulation in Pandas, and knowing how to effectively perform various operations on them is key to unlocking their full potential. This lesson covers essential techniques like selection, filtering, sorting, and basic computations.
+Data Frames are central to data manipulation in Pandas, and knowing how to select, filter, sort and summarise them is key to unlocking their power. In this lesson we'll use a small table of robot sensor readings, which we'll keep using for the next few lessons.
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'robot':   ['BurgerBot', 'SMARS', 'BurgerBot', 'SMARS', 'Quad', 'Quad'],
+    'sensor':  ['distance', 'distance', 'line', 'distance', 'imu', 'distance'],
+    'reading': [23.5, 41.0, 1.0, 12.2, None, 30.1],
+    'battery': [87, 64, 85, 60, 92, 90],
+})
+print(df)
+```
 
 ---
 
@@ -63,91 +76,114 @@ Welcome to the lesson on Basic Operations with Data Frames in Pandas. Data Frame
 
 ### Selecting Columns
 
-To select a single column, use the column label:
+To select a single column, use the column name. You get a Series back:
 
 ```python
-# Selecting a single column
-selected_column = df['ColumnName']
+batteries = df['battery']
 ```
 
-To select multiple columns, use a list of column labels:
+To select multiple columns, use a list of column names. You get a Data Frame back:
 
 ```python
-# Selecting multiple columns
-selected_columns = df[['Column1', 'Column2']]
+subset = df[['robot', 'battery']]
 ```
 
 ---
 
 ### Selecting Rows
 
-Rows can be selected by their position using `iloc` or by index using `loc`:
+Rows can be selected by their position using `iloc`, or by their index label using `loc`:
 
 ```python
-# Selecting rows by position
-rows_by_position = df.iloc[0:5]  # First five rows
+# By position: the first three rows
+first_three = df.iloc[0:3]
 
-# Selecting rows by index
-rows_by_index = df.loc['IndexLabel']
+# By label: the row whose index is 2
+row = df.loc[2]
 ```
+
+Our index is just the numbers 0 to 5, so `loc` and `iloc` look similar here. They behave differently once the index has other labels, such as names or dates.
 
 ---
 
 ## Filtering Data
 
-You can filter data based on conditions:
+Put a condition inside the square brackets to keep only the rows where it's true:
 
 ```python
-# Filtering data
-filtered_data = df[df['ColumnName'] > value]
+# Robots with more than 80% battery
+charged = df[df['battery'] > 80]
+
+# Combine conditions with & (and) and | (or), with brackets around each one
+smars_distance = df[(df['robot'] == 'SMARS') & (df['sensor'] == 'distance')]
 ```
 
 ---
 
 ## Sorting Data
 
-Data in a Data Frame can be sorted by the values of one or more columns:
-
 ```python
-# Sorting data
-sorted_data = df.sort_values(by='ColumnName')
+# Lowest battery first
+by_battery = df.sort_values(by='battery')
+
+# Highest battery first
+by_battery_desc = df.sort_values(by='battery', ascending=False)
 ```
 
 ---
 
 ## Basic Computations
 
-Pandas allows for basic statistical computations:
-
 ```python
-# Basic computations
-mean_value = df['ColumnName'].mean()
-sum_value = df['ColumnName'].sum()
+print(df['battery'].mean())   # average battery level
+print(df['battery'].sum())
+print(df['battery'].max())
 ```
+
+Pandas skips missing values in calculations like `mean()`, so the empty reading for the Quad doesn't cause an error.
 
 ---
 
 ## Dropping rows and columns
 
-You can drop rows or columns from a Data Frame:
-
 ```python
-# Dropping rows
-df_dropped_rows = df.drop([0, 1, 2])
+# Drop rows by index label
+fewer_rows = df.drop([0, 1])
 
-# Dropping columns
-df_dropped_columns = df.drop(['Column1', 'Column2'], axis=1)
+# Drop a column
+no_sensor = df.drop(columns=['sensor'])
 ```
+
+`drop()` returns a new Data Frame and leaves `df` unchanged. Assign the result back (`df = df.drop(...)`) to keep the change.
 
 > ## Axis
 >
-> Note that `axis=1` indicates that the operation should be performed on columns, whereas `axis=0` indicates
-> that it should be performed on rows.
+> You'll also see `df.drop(['sensor'], axis=1)`. `axis=1` means "columns" and `axis=0` means "rows". Using `columns=` is easier to read.
+
+---
+
+## Try it yourself
+
+Find all the readings from the `distance` sensor, sorted from nearest to furthest.
+
+{% quiz %}
+? What does `df[df['battery'] > 80]` return?
+- [ ] `True` or `False`
+- [x] Only the rows where battery is above 80
+- [ ] The battery column with values over 80 set to 80
+> A condition inside the brackets filters the rows.
+
+? What's the difference between `iloc` and `loc`?
+- [x] `iloc` uses positions, `loc` uses index labels
+- [ ] `iloc` selects columns, `loc` selects rows
+- [ ] There is no difference
+> `iloc[0]` is always the first row, while `loc[0]` is the row labelled 0.
+{% endquiz %}
 
 ---
 
 ## Summary
 
-In this lesson, we have covered the basics of data selection, filtering, sorting, and performing basic computations in Pandas. These operations are fundamental to data manipulation and analysis.
+In this lesson, we have covered data selection, filtering, sorting, and basic computations in Pandas. These operations are fundamental to data manipulation and analysis.
 
 ---

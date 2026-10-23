@@ -1,15 +1,16 @@
 ---
 layout: lesson
-title: Advanced Visualization with CVZone
+title: Annotating Your Video
 author: Kevin McAleer
 type: page
 cover: /learn/cvzone/assets/computer_vision.jpg
 date: 2023-10-07
 previous: 04_posture.html
-description: Dive deeper into CVZone's capabilities and learn how to annotate images
-  for better pose analysis insights.
+description: Overlay live text and feedback on your video with CVZone's putTextRect,
+  and build a curl counter
 percent: 100
-duration: 2
+duration: 4
+quiz_total: 10
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
@@ -17,102 +18,144 @@ navigation:
     content:
     - name: Computer Vision with CVZone
       link: 00_intro.html
-    - name: Watch the demonstration
-      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone
       link: 01_install.html
-  - section: Face, Hand and Posture Detection
+  - section: Face, Hand and Pose Detection
     content:
     - name: Face Detection
       link: 02_face.html
     - name: Hand Detection
       link: 03_hand.html
-    - name: Posture Detection
+    - name: Pose Detection
       link: 04_posture.html
-    - name: Advanced Visualization with CVZone
+    - name: Annotating Your Video
       link: 05_advanced.html
 ---
 
 
-## Advanced Visualization with CVZone
+## Annotating your video
 
-Enhancing visual feedback is essential, especially when working with posture detection. With CVZone's utilities like `putText`, you can overlay important information onto your video stream, providing real-time feedback and insights.
-
----
-
-## Annotating with Text
-
-CVZone offers a `putText` function similar to OpenCV's, but with an easier interface. Let's explore how to use it:
-
-1. **Basic Text Annotation:**
-
-   With CVZone, you can effortlessly overlay text on images or video frames:
-
-   ```python
-   from cvzone.Utils import putText
-   img = putText(img, "Detected Posture", [50, 50])
-   ```
-
-   This adds the text "Detected Posture" at the coordinate (50, 50) on the image.
-
-2. **Displaying Dynamic Data:**
-
-   Annotate the image with real-time, dynamic data, such as the angle between specific landmarks:
-
-   ```python
-   angle, img = detector.findAngle(lmList[11][0:2], lmList[13][0:2], lmList[15][0:2], img=img)
-   img = putText(img, f"Angle: {angle:.2f}°", [50, 80])
-   ```
+Printing numbers to the terminal is fine for testing, but it's much nicer to show feedback right on the video. CVZone's `putTextRect()` draws text on a coloured background, so it's easy to read whatever is behind it.
 
 ---
 
-## Enhancing Visualization
-
-Now, let's build on our previous code to make it more sophisticated with added visualizations:
+## Adding text
 
 ```python
-from cvzone.PoseModule import PoseDetector
-from cvzone.Utils import putText
+import cvzone
+
+img, bbox = cvzone.putTextRect(img, "Hello!", (50, 50))
+```
+
+- The position is where the text starts, in pixels from the top left corner
+- It returns the image and the box around the text
+
+You can change the look with a few options:
+
+```python
+img, _ = cvzone.putTextRect(img, "Hello!", (50, 50),
+                            scale=2, thickness=2,
+                            colorT=(255, 255, 255),   # text colour
+                            colorR=(255, 0, 255))     # background colour
+```
+
+> ## Colours are BGR
+>
+> OpenCV colours are `(blue, green, red)`, not `(red, green, blue)`. So `(0, 0, 255)` is red and `(255, 0, 0)` is blue.
+
+---
+
+## A bicep curl counter
+
+Let's put the last lesson to work. This program watches your left elbow and counts a curl each time you bend your arm fully and straighten it again.
+
+```python
 import cv2
+import cvzone
+from cvzone.PoseModule import PoseDetector
 
 cap = cv2.VideoCapture(0)
 detector = PoseDetector()
 
+count = 0
+arm_bent = False
+
 while True:
     success, img = cap.read()
+    if not success:
+        break
+
     img = detector.findPose(img)
     lmList, _ = detector.findPosition(img, draw=False)
 
     if lmList:
         angle, img = detector.findAngle(lmList[11][0:2], lmList[13][0:2], lmList[15][0:2], img=img)
-        img = putText(img, f"Angle: {angle:.2f}°", [50, 80], fontSize=1, color=(255, 0, 255))
 
-        # Check posture and provide real-time feedback
-        if angle > 50:
-            feedback = "Poor Posture!"
-            img = putText(img, feedback, [50, 120], fontSize=1.2, color=(0, 0, 255))
-        else:
-            feedback = "Good Posture!"
-            img = putText(img, feedback, [50, 120], fontSize=1.2, color=(0, 255, 0))
+        if angle < 50 and not arm_bent:
+            arm_bent = True
+        elif angle > 150 and arm_bent:
+            arm_bent = False
+            count += 1
 
-    cv2.imshow("Image", img)
-    cv2.waitKey(1)
+        status = "Bent" if arm_bent else "Straight"
+        colour = (0, 165, 255) if arm_bent else (0, 200, 0)
+        img, _ = cvzone.putTextRect(img, f"Angle: {int(angle)}", (50, 60), scale=2, thickness=2)
+        img, _ = cvzone.putTextRect(img, status, (50, 120), scale=2, thickness=2, colorR=colour)
+
+    img, _ = cvzone.putTextRect(img, f"Curls: {count}", (50, 200), scale=3, thickness=3, colorR=(255, 0, 0))
+
+    cv2.imshow("Curl Counter", img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
 ```
 
 ---
 
-## Further Exploration
+## How it works
 
-- **Custom Annotations:** Experiment with different text positions, sizes, and colors to make the feedback more intuitive.
+- `arm_bent` remembers whether the arm was last seen bent or straight
+- A curl only counts when the arm goes from bent (below 50 degrees) back to straight (above 150 degrees). The gap between the two numbers stops one wobbly movement being counted several times
+- The status label changes colour so you can see the state at a glance
+- The count is drawn outside the `if lmList:` block, so it stays on screen even when you step out of view
 
-- **Interactive Feedback:** Use CVZone's functionalities to draw shapes, lines, or even custom animations to make your application more interactive.
-
-- **Integration:** Think about integrating the posture detection system with other applications or even using it as an input method (e.g., a game controlled by your posture).
+> ## No degree symbol
+>
+> OpenCV's built-in fonts can't draw `°`, so it would show up as `??`. Stick to plain text in your labels.
 
 ---
 
-By leveraging CVZone's comprehensive utilities, you can transform basic detection code into an informative, interactive, and user-friendly application.
+## Further exploration
+
+- **Both arms:** count curls on the right arm too, using landmarks 12, 14 and 16
+- **Other exercises:** squats use the hip, knee and ankle (23, 25, 27)
+- **Other drawing tools:** `cvzone.cornerRect()` draws a stylish box around a `bbox`, and `cvzone.stackImages()` puts several images side by side
+
+---
+
+{% quiz %}
+? Which colour is `(0, 0, 255)` in OpenCV?
+- [ ] Blue
+- [x] Red
+- [ ] Green
+> OpenCV uses BGR order, so the last number is red.
+
+? Why does the curl counter use two thresholds (50 and 150) instead of one?
+- [ ] To make the program faster
+- [x] So small wobbles around one angle don't count as several curls
+- [ ] Because `findAngle()` returns two values
+> The gap means the arm has to fully bend and fully straighten before a curl is counted.
+{% endquiz %}
+
+---
+
+## What's next?
+
+- [Building Object Detection Models with Raspberry Pi AI Camera](/learn/object_model/) - train and run your own object detection model
+- Combine hand or face tracking with a robot from [Build a SMARS Robot](/learn/smars/) or [BurgerBot](/learn/burgerbot/)
 
 ---

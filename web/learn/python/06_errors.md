@@ -10,7 +10,8 @@ next: 07_libraries.html
 description: Learn how to handle errors and exceptions in your Python programs to
   ensure they can recover gracefully from unexpected issues.
 percent: 30
-duration: 2
+duration: 3
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -116,6 +117,22 @@ x = -5
 if x < 0:
     raise ValueError("x cannot be negative")
 ```
+
+---
+
+{% quiz %}
+? When does a `finally` block run?
+- [ ] Only when there's an error
+- [ ] Only when there's no error
+- [x] Every time, error or not
+> `finally` is for clean-up code that must always run.
+
+? What does `int("hello")` raise?
+- [x] `ValueError`
+- [ ] `ZeroDivisionError`
+- [ ] `FileNotFoundError`
+> The string can't be turned into a number, so Python raises a `ValueError`.
+{% endquiz %}
 
 ---
 

@@ -10,7 +10,8 @@ next: 11_data_visualisation.html
 description: Understand the basics of web scraping using Python, including the use
   of libraries like Beautiful Soup and requests.
 percent: 50
-duration: 2
+duration: 3
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -81,7 +82,11 @@ Web scraping is the process of extracting information directly from a web page. 
 
 ### Downloading Web Pages with `requests`
 
-The `requests` library allows you to send HTTP requests using Python. You can use it to download web pages.
+The `requests` library allows you to send HTTP requests using Python. You can use it to download web pages. Install it, and Beautiful Soup, with:
+
+```bash
+pip install requests beautifulsoup4
+```
 
 ```python
 import requests
@@ -118,6 +123,24 @@ title_tag = soup.find('title')
 # Print the text of the title tag
 print(title_tag.text)
 ```
+
+---
+
+## Scrape responsibly
+
+- Check the site's terms of use and its `robots.txt` file (for example `https://www.example.com/robots.txt`) to see what it allows
+- Don't hammer a site with requests: add a pause with `time.sleep()` between pages
+- If the site offers an API, use that instead. It's more reliable than scraping
+
+---
+
+{% quiz %}
+? What does a status code of `200` mean?
+- [x] The request succeeded
+- [ ] The page wasn't found
+- [ ] The server had an error
+> 200 means OK. 404 means not found, and 500 is a server error.
+{% endquiz %}
 
 ---
 

@@ -9,7 +9,8 @@ previous: 01_introduction.html
 next: 03_data_types.html
 description: Learn the basics of Redis and how to use it with Python.
 percent: 20
-duration: 3
+duration: 4
+quiz_total: 14
 navigation:
 - name: Using Redis with Python
 - content:
@@ -74,7 +75,51 @@ Redis data is organized into key-value pairs, where the key is a string and the 
 
 ### Installing and Configuring Redis
 
-To install Redis, you can download it from the Redis website and follow the installation instructions for your operating system. Once Redis is installed, you can start the Redis server using the `redis-server` command. By default, Redis listens on port 6379, but you can change this in the Redis configuration file.
+Pick whichever option suits your computer:
+
+**Raspberry Pi OS, Debian or Ubuntu**
+
+```bash
+sudo apt update
+sudo apt install redis-server
+```
+
+The server starts automatically and runs in the background.
+
+**macOS** (with [Homebrew](https://brew.sh))
+
+```bash
+brew install redis
+brew services start redis
+```
+
+**Any computer with Docker** (including Windows)
+
+```bash
+docker run -d --name redis -p 6379:6379 redis
+```
+
+See the [Docker course](/learn/docker/) if you're new to Docker.
+
+To check Redis is running, use the `redis-cli` command-line tool (inside Docker, use `docker exec -it redis redis-cli`):
+
+```bash
+redis-cli ping
+```
+
+If you see `PONG`, you're ready. You can type any Redis command into `redis-cli` to try it out, which is handy for the command examples in later lessons.
+
+By default, Redis listens on port `6379`, but you can change this in the Redis configuration file.
+
+---
+
+### Install the Python library
+
+```bash
+pip install redis
+```
+
+On Raspberry Pi OS, create and activate a virtual environment first (`python3 -m venv ~/redis-env` then `source ~/redis-env/bin/activate`).
 
 ---
 
@@ -85,19 +130,51 @@ To use Redis with Python, you can use the Redis Python library, which provides a
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379)
+redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 # Set a string value
 redis_client.set('mykey', 'myvalue')
 
 # Get a string value
 value = redis_client.get('mykey')
+print(value)   # myvalue
 
 # Delete a key
 redis_client.delete('mykey')
 ```
 
-In this example, we create a Redis client using the redis.Redis method, which connects to the Redis server on localhost at port 6379. We then use the set method to set a string value for the key mykey, and the get method to retrieve the value. We also use the delete method to delete the key and its value.
+In this example, we create a Redis client with `redis.Redis()`, which connects to the Redis server on localhost at port 6379. We then use `set()` to store a string value for the key `mykey`, and `get()` to retrieve it. Finally, `delete()` removes the key and its value.
+
+> ## Bytes or strings?
+>
+> Redis stores everything as bytes. Without `decode_responses=True`, `get()` returns `b'myvalue'` instead of `'myvalue'`. We use `decode_responses=True` throughout this course so you get normal Python strings back.
+
+---
+
+### Keys that expire
+
+One of Redis's handiest tricks is that keys can delete themselves after a set time. That's perfect for caching:
+
+```python
+redis_client.set('weather', 'sunny', ex=60)   # expires in 60 seconds
+print(redis_client.ttl('weather'))            # seconds left to live
+```
+
+---
+
+{% quiz %}
+? Which port does Redis listen on by default?
+- [ ] 80
+- [ ] 5432
+- [x] 6379
+> 6379 is Redis's default port. You can change it in the configuration file.
+
+? Why do we pass `decode_responses=True` when connecting?
+- [ ] It makes Redis faster
+- [x] So results come back as Python strings instead of bytes
+- [ ] It's required to connect to localhost
+> Redis returns bytes by default, like `b'myvalue'`.
+{% endquiz %}
 
 ---
 
