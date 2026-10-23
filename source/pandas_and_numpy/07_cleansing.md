@@ -10,7 +10,19 @@ cover: /learn/pandas_and_numpy/assets/pandas06.png
 
 ## Overview
 
-In this lesson, we delve into Data Cleaning and Preparation with Pandas. Effective data analysis often requires thorough cleaning and preparation of datasets. This lesson covers key techniques like handling missing data, transforming data, and filtering to prepare your datasets for analysis.
+Real data is messy: values go missing, rows get duplicated and text comes in different shapes. In this lesson we'll clean up the robot sensor data from the last lesson.
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    'robot':   ['BurgerBot', 'SMARS', 'BurgerBot', 'SMARS', 'Quad', 'Quad'],
+    'sensor':  ['distance', 'distance', 'line', 'distance', 'imu', 'distance'],
+    'reading': [23.5, 41.0, 1.0, 12.2, None, 30.1],
+    'battery': [87, 64, 85, 60, 92, 90],
+})
+print(df)
+```
 
 ---
 
@@ -18,40 +30,59 @@ In this lesson, we delve into Data Cleaning and Preparation with Pandas. Effecti
 
 ### Identifying Missing Data
 
-Pandas provides functions to identify and handle missing data:
+Missing values show up as `NaN` (Not a Number). To find them:
 
 ```python
-# Identifying missing data
-missing_data = df.isnull()
+print(df.isna())          # True wherever a value is missing
+print(df.isna().sum())    # how many are missing in each column
 ```
+
+`isnull()` does exactly the same as `isna()`.
 
 ---
 
 ### Filling Missing Data
 
-You can fill missing data with a specific value or interpolated values:
+You can fill missing data with a fixed value, a calculated value, or by interpolating between neighbours:
 
 ```python
-# Filling missing data with a specific value
-df_filled = df.fillna(value)
+# Fill with zero
+df_zero = df.fillna({'reading': 0})
 
-# Interpolating missing values
-df_interpolated = df.interpolate()
+# Fill with the column average
+df_mean = df.fillna({'reading': df['reading'].mean()})
+
+# Estimate from the values either side
+df['reading_estimated'] = df['reading'].interpolate()
 ```
+
+Interpolating works best when rows are in a meaningful order, such as readings over time.
 
 ---
 
 ### Dropping Missing Data
 
-Alternatively, you can choose to drop rows or columns with missing values:
+Alternatively, you can drop rows or columns with missing values:
 
 ```python
-# Dropping rows with missing data
+# Drop rows with any missing data
 df_dropped_rows = df.dropna()
 
-# Dropping columns with missing data
+# Drop columns with any missing data
 df_dropped_columns = df.dropna(axis=1)
 ```
+
+---
+
+## Removing duplicates
+
+To remove rows that are exact copies of another row, use `drop_duplicates()`:
+
+```python
+df = df.drop_duplicates()
+```
+
+Pass `subset=['robot', 'sensor']` to treat rows as duplicates when only those columns match.
 
 ---
 
@@ -59,39 +90,75 @@ df_dropped_columns = df.dropna(axis=1)
 
 ### Applying Functions
 
-Transform data by applying a function to each column or row:
+`apply()` runs a function on every value in a column:
 
 ```python
-# Applying a function
-df_transformed = df.apply(function)
+# Convert distance readings from cm to inches
+df['inches'] = df['reading'].apply(lambda cm: cm / 2.54)
+```
+
+For simple maths like this, operating on the whole column is shorter and much faster, and gives the same result:
+
+```python
+df['inches'] = df['reading'] / 2.54
 ```
 
 ---
 
 ### Replacing Values
 
-Replace specific values in the DataFrame:
+Replace specific values in a column:
 
 ```python
-# Replacing values
-df_replaced = df.replace(original_value, new_value)
+df['sensor'] = df['sensor'].replace('imu', 'motion')
 ```
 
 ---
 
-## Data Filtering
+### Tidying text
 
-Filter data based on conditions or values:
+The `.str` accessor applies string methods to a whole column:
 
 ```python
-# Filtering data
-filtered_data = df[df['ColumnName'] > value]
+df['robot'] = df['robot'].str.strip().str.lower()
 ```
+
+This removes stray spaces and makes the names lower case, so `'SMARS '` and `'smars'` count as the same robot.
+
+---
+
+### Changing data types
+
+Columns sometimes load with the wrong type, such as numbers stored as text. Use `astype()` to convert them:
+
+```python
+df['battery'] = df['battery'].astype(float)
+print(df.dtypes)
+```
+
+---
+
+## Try it yourself
+
+Fill the Quad's missing reading with the average of the other `distance` readings, then check `df.isna().sum()` shows no missing values.
+
+{% quiz %}
+? What does `df.isna().sum()` tell you?
+- [x] How many missing values each column has
+- [ ] The total of every column
+- [ ] Which rows are duplicates
+> `isna()` gives True for each missing value, and `sum()` counts the Trues in each column.
+
+? Which is usually faster for simple maths on a whole column?
+- [ ] `df['reading'].apply(lambda cm: cm / 2.54)`
+- [x] `df['reading'] / 2.54`
+> Vectorised column operations run in fast compiled code instead of calling a Python function for every value.
+{% endquiz %}
 
 ---
 
 ## Summary
 
-This lesson covered essential techniques in data cleaning and preparation using Pandas. Handling missing data, transforming data, and filtering are critical steps in preparing your dataset for analysis.
+This lesson covered essential techniques in data cleaning and preparation using Pandas: finding and handling missing data, removing duplicates, transforming values and fixing data types.
 
 ---

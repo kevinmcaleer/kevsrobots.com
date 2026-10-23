@@ -26,7 +26,7 @@ A Data Frame in Pandas is a two-dimensional, size-mutable[^1], and potentially h
 
 **Data Frame Axis**
 
-Data Frame Axis are the horizontal and vertical lines that contain the labels for rows and columns. The horizontal axis is called the index, and the vertical axis is called the columns.
+A Data Frame has two axes. **Axis 0** runs down the rows, and its labels are called the `index`. **Axis 1** runs across the columns, and its labels are the column names. You'll see `axis=0` and `axis=1` in many Pandas methods.
 
 ![A Dataframe image](assets/axis.png){:class="img-fluid w-50"}
 
@@ -124,6 +124,8 @@ print(df.head()) # first five rows
 print(df.tail()) # last five rows
 ```
 
+Our Data Frame only has three rows, so both show all of it. Pass a number to see fewer, like `df.head(2)`.
+
 ---
 
 ### Data Selection
@@ -134,7 +136,7 @@ You can select a specific column or row from a Data Frame:
 # Selecting a column
 print(df['Name'])
 
-# Selecting a row
+# Selecting a row by position (rows count from 0, so this is Bob)
 print(df.iloc[1])
 ```
 
@@ -164,11 +166,17 @@ df['Salary'] = [75000, 85000, 95000]
 
 ---
 
-If you want to replace just a single value, you can use `df.replace()`:
+If you want to replace one value wherever it appears, you can use `replace()`:
 
 ```python
-# Replacing a single value
+# Replace every 75000 with 76000
 df['Salary'] = df['Salary'].replace(75000, 76000)
+```
+
+To change one particular cell, use `loc` with the row label and column name:
+
+```python
+df.loc[0, 'Salary'] = 77000   # Alice's salary
 ```
 
 ---
@@ -178,6 +186,21 @@ df['Salary'] = df['Salary'].replace(75000, 76000)
 Experiment with what you have learned in this lesson below:
 
 <figure style="margin:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden"><iframe src="https://coddy.tech/embed-editor?lang=matplotlib&theme=light&layout=stacked&code=aW1wb3J0IHBhbmRhcyBhcyBwZAoKZGF0YSA9IHsKICAgICdOYW1lJzogWydBbGljZScsICdCb2InLCAnQ2hhcmxpZSddLAogICAgJ0FnZSc6IFsyNSwgMzAsIDM1XSwKICAgICdDaXR5JzogWydOZXcgWW9yaycsICdQYXJpcycsICdMb25kb24nXQp9CgpkZiA9IHBkLkRhdGFGcmFtZShkYXRhKQpwcmludChkZikKcHJpbnQoZGYuc2hhcGUpCgojIEFkZCBhIGNvbHVtbiwgdGhlbiBkZWxldGUgb25lCmRmWydTYWxhcnknXSA9IFs3MDAwMCwgODAwMDAsIDkwMDAwXQpkZWwgZGZbJ0FnZSddCnByaW50KGRmKQo&credit=0" width="100%" height="460" style="display:block;border:0;width:100%" title="Python code editor by Coddy" loading="lazy"></iframe><figcaption style="box-sizing:border-box;padding:5px 12px;font:11px/1.4 system-ui,-apple-system,sans-serif;color:#64748b;background:#f1f5f9;border-top:1px solid #e2e8f0;text-align:right" dir="ltr">Powered by <a href="https://coddy.tech/embed" target="_blank" rel="noopener" style="color:#0077ff;font-weight:600;text-decoration:none;">Coddy</a></figcaption></figure>
+
+---
+
+{% quiz %}
+? A Data Frame has 10 rows and 4 columns. What does `df.shape` return?
+- [ ] `(4, 10)`
+- [x] `(10, 4)`
+- [ ] `40`
+> `shape` is always (rows, columns).
+
+? Which axis runs across the columns?
+- [ ] Axis 0
+- [x] Axis 1
+> Axis 0 is the rows (the index) and axis 1 is the columns.
+{% endquiz %}
 
 ---
 

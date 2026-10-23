@@ -16,7 +16,7 @@ In this lesson, we will walk through the process of installing Pandas and NumPy.
 
 ## Prerequisites
 
-Before installing Pandas and NumPy, make sure you have Python installed on your system. Python 3.6 or later is recommended for the best experience. You can check your Python version by running:
+Before installing Pandas and NumPy, make sure you have Python installed on your system. Current versions of Pandas need Python 3.10 or later. You can check your Python version by running:
 
 ```shell
 python --version
@@ -31,11 +31,20 @@ Pandas and NumPy can be easily installed using Python's package manager, pip. If
 Run the following commands in your terminal or command prompt to install Pandas and NumPy:
 
 ```shell
-pip install pandas
-pip install numpy
+pip install pandas numpy
 ```
 
-These commands download and install the latest versions of Pandas and NumPy from the Python Package Index (PyPI).
+This downloads and installs the latest versions of Pandas and NumPy from the Python Package Index (PyPI).
+
+> ## On a Raspberry Pi or recent Linux
+>
+> If pip says `externally-managed-environment`, create a virtual environment first:
+>
+> ```shell
+> python3 -m venv ~/data-env
+> source ~/data-env/bin/activate
+> pip install pandas numpy matplotlib
+> ```
 
 ---
 
@@ -68,14 +77,13 @@ For other issues, consulting the official Pandas and NumPy documentation or comm
 
 ## Jupyter Notebooks
 
-You may prefer to use a Juypter Notebook, such as the free Google Collaboratory, to run your code. If so, you can install Pandas and NumPy in a Jupyter Notebook by running the following commands in a code cell:
+You may prefer to use a Jupyter Notebook, such as the free Google Colaboratory (Colab), to run your code. Colab already has Pandas and NumPy installed. In other notebooks you can install them by running this in a code cell:
 
 ```python
-!pip install pandas
-!pip install numpy
+%pip install pandas numpy
 ```
 
-To access Google Collaboratory, you will need a Google account. You can access Google Collaboratory here - <https://colab.research.google.com/>.
+To use Google Colab, you will need a Google account. You can access it here - <https://colab.research.google.com/>.
 
 ---
 
