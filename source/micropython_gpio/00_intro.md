@@ -2,64 +2,70 @@
 layout: lesson
 title: Introduction
 type: page
-description: Learn how to control the GPIO pins on the Raspberry Pi Pico with MicroPython, and connect different components such as LEDs, motors, and sensors.
+description: Learn how to control the GPIO pins on the Raspberry Pi Pico with MicroPython, and connect LEDs, motors, servos and sensors.
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}
 
+## Watch the videos
+
+This course has two companion videos. Part 1 covers pin types, digital I/O and PWM; Part 2 covers analog input, the communication buses, servos and sensors.
+
+{% include youtubeplayer.html id="M-0P6ipVwNU" %}
+
+{% include youtubeplayer.html id="NlybkEO_2iU" %}
+
+---
+
 ## Overview
 
-Welcome to the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course! In this course, you will learn the basics of using MicroPython to control the GPIO pins on the Raspberry Pi Pico. You will learn how to connect different components to the board, including LEDs, motors, and sensors, and how to control them with MicroPython code.
+Welcome to `Raspberry Pi Pico with MicroPython - GPIO Mastery`! The Pico's GPIO (General Purpose Input/Output) pins are how your code reaches out and touches the real world. In this course you'll learn what each kind of pin can do, how to wire things up safely, and how to drive LEDs, motors, servos and sensors from MicroPython.
 
 ## Course Content
 
-This course is divided into the following lessons:
+The course is split into short sections:
 
-1. Introduction to MicroPython
-2. GPIO Pins and Pin Numbering
-3. Digital I/O and PWM
-4. Analog Inputs and ADC
-5. I2C and SPI
-6. Ultrasonic Range Finders
-7. Using Servos
-8. Using Motors
-9. Using Potentiometers
-10. Using Temperature Sensors
-11. Recap and Review
+1. **Introduction to GPIO pins** - pin types, pin numbering and voltage levels
+2. **Digital I/O and PWM** - buttons, LEDs and motors
+3. **Analog I/O (ADC)** - reading voltages, potentiometers and temperature sensors
+4. **UART, I2C and SPI** - talking to other chips and modules
+5. **Servos and ultrasonic range finders** - two robot favourites
+6. **Ground pins** - why every circuit needs a common ground
+7. **Recap and review**
 
 ## Key Results
 
 After completing this course, you will be able to:
 
-* Understand the basics of MicroPython and how to use it to control the Raspberry Pi Pico
-* Connect different components to the board and control them with MicroPython code
-* Identify different types of GPIO pins and their functions
-* Use analog inputs and ADC to read sensor data
-* Use I2C and SPI to communicate with other devices
-* Understand the basics of using ultrasonic range finders, servos, motors, potentiometers, and temperature sensors
+* Identify the different types of GPIO pins on the Pico and find them on the pinout
+* Use digital inputs and outputs, including pull-up resistors for buttons
+* Use PWM to fade LEDs, set motor speed and position servos
+* Read analog voltages with the ADC
+* Talk to other devices over UART, I2C and SPI
+* Keep your Pico safe by respecting its 3.3V logic level
 
 ---
 
 ## What you'll need
 
-To follow this course, you will need:
+* A Raspberry Pi Pico or Pico W with MicroPython installed (see [How to install MicroPython](/learn/how_to_install_micropython/))
+* A computer with [Thonny](https://thonny.org) to edit and run code
+* A breadboard, jumper wires, a few LEDs and 220Ω resistors, and a push button
+* Optional parts for the later lessons: a 10kΩ potentiometer, a small DC motor and motor driver (L293D or DRV8833), an SG90 servo, an HC-SR04 range finder and a DS18B20 or DHT11 temperature sensor
 
-* A computer, tablet, or phone to read the course material from
-* A Raspberry Pi Pico board
-* Jumper wires and a breadboard for hands-on practice
-* Different components to connect to the board, such as LEDs, motors, sensors, and other electronic components.
+---
+
+## Prerequisites
+
+You should be comfortable writing simple Python programs. If you're brand new to MicroPython, take [Learn MicroPython - The basics](/learn/micropython/) first.
 
 ---
 
 ## How the course works
 
-Each lesson in this course is designed to be self-contained and can be completed in any order. The lessons start with an overview of the topic and then dive into the details with examples of real code.
+Each lesson explains one idea, then shows real code you can run on your Pico. Most lessons end with a **Try it yourself** challenge and a quick quiz. Your quiz score and progress are saved in your browser and shown in the sidebar.
 
-New keywords are introduced and explained, and are highlighted to help emphasize them.
-
-For example, keywords are highlighted inline with the lesson text like `this`.
-
-Important notes will be highlighted in sections like the two below:
+New keywords are highlighted inline like `this`.
 
 > ## This is a note
 >
@@ -74,6 +80,6 @@ Important notes will be highlighted in sections like the two below:
 
 ---
 
-We hope that you find this course useful and informative. If you have any questions or feedback, please feel free to ask in the comments section or contact us directly. Let's get started!
+Let's get started!
 
 ---

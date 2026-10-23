@@ -7,90 +7,88 @@ description: Learn about digital input and output with Raspberry Pi Pico using M
 
 ## Overview
 
-Welcome to Lesson 4 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will explore digital input and output with the Raspberry Pi Pico using MicroPython.
+Digital I/O is the simplest thing a GPIO pin can do: a pin is either on (`1`) or off (`0`). In this lesson you'll make outputs, read inputs and wire up a button the right way.
 
 ---
 
-## Course Content
+## Digital input and output
 
-In this lesson, you will learn:
+**Digital output** means the Pico sets a pin high (3.3V) or low (0V), for example to turn an LED on or off.
 
-* What digital input and output are
-* How to configure Raspberry Pi Pico pins for digital I/O
-* How to read and write digital values using MicroPython
+**Digital input** means the Pico reads whether a pin is high or low, for example to tell whether a button is pressed.
 
 ---
 
-## Digital Input and Output
+## Configuring pins for digital I/O
 
-Digital input and output (I/O) refers to the process of sending and receiving digital signals to and from a microcontroller or computer. In the case of the Raspberry Pi Pico, digital I/O is used to communicate with other devices, such as sensors, switches, and LEDs.
-
-Digital output is the process of sending digital signals from the Raspberry Pi Pico to other devices. This can be used to control LEDs or to send signals to other devices that can be used for various purposes.
-
-Digital input is the process of receiving digital signals from other devices. This can be used to read values from sensors or switches.
-
-## Configuring Raspberry Pi Pico Pins for Digital I/O
-
-To use a pin on the Raspberry Pi Pico for digital I/O, you need to configure it as either an `input` or an `output`. This is done using the `Pin` class in MicroPython. To configure a pin as an `input`, you can use the following code:
+You choose what a pin does with the `Pin` class from the `machine` module.
 
 ```python
 from machine import Pin
 
-# Configure pin 0 as an input
-pin = Pin(0, Pin.IN)
-```
-
-To configure a pin as an `output`, you can use the following code:
-
-```python
-from machine import Pin
-
-# Configure pin 1 as an output
-pin = Pin(1, Pin.OUT)
+led = Pin(15, Pin.OUT)                   # GP15 as an output
+button = Pin(14, Pin.IN, Pin.PULL_UP)    # GP14 as an input with the pull-up resistor on
 ```
 
 ---
 
-## Reading and Writing Digital Values
-
-Once a pin has been configured for digital I/O, you can read and write digital values to and from it. To read the value of a digital input pin, you can use the value() method of the Pin class. For example:
+## Writing digital values
 
 ```python
-from machine import Pin
-
-# Configure pin 0 as an input
-pin = Pin(0, Pin.IN)
-
-# Read the value of the input pin
-value = pin.value()
+led.value(1)   # on
+led.value(0)   # off
+led.toggle()   # flip to the other state
 ```
 
-The value variable will contain the value of the input pin.
-
-To write a digital value to a pin, you can use the value() method of the Pin class. For example:
+## Reading digital values
 
 ```python
-from machine import Pin
-
-# Configure pin 1 as an output
-pin = Pin(1, Pin.OUT)
-
-# Set the value of the output pin to 1
-pin.value(1)
+print(button.value())
 ```
 
-This will set the value of the output pin to 1.
+`value()` with no argument returns `0` or `1`.
 
 ---
 
-## Conclusion
+## Wiring a button with a pull-up
 
-In this lesson, you learned about digital input and output, how to configure Raspberry Pi Pico pins for digital I/O, and how to read and write digital values using MicroPython. You can use this knowledge to communicate with other devices, such as sensors, switches, and LEDs.
+An input pin that isn't connected to anything "floats" and reads random values. A pull-up resistor holds it at `1` until something pulls it to ground. The Pico has these resistors built in, so you only need `Pin.PULL_UP`.
+
+Wire one leg of the button to `GP14` and the other leg to `GND`. Now the pin reads `1` when the button is up and `0` when it's pressed.
+
+```python
+from machine import Pin
+from time import sleep
+
+led = Pin(15, Pin.OUT)
+button = Pin(14, Pin.IN, Pin.PULL_UP)
+
+while True:
+    if button.value() == 0:   # pressed
+        led.value(1)
+    else:
+        led.value(0)
+    sleep(0.01)
+```
 
 ---
 
-## Key Results
+## Try it yourself
 
-After you have completed this lesson, you will have a solid understanding of digital input and output with the Raspberry Pi Pico using MicroPython. You will be able to configure pins for digital I/O, read digital values from sensors, and control digital devices such as LEDs and switches.
+Change the program so each press *toggles* the LED instead of only lighting it while you hold the button. Hint: remember the last button value and only act when it changes from `1` to `0`.
+
+{% quiz %}
+? A button is wired between GP14 and GND, with `Pin.PULL_UP`. What does `button.value()` return while it's pressed?
+- [x] 0
+- [ ] 1
+- [ ] It changes randomly
+> Pressing the button connects the pin to ground, so it reads 0. The pull-up makes it read 1 when released.
+
+? What happens to an input pin with no pull-up or pull-down and nothing connected?
+- [ ] It always reads 0
+- [x] It floats and can read random values
+- [ ] It reads 3.3V as an analog value
+> A floating input picks up electrical noise. Pull resistors give it a known default.
+{% endquiz %}
 
 ---
