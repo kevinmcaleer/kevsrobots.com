@@ -1,3 +1,13 @@
+- published: 2026/10/25
+  video_id: epuO7xpz6i4
+  title: "I Taught a Computer to Learn From Its Mistakes"
+  type: video
+  strategy: home
+- published: 2026/10/04
+  video_id: pJkOEz_k8v0
+  title: "I Built a Chess Computer That Plays on a REAL Board (Arduino Uno Q project)"
+  type: livestream
+  strategy: home
 - published: 2026/09/20
   video_id: HJYdGICcw0k
   title: "My Robot Dodges Obstacles, and I Never Coded It"
