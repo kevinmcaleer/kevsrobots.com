@@ -638,6 +638,18 @@
     };
   }
 
+  // The editor's toolbar sticks to the top of the viewport as the page
+  // scrolls; stop it below the site's sticky top bar instead of under it.
+  // The bar wraps onto more lines on a narrow screen, so follow its height.
+  function pinToolbarBelowTopBar() {
+    const bar = document.querySelector('.navbar.sticky-top');
+    if (!bar) return;
+    const root = document.documentElement;
+    const update = () => root.style.setProperty('--kr-top-bar-height', bar.offsetHeight + 'px');
+    update();
+    if (window.ResizeObserver) new ResizeObserver(update).observe(bar);
+  }
+
   function initEditor() {
     if (mde) return;
     // The default toolbar, with Raw (which has line numbers) in place of Preview and Side by side.
@@ -677,6 +689,7 @@
       scheduleBomTotals();
     });
     setupImageAutocomplete(mde);
+    pinToolbarBelowTopBar();
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
     document.dispatchEvent(new CustomEvent('project-markdown-editor:ready', { detail: mde }));
