@@ -28,6 +28,9 @@ mkdir -p "$dest/dictionaries"
 sed '$ { /^\/\/# sourceMappingURL=/d; }' "$pkg/dist/markdown-editor.js" > "$dest/markdown-editor.js"
 node --check "$dest/markdown-editor.js"
 cp "$pkg/dist/markdown-editor.css" "$dest/markdown-editor.css"
+# Callout styles on their own, for pages that render Markdown without the
+# editor (projects/view.html, with assets/js/project-callouts.js).
+cp "$pkg/src/callouts.css" "$dest/callouts.css"
 cp "$pkg/dist/dictionaries/"* "$dest/dictionaries/"
 
 version="$(node -p "require('$pkg/package.json').version")"
