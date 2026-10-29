@@ -64,6 +64,9 @@ def _photo_response(slug: str, photo: PartPhoto) -> PartPhotoResponse:
         sort_order=photo.sort_order,
         created_by=photo.created_by,
         created_at=photo.created_at,
+        source=photo.source,
+        licence=photo.licence,
+        needs_review=bool(photo.source) and not photo.licence,
     )
 
 
@@ -209,6 +212,11 @@ async def update_photo(
         photo.title = body.title.strip() or None
     if body.sort_order is not None:
         photo.sort_order = body.sort_order
+    # Issue #266: image credit; present in the body → set, "" clears.
+    for field in ("source", "licence"):
+        if field in body.model_fields_set:
+            value = getattr(body, field)
+            setattr(photo, field, (value or "").strip() or None)
     await session.commit()
     await session.refresh(photo)
     return _photo_response(slug, photo)

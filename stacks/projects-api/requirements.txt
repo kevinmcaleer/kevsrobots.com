@@ -13,3 +13,4 @@ Pillow==13.0.0
 reportlab==5.0.1
 httpx==0.28.1
 apscheduler==3.11.3
+PyYAML==6.0.3

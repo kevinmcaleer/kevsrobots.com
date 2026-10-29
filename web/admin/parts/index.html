@@ -45,6 +45,13 @@ permalink: /admin/parts/
     </div>
 
     <div id="list" class="vstack gap-3"></div>
+
+    <!-- Issue #266: imported images whose licence isn't on record yet -->
+    <div id="photo-review" class="mt-5 d-none">
+      <h4><i class="fas fa-camera me-2"></i> Image credits to review <span class="badge bg-warning text-dark" id="photo-review-count">0</span></h4>
+      <p class="text-muted small">These images came from a source with no licence recorded, such as the Snakie parts library. Pick the licence they're used under, or remove the photo from the part's edit page.</p>
+      <div id="photo-review-list" class="row g-3"></div>
+    </div>
   </div>
 </div>
 
@@ -173,6 +180,52 @@ permalink: /admin/parts/
     });
   });
 
+  const LICENCES = [
+    ['permission-granted:adafruit', 'Permission granted: Adafruit'],
+    ['permission-granted:pimoroni', 'Permission granted: Pimoroni'],
+    ['permission-granted:digikey', 'Permission granted: DigiKey'],
+    ['cc-by', 'CC BY'],
+    ['own', 'Own photo'],
+  ];
+
+  async function loadPhotoReview() {
+    const resp = await ProjectAuth.apiFetch(API + '/api/admin/parts/photos/needs-review');
+    if (!resp.ok) return;
+    const photos = await resp.json();
+    document.getElementById('photo-review-count').textContent = photos.length;
+    document.getElementById('photo-review').classList.toggle('d-none', photos.length === 0);
+    document.getElementById('photo-review-list').innerHTML = photos.map(p => `
+      <div class="col-6 col-md-3 col-xl-2" data-photo-id="${p.id}" data-slug="${esc(p.part_slug)}">
+        <div class="card h-100">
+          <img src="${esc(p.is_external ? p.url : API + p.url)}" class="card-img-top" loading="lazy" alt="">
+          <div class="card-body p-2 small">
+            <a href="/parts/view.html?slug=${encodeURIComponent(p.part_slug)}" target="_blank" class="fw-semibold">${esc(p.part_name)}</a>
+            <div class="text-muted">${esc(p.source)}</div>
+            <select class="form-select form-select-sm mt-1 photo-licence" aria-label="Licence for ${esc(p.part_name)}">
+              <option value="">Licence…</option>
+              ${LICENCES.map(([v, label]) => `<option value="${v}">${label}</option>`).join('')}
+            </select>
+            <div class="photo-feedback"></div>
+          </div>
+        </div>
+      </div>`).join('');
+    document.querySelectorAll('.photo-licence').forEach(sel => {
+      sel.addEventListener('change', async () => {
+        if (!sel.value) return;
+        const card = sel.closest('[data-photo-id]');
+        const fb = card.querySelector('.photo-feedback');
+        const resp = await ProjectAuth.apiFetch(API + '/api/parts/' + encodeURIComponent(card.dataset.slug) + '/photos/' + card.dataset.photoId, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ licence: sel.value }),
+        });
+        if (resp.ok) { card.remove(); loadPhotoReview(); }
+        else fb.innerHTML = '<span class="text-danger">HTTP ' + resp.status + '</span>';
+      });
+    });
+  }
+
   loadList();
+  loadPhotoReview();
 })();
 </script>

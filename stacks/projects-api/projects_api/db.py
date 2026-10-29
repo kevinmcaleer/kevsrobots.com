@@ -1287,6 +1287,64 @@ async def add_project_file_model_columns_if_missing() -> None:
                 ))
 
 
+async def _add_columns_if_missing(table: str, columns: dict[str, str], why: str) -> None:
+    """Add each ``name: ddl`` column to ``table`` when it isn't there yet.
+    Postgres-only and idempotent, like the single-column helpers above."""
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = :table"
+        ), {"table": table})
+        if table_check.first() is None:
+            return
+        existing = {
+            row[0] for row in await conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = current_schema() AND table_name = :table"
+            ), {"table": table})
+        }
+        for column, ddl in columns.items():
+            if column not in existing:
+                logger.warning("Adding %s.%s column (%s)", table, column, why)
+                await conn.execute(text(f'ALTER TABLE "{table}" ADD COLUMN "{column}" {ddl}'))
+
+
+PART_SPEC_COLUMNS = {
+    "manufacturer": "VARCHAR(120)",
+    "package": "VARCHAR(20)",
+    "voltage": "VARCHAR(60)",
+    "pin_spacing": "DOUBLE PRECISION",
+    "dimensions_mm": "JSONB",
+    "definition": "JSONB",
+    "mesh_file_path": "TEXT",
+    "datasheet_url": "TEXT",
+}
+
+
+async def add_part_spec_columns_if_missing() -> None:
+    """Issue #266: the Snakie parts.yml fields on ``parts`` and their
+    snapshots on ``part_revisions``, plus image credits on ``part_photos``.
+    Must run before any backfill that selects full Part / PartRevision rows."""
+    await _add_columns_if_missing("parts", PART_SPEC_COLUMNS, "issue #266")
+    await _add_columns_if_missing("part_revisions", PART_SPEC_COLUMNS, "issue #266")
+    await _add_columns_if_missing(
+        "part_photos", {"source": "VARCHAR(200)", "licence": "VARCHAR(60)"}, "issue #266"
+    )
+
+
+async def add_supplier_kind_and_availability_if_missing() -> None:
+    """Issue #267: ``part_suppliers.kind`` and the unavailable report."""
+    await _add_columns_if_missing("part_suppliers", {
+        "kind": "VARCHAR(20) NOT NULL DEFAULT 'shop'",
+        "unavailable_at": "TIMESTAMP",
+        "unavailable_note": "VARCHAR(500)",
+        "unavailable_by": "VARCHAR(100)",
+    }, "issue #267")
+
+
 async def add_feedback_admin_notes_if_missing() -> None:
     """Additive migration for the Snakie dev-mode Bug Tracker (issue #206).
 
