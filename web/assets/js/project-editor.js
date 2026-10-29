@@ -533,17 +533,19 @@
   // markdown-studio's editor bundle (assets/js/markdown-editor/, issue #255),
   // in place of EasyMDE. The live view, selection toolbar, find & replace,
   // spelling, image picker, drafts and status bar come with it; this wires
-  // it to the Projects API and draws ```mermaid blocks as diagrams. There's
+  // it to the Projects API and draws ```mermaid blocks as diagrams (and edits
+  // them in Mermaid Factory's split code + diagram editor). There's
   // no separate Preview: the live view is the preview, with Raw for source.
   const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // the API's max_image_size
-  const MERMAID_URL = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  // Mermaid Factory's mermaid-tools (scripts/update-mermaid-tools.sh).
+  const MERMAID_TOOLS_URL = '/assets/js/mermaid-tools/mermaid-tools.js';
   const DIAGRAM_TEMPLATES = [
     { label: 'Flowchart', md: '\n```mermaid\ngraph TD\n    A[Start] --> B[Step 1]\n    B --> C[Step 2]\n    C --> D[End]\n```\n' },
     { label: 'Sequence Diagram', md: '\n```mermaid\nsequenceDiagram\n    participant A\n    participant B\n    A->>B: Hello\n    B-->>A: Hi back\n```\n' },
     { label: 'State Diagram', md: '\n```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Running\n    Running --> Idle\n    Running --> [*]\n```\n' },
   ];
   let mde = null;
-  let mermaidLib = null;
+  let mermaidTools = null;
 
   function imageViewUrl(img) {
     return API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
@@ -566,15 +568,41 @@
     return imageViewUrl(img);
   }
 
+  function loadMermaidTools() {
+    if (!mermaidTools) mermaidTools = import(MERMAID_TOOLS_URL);
+    return mermaidTools;
+  }
+
   // A ```mermaid block in the live view: its diagram, until the cursor goes in.
-  let mermaidCount = 0;
   async function renderMermaid(source, element) {
-    if (!mermaidLib) {
-      mermaidLib = (await import(MERMAID_URL)).default;
-      mermaidLib.initialize({ startOnLoad: false });
-    }
-    const { svg } = await mermaidLib.render('project-mermaid-' + (++mermaidCount), source);
-    element.innerHTML = svg;
+    const tools = await loadMermaidTools();
+    const result = await tools.renderMermaid(source);
+    if (result.error) throw new Error(result.error);
+    element.innerHTML = result.svg;
+  }
+
+  // ...and with the cursor in it: the code beside its live diagram, where
+  // clicking a flowchart shape edits its text and shape or adds a shape joined to it.
+  function editMermaid(context) {
+    let editor = null;
+    let gone = false;
+    let source = context.source;
+    loadMermaidTools().then(tools => {
+      if (gone) return;
+      editor = tools.mountEditor(context.element, {
+        source: source,
+        onChange: context.onChange,
+        onExit: context.onExit,
+        autofocus: context.focus,
+      });
+    }, err => {
+      context.element.textContent = 'Couldn\'t load the diagram editor: ' + err.message;
+    });
+    return {
+      setSource: next => { source = next; if (editor) editor.setSource(next); },
+      focus: () => editor && editor.focus(),
+      destroy: () => { gone = true; if (editor) editor.destroy(); },
+    };
   }
 
   function initEditor() {
@@ -605,6 +633,7 @@
       images: { maxBytes: MAX_IMAGE_BYTES, libraryName: 'the gallery' },
       preview: false,
       codeRenderers: { mermaid: renderMermaid },
+      codeEditors: { mermaid: editMermaid },
       slashCommands: ProjectSlashCommands.create(slashContext()),
       proofing: { languageApiBase: LANGUAGE_API, languageApi: languageRequest },
     });
