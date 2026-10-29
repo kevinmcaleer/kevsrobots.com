@@ -10,6 +10,72 @@
   background: #f8f9fa;
 }
 
+/* Details row under the title and description: difficulty, build time
+   and tags, edited in place. Quiet until hovered or focused, like the
+   title fields above it. */
+.project-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0 0.75rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.project-meta-field,
+.project-meta-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.project-meta-tags {
+  flex: 1 1 16rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.project-meta-row .form-control,
+.project-meta-row .form-select {
+  border-color: transparent;
+  background-color: transparent;
+  color: inherit;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+}
+
+.project-meta-row .form-select {
+  padding-right: 1.75rem;
+  width: auto;
+}
+
+.project-meta-row .form-control:hover,
+.project-meta-row .form-select:hover {
+  background-color: #f8f9fa;
+}
+
+.project-meta-row .form-control:focus,
+.project-meta-row .form-select:focus {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  box-shadow: none;
+}
+
+#project-time {
+  width: 5.75rem;
+}
+
+#tag-input {
+  flex: 1 1 7rem;
+  min-width: 7rem;
+  width: auto;
+}
+
+.project-meta-unit {
+  margin-left: -0.25rem;
+}
+
 /* Image autocomplete popup */
 .image-autocomplete-popup {
   position: fixed;

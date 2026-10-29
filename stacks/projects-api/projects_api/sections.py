@@ -17,6 +17,7 @@ SECTIONS: list[tuple[str, str]] = [
     ("assembly-instructions", "Assembly instructions"),
     ("wiring", "Wiring"),
     ("code", "Code"),
+    ("code-repository", "Code repository"),
     ("3d-printed-parts", "3D printed parts"),
 ]
 

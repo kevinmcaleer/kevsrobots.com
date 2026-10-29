@@ -31,6 +31,12 @@
       icon: 'M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5',
     },
     {
+      id: 'code-repository',
+      heading: 'Code repository',
+      keywords: ['repo', 'repository', 'github', 'git', 'source'],
+      icon: 'M4.5 2.5v11M11.5 6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM11.5 6.5c0 3.5-7 2-7 5.5',
+    },
+    {
       id: '3d-printed-parts',
       heading: '3D printed parts',
       keywords: ['3d', 'printed', 'print', 'stl', 'models', 'cad'],
