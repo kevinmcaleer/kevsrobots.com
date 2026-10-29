@@ -609,7 +609,7 @@
   // A ```mermaid block in the live view: its diagram, until the cursor goes in.
   async function renderMermaid(source, element) {
     const tools = await loadMermaidTools();
-    const result = await tools.renderMermaid(source);
+    const result = await tools.renderMermaid(source, window.ProjectMermaidTheme);
     if (result.error) throw new Error(result.error);
     element.innerHTML = result.svg;
   }
@@ -623,6 +623,7 @@
     loadMermaidTools().then(tools => {
       if (gone) return;
       editor = tools.mountEditor(context.element, {
+        ...window.ProjectMermaidTheme,
         source: source,
         onChange: context.onChange,
         onExit: context.onExit,

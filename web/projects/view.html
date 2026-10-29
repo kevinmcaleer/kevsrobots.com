@@ -710,6 +710,7 @@ description: View project details
 <!-- Issue #257: a YouTube link on its own line plays inline. -->
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-callouts.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-mermaid-theme.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-image-sizes.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #259: "On this page", canonical sections marked with icons. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
@@ -1866,7 +1867,7 @@ description: View project details
       const pre = code.parentElement;
       const div = document.createElement('div');
       div.className = 'mermaid';
-      const result = await tools.renderMermaid(code.textContent);
+      const result = await tools.renderMermaid(code.textContent, window.ProjectMermaidTheme);
       if (result.error) {
         console.warn('Mermaid render error:', result.error);
         continue;
