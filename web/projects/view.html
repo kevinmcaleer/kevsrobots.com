@@ -11,6 +11,7 @@ description: View project details
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/instruction-viewer.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/js/markdown-editor/callouts.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
 <div class="container py-4">
@@ -28,7 +29,7 @@ description: View project details
     <div class="row">
       <!-- LEFT: Table of contents -->
       <div class="col-lg-2 d-none d-lg-block">
-        <nav id="toc-nav" class="toc-nav sticky-top" style="top:80px"></nav>
+        <nav id="toc-nav" class="kr-toc kr-toc--column sticky-top" aria-label="On this page"></nav>
       </div>
 
       <!-- MIDDLE: Main content -->
@@ -675,6 +676,9 @@ description: View project details
 <!-- Issue #257: a YouTube link on its own line plays inline. -->
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-callouts.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Issue #259: "On this page" with the canonical sections first. -->
+<script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -2156,6 +2160,31 @@ description: View project details
     });
   }
 
+  // Issue #259: a structured section the page renders itself (the BOM
+  // table from the API) sits under the author's matching heading when
+  // there is one, so the reader finds it where the document says it is.
+  // Without one it stays where it is and the nav lists it as an extra.
+  function placeUnderHeading(el, sectionId, headings) {
+    if (!el || el.classList.contains('d-none')) return false;
+    const own = el.querySelector(':scope > h4');
+    const heading = headings.find(h => {
+      const s = ProjectSections.match(h.textContent);
+      return s && s.id === sectionId;
+    });
+    if (!heading) {
+      if (own) own.classList.remove('d-none');
+      return false;
+    }
+    const level = Number(heading.tagName[1]);
+    let next = heading.nextElementSibling;
+    while (next && next !== el && !(/^H[1-6]$/.test(next.tagName) && Number(next.tagName[1]) <= level)) {
+      next = next.nextElementSibling;
+    }
+    if (next !== el) heading.parentNode.insertBefore(el, next);
+    if (own) own.classList.add('d-none');
+    return true;
+  }
+
   function buildTOC() {
     const nav = document.getElementById('toc-nav');
     if (!nav) return;
@@ -2165,66 +2194,72 @@ description: View project details
     // h3 textContent. Falls through to the heading-scan otherwise.
     const builderSteps = document.querySelectorAll('#view-content .builder-step[data-step-num]');
     if (builderSteps.length > 0) {
+      nav.className = 'toc-nav sticky-top';
+      nav.style.top = '80px';
       return buildBuilderTOC(nav, builderSteps);
     }
-    const headings = document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3, #view-content h4');
-    if (headings.length < 2) { nav.innerHTML = ''; return; }
+    nav.className = 'kr-toc kr-toc--column sticky-top';
+    nav.style.top = '';
+
+    // H1s are the top level and H2s nest under them (issue #259); deeper
+    // headings stay in the text only.
+    const headings = Array.from(document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3'));
     const used = {};
-    const links = [];
     headings.forEach(h => {
       let id = h.id || slugify(h.textContent);
       if (!id) return;
       if (used[id]) { used[id]++; id = id + '-' + used[id]; } else { used[id] = 1; }
       h.id = id;
-      const level = h.tagName.toLowerCase();
-      links.push(`<a href="#${id}" class="toc-${level}" data-toc-target="${id}">${esc(h.textContent)}</a>`);
     });
-    // Extra non-heading anchors at the bottom (sections rendered outside the markdown)
+
+    const bomUnderHeading = placeUnderHeading(document.getElementById('view-bom-section'), 'bill-of-materials', headings);
+    // Sections rendered outside the markdown, listed when visible.
     const extras = [
-      { id: 'view-bom-section', label: 'Bill of Materials' },
-      { id: 'view-files-section', label: 'Files & Downloads' },
-      { id: 'makes-section', label: 'Community Makes' },
-    ];
-    extras.forEach(ex => {
-      const el = document.getElementById(ex.id);
-      if (el && !el.classList.contains('d-none')) {
-        links.push(`<a href="#${ex.id}" class="toc-h1 toc-extra" data-toc-target="${ex.id}">${esc(ex.label)}</a>`);
-      }
+      { key: 'view-bom-section', text: 'Bill of Materials', section: 'bill-of-materials' },
+      { key: 'view-files-section', text: 'Files & Downloads' },
+      { key: 'makes-section', text: 'Community Makes' },
+    ].filter(ex => {
+      const el = document.getElementById(ex.key);
+      if (!el || el.classList.contains('d-none')) return false;
+      return !(ex.key === 'view-bom-section' && bomUnderHeading);
     });
 
-    nav.innerHTML = '<div class="toc-title">On this page</div>' + links.join('');
+    const entries = headings.filter(h => h.id).map(h => ({
+      level: Number(h.tagName[1]), text: h.textContent.trim(), key: h.id,
+    }));
+    if (entries.length + extras.length < 2) { nav.innerHTML = ''; return; }
 
-    nav.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        const target = document.getElementById(a.dataset.tocTarget);
-        if (target) {
-          window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
-          history.replaceState(null, '', '#' + a.dataset.tocTarget);
-        }
+    const toc = ProjectToc.render(nav, entries, {
+      extras,
+      onSelect(id) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+        history.replaceState(null, '', '#' + id);
+      },
+    });
+
+    // Scroll-spy: light the last linked section whose top has passed
+    // under the sticky header. The nav order isn't the page order (the
+    // canonical sections come first), so this looks at positions.
+    const targets = Array.from(toc.links.keys()).map(id => document.getElementById(id)).filter(Boolean);
+    function spy() {
+      let current = null;
+      targets.forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        if (top <= 100 && (!current || top > current.getBoundingClientRect().top)) current = el;
       });
-    });
-
-    // Scroll-spy
-    const linkMap = {};
-    nav.querySelectorAll('a').forEach(a => { linkMap[a.dataset.tocTarget] = a; });
-    let activeId = null;
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          if (activeId && linkMap[activeId]) linkMap[activeId].classList.remove('active');
-          activeId = entry.target.id;
-          if (linkMap[activeId]) linkMap[activeId].classList.add('active');
-        }
-      });
-    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
-    headings.forEach(h => observer.observe(h));
-    // Also observe extra sections (Files & Downloads, etc.) so the scroll-spy
-    // updates the active highlight when the user scrolls or clicks them.
-    extras.forEach(ex => {
-      const el = document.getElementById(ex.id);
-      if (el && !el.classList.contains('d-none')) observer.observe(el);
-    });
+      toc.setActive(current ? current.id : null);
+    }
+    if (buildTOC._spy) window.removeEventListener('scroll', buildTOC._spy);
+    let queued = false;
+    buildTOC._spy = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => { queued = false; spy(); });
+    };
+    window.addEventListener('scroll', buildTOC._spy, { passive: true });
+    spy();
   }
 
   loadProject();

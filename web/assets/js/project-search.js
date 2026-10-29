@@ -41,6 +41,14 @@ var ProjectSearch = (function () {
     return list;
   }
 
+  // Issue #259: small icons for the canonical sections the project has
+  // (Bill of Materials, Wiring, ...), a quick sense of how complete it is.
+  function sectionBadges(p) {
+    if (typeof ProjectSections === 'undefined') return '';
+    var html = ProjectSections.badgesHtml(p.sections);
+    return html ? '<span class="ms-auto">' + html + '</span>' : '';
+  }
+
   /**
    * Render a single project card matching the hub layout.
    * `myProjectIds` is an optional Set of project ids owned by the viewer.
@@ -78,7 +86,7 @@ var ProjectSearch = (function () {
               '<p class="card-text text-muted small">' + esc(p.short_description || '') + '</p>' +
               '<div class="d-flex flex-wrap gap-1 mb-2">' +
                 (STATUS_BADGES[p.status] || '') +
-                diff + time + remixBadge +
+                diff + time + remixBadge + sectionBadges(p) +
               '</div>' +
               '<div class="d-flex flex-wrap gap-1">' + tagsHtml + '</div>' +
             '</div>' +
@@ -151,6 +159,7 @@ var ProjectSearch = (function () {
   }
 
   return {
+    sectionBadges: sectionBadges,
     esc: esc,
     cardHtml: cardHtml,
     rankHubProjects: rankHubProjects,
