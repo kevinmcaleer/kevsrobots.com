@@ -9,6 +9,9 @@
 
 .kr-toc.kr-toc--column {
   top: 80px;
+  // Bootstrap's .sticky-top gives 1020, the same as the site's sticky top
+  // bar, so the nav painted over the bar when its column scrolled away.
+  z-index: 1;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
   padding-right: 8px;
