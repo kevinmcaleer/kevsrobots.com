@@ -352,6 +352,9 @@
       // history.replaceState anything slug-shaped here.
       updateStatusBadge(currentProject.status);
       showSaveStatus('saved', 'Saved');
+      // The server has this text now, so the editor's local draft of it
+      // can go (unless more was typed while the save was in flight).
+      if (mde && mde.getDoc() === (data.content_md || '')) mde.clearDraft();
       // Issue #106: surface any badges awarded by this save (typically
       // only on the initial create, but the API may award one on a PUT
       // too if e.g. setting status -> completed crosses a threshold).
@@ -594,13 +597,13 @@
     if (changed) scheduleAutoSave();
   }
 
-  // Debounced trigger fired from the EasyMDE change handler.
+  // Debounced trigger fired from the editor's change handler.
   let autoTagTimer = null;
   function scheduleAutoTagDetection() {
     if (autoTagTimer) clearTimeout(autoTagTimer);
     autoTagTimer = setTimeout(() => {
       autoTagTimer = null;
-      if (easyMDE) applyAutoDetectedTags(easyMDE.value());
+      if (mde) applyAutoDetectedTags(mde.getDoc());
     }, 1000);
   }
 
@@ -633,449 +636,138 @@
     }
   });
 
-  // --- EasyMDE Markdown Editor ---
-  let easyMDE = null;
+  // --- Markdown editor ---
+  // markdown-studio's editor bundle (assets/js/markdown-editor/, issue #255),
+  // in place of EasyMDE. The live preview, selection toolbar, find & replace,
+  // spelling, image picker, drafts and status bar come with it; this wires
+  // it to the Projects API and renders the preview the way the site does.
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // the API's max_image_size
+  const MERMAID_URL = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  const DIAGRAM_TEMPLATES = [
+    { label: 'Flowchart', md: '\n```mermaid\ngraph TD\n    A[Start] --> B[Step 1]\n    B --> C[Step 2]\n    C --> D[End]\n```\n' },
+    { label: 'Sequence Diagram', md: '\n```mermaid\nsequenceDiagram\n    participant A\n    participant B\n    A->>B: Hello\n    B-->>A: Hi back\n```\n' },
+    { label: 'State Diagram', md: '\n```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Running\n    Running --> Idle\n    Running --> [*]\n```\n' },
+  ];
+  let mde = null;
+  let mermaidLib = null;
+
+  function imageViewUrl(img) {
+    return API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
+  }
+
+  async function fetchProjectImages() {
+    if (!currentProject) return [];
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
+    return resp.ok ? resp.json() : [];
+  }
+
+  // Pasted, dropped and picked images go into the project's gallery.
+  async function uploadEditorImage(file) {
+    if (!currentProject) {
+      await saveProject();
+      if (!currentProject) throw new Error('Add a title and save before adding images');
+    }
+    const img = await uploadSingleImage(file);
+    loadImages();
+    return imageViewUrl(img);
+  }
+
+  // ```mermaid fences become diagrams in the preview, as on the public page.
+  function mermaidFences(md) {
+    const fence = md.renderer.rules.fence;
+    md.renderer.rules.fence = function (tokens, idx, options, env, self) {
+      const lang = tokens[idx].info.trim().split(/\s+/)[0];
+      if (lang === 'mermaid') {
+        return '<div class="mermaid">' + md.utils.escapeHtml(tokens[idx].content) + '</div>';
+      }
+      return fence(tokens, idx, options, env, self);
+    };
+  }
+
+  async function decoratePreview(el) {
+    el.querySelectorAll('table').forEach(t => {
+      t.classList.add('table', 'table-single', 'table-narrow');
+    });
+    const diagrams = el.querySelectorAll('.mermaid:not([data-processed])');
+    if (diagrams.length === 0) return;
+    try {
+      if (!mermaidLib) {
+        mermaidLib = (await import(MERMAID_URL)).default;
+        mermaidLib.initialize({ startOnLoad: false });
+      }
+      await mermaidLib.run({ nodes: Array.from(diagrams) });
+    } catch (e) { /* mermaid not available, or a diagram has a syntax error */ }
+  }
 
   function initEditor() {
-    if (easyMDE) return;
-    easyMDE = new EasyMDE({
-      element: contentEditor,
-      spellChecker: false,
-      autofocus: false,
-      placeholder: 'Write your project content in Markdown...\n\n# Background\nDescribe what this project is about...\n\n## How to Build\n- Step 1: ...',
-      status: false,
-      minHeight: '350px',
-      renderingConfig: {
-        codeSyntaxHighlighting: true,
-      },
-      toolbar: [
-        'bold', 'italic', 'heading', '|',
-        'code', 'quote', 'unordered-list', 'ordered-list', '|',
-        'link',
-        {
-          name: 'insert-image',
-          action: function(editor) { showImagePicker(editor); },
-          className: 'fas fa-image no-disable',
-          title: 'Insert uploaded image',
-        },
-        'table', '|',
-        {
-          name: 'diagram',
-          action: function(editor) { showDiagramMenu(editor); },
-          className: 'fas fa-project-diagram no-disable',
-          title: 'Insert diagram',
-        },
-        '|',
-        {
-          name: 'preview',
-          action: function(editor) {
-            // Close side-by-side first
-            var container = editor.codemirror.getWrapperElement().closest('.EasyMDEContainer');
-            var sbsPreview = container.querySelector('.editor-preview-side-custom');
-            if (sbsPreview) {
-              sbsPreview.remove();
-              container.classList.remove('sided--no-fullscreen');
-              editor.codemirror.refresh();
-            }
-            EasyMDE.togglePreview(editor);
-            // Render mermaid in the preview pane + style any markdown tables
-            setTimeout(async () => {
-              var previewEl = container.querySelector('.editor-preview-active');
-              if (!previewEl) return;
-              previewEl.querySelectorAll('table').forEach(function(t) {
-                t.classList.add('table', 'table-single', 'table-narrow');
-              });
-              var blocks = previewEl.querySelectorAll('pre code.language-mermaid');
-              if (blocks.length === 0) return;
-              try {
-                var mod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
-                var mermaid = mod.default;
-                mermaid.initialize({ startOnLoad: false });
-                blocks.forEach((block, i) => {
-                  var div = document.createElement('div');
-                  div.className = 'mermaid';
-                  div.id = 'mermaid-preview-' + Date.now() + '-' + i;
-                  div.textContent = block.textContent;
-                  block.parentElement.replaceWith(div);
-                });
-                await mermaid.run({ querySelector: '.editor-preview-active .mermaid' });
-              } catch (e) { /* mermaid not available */ }
-            }, 50);
-          },
-          className: 'fa fa-eye no-disable',
-          title: 'Toggle preview',
-        },
-        {
-          name: 'side-by-side',
-          action: function(editor) {
-            var cm = editor.codemirror;
-            var wrap = cm.getWrapperElement();
-            var container = wrap.closest('.EasyMDEContainer');
-            var existingPreview = container.querySelector('.editor-preview-side-custom');
-
-            // Close regular preview if it's open
-            var regularPreview = container.querySelector('.editor-preview-active');
-            if (regularPreview) {
-              EasyMDE.togglePreview(editor);
-            }
-
-            if (existingPreview) {
-              existingPreview.remove();
-              container.classList.remove('sided--no-fullscreen');
-              requestAnimationFrame(() => cm.refresh());
-              return;
-            }
-
-            // Create our own preview pane
-            var preview = document.createElement('div');
-            preview.className = 'editor-preview-side-custom';
-            container.appendChild(preview);
-            container.classList.add('sided--no-fullscreen');
-
-            let mermaidLib = null;
-            async function renderMermaid() {
-              const blocks = preview.querySelectorAll('pre code.language-mermaid');
-              if (blocks.length === 0) return;
-              try {
-                if (!mermaidLib) {
-                  const mod = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs');
-                  mermaidLib = mod.default;
-                  mermaidLib.initialize({ startOnLoad: false });
-                }
-                blocks.forEach((block, i) => {
-                  const div = document.createElement('div');
-                  div.className = 'mermaid';
-                  div.id = 'mermaid-' + Date.now() + '-' + i;
-                  div.textContent = block.textContent;
-                  block.parentElement.replaceWith(div);
-                });
-                await mermaidLib.run({ querySelector: '.editor-preview-side-custom .mermaid' });
-              } catch (e) { /* mermaid not available */ }
-            }
-
-            let renderTimer = null;
-            function updatePreview() {
-              preview.innerHTML = editor.markdown(editor.value());
-              preview.querySelectorAll('table').forEach(t => {
-                t.classList.add('table', 'table-single', 'table-narrow');
-              });
-              clearTimeout(renderTimer);
-              renderTimer = setTimeout(renderMermaid, 200);
-            }
-            updatePreview();
-            cm.on('change', updatePreview);
-
-            // Build a map of source-line → top-level block index
-            function getBlockStarts(markdown) {
-              const lines = markdown.split('\n');
-              const starts = [];
-              let inBlock = false;
-              let inCode = false;
-              for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                if (line.startsWith('```')) {
-                  if (!inCode) {
-                    if (!inBlock) starts.push(i);
-                    inCode = true;
-                    inBlock = true;
-                  } else {
-                    inCode = false;
-                  }
-                  continue;
-                }
-                if (inCode) continue;
-                if (line.trim() === '') {
-                  inBlock = false;
-                  continue;
-                }
-                if (!inBlock) {
-                  starts.push(i);
-                  inBlock = true;
-                }
-              }
-              return starts;
-            }
-
-            // Sync preview to editor's top visible line by mapping blocks
-            var syncing = false;
-            function syncScroll() {
-              if (syncing) return;
-              const blockStarts = getBlockStarts(editor.value());
-              if (blockStarts.length === 0) return;
-
-              const info = cm.getScrollInfo();
-              const topLine = cm.lineAtHeight(info.top, 'local');
-
-              // Find which block the top line belongs to
-              let blockIdx = 0;
-              for (let i = 0; i < blockStarts.length; i++) {
-                if (blockStarts[i] <= topLine) blockIdx = i;
-                else break;
-              }
-
-              const previewBlocks = Array.from(preview.children);
-              const target = previewBlocks[blockIdx];
-              if (!target) return;
-
-              // How far through the current block is the editor?
-              const blockStartLine = blockStarts[blockIdx];
-              const blockEndLine = blockIdx < blockStarts.length - 1
-                ? blockStarts[blockIdx + 1] - 1
-                : cm.lineCount() - 1;
-              const blockSize = Math.max(1, blockEndLine - blockStartLine + 1);
-              const blockProgress = Math.min(1, Math.max(0, (topLine - blockStartLine) / blockSize));
-
-              const targetRect = target.getBoundingClientRect();
-              const previewRect = preview.getBoundingClientRect();
-              const targetTop = targetRect.top - previewRect.top + preview.scrollTop;
-              const offset = targetTop + (targetRect.height * blockProgress);
-
-              syncing = true;
-              preview.scrollTop = offset;
-              setTimeout(() => { syncing = false; }, 50);
-            }
-            cm.on('scroll', syncScroll);
-            cm.on('cursorActivity', syncScroll);
-
-            // Refresh CodeMirror so click coords match the new layout
-            requestAnimationFrame(() => cm.refresh());
-          },
-          className: 'fas fa-columns no-disable',
-          title: 'Side-by-side preview',
-        },
-        'fullscreen', '|',
-        'guide',
-      ],
+    if (mde) return;
+    const toolbar = MarkdownEditor.DEFAULT_TOOLBAR.slice();
+    toolbar.splice(toolbar.indexOf('table') + 1, 0, {
+      id: 'diagram',
+      label: 'Insert diagram',
+      icon: 'M2 2.5h5v4H2zM9 9.5h5v4H9zM4.5 6.5v5H9',
+      run: (editor, button) => showDiagramMenu(editor, button),
     });
 
-    easyMDE.codemirror.on('change', () => {
+    mde = MarkdownEditor.mount(contentEditor, {
+      placeholder: 'Write your project content in Markdown...\n\n# Background\nDescribe what this project is about...\n\n## How to Build\n- Step 1: ...',
+      minHeight: 350,
+      theme: 'light',
+      toolbar: toolbar,
+      draft: { key: 'projects.' + (projectId || 'new') },
+      uploadImage: uploadEditorImage,
+      imageLibrary: async () => (await fetchProjectImages()).map(img => ({
+        url: imageViewUrl(img), alt: img.filename,
+      })),
+      images: { maxBytes: MAX_IMAGE_BYTES },
+      preview: { markdownIt: mermaidFences, afterRender: decoratePreview },
+    });
+
+    mde.on('change', () => {
       scheduleAutoSave();
       scheduleAutoTagDetection();
     });
-    setupFloatingToolbar(easyMDE);
-    setupImageAutocomplete(easyMDE);
-    // Expose for external integrations (e.g. global drop zone — issue #117)
-    window.easyMDE = easyMDE;
-  }
-
-  // --- Floating toolbar on text selection ---
-  function setupFloatingToolbar(editor) {
-    const cm = editor.codemirror;
-    let toolbar = document.createElement('div');
-    toolbar.className = 'mini-toolbar';
-    toolbar.style.display = 'none';
-    toolbar.innerHTML = `
-      <button data-fmt="bold" title="Bold"><i class="fas fa-bold"></i></button>
-      <button data-fmt="italic" title="Italic"><i class="fas fa-italic"></i></button>
-      <button data-fmt="heading" title="Heading"><i class="fas fa-heading"></i></button>
-      <button data-fmt="quote" title="Quote"><i class="fas fa-quote-right"></i></button>
-      <button data-fmt="ul" title="Bullet list"><i class="fas fa-list-ul"></i></button>
-      <button data-fmt="ol" title="Numbered list"><i class="fas fa-list-ol"></i></button>
-      <button data-fmt="code" title="Code"><i class="fas fa-code"></i></button>
-      <button data-fmt="link" title="Link"><i class="fas fa-link"></i></button>
-    `;
-    document.body.appendChild(toolbar);
-
-    function toggleWrap(marker) {
-      const sel = cm.getSelection();
-      const from = cm.getCursor('from');
-      const to = cm.getCursor('to');
-      const mlen = marker.length;
-      const m = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = new RegExp('^' + m + '([\\s\\S]*)' + m + '$');
-      const match = sel.match(re);
-      if (match) {
-        // Markers were inside the selection — strip them, re-select inner content
-        cm.replaceSelection(match[1]);
-        const newTo = cm.getCursor();
-        cm.setSelection(from, newTo);
-        return;
-      }
-      const lineFrom = cm.getLine(from.line);
-      const lineTo = cm.getLine(to.line);
-      const before = lineFrom.substring(Math.max(0, from.ch - mlen), from.ch);
-      const after = lineTo.substring(to.ch, to.ch + mlen);
-      if (before === marker && after === marker) {
-        // Markers were just outside the selection — strip them, keep selection on inner content
-        cm.replaceRange('', { line: to.line, ch: to.ch }, { line: to.line, ch: to.ch + mlen });
-        cm.replaceRange('', { line: from.line, ch: from.ch - mlen }, { line: from.line, ch: from.ch });
-        const newFrom = { line: from.line, ch: from.ch - mlen };
-        const newTo = from.line === to.line
-          ? { line: to.line, ch: to.ch - mlen }
-          : { line: to.line, ch: to.ch };
-        cm.setSelection(newFrom, newTo);
-        return;
-      }
-      // Wrap selection with markers and reselect the inner (unwrapped) content
-      cm.replaceSelection(marker + sel + marker);
-      const newFrom = { line: from.line, ch: from.ch + mlen };
-      const newTo = from.line === to.line
-        ? { line: to.line, ch: to.ch + mlen }
-        : { line: to.line, ch: to.ch };
-      cm.setSelection(newFrom, newTo);
-    }
-
-    function toggleLinePrefix(prefixRegex, prefixToAdd, lineMatchTest) {
-      const from = cm.getCursor('from');
-      const to = cm.getCursor('to');
-      const lines = [];
-      for (let l = from.line; l <= to.line; l++) {
-        lines.push(cm.getLine(l));
-      }
-      const allHavePrefix = lines.every(line => lineMatchTest(line));
-      const newLines = lines.map(line => {
-        if (allHavePrefix) {
-          return line.replace(prefixRegex, '');
-        } else {
-          return prefixToAdd + line.replace(prefixRegex, '');
-        }
-      });
-      cm.replaceRange(newLines.join('\n'),
-        { line: from.line, ch: 0 },
-        { line: to.line, ch: cm.getLine(to.line).length }
-      );
-      // Reselect the full affected line range so the toolbar stays visible
-      cm.setSelection(
-        { line: from.line, ch: 0 },
-        { line: to.line, ch: cm.getLine(to.line).length }
-      );
-    }
-
-    function cycleHeading() {
-      const from = cm.getCursor('from');
-      const line = cm.getLine(from.line);
-      const match = line.match(/^(#{1,6})\s/);
-      let newLine;
-      if (!match) {
-        newLine = '# ' + line;
-      } else if (match[1].length < 6) {
-        newLine = '#'.repeat(match[1].length + 1) + ' ' + line.substring(match[0].length);
-      } else {
-        // h6 → remove heading
-        newLine = line.substring(match[0].length);
-      }
-      cm.replaceRange(newLine, { line: from.line, ch: 0 }, { line: from.line, ch: line.length });
-      // Reselect the heading line so the toolbar stays visible
-      cm.setSelection(
-        { line: from.line, ch: 0 },
-        { line: from.line, ch: cm.getLine(from.line).length }
-      );
-    }
-
-    function applyFormat(fmt) {
-      const sel = cm.getSelection();
-      switch (fmt) {
-        case 'bold': toggleWrap('**'); break;
-        case 'italic': toggleWrap('*'); break;
-        case 'code': toggleWrap('`'); break;
-        case 'heading': cycleHeading(); break;
-        case 'quote':
-          toggleLinePrefix(/^> /, '> ', l => /^> /.test(l));
-          break;
-        case 'ul':
-          toggleLinePrefix(/^(- |\* |\d+\. )/, '- ', l => /^(- |\* )/.test(l));
-          break;
-        case 'ol':
-          toggleLinePrefix(/^(- |\* |\d+\. )/, '1. ', l => /^\d+\. /.test(l));
-          break;
-        case 'link': {
-          const linkFrom = cm.getCursor('from');
-          const linkText = sel || 'text';
-          cm.replaceSelection('[' + linkText + '](https://)');
-          // Reselect the link text inside [...] so the user can tweak it
-          cm.setSelection(
-            { line: linkFrom.line, ch: linkFrom.ch + 1 },
-            { line: linkFrom.line, ch: linkFrom.ch + 1 + linkText.length }
-          );
-          break;
-        }
-      }
-      cm.focus();
-    }
-
-    toolbar.querySelectorAll('button').forEach(btn => {
-      btn.addEventListener('mousedown', e => {
-        e.preventDefault();
-        applyFormat(btn.dataset.fmt);
-        positionToolbar();
-      });
-    });
-
-    function positionToolbar() {
-      if (!cm.somethingSelected()) {
-        toolbar.style.display = 'none';
-        return;
-      }
-      const from = cm.getCursor('from');
-      const coords = cm.cursorCoords(from, 'window');
-      toolbar.style.display = 'flex';
-      const tw = toolbar.offsetWidth;
-      let left = coords.left;
-      if (left + tw > window.innerWidth - 10) left = window.innerWidth - tw - 10;
-      toolbar.style.left = Math.max(10, left) + 'px';
-      toolbar.style.top = (coords.top - toolbar.offsetHeight - 8) + 'px';
-    }
-
-    cm.on('cursorActivity', positionToolbar);
-    cm.on('blur', () => {
-      setTimeout(() => {
-        if (!toolbar.matches(':hover')) toolbar.style.display = 'none';
-      }, 150);
-    });
-    window.addEventListener('scroll', positionToolbar, true);
+    setupImageAutocomplete(mde);
+    // For the TOC in editor.html and other page scripts.
+    window.projectMarkdownEditor = mde;
+    document.dispatchEvent(new CustomEvent('project-markdown-editor:ready', { detail: mde }));
   }
 
   // --- Image autocomplete on `![` ---
   function setupImageAutocomplete(editor) {
-    const cm = editor.codemirror;
+    const view = editor.view;
     let popup = null;
     let images = [];
     let filteredImages = [];
     let activeIdx = 0;
-    let startCursor = null;
+    let start = null;
 
     function fetchImages() {
-      if (!currentProject) { images = []; return; }
-      apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' })
-        .then(r => r.json())
-        .then(imgs => {
-          images = imgs.map(img => ({
-            url: API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view',
-            name: img.filename,
-          }));
-        }).catch(() => {});
+      fetchProjectImages().then(imgs => {
+        images = imgs.map(img => ({ url: imageViewUrl(img), name: img.filename }));
+        if (start !== null) update();
+      }).catch(() => {});
     }
     fetchImages();
-    // Refresh image list periodically
-    setInterval(fetchImages, 10000);
 
-    function showPopup(coords) {
-      if (!popup) {
-        popup = document.createElement('div');
-        popup.className = 'image-autocomplete-popup';
-        document.body.appendChild(popup);
-      }
-      popup.style.display = 'block';
-      popup.style.left = coords.left + 'px';
-      popup.style.top = (coords.bottom + 4) + 'px';
-      renderPopup();
+    function isOpen() {
+      return popup && popup.style.display !== 'none';
     }
 
     function hidePopup() {
       if (popup) popup.style.display = 'none';
-      startCursor = null;
+      start = null;
     }
 
     function renderPopup() {
-      if (!popup) return;
       if (filteredImages.length === 0) {
         popup.innerHTML = '<div class="p-2 text-muted small">No matching images</div>';
         return;
       }
       popup.innerHTML = filteredImages.map((img, i) => `
         <div class="image-ac-item ${i === activeIdx ? 'active' : ''}" data-idx="${i}">
-          <img src="${img.url}" style="width:30px;height:30px;object-fit:cover;border-radius:3px;margin-right:6px">
-          <small>${img.name}</small>
+          <img src="${escapeHtmlAttr(img.url)}" style="width:30px;height:30px;object-fit:cover;border-radius:3px;margin-right:6px">
+          <small>${escapeHtmlAttr(img.name)}</small>
         </div>
       `).join('');
       popup.querySelectorAll('.image-ac-item').forEach(item => {
@@ -1087,143 +779,99 @@
     }
 
     function selectImage(idx) {
-      if (!startCursor) return;
       const img = filteredImages[idx];
-      if (!img) return;
-      const cursor = cm.getCursor();
-      cm.replaceRange('![' + img.name + '](' + img.url + ')', startCursor, cursor);
+      if (start === null || !img) return;
+      const insert = '![' + img.name + '](' + img.url + ')';
+      view.dispatch({
+        changes: { from: start, to: view.state.selection.main.head, insert: insert },
+        selection: { anchor: start + insert.length },
+      });
       hidePopup();
-      cm.focus();
-      scheduleAutoSave();
+      view.focus();
     }
 
-    cm.on('inputRead', (cm, change) => {
-      const cursor = cm.getCursor();
-      const lineText = cm.getLine(cursor.line);
-      const before = lineText.substring(0, cursor.ch);
-      const match = before.match(/!\[([^\]]*)$/);
-      if (match) {
-        if (!startCursor) {
-          startCursor = { line: cursor.line, ch: cursor.ch - match[0].length };
-          fetchImages();
-        }
-        const query = match[1].toLowerCase();
-        filteredImages = images.filter(im => im.name.toLowerCase().includes(query));
-        activeIdx = 0;
-        const coords = cm.cursorCoords(cursor, 'window');
-        showPopup(coords);
-      } else {
-        hidePopup();
+    // Opens, filters or closes the list from the text before the cursor.
+    function update() {
+      const sel = view.state.selection.main;
+      const line = view.state.doc.lineAt(sel.head);
+      const match = sel.empty && line.text.slice(0, sel.head - line.from).match(/!\[([^\]]*)$/);
+      if (!match) { hidePopup(); return; }
+      if (start === null) {
+        start = sel.head - match[0].length;
+        fetchImages();
       }
-    });
+      const query = match[1].toLowerCase();
+      filteredImages = images.filter(im => im.name.toLowerCase().includes(query));
+      activeIdx = 0;
+      if (!popup) {
+        popup = document.createElement('div');
+        popup.className = 'image-autocomplete-popup';
+        document.body.appendChild(popup);
+      }
+      const coords = view.coordsAtPos(sel.head);
+      if (!coords) { hidePopup(); return; }
+      popup.style.display = 'block';
+      popup.style.left = coords.left + 'px';
+      popup.style.top = (coords.bottom + 4) + 'px';
+      renderPopup();
+    }
 
-    cm.on('keydown', (cm, e) => {
-      if (!popup || popup.style.display === 'none') return;
-      if (e.key === 'ArrowDown') {
+    editor.on('change', () => {
+      if (view.hasFocus) update();
+      else hidePopup();
+    });
+    editor.on('blur', hidePopup);
+
+    // Capturing on the editor's outer element runs before CodeMirror's keys.
+    view.dom.addEventListener('keydown', e => {
+      if (!isOpen()) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        if (filteredImages.length === 0) return;
         e.preventDefault();
-        activeIdx = (activeIdx + 1) % filteredImages.length;
+        e.stopPropagation();
+        const step = e.key === 'ArrowDown' ? 1 : -1;
+        activeIdx = (activeIdx + step + filteredImages.length) % filteredImages.length;
         renderPopup();
-      } else if (e.key === 'ArrowUp') {
+      } else if ((e.key === 'Enter' || e.key === 'Tab') && filteredImages.length > 0) {
         e.preventDefault();
-        activeIdx = (activeIdx - 1 + filteredImages.length) % filteredImages.length;
-        renderPopup();
-      } else if (e.key === 'Enter' || e.key === 'Tab') {
-        if (filteredImages.length > 0) {
-          e.preventDefault();
-          selectImage(activeIdx);
-        }
+        e.stopPropagation();
+        selectImage(activeIdx);
       } else if (e.key === 'Escape') {
+        e.stopPropagation();
+        hidePopup();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Home' || e.key === 'End') {
         hidePopup();
       }
-    });
-
-    cm.on('cursorActivity', () => {
-      if (!startCursor) return;
-      const cursor = cm.getCursor();
-      if (cursor.line !== startCursor.line || cursor.ch < startCursor.ch) {
-        hidePopup();
-      }
-    });
+    }, true);
+    view.dom.addEventListener('mousedown', hidePopup);
   }
 
   function getEditorValue() {
-    return easyMDE ? easyMDE.value() : contentEditor.value;
+    return mde ? mde.getDoc() : contentEditor.value;
   }
 
   function setEditorValue(val) {
-    if (easyMDE) easyMDE.value(val || '');
+    if (mde) mde.setDoc(val || '');
     else contentEditor.value = val || '';
   }
 
-  // Image picker popover
-  function showImagePicker(editor) {
-    const existing = document.querySelector('.image-picker-popover');
-    if (existing) { existing.remove(); return; }
-
-    const pickerList = document.getElementById('image-picker-list');
-    if (!pickerList || !pickerList.innerHTML.trim()) {
-      const cm = editor.codemirror;
-      cm.replaceSelection('![alt text](image-url)');
-      cm.focus();
-      return;
-    }
-
-    const btn = document.querySelector('.fa-image').closest('button');
-    const rect = btn.getBoundingClientRect();
-    const pop = document.createElement('div');
-    pop.className = 'image-picker-popover';
-    pop.style.cssText = 'position:fixed;z-index:10000;background:white;border:1px solid #ddd;border-radius:8px;padding:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-height:250px;overflow-y:auto;min-width:220px;left:' + rect.left + 'px;top:' + (rect.bottom + 4) + 'px;';
-    pop.innerHTML = pickerList.innerHTML;
-    document.body.appendChild(pop);
-
-    pop.querySelectorAll('.image-picker-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const url = item.dataset.imgUrl;
-        const name = item.dataset.imgName;
-        const cm = editor.codemirror;
-        cm.replaceSelection('![' + name + '](' + url + ')\n');
-        cm.focus();
-        pop.remove();
-        scheduleAutoSave();
-      });
-    });
-
-    setTimeout(() => {
-      document.addEventListener('click', function closePicker(e) {
-        if (!pop.contains(e.target) && !btn.contains(e.target)) {
-          pop.remove();
-          document.removeEventListener('click', closePicker);
-        }
-      });
-    }, 10);
-  }
-
-  // Diagram menu
-  function showDiagramMenu(editor) {
+  // Diagram menu, under the toolbar's diagram button.
+  function showDiagramMenu(editor, btn) {
     const existing = document.querySelector('.diagram-menu-popover');
     if (existing) { existing.remove(); return; }
 
-    const btn = document.querySelector('.fa-project-diagram').closest('button');
     const rect = btn.getBoundingClientRect();
     const pop = document.createElement('div');
     pop.className = 'diagram-menu-popover';
     pop.style.cssText = 'position:fixed;z-index:10000;background:white;border:1px solid #ddd;border-radius:8px;padding:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);left:' + rect.left + 'px;top:' + (rect.bottom + 4) + 'px;';
-
-    const items = [
-      { label: 'Flowchart', md: '\n```mermaid\ngraph TD\n    A[Start] --> B[Step 1]\n    B --> C[Step 2]\n    C --> D[End]\n```\n' },
-      { label: 'Sequence Diagram', md: '\n```mermaid\nsequenceDiagram\n    participant A\n    participant B\n    A->>B: Hello\n    B-->>A: Hi back\n```\n' },
-      { label: 'State Diagram', md: '\n```mermaid\nstateDiagram-v2\n    [*] --> Idle\n    Idle --> Running\n    Running --> Idle\n    Running --> [*]\n```\n' },
-    ];
-
-    pop.innerHTML = items.map(i => '<div class="image-picker-item p-2" style="cursor:pointer"><small>' + i.label + '</small></div>').join('');
+    pop.innerHTML = DIAGRAM_TEMPLATES.map(i => '<div class="image-picker-item p-2" style="cursor:pointer"><small>' + i.label + '</small></div>').join('');
     document.body.appendChild(pop);
 
     pop.querySelectorAll('.image-picker-item').forEach((item, idx) => {
       item.addEventListener('click', () => {
-        editor.codemirror.replaceSelection(items[idx].md);
-        editor.codemirror.focus();
+        editor.replaceSelection(DIAGRAM_TEMPLATES[idx].md);
+        editor.focus();
         pop.remove();
-        scheduleAutoSave();
       });
     });
 
@@ -1541,37 +1189,6 @@
       if (gallery.querySelector('.dragging')) return;
       ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
     });
-
-    // Populate image picker dropdown
-    const pickerList = document.getElementById('image-picker-list');
-    if (pickerList) {
-      if (images.length === 0) {
-        pickerList.innerHTML = '<small class="text-muted">No images uploaded yet</small>';
-      } else {
-        pickerList.innerHTML = images.map(img => {
-          const imgUrl = API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
-          return `<div class="d-flex align-items-center gap-2 p-1 rounded image-picker-item" style="cursor:pointer" data-img-url="${imgUrl}" data-img-name="${img.filename}">
-            <img src="${imgUrl}" style="width:36px;height:36px;object-fit:cover;border-radius:4px">
-            <small class="text-truncate" style="max-width:140px">${img.filename}</small>
-          </div>`;
-        }).join('');
-        pickerList.querySelectorAll('.image-picker-item').forEach(item => {
-          item.addEventListener('click', () => {
-            const url = item.dataset.imgUrl;
-            const name = item.dataset.imgName;
-            const ta = contentEditor;
-            const pos = ta.selectionStart;
-            const insert = '![' + name + '](' + url + ')\n';
-            ta.value = ta.value.substring(0, pos) + insert + ta.value.substring(ta.selectionEnd);
-            ta.focus();
-            ta.selectionStart = ta.selectionEnd = pos + insert.length;
-            scheduleAutoSave();
-            // Close the dropdown
-            bootstrap.Dropdown.getOrCreateInstance(item.closest('.dropdown-menu').previousElementSibling).hide();
-          });
-        });
-      }
-    }
   }
 
   function setupImageDrag(gallery) {
@@ -2976,7 +2593,7 @@
     { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'image-input',
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
     { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',
-      // Target varies by mode: markdown authors get the EasyMDE
+      // Target varies by mode: markdown authors get the Markdown
       // surface; builder authors get the "Open in focused workspace"
       // link (which then navigates them into the step editor). The
       // renderer resolves this on every recompute so the link's
@@ -2985,16 +2602,14 @@
         ? 'open-instruction-builder'
         : 'content-editor',
       // Passes either way:
-      //   • markdown mode → ≥200 chars in the EasyMDE editor (legacy).
+      //   • markdown mode → ≥200 chars in the Markdown editor (legacy).
       //   • builder mode  → at least one step of step_type 'text' whose
       //     body has ≥200 chars after trimming. Builder authors don't
       //     write into the markdown editor — their long-form content
       //     lives in text steps, so the check needs to look there too
       //     or builder projects can never score full marks.
       check: () => {
-        var mdLen = easyMDE
-          ? easyMDE.value().trim().length
-          : (contentEditor ? contentEditor.value.trim().length : 0);
+        var mdLen = getEditorValue().trim().length;
         if (mdLen >= 200) return true;
         var inBuilder = currentProject && currentProject.content_mode === 'builder';
         if (!inBuilder) return false;
@@ -3129,9 +2744,14 @@
     } catch (e) {
       el.scrollIntoView();
     }
-    // Special-case the markdown editor: focus CodeMirror, not the hidden textarea.
-    if (id === 'content-editor' && easyMDE && easyMDE.codemirror) {
-      setTimeout(() => easyMDE.codemirror.focus(), 250);
+    // Special-case the markdown editor: focus it, not the hidden textarea.
+    if (id === 'content-editor' && mde) {
+      try {
+        mde.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (e) {
+        mde.element.scrollIntoView();
+      }
+      setTimeout(() => mde.focus(), 250);
       return;
     }
     setTimeout(() => { try { el.focus(); } catch (_) {} }, 250);
@@ -3154,17 +2774,17 @@
     }
   });
 
-  // EasyMDE body changes
-  function _wireEasyMDEForCompleteness() {
-    if (easyMDE && easyMDE.codemirror) {
-      easyMDE.codemirror.on('change', recomputeCompleteness);
+  // Markdown editor body changes (it mounts once auth has been checked)
+  function _wireEditorForCompleteness() {
+    if (mde) {
+      mde.on('change', recomputeCompleteness);
       return true;
     }
     return false;
   }
-  if (!_wireEasyMDEForCompleteness()) {
+  if (!_wireEditorForCompleteness()) {
     const _wireTimer = setInterval(() => {
-      if (_wireEasyMDEForCompleteness()) clearInterval(_wireTimer);
+      if (_wireEditorForCompleteness()) clearInterval(_wireTimer);
     }, 200);
   }
 
@@ -3201,8 +2821,10 @@
   async function init() {
     const authed = await checkAuth();
     if (!authed) return;
-    initEditor();
+    // Load first so the editor opens on the saved text, and only offers
+    // its local draft back when that differs.
     if (projectId) await loadProject();
+    initEditor();
     editorContainer.classList.remove('d-none');
     recomputeCompleteness();
   }

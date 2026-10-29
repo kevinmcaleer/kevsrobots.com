@@ -13,7 +13,7 @@ hide_nibsy: true
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/circuit-editor.css">
 <link rel="stylesheet" href="/assets/css/image-viewer.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+<link rel="stylesheet" href="/assets/js/markdown-editor/markdown-editor.css?v={{ site.time | date: '%s' }}">
 
 <!-- Global drag-and-drop overlay (issue #117) -->
 <div id="global-dropzone" class="global-dropzone d-none" aria-hidden="true">
@@ -161,12 +161,9 @@ hide_nibsy: true
         </button>
       </div>
 
-      <!-- Markdown Editor (EasyMDE) -->
+      <!-- Markdown Editor (markdown-studio's editor bundle, mounted on the textarea) -->
       <div class="mb-4" id="content-mode-pane-markdown">
         <textarea id="content-editor"></textarea>
-        <div id="image-picker-container" class="d-none">
-          <div id="image-picker-list"></div>
-        </div>
       </div>
 
       <!-- Instruction Builder pane — shows the same rendered output
@@ -463,7 +460,10 @@ hide_nibsy: true
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<!-- Issue #255: markdown-studio's Markdown editor, vendored by
+     scripts/update-markdown-editor.sh. Its spelling word lists load from
+     dictionaries/ beside the script. -->
+<script src="/assets/js/markdown-editor/markdown-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/terms-gate.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
@@ -509,8 +509,8 @@ hide_nibsy: true
   }
 
   function render() {
-    const editor = window.easyMDE || null;
-    const md = editor ? editor.value() : (document.getElementById('content-editor')?.value || '');
+    const editor = window.projectMarkdownEditor || null;
+    const md = editor ? editor.getDoc() : (document.getElementById('content-editor')?.value || '');
     const headings = parseHeadings(md);
 
     const headingLinks = headings.map((h, idx) =>
@@ -558,13 +558,19 @@ hide_nibsy: true
           return;
         }
         const line = parseInt(a.dataset.line, 10);
-        if (window.easyMDE && window.easyMDE.codemirror) {
-          const cm = window.easyMDE.codemirror;
-          cm.focus();
-          cm.setCursor({ line: line, ch: 0 });
-          // Scroll heading to top of editor viewport
-          const coords = cm.charCoords({ line: line, ch: 0 }, 'local');
-          cm.scrollTo(null, coords.top - 20);
+        const editor = window.projectMarkdownEditor;
+        if (editor) {
+          const view = editor.view;
+          const doc = view.state.doc;
+          const pos = doc.line(Math.min(line + 1, doc.lines)).from;
+          // Put the cursor on the heading and scroll it to the top
+          // (view.constructor is CodeMirror's EditorView).
+          view.dispatch({
+            selection: { anchor: pos },
+            effects: view.constructor.scrollIntoView(pos, { y: 'start', yMargin: 20 }),
+          });
+          view.focus();
+          editor.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
           // Highlight in TOC
           nav.querySelectorAll('a').forEach(x => x.classList.remove('active'));
           a.classList.add('active');
@@ -573,22 +579,14 @@ hide_nibsy: true
     });
   }
 
-  // Hook in once EasyMDE is initialised (project-editor.js exposes it on window if available;
-  // otherwise we poll briefly to grab the instance from the DOM).
+  // Hook in once project-editor.js has mounted the editor (it announces
+  // it, and leaves it on window.projectMarkdownEditor).
+  let attached = false;
   function attach() {
-    // project-editor.js keeps the instance in a closure — find it via the CodeMirror element
-    const cmEl = document.querySelector('.EasyMDEContainer .CodeMirror');
-    if (!cmEl || !cmEl.CodeMirror) {
-      setTimeout(attach, 200);
-      return;
-    }
-    const cm = cmEl.CodeMirror;
-    // Expose for click handler
-    if (!window.easyMDE) {
-      // Reconstruct a minimal interface from CodeMirror for navigation
-      window.easyMDE = { value: () => cm.getValue(), codemirror: cm };
-    }
-    cm.on('change', () => {
+    const editor = window.projectMarkdownEditor;
+    if (!editor || attached) return;
+    attached = true;
+    editor.on('change', () => {
       clearTimeout(render._t);
       render._t = setTimeout(render, 150);
     });
@@ -612,8 +610,8 @@ hide_nibsy: true
     render();
   }
 
-  document.addEventListener('DOMContentLoaded', attach);
-  if (document.readyState !== 'loading') attach();
+  document.addEventListener('project-markdown-editor:ready', attach);
+  attach();
 })();
 </script>
 
