@@ -463,9 +463,10 @@
 
   // --- Markdown editor ---
   // markdown-studio's editor bundle (assets/js/markdown-editor/, issue #255),
-  // in place of EasyMDE. The live preview, selection toolbar, find & replace,
+  // in place of EasyMDE. The live view, selection toolbar, find & replace,
   // spelling, image picker, drafts and status bar come with it; this wires
-  // it to the Projects API and renders the preview the way the site does.
+  // it to the Projects API and draws ```mermaid blocks as diagrams. There's
+  // no separate Preview: the live view is the preview, with Raw for source.
   const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // the API's max_image_size
   const MERMAID_URL = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
   const DIAGRAM_TEMPLATES = [
@@ -497,37 +498,23 @@
     return imageViewUrl(img);
   }
 
-  // ```mermaid fences become diagrams in the preview, as on the public page.
-  function mermaidFences(md) {
-    const fence = md.renderer.rules.fence;
-    md.renderer.rules.fence = function (tokens, idx, options, env, self) {
-      const lang = tokens[idx].info.trim().split(/\s+/)[0];
-      if (lang === 'mermaid') {
-        return '<div class="mermaid">' + md.utils.escapeHtml(tokens[idx].content) + '</div>';
-      }
-      return fence(tokens, idx, options, env, self);
-    };
-  }
-
-  async function decoratePreview(el) {
-    el.querySelectorAll('table').forEach(t => {
-      t.classList.add('table', 'table-single', 'table-narrow');
-    });
-    ProjectEmbeds.embedVideos(el);
-    const diagrams = el.querySelectorAll('.mermaid:not([data-processed])');
-    if (diagrams.length === 0) return;
-    try {
-      if (!mermaidLib) {
-        mermaidLib = (await import(MERMAID_URL)).default;
-        mermaidLib.initialize({ startOnLoad: false });
-      }
-      await mermaidLib.run({ nodes: Array.from(diagrams) });
-    } catch (e) { /* mermaid not available, or a diagram has a syntax error */ }
+  // A ```mermaid block in the live view: its diagram, until the cursor goes in.
+  let mermaidCount = 0;
+  async function renderMermaid(source, element) {
+    if (!mermaidLib) {
+      mermaidLib = (await import(MERMAID_URL)).default;
+      mermaidLib.initialize({ startOnLoad: false });
+    }
+    const { svg } = await mermaidLib.render('project-mermaid-' + (++mermaidCount), source);
+    element.innerHTML = svg;
   }
 
   function initEditor() {
     if (mde) return;
-    const toolbar = MarkdownEditor.DEFAULT_TOOLBAR.slice();
+    // The default toolbar, with Raw in place of Preview and Side by side.
+    const toolbar = MarkdownEditor.DEFAULT_TOOLBAR
+      .filter(item => item !== 'preview' && item !== 'side-by-side');
+    toolbar.splice(toolbar.indexOf('fullscreen'), 0, 'raw');
     toolbar.splice(toolbar.indexOf('table') + 1, 0, {
       id: 'diagram',
       label: 'Insert diagram',
@@ -546,7 +533,8 @@
         url: imageViewUrl(img), alt: img.filename,
       })),
       images: { maxBytes: MAX_IMAGE_BYTES },
-      preview: { markdownIt: mermaidFences, afterRender: decoratePreview },
+      preview: false,
+      codeRenderers: { mermaid: renderMermaid },
       slashCommands: ProjectSlashCommands.create(slashContext()),
       proofing: { languageApiBase: LANGUAGE_API, languageApi: languageRequest },
     });
