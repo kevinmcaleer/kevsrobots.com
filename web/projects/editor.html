@@ -339,8 +339,8 @@ hide_nibsy: true
   }
 
   // Issue #259: the same "On this page" as the project page, built by
-  // project-toc.js: canonical sections first with icons, then H1s with
-  // their H2s, then the editor's own cards.
+  // project-toc.js: H1s with their H2s in document order (canonical
+  // sections marked with icons), then the editor's own cards.
   function render() {
     const editor = window.projectMarkdownEditor || null;
     const md = editor ? editor.getDoc() : (document.getElementById('content-editor')?.value || '');
