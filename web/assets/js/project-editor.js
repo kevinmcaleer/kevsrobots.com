@@ -112,12 +112,13 @@
       titleInput.value = currentProject.title || '';
       updateTitleWarning();
       descInput.value = currentProject.short_description || '';
-      setEditorValue(withRepoSection(currentProject.content_md, currentProject.code_repo_url));
+      projectVideos = await fetchVideos();
+      setEditorValue(withVideosSection(
+        withRepoSection(currentProject.content_md, currentProject.code_repo_url), projectVideos));
       difficultySelect.value = currentProject.difficulty || '';
       timeInput.value = currentProject.estimated_minutes || '';
       updateStatusBadge(currentProject.status);
       renderTags(currentProject.tags || []);
-      loadVideos();
       loadFiles();
       loadImages();
     } catch (e) {
@@ -211,6 +212,7 @@
       if (!projectId) {
         history.replaceState(null, '', '?id=' + currentProject.id);
       }
+      if (projectVideos === null && !projectId) projectVideos = [];
       // Issue #190: a title save can change the slug, so refresh the
       // "View live" / view-toggle links from the (possibly new) slug.
       // updateStatusBadge already reads currentProject.slug to rebuild
@@ -220,6 +222,7 @@
       // history.replaceState anything slug-shaped here.
       updateStatusBadge(currentProject.status);
       showSaveStatus('saved', 'Saved');
+      syncVideos(content);
       // The server has this text now, so the editor's local draft of it
       // can go (unless more was typed while the save was in flight).
       if (mde && mde.getDoc() === (data.content_md || '')) mde.clearDraft();
@@ -612,6 +615,7 @@
     mde.on('change', () => {
       scheduleAutoSave();
       scheduleAutoTagDetection();
+      scheduleBomTotals();
     });
     setupImageAutocomplete(mde);
     // For the TOC in editor.html and other page scripts.
@@ -1347,127 +1351,216 @@
   }
   window.showAccountAgeAlert = showAccountAgeAlert;
 
-  // --- Videos (issue #171) ---
+  // --- Bill of Materials totals ---
   //
-  // First-class YouTube video list. Pasting a URL extracts the 11-char
-  // id client-side so the thumbnail flips immediately; the backend
-  // re-validates server-side and 422s on anything malformed.
-  //
-  // The id extractor is shared with the `/video` command and the view
-  // page, in project-embeds.js.
-  const extractYouTubeId = ProjectEmbeds.youTubeId;
+  // When the Bill of Materials table has Qty and Price columns, the editor
+  // keeps a Total column (Qty × Price per row, added if missing) and a
+  // "**Total**" row under the last part with the sum. They're written
+  // into the Markdown, so the project page and any export show them too.
+  const BOM_QTY = /^(qty|quantity|count)$/;
+  const BOM_PRICE = /^(price|unit price|price each|each|cost|unit cost)$/;
+  const BOM_TOTAL = /^(total|subtotal|line total|row total)$/;
 
-  document.getElementById('add-video-btn').addEventListener('click', async () => {
-    if (!currentProject) { await saveProject(); if (!currentProject) return; }
-    const input = prompt('Paste a YouTube URL (or 11-char video ID):');
-    if (input === null) return;
-    const trimmed = String(input || '').trim();
-    if (!trimmed) return;
-    const id = extractYouTubeId(trimmed);
-    if (!id) {
-      alert('That doesn\'t look like a YouTube URL. Try one of:\n\nhttps://www.youtube.com/watch?v=…\nhttps://youtu.be/…\nhttps://www.youtube.com/embed/…\nhttps://www.youtube.com/shorts/…\n\nOr paste the 11-character video ID directly.');
-      return;
-    }
-    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/videos', {
-      method: 'POST', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url_or_id: trimmed }),
-    });
-    if (!resp.ok) {
-      let detail = 'Failed to add video.';
-      try { const body = await resp.json(); detail = body.detail || detail; } catch (_) {}
-      alert(detail);
-      return;
-    }
-    loadVideos();
-  });
-
-  async function loadVideos() {
-    if (!currentProject) return;
-    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/videos', { credentials: 'include' });
-    const videos = await resp.json();
-    const tbody = document.getElementById('videos-body');
-    const empty = document.getElementById('videos-empty');
-    if (!tbody) return;
-    if (videos.length === 0) {
-      tbody.innerHTML = '';
-      if (empty) empty.classList.remove('d-none');
-      return;
-    }
-    if (empty) empty.classList.add('d-none');
-    tbody.innerHTML = videos.map(v => `
-      <tr data-video-id="${v.id}">
-        <td>
-          <a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.youtube_id)}" target="_blank" rel="noopener" title="${escapeHtmlAttr(v.youtube_id)}">
-            <img src="https://img.youtube.com/vi/${encodeURIComponent(v.youtube_id)}/default.jpg" alt="" loading="lazy" style="width:72px;height:auto;border-radius:3px">
-          </a>
-        </td>
-        <td><code class="small">${escapeHtmlAttr(v.youtube_id)}</code></td>
-        <td><input class="form-control form-control-sm" data-field="title" value="${escapeHtmlAttr(v.title || '')}" maxlength="200" placeholder="Optional title" onchange="updateVideo(${v.id}, this)"></td>
-        <td>
-          <div class="btn-group btn-group-sm" role="group" aria-label="Reorder">
-            <button class="btn btn-outline-secondary" onclick="moveVideo(${v.id}, -1)" title="Move up"><i class="fas fa-arrow-up"></i></button>
-            <button class="btn btn-outline-secondary" onclick="moveVideo(${v.id}, 1)" title="Move down"><i class="fas fa-arrow-down"></i></button>
-          </div>
-        </td>
-        <td><button class="btn btn-sm text-danger" onclick="deleteVideo(${v.id})" title="Delete video"><i class="fas fa-times"></i></button></td>
-      </tr>
-    `).join('');
-    // Stash the loaded list so moveVideo() can compute neighbour
-    // sort_orders without a re-fetch.
-    window._videosCache = videos;
+  function parseAmount(cell) {
+    const m = String(cell || '').replace(/[*_`]/g, '').replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+    return m ? parseFloat(m[0]) : null;
   }
 
-  const _videoSavePending = {};
-  window.updateVideo = async function(videoId, input) {
-    const field = input.dataset.field;
-    if (!field) return;
-    const payload = { [field]: input.value };
-    const prev = _videoSavePending[videoId] || Promise.resolve();
-    const next = prev.then(async () => {
-      try {
-        await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + videoId, {
-          method: 'PUT', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      } catch (_) { loadVideos(); }
-    });
-    _videoSavePending[videoId] = next;
-  };
+  // "£", "$", "€"... in front of the number, or after it ("12 EUR").
+  function currencyOf(cell) {
+    const text = String(cell || '').replace(/[*_`]/g, '').trim();
+    const m = text.match(/^([^\d\s.-]+)\s*-?\d/) || text.match(/\d\s*([^\d\s.,]+)$/);
+    return m ? { symbol: m[1], before: /^[^\d\s.-]/.test(text) } : null;
+  }
 
-  window.moveVideo = async function(videoId, delta) {
-    const list = (window._videosCache || []);
-    const idx = list.findIndex(v => v.id === videoId);
-    if (idx < 0) return;
-    const target = idx + delta;
-    if (target < 0 || target >= list.length) return;
-    // Swap sort_order with the neighbour. Two sequential PUTs are fine
-    // here — the list is tiny in practice and the backend has no
-    // uniqueness constraint on sort_order so a transient duplicate is
-    // harmless.
-    const mine = list[idx];
-    const neighbour = list[target];
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + mine.id, {
-      method: 'PUT', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sort_order: neighbour.sort_order }),
-    });
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + neighbour.id, {
-      method: 'PUT', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sort_order: mine.sort_order }),
-    });
-    loadVideos();
-  };
+  function money(n, currency) {
+    const amount = n.toFixed(2);
+    if (!currency) return amount;
+    return currency.before ? currency.symbol + amount : amount + ' ' + currency.symbol;
+  }
 
-  window.deleteVideo = async function(videoId) {
-    if (!confirm('Remove this video from the project?')) return;
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/videos/' + videoId, {
-      method: 'DELETE', credentials: 'include',
+  // The lines to replace: [{ line, text }] (line counted from 0), plus
+  // where a missing total row goes. Empty when there's nothing to change.
+  function bomTotalsChanges(markdown) {
+    const table = ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return [];
+    const header = table.header;
+    const qtyCol = header.findIndex(h => BOM_QTY.test(h));
+    const priceCol = header.findIndex(h => BOM_PRICE.test(h));
+    if (qtyCol < 0 || priceCol < 0) return [];
+    const lines = markdown.split('\n');
+    const rowText = cells => '| ' + cells.join(' | ') + ' |';
+    const raw = line => lines[line].trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '').split(/(?<!\\)\|/).map(c => c.trim());
+    const changes = [];
+
+    let totalCol = header.findIndex(h => BOM_TOTAL.test(h));
+    const adding = totalCol < 0;
+    if (adding) {
+      totalCol = priceCol + 1;
+      const head = raw(table.headerLine);
+      head.splice(totalCol, 0, 'Total');
+      changes.push({ line: table.headerLine, text: rowText(head) });
+      const sep = raw(table.headerLine + 1);
+      sep.splice(totalCol, 0, '---');
+      changes.push({ line: table.headerLine + 1, text: rowText(sep) });
+    }
+
+    let currency = null;
+    let sum = 0;
+    let priced = 0;
+    const totalRows = [];
+    table.rows.forEach((row, r) => {
+      const line = table.lines[r];
+      if (ProjectSlashCommands.isTotalRow(row)) { totalRows.push(line); return; }
+      const cells = raw(line);
+      while (cells.length < header.length) cells.push('');
+      if (adding) cells.splice(totalCol, 0, '');
+      const qty = parseAmount(cells[qtyCol]);
+      const price = parseAmount(cells[priceCol]);
+      currency = currency || currencyOf(cells[priceCol]);
+      let total = '';
+      if (qty !== null && price !== null) {
+        sum += qty * price;
+        priced++;
+        total = money(qty * price, currencyOf(cells[priceCol]) || currency);
+      }
+      if (adding || (cells[totalCol] || '') !== total) {
+        cells[totalCol] = total;
+        changes.push({ line, text: rowText(cells) });
+      }
     });
-    loadVideos();
-  };
+
+    // The grand total sits under the last part; any other total row goes.
+    const width = header.length + (adding ? 1 : 0);
+    const lastLine = table.lines[table.lines.length - 1];
+    const totalCells = new Array(width).fill('');
+    totalCells[0] = '**Total**';
+    totalCells[totalCol] = '**' + money(sum, currency) + '**';
+    const wantText = priced ? rowText(totalCells) : null;
+    totalRows.forEach(line => {
+      if (line === lastLine && wantText) {
+        if (lines[line].trim() !== wantText) changes.push({ line, text: wantText });
+      } else {
+        changes.push({ line, text: null }); // remove
+      }
+    });
+    if (wantText && totalRows[totalRows.length - 1] !== lastLine) {
+      changes.push({ line: lastLine, append: wantText });
+    }
+    return changes;
+  }
+
+  function applyBomTotals() {
+    if (!mde || !mde.view) return;
+    const view = mde.view;
+    const doc = view.state.doc;
+    const changes = bomTotalsChanges(doc.toString());
+    if (!changes.length) return;
+    const specs = [];
+    changes.forEach(c => {
+      const line = doc.line(c.line + 1);
+      if (c.append) specs.push({ from: line.to, insert: '\n' + c.append });
+      else if (c.text === null) specs.push({ from: line.from, to: Math.min(line.to + 1, doc.length) });
+      else specs.push({ from: line.from, to: line.to, insert: c.text });
+    });
+    view.dispatch({ changes: specs, userEvent: 'input.bomtotals' });
+  }
+
+  let bomTotalsTimer = null;
+  function scheduleBomTotals() {
+    clearTimeout(bomTotalsTimer);
+    bomTotalsTimer = setTimeout(applyBomTotals, 800);
+  }
+
+  // --- Videos section (issue #171) ---
+  //
+  // Videos are an optional "Videos" section of the document: a table
+  // with the YouTube link in its first column and an optional title.
+  // The project's video list (the API, which the project page's player
+  // and the cards read) follows that table after each save. A project
+  // saved before the section existed gets one made from its videos when
+  // it's opened, the way code_repo_url became a section.
+  const extractYouTubeId = ProjectEmbeds.youTubeId;
+  let projectVideos = null; // the API's list as last seen; null until it loads
+
+  // [{ youtube_id, title }] in table order, each video once.
+  function videosFromMarkdown(markdown) {
+    const table = ProjectSections.sectionTable(markdown, 'videos');
+    if (!table) return [];
+    let videoCol = table.header.findIndex(h => /^(video|videos|url|link|youtube)$/.test(h));
+    if (videoCol < 0) videoCol = 0;
+    const titleCol = table.header.findIndex(h => /^(title|name|caption|description)$/.test(h));
+    const seen = new Set();
+    const out = [];
+    table.rows.forEach(row => {
+      const cell = row[videoCol] || '';
+      const link = cell.match(/\]\(([^)\s]+)/);
+      const id = extractYouTubeId(link ? link[1] : cell.replace(/^<|>$/g, ''));
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      const title = titleCol >= 0 ? (row[titleCol] || '').replace(/\\\|/g, '|').trim() : '';
+      out.push({ youtube_id: id, title: title || null });
+    });
+    return out;
+  }
+
+  function withVideosSection(markdown, videos) {
+    const md = markdown || '';
+    if (!videos || !videos.length || ProjectSections.present(md).has('videos')) return md;
+    const cell = t => String(t || '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+    const rows = videos.map(v => '| ' + ProjectEmbeds.videoMarkdown(v.youtube_id) + ' | ' + cell(v.title) + ' |').join('\n');
+    return md.replace(/\s*$/, '') + (md.trim() ? '\n\n' : '') +
+      '# ' + ProjectSections.get('videos').heading + '\n\n| Video | Title |\n| --- | --- |\n' + rows + '\n';
+  }
+
+  async function fetchVideos() {
+    try {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/videos', { credentials: 'include' });
+      if (!resp.ok) return null;
+      const list = await resp.json();
+      return Array.isArray(list) ? list.sort((a, b) => a.sort_order - b.sort_order) : null;
+    } catch (_) { return null; }
+  }
+
+  // Brings the API's list in line with the table. One run at a time; a
+  // save during a run queues one more.
+  let videoSync = Promise.resolve();
+  function syncVideos(markdown) {
+    videoSync = videoSync.then(() => syncVideosNow(markdown)).catch(e => console.error('Video sync failed:', e));
+    return videoSync;
+  }
+
+  async function syncVideosNow(markdown) {
+    // Not before the list has loaded: an empty table then would delete them.
+    if (!currentProject || projectVideos === null) return;
+    const want = videosFromMarkdown(markdown);
+    const have = projectVideos;
+    const call = (path, method, body) => apiFetch(API + '/api/projects/' + currentProject.id + '/videos' + path, {
+      method, credentials: 'include',
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const wanted = new Set(want.map(v => v.youtube_id));
+    let changed = false;
+    for (const v of have) {
+      if (!wanted.has(v.youtube_id)) { await call('/' + v.id, 'DELETE'); changed = true; }
+    }
+    for (let i = 0; i < want.length; i++) {
+      const w = want[i];
+      let row = have.find(v => v.youtube_id === w.youtube_id);
+      if (!row) {
+        const resp = await call('', 'POST', { url_or_id: w.youtube_id, title: w.title });
+        if (!resp.ok) continue;
+        row = await resp.json();
+        changed = true;
+      }
+      if ((row.title || null) !== w.title || row.sort_order !== i) {
+        await call('/' + row.id, 'PUT', { title: w.title || '', sort_order: i });
+        changed = true;
+      }
+    }
+    if (changed) projectVideos = (await fetchVideos()) || projectVideos;
+  }
 
   // The Build Journal was retired from the editor (it belongs in the
   // page content now). Existing entries stay stored and the API is
@@ -1904,7 +1997,7 @@
     // it's just as much a doc artefact as a file.
     { key: 'extra',  points: 10, label: 'Add a file or video',                 target: 'editor-files-section',
       check: () => document.querySelectorAll('#file-list tbody tr').length > 0
-                || document.querySelectorAll('#videos-body tr').length > 0 },
+                || videosFromMarkdown(getEditorValue()).length > 0 },
   ];
 
   let completenessFrame = null;
@@ -2065,8 +2158,6 @@
   _observe('tags-container');
   _observe('image-gallery');
   _observe('file-list');
-  // Issue #171: re-score the completeness meter when a video lands.
-  _observe('videos-body');
 
   // Expose so loadProject() / init can trigger explicitly.
   window._recomputeCompleteness = recomputeCompleteness;
@@ -2120,6 +2211,7 @@
     // its local draft back when that differs.
     if (projectId) await loadProject();
     initEditor();
+    scheduleBomTotals();
     editorContainer.classList.remove('d-none');
     const completenessCard = document.getElementById('completeness-card');
     if (completenessCard) completenessCard.classList.remove('d-none');
