@@ -479,6 +479,11 @@ hide_nibsy: true
      project-editor.js so the latter's boot flow can call
      ProjectInstructions.init(projectId, isOwner). -->
 <script src="/assets/js/project-instructions.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Issue #257: the Project `/` commands, the canonical section names
+     they insert, and the YouTube embed shared with the view page. -->
+<script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-slash-commands.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 // Editor TOC — live-updates from markdown source as the user types
