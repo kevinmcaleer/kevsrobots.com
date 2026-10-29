@@ -32,6 +32,9 @@
   a.kr-toc-section { color: $kr-ink; font-weight: 600; }
   a.kr-toc-section.is-active { font-weight: 700; }
   .project-section-icon { flex: none; color: $kevred; }
+  // Entries without an icon keep its space, so every entry's text starts
+  // at the same place.
+  a:not(.kr-toc-section)::before { content: ''; flex: none; width: 16px; }
 
   .kr-toc-extras { padding-top: 0.6rem; border-top: 1px solid $kr-line; }
   .kr-toc-empty { color: $kr-ink-soft; font-size: 0.8rem; font-style: italic; padding: 0.3rem 0.7rem; }
