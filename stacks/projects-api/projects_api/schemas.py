@@ -671,22 +671,39 @@ class FileResponse(BaseModel):
     id: int
     filename: str
     file_size: int
+    # model | code | document | archive (issue #261).
     file_type: str
     description: Optional[str]
+    print_settings: Optional[str] = None
+    # Set when a rendered thumbnail exists (issue #262); it is served at
+    # ``/api/projects/{id}/files/{file_id}/thumbnail?v=<thumbnail_version>``.
+    thumbnail_version: Optional[str] = None
     uploaded_at: datetime
     download_count: int = 0
 
 
 class FileUpdate(BaseModel):
     """Partial-update body for ``PUT /api/projects/{id}/files/{file_id}``
-    (issue #187). Only ``description`` is mutable today; every other file
-    field is fixed at upload time. Mirrors the ``LinkUpdate`` / BOM partial
+    (issue #187). Only ``description`` and ``print_settings`` are mutable;
+    every other file field is fixed at upload time. Mirrors the ``LinkUpdate`` / BOM partial
     semantics — fields omitted (``exclude_unset``) are left untouched, an
     explicit empty string clears the description, ``None`` is treated as
     omitted (don't touch). Long descriptions are allowed up to 2000 chars
     — the editor textarea wraps in the column rather than truncating."""
 
     description: Optional[str] = Field(None, max_length=2000)
+    # Issue #261: slicer settings for a model (layer height, infill, …).
+    print_settings: Optional[str] = Field(None, max_length=2000)
+
+
+class ModelMissingThumbnail(BaseModel):
+    """A 3D model with no thumbnail yet, for the admin backfill (#262)."""
+
+    file_id: int
+    project_id: int
+    project_title: str
+    filename: str
+    file_size: int
 
 
 class ImageResponse(BaseModel):

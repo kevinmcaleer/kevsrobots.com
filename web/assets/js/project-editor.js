@@ -655,7 +655,7 @@
           try {
             if (!currentProject) await saveProject();
             if (!currentProject) throw new Error('Add a title and save before adding files');
-            const uploaded = await uploadSingleFile(file);
+            const uploaded = await uploadProjectFile(file);
             loadFiles();
             resolve({ name: uploaded.filename || file.name, url: fileDownloadUrl(uploaded) });
           } catch (e) {
@@ -833,7 +833,11 @@
   // page-wide overlay). All drag-and-drop is now handled by the global
   // overlay further down — see setupGlobalDropzone().
   const fileInput = document.getElementById('file-input');
-  fileInput.addEventListener('change', e => uploadFiles(e.target.files));
+  fileInput.addEventListener('change', e => {
+    // Picked files go through the same sorter as a drop.
+    processDroppedFiles(Array.from(e.target.files || []));
+    fileInput.value = '';
+  });
 
   const FILE_KINDS = {
     py: 'Python Script', cpp: 'C++ Source', h: 'Header File', ino: 'Arduino Sketch',
@@ -870,39 +874,6 @@
     return FILE_ICONS[ext] || 'fa-file fas';
   }
 
-  async function uploadFiles(fileList) {
-    if (!currentProject) {
-      await saveProject();
-      if (!currentProject) return;
-    }
-    const errors = [];
-    // The backend routes image uploads to the Images gallery (returning an
-    // image-shaped body with `sort_order` instead of `file_type`), so refresh
-    // that list too when any upload landed there.
-    let movedToImages = false;
-    for (const file of fileList) {
-      const form = new FormData();
-      form.append('file', file);
-      try {
-        const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', {
-          method: 'POST', credentials: 'include', body: form,
-        });
-        if (!resp.ok) {
-          const err = await resp.json();
-          errors.push(file.name + ': ' + (err.detail || 'failed'));
-        } else {
-          const saved = await resp.json().catch(() => null);
-          if (saved && saved.file_type === undefined) movedToImages = true;
-        }
-      } catch (e) { errors.push(file.name + ': network error'); }
-    }
-    if (errors.length > 0) {
-      alert('Some files could not be uploaded:\n\n' + errors.join('\n'));
-    }
-    loadFiles();
-    if (movedToImages) loadImages();
-  }
-
   let projectFiles = []; // the last list loadFiles() fetched, for `/3d printed parts`
   async function loadFiles() {
     if (!currentProject) return;
@@ -915,12 +886,14 @@
     // cell. Click the muted placeholder ("Add a description…") or the
     // existing text to flip into an input; Enter / blur saves; Escape
     // cancels. Long descriptions wrap in the column via the
-    // .file-description CSS rule (max-width + word-break).
+    // .file-description CSS rule (word-break).
+    // Models first (issue #261), each with its thumbnail (issue #262).
+    const ordered = files.filter(f => f.file_type === 'model').concat(files.filter(f => f.file_type !== 'model'));
     // Full width; the Description column takes the spare room.
     list.innerHTML = `<table class="table table-single table-hover mb-0 files-table">
       <thead>
         <tr>
-          <th style="width:20px"></th>
+          <th style="width:48px"></th>
           <th>File</th>
           <th class="w-100">Description</th>
           <th class="text-muted small">Kind</th>
@@ -928,11 +901,14 @@
           <th style="width:30px"></th>
         </tr>
       </thead>
-      <tbody>${files.map(f => `
+      <tbody>${ordered.map(f => `
         <tr data-file-id="${f.id}">
-          <td class="text-muted" style="width:20px"><i class="${fileIcon(f.filename)}"></i></td>
-          <td><a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${escapeHtmlAttr(f.filename)}</a></td>
-          <td class="file-description" data-file-id="${f.id}">${renderFileDescription(f.description)}</td>
+          <td class="text-muted text-center" style="width:48px">${fileThumb(f)}</td>
+          <td><a href="${fileDownloadUrl(f)}">${escapeHtmlAttr(f.filename)}</a></td>
+          <td class="file-description">
+            <div class="kr-file-field" data-file-id="${f.id}" data-field="description">${renderFileField('description', f.description)}</div>
+            ${f.file_type === 'model' ? `<div class="kr-file-field small" data-file-id="${f.id}" data-field="print_settings">${renderFileField('print_settings', f.print_settings)}</div>` : ''}
+          </td>
           <td class="text-muted small">${fileKind(f.filename)}</td>
           <td class="text-muted small text-end">${(f.file_size / 1024).toFixed(1)} KB</td>
           <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})"><i class="fas fa-trash fa-xs"></i></button></td>
@@ -940,25 +916,43 @@
       `).join('')}</tbody></table>`;
   }
 
-  // Render the description cell's "view" state — a span the user clicks
-  // to edit. Empty values get a muted placeholder so the affordance is
-  // discoverable; non-empty values render the description verbatim.
-  function renderFileDescription(desc) {
-    const hasText = desc != null && String(desc).length > 0;
+  function fileThumbUrl(f) {
+    return API + '/api/projects/' + currentProject.id + '/files/' + f.id + '/thumbnail?v=' + f.thumbnail_version;
+  }
+
+  // A model's rendered thumbnail, or its icon until it has one.
+  function fileThumb(f) {
+    if (f.thumbnail_version) {
+      return `<img src="${fileThumbUrl(f)}" alt="" class="kr-file-thumb" width="40" height="40" loading="lazy">`;
+    }
+    return `<i class="${fileIcon(f.filename)}"></i>`;
+  }
+
+  // Render an editable file field's "view" state — a span the user
+  // clicks to edit. Empty values get a muted placeholder so the affordance
+  // is discoverable. Models also carry print settings (issue #261).
+  const FILE_FIELDS = {
+    description: { add: 'Add a description…', edit: 'Describe this file…' },
+    print_settings: { add: 'Add print settings…', edit: 'Layer height, infill, supports…', label: 'Print settings: ' },
+  };
+
+  function renderFileField(field, value) {
+    const meta = FILE_FIELDS[field];
+    const hasText = value != null && String(value).length > 0;
     if (hasText) {
       return `<span class="kr-file-desc" tabindex="0" role="button"
-        title="Click to edit description">${escapeHtmlAttr(desc)}</span>`;
+        title="Click to edit">${meta.label ? `<span class="text-muted">${meta.label}</span>` : ''}${escapeHtmlAttr(value)}</span>`;
     }
     return `<span class="kr-file-desc text-muted fst-italic" tabindex="0"
-      role="button" title="Click to add a description"
-      data-empty="1">Add a description…</span>`;
+      role="button" title="Click to add"
+      data-empty="1">${meta.add}</span>`;
   }
 
   // Track in-flight PUTs per row so a fast typer doesn't fire overlapping
   // requests — serialise per-row by chaining onto the previous promise.
   const _fileDescSavePending = {};
 
-  async function saveFileDescription(fileId, newValue) {
+  async function saveFileField(fileId, field, newValue) {
     if (!currentProject) return null;
     const prev = _fileDescSavePending[fileId] || Promise.resolve();
     const next = prev.then(async () => {
@@ -968,7 +962,7 @@
           method: 'PUT',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ description: newValue }),
+          body: JSON.stringify({ [field]: newValue }),
         }
       );
       if (!resp.ok) throw new Error('save failed: ' + resp.status);
@@ -1004,11 +998,13 @@
   }
 
   function beginFileDescriptionEdit(span) {
-    const cell = span.closest('.file-description');
+    const cell = span.closest('.kr-file-field');
     if (!cell) return;
     const fileId = parseInt(cell.dataset.fileId, 10);
     if (!Number.isFinite(fileId)) return;
-    const original = span.dataset.empty === '1' ? '' : (span.textContent || '');
+    const field = cell.dataset.field;
+    const file = projectFiles.find(f => f.id === fileId);
+    const original = (file && file[field]) || '';
     span.dataset.editing = '1';
 
     const input = document.createElement('input');
@@ -1016,7 +1012,7 @@
     input.className = 'form-control form-control-sm kr-file-desc-input';
     input.value = original;
     input.maxLength = 2000;
-    input.placeholder = 'Describe this file…';
+    input.placeholder = FILE_FIELDS[field].edit;
     cell.innerHTML = '';
     cell.appendChild(input);
     input.focus();
@@ -1026,20 +1022,17 @@
     const finish = async (commit) => {
       if (finished) return;
       finished = true;
-      if (!commit) {
-        cell.innerHTML = renderFileDescription(original || null);
-        return;
-      }
       const next = input.value;
-      if (next === original) {
-        cell.innerHTML = renderFileDescription(original || null);
+      if (!commit || next === original) {
+        cell.innerHTML = renderFileField(field, original || null);
         return;
       }
       // Optimistic re-render with the new value; if the save fails the
       // reload at the end of the catch reconciles with the server.
-      cell.innerHTML = renderFileDescription(next || null);
+      cell.innerHTML = renderFileField(field, next || null);
+      if (file) file[field] = next;
       try {
-        await saveFileDescription(fileId, next);
+        await saveFileField(fileId, field, next);
       } catch (_) {
         loadFiles();
       }
@@ -1489,8 +1482,9 @@
   });
 
   // --- Global drop zone (issue #117) ---
-  // Smart routing: images -> uploadImages(), README.md -> editor content,
-  // license files and everything else -> uploadFiles().
+  // Smart routing (issue #261): images -> the gallery, README.md -> editor
+  // content, 3D printable models -> Files & Models with a rendered
+  // thumbnail, everything else -> Files. A dropped folder is walked.
   const ALLOWED_FILE_EXTS = new Set([
     'py', 'cpp', 'h', 'ino', 'md', 'txt', 'pdf',
     'stl', 'obj', 'gcode', '3mf', 'step', 'stp', 'dxf', 'dwg', 'svg',
@@ -1499,7 +1493,10 @@
     'scad', 'kicad_pcb', 'kicad_sch', 'brd', 'sch',
     'f3d', 'fcstd',
   ]);
-  const IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']);
+  const IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'heic', 'heif']);
+  const HEIC_EXTS = new Set(['heic', 'heif']);
+  // What the server files each upload as (storage.file_category).
+  const MODEL_EXTS = new Set(['stl', '3mf', 'obj', 'step', 'stp', 'gcode']);
 
   function getExt(name) {
     const i = (name || '').lastIndexOf('.');
@@ -1511,15 +1508,77 @@
     return IMAGE_EXTS.has(getExt(file.name));
   }
 
+  // Each file found inside a dropped folder, by how deep it sat: only a
+  // README at the top of the folder is the project's write-up.
+  const dropDepth = new WeakMap();
+
   function isReadmeFile(file) {
     const n = (file.name || '').toLowerCase();
-    return n === 'readme.md' || n === 'index.md';
+    return (n === 'readme.md' || n === 'index.md') && (dropDepth.get(file) || 0) <= 1;
   }
 
-  function isLicenseFile(file) {
-    const n = (file.name || '').toLowerCase();
-    return n === 'license' || n === 'license.md' || n === 'license.txt'
-      || n === 'licence' || n === 'licence.md' || n === 'licence.txt';
+  function isModelFile(file) {
+    return MODEL_EXTS.has(getExt(file.name));
+  }
+
+  // Folder entries the browser offers with a drop. Read them during the
+  // drop event: the DataTransfer is emptied once the handler returns.
+  function droppedEntries(dataTransfer) {
+    const items = Array.from((dataTransfer && dataTransfer.items) || []);
+    return items
+      .filter(item => item.kind === 'file')
+      .map(item => (item.webkitGetAsEntry ? item.webkitGetAsEntry() : null));
+  }
+
+  // Not worth filing: hidden files, macOS zip debris and OS thumbnails.
+  function isJunkEntry(name) {
+    return name.startsWith('.') || name === '__MACOSX' || name === 'Thumbs.db' || name === 'desktop.ini';
+  }
+
+  const MAX_FOLDER_FILES = 200;
+
+  // Every file under the dropped entries, depth-first. A directory reader
+  // hands back entries in batches until it returns an empty one.
+  async function walkEntries(entries) {
+    const out = [];
+    async function visit(entry, depth) {
+      if (!entry || isJunkEntry(entry.name) || out.length >= MAX_FOLDER_FILES) return;
+      if (entry.isFile) {
+        const file = await new Promise((resolve, reject) => entry.file(resolve, reject));
+        dropDepth.set(file, depth);
+        out.push(file);
+        return;
+      }
+      if (!entry.isDirectory) return;
+      const reader = entry.createReader();
+      for (;;) {
+        const batch = await new Promise((resolve, reject) => reader.readEntries(resolve, reject));
+        if (!batch.length) break;
+        for (const child of batch) await visit(child, depth + 1);
+      }
+    }
+    for (const entry of entries) await visit(entry, 0);
+    return out;
+  }
+
+  // HEIC photos (iPhone) become JPEGs before they go to the gallery, which
+  // browsers can't show HEIC in. The converter loads on first use.
+  const HEIC2ANY_URL = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+  let heicLoading = null;
+  async function heicToJpeg(file) {
+    if (!window.heic2any) {
+      heicLoading = heicLoading || new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = HEIC2ANY_URL;
+        script.onload = resolve;
+        script.onerror = () => { heicLoading = null; reject(new Error('could not load the HEIC converter')); };
+        document.head.appendChild(script);
+      });
+      await heicLoading;
+    }
+    const out = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+    const blob = Array.isArray(out) ? out[0] : out;
+    return new File([blob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
   }
 
   function isAcceptedFile(file) {
@@ -1563,6 +1622,22 @@
     if (!dropProgressEl) return;
     dropProgressTitle.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> ' + summary;
     setTimeout(() => { dropProgressEl.classList.add('d-none'); }, 4000);
+  }
+
+  // Upload a file and, for a model the browser can draw, its thumbnail
+  // (issue #262). A thumbnail that fails leaves the model filed without
+  // one; the admin backfill can render it later.
+  async function uploadProjectFile(file) {
+    const saved = await uploadSingleFile(file);
+    if (saved.file_type === 'model' && window.ModelThumbnails && ModelThumbnails.canRender(file.name)) {
+      try {
+        const url = API + '/api/projects/' + currentProject.id + '/files/' + saved.id + '/thumbnail';
+        return await ModelThumbnails.upload(apiFetch, url, await file.arrayBuffer());
+      } catch (e) {
+        console.warn('No thumbnail for ' + file.name, e);
+      }
+    }
+    return saved;
   }
 
   // Upload a single file via the files API and return the response JSON.
@@ -1618,12 +1693,6 @@
     return true;
   }
 
-  async function handleLicenseDrop(file, row) {
-    // Related Links is retired from the editor, so a licence is just a file.
-    await uploadSingleFile(file);
-    updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to Files &amp; Models</span>');
-  }
-
   async function processDroppedFiles(fileList) {
     const files = Array.from(fileList || []);
     if (files.length === 0) return;
@@ -1650,12 +1719,13 @@
     }
 
     let imageCount = 0;
+    let modelCount = 0;
     let fileCount = 0;
     let readmeCount = 0;
-    let licenseCount = 0;
     let errorCount = 0;
     let needsImageReload = false;
     let needsFileReload = false;
+    const skippedCount = files.length - accepted.length;
 
     for (const file of accepted) {
       const row = addProgressLine(file.name, '<i class="fas fa-spinner fa-spin"></i>');
@@ -1663,18 +1733,21 @@
         if (isReadmeFile(file)) {
           const ok = await handleReadmeDrop(file, row);
           if (ok) readmeCount++;
-        } else if (isLicenseFile(file)) {
-          await handleLicenseDrop(file, row);
-          licenseCount++;
-          needsFileReload = true;
         } else if (isImageFile(file)) {
-          await uploadSingleImage(file);
+          const image = HEIC_EXTS.has(getExt(file.name)) ? await heicToJpeg(file) : file;
+          await uploadSingleImage(image);
           updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery</span>');
           imageCount++;
           needsImageReload = true;
+        } else if (isModelFile(file)) {
+          await uploadProjectFile(file);
+          updateProgressLine(row, '<span class="text-success"><i class="fas fa-cube"></i> added to Files &amp; Models</span>');
+          modelCount++;
+          needsFileReload = true;
         } else {
+          // Licences included: Related Links is retired, so a licence is just a file.
           await uploadSingleFile(file);
-          updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> uploaded</span>');
+          updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to Files</span>');
           fileCount++;
           needsFileReload = true;
         }
@@ -1689,13 +1762,17 @@
 
     scheduleAutoSave();
 
+    // "12 images, 3 models, 4 files added"
+    const plural = (n, word) => n + ' ' + word + (n === 1 ? '' : 's');
     const parts = [];
-    if (imageCount) parts.push(imageCount + ' image' + (imageCount === 1 ? '' : 's'));
-    if (fileCount) parts.push(fileCount + ' file' + (fileCount === 1 ? '' : 's'));
-    if (readmeCount) parts.push('README');
-    if (licenseCount) parts.push('license');
-    let summary = parts.length ? 'Added ' + parts.join(', ') : 'Done';
+    if (imageCount) parts.push(plural(imageCount, 'image'));
+    if (modelCount) parts.push(plural(modelCount, 'model'));
+    if (fileCount) parts.push(plural(fileCount, 'file'));
+    let summary = parts.length ? parts.join(', ') + ' added' : '';
+    if (readmeCount) summary += (summary ? ', ' : '') + 'README loaded';
+    if (!summary) summary = 'Nothing added';
     if (errorCount) summary += ' (' + errorCount + ' failed)';
+    if (skippedCount) summary += ' (' + skippedCount + ' unsupported)';
     finishProgress(summary);
   }
 
@@ -1757,17 +1834,31 @@
       overlay.classList.remove('is-active');
       // The entire editor page is one drop target, and
       // processDroppedFiles() routes by type: images → gallery,
-      // README/index.md → markdown editor, LICENSE → linked file,
-      // anything else in ALLOWED_FILE_EXTS → Files & Models.
+      // README/index.md → markdown editor, models → Files & Models,
+      // anything else in ALLOWED_FILE_EXTS → Files.
       // The one exception: images dropped on the text belong to the editor
       // bundle, which places them where they land and files them in the
       // gallery through the uploadImage hook.
       const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+      const entries = droppedEntries(e.dataTransfer);
       const onText = mde && mde.element && mde.element.contains(e.target);
+      const tookImage = (f) => onText && editorTook && f.type && f.type.startsWith('image/');
+      // A folder (issue #261): walk it, leaving out any loose images the
+      // editor already took.
+      if (entries.some(entry => entry && entry.isDirectory)) {
+        const rest = entries.filter((entry, i) => entry && !(files[i] && tookImage(files[i])));
+        walkEntries(rest).then(found => {
+          if (found.length >= MAX_FOLDER_FILES) {
+            alert('Only the first ' + MAX_FOLDER_FILES + ' files in that folder will be added.');
+          }
+          processDroppedFiles(found);
+        }).catch(err => alert('Could not read that folder: ' + (err.message || err)));
+        return;
+      }
       // The editor took the images (it prevents the default when it does);
       // anything dropped with them still gets routed here.
       if (onText && editorTook) {
-        const rest = files.filter(f => !(f.type && f.type.startsWith('image/')));
+        const rest = files.filter(f => !tookImage(f));
         if (rest.length) processDroppedFiles(rest);
         return;
       }

@@ -390,6 +390,10 @@ class ProjectFile(Base):
     file_size: Mapped[int] = mapped_column(Integer, nullable=False)
     file_type: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
+    # Issue #261: slicer settings for a printable model, free text.
+    print_settings: Mapped[Optional[str]] = mapped_column(Text)
+    # Issue #262: storage path of the PNG rendered in the browser.
+    thumbnail_path: Mapped[Optional[str]] = mapped_column(Text)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )

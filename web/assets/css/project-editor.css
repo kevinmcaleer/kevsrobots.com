@@ -626,6 +626,13 @@
   width: 100%;
 }
 
+/* Issue #262: a model's rendered thumbnail in the Files & Models table. */
+#editor-files-section .kr-file-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
 /* Per-step rendering inside the preview surface (and in the public
    viewer at /projects/view.html — the same builder-renderer.js
    emits this markup). The step number is a circular pip beside the
