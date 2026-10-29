@@ -579,12 +579,13 @@ description: View project details
   }
 
   /* Title, description and details row: the editor's fields, read-only.
-     The title drops main.scss's uppercase display h1 for the editor's. */
+     The title drops main.scss's uppercase display h1 for the editor's,
+     in the document's serif heading face. */
   #view-title {
-    font-family: inherit;
-    font-size: 1.8rem !important;
+    font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+    font-size: 2rem !important;
     font-stretch: normal !important;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: normal;
     line-height: 1.5;
     text-transform: none;

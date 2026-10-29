@@ -1,7 +1,10 @@
 /* Project Editor Styles */
 
+/* The title in the document's serif heading face (project-content.css). */
 #project-title {
-  font-size: 1.8rem;
+  font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 500;
 }
 
 #project-title:focus,
