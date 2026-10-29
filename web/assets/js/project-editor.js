@@ -4,6 +4,8 @@
  */
 (function () {
   const API = 'https://projects.kevsrobots.com';
+  // Grammar, Look Up and Synonyms (stacks/language-tools). Spelling works without it.
+  const LANGUAGE_API = 'https://language.kevsrobots.com';
   const params = new URLSearchParams(window.location.search);
   const projectId = params.get('id');
   let currentProject = null;
@@ -723,6 +725,7 @@
       images: { maxBytes: MAX_IMAGE_BYTES },
       preview: { markdownIt: mermaidFences, afterRender: decoratePreview },
       slashCommands: ProjectSlashCommands.create(slashContext()),
+      proofing: { languageApiBase: LANGUAGE_API, languageApi: languageRequest },
     });
 
     mde.on('change', () => {
@@ -733,6 +736,16 @@
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
     document.dispatchEvent(new CustomEvent('project-markdown-editor:ready', { detail: mde }));
+  }
+
+  // The editor's language requests, through apiFetch so the dev token goes too.
+  async function languageRequest(path, options) {
+    const body = options && options.body;
+    const resp = await apiFetch(LANGUAGE_API + path, body === undefined
+      ? { headers: { Accept: 'application/json' } }
+      : { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!resp.ok) throw Object.assign(new Error(String(resp.status)), { status: resp.status });
+    return resp.json();
   }
 
   // What the Project `/` commands (issue #257) read from and upload to.
