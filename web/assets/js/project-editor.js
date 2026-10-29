@@ -527,10 +527,29 @@
       }
       return;
     }
-    addTagBadge(tag, false);
+    const added = addTagBadge(tag, false);
+    added.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     tagInput.value = '';
     scheduleAutoSave();
   }
+
+  // The tag chips scroll sideways on one line; let a mouse wheel scroll them.
+  tagsContainer.addEventListener('wheel', (e) => {
+    if (!e.deltaY || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    if (tagsContainer.scrollWidth <= tagsContainer.clientWidth) return;
+    e.preventDefault();
+    tagsContainer.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  // Mark which ends of the chip strip have tags scrolled out of view.
+  function updateTagFades() {
+    const { scrollLeft, scrollWidth, clientWidth } = tagsContainer;
+    tagsContainer.classList.toggle('more-before', scrollLeft > 1);
+    tagsContainer.classList.toggle('more-after', scrollLeft + clientWidth < scrollWidth - 1);
+  }
+  tagsContainer.addEventListener('scroll', updateTagFades, { passive: true });
+  new MutationObserver(updateTagFades).observe(tagsContainer, { childList: true });
+  if (window.ResizeObserver) new ResizeObserver(updateTagFades).observe(tagsContainer);
 
   tagInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ',') {
