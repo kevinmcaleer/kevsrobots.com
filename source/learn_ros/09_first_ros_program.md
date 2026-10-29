@@ -2,7 +2,13 @@
 layout: lesson
 title: First ROS2 Program
 type: page
-description: Lets create our first ROS2 program
+description: Let's create our first ROS2 program
+---
+
+## Watch the video
+
+{% include youtubeplayer.html id="l9_lBNemtZg" %}
+
 ---
 
 ## Source the ROS setup.bash script
@@ -56,7 +62,7 @@ ls
 
 ## Source the setup.bash script
 
-Lets go ahead and setup out terminal shell environment with our freshly created workspace bash setup scripts.
+Let's go ahead and setup our terminal shell environment with our freshly created workspace bash setup scripts.
 
 * **Source the scripts** - From the remote terminal, type:
 
@@ -82,7 +88,7 @@ chmod 777 -R ../first_app
 
 ## Create talker.py in src
 
-Lets create our first ROS2 python program.
+Let's create our first ROS2 python program.
 
 * **Select the `src` folder and Click New file** - From the VSCode folder window, select the `src` folder and then click the `New Files` button
 * **Name the file** - name the file `talker.py`
@@ -93,7 +99,7 @@ Lets create our first ROS2 python program.
 
 ## Paste this code
 
-Lets cheat a bit - paste the code below, we'll explain it in the next section
+Let's cheat a bit - paste the code below, we'll explain it in the next section
 
 * **Paste this code** - into the new file
 
@@ -120,7 +126,7 @@ if __name__ == "__main__":
 
 ## Run the program
 
-Lets run it! Don't worry we'll explain exactly whats going on.
+Let's run it! Don't worry we'll explain exactly whats going on.
 
 * **Run the code** - From the ROS2 container terminal, type:
 
@@ -133,6 +139,13 @@ python3 src/talker.py
 
 Congratulations! You've just written a ROS2 program.
 
-But what does the code actually mean? Lets look at that closer in the next section.
+## What the code means
+
+* `import rclpy` loads the ROS 2 Python library (**r**os **cl**ient library for **py**thon).
+* `rclpy.init()` starts ROS communications for this program.
+* `Node("py_test")` creates a **node** called `py_test`. A node is a single program in a ROS system; a robot usually has lots of them, each doing one job (reading a sensor, driving the motors, planning a route).
+* `node.get_logger().info(...)` prints a message through ROS's logging system, with a timestamp and the node's name.
+* `rclpy.spin(node)` keeps the node running and handling events until you press `CTRL + C`.
+* `rclpy.shutdown()` tidies up when the node stops.
 
 ---

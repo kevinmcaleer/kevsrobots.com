@@ -1,16 +1,16 @@
 ---
 title: Create the Lower Eyelid Component
-description: Lets create the Lower Eyelid
+description: Let's create the Lower Eyelid
 layout: lesson
 type: page
 cover: /learn/eye_mechanism/assets/cover.jpg
 ---
 
-[]({{page.cover}}){:class="cover"}
+![Eye mechanism]({{page.cover}}){:class="cover"}
 
 > ## Components
 >
-> It's good practice to separate each part of our model into different components. This will make is possible to attach them together later with articulated joints.
+> It's good practice to separate each part of our model into different components. This will make it possible to attach them together later with articulated joints.
 
 ---
 
@@ -45,7 +45,7 @@ We want to create the new component at the same level as the original component 
 
 The result should look like this:
 
-![Create new Component](assets/eye46.jpg){:class="img-fluid w-150"}
+![Create new Component](assets/eye46.jpg){:class="img-fluid w-100"}
 
 ---
 

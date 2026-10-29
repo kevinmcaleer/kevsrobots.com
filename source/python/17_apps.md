@@ -50,13 +50,27 @@ questions = [
 def run_quiz(questions):
    score = 0
    for question in questions:
-       answer = input(question.prompt)
+       answer = input(question.prompt).strip().lower()
        if answer == question.answer:
            score += 1
    print(f"You got {score}/{len(questions)} correct")
 
 run_quiz(questions)
 ```
+
+### How it works
+
+- The `Question` class bundles each prompt with its correct answer
+- `run_quiz()` loops through the questions, asks each one with `input()` and adds a point for each right answer
+- `.strip().lower()` tidies up the answer, so `" A "` still counts as `a`
+
+---
+
+## Try it yourself
+
+- Add three more questions of your own
+- Load the questions from a text file, using what you learned in the files lesson
+- Tell the player the right answer when they get one wrong
 
 ---
 

@@ -11,6 +11,7 @@ description: Learn how to use Pandas in conjunction with Matplotlib for effectiv
   data visualization, enabling you to present data insights visually.
 percent: 80
 duration: 3
+quiz_total: 17
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
@@ -66,12 +67,25 @@ In this lesson, we focus on Visualization with Pandas and Matplotlib. Effective 
 Pandas DataFrames and Series have a `.plot()` method, which is a wrapper around Matplotlib's functionality:
 
 ```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame({
+    'day': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+    'SMARS': [12, 15, 9, 20, 17],
+    'Quad': [8, 6, 11, 7, 10],
+})
+
 # Basic line plot
-df['ColumnName'].plot()
+df['SMARS'].plot()
+plt.show()
 
 # Basic histogram
-df['ColumnName'].plot.hist()
+df['SMARS'].plot.hist()
+plt.show()
 ```
+
+In a script, `plt.show()` opens the window. In a Jupyter notebook the chart appears on its own.
 
 ## Customizing Plots
 
@@ -79,7 +93,8 @@ You can customize plots with various parameters:
 
 ```python
 # Customized plot
-df.plot(kind='bar', title='Bar Chart', legend=True, fontsize=12)
+df.plot(x='day', kind='bar', title='Distance per day', legend=True, fontsize=12)
+plt.show()
 ```
 
 ## Plotting Multiple Columns
@@ -88,16 +103,23 @@ Compare multiple columns in a single plot:
 
 ```python
 # Plotting multiple columns
-df[['Column1', 'Column2']].plot(kind='bar')
+df.plot(x='day', y=['SMARS', 'Quad'], kind='line')
+plt.show()
 ```
 
 ## Time Series Plotting
 
 Time series data can be visualized effectively:
 
+When the index holds dates, `plot()` puts them along the x-axis automatically:
+
 ```python
-# Time series plot
-time_series_df.plot()
+log = pd.DataFrame(
+    {'distance_m': [12, 15, 9, 20]},
+    index=pd.to_datetime(['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-04']),
+)
+log.plot()
+plt.show()
 ```
 
 ## Advanced Plots with Matplotlib
@@ -108,16 +130,16 @@ For more advanced plots, directly use Matplotlib:
 import matplotlib.pyplot as plt
 
 # Scatter plot with Matplotlib
-plt.scatter(df['Column1'], df['Column2'])
+plt.scatter(df['SMARS'], df['Quad'])
 plt.title('Scatter Plot')
-plt.xlabel('Column 1')
-plt.ylabel('Column 2')
+plt.xlabel('SMARS distance')
+plt.ylabel('Quad distance')
 plt.show()
 ```
 
 ---
 
-## Some more exmaples
+## Some more examples
 
 Matplotlib is a versatile plotting library in Python, widely used for creating static, interactive, and animated visualizations. Here are a few examples to showcase its capabilities:
 
@@ -157,7 +179,7 @@ plt.show()
 
 This creates a bar chart displaying the values of different categories.
 
-![Line Plot](assets/chart02.png){:class="img-fluid w-50 shadow-lg"}
+![Bar Chart](assets/chart02.png){:class="img-fluid w-50 shadow-lg"}
 
 ---
 
@@ -178,7 +200,7 @@ plt.show()
 
 This scatter plot uses random data, with varying sizes and colors for the points.
 
-![Line Plot](assets/chart03.png){:class="img-fluid w-50 shadow-lg"}
+![Scatter Plot](assets/chart03.png){:class="img-fluid w-50 shadow-lg"}
 
 ---
 
@@ -196,7 +218,7 @@ plt.show()
 
 This code generates a histogram of normally distributed data.
 
-![Line Plot](assets/chart04.png){:class="img-fluid w-50 shadow-lg"}
+![Histogram](assets/chart04.png){:class="img-fluid w-50 shadow-lg"}
 
 ---
 
@@ -214,7 +236,17 @@ plt.show()
 
 This creates a pie chart showing the relative sizes of different items.
 
-![Line Plot](assets/chart05.png){:class="img-fluid w-50 shadow-lg"}
+![Pie Chart](assets/chart05.png){:class="img-fluid w-50 shadow-lg"}
+
+---
+
+{% quiz %}
+? Which plot shows how values are distributed across ranges?
+- [ ] Pie chart
+- [x] Histogram
+- [ ] Line plot
+> A histogram groups values into bins and shows how many fall in each.
+{% endquiz %}
 
 ---
 

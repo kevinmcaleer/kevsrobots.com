@@ -101,6 +101,22 @@ print(delta.days)
 
 ---
 
+{% quiz %}
+? What's the difference between a module and a library?
+- [x] A module is one Python file; a library is a collection of modules
+- [ ] They're exactly the same
+- [ ] Libraries are written in C and modules in Python
+> A module is a single `.py` file. A library (or package) groups related modules together.
+
+? After `import random`, how do you pick a random item from a list?
+- [ ] `random.pick(items)`
+- [x] `random.choice(items)`
+- [ ] `choice(items)`
+> Use dot notation to reach functions inside the module: `random.choice()`.
+{% endquiz %}
+
+---
+
 ## Summary
 
 In this lesson, you've learned about Python libraries and modules. You've learned how to import them and explored a few popular libraries: `math`, `random`, and `datetime`. Libraries and modules are powerful tools that allow you to leverage existing code and build complex applications more easily.

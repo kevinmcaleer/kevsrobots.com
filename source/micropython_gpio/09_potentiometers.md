@@ -5,65 +5,61 @@ type: page
 description: Learn how to use potentiometers with the Raspberry Pi Pico and MicroPython.
 ---
 
-<!-- ![Cover photo of a potentiometer connected to a Raspberry Pi Pico board](assets/raspberry_pi_pico_potentiometer.jpg){:class="cover"} -->
-
 ## Overview
 
-Welcome to Lesson 9 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will learn how to use potentiometers with the Raspberry Pi Pico and MicroPython.
-
-## Course Content
-
-In this lesson, you will learn:
-
-* What potentiometers are and how they work
-* How to connect a potentiometer to the Raspberry Pi Pico
-* How to write MicroPython code to read potentiometer values
+A potentiometer (or "pot") is a knob that gives you a voltage you can change by hand. It's the perfect first analog input. In this lesson you'll wire one up and read it.
 
 ---
 
-## What are Potentiometers?
+## What are potentiometers?
 
-`Potentiometers` are three-terminal resistors with a sliding contact that forms a variable voltage divider. By adjusting the position of the sliding contact, the output voltage can be varied between the input voltage and ground. You can learn more about [how potentiometers work here](/resources/how_it_works/pots).
-
----
-
-## Connecting a Potentiometer to Raspberry Pi Pico
-
-To connect a potentiometer to your Raspberry Pi Pico board, follow these steps:
-
-1. Connect the potentiometer's outer pins to the 3.3V and GND pins on the Raspberry Pi Pico board.
-2. Connect the potentiometer's center pin to a GPIO pin on the Raspberry Pi Pico board.
+`Potentiometers` are three-terminal resistors with a sliding contact that forms a variable voltage divider. Turn the knob and the middle pin's voltage moves smoothly between the voltages on the two outer pins. You can learn more about [how potentiometers work here](/resources/how_it_works/pots.html).
 
 ---
 
-## Reading Potentiometer Values with MicroPython
+## Connecting a potentiometer to the Pico
 
-To read potentiometer values using MicroPython, you can use the `machine.ADC` module. Here's some example code to get you started:
+1. Connect one outer pin to `3V3(OUT)` (physical pin 36)
+2. Connect the other outer pin to `GND` (or `AGND`, physical pin 33, for the cleanest readings)
+3. Connect the middle pin (the wiper) to `GP26` (physical pin 31)
+
+A 10kΩ potentiometer is a good choice.
+
+---
+
+## Reading potentiometer values with MicroPython
 
 ```python
-from machine import Pin, ADC
-import time
+from machine import ADC
+from time import sleep
 
-potentiometer_pin = Pin(26, Pin.IN)
-adc = ADC(potentiometer_pin)
-adc.atten(ADC.ATTN_11DB)
+pot = ADC(26)
 
 while True:
-    potentiometer_value = adc.read()
-    print(potentiometer_value)
-    time.sleep(0.1)
+    value = pot.read_u16()
+    percent = value * 100 // 65535
+    print(value, f"{percent}%")
+    sleep(0.1)
 ```
 
+Turn the knob and watch the numbers change. Thonny's **View > Plotter** draws them as a graph.
+
+> ## ESP32 code won't work here
+>
+> Examples for the ESP32 use `adc.atten()` and `adc.read()`. The Pico doesn't have these: use `read_u16()`.
+
 ---
 
-## Conclusion
+## Try it yourself
 
-In this lesson, you learned how to use potentiometers to control the input voltage to the Raspberry Pi Pico board, and how to read potentiometer values using MicroPython. You can use this knowledge to create a variety of projects with your Raspberry Pi Pico board.
+Combine this with lesson 6: use the potentiometer to set the LED brightness by passing `pot.read_u16()` straight to `led.duty_u16()`.
 
----
-
-## Key Results
-
-After you have completed this lesson, you will know how to use potentiometers with the Raspberry Pi Pico and MicroPython. You will be able to connect a potentiometer to the Pico, write MicroPython code to read potentiometer values, and understand the basics of potentiometer operation.
+{% quiz %}
+? Which potentiometer pin goes to the ADC input?
+- [ ] Either outer pin
+- [x] The middle pin (the wiper)
+- [ ] None, it connects to 3V3
+> The wiper's voltage changes as you turn the knob. The outer pins go to 3V3 and GND.
+{% endquiz %}
 
 ---

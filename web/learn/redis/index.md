@@ -9,7 +9,8 @@ next: 02_redis_basics.html
 description: Get started with Redis, learn what it is, why you should use it, and
   where to download it.
 percent: 10
-duration: 2
+duration: 3
+quiz_total: 14
 navigation:
 - name: Using Redis with Python
 - content:
@@ -50,7 +51,25 @@ navigation:
 
 ### Overview
 
-Welcome to the first lesson of the `Using Redis with Python` course. In this lesson, we will introduce `Redis` and its use cases. You will learn what Redis is, why you should use it, and where to download it.
+Welcome to the `Using Redis with Python` course! Redis is a super-fast data store that lives in memory. It's used everywhere from big websites to home projects, for caching, counters, queues, leaderboards and sending messages between programs. You could use it to pass sensor readings from a robot to a dashboard, for example.
+
+### Course Content
+
+1. **Introduction** - what Redis is and what it's good for
+2. **Redis basics** - install Redis and connect from Python
+3. **Data types** - a quick tour of strings, hashes, lists, sets and sorted sets
+4. **Commands and transactions** - run several commands together safely, and handle errors
+5. **Lists, sets, hashes and sorted sets** - one lesson on each, in more depth
+6. **Pub/sub** - send messages between programs
+7. **Summary** - a recap and where to go next
+
+### Prerequisites
+
+You should be comfortable writing simple Python programs. If you're new to Python, take [Python for beginners](/learn/python/) first.
+
+### How the course works
+
+Each lesson explains a topic, shows the Redis commands, then shows the same thing in Python. Most lessons end with a quick quiz, and your progress is saved in your browser and shown in the sidebar.
 
 ---
 
@@ -60,7 +79,7 @@ In this lesson, we will cover:
 
 * [What is Redis?](#what-is-redis)
 * [Redis use cases](#redis-use-cases)
-* [Where to download Redis](#where-to-download-redis))
+* [Where to download Redis](#where-to-download-redis)
 
 ---
 
@@ -83,21 +102,31 @@ Redis has many use cases, including:
 
 ### Where to download Redis
 
-You can download Redis from the official Redis website at <https://redis.io/download>. Redis is available for Windows, macOS, and Linux.
+Redis runs on Linux and macOS, including the Raspberry Pi. On Windows, run it with Docker or WSL. You'll find installation instructions on the official Redis website at <https://redis.io/downloads/>, and the next lesson walks you through the easiest options.
+
+> ## Redis or Valkey?
+>
+> In 2024 Redis changed its licence, and the Linux Foundation started [Valkey](https://valkey.io), an open source fork. Valkey works with the same commands and the same Python library, so everything in this course works with either.
 
 ---
 
 ### Key Takeaways
 
-After completing this lesson, you should have a basic understanding of what Redis is, why you should use it, and where to download it.
+After completing this course, you will be able to:
+
+* Install Redis and connect to it from Python
+* Store and retrieve strings, hashes, lists, sets and sorted sets
+* Group commands into transactions and handle errors
+* Send messages between programs with pub/sub
+
+---
 
 ### What you'll need
 
 To complete this lesson, you will need:
 
-* A computer with an internet connection
-* A web browser
-* Optional: A Redis installation for testing and experimentation
+* A computer with Python 3 installed. A Raspberry Pi works well
+* An internet connection to install Redis and the `redis` Python library
 
 ---
 

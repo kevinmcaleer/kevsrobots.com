@@ -11,6 +11,7 @@ description: Explore the basics of data visualization in Python, focusing on usi
   Matplotlib and Seaborn libraries.
 percent: 55
 duration: 2
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -100,13 +101,27 @@ Seaborn is a Python data visualization library based on Matplotlib. It provides 
 
 ```python
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Load an example dataset
 tips = sns.load_dataset("tips")
 
 # Create a simple histogram
 sns.histplot(data=tips, x="total_bill")
+plt.show()
 ```
+
+Seaborn draws on Matplotlib, so `plt.show()` is what opens the window. Install both with `pip install matplotlib seaborn`.
+
+---
+
+{% quiz %}
+? What opens the window showing your chart in a Python script?
+- [ ] `plt.plot()`
+- [x] `plt.show()`
+- [ ] `sns.load_dataset()`
+> `plot()` and Seaborn functions draw the chart; `plt.show()` displays it.
+{% endquiz %}
 
 ---
 

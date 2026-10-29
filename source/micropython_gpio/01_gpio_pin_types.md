@@ -3,73 +3,81 @@ layout: lesson
 title: GPIO Pin Types
 type: page
 description: Learn about the different types of GPIO pins on the Raspberry Pi Pico and their basic functions.
-cover: /learn/micropython_gpio/assets/burger_bot.jpg
 ---
 
 ## Overview
 
-Welcome to Lesson 1 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will discuss the different types of GPIO pins available on the Raspberry Pi Pico and their basic functions. We will cover the following types of pins:
-
-- Digital I/O
-- Analog I/O (ADC)
-- PWM
-- UART
-- I2C
-- SPI
-- GND
+In this lesson we'll look at the different jobs a Pico GPIO pin can do. The clever part is that most pins can do *several* jobs: you choose which one in your code.
 
 ---
 
-## Course Content
+## Different types of GPIO pins
 
-GPIO (General Purpose Input/Output) pins are used to connect electronic components to the Raspberry Pi Pico. In this lesson, you will learn:
+The Raspberry Pi Pico has 26 usable GPIO pins (`GP0` to `GP22` and `GP26` to `GP28`). Each one can be set up as:
 
-- Different types of GPIO pins on the Raspberry Pi Pico
-- Their basic functions and how they can be used in various applications
-- Pin numbering and how to identify pins on the Pico board
+- `Digital I/O` - send or receive simple on/off (1 or 0) signals: LEDs, buttons, switches
+- `PWM` (Pulse Width Modulation) - switch on and off very fast to dim LEDs, set motor speed or position servos. **Every** GPIO pin can do PWM
+- `UART` - simple two-wire serial, used by GPS modules and other microcontrollers
+- `I2C` (Inter-Integrated Circuit) - a two-wire bus that can talk to many sensors and displays at once
+- `SPI` (Serial Peripheral Interface) - a faster four-wire bus, used by displays and SD cards
 
-### Different types of GPIO pins
+Three pins have an extra trick:
 
-The Raspberry Pi Pico has several types of GPIO pins, including:
+- `ADC` (Analog-to-Digital Converter) - `GP26`, `GP27` and `GP28` can measure a voltage between 0V and 3.3V, so you can read potentiometers and analog sensors
 
-- `Digital I/O pins`, which can be used to send or receive digital signals
-- `PWM` (Pulse Width Modulation) pins, which can be used to control the brightness of LEDs or the speed of motors
-- `ADC` (Analog-to-Digital Converter) pins, which can be used to read analog signals from sensors
-- `I2C` (Inter-Integrated Circuit) pins, which can be used to communicate with other devices using the I2C protocol
-- `SPI` (Serial Peripheral Interface) pins, which can be used to communicate with other devices using the SPI protocol
+The rest of the 40 pins around the edge are power (`3V3`, `VBUS`, `VSYS`) and ground (`GND`) pins, plus a couple of control pins (`RUN`, `3V3_EN`).
 
 ---
 
-### Basic functions of GPIO pins
+## Basic functions of GPIO pins
 
-`Digital I/O pins` can be used to send or receive digital signals, which can be used to control LEDs, read button presses, or communicate with other digital devices.
+`Digital I/O pins` send or receive digital signals, which can control LEDs, read button presses, or signal other digital devices.
 
-`PWM pins` can be used to control the brightness of LEDs, the speed of motors, or the position of servos by adjusting the duty cycle of the PWM signal.
+`PWM` lets you control the brightness of LEDs, the speed of motors, or the position of servos by adjusting the duty cycle of the PWM signal.
 
-`ADC pins` can be used to read analog signals from sensors, such as temperature or light sensors, and convert them into digital values that can be processed by the Pico.
+`ADC pins` read analog signals from sensors, such as light sensors or potentiometers, and convert them into numbers your code can use.
 
-`I2C` and `SPI pins` can be used to communicate with other devices, such as sensors, displays, or other microcontrollers, using the [I2C](/resources/glossary#i2c) or [SPI](/resources/glossary#spi) protocol.
-
----
-
-## Key Results
-
-After you have completed this lesson, you will have a solid understanding of the various GPIO pins available on the Raspberry Pi Pico. This knowledge will enable you to confidently use these pins in your projects, allowing you to interface with various devices and components.
+`UART`, `I2C` and `SPI` let the Pico communicate with other devices, such as sensors, displays, or other microcontrollers. See the glossary for [I2C](/resources/glossary#i2c) and [SPI](/resources/glossary#spi).
 
 ---
 
 ## MicroPython code example
 
-The code below imports the `machine` module, which provides access to hardware-related functionality on the Raspberry Pi Pico.
-
-Then it initializes a GPIO pin with the number 25 as an output pin using the `machine.Pin` class, and assigns it to the variable `pin`.
-
-Finally, it sets the value of the output pin to 1 using the `pin.value(1)` method. This means that the pin will output a voltage of 3.3V, which can be used to turn on a connected device, such as an LED.
+The code below lights the Pico's on-board LED:
 
 ```python
 import machine
-pin = machine.Pin(25, machine.Pin.OUT)
-pin.value(1)
+
+led = machine.Pin("LED", machine.Pin.OUT)
+led.value(1)
 ```
+
+- `import machine` gives us access to the Pico's hardware
+- `machine.Pin("LED", machine.Pin.OUT)` sets up the on-board LED pin as an output
+- `led.value(1)` sets the pin high (3.3V), so the LED turns on
+
+> ## Pico or Pico W?
+>
+> On the original Pico the on-board LED is wired to `GP25`, so you'll often see `Pin(25, Pin.OUT)` in older tutorials. On the Pico W the LED is connected through the wireless chip, so `Pin(25)` won't work. Using the name `"LED"` works on both boards with current MicroPython firmware.
+
+---
+
+## Try it yourself
+
+Change `led.value(1)` to `led.value(0)` and run the code again. Then try `led.toggle()` a few times from the Thonny shell.
+
+{% quiz %}
+? Which Pico pins can be used for PWM?
+- [ ] Only GP18, GP19 and GP20
+- [ ] Only the pins marked ADC
+- [x] Every GPIO pin
+> The Pico has 8 PWM slices with 2 channels each, and every GPIO pin is connected to one of them.
+
+? Which pins can read an analog voltage with the ADC?
+- [ ] GP0 to GP3
+- [x] GP26, GP27 and GP28
+- [ ] Any GPIO pin
+> Only GP26, GP27 and GP28 (ADC0 to ADC2) are wired to the analog-to-digital converter.
+{% endquiz %}
 
 ---

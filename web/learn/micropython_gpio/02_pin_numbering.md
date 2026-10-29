@@ -10,7 +10,8 @@ next: 03_voltage_levels.html
 description: Understand the Raspberry Pi Pico's pin numbering system and the role
   of each pin.
 percent: 15
-duration: 5
+duration: 3
+quiz_total: 33
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -71,83 +72,62 @@ navigation:
 
 ## Overview
 
-Welcome to Lesson 2 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will discuss the Raspberry Pi Pico's pin numbering system and the role of each pin.
+The Pico has two numbering schemes, and mixing them up is the most common beginner mistake. In this lesson you'll learn the difference and how to find the pin you need.
 
 ---
 
-## Course Content
+## Physical pins and GP numbers
 
-In this lesson, you will learn:
+- **Physical pin numbers** (1 to 40) describe where a pin is on the board. Pin 1 is top left, next to the USB socket. Pins 1 to 20 run down the left edge, and pins 21 to 40 run back up the right edge.
+- **GP numbers** (`GP0`, `GP1`...) are the names the RP2040 chip uses. **MicroPython uses GP numbers.**
 
-* The Raspberry Pi Pico's pin numbering system
-* The role of each pin and how to identify them
-
----
-
-The Raspberry Pi Pico has several types of GPIO pins, including digital I/O, PWM, ADC, I2C, and SPI pins. Each pin has a specific function and can be used to connect different electronic components to the board.
+So `Pin(15)` means `GP15`, which is physical pin 20, not physical pin 15.
 
 ---
 
-## Raspberry Pi Pico's Pin Numbering System
+## Identifying pins on the Raspberry Pi Pico
 
-The GPIO pins on the Raspberry Pi Pico are numbered from 0 to 29. The pins are arranged in two rows on the board, with the odd-numbered pins on the left row and the even-numbered pins on the right row. The pins are numbered in a way that reflects their basic functions and groupings.
-
----
-
-## Identifying Pins on the Raspberry Pi Pico
-
-To identify the pins on the Raspberry Pi Pico, we can refer to the pinout diagram in the datasheet or on the board itself. The pinout diagram shows the function and number of each pin, as well as its physical location on the board.
+The pinout diagram shows the GP number and every alternative function of each pin:
 
 ![Pico Pinouts](assets/pico_pinouts.jpg){:class="img-fluid w-100"}
 
-In addition, the Raspberry Pi Pico has labels on the board that indicate the function of each pin. For example, the pins labeled "GP0" to "GP28" are digital I/O pins, and the pins labeled "ADC0" to "ADC3" are ADC pins.
+The underside of the board is also printed with the GP numbers, which is handy when the Pico is in a breadboard.
 
 ---
 
 ## Pinouts
 
-| Pin Number | Type        | Capabilities                                        |
-|------------|-------------|-----------------------------------------------------|
-| GP0        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP1        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP2        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP3        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP4        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP5        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP6        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP7        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP8        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP9        | Digital I/O | General purpose I/O, can be used as input or output |
-| GP10       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP11       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP12       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP13       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP14       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP15       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP16       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP17       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP18       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP19       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP20       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP21       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP22       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP26       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP27       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP28       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP29       | Digital I/O | General purpose I/O, can be used as input or output |
-| GP14       | ADC         | Analog-to-digital converter input                   |
-| GP15       | ADC         | Analog-to-digital converter input                   |
-| GP16       | ADC         | Analog-to-digital converter input                   |
-| GP17       | ADC         | Analog-to-digital converter input                   |
-| GP18       | PWM         | Pulse-width modulation output                       |
-| GP19       | PWM         | Pulse-width modulation output                       |
-| GP20       | PWM         | Pulse-width modulation output                       |
+| GP numbers | Physical pins | What they can do |
+|------------|---------------|------------------|
+| GP0 to GP22 | 1-2, 4-7, 9-12, 14-17, 19-22, 24-27, 29 | Digital I/O, PWM, plus UART, I2C or SPI depending on the pin |
+| GP26, GP27, GP28 | 31, 32, 34 | Digital I/O, PWM, **and** ADC0, ADC1, ADC2 |
+| GND | 3, 8, 13, 18, 23, 28, 33 (AGND), 38 | Ground |
+| 3V3(OUT) | 36 | 3.3V output for sensors (up to about 300mA) |
+| VSYS | 39 | Main power input, 1.8V to 5.5V |
+| VBUS | 40 | 5V from USB, when USB is plugged in |
+| RUN, 3V3_EN, ADC_VREF | 30, 37, 35 | Reset, regulator enable and ADC reference |
 {:class="table table-striped"}
+
+`GP23`, `GP24`, `GP25` and `GP29` are used inside the board (power supply control, USB sensing, the LED on the original Pico, and measuring VSYS), so they don't appear on the edge pins.
 
 ---
 
-## Key Results
+## Try it yourself
 
-After you have completed this lesson, you will be familiar with the Raspberry Pi Pico's pin numbering system. You will be able to identify and locate each pin, which will allow you to correctly connect components and devices to the appropriate pins in your projects.
+Using the pinout diagram, find the physical pin numbers for `GP0`, `GP15` and `GP28`. Which of these could you use to read a potentiometer?
+
+{% quiz %}
+? You wire an LED to physical pin 20. What do you write in MicroPython?
+- [ ] `Pin(20, Pin.OUT)`
+- [x] `Pin(15, Pin.OUT)`
+- [ ] `Pin(25, Pin.OUT)`
+> Physical pin 20 is GP15, and MicroPython uses GP numbers.
+
+? Which pin gives you 5V while the Pico is plugged into USB?
+- [ ] 3V3(OUT)
+- [x] VBUS
+- [ ] ADC_VREF
+> VBUS (physical pin 40) is connected to the USB 5V supply.
+{% endquiz %}
 
 ---

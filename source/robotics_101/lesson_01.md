@@ -5,7 +5,7 @@ type: page
 description: Learn about the different parts of a robot
 ---
 
-> *"A Robot is a machine, especially one programmable by a computer, capable of carrying out a  complex series of actions automatically.*
+> *"A Robot is a machine, especially one programmable by a computer, capable of carrying out a complex series of actions automatically.*
 > *Robots can be guided by an external control device or the control may be embedded within."*
 
 ## But what does this mean?

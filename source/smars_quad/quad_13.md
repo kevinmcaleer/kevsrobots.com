@@ -31,9 +31,13 @@ PCA9685 Pin | Quad Limb
 PCA9685 | Raspberry Pi
 :------:|:-----------:
   GND   |   6 (GND)
-  VCC   |   2 (VCC)
-  SCL   |   5 (SDL)
+  VCC   |   1 (3.3V)
+  SCL   |   5 (SCL)
   SDA   |   3 (SDA)
 {:class="table table-striped "}
+
+> ## Power the servos separately
+>
+> `VCC` only powers the PCA9685's chip, so connect it to 3.3V to keep the I2C signals safe for the Pi. Eight servos need far more current than the Pi can give, so connect a separate 5V supply or battery pack to the screw terminal (`V+` and `GND`) on the PCA9685.
 
 ---

@@ -10,8 +10,9 @@ description: Learn how to download, print, assemble, and program the original SM
   robot
 percent: 6
 duration: 2
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:
@@ -60,25 +61,32 @@ navigation:
 
 ![SMARS Course image]({{page.cover}}){:class="cover"}
 
+## Watch the video
+
+New to SMARS? This video shows what makes it such a great first robot. Each lesson in this course also has its own video from the build series.
+
+{% include youtubeplayer.html id="XhArIe9UDoc" %}
+
+---
+
 ## Overview
 
-Welcome to `Build your own SMARS robot` course. This course is aimed at people wanting to printing out, construct and code a simple robot. Unlike most of the other robot projects on this site, this robot uses an `Arduino Uno v3`, and the code is written in `C++`.
+Welcome to the **Build a SMARS Robot** course. SMARS (Screwless Modular Assemblable Robotic System) is a small 3D-printed tracked robot that snaps together without screws. This course takes you from printing the parts to driving it around. Unlike most of the other robots on this site, SMARS uses an `Arduino Uno`, and the code is written in `C++`.
 
 ## Course Content
 
 In this course you will learn:
 
-* Where to download the files
-* How to construct the robot
-* How to wire up the robot
-* How to power the robot
-* how to bring it to life with code
+* Where to download the files and what to print
+* How to solder the motors and assemble the robot
+* How to wire up the motor shield and power the robot
+* How to load code onto the Arduino and control your SMARS
 
 ---
 
 ## Key Results
 
-After you have completed this course you will know how to construct your own robot, wire it and power it up, and finally how to program it to avoid obstacles.
+After you have completed this course you will have built your own SMARS robot, wired it up and powered it, and loaded code that lets you drive it by remote control.
 
 ---
 
@@ -86,37 +94,32 @@ After you have completed this course you will know how to construct your own rob
 
 To take this course you will need:
 
-* a computer, tablet or phone to read the course material from
-* access to a 3d printer
-* a computer that is capable of connecting to an Arduino board such as the [Raspberry Pi Pico](https://www.raspberrypi.com)
-* a An Arduino Uno v3 board (or clone)
-* a USB cable to connect the computer to the Arduino board
+* Access to a 3D printer (or a friend or library with one)
+* An `Arduino Uno` (or a clone) and a `Fundumoto` motor shield
+* Two N20 geared motors and a 9V battery with a battery clip
+* A soldering iron, solder and some red and black wire
+* A computer with the [Arduino IDE](https://www.arduino.cc/en/software) and a USB cable for the Arduino
+
+The full parts list is in the next lesson.
 
 ---
 
 ## How the course works
 
-New Keywords are introduced and explained, and are highlighted to help emphasise them. 
+New keywords are highlighted inline like `this`, and code examples look like this:
 
-For example keywords are highlighed inline with the course text like `this`.
-
-Longer examples of code are hightlighted like this:
-
-```python
-print('this is an example')
+```cpp
+digitalWrite(12, HIGH);
 ```
 
-Important notes will be highlighted in sections like the two below:
+Important notes are highlighted like this:
 
 > ## This is a note
 >
-> Important notes are hightlighted like this
+> Important notes are highlighted like this
 
----
+There's a short quiz at the end of each section so you can check your understanding.
 
-> ## Another aside
->
-> Asides are also highlighed in sections, but in an alternative colour
-{:.bg-blue}
+## Prerequisites
 
----
+None! This is a great first robot. If you're new to robots, [Robotics 101](/learn/robotics_101/) explains the parts of a robot in more detail.

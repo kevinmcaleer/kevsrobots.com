@@ -10,7 +10,8 @@ next: 16_advanced.html
 description: Learn how Python can be used to interact with databases, including creating,
   reading, updating, and deleting data.
 percent: 75
-duration: 2
+duration: 3
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -74,13 +75,16 @@ Python provides several libraries to interact with databases. Whether you are de
 
 ### What are Databases?
 
-A database is an organized collection of data stored and accessed electronically. Databases can be classified based on types of content: bibliographic, full-text, numeric, and images.
+A database is an organized collection of data stored and accessed electronically. There are two main families:
+
+- **Relational (SQL) databases** like SQLite, MySQL and PostgreSQL store data in tables of rows and columns, and you query them with SQL
+- **NoSQL databases** like MongoDB and Redis store data as documents, key-value pairs or other shapes
 
 ---
 
 ### Introduction to SQLite
 
-SQLite is a C library that provides a lightweight disk-based database. It doesn't require a separate server process and allows accessing the database using a nonstandard variant of the SQL query language. Python provides the sqlite3 module which complies with the DB-API 2.0 specification.
+SQLite is a lightweight database that keeps everything in a single file. It doesn't need a separate server, and Python comes with the `sqlite3` module built in, so there's nothing to install.
 
 > ## Learn More about SQLite
 >
@@ -96,18 +100,38 @@ conn = sqlite3.connect('example.db')
 c = conn.cursor()
 
 # Create table
-c.execute('''CREATE TABLE stocks
+c.execute('''CREATE TABLE IF NOT EXISTS stocks
              (date text, trans text, symbol text, qty real, price real)''')
 
-# Insert a row of data
-c.execute("INSERT INTO stocks VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
+# Insert a row of data, using ? placeholders for the values
+c.execute("INSERT INTO stocks VALUES (?, ?, ?, ?, ?)", ('2006-01-05', 'BUY', 'RHAT', 100, 35.14))
 
 # Save (commit) the changes
 conn.commit()
 
+# Read the data back
+for row in c.execute("SELECT * FROM stocks"):
+    print(row)
+
 # Close the connection
 conn.close()
 ```
+
+---
+
+> ## Always use placeholders
+>
+> Use `?` placeholders rather than building SQL with f-strings. Placeholders stop odd characters in your data (or deliberately malicious ones, called SQL injection) from breaking your query.
+
+---
+
+{% quiz %}
+? Why use `?` placeholders in SQL queries?
+- [ ] They make queries run faster
+- [x] They safely insert values and prevent SQL injection
+- [ ] SQLite doesn't support any other way
+> Placeholders let the database handle quoting, so data can't be mistaken for SQL.
+{% endquiz %}
 
 ---
 

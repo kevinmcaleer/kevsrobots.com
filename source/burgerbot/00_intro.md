@@ -8,7 +8,11 @@ cover: /learn/burgerbot/assets/burgerbot.jpg
 date_updated: 2024-07-29
 ---
 
-![Cource Cover Image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+## Watch the video
+
+{% include youtubeplayer.html id="5G6psAuTYT4" %}
 
 ---
 
@@ -28,7 +32,7 @@ In this course, you'll learn:
 
 - What BurgerBot is and why it's great for learning robotics
 - How to 3D print and assemble the robot chassis from scratch
-- Installing MicroPython on Raspberry Pi Pico
+- Installing MicroPython and the BurgerBot library on a Raspberry Pi Pico
 - Loading code onto your robot using Thonny IDE
 - Programming basic robot movement (forward, backward, turning)
 - Using an ultrasonic rangefinder to measure distance
@@ -74,7 +78,7 @@ M2 & M3 Nuts and bolts                                                          
 **Additional Requirements:**
 - 3D printer access (or order pre-printed parts)
 - Raspberry Pi Pico (not included in price above)
-- USB-C cable for programming
+- Micro-USB cable for programming (USB-C if you use a Pico 2 or a Pimoroni Pico LiPo)
 - Computer with Thonny IDE installed
 
 ---
@@ -115,7 +119,7 @@ This course is beginner-friendly! You don't need prior experience with:
 
 **Helpful (but not required):**
 - Basic Python knowledge - see [Python for Beginners](/learn/python/)
-- Familiarity with Raspberry Pi Pico - see [Getting Started with Pico](/learn/pico/)
+- Familiarity with Raspberry Pi Pico - see [Raspberry Pi Pico with MicroPython - GPIO Mastery](/learn/micropython_gpio/)
 - Understanding of basic electronics
 
 If you're completely new to MicroPython, you might want to check out our [Learn MicroPython - The Basics](/learn/micropython/) course first, but it's not required - we'll guide you through everything!
@@ -126,7 +130,6 @@ If you're completely new to MicroPython, you might want to check out our [Learn 
 
 After completing BurgerBot, continue your robotics journey with:
 
-- [Line Following Robots](/learn/line-following/) - Advanced sensor techniques (covered in BurgerBot upgrades!)
 - [MicroPython GPIO](/learn/micropython_gpio/) - Deep dive into hardware control
 - [SMARS Robot](/learn/smars/) - Build a more complex tracked robot
 - [MicroPython Robotics](/learn/micropython_robotics/) - Explore more robotics concepts

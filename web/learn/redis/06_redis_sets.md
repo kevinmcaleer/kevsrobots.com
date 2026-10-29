@@ -10,6 +10,7 @@ next: 07_redis_hashes.html
 description: Learn about Redis sets and how to use them with Python.
 percent: 60
 duration: 3
+quiz_total: 14
 navigation:
 - name: Using Redis with Python
 - content:
@@ -93,6 +94,7 @@ In addition to adding and retrieving set elements, Redis provides several comman
 * `srem`: Remove an element from a set
 * `spop`: Remove and return a random element from a set
 * `smembers`: Get all members of a set
+* `sinter`, `sunion`, `sdiff`: Find the members two sets have in common, all members of both, or the difference
 
 ---
 
@@ -103,7 +105,7 @@ To use Redis sets in Python, you can use the `set` methods of the Redis Python l
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379)
+redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 # Add elements to a set
 redis_client.sadd('myset', 'element1', 'element2')
@@ -119,6 +121,16 @@ members = redis_client.smembers('myset')
 ```
 
 In this example, we use the Redis Python library to add elements to a set using the `sadd` method, check if an element is a member of a set using the `sismember` method, remove an element from a set using the `srem` method, and get all members of a set using the `smembers` method.
+
+---
+
+{% quiz %}
+? What does `sadd` return when you add an element that's already in the set?
+- [x] 0
+- [ ] 1
+- [ ] An error
+> It returns how many new elements were added, so a duplicate gives 0.
+{% endquiz %}
 
 ---
 

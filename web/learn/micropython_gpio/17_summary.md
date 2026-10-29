@@ -6,10 +6,11 @@ type: page
 cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
 date: 2023-04-14
 previous: 16_ground_pins.html
-description: A summary of what you have learned in the `Raspberry Pi Pico with MicroPython
-  - GPIO Mastery` course.
+description: A summary of what you have learned in the Raspberry Pi Pico with MicroPython
+  - GPIO Mastery course.
 percent: 100
 duration: 2
+quiz_total: 33
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -70,40 +71,60 @@ navigation:
 
 ## Overview
 
-Welcome to Lesson 17 of the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. In this lesson, we will review what you have learned in this course.
+Congratulations on finishing `Raspberry Pi Pico with MicroPython - GPIO Mastery`! Here's a quick recap.
 
 ---
 
-## Course Content
+## What you've learned
 
-In this course, you have learned:
-
-* What MicroPython is, why you should use it, where to download it, and which software to use to develop Python code
-* How to connect components to the Raspberry Pi Pico using different types of GPIO pins, including digital I/O, PWM, ADC, I2C, and SPI
-* How to write MicroPython code to control LEDs, motors, servos, and ultrasonic range finders
-* How to use potentiometers and temperature sensors with the Raspberry Pi Pico
-* The basics of using ground pins in your circuits
+* The different jobs a GPIO pin can do, and the difference between GP numbers and physical pin numbers
+* Why the Pico is a 3.3V device, and how to protect it from 5V signals
+* Digital inputs and outputs, including pull-up resistors for buttons
+* PWM with `duty_u16()` to fade LEDs, set motor speed and position servos
+* Reading voltages with the ADC on GP26, GP27 and GP28
+* Reading temperature from the built-in sensor, a DS18B20 and a DHT11
+* Talking to other devices over UART, I2C and SPI
+* Measuring distance with an HC-SR04
+* Why every circuit, and every power supply, needs a shared ground
 
 ---
 
-## Key Results
+## Quick reference
 
-After completing this course, you will have a solid understanding of the basics of using the Raspberry Pi Pico with MicroPython. You will be able to connect components to the board and control them using MicroPython code. You will also be able to use potentiometers and temperature sensors in your circuits, and understand the basics of ground pins.
+| Task | Code |
+|------|------|
+| Output | `Pin(15, Pin.OUT).value(1)` |
+| Button input | `Pin(14, Pin.IN, Pin.PULL_UP).value()` |
+| PWM | `p = PWM(Pin(15)); p.freq(1000); p.duty_u16(32768)` |
+| Analog input | `ADC(26).read_u16()` |
+| I2C scan | `I2C(0, sda=Pin(0), scl=Pin(1)).scan()` |
+| UART | `UART(0, baudrate=9600, tx=Pin(0), rx=Pin(1))` |
+{:class="table table-striped"}
+
+---
+
+{% quiz %}
+? Which method sets the PWM duty cycle on the Pico?
+- [ ] `duty()`
+- [x] `duty_u16()`
+- [ ] `read_u16()`
+> `duty_u16()` takes 0 to 65535. `read_u16()` is for reading the ADC.
+
+? You need to read a light sensor that outputs 0V to 3.3V. Which pin do you use?
+- [ ] GP15
+- [x] GP27
+- [ ] VBUS
+> GP27 is ADC1, one of the three analog-capable pins.
+{% endquiz %}
 
 ---
 
 ## What's next?
 
-Now that you have completed this course, you are ready to take your Raspberry Pi Pico and MicroPython skills to the next level. Here are some ideas for what you can do next:
+* Put these skills into a robot with [MicroPython Robotics Projects with the Raspberry Pi Pico](/learn/micropython_robotics/)
+* Go further with the language in [Intermediate level MicroPython](/learn/intermediate_micropython/)
+* Build a two-wheeled robot with [BurgerBot](/learn/burgerbot/)
 
-* Use your new knowledge to build your own circuits and projects
-* Explore more advanced topics in MicroPython, such as threading, interrupts, and networking
-* Learn more about electronics and circuit design to create even more complex projects
-
----
-
-## Thank you
-
-Thank you for taking the `Raspberry Pi Pico with MicroPython - GPIO Mastery` course. We hope that you have learned a lot and enjoyed the course. If you have any feedback or suggestions, please let us know!
+If you have feedback or questions, leave a comment below. Thanks for taking the course!
 
 ---

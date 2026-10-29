@@ -10,7 +10,9 @@
       - raspberry pi
       - ros
   description: >- 
-     Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.
+     A friendly first look at robots: what a robot is, a quick history from ancient
+     automata to today, the skills you need to build one, and the parts that make a
+     robot work.
   content:
   - section:
       name: Overview

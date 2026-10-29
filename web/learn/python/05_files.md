@@ -11,6 +11,7 @@ description: Learn how to read from and write to files in Python, handling both 
   and binary files.
 percent: 25
 duration: 3
+quiz_total: 27
 navigation:
 - name: Python for beginners
 - content:
@@ -148,6 +149,22 @@ with open("test.txt", "w") as f:
 with open("test.txt", "r") as f:
     print(f.read())  # Prints "Hello, World!"
 ```
+
+---
+
+{% quiz %}
+? Which mode adds to the end of an existing file without deleting what's there?
+- [ ] `'w'`
+- [x] `'a'`
+- [ ] `'r'`
+> `'w'` empties the file first. `'a'` appends.
+
+? Why is `with open(...) as f:` preferred?
+- [ ] It's faster
+- [x] It closes the file automatically, even if an error happens
+- [ ] It's the only way to read binary files
+> The `with` statement guarantees the file gets closed when the block ends.
+{% endquiz %}
 
 ---
 

@@ -10,8 +10,9 @@ next: smars04.html
 description: Fit the Motors to the chassis
 percent: 24
 duration: 1
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:

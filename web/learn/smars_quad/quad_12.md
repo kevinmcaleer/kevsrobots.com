@@ -8,10 +8,11 @@ date: 2023-03-04
 previous: quad_11.html
 next: quad_13.html
 description: Download the python code
-percent: 91
+percent: 78
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -43,16 +44,20 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 
 ## 12 Download the python code
 
-Download the python library and test program from github from your raspberry pi zero by typing:
+Download the Python library and test program from GitHub onto your Raspberry Pi Zero by typing:
 
 ```bash
 git clone https://github.com/kevinmcaleer/smarslab

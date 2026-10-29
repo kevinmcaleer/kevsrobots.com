@@ -1,16 +1,8 @@
 ---
 layout: lesson
 title: Skills and Knowledge
-author: Kevin McAleer
-type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
-date: 2023-01-17
-previous: lesson_02.html
-next: lesson_04.html
 description: "What you\u2019ll need to know to build robots and bring them to life"
-percent: 64
-duration: 2
-quiz_total: 11
+type: page
 navigation:
 - name: Robotics 101
 - content:
@@ -51,7 +43,7 @@ Building a robot requires:
 
 - A design or blueprint
 - Practical skills
-- Materials & parts - wheels, filament, glue, 
+- Materials & parts - wheels, filament, glue
 - Tools & Machinery, a 3d printer
 - Time, Patience and practice
 
@@ -68,7 +60,7 @@ SMARS is a 3d Printed Robot, the designs can be found at:
 
 - A program is a list of human-readable instructions for the computer to carry out
 - A program is written in a computer language, such as Python, Javascript, C++
-- Programs can also constructed visually, using blocks in software such as Scratch
+- Programs can also be constructed visually, using blocks in software such as Scratch
 
 An example program, written in Python:
 

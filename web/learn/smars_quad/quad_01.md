@@ -8,10 +8,11 @@ date: 2023-03-04
 previous: 00_intro.html
 next: quad_02.html
 description: Download and print the files
-percent: 14
+percent: 12
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -43,16 +44,20 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 
 ## 1 Print the Parts
 
-Download the build files from thingiverse. [Click here for the latest version:](https://www.thingiverse.com/thing:2755973)
+Download the build files from Thingiverse. [Click here for the latest version:](https://www.thingiverse.com/thing:2755973)
 
 ![Page 1](assets/instruction01.png){:class="img-fluid w-25"}
 

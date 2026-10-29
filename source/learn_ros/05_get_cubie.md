@@ -9,7 +9,7 @@ description: Download the Cubie-1 example files
 
 ## Example files
 
-This course has some example files that you can use to follow along. Lets grab these and continue with the container build.
+This course has some example files that you can use to follow along. Let's grab these and continue with the container build.
 
 ---
 

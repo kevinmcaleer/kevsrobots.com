@@ -10,7 +10,9 @@
       - raspberry pi
       - robotics
   description: >- 
-     Learning ROS with me, is a course that will teach you how to use ROS2 on Raspberry Pi 4.
+     Learn ROS 2, the Robot Operating System, on a Raspberry Pi: run it in Docker, write
+     Python nodes that publish and subscribe to topics, and visualise LiDAR scans in
+     RViz2.
   content:
   - section:
       name: Overview
@@ -58,3 +60,4 @@
       - 16_rviz_displays.md
       - 17_tf2.md
       - 18_laserscan.md
+      - 19_summary.md

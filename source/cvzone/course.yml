@@ -6,7 +6,7 @@
   layout: course
   cover: assets/computer_vision.jpg
   description: >- 
-     Computer Vision on Raspberry Pi with CVZone
+     Detect faces, hands and body poses in real time on a Raspberry Pi with Python, OpenCV and CVZone
   groups:
     - computer vision
     - python
@@ -16,13 +16,12 @@
       name: Overview
       content:
       - 00_intro.md
-      - 00_video.md
   - section:
       name: Getting Started
       content:
       - 01_install.md
   - section:
-      name: Face, Hand and Posture Detection
+      name: Face, Hand and Pose Detection
       content:
       - 02_face.md
       - 03_hand.md

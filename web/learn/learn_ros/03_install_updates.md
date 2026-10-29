@@ -1,15 +1,8 @@
 ---
 layout: lesson
 title: Installing updates
-author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
-date: 2023-01-07
-previous: 02_pi_setup.html
-next: 04_docker_install.html
 description: Update and Upgrade the OS to the latest patch level
-percent: 20
-duration: 1
 navigation:
 - name: Learn ROS with me
 - content:
@@ -69,6 +62,8 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
@@ -81,7 +76,7 @@ navigation:
 
 ```bash
 sudo apt update
-sudo apt upgrade
+sudo apt upgrade -y
 ```
 
 ### Alternatively you can use the Raspberry Pi Update menu to install updates.

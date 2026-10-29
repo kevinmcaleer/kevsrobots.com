@@ -1,17 +1,9 @@
 ---
 layout: lesson
 title: A Quick History
-author: Kevin McAleer
-type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
-date: 2023-01-17
-previous: lesson_01.html
-next: lesson_03.html
 description: Learn about the term 'Robot', who the Father of robotics is, and examples
   from the early age of robotics
-percent: 48
-duration: 5
-quiz_total: 11
+type: page
 navigation:
 - name: Robotics 101
 - content:
@@ -49,27 +41,27 @@ navigation:
 
 ## The term Robot
 
-> *'Robot' was first applied as a term for artificial automata in the 1920 play R.U.R. by the Czech writer*
+> *'Robot' was first applied as a term for artificial automata in the 1920 play R.U.R. by the Czech writer Karel Čapek*
 
 [![Photo of Josef Capek](assets/josef_capek.jpg){:class="img-fluid w-25"}](assets/josef_capek.jpg)
 
-However, **Josef Čapek** was named by his brother Karel as the true inventor of the term robot.
+However, **Josef Čapek** was named by his brother Karel as the true inventor of the term robot.
 
-The word 'robot' itself was not new, having been in the Slavic language as robota (forced labor), a term applied to peasants obligated to compulsory service under the feudal system.
+The word 'robot' itself was not new, having been in the Slavic language as robota (forced labor), a term applied to peasants obligated to compulsory service under the feudal system.
 
-Čapek's fictional story postulated the technological creation of artificial human bodies without souls, and the old theme of the feudal robota class eloquently fit the imagination of a new class of manufactured, artificial workers.
+Čapek's fictional story postulated the technological creation of artificial human bodies without souls, and the old theme of the feudal robota class eloquently fit the imagination of a new class of manufactured, artificial workers.
 
 ---
 
 ## Father of Robotics
 
-Ismail al-Jazari, 12 Century
+Ismail al-Jazari, 12th century
 
-*“...is quite likely that it was an early programmable automata. It has a programmable drum machine with pegs (cams) that bump into little levers that operated the percussion.”*
+*“...is quite likely that it was an early programmable automata. It has a programmable drum machine with pegs (cams) that bump into little levers that operated the percussion.”*
 
 ---
 
-The hand-washing automaton with a flush mechanism designed by al-Jazari.
+The hand-washing automaton with a flush mechanism designed by al-Jazari.
 
 [![Hand Washing automaton](assets/hand_washing.jpg){:class="img-fluid w-25"}](assets/hand_washing.jpg)
 
@@ -77,17 +69,17 @@ The hand-washing automaton with a flush mechanism designed by al-Jazari.
 
 A Musical Toy from a copy of al-Jazari's treatise on automata, Kitab fi ma'ari-fat al-hiyal al-handasiya (1206 C.E.) Early 14th century (1315).
 
-[![Muscial Toy automaton](assets/muscial_toy.jpg){:class="img-fluid w-50"}](assets/muscial_toy.jpg)
+[![Musical Toy automaton](assets/muscial_toy.jpg){:class="img-fluid w-50"}](assets/muscial_toy.jpg)
 
 ---
 
 ## Historic Robots
 
-**Also known as Automatons** - From the greek neuter ‘acting of one’s own will’.
+**Also known as Automatons** - from the Greek for "acting of one's own will".
 
-### The Duck of Vaucanson
+### The Duck of Vaucanson
 
-A postulated interior of the Duck of Vaucanson (1738-1739) [^1].
+A postulated interior of the Duck of Vaucanson (1738-1739) [^1].
 
 [![A Postulated interior of the duck of Vaucanson](assets/duck.jpg){:class="img-fluid w-50"}](assets/duck.jpg)
 
@@ -95,7 +87,7 @@ A postulated interior of the Duck of Vaucanson (1738-1739) [^1].
 
 ### Rama
 
-Automaton in the Swiss Museum CIMA [^2].
+Automaton in the Swiss Museum CIMA [^2].
 
 [![Rama](assets/rama.jpg){:class="img-fluid w-25"}](assets/rama.jpg)
 
@@ -123,7 +115,7 @@ W. H. Richards with "George", 1932 [^4]
 
 ---
 
-## Elektro
+### Elektro
 
 Elektro the Moto-Man and his Little Dog Sparko. [^5]
 
@@ -131,12 +123,12 @@ Created by Westinghouse Electric Company for the 1939 World's Fair.
 He could:
 
 - walk by voice command
-- speak about 700 words (using a 78-rpm record player)
+- speak about 700 words (using a 78-rpm record player)
 - smoke cigarettes
 - blow up balloons
 - and move his head and arms.
 
-Elektro's body consisted of a steel gear, cam and motor skeleton covered by an aluminum skin. His photoelectric "eyes" could distinguish red and green light.
+Elektro's body consisted of a steel gear, cam and motor skeleton covered by an aluminum skin. His photoelectric "eyes" could distinguish red and green light.
 Pictured here with Sparko
 
 [![Elektro](assets/elektro.jpg){:class="img-fluid w-25"}](assets/elektro.jpg)
@@ -148,7 +140,7 @@ Pictured here with Sparko
 ### Some examples of robots from today
 
 - **Industrial** - Manufacturing, packaging, distribution, production
-- **Educational** - Lego Mind-storms
+- **Educational** - Lego Mindstorms
 - **Entertainment** - Movies, Short-Circuit, Star Wars, iRobot
 - **Healthcare** - prosthetic limbs
 - **Military** - Drones, bomb-disposal, Satellite positioning and surveillance
@@ -176,7 +168,7 @@ K.I.T.T. (Knight Industries Two Thousand) - a fictional non-humanoid robot [^6]
 
 ### EveR-2
 
-EveR-2, the first android that has the ability to sing [^7]
+EveR-2, the first android that has the ability to sing [^7]
 
 [![EveR-2](assets/ever2.jpg){:class="img-fluid w-25"}](assets/ever2.jpg)
 

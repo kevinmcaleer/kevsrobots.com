@@ -1,15 +1,8 @@
 ---
 layout: lesson
 title: Build the ROS2 Container
-author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
-date: 2023-01-07
-previous: 06_clone_images.html
-next: 08_vscode_setup.html
 description: Use the official docker images to build our ROS2 container
-percent: 40
-duration: 2
 navigation:
 - name: Learn ROS with me
 - content:
@@ -69,6 +62,8 @@ navigation:
       link: 17_tf2.html
     - name: Laserscan data
       link: 18_laserscan.html
+    - name: Summary and next steps
+      link: 19_summary.html
 ---
 
 
@@ -80,7 +75,7 @@ To make the process of building our ROS2 container simpler I have created a `doc
 >
 > The `docker-compose.yml` file contains instructions on which docker image to use and also any parameters we want to include, such as host device (we'll want to use the lidar sensor which is found at `/dev/ttyUSB0` on the host file system), and also any volume or folder mappings.
 >
-> **Contents of the `docker-compose.yml`**
+> **Contents of the `docker-compose.yml`** (change `/home/kev` to your own home folder, for example `/home/pi`)
 >
 > ```docker
 > version: "3.9"
@@ -139,9 +134,29 @@ docker build -t ros2 .
 * **Run the container** - From the terminal, type:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-*The container will now be running, you can check to see if its running using the `docker ps` command.*
+*The container will now be running. You can check using the `docker ps` command.*
+
+> ## No LiDAR plugged in yet?
+>
+> The `devices` section passes the LiDAR on `/dev/ttyUSB0` into the container, and Docker won't start the container if that device doesn't exist. Comment out the two `devices` lines with a `#` until your LiDAR is connected.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why do we map (bind) folders from the Pi into the container?
+- [ ] To make the container start faster
+- [x] So files we create are kept when the container is stopped
+- [ ] To give the container internet access
+> Anything written inside a container is lost when it's removed, unless it's in a mapped folder.
+
+? Which command starts the container in the background?
+- [ ] `docker build -t ros2 .`
+- [x] `docker compose up -d`
+- [ ] `docker ps`
+> `-d` means detached: the container keeps running after the command returns.
+{% endquiz %}

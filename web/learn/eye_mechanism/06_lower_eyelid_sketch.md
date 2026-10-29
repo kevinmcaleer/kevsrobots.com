@@ -7,9 +7,10 @@ cover: /learn/eye_mechanism/assets/cover.jpg
 date: 2023-01-29
 previous: 05_hinge.html
 next: 07_create_lower_sketch.html
-description: Lets create the Lower Eyelid
-percent: 77
+description: Let's create the Lower Eyelid
+percent: 70
 duration: 2
+quiz_total: 9
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -39,14 +40,18 @@ navigation:
       link: 07_create_lower_sketch.html
     - name: Create Hinge from Profile
       link: 08_hinge.html
+  - section: Joints and Export
+    content:
+    - name: Joints and Export
+      link: 09_joint_and_export.html
 ---
 
 
-[]({{page.cover}}){:class="cover"}
+![Eye mechanism]({{page.cover}}){:class="cover"}
 
 > ## Components
 >
-> It's good practice to separate each part of our model into different components. This will make is possible to attach them together later with articulated joints.
+> It's good practice to separate each part of our model into different components. This will make it possible to attach them together later with articulated joints.
 
 ---
 
@@ -81,7 +86,7 @@ We want to create the new component at the same level as the original component 
 
 The result should look like this:
 
-![Create new Component](assets/eye46.jpg){:class="img-fluid w-150"}
+![Create new Component](assets/eye46.jpg){:class="img-fluid w-100"}
 
 ---
 

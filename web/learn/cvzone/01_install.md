@@ -5,11 +5,12 @@ author: Kevin McAleer
 type: page
 cover: /learn/cvzone/assets/install.png
 date: 2023-10-07
-previous: 00_video.html
+previous: 00_intro.html
 next: 02_face.html
 description: Kickstart your computer vision journey on Raspberry Pi using CVZone
-percent: 42
-duration: 2
+percent: 32
+duration: 4
+quiz_total: 10
 navigation:
 - name: Computer Vision on Raspberry Pi with CVZone
 - content:
@@ -17,73 +18,149 @@ navigation:
     content:
     - name: Computer Vision with CVZone
       link: 00_intro.html
-    - name: Watch the demonstration
-      link: 00_video.html
   - section: Getting Started
     content:
     - name: Installing CVZone
       link: 01_install.html
-  - section: Face, Hand and Posture Detection
+  - section: Face, Hand and Pose Detection
     content:
     - name: Face Detection
       link: 02_face.html
     - name: Hand Detection
       link: 03_hand.html
-    - name: Posture Detection
+    - name: Pose Detection
       link: 04_posture.html
-    - name: Advanced Visualization with CVZone
+    - name: Annotating Your Video
       link: 05_advanced.html
 ---
 
 
 ![Cover Image]({{page.cover}}){:class="cover"}
 
-This guide covers the installation process and the basic requirements to get you started with face, hand, and posture detection.
+## Overview
 
-## Using CVZone with Python on a Raspberry Pi: A Comprehensive Tutorial
+In this lesson you'll set up your Raspberry Pi for computer vision: a Python virtual environment with OpenCV, MediaPipe and CVZone, plus a quick camera test.
 
-In the ever-evolving field of computer vision, having the right tools is crucial. `CVZone`, a sought-after computer vision library, brings robust capabilities to developers. When combined with the flexibility of a Raspberry Pi, you can harness its power for various applications, including face, hand, and posture detection. This tutorial aims to guide you through setting up your Raspberry Pi environment to use CVZone efficiently.
+---
+
+## What each library does
+
+- **OpenCV** (`cv2`) - reads frames from the camera, draws on them and shows them in a window
+- **MediaPipe** - Google's machine learning models that actually find the faces, hands and bodies
+- **CVZone** - a thin layer over both that turns each detector into a couple of lines of code
 
 ---
 
 ## Requirements
 
-- **Raspberry Pi:** Ensure it's running Raspbian OS.
-- **Camera:** You can opt for the Raspberry Pi's native camera module or a compatible USB webcam.
-- **Libraries:** CVZone and OpenCV are the mainstays for our computer vision tasks.
-- **Python:** Version 3.6 or later is recommended for compatibility and performance.
+- **Raspberry Pi 4 or 5** running **64-bit** Raspberry Pi OS. MediaPipe only provides packages for 64-bit systems
+- **Camera:** a USB webcam or a Raspberry Pi camera module
+- **Python 3** (already installed on Raspberry Pi OS)
 
 ---
 
-## Installation Steps
+## Installation steps
 
-1. **Setting up your Raspberry Pi:**
-   - Begin with a Raspberry Pi with Raspbian OS already installed.
-   - Connect your chosen camera module or USB webcam to the Raspberry Pi. Ensure that it's compatible and properly detected by the system.
-
-2. **Install OpenCV:**
-
-   OpenCV is a foundational library for computer vision. Install it using the following commands:
+1. **Update your Pi:**
 
    ```bash
-   sudo apt-get update
-   sudo apt-get install libopencv-dev python3-opencv
+   sudo apt update && sudo apt full-upgrade -y
    ```
 
-3. **Install CVZone:**
+2. **Create a virtual environment:**
 
-   With OpenCV in place, you can now proceed to install CVZone:
+   Recent versions of Raspberry Pi OS don't let `pip` install packages system-wide, so we create a virtual environment for the course. The `--system-site-packages` option lets it see the camera library that comes with Raspberry Pi OS.
 
    ```bash
-   pip3 install cvzone
+   python3 -m venv --system-site-packages ~/cvzone-env
+   source ~/cvzone-env/bin/activate
    ```
+
+   Your prompt now starts with `(cvzone-env)`. Run the `source` line again each time you open a new terminal.
+
+3. **Install CVZone and MediaPipe:**
+
+   ```bash
+   pip install cvzone mediapipe
+   ```
+
+   This also installs OpenCV (`opencv-python`) and NumPy. It can take a few minutes.
 
 ---
 
-## Setting The Stage For Vision Mastery
+## Test your camera
 
-With CVZone and OpenCV installed on your Raspberry Pi, you've established a solid foundation for diving into computer vision projects. The combination of these tools with the compact and affordable Raspberry Pi platform empowers you to experiment, innovate, and deploy real-world applications.
+Save this as `camera_test.py` and run it with `python camera_test.py`:
 
-Remember, while this tutorial equips you with the necessary tools, the true exploration begins when you start experimenting with various detection and recognition algorithms, tweaking performance parameters, or integrating additional libraries. The world of computer vision on Raspberry Pi is vast and waiting for you to make your mark!
+```python
+import cv2
+
+cap = cv2.VideoCapture(0)
+
+while True:
+    success, img = cap.read()
+    if not success:
+        print("No camera image")
+        break
+    cv2.imshow("Camera test", img)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+```
+
+- `cv2.VideoCapture(0)` opens the first camera
+- `cap.read()` grabs one frame. `success` is `False` if it failed
+- `cv2.imshow()` shows the frame in a window, and `cv2.waitKey(1)` gives the window time to draw and checks for a key press
+- Press `q` to quit
+
+> ## Using a Raspberry Pi camera module
+>
+> `cv2.VideoCapture(0)` works with USB webcams. Camera modules on the ribbon cable use the `picamera2` library instead. Swap the capture lines for:
+>
+> ```python
+> from picamera2 import Picamera2
+>
+> picam2 = Picamera2()
+> picam2.configure(picam2.create_preview_configuration(main={"format": "RGB888", "size": (640, 480)}))
+> picam2.start()
+>
+> img = picam2.capture_array()   # use this in place of cap.read()
+> ```
+>
+> The `RGB888` format gives you frames in the same colour order OpenCV expects. The rest of the code in this course works the same way.
+
+---
+
+## Common Issues
+
+**Problem:** `pip install` says `error: externally-managed-environment`.
+**Solution:** Activate the virtual environment first with `source ~/cvzone-env/bin/activate`.
+**Why:** Raspberry Pi OS protects the system Python, so packages go in a virtual environment.
+
+**Problem:** `pip` can't find a version of `mediapipe`.
+**Solution:** Check you're on 64-bit Raspberry Pi OS with `uname -m`, which should print `aarch64`. If it does, check [MediaPipe on PyPI](https://pypi.org/project/mediapipe/) supports your Python version (`python --version`).
+**Why:** MediaPipe only publishes packages for 64-bit Arm and particular Python versions.
+
+**Problem:** The test program prints "No camera image".
+**Solution:** Check the webcam is plugged in and try `cv2.VideoCapture(1)`, or use the `picamera2` code for a camera module.
+**Why:** OpenCV couldn't open a camera at that index.
+
+---
+
+{% quiz %}
+? What does MediaPipe do in this course?
+- [ ] It shows the video window
+- [x] It provides the machine learning models that find faces, hands and bodies
+- [ ] It installs Python packages
+> OpenCV handles the video, MediaPipe does the detecting, and CVZone makes both easy to use.
+
+? Why do we use a virtual environment?
+- [x] Raspberry Pi OS doesn't let pip install packages system-wide
+- [ ] It makes the camera faster
+- [ ] CVZone only works in virtual environments
+> A virtual environment keeps the course's packages separate from the system Python.
+{% endquiz %}
 
 ---

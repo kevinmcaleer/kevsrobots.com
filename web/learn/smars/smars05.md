@@ -10,8 +10,9 @@ next: smars06.html
 description: Fit Motors Holders to the chassis
 percent: 36
 duration: 1
+quiz_total: 8
 navigation:
-- name: SMARS
+- name: Build a SMARS Robot
 - content:
   - section: Overview
     content:
@@ -60,7 +61,7 @@ navigation:
 
 ## Fit Motors Holders
 
-The motors are kept in place by the motor holders. You will have to bend these slightly to insert them into the little recess just about the motors. It is also good practice to push the motor wires through these before inserting. This will make them fit snug and will allow the motor wires to be free and untrapped.
+The motors are kept in place by the motor holders. You will have to bend these slightly to insert them into the little recess just above the motors. It is also good practice to push the motor wires through these before inserting. This will make them fit snug and will allow the motor wires to be free and untrapped.
 
 ![Fit Motors](assets/motor_holder.jpg){:class="img-fluid w-50"}
 

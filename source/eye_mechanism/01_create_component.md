@@ -1,7 +1,7 @@
 ---
 title: Create a Component
 layout: lesson
-description: Creating the initial Compoent
+description: Creating the initial Component
 type: page
 ---
 
@@ -17,7 +17,7 @@ It will open on a fresh new blank design
 
 ## Create a Component
 
-* **Click Assemble** - Click on the Assemble drowdown button on the toolbar
+* **Click Assemble** - Click on the Assemble dropdown button on the toolbar
 
 ![Fusion full screen](assets/eye00.jpg){:class="img-fluid w-100"}
 
@@ -31,7 +31,7 @@ It will open on a fresh new blank design
 
 ---
 
-* **Look at the Browser** - Check that the new component has been created in the brwoser on the left hand side of the screen
+* **Look at the Browser** - Check that the new component has been created in the browser on the left hand side of the screen
 
 ![Create Component Dialog](assets/eye02.jpg){:class="img-fluid w-50"}
 

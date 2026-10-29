@@ -8,8 +8,9 @@ date: 2023-04-27
 previous: 00_intro.html
 next: 01_what_is_burger_bot.html
 description: Introduction to BurgerBot and why it was created.
-percent: 14
+percent: 12
 duration: 55
+quiz_total: 11
 video_id: awQ97DOyOcM
 navigation:
 - name: Build your own BurgerBot
@@ -46,6 +47,8 @@ navigation:
     content:
     - name: BurgerBot Upgrades video
       link: 08_video.html
+    - name: Drawing with a Pen
+      link: 08_pen.html
     - name: Line Following
       link: 08_line_following.html
     - name: Line Following Code

@@ -1,17 +1,14 @@
 ---
-layout: lesson
 title: Lesson 01 - Movement
-author: Kevin McAleer
-type: page
-cover: /learn/smars_code/assets/program_smars.png
-date: 2023-09-10
-next: 02_lesson_02.html
 description: Learn how to move your robot
-percent: 14
-duration: 9
+layout: lesson
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:
+  - section: Overview
+    content:
+    - name: Overview
+      link: 00_intro.html
   - section: Movement
     content:
     - name: Lesson 01 - Movement
@@ -35,7 +32,7 @@ navigation:
 ---
 
 
-## LiveStream video
+## Watch the livestream
 
 {% include youtubeplayer.html id="2mmB2TD71g4" %}
 
@@ -47,27 +44,27 @@ In this lesson you will learn how to move your robot forward by writing code and
 
 ---
 
-## Things's you'll needs
+## What you'll need
 
 Before you begin, you'll need to make sure you have a couple of things before you start this lesson:
 
 * A [SMARS robot](/learn/smars/)
 * A USB Cable to connect to your computer
-* A Computer that can run the [Arduino IDE](https://create.arduino.cc/editor)
+* A Computer that can run the [Arduino IDE](https://www.arduino.cc/en/software)
 
 ---
 
 ## Preparation
 
 1. Connect the SMARS to the USB cable, and the USB Cable to your computer
-1. Launch the [Arduino IDE](https://create.arduino.cc/editor) on your computer
+1. Launch the [Arduino IDE](https://www.arduino.cc/en/software) on your computer
 1. Create a new Sketch, by clicking the `New Sketch` button
 
 ---
 
-## Lets code
+## Let's code
 
-You can download the code below from [GitHub](https://www.github.com/kevinmcaleer/lesson_01_movement), but its better to type it in yourself line by line, as you will get to understand what each line means.
+You can download the code below from [GitHub](https://www.github.com/kevinmcaleer/lesson_01_movement), but it's better to type it in yourself line by line, as you will get to understand what each line means.
 
 **Type the following lines:**
 
@@ -80,7 +77,7 @@ int motor_A = 12; // official Arduino Motor Shield uses D12
 int motor_B = 13; // official Arduino Motor Shield uses D13
 
 // set the Motor Speed using the Arduino Pins
-int motor_A_speed = 10; // official Arduino Motor Shield uses D3
+int motor_A_speed = 10; // Fundumoto shield uses D10 (the official Arduino Motor Shield uses D3)
 int motor_B_speed = 11; // official Arduino Motor Shield uses D11
 
 // set the time between motor on and motor off
@@ -162,13 +159,13 @@ Variables are special words that hold a value, such as a number, some text or ot
 
 `int` means integer, which is a whole number between -32,768 and 32,767.
 
-The Arduino has 32 pins, 20 of which can be used for read from and writing to. We tell the motors to turn on and off by writing a `1` or `0`, also known as `HIGH` or `LOW` values.
+The Arduino Uno has 20 pins you can read from and write to (14 digital pins and 6 analog pins). We set the direction of each motor by writing a `1` or `0`, also known as `HIGH` or `LOW`.
 
 `int motor_A = 12;` means tell the Arduino that there is a motor on pin 12, and we will refer to it as motor_A in our program.
 
 `int motor_A_speed = 10;` means tell the Arduino that we will control the speed of Motor A using pin 10.
 
-`int wait_in_milliseconds = 1000;` means set the integer `wait_in_milliseconds` to the value 1000 - the delay command used later on uses a value in milliseconds, (or thousands of a second). This means we can very accurately turn things on and off. A value of 500 would represent half a second. 1000 represents 1 second (a thousand milliseconds).
+`int wait_in_milliseconds = 1000;` means set the integer `wait_in_milliseconds` to the value 1000 - the delay command used later on uses a value in milliseconds (thousandths of a second). This means we can very accurately turn things on and off. A value of 500 would represent half a second. 1000 represents 1 second (a thousand milliseconds).
 
 ---
 
@@ -190,7 +187,7 @@ Arduino's have two main areas of code:
 1. and the **loop** section, that is used (executed) over and over until the Arduino is powered off, or the reset button is pressed.
 
 `void setup()`
-'void' seems like a strange word, often meaning empty. In this case  it means that there is no value returned by the section `setup` - it is void of value. Sections of code (also call **Functions** can return values or return nothing when they complete running).
+'void' seems like a strange word, often meaning empty. In this case  it means that there is no value returned by the section `setup` - it is void of value. Sections of code (also called **Functions**) can return a value, or nothing, when they finish running.
 
 `setup()` is the name of the Function.
 
@@ -199,7 +196,7 @@ Arduino's have two main areas of code:
 `pinMode(motor_A, OUTPUT);` means set the mode of the pin that `motor_A` is using (pin 12) to `OUTPUT`. Digital pins can either be `INPUT` or `OUTPUT`, which means the Arduino is either reading from or writing to the PIN. Pins can be either `Digital` or `Analog`:
 
 * `Digital` pins use values that are either 1 or 0 (HIGH or LOW). If you were to measure the voltage of a pin that is 1 (or HIGH) it would be 5 volts, where as a pin that is 0 (or LOW) would be 0 volts.
-* `Analog` pins use values that are a range of values, from 0 to 1023. If you were to measure the voltage of a pin that is set to an analog value it would be anywhere between 0 volts and 5 volts.
+* `Analog` values cover a range. When you **read** an analog pin with `analogRead()` you get a number from 0 (0 volts) to 1023 (5 volts). When you **write** with `analogWrite()` you send a number from 0 to 255, which switches the pin on and off very quickly (PWM) to act like a voltage in between. That's how we set the motor speed.
 
 ---
 
@@ -246,7 +243,7 @@ To move the robot forward we need to:
 
 `delay(wait_in_milliseconds);` means wait the amount of time stored in the variable `wait_in_milliseconds` (which we set earlier as 1000 milliseconds, or 1 second).
 
-We need to wait an amount of time othewise the Arduino will continue on to the next instruction which tells the motors to stop. Without the delay the motors wouldn't have any time to turn and the Robot would not move forward.
+We need to wait an amount of time, otherwise the Arduino will continue on to the next instruction which tells the motors to stop. Without the delay the motors wouldn't have any time to turn and the Robot would not move forward.
 
 Changing the amount of time stored in `wait_in_milliseconds` will make the amount of distance travelled either longer or shorter.
 
@@ -328,6 +325,28 @@ If you've made it this far you've successfully created your first SMARS program 
 
 How would you change this program to make the robot go backwards?
 
-Take a minute to appreciate what you've done, and then move on to the next lesson: [Lesson 2 - turning](02_lesson_02).
+Take a minute to appreciate what you've done, and then move on to the next lesson: [Lesson 2 - turning](02_lesson_02.html).
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? How many times does the code inside `setup()` run?
+- [x] Once, when the Arduino starts
+- [ ] Over and over until the power is turned off
+- [ ] Every time `forward()` is called
+> `setup()` runs once at the start. `loop()` is the part that runs over and over.
+
+? What does `analogWrite(motor_A_speed, 255);` do?
+- [ ] Stops motor A
+- [x] Runs motor A at full speed
+- [ ] Reads the speed of motor A
+> Motor speed goes from 0 (stopped) to 255 (full speed).
+
+? Why are the motor directions opposite (`LOW` and `HIGH`) to go forwards?
+- [ ] One motor is broken
+- [x] The two motors face opposite ways in the chassis
+- [ ] `HIGH` means fast and `LOW` means slow
+> Because the motors are mounted facing each other, they have to spin in opposite directions to drive the robot the same way.
+{% endquiz %}

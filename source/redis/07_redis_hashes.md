@@ -53,21 +53,23 @@ In addition to adding and retrieving hash elements, Redis provides several comma
 * `hexists`: Check if a key exists in a hash
 * `hkeys`: Get all keys in a hash
 * `hvals`: Get all values in a hash
+* `hgetall`: Get every key and value
+* `hincrby`: Add a number to a value, handy for counters
 
 ---
 
 ### Using Redis Hashes with Python
 
-To use Redis hashes in Python, you can use the `dict` methods of the Redis Python library. Here's an example of how to use Redis hashes in Python:
+To use Redis hashes in Python, you can use the hash methods of the Redis Python library, which all start with `h`. Here's an example of how to use Redis hashes in Python:
 
 ```python
 import redis
 
-redis_client = redis.Redis(host='localhost', port=6379)
+redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
-# Add key-value pairs to a hash
+# Add key-value pairs to a hash, one at a time or several at once
 redis_client.hset('myhash', 'key1', 'value1')
-redis_client.hset('myhash', 'key2', 'value2')
+redis_client.hset('myhash', mapping={'key2': 'value2', 'key3': 'value3'})
 
 # Get the value of a key in a hash
 value = redis_client.hget('myhash', 'key1')
@@ -83,6 +85,16 @@ values = redis_client.hvals('myhash')
 ```
 
 In this example, we use the Redis Python library to add key-value pairs to a hash using the `hset` method, retrieve the value of a key in a hash using the `hget` method, delete one or more keys from a hash using the `hdel` method, get all keys in a hash using the `hkeys` method, and get all values in a hash using the `hvals` method.
+
+---
+
+{% quiz %}
+? Which method returns a whole hash as a Python dictionary?
+- [ ] `hget()`
+- [x] `hgetall()`
+- [ ] `hkeys()`
+> `hgetall()` returns every field and value. `hkeys()` only returns the field names.
+{% endquiz %}
 
 ---
 

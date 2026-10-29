@@ -8,10 +8,11 @@ date: 2023-03-04
 previous: quad_09.html
 next: quad_11.html
 description: Mount the foot on the servo holder
-percent: 77
+percent: 66
 duration: 1
+quiz_total: 5
 navigation:
-- name: SMARS Quad
+- name: Build a SMARS Quad Walking Robot
 - content:
   - section: Overview
     content:
@@ -43,16 +44,20 @@ navigation:
       link: quad_10.html
     - name: Check Rotation
       link: quad_11.html
+  - section: Wire and code
+    content:
     - name: Code
       link: quad_12.html
     - name: Wiring
       link: quad_13.html
+    - name: Make it walk
+      link: quad_14.html
 ---
 
 
 ## 10 Mount the foot on the servo holder
 
-Adding the foot to the servo servo holder is simple, make sure the servo can rotate in both directions before you screw in the servo horn. You can check the precise angle of these later using the `test.py` program.
+Adding the foot to the servo holder is simple, make sure the servo can rotate in both directions before you screw in the servo horn. You can check the precise angle of these later using the `test.py` program.
 
 ![Mount the foot on the servo holder](assets/instruction10.png){:class="img-fluid w-25"}
 

@@ -32,7 +32,7 @@ print(df)
 
 ### Reading from Excel
 
-Reading from an Excel file is just as straightforward:
+Reading from an Excel file is just as straightforward, though you'll need the `openpyxl` library installed (`pip install openpyxl`):
 
 ```python
 # Reading from an Excel file
@@ -42,20 +42,9 @@ print(df)
 
 ---
 
-### Removing duplicates
-
-To remove duplicate rows from a Data Frame, use `df.drop_duplicates()`:
-
-```python
-# Removing duplicate rows
-df = df.drop_duplicates()
-```
-
----
-
 ### Reading from YAML
 
-To read YAML data, you'll need an additional library, `PyYAML`:
+To read YAML data, you'll need an additional library, `PyYAML` (`pip install pyyaml`). The YAML file should hold a list of records, one per row:
 
 ```python
 import yaml
@@ -79,8 +68,10 @@ You can export a Data Frame to a CSV file using `df.to_csv()`:
 
 ```python
 # Writing to a CSV file
-df.to_csv('path/to/your/newfile.csv')
+df.to_csv('path/to/your/newfile.csv', index=False)
 ```
+
+`index=False` stops Pandas writing the row numbers as an extra, unnamed column. Leave it out if your index holds useful labels.
 
 ---
 
@@ -90,8 +81,18 @@ Similarly, to export to an Excel file:
 
 ```python
 # Writing to an Excel file
-df.to_excel('path/to/your/newfile.xlsx')
+df.to_excel('path/to/your/newfile.xlsx', index=False)
 ```
+
+---
+
+{% quiz %}
+? Why pass `index=False` to `to_csv()`?
+- [ ] To make the file smaller by removing headers
+- [x] To stop the row numbers being saved as an extra column
+- [ ] To sort the rows
+> Without it, reading the file back in gives you an unwanted "Unnamed: 0" column.
+{% endquiz %}
 
 ---
 

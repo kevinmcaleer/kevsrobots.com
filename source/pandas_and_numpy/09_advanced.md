@@ -21,31 +21,44 @@ This lesson focuses on Advanced Data Manipulation Techniques with Pandas. Buildi
 Concatenate Pandas objects along a particular axis:
 
 ```python
-# Concatenating DataFrames
-concatenated_df = pd.concat([df1, df2])
+import pandas as pd
+
+monday = pd.DataFrame({'robot': ['SMARS', 'Quad'], 'distance_m': [12, 8]})
+tuesday = pd.DataFrame({'robot': ['SMARS', 'BurgerBot'], 'distance_m': [15, 20]})
+
+# Stack the rows of both tables
+all_days = pd.concat([monday, tuesday], ignore_index=True)
 ```
+
+`ignore_index=True` gives the result a fresh index of 0, 1, 2, 3 instead of repeating 0, 1, 0, 1.
 
 ---
 
 ### Merge
 
-Merge two datasets based on common columns:
+Merge two datasets that share a column, like a database join:
 
 ```python
-# Merging DataFrames
-merged_df = pd.merge(df1, df2, on='CommonColumn')
+specs = pd.DataFrame({'robot': ['SMARS', 'Quad', 'BurgerBot'], 'wheels': [4, 0, 2]})
+
+merged = pd.merge(all_days, specs, on='robot')
 ```
+
+Each row of `all_days` gets the matching `wheels` value from `specs`. Use `how='left'` to keep rows that have no match.
 
 ---
 
 ## Joining
 
-Join data on keys:
+`join()` matches a column in one table to the **index** of another:
 
 ```python
-# Joining DataFrames
-joined_df = df1.join(df2, on='KeyColumn')
+specs_by_robot = specs.set_index('robot')
+
+joined = all_days.join(specs_by_robot, on='robot')
 ```
+
+This gives the same result as the merge above. `merge()` is usually easier when both tables have the key as a normal column.
 
 ---
 
@@ -56,8 +69,13 @@ joined_df = df1.join(df2, on='KeyColumn')
 Pandas is robust in handling time series data:
 
 ```python
-# Parsing dates
-df['date_column'] = pd.to_datetime(df['date_column'])
+log = pd.DataFrame({
+    'date': ['2024-01-01', '2024-01-03', '2024-01-09', '2024-01-12'],
+    'distance_m': [12, 15, 9, 20],
+})
+
+# Turn the text into real dates
+log['date'] = pd.to_datetime(log['date'])
 ```
 
 ---
@@ -67,9 +85,12 @@ df['date_column'] = pd.to_datetime(df['date_column'])
 Utilize functions specific to time series:
 
 ```python
-# Resampling time series data
-resampled_data = df.resample('W').mean()
+# Total distance per week
+weekly = log.resample('W', on='date').sum()
+print(weekly)
 ```
+
+`resample()` groups rows into time periods, here weeks (`'W'`). Use `'D'` for days or `'MS'` for months. If the dates are the index, you can leave out `on=`.
 
 ---
 
@@ -95,9 +116,25 @@ Here are 10 essential tips for using pandas in data science:
 
 9. **Pivot Tables and Crosstabs**: Learn to reshape data and perform grouped summaries using `pivot_table()` and `crosstab()`.
 
-10. **Optimize Performance and Memory Usage**: Use methods like `category` data types for categorical data and the `eval()` and `query()` functions for memory-efficient operations.
+10. **Optimize Performance and Memory Usage**: Use the `category` data type for columns with only a few different values, and try `query()` for readable filtering.
 
 These tips can significantly enhance your efficiency and effectiveness in data manipulation and analysis using pandas.
+
+---
+
+{% quiz %}
+? Which function stacks the rows of two Data Frames on top of each other?
+- [x] `pd.concat()`
+- [ ] `pd.merge()`
+- [ ] `df.join()`
+> `concat()` stacks; `merge()` and `join()` match rows up using a key.
+
+? What does `log.resample('W', on='date').sum()` do?
+- [ ] Sorts the log by date
+- [x] Adds up the values for each week
+- [ ] Removes weekends
+> `resample()` groups rows into time periods, then `sum()` totals each one.
+{% endquiz %}
 
 ---
 

@@ -9,7 +9,7 @@ description: Download the official docker images for ROS from the Open Source Ro
 
 ## Open Source Robotics Foundation Official Docker files
 
-The Open Source Robotics Foundation (OSRF) maintain a suite of official Docker container definitions. Lets grab these so that we can build our own container.
+The Open Source Robotics Foundation (OSRF) maintain a suite of official Docker container definitions. Let's grab these so that we can build our own container.
 
 ---
 
