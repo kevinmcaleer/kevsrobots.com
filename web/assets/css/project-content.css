@@ -130,10 +130,16 @@
   text-decoration: line-through;
 }
 
-/* Lists: one line per item, the markers dimmed. */
+/* Lists: one line per item, the markers dimmed. The markers hang in the
+   padding, so wrapped lines line up with the words (as in the editor). */
 .project-prose ul,
 .project-prose ol {
   padding-left: 1.3em;
+}
+
+/* Two-digit numbers need a wider gutter (the editor adds 0.6em a digit). */
+.project-prose ol:has(> li:nth-child(10)) {
+  padding-left: 1.9em;
 }
 
 .project-prose li {
@@ -150,6 +156,10 @@
   color: var(--muted);
 }
 
+.project-prose ul ul {
+  list-style-type: disc;
+}
+
 .project-prose ul > li::marker {
   font-weight: 700;
 }
@@ -158,8 +168,10 @@
   list-style: none;
 }
 
+/* The box fills the gutter (less the space after it), so the words line up. */
 .project-prose li > input[type="checkbox"] {
-  margin: 0 0.45em 0 -1.3em;
+  width: 13px;
+  margin: 0 calc(1.3em - 13px - 0.25em) 0 -1.3em;
   vertical-align: -0.1em;
   accent-color: var(--accent);
 }
