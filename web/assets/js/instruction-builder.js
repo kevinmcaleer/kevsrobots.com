@@ -3541,11 +3541,10 @@
         '<div class="ib-bom-empty">' +
         '<div class="ib-bom-empty-icon"><i class="fas fa-receipt"></i></div>' +
         '<p>This project has no Bill of Materials yet.</p>' +
-        '<p class="small text-muted">Add parts in the project editor\'s BOM section.</p>' +
+        '<p class="small text-muted">This list shows the project\'s stored BOM rows.</p>' +
         '<a class="btn btn-sm btn-outline-primary" href="' +
-        escapeHtml('/projects/editor.html?id=' + encodeURIComponent(state.projectId) +
-                   '#editor-bom-section') +
-        '"><i class="fas fa-external-link-alt me-1"></i> Open BOM in editor</a>' +
+        escapeHtml('/projects/editor.html?id=' + encodeURIComponent(state.projectId)) +
+        '"><i class="fas fa-external-link-alt me-1"></i> Open project editor</a>' +
         '</div>';
       return;
     }
@@ -8393,7 +8392,7 @@
     // Update back / new-tab links with the project id
     if (dom.backLink) dom.backLink.href = '/projects/editor.html?id=' + encodeURIComponent(state.projectId);
     if (dom.openEditorNewTab) dom.openEditorNewTab.href = '/projects/editor.html?id=' + encodeURIComponent(state.projectId);
-    if (dom.bomOpenEditor) dom.bomOpenEditor.href = '/projects/editor.html?id=' + encodeURIComponent(state.projectId) + '#editor-bom-section';
+    if (dom.bomOpenEditor) dom.bomOpenEditor.href = '/projects/editor.html?id=' + encodeURIComponent(state.projectId);
 
     // Auth probe
     try {

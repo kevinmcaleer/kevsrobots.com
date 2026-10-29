@@ -2199,6 +2199,24 @@ description: View project details
     return true;
   }
 
+  // Whether the author's heading for sectionId is followed by a table
+  // with at least one row before the next heading at its level or above.
+  function sectionHasTable(sectionId, headings) {
+    const heading = headings.find(h => {
+      const s = ProjectSections.match(h.textContent);
+      return s && s.id === sectionId;
+    });
+    if (!heading) return false;
+    const level = Number(heading.tagName[1]);
+    for (let el = heading.nextElementSibling; el; el = el.nextElementSibling) {
+      if (/^H[1-6]$/.test(el.tagName) && Number(el.tagName[1]) <= level) return false;
+      if (el.id === 'view-bom-section') continue; // the stored rows, once moved here
+      const table = el.tagName === 'TABLE' ? el : el.querySelector && el.querySelector('table');
+      if (table && table.querySelector('tbody tr')) return true;
+    }
+    return false;
+  }
+
   function buildTOC() {
     const nav = document.getElementById('toc-nav');
     if (!nav) return;
@@ -2226,7 +2244,12 @@ description: View project details
       h.id = id;
     });
 
-    const bomUnderHeading = placeUnderHeading(document.getElementById('view-bom-section'), 'bill-of-materials', headings);
+    const bomSection = document.getElementById('view-bom-section');
+    // The editor no longer edits the stored BOM rows: once the author's own
+    // Bill of Materials section has a table, that is the BOM, and the stored
+    // rows would only repeat it.
+    if (bomSection && sectionHasTable('bill-of-materials', headings)) bomSection.classList.add('d-none');
+    const bomUnderHeading = placeUnderHeading(bomSection, 'bill-of-materials', headings);
     // Sections rendered outside the markdown, listed when visible.
     const extras = [
       { key: 'view-bom-section', text: 'Bill of Materials', section: 'bill-of-materials' },
