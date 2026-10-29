@@ -230,7 +230,7 @@
   //   ctx.listParts()   resolves to the BOM: { name, url (catalog page or null), detail }
   //   ctx.diagrams      [{ label, md }], the diagram templates
   function create(ctx) {
-    const sections = window.ProjectSections.list.map(section => ({
+    const sections = window.ProjectSections.list.filter(section => section.menu !== false).map(section => ({
       id: 'section-' + section.id,
       label: section.heading,
       keywords: section.keywords.concat(['section']),
@@ -398,8 +398,6 @@
         return { before: h + '1. ', placeholder: 'First step', after: '\n' };
       case 'wiring':
         return { before: h + '| From | To | Notes |\n| --- | --- | --- |\n| ', placeholder: 'Pico GP0', after: ' |  |  |\n' };
-      case 'code':
-        return { before: h + '```python\n', placeholder: '# Your code here', after: '\n```\n' };
       case 'code-repository':
         return { before: h, placeholder: 'Paste your repository link (GitHub, GitLab…)', after: '\n' };
       case '3d-printed-parts': {

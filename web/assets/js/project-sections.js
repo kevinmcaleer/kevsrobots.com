@@ -1,7 +1,7 @@
 // Canonical project sections (issue #257).
 //
 // The one list of section names a project page can have. The editor's `/`
-// commands insert these headings, and the page navigation (#259) and the
+// commands insert these headings (except any marked `menu: false`), and the page navigation (#259) and the
 // view page recognise them, so the spelling is the same everywhere. Add a
 // section here, not in the places that use it.
 (function () {
@@ -29,6 +29,10 @@
       heading: 'Code',
       keywords: ['program', 'software', 'firmware', 'sketch', 'micropython'],
       icon: 'M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5',
+      // Still recognised in the page navigation and on cards, but not
+      // offered in the `/` menu: it read as a twin of the editor's own
+      // "Code block", and "Code repository" is the section to add.
+      menu: false,
     },
     {
       id: 'code-repository',
