@@ -19,9 +19,12 @@ from ..models import Download, Project, ProjectFile, ProjectImage
 from ..visibility import hide_drafts
 from ..schemas import FileResponse, FileUpdate, ImageResponse
 from ..storage import (
+    MAX_THUMBNAIL_SIZE,
     delete_file,
+    file_category,
     generate_filename,
     is_image,
+    is_png,
     read_file,
     save_file,
     validate_file,
@@ -93,6 +96,61 @@ async def _log_download(
     # download-count thresholds and award badges asynchronously.
     return True
 
+def thumbnail_version(path: Optional[str]) -> Optional[str]:
+    """A short tag that changes whenever a model gets a new thumbnail: the
+    page puts it in the thumbnail URL, and it doubles as the ETag."""
+    if not path:
+        return None
+    return hashlib.sha256(path.encode("utf-8")).hexdigest()[:16]
+
+
+def file_response(record: ProjectFile, download_count: int = 0) -> FileResponse:
+    """The API shape of a project file. ``file_type`` is worked out from the
+    filename so legacy rows, which stored the extension, read as categories."""
+    return FileResponse(
+        id=record.id,
+        filename=record.filename,
+        file_size=record.file_size,
+        file_type=file_category(record.filename),
+        description=record.description,
+        print_settings=record.print_settings,
+        thumbnail_version=thumbnail_version(record.thumbnail_path),
+        uploaded_at=record.uploaded_at,
+        download_count=download_count,
+    )
+
+
+async def store_thumbnail(
+    session: AsyncSession, record: ProjectFile, file: UploadFile
+) -> FileResponse:
+    """Save a browser-rendered PNG as ``record``'s thumbnail (issue #262),
+    replacing any earlier one. Shared by the author and admin backfill routes."""
+    if file_category(record.filename) != "model":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Only 3D models have thumbnails")
+    content = await file.read()
+    if len(content) > MAX_THUMBNAIL_SIZE:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Thumbnail too large")
+    if not is_png(content):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Thumbnail must be a PNG")
+    stem = record.filename.rsplit(".", 1)[0]
+    path = save_file(
+        content, generate_filename(stem + ".png", record.project_id),
+        record.project_id, "thumbnails",
+    )
+    if path is None:
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save thumbnail")
+    old = record.thumbnail_path
+    record.thumbnail_path = path
+    await session.commit()
+    await session.refresh(record)
+    if old:
+        delete_file(old)
+    count = int((await session.execute(
+        select(func.count(Download.id)).where(Download.file_id == record.id)
+    )).scalar_one())
+    return file_response(record, count)
+
+
 router = APIRouter(prefix="/api/projects/{project_id}/files", tags=["files"])
 
 
@@ -121,20 +179,7 @@ async def list_files(
             )
         ).all()
         counts = {fid: int(c) for fid, c in rows}
-    out: list[FileResponse] = []
-    for i in items:
-        out.append(
-            FileResponse(
-                id=i.id,
-                filename=i.filename,
-                file_size=i.file_size,
-                file_type=i.file_type,
-                description=i.description,
-                uploaded_at=i.uploaded_at,
-                download_count=counts.get(i.id, 0),
-            )
-        )
-    return out
+    return [file_response(i, counts.get(i.id, 0)) for i in items]
 
 
 @router.post("", response_model=FileResponse | ImageResponse, status_code=201)
@@ -203,18 +248,17 @@ async def upload_file(
     if path is None:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save file")
 
-    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else "unknown"
     record = ProjectFile(
         project_id=project_id,
         filename=file.filename,
         file_path=path,
         file_size=len(content),
-        file_type=ext,
+        file_type=file_category(file.filename),
     )
     session.add(record)
     await session.commit()
     await session.refresh(record)
-    return FileResponse.model_validate(record, from_attributes=True)
+    return file_response(record)
 
 
 @router.get("/{file_id}/download")
@@ -222,9 +266,12 @@ async def download_file(
     project_id: int,
     file_id: int,
     request: Request,
+    preview: bool = False,
     user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> Response:
+    """The file itself. ``?preview=1`` is the 3D viewer reading a model to
+    show it, which isn't counted as a download."""
     record = await session.get(ProjectFile, file_id)
     if record is None or record.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
@@ -238,11 +285,12 @@ async def download_file(
     # Log the download. Never fail the file response if logging breaks —
     # the user came here to download, not to feed analytics.
     try:
-        settings = get_settings()
-        ip_hash = None
-        if not user:
-            ip_hash = _hash_ip(_client_ip(request), settings.ip_hash_salt)
-        await _log_download(session, project_id, file_id, user, ip_hash)
+        if not preview:
+            settings = get_settings()
+            ip_hash = None
+            if not user:
+                ip_hash = _hash_ip(_client_ip(request), settings.ip_hash_salt)
+            await _log_download(session, project_id, file_id, user, ip_hash)
     except Exception:  # pragma: no cover — defensive guard
         logger.warning("Failed to log download for file %s", file_id, exc_info=True)
 
@@ -262,7 +310,7 @@ async def update_file(
 ) -> FileResponse:
     """Partial-update an uploaded file's metadata (issue #187).
 
-    Owner-only. Today only ``description`` is mutable — the file itself is
+    Owner-only. ``description`` and ``print_settings`` are mutable — the file itself is
     immutable post-upload (filename/size/type are stamped at write time).
     Partial-update semantics match ``LinkUpdate``: fields omitted from the
     body (``exclude_unset``) are left untouched; an explicit empty string
@@ -295,14 +343,51 @@ async def update_file(
             )
         ).scalar_one()
     )
-    return FileResponse(
-        id=record.id,
-        filename=record.filename,
-        file_size=record.file_size,
-        file_type=record.file_type,
-        description=record.description,
-        uploaded_at=record.uploaded_at,
-        download_count=download_count,
+    return file_response(record, download_count)
+
+
+@router.post("/{file_id}/thumbnail", response_model=FileResponse)
+async def upload_thumbnail(
+    project_id: int,
+    file_id: int,
+    file: UploadFile,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> FileResponse:
+    """Store a model's thumbnail (issue #262). The editor renders it with
+    Three.js after the upload, so the server never renders anything."""
+    project = await session.get(Project, project_id)
+    if project is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    if project.author_username != user:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+    record = await session.get(ProjectFile, file_id)
+    if record is None or record.project_id != project_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    return await store_thumbnail(session, record, file)
+
+
+@router.get("/{file_id}/thumbnail")
+async def view_thumbnail(
+    project_id: int,
+    file_id: int,
+    user: Optional[str] = Depends(get_optional_user),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    record = await session.get(ProjectFile, file_id)
+    if record is None or record.project_id != project_id or not record.thumbnail_path:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    draft = await hide_drafts(session, project_id, user)
+    data = read_file(record.thumbnail_path)
+    if data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Thumbnail not found in storage")
+    # Pages ask for ?v=<thumbnail_version>, so a replaced thumbnail is a new
+    # URL and a long max-age is safe.
+    etag = '"' + thumbnail_version(record.thumbnail_path) + '"'
+    cache = "private, no-store" if draft else "public, max-age=86400"
+    return Response(
+        content=data, media_type="image/png",
+        headers={"Cache-Control": cache, "ETag": etag},
     )
 
 
@@ -324,5 +409,7 @@ async def delete_file_endpoint(
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     delete_file(record.file_path)
+    if record.thumbnail_path:
+        delete_file(record.thumbnail_path)
     await session.delete(record)
     await session.commit()

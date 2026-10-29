@@ -113,9 +113,19 @@ description: View project details
         <!-- Rendered markdown -->
         <div id="view-content" class="mb-5" style="line-height:1.8"></div>
 
-        <!-- Files -->
+        <!-- Thumbnail grid of the models, moved under the author's
+             "3D printed parts" heading when there is one (issue #262). -->
+        <div id="view-models-grid" class="view-models-grid mb-3 d-none"></div>
+
+        <!-- Files & Models: printable models (issue #261) -->
+        <div id="view-models-section" class="mb-4 d-none">
+          <h4><i class="fas fa-cube me-3"></i> Files & Models</h4>
+          <div id="view-models"></div>
+        </div>
+
+        <!-- Files: code, documents and archives -->
         <div id="view-files-section" class="mb-4 d-none">
-          <h4><i class="fas fa-paperclip me-3"></i> Files & Downloads</h4>
+          <h4><i class="fas fa-paperclip me-3"></i> Files</h4>
           <div id="view-files-total" class="small text-muted mb-2 d-none">
             <i class="fas fa-download me-1"></i> Total downloads: <span id="view-files-total-count">0</span>
           </div>
@@ -406,6 +416,13 @@ description: View project details
 </div>
 
 <style>
+  /* Issue #262: model thumbnails under "3D printed parts" and in Files & Models. */
+  .view-models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .view-models-grid__item { margin: 0; text-align: center; padding: 8px; border: 1px solid rgba(0,0,0,.08); border-radius: 8px; }
+  .view-models-grid__item img, .view-models-grid__item .fa-cube { display: block; margin: 0 auto 6px; }
+  .view-models-grid__item .fa-cube { width: 128px; height: 128px; line-height: 128px; }
+  .view-model-thumb { object-fit: contain; }
+
   .like-pulse { animation: likePulse 0.3s ease; }
   @keyframes likePulse {
     0% { transform: scale(1); }
@@ -686,6 +703,7 @@ description: View project details
      project-auth so getPreferredCurrency can use ProjectAuth.apiFetch. -->
 <script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/instruction-viewer.js?v={{ site.time | date: '%s' }}"></script>
@@ -1429,9 +1447,6 @@ description: View project details
     const resp = await fetch(API + '/api/projects/' + projectId + '/files', { credentials: 'include' });
     const files = await resp.json();
     if (files.length === 0) return;
-    document.getElementById('view-files-section').classList.remove('d-none');
-    // Rebuild TOC now that the Files section is visible
-    try { buildTOC(); } catch (e) {}
     var fileKinds = {
       py:'Python Script',cpp:'C++ Source',h:'Header',ino:'Arduino Sketch',
       md:'Markdown',txt:'Text',pdf:'PDF Document',csv:'Spreadsheet',
@@ -1452,24 +1467,85 @@ description: View project details
     };
     function fKind(n){var e=(n||'').split('.').pop().toLowerCase();return fileKinds[e]||e.toUpperCase()+' File';}
     function fIcon(n){var e=(n||'').split('.').pop().toLowerCase();return fileIcons[e]||'fas fa-file';}
-    var totalDownloads = files.reduce(function(acc, f) { return acc + (f.download_count || 0); }, 0);
-    var totalEl = document.getElementById('view-files-total');
-    if (totalEl) {
-      document.getElementById('view-files-total-count').textContent = totalDownloads;
-      totalEl.classList.remove('d-none');
-    }
-    document.getElementById('view-files').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${files.map(f => `
+    const base = API + '/api/projects/' + projectId + '/files/';
+    const downloadUrl = f => base + f.id + '/download';
+    const thumbUrl = f => base + f.id + '/thumbnail?v=' + f.thumbnail_version;
+    const viewable = f => window.ModelThumbnails && ModelThumbnails.canRender(f.filename);
+    const size = f => (f.file_size / 1024 >= 1024
+      ? (f.file_size / 1048576).toFixed(1) + ' MB'
+      : (f.file_size / 1024).toFixed(1) + ' KB');
+    // A model's thumbnail, or a cube until it has one (OBJ and 3MF for now).
+    const thumb = (f, px) => f.thumbnail_version
+      ? `<img src="${thumbUrl(f)}" alt="${esc(f.filename)}" width="${px}" height="${px}" loading="lazy" class="view-model-thumb">`
+      : `<i class="fas fa-cube text-muted" style="font-size:${Math.round(px / 2)}px"></i>`;
+    const openModel = id => {
+      const f = files.find(x => x.id === id);
+      if (!f) return;
+      ModelThumbnails.openViewer({ url: downloadUrl(f) + '?preview=1', name: f.filename, downloadUrl: downloadUrl(f) });
+    };
+
+    const models = files.filter(f => f.file_type === 'model');
+    const others = files.filter(f => f.file_type !== 'model');
+    const row = (f, first) => `
       <tr>
-        <td class="text-muted" style="width:20px"><i class="${fIcon(f.filename)}"></i></td>
+        <td class="text-muted text-center" style="width:${models.includes(f) ? 64 : 20}px">${first}</td>
         <td>
-          <a href="${API}/api/projects/${projectId}/files/${f.id}/download">${esc(f.filename)}</a>
+          <a href="${downloadUrl(f)}">${esc(f.filename)}</a>
           ${f.description ? `<small class="text-muted d-block">${esc(f.description)}</small>` : ''}
+          ${f.print_settings ? `<small class="text-muted d-block"><i class="fas fa-sliders-h me-1"></i>${esc(f.print_settings)}</small>` : ''}
         </td>
         <td class="text-muted small">${fKind(f.filename)}</td>
         <td class="text-muted small text-end" style="width:90px" title="Downloads"><i class="fas fa-download"></i> ${(f.download_count || 0)}</td>
-        <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
-      </tr>
-    `).join('')}</tbody></table>`;
+        <td class="text-muted small text-end" style="width:80px">${size(f)}</td>
+        <td class="text-end" style="width:44px"><a href="${downloadUrl(f)}" class="btn btn-sm btn-outline-secondary" title="Download ${esc(f.filename)}" aria-label="Download ${esc(f.filename)}"><i class="fas fa-download"></i></a></td>
+      </tr>`;
+
+    if (models.length) {
+      document.getElementById('view-models-section').classList.remove('d-none');
+      document.getElementById('view-models').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${models.map(f => row(f,
+        viewable(f)
+          ? `<button type="button" class="btn btn-link p-0" data-view-model="${f.id}" title="View ${esc(f.filename)} in 3D">${thumb(f, 56)}</button>`
+          : thumb(f, 56))).join('')}</tbody></table>`;
+      const grid = document.getElementById('view-models-grid');
+      grid.innerHTML = models.map(f => `
+        <figure class="view-models-grid__item">
+          ${viewable(f)
+            ? `<button type="button" class="btn btn-link p-0" data-view-model="${f.id}" title="View in 3D">${thumb(f, 128)}</button>`
+            : `<a href="${downloadUrl(f)}">${thumb(f, 128)}</a>`}
+          <figcaption class="small text-truncate"><a href="${downloadUrl(f)}">${esc(f.filename)}</a></figcaption>
+        </figure>`).join('');
+      grid.dataset.ready = '1';
+    }
+    if (others.length) {
+      document.getElementById('view-files-section').classList.remove('d-none');
+      document.getElementById('view-files').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${others.map(f => row(f,
+        `<i class="${fIcon(f.filename)}"></i>`)).join('')}</tbody></table>`;
+    }
+    var totalDownloads = files.reduce(function(acc, f) { return acc + (f.download_count || 0); }, 0);
+    var totalEl = document.getElementById('view-files-total');
+    if (totalEl && others.length) {
+      document.getElementById('view-files-total-count').textContent = totalDownloads;
+      totalEl.classList.remove('d-none');
+    }
+
+    // Thumbnails open the 3D viewer, and so do links to an STL in the
+    // write-up (the /3d printed parts and /file commands insert them).
+    if (!loadFiles._bound) {
+      loadFiles._bound = true;
+      document.addEventListener('click', e => {
+        const btn = e.target.closest('[data-view-model]');
+        if (btn) { e.preventDefault(); openModel(Number(btn.dataset.viewModel)); return; }
+        const link = e.target.closest('#view-content a[href]');
+        const m = link && link.getAttribute('href').match(/\/api\/projects\/\d+\/files\/(\d+)\/download$/);
+        const f = m && files.find(x => x.id === Number(m[1]));
+        if (f && viewable(f) && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
+          e.preventDefault();
+          openModel(f.id);
+        }
+      });
+    }
+    // Rebuild TOC now that the sections are visible
+    try { buildTOC(); } catch (e) {}
   }
 
   async function loadImages() {
@@ -2149,7 +2225,8 @@ description: View project details
     // Files, Community Makes) so the structure feels consistent.
     const extras = [
       { id: 'view-bom-section',   label: 'Bill of Materials' },
-      { id: 'view-files-section', label: 'Files & Downloads' },
+      { id: 'view-models-section', label: 'Files & Models' },
+      { id: 'view-files-section', label: 'Files' },
       { id: 'makes-section',      label: 'Community Makes' },
     ];
     extras.forEach(ex => {
@@ -2312,10 +2389,17 @@ description: View project details
     // rows would only repeat it.
     if (bomSection && sectionHasTable('bill-of-materials', headings)) bomSection.classList.add('d-none');
     const bomUnderHeading = placeUnderHeading(bomSection, 'bill-of-materials', headings);
+    // The models' thumbnails go under the author's 3D printed parts heading.
+    const modelsGrid = document.getElementById('view-models-grid');
+    if (modelsGrid && modelsGrid.dataset.ready) {
+      modelsGrid.classList.remove('d-none');
+      if (!placeUnderHeading(modelsGrid, '3d-printed-parts', headings)) modelsGrid.classList.add('d-none');
+    }
     // Sections rendered outside the markdown, listed when visible.
     const extras = [
       { key: 'view-bom-section', text: 'Bill of Materials', section: 'bill-of-materials' },
-      { key: 'view-files-section', text: 'Files & Downloads' },
+      { key: 'view-models-section', text: 'Files & Models' },
+      { key: 'view-files-section', text: 'Files' },
       { key: 'makes-section', text: 'Community Makes' },
     ].filter(ex => {
       const el = document.getElementById(ex.key);

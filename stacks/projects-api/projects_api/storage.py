@@ -66,6 +66,36 @@ def is_image(filename: str) -> bool:
     return Path(filename).suffix.lower() in ALLOWED_IMAGE_EXTENSIONS
 
 
+# Issue #261: what a project file is, for the Files & Models and Files
+# tables. Printable models go to Files & Models; everything else is a file
+# of some kind. Worked out from the extension, so rows uploaded before
+# file_type held a category (it used to hold the extension) read the same.
+MODEL_EXTENSIONS = {".stl", ".3mf", ".obj", ".step", ".stp", ".gcode"}
+CODE_EXTENSIONS = {".py", ".cpp", ".h", ".ino", ".scad"}
+ARCHIVE_EXTENSIONS = {".zip", ".tar", ".gz", ".7z", ".rar"}
+
+
+def file_category(filename: str) -> str:
+    """``model``, ``code``, ``archive`` or ``document`` for ``filename``."""
+    ext = Path(filename or "").suffix.lower()
+    if ext in MODEL_EXTENSIONS:
+        return "model"
+    if ext in CODE_EXTENSIONS:
+        return "code"
+    if ext in ARCHIVE_EXTENSIONS:
+        return "archive"
+    return "document"
+
+
+# Issue #262: model thumbnails are 256x256 PNGs rendered in the browser.
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+MAX_THUMBNAIL_SIZE = 1024 * 1024
+
+
+def is_png(content: bytes) -> bool:
+    return content.startswith(PNG_SIGNATURE)
+
+
 def generate_filename(original: str, project_id: int) -> str:
     ext = Path(original).suffix.lower()
     unique = uuid.uuid4().hex[:8]

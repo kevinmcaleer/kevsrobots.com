@@ -30,7 +30,7 @@ async def test_upload_file(client, project_id) -> None:
     assert resp.status_code == 201
     body = resp.json()
     assert body["filename"] == "code.py"
-    assert body["file_type"] == "py"
+    assert body["file_type"] == "code"
     assert body["file_size"] == len(b"print('hello')")
 
 
@@ -192,7 +192,7 @@ async def test_non_image_uploaded_via_files_endpoint_stays_a_file(
             headers=headers,
         )
     assert resp.status_code == 201
-    assert resp.json()["file_type"] in {"txt", "bin"}
+    assert resp.json()["file_type"] == "document"
     files = await client.get(f"/api/projects/{project_id}/files")
     assert len(files.json()) == 1
     images = await client.get(f"/api/projects/{project_id}/images")

@@ -29,6 +29,7 @@ from .db import (
     add_project_content_mode_if_missing,
     add_project_featured_columns_if_missing,
     add_project_file_description_if_missing,
+    add_project_file_model_columns_if_missing,
     add_project_slug_if_missing,
     add_remix_columns_if_missing,
     add_supplier_country_if_missing,
@@ -52,6 +53,7 @@ from .db import (
 )
 from .routers import (
     admin_feedback,
+    admin_files,
     admin_parts,
     auth,
     badges,
@@ -136,6 +138,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Issue #187: ensure project_files.description column exists on legacy
     # Postgres deployments. No-op on fresh deploys / SQLite tests.
     await add_project_file_description_if_missing()
+    # Issues #261/#262: project_files.print_settings and thumbnail_path.
+    await add_project_file_model_columns_if_missing()
     # B3 (issue #178): ensure instruction_steps.step_type / body /
     # video_url / schematic_id columns exist on legacy Postgres
     # deployments. No-op on fresh deploys / SQLite tests.
@@ -308,6 +312,8 @@ def create_app() -> FastAPI:
     # Issue #138: user feedback widget + admin inbox.
     app.include_router(feedback.router)
     app.include_router(admin_feedback.router)
+    # Issue #262: admin backfill of 3D model thumbnails.
+    app.include_router(admin_files.router)
     # Issue #150: public FX conversion endpoint.
     app.include_router(fx.router)
     return app
