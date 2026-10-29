@@ -12,6 +12,7 @@ hide_nibsy: true
 {% include nav_projects.html %}
 
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/parts-catalog.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/circuit-editor.css">
 <link rel="stylesheet" href="/assets/css/image-viewer.css">
 <link rel="stylesheet" href="/assets/js/markdown-editor/markdown-editor.css?v={{ site.time | date: '%s' }}">
@@ -147,6 +148,7 @@ hide_nibsy: true
 
       <!-- Markdown Editor (markdown-studio's editor bundle, mounted on the textarea) -->
       <div class="mb-4" id="content-markdown-pane">
+        <div class="bom-link-bar" id="bom-link-bar" role="status" hidden></div>
         <textarea id="content-editor"></textarea>
       </div>
 
@@ -256,6 +258,10 @@ hide_nibsy: true
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/parts-catalog.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/bom-sync.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/part-links.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-slash-commands.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-mermaid-theme.js?v={{ site.time | date: '%s' }}"></script>

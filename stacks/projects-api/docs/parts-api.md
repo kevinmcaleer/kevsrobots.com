@@ -250,6 +250,80 @@ the newly-written revision).
 
 ---
 
+## Snakie parts.yml (issue #266)
+
+A part carries the fields of Snakie's `parts.yml`. `manufacturer`,
+`package` (`THT`/`SMD`), `voltage`, `pin_spacing` (mm), `dimensions_mm`
+(`{width, height}`) and `datasheet_url` are editable through
+`PUT /api/parts/{slug}` (present → set, `""`/`null` clears). The rest of the
+Snakie `PartDefinition` (headers of pins, geometry, electrical model) lives
+in `definition`. Every revision snapshots all of them.
+
+- `GET /api/parts/{slug}/parts.yml` serialises the part in Snakie's format.
+  Catalog columns win over the stored definition; `image` and `mesh` are
+  absolute URLs.
+- `PUT /api/parts/{slug}/definition` takes the JSON the Snakie part editor
+  saves and writes a revision. Its manufacturer, package, voltage, pin
+  spacing and dimensions update the part's own; name and description don't.
+- `GET /api/parts/{slug}/mesh` serves the 3D mesh when the part has one.
+- Photos carry `source` and `licence` (`permission-granted:adafruit`,
+  `permission-granted:pimoroni`, `permission-granted:digikey`, `cc-by`,
+  `own`). A source with no licence sets `needs_review`, and the photo is
+  listed at `GET /api/admin/parts/photos/needs-review` for an admin to set
+  one with `PUT /api/parts/{slug}/photos/{id}`.
+
+### Seeding from the Snakie standard library
+
+```bash
+docker exec -it <projects-api container> \
+  python -m projects_api.import_snakie_parts /path/to/Snakie/examples/parts/snakie-standard
+```
+
+The command matches each part by slug, then name, then part number. Parts
+that match nothing are created as drafts. An existing part gets the Snakie
+fields refreshed, while its name, description, part number, category and
+tags are only filled in where empty. Changes are recorded as revisions by
+`snakie-import`. A second run changes nothing. The library's images have no
+recorded licence, so they arrive flagged for review.
+
+## Vendors, price history and availability (issues #202, #267)
+
+- A part's suppliers carry a `kind`: `shop` (somewhere to buy it) or a
+  technical link (`datasheet`, `driver`, `support`, `docs`). `PUT
+  /api/parts/{slug}` matches suppliers to existing rows **by URL**, so a
+  supplier keeps its id (and the BOM rows and price history that point at
+  it) across edits and restores.
+- Every new or changed shop price writes a `part_price_snapshots` row: on
+  an edit or restore, and in the daily supplier job (which also picks up
+  any price that changed without one). `GET /api/parts/{slug}/price-history`
+  returns each shop's points, oldest first.
+- `POST /api/parts/{slug}/suppliers/{id}/unavailable` (`{"note": …}`), by
+  any signed-in user, reports the part unavailable at that shop. `DELETE`
+  on the same path clears it, for the reporter, the part's creator or an
+  admin. Supplier responses carry `unavailable_*` and the `last_price*`
+  last recorded.
+- BOM rows: a chosen supplier's price is used while that supplier is
+  available. Otherwise, and for linked rows with no price of their own,
+  the row uses the cheapest available shop (`price_source: "cheapest"`).
+  `suppliers_unavailable` is true when every shop is broken or unavailable.
+
+## GET `/api/parts/_catalog` (issue #265)
+
+Every part (merged ones left out), by name, as
+`{id, slug, name, sku, mpn, category, family, manufacturer, tags, status,
+usage_count, cover_url, has_price}`. The visual catalog on `/parts/` and
+the editor's "Browse the catalog" load it once and shelve and filter
+locally (`web/assets/js/parts-catalog.js`). `has_price` means some shop
+link has a price.
+
+## GET `/api/parts/_resolve?names=…` (issue #263)
+
+Looks up each `names` value (repeat the parameter, up to 100) as an exact,
+case-insensitive match on a part's name, an alias, its SKU or its part
+number. Returns one `{name, slug, part_name, cover_url}` per distinct name,
+with `slug` null when nothing matches. The project editor's "Link all"
+uses it to link Bill of Materials rows that already name a catalog part.
+
 ## BOM integration
 
 `BOMItemCreate` / `BOMItemResponse` now include an optional `part_id`
@@ -259,6 +333,18 @@ part_id = ?`. The free-form fields (`name`, `quantity`, `unit`,
 `unit_cost`, `supplier_url`) still work and remain authoritative — the
 frontend should populate them from the chosen part for display, but the
 catalog row is the source of truth for future revisions.
+
+### PUT `/api/projects/{id}/bom/sync` (issue #264)
+
+The project's Bill of Materials lives in its Markdown as a table. On each
+save the editor parses it (`web/assets/js/bom-sync.js`) and sends
+`{rows: [{name, quantity, part_slug, unit_cost?, currency_code?}]}`.
+The stored rows then follow the table in order: each reuses a stored row
+for the same part, else the same name, so the pinned revision, chosen
+supplier and unit survive; rows the table no longer has are deleted and
+usage counts follow. `unit_cost` is left out when the table has no Price
+column, which keeps the stored price. Owner only; returns the list as
+`GET /bom` does. With no table in the text the editor doesn't call it.
 
 ### Example BOM body
 

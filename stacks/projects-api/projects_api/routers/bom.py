@@ -18,9 +18,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..db import get_session
+from ..fx import get_rate
 from ..models import Part, PartRevision, PartSupplier, Project, ProjectBOMItem
 from ..visibility import hide_drafts
-from ..schemas import BOMItemCreate, BOMItemResponse
+from ..schemas import BOMItemCreate, BOMItemResponse, BOMSync
 from .parts import first_photo_cover_urls
 
 router = APIRouter(prefix="/api/projects/{project_id}/bom", tags=["bom"])
@@ -108,6 +109,56 @@ async def _fetch_supplier_pricing(
     return {sid: (cost, code) for sid, cost, code in rows}
 
 
+def _available(sup: PartSupplier) -> bool:
+    return not sup.is_broken and sup.unavailable_at is None
+
+
+async def _fetch_part_offers(
+    session: AsyncSession, part_ids: list[int]
+) -> dict[int, tuple[Optional[float], Optional[str], bool, set[int]]]:
+    """Issue #267: per linked part, the cheapest available shop price
+    ``(cost, currency)``, whether every shop is unavailable, and the ids of
+    the shops that are unavailable. Prices in other currencies are compared
+    through the FX rates; an offer whose rate is unknown only counts when
+    nothing else does. One query for the whole BOM."""
+    if not part_ids:
+        return {}
+    sups = (
+        await session.scalars(
+            select(PartSupplier).where(
+                PartSupplier.part_id.in_(part_ids),
+                PartSupplier.kind == "shop",
+            )
+        )
+    ).all()
+    by_part: dict[int, list[PartSupplier]] = {}
+    for sup in sups:
+        by_part.setdefault(sup.part_id, []).append(sup)
+    out: dict[int, tuple[Optional[float], Optional[str], bool, set[int]]] = {}
+    for part_id, shops in by_part.items():
+        unavailable = {s.id for s in shops if not _available(s)}
+        priced = [s for s in shops if _available(s) and s.unit_cost is not None]
+        best: Optional[PartSupplier] = None
+        currencies = {s.currency_code for s in priced}
+        if len(currencies) <= 1:
+            best = min(priced, key=lambda s: s.unit_cost, default=None)
+        else:
+            base = next(iter(sorted(c for c in currencies if c))) if any(currencies) else None
+            scored = []
+            for s in priced:
+                rate = await get_rate(s.currency_code, base) if s.currency_code and base else None
+                if rate is not None:
+                    scored.append((s.unit_cost * rate, s))
+            best = min(scored, key=lambda t: t[0])[1] if scored else priced[0]
+        out[part_id] = (
+            best.unit_cost if best else None,
+            best.currency_code if best else None,
+            len(unavailable) == len(shops),
+            unavailable,
+        )
+    return out
+
+
 async def _covers_for(session: AsyncSession, parts_meta) -> dict[int, str]:
     """First-photo cover URL per part id, derived from parts_meta (which
     carries the slug). Batched — one query for the whole BOM."""
@@ -121,6 +172,7 @@ def _to_response(
     parts_meta: dict[int, tuple[Optional[str], Optional[str], Optional[int]]],
     supplier_pricing: dict[int, tuple[Optional[float], Optional[str]]],
     covers: Optional[dict[int, str]] = None,
+    offers: Optional[dict] = None,
 ) -> BOMItemResponse:
     """Build a BOMItemResponse, decorating with part slug / supplier.
 
@@ -132,6 +184,9 @@ def _to_response(
       2. Otherwise (no supplier link, supplier deleted under us, or
          supplier has no price recorded): fall back to the row's own
          ``unit_cost`` + ``currency_code``. ``price_source = "row"``.
+      3. Issue #267: when the chosen supplier is unavailable or broken, or
+         the row has no price of its own, the cheapest available shop for
+         the linked part. ``price_source = "cheapest"``.
 
     A stale ``supplier_id`` pointing at a deleted supplier behaves
     identically to having no link at all — ON DELETE SET NULL on the FK
@@ -156,7 +211,9 @@ def _to_response(
     effective_unit_cost: Optional[float] = item.unit_cost
     effective_currency_code: Optional[str] = item.currency_code
     price_source = "row"
-    if item.supplier_id is not None:
+    offer = (offers or {}).get(item.part_id) if item.part_id is not None else None
+    chosen_unavailable = bool(offer and item.supplier_id in offer[3])
+    if item.supplier_id is not None and not chosen_unavailable:
         sup_cost, sup_currency = supplier_pricing.get(
             item.supplier_id, (None, None)
         )
@@ -164,6 +221,11 @@ def _to_response(
             effective_unit_cost = sup_cost
             effective_currency_code = sup_currency
             price_source = "supplier"
+    if offer and offer[0] is not None and (
+        chosen_unavailable or (price_source == "row" and item.unit_cost is None)
+    ):
+        effective_unit_cost, effective_currency_code = offer[0], offer[1]
+        price_source = "cheapest"
 
     return BOMItemResponse(
         id=item.id,
@@ -183,6 +245,7 @@ def _to_response(
         effective_unit_cost=effective_unit_cost,
         effective_currency_code=effective_currency_code,
         price_source=price_source,
+        suppliers_unavailable=bool(offer and offer[2]),
         cover_url=(covers or {}).get(item.part_id) if item.part_id is not None else None,
     )
 
@@ -229,7 +292,8 @@ async def list_bom(
         session, list(set(supplier_ids))
     )
     covers = await _covers_for(session, parts_meta)
-    return [_to_response(i, parts_meta, supplier_pricing, covers) for i in items]
+    offers = await _fetch_part_offers(session, list(parts_meta))
+    return [_to_response(i, parts_meta, supplier_pricing, covers, offers) for i in items]
 
 
 async def _validate_supplier_id(
@@ -259,6 +323,91 @@ async def _resolve_part_revision(
         if rev is not None and rev.part_id == part.id:
             return requested
     return part.current_revision_id
+
+
+@router.put("/sync", response_model=list[BOMItemResponse])
+async def sync_bom(
+    project_id: int,
+    body: BOMSync,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> list[BOMItemResponse]:
+    """Issue #264: make the stored rows follow the Bill of Materials table
+    in the project's Markdown, in its order.
+
+    Each table row reuses a stored row for the same part (or, unlinked, the
+    same name), so what the table doesn't carry (the pinned revision, the
+    chosen supplier, the unit) survives. A row whose part changed is
+    re-pinned and loses a supplier of the old part. Rows the table no longer
+    has are deleted, and usage counts follow."""
+    await _check_owner(session, project_id, user)
+    existing = list(
+        (
+            await session.scalars(
+                select(ProjectBOMItem)
+                .where(ProjectBOMItem.project_id == project_id)
+                .order_by(ProjectBOMItem.sort_order, ProjectBOMItem.id)
+            )
+        ).all()
+    )
+    slugs = {r.part_slug for r in body.rows if r.part_slug}
+    parts_by_slug = {
+        p.slug: p
+        for p in (await session.scalars(select(Part).where(Part.slug.in_(slugs)))).all()
+    } if slugs else {}
+    touched: set[int] = {i.part_id for i in existing if i.part_id is not None}
+    unused = list(existing)
+
+    def take(match) -> Optional[ProjectBOMItem]:
+        for item in unused:
+            if match(item):
+                unused.remove(item)
+                return item
+        return None
+
+    wanted = [(row, parts_by_slug.get(row.part_slug) if row.part_slug else None) for row in body.rows]
+    # Same part first, then same name (a row just linked, or linked to
+    # another part), so a name match never takes a row another part needs.
+    matched: list[Optional[ProjectBOMItem]] = [
+        take(lambda i, p=part: i.part_id == p.id) if part is not None else None
+        for row, part in wanted
+    ]
+    for n, (row, part) in enumerate(wanted):
+        if matched[n] is None:
+            name = row.name.strip().lower()
+            matched[n] = take(lambda i: i.name.strip().lower() == name)
+
+    for order, (row, part) in enumerate(wanted):
+        name = row.name.strip()
+        item = matched[order]
+        if item is None:
+            item = ProjectBOMItem(project_id=project_id, unit="qty")
+            session.add(item)
+        new_part_id = part.id if part is not None else None
+        if item.part_id != new_part_id:
+            item.part_revision_id = part.current_revision_id if part is not None else None
+            if item.supplier_id is not None:
+                sup = await session.get(PartSupplier, item.supplier_id)
+                if sup is None or sup.part_id != new_part_id:
+                    item.supplier_id = None
+        elif part is not None and item.part_revision_id is None:
+            item.part_revision_id = part.current_revision_id
+        item.part_id = new_part_id
+        item.name = name
+        item.quantity = row.quantity
+        item.sort_order = order
+        if "unit_cost" in row.model_fields_set:
+            item.unit_cost = row.unit_cost
+            item.currency_code = row.currency_code if row.unit_cost is not None else None
+        if new_part_id is not None:
+            touched.add(new_part_id)
+    for item in unused:
+        await session.delete(item)
+    await session.flush()
+    for part_id in touched:
+        await _refresh_usage_count(session, part_id)
+    await session.commit()
+    return await list_bom(project_id, session, user)
 
 
 @router.post("", response_model=BOMItemResponse, status_code=201)
@@ -302,7 +451,8 @@ async def add_bom_item(
         session, [item.supplier_id] if item.supplier_id else []
     )
     covers = await _covers_for(session, parts_meta)
-    return _to_response(item, parts_meta, supplier_pricing, covers)
+    offers = await _fetch_part_offers(session, list(parts_meta))
+    return _to_response(item, parts_meta, supplier_pricing, covers, offers)
 
 
 @router.put("/{item_id}", response_model=BOMItemResponse)
@@ -359,7 +509,8 @@ async def update_bom_item(
         session, [item.supplier_id] if item.supplier_id else []
     )
     covers = await _covers_for(session, parts_meta)
-    return _to_response(item, parts_meta, supplier_pricing, covers)
+    offers = await _fetch_part_offers(session, list(parts_meta))
+    return _to_response(item, parts_meta, supplier_pricing, covers, offers)
 
 
 @router.post("/{item_id}/upgrade-revision", response_model=BOMItemResponse)
@@ -397,7 +548,8 @@ async def upgrade_bom_item_revision(
         session, [item.supplier_id] if item.supplier_id else []
     )
     covers = await _covers_for(session, parts_meta)
-    return _to_response(item, parts_meta, supplier_pricing, covers)
+    offers = await _fetch_part_offers(session, list(parts_meta))
+    return _to_response(item, parts_meta, supplier_pricing, covers, offers)
 
 
 @router.delete("/{item_id}", status_code=204)

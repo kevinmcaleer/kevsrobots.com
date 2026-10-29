@@ -15,6 +15,8 @@
     part: 'M5 5h6v6H5zM6.5 2.5V5M9.5 2.5V5M6.5 11v2.5M9.5 11v2.5M2.5 6.5H5M2.5 9.5H5M11 6.5h2.5M11 9.5h2.5',
     diagram: 'M2 2.5h5v4H2zM9 9.5h5v4H9zM4.5 6.5v5H9',
     upload: 'M8 11V3M5 6l3-3 3 3M3 11v2.5h10V11',
+    add: 'M8 3v10M3 8h10',
+    browse: 'M2 2.5h5v5H2zM9 2.5h5v5H9zM2 9.5h5v5H2zM9 9.5h5v5H9z',
   };
   const MODEL_FILE_RE = /\.(stl|3mf|obj|step|stp)$/i;
 
@@ -86,6 +88,12 @@
   //   free(query)  optional: an item made from what was typed (a URL, say),
   //                listed first; return null when the query isn't one
   //   empty        shown when nothing matches
+  //   search(query) optional: resolves to more items for what was typed
+  //                (the parts catalog, say), listed after load()'s; an
+  //                item with the same `key` as one already listed is left out
+  //   query        optional: what the search field starts with
+  //   last(query, shown)  optional: an item, or a list of them, listed
+  //                after everything else ("Create 'servo'"); null for none
   function openPicker(view, opts) {
     if (open) open.close(false);
 
@@ -99,6 +107,7 @@
     const input = el.querySelector('input');
     const list = el.querySelector('[role=listbox]');
     input.placeholder = opts.placeholder || 'Search…';
+    if (opts.query) input.value = opts.query;
     input.setAttribute('aria-label', opts.placeholder || 'Search');
     document.body.appendChild(el);
 
@@ -118,6 +127,8 @@
     let items = null; // null while loading
     let shown = [];
     let active = 0;
+    let found = { q: null, items: [] }; // search()'s items, and what for
+    let searchTimer = 0;
 
     function render() {
       const q = input.value.trim();
@@ -129,6 +140,12 @@
         shown = shown.concat(items.filter(it => it.always ||
           !ql || (it.label + ' ' + (it.detail || '')).toLowerCase().includes(ql)));
       }
+      if (found.q === q) {
+        const keys = new Set(shown.map(it => it.key).filter(Boolean));
+        shown = shown.concat(found.items.filter(it => !it.key || !keys.has(it.key)));
+      }
+      const last = opts.last ? opts.last(q, shown) : null;
+      if (last) shown = shown.concat(last);
       if (active >= shown.length) active = Math.max(0, shown.length - 1);
       list.replaceChildren();
       if (!shown.length) {
@@ -200,7 +217,20 @@
       if (!el.contains(e.target)) close(false);
     }
 
-    input.addEventListener('input', () => { active = 0; render(); });
+    function search() {
+      if (!opts.search) return;
+      clearTimeout(searchTimer);
+      const q = input.value.trim();
+      searchTimer = setTimeout(() => {
+        Promise.resolve(opts.search(q)).then(more => {
+          if (open !== picker || input.value.trim() !== q) return;
+          found = { q, items: more || [] };
+          render();
+        }, () => {});
+      }, 200);
+    }
+
+    input.addEventListener('input', () => { active = 0; render(); search(); });
     input.addEventListener('keydown', e => {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
@@ -222,6 +252,7 @@
     open = picker;
     render();
     input.focus();
+    search();
     Promise.resolve(opts.load ? opts.load() : []).then(
       loaded => { items = loaded || []; if (open === picker) render(); },
       () => { items = []; if (open === picker) render(); },
@@ -237,6 +268,7 @@
   //   ctx.uploadFile()  asks for a file, uploads it, resolves to { name, url } or null
   //   ctx.listVideos()  resolves to the project's videos: { id, title }
   //   ctx.listParts()   resolves to the BOM: { name, url (catalog page or null), detail }
+  //   ctx.searchParts(q), ctx.createPart(name)   the parts catalog, see partPicker
   //   ctx.diagrams      [{ label, md }], the diagram templates
   // The sections a document already has, worked out once per version of
   // the text (the menu asks on every keystroke while it's open).
@@ -372,27 +404,7 @@
         keywords: ['component', 'bom', 'tag'],
         group: 'project',
         icon: ICONS.part,
-        run: view => openPicker(view, {
-          placeholder: 'Find a part in the Bill of Materials…',
-          empty: 'Add parts to the Bill of Materials first',
-          load: async () => {
-            // The Bill of Materials table in the text, then the structured
-            // BOM rows it doesn't already name.
-            const parts = bomTableParts(view.state.doc.toString());
-            const byName = new Map(parts.map(p => [p.name.toLowerCase(), p]));
-            for (const p of await ctx.listParts()) {
-              const same = byName.get(p.name.toLowerCase());
-              if (!same) parts.push(p);
-              else if (!same.url) same.url = p.url; // a catalog link the table lacks
-            }
-            return parts.map(p => ({
-              label: p.name,
-              detail: p.detail || '',
-              icon: ICONS.part,
-              pick: () => insertAtCursor(view, p.url ? '[' + mdLinkText(p.name) + '](' + p.url + ')' : p.name, false),
-            }));
-          },
-        }),
+        run: view => partPicker(view, ctx, part => insertAtCursor(view, partLink(part), false), { browse: true }),
       },
       {
         id: 'diagram',
@@ -412,6 +424,74 @@
         }),
       },
     ]);
+  }
+
+  function partLink(part) {
+    return part.url ? '[' + mdLinkText(part.name) + '](' + part.url + ')' : part.name;
+  }
+
+  // Picks a part (issue #263): the Bill of Materials table's and rows'
+  // parts first, then the parts catalog for what's typed, and last
+  // "Create '…'" to add what's typed to the catalog. pick({ name, url })
+  // gets the choice; url is null for a BOM part not in the catalog.
+  //   ctx.listParts()        the BOM's parts, as for the Part command
+  //   ctx.searchParts(q)     resolves to catalog parts: { name, slug, url, thumb, detail }
+  //   ctx.createPart(name)   adds one, resolving to { name, slug, url }, or null
+  //   ctx.browseCatalog(view, q)  opens the full catalog (with opts.browse)
+  function partPicker(view, ctx, pick, opts) {
+    const key = p => (p.slug ? 'slug:' + p.slug : 'name:' + p.name.toLowerCase());
+    const item = p => ({
+      key: key(p),
+      label: p.name,
+      detail: p.detail || '',
+      icon: p.thumb ? null : ICONS.part,
+      thumb: p.thumb || null,
+      pick: () => pick(p),
+    });
+    return openPicker(view, {
+      query: opts && opts.query,
+      placeholder: (opts && opts.placeholder) || 'Find a part…',
+      empty: 'Type to search the parts catalog',
+      load: async () => {
+        if (opts && opts.catalogOnly) return [];
+        // The Bill of Materials table in the text, then the structured
+        // BOM rows it doesn't already name.
+        const parts = bomTableParts(view.state.doc.toString());
+        const byName = new Map(parts.map(p => [p.name.toLowerCase(), p]));
+        for (const p of await ctx.listParts()) {
+          const same = byName.get(p.name.toLowerCase());
+          if (!same) parts.push(p);
+          else if (!same.url) same.url = p.url; // a catalog link the table lacks
+        }
+        parts.forEach(p => { p.slug = window.PartLinks ? window.PartLinks.slugOf(p.url) : null; });
+        return parts.map(item);
+      },
+      search: async q => (ctx.searchParts ? (await ctx.searchParts(q)).map(item) : []),
+      last: (q, shown) => {
+        const out = [];
+        if (q && ctx.createPart && !shown.some(it => it.label.toLowerCase() === q.toLowerCase())) {
+          out.push({
+            label: 'Create \u201c' + q + '\u201d',
+            detail: 'Add it to the parts catalog',
+            icon: ICONS.add,
+            pick: async () => {
+              const part = await ctx.createPart(q);
+              if (part) pick(part);
+              else view.focus();
+            },
+          });
+        }
+        if (opts && opts.browse && ctx.browseCatalog) {
+          out.push({
+            label: 'Browse the catalog\u2026',
+            detail: 'Pick several parts for the Bill of Materials',
+            icon: ICONS.browse,
+            pick: () => ctx.browseCatalog(view, q),
+          });
+        }
+        return out;
+      },
+    });
   }
 
   // The parts listed in the Markdown table under the Bill of Materials
@@ -483,5 +563,5 @@
     }
   }
 
-  window.ProjectSlashCommands = { create, openPicker, insertAtCursor, bomTableParts, isTotalRow };
+  window.ProjectSlashCommands = { create, openPicker, partPicker, partLink, insertAtCursor, bomTableParts, isTotalRow };
 })();

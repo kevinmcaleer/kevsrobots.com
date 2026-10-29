@@ -7,6 +7,7 @@ description: Browse and search the community parts catalog
 {% include nav_projects.html %}
 
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/parts-catalog.css?v={{ site.time | date: '%s' }}">
 
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
@@ -21,179 +22,31 @@ description: Browse and search the community parts catalog
     </div>
   </div>
 
-  <div class="card mb-4">
-    <div class="card-body">
-      <label for="parts-search" class="form-label small text-muted">Search by name, SKU or MPN</label>
-      <div class="input-group">
-        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
-        <input type="search" id="parts-search" class="form-control" placeholder="Start typing... e.g. SG90, motor driver, 9V battery" autocomplete="off">
-      </div>
-      <div class="form-text">Searches name, aliases, SKU and MPN. Results update as you type.</div>
-    </div>
-  </div>
-
-  <div id="parts-status" class="text-muted small mb-2"></div>
-
-  <div id="parts-results" class="list-group"></div>
-
-  <div id="parts-empty" class="text-center py-5 d-none">
-    <i class="fas fa-search fa-2x text-muted mb-2"></i>
-    <p class="text-muted">No parts match that search yet.</p>
-    <a href="/parts/edit.html?new=1" id="parts-empty-new" class="btn btn-sm btn-outline-primary d-none">
-      <i class="fas fa-plus me-1"></i> Add the first one
-    </a>
-  </div>
+  <div id="parts-catalog"></div>
 </div>
 
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/parts-catalog.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
-  const searchInput = document.getElementById('parts-search');
-  const statusEl = document.getElementById('parts-status');
-  const resultsEl = document.getElementById('parts-results');
-  const emptyEl = document.getElementById('parts-empty');
   const newBtn = document.getElementById('new-part-btn');
-  const emptyNewBtn = document.getElementById('parts-empty-new');
-  let debounceTimer = null;
-  let inFlight = null;
 
-  function esc(s) {
-    const d = document.createElement('div');
-    d.textContent = s == null ? '' : String(s);
-    return d.innerHTML;
-  }
-
-  function statusBadge(status) {
-    if (status === 'verified') {
-      return '<span class="badge bg-success-subtle text-success"><i class="fas fa-check-circle me-1"></i>verified</span>';
-    }
-    if (status === 'under_review') {
-      return '<span class="badge bg-warning-subtle text-warning">under review</span>';
-    }
-    return '<span class="badge bg-secondary-subtle text-secondary">draft</span>';
-  }
-
-  function renderParts(parts) {
-    if (!parts || parts.length === 0) {
-      resultsEl.innerHTML = '';
-      emptyEl.classList.remove('d-none');
-      statusEl.textContent = '';
-      return;
-    }
-    emptyEl.classList.add('d-none');
-    statusEl.textContent = parts.length + ' result' + (parts.length === 1 ? '' : 's');
-    resultsEl.innerHTML = parts.map(p => {
-      const count = typeof p.usage_count === 'number' ? p.usage_count : 0;
-      const partUrl = '/parts/view.html?slug=' + encodeURIComponent(p.slug);
-      const searchUrl = '/projects/search?part=' + encodeURIComponent(p.slug);
-      // Render the count as a separate <a> outside the row link (nested
-      // anchors are invalid HTML), so clicking the count filters projects
-      // without also triggering the part-view link.
-      const countBadge = count > 0
-        ? `<a href="${searchUrl}" class="badge bg-light text-dark text-decoration-none" title="View projects using ${esc(p.name)}"><i class="fas fa-clipboard-list me-1"></i>${count} project${count === 1 ? '' : 's'}</a>`
-        : `<span class="badge bg-light text-muted"><i class="fas fa-clipboard-list me-1"></i>0 projects</span>`;
-      // 48px square thumbnail from the part's first photo (cover_url), or a
-      // neutral icon tile when it has no photo, so every row keeps height.
-      // cover_url is render-ready: external URLs are absolute; uploaded
-      // photos come back as a relative /api/…/view path → prefix the API base.
-      const coverSrc = p.cover_url
-        ? (/^https?:\/\//.test(p.cover_url) ? p.cover_url : API + p.cover_url)
-        : '';
-      const thumb = coverSrc
-        ? `<img src="${esc(coverSrc)}" alt="" loading="lazy"
-                class="rounded flex-shrink-0"
-                style="width:48px;height:48px;object-fit:cover;background:#f1f3f5;">`
-        : `<div class="rounded flex-shrink-0 d-flex align-items-center justify-content-center text-muted"
-                style="width:48px;height:48px;background:#f1f3f5;">
-             <i class="fas fa-cube"></i>
-           </div>`;
-      return `
-      <div class="list-group-item p-0">
-        <div class="d-flex justify-content-between align-items-start gap-3">
-          <a href="${partUrl}" class="flex-grow-1 text-decoration-none text-reset p-3 list-group-item-action d-flex align-items-center gap-3">
-            ${thumb}
-            <div class="flex-grow-1 min-w-0">
-              <div class="fw-bold text-truncate">${esc(p.name)}</div>
-              <div class="small text-muted">
-                ${p.sku ? '<span class="me-2"><strong>SKU:</strong> ' + esc(p.sku) + '</span>' : ''}
-              </div>
-            </div>
-          </a>
-          <div class="text-end d-flex flex-column align-items-end gap-1 p-3">
-            ${statusBadge(p.status)}
-            ${countBadge}
-          </div>
-        </div>
-      </div>
-    `;
-    }).join('');
-  }
-
-  // Issue #135: honour ?family= and ?category= query params so links from
-  // the part view page (e.g. the family chip) can pre-filter the list.
-  const urlParams = new URLSearchParams(window.location.search);
-  const familyFilter = urlParams.get('family') || '';
-  const categoryFilter = urlParams.get('category') || '';
-  if (familyFilter || categoryFilter) {
-    const filterChips = [];
-    if (familyFilter) filterChips.push('family: ' + familyFilter);
-    if (categoryFilter) filterChips.push('category: ' + categoryFilter);
-    statusEl.innerHTML = 'Filtering by ' + filterChips.map(c => `<span class="badge bg-primary-subtle text-primary-emphasis">${esc(c)}</span>`).join(' ') + ' — <a href="/parts/">clear</a>';
-  }
-
-  async function search(query) {
-    if (inFlight && inFlight.abort) { try { inFlight.abort(); } catch (_) {} }
-    inFlight = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-    statusEl.textContent = 'Searching...';
-    try {
-      const opts = inFlight ? { signal: inFlight.signal } : {};
-      let url = API + '/api/parts?q=' + encodeURIComponent(query) + '&limit=25';
-      if (familyFilter) url += '&family=' + encodeURIComponent(familyFilter);
-      if (categoryFilter) url += '&category=' + encodeURIComponent(categoryFilter);
-      const resp = await fetch(url, opts);
-      if (!resp.ok) {
-        statusEl.textContent = 'Could not reach the parts catalog. Please try again later.';
-        resultsEl.innerHTML = '';
-        return;
-      }
-      const data = await resp.json();
-      renderParts(Array.isArray(data) ? data : []);
-    } catch (e) {
-      if (e && e.name === 'AbortError') return;
-      statusEl.textContent = 'Could not reach the parts catalog. Please try again later.';
-      resultsEl.innerHTML = '';
-    }
-  }
-
-  searchInput.addEventListener('input', () => {
-    const q = searchInput.value.trim();
-    if (debounceTimer) clearTimeout(debounceTimer);
-    if (q.length === 0) {
-      // Empty search returns recently-edited / popular if backend allows it
-      debounceTimer = setTimeout(() => search(''), 250);
-      return;
-    }
-    if (q.length < 2) {
-      statusEl.textContent = 'Keep typing...';
-      return;
-    }
-    debounceTimer = setTimeout(() => search(q), 250);
+  // Issue #265: the catalog, a shelf per category. ?category= and
+  // ?family= (from a part page's chips) and ?q= start it filtered.
+  const params = new URLSearchParams(window.location.search);
+  PartsCatalog.mount(document.getElementById('parts-catalog'), {
+    api: API,
+    initial: { category: params.get('category'), family: params.get('family'), query: params.get('q') || '' },
   });
 
-  // Show "new part" buttons if the user is logged in (server enforces age).
+  // Show the "New part" button if the user is logged in (server enforces age).
   async function checkAuth() {
     try {
       const resp = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
-      if (resp.ok) {
-        newBtn.classList.remove('d-none');
-        emptyNewBtn.classList.remove('d-none');
-      }
+      if (resp.ok) newBtn.classList.remove('d-none');
     } catch (_) {}
   }
   checkAuth();
-
-  // Initial load — show some results immediately
-  search('');
 })();
 </script>

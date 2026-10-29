@@ -223,6 +223,7 @@
       updateStatusBadge(currentProject.status);
       showSaveStatus('saved', 'Saved');
       syncVideos(content);
+      syncBom(content);
       // The server has this text now, so the editor's local draft of it
       // can go (unless more was typed while the save was in flight).
       if (mde && mde.getDoc() === (data.content_md || '')) mde.clearDraft();
@@ -688,8 +689,10 @@
       scheduleAutoSave();
       scheduleAutoTagDetection();
       scheduleBomTotals();
+      scheduleBomLinks();
     });
     setupImageAutocomplete(mde);
+    setupPartLinks(mde);
     pinToolbarBelowTopBar();
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
@@ -749,7 +752,379 @@
         detail: item.quantity + ' ' + (item.unit === 'qty' ? '\u00d7' : item.unit) + (item.part_slug ? ' \u00b7 in the parts catalog' : ''),
       })),
       diagrams: DIAGRAM_TEMPLATES,
+      searchParts: searchCatalogParts,
+      createPart: createCatalogPart,
+      browseCatalog: async (view, q) => {
+        const parts = await PartsCatalog.open({
+          api: API, query: q, title: 'Add parts to the Bill of Materials', addLabel: 'Add to Bill of Materials',
+          origin: view.coordsAtPos(view.state.selection.main.head) || view.dom,
+        });
+        if (parts.length) addBomRows(view, parts);
+        else view.focus();
+      },
     };
+  }
+
+  // Issue #265: a row in the Bill of Materials table for each part, one
+  // of each, after its last part. Parts the table already links are left
+  // out. A project without the table gets one, under its Bill of
+  // Materials heading when it has that.
+  function addBomRows(view, parts) {
+    const markdown = view.state.doc.toString();
+    const parsed = BomSync.parse(markdown);
+    const have = new Set(parsed ? parsed.rows.map(r => r.part_slug).filter(Boolean) : []);
+    const adding = parts.filter(p => !have.has(p.slug));
+    if (!adding.length) { view.focus(); return; }
+    const link = p => '[' + p.name.replace(/([\[\]])/g, '\\$1').replace(/\|/g, '\\|') + '](' + PartLinks.href(p.slug) + ')';
+    const doc = view.state.doc;
+    const table = ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    let at;
+    let insert;
+    if (table) {
+      let partCol = table.header.findIndex(h => /^(part|parts|item|items|name|component|components)$/.test(h));
+      if (partCol < 0) partCol = 0;
+      const qtyCol = table.header.findIndex(h => /^(qty|quantity|count)$/.test(h));
+      let after = table.headerLine + 1;
+      table.rows.forEach((row, r) => { if (!ProjectSlashCommands.isTotalRow(row)) after = table.lines[r]; });
+      const rows = adding.map(p => {
+        const cells = table.header.map(() => '');
+        cells[partCol] = link(p);
+        if (qtyCol >= 0) cells[qtyCol] = '1';
+        return '| ' + cells.join(' | ') + ' |';
+      });
+      at = doc.line(after + 1).to;
+      insert = '\n' + rows.join('\n');
+    } else {
+      const items = adding.map(p => ({ name: p.name, quantity: 1, part_slug: p.slug, unit_cost: null }));
+      const section = ProjectSections.get('bill-of-materials');
+      const lines = markdown.split('\n');
+      const headingLine = lines.findIndex(line => {
+        const m = line.match(/^ {0,3}#{1,6}\s+(.*?)\s*#*\s*$/);
+        return m && ProjectSections.match(m[1]) === section;
+      });
+      if (headingLine >= 0) {
+        at = doc.line(headingLine + 1).to;
+        insert = '\n\n' + BomSync.tableFromRows(items).split('\n').slice(2).join('\n').replace(/\n$/, '');
+      } else {
+        at = doc.length;
+        const tail = markdown.endsWith('\n\n') || !markdown ? '' : markdown.endsWith('\n') ? '\n' : '\n\n';
+        insert = tail + BomSync.tableFromRows(items, section.heading);
+      }
+    }
+    view.dispatch({ changes: { from: at, insert }, selection: { anchor: at + insert.length }, scrollIntoView: true, userEvent: 'input' });
+    view.focus();
+  }
+
+  // --- Part links (issue #263) ---
+  //
+  // A part named in the text links to its catalog page; part-links.js
+  // draws those links as chips with the part's photo and a card on hover.
+  // Right-clicking one offers Open, Change and Unlink, and a bar over the
+  // editor offers to link the Bill of Materials rows that name a catalog
+  // part exactly.
+  const partApiUrl = url => (url && url.startsWith('/') ? API + url : url);
+
+  async function searchCatalogParts(q) {
+    const resp = await fetch(API + '/api/parts?limit=8&q=' + encodeURIComponent(q || ''));
+    if (!resp.ok) return [];
+    return (await resp.json()).map(p => ({
+      name: p.name,
+      slug: p.slug,
+      url: PartLinks.href(p.slug),
+      thumb: partApiUrl(p.cover_url),
+      detail: [p.category, 'used in ' + p.usage_count + (p.usage_count === 1 ? ' project' : ' projects')]
+        .filter(Boolean).join(' \u00b7 '),
+    }));
+  }
+
+  async function createCatalogPart(name) {
+    const resp = await apiFetch(API + '/api/parts', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    const body = await resp.json().catch(() => ({}));
+    if (resp.status === 403) {
+      showAccountAgeAlert(body.detail);
+      return null;
+    }
+    if (!resp.ok) throw new Error(typeof body.detail === 'string' ? body.detail : 'The part could not be created');
+    return { name: body.name, slug: body.slug, url: PartLinks.href(body.slug) };
+  }
+
+  // The [text](url) of the link to `slug` nearest where `link` was
+  // clicked (x, y) in the text.
+  function partLinkRange(view, link, slug, x, y) {
+    let pos = view.posAtCoords({ x, y });
+    if (pos == null) {
+      try { pos = view.posAtDOM(link); } catch (_) { pos = 0; }
+    }
+    const doc = view.state.doc.toString();
+    let best = null;
+    for (const m of doc.matchAll(/\[((?:\\.|[^\]\\])*)\]\(([^)\s]+)\)/g)) {
+      if (doc[m.index - 1] === '!' || PartLinks.slugOf(m[2]) !== slug) continue;
+      const from = m.index;
+      const to = from + m[0].length;
+      const d = pos < from ? from - pos : pos > to ? pos - to : 0;
+      if (!best || d < best.d) best = { from, to, d, text: m[1].replace(/\\([\[\]\\])/g, '$1') };
+    }
+    return best;
+  }
+
+  let partMenu = null;
+  function closePartMenu() {
+    if (partMenu) partMenu.remove();
+    partMenu = null;
+  }
+
+  function showPartMenu(view, link, x, y) {
+    closePartMenu();
+    const range = partLinkRange(view, link.el, link.slug, x, y);
+    if (!range) return;
+    // The link as it was when the menu opened. The text under it is
+    // redrawn as the cursor moves, so `link.el` may be gone by now.
+    const source = view.state.sliceDoc(range.from, range.to);
+    const replace = insert => {
+      if (view.state.sliceDoc(range.from, range.to) !== source) return;
+      view.dispatch({ changes: { from: range.from, to: range.to, insert }, selection: { anchor: range.from + insert.length }, userEvent: 'input' });
+      view.focus();
+    };
+    const actions = [
+      ['Open part page', () => window.open(PartLinks.href(link.slug), '_blank', 'noopener')],
+      ['Change part\u2026', () => {
+        view.dispatch({ selection: { anchor: range.to } });
+        ProjectSlashCommands.partPicker(view, slashContext(), part => {
+          replace(ProjectSlashCommands.partLink(part));
+        }, { placeholder: 'Change to\u2026' });
+      }],
+      ['Unlink', () => replace(range.text)],
+    ];
+    partMenu = document.createElement('div');
+    partMenu.className = 'part-link-menu';
+    partMenu.setAttribute('role', 'menu');
+    actions.forEach(([label, run]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'menuitem');
+      b.textContent = label;
+      b.addEventListener('click', () => { closePartMenu(); run(); });
+      partMenu.appendChild(b);
+    });
+    partMenu.addEventListener('keydown', e => {
+      const items = [...partMenu.querySelectorAll('button')];
+      const i = items.indexOf(document.activeElement);
+      if (e.key === 'Escape') { e.preventDefault(); closePartMenu(); view.focus(); }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        items[(i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length].focus();
+      }
+    });
+    document.body.appendChild(partMenu);
+    partMenu.style.left = Math.min(x, window.innerWidth - partMenu.offsetWidth - 8) + 'px';
+    partMenu.style.top = Math.min(y, window.innerHeight - partMenu.offsetHeight - 8) + 'px';
+    partMenu.querySelector('button').focus();
+  }
+
+  function setupPartLinks(editor) {
+    const view = editor.view;
+    PartLinks.attachHover(view.contentDOM);
+    PartLinks.thumbsFor(view.state.doc.toString());
+    view.contentDOM.addEventListener('contextmenu', e => {
+      const link = PartLinks.linkAt(e.target);
+      if (!link) return;
+      e.preventDefault();
+      PartLinks.hideCard();
+      showPartMenu(view, link, e.clientX, e.clientY);
+    });
+    document.addEventListener('mousedown', e => {
+      if (partMenu && !partMenu.contains(e.target)) closePartMenu();
+    }, true);
+    const bar = document.getElementById('bom-link-bar');
+    if (bar) {
+      bar.addEventListener('click', e => {
+        const action = e.target.closest('[data-action]');
+        if (!action) return;
+        if (action.dataset.action === 'link-all') linkAllBomParts();
+        else if (action.dataset.action === 'review') reviewBomPart();
+        else if (action.dataset.action === 'insert-bom') insertBomTable();
+        else if (action.dataset.action === 'dismiss') { bomLinkBarDismissed = true; bar.hidden = true; }
+      });
+    }
+    scheduleBomLinks();
+  }
+
+  // The Bill of Materials table's rows whose part isn't a link:
+  // [{ name, text, line, start, end }], line counted from 0 and start/end
+  // the columns of the cell's text.
+  function unlinkedBomRows(markdown) {
+    const table = ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return [];
+    let col = table.header.findIndex(h => /^(part|parts|item|name|component)s?$/.test(h));
+    if (col < 0) col = 0;
+    const lines = markdown.split('\n');
+    const out = [];
+    table.lines.forEach((line, r) => {
+      if (ProjectSlashCommands.isTotalRow(table.rows[r])) return;
+      const text = lines[line];
+      const pipes = [...text.matchAll(/(?<!\\)\|/g)].map(m => m.index);
+      if (pipes[col] === undefined) return;
+      let start = pipes[col] + 1;
+      let end = pipes[col + 1] === undefined ? text.length : pipes[col + 1];
+      while (start < end && /\s/.test(text[start])) start++;
+      while (end > start && /\s/.test(text[end - 1])) end--;
+      const cell = text.slice(start, end);
+      if (/\]\(/.test(cell)) return; // already a link
+      const name = cell.replace(/[*_`]/g, '').replace(/\\\|/g, '|').trim();
+      if (name) out.push({ name, text: cell, line, start, end });
+    });
+    return out;
+  }
+
+  const resolvedParts = new Map(); // lower-cased name -> { slug } or null
+  let bomLinkBarDismissed = false;
+
+  async function resolvePartNames(names) {
+    const missing = [...new Set(names.map(n => n.toLowerCase()))].filter(n => !resolvedParts.has(n));
+    if (missing.length) {
+      const qs = missing.slice(0, 100).map(n => 'names=' + encodeURIComponent(n)).join('&');
+      const resp = await fetch(API + '/api/parts/_resolve?' + qs).catch(() => null);
+      if (resp && resp.ok) {
+        for (const r of await resp.json()) resolvedParts.set(r.name.toLowerCase(), r.slug ? r : null);
+      }
+    }
+    return names.map(n => resolvedParts.get(n.toLowerCase()) || null);
+  }
+
+  async function updateBomLinkBar() {
+    if (!mde || !mde.view) return;
+    const markdown = mde.view.state.doc.toString();
+    PartLinks.thumbsFor(markdown);
+    const bar = document.getElementById('bom-link-bar');
+    if (!bar) return;
+    // A project saved before the table lived in the text (issue #264).
+    if (storedBom && storedBom.length && !BomSync.parse(markdown)) {
+      const n = storedBom.length;
+      bar.innerHTML =
+        '<i class="fas fa-list" aria-hidden="true"></i>' +
+        '<span>This project has ' + n + ' Bill of Materials ' + (n === 1 ? 'row' : 'rows') +
+        ' that ' + (n === 1 ? 'isn\u2019t' : 'aren\u2019t') + ' in the text yet.</span>' +
+        '<button type="button" class="btn btn-sm btn-success" data-action="insert-bom">Insert BOM table</button>';
+      bar.hidden = false;
+      return;
+    }
+    const rows = unlinkedBomRows(markdown);
+    if (!rows.length || bomLinkBarDismissed) { bar.hidden = true; return; }
+    const matches = (await resolvePartNames(rows.map(r => r.name))).filter(Boolean).length;
+    const n = rows.length;
+    bar.innerHTML =
+      '<i class="fas fa-link" aria-hidden="true"></i>' +
+      '<span>' + n + (n === 1 ? ' part in the Bill of Materials isn\u2019t' : ' parts in the Bill of Materials aren\u2019t') +
+      ' linked to the parts catalog.</span>' +
+      (matches ? '<button type="button" class="btn btn-sm btn-success" data-action="link-all">Link ' +
+        (matches === n ? (n === 1 ? 'it' : 'all ' + n) : matches + ' exact ' + (matches === 1 ? 'match' : 'matches')) + '</button>' : '') +
+      '<button type="button" class="btn btn-sm btn-outline-secondary" data-action="review">Review</button>' +
+      '<button type="button" class="btn-close ms-auto" data-action="dismiss" aria-label="Hide"></button>';
+    bar.hidden = false;
+  }
+
+  let bomLinksTimer = null;
+  function scheduleBomLinks() {
+    clearTimeout(bomLinksTimer);
+    bomLinksTimer = setTimeout(updateBomLinkBar, 1000);
+  }
+
+  // --- Bill of Materials sync (issue #264) ---
+  //
+  // The stored BOM rows (cost estimates, the parts catalog's "used in
+  // projects") follow the Bill of Materials table after each save. Without
+  // a table nothing changes, so a project saved before the table lived in
+  // the text keeps its rows, and the bar above offers to write them out.
+  let storedBom = null; // the API's rows as last seen; null until loaded
+  let lastBomSync = null; // the rows last sent
+  let bomSync = Promise.resolve();
+
+  async function loadStoredBom() {
+    if (!currentProject) { storedBom = []; return; }
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom', { credentials: 'include' });
+    storedBom = resp.ok ? await resp.json() : null;
+    scheduleBomLinks();
+  }
+
+  function syncBom(markdown) {
+    bomSync = bomSync.then(() => syncBomNow(markdown)).catch(e => console.error('BOM sync failed:', e));
+    return bomSync;
+  }
+
+  async function syncBomNow(markdown) {
+    if (!currentProject) return;
+    const parsed = BomSync.parse(markdown);
+    if (!parsed) return;
+    const body = JSON.stringify({ rows: parsed.rows });
+    if (body === lastBomSync) return;
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/sync', {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    lastBomSync = body;
+    storedBom = await resp.json();
+  }
+
+  function insertBomTable() {
+    if (!storedBom || !storedBom.length) return;
+    const view = mde.view;
+    const doc = view.state.doc;
+    const heading = ProjectSections.get('bill-of-materials').heading;
+    const lead = !doc.length ? '' : doc.toString().endsWith('\n\n') ? '' : doc.toString().endsWith('\n') ? '\n' : '\n\n';
+    const insert = lead + BomSync.tableFromRows(storedBom, heading);
+    view.dispatch({ changes: { from: doc.length, insert }, selection: { anchor: doc.length + insert.length }, scrollIntoView: true, userEvent: 'input' });
+    view.focus();
+    updateBomLinkBar();
+  }
+
+  // Links each unlinked row that names a catalog part exactly, keeping
+  // the row's own wording as the link's text.
+  async function linkAllBomParts() {
+    const view = mde.view;
+    const rows = unlinkedBomRows(view.state.doc.toString());
+    const found = await resolvePartNames(rows.map(r => r.name));
+    const changes = [];
+    rows.forEach((r, i) => {
+      if (!found[i]) return;
+      const line = view.state.doc.line(r.line + 1);
+      changes.push({
+        from: line.from + r.start,
+        to: line.from + r.end,
+        insert: '[' + r.text.replace(/([\[\]])/g, '\\$1') + '](' + PartLinks.href(found[i].slug) + ')',
+      });
+    });
+    if (changes.length) view.dispatch({ changes, userEvent: 'input' });
+    updateBomLinkBar();
+  }
+
+  // Picks the catalog part for the first unlinked row, starting from its name.
+  function reviewBomPart() {
+    const view = mde.view;
+    const row = unlinkedBomRows(view.state.doc.toString())[0];
+    if (!row) return;
+    const line = view.state.doc.line(row.line + 1);
+    const from = line.from + row.start;
+    view.dispatch({ selection: { anchor: from, head: line.from + row.end }, scrollIntoView: true });
+    view.focus();
+    ProjectSlashCommands.partPicker(view, slashContext(), part => {
+      if (!part.url) return;
+      const cur = unlinkedBomRows(view.state.doc.toString()).find(r => r.line === row.line);
+      if (!cur) return;
+      const l = view.state.doc.line(cur.line + 1);
+      view.dispatch({
+        changes: { from: l.from + cur.start, to: l.from + cur.end, insert: '[' + cur.text.replace(/([\[\]])/g, '\\$1') + '](' + part.url + ')' },
+        userEvent: 'input',
+      });
+      view.focus();
+      updateBomLinkBar();
+    }, { placeholder: 'Link \u201c' + row.name + '\u201d to\u2026', catalogOnly: true, query: row.name });
   }
 
   // --- Image autocomplete on `![` ---
@@ -2288,6 +2663,7 @@
     if (projectId) await loadProject();
     initEditor();
     scheduleBomTotals();
+    loadStoredBom().catch(() => {});
     editorContainer.classList.remove('d-none');
     const completenessCard = document.getElementById('completeness-card');
     if (completenessCard) completenessCard.classList.remove('d-none');

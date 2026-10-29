@@ -52,7 +52,8 @@ import re
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi.responses import Response
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -68,11 +69,17 @@ from ..models import (
     Part,
     PartAlias,
     PartPhoto,
+    PartPriceSnapshot,
     PartRelation,
     PartRevision,
     PartSupplier,
 )
+from ..auth import require_terms_accepted
+from ..config import get_settings
 from ..parts_lifecycle import compute_part_status
+from ..price_history import last_snapshot, record_price
+from ..snakie_parts import spec_from_definition, stored_definition, to_parts_yml
+from ..storage import read_file
 from ..parts_taxonomy import canonicalize, merge_for_suggestions
 from ..schemas import (
     PartCreate,
@@ -87,6 +94,11 @@ from ..schemas import (
     PartSupplierResponse,
     PartSymbolRef,
     PartUpdate,
+    PartCatalogEntry,
+    PartResolveResult,
+    PricePoint,
+    SupplierPriceHistory,
+    SupplierUnavailableBody,
 )
 
 
@@ -97,6 +109,34 @@ router = APIRouter(prefix="/api/parts", tags=["parts"])
 
 
 # --- helpers ------------------------------------------------------------
+
+
+# Issue #266: the Snakie parts.yml fields. Copied into every revision and
+# back on restore, alongside the original editable fields.
+SPEC_FIELDS = (
+    "manufacturer", "package", "voltage", "pin_spacing", "dimensions_mm",
+    "definition", "mesh_file_path", "datasheet_url",
+)
+# The ones PUT /api/parts/{slug} edits (definition via PUT …/definition,
+# the mesh only through the importer).
+EDITABLE_SPEC_FIELDS = (
+    "manufacturer", "package", "voltage", "pin_spacing", "dimensions_mm", "datasheet_url",
+)
+
+
+def spec_values(obj) -> dict:
+    return {f: getattr(obj, f) for f in SPEC_FIELDS}
+
+
+def _spec_response(obj) -> dict:
+    out = spec_values(obj)
+    out.pop("mesh_file_path")
+    return out
+
+
+def photo_needs_review(photo: PartPhoto) -> bool:
+    """A credited source with no licence on record (issue #266)."""
+    return bool(photo.source) and not photo.licence
 
 
 _SLUG_BAD_CHARS = re.compile(r"[^a-z0-9]+")
@@ -136,7 +176,7 @@ async def _load_suppliers(session: AsyncSession, part_id: int) -> list[PartSuppl
     )
 
 
-def _supplier_response(s: PartSupplier) -> PartSupplierResponse:
+def _supplier_response(s: PartSupplier, last: Optional[PartPriceSnapshot] = None) -> PartSupplierResponse:
     return PartSupplierResponse(
         id=s.id,
         name=s.supplier_name,
@@ -149,7 +189,49 @@ def _supplier_response(s: PartSupplier) -> PartSupplierResponse:
         country_code=s.country_code,
         unit_cost=s.unit_cost,
         currency_code=s.currency_code,
+        kind=s.kind or "shop",
+        unavailable_at=s.unavailable_at,
+        unavailable_note=s.unavailable_note,
+        unavailable_by=s.unavailable_by,
+        last_price=last.unit_cost if last else None,
+        last_price_currency=last.currency_code if last else None,
+        last_price_at=last.recorded_at if last else None,
     )
+
+
+async def _sync_suppliers(session: AsyncSession, part_id: int, entries: list[dict]) -> None:
+    """Make the part's suppliers match ``entries`` (revision-snapshot dicts),
+    matching existing rows by URL so their ids survive. The id is what BOM
+    rows (``supplier_id``) and price history hang off, so replacing rows
+    wholesale would cut both. Records a price snapshot for every new or
+    changed price (issue #267)."""
+    existing: dict[str, PartSupplier] = {}
+    extra: list[PartSupplier] = []
+    for sup in await _load_suppliers(session, part_id):
+        if sup.url in existing:
+            extra.append(sup)
+        else:
+            existing[sup.url] = sup
+    kept: list[PartSupplier] = []
+    for entry in entries:
+        url = entry.get("url")
+        if not url:
+            continue
+        sup = existing.pop(url, None)
+        if sup is None:
+            sup = PartSupplier(part_id=part_id, url=url)
+            session.add(sup)
+        sup.supplier_name = entry.get("name")
+        sup.country_code = entry.get("country_code")
+        sup.unit_cost = entry.get("unit_cost")
+        sup.currency_code = entry.get("currency_code")
+        sup.kind = entry.get("kind") or "shop"
+        kept.append(sup)
+    for sup in list(existing.values()) + extra:
+        await session.delete(sup)
+    await session.flush()
+    for sup in kept:
+        await record_price(session, sup)
 
 
 def _suppliers_to_json(suppliers: list[PartSupplier]) -> list[dict]:
@@ -164,6 +246,7 @@ def _suppliers_to_json(suppliers: list[PartSupplier]) -> list[dict]:
             "country_code": s.country_code,
             "unit_cost": s.unit_cost,
             "currency_code": s.currency_code,
+            "kind": s.kind or "shop",
         }
         for s in suppliers
     ]
@@ -326,6 +409,7 @@ async def _load_photos(session: AsyncSession, part: Part) -> list[PartPhotoRespo
         out.append(PartPhotoResponse(
             id=p.id, title=p.title, url=url, is_external=is_external,
             sort_order=p.sort_order, created_by=p.created_by, created_at=p.created_at,
+            source=p.source, licence=p.licence, needs_review=photo_needs_review(p),
         ))
     return out
 
@@ -358,7 +442,7 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         usage_count=part.usage_count,
         category=part.category,
         family=part.family,
-        suppliers=[_supplier_response(s) for s in suppliers],
+        suppliers=[_supplier_response(s, await last_snapshot(session, s.id)) for s in suppliers],
         recent_revisions=[
             PartRevisionSummary(
                 id=r.id,
@@ -375,6 +459,8 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         symbol_id=part.symbol_id,
         symbol=_symbol_ref(await _resolve_symbol(session, part.symbol_id)),
         photos=await _load_photos(session, part),
+        has_mesh=bool(part.mesh_file_path),
+        **_spec_response(part),
     )
 
 
@@ -507,6 +593,79 @@ async def list_families(
     return [row[0] for row in rows if row[0]]
 
 
+@router.get("/_resolve", response_model=list[PartResolveResult])
+async def resolve_part_names(
+    names: list[str] = Query(..., max_length=100),
+    session: AsyncSession = Depends(get_session),
+) -> list[PartResolveResult]:
+    """Issue #263: the catalog part each name is exactly (ignoring case):
+    its name, an alias, its SKU or its part number. The editor's "Link all"
+    uses this for the unlinked rows of a Bill of Materials table, so only
+    an exact match links; anything else is left for the author to pick."""
+    wanted = {n.strip().lower(): n for n in names if n and n.strip()}
+    found: dict[str, Part] = {}
+    if wanted:
+        keys = list(wanted)
+        for column in (func.lower(Part.name), func.lower(Part.sku), func.lower(Part.mpn)):
+            for part in (await session.scalars(select(Part).where(column.in_(keys)))).all():
+                for key in keys:
+                    if key not in found and key in {
+                        (part.name or "").lower(), (part.sku or "").lower(), (part.mpn or "").lower(),
+                    }:
+                        found[key] = part
+        rows = (
+            await session.execute(
+                select(func.lower(PartAlias.alias), Part)
+                .join(Part, Part.id == PartAlias.part_id)
+                .where(func.lower(PartAlias.alias).in_(keys))
+            )
+        ).all()
+        for alias, part in rows:
+            found.setdefault(alias, part)
+    covers = await first_photo_cover_urls(session, {p.id: p.slug for p in found.values()})
+    out = []
+    for key, original in wanted.items():
+        part = found.get(key)
+        out.append(PartResolveResult(
+            name=original,
+            slug=part.slug if part else None,
+            part_name=part.name if part else None,
+            cover_url=(covers.get(part.id) or part.image_url) if part else None,
+        ))
+    return out
+
+
+@router.get("/_catalog", response_model=list[PartCatalogEntry])
+async def parts_catalog(session: AsyncSession = Depends(get_session)) -> list[PartCatalogEntry]:
+    """Issue #265: every part, compactly, for the visual catalog on
+    ``/parts/`` and the editor's "Browse catalog". The page shelves and
+    filters them itself, so this is one request however the reader filters.
+    ``has_price`` is set when some shop link for the part has a price."""
+    parts = (
+        await session.scalars(select(Part).order_by(func.lower(Part.name)))
+    ).all()
+    parts = [p for p in parts if not (p.status or "").startswith("merged")]
+    priced = set(
+        (
+            await session.scalars(
+                select(PartSupplier.part_id)
+                .where(PartSupplier.unit_cost.is_not(None), PartSupplier.kind == "shop")
+                .distinct()
+            )
+        ).all()
+    )
+    covers = await first_photo_cover_urls(session, {p.id: p.slug for p in parts})
+    return [
+        PartCatalogEntry(
+            id=p.id, slug=p.slug, name=p.name, sku=p.sku, mpn=p.mpn,
+            category=p.category, family=p.family, manufacturer=p.manufacturer,
+            tags=list(p.tags or []), status=p.status, usage_count=p.usage_count,
+            cover_url=covers.get(p.id) or p.image_url, has_price=p.id in priced,
+        )
+        for p in parts
+    ]
+
+
 @router.post("", response_model=PartDetail, status_code=201)
 async def create_part(
     body: PartCreate,
@@ -624,6 +783,7 @@ def _supplier_signature(suppliers: list[dict]) -> list[tuple]:
             s.get("country_code"),
             s.get("unit_cost"),
             s.get("currency_code"),
+            s.get("kind") or "shop",
         )
         for s in suppliers
     ]
@@ -674,6 +834,17 @@ async def update_part(
     else:
         next_symbol_id = part.symbol_id
 
+    # Issue #266: spec fields — present in the body → set ("" clears).
+    next_spec = spec_values(part)
+    for field in EDITABLE_SPEC_FIELDS:
+        if field in body.model_fields_set:
+            value = getattr(body, field)
+            if field == "dimensions_mm" and value is not None:
+                value = value.model_dump()
+            if isinstance(value, str):
+                value = value.strip() or None
+            next_spec[field] = value
+
     current_suppliers = await _load_suppliers(session, part.id)
     current_supplier_json = _suppliers_to_json(current_suppliers)
     if body.suppliers is not None:
@@ -684,6 +855,7 @@ async def update_part(
                 "country_code": (s.country_code or None),
                 "unit_cost": s.unit_cost,
                 "currency_code": (s.currency_code or None),
+                "kind": s.kind,
             }
             for s in body.suppliers
         ]
@@ -700,6 +872,7 @@ async def update_part(
         or next_category != part.category
         or next_family != part.family
         or next_symbol_id != part.symbol_id
+        or next_spec != spec_values(part)
         or _supplier_signature(next_supplier_json) != _supplier_signature(current_supplier_json)
     )
     if not changed:
@@ -758,6 +931,7 @@ async def update_part(
         symbol_id=next_symbol_id,
         suppliers_json=next_supplier_json,
         created_at=now,
+        **next_spec,
     )
     session.add(rev)
     await session.flush()
@@ -772,25 +946,14 @@ async def update_part(
     part.category = next_category
     part.family = next_family
     part.symbol_id = next_symbol_id
+    for field, value in next_spec.items():
+        setattr(part, field, value)
     part.current_revision_id = rev.id
     part.updated_at = now
 
-    # Replace suppliers en-bloc (simplest correct behaviour for v1).
+    # Suppliers follow the body, matched by URL so ids and history survive.
     if body.suppliers is not None:
-        await session.execute(
-            delete(PartSupplier).where(PartSupplier.part_id == part.id)
-        )
-        for entry in next_supplier_json:
-            session.add(
-                PartSupplier(
-                    part_id=part.id,
-                    supplier_name=entry.get("name"),
-                    url=entry.get("url"),
-                    country_code=entry.get("country_code"),
-                    unit_cost=entry.get("unit_cost"),
-                    currency_code=entry.get("currency_code"),
-                )
-            )
+        await _sync_suppliers(session, part.id, next_supplier_json)
 
     await session.commit()
     await session.refresh(part)
@@ -865,6 +1028,7 @@ async def get_revision(
         category=rev.category,
         family=rev.family,
         symbol_id=rev.symbol_id,
+        **_spec_response(rev),
     )
 
 
@@ -926,6 +1090,7 @@ async def restore_revision(
         symbol_id=source.symbol_id,
         suppliers_json=suppliers_json,
         created_at=now,
+        **spec_values(source),
     )
     session.add(new_rev)
     await session.flush()
@@ -939,25 +1104,12 @@ async def restore_revision(
     part.category = source.category
     part.family = source.family
     part.symbol_id = source.symbol_id
+    for field, value in spec_values(source).items():
+        setattr(part, field, value)
     part.current_revision_id = new_rev.id
     part.updated_at = now
 
-    await session.execute(
-        delete(PartSupplier).where(PartSupplier.part_id == part.id)
-    )
-    for entry in suppliers_json:
-        if not entry.get("url"):
-            continue
-        session.add(
-            PartSupplier(
-                part_id=part.id,
-                supplier_name=entry.get("name"),
-                url=entry.get("url"),
-                country_code=entry.get("country_code"),
-                unit_cost=entry.get("unit_cost"),
-                currency_code=entry.get("currency_code"),
-            )
-        )
+    await _sync_suppliers(session, part.id, suppliers_json)
 
     await session.commit()
     await session.refresh(part)
@@ -1069,3 +1221,187 @@ async def list_family_parts(
     part = await _get_part_by_slug(session, slug)
     family_parts = await _load_family_parts(session, part.id, part.family)
     return [_to_related_ref(p) for p in family_parts]
+
+
+# --- Snakie parts.yml (issue #266) -------------------------------------
+
+
+async def _cover_photo(session: AsyncSession, part: Part) -> Optional[PartPhoto]:
+    return await session.scalar(
+        select(PartPhoto)
+        .where(PartPhoto.part_id == part.id)
+        .order_by(PartPhoto.sort_order.asc(), PartPhoto.id.asc())
+        .limit(1)
+    )
+
+
+@router.get("/{slug}/parts.yml")
+async def export_parts_yml(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """The part as Snakie ``parts.yml``, so Snakie can install catalog parts
+    as a community library. Image and mesh are absolute URLs."""
+    part = await _get_part_by_slug(session, slug)
+    base = get_settings().public_base_url.rstrip("/")
+    cover = await _cover_photo(session, part)
+    image_url = None
+    if cover is not None:
+        image_url = cover.external_url or f"{base}/api/parts/{part.slug}/photos/{cover.id}/view"
+    mesh_url = f"{base}/api/parts/{part.slug}/mesh" if part.mesh_file_path else None
+    return Response(
+        content=to_parts_yml(part, image_url=image_url, mesh_url=mesh_url),
+        media_type="application/yaml",
+        headers={"Content-Disposition": f'inline; filename="{part.slug}.parts.yml"'},
+    )
+
+
+@router.put("/{slug}/definition", response_model=PartDetail)
+async def put_definition(
+    slug: str,
+    definition: dict = Body(...),
+    user: str = Depends(require_terms_accepted_aged),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Store the JSON the Snakie part editor saves (a PartDefinition) as a
+    new revision. Its catalogue fields (manufacturer, package, voltage, pin
+    spacing, dimensions) update the part's own; name and description stay
+    as the catalog has them."""
+    if not isinstance(definition.get("headers", []), list):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="headers must be a list")
+    part = await _get_part_by_slug(session, slug)
+    next_spec = spec_values(part)
+    next_spec.update(spec_from_definition(definition))
+    next_spec["definition"] = stored_definition(definition)
+    if next_spec == spec_values(part):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No fields changed")
+
+    now = _now_naive_utc()
+    suppliers = await _load_suppliers(session, part.id)
+    rev = PartRevision(
+        part_id=part.id,
+        author=user,
+        change_summary="Updated the part definition",
+        name=part.name,
+        sku=part.sku,
+        mpn=part.mpn,
+        description_md=part.description_md,
+        image_url=part.image_url,
+        tags=list(part.tags or []),
+        category=part.category,
+        family=part.family,
+        symbol_id=part.symbol_id,
+        suppliers_json=_suppliers_to_json(suppliers),
+        created_at=now,
+        **next_spec,
+    )
+    session.add(rev)
+    await session.flush()
+    for field, value in next_spec.items():
+        setattr(part, field, value)
+    part.current_revision_id = rev.id
+    part.updated_at = now
+    await session.commit()
+    await session.refresh(part)
+    return await _part_detail(session, part)
+
+
+MESH_MEDIA_TYPES = {
+    "glb": "model/gltf-binary", "gltf": "model/gltf+json",
+    "stl": "model/stl", "obj": "model/obj",
+}
+
+
+@router.get("/{slug}/mesh")
+async def get_mesh(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    part = await _get_part_by_slug(session, slug)
+    if not part.mesh_file_path:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No mesh for this part")
+    data = read_file(part.mesh_file_path)
+    if data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Mesh not found in storage")
+    ext = part.mesh_file_path.rsplit(".", 1)[-1].lower()
+    return Response(
+        content=data,
+        media_type=MESH_MEDIA_TYPES.get(ext, "application/octet-stream"),
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+# --- price history + availability (issues #202, #267) --------------------
+
+
+@router.get("/{slug}/price-history", response_model=list[SupplierPriceHistory])
+async def price_history(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> list[SupplierPriceHistory]:
+    """Every shop's recorded prices, oldest first, for the part page chart."""
+    part = await _get_part_by_slug(session, slug)
+    suppliers = await _load_suppliers(session, part.id)
+    snaps = (
+        await session.scalars(
+            select(PartPriceSnapshot)
+            .where(PartPriceSnapshot.part_id == part.id)
+            .order_by(PartPriceSnapshot.recorded_at.asc(), PartPriceSnapshot.id.asc())
+        )
+    ).all()
+    by_supplier: dict[int, list[PricePoint]] = {}
+    for snap in snaps:
+        by_supplier.setdefault(snap.supplier_id, []).append(PricePoint(
+            unit_cost=snap.unit_cost, currency_code=snap.currency_code, recorded_at=snap.recorded_at,
+        ))
+    return [
+        SupplierPriceHistory(supplier_id=sup.id, name=sup.supplier_name, url=sup.url,
+                             points=by_supplier.get(sup.id, []))
+        for sup in suppliers
+        if (sup.kind or "shop") == "shop"
+    ]
+
+
+async def _get_supplier(session: AsyncSession, part: Part, supplier_id: int) -> PartSupplier:
+    sup = await session.get(PartSupplier, supplier_id)
+    if sup is None or sup.part_id != part.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Supplier not found")
+    return sup
+
+
+@router.post("/{slug}/suppliers/{supplier_id}/unavailable", response_model=PartDetail)
+async def mark_unavailable(
+    slug: str,
+    supplier_id: int,
+    body: SupplierUnavailableBody,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Any signed-in user can report a part unavailable at a supplier."""
+    part = await _get_part_by_slug(session, slug)
+    sup = await _get_supplier(session, part, supplier_id)
+    sup.unavailable_at = _now_naive_utc()
+    sup.unavailable_note = (body.note or "").strip() or None
+    sup.unavailable_by = user
+    await session.commit()
+    return await _part_detail(session, part)
+
+
+@router.delete("/{slug}/suppliers/{supplier_id}/unavailable", response_model=PartDetail)
+async def clear_unavailable(
+    slug: str,
+    supplier_id: int,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """The reporter, the part's creator or an admin can clear a report."""
+    part = await _get_part_by_slug(session, slug)
+    sup = await _get_supplier(session, part, supplier_id)
+    allowed = user in (sup.unavailable_by, part.created_by) or user in get_settings().admin_usernames_list
+    if not allowed:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Only the reporter, the part's creator or an admin can clear this")
+    sup.unavailable_at = None
+    sup.unavailable_note = None
+    sup.unavailable_by = None
+    await session.commit()
+    return await _part_detail(session, part)

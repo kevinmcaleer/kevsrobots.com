@@ -98,6 +98,7 @@ description: View a part in the catalog
 
             <div id="part-image-wrap" class="mb-4 d-none">
               <img id="part-image" class="img-fluid rounded" alt="">
+              <div id="part-image-credit" class="small text-muted mt-1 d-none"></div>
             </div>
 
             <div id="part-tags" class="d-flex flex-wrap gap-2 mb-3"></div>
@@ -106,6 +107,18 @@ description: View a part in the catalog
             <hr>
 
             <div id="part-description" class="mb-4" style="line-height:1.7"></div>
+
+            <!-- Issue #266: the Snakie parts.yml fields -->
+            <div id="part-specs-section" class="mb-4 d-none">
+              <h4><i class="fas fa-microchip me-3 text-primary"></i> Specifications</h4>
+              <table class="table table-sm mb-2"><tbody id="part-specs"></tbody></table>
+              <a id="part-yml-link" class="small" href="#"><i class="fas fa-file-code me-1"></i> Download parts.yml for Snakie</a>
+            </div>
+
+            <div id="part-pinout-section" class="mb-4 d-none">
+              <h4><i class="fas fa-plug me-3 text-primary"></i> Pinout</h4>
+              <div id="part-pinout"></div>
+            </div>
 
             <div id="part-family-section" class="mb-4 d-none">
               <h4><i class="fas fa-sitemap me-3 text-primary"></i> Same family</h4>
@@ -119,9 +132,28 @@ description: View a part in the catalog
               <div id="part-related-list" class="row g-2"></div>
             </div>
 
-            <div id="part-suppliers-section" class="mb-4 d-none">
-              <h4><i class="fas fa-truck me-3"></i> Suppliers</h4>
-              <ul id="part-suppliers" class="list-group"></ul>
+            <!-- Issues #202/#267: vendors, price history, links, alternatives
+                 (filled by part-prices.js) -->
+            <div id="part-vendors-section" class="mb-4 d-none">
+              <div class="d-flex align-items-center mb-2">
+                <h4 class="mb-0 me-auto"><i class="fas fa-truck me-3"></i> Vendors</h4>
+                <label for="part-currency" class="small text-muted me-2">Prices in</label>
+                <select id="part-currency" class="form-select form-select-sm w-auto"></select>
+              </div>
+              <div id="part-vendors"></div>
+              <div id="part-price-chart"></div>
+              <p class="small text-muted mt-2 mb-0">Prices change. Converted prices use today's exchange rates.</p>
+            </div>
+
+            <div id="part-alternatives-section" class="mb-4 d-none">
+              <h5><i class="fas fa-random me-2 text-warning"></i> Alternatives</h5>
+              <p class="small text-muted mb-2">This part isn't available everywhere right now. These related parts may do instead.</p>
+              <div id="part-alternatives"></div>
+            </div>
+
+            <div id="part-techinfo-section" class="mb-4 d-none">
+              <h4><i class="fas fa-book-open me-3"></i> Technical information</h4>
+              <ul id="part-techinfo" class="list-group"></ul>
             </div>
           </div>
 
@@ -320,6 +352,7 @@ description: View a part in the catalog
      when #149 adds per-supplier prices we can show them in the
      viewer's preferred currency without touching this file again. -->
 <script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/part-prices.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -392,50 +425,86 @@ description: View a part in the catalog
     return '<span class="badge bg-secondary">draft</span>';
   }
 
-  function supplierStatusBadge(s) {
-    if (s === 'ok') return '<span class="badge bg-success-subtle text-success ms-2">link OK</span>';
-    if (s === 'broken') return '<span class="badge bg-danger-subtle text-danger ms-2">link broken</span>';
-    return '';
-  }
-
-  function supplierBrokenPill(supplier) {
-    // Issue #122 Phase 2: prominent "link reported broken" pill alongside
-    // the supplier link when the daily health check has marked it broken.
-    if (supplier && supplier.is_broken) {
-      return '<span class="badge bg-danger ms-2" title="The supplier URL has failed our daily link-check 3 times in a row."><i class="fas fa-exclamation-triangle me-1"></i> link reported broken</span>';
+  // Issue #266: image credits. A licence of permission-granted:<who> means
+  // that supplier allowed the use.
+  const LICENCE_LABELS = {
+    'cc-by': 'CC BY',
+    'own': 'own photo',
+  };
+  function licenceLabel(licence) {
+    if (!licence) return '';
+    if (licence.startsWith('permission-granted:')) {
+      const who = licence.slice('permission-granted:'.length);
+      return 'used with permission of ' + who.charAt(0).toUpperCase() + who.slice(1);
     }
-    return '';
+    return LICENCE_LABELS[licence] || licence;
+  }
+  function photoCredit(p) {
+    if (!p || (!p.source && !p.licence)) return '';
+    const bits = [];
+    if (p.source) bits.push(esc(p.source));
+    if (p.licence) bits.push(esc(licenceLabel(p.licence)));
+    return '<i class="fas fa-camera me-1"></i>Image: ' + bits.join(', ');
   }
 
-  // Issue #149: render a small flag + ISO code pill for the supplier's
-  // country. Uses the regional-indicator unicode trick (two letters
-  // mapped into the flag emoji range) so we don't need a flag sprite.
-  // Falls back to a neutral "globe" pill when country_code is null.
-  function countryFlagBadge(code) {
-    if (!code || typeof code !== 'string' || !/^[A-Za-z]{2}$/.test(code)) {
-      return '<span class="badge bg-light text-muted ms-2" title="Country not set"><i class="fas fa-globe"></i></span>';
+  function renderSpecs(part) {
+    const rows = [];
+    const add = (label, html) => { if (html) rows.push(`<tr><th class="text-muted fw-normal" style="width:40%">${label}</th><td>${html}</td></tr>`); };
+    add('Manufacturer', esc(part.manufacturer));
+    add('Part number', esc(part.mpn));
+    add('Package', part.package === 'THT' ? 'Through-hole (THT)' : part.package === 'SMD' ? 'Surface mount (SMD)' : esc(part.package));
+    add('Voltage', esc(part.voltage));
+    add('Pin spacing', part.pin_spacing ? esc(String(part.pin_spacing)) + ' mm' : '');
+    const d = part.dimensions_mm;
+    add('Dimensions', d && d.width && d.height ? esc(d.width + ' × ' + d.height) + ' mm' : '');
+    const mcu = part.definition && part.definition.mcu;
+    add('Microcontroller', esc(mcu));
+    if (part.datasheet_url && /^https?:\/\//.test(part.datasheet_url)) {
+      add('Datasheet', `<a href="${esc(part.datasheet_url)}" target="_blank" rel="noopener">Datasheet <i class="fas fa-external-link-alt fa-xs"></i></a>`);
     }
-    const up = code.toUpperCase();
-    const flag = String.fromCodePoint(
-      0x1F1E6 + (up.charCodeAt(0) - 65),
-      0x1F1E6 + (up.charCodeAt(1) - 65),
-    );
-    return `<span class="badge bg-light text-dark ms-2" title="Supplier country: ${esc(up)}">${flag} ${esc(up)}</span>`;
+    const props = part.definition && part.definition.properties;
+    if (props && typeof props === 'object') {
+      Object.keys(props).forEach(k => add(esc(k.charAt(0).toUpperCase() + k.slice(1)), esc(String(props[k]))));
+    }
+    if (!rows.length && !part.definition) return;
+    document.getElementById('part-specs').innerHTML = rows.join('');
+    document.getElementById('part-yml-link').href = API + '/api/parts/' + encodeURIComponent(part.slug) + '/parts.yml';
+    document.getElementById('part-specs-section').classList.remove('d-none');
   }
 
-  // Supplier-pricing feature: render a small "GBP 12.50"-style pill
-  // next to the supplier link when a price is set. Suppressed entirely
-  // when unit_cost is null so suppliers without recorded prices look
-  // unchanged.
-  function supplierPriceBadge(supplier) {
-    if (!supplier || supplier.unit_cost == null) return '';
-    const amount = Number(supplier.unit_cost).toFixed(2);
-    const code = (supplier.currency_code || '').trim().toUpperCase();
-    const label = code ? `${code} ${amount}` : amount;
-    const title = code
-      ? `Supplier price: ${code} ${amount}`
-      : `Supplier price: ${amount} (currency not set)`;
-    return `<span class="badge bg-success-subtle text-success ms-2" title="${esc(title)}"><i class="fas fa-tag me-1"></i>${esc(label)}</span>`;
+  // One table per header (edge of the board), in pin order: the same rows
+  // Snakie's board viewer labels.
+  const PIN_TYPES = { pwr: 'Power', gnd: 'Ground', io: 'I/O', other: 'Other' };
+  function renderPinout(definition) {
+    const headers = definition && Array.isArray(definition.headers) ? definition.headers : [];
+    const withPins = headers.filter(h => h && Array.isArray(h.pins) && h.pins.length);
+    if (!withPins.length) return;
+    const edgeName = e => ({ left: 'Left', right: 'Right', top: 'Top', bottom: 'Bottom' }[e] || e || 'Header');
+    const functions = pin => {
+      const out = [];
+      const signals = pin.signals && typeof pin.signals === 'object' ? pin.signals : {};
+      const buses = pin.buses && typeof pin.buses === 'object' ? pin.buses : {};
+      (pin.capabilities || []).forEach(cap => {
+        if (cap === 'digital') return;
+        const sig = signals[cap];
+        const bus = buses[cap];
+        out.push(cap.toUpperCase() + (bus !== undefined ? bus : '') + (sig ? ' ' + sig : ''));
+      });
+      return out.join(', ');
+    };
+    document.getElementById('part-pinout').innerHTML = withPins.map(h => `
+      <h6 class="mt-3">${esc(edgeName(h.edge))} header${h.label ? ' · ' + esc(h.label) : ''}</h6>
+      <div class="table-responsive"><table class="table table-sm table-striped mb-2">
+        <thead><tr><th>Pin</th><th>Name</th><th>Type</th><th>GPIO</th><th>Functions</th></tr></thead>
+        <tbody>${h.pins.map(pin => `<tr>
+          <td>${pin.number != null ? esc(String(pin.number)) : ''}</td>
+          <td><code>${esc(pin.label || pin.name)}</code></td>
+          <td>${esc(PIN_TYPES[pin.type] || pin.type || '')}</td>
+          <td>${pin.gpio != null ? esc(String(pin.gpio)) : ''}</td>
+          <td class="small">${esc(functions(pin))}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`).join('');
+    document.getElementById('part-pinout-section').classList.remove('d-none');
   }
 
   function fmtTime(dateStr) {
@@ -480,7 +549,15 @@ description: View a part in the catalog
       img.src = coverUrl;
       img.alt = part.name || '';
       img.loading = 'lazy';
+      const credit = photoCredit(photos[0]);
+      if (credit) {
+        const el = document.getElementById('part-image-credit');
+        el.innerHTML = credit;
+        el.classList.remove('d-none');
+      }
     }
+    renderSpecs(part);
+    renderPinout(part.definition);
 
     // Photos tab — the multi-photo gallery, each with its optional title
     // (e.g. an orientation note), else the empty state.
@@ -491,6 +568,7 @@ description: View a part in the catalog
             <img src="${esc(photoSrc(p))}" class="img-fluid rounded" loading="lazy" alt="${esc(p.title || part.name || '')}">
           </a>
           ${p.title ? `<div class="small text-muted mt-1 text-center">${esc(p.title)}</div>` : ''}
+          ${photoCredit(p) ? `<div class="small text-muted text-center">${photoCredit(p)}</div>` : ''}
         </div>`).join('');
     } else {
       document.getElementById('part-photos-empty').classList.remove('d-none');
@@ -520,22 +598,7 @@ description: View a part in the catalog
       descEl.innerHTML = '<p class="text-muted fst-italic">No description yet. <a href="/parts/edit.html?slug=' + encodeURIComponent(slug) + '">Help write one</a>.</p>';
     }
 
-    if (Array.isArray(part.suppliers) && part.suppliers.length > 0) {
-      const sec = document.getElementById('part-suppliers-section');
-      sec.classList.remove('d-none');
-      document.getElementById('part-suppliers').innerHTML = part.suppliers.map(s => `
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || s.url)} <i class="fas fa-external-link-alt fa-xs text-muted"></i></a>
-            ${supplierPriceBadge(s)}
-            ${supplierBrokenPill(s)}
-            ${countryFlagBadge(s.country_code)}
-            ${supplierStatusBadge(s.last_status)}
-          </div>
-          ${s.last_checked_at ? `<small class="text-muted">checked ${fmtTime(s.last_checked_at)}</small>` : ''}
-        </li>
-      `).join('');
-    }
+    PartPrices.render(part, { api: API, signedIn: false });
 
     // Issue #122 Phase 2: wire the discussion card link.
     document.getElementById('part-talk-link').href = '/parts/talk.html?slug=' + encodeURIComponent(slug);
@@ -644,6 +707,7 @@ description: View a part in the catalog
     try {
       const me = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
       if (me.ok) {
+        PartPrices.render(part, { api: API, signedIn: true });
         document.getElementById('part-edit-container').classList.remove('d-none');
         const editUrl = '/parts/edit.html?slug=' + encodeURIComponent(slug);
         document.getElementById('part-edit-link').href = editUrl;
