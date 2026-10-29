@@ -1387,9 +1387,7 @@ description: View project details
       // Supplier-pricing feature: tiny link icon flags rows whose
       // price came from the part's supplier rather than the row's own
       // value. Helps viewers reason about why a price changed.
-      const supplierIndicator = i.price_source === 'supplier'
-        ? ' <i title="From supplier" class="fas fa-link text-muted small"></i>'
-        : '';
+      const supplierIndicator = bomPriceIndicator(i);
       return `<tr>
         <td>${coverThumb}${nameCell}</td>
         <td>${i.quantity}</td>
@@ -1434,14 +1432,22 @@ description: View project details
         const cell = tbody.querySelector(`[data-bom-price="${idx}"]`);
         if (!cell) return;
         // Preserve the trailing supplier-link icon if present.
-        const indicator = i.price_source === 'supplier'
-          ? ' <i title="From supplier" class="fas fa-link text-muted small"></i>'
-          : '';
+        const indicator = bomPriceIndicator(i);
         try {
           cell.innerHTML = (await CurrencyConvert.renderPrice(cost, ccy)) + indicator;
         } catch (_) { /* keep the native fallback */ }
       });
     }
+  }
+
+  // Where a BOM row's price came from, and (issue #267) a warning when no
+  // shop has the part right now.
+  function bomPriceIndicator(i) {
+    let html = '';
+    if (i.price_source === 'supplier') html += ' <i title="From supplier" class="fas fa-link text-muted small"></i>';
+    if (i.price_source === 'cheapest') html += ' <i title="Cheapest available supplier" class="fas fa-tag text-muted small"></i>';
+    if (i.suppliers_unavailable) html += ' <i title="Unavailable at every supplier right now" class="fas fa-exclamation-triangle text-warning small"></i>';
+    return html;
   }
 
   async function loadFiles() {

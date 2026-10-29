@@ -69,12 +69,15 @@ from ..models import (
     Part,
     PartAlias,
     PartPhoto,
+    PartPriceSnapshot,
     PartRelation,
     PartRevision,
     PartSupplier,
 )
+from ..auth import require_terms_accepted
 from ..config import get_settings
 from ..parts_lifecycle import compute_part_status
+from ..price_history import last_snapshot, record_price
 from ..snakie_parts import spec_from_definition, stored_definition, to_parts_yml
 from ..storage import read_file
 from ..parts_taxonomy import canonicalize, merge_for_suggestions
@@ -91,6 +94,9 @@ from ..schemas import (
     PartSupplierResponse,
     PartSymbolRef,
     PartUpdate,
+    PricePoint,
+    SupplierPriceHistory,
+    SupplierUnavailableBody,
 )
 
 
@@ -168,7 +174,7 @@ async def _load_suppliers(session: AsyncSession, part_id: int) -> list[PartSuppl
     )
 
 
-def _supplier_response(s: PartSupplier) -> PartSupplierResponse:
+def _supplier_response(s: PartSupplier, last: Optional[PartPriceSnapshot] = None) -> PartSupplierResponse:
     return PartSupplierResponse(
         id=s.id,
         name=s.supplier_name,
@@ -181,7 +187,49 @@ def _supplier_response(s: PartSupplier) -> PartSupplierResponse:
         country_code=s.country_code,
         unit_cost=s.unit_cost,
         currency_code=s.currency_code,
+        kind=s.kind or "shop",
+        unavailable_at=s.unavailable_at,
+        unavailable_note=s.unavailable_note,
+        unavailable_by=s.unavailable_by,
+        last_price=last.unit_cost if last else None,
+        last_price_currency=last.currency_code if last else None,
+        last_price_at=last.recorded_at if last else None,
     )
+
+
+async def _sync_suppliers(session: AsyncSession, part_id: int, entries: list[dict]) -> None:
+    """Make the part's suppliers match ``entries`` (revision-snapshot dicts),
+    matching existing rows by URL so their ids survive. The id is what BOM
+    rows (``supplier_id``) and price history hang off, so replacing rows
+    wholesale would cut both. Records a price snapshot for every new or
+    changed price (issue #267)."""
+    existing: dict[str, PartSupplier] = {}
+    extra: list[PartSupplier] = []
+    for sup in await _load_suppliers(session, part_id):
+        if sup.url in existing:
+            extra.append(sup)
+        else:
+            existing[sup.url] = sup
+    kept: list[PartSupplier] = []
+    for entry in entries:
+        url = entry.get("url")
+        if not url:
+            continue
+        sup = existing.pop(url, None)
+        if sup is None:
+            sup = PartSupplier(part_id=part_id, url=url)
+            session.add(sup)
+        sup.supplier_name = entry.get("name")
+        sup.country_code = entry.get("country_code")
+        sup.unit_cost = entry.get("unit_cost")
+        sup.currency_code = entry.get("currency_code")
+        sup.kind = entry.get("kind") or "shop"
+        kept.append(sup)
+    for sup in list(existing.values()) + extra:
+        await session.delete(sup)
+    await session.flush()
+    for sup in kept:
+        await record_price(session, sup)
 
 
 def _suppliers_to_json(suppliers: list[PartSupplier]) -> list[dict]:
@@ -196,6 +244,7 @@ def _suppliers_to_json(suppliers: list[PartSupplier]) -> list[dict]:
             "country_code": s.country_code,
             "unit_cost": s.unit_cost,
             "currency_code": s.currency_code,
+            "kind": s.kind or "shop",
         }
         for s in suppliers
     ]
@@ -391,7 +440,7 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         usage_count=part.usage_count,
         category=part.category,
         family=part.family,
-        suppliers=[_supplier_response(s) for s in suppliers],
+        suppliers=[_supplier_response(s, await last_snapshot(session, s.id)) for s in suppliers],
         recent_revisions=[
             PartRevisionSummary(
                 id=r.id,
@@ -659,6 +708,7 @@ def _supplier_signature(suppliers: list[dict]) -> list[tuple]:
             s.get("country_code"),
             s.get("unit_cost"),
             s.get("currency_code"),
+            s.get("kind") or "shop",
         )
         for s in suppliers
     ]
@@ -730,6 +780,7 @@ async def update_part(
                 "country_code": (s.country_code or None),
                 "unit_cost": s.unit_cost,
                 "currency_code": (s.currency_code or None),
+                "kind": s.kind,
             }
             for s in body.suppliers
         ]
@@ -825,22 +876,9 @@ async def update_part(
     part.current_revision_id = rev.id
     part.updated_at = now
 
-    # Replace suppliers en-bloc (simplest correct behaviour for v1).
+    # Suppliers follow the body, matched by URL so ids and history survive.
     if body.suppliers is not None:
-        await session.execute(
-            delete(PartSupplier).where(PartSupplier.part_id == part.id)
-        )
-        for entry in next_supplier_json:
-            session.add(
-                PartSupplier(
-                    part_id=part.id,
-                    supplier_name=entry.get("name"),
-                    url=entry.get("url"),
-                    country_code=entry.get("country_code"),
-                    unit_cost=entry.get("unit_cost"),
-                    currency_code=entry.get("currency_code"),
-                )
-            )
+        await _sync_suppliers(session, part.id, next_supplier_json)
 
     await session.commit()
     await session.refresh(part)
@@ -996,22 +1034,7 @@ async def restore_revision(
     part.current_revision_id = new_rev.id
     part.updated_at = now
 
-    await session.execute(
-        delete(PartSupplier).where(PartSupplier.part_id == part.id)
-    )
-    for entry in suppliers_json:
-        if not entry.get("url"):
-            continue
-        session.add(
-            PartSupplier(
-                part_id=part.id,
-                supplier_name=entry.get("name"),
-                url=entry.get("url"),
-                country_code=entry.get("country_code"),
-                unit_cost=entry.get("unit_cost"),
-                currency_code=entry.get("currency_code"),
-            )
-        )
+    await _sync_suppliers(session, part.id, suppliers_json)
 
     await session.commit()
     await session.refresh(part)
@@ -1231,3 +1254,79 @@ async def get_mesh(
         media_type=MESH_MEDIA_TYPES.get(ext, "application/octet-stream"),
         headers={"Cache-Control": "public, max-age=86400"},
     )
+
+
+# --- price history + availability (issues #202, #267) --------------------
+
+
+@router.get("/{slug}/price-history", response_model=list[SupplierPriceHistory])
+async def price_history(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> list[SupplierPriceHistory]:
+    """Every shop's recorded prices, oldest first, for the part page chart."""
+    part = await _get_part_by_slug(session, slug)
+    suppliers = await _load_suppliers(session, part.id)
+    snaps = (
+        await session.scalars(
+            select(PartPriceSnapshot)
+            .where(PartPriceSnapshot.part_id == part.id)
+            .order_by(PartPriceSnapshot.recorded_at.asc(), PartPriceSnapshot.id.asc())
+        )
+    ).all()
+    by_supplier: dict[int, list[PricePoint]] = {}
+    for snap in snaps:
+        by_supplier.setdefault(snap.supplier_id, []).append(PricePoint(
+            unit_cost=snap.unit_cost, currency_code=snap.currency_code, recorded_at=snap.recorded_at,
+        ))
+    return [
+        SupplierPriceHistory(supplier_id=sup.id, name=sup.supplier_name, url=sup.url,
+                             points=by_supplier.get(sup.id, []))
+        for sup in suppliers
+        if (sup.kind or "shop") == "shop"
+    ]
+
+
+async def _get_supplier(session: AsyncSession, part: Part, supplier_id: int) -> PartSupplier:
+    sup = await session.get(PartSupplier, supplier_id)
+    if sup is None or sup.part_id != part.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Supplier not found")
+    return sup
+
+
+@router.post("/{slug}/suppliers/{supplier_id}/unavailable", response_model=PartDetail)
+async def mark_unavailable(
+    slug: str,
+    supplier_id: int,
+    body: SupplierUnavailableBody,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Any signed-in user can report a part unavailable at a supplier."""
+    part = await _get_part_by_slug(session, slug)
+    sup = await _get_supplier(session, part, supplier_id)
+    sup.unavailable_at = _now_naive_utc()
+    sup.unavailable_note = (body.note or "").strip() or None
+    sup.unavailable_by = user
+    await session.commit()
+    return await _part_detail(session, part)
+
+
+@router.delete("/{slug}/suppliers/{supplier_id}/unavailable", response_model=PartDetail)
+async def clear_unavailable(
+    slug: str,
+    supplier_id: int,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """The reporter, the part's creator or an admin can clear a report."""
+    part = await _get_part_by_slug(session, slug)
+    sup = await _get_supplier(session, part, supplier_id)
+    allowed = user in (sup.unavailable_by, part.created_by) or user in get_settings().admin_usernames_list
+    if not allowed:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Only the reporter, the part's creator or an admin can clear this")
+    sup.unavailable_at = None
+    sup.unavailable_note = None
+    sup.unavailable_by = None
+    await session.commit()
+    return await _part_detail(session, part)

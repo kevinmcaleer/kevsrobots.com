@@ -159,8 +159,8 @@ description: Edit a part in the catalog
 
         <div class="mb-3">
           <div class="d-flex justify-content-between align-items-center mb-1">
-            <label class="form-label mb-0">Suppliers</label>
-            <button class="btn btn-sm btn-outline-primary" id="add-supplier-btn" type="button"><i class="fas fa-plus me-1"></i>Add supplier</button>
+            <label class="form-label mb-0">Suppliers &amp; links</label>
+            <button class="btn btn-sm btn-outline-primary" id="add-supplier-btn" type="button"><i class="fas fa-plus me-1"></i>Add link</button>
           </div>
           <div id="suppliers-list"></div>
         </div>
@@ -296,17 +296,24 @@ description: Edit a part in the catalog
       s.url || '',
       s.country_code || '',
       s.unit_cost,
-      s.currency_code || ''
+      s.currency_code || '',
+      s.kind || 'shop'
     ));
   }
-  function addSupplierRow(name, url, countryCode, unitCost, currencyCode) {
+  // Issue #267: a link is a shop or technical information.
+  const LINK_KINDS = [
+    ['shop', 'Shop'], ['datasheet', 'Datasheet'], ['driver', 'Driver / library'],
+    ['support', 'Support'], ['docs', 'Documentation'],
+  ];
+  function addSupplierRow(name, url, countryCode, unitCost, currencyCode, kind) {
     const row = document.createElement('div');
     row.className = 'supplier-row mb-3 p-2 border rounded';
     const priceVal = (unitCost == null || unitCost === '') ? '' : Number(unitCost);
     row.innerHTML = `
       <div class="row g-2 mb-1 align-items-center">
-        <div class="col-md-3"><input type="text" class="form-control form-control-sm supplier-name" placeholder="Supplier name" value="${esc(name)}"></div>
-        <div class="col-md-6"><input type="url" class="form-control form-control-sm supplier-url" placeholder="https://..." value="${esc(url)}"></div>
+        <div class="col-md-2"><select class="form-select form-select-sm supplier-kind" aria-label="Link kind">${LINK_KINDS.map(([v, l]) => `<option value="${v}"${v === (kind || 'shop') ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="col-md-3"><input type="text" class="form-control form-control-sm supplier-name" placeholder="Name" value="${esc(name)}"></div>
+        <div class="col-md-4"><input type="url" class="form-control form-control-sm supplier-url" placeholder="https://..." value="${esc(url)}"></div>
         <div class="col-md-2"><select class="form-select form-select-sm supplier-country" aria-label="Supplier country">${countryOptionsHtml(countryCode)}</select></div>
         <div class="col-md-1 d-flex align-items-center justify-content-end"><button class="btn btn-sm text-danger supplier-remove" type="button" aria-label="Remove"><i class="fas fa-times"></i></button></div>
       </div>
@@ -340,10 +347,11 @@ description: Edit a part in the catalog
         country_code: code || null,
         unit_cost: cost,
         currency_code: currency || null,
+        kind: r.querySelector('.supplier-kind').value || 'shop',
       };
     }).filter(s => s.name || s.url);
   }
-  document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', '', '', null, ''));
+  document.getElementById('add-supplier-btn').addEventListener('click', () => addSupplierRow('', '', '', null, '', 'shop'));
 
   // --- Category dropdown + family autocomplete (issue #135) ---
   async function loadCategories() {

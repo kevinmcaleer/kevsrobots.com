@@ -37,6 +37,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from .db import get_sessionmaker
 from .models import Part, PartSupplier
 from .parts_lifecycle import compute_part_status
+from .price_history import record_price
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +141,11 @@ async def run_health_check_for_suppliers(
             *(_check_supplier(client, semaphore, s, now) for s in suppliers_list),
             return_exceptions=False,
         )
+
+    # Issue #267: snapshot any price that changed since the last one, which
+    # also backfills history for prices set before snapshots existed.
+    for supplier in suppliers_list:
+        await record_price(session, supplier)
 
     # Refresh lifecycle status for any part whose suppliers we just
     # touched. A newly-healthy supplier might be the missing signal for

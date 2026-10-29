@@ -132,9 +132,28 @@ description: View a part in the catalog
               <div id="part-related-list" class="row g-2"></div>
             </div>
 
-            <div id="part-suppliers-section" class="mb-4 d-none">
-              <h4><i class="fas fa-truck me-3"></i> Suppliers</h4>
-              <ul id="part-suppliers" class="list-group"></ul>
+            <!-- Issues #202/#267: vendors, price history, links, alternatives
+                 (filled by part-prices.js) -->
+            <div id="part-vendors-section" class="mb-4 d-none">
+              <div class="d-flex align-items-center mb-2">
+                <h4 class="mb-0 me-auto"><i class="fas fa-truck me-3"></i> Vendors</h4>
+                <label for="part-currency" class="small text-muted me-2">Prices in</label>
+                <select id="part-currency" class="form-select form-select-sm w-auto"></select>
+              </div>
+              <div id="part-vendors"></div>
+              <div id="part-price-chart"></div>
+              <p class="small text-muted mt-2 mb-0">Prices change. Converted prices use today's exchange rates.</p>
+            </div>
+
+            <div id="part-alternatives-section" class="mb-4 d-none">
+              <h5><i class="fas fa-random me-2 text-warning"></i> Alternatives</h5>
+              <p class="small text-muted mb-2">This part isn't available everywhere right now. These related parts may do instead.</p>
+              <div id="part-alternatives"></div>
+            </div>
+
+            <div id="part-techinfo-section" class="mb-4 d-none">
+              <h4><i class="fas fa-book-open me-3"></i> Technical information</h4>
+              <ul id="part-techinfo" class="list-group"></ul>
             </div>
           </div>
 
@@ -333,6 +352,7 @@ description: View a part in the catalog
      when #149 adds per-supplier prices we can show them in the
      viewer's preferred currency without touching this file again. -->
 <script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/part-prices.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -403,52 +423,6 @@ description: View a part in the catalog
     if (status === 'disputed') return '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i>disputed</span>';
     if (status === 'under_review') return '<span class="badge bg-warning text-dark">under review</span>';
     return '<span class="badge bg-secondary">draft</span>';
-  }
-
-  function supplierStatusBadge(s) {
-    if (s === 'ok') return '<span class="badge bg-success-subtle text-success ms-2">link OK</span>';
-    if (s === 'broken') return '<span class="badge bg-danger-subtle text-danger ms-2">link broken</span>';
-    return '';
-  }
-
-  function supplierBrokenPill(supplier) {
-    // Issue #122 Phase 2: prominent "link reported broken" pill alongside
-    // the supplier link when the daily health check has marked it broken.
-    if (supplier && supplier.is_broken) {
-      return '<span class="badge bg-danger ms-2" title="The supplier URL has failed our daily link-check 3 times in a row."><i class="fas fa-exclamation-triangle me-1"></i> link reported broken</span>';
-    }
-    return '';
-  }
-
-  // Issue #149: render a small flag + ISO code pill for the supplier's
-  // country. Uses the regional-indicator unicode trick (two letters
-  // mapped into the flag emoji range) so we don't need a flag sprite.
-  // Falls back to a neutral "globe" pill when country_code is null.
-  function countryFlagBadge(code) {
-    if (!code || typeof code !== 'string' || !/^[A-Za-z]{2}$/.test(code)) {
-      return '<span class="badge bg-light text-muted ms-2" title="Country not set"><i class="fas fa-globe"></i></span>';
-    }
-    const up = code.toUpperCase();
-    const flag = String.fromCodePoint(
-      0x1F1E6 + (up.charCodeAt(0) - 65),
-      0x1F1E6 + (up.charCodeAt(1) - 65),
-    );
-    return `<span class="badge bg-light text-dark ms-2" title="Supplier country: ${esc(up)}">${flag} ${esc(up)}</span>`;
-  }
-
-  // Supplier-pricing feature: render a small "GBP 12.50"-style pill
-  // next to the supplier link when a price is set. Suppressed entirely
-  // when unit_cost is null so suppliers without recorded prices look
-  // unchanged.
-  function supplierPriceBadge(supplier) {
-    if (!supplier || supplier.unit_cost == null) return '';
-    const amount = Number(supplier.unit_cost).toFixed(2);
-    const code = (supplier.currency_code || '').trim().toUpperCase();
-    const label = code ? `${code} ${amount}` : amount;
-    const title = code
-      ? `Supplier price: ${code} ${amount}`
-      : `Supplier price: ${amount} (currency not set)`;
-    return `<span class="badge bg-success-subtle text-success ms-2" title="${esc(title)}"><i class="fas fa-tag me-1"></i>${esc(label)}</span>`;
   }
 
   // Issue #266: image credits. A licence of permission-granted:<who> means
@@ -624,22 +598,7 @@ description: View a part in the catalog
       descEl.innerHTML = '<p class="text-muted fst-italic">No description yet. <a href="/parts/edit.html?slug=' + encodeURIComponent(slug) + '">Help write one</a>.</p>';
     }
 
-    if (Array.isArray(part.suppliers) && part.suppliers.length > 0) {
-      const sec = document.getElementById('part-suppliers-section');
-      sec.classList.remove('d-none');
-      document.getElementById('part-suppliers').innerHTML = part.suppliers.map(s => `
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || s.url)} <i class="fas fa-external-link-alt fa-xs text-muted"></i></a>
-            ${supplierPriceBadge(s)}
-            ${supplierBrokenPill(s)}
-            ${countryFlagBadge(s.country_code)}
-            ${supplierStatusBadge(s.last_status)}
-          </div>
-          ${s.last_checked_at ? `<small class="text-muted">checked ${fmtTime(s.last_checked_at)}</small>` : ''}
-        </li>
-      `).join('');
-    }
+    PartPrices.render(part, { api: API, signedIn: false });
 
     // Issue #122 Phase 2: wire the discussion card link.
     document.getElementById('part-talk-link').href = '/parts/talk.html?slug=' + encodeURIComponent(slug);
@@ -748,6 +707,7 @@ description: View a part in the catalog
     try {
       const me = await ProjectAuth.apiFetch(API + '/api/projects/my/list');
       if (me.ok) {
+        PartPrices.render(part, { api: API, signedIn: true });
         document.getElementById('part-edit-container').classList.remove('d-none');
         const editUrl = '/parts/edit.html?slug=' + encodeURIComponent(slug);
         document.getElementById('part-edit-link').href = editUrl;

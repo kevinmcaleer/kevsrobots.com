@@ -702,6 +702,42 @@ class PartSupplier(Base):
     # on ``PartSupplierInput``.
     unit_cost: Mapped[Optional[float]] = mapped_column(Float)
     currency_code: Mapped[Optional[str]] = mapped_column(String(3))
+    # Issue #267: what the link is. ``shop`` (somewhere to buy it) or
+    # technical information: ``datasheet``, ``driver``, ``support``, ``docs``.
+    kind: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="shop", server_default="shop"
+    )
+    # Issue #267: a signed-in user reported the part unavailable here (out
+    # of stock, discontinued). Cleared by the reporter, the part's creator
+    # or an admin. Separate from ``is_broken``, which is the link checker's.
+    unavailable_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    unavailable_note: Mapped[Optional[str]] = mapped_column(String(500))
+    unavailable_by: Mapped[Optional[str]] = mapped_column(String(100))
+
+
+class PartPriceSnapshot(Base):
+    """A supplier's price at a point in time (issues #202, #267).
+
+    Written whenever a supplier's price is set or changes, whether by an
+    edit on the part page or noticed by the daily supplier job, so the
+    part page can chart price over time. Brand-new table: ``create_all``
+    provisions it.
+    """
+
+    __tablename__ = "part_price_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    part_id: Mapped[int] = mapped_column(
+        ForeignKey("parts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    supplier_id: Mapped[int] = mapped_column(
+        ForeignKey("part_suppliers.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    unit_cost: Mapped[float] = mapped_column(Float, nullable=False)
+    currency_code: Mapped[Optional[str]] = mapped_column(String(3))
+    recorded_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
 
 
 # --- Parts talk pages (issue #122, Phase 2) ------------------------------

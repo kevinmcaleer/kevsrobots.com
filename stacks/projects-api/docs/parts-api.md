@@ -286,6 +286,27 @@ tags are only filled in where empty. Changes are recorded as revisions by
 `snakie-import`. A second run changes nothing. The library's images have no
 recorded licence, so they arrive flagged for review.
 
+## Vendors, price history and availability (issues #202, #267)
+
+- A part's suppliers carry a `kind`: `shop` (somewhere to buy it) or a
+  technical link (`datasheet`, `driver`, `support`, `docs`). `PUT
+  /api/parts/{slug}` matches suppliers to existing rows **by URL**, so a
+  supplier keeps its id (and the BOM rows and price history that point at
+  it) across edits and restores.
+- Every new or changed shop price writes a `part_price_snapshots` row: on
+  an edit or restore, and in the daily supplier job (which also picks up
+  any price that changed without one). `GET /api/parts/{slug}/price-history`
+  returns each shop's points, oldest first.
+- `POST /api/parts/{slug}/suppliers/{id}/unavailable` (`{"note": …}`), by
+  any signed-in user, reports the part unavailable at that shop. `DELETE`
+  on the same path clears it, for the reporter, the part's creator or an
+  admin. Supplier responses carry `unavailable_*` and the `last_price*`
+  last recorded.
+- BOM rows: a chosen supplier's price is used while that supplier is
+  available. Otherwise, and for linked rows with no price of their own,
+  the row uses the cheapest available shop (`price_source: "cheapest"`).
+  `suppliers_unavailable` is true when every shop is broken or unavailable.
+
 ## BOM integration
 
 `BOMItemCreate` / `BOMItemResponse` now include an optional `part_id`

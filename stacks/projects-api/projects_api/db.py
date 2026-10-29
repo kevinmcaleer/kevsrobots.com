@@ -1335,6 +1335,16 @@ async def add_part_spec_columns_if_missing() -> None:
     )
 
 
+async def add_supplier_kind_and_availability_if_missing() -> None:
+    """Issue #267: ``part_suppliers.kind`` and the unavailable report."""
+    await _add_columns_if_missing("part_suppliers", {
+        "kind": "VARCHAR(20) NOT NULL DEFAULT 'shop'",
+        "unavailable_at": "TIMESTAMP",
+        "unavailable_note": "VARCHAR(500)",
+        "unavailable_by": "VARCHAR(100)",
+    }, "issue #267")
+
+
 async def add_feedback_admin_notes_if_missing() -> None:
     """Additive migration for the Snakie dev-mode Bug Tracker (issue #206).
 

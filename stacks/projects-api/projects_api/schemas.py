@@ -247,6 +247,9 @@ class BOMItemResponse(BaseModel):
     effective_unit_cost: Optional[float] = None
     effective_currency_code: Optional[str] = None
     price_source: str = "row"
+    # Issue #267: every shop for the linked part is broken or reported
+    # unavailable; the page shows a warning icon.
+    suppliers_unavailable: bool = False
     # Render-ready cover image for the linked part — its first photo
     # (external URL as-is, uploaded → /api/parts/{slug}/photos/{id}/view,
     # which the frontend prefixes with the API base). Null when no photo.
@@ -849,6 +852,11 @@ class PartSupplierInput(BaseModel):
     # ``ProjectBOMItem.supplier_id``, so editing it auto-propagates.
     unit_cost: Optional[float] = Field(None, ge=0)
     currency_code: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
+    # Issue #267: a shop, or a technical-information link.
+    kind: str = Field("shop", pattern=r"^(shop|datasheet|driver|support|docs)$")
+
+
+SUPPLIER_KINDS = ("shop", "datasheet", "driver", "support", "docs")
 
 
 class PartSupplierResponse(BaseModel):
@@ -869,6 +877,35 @@ class PartSupplierResponse(BaseModel):
     # auto-fills BOM rows linked via ``supplier_id``.
     unit_cost: Optional[float] = None
     currency_code: Optional[str] = None
+    # Issue #267
+    kind: str = "shop"
+    unavailable_at: Optional[datetime] = None
+    unavailable_note: Optional[str] = None
+    unavailable_by: Optional[str] = None
+    # The last price recorded for this supplier, for showing greyed out
+    # when its link is broken or it's unavailable.
+    last_price: Optional[float] = None
+    last_price_currency: Optional[str] = None
+    last_price_at: Optional[datetime] = None
+
+
+class SupplierUnavailableBody(BaseModel):
+    note: Optional[str] = Field(None, max_length=500)
+
+
+class PricePoint(BaseModel):
+    unit_cost: float
+    currency_code: Optional[str] = None
+    recorded_at: datetime
+
+
+class SupplierPriceHistory(BaseModel):
+    """One supplier's recorded prices, oldest first (issue #267)."""
+
+    supplier_id: int
+    name: Optional[str] = None
+    url: str
+    points: list[PricePoint] = Field(default_factory=list)
 
 
 class PartDimensions(BaseModel):
