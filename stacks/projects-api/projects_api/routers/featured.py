@@ -28,6 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
 from ..models import Project, ProjectTag
+from ..visibility import not_draft
 from ..schemas import (
     FeatureProjectRequest,
     FeaturedProjectResponse,
@@ -159,6 +160,7 @@ async def list_featured_projects(
         .where(
             Project.is_featured == True,  # noqa: E712
             Project.status != "archived",
+            not_draft(),
             Project.is_blocked == False,  # noqa: E712
         )
         .order_by(Project.featured_at.desc().nullslast(), Project.id.desc())

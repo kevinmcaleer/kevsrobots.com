@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth import get_current_user
 from ..db import get_session
 from ..models import Download, Project, ProjectFile, ProjectTag
+from ..visibility import not_draft
 from ..schemas import (
     DailyDownloadCount,
     FileDownloadStats,
@@ -185,6 +186,7 @@ async def popular_projects(
         .join(Download, Download.project_id == Project.id)
         .where(
             Project.status != "archived",
+            not_draft(),
             Project.is_blocked == False,  # noqa: E712
         )
         .group_by(Project.id)

@@ -46,7 +46,8 @@
   const repoInput = document.getElementById('project-repo');
   const tagsContainer = document.getElementById('tags-container');
   const tagInput = document.getElementById('tag-input');
-  const statusBadge = document.getElementById('status-badge');
+  const publishSwitch = document.getElementById('publish-switch');
+  const publishSwitchLabel = document.getElementById('publish-switch-label');
   const saveIndicator = document.getElementById('save-indicator');
   // --- Auth ---
   const IS_LOCAL = location.hostname === 'localhost'
@@ -123,7 +124,6 @@
       loadVideos();
       loadFiles();
       loadImages();
-      loadJournal();
     } catch (e) {
       console.error('Failed to load project:', e);
     }
@@ -157,10 +157,11 @@
           body: JSON.stringify(data),
         });
       } else {
+        // Issue #260: a new project is a private draft until published.
         resp = await apiFetch(API + '/api/projects', {
           method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(Object.assign({ status: 'draft' }, data)),
         });
       }
       if (!resp.ok) throw new Error(await resp.text());
@@ -199,21 +200,41 @@
 
   // --- Save / Status / Delete --- (autosave only; no manual save button)
 
-  const statusSelect = document.getElementById('project-status');
-  if (statusSelect) statusSelect.addEventListener('change', async () => {
+  // The top bar's switch is Draft / Published (issue #260). Drafts are
+  // private to the author. ``wip`` (older projects) and ``completed``
+  // both count as published; switching on publishes as ``completed``.
+  // Archived lives in the details drawer; publishing again un-archives.
+  async function setStatus(status) {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     try {
       const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
         method: 'PUT', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: statusSelect.value }),
+        body: JSON.stringify({ status: status }),
       });
       if (resp.ok) {
         currentProject = await resp.json();
         updateStatusBadge(currentProject.status);
         showSaveStatus('saved', 'Status updated');
+        if (window.BadgeToast) BadgeToast.fromResponse(currentProject);
+      } else {
+        throw new Error('HTTP ' + resp.status);
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      showSaveStatus('error', 'Status not saved');
+      updateStatusBadge(currentProject ? currentProject.status : 'draft');
+    }
+  }
+
+  if (publishSwitch) publishSwitch.addEventListener('change', () => {
+    setStatus(publishSwitch.checked ? 'completed' : 'draft');
+  });
+
+  const archiveBtn = document.getElementById('archive-btn');
+  if (archiveBtn) archiveBtn.addEventListener('click', () => {
+    const archived = currentProject && currentProject.status === 'archived';
+    setStatus(archived ? 'draft' : 'archived');
   });
 
   const deleteBtn = document.getElementById('delete-btn');
@@ -228,14 +249,16 @@
     } catch (e) { console.error(e); }
   });
 
-  const statusLabels = { wip: 'Work in Progress', completed: 'Completed', archived: 'Archived' };
-  const statusColors = { wip: 'bg-info', completed: 'bg-success', archived: 'bg-secondary' };
+  const statusLabels = { draft: 'Draft', wip: 'Published', completed: 'Published', archived: 'Archived' };
 
   function updateStatusBadge(status) {
-    statusBadge.textContent = statusLabels[status] || status;
-    statusBadge.className = 'badge ' + (statusColors[status] || 'bg-secondary');
-    if (statusSelect) statusSelect.value = status;
-    const viewLiveBtn = document.getElementById('view-live-btn');
+    if (publishSwitch) publishSwitch.checked = status === 'wip' || status === 'completed';
+    if (publishSwitchLabel) publishSwitchLabel.textContent = statusLabels[status] || status;
+    if (archiveBtn) {
+      archiveBtn.innerHTML = status === 'archived'
+        ? '<i class="fas fa-box-open me-1"></i> Unarchive (back to draft)'
+        : '<i class="fas fa-box-archive me-1"></i> Archive project';
+    }
     const viewToggle = document.getElementById('view-toggle-btn');
     if (currentProject) {
       // Issue #152: link to the canonical /projects/<owner>/<slug> URL
@@ -244,10 +267,6 @@
       var liveUrl = (currentProject.slug && currentProject.author_username)
         ? '/projects/' + encodeURIComponent(currentProject.author_username) + '/' + encodeURIComponent(currentProject.slug)
         : '/projects/view.html?id=' + currentProject.id;
-      if (viewLiveBtn) {
-        viewLiveBtn.style.display = '';
-        viewLiveBtn.href = liveUrl;
-      }
       if (viewToggle) {
         viewToggle.classList.remove('d-none');
         viewToggle.href = liveUrl;
@@ -530,7 +549,7 @@
       draft: { key: 'projects.' + (projectId || 'new') },
       uploadImage: uploadEditorImage,
       imageLibrary: async () => (await fetchProjectImages()).map(img => ({
-        url: imageViewUrl(img), alt: img.filename,
+        url: imageViewUrl(img), alt: img.caption || img.filename,
       })),
       images: { maxBytes: MAX_IMAGE_BYTES },
       preview: false,
@@ -1017,28 +1036,43 @@
   }
 
   let imageOrder = [];
+  let galleryImages = [];
 
   async function loadImages() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
     const images = await resp.json();
+    galleryImages = images;
     imageOrder = images.map(img => img.id);
     const gallery = document.getElementById('image-gallery');
+    // Issue #258: each thumbnail has a star to make it the cover, an alt
+    // text field (the default alt when /image inserts it) and can be
+    // moved with the left/right arrow keys as well as by dragging.
     gallery.innerHTML = images.map((img, idx) => {
-      const imgUrl = API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
+      const isCover = idx === 0;
+      const name = escHtml(img.filename);
       return `
-      <div class="col-4" data-image-id="${img.id}" draggable="true">
-        <div class="image-thumb ${idx === 0 ? 'is-cover' : ''}">
-          <img src="${imgUrl}" alt="${img.filename}" data-view-idx="${idx}" class="iv-clickable">
-          <button class="delete-overlay" onclick="event.stopPropagation();deleteImage(${img.id})"><i class="fas fa-trash"></i></button>
-          ${idx === 0 ? '<span class="cover-badge">★ Cover</span>' : ''}
+      <div class="col-6 col-sm-4 col-md-3 col-xl-2" data-image-id="${img.id}" draggable="true">
+        <div class="image-thumb ${isCover ? 'is-cover' : ''}" tabindex="0"
+             aria-label="${name}${isCover ? ' (cover)' : ''}. Left and right arrow keys move it.">
+          <img src="${imageViewUrl(img)}" alt="${escHtml(img.caption || img.filename)}" data-view-idx="${idx}" class="iv-clickable">
+          <button type="button" class="cover-star ${isCover ? 'is-cover' : ''}" data-cover-id="${img.id}"
+                  title="${isCover ? 'This is the cover' : 'Make this the cover'}"
+                  aria-label="${isCover ? 'Cover image' : 'Make ' + name + ' the cover'}" aria-pressed="${isCover}">
+            <i class="${isCover ? 'fas' : 'far'} fa-star"></i>
+          </button>
+          <button type="button" class="delete-overlay" data-delete-id="${img.id}" aria-label="Delete ${name}"><i class="fas fa-trash"></i></button>
+          ${isCover ? '<span class="cover-badge">★ Cover</span>' : ''}
         </div>
+        <input type="text" class="form-control form-control-sm image-alt mt-1" data-alt-id="${img.id}"
+               value="${escHtml(img.caption || '')}" placeholder="Alt text" maxlength="300"
+               aria-label="Alt text for ${name}">
       </div>`;
     }).join('');
 
     // Set cover_image from first image
     if (images.length > 0) {
-      const firstUrl = API + '/api/projects/' + currentProject.id + '/images/' + images[0].id + '/view';
+      const firstUrl = imageViewUrl(images[0]);
       if (currentProject.cover_image !== firstUrl) {
         currentProject.cover_image = firstUrl;
         apiFetch(API + '/api/projects/' + currentProject.id, {
@@ -1051,19 +1085,85 @@
 
     // Drag-and-drop reordering
     setupImageDrag(gallery);
-
-    // Image viewer on click (only if not dragging)
-    const viewerImages = images.map(img => ({
-      url: API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view',
-      alt: img.filename
-    }));
-    gallery.addEventListener('click', e => {
-      const img = e.target.closest('.iv-clickable');
-      if (!img) return;
-      if (gallery.querySelector('.dragging')) return;
-      ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
-    });
   }
+
+  function escHtml(t) {
+    return String(t == null ? '' : t)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // PUT each image's position from imageOrder, then redraw. The cover is
+  // whichever image is first, so this is also how a cover is chosen.
+  async function saveImageOrder(message) {
+    for (let i = 0; i < imageOrder.length; i++) {
+      await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageOrder[i], {
+        method: 'PUT', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sort_order: i }),
+      });
+    }
+    showSaveStatus('saved', message || 'Image order updated');
+    await loadImages();
+  }
+
+  async function moveImage(id, toIdx) {
+    const fromIdx = imageOrder.indexOf(id);
+    if (fromIdx < 0 || toIdx < 0 || toIdx >= imageOrder.length || toIdx === fromIdx) return false;
+    imageOrder.splice(fromIdx, 1);
+    imageOrder.splice(toIdx, 0, id);
+    await saveImageOrder(toIdx === 0 ? 'Cover updated' : 'Image order updated');
+    return true;
+  }
+
+  // One set of listeners on the gallery, however often it's redrawn.
+  (function wireGallery() {
+    const gallery = document.getElementById('image-gallery');
+    if (!gallery) return;
+    gallery.addEventListener('click', e => {
+      const star = e.target.closest('.cover-star');
+      if (star) {
+        e.stopPropagation();
+        moveImage(parseInt(star.dataset.coverId, 10), 0);
+        return;
+      }
+      const del = e.target.closest('.delete-overlay');
+      if (del) {
+        e.stopPropagation();
+        window.deleteImage(parseInt(del.dataset.deleteId, 10));
+        return;
+      }
+      const img = e.target.closest('.iv-clickable');
+      if (!img || gallery.querySelector('.dragging')) return;
+      ImageViewer.open(galleryImages.map(i => ({ url: imageViewUrl(i), alt: i.caption || i.filename })),
+        parseInt(img.dataset.viewIdx, 10));
+    });
+    gallery.addEventListener('keydown', async e => {
+      const thumb = e.target.closest('.image-thumb');
+      if (!thumb || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      const id = parseInt(thumb.closest('[data-image-id]').dataset.imageId, 10);
+      const to = imageOrder.indexOf(id) + (e.key === 'ArrowLeft' ? -1 : 1);
+      if (await moveImage(id, to)) {
+        const moved = gallery.querySelector('[data-image-id="' + id + '"] .image-thumb');
+        if (moved) moved.focus();
+      }
+    });
+    gallery.addEventListener('change', async e => {
+      const input = e.target.closest('.image-alt');
+      if (!input) return;
+      const id = parseInt(input.dataset.altId, 10);
+      const caption = input.value.trim();
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + id, {
+        method: 'PUT', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ caption: caption || null }),
+      });
+      if (!resp.ok) { showSaveStatus('error', 'Alt text not saved'); return; }
+      const img = galleryImages.find(i => i.id === id);
+      if (img) img.caption = caption || null;
+      showSaveStatus('saved', 'Alt text saved');
+    });
+  })();
 
   function setupImageDrag(gallery) {
     let dragEl = null;
@@ -1117,21 +1217,7 @@
       if (target && dragId) {
         const dropId = target.dataset.imageId;
         if (dropId && dragId !== dropId) {
-          const fromIdx = imageOrder.indexOf(parseInt(dragId));
-          const toIdx = imageOrder.indexOf(parseInt(dropId));
-          if (fromIdx > -1 && toIdx > -1) {
-            imageOrder.splice(fromIdx, 1);
-            imageOrder.splice(toIdx, 0, parseInt(dragId));
-            for (let i = 0; i < imageOrder.length; i++) {
-              await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageOrder[i], {
-                method: 'PUT', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sort_order: i }),
-              });
-            }
-            showSaveStatus('saved', 'Image order updated');
-            loadImages();
-          }
+          await moveImage(parseInt(dragId, 10), imageOrder.indexOf(parseInt(dropId, 10)));
         }
       }
       dragEl = null;
@@ -1141,7 +1227,7 @@
     gallery.querySelectorAll('[data-image-id]').forEach(el => {
       el.setAttribute('draggable', 'false');
       el.addEventListener('mousedown', e => {
-        if (e.target.closest('button')) return;
+        if (e.target.closest('button, input')) return;
         e.preventDefault();
         dragEl = el;
         dragId = el.dataset.imageId;
@@ -1173,6 +1259,9 @@
   }
 
   window.deleteImage = async function(imageId) {
+    // Issue #258: warn before deleting an image the text still shows.
+    const inText = getEditorValue().includes('/images/' + imageId + '/view');
+    if (inText && !confirm('This image is used in your project text. Delete it anyway? The text will show a broken image until you remove it.')) return;
     await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageId, {
       method: 'DELETE', credentials: 'include',
     });
@@ -2024,118 +2113,9 @@
     loadVideos();
   };
 
-  // --- Journal ---
-  const journalInput = document.getElementById('journal-input');
-
-  async function postJournalEntry(text) {
-    const url = API + '/api/projects/' + currentProject.id + '/journal';
-    const body = JSON.stringify({ title: text, status: 'in_progress' });
-    const doFetch = () => apiFetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-    });
-    try {
-      return await doFetch();
-    } catch (err) {
-      // Single retry on transient network failures (Failed to fetch, etc.)
-      console.warn('Journal POST failed, retrying once:', err);
-      await new Promise(r => setTimeout(r, 250));
-      return await doFetch();
-    }
-  }
-
-  journalInput.addEventListener('keydown', async (e) => {
-    if (e.key !== 'Enter') return;
-    e.preventDefault();
-    const text = journalInput.value.trim();
-    if (!text) return;
-    if (!currentProject) { await saveProject(); if (!currentProject) return; }
-    journalInput.disabled = true;
-    try {
-      const resp = await postJournalEntry(text);
-      if (!resp.ok) {
-        const bodyText = await resp.text().catch(() => '');
-        console.error('Journal add failed:', resp.status, bodyText);
-        alert('Could not save journal entry (HTTP ' + resp.status + '). ' + (bodyText || ''));
-        return;
-      }
-      journalInput.value = '';
-      loadJournal();
-    } catch (err) {
-      console.error('Journal add error:', err);
-      alert('Could not save journal entry: ' + err.message
-        + '\n\nCheck the browser console + Network tab for details.');
-    } finally {
-      journalInput.disabled = false;
-      journalInput.focus();
-    }
-  });
-
-  function formatTimeAgo(dateStr) {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return mins + 'm ago';
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return hrs + 'h ago';
-    const days = Math.floor(hrs / 24);
-    if (days < 7) return days + 'd ago';
-    return new Date(dateStr).toLocaleDateString();
-  }
-
-  async function loadJournal() {
-    if (!currentProject) return;
-    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', { credentials: 'include' });
-    const entries = await resp.json();
-    document.getElementById('journal-list').innerHTML = entries.map(e => `
-      <div class="journal-entry" data-entry-id="${e.id}">
-        <div class="d-flex justify-content-between align-items-start">
-          <span class="journal-text">${e.title}</span>
-          <span class="journal-actions">
-            <button class="edit-journal" onclick="editJournal(${e.id}, this)" title="Edit"><i class="fas fa-pencil-alt"></i></button>
-            <button class="delete-journal" onclick="deleteJournal(${e.id})" title="Delete"><i class="fas fa-times"></i></button>
-          </span>
-        </div>
-        <span class="journal-date">${formatTimeAgo(e.created_at)}</span>
-      </div>
-    `).join('');
-  }
-
-  window.deleteJournal = async function(entryId) {
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/journal/' + entryId, {
-      method: 'DELETE', credentials: 'include',
-    });
-    loadJournal();
-  };
-
-  window.editJournal = function(entryId, btn) {
-    const entry = btn.closest('.journal-entry');
-    const textEl = entry.querySelector('.journal-text');
-    const current = textEl.textContent;
-    textEl.innerHTML = '<input type="text" class="journal-edit-input" value="' + current.replace(/"/g, '&quot;') + '">';
-    const input = textEl.querySelector('input');
-    input.focus();
-    input.select();
-
-    async function save() {
-      const newText = input.value.trim();
-      if (newText && newText !== current) {
-        await apiFetch(API + '/api/projects/' + currentProject.id + '/journal/' + entryId, {
-          method: 'PUT', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: newText, status: 'in_progress' }),
-        });
-      }
-      loadJournal();
-    }
-
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); save(); }
-      if (e.key === 'Escape') loadJournal();
-    });
-    input.addEventListener('blur', save);
-  };
+  // The Build Journal was retired from the editor (it belongs in the
+  // page content now). Existing entries stay stored and the API is
+  // unchanged; the editor just no longer reads or writes them.
 
   // --- Auto-save on input ---
   [titleInput, descInput, difficultySelect, timeInput, repoInput].forEach(el => {
@@ -2411,11 +2391,16 @@
       dragDepth = 0;
       overlay.classList.add('d-none');
       overlay.classList.remove('is-active');
-      // No exceptions — the entire editor page is one drop target, and
+      // The entire editor page is one drop target, and
       // processDroppedFiles() routes by type: images → gallery,
       // README/index.md → markdown editor, LICENSE → linked file,
       // anything else in ALLOWED_FILE_EXTS → Files & Models.
+      // The one exception: images dropped on the text belong to the editor
+      // bundle, which places them where they land and files them in the
+      // gallery through the uploadImage hook.
       const files = e.dataTransfer && e.dataTransfer.files;
+      const onText = mde && mde.element && mde.element.contains(e.target);
+      if (onText && files && files.length && Array.from(files).every(isImageFile)) return;
       if (files && files.length) processDroppedFiles(files);
     });
 
@@ -2436,7 +2421,7 @@
       check: () => titleInput && titleInput.value.trim().length >= 3 },
     { key: 'desc',   points: 10, label: 'Write a short description',           target: 'project-description',
       check: () => descInput && descInput.value.trim().length >= 10 },
-    { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'image-input',
+    { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'editor-images-section',
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
     { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',
       target: 'content-editor',
@@ -2452,10 +2437,9 @@
     { key: 'repo',   points: 10, label: 'Link a code repository',              target: 'project-repo',
       check: () => repoInput && repoInput.value.trim().length > 0 },
     // Issue #171: a YouTube video counts toward "extra content" too —
-    // it's just as much a doc artefact as a file or a journal entry.
-    { key: 'extra',  points: 10, label: 'Add a file, journal entry, or video', target: 'journal-input',
+    // it's just as much a doc artefact as a file.
+    { key: 'extra',  points: 10, label: 'Add a file or video',                 target: 'editor-files-section',
       check: () => document.querySelectorAll('#file-list tbody tr').length > 0
-                || document.querySelectorAll('#journal-list .journal-entry').length > 0
                 || document.querySelectorAll('#videos-body tr').length > 0 },
   ];
 
@@ -2498,6 +2482,8 @@
     const pct = Math.round(earned);
 
     scoreEl.textContent = pct + '%';
+    const miniEl = document.getElementById('completeness-mini');
+    if (miniEl) miniEl.textContent = pct + '%';
     if (pointsEl) pointsEl.textContent = earned + ' / 100';
     barEl.style.width = pct + '%';
     barEl.setAttribute('aria-valuenow', String(pct));
@@ -2509,8 +2495,10 @@
     if (pct >= 100) {
       if (cardBody) cardBody.classList.add('d-none');
       if (completeBadge) completeBadge.classList.remove('d-none');
+      if (miniEl) miniEl.classList.add('d-none');
       return;
     }
+    if (miniEl) miniEl.classList.remove('d-none');
     if (cardBody) cardBody.classList.remove('d-none');
     if (completeBadge) completeBadge.classList.add('d-none');
     if (celebrateEl) celebrateEl.classList.add('d-none');
@@ -2553,6 +2541,15 @@
   function focusCompletenessTarget(id) {
     const el = document.getElementById(id);
     if (!el) return;
+    // Metadata fields live in the details drawer: open it, then focus.
+    const drawer = el.closest('.offcanvas');
+    if (drawer && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
+      const focusField = () => { try { el.focus(); } catch (_) {} };
+      if (drawer.classList.contains('show')) { focusField(); return; }
+      drawer.addEventListener('shown.bs.offcanvas', focusField, { once: true });
+      bootstrap.Offcanvas.getOrCreateInstance(drawer).show();
+      return;
+    }
     try {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (e) {
@@ -2603,7 +2600,7 @@
   }
 
   // Watch DOM sections we render imperatively (tags badges, BOM rows, gallery,
-  // file list, journal list). MutationObserver keeps the meter in sync without
+  // file list, videos). MutationObserver keeps the meter in sync without
   // touching every render function call site.
   function _observe(id) {
     const el = document.getElementById(id);
@@ -2614,7 +2611,6 @@
   _observe('bom-body');
   _observe('image-gallery');
   _observe('file-list');
-  _observe('journal-list');
   // Issue #171: re-score the completeness meter when a video lands.
   _observe('videos-body');
 
@@ -2626,6 +2622,37 @@
     const btn = document.getElementById('completeness-info');
     if (!btn || typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
     new bootstrap.Popover(btn);
+  })();
+
+  // Collapse / expand the overlay. Remembered per browser; small screens
+  // start collapsed so the overlay doesn't cover the document.
+  (function initCompletenessOverlay() {
+    const card = document.getElementById('completeness-card');
+    const toggle = document.getElementById('completeness-toggle');
+    const chevron = document.getElementById('completeness-collapse');
+    if (!card || !toggle) return;
+    const KEY = 'projectEditor.completenessCollapsed';
+    let collapsed = window.matchMedia('(max-width: 991.98px)').matches;
+    try {
+      const saved = localStorage.getItem(KEY);
+      if (saved !== null) collapsed = saved === '1';
+    } catch (e) {}
+    function apply() {
+      card.classList.toggle('is-collapsed', collapsed);
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      if (chevron) {
+        chevron.setAttribute('aria-label', (collapsed ? 'Expand' : 'Collapse') + ' project completeness');
+        chevron.innerHTML = '<i class="fas fa-chevron-' + (collapsed ? 'up' : 'down') + '"></i>';
+      }
+    }
+    function flip() {
+      collapsed = !collapsed;
+      try { localStorage.setItem(KEY, collapsed ? '1' : '0'); } catch (e) {}
+      apply();
+    }
+    toggle.addEventListener('click', flip);
+    if (chevron) chevron.addEventListener('click', flip);
+    apply();
   })();
 
   // First paint so the meter shows 0% (new projects) or actual score (after load).
@@ -2640,6 +2667,8 @@
     if (projectId) await loadProject();
     initEditor();
     editorContainer.classList.remove('d-none');
+    const completenessCard = document.getElementById('completeness-card');
+    if (completenessCard) completenessCard.classList.remove('d-none');
     recomputeCompleteness();
   }
 

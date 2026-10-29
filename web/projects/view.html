@@ -831,6 +831,17 @@ description: View project details
       document.getElementById('project-view').classList.remove('d-none');
       document.title = project.title + ' — KevsRobots';
 
+      // Issue #260: only the author can load a draft, so tell them it's
+      // private and point back at the editor's publish switch.
+      if (project.status === 'draft' && !document.getElementById('draft-banner')) {
+        const banner = document.createElement('div');
+        banner.id = 'draft-banner';
+        banner.className = 'alert alert-secondary d-flex align-items-center gap-2';
+        banner.innerHTML = '<i class="fas fa-lock"></i><div><strong>Draft.</strong> Only you can see this project. '
+          + '<a href="/projects/editor.html?id=' + encodeURIComponent(project.id) + '">Publish it from the editor</a> when it\'s ready.</div>';
+        document.getElementById('project-view').prepend(banner);
+      }
+
       document.getElementById('view-title').textContent = project.title;
       // Issue #115: Staff Pick badge near the title with the editor note
       // as a hover tooltip.
@@ -1187,7 +1198,7 @@ description: View project details
     const listEl = document.getElementById('view-remixes');
     if (!section || !listEl) return;
     try {
-      const resp = await fetch(API + '/api/projects/' + project.id + '/remixes');
+      const resp = await fetch(API + '/api/projects/' + project.id + '/remixes', { credentials: 'include' });
       if (!resp.ok) return;
       const remixes = await resp.json();
       if (!Array.isArray(remixes) || remixes.length === 0) return;
@@ -1282,7 +1293,7 @@ description: View project details
   }
 
   async function loadBOM() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/bom');
+    const resp = await fetch(API + '/api/projects/' + projectId + '/bom', { credentials: 'include' });
     const items = await resp.json();
     if (items.length === 0) return;
     document.getElementById('view-bom-section').classList.remove('d-none');
@@ -1394,7 +1405,7 @@ description: View project details
   }
 
   async function loadFiles() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/files');
+    const resp = await fetch(API + '/api/projects/' + projectId + '/files', { credentials: 'include' });
     const files = await resp.json();
     if (files.length === 0) return;
     document.getElementById('view-files-section').classList.remove('d-none');
@@ -1441,7 +1452,7 @@ description: View project details
   }
 
   async function loadImages() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/images');
+    const resp = await fetch(API + '/api/projects/' + projectId + '/images', { credentials: 'include' });
     const images = await resp.json();
     if (images.length === 0) return;
     document.getElementById('view-images-section').classList.remove('d-none');
@@ -1470,7 +1481,7 @@ description: View project details
   async function loadVideos() {
     let videos = [];
     try {
-      const resp = await fetch(API + '/api/projects/' + projectId + '/videos');
+      const resp = await fetch(API + '/api/projects/' + projectId + '/videos', { credentials: 'include' });
       if (!resp.ok) return;
       videos = await resp.json();
     } catch (_) { return; }
@@ -1524,7 +1535,7 @@ description: View project details
   }
 
   async function loadLinks() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/links');
+    const resp = await fetch(API + '/api/projects/' + projectId + '/links', { credentials: 'include' });
     const links = await resp.json();
     if (links.length === 0) return;
     document.getElementById('view-links-section').classList.remove('d-none');
@@ -1595,7 +1606,7 @@ description: View project details
       zip.file('README.md', readme);
 
       // Images
-      var imgResp = await fetch(API + '/api/projects/' + project.id + '/images');
+      var imgResp = await fetch(API + '/api/projects/' + project.id + '/images', { credentials: 'include' });
       var images = await imgResp.json();
       for (var img of images) {
         try {
@@ -1608,7 +1619,7 @@ description: View project details
       }
 
       // Files
-      var fileResp = await fetch(API + '/api/projects/' + project.id + '/files');
+      var fileResp = await fetch(API + '/api/projects/' + project.id + '/files', { credentials: 'include' });
       var files = await fileResp.json();
       for (var f of files) {
         try {
@@ -1623,7 +1634,7 @@ description: View project details
       }
 
       // BOM as CSV
-      var bomResp = await fetch(API + '/api/projects/' + project.id + '/bom');
+      var bomResp = await fetch(API + '/api/projects/' + project.id + '/bom', { credentials: 'include' });
       var bom = await bomResp.json();
       if (bom.length > 0) {
         // Issue #149: include currency column so the CSV is parseable
@@ -1785,7 +1796,7 @@ description: View project details
   }
 
   function fetchMakes(project) {
-    fetch(API + '/api/projects/' + project.id + '/makes')
+    fetch(API + '/api/projects/' + project.id + '/makes', { credentials: 'include' })
       .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (makes) { renderMakes(makes, project); })
       .catch(function () { renderMakes([], project); });

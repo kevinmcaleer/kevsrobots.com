@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, require_terms_accepted
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Project, ProjectImage
+from ..visibility import hide_drafts
 from ..schemas import ImageResponse
 from ..storage import (
     ALLOWED_IMAGE_EXTENSIONS,
@@ -27,7 +30,9 @@ router = APIRouter(prefix="/api/projects/{project_id}/images", tags=["images"])
 async def list_images(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[ImageResponse]:
+    await hide_drafts(session, project_id, user)
     items = (
         await session.scalars(
             select(ProjectImage)

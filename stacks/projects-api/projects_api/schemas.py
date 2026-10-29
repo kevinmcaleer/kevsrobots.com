@@ -62,6 +62,9 @@ class ProjectCreate(BaseModel):
     estimated_minutes: Optional[int] = Field(None, ge=1)
     code_repo_url: Optional[str] = None
     tags: list[str] = Field(default_factory=list)
+    # Issue #260: the editor creates projects as private drafts. Other
+    # clients keep the old default of a public ``wip`` project.
+    status: str = Field("wip", pattern="^(draft|wip)$")
 
 
 class ProjectUpdate(BaseModel):
@@ -76,7 +79,7 @@ class ProjectUpdate(BaseModel):
     difficulty: Optional[str] = Field(None, pattern="^(beginner|intermediate|advanced)$")
     estimated_minutes: Optional[int] = Field(None, ge=1)
     code_repo_url: Optional[str] = None
-    status: Optional[str] = Field(None, pattern="^(wip|completed|archived)$")
+    status: Optional[str] = Field(None, pattern="^(draft|wip|completed|archived)$")
     cover_image: Optional[str] = None
     tags: Optional[list[str]] = None
     # Issue #152: when ``regenerate_slug`` is true, the server picks a new

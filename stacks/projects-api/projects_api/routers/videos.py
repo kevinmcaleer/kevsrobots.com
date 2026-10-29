@@ -23,13 +23,16 @@ unit tests can hit it directly without spinning up a client.
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, require_terms_accepted
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectVideo
+from ..visibility import hide_drafts
 from ..schemas import VideoCreate, VideoResponse, VideoUpdate
 from ..youtube import extract_youtube_id
 
@@ -49,9 +52,11 @@ async def _check_owner(session: AsyncSession, project_id: int, user: str) -> Pro
 async def list_videos(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[VideoResponse]:
     """Public read. Order is ``sort_order`` ASC then ``id`` ASC so
     rows with the same sort key fall back to insertion order."""
+    await hide_drafts(session, project_id, user)
     items = (
         await session.scalars(
             select(ProjectVideo)

@@ -37,6 +37,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
 from ..models import Project
+from ..visibility import is_draft
 from .projects import _get_tags, resolve_project_id
 
 router = APIRouter(tags=["social-og"])
@@ -206,7 +207,8 @@ async def project_og_card(
         raise
 
     project = await session.get(Project, project_id)
-    if project is None:  # pragma: no cover - resolve_project_id just found it
+    # Issue #260: crawlers never see a draft.
+    if project is None or is_draft(project):
         return Response(
             content=_render_not_found_html(),
             status_code=404,

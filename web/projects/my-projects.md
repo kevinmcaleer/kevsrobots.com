@@ -44,6 +44,11 @@ layout: content
       </button>
     </li>
     <li class="nav-item" role="presentation">
+      <button class="nav-link" id="draft-tab" data-status="draft" onclick="filterProjects('draft')">
+        Drafts <span class="badge bg-secondary ms-1" id="draft-count">0</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
       <button class="nav-link" id="wip-tab" data-status="wip" onclick="filterProjects('wip')">
         In Progress <span class="badge bg-warning ms-1" id="wip-count">0</span>
       </button>
@@ -138,13 +143,15 @@ async function checkAuth() {
   }
 }
 
-// Update status counts. projects-api uses wip/completed/archived.
+// Update status counts. projects-api uses draft/wip/completed/archived.
 function updateCounts() {
+  const draftCount = allProjects.filter(p => p.status === 'draft').length;
   const wipCount = allProjects.filter(p => p.status === 'wip').length;
   const completedCount = allProjects.filter(p => p.status === 'completed').length;
   const archivedCount = allProjects.filter(p => p.status === 'archived').length;
 
   document.getElementById('all-count').textContent = allProjects.length;
+  document.getElementById('draft-count').textContent = draftCount;
   document.getElementById('wip-count').textContent = wipCount;
   document.getElementById('completed-count').textContent = completedCount;
   document.getElementById('archived-count').textContent = archivedCount;
@@ -217,7 +224,9 @@ function createProjectCard(project) {
   col.className = 'col';
 
   let statusBadge;
-  if (project.status === 'wip') {
+  if (project.status === 'draft') {
+    statusBadge = '<span class="badge bg-light text-dark border"><i class="fas fa-lock me-1"></i>Draft</span>';
+  } else if (project.status === 'wip') {
     statusBadge = '<span class="badge bg-warning text-dark">In Progress</span>';
   } else if (project.status === 'completed') {
     statusBadge = '<span class="badge bg-success">Completed</span>';
