@@ -51,13 +51,8 @@ thanks: false
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="wip-tab" data-status="wip" onclick="filterProjects('wip')">
-        In Progress <span class="badge bg-warning ms-1" id="wip-count">0</span>
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="completed-tab" data-status="completed" onclick="filterProjects('completed')">
-        Completed <span class="badge bg-success ms-1" id="completed-count">0</span>
+      <button class="nav-link" id="published-tab" data-status="published" onclick="filterProjects('published')">
+        Published <span class="badge bg-success ms-1" id="published-count">0</span>
       </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -145,17 +140,21 @@ async function checkAuth() {
   }
 }
 
-// Update status counts. projects-api uses draft/wip/completed/archived.
+// Update status counts. Issue #260: projects are Draft, Published or
+// Archived. projects-api stores published as ``completed`` (or ``wip``
+// for a project an older API client created), so both count.
+function isPublished(p) {
+  return p.status === 'completed' || p.status === 'wip';
+}
+
 function updateCounts() {
   const draftCount = allProjects.filter(p => p.status === 'draft').length;
-  const wipCount = allProjects.filter(p => p.status === 'wip').length;
-  const completedCount = allProjects.filter(p => p.status === 'completed').length;
+  const publishedCount = allProjects.filter(isPublished).length;
   const archivedCount = allProjects.filter(p => p.status === 'archived').length;
 
   document.getElementById('all-count').textContent = allProjects.length;
   document.getElementById('draft-count').textContent = draftCount;
-  document.getElementById('wip-count').textContent = wipCount;
-  document.getElementById('completed-count').textContent = completedCount;
+  document.getElementById('published-count').textContent = publishedCount;
   document.getElementById('archived-count').textContent = archivedCount;
 }
 
@@ -173,7 +172,7 @@ function filterProjects(status) {
 
   const filtered = status === ''
     ? allProjects
-    : allProjects.filter(p => p.status === status);
+    : allProjects.filter(p => status === 'published' ? isPublished(p) : p.status === status);
 
   displayProjects(filtered);
 }
@@ -228,10 +227,8 @@ function createProjectCard(project) {
   let statusBadge;
   if (project.status === 'draft') {
     statusBadge = '<span class="badge bg-light text-dark border"><i class="fas fa-lock me-1"></i>Draft</span>';
-  } else if (project.status === 'wip') {
-    statusBadge = '<span class="badge bg-warning text-dark">In Progress</span>';
-  } else if (project.status === 'completed') {
-    statusBadge = '<span class="badge bg-success">Completed</span>';
+  } else if (isPublished(project)) {
+    statusBadge = '<span class="badge bg-success">Published</span>';
   } else {
     statusBadge = '<span class="badge bg-secondary">Archived</span>';
   }

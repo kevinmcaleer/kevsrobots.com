@@ -243,9 +243,10 @@
   // --- Save / Status / Delete --- (autosave only; no manual save button)
 
   // The top bar's switch is Draft / Published (issue #260). Drafts are
-  // private to the author. ``wip`` (older projects) and ``completed``
-  // both count as published; switching on publishes as ``completed``.
-  // Archived lives in the top bar's menu; publishing again un-archives.
+  // private to the author; switching on publishes as ``completed``. (A
+  // legacy ``wip`` row from an API client also counts as published.)
+  // The Archived checkbox beside it is the third state; publishing again,
+  // or unticking it, un-archives (back to a draft).
   async function setStatus(status) {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     try {
@@ -273,10 +274,9 @@
     setStatus(publishSwitch.checked ? 'completed' : 'draft');
   });
 
-  const archiveBtn = document.getElementById('archive-btn');
-  if (archiveBtn) archiveBtn.addEventListener('click', () => {
-    const archived = currentProject && currentProject.status === 'archived';
-    setStatus(archived ? 'draft' : 'archived');
+  const archiveCheck = document.getElementById('archive-check');
+  if (archiveCheck) archiveCheck.addEventListener('change', () => {
+    setStatus(archiveCheck.checked ? 'archived' : 'draft');
   });
 
   const deleteBtn = document.getElementById('delete-btn');
@@ -296,11 +296,7 @@
   function updateStatusBadge(status) {
     if (publishSwitch) publishSwitch.checked = status === 'wip' || status === 'completed';
     if (publishSwitchLabel) publishSwitchLabel.textContent = statusLabels[status] || status;
-    if (archiveBtn) {
-      archiveBtn.innerHTML = status === 'archived'
-        ? '<i class="fas fa-box-open me-1"></i> Unarchive (back to draft)'
-        : '<i class="fas fa-box-archive me-1"></i> Archive project';
-    }
+    if (archiveCheck) archiveCheck.checked = status === 'archived';
     const viewToggle = document.getElementById('view-toggle-btn');
     if (currentProject) {
       // Issue #152: link to the canonical /projects/<owner>/<slug> URL

@@ -42,6 +42,7 @@ from .db import (
     backfill_library_symbol_revisions,
     backfill_part_image_url_to_photos,
     backfill_part_revisions_if_missing,
+    backfill_wip_projects_to_draft,
     create_all,
     drop_legacy_link_type_check_if_present,
     migrate_image_files_to_images,
@@ -187,6 +188,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # after add_project_file_description_if_missing (above) because it issues a
     # full-model select(ProjectFile).
     await migrate_image_files_to_images()
+    # Issue #260: existing work-in-progress projects become private drafts.
+    await backfill_wip_projects_to_draft()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:

@@ -152,3 +152,49 @@ async def test_draft_image_and_file_urls_are_private(client) -> None:
         resp = await client.get(url)
         assert resp.status_code == 200, url
         assert "cache-control" not in resp.headers
+
+
+@pytest.mark.asyncio
+async def test_remix_starts_as_draft_and_its_chain_is_private(client) -> None:
+    alice = make_auth_header("alice")
+    bob = make_auth_header("bob")
+    original = (await client.post("/api/projects", json={"title": "Open Walker"}, headers=alice)).json()
+    remix = (
+        await client.post(
+            f"/api/projects/{original['id']}/remix",
+            json={"remix_description": "Longer legs for rough ground"},
+            headers=bob,
+        )
+    ).json()
+    assert remix["status"] == "draft"
+    assert (await client.get(f"/api/projects/{remix['id']}/remix-chain")).status_code == 404
+    assert (await client.get(f"/api/projects/{remix['id']}/remix-chain", headers=bob)).status_code == 200
+    listing = (await client.get(f"/api/projects/{original['id']}/remixes")).json()
+    assert remix["id"] not in [r["id"] for r in listing]
+
+
+@pytest.mark.asyncio
+async def test_wip_backfill_runs_once(client, sessionmaker_, monkeypatch) -> None:
+    from sqlalchemy import delete
+
+    from projects_api import db
+    from projects_api.models import AppliedMigration, Project
+
+    monkeypatch.setattr(db, "get_sessionmaker", lambda: sessionmaker_)
+    # Start as a database from before the migration.
+    async with sessionmaker_() as session:
+        await session.execute(delete(AppliedMigration))
+        await session.commit()
+    alice = make_auth_header("alice")
+    old = (await client.post("/api/projects", json={"title": "Old Walker"}, headers=alice)).json()
+    assert old["status"] == "wip"
+
+    await db.backfill_wip_projects_to_draft()
+    async with sessionmaker_() as session:
+        assert (await session.get(Project, old["id"])).status == "draft"
+
+    # A wip project made after the backfill (by an API client) is left alone.
+    later = (await client.post("/api/projects", json={"title": "New Walker"}, headers=alice)).json()
+    await db.backfill_wip_projects_to_draft()
+    async with sessionmaker_() as session:
+        assert (await session.get(Project, later["id"])).status == "wip"
