@@ -1,0 +1,26 @@
+/* Image sizes, from a `{size}` after an image's Markdown (see imageSize.ts).
+   Standalone, so a page that renders the Markdown itself can use it too.
+   Half and small leave room for the space between two on one line, so a
+   pair of halves (or four smalls) sit side by side. */
+img.image-full {
+  width: 100%;
+  height: auto;
+}
+
+img.image-half {
+  width: calc(50% - 0.3em);
+  height: auto;
+}
+
+img.image-small {
+  width: calc(25% - 0.3em);
+  height: auto;
+}
+
+/* kevsrobots' .cover: a full-width banner, cropped to fit. */
+img.image-cover {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+}

@@ -11,6 +11,7 @@ description: View project details
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/instruction-viewer.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/js/markdown-editor/callouts.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/js/markdown-editor/image-sizes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
@@ -676,6 +677,7 @@ description: View project details
 <!-- Issue #257: a YouTube link on its own line plays inline. -->
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-callouts.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-image-sizes.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #259: "On this page" with the canonical sections first. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
@@ -923,6 +925,7 @@ description: View project details
       } else if (project.content_md) {
         const contentEl = document.getElementById('view-content');
         contentEl.innerHTML = marked.parse(project.content_md);
+        ProjectImageSizes.render(contentEl);
         styleMarkdownTables(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
         ProjectCallouts.render(contentEl);
@@ -1575,6 +1578,7 @@ description: View project details
       </div>
     `).join('');
     styleMarkdownTables(journalEl);
+    ProjectImageSizes.render(journalEl);
     ProjectCallouts.render(journalEl);
     CodeCopy.attach(journalEl);
   }
