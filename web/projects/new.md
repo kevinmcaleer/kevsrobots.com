@@ -2,6 +2,8 @@
 title: Create New Project
 description: Share your maker project with the community
 layout: content
+# User-created content: no "support my work" box.
+thanks: false
 ---
 
 {% include nav_projects.html %}
