@@ -11,7 +11,6 @@ description: View project details
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/image-viewer.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
-<link rel="stylesheet" href="/assets/css/instruction-viewer.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/js/markdown-editor/callouts.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/js/markdown-editor/image-sizes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
@@ -175,44 +174,6 @@ description: View project details
             <i class="fas fa-download me-1"></i> Total downloads: <span id="view-files-total-count">0</span>
           </div>
           <div id="view-files" class="list-group"></div>
-        </div>
-
-        <!-- Build Instructions (issue #178, Phase 2a) — read-only slideshow.
-             Hidden by default; instruction-viewer.js fetches the public
-             /api/projects/{id}/instruction endpoint and reveals the shell
-             only once an instruction with at least one step is confirmed.
-             The slideshow itself is just <img> swapping (each step's
-             canvas_json is pre-rendered to a PNG at init time). -->
-        <div id="instruction-slideshow-section" class="mb-4 d-none">
-          <h4><i class="fas fa-list-ol me-3 text-primary"></i> Build Instructions</h4>
-          <div id="iv-frame" class="iv-frame">
-            <div id="iv-step-badge" class="iv-step-badge">Step 1 of 1</div>
-            <button type="button" id="iv-fullscreen" class="iv-fullscreen-btn"
-                    aria-label="View fullscreen" title="View fullscreen">
-              <i class="fas fa-expand"></i>
-            </button>
-            <button type="button" id="iv-prev" class="iv-nav-btn iv-nav-prev"
-                    aria-label="Previous step" title="Previous step">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button type="button" id="iv-next" class="iv-nav-btn iv-nav-next"
-                    aria-label="Next step" title="Next step">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-            <div id="iv-stage" class="iv-stage"></div>
-            <div id="iv-spinner" class="iv-spinner">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading instructions&hellip;</span>
-              </div>
-              <div class="small">Preparing slideshow&hellip;</div>
-            </div>
-          </div>
-          <div id="iv-dots" class="iv-dots" role="tablist" aria-label="Instruction steps"></div>
-          <div id="iv-step-meta" class="iv-step-meta">
-            <h4 id="iv-step-title"></h4>
-            <p id="iv-step-description" class="iv-step-description d-none"></p>
-          </div>
-          <div id="iv-fallback" class="iv-fallback-list d-none"></div>
         </div>
 
         <!-- BOM -->
@@ -703,7 +664,6 @@ description: View project details
 <script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
-<script src="/assets/js/instruction-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Builder-mode renderer — shared with the project editor's
      preview pane so the two surfaces emit identical markup. -->
 <script src="/assets/js/builder-renderer.js?v={{ site.time | date: '%s' }}"></script>
@@ -1034,18 +994,6 @@ description: View project details
       loadVideos();
       loadJournal();
       loadMakes(project);
-
-      // Issue #178 Phase 2a — legacy slideshow viewer for build
-      // instructions. In builder mode the inline step renderer above
-      // already shows the same content (and richer — type-specific
-      // bodies, TOC, anchors), so we skip the slideshow to avoid
-      // duplicating it at the bottom of the page. Markdown-mode
-      // projects keep the slideshow as the only surface for any
-      // instructions they may have authored via the lite stepper.
-      if (viewMode !== 'builder' &&
-          window.InstructionViewer && typeof window.InstructionViewer.init === 'function') {
-        try { window.InstructionViewer.init(project.id); } catch (_) {}
-      }
 
       // Load interactions (likes + comments) via Chatter
       var projectUrl = 'projects/view.html?id=' + projectId;
