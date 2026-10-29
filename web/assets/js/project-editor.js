@@ -2269,29 +2269,7 @@
     updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> uploaded &amp; linked</span>');
   }
 
-  // Issue #258: an image dropped on the text also goes into the text, as
-  // its own paragraph after the line it landed on. Returns where the next
-  // one should go.
-  function insertImageMarkdown(pos, alt, url) {
-    const view = mde.view;
-    const line = view.state.doc.lineAt(Math.min(pos, view.state.doc.length));
-    const blank = !line.text.trim();
-    const at = blank ? line.from : line.to;
-    const text = (blank ? '' : '\n\n') + '![' + alt.replace(/[[\]]/g, '') + '](' + url + ')\n';
-    view.dispatch({ changes: { from: at, insert: text } });
-    return at + text.length;
-  }
-
-  // The text position under a drop, or null when it wasn't on the editor.
-  function editorDropPos(e) {
-    if (!mde || !mde.element || !mde.view) return null;
-    const r = mde.element.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return null;
-    const pos = mde.view.posAtCoords({ x: e.clientX, y: e.clientY });
-    return pos == null ? mde.view.state.selection.main.head : pos;
-  }
-
-  async function processDroppedFiles(fileList, insertAt) {
+  async function processDroppedFiles(fileList) {
     const files = Array.from(fileList || []);
     if (files.length === 0) return;
 
@@ -2337,13 +2315,8 @@
           needsFileReload = true;
           needsLinksReload = true;
         } else if (isImageFile(file)) {
-          const img = await uploadSingleImage(file);
-          if (insertAt != null && mde) {
-            insertAt = insertImageMarkdown(insertAt, file.name.replace(/\.[^.]+$/, ''), imageViewUrl(img));
-            updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery and text</span>');
-          } else {
-            updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery</span>');
-          }
+          await uploadSingleImage(file);
+          updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery</span>');
           imageCount++;
           needsImageReload = true;
         } else {
@@ -2418,13 +2391,17 @@
       dragDepth = 0;
       overlay.classList.add('d-none');
       overlay.classList.remove('is-active');
-      // No exceptions — the entire editor page is one drop target, and
+      // The entire editor page is one drop target, and
       // processDroppedFiles() routes by type: images → gallery,
       // README/index.md → markdown editor, LICENSE → linked file,
       // anything else in ALLOWED_FILE_EXTS → Files & Models.
-      // Images dropped on the text are also inserted where they land.
+      // The one exception: images dropped on the text belong to the editor
+      // bundle, which places them where they land and files them in the
+      // gallery through the uploadImage hook.
       const files = e.dataTransfer && e.dataTransfer.files;
-      if (files && files.length) processDroppedFiles(files, editorDropPos(e));
+      const onText = mde && mde.element && mde.element.contains(e.target);
+      if (onText && files && files.length && Array.from(files).every(isImageFile)) return;
+      if (files && files.length) processDroppedFiles(files);
     });
 
     document.addEventListener('keydown', (e) => {
