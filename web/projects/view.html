@@ -469,6 +469,22 @@ description: View project details
     border-left-color: var(--bs-primary, #0d6efd);
   }
 
+  /* Linkable headings: land below the sticky header, with a "#" link
+     that shows on hover or focus. */
+  #view-content :is(h1, h2, h3, h4, h5, h6) { scroll-margin-top: 80px; }
+  #view-content .heading-anchor {
+    margin-left: 0.4em;
+    color: #adb5bd;
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  #view-content :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor,
+  #view-content .heading-anchor:focus-visible { opacity: 1; }
+  #view-content .heading-anchor:hover { color: #4A90D9; }
+  @media (hover: none) { #view-content .heading-anchor { opacity: 0.6; } }
+
   /* Mermaid in view */
   #view-content .mermaid {
     text-align: center;
@@ -2174,6 +2190,50 @@ description: View project details
     });
   }
 
+  // Every heading in the project text gets an id and a "#" link, so any
+  // section can be linked to as /projects/<owner>/<slug>#<heading>. Ids
+  // come from the heading text; a repeat, or a clash with an element
+  // already on the page (comments-section, ...), gets -2, -3. Safe to
+  // call again: headings done before keep their ids.
+  function anchorHeadings(root) {
+    if (!root) return;
+    root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+      if (h.dataset.anchored || h.closest('#view-bom-section')) return;
+      let id = h.id;
+      if (!id) {
+        const base = slugify(headingText(h)) || 'section';
+        let n = 1;
+        id = base;
+        while (document.getElementById(id)) id = base + '-' + (++n);
+        h.id = id;
+      }
+      h.dataset.anchored = '1';
+      h.insertAdjacentHTML('beforeend',
+        '<a class="heading-anchor" href="#' + encodeURIComponent(id) + '" aria-label="Link to this section">#</a>');
+    });
+  }
+
+  // A heading's own text, without the "#" link anchorHeadings adds.
+  function headingText(h) {
+    const anchor = h.querySelector(':scope > .heading-anchor');
+    return (anchor ? h.textContent.slice(0, -anchor.textContent.length) : h.textContent).trim();
+  }
+
+  // Deep links: the project text is rendered after the page loads, so
+  // the browser can't jump to a #heading itself. Scroll there once the
+  // content is in, and again as the BOM and files arrive and push things
+  // around, until the reader scrolls on their own.
+  let readerScrolled = false;
+  ['wheel', 'touchmove', 'keydown'].forEach(ev =>
+    window.addEventListener(ev, () => { readerScrolled = true; }, { once: true, passive: true }));
+  function scrollToHash() {
+    if (readerScrolled || !location.hash) return;
+    let id;
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { return; }
+    const target = id && document.getElementById(id);
+    if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80 });
+  }
+
   // Issue #259: a structured section the page renders itself (the BOM
   // table from the API) sits under the author's matching heading when
   // there is one, so the reader finds it where the document says it is.
@@ -2182,7 +2242,7 @@ description: View project details
     if (!el || el.classList.contains('d-none')) return false;
     const own = el.querySelector(':scope > h4');
     const heading = headings.find(h => {
-      const s = ProjectSections.match(h.textContent);
+      const s = ProjectSections.match(headingText(h));
       return s && s.id === sectionId;
     });
     if (!heading) {
@@ -2210,21 +2270,17 @@ description: View project details
     if (builderSteps.length > 0) {
       nav.className = 'toc-nav sticky-top';
       nav.style.top = '80px';
-      return buildBuilderTOC(nav, builderSteps);
+      buildBuilderTOC(nav, builderSteps);
+      scrollToHash();
+      return;
     }
     nav.className = 'kr-toc kr-toc--column sticky-top';
     nav.style.top = '';
 
     // H1s are the top level and H2s nest under them (issue #259); deeper
     // headings stay in the text only.
+    anchorHeadings(document.getElementById('view-content'));
     const headings = Array.from(document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3'));
-    const used = {};
-    headings.forEach(h => {
-      let id = h.id || slugify(h.textContent);
-      if (!id) return;
-      if (used[id]) { used[id]++; id = id + '-' + used[id]; } else { used[id] = 1; }
-      h.id = id;
-    });
 
     const bomUnderHeading = placeUnderHeading(document.getElementById('view-bom-section'), 'bill-of-materials', headings);
     // Sections rendered outside the markdown, listed when visible.
@@ -2239,8 +2295,9 @@ description: View project details
     });
 
     const entries = headings.filter(h => h.id).map(h => ({
-      level: Number(h.tagName[1]), text: h.textContent.trim(), key: h.id,
+      level: Number(h.tagName[1]), text: headingText(h), key: h.id,
     }));
+    scrollToHash();
     if (entries.length + extras.length < 2) { nav.innerHTML = ''; return; }
 
     const toc = ProjectToc.render(nav, entries, {
