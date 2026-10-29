@@ -1,0 +1,44 @@
+# Language tools (grammar, dictionary, thesaurus) for the project editor —
+# deploy with:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Needs a .env beside this file with JWT_SECRET (the same value as the
+# Projects API) and LANGUAGE_TUNNEL_TOKEN. See README.md.
+
+services:
+  languagetool:
+    # Multi-arch (amd64 + arm64), so it runs on the Pi.
+    image: erikvl87/languagetool:latest
+    network_mode: host
+    environment:
+      # LanguageTool listens on 8010 by default.
+      - Java_Xms=256m
+      - Java_Xmx=1g
+    restart: unless-stopped
+
+  language-tools:
+    image: 192.168.2.1:5000/language-tools:latest
+    network_mode: host
+    env_file: .env
+    environment:
+      - PORT=8310
+      - LANGUAGETOOL_URL=http://127.0.0.1:8010
+    depends_on:
+      - languagetool
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8310/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    network_mode: host
+    # IPv4 only, for the same reason as the Projects API's tunnel: after a
+    # power cut IPv6 can come up without a route and QUIC never recovers.
+    command: tunnel --no-autoupdate --edge-ip-version 4 run
+    environment:
+      - TUNNEL_TOKEN=${LANGUAGE_TUNNEL_TOKEN}
+    restart: unless-stopped
