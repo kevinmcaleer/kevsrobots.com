@@ -141,14 +141,18 @@ async function checkAuth() {
 }
 
 // Update status counts. Issue #260: projects are Draft, Published or
-// Archived. projects-api stores published as ``completed`` (or ``wip``
-// for a project an older API client created), so both count.
+// Archived. Published is ``completed``; ``wip`` counts as a Draft (it is
+// how an API from before #260 stores one).
 function isPublished(p) {
-  return p.status === 'completed' || p.status === 'wip';
+  return p.status === 'completed';
+}
+
+function isDraft(p) {
+  return p.status === 'draft' || p.status === 'wip';
 }
 
 function updateCounts() {
-  const draftCount = allProjects.filter(p => p.status === 'draft').length;
+  const draftCount = allProjects.filter(isDraft).length;
   const publishedCount = allProjects.filter(isPublished).length;
   const archivedCount = allProjects.filter(p => p.status === 'archived').length;
 
@@ -172,7 +176,8 @@ function filterProjects(status) {
 
   const filtered = status === ''
     ? allProjects
-    : allProjects.filter(p => status === 'published' ? isPublished(p) : p.status === status);
+    : allProjects.filter(p => status === 'published' ? isPublished(p)
+      : status === 'draft' ? isDraft(p) : p.status === status);
 
   displayProjects(filtered);
 }
@@ -225,7 +230,7 @@ function createProjectCard(project) {
   col.className = 'col';
 
   let statusBadge;
-  if (project.status === 'draft') {
+  if (isDraft(project)) {
     statusBadge = '<span class="badge bg-light text-dark border"><i class="fas fa-lock me-1"></i>Draft</span>';
   } else if (isPublished(project)) {
     statusBadge = '<span class="badge bg-success">Published</span>';
