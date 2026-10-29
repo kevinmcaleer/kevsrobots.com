@@ -681,6 +681,13 @@
       preview: false,
       codeRenderers: { mermaid: renderMermaid },
       codeEditors: { mermaid: editMermaid },
+      // The Videos table as thumbnail cards, as on the view page, until it's clicked.
+      tableRenderer: ({ rows, heading }) => {
+        const section = heading && ProjectSections.match(heading);
+        if (!section || section.id !== 'videos') return null;
+        const items = ProjectEmbeds.videoTableItems(rows);
+        return items.length ? ProjectEmbeds.videoCards(items) : null;
+      },
       slashCommands: ProjectSlashCommands.create(slashContext()),
       proofing: { languageApiBase: LANGUAGE_API, languageApi: languageRequest },
     });

@@ -1,0 +1,58 @@
+/*
+ * The Videos section's table drawn as a gallery of cards (project-embeds.js
+ * videoCards), on projects/view.html and in the project editor's live view.
+ * The cards are the site's video cards (_includes/card.html: card-hover,
+ * shadow-hover, a thumbnail over the title); this adds the 16:9 thumbnail,
+ * the play mark, and resets the editor's own table and link styles.
+ */
+
+.project-video-grid {
+  margin-top: 0;
+  white-space: normal;
+  font-family: var(--font-ui, inherit);
+}
+
+.project-video-grid a,
+.project-video-grid a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-video-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: #000;
+}
+
+.project-video-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+.project-video-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  color: #ff0000;
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+.project-video-card .card-body {
+  padding: 0.75rem 1rem;
+}
+
+.project-video-card .card-body p {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 0.95rem;
+}

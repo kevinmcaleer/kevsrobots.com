@@ -15,6 +15,7 @@ description: View project details
 <link rel="stylesheet" href="/assets/js/markdown-editor/image-sizes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-content.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-videos.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
 <div class="container-fluid py-3">
@@ -1691,32 +1692,15 @@ description: View project details
       if (table) break;
     }
     if (!table) return true;
-    const head = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim().toLowerCase());
-    let videoCol = head.findIndex(h => /^(video|videos|url|link|youtube)$/.test(h));
-    if (videoCol < 0) videoCol = 0;
-    const titleCol = head.findIndex(h => /^(title|name|caption|description)$/.test(h));
-    const items = [];
-    table.querySelectorAll('tbody tr').forEach(tr => {
-      const cells = tr.children;
-      const cell = cells[videoCol];
-      if (!cell) return;
-      const a = cell.querySelector('a');
-      const id = ProjectEmbeds.youTubeId(a ? a.getAttribute('href') : cell.textContent);
-      if (!id) return;
-      items.push({ id, title: titleCol >= 0 && cells[titleCol] ? cells[titleCol].textContent.trim() : '' });
-    });
-    const grid = document.createElement('div');
-    grid.className = 'row g-3 mb-3 project-video-grid';
-    grid.innerHTML = items.map(v => `
-      <div class="${items.length > 1 ? 'col-md-6' : 'col-12'}">
-        <div class="ratio ratio-16x9">
-          <iframe class="rounded-1" src="https://www.youtube.com/embed/${encodeURIComponent(v.id)}"
-                  title="${esc(v.title || 'Project video')}" loading="lazy"
-                  frameborder="0" allowfullscreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-        </div>
-        ${v.title ? `<p class="small text-muted mt-1 mb-0">${esc(v.title)}</p>` : ''}
-      </div>`).join('');
+    // The cells as text (a YouTube link as its address), then the same cards as the editor's live view.
+    const cellText = cell => {
+      const a = cell.querySelector('a[href*="youtu"]');
+      return a ? a.getAttribute('href') : cell.textContent;
+    };
+    const rows = Array.from(table.rows).map(tr => Array.from(tr.cells).map(cellText));
+    const items = ProjectEmbeds.videoTableItems(rows);
+    if (!items.length) return true;
+    const grid = ProjectEmbeds.videoCards(items);
     // styleMarkdownTables may have wrapped the table; replace the wrapper.
     const box = table.parentElement && table.parentElement !== heading.parentElement ? table.parentElement : table;
     box.replaceWith(grid);
