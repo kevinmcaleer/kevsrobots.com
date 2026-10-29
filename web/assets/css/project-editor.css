@@ -786,3 +786,13 @@
 #content-markdown-pane .prose {
   max-width: none;
 }
+
+/* A heading in the page navigation that shares its name with another. */
+.kr-toc a.kr-toc-duplicate {
+  color: #b45309;
+}
+.kr-toc a.kr-toc-duplicate::after {
+  content: "\26A0";
+  margin-left: 0.35rem;
+  font-size: 0.8em;
+}
