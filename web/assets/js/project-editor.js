@@ -688,6 +688,7 @@
     el.querySelectorAll('table').forEach(t => {
       t.classList.add('table', 'table-single', 'table-narrow');
     });
+    ProjectEmbeds.embedVideos(el);
     const diagrams = el.querySelectorAll('.mermaid:not([data-processed])');
     if (diagrams.length === 0) return;
     try {
@@ -721,6 +722,7 @@
       })),
       images: { maxBytes: MAX_IMAGE_BYTES },
       preview: { markdownIt: mermaidFences, afterRender: decoratePreview },
+      slashCommands: ProjectSlashCommands.create(slashContext()),
     });
 
     mde.on('change', () => {
@@ -731,6 +733,52 @@
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
     document.dispatchEvent(new CustomEvent('project-markdown-editor:ready', { detail: mde }));
+  }
+
+  // What the Project `/` commands (issue #257) read from and upload to.
+  function fileDownloadUrl(f) {
+    return API + '/api/projects/' + currentProject.id + '/files/' + f.id + '/download';
+  }
+
+  function slashContext() {
+    const getJson = async path => {
+      if (!currentProject) return [];
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + path, { credentials: 'include' });
+      return resp.ok ? resp.json() : [];
+    };
+    return {
+      listFiles: async () => (await getJson('/files')).map(f => ({
+        name: f.filename, description: f.description, url: fileDownloadUrl(f),
+      })),
+      modelFiles: () => currentProject ? projectFiles.map(f => ({ name: f.filename, url: fileDownloadUrl(f) })) : [],
+      uploadFile: () => new Promise(resolve => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.addEventListener('cancel', () => resolve(null));
+        input.addEventListener('change', async () => {
+          const file = input.files && input.files[0];
+          if (!file) { resolve(null); return; }
+          try {
+            if (!currentProject) await saveProject();
+            if (!currentProject) throw new Error('Add a title and save before adding files');
+            const uploaded = await uploadSingleFile(file);
+            loadFiles();
+            resolve({ name: uploaded.filename || file.name, url: fileDownloadUrl(uploaded) });
+          } catch (e) {
+            alert(file.name + ' could not be uploaded: ' + e.message);
+            resolve(null);
+          }
+        });
+        input.click();
+      }),
+      listVideos: async () => (await getJson('/videos')).map(v => ({ id: v.youtube_id, title: v.title })),
+      listParts: async () => (await getJson('/bom')).filter(item => item.name).map(item => ({
+        name: item.name,
+        url: item.part_slug ? '/parts/view.html?slug=' + encodeURIComponent(item.part_slug) : null,
+        detail: item.quantity + ' ' + (item.unit === 'qty' ? '\u00d7' : item.unit) + (item.part_slug ? ' \u00b7 in the parts catalog' : ''),
+      })),
+      diagrams: DIAGRAM_TEMPLATES,
+    };
   }
 
   // --- Image autocomplete on `![` ---
@@ -961,10 +1009,12 @@
     if (movedToImages) loadImages();
   }
 
+  let projectFiles = []; // the last list loadFiles() fetched, for `/3d printed parts`
   async function loadFiles() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', { credentials: 'include' });
     const files = await resp.json();
+    projectFiles = files;
     const list = document.getElementById('file-list');
     if (files.length === 0) { list.innerHTML = ''; return; }
     // Issue #187: render a Description column with an inline-editable
@@ -2034,37 +2084,9 @@
   // id client-side so the thumbnail flips immediately; the backend
   // re-validates server-side and 422s on anything malformed.
   //
-  // Same shape as the backend extractor in projects_api/youtube.py —
-  // keep the two in sync. Case is preserved (YouTube ids are
-  // case-sensitive).
-  const YT_ID_RE = /^[A-Za-z0-9_-]{11}$/;
-  function extractYouTubeId(s) {
-    if (!s) return null;
-    const trimmed = String(s).trim();
-    if (!trimmed) return null;
-    if (YT_ID_RE.test(trimmed)) return trimmed;
-    let url;
-    try { url = new URL(trimmed.includes('://') ? trimmed : 'https://' + trimmed); }
-    catch (_) { return null; }
-    let host = url.hostname.toLowerCase();
-    if (host.startsWith('www.')) host = host.slice(4);
-    let candidate = null;
-    if (host === 'youtu.be') {
-      candidate = url.pathname.replace(/^\//, '').split('/', 1)[0];
-    } else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com') {
-      const p = url.pathname || '';
-      if (p === '/watch' || p.startsWith('/watch/')) {
-        candidate = url.searchParams.get('v');
-      } else if (p.startsWith('/embed/')) {
-        candidate = p.slice('/embed/'.length).split('/', 1)[0];
-      } else if (p.startsWith('/shorts/')) {
-        candidate = p.slice('/shorts/'.length).split('/', 1)[0];
-      } else if (p.startsWith('/v/')) {
-        candidate = p.slice('/v/'.length).split('/', 1)[0];
-      }
-    }
-    return (candidate && YT_ID_RE.test(candidate)) ? candidate : null;
-  }
+  // The id extractor is shared with the `/video` command and the view
+  // page, in project-embeds.js.
+  const extractYouTubeId = ProjectEmbeds.youTubeId;
 
   document.getElementById('add-video-btn').addEventListener('click', async () => {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
