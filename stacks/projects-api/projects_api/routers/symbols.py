@@ -24,13 +24,16 @@ a stale link can't slip through; the same rule applies on PUT.
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import require_terms_accepted
+from ..auth import get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectBOMItem, ProjectSymbol
+from ..visibility import hide_drafts
 from ..schemas import (
     ProjectSymbolCreate,
     ProjectSymbolResponse,
@@ -101,10 +104,12 @@ def _to_response(symbol: ProjectSymbol) -> ProjectSymbolResponse:
 async def list_symbols(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[ProjectSymbolResponse]:
     """Public read — surfaces user-authored content for project viewers
     (a remixer can see the library that ships with the project before
     deciding to fork)."""
+    await hide_drafts(session, project_id, user)
     rows = (
         await session.scalars(
             select(ProjectSymbol)
@@ -143,7 +148,9 @@ async def get_symbol(
     project_id: int,
     symbol_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> ProjectSymbolResponse:
+    await hide_drafts(session, project_id, user)
     symbol = await _get_symbol(session, project_id, symbol_id)
     if symbol is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Symbol not found")

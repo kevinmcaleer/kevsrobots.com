@@ -16,9 +16,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, require_terms_accepted
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Part, PartRevision, PartSupplier, Project, ProjectBOMItem
+from ..visibility import hide_drafts
 from ..schemas import BOMItemCreate, BOMItemResponse
 from .parts import first_photo_cover_urls
 
@@ -207,7 +208,9 @@ async def _refresh_usage_count(session: AsyncSession, part_id: int) -> None:
 async def list_bom(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[BOMItemResponse]:
+    await hide_drafts(session, project_id, user)
     items = (
         await session.scalars(
             select(ProjectBOMItem)

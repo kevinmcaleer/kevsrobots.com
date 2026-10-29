@@ -157,10 +157,11 @@
           body: JSON.stringify(data),
         });
       } else {
+        // Issue #260: a new project is a private draft until published.
         resp = await apiFetch(API + '/api/projects', {
           method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(Object.assign({ status: 'draft' }, data)),
         });
       }
       if (!resp.ok) throw new Error(await resp.text());
@@ -199,7 +200,9 @@
 
   // --- Save / Status / Delete --- (autosave only; no manual save button)
 
-  // The top bar's switch is Draft (``wip``) / Published (``completed``).
+  // The top bar's switch is Draft / Published (issue #260). Drafts are
+  // private to the author. ``wip`` (older projects) and ``completed``
+  // both count as published; switching on publishes as ``completed``.
   // Archived lives in the details drawer; publishing again un-archives.
   async function setStatus(status) {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
@@ -220,18 +223,18 @@
     } catch (e) {
       console.error(e);
       showSaveStatus('error', 'Status not saved');
-      updateStatusBadge(currentProject ? currentProject.status : 'wip');
+      updateStatusBadge(currentProject ? currentProject.status : 'draft');
     }
   }
 
   if (publishSwitch) publishSwitch.addEventListener('change', () => {
-    setStatus(publishSwitch.checked ? 'completed' : 'wip');
+    setStatus(publishSwitch.checked ? 'completed' : 'draft');
   });
 
   const archiveBtn = document.getElementById('archive-btn');
   if (archiveBtn) archiveBtn.addEventListener('click', () => {
     const archived = currentProject && currentProject.status === 'archived';
-    setStatus(archived ? 'wip' : 'archived');
+    setStatus(archived ? 'draft' : 'archived');
   });
 
   const deleteBtn = document.getElementById('delete-btn');
@@ -246,10 +249,10 @@
     } catch (e) { console.error(e); }
   });
 
-  const statusLabels = { wip: 'Draft', completed: 'Published', archived: 'Archived' };
+  const statusLabels = { draft: 'Draft', wip: 'Published', completed: 'Published', archived: 'Archived' };
 
   function updateStatusBadge(status) {
-    if (publishSwitch) publishSwitch.checked = status === 'completed';
+    if (publishSwitch) publishSwitch.checked = status === 'wip' || status === 'completed';
     if (publishSwitchLabel) publishSwitchLabel.textContent = statusLabels[status] || status;
     if (archiveBtn) {
       archiveBtn.innerHTML = status === 'archived'
@@ -546,7 +549,7 @@
       draft: { key: 'projects.' + (projectId || 'new') },
       uploadImage: uploadEditorImage,
       imageLibrary: async () => (await fetchProjectImages()).map(img => ({
-        url: imageViewUrl(img), alt: img.filename,
+        url: imageViewUrl(img), alt: img.caption || img.filename,
       })),
       images: { maxBytes: MAX_IMAGE_BYTES },
       preview: false,
@@ -1033,28 +1036,43 @@
   }
 
   let imageOrder = [];
+  let galleryImages = [];
 
   async function loadImages() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
     const images = await resp.json();
+    galleryImages = images;
     imageOrder = images.map(img => img.id);
     const gallery = document.getElementById('image-gallery');
+    // Issue #258: each thumbnail has a star to make it the cover, an alt
+    // text field (the default alt when /image inserts it) and can be
+    // moved with the left/right arrow keys as well as by dragging.
     gallery.innerHTML = images.map((img, idx) => {
-      const imgUrl = API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
+      const isCover = idx === 0;
+      const name = escHtml(img.filename);
       return `
       <div class="col-6 col-sm-4 col-md-3 col-xl-2" data-image-id="${img.id}" draggable="true">
-        <div class="image-thumb ${idx === 0 ? 'is-cover' : ''}">
-          <img src="${imgUrl}" alt="${img.filename}" data-view-idx="${idx}" class="iv-clickable">
-          <button class="delete-overlay" onclick="event.stopPropagation();deleteImage(${img.id})"><i class="fas fa-trash"></i></button>
-          ${idx === 0 ? '<span class="cover-badge">★ Cover</span>' : ''}
+        <div class="image-thumb ${isCover ? 'is-cover' : ''}" tabindex="0"
+             aria-label="${name}${isCover ? ' (cover)' : ''}. Left and right arrow keys move it.">
+          <img src="${imageViewUrl(img)}" alt="${escHtml(img.caption || img.filename)}" data-view-idx="${idx}" class="iv-clickable">
+          <button type="button" class="cover-star ${isCover ? 'is-cover' : ''}" data-cover-id="${img.id}"
+                  title="${isCover ? 'This is the cover' : 'Make this the cover'}"
+                  aria-label="${isCover ? 'Cover image' : 'Make ' + name + ' the cover'}" aria-pressed="${isCover}">
+            <i class="${isCover ? 'fas' : 'far'} fa-star"></i>
+          </button>
+          <button type="button" class="delete-overlay" data-delete-id="${img.id}" aria-label="Delete ${name}"><i class="fas fa-trash"></i></button>
+          ${isCover ? '<span class="cover-badge">★ Cover</span>' : ''}
         </div>
+        <input type="text" class="form-control form-control-sm image-alt mt-1" data-alt-id="${img.id}"
+               value="${escHtml(img.caption || '')}" placeholder="Alt text" maxlength="300"
+               aria-label="Alt text for ${name}">
       </div>`;
     }).join('');
 
     // Set cover_image from first image
     if (images.length > 0) {
-      const firstUrl = API + '/api/projects/' + currentProject.id + '/images/' + images[0].id + '/view';
+      const firstUrl = imageViewUrl(images[0]);
       if (currentProject.cover_image !== firstUrl) {
         currentProject.cover_image = firstUrl;
         apiFetch(API + '/api/projects/' + currentProject.id, {
@@ -1067,19 +1085,85 @@
 
     // Drag-and-drop reordering
     setupImageDrag(gallery);
-
-    // Image viewer on click (only if not dragging)
-    const viewerImages = images.map(img => ({
-      url: API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view',
-      alt: img.filename
-    }));
-    gallery.addEventListener('click', e => {
-      const img = e.target.closest('.iv-clickable');
-      if (!img) return;
-      if (gallery.querySelector('.dragging')) return;
-      ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
-    });
   }
+
+  function escHtml(t) {
+    return String(t == null ? '' : t)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // PUT each image's position from imageOrder, then redraw. The cover is
+  // whichever image is first, so this is also how a cover is chosen.
+  async function saveImageOrder(message) {
+    for (let i = 0; i < imageOrder.length; i++) {
+      await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageOrder[i], {
+        method: 'PUT', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sort_order: i }),
+      });
+    }
+    showSaveStatus('saved', message || 'Image order updated');
+    await loadImages();
+  }
+
+  async function moveImage(id, toIdx) {
+    const fromIdx = imageOrder.indexOf(id);
+    if (fromIdx < 0 || toIdx < 0 || toIdx >= imageOrder.length || toIdx === fromIdx) return false;
+    imageOrder.splice(fromIdx, 1);
+    imageOrder.splice(toIdx, 0, id);
+    await saveImageOrder(toIdx === 0 ? 'Cover updated' : 'Image order updated');
+    return true;
+  }
+
+  // One set of listeners on the gallery, however often it's redrawn.
+  (function wireGallery() {
+    const gallery = document.getElementById('image-gallery');
+    if (!gallery) return;
+    gallery.addEventListener('click', e => {
+      const star = e.target.closest('.cover-star');
+      if (star) {
+        e.stopPropagation();
+        moveImage(parseInt(star.dataset.coverId, 10), 0);
+        return;
+      }
+      const del = e.target.closest('.delete-overlay');
+      if (del) {
+        e.stopPropagation();
+        window.deleteImage(parseInt(del.dataset.deleteId, 10));
+        return;
+      }
+      const img = e.target.closest('.iv-clickable');
+      if (!img || gallery.querySelector('.dragging')) return;
+      ImageViewer.open(galleryImages.map(i => ({ url: imageViewUrl(i), alt: i.caption || i.filename })),
+        parseInt(img.dataset.viewIdx, 10));
+    });
+    gallery.addEventListener('keydown', async e => {
+      const thumb = e.target.closest('.image-thumb');
+      if (!thumb || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      const id = parseInt(thumb.closest('[data-image-id]').dataset.imageId, 10);
+      const to = imageOrder.indexOf(id) + (e.key === 'ArrowLeft' ? -1 : 1);
+      if (await moveImage(id, to)) {
+        const moved = gallery.querySelector('[data-image-id="' + id + '"] .image-thumb');
+        if (moved) moved.focus();
+      }
+    });
+    gallery.addEventListener('change', async e => {
+      const input = e.target.closest('.image-alt');
+      if (!input) return;
+      const id = parseInt(input.dataset.altId, 10);
+      const caption = input.value.trim();
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + id, {
+        method: 'PUT', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ caption: caption || null }),
+      });
+      if (!resp.ok) { showSaveStatus('error', 'Alt text not saved'); return; }
+      const img = galleryImages.find(i => i.id === id);
+      if (img) img.caption = caption || null;
+      showSaveStatus('saved', 'Alt text saved');
+    });
+  })();
 
   function setupImageDrag(gallery) {
     let dragEl = null;
@@ -1133,21 +1217,7 @@
       if (target && dragId) {
         const dropId = target.dataset.imageId;
         if (dropId && dragId !== dropId) {
-          const fromIdx = imageOrder.indexOf(parseInt(dragId));
-          const toIdx = imageOrder.indexOf(parseInt(dropId));
-          if (fromIdx > -1 && toIdx > -1) {
-            imageOrder.splice(fromIdx, 1);
-            imageOrder.splice(toIdx, 0, parseInt(dragId));
-            for (let i = 0; i < imageOrder.length; i++) {
-              await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageOrder[i], {
-                method: 'PUT', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sort_order: i }),
-              });
-            }
-            showSaveStatus('saved', 'Image order updated');
-            loadImages();
-          }
+          await moveImage(parseInt(dragId, 10), imageOrder.indexOf(parseInt(dropId, 10)));
         }
       }
       dragEl = null;
@@ -1157,7 +1227,7 @@
     gallery.querySelectorAll('[data-image-id]').forEach(el => {
       el.setAttribute('draggable', 'false');
       el.addEventListener('mousedown', e => {
-        if (e.target.closest('button')) return;
+        if (e.target.closest('button, input')) return;
         e.preventDefault();
         dragEl = el;
         dragId = el.dataset.imageId;
@@ -1189,6 +1259,9 @@
   }
 
   window.deleteImage = async function(imageId) {
+    // Issue #258: warn before deleting an image the text still shows.
+    const inText = getEditorValue().includes('/images/' + imageId + '/view');
+    if (inText && !confirm('This image is used in your project text. Delete it anyway? The text will show a broken image until you remove it.')) return;
     await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageId, {
       method: 'DELETE', credentials: 'include',
     });
@@ -2196,7 +2269,29 @@
     updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> uploaded &amp; linked</span>');
   }
 
-  async function processDroppedFiles(fileList) {
+  // Issue #258: an image dropped on the text also goes into the text, as
+  // its own paragraph after the line it landed on. Returns where the next
+  // one should go.
+  function insertImageMarkdown(pos, alt, url) {
+    const view = mde.view;
+    const line = view.state.doc.lineAt(Math.min(pos, view.state.doc.length));
+    const blank = !line.text.trim();
+    const at = blank ? line.from : line.to;
+    const text = (blank ? '' : '\n\n') + '![' + alt.replace(/[[\]]/g, '') + '](' + url + ')\n';
+    view.dispatch({ changes: { from: at, insert: text } });
+    return at + text.length;
+  }
+
+  // The text position under a drop, or null when it wasn't on the editor.
+  function editorDropPos(e) {
+    if (!mde || !mde.element || !mde.view) return null;
+    const r = mde.element.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return null;
+    const pos = mde.view.posAtCoords({ x: e.clientX, y: e.clientY });
+    return pos == null ? mde.view.state.selection.main.head : pos;
+  }
+
+  async function processDroppedFiles(fileList, insertAt) {
     const files = Array.from(fileList || []);
     if (files.length === 0) return;
 
@@ -2242,8 +2337,13 @@
           needsFileReload = true;
           needsLinksReload = true;
         } else if (isImageFile(file)) {
-          await uploadSingleImage(file);
-          updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery</span>');
+          const img = await uploadSingleImage(file);
+          if (insertAt != null && mde) {
+            insertAt = insertImageMarkdown(insertAt, file.name.replace(/\.[^.]+$/, ''), imageViewUrl(img));
+            updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery and text</span>');
+          } else {
+            updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery</span>');
+          }
           imageCount++;
           needsImageReload = true;
         } else {
@@ -2322,8 +2422,9 @@
       // processDroppedFiles() routes by type: images → gallery,
       // README/index.md → markdown editor, LICENSE → linked file,
       // anything else in ALLOWED_FILE_EXTS → Files & Models.
+      // Images dropped on the text are also inserted where they land.
       const files = e.dataTransfer && e.dataTransfer.files;
-      if (files && files.length) processDroppedFiles(files);
+      if (files && files.length) processDroppedFiles(files, editorDropPos(e));
     });
 
     document.addEventListener('keydown', (e) => {

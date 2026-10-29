@@ -21,6 +21,7 @@ from ..schemas import (
     RemixedFromRef,
 )
 from ..slugs import slugify_title, unique_slug_for_author
+from ..visibility import can_view, is_draft, not_draft
 from .users import log_activity  # Issue #111: profile activity feed.
 
 
@@ -175,7 +176,9 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
 
     remixes_count = (
         await session.scalar(
-            select(func.count(Project.id)).where(Project.remixed_from_id == project.id)
+            select(func.count(Project.id)).where(
+                Project.remixed_from_id == project.id, not_draft()
+            )
         )
     ) or 0
 
@@ -234,6 +237,10 @@ async def list_projects(
         Project.status != "archived",
         Project.is_blocked == False,  # noqa: E712
     )
+    # Issue #260: drafts are private. The only listing that includes one
+    # is an author's own profile (``author`` == the caller).
+    if not (author and user and author == user):
+        query = query.where(not_draft())
     if difficulty:
         query = query.where(Project.difficulty == difficulty)
     if author:
@@ -310,7 +317,7 @@ async def get_project(
     session: AsyncSession = Depends(get_session),
 ) -> ProjectResponse:
     project = await session.get(Project, project_id)
-    if project is None:
+    if project is None or not can_view(project, user):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
     return await _project_response(session, project)
 
@@ -340,7 +347,7 @@ async def create_project(
         difficulty=body.difficulty,
         estimated_minutes=body.estimated_minutes,
         code_repo_url=body.code_repo_url,
-        status="wip",
+        status=body.status,
         author_username=user,
     )
     session.add(project)
@@ -350,15 +357,17 @@ async def create_project(
     # Issue #111: log create as a profile-activity event. project_updated
     # would be wrong (no audience yet) — we use the same row to mean
     # "started a project"; the listener treats it the same as a publish
-    # until the status flips to completed.
-    await log_activity(
-        session,
-        user_id=user,
-        kind="project_updated",
-        subject_id=project.id,
-        subject_title=project.title,
-        subject_url=f"/projects/view.html?id={project.id}",
-    )
+    # until the status flips to completed. Issue #260: a draft has no
+    # audience, so it logs nothing until it's published.
+    if not is_draft(project):
+        await log_activity(
+            session,
+            user_id=user,
+            kind="project_updated",
+            subject_id=project.id,
+            subject_title=project.title,
+            subject_url=f"/projects/view.html?id={project.id}",
+        )
     await session.commit()
     await session.refresh(project)
     # Issue #106: evaluate badges synchronously after the project row is
@@ -457,17 +466,19 @@ async def update_project(
     # Issue #111: emit activity. A status flip from non-completed to
     # completed is the first-time "publish" event; everything else is
     # generic project_updated. Archived → completed is also a publish.
+    # Issue #260: a draft has no audience, so edits to it log nothing.
     became_completed = (
         previous_status != "completed" and project.status == "completed"
     )
-    await log_activity(
-        session,
-        user_id=user,
-        kind="project_published" if became_completed else "project_updated",
-        subject_id=project.id,
-        subject_title=project.title,
-        subject_url=f"/projects/view.html?id={project.id}",
-    )
+    if not is_draft(project):
+        await log_activity(
+            session,
+            user_id=user,
+            kind="project_published" if became_completed else "project_updated",
+            subject_id=project.id,
+            subject_title=project.title,
+            subject_url=f"/projects/view.html?id={project.id}",
+        )
 
     await session.commit()
     await session.refresh(project)

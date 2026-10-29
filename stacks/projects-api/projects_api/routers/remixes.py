@@ -25,6 +25,7 @@ from ..auth import get_current_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..db import get_session
 from ..models import Project, ProjectTag
+from ..visibility import can_view, is_draft, not_draft
 from ..schemas import (
     ProjectListItem,
     ProjectResponse,
@@ -75,7 +76,7 @@ async def create_remix(
     everything afterwards via the normal editor flow.
     """
     original = await session.get(Project, project_id)
-    if original is None:
+    if original is None or not can_view(original, user):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
     if getattr(original, "is_blocked", False):
         raise HTTPException(
@@ -141,6 +142,7 @@ async def list_remixes(
             select(Project)
             .where(Project.remixed_from_id == project_id)
             .where(Project.is_blocked == False)  # noqa: E712
+            .where(not_draft())
             .order_by(Project.created_at.desc())
         )
     ).all()
@@ -189,6 +191,9 @@ async def remix_chain(
 
     items: list[ProjectListItem] = []
     for p in chain:
+        # Issue #260: drafts (other than the one asked about) stay private.
+        if is_draft(p) and p.id != project_id:
+            continue
         tags = await _get_tags(session, p.id)
         items.append(_list_item_from_project(p, tags))
     return items

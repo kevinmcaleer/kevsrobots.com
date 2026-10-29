@@ -29,17 +29,19 @@ remain valid.
 from __future__ import annotations
 
 import asyncio
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ..auth import require_terms_accepted
+from ..auth import get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..instructions_pdf import render_instructions_pdf
 from ..instructions_video import render_instructions_video
 from ..models import Instruction, InstructionStep, Project
+from ..visibility import hide_drafts
 from ..schemas import (
     InstructionCreate,
     InstructionExportRequest,
@@ -118,8 +120,10 @@ def _instruction_to_response(instruction: Instruction) -> InstructionResponse:
 async def get_instruction(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> InstructionResponse:
     """Public read — surfaces user-authored content like the other GETs."""
+    await hide_drafts(session, project_id, user)
     instruction = await _get_instruction(session, project_id)
     if instruction is None:
         raise HTTPException(
@@ -217,10 +221,12 @@ async def delete_instruction(
 async def list_steps(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[InstructionStepResponse]:
     """Public read. Steps come back in ``step_number`` ASC order; ties
     (which shouldn't happen post-renumber but might during a transient
     DB state) fall back to ``id`` ASC."""
+    await hide_drafts(session, project_id, user)
     instruction = await _get_instruction(session, project_id)
     if instruction is None:
         # Empty list rather than 404 — the steps collection is

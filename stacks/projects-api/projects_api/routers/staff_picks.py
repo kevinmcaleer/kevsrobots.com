@@ -22,6 +22,7 @@ from ..auth import get_optional_user
 from ..config import get_settings
 from ..db import get_session
 from ..models import Project, StaffPick, StaffPickItem
+from ..visibility import is_draft
 from ..schemas import (
     StaffPickCreate,
     StaffPickDetail,
@@ -78,7 +79,8 @@ async def _load_items(session: AsyncSession, pick_id: int) -> list[StaffPickItem
     for row in rows:
         project = await session.get(Project, row.project_id)
         project_ref: Optional[StaffPickProjectRef] = None
-        if project is not None:
+        # Issue #260: a project moved back to draft shows as missing.
+        if project is not None and not is_draft(project):
             project_ref = StaffPickProjectRef(
                 id=project.id,
                 slug=getattr(project, "slug", None),

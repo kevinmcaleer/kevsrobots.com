@@ -103,10 +103,11 @@ async def list_bom_by_slug(
     owner: str,
     slug: str,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[BOMItemResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await bom_router_module.list_bom(
-        project_id=project_id, session=session
+        project_id=project_id, session=session, user=user
     )
 
 
@@ -115,10 +116,11 @@ async def list_images_by_slug(
     owner: str,
     slug: str,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[ImageResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await images_router_module.list_images(
-        project_id=project_id, session=session
+        project_id=project_id, session=session, user=user
     )
 
 
@@ -127,10 +129,11 @@ async def list_files_by_slug(
     owner: str,
     slug: str,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[FileResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await files_router_module.list_files(
-        project_id=project_id, session=session
+        project_id=project_id, session=session, user=user
     )
 
 
@@ -139,10 +142,11 @@ async def list_links_by_slug(
     owner: str,
     slug: str,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[LinkResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await links_router_module.list_links(
-        project_id=project_id, session=session
+        project_id=project_id, session=session, user=user
     )
 
 
@@ -154,10 +158,11 @@ async def list_journal_by_slug(
     owner: str,
     slug: str,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[JournalEntryResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await journal_router_module.list_entries(
-        project_id=project_id, session=session
+        project_id=project_id, session=session, user=user
     )
 
 
@@ -166,8 +171,9 @@ async def list_makes_by_slug(
     owner: str,
     slug: str,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[MakeResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await makes_router_module.list_makes_for_project(
-        project_id=project_id, session=session
+        project_id=project_id, session=session, user=user
     )

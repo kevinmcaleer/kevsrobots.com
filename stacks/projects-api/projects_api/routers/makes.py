@@ -25,11 +25,12 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, require_terms_accepted
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..config import get_settings
 from ..db import get_session
 from ..models import Make, MakeImage, Project
+from ..visibility import can_view, hide_drafts
 from ..schemas import MakeImageResponse, MakeResponse
 from ..storage import (
     ALLOWED_IMAGE_EXTENSIONS,
@@ -113,7 +114,7 @@ async def create_make(
     session: AsyncSession = Depends(get_session),
 ) -> MakeResponse:
     project = await session.get(Project, project_id)
-    if project is None:
+    if project is None or not can_view(project, user):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
     # Filter out the empty UploadFile FastAPI sometimes synthesises when
@@ -229,7 +230,9 @@ async def create_make(
 async def list_makes_for_project(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[MakeResponse]:
+    await hide_drafts(session, project_id, user)
     makes = (
         await session.scalars(
             select(Make)

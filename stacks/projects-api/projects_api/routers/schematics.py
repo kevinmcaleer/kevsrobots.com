@@ -24,13 +24,16 @@ project's single schematic id onto the step.
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import require_terms_accepted
+from ..auth import get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectSchematic
+from ..visibility import hide_drafts
 from ..schemas import (
     ProjectSchematicCreate,
     ProjectSchematicResponse,
@@ -80,8 +83,10 @@ def _to_response(schematic: ProjectSchematic) -> ProjectSchematicResponse:
 async def get_schematic(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> ProjectSchematicResponse:
     """Public read — surfaces user-authored content."""
+    await hide_drafts(session, project_id, user)
     schematic = await _get_schematic(session, project_id)
     if schematic is None:
         raise HTTPException(

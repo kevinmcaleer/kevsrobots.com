@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, require_terms_accepted
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectLink
+from ..visibility import hide_drafts
 from ..schemas import LinkCreate, LinkResponse, LinkUpdate
 
 router = APIRouter(prefix="/api/projects/{project_id}/links", tags=["links"])
@@ -18,7 +21,9 @@ router = APIRouter(prefix="/api/projects/{project_id}/links", tags=["links"])
 async def list_links(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[LinkResponse]:
+    await hide_drafts(session, project_id, user)
     items = (
         await session.scalars(
             select(ProjectLink)

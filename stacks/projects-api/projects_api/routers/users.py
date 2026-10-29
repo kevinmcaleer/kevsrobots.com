@@ -43,6 +43,7 @@ from ..models import (
     UserFollow,
     UserProfile,
 )
+from ..visibility import not_draft
 from ..schemas import (
     FollowCheckResponse,
     UserActivityItem,
@@ -105,6 +106,7 @@ async def _compute_stats(session: AsyncSession, username: str) -> UserProfileSta
         select(func.count(Project.id)).where(
             Project.author_username == username,
             Project.is_blocked == False,  # noqa: E712
+            not_draft(),
         )
     ) or 0
     makes = await session.scalar(

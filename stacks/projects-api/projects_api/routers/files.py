@@ -16,6 +16,7 @@ from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Download, Project, ProjectFile, ProjectImage
+from ..visibility import hide_drafts
 from ..schemas import FileResponse, FileUpdate, ImageResponse
 from ..storage import (
     delete_file,
@@ -99,7 +100,9 @@ router = APIRouter(prefix="/api/projects/{project_id}/files", tags=["files"])
 async def list_files(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[FileResponse]:
+    await hide_drafts(session, project_id, user)
     items = (
         await session.scalars(
             select(ProjectFile)
