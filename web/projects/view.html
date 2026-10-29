@@ -671,6 +671,8 @@ description: View project details
 <!-- Builder-mode renderer — shared with the project editor's
      preview pane so the two surfaces emit identical markup. -->
 <script src="/assets/js/builder-renderer.js?v={{ site.time | date: '%s' }}"></script>
+<!-- Issue #257: a YouTube link on its own line plays inline. -->
+<script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -904,6 +906,7 @@ description: View project details
         const contentEl = document.getElementById('view-content');
         contentEl.innerHTML = marked.parse(project.content_md);
         styleMarkdownTables(contentEl);
+        ProjectEmbeds.embedVideos(contentEl);
         await renderMermaid();
         buildTOC();
       }
