@@ -2,9 +2,8 @@
 title: Project Editor
 layout: content
 description: Create or edit a project
-# Nibsy floats in the bottom-right corner and overlaps the project editor's
-# sidebar (completeness meter, metadata) on smaller screens. Hide it here
-# so the editor stays focused on the task.
+# Nibsy floats in the bottom-right corner, where the completeness overlay
+# sits. Hide it here so the editor stays focused on the task.
 hide_nibsy: true
 ---
 
@@ -94,11 +93,20 @@ hide_nibsy: true
 </style>
 
 <div class="container-fluid py-3">
+  <!-- Top bar: save state, project details drawer, View, and the
+       Draft / Published switch (it replaced the sidebar's status card). -->
   <div class="d-flex justify-content-end align-items-center mb-3">
     <div id="editor-status" class="d-flex align-items-center gap-2">
-      <a id="view-toggle-btn" href="#" class="btn btn-sm btn-outline-secondary d-none"><i class="fas fa-eye me-1"></i> View</a>
-      <span id="status-badge" class="badge bg-secondary">Draft</span>
       <span id="save-indicator" class="text-muted small"></span>
+      <button type="button" id="details-btn" class="btn btn-sm btn-outline-secondary"
+              data-bs-toggle="offcanvas" data-bs-target="#project-details" aria-controls="project-details">
+        <i class="fas fa-sliders-h me-1"></i> Details
+      </button>
+      <a id="view-toggle-btn" href="#" class="btn btn-sm btn-outline-secondary d-none"><i class="fas fa-eye me-1"></i> View</a>
+      <div class="form-check form-switch publish-switch mb-0" title="Switch on to publish this project">
+        <input class="form-check-input" type="checkbox" role="switch" id="publish-switch">
+        <label class="form-check-label small" for="publish-switch" id="publish-switch-label">Draft</label>
+      </div>
     </div>
   </div>
 
@@ -112,8 +120,8 @@ hide_nibsy: true
       <nav id="editor-toc-nav" class="toc-nav sticky-top" style="top:80px"></nav>
     </div>
 
-    <!-- MIDDLE: Main Content -->
-    <div class="col-lg-7">
+    <!-- MAIN: the editor takes the centre and right columns -->
+    <div class="col-lg-10">
       <!-- Title & Description -->
       <!-- Issue: early-adopter projects all shipped as "Untitled Project".
            Show a prominent warning when the title is empty or still the
@@ -141,6 +149,23 @@ hide_nibsy: true
       <!-- Markdown Editor (markdown-studio's editor bundle, mounted on the textarea) -->
       <div class="mb-4" id="content-markdown-pane">
         <textarea id="content-editor"></textarea>
+      </div>
+
+      <!-- Images: a gallery strip under the document -->
+      <div class="card mb-4" id="editor-images-section">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+          <span><i class="fas fa-camera me-1"></i> Images</span>
+          <!-- Click-to-pick only — the whole page is the dropzone (see
+               #global-dropzone above). -->
+          <label for="image-input" class="btn btn-sm btn-outline-primary mb-0">
+            <i class="fas fa-image me-1"></i> Choose images
+          </label>
+          <input type="file" id="image-input" class="d-none" multiple accept="image/*">
+        </div>
+        <div class="card-body">
+          <small class="text-muted d-block mb-2"><i class="fas fa-info-circle me-1"></i>First image is the cover. Drag to reorder, or drop images anywhere on the page.</small>
+          <div id="image-gallery" class="row g-2"></div>
+        </div>
       </div>
 
       <!-- File Upload -->
@@ -244,134 +269,98 @@ hide_nibsy: true
       </div>
     </div>
 
-    <!-- RIGHT SIDEBAR: Metadata (scrolls with main content) -->
-    <div class="col-lg-3">
-      <div>
-        <!-- Project Completeness (issue #137) -->
-        <div class="card mb-3" id="completeness-card">
-          <div class="card-header py-2 d-flex justify-content-between align-items-center">
-            <span>
-              <i class="fas fa-bullseye me-1"></i> Project Completeness
-              <!-- Shown only when completeness === 100%; the card body
-                   collapses at that point so the sidebar isn't dominated
-                   by a "you're done!" checklist. -->
-              <span id="completeness-complete-badge" class="badge bg-success ms-2 d-none">
-                <i class="fas fa-check"></i> Complete
-              </span>
-            </span>
-            <button type="button" class="btn btn-sm btn-link p-0 text-muted" id="completeness-info"
-                    data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="bottom"
-                    data-bs-html="true"
-                    data-bs-title="How completeness is scored"
-                    data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>BOM item</strong> (10) &middot; <strong>Code repo URL</strong> (10) &middot; <strong>File, journal entry, or video</strong> (10)"
-                    aria-label="How completeness is scored">
-              <i class="fas fa-circle-question"></i>
-            </button>
-          </div>
-          <div class="card-body">
-            <div class="d-flex align-items-baseline justify-content-between mb-2">
-              <span id="completeness-score" class="fs-3 fw-bold">0%</span>
-              <span id="completeness-points" class="small text-muted">0 / 100</span>
-            </div>
-            <div class="progress mb-3" style="height:8px">
-              <div id="completeness-bar" class="progress-bar completeness-bar-red" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <div id="completeness-next" class="alert alert-light small py-2 px-2 mb-2 d-none">
-              <strong>Next:</strong> <a href="#" id="completeness-next-link"></a>
-            </div>
-            <ul id="completeness-checklist" class="list-unstyled small mb-0"></ul>
-            <div id="completeness-celebration" class="text-center py-3 d-none">
-              <div class="display-6">&#127881;</div>
-              <div class="small">This project is feature complete &mdash; great work!</div>
-            </div>
-          </div>
-        </div>
+  </div>
+</div>
 
-        <div class="card mb-3">
-          <div class="card-header py-2">Metadata</div>
-          <div class="card-body">
-            <div class="row g-2 mb-3">
-              <div class="col-7">
-                <label class="form-label small text-muted">Difficulty</label>
-                <select id="project-difficulty" class="form-select form-select-sm">
-                  <option value="">Select...</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
-              <div class="col-5">
-                <label class="form-label small text-muted">Time (min)</label>
-                <input type="number" id="project-time" class="form-control form-control-sm" min="1" placeholder="e.g. 60">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small text-muted">Tags</label>
-              <div id="tags-container" class="d-flex flex-wrap gap-1 mb-1"></div>
-              <div class="input-group input-group-sm">
-                <input type="text" id="tag-input" class="form-control" placeholder="Add tag...">
-                <button class="btn btn-outline-secondary" id="add-tag-btn">Add</button>
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small text-muted">Code Repository URL</label>
-              <input type="url" id="project-repo" class="form-control form-control-sm" placeholder="https://github.com/...">
-            </div>
-          </div>
-        </div>
-
-        <!-- Images sidebar -->
-        <div class="card mb-3">
-          <div class="card-header py-2">
-            <i class="fas fa-camera me-1"></i> Images
-          </div>
-          <div class="card-body">
-            <!-- Click-to-pick only — the whole page is the dropzone (see
-                 #global-dropzone above). -->
-            <div class="text-center mb-2">
-              <label for="image-input" class="btn btn-outline-primary btn-sm">
-                <i class="fas fa-image me-1"></i> Choose images
-              </label>
-              <input type="file" id="image-input" class="d-none" multiple accept="image/*">
-            </div>
-            <small class="text-muted d-block mb-2"><i class="fas fa-info-circle me-1"></i>First image is the cover. Drag to reorder.</small>
-            <div id="image-gallery" class="row g-2"></div>
-          </div>
-        </div>
-
-        <!-- Build Journal sidebar -->
-        <div class="card mb-3">
-          <div class="card-header py-2">
-            <i class="fas fa-calendar-alt me-2"></i> Build Journal
-          </div>
-          <div class="card-body p-2">
-            <input type="text" id="journal-input" class="form-control form-control-sm border-0 mb-2"
-                   placeholder="What did you work on? Press Enter..." autocomplete="off">
-            <div id="journal-list"></div>
-          </div>
-        </div>
-
-        <!-- Status -->
-        <div class="card mb-3">
-          <div class="card-header py-2">Project Status</div>
-          <div class="card-body">
-            <select id="project-status" class="form-select form-select-sm">
-              <option value="wip">🔨 Work in Progress</option>
-              <option value="completed">✅ Completed</option>
-              <option value="archived">📦 Archived (hidden from listing)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="d-grid gap-2">
-          <a href="#" id="view-live-btn" class="btn btn-outline-primary" style="display:none" target="_blank"><i class="fas fa-external-link-alt me-1"></i> View Project</a>
-          <button class="btn btn-outline-danger btn-sm mt-2" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete Project</button>
-        </div>
+<!-- Project details drawer, opened from the top bar's Details button -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="project-details" aria-labelledby="project-details-title">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="project-details-title"><i class="fas fa-sliders-h me-2"></i>Project details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="row g-2 mb-3">
+      <div class="col-7">
+        <label class="form-label small text-muted" for="project-difficulty">Difficulty</label>
+        <select id="project-difficulty" class="form-select form-select-sm">
+          <option value="">Select...</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
       </div>
+      <div class="col-5">
+        <label class="form-label small text-muted" for="project-time">Time (min)</label>
+        <input type="number" id="project-time" class="form-control form-control-sm" min="1" placeholder="e.g. 60">
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label small text-muted" for="tag-input">Tags</label>
+      <div id="tags-container" class="d-flex flex-wrap gap-1 mb-1"></div>
+      <div class="input-group input-group-sm">
+        <input type="text" id="tag-input" class="form-control" placeholder="Add tag...">
+        <button class="btn btn-outline-secondary" id="add-tag-btn">Add</button>
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="form-label small text-muted" for="project-repo">Code Repository URL</label>
+      <input type="url" id="project-repo" class="form-control form-control-sm" placeholder="https://github.com/...">
+    </div>
+
+    <hr>
+    <div class="d-grid gap-2">
+      <!-- Archiving hides the project from the hub without deleting it.
+           Publishing again (top bar switch) brings it back. -->
+      <button type="button" class="btn btn-outline-secondary btn-sm" id="archive-btn"><i class="fas fa-box-archive me-1"></i> Archive project</button>
+      <button type="button" class="btn btn-outline-danger btn-sm" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete project</button>
     </div>
   </div>
 </div>
+
+<!-- Project Completeness (issue #137): a collapsible overlay pinned to the
+     bottom right of the page. The collapsed state is remembered per browser. -->
+<aside class="card shadow completeness-overlay d-none" id="completeness-card" aria-label="Project completeness">
+  <div class="card-header py-2 d-flex align-items-center gap-2">
+    <button type="button" class="btn btn-link p-0 text-reset text-decoration-none flex-grow-1 text-start completeness-toggle"
+            id="completeness-toggle" aria-expanded="true" aria-controls="completeness-body">
+      <i class="fas fa-bullseye me-1"></i> Project Completeness
+      <span id="completeness-mini" class="badge bg-light text-dark ms-1">0%</span>
+      <!-- Shown only when completeness === 100%; the body collapses then. -->
+      <span id="completeness-complete-badge" class="badge bg-success ms-1 d-none">
+        <i class="fas fa-check"></i> Complete
+      </span>
+    </button>
+    <button type="button" class="btn btn-sm btn-link p-0 text-muted" id="completeness-info"
+            data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top"
+            data-bs-html="true"
+            data-bs-title="How completeness is scored"
+            data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>BOM item</strong> (10) &middot; <strong>Code repo URL</strong> (10) &middot; <strong>File or video</strong> (10)"
+            aria-label="How completeness is scored">
+      <i class="fas fa-circle-question"></i>
+    </button>
+    <button type="button" class="btn btn-sm btn-link p-0 text-muted completeness-chevron" id="completeness-collapse"
+            aria-controls="completeness-body" aria-label="Collapse project completeness">
+      <i class="fas fa-chevron-down"></i>
+    </button>
+  </div>
+  <div class="card-body" id="completeness-body">
+    <div class="d-flex align-items-baseline justify-content-between mb-2">
+      <span id="completeness-score" class="fs-3 fw-bold">0%</span>
+      <span id="completeness-points" class="small text-muted">0 / 100</span>
+    </div>
+    <div class="progress mb-3" style="height:8px">
+      <div id="completeness-bar" class="progress-bar completeness-bar-red" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    <div id="completeness-next" class="alert alert-light small py-2 px-2 mb-2 d-none">
+      <strong>Next:</strong> <a href="#" id="completeness-next-link"></a>
+    </div>
+    <ul id="completeness-checklist" class="list-unstyled small mb-0"></ul>
+    <div id="completeness-celebration" class="text-center py-3 d-none">
+      <div class="display-6">&#127881;</div>
+      <div class="small">This project is feature complete &mdash; great work!</div>
+    </div>
+  </div>
+</aside>
 
 <!-- Issue #255: markdown-studio's Markdown editor, vendored by
      scripts/update-markdown-editor.sh. Its spelling word lists load from

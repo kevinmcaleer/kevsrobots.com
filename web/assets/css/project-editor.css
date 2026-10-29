@@ -229,71 +229,6 @@
   background: #f0f4f8;
 }
 
-/* Journal entries */
-#journal-input {
-  background: #f8f9fa;
-  font-size: 0.85rem;
-}
-
-#journal-input:focus {
-  background: white;
-  box-shadow: none;
-  border-bottom: 2px solid #4A90D9 !important;
-}
-
-.journal-entry {
-  padding: 6px 8px;
-  border-radius: 6px;
-  position: relative;
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-
-.journal-entry:hover {
-  background: #f8f9fa;
-}
-
-.journal-entry .journal-actions {
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.journal-entry:hover .journal-actions {
-  opacity: 1;
-}
-
-.journal-entry .journal-actions button {
-  border: none;
-  background: none;
-  padding: 0 3px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  color: #999;
-}
-
-.journal-entry .journal-actions button:hover {
-  color: #333;
-}
-
-.journal-entry .journal-actions button.delete-journal:hover {
-  color: #dc3545;
-}
-
-.journal-entry .journal-date {
-  font-size: 0.7rem;
-  color: #aaa;
-}
-
-.journal-entry .journal-edit-input {
-  font-size: 0.85rem;
-  border: none;
-  border-bottom: 1px solid #4A90D9;
-  background: transparent;
-  width: 100%;
-  padding: 0;
-  outline: none;
-}
-
 /* Save indicator */
 #save-indicator {
   font-size: 0.8rem;
@@ -596,6 +531,60 @@
 }
 
 /* --- Project completeness meter (issue #137) --- */
+/* Pinned to the bottom right, above the Feedback button (which sits at
+   bottom: 1.5rem). Collapses to just its header. */
+.completeness-overlay {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 5rem;
+  width: 320px;
+  max-width: calc(100vw - 2rem);
+  z-index: 1030;
+}
+.completeness-overlay .card-body {
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+}
+.completeness-overlay.is-collapsed .card-body {
+  display: none;
+}
+.completeness-overlay.is-collapsed .card-header {
+  border-bottom: 0;
+}
+.completeness-overlay .completeness-toggle {
+  font-size: 0.95rem;
+}
+@media (max-width: 575.98px) {
+  .completeness-overlay {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
+}
+
+/* Leave room at the end of the page so the overlay never covers the
+   last section (Videos). */
+#editor-container {
+  padding-bottom: 6rem;
+}
+
+/* Top bar Draft / Published switch */
+.publish-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-left: 0;
+}
+.publish-switch .form-check-input {
+  margin: 0;
+  float: none;
+  cursor: pointer;
+}
+.publish-switch .form-check-label {
+  min-width: 4.5rem;
+  cursor: pointer;
+}
+
 #completeness-card .progress {
   background-color: #eef0f2;
   border-radius: 4px;

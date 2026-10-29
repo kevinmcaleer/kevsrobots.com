@@ -46,7 +46,8 @@
   const repoInput = document.getElementById('project-repo');
   const tagsContainer = document.getElementById('tags-container');
   const tagInput = document.getElementById('tag-input');
-  const statusBadge = document.getElementById('status-badge');
+  const publishSwitch = document.getElementById('publish-switch');
+  const publishSwitchLabel = document.getElementById('publish-switch-label');
   const saveIndicator = document.getElementById('save-indicator');
   // --- Auth ---
   const IS_LOCAL = location.hostname === 'localhost'
@@ -123,7 +124,6 @@
       loadVideos();
       loadFiles();
       loadImages();
-      loadJournal();
     } catch (e) {
       console.error('Failed to load project:', e);
     }
@@ -199,21 +199,39 @@
 
   // --- Save / Status / Delete --- (autosave only; no manual save button)
 
-  const statusSelect = document.getElementById('project-status');
-  if (statusSelect) statusSelect.addEventListener('change', async () => {
+  // The top bar's switch is Draft (``wip``) / Published (``completed``).
+  // Archived lives in the details drawer; publishing again un-archives.
+  async function setStatus(status) {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     try {
       const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
         method: 'PUT', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: statusSelect.value }),
+        body: JSON.stringify({ status: status }),
       });
       if (resp.ok) {
         currentProject = await resp.json();
         updateStatusBadge(currentProject.status);
         showSaveStatus('saved', 'Status updated');
+        if (window.BadgeToast) BadgeToast.fromResponse(currentProject);
+      } else {
+        throw new Error('HTTP ' + resp.status);
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      showSaveStatus('error', 'Status not saved');
+      updateStatusBadge(currentProject ? currentProject.status : 'wip');
+    }
+  }
+
+  if (publishSwitch) publishSwitch.addEventListener('change', () => {
+    setStatus(publishSwitch.checked ? 'completed' : 'wip');
+  });
+
+  const archiveBtn = document.getElementById('archive-btn');
+  if (archiveBtn) archiveBtn.addEventListener('click', () => {
+    const archived = currentProject && currentProject.status === 'archived';
+    setStatus(archived ? 'wip' : 'archived');
   });
 
   const deleteBtn = document.getElementById('delete-btn');
@@ -228,14 +246,16 @@
     } catch (e) { console.error(e); }
   });
 
-  const statusLabels = { wip: 'Work in Progress', completed: 'Completed', archived: 'Archived' };
-  const statusColors = { wip: 'bg-info', completed: 'bg-success', archived: 'bg-secondary' };
+  const statusLabels = { wip: 'Draft', completed: 'Published', archived: 'Archived' };
 
   function updateStatusBadge(status) {
-    statusBadge.textContent = statusLabels[status] || status;
-    statusBadge.className = 'badge ' + (statusColors[status] || 'bg-secondary');
-    if (statusSelect) statusSelect.value = status;
-    const viewLiveBtn = document.getElementById('view-live-btn');
+    if (publishSwitch) publishSwitch.checked = status === 'completed';
+    if (publishSwitchLabel) publishSwitchLabel.textContent = statusLabels[status] || status;
+    if (archiveBtn) {
+      archiveBtn.innerHTML = status === 'archived'
+        ? '<i class="fas fa-box-open me-1"></i> Unarchive (back to draft)'
+        : '<i class="fas fa-box-archive me-1"></i> Archive project';
+    }
     const viewToggle = document.getElementById('view-toggle-btn');
     if (currentProject) {
       // Issue #152: link to the canonical /projects/<owner>/<slug> URL
@@ -244,10 +264,6 @@
       var liveUrl = (currentProject.slug && currentProject.author_username)
         ? '/projects/' + encodeURIComponent(currentProject.author_username) + '/' + encodeURIComponent(currentProject.slug)
         : '/projects/view.html?id=' + currentProject.id;
-      if (viewLiveBtn) {
-        viewLiveBtn.style.display = '';
-        viewLiveBtn.href = liveUrl;
-      }
       if (viewToggle) {
         viewToggle.classList.remove('d-none');
         viewToggle.href = liveUrl;
@@ -1027,7 +1043,7 @@
     gallery.innerHTML = images.map((img, idx) => {
       const imgUrl = API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
       return `
-      <div class="col-4" data-image-id="${img.id}" draggable="true">
+      <div class="col-6 col-sm-4 col-md-3 col-xl-2" data-image-id="${img.id}" draggable="true">
         <div class="image-thumb ${idx === 0 ? 'is-cover' : ''}">
           <img src="${imgUrl}" alt="${img.filename}" data-view-idx="${idx}" class="iv-clickable">
           <button class="delete-overlay" onclick="event.stopPropagation();deleteImage(${img.id})"><i class="fas fa-trash"></i></button>
@@ -2024,118 +2040,9 @@
     loadVideos();
   };
 
-  // --- Journal ---
-  const journalInput = document.getElementById('journal-input');
-
-  async function postJournalEntry(text) {
-    const url = API + '/api/projects/' + currentProject.id + '/journal';
-    const body = JSON.stringify({ title: text, status: 'in_progress' });
-    const doFetch = () => apiFetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-    });
-    try {
-      return await doFetch();
-    } catch (err) {
-      // Single retry on transient network failures (Failed to fetch, etc.)
-      console.warn('Journal POST failed, retrying once:', err);
-      await new Promise(r => setTimeout(r, 250));
-      return await doFetch();
-    }
-  }
-
-  journalInput.addEventListener('keydown', async (e) => {
-    if (e.key !== 'Enter') return;
-    e.preventDefault();
-    const text = journalInput.value.trim();
-    if (!text) return;
-    if (!currentProject) { await saveProject(); if (!currentProject) return; }
-    journalInput.disabled = true;
-    try {
-      const resp = await postJournalEntry(text);
-      if (!resp.ok) {
-        const bodyText = await resp.text().catch(() => '');
-        console.error('Journal add failed:', resp.status, bodyText);
-        alert('Could not save journal entry (HTTP ' + resp.status + '). ' + (bodyText || ''));
-        return;
-      }
-      journalInput.value = '';
-      loadJournal();
-    } catch (err) {
-      console.error('Journal add error:', err);
-      alert('Could not save journal entry: ' + err.message
-        + '\n\nCheck the browser console + Network tab for details.');
-    } finally {
-      journalInput.disabled = false;
-      journalInput.focus();
-    }
-  });
-
-  function formatTimeAgo(dateStr) {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return mins + 'm ago';
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return hrs + 'h ago';
-    const days = Math.floor(hrs / 24);
-    if (days < 7) return days + 'd ago';
-    return new Date(dateStr).toLocaleDateString();
-  }
-
-  async function loadJournal() {
-    if (!currentProject) return;
-    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/journal', { credentials: 'include' });
-    const entries = await resp.json();
-    document.getElementById('journal-list').innerHTML = entries.map(e => `
-      <div class="journal-entry" data-entry-id="${e.id}">
-        <div class="d-flex justify-content-between align-items-start">
-          <span class="journal-text">${e.title}</span>
-          <span class="journal-actions">
-            <button class="edit-journal" onclick="editJournal(${e.id}, this)" title="Edit"><i class="fas fa-pencil-alt"></i></button>
-            <button class="delete-journal" onclick="deleteJournal(${e.id})" title="Delete"><i class="fas fa-times"></i></button>
-          </span>
-        </div>
-        <span class="journal-date">${formatTimeAgo(e.created_at)}</span>
-      </div>
-    `).join('');
-  }
-
-  window.deleteJournal = async function(entryId) {
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/journal/' + entryId, {
-      method: 'DELETE', credentials: 'include',
-    });
-    loadJournal();
-  };
-
-  window.editJournal = function(entryId, btn) {
-    const entry = btn.closest('.journal-entry');
-    const textEl = entry.querySelector('.journal-text');
-    const current = textEl.textContent;
-    textEl.innerHTML = '<input type="text" class="journal-edit-input" value="' + current.replace(/"/g, '&quot;') + '">';
-    const input = textEl.querySelector('input');
-    input.focus();
-    input.select();
-
-    async function save() {
-      const newText = input.value.trim();
-      if (newText && newText !== current) {
-        await apiFetch(API + '/api/projects/' + currentProject.id + '/journal/' + entryId, {
-          method: 'PUT', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: newText, status: 'in_progress' }),
-        });
-      }
-      loadJournal();
-    }
-
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); save(); }
-      if (e.key === 'Escape') loadJournal();
-    });
-    input.addEventListener('blur', save);
-  };
+  // The Build Journal was retired from the editor (it belongs in the
+  // page content now). Existing entries stay stored and the API is
+  // unchanged; the editor just no longer reads or writes them.
 
   // --- Auto-save on input ---
   [titleInput, descInput, difficultySelect, timeInput, repoInput].forEach(el => {
@@ -2436,7 +2343,7 @@
       check: () => titleInput && titleInput.value.trim().length >= 3 },
     { key: 'desc',   points: 10, label: 'Write a short description',           target: 'project-description',
       check: () => descInput && descInput.value.trim().length >= 10 },
-    { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'image-input',
+    { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'editor-images-section',
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
     { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',
       target: 'content-editor',
@@ -2452,10 +2359,9 @@
     { key: 'repo',   points: 10, label: 'Link a code repository',              target: 'project-repo',
       check: () => repoInput && repoInput.value.trim().length > 0 },
     // Issue #171: a YouTube video counts toward "extra content" too —
-    // it's just as much a doc artefact as a file or a journal entry.
-    { key: 'extra',  points: 10, label: 'Add a file, journal entry, or video', target: 'journal-input',
+    // it's just as much a doc artefact as a file.
+    { key: 'extra',  points: 10, label: 'Add a file or video',                 target: 'editor-files-section',
       check: () => document.querySelectorAll('#file-list tbody tr').length > 0
-                || document.querySelectorAll('#journal-list .journal-entry').length > 0
                 || document.querySelectorAll('#videos-body tr').length > 0 },
   ];
 
@@ -2498,6 +2404,8 @@
     const pct = Math.round(earned);
 
     scoreEl.textContent = pct + '%';
+    const miniEl = document.getElementById('completeness-mini');
+    if (miniEl) miniEl.textContent = pct + '%';
     if (pointsEl) pointsEl.textContent = earned + ' / 100';
     barEl.style.width = pct + '%';
     barEl.setAttribute('aria-valuenow', String(pct));
@@ -2509,8 +2417,10 @@
     if (pct >= 100) {
       if (cardBody) cardBody.classList.add('d-none');
       if (completeBadge) completeBadge.classList.remove('d-none');
+      if (miniEl) miniEl.classList.add('d-none');
       return;
     }
+    if (miniEl) miniEl.classList.remove('d-none');
     if (cardBody) cardBody.classList.remove('d-none');
     if (completeBadge) completeBadge.classList.add('d-none');
     if (celebrateEl) celebrateEl.classList.add('d-none');
@@ -2553,6 +2463,15 @@
   function focusCompletenessTarget(id) {
     const el = document.getElementById(id);
     if (!el) return;
+    // Metadata fields live in the details drawer: open it, then focus.
+    const drawer = el.closest('.offcanvas');
+    if (drawer && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
+      const focusField = () => { try { el.focus(); } catch (_) {} };
+      if (drawer.classList.contains('show')) { focusField(); return; }
+      drawer.addEventListener('shown.bs.offcanvas', focusField, { once: true });
+      bootstrap.Offcanvas.getOrCreateInstance(drawer).show();
+      return;
+    }
     try {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (e) {
@@ -2603,7 +2522,7 @@
   }
 
   // Watch DOM sections we render imperatively (tags badges, BOM rows, gallery,
-  // file list, journal list). MutationObserver keeps the meter in sync without
+  // file list, videos). MutationObserver keeps the meter in sync without
   // touching every render function call site.
   function _observe(id) {
     const el = document.getElementById(id);
@@ -2614,7 +2533,6 @@
   _observe('bom-body');
   _observe('image-gallery');
   _observe('file-list');
-  _observe('journal-list');
   // Issue #171: re-score the completeness meter when a video lands.
   _observe('videos-body');
 
@@ -2626,6 +2544,37 @@
     const btn = document.getElementById('completeness-info');
     if (!btn || typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
     new bootstrap.Popover(btn);
+  })();
+
+  // Collapse / expand the overlay. Remembered per browser; small screens
+  // start collapsed so the overlay doesn't cover the document.
+  (function initCompletenessOverlay() {
+    const card = document.getElementById('completeness-card');
+    const toggle = document.getElementById('completeness-toggle');
+    const chevron = document.getElementById('completeness-collapse');
+    if (!card || !toggle) return;
+    const KEY = 'projectEditor.completenessCollapsed';
+    let collapsed = window.matchMedia('(max-width: 991.98px)').matches;
+    try {
+      const saved = localStorage.getItem(KEY);
+      if (saved !== null) collapsed = saved === '1';
+    } catch (e) {}
+    function apply() {
+      card.classList.toggle('is-collapsed', collapsed);
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      if (chevron) {
+        chevron.setAttribute('aria-label', (collapsed ? 'Expand' : 'Collapse') + ' project completeness');
+        chevron.innerHTML = '<i class="fas fa-chevron-' + (collapsed ? 'up' : 'down') + '"></i>';
+      }
+    }
+    function flip() {
+      collapsed = !collapsed;
+      try { localStorage.setItem(KEY, collapsed ? '1' : '0'); } catch (e) {}
+      apply();
+    }
+    toggle.addEventListener('click', flip);
+    if (chevron) chevron.addEventListener('click', flip);
+    apply();
   })();
 
   // First paint so the meter shows 0% (new projects) or actual score (after load).
@@ -2640,6 +2589,8 @@
     if (projectId) await loadProject();
     initEditor();
     editorContainer.classList.remove('d-none');
+    const completenessCard = document.getElementById('completeness-card');
+    if (completenessCard) completenessCard.classList.remove('d-none');
     recomputeCompleteness();
   }
 
