@@ -35,13 +35,15 @@
       tail = md.endsWith('\n') ? '\n' : '\n\n';
     }
     const insert = lead + md + tail;
+    // Focus first: when the cursor is in a table, the editor then carries
+    // on in the cell the text went into.
+    view.focus();
     view.dispatch({
       changes: { from: head, to: state.selection.main.to, insert },
       selection: { anchor: head + insert.length },
       scrollIntoView: true,
       userEvent: 'input',
     });
-    view.focus();
   }
 
   function mdLinkText(s) {
@@ -53,6 +55,19 @@
   }
 
   // ------------------------------------------------------------ picker
+
+  // Where the cursor is on screen: in a table's cell (the `/` menu there
+  // leaves the caret in the cell), or in the text.
+  function caretRect(view) {
+    const active = document.activeElement;
+    if (active && /^T[DH]$/.test(active.tagName) && view.contentDOM.contains(active)) {
+      const sel = window.getSelection();
+      const rect = sel.rangeCount ? sel.getRangeAt(0).getClientRects()[0] : null;
+      // A caret at the end of a cell can measure as an empty box.
+      return rect && rect.height ? rect : active.getBoundingClientRect();
+    }
+    return view.coordsAtPos(view.state.selection.main.head);
+  }
 
   let open = null; // the picker that's showing, so a second one replaces it
 
@@ -78,15 +93,18 @@
     input.setAttribute('aria-label', opts.placeholder || 'Search');
     document.body.appendChild(el);
 
-    const at = view.coordsAtPos(view.state.selection.main.head);
+    const at = caretRect(view);
     const box = view.dom.getBoundingClientRect();
     const left = at ? at.left : box.left;
     const top = at ? at.bottom + 4 : box.top;
     el.style.left = Math.max(8, Math.min(left, window.innerWidth - el.offsetWidth - 8)) + 'px';
-    // Above the cursor when a full list (about 320px) wouldn't fit below.
-    const tall = 320;
-    el.style.top = (top + tall > window.innerHeight - 8 && at
-      ? Math.max(8, at.top - Math.min(tall, el.offsetHeight + 260) - 4) : top) + 'px';
+    // Above the cursor, growing upwards, when a full list (about 320px)
+    // wouldn't fit below.
+    if (at && top + 320 > window.innerHeight - 8 && at.top > 320) {
+      el.style.bottom = (window.innerHeight - at.top + 4) + 'px';
+    } else {
+      el.style.top = top + 'px';
+    }
 
     let items = null; // null while loading
     let shown = [];
@@ -260,6 +278,7 @@
         keywords: ['youtube', 'embed', 'film'],
         group: 'project',
         icon: ICONS.video,
+        block: true,
         run: view => openPicker(view, {
           placeholder: 'Paste a YouTube URL…',
           empty: 'Paste a YouTube link to embed it',
@@ -289,12 +308,23 @@
         run: view => openPicker(view, {
           placeholder: 'Find a part in the Bill of Materials…',
           empty: 'Add parts to the Bill of Materials first',
-          load: async () => (await ctx.listParts()).map(p => ({
-            label: p.name,
-            detail: p.detail || '',
-            icon: ICONS.part,
-            pick: () => insertAtCursor(view, p.url ? '[' + mdLinkText(p.name) + '](' + p.url + ')' : p.name, false),
-          })),
+          load: async () => {
+            // The Bill of Materials table in the text, then the structured
+            // BOM rows it doesn't already name.
+            const parts = bomTableParts(view.state.doc.toString());
+            const byName = new Map(parts.map(p => [p.name.toLowerCase(), p]));
+            for (const p of await ctx.listParts()) {
+              const same = byName.get(p.name.toLowerCase());
+              if (!same) parts.push(p);
+              else if (!same.url) same.url = p.url; // a catalog link the table lacks
+            }
+            return parts.map(p => ({
+              label: p.name,
+              detail: p.detail || '',
+              icon: ICONS.part,
+              pick: () => insertAtCursor(view, p.url ? '[' + mdLinkText(p.name) + '](' + p.url + ')' : p.name, false),
+            }));
+          },
         }),
       },
       {
@@ -303,6 +333,7 @@
         keywords: ['mermaid', 'flowchart', 'sequence', 'state', 'chart'],
         group: 'project',
         icon: ICONS.diagram,
+        block: true,
         run: view => openPicker(view, {
           placeholder: 'Pick a diagram…',
           load: () => ctx.diagrams.map(d => ({
@@ -314,6 +345,45 @@
         }),
       },
     ]);
+  }
+
+  // The parts listed in the Markdown table under the Bill of Materials
+  // heading: { name, url (when the cell is a link), detail }. The part is
+  // the column headed Part, Item, Name or Component (else the first), and
+  // Qty or Quantity gives the count.
+  function bomTableParts(markdown) {
+    const lines = markdown.split('\n');
+    const cells = line => line.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '')
+      .split(/(?<!\\)\|/).map(c => c.trim());
+    let i = lines.findIndex(line => {
+      const m = line.match(/^#{1,6}\s+(.*?)\s*#*\s*$/);
+      return m && window.ProjectSections.match(m[1]) === window.ProjectSections.get('bill-of-materials');
+    });
+    if (i < 0) return [];
+    // The first table before the next heading.
+    for (i++; i < lines.length && !/^\s*\|/.test(lines[i]); i++) {
+      if (/^#{1,6}\s/.test(lines[i])) return [];
+    }
+    if (i + 1 >= lines.length || !/^\s*\|?\s*:?-{3,}/.test(lines[i + 1])) return [];
+    const header = cells(lines[i]).map(h => h.toLowerCase());
+    let nameCol = header.findIndex(h => /^(part|parts|item|name|component)s?$/.test(h));
+    if (nameCol < 0) nameCol = 0;
+    const qtyCol = header.findIndex(h => /^(qty|quantity|count)$/.test(h));
+    const parts = [];
+    for (let r = i + 2; r < lines.length && /^\s*\|/.test(lines[r]); r++) {
+      const row = cells(lines[r]);
+      const raw = (row[nameCol] || '').replace(/\\\|/g, '|');
+      const link = raw.match(/^\[([^\]]+)\]\(([^)\s]+)[^)]*\)$/);
+      const name = (link ? link[1] : raw).replace(/[*_`]/g, '').trim();
+      if (!name) continue;
+      const qty = qtyCol >= 0 ? row[qtyCol] : '';
+      parts.push({
+        name,
+        url: link ? link[2] : null,
+        detail: (qty ? qty + ' \u00d7 \u00b7 ' : '') + 'in the Bill of Materials table',
+      });
+    }
+    return parts;
   }
 
   // What a canonical section command inserts: its H1 (exactly as
@@ -342,5 +412,5 @@
     }
   }
 
-  window.ProjectSlashCommands = { create, openPicker, insertAtCursor };
+  window.ProjectSlashCommands = { create, openPicker, insertAtCursor, bomTableParts };
 })();
