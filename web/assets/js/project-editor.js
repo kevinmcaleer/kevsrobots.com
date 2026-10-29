@@ -916,14 +916,15 @@
     // existing text to flip into an input; Enter / blur saves; Escape
     // cancels. Long descriptions wrap in the column via the
     // .file-description CSS rule (max-width + word-break).
-    list.innerHTML = `<table class="table table-single table-narrow table-hover mb-0">
+    // Full width; the Description column takes the spare room.
+    list.innerHTML = `<table class="table table-single table-hover mb-0 files-table">
       <thead>
         <tr>
           <th style="width:20px"></th>
           <th>File</th>
-          <th>Description</th>
+          <th class="w-100">Description</th>
           <th class="text-muted small">Kind</th>
-          <th class="text-muted small text-end" style="width:70px">Size</th>
+          <th class="text-muted small text-end">Size</th>
           <th style="width:30px"></th>
         </tr>
       </thead>
@@ -933,7 +934,7 @@
           <td><a href="${API}/api/projects/${currentProject.id}/files/${f.id}/download">${escapeHtmlAttr(f.filename)}</a></td>
           <td class="file-description" data-file-id="${f.id}">${renderFileDescription(f.description)}</td>
           <td class="text-muted small">${fileKind(f.filename)}</td>
-          <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
+          <td class="text-muted small text-end">${(f.file_size / 1024).toFixed(1)} KB</td>
           <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})"><i class="fas fa-trash fa-xs"></i></button></td>
         </tr>
       `).join('')}</tbody></table>`;
