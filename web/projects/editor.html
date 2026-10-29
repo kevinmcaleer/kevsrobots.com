@@ -191,28 +191,6 @@ hide_nibsy: true
         </div>
       </div>
 
-      <!-- Videos (issue #171: first-class YouTube video list) -->
-      <div class="card mb-4" id="editor-videos-section">
-        <div class="card-header py-2 d-flex justify-content-between align-items-center">
-          <span><i class="fab fa-youtube me-1 text-danger"></i> Videos</span>
-          <button class="btn btn-sm btn-outline-primary" id="add-video-btn"><i class="fas fa-plus"></i> Add Video</button>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-single table-narrow mb-0" id="videos-table">
-            <thead>
-              <tr>
-                <th style="width:80px"></th>
-                <th>YouTube URL or ID</th>
-                <th>Title (optional)</th>
-                <th style="width:90px">Order</th>
-                <th style="width:40px"></th>
-              </tr>
-            </thead>
-            <tbody id="videos-body"></tbody>
-          </table>
-          <p id="videos-empty" class="text-muted small p-3 mb-0 d-none">No videos yet &mdash; paste a YouTube URL above.</p>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -372,10 +350,6 @@ hide_nibsy: true
     // Page sections rendered outside the editor
     const extras = [];
     extras.push({ key: 'editor-files-section', text: 'Files & Models' });
-    // Issue #171: surface the videos card when at least one video is present.
-    if (document.querySelectorAll('#videos-body tr').length > 0) {
-      extras.push({ key: 'editor-videos-section', text: 'Videos' });
-    }
 
     const toc = ProjectToc.render(nav, entries, {
       extras,
@@ -399,14 +373,6 @@ hide_nibsy: true
       clearTimeout(render._t);
       render._t = setTimeout(render, 150);
     });
-    // Re-render the TOC when the Videos card gains or loses rows (issue #171).
-    const videosBody = document.getElementById('videos-body');
-    if (videosBody) {
-      new MutationObserver(() => {
-        clearTimeout(render._t);
-        render._t = setTimeout(render, 50);
-      }).observe(videosBody, { childList: true });
-    }
     render();
   }
 

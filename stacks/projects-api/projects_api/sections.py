@@ -19,6 +19,7 @@ SECTIONS: list[tuple[str, str]] = [
     ("code", "Code"),
     ("code-repository", "Code repository"),
     ("3d-printed-parts", "3D printed parts"),
+    ("videos", "Videos"),
 ]
 
 _HEADING = re.compile(r"^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$")

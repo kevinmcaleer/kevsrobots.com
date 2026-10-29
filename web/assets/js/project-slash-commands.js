@@ -286,6 +286,27 @@
         load: async () => [],
       });
     }
+    // Videos likewise asks for the first one, then starts the table
+    // (more rows can go under it). The project's video list follows it.
+    const videos = sections.find(c => c.id === 'section-videos');
+    if (videos) {
+      const head = '# ' + window.ProjectSections.get('videos').heading + '\n\n| Video | Title |\n| --- | --- |\n';
+      delete videos.insert;
+      videos.run = view => openPicker(view, {
+        placeholder: 'Paste a YouTube link…',
+        empty: 'Paste a YouTube link to start the Videos table',
+        free: q => {
+          const id = window.ProjectEmbeds.youTubeId(q);
+          return id ? {
+            label: 'Add this video',
+            detail: id,
+            icon: ICONS.video,
+            pick: () => insertAtCursor(view, head + '| ' + window.ProjectEmbeds.videoMarkdown(id) + ' |  |\n', true),
+          } : null;
+        },
+        load: async () => [],
+      });
+    }
 
     return sections.concat([
       {
@@ -397,6 +418,12 @@
   // heading: { name, url (when the cell is a link), detail }. The part is
   // the column headed Part, Item, Name or Component (else the first), and
   // Qty or Quantity gives the count.
+  // The grand total row the editor keeps under a priced Bill of
+  // Materials: "**Total**" in its first cell.
+  function isTotalRow(row) {
+    return /^\*\*total\*\*$/i.test((row[0] || '').trim());
+  }
+
   function bomTableParts(markdown) {
     const lines = markdown.split('\n');
     const cells = line => line.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '')
@@ -421,7 +448,7 @@
       const raw = (row[nameCol] || '').replace(/\\\|/g, '|');
       const link = raw.match(/^\[([^\]]+)\]\(([^)\s]+)[^)]*\)$/);
       const name = (link ? link[1] : raw).replace(/[*_`]/g, '').trim();
-      if (!name) continue;
+      if (!name || isTotalRow(row)) continue;
       const qty = qtyCol >= 0 ? row[qtyCol] : '';
       parts.push({
         name,
@@ -439,7 +466,7 @@
     const h = '# ' + section.heading + '\n\n';
     switch (section.id) {
       case 'bill-of-materials':
-        return { before: h + '| Part | Qty | Notes |\n| --- | --- | --- |\n| ', placeholder: 'Part name', after: ' | 1 |  |\n' };
+        return { before: h + '| Part | Qty | Price | Total | Notes |\n| --- | --- | --- | --- | --- |\n| ', placeholder: 'Part name', after: ' | 1 |  |  |  |\n' };
       case 'assembly-instructions':
         return { before: h + '1. ', placeholder: 'First step', after: '\n' };
       case 'wiring':
@@ -456,5 +483,5 @@
     }
   }
 
-  window.ProjectSlashCommands = { create, openPicker, insertAtCursor, bomTableParts };
+  window.ProjectSlashCommands = { create, openPicker, insertAtCursor, bomTableParts, isTotalRow };
 })();
