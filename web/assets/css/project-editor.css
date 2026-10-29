@@ -399,6 +399,12 @@
   top: 70px;
 }
 
+/* The editor toolbar sticks below the top bar (its height is set by
+   project-editor.js) as the page scrolls through the document. */
+#content-markdown-pane .mde {
+  --mde-sticky-top: var(--kr-top-bar-height, 56px);
+}
+
 /* Mobile: sidebar becomes stacked */
 @media (max-width: 991.98px) {
   #editor-container .sticky-top {

@@ -610,7 +610,7 @@
   // A ```mermaid block in the live view: its diagram, until the cursor goes in.
   async function renderMermaid(source, element) {
     const tools = await loadMermaidTools();
-    const result = await tools.renderMermaid(source);
+    const result = await tools.renderMermaid(source, window.ProjectMermaidTheme);
     if (result.error) throw new Error(result.error);
     element.innerHTML = result.svg;
   }
@@ -624,6 +624,7 @@
     loadMermaidTools().then(tools => {
       if (gone) return;
       editor = tools.mountEditor(context.element, {
+        ...window.ProjectMermaidTheme,
         source: source,
         onChange: context.onChange,
         onExit: context.onExit,
@@ -639,12 +640,24 @@
     };
   }
 
+  // The editor's toolbar sticks to the top of the viewport as the page
+  // scrolls; stop it below the site's sticky top bar instead of under it.
+  // The bar wraps onto more lines on a narrow screen, so follow its height.
+  function pinToolbarBelowTopBar() {
+    const bar = document.querySelector('.navbar.sticky-top');
+    if (!bar) return;
+    const root = document.documentElement;
+    const update = () => root.style.setProperty('--kr-top-bar-height', bar.offsetHeight + 'px');
+    update();
+    if (window.ResizeObserver) new ResizeObserver(update).observe(bar);
+  }
+
   function initEditor() {
     if (mde) return;
-    // The default toolbar, with Line numbers and Raw in place of Preview and Side by side.
+    // The default toolbar, with Raw (which has line numbers) in place of Preview and Side by side.
     const toolbar = MarkdownEditor.DEFAULT_TOOLBAR
       .filter(item => item !== 'preview' && item !== 'side-by-side');
-    toolbar.splice(toolbar.indexOf('fullscreen'), 0, 'line-numbers', 'raw');
+    toolbar.splice(toolbar.indexOf('fullscreen'), 0, 'raw');
     toolbar.splice(toolbar.indexOf('table') + 1, 0, {
       id: 'diagram',
       label: 'Insert diagram',
@@ -657,7 +670,6 @@
       minHeight: 350,
       theme: 'light',
       toolbar: toolbar,
-      lineNumbers: true,
       draft: { key: 'projects.' + (projectId || 'new') },
       uploadImage: uploadEditorImage,
       // Several images dropped on the text at once go to the gallery only.
@@ -681,6 +693,7 @@
     });
     setupImageAutocomplete(mde);
     setupPartLinks(mde);
+    pinToolbarBelowTopBar();
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
     document.dispatchEvent(new CustomEvent('project-markdown-editor:ready', { detail: mde }));
