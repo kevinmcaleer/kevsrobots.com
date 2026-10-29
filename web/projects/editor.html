@@ -134,6 +134,17 @@ hide_nibsy: true
 
       <hr>
 
+      <!-- Shown while two headings share a name: the project page can only
+           link (#wiring) to the first of them. -->
+      <div id="duplicate-headings" class="alert alert-warning d-flex align-items-start mb-2 py-2 px-3 small d-none" role="status">
+        <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+        <div>
+          <strong>Two headings have the same name.</strong>
+          Links to a heading only reach the first one with that name, so rename one.
+          <ul class="duplicate-headings-list mb-0 ps-3"></ul>
+        </div>
+      </div>
+
       <!-- Markdown Editor (markdown-studio's editor bundle, mounted on the textarea) -->
       <div class="mb-4" id="content-markdown-pane">
         <textarea id="content-editor"></textarea>
@@ -276,25 +287,57 @@ hide_nibsy: true
   const nav = document.getElementById('editor-toc-nav');
   if (!nav) return;
 
-  function parseHeadings(md) {
-    const lines = (md || '').split('\n');
-    const headings = [];
-    let inFence = false;
-    let fenceMarker = '';
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const fenceMatch = line.match(/^(```+|~~~+)/);
-      if (fenceMatch) {
-        if (!inFence) { inFence = true; fenceMarker = fenceMatch[1][0]; }
-        else if (line.startsWith(fenceMarker.repeat(3))) { inFence = false; }
-        continue;
-      }
-      if (inFence) continue;
-      const m = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
-      if (m) headings.push({ level: m[1].length, text: m[2].trim(), line: i });
-    }
-    return headings;
+  // Heading text as the project page turns it into a #link (view.html's
+  // slugify): two headings with the same one can't both be linked to.
+  function slugify(text) {
+    return (text || '').toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
   }
+
+  // Headings sharing a name, as [[heading, heading, ...], ...].
+  function duplicateHeadings(headings) {
+    const bySlug = new Map();
+    headings.forEach(h => {
+      const slug = slugify(h.text);
+      if (!slug) return;
+      if (!bySlug.has(slug)) bySlug.set(slug, []);
+      bySlug.get(slug).push(h);
+    });
+    return Array.from(bySlug.values()).filter(list => list.length > 1);
+  }
+
+  const dupBox = document.getElementById('duplicate-headings');
+  function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  function showDuplicates(dups, toc) {
+    if (dupBox) {
+      dupBox.classList.toggle('d-none', !dups.length);
+      dupBox.querySelector('.duplicate-headings-list').innerHTML = dups.map(list =>
+        '<li>' + list.length + ' headings are called <strong>' + esc(list[0].text) + '</strong>: ' +
+        list.map((h, i) => '<a href="#" data-line="' + h.line + '">' + (i === 0 ? 'first' : i === 1 ? 'second' : 'number ' + (i + 1)) + '</a>').join(', ') +
+        '</li>').join('');
+    }
+    dups.forEach(list => list.forEach(h => {
+      const a = toc.links.get(String(h.line));
+      if (!a) return;
+      a.classList.add('kr-toc-duplicate');
+      a.title = 'Another heading has this name. Rename one so #links reach the right place.';
+    }));
+  }
+
+  if (dupBox) dupBox.addEventListener('click', e => {
+    const a = e.target.closest('a[data-line]');
+    if (!a) return;
+    e.preventDefault();
+    scrollToLine(Number(a.dataset.line));
+  });
 
   function scrollToSection(id) {
     const el = document.getElementById(id);
@@ -323,7 +366,8 @@ hide_nibsy: true
   function render() {
     const editor = window.projectMarkdownEditor || null;
     const md = editor ? editor.getDoc() : (document.getElementById('content-editor')?.value || '');
-    const entries = parseHeadings(md).map(h => ({ level: h.level, text: h.text, key: h.line }));
+    const headings = ProjectSections.headings(md);
+    const entries = headings.map(h => ({ level: h.level, text: h.text, key: h.line }));
 
     // Page sections rendered outside the editor
     const extras = [];
@@ -333,7 +377,7 @@ hide_nibsy: true
       extras.push({ key: 'editor-videos-section', text: 'Videos' });
     }
 
-    ProjectToc.render(nav, entries, {
+    const toc = ProjectToc.render(nav, entries, {
       extras,
       empty: 'Add headings (#, ##) to build a table of contents',
       onSelect(key) {
@@ -341,6 +385,7 @@ hide_nibsy: true
         else scrollToLine(key);
       },
     });
+    showDuplicates(duplicateHeadings(headings), toc);
   }
 
   // Hook in once project-editor.js has mounted the editor (it announces

@@ -46,6 +46,15 @@
     });
   }
 
+  // A repository link from what was typed: a URL, or a bare
+  // "github.com/you/robot" given https.
+  function repoUrl(q) {
+    const text = String(q || '').trim();
+    if (/^https?:\/\/[^\s/]+\.[^\s]+$/i.test(text)) return text;
+    if (/^[a-z0-9-]+(\.[a-z0-9-]+)+\/\S+$/i.test(text)) return 'https://' + text;
+    return null;
+  }
+
   function mdLinkText(s) {
     return String(s).replace(/([\[\]\\])/g, '\\$1');
   }
@@ -229,8 +238,23 @@
   //   ctx.listVideos()  resolves to the project's videos: { id, title }
   //   ctx.listParts()   resolves to the BOM: { name, url (catalog page or null), detail }
   //   ctx.diagrams      [{ label, md }], the diagram templates
+  // The sections a document already has, worked out once per version of
+  // the text (the menu asks on every keystroke while it's open).
+  const presentByDoc = new WeakMap();
+  function sectionsIn(state) {
+    let ids = presentByDoc.get(state.doc);
+    if (!ids) {
+      ids = window.ProjectSections.present(state.doc.toString());
+      presentByDoc.set(state.doc, ids);
+    }
+    return ids;
+  }
+
   function create(ctx) {
+    // A section the document already has, added with `/` or typed, is left
+    // out of the menu so it isn't added twice.
     const sections = window.ProjectSections.list.filter(section => section.menu !== false).map(section => ({
+      hidden: state => sectionsIn(state).has(section.id),
       id: 'section-' + section.id,
       label: section.heading,
       keywords: section.keywords.concat(['section']),
@@ -240,6 +264,28 @@
       blankBefore: true,
       insert: () => sectionTemplate(section, ctx),
     }));
+    // Code repository asks for the link first. A selected placeholder
+    // read as "paste here", but pasting a URL over selected text makes a
+    // Markdown link of it, which the live view folds away.
+    const repo = sections.find(c => c.id === 'section-code-repository');
+    if (repo) {
+      const heading = '# ' + window.ProjectSections.get('code-repository').heading + '\n\n';
+      delete repo.insert;
+      repo.run = view => openPicker(view, {
+        placeholder: 'Paste your repository link…',
+        empty: 'Paste a link to your code (GitHub, GitLab…)',
+        free: q => {
+          const url = repoUrl(q);
+          return url ? {
+            label: 'Add this repository',
+            detail: url,
+            icon: repo.icon,
+            pick: () => insertAtCursor(view, heading + url + '\n', true),
+          } : null;
+        },
+        load: async () => [],
+      });
+    }
 
     return sections.concat([
       {
@@ -398,8 +444,6 @@
         return { before: h + '1. ', placeholder: 'First step', after: '\n' };
       case 'wiring':
         return { before: h + '| From | To | Notes |\n| --- | --- | --- |\n| ', placeholder: 'Pico GP0', after: ' |  |  |\n' };
-      case 'code-repository':
-        return { before: h, placeholder: 'Paste your repository link (GitHub, GitLab…)', after: '\n' };
       case '3d-printed-parts': {
         const models = (ctx.modelFiles ? ctx.modelFiles() : []).filter(f => MODEL_FILE_RE.test(f.name));
         const head = h + '| Part | Qty | Notes |\n| --- | --- | --- |\n';

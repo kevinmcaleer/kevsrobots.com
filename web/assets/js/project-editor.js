@@ -886,17 +886,18 @@
     // cell. Click the muted placeholder ("Add a description…") or the
     // existing text to flip into an input; Enter / blur saves; Escape
     // cancels. Long descriptions wrap in the column via the
-    // .file-description CSS rule (max-width + word-break).
+    // .file-description CSS rule (word-break).
     // Models first (issue #261), each with its thumbnail (issue #262).
     const ordered = files.filter(f => f.file_type === 'model').concat(files.filter(f => f.file_type !== 'model'));
-    list.innerHTML = `<table class="table table-single table-narrow table-hover mb-0">
+    // Full width; the Description column takes the spare room.
+    list.innerHTML = `<table class="table table-single table-hover mb-0 files-table">
       <thead>
         <tr>
           <th style="width:48px"></th>
           <th>File</th>
-          <th>Description</th>
+          <th class="w-100">Description</th>
           <th class="text-muted small">Kind</th>
-          <th class="text-muted small text-end" style="width:70px">Size</th>
+          <th class="text-muted small text-end">Size</th>
           <th style="width:30px"></th>
         </tr>
       </thead>
@@ -909,7 +910,7 @@
             ${f.file_type === 'model' ? `<div class="kr-file-field small" data-file-id="${f.id}" data-field="print_settings">${renderFileField('print_settings', f.print_settings)}</div>` : ''}
           </td>
           <td class="text-muted small">${fileKind(f.filename)}</td>
-          <td class="text-muted small text-end" style="width:70px">${(f.file_size / 1024).toFixed(1)} KB</td>
+          <td class="text-muted small text-end">${(f.file_size / 1024).toFixed(1)} KB</td>
           <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})"><i class="fas fa-trash fa-xs"></i></button></td>
         </tr>
       `).join('')}</tbody></table>`;
