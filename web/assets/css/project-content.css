@@ -1,0 +1,404 @@
+/*
+ * A published project's document (#view-content on projects/view.html),
+ * drawn the way the project editor's live view draws it: markdown-studio's
+ * editor bundle (vendored in /assets/js/markdown-editor/). The tokens are
+ * the bundle's light theme (standalone.css's .mde); the sizes and spacing
+ * follow its live view (livePreview.ts's liveTheme and editorTheme.ts's
+ * heading styles). Keep them in step when the editor's look changes.
+ *
+ * In the live view every block sits on its own line with a blank line
+ * between blocks, so the gap between blocks is one line: 1.7 x 16px.
+ *
+ * Everything is scoped to .project-prose so the rest of the site keeps
+ * main.scss's look. Some of main.scss's rules (h1, blockquote) use
+ * !important, so the overrides of those do too.
+ */
+
+.project-prose {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-2: #f0eee6;
+  --text: #141413;
+  --muted: #6b6a63;
+  --border: #e3e0d6;
+  --accent: #c96442;
+  --highlight: #fbe7a1;
+  --code-bg: #f0eee6;
+  --code-text: #3d3929;
+  --syntax-keyword: #a3367a;
+  --syntax-string: #3d7a3d;
+  --syntax-number: #b45f06;
+  --syntax-function: #2f5fa7;
+  --syntax-type: #8a5a00;
+  --syntax-attr: #6b4fbb;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --block-gap: 1.7rem;
+
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The editor's box: parchment, a hairline border and round corners. */
+.project-doc {
+  padding: 1.25rem calc(1.25rem + 6px) calc(3rem - var(--block-gap));
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.project-prose p,
+.project-prose ul,
+.project-prose ol,
+.project-prose pre,
+.project-prose blockquote,
+.project-prose .code-copy-wrap,
+.project-prose .mermaid {
+  margin: 0 0 var(--block-gap);
+}
+
+.project-prose .code-copy-wrap > pre {
+  margin: 0;
+}
+
+/* Headings: serif, the live view's sizes, and the blank line under them. */
+.project-prose :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0 0 var(--block-gap);
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-stretch: normal !important;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.7;
+  text-transform: none;
+}
+
+.project-prose h1 {
+  padding: 0.375em 0 0.0625em;
+  font-size: 1.6em !important;
+  font-weight: 500;
+}
+
+.project-prose h2 {
+  padding: 0.37em 0 0.037em;
+  font-size: 1.35em;
+  font-weight: 500;
+}
+
+.project-prose h3 {
+  padding-top: 0.3em;
+  font-size: 1.15em;
+}
+
+.project-prose :is(h4, h5, h6) {
+  font-size: 1em;
+}
+
+.project-prose > :first-child {
+  padding-top: 0;
+}
+
+.project-prose strong,
+.project-prose b {
+  font-weight: 700;
+}
+
+.project-prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.project-prose a:hover {
+  color: color-mix(in srgb, var(--accent) 80%, black);
+}
+
+.project-prose mark {
+  padding: 0;
+  background: var(--highlight);
+  border-radius: 2px;
+  color: inherit;
+}
+
+.project-prose del,
+.project-prose s {
+  text-decoration: line-through;
+}
+
+/* Lists: one line per item, the markers dimmed. */
+.project-prose ul,
+.project-prose ol {
+  padding-left: 1.3em;
+}
+
+.project-prose li {
+  margin: 0;
+}
+
+.project-prose li > ul,
+.project-prose li > ol,
+.project-prose li > p {
+  margin: 0;
+}
+
+.project-prose li::marker {
+  color: var(--muted);
+}
+
+.project-prose ul > li::marker {
+  font-weight: 700;
+}
+
+.project-prose li:has(> input[type="checkbox"]) {
+  list-style: none;
+}
+
+.project-prose li > input[type="checkbox"] {
+  margin: 0 0.45em 0 -1.3em;
+  vertical-align: -0.1em;
+  accent-color: var(--accent);
+}
+
+/* Quotes: a rule down the left, the words dimmed and italic. */
+.project-prose blockquote {
+  padding: 0 0 0 1em !important;
+  border: 0;
+  border-left: 3px solid var(--border);
+  border-radius: 0;
+  background: none;
+  color: var(--muted) !important;
+  font-size: inherit;
+  font-style: italic;
+}
+
+.project-prose blockquote :is(p, ul, ol, li, a, code) {
+  color: inherit !important;
+}
+
+.project-prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* Callouts (callouts.css draws them): squared on the left, as in the live view. */
+.project-prose .callout {
+  margin: 0 0 var(--block-gap);
+  padding: 0.35em 1em;
+  border-radius: 0 8px 8px 0;
+}
+
+.project-prose .callout-title {
+  line-height: 1.7;
+}
+
+.project-prose .callout-content {
+  margin-top: 0;
+}
+
+.project-prose .callout-content > * {
+  margin-bottom: 0;
+}
+
+.project-prose .callout blockquote,
+.project-prose .callout :is(p, li) {
+  color: inherit !important;
+  font-style: normal;
+}
+
+/* Inline code: shaded, in the text's own font, as the live view shows it. */
+.project-prose code {
+  padding: 0;
+  background: var(--code-bg);
+  border-radius: 3px;
+  color: var(--code-text);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Code blocks: a shaded panel, the language and a copy button at the top right. */
+.project-prose pre {
+  padding: 1.35rem 1rem;
+  font-size: inherit;
+  background: var(--code-bg);
+  border: 0;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.project-prose pre code,
+.project-prose pre code.hljs {
+  display: block;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  line-height: 1.7;
+  white-space: pre;
+}
+
+.project-prose .code-copy-wrap[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  z-index: 1;
+  top: 0.45rem;
+  right: 2.6rem;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.7em;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.project-prose .copy-code-button {
+  top: 0.15rem;
+  right: 0.4rem;
+  width: 1.9em;
+  height: 1.9em;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 5px;
+  color: var(--muted);
+  opacity: 1;
+}
+
+.project-prose .copy-code-button svg {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.project-prose .copy-code-button:hover,
+.project-prose .copy-code-button:focus-visible {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+/* Code colours: the editor's palette for highlight.js's tokens. */
+.project-prose .hljs-keyword,
+.project-prose .hljs-selector-tag,
+.project-prose .hljs-built_in,
+.project-prose .hljs-doctag {
+  color: var(--syntax-keyword);
+}
+
+.project-prose .hljs-string,
+.project-prose .hljs-regexp,
+.project-prose .hljs-addition,
+.project-prose .hljs-template-string {
+  color: var(--syntax-string);
+}
+
+.project-prose .hljs-number,
+.project-prose .hljs-literal,
+.project-prose .hljs-symbol {
+  color: var(--syntax-number);
+}
+
+.project-prose .hljs-comment,
+.project-prose .hljs-quote {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.project-prose .hljs-title,
+.project-prose .hljs-title.function_,
+.project-prose .hljs-section {
+  color: var(--syntax-function);
+}
+
+.project-prose .hljs-type,
+.project-prose .hljs-title.class_,
+.project-prose .hljs-name,
+.project-prose .hljs-tag {
+  color: var(--syntax-type);
+}
+
+.project-prose .hljs-attr,
+.project-prose .hljs-attribute,
+.project-prose .hljs-variable,
+.project-prose .hljs-property,
+.project-prose .hljs-params,
+.project-prose .hljs-meta {
+  color: var(--syntax-attr);
+}
+
+/* Tables (the BOM among them): full width, hairline cells, a shaded header. */
+.project-prose table {
+  width: 100%;
+  margin: 1.4rem 0 calc(1.1rem + var(--block-gap));
+  border-collapse: collapse;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.project-prose th,
+.project-prose td {
+  padding: 0.45em 0.75em;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.project-prose th {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+
+/* Images: round corners; their {size} comes from image-sizes.css. */
+.project-prose img {
+  max-width: 100%;
+  border-radius: 6px;
+  vertical-align: bottom;
+}
+
+.project-prose img.image-cover {
+  border-radius: 5px;
+}
+
+.project-prose hr {
+  margin: 0.85rem 0 calc(0.85rem + var(--block-gap));
+  border: 0;
+  border-top: 1px solid var(--border);
+  opacity: 1;
+}
+
+.project-prose .mermaid {
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.project-prose .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.project-prose iframe,
+.project-prose video {
+  max-width: 100%;
+  margin-bottom: var(--block-gap);
+  border-radius: 6px;
+}
+
+/* The last block's gap is in the box's own padding. */
+.project-prose > :last-child {
+  margin-bottom: var(--block-gap);
+}
+
+/* Narrow screens: a wide table scrolls sideways inside the box. */
+@media (max-width: 575.98px) {
+  .project-doc {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .project-prose table {
+    display: block;
+    overflow-x: auto;
+  }
+}
