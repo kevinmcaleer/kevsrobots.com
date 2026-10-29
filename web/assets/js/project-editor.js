@@ -46,10 +46,6 @@
   const tagInput = document.getElementById('tag-input');
   const statusBadge = document.getElementById('status-badge');
   const saveIndicator = document.getElementById('save-indicator');
-  // The lite "Build Instructions" stepper (issue #178 phase 0) sits under
-  // the Markdown editor once a project has loaded.
-  const editorInstructionsSection = document.getElementById('editor-instructions-section');
-
   // --- Auth ---
   const IS_LOCAL = location.hostname === 'localhost'
     || location.hostname === '0.0.0.0'
@@ -120,23 +116,12 @@
       repoInput.value = currentProject.code_repo_url || '';
       updateStatusBadge(currentProject.status);
       renderTags(currentProject.tags || []);
-      if (editorInstructionsSection) editorInstructionsSection.classList.remove('d-none');
       loadBOM();
       loadLinks();
       loadVideos();
       loadFiles();
       loadImages();
       loadJournal();
-      // Issue #178 Phase 0: bring up the instruction-builder section.
-      // Lives in its own module (project-instructions.js) to avoid
-      // piling more behaviour onto this file ahead of Phase 1's
-      // Fabric.js canvas work. isOwner is implicit here — the editor
-      // page only opens for the logged-in user, and the backend
-      // rejects non-owner writes with 403 (mirrors the other sections
-      // above, which don't track ownership client-side either).
-      if (window.ProjectInstructions && typeof window.ProjectInstructions.init === 'function') {
-        window.ProjectInstructions.init(currentProject.id, true);
-      }
     } catch (e) {
       console.error('Failed to load project:', e);
     }
