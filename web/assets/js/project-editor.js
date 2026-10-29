@@ -527,10 +527,29 @@
       }
       return;
     }
-    addTagBadge(tag, false);
+    const added = addTagBadge(tag, false);
+    added.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     tagInput.value = '';
     scheduleAutoSave();
   }
+
+  // The tag chips scroll sideways on one line; let a mouse wheel scroll them.
+  tagsContainer.addEventListener('wheel', (e) => {
+    if (!e.deltaY || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    if (tagsContainer.scrollWidth <= tagsContainer.clientWidth) return;
+    e.preventDefault();
+    tagsContainer.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  // Mark which ends of the chip strip have tags scrolled out of view.
+  function updateTagFades() {
+    const { scrollLeft, scrollWidth, clientWidth } = tagsContainer;
+    tagsContainer.classList.toggle('more-before', scrollLeft > 1);
+    tagsContainer.classList.toggle('more-after', scrollLeft + clientWidth < scrollWidth - 1);
+  }
+  tagsContainer.addEventListener('scroll', updateTagFades, { passive: true });
+  new MutationObserver(updateTagFades).observe(tagsContainer, { childList: true });
+  if (window.ResizeObserver) new ResizeObserver(updateTagFades).observe(tagsContainer);
 
   tagInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -621,10 +640,10 @@
 
   function initEditor() {
     if (mde) return;
-    // The default toolbar, with Raw in place of Preview and Side by side.
+    // The default toolbar, with Line numbers and Raw in place of Preview and Side by side.
     const toolbar = MarkdownEditor.DEFAULT_TOOLBAR
       .filter(item => item !== 'preview' && item !== 'side-by-side');
-    toolbar.splice(toolbar.indexOf('fullscreen'), 0, 'raw');
+    toolbar.splice(toolbar.indexOf('fullscreen'), 0, 'line-numbers', 'raw');
     toolbar.splice(toolbar.indexOf('table') + 1, 0, {
       id: 'diagram',
       label: 'Insert diagram',
@@ -637,6 +656,7 @@
       minHeight: 350,
       theme: 'light',
       toolbar: toolbar,
+      lineNumbers: true,
       draft: { key: 'projects.' + (projectId || 'new') },
       uploadImage: uploadEditorImage,
       // Several images dropped on the text at once go to the gallery only.

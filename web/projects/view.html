@@ -15,9 +15,10 @@ description: View project details
 <link rel="stylesheet" href="/assets/js/markdown-editor/callouts.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/js/markdown-editor/image-sizes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-content.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
-<div class="container py-4">
+<div class="container-fluid py-3">
   <div id="loading" class="text-center py-5">
     <div class="spinner-border text-primary" role="status"></div>
   </div>
@@ -29,14 +30,31 @@ description: View project details
   </div>
 
   <div id="project-view" class="d-none">
+    <!-- Top bar: the project's actions, where the editor has View, the
+         Draft / Published switch and the menu. -->
+    <div id="view-actions" class="d-flex justify-content-end align-items-center flex-wrap gap-2 mb-3">
+      <a id="view-repo" href="#" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary d-none">
+        <i class="fab fa-github me-1"></i> View code
+      </a>
+      <button id="download-project-btn" type="button" class="btn btn-sm btn-outline-secondary d-none">
+        <i class="fas fa-download me-1"></i> Download project
+      </button>
+      <a id="analytics-btn-container" href="#" class="btn btn-sm btn-outline-secondary d-none">
+        <i class="fas fa-chart-line me-1"></i> Analytics
+      </a>
+      <a id="edit-btn-container" href="#" class="btn btn-sm btn-outline-secondary d-none">
+        <i class="fas fa-pencil-alt me-1"></i> Edit
+      </a>
+    </div>
+
     <div class="row">
       <!-- LEFT: Table of contents -->
       <div class="col-lg-2 d-none d-lg-block">
         <nav id="toc-nav" class="kr-toc kr-toc--column sticky-top" aria-label="On this page"></nav>
       </div>
 
-      <!-- MIDDLE: Main content -->
-      <div class="col-lg-7">
+      <!-- MAIN: the document takes the centre and right columns, as in the editor -->
+      <div class="col-lg-10">
         <!-- Showcase-style breadcrumbs above the title. Rendered in JS once
              the project loads so we can include the project title (and, for
              remixes, the parent project) as the final crumb(s). The legacy
@@ -63,6 +81,23 @@ description: View project details
           </a>
         </div>
 
+        <p id="view-description" class="view-description text-muted"></p>
+
+        <!-- Details row: difficulty, build time and tags, as the editor shows
+             them under the description. Hidden until one is set. -->
+        <div id="view-meta-card" class="project-meta-row view-meta-row mb-2 d-none">
+          <span id="view-difficulty-row" class="project-meta-field d-none" title="Difficulty">
+            <i class="fas fa-signal" aria-hidden="true"></i> <span id="view-difficulty"></span>
+          </span>
+          <span id="view-estimated-row" class="project-meta-field d-none" title="Estimated build time">
+            <i class="fas fa-clock" aria-hidden="true"></i> <span id="view-estimated"></span>
+          </span>
+          <span id="view-tags-row" class="project-meta-tags d-none" title="Tags">
+            <i class="fas fa-tags" aria-hidden="true"></i>
+            <span id="view-tags" class="d-flex flex-wrap gap-1"></span>
+          </span>
+        </div>
+
         <!-- Showcase-style metadata strip: date | reading time | by author | share icons.
              Wraps gracefully on narrow viewports. Populated in JS once project + Chatter
              profile load. -->
@@ -75,6 +110,8 @@ description: View project details
             <i class="fa-regular fa-user me-1"></i> By
             <a id="meta-author-link" href="#" class="text-decoration-none fw-semibold"><span id="meta-author-name">&hellip;</span></a>
           </span>
+          <span class="meta-sep" aria-hidden="true">|</span>
+          <span id="meta-updated" class="meta-updated d-none">Updated <span id="view-updated"></span></span>
           <span class="meta-sep" aria-hidden="true">|</span>
           <span class="meta-share">
             Share
@@ -106,12 +143,20 @@ description: View project details
              aria-label="What changed in this remix"></i>
         </div>
 
-        <p id="view-description" class="lead text-muted"></p>
 
         <hr>
 
         <!-- Rendered markdown -->
-        <div id="view-content" class="mb-5" style="line-height:1.8"></div>
+        <div id="view-content" class="project-doc project-prose mb-4"></div>
+
+        <!-- Images -->
+        <div id="view-images-section" class="card mb-4 d-none">
+          <div class="card-header py-2"><i class="fas fa-camera me-2"></i> Images</div>
+          <div class="card-body">
+            <div id="view-images" class="row g-2"></div>
+          </div>
+        </div>
+
 
         <!-- Thumbnail grid of the models, moved under the author's
              "3D printed parts" heading when there is one (issue #262). -->
@@ -186,6 +231,24 @@ description: View project details
           <div id="view-links"></div>
         </div>
 
+        <!-- Journal -->
+        <div id="view-journal-section" class="card mb-4 d-none">
+          <div class="card-header py-2"><i class="fas fa-calendar-alt me-2"></i> Build Journal</div>
+          <div class="card-body">
+            <div id="view-journal"></div>
+          </div>
+        </div>
+
+        <!-- Remixes (issue #108) — direct derivatives of this project -->
+        <div id="view-remixes-section" class="card mb-4 d-none">
+          <div class="card-header py-2 d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-code-branch me-2"></i> Remixes <span id="view-remixes-count" class="badge bg-secondary"></span></span>
+          </div>
+          <div class="card-body">
+            <div id="view-remixes"></div>
+          </div>
+        </div>
+
         <!-- Report -->
         <div id="report-section" class="mb-4 d-none">
           <a href="#" id="report-toggle" class="text-muted small text-decoration-none">
@@ -227,99 +290,6 @@ description: View project details
         </div>
       </div>
 
-      <!-- RIGHT: Sidebar (scrolls with main content) -->
-      <div class="col-lg-3">
-        <div>
-          <!-- Project metadata: tags + difficulty + estimated time. Moved out
-               of the main content column (showcase-style — metadata lives in
-               the sidebar, not under the description). Hidden until at least
-               one field populates. -->
-          <div id="view-meta-card" class="card mb-3 d-none">
-            <div class="card-body py-3">
-              <div id="view-difficulty-row" class="mb-2 d-none">
-                <span class="small text-muted d-block mb-1">Difficulty</span>
-                <span id="view-difficulty"></span>
-              </div>
-              <div id="view-estimated-row" class="mb-2 d-none">
-                <span class="small text-muted d-block mb-1">Estimated time</span>
-                <span id="view-estimated"></span>
-              </div>
-              <div id="view-tags-row" class="d-none">
-                <span class="small text-muted d-block mb-1">Tags</span>
-                <div id="view-tags" class="d-flex flex-wrap gap-1"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Author & actions -->
-          <div class="card mb-3">
-            <div class="card-body">
-              <div class="mb-3">
-                <span class="text-muted">by <a id="view-author-link" href="#" class="text-decoration-none fw-bold" title="View profile"><strong id="view-author"></strong></a></span>
-                <div class="small text-muted mt-1">
-                  <i class="fas fa-calendar-plus me-1"></i> Created <span id="view-created"></span><br>
-                  <i class="fas fa-clock me-1"></i> Updated <span id="view-updated"></span>
-                </div>
-              </div>
-              <div id="view-repo" class="mb-3 d-none">
-                <a id="view-repo-link" href="#" target="_blank" class="btn btn-sm btn-outline-dark w-100">
-                  <i class="fab fa-github me-2"></i> View Code
-                </a>
-              </div>
-              <div id="download-btn-container" class="mb-2 d-none">
-                <button id="download-project-btn" class="btn btn-sm btn-success w-100">
-                  <i class="fas fa-download me-2"></i> Download Project
-                </button>
-              </div>
-              <div id="edit-btn-container" class="d-none">
-                <a id="edit-link" href="#" class="btn btn-sm btn-outline-primary w-100">
-                  <i class="fas fa-pencil-alt me-2"></i> Edit Project
-                </a>
-              </div>
-              <div id="analytics-btn-container" class="d-none mt-2">
-                <a id="analytics-link" href="#" class="btn btn-sm btn-outline-secondary w-100">
-                  <i class="fas fa-chart-line me-2"></i> Analytics
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Images -->
-          <div id="view-images-section" class="card mb-3 d-none">
-            <div class="card-header py-2"><i class="fas fa-camera me-2"></i> Images</div>
-            <div class="card-body">
-              <div id="view-images" class="row g-2"></div>
-            </div>
-          </div>
-
-          <!-- Journal -->
-          <div id="view-journal-section" class="card mb-3 d-none">
-            <div class="card-header py-2"><i class="fas fa-calendar-alt me-2"></i> Build Journal</div>
-            <div class="card-body">
-              <div id="view-journal"></div>
-            </div>
-          </div>
-
-          <!-- Remixes (issue #108) — direct derivatives of this project -->
-          <div id="view-remixes-section" class="card mb-3 d-none">
-            <div class="card-header py-2 d-flex justify-content-between align-items-center">
-              <span><i class="fas fa-code-branch me-2"></i> Remixes <span id="view-remixes-count" class="badge bg-secondary"></span></span>
-            </div>
-            <div class="card-body">
-              <div id="view-remixes"></div>
-            </div>
-          </div>
-
-          <!-- Makes sidebar link -->
-          <div id="view-makes-sidebar" class="card mb-3 d-none">
-            <div class="card-body py-2">
-              <a href="#makes-section" id="view-makes-link" class="text-decoration-none small">
-                <i class="fas fa-hammer me-2"></i> Makes (<span id="view-makes-count">0</span>)
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -505,11 +475,6 @@ description: View project details
   #view-content .heading-anchor:hover { color: #4A90D9; }
   @media (hover: none) { #view-content .heading-anchor { opacity: 0.6; } }
 
-  /* Mermaid in view */
-  #view-content .mermaid {
-    text-align: center;
-    margin: 1.5rem 0;
-  }
 
   /* Instruction Builder steps shown in the viewer when the project's
      content_mode is "builder". The step number is a circular pip
@@ -611,6 +576,38 @@ description: View project details
   .project-breadcrumbs .breadcrumb-item.active {
     color: #212529;
     font-weight: 500;
+  }
+
+  /* Title, description and details row: the editor's fields, read-only.
+     The title drops main.scss's uppercase display h1 for the editor's,
+     in the document's serif heading face. */
+  #view-title {
+    font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+    font-size: 2rem !important;
+    font-stretch: normal !important;
+    font-weight: 500;
+    letter-spacing: normal;
+    line-height: 1.5;
+    text-transform: none;
+  }
+  .view-description {
+    margin-bottom: 0.5rem;
+  }
+  .view-meta-row {
+    padding: 0;
+  }
+  .view-meta-row .project-meta-field,
+  .view-meta-row .project-meta-tags {
+    min-height: 31px;
+  }
+  .view-meta-row .tag-badge:hover {
+    background: #d6ebfb;
+  }
+  .view-gallery-thumb {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    cursor: pointer;
   }
 
   /* Showcase-style metadata strip under the title */
@@ -763,7 +760,6 @@ description: View project details
     }
   }
 
-  const difficultyColors = { beginner: 'success', intermediate: 'warning', advanced: 'danger' };
   const typeIcons = { article: 'fa-newspaper', video: 'fa-play-circle', tutorial: 'fa-graduation-cap', documentation: 'fa-book', other: 'fa-external-link-alt' };
   const statusLabels = { planning: 'Planning', in_progress: 'In Progress', completed: 'Completed' };
   const statusClasses = { planning: 'bg-warning text-dark', in_progress: 'bg-info text-white', completed: 'bg-success text-white' };
@@ -776,6 +772,22 @@ description: View project details
     if (!containerEl) return;
     containerEl.querySelectorAll('table').forEach(t => {
       t.classList.add('table', 'table-single', 'table-narrow');
+    });
+  }
+
+  // Code blocks in the editor's colours (project-content.css maps
+  // highlight.js's tokens to its palette).
+  function highlightCode(containerEl) {
+    if (!window.hljs) return;
+    containerEl.querySelectorAll('pre code').forEach(code => hljs.highlightElement(code));
+  }
+
+  // The language at the top right of a code block, beside its copy button,
+  // as the editor shows it.
+  function labelCodeBlocks(containerEl) {
+    containerEl.querySelectorAll('.code-copy-wrap > pre > code').forEach(code => {
+      const lang = Array.from(code.classList).find(c => c.startsWith('language-'));
+      if (lang) code.closest('.code-copy-wrap').dataset.lang = lang.slice('language-'.length);
     });
   }
 
@@ -888,27 +900,26 @@ description: View project details
         if (wrap) wrap.innerHTML = FeaturedProjects.badge(project.featured_note);
       }
       document.getElementById('view-description').textContent = project.short_description || '';
-      document.getElementById('view-author').textContent = project.author_username;
-      var authorLink = document.getElementById('view-author-link');
-      if (authorLink) {
-        // Issue #111: use the canonical query-string form. The
-        // /profile/<username>/ path still works (the index.html
-        // redirector forwards it), but the ?u= form skips the redirect.
-        authorLink.href = '/profile/?u=' + encodeURIComponent(project.author_username);
+      // The byline carries the published date; add the last update when
+      // it was on a later day.
+      const created = new Date(project.created_at);
+      const updated = new Date(project.updated_at);
+      if (project.updated_at && updated.toDateString() !== created.toDateString()) {
+        document.getElementById('view-updated').textContent = updated.toLocaleDateString(undefined, {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+        document.getElementById('meta-updated').classList.remove('d-none');
       }
-      document.getElementById('view-created').textContent = new Date(project.created_at).toLocaleDateString();
-      document.getElementById('view-updated').textContent = new Date(project.updated_at).toLocaleDateString();
 
-      // Showcase-style metadata moved to the sidebar (tags + difficulty +
-      // estimated time). Mirror the hub card badge styles for visual
-      // continuity.
+      // The details row under the description (difficulty, build time and
+      // tags), shown as the editor shows it.
       const metaCard = document.getElementById('view-meta-card');
       let anyMeta = false;
       if (project.difficulty) {
         const dRow = document.getElementById('view-difficulty-row');
         const dEl = document.getElementById('view-difficulty');
         if (dRow && dEl) {
-          dEl.innerHTML = `<span class="badge bg-${difficultyColors[project.difficulty] || 'secondary'}">${esc(project.difficulty)}</span>`;
+          dEl.textContent = project.difficulty.charAt(0).toUpperCase() + project.difficulty.slice(1);
           dRow.classList.remove('d-none');
           anyMeta = true;
         }
@@ -917,7 +928,7 @@ description: View project details
         const eRow = document.getElementById('view-estimated-row');
         const eEl = document.getElementById('view-estimated');
         if (eRow && eEl) {
-          eEl.innerHTML = `<span class="badge bg-light text-dark"><i class="fas fa-clock me-1"></i>${project.estimated_minutes} min</span>`;
+          eEl.textContent = project.estimated_minutes + ' min';
           eRow.classList.remove('d-none');
           anyMeta = true;
         }
@@ -929,7 +940,7 @@ description: View project details
           tEl.innerHTML = project.tags.map(t => {
             const safe = esc(t);
             const url = '/projects/search?tag=' + encodeURIComponent(String(t).toLowerCase());
-            return `<a href="${url}" class="badge bg-light text-primary text-decoration-none">${safe}</a>`;
+            return `<a href="${url}" class="tag-badge text-decoration-none">${safe}</a>`;
           }).join('');
           tRow.classList.remove('d-none');
           anyMeta = true;
@@ -962,19 +973,21 @@ description: View project details
         const contentEl = document.getElementById('view-content');
         contentEl.innerHTML = marked.parse(project.content_md);
         ProjectImageSizes.render(contentEl);
-        styleMarkdownTables(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
         videosInContent = embedVideoSection(contentEl);
         ProjectCallouts.render(contentEl);
         await renderMermaid();
+        highlightCode(contentEl);
         CodeCopy.attach(contentEl);
+        labelCodeBlocks(contentEl);
         buildTOC();
       }
 
       // Repo link
       if (project.code_repo_url) {
-        document.getElementById('view-repo').classList.remove('d-none');
-        document.getElementById('view-repo-link').href = project.code_repo_url;
+        const repoLink = document.getElementById('view-repo');
+        repoLink.href = project.code_repo_url;
+        repoLink.classList.remove('d-none');
       }
 
       // Edit button & report button (check if current user is author)
@@ -985,19 +998,17 @@ description: View project details
           const isOwner = myProjects.some(p => p.id === project.id);
           if (isOwner) {
             const editUrl = '/projects/editor.html?id=' + project.id;
-            document.getElementById('edit-btn-container').classList.remove('d-none');
-            document.getElementById('edit-link').href = editUrl;
+            const editBtn = document.getElementById('edit-btn-container');
+            editBtn.href = editUrl;
+            editBtn.classList.remove('d-none');
             const editIcon = document.getElementById('edit-icon');
             editIcon.href = editUrl;
             editIcon.classList.remove('d-none');
             // Analytics dashboard link — owner-only
             const analyticsUrl = '/projects/analytics.html?id=' + project.id;
-            const analyticsContainer = document.getElementById('analytics-btn-container');
-            const analyticsLink = document.getElementById('analytics-link');
-            if (analyticsContainer && analyticsLink) {
-              analyticsLink.href = analyticsUrl;
-              analyticsContainer.classList.remove('d-none');
-            }
+            const analyticsLink = document.getElementById('analytics-btn-container');
+            analyticsLink.href = analyticsUrl;
+            analyticsLink.classList.remove('d-none');
           } else {
             // Logged-in non-owner: show remix button & report form (issue #108).
             const remixIcon = document.getElementById('remix-icon');
@@ -1041,8 +1052,9 @@ description: View project details
       ProjectInteractions.loadComments(projectUrl, document.getElementById('comments-container'));
 
       // Show download button if there are files or content
-      document.getElementById('download-btn-container').classList.remove('d-none');
-      document.getElementById('download-project-btn').addEventListener('click', () => downloadProject(project));
+      const downloadBtn = document.getElementById('download-project-btn');
+      downloadBtn.classList.remove('d-none');
+      downloadBtn.addEventListener('click', () => downloadProject(project));
 
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');
@@ -1565,9 +1577,9 @@ description: View project details
       alt: img.filename
     }));
     document.getElementById('view-images').innerHTML = images.map((img, idx) => `
-      <div class="col-6">
+      <div class="col-6 col-md-4 col-lg-3">
         <img src="${API}/api/projects/${projectId}/images/${img.id}/view"
-             class="img-fluid rounded" alt="${esc(img.filename)}"
+             class="view-gallery-thumb rounded" alt="${esc(img.filename)}"
              style="cursor:pointer" data-view-idx="${idx}">
       </div>
     `).join('');
@@ -1736,7 +1748,7 @@ description: View project details
   async function downloadProject(project) {
     const btn = document.getElementById('download-project-btn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Packaging...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Packaging...';
 
     try {
       const zip = new JSZip();
@@ -1830,7 +1842,7 @@ description: View project details
         } catch (e) {
           console.warn('[ZIP] PDF export skipped:', e);
         }
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Packaging…';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Packaging…';
       }
 
       var content = await zip.generateAsync({ type: 'blob' });
@@ -1846,7 +1858,7 @@ description: View project details
     }
 
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-download me-2"></i> Download Project';
+    btn.innerHTML = '<i class="fas fa-download me-1"></i> Download project';
   }
 
   // Drawn with the editor's mermaid-tools, so a diagram looks the same in both.
@@ -1958,16 +1970,6 @@ description: View project details
     var empty = document.getElementById('makes-empty');
     var count = document.getElementById('makes-count');
     count.textContent = makes.length > 0 ? '(' + makes.length + ')' : '';
-
-    // Sidebar link only shows when there are makes.
-    var sb = document.getElementById('view-makes-sidebar');
-    var sbCount = document.getElementById('view-makes-count');
-    if (makes.length > 0) {
-      sb.classList.remove('d-none');
-      sbCount.textContent = makes.length;
-    } else {
-      sb.classList.add('d-none');
-    }
 
     if (makes.length === 0) {
       empty.classList.remove('d-none');

@@ -1,7 +1,10 @@
 /* Project Editor Styles */
 
+/* The title in the document's serif heading face (project-content.css). */
 #project-title {
-  font-size: 1.8rem;
+  font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 500;
 }
 
 #project-title:focus,
@@ -66,8 +69,62 @@
   width: 5.75rem;
 }
 
+/* Tags stay on one line: the chips scroll sideways and the Add tag box
+   keeps its place at the end of the row. */
+#project-meta-row .project-meta-tags {
+  flex-wrap: nowrap;
+}
+
+.project-meta-chips {
+  display: flex;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.project-meta-chips:hover {
+  scrollbar-color: #ced4da transparent;
+}
+
+/* Fade the edge that has more chips hidden behind it. */
+.project-meta-chips.more-after {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
+}
+
+.project-meta-chips.more-before {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 1.5rem);
+  mask-image: linear-gradient(to right, transparent, #000 1.5rem);
+}
+
+.project-meta-chips.more-before.more-after {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+}
+
+.project-meta-chips::-webkit-scrollbar {
+  height: 4px;
+}
+
+.project-meta-chips::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+}
+
+.project-meta-chips:hover::-webkit-scrollbar-thumb {
+  background: #ced4da;
+}
+
+.project-meta-chips .tag-badge {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 #tag-input {
-  flex: 1 1 7rem;
+  flex: 0 0 7rem;
   min-width: 7rem;
   width: auto;
 }
