@@ -2,6 +2,8 @@
 title: My Projects
 description: Manage your project portfolio
 layout: content
+# User-created content: no "support my work" box.
+thanks: false
 ---
 
 {% include nav_projects.html %}

@@ -2,6 +2,8 @@
 title: Edit Project
 description: Manage your project details, steps, files, and more
 layout: content
+# User-created content: no "support my work" box.
+thanks: false
 ---
 
 # Edit Project
