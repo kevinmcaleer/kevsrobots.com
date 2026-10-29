@@ -49,7 +49,15 @@ description: View project details
     <div class="row">
       <!-- LEFT: Table of contents -->
       <div class="col-lg-2 d-none d-lg-block">
-        <nav id="toc-nav" class="kr-toc kr-toc--column sticky-top" aria-label="On this page"></nav>
+        <div class="view-side sticky-top">
+          <nav id="toc-nav" class="kr-toc kr-toc--column" aria-label="On this page"></nav>
+          <!-- Under the nav: the write-up as a PDF (the browser's Save as PDF). -->
+          <div id="view-side-downloads" class="view-side-downloads d-none">
+            <button id="download-pdf-btn" type="button" class="btn btn-sm btn-outline-secondary w-100">
+              <i class="fas fa-file-pdf me-1"></i> Download PDF
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- MAIN: the document takes the centre and right columns, as in the editor -->
@@ -174,6 +182,15 @@ description: View project details
             <i class="fas fa-download me-1"></i> Total downloads: <span id="view-files-total-count">0</span>
           </div>
           <div id="view-files" class="list-group"></div>
+        </div>
+
+        <!-- Under the Files & Models tables: every file plus the write-up
+             as README.md, zipped in the browser (downloadProject). -->
+        <div id="view-download-all" class="view-download-all mb-4 d-none">
+          <button id="download-all-btn" type="button" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-file-archive me-1"></i> Download all (.zip)
+          </button>
+          <small class="text-muted ms-2">All the files, with the write-up as README.md</small>
         </div>
 
         <!-- BOM -->
@@ -347,6 +364,41 @@ description: View project details
 </div>
 
 <style>
+  /* The left column: the nav with the PDF download under it, sticky
+     together. z-index 1, not sticky-top's 1020, which painted over the
+     site's sticky top bar. The nav leaves room for the button. */
+  .view-side { top: 80px; z-index: 1; }
+  .view-side .kr-toc--column,
+  .view-side .toc-nav { max-height: calc(100vh - 150px); }
+  .view-side-downloads { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e3e0d6; }
+  .view-side-downloads:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+
+  /* Download PDF prints #kr-print-root, a copy of the title, details and
+     document, and nothing else. */
+  .kr-print { display: none; }
+  @media print {
+    @page { margin: 16mm 14mm; }
+    body.kr-printing { background: #fff !important; padding: 0 !important; margin: 0 !important; }
+    body.kr-printing > *:not(#kr-print-root) { display: none !important; }
+    body.kr-printing #kr-print-root { display: block; }
+    .kr-print { color: #141413; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .kr-print-head h1 {
+      font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+      font-size: 2rem !important; font-weight: 500; text-transform: none;
+      letter-spacing: normal; line-height: 1.3; margin: 0 0 0.4rem;
+    }
+    .kr-print-desc { color: #6b6a63; font-size: 1.05rem; margin: 0 0 0.3rem; }
+    .kr-print-meta { color: #6b6a63; font-size: 0.85rem; margin: 0 0 1rem; }
+    .kr-print .project-doc { background: none; border: 0; border-radius: 0; padding: 0; }
+    .kr-print img { max-width: 100%; height: auto; }
+    .kr-print :is(img, pre, table, figure, blockquote, svg, .callout) { break-inside: avoid; }
+    .kr-print :is(h1, h2, h3, h4) { break-after: avoid; }
+    .kr-print a { color: inherit; }
+    .kr-print-foot { margin-top: 1.5rem; padding-top: 0.5rem; border-top: 1px solid #e3e0d6; color: #6b6a63; font-size: 0.8rem; }
+  }
+
+  .view-download-all { margin-top: -0.75rem; }
+
   /* Issue #262: model thumbnails under "3D printed parts" and in Files & Models. */
   .view-models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
   .view-models-grid__item { margin: 0; text-align: center; padding: 8px; border: 1px solid rgba(0,0,0,.08); border-radius: 8px; }
@@ -1003,7 +1055,11 @@ description: View project details
       // Show download button if there are files or content
       const downloadBtn = document.getElementById('download-project-btn');
       downloadBtn.classList.remove('d-none');
-      downloadBtn.addEventListener('click', () => downloadProject(project));
+      downloadBtn.addEventListener('click', () => downloadProject(project, downloadBtn));
+      const downloadAllBtn = document.getElementById('download-all-btn');
+      downloadAllBtn.addEventListener('click', () => downloadProject(project, downloadAllBtn));
+      document.getElementById('view-side-downloads').classList.remove('d-none');
+      document.getElementById('download-pdf-btn').addEventListener('click', () => downloadPdf(project));
 
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');
@@ -1483,6 +1539,7 @@ description: View project details
       document.getElementById('view-files').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${others.map(f => row(f,
         `<i class="${fIcon(f.filename)}"></i>`)).join('')}</tbody></table>`;
     }
+    document.getElementById('view-download-all').classList.toggle('d-none', !files.length);
     var totalDownloads = files.reduce(function(acc, f) { return acc + (f.download_count || 0); }, 0);
     var totalEl = document.getElementById('view-files-total');
     if (totalEl && others.length) {
@@ -1688,14 +1745,27 @@ description: View project details
     CodeCopy.attach(journalEl);
   }
 
-  async function downloadProject(project) {
-    const btn = document.getElementById('download-project-btn');
+  function projectSlug(project) {
+    return project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'project';
+  }
+
+  // Issue #152: the canonical project URL, so downloads link back to the
+  // SEO-friendly path. Falls back to ?id= for legacy projects whose slug
+  // hasn't backfilled yet.
+  function publicProjectUrl(project) {
+    return (project.author_username && project.slug)
+      ? 'https://www.kevsrobots.com/projects/' + encodeURIComponent(project.author_username) + '/' + encodeURIComponent(project.slug)
+      : 'https://www.kevsrobots.com/projects/view.html?id=' + project.id;
+  }
+
+  async function downloadProject(project, btn) {
+    const label = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Packaging...';
 
     try {
       const zip = new JSZip();
-      var slug = project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      var slug = projectSlug(project);
 
       // README.md
       var readme = '# ' + project.title + '\n\n';
@@ -1705,13 +1775,7 @@ description: View project details
       if (project.code_repo_url) readme += '**Code:** ' + project.code_repo_url + '\n';
       readme += '\n---\n\n';
       if (project.content_md) readme += project.content_md + '\n';
-      // Issue #152: emit the canonical project URL in the README so
-      // downloaded ZIPs link back to the SEO-friendly path. Fall back
-      // to ?id= for legacy projects whose slug hasn't backfilled yet.
-      var publicUrl = (project.author_username && project.slug)
-        ? 'https://www.kevsrobots.com/projects/' + encodeURIComponent(project.author_username) + '/' + encodeURIComponent(project.slug)
-        : 'https://www.kevsrobots.com/projects/view.html?id=' + project.id;
-      readme += '\n\n*Downloaded from [KevsRobots](' + publicUrl + ')*\n';
+      readme += '\n\n*Downloaded from [KevsRobots](' + publicProjectUrl(project) + ')*\n';
       zip.file('README.md', readme);
 
       // Images
@@ -1801,7 +1865,88 @@ description: View project details
     }
 
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-download me-1"></i> Download project';
+    btn.innerHTML = label;
+  }
+
+  // The write-up as a PDF: a print-only copy of the title, details and
+  // rendered document, printed with the browser's dialog (Save as PDF),
+  // so the text stays selectable and the links keep working. The page's
+  // title becomes the suggested file name.
+  async function downloadPdf(project) {
+    const stale = document.getElementById('kr-print-root');
+    if (stale) stale.remove();
+    const root = document.createElement('div');
+    root.id = 'kr-print-root';
+    root.className = 'kr-print';
+
+    const head = document.createElement('header');
+    head.className = 'kr-print-head';
+    const title = document.createElement('h1');
+    title.textContent = project.title;
+    head.appendChild(title);
+    if (project.short_description) {
+      const desc = document.createElement('p');
+      desc.className = 'kr-print-desc';
+      desc.textContent = project.short_description;
+      head.appendChild(desc);
+    }
+    const details = [];
+    const author = document.getElementById('meta-author-name').textContent.trim();
+    if (author && author !== '\u2026') details.push('By ' + author);
+    if (project.difficulty) details.push('Difficulty: ' + project.difficulty);
+    const est = document.getElementById('view-estimated').textContent.trim();
+    if (est) details.push('Build time: ' + est);
+    const url = publicProjectUrl(project);
+    const meta = document.createElement('p');
+    meta.className = 'kr-print-meta';
+    meta.textContent = details.join(' \u00b7 ');
+    head.appendChild(meta);
+    root.appendChild(head);
+
+    const doc = document.getElementById('view-content').cloneNode(true);
+    doc.removeAttribute('id');
+    doc.querySelectorAll('.heading-anchor, .copy-code-button').forEach(el => el.remove());
+    // A video can't play on paper: its thumbnail and link instead.
+    doc.querySelectorAll('.project-video-embed').forEach(box => {
+      const frame = box.querySelector('iframe');
+      const id = frame && (frame.src.match(/\/embed\/([^?&#/]+)/) || [])[1];
+      const p = document.createElement('p');
+      if (id) {
+        const watch = 'https://www.youtube.com/watch?v=' + id;
+        p.innerHTML = '<a href="' + watch + '"><img src="https://img.youtube.com/vi/' + id + '/hqdefault.jpg" alt="YouTube video"></a><br>' +
+          '<small>Watch on YouTube: <a href="' + watch + '">' + watch + '</a></small>';
+      }
+      box.replaceWith(p);
+    });
+    doc.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+    root.appendChild(doc);
+
+    const foot = document.createElement('p');
+    foot.className = 'kr-print-foot';
+    foot.innerHTML = 'From KevsRobots: <a href="' + url + '">' + esc(url) + '</a>';
+    root.appendChild(foot);
+
+    document.body.appendChild(root);
+    document.body.classList.add('kr-printing');
+    // Wait for the copy's images, so none prints blank.
+    await Promise.race([
+      Promise.all(Array.from(root.querySelectorAll('img')).map(img => img.complete
+        ? null : new Promise(done => { img.onload = img.onerror = done; }))),
+      new Promise(done => setTimeout(done, 5000)),
+    ]);
+
+    const pageTitle = document.title;
+    document.title = projectSlug(project);
+    let cleaned = false;
+    const cleanup = () => {
+      if (cleaned) return;
+      cleaned = true;
+      document.title = pageTitle;
+      document.body.classList.remove('kr-printing');
+      root.remove();
+    };
+    window.addEventListener('afterprint', cleanup, { once: true });
+    window.print();
   }
 
   // Drawn with the editor's mermaid-tools, so a diagram looks the same in both.
@@ -2367,14 +2512,12 @@ description: View project details
     // h3 textContent. Falls through to the heading-scan otherwise.
     const builderSteps = document.querySelectorAll('#view-content .builder-step[data-step-num]');
     if (builderSteps.length > 0) {
-      nav.className = 'toc-nav sticky-top';
-      nav.style.top = '80px';
+      nav.className = 'toc-nav';
       buildBuilderTOC(nav, builderSteps);
       scrollToHash();
       return;
     }
-    nav.className = 'kr-toc kr-toc--column sticky-top';
-    nav.style.top = '';
+    nav.className = 'kr-toc kr-toc--column';
 
     // H1s are the top level and H2s nest under them (issue #259); deeper
     // headings stay in the text only.
