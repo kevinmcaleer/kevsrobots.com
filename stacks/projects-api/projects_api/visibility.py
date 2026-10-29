@@ -36,12 +36,14 @@ def not_draft():
 
 async def hide_drafts(
     session: AsyncSession, project_id: int, user: Optional[str]
-) -> None:
+) -> bool:
     """404 when ``project_id`` is someone else's draft.
 
     A missing project is left to the caller, so the sub-resource routes
-    keep whatever they already did for unknown ids.
+    keep whatever they already did for unknown ids. Returns whether the
+    project is a draft (which its author is allowed to see).
     """
     project = await session.get(Project, project_id)
     if project is not None and not can_view(project, user):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
+    return project is not None and is_draft(project)
