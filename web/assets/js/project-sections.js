@@ -46,10 +46,30 @@
 
   const byName = new Map(SECTIONS.map(s => [normalise(s.heading), s]));
 
+  // The section's line icon as inline SVG (issue #259).
+  function iconSvg(section, size) {
+    const px = size || 16;
+    return '<svg class="project-section-icon" width="' + px + '" height="' + px + '" viewBox="0 0 16 16" aria-hidden="true">' +
+      '<path d="' + section.icon + '" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  // Small icons for the canonical sections a project has, for the hub and
+  // search cards. `ids` comes from the list API's `sections` field.
+  function badgesHtml(ids) {
+    const have = new Set(ids || []);
+    const items = SECTIONS.filter(s => have.has(s.id));
+    if (!items.length) return '';
+    const names = items.map(s => s.heading).join(', ');
+    return '<span class="project-section-badges" role="img" title="Has: ' + names + '" aria-label="Has: ' + names + '">' +
+      items.map(s => iconSvg(s, 14)).join('') + '</span>';
+  }
+
   window.ProjectSections = {
     list: SECTIONS,
     get: id => SECTIONS.find(s => s.id === id) || null,
     // The canonical section a heading's text names, or null.
     match: text => byName.get(normalise(text)) || null,
+    iconSvg,
+    badgesHtml,
   };
 })();

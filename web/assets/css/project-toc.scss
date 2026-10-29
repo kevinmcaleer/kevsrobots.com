@@ -1,0 +1,53 @@
+---
+# "On this page" for project pages and the project editor (issue #259):
+# the article layout's .kr-toc look in a sticky left column, with the
+# canonical sections (project-sections.js) grouped and highlighted first.
+---
+@import 'colours';
+@import 'kr-tokens';
+@import 'kr-toc';
+
+.kr-toc.kr-toc--column {
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  padding-right: 8px;
+  @include kr-toc-list;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    cursor: pointer;
+    span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
+  ol + ol { margin-top: 0.75rem; }
+  ol ol { margin: 2px 0 0 0.75rem; }
+  a.kr-toc-sub { font-size: 0.8rem; }
+
+  // The canonical sections: a tinted card at the top, icon per entry.
+  .kr-toc-sections {
+    background: $kr-paper;
+    border: 1px solid $kr-line;
+    border-radius: 8px;
+    padding: 0.35rem 0;
+    a { border-left-color: transparent; }
+    a.is-active { border-left-color: $kevred; }
+    > li > a { color: $kr-ink; font-weight: 600; }
+    > li > a.is-active { font-weight: 700; }
+    ol { margin-left: 1.6rem; }
+  }
+  .project-section-icon { flex: none; color: $kevred; }
+
+  .kr-toc-extras { padding-top: 0.6rem; border-top: 1px solid $kr-line; }
+  .kr-toc-empty { color: $kr-ink-soft; font-size: 0.8rem; font-style: italic; padding: 0.3rem 0.7rem; }
+}
+
+// Section icons on hub and search cards.
+.project-section-badges {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  color: $kr-ink-soft;
+  .project-section-icon { display: block; }
+}

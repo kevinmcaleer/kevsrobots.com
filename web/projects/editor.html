@@ -13,6 +13,7 @@ hide_nibsy: true
 <link rel="stylesheet" href="/assets/css/circuit-editor.css">
 <link rel="stylesheet" href="/assets/css/image-viewer.css">
 <link rel="stylesheet" href="/assets/js/markdown-editor/markdown-editor.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 
 <!-- Global drag-and-drop overlay (issue #117) -->
 <div id="global-dropzone" class="global-dropzone d-none" aria-hidden="true">
@@ -38,59 +39,6 @@ hide_nibsy: true
   <div class="drop-progress__body"></div>
 </div>
 
-<style>
-  /* Table of Contents — mirrors view.html */
-  .toc-nav {
-    font-size: 0.875rem;
-    line-height: 1.4;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    padding-right: 8px;
-  }
-  .toc-nav .toc-title {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #999;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .toc-nav .toc-empty {
-    color: #bbb;
-    font-size: 0.8rem;
-    font-style: italic;
-    padding: 4px 8px;
-  }
-  .toc-nav a {
-    display: block;
-    padding: 4px 8px;
-    color: #6c757d;
-    text-decoration: none;
-    border-left: 2px solid transparent;
-    margin-bottom: 2px;
-    transition: color 0.15s, border-color 0.15s;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .toc-nav a:hover { color: #4A90D9; }
-  .toc-nav a.active {
-    color: #4A90D9;
-    border-left-color: #4A90D9;
-    background: #f0f7ff;
-  }
-  .toc-nav a.toc-h2 { padding-left: 16px; }
-  .toc-nav a.toc-h3 { padding-left: 24px; font-size: 0.82rem; }
-  .toc-nav a.toc-h4 { padding-left: 32px; font-size: 0.78rem; }
-  .toc-nav a.toc-h5,
-  .toc-nav a.toc-h6 { padding-left: 40px; font-size: 0.75rem; }
-  .toc-nav a.toc-extra {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #eee;
-  }
-</style>
 
 <div class="container-fluid py-3">
   <!-- Top bar: save state, project details drawer, View, and the
@@ -117,7 +65,7 @@ hide_nibsy: true
   <div id="editor-container" class="row d-none">
     <!-- LEFT: Table of contents (mirrors view.html) -->
     <div class="col-lg-2 d-none d-lg-block">
-      <nav id="editor-toc-nav" class="toc-nav sticky-top" style="top:80px"></nav>
+      <nav id="editor-toc-nav" class="kr-toc kr-toc--column sticky-top" aria-label="On this page"></nav>
     </div>
 
     <!-- MAIN: the editor takes the centre and right columns -->
@@ -375,6 +323,7 @@ hide_nibsy: true
 <!-- Issue #257: the Project `/` commands, the canonical section names
      they insert, and the YouTube embed shared with the view page. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-slash-commands.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-editor.js?v={{ site.time | date: '%s' }}"></script>
@@ -383,8 +332,6 @@ hide_nibsy: true
 (function() {
   const nav = document.getElementById('editor-toc-nav');
   if (!nav) return;
-
-  function esc(t) { const d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
 
   function parseHeadings(md) {
     const lines = (md || '').split('\n');
@@ -406,69 +353,53 @@ hide_nibsy: true
     return headings;
   }
 
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+  }
+
+  function scrollToLine(line) {
+    const editor = window.projectMarkdownEditor;
+    if (!editor) return;
+    const view = editor.view;
+    const doc = view.state.doc;
+    const pos = doc.line(Math.min(line + 1, doc.lines)).from;
+    // Put the cursor on the heading and scroll it to the top
+    // (view.constructor is CodeMirror's EditorView).
+    view.dispatch({
+      selection: { anchor: pos },
+      effects: view.constructor.scrollIntoView(pos, { y: 'start', yMargin: 20 }),
+    });
+    view.focus();
+    editor.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Issue #259: the same "On this page" as the project page, built by
+  // project-toc.js: canonical sections first with icons, then H1s with
+  // their H2s, then the editor's own cards.
   function render() {
     const editor = window.projectMarkdownEditor || null;
     const md = editor ? editor.getDoc() : (document.getElementById('content-editor')?.value || '');
-    const headings = parseHeadings(md);
+    const entries = parseHeadings(md).map(h => ({ level: h.level, text: h.text, key: h.line }));
 
-    const headingLinks = headings.map((h, idx) =>
-      `<a class="toc-h${h.level}" data-line="${h.line}" data-idx="${idx}">${esc(h.text)}</a>`
-    );
-
-    // Extra non-markdown anchors (page sections rendered outside the editor)
-    const extraLinks = [];
-    const bomRows = document.querySelectorAll('#bom-body tr').length;
-    if (bomRows > 0) {
-      extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-bom-section">Bill of Materials</a>`);
+    // Page sections rendered outside the editor
+    const extras = [];
+    if (document.querySelectorAll('#bom-body tr').length > 0) {
+      extras.push({ key: 'editor-bom-section', text: 'Bill of Materials', section: 'bill-of-materials' });
     }
-    extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-files-section">Files &amp; Models</a>`);
-    // Issue #171: surface the videos card in the editor TOC when at
-    // least one video is present, mirroring the BOM behaviour.
-    const videoRows = document.querySelectorAll('#videos-body tr').length;
-    if (videoRows > 0) {
-      extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-videos-section">Videos</a>`);
+    extras.push({ key: 'editor-files-section', text: 'Files & Models' });
+    // Issue #171: surface the videos card when at least one video is present.
+    if (document.querySelectorAll('#videos-body tr').length > 0) {
+      extras.push({ key: 'editor-videos-section', text: 'Videos' });
     }
 
-    let body;
-    if (headings.length === 0) {
-      body = '<div class="toc-empty">Add headings (#, ##) to build a table of contents</div>' + extraLinks.join('');
-    } else {
-      body = headingLinks.join('') + extraLinks.join('');
-    }
-    nav.innerHTML = '<div class="toc-title">On this page</div>' + body;
-
-    nav.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        // Page-level scroll target (non-markdown section)
-        if (a.dataset.scrollTo) {
-          const el = document.getElementById(a.dataset.scrollTo);
-          if (el) {
-            window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
-            nav.querySelectorAll('a').forEach(x => x.classList.remove('active'));
-            a.classList.add('active');
-          }
-          return;
-        }
-        const line = parseInt(a.dataset.line, 10);
-        const editor = window.projectMarkdownEditor;
-        if (editor) {
-          const view = editor.view;
-          const doc = view.state.doc;
-          const pos = doc.line(Math.min(line + 1, doc.lines)).from;
-          // Put the cursor on the heading and scroll it to the top
-          // (view.constructor is CodeMirror's EditorView).
-          view.dispatch({
-            selection: { anchor: pos },
-            effects: view.constructor.scrollIntoView(pos, { y: 'start', yMargin: 20 }),
-          });
-          view.focus();
-          editor.element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          // Highlight in TOC
-          nav.querySelectorAll('a').forEach(x => x.classList.remove('active'));
-          a.classList.add('active');
-        }
-      });
+    ProjectToc.render(nav, entries, {
+      extras,
+      empty: 'Add headings (#, ##) to build a table of contents',
+      onSelect(key) {
+        if (typeof key === 'string') scrollToSection(key);
+        else scrollToLine(key);
+      },
     });
   }
 

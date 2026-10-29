@@ -12,7 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..db import get_session
-from ..models import Download, Project, ProjectSlugHistory, ProjectTag, UserFollow
+from ..models import (
+    Download,
+    Project,
+    ProjectBOMItem,
+    ProjectSlugHistory,
+    ProjectTag,
+    UserFollow,
+)
 from ..schemas import (
     ProjectCreate,
     ProjectListItem,
@@ -20,6 +27,7 @@ from ..schemas import (
     ProjectUpdate,
     RemixedFromRef,
 )
+from ..sections import canonical_sections
 from ..slugs import slugify_title, unique_slug_for_author
 from ..visibility import can_view, is_draft, not_draft
 from .users import log_activity  # Issue #111: profile activity feed.
@@ -137,6 +145,16 @@ async def _download_count(session: AsyncSession, project_id: int) -> int:
         select(func.count(Download.id)).where(Download.project_id == project_id)
     )
     return int(result.scalar_one() or 0)
+
+async def _sections(session: AsyncSession, project: Project) -> list[str]:
+    """Canonical sections for a list card (issue #259): headings in the
+    Markdown, plus the Bill of Materials when the structured BOM has rows."""
+    has_bom = (
+        await session.execute(
+            select(ProjectBOMItem.id).where(ProjectBOMItem.project_id == project.id).limit(1)
+        )
+    ).first() is not None
+    return canonical_sections(project.content_md, has_bom=has_bom)
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
@@ -305,6 +323,7 @@ async def list_projects(
                 download_count=await _download_count(session, p.id),
                 is_featured=bool(getattr(p, "is_featured", False)),
                 featured_note=getattr(p, "featured_note", None),
+                sections=await _sections(session, p),
             )
         )
     return items
@@ -532,6 +551,7 @@ async def my_projects(
                 download_count=await _download_count(session, p.id),
                 is_featured=bool(getattr(p, "is_featured", False)),
                 featured_note=getattr(p, "featured_note", None),
+                sections=await _sections(session, p),
             )
         )
     return items

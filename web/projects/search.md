@@ -10,6 +10,8 @@ permalink: /projects/search
 
 {% include nav_projects.html %}
 
+<link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
+
 # {{page.title}}
 ## {{page.description}}
 
@@ -124,6 +126,7 @@ permalink: /projects/search
 <script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-search.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function () {
