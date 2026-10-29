@@ -2020,9 +2020,10 @@
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
     // Read from the document on every change, so deleting the section
     // (or emptying it) takes the points away again.
-    { key: 'body',   points: 20, label: 'Write the Assembly instructions (type /)',
+    // Any text under the heading counts, so one step from /assembly does.
+    { key: 'body',   points: 20, label: 'Add Assembly instructions with at least one step (type /)',
       target: 'content-editor',
-      check: () => (ProjectSections.sectionText(getEditorValue(), 'assembly-instructions') || '').length >= 100 },
+      check: () => /\w/.test(ProjectSections.sectionText(getEditorValue(), 'assembly-instructions') || '') },
     { key: 'diff',   points: 5,  label: 'Set a difficulty level',              target: 'project-difficulty',
       check: () => difficultySelect && difficultySelect.value !== '' },
     { key: 'time',   points: 5,  label: 'Estimate build time',                 target: 'project-time',
