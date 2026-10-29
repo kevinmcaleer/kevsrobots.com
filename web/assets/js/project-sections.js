@@ -125,6 +125,20 @@
     return table;
   }
 
+  // The text under a section's heading, up to the next heading at its
+  // level or above, or null when there's no such heading.
+  function sectionText(markdown, id) {
+    const all = headings(markdown);
+    const at = all.findIndex(h => {
+      const section = byName.get(normalise(h.text));
+      return section && section.id === id;
+    });
+    if (at < 0) return null;
+    const end = all.slice(at + 1).find(h => h.level <= all[at].level);
+    const lines = String(markdown || '').split('\n');
+    return lines.slice(all[at].line + 1, end ? end.line : lines.length).join('\n').trim();
+  }
+
   // Ids of the canonical sections the Markdown has a heading for.
   function present(markdown) {
     const ids = new Set();
@@ -145,5 +159,6 @@
     headings,
     present,
     sectionTable,
+    sectionText,
   };
 })();

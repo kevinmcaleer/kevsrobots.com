@@ -1989,9 +1989,11 @@
       check: () => descInput && descInput.value.trim().length >= 10 },
     { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'editor-images-section',
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
-    { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',
+    // Read from the document on every change, so deleting the section
+    // (or emptying it) takes the points away again.
+    { key: 'body',   points: 20, label: 'Write the Assembly instructions (type /)',
       target: 'content-editor',
-      check: () => getEditorValue().trim().length >= 200 },
+      check: () => (ProjectSections.sectionText(getEditorValue(), 'assembly-instructions') || '').length >= 100 },
     { key: 'diff',   points: 5,  label: 'Set a difficulty level',              target: 'project-difficulty',
       check: () => difficultySelect && difficultySelect.value !== '' },
     { key: 'time',   points: 5,  label: 'Estimate build time',                 target: 'project-time',
