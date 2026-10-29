@@ -23,7 +23,7 @@ hide_nibsy: true
     <ul class="global-dropzone__routes">
       <li><i class="fas fa-image text-info me-2"></i><strong>Images</strong> &rarr; uploaded to the gallery</li>
       <li><i class="fas fa-file-alt text-success me-2"></i><strong>README.md</strong> &rarr; loaded into the content editor</li>
-      <li><i class="fas fa-balance-scale text-warning me-2"></i><strong>LICENSE</strong> &rarr; uploaded and linked under Related Links</li>
+      <li><i class="fas fa-balance-scale text-warning me-2"></i><strong>LICENSE</strong> &rarr; added to Files &amp; Models</li>
       <li><i class="fas fa-paperclip text-secondary me-2"></i><strong>Other files</strong> &rarr; added to Files &amp; Models</li>
     </ul>
     <p class="global-dropzone__hint text-muted small mb-0">Release the mouse to drop. Press Esc to cancel.</p>
@@ -176,59 +176,6 @@ hide_nibsy: true
         </div>
       </div>
 
-      <!-- Bill of Materials -->
-      <div class="card mb-4" id="editor-bom-section">
-        <div class="card-header py-2 d-flex justify-content-between align-items-center">
-          <span><i class="fas fa-clipboard-list me-1"></i> Bill of Materials</span>
-          <button class="btn btn-sm btn-outline-primary" id="add-bom-btn"><i class="fas fa-plus"></i> Add Item</button>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-single table-narrow mb-0" id="bom-table">
-            <thead>
-              <tr>
-                <th>Part</th>
-                <th style="width:60px">Qty</th>
-                <th style="width:60px">Unit</th>
-                <th style="width:80px">Cost</th>
-                <th style="width:90px">Currency</th>
-                <th>Supplier</th>
-                <th style="width:40px"></th>
-              </tr>
-            </thead>
-            <tbody id="bom-body"></tbody>
-            <tfoot>
-              <tr class="table-light">
-                <td colspan="3" class="text-end fw-bold">Total:</td>
-                <td id="bom-total" class="fw-bold">£0.00</td>
-                <td colspan="3"></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-
-      <!-- Related Links (issue #171: BOM-style inline editable table) -->
-      <div class="card mb-4" id="editor-links-section">
-        <div class="card-header py-2 d-flex justify-content-between align-items-center">
-          <span><i class="fas fa-link me-1"></i> Related Links</span>
-          <button class="btn btn-sm btn-outline-primary" id="add-link-btn"><i class="fas fa-plus"></i> Add Link</button>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-single table-narrow mb-0" id="links-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>URL</th>
-                <th style="width:130px">Type</th>
-                <th style="width:40px"></th>
-              </tr>
-            </thead>
-            <tbody id="links-body"></tbody>
-          </table>
-          <p id="links-empty" class="text-muted small p-3 mb-0 d-none">No links yet &mdash; click <strong>Add Link</strong> above.</p>
-        </div>
-      </div>
-
       <!-- Videos (issue #171: first-class YouTube video list) -->
       <div class="card mb-4" id="editor-videos-section">
         <div class="card-header py-2 d-flex justify-content-between align-items-center">
@@ -273,7 +220,7 @@ hide_nibsy: true
             data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top"
             data-bs-html="true"
             data-bs-title="How completeness is scored"
-            data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>BOM item</strong> (10) &middot; <strong>Code repository section</strong> (10) &middot; <strong>File or video</strong> (10)"
+            data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>Bill of Materials part</strong> (10) &middot; <strong>Code repository section</strong> (10) &middot; <strong>File or video</strong> (10)"
             aria-label="How completeness is scored">
       <i class="fas fa-circle-question"></i>
     </button>
@@ -375,9 +322,6 @@ hide_nibsy: true
 
     // Page sections rendered outside the editor
     const extras = [];
-    if (document.querySelectorAll('#bom-body tr').length > 0) {
-      extras.push({ key: 'editor-bom-section', text: 'Bill of Materials', section: 'bill-of-materials' });
-    }
     extras.push({ key: 'editor-files-section', text: 'Files & Models' });
     // Issue #171: surface the videos card when at least one video is present.
     if (document.querySelectorAll('#videos-body tr').length > 0) {
@@ -405,16 +349,7 @@ hide_nibsy: true
       clearTimeout(render._t);
       render._t = setTimeout(render, 150);
     });
-    // Re-render the TOC when the BOM table contents change, so the
-    // "Bill of Materials" entry appears/disappears with row count.
-    const bomBody = document.getElementById('bom-body');
-    if (bomBody) {
-      new MutationObserver(() => {
-        clearTimeout(render._t);
-        render._t = setTimeout(render, 50);
-      }).observe(bomBody, { childList: true });
-    }
-    // Same treatment for the Videos card (issue #171).
+    // Re-render the TOC when the Videos card gains or loses rows (issue #171).
     const videosBody = document.getElementById('videos-body');
     if (videosBody) {
       new MutationObserver(() => {
