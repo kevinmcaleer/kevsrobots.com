@@ -548,10 +548,12 @@
       toolbar: toolbar,
       draft: { key: 'projects.' + (projectId || 'new') },
       uploadImage: uploadEditorImage,
+      // Several images dropped on the text at once go to the gallery only.
+      addImages: files => processDroppedFiles(files),
       imageLibrary: async () => (await fetchProjectImages()).map(img => ({
         url: imageViewUrl(img), alt: img.caption || img.filename,
       })),
-      images: { maxBytes: MAX_IMAGE_BYTES },
+      images: { maxBytes: MAX_IMAGE_BYTES, libraryName: 'the gallery' },
       preview: false,
       codeRenderers: { mermaid: renderMermaid },
       slashCommands: ProjectSlashCommands.create(slashContext()),
@@ -2370,10 +2372,20 @@
       overlay.classList.add('is-active');
     });
 
+    // Only images, as far as the browser lets on before the drop.
+    function onlyImages(e) {
+      const items = Array.from((e.dataTransfer && e.dataTransfer.items) || []);
+      return items.length > 0 && items.every(item => item.kind === 'file' && (!item.type || item.type.startsWith('image/')));
+    }
+
     document.addEventListener('dragover', (e) => {
       if (!hasFiles(e)) return;
       e.preventDefault();
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+      // Over the text, images are the editor's: it shows where they'll land,
+      // so the overlay steps aside.
+      const overText = mde && mde.view && mde.view.dom.contains(e.target) && onlyImages(e);
+      overlay.classList.toggle('d-none', !!overText);
     });
 
     document.addEventListener('dragleave', (e) => {
@@ -2387,6 +2399,8 @@
 
     document.addEventListener('drop', (e) => {
       if (!hasFiles(e)) return;
+      // Whether the editor took the drop, before this handler takes it too.
+      const editorTook = e.defaultPrevented;
       e.preventDefault();
       dragDepth = 0;
       overlay.classList.add('d-none');
@@ -2398,10 +2412,17 @@
       // The one exception: images dropped on the text belong to the editor
       // bundle, which places them where they land and files them in the
       // gallery through the uploadImage hook.
-      const files = e.dataTransfer && e.dataTransfer.files;
+      const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
       const onText = mde && mde.element && mde.element.contains(e.target);
-      if (onText && files && files.length && Array.from(files).every(isImageFile)) return;
-      if (files && files.length) processDroppedFiles(files);
+      // The editor took the images (it prevents the default when it does);
+      // anything dropped with them still gets routed here.
+      if (onText && editorTook) {
+        const rest = files.filter(f => !(f.type && f.type.startsWith('image/')));
+        if (rest.length) processDroppedFiles(rest);
+        return;
+      }
+      if (onText && files.length && files.every(isImageFile)) return;
+      if (files.length) processDroppedFiles(files);
     });
 
     document.addEventListener('keydown', (e) => {
