@@ -1,0 +1,18 @@
+// The "On this page" list's look, shared by the article layout's fixed
+// .kr-toc (article.scss) and the project pages' column (project-toc.scss).
+// Needs 'colours' and 'kr-tokens' imported first.
+@mixin kr-toc-list {
+  p { font: 600 0.7rem $kr-mono; letter-spacing: 0.1em; text-transform: uppercase; color: $kr-ink-soft; margin: 0 0 0.5rem; }
+  ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  a {
+    display: block;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    padding: 0.3rem 0.7rem;
+    border-left: 2px solid $kr-line;
+    color: $kr-ink-soft;
+    text-decoration: none;
+    &:hover { color: $kevred; }
+    &.is-active { border-color: $kevred; color: $kr-ink; font-weight: 700; }
+  }
+}

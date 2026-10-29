@@ -164,6 +164,9 @@ class ProjectListItem(BaseModel):
     # render the gold ribbon without a second API call per project.
     is_featured: bool = False
     featured_note: Optional[str] = None
+    # Issue #259: ids of the canonical sections the project has (Bill of
+    # Materials, Wiring, ...), so cards can show a completeness hint.
+    sections: list[str] = Field(default_factory=list)
 
 
 class ProjectRemixCreate(BaseModel):

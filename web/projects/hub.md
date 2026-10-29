@@ -19,6 +19,7 @@ thanks: false
 ---
 
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 
 <!-- Project Gallery Component -->
 <div id="projects-hub">
@@ -104,6 +105,7 @@ thanks: false
 <script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-search.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
@@ -223,6 +225,7 @@ thanks: false
                   ${p.difficulty ? `<span class="badge bg-${difficultyColors[p.difficulty] || 'secondary'}">${p.difficulty}</span>` : ''}
                   ${p.estimated_minutes ? `<span class="badge bg-light text-dark"><i class="fas fa-clock"></i> ${p.estimated_minutes}min</span>` : ''}
                   ${p.is_remix ? '<span class="badge bg-light text-muted"><i class="fas fa-code-branch"></i> Remix</span>' : ''}
+                  ${ProjectSearch.sectionBadges(p)}
                 </div>
                 <div class="d-flex flex-wrap gap-1 kr-card-tags">
                   ${(p.tags || []).slice(0, 4).map(t => `<span class="badge bg-light text-primary">${esc(t)}</span>`).join('')}
