@@ -46,159 +46,9 @@
   const tagInput = document.getElementById('tag-input');
   const statusBadge = document.getElementById('status-badge');
   const saveIndicator = document.getElementById('save-indicator');
-  // Content-mode toggle (Markdown vs Instruction Builder).
-  const contentModeBtns = document.querySelectorAll('.content-mode-btn');
-  const contentModePaneMarkdown = document.getElementById('content-mode-pane-markdown');
-  const contentModePaneBuilder = document.getElementById('content-mode-pane-builder');
+  // The lite "Build Instructions" stepper (issue #178 phase 0) sits under
+  // the Markdown editor once a project has loaded.
   const editorInstructionsSection = document.getElementById('editor-instructions-section');
-  const openInstructionBuilderLink = document.getElementById('open-instruction-builder');
-
-  // --- Content-mode toggle (Markdown vs Instruction Builder) ---
-  // Reflects the saved choice into the UI, swapping which content
-  // surface is visible. Triggered on load (from the project payload)
-  // and on user click (PUTs content_mode back to the server).
-  function applyContentMode(mode) {
-    var m = (mode === 'builder') ? 'builder' : 'markdown';
-    contentModeBtns.forEach(function (btn) {
-      var isActive = btn.dataset.contentMode === m;
-      btn.classList.toggle('is-active', isActive);
-      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-    });
-    if (contentModePaneMarkdown) {
-      contentModePaneMarkdown.classList.toggle('d-none', m !== 'markdown');
-    }
-    if (contentModePaneBuilder) {
-      contentModePaneBuilder.classList.toggle('d-none', m !== 'builder');
-    }
-    // The legacy in-page "Build Instructions" lite-stepper (issue #178
-    // phase 0) belongs to the markdown surface — hide it in builder
-    // mode so the user has one clear path. The full builder
-    // supersedes the lite-stepper.
-    if (editorInstructionsSection) {
-      editorInstructionsSection.classList.toggle('d-none', m !== 'markdown');
-    }
-    // Builder mode collapses the editor's TOC / sidebar columns so
-    // the preview reads at a comfortable width. The CSS hook is
-    // ``body.is-builder-mode``; project-editor.css handles the
-    // column-width overrides.
-    document.body.classList.toggle('is-builder-mode', m === 'builder');
-    // Render the read-only preview of the project's builder steps so
-    // the author sees exactly what visitors will see. Authoring
-    // happens in the focused workspace — the link is at the top of
-    // the pane.
-    if (m === 'builder') renderBuilderPreview();
-  }
-
-  function renderBuilderPreview() {
-    if (!currentProject || !currentProject.id) return;
-    if (openInstructionBuilderLink) {
-      openInstructionBuilderLink.href =
-        '/projects/instructions/edit.html?id=' + encodeURIComponent(currentProject.id);
-    }
-    var surface = document.getElementById('builder-preview-surface');
-    if (!surface) return;
-    if (window.BuilderRenderer && typeof window.BuilderRenderer.render === 'function') {
-      window.BuilderRenderer.render(surface, currentProject.id);
-    } else {
-      surface.innerHTML =
-        '<div class="alert alert-warning small">' +
-        '  Preview library failed to load — refresh the page to retry.' +
-        '</div>';
-    }
-    // Refresh the cached instruction so the completeness check sees
-    // the latest steps. The renderer fetches independently for its
-    // own draw, but we need the data here in JS scope too.
-    refreshBuilderInstructionCache();
-  }
-
-  // ----- Builder-mode instruction cache for completeness check -----
-  // The completeness meter runs on a rAF cadence and needs sync
-  // access to "is there a text step with 200+ chars?". Refetching
-  // the instruction on every check would be wasteful, so we cache
-  // here and refresh on the key lifecycle events:
-  //   - loadProject() / project change
-  //   - switch into builder content_mode
-  //   - return from the focused workspace (pageshow with bfcache)
-  let builderInstruction = null;
-  let builderInstructionPromise = null;
-  async function refreshBuilderInstructionCache() {
-    if (!currentProject || !currentProject.id) return null;
-    // Coalesce in-flight fetches so a flurry of mode-switch /
-    // pageshow events doesn't fire N parallel requests.
-    if (builderInstructionPromise) return builderInstructionPromise;
-    builderInstructionPromise = (async function () {
-      try {
-        var r = await apiFetch(
-          API + '/api/projects/' + currentProject.id + '/instruction',
-          { credentials: 'include' });
-        if (r.ok) {
-          builderInstruction = await r.json();
-        } else if (r.status === 404) {
-          // No instruction yet — that's fine, completeness check
-          // treats absence as "no builder content".
-          builderInstruction = { steps: [] };
-        }
-      } catch (_) {
-        // Network blip — leave the cache as-is rather than blanking it.
-      } finally {
-        builderInstructionPromise = null;
-      }
-      // Re-run completeness now that the cache has fresh data.
-      try { recomputeCompleteness(); } catch (_) {}
-      return builderInstruction;
-    })();
-    return builderInstructionPromise;
-  }
-
-  async function persistContentMode(mode) {
-    if (!currentProject) return;
-    try {
-      var resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content_mode: mode }),
-      });
-      if (resp.ok) {
-        currentProject = await resp.json();
-      }
-    } catch (e) {
-      console.error('Failed to persist content_mode:', e);
-    }
-  }
-
-  contentModeBtns.forEach(function (btn) {
-    btn.addEventListener('click', async function () {
-      var mode = btn.dataset.contentMode;
-      applyContentMode(mode);
-      if (!currentProject) {
-        // No row yet — force a save so the project gets an id; the
-        // active content_mode rides along via getActiveContentMode().
-        await saveProject();
-        if (currentProject && openInstructionBuilderLink) {
-          openInstructionBuilderLink.href =
-            '/projects/instructions/edit.html?id=' + encodeURIComponent(currentProject.id);
-        }
-        // Newly-saved project — kick off the preview now that we
-        // have an id (applyContentMode ran before saveProject so it
-        // bailed early with no id).
-        if (mode === 'builder') renderBuilderPreview();
-      } else {
-        persistContentMode(mode);
-      }
-    });
-  });
-
-  // The "Open in focused workspace" link is target=_self by default
-  // (no target attr) so the user comes back via the in-builder Back
-  // link. When they return, browsers either replay this page from
-  // bfcache (pageshow with persisted=true) or do a fresh load.
-  // Either way we want to re-render the preview so the latest
-  // authored steps are reflected.
-  window.addEventListener('pageshow', function (e) {
-    if (e.persisted && document.body.classList.contains('is-builder-mode')) {
-      renderBuilderPreview();
-    }
-  });
 
   // --- Auth ---
   const IS_LOCAL = location.hostname === 'localhost'
@@ -270,13 +120,7 @@
       repoInput.value = currentProject.code_repo_url || '';
       updateStatusBadge(currentProject.status);
       renderTags(currentProject.tags || []);
-      // Surface the saved content-mode choice and point the builder
-      // deep-link at this project.
-      applyContentMode(currentProject.content_mode || 'markdown');
-      if (openInstructionBuilderLink) {
-        openInstructionBuilderLink.href =
-          '/projects/instructions/edit.html?id=' + encodeURIComponent(currentProject.id);
-      }
+      if (editorInstructionsSection) editorInstructionsSection.classList.remove('d-none');
       loadBOM();
       loadLinks();
       loadVideos();
@@ -305,17 +149,11 @@
     if (status === 'saved') setTimeout(() => { saveIndicator.textContent = ''; }, 2000);
   }
 
-  function getActiveContentMode() {
-    var active = document.querySelector('.content-mode-btn.is-active');
-    return active && active.dataset.contentMode === 'builder' ? 'builder' : 'markdown';
-  }
-
   async function saveProject() {
     const data = {
       title: titleInput.value || 'Untitled Project',
       short_description: descInput.value || null,
       content_md: getEditorValue() || null,
-      content_mode: getActiveContentMode(),
       difficulty: difficultySelect.value || null,
       estimated_minutes: timeInput.value ? parseInt(timeInput.value) : null,
       code_repo_url: repoInput.value || null,
@@ -2615,32 +2453,8 @@
     { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'image-input',
       check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
     { key: 'body',   points: 20, label: 'Write 200+ chars of build steps',
-      // Target varies by mode: markdown authors get the Markdown
-      // surface; builder authors get the "Open in focused workspace"
-      // link (which then navigates them into the step editor). The
-      // renderer resolves this on every recompute so the link's
-      // destination stays in sync with whichever mode is active.
-      target: () => (currentProject && currentProject.content_mode === 'builder')
-        ? 'open-instruction-builder'
-        : 'content-editor',
-      // Passes either way:
-      //   • markdown mode → ≥200 chars in the Markdown editor (legacy).
-      //   • builder mode  → at least one step of step_type 'text' whose
-      //     body has ≥200 chars after trimming. Builder authors don't
-      //     write into the markdown editor — their long-form content
-      //     lives in text steps, so the check needs to look there too
-      //     or builder projects can never score full marks.
-      check: () => {
-        var mdLen = getEditorValue().trim().length;
-        if (mdLen >= 200) return true;
-        var inBuilder = currentProject && currentProject.content_mode === 'builder';
-        if (!inBuilder) return false;
-        if (!builderInstruction || !Array.isArray(builderInstruction.steps)) return false;
-        return builderInstruction.steps.some(function (s) {
-          return s && s.step_type === 'text' &&
-                 String(s.body || '').trim().length >= 200;
-        });
-      } },
+      target: 'content-editor',
+      check: () => getEditorValue().trim().length >= 200 },
     { key: 'diff',   points: 5,  label: 'Set a difficulty level',              target: 'project-difficulty',
       check: () => difficultySelect && difficultySelect.value !== '' },
     { key: 'time',   points: 5,  label: 'Estimate build time',                 target: 'project-time',
@@ -2753,14 +2567,6 @@
   function focusCompletenessTarget(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    // Special-case the "Open in focused workspace" link: instead of
-    // just focusing it, navigate. The user wanted that item — the
-    // whole point is to land them in the step editor, not to scroll
-    // them to a button they'd then have to click themselves.
-    if (id === 'open-instruction-builder' && el.tagName === 'A' && el.href) {
-      window.location.href = el.href;
-      return;
-    }
     try {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (e) {
