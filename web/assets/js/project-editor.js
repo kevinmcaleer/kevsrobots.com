@@ -260,6 +260,10 @@
         updateStatusBadge(currentProject.status);
         showSaveStatus('saved', 'Status updated');
         if (window.BadgeToast) BadgeToast.fromResponse(currentProject);
+      } else if (resp.status === 422 && status === 'draft') {
+        // A projects API from before issue #260 doesn't know "draft" yet.
+        showSaveStatus('error', "Couldn't set Draft: the projects API needs updating to support drafts");
+        updateStatusBadge(currentProject.status);
       } else {
         throw new Error('HTTP ' + resp.status);
       }
@@ -291,11 +295,12 @@
     } catch (e) { console.error(e); }
   });
 
-  const statusLabels = { draft: 'Draft', wip: 'Published', completed: 'Published', archived: 'Archived' };
-
+  // The switch only ever reads Draft or Published; Archived is shown by
+  // its own checkbox.
   function updateStatusBadge(status) {
-    if (publishSwitch) publishSwitch.checked = status === 'wip' || status === 'completed';
-    if (publishSwitchLabel) publishSwitchLabel.textContent = statusLabels[status] || status;
+    const published = status === 'wip' || status === 'completed';
+    if (publishSwitch) publishSwitch.checked = published;
+    if (publishSwitchLabel) publishSwitchLabel.textContent = published ? 'Published' : 'Draft';
     if (archiveCheck) archiveCheck.checked = status === 'archived';
     const viewToggle = document.getElementById('view-toggle-btn');
     if (currentProject) {
