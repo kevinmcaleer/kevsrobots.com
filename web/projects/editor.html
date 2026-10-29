@@ -138,95 +138,9 @@ hide_nibsy: true
 
       <hr>
 
-      <!-- Content-mode toggle: pick between the long-form Markdown
-           editor and the visual Instruction Builder. The choice is
-           persisted on the project (projects.content_mode) and only
-           reveals one of the two surfaces at a time so the page
-           stays focused. -->
-      <div class="content-mode-toggle mb-4" id="content-mode-toggle" role="tablist"
-           aria-label="Content editor mode">
-        <button type="button" class="content-mode-btn is-active"
-                id="content-mode-btn-markdown"
-                data-content-mode="markdown" role="tab" aria-selected="true">
-          <i class="fas fa-pen-to-square me-2"></i>
-          <span class="content-mode-btn-label">Markdown</span>
-          <span class="content-mode-btn-sub">Write the project as long-form text</span>
-        </button>
-        <button type="button" class="content-mode-btn"
-                id="content-mode-btn-builder"
-                data-content-mode="builder" role="tab" aria-selected="false">
-          <i class="fas fa-list-ol me-2"></i>
-          <span class="content-mode-btn-label">Instruction Builder</span>
-          <span class="content-mode-btn-sub">Build steps with photos, schematics &amp; video</span>
-        </button>
-      </div>
-
       <!-- Markdown Editor (markdown-studio's editor bundle, mounted on the textarea) -->
-      <div class="mb-4" id="content-mode-pane-markdown">
+      <div class="mb-4" id="content-markdown-pane">
         <textarea id="content-editor"></textarea>
-      </div>
-
-      <!-- Instruction Builder pane — shows the same rendered output
-           that the public viewer renders, with the "Open in focused
-           workspace" button up top so authors can jump into the full
-           builder UI in one click. The pane never embeds the builder
-           interface itself; the focused workspace is where authoring
-           happens. -->
-      <div class="content-mode-builder-pane d-none" id="content-mode-pane-builder">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div>
-            <h5 class="mb-1">
-              <i class="fas fa-list-ol me-2 text-primary"></i>
-              Instruction Builder &mdash; preview
-            </h5>
-            <p class="text-muted small mb-0">
-              This is what visitors will see. Click the button to author or edit steps.
-            </p>
-          </div>
-          <a id="open-instruction-builder"
-             class="btn btn-primary"
-             href="#">
-            <i class="fas fa-arrow-up-right-from-square me-1"></i>
-            Open in focused workspace
-          </a>
-        </div>
-        <div class="builder-preview-surface" id="builder-preview-surface">
-          <div class="text-muted small">
-            <i class="fas fa-spinner fa-spin me-1"></i> Loading preview&hellip;
-          </div>
-        </div>
-      </div>
-
-      <!-- Build Instructions (issue #178, Phase 0 — data plumbing only) -->
-      <div class="card mb-4 d-none" id="editor-instructions-section">
-        <div class="card-header py-2">
-          <i class="fas fa-list-ol me-1"></i> Build Instructions
-        </div>
-        <div class="card-body">
-          <p class="text-muted small mb-3">
-            Outline the build steps for your project. In this phase you can
-            add step titles and descriptions. The visual canvas &mdash;
-            overlays, arrows, photo annotations &mdash; is coming next.
-          </p>
-
-          <div id="instructions-meta" class="mb-3">
-            <label for="instruction-title" class="form-label fw-semibold small text-muted">Instruction set title</label>
-            <input type="text" class="form-control form-control-sm mb-2" id="instruction-title"
-                   placeholder="e.g. Assembling the SMARS chassis" maxlength="200">
-            <label for="instruction-description" class="form-label fw-semibold small text-muted">Description</label>
-            <textarea class="form-control form-control-sm" id="instruction-description" rows="2"
-                      placeholder="Optional. One-line summary shown above the steps."></textarea>
-            <div id="instruction-meta-saved" class="text-success small mt-1 d-none"><i class="fas fa-check me-1"></i>Saved</div>
-          </div>
-
-          <h6 class="mt-4 mb-2 text-muted text-uppercase small">Steps</h6>
-          <div id="instruction-steps-list">
-            <!-- Populated by project-instructions.js -->
-          </div>
-          <button id="add-instruction-step" type="button" class="btn btn-outline-primary btn-sm mt-2">
-            <i class="fas fa-plus me-1"></i> Add step
-          </button>
-        </div>
       </div>
 
       <!-- File Upload -->
@@ -459,7 +373,6 @@ hide_nibsy: true
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <!-- Issue #255: markdown-studio's Markdown editor, vendored by
      scripts/update-markdown-editor.sh. Its spelling word lists load from
      dictionaries/ beside the script. -->
@@ -470,15 +383,6 @@ hide_nibsy: true
 <script src="/assets/js/circuit-components.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/circuit-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
-<!-- Builder-mode renderer — shared with /projects/view.html so the
-     editor's preview surface and the public page render the same
-     output. Loaded before project-editor.js so applyContentMode can
-     call BuilderRenderer.render() when the user picks Builder. -->
-<script src="/assets/js/builder-renderer.js?v={{ site.time | date: '%s' }}"></script>
-<!-- Issue #178 Phase 0: instruction-section module. Loaded BEFORE
-     project-editor.js so the latter's boot flow can call
-     ProjectInstructions.init(projectId, isOwner). -->
-<script src="/assets/js/project-instructions.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #257: the Project `/` commands, the canonical section names
      they insert, and the YouTube embed shared with the view page. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
@@ -524,11 +428,6 @@ hide_nibsy: true
 
     // Extra non-markdown anchors (page sections rendered outside the editor)
     const extraLinks = [];
-    // Issue #178 Phase 0: surface the Build Instructions card. Always
-    // present (unlike BOM / videos which appear only when populated)
-    // because the card itself is always rendered and the user-facing
-    // flow is "scroll here to start outlining the build".
-    extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-instructions-section">Build Instructions</a>`);
     const bomRows = document.querySelectorAll('#bom-body tr').length;
     if (bomRows > 0) {
       extraLinks.push(`<a class="toc-h1 toc-extra" data-scroll-to="editor-bom-section">Bill of Materials</a>`);
