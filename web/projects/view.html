@@ -906,6 +906,7 @@ description: View project details
       const viewMode = (project.content_mode === 'builder') ? 'builder' : 'markdown';
       if (viewMode === 'builder') {
         await renderBuilderInstructions(project);
+        CodeCopy.attach(document.getElementById('view-content'));
         // Build the step-aware TOC now that the sections are in the DOM.
         buildTOC();
       } else if (project.content_md) {
@@ -915,6 +916,7 @@ description: View project details
         ProjectEmbeds.embedVideos(contentEl);
         ProjectCallouts.render(contentEl);
         await renderMermaid();
+        CodeCopy.attach(contentEl);
         buildTOC();
       }
 
@@ -1563,6 +1565,7 @@ description: View project details
     `).join('');
     styleMarkdownTables(journalEl);
     ProjectCallouts.render(journalEl);
+    CodeCopy.attach(journalEl);
   }
 
   async function downloadProject(project) {
