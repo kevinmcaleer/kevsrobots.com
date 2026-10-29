@@ -859,3 +859,12 @@
   padding: 6px 8px;
   color: #6c757d;
 }
+
+/* The project editor spans the centre and right columns, so let the
+   text use that width too. The editor bundle keeps a 46rem reading
+   column for the Notes app; override it here only. */
+#content-markdown-pane .cm-content,
+#content-markdown-pane .cm-find,
+#content-markdown-pane .prose {
+  max-width: none;
+}
