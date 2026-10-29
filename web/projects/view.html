@@ -1843,28 +1843,25 @@ description: View project details
     btn.innerHTML = '<i class="fas fa-download me-2"></i> Download Project';
   }
 
+  // Drawn with the editor's mermaid-tools, so a diagram looks the same in both.
   let mermaidLoaded = null;
   async function renderMermaid() {
     const blocks = document.querySelectorAll('#view-content pre code.language-mermaid');
     if (blocks.length === 0) return;
-    if (!mermaidLoaded) {
-      mermaidLoaded = import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs').then(m => {
-        m.default.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
-        return m.default;
-      });
-    }
-    const mermaid = await mermaidLoaded;
-    blocks.forEach((code, i) => {
+    if (!mermaidLoaded) mermaidLoaded = import('/assets/js/mermaid-tools/mermaid-tools.js');
+    const tools = await mermaidLoaded;
+    for (const code of blocks) {
       const pre = code.parentElement;
       const div = document.createElement('div');
       div.className = 'mermaid';
-      div.id = 'mermaid-view-' + i + '-' + Date.now();
-      div.textContent = code.textContent;
+      const result = await tools.renderMermaid(code.textContent);
+      if (result.error) {
+        console.warn('Mermaid render error:', result.error);
+        continue;
+      }
+      div.innerHTML = result.svg;
       pre.replaceWith(div);
-    });
-    try {
-      await mermaid.run({ querySelector: '#view-content .mermaid' });
-    } catch (e) { console.warn('Mermaid render error:', e); }
+    }
   }
 
   function slugify(text) {
