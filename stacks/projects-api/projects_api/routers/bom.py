@@ -21,7 +21,7 @@ from ..db import get_session
 from ..fx import get_rate
 from ..models import Part, PartRevision, PartSupplier, Project, ProjectBOMItem
 from ..visibility import hide_drafts
-from ..schemas import BOMItemCreate, BOMItemResponse
+from ..schemas import BOMItemCreate, BOMItemResponse, BOMSync
 from .parts import first_photo_cover_urls
 
 router = APIRouter(prefix="/api/projects/{project_id}/bom", tags=["bom"])
@@ -323,6 +323,91 @@ async def _resolve_part_revision(
         if rev is not None and rev.part_id == part.id:
             return requested
     return part.current_revision_id
+
+
+@router.put("/sync", response_model=list[BOMItemResponse])
+async def sync_bom(
+    project_id: int,
+    body: BOMSync,
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> list[BOMItemResponse]:
+    """Issue #264: make the stored rows follow the Bill of Materials table
+    in the project's Markdown, in its order.
+
+    Each table row reuses a stored row for the same part (or, unlinked, the
+    same name), so what the table doesn't carry (the pinned revision, the
+    chosen supplier, the unit) survives. A row whose part changed is
+    re-pinned and loses a supplier of the old part. Rows the table no longer
+    has are deleted, and usage counts follow."""
+    await _check_owner(session, project_id, user)
+    existing = list(
+        (
+            await session.scalars(
+                select(ProjectBOMItem)
+                .where(ProjectBOMItem.project_id == project_id)
+                .order_by(ProjectBOMItem.sort_order, ProjectBOMItem.id)
+            )
+        ).all()
+    )
+    slugs = {r.part_slug for r in body.rows if r.part_slug}
+    parts_by_slug = {
+        p.slug: p
+        for p in (await session.scalars(select(Part).where(Part.slug.in_(slugs)))).all()
+    } if slugs else {}
+    touched: set[int] = {i.part_id for i in existing if i.part_id is not None}
+    unused = list(existing)
+
+    def take(match) -> Optional[ProjectBOMItem]:
+        for item in unused:
+            if match(item):
+                unused.remove(item)
+                return item
+        return None
+
+    wanted = [(row, parts_by_slug.get(row.part_slug) if row.part_slug else None) for row in body.rows]
+    # Same part first, then same name (a row just linked, or linked to
+    # another part), so a name match never takes a row another part needs.
+    matched: list[Optional[ProjectBOMItem]] = [
+        take(lambda i, p=part: i.part_id == p.id) if part is not None else None
+        for row, part in wanted
+    ]
+    for n, (row, part) in enumerate(wanted):
+        if matched[n] is None:
+            name = row.name.strip().lower()
+            matched[n] = take(lambda i: i.name.strip().lower() == name)
+
+    for order, (row, part) in enumerate(wanted):
+        name = row.name.strip()
+        item = matched[order]
+        if item is None:
+            item = ProjectBOMItem(project_id=project_id, unit="qty")
+            session.add(item)
+        new_part_id = part.id if part is not None else None
+        if item.part_id != new_part_id:
+            item.part_revision_id = part.current_revision_id if part is not None else None
+            if item.supplier_id is not None:
+                sup = await session.get(PartSupplier, item.supplier_id)
+                if sup is None or sup.part_id != new_part_id:
+                    item.supplier_id = None
+        elif part is not None and item.part_revision_id is None:
+            item.part_revision_id = part.current_revision_id
+        item.part_id = new_part_id
+        item.name = name
+        item.quantity = row.quantity
+        item.sort_order = order
+        if "unit_cost" in row.model_fields_set:
+            item.unit_cost = row.unit_cost
+            item.currency_code = row.currency_code if row.unit_cost is not None else None
+        if new_part_id is not None:
+            touched.add(new_part_id)
+    for item in unused:
+        await session.delete(item)
+    await session.flush()
+    for part_id in touched:
+        await _refresh_usage_count(session, part_id)
+    await session.commit()
+    return await list_bom(project_id, session, user)
 
 
 @router.post("", response_model=BOMItemResponse, status_code=201)

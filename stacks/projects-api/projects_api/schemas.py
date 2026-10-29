@@ -215,6 +215,23 @@ class BOMItemCreate(BaseModel):
     supplier_id: Optional[int] = None
 
 
+class BOMSyncRow(BaseModel):
+    """One row of the Bill of Materials table in a project's Markdown
+    (issue #264). ``part_slug`` comes from the row's catalog link. Leave
+    ``unit_cost`` out (rather than null) when the table has no Price
+    column, so the stored price is kept."""
+
+    name: str = Field(..., min_length=1, max_length=200)
+    quantity: int = Field(1, ge=1)
+    part_slug: Optional[str] = Field(None, max_length=200)
+    unit_cost: Optional[float] = None
+    currency_code: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
+
+
+class BOMSync(BaseModel):
+    rows: list[BOMSyncRow] = Field(default_factory=list, max_length=500)
+
+
 class BOMItemResponse(BaseModel):
     id: int
     name: str

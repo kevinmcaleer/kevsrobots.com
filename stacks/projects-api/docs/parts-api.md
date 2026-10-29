@@ -325,6 +325,18 @@ part_id = ?`. The free-form fields (`name`, `quantity`, `unit`,
 frontend should populate them from the chosen part for display, but the
 catalog row is the source of truth for future revisions.
 
+### PUT `/api/projects/{id}/bom/sync` (issue #264)
+
+The project's Bill of Materials lives in its Markdown as a table. On each
+save the editor parses it (`web/assets/js/bom-sync.js`) and sends
+`{rows: [{name, quantity, part_slug, unit_cost?, currency_code?}]}`.
+The stored rows then follow the table in order: each reuses a stored row
+for the same part, else the same name, so the pinned revision, chosen
+supplier and unit survive; rows the table no longer has are deleted and
+usage counts follow. `unit_cost` is left out when the table has no Price
+column, which keeps the stored price. Owner only; returns the list as
+`GET /bom` does. With no table in the text the editor doesn't call it.
+
 ### Example BOM body
 
 ```json

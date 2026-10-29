@@ -52,14 +52,14 @@
     return photo ? apiUrl(photo.url) : null;
   }
 
-  // The cheapest shop that still has it, in the reader's currency where
-  // there's one (else the shop's own): "£3.90 at Pimoroni".
-  async function lowestPrice(part) {
+  // The cheapest shop that still has it, as { amount, code, name }, in
+  // currency `to` (else the reader's, else the shop's own), or null.
+  async function cheapest(part, to) {
     const shops = (part.suppliers || []).filter(s =>
-      (s.kind || 'shop') === 'shop' && !s.unavailable_at && s.unit_cost != null);
+      (s.kind || 'shop') === 'shop' && !s.unavailable_at && !s.is_broken && s.unit_cost != null);
     if (!shops.length) return null;
     const cc = window.CurrencyConvert;
-    const to = (cc && await cc.getPreferredCurrency().catch(() => null)) || shops[0].currency_code || 'GBP';
+    to = to || (cc && await cc.getPreferredCurrency().catch(() => null)) || shops[0].currency_code || 'GBP';
     let best = null;
     for (const s of shops) {
       let amount = Number(s.unit_cost);
@@ -70,7 +70,14 @@
       }
       if (code === to && (!best || amount < best.amount)) best = { amount, code, name: s.name };
     }
+    return best;
+  }
+
+  // The same, for reading: "£3.90 at Pimoroni".
+  async function lowestPrice(part) {
+    const best = await cheapest(part);
     if (!best) return null;
+    const cc = window.CurrencyConvert;
     const price = cc ? cc.formatPrice(best.amount, best.code) : best.amount.toFixed(2) + ' ' + best.code;
     return best.name ? price + ' at ' + best.name : price;
   }
@@ -209,5 +216,5 @@
     root.addEventListener('mousedown', hideCard);
   }
 
-  window.PartLinks = { slugOf, href, absolutize, fetchPart, coverOf, lowestPrice, thumbsFor, decorate, attachHover, linkAt, hideCard };
+  window.PartLinks = { slugOf, href, absolutize, fetchPart, coverOf, cheapest, lowestPrice, thumbsFor, decorate, attachHover, linkAt, hideCard };
 })();

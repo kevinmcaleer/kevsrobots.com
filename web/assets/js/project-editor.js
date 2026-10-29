@@ -223,6 +223,7 @@
       updateStatusBadge(currentProject.status);
       showSaveStatus('saved', 'Saved');
       syncVideos(content);
+      syncBom(content);
       // The server has this text now, so the editor's local draft of it
       // can go (unless more was typed while the save was in flight).
       if (mde && mde.getDoc() === (data.content_md || '')) mde.clearDraft();
@@ -875,6 +876,7 @@
         if (!action) return;
         if (action.dataset.action === 'link-all') linkAllBomParts();
         else if (action.dataset.action === 'review') reviewBomPart();
+        else if (action.dataset.action === 'insert-bom') insertBomTable();
         else if (action.dataset.action === 'dismiss') { bomLinkBarDismissed = true; bar.hidden = true; }
       });
     }
@@ -925,10 +927,22 @@
 
   async function updateBomLinkBar() {
     if (!mde || !mde.view) return;
-    PartLinks.thumbsFor(mde.view.state.doc.toString());
+    const markdown = mde.view.state.doc.toString();
+    PartLinks.thumbsFor(markdown);
     const bar = document.getElementById('bom-link-bar');
     if (!bar) return;
-    const rows = unlinkedBomRows(mde.view.state.doc.toString());
+    // A project saved before the table lived in the text (issue #264).
+    if (storedBom && storedBom.length && !BomSync.parse(markdown)) {
+      const n = storedBom.length;
+      bar.innerHTML =
+        '<i class="fas fa-list" aria-hidden="true"></i>' +
+        '<span>This project has ' + n + ' Bill of Materials ' + (n === 1 ? 'row' : 'rows') +
+        ' that ' + (n === 1 ? 'isn\u2019t' : 'aren\u2019t') + ' in the text yet.</span>' +
+        '<button type="button" class="btn btn-sm btn-success" data-action="insert-bom">Insert BOM table</button>';
+      bar.hidden = false;
+      return;
+    }
+    const rows = unlinkedBomRows(markdown);
     if (!rows.length || bomLinkBarDismissed) { bar.hidden = true; return; }
     const matches = (await resolvePartNames(rows.map(r => r.name))).filter(Boolean).length;
     const n = rows.length;
@@ -947,6 +961,56 @@
   function scheduleBomLinks() {
     clearTimeout(bomLinksTimer);
     bomLinksTimer = setTimeout(updateBomLinkBar, 1000);
+  }
+
+  // --- Bill of Materials sync (issue #264) ---
+  //
+  // The stored BOM rows (cost estimates, the parts catalog's "used in
+  // projects") follow the Bill of Materials table after each save. Without
+  // a table nothing changes, so a project saved before the table lived in
+  // the text keeps its rows, and the bar above offers to write them out.
+  let storedBom = null; // the API's rows as last seen; null until loaded
+  let lastBomSync = null; // the rows last sent
+  let bomSync = Promise.resolve();
+
+  async function loadStoredBom() {
+    if (!currentProject) { storedBom = []; return; }
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom', { credentials: 'include' });
+    storedBom = resp.ok ? await resp.json() : null;
+    scheduleBomLinks();
+  }
+
+  function syncBom(markdown) {
+    bomSync = bomSync.then(() => syncBomNow(markdown)).catch(e => console.error('BOM sync failed:', e));
+    return bomSync;
+  }
+
+  async function syncBomNow(markdown) {
+    if (!currentProject) return;
+    const parsed = BomSync.parse(markdown);
+    if (!parsed) return;
+    const body = JSON.stringify({ rows: parsed.rows });
+    if (body === lastBomSync) return;
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/bom/sync', {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    lastBomSync = body;
+    storedBom = await resp.json();
+  }
+
+  function insertBomTable() {
+    if (!storedBom || !storedBom.length) return;
+    const view = mde.view;
+    const doc = view.state.doc;
+    const heading = ProjectSections.get('bill-of-materials').heading;
+    const lead = !doc.length ? '' : doc.toString().endsWith('\n\n') ? '' : doc.toString().endsWith('\n') ? '\n' : '\n\n';
+    const insert = lead + BomSync.tableFromRows(storedBom, heading);
+    view.dispatch({ changes: { from: doc.length, insert }, selection: { anchor: doc.length + insert.length }, scrollIntoView: true, userEvent: 'input' });
+    view.focus();
+    updateBomLinkBar();
   }
 
   // Links each unlinked row that names a catalog part exactly, keeping
@@ -2528,6 +2592,7 @@
     if (projectId) await loadProject();
     initEditor();
     scheduleBomTotals();
+    loadStoredBom().catch(() => {});
     editorContainer.classList.remove('d-none');
     const completenessCard = document.getElementById('completeness-card');
     if (completenessCard) completenessCard.classList.remove('d-none');

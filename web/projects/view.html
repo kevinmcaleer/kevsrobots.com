@@ -1346,10 +1346,83 @@ description: View project details
     return `<span class="text-muted" title="Currency not set">${amount}</span>`;
   }
 
+  // Issue #264: the author's Bill of Materials table, enriched from the
+  // stored rows (which follow it on each save): a linked row's price as
+  // the shops have it now, in the reader's currency, a badge when the part
+  // has changed since, and an estimated total under the table.
+  async function enrichBomTable(items) {
+    const headings = Array.from(document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3'));
+    const table = sectionTableEl('bill-of-materials', headings);
+    if (!table || !items.length || table.dataset.enriched) return;
+    table.dataset.enriched = '1';
+    const head = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim().toLowerCase());
+    let partCol = head.findIndex(h => /^(part|parts|item|items|name|component|components)$/.test(h));
+    if (partCol < 0) partCol = 0;
+    const priceCol = head.findIndex(h => /^(price|unit price|price each|each|cost|unit cost)$/.test(h));
+    const bySlug = new Map(items.filter(i => i.part_slug).map(i => [i.part_slug, i]));
+    const byName = new Map(items.map(i => [i.name.trim().toLowerCase(), i]));
+    const cc = window.CurrencyConvert;
+    const counts = {};
+    items.forEach(i => { const c = i.effective_currency_code || i.currency_code; if (c) counts[c] = (counts[c] || 0) + 1; });
+    const common = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+    const to = (cc && await cc.getPreferredCurrency().catch(() => null)) || common || 'GBP';
+    const fmt = (n, code) => (cc ? cc.formatPrice(n, code) : n.toFixed(2) + ' ' + code);
+    let total = 0;
+    let priced = 0;
+    let unpriced = 0;
+    for (const tr of table.querySelectorAll('tbody tr')) {
+      const cell = tr.children[partCol];
+      if (!cell || /^total$/i.test(cell.textContent.trim())) continue;
+      const a = cell.querySelector('a[href]');
+      const slug = a && PartLinks.slugOf(a.getAttribute('href'));
+      const item = (slug && bySlug.get(slug)) || byName.get(cell.textContent.trim().toLowerCase());
+      if (!item) continue;
+      if (item.part_revision_outdated) {
+        cell.insertAdjacentHTML('beforeend', ' <span class="badge rounded-pill text-bg-light border ms-1" title="The part’s catalog page has changed since this project used it">updated</span>');
+      }
+      // The chosen shop's price, else the cheapest shop's today, else the
+      // price in the table.
+      let live = null;
+      if (item.part_slug && item.price_source !== 'supplier') {
+        const part = await PartLinks.fetchPart(item.part_slug);
+        live = part ? await PartLinks.cheapest(part, to) : null;
+      }
+      let amount = live ? live.amount : null;
+      if (amount == null) {
+        const cost = item.effective_unit_cost != null ? item.effective_unit_cost : item.unit_cost;
+        const from = item.effective_currency_code || item.currency_code || to;
+        if (cost == null) { unpriced++; continue; }
+        amount = Number(cost);
+        if (from !== to) {
+          const c = cc ? await cc.convert(amount, from, to) : null;
+          if (!c) { unpriced++; continue; }
+          amount = c.amount;
+        }
+      }
+      total += amount * item.quantity;
+      priced++;
+      const priceCell = priceCol >= 0 ? tr.children[priceCol] : null;
+      if (priceCell && (live || item.price_source !== 'row')) {
+        const where = live && live.name ? ' at ' + live.name : '';
+        priceCell.insertAdjacentHTML('beforeend', '<div class="small text-muted">' + esc(fmt(amount, to) + ' now' + where) + bomPriceIndicator(item) + '</div>');
+      } else if (item.suppliers_unavailable) {
+        cell.insertAdjacentHTML('beforeend', bomPriceIndicator(item));
+      }
+    }
+    if (!priced) return;
+    const note = document.createElement('p');
+    note.className = 'small text-muted bom-estimate';
+    note.innerHTML = 'Estimated total: <strong class="text-body">' + esc(fmt(total, to)) + '</strong>' +
+      (unpriced ? ' for ' + priced + ' of ' + (priced + unpriced) + ' parts' : '') +
+      '. Prices change, so check with the shops before you buy.';
+    (table.closest('.table-responsive') || table).insertAdjacentElement('afterend', note);
+  }
+
   async function loadBOM() {
     const resp = await fetch(API + '/api/projects/' + projectId + '/bom', { credentials: 'include' });
     const items = await resp.json();
     if (items.length === 0) return;
+    enrichBomTable(items).catch(e => console.error('BOM enrichment failed:', e));
     document.getElementById('view-bom-section').classList.remove('d-none');
     // Rebuild TOC now that the BOM section is visible
     try { buildTOC(); } catch (e) {}
@@ -2399,22 +2472,26 @@ description: View project details
     return true;
   }
 
-  // Whether the author's heading for sectionId is followed by a table
-  // with at least one row before the next heading at its level or above.
-  function sectionHasTable(sectionId, headings) {
+  // The table under the author's heading for sectionId, with at least one
+  // row, before the next heading at its level or above; else null.
+  function sectionTableEl(sectionId, headings) {
     const heading = headings.find(h => {
       const s = ProjectSections.match(h.textContent);
       return s && s.id === sectionId;
     });
-    if (!heading) return false;
+    if (!heading) return null;
     const level = Number(heading.tagName[1]);
     for (let el = heading.nextElementSibling; el; el = el.nextElementSibling) {
-      if (/^H[1-6]$/.test(el.tagName) && Number(el.tagName[1]) <= level) return false;
+      if (/^H[1-6]$/.test(el.tagName) && Number(el.tagName[1]) <= level) return null;
       if (el.id === 'view-bom-section') continue; // the stored rows, once moved here
       const table = el.tagName === 'TABLE' ? el : el.querySelector && el.querySelector('table');
-      if (table && table.querySelector('tbody tr')) return true;
+      if (table && table.querySelector('tbody tr')) return table;
     }
-    return false;
+    return null;
+  }
+
+  function sectionHasTable(sectionId, headings) {
+    return !!sectionTableEl(sectionId, headings);
   }
 
   function buildTOC() {
