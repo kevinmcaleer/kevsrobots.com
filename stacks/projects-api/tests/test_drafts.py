@@ -118,3 +118,37 @@ async def test_social_card_hides_drafts(client) -> None:
     project = await _create(client, alice)
     resp = await client.get(f"/og/alice/{project['slug']}")
     assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_draft_image_and_file_urls_are_private(client) -> None:
+    alice = make_auth_header("alice")
+    project = await _create(client, alice)
+    pid = project["id"]
+    img = await client.post(
+        f"/api/projects/{pid}/images",
+        files={"file": ("photo.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * 64, "image/png")},
+        headers=alice,
+    )
+    assert img.status_code == 201, img.text
+    f = await client.post(
+        f"/api/projects/{pid}/files",
+        files={"file": ("code.py", b"print('hi')", "text/plain")},
+        headers=alice,
+    )
+    assert f.status_code == 201, f.text
+    view = f"/api/projects/{pid}/images/{img.json()['id']}/view"
+    download = f"/api/projects/{pid}/files/{f.json()['id']}/download"
+
+    for url in (view, download):
+        assert (await client.get(url)).status_code == 404, url
+        assert (await client.get(url, headers=make_auth_header("bob"))).status_code == 404, url
+        own = await client.get(url, headers=alice)
+        assert own.status_code == 200, url
+        assert own.headers["cache-control"] == "private, no-store"
+
+    await _publish(client, alice, pid)
+    for url in (view, download):
+        resp = await client.get(url)
+        assert resp.status_code == 200, url
+        assert "cache-control" not in resp.headers
