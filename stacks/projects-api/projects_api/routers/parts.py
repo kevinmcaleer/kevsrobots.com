@@ -94,6 +94,7 @@ from ..schemas import (
     PartSupplierResponse,
     PartSymbolRef,
     PartUpdate,
+    PartResolveResult,
     PricePoint,
     SupplierPriceHistory,
     SupplierUnavailableBody,
@@ -589,6 +590,48 @@ async def list_families(
     stmt = stmt.group_by(Part.family).order_by(func.count(Part.id).desc(), Part.family.asc()).limit(limit)
     rows = (await session.execute(stmt)).all()
     return [row[0] for row in rows if row[0]]
+
+
+@router.get("/_resolve", response_model=list[PartResolveResult])
+async def resolve_part_names(
+    names: list[str] = Query(..., max_length=100),
+    session: AsyncSession = Depends(get_session),
+) -> list[PartResolveResult]:
+    """Issue #263: the catalog part each name is exactly (ignoring case):
+    its name, an alias, its SKU or its part number. The editor's "Link all"
+    uses this for the unlinked rows of a Bill of Materials table, so only
+    an exact match links; anything else is left for the author to pick."""
+    wanted = {n.strip().lower(): n for n in names if n and n.strip()}
+    found: dict[str, Part] = {}
+    if wanted:
+        keys = list(wanted)
+        for column in (func.lower(Part.name), func.lower(Part.sku), func.lower(Part.mpn)):
+            for part in (await session.scalars(select(Part).where(column.in_(keys)))).all():
+                for key in keys:
+                    if key not in found and key in {
+                        (part.name or "").lower(), (part.sku or "").lower(), (part.mpn or "").lower(),
+                    }:
+                        found[key] = part
+        rows = (
+            await session.execute(
+                select(func.lower(PartAlias.alias), Part)
+                .join(Part, Part.id == PartAlias.part_id)
+                .where(func.lower(PartAlias.alias).in_(keys))
+            )
+        ).all()
+        for alias, part in rows:
+            found.setdefault(alias, part)
+    covers = await first_photo_cover_urls(session, {p.id: p.slug for p in found.values()})
+    out = []
+    for key, original in wanted.items():
+        part = found.get(key)
+        out.append(PartResolveResult(
+            name=original,
+            slug=part.slug if part else None,
+            part_name=part.name if part else None,
+            cover_url=(covers.get(part.id) or part.image_url) if part else None,
+        ))
+    return out
 
 
 @router.post("", response_model=PartDetail, status_code=201)

@@ -307,6 +307,14 @@ recorded licence, so they arrive flagged for review.
   the row uses the cheapest available shop (`price_source: "cheapest"`).
   `suppliers_unavailable` is true when every shop is broken or unavailable.
 
+## GET `/api/parts/_resolve?names=…` (issue #263)
+
+Looks up each `names` value (repeat the parameter, up to 100) as an exact,
+case-insensitive match on a part's name, an alias, its SKU or its part
+number. Returns one `{name, slug, part_name, cover_url}` per distinct name,
+with `slug` null when nothing matches. The project editor's "Link all"
+uses it to link Bill of Materials rows that already name a catalog part.
+
 ## BOM integration
 
 `BOMItemCreate` / `BOMItemResponse` now include an optional `part_id`

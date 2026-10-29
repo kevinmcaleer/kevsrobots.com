@@ -226,3 +226,15 @@ async def test_admin_photo_review_queue(client, session, monkeypatch) -> None:
                      headers=make_auth_header("admin"))
     assert (await client.get("/api/admin/parts/photos/needs-review",
                              headers=make_auth_header("admin"))).json() == []
+
+
+@pytest.mark.asyncio
+async def test_resolve_exact_names(client, session) -> None:
+    await import_library(LIBRARY, session)
+    resp = await client.get("/api/parts/_resolve", params=[
+        ("names", "raspberry pi pico"), ("names", "SC0915"), ("names", "Pico"), ("names", "  "),
+    ])
+    assert resp.status_code == 200, resp.text
+    got = {r["name"]: r["slug"] for r in resp.json()}
+    assert got == {"raspberry pi pico": "pico", "SC0915": "pico", "Pico": None}
+    assert resp.json()[0]["cover_url"].startswith("/api/parts/pico/photos/")

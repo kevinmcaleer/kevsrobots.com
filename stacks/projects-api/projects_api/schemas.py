@@ -977,6 +977,15 @@ class PartSearchResult(BaseModel):
     cover_url: Optional[str] = None
 
 
+class PartResolveResult(BaseModel):
+    """One name looked up by ``GET /api/parts/_resolve`` (issue #263)."""
+
+    name: str
+    slug: Optional[str] = None
+    part_name: Optional[str] = None
+    cover_url: Optional[str] = None
+
+
 class PartRevisionSummary(BaseModel):
     id: int
     author: str
