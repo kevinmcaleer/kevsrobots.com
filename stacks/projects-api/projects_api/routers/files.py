@@ -228,6 +228,8 @@ async def download_file(
     record = await session.get(ProjectFile, file_id)
     if record is None or record.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+    # Issue #260: a draft's files are the author's alone.
+    draft = await hide_drafts(session, project_id, user)
 
     data = read_file(record.file_path)
     if data is None:
@@ -244,11 +246,10 @@ async def download_file(
     except Exception:  # pragma: no cover — defensive guard
         logger.warning("Failed to log download for file %s", file_id, exc_info=True)
 
-    return Response(
-        content=data,
-        media_type="application/octet-stream",
-        headers={"Content-Disposition": f'attachment; filename="{record.filename}"'},
-    )
+    headers = {"Content-Disposition": f'attachment; filename="{record.filename}"'}
+    if draft:
+        headers["Cache-Control"] = "private, no-store"
+    return Response(content=data, media_type="application/octet-stream", headers=headers)
 
 
 @router.put("/{file_id}", response_model=FileResponse)

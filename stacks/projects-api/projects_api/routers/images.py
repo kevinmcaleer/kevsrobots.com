@@ -86,10 +86,15 @@ async def view_image(
     project_id: int,
     image_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> Response:
     record = await session.get(ProjectImage, image_id)
     if record is None or record.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+    # Issue #260: a draft's images are the author's alone. <img> requests
+    # carry the .kevsrobots.com access_token cookie, so this works on
+    # the site; tell caches not to keep a copy for anyone else.
+    draft = await hide_drafts(session, project_id, user)
 
     data = read_file(record.file_path)
     if data is None:
@@ -98,7 +103,11 @@ async def view_image(
     ext = record.filename.rsplit(".", 1)[-1].lower() if "." in record.filename else "png"
     media_types = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
                    "gif": "image/gif", "webp": "image/webp", "svg": "image/svg+xml"}
-    return Response(content=data, media_type=media_types.get(ext, "application/octet-stream"))
+    return Response(
+        content=data,
+        media_type=media_types.get(ext, "application/octet-stream"),
+        headers={"Cache-Control": "private, no-store"} if draft else None,
+    )
 
 
 @router.put("/{image_id}", response_model=ImageResponse)
