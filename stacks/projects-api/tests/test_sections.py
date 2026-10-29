@@ -24,6 +24,12 @@ def test_matches_headings_in_canonical_order() -> None:
     assert canonical_sections(md) == ["bill-of-materials", "wiring", "code"]
 
 
+def test_code_repository_is_its_own_section() -> None:
+    md = "# Code repository\n\nhttps://github.com/example/robot\n"
+    assert canonical_sections(md) == ["code-repository"]
+    assert canonical_sections(md + "# Code\n") == ["code", "code-repository"]
+
+
 def test_ignores_headings_in_code_fences_and_plain_text() -> None:
     md = "Code\n```\n# Wiring\n```\n~~~~\n# Code\n~~~~\n#Code\n"
     assert canonical_sections(md) == []

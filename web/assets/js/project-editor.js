@@ -43,7 +43,6 @@
   const contentPreview = document.getElementById('content-preview');
   const difficultySelect = document.getElementById('project-difficulty');
   const timeInput = document.getElementById('project-time');
-  const repoInput = document.getElementById('project-repo');
   const tagsContainer = document.getElementById('tags-container');
   const tagInput = document.getElementById('tag-input');
   const publishSwitch = document.getElementById('publish-switch');
@@ -113,10 +112,9 @@
       titleInput.value = currentProject.title || '';
       updateTitleWarning();
       descInput.value = currentProject.short_description || '';
-      setEditorValue(currentProject.content_md);
+      setEditorValue(withRepoSection(currentProject.content_md, currentProject.code_repo_url));
       difficultySelect.value = currentProject.difficulty || '';
       timeInput.value = currentProject.estimated_minutes || '';
-      repoInput.value = currentProject.code_repo_url || '';
       updateStatusBadge(currentProject.status);
       renderTags(currentProject.tags || []);
       loadVideos();
@@ -127,6 +125,51 @@
     }
   }
 
+  // --- Code repository section ---
+  // The repository link is a `/` section of the document ("Code
+  // repository", project-sections.js). The project's code_repo_url is
+  // kept in step with the first link in that section, so the view page's
+  // View Code button and the README export still have it.
+  const REPO_SECTION = 'code-repository';
+  const URL_RE = /https?:\/\/[^\s<>()\[\]]+/;
+
+  // The section's first link, '' when the section has none yet, or null
+  // when there's no section.
+  function repoUrlFromMarkdown(markdown) {
+    let found = null, inSection = false, level = 0, fence = null;
+    for (const line of String(markdown || '').split('\n')) {
+      const f = line.match(/^ {0,3}(`{3,}|~{3,})/);
+      if (f) {
+        if (fence === null) fence = f[1];
+        else if (f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
+        continue;
+      }
+      if (fence !== null) continue;
+      const h = line.match(/^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$/);
+      if (h) {
+        const section = window.ProjectSections && ProjectSections.match(h[2]);
+        if (inSection && h[1].length <= level) inSection = false;
+        if (section && section.id === REPO_SECTION) { inSection = true; level = h[1].length; found = ''; }
+        continue;
+      }
+      if (inSection) {
+        const m = line.match(URL_RE);
+        if (m) return m[0].replace(/[.,;:!?'"]+$/, '');
+      }
+    }
+    return found;
+  }
+
+  // A project saved before the section existed has only code_repo_url:
+  // give it the section, so the link stays editable. It's saved with the
+  // next edit.
+  function withRepoSection(markdown, url) {
+    const md = markdown || '';
+    if (!url || repoUrlFromMarkdown(md) !== null) return md;
+    const heading = ProjectSections.get(REPO_SECTION).heading;
+    return md.replace(/\s*$/, '') + (md.trim() ? '\n\n' : '') + '# ' + heading + '\n\n' + url + '\n';
+  }
+
   // --- Save ---
   function showSaveStatus(status, msg) {
     saveIndicator.className = 'save-' + status;
@@ -135,13 +178,14 @@
   }
 
   async function saveProject() {
+    const content = getEditorValue();
     const data = {
       title: titleInput.value || 'Untitled Project',
       short_description: descInput.value || null,
-      content_md: getEditorValue() || null,
+      content_md: content || null,
       difficulty: difficultySelect.value || null,
       estimated_minutes: timeInput.value ? parseInt(timeInput.value) : null,
-      code_repo_url: repoInput.value || null,
+      code_repo_url: repoUrlFromMarkdown(content) || null,
       tags: getCurrentTags(),
     };
 
@@ -201,7 +245,7 @@
   // The top bar's switch is Draft / Published (issue #260). Drafts are
   // private to the author. ``wip`` (older projects) and ``completed``
   // both count as published; switching on publishes as ``completed``.
-  // Archived lives in the details drawer; publishing again un-archives.
+  // Archived lives in the top bar's menu; publishing again un-archives.
   async function setStatus(status) {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     try {
@@ -449,9 +493,11 @@
     }, 1000);
   }
 
-  document.getElementById('add-tag-btn').addEventListener('click', () => {
-    const tag = tagInput.value.trim().toLowerCase();
-    if (!tag) return;
+  // Tags are typed straight into the row under the description: Enter or
+  // a comma adds one, and Backspace in the empty box removes the last.
+  function addTagFromInput() {
+    const tag = tagInput.value.trim().replace(/,+$/, '').trim().toLowerCase();
+    if (!tag) { tagInput.value = ''; return; }
     // If the same tag was previously auto-added, "promote" it to manual so
     // it isn't removed when the keyword disappears from the content.
     const existing = tagsContainer.querySelector(`.tag-badge[data-tag="${CSS.escape(tag)}"]`);
@@ -469,14 +515,18 @@
     addTagBadge(tag, false);
     tagInput.value = '';
     scheduleAutoSave();
-  });
+  }
 
   tagInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      document.getElementById('add-tag-btn').click();
+      addTagFromInput();
+    } else if (e.key === 'Backspace' && !tagInput.value) {
+      const last = tagsContainer.querySelector('.tag-badge:last-child');
+      if (last) { last.remove(); scheduleAutoSave(); }
     }
   });
+  tagInput.addEventListener('blur', addTagFromInput);
 
   // --- Markdown editor ---
   // markdown-studio's editor bundle (assets/js/markdown-editor/, issue #255),
@@ -1429,7 +1479,7 @@
   // unchanged; the editor just no longer reads or writes them.
 
   // --- Auto-save on input ---
-  [titleInput, descInput, difficultySelect, timeInput, repoInput].forEach(el => {
+  [titleInput, descInput, difficultySelect, timeInput].forEach(el => {
     if (el) {
       el.addEventListener('input', scheduleAutoSave);
       el.addEventListener('change', scheduleAutoSave);
@@ -1755,8 +1805,8 @@
     // under the Bill of Materials heading counts, as /part reads it.
     { key: 'bom',    points: 10, label: 'Add a part to the Bill of Materials', target: 'content-editor',
       check: () => ProjectSlashCommands.bomTableParts(getEditorValue()).length > 0 },
-    { key: 'repo',   points: 10, label: 'Link a code repository',              target: 'project-repo',
-      check: () => repoInput && repoInput.value.trim().length > 0 },
+    { key: 'repo',   points: 10, label: 'Add a Code repository section (type /)', target: 'content-editor',
+      check: () => !!repoUrlFromMarkdown(getEditorValue()) },
     // Issue #171: a YouTube video counts toward "extra content" too —
     // it's just as much a doc artefact as a file.
     { key: 'extra',  points: 10, label: 'Add a file or video',                 target: 'editor-files-section',
@@ -1862,15 +1912,6 @@
   function focusCompletenessTarget(id) {
     const el = document.getElementById(id);
     if (!el) return;
-    // Metadata fields live in the details drawer: open it, then focus.
-    const drawer = el.closest('.offcanvas');
-    if (drawer && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
-      const focusField = () => { try { el.focus(); } catch (_) {} };
-      if (drawer.classList.contains('show')) { focusField(); return; }
-      drawer.addEventListener('shown.bs.offcanvas', focusField, { once: true });
-      bootstrap.Offcanvas.getOrCreateInstance(drawer).show();
-      return;
-    }
     try {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (e) {
@@ -1899,7 +1940,7 @@
   });
 
   // Fan-in: same set as autosave, but on a separate (fast) cadence.
-  [titleInput, descInput, difficultySelect, timeInput, repoInput].forEach(el => {
+  [titleInput, descInput, difficultySelect, timeInput].forEach(el => {
     if (el) {
       el.addEventListener('input', recomputeCompleteness);
       el.addEventListener('change', recomputeCompleteness);

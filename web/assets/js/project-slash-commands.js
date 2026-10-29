@@ -400,6 +400,8 @@
         return { before: h + '| From | To | Notes |\n| --- | --- | --- |\n| ', placeholder: 'Pico GP0', after: ' |  |  |\n' };
       case 'code':
         return { before: h + '```python\n', placeholder: '# Your code here', after: '\n```\n' };
+      case 'code-repository':
+        return { before: h, placeholder: 'Paste your repository link (GitHub, GitLab…)', after: '\n' };
       case '3d-printed-parts': {
         const models = (ctx.modelFiles ? ctx.modelFiles() : []).filter(f => MODEL_FILE_RE.test(f.name));
         const head = h + '| Part | Qty | Notes |\n| --- | --- | --- |\n';

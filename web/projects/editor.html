@@ -41,19 +41,29 @@ hide_nibsy: true
 
 
 <div class="container-fluid py-3">
-  <!-- Top bar: save state, project details drawer, View, and the
-       Draft / Published switch (it replaced the sidebar's status card). -->
+  <!-- Top bar: save state, View, the Draft / Published switch (it
+       replaced the sidebar's status card) and the Archive / Delete menu. -->
   <div class="d-flex justify-content-end align-items-center mb-3">
     <div id="editor-status" class="d-flex align-items-center gap-2">
       <span id="save-indicator" class="text-muted small"></span>
-      <button type="button" id="details-btn" class="btn btn-sm btn-outline-secondary"
-              data-bs-toggle="offcanvas" data-bs-target="#project-details" aria-controls="project-details">
-        <i class="fas fa-sliders-h me-1"></i> Details
-      </button>
       <a id="view-toggle-btn" href="#" class="btn btn-sm btn-outline-secondary d-none"><i class="fas fa-eye me-1"></i> View</a>
       <div class="form-check form-switch publish-switch mb-0" title="Drafts are only visible to you. Switch on to publish.">
         <input class="form-check-input" type="checkbox" role="switch" id="publish-switch">
         <label class="form-check-label small" for="publish-switch" id="publish-switch-label">Draft</label>
+      </div>
+      <!-- Archive / Delete. The rest of the details sit under the title. -->
+      <div class="dropdown">
+        <button type="button" id="project-menu-btn" class="btn btn-sm btn-outline-secondary"
+                data-bs-toggle="dropdown" aria-expanded="false" aria-label="More project actions" title="More">
+          <i class="fas fa-ellipsis"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="project-menu-btn">
+          <!-- Archiving hides the project from the hub without deleting it.
+               Publishing again (the switch) brings it back. -->
+          <li><button type="button" class="dropdown-item" id="archive-btn"><i class="fas fa-box-archive me-1"></i> Archive project</button></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button type="button" class="dropdown-item text-danger" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete project</button></li>
+        </ul>
       </div>
     </div>
   </div>
@@ -87,9 +97,35 @@ hide_nibsy: true
                placeholder="Project title..." maxlength="200">
         <div id="title-error" class="text-danger small d-none"></div>
       </div>
-      <div class="mb-4">
+      <div class="mb-2">
         <input type="text" id="project-description" class="form-control border-0 text-muted"
                placeholder="Short description (one-liner)..." maxlength="500">
+      </div>
+      <!-- Details row: difficulty, build time and tags, edited in place.
+           The code repository is a `/` section in the document instead. -->
+      <div class="project-meta-row mb-4" id="project-meta-row">
+        <label class="visually-hidden" for="project-difficulty">Difficulty</label>
+        <div class="project-meta-field" title="Difficulty">
+          <i class="fas fa-signal" aria-hidden="true"></i>
+          <select id="project-difficulty" class="form-select form-select-sm">
+            <option value="">Difficulty&hellip;</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+        <div class="project-meta-field" title="Estimated build time, in minutes">
+          <i class="fas fa-clock" aria-hidden="true"></i>
+          <label class="visually-hidden" for="project-time">Build time (minutes)</label>
+          <input type="number" id="project-time" class="form-control form-control-sm" min="1" placeholder="Build time">
+          <span class="project-meta-unit">min</span>
+        </div>
+        <div class="project-meta-tags" title="Tags">
+          <i class="fas fa-tags" aria-hidden="true"></i>
+          <div id="tags-container" class="d-flex flex-wrap gap-1"></div>
+          <label class="visually-hidden" for="tag-input">Add a tag</label>
+          <input type="text" id="tag-input" class="form-control form-control-sm" placeholder="Add tag&hellip;">
+        </div>
       </div>
 
       <hr>
@@ -167,51 +203,6 @@ hide_nibsy: true
   </div>
 </div>
 
-<!-- Project details drawer, opened from the top bar's Details button -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="project-details" aria-labelledby="project-details-title">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="project-details-title"><i class="fas fa-sliders-h me-2"></i>Project details</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="row g-2 mb-3">
-      <div class="col-7">
-        <label class="form-label small text-muted" for="project-difficulty">Difficulty</label>
-        <select id="project-difficulty" class="form-select form-select-sm">
-          <option value="">Select...</option>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
-        </select>
-      </div>
-      <div class="col-5">
-        <label class="form-label small text-muted" for="project-time">Time (min)</label>
-        <input type="number" id="project-time" class="form-control form-control-sm" min="1" placeholder="e.g. 60">
-      </div>
-    </div>
-    <div class="mb-3">
-      <label class="form-label small text-muted" for="tag-input">Tags</label>
-      <div id="tags-container" class="d-flex flex-wrap gap-1 mb-1"></div>
-      <div class="input-group input-group-sm">
-        <input type="text" id="tag-input" class="form-control" placeholder="Add tag...">
-        <button class="btn btn-outline-secondary" id="add-tag-btn">Add</button>
-      </div>
-    </div>
-    <div class="mb-4">
-      <label class="form-label small text-muted" for="project-repo">Code Repository URL</label>
-      <input type="url" id="project-repo" class="form-control form-control-sm" placeholder="https://github.com/...">
-    </div>
-
-    <hr>
-    <div class="d-grid gap-2">
-      <!-- Archiving hides the project from the hub without deleting it.
-           Publishing again (top bar switch) brings it back. -->
-      <button type="button" class="btn btn-outline-secondary btn-sm" id="archive-btn"><i class="fas fa-box-archive me-1"></i> Archive project</button>
-      <button type="button" class="btn btn-outline-danger btn-sm" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete project</button>
-    </div>
-  </div>
-</div>
-
 <!-- Project Completeness (issue #137): a collapsible overlay pinned to the
      bottom right of the page. The collapsed state is remembered per browser. -->
 <aside class="card shadow completeness-overlay d-none" id="completeness-card" aria-label="Project completeness">
@@ -229,7 +220,7 @@ hide_nibsy: true
             data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top"
             data-bs-html="true"
             data-bs-title="How completeness is scored"
-            data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>Bill of Materials part</strong> (10) &middot; <strong>Code repo URL</strong> (10) &middot; <strong>File or video</strong> (10)"
+            data-bs-content="Each item awards points toward 100:<br><strong>Title</strong> (10) &middot; <strong>Short description</strong> (10) &middot; <strong>Cover image</strong> (15) &middot; <strong>Build steps 200+ chars</strong> (20) &middot; <strong>Difficulty</strong> (5) &middot; <strong>Time estimate</strong> (5) &middot; <strong>Tag</strong> (5) &middot; <strong>Bill of Materials part</strong> (10) &middot; <strong>Code repository section</strong> (10) &middot; <strong>File or video</strong> (10)"
             aria-label="How completeness is scored">
       <i class="fas fa-circle-question"></i>
     </button>
