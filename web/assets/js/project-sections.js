@@ -46,6 +46,12 @@
       keywords: ['3d', 'printed', 'print', 'stl', 'models', 'cad'],
       icon: 'M8 1.8 13.5 5v6L8 14.2 2.5 11V5zM2.5 5 8 8.2 13.5 5M8 8.2v6',
     },
+    {
+      id: 'videos',
+      heading: 'Videos',
+      keywords: ['youtube', 'video', 'film', 'clips'],
+      icon: 'M2 4h8.5v8H2zM10.5 7 14 5v6l-3.5-2',
+    },
   ];
 
   // "Bill of Materials", "bill of materials " and "Bill-of-materials" are
@@ -93,6 +99,32 @@
     return out;
   }
 
+  // The first table in a section, before the next heading:
+  //   { header: ['part', 'qty', ...] (lower case), rows: [[cell, ...]],
+  //     headerLine, lines: [line numbers of the rows] }
+  // or null. Cells are trimmed; escaped pipes stay escaped.
+  function sectionTable(markdown, id) {
+    const lines = String(markdown || '').split('\n');
+    const heading = headings(markdown).find(h => {
+      const section = byName.get(normalise(h.text));
+      return section && section.id === id;
+    });
+    if (!heading) return null;
+    const cells = line => line.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '')
+      .split(/(?<!\\)\|/).map(c => c.trim());
+    let i = heading.line + 1;
+    for (; i < lines.length && !/^\s*\|/.test(lines[i]); i++) {
+      if (/^ {0,3}#{1,6}\s/.test(lines[i])) return null;
+    }
+    if (i + 1 >= lines.length || !/^\s*\|?\s*:?-{3,}/.test(lines[i + 1])) return null;
+    const table = { header: cells(lines[i]).map(h => h.toLowerCase()), rows: [], headerLine: i, lines: [] };
+    for (let r = i + 2; r < lines.length && /^\s*\|/.test(lines[r]); r++) {
+      table.rows.push(cells(lines[r]));
+      table.lines.push(r);
+    }
+    return table;
+  }
+
   // Ids of the canonical sections the Markdown has a heading for.
   function present(markdown) {
     const ids = new Set();
@@ -112,5 +144,6 @@
     badgesHtml,
     headings,
     present,
+    sectionTable,
   };
 })();

@@ -21,12 +21,12 @@ hide_nibsy: true
 <div id="global-dropzone" class="global-dropzone d-none" aria-hidden="true">
   <div class="global-dropzone__inner">
     <i class="fas fa-cloud-upload-alt global-dropzone__icon"></i>
-    <h2 class="global-dropzone__title">Drop files to add them to your project</h2>
+    <h2 class="global-dropzone__title">Drop files or a whole folder to add them to your project</h2>
     <ul class="global-dropzone__routes">
-      <li><i class="fas fa-image text-info me-2"></i><strong>Images</strong> &rarr; uploaded to the gallery</li>
+      <li><i class="fas fa-image text-info me-2"></i><strong>Images</strong> (incl. HEIC) &rarr; uploaded to the gallery</li>
       <li><i class="fas fa-file-alt text-success me-2"></i><strong>README.md</strong> &rarr; loaded into the content editor</li>
-      <li><i class="fas fa-balance-scale text-warning me-2"></i><strong>LICENSE</strong> &rarr; added to Files &amp; Models</li>
-      <li><i class="fas fa-paperclip text-secondary me-2"></i><strong>Other files</strong> &rarr; added to Files &amp; Models</li>
+      <li><i class="fas fa-cube text-warning me-2"></i><strong>3D models</strong> (.stl, .3mf, .obj, .step, .gcode) &rarr; Files &amp; Models</li>
+      <li><i class="fas fa-paperclip text-secondary me-2"></i><strong>Code, documents, archives</strong> &rarr; Files</li>
     </ul>
     <p class="global-dropzone__hint text-muted small mb-0">Release the mouse to drop. Press Esc to cancel.</p>
   </div>
@@ -181,7 +181,7 @@ hide_nibsy: true
               <i class="fas fa-upload me-1"></i> Choose files
             </label>
             <small class="text-muted d-block">or drag files anywhere on the page<br>
-              .py, .cpp, .ino, .stl, .dxf, .pdf, .md, .json, .zip … &mdash; 25MB max per file</small>
+              .stl, .3mf, .py, .ino, .dxf, .pdf, .md, .zip … &mdash; 25MB max per file</small>
             <input type="file" id="file-input" class="d-none" multiple>
           </div>
           <div id="file-list"></div>
@@ -191,28 +191,6 @@ hide_nibsy: true
         </div>
       </div>
 
-      <!-- Videos (issue #171: first-class YouTube video list) -->
-      <div class="card mb-4" id="editor-videos-section">
-        <div class="card-header py-2 d-flex justify-content-between align-items-center">
-          <span><i class="fab fa-youtube me-1 text-danger"></i> Videos</span>
-          <button class="btn btn-sm btn-outline-primary" id="add-video-btn"><i class="fas fa-plus"></i> Add Video</button>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-single table-narrow mb-0" id="videos-table">
-            <thead>
-              <tr>
-                <th style="width:80px"></th>
-                <th>YouTube URL or ID</th>
-                <th>Title (optional)</th>
-                <th style="width:90px">Order</th>
-                <th style="width:40px"></th>
-              </tr>
-            </thead>
-            <tbody id="videos-body"></tbody>
-          </table>
-          <p id="videos-empty" class="text-muted small p-3 mb-0 d-none">No videos yet &mdash; paste a YouTube URL above.</p>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -279,6 +257,7 @@ hide_nibsy: true
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-slash-commands.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 // Editor TOC — live-updates from markdown source as the user types
@@ -371,10 +350,6 @@ hide_nibsy: true
     // Page sections rendered outside the editor
     const extras = [];
     extras.push({ key: 'editor-files-section', text: 'Files & Models' });
-    // Issue #171: surface the videos card when at least one video is present.
-    if (document.querySelectorAll('#videos-body tr').length > 0) {
-      extras.push({ key: 'editor-videos-section', text: 'Videos' });
-    }
 
     const toc = ProjectToc.render(nav, entries, {
       extras,
@@ -398,14 +373,6 @@ hide_nibsy: true
       clearTimeout(render._t);
       render._t = setTimeout(render, 150);
     });
-    // Re-render the TOC when the Videos card gains or loses rows (issue #171).
-    const videosBody = document.getElementById('videos-body');
-    if (videosBody) {
-      new MutationObserver(() => {
-        clearTimeout(render._t);
-        render._t = setTimeout(render, 50);
-      }).observe(videosBody, { childList: true });
-    }
     render();
   }
 

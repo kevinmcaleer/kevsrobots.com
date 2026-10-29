@@ -592,7 +592,20 @@
 #editor-files-section .file-description {
   white-space: normal;
   word-break: break-word;
-  max-width: 24em;
+}
+
+/* File name, Kind and Size stay on one line; Description wraps. On a
+   narrow screen the table scrolls sideways rather than squashing. */
+#editor-files-section #file-list {
+  overflow-x: auto;
+}
+/* File name, Kind and Size stay on one line; Description wraps. */
+#editor-files-section .files-table th,
+#editor-files-section .files-table td {
+  white-space: nowrap;
+}
+#editor-files-section .files-table td.file-description {
+  white-space: normal;
 }
 
 #editor-files-section .file-description .kr-file-desc {
@@ -611,6 +624,13 @@
 
 #editor-files-section .file-description .kr-file-desc-input {
   width: 100%;
+}
+
+/* Issue #262: a model's rendered thumbnail in the Files & Models table. */
+#editor-files-section .kr-file-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 /* Per-step rendering inside the preview surface (and in the public

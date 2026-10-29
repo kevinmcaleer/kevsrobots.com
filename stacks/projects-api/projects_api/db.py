@@ -1257,6 +1257,36 @@ async def add_project_file_description_if_missing() -> None:
             ))
 
 
+async def add_project_file_model_columns_if_missing() -> None:
+    """Additive migration for issues #261 and #262 (3D models).
+
+    Adds ``print_settings`` and ``thumbnail_path`` (TEXT, nullable) to
+    ``project_files`` on existing Postgres deployments. Idempotent and a
+    no-op elsewhere; mirrors ``add_project_file_description_if_missing``.
+    """
+    engine = get_engine()
+    if engine.dialect.name != "postgresql":
+        return
+    async with engine.begin() as conn:
+        table_check = await conn.execute(text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = current_schema() AND table_name = 'project_files'"
+        ))
+        if table_check.first() is None:
+            return
+        for column in ("print_settings", "thumbnail_path"):
+            existing = await conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = current_schema() AND table_name = 'project_files' "
+                "AND column_name = :column"
+            ), {"column": column})
+            if existing.first() is None:
+                logger.warning("Adding project_files.%s column (issues #261/#262)", column)
+                await conn.execute(text(
+                    f'ALTER TABLE "project_files" ADD COLUMN "{column}" TEXT'
+                ))
+
+
 async def add_feedback_admin_notes_if_missing() -> None:
     """Additive migration for the Snakie dev-mode Bug Tracker (issue #206).
 

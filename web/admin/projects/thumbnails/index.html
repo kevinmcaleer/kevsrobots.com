@@ -1,0 +1,147 @@
+---
+title: Model Thumbnails
+layout: default
+description: Render thumbnails for 3D models uploaded before thumbnails existed
+permalink: /admin/projects/thumbnails/
+sitemap: false
+---
+
+{% include nav_admin.html %}
+
+<div class="container py-4">
+  <h1><i class="fas fa-cube me-3"></i> Model Thumbnails</h1>
+  <p class="text-muted">
+    Models uploaded in the editor get a thumbnail as they upload. These are the
+    models that have none yet. Rendering happens here in your browser, one model
+    at a time, and each thumbnail is saved as soon as it is drawn. OBJ, 3MF,
+    STEP and G-code files can't be drawn yet, so they stay on the list.
+  </p>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="admin-content" class="d-none">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-images me-2"></i> Models without a thumbnail</span>
+        <span>
+          <span id="missing-count" class="badge bg-secondary me-2">0</span>
+          <button type="button" id="backfill-btn" class="btn btn-sm btn-primary" disabled>
+            <i class="fas fa-play me-1"></i> Render thumbnails
+          </button>
+        </span>
+      </div>
+      <div class="card-body p-0">
+        <div id="backfill-summary" class="px-3 pt-3 small d-none"></div>
+        <div id="none-missing" class="text-center text-muted py-4 d-none">
+          <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+          <p>Every model that can be drawn has a thumbnail.</p>
+        </div>
+        <div class="table-responsive">
+          <table id="missing-table" class="table table-hover mb-0 d-none">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Project</th>
+                <th class="text-end">Size</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="missing-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  let missing = [];
+
+  function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t || '';
+    return d.innerHTML;
+  }
+
+  function setStatus(fileId, html) {
+    const cell = document.querySelector('[data-status="' + fileId + '"]');
+    if (cell) cell.innerHTML = html;
+  }
+
+  async function init() {
+    try {
+      const resp = await fetch(API + '/api/admin/files/missing-thumbnails', { credentials: 'include' });
+      document.getElementById('loading').classList.add('d-none');
+      if (resp.status === 403 || resp.status === 401) {
+        document.getElementById('access-denied').classList.remove('d-none');
+        return;
+      }
+      if (!resp.ok) throw new Error('Failed');
+      document.getElementById('admin-content').classList.remove('d-none');
+      missing = await resp.json();
+      render();
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('access-denied').classList.remove('d-none');
+    }
+  }
+
+  function render() {
+    const drawable = missing.filter(m => ModelThumbnails.canRender(m.filename));
+    document.getElementById('missing-count').textContent = missing.length;
+    document.getElementById('backfill-btn').disabled = drawable.length === 0;
+    const none = missing.length === 0;
+    document.getElementById('none-missing').classList.toggle('d-none', !none);
+    document.getElementById('missing-table').classList.toggle('d-none', none);
+    document.getElementById('missing-body').innerHTML = missing.map(function(m) {
+      return '<tr>' +
+        '<td>' + esc(m.filename) + '</td>' +
+        '<td><a href="/projects/view.html?id=' + m.project_id + '">' + esc(m.project_title) + '</a></td>' +
+        '<td class="text-end text-muted small">' + (m.file_size / 1024).toFixed(1) + ' KB</td>' +
+        '<td data-status="' + m.file_id + '" class="small">' +
+          (ModelThumbnails.canRender(m.filename) ? '<span class="text-muted">waiting</span>' : '<span class="text-muted">can’t be drawn yet</span>') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  async function backfill() {
+    const btn = document.getElementById('backfill-btn');
+    btn.disabled = true;
+    const drawable = missing.filter(m => ModelThumbnails.canRender(m.filename));
+    let done = 0, failed = 0;
+    for (const m of drawable) {
+      setStatus(m.file_id, '<i class="fas fa-spinner fa-spin"></i> rendering');
+      try {
+        const resp = await fetch(API + '/api/admin/files/' + m.file_id + '/model', { credentials: 'include' });
+        if (!resp.ok) throw new Error('could not read the model (' + resp.status + ')');
+        const saved = await ModelThumbnails.upload(fetch.bind(window),
+          API + '/api/admin/files/' + m.file_id + '/thumbnail', await resp.arrayBuffer());
+        setStatus(m.file_id, '<img src="' + API + '/api/projects/' + m.project_id + '/files/' + m.file_id +
+          '/thumbnail?v=' + saved.thumbnail_version + '" width="48" height="48" alt=""> <span class="text-success">done</span>');
+        done++;
+      } catch (e) {
+        setStatus(m.file_id, '<span class="text-danger">' + esc(e.message || 'failed') + '</span>');
+        failed++;
+      }
+    }
+    const summary = document.getElementById('backfill-summary');
+    summary.textContent = done + ' rendered' + (failed ? ', ' + failed + ' failed' : '') + '.';
+    summary.classList.remove('d-none');
+  }
+
+  document.getElementById('backfill-btn').addEventListener('click', backfill);
+  init();
+})();
+</script>
