@@ -1,7 +1,7 @@
 ---
 # "On this page" for project pages and the project editor (issue #259):
 # the article layout's .kr-toc look in a sticky left column, with the
-# canonical sections (project-sections.js) grouped and highlighted first.
+# canonical sections (project-sections.js) marked with an icon.
 ---
 @import 'colours';
 @import 'kr-tokens';
@@ -28,18 +28,9 @@
   ol ol { margin: 2px 0 0 0.75rem; }
   a.kr-toc-sub { font-size: 0.8rem; }
 
-  // The canonical sections: a tinted card at the top, icon per entry.
-  .kr-toc-sections {
-    background: $kr-paper;
-    border: 1px solid $kr-line;
-    border-radius: 8px;
-    padding: 0.35rem 0;
-    a { border-left-color: transparent; }
-    a.is-active { border-left-color: $kevred; }
-    > li > a { color: $kr-ink; font-weight: 600; }
-    > li > a.is-active { font-weight: 700; }
-    ol { margin-left: 1.6rem; }
-  }
+  // The canonical sections keep their place in the list but stand out.
+  a.kr-toc-section { color: $kr-ink; font-weight: 600; }
+  a.kr-toc-section.is-active { font-weight: 700; }
   .project-section-icon { flex: none; color: $kevred; }
 
   .kr-toc-extras { padding-top: 0.6rem; border-top: 1px solid $kr-line; }
