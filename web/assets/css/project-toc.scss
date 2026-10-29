@@ -25,8 +25,9 @@
     span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   }
   ol + ol { margin-top: 0.75rem; }
-  ol ol { margin: 2px 0 0 0.75rem; }
-  a.kr-toc-sub { font-size: 0.8rem; }
+  // Sub-headings share the top level's guide line; only their text indents.
+  ol ol { margin: 2px 0 0; }
+  a.kr-toc-sub { font-size: 0.8rem; padding-left: 1.45rem; }
 
   // The canonical sections keep their place in the list but stand out.
   a.kr-toc-section { color: $kr-ink; font-weight: 600; }
