@@ -245,28 +245,39 @@
 
   // --- Save / Status / Delete --- (autosave only; no manual save button)
 
-  // The top bar's switch is Draft / Published (issue #260). Drafts are
-  // private to the author; switching on publishes as ``completed``. (A
-  // legacy ``wip`` row from an API client also counts as published.)
-  // The Archived checkbox beside it is the third state; publishing again,
-  // or unticking it, un-archives (back to a draft).
+  // The top bar's switch is Draft / Published (issue #260); switching on
+  // publishes as ``completed``. ``wip`` also reads as Draft: a projects
+  // API from before #260 has no ``draft`` status, so Draft is saved as
+  // ``wip`` there (still public on that API). The Archived checkbox beside
+  // the switch is the third state; publishing, or unticking it, un-archives
+  // (back to a draft).
+  let draftStatus = 'draft'; // becomes 'wip' once the API turns 'draft' down
+
+  async function putStatus(status) {
+    return apiFetch(API + '/api/projects/' + currentProject.id, {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: status }),
+    });
+  }
+
   async function setStatus(status) {
     if (!currentProject) { await saveProject(); if (!currentProject) return; }
     try {
-      const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: status }),
-      });
+      if (status === 'draft') status = draftStatus;
+      let resp = await putStatus(status);
+      if (resp.status === 422 && status === 'draft') {
+        // An API from before issue #260 doesn't know "draft": use "wip".
+        draftStatus = status = 'wip';
+        resp = await putStatus(status);
+      }
       if (resp.ok) {
         currentProject = await resp.json();
         updateStatusBadge(currentProject.status);
-        showSaveStatus('saved', 'Status updated');
+        showSaveStatus('saved', currentProject.status === 'wip'
+          ? 'Saved as Draft (still listed in the hub until the projects API is updated)'
+          : 'Status updated');
         if (window.BadgeToast) BadgeToast.fromResponse(currentProject);
-      } else if (resp.status === 422 && status === 'draft') {
-        // A projects API from before issue #260 doesn't know "draft" yet.
-        showSaveStatus('error', "Couldn't set Draft: the projects API needs updating to support drafts");
-        updateStatusBadge(currentProject.status);
       } else {
         throw new Error('HTTP ' + resp.status);
       }
@@ -301,7 +312,7 @@
   // The switch only ever reads Draft or Published; Archived is shown by
   // its own checkbox.
   function updateStatusBadge(status) {
-    const published = status === 'wip' || status === 'completed';
+    const published = status === 'completed';
     if (publishSwitch) publishSwitch.checked = published;
     if (publishSwitchLabel) publishSwitchLabel.textContent = published ? 'Published' : 'Draft';
     if (archiveCheck) archiveCheck.checked = status === 'archived';
