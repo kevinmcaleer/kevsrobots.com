@@ -52,7 +52,8 @@ import re
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi.responses import Response
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -72,7 +73,10 @@ from ..models import (
     PartRevision,
     PartSupplier,
 )
+from ..config import get_settings
 from ..parts_lifecycle import compute_part_status
+from ..snakie_parts import spec_from_definition, stored_definition, to_parts_yml
+from ..storage import read_file
 from ..parts_taxonomy import canonicalize, merge_for_suggestions
 from ..schemas import (
     PartCreate,
@@ -97,6 +101,34 @@ router = APIRouter(prefix="/api/parts", tags=["parts"])
 
 
 # --- helpers ------------------------------------------------------------
+
+
+# Issue #266: the Snakie parts.yml fields. Copied into every revision and
+# back on restore, alongside the original editable fields.
+SPEC_FIELDS = (
+    "manufacturer", "package", "voltage", "pin_spacing", "dimensions_mm",
+    "definition", "mesh_file_path", "datasheet_url",
+)
+# The ones PUT /api/parts/{slug} edits (definition via PUT …/definition,
+# the mesh only through the importer).
+EDITABLE_SPEC_FIELDS = (
+    "manufacturer", "package", "voltage", "pin_spacing", "dimensions_mm", "datasheet_url",
+)
+
+
+def spec_values(obj) -> dict:
+    return {f: getattr(obj, f) for f in SPEC_FIELDS}
+
+
+def _spec_response(obj) -> dict:
+    out = spec_values(obj)
+    out.pop("mesh_file_path")
+    return out
+
+
+def photo_needs_review(photo: PartPhoto) -> bool:
+    """A credited source with no licence on record (issue #266)."""
+    return bool(photo.source) and not photo.licence
 
 
 _SLUG_BAD_CHARS = re.compile(r"[^a-z0-9]+")
@@ -326,6 +358,7 @@ async def _load_photos(session: AsyncSession, part: Part) -> list[PartPhotoRespo
         out.append(PartPhotoResponse(
             id=p.id, title=p.title, url=url, is_external=is_external,
             sort_order=p.sort_order, created_by=p.created_by, created_at=p.created_at,
+            source=p.source, licence=p.licence, needs_review=photo_needs_review(p),
         ))
     return out
 
@@ -375,6 +408,8 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         symbol_id=part.symbol_id,
         symbol=_symbol_ref(await _resolve_symbol(session, part.symbol_id)),
         photos=await _load_photos(session, part),
+        has_mesh=bool(part.mesh_file_path),
+        **_spec_response(part),
     )
 
 
@@ -674,6 +709,17 @@ async def update_part(
     else:
         next_symbol_id = part.symbol_id
 
+    # Issue #266: spec fields — present in the body → set ("" clears).
+    next_spec = spec_values(part)
+    for field in EDITABLE_SPEC_FIELDS:
+        if field in body.model_fields_set:
+            value = getattr(body, field)
+            if field == "dimensions_mm" and value is not None:
+                value = value.model_dump()
+            if isinstance(value, str):
+                value = value.strip() or None
+            next_spec[field] = value
+
     current_suppliers = await _load_suppliers(session, part.id)
     current_supplier_json = _suppliers_to_json(current_suppliers)
     if body.suppliers is not None:
@@ -700,6 +746,7 @@ async def update_part(
         or next_category != part.category
         or next_family != part.family
         or next_symbol_id != part.symbol_id
+        or next_spec != spec_values(part)
         or _supplier_signature(next_supplier_json) != _supplier_signature(current_supplier_json)
     )
     if not changed:
@@ -758,6 +805,7 @@ async def update_part(
         symbol_id=next_symbol_id,
         suppliers_json=next_supplier_json,
         created_at=now,
+        **next_spec,
     )
     session.add(rev)
     await session.flush()
@@ -772,6 +820,8 @@ async def update_part(
     part.category = next_category
     part.family = next_family
     part.symbol_id = next_symbol_id
+    for field, value in next_spec.items():
+        setattr(part, field, value)
     part.current_revision_id = rev.id
     part.updated_at = now
 
@@ -865,6 +915,7 @@ async def get_revision(
         category=rev.category,
         family=rev.family,
         symbol_id=rev.symbol_id,
+        **_spec_response(rev),
     )
 
 
@@ -926,6 +977,7 @@ async def restore_revision(
         symbol_id=source.symbol_id,
         suppliers_json=suppliers_json,
         created_at=now,
+        **spec_values(source),
     )
     session.add(new_rev)
     await session.flush()
@@ -939,6 +991,8 @@ async def restore_revision(
     part.category = source.category
     part.family = source.family
     part.symbol_id = source.symbol_id
+    for field, value in spec_values(source).items():
+        setattr(part, field, value)
     part.current_revision_id = new_rev.id
     part.updated_at = now
 
@@ -1069,3 +1123,111 @@ async def list_family_parts(
     part = await _get_part_by_slug(session, slug)
     family_parts = await _load_family_parts(session, part.id, part.family)
     return [_to_related_ref(p) for p in family_parts]
+
+
+# --- Snakie parts.yml (issue #266) -------------------------------------
+
+
+async def _cover_photo(session: AsyncSession, part: Part) -> Optional[PartPhoto]:
+    return await session.scalar(
+        select(PartPhoto)
+        .where(PartPhoto.part_id == part.id)
+        .order_by(PartPhoto.sort_order.asc(), PartPhoto.id.asc())
+        .limit(1)
+    )
+
+
+@router.get("/{slug}/parts.yml")
+async def export_parts_yml(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """The part as Snakie ``parts.yml``, so Snakie can install catalog parts
+    as a community library. Image and mesh are absolute URLs."""
+    part = await _get_part_by_slug(session, slug)
+    base = get_settings().public_base_url.rstrip("/")
+    cover = await _cover_photo(session, part)
+    image_url = None
+    if cover is not None:
+        image_url = cover.external_url or f"{base}/api/parts/{part.slug}/photos/{cover.id}/view"
+    mesh_url = f"{base}/api/parts/{part.slug}/mesh" if part.mesh_file_path else None
+    return Response(
+        content=to_parts_yml(part, image_url=image_url, mesh_url=mesh_url),
+        media_type="application/yaml",
+        headers={"Content-Disposition": f'inline; filename="{part.slug}.parts.yml"'},
+    )
+
+
+@router.put("/{slug}/definition", response_model=PartDetail)
+async def put_definition(
+    slug: str,
+    definition: dict = Body(...),
+    user: str = Depends(require_terms_accepted_aged),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Store the JSON the Snakie part editor saves (a PartDefinition) as a
+    new revision. Its catalogue fields (manufacturer, package, voltage, pin
+    spacing, dimensions) update the part's own; name and description stay
+    as the catalog has them."""
+    if not isinstance(definition.get("headers", []), list):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="headers must be a list")
+    part = await _get_part_by_slug(session, slug)
+    next_spec = spec_values(part)
+    next_spec.update(spec_from_definition(definition))
+    next_spec["definition"] = stored_definition(definition)
+    if next_spec == spec_values(part):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No fields changed")
+
+    now = _now_naive_utc()
+    suppliers = await _load_suppliers(session, part.id)
+    rev = PartRevision(
+        part_id=part.id,
+        author=user,
+        change_summary="Updated the part definition",
+        name=part.name,
+        sku=part.sku,
+        mpn=part.mpn,
+        description_md=part.description_md,
+        image_url=part.image_url,
+        tags=list(part.tags or []),
+        category=part.category,
+        family=part.family,
+        symbol_id=part.symbol_id,
+        suppliers_json=_suppliers_to_json(suppliers),
+        created_at=now,
+        **next_spec,
+    )
+    session.add(rev)
+    await session.flush()
+    for field, value in next_spec.items():
+        setattr(part, field, value)
+    part.current_revision_id = rev.id
+    part.updated_at = now
+    await session.commit()
+    await session.refresh(part)
+    return await _part_detail(session, part)
+
+
+MESH_MEDIA_TYPES = {
+    "glb": "model/gltf-binary", "gltf": "model/gltf+json",
+    "stl": "model/stl", "obj": "model/obj",
+}
+
+
+@router.get("/{slug}/mesh")
+async def get_mesh(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    part = await _get_part_by_slug(session, slug)
+    if not part.mesh_file_path:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No mesh for this part")
+    data = read_file(part.mesh_file_path)
+    if data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Mesh not found in storage")
+    ext = part.mesh_file_path.rsplit(".", 1)[-1].lower()
+    return Response(
+        content=data,
+        media_type=MESH_MEDIA_TYPES.get(ext, "application/octet-stream"),
+        headers={"Cache-Control": "public, max-age=86400"},
+    )

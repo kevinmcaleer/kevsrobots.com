@@ -250,6 +250,42 @@ the newly-written revision).
 
 ---
 
+## Snakie parts.yml (issue #266)
+
+A part carries the fields of Snakie's `parts.yml`. `manufacturer`,
+`package` (`THT`/`SMD`), `voltage`, `pin_spacing` (mm), `dimensions_mm`
+(`{width, height}`) and `datasheet_url` are editable through
+`PUT /api/parts/{slug}` (present → set, `""`/`null` clears). The rest of the
+Snakie `PartDefinition` (headers of pins, geometry, electrical model) lives
+in `definition`. Every revision snapshots all of them.
+
+- `GET /api/parts/{slug}/parts.yml` serialises the part in Snakie's format.
+  Catalog columns win over the stored definition; `image` and `mesh` are
+  absolute URLs.
+- `PUT /api/parts/{slug}/definition` takes the JSON the Snakie part editor
+  saves and writes a revision. Its manufacturer, package, voltage, pin
+  spacing and dimensions update the part's own; name and description don't.
+- `GET /api/parts/{slug}/mesh` serves the 3D mesh when the part has one.
+- Photos carry `source` and `licence` (`permission-granted:adafruit`,
+  `permission-granted:pimoroni`, `permission-granted:digikey`, `cc-by`,
+  `own`). A source with no licence sets `needs_review`, and the photo is
+  listed at `GET /api/admin/parts/photos/needs-review` for an admin to set
+  one with `PUT /api/parts/{slug}/photos/{id}`.
+
+### Seeding from the Snakie standard library
+
+```bash
+docker exec -it <projects-api container> \
+  python -m projects_api.import_snakie_parts /path/to/Snakie/examples/parts/snakie-standard
+```
+
+The command matches each part by slug, then name, then part number. Parts
+that match nothing are created as drafts. An existing part gets the Snakie
+fields refreshed, while its name, description, part number, category and
+tags are only filled in where empty. Changes are recorded as revisions by
+`snakie-import`. A second run changes nothing. The library's images have no
+recorded licence, so they arrive flagged for review.
+
 ## BOM integration
 
 `BOMItemCreate` / `BOMItemResponse` now include an optional `part_id`

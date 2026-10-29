@@ -30,6 +30,7 @@ from .db import (
     add_project_featured_columns_if_missing,
     add_project_file_description_if_missing,
     add_project_file_model_columns_if_missing,
+    add_part_spec_columns_if_missing,
     add_project_slug_if_missing,
     add_remix_columns_if_missing,
     add_supplier_country_if_missing,
@@ -135,6 +136,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Issue #122 Phase 2: supplier link-health columns + lifecycle columns.
     await add_supplier_health_columns_if_missing()
     await add_part_status_columns_if_missing()
+    # Issue #266: Snakie part fields (parts, part_revisions, part_photos).
+    # Before every backfill below, which select full Part rows.
+    await add_part_spec_columns_if_missing()
     # Issue #187: ensure project_files.description column exists on legacy
     # Postgres deployments. No-op on fresh deploys / SQLite tests.
     await add_project_file_description_if_missing()

@@ -98,6 +98,7 @@ description: View a part in the catalog
 
             <div id="part-image-wrap" class="mb-4 d-none">
               <img id="part-image" class="img-fluid rounded" alt="">
+              <div id="part-image-credit" class="small text-muted mt-1 d-none"></div>
             </div>
 
             <div id="part-tags" class="d-flex flex-wrap gap-2 mb-3"></div>
@@ -106,6 +107,18 @@ description: View a part in the catalog
             <hr>
 
             <div id="part-description" class="mb-4" style="line-height:1.7"></div>
+
+            <!-- Issue #266: the Snakie parts.yml fields -->
+            <div id="part-specs-section" class="mb-4 d-none">
+              <h4><i class="fas fa-microchip me-3 text-primary"></i> Specifications</h4>
+              <table class="table table-sm mb-2"><tbody id="part-specs"></tbody></table>
+              <a id="part-yml-link" class="small" href="#"><i class="fas fa-file-code me-1"></i> Download parts.yml for Snakie</a>
+            </div>
+
+            <div id="part-pinout-section" class="mb-4 d-none">
+              <h4><i class="fas fa-plug me-3 text-primary"></i> Pinout</h4>
+              <div id="part-pinout"></div>
+            </div>
 
             <div id="part-family-section" class="mb-4 d-none">
               <h4><i class="fas fa-sitemap me-3 text-primary"></i> Same family</h4>
@@ -438,6 +451,88 @@ description: View a part in the catalog
     return `<span class="badge bg-success-subtle text-success ms-2" title="${esc(title)}"><i class="fas fa-tag me-1"></i>${esc(label)}</span>`;
   }
 
+  // Issue #266: image credits. A licence of permission-granted:<who> means
+  // that supplier allowed the use.
+  const LICENCE_LABELS = {
+    'cc-by': 'CC BY',
+    'own': 'own photo',
+  };
+  function licenceLabel(licence) {
+    if (!licence) return '';
+    if (licence.startsWith('permission-granted:')) {
+      const who = licence.slice('permission-granted:'.length);
+      return 'used with permission of ' + who.charAt(0).toUpperCase() + who.slice(1);
+    }
+    return LICENCE_LABELS[licence] || licence;
+  }
+  function photoCredit(p) {
+    if (!p || (!p.source && !p.licence)) return '';
+    const bits = [];
+    if (p.source) bits.push(esc(p.source));
+    if (p.licence) bits.push(esc(licenceLabel(p.licence)));
+    return '<i class="fas fa-camera me-1"></i>Image: ' + bits.join(', ');
+  }
+
+  function renderSpecs(part) {
+    const rows = [];
+    const add = (label, html) => { if (html) rows.push(`<tr><th class="text-muted fw-normal" style="width:40%">${label}</th><td>${html}</td></tr>`); };
+    add('Manufacturer', esc(part.manufacturer));
+    add('Part number', esc(part.mpn));
+    add('Package', part.package === 'THT' ? 'Through-hole (THT)' : part.package === 'SMD' ? 'Surface mount (SMD)' : esc(part.package));
+    add('Voltage', esc(part.voltage));
+    add('Pin spacing', part.pin_spacing ? esc(String(part.pin_spacing)) + ' mm' : '');
+    const d = part.dimensions_mm;
+    add('Dimensions', d && d.width && d.height ? esc(d.width + ' × ' + d.height) + ' mm' : '');
+    const mcu = part.definition && part.definition.mcu;
+    add('Microcontroller', esc(mcu));
+    if (part.datasheet_url && /^https?:\/\//.test(part.datasheet_url)) {
+      add('Datasheet', `<a href="${esc(part.datasheet_url)}" target="_blank" rel="noopener">Datasheet <i class="fas fa-external-link-alt fa-xs"></i></a>`);
+    }
+    const props = part.definition && part.definition.properties;
+    if (props && typeof props === 'object') {
+      Object.keys(props).forEach(k => add(esc(k.charAt(0).toUpperCase() + k.slice(1)), esc(String(props[k]))));
+    }
+    if (!rows.length && !part.definition) return;
+    document.getElementById('part-specs').innerHTML = rows.join('');
+    document.getElementById('part-yml-link').href = API + '/api/parts/' + encodeURIComponent(part.slug) + '/parts.yml';
+    document.getElementById('part-specs-section').classList.remove('d-none');
+  }
+
+  // One table per header (edge of the board), in pin order: the same rows
+  // Snakie's board viewer labels.
+  const PIN_TYPES = { pwr: 'Power', gnd: 'Ground', io: 'I/O', other: 'Other' };
+  function renderPinout(definition) {
+    const headers = definition && Array.isArray(definition.headers) ? definition.headers : [];
+    const withPins = headers.filter(h => h && Array.isArray(h.pins) && h.pins.length);
+    if (!withPins.length) return;
+    const edgeName = e => ({ left: 'Left', right: 'Right', top: 'Top', bottom: 'Bottom' }[e] || e || 'Header');
+    const functions = pin => {
+      const out = [];
+      const signals = pin.signals && typeof pin.signals === 'object' ? pin.signals : {};
+      const buses = pin.buses && typeof pin.buses === 'object' ? pin.buses : {};
+      (pin.capabilities || []).forEach(cap => {
+        if (cap === 'digital') return;
+        const sig = signals[cap];
+        const bus = buses[cap];
+        out.push(cap.toUpperCase() + (bus !== undefined ? bus : '') + (sig ? ' ' + sig : ''));
+      });
+      return out.join(', ');
+    };
+    document.getElementById('part-pinout').innerHTML = withPins.map(h => `
+      <h6 class="mt-3">${esc(edgeName(h.edge))} header${h.label ? ' · ' + esc(h.label) : ''}</h6>
+      <div class="table-responsive"><table class="table table-sm table-striped mb-2">
+        <thead><tr><th>Pin</th><th>Name</th><th>Type</th><th>GPIO</th><th>Functions</th></tr></thead>
+        <tbody>${h.pins.map(pin => `<tr>
+          <td>${pin.number != null ? esc(String(pin.number)) : ''}</td>
+          <td><code>${esc(pin.label || pin.name)}</code></td>
+          <td>${esc(PIN_TYPES[pin.type] || pin.type || '')}</td>
+          <td>${pin.gpio != null ? esc(String(pin.gpio)) : ''}</td>
+          <td class="small">${esc(functions(pin))}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`).join('');
+    document.getElementById('part-pinout-section').classList.remove('d-none');
+  }
+
   function fmtTime(dateStr) {
     if (!dateStr) return 'unknown';
     try { return new Date(dateStr).toLocaleDateString(); } catch (_) { return 'unknown'; }
@@ -480,7 +575,15 @@ description: View a part in the catalog
       img.src = coverUrl;
       img.alt = part.name || '';
       img.loading = 'lazy';
+      const credit = photoCredit(photos[0]);
+      if (credit) {
+        const el = document.getElementById('part-image-credit');
+        el.innerHTML = credit;
+        el.classList.remove('d-none');
+      }
     }
+    renderSpecs(part);
+    renderPinout(part.definition);
 
     // Photos tab — the multi-photo gallery, each with its optional title
     // (e.g. an orientation note), else the empty state.
@@ -491,6 +594,7 @@ description: View a part in the catalog
             <img src="${esc(photoSrc(p))}" class="img-fluid rounded" loading="lazy" alt="${esc(p.title || part.name || '')}">
           </a>
           ${p.title ? `<div class="small text-muted mt-1 text-center">${esc(p.title)}</div>` : ''}
+          ${photoCredit(p) ? `<div class="small text-muted text-center">${photoCredit(p)}</div>` : ''}
         </div>`).join('');
     } else {
       document.getElementById('part-photos-empty').classList.remove('d-none');

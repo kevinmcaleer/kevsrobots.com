@@ -52,6 +52,46 @@ description: Edit a part in the catalog
           </div>
         </div>
 
+        <!-- Issue #266: the Snakie parts.yml specification fields. Shown when
+             editing; a new part gets them on its first edit. -->
+        <fieldset id="part-specs-fields" class="mb-3 d-none">
+          <legend class="form-label fs-6 mb-2">Specifications</legend>
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label for="part-manufacturer" class="form-label small">Manufacturer</label>
+              <input type="text" id="part-manufacturer" class="form-control" maxlength="120" placeholder="e.g. Raspberry Pi">
+            </div>
+            <div class="col-md-3">
+              <label for="part-package" class="form-label small">Package</label>
+              <select id="part-package" class="form-select">
+                <option value="">—</option>
+                <option value="THT">Through-hole (THT)</option>
+                <option value="SMD">Surface mount (SMD)</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="part-voltage" class="form-label small">Voltage</label>
+              <input type="text" id="part-voltage" class="form-control" maxlength="60" placeholder="e.g. 3.3–5V">
+            </div>
+            <div class="col-md-4">
+              <label for="part-pin-spacing" class="form-label small">Pin spacing (mm)</label>
+              <input type="number" id="part-pin-spacing" class="form-control" min="0" max="100" step="0.01" placeholder="2.54">
+            </div>
+            <div class="col-md-4">
+              <label for="part-width" class="form-label small">Width (mm)</label>
+              <input type="number" id="part-width" class="form-control" min="0" step="0.1">
+            </div>
+            <div class="col-md-4">
+              <label for="part-height" class="form-label small">Height (mm)</label>
+              <input type="number" id="part-height" class="form-control" min="0" step="0.1">
+            </div>
+            <div class="col-12">
+              <label for="part-datasheet" class="form-label small">Datasheet URL</label>
+              <input type="url" id="part-datasheet" class="form-control" maxlength="2000" placeholder="https://…">
+            </div>
+          </div>
+        </fieldset>
+
         <div class="row g-2 mb-3">
           <div class="col-md-6">
             <label for="part-category" class="form-label">Category</label>
@@ -697,6 +737,14 @@ description: Edit a part in the catalog
       document.getElementById('part-name').value = currentPart.name || '';
       document.getElementById('part-sku').value = currentPart.sku || '';
       document.getElementById('part-mpn').value = currentPart.mpn || '';
+      document.getElementById('part-manufacturer').value = currentPart.manufacturer || '';
+      document.getElementById('part-package').value = currentPart.package || '';
+      document.getElementById('part-voltage').value = currentPart.voltage || '';
+      document.getElementById('part-pin-spacing').value = currentPart.pin_spacing != null ? currentPart.pin_spacing : '';
+      document.getElementById('part-width').value = currentPart.dimensions_mm ? currentPart.dimensions_mm.width : '';
+      document.getElementById('part-height').value = currentPart.dimensions_mm ? currentPart.dimensions_mm.height : '';
+      document.getElementById('part-datasheet').value = currentPart.datasheet_url || '';
+      document.getElementById('part-specs-fields').classList.remove('d-none');
       document.getElementById('part-category').value = currentPart.category || '';
       document.getElementById('part-family').value = currentPart.family || '';
       document.getElementById('part-symbol-select').value = currentPart.symbol_id ? String(currentPart.symbol_id) : '';
@@ -728,8 +776,26 @@ description: Edit a part in the catalog
   }
 
   // --- Save ---
+  // Issue #266: sent only once the fields are on screen (editing), so a
+  // create never clears them. "" / null clears a field.
+  function specBody() {
+    if (document.getElementById('part-specs-fields').classList.contains('d-none')) return {};
+    const num = id => { const v = document.getElementById(id).value; return v === '' ? null : Number(v); };
+    const width = num('part-width');
+    const height = num('part-height');
+    return {
+      manufacturer: document.getElementById('part-manufacturer').value.trim(),
+      package: document.getElementById('part-package').value,
+      voltage: document.getElementById('part-voltage').value.trim(),
+      pin_spacing: num('part-pin-spacing'),
+      dimensions_mm: width != null && height != null ? { width, height } : null,
+      datasheet_url: document.getElementById('part-datasheet').value.trim(),
+    };
+  }
+
   function buildBody() {
     return {
+      ...specBody(),
       name: document.getElementById('part-name').value.trim(),
       sku: document.getElementById('part-sku').value.trim() || null,
       mpn: document.getElementById('part-mpn').value.trim() || null,

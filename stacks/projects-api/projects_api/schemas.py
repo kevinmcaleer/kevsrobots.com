@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 # --- Badges & Achievements (issue #106) ----------------------------------
@@ -871,6 +871,13 @@ class PartSupplierResponse(BaseModel):
     currency_code: Optional[str] = None
 
 
+class PartDimensions(BaseModel):
+    """A part's physical size in millimetres (Snakie ``dimensions``)."""
+
+    width: float = Field(..., ge=0)
+    height: float = Field(..., ge=0)
+
+
 class PartCreate(BaseModel):
     name: str = Field(..., min_length=2, max_length=200)
     sku: Optional[str] = Field(None, max_length=100)
@@ -904,6 +911,14 @@ class PartUpdate(BaseModel):
     # clear the link, send an id to (re)link. (None as the default can't
     # mean "clear" on its own, hence the fields-set check in the router.)
     symbol_id: Optional[int] = None
+    # Issue #266: Snakie parts.yml catalogue fields. Present in the body
+    # (``model_fields_set``) → set; an empty string or null clears.
+    manufacturer: Optional[str] = Field(None, max_length=120)
+    package: Optional[str] = Field(None, max_length=20)
+    voltage: Optional[str] = Field(None, max_length=60)
+    pin_spacing: Optional[float] = Field(None, ge=0, le=100)
+    dimensions_mm: Optional[PartDimensions] = None
+    datasheet_url: Optional[str] = Field(None, max_length=2000)
 
 
 class PartSearchResult(BaseModel):
@@ -947,6 +962,15 @@ class PartRevisionDetail(BaseModel):
     family: Optional[str] = None
     # Part-hub: the symbol link as it stood at this revision (for rollback).
     symbol_id: Optional[int] = None
+    # Issue #266: Snakie parts.yml fields. ``definition`` is the Snakie
+    # PartDefinition (headers of pins, geometry, electrical model).
+    manufacturer: Optional[str] = None
+    package: Optional[str] = None
+    voltage: Optional[str] = None
+    pin_spacing: Optional[float] = None
+    dimensions_mm: Optional[dict] = None
+    definition: Optional[dict] = None
+    datasheet_url: Optional[str] = None
 
 
 class PartRelatedRef(BaseModel):
@@ -1159,6 +1183,17 @@ class PartDetail(BaseModel):
     # Part-hub: photo gallery (ordered by sort_order). Empty when the part
     # has no photos — the view shows the empty state.
     photos: list["PartPhotoResponse"] = Field(default_factory=list)
+    # Issue #266: Snakie parts.yml fields. ``definition`` is the Snakie
+    # PartDefinition (headers of pins, geometry, electrical model).
+    manufacturer: Optional[str] = None
+    package: Optional[str] = None
+    voltage: Optional[str] = None
+    pin_spacing: Optional[float] = None
+    dimensions_mm: Optional[dict] = None
+    definition: Optional[dict] = None
+    datasheet_url: Optional[str] = None
+    # Set when the part has a 3D mesh (served at /api/parts/{slug}/mesh).
+    has_mesh: bool = False
 
 
 # --- Part photos (part-hub gallery) --------------------------------------
@@ -1175,6 +1210,11 @@ class PartPhotoResponse(BaseModel):
     sort_order: int = 0
     created_by: str
     created_at: datetime
+    # Issue #266: image credit. ``needs_review`` when the source is known
+    # but its licence isn't (e.g. imported from the Snakie library).
+    source: Optional[str] = None
+    licence: Optional[str] = None
+    needs_review: bool = False
 
 
 class PartPhotoLinkCreate(BaseModel):
@@ -1184,11 +1224,44 @@ class PartPhotoLinkCreate(BaseModel):
     title: Optional[str] = Field(None, max_length=200)
 
 
+# Issue #266: the terms an image is used on. ``permission-granted:<who>``
+# for a supplier that gave permission, ``cc-by`` for Creative Commons
+# Attribution, ``own`` for the uploader's own photo.
+PHOTO_LICENCES = (
+    "permission-granted:adafruit",
+    "permission-granted:pimoroni",
+    "permission-granted:digikey",
+    "cc-by",
+    "own",
+)
+
+
+class PartPhotoReview(BaseModel):
+    """A photo whose licence needs confirming (admin parts page, #266)."""
+
+    id: int
+    part_slug: str
+    part_name: str
+    source: str
+    url: str
+    is_external: bool
+
+
 class PartPhotoUpdate(BaseModel):
-    """Edit a photo's title and/or position (PUT …/photos/{id})."""
+    """Edit a photo's title, position and credit (PUT …/photos/{id})."""
 
     title: Optional[str] = Field(None, max_length=200)
     sort_order: Optional[int] = None
+    # Present in the body → set; "" clears.
+    source: Optional[str] = Field(None, max_length=200)
+    licence: Optional[str] = Field(None, max_length=60)
+
+    @field_validator("licence")
+    @classmethod
+    def _known_licence(cls, v: Optional[str]) -> Optional[str]:
+        if v and v not in PHOTO_LICENCES:
+            raise ValueError("licence must be one of " + ", ".join(PHOTO_LICENCES))
+        return v
 
 
 # Resolve PartDetail's forward reference to PartPhotoResponse (defined above).

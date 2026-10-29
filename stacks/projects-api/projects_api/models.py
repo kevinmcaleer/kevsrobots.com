@@ -605,6 +605,18 @@ class Part(Base):
         nullable=True, index=True,
     )
     usage_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    # Issue #266: the Snakie ``parts.yml`` model. Catalogue fields shown on
+    # the part page, plus ``definition`` (the Snakie PartDefinition as JSON:
+    # geometry, headers of pins, symbol, electrical model). All nullable and
+    # snapshotted in ``PartRevision`` (see ``parts.SPEC_FIELDS``).
+    manufacturer: Mapped[Optional[str]] = mapped_column(String(120))
+    package: Mapped[Optional[str]] = mapped_column(String(20))
+    voltage: Mapped[Optional[str]] = mapped_column(String(60))
+    pin_spacing: Mapped[Optional[float]] = mapped_column(Float)
+    dimensions_mm: Mapped[Optional[dict]] = mapped_column(JsonType)
+    definition: Mapped[Optional[dict]] = mapped_column(JsonType)
+    mesh_file_path: Mapped[Optional[str]] = mapped_column(Text)
+    datasheet_url: Mapped[Optional[str]] = mapped_column(Text)
 
 
 class PartRelation(Base):
@@ -983,6 +995,18 @@ class PartRevision(Base):
                    name="fk_part_revisions_symbol_id"),
         nullable=True,
     )
+    # Issue #266: the Snakie ``parts.yml`` model. Catalogue fields shown on
+    # the part page, plus ``definition`` (the Snakie PartDefinition as JSON:
+    # geometry, headers of pins, symbol, electrical model). All nullable and
+    # snapshotted in ``PartRevision`` (see ``parts.SPEC_FIELDS``).
+    manufacturer: Mapped[Optional[str]] = mapped_column(String(120))
+    package: Mapped[Optional[str]] = mapped_column(String(20))
+    voltage: Mapped[Optional[str]] = mapped_column(String(60))
+    pin_spacing: Mapped[Optional[float]] = mapped_column(Float)
+    dimensions_mm: Mapped[Optional[dict]] = mapped_column(JsonType)
+    definition: Mapped[Optional[dict]] = mapped_column(JsonType)
+    mesh_file_path: Mapped[Optional[str]] = mapped_column(Text)
+    datasheet_url: Mapped[Optional[str]] = mapped_column(Text)
 
 
 class PartPhoto(Base):
@@ -1016,6 +1040,12 @@ class PartPhoto(Base):
     sort_order: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
+    # Issue #266: where the image came from and on what terms, shown as a
+    # credit on the part page. ``source`` is free text (a supplier, a
+    # library, a person); ``licence`` is one of ``schemas.PHOTO_LICENCES``.
+    # A photo with a source but no licence is flagged for review.
+    source: Mapped[Optional[str]] = mapped_column(String(200))
+    licence: Mapped[Optional[str]] = mapped_column(String(60))
     created_by: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
