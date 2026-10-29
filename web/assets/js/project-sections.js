@@ -74,6 +74,35 @@
       items.map(s => iconSvg(s, 14)).join('') + '</span>';
   }
 
+  // The Markdown's headings, outside code fences: { level, text, line }
+  // with `line` counted from 0.
+  function headings(markdown) {
+    const out = [];
+    let fence = null;
+    String(markdown || '').split('\n').forEach((line, i) => {
+      const f = line.match(/^ {0,3}(`{3,}|~{3,})/);
+      if (f) {
+        if (fence === null) fence = f[1];
+        else if (f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
+        return;
+      }
+      if (fence !== null) return;
+      const m = line.match(/^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$/);
+      if (m) out.push({ level: m[1].length, text: m[2].trim(), line: i });
+    });
+    return out;
+  }
+
+  // Ids of the canonical sections the Markdown has a heading for.
+  function present(markdown) {
+    const ids = new Set();
+    headings(markdown).forEach(h => {
+      const section = byName.get(normalise(h.text));
+      if (section) ids.add(section.id);
+    });
+    return ids;
+  }
+
   window.ProjectSections = {
     list: SECTIONS,
     get: id => SECTIONS.find(s => s.id === id) || null,
@@ -81,5 +110,7 @@
     match: text => byName.get(normalise(text)) || null,
     iconSvg,
     badgesHtml,
+    headings,
+    present,
   };
 })();

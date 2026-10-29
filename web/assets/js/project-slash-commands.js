@@ -238,8 +238,23 @@
   //   ctx.listVideos()  resolves to the project's videos: { id, title }
   //   ctx.listParts()   resolves to the BOM: { name, url (catalog page or null), detail }
   //   ctx.diagrams      [{ label, md }], the diagram templates
+  // The sections a document already has, worked out once per version of
+  // the text (the menu asks on every keystroke while it's open).
+  const presentByDoc = new WeakMap();
+  function sectionsIn(state) {
+    let ids = presentByDoc.get(state.doc);
+    if (!ids) {
+      ids = window.ProjectSections.present(state.doc.toString());
+      presentByDoc.set(state.doc, ids);
+    }
+    return ids;
+  }
+
   function create(ctx) {
+    // A section the document already has, added with `/` or typed, is left
+    // out of the menu so it isn't added twice.
     const sections = window.ProjectSections.list.filter(section => section.menu !== false).map(section => ({
+      hidden: state => sectionsIn(state).has(section.id),
       id: 'section-' + section.id,
       label: section.heading,
       keywords: section.keywords.concat(['section']),
