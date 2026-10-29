@@ -994,6 +994,25 @@ class PartSearchResult(BaseModel):
     cover_url: Optional[str] = None
 
 
+class PartCatalogEntry(BaseModel):
+    """One card on the visual parts catalog (``GET /api/parts/_catalog``,
+    issue #265): enough to shelve, filter and draw it."""
+
+    id: int
+    slug: str
+    name: str
+    sku: Optional[str] = None
+    mpn: Optional[str] = None
+    category: Optional[str] = None
+    family: Optional[str] = None
+    manufacturer: Optional[str] = None
+    tags: list[str] = Field(default_factory=list)
+    status: str
+    usage_count: int = 0
+    cover_url: Optional[str] = None
+    has_price: bool = False
+
+
 class PartResolveResult(BaseModel):
     """One name looked up by ``GET /api/parts/_resolve`` (issue #263)."""
 

@@ -754,7 +754,65 @@
       diagrams: DIAGRAM_TEMPLATES,
       searchParts: searchCatalogParts,
       createPart: createCatalogPart,
+      browseCatalog: async (view, q) => {
+        const parts = await PartsCatalog.open({
+          api: API, query: q, title: 'Add parts to the Bill of Materials', addLabel: 'Add to Bill of Materials',
+          origin: view.coordsAtPos(view.state.selection.main.head) || view.dom,
+        });
+        if (parts.length) addBomRows(view, parts);
+        else view.focus();
+      },
     };
+  }
+
+  // Issue #265: a row in the Bill of Materials table for each part, one
+  // of each, after its last part. Parts the table already links are left
+  // out. A project without the table gets one, under its Bill of
+  // Materials heading when it has that.
+  function addBomRows(view, parts) {
+    const markdown = view.state.doc.toString();
+    const parsed = BomSync.parse(markdown);
+    const have = new Set(parsed ? parsed.rows.map(r => r.part_slug).filter(Boolean) : []);
+    const adding = parts.filter(p => !have.has(p.slug));
+    if (!adding.length) { view.focus(); return; }
+    const link = p => '[' + p.name.replace(/([\[\]])/g, '\\$1').replace(/\|/g, '\\|') + '](' + PartLinks.href(p.slug) + ')';
+    const doc = view.state.doc;
+    const table = ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    let at;
+    let insert;
+    if (table) {
+      let partCol = table.header.findIndex(h => /^(part|parts|item|items|name|component|components)$/.test(h));
+      if (partCol < 0) partCol = 0;
+      const qtyCol = table.header.findIndex(h => /^(qty|quantity|count)$/.test(h));
+      let after = table.headerLine + 1;
+      table.rows.forEach((row, r) => { if (!ProjectSlashCommands.isTotalRow(row)) after = table.lines[r]; });
+      const rows = adding.map(p => {
+        const cells = table.header.map(() => '');
+        cells[partCol] = link(p);
+        if (qtyCol >= 0) cells[qtyCol] = '1';
+        return '| ' + cells.join(' | ') + ' |';
+      });
+      at = doc.line(after + 1).to;
+      insert = '\n' + rows.join('\n');
+    } else {
+      const items = adding.map(p => ({ name: p.name, quantity: 1, part_slug: p.slug, unit_cost: null }));
+      const section = ProjectSections.get('bill-of-materials');
+      const lines = markdown.split('\n');
+      const headingLine = lines.findIndex(line => {
+        const m = line.match(/^ {0,3}#{1,6}\s+(.*?)\s*#*\s*$/);
+        return m && ProjectSections.match(m[1]) === section;
+      });
+      if (headingLine >= 0) {
+        at = doc.line(headingLine + 1).to;
+        insert = '\n\n' + BomSync.tableFromRows(items).split('\n').slice(2).join('\n').replace(/\n$/, '');
+      } else {
+        at = doc.length;
+        const tail = markdown.endsWith('\n\n') || !markdown ? '' : markdown.endsWith('\n') ? '\n' : '\n\n';
+        insert = tail + BomSync.tableFromRows(items, section.heading);
+      }
+    }
+    view.dispatch({ changes: { from: at, insert }, selection: { anchor: at + insert.length }, scrollIntoView: true, userEvent: 'input' });
+    view.focus();
   }
 
   // --- Part links (issue #263) ---

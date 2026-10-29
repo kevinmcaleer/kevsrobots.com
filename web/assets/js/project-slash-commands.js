@@ -16,6 +16,7 @@
     diagram: 'M2 2.5h5v4H2zM9 9.5h5v4H9zM4.5 6.5v5H9',
     upload: 'M8 11V3M5 6l3-3 3 3M3 11v2.5h10V11',
     add: 'M8 3v10M3 8h10',
+    browse: 'M2 2.5h5v5H2zM9 2.5h5v5H9zM2 9.5h5v5H2zM9 9.5h5v5H9z',
   };
   const MODEL_FILE_RE = /\.(stl|3mf|obj|step|stp)$/i;
 
@@ -91,8 +92,8 @@
   //                (the parts catalog, say), listed after load()'s; an
   //                item with the same `key` as one already listed is left out
   //   query        optional: what the search field starts with
-  //   last(query, shown)  optional: an item listed after everything else
-  //                ("Create 'servo'"); return null for none
+  //   last(query, shown)  optional: an item, or a list of them, listed
+  //                after everything else ("Create 'servo'"); null for none
   function openPicker(view, opts) {
     if (open) open.close(false);
 
@@ -143,8 +144,8 @@
         const keys = new Set(shown.map(it => it.key).filter(Boolean));
         shown = shown.concat(found.items.filter(it => !it.key || !keys.has(it.key)));
       }
-      const last = q && opts.last ? opts.last(q, shown) : null;
-      if (last) shown.push(last);
+      const last = opts.last ? opts.last(q, shown) : null;
+      if (last) shown = shown.concat(last);
       if (active >= shown.length) active = Math.max(0, shown.length - 1);
       list.replaceChildren();
       if (!shown.length) {
@@ -403,7 +404,7 @@
         keywords: ['component', 'bom', 'tag'],
         group: 'project',
         icon: ICONS.part,
-        run: view => partPicker(view, ctx, part => insertAtCursor(view, partLink(part), false)),
+        run: view => partPicker(view, ctx, part => insertAtCursor(view, partLink(part), false), { browse: true }),
       },
       {
         id: 'diagram',
@@ -436,6 +437,7 @@
   //   ctx.listParts()        the BOM's parts, as for the Part command
   //   ctx.searchParts(q)     resolves to catalog parts: { name, slug, url, thumb, detail }
   //   ctx.createPart(name)   adds one, resolving to { name, slug, url }, or null
+  //   ctx.browseCatalog(view, q)  opens the full catalog (with opts.browse)
   function partPicker(view, ctx, pick, opts) {
     const key = p => (p.slug ? 'slug:' + p.slug : 'name:' + p.name.toLowerCase());
     const item = p => ({
@@ -466,17 +468,28 @@
       },
       search: async q => (ctx.searchParts ? (await ctx.searchParts(q)).map(item) : []),
       last: (q, shown) => {
-        if (!ctx.createPart || shown.some(it => it.label.toLowerCase() === q.toLowerCase())) return null;
-        return {
-          label: 'Create \u201c' + q + '\u201d',
-          detail: 'Add it to the parts catalog',
-          icon: ICONS.add,
-          pick: async () => {
-            const part = await ctx.createPart(q);
-            if (part) pick(part);
-            else view.focus();
-          },
-        };
+        const out = [];
+        if (q && ctx.createPart && !shown.some(it => it.label.toLowerCase() === q.toLowerCase())) {
+          out.push({
+            label: 'Create \u201c' + q + '\u201d',
+            detail: 'Add it to the parts catalog',
+            icon: ICONS.add,
+            pick: async () => {
+              const part = await ctx.createPart(q);
+              if (part) pick(part);
+              else view.focus();
+            },
+          });
+        }
+        if (opts && opts.browse && ctx.browseCatalog) {
+          out.push({
+            label: 'Browse the catalog\u2026',
+            detail: 'Pick several parts for the Bill of Materials',
+            icon: ICONS.browse,
+            pick: () => ctx.browseCatalog(view, q),
+          });
+        }
+        return out;
       },
     });
   }

@@ -307,6 +307,15 @@ recorded licence, so they arrive flagged for review.
   the row uses the cheapest available shop (`price_source: "cheapest"`).
   `suppliers_unavailable` is true when every shop is broken or unavailable.
 
+## GET `/api/parts/_catalog` (issue #265)
+
+Every part (merged ones left out), by name, as
+`{id, slug, name, sku, mpn, category, family, manufacturer, tags, status,
+usage_count, cover_url, has_price}`. The visual catalog on `/parts/` and
+the editor's "Browse the catalog" load it once and shelve and filter
+locally (`web/assets/js/parts-catalog.js`). `has_price` means some shop
+link has a price.
+
 ## GET `/api/parts/_resolve?names=…` (issue #263)
 
 Looks up each `names` value (repeat the parameter, up to 100) as an exact,

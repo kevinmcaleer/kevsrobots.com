@@ -94,6 +94,7 @@ from ..schemas import (
     PartSupplierResponse,
     PartSymbolRef,
     PartUpdate,
+    PartCatalogEntry,
     PartResolveResult,
     PricePoint,
     SupplierPriceHistory,
@@ -632,6 +633,37 @@ async def resolve_part_names(
             cover_url=(covers.get(part.id) or part.image_url) if part else None,
         ))
     return out
+
+
+@router.get("/_catalog", response_model=list[PartCatalogEntry])
+async def parts_catalog(session: AsyncSession = Depends(get_session)) -> list[PartCatalogEntry]:
+    """Issue #265: every part, compactly, for the visual catalog on
+    ``/parts/`` and the editor's "Browse catalog". The page shelves and
+    filters them itself, so this is one request however the reader filters.
+    ``has_price`` is set when some shop link for the part has a price."""
+    parts = (
+        await session.scalars(select(Part).order_by(func.lower(Part.name)))
+    ).all()
+    parts = [p for p in parts if not (p.status or "").startswith("merged")]
+    priced = set(
+        (
+            await session.scalars(
+                select(PartSupplier.part_id)
+                .where(PartSupplier.unit_cost.is_not(None), PartSupplier.kind == "shop")
+                .distinct()
+            )
+        ).all()
+    )
+    covers = await first_photo_cover_urls(session, {p.id: p.slug for p in parts})
+    return [
+        PartCatalogEntry(
+            id=p.id, slug=p.slug, name=p.name, sku=p.sku, mpn=p.mpn,
+            category=p.category, family=p.family, manufacturer=p.manufacturer,
+            tags=list(p.tags or []), status=p.status, usage_count=p.usage_count,
+            cover_url=covers.get(p.id) or p.image_url, has_price=p.id in priced,
+        )
+        for p in parts
+    ]
 
 
 @router.post("", response_model=PartDetail, status_code=201)

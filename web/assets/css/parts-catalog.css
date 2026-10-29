@@ -1,0 +1,294 @@
+/* The visual parts catalog (issue #265): /parts/ and the project editor's
+   "Browse catalog". Drawn with the Notes tokens the project pages use
+   (project-content.css), scoped to .parts-catalog. */
+
+.parts-catalog,
+.parts-catalog-dialog {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-2: #f0eee6;
+  --text: #141413;
+  --muted: #6b6a63;
+  --border: #e3e0d6;
+  --accent: #c96442;
+  --ok: #3d7a3d;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+.parts-catalog-search {
+  margin-bottom: 0.5rem;
+}
+.parts-catalog-search input {
+  background: var(--surface);
+  border-color: var(--border);
+  border-radius: 999px;
+  padding-left: 1rem;
+}
+
+.parts-catalog-status {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.parts-catalog-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 767px) {
+  .parts-catalog-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Filters */
+.parts-catalog-facets {
+  position: sticky;
+  top: 1rem;
+  font-size: 0.875rem;
+}
+.parts-catalog-facet {
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+}
+.parts-catalog-facet legend {
+  margin-bottom: 0.25rem;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+}
+.parts-catalog-facet-value {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1px 0;
+  cursor: pointer;
+}
+.parts-catalog-facet-value span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.parts-catalog-facet-value small {
+  color: var(--muted);
+}
+.parts-catalog-facet-value.is-empty {
+  color: var(--muted);
+}
+.parts-catalog-facet-value input {
+  accent-color: var(--accent);
+}
+.parts-catalog-priced {
+  margin-bottom: 1rem;
+}
+.parts-catalog-chip {
+  margin-bottom: 0.75rem;
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.8125rem;
+}
+
+/* Shelves */
+.parts-catalog-shelf {
+  margin-bottom: 2rem;
+}
+.parts-catalog-shelf h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+.parts-catalog-shelf h2 small {
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+}
+.parts-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+.parts-catalog-more {
+  margin-top: 0.75rem;
+}
+.parts-catalog-empty {
+  color: var(--muted);
+}
+
+/* Cards */
+.parts-catalog-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+}
+.parts-catalog-card:hover {
+  border-color: #cfc9b8;
+  box-shadow: 0 6px 18px rgba(20, 20, 19, 0.08);
+  color: inherit;
+  transform: translateY(-1px);
+}
+.parts-catalog-card:focus-visible,
+.parts-catalog-card:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.parts-catalog-card.is-chosen {
+  border-color: var(--ok);
+  box-shadow: 0 0 0 2px rgba(61, 122, 61, 0.35);
+}
+.parts-catalog-photo {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.parts-catalog-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
+}
+.parts-catalog-photo.is-empty {
+  background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 5h6v6H5zM6.5 2.5V5M9.5 2.5V5M6.5 11v2.5M9.5 11v2.5M2.5 6.5H5M2.5 9.5H5M11 6.5h2.5M11 9.5h2.5' fill='none' stroke='%23b8b3a3' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E") center / 40% no-repeat;
+}
+.parts-catalog-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 10px 10px;
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+.parts-catalog-name {
+  font-weight: 600;
+}
+.parts-catalog-maker {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.parts-catalog-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  font-size: 0.6875rem;
+  line-height: 1.6;
+}
+.parts-catalog-badge.is-verified {
+  color: var(--ok);
+}
+.parts-catalog-badge.is-disputed {
+  color: #b45309;
+}
+.parts-catalog-check {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ok);
+}
+
+/* Picking: the Add bar */
+.parts-catalog-addbar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem -1rem -1rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.parts-catalog-chosen {
+  flex: 1;
+  color: var(--muted);
+}
+
+/* Full screen, from the editor */
+.parts-catalog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  padding: 2vh 2vw;
+  background: rgba(20, 20, 19, 0);
+  transition: background 0.2s;
+}
+.parts-catalog-overlay.is-open {
+  background: rgba(20, 20, 19, 0.35);
+}
+.parts-catalog-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 1rem 0;
+  overflow: auto;
+  border-radius: 16px;
+  background: var(--bg);
+  box-shadow: 0 24px 60px rgba(20, 20, 19, 0.25);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.18s;
+}
+.parts-catalog-overlay.is-open .parts-catalog-dialog {
+  opacity: 1;
+  transform: none;
+}
+.parts-catalog-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.parts-catalog-dialog-head h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+.parts-catalog-dialog > div:last-child {
+  flex: 1;
+}
+body.parts-catalog-open {
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .parts-catalog-dialog,
+  .parts-catalog-overlay,
+  .parts-catalog-card {
+    transition: none;
+  }
+}
