@@ -111,6 +111,17 @@ class Project(Base):
 # Brand-new table — ``create_all`` handles it, no ALTER helper required.
 
 
+# One row per one-shot data migration that must never run twice (e.g. the
+# issue #260 wip → draft backfill). Brand-new table — ``create_all`` builds it.
+class AppliedMigration(Base):
+    __tablename__ = "applied_migrations"
+
+    name: Mapped[str] = mapped_column(String(100), primary_key=True)
+    applied_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+
 class ProjectSlugHistory(Base):
     __tablename__ = "project_slug_history"
 

@@ -7,6 +7,13 @@ import pytest
 from .conftest import make_auth_header
 
 
+async def _publish(client, headers, project_id: int) -> None:
+    resp = await client.put(
+        f"/api/projects/{project_id}", json={"status": "completed"}, headers=headers
+    )
+    assert resp.status_code == 200, resp.text
+
+
 async def _create_project(client, headers, **fields) -> dict:
     payload = {"title": "Original Robot", "short_description": "A great bot"}
     payload.update(fields)
@@ -37,7 +44,8 @@ async def test_create_remix_links_to_original(client) -> None:
     assert remix["remixed_from"]["author_username"] == "alice"
     assert remix["is_remix"] is True
     assert remix["remix_description"].startswith("Swapped the motor")
-    assert remix["status"] == "wip"
+    # Issue #260: a remix starts as a private draft.
+    assert remix["status"] == "draft"
 
 
 @pytest.mark.asyncio
@@ -52,6 +60,7 @@ async def test_remix_appears_in_originals_remix_list(client) -> None:
         headers=bob,
     )
     remix = remix_resp.json()
+    await _publish(client, bob, remix["id"])
 
     # Direct remixes list contains the new project.
     listing = await client.get(f"/api/projects/{original['id']}/remixes")
@@ -80,6 +89,7 @@ async def test_remix_chain_returns_full_ancestry(client) -> None:
         headers=bob,
     )
     b = b_resp.json()
+    await _publish(client, bob, b["id"])
 
     c_resp = await client.post(
         f"/api/projects/{b['id']}/remix",
@@ -87,6 +97,7 @@ async def test_remix_chain_returns_full_ancestry(client) -> None:
         headers=carol,
     )
     c = c_resp.json()
+    await _publish(client, carol, c["id"])
 
     chain = await client.get(f"/api/projects/{c['id']}/remix-chain")
     assert chain.status_code == 200
@@ -206,6 +217,7 @@ async def test_list_projects_marks_remixes(client) -> None:
         headers=bob,
     )
     remix_id = remix_resp.json()["id"]
+    await _publish(client, bob, remix_id)
 
     listing = await client.get("/api/projects")
     by_id = {p["id"]: p for p in listing.json()}

@@ -51,17 +51,19 @@ hide_nibsy: true
         <input class="form-check-input" type="checkbox" role="switch" id="publish-switch">
         <label class="form-check-label small" for="publish-switch" id="publish-switch-label">Draft</label>
       </div>
-      <!-- Archive / Delete. The rest of the details sit under the title. -->
+      <!-- Archived hides the project from the hub, search and profiles
+           without deleting it. Unticking it, or publishing, brings it back. -->
+      <div class="form-check mb-0 archive-check" title="Hide this project from the hub without deleting it">
+        <input class="form-check-input" type="checkbox" id="archive-check">
+        <label class="form-check-label small" for="archive-check">Archived</label>
+      </div>
+      <!-- Delete. The rest of the details sit under the title. -->
       <div class="dropdown">
         <button type="button" id="project-menu-btn" class="btn btn-sm btn-outline-secondary"
                 data-bs-toggle="dropdown" aria-expanded="false" aria-label="More project actions" title="More">
           <i class="fas fa-ellipsis"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="project-menu-btn">
-          <!-- Archiving hides the project from the hub without deleting it.
-               Publishing again (the switch) brings it back. -->
-          <li><button type="button" class="dropdown-item" id="archive-btn"><i class="fas fa-box-archive me-1"></i> Archive project</button></li>
-          <li><hr class="dropdown-divider"></li>
           <li><button type="button" class="dropdown-item text-danger" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete project</button></li>
         </ul>
       </div>

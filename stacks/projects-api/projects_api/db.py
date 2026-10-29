@@ -1722,3 +1722,25 @@ async def migrate_image_files_to_images() -> None:
             f"; set cover on {covered} project(s)" if covered else "",
         )
         await session.commit()
+
+
+async def backfill_wip_projects_to_draft() -> None:
+    """Issue #260: projects that were "work in progress" become private
+    drafts, once. Recorded in ``applied_migrations`` so a project that an
+    API client later creates as ``wip`` is never swept up by a restart.
+    """
+    from .models import AppliedMigration, Project
+
+    name = "260-wip-projects-to-draft"
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        if await session.get(AppliedMigration, name) is not None:
+            return
+        result = await session.execute(
+            Project.__table__.update()
+            .where(Project.status == "wip")
+            .values(status="draft")
+        )
+        session.add(AppliedMigration(name=name))
+        await session.commit()
+        logger.warning("Moved %d work-in-progress projects to draft (issue #260)", result.rowcount)

@@ -21,11 +21,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, require_terms_accepted
+from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..badges import evaluate_user
 from ..db import get_session
 from ..models import Project, ProjectTag
-from ..visibility import can_view, is_draft, not_draft
+from ..visibility import DRAFT, can_view, is_draft, not_draft
 from ..schemas import (
     ProjectListItem,
     ProjectResponse,
@@ -97,7 +97,8 @@ async def create_remix(
         # Don't inherit the original code_repo_url — the remixer's fork
         # will live somewhere different. They can fill it in later.
         code_repo_url=None,
-        status="wip",
+        # Issue #260: a remix starts as a private draft.
+        status=DRAFT,
         author_username=user,
         remixed_from_id=original.id,
         remix_description=body.remix_description.strip(),
@@ -130,11 +131,12 @@ async def create_remix(
 async def list_remixes(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[ProjectListItem]:
     """List direct (one-hop) remixes of a given project."""
     # 404 the parent itself so callers get a clear signal.
     parent = await session.get(Project, project_id)
-    if parent is None:
+    if parent is None or not can_view(parent, user):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
 
     remixes = (
@@ -158,6 +160,7 @@ async def list_remixes(
 async def remix_chain(
     project_id: int,
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> list[ProjectListItem]:
     """Return the ancestry chain ``[original, ..., this]``.
 
@@ -167,7 +170,7 @@ async def remix_chain(
     against malformed data, not expected in normal operation.
     """
     current: Optional[Project] = await session.get(Project, project_id)
-    if current is None:
+    if current is None or not can_view(current, user):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
 
     chain: list[Project] = []
