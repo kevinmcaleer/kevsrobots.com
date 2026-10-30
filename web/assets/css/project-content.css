@@ -357,6 +357,23 @@
   vertical-align: top;
 }
 
+/* A column's alignment from the Markdown (`:---:`, `---:`), which marked
+   writes as an align attribute; the left default above would hide it. */
+.project-prose th[align="left"],
+.project-prose td[align="left"] {
+  text-align: left;
+}
+
+.project-prose th[align="center"],
+.project-prose td[align="center"] {
+  text-align: center;
+}
+
+.project-prose th[align="right"],
+.project-prose td[align="right"] {
+  text-align: right;
+}
+
 .project-prose th {
   background: var(--surface-2);
   font-weight: 600;
