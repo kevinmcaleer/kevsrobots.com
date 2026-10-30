@@ -660,7 +660,7 @@
     toolbar.splice(toolbar.indexOf('fullscreen'), 0, 'raw');
     toolbar.splice(toolbar.indexOf('table') + 1, 0, {
       id: 'diagram',
-      label: 'Insert diagram',
+      label: 'Insert Mermaid diagram',
       icon: 'M2 2.5h5v4H2zM9 9.5h5v4H9zM4.5 6.5v5H9',
       run: (editor, button) => showDiagramMenu(editor, button),
     });
@@ -700,7 +700,7 @@
     });
     setupImageAutocomplete(mde);
     setupPartLinks(mde);
-    setupWiringButtons(mde);
+    setupImageEditButtons(mde);
     pinToolbarBelowTopBar();
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
@@ -761,6 +761,10 @@
       })),
       diagrams: DIAGRAM_TEMPLATES,
       openWiring: () => openWiring(),
+      diagramTemplates: DiagramEditor.TEMPLATES,
+      newDiagram: (view, template) => newDiagram(view, template),
+      listDiagrams: async () => (await getJson('/diagrams')),
+      diagramMarkdown: d => diagramMarkdown(d),
       searchParts: searchCatalogParts,
       createPart: createCatalogPart,
       browseCatalog: async (view, q) => {
@@ -849,22 +853,104 @@
     if (changes.length) view.dispatch({ changes, userEvent: 'delete' });
   }
 
-  // "Edit wiring" on the diagram in the live view. The editor redraws its
-  // images at will, so the button goes back on whenever one appears.
-  function setupWiringButtons(mde) {
+  // --- Diagrams (issue #270) ---
+  //
+  // The drawing tool (diagram-editor.js). `/diagram` creates one from a
+  // template and puts its image at the cursor; "Edit diagram" on the
+  // image reopens it. A new diagram closed without saving is taken out.
+  const DIAGRAM_RE = /!\[([^\]]*)\]\((https:\/\/projects\.kevsrobots\.com\/api\/projects\/\d+\/diagrams\/(\d+)\.svg(?:\?v=\d+)?)\)/g;
+  const diagramSrcId = src => { const m = String(src || '').match(/\/api\/projects\/\d+\/diagrams\/(\d+)\.svg/); return m ? +m[1] : null; };
+
+  function diagramUrl(d) {
+    return API + '/api/projects/' + d.project_id + '/diagrams/' + d.id + '.svg';
+  }
+  function diagramMarkdown(d, version) {
+    const alt = String(d.title || 'Diagram').replace(/([\[\]])/g, '\\$1');
+    return '![' + alt + '](' + diagramUrl(d) + '?v=' + (version || Date.parse(d.updated_at) || 0) + ')';
+  }
+  // Every image of diagram `id` in the text, as { from, to }.
+  function diagramLinks(markdown, id) {
+    const out = [];
+    for (const m of markdown.matchAll(DIAGRAM_RE)) if (+m[3] === id) out.push({ from: m.index, to: m.index + m[0].length });
+    return out;
+  }
+
+  async function newDiagram(view, template) {
+    if (!currentProject) await saveProject();
+    if (!currentProject) { alert('Add a title and save before adding a diagram.'); return; }
+    const count = (await (await apiFetch(API + '/api/projects/' + currentProject.id + '/diagrams', { credentials: 'include' })).json().catch(() => [])).length || 0;
+    const t = DiagramEditor.TEMPLATES.find(x => x.id === template);
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/diagrams', {
+      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: (t && t.id !== 'blank' ? t.label : 'Diagram') + (count ? ' ' + (count + 1) : '') }),
+    });
+    if (!resp.ok) { alert('Could not create the diagram (HTTP ' + resp.status + ').'); return; }
+    const d = await resp.json();
+    ProjectSlashCommands.insertAtCursor(view, diagramMarkdown(d, 0), true);
+    openDiagram(d.id, { template, fresh: true });
+  }
+
+  function openDiagram(id, opts) {
+    opts = opts || {};
+    const view = mde.view;
+    return DiagramEditor.open({
+      projectId: currentProject.id,
+      diagramId: id,
+      template: opts.template,
+      apiFetch: (url, o) => apiFetch(url, Object.assign({ credentials: 'include' }, o || {})),
+      listImages: async () => {
+        const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
+        return resp.ok ? (await resp.json()).map(img => ({ url: imageViewUrl(img), title: img.caption || (img.filename || '').replace(/\.[^.]+$/, '') })) : [];
+      },
+      uploadImage: async (blob, name) => {
+        const file = blob instanceof File ? blob : new File([blob], name || 'diagram-image.png', { type: blob.type || 'image/png' });
+        const img = await uploadSingleImage(file);
+        loadImages();
+        return { url: imageViewUrl(img) };
+      },
+      placeImage: d => {
+        const md = view.state.doc.toString();
+        const changes = diagramLinks(md, d.id).map(r => ({ ...r, insert: diagramMarkdown(d) }));
+        if (changes.length) view.dispatch({ changes, userEvent: 'input' });
+        else ProjectSlashCommands.insertAtCursor(view, diagramMarkdown(d), true);
+      },
+      onClose: async saved => {
+        if (!opts.fresh || saved) return;
+        // Never saved: take the new diagram back out.
+        const md = view.state.doc.toString();
+        const changes = diagramLinks(md, id).map(r => {
+          const after = md.slice(r.to, r.to + 2);
+          return { from: r.from, to: r.to + (after === '\n\n' ? 2 : after[0] === '\n' ? 1 : 0) };
+        });
+        if (changes.length) view.dispatch({ changes, userEvent: 'delete' });
+        await apiFetch(API + '/api/projects/' + currentProject.id + '/diagrams/' + id, { method: 'DELETE', credentials: 'include' }).catch(() => {});
+      },
+    });
+  }
+
+  // "Edit wiring" / "Edit diagram" on those images in the live view. The
+  // editor redraws its images at will, so the buttons go back on whenever
+  // one appears.
+  function setupImageEditButtons(mde) {
     const root = mde.view.dom;
+    const button = (wrap, icon, label, run) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'project-wiring-edit';
+      btn.innerHTML = '<i class="fas ' + icon + ' me-1"></i>' + label;
+      // Keep the click from moving the cursor into the image's Markdown.
+      btn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); });
+      btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); run(); });
+      wrap.appendChild(btn);
+    };
     const decorate = () => {
       root.querySelectorAll('.cm-md-image-wrap').forEach(wrap => {
         const img = wrap.querySelector('img.cm-md-image');
-        if (!img || !ProjectWiring.isWiringSrc(img.getAttribute('src')) || wrap.querySelector('.project-wiring-edit')) return;
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'project-wiring-edit';
-        btn.innerHTML = '<i class="fas fa-plug me-1"></i>Edit wiring';
-        // Keep the click from moving the cursor into the image's Markdown.
-        btn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); });
-        btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openWiring(); });
-        wrap.appendChild(btn);
+        if (!img || wrap.querySelector('.project-wiring-edit')) return;
+        const src = img.getAttribute('src');
+        if (ProjectWiring.isWiringSrc(src)) button(wrap, 'fa-plug', 'Edit wiring', openWiring);
+        const id = diagramSrcId(src);
+        if (id) button(wrap, 'fa-shapes', 'Edit diagram', () => currentProject && openDiagram(id));
       });
     };
     new MutationObserver(decorate).observe(root, { childList: true, subtree: true });

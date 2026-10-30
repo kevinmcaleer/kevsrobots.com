@@ -492,6 +492,38 @@ class ProjectWiringResponse(BaseModel):
     updated_at: datetime
 
 
+# --- Project diagrams (issue #270) -----------------------------------------
+
+
+class ProjectDiagramCreate(BaseModel):
+    title: str = Field("Diagram", min_length=1, max_length=200)
+    data: Optional[dict] = None
+
+
+class ProjectDiagramUpdate(BaseModel):
+    """Partial: fields left out stay as they are."""
+
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    data: Optional[dict] = None
+    # The export: SVG text, and a PNG as a data: URL.
+    svg: Optional[str] = None
+    png: Optional[str] = None
+
+
+class ProjectDiagramSummary(BaseModel):
+    id: int
+    project_id: int
+    title: str
+    svg_url: Optional[str] = None
+    png_url: Optional[str] = None
+    updated_at: datetime
+
+
+class ProjectDiagramResponse(ProjectDiagramSummary):
+    data: dict
+    created_at: datetime
+
+
 # --- Project symbols (Symbol Designer) -----------------------------------
 #
 # Per-project user-designed schematic symbols. The body-shape and pin

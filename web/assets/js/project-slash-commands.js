@@ -14,6 +14,7 @@
     video: 'M2 4h8.5v8H2zM10.5 7 14 5v6l-3.5-2',
     part: 'M5 5h6v6H5zM6.5 2.5V5M9.5 2.5V5M6.5 11v2.5M9.5 11v2.5M2.5 6.5H5M2.5 9.5H5M11 6.5h2.5M11 9.5h2.5',
     diagram: 'M2 2.5h5v4H2zM9 9.5h5v4H9zM4.5 6.5v5H9',
+    draw: 'M2 3h12v10H2zM4.5 10.5l2.5-3 2 2 1.5-1.5 1.5 2.5M10.5 5.5h.01',
     upload: 'M8 11V3M5 6l3-3 3 3M3 11v2.5h10V11',
     add: 'M8 3v10M3 8h10',
     browse: 'M2 2.5h5v5H2zM9 2.5h5v5H9zM2 9.5h5v5H2zM9 9.5h5v5H9z',
@@ -271,6 +272,8 @@
   //   ctx.searchParts(q), ctx.createPart(name)   the parts catalog, see partPicker
   //   ctx.diagrams      [{ label, md }], the diagram templates
   //   ctx.openWiring(view)  opens the electronics workspace (issue #268)
+  //   ctx.diagramTemplates  [{ id, label, detail }]; ctx.newDiagram(view, id)
+  //   ctx.listDiagrams()    the project's diagrams; ctx.diagramMarkdown(d) (issue #270)
   // The sections a document already has, worked out once per version of
   // the text (the menu asks on every keystroke while it's open).
   const presentByDoc = new WeakMap();
@@ -426,9 +429,36 @@
         run: view => partPicker(view, ctx, part => insertAtCursor(view, partLink(part), false), { browse: true }),
       },
       {
+        // Issue #270: the drawing tool. Templates first, then the
+        // project's diagrams to show again.
         id: 'diagram',
         label: 'Diagram',
-        keywords: ['mermaid', 'flowchart', 'sequence', 'state', 'chart'],
+        keywords: ['drawing', 'annotate', 'photo', 'illustration', 'exploded', 'canvas', 'shapes'],
+        group: 'project',
+        icon: ICONS.draw,
+        block: true,
+        hidden: () => !ctx.newDiagram,
+        run: view => openPicker(view, {
+          placeholder: 'New diagram, or one of this project’s…',
+          load: async () => ctx.diagramTemplates.map(t => ({
+            label: 'New: ' + t.label,
+            detail: t.detail,
+            icon: ICONS.draw,
+            always: true,
+            pick: () => ctx.newDiagram(view, t.id),
+          })).concat((await ctx.listDiagrams()).map(d => ({
+            label: d.title,
+            detail: 'Diagram in this project',
+            thumb: d.svg_url || null,
+            icon: d.svg_url ? null : ICONS.draw,
+            pick: () => insertAtCursor(view, ctx.diagramMarkdown(d), true),
+          }))),
+        }),
+      },
+      {
+        id: 'mermaid',
+        label: 'Mermaid diagram',
+        keywords: ['mermaid', 'flowchart', 'sequence', 'state', 'chart', 'diagram'],
         group: 'project',
         icon: ICONS.diagram,
         block: true,

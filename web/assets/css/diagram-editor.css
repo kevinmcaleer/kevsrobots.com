@@ -1,0 +1,147 @@
+/* The diagram tool (issue #270), full screen over the project editor
+   (diagram-editor.js). Notes tokens, like the parts catalog. */
+.diagram-editor {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-2: #f0eee6;
+  --text: #141413;
+  --muted: #6b6a63;
+  --border: #e3e0d6;
+  --accent: #c96442;
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+body.diagram-editor-open { overflow: hidden; }
+.diagram-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.diagram-title { width: 16rem; max-width: 40vw; }
+.diagram-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 280px;
+}
+.diagram-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.diagram-tool {
+  width: 40px;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+}
+.diagram-tool:hover { background: var(--surface-2); border-color: var(--border); }
+.diagram-stage {
+  position: relative;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #e9e6dc;
+}
+.diagram-artboard {
+  position: relative;
+  box-shadow: 0 6px 24px rgba(20, 20, 19, 0.18);
+}
+.diagram-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(20, 20, 19, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 20, 19, 0.06) 1px, transparent 1px);
+}
+.diagram-grid[hidden] { display: none; }
+.diagram-panel {
+  overflow: auto;
+  padding: 10px 12px;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.8125rem;
+}
+.diagram-panel h6 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.diagram-panel section { margin-bottom: 1rem; }
+.diagram-panel section[hidden], .diagram-panel [data-for][hidden] { display: none; }
+.diagram-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.diagram-row > label:first-child { width: 4rem; color: var(--muted); }
+.diagram-row input[type=color] { width: 34px; height: 28px; padding: 0; border: 1px solid var(--border); border-radius: 6px; }
+.diagram-row input[type=number] { width: 4.5rem; }
+.diagram-row .form-range { flex: 1; }
+.diagram-row .form-select { flex: 1; }
+.diagram-layers { list-style: none; margin: 0; padding: 0; }
+.diagram-layers li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.diagram-layers li:hover { background: var(--surface-2); }
+.diagram-layers li.is-active { border-color: var(--accent); background: #fbefe9; }
+.diagram-layers li.is-hidden .diagram-layer-name { opacity: 0.45; }
+.diagram-layers li.is-dragover { border-top: 2px solid var(--accent); }
+.diagram-layers li.is-dragging { opacity: 0.5; }
+.diagram-layer-icon { width: 1rem; color: var(--muted); text-align: center; }
+.diagram-layer-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.diagram-layers li button { border: 0; background: transparent; color: var(--muted); padding: 0 2px; }
+.diagram-layers li button:hover { color: var(--text); }
+.diagram-layers-empty { color: var(--muted); font-style: italic; cursor: default !important; }
+.diagram-photos {
+  position: absolute;
+  top: 56px;
+  left: 60px;
+  z-index: 2;
+  width: min(520px, 80vw);
+  max-height: 70vh;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgba(20, 20, 19, 0.2);
+}
+.diagram-photos[hidden] { display: none; }
+.diagram-photos-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.diagram-photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+.diagram-photos-grid button { padding: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface-2); aspect-ratio: 1; }
+.diagram-photos-grid img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 900px) {
+  .diagram-body { grid-template-columns: 48px minmax(0, 1fr); }
+  .diagram-panel { display: none; }
+}
