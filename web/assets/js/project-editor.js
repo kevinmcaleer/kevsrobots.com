@@ -647,6 +647,52 @@
     element.innerHTML = result.svg;
   }
 
+  function projectTitle() {
+    return (titleInput && titleInput.value.trim()) || undefined;
+  }
+
+  // "Open in Mermaid Factory" opens the diagram there in a new tab, where
+  // "Save to your project" puts the edited code back in its block here.
+  function openInMermaidFactory(tools, code) {
+    let current = code;
+    tools.openInFactory(code, {
+      base: MERMAID_FACTORY_URL,
+      title: projectTitle(),
+      label: 'your project',
+      onSave: next => {
+        if (!mde || !replaceMermaidBlock(current, next)) {
+          return 'The diagram was changed or removed in the project since you opened it, so it wasn\'t replaced. Copy the code across instead.';
+        }
+        current = next;
+        return true;
+      },
+    });
+  }
+
+  // Swaps the code of the first ```mermaid block whose code is `oldCode` for `newCode`.
+  function replaceMermaidBlock(oldCode, newCode) {
+    const doc = mde.view.state.doc;
+    const want = oldCode.replace(/\s+$/, '');
+    for (let n = 1; n <= doc.lines; n++) {
+      const fence = /^ {0,3}(`{3,}|~{3,})\s*mermaid\b/i.exec(doc.line(n).text);
+      if (!fence) continue;
+      const close = new RegExp('^ {0,3}' + fence[1][0] + '{' + fence[1].length + ',}\\s*$');
+      let end = n + 1;
+      while (end <= doc.lines && !close.test(doc.line(end).text)) end++;
+      if (end > doc.lines) return false; // an unclosed fence runs to the end
+      const empty = end === n + 1;
+      const from = empty ? doc.line(end).from : doc.line(n + 1).from;
+      const to = empty ? from : doc.line(end - 1).to;
+      if (doc.sliceString(from, to).replace(/\s+$/, '') === want) {
+        const insert = newCode.replace(/\s+$/, '') + (empty ? '\n' : '');
+        mde.view.dispatch({ changes: { from, to, insert }, userEvent: 'input' });
+        return true;
+      }
+      n = end;
+    }
+    return false;
+  }
+
   // ...and with the cursor in it: the code beside its live diagram, where
   // clicking a flowchart shape edits its text and shape or adds a shape joined to it.
   function editMermaid(context) {
@@ -662,7 +708,8 @@
         onExit: context.onExit,
         autofocus: context.focus,
         factoryUrl: MERMAID_FACTORY_URL,
-        title: (titleInput && titleInput.value.trim()) || undefined,
+        title: projectTitle(),
+        onOpenInFactory: code => openInMermaidFactory(tools, code),
       });
     }, err => {
       context.element.textContent = 'Couldn\'t load the diagram editor: ' + err.message;
