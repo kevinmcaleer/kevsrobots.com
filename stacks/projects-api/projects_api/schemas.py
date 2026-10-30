@@ -471,6 +471,59 @@ class ProjectSchematicResponse(BaseModel):
     updated_at: datetime
 
 
+# --- Project wiring (issue #268) -------------------------------------------
+#
+# Snakie's electronics workspace. ``data`` is a Snakie RobotDefinition
+# (board, parts, connections); ``svg`` is the canvas the browser exported,
+# cleaned before it's stored (svg_safety.py).
+
+
+class ProjectWiringUpdate(BaseModel):
+    data: dict
+    svg: Optional[str] = None
+
+
+class ProjectWiringResponse(BaseModel):
+    project_id: int
+    data: dict
+    # Where the last render is served, or None before the first one.
+    svg_url: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
+# --- Project diagrams (issue #270) -----------------------------------------
+
+
+class ProjectDiagramCreate(BaseModel):
+    title: str = Field("Diagram", min_length=1, max_length=200)
+    data: Optional[dict] = None
+
+
+class ProjectDiagramUpdate(BaseModel):
+    """Partial: fields left out stay as they are."""
+
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    data: Optional[dict] = None
+    # The export: SVG text, and a PNG as a data: URL.
+    svg: Optional[str] = None
+    png: Optional[str] = None
+
+
+class ProjectDiagramSummary(BaseModel):
+    id: int
+    project_id: int
+    title: str
+    svg_url: Optional[str] = None
+    png_url: Optional[str] = None
+    updated_at: datetime
+
+
+class ProjectDiagramResponse(ProjectDiagramSummary):
+    data: dict
+    created_at: datetime
+
+
 # --- Project symbols (Symbol Designer) -----------------------------------
 #
 # Per-project user-designed schematic symbols. The body-shape and pin
@@ -1276,6 +1329,8 @@ class PartDetail(BaseModel):
     datasheet_url: Optional[str] = None
     # Set when the part has a 3D mesh (served at /api/parts/{slug}/mesh).
     has_mesh: bool = False
+    # The model's file type (stl / glb / obj), so a page knows how to show it.
+    mesh_format: Optional[str] = None
 
 
 # --- Part photos (part-hub gallery) --------------------------------------
@@ -1423,7 +1478,7 @@ class PartTalkThreadDetail(BaseModel):
 # --- Parts moderation (issue #123, Phase 3) ------------------------------
 
 
-PART_REPORT_REASONS = ("spam", "wrong", "duplicate", "other")
+PART_REPORT_REASONS = ("spam", "wrong", "pinout", "duplicate", "other")
 PART_REPORT_RESOLUTIONS = ("accepted", "dismissed")
 PART_MERGE_VOTES = ("approve", "reject")
 
@@ -1431,7 +1486,7 @@ PART_MERGE_VOTES = ("approve", "reject")
 class PartReportCreate(BaseModel):
     """Body of POST /api/parts/{slug}/report."""
 
-    reason: str = Field(..., pattern=r"^(spam|wrong|duplicate|other)$")
+    reason: str = Field(..., pattern=r"^(spam|wrong|pinout|duplicate|other)$")
     note: Optional[str] = Field(None, max_length=500)
 
 

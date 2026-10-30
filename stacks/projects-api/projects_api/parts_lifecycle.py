@@ -13,7 +13,8 @@ of the following are true:
 
 A ``verified`` part is demoted to ``disputed`` if a ``part_reports``
 table exists (Phase 3, issue #123) and contains an open report whose
-``reason`` is ``"wrong"`` or ``"duplicate"``. If the table does not yet
+``reason`` is ``"wrong"``, ``"pinout"`` (a wrong pinout, issue #269) or
+``"duplicate"``. If the table does not yet
 exist on the running database, the demotion check is silently skipped —
 this keeps Phase 2 deployable before #123 ships.
 
@@ -123,7 +124,7 @@ async def _has_open_disputed_report(
             "SELECT 1 FROM part_reports "
             "WHERE part_id = :pid "
             "  AND resolved_at IS NULL "
-            "  AND reason IN ('wrong', 'duplicate') "
+            "  AND reason IN ('wrong', 'pinout', 'duplicate') "
             "LIMIT 1"
         ),
         {"pid": part_id},

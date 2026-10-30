@@ -1347,6 +1347,62 @@ class ProjectSchematic(Base):
     )
 
 
+class ProjectWiring(Base):
+    """A project's wiring, drawn in Snakie's electronics workspace (issue
+    #268). One per project for v1, like schematics. ``data`` is a Snakie
+    ``RobotDefinition`` (board, parts, connections); ``svg_path`` is the
+    last render, served at ``/api/projects/{id}/wiring.svg`` so the
+    project's Markdown can show it as an image."""
+
+    __tablename__ = "project_wiring"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    data: Mapped[dict] = mapped_column(JsonType, nullable=False)
+    svg_path: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+class ProjectDiagram(Base):
+    """A freeform diagram (issue #270): an annotated photo, an exploded
+    view. Many per project. ``data`` is the Fabric canvas JSON (with each
+    object's layer name) and is the source; ``svg_path`` / ``png_path``
+    are the last export, which the project's Markdown shows as an image."""
+
+    __tablename__ = "project_diagrams"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False, default="Diagram")
+    data: Mapped[dict] = mapped_column(JsonType, nullable=False)
+    svg_path: Mapped[Optional[str]] = mapped_column(Text)
+    png_path: Mapped[Optional[str]] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
 class ProjectSymbol(Base):
     """A user-designed schematic symbol scoped to a project.
 

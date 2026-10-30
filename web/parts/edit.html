@@ -8,6 +8,13 @@ description: Edit a part in the catalog
 
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+<style>
+  /* Issue #269: the Electronics tab (Snakie's Part Editor). */
+  .part-electronics-editor { height: 78vh; min-height: 520px; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; }
+  .part-electronics-photo { width: 44px; height: 44px; padding: 0; border: 2px solid transparent; border-radius: 6px; background: #f0eee6; overflow: hidden; }
+  .part-electronics-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .part-electronics-photo.is-active { border-color: var(--bs-primary, #0d6efd); }
+</style>
 
 <div class="container py-4">
   <div class="mb-3">
@@ -34,6 +41,23 @@ description: Edit a part in the catalog
 
     <div id="save-error" class="alert alert-danger d-none"></div>
 
+    <!-- Issue #269: Details is the form; Electronics is Snakie's Part
+         Editor (existing parts only — it saves to the part's definition). -->
+    <ul class="nav nav-tabs mb-3 d-none" id="edit-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-details-btn" data-bs-toggle="tab" data-bs-target="#tab-details" type="button" role="tab">
+          <i class="fas fa-pencil-alt me-1"></i> Details
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-electronics-btn" data-bs-toggle="tab" data-bs-target="#tab-electronics" type="button" role="tab">
+          <i class="fas fa-microchip me-1"></i> Electronics
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+    <div class="tab-pane fade show active" id="tab-details" role="tabpanel" aria-labelledby="tab-details-btn">
     <div class="row">
       <div class="col-lg-8">
         <div class="mb-3">
@@ -112,7 +136,7 @@ description: Edit a part in the catalog
           <select id="part-symbol-select" class="form-select">
             <option value="">— No symbol —</option>
           </select>
-          <div class="form-text">Link a library symbol so this part can be dropped straight into a schematic. Design new ones in the <a href="/projects/symbol/edit.html" target="_blank" rel="noopener">Symbol Designer</a>.</div>
+          <div class="form-text">A legacy library symbol for the old schematic editor. A part's own symbol is drawn from its pins: <a href="#" id="edit-electronics-link">Edit part electronics</a>.</div>
         </div>
 
         <div id="related-parts-section" class="mb-3 d-none">
@@ -133,6 +157,16 @@ description: Edit a part in the catalog
           <div class="row g-2 align-items-center">
             <div class="col-12 col-sm">
               <input type="text" id="photo-title-input" class="form-control form-control-sm" placeholder="Title (optional, e.g. top view)" maxlength="200">
+            </div>
+            <div class="col-12 col-sm-auto">
+              <select id="photo-licence-input" class="form-select form-select-sm" aria-label="Photo licence">
+                <option value="">Licence…</option>
+                <option value="own">My own photo</option>
+                <option value="cc-by">CC BY (credit the source)</option>
+                <option value="permission-granted:adafruit">Adafruit (permission granted)</option>
+                <option value="permission-granted:pimoroni">Pimoroni (permission granted)</option>
+                <option value="permission-granted:digikey">DigiKey (permission granted)</option>
+              </select>
             </div>
             <div class="col-12 col-sm-auto">
               <input type="file" id="photo-file-input" class="form-control form-control-sm" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml">
@@ -188,11 +222,19 @@ description: Edit a part in the catalog
         </div>
       </div>
     </div>
+    </div>
+    <div class="tab-pane fade" id="tab-electronics" role="tabpanel" aria-labelledby="tab-electronics-btn">
+      <p class="text-muted small mb-2">Place the part's pins over its photo, set what each pin does, and its schematic symbol is drawn from the headers. Saving adds a revision to the part's history.</p>
+      <div id="part-electronics"></div>
+    </div>
+    </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/snakie-host.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/part-electronics.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -607,8 +649,11 @@ description: Edit a part in the catalog
     const fileInput = document.getElementById('photo-file-input');
     const file = fileInput.files && fileInput.files[0];
     if (!file) { showPhotoError('Choose an image file to upload.'); return; }
+    const licence = document.getElementById('photo-licence-input').value;
+    if (!licence) { showPhotoError('Choose a licence for the photo.'); return; }
     const fd = new FormData();
     fd.append('file', file);
+    fd.append('licence', licence);
     const title = document.getElementById('photo-title-input').value.trim();
     if (title) fd.append('title', title);
     try {
@@ -768,6 +813,7 @@ description: Edit a part in the catalog
       document.getElementById('part-photos-section').classList.remove('d-none');
       renderPhotoList(currentPart.photos || []);
       loadPhotos();
+      setupElectronics();
 
       hide(document.getElementById('loading'));
       show(document.getElementById('edit-container'));
@@ -781,6 +827,24 @@ description: Edit a part in the catalog
       hide(document.getElementById('loading'));
       show(document.getElementById('edit-container'));
     }
+  }
+
+  // --- Electronics (issue #269) ---
+  // Mounted the first time the tab opens (the editor bundle is 1.4 MB).
+  // ?tab=electronics opens it straight away (the part page links there).
+  let electronics = null;
+  function setupElectronics() {
+    document.getElementById('edit-tabs').classList.remove('d-none');
+    const btn = document.getElementById('tab-electronics-btn');
+    btn.addEventListener('shown.bs.tab', () => {
+      if (electronics) return;
+      electronics = PartElectronics.create(document.getElementById('part-electronics'), currentPart, {
+        onSaved: part => { currentPart = part; loadPhotos(); },
+        onClose: () => document.getElementById('tab-details-btn').click(),
+      });
+    });
+    document.getElementById('edit-electronics-link').addEventListener('click', e => { e.preventDefault(); btn.click(); });
+    if (params.get('tab') === 'electronics') btn.click();
   }
 
   // --- Save ---

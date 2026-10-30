@@ -32,6 +32,12 @@ import yaml
 # Keys of a Snakie definition that point at files beside parts.yml. They
 # mean nothing once the definition is stored here; the export swaps in URLs.
 FILE_KEYS = ("image", "help", "mesh")
+# Runtime keys the Snakie editor (and the embedded bundle) put on a part:
+# ``imageData`` is the photo inlined as a data URL. Never stored.
+RUNTIME_KEYS = ("imageData",)
+# Ours, not Snakie's (issue #269): the PartPhoto the pins were placed over.
+# Kept in the stored definition, left out of parts.yml.
+HOST_KEYS = ("photo_id",)
 
 
 def spec_from_definition(definition: dict) -> dict:
@@ -58,8 +64,14 @@ def spec_from_definition(definition: dict) -> dict:
 
 def stored_definition(definition: dict) -> dict:
     """What to keep in ``parts.definition``: everything except the file
-    references, which only make sense inside a Snakie library folder."""
-    return {k: v for k, v in definition.items() if k not in FILE_KEYS}
+    references, which only make sense inside a Snakie library folder, and
+    the inlined image data the editor carries at runtime (the rear face's
+    too)."""
+    out = {k: v for k, v in definition.items() if k not in FILE_KEYS and k not in RUNTIME_KEYS}
+    rear = out.get("rear")
+    if isinstance(rear, dict):
+        out["rear"] = {k: v for k, v in rear.items() if k not in FILE_KEYS and k not in RUNTIME_KEYS}
+    return out
 
 
 def to_parts_yml(
@@ -90,7 +102,8 @@ def to_parts_yml(
         if value not in (None, "", []):
             out[key] = value
     for key, value in definition.items():
-        if key not in out and key not in FILE_KEYS and key not in ("id", "name", "description"):
+        if (key not in out and key not in FILE_KEYS and key not in HOST_KEYS
+                and key not in ("id", "name", "description")):
             out[key] = value
     # Snakie requires a headers list, even an empty one.
     out.setdefault("headers", [])
