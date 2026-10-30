@@ -2679,6 +2679,9 @@
 
   let completenessFrame = null;
   let completenessPct = 0;
+  let wasComplete = false;
+  // Set by initCompletenessOverlay: collapses the panel without saving that.
+  let collapseCompleteness = null;
   // Closed with the panel's ×: listed in the editor's hints instead,
   // which is how it comes back. Remembered per browser.
   const COMPLETENESS_CLOSED_KEY = 'projectEditor.completenessClosed';
@@ -2700,7 +2703,6 @@
   }
 
   function _doRecomputeCompleteness() {
-    const cardEl = document.getElementById('completeness-card');
     const scoreEl = document.getElementById('completeness-score');
     const pointsEl = document.getElementById('completeness-points');
     const barEl = document.getElementById('completeness-bar');
@@ -2709,7 +2711,6 @@
     const listEl = document.getElementById('completeness-checklist');
     const celebrateEl = document.getElementById('completeness-celebration');
     const completeBadge = document.getElementById('completeness-complete-badge');
-    const cardBody = cardEl && cardEl.querySelector('.completeness-body');
     if (!scoreEl || !barEl || !listEl) return;
 
     let earned = 0;
@@ -2731,19 +2732,15 @@
     completenessPct = pct;
     if (completenessClosed) setCompletenessHint();
 
-    // At 100%, collapse the card body to just the header. The header gets
-    // a small "Complete" pill so the user can still see status at a glance
-    // without the whole checklist taking up sidebar space.
-    if (pct >= 100) {
-      if (cardBody) cardBody.classList.add('d-none');
-      if (completeBadge) completeBadge.classList.remove('d-none');
-      if (miniEl) miniEl.classList.add('d-none');
-      return;
-    }
-    if (miniEl) miniEl.classList.remove('d-none');
-    if (cardBody) cardBody.classList.remove('d-none');
-    if (completeBadge) completeBadge.classList.add('d-none');
-    if (celebrateEl) celebrateEl.classList.add('d-none');
+    // At 100% the header gets a "Complete" pill in place of the score, and
+    // the panel collapses to just its header when it gets there. Expanding
+    // it still shows the checklist, all ticked, under the celebration.
+    const complete = pct >= 100;
+    if (miniEl) miniEl.classList.toggle('d-none', complete);
+    if (completeBadge) completeBadge.classList.toggle('d-none', !complete);
+    if (celebrateEl) celebrateEl.classList.toggle('d-none', !complete);
+    if (complete && !wasComplete && typeof collapseCompleteness === 'function') collapseCompleteness();
+    wasComplete = complete;
     listEl.classList.remove('d-none');
 
     // Resolve target. Items can declare ``target`` as a string OR as
@@ -2882,6 +2879,7 @@
     }
     toggle.addEventListener('click', flip);
     if (chevron) chevron.addEventListener('click', flip);
+    collapseCompleteness = () => { collapsed = true; apply(); };
     apply();
     const closeBtn = document.getElementById('completeness-close');
     if (closeBtn) closeBtn.addEventListener('click', closeCompleteness);
