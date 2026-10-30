@@ -34,6 +34,9 @@ cp "$pkg/src/callouts.css" "$dest/callouts.css"
 # Likewise the image sizes (`{small}` after an image), with
 # assets/js/project-image-sizes.js.
 cp "$pkg/src/image-sizes.css" "$dest/image-sizes.css"
+# And image grids (a table of images as cards), with
+# assets/js/project-image-grid.js.
+cp "$pkg/src/image-grid.css" "$dest/image-grid.css"
 cp "$pkg/dist/dictionaries/"* "$dest/dictionaries/"
 
 version="$(node -p "require('$pkg/package.json').version")"

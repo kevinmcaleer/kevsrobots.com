@@ -362,6 +362,18 @@
   font-weight: 600;
 }
 
+/* A table of images is a grid of cards (image-grid.css): the table rules
+   above give way to it, keeping only the space around the block. */
+.project-prose table.image-grid {
+  width: calc(100% + 1.5rem);
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  margin-top: 0.65rem;
+  margin-bottom: calc(0.35rem + var(--block-gap));
+  border-collapse: separate;
+  font-size: inherit;
+}
+
 /* Images: round corners; their {size} comes from image-sizes.css. */
 .project-prose img {
   max-width: 100%;
@@ -412,5 +424,14 @@
   .project-prose table {
     display: block;
     overflow-x: auto;
+  }
+
+  /* A grid of images still fits the box, its cards just narrower. */
+  .project-prose table.image-grid {
+    display: table;
+    border-spacing: 0.5rem;
+    width: calc(100% + 1rem);
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
   }
 }
