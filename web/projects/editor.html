@@ -207,7 +207,8 @@ hide_nibsy: true
 </div>
 
 <!-- Project Completeness (issue #137): a collapsible overlay pinned to the
-     bottom right of the page. The collapsed state is remembered per browser. -->
+     bottom right of the page. It can also be closed into the editor's hints
+     panel. Both states are remembered per browser. -->
 <aside class="completeness-overlay d-none" id="completeness-card" aria-label="Project completeness">
   <div class="completeness-head d-flex align-items-center gap-2">
     <button type="button" class="btn btn-link p-0 text-reset text-decoration-none flex-grow-1 text-start completeness-toggle"
@@ -230,6 +231,10 @@ hide_nibsy: true
     <button type="button" class="btn btn-sm btn-link p-0 text-muted completeness-chevron" id="completeness-collapse"
             aria-controls="completeness-body" aria-label="Collapse project completeness">
       <i class="fas fa-chevron-down"></i>
+    </button>
+    <button type="button" class="btn btn-sm btn-link p-0 text-muted completeness-close" id="completeness-close"
+            aria-label="Close project completeness" title="Close (it stays in the editor's hints)">
+      <i class="fas fa-xmark"></i>
     </button>
   </div>
   <div class="completeness-body" id="completeness-body">
