@@ -781,6 +781,8 @@
       scheduleBomTotals();
       scheduleBomLinks();
     });
+    // Hints set before the editor was mounted (a closed completeness panel).
+    if (editorHints.size) mde.setHints(Array.from(editorHints.values()));
     setupImageAutocomplete(mde);
     setupPartLinks(mde);
     setupImageEditButtons(mde);
@@ -1322,8 +1324,17 @@
   // The Bill of Materials hint in the editor's hints panel (the status
   // bar's "N hints"), or none.
   function setBomHint(hint) {
+    setEditorHint('bom-links', hint);
+  }
+
+  // setHints replaces the whole list, so each of the page's hints is kept
+  // here by id and the list is sent again whenever one changes.
+  const editorHints = new Map();
+  function setEditorHint(id, hint) {
+    if (hint) editorHints.set(id, Object.assign({ id: id }, hint));
+    else editorHints.delete(id);
     if (!mde || typeof mde.setHints !== 'function') return;
-    mde.setHints(hint ? [Object.assign({ id: 'bom-links' }, hint)] : []);
+    mde.setHints(Array.from(editorHints.values()));
   }
 
   function showBomLinkBar() {
@@ -2667,6 +2678,12 @@
   ];
 
   let completenessFrame = null;
+  let completenessPct = 0;
+  // Closed with the panel's ×: listed in the editor's hints instead,
+  // which is how it comes back. Remembered per browser.
+  const COMPLETENESS_CLOSED_KEY = 'projectEditor.completenessClosed';
+  let completenessClosed = false;
+  try { completenessClosed = localStorage.getItem(COMPLETENESS_CLOSED_KEY) === '1'; } catch (e) {}
   function recomputeCompleteness() {
     if (completenessFrame) cancelAnimationFrame(completenessFrame);
     completenessFrame = requestAnimationFrame(() => {
@@ -2711,6 +2728,8 @@
     barEl.style.width = pct + '%';
     barEl.setAttribute('aria-valuenow', String(pct));
     barEl.className = 'progress-bar ' + _bandClass(pct);
+    completenessPct = pct;
+    if (completenessClosed) setCompletenessHint();
 
     // At 100%, collapse the card body to just the header. The header gets
     // a small "Complete" pill so the user can still see status at a glance
@@ -2864,7 +2883,75 @@
     toggle.addEventListener('click', flip);
     if (chevron) chevron.addEventListener('click', flip);
     apply();
+    const closeBtn = document.getElementById('completeness-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeCompleteness);
   })();
+
+  function setCompletenessHint() {
+    setEditorHint('completeness', completenessClosed ? {
+      title: 'Project completeness: ' + completenessPct + '%',
+      detail: completenessPct >= 100 ? 'Everything\u2019s filled in.' : 'See what\u2019s left to fill in.',
+      actions: [{ label: 'Show project completeness', run: showCompleteness }],
+    } : null);
+  }
+
+  // The editor's "N hints" button in its status bar, where the panel goes
+  // when it's closed and comes back from.
+  function hintsButton() {
+    const btn = document.querySelector('.mde .writing-lint .writing-toggle');
+    if (!btn) return null;
+    const r = btn.getBoundingClientRect();
+    return (r.width && r.bottom > 0 && r.top < window.innerHeight) ? r : null;
+  }
+
+  // Moves and shrinks the panel onto the hints button (or back from it).
+  function flyCompleteness(card, toHints) {
+    const target = hintsButton();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!target || reduce || typeof card.animate !== 'function') return Promise.resolve();
+    const from = card.getBoundingClientRect();
+    const dx = (target.left + target.width / 2) - (from.left + from.width / 2);
+    const dy = (target.top + target.height / 2) - (from.top + from.height / 2);
+    const scale = Math.max(target.width / from.width, 0.05);
+    const away = { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + scale + ')', opacity: 0.1 };
+    const home = { transform: 'none', opacity: 1 };
+    const anim = card.animate(toHints ? [home, away] : [away, home], {
+      duration: 420,
+      easing: toHints ? 'cubic-bezier(.5,0,.75,0)' : 'cubic-bezier(.25,1,.5,1)',
+    });
+    return anim.finished.catch(() => {});
+  }
+
+  function pulseHintsButton() {
+    const btn = document.querySelector('.mde .writing-lint .writing-toggle');
+    if (!btn) return;
+    btn.classList.remove('completeness-landed');
+    void btn.offsetWidth;
+    btn.classList.add('completeness-landed');
+    setTimeout(() => btn.classList.remove('completeness-landed'), 700);
+  }
+
+  async function closeCompleteness() {
+    const card = document.getElementById('completeness-card');
+    if (!card || completenessClosed) return;
+    completenessClosed = true;
+    try { localStorage.setItem(COMPLETENESS_CLOSED_KEY, '1'); } catch (e) {}
+    card.style.transformOrigin = 'center';
+    await flyCompleteness(card, true);
+    card.classList.add('d-none');
+    setCompletenessHint();
+    pulseHintsButton();
+  }
+
+  function showCompleteness() {
+    const card = document.getElementById('completeness-card');
+    if (!card) return;
+    completenessClosed = false;
+    try { localStorage.removeItem(COMPLETENESS_CLOSED_KEY); } catch (e) {}
+    setCompletenessHint();
+    card.classList.remove('d-none');
+    flyCompleteness(card, false);
+  }
 
   // First paint so the meter shows 0% (new projects) or actual score (after load).
   recomputeCompleteness();
@@ -2881,7 +2968,7 @@
     loadStoredBom().catch(() => {});
     editorContainer.classList.remove('d-none');
     const completenessCard = document.getElementById('completeness-card');
-    if (completenessCard) completenessCard.classList.remove('d-none');
+    if (completenessCard && !completenessClosed) completenessCard.classList.remove('d-none');
     recomputeCompleteness();
   }
 
