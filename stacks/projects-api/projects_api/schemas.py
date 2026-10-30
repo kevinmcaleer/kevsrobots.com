@@ -1276,6 +1276,8 @@ class PartDetail(BaseModel):
     datasheet_url: Optional[str] = None
     # Set when the part has a 3D mesh (served at /api/parts/{slug}/mesh).
     has_mesh: bool = False
+    # The model's file type (stl / glb / obj), so a page knows how to show it.
+    mesh_format: Optional[str] = None
 
 
 # --- Part photos (part-hub gallery) --------------------------------------
@@ -1423,7 +1425,7 @@ class PartTalkThreadDetail(BaseModel):
 # --- Parts moderation (issue #123, Phase 3) ------------------------------
 
 
-PART_REPORT_REASONS = ("spam", "wrong", "duplicate", "other")
+PART_REPORT_REASONS = ("spam", "wrong", "pinout", "duplicate", "other")
 PART_REPORT_RESOLUTIONS = ("accepted", "dismissed")
 PART_MERGE_VOTES = ("approve", "reject")
 
@@ -1431,7 +1433,7 @@ PART_MERGE_VOTES = ("approve", "reject")
 class PartReportCreate(BaseModel):
     """Body of POST /api/parts/{slug}/report."""
 
-    reason: str = Field(..., pattern=r"^(spam|wrong|duplicate|other)$")
+    reason: str = Field(..., pattern=r"^(spam|wrong|pinout|duplicate|other)$")
     note: Optional[str] = Field(None, max_length=500)
 
 

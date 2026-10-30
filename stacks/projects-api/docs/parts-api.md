@@ -265,7 +265,18 @@ in `definition`. Every revision snapshots all of them.
 - `PUT /api/parts/{slug}/definition` takes the JSON the Snakie part editor
   saves and writes a revision. Its manufacturer, package, voltage, pin
   spacing and dimensions update the part's own; name and description don't.
+  An optional `?change_summary=` names the revision. `photo_id` in the body
+  (issue #269) is the part photo the pins were placed over; it must be one
+  of this part's, and `parts.yml` exports that photo as the `image`. The
+  editor's runtime `imageData` (and `rear.imageData`) is never stored.
 - `GET /api/parts/{slug}/mesh` serves the 3D mesh when the part has one.
+  `POST` (multipart `file`, STL, GLB or OBJ) attaches one and `DELETE`
+  detaches it; both write a revision, and earlier files stay in storage so
+  a restore brings its model back. `mesh_format` on the part says the type.
+- Uploading a photo (`POST /api/parts/{slug}/photos`) needs a `licence`
+  form field (issue #269), plus `source` for a CC BY photo.
+- A report's `reason` can be `pinout` (a wrong pinout). Like `wrong` and
+  `duplicate`, an open one marks a verified part disputed.
 - Photos carry `source` and `licence` (`permission-granted:adafruit`,
   `permission-granted:pimoroni`, `permission-granted:digikey`, `cc-by`,
   `own`). A source with no licence sets `needs_review`, and the photo is

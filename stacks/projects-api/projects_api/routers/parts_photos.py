@@ -25,7 +25,7 @@ from ..auth import require_terms_accepted_aged
 from ..config import get_settings
 from ..db import get_session
 from ..models import Part, PartPhoto
-from ..schemas import PartPhotoLinkCreate, PartPhotoResponse, PartPhotoUpdate
+from ..schemas import PHOTO_LICENCES, PartPhotoLinkCreate, PartPhotoResponse, PartPhotoUpdate
 from ..storage import (
     ALLOWED_IMAGE_EXTENSIONS,
     delete_file,
@@ -114,10 +114,19 @@ async def upload_photo(
     slug: str,
     file: UploadFile,
     title: Optional[str] = Form(None),
+    licence: Optional[str] = Form(None),
+    source: Optional[str] = Form(None),
     user: str = Depends(require_terms_accepted_aged),
     session: AsyncSession = Depends(get_session),
 ) -> PartPhotoResponse:
-    """Upload an image file as a part photo (stored on NAS/local)."""
+    """Upload an image file as a part photo (stored on NAS/local). A
+    licence is required (issue #269): an uploaded photo gets copied into
+    other people's projects and Snakie libraries, so we need to know we may."""
+    if licence not in PHOTO_LICENCES:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Choose a licence for the photo: " + ", ".join(PHOTO_LICENCES),
+        )
     part = await _get_part(session, slug)
     settings = get_settings()
     content = await file.read()
@@ -140,6 +149,8 @@ async def upload_photo(
         filename=file.filename,
         sort_order=await _next_sort_order(session, part.id),
         created_by=user,
+        licence=licence,
+        source=(source or "").strip()[:200] or None,
     )
     session.add(photo)
     await session.commit()

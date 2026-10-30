@@ -52,7 +52,7 @@ import re
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, UploadFile, status
 from fastapi.responses import Response
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -79,7 +79,7 @@ from ..config import get_settings
 from ..parts_lifecycle import compute_part_status
 from ..price_history import last_snapshot, record_price
 from ..snakie_parts import spec_from_definition, stored_definition, to_parts_yml
-from ..storage import read_file
+from ..storage import generate_filename, read_file, save_file
 from ..parts_taxonomy import canonicalize, merge_for_suggestions
 from ..schemas import (
     PartCreate,
@@ -118,7 +118,7 @@ SPEC_FIELDS = (
     "definition", "mesh_file_path", "datasheet_url",
 )
 # The ones PUT /api/parts/{slug} edits (definition via PUT …/definition,
-# the mesh only through the importer).
+# the mesh via POST/DELETE …/mesh).
 EDITABLE_SPEC_FIELDS = (
     "manufacturer", "package", "voltage", "pin_spacing", "dimensions_mm", "datasheet_url",
 )
@@ -460,6 +460,7 @@ async def _part_detail(session: AsyncSession, part: Part) -> PartDetail:
         symbol=_symbol_ref(await _resolve_symbol(session, part.symbol_id)),
         photos=await _load_photos(session, part),
         has_mesh=bool(part.mesh_file_path),
+        mesh_format=part.mesh_file_path.rsplit(".", 1)[-1].lower() if part.mesh_file_path else None,
         **_spec_response(part),
     )
 
@@ -1235,6 +1236,15 @@ async def _cover_photo(session: AsyncSession, part: Part) -> Optional[PartPhoto]
     )
 
 
+async def _definition_photo(session: AsyncSession, part: Part) -> Optional[PartPhoto]:
+    """The photo the definition's pins were placed over (issue #269)."""
+    photo_id = (part.definition or {}).get("photo_id")
+    if not isinstance(photo_id, int):
+        return None
+    photo = await session.get(PartPhoto, photo_id)
+    return photo if photo is not None and photo.part_id == part.id else None
+
+
 @router.get("/{slug}/parts.yml")
 async def export_parts_yml(
     slug: str,
@@ -1244,7 +1254,7 @@ async def export_parts_yml(
     as a community library. Image and mesh are absolute URLs."""
     part = await _get_part_by_slug(session, slug)
     base = get_settings().public_base_url.rstrip("/")
-    cover = await _cover_photo(session, part)
+    cover = await _definition_photo(session, part) or await _cover_photo(session, part)
     image_url = None
     if cover is not None:
         image_url = cover.external_url or f"{base}/api/parts/{part.slug}/photos/{cover.id}/view"
@@ -1256,32 +1266,20 @@ async def export_parts_yml(
     )
 
 
-@router.put("/{slug}/definition", response_model=PartDetail)
-async def put_definition(
-    slug: str,
-    definition: dict = Body(...),
-    user: str = Depends(require_terms_accepted_aged),
-    session: AsyncSession = Depends(get_session),
+async def _spec_revision(
+    session: AsyncSession, part: Part, user: str, next_spec: dict, summary: str,
 ) -> PartDetail:
-    """Store the JSON the Snakie part editor saves (a PartDefinition) as a
-    new revision. Its catalogue fields (manufacturer, package, voltage, pin
-    spacing, dimensions) update the part's own; name and description stay
-    as the catalog has them."""
-    if not isinstance(definition.get("headers", []), list):
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="headers must be a list")
-    part = await _get_part_by_slug(session, slug)
-    next_spec = spec_values(part)
-    next_spec.update(spec_from_definition(definition))
-    next_spec["definition"] = stored_definition(definition)
+    """Apply ``next_spec`` (every SPEC_FIELDS value) to ``part`` as a new
+    revision, as PUT /api/parts/{slug} does for the other fields, so history,
+    restore and the verified lifecycle treat it like any other edit."""
     if next_spec == spec_values(part):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="No fields changed")
-
     now = _now_naive_utc()
     suppliers = await _load_suppliers(session, part.id)
     rev = PartRevision(
         part_id=part.id,
         author=user,
-        change_summary="Updated the part definition",
+        change_summary=summary,
         name=part.name,
         sku=part.sku,
         mpn=part.mpn,
@@ -1303,13 +1301,96 @@ async def put_definition(
     part.updated_at = now
     await session.commit()
     await session.refresh(part)
+    await compute_part_status(session, part, commit=True)
+    await session.refresh(part)
     return await _part_detail(session, part)
+
+
+def _summary(text: Optional[str], default: str) -> str:
+    return (text or "").strip()[:200] or default
+
+
+@router.put("/{slug}/definition", response_model=PartDetail)
+async def put_definition(
+    slug: str,
+    definition: dict = Body(...),
+    change_summary: Optional[str] = Query(None, max_length=200),
+    user: str = Depends(require_terms_accepted_aged),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Store the JSON the Snakie part editor saves (a PartDefinition) as a
+    new revision. Its catalogue fields (manufacturer, package, voltage, pin
+    spacing, dimensions) update the part's own; name and description stay
+    as the catalog has them. ``photo_id`` (issue #269) names the part photo
+    the pins were placed over."""
+    if not isinstance(definition.get("headers", []), list):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="headers must be a list")
+    part = await _get_part_by_slug(session, slug)
+    photo_id = definition.get("photo_id")
+    if photo_id is not None:
+        photo = await session.get(PartPhoto, photo_id) if isinstance(photo_id, int) else None
+        if photo is None or photo.part_id != part.id:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="photo_id is not a photo of this part")
+    next_spec = spec_values(part)
+    next_spec.update(spec_from_definition(definition))
+    next_spec["definition"] = stored_definition(definition)
+    return await _spec_revision(
+        session, part, user, next_spec, _summary(change_summary, "Updated the part definition"),
+    )
 
 
 MESH_MEDIA_TYPES = {
     "glb": "model/gltf-binary", "gltf": "model/gltf+json",
     "stl": "model/stl", "obj": "model/obj",
 }
+# What can be uploaded: one self-contained file (a .gltf points at others).
+MESH_UPLOAD_EXTENSIONS = (".stl", ".glb", ".obj")
+
+
+@router.post("/{slug}/mesh", response_model=PartDetail)
+async def upload_mesh(
+    slug: str,
+    file: UploadFile,
+    change_summary: Optional[str] = Query(None, max_length=200),
+    user: str = Depends(require_terms_accepted_aged),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Attach a 3-D model (STL, GLB or OBJ) to the part, as a revision
+    (issue #269). Earlier files stay in storage, so restoring an older
+    revision brings its model back."""
+    part = await _get_part_by_slug(session, slug)
+    name = file.filename or ""
+    ext = ("." + name.rsplit(".", 1)[-1].lower()) if "." in name else ""
+    if ext not in MESH_UPLOAD_EXTENSIONS:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="A 3-D model must be an STL, GLB or OBJ file")
+    content = await file.read()
+    if not content:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="The file is empty")
+    if len(content) > get_settings().max_file_size:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="The model is too large")
+    path = save_file(content, generate_filename(name, part.id), part.id, "part_meshes")
+    if path is None:
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save the model")
+    next_spec = spec_values(part)
+    next_spec["mesh_file_path"] = path
+    return await _spec_revision(
+        session, part, user, next_spec, _summary(change_summary, "Added a 3-D model"),
+    )
+
+
+@router.delete("/{slug}/mesh", response_model=PartDetail)
+async def remove_mesh(
+    slug: str,
+    user: str = Depends(require_terms_accepted_aged),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Detach the part's 3-D model, as a revision (the file is kept)."""
+    part = await _get_part_by_slug(session, slug)
+    if not part.mesh_file_path:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No mesh for this part")
+    next_spec = spec_values(part)
+    next_spec["mesh_file_path"] = None
+    return await _spec_revision(session, part, user, next_spec, "Removed the 3-D model")
 
 
 @router.get("/{slug}/mesh")

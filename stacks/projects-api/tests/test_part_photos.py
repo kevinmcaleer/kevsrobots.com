@@ -38,7 +38,7 @@ async def _upload(client, slug, filename="top.png", title="Top view", user="test
     return await client.post(
         f"/api/parts/{slug}/photos",
         files={"file": (filename, PNG, "image/png")},
-        data={"title": title},
+        data={"title": title, "licence": "own"},
         headers=make_auth_header(user),
     )
 

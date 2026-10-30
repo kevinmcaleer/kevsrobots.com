@@ -7,6 +7,10 @@ description: View a part in the catalog
 {% include nav_projects.html %}
 
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+<style>
+  .part-pinout-preview .snakie-embed { border-radius: 12px; overflow: hidden; }
+  .part-model-thumb img { display: block; background: #f0eee6; border-radius: 6px; }
+</style>
 
 <div class="container py-4">
   <div class="mb-3">
@@ -38,7 +42,7 @@ description: View a part in the catalog
         <div id="part-disputed-banner" class="alert alert-warning d-none">
           <i class="fas fa-exclamation-triangle me-2"></i>
           <strong>This part is currently disputed.</strong>
-          Community members have flagged the metadata as wrong or duplicating another entry. Help resolve it on the <a href="#" id="part-disputed-talk-link">discussion page</a>.
+          Community members have flagged the metadata or pinout as wrong, or the part as duplicating another entry. Help resolve it on the <a href="#" id="part-disputed-talk-link">discussion page</a>.
         </div>
 
         <!-- Part hub tabs. Overview is the home; enhancement (edit /
@@ -89,11 +93,10 @@ description: View a part in the catalog
               <a id="part-improve-photo" href="#" class="btn btn-sm btn-outline-primary d-none">
                 <i class="fas fa-image me-1"></i> Add a photo
               </a>
-              <button type="button" id="part-improve-symbol"
-                      class="btn btn-sm btn-outline-primary d-none"
-                      title="Link a schematic symbol to this part (coming soon)" disabled>
-                <i class="fas fa-microchip me-1"></i> Edit symbol
-              </button>
+              <a id="part-improve-symbol" href="#"
+                 class="btn btn-sm btn-outline-primary d-none">
+                <i class="fas fa-microchip me-1"></i> Edit part electronics
+              </a>
             </div>
 
             <div id="part-image-wrap" class="mb-4 d-none">
@@ -117,7 +120,18 @@ description: View a part in the catalog
 
             <div id="part-pinout-section" class="mb-4 d-none">
               <h4><i class="fas fa-plug me-3 text-primary"></i> Pinout</h4>
+              <!-- Issue #269: the part's pins over its photo, and its
+                   symbol, from Snakie's bundle (loaded when scrolled to). -->
+              <div id="part-pinout-preview" class="part-pinout-preview mb-3"></div>
               <div id="part-pinout"></div>
+            </div>
+
+            <div id="part-model-section" class="mb-4 d-none">
+              <h4><i class="fas fa-cube me-3 text-primary"></i> 3-D model</h4>
+              <button type="button" id="part-model-open" class="part-model-thumb btn p-0 border rounded" title="Open the 3-D model">
+                <img id="part-model-img" alt="" width="160" height="160">
+              </button>
+              <div><a id="part-model-download" class="small" href="#" download><i class="fas fa-download me-1"></i> Download the model</a></div>
             </div>
 
             <div id="part-family-section" class="mb-4 d-none">
@@ -160,6 +174,8 @@ description: View a part in the catalog
           <!-- ===== Symbol ===== -->
           <div class="tab-pane fade" id="tab-symbol" role="tabpanel"
                aria-labelledby="tab-symbol-btn">
+            <!-- Issue #269: the symbol drawn from the part's own pins. -->
+            <div id="part-own-symbol" class="part-pinout-preview mb-3 d-none"></div>
             <!-- Linked: show the symbol card. Populated by JS from part.symbol. -->
             <div id="part-symbol-linked" class="d-none">
               <div class="card">
@@ -296,6 +312,7 @@ description: View a part in the catalog
           <label for="report-reason" class="form-label">Reason</label>
           <select id="report-reason" class="form-select">
             <option value="wrong">Wrong information</option>
+            <option value="pinout">Wrong pinout</option>
             <option value="duplicate">Duplicate of another part</option>
             <option value="spam">Spam or vandalism</option>
             <option value="other">Other</option>
@@ -353,6 +370,8 @@ description: View a part in the catalog
      viewer's preferred currency without touching this file again. -->
 <script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/part-prices.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/snakie-host.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -507,6 +526,74 @@ description: View a part in the catalog
     document.getElementById('part-pinout-section').classList.remove('d-none');
   }
 
+  // Issue #269: the read-only part view from Snakie's bundle — the board
+  // with its pins (hover one to read it) and the symbol drawn from them.
+  // The bundle is large, so it loads when the pinout scrolls into view.
+  function hasPins(definition) {
+    const headers = definition && Array.isArray(definition.headers) ? definition.headers : [];
+    return headers.some(h => h && Array.isArray(h.pins) && h.pins.length);
+  }
+
+  function renderElectronics(part) {
+    if (!hasPins(part.definition)) return;
+    const mountIn = async (el) => {
+      try {
+        const SP = await SnakieHost.load();
+        SP.mountPartView(el, { part: await SnakieHost.partFor(part) });
+      } catch (_) {
+        el.classList.add('d-none'); // the table below still says it all
+      }
+    };
+    const preview = document.getElementById('part-pinout-preview');
+    const io = new IntersectionObserver(entries => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      io.disconnect();
+      mountIn(preview);
+    }, { rootMargin: '200px' });
+    io.observe(preview);
+    // No library symbol linked: the Symbol tab shows the part's own.
+    if (!part.symbol) {
+      const own = document.getElementById('part-own-symbol');
+      own.classList.remove('d-none');
+      let done = false;
+      document.getElementById('tab-symbol-btn').addEventListener('shown.bs.tab', () => {
+        if (done) return;
+        done = true;
+        // Open on the preview's Schematic tab, once React has drawn it.
+        mountIn(own).then(() => {
+          let tries = 40;
+          const pick = () => {
+            const tab = [...own.querySelectorAll('[role=tab]')].find(t => /schematic/i.test(t.textContent));
+            if (tab) tab.click();
+            else if (tries-- > 0) setTimeout(pick, 50);
+          };
+          pick();
+        });
+      });
+      const empty = document.getElementById('part-symbol-empty');
+      empty.querySelector('p').textContent = 'No library symbol linked. Above is the symbol drawn from the part’s pins.';
+    }
+  }
+
+  // Issue #269: the part's 3-D model, with a thumbnail rendered here (STL).
+  function renderModel(part) {
+    if (!part.has_mesh) return;
+    const url = API + '/api/parts/' + encodeURIComponent(part.slug) + '/mesh';
+    const name = part.slug + '.' + (part.mesh_format || 'stl');
+    document.getElementById('part-model-section').classList.remove('d-none');
+    document.getElementById('part-model-download').href = url;
+    const open = document.getElementById('part-model-open');
+    if (!ModelThumbnails.canRender(name)) {
+      open.classList.add('d-none');
+      return;
+    }
+    open.addEventListener('click', () => ModelThumbnails.openViewer({ url, name: part.name, downloadUrl: url }));
+    fetch(url).then(r => (r.ok ? r.arrayBuffer() : Promise.reject()))
+      .then(buf => ModelThumbnails.renderPng(buf, 160))
+      .then(png => { document.getElementById('part-model-img').src = URL.createObjectURL(png); })
+      .catch(() => {});
+  }
+
   function fmtTime(dateStr) {
     if (!dateStr) return 'unknown';
     try { return new Date(dateStr).toLocaleDateString(); } catch (_) { return 'unknown'; }
@@ -558,6 +645,8 @@ description: View a part in the catalog
     }
     renderSpecs(part);
     renderPinout(part.definition);
+    renderElectronics(part);
+    renderModel(part);
 
     // Photos tab — the multi-photo gallery, each with its optional title
     // (e.g. an orientation note), else the empty state.
@@ -726,13 +815,11 @@ description: View a part in the catalog
         photosAdd.classList.remove('d-none');
         // Edit-symbol CTA: jump to the Symbol tab (linking/unlinking itself
         // happens in the edit form, reachable from there).
+        // Issue #269: pins, pin types and the symbol are edited on the
+        // edit page's Electronics tab.
         const improveSymbol = document.getElementById('part-improve-symbol');
-        improveSymbol.disabled = false;
-        improveSymbol.removeAttribute('title');
+        improveSymbol.href = editUrl + '&tab=electronics';
         improveSymbol.classList.remove('d-none');
-        improveSymbol.addEventListener('click', () => {
-          document.getElementById('tab-symbol-btn').click();
-        });
         // Symbol tab CTAs: link (when none) / change (when linked) both go
         // to the edit form where the picker lives.
         const symLink = document.getElementById('part-symbol-link');
