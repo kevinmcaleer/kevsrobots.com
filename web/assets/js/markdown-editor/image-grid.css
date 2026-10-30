@@ -62,3 +62,19 @@ table.image-grid .image-card img.image-cover {
   height: auto;
   object-fit: cover;
 }
+
+/* A cell that starts with #'s is a heading (see cellHeadings.ts): a heading
+   over each column of a grid, say. It sits snug in its cell, in the text's
+   colour rather than a column label's. */
+table th .cell-heading,
+table td .cell-heading {
+  margin: 0;
+  color: var(--text, inherit);
+  line-height: 1.25;
+}
+
+table.image-grid th:has(.cell-heading) {
+  padding-bottom: 0.25rem;
+  color: inherit;
+  font-size: inherit;
+}

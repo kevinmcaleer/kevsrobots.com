@@ -374,6 +374,21 @@
   font-size: inherit;
 }
 
+/* A table cell that starts with #'s is a heading (project-cell-headings.js):
+   its level's size and font, snug in its cell, in the text's colour even
+   where an image grid's column labels are muted. */
+.project-prose :is(th, td) > .cell-heading {
+  margin: 0;
+  padding: 0;
+  color: var(--text, inherit);
+  line-height: 1.25;
+}
+
+.project-prose table.image-grid th:has(> .cell-heading) {
+  padding-bottom: 0.25rem;
+  font-size: inherit;
+}
+
 /* Images: round corners; their {size} comes from image-sizes.css. */
 .project-prose img {
   max-width: 100%;

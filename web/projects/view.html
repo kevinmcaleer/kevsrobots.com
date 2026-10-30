@@ -729,6 +729,7 @@ description: View project details
 <script src="/assets/js/project-mermaid-theme.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-image-sizes.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-image-grid.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-cell-headings.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #259: "On this page", canonical sections marked with icons. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
@@ -992,6 +993,7 @@ description: View project details
         contentEl.innerHTML = marked.parse(project.content_md);
         ProjectImageSizes.render(contentEl);
         ProjectImageGrid.render(contentEl);
+        ProjectCellHeadings.render(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
         videosInContent = embedVideoSection(contentEl);
         ProjectCallouts.render(contentEl);
@@ -1362,7 +1364,7 @@ description: View project details
   // the shops have it now, in the reader's currency, a badge when the part
   // has changed since, and an estimated total under the table.
   async function enrichBomTable(items) {
-    const headings = Array.from(document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3'));
+    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading)'));
     const table = sectionTableEl('bill-of-materials', headings);
     if (!table || !items.length || table.dataset.enriched) return;
     table.dataset.enriched = '1';
@@ -1686,7 +1688,7 @@ description: View project details
   // which case loadVideos() leaves the player above the description out.
   let videosInContent = false;
   function embedVideoSection(root) {
-    const heading = Array.from(root.querySelectorAll('h1, h2, h3, h4, h5, h6')).find(h => {
+    const heading = Array.from(root.querySelectorAll(':is(h1, h2, h3, h4, h5, h6):not(.cell-heading)')).find(h => {
       const section = ProjectSections.match(h.textContent);
       return section && section.id === 'videos';
     });
@@ -1828,6 +1830,7 @@ description: View project details
     styleMarkdownTables(journalEl);
     ProjectImageSizes.render(journalEl);
     ProjectImageGrid.render(journalEl);
+    ProjectCellHeadings.render(journalEl);
     ProjectCallouts.render(journalEl);
     CodeCopy.attach(journalEl);
   }
@@ -2511,7 +2514,8 @@ description: View project details
   function anchorHeadings(root) {
     if (!root) return;
     root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
-      if (h.dataset.anchored || h.closest('#view-bom-section')) return;
+      // A heading in a table cell (project-cell-headings.js) is a label, not a section.
+      if (h.dataset.anchored || h.closest('#view-bom-section') || h.classList.contains('cell-heading')) return;
       let id = h.id;
       if (!id) {
         const base = slugify(headingText(h)) || 'section';
@@ -2613,7 +2617,7 @@ description: View project details
     // H1s are the top level and H2s nest under them (issue #259); deeper
     // headings stay in the text only.
     anchorHeadings(document.getElementById('view-content'));
-    const headings = Array.from(document.querySelectorAll('#view-content h1, #view-content h2, #view-content h3'));
+    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading)'));
 
     const bomSection = document.getElementById('view-bom-section');
     // The editor no longer edits the stored BOM rows: once the author's own
