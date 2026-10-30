@@ -514,7 +514,7 @@
   position: fixed;
   right: 1.5rem;
   bottom: 5rem;
-  width: 340px;
+  width: 380px;
   max-width: calc(100vw - 2rem);
   z-index: 1030;
 }
@@ -533,10 +533,26 @@
 .completeness-overlay.is-collapsed .completeness-head {
   border-bottom: 0;
 }
+/* The title gives way (with an ellipsis) so the pill and the info,
+   collapse and close buttons always stay inside the bar. */
 .completeness-overlay .completeness-toggle {
+  display: flex;
+  align-items: center;
+  min-width: 0;
   font-size: 0.95rem;
   font-weight: 500;
   white-space: nowrap;
+}
+.completeness-overlay .completeness-title {
+  min-width: 0;
+  margin-right: 0.15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.completeness-overlay .completeness-toggle > i,
+.completeness-overlay .completeness-pill,
+.completeness-overlay .completeness-head > .btn:not(.completeness-toggle) {
+  flex-shrink: 0;
 }
 .completeness-overlay #completeness-score {
   font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
