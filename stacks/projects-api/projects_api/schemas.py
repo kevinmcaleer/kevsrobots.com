@@ -471,6 +471,27 @@ class ProjectSchematicResponse(BaseModel):
     updated_at: datetime
 
 
+# --- Project wiring (issue #268) -------------------------------------------
+#
+# Snakie's electronics workspace. ``data`` is a Snakie RobotDefinition
+# (board, parts, connections); ``svg`` is the canvas the browser exported,
+# cleaned before it's stored (svg_safety.py).
+
+
+class ProjectWiringUpdate(BaseModel):
+    data: dict
+    svg: Optional[str] = None
+
+
+class ProjectWiringResponse(BaseModel):
+    project_id: int
+    data: dict
+    # Where the last render is served, or None before the first one.
+    svg_url: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+
 # --- Project symbols (Symbol Designer) -----------------------------------
 #
 # Per-project user-designed schematic symbols. The body-shape and pin

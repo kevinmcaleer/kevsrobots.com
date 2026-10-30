@@ -270,6 +270,7 @@
   //   ctx.listParts()   resolves to the BOM: { name, url (catalog page or null), detail }
   //   ctx.searchParts(q), ctx.createPart(name)   the parts catalog, see partPicker
   //   ctx.diagrams      [{ label, md }], the diagram templates
+  //   ctx.openWiring(view)  opens the electronics workspace (issue #268)
   // The sections a document already has, worked out once per version of
   // the text (the menu asks on every keystroke while it's open).
   const presentByDoc = new WeakMap();
@@ -338,6 +339,24 @@
         },
         load: async () => [],
       });
+    }
+
+    // Wiring (issue #268) opens the electronics workspace: its heading goes
+    // in now, and the diagram under it when the wiring is first saved.
+    // Offered until the document has the diagram (an older Wiring section
+    // with a From/To table can still get one).
+    const wiring = sections.find(c => c.id === 'section-wiring');
+    if (wiring && ctx.openWiring) {
+      delete wiring.insert;
+      wiring.label = 'Wiring diagram';
+      wiring.keywords = wiring.keywords.concat(['wiring', 'workspace', 'breadboard']);
+      wiring.hidden = state => !!(window.ProjectWiring && window.ProjectWiring.findImage(state.doc.toString()));
+      wiring.run = view => {
+        if (!sectionsIn(view.state).has('wiring')) {
+          insertAtCursor(view, '# ' + window.ProjectSections.get('wiring').heading + '\n', true);
+        }
+        ctx.openWiring(view);
+      };
     }
 
     return sections.concat([

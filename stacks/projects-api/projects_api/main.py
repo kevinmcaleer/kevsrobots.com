@@ -87,6 +87,7 @@ from .routers import (
     symbols,
     users,
     videos,
+    wiring,
 )
 from .supplier_health import background_jobs_disabled, run_full_health_check
 
@@ -278,6 +279,8 @@ def create_app() -> FastAPI:
     # Issue #178 Phase E2: per-project schematic (one schematic per
     # project for v1; opaque JSON blob stored in project_schematics).
     app.include_router(schematics.router)
+    # Issue #268: the project's wiring, from Snakie's electronics workspace.
+    app.include_router(wiring.router)
     # Symbol Designer: per-project user-designed schematic symbols.
     # Augments the hard-coded library in the schematic editor (E2) at
     # runtime; one symbol can be linked to a BOM row via ``bom_item_id``

@@ -1,0 +1,64 @@
+/* The project's electronics workspace (issue #268): Snakie's wiring canvas
+   full screen over the editor (project-wiring.js). Under the parts catalog
+   (z-index 10050), which opens over it to add parts. */
+.project-wiring {
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  display: flex;
+  flex-direction: column;
+  background: #faf9f5;
+}
+.project-wiring-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e3e0d6;
+  background: #fff;
+}
+.project-wiring-warnings {
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid #f0d9a8;
+  background: #fff8e6;
+  font-size: 0.8125rem;
+  max-height: 6.5rem;
+  overflow: auto;
+}
+.project-wiring-warning.is-short,
+.project-wiring-warning.is-rails {
+  color: #9a2b12;
+  font-weight: 600;
+}
+.project-wiring-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.project-wiring-canvas > .snakie-embed {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+body.project-wiring-open {
+  overflow: hidden;
+}
+
+/* "Edit wiring" on the diagram in the editor's live view. */
+.project-wiring-edit {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 0.25em 0.6em;
+  border: 1px solid #e3e0d6;
+  border-radius: 6px;
+  background: #fff;
+  color: #141413;
+  font: 600 0.75rem/1.2 ui-sans-serif, system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.project-wiring-edit:hover {
+  background: #f0eee6;
+}

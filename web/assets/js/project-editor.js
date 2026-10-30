@@ -700,6 +700,7 @@
     });
     setupImageAutocomplete(mde);
     setupPartLinks(mde);
+    setupWiringButtons(mde);
     pinToolbarBelowTopBar();
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
@@ -759,6 +760,7 @@
         detail: item.quantity + ' ' + (item.unit === 'qty' ? '\u00d7' : item.unit) + (item.part_slug ? ' \u00b7 in the parts catalog' : ''),
       })),
       diagrams: DIAGRAM_TEMPLATES,
+      openWiring: () => openWiring(),
       searchParts: searchCatalogParts,
       createPart: createCatalogPart,
       browseCatalog: async (view, q) => {
@@ -770,6 +772,103 @@
         else view.focus();
       },
     };
+  }
+
+  // --- Wiring (issue #268) ---
+  //
+  // Snakie's electronics workspace (project-wiring.js), opened from the
+  // Wiring `/` command or the "Edit wiring" button on the diagram. The
+  // diagram is an image under the Wiring heading.
+  function openWiring() {
+    const view = mde.view;
+    return ProjectWiring.open({
+      projectId: async () => {
+        if (!currentProject) await saveProject();
+        if (!currentProject) { alert('Add a title and save before wiring the project.'); return null; }
+        return currentProject.id;
+      },
+      markdown: () => view.state.doc.toString(),
+      bomSlugs: () => {
+        const parsed = BomSync.parse(view.state.doc.toString());
+        return parsed ? [...new Set(parsed.rows.map(r => r.part_slug).filter(Boolean))] : [];
+      },
+      addBomRows: parts => addBomRows(view, parts),
+      removeBomRows: slugs => removeBomRows(view, slugs),
+      placeImage: url => placeWiringImage(view, url),
+      insertText: md => insertAfterWiring(view, md),
+      apiFetch: (url, opts) => apiFetch(url, Object.assign({ credentials: 'include' }, opts || {})),
+    });
+  }
+
+  // The wiring diagram in the text: its link refreshed when it's there,
+  // else put under the Wiring heading (added at the end when missing).
+  function placeWiringImage(view, url) {
+    const markdown = view.state.doc.toString();
+    const found = ProjectWiring.findImage(markdown);
+    if (found) {
+      const from = found.index + found.alt.length + 4; // past "![alt]("
+      view.dispatch({ changes: { from, to: from + found.url.length, insert: url }, userEvent: 'input' });
+      return;
+    }
+    const image = '![Wiring diagram](' + url + ')';
+    const heading = ProjectSections.headings(markdown).find(h => ProjectSections.match(h.text) === ProjectSections.get('wiring'));
+    if (heading) {
+      const line = view.state.doc.line(heading.line + 1);
+      const last = line.number === view.state.doc.lines;
+      view.dispatch({ changes: { from: line.to, insert: '\n\n' + image + (last ? '\n' : '') }, userEvent: 'input' });
+    } else {
+      const tail = !markdown ? '' : markdown.endsWith('\n\n') ? '' : markdown.endsWith('\n') ? '\n' : '\n\n';
+      view.dispatch({ changes: { from: markdown.length, insert: tail + '# ' + ProjectSections.get('wiring').heading + '\n\n' + image + '\n' }, userEvent: 'input' });
+    }
+  }
+
+  // Markdown put after the wiring diagram (the pinout table), else at the end.
+  function insertAfterWiring(view, md) {
+    const markdown = view.state.doc.toString();
+    const found = ProjectWiring.findImage(markdown);
+    const at = found ? view.state.doc.lineAt(found.index).to : markdown.length;
+    const end = at === markdown.length ? '\n' : '';
+    view.dispatch({ changes: { from: at, insert: '\n\n' + md.trim() + end }, userEvent: 'input' });
+  }
+
+  // The Bill of Materials rows that link any of `slugs`, taken out.
+  function removeBomRows(view, slugs) {
+    const table = ProjectSections.sectionTable(view.state.doc.toString(), 'bill-of-materials');
+    if (!table) return;
+    const want = new Set(slugs);
+    const changes = [];
+    table.rows.forEach((cells, r) => {
+      const linked = cells.some(cell => {
+        const m = cell.match(/\]\(([^)\s]+)/);
+        return m && want.has(PartLinks.slugOf(m[1]));
+      });
+      if (!linked) return;
+      const line = view.state.doc.line(table.lines[r] + 1);
+      changes.push({ from: line.from, to: Math.min(line.to + 1, view.state.doc.length) });
+    });
+    if (changes.length) view.dispatch({ changes, userEvent: 'delete' });
+  }
+
+  // "Edit wiring" on the diagram in the live view. The editor redraws its
+  // images at will, so the button goes back on whenever one appears.
+  function setupWiringButtons(mde) {
+    const root = mde.view.dom;
+    const decorate = () => {
+      root.querySelectorAll('.cm-md-image-wrap').forEach(wrap => {
+        const img = wrap.querySelector('img.cm-md-image');
+        if (!img || !ProjectWiring.isWiringSrc(img.getAttribute('src')) || wrap.querySelector('.project-wiring-edit')) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'project-wiring-edit';
+        btn.innerHTML = '<i class="fas fa-plug me-1"></i>Edit wiring';
+        // Keep the click from moving the cursor into the image's Markdown.
+        btn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); });
+        btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openWiring(); });
+        wrap.appendChild(btn);
+      });
+    };
+    new MutationObserver(decorate).observe(root, { childList: true, subtree: true });
+    decorate();
   }
 
   // Issue #265: a row in the Bill of Materials table for each part, one
