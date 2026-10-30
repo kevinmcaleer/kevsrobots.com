@@ -86,7 +86,130 @@
     return lines.join('\n') + '\n';
   }
 
-  const api = { parse, price, formatPrice, tableFromRows };
+  // --- Totals ---
+  //
+  // When the Bill of Materials table has Qty and Price columns, the editor
+  // keeps a Total column (Qty × Price per row, added if missing) and a
+  // "**Total**" row under the last part with the sum. They're written
+  // into the Markdown, so the project page and any export show them too.
+  function isTotalRow(row) {
+    return /^\*\*total\*\*$/i.test((row[0] || '').trim());
+  }
+
+  const BOM_QTY = /^(qty|quantity|count)$/;
+  const BOM_PRICE = /^(price|unit price|price each|each|cost|unit cost)$/;
+  const BOM_TOTAL = /^(total|subtotal|line total|row total)$/;
+
+  function parseAmount(cell) {
+    const m = String(cell || '').replace(/[*_`]/g, '').replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+    return m ? parseFloat(m[0]) : null;
+  }
+
+  // "£", "$", "€"... in front of the number, or after it ("12 EUR").
+  function currencyOf(cell) {
+    const text = String(cell || '').replace(/[*_`]/g, '').trim();
+    const m = text.match(/^([^\d\s.-]+)\s*-?\d/) || text.match(/\d\s*([^\d\s.,]+)$/);
+    return m ? { symbol: m[1], before: /^[^\d\s.-]/.test(text) } : null;
+  }
+
+  function money(n, currency) {
+    const amount = n.toFixed(2);
+    if (!currency) return amount;
+    return currency.before ? currency.symbol + amount : amount + ' ' + currency.symbol;
+  }
+
+  // The lines to replace: [{ line, text }] (line counted from 0), plus
+  // where a missing total row goes. Empty when there's nothing to change.
+  function totalsChanges(markdown) {
+    const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return [];
+    const header = table.header;
+    const qtyCol = header.findIndex(h => BOM_QTY.test(h));
+    const priceCol = header.findIndex(h => BOM_PRICE.test(h));
+    if (qtyCol < 0 || priceCol < 0) return [];
+    const lines = markdown.split('\n');
+    const rowText = cells => '| ' + cells.join(' | ') + ' |';
+    const raw = line => lines[line].trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '').split(/(?<!\\)\|/).map(c => c.trim());
+    const changes = [];
+
+    let totalCol = header.findIndex(h => BOM_TOTAL.test(h));
+    const adding = totalCol < 0;
+    if (adding) {
+      totalCol = priceCol + 1;
+      const head = raw(table.headerLine);
+      head.splice(totalCol, 0, 'Total');
+      changes.push({ line: table.headerLine, text: rowText(head) });
+      const sep = raw(table.headerLine + 1);
+      sep.splice(totalCol, 0, '---');
+      changes.push({ line: table.headerLine + 1, text: rowText(sep) });
+    }
+
+    let currency = null;
+    let sum = 0;
+    let priced = 0;
+    const totalRows = [];
+    table.rows.forEach((row, r) => {
+      const line = table.lines[r];
+      if (isTotalRow(row)) { totalRows.push(line); return; }
+      const cells = raw(line);
+      while (cells.length < header.length) cells.push('');
+      if (adding) cells.splice(totalCol, 0, '');
+      const qty = parseAmount(cells[qtyCol]);
+      const price = parseAmount(cells[priceCol]);
+      currency = currency || currencyOf(cells[priceCol]);
+      let total = '';
+      if (qty !== null && price !== null) {
+        sum += qty * price;
+        priced++;
+        total = money(qty * price, currencyOf(cells[priceCol]) || currency);
+      }
+      if (adding || (cells[totalCol] || '') !== total) {
+        cells[totalCol] = total;
+        changes.push({ line, text: rowText(cells) });
+      }
+    });
+
+    // The grand total sits under the last part; any other total row goes.
+    const width = header.length + (adding ? 1 : 0);
+    const lastLine = table.lines[table.lines.length - 1];
+    const totalCells = new Array(width).fill('');
+    totalCells[0] = '**Total**';
+    totalCells[totalCol] = '**' + money(sum, currency) + '**';
+    const wantText = priced ? rowText(totalCells) : null;
+    totalRows.forEach(line => {
+      if (line === lastLine && wantText) {
+        if (lines[line].trim() !== wantText) changes.push({ line, text: wantText });
+      } else {
+        changes.push({ line, text: null }); // remove
+      }
+    });
+    if (wantText && totalRows[totalRows.length - 1] !== lastLine) {
+      changes.push({ line: lastLine, append: wantText });
+    }
+    return changes;
+  }
+
+  // The text with totalsChanges applied, as the editor writes it.
+  function withTotals(markdown) {
+    const changes = totalsChanges(markdown);
+    if (!changes.length) return markdown;
+    const lines = markdown.split('\n');
+    const out = [];
+    lines.forEach((text, i) => {
+      // A line can be rewritten (or removed) and have the total row after it.
+      let line = text;
+      const appended = [];
+      changes.filter(c => c.line === i).forEach(c => {
+        if (c.append) appended.push(c.append);
+        else line = c.text;
+      });
+      if (line !== null) out.push(line);
+      out.push(...appended);
+    });
+    return out.join('\n');
+  }
+
+  const api = { parse, price, formatPrice, tableFromRows, totalsChanges, withTotals };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.BomSync = api;
 })(typeof window !== 'undefined' ? window : globalThis);

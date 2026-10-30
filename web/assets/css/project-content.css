@@ -2,7 +2,7 @@
  * A published project's document (#view-content on projects/view.html),
  * drawn the way the project editor's live view draws it: markdown-studio's
  * editor bundle (vendored in /assets/js/markdown-editor/). The tokens are
- * the bundle's light theme (standalone.css's .mde); the sizes and spacing
+ * project-notes.css's (the bundle's light theme); the sizes and spacing
  * follow its live view (livePreview.ts's liveTheme and editorTheme.ts's
  * heading styles). Keep them in step when the editor's look changes.
  *
@@ -14,26 +14,9 @@
  * !important, so the overrides of those do too.
  */
 
+/* The Notes tokens (--bg, --text, --border, --font-serif...) come from
+   project-notes.css's .kr-notes, on the page container. */
 .project-prose {
-  --bg: #faf9f5;
-  --surface: #ffffff;
-  --surface-2: #f0eee6;
-  --text: #141413;
-  --muted: #6b6a63;
-  --border: #e3e0d6;
-  --accent: #c96442;
-  --highlight: #fbe7a1;
-  --code-bg: #f0eee6;
-  --code-text: #3d3929;
-  --syntax-keyword: #a3367a;
-  --syntax-string: #3d7a3d;
-  --syntax-number: #b45f06;
-  --syntax-function: #2f5fa7;
-  --syntax-type: #8a5a00;
-  --syntax-attr: #6b4fbb;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-serif: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
   --block-gap: 1.7rem;
 
   color: var(--text);

@@ -40,7 +40,6 @@
   }
 
   const contentEditor = document.getElementById('content-editor');
-  const contentPreview = document.getElementById('content-preview');
   const difficultySelect = document.getElementById('project-difficulty');
   const timeInput = document.getElementById('project-time');
   const tagsContainer = document.getElementById('tags-container');
@@ -82,7 +81,7 @@
 
   function showDevLogin() {
     authRequired.innerHTML = `
-      <div class="card p-3">
+      <div class="kr-dev-login">
         <h5>Local Dev Login</h5>
         <p class="small text-muted">Secure cookies don't work over HTTP. Generate a token on the server.</p>
         <p class="small text-muted mb-1"><strong>Long-lived token (recommended — 30 days, survives Jekyll rebuilds):</strong><br>
@@ -121,9 +120,25 @@
       renderTags(currentProject.tags || []);
       loadFiles();
       loadImages();
+      loadLegacySchematic();
     } catch (e) {
       console.error('Failed to load project:', e);
     }
+  }
+
+  // A schematic from the old schematic editor (issue #273): offer it until
+  // the owner redraws it in the electronics workspace.
+  async function loadLegacySchematic() {
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/schematic', { credentials: 'include' }).catch(() => null);
+    if (!resp || !resp.ok) return;
+    const schematic = await resp.json();
+    if (!schematic.schematic_data) return;
+    // Redrawn in the electronics workspace: the wiring replaces it.
+    const wiring = await apiFetch(API + '/api/projects/' + currentProject.id + '/wiring', { credentials: 'include' }).catch(() => null);
+    if (wiring && wiring.ok) return;
+    const link = document.getElementById('legacy-schematic-link');
+    link.href = '/projects/schematic/edit.html?id=' + encodeURIComponent(currentProject.id);
+    document.getElementById('legacy-schematic').classList.remove('d-none');
   }
 
   // --- Code repository section ---
@@ -2018,107 +2033,13 @@
   // --- Bill of Materials totals ---
   //
   // When the Bill of Materials table has Qty and Price columns, the editor
-  // keeps a Total column (Qty × Price per row, added if missing) and a
-  // "**Total**" row under the last part with the sum. They're written
-  // into the Markdown, so the project page and any export show them too.
-  const BOM_QTY = /^(qty|quantity|count)$/;
-  const BOM_PRICE = /^(price|unit price|price each|each|cost|unit cost)$/;
-  const BOM_TOTAL = /^(total|subtotal|line total|row total)$/;
-
-  function parseAmount(cell) {
-    const m = String(cell || '').replace(/[*_`]/g, '').replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
-    return m ? parseFloat(m[0]) : null;
-  }
-
-  // "£", "$", "€"... in front of the number, or after it ("12 EUR").
-  function currencyOf(cell) {
-    const text = String(cell || '').replace(/[*_`]/g, '').trim();
-    const m = text.match(/^([^\d\s.-]+)\s*-?\d/) || text.match(/\d\s*([^\d\s.,]+)$/);
-    return m ? { symbol: m[1], before: /^[^\d\s.-]/.test(text) } : null;
-  }
-
-  function money(n, currency) {
-    const amount = n.toFixed(2);
-    if (!currency) return amount;
-    return currency.before ? currency.symbol + amount : amount + ' ' + currency.symbol;
-  }
-
-  // The lines to replace: [{ line, text }] (line counted from 0), plus
-  // where a missing total row goes. Empty when there's nothing to change.
-  function bomTotalsChanges(markdown) {
-    const table = ProjectSections.sectionTable(markdown, 'bill-of-materials');
-    if (!table) return [];
-    const header = table.header;
-    const qtyCol = header.findIndex(h => BOM_QTY.test(h));
-    const priceCol = header.findIndex(h => BOM_PRICE.test(h));
-    if (qtyCol < 0 || priceCol < 0) return [];
-    const lines = markdown.split('\n');
-    const rowText = cells => '| ' + cells.join(' | ') + ' |';
-    const raw = line => lines[line].trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '').split(/(?<!\\)\|/).map(c => c.trim());
-    const changes = [];
-
-    let totalCol = header.findIndex(h => BOM_TOTAL.test(h));
-    const adding = totalCol < 0;
-    if (adding) {
-      totalCol = priceCol + 1;
-      const head = raw(table.headerLine);
-      head.splice(totalCol, 0, 'Total');
-      changes.push({ line: table.headerLine, text: rowText(head) });
-      const sep = raw(table.headerLine + 1);
-      sep.splice(totalCol, 0, '---');
-      changes.push({ line: table.headerLine + 1, text: rowText(sep) });
-    }
-
-    let currency = null;
-    let sum = 0;
-    let priced = 0;
-    const totalRows = [];
-    table.rows.forEach((row, r) => {
-      const line = table.lines[r];
-      if (ProjectSlashCommands.isTotalRow(row)) { totalRows.push(line); return; }
-      const cells = raw(line);
-      while (cells.length < header.length) cells.push('');
-      if (adding) cells.splice(totalCol, 0, '');
-      const qty = parseAmount(cells[qtyCol]);
-      const price = parseAmount(cells[priceCol]);
-      currency = currency || currencyOf(cells[priceCol]);
-      let total = '';
-      if (qty !== null && price !== null) {
-        sum += qty * price;
-        priced++;
-        total = money(qty * price, currencyOf(cells[priceCol]) || currency);
-      }
-      if (adding || (cells[totalCol] || '') !== total) {
-        cells[totalCol] = total;
-        changes.push({ line, text: rowText(cells) });
-      }
-    });
-
-    // The grand total sits under the last part; any other total row goes.
-    const width = header.length + (adding ? 1 : 0);
-    const lastLine = table.lines[table.lines.length - 1];
-    const totalCells = new Array(width).fill('');
-    totalCells[0] = '**Total**';
-    totalCells[totalCol] = '**' + money(sum, currency) + '**';
-    const wantText = priced ? rowText(totalCells) : null;
-    totalRows.forEach(line => {
-      if (line === lastLine && wantText) {
-        if (lines[line].trim() !== wantText) changes.push({ line, text: wantText });
-      } else {
-        changes.push({ line, text: null }); // remove
-      }
-    });
-    if (wantText && totalRows[totalRows.length - 1] !== lastLine) {
-      changes.push({ line: lastLine, append: wantText });
-    }
-    return changes;
-  }
-
+  // keeps a Total column and a "**Total**" row in the Markdown
+  // (BomSync.totalsChanges works out which lines change).
   function applyBomTotals() {
     if (!mde || !mde.view) return;
     const view = mde.view;
     const doc = view.state.doc;
-    const changes = bomTotalsChanges(doc.toString());
+    const changes = BomSync.totalsChanges(doc.toString());
     if (!changes.length) return;
     const specs = [];
     changes.forEach(c => {
@@ -2693,7 +2614,7 @@
     const listEl = document.getElementById('completeness-checklist');
     const celebrateEl = document.getElementById('completeness-celebration');
     const completeBadge = document.getElementById('completeness-complete-badge');
-    const cardBody = cardEl && cardEl.querySelector('.card-body');
+    const cardBody = cardEl && cardEl.querySelector('.completeness-body');
     if (!scoreEl || !barEl || !listEl) return;
 
     let earned = 0;
@@ -2756,7 +2677,7 @@
              + '</li>';
       }
       return '<li class="completeness-item completeness-item-unmet py-1">'
-           + '<i class="far fa-circle me-2 text-primary"></i>'
+           + '<i class="far fa-circle me-2"></i>'
            + '<a href="#" class="completeness-link text-decoration-none" data-target="' + resolveTarget(item) + '">' + item.label + '</a>'
            + '</li>';
     }).join('');

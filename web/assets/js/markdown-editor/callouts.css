@@ -24,7 +24,10 @@
   gap: 0.5em;
   font-weight: 600;
   line-height: 1.4;
-  color: rgb(var(--callout-color));
+  /* The type's colour, darkened for text: most of them are too light to
+     read on their own tint (teal is 2:1). A dark theme sets the tone to
+     100%, the colour itself. */
+  color: color-mix(in srgb, rgb(var(--callout-color)) var(--callout-title-tone, 60%), black);
 }
 
 .callout-icon {

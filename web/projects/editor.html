@@ -11,6 +11,7 @@ hide_nibsy: true
 
 {% include nav_projects.html %}
 
+<link rel="stylesheet" href="/assets/css/project-notes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/parts-catalog.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-wiring.css?v={{ site.time | date: '%s' }}">
@@ -39,13 +40,14 @@ hide_nibsy: true
 <div id="drop-progress" class="drop-progress d-none" aria-live="polite">
   <div class="drop-progress__header">
     <span class="drop-progress__title"><i class="fas fa-spinner fa-spin me-1"></i> Processing files...</span>
-    <button type="button" class="btn-close btn-close-white btn-sm" id="drop-progress-close" aria-label="Close"></button>
+    <button type="button" class="btn-close btn-sm" id="drop-progress-close" aria-label="Close"></button>
   </div>
   <div class="drop-progress__body"></div>
 </div>
 
 
-<div class="container-fluid py-3">
+<!-- .kr-notes: the Notes look shared with the project page (project-notes.css). -->
+<div class="container-fluid py-3 kr-notes" id="project-editor-page">
   <!-- Top bar: save state, View, the Draft / Published switch (it
        replaced the sidebar's status card) and the Archive / Delete menu. -->
   <div class="d-flex justify-content-end align-items-center mb-3">
@@ -75,7 +77,7 @@ hide_nibsy: true
     </div>
   </div>
 
-  <div id="auth-required" class="alert alert-warning d-none">
+  <div id="auth-required" class="kr-notice d-none">
     You need to <a href="javascript:void(0)" onclick="document.querySelector('.nibsy-menu-item[href=\'/login\']')?.click()">log in</a> to create or edit projects.
   </div>
 
@@ -92,8 +94,8 @@ hide_nibsy: true
            Show a prominent warning when the title is empty or still the
            default, so the editor nudges the author to give it a real name.
            We can't BLOCK saving (autosave is on) — this is the heavy nudge. -->
-      <div id="title-needs-attention" class="alert alert-warning d-flex align-items-center mb-2 py-2 px-3 small d-none" role="alert">
-        <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+      <div id="title-needs-attention" class="kr-notice mb-2 d-none" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
         <div class="flex-grow-1">
           <strong>This project needs a title.</strong>
           The placeholder "Untitled Project" hides it from search, the hub, and your visitors. Type a memorable name in the field below.
@@ -135,12 +137,19 @@ hide_nibsy: true
         </div>
       </div>
 
-      <hr>
+      <!-- A schematic from the old schematic editor (issue #273). It still
+           shows on the project page; redrawing it in the electronics
+           workspace (/wiring) replaces it. -->
+      <div id="legacy-schematic" class="kr-notice mb-2 d-none" role="status">
+        <i class="fas fa-diagram-project"></i>
+        <span>This project has a schematic from the old schematic editor. It still shows on the project page. To move it into the document, redraw it with <code>/wiring</code>.</span>
+        <a id="legacy-schematic-link" class="btn btn-sm btn-outline-secondary ms-auto" href="#">Open the old schematic editor</a>
+      </div>
 
       <!-- Shown while two headings share a name: the project page can only
            link (#wiring) to the first of them. -->
-      <div id="duplicate-headings" class="alert alert-warning d-flex align-items-start mb-2 py-2 px-3 small d-none" role="status">
-        <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+      <div id="duplicate-headings" class="kr-notice align-items-start mb-2 d-none" role="status">
+        <i class="fas fa-exclamation-triangle mt-1"></i>
         <div>
           <strong>Two headings have the same name.</strong>
           Links to a heading only reach the first one with that name, so rename one.
@@ -150,50 +159,47 @@ hide_nibsy: true
 
       <!-- Markdown Editor (markdown-studio's editor bundle, mounted on the textarea) -->
       <div class="mb-4" id="content-markdown-pane">
-        <div class="bom-link-bar" id="bom-link-bar" role="status" hidden></div>
+        <div class="bom-link-bar kr-notice" id="bom-link-bar" role="status" hidden></div>
         <textarea id="content-editor"></textarea>
       </div>
 
       <!-- Images: a gallery strip under the document -->
-      <div class="card mb-4" id="editor-images-section">
-        <div class="card-header py-2 d-flex justify-content-between align-items-center">
-          <span><i class="fas fa-camera me-1"></i> Images</span>
-          <!-- Click-to-pick only — the whole page is the dropzone (see
-               #global-dropzone above). -->
-          <label for="image-input" class="btn btn-sm btn-outline-primary mb-0">
-            <i class="fas fa-image me-1"></i> Choose images
-          </label>
-          <input type="file" id="image-input" class="d-none" multiple accept="image/*">
+      <section class="kr-section" id="editor-images-section">
+        <div class="kr-section-head">
+          <h2 class="kr-section-title"><i class="fas fa-camera" aria-hidden="true"></i> Images</h2>
+          <div class="kr-section-actions">
+            <!-- Click-to-pick only — the whole page is the dropzone (see
+                 #global-dropzone above). -->
+            <label for="image-input" class="btn btn-sm btn-outline-secondary mb-0">
+              <i class="fas fa-image me-1"></i> Choose images
+            </label>
+            <input type="file" id="image-input" class="d-none" multiple accept="image/*">
+          </div>
         </div>
-        <div class="card-body">
-          <small class="text-muted d-block mb-2"><i class="fas fa-info-circle me-1"></i>First image is the cover. Drag to reorder, or drop images anywhere on the page.</small>
-          <div id="image-gallery" class="row g-2"></div>
-        </div>
-      </div>
+        <p class="kr-section-hint">The first image is the cover. Drag to reorder, or drop images anywhere on the page.</p>
+        <div id="image-gallery" class="row g-2"></div>
+      </section>
 
       <!-- File Upload -->
-      <div class="card mb-4" id="editor-files-section">
-        <div class="card-header py-2">
-          <i class="fas fa-paperclip me-1"></i> Files & Models
-        </div>
-        <div class="card-body">
-          <!-- Drop targets unified: the entire page is the dropzone (see the
-               #global-dropzone overlay above). This area just keeps a click-
-               to-pick button for users who prefer the file dialog. -->
-          <div class="text-center mb-3">
-            <label for="file-input" class="btn btn-outline-primary btn-sm mb-1">
+      <section class="kr-section" id="editor-files-section">
+        <div class="kr-section-head">
+          <h2 class="kr-section-title"><i class="fas fa-paperclip" aria-hidden="true"></i> Files &amp; Models</h2>
+          <div class="kr-section-actions">
+            <!-- Drop targets unified: the entire page is the dropzone (see the
+                 #global-dropzone overlay above). This keeps a click-to-pick
+                 button for users who prefer the file dialog. -->
+            <label for="file-input" class="btn btn-outline-secondary btn-sm mb-0">
               <i class="fas fa-upload me-1"></i> Choose files
             </label>
-            <small class="text-muted d-block">or drag files anywhere on the page<br>
-              .stl, .3mf, .py, .ino, .dxf, .pdf, .md, .zip … &mdash; 25MB max per file</small>
             <input type="file" id="file-input" class="d-none" multiple>
           </div>
-          <div id="file-list"></div>
-          <div id="file-progress" class="d-none">
-            <div class="progress"><div class="progress-bar" role="progressbar" style="width: 0%"></div></div>
-          </div>
         </div>
-      </div>
+        <p class="kr-section-hint">Or drag files anywhere on the page: .stl, .3mf, .py, .ino, .dxf, .pdf, .md, .zip &hellip; up to 25MB each.</p>
+        <div id="file-list"></div>
+        <div id="file-progress" class="d-none">
+          <div class="progress"><div class="progress-bar" role="progressbar" style="width: 0%"></div></div>
+        </div>
+      </section>
 
     </div>
 
@@ -202,14 +208,14 @@ hide_nibsy: true
 
 <!-- Project Completeness (issue #137): a collapsible overlay pinned to the
      bottom right of the page. The collapsed state is remembered per browser. -->
-<aside class="card shadow completeness-overlay d-none" id="completeness-card" aria-label="Project completeness">
-  <div class="card-header py-2 d-flex align-items-center gap-2">
+<aside class="completeness-overlay d-none" id="completeness-card" aria-label="Project completeness">
+  <div class="completeness-head d-flex align-items-center gap-2">
     <button type="button" class="btn btn-link p-0 text-reset text-decoration-none flex-grow-1 text-start completeness-toggle"
             id="completeness-toggle" aria-expanded="true" aria-controls="completeness-body">
       <i class="fas fa-bullseye me-1"></i> Project Completeness
-      <span id="completeness-mini" class="badge bg-light text-dark ms-1">0%</span>
+      <span id="completeness-mini" class="completeness-pill ms-1">0%</span>
       <!-- Shown only when completeness === 100%; the body collapses then. -->
-      <span id="completeness-complete-badge" class="badge bg-success ms-1 d-none">
+      <span id="completeness-complete-badge" class="completeness-pill completeness-pill--done ms-1 d-none">
         <i class="fas fa-check"></i> Complete
       </span>
     </button>
@@ -226,7 +232,7 @@ hide_nibsy: true
       <i class="fas fa-chevron-down"></i>
     </button>
   </div>
-  <div class="card-body" id="completeness-body">
+  <div class="completeness-body" id="completeness-body">
     <div class="d-flex align-items-baseline justify-content-between mb-2">
       <span id="completeness-score" class="fs-3 fw-bold">0%</span>
       <span id="completeness-points" class="small text-muted">0 / 100</span>
@@ -234,7 +240,7 @@ hide_nibsy: true
     <div class="progress mb-3" style="height:8px">
       <div id="completeness-bar" class="progress-bar completeness-bar-red" role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
-    <div id="completeness-next" class="alert alert-light small py-2 px-2 mb-2 d-none">
+    <div id="completeness-next" class="completeness-next small mb-2 d-none">
       <strong>Next:</strong> <a href="#" id="completeness-next-link"></a>
     </div>
     <ul id="completeness-checklist" class="list-unstyled small mb-0"></ul>

@@ -8,6 +8,7 @@ description: View project details
 
 {% include nav_projects.html %}
 
+<link rel="stylesheet" href="/assets/css/project-notes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/image-viewer.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
@@ -19,7 +20,8 @@ description: View project details
 <link rel="stylesheet" href="/assets/css/project-videos.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
-<div class="container-fluid py-3">
+<!-- .kr-notes: the Notes look shared with the editor (project-notes.css). -->
+<div class="container-fluid py-3 kr-notes" id="project-view-page">
   <div id="loading" class="text-center py-5">
     <div class="spinner-border text-primary" role="status"></div>
   </div>
@@ -159,12 +161,10 @@ description: View project details
         <div id="view-content" class="project-doc project-prose mb-4"></div>
 
         <!-- Images -->
-        <div id="view-images-section" class="card mb-4 d-none">
-          <div class="card-header py-2"><i class="fas fa-camera me-2"></i> Images</div>
-          <div class="card-body">
-            <div id="view-images" class="row g-2"></div>
-          </div>
-        </div>
+        <section id="view-images-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-camera" aria-hidden="true"></i> Images</h2>
+          <div id="view-images" class="row g-2"></div>
+        </section>
 
 
         <!-- Thumbnail grid of the models, moved under the author's
@@ -172,14 +172,14 @@ description: View project details
         <div id="view-models-grid" class="view-models-grid mb-3 d-none"></div>
 
         <!-- Files & Models: printable models (issue #261) -->
-        <div id="view-models-section" class="mb-4 d-none">
-          <h4><i class="fas fa-cube me-3"></i> Files & Models</h4>
+        <div id="view-models-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-cube" aria-hidden="true"></i> Files &amp; Models</h2>
           <div id="view-models"></div>
         </div>
 
         <!-- Files: code, documents and archives -->
-        <div id="view-files-section" class="mb-4 d-none">
-          <h4><i class="fas fa-paperclip me-3"></i> Files</h4>
+        <div id="view-files-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-paperclip" aria-hidden="true"></i> Files</h2>
           <div id="view-files-total" class="small text-muted mb-2 d-none">
             <i class="fas fa-download me-1"></i> Total downloads: <span id="view-files-total-count">0</span>
           </div>
@@ -196,8 +196,8 @@ description: View project details
         </div>
 
         <!-- BOM -->
-        <div id="view-bom-section" class="mb-4 d-none">
-          <h4><i class="fas fa-clipboard-list me-3"></i> Bill of Materials</h4>
+        <div id="view-bom-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Bill of Materials</h2>
           <table class="table table-single table-narrow">
             <thead><tr><th>Part</th><th>Qty</th><th>Unit</th><th>Cost</th><th>Supplier</th></tr></thead>
             <tbody id="view-bom"></tbody>
@@ -205,29 +205,30 @@ description: View project details
           </table>
         </div>
 
+        <!-- A schematic from the old schematic editor (issue #273), until
+             the owner redraws it in the electronics workspace. -->
+        <section id="view-schematic-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-diagram-project" aria-hidden="true"></i> Schematic</h2>
+          <div><div id="view-schematic"><div class="small text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Drawing the schematic&hellip;</div></div></div>
+        </section>
+
         <!-- Links -->
-        <div id="view-links-section" class="mb-4 d-none">
-          <h4><i class="fas fa-link me-3"></i> Related Links</h4>
+        <div id="view-links-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-link" aria-hidden="true"></i> Related Links</h2>
           <div id="view-links"></div>
         </div>
 
         <!-- Journal -->
-        <div id="view-journal-section" class="card mb-4 d-none">
-          <div class="card-header py-2"><i class="fas fa-calendar-alt me-2"></i> Build Journal</div>
-          <div class="card-body">
-            <div id="view-journal"></div>
-          </div>
-        </div>
+        <section id="view-journal-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Build Journal</h2>
+          <div id="view-journal"></div>
+        </section>
 
         <!-- Remixes (issue #108) — direct derivatives of this project -->
-        <div id="view-remixes-section" class="card mb-4 d-none">
-          <div class="card-header py-2 d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-code-branch me-2"></i> Remixes <span id="view-remixes-count" class="badge bg-secondary"></span></span>
-          </div>
-          <div class="card-body">
-            <div id="view-remixes"></div>
-          </div>
-        </div>
+        <section id="view-remixes-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-code-branch" aria-hidden="true"></i> Remixes <span id="view-remixes-count" class="text-muted small fw-normal"></span></h2>
+          <div id="view-remixes"></div>
+        </section>
 
         <!-- Report -->
         <div id="report-section" class="mb-4 d-none">
@@ -252,16 +253,16 @@ description: View project details
         </div>
 
         <!-- Comments -->
-        <div id="comments-section" class="mb-4">
-          <h4><i class="fas fa-comments me-3"></i> Comments</h4>
+        <div id="comments-section" class="kr-section">
+          <h2 class="kr-section-title"><i class="fas fa-comments" aria-hidden="true"></i> Comments</h2>
           <div id="comments-container"></div>
         </div>
 
         <!-- Community Makes ("I Made This!") -->
-        <div id="makes-section" class="mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4 class="mb-0"><i class="fas fa-hammer me-3"></i> Community Makes <span id="makes-count" class="text-muted small fw-normal"></span></h4>
-            <button id="i-made-this-btn" class="btn btn-sm btn-primary d-none" type="button">
+        <div id="makes-section" class="kr-section">
+          <div class="kr-section-head">
+            <h2 class="kr-section-title"><i class="fas fa-hammer" aria-hidden="true"></i> Community Makes <span id="makes-count" class="text-muted small fw-normal"></span></h2>
+            <button id="i-made-this-btn" class="btn btn-sm btn-primary ms-auto d-none" type="button">
               <i class="fas fa-plus-circle me-1"></i> I Made This!
             </button>
           </div>
@@ -1049,6 +1050,7 @@ description: View project details
       loadFiles();
       loadImages();
       loadLinks();
+      if (viewMode === 'markdown') loadLegacySchematic();
       loadVideos();
       loadJournal();
       loadMakes(project);
@@ -1765,6 +1767,22 @@ description: View project details
           <span class="visually-hidden">Next</span>
         </button>
       </div>`;
+  }
+
+  // Builder projects draw their schematic in their steps; a Markdown
+  // project's old schematic gets its own section.
+  async function loadLegacySchematic() {
+    const resp = await fetch(API + '/api/projects/' + projectId + '/schematic', { credentials: 'include' }).catch(() => null);
+    if (!resp || !resp.ok) return;
+    const schematic = await resp.json();
+    if (!schematic.schematic_data) return;
+    // Redrawn in the electronics workspace: the wiring replaces it.
+    const wiring = await fetch(API + '/api/projects/' + projectId + '/wiring', { credentials: 'include' }).catch(() => null);
+    if (wiring && wiring.ok) return;
+    document.getElementById('view-schematic-section').classList.remove('d-none');
+    if (window.BuilderRenderer && BuilderRenderer.renderSchematicPreview) {
+      BuilderRenderer.renderSchematicPreview(document.getElementById('view-schematic'), projectId).catch(() => {});
+    }
   }
 
   async function loadLinks() {
@@ -2535,7 +2553,7 @@ description: View project details
   // Without one it stays where it is and the nav lists it as an extra.
   function placeUnderHeading(el, sectionId, headings) {
     if (!el || el.classList.contains('d-none')) return false;
-    const own = el.querySelector(':scope > h4');
+    const own = el.querySelector(':scope > .kr-section-title');
     const heading = headings.find(h => {
       const s = ProjectSections.match(headingText(h));
       return s && s.id === sectionId;

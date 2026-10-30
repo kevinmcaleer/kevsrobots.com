@@ -1,0 +1,332 @@
+/*
+ * The Notes look shared by the project editor (projects/editor.html) and
+ * the project page (projects/view.html), issue #272.
+ *
+ * The tokens are markdown-studio's (web/src/styles.css, and the editor
+ * bundle's standalone.css .mde defaults), so the bundle and the pages
+ * around it agree: warm paper, a hairline border, serif headings and one
+ * terracotta accent. Keep them in step when markdown-studio's change.
+ *
+ * Everything is scoped to .kr-notes, set on each page's container, so the
+ * rest of the site keeps main.scss's look. Below the tokens sit the small
+ * set of components both pages share: quiet sections (in place of
+ * Bootstrap cards), buttons, notices, and the popovers and pickers.
+ *
+ * Dark: the tokens for it are here, but they only apply when the
+ * container has data-theme="dark" (the rest of kevsrobots is light only).
+ */
+
+.kr-notes {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-2: #f0eee6;
+  --text: #141413;
+  --muted: #6b6a63;
+  --border: #e3e0d6;
+  --accent: #c96442;
+  /* The accent as text on paper, and behind white text: #c96442 is only
+     3.9:1 against either, so links, tags and filled buttons use this
+     darker step (6:1 on --bg, 6.3:1 under white). */
+  --accent-strong: #9c4628;
+  --accent-deep: #8a3d22;
+  --accent-text: #ffffff;
+  --accent-soft: #f6e4dc;
+  --danger: #b4322a;
+  --success: #3d7a3d;
+  --notice-bg: #fbf3dc;
+  --notice-border: #ecd9a3;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.04);
+  --shadow-pop: 0 2px 6px rgb(0 0 0 / 0.06), 0 12px 32px rgb(0 0 0 / 0.1);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --highlight: #fbe7a1;
+  --code-bg: #f0eee6;
+  --code-text: #3d3929;
+  --syntax-keyword: #a3367a;
+  --syntax-string: #3d7a3d;
+  --syntax-number: #9a5205;
+  --syntax-function: #2f5fa7;
+  --syntax-type: #8a5a00;
+  --syntax-attr: #6b4fbb;
+  color-scheme: light;
+}
+
+.kr-notes[data-theme="dark"] {
+  --bg: #262624;
+  --surface: #30302e;
+  --surface-2: #3a3a37;
+  --text: #f5f4ef;
+  --muted: #a6a39a;
+  --border: #45443f;
+  --accent: #d97757;
+  --accent-strong: #e38b6d;
+  --accent-deep: #eda288;
+  --accent-text: #141413;
+  --accent-soft: #4a3329;
+  --danger: #e2675e;
+  --success: #8cc48c;
+  --notice-bg: #3b3424;
+  --notice-border: #5c4f2c;
+  --shadow: none;
+  --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.4);
+  --highlight: #6b5a1f;
+  --code-bg: #1f1e1d;
+  --code-text: #e8e6dc;
+  --syntax-keyword: #e48dc2;
+  --syntax-string: #9ccc8a;
+  --syntax-number: #f0a868;
+  --syntax-function: #8ab4f8;
+  --syntax-type: #e8c47c;
+  --syntax-attr: #b9a5f2;
+  --callout-title-tone: 100%;
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.kr-notes a:not(.btn):not(.dropdown-item) {
+  color: var(--accent-strong);
+}
+
+/* --- Quiet sections (Images, Files & Models, ...) ---
+   A serif heading over a hairline, where Bootstrap cards used to be. */
+.kr-section {
+  margin: 0 0 2rem;
+}
+
+.kr-section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.kr-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-serif) !important;
+  font-size: 1.3rem !important;
+  font-stretch: normal !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+.kr-section > .kr-section-title {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.kr-section-title > i {
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.kr-section-head > .kr-section-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kr-section-hint {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.kr-notes .text-muted {
+  color: var(--muted) !important;
+}
+
+/* Cards that stay (a reader's make, the report form): paper, not grey. */
+.kr-notes .card {
+  --bs-card-bg: var(--surface);
+  --bs-card-border-color: var(--border);
+  --bs-card-border-radius: var(--radius);
+  --bs-card-cap-bg: var(--surface-2);
+  color: var(--text);
+  box-shadow: none !important;
+}
+
+/* Tables the page draws itself (Files & Models, Files, a stored BOM):
+   the document's table look (project-content.css), hairlines on paper. */
+.kr-notes .kr-section .table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: var(--surface-2);
+  --bs-table-color: var(--text);
+  --bs-table-hover-color: var(--text);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.kr-notes .kr-section .table > :not(caption) > * > * {
+  border-bottom-color: var(--border);
+}
+
+.kr-notes .kr-section .table th,
+.kr-notes .kr-section .table thead td {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.kr-notes .kr-section .table tfoot tr {
+  --bs-table-bg: var(--surface-2);
+}
+
+.kr-notes .list-group {
+  --bs-list-group-bg: transparent;
+  --bs-list-group-border-color: var(--border);
+  --bs-list-group-color: var(--text);
+  --bs-list-group-action-hover-bg: var(--surface-2);
+}
+
+/* --- Buttons ---
+   Bootstrap's markup, in the Notes palette: the filled ones take the
+   accent, the outlined ones are quiet until hovered. */
+.kr-notes .btn {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.kr-notes :is(.btn-primary, .btn-success) {
+  --bs-btn-color: var(--accent-text);
+  --bs-btn-bg: var(--accent-strong);
+  --bs-btn-border-color: var(--accent-strong);
+  --bs-btn-hover-color: var(--accent-text);
+  --bs-btn-hover-bg: var(--accent-deep);
+  --bs-btn-hover-border-color: var(--accent-deep);
+  --bs-btn-active-color: var(--accent-text);
+  --bs-btn-active-bg: var(--accent-deep);
+  --bs-btn-active-border-color: var(--accent-deep);
+  --bs-btn-disabled-color: var(--accent-text);
+  --bs-btn-disabled-bg: var(--accent-strong);
+  --bs-btn-disabled-border-color: var(--accent-strong);
+  --bs-btn-focus-shadow-rgb: 201, 100, 66;
+}
+
+.kr-notes :is(.btn-outline-primary, .btn-outline-secondary, .btn-outline-success) {
+  --bs-btn-color: var(--text);
+  --bs-btn-bg: var(--surface);
+  --bs-btn-border-color: var(--border);
+  --bs-btn-hover-color: var(--text);
+  --bs-btn-hover-bg: var(--surface-2);
+  --bs-btn-hover-border-color: var(--border);
+  --bs-btn-active-color: var(--text);
+  --bs-btn-active-bg: var(--surface-2);
+  --bs-btn-active-border-color: var(--muted);
+  --bs-btn-disabled-color: var(--muted);
+  --bs-btn-disabled-bg: var(--surface);
+  --bs-btn-disabled-border-color: var(--border);
+  --bs-btn-focus-shadow-rgb: 201, 100, 66;
+}
+
+.kr-notes .btn-outline-primary {
+  --bs-btn-color: var(--accent-strong);
+  --bs-btn-hover-color: var(--accent-strong);
+  --bs-btn-active-color: var(--accent-strong);
+}
+
+.kr-notes .form-check-input:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.kr-notes .form-check-input:focus,
+.kr-notes .form-control:focus,
+.kr-notes .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.2rem rgb(201 100 66 / 0.2);
+}
+
+.kr-notes .dropdown-menu {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+}
+
+.kr-notes .dropdown-item:hover,
+.kr-notes .dropdown-item:focus {
+  background: var(--surface-2);
+}
+
+/* --- Notices ---
+   The editor's in-page prompts (a missing title, duplicate headings, BOM
+   rows to link or insert): warm and calm rather than Bootstrap alerts. */
+.kr-notes .kr-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--notice-border);
+  border-radius: var(--radius-sm);
+  background: var(--notice-bg);
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.kr-notes .kr-notice[hidden],
+.kr-notes .kr-notice.d-none {
+  display: none !important;
+}
+
+.kr-notes .kr-notice > i {
+  color: #8a5a00;
+}
+
+.kr-notes .kr-notice code {
+  color: var(--code-text);
+  font-family: var(--font-mono);
+}
+
+/* The message takes the room; its buttons sit at the end, or wrap under. */
+.kr-notes .kr-notice > :is(span, div) {
+  flex: 1 1 18rem;
+}
+
+/* --- Popovers and pickers ---
+   Everything that floats over the page shares one surface: the `/`
+   pickers (image, part, catalog), the part card and menu, the image
+   autocomplete, the diagram menu, the drop progress toast and the
+   completeness meter. They are appended to <body>, so the tokens are
+   repeated here rather than inherited from .kr-notes. */
+:is(.project-slash-picker, .part-link-card, .part-link-menu,
+    .image-autocomplete-popup, .diagram-menu-popover, .drop-progress,
+    .completeness-overlay) {
+  --kr-pop-bg: #ffffff;
+  --kr-pop-hover: #f0eee6;
+  --kr-pop-border: #e3e0d6;
+  --kr-pop-text: #141413;
+  --kr-pop-muted: #6b6a63;
+  border: 1px solid var(--kr-pop-border) !important;
+  border-radius: var(--radius, 12px);
+  background: var(--kr-pop-bg) !important;
+  color: var(--kr-pop-text);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.06), 0 12px 32px rgb(0 0 0 / 0.1) !important;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:is(.project-slash-picker-item, .image-ac-item, .part-link-menu button,
+    .diagram-menu-popover .image-picker-item):is(:hover, :focus, .active) {
+  background: var(--kr-pop-hover) !important;
+  color: var(--kr-pop-text);
+  outline: none;
+}
+
+:is(.project-slash-picker, .part-link-card, .image-autocomplete-popup) small,
+.project-slash-picker-empty {
+  color: var(--kr-pop-muted);
+}

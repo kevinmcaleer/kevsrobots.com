@@ -64,3 +64,35 @@ test('a table from stored rows', () => {
     { name: 'Tape', quantity: 1, part_slug: null, unit_cost: null, currency_code: null },
   ]);
 });
+
+test('adds a Total column and a total row', () => {
+  const md = doc([
+    '| Part | Qty | Price |',
+    '| --- | --- | --- |',
+    '| Pico | 1 | £4.00 |',
+    '| Servo | 2 | £2.50 |',
+  ].join('\n'));
+  assert.equal(BomSync.withTotals(md), doc([
+    '| Part | Qty | Price | Total |',
+    '| --- | --- | --- | --- |',
+    '| Pico | 1 | £4.00 | £4.00 |',
+    '| Servo | 2 | £2.50 | £5.00 |',
+    '| **Total** |  |  | **£9.00** |',
+  ].join('\n')));
+});
+
+test('leaves a table whose totals are right as it is', () => {
+  const md = doc([
+    '| Part | Qty | Price | Total |',
+    '| --- | --- | --- | --- |',
+    '| Pico | 1 | £4.00 | £4.00 |',
+    '| **Total** |  |  | **£4.00** |',
+  ].join('\n'));
+  assert.deepEqual(BomSync.totalsChanges(md), []);
+  assert.equal(BomSync.withTotals(md), md);
+});
+
+test('a table without Qty and Price gets no totals', () => {
+  const md = doc('| Part | Notes |\n| --- | --- |\n| Pico | brain |');
+  assert.equal(BomSync.withTotals(md), md);
+});
