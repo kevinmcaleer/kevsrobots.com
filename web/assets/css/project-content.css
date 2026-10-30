@@ -179,11 +179,11 @@
   margin-bottom: 0;
 }
 
-/* Callouts (callouts.css draws them): squared on the left, as in the live view. */
+/* Callouts (callouts.css draws them): a solid tint, rounded all round, as in the live view. */
 .project-prose .callout {
   margin: 0 0 var(--block-gap);
   padding: 0.35em 1em;
-  border-radius: 0 8px 8px 0;
+  border-radius: 8px;
 }
 
 .project-prose .callout-title {

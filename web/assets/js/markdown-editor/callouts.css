@@ -12,9 +12,9 @@
 .callout {
   margin: 0 0 1em;
   padding: 0.7em 1em;
-  border-left: 3px solid rgb(var(--callout-color));
   border-radius: 8px;
-  background: rgb(var(--callout-color) / 0.08);
+  /* A solid tint with rounded corners, as Obsidian draws them: no stripe down the left. */
+  background: rgb(var(--callout-color) / 0.1);
   color: inherit;
 }
 
