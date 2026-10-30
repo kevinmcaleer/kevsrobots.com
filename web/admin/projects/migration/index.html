@@ -1,0 +1,333 @@
+---
+title: Editor Migration
+layout: default
+description: Move existing projects to the new project editor
+permalink: /admin/projects/migration/
+sitemap: false
+---
+
+{% include nav_admin.html %}
+
+<link rel="stylesheet" href="/assets/js/markdown-editor/markdown-editor.css?v={{ site.time | date: '%s' }}">
+
+<div class="container py-4">
+  <h1><i class="fas fa-right-left me-3"></i> Editor Migration</h1>
+  <p class="text-muted">
+    Moving existing projects to the new project editor (issue #273). Nothing on
+    this page changes a project until you press a button, and the only change
+    it can make is appending a Bill of Materials table.
+  </p>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="admin-content" class="d-none">
+    <!-- 1. Stored BOM rows that aren't a table in the text yet -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-list me-2"></i> Bill of Materials not in the text yet</span>
+        <span>
+          <span id="bom-count" class="badge bg-secondary me-2">0</span>
+          <button type="button" id="bom-btn" class="btn btn-sm btn-primary" disabled>
+            <i class="fas fa-play me-1"></i> Insert BOM tables
+          </button>
+        </span>
+      </div>
+      <div class="card-body p-0">
+        <p class="small text-muted px-3 pt-3 mb-2">
+          These projects were saved before the Bill of Materials lived in the
+          Markdown. Their owners see an "Insert BOM table" bar in the editor.
+          This button does the same for all of them: it appends the table to
+          the end of the text, under a <code>&lt;!-- … generated … --&gt;</code>
+          comment, and leaves "last updated" alone.
+        </p>
+        <div id="bom-summary" class="px-3 small d-none"></div>
+        <div id="bom-none" class="text-center text-muted py-4 d-none">
+          <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+          <p>Every project with BOM rows has its table in the text.</p>
+        </div>
+        <div class="table-responsive">
+          <table id="bom-table" class="table table-hover mb-0 d-none">
+            <thead><tr><th>Project</th><th>Owner</th><th class="text-end">Rows</th><th>Status</th></tr></thead>
+            <tbody id="bom-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Projects still on the old schematic editor -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-diagram-project me-2"></i> Projects using the old schematic editor</span>
+        <span id="schematic-count" class="badge bg-secondary">0</span>
+      </div>
+      <div class="card-body p-0">
+        <p class="small text-muted px-3 pt-3 mb-2">
+          These keep rendering on their project pages, and the editor offers
+          "Open the old schematic editor" until the owner redraws the wiring in
+          the electronics workspace. When this reaches zero, the old schematic
+          and symbol editors can go.
+        </p>
+        <div id="schematic-none" class="text-center text-muted py-4 d-none">
+          <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+          <p>No project uses the old schematic editor.</p>
+        </div>
+        <div class="table-responsive">
+          <table id="schematic-table" class="table table-hover mb-0 d-none">
+            <thead><tr><th>Project</th><th>Owner</th><th>Mode</th><th>Last edited</th><th></th></tr></thead>
+            <tbody id="schematic-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Every project opens and saves unchanged -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-rotate me-2"></i> Open-and-save check</span>
+        <button type="button" id="check-btn" class="btn btn-sm btn-primary">
+          <i class="fas fa-play me-1"></i> Check every project
+        </button>
+      </div>
+      <div class="card-body">
+        <p class="small text-muted">
+          Loads each project's Markdown into the editor here in your browser
+          (the same editor bundle the project editor uses) and reads it back,
+          without saving anything. A project passes when the text comes back
+          unchanged. The editor also writes three things into a project's text
+          the first time it is opened: Bill of Materials totals, a Code
+          repository section for a stored repository link, and a Videos
+          section for stored videos. Those are listed as expected, not as
+          failures, as is text saved with Windows line endings, which the
+          editor keeps as plain <code>\n</code> (it renders the same).
+        </p>
+        <div id="check-progress" class="small mb-2 d-none"></div>
+        <div id="check-summary" class="mb-2 d-none"></div>
+        <div class="table-responsive">
+          <table id="check-table" class="table table-sm mb-0 d-none">
+            <thead><tr><th>Project</th><th>Result</th></tr></thead>
+            <tbody id="check-body"></tbody>
+          </table>
+        </div>
+        <!-- The editor the check loads each project into. -->
+        <div id="check-editor" aria-hidden="true" style="position:absolute;left:-10000px;top:0;width:800px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/markdown-editor/markdown-editor.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/bom-sync.js?v={{ site.time | date: '%s' }}"></script>
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  // Must match GENERATED_MARKER in projects-api's admin_migration.py.
+  const MARKER = '<!-- Bill of Materials table generated from the stored BOM rows (#273) -->';
+  let bomCandidates = [];
+
+  function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t == null ? '' : String(t);
+    return d.innerHTML;
+  }
+
+  function projectLink(id, title) {
+    return '<a href="/projects/view.html?id=' + id + '">' + esc(title) + '</a>';
+  }
+
+  async function getJson(path) {
+    const resp = await fetch(API + path, { credentials: 'include' });
+    if (resp.status === 401 || resp.status === 403) throw Object.assign(new Error('denied'), { denied: true });
+    if (!resp.ok) throw new Error(path + ' failed (' + resp.status + ')');
+    return resp.json();
+  }
+
+  async function init() {
+    try {
+      const [bom, schematics] = await Promise.all([
+        getJson('/api/admin/migration/bom'),
+        getJson('/api/admin/migration/schematics'),
+      ]);
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('admin-content').classList.remove('d-none');
+      // The editor's rule: rows but no Bill of Materials table in the text.
+      bomCandidates = bom.filter(p => p.rows.length && !BomSync.parse(p.content_md));
+      renderBom(bom.length - bomCandidates.length);
+      renderSchematics(schematics);
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('access-denied').classList.remove('d-none');
+      if (!e.denied) document.querySelector('#access-denied .alert').textContent = e.message;
+    }
+  }
+
+  // --- 1. BOM tables ---
+
+  function renderBom(alreadyInText) {
+    const none = bomCandidates.length === 0;
+    document.getElementById('bom-count').textContent = bomCandidates.length;
+    document.getElementById('bom-btn').disabled = none;
+    document.getElementById('bom-none').classList.toggle('d-none', !none);
+    document.getElementById('bom-table').classList.toggle('d-none', none);
+    if (alreadyInText) {
+      const summary = document.getElementById('bom-summary');
+      summary.textContent = alreadyInText + (alreadyInText === 1 ? ' other project has' : ' other projects have') +
+        ' BOM rows and a table in the text already.';
+      summary.classList.remove('d-none');
+    }
+    document.getElementById('bom-body').innerHTML = bomCandidates.map(p =>
+      '<tr>' +
+        '<td>' + projectLink(p.project_id, p.title) + (p.status === 'draft' || p.status === 'wip' ? ' <span class="badge bg-light text-dark">draft</span>' : '') + '</td>' +
+        '<td>' + esc(p.author_username) + '</td>' +
+        '<td class="text-end">' + p.rows.length + '</td>' +
+        '<td data-bom-status="' + p.project_id + '" class="small text-muted">waiting</td>' +
+      '</tr>').join('');
+  }
+
+  // The project's text with the table appended, as the editor's
+  // "Insert BOM table" writes it, under the marker.
+  function withBomTable(p) {
+    const md = p.content_md;
+    const lead = !md.length ? '' : md.endsWith('\n\n') ? '' : md.endsWith('\n') ? '\n' : '\n\n';
+    const heading = ProjectSections.get('bill-of-materials').heading;
+    return md + lead + MARKER + '\n' + BomSync.tableFromRows(p.rows, heading);
+  }
+
+  async function insertBomTables() {
+    const btn = document.getElementById('bom-btn');
+    if (!confirm('Append a Bill of Materials table to ' + bomCandidates.length + ' project(s)?')) return;
+    btn.disabled = true;
+    let done = 0, failed = 0;
+    for (const p of bomCandidates) {
+      const cell = document.querySelector('[data-bom-status="' + p.project_id + '"]');
+      cell.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      try {
+        const resp = await fetch(API + '/api/admin/migration/projects/' + p.project_id + '/bom-table', {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ expected_content_md: p.content_md, content_md: withBomTable(p) }),
+        });
+        if (!resp.ok) throw new Error((await resp.json().catch(() => ({}))).detail || 'failed (' + resp.status + ')');
+        cell.innerHTML = '<span class="text-success">inserted</span>';
+        done++;
+      } catch (e) {
+        cell.innerHTML = '<span class="text-danger">' + esc(e.message) + '</span>';
+        failed++;
+      }
+    }
+    const summary = document.getElementById('bom-summary');
+    summary.textContent = done + ' inserted' + (failed ? ', ' + failed + ' failed' : '') + '.';
+    summary.classList.remove('d-none');
+  }
+
+  // --- 2. Old schematics ---
+
+  function renderSchematics(rows) {
+    const none = rows.length === 0;
+    document.getElementById('schematic-count').textContent = rows.length;
+    document.getElementById('schematic-none').classList.toggle('d-none', !none);
+    document.getElementById('schematic-table').classList.toggle('d-none', none);
+    document.getElementById('schematic-body').innerHTML = rows.map(r =>
+      '<tr>' +
+        '<td>' + projectLink(r.project_id, r.title) + '</td>' +
+        '<td>' + esc(r.author_username) + '</td>' +
+        '<td>' + (r.content_mode === 'builder' ? 'Instruction builder' : 'Markdown') + '</td>' +
+        '<td class="small text-muted">' + esc(new Date(r.updated_at).toLocaleDateString()) + '</td>' +
+        '<td><a class="small" href="/projects/schematic/edit.html?id=' + r.project_id + '">Open schematic</a></td>' +
+      '</tr>').join('');
+  }
+
+  // --- 3. Open-and-save check ---
+
+  // What the project editor writes into the text the first time it opens
+  // a project (project-editor.js: withRepoSection, withVideosSection and
+  // the BOM totals).
+  function expectedAdditions(p) {
+    const out = [];
+    if (BomSync.totalsChanges(p.content_md).length) out.push('BOM totals');
+    if (p.code_repo_url && !p.content_md.includes(p.code_repo_url)) out.push('Code repository section');
+    if (p.video_count && !ProjectSections.present(p.content_md).has('videos')) out.push('Videos section');
+    return out;
+  }
+
+  function firstDifference(a, b) {
+    let i = 0;
+    while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    const line = a.slice(0, i).split('\n').length;
+    return 'line ' + line + ': stored ' + JSON.stringify(a.slice(i, i + 40)) + ', editor ' + JSON.stringify(b.slice(i, i + 40));
+  }
+
+  const nextFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+
+  async function runCheck() {
+    const btn = document.getElementById('check-btn');
+    btn.disabled = true;
+    const progress = document.getElementById('check-progress');
+    const body = document.getElementById('check-body');
+    body.innerHTML = '';
+    progress.classList.remove('d-none');
+    document.getElementById('check-summary').classList.add('d-none');
+
+    const host = document.getElementById('check-editor');
+    host.innerHTML = '';
+    const editor = window.MarkdownEditor.mount(host, { doc: '', spellcheck: 'off', toolbar: false, status: false });
+
+    const { count } = await getJson('/api/admin/migration/contents/count');
+    let checked = 0, same = 0, expected = 0, changed = 0, builder = 0;
+    for (let offset = 0; offset < count; offset += 50) {
+      const page = await getJson('/api/admin/migration/contents?offset=' + offset + '&limit=50');
+      for (const p of page) {
+        checked++;
+        progress.textContent = 'Checking ' + checked + ' of ' + count + '…';
+        editor.setDoc(p.content_md);
+        await nextFrame();
+        const back = editor.getDoc();
+        const additions = expectedAdditions(p);
+        let result;
+        // The editor (CodeMirror) keeps lines with \n only, so text saved
+        // with Windows line endings comes back with \n: it renders the same.
+        const lineEndingsOnly = back !== p.content_md && back === p.content_md.replace(/\r\n?/g, '\n');
+        if (lineEndingsOnly) additions.unshift('\\r\\n line endings become \\n');
+        if (back !== p.content_md && !lineEndingsOnly) {
+          changed++;
+          result = '<span class="text-danger"><i class="fas fa-xmark me-1"></i> Changed by the editor: ' + esc(firstDifference(p.content_md, back)) + '</span>';
+        } else if (additions.length) {
+          expected++;
+          result = '<span class="text-body-secondary"><i class="fas fa-plus me-1"></i> Expected on first open: ' + esc(additions.join(', ')) + '</span>';
+        } else {
+          same++;
+        }
+        if (p.content_mode === 'builder') builder++;
+        if (result) {
+          body.insertAdjacentHTML('beforeend', '<tr><td>' + projectLink(p.project_id, p.title) +
+            (p.content_mode === 'builder' ? ' <span class="badge bg-light text-dark">builder</span>' : '') +
+            '</td><td class="small">' + result + '</td></tr>');
+        }
+      }
+    }
+    editor.destroy && editor.destroy();
+    progress.classList.add('d-none');
+    document.getElementById('check-table').classList.toggle('d-none', !body.children.length);
+    const summary = document.getElementById('check-summary');
+    summary.innerHTML =
+      '<strong>' + checked + ' projects checked.</strong> ' +
+      same + ' unchanged, ' + expected + ' with an expected change on first open, ' +
+      '<span class="' + (changed ? 'text-danger fw-bold' : '') + '">' + changed + ' changed by the editor</span>' +
+      (builder ? ' (' + builder + ' use the instruction builder, which keeps its own editor)' : '') + '.';
+    summary.classList.remove('d-none');
+    btn.disabled = false;
+  }
+
+  document.getElementById('bom-btn').addEventListener('click', insertBomTables);
+  document.getElementById('check-btn').addEventListener('click', runCheck);
+  init();
+})();
+</script>

@@ -160,6 +160,11 @@ Key data files:
   ```
   For inline icons in body text, badges, or buttons, `me-1` or `me-2` is fine — the rule is specifically about headings.
 
+### Project editor (`web/projects/editor.html`, `view.html`)
+- **How it fits together** - `docs/projects-editor.md`: one Markdown document per project, the vendored markdown-studio editor bundle, BOM sync, wiring, diagrams, and the admin migration page.
+- **Look** - Notes tokens and shared components live in `web/assets/css/project-notes.css` on `.kr-notes`; use `.kr-section` / `.kr-notice`, not Bootstrap cards, on these pages.
+- **Gone** - EasyMDE, `circuit-editor.js`, `circuit-components.js` and `project-instructions.js` are removed from the editor. `web/parts/edit.html` and the Instruction Builder still use EasyMDE; the schematic and symbol editors stay for older projects until `/admin/projects/migration/` counts zero.
+
 ### Blog Posts
 - **File naming** - `YYYY-MM-DD-title.md` in `/web/_posts/`
 - **Frontmatter required** - title, description, layout, date, author, cover, tags

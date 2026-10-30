@@ -779,6 +779,47 @@ class ModelMissingThumbnail(BaseModel):
     file_size: int
 
 
+class MigrationBomCandidate(BaseModel):
+    """A project with stored BOM rows, for the editor migration (#273)."""
+
+    project_id: int
+    title: str
+    author_username: str
+    status: str
+    content_mode: str
+    content_md: str
+    rows: list["BOMItemResponse"]
+
+
+class MigrationBomTable(BaseModel):
+    """The text the admin page read, and that text with a generated BOM
+    table appended (#273)."""
+
+    expected_content_md: str
+    content_md: str
+
+
+class MigrationSchematic(BaseModel):
+    """A project still using the old schematic editor (#273)."""
+
+    project_id: int
+    title: str
+    author_username: str
+    content_mode: str
+    updated_at: datetime
+
+
+class MigrationContent(BaseModel):
+    """A project's Markdown, for the open-and-save check (#273)."""
+
+    project_id: int
+    title: str
+    content_mode: str
+    content_md: str
+    code_repo_url: Optional[str] = None
+    video_count: int = 0
+
+
 class ImageResponse(BaseModel):
     id: int
     filename: str

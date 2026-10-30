@@ -552,9 +552,18 @@
     }
   }
 
+  // A Markdown project's schematic from the old schematic editor, drawn
+  // into slotEl the same way (issue #273: it keeps showing on the
+  // project page until the owner redraws it in the electronics workspace).
+  function renderSchematicPreview(slotEl, projectId) {
+    slotEl.classList.add('builder-step-schematic-preview');
+    return rasteriseSchematicSteps(slotEl.parentNode, [], projectId);
+  }
+
   window.BuilderRenderer = {
     render: render,
     renderInto: renderInto,
+    renderSchematicPreview: renderSchematicPreview,
     exportInstructionsPdf: exportInstructionsPdf,
   };
 })();
