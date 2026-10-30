@@ -271,9 +271,12 @@ function createProjectCard(project) {
         ? `<img src="${escapeHtml(project.cover_image)}" class="card-img-top" loading="lazy" alt="${escapeHtml(project.title)}">`
         : `<div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="background:#f1f3f5;"><i class="fas fa-cube fa-2x"></i></div>`);
 
+  // The thumbnail opens the project in the editor, same as the Edit button.
+  const editUrl = `/projects/editor.html?id=${project.id}`;
+
   col.innerHTML = `
     <div class="${cardClasses}">
-      ${thumb}
+      <a href="${editUrl}" class="d-block kr-card-thumb-link" title="Edit project" aria-label="Edit ${escapeHtml(project.title || 'Untitled Project')}">${thumb}</a>
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
           <h5 class="card-title mb-0">${titleHtml}</h5>
@@ -290,7 +293,7 @@ function createProjectCard(project) {
       </div>
       <div class="card-footer bg-transparent">
         <div class="btn-group w-100" role="group">
-          <a href="/projects/editor.html?id=${project.id}" class="btn btn-sm btn-primary">
+          <a href="${editUrl}" class="btn btn-sm btn-primary">
             <i class="fas fa-pencil-alt"></i> Edit
           </a>
           <a href="${(project.slug && project.author_username) ? '/projects/' + encodeURIComponent(project.author_username) + '/' + encodeURIComponent(project.slug) : '/projects/view.html?id=' + project.id}" class="btn btn-sm btn-outline-primary">
