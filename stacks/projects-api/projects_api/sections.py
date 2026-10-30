@@ -32,7 +32,14 @@ def _normalise(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
 
 
+# Other headings that count as a section, in any case (ALIASES in
+# project-sections.js).
+ALIASES: dict[str, list[str]] = {
+    "bill-of-materials": ["BOM", "Parts", "Parts list"],
+}
+
 _BY_NAME = {_normalise(heading): sid for sid, heading in SECTIONS}
+_BY_NAME.update({_normalise(name): sid for sid, names in ALIASES.items() for name in names})
 
 
 def canonical_sections(content_md: Optional[str], has_bom: bool = False) -> list[str]:

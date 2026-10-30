@@ -2578,18 +2578,21 @@ description: View project details
 
   // The table under the author's heading for sectionId, with at least one
   // row, before the next heading at its level or above; else null.
+  // When several headings name the section ("Bill of Materials" and a
+  // later "BOM"), the first of them with a table counts.
   function sectionTableEl(sectionId, headings) {
-    const heading = headings.find(h => {
+    const named = headings.filter(h => {
       const s = ProjectSections.match(h.textContent);
       return s && s.id === sectionId;
     });
-    if (!heading) return null;
-    const level = Number(heading.tagName[1]);
-    for (let el = heading.nextElementSibling; el; el = el.nextElementSibling) {
-      if (/^H[1-6]$/.test(el.tagName) && Number(el.tagName[1]) <= level) return null;
-      if (el.id === 'view-bom-section') continue; // the stored rows, once moved here
-      const table = el.tagName === 'TABLE' ? el : el.querySelector && el.querySelector('table');
-      if (table && table.querySelector('tbody tr')) return table;
+    for (const heading of named) {
+      const level = Number(heading.tagName[1]);
+      for (let el = heading.nextElementSibling; el; el = el.nextElementSibling) {
+        if (/^H[1-6]$/.test(el.tagName) && Number(el.tagName[1]) <= level) break;
+        if (el.id === 'view-bom-section') continue; // the stored rows, once moved here
+        const table = el.tagName === 'TABLE' ? el : el.querySelector && el.querySelector('table');
+        if (table && table.querySelector('tbody tr')) return table;
+      }
     }
     return null;
   }

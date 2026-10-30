@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from projects_api.sections import SECTIONS, canonical_sections
+from projects_api.sections import ALIASES, SECTIONS, canonical_sections
 from .conftest import make_auth_header
 
 SECTIONS_JS = Path(__file__).resolve().parents[3] / "web" / "assets" / "js" / "project-sections.js"
@@ -66,3 +66,18 @@ async def test_list_reports_sections(client) -> None:
     )
     mine = (await client.get("/api/projects/my/list", headers=headers)).json()
     assert mine[0]["sections"] == ["bill-of-materials", "wiring", "code"]
+
+
+def test_bom_aliases_count_as_bill_of_materials() -> None:
+    for heading in ("# BOM", "## bom", "### Parts", "# PARTS LIST"):
+        assert canonical_sections(heading + "\n") == ["bill-of-materials"]
+
+
+@pytest.mark.skipif(not SECTIONS_JS.exists(), reason="web/ not checked out")
+def test_same_aliases_as_project_sections_js() -> None:
+    js = SECTIONS_JS.read_text()
+    found = {
+        sid: re.findall(r"'([^']+)'", names)
+        for sid, names in re.findall(r"id: '([^']+)',\s*heading: '[^']+',\s*(?://[^\n]*\n\s*)*aliases: \[([^\]]*)\]", js)
+    }
+    assert found == ALIASES
