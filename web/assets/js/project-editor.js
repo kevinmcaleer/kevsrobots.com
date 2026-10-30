@@ -1176,7 +1176,7 @@
         if (action.dataset.action === 'link-all') linkAllBomParts();
         else if (action.dataset.action === 'review') reviewBomPart();
         else if (action.dataset.action === 'insert-bom') insertBomTable();
-        else if (action.dataset.action === 'dismiss') { bomLinkBarDismissed = true; bar.hidden = true; }
+        else if (action.dataset.action === 'dismiss') { bomLinkBarDismissed = true; bar.hidden = true; updateBomLinkBar(); }
       });
     }
     scheduleBomLinks();
@@ -1233,6 +1233,10 @@
     // A project saved before the table lived in the text (issue #264).
     if (storedBom && storedBom.length && !BomSync.parse(markdown)) {
       const n = storedBom.length;
+      setBomHint({
+        title: n + ' Bill of Materials ' + (n === 1 ? 'row isn\u2019t' : 'rows aren\u2019t') + ' in the text yet',
+        actions: [{ label: 'Insert BOM table', run: insertBomTable }],
+      });
       bar.innerHTML =
         '<i class="fas fa-list" aria-hidden="true"></i>' +
         '<span>This project has ' + n + ' Bill of Materials ' + (n === 1 ? 'row' : 'rows') +
@@ -1242,18 +1246,45 @@
       return;
     }
     const rows = unlinkedBomRows(markdown);
-    if (!rows.length || bomLinkBarDismissed) { bar.hidden = true; return; }
+    if (!rows.length) { setBomHint(null); bar.hidden = true; return; }
     const matches = (await resolvePartNames(rows.map(r => r.name))).filter(Boolean).length;
     const n = rows.length;
+    const linkLabel = 'Link ' + (matches === n ? (n === 1 ? 'it' : 'all ' + n) : matches + ' exact ' + (matches === 1 ? 'match' : 'matches'));
+    // Listed in the hints panel even once the bar is closed, which is
+    // how the bar comes back.
+    setBomHint({
+      title: n + (n === 1 ? ' part in the Bill of Materials isn\u2019t' : ' parts in the Bill of Materials aren\u2019t') + ' linked',
+      detail: 'Link them to the parts catalog so their photos and details show.',
+      actions: [
+        ...(bomLinkBarDismissed ? [{ label: 'Show the bar', run: showBomLinkBar }] : []),
+        ...(matches ? [{ label: linkLabel, run: linkAllBomParts }] : []),
+        { label: 'Review', run: reviewBomPart },
+      ],
+    });
+    if (bomLinkBarDismissed) { bar.hidden = true; return; }
     bar.innerHTML =
       '<i class="fas fa-link" aria-hidden="true"></i>' +
       '<span>' + n + (n === 1 ? ' part in the Bill of Materials isn\u2019t' : ' parts in the Bill of Materials aren\u2019t') +
       ' linked to the parts catalog.</span>' +
-      (matches ? '<button type="button" class="btn btn-sm btn-success" data-action="link-all">Link ' +
-        (matches === n ? (n === 1 ? 'it' : 'all ' + n) : matches + ' exact ' + (matches === 1 ? 'match' : 'matches')) + '</button>' : '') +
+      (matches ? '<button type="button" class="btn btn-sm btn-success" data-action="link-all">' + linkLabel + '</button>' : '') +
       '<button type="button" class="btn btn-sm btn-outline-secondary" data-action="review">Review</button>' +
       '<button type="button" class="btn-close ms-auto" data-action="dismiss" aria-label="Hide"></button>';
     bar.hidden = false;
+  }
+
+  // The Bill of Materials hint in the editor's hints panel (the status
+  // bar's "N hints"), or none.
+  function setBomHint(hint) {
+    if (!mde || typeof mde.setHints !== 'function') return;
+    mde.setHints(hint ? [Object.assign({ id: 'bom-links' }, hint)] : []);
+  }
+
+  function showBomLinkBar() {
+    bomLinkBarDismissed = false;
+    updateBomLinkBar().then(() => {
+      const bar = document.getElementById('bom-link-bar');
+      if (bar && !bar.hidden) bar.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
   }
 
   let bomLinksTimer = null;
