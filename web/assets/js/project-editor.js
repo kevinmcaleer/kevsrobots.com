@@ -700,6 +700,8 @@
       preview: false,
       codeRenderers: { mermaid: renderMermaid },
       codeEditors: { mermaid: editMermaid },
+      // Mermaid Factory's highlighter for ```mermaid fences in Raw.
+      codeLanguages: { mermaid: () => loadMermaidTools().then(tools => tools.mermaidStreamParser) },
       // The Videos table as thumbnail cards, as on the view page, until it's clicked.
       tableRenderer: ({ rows, heading }) => {
         const section = heading && ProjectSections.match(heading);
