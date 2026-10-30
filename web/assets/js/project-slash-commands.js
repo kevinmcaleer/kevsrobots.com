@@ -554,37 +554,25 @@
   }
 
   function bomTableParts(markdown) {
-    const lines = markdown.split('\n');
-    const cells = line => line.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '')
-      .split(/(?<!\\)\|/).map(c => c.trim());
-    let i = lines.findIndex(line => {
-      const m = line.match(/^#{1,6}\s+(.*?)\s*#*\s*$/);
-      return m && window.ProjectSections.match(m[1]) === window.ProjectSections.get('bill-of-materials');
-    });
-    if (i < 0) return [];
-    // The first table before the next heading.
-    for (i++; i < lines.length && !/^\s*\|/.test(lines[i]); i++) {
-      if (/^#{1,6}\s/.test(lines[i])) return [];
-    }
-    if (i + 1 >= lines.length || !/^\s*\|?\s*:?-{3,}/.test(lines[i + 1])) return [];
-    const header = cells(lines[i]).map(h => h.toLowerCase());
+    const table = window.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return [];
+    const header = table.header;
     let nameCol = header.findIndex(h => /^(part|parts|item|name|component)s?$/.test(h));
     if (nameCol < 0) nameCol = 0;
     const qtyCol = header.findIndex(h => /^(qty|quantity|count)$/.test(h));
     const parts = [];
-    for (let r = i + 2; r < lines.length && /^\s*\|/.test(lines[r]); r++) {
-      const row = cells(lines[r]);
+    table.rows.forEach(row => {
       const raw = (row[nameCol] || '').replace(/\\\|/g, '|');
       const link = raw.match(/^\[([^\]]+)\]\(([^)\s]+)[^)]*\)$/);
       const name = (link ? link[1] : raw).replace(/[*_`]/g, '').trim();
-      if (!name || isTotalRow(row)) continue;
+      if (!name || isTotalRow(row)) return;
       const qty = qtyCol >= 0 ? row[qtyCol] : '';
       parts.push({
         name,
         url: link ? link[2] : null,
         detail: (qty ? qty + ' \u00d7 \u00b7 ' : '') + 'in the Bill of Materials table',
       });
-    }
+    });
     return parts;
   }
 

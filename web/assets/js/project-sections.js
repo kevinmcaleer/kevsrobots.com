@@ -9,6 +9,8 @@
     {
       id: 'bill-of-materials',
       heading: 'Bill of Materials',
+      // Other headings that count as this section, in any case.
+      aliases: ['BOM', 'Parts', 'Parts list'],
       keywords: ['bom', 'parts list', 'components', 'shopping list'],
       icon: 'M5.5 2.5h5v2h-5zM5.5 3.5H3.5v10h9v-10h-2M5.5 7.5h5M5.5 10h5',
     },
@@ -60,7 +62,8 @@
     return String(text || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   }
 
-  const byName = new Map(SECTIONS.map(s => [normalise(s.heading), s]));
+  const byName = new Map(SECTIONS.flatMap(s =>
+    [s.heading].concat(s.aliases || []).map(name => [normalise(name), s])));
 
   // The section's line icon as inline SVG (issue #259).
   function iconSvg(section, size) {
@@ -102,27 +105,33 @@
   // The first table in a section, before the next heading:
   //   { header: ['part', 'qty', ...] (lower case), rows: [[cell, ...]],
   //     headerLine, lines: [line numbers of the rows] }
-  // or null. Cells are trimmed; escaped pipes stay escaped.
+  // or null. Cells are trimmed; escaped pipes stay escaped. When several
+  // headings name the section ("Bill of Materials" and a later "BOM"),
+  // the first of them with a table counts.
   function sectionTable(markdown, id) {
     const lines = String(markdown || '').split('\n');
-    const heading = headings(markdown).find(h => {
-      const section = byName.get(normalise(h.text));
-      return section && section.id === id;
-    });
-    if (!heading) return null;
     const cells = line => line.trim().replace(/^\|/, '').replace(/(?<!\\)\|$/, '')
       .split(/(?<!\\)\|/).map(c => c.trim());
-    let i = heading.line + 1;
-    for (; i < lines.length && !/^\s*\|/.test(lines[i]); i++) {
-      if (/^ {0,3}#{1,6}\s/.test(lines[i])) return null;
+    const tableAfter = line => {
+      let i = line + 1;
+      for (; i < lines.length && !/^\s*\|/.test(lines[i]); i++) {
+        if (/^ {0,3}#{1,6}\s/.test(lines[i])) return null;
+      }
+      if (i + 1 >= lines.length || !/^\s*\|?\s*:?-{3,}/.test(lines[i + 1])) return null;
+      const table = { header: cells(lines[i]).map(h => h.toLowerCase()), rows: [], headerLine: i, lines: [] };
+      for (let r = i + 2; r < lines.length && /^\s*\|/.test(lines[r]); r++) {
+        table.rows.push(cells(lines[r]));
+        table.lines.push(r);
+      }
+      return table;
+    };
+    for (const h of headings(markdown)) {
+      const section = byName.get(normalise(h.text));
+      if (!section || section.id !== id) continue;
+      const table = tableAfter(h.line);
+      if (table) return table;
     }
-    if (i + 1 >= lines.length || !/^\s*\|?\s*:?-{3,}/.test(lines[i + 1])) return null;
-    const table = { header: cells(lines[i]).map(h => h.toLowerCase()), rows: [], headerLine: i, lines: [] };
-    for (let r = i + 2; r < lines.length && /^\s*\|/.test(lines[r]); r++) {
-      table.rows.push(cells(lines[r]));
-      table.lines.push(r);
-    }
-    return table;
+    return null;
   }
 
   // The text under a section's heading, up to the next heading at its

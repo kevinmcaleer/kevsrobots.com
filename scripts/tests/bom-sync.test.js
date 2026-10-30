@@ -96,3 +96,20 @@ test('a table without Qty and Price gets no totals', () => {
   const md = doc('| Part | Notes |\n| --- | --- |\n| Pico | brain |');
   assert.equal(BomSync.withTotals(md), md);
 });
+
+test('BOM, Parts and Parts list headings count as the Bill of Materials', () => {
+  const table = '| Part | Qty | Price |\n| --- | --- | --- |\n| Cell | 2 | 5 |\n';
+  ['## BOM', '# parts', '### Parts List'].forEach(h => {
+    const out = BomSync.withTotals('# Intro\n\n' + h + '\n\n' + table);
+    assert.match(out, /\| Part \| Qty \| Price \| Total \|/, h);
+    assert.match(out, /\| \*\*Total\*\* \|  \|  \| \*\*10\.00\*\* \|/, h);
+  });
+});
+
+test('the first Bill of Materials heading with a table counts', () => {
+  const md = '# Bill of Materials\n\nSee below.\n\n# Assembly instructions\n\n## BOM\n\n' +
+    '| | Part | link | Qty | Price |\n| --- | --- | --- | --- | --- |\n| Power | Cell | x | 2 | 5 |\n';
+  const out = BomSync.parse(md);
+  assert.deepEqual(out.rows.map(r => [r.name, r.quantity]), [['Cell', 2]]);
+  assert.match(BomSync.withTotals(md), /\| \*\*Total\*\* \|  \|  \|  \|  \| \*\*10\.00\*\* \|/);
+});
