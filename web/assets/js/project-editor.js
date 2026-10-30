@@ -573,6 +573,9 @@
   const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // the API's max_image_size
   // Mermaid Factory's mermaid-tools (scripts/update-mermaid-tools.sh).
   const MERMAID_TOOLS_URL = '/assets/js/mermaid-tools/mermaid-tools.js';
+  // Where a diagram block's "Open in Mermaid Factory" link goes.
+  const MERMAID_FACTORY_URL = 'https://mermaid.kevspowertools.com';
+  // The starters if mermaid-tools won't load; normally they come from its gallery.
   const DIAGRAM_TEMPLATES = [
     { label: 'Flowchart', md: '\n```mermaid\ngraph TD\n    A[Start] --> B[Step 1]\n    B --> C[Step 2]\n    C --> D[End]\n```\n' },
     { label: 'Sequence Diagram', md: '\n```mermaid\nsequenceDiagram\n    participant A\n    participant B\n    A->>B: Hello\n    B-->>A: Hi back\n```\n' },
@@ -580,6 +583,7 @@
   ];
   let mde = null;
   let mermaidTools = null;
+  let diagramStarters = null;
 
   function imageViewUrl(img) {
     return API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
@@ -607,6 +611,19 @@
     return mermaidTools;
   }
 
+  // Mermaid Factory's gallery of starters (flowchart first, then sequence,
+  // class, state, ER, journey, Gantt, pie…) as [{ label, detail, md }].
+  function loadDiagramStarters() {
+    if (!diagramStarters) {
+      diagramStarters = loadMermaidTools().then(tools => tools.templates.map(t => ({
+        label: t.name,
+        detail: t.description,
+        md: '\n```mermaid\n' + t.source.trim() + '\n```\n',
+      })), () => DIAGRAM_TEMPLATES);
+    }
+    return diagramStarters;
+  }
+
   // A ```mermaid block in the live view: its diagram, until the cursor goes in.
   async function renderMermaid(source, element) {
     const tools = await loadMermaidTools();
@@ -629,6 +646,8 @@
         onChange: context.onChange,
         onExit: context.onExit,
         autofocus: context.focus,
+        factoryUrl: MERMAID_FACTORY_URL,
+        title: (titleInput && titleInput.value.trim()) || undefined,
       });
     }, err => {
       context.element.textContent = 'Couldn\'t load the diagram editor: ' + err.message;
@@ -759,7 +778,7 @@
         url: item.part_slug ? '/parts/view.html?slug=' + encodeURIComponent(item.part_slug) : null,
         detail: item.quantity + ' ' + (item.unit === 'qty' ? '\u00d7' : item.unit) + (item.part_slug ? ' \u00b7 in the parts catalog' : ''),
       })),
-      diagrams: DIAGRAM_TEMPLATES,
+      diagrams: loadDiagramStarters,
       openWiring: () => openWiring(),
       diagramTemplates: DiagramEditor.TEMPLATES,
       newDiagram: (view, template) => newDiagram(view, template),
@@ -1442,20 +1461,23 @@
   }
 
   // Diagram menu, under the toolbar's diagram button.
-  function showDiagramMenu(editor, btn) {
+  async function showDiagramMenu(editor, btn) {
     const existing = document.querySelector('.diagram-menu-popover');
     if (existing) { existing.remove(); return; }
+    const starters = await loadDiagramStarters();
 
     const rect = btn.getBoundingClientRect();
     const pop = document.createElement('div');
     pop.className = 'diagram-menu-popover';
-    pop.style.cssText = 'position:fixed;z-index:10000;background:white;border:1px solid #ddd;border-radius:8px;padding:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);left:' + rect.left + 'px;top:' + (rect.bottom + 4) + 'px;';
-    pop.innerHTML = DIAGRAM_TEMPLATES.map(i => '<div class="image-picker-item p-2" style="cursor:pointer"><small>' + i.label + '</small></div>').join('');
+    pop.style.cssText = 'position:fixed;z-index:10000;background:white;border:1px solid #ddd;border-radius:8px;padding:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-height:60vh;overflow-y:auto;left:' + rect.left + 'px;top:' + (rect.bottom + 4) + 'px;';
+    pop.innerHTML = starters.map(() => '<div class="image-picker-item p-2" style="cursor:pointer"><small></small></div>').join('');
     document.body.appendChild(pop);
 
     pop.querySelectorAll('.image-picker-item').forEach((item, idx) => {
+      item.querySelector('small').textContent = starters[idx].label;
+      if (starters[idx].detail) item.title = starters[idx].detail;
       item.addEventListener('click', () => {
-        editor.replaceSelection(DIAGRAM_TEMPLATES[idx].md);
+        editor.replaceSelection(starters[idx].md);
         editor.focus();
         pop.remove();
       });

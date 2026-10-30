@@ -270,7 +270,7 @@
   //   ctx.listVideos()  resolves to the project's videos: { id, title }
   //   ctx.listParts()   resolves to the BOM: { name, url (catalog page or null), detail }
   //   ctx.searchParts(q), ctx.createPart(name)   the parts catalog, see partPicker
-  //   ctx.diagrams      [{ label, md }], the diagram templates
+  //   ctx.diagrams()    resolves to the Mermaid starters, [{ label, detail, md }]
   //   ctx.openWiring(view)  opens the electronics workspace (issue #268)
   //   ctx.diagramTemplates  [{ id, label, detail }]; ctx.newDiagram(view, id)
   //   ctx.listDiagrams()    the project's diagrams; ctx.diagramMarkdown(d) (issue #270)
@@ -458,15 +458,15 @@
       {
         id: 'mermaid',
         label: 'Mermaid diagram',
-        keywords: ['mermaid', 'flowchart', 'sequence', 'state', 'chart', 'diagram'],
+        keywords: ['mermaid', 'flowchart', 'sequence', 'state', 'class', 'gantt', 'pie', 'chart', 'diagram'],
         group: 'project',
         icon: ICONS.diagram,
         block: true,
         run: view => openPicker(view, {
           placeholder: 'Pick a diagram…',
-          load: () => ctx.diagrams.map(d => ({
+          load: async () => (await ctx.diagrams()).map(d => ({
             label: d.label,
-            detail: 'Mermaid',
+            detail: d.detail || 'Mermaid',
             icon: ICONS.diagram,
             pick: () => insertAtCursor(view, d.md.trim() + '\n', true),
           })),
