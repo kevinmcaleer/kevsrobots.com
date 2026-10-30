@@ -1,0 +1,64 @@
+/* Image grids: a table of images shows as cards, one per cell, in as many
+   equal columns as the table has (see imageGrid.ts). Standalone, so a page
+   that renders the Markdown itself can use it too. The cards use the same
+   tokens as the text around them: --border, --surface and --muted. */
+table.image-grid {
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0.75rem;
+  /* The spacing between cards, not around them: the outer edge lines up with the text. */
+  width: calc(100% + 1.5rem);
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+}
+
+table.image-grid th,
+table.image-grid td {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: top;
+}
+
+table.image-grid.image-grid-nohead thead {
+  display: none;
+}
+
+/* A plain-text header row labels the columns. */
+table.image-grid th:not(.image-card) {
+  color: var(--muted, #6b7280);
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+table.image-grid .image-card {
+  padding: 0.5rem 0.5rem 0.25rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  color: var(--muted, #6b7280);
+  font-size: 0.88em;
+  line-height: 1.4;
+}
+
+/* Every card's picture is the same shape, so a row lines up: the image fits
+   inside it whatever {size} it was given ({cover} fills it, cropped). Text
+   after the image in its cell is the card's caption, underneath. */
+table.image-grid .image-card img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  margin: 0 auto 0.25rem;
+  border-radius: 6px;
+}
+
+table.image-grid .image-card img.image-cover {
+  height: auto;
+  object-fit: cover;
+}
