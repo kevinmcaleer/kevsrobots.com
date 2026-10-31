@@ -10,6 +10,17 @@
 (function () {
   const API = 'https://projects.kevsrobots.com';
   const BASE = '/assets/js/snakie-parts/';
+  // The bundle's URLs carry this script's own ?v= (the site build time), so
+  // a re-vendored bundle isn't served from a stale browser cache: before
+  // this, its URL never changed and browsers kept the old one.
+  const STAMP = (() => {
+    try {
+      const v = new URL(document.currentScript.src).searchParams.get('v');
+      return v ? '?v=' + encodeURIComponent(v) : '';
+    } catch (_) {
+      return '';
+    }
+  })();
   const FONTS = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap';
 
   let loading = null;
@@ -27,10 +38,10 @@
     if (window.SnakieParts) return Promise.resolve(window.SnakieParts);
     if (!loading) {
       addCss(FONTS);
-      addCss(BASE + 'snakie-parts.css');
+      addCss(BASE + 'snakie-parts.css' + STAMP);
       loading = new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = BASE + 'snakie-parts.js';
+        script.src = BASE + 'snakie-parts.js' + STAMP;
         script.onload = () => resolve(window.SnakieParts);
         script.onerror = () => { loading = null; reject(new Error('Could not load the part editor')); };
         document.head.appendChild(script);
