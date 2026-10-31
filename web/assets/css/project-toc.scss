@@ -29,10 +29,19 @@
   ol ol { margin: 2px 0 0; }
   a.kr-toc-sub { font-size: 0.8rem; padding-left: 1.45rem; }
 
-  // The canonical sections keep their place in the list but stand out.
-  a.kr-toc-section { color: $kr-ink; font-weight: 600; }
-  a.kr-toc-section.is-active { font-weight: 700; }
-  .project-section-icon { flex: none; color: $kevred; }
+  // Every entry, canonical section or the author's own heading, in one
+  // colour. Inside .kr-notes (the editor and the project page) the Notes
+  // link rule (`.kr-notes a:not(.btn):not(.dropdown-item)`) is stronger
+  // than the list's own, so plain headings came out accent-red while the
+  // canonical sections were dark: `[data-toc-key]` lifts these above it.
+  a[data-toc-key] { color: var(--text, #{$kr-ink}); font-weight: 500; }
+  a[data-toc-key]:hover { color: var(--accent-strong, #{$kevred}); }
+  a[data-toc-key].is-active { color: var(--text, #{$kr-ink}); font-weight: 700; }
+  // Canonical sections keep their place in the list; a washed-out icon
+  // marks them, so a heading without one doesn't look out of place.
+  .project-section-icon { flex: none; color: var(--muted, #{$kr-ink-soft}); opacity: 0.6; }
+  a[data-toc-key]:hover .project-section-icon,
+  a[data-toc-key].is-active .project-section-icon { opacity: 0.9; }
   // Entries without an icon keep its space, so every entry's text starts
   // at the same place.
   a:not(.kr-toc-section)::before { content: ''; flex: none; width: 16px; }

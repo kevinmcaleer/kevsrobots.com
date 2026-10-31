@@ -899,6 +899,7 @@
 }
 
 /* A heading in the page navigation that shares its name with another. */
+.kr-toc.kr-toc--column a[data-toc-key].kr-toc-duplicate,
 .kr-toc a.kr-toc-duplicate {
   color: #b45309;
 }
