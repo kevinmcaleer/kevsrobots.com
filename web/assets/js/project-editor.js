@@ -900,6 +900,7 @@
           [heading('gallery'), 'Your pictures as a gallery: / then Gallery and pick a layout. Add pictures in its bar; hover a picture to move or remove it, or drag it'],
         ],
         note: 'These headings fill the page navigation and the completeness check.',
+        link: { label: 'First project? Read the step-by-step getting started guide', href: '/projects/getting-started/' },
       },
       {
         title: 'Bill of Materials',
@@ -3767,6 +3768,19 @@
   recomputeCompleteness();
 
   // --- Init ---
+  // The getting started guide's notice, on a new project until it's closed.
+  function showGettingStartedTip() {
+    const tip = document.getElementById('getting-started-tip');
+    if (!tip || projectId) return;
+    const KEY = 'projects.gettingStartedTipClosed';
+    try { if (localStorage.getItem(KEY)) return; } catch (_) {}
+    tip.classList.remove('d-none');
+    document.getElementById('getting-started-tip-close').addEventListener('click', () => {
+      tip.classList.add('d-none');
+      try { localStorage.setItem(KEY, '1'); } catch (_) {}
+    });
+  }
+
   async function init() {
     const authed = await checkAuth();
     if (!authed) return;
@@ -3778,6 +3792,7 @@
     scheduleBomTotals();
     loadStoredBom().catch(() => {});
     editorContainer.classList.remove('d-none');
+    showGettingStartedTip();
     const completenessCard = document.getElementById('completeness-card');
     if (completenessCard && !completenessClosed) completenessCard.classList.remove('d-none');
     recomputeCompleteness();

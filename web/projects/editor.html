@@ -97,6 +97,13 @@ hide_nibsy: true
            Show a prominent warning when the title is empty or still the
            default, so the editor nudges the author to give it a real name.
            We can't BLOCK saving (autosave is on) — this is the heavy nudge. -->
+      <!-- A new project: point first-time authors at the guide. Closing it
+           hides it for good (localStorage). -->
+      <div id="getting-started-tip" class="kr-notice mb-2 d-none" role="status">
+        <i class="fas fa-circle-question"></i>
+        <span class="flex-grow-1">First project? The <a href="/projects/getting-started/" target="_blank" rel="noopener">getting started guide</a> shows how to add your parts, draw the wiring and write the build steps.</span>
+        <button type="button" class="btn-close btn-sm" id="getting-started-tip-close" aria-label="Close"></button>
+      </div>
       <div id="title-needs-attention" class="kr-notice mb-2 d-none" role="alert">
         <i class="fas fa-exclamation-triangle"></i>
         <div class="flex-grow-1">
