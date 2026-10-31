@@ -305,7 +305,7 @@
    repeated here rather than inherited from .kr-notes. */
 :is(.project-slash-picker, .part-link-card, .part-link-menu,
     .image-autocomplete-popup, .diagram-menu-popover, .drop-progress,
-    .completeness-overlay) {
+    .completeness-overlay, .bom-price-offers) {
   --kr-pop-bg: #ffffff;
   --kr-pop-hover: #f0eee6;
   --kr-pop-border: #e3e0d6;

@@ -234,3 +234,66 @@ test('linkRow with dropShopLink links a shop-linked row with no Notes column', (
   const edit = BomSync.linkRow(md, 'UBEC', 'ubec', { dropShopLink: true });
   assert.equal(edit.text, '| [UBEC](/parts/view.html?slug=ubec) | 1 |');
 });
+
+// --- Catalog prices ---
+
+const pricedDoc = (head = 'Price') => doc([
+  '| Part | Qty | ' + head + ' | Total | Notes |',
+  '| --- | --- | --- | --- | --- |',
+  '| [Raspberry Pi Pico](/parts/view.html?slug=pico) | 1 |  |  |  |',
+  '| [SG90](/parts/view.html?slug=sg90) | 2 | £3.00 | £6.00 | spare |',
+  '| Wires | 1 | £1.00 | £1.00 |  |',
+  '| **Total** |  |  | **£7.00** |  |',
+].join('\n'));
+
+test('linkedRows lists the rows that link a catalog part, with their prices', () => {
+  const out = BomSync.linkedRows(pricedDoc('Price (£)'));
+  assert.equal(out.hasPrice, true);
+  assert.equal(out.currency, 'GBP');
+  assert.deepEqual(out.rows.map(r => [r.slug, r.name, r.price, r.priceText]), [
+    ['pico', 'Raspberry Pi Pico', null, ''],
+    ['sg90', 'SG90', { amount: 3, code: 'GBP' }, '£3.00'],
+  ]);
+  assert.equal(BomSync.linkedRows('# Overview\n\nNo table.'), null);
+});
+
+test('catalogPrice prefers a shop in the table currency, then the cheapest', () => {
+  const shops = [
+    { name: 'Adafruit', unit_cost: 4, currency_code: 'USD', kind: 'shop' },
+    { name: 'Pimoroni', unit_cost: 4.8, currency_code: 'GBP', kind: 'shop' },
+    { name: 'The Pi Hut', unit_cost: 4.2, currency_code: 'GBP', kind: 'shop' },
+    { name: 'Gone', unit_cost: 1, currency_code: 'GBP', kind: 'shop', unavailable_at: '2026-10-01' },
+    { name: 'Broken', unit_cost: 1, currency_code: 'GBP', kind: 'shop', is_broken: true },
+    { name: 'Datasheet', unit_cost: 0.5, currency_code: 'GBP', kind: 'datasheet' },
+    { name: 'No price', unit_cost: null, currency_code: 'GBP' },
+  ];
+  assert.deepEqual(BomSync.catalogPrice(shops, 'GBP'), { amount: 4.2, code: 'GBP', shop: 'The Pi Hut' });
+  assert.deepEqual(BomSync.catalogPrice(shops, ['EUR', 'GBP']), { amount: 4.2, code: 'GBP', shop: 'The Pi Hut' });
+  // Neither: the first shop's currency, not a cheaper number in another.
+  assert.deepEqual(BomSync.catalogPrice(shops, 'EUR'), { amount: 4, code: 'USD', shop: 'Adafruit' });
+  assert.deepEqual(BomSync.catalogPrice(shops.slice(1), null), { amount: 4.2, code: 'GBP', shop: 'The Pi Hut' });
+  assert.equal(BomSync.catalogPrice([], 'GBP'), null);
+  assert.equal(BomSync.catalogPrice(shops.slice(3), 'GBP'), null);
+});
+
+test('setRowPrice writes the price cell and adds a note', () => {
+  const md = pricedDoc();
+  const lines = md.split('\n');
+  const pico = lines.findIndex(l => l.includes('slug=pico'));
+  assert.deepEqual(BomSync.setRowPrice(md, 'pico', '£4.20'), {
+    line: pico, text: '| [Raspberry Pi Pico](/parts/view.html?slug=pico) | 1 | £4.20 |  |  |',
+  });
+  assert.deepEqual(BomSync.setRowPrice(md, 'pico', '£3.30', 'from $4.00'), {
+    line: pico, text: '| [Raspberry Pi Pico](/parts/view.html?slug=pico) | 1 | £3.30 |  | from $4.00 |',
+  });
+  const sg = BomSync.setRowPrice(md, 'SG90', '£2.50', 'from $3.10');
+  assert.equal(sg.text, '| [SG90](/parts/view.html?slug=sg90) | 2 | £2.50 | £6.00 | spare · from $3.10 |');
+  assert.equal(BomSync.setRowPrice(md, 'nope', '£1'), null);
+  // No closing pipe, no Notes column.
+  const open = doc('| Part | Price\n| --- | ---\n| [Pico](/parts/view.html?slug=pico) |');
+  assert.equal(BomSync.setRowPrice(open, 'pico', '£4.00', 'note'), null);
+  const open2 = doc('| Part | Price\n| --- | ---\n| [Pico](/parts/view.html?slug=pico) | 1');
+  assert.equal(BomSync.setRowPrice(open2, 'pico', '£4.00', 'note').text, '| [Pico](/parts/view.html?slug=pico) | £4.00 ');
+  // No Price column.
+  assert.equal(BomSync.setRowPrice(doc('| Part | Qty |\n| --- | --- |\n| [Pico](/parts/view.html?slug=pico) | 1 |'), 'pico', '£4'), null);
+});

@@ -866,6 +866,7 @@
       scheduleAutoTagDetection();
       scheduleBomTotals();
       scheduleBomLinks();
+      scheduleBomPrices();
       scheduleGalleryAddBar();
       schedulePinout();
     });
@@ -1802,7 +1803,7 @@
     tip.innerHTML =
       '<i class="fas fa-calculator" aria-hidden="true"></i>' +
       '<span>' + (priced
-        ? 'Each row\u2019s <strong>Total</strong> is Qty \u00d7 Price, and the <strong>Total</strong> row adds them up. The editor fills both in for you. Write prices with a dot, like 4.99, and pick a currency from the <strong>Price</strong> column\u2019s menu.'
+        ? 'Each row\u2019s <strong>Total</strong> is Qty \u00d7 Price, and the <strong>Total</strong> row adds them up. The editor fills both in for you. Write prices with a dot, like 4.99, and pick a currency from the <strong>Price</strong> column\u2019s menu. A part from the parts catalog brings its price with it.'
         : 'Add a <strong>Qty</strong> column and a <strong>Price</strong> column, and the editor adds a <strong>Total</strong> column and a <strong>Total</strong> row for you.') +
       '</span>' +
       '<button type="button" class="btn-close" aria-label="Hide this tip"></button>';
@@ -2728,6 +2729,225 @@
     bomTotalsTimer = setTimeout(applyBomTotals, 800);
   }
 
+  // --- Catalog prices in the Bill of Materials ---
+  //
+  // When a row of the Bill of Materials gets linked to a catalog part (the
+  // /part picker, Link…, Browse the catalog, the wiring panel, New part),
+  // its Price comes from the part's shops (BomSync.catalogPrice): a shop in
+  // the table's currency, the cheapest first. An empty Price cell is filled
+  // in; a price already typed is only replaced when they say so. A shop
+  // price in another currency is offered converted (CurrencyConvert, the
+  // projects API's free daily rates), with the shop's own price shown and
+  // kept in the row's Notes. The totals follow (applyBomTotals).
+  //
+  // Rows are told apart by the part they link: a part not linked when last
+  // looked is a new one. What the project opened with is left alone.
+  const partDetails = new Map(); // slug -> Promise<PartDetail | null>
+  function partDetail(slug) {
+    if (!partDetails.has(slug)) {
+      partDetails.set(slug, apiFetch(API + '/api/parts/' + encodeURIComponent(slug), { credentials: 'include' })
+        .then(resp => (resp && resp.ok ? resp.json() : null))
+        .catch(() => null));
+    }
+    return partDetails.get(slug);
+  }
+
+  async function convertPrice(amount, from, to) {
+    if (!window.CurrencyConvert) return null;
+    const out = await CurrencyConvert.convert(amount, from, to);
+    return out && out.amount != null ? out : null;
+  }
+
+  let bomPriceSeen = null; // the parts the table linked when last looked
+  const priceOffers = new Map(); // slug -> an offer waiting for their say
+  let bomPriceTimer = null;
+  function scheduleBomPrices() {
+    clearTimeout(bomPriceTimer);
+    bomPriceTimer = setTimeout(updateBomPrices, 700);
+  }
+
+  function linkedBomSlugs() {
+    const table = BomSync.linkedRows(mde.view.state.doc.toString());
+    return new Set(table ? table.rows.map(r => r.slug) : []);
+  }
+
+  function seedBomPrices() {
+    if (mde && mde.view) bomPriceSeen = linkedBomSlugs();
+  }
+
+  const samePrice = (a, b) => a && b && a.code === b.code && Math.abs(a.amount - b.amount) < 0.005;
+
+  async function updateBomPrices() {
+    if (!mde || !mde.view) return;
+    const now = linkedBomSlugs();
+    if (!bomPriceSeen) { bomPriceSeen = now; return; }
+    const added = [...now].filter(slug => !bomPriceSeen.has(slug));
+    bomPriceSeen = now;
+    for (const slug of [...priceOffers.keys()]) if (!now.has(slug)) priceOffers.delete(slug);
+    const filled = [];
+    // One after another, in the table's order: the first price can set
+    // the currency of a table that had none.
+    const details = await Promise.all(added.map(partDetail));
+    // For a table with no currency yet: the reader's own, from their profile.
+    const preferred = window.CurrencyConvert ? await CurrencyConvert.getPreferredCurrency().catch(() => null) : null;
+    for (let i = 0; i < added.length; i++) {
+      const slug = added[i];
+      const part = details[i];
+      if (!part) continue;
+      // The text may have moved on while the part loaded.
+      const table = BomSync.linkedRows(mde.view.state.doc.toString());
+      const row = table && table.hasPrice && table.rows.find(r => r.slug === slug);
+      if (!row) continue;
+      const want = table.currency;
+      const shop = BomSync.catalogPrice(part.suppliers, [want, preferred]);
+      if (!shop) continue;
+      const offer = { slug, name: row.name || part.name, shop, want, had: row.price, hadText: row.priceText, target: null, rate: null };
+      if (!want || shop.code === want) {
+        offer.target = { amount: shop.amount, code: shop.code };
+      } else {
+        const conv = await convertPrice(shop.amount, shop.code, want);
+        if (conv) {
+          offer.target = { amount: conv.amount, code: want };
+          offer.rate = conv;
+        }
+      }
+      if (row.price && samePrice(row.price, offer.target)) continue;
+      if (!row.priceText && offer.target && !offer.rate) {
+        if (applyPriceOffer(offer)) filled.push(offer);
+        continue;
+      }
+      priceOffers.set(slug, offer);
+    }
+    if (filled.length) {
+      const one = filled[0];
+      const message = filled.length === 1
+        ? 'Price filled in from the parts catalog: ' + one.name + ', ' + BomSync.formatPrice(one.target.amount, one.target.code) + (one.shop.shop ? ' at ' + one.shop.shop : '') + '.'
+        : 'Prices filled in from the parts catalog for ' + filled.length + ' parts.';
+      if (priceOffers.size) priceFilledNote = message;
+      else showToast(message);
+    }
+    drawPriceOffers();
+  }
+
+  // Writes the offer's price into its row (and, for a converted price, the
+  // shop's own price into the row's Notes). False when the row has gone.
+  function applyPriceOffer(offer) {
+    if (!offer.target) return false;
+    const view = mde.view;
+    const priceText = BomSync.formatPrice(offer.target.amount, offer.target.code);
+    const note = offer.rate ? 'converted from ' + BomSync.formatPrice(offer.shop.amount, offer.shop.code) : null;
+    const edit = BomSync.setRowPrice(view.state.doc.toString(), offer.slug, priceText, note);
+    if (!edit) return false;
+    const line = view.state.doc.line(edit.line + 1);
+    if (line.text !== edit.text) {
+      view.dispatch({ changes: { from: line.from, to: line.to, insert: edit.text }, userEvent: 'input.bomprice' });
+    }
+    scheduleBomTotals();
+    return true;
+  }
+
+  // The card at the top right listing the catalog prices that need their
+  // say, one row each, with the hints panel keeping count once it's closed.
+  let priceCardClosed = false;
+  let priceFilledNote = null; // what was filled in without asking, while the card is up
+  function drawPriceOffers() {
+    let card = document.getElementById('bom-price-offers');
+    const offers = [...priceOffers.values()];
+    if (!offers.length) {
+      if (card) card.remove();
+      priceCardClosed = false;
+      priceFilledNote = null;
+      setEditorHint('bom-prices', null);
+      return;
+    }
+    const n = offers.length;
+    setEditorHint('bom-prices', {
+      title: n === 1 ? 'A catalog price to check' : n + ' catalog prices to check',
+      detail: 'Parts you added to the Bill of Materials have prices in the parts catalog.',
+      actions: [{ label: 'Show', run: () => { priceCardClosed = false; drawPriceOffers(); } }],
+    });
+    if (priceCardClosed) { if (card) card.remove(); priceFilledNote = null; return; }
+    if (!card) {
+      card = document.createElement('div');
+      card.id = 'bom-price-offers';
+      card.className = 'bom-price-offers';
+      card.setAttribute('role', 'dialog');
+      card.setAttribute('aria-label', 'Catalog prices');
+      document.body.appendChild(card);
+    }
+    card.textContent = '';
+    const head = document.createElement('div');
+    head.className = 'bom-price-offers__head';
+    const title = document.createElement('span');
+    title.innerHTML = '<i class="fas fa-tag" aria-hidden="true"></i> ';
+    title.appendChild(document.createTextNode(n === 1 ? 'Catalog price' : n + ' catalog prices'));
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'btn-close';
+    close.setAttribute('aria-label', 'Close');
+    close.addEventListener('click', () => { priceCardClosed = true; drawPriceOffers(); });
+    head.append(title, close);
+    card.appendChild(head);
+    if (priceFilledNote) {
+      const done = document.createElement('p');
+      done.className = 'bom-price-offers__done';
+      done.textContent = priceFilledNote;
+      card.appendChild(done);
+    }
+    const button = (label, primary, run) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn btn-sm ' + (primary ? 'btn-success' : 'btn-outline-secondary');
+      b.textContent = label;
+      b.addEventListener('click', run);
+      return b;
+    };
+    const settle = slug => { priceOffers.delete(slug); drawPriceOffers(); };
+    offers.forEach(offer => {
+      const row = document.createElement('div');
+      row.className = 'bom-price-offers__row';
+      const text = document.createElement('p');
+      const shopPrice = BomSync.formatPrice(offer.shop.amount, offer.shop.code);
+      const strong = document.createElement('strong');
+      strong.textContent = offer.name;
+      text.appendChild(strong);
+      let words = ' is ' + shopPrice + (offer.shop.shop ? ' at ' + offer.shop.shop : '') + ' in the parts catalog';
+      if (offer.rate) {
+        words += ', about ' + BomSync.formatPrice(offer.target.amount, offer.target.code) + ' in your table’s currency';
+        if (offer.rate.fetched_at) words += ' (rate of ' + new Date(offer.rate.fetched_at).toLocaleDateString() + ')';
+      } else if (!offer.target) {
+        words += ', but there’s no exchange rate to ' + offer.want + ' right now, so it can’t be converted';
+      }
+      words += '.';
+      if (offer.hadText) words += ' You have ' + offer.hadText + '.';
+      text.appendChild(document.createTextNode(words));
+      const actions = document.createElement('div');
+      actions.className = 'bom-price-offers__actions';
+      if (offer.target) {
+        const use = BomSync.formatPrice(offer.target.amount, offer.target.code);
+        actions.appendChild(button((offer.rate ? 'Convert to ' : 'Use ') + use, true, () => {
+          if (!applyPriceOffer(offer)) showToast('That row isn’t in the Bill of Materials any more.');
+          settle(offer.slug);
+        }));
+        actions.appendChild(button(offer.hadText ? 'Keep ' + offer.hadText : 'Leave it empty', false, () => settle(offer.slug)));
+      } else {
+        actions.appendChild(button('OK', false, () => settle(offer.slug)));
+      }
+      row.append(text, actions);
+      card.appendChild(row);
+    });
+    const usable = offers.filter(o => o.target);
+    if (usable.length > 1) {
+      const all = document.createElement('div');
+      all.className = 'bom-price-offers__actions bom-price-offers__all';
+      all.appendChild(button('Use all ' + usable.length + ' catalog prices', true, () => {
+        usable.forEach(o => { applyPriceOffer(o); priceOffers.delete(o.slug); });
+        drawPriceOffers();
+      }));
+      card.appendChild(all);
+    }
+  }
+
   // --- Videos section (issue #171) ---
   //
   // Videos live in the document: `::: videos` blocks of YouTube links
@@ -3554,6 +3774,7 @@
     // its local draft back when that differs.
     if (projectId) await loadProject();
     initEditor();
+    seedBomPrices();
     scheduleBomTotals();
     loadStoredBom().catch(() => {});
     editorContainer.classList.remove('d-none');

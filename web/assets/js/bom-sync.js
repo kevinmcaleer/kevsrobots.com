@@ -378,6 +378,104 @@
     return null;
   }
 
+  // --- Catalog prices ---
+  //
+  // When a row of the Bill of Materials is linked to a catalog part, the
+  // editor fills its Price cell from the part's shops (catalogPrice), and
+  // asks first when the cell already has a price or the shop's currency
+  // isn't the table's.
+
+  // The table's rows that link a catalog part:
+  // [{ line, slug, price: { amount, code } | null, priceText }], line
+  // counted from 0. `hasPrice` says whether the table has a Price column;
+  // `currency` is the table's (tableCurrency), or null.
+  function linkedRows(markdown) {
+    const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return null;
+    const header = table.header.map(plain);
+    let partCol = header.findIndex(h => PART_COL.test(h));
+    if (partCol < 0) partCol = 0;
+    const priceCol = header.findIndex(h => PRICE_COL.test(h));
+    const tableCode = priceCol >= 0 ? headerCurrency(header[priceCol]) : null;
+    const rows = [];
+    table.rows.forEach((cells, r) => {
+      if (/^\*\*total\*\*$/i.test((cells[0] || '').trim())) return;
+      const link = (cells[partCol] || '').trim().match(/^\[((?:\\.|[^\]\\])*)\]\(([^)\s]+)[^)]*\)$/);
+      const slug = link && link[2].match(SLUG_RE);
+      if (!slug) return;
+      const text = priceCol >= 0 ? plain(cells[priceCol]) : '';
+      const p = text ? price(text) : null;
+      rows.push({
+        line: table.lines[r],
+        slug: slug[1].toLowerCase(),
+        name: plain(link[1].replace(/\\([\[\]\\])/g, '$1')),
+        price: p ? { amount: p.amount, code: p.code || tableCode } : null,
+        priceText: text,
+      });
+    });
+    return { hasPrice: priceCol >= 0, currency: tableCurrency([table.header, ...table.rows]), rows };
+  }
+
+  // The price to bring in from a catalog part's shops (PartDetail's
+  // suppliers): { amount, code, shop }, or null when no shop has one. Shops
+  // that are unavailable or whose link is broken are skipped. The cheapest
+  // shop in the first currency of `wants` (the table's, then the reader's
+  // own) that any shop prices in wins; else the cheapest in the currency
+  // of the first priced shop, as prices in different currencies can't be
+  // compared.
+  function catalogPrice(suppliers, wants) {
+    const shops = (suppliers || []).filter(s => (s.kind || 'shop') === 'shop' &&
+      s.unit_cost != null && isFinite(Number(s.unit_cost)) && s.currency_code &&
+      !s.unavailable_at && !s.is_broken);
+    if (!shops.length) return null;
+    const codeOfShop = s => String(s.currency_code).toUpperCase();
+    const order = [].concat(wants || []).filter(Boolean).map(c => String(c).toUpperCase());
+    const code = order.find(c => shops.some(s => codeOfShop(s) === c)) || codeOfShop(shops[0]);
+    const best = shops.filter(s => codeOfShop(s) === code)
+      .sort((a, b) => Number(a.unit_cost) - Number(b.unit_cost))[0];
+    return { amount: Number(best.unit_cost), code, shop: best.name || null };
+  }
+
+  // The row linking `slug` with its Price cell set to `priceText`, and
+  // `note` added to its Notes column when it has one: { line, text }, or
+  // null when there's no such row or no Price column.
+  function setRowPrice(markdown, slug, priceText, note) {
+    const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return null;
+    const header = table.header.map(plain);
+    let partCol = header.findIndex(h => PART_COL.test(h));
+    if (partCol < 0) partCol = 0;
+    const priceCol = header.findIndex(h => PRICE_COL.test(h));
+    if (priceCol < 0) return null;
+    const noteCol = header.findIndex(h => NOTE_COL.test(h));
+    const lines = String(markdown).split('\n');
+    for (let r = 0; r < table.rows.length; r++) {
+      const link = (table.rows[r][partCol] || '').trim().match(/^\[(?:\\.|[^\]\\])*\]\(([^)\s]+)[^)]*\)$/);
+      const m = link && link[1].match(SLUG_RE);
+      if (!m || m[1].toLowerCase() !== String(slug).toLowerCase()) continue;
+      const lineNo = table.lines[r];
+      const text = lines[lineNo];
+      const pipes = [...text.matchAll(/(?<!\\)\|/g)].map(x => x.index);
+      // Each cell's span between its pipes, so only the changed ones move.
+      const bounds = text.trim().startsWith('|') ? pipes : [-1, ...pipes];
+      const cells = [];
+      for (let c = 0; c + 1 < bounds.length || (bounds[c] !== undefined && text.slice(bounds[c] + 1).trim()); c++) {
+        cells.push({ from: bounds[c] + 1, to: bounds[c + 1] === undefined ? text.length : bounds[c + 1] });
+      }
+      const edits = [];
+      if (cells[priceCol]) edits.push({ ...cells[priceCol], insert: ' ' + priceText + ' ' });
+      else return null;
+      if (note && noteCol >= 0 && noteCol !== priceCol && cells[noteCol]) {
+        const had = text.slice(cells[noteCol].from, cells[noteCol].to).trim();
+        if (!had.includes(note)) edits.push({ ...cells[noteCol], insert: ' ' + (had ? had + ' · ' : '') + note + ' ' });
+      }
+      let out = text;
+      edits.sort((a, b) => b.from - a.from).forEach(e => { out = out.slice(0, e.from) + e.insert + out.slice(e.to); });
+      return { line: lineNo, text: out };
+    }
+    return null;
+  }
+
   // The text with totalsChanges applied, as the editor writes it.
   function withTotals(markdown) {
     const changes = totalsChanges(markdown);
@@ -400,7 +498,7 @@
 
   const api = {
     parse, linkRow, rowDetails, price, formatPrice, tableFromRows, totalsChanges, withTotals,
-    CURRENCIES, headerCurrency, withCurrency, tableCurrency, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
+    CURRENCIES, headerCurrency, withCurrency, tableCurrency, linkedRows, catalogPrice, setRowPrice, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
   };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.BomSync = api;

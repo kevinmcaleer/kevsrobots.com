@@ -396,6 +396,57 @@
   font-size: 0.8rem;
 }
 
+/* Catalog prices for parts just added to the Bill of Materials that need
+   a yes or no: a price already typed, or one in another currency. Top
+   right, where the editor's toasts show. */
+.bom-price-offers {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  max-height: 70vh;
+  overflow-y: auto;
+  z-index: 11000;
+  font-size: 0.875rem;
+}
+.bom-price-offers__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--kr-pop-border);
+  font-weight: 500;
+}
+.bom-price-offers__head i {
+  color: #8a5a00;
+}
+.bom-price-offers__done {
+  margin: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--kr-pop-border);
+  color: var(--kr-pop-muted);
+}
+.bom-price-offers__row {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--kr-pop-border);
+}
+.bom-price-offers__row:last-child {
+  border-bottom: 0;
+}
+.bom-price-offers__row p {
+  margin: 0 0 8px;
+}
+.bom-price-offers__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bom-price-offers__all {
+  padding: 10px 12px;
+}
+
 /* --- Project completeness meter (issue #137) --- */
 /* Pinned to the bottom right, above the Feedback button (which sits at
    bottom: 1.5rem). Collapses to just its header. */
