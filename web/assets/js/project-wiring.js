@@ -47,6 +47,39 @@
 
   const { BOM_LIB, hasPins, isBoard } = WiringBom;
 
+  // The server keeps only PNG/JPEG/GIF/WebP pictures in a saved diagram
+  // (svg_safety.clean_svg), so the placeholder cards, which are SVG, are
+  // drawn into PNGs first.
+  const pngs = new Map();
+  function svgToPng(src) {
+    if (!pngs.has(src)) {
+      pngs.set(src, new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = (img.naturalWidth || 300) * 2;
+          c.height = (img.naturalHeight || 200) * 2;
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          try { resolve(c.toDataURL('image/png')); } catch (_) { resolve(null); }
+        };
+        img.onerror = () => resolve(null);
+        img.src = src;
+      }));
+    }
+    return pngs.get(src);
+  }
+  async function rasterizeSvgImages(svgText) {
+    const re = /(href=")(data:image\/svg\+xml[^"]*)"/g;
+    const srcs = [...new Set([...svgText.matchAll(re)].map(m => m[2].replace(/&amp;/g, '&')))];
+    if (!srcs.length) return svgText;
+    const out = new Map();
+    await Promise.all(srcs.map(async src => out.set(src, await svgToPng(src))));
+    return svgText.replace(re, (all, pre, src) => {
+      const png = out.get(src.replace(/&amp;/g, '&'));
+      return png ? pre + png + '"' : all;
+    });
+  }
+
   function download(name, blob) {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -487,7 +520,7 @@
       status('Saving…');
       try {
         const data = handle.robot();
-        const svg = await handle.exportSvg();
+        const svg = await rasterizeSvgImages(await handle.exportSvg());
         const resp = await ctx.apiFetch(API + '/api/projects/' + projectId + '/wiring', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
