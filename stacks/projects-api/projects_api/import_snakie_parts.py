@@ -119,23 +119,55 @@ def _first_paragraph(text: Optional[str]) -> Optional[str]:
     return text or None
 
 
+SNAKIE_SOURCE_SUFFIX = " (Snakie)"
+
+
 async def _import_photo(
     session: AsyncSession, part: Part, folder: Path, raw: dict, source: str,
     report: Optional[ImportReport] = None,
 ) -> bool:
-    """Add the library's image as a photo, once. Returns whether it did."""
+    """Keep one copy of the library's image as a photo: the picture Snakie
+    draws the part with, which its pins are placed over. Returns whether
+    anything changed.
+
+    A part keeps a single library photo across library versions: a newer
+    picture replaces the file (and clears its licence, since it's a new
+    image), and copies left by older imports, which matched on the exact
+    library version, are removed."""
     image = raw.get("image")
     if not isinstance(image, str) or "/" in image:
         return False
     path = folder / image
     if not path.is_file() or path.suffix.lower() not in ALLOWED_IMAGE_EXTENSIONS:
         return False
-    existing = await session.scalar(
-        select(PartPhoto.id).where(PartPhoto.part_id == part.id, PartPhoto.source == source).limit(1)
-    )
-    if existing is not None:
-        return False
-    stored = save_file(path.read_bytes(), generate_filename(image, part.id), part.id, "part_images")
+    content = path.read_bytes()
+    existing = (await session.scalars(
+        select(PartPhoto)
+        .where(PartPhoto.part_id == part.id, PartPhoto.source.like("%" + SNAKIE_SOURCE_SUFFIX))
+        .order_by(PartPhoto.id.asc())
+    )).all()
+    changed = False
+    for extra in existing[1:]:
+        if extra.file_path:
+            delete_file(extra.file_path)
+        await session.delete(extra)
+        changed = True
+    if existing:
+        kept = existing[0]
+        if kept.file_path and read_file(kept.file_path) == content:
+            return changed
+        stored = save_file(content, generate_filename(image, part.id), part.id, "part_images")
+        if stored is None:
+            logger.warning("Could not store the image for %s", part.slug)
+            if report is not None:
+                report.photo_failed.append(part.slug)
+            return changed
+        if kept.file_path:
+            delete_file(kept.file_path)
+        kept.file_path, kept.external_url, kept.filename = stored, None, image
+        kept.source, kept.licence = source, None
+        return True
+    stored = save_file(content, generate_filename(image, part.id), part.id, "part_images")
     if stored is None:
         logger.warning("Could not store the image for %s", part.slug)
         if report is not None:

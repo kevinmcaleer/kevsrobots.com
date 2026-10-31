@@ -1245,6 +1245,18 @@ async def _definition_photo(session: AsyncSession, part: Part) -> Optional[PartP
     return photo if photo is not None and photo.part_id == part.id else None
 
 
+async def _snakie_photo(session: AsyncSession, part: Part) -> Optional[PartPhoto]:
+    """The picture imported from Snakie's library (``source`` "… (Snakie)").
+    A definition from Snakie has its pins placed over that picture, not over
+    the catalog's own product photos, so it comes before the cover."""
+    return await session.scalar(
+        select(PartPhoto)
+        .where(PartPhoto.part_id == part.id, PartPhoto.source.like("% (Snakie)"))
+        .order_by(PartPhoto.id.asc())
+        .limit(1)
+    )
+
+
 @router.get("/{slug}/parts.yml")
 async def export_parts_yml(
     slug: str,
@@ -1254,7 +1266,11 @@ async def export_parts_yml(
     as a community library. Image and mesh are absolute URLs."""
     part = await _get_part_by_slug(session, slug)
     base = get_settings().public_base_url.rstrip("/")
-    cover = await _definition_photo(session, part) or await _cover_photo(session, part)
+    cover = (
+        await _definition_photo(session, part)
+        or await _snakie_photo(session, part)
+        or await _cover_photo(session, part)
+    )
     image_url = None
     if cover is not None:
         image_url = cover.external_url or f"{base}/api/parts/{part.slug}/photos/{cover.id}/view"
