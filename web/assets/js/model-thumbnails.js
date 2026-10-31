@@ -194,8 +194,8 @@
     return viewer;
   }
 
-  // Show the STL at `url` (fetched with credentials, so a draft's author
-  // sees theirs). `downloadUrl` is the counted download link.
+  // Show the STL at `url` (fetched with credentials or the dev token, so a
+  // draft's author sees theirs). `downloadUrl` is the counted download link.
   async function openViewer({ url, name, downloadUrl }) {
     const v = viewerShell();
     if (v.close) v.close();
@@ -224,7 +224,12 @@
 
     try {
       const THREE = await loadThree();
-      const resp = await fetch(url, { credentials: 'include' });
+      // Through ProjectAuth where the page has it: a draft's files are its
+      // author's alone, and with a dev token (local http) the login cookie
+      // isn't sent, so a plain fetch gets a 404.
+      const resp = window.ProjectAuth
+        ? await ProjectAuth.apiFetch(url, {})
+        : await fetch(url, { credentials: 'include' });
       if (!resp.ok) throw new Error('Could not load the model (' + resp.status + ')');
       const buffer = await resp.arrayBuffer();
       if (closed) return;
