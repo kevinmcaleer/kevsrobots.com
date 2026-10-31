@@ -774,6 +774,8 @@
       // A tip on Qty, Price and the automatic totals above the Bill of Materials table.
       tableNote: ({ rows, heading }) => bomTableTip(rows, heading),
       slashCommands: ProjectSlashCommands.create(slashContext()),
+      // Project topics in the ? Markdown guide, after the editor's own.
+      guide: projectGuideTopics(),
       proofing: { languageApiBase: LANGUAGE_API, languageApi: languageRequest },
     });
 
@@ -792,6 +794,50 @@
     // For the TOC in editor.html and other page scripts.
     window.projectMarkdownEditor = mde;
     document.dispatchEvent(new CustomEvent('project-markdown-editor:ready', { detail: mde }));
+  }
+
+  // The ? guide's project topics: the sections a project page knows, and
+  // what the Bill of Materials, Videos and diagram blocks do with them.
+  function projectGuideTopics() {
+    const heading = id => '## ' + ProjectSections.get(id).heading;
+    return [
+      {
+        title: 'Project sections',
+        rows: [
+          ['/', 'Type / on a new line to add a section, a part, a video, a file or a diagram'],
+          [heading('bill-of-materials'), 'The parts list, as a table'],
+          [heading('assembly-instructions'), 'How to build it, step by step'],
+          [heading('wiring'), 'The wiring diagram, drawn in the wiring workspace'],
+          [heading('code-repository'), 'A link to your code repository'],
+          [heading('3d-printed-parts'), 'Your STL files'],
+          [heading('videos'), 'A table of YouTube links'],
+        ],
+        note: 'These headings fill the page navigation and the completeness check.',
+      },
+      {
+        title: 'Bill of Materials',
+        rows: [
+          ['| Part | Qty | Price |', 'Add Qty and Price columns: a Total column and a Total row are filled in for you'],
+          ['4.99', 'Write prices with a dot'],
+          ['[Pico](/parts/view.html?slug=pico)', 'A link to a catalog part shows its picture and details (type / then Part)'],
+        ],
+      },
+      {
+        title: 'Videos',
+        rows: [
+          ['| Video | Title |', 'Under ## Videos, each row\u2019s YouTube link shows as a thumbnail card'],
+          ['https://youtu.be/\u2026', 'A YouTube link on a line of its own plays in the page'],
+        ],
+      },
+      {
+        title: 'Diagrams',
+        rows: [
+          ['```mermaid', 'A Mermaid diagram: code and drawing side by side while you edit it, just the drawing otherwise'],
+          ['Open in Mermaid Factory', 'Edit it by clicking the shapes, then Save to bring it back'],
+        ],
+        note: 'The diagram button on the toolbar, or / then Mermaid diagram, starts one from 28 templates.',
+      },
+    ];
   }
 
   // The editor's language requests, through apiFetch so the dev token goes too.
