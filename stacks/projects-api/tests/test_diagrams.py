@@ -72,3 +72,18 @@ async def test_owner_only_and_bad_input(client, project_id) -> None:
     # Another project's diagram id isn't reachable through this one.
     other_proj = (await client.post("/api/projects", json={"title": "Other"}, headers=h)).json()["id"]
     assert (await client.get(f"/api/projects/{other_proj}/diagrams/{did}")).status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_draft_diagram_exports_are_never_cached(client) -> None:
+    h = make_auth_header()
+    pid = (await client.post("/api/projects", json={"title": "Secret drawing", "status": "draft"}, headers=h)).json()["id"]
+    did = (await client.post(f"/api/projects/{pid}/diagrams", json={"title": "Arm", "data": CANVAS}, headers=h)).json()["id"]
+    unexported = await client.get(f"/api/projects/{pid}/diagrams/{did}.svg", headers=h)
+    assert unexported.status_code == 404 and "no-store" in unexported.headers["cache-control"]
+    await client.put(f"/api/projects/{pid}/diagrams/{did}", json={"data": CANVAS, "svg": SVG, "png": PNG}, headers=h)
+    for ext in ("svg", "png"):
+        hidden = await client.get(f"/api/projects/{pid}/diagrams/{did}.{ext}")
+        assert hidden.status_code == 404 and "no-store" in hidden.headers["cache-control"]
+        own = await client.get(f"/api/projects/{pid}/diagrams/{did}.{ext}", headers=h)
+        assert own.status_code == 200 and own.headers["cache-control"] == "private, no-store"

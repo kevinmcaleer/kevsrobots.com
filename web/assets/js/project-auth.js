@@ -43,7 +43,9 @@ var ProjectAuth = (function() {
 
   function blobUrlFor(url) {
     if (!blobUrls[url]) {
-      blobUrls[url] = apiFetch(url).then(function(resp) {
+      // no-store: skip any 404 the browser kept from the <img> request
+      // that went without the token (the API used to let it be cached).
+      blobUrls[url] = apiFetch(url, { cache: 'no-store' }).then(function(resp) {
         if (!resp.ok) throw new Error(resp.status);
         return resp.blob();
       }).then(function(blob) {

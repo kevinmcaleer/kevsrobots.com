@@ -36,7 +36,7 @@ from ..schemas import (
 )
 from ..storage import delete_file, read_file, save_file
 from ..svg_safety import SVG_CSP, UnsafeSvg, clean_svg
-from ..visibility import hide_drafts
+from ..visibility import NO_STORE, hide_drafts
 
 router = APIRouter(prefix="/api/projects/{project_id}/diagrams", tags=["diagrams"])
 
@@ -54,10 +54,12 @@ async def _owned_project(session: AsyncSession, project_id: int, user: str) -> P
     return project
 
 
-async def _diagram(session: AsyncSession, project_id: int, diagram_id: int) -> ProjectDiagram:
+async def _diagram(
+    session: AsyncSession, project_id: int, diagram_id: int, no_store: bool = False
+) -> ProjectDiagram:
     d = await session.get(ProjectDiagram, diagram_id)
     if d is None or d.project_id != project_id:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Diagram not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Diagram not found", headers=NO_STORE if no_store else None)
     return d
 
 
@@ -131,11 +133,12 @@ async def create_diagram(
     return _full(d)
 
 
-def _file_response(path: Optional[str], media_type: str, extra: Optional[dict] = None) -> Response:
+def _file_response(path: Optional[str], media_type: str, draft: bool, extra: Optional[dict] = None) -> Response:
     data = read_file(path) if path else None
     if data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="This diagram hasn't been exported yet")
-    headers = {"X-Content-Type-Options": "nosniff", "Cache-Control": "public, max-age=60"}
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="This diagram hasn't been exported yet", headers=NO_STORE)
+    cache = NO_STORE["Cache-Control"] if draft else "public, max-age=60"
+    headers = {"X-Content-Type-Options": "nosniff", "Cache-Control": cache}
     headers.update(extra or {})
     return Response(content=data, media_type=media_type, headers=headers)
 
@@ -148,9 +151,9 @@ async def get_diagram_svg(
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
 ) -> Response:
-    await hide_drafts(session, project_id, user)
-    d = await _diagram(session, project_id, diagram_id)
-    return _file_response(d.svg_path, "image/svg+xml", {"Content-Security-Policy": SVG_CSP})
+    draft = await hide_drafts(session, project_id, user, no_store=True)
+    d = await _diagram(session, project_id, diagram_id, no_store=True)
+    return _file_response(d.svg_path, "image/svg+xml", draft, {"Content-Security-Policy": SVG_CSP})
 
 
 @router.get("/{diagram_id}.png")
@@ -160,9 +163,9 @@ async def get_diagram_png(
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
 ) -> Response:
-    await hide_drafts(session, project_id, user)
-    d = await _diagram(session, project_id, diagram_id)
-    return _file_response(d.png_path, "image/png")
+    draft = await hide_drafts(session, project_id, user, no_store=True)
+    d = await _diagram(session, project_id, diagram_id, no_store=True)
+    return _file_response(d.png_path, "image/png", draft)
 
 
 @router.get("/{diagram_id}", response_model=ProjectDiagramResponse)
