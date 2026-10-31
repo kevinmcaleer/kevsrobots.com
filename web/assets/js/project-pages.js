@@ -13,10 +13,13 @@
 // `auto`: then a long write-up is split before its top-level headings,
 // keeping each page to a reasonable length.
 //
-// ProjectPages.paginate(contentEl, { auto, autoWords, minWords, pagerEl })
+// ProjectPages.paginate(contentEl, { auto, autoWords, minWords, pagerEl, endEl })
 //   Wraps the content's pages in <section class="kr-page"> and shows one
 //   at a time, with Previous / 1 2 3 / Next and "View as one page" in
-//   pagerEl. Returns null when there is only one page, else
+//   pagerEl. endEl, if given, is what follows the text (files and models,
+//   comments...): it belongs to the last page, so it shows only there
+//   and in the one-page view, and links into it open the last page.
+//   Returns null when there is only one page, else
 //   { count, current(), show(n), pageOf(el), reveal(id), oneView() }.
 //
 // URLs: #page-2 opens page 2; #<heading-id> opens the page holding that
@@ -153,6 +156,7 @@
 
     function apply() {
       sections.forEach((s, i) => { s.hidden = !oneView && i + 1 !== current; });
+      if (opts.endEl) opts.endEl.hidden = !oneView && current !== sections.length;
       contentEl.classList.toggle('kr-paged-all', oneView);
       drawPager();
       contentEl.dispatchEvent(new CustomEvent('kr-page-change', { detail: { page: current, oneView } }));
@@ -173,7 +177,9 @@
     }
 
     function pageOf(el) {
-      const s = el && el.closest && el.closest('.kr-page');
+      if (!el) return null;
+      if (opts.endEl && opts.endEl.contains(el)) return sections.length;
+      const s = el.closest && el.closest('.kr-page');
       return s && sections.includes(s) ? Number(s.dataset.page) : null;
     }
 
