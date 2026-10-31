@@ -800,9 +800,10 @@
   font-size: 0.8em;
 }
 
-/* Part links (issue #263): a link to a catalog part is a chip (square-ish
-   corners, no fill) with a large thumbnail of the
-   part's photo, in the editor's live view and on the project page.
+/* Part links (issue #263): a link to a catalog part shows a large
+   thumbnail of the part's photo before its name, with no outline box or
+   padding (so a linked BOM row is no taller than its picture needs), in the
+   editor's live view and on the project page.
    part-links.js adds a rule per part giving ::before its photo. */
 .cm-content .cm-md-link[data-href*="/parts/view.html?slug="],
 .cm-content a[href*="/parts/view.html?slug="],
@@ -812,10 +813,10 @@ a.part-link,
   align-items: center;
   vertical-align: middle;
   max-width: 100%;
-  padding: 0.15em 0.5em 0.15em 0.15em;
-  border-radius: 5px;
+  padding: 0;
+  border-radius: 4px;
   background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.14);
+  border: 0;
   color: #1f5f2a;
   text-decoration: none;
   white-space: nowrap;
@@ -842,8 +843,9 @@ a.part-link::before {
 }
 a.part-link:hover,
 .project-prose a.part-link:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: transparent;
   color: #1f5f2a;
+  text-decoration: underline;
 }
 
 /* What hovering a part link shows. */
