@@ -771,6 +771,8 @@
         const items = ProjectEmbeds.videoTableItems(rows);
         return items.length ? ProjectEmbeds.videoCards(items) : null;
       },
+      // A tip on Qty, Price and the automatic totals above the Bill of Materials table.
+      tableNote: ({ rows, heading }) => bomTableTip(rows, heading),
       slashCommands: ProjectSlashCommands.create(slashContext()),
       proofing: { languageApiBase: LANGUAGE_API, languageApi: languageRequest },
     });
@@ -1350,6 +1352,56 @@
     clearTimeout(bomLinksTimer);
     bomLinksTimer = setTimeout(updateBomLinkBar, 1000);
   }
+
+  // --- Bill of Materials tip ---
+  //
+  // Above the Bill of Materials table in the editor: what the Qty and Price
+  // columns do (BomSync.totalsChanges keeps the Total column and row). It
+  // can be closed (remembered on this device); the hints panel brings it
+  // back. Closing hides it with a class rather than redrawing, because the
+  // editor only redraws its tables when the text changes.
+  const BOM_TIP_CLOSED_KEY = 'projectEditor.bomTipClosed';
+  let bomTipClosed = false;
+  try { bomTipClosed = localStorage.getItem(BOM_TIP_CLOSED_KEY) === '1'; } catch (e) {}
+
+  function bomTableTip(rows, heading) {
+    const section = heading && ProjectSections.match(heading);
+    if (!section || section.id !== 'bill-of-materials') return null;
+    const header = (rows[0] || []).map(h => h.replace(/[*_`]/g, '').trim().toLowerCase());
+    const priced = header.some(h => /^(qty|quantity|count)$/.test(h)) &&
+      header.some(h => /^(price|unit price|price each|each|cost|unit cost)$/.test(h));
+    const tip = document.createElement('div');
+    tip.className = 'kr-notice bom-table-tip';
+    tip.setAttribute('role', 'note');
+    tip.innerHTML =
+      '<i class="fas fa-calculator" aria-hidden="true"></i>' +
+      '<span>' + (priced
+        ? 'Each row\u2019s <strong>Total</strong> is Qty \u00d7 Price, and the <strong>Total</strong> row adds them up. The editor fills both in for you. Write prices with a dot, like 4.99.'
+        : 'Add a <strong>Qty</strong> column and a <strong>Price</strong> column, and the editor adds a <strong>Total</strong> column and a <strong>Total</strong> row for you.') +
+      '</span>' +
+      '<button type="button" class="btn-close" aria-label="Hide this tip"></button>';
+    tip.querySelector('.btn-close').addEventListener('click', () => setBomTipClosed(true));
+    return tip;
+  }
+
+  function setBomTipClosed(closed) {
+    bomTipClosed = closed;
+    try {
+      if (closed) localStorage.setItem(BOM_TIP_CLOSED_KEY, '1');
+      else localStorage.removeItem(BOM_TIP_CLOSED_KEY);
+    } catch (e) {}
+    contentEditor.classList.toggle('bom-tip-closed', closed);
+    setEditorHint('bom-tip', closed ? {
+      title: 'Bill of Materials totals',
+      detail: 'Add Qty and Price columns to the Bill of Materials table, and a Total column and row are added for you.',
+      actions: [{ label: 'Show the tip', run: () => {
+        setBomTipClosed(false);
+        const tip = contentEditor.querySelector('.bom-table-tip');
+        if (tip) tip.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } }],
+    } : null);
+  }
+  if (bomTipClosed) setBomTipClosed(true);
 
   // --- Bill of Materials sync (issue #264) ---
   //

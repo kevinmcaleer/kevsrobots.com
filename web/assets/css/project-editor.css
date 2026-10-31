@@ -1015,6 +1015,15 @@ a.part-link:hover,
   display: none;
 }
 
+/* Above the Bill of Materials table in the editor: what Qty and Price do.
+   Closed, it's hidden by this class until the hints panel shows it again. */
+.kr-notes .bom-table-tip {
+  margin: 0;
+}
+.bom-tip-closed .cm-md-table-note:has(.bom-table-tip) {
+  display: none;
+}
+
 /* --- The Notes look on the editor page (issue #272) ---
    Tokens and shared components are in project-notes.css. */
 
