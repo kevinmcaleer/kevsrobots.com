@@ -28,7 +28,13 @@ var ProjectAuth = (function() {
   // dev token there's no cookie and an <img> can't send the header, so
   // the API sees a stranger and the picture breaks. With a dev token,
   // fetch those pictures with it and show them from a blob URL instead.
-  var PRIVATE_IMAGE_RE = /^https:\/\/projects\.kevsrobots\.com\/api\/(projects|makes)\/\d+\/(images|files)\/\d+\/(view|thumbnail)\b/;
+  // That covers uploaded images and file thumbnails, and the drawings the
+  // API renders: the wiring diagram (#268) and diagram exports (#270).
+  var PRIVATE_IMAGE_RE = new RegExp('^https://projects\\.kevsrobots\\.com/api/(?:' + [
+    '(?:projects|makes)/\\d+/(?:images|files)/\\d+/(?:view|thumbnail)\\b',
+    'projects/\\d+/wiring\\.svg(?:[?#]|$)',
+    'projects/\\d+/diagrams/\\d+\\.(?:svg|png)(?:[?#]|$)',
+  ].join('|') + ')');
   var blobUrls = {}; // api url -> Promise of a blob: url
 
   function isPrivateImageUrl(url) {
