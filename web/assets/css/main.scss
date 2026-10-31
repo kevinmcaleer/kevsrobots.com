@@ -414,6 +414,23 @@ h1, h2, h3, h4 {
   }
 }
 
+// The real cause of the overlap: the site-wide `i { width: 16px !important }`
+// (for the nav icons, further down) squeezes a heading's icon box to 16px.
+// At h1's 40pt the glyph is ~60px wide and spills out of that box, so the
+// title starts on top of it however much gap or margin follows the box.
+// Let heading icons size to their glyph. Fixes every page using the
+// <h1><i class="fas fa-…"></i> Title layout (Parts Catalog, admin pages…).
+h1, h2, h3, h4, h5, h6 {
+  > .fas:first-child,
+  > .far:first-child,
+  > .fab:first-child,
+  > .fa-solid:first-child,
+  > .fa-regular:first-child,
+  > .fa-brands:first-child {
+    width: auto !important;
+  }
+}
+
 // Smaller headings (h5/h6 — card titles, comment author lines, etc.) don't
 // have the negative letter-spacing of h1-h4, so they need less space — but
 // the default `me-1` Bootstrap utility (0.25rem) still has the icon hug
