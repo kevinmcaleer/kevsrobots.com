@@ -362,6 +362,16 @@
   font-weight: 600;
 }
 
+/* Column widths from the delimiter row's dashes (project-table-widths.js):
+   each column takes its share of the full width. */
+.project-prose table.has-widths {
+  table-layout: fixed;
+}
+
+.project-prose table.has-widths :is(th, td) {
+  overflow-wrap: break-word;
+}
+
 /* A table of images is a grid of cards (image-grid.css): the table rules
    above give way to it, keeping only the space around the block. */
 .project-prose table.image-grid {
@@ -475,6 +485,15 @@
   .project-prose table {
     display: block;
     overflow-x: auto;
+  }
+
+  /* Phones keep the sideways scroll; widths only apply from 576px up. */
+  .project-prose table.has-widths {
+    table-layout: auto;
+  }
+
+  .project-prose table.has-widths col {
+    width: auto !important;
   }
 
   /* A grid of images still fits the box, its cards just narrower. */

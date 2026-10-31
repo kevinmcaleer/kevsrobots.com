@@ -710,7 +710,9 @@ description: View project details
     border-color: #4A90D9 !important;
   }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@18.1.2/lib/marked.umd.js"></script>
+<!-- Table column widths from the delimiter row's dashes (before any marked.parse). -->
+<script src="/assets/js/project-table-widths.js?v={{ site.time | date: '%s' }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
