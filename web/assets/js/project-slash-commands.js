@@ -409,9 +409,9 @@
     }
 
     // Gallery asks for a layout, then writes a `::: gallery <layout>` block
-    // of every picture in the project's gallery, in its order. Choosing and
-    // ordering is then deleting and moving lines (ProjectGallery,
-    // project-gallery.js). Its heading goes in once; later picks add just
+    // of every picture uploaded to the project, in its order. Pictures are
+    // then added, removed and reordered with the gallery's own buttons in
+    // the editor (or by editing its lines; ProjectGallery, project-gallery.js). Its heading goes in once; later picks add just
     // another block, so it is never hidden.
     const gallery = sections.find(c => c.id === 'section-gallery');
     if (gallery) {

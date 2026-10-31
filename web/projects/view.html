@@ -162,10 +162,11 @@ description: View project details
         <!-- Rendered markdown -->
         <div id="view-content" class="project-doc project-prose mb-4"></div>
 
-        <!-- Images -->
+        <!-- Pictures from the retired Images section: shown as a gallery
+             only while the project's text has no gallery of its own. -->
         <section id="view-images-section" class="kr-section d-none">
-          <h2 class="kr-section-title"><i class="fas fa-camera" aria-hidden="true"></i> Images</h2>
-          <div id="view-images" class="row g-2"></div>
+          <h2 class="kr-section-title"><i class="fas fa-images" aria-hidden="true"></i> Gallery</h2>
+          <div id="view-images"></div>
         </section>
 
 
@@ -621,12 +622,7 @@ description: View project details
   .view-meta-row .tag-badge:hover {
     background: #d6ebfb;
   }
-  .view-gallery-thumb {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    cursor: pointer;
-  }
+
 
   /* Showcase-style metadata strip under the title */
   .project-meta-strip {
@@ -1060,7 +1056,7 @@ description: View project details
 
       loadBOM();
       loadFiles();
-      loadImages();
+      loadImages(project);
       loadLinks();
       if (viewMode === 'markdown') loadLegacySchematic();
       loadVideos();
@@ -1666,26 +1662,25 @@ description: View project details
     try { buildTOC(); } catch (e) {}
   }
 
-  async function loadImages() {
+  // The Images section under the page is retired: pictures go in a
+  // `::: gallery` block in the text. Until the owner adds one, uploads the
+  // text doesn't show still appear, as a gallery in its place.
+  async function loadImages(project) {
+    const markdown = (project && project.content_md) || '';
+    if (/^[ \t]{0,3}:::[ \t]*gallery\b/im.test(markdown)) return;
     const resp = await fetch(API + '/api/projects/' + projectId + '/images', { credentials: 'include' });
-    const images = await resp.json();
+    if (!resp.ok) return;
+    const images = (await resp.json()).filter(img => !markdown.includes('/images/' + img.id + '/view'));
     if (images.length === 0) return;
-    document.getElementById('view-images-section').classList.remove('d-none');
-    const viewerImages = images.map(img => ({
-      url: API + '/api/projects/' + projectId + '/images/' + img.id + '/view',
-      alt: img.filename
-    }));
-    document.getElementById('view-images').innerHTML = images.map((img, idx) => `
-      <div class="col-6 col-md-4 col-lg-3">
-        <img src="${API}/api/projects/${projectId}/images/${img.id}/view"
-             class="view-gallery-thumb rounded" alt="${esc(img.filename)}"
-             style="cursor:pointer" data-view-idx="${idx}">
-      </div>
-    `).join('');
-    document.getElementById('view-images').addEventListener('click', e => {
-      const img = e.target.closest('[data-view-idx]');
-      if (img) ImageViewer.open(viewerImages, parseInt(img.dataset.viewIdx));
-    });
+    const section = document.getElementById('view-images-section');
+    const holder = document.getElementById('view-images');
+    holder.innerHTML = ProjectGallery.html('filmstrip', images.map(img => ({
+      src: API + '/api/projects/' + projectId + '/images/' + img.id + '/view',
+      alt: img.caption || img.filename || '',
+      title: '',
+    })));
+    ProjectGallery.render(holder);
+    section.classList.remove('d-none');
   }
 
   // Issue #171: render embedded YouTube videos above the description.
