@@ -10,6 +10,7 @@ as Markdown Studio's own server (``proofing/languageApi.ts``):
 - ``POST /api/language/check``                grammar, proxied to LanguageTool
 - ``GET  /api/language/translate/languages``  LibreTranslate's languages (off by default)
 - ``POST /api/language/translate``            a translation (off by default)
+- ``POST /api/language/rewrite``              one sentence rewritten by Claude (off by default)
 
 Every endpoint needs a signed-in user and is rate limited per user, so the
 service can't be used as an open LanguageTool proxy.
@@ -29,6 +30,7 @@ from pydantic import BaseModel, Field
 from .auth import get_current_user
 from .config import Settings
 from .ratelimit import RateLimiter
+from .rewrite import MAX_SENTENCE, RewriteRequest, client_for, rewrite
 from .wordnet import WordNet
 
 log = logging.getLogger(__name__)
@@ -64,7 +66,12 @@ class TranslateRequest(BaseModel):
 class Language:
     """The services this server has, and the clients that reach them."""
 
-    def __init__(self, settings: Settings, transport: httpx.AsyncBaseTransport | None = None):
+    def __init__(
+        self,
+        settings: Settings,
+        transport: httpx.AsyncBaseTransport | None = None,
+        claude: Any = None,
+    ):
         self.settings = settings
         self.languagetool_url = settings.languagetool_url.rstrip("/")
         self.libretranslate_url = settings.libretranslate_url.rstrip("/")
@@ -72,6 +79,8 @@ class Language:
         self.wordnet = WordNet.open(settings.wordnet_dir)
         self.transport = transport
         self.limiter = RateLimiter()
+        # An Anthropic client for rewrites; tests pass a stand-in.
+        self.claude = claude if claude is not None else client_for(settings.anthropic_api_key)
         self._languages: tuple[float, list[dict]] | None = None
         if settings.wordnet_dir and self.wordnet is None:
             log.warning("WordNet isn't at %s, so Look Up is off", settings.wordnet_dir)
@@ -84,6 +93,7 @@ class Language:
             "lookup": self.wordnet is not None,
             "grammar": bool(self.languagetool_url),
             "translate": bool(self.libretranslate_url),
+            "rewrite": self.claude is not None,
         }
 
     async def check(self, body: CheckRequest) -> list[dict]:
@@ -203,5 +213,19 @@ def make_router(language: Language) -> APIRouter:
             raise HTTPException(status_code=400, detail="That's too much text to translate at once.")
         language.limiter.hit(user, "translate", settings.translate_per_minute)
         return await upstream(language.translate(body), "translation")
+
+    @router.post("/api/language/rewrite")
+    async def rewrite_sentence(body: RewriteRequest, user: str = Depends(get_current_user)):
+        """One sentence in the active voice. The editor shows it before changing anything."""
+        if language.claude is None:
+            raise unavailable("Rewriting")
+        if body.language not in LANGUAGES:
+            raise HTTPException(status_code=400, detail="Unsupported language.")
+        if not body.text.strip():
+            raise HTTPException(status_code=400, detail="There's no sentence to rewrite.")
+        if len(body.text) > MAX_SENTENCE:
+            raise HTTPException(status_code=400, detail="That sentence is too long to rewrite.")
+        language.limiter.hit(user, "rewrite", settings.rewrite_per_minute)
+        return {"text": await rewrite(language.claude, settings.rewrite_model, body)}
 
     return router

@@ -21,6 +21,7 @@ CHECK = {"language": "en-GB", "annotation": [{"text": "This bots "}, {"markup": 
         ("GET", "/api/language/define?word=dog", None),
         ("POST", "/api/language/check", CHECK),
         ("POST", "/api/language/translate", {"text": "hi", "target": "fr"}),
+        ("POST", "/api/language/rewrite", {"text": "It was written by Kev."}),
     ],
 )
 async def test_every_endpoint_needs_a_session(client, upstream, method, path, body):
@@ -39,12 +40,12 @@ async def test_the_session_cookie_works(client):
 
 async def test_health_is_public(client):
     response = await client.get("/health")
-    assert response.json() == {"status": "ok", "lookup": True, "grammar": True, "translate": False}
+    assert response.json() == {"status": "ok", "lookup": True, "grammar": True, "translate": False, "rewrite": False}
 
 
 async def test_features(client):
     response = await client.get("/api/language", headers=AUTH)
-    assert response.json() == {"lookup": True, "grammar": True, "translate": False}
+    assert response.json() == {"lookup": True, "grammar": True, "translate": False, "rewrite": False}
 
 
 async def test_cors_allows_the_site_with_credentials(client):
