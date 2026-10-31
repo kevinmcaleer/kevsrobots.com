@@ -785,6 +785,9 @@
       // Project topics in the ? Markdown guide, after the editor's own.
       guide: projectGuideTopics(),
       proofing: { languageApiBase: LANGUAGE_API, languageApi: languageRequest },
+      // Canonical sections (Bill of Materials, Wiring…) are # headings, so a
+      // project has several H1s on purpose: no "More than one H1" hint.
+      lintSkip: ['multiple-h1'],
     });
 
     mde.on('change', () => {
