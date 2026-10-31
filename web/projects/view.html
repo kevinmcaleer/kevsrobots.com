@@ -900,6 +900,10 @@ description: View project details
       const resp = await fetch(fetchUrl, { credentials: 'include' });
       if (!resp.ok) throw new Error('Not found');
       const project = await resp.json();
+      // #todo notes are the writer's reminders, not part of the page: take
+      // them out once, here, so nothing below (the write-up, its pages, the
+      // read time, the Download files README) ever sees them.
+      if (window.ProjectTodos) project.content_md = ProjectTodos.strip(project.content_md);
 
       // Backfill projectId from the response so the rest of this page
       // (which still issues id-based API calls) just works.
@@ -1003,8 +1007,7 @@ description: View project details
         buildTOC();
       } else if (project.content_md) {
         const contentEl = document.getElementById('view-content');
-        // #todo notes are the writer's reminders, not part of the page.
-        contentEl.innerHTML = marked.parse(window.ProjectTodos ? ProjectTodos.strip(project.content_md) : project.content_md);
+        contentEl.innerHTML = marked.parse(project.content_md);
         ProjectImageSizes.render(contentEl);
         ProjectImageGrid.render(contentEl);
         ProjectGallery.render(contentEl);
@@ -1861,7 +1864,7 @@ description: View project details
           <span class="badge ${statusClasses[e.status] || 'bg-secondary'} small">${statusLabels[e.status] || e.status}</span>
         </div>
         <small class="text-muted">${new Date(e.created_at).toLocaleDateString()}</small>
-        ${e.content_md ? `<div class="small mt-1">${marked.parse(e.content_md)}</div>` : ''}
+        ${e.content_md ? `<div class="small mt-1">${marked.parse(window.ProjectTodos ? ProjectTodos.strip(e.content_md) : e.content_md)}</div>` : ''}
       </div>
     `).join('');
     styleMarkdownTables(journalEl);

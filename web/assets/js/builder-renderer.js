@@ -56,6 +56,8 @@
     var type = step.step_type || 'photo';
     if (type === 'text') {
       var body = step.body || '';
+      // #todo notes are the writer's reminders, kept off the page.
+      if (window.ProjectTodos) body = window.ProjectTodos.strip(body);
       return '<div class="builder-step-text">' +
         (body && window.marked ? window.marked.parse(body)
                                : (body ? esc(body)
