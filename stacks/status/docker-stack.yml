@@ -39,7 +39,7 @@ services:
 
   cloudflared:
     image: cloudflare/cloudflared:latest
-    # ``--edge-ip-version 4`` forces IPv4. See docker-compose.prod.yml
+    # ``--edge-ip-version 4`` forces IPv4. See docker-compose.yml
     # comment / CLAUDE.md for the rationale (a Pi power-cut can leave
     # IPv6 up without a route, wedging the tunnel).
     command: tunnel --no-autoupdate --edge-ip-version 4 run
