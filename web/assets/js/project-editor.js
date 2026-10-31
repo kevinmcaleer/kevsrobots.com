@@ -591,6 +591,8 @@
   const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // the API's max_image_size
   // Mermaid Factory's mermaid-tools (scripts/update-mermaid-tools.sh).
   const MERMAID_TOOLS_URL = '/assets/js/mermaid-tools/mermaid-tools.js';
+  // Layers, the graphic editor behind /Graphic (scripts/update-layers.sh).
+  const LAYERS_URL = '/assets/js/layers/layers.js';
   // Where a diagram block's "Open in Mermaid Factory" link goes.
   const MERMAID_FACTORY_URL = 'https://mermaid.kevspowertools.com';
   // The starters if mermaid-tools won't load; normally they come from its gallery.
@@ -764,6 +766,17 @@
       deleteLibraryImage: deleteLibraryImage,
       images: { maxBytes: MAX_IMAGE_BYTES, libraryName: 'the gallery' },
       preview: false,
+      // "/Graphic": text, shapes, arrows and pictures drawn in Layers, in the
+      // page or full screen. It's saved as a gallery picture whose PNG holds
+      // its layers (its link ends in #layers), so "Edit graphic" opens it again.
+      layers: {
+        load: () => import(LAYERS_URL),
+        fetchImage: async url => {
+          const resp = await apiFetch(url, { credentials: 'include' });
+          if (!resp.ok) throw new Error('Could not load the picture (HTTP ' + resp.status + ')');
+          return resp.blob();
+        },
+      },
       codeRenderers: { mermaid: renderMermaid },
       codeEditors: { mermaid: editMermaid },
       // Mermaid Factory's highlighter for ```mermaid fences in Raw.
@@ -868,6 +881,15 @@
           ['| Video | Title |', 'An older Videos table still shows as cards'],
         ],
         note: 'On the project page the cards play in place. The videos are listed with your project too.',
+      },
+      {
+        title: 'Graphics',
+        rows: [
+          ['/Graphic', 'Draw a graphic of text, shapes, arrows, step numbers and pictures, right there in the page; Full screen for more room'],
+          ['Edit graphic', 'Hover a graphic (or double-click it) to change it again: every layer is kept inside the picture'],
+          ['Draw on it', 'Click any picture, then Draw on it, to add labels and arrows over a photo'],
+        ],
+        note: 'A graphic is saved as a picture in your gallery, so sizes, captions and galleries work on it as they do on photos.',
       },
       {
         title: 'Diagrams',

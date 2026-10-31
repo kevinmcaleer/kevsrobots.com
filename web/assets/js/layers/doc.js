@@ -1,0 +1,1 @@
+export{h as CHUNK_KEYWORD,t as DOC_APP,n as DOC_VERSION,r as MAX_SIDE,i as MIN_SIDE,a as SIZES,o as blankDoc,s as clampSide,c as defaultFetch,l as embedDoc,u as extractDoc,d as fileName,f as normalizeDoc,p as parseDoc,m as readDoc,g as readText,_ as writeText}from"./doc-2swF_9Na.js";
