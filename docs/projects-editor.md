@@ -50,6 +50,18 @@ README into the text, models to Files & Models (`project-editor.js`,
 (`model-thumbnails.js`); older models get theirs at
 `/admin/projects/thumbnails/`.
 
+### Graphics (Layers)
+
+`/Graphic` opens Layers, markdown-studio's Canva-style graphic editor
+(`packages/layers`), in the page in place of the picture, with a Full screen
+button. Save uploads a PNG to the gallery and writes `![Title](…/images/{id}/view#layers)`:
+the PNG carries its layers (an `iTXt` chunk), and `#layers` marks it, so
+"Edit graphic" (hover or double-click) and "Draw on it" in a picture's
+popover open it again. Nothing new on the server. The bundle's `layers`
+option in `project-editor.js` loads `web/assets/js/layers/layers.js`,
+vendored by `scripts/update-layers.sh` (re-run it with
+`update-markdown-editor.sh` after markdown-studio Layers changes).
+
 ### Bill of Materials
 
 The BOM is a table under the Bill of Materials heading. `bom-sync.js`
