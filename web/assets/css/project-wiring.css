@@ -6,6 +6,15 @@
   display: flex;
   flex-direction: column;
   background: #faf9f5;
+  /* A drag between pins (or across the panels) shouldn't sweep up the pin
+     labels, the toolbar and the page underneath as a browser text selection.
+     Fields stay selectable so you can still edit and copy what's in them. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+.project-wiring :is(input, textarea, [contenteditable]:not([contenteditable="false"])) {
+  -webkit-user-select: text;
+  user-select: text;
 }
 .project-wiring-overlay {
   position: fixed;
