@@ -22,7 +22,10 @@ XLINK_NS = "http://www.w3.org/1999/xlink"
 # Elements that never belong in a picture we serve.
 _BLOCKED = {"script", "foreignobject", "iframe", "object", "embed", "audio", "video", "handler", "listener"}
 _SAFE_HREF = re.compile(r"^(#|data:image/(png|jpe?g|gif|webp);base64,)", re.I)
-_BAD_STYLE = re.compile(r"javascript:|expression\s*\(|url\(\s*['\"]?\s*(?!#|data:image/)", re.I)
+# A url( that isn't a fragment or an inline image. The quote is inside the
+# lookahead: as `['"]?` before it, the regex backtracked past the quote and
+# rejected `url("#id")`, which is how browsers write computed styles.
+_BAD_STYLE = re.compile(r"javascript:|expression\s*\(|url\(\s*(?!['\"]?\s*(?:#|data:image/))", re.I)
 
 # Served with every stored SVG: drawing only, images inline.
 SVG_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:"
