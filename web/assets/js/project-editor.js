@@ -784,6 +784,10 @@
       tableStepper: bomQtyStepper,
       // The pinout table's marker line (pinout-sync.js) stays out of sight.
       hiddenComments: comment => PinoutSync.isMarker(comment),
+      // <!-- page --> lines split the published write-up into pages
+      // (project-pages.js); drawn here as a dashed "Page 2" rule, with a
+      // Page break / command.
+      pageBreaks: true,
       slashCommands: ProjectSlashCommands.create(slashContext()),
       // Project topics in the ? Markdown guide, after the editor's own.
       guide: projectGuideTopics(),
@@ -865,6 +869,14 @@
           ['Open in Mermaid Factory', 'Edit it by clicking the shapes, then Save to bring it back'],
         ],
         note: 'The diagram button on the toolbar, or / then Mermaid diagram, starts one from 28 templates.',
+      },
+      {
+        title: 'Pages',
+        rows: [
+          ['<!-- page -->', 'Starts a new page: a long write-up reads as shorter pages, with Previous, page numbers and Next at the bottom of each'],
+          ['/ then Page break', 'Adds one where the cursor is; it shows here as a dashed Page 2 line. Hover it and click \u00d7 to remove it'],
+        ],
+        note: 'Break between sections, not in the middle of one. The On this page list still shows every section and opens the right page, and readers can still pick View as one page.',
       },
     ];
   }
