@@ -162,8 +162,10 @@ description: View project details
 
         <!-- Rendered markdown -->
         <div id="view-content" class="project-doc project-prose mb-4"></div>
-        <!-- Previous / page numbers / Next, when the text has pages. -->
-        <nav id="view-pager" class="kr-pager" aria-label="Pages"></nav>
+        <!-- Everything after the text: pictures, files and models, BOM,
+             comments, community makes. When the text has pages, this
+             shows once, on the last page, above the page controls. -->
+        <div id="view-end">
 
         <!-- Pictures from the retired Images section: shown as a gallery
              only while the project's text has no gallery of its own. -->
@@ -275,6 +277,10 @@ description: View project details
           <p id="makes-empty" class="text-muted small mb-3 d-none">No makes yet — be the first to share your build!</p>
           <div id="makes-grid" class="row row-cols-1 row-cols-md-2 g-3"></div>
         </div>
+        </div>
+
+        <!-- Previous / page numbers / Next, when the text has pages. -->
+        <nav id="view-pager" class="kr-pager" aria-label="Pages"></nav>
       </div>
 
     </div>
@@ -486,6 +492,9 @@ description: View project details
   /* Linkable headings: land below the sticky header, with a "#" link
      that shows on hover or focus. */
   #view-content :is(h1, h2, h3, h4, h5, h6) { scroll-margin-top: 80px; }
+  /* What follows the text shows on the last page only (project-pages.js). */
+  #view-end[hidden] { display: none !important; }
+  #view-end:not([hidden]) + .kr-pager { margin-top: 1.5rem; }
   #view-content .heading-anchor {
     margin-left: 0.4em;
     color: #adb5bd;
@@ -1027,6 +1036,7 @@ description: View project details
         projectPages = ProjectPages.paginate(contentEl, {
           auto: params.get('pages') === 'auto',
           pagerEl: document.getElementById('view-pager'),
+          endEl: document.getElementById('view-end'),
         });
         buildTOC();
       }
