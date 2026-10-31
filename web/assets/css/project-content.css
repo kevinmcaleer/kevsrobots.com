@@ -204,14 +204,14 @@
   font-style: normal;
 }
 
-/* Inline code: shaded, in the text's own font, as the live view shows it. */
+/* Inline code: shaded, in the code blocks' monospace font, as the live view shows it. */
 .project-prose code {
-  padding: 0;
+  padding: 0.1em 0.2em;
   background: var(--code-bg);
   border-radius: 3px;
   color: var(--code-text);
-  font-family: inherit;
-  font-size: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.88em;
 }
 
 /* Code blocks: a shaded panel, the language and a copy button at the top right. */
