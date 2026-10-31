@@ -330,3 +330,17 @@
 .project-slash-picker-empty {
   color: var(--kr-pop-muted);
 }
+
+/* Cards (`::: cards`): a card's title is a heading, so main.scss's bare
+   h1/h2 rules (Oswald, capitals, condensed, 40pt, some !important) would
+   reach it. Keep it in the Notes heading face, in the editor and on the
+   project page alike; the rest of its look is the bundle's cards.css. */
+.kr-notes .md-card-body > :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--text);
+  font-family: var(--font-serif) !important;
+  font-size: 1.2em !important;
+  font-stretch: normal !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
