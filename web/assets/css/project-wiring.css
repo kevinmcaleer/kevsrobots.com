@@ -1,13 +1,45 @@
 /* The project's electronics workspace (issue #268): Snakie's wiring canvas
-   full screen over the editor (project-wiring.js). Under the parts catalog
+   (project-wiring.js), in the document in place of the wiring diagram, or
+   full screen over the editor. Full screen it's under the parts catalog
    (z-index 10050), which opens over it to add parts. */
 .project-wiring {
+  display: flex;
+  flex-direction: column;
+  background: #faf9f5;
+}
+.project-wiring-overlay {
   position: fixed;
   inset: 0;
   z-index: 10040;
   display: flex;
-  flex-direction: column;
-  background: #faf9f5;
+}
+.project-wiring-overlay > .project-wiring {
+  flex: 1;
+  min-width: 0;
+}
+/* In the page: the column's width, a fixed height, framed like a picture. */
+.project-wiring.is-inline {
+  height: min(600px, 75vh);
+  border: 1px solid #e3e0d6;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.project-wiring.is-inline .project-wiring-bar {
+  gap: 0.35rem;
+  padding: 0.4rem 0.5rem;
+}
+.project-wiring.is-inline .project-wiring-bom { width: 260px; }
+/* Shorter labels in the page, and the status on a line of its own. */
+.project-wiring .pw-inline-label,
+.project-wiring.is-inline .pw-full-label { display: none; }
+.project-wiring.is-inline .pw-inline-label { display: inline; }
+.project-wiring.is-inline .project-wiring-status:not(:empty) {
+  order: 99;
+  flex-basis: 100%;
+  margin-left: 0 !important;
 }
 .project-wiring-bar {
   display: flex;

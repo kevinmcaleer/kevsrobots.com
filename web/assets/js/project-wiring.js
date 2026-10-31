@@ -150,14 +150,23 @@
   //   wiringSaved(block)    the pinout table the just-saved wiring makes;
   //                         returns { stale } for the table in the text
   //   apiFetch(url, opts)   fetch with the signed-in user's token
-  async function open(ctx) {
+  // where: where it opens. { block, onForcedClose(fn) }: in the document,
+  // in the editor's host block (MarkdownEditor openBlock: { element,
+  // close() }), with a button to go full screen and back; the host calls
+  // the fn onForcedClose gives it when the editor closes the block itself.
+  // Without a block it opens full screen, as it used to.
+  async function open(ctx, where) {
+    const block = where && where.block ? where.block : null;
     const projectId = await ctx.projectId();
-    if (!projectId) return;
+    if (!projectId) { if (block) block.close(); return; }
+    // The workspace. In the page it sits in the block; full screen, it
+    // moves into an overlay on the body (the same element, so the canvas
+    // keeps everything), and back.
     const overlay = document.createElement('div');
     overlay.className = 'project-wiring';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-label', 'Wiring');
+    let fullOverlay = null;
+    let mode = block ? 'inline' : 'full';
     overlay.innerHTML = `
       <div class="project-wiring-bar">
         <strong class="me-2"><i class="fas fa-plug me-1"></i> Wiring</strong>
@@ -166,10 +175,10 @@
           <button type="button" class="btn btn-outline-secondary" data-view="schematic">Schematic</button>
         </div>
         <button type="button" class="btn btn-sm btn-outline-primary" data-act="add"><i class="fas fa-plus me-1"></i>Add parts</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary active" data-act="bom" aria-pressed="true"><i class="fas fa-list me-1"></i>Bill of Materials <span class="badge text-bg-light" data-bom-count></span></button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-act="bom" aria-pressed="false"><i class="fas fa-list me-1"></i><span class="pw-full-label">Bill of Materials</span><span class="pw-inline-label">BOM</span> <span class="badge text-bg-light" data-bom-count></span></button>
         <button type="button" class="btn btn-sm btn-outline-secondary" data-act="pinout"><i class="fas fa-table me-1"></i>Insert pinout table</button>
         <div class="dropdown">
-          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Export</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">Export</button>
           <ul class="dropdown-menu">
             <li><button type="button" class="dropdown-item" data-act="svg">SVG</button></li>
             <li><button type="button" class="dropdown-item" data-act="png">PNG</button></li>
@@ -177,6 +186,7 @@
         </div>
         <span class="project-wiring-status small text-muted ms-2" role="status"></span>
         <span class="ms-auto"></span>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-act="mode"${block ? '' : ' hidden'}></button>
         <button type="button" class="btn btn-sm btn-primary" data-act="save"><i class="fas fa-save me-1"></i>Save</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" data-act="close">Close</button>
       </div>
@@ -185,8 +195,45 @@
         <div class="project-wiring-canvas"><div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div></div>
         <aside class="project-wiring-bom" aria-label="Bill of Materials"></aside>
       </div>`;
-    document.body.appendChild(overlay);
-    document.body.classList.add('project-wiring-open');
+    // The Bill of Materials panel: shown full screen, hidden in the page
+    // (the column is narrow), until the writer says otherwise in that mode.
+    const bomShown = { inline: false, full: true };
+    function applyBom() {
+      const on = bomShown[mode];
+      overlay.classList.toggle('bom-hidden', !on);
+      const b = overlay.querySelector('[data-act=bom]');
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    }
+    function setMode(next) {
+      if (!block) next = 'full';
+      mode = next;
+      overlay.classList.toggle('is-inline', mode === 'inline');
+      overlay.classList.toggle('is-full', mode === 'full');
+      const btn = overlay.querySelector('[data-act=mode]');
+      btn.innerHTML = mode === 'full'
+        ? '<i class="fas fa-compress me-1"></i>Back to page'
+        : '<i class="fas fa-expand me-1"></i>Full screen';
+      btn.title = mode === 'full' ? 'Back to the page (Esc)' : 'Full screen';
+      if (mode === 'full') {
+        if (!fullOverlay) {
+          fullOverlay = document.createElement('div');
+          fullOverlay.className = 'project-wiring-overlay';
+          fullOverlay.setAttribute('role', 'dialog');
+          fullOverlay.setAttribute('aria-modal', 'true');
+          fullOverlay.setAttribute('aria-label', 'Wiring');
+        }
+        fullOverlay.appendChild(overlay);
+        document.body.appendChild(fullOverlay);
+        document.body.classList.add('project-wiring-open');
+      } else {
+        block.element.appendChild(overlay);
+        if (fullOverlay) fullOverlay.remove();
+        document.body.classList.remove('project-wiring-open');
+      }
+      applyBom();
+    }
+    setMode(mode);
     const $ = sel => overlay.querySelector(sel);
     const status = (text, bad) => {
       const s = $('.project-wiring-status');
@@ -202,20 +249,36 @@
     let startSlugs = new Set();
     const libraries = () => [library, bomLibrary];
 
-    function close() {
+    // Takes the workspace away, with no asking: also what happens when the
+    // editor closes the block itself (another one opened, or it went).
+    function teardown() {
       if (closed) return;
-      if (dirty && !window.confirm('Close without saving the wiring?')) return;
       closed = true;
       if (handle) handle.unmount();
       overlay.remove();
+      if (fullOverlay) fullOverlay.remove();
       document.body.classList.remove('project-wiring-open');
       document.removeEventListener('keydown', onKey, true);
       window.removeEventListener('focus', onFocus);
+      if (block) block.close();
     }
+    function close() {
+      if (closed) return;
+      if (dirty && !window.confirm('Close without saving the wiring?')) return;
+      teardown();
+    }
+    if (where && where.onForcedClose) where.onForcedClose(teardown);
+    // Esc goes back to the page from full screen (or closes the full
+    // screen only workspace). In the page, Esc is the editor's.
     function onKey(e) {
-      if (e.key === 'Escape' && !document.querySelector('.parts-catalog-overlay')) { e.stopPropagation(); close(); }
+      if (e.key !== 'Escape' || mode !== 'full' || document.querySelector('.parts-catalog-overlay')) return;
+      if (overlay.querySelector('.dropdown-menu.show')) return;
+      e.stopPropagation();
+      if (block) setMode('inline'); else close();
     }
     document.addEventListener('keydown', onKey, true);
+    $('[data-act=close]').addEventListener('click', close);
+    $('[data-act=mode]').addEventListener('click', () => setMode(mode === 'full' ? 'inline' : 'full'));
 
     function showWarnings() {
       const box = $('.project-wiring-warnings');
@@ -465,12 +528,9 @@
       handle.setView(b.dataset.view);
     }));
 
-    $('[data-act=close]').addEventListener('click', close);
-
-    $('[data-act=bom]').addEventListener('click', e => {
-      const on = !overlay.classList.toggle('bom-hidden');
-      e.currentTarget.classList.toggle('active', on);
-      e.currentTarget.setAttribute('aria-pressed', String(on));
+    $('[data-act=bom]').addEventListener('click', () => {
+      bomShown[mode] = !bomShown[mode];
+      applyBom();
     });
 
     $('[data-act=add]').addEventListener('click', async e => {
@@ -497,7 +557,9 @@
 
     const pinoutBtn = $('[data-act=pinout]');
     const pinoutLabel = () => {
-      pinoutBtn.innerHTML = '<i class="fas fa-table me-1"></i>' + (ctx.hasPinout() ? 'Update pinout table' : 'Insert pinout table');
+      const verb = ctx.hasPinout() ? 'Update' : 'Insert';
+      pinoutBtn.innerHTML = '<i class="fas fa-table me-1"></i><span class="pw-full-label">' + verb + ' pinout table</span><span class="pw-inline-label">Pinout</span>';
+      pinoutBtn.title = verb + ' pinout table';
     };
     pinoutLabel();
     pinoutBtn.addEventListener('click', () => {

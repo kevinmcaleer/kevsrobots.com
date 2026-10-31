@@ -1021,9 +1021,27 @@
   //
   // Snakie's electronics workspace (project-wiring.js), opened from the
   // Wiring `/` command or the "Edit wiring" button on the diagram. The
-  // diagram is an image under the Wiring heading.
+  // diagram is an image under the Wiring heading. It opens in the
+  // document, in place of the diagram (the editor's openBlock), with a
+  // Full screen button; a new wiring opens after the cursor's line, and
+  // its diagram goes there when it's first saved.
+  let wiringBlock = null;
   function openWiring() {
     const view = mde.view;
+    if (wiringBlock && wiringBlock.isOpen()) {
+      wiringBlock.element.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      return;
+    }
+    let block = null;
+    let forced = null;
+    if (typeof mde.openBlock === 'function') {
+      const found = ProjectWiring.findImage(view.state.doc.toString());
+      block = mde.openBlock(found ? found.index : view.state.selection.main.head, {
+        estimatedHeight: 560,
+        onClose: () => { if (wiringBlock === block) wiringBlock = null; if (forced) forced(); },
+      });
+      wiringBlock = block;
+    }
     return ProjectWiring.open({
       projectId: async () => {
         if (!currentProject) await saveProject();
@@ -1043,7 +1061,7 @@
       createPart: createCatalogPart,
       addBomRows: parts => addBomRows(view, parts),
       removeBomRows: slugs => removeBomRows(view, slugs),
-      placeImage: url => placeWiringImage(view, url),
+      placeImage: url => placeWiringImage(view, url, block),
       insertPinout: block => putPinout(block),
       hasPinout: () => !!PinoutSync.find(view.state.doc.toString()),
       wiringSaved: block => {
@@ -1051,12 +1069,13 @@
         return checkPinout();
       },
       apiFetch: (url, opts) => apiFetch(url, Object.assign({ credentials: 'include' }, opts || {})),
-    });
+    }, block ? { block, onForcedClose: fn => { forced = fn; } } : null);
   }
 
   // The wiring diagram in the text: its link refreshed when it's there,
-  // else put under the Wiring heading (added at the end when missing).
-  function placeWiringImage(view, url) {
+  // else put where the open workspace is (and the workspace moved onto
+  // it), else under the Wiring heading (added at the end when missing).
+  function placeWiringImage(view, url, block) {
     const markdown = view.state.doc.toString();
     const found = ProjectWiring.findImage(markdown);
     if (found) {
@@ -1065,6 +1084,19 @@
       return;
     }
     const image = '![Wiring diagram](' + url + ')';
+    const at = block && block.isOpen() ? block.pos() : -1;
+    if (at >= 0) {
+      const line = view.state.doc.lineAt(Math.min(at, view.state.doc.length));
+      const last = line.number === view.state.doc.lines;
+      const nextText = last ? '' : view.state.doc.line(line.number + 1).text;
+      const blank = !line.text.trim();
+      const from = blank ? line.from : line.to;
+      // A line of its own, with a blank line before and after it.
+      const after = last ? '\n' : nextText.trim() ? '\n' : '';
+      view.dispatch({ changes: { from, to: line.to, insert: (blank ? '' : '\n\n') + image + after }, userEvent: 'input' });
+      block.moveTo(from + (blank ? 0 : 2));
+      return;
+    }
     const heading = ProjectSections.headings(markdown).find(h => ProjectSections.match(h.text) === ProjectSections.get('wiring'));
     if (heading) {
       const line = view.state.doc.line(heading.line + 1);
