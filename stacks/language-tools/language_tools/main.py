@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 import httpx
 from fastapi import FastAPI
@@ -14,9 +15,9 @@ from .language import Language, make_router
 logging.basicConfig(level=logging.INFO)
 
 
-def create_app(transport: httpx.AsyncBaseTransport | None = None) -> FastAPI:
+def create_app(transport: httpx.AsyncBaseTransport | None = None, claude: Any = None) -> FastAPI:
     settings = get_settings()
-    language = Language(settings, transport)
+    language = Language(settings, transport, claude)
 
     app = FastAPI(title="kevsrobots language tools", docs_url=None, redoc_url=None)
     app.add_middleware(

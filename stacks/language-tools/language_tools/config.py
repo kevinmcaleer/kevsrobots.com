@@ -45,6 +45,11 @@ class Settings(BaseSettings):
     libretranslate_url: str = ""
     libretranslate_api_key: str = ""
 
+    # Claude, for "Rewrite as active" on the passive-voice hint. Off unless
+    # ANTHROPIC_API_KEY is set (the same key Mermaid Factory's AI box can use).
+    anthropic_api_key: str = ""
+    rewrite_model: str = "claude-opus-5-5"
+
     # WordNet's dict/ directory (index.noun, data.noun…) for Look Up and
     # Synonyms. The Docker image puts it at /usr/share/wordnet.
     wordnet_dir: Optional[Path] = None
@@ -54,6 +59,7 @@ class Settings(BaseSettings):
     check_per_minute: int = 30
     lookup_per_minute: int = 120
     translate_per_minute: int = 20
+    rewrite_per_minute: int = 10
 
 
 @lru_cache
