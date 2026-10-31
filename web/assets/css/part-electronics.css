@@ -1,0 +1,7 @@
+/* The part electronics editor (part-electronics.js): Snakie's Part Editor
+   with the photo picker above it. Used on /parts/edit.html and in the
+   project wiring workspace's Edit part dialog. */
+.part-electronics-editor { height: 78vh; min-height: 520px; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; }
+.part-electronics-photo { width: 44px; height: 44px; padding: 0; border: 2px solid transparent; border-radius: 6px; background: #f0eee6; overflow: hidden; }
+.part-electronics-photo img { width: 100%; height: 100%; object-fit: cover; }
+.part-electronics-photo.is-active { border-color: var(--bs-primary, #0d6efd); }

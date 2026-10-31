@@ -32,14 +32,28 @@
     return /\/api\/projects\/\d+\/wiring\.svg/.test(src || '');
   }
 
-  // A catalog part as the workspace's PartDefinition, or null.
+  // A picture's size in pixels, { w, h } (0 × 0 when it won't load).
+  function photoSize(src) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+      img.onerror = () => resolve({ w: 0, h: 0 });
+      img.src = src;
+    });
+  }
+
+  // A catalog part as the workspace's PartDefinition, or null. One with
+  // no pins yet is drawn at its photo's shape (WiringBom.fitToPhoto).
   const defs = new Map(); // slug -> Promise<PartDefinition|null>
   function definition(slug) {
     if (!defs.has(slug)) {
       defs.set(slug, (async () => {
         const resp = await fetch(API + '/api/parts/' + encodeURIComponent(slug));
         if (!resp.ok) return null;
-        return SnakieHost.partFor(await resp.json());
+        const def = await SnakieHost.partFor(await resp.json());
+        if (hasPins(def) || !def.imageData) return def;
+        const size = await photoSize(def.imageData);
+        return WiringBom.fitToPhoto(def, size.w, size.h);
       })().catch(() => null));
     }
     return defs.get(slug);
@@ -255,6 +269,7 @@
     function teardown() {
       if (closed) return;
       closed = true;
+      if (partDialog) partDialog.close();
       if (handle) handle.unmount();
       overlay.remove();
       if (fullOverlay) fullOverlay.remove();
@@ -272,6 +287,7 @@
     // Esc goes back to the page from full screen (or closes the full
     // screen only workspace). In the page, Esc is the editor's.
     function onKey(e) {
+      if (partDialog) return; // Esc is the Part Editor's while it's open.
       if (e.key !== 'Escape' || mode !== 'full' || document.querySelector('.parts-catalog-overlay')) return;
       if (overlay.querySelector('.dropdown-menu.show')) return;
       e.stopPropagation();
@@ -406,7 +422,7 @@
       const pins = def && hasPins(def);
       markDirty('Linked “' + e.name + '” to ' + (def ? def.name : part.name) + '.' +
         (inTable ? ' The Bill of Materials table links it too.' : ' The Bill of Materials table was left as it is: its row links a shop page and has no Notes column to move that link to. Link the row in the table by hand.') +
-        (pins ? '' : ' It has no pins in the catalog yet: use Add pins.') + ' Not saved');
+        (pins ? '' : ' It has no pins in the catalog yet: use Edit part.') + ' Not saved');
     }
 
     async function pickLink(e, origin) {
@@ -422,18 +438,67 @@
         const part = await ctx.createPart(e.name, origin);
         if (!part) return;
         await linkEntry(e, part);
-        if (!part.existing) status('“' + part.name + '” is linked to its new catalog part. Use Add pins when you want to wire it up.');
+        if (!part.existing) status('“' + part.name + '” is linked to its new catalog part. Use Edit part to give it pins.');
       } catch (err) {
         status(err.message || String(err), true);
       }
     }
 
-    function pinsUrl(slug) {
-      return '/parts/edit.html?slug=' + encodeURIComponent(slug) + '&tab=electronics';
+    // Snakie's Part Editor over the workspace, for a catalog part: pins and
+    // their labels, the size in millimetres, the photo (remove its
+    // background, crop, swap it). Each save is a revision of the part, the
+    // same as the part's own Electronics tab, and the canvas redraws it.
+    let partDialog = null;
+    async function editPart(entry) {
+      if (!entry || !entry.slug || partDialog) return;
+      const slug = entry.slug;
+      const dlg = document.createElement('div');
+      dlg.className = 'project-wiring-part-dialog';
+      dlg.setAttribute('role', 'dialog');
+      dlg.setAttribute('aria-label', 'Edit ' + entry.name);
+      dlg.innerHTML =
+        '<div class="pwp-box">' +
+          '<div class="pwp-head"><strong>' + esc(entry.name) + '</strong>' +
+          '<span class="small text-muted ms-2">Changes are saved to the catalog part, for every project that uses it.</span>' +
+          '<a class="btn btn-sm btn-link ms-auto" target="_blank" rel="noopener" href="/parts/edit.html?slug=' + encodeURIComponent(slug) + '&tab=electronics">Open part page</a>' +
+          '<button type="button" class="btn-close" aria-label="Close" data-pwp-close></button></div>' +
+          '<div class="pwp-body"><div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div></div>' +
+        '</div>';
+      document.body.appendChild(dlg);
+      let editor = null;
+      let saved = false;
+      partDialog = {
+        close() {
+          if (editor) editor.unmount();
+          dlg.remove();
+          partDialog = null;
+          // The editor shares the bundle's parts backend: hand it back.
+          if (handle) handle.setLibraries(libraries());
+          if (saved) status('“' + entry.name + '” is updated. Not saved');
+        },
+      };
+      dlg.querySelector('[data-pwp-close]').addEventListener('click', () => partDialog && partDialog.close());
+      try {
+        const resp = await ctx.apiFetch(API + '/api/parts/' + encodeURIComponent(slug));
+        if (!resp.ok) throw new Error('Could not read the part (HTTP ' + resp.status + ')');
+        const part = await resp.json();
+        if (!partDialog) return;
+        editor = PartElectronics.create(dlg.querySelector('.pwp-body'), part, {
+          onSaved: async () => {
+            saved = true;
+            defs.delete(slug);
+            const def = await definition(slug);
+            if (def) { addToLibrary([WiringBom.withFallbackImage(def)]); dirty = true; drawBom(); }
+          },
+          onClose: () => partDialog && partDialog.close(),
+        });
+      } catch (err) {
+        dlg.querySelector('.pwp-body').innerHTML = '<div class="alert alert-danger m-3">' + esc(err.message || err) + '</div>';
+      }
     }
 
-    // Back from adding a part's pins in another tab: read the pin-less
-    // parts again, and redraw the ones that have pins now.
+    // Back from editing a part in another tab (its part page): read the
+    // pin-less parts again, and redraw the ones that have pins now.
     let refreshing = false;
     async function onFocus() {
       if (refreshing || closed || !handle) return;
@@ -485,7 +550,9 @@
           out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-link="' + i + '"><i class="fas fa-link me-1"></i>Link…</button>');
           out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-new="' + i + '" title="Not in the catalog? Add it as a new part, with pictures and links" aria-label="Add “' + esc(e.name) + '” to the catalog as a new part"><i class="fas fa-plus"></i></button>');
         } else if (e.def && !e.pins) {
-          out.push('<a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" href="' + esc(pinsUrl(e.slug)) + '" title="Opens the part’s electronics editor in a new tab"><i class="fas fa-up-right-from-square me-1"></i>Add pins</a>');
+          out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-edit="' + i + '" title="Add pins and labels, set the size, or remove the photo’s background"><i class="fas fa-pen-ruler me-1"></i>Edit part</button>');
+        } else if (e.def) {
+          out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-edit="' + i + '" title="Edit the part: pins, labels, size, picture" aria-label="Edit “' + esc(e.name) + '”"><i class="fas fa-pen-ruler"></i></button>');
         }
         return out.join('');
       };
@@ -518,6 +585,7 @@
         if (window.confirm('Take the board off the wiring? Its wires go too.')) handle.setBoard(null);
       });
       box.querySelectorAll('[data-bom-new]').forEach(b => b.addEventListener('click', ev => newPart(list[+b.dataset.bomNew], ev.currentTarget)));
+      box.querySelectorAll('[data-bom-edit]').forEach(b => b.addEventListener('click', () => editPart(list[+b.dataset.bomEdit])));
     }
 
     overlay.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
