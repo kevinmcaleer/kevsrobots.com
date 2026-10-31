@@ -204,6 +204,9 @@
       code_repo_url: repoUrlFromMarkdown(content) || null,
       tags: getCurrentTags(),
     };
+    // The first gallery picture is the cover (see coverUrl).
+    const cover = coverUrl(content);
+    if (cover) data.cover_image = cover;
 
     showSaveStatus('saving', 'Saving...');
     try {
@@ -753,11 +756,12 @@
       toolbar: toolbar,
       draft: { key: 'projects.' + (projectId || 'new') },
       uploadImage: uploadEditorImage,
-      // Several images dropped on the text at once go to the gallery only.
+      // Several images dropped on the text at once go to the end of the gallery.
       addImages: files => processDroppedFiles(files),
       imageLibrary: async () => (await fetchProjectImages()).map(img => ({
         url: imageViewUrl(img), alt: img.caption || img.filename,
       })),
+      deleteLibraryImage: deleteLibraryImage,
       images: { maxBytes: MAX_IMAGE_BYTES, libraryName: 'the gallery' },
       preview: false,
       codeRenderers: { mermaid: renderMermaid },
@@ -788,6 +792,7 @@
       scheduleAutoTagDetection();
       scheduleBomTotals();
       scheduleBomLinks();
+      scheduleGalleryAddBar();
     });
     // Hints set before the editor was mounted (a closed completeness panel).
     if (editorHints.size) mde.setHints(Array.from(editorHints.values()));
@@ -815,7 +820,7 @@
           [heading('code-repository'), 'A link to your code repository'],
           [heading('3d-printed-parts'), 'Your STL files'],
           [heading('videos'), 'Your YouTube videos, as a group of cards: / then Videos, then add, delete or move link lines'],
-          [heading('gallery'), 'Your pictures as a gallery: / then Gallery, pick a layout, then delete or move picture lines'],
+          [heading('gallery'), 'Your pictures as a gallery: / then Gallery and pick a layout. Add pictures in its bar; hover a picture to move or remove it, or drag it'],
         ],
         note: 'These headings fill the page navigation and the completeness check.',
       },
@@ -826,6 +831,16 @@
           ['4.99', 'Write prices with a dot'],
           ['[Pico](/parts/view.html?slug=pico)', 'A link to a catalog part shows its picture and details (type / then Part)'],
         ],
+      },
+      {
+        title: 'Pictures and the gallery',
+        rows: [
+          ['::: gallery filmstrip', 'The gallery: its first picture is the project\u2019s cover'],
+          ['Add pictures', 'In the gallery\u2019s bar: pick from your uploads or upload more (several at once)'],
+          ['Markdown', 'Shows the gallery\u2019s picture lines; Show gallery goes back'],
+          ['Drop pictures on the page', 'They\u2019re uploaded and added to the end of the gallery (a Gallery section is made if there isn\u2019t one)'],
+        ],
+        note: 'Delete an upload from the image picker (toolbar picture button): hover it and click the bin.',
       },
       {
         title: 'Project videos',
@@ -1404,6 +1419,12 @@
   }
 
   let bomLinksTimer = null;
+  let galleryAddTimer = null;
+  function scheduleGalleryAddBar() {
+    clearTimeout(galleryAddTimer);
+    galleryAddTimer = setTimeout(updateGalleryAddBar, 1000);
+  }
+
   function scheduleBomLinks() {
     clearTimeout(bomLinksTimer);
     bomLinksTimer = setTimeout(updateBomLinkBar, 1000);
@@ -1949,78 +1970,19 @@
     loadFiles();
   };
 
-  // --- Image Upload ---
-  // Old #image-dropzone removed (replaced with a click-to-pick button).
-  // All drag-and-drop is handled by the global overlay in
-  // setupGlobalDropzone() further down.
-  const imageInput = document.getElementById('image-input');
-  imageInput.addEventListener('change', e => uploadImages(e.target.files));
-
-  async function uploadImages(fileList) {
-    if (!currentProject) {
-      await saveProject();
-      if (!currentProject) return;
-    }
-    for (const file of fileList) {
-      const form = new FormData();
-      form.append('file', file);
-      await apiFetch(API + '/api/projects/' + currentProject.id + '/images', {
-        method: 'POST', credentials: 'include', body: form,
-      });
-    }
-    loadImages();
-  }
-
-  let imageOrder = [];
-  let galleryImages = [];
+  // --- Pictures ---
+  // Uploaded pictures are the project's image library: the image picker
+  // shows them (and can delete them), and the page's `::: gallery` block
+  // shows the ones chosen, in its order. The old Images section under the
+  // document is retired. The cover is the first gallery picture, else the
+  // first picture in the text, else the first upload.
+  let projectImages = [];
 
   async function loadImages() {
     if (!currentProject) return;
-    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
-    const images = await resp.json();
-    galleryImages = images;
-    imageOrder = images.map(img => img.id);
-    const gallery = document.getElementById('image-gallery');
-    // Issue #258: each thumbnail has a star to make it the cover, an alt
-    // text field (the default alt when /image inserts it) and can be
-    // moved with the left/right arrow keys as well as by dragging.
-    gallery.innerHTML = images.map((img, idx) => {
-      const isCover = idx === 0;
-      const name = escHtml(img.filename);
-      return `
-      <div class="col-6 col-sm-4 col-md-3 col-xl-2" data-image-id="${img.id}" draggable="true">
-        <div class="image-thumb ${isCover ? 'is-cover' : ''}" tabindex="0"
-             aria-label="${name}${isCover ? ' (cover)' : ''}. Left and right arrow keys move it.">
-          <img src="${imageViewUrl(img)}" alt="${escHtml(img.caption || img.filename)}" data-view-idx="${idx}" class="iv-clickable">
-          <button type="button" class="cover-star ${isCover ? 'is-cover' : ''}" data-cover-id="${img.id}"
-                  title="${isCover ? 'This is the cover' : 'Make this the cover'}"
-                  aria-label="${isCover ? 'Cover image' : 'Make ' + name + ' the cover'}" aria-pressed="${isCover}">
-            <i class="${isCover ? 'fas' : 'far'} fa-star"></i>
-          </button>
-          <button type="button" class="delete-overlay" data-delete-id="${img.id}" aria-label="Delete ${name}"><i class="fas fa-trash"></i></button>
-          ${isCover ? '<span class="cover-badge">★ Cover</span>' : ''}
-        </div>
-        <input type="text" class="form-control form-control-sm image-alt mt-1" data-alt-id="${img.id}"
-               value="${escHtml(img.caption || '')}" placeholder="Alt text" maxlength="300"
-               aria-label="Alt text for ${name}">
-      </div>`;
-    }).join('');
-
-    // Set cover_image from first image
-    if (images.length > 0) {
-      const firstUrl = imageViewUrl(images[0]);
-      if (currentProject.cover_image !== firstUrl) {
-        currentProject.cover_image = firstUrl;
-        apiFetch(API + '/api/projects/' + currentProject.id, {
-          method: 'PUT', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cover_image: firstUrl }),
-        });
-      }
-    }
-
-    // Drag-and-drop reordering
-    setupImageDrag(gallery);
+    try { projectImages = await fetchProjectImages(); } catch (e) { return; }
+    updateGalleryAddBar();
+    if (window._recomputeCompleteness) window._recomputeCompleteness();
   }
 
   function escHtml(t) {
@@ -2028,181 +1990,119 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // PUT each image's position from imageOrder, then redraw. The cover is
-  // whichever image is first, so this is also how a cover is chosen.
-  async function saveImageOrder(message) {
-    for (let i = 0; i < imageOrder.length; i++) {
-      await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageOrder[i], {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sort_order: i }),
-      });
+  const GALLERY_OPEN = /^[ \t]{0,3}:::[ \t]*gallery\b.*$/i;
+  const GALLERY_CLOSE = /^[ \t]{0,3}:::[ \t]*$/;
+  const PICTURE = /!\[(?:\\.|[^\]\\])*\]\(\s*<?([^\s)>]+)>?/;
+
+  // The first closed `::: gallery` block: { open, close } line numbers from 0.
+  function firstGallery(lines) {
+    let fence = null;
+    for (let i = 0; i < lines.length; i++) {
+      const marker = /^[ \t]{0,3}(`{3,}|~{3,})/.exec(lines[i]);
+      if (fence) { if (marker && marker[1][0] === fence[0]) fence = null; continue; }
+      if (marker) { fence = marker[1]; continue; }
+      if (!GALLERY_OPEN.test(lines[i])) continue;
+      for (let j = i + 1; j < lines.length; j++) {
+        if (GALLERY_CLOSE.test(lines[j])) return { open: i, close: j };
+        if (GALLERY_OPEN.test(lines[j])) break;
+      }
     }
-    showSaveStatus('saved', message || 'Image order updated');
-    await loadImages();
+    return null;
   }
 
-  async function moveImage(id, toIdx) {
-    const fromIdx = imageOrder.indexOf(id);
-    if (fromIdx < 0 || toIdx < 0 || toIdx >= imageOrder.length || toIdx === fromIdx) return false;
-    imageOrder.splice(fromIdx, 1);
-    imageOrder.splice(toIdx, 0, id);
-    await saveImageOrder(toIdx === 0 ? 'Cover updated' : 'Image order updated');
-    return true;
+  // The cover: the first gallery picture, else the first picture in the
+  // text, else the first upload; null when there's none.
+  function coverUrl(markdown) {
+    const lines = String(markdown || '').split('\n');
+    const gallery = firstGallery(lines);
+    const inGallery = gallery && PICTURE.exec(lines.slice(gallery.open + 1, gallery.close).join('\n'));
+    if (inGallery) return inGallery[1];
+    const anywhere = PICTURE.exec(markdown || '');
+    if (anywhere) return anywhere[1];
+    return projectImages.length && currentProject ? imageViewUrl(projectImages[0]) : null;
   }
 
-  // One set of listeners on the gallery, however often it's redrawn.
-  (function wireGallery() {
-    const gallery = document.getElementById('image-gallery');
-    if (!gallery) return;
-    gallery.addEventListener('click', e => {
-      const star = e.target.closest('.cover-star');
-      if (star) {
-        e.stopPropagation();
-        moveImage(parseInt(star.dataset.coverId, 10), 0);
-        return;
-      }
-      const del = e.target.closest('.delete-overlay');
-      if (del) {
-        e.stopPropagation();
-        window.deleteImage(parseInt(del.dataset.deleteId, 10));
-        return;
-      }
-      const img = e.target.closest('.iv-clickable');
-      if (!img || gallery.querySelector('.dragging')) return;
-      ImageViewer.open(galleryImages.map(i => ({ url: imageViewUrl(i), alt: i.caption || i.filename })),
-        parseInt(img.dataset.viewIdx, 10));
+  // Uploads the text doesn't show: pictures from the old Images section, or
+  // ones added since and taken out again.
+  function unplacedImages(markdown) {
+    return projectImages.filter(img => !markdown.includes('/images/' + img.id + '/view'));
+  }
+
+  // Adds pictures ({ url, name, caption }) to the end of the page's first
+  // gallery, or a new Gallery section at the end when it has none.
+  function addPicturesToGallery(pictures) {
+    if (!pictures.length || !mde || !mde.view) return;
+    const view = mde.view;
+    const doc = view.state.doc;
+    const lines = doc.toString().split('\n');
+    const gallery = firstGallery(lines);
+    const block = ProjectSlashCommands.galleryMarkdown('filmstrip', pictures);
+    const pictureLines = block.split('\n').slice(1, -1).join('\n');
+    if (gallery) {
+      const close = doc.line(gallery.close + 1);
+      view.dispatch({ changes: { from: close.from, insert: pictureLines + '\n' }, userEvent: 'input.gallery' });
+      return;
+    }
+    const markdown = doc.toString();
+    const heading = ProjectSections.get('gallery').heading;
+    const hasHeading = markdown.split('\n').some(line => {
+      const m = /^#{1,6}\s+(.*?)\s*#*\s*$/.exec(line);
+      const section = m && ProjectSections.match(m[1]);
+      return section && section.id === 'gallery';
     });
-    gallery.addEventListener('keydown', async e => {
-      const thumb = e.target.closest('.image-thumb');
-      if (!thumb || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
-      e.preventDefault();
-      const id = parseInt(thumb.closest('[data-image-id]').dataset.imageId, 10);
-      const to = imageOrder.indexOf(id) + (e.key === 'ArrowLeft' ? -1 : 1);
-      if (await moveImage(id, to)) {
-        const moved = gallery.querySelector('[data-image-id="' + id + '"] .image-thumb');
-        if (moved) moved.focus();
+    const tail = markdown.trim() ? (markdown.endsWith('\n\n') ? '' : markdown.endsWith('\n') ? '\n' : '\n\n') : '';
+    const insert = tail + (hasHeading ? '' : '# ' + heading + '\n\n') + block + '\n';
+    view.dispatch({ changes: { from: doc.length, insert: insert }, userEvent: 'input.gallery' });
+  }
+
+  // The notice over the document when uploads aren't on the page, with a
+  // button that puts them in the gallery. "Not now" hides it until another
+  // picture is left out.
+  function galleryAddDismissKey() {
+    return 'projects.' + (currentProject ? currentProject.id : 'new') + '.gallery-add-dismissed';
+  }
+  function updateGalleryAddBar() {
+    const bar = document.getElementById('gallery-add-bar');
+    if (!bar || !mde || !mde.view) return;
+    const unplaced = unplacedImages(mde.view.state.doc.toString());
+    let dismissed = [];
+    try { dismissed = JSON.parse(localStorage.getItem(galleryAddDismissKey()) || '[]'); } catch (e) {}
+    if (!unplaced.length || unplaced.every(img => dismissed.includes(img.id))) { bar.hidden = true; return; }
+    const n = unplaced.length;
+    bar.innerHTML =
+      '<i class="fas fa-images" aria-hidden="true"></i>' +
+      '<span>' + n + ' uploaded ' + (n === 1 ? 'picture isn\u2019t' : 'pictures aren\u2019t') +
+      ' on your page. The Images section is now the gallery in your text.</span>' +
+      '<button type="button" class="btn btn-sm btn-success" data-action="add-to-gallery">Add ' + (n === 1 ? 'it' : 'them') + ' to the gallery</button>' +
+      '<button type="button" class="btn btn-sm btn-link" data-action="dismiss">Not now</button>';
+    bar.hidden = false;
+  }
+  (function wireGalleryAddBar() {
+    const bar = document.getElementById('gallery-add-bar');
+    if (!bar) return;
+    bar.addEventListener('click', e => {
+      const action = e.target.closest('[data-action]');
+      if (!action || !mde || !mde.view) return;
+      const unplaced = unplacedImages(mde.view.state.doc.toString());
+      if (action.dataset.action === 'add-to-gallery') {
+        addPicturesToGallery(unplaced.map(img => ({ url: imageViewUrl(img), name: img.filename, caption: img.caption || '' })));
+      } else if (action.dataset.action === 'dismiss') {
+        try { localStorage.setItem(galleryAddDismissKey(), JSON.stringify(unplaced.map(img => img.id))); } catch (e) {}
       }
-    });
-    gallery.addEventListener('change', async e => {
-      const input = e.target.closest('.image-alt');
-      if (!input) return;
-      const id = parseInt(input.dataset.altId, 10);
-      const caption = input.value.trim();
-      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + id, {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caption: caption || null }),
-      });
-      if (!resp.ok) { showSaveStatus('error', 'Alt text not saved'); return; }
-      const img = galleryImages.find(i => i.id === id);
-      if (img) img.caption = caption || null;
-      showSaveStatus('saved', 'Alt text saved');
+      updateGalleryAddBar();
     });
   })();
 
-  function setupImageDrag(gallery) {
-    let dragEl = null;
-    let dragId = null;
-    let ghostEl = null;
-    let offsetX = 0, offsetY = 0;
-
-    function getDropTarget(x, y) {
-      const items = gallery.querySelectorAll('[data-image-id]');
-      for (const item of items) {
-        if (item === dragEl) continue;
-        const r = item.getBoundingClientRect();
-        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return item;
-      }
-      return null;
-    }
-
-    function onMouseMove(e) {
-      if (!ghostEl) return;
-      ghostEl.style.left = (e.clientX - offsetX) + 'px';
-      ghostEl.style.top = (e.clientY - offsetY) + 'px';
-
-      const target = getDropTarget(e.clientX, e.clientY);
-      const items = Array.from(gallery.querySelectorAll('[data-image-id]'));
-      items.forEach(item => item.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right'));
-
-      if (target) {
-        target.classList.add('drag-over');
-        const fromIdx = items.indexOf(dragEl);
-        const toIdx = items.indexOf(target);
-        items.forEach((item, i) => {
-          if (item === dragEl) return;
-          if (fromIdx < toIdx && i > fromIdx && i <= toIdx) item.classList.add('drag-shift-left');
-          else if (fromIdx > toIdx && i >= toIdx && i < fromIdx) item.classList.add('drag-shift-right');
-        });
-      }
-    }
-
-    async function onMouseUp(e) {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      if (ghostEl) { ghostEl.remove(); ghostEl = null; }
-      if (!dragEl) return;
-
-      dragEl.classList.remove('dragging');
-      gallery.querySelectorAll('.drag-over, .drag-shift-left, .drag-shift-right').forEach(d => {
-        d.classList.remove('drag-over', 'drag-shift-left', 'drag-shift-right');
-      });
-
-      const target = getDropTarget(e.clientX, e.clientY);
-      if (target && dragId) {
-        const dropId = target.dataset.imageId;
-        if (dropId && dragId !== dropId) {
-          await moveImage(parseInt(dragId, 10), imageOrder.indexOf(parseInt(dropId, 10)));
-        }
-      }
-      dragEl = null;
-      dragId = null;
-    }
-
-    gallery.querySelectorAll('[data-image-id]').forEach(el => {
-      el.setAttribute('draggable', 'false');
-      el.addEventListener('mousedown', e => {
-        if (e.target.closest('button, input')) return;
-        e.preventDefault();
-        dragEl = el;
-        dragId = el.dataset.imageId;
-
-        const rect = el.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-
-        // Create ghost
-        ghostEl = el.cloneNode(true);
-        ghostEl.style.position = 'fixed';
-        ghostEl.style.left = (e.clientX - offsetX) + 'px';
-        ghostEl.style.top = (e.clientY - offsetY) + 'px';
-        ghostEl.style.width = rect.width + 'px';
-        ghostEl.style.zIndex = '10000';
-        ghostEl.style.pointerEvents = 'none';
-        ghostEl.style.transform = 'rotate(4deg) scale(1.05)';
-        ghostEl.style.opacity = '0.9';
-        ghostEl.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
-        ghostEl.style.borderRadius = '6px';
-        ghostEl.style.transition = 'none';
-        document.body.appendChild(ghostEl);
-
-        el.classList.add('dragging');
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-      });
-    });
-  }
-
-  window.deleteImage = async function(imageId) {
-    // Issue #258: warn before deleting an image the text still shows.
-    const inText = getEditorValue().includes('/images/' + imageId + '/view');
-    if (inText && !confirm('This image is used in your project text. Delete it anyway? The text will show a broken image until you remove it.')) return;
-    await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + imageId, {
+  // The image picker's delete button (it asks first).
+  async function deleteLibraryImage(image) {
+    const m = /\/images\/(\d+)\/view/.exec(image.url || '');
+    if (!m || !currentProject) throw new Error('Not one of this project\u2019s pictures');
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images/' + m[1], {
       method: 'DELETE', credentials: 'include',
     });
+    if (!resp.ok) throw new Error('Couldn\u2019t delete the picture');
     loadImages();
-  };
+  }
 
   function escapeHtmlAttr(s) {
     return String(s == null ? '' : s)
@@ -2616,6 +2516,7 @@
     let readmeCount = 0;
     let errorCount = 0;
     let needsImageReload = false;
+    const uploadedImages = [];
     let needsFileReload = false;
     const skippedCount = files.length - accepted.length;
 
@@ -2627,7 +2528,8 @@
           if (ok) readmeCount++;
         } else if (isImageFile(file)) {
           const image = HEIC_EXTS.has(getExt(file.name)) ? await heicToJpeg(file) : file;
-          await uploadSingleImage(image);
+          const img = await uploadSingleImage(image);
+          uploadedImages.push({ url: imageViewUrl(img), name: img.filename || file.name, caption: img.caption || '' });
           updateProgressLine(row, '<span class="text-success"><i class="fas fa-check"></i> added to gallery</span>');
           imageCount++;
           needsImageReload = true;
@@ -2649,6 +2551,8 @@
       }
     }
 
+    // Into the page's gallery, so they show (a new Gallery section if it has none).
+    addPicturesToGallery(uploadedImages);
     if (needsImageReload) loadImages();
     if (needsFileReload) loadFiles();
 
@@ -2775,8 +2679,9 @@
       check: () => titleInput && titleInput.value.trim().length >= 3 },
     { key: 'desc',   points: 10, label: 'Write a short description',           target: 'project-description',
       check: () => descInput && descInput.value.trim().length >= 10 },
-    { key: 'cover',  points: 15, label: 'Upload a cover image',                target: 'editor-images-section',
-      check: () => document.querySelectorAll('#image-gallery [data-image-id]').length > 0 },
+    // The cover is the gallery's first picture (or the text's, or the first upload).
+    { key: 'cover',  points: 15, label: 'Add a cover picture (the first in your gallery)', target: 'content-editor',
+      check: () => !!coverUrl(getEditorValue()) },
     // Read from the document on every change, so deleting the section
     // (or emptying it) takes the points away again.
     // Any text under the heading counts, so one step from /assembly does.
@@ -2963,7 +2868,6 @@
     new MutationObserver(recomputeCompleteness).observe(el, { childList: true, subtree: true });
   }
   _observe('tags-container');
-  _observe('image-gallery');
   _observe('file-list');
 
   // Expose so loadProject() / init can trigger explicitly.

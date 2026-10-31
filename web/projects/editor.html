@@ -27,7 +27,7 @@ hide_nibsy: true
     <i class="fas fa-cloud-upload-alt global-dropzone__icon"></i>
     <h2 class="global-dropzone__title">Drop files or a whole folder to add them to your project</h2>
     <ul class="global-dropzone__routes">
-      <li><i class="fas fa-image text-info me-2"></i><strong>Images</strong> (incl. HEIC) &rarr; uploaded to the gallery</li>
+      <li><i class="fas fa-image text-info me-2"></i><strong>Images</strong> (incl. HEIC) &rarr; added to the end of your gallery</li>
       <li><i class="fas fa-file-alt text-success me-2"></i><strong>README.md</strong> &rarr; loaded into the content editor</li>
       <li><i class="fas fa-cube text-warning me-2"></i><strong>3D models</strong> (.stl, .3mf, .obj, .step, .gcode) &rarr; Files &amp; Models</li>
       <li><i class="fas fa-paperclip text-secondary me-2"></i><strong>Code, documents, archives</strong> &rarr; Files</li>
@@ -160,25 +160,10 @@ hide_nibsy: true
       <!-- Markdown Editor (markdown-studio's editor bundle, mounted on the textarea) -->
       <div class="mb-4" id="content-markdown-pane">
         <div class="bom-link-bar kr-notice" id="bom-link-bar" role="status" hidden></div>
+        <!-- Uploaded pictures the text doesn't show (the retired Images section's), with a button to add them to the gallery. -->
+        <div class="bom-link-bar kr-notice" id="gallery-add-bar" role="status" hidden></div>
         <textarea id="content-editor"></textarea>
       </div>
-
-      <!-- Images: a gallery strip under the document -->
-      <section class="kr-section" id="editor-images-section">
-        <div class="kr-section-head">
-          <h2 class="kr-section-title"><i class="fas fa-camera" aria-hidden="true"></i> Images</h2>
-          <div class="kr-section-actions">
-            <!-- Click-to-pick only — the whole page is the dropzone (see
-                 #global-dropzone above). -->
-            <label for="image-input" class="btn btn-sm btn-outline-secondary mb-0">
-              <i class="fas fa-image me-1"></i> Choose images
-            </label>
-            <input type="file" id="image-input" class="d-none" multiple accept="image/*">
-          </div>
-        </div>
-        <p class="kr-section-hint">The first image is the cover. Drag to reorder, or drop images anywhere on the page.</p>
-        <div id="image-gallery" class="row g-2"></div>
-      </section>
 
       <!-- File Upload -->
       <section class="kr-section" id="editor-files-section">

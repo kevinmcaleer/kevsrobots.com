@@ -55,7 +55,10 @@
   // The same markup as gallery.ts' galleryHtml.
   function html(layout, list) {
     const safe = list.map(i => Object.assign({}, i, { src: safeUrl(i.src) })).filter(i => i.src);
-    const caption = i => i.title || i.alt;
+    // Its title, or alt text someone wrote: not one made from a file name
+    // (project-image-captions.js' rule, as gallery.ts uses imageCaption).
+    const captions = window.ProjectImageCaptions;
+    const caption = i => i.title || (captions ? captions.caption(i.alt) || '' : i.alt);
     const items = safe.map((i, n) => {
       const title = caption(i);
       return '<a class="md-gallery-item' + (layout === 'filmstrip' && n === 0 ? ' is-active' : '') + '" href="' + esc(i.src) +
