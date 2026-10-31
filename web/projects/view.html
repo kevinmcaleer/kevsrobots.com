@@ -731,6 +731,7 @@ description: View project details
 <script src="/assets/js/project-mermaid-theme.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-image-sizes.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-image-grid.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-image-captions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-gallery.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-cards.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-cell-headings.js?v={{ site.time | date: '%s' }}"></script>
@@ -998,6 +999,7 @@ description: View project details
         ProjectImageSizes.render(contentEl);
         ProjectImageGrid.render(contentEl);
         ProjectGallery.render(contentEl);
+        ProjectImageCaptions.render(contentEl);
         ProjectCellHeadings.render(contentEl);
         const videoBlocks = ProjectEmbeds.renderVideoBlocks(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
@@ -1839,6 +1841,7 @@ description: View project details
     ProjectImageSizes.render(journalEl);
     ProjectImageGrid.render(journalEl);
     ProjectGallery.render(journalEl);
+    ProjectImageCaptions.render(journalEl);
     ProjectEmbeds.renderVideoBlocks(journalEl);
     ProjectCellHeadings.render(journalEl);
     ProjectCallouts.render(journalEl);

@@ -431,6 +431,11 @@
   border-radius: 5px;
 }
 
+/* A lone picture with a title is a figure with a caption (project-image-captions.js). */
+.project-prose figure.image-figure > figcaption {
+  color: var(--muted);
+}
+
 .project-prose hr {
   margin: 0.85rem 0 calc(0.85rem + var(--block-gap));
   border: 0;
