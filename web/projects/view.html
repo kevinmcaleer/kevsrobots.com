@@ -16,6 +16,7 @@ description: View project details
 <link rel="stylesheet" href="/assets/js/markdown-editor/image-sizes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/js/markdown-editor/image-grid.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/js/markdown-editor/gallery.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/js/markdown-editor/cards.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-content.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-videos.css?v={{ site.time | date: '%s' }}">
@@ -731,6 +732,7 @@ description: View project details
 <script src="/assets/js/project-image-sizes.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-image-grid.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-gallery.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-cards.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-cell-headings.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #259: "On this page", canonical sections marked with icons. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
@@ -1368,7 +1370,7 @@ description: View project details
   // the shops have it now, in the reader's currency, a badge when the part
   // has changed since, and an estimated total under the table.
   async function enrichBomTable(items) {
-    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading)'));
+    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading, .md-card *)'));
     const table = sectionTableEl('bill-of-materials', headings);
     if (!table || !items.length || table.dataset.enriched) return;
     table.dataset.enriched = '1';
@@ -1694,7 +1696,7 @@ description: View project details
   // block in the page).
   let videosInContent = false;
   function embedVideoSection(root) {
-    const heading = Array.from(root.querySelectorAll(':is(h1, h2, h3, h4, h5, h6):not(.cell-heading)')).find(h => {
+    const heading = Array.from(root.querySelectorAll(':is(h1, h2, h3, h4, h5, h6):not(.cell-heading, .md-card *)')).find(h => {
       const section = ProjectSections.match(h.textContent);
       return section && section.id === 'videos';
     });
@@ -2523,7 +2525,7 @@ description: View project details
     if (!root) return;
     root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
       // A heading in a table cell (project-cell-headings.js) is a label, not a section.
-      if (h.dataset.anchored || h.closest('#view-bom-section') || h.classList.contains('cell-heading')) return;
+      if (h.dataset.anchored || h.closest('#view-bom-section') || h.classList.contains('cell-heading') || h.closest('.md-card')) return;
       let id = h.id;
       if (!id) {
         const base = slugify(headingText(h)) || 'section';
@@ -2628,7 +2630,7 @@ description: View project details
     // H1s are the top level and H2s nest under them (issue #259); deeper
     // headings stay in the text only.
     anchorHeadings(document.getElementById('view-content'));
-    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading)'));
+    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading, .md-card *)'));
 
     const bomSection = document.getElementById('view-bom-section');
     // The editor no longer edits the stored BOM rows: once the author's own
