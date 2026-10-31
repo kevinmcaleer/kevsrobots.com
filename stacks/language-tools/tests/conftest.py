@@ -111,7 +111,6 @@ def env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     monkeypatch.setenv("LIBRETRANSLATE_URL", "")
     monkeypatch.setenv("WORDNET_DIR", str(write_wordnet(tmp_path / "wordnet")))
     monkeypatch.setenv("CHECK_PER_MINUTE", "30")
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     return monkeypatch
 
 

@@ -2103,25 +2103,53 @@
   }
 
   let projectFiles = []; // the last list loadFiles() fetched, for `/3d printed parts`
+  let modelGallery = null; // ProjectModels handle, to keep the shown model across re-renders
   async function loadFiles() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', { credentials: 'include' });
-    const files = await resp.json();
-    projectFiles = files;
+    projectFiles = await resp.json();
+    renderFiles();
+    renderMissingThumbnails();
+  }
+
+  // Files & Models: the models as a filmstrip gallery (project-models.js,
+  // like Printables: a big picture with a cube badge when it is rendered
+  // from the model, a strip of the others under it), then the other files
+  // as a compact table, then Download files. Descriptions are edited in
+  // place; a model's print settings are an optional second box shown when
+  // the description is being edited (issues #187, #261).
+  function renderFiles() {
+    const section = document.getElementById('editor-files-section');
+    if (section && section.querySelector('.kr-file-fields.is-editing')) {
+      section.dataset.renderPending = '1';
+      return;
+    }
+    if (section) delete section.dataset.renderPending;
+    const files = projectFiles;
+    const models = files.filter(f => f.file_type === 'model');
+    const others = files.filter(f => f.file_type !== 'model');
+
+    modelGallery = window.ProjectModels ? ProjectModels.render(document.getElementById('model-gallery'), models, {
+      selectedId: modelGallery && modelGallery.selectedId(),
+      thumbUrl: fileThumbUrl,
+      canView: f => !!(window.ModelThumbnails && ModelThumbnails.canRender(f.filename)),
+      openViewer: f => ModelThumbnails.openViewer({ url: fileDownloadUrl(f) + '?preview=1', name: f.filename, downloadUrl: fileDownloadUrl(f) }),
+      details: f => `
+        <div class="kr-models-details-main">
+          <div class="kr-models-details-name"><a href="${fileDownloadUrl(f)}">${escapeHtmlAttr(f.filename)}</a></div>
+          <div class="kr-models-details-meta">${fileKind(f.filename)} · ${ProjectModels.formatSize(f.file_size)}</div>
+          ${renderFileFields(f)}
+        </div>
+        <div class="kr-models-details-actions">
+          <button type="button" class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})" title="Delete ${escapeHtmlAttr(f.filename)}" aria-label="Delete ${escapeHtmlAttr(f.filename)}"><i class="fas fa-trash fa-xs"></i></button>
+        </div>`,
+    }) : null;
+
     const list = document.getElementById('file-list');
-    if (files.length === 0) { list.innerHTML = ''; return; }
-    // Issue #187: render a Description column with an inline-editable
-    // cell. Click the muted placeholder ("Add a description…") or the
-    // existing text to flip into an input; Enter / blur saves; Escape
-    // cancels. Long descriptions wrap in the column via the
-    // .file-description CSS rule (word-break).
-    // Models first (issue #261), each with its thumbnail (issue #262).
-    const ordered = files.filter(f => f.file_type === 'model').concat(files.filter(f => f.file_type !== 'model'));
-    // Full width; the Description column takes the spare room.
-    list.innerHTML = `<table class="table table-single table-hover mb-0 files-table">
+    list.innerHTML = others.length ? `<table class="table table-single table-hover mb-0 files-table">
       <thead>
         <tr>
-          <th style="width:48px"></th>
+          <th style="width:36px"></th>
           <th>File</th>
           <th class="w-100">Description</th>
           <th class="text-muted small">Kind</th>
@@ -2129,68 +2157,100 @@
           <th style="width:30px"></th>
         </tr>
       </thead>
-      <tbody>${ordered.map(f => `
+      <tbody>${others.map(f => `
         <tr data-file-id="${f.id}">
-          <td class="text-muted text-center" style="width:48px">${fileThumb(f)}</td>
+          <td class="text-muted text-center" style="width:36px"><i class="${fileIcon(f.filename)}"></i></td>
           <td><a href="${fileDownloadUrl(f)}">${escapeHtmlAttr(f.filename)}</a></td>
-          <td class="file-description">
-            <div class="kr-file-field" data-file-id="${f.id}" data-field="description">${renderFileField('description', f.description)}</div>
-            ${f.file_type === 'model' ? `<div class="kr-file-field small" data-file-id="${f.id}" data-field="print_settings">${renderFileField('print_settings', f.print_settings)}</div>` : ''}
-          </td>
+          <td class="file-description">${renderFileFields(f)}</td>
           <td class="text-muted small">${fileKind(f.filename)}</td>
-          <td class="text-muted small text-end">${(f.file_size / 1024).toFixed(1)} KB</td>
-          <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})"><i class="fas fa-trash fa-xs"></i></button></td>
+          <td class="text-muted small text-end">${ProjectModels.formatSize(f.file_size)}</td>
+          <td style="width:30px"><button class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})" aria-label="Delete ${escapeHtmlAttr(f.filename)}"><i class="fas fa-trash fa-xs"></i></button></td>
         </tr>
-      `).join('')}</tbody></table>`;
+      `).join('')}</tbody></table>` : '';
+
+    const download = document.getElementById('download-files');
+    if (download) download.hidden = files.length === 0;
   }
 
   function fileThumbUrl(f) {
     return API + '/api/projects/' + currentProject.id + '/files/' + f.id + '/thumbnail?v=' + f.thumbnail_version;
   }
 
-  // A model's rendered thumbnail, or its icon until it has one.
-  function fileThumb(f) {
-    if (f.thumbnail_version) {
-      return `<img src="${fileThumbUrl(f)}" alt="" class="kr-file-thumb" width="40" height="40" loading="lazy">`;
+  // Models uploaded before thumbnails existed (or whose render failed)
+  // get one now, one at a time in the background, so the gallery fills in
+  // without the admin backfill. Each is tried once a page load.
+  const thumbnailTried = new Set();
+  let thumbnailsRunning = false;
+  async function renderMissingThumbnails() {
+    if (thumbnailsRunning || !window.ModelThumbnails || !currentProject) return;
+    thumbnailsRunning = true;
+    try {
+      for (;;) {
+        const f = projectFiles.find(x => x.file_type === 'model' && !x.thumbnail_version
+          && !thumbnailTried.has(x.id) && ModelThumbnails.canRender(x.filename));
+        if (!f) break;
+        thumbnailTried.add(f.id);
+        try {
+          const resp = await apiFetch(fileDownloadUrl(f) + '?preview=1', { credentials: 'include' });
+          if (!resp.ok) continue;
+          const url = API + '/api/projects/' + currentProject.id + '/files/' + f.id + '/thumbnail';
+          const saved = await ModelThumbnails.upload(apiFetch, url, await resp.arrayBuffer());
+          if (saved && saved.thumbnail_version) {
+            f.thumbnail_version = saved.thumbnail_version;
+            renderFiles();
+          }
+        } catch (e) {
+          console.warn('No thumbnail for ' + f.filename, e);
+        }
+      }
+    } finally {
+      thumbnailsRunning = false;
     }
-    return `<i class="${fileIcon(f.filename)}"></i>`;
   }
 
-  // Render an editable file field's "view" state — a span the user
-  // clicks to edit. Empty values get a muted placeholder so the affordance
-  // is discoverable. Models also carry print settings (issue #261).
+  // A file's editable text: one line, "Add a description…" when empty.
+  // A model's print settings show as a second line only once they are
+  // set; otherwise they are offered as an optional box while editing.
   const FILE_FIELDS = {
     description: { add: 'Add a description…', edit: 'Describe this file…' },
-    print_settings: { add: 'Add print settings…', edit: 'Layer height, infill, supports…', label: 'Print settings: ' },
+    print_settings: { add: 'Add print settings…', edit: 'Print settings (optional): layer height, infill, supports…', label: 'Print settings: ' },
   };
 
-  function renderFileField(field, value) {
-    const meta = FILE_FIELDS[field];
-    const hasText = value != null && String(value).length > 0;
-    if (hasText) {
-      return `<span class="kr-file-desc" tabindex="0" role="button"
-        title="Click to edit">${meta.label ? `<span class="text-muted">${meta.label}</span>` : ''}${escapeHtmlAttr(value)}</span>`;
-    }
-    return `<span class="kr-file-desc text-muted fst-italic" tabindex="0"
-      role="button" title="Click to add"
-      data-empty="1">${meta.add}</span>`;
+  function fileFieldsFor(f) {
+    return f.file_type === 'model' ? ['description', 'print_settings'] : ['description'];
   }
 
-  // Track in-flight PUTs per row so a fast typer doesn't fire overlapping
-  // requests — serialise per-row by chaining onto the previous promise.
+  function renderFileFields(f) {
+    const lines = fileFieldsFor(f).map(field => {
+      const value = f[field];
+      const hasText = value != null && String(value).length > 0;
+      if (hasText) {
+        const meta = FILE_FIELDS[field];
+        return `<span class="kr-file-desc${field === 'description' ? '' : ' small'}" data-field="${field}" tabindex="0" role="button"
+          title="Click to edit">${meta.label ? `<span class="text-muted">${meta.label}</span>` : ''}${escapeHtmlAttr(value)}</span>`;
+      }
+      if (field !== 'description') return '';
+      return `<span class="kr-file-desc text-muted fst-italic" data-field="${field}" tabindex="0"
+        role="button" title="Click to add" data-empty="1">${FILE_FIELDS[field].add}</span>`;
+    }).filter(Boolean);
+    return `<div class="kr-file-fields" data-file-id="${f.id}">${lines.join('')}</div>`;
+  }
+
+  // Track in-flight PUTs per file so a fast typer doesn't fire overlapping
+  // requests — serialise per file by chaining onto the previous promise.
   const _fileDescSavePending = {};
 
-  async function saveFileField(fileId, field, newValue) {
+  async function saveFileFields(fileId, patch) {
     if (!currentProject) return null;
     const prev = _fileDescSavePending[fileId] || Promise.resolve();
-    const next = prev.then(async () => {
+    const next = prev.catch(() => {}).then(async () => {
       const resp = await apiFetch(
         API + '/api/projects/' + currentProject.id + '/files/' + fileId,
         {
           method: 'PUT',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ [field]: newValue }),
+          body: JSON.stringify(patch),
         }
       );
       if (!resp.ok) throw new Error('save failed: ' + resp.status);
@@ -2200,82 +2260,92 @@
     return next;
   }
 
-  // Inline-edit handler: wired via event delegation on #file-list so it
-  // survives loadFiles() re-renders without re-binding listeners.
+  // Inline editing, wired by delegation on the section so it survives
+  // re-renders of the gallery and the table.
   function setupFileDescriptionEditing() {
-    const list = document.getElementById('file-list');
-    if (!list || list.dataset.descBound === '1') return;
-    list.dataset.descBound = '1';
+    const section = document.getElementById('editor-files-section');
+    if (!section || section.dataset.descBound === '1') return;
+    section.dataset.descBound = '1';
 
-    list.addEventListener('click', e => {
+    section.addEventListener('click', e => {
+      const span = e.target.closest('.kr-file-desc');
+      if (span) beginFileFieldsEdit(span);
+    });
+    section.addEventListener('keydown', e => {
       const span = e.target.closest('.kr-file-desc');
       if (!span) return;
-      // Already editing? Don't re-enter.
-      if (span.dataset.editing === '1') return;
-      beginFileDescriptionEdit(span);
-    });
-    list.addEventListener('keydown', e => {
-      const span = e.target.closest('.kr-file-desc');
-      if (!span || span.dataset.editing === '1') return;
       // Enter / Space activates the editor for keyboard users.
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        beginFileDescriptionEdit(span);
+        beginFileFieldsEdit(span);
       }
+    });
+    const download = document.getElementById('download-files-btn');
+    if (download) download.addEventListener('click', () => {
+      if (currentProject) ProjectDownload.zip(currentProject, download, { contentMd: getEditorValue() });
     });
   }
 
-  function beginFileDescriptionEdit(span) {
-    const cell = span.closest('.kr-file-field');
-    if (!cell) return;
-    const fileId = parseInt(cell.dataset.fileId, 10);
-    if (!Number.isFinite(fileId)) return;
-    const field = cell.dataset.field;
+  function beginFileFieldsEdit(span) {
+    const box = span.closest('.kr-file-fields');
+    if (!box || box.classList.contains('is-editing')) return;
+    const fileId = parseInt(box.dataset.fileId, 10);
     const file = projectFiles.find(f => f.id === fileId);
-    const original = (file && file[field]) || '';
-    span.dataset.editing = '1';
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'form-control form-control-sm kr-file-desc-input';
-    input.value = original;
-    input.maxLength = 2000;
-    input.placeholder = FILE_FIELDS[field].edit;
-    cell.innerHTML = '';
-    cell.appendChild(input);
-    input.focus();
-    input.select();
+    if (!file) return;
+    const fields = fileFieldsFor(file);
+    const original = {};
+    fields.forEach(field => { original[field] = file[field] || ''; });
+    box.classList.add('is-editing');
+    box.innerHTML = '';
+    const inputs = {};
+    fields.forEach(field => {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'form-control form-control-sm kr-file-desc-input' + (field === 'description' ? '' : ' mt-1');
+      input.value = original[field];
+      input.maxLength = 2000;
+      input.placeholder = FILE_FIELDS[field].edit;
+      input.setAttribute('aria-label', field === 'description' ? 'Description' : 'Print settings (optional)');
+      box.appendChild(input);
+      inputs[field] = input;
+    });
+    const first = inputs[span.dataset.field] || inputs.description;
+    first.focus();
+    first.select();
 
     let finished = false;
     const finish = async (commit) => {
       if (finished) return;
       finished = true;
-      const next = input.value;
-      if (!commit || next === original) {
-        cell.innerHTML = renderFileField(field, original || null);
-        return;
-      }
-      // Optimistic re-render with the new value; if the save fails the
-      // reload at the end of the catch reconciles with the server.
-      cell.innerHTML = renderFileField(field, next || null);
-      if (file) file[field] = next;
+      const patch = {};
+      if (commit) fields.forEach(field => {
+        if (inputs[field].value !== original[field]) patch[field] = inputs[field].value;
+      });
+      Object.assign(file, patch);
+      box.classList.remove('is-editing');
+      box.outerHTML = renderFileFields(file);
+      const section = document.getElementById('editor-files-section');
+      if (section && section.dataset.renderPending) renderFiles();
+      if (!Object.keys(patch).length) return;
       try {
-        await saveFileField(fileId, field, next);
+        await saveFileFields(fileId, patch);
       } catch (_) {
         loadFiles();
       }
     };
 
-    input.addEventListener('keydown', e => {
+    box.addEventListener('keydown', e => {
       if (e.key === 'Enter') { e.preventDefault(); finish(true); }
       else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
     });
-    input.addEventListener('blur', () => finish(true));
+    // Saved when the focus leaves both boxes, not when it moves between them.
+    box.addEventListener('focusout', e => {
+      if (!box.contains(e.relatedTarget)) finish(true);
+    });
   }
 
-  // Bind the delegated handler once at module init — the file-list
-  // element exists from page load even before any files have been
-  // uploaded.
+  // Bind the delegated handler once at module init — the section exists
+  // from page load even before any files have been uploaded.
   setupFileDescriptionEditing();
 
   window.deleteFile = async function(fileId) {
@@ -3141,7 +3211,7 @@
     // Issue #171: a YouTube video counts toward "extra content" too —
     // it's just as much a doc artefact as a file.
     { key: 'extra',  points: 10, label: 'Add a file or video',                 target: 'editor-files-section',
-      check: () => document.querySelectorAll('#file-list tbody tr').length > 0
+      check: () => projectFiles.length > 0
                 || videosFromMarkdown(getEditorValue()).length > 0 },
   ];
 
@@ -3307,6 +3377,7 @@
   }
   _observe('tags-container');
   _observe('file-list');
+  _observe('model-gallery');
 
   // Expose so loadProject() / init can trigger explicitly.
   window._recomputeCompleteness = recomputeCompleteness;

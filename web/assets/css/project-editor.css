@@ -588,29 +588,31 @@
   white-space: normal;
 }
 
-#editor-files-section .file-description .kr-file-desc {
-  display: inline-block;
+/* A file's description (and a model's print settings) edit in place:
+   one line each, the placeholder a single line too. */
+#editor-files-section .kr-file-desc {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
   min-width: 8em;
   padding: 0.125rem 0.25rem;
+  margin-left: -0.25rem;
   border-radius: 0.25rem;
   cursor: text;
 }
 
-#editor-files-section .file-description .kr-file-desc:hover,
-#editor-files-section .file-description .kr-file-desc:focus {
+#editor-files-section .kr-file-desc:hover,
+#editor-files-section .kr-file-desc:focus {
   background-color: var(--accent-soft, rgba(13, 110, 253, 0.08));
   outline: none;
 }
 
-#editor-files-section .file-description .kr-file-desc-input {
+#editor-files-section .kr-file-desc-input {
   width: 100%;
 }
 
-/* Issue #262: a model's rendered thumbnail in the Files & Models table. */
-#editor-files-section .kr-file-thumb {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
+#editor-files-section #model-gallery:not(:empty) + #file-list:not(:empty) {
+  margin-top: 0.25rem;
 }
 
 /* Per-step rendering inside the preview surface (and in the public

@@ -13,6 +13,7 @@ hide_nibsy: true
 
 <link rel="stylesheet" href="/assets/css/project-notes.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-editor.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-models.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/parts-catalog.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/part-submit.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-wiring.css?v={{ site.time | date: '%s' }}">
@@ -181,9 +182,18 @@ hide_nibsy: true
           </div>
         </div>
         <p class="kr-section-hint">Or drag files anywhere on the page: .stl, .3mf, .py, .ino, .dxf, .pdf, .md, .zip &hellip; up to 25MB each.</p>
+        <!-- The models as a filmstrip gallery, then the other files. -->
+        <div id="model-gallery"></div>
         <div id="file-list"></div>
         <div id="file-progress" class="d-none">
           <div class="progress"><div class="progress-bar" role="progressbar" style="width: 0%"></div></div>
+        </div>
+        <!-- Every file and picture plus the write-up, zipped (project-download.js). -->
+        <div class="kr-download-files" id="download-files" hidden>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="download-files-btn">
+            <i class="fas fa-file-archive me-1"></i> Download files
+          </button>
+          <small class="text-muted">One .zip of every file and picture, with the write-up as README.md</small>
         </div>
       </section>
 
@@ -263,6 +273,8 @@ hide_nibsy: true
 <script src="/assets/js/part-links.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-slash-commands.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-models.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-download.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-mermaid-theme.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/snakie-host.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/pinout-sync.js?v={{ site.time | date: '%s' }}"></script>
