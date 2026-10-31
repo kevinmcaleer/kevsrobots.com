@@ -775,6 +775,8 @@
       },
       // A tip on Qty, Price and the automatic totals above the Bill of Materials table.
       tableNote: ({ rows, heading }) => bomTableTip(rows, heading),
+      // Up and down buttons on the Bill of Materials' Qty cells.
+      tableStepper: bomQtyStepper,
       slashCommands: ProjectSlashCommands.create(slashContext()),
       // Project topics in the ? Markdown guide, after the editor's own.
       guide: projectGuideTopics(),
@@ -1436,6 +1438,18 @@
       '<button type="button" class="btn-close" aria-label="Hide this tip"></button>';
     tip.querySelector('.btn-close').addEventListener('click', () => setBomTipClosed(true));
     return tip;
+  }
+
+  // The Bill of Materials' Qty (Quantity, Count) cells get up and down
+  // buttons in the editor, and Alt+Up / Alt+Down. Each step writes the plain
+  // number into the Markdown, so the totals are worked out again as when
+  // it's typed. Not the Total row, whose Qty cell stays empty.
+  function bomQtyStepper({ header, row, heading }) {
+    const section = heading && ProjectSections.match(heading);
+    if (!section || section.id !== 'bill-of-materials') return null;
+    if (!/^(qty|quantity|count)$/.test(header.replace(/[*_`]/g, '').trim().toLowerCase())) return null;
+    if (ProjectSlashCommands.isTotalRow(row)) return null;
+    return { min: 0 };
   }
 
   function setBomTipClosed(closed) {
