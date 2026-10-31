@@ -81,3 +81,11 @@ def test_same_aliases_as_project_sections_js() -> None:
         for sid, names in re.findall(r"id: '([^']+)',\s*heading: '[^']+',\s*(?://[^\n]*\n\s*)*aliases: \[([^\]]*)\]", js)
     }
     assert found == ALIASES
+
+
+def test_card_titles_are_not_sections():
+    md = "# Overview\n\n::: cards\n![a](/a.jpg)\n## Wiring\nwords\n\n---\n\n## Gallery\n:::\n\n# Code\n"
+    assert canonical_sections(md) == canonical_sections("# Overview\n# Code\n")
+    assert "wiring" not in canonical_sections(md)
+    # An unclosed block hides nothing.
+    assert "wiring" in canonical_sections("::: cards\n## Wiring\n")

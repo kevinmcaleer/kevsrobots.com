@@ -92,19 +92,39 @@
       items.map(s => iconSvg(s, 14)).join('') + '</span>';
   }
 
-  // The Markdown's headings, outside code fences: { level, text, line }
+  // The lines inside closed `::: cards` blocks (project-cards.js): a card's
+  // title is a label, not a section of the page.
+  function cardLines(lines) {
+    const skip = new Set();
+    for (let i = 0; i < lines.length; i++) {
+      if (!/^ {0,3}:::[ \t]*cards\b/i.test(lines[i])) continue;
+      for (let j = i + 1; j < lines.length; j++) {
+        if (/^ {0,3}:::[ \t]*cards\b/i.test(lines[j])) break;
+        if (/^ {0,3}:::[ \t]*$/.test(lines[j])) {
+          for (let k = i; k <= j; k++) skip.add(k);
+          i = j;
+          break;
+        }
+      }
+    }
+    return skip;
+  }
+
+  // The Markdown's headings, outside code fences and cards: { level, text, line }
   // with `line` counted from 0.
   function headings(markdown) {
     const out = [];
     let fence = null;
-    String(markdown || '').split('\n').forEach((line, i) => {
+    const lines = String(markdown || '').split('\n');
+    const cards = cardLines(lines);
+    lines.forEach((line, i) => {
       const f = line.match(/^ {0,3}(`{3,}|~{3,})/);
       if (f) {
         if (fence === null) fence = f[1];
         else if (f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
         return;
       }
-      if (fence !== null) return;
+      if (fence !== null || cards.has(i)) return;
       const m = line.match(/^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$/);
       if (m) out.push({ level: m[1].length, text: m[2].trim(), line: i });
     });

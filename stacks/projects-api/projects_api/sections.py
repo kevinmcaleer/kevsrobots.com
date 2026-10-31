@@ -44,6 +44,28 @@ _BY_NAME = {_normalise(heading): sid for sid, heading in SECTIONS}
 _BY_NAME.update({_normalise(name): sid for sid, names in ALIASES.items() for name in names})
 
 
+_CARDS_OPEN = re.compile(r"^ {0,3}:::[ \t]*cards\b", re.IGNORECASE)
+_BLOCK_CLOSE = re.compile(r"^ {0,3}:::[ \t]*$")
+
+
+def _card_lines(lines: list[str]) -> set[int]:
+    """Line numbers inside closed ``::: cards`` blocks: a card's title is a
+    label, not a section (project-cards.js on the site)."""
+    skip: set[int] = set()
+    i = 0
+    while i < len(lines):
+        if _CARDS_OPEN.match(lines[i]):
+            for j in range(i + 1, len(lines)):
+                if _CARDS_OPEN.match(lines[j]):
+                    break
+                if _BLOCK_CLOSE.match(lines[j]):
+                    skip.update(range(i, j + 1))
+                    i = j
+                    break
+        i += 1
+    return skip
+
+
 def canonical_sections(content_md: Optional[str], has_bom: bool = False) -> list[str]:
     """Ids of the canonical sections a project has, in canonical order.
 
@@ -55,7 +77,11 @@ def canonical_sections(content_md: Optional[str], has_bom: bool = False) -> list
     if has_bom:
         found.add("bill-of-materials")
     fence: Optional[str] = None
-    for line in (content_md or "").splitlines():
+    lines = (content_md or "").splitlines()
+    cards = _card_lines(lines)
+    for i, line in enumerate(lines):
+        if i in cards:
+            continue
         m = _FENCE.match(line)
         if m:
             marker = m.group(1)
