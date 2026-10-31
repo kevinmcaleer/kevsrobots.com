@@ -811,6 +811,7 @@
           [heading('code-repository'), 'A link to your code repository'],
           [heading('3d-printed-parts'), 'Your STL files'],
           [heading('videos'), 'A table of YouTube links'],
+          [heading('gallery'), 'Your pictures as a gallery: / then Gallery, pick a layout, then delete or move picture lines'],
         ],
         note: 'These headings fill the page navigation and the completeness check.',
       },
@@ -887,6 +888,10 @@
         input.click();
       }),
       listVideos: async () => (await getJson('/videos')).map(v => ({ id: v.youtube_id, title: v.title })),
+      // The gallery's pictures, in its order, for a new `::: gallery` block.
+      listImages: async () => (await fetchProjectImages()).map(img => ({
+        url: imageViewUrl(img), name: img.filename, caption: img.caption || '',
+      })),
       listParts: async () => (await getJson('/bom')).filter(item => item.name).map(item => ({
         name: item.name,
         url: item.part_slug ? '/parts/view.html?slug=' + encodeURIComponent(item.part_slug) : null,

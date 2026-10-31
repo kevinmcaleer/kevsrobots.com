@@ -37,6 +37,8 @@ cp "$pkg/src/image-sizes.css" "$dest/image-sizes.css"
 # And image grids (a table of images as cards), with
 # assets/js/project-image-grid.js.
 cp "$pkg/src/image-grid.css" "$dest/image-grid.css"
+# Galleries (`::: gallery`), for the view page: assets/js/project-gallery.js.
+cp "$pkg/src/gallery.css" "$dest/gallery.css"
 cp "$pkg/dist/dictionaries/"* "$dest/dictionaries/"
 
 version="$(node -p "require('$pkg/package.json').version")"

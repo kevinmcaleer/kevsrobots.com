@@ -20,6 +20,7 @@ SECTIONS: list[tuple[str, str]] = [
     ("code-repository", "Code repository"),
     ("3d-printed-parts", "3D printed parts"),
     ("videos", "Videos"),
+    ("gallery", "Gallery"),
 ]
 
 _HEADING = re.compile(r"^ {0,3}(#{1,6})\s+(.+?)\s*#*\s*$")
@@ -36,6 +37,7 @@ def _normalise(text: str) -> str:
 # project-sections.js).
 ALIASES: dict[str, list[str]] = {
     "bill-of-materials": ["BOM", "Parts", "Parts list"],
+    "gallery": ["Photos", "Pictures"],
 }
 
 _BY_NAME = {_normalise(heading): sid for sid, heading in SECTIONS}

@@ -54,6 +54,15 @@
       keywords: ['youtube', 'video', 'film', 'clips'],
       icon: 'M2 4h8.5v8H2zM10.5 7 14 5v6l-3.5-2',
     },
+    {
+      // A `::: gallery <layout>` block of the project's pictures under it
+      // (ProjectGallery, project-gallery.js).
+      id: 'gallery',
+      heading: 'Gallery',
+      aliases: ['Photos', 'Pictures'],
+      keywords: ['photos', 'pictures', 'images', 'filmstrip', 'bento', 'lightbox', 'slideshow'],
+      icon: 'M2 3.5h12v9H2zM2 10l3.5-3 3 2.5 2-1.5 3.5 3M10.5 6.5h.01',
+    },
   ];
 
   // "Bill of Materials", "bill of materials " and "Bill-of-materials" are
