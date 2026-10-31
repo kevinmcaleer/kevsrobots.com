@@ -37,6 +37,7 @@ def _normalise(text: str) -> str:
 # project-sections.js).
 ALIASES: dict[str, list[str]] = {
     "bill-of-materials": ["BOM", "Parts", "Parts list"],
+    "assembly-instructions": ["Assembly", "Build"],
     "gallery": ["Photos", "Pictures"],
 }
 

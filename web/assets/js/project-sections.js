@@ -17,6 +17,7 @@
     {
       id: 'assembly-instructions',
       heading: 'Assembly instructions',
+      aliases: ['Assembly', 'Build'],
       keywords: ['assembly', 'build', 'steps', 'instructions', 'how to'],
       icon: 'M2.5 3.5h1v3M2.5 6.5h2M6.5 4h7M6.5 8h7M6.5 12h7M2.5 10.5h2l-2 2.5h2',
     },
