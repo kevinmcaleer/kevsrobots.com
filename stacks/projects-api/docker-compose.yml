@@ -1,8 +1,11 @@
-# Projects API — deploy with:
-#   docker compose -f docker-compose.prod.yml up -d
+# Projects API — run from this folder:
+#   docker compose up -d --build     # rebuild from source and restart
+#   docker compose up -d             # restart with the existing image
+# To also publish the image to the registry: docker compose push projects-api
 
 services:
   projects-api:
+    build: .
     image: 192.168.2.1:5000/projects-api:latest
     network_mode: host
     env_file: .env
