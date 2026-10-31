@@ -161,6 +161,8 @@ description: View project details
 
         <!-- Rendered markdown -->
         <div id="view-content" class="project-doc project-prose mb-4"></div>
+        <!-- Previous / page numbers / Next, when the text has pages. -->
+        <nav id="view-pager" class="kr-pager" aria-label="Pages"></nav>
 
         <!-- Pictures from the retired Images section: shown as a gallery
              only while the project's text has no gallery of its own. -->
@@ -737,6 +739,7 @@ description: View project details
 <!-- Issue #259: "On this page", canonical sections marked with icons. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-pages.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/page-jump.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
@@ -1011,6 +1014,12 @@ description: View project details
         highlightCode(contentEl);
         CodeCopy.attach(contentEl);
         labelCodeBlocks(contentEl);
+        // Pages: split at the author's <!-- page --> lines. ?pages=auto
+        // previews splitting a long write-up at its sections instead.
+        projectPages = ProjectPages.paginate(contentEl, {
+          auto: params.get('pages') === 'auto',
+          pagerEl: document.getElementById('view-pager'),
+        });
         buildTOC();
       }
 
@@ -2008,6 +2017,8 @@ description: View project details
 
     const doc = document.getElementById('view-content').cloneNode(true);
     doc.removeAttribute('id');
+    // Paper gets the whole write-up, every page of it.
+    doc.querySelectorAll('.kr-page[hidden]').forEach(el => el.removeAttribute('hidden'));
     doc.querySelectorAll('.heading-anchor, .copy-code-button').forEach(el => el.remove());
     // A video can't play on paper: its thumbnail and link instead.
     doc.querySelectorAll('.project-video-embed').forEach(box => {
@@ -2551,12 +2562,14 @@ description: View project details
   // content is in, and again as the BOM and files arrive and push things
   // around, until the reader scrolls on their own.
   let readerScrolled = false;
+  let projectPages = null; // ProjectPages.paginate's result, when the text has pages
   ['wheel', 'touchmove', 'keydown'].forEach(ev =>
     window.addEventListener(ev, () => { readerScrolled = true; }, { once: true, passive: true }));
   function scrollToHash() {
     if (readerScrolled || !location.hash) return;
     let id;
     try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { return; }
+    if (projectPages) projectPages.reveal(id);
     const target = id && document.getElementById(id);
     if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80 });
   }
@@ -2667,6 +2680,8 @@ description: View project details
       onSelect(id) {
         const target = document.getElementById(id);
         if (!target) return;
+        // On another page: open that page first.
+        if (projectPages) projectPages.reveal(id);
         // page-jump.js: lands on it even if pictures above it are still loading.
         PageJump.toElement(target, { offset: 80 });
         history.replaceState(null, '', '#' + id);
@@ -2680,6 +2695,7 @@ description: View project details
     function spy() {
       let current = null;
       targets.forEach(el => {
+        if (el.closest('[hidden]')) return; // on another page
         const top = el.getBoundingClientRect().top;
         if (top <= 100 && (!current || top > current.getBoundingClientRect().top)) current = el;
       });
@@ -2693,6 +2709,10 @@ description: View project details
       requestAnimationFrame(() => { queued = false; spy(); });
     };
     window.addEventListener('scroll', buildTOC._spy, { passive: true });
+    if (projectPages && !buildTOC._pageSpy) {
+      buildTOC._pageSpy = true;
+      document.getElementById('view-content').addEventListener('kr-page-change', () => buildTOC._spy());
+    }
     spy();
   }
 

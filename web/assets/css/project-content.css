@@ -505,3 +505,88 @@
     margin-right: -0.5rem;
   }
 }
+
+/* ---- Pages (project-pages.js) ------------------------------------------
+   A write-up split with <!-- page --> lines shows one page at a time, with
+   Previous / page numbers / Next under the document. */
+.kr-page[hidden] { display: none !important; }
+
+/* "View as one page": a dashed rule where each page break was. */
+.kr-paged-all .kr-page + .kr-page {
+  margin-top: var(--block-gap);
+  padding-top: var(--block-gap);
+  border-top: 1px dashed var(--border);
+}
+
+.kr-pager:empty { display: none; }
+.kr-pager {
+  margin: -0.5rem 0 1.5rem;
+  font-family: var(--font-sans);
+}
+.kr-pager-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+.kr-notes .kr-pager a.kr-pager-step,
+.kr-pager-step {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg);
+  color: var(--text);
+  text-decoration: none;
+}
+.kr-pager-step.is-empty { visibility: hidden; }
+.kr-notes .kr-pager a.kr-pager-step:hover { border-color: var(--accent); color: var(--text); }
+.kr-pager-next { text-align: right; }
+.kr-pager-dir { font-size: 0.8rem; color: var(--muted); }
+.kr-pager-step:hover .kr-pager-dir { color: var(--accent-strong); }
+.kr-pager-name {
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kr-pager-nums {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+.kr-pager-of { color: var(--muted); margin-right: 0.25rem; }
+.kr-notes .kr-pager a.kr-pager-num,
+.kr-pager-num {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: var(--text);
+  text-decoration: none;
+}
+.kr-notes .kr-pager a.kr-pager-num:hover { background: var(--surface-2); color: var(--text); }
+.kr-pager-num.is-current { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+.kr-pager-all, .kr-pager-one {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.kr-pager-one { display: flex; justify-content: center; gap: 0.75rem; color: var(--muted); }
+.kr-notes .kr-pager .kr-pager-all a, .kr-notes .kr-pager .kr-pager-one a { color: var(--muted); text-decoration: none; }
+.kr-notes .kr-pager .kr-pager-all a:hover, .kr-notes .kr-pager .kr-pager-one a:hover { text-decoration: underline; color: var(--accent-strong); }
+
+@media (max-width: 575.98px) {
+  .kr-pager-row { grid-template-columns: 1fr 1fr; }
+  .kr-pager-nums { grid-column: 1 / -1; grid-row: 1; justify-content: center; }
+}
+@media print {
+  .kr-page[hidden] { display: block !important; }
+  .kr-pager { display: none !important; }
+}
