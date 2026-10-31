@@ -66,12 +66,21 @@
   margin-bottom: 0;
 }
 
-/* The card's title: its heading, whatever its level. */
+/* The card's title: its heading, whatever its level, in the same face as
+   the document's headings (--font-serif) rather than whatever the page
+   gives a bare h1/h2 (a site's display font, capitals, condensed). */
 .md-cards .md-card-body > :is(h1, h2, h3, h4, h5, h6) {
   margin: 0 0 0.3rem;
+  padding: 0;
   color: var(--text, inherit);
+  font-family: var(--font-serif, inherit);
   font-size: 1.2em;
-  line-height: 1.25;
+  font-stretch: normal;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.3;
+  text-transform: none;
 }
 
 .md-cards .md-card-body > :is(h4, h5, h6) {
