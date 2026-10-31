@@ -5,6 +5,10 @@ This router implements:
 * ``GET    /api/parts``                 — fuzzy search across name + aliases
                                           + sku + mpn.
 * ``POST   /api/parts``                 — create a draft part (14-day gated).
+* ``POST   /api/parts/submit``          — submit a part from the project
+                                          editor (any signed-in account);
+                                          it waits as ``pending`` until an
+                                          admin approves it.
 * ``GET    /api/parts/{slug}``          — full part incl. suppliers + last
                                           10 revisions.
 * ``PUT    /api/parts/{slug}``          — write a new revision (14-day
@@ -57,7 +61,7 @@ from fastapi.responses import Response
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import require_terms_accepted_aged
+from ..auth import PartWriter, get_optional_user, require_part_writer, require_terms_accepted_aged
 from ..db import get_session
 from ..mass_deletion import (
     check_and_handle_mass_deletion,
@@ -83,6 +87,7 @@ from ..storage import generate_filename, read_file, save_file
 from ..parts_taxonomy import canonicalize, merge_for_suggestions
 from ..schemas import (
     PartCreate,
+    PartSubmit,
     PartDetail,
     PartRelatedRef,
     PartRelationCreate,
@@ -122,6 +127,27 @@ SPEC_FIELDS = (
 EDITABLE_SPEC_FIELDS = (
     "manufacturer", "package", "voltage", "pin_spacing", "dimensions_mm", "datasheet_url",
 )
+
+
+# Issue: user-submitted parts. A part sent from the project editor's "New
+# part" dialog is ``pending`` until an admin approves it (it then becomes a
+# ``draft`` like any other) or turns it down (``rejected``). Until then it's
+# left out of search, the catalog and exact-name linking for everyone but
+# the person who sent it; its own page still works, since their project
+# links to it.
+UNREVIEWED_STATUSES = ("pending", "rejected")
+# How many parts one account may have waiting at once.
+MAX_PENDING_PER_USER = 25
+
+
+def listed_for(user: Optional[str]):
+    """The parts a search or the catalog shows ``user`` (None: signed out)."""
+    reviewed = Part.status.notin_(UNREVIEWED_STATUSES)
+    return or_(reviewed, Part.created_by == user) if user else reviewed
+
+
+def is_listed_for(part: Part, user: Optional[str]) -> bool:
+    return part.status not in UNREVIEWED_STATUSES or (user is not None and part.created_by == user)
 
 
 def spec_values(obj) -> dict:
@@ -484,6 +510,7 @@ async def search_parts(
     limit: int = Query(10, ge=1, le=50),
     category: Optional[str] = Query(None, max_length=60),
     family: Optional[str] = Query(None, max_length=80),
+    user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> list[PartSearchResult]:
     """Substring search across name / sku / mpn / aliases.
@@ -495,7 +522,7 @@ async def search_parts(
     useful for the catalog browse page and the related-parts picker on
     the edit screen (issue #135).
     """
-    stmt = select(Part)
+    stmt = select(Part).where(listed_for(user))
     if q and q.strip():
         needle = f"%{q.strip().lower()}%"
         alias_part_ids_subq = (
@@ -597,6 +624,7 @@ async def list_families(
 @router.get("/_resolve", response_model=list[PartResolveResult])
 async def resolve_part_names(
     names: list[str] = Query(..., max_length=100),
+    user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> list[PartResolveResult]:
     """Issue #263: the catalog part each name is exactly (ignoring case):
@@ -623,6 +651,7 @@ async def resolve_part_names(
         ).all()
         for alias, part in rows:
             found.setdefault(alias, part)
+        found = {k: p for k, p in found.items() if is_listed_for(p, user)}
     covers = await first_photo_cover_urls(session, {p.id: p.slug for p in found.values()})
     out = []
     for key, original in wanted.items():
@@ -637,7 +666,10 @@ async def resolve_part_names(
 
 
 @router.get("/_catalog", response_model=list[PartCatalogEntry])
-async def parts_catalog(session: AsyncSession = Depends(get_session)) -> list[PartCatalogEntry]:
+async def parts_catalog(
+    user: Optional[str] = Depends(get_optional_user),
+    session: AsyncSession = Depends(get_session),
+) -> list[PartCatalogEntry]:
     """Issue #265: every part, compactly, for the visual catalog on
     ``/parts/`` and the editor's "Browse catalog". The page shelves and
     filters them itself, so this is one request however the reader filters.
@@ -645,7 +677,7 @@ async def parts_catalog(session: AsyncSession = Depends(get_session)) -> list[Pa
     parts = (
         await session.scalars(select(Part).order_by(func.lower(Part.name)))
     ).all()
-    parts = [p for p in parts if not (p.status or "").startswith("merged")]
+    parts = [p for p in parts if not (p.status or "").startswith("merged") and is_listed_for(p, user)]
     priced = set(
         (
             await session.scalars(
@@ -735,6 +767,117 @@ async def create_part(
     return await _part_detail(session, part)
 
 
+def _http_url(url: Optional[str], what: str) -> Optional[str]:
+    url = (url or "").strip()
+    if not url:
+        return None
+    if not (url.startswith("http://") or url.startswith("https://")):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail=f"The {what} must start with http:// or https://")
+    return url
+
+
+def _clean(value: Optional[str]) -> Optional[str]:
+    value = (value or "").strip()
+    return value or None
+
+
+@router.post("/submit", response_model=PartDetail, status_code=201)
+async def submit_part(
+    body: PartSubmit,
+    writer: PartWriter = Depends(require_part_writer),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """A part sent from the project editor's "New part" dialog, so a maker
+    can add the part they used without leaving their project.
+
+    Any signed-in account (T&Cs accepted) may send one. It is ``pending``
+    until an admin approves it on /admin/parts/ (an admin's own goes
+    straight in as a ``draft``). The sender can link it, add its photos
+    and edit it meanwhile; nobody else finds it in search or the catalog.
+    """
+    user = writer.username
+    is_admin = user in get_settings().admin_usernames_list
+    name = body.name.strip()
+    if len(name) < 2:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Give the part a name")
+    if not is_admin:
+        waiting = await session.scalar(
+            select(func.count(Part.id)).where(Part.created_by == user, Part.status == "pending")
+        )
+        if (waiting or 0) >= MAX_PENDING_PER_USER:
+            raise HTTPException(
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"You have {waiting} parts waiting for review. Please wait until some are approved before sending more.",
+            )
+
+    links: list[dict] = []
+    seen: set[str] = set()
+    for link in body.links:
+        url = _http_url(link.url, "link")
+        if not url or url in seen:
+            continue
+        seen.add(url)
+        links.append({
+            "name": _clean(link.name), "url": url, "country_code": link.country_code,
+            "unit_cost": link.unit_cost,
+            "currency_code": link.currency_code if link.unit_cost is not None else None,
+            "kind": link.kind or "shop",
+        })
+
+    slug = await _unique_slug(session, _slugify(name))
+    now = _now_naive_utc()
+    category = canonicalize(body.category, await _distinct_categories_by_usage(session))
+    part = Part(
+        slug=slug,
+        name=name,
+        sku=_clean(body.sku),
+        mpn=_clean(body.mpn),
+        description_md=_clean(body.description_md),
+        tags=_normalize_tags(body.tags),
+        status="draft" if is_admin else "pending",
+        category=category,
+        family=_clean(body.family),
+        manufacturer=_clean(body.manufacturer),
+        package=_clean(body.package),
+        voltage=_clean(body.voltage),
+        datasheet_url=_http_url(body.datasheet_url, "datasheet link"),
+        created_by=user,
+        created_at=now,
+        updated_at=now,
+        usage_count=0,
+    )
+    session.add(part)
+    await session.flush()
+
+    await _sync_suppliers(session, part.id, links)
+    suppliers = await _load_suppliers(session, part.id)
+
+    rev = PartRevision(
+        part_id=part.id,
+        author=user,
+        change_summary="Submitted from a project",
+        name=part.name,
+        sku=part.sku,
+        mpn=part.mpn,
+        description_md=part.description_md,
+        image_url=part.image_url,
+        tags=list(part.tags or []),
+        category=part.category,
+        family=part.family,
+        symbol_id=None,
+        suppliers_json=_suppliers_to_json(suppliers),
+        created_at=now,
+        **spec_values(part),
+    )
+    session.add(rev)
+    await session.flush()
+    part.current_revision_id = rev.id
+
+    await session.commit()
+    await session.refresh(part)
+    return await _part_detail(session, part)
+
+
 # --- related parts + family helpers ------------------------------------
 
 
@@ -794,10 +937,13 @@ def _supplier_signature(suppliers: list[dict]) -> list[tuple]:
 async def update_part(
     slug: str,
     body: PartUpdate,
-    user: str = Depends(require_terms_accepted_aged),
+    writer: PartWriter = Depends(require_part_writer),
     session: AsyncSession = Depends(get_session),
 ) -> PartDetail:
     part = await _get_part_by_slug(session, slug)
+    # Aged accounts edit any part; a new account only the one it submitted.
+    writer.check_part(part)
+    user = writer.username
 
     # Resolve the *next* state for each editable field. None on the body
     # means "no change requested for this field".
@@ -1331,7 +1477,7 @@ async def put_definition(
     slug: str,
     definition: dict = Body(...),
     change_summary: Optional[str] = Query(None, max_length=200),
-    user: str = Depends(require_terms_accepted_aged),
+    writer: PartWriter = Depends(require_part_writer),
     session: AsyncSession = Depends(get_session),
 ) -> PartDetail:
     """Store the JSON the Snakie part editor saves (a PartDefinition) as a
@@ -1342,6 +1488,8 @@ async def put_definition(
     if not isinstance(definition.get("headers", []), list):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="headers must be a list")
     part = await _get_part_by_slug(session, slug)
+    writer.check_part(part)
+    user = writer.username
     photo_id = definition.get("photo_id")
     if photo_id is not None:
         photo = await session.get(PartPhoto, photo_id) if isinstance(photo_id, int) else None

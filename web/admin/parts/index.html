@@ -45,6 +45,21 @@ permalink: /admin/parts/
       <div class="card-footer small d-none" id="snakie-sync-result"></div>
     </div>
 
+    <!-- Parts people added from their projects' Bill of Materials -->
+    <div class="card mb-4" id="submitted">
+      <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+          <h5 class="mb-0 flex-grow-1"><i class="fas fa-inbox me-2"></i> New parts to review <span class="badge bg-info text-dark" id="submitted-count">0</span></h5>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Which submitted parts">
+            <button type="button" class="btn btn-outline-secondary active" data-submitted="pending">Waiting</button>
+            <button type="button" class="btn btn-outline-secondary" data-submitted="rejected">Turned down</button>
+          </div>
+        </div>
+        <div class="text-muted small mb-3">Added by makers from their projects. Only the person who added a part sees it in search and the catalog until you approve it; approved parts become drafts like any other. Turning one down keeps it out of the catalog, but the projects linking it keep working.</div>
+        <div id="submitted-list" class="vstack gap-2"></div>
+      </div>
+    </div>
+
     <ul class="nav nav-pills mb-3" id="status-tabs">
       <li class="nav-item"><button type="button" class="nav-link active" data-status="open">Open <span class="badge bg-light text-dark ms-1" id="badge-open">0</span></button></li>
       <li class="nav-item"><button type="button" class="nav-link" data-status="resolved">Resolved</button></li>
@@ -270,7 +285,59 @@ permalink: /admin/parts/
     }
   });
 
+  // --- New parts to review ------------------------------------------------
+  let submittedStatus = 'pending';
+  async function loadSubmitted() {
+    const box = document.getElementById('submitted-list');
+    const resp = await ProjectAuth.apiFetch(API + '/api/admin/parts/submitted?status=' + submittedStatus);
+    if (!resp.ok) { box.innerHTML = '<div class="text-danger small">Could not load (HTTP ' + resp.status + ').</div>'; return; }
+    const parts = await resp.json();
+    if (submittedStatus === 'pending') document.getElementById('submitted-count').textContent = parts.length;
+    if (!parts.length) {
+      box.innerHTML = '<div class="text-muted small fst-italic">' + (submittedStatus === 'pending' ? 'Nothing waiting.' : 'None turned down.') + '</div>';
+      return;
+    }
+    const img = u => (u ? (u.startsWith('/') ? API + u : u) : '');
+    box.innerHTML = parts.map(p => `
+      <div class="d-flex flex-wrap align-items-start gap-3 border rounded p-2" data-slug="${esc(p.slug)}">
+        ${p.cover_url ? `<img src="${esc(img(p.cover_url))}" alt="" width="64" height="64" style="object-fit:contain;border-radius:6px;background:#f6f6f6">` : '<div style="width:64px;height:64px;border-radius:6px;background:#f0f0f0" class="d-grid text-muted" title="No picture"><i class="fas fa-image m-auto"></i></div>'}
+        <div class="flex-grow-1" style="min-width:14rem">
+          <a href="/parts/view.html?slug=${encodeURIComponent(p.slug)}" target="_blank" class="fw-semibold">${esc(p.name)}</a>
+          ${p.category ? `<span class="badge bg-light text-dark ms-1">${esc(p.category)}</span>` : ''}
+          <div class="small text-muted">by <strong>${esc(p.created_by)}</strong> · ${fmtTime(p.created_at)} · ${p.photo_count} picture${p.photo_count === 1 ? '' : 's'} · used in ${p.usage_count} project${p.usage_count === 1 ? '' : 's'}</div>
+          ${p.description_md ? `<div class="small mt-1" style="white-space:pre-wrap">${esc(p.description_md.slice(0, 300))}</div>` : ''}
+          ${p.links.length ? `<div class="small mt-1">${p.links.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener nofollow" class="me-2">${esc(u.replace(/^https?:\/\/(www\.)?/, '').slice(0, 50))}</a>`).join('')}</div>` : ''}
+          <div class="submitted-feedback small"></div>
+        </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-sm btn-outline-secondary" href="/parts/edit.html?slug=${encodeURIComponent(p.slug)}" target="_blank"><i class="fas fa-pen me-1"></i> Edit</a>
+          <button type="button" class="btn btn-sm btn-success" data-review="approve"><i class="fas fa-check me-1"></i> Approve</button>
+          ${p.status === 'pending' ? '<button type="button" class="btn btn-sm btn-outline-danger" data-review="reject"><i class="fas fa-times me-1"></i> Turn down</button>' : ''}
+        </div>
+      </div>`).join('');
+    box.querySelectorAll('[data-review]').forEach(btn => btn.addEventListener('click', async () => {
+      const row = btn.closest('[data-slug]');
+      const action = btn.dataset.review;
+      if (action === 'reject' && !window.confirm('Turn this part down? It stays out of the catalog; projects linking it keep working.')) return;
+      btn.disabled = true;
+      const r = await ProjectAuth.apiFetch(API + '/api/admin/parts/' + encodeURIComponent(row.dataset.slug) + '/' + action, { method: 'POST' });
+      if (r.ok) { row.remove(); loadSubmitted(); }
+      else {
+        btn.disabled = false;
+        let body = {};
+        try { body = await r.json(); } catch (_) {}
+        row.querySelector('.submitted-feedback').innerHTML = '<span class="text-danger">' + esc(body.detail || ('HTTP ' + r.status)) + '</span>';
+      }
+    }));
+  }
+  document.querySelectorAll('[data-submitted]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-submitted]').forEach(x => x.classList.toggle('active', x === b));
+    submittedStatus = b.dataset.submitted;
+    loadSubmitted();
+  }));
+
   loadList();
   loadPhotoReview();
+  loadSubmitted();
 })();
 </script>

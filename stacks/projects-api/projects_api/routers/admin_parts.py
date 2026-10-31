@@ -1,5 +1,8 @@
 """Admin-only parts endpoints (issue #122 Phase 2).
 
+Also the review queue for parts people submit from the project editor
+(``GET /submitted``, ``POST /{slug}/approve``, ``POST /{slug}/reject``).
+
 Currently a single endpoint: force a synchronous supplier health check
 for one part. Useful when the daily APScheduler job hasn't fired yet
 and an admin wants to verify a fix landed without waiting 24 hours.
@@ -13,14 +16,17 @@ import re
 import tempfile
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from datetime import datetime, timezone
+from typing import Literal
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import require_admin
 from ..db import get_session
 from ..models import Part, PartPhoto, PartSupplier
-from ..schemas import PartPhotoReview, PartSupplierResponse
+from ..schemas import PartDetail, PartPhotoReview, PartReviewItem, PartSupplierResponse
 from ..import_snakie_parts import download_github_library, import_library
 from ..supplier_health import recheck_part_suppliers
 
@@ -137,3 +143,85 @@ async def photos_needing_review(
         )
         for photo, slug, name in rows
     ]
+
+
+# --- submitted parts (the project editor's "New part" dialog) -----------
+
+
+@router.get("/submitted", response_model=list[PartReviewItem])
+async def submitted_parts(
+    status_: Literal["pending", "rejected"] = Query("pending", alias="status"),
+    _admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> list[PartReviewItem]:
+    """Admin: parts waiting for review (or the ones turned down), oldest first."""
+    from .parts import first_photo_cover_urls
+
+    parts = (
+        await session.scalars(
+            select(Part).where(Part.status == status_).order_by(Part.created_at.asc(), Part.id.asc())
+        )
+    ).all()
+    ids = [p.id for p in parts]
+    covers = await first_photo_cover_urls(session, {p.id: p.slug for p in parts})
+    photo_counts: dict[int, int] = {}
+    links: dict[int, list[str]] = {}
+    if ids:
+        for pid, n in (
+            await session.execute(
+                select(PartPhoto.part_id, func.count(PartPhoto.id)).where(PartPhoto.part_id.in_(ids)).group_by(PartPhoto.part_id)
+            )
+        ).all():
+            photo_counts[pid] = int(n)
+        for sup in (
+            await session.scalars(select(PartSupplier).where(PartSupplier.part_id.in_(ids)).order_by(PartSupplier.id))
+        ).all():
+            links.setdefault(sup.part_id, []).append(sup.url)
+    return [
+        PartReviewItem(
+            id=p.id, slug=p.slug, name=p.name, status=p.status, created_by=p.created_by,
+            created_at=p.created_at, description_md=p.description_md, category=p.category,
+            cover_url=covers.get(p.id) or p.image_url, photo_count=photo_counts.get(p.id, 0),
+            links=links.get(p.id, []) + ([p.datasheet_url] if p.datasheet_url else []),
+            usage_count=p.usage_count or 0,
+        )
+        for p in parts
+    ]
+
+
+async def _set_review_status(session: AsyncSession, slug: str, new_status: str) -> PartDetail:
+    from .parts import _part_detail
+
+    part = await session.scalar(select(Part).where(Part.slug == slug))
+    if part is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Part not found")
+    if part.status not in ("pending", "rejected"):
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=f"The part is already in the catalog ({part.status})")
+    part.status = new_status
+    part.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    await session.commit()
+    await session.refresh(part)
+    return await _part_detail(session, part)
+
+
+@router.post("/{slug}/approve", response_model=PartDetail)
+async def approve_part(
+    slug: str,
+    _admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Admin: put a submitted part in the catalog. It becomes a ``draft``,
+    so everyone can find it and the usual verification rules apply."""
+    return await _set_review_status(session, slug, "draft")
+
+
+@router.post("/{slug}/reject", response_model=PartDetail)
+async def reject_part(
+    slug: str,
+    _admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Admin: turn a submitted part down. It stays out of the catalog, but
+    isn't deleted, so the projects that link it keep working (and it can
+    still be approved later)."""
+    return await _set_review_status(session, slug, "rejected")

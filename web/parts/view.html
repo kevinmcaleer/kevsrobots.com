@@ -39,6 +39,11 @@ description: View a part in the catalog
         <div id="part-ids" class="text-muted small mb-3"></div>
 
         <!-- Issue #122 Phase 2: lifecycle banners -->
+        <div id="part-review-banner" class="alert alert-info d-none">
+          <i class="fas fa-hourglass-half me-2"></i>
+          <span id="part-review-text"></span>
+        </div>
+
         <div id="part-disputed-banner" class="alert alert-warning d-none">
           <i class="fas fa-exclamation-triangle me-2"></i>
           <strong>This part is currently disputed.</strong>
@@ -441,6 +446,8 @@ description: View a part in the catalog
     if (status === 'verified') return '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>verified</span>';
     if (status === 'disputed') return '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i>disputed</span>';
     if (status === 'under_review') return '<span class="badge bg-warning text-dark">under review</span>';
+    if (status === 'pending') return '<span class="badge bg-info text-dark"><i class="fas fa-hourglass-half me-1"></i>waiting for review</span>';
+    if (status === 'rejected') return '<span class="badge bg-secondary">not in the catalog</span>';
     return '<span class="badge bg-secondary">draft</span>';
   }
 
@@ -691,6 +698,13 @@ description: View a part in the catalog
 
     // Issue #122 Phase 2: wire the discussion card link.
     document.getElementById('part-talk-link').href = '/parts/talk.html?slug=' + encodeURIComponent(slug);
+    // A part someone added from their project, not yet checked (or turned down).
+    if (part.status === 'pending' || part.status === 'rejected') {
+      document.getElementById('part-review-text').textContent = part.status === 'pending'
+        ? 'This part was added from a project by ' + (part.created_by || 'a maker') + '. It shows in the parts catalog once the KevsRobots team has checked it.'
+        : 'This part isn\u2019t in the parts catalog. Projects that use it can still link here.';
+      document.getElementById('part-review-banner').classList.remove('d-none');
+    }
     if (part.status === 'disputed') {
       document.getElementById('part-disputed-banner').classList.remove('d-none');
       document.getElementById('part-disputed-talk-link').href = '/parts/talk.html?slug=' + encodeURIComponent(slug);

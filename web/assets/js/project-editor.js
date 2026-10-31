@@ -829,6 +829,8 @@
       tableStepper: bomQtyStepper,
       // A Currency list in the Bill of Materials' Price column menu.
       tableColumnAction: bomCurrencyAction,
+      // "New part" on a Bill of Materials row not linked to a catalog part.
+      tableCellAction: bomNewPartAction,
       // The pinout table's marker line (pinout-sync.js) stays out of sight.
       hiddenComments: comment => PinoutSync.isMarker(comment),
       // <!-- page --> lines split the published write-up into pages
@@ -1236,9 +1238,9 @@
   // to a part yet to the catalog part { slug }, keeping the row's own
   // wording as the link text (BomSync.linkRow). False when the table was
   // left alone: no such row, or one whose shop link has nowhere to go.
-  function linkBomRow(view, name, part) {
+  function linkBomRow(view, name, part, opts) {
     if (!part || !part.slug) return false;
-    const edit = BomSync.linkRow(view.state.doc.toString(), name, part.slug);
+    const edit = BomSync.linkRow(view.state.doc.toString(), name, part.slug, opts);
     if (!edit) return false;
     const line = view.state.doc.line(edit.line + 1);
     view.dispatch({ changes: { from: line.from, to: line.to, insert: edit.text }, userEvent: 'input' });
@@ -1440,20 +1442,60 @@
     }));
   }
 
-  async function createCatalogPart(name) {
-    const resp = await apiFetch(API + '/api/parts', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
+  // A new catalog part, through the "New part" dialog (part-submit.js),
+  // filled in from the Bill of Materials row named `name` when there is
+  // one. Resolves to { name, slug, url, existing } (existing: they picked a
+  // part already in the catalog), or null when they closed it. `origin`
+  // is where the dialog grows from.
+  async function createCatalogPart(name, origin) {
+    const view = mde && mde.view;
+    const row = view ? BomSync.rowDetails(view.state.doc.toString(), name) : null;
+    const part = await PartSubmit.open({
+      api: API,
+      apiFetch: (url, opts) => apiFetch(url, Object.assign({ credentials: 'include' }, opts || {})),
+      prefill: Object.assign({ name }, row || {}),
+      origin: origin || (view && view.coordsAtPos(view.state.selection.main.head)) || null,
+      searchParts: searchCatalogParts,
     });
-    const body = await resp.json().catch(() => ({}));
-    if (resp.status === 403) {
-      showAccountAgeAlert(body.detail);
-      return null;
+    if (!part) return null;
+    if (!part.existing) {
+      showToast(part.status === 'pending'
+        ? '“' + part.name + '” is in your project now. It joins the catalog for everyone once it’s been checked.'
+        : '“' + part.name + '” was added to the parts catalog.');
     }
-    if (!resp.ok) throw new Error(typeof body.detail === 'string' ? body.detail : 'The part could not be created');
-    return { name: body.name, slug: body.slug, url: PartLinks.href(body.slug) };
+    return { name: part.name, slug: part.slug, url: PartLinks.href(part.slug), existing: !!part.existing };
+  }
+
+  // The "New part" button on a Bill of Materials row whose part isn't
+  // linked to the catalog yet: the dialog, then the row linked to the part.
+  const NEW_PART_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>';
+  function bomNewPartAction({ header, row, col, value, heading }) {
+    const section = heading && ProjectSections.match(heading);
+    if (!section || section.id !== 'bill-of-materials') return null;
+    if (ProjectSlashCommands.isTotalRow(row)) return null;
+    const label = header.replace(/[*_`]/g, '').trim().toLowerCase();
+    const isPartCol = /^(part|parts|item|items|name|component|components)$/.test(label);
+    if (!isPartCol && col !== 0) return null;
+    const raw = String(value || '').trim();
+    const link = raw.match(/^\[((?:\\.|[^\]\\])*)\]\(([^)\s]+)[^)]*\)$/);
+    if (link && PartLinks.slugOf(link[2])) return null;
+    const name = (link ? link[1].replace(/\\([\[\]\\])/g, '$1') : raw).replace(/\\\|/g, '|').replace(/[*_`]/g, '').trim();
+    if (name.length < 2) return null;
+    return {
+      label: 'New part',
+      title: 'Add “' + name + '” to the parts catalog, with pictures and links',
+      icon: NEW_PART_ICON,
+      run: async (_cell, button) => {
+        try {
+          const part = await createCatalogPart(name, button);
+          if (part && !linkBomRow(mde.view, name, part, { dropShopLink: !part.existing })) {
+            showToast('The part was added, but this row could not be linked to it. Use /part in the row to link it.');
+          }
+        } catch (err) {
+          showToast(err.message || String(err));
+        }
+      },
+    };
   }
 
   // The [text](url) of the link to `slug` nearest where `link` was
@@ -2469,6 +2511,28 @@
       .replace(/'/g, '&#39;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
+  }
+
+  // A short note at the top right that goes by itself.
+  function showToast(message) {
+    let toast = document.getElementById('editor-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'editor-toast';
+      toast.className = 'alert alert-success alert-dismissible position-fixed shadow';
+      toast.setAttribute('role', 'status');
+      toast.style.cssText = 'top: 80px; right: 20px; z-index: 11000; max-width: 380px;';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'btn-close';
+    close.setAttribute('aria-label', 'Close');
+    close.addEventListener('click', () => toast.remove());
+    toast.appendChild(close);
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => { if (toast.parentNode) toast.remove(); }, 7000);
   }
 
   // --- Account-age (14-day) friendly error ---
