@@ -55,6 +55,48 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
+  // The bundle, the saved wiring ({ data } or null) and the library: the
+  // BOM's catalog parts that have electronics, plus any placed part the BOM
+  // no longer links.
+  async function partsOf(slugs) {
+    const out = [];
+    for (const slug of slugs) {
+      const def = await definition(slug);
+      if (def && hasPins(def)) out.push(def);
+    }
+    return out;
+  }
+  async function loadSaved(ctx, projectId) {
+    const SP = await SnakieHost.load();
+    const [saved, parts] = await Promise.all([
+      ctx.apiFetch(API + '/api/projects/' + projectId + '/wiring').then(r => (r.ok ? r.json() : null)).catch(() => null),
+      partsOf(ctx.bomSlugs()),
+    ]);
+    const robotParts = saved && saved.data && Array.isArray(saved.data.parts) ? saved.data.parts : [];
+    const extra = robotParts.map(p => p.part).filter(slug => !parts.some(d => d.id === slug));
+    parts.push(...await partsOf([...new Set(extra)]));
+    return { SP, saved, library: { id: LIB, name: 'This project', parts } };
+  }
+
+  // The pinout table the saved wiring makes now (PinoutSync.fromGenerated),
+  // without opening the workspace: the canvas is mounted out of sight just
+  // long enough to ask it. '' when nothing is wired, null with no wiring.
+  // ctx: { projectId, bomSlugs(), apiFetch() }.
+  async function pinoutFor(ctx) {
+    const { SP, saved, library } = await loadSaved(ctx, ctx.projectId);
+    if (!saved || !saved.data) return null;
+    const box = document.createElement('div');
+    box.setAttribute('aria-hidden', 'true');
+    box.style.cssText = 'position:fixed;left:-10000px;top:0;width:800px;height:600px;visibility:hidden;pointer-events:none';
+    document.body.appendChild(box);
+    try {
+      const handle = SP.mountWiring(box, { robot: saved.data, libraries: [library], onChange: () => {} });
+      try { return PinoutSync.fromGenerated(handle.pinoutMarkdown()); } finally { handle.unmount(); }
+    } finally {
+      box.remove();
+    }
+  }
+
   // Opens the workspace. ctx:
   //   projectId()           the project's id, saving it first if it's new
   //   markdown()            the document's text
@@ -62,7 +104,12 @@
   //   addBomRows(parts)     adds rows for [{ name, slug }]
   //   removeBomRows(slugs)  removes the rows linking these slugs
   //   placeImage(url)       puts (or refreshes) the wiring image in the text
-  //   insertText(md)        inserts Markdown after the wiring image
+  //   insertPinout(block)   puts the pinout table in the text (after the
+  //                         wiring image), or refreshes the one there; false
+  //                         when the writer said no to losing their edits
+  //   hasPinout()           whether the text has a pinout table
+  //   wiringSaved(block)    the pinout table the just-saved wiring makes;
+  //                         returns { stale } for the table in the text
   //   apiFetch(url, opts)   fetch with the signed-in user's token
   async function open(ctx) {
     const projectId = await ctx.projectId();
@@ -131,27 +178,12 @@
       box.innerHTML = list.map(w => `<div class="project-wiring-warning is-${esc(w.kind)}"><i class="fas ${w.kind === 'short' || w.kind === 'rails' ? 'fa-bolt' : 'fa-triangle-exclamation'} me-1"></i>${esc(w.message)}</div>`).join('');
     }
 
-    // The library: the BOM's catalog parts that have electronics.
-    async function partsOf(slugs) {
-      const out = [];
-      for (const slug of slugs) {
-        const def = await definition(slug);
-        if (def && hasPins(def)) out.push(def);
-      }
-      return out;
-    }
-
     try {
-      const SP = await SnakieHost.load();
-      const [saved, parts] = await Promise.all([
-        ctx.apiFetch(API + '/api/projects/' + projectId + '/wiring').then(r => (r.ok ? r.json() : null)).catch(() => null),
-        partsOf(ctx.bomSlugs()),
-      ]);
-      // Placed parts the BOM no longer links still need their definitions.
-      const robotParts = saved && saved.data && Array.isArray(saved.data.parts) ? saved.data.parts : [];
-      const extra = robotParts.map(p => p.part).filter(slug => !parts.some(d => d.id === slug));
-      parts.push(...await partsOf([...new Set(extra)]));
-      library = { id: LIB, name: 'This project', parts };
+      const loaded = await loadSaved(ctx, projectId);
+      const SP = loaded.SP;
+      const saved = loaded.saved;
+      library = loaded.library;
+      const parts = library.parts;
 
       let robot = saved && saved.data;
       const fresh = !robot;
@@ -209,12 +241,19 @@
       status(noPins.length ? noPins.join(', ') + (noPins.length > 1 ? ' have' : ' has') + ' no pins yet, so ' + (noPins.length > 1 ? 'they were' : 'it was') + ' only added to the Bill of Materials.' : 'Added. Not saved');
     });
 
-    $('[data-act=pinout]').addEventListener('click', () => {
+    const pinoutBtn = $('[data-act=pinout]');
+    const pinoutLabel = () => {
+      pinoutBtn.innerHTML = '<i class="fas fa-table me-1"></i>' + (ctx.hasPinout() ? 'Update pinout table' : 'Insert pinout table');
+    };
+    pinoutLabel();
+    pinoutBtn.addEventListener('click', () => {
       // Just the table: it goes under the document's own Wiring heading.
-      const md = handle.pinoutMarkdown().replace(/^\s*#{1,6} [^\n]*\n+/, '');
-      if (!/^\s*\|/.test(md)) { status('Wire something first: the pinout table lists the board pins in use.', true); return; }
-      ctx.insertText(md);
-      status('Pinout table inserted into the document.');
+      const block = PinoutSync.fromGenerated(handle.pinoutMarkdown());
+      if (!block) { status('Wire something first: the pinout table lists the board pins in use.', true); return; }
+      const had = ctx.hasPinout();
+      if (ctx.insertPinout(block) === false) return;
+      status(had ? 'Pinout table updated in the document.' : 'Pinout table inserted into the document.');
+      pinoutLabel();
     });
 
     $('[data-act=svg]').addEventListener('click', async () => {
@@ -252,7 +291,10 @@
           if (window.confirm('Remove ' + names.join(', ') + ' from the Bill of Materials too?')) ctx.removeBomRows(gone);
         }
         startSlugs = now;
-        status('Saved. The diagram in the document is up to date.');
+        const pin = ctx.hasPinout() ? ctx.wiringSaved(PinoutSync.fromGenerated(handle.pinoutMarkdown())) : null;
+        status(pin && pin.stale
+          ? 'Saved. The pinout table in the document no longer matches: Update pinout table to refresh it.'
+          : 'Saved. The diagram in the document is up to date.', pin && pin.stale);
       } catch (err) {
         status(err.message || String(err), true);
       } finally {
@@ -261,5 +303,5 @@
     });
   }
 
-  window.ProjectWiring = { open, findImage, isWiringSrc, svgUrl };
+  window.ProjectWiring = { open, pinoutFor, findImage, isWiringSrc, svgUrl };
 })();

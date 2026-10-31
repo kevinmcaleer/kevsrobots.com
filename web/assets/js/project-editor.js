@@ -778,9 +778,12 @@
         return items.length ? ProjectEmbeds.videoCards(items) : null;
       },
       // A tip on Qty, Price and the automatic totals above the Bill of Materials table.
-      tableNote: ({ rows, heading }) => bomTableTip(rows, heading),
+      // Above the pinout table: a note with Refresh when it's out of date.
+      tableNote: ({ rows, heading }) => bomTableTip(rows, heading) || pinoutTableNote(rows),
       // Up and down buttons on the Bill of Materials' Qty cells.
       tableStepper: bomQtyStepper,
+      // The pinout table's marker line (pinout-sync.js) stays out of sight.
+      hiddenComments: comment => PinoutSync.isMarker(comment),
       slashCommands: ProjectSlashCommands.create(slashContext()),
       // Project topics in the ? Markdown guide, after the editor's own.
       guide: projectGuideTopics(),
@@ -793,7 +796,9 @@
       scheduleBomTotals();
       scheduleBomLinks();
       scheduleGalleryAddBar();
+      schedulePinout();
     });
+    schedulePinout();
     // Hints set before the editor was mounted (a closed completeness panel).
     if (editorHints.size) mde.setHints(Array.from(editorHints.values()));
     setupImageAutocomplete(mde);
@@ -957,7 +962,12 @@
       addBomRows: parts => addBomRows(view, parts),
       removeBomRows: slugs => removeBomRows(view, slugs),
       placeImage: url => placeWiringImage(view, url),
-      insertText: md => insertAfterWiring(view, md),
+      insertPinout: block => putPinout(block),
+      hasPinout: () => !!PinoutSync.find(view.state.doc.toString()),
+      wiringSaved: block => {
+        pinoutFresh = { key: wiringKey(view.state.doc.toString()), block };
+        return checkPinout();
+      },
       apiFetch: (url, opts) => apiFetch(url, Object.assign({ credentials: 'include' }, opts || {})),
     });
   }
@@ -984,13 +994,160 @@
     }
   }
 
-  // Markdown put after the wiring diagram (the pinout table), else at the end.
+  // Markdown put after the wiring diagram (the pinout table), else at the
+  // end, with a blank line on each side: a table straight after it would
+  // otherwise run on as part of the same table.
   function insertAfterWiring(view, md) {
     const markdown = view.state.doc.toString();
     const found = ProjectWiring.findImage(markdown);
     const at = found ? view.state.doc.lineAt(found.index).to : markdown.length;
-    const end = at === markdown.length ? '\n' : '';
+    const rest = markdown.slice(at);
+    const end = !rest ? '\n' : rest.startsWith('\n\n') ? '' : rest.startsWith('\n') ? '\n' : '\n\n';
     view.dispatch({ changes: { from: at, insert: '\n\n' + md.trim() + end }, userEvent: 'input' });
+  }
+
+  // --- Pinout table ---
+  //
+  // "Insert pinout table" in the wiring workspace writes the table with a
+  // hidden marker (pinout-sync.js) recording what it was made from. The
+  // editor makes the table again from the saved wiring (out of sight, see
+  // ProjectWiring.pinoutFor) and, when it differs, puts a note above the
+  // table and a hint in the hints panel, both with Refresh. Refreshing a
+  // table the writer has edited asks first, since their changes are lost.
+  let pinoutFresh = null; // { key, block }: the table the wiring makes, for the image link `key`
+  let pinoutState = null; // { stale, edited } for the table in the text, null when unknown
+  let pinoutLoading = null;
+  let pinoutTimer = null;
+
+  // The wiring image's link (its ?v= changes on each save), '' without one.
+  function wiringKey(markdown) {
+    const img = ProjectWiring.findImage(markdown);
+    return img ? img.url : '';
+  }
+
+  // The table the saved wiring makes now ('' when nothing's wired, null
+  // without wiring), worked out once per save of the wiring.
+  async function freshPinout() {
+    const key = wiringKey(mde.view.state.doc.toString());
+    if (pinoutFresh && pinoutFresh.key === key) return pinoutFresh.block;
+    if (!currentProject) return null;
+    if (!pinoutLoading) {
+      pinoutLoading = ProjectWiring.pinoutFor({
+        projectId: currentProject.id,
+        bomSlugs: () => {
+          const parsed = BomSync.parse(mde.view.state.doc.toString());
+          return parsed ? [...new Set(parsed.rows.map(r => r.part_slug).filter(Boolean))] : [];
+        },
+        apiFetch: (url, opts) => apiFetch(url, Object.assign({ credentials: 'include' }, opts || {})),
+      }).then(block => { pinoutFresh = { key, block }; return block; })
+        .finally(() => { pinoutLoading = null; });
+    }
+    return pinoutLoading;
+  }
+
+  // The editor's box: mount() puts it after the #content-editor textarea, so
+  // their parent holds both.
+  function editorBox() {
+    return contentEditor.parentElement;
+  }
+  editorBox().addEventListener('click', e => {
+    if (!e.target.closest('.pinout-refresh')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    refreshPinout();
+  });
+
+  function schedulePinout() {
+    clearTimeout(pinoutTimer);
+    pinoutTimer = setTimeout(() => {
+      if (!mde || !PinoutSync.find(mde.view.state.doc.toString())) { checkPinout(); return; }
+      if (pinoutFresh && pinoutFresh.key === wiringKey(mde.view.state.doc.toString())) { checkPinout(); return; }
+      freshPinout().then(checkPinout).catch(e => console.warn('Pinout check failed:', e));
+    }, 1500);
+  }
+
+  // Compares the table in the text with the last table the wiring made,
+  // and shows the result. Returns { stale, edited } or null.
+  function checkPinout() {
+    const markdown = mde ? mde.view.state.doc.toString() : '';
+    const found = PinoutSync.find(markdown);
+    const fresh = pinoutFresh && pinoutFresh.key === wiringKey(markdown) ? pinoutFresh.block : null;
+    pinoutState = found && fresh ? PinoutSync.compare(found, fresh) : null;
+    const stale = !!(pinoutState && pinoutState.stale);
+    setEditorHint('pinout', stale ? {
+      title: 'The pinout table is out of date',
+      detail: 'The wiring diagram has changed since the pinout table was made.' +
+        (pinoutState.edited === false ? '' : ' Refreshing it replaces any changes you made to the table.'),
+      actions: [
+        { label: 'Refresh the table', run: () => refreshPinout() },
+        { label: 'Show me', run: () => {
+          const note = editorBox().querySelector('.pinout-table-note:not([hidden])');
+          if (note) note.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        } },
+      ],
+    } : null);
+    editorBox().querySelectorAll('.pinout-table-note').forEach(fillPinoutNote);
+    return pinoutState;
+  }
+
+  // The note above the pinout table: shown only while it's out of date.
+  // Every table that could be one gets a (hidden) note, because the editor
+  // only redraws its tables when the text changes and the check finishes
+  // later: checkPinout() fills in the notes already on screen.
+  const PINOUT_HEADERS = [PinoutSync.MCU_HEADER.join('|'), 'from|to|net'];
+  function pinoutTableNote(rows) {
+    const header = (rows[0] || []).map(c => c.replace(/[*_`]/g, '').trim().toLowerCase()).join('|');
+    if (!PINOUT_HEADERS.includes(header)) return null;
+    const note = document.createElement('div');
+    note.className = 'kr-notice pinout-table-note';
+    note.setAttribute('role', 'note');
+    note.dataset.header = header;
+    fillPinoutNote(note);
+    return note;
+  }
+
+  function fillPinoutNote(note) {
+    const found = mde ? PinoutSync.find(mde.view.state.doc.toString()) : null;
+    const mine = found && found.header.map(c => c.replace(/[*_`]/g, '').trim().toLowerCase()).join('|') === note.dataset.header;
+    const stale = !!(mine && pinoutState && pinoutState.stale);
+    note.hidden = !stale;
+    if (!stale) { note.innerHTML = ''; return; }
+    note.innerHTML =
+      '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i>' +
+      '<span>This pinout table doesn\u2019t match the wiring diagram any more.' +
+      (pinoutState.edited === false ? '' : ' Refreshing it replaces any changes you made to the table.') + '</span>' +
+      '<button type="button" class="btn btn-sm btn-outline-secondary pinout-refresh"><i class="fas fa-rotate me-1"></i>Refresh</button>';
+  }
+
+  // Puts `block` in the text as the pinout table: replacing the one there
+  // (asking first when the writer's changes would be lost) or after the
+  // wiring image. Returns false when the writer said no.
+  function putPinout(block) {
+    const view = mde.view;
+    const markdown = view.state.doc.toString();
+    const found = PinoutSync.find(markdown);
+    const text = PinoutSync.withMarker(block);
+    if (!found) {
+      insertAfterWiring(view, text);
+    } else {
+      const same = PinoutSync.normalize(found.block) === PinoutSync.normalize(block);
+      const edited = found.hash ? PinoutSync.hash(found.block) !== found.hash : true;
+      if (!same && edited && !window.confirm(found.hash
+        ? 'You\u2019ve edited the pinout table since it was made. Refreshing it from the wiring diagram replaces your changes.\n\nRefresh the table anyway?'
+        : 'Refreshing the pinout table from the wiring diagram replaces the table as it is now, including any changes you made to it.\n\nRefresh the table anyway?')) return false;
+      view.dispatch({ changes: { from: found.from, to: found.to, insert: text }, userEvent: 'input' });
+    }
+    pinoutFresh = { key: wiringKey(view.state.doc.toString()), block };
+    checkPinout();
+    return true;
+  }
+
+  async function refreshPinout() {
+    let block;
+    try { block = await freshPinout(); } catch (e) { alert('Could not read the wiring: ' + (e.message || e)); return; }
+    if (block == null) { alert('This project has no saved wiring to make the table from.'); return; }
+    if (!block) { alert('Nothing is wired yet, so there is no pinout table to make.'); return; }
+    putPinout(block);
   }
 
   // The Bill of Materials rows that link any of `slugs`, taken out.
@@ -1479,13 +1636,13 @@
       if (closed) localStorage.setItem(BOM_TIP_CLOSED_KEY, '1');
       else localStorage.removeItem(BOM_TIP_CLOSED_KEY);
     } catch (e) {}
-    contentEditor.classList.toggle('bom-tip-closed', closed);
+    contentEditor.parentElement.classList.toggle('bom-tip-closed', closed);
     setEditorHint('bom-tip', closed ? {
       title: 'Bill of Materials totals',
       detail: 'Add Qty and Price columns to the Bill of Materials table, and a Total column and row are added for you.',
       actions: [{ label: 'Show the tip', run: () => {
         setBomTipClosed(false);
-        const tip = contentEditor.querySelector('.bom-table-tip');
+        const tip = contentEditor.parentElement.querySelector('.bom-table-tip');
         if (tip) tip.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       } }],
     } : null);
@@ -1705,6 +1862,7 @@
   function setEditorValue(val) {
     if (mde) mde.setDoc(val || '');
     else contentEditor.value = val || '';
+    if (mde) schedulePinout();
   }
 
   // Diagram menu, under the toolbar's diagram button.

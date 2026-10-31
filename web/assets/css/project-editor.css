@@ -914,6 +914,19 @@ a.part-link:hover,
   display: none;
 }
 
+/* Above the pinout table: it no longer matches the wiring diagram. Hidden
+   (and taking no room) while it does. */
+.kr-notes .pinout-table-note {
+  margin: 0;
+}
+.kr-notes .pinout-table-note .pinout-refresh {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.cm-md-table-note:has(.pinout-table-note[hidden]) {
+  display: none;
+}
+
 /* --- The Notes look on the editor page (issue #272) ---
    Tokens and shared components are in project-notes.css. */
 
