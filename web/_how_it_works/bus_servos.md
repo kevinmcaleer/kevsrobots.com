@@ -113,6 +113,32 @@ Control = **write to registers**. Feedback = **read from registers**. That's the
 
 ---
 
+## The Connector Pinout
+
+Each STS3215 has two **Molex 5264** 3-pin ports (2.5 mm pitch). Both ports are wired in parallel, and each carries three signals:
+
+| Pin | Name | What it carries |
+|---|---|---|
+| D | Data | The half-duplex TTL serial line. Commands and replies share this one wire (2–5 V high, 0–0.45 V low, 1 Mbaud by default) |
+| V | VCC | Servo power straight from your supply: 6–8.4 V for the 7.4 V STS3215 |
+| G | GND | Ground, shared with the microcontroller |
+{:class="table table-single table-narrow"}
+
+![STS3215 connector pinout: D, V, G from left to right on each port](/assets/img/how_it_works/sts3215-pinout.png){:class="img-fluid w-50"}
+
+**Which pin is which?** Hold the servo with the horn at the top and the ports facing you, so the notched side of each connector is at the bottom. Reading left to right, each port is **D, V, G**. VCC is always the **middle** pin, so the only two pins you could mix up are data and ground.
+
+The paperwork can look contradictory, because the two manufacturers count the same row from opposite ends:
+
+* Feetech's STS3215 spec calls **pin 1 GND**, pin 2 VCC and pin 3 Signal.
+* Waveshare's Bus Servo Adapter schematic calls **pin 1 DATA**, pin 2 V+ and pin 3 GND, and prints **D V G** on the board under each port.
+
+Both describe the same wiring. The servo cables are straight through, so D on the adapter lands on D on the servo.
+
+> **Check before you power up.** If you're making your own cables or wiring a servo to something other than a driver board, use a multimeter in continuity mode. With everything unpowered, the G pin should beep against your supply's negative terminal on a working chain.
+
+---
+
 ## Daisy Chaining
 
 Each STS3215 has two identical ports — one **in**, one **out**. Both carry **power, ground, and the data line** on the same connector, which means the entire arm can be wired with a single continuous chain.
@@ -135,7 +161,7 @@ Because the bus is half-duplex, only one device can transmit at a time. The mast
 2. **Switch the line around** (either electronically via a direction pin, or by relying on an open-drain buffer).
 3. **Listen** for the reply, timing out after a millisecond or two if nothing comes back.
 
-On a driver board like the [Waveshare Bus Servo Adapter](https://www.waveshare.com/wiki/Bus_Servo_Adapter_(A)), this direction switching is handled in hardware — you just connect the microcontroller's TX and RX pins and the board takes care of the rest.
+On a driver board like the [Waveshare Bus Servo Adapter](https://www.waveshare.com/wiki/Bus_Servo_Adapter_(A)), this direction switching is handled in hardware — you just connect the microcontroller's TX and RX pins and the board takes care of the rest. Inside, your **TX** drives the servo's D wire through a tri-state buffer (an SN74LVC1G126) that only switches on while you're transmitting, and a second buffer (an SN74LVC1G125) copies the D wire back onto your **RX** pin. That's how two microcontroller pins become one shared data wire.
 
 ---
 
@@ -214,5 +240,7 @@ Bus servos aren't always the answer:
 * [Servos — How they work](servos.html)
 * [I²C — another embedded bus protocol](i2c.html)
 * [Shift Registers — multiplexing GPIO with serial data](shift-registers.html)
+* [Feetech STS3215 product spec (pin definition in section 6-7)](https://core-electronics.com.au/attachments/uploads/sts3215-smart-servo-datasheet-translated.pdf)
+* [Waveshare Bus Servo Adapter (A) schematic](https://files.waveshare.com/wiki/Bus-Servo-Adapter-(A)/Bus%20Servo%20Adapter%20(A)-Sch.pdf)
 
 ---
