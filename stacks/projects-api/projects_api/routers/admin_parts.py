@@ -7,7 +7,11 @@ and an admin wants to verify a fix landed without waiting 24 hours.
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import re
+import tempfile
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -17,11 +21,55 @@ from ..auth import require_admin
 from ..db import get_session
 from ..models import Part, PartPhoto, PartSupplier
 from ..schemas import PartPhotoReview, PartSupplierResponse
+from ..import_snakie_parts import download_github_library, import_library
 from ..supplier_health import recheck_part_suppliers
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/admin/parts", tags=["admin-parts"])
+
+
+_REF = re.compile(r"^[A-Za-z0-9._/-]{1,100}$")
+_sync_lock = asyncio.Lock()
+
+
+@router.post("/sync-snakie")
+async def sync_snakie_library(
+    ref: str = "master",
+    _admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Admin: import Snakie's Standard parts library from GitHub.
+
+    The same import as ``python -m projects_api.import_snakie_parts --github``
+    (Snakie is the master copy of the catalog). Parts are matched by slug,
+    then name, then part number, so running it again only adds new parts
+    and refreshes changed ones.
+    """
+    if not _REF.match(ref) or ".." in ref:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Bad branch or tag name")
+    if _sync_lock.locked():
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="A sync is already running")
+    async with _sync_lock:
+        with tempfile.TemporaryDirectory() as tmp:
+            try:
+                library = await asyncio.to_thread(download_github_library, ref, Path(tmp) / "library")
+            except Exception as exc:  # network, 404, bad tarball
+                logger.warning("Snakie library download failed (%s): %s", ref, exc)
+                raise HTTPException(
+                    status.HTTP_502_BAD_GATEWAY,
+                    detail=f"Could not download the Snakie library ({ref}): {exc}",
+                ) from exc
+            report = await import_library(library, session)
+    return {
+        "ref": ref,
+        "summary": report.summary(),
+        "created": report.created,
+        "updated": report.updated,
+        "unchanged": report.unchanged,
+        "skipped": report.skipped,
+        "photo_failed": report.photo_failed,
+    }
 
 
 @router.post(

@@ -297,6 +297,15 @@ tags are only filled in where empty. Changes are recorded as revisions by
 `snakie-import`. A second run changes nothing. The library's images have no
 recorded licence, so they arrive flagged for review.
 
+Snakie's library is the master copy, so the usual way to run the import is
+the **Sync from Snakie** button on `/admin/parts/`
+(`POST /api/admin/parts/sync-snakie`, admin only, optional `?ref=` branch or
+tag, default `master`). It downloads the library from GitHub and returns the
+created, updated, unchanged and skipped slugs, plus any whose picture could
+not be stored. The command line does the same with `--github [ref]`. Run it
+when Snakie's library changes; a projects-api redeploy doesn't need it,
+because the parts live in the database.
+
 ## Vendors, price history and availability (issues #202, #267)
 
 - A part's suppliers carry a `kind`: `shop` (somewhere to buy it) or a
