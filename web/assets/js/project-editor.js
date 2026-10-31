@@ -4,6 +4,17 @@
  */
 (function () {
   const API = 'https://projects.kevsrobots.com';
+  // This script's own ?v= (the site build time). The vendored modules loaded
+  // with import() carry it too, so a re-vendored Layers or mermaid-tools isn't
+  // served from a stale browser cache (their URLs never change otherwise).
+  const STAMP = (() => {
+    try {
+      const v = new URL(document.currentScript.src).searchParams.get('v');
+      return v ? '?v=' + encodeURIComponent(v) : '';
+    } catch (_) {
+      return '';
+    }
+  })();
   // Grammar, Look Up and Synonyms (stacks/language-tools). Spelling works without it.
   const LANGUAGE_API = 'https://language.kevsrobots.com';
   const params = new URLSearchParams(window.location.search);
@@ -620,9 +631,9 @@
   // no separate Preview: the live view is the preview, with Raw for source.
   const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // the API's max_image_size
   // Mermaid Factory's mermaid-tools (scripts/update-mermaid-tools.sh).
-  const MERMAID_TOOLS_URL = '/assets/js/mermaid-tools/mermaid-tools.js';
+  const MERMAID_TOOLS_URL = '/assets/js/mermaid-tools/mermaid-tools.js' + STAMP;
   // Layers, the graphic editor behind /Graphic (scripts/update-layers.sh).
-  const LAYERS_URL = '/assets/js/layers/layers.js';
+  const LAYERS_URL = '/assets/js/layers/layers.js' + STAMP;
   // Where a diagram block's "Open in Mermaid Factory" link goes.
   const MERMAID_FACTORY_URL = 'https://mermaid.kevspowertools.com';
   // The starters if mermaid-tools won't load; normally they come from its gallery.
