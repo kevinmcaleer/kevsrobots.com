@@ -273,3 +273,66 @@ def test_extract_library_without_the_library_fails(tmp_path) -> None:
     from projects_api.import_snakie_parts import extract_library
     with pytest.raises(ValueError):
         extract_library(_tarball({"Snakie-master/README.md": b"x"}), tmp_path / "lib")
+
+
+@pytest.mark.asyncio
+async def test_admin_sync_snakie(client, monkeypatch) -> None:
+    from projects_api.routers import admin_parts
+
+    def _fake_download(ref: str, dest: Path) -> Path:
+        assert ref == "master"
+        return LIBRARY
+
+    monkeypatch.setattr(admin_parts, "download_github_library", _fake_download)
+    url = "/api/admin/parts/sync-snakie"
+    assert (await client.post(url, headers=make_auth_header())).status_code == 403
+
+    monkeypatch.setenv("ADMIN_USERNAMES", "admin")
+    admin = make_auth_header("admin")
+    first = await client.post(url, headers=admin)
+    assert first.status_code == 200, first.text
+    assert first.json()["created"]
+    again = (await client.post(url, headers=admin)).json()
+    assert again["created"] == [] and again["unchanged"]
+
+    assert (await client.post(url + "?ref=../x", headers=admin)).status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_admin_sync_snakie_download_failure(client, monkeypatch) -> None:
+    from projects_api.routers import admin_parts
+
+    def _fail(ref: str, dest: Path) -> Path:
+        raise OSError("no route to host")
+
+    monkeypatch.setattr(admin_parts, "download_github_library", _fail)
+    monkeypatch.setenv("ADMIN_USERNAMES", "admin")
+    resp = await client.post("/api/admin/parts/sync-snakie", headers=make_auth_header("admin"))
+    assert resp.status_code == 502
+    assert "no route to host" in resp.json()["detail"]
+
+
+def test_smb_chunks_stay_under_the_credit_limit() -> None:
+    from projects_api.storage import _smb_read_chunks, _smb_write_chunks
+
+    class FakeOpen:
+        def __init__(self) -> None:
+            self.data = bytearray()
+            self.sizes: list[int] = []
+
+        def write(self, data: bytes, offset: int) -> None:
+            self.sizes.append(len(data))
+            self.data[offset:offset + len(data)] = data
+
+        def read(self, offset: int, length: int) -> bytes:
+            self.sizes.append(length)
+            return bytes(self.data[offset:offset + length])
+
+    content = bytes(range(256)) * (6 * 4096 + 7)  # ~6 MB, like the LiPo photos
+    f = FakeOpen()
+    _smb_write_chunks(f, content)
+    assert bytes(f.data) == content
+    assert max(f.sizes) <= 1024 * 1024
+    f.sizes.clear()
+    assert _smb_read_chunks(f, len(content)) == content
+    assert max(f.sizes) <= 1024 * 1024

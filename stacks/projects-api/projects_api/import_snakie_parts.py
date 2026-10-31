@@ -63,11 +63,14 @@ class ImportReport:
     updated: list[str] = field(default_factory=list)
     unchanged: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
+    # Parts whose picture couldn't be stored; a re-run retries them.
+    photo_failed: list[str] = field(default_factory=list)
 
     def summary(self) -> str:
         return (
             f"{len(self.created)} created, {len(self.updated)} updated, "
             f"{len(self.unchanged)} unchanged, {len(self.skipped)} skipped"
+            + (f", {len(self.photo_failed)} pictures not stored" if self.photo_failed else "")
         )
 
 
@@ -116,7 +119,10 @@ def _first_paragraph(text: Optional[str]) -> Optional[str]:
     return text or None
 
 
-async def _import_photo(session: AsyncSession, part: Part, folder: Path, raw: dict, source: str) -> bool:
+async def _import_photo(
+    session: AsyncSession, part: Part, folder: Path, raw: dict, source: str,
+    report: Optional[ImportReport] = None,
+) -> bool:
     """Add the library's image as a photo, once. Returns whether it did."""
     image = raw.get("image")
     if not isinstance(image, str) or "/" in image:
@@ -132,6 +138,8 @@ async def _import_photo(session: AsyncSession, part: Part, folder: Path, raw: di
     stored = save_file(path.read_bytes(), generate_filename(image, part.id), part.id, "part_images")
     if stored is None:
         logger.warning("Could not store the image for %s", part.slug)
+        if report is not None:
+            report.photo_failed.append(part.slug)
         return False
     count = await session.scalar(select(func.count(PartPhoto.id)).where(PartPhoto.part_id == part.id))
     session.add(PartPhoto(
@@ -212,7 +220,7 @@ async def import_part(session: AsyncSession, folder: Path, report: ImportReport,
     mesh_path = _import_mesh(part, folder, raw)
     if mesh_path:
         part.mesh_file_path = mesh_path
-    photo_added = await _import_photo(session, part, folder, raw, source)
+    photo_added = await _import_photo(session, part, folder, raw, source, report)
 
     after = (
         part.description_md, part.mpn, part.category, list(part.tags or []),

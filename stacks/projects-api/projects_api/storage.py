@@ -192,6 +192,28 @@ def delete_file(file_path: str) -> bool:
     return False
 
 
+# SMB servers grant a limited number of credits per request (one credit
+# covers 64 KiB; the NAS allows 64, about 4 MiB), so a single write or read
+# of a bigger file is refused with "Request requires N credits". Move files
+# in 1 MiB pieces instead.
+SMB_CHUNK = 1024 * 1024
+
+
+def _smb_write_chunks(f, content: bytes, chunk: int = SMB_CHUNK) -> None:
+    for offset in range(0, len(content), chunk):
+        f.write(content[offset:offset + chunk], offset)
+
+
+def _smb_read_chunks(f, size: int, chunk: int = SMB_CHUNK) -> bytes:
+    out = bytearray()
+    while len(out) < size:
+        piece = f.read(len(out), min(chunk, size - len(out)))
+        if not piece:
+            break
+        out += piece
+    return bytes(out)
+
+
 def _save_to_nas(content: bytes, filename: str, project_id: int, file_type: str) -> bool:
     try:
         from smbprotocol.connection import Connection
@@ -237,7 +259,7 @@ def _save_to_nas(content: bytes, filename: str, project_id: int, file_type: str)
             CreateDisposition.FILE_OVERWRITE_IF,
             CreateOptions.FILE_NON_DIRECTORY_FILE, None,
         )
-        f.write(content, 0)
+        _smb_write_chunks(f, content)
         f.close()
         tree.disconnect()
         conn.disconnect()
@@ -285,7 +307,7 @@ def _read_from_nas(rel_path: str) -> Optional[bytes]:
             CreateDisposition.FILE_OPEN,
             CreateOptions.FILE_NON_DIRECTORY_FILE, None,
         )
-        data = f.read(0, f.end_of_file)
+        data = _smb_read_chunks(f, f.end_of_file)
         f.close()
         tree.disconnect()
         conn.disconnect()

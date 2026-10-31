@@ -33,6 +33,18 @@ permalink: /admin/parts/
   </div>
 
   <div id="content" class="d-none">
+    <!-- Snakie's Standard library is the master copy of the parts catalog -->
+    <div class="card mb-4" id="snakie-sync">
+      <div class="card-body d-flex flex-wrap align-items-center gap-3">
+        <div class="flex-grow-1">
+          <h5 class="mb-1"><i class="fas fa-rotate me-2"></i> Snakie parts library</h5>
+          <div class="text-muted small">Import new and changed parts from Snakie's Standard library on GitHub (master). Safe to run again: parts are matched by slug, then name, then part number.</div>
+        </div>
+        <button type="button" class="btn btn-primary" id="snakie-sync-btn"><i class="fas fa-download me-1"></i> Sync from Snakie</button>
+      </div>
+      <div class="card-footer small d-none" id="snakie-sync-result"></div>
+    </div>
+
     <ul class="nav nav-pills mb-3" id="status-tabs">
       <li class="nav-item"><button type="button" class="nav-link active" data-status="open">Open <span class="badge bg-light text-dark ms-1" id="badge-open">0</span></button></li>
       <li class="nav-item"><button type="button" class="nav-link" data-status="resolved">Resolved</button></li>
@@ -225,6 +237,38 @@ permalink: /admin/parts/
       });
     });
   }
+
+  document.getElementById('snakie-sync-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('snakie-sync-btn');
+    const out = document.getElementById('snakie-sync-result');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Syncing…';
+    out.classList.remove('d-none');
+    out.textContent = 'Downloading the library from GitHub and importing it. This can take a minute.';
+    try {
+      const resp = await ProjectAuth.apiFetch(API + '/api/admin/parts/sync-snakie', { method: 'POST' });
+      let body = {};
+      try { body = await resp.json(); } catch (_) {}
+      if (!resp.ok) {
+        out.innerHTML = '<span class="text-danger">' + esc(body.detail || ('HTTP ' + resp.status)) + '</span>';
+        return;
+      }
+      const list = (label, slugs) => slugs && slugs.length
+        ? `<div><strong>${label}:</strong> ${slugs.map(s => `<a href="/parts/view.html?slug=${encodeURIComponent(s)}" target="_blank">${esc(s)}</a>`).join(', ')}</div>`
+        : '';
+      out.innerHTML = `<div class="text-success fw-semibold mb-1"><i class="fas fa-check me-1"></i> ${esc(body.summary)}</div>`
+        + list('Created', body.created)
+        + list('Updated', body.updated)
+        + list('Pictures not stored (sync again to retry)', body.photo_failed)
+        + (body.skipped && body.skipped.length ? `<div class="text-danger"><strong>Skipped:</strong> ${body.skipped.map(esc).join('; ')}</div>` : '');
+      loadPhotoReview();
+    } catch (e) {
+      out.innerHTML = '<span class="text-danger">Network error: ' + esc(e.message || e) + '</span>';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-download me-1"></i> Sync from Snakie';
+    }
+  });
 
   loadList();
   loadPhotoReview();
