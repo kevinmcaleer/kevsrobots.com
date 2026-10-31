@@ -82,3 +82,18 @@ test('linkedSince finds placeholders whose row is linked now', () => {
   const rows = [{ name: 'TT motor', slug: 'tt-motor' }, { name: 'Tape', slug: null }];
   assert.deepEqual(W.linkedSince(robot, rows), [{ from: 'row-tt-motor', slug: 'tt-motor', name: 'TT motor' }]);
 });
+
+test('a pin-less part takes its photo’s shape', () => {
+  const holder = { id: 'holder', name: '18650 holder', headers: [], imageData: 'x.jpg' };
+  const wide = W.fitToPhoto(holder, 800, 400);
+  assert.equal(wide.aspect, 2);
+  assert.equal(wide.dimensions, undefined);
+  // A real width is kept, the height follows the photo.
+  const sized = W.fitToPhoto(Object.assign({}, holder, { dimensions: { width: 77, height: 77 } }), 800, 400);
+  assert.deepEqual(sized.dimensions, { width: 77, height: 38.5 });
+  assert.equal(sized.aspect, 2);
+  // No size read, or pins placed already: unchanged.
+  assert.equal(W.fitToPhoto(holder, 0, 0), holder);
+  const led = { id: 'led', headers: pins(2), aspect: 0.6 };
+  assert.equal(W.fitToPhoto(led, 800, 400), led);
+});

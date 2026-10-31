@@ -185,3 +185,33 @@ body.project-wiring-open {
   .project-wiring-body { flex-direction: column; }
   .project-wiring-bom { width: auto; max-height: 40%; border-left: 0; border-top: 1px solid #e3e0d6; }
 }
+
+/* Edit part: Snakie's Part Editor in a dialog over the workspace, above
+   the full screen overlay and below the parts catalog. */
+.project-wiring-part-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 10045;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(20, 24, 28, 0.55);
+}
+.project-wiring-part-dialog .pwp-box {
+  width: min(1280px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 16px 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+.project-wiring-part-dialog .pwp-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.project-wiring-part-dialog .part-electronics-editor { height: 72vh; }

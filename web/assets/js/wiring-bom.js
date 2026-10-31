@@ -84,6 +84,22 @@
     });
   }
 
+  // A part with no pins drawn at its photo's shape. With nothing else to
+  // go on, the canvas fits a picture to the part's outline (Snakie's
+  // default is a tall 0.6), which squashed product photos. The photo's own
+  // width/height (`w`, `h`, in pixels) gives the outline; a real width in
+  // millimetres is kept and the height follows it. Parts with pins are
+  // left alone: their pins were placed over the outline as it is.
+  function fitToPhoto(def, w, h) {
+    if (!def || hasPins(def) || !(w > 0) || !(h > 0)) return def;
+    const aspect = w / h;
+    const out = Object.assign({}, def, { aspect });
+    const width = def.dimensions && def.dimensions.width;
+    if (width > 0) out.dimensions = Object.assign({}, def.dimensions, { width, height: Math.round(width / aspect * 10) / 10 });
+    else delete out.dimensions;
+    return out;
+  }
+
   // The rows the panel lists, one per distinct part, in BOM order:
   //   { name, slug, lib, part, def, linked, pins, board, onCanvas, isTheBoard }
   // `rows` is [{ name, slug }] from the BOM table, `defs` a Map of slug ->
@@ -151,7 +167,7 @@
     return out;
   }
 
-  const api = { BOM_LIB, placeholderId, placeholderPart, placeholderImage, withFallbackImage, hasPins, isBoard, entries, relink, linkedSince };
+  const api = { BOM_LIB, placeholderId, placeholderPart, placeholderImage, withFallbackImage, fitToPhoto, hasPins, isBoard, entries, relink, linkedSince };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.WiringBom = api;
 })(typeof window !== 'undefined' ? window : globalThis);

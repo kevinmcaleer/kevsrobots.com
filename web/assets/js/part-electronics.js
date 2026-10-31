@@ -24,6 +24,32 @@
     return fallback;
   }
 
+  // A part with no pins yet starts at its photo's shape, not Snakie's tall
+  // default outline (which stretched the photo to fit). A width in mm is
+  // kept and the height follows the photo. Once it has pins the outline
+  // is the one they were placed on, so it's left alone.
+  function hasPins(def) {
+    return (def.headers || []).some(h => (h.pins || []).length > 0) || (def.connectors || []).some(c => (c.pins || []).length > 0);
+  }
+  function fitToPhoto(def) {
+    if (!def.imageData || hasPins(def)) return def;
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        if (!(w > 0 && h > 0)) { resolve(def); return; }
+        const aspect = w / h;
+        const width = def.dimensions && def.dimensions.width;
+        const out = Object.assign({}, def, { aspect });
+        if (width > 0) out.dimensions = Object.assign({}, def.dimensions, { width, height: Math.round(width / aspect * 10) / 10 });
+        else delete out.dimensions;
+        resolve(out);
+      };
+      img.onerror = () => resolve(def);
+      img.src = def.imageData;
+    });
+  }
+
   // Draws the tab into `root` for `part` (GET /api/parts/{slug}).
   // `onSaved(part)` gets the part after each save.
   function create(root, part, opts) {
@@ -134,7 +160,7 @@
       if (mounted) { mounted.unmount(); mounted = null; }
       try {
         const SP = await SnakieHost.load();
-        const def = await SnakieHost.partFor(current, { photo, inline: true });
+        const def = await fitToPhoto(await SnakieHost.partFor(current, { photo, inline: true }));
         mounted = SP.mountPartEditor(box, {
           part: def,
           libraryId: 'kevsrobots',
