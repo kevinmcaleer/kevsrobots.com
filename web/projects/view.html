@@ -1380,7 +1380,7 @@ description: View project details
     const head = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim().toLowerCase());
     let partCol = head.findIndex(h => /^(part|parts|item|items|name|component|components)$/.test(h));
     if (partCol < 0) partCol = 0;
-    const priceCol = head.findIndex(h => /^(price|unit price|price each|each|cost|unit cost)$/.test(h));
+    const priceCol = head.findIndex(h => /^(price|unit price|price each|each|cost|unit cost)(?:\s*\([^)]*\))?$/.test(h));
     const bySlug = new Map(items.filter(i => i.part_slug).map(i => [i.part_slug, i]));
     const byName = new Map(items.map(i => [i.name.trim().toLowerCase(), i]));
     const cc = window.CurrencyConvert;

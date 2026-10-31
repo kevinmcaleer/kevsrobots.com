@@ -113,3 +113,63 @@ test('the first Bill of Materials heading with a table counts', () => {
   assert.deepEqual(out.rows.map(r => [r.name, r.quantity]), [['Cell', 2]]);
   assert.match(BomSync.withTotals(md), /\| \*\*Total\*\* \|  \|  \|  \|  \| \*\*10\.00\*\* \|/);
 });
+
+test('a currency in the Price header formats every price and total', () => {
+  const md = doc([
+    '| Part | Qty | Price (£) |',
+    '| --- | --- | --- |',
+    '| Pico | 1 | 4 |',
+    '| Servo | 2 | $2.5 |',
+  ].join('\n'));
+  assert.equal(BomSync.withTotals(md), doc([
+    '| Part | Qty | Price (£) | Total |',
+    '| --- | --- | --- | --- |',
+    '| Pico | 1 | £4.00 | £4.00 |',
+    '| Servo | 2 | £2.50 | £5.00 |',
+    '| **Total** |  |  | **£9.00** |',
+  ].join('\n')));
+});
+
+test('yen has no decimals, and a code works in the header', () => {
+  const md = doc('| Part | Qty | Price (JPY) |\n| --- | --- | --- |\n| Pico | 2 | 650 |');
+  assert.match(BomSync.withTotals(md), /\| Pico \| 2 \| ¥650 \| ¥1300 \|\n\| \*\*Total\*\* \|  \|  \| \*\*¥1300\*\* \|/);
+  const chf = doc('| Part | Qty | Unit price (CHF) |\n| --- | --- | --- |\n| Pico | 1 | 4 |');
+  assert.match(BomSync.withTotals(chf), /\| Pico \| 1 \| 4\.00 CHF \| 4\.00 CHF \|/);
+});
+
+test('the price being typed is left alone until the caret moves on', () => {
+  const md = doc('| Part | Qty | Price (€) | Total |\n| --- | --- | --- | --- |\n| Pico | 2 | 4 |  |');
+  const line = md.split('\n').findIndex(l => l.startsWith('| Pico'));
+  const changes = BomSync.totalsChanges(md, { typingLine: line });
+  assert.equal(changes.find(c => c.line === line).text, '| Pico | 2 | 4 | €8.00 |');
+  assert.equal(BomSync.totalsChanges(md).find(c => c.line === line).text, '| Pico | 2 | €4.00 | €8.00 |');
+});
+
+test('choosing a currency rewrites the header, prices and totals', () => {
+  const rows = [
+    ['Part', 'Qty', 'Unit price', 'Total', 'Notes'],
+    ['Pico', '1', '£4', '£4.00', 'brain'],
+    ['Wires', 'lots', '~', '', ''],
+    ['**Total**', '', '', '**£4.00**', ''],
+  ];
+  assert.deepEqual(BomSync.withCurrency(rows, 'USD'), [
+    ['Part', 'Qty', 'Unit price ($)', 'Total', 'Notes'],
+    ['Pico', '1', '$4.00', '$4.00', 'brain'],
+    ['Wires', 'lots', '~', '', ''],
+    ['**Total**', '', '', '**$4.00**', ''],
+  ]);
+  const back = BomSync.withCurrency(BomSync.withCurrency(rows, 'USD'), null);
+  assert.deepEqual(back[0], ['Part', 'Qty', 'Unit price', 'Total', 'Notes']);
+  assert.deepEqual(back[1], ['Pico', '1', '4.00', '4.00', 'brain']);
+});
+
+test('the table currency comes from the header, else the first price', () => {
+  assert.equal(BomSync.tableCurrency([['Part', 'Price (€)'], ['Pico', '£4']]), 'EUR');
+  assert.equal(BomSync.tableCurrency([['Part', 'Price'], ['Pico', '4'], ['Servo', '£4']]), 'GBP');
+  assert.equal(BomSync.tableCurrency([['Part', 'Price'], ['Pico', '4']]), null);
+});
+
+test('a bare price takes the header currency when synced', () => {
+  const out = BomSync.parse(doc('| Part | Qty | Price (€) |\n| --- | --- | --- |\n| Pico | 1 | 4 |'));
+  assert.deepEqual(out.rows[0], { name: 'Pico', quantity: 1, part_slug: null, unit_cost: 4, currency_code: 'EUR' });
+});

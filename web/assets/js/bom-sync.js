@@ -9,13 +9,46 @@
 (function (root) {
   const PART_COL = /^(part|parts|item|items|name|component|components)$/;
   const QTY_COL = /^(qty|quantity|count|no\.?|#)$/;
-  const PRICE_COL = /^(price|unit price|price each|each|cost|unit cost)$/;
+  // A Price header can name the table's currency: "Price (£)", "Price (EUR)".
+  const PRICE_COL = /^(price|unit price|price each|each|cost|unit cost)(?:\s*\([^)]*\))?$/;
   const SLUG_RE = /^(?:https?:\/\/(?:www\.)?kevsrobots\.com)?\/parts\/view\.html\?slug=([a-z0-9][a-z0-9-]*)$/i;
-  const SYMBOLS = { '£': 'GBP', '$': 'USD', 'US$': 'USD', '€': 'EUR', '¥': 'JPY', 'A$': 'AUD', 'C$': 'CAD' };
-  const CODE_SYMBOLS = { GBP: '£', USD: '$', EUR: '€', JPY: '¥', AUD: 'A$', CAD: 'C$' };
+  const SYMBOLS = { '£': 'GBP', '$': 'USD', 'US$': 'USD', '€': 'EUR', '¥': 'JPY', 'A$': 'AUD', 'C$': 'CAD', '₹': 'INR' };
+  const CODE_SYMBOLS = { GBP: '£', USD: '$', EUR: '€', JPY: '¥', AUD: 'A$', CAD: 'C$', INR: '₹' };
+  // The currencies offered for a Bill of Materials' Price column, and how
+  // many decimals each one shows.
+  const CURRENCIES = [
+    { code: 'GBP', name: 'British pound' },
+    { code: 'USD', name: 'US dollar' },
+    { code: 'EUR', name: 'Euro' },
+    { code: 'CAD', name: 'Canadian dollar' },
+    { code: 'AUD', name: 'Australian dollar' },
+    { code: 'JPY', name: 'Japanese yen' },
+    { code: 'INR', name: 'Indian rupee' },
+    { code: 'CHF', name: 'Swiss franc' },
+  ];
+  const DECIMALS = { JPY: 0 };
+  const decimals = code => (code && DECIMALS[code] != null ? DECIMALS[code] : 2);
 
   function plain(cell) {
     return String(cell || '').replace(/\\\|/g, '|').replace(/[*_`]/g, '').trim();
+  }
+
+  // A currency mark ("£", "A$", "EUR") as its code, or null.
+  function codeOf(mark) {
+    mark = String(mark || '').trim();
+    if (/^[A-Z]{3}$/i.test(mark)) return mark.toUpperCase();
+    return SYMBOLS[mark] || null;
+  }
+
+  // The currency a Price header names, "Price (£)" -> 'GBP', or null.
+  function headerCurrency(header) {
+    const m = plain(header).match(/\(([^)]*)\)\s*$/);
+    return m ? codeOf(m[1]) : null;
+  }
+
+  // The header without its currency: "Unit price (£)" -> "Unit price".
+  function headerLabel(header) {
+    return plain(header).replace(/\s*\([^)]*\)\s*$/, '');
   }
 
   // "£4.50", "4.50 EUR", "USD 3", "$1,200.00" -> { amount, code }; code
@@ -27,16 +60,14 @@
     const before = text.slice(0, m.index).trim();
     const after = text.slice(m.index + m[0].length).trim();
     const mark = before || after;
-    let code = null;
-    if (/^[A-Z]{3}$/.test(mark)) code = mark;
-    else if (SYMBOLS[mark]) code = SYMBOLS[mark];
+    const code = /^[A-Z]{3}$/.test(mark) ? mark : (SYMBOLS[mark] || null);
     return { amount: parseFloat(m[0]), code };
   }
 
   // A price as the table shows it: "£4.50", or "4.50 CHF".
   function formatPrice(amount, code) {
     if (amount == null) return '';
-    const n = Number(amount).toFixed(code === 'JPY' ? 0 : 2);
+    const n = Number(amount).toFixed(decimals(code));
     if (!code) return n;
     return CODE_SYMBOLS[code] ? CODE_SYMBOLS[code] + n : n + ' ' + code;
   }
@@ -53,6 +84,7 @@
     if (partCol < 0) partCol = 0;
     const qtyCol = header.findIndex(h => QTY_COL.test(h));
     const priceCol = header.findIndex(h => PRICE_COL.test(h));
+    const tableCode = priceCol >= 0 ? headerCurrency(header[priceCol]) : null;
     const rows = [];
     table.rows.forEach(cells => {
       if (/^\*\*total\*\*$/i.test((cells[0] || '').trim())) return;
@@ -66,7 +98,7 @@
       if (priceCol >= 0) {
         const p = price(cells[priceCol]);
         row.unit_cost = p ? p.amount : null;
-        row.currency_code = p ? p.code : null;
+        row.currency_code = p ? (p.code || tableCode) : null;
       }
       rows.push(row);
     });
@@ -97,7 +129,7 @@
   }
 
   const BOM_QTY = /^(qty|quantity|count)$/;
-  const BOM_PRICE = /^(price|unit price|price each|each|cost|unit cost)$/;
+  const BOM_PRICE = PRICE_COL;
   const BOM_TOTAL = /^(total|subtotal|line total|row total)$/;
 
   function parseAmount(cell) {
@@ -120,7 +152,12 @@
 
   // The lines to replace: [{ line, text }] (line counted from 0), plus
   // where a missing total row goes. Empty when there's nothing to change.
-  function totalsChanges(markdown) {
+  // When the Price header names a currency ("Price (£)"), every price and
+  // total is written in it with its decimals: "4" becomes "£4.00". The
+  // price on `options.typingLine` (the caret's row) is left as typed until
+  // the caret moves on, so "4" isn't turned into "£4.00" mid-"4.5".
+  function totalsChanges(markdown, options) {
+    const typingLine = options && options.typingLine != null ? options.typingLine : -1;
     const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
     if (!table) return [];
     const header = table.header;
@@ -144,6 +181,8 @@
       changes.push({ line: table.headerLine + 1, text: rowText(sep) });
     }
 
+    const tableCode = headerCurrency(header[priceCol]);
+    const show = (n, cellCurrency) => (tableCode ? formatPrice(n, tableCode) : money(n, cellCurrency));
     let currency = null;
     let sum = 0;
     let priced = 0;
@@ -161,12 +200,15 @@
       if (qty !== null && price !== null) {
         sum += qty * price;
         priced++;
-        total = money(qty * price, currencyOf(cells[priceCol]) || currency);
+        total = show(qty * price, currencyOf(cells[priceCol]) || currency);
       }
-      if (adding || (cells[totalCol] || '') !== total) {
-        cells[totalCol] = total;
-        changes.push({ line, text: rowText(cells) });
+      let changed = adding || (cells[totalCol] || '') !== total;
+      cells[totalCol] = total;
+      if (tableCode && price !== null && line !== typingLine) {
+        const shown = formatPrice(price, tableCode);
+        if (cells[priceCol] !== shown) { cells[priceCol] = shown; changed = true; }
       }
+      if (changed) changes.push({ line, text: rowText(cells) });
     });
 
     // The grand total sits under the last part; any other total row goes.
@@ -174,7 +216,7 @@
     const lastLine = table.lines[table.lines.length - 1];
     const totalCells = new Array(width).fill('');
     totalCells[0] = '**Total**';
-    totalCells[totalCol] = '**' + money(sum, currency) + '**';
+    totalCells[totalCol] = '**' + show(sum, currency) + '**';
     const wantText = priced ? rowText(totalCells) : null;
     totalRows.forEach(line => {
       if (line === lastLine && wantText) {
@@ -187,6 +229,47 @@
       changes.push({ line: lastLine, append: wantText });
     }
     return changes;
+  }
+
+  // --- Currency ---
+
+  // The table's rows (header first, each cell's Markdown) with its Price
+  // column in `code` (null for none): the header names it, "Price (£)",
+  // and each price and total is written with the currency's decimals.
+  function withCurrency(rows, code) {
+    if (!rows.length) return rows;
+    const head = rows[0].map(h => plain(h).toLowerCase());
+    const priceCol = head.findIndex(h => PRICE_COL.test(h));
+    if (priceCol < 0) return rows;
+    const totalCol = head.findIndex(h => BOM_TOTAL.test(h));
+    const mark = code ? (CODE_SYMBOLS[code] || code) : null;
+    const amount = cell => {
+      const p = price(cell);
+      return p ? formatPrice(p.amount, code) : null;
+    };
+    return rows.map((row, r) => row.map((cell, c) => {
+      if (r === 0) return c === priceCol ? headerLabel(cell) + (mark ? ' (' + mark + ')' : '') : cell;
+      if (c !== priceCol && c !== totalCol) return cell;
+      if (c === priceCol && isTotalRow(row)) return cell;
+      const shown = amount(cell);
+      if (shown === null) return cell;
+      return /^\*\*.*\*\*$/.test(cell.trim()) ? '**' + shown + '**' : shown;
+    }));
+  }
+
+  // The currency a Bill of Materials table's prices are in: the Price
+  // header's, else the first price that names one. Null for none.
+  function tableCurrency(rows) {
+    const head = (rows[0] || []).map(h => plain(h).toLowerCase());
+    const priceCol = head.findIndex(h => PRICE_COL.test(h));
+    if (priceCol < 0) return null;
+    const named = headerCurrency(rows[0][priceCol]);
+    if (named) return named;
+    for (const row of rows.slice(1)) {
+      const p = price(row[priceCol]);
+      if (p && p.code) return p.code;
+    }
+    return null;
   }
 
   // The text with totalsChanges applied, as the editor writes it.
@@ -209,7 +292,10 @@
     return out.join('\n');
   }
 
-  const api = { parse, price, formatPrice, tableFromRows, totalsChanges, withTotals };
+  const api = {
+    parse, price, formatPrice, tableFromRows, totalsChanges, withTotals,
+    CURRENCIES, headerCurrency, withCurrency, tableCurrency, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
+  };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.BomSync = api;
 })(typeof window !== 'undefined' ? window : globalThis);

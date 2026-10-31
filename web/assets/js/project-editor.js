@@ -782,6 +782,8 @@
       tableNote: ({ rows, heading }) => bomTableTip(rows, heading) || pinoutTableNote(rows),
       // Up and down buttons on the Bill of Materials' Qty cells.
       tableStepper: bomQtyStepper,
+      // A Currency list in the Bill of Materials' Price column menu.
+      tableColumnAction: bomCurrencyAction,
       // The pinout table's marker line (pinout-sync.js) stays out of sight.
       hiddenComments: comment => PinoutSync.isMarker(comment),
       slashCommands: ProjectSlashCommands.create(slashContext()),
@@ -792,6 +794,10 @@
       // project has several H1s on purpose: no "More than one H1" hint.
       lintSkip: ['multiple-h1'],
     });
+
+    // Leaving a price writes it in the table's currency ("4" -> "£4.00").
+    contentEditor.addEventListener('focusout', scheduleBomTotals);
+    contentEditor.addEventListener('click', scheduleBomTotals);
 
     mde.on('change', () => {
       scheduleAutoSave();
@@ -837,6 +843,7 @@
         rows: [
           ['| Part | Qty | Price |', 'Add Qty and Price columns: a Total column and a Total row are filled in for you'],
           ['4.99', 'Write prices with a dot'],
+          ['Price (£)', 'Pick a currency from the Price column\u2019s menu: every price and total is shown in it, so 4 becomes £4.00'],
           ['[Pico](/parts/view.html?slug=pico)', 'A link to a catalog part shows its picture and details (type / then Part)'],
         ],
       },
@@ -1627,14 +1634,14 @@
     if (!section || section.id !== 'bill-of-materials') return null;
     const header = (rows[0] || []).map(h => h.replace(/[*_`]/g, '').trim().toLowerCase());
     const priced = header.some(h => /^(qty|quantity|count)$/.test(h)) &&
-      header.some(h => /^(price|unit price|price each|each|cost|unit cost)$/.test(h));
+      header.some(h => BomSync.isPriceHeader(h));
     const tip = document.createElement('div');
     tip.className = 'kr-notice bom-table-tip';
     tip.setAttribute('role', 'note');
     tip.innerHTML =
       '<i class="fas fa-calculator" aria-hidden="true"></i>' +
       '<span>' + (priced
-        ? 'Each row\u2019s <strong>Total</strong> is Qty \u00d7 Price, and the <strong>Total</strong> row adds them up. The editor fills both in for you. Write prices with a dot, like 4.99.'
+        ? 'Each row\u2019s <strong>Total</strong> is Qty \u00d7 Price, and the <strong>Total</strong> row adds them up. The editor fills both in for you. Write prices with a dot, like 4.99, and pick a currency from the <strong>Price</strong> column\u2019s menu.'
         : 'Add a <strong>Qty</strong> column and a <strong>Price</strong> column, and the editor adds a <strong>Total</strong> column and a <strong>Total</strong> row for you.') +
       '</span>' +
       '<button type="button" class="btn-close" aria-label="Hide this tip"></button>';
@@ -1652,6 +1659,25 @@
     if (!/^(qty|quantity|count)$/.test(header.replace(/[*_`]/g, '').trim().toLowerCase())) return null;
     if (ProjectSlashCommands.isTotalRow(row)) return null;
     return { min: 0 };
+  }
+
+  // The Bill of Materials' Price column menu offers a currency. Choosing one
+  // names it in the header ("Price (£)") and writes every price and total
+  // in it with its decimals, so "4" shows as "£4.00"; prices typed later
+  // follow it (BomSync.totalsChanges).
+  const COIN_ICON = 'M8 2.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zM10 6.2A1.9 1.9 0 0 0 6.5 7v3.8M5.5 8.5h3M5.5 10.8h4.8';
+  function bomCurrencyAction({ header, rows, heading }) {
+    const section = heading && ProjectSections.match(heading);
+    if (!section || section.id !== 'bill-of-materials') return null;
+    if (!BomSync.isPriceHeader(header)) return null;
+    const current = BomSync.tableCurrency(rows);
+    const option = (code, label) => ({ label, checked: current === code, apply: r => BomSync.withCurrency(r, code) });
+    return {
+      label: 'Currency' + (current ? ' (' + current + ')' : ''),
+      icon: COIN_ICON,
+      options: BomSync.CURRENCIES.map(c => option(c.code, c.name + ' (' + BomSync.formatPrice(0, c.code).replace(/[\d.\s]/g, '') + ')'))
+        .concat([option(null, 'No currency')]),
+    };
   }
 
   function setBomTipClosed(closed) {
@@ -2330,7 +2356,7 @@
     if (!mde || !mde.view) return;
     const view = mde.view;
     const doc = view.state.doc;
-    const changes = BomSync.totalsChanges(doc.toString());
+    const changes = BomSync.totalsChanges(doc.toString(), { typingLine: bomTypingLine(view) });
     if (!changes.length) return;
     const specs = [];
     changes.forEach(c => {
@@ -2340,6 +2366,22 @@
       else specs.push({ from: line.from, to: line.to, insert: c.text });
     });
     view.dispatch({ changes: specs, userEvent: 'input.bomtotals' });
+  }
+
+  // The line (from 0) being typed in: a focused table cell's row, or the
+  // caret's line in the Markdown. Its price keeps its typed form until the
+  // caret leaves (see the focusout below).
+  function bomTypingLine(view) {
+    const cell = document.activeElement;
+    if (cell && cell.closest && cell.closest('.cm-md-table') && cell.dataset && cell.dataset.row != null) {
+      try {
+        const table = cell.closest('.cm-md-table');
+        const header = view.state.doc.lineAt(view.posAtDOM(table)).number - 1;
+        return header + 1 + Number(cell.dataset.row);
+      } catch (e) { return -1; }
+    }
+    if (view.hasFocus) return view.state.doc.lineAt(view.state.selection.main.head).number - 1;
+    return -1;
   }
 
   let bomTotalsTimer = null;
