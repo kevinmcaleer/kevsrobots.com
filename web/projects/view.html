@@ -736,6 +736,7 @@ description: View project details
 <!-- Issue #259: "On this page", canonical sections marked with icons. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/page-jump.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -2488,10 +2489,7 @@ description: View project details
         e.preventDefault();
         const target = document.getElementById(a.dataset.tocTarget);
         if (target) {
-          window.scrollTo({
-            top: target.getBoundingClientRect().top + window.scrollY - 80,
-            behavior: 'smooth'
-          });
+          PageJump.toElement(target, { offset: 80 });
           history.replaceState(null, '', '#' + a.dataset.tocTarget);
         }
       });
@@ -2667,7 +2665,8 @@ description: View project details
       onSelect(id) {
         const target = document.getElementById(id);
         if (!target) return;
-        window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+        // page-jump.js: lands on it even if pictures above it are still loading.
+        PageJump.toElement(target, { offset: 80 });
         history.replaceState(null, '', '#' + id);
       },
     });
