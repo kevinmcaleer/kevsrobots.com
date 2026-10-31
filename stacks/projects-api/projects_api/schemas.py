@@ -1041,6 +1041,44 @@ class PartCreate(BaseModel):
     symbol_id: Optional[int] = None
 
 
+class PartSubmit(BaseModel):
+    """A part submitted from the project editor's "New part" dialog. Any
+    signed-in account may send one; it waits (status ``pending``) until an
+    admin approves it, visible meanwhile only to the person who sent it and
+    on the pages that link to it."""
+
+    name: str = Field(..., min_length=2, max_length=200)
+    description_md: Optional[str] = Field(None, max_length=20000)
+    category: Optional[str] = Field(None, max_length=60)
+    family: Optional[str] = Field(None, max_length=80)
+    tags: list[str] = Field(default_factory=list, max_length=20)
+    sku: Optional[str] = Field(None, max_length=100)
+    mpn: Optional[str] = Field(None, max_length=100)
+    manufacturer: Optional[str] = Field(None, max_length=120)
+    package: Optional[str] = Field(None, max_length=20)
+    voltage: Optional[str] = Field(None, max_length=60)
+    datasheet_url: Optional[str] = Field(None, max_length=2000)
+    # Shop links (with an optional price) and other links (docs, drivers).
+    links: list[PartSupplierInput] = Field(default_factory=list, max_length=10)
+
+
+class PartReviewItem(BaseModel):
+    """A submitted part in the admin review queue."""
+
+    id: int
+    slug: str
+    name: str
+    status: str
+    created_by: str
+    created_at: datetime
+    description_md: Optional[str] = None
+    category: Optional[str] = None
+    cover_url: Optional[str] = None
+    photo_count: int = 0
+    links: list[str] = Field(default_factory=list)
+    usage_count: int = 0
+
+
 class PartUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=2, max_length=200)
     sku: Optional[str] = Field(None, max_length=100)

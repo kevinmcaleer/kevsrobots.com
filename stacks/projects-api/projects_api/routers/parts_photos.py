@@ -7,7 +7,8 @@ pattern (``storage.save_file`` + a ``/view`` byte-serving route) but adds
 the link option and a per-photo title.
 
 Gating mirrors the parts wiki: any logged-in account past the 14-day age
-gate can add photos (community enhancement is encouraged). Editing /
+gate can add photos (and anyone to a part they submitted that's still
+waiting for review) (community enhancement is encouraged). Editing /
 deleting a photo is restricted to its uploader or an admin to blunt
 casual vandalism.
 """
@@ -21,7 +22,7 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import require_terms_accepted_aged
+from ..auth import PartWriter, require_part_writer, require_terms_accepted_aged
 from ..config import get_settings
 from ..db import get_session
 from ..models import Part, PartPhoto
@@ -116,7 +117,7 @@ async def upload_photo(
     title: Optional[str] = Form(None),
     licence: Optional[str] = Form(None),
     source: Optional[str] = Form(None),
-    user: str = Depends(require_terms_accepted_aged),
+    writer: PartWriter = Depends(require_part_writer),
     session: AsyncSession = Depends(get_session),
 ) -> PartPhotoResponse:
     """Upload an image file as a part photo (stored on NAS/local). A
@@ -128,6 +129,9 @@ async def upload_photo(
             detail="Choose a licence for the photo: " + ", ".join(PHOTO_LICENCES),
         )
     part = await _get_part(session, slug)
+    # Anyone may add photos to the part they submitted while it waits for review.
+    writer.check_part(part)
+    user = writer.username
     settings = get_settings()
     content = await file.read()
 
@@ -162,11 +166,13 @@ async def upload_photo(
 async def link_photo(
     slug: str,
     body: PartPhotoLinkCreate,
-    user: str = Depends(require_terms_accepted_aged),
+    writer: PartWriter = Depends(require_part_writer),
     session: AsyncSession = Depends(get_session),
 ) -> PartPhotoResponse:
     """Add an off-site image by URL (no upload)."""
     part = await _get_part(session, slug)
+    writer.check_part(part)
+    user = writer.username
     url = body.external_url.strip()
     if not (url.startswith("http://") or url.startswith("https://")):
         raise HTTPException(

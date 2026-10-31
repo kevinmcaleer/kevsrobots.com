@@ -139,7 +139,8 @@
   //   bomRows()             every BOM row as [{ name, slug|null }], in order
   //   linkBomRow(name, part) links the unlinked row `name` to part { name, slug } in the
   //                         BOM table; false when the table was left alone
-  //   createPart(name)      adds a draft catalog part, as { name, slug }, or null
+  //   createPart(name, origin)  opens the "New part" dialog for the row `name`;
+  //                         resolves to the part { name, slug, existing }, or null
   //   addBomRows(parts)     adds rows for [{ name, slug }]
   //   removeBomRows(slugs)  removes the rows linking these slugs
   //   placeImage(url)       puts (or refreshes) the wiring image in the text
@@ -353,13 +354,12 @@
       if (picked.length) await linkEntry(e, picked[0]);
     }
 
-    async function newPart(e) {
+    async function newPart(e, origin) {
       try {
-        const part = await ctx.createPart(e.name);
+        const part = await ctx.createPart(e.name, origin);
         if (!part) return;
         await linkEntry(e, part);
-        window.open(pinsUrl(part.slug), '_blank', 'noopener');
-        status('“' + e.name + '” is a new draft part in the catalog. Add its pins in the tab that opened, then come back here.');
+        if (!part.existing) status('“' + part.name + '” is linked to its new catalog part. Use Add pins when you want to wire it up.');
       } catch (err) {
         status(err.message || String(err), true);
       }
@@ -420,7 +420,7 @@
         }
         if (!e.linked) {
           out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-link="' + i + '"><i class="fas fa-link me-1"></i>Link…</button>');
-          out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-new="' + i + '" title="Not in the catalog? Add it as a new part, then give it pins" aria-label="Add “' + esc(e.name) + '” to the catalog as a new part"><i class="fas fa-plus"></i></button>');
+          out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-new="' + i + '" title="Not in the catalog? Add it as a new part, with pictures and links" aria-label="Add “' + esc(e.name) + '” to the catalog as a new part"><i class="fas fa-plus"></i></button>');
         } else if (e.def && !e.pins) {
           out.push('<a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener" href="' + esc(pinsUrl(e.slug)) + '" title="Opens the part’s electronics editor in a new tab"><i class="fas fa-up-right-from-square me-1"></i>Add pins</a>');
         }
@@ -454,10 +454,7 @@
       if (unboard) unboard.addEventListener('click', () => {
         if (window.confirm('Take the board off the wiring? Its wires go too.')) handle.setBoard(null);
       });
-      box.querySelectorAll('[data-bom-new]').forEach(b => b.addEventListener('click', () => {
-        const e = list[+b.dataset.bomNew];
-        if (window.confirm('Add “' + e.name + '” to the parts catalog as a new draft part, and link this row to it?')) newPart(e);
-      }));
+      box.querySelectorAll('[data-bom-new]').forEach(b => b.addEventListener('click', ev => newPart(list[+b.dataset.bomNew], ev.currentTarget)));
     }
 
     overlay.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {

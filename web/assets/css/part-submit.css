@@ -1,0 +1,317 @@
+/* "New part" dialog (part-submit.js): add a part to the catalog from a
+   project's Bill of Materials. Drawn with the Notes tokens the catalog uses
+   (parts-catalog.css). */
+
+.part-submit-dialog {
+  --bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-2: #f0eee6;
+  --text: #141413;
+  --muted: #6b6a63;
+  --border: #e3e0d6;
+  --accent: #c96442;
+  --danger: #b3261e;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+.part-submit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10060;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4vh 16px;
+  overflow: auto;
+  background: rgba(20, 20, 19, 0);
+  transition: background 0.2s;
+}
+.part-submit-overlay.is-open {
+  background: rgba(20, 20, 19, 0.35);
+}
+body.part-submit-open {
+  overflow: hidden;
+}
+
+.part-submit-dialog {
+  width: 100%;
+  max-width: 560px;
+  padding: 1.25rem 1.25rem 1rem;
+  border-radius: 16px;
+  background: var(--bg);
+  box-shadow: 0 24px 60px rgba(20, 20, 19, 0.25);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.16s;
+}
+.part-submit-overlay.is-open .part-submit-dialog {
+  opacity: 1;
+  transform: none;
+}
+
+.part-submit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.part-submit-head h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+.part-submit-intro {
+  margin: 0.25rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.part-submit-field {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.part-submit-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.part-submit-hint {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.part-submit-dialog .form-control,
+.part-submit-dialog .form-select {
+  border-color: var(--border);
+  background-color: var(--surface);
+  border-radius: 8px;
+}
+.part-submit-dialog .form-control:focus,
+.part-submit-dialog .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* Parts already in the catalog with a name like it. */
+.part-submit-matches:empty {
+  display: none;
+}
+.part-submit-matches {
+  margin: -0.25rem 0 0.75rem;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.part-submit-matches-title {
+  margin: 0 0 0.35rem 0.25rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.part-submit-match {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+}
+.part-submit-match:hover,
+.part-submit-match:focus-visible {
+  background: var(--surface);
+}
+.part-submit-match img {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  object-fit: contain;
+  background: var(--surface);
+}
+.part-submit-match-name {
+  font-weight: 600;
+}
+.part-submit-match-detail {
+  overflow: hidden;
+  flex: 1;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.part-submit-match-use {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Pictures: a drop zone that's also the button to choose them. */
+.part-submit-drop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 84px;
+  margin-bottom: 0.5rem;
+  padding: 0.6rem;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.part-submit-drop:hover,
+.part-submit-drop:focus-visible,
+.part-submit-drop.is-over {
+  border-color: var(--accent);
+  outline: none;
+}
+.part-submit-drop.is-over {
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+.part-submit-drop-text {
+  flex: 1;
+  min-width: 10rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+.part-submit-drop-text strong {
+  color: var(--text);
+}
+.part-submit-drop.has-photos .part-submit-drop-text {
+  flex: 0 1 auto;
+  text-align: left;
+}
+.part-submit-thumbs {
+  display: contents;
+}
+.part-submit-thumb {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.part-submit-thumb img {
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+.part-submit-thumb-x {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.part-submit-licence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.part-submit-licence .form-select {
+  flex: 0 1 auto;
+  width: auto;
+}
+.part-submit-licence .form-control {
+  flex: 1 1 12rem;
+  font-size: 0.875rem;
+}
+
+.part-submit-row,
+.part-submit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 11rem;
+  gap: 0 0.75rem;
+}
+.part-submit-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 480px) {
+  .part-submit-row,
+  .part-submit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.part-submit-price {
+  display: flex;
+}
+.part-submit-price .form-select {
+  flex: 0 0 4.75rem;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.part-submit-price .form-control {
+  min-width: 0;
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.part-submit-more {
+  margin: 0.25rem 0 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.part-submit-more summary {
+  padding: 0.6rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.part-submit-more[open] summary {
+  margin-bottom: 0.25rem;
+}
+
+.part-submit-note {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.part-submit-status {
+  min-height: 1.2em;
+  margin-bottom: 0.5rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.part-submit-status.is-error {
+  color: var(--danger);
+}
+.part-submit-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.part-submit-foot .btn-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .part-submit-overlay,
+  .part-submit-dialog {
+    transition: none;
+  }
+}

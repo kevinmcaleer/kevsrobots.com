@@ -212,3 +212,25 @@ test('linkRow moves a shop link on the name into the Notes column', () => {
   const bare = doc('| Part | Qty |\n| --- | --- |\n| [Wheels](https://example.com/w) | 4 |');
   assert.equal(BomSync.linkRow(bare, 'Wheels', 'wheel'), null, 'no Notes column: the shop link is not dropped');
 });
+
+test('rowDetails reads a row for the New part dialog', () => {
+  const md = doc([
+    '| Part | Qty | Price (£) | Notes |',
+    '| --- | --- | --- | --- |',
+    '| [UBEC](https://shop.example.com/ubec) | 1 | £6.50 | 5V regulator |',
+    '| SG90 servo | 2 | 2.50 EUR | small · [Buy](https://shop.example.com/sg90) |',
+    '| Wire | 1 |  |  |',
+    '| **Total** |  |  |  |',
+  ].join('\n'));
+  assert.deepEqual(BomSync.rowDetails(md, 'ubec'), { name: 'UBEC', shopUrl: 'https://shop.example.com/ubec', price: 6.5, currency: 'GBP', notes: '5V regulator' });
+  assert.deepEqual(BomSync.rowDetails(md, 'SG90 servo'), { name: 'SG90 servo', shopUrl: 'https://shop.example.com/sg90', price: 2.5, currency: 'EUR', notes: 'small' });
+  assert.deepEqual(BomSync.rowDetails(md, 'Wire'), { name: 'Wire', shopUrl: null, price: null, currency: 'GBP', notes: null });
+  assert.equal(BomSync.rowDetails(md, 'Nope'), null);
+});
+
+test('linkRow with dropShopLink links a shop-linked row with no Notes column', () => {
+  const md = doc(['| Part | Qty |', '| --- | --- |', '| [UBEC](https://shop.example.com/ubec) | 1 |'].join('\n'));
+  assert.equal(BomSync.linkRow(md, 'UBEC', 'ubec'), null);
+  const edit = BomSync.linkRow(md, 'UBEC', 'ubec', { dropShopLink: true });
+  assert.equal(edit.text, '| [UBEC](/parts/view.html?slug=ubec) | 1 |');
+});
