@@ -1,8 +1,31 @@
+# Countdown — run from this folder (cp .env.example .env first):
+#   docker compose up -d --build     # rebuild from source and restart
+#   docker compose up -d             # restart with the existing image
+# To also publish the image to the registry: docker compose push countdown
+#
+# In Cloudflare Zero Trust, configure the countdown tunnel's public hostname
+# countdown.kevsrobots.com to forward to http://localhost:8220.
+
 services:
   countdown:
     build: .
-    ports:
-      - "8220:8220"
-    volumes:
-      - .:/usr/src/app
+    image: 192.168.2.1:5000/countdown:latest
+    network_mode: host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8220/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    network_mode: host
+    command: tunnel --no-autoupdate --edge-ip-version 4 run
+    environment:
+      - TUNNEL_TOKEN=${COUNTDOWN_TUNNEL_TOKEN}
+    depends_on:
+      countdown:
+        condition: service_healthy
     restart: unless-stopped

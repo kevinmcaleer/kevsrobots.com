@@ -75,21 +75,12 @@ cd stacks/nibsy-api
 docker build -t nibsy-api-local .
 ```
 
-Or with compose (also brings up a local Postgres on host port 5434):
-
-```bash
-docker compose up --build
-```
-
 ## Production deployment
 
-Build and push the image to the Pi registry:
-
-```bash
-cd stacks/nibsy-api
-docker build -t 192.168.2.1:5000/nibsy-api:latest .
-docker push 192.168.2.1:5000/nibsy-api:latest
-```
+There is one compose file, `docker-compose.yml`, and it is the production
+one: `docker compose up -d --build` builds the image (tagged
+`192.168.2.1:5000/nibsy-api:latest`) and starts it. To publish the image to
+the Pi registry as well, run `docker compose push nibsy-api`.
 
 Create the Postgres database:
 
@@ -100,7 +91,7 @@ psql -h 192.168.2.1 -p 5433 -U nibsy -c "CREATE DATABASE nibsy;"
 Copy `.env.example` to `.env` and fill in the tunnel token, then:
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d
+docker compose up -d --build
 ```
 
 This starts the API and a `cloudflared` sidecar that exposes it via
@@ -111,7 +102,7 @@ in the Cloudflare Zero Trust dashboard to route to
 Verify the deployment:
 
 ```bash
-docker compose -f docker-compose.prod.yml ps
+docker compose ps
 curl https://nibsy.kevsrobots.com/health
 ```
 

@@ -35,12 +35,12 @@ grammar rules.
 
 ## Deploy
 
-1. Build and push the image:
-   `docker build -t 192.168.2.1:5000/language-tools:latest . && docker push 192.168.2.1:5000/language-tools:latest`
+1. Nothing to build by hand: `docker compose up -d --build` (step 3) builds
+   the image. `docker compose push language-tools` publishes it to the registry.
 2. In Cloudflare Zero Trust, create a tunnel (or add a public hostname to the
    Projects API's tunnel) for `language.kevsrobots.com` → `http://localhost:8310`.
    If you reuse the Projects API's tunnel, drop the `cloudflared` service here.
-3. `docker compose -f docker-compose.prod.yml up -d`. LanguageTool takes
+3. `docker compose up -d --build`. LanguageTool takes
    a minute or so to start, and uses about 1 GB of memory.
 
 The editor's base URL is `LANGUAGE_API` in `web/assets/js/project-editor.js`.

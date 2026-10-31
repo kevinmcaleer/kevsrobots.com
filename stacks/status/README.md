@@ -23,7 +23,7 @@ Public status page + API for every kevsrobots web service. Lives at
 ```
 stacks/status/
 ├── Dockerfile
-├── docker-compose.prod.yml   # compose deploy on a single Pi
+├── docker-compose.yml        # compose deploy on a single Pi
 ├── docker-stack.yml          # Swarm deploy across the cluster
 ├── .env.example              # every env var documented inline
 ├── requirements.txt
@@ -84,13 +84,13 @@ project's `CLAUDE.md`.)
 cd stacks/status
 cp .env.example .env          # then fill in STATUS_TUNNEL_TOKEN, etc.
 mkdir -p data                 # SQLite lives here
-docker compose -f docker-compose.prod.yml up -d
+docker compose up -d --build
 ```
 
 Verify:
 
 ```bash
-docker compose -f docker-compose.prod.yml ps
+docker compose ps
 curl http://127.0.0.1:8210/health         # local
 curl https://status.kevsrobots.com/health # via Cloudflare tunnel
 ```

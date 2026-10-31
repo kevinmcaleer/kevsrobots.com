@@ -1,21 +1,17 @@
-# Production deployment for the kevsrobots status service.
+# kevsrobots status service — run from this folder:
+#   docker compose up -d --build     # rebuild from source and restart
+#   docker compose up -d             # restart with the existing image
+# To also publish the image to the registry: docker compose push status
 #
-# Run with:
-#   docker compose -f docker-compose.prod.yml up -d
-#
-# Prerequisites:
-#   1. Copy .env.example to .env and fill in values (notably
-#      STATUS_TUNNEL_TOKEN from Cloudflare Zero Trust).
-#   2. Build and push the image on a build host:
-#      docker build -t 192.168.2.1:5000/status:latest .
-#      docker push 192.168.2.1:5000/status:latest
+# Prerequisites: copy .env.example to .env and fill in values (notably
+# STATUS_TUNNEL_TOKEN from Cloudflare Zero Trust), and mkdir -p data.
 
 services:
   status:
-    # ``build:`` makes ``docker compose -f docker-compose.prod.yml build``
-    # rebuild from this directory directly — same tag as the registry
-    # image, so the same compose file pulls if you're deploying without
-    # local sources, and builds if you are. (docker-stack.yml leaves
+    # ``build:`` makes ``docker compose up -d --build`` rebuild from this
+    # directory directly — same tag as the registry image, so the same
+    # compose file pulls if you're deploying without local sources, and
+    # builds if you are. (docker-stack.yml leaves
     # build: out — Swarm only pulls.)
     build: .
     image: 192.168.2.1:5000/status:latest
