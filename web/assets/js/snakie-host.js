@@ -63,11 +63,19 @@
   }
 
   // The photo a part's pins were placed over: the definition's photo_id,
-  // else the cover (first) photo.
+  // else the picture imported from Snakie's library (a definition from
+  // Snakie places its pins over that cut-out, not over the catalog's own
+  // product shots), else the cover (first) photo.
+  function isSnakiePhoto(photo) {
+    return / \(Snakie\)$/.test(photo.source || '');
+  }
+
   function pinPhoto(part) {
     const photos = part.photos || [];
     const id = part.definition && part.definition.photo_id;
-    return photos.find(p => p.id === id) || photos[0] || null;
+    return photos.find(p => p.id === id)
+      || photos.filter(isSnakiePhoto).sort((a, b) => a.id - b.id)[0]
+      || photos[0] || null;
   }
 
   // A catalog part (GET /api/parts/{slug}) as a Snakie PartDefinition, with

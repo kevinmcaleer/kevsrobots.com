@@ -336,3 +336,52 @@ def test_smb_chunks_stay_under_the_credit_limit() -> None:
     f.sizes.clear()
     assert _smb_read_chunks(f, len(content)) == content
     assert max(f.sizes) <= 1024 * 1024
+
+
+@pytest.mark.asyncio
+async def test_parts_yml_prefers_the_snakie_picture_over_catalog_photos(client, session) -> None:
+    # A part made on the site with its own product photo, later matched by
+    # the Snakie import: Snakie's pins are placed over Snakie's picture, so
+    # that is the image the wiring editor must draw it with.
+    part = await _create(client)
+    resp = await client.post(
+        f"/api/parts/{part['slug']}/photos",
+        files={"file": ("box.png", b"\x89PNG\r\n\x1a\nproduct-shot", "image/png")},
+        data={"title": "Product shot", "licence": "own"}, headers=make_auth_header(),
+    )
+    assert resp.status_code == 201, resp.text
+    own = resp.json()
+
+    await import_library(LIBRARY, session)
+    photos = (await client.get(f"/api/parts/{part['slug']}")).json()["photos"]
+    assert photos[0]["id"] == own["id"]  # still the catalog's cover photo
+    snakie = next(p for p in photos if (p["source"] or "").endswith("(Snakie)"))
+
+    out = yaml.safe_load((await client.get(f"/api/parts/{part['slug']}/parts.yml")).text)
+    assert out["image"].endswith(f"/photos/{snakie['id']}/view")
+
+
+@pytest.mark.asyncio
+async def test_new_library_version_keeps_one_snakie_picture(session, tmp_path) -> None:
+    import shutil
+
+    await import_library(LIBRARY, session)
+    newer = tmp_path / "snakie-standard"
+    shutil.copytree(LIBRARY, newer)
+    (newer / "library.yml").write_text("id: snakie-standard\nname: Standard Parts\nversion: 1.18.0\n")
+
+    await import_library(newer, session)
+    pico = await session.scalar(select(Part).where(Part.slug == "pico"))
+    photos = (await session.scalars(select(PartPhoto).where(PartPhoto.part_id == pico.id))).all()
+    assert len(photos) == 1
+
+    # A redrawn picture replaces the file and asks for its licence again.
+    photos[0].licence = "own"
+    await session.commit()
+    (newer / "pico" / "image.png").write_bytes(b"\x89PNG\r\n\x1a\nredrawn")
+    report = await import_library(newer, session)
+    assert "pico" in report.updated
+    photos = (await session.scalars(select(PartPhoto).where(PartPhoto.part_id == pico.id))).all()
+    assert len(photos) == 1
+    assert photos[0].licence is None
+    assert photos[0].source == "Standard Parts 1.18.0 (Snakie)"
