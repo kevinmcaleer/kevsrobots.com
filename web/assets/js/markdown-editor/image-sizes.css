@@ -24,3 +24,46 @@ img.image-cover {
   object-fit: cover;
   border-radius: 5px;
 }
+
+/* Captions: a picture on a line of its own, with a title someone wrote,
+   is a figure with that title under it (see imageCaption.ts). The figure
+   takes the picture's size, so the caption lines up with the picture. */
+figure.image-figure {
+  display: table;
+  margin: 0.75em 0;
+}
+
+figure.image-figure > img {
+  display: block;
+  max-width: 100%;
+}
+
+figure.image-figure-full,
+figure.image-figure-cover {
+  width: 100%;
+}
+
+figure.image-figure-half {
+  width: calc(50% - 0.3em);
+}
+
+figure.image-figure-small {
+  width: calc(25% - 0.3em);
+}
+
+figure.image-figure-full > img,
+figure.image-figure-half > img,
+figure.image-figure-small > img,
+figure.image-figure-cover > img {
+  width: 100%;
+}
+
+figure.image-figure > figcaption {
+  display: table-caption;
+  caption-side: bottom;
+  padding-top: 0.4em;
+  font-size: 0.875em;
+  line-height: 1.4;
+  color: var(--muted, #6b6b6b);
+  text-align: center;
+}
