@@ -997,8 +997,9 @@ description: View project details
         ProjectImageGrid.render(contentEl);
         ProjectGallery.render(contentEl);
         ProjectCellHeadings.render(contentEl);
+        const videoBlocks = ProjectEmbeds.renderVideoBlocks(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
-        videosInContent = embedVideoSection(contentEl);
+        videosInContent = embedVideoSection(contentEl) || videoBlocks > 0;
         ProjectCallouts.render(contentEl);
         PartLinks.decorate(contentEl);
         await renderMermaid();
@@ -1686,9 +1687,11 @@ description: View project details
   // carousel with indicators + prev/next controls, first slide active.
   // Iframe markup mirrors _layouts/showcase.html so a project page's
   // video block feels consistent with the existing showcase layout.
-  // The author's "Videos" section (a table of YouTube links and titles)
-  // plays where it is in the page. Returns whether there was one, in
-  // which case loadVideos() leaves the player above the description out.
+  // The author's "Videos" section (a `::: videos` block, or an older
+  // project's table of YouTube links and titles) plays where it is in the
+  // page. Returns whether there was one, in which case loadVideos() leaves
+  // the player above the description out (as it does for any `::: videos`
+  // block in the page).
   let videosInContent = false;
   function embedVideoSection(root) {
     const heading = Array.from(root.querySelectorAll(':is(h1, h2, h3, h4, h5, h6):not(.cell-heading)')).find(h => {
@@ -1834,6 +1837,7 @@ description: View project details
     ProjectImageSizes.render(journalEl);
     ProjectImageGrid.render(journalEl);
     ProjectGallery.render(journalEl);
+    ProjectEmbeds.renderVideoBlocks(journalEl);
     ProjectCellHeadings.render(journalEl);
     ProjectCallouts.render(journalEl);
     CodeCopy.attach(journalEl);

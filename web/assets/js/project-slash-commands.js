@@ -353,25 +353,58 @@
         load: async () => [],
       });
     }
-    // Videos likewise asks for the first one, then starts the table
-    // (more rows can go under it). The project's video list follows it.
+    // Videos (one command for one video or several) writes a `::: videos`
+    // block: of the YouTube links pasted into its box, or of a video the
+    // project has, or of all of them. More go in as lines, which the
+    // editor shows as a group of cards (ProjectEmbeds). Its heading goes
+    // in once; later picks add just another block, so it's never hidden.
     const videos = sections.find(c => c.id === 'section-videos');
     if (videos) {
-      const head = '# ' + window.ProjectSections.get('videos').heading + '\n\n| Video | Title |\n| --- | --- |\n';
       delete videos.insert;
+      videos.hidden = () => false;
+      videos.keywords = videos.keywords.concat(['embed', 'player']);
+      const insertVideos = (view, list) => {
+        // Inside a block already: just its lines.
+        const lineNo = view.state.doc.lineAt(view.state.selection.main.head).number - 1;
+        const inBlock = window.ProjectEmbeds.findVideoBlocks(view.state.doc.toString())
+          .some(b => lineNo > b.open && lineNo < b.close);
+        if (inBlock) {
+          insertAtCursor(view, list.map(window.ProjectEmbeds.videoLine).join('\n'), false);
+          return;
+        }
+        const heading = sectionsIn(view.state).has('videos') ? '' : '# ' + window.ProjectSections.get('videos').heading + '\n\n';
+        insertAtCursor(view, heading + window.ProjectEmbeds.videoBlock(list), true);
+      };
       videos.run = view => openPicker(view, {
-        placeholder: 'Paste a YouTube link…',
-        empty: 'Paste a YouTube link to start the Videos table',
+        placeholder: 'Paste one or more YouTube links…',
+        empty: 'Paste a YouTube link to add videos',
         free: q => {
-          const id = window.ProjectEmbeds.youTubeId(q);
-          return id ? {
-            label: 'Add this video',
-            detail: id,
+          const ids = Array.from(new Set(q.split(/\s+/).map(w => window.ProjectEmbeds.youTubeId(w)).filter(Boolean)));
+          return ids.length ? {
+            label: ids.length === 1 ? 'Add this video' : 'Add these ' + ids.length + ' videos',
+            detail: ids.join(', '),
             icon: ICONS.video,
-            pick: () => insertAtCursor(view, head + '| ' + window.ProjectEmbeds.videoMarkdown(id) + ' |  |\n', true),
+            pick: () => insertVideos(view, ids.map(id => ({ id }))),
           } : null;
         },
-        load: async () => [],
+        load: async () => {
+          const list = ctx.listVideos ? await ctx.listVideos().catch(() => []) : [];
+          const items = list.map(v => ({
+            label: v.title || v.id,
+            detail: 'From this project\u2019s videos',
+            thumb: 'https://img.youtube.com/vi/' + encodeURIComponent(v.id) + '/default.jpg',
+            pick: () => insertVideos(view, [v]),
+          }));
+          if (list.length > 1) {
+            items.unshift({
+              label: 'All ' + list.length + ' of this project\u2019s videos',
+              detail: 'In their order; delete or move lines to change them',
+              icon: ICONS.video,
+              pick: () => insertVideos(view, list),
+            });
+          }
+          return items;
+        },
       });
     }
 
@@ -446,33 +479,6 @@
             });
             return files;
           },
-        }),
-      },
-      {
-        id: 'video',
-        label: 'Video',
-        keywords: ['youtube', 'embed', 'film'],
-        group: 'project',
-        icon: ICONS.video,
-        block: true,
-        run: view => openPicker(view, {
-          placeholder: 'Paste a YouTube URL…',
-          empty: 'Paste a YouTube link to embed it',
-          free: q => {
-            const id = window.ProjectEmbeds.youTubeId(q);
-            return id ? {
-              label: 'Embed this video',
-              detail: id,
-              icon: ICONS.video,
-              pick: () => insertAtCursor(view, window.ProjectEmbeds.videoMarkdown(id), true),
-            } : null;
-          },
-          load: async () => (await ctx.listVideos()).map(v => ({
-            label: v.title || v.id,
-            detail: 'From this project’s videos',
-            thumb: 'https://img.youtube.com/vi/' + encodeURIComponent(v.id) + '/default.jpg',
-            pick: () => insertAtCursor(view, window.ProjectEmbeds.videoMarkdown(v.id), true),
-          })),
         }),
       },
       {
