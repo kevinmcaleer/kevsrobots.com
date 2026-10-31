@@ -115,7 +115,9 @@
   // as the link text. A row whose name links a shop page instead keeps
   // that link in its Notes (or Link/Buy/Supplier) column, as "Buy"; with
   // no such column, the row is left alone, so no link is lost.
-  function linkRow(markdown, name, slug) {
+  // opts.dropShopLink: with no Notes column, link the row anyway, losing
+  // the shop link from the table (it's on the new part's page by then).
+  function linkRow(markdown, name, slug, opts) {
     const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
     if (!table || !slug) return null;
     const header = table.header.map(plain);
@@ -150,9 +152,9 @@
       if (link) {
         // The shop link moves to the notes rather than being lost.
         const note = noteCol >= 0 && noteCol !== partCol ? span(noteCol) : null;
-        if (!note) return null;
-        const had = text.slice(note.start, note.end);
-        if (!had.includes(link[2])) {
+        if (!note && !(opts && opts.dropShopLink)) return null;
+        const had = note ? text.slice(note.start, note.end) : link[2];
+        if (note && !had.includes(link[2])) {
           const buy = '[Buy](' + link[2] + ')';
           edits.push(note.start === note.end
             ? { start: pipes[noteCol] + 1, end: pipes[noteCol + 1] === undefined ? text.length : pipes[noteCol + 1], insert: ' ' + buy + ' ' }
@@ -162,6 +164,49 @@
       let out = text;
       edits.sort((a, b) => b.start - a.start).forEach(e => { out = out.slice(0, e.start) + e.insert + out.slice(e.end); });
       return { line: lineNo, text: out };
+    }
+    return null;
+  }
+
+  // What the Bill of Materials row named `name` says about its part, to
+  // fill in the "New part" dialog: { name, shopUrl, price, currency, notes }
+  // (each null when the row doesn't say), or null when there's no such row.
+  // The shop link is the one on the name, else the first web link in the
+  // Notes column; the notes are that column's text without its links.
+  function rowDetails(markdown, name) {
+    const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return null;
+    const header = table.header.map(plain);
+    let partCol = header.findIndex(h => PART_COL.test(h.toLowerCase()));
+    if (partCol < 0) partCol = 0;
+    const noteCol = header.findIndex(h => NOTE_COL.test(h.toLowerCase()));
+    const priceCol = header.findIndex(h => PRICE_COL.test(h.toLowerCase()));
+    const tableCode = priceCol >= 0 ? headerCurrency(header[priceCol]) : null;
+    const want = String(name || '').trim().toLowerCase();
+    for (const cells of table.rows) {
+      if (/^\*\*total\*\*$/i.test((cells[0] || '').trim())) continue;
+      const raw = (cells[partCol] || '').trim();
+      const link = raw.match(/^\[((?:\\.|[^\]\\])*)\]\(([^)\s]+)[^)]*\)$/);
+      const rowName = plain(link ? link[1].replace(/\\([\[\]\\])/g, '$1') : raw).slice(0, 200);
+      if (!rowName || rowName.toLowerCase() !== want) continue;
+      let shopUrl = link && /^https?:\/\//i.test(link[2]) ? link[2] : null;
+      let notes = null;
+      if (noteCol >= 0 && noteCol !== partCol) {
+        const note = cells[noteCol] || '';
+        if (!shopUrl) {
+          const m = note.match(/\]\((https?:\/\/[^)\s]+)/i) || note.match(/https?:\/\/[^\s)|]+/i);
+          if (m) shopUrl = m[1] || m[0];
+        }
+        notes = plain(note.replace(/!?\[[^\]]*\]\([^)]*\)/g, '').replace(/https?:\/\/\S+/g, '').replace(/<br\s*\/?>/gi, ' ').replace(/\s*·\s*$/, '').replace(/^\s*·\s*/, '')) || null;
+      }
+      const p = priceCol >= 0 ? price(cells[priceCol]) : null;
+      return {
+        name: rowName,
+        shopUrl,
+        price: p ? p.amount : null,
+        currency: p ? (p.code || tableCode) : tableCode,
+        notes,
+      };
     }
     return null;
   }
@@ -354,7 +399,7 @@
   }
 
   const api = {
-    parse, linkRow, price, formatPrice, tableFromRows, totalsChanges, withTotals,
+    parse, linkRow, rowDetails, price, formatPrice, tableFromRows, totalsChanges, withTotals,
     CURRENCIES, headerCurrency, withCurrency, tableCurrency, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
   };
   if (typeof module === 'object' && module.exports) module.exports = api;

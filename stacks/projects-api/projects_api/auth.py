@@ -447,3 +447,58 @@ async def get_current_user_aged(
             detail=f"Account must be at least {MIN_ACCOUNT_AGE_DAYS} days old to edit the parts catalog. Come back in {remaining} day(s).",
         )
     return username
+
+
+class PartWriter:
+    """Who is writing to the parts catalog, and whether their account has
+    passed the 14-day age gate (``aged``). See :func:`require_part_writer`."""
+
+    def __init__(self, username: str, aged: bool, age_error: Optional[str] = None) -> None:
+        self.username = username
+        self.aged = aged
+        # The 403 an aged-only route would have raised, for when it applies.
+        self.age_error = age_error or "Account age cannot be verified"
+
+    def require_aged(self) -> None:
+        if not self.aged:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=self.age_error)
+
+    def check_part(self, part: Any) -> None:
+        """May this writer change ``part``? Aged accounts may change any
+        part (the parts wiki); anyone may change a part they submitted
+        while it's still waiting for review."""
+        if self.aged:
+            return
+        if getattr(part, "status", None) == "pending" and getattr(part, "created_by", None) == self.username:
+            return
+        self.require_aged()
+
+
+async def require_part_writer(
+    username: str = Depends(require_terms_accepted),
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+) -> PartWriter:
+    """Signed in and T&Cs accepted, but not yet age-gated.
+
+    For catalog routes where a brand-new account may still act on its own
+    *submitted* part (status ``pending``): submitting a part from the
+    project editor, adding its photos, fixing its details. Everything else
+    the route does calls ``writer.require_aged()`` / ``check_part()``,
+    which raise the same 403 :func:`get_current_user_aged` would. Admins
+    count as aged.
+    """
+    if username in get_settings().admin_usernames_list:
+        return PartWriter(username, True)
+    token = _extract_token(access_token, authorization)
+    created_at = await fetch_account_created_at(username, token) if token else None
+    if created_at is None:
+        return PartWriter(username, False, "Account age cannot be verified")
+    age_days = (datetime.utcnow() - created_at).total_seconds() / 86400.0
+    if age_days < MIN_ACCOUNT_AGE_DAYS:
+        remaining = max(0, MIN_ACCOUNT_AGE_DAYS - int(age_days))
+        return PartWriter(
+            username, False,
+            f"Account must be at least {MIN_ACCOUNT_AGE_DAYS} days old to edit the parts catalog. Come back in {remaining} day(s).",
+        )
+    return PartWriter(username, True)

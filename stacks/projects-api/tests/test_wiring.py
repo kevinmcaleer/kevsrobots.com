@@ -86,6 +86,19 @@ def test_clean_svg_strips_script() -> None:
     assert 'fill="url(#g)"' in out
 
 
+def test_clean_svg_keeps_quoted_fragment_urls_in_styles() -> None:
+    # Browsers write computed styles with quoted references; the wiring
+    # canvas's blueprint paper and grid rely on them.
+    svg = ('<svg xmlns="http://www.w3.org/2000/svg">'
+           '<rect style="fill:url(&quot;#wc-paper&quot;);mix-blend-mode:soft-light"/>'
+           "<rect style=\"filter:url('#rough')\"/>"
+           '<rect style="fill:url(&quot;https://evil.example/&quot;)"/></svg>')
+    out = clean_svg(svg)
+    assert 'url(&quot;#wc-paper&quot;)' in out and "mix-blend-mode" in out
+    assert "#rough" in out
+    assert "evil.example" not in out
+
+
 def test_clean_svg_refuses_doctype_and_non_svg() -> None:
     with pytest.raises(UnsafeSvg):
         clean_svg('<!DOCTYPE svg [<!ENTITY a "b">]><svg xmlns="http://www.w3.org/2000/svg"/>')

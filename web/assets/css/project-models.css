@@ -56,23 +56,18 @@
 }
 .kr-models-open:hover { filter: brightness(1.08); }
 
-/* A cube in the corner: this picture is rendered from the model. */
+/* A cube in the corner: this picture is rendered from the model. Just
+   the icon, no box (Kev, 2026-10-31). */
 .kr-model-badge {
   position: absolute;
-  top: 0.4rem;
-  right: 0.4rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 6px;
-  background: rgb(255 255 255 / 0.9);
+  top: 0.45rem;
+  right: 0.5rem;
   color: var(--accent, #2563eb);
-  font-size: 0.8rem;
+  font-size: 0.95rem;
+  line-height: 1;
   pointer-events: none;
 }
+.kr-model-badge i { display: block; margin: 0; line-height: 1; }
 
 .kr-model-placeholder {
   display: flex;
@@ -92,7 +87,10 @@
   grid-auto-columns: 7.5rem;
   gap: 0.5rem;
   overflow-x: auto;
-  padding: 2px 2px 0.4rem;
+  /* Room for the selected outline (2px + 1px offset): a scrolling strip
+     clips anything outside its padding box. */
+  padding: 4px 4px 0.4rem;
+  scroll-padding-inline: 4px;
   scroll-snap-type: x proximity;
 }
 .kr-models[data-count="1"] .kr-models-strip { display: none; }
@@ -128,9 +126,9 @@
   outline-offset: 1px;
 }
 .kr-models-thumb:focus-visible { outline: none; }
-.kr-models-thumb:focus-visible .kr-models-thumb-pic { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; }
+.kr-models-thumb:focus-visible .kr-models-thumb-pic { outline: 2px solid var(--accent, #2563eb); outline-offset: 1px; }
 .kr-models-thumb-pic .kr-model-placeholder { font-size: 1.6rem; }
-.kr-models-thumb-pic .kr-model-badge { top: 0.25rem; right: 0.25rem; width: 1.25rem; height: 1.25rem; font-size: 0.65rem; }
+.kr-models-thumb-pic .kr-model-badge { top: 0.3rem; right: 0.35rem; font-size: 0.75rem; }
 
 .kr-models-thumb-img {
   display: block;
