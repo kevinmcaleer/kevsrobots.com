@@ -60,7 +60,7 @@
       id: 'gallery',
       heading: 'Gallery',
       aliases: ['Photos', 'Pictures'],
-      keywords: ['photos', 'pictures', 'images', 'filmstrip', 'bento', 'lightbox', 'slideshow'],
+      keywords: ['photos', 'pictures', 'images', 'filmstrip', 'bento', 'lightbox', 'carousel', 'slideshow'],
       icon: 'M2 3.5h12v9H2zM2 10l3.5-3 3 2.5 2-1.5 3.5 3M10.5 6.5h.01',
     },
   ];
