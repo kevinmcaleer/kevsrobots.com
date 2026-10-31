@@ -152,7 +152,7 @@ pg_restore -l kevsrobots_cms_2026-05-24_00-00-00.dump | less
 | `deploy.sh` says `docker secret 'postgres_user' missing` | Recreate via the `printf … \| docker secret create` lines above.                                            |
 | Service stuck in `Preparing` forever               | NFS mount failing. Check `docker service ps postgres-backup_backup --no-trunc` for the error, then `showmount -e <NAS_IP>` from the host. |
 | Logs show `pg_dump: connection to server failed`   | Wrong network. Re-check `POSTGRES_NETWORK` in `.env` — must match an actual overlay (`docker network ls`).        |
-| Logs show `pg_dump: error: server version mismatch`| Database is on a newer Postgres than `postgres:16-alpine`. Bump the image tag in `docker-compose.prod.yml` to match. |
+| Logs show `pg_dump: error: server version mismatch`| Database is on a newer Postgres than `postgres:16-alpine`. Bump the image tag in `docker-compose.yml` to match. |
 | Daily folder filling up past 28 files              | The prune step needs write access to its own files on NFS — confirm `no_root_squash` (or matching uid/gid) on the NFS export. |
 
 ## Why this design

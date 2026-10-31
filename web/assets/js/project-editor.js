@@ -974,6 +974,12 @@
         const parsed = BomSync.parse(view.state.doc.toString());
         return parsed ? [...new Set(parsed.rows.map(r => r.part_slug).filter(Boolean))] : [];
       },
+      bomRows: () => {
+        const parsed = BomSync.parse(view.state.doc.toString());
+        return parsed ? parsed.rows.map(r => ({ name: r.name, slug: r.part_slug })) : [];
+      },
+      linkBomRow: (name, part) => linkBomRow(view, name, part),
+      createPart: createCatalogPart,
       addBomRows: parts => addBomRows(view, parts),
       removeBomRows: slugs => removeBomRows(view, slugs),
       placeImage: url => placeWiringImage(view, url),
@@ -1163,6 +1169,21 @@
     if (block == null) { alert('This project has no saved wiring to make the table from.'); return; }
     if (!block) { alert('Nothing is wired yet, so there is no pinout table to make.'); return; }
     putPinout(block);
+  }
+
+  // Links the first unlinked Bill of Materials row named `name` to the
+  // catalog part { slug }, keeping the row's own wording as the link text.
+  function linkBomRow(view, name, part) {
+    const want = String(name).trim().toLowerCase();
+    const row = unlinkedBomRows(view.state.doc.toString()).find(r => r.name.toLowerCase() === want);
+    if (!row || !part || !part.slug) return false;
+    const line = view.state.doc.line(row.line + 1);
+    view.dispatch({
+      changes: { from: line.from + row.start, to: line.from + row.end, insert: '[' + row.text.replace(/([\[\]])/g, '\\$1') + '](' + PartLinks.href(part.slug) + ')' },
+      userEvent: 'input',
+    });
+    scheduleBomLinks();
+    return true;
   }
 
   // The Bill of Materials rows that link any of `slugs`, taken out.

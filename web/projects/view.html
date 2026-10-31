@@ -735,10 +735,12 @@ description: View project details
 <script src="/assets/js/project-gallery.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-cards.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-cell-headings.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-todos.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #259: "On this page", canonical sections marked with icons. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-pages.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/page-jump.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const API = 'https://projects.kevsrobots.com';
@@ -996,7 +998,8 @@ description: View project details
         buildTOC();
       } else if (project.content_md) {
         const contentEl = document.getElementById('view-content');
-        contentEl.innerHTML = marked.parse(project.content_md);
+        // #todo notes are the writer's reminders, not part of the page.
+        contentEl.innerHTML = marked.parse(window.ProjectTodos ? ProjectTodos.strip(project.content_md) : project.content_md);
         ProjectImageSizes.render(contentEl);
         ProjectImageGrid.render(contentEl);
         ProjectGallery.render(contentEl);
@@ -2499,10 +2502,7 @@ description: View project details
         e.preventDefault();
         const target = document.getElementById(a.dataset.tocTarget);
         if (target) {
-          window.scrollTo({
-            top: target.getBoundingClientRect().top + window.scrollY - 80,
-            behavior: 'smooth'
-          });
+          PageJump.toElement(target, { offset: 80 });
           history.replaceState(null, '', '#' + a.dataset.tocTarget);
         }
       });
@@ -2682,7 +2682,8 @@ description: View project details
         if (!target) return;
         // On another page: open that page first.
         if (projectPages) projectPages.reveal(id);
-        window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+        // page-jump.js: lands on it even if pictures above it are still loading.
+        PageJump.toElement(target, { offset: 80 });
         history.replaceState(null, '', '#' + id);
       },
     });

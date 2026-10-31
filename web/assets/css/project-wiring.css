@@ -62,3 +62,85 @@ body.project-wiring-open {
 .project-wiring-edit:hover {
   background: #f0eee6;
 }
+/* Only while the pointer is over the picture (or the button has keyboard
+   focus), like the image size bar. Readers never get the button: only the
+   editor adds it. */
+.cm-md-image-wrap .project-wiring-edit {
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.cm-md-image-wrap:hover .project-wiring-edit,
+.cm-md-image-wrap .project-wiring-edit:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .cm-md-image-wrap .project-wiring-edit { opacity: 1; }
+}
+
+/* The canvas and, beside it, the Bill of Materials panel (wiring-bom.js). */
+.project-wiring-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.project-wiring-body > .project-wiring-canvas {
+  flex: 1;
+  min-width: 0;
+}
+.project-wiring-bom {
+  width: 300px;
+  flex: none;
+  overflow: auto;
+  border-left: 1px solid #e3e0d6;
+  background: #faf9f5;
+  font-size: 0.8125rem;
+}
+.project-wiring.bom-hidden .project-wiring-bom { display: none; }
+.project-wiring-bom .wb-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e3e0d6;
+  background: #faf9f5;
+}
+.project-wiring-bom .wb-list { list-style: none; margin: 0; padding: 0; }
+.project-wiring-bom .wb-row {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 0.25rem 0.6rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #efece3;
+}
+.project-wiring-bom .wb-thumb {
+  grid-row: span 2;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #f0eee6;
+  color: #8a7f66;
+  overflow: hidden;
+}
+.project-wiring-bom .wb-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.project-wiring-bom .wb-text { display: flex; flex-direction: column; min-width: 0; }
+.project-wiring-bom .wb-name { font-weight: 600; overflow-wrap: anywhere; }
+.project-wiring-bom .wb-state { font-size: 0.75rem; color: #6c6552; }
+.project-wiring-bom .wb-state.is-placed { color: #2f6b3b; }
+.project-wiring-bom .wb-state.is-board { color: #2f6b3b; font-weight: 600; }
+.project-wiring-bom .wb-state.is-unlinked { color: #9a5b12; }
+.project-wiring-bom .wb-state.is-nopins { color: #8a6d1a; }
+.project-wiring-bom .wb-acts { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.project-wiring-bom .wb-acts:empty { display: none; }
+.project-wiring-bom .wb-acts .btn { --bs-btn-padding-y: 0.1rem; --bs-btn-padding-x: 0.45rem; --bs-btn-font-size: 0.75rem; }
+.project-wiring-bom .wb-empty,
+.project-wiring-bom .wb-foot { margin: 0; padding: 0.75rem; color: #6c6552; }
+@media (max-width: 700px) {
+  .project-wiring-body { flex-direction: column; }
+  .project-wiring-bom { width: auto; max-height: 40%; border-left: 0; border-top: 1px solid #e3e0d6; }
+}

@@ -70,7 +70,7 @@ echo "  Network:     $net"
 echo "  Retention:   daily=${DAILY_KEEP:-28}, weekly=${WEEKLY_KEEP:-4}"
 echo
 
-docker stack deploy -c docker-compose.prod.yml postgres-backup
+docker stack deploy -c docker-compose.yml postgres-backup
 
 echo
 echo "Deployed. Watch the first backup land:"

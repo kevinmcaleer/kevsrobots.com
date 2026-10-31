@@ -1,34 +1,40 @@
-# Local development convenience only.
-# Production deployment (#70) ships its own docker-stack.yml with the
-# 192.168.2.1:5000/nibsy-api:latest image — that is NOT included here.
+# Nibsy API — run from this folder:
+#   docker compose up -d --build     # rebuild from source and restart
+#   docker compose up -d             # restart with the existing image
+# To also publish the image to the registry: docker compose push nibsy-api
+#
+# Prerequisites: copy .env.example to .env and fill in values, and create
+# the nibsy database on your Postgres server.
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: nibsy
-      POSTGRES_PASSWORD: nibsy
-      POSTGRES_DB: nibsy
-    ports:
-      - "5434:5432"
-    volumes:
-      - nibsy_pg_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
   nibsy-api:
     build: .
-    depends_on:
-      - postgres
-    ports:
-      - "8200:8200"
+    image: 192.168.2.1:5000/nibsy-api:latest
+    network_mode: host
+    env_file: .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://nibsy:nibsy@postgres:5432/nibsy
-      NIBSY_DATA_DIR: /usr/src/app/_data
-      PORT: 8200
+      - PORT=8200
+      - NIBSY_DATA_DIR=/data
     volumes:
-      - .:/usr/src/app
-      - ../../web/_data:/usr/src/app/_data:ro
+      - /home/kev/kevsrobots.com/web/_data:/data:ro
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8200/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
 
-volumes:
-  nibsy_pg_data:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    network_mode: host
+    # ``--edge-ip-version 4`` forces the QUIC socket to IPv4 only.
+    # Without it, cloudflared binds a dual-stack [::] socket; after
+    # a Pi power-cut IPv6 can come up without a working default
+    # route, and every send fails with "sendmsg: network is
+    # unreachable" indefinitely. v4-only keeps the tunnel working
+    # regardless of host IPv6 state.
+    command: tunnel --no-autoupdate --edge-ip-version 4 run
+    environment:
+      - TUNNEL_TOKEN=${NIBSY_TUNNEL_TOKEN}
+    restart: unless-stopped

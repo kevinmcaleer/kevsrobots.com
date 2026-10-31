@@ -1,12 +1,15 @@
 # postgres-backup — Docker Swarm stack that runs scheduled backups of
 # the kevsrobots_cms database to an NFS-mounted directory on the NAS.
 #
+# This one is a Swarm stack (external secrets, configs, an overlay
+# network), so it deploys with ./deploy.sh, not ``docker compose up``.
+#
 # Configuration lives in .env (copy from .env.example, fill in the
 # placeholders, then run ./deploy.sh).
 #
 # Manual deploy (if you'd rather not use the wrapper):
 #   set -a; source .env; set +a
-#   sudo -E docker stack deploy -c docker-compose.prod.yml postgres-backup
+#   sudo -E docker stack deploy -c docker-compose.yml postgres-backup
 #
 # (the -E preserves the variables sourced from .env into the sudo
 # environment — without it, docker stack deploy sees empty placeholders).

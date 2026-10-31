@@ -1,6 +1,8 @@
 # Language tools (grammar, dictionary, thesaurus) for the project editor —
-# deploy with:
-#   docker compose -f docker-compose.prod.yml up -d
+# run from this folder:
+#   docker compose up -d --build     # rebuild from source and restart
+#   docker compose up -d             # restart with the existing image
+# To also publish the image to the registry: docker compose push language-tools
 #
 # Needs a .env beside this file with JWT_SECRET (the same value as the
 # Projects API) and LANGUAGE_TUNNEL_TOKEN. See README.md.
@@ -17,6 +19,7 @@ services:
     restart: unless-stopped
 
   language-tools:
+    build: .
     image: 192.168.2.1:5000/language-tools:latest
     network_mode: host
     env_file: .env

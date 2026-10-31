@@ -43,7 +43,7 @@ services:
     # it, cloudflared binds a dual-stack [::] socket; after a Pi power-cut
     # IPv6 can come up without a working default route and every send fails
     # with "sendmsg: network is unreachable" indefinitely. Keep in sync with
-    # docker-compose.prod.yml.
+    # docker-compose.yml.
     command: tunnel --no-autoupdate --edge-ip-version 4 run
     environment:
       - TUNNEL_TOKEN=${NIBSY_TUNNEL_TOKEN}
