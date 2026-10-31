@@ -798,18 +798,22 @@
   font-size: 0.8em;
 }
 
-/* Part links (issue #263): a link to a catalog part is a chip with the
+/* Part links (issue #263): a link to a catalog part is a chip (square-ish
+   corners, no fill) with a large thumbnail of the
    part's photo, in the editor's live view and on the project page.
    part-links.js adds a rule per part giving ::before its photo. */
 .cm-content .cm-md-link[data-href*="/parts/view.html?slug="],
 .cm-content a[href*="/parts/view.html?slug="],
 a.part-link,
 .project-prose a.part-link {
-  display: inline;
-  padding: 0.05em 0.45em 0.05em 0.2em;
-  border-radius: 999px;
-  background: #eef6ee;
-  border: 1px solid #cfe3cf;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  max-width: 100%;
+  padding: 0.15em 0.5em 0.15em 0.15em;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.14);
   color: #1f5f2a;
   text-decoration: none;
   white-space: nowrap;
@@ -821,11 +825,12 @@ a.part-link,
 a.part-link::before {
   content: "";
   display: inline-block;
-  width: 1.1em;
-  height: 1.1em;
-  margin-right: 0.3em;
-  vertical-align: -0.2em;
-  border-radius: 50%;
+  flex: none;
+  width: 2.2em;
+  height: 2.2em;
+  margin-right: 0.4em;
+  vertical-align: middle;
+  border-radius: 4px;
   background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 5h6v6H5zM6.5 2.5V5M9.5 2.5V5M6.5 11v2.5M9.5 11v2.5M2.5 6.5H5M2.5 9.5H5M11 6.5h2.5M11 9.5h2.5' fill='none' stroke='%231f5f2a' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E") center / cover no-repeat;
 }
 /* The live view colours and underlines a link's text itself. */
@@ -835,7 +840,7 @@ a.part-link::before {
 }
 a.part-link:hover,
 .project-prose a.part-link:hover {
-  background: #e0efe0;
+  background: rgba(0, 0, 0, 0.04);
   color: #1f5f2a;
 }
 
