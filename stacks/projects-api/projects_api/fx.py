@@ -35,11 +35,13 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 
-#: ISO 4217 codes we accept on the API surface. Kept short on purpose —
-#: the UI dropdown only offers these. Validation lives here so the
-#: profile route and the fx route share the same allow-list.
+#: ISO 4217 codes we accept on the API surface. Kept short on purpose:
+#: the account page's dropdown offers the first six, and a project's Bill
+#: of Materials can also be priced in INR or CHF (bom-sync.js CURRENCIES),
+#: which the editor converts catalog prices into. Validation lives here so
+#: the profile route and the fx route share the same allow-list.
 SUPPORTED_CURRENCIES: frozenset[str] = frozenset({
-    "GBP", "USD", "EUR", "JPY", "AUD", "CAD",
+    "GBP", "USD", "EUR", "JPY", "AUD", "CAD", "INR", "CHF",
 })
 
 #: How long a successful fetch stays "fresh". A second call within the
