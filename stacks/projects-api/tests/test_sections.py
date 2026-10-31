@@ -39,6 +39,11 @@ def test_structured_bom_counts() -> None:
     assert canonical_sections(None, has_bom=True) == ["bill-of-materials"]
 
 
+def test_assembly_aliases_count_as_assembly_instructions() -> None:
+    for heading in ("# Assembly", "## assembly", "### BUILD", "# Build", "# Assembly Instructions"):
+        assert canonical_sections(heading + "\n") == ["assembly-instructions"]
+
+
 @pytest.mark.skipif(not SECTIONS_JS.exists(), reason="web/ not checked out")
 def test_same_list_as_project_sections_js() -> None:
     js = SECTIONS_JS.read_text()
