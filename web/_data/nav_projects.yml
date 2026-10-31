@@ -17,3 +17,6 @@
 - name: Parts Catalog
   link: /parts/
   icon: fas fa-microchip
+- name: Getting started
+  link: /projects/getting-started/
+  icon: fas fa-circle-question

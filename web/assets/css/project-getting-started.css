@@ -1,0 +1,40 @@
+/* The "Getting started with projects" guide (projects/getting-started.md). */
+.kr-guide {
+  max-width: 820px;
+  margin: 0 auto 3rem;
+}
+
+.kr-guide h2 {
+  margin-top: 2rem;
+}
+
+.kr-guide img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.kr-guide blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background: rgba(13, 110, 253, 0.07);
+  border-radius: 8px;
+}
+
+.kr-guide blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.kr-guide table {
+  margin-bottom: 1.5rem;
+}
+
+.kr-guide table td,
+.kr-guide table th {
+  padding: 0.35rem 0.75rem;
+  vertical-align: top;
+}
