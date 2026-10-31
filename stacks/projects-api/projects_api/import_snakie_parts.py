@@ -1,9 +1,14 @@
 """Seed the parts catalog from a Snakie parts library (issue #266).
 
     python -m projects_api.import_snakie_parts <path to a Snakie library>
+    python -m projects_api.import_snakie_parts --github [ref]
 
 e.g. ``examples/parts/snakie-standard`` in kevinmcaleer/Snakie: one folder
 per part, each with ``parts.yml`` and optionally an image and a mesh.
+Snakie's Standard library is the master copy of the catalog, so
+``--github`` downloads it straight from GitHub (the ``master`` branch, or
+the branch, tag or commit given) instead of needing a checkout on the
+server.
 
 Each part is matched to the catalog by slug (Snakie's ``id``), then by
 name, then by part number, and created as a draft when nothing matches.
@@ -23,8 +28,12 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import io
 import logging
 import sys
+import tarfile
+import tempfile
+import urllib.request
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -43,6 +52,8 @@ from .storage import ALLOWED_IMAGE_EXTENSIONS, delete_file, generate_filename, r
 logger = logging.getLogger(__name__)
 
 AUTHOR = "snakie-import"
+GITHUB_REPO = "kevinmcaleer/Snakie"
+GITHUB_LIBRARY_PATH = "examples/parts/snakie-standard"
 MESH_EXTENSIONS = {".stl", ".glb", ".gltf", ".obj"}
 
 
@@ -257,10 +268,66 @@ async def _main(path: Path) -> int:
     return 0
 
 
+def github_tarball_url(ref: str) -> str:
+    return f"https://codeload.github.com/{GITHUB_REPO}/tar.gz/{ref}"
+
+
+def extract_library(tarball: bytes, dest: Path, library_path: str = GITHUB_LIBRARY_PATH) -> Path:
+    """Unpack only ``library_path`` from a GitHub source tarball into ``dest``
+    and return the library folder. GitHub wraps everything in one top-level
+    ``<repo>-<ref>/`` folder, which is dropped. Links and anything that would
+    land outside ``dest`` are skipped."""
+    root = dest.resolve()
+    prefix = library_path.strip("/") + "/"
+    found = False
+    with tarfile.open(fileobj=io.BytesIO(tarball), mode="r:gz") as tar:
+        for member in tar.getmembers():
+            parts = member.name.split("/", 1)
+            if len(parts) < 2 or not parts[1].startswith(prefix):
+                continue
+            if not (member.isfile() or member.isdir()):
+                continue
+            rel = parts[1][len(prefix):]
+            target = (root / rel).resolve()
+            if target != root and root not in target.parents:
+                continue
+            found = True
+            if member.isdir():
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            src = tar.extractfile(member)
+            if src is not None:
+                target.write_bytes(src.read())
+    if not found:
+        raise ValueError(f"{library_path} is not in the downloaded tarball")
+    return root
+
+
+def download_github_library(ref: str, dest: Path) -> Path:
+    with urllib.request.urlopen(github_tarball_url(ref), timeout=120) as resp:
+        data = resp.read()
+    return extract_library(data, dest)
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("path", type=Path, help="a Snakie library folder (one folder per part)")
+    parser.add_argument("path", type=Path, nargs="?", help="a Snakie library folder (one folder per part)")
+    parser.add_argument(
+        "--github", nargs="?", const="master", metavar="REF",
+        help=f"download {GITHUB_LIBRARY_PATH} from github.com/{GITHUB_REPO} (default branch: master)",
+    )
     args = parser.parse_args(argv)
+    if args.github:
+        with tempfile.TemporaryDirectory() as tmp:
+            try:
+                library = download_github_library(args.github, Path(tmp) / "library")
+            except Exception as exc:  # network, 404, bad tarball
+                print(f"Could not download the Snakie library ({args.github}): {exc}", file=sys.stderr)
+                return 2
+            return asyncio.run(_main(library))
+    if args.path is None:
+        parser.error("give a library folder or --github")
     if not args.path.is_dir():
         print(f"{args.path} is not a folder", file=sys.stderr)
         return 2
