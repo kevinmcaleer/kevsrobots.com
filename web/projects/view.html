@@ -733,6 +733,7 @@ description: View project details
 <script src="/assets/js/project-gallery.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-cards.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-cell-headings.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-todos.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #259: "On this page", canonical sections marked with icons. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
@@ -993,7 +994,8 @@ description: View project details
         buildTOC();
       } else if (project.content_md) {
         const contentEl = document.getElementById('view-content');
-        contentEl.innerHTML = marked.parse(project.content_md);
+        // #todo notes are the writer's reminders, not part of the page.
+        contentEl.innerHTML = marked.parse(window.ProjectTodos ? ProjectTodos.strip(project.content_md) : project.content_md);
         ProjectImageSizes.render(contentEl);
         ProjectImageGrid.render(contentEl);
         ProjectGallery.render(contentEl);
