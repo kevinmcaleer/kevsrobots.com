@@ -1232,17 +1232,16 @@
     putPinout(block);
   }
 
-  // Links the first unlinked Bill of Materials row named `name` to the
-  // catalog part { slug }, keeping the row's own wording as the link text.
+  // Links the first Bill of Materials row named `name` that isn't linked
+  // to a part yet to the catalog part { slug }, keeping the row's own
+  // wording as the link text (BomSync.linkRow). False when the table was
+  // left alone: no such row, or one whose shop link has nowhere to go.
   function linkBomRow(view, name, part) {
-    const want = String(name).trim().toLowerCase();
-    const row = unlinkedBomRows(view.state.doc.toString()).find(r => r.name.toLowerCase() === want);
-    if (!row || !part || !part.slug) return false;
-    const line = view.state.doc.line(row.line + 1);
-    view.dispatch({
-      changes: { from: line.from + row.start, to: line.from + row.end, insert: '[' + row.text.replace(/([\[\]])/g, '\\$1') + '](' + PartLinks.href(part.slug) + ')' },
-      userEvent: 'input',
-    });
+    if (!part || !part.slug) return false;
+    const edit = BomSync.linkRow(view.state.doc.toString(), name, part.slug);
+    if (!edit) return false;
+    const line = view.state.doc.line(edit.line + 1);
+    view.dispatch({ changes: { from: line.from, to: line.to, insert: edit.text }, userEvent: 'input' });
     scheduleBomLinks();
     return true;
   }
