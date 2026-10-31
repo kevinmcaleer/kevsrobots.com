@@ -173,3 +173,42 @@ test('a bare price takes the header currency when synced', () => {
   const out = BomSync.parse(doc('| Part | Qty | Price (€) |\n| --- | --- | --- |\n| Pico | 1 | 4 |'));
   assert.deepEqual(out.rows[0], { name: 'Pico', quantity: 1, part_slug: null, unit_cost: 4, currency_code: 'EUR' });
 });
+
+test('linkRow links the row the wiring workspace names, keeping its wording', () => {
+  const md = doc([
+    '| Part | Qty | Notes |',
+    '| --- | --- | --- |',
+    '| [Pico](/parts/view.html?slug=pico) | 1 |  |',
+    '| **SG90** servo | 2 |  |',
+    '| Arm [left] | 1 | |',
+    '| **Total** |  |  |',
+  ].join('\n'));
+  const lines = md.split('\n');
+  const sg = BomSync.linkRow(md, 'sg90 SERVO', 'sg90');
+  assert.equal(lines[sg.line], '| **SG90** servo | 2 |  |');
+  assert.equal(sg.text, '| [**SG90** servo](/parts/view.html?slug=sg90) | 2 |  |');
+  const arm = BomSync.linkRow(md, 'Arm [left]', 'arm');
+  assert.equal(arm.text, '| [Arm \\[left\\]](/parts/view.html?slug=arm) | 1 | |');
+  lines[arm.line] = arm.text;
+  assert.equal(BomSync.parse(lines.join('\n')).rows.find(r => r.name === 'Arm [left]').part_slug, 'arm');
+  assert.equal(BomSync.linkRow(md, 'Pico', 'other'), null, 'a row linked to a part is left alone');
+  assert.equal(BomSync.linkRow(md, 'Total', 'x'), null);
+  assert.equal(BomSync.linkRow(md, 'Motor', 'motor'), null);
+});
+
+test('linkRow moves a shop link on the name into the Notes column', () => {
+  const md = doc([
+    '| Part | Qty | Notes |',
+    '| --- | --- | --- |',
+    '| [Wheels](https://example.com/w) | 4 |  |',
+    '| [Tyres](https://example.com/t) | 4 | grippy |',
+  ].join('\n'));
+  assert.equal(BomSync.linkRow(md, 'Wheels', 'wheel').text, '| [Wheels](/parts/view.html?slug=wheel) | 4 | [Buy](https://example.com/w) |');
+  const tyre = BomSync.linkRow(md, 'tyres', 'tyre');
+  assert.equal(tyre.text, '| [Tyres](/parts/view.html?slug=tyre) | 4 | grippy · [Buy](https://example.com/t) |');
+  const lines = md.split('\n');
+  lines[tyre.line] = tyre.text;
+  assert.deepEqual(BomSync.parse(lines.join('\n')).rows[1], { name: 'Tyres', quantity: 4, part_slug: 'tyre' });
+  const bare = doc('| Part | Qty |\n| --- | --- |\n| [Wheels](https://example.com/w) | 4 |');
+  assert.equal(BomSync.linkRow(bare, 'Wheels', 'wheel'), null, 'no Notes column: the shop link is not dropped');
+});

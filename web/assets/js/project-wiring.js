@@ -137,7 +137,8 @@
   //   markdown()            the document's text
   //   bomSlugs()            the catalog slugs the BOM table links, in order
   //   bomRows()             every BOM row as [{ name, slug|null }], in order
-  //   linkBomRow(name, part) links the unlinked row `name` to part { name, slug }
+  //   linkBomRow(name, part) links the unlinked row `name` to part { name, slug } in the
+  //                         BOM table; false when the table was left alone
   //   createPart(name)      adds a draft catalog part, as { name, slug }, or null
   //   addBomRows(parts)     adds rows for [{ name, slug }]
   //   removeBomRows(slugs)  removes the rows linking these slugs
@@ -323,7 +324,7 @@
     async function linkEntry(e, part) {
       if (!part || !part.slug) return;
       status('Linking…');
-      ctx.linkBomRow(e.name, part);
+      const inTable = ctx.linkBomRow(e.name, part);
       const def = await definition(part.slug);
       if (def) addToLibrary([WiringBom.withFallbackImage(def)]);
       const before = handle.robot();
@@ -339,7 +340,9 @@
       syncPlaceholders(handle.robot());
       handle.setLibraries(libraries());
       const pins = def && hasPins(def);
-      markDirty('Linked “' + e.name + '” to ' + (def ? def.name : part.name) + '.' + (pins ? '' : ' It has no pins in the catalog yet: use Add pins.') + ' Not saved');
+      markDirty('Linked “' + e.name + '” to ' + (def ? def.name : part.name) + '.' +
+        (inTable ? ' The Bill of Materials table links it too.' : ' The Bill of Materials table was left as it is: its row links a shop page and has no Notes column to move that link to. Link the row in the table by hand.') +
+        (pins ? '' : ' It has no pins in the catalog yet: use Add pins.') + ' Not saved');
     }
 
     async function pickLink(e, origin) {

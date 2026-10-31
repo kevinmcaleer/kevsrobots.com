@@ -8,6 +8,8 @@
 // sends what it returns (tests: node --test scripts/tests/*.test.js).
 (function (root) {
   const PART_COL = /^(part|parts|item|items|name|component|components)$/;
+  // Where a row's other links go: a shop link moved off its name, say.
+  const NOTE_COL = /^(notes?|links?|buy|where to buy|suppliers?|source|shop|comments?)$/;
   const QTY_COL = /^(qty|quantity|count|no\.?|#)$/;
   // A Price header can name the table's currency: "Price (£)", "Price (EUR)".
   const PRICE_COL = /^(price|unit price|price each|each|cost|unit cost)(?:\s*\([^)]*\))?$/;
@@ -103,6 +105,65 @@
       rows.push(row);
     });
     return { hasPrice: priceCol >= 0, rows };
+  }
+
+  // Linking the Bill of Materials row named `name` to catalog part `slug`,
+  // as the wiring workspace's Link… does: { line, text } (the 0-based line
+  // and its new text), or null when no row by that name is waiting for a
+  // part. Rows are named as parse() names them, so whatever the workspace
+  // lists as "not linked" can be linked here. The row's wording is kept
+  // as the link text. A row whose name links a shop page instead keeps
+  // that link in its Notes (or Link/Buy/Supplier) column, as "Buy"; with
+  // no such column, the row is left alone, so no link is lost.
+  function linkRow(markdown, name, slug) {
+    const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table || !slug) return null;
+    const header = table.header.map(plain);
+    let partCol = header.findIndex(h => PART_COL.test(h));
+    if (partCol < 0) partCol = 0;
+    const noteCol = header.findIndex(h => NOTE_COL.test(h));
+    const want = String(name || '').trim().toLowerCase();
+    const lines = String(markdown).split('\n');
+    for (let r = 0; r < table.rows.length; r++) {
+      const cells = table.rows[r];
+      if (/^\*\*total\*\*$/i.test((cells[0] || '').trim())) continue;
+      const raw = (cells[partCol] || '').trim();
+      const link = raw.match(/^\[((?:\\.|[^\]\\])*)\]\(([^)\s]+)[^)]*\)$/);
+      if (link && SLUG_RE.test(link[2])) continue; // linked to a part already
+      const rowName = plain(link ? link[1].replace(/\\([\[\]\\])/g, '$1') : raw).slice(0, 200);
+      if (!rowName || rowName.toLowerCase() !== want) continue;
+      const lineNo = table.lines[r];
+      const text = lines[lineNo];
+      const pipes = [...text.matchAll(/(?<!\\)\|/g)].map(m => m.index);
+      const span = col => {
+        if (pipes[col] === undefined) return null;
+        let start = pipes[col] + 1;
+        let end = pipes[col + 1] === undefined ? text.length : pipes[col + 1];
+        while (start < end && /\s/.test(text[start])) start++;
+        while (end > start && /\s/.test(text[end - 1])) end--;
+        return { start, end };
+      };
+      const part = span(partCol);
+      if (!part) return null;
+      const label = link ? link[1] : text.slice(part.start, part.end).replace(/(?<!\\)([\[\]])/g, '\\$1');
+      const edits = [{ ...part, insert: '[' + label + '](/parts/view.html?slug=' + encodeURIComponent(slug) + ')' }];
+      if (link) {
+        // The shop link moves to the notes rather than being lost.
+        const note = noteCol >= 0 && noteCol !== partCol ? span(noteCol) : null;
+        if (!note) return null;
+        const had = text.slice(note.start, note.end);
+        if (!had.includes(link[2])) {
+          const buy = '[Buy](' + link[2] + ')';
+          edits.push(note.start === note.end
+            ? { start: pipes[noteCol] + 1, end: pipes[noteCol + 1] === undefined ? text.length : pipes[noteCol + 1], insert: ' ' + buy + ' ' }
+            : { start: note.end, end: note.end, insert: ' · ' + buy });
+        }
+      }
+      let out = text;
+      edits.sort((a, b) => b.start - a.start).forEach(e => { out = out.slice(0, e.start) + e.insert + out.slice(e.end); });
+      return { line: lineNo, text: out };
+    }
+    return null;
   }
 
   // A Bill of Materials section made from stored rows, for a project
@@ -293,7 +354,7 @@
   }
 
   const api = {
-    parse, price, formatPrice, tableFromRows, totalsChanges, withTotals,
+    parse, linkRow, price, formatPrice, tableFromRows, totalsChanges, withTotals,
     CURRENCIES, headerCurrency, withCurrency, tableCurrency, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
   };
   if (typeof module === 'object' && module.exports) module.exports = api;
