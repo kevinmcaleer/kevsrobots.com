@@ -62,6 +62,20 @@ body.project-wiring-open {
 .project-wiring-edit:hover {
   background: #f0eee6;
 }
+/* Only while the pointer is over the picture (or the button has keyboard
+   focus), like the image size bar. Readers never get the button: only the
+   editor adds it. */
+.cm-md-image-wrap .project-wiring-edit {
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.cm-md-image-wrap:hover .project-wiring-edit,
+.cm-md-image-wrap .project-wiring-edit:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .cm-md-image-wrap .project-wiring-edit { opacity: 1; }
+}
 
 /* The canvas and, beside it, the Bill of Materials panel (wiring-bom.js). */
 .project-wiring-body {
