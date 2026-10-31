@@ -274,6 +274,7 @@
     { layout: 'filmstrip', label: 'Filmstrip', detail: 'One large picture, the rest in a strip under it', icon: 'M2 2.5h12v8H2zM2 12.5h3v1.5H2zM6.5 12.5h3v1.5h-3zM11 12.5h3v1.5h-3z' },
     { layout: 'bento', label: 'Bento', detail: 'A grid of tiles, the first one big', icon: 'M2 2.5h7v7H2zM10.5 2.5H14v3h-3.5zM10.5 7H14v2.5h-3.5zM2 11h12v2.5H2z' },
     { layout: 'lightbox', label: 'Lightbox', detail: 'Even thumbnails that open full size', icon: 'M2 2.5h3.5V6H2zM6.25 2.5h3.5V6h-3.5zM10.5 2.5H14V6h-3.5zM2 7.5h3.5V11H2zM6.25 7.5h3.5V11h-3.5zM10.5 7.5H14V11h-3.5z' },
+    { layout: 'carousel', label: 'Carousel', detail: 'One picture at a time, moving on to the next by itself', icon: 'M3 2.5h10v8H3zM5 12.75h3v1.25H5zM9.25 12.75h1.25v1.25H9.25zM11.5 12.75h1.25v1.25H11.5z' },
   ];
 
   // The block's Markdown: one picture per line, between its fences.

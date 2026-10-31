@@ -157,6 +157,199 @@
   aspect-ratio: 1;
 }
 
+/* Carousel: one picture at a time on a soft panel, sliding on to the next by
+   itself. The track scrolls sideways, so it swipes (and works with no
+   script); under it a tray of dots, the active one a pill that fills as its
+   picture's countdown (--md-gallery-interval), and a round pause button.
+   wireGallery makes it go and adds data-gallery-wired; until then the
+   controls stay hidden. */
+.md-gallery-carousel {
+  --md-gallery-interval: 5s;
+  --md-gallery-tray: color-mix(in srgb, currentColor 8%, transparent);
+  --md-gallery-dot: color-mix(in srgb, currentColor 42%, transparent);
+  --md-gallery-dot-on: color-mix(in srgb, currentColor 85%, transparent);
+}
+
+.md-gallery-carousel .md-gallery-items {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border-radius: 18px;
+}
+
+.md-gallery-carousel .md-gallery-items::-webkit-scrollbar {
+  display: none;
+}
+
+.md-gallery-carousel .md-gallery-item {
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  box-shadow: none;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  text-decoration: none;
+}
+
+.md-gallery-carousel .md-gallery-item:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.md-gallery-carousel .md-gallery-item img {
+  flex: 1;
+  min-height: 0;
+  object-fit: contain;
+  border-radius: 0;
+}
+
+.md-gallery-carousel .md-gallery-caption {
+  padding: 0.5rem 1rem 0.65rem;
+  color: var(--muted, #6b7280);
+  font-size: 0.88em;
+  text-align: center;
+}
+
+.md-gallery-controls {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.md-gallery-carousel[data-gallery-wired] .md-gallery-controls {
+  display: flex;
+}
+
+.md-gallery-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  height: 2.75rem;
+  padding: 0 1.15rem;
+  border-radius: 999px;
+  background: var(--md-gallery-tray);
+}
+
+.md-gallery-carousel button {
+  margin: 0;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.md-gallery-dot {
+  position: relative;
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--md-gallery-dot);
+  transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+/* A bigger target than the dot itself. */
+.md-gallery-dot::after {
+  content: "";
+  position: absolute;
+  inset: -0.6rem -0.3rem;
+}
+
+.md-gallery-dot:hover {
+  background: var(--md-gallery-dot-on);
+}
+
+.md-gallery-dot.is-active {
+  width: 3rem;
+  background: var(--md-gallery-dot);
+}
+
+.md-gallery-dot-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: inherit;
+  background: var(--md-gallery-dot-on);
+}
+
+/* Stopped on a picture (paused, or picked while paused): its pill full. */
+.md-gallery-dot.is-active .md-gallery-dot-fill {
+  width: 100%;
+}
+
+.md-gallery-dot.is-active.is-counting .md-gallery-dot-fill {
+  width: 0;
+  animation: md-gallery-countdown var(--md-gallery-interval) linear forwards;
+}
+
+/* Paused, or scrolled out of sight: the countdown holds where it is. */
+.md-gallery-carousel.is-paused .md-gallery-dot-fill,
+.md-gallery-carousel.is-offscreen .md-gallery-dot-fill {
+  animation-play-state: paused;
+}
+
+@keyframes md-gallery-countdown {
+  from {
+    width: 0.5rem;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.md-gallery-play {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--md-gallery-tray);
+  transition: background-color 0.15s ease;
+}
+
+.md-gallery-play:hover {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.md-gallery-dot:focus-visible,
+.md-gallery-play:focus-visible {
+  outline: 2px solid var(--accent, #2563eb);
+  outline-offset: 2px;
+}
+
+.md-gallery-carousel .md-gallery-controls .md-gallery-play svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+  stroke: none;
+}
+
+.md-gallery-carousel .md-gallery-icon-play,
+.md-gallery-carousel.is-paused .md-gallery-icon-pause {
+  display: none;
+}
+
+.md-gallery-carousel.is-paused .md-gallery-icon-play {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-gallery-dot,
+  .md-gallery-play {
+    transition: none;
+  }
+}
+
 @media (max-width: 600px) {
   .md-gallery-bento .md-gallery-items {
     grid-template-columns: repeat(2, 1fr);
@@ -169,5 +362,20 @@
 
   .md-gallery-lightbox .md-gallery-items {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .md-gallery-carousel .md-gallery-item {
+    aspect-ratio: 4 / 3;
+  }
+
+  .md-gallery-dots {
+    gap: 0.55rem;
+    height: 2.4rem;
+    padding: 0 0.95rem;
+  }
+
+  .md-gallery-play {
+    width: 2.4rem;
+    height: 2.4rem;
   }
 }
