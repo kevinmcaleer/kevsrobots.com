@@ -985,3 +985,92 @@ a.part-link:hover,
     padding-bottom: 4rem;
   }
 }
+
+/* "Show them" on the pictures notice: uploads that aren't on the page,
+   as thumbnails with Add to gallery and Delete. */
+.unplaced-pictures-dialog {
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(80vh, 720px);
+  padding: 0;
+  border: 1px solid #e3e0d6;
+  border-radius: var(--radius, 12px);
+  background: #ffffff;
+  color: #141413;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.06), 0 12px 32px rgb(0 0 0 / 0.1);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.unplaced-pictures-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.unplaced-pictures-dialog::backdrop {
+  background: rgb(20 20 19 / 0.35);
+}
+.unplaced-pictures-head,
+.unplaced-pictures-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+}
+.unplaced-pictures-head {
+  justify-content: space-between;
+  border-bottom: 1px solid #e3e0d6;
+}
+.unplaced-pictures-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.unplaced-pictures-intro {
+  margin: 12px 16px 0;
+  color: #6b6a63;
+  font-size: 0.875rem;
+}
+.unplaced-pictures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 12px 16px;
+  overflow-y: auto;
+  list-style: none;
+}
+.unplaced-picture {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.unplaced-picture-thumb {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid #e3e0d6;
+  border-radius: 8px;
+  background: #f0eee6;
+}
+.unplaced-picture-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.unplaced-picture-name {
+  overflow: hidden;
+  font-size: 0.8rem;
+  color: #6b6a63;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.unplaced-picture-actions {
+  display: flex;
+  gap: 6px;
+}
+.unplaced-picture-actions .btn-outline-success {
+  flex: 1;
+}
+.unplaced-pictures-foot {
+  justify-content: flex-end;
+  border-top: 1px solid #e3e0d6;
+}

@@ -2346,6 +2346,7 @@
       '<i class="fas fa-images" aria-hidden="true"></i>' +
       '<span>' + n + ' uploaded ' + (n === 1 ? 'picture isn\u2019t' : 'pictures aren\u2019t') +
       ' on your page. The Images section is now the gallery in your text.</span>' +
+      '<button type="button" class="btn btn-sm btn-outline-secondary" data-action="show-unplaced">Show ' + (n === 1 ? 'it' : 'them') + '</button>' +
       '<button type="button" class="btn btn-sm btn-success" data-action="add-to-gallery">Add ' + (n === 1 ? 'it' : 'them') + ' to the gallery</button>' +
       '<button type="button" class="btn btn-sm btn-link" data-action="dismiss">Not now</button>';
     bar.hidden = false;
@@ -2357,6 +2358,7 @@
       const action = e.target.closest('[data-action]');
       if (!action || !mde || !mde.view) return;
       const unplaced = unplacedImages(mde.view.state.doc.toString());
+      if (action.dataset.action === 'show-unplaced') { openUnplacedDialog(); return; }
       if (action.dataset.action === 'add-to-gallery') {
         addPicturesToGallery(unplaced.map(img => ({ url: imageViewUrl(img), name: img.filename, caption: img.caption || '' })));
       } else if (action.dataset.action === 'dismiss') {
@@ -2365,6 +2367,89 @@
       updateGalleryAddBar();
     });
   })();
+
+  // "Show them": a dialog of the uploads that aren't on the page, each with
+  // its thumbnail, an Add to gallery button and a Delete button.
+  function galleryPicture(img) {
+    return { url: imageViewUrl(img), name: img.filename, caption: img.caption || '' };
+  }
+  function unplacedDialog() {
+    let dialog = document.getElementById('unplaced-pictures-dialog');
+    if (dialog) return dialog;
+    dialog = document.createElement('dialog');
+    dialog.id = 'unplaced-pictures-dialog';
+    dialog.className = 'unplaced-pictures-dialog';
+    dialog.setAttribute('aria-labelledby', 'unplaced-pictures-title');
+    document.body.appendChild(dialog);
+    dialog.addEventListener('click', async e => {
+      if (e.target === dialog) { dialog.close(); return; } // the backdrop
+      const action = e.target.closest('[data-action]');
+      if (!action || !mde || !mde.view) return;
+      const unplaced = unplacedImages(mde.view.state.doc.toString());
+      const img = unplaced.find(i => String(i.id) === action.dataset.id);
+      switch (action.dataset.action) {
+        case 'close':
+          dialog.close();
+          return;
+        case 'add-all':
+          addPicturesToGallery(unplaced.map(galleryPicture));
+          dialog.close();
+          break;
+        case 'add':
+          if (img) addPicturesToGallery([galleryPicture(img)]);
+          break;
+        case 'delete':
+          if (!img || !confirm('Delete \u201c' + (img.filename || 'this picture') + '\u201d? This can\u2019t be undone.')) return;
+          action.disabled = true;
+          try {
+            await deleteLibraryImage({ url: imageViewUrl(img) });
+            projectImages = projectImages.filter(i => i.id !== img.id);
+          } catch (err) {
+            action.disabled = false;
+            alert(err.message || 'Couldn\u2019t delete the picture');
+            return;
+          }
+          break;
+      }
+      updateGalleryAddBar();
+      renderUnplacedDialog();
+    });
+    return dialog;
+  }
+  function renderUnplacedDialog() {
+    const dialog = document.getElementById('unplaced-pictures-dialog');
+    if (!dialog || !dialog.open || !mde || !mde.view) return;
+    const unplaced = unplacedImages(mde.view.state.doc.toString());
+    if (!unplaced.length) { dialog.close(); return; }
+    const n = unplaced.length;
+    dialog.innerHTML =
+      '<header class="unplaced-pictures-head">' +
+        '<h2 id="unplaced-pictures-title">' + n + ' ' + (n === 1 ? 'picture isn\u2019t' : 'pictures aren\u2019t') + ' on your page</h2>' +
+        '<button type="button" class="btn-close" data-action="close" aria-label="Close"></button>' +
+      '</header>' +
+      '<p class="unplaced-pictures-intro">You uploaded these, but your text doesn\u2019t show them. Add them to the gallery, or delete the ones you don\u2019t need.</p>' +
+      '<ul class="unplaced-pictures-grid">' + unplaced.map(img =>
+        '<li class="unplaced-picture">' +
+          '<a class="unplaced-picture-thumb" href="' + escapeHtmlAttr(imageViewUrl(img)) + '" target="_blank" rel="noopener" title="Open full size">' +
+            '<img src="' + escapeHtmlAttr(imageViewUrl(img)) + '" alt="' + escapeHtmlAttr(img.caption || img.filename || '') + '" loading="lazy">' +
+          '</a>' +
+          '<span class="unplaced-picture-name" title="' + escapeHtmlAttr(img.filename || '') + '">' + escHtml(img.filename || 'Picture') + '</span>' +
+          '<span class="unplaced-picture-actions">' +
+            '<button type="button" class="btn btn-sm btn-outline-success" data-action="add" data-id="' + img.id + '">Add to gallery</button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger" data-action="delete" data-id="' + img.id + '" aria-label="Delete ' + escapeHtmlAttr(img.filename || 'picture') + '" title="Delete"><i class="fas fa-trash-alt" aria-hidden="true"></i></button>' +
+          '</span>' +
+        '</li>').join('') +
+      '</ul>' +
+      '<footer class="unplaced-pictures-foot">' +
+        '<button type="button" class="btn btn-sm btn-link" data-action="close">Close</button>' +
+        '<button type="button" class="btn btn-sm btn-success" data-action="add-all">Add ' + (n === 1 ? 'it' : 'all ' + n) + ' to the gallery</button>' +
+      '</footer>';
+  }
+  function openUnplacedDialog() {
+    const dialog = unplacedDialog();
+    if (!dialog.open) dialog.showModal();
+    renderUnplacedDialog();
+  }
 
   // The image picker's delete button (it asks first).
   async function deleteLibraryImage(image) {
