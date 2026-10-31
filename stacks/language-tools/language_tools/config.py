@@ -20,8 +20,12 @@ class Settings(BaseSettings):
     port: int = 8310
 
     # The project editor on www.kevsrobots.com calls this with the session
-    # cookie, so it needs CORS with credentials for the site's origin.
-    cors_origins: str = "https://www.kevsrobots.com,http://localhost:4000"
+    # cookie, so it needs CORS with credentials for the site's origin. The
+    # local Jekyll site runs on local.kevsrobots.com:4000 (and localhost:4000).
+    cors_origins: str = (
+        "https://www.kevsrobots.com,https://kevsrobots.com,"
+        "http://localhost:4000,http://local.kevsrobots.com:4000"
+    )
 
     @computed_field
     @property
