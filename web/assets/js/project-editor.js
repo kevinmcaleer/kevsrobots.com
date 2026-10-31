@@ -187,11 +187,35 @@
   }
 
   // --- Save ---
+  // The save state is a cloud at the right end of the editor's toolbar,
+  // which stays on screen deep in a long write-up: a plain cloud when saved,
+  // turning arrows while saving (or about to), a cross when it couldn't save.
+  // ``msg`` is its tooltip. The top bar's text is only for when the editor
+  // isn't up (or is an older bundle without setSaveStatus).
   function showSaveStatus(status, msg) {
+    if (mde && mde.setSaveStatus) {
+      saveIndicator.textContent = '';
+      mde.setSaveStatus(status, msg);
+      return;
+    }
     saveIndicator.className = 'save-' + status;
-    saveIndicator.textContent = msg;
+    saveIndicator.textContent = msg || { saving: 'Saving...', saved: 'Saved', error: 'Save failed' }[status];
     if (status === 'saved') setTimeout(() => { saveIndicator.textContent = ''; }, 2000);
   }
+
+  // After a failed save, try again on its own (the text is kept on this
+  // device by the editor's draft meanwhile), and as soon as we're back online.
+  const SAVE_RETRY_MS = 15000;
+  let lastSaveFailed = false;
+  function saveFailed(what) {
+    lastSaveFailed = true;
+    const why = navigator.onLine === false ? "you're offline" : "the server didn't answer";
+    showSaveStatus('error', what + ' (' + why + '). Trying again shortly; your text is kept on this device meanwhile.');
+    if (!autoSaveTimer) autoSaveTimer = setTimeout(saveProject, SAVE_RETRY_MS);
+  }
+  window.addEventListener('online', () => {
+    if (lastSaveFailed) scheduleAutoSave();
+  });
 
   async function saveProject() {
     const content = getEditorValue();
@@ -208,7 +232,9 @@
     const cover = coverUrl(content);
     if (cover) data.cover_image = cover;
 
-    showSaveStatus('saving', 'Saving...');
+    // Saving now, so a pending autosave (or retry) isn't needed.
+    if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+    showSaveStatus('saving');
     try {
       let resp;
       if (currentProject) {
@@ -239,7 +265,9 @@
       // own URL stays at /projects/editor.html?id=<id>, so we do NOT
       // history.replaceState anything slug-shaped here.
       updateStatusBadge(currentProject.status);
-      showSaveStatus('saved', 'Saved');
+      lastSaveFailed = false;
+      // More was typed while this save was in flight: that's still to save.
+      showSaveStatus(autoSaveTimer ? 'saving' : 'saved');
       syncVideos(content);
       syncBom(content);
       // The server has this text now, so the editor's local draft of it
@@ -253,13 +281,15 @@
       }
     } catch (e) {
       console.error('Save failed:', e);
-      showSaveStatus('error', 'Save failed');
+      saveFailed("Couldn't save your changes");
     }
   }
 
   function scheduleAutoSave() {
     if (autoSaveTimer) clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(saveProject, 3000);
+    // The cloud turns from the first change: it isn't saved yet.
+    showSaveStatus('saving', 'Saving your changes in a moment…');
   }
 
   // --- Save / Status / Delete --- (autosave only; no manual save button)
@@ -302,7 +332,7 @@
       }
     } catch (e) {
       console.error(e);
-      showSaveStatus('error', 'Status not saved');
+      showSaveStatus('error', "Couldn't change the project's status. Try the switch again.");
       updateStatusBadge(currentProject ? currentProject.status : 'draft');
     }
   }
@@ -757,6 +787,8 @@
       theme: 'light',
       toolbar: toolbar,
       draft: { key: 'projects.' + (projectId || 'new') },
+      // The cloud at the toolbar's right end (showSaveStatus).
+      saveStatus: currentProject ? 'saved' : null,
       uploadImage: uploadEditorImage,
       // Several images dropped on the text at once go to the end of the gallery.
       addImages: files => processDroppedFiles(files),
