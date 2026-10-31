@@ -238,3 +238,38 @@ async def test_resolve_exact_names(client, session) -> None:
     got = {r["name"]: r["slug"] for r in resp.json()}
     assert got == {"raspberry pi pico": "pico", "SC0915": "pico", "Pico": None}
     assert resp.json()[0]["cover_url"].startswith("/api/parts/pico/photos/")
+
+
+def _tarball(files: dict[str, bytes]) -> bytes:
+    import io
+    import tarfile
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w:gz") as tar:
+        for name, data in files.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+    return buf.getvalue()
+
+
+def test_extract_library_keeps_only_the_standard_library(tmp_path) -> None:
+    from projects_api.import_snakie_parts import extract_library
+    data = _tarball({
+        "Snakie-master/README.md": b"x",
+        "Snakie-master/examples/parts/snakie-standard/library.yml": b"id: snakie-standard\n",
+        "Snakie-master/examples/parts/snakie-standard/pico/parts.yml": b"id: pico\nname: Pico\n",
+        "Snakie-master/examples/parts/snakie-basics/vl53l0x/parts.yml": b"id: vl53l0x\n",
+        "Snakie-master/examples/parts/snakie-standard/../../../../escape.txt": b"no",
+    })
+    root = extract_library(data, tmp_path / "lib")
+    assert (root / "pico" / "parts.yml").read_text() == "id: pico\nname: Pico\n"
+    assert (root / "library.yml").is_file()
+    assert not (root / "vl53l0x").exists()
+    assert not (tmp_path / "escape.txt").exists()
+    assert sorted(p.name for p in root.iterdir()) == ["library.yml", "pico"]
+
+
+def test_extract_library_without_the_library_fails(tmp_path) -> None:
+    from projects_api.import_snakie_parts import extract_library
+    with pytest.raises(ValueError):
+        extract_library(_tarball({"Snakie-master/README.md": b"x"}), tmp_path / "lib")
