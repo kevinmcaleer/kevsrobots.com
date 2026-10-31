@@ -5,9 +5,24 @@
 // well anywhere else. `/video` in the editor writes one; the view page and
 // the editor's preview both call embedVideos() after rendering.
 //
-// The Videos section's `| Video | Title |` table shows as a gallery of
-// thumbnail cards (videoCards), like the video cards across the site, on the
-// view page and in the editor's live view. The table stays the Markdown.
+// Videos are a `::: videos` block of YouTube links, one or several, shown
+// as a group of thumbnail cards (videoCards), like the video cards across
+// the site, on the view page and in the editor's live view:
+//
+//   ::: videos
+//   https://www.youtube.com/watch?v=dQw4w9WgXcQ Part one
+//   [Part two](https://youtu.be/abcdefghijk)
+//   :::
+//
+// A line's title is its link text or the words after its address; without
+// one, YouTube's title is looked up. The editor draws the block itself
+// (markdown-studio's bundle, with videoCards as its videoRenderer); the view
+// page renders with marked, so this file adds a marked extension for it.
+// Keep the parsing in step with markdown-studio's
+// packages/markdown-editor/src/videos.ts.
+//
+// Older projects' Videos section `| Video | Title |` table shows as the same
+// cards, and the table stays the Markdown.
 (function () {
   // Same shape as the backend extractor in projects_api/youtube.py —
   // keep the two in sync. Case is preserved (YouTube ids are
@@ -115,10 +130,146 @@
     return titles.get(id);
   }
 
+  // ------------------------------------------------------- ::: videos
+
+  const VIDEOS_OPEN = /^[ \t]{0,3}:::[ \t]*videos?[ \t]*$/i;
+  const VIDEOS_CLOSE = /^[ \t]{0,3}:::[ \t]*$/;
+  const LINK = /\[((?:\\.|[^\]\\])*)\]\(\s*<?([^\s)>]+)>?(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/;
+  const URL_IN_TEXT = /<?(https?:\/\/[^\s<>]+|(?:www\.)?(?:youtube\.com|youtu\.be)\/[^\s<>]+)>?/i;
+
+  function cleanTitle(text) {
+    return String(text).replace(/[*_`~]+/g, '')
+      .replace(/\\([\\`*_{}[\]()#+\-.!|"'<>~])/g, '$1')
+      .replace(/^\s*(?:[-*+]|\d+[.)])\s+/, '')
+      .replace(/^[\s\-–—:|]+|[\s\-–—:|]+$/g, '')
+      .trim();
+  }
+
+  // The video on one line of a block, { id, title }, or null.
+  function videoFromLine(line) {
+    const link = LINK.exec(line);
+    if (link) {
+      const id = youTubeId(link[2]);
+      if (id) {
+        const label = cleanTitle(link[1]);
+        const rest = cleanTitle(line.replace(link[0], ' '));
+        return { id, title: youTubeId(label) ? rest : (label || rest) };
+      }
+    }
+    const bare = URL_IN_TEXT.exec(line);
+    if (!bare) return null;
+    const id = youTubeId(bare[1]);
+    return id ? { id, title: cleanTitle(line.replace(bare[0], ' ')) } : null;
+  }
+
+  // The videos in a block's lines, in order.
+  function videoBlockItems(body) {
+    return String(body).split('\n').map(videoFromLine).filter(Boolean);
+  }
+
+  // A block's line for a video: its address, then its title if it has one.
+  function videoLine(v) {
+    const title = String(v.title || '').replace(/\s+/g, ' ').trim();
+    return videoMarkdown(v.id) + (title ? ' ' + title : '');
+  }
+
+  // A `::: videos` block of these videos.
+  function videoBlock(videos) {
+    return '::: videos\n' + videos.map(videoLine).join('\n') + (videos.length ? '\n' : '') + ':::';
+  }
+
+  // Every closed `::: videos` block in some Markdown (outside code), as
+  // { open, close, videos } with 0-based line numbers.
+  function findVideoBlocks(markdown) {
+    const lines = String(markdown || '').split('\n');
+    const blocks = [];
+    let fence = null;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const marker = /^[ \t]{0,3}(`{3,}|~{3,})/.exec(line);
+      if (fence) {
+        if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !line.slice(marker[0].length).trim()) fence = null;
+        continue;
+      }
+      if (marker) { fence = marker[1]; continue; }
+      if (!VIDEOS_OPEN.test(line)) continue;
+      let close = -1;
+      for (let j = i + 1; j < lines.length; j++) {
+        if (VIDEOS_CLOSE.test(lines[j])) { close = j; break; }
+        if (/^[ \t]{0,3}:::/.test(lines[j])) break;
+      }
+      if (close < 0) continue;
+      blocks.push({ open: i, close, videos: videoBlockItems(lines.slice(i + 1, close).join('\n')) });
+      i = close;
+    }
+    return blocks;
+  }
+
+  function escAttr(text) {
+    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // marked: a closed `::: videos` block at the start of `src` becomes a
+  // placeholder that renderVideoBlocks() fills with the cards.
+  const markedExtension = {
+    name: 'videos',
+    level: 'block',
+    start(src) {
+      const m = /^[ \t]{0,3}:::[ \t]*videos?[ \t]*$/im.exec(src);
+      return m ? m.index : undefined;
+    },
+    tokenizer(src) {
+      const lines = src.split('\n');
+      if (!VIDEOS_OPEN.test(lines[0])) return undefined;
+      for (let i = 1; i < lines.length; i++) {
+        if (VIDEOS_CLOSE.test(lines[i])) {
+          const raw = lines.slice(0, i + 1).join('\n') + (i + 1 < lines.length ? '\n' : '');
+          return { type: 'videos', raw, videos: videoBlockItems(lines.slice(1, i).join('\n')) };
+        }
+        if (/^[ \t]{0,3}:::/.test(lines[i])) return undefined;
+      }
+      return undefined;
+    },
+    renderer(token) {
+      return '<div class="project-videos-block" data-videos="' + escAttr(JSON.stringify(token.videos)) + '"></div>\n';
+    },
+  };
+  if (window.marked && typeof window.marked.use === 'function') window.marked.use({ extensions: [markedExtension] });
+
+  // Swaps each `::: videos` placeholder under `root` for its cards, which
+  // play in place. Returns how many blocks there were.
+  function renderVideoBlocks(root) {
+    const blocks = root.querySelectorAll('.project-videos-block');
+    blocks.forEach(el => {
+      let videos = [];
+      try { videos = JSON.parse(el.dataset.videos || '[]'); } catch (_) { /* none */ }
+      if (!videos.length) { el.remove(); return; }
+      el.replaceWith(videoCards(videos, { play: true }));
+    });
+    return blocks.length;
+  }
+
+  // A video's card swaps its thumbnail for the playing video.
+  function playInCard(col, id, title) {
+    const thumb = col.querySelector('.project-video-thumb');
+    if (!thumb || thumb.querySelector('iframe')) return;
+    const frame = document.createElement('iframe');
+    frame.src = 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?autoplay=1';
+    frame.title = title || 'YouTube video';
+    frame.setAttribute('frameborder', '0');
+    frame.setAttribute('allowfullscreen', '');
+    frame.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+    thumb.replaceChildren(frame);
+  }
+
   // A gallery of cards, one per video: the YouTube thumbnail with the title
   // underneath, linking to the video. A video without a title shows
   // YouTube's title once it's looked up ("YouTube video" until then).
-  function videoCards(items) {
+  //
+  // With { play: true } (the view page) a click plays the video in its card;
+  // otherwise the card links to YouTube.
+  function videoCards(items, opts) {
+    const play = !!(opts && opts.play);
     const grid = document.createElement('div');
     grid.className = 'row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 mb-3 project-video-grid';
     items.forEach(v => {
@@ -156,10 +307,20 @@
       card.append(thumb, body);
       link.appendChild(card);
       col.appendChild(link);
+      if (play) {
+        link.addEventListener('click', e => {
+          if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+          e.preventDefault();
+          playInCard(col, v.id, title.textContent);
+        });
+      }
       grid.appendChild(col);
     });
     return grid;
   }
 
-  window.ProjectEmbeds = { youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards };
+  window.ProjectEmbeds = {
+    youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards,
+    videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
+  };
 })();

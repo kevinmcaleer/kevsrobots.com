@@ -764,7 +764,9 @@
       codeEditors: { mermaid: editMermaid },
       // Mermaid Factory's highlighter for ```mermaid fences in Raw.
       codeLanguages: { mermaid: () => loadMermaidTools().then(tools => tools.mermaidStreamParser) },
-      // The Videos table as thumbnail cards, as on the view page, until it's clicked.
+      // A `::: videos` block, and an older project's Videos table, as the
+      // view page's cards until they're clicked.
+      videoRenderer: videos => (videos.length ? ProjectEmbeds.videoCards(videos) : null),
       tableRenderer: ({ rows, heading }) => {
         const section = heading && ProjectSections.match(heading);
         if (!section || section.id !== 'videos') return null;
@@ -804,13 +806,13 @@
       {
         title: 'Project sections',
         rows: [
-          ['/', 'Type / on a new line to add a section, a part, a video, a file or a diagram'],
+          ['/', 'Type / on a new line to add a section, a part, videos, a file or a diagram'],
           [heading('bill-of-materials'), 'The parts list, as a table'],
           [heading('assembly-instructions'), 'How to build it, step by step'],
           [heading('wiring'), 'The wiring diagram, drawn in the wiring workspace'],
           [heading('code-repository'), 'A link to your code repository'],
           [heading('3d-printed-parts'), 'Your STL files'],
-          [heading('videos'), 'A table of YouTube links'],
+          [heading('videos'), 'Your YouTube videos, as a group of cards: / then Videos, then add, delete or move link lines'],
           [heading('gallery'), 'Your pictures as a gallery: / then Gallery, pick a layout, then delete or move picture lines'],
         ],
         note: 'These headings fill the page navigation and the completeness check.',
@@ -824,11 +826,12 @@
         ],
       },
       {
-        title: 'Videos',
+        title: 'Project videos',
         rows: [
-          ['| Video | Title |', 'Under ## Videos, each row\u2019s YouTube link shows as a thumbnail card'],
-          ['https://youtu.be/\u2026', 'A YouTube link on a line of its own plays in the page'],
+          ['/ then Videos', 'Adds a ::: videos block: paste YouTube links, or pick this project\u2019s videos'],
+          ['| Video | Title |', 'An older Videos table still shows as cards'],
         ],
+        note: 'On the project page the cards play in place. The videos are listed with your project too.',
       },
       {
         title: 'Diagrams',
@@ -2251,43 +2254,48 @@
 
   // --- Videos section (issue #171) ---
   //
-  // Videos are an optional "Videos" section of the document: a table
-  // with the YouTube link in its first column and an optional title.
-  // The project's video list (the API, which the project page's player
-  // and the cards read) follows that table after each save. A project
-  // saved before the section existed gets one made from its videos when
-  // it's opened, the way code_repo_url became a section.
+  // Videos live in the document: `::: videos` blocks of YouTube links
+  // (ProjectEmbeds.findVideoBlocks), or an older project's "Videos"
+  // section table with the YouTube link in its first column and an
+  // optional title. The project's video list (the API, which the project
+  // page's player and the cards read) follows them after each save. A
+  // project saved before the section existed gets one made from its
+  // videos when it's opened, the way code_repo_url became a section.
   const extractYouTubeId = ProjectEmbeds.youTubeId;
   let projectVideos = null; // the API's list as last seen; null until it loads
 
-  // [{ youtube_id, title }] in table order, each video once.
+  // [{ youtube_id, title }] in document order (the Videos table first,
+  // then the blocks), each video once.
   function videosFromMarkdown(markdown) {
-    const table = ProjectSections.sectionTable(markdown, 'videos');
-    if (!table) return [];
-    let videoCol = table.header.findIndex(h => /^(video|videos|url|link|youtube)$/.test(h));
-    if (videoCol < 0) videoCol = 0;
-    const titleCol = table.header.findIndex(h => /^(title|name|caption|description)$/.test(h));
     const seen = new Set();
     const out = [];
-    table.rows.forEach(row => {
-      const cell = row[videoCol] || '';
-      const link = cell.match(/\]\(([^)\s]+)/);
-      const id = extractYouTubeId(link ? link[1] : cell.replace(/^<|>$/g, ''));
+    const add = (id, title) => {
       if (!id || seen.has(id)) return;
       seen.add(id);
-      const title = titleCol >= 0 ? (row[titleCol] || '').replace(/\\\|/g, '|').trim() : '';
       out.push({ youtube_id: id, title: title || null });
-    });
+    };
+    const table = ProjectSections.sectionTable(markdown, 'videos');
+    if (table) {
+      let videoCol = table.header.findIndex(h => /^(video|videos|url|link|youtube)$/.test(h));
+      if (videoCol < 0) videoCol = 0;
+      const titleCol = table.header.findIndex(h => /^(title|name|caption|description)$/.test(h));
+      table.rows.forEach(row => {
+        const cell = row[videoCol] || '';
+        const link = cell.match(/\]\(([^)\s]+)/);
+        const id = extractYouTubeId(link ? link[1] : cell.replace(/^<|>$/g, ''));
+        add(id, titleCol >= 0 ? (row[titleCol] || '').replace(/\\\|/g, '|').trim() : '');
+      });
+    }
+    ProjectEmbeds.findVideoBlocks(markdown).forEach(block => block.videos.forEach(v => add(v.id, v.title)));
     return out;
   }
 
   function withVideosSection(markdown, videos) {
     const md = markdown || '';
-    if (!videos || !videos.length || ProjectSections.present(md).has('videos')) return md;
-    const cell = t => String(t || '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
-    const rows = videos.map(v => '| ' + ProjectEmbeds.videoMarkdown(v.youtube_id) + ' | ' + cell(v.title) + ' |').join('\n');
+    if (!videos || !videos.length || ProjectSections.present(md).has('videos') || ProjectEmbeds.findVideoBlocks(md).length) return md;
+    const block = ProjectEmbeds.videoBlock(videos.map(v => ({ id: v.youtube_id, title: v.title })));
     return md.replace(/\s*$/, '') + (md.trim() ? '\n\n' : '') +
-      '# ' + ProjectSections.get('videos').heading + '\n\n| Video | Title |\n| --- | --- |\n' + rows + '\n';
+      '# ' + ProjectSections.get('videos').heading + '\n\n' + block + '\n';
   }
 
   async function fetchVideos() {
