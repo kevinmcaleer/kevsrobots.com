@@ -132,6 +132,7 @@
   let card = null;
   let showing = null; // the element the card is for
   let timer = 0;
+  let leaving = 0; // hides the card a moment after the pointer leaves, so it can reach the card's button
 
   // The part link under `target`, as { el, slug }.
   function linkAt(target) {
@@ -143,6 +144,7 @@
 
   function hideCard() {
     clearTimeout(timer);
+    clearTimeout(leaving);
     showing = null;
     if (card) card.hidden = true;
   }
@@ -153,7 +155,11 @@
       card = document.createElement('div');
       card.className = 'part-link-card';
       card.setAttribute('role', 'tooltip');
-      card.addEventListener('mouseleave', hideCard);
+      card.addEventListener('mouseenter', () => clearTimeout(leaving));
+      card.addEventListener('mouseleave', e => {
+        if (showing && showing.contains(e.relatedTarget)) return;
+        hideCard();
+      });
       document.body.appendChild(card);
     }
     const part = await fetchPart(slug);
@@ -183,6 +189,7 @@
       if (part.category) add(part.category).classList.add('text-muted');
       const price = add('…');
       add('Used in ' + part.usage_count + (part.usage_count === 1 ? ' project' : ' projects'));
+      body.appendChild(openLink(slug));
       card.appendChild(body);
       lowestPrice(part).then(p => { price.textContent = p ? 'From ' + p : 'No price yet'; });
     }
@@ -194,6 +201,24 @@
     card.style.top = (r.bottom + 6 + h > window.innerHeight && r.top > h + 6 ? r.top - h - 6 : r.bottom + 6) + 'px';
   }
 
+  // The card's "Open part page" button: the part's page in a new tab, so
+  // the editor (or the project page) stays where it was.
+  function openLink(slug) {
+    const a = document.createElement('a');
+    a.className = 'part-link-open';
+    a.href = href(slug);
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = 'Open part page';
+    a.addEventListener('click', () => setTimeout(hideCard));
+    return a;
+  }
+
+  // Opens the part's page in a new tab.
+  function openPart(slug) {
+    window.open(href(slug), '_blank', 'noopener');
+  }
+
   const hovered = new WeakSet();
 
   // Shows the card over part links in `root` (the page's content, or the
@@ -203,7 +228,9 @@
     hovered.add(root);
     root.addEventListener('mouseover', e => {
       const link = linkAt(e.target);
-      if (!link || link.el === showing) return;
+      if (!link) return;
+      clearTimeout(leaving);
+      if (link.el === showing) return;
       clearTimeout(timer);
       timer = setTimeout(() => showCard(link.el, link.slug), 300);
     });
@@ -211,10 +238,12 @@
       const link = linkAt(e.target);
       if (!link || link.el.contains(e.relatedTarget)) return;
       if (card && card.contains(e.relatedTarget)) return;
-      hideCard();
+      clearTimeout(timer);
+      clearTimeout(leaving);
+      leaving = setTimeout(hideCard, 250);
     });
     root.addEventListener('mousedown', hideCard);
   }
 
-  window.PartLinks = { slugOf, href, absolutize, fetchPart, coverOf, cheapest, lowestPrice, thumbsFor, decorate, attachHover, linkAt, hideCard };
+  window.PartLinks = { slugOf, href, absolutize, fetchPart, coverOf, cheapest, lowestPrice, thumbsFor, decorate, attachHover, linkAt, hideCard, openPart };
 })();

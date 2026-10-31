@@ -1579,7 +1579,7 @@
       view.focus();
     };
     const actions = [
-      ['Open part page', () => window.open(PartLinks.href(link.slug), '_blank', 'noopener')],
+      ['Open part page', () => PartLinks.openPart(link.slug)],
       ['Change part\u2026', () => {
         view.dispatch({ selection: { anchor: range.to } });
         ProjectSlashCommands.partPicker(view, slashContext(), part => {
@@ -1625,6 +1625,17 @@
       PartLinks.hideCard();
       showPartMenu(view, link, e.clientX, e.clientY);
     });
+    // Cmd/Ctrl-click a part link (also in a table cell) opens its page in a
+    // new tab; a plain click still edits the text.
+    view.contentDOM.addEventListener('mousedown', e => {
+      if (!(e.metaKey || e.ctrlKey) || e.button !== 0) return;
+      const link = PartLinks.linkAt(e.target);
+      if (!link) return;
+      e.preventDefault();
+      e.stopPropagation();
+      PartLinks.hideCard();
+      PartLinks.openPart(link.slug);
+    }, true);
     document.addEventListener('mousedown', e => {
       if (partMenu && !partMenu.contains(e.target)) closePartMenu();
     }, true);
