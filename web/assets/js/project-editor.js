@@ -811,6 +811,7 @@
           [heading('code-repository'), 'A link to your code repository'],
           [heading('3d-printed-parts'), 'Your STL files'],
           [heading('videos'), 'A table of YouTube links'],
+          [heading('gallery'), 'Your pictures as a gallery: / then Gallery, pick a layout, then delete or move picture lines'],
         ],
         note: 'These headings fill the page navigation and the completeness check.',
       },
