@@ -93,3 +93,31 @@ def test_clean_svg_refuses_doctype_and_non_svg() -> None:
         clean_svg("<html/>")
     with pytest.raises(UnsafeSvg):
         clean_svg("not xml")
+
+
+@pytest.mark.asyncio
+async def test_draft_wiring_svg_is_never_cached(client) -> None:
+    # Cloudflare caches .svg URLs: a stranger's 404 for a draft's diagram
+    # must not stick, and the author's copy must not be shared.
+    resp = await client.post("/api/projects", json={"title": "Secret wiring", "status": "draft"},
+                             headers=make_auth_header())
+    pid = resp.json()["id"]
+    missing = await client.get(f"/api/projects/{pid}/wiring.svg", headers=make_auth_header())
+    assert missing.status_code == 404
+    assert "no-store" in missing.headers["cache-control"]
+    await client.put(f"/api/projects/{pid}/wiring", json={"data": ROBOT, "svg": SVG}, headers=make_auth_header())
+
+    hidden = await client.get(f"/api/projects/{pid}/wiring.svg")
+    assert hidden.status_code == 404
+    assert "no-store" in hidden.headers["cache-control"]
+    own = await client.get(f"/api/projects/{pid}/wiring.svg", headers=make_auth_header())
+    assert own.status_code == 200
+    assert own.headers["cache-control"] == "private, no-store"
+
+
+@pytest.mark.asyncio
+async def test_public_wiring_svg_is_cached_briefly(client, project_id) -> None:
+    await client.put(f"/api/projects/{project_id}/wiring", json={"data": ROBOT, "svg": SVG}, headers=make_auth_header())
+    svg = await client.get(f"/api/projects/{project_id}/wiring.svg")
+    assert svg.status_code == 200
+    assert svg.headers["cache-control"] == "public, max-age=60"

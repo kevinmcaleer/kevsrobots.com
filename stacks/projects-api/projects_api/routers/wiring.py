@@ -27,7 +27,7 @@ from ..models import Project, ProjectWiring
 from ..schemas import ProjectWiringResponse, ProjectWiringUpdate
 from ..storage import delete_file, read_file, save_file
 from ..svg_safety import SVG_CSP, UnsafeSvg, clean_svg
-from ..visibility import hide_drafts
+from ..visibility import NO_STORE, hide_drafts
 
 router = APIRouter(prefix="/api/projects/{project_id}", tags=["wiring"])
 
@@ -138,11 +138,11 @@ async def get_wiring_svg(
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
 ) -> Response:
-    await hide_drafts(session, project_id, user)
+    draft = await hide_drafts(session, project_id, user, no_store=True)
     w = await _wiring(session, project_id)
     data = read_file(w.svg_path) if w and w.svg_path else None
     if data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No wiring diagram for this project")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No wiring diagram for this project", headers=NO_STORE)
     return Response(
         content=data,
         media_type="image/svg+xml",
@@ -150,7 +150,8 @@ async def get_wiring_svg(
             "Content-Security-Policy": SVG_CSP,
             "X-Content-Type-Options": "nosniff",
             # Short: the editor adds ?v= to the link when it saves, but a
-            # bare link should catch up quickly too.
-            "Cache-Control": "public, max-age=60",
+            # bare link should catch up quickly too. A draft's is its
+            # author's alone, so no shared cache may keep it.
+            "Cache-Control": NO_STORE["Cache-Control"] if draft else "public, max-age=60",
         },
     )

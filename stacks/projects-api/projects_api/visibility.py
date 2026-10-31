@@ -34,16 +34,28 @@ def not_draft():
     return Project.status != DRAFT
 
 
+# For a picture that a draft can hide: nothing may keep it, neither the
+# browser nor Cloudflare. Cloudflare caches .svg/.png URLs and gives a
+# response without Cache-Control a 4 hour browser TTL, so a stranger's 404
+# for a draft's diagram (or an image tag sent without the dev token) stuck
+# for hours, even after the project went public; and a public 200 could
+# hand a draft's picture to the next caller.
+NO_STORE = {"Cache-Control": "private, no-store"}
+
+
 async def hide_drafts(
-    session: AsyncSession, project_id: int, user: Optional[str]
+    session: AsyncSession, project_id: int, user: Optional[str], *, no_store: bool = False
 ) -> bool:
     """404 when ``project_id`` is someone else's draft.
 
     A missing project is left to the caller, so the sub-resource routes
     keep whatever they already did for unknown ids. Returns whether the
-    project is a draft (which its author is allowed to see).
+    project is a draft (which its author is allowed to see). With
+    ``no_store`` the 404 tells caches not to keep it.
     """
     project = await session.get(Project, project_id)
     if project is not None and not can_view(project, user):
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail="Project not found", headers=NO_STORE if no_store else None
+        )
     return project is not None and is_draft(project)
