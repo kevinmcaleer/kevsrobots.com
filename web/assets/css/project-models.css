@@ -1,0 +1,177 @@
+/* Files & Models: the models as a filmstrip gallery (project-models.js),
+   in the editor and on the project page. Same look as the `::: gallery
+   filmstrip` block (markdown-editor/gallery.css), using the page tokens
+   --border, --surface, --muted, --text and --accent. */
+.kr-models {
+  --kr-models-radius: 10px;
+  margin: 0 0 1rem;
+}
+
+.kr-models-stage {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.kr-models-hero {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 360px;
+  padding: 0;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--kr-models-radius);
+  background: radial-gradient(circle at 50% 45%, #fff, var(--surface, #f3f4f6) 75%);
+  overflow: hidden;
+  cursor: zoom-in;
+}
+.kr-models-hero[disabled] { cursor: default; }
+.kr-models-hero:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; }
+
+.kr-models-hero-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 1rem;
+}
+
+/* The Open 3D viewer pill sits over the bottom of the big picture. */
+.kr-models-open {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent, #2563eb);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+}
+.kr-models-open:hover { filter: brightness(1.08); }
+
+/* A cube in the corner: this picture is rendered from the model. */
+.kr-model-badge {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.9);
+  color: var(--accent, #2563eb);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.kr-model-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--muted, #6b7280);
+  opacity: 0.6;
+}
+.kr-models-hero .kr-model-placeholder { font-size: 4rem; }
+
+/* The strip: every model, the shown one outlined. */
+.kr-models-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 7.5rem;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 2px 2px 0.4rem;
+  scroll-snap-type: x proximity;
+}
+.kr-models[data-count="1"] .kr-models-strip { display: none; }
+
+.kr-models-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted, #6b7280);
+  font-size: 0.75rem;
+  text-align: center;
+  opacity: 0.75;
+  scroll-snap-align: start;
+}
+.kr-models-thumb:hover,
+.kr-models-thumb.is-active { opacity: 1; color: var(--text, inherit); }
+
+.kr-models-thumb-pic {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--kr-models-radius);
+  background: var(--surface, #f3f4f6);
+  overflow: hidden;
+}
+.kr-models-thumb.is-active .kr-models-thumb-pic {
+  outline: 2px solid var(--accent, #2563eb);
+  outline-offset: 1px;
+}
+.kr-models-thumb:focus-visible { outline: none; }
+.kr-models-thumb:focus-visible .kr-models-thumb-pic { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; }
+.kr-models-thumb-pic .kr-model-placeholder { font-size: 1.6rem; }
+.kr-models-thumb-pic .kr-model-badge { top: 0.25rem; right: 0.25rem; width: 1.25rem; height: 1.25rem; font-size: 0.65rem; }
+
+.kr-models-thumb-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.3rem;
+}
+
+.kr-models-thumb-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The shown model's name, description and print settings. */
+.kr-models-details {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--kr-models-radius);
+  font-size: 0.9rem;
+}
+.kr-models-details-main { flex: 1; min-width: 0; }
+.kr-models-details-name { font-weight: 600; word-break: break-word; }
+.kr-models-details-meta { color: var(--muted, #6b7280); font-size: 0.8rem; }
+.kr-models-details-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+/* The Download files button under the files. */
+.kr-download-files {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 576px) {
+  .kr-models-strip { grid-auto-columns: 5.5rem; }
+  .kr-models-hero { aspect-ratio: 4 / 3; }
+}

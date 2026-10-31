@@ -19,6 +19,7 @@ description: View project details
 <link rel="stylesheet" href="/assets/js/markdown-editor/cards.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-content.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-models.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-videos.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
@@ -191,13 +192,13 @@ description: View project details
           <div id="view-files" class="list-group"></div>
         </div>
 
-        <!-- Under the Files & Models tables: every file plus the write-up
-             as README.md, zipped in the browser (downloadProject). -->
+        <!-- Under Files & Models: every file and picture plus the write-up
+             as README.md, zipped in the browser (project-download.js). -->
         <div id="view-download-all" class="view-download-all mb-4 d-none">
           <button id="download-all-btn" type="button" class="btn btn-sm btn-outline-secondary">
-            <i class="fas fa-file-archive me-1"></i> Download all (.zip)
+            <i class="fas fa-file-archive me-1"></i> Download files
           </button>
-          <small class="text-muted ms-2">All the files, with the write-up as README.md</small>
+          <small class="text-muted ms-2">One .zip of every file and picture, with the write-up as README.md</small>
         </div>
 
         <!-- BOM -->
@@ -384,32 +385,34 @@ description: View project details
   /* Download PDF prints #kr-print-root, a copy of the title, details and
      document, and nothing else. */
   .kr-print { display: none; }
+  /* The same copy, drawn to a .pdf for the Download files zip (pdfBlob). */
+  .kr-print.kr-print-pdf { display: block; width: 700px; padding: 8px 4px; box-sizing: border-box; background: #fff; }
+  .kr-print { color: #141413; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .kr-print-head h1 {
+    font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+    font-size: 2rem !important; font-weight: 500; text-transform: none;
+    letter-spacing: normal; line-height: 1.3; margin: 0 0 0.4rem;
+  }
+  .kr-print-desc { color: #6b6a63; font-size: 1.05rem; margin: 0 0 0.3rem; }
+  .kr-print-meta { color: #6b6a63; font-size: 0.85rem; margin: 0 0 1rem; }
+  .kr-print .project-doc { background: none; border: 0; border-radius: 0; padding: 0; }
+  .kr-print img { max-width: 100%; height: auto; }
+  .kr-print :is(img, pre, table, figure, blockquote, svg, .callout) { break-inside: avoid; }
+  .kr-print :is(h1, h2, h3, h4) { break-after: avoid; }
+  .kr-print a { color: inherit; }
+  .kr-print-foot { margin-top: 1.5rem; padding-top: 0.5rem; border-top: 1px solid #e3e0d6; color: #6b6a63; font-size: 0.8rem; }
   @media print {
     @page { margin: 16mm 14mm; }
     body.kr-printing { background: #fff !important; padding: 0 !important; margin: 0 !important; }
     body.kr-printing > *:not(#kr-print-root) { display: none !important; }
     body.kr-printing #kr-print-root { display: block; }
-    .kr-print { color: #141413; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .kr-print-head h1 {
-      font-family: ui-serif, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
-      font-size: 2rem !important; font-weight: 500; text-transform: none;
-      letter-spacing: normal; line-height: 1.3; margin: 0 0 0.4rem;
-    }
-    .kr-print-desc { color: #6b6a63; font-size: 1.05rem; margin: 0 0 0.3rem; }
-    .kr-print-meta { color: #6b6a63; font-size: 0.85rem; margin: 0 0 1rem; }
-    .kr-print .project-doc { background: none; border: 0; border-radius: 0; padding: 0; }
-    .kr-print img { max-width: 100%; height: auto; }
-    .kr-print :is(img, pre, table, figure, blockquote, svg, .callout) { break-inside: avoid; }
-    .kr-print :is(h1, h2, h3, h4) { break-after: avoid; }
-    .kr-print a { color: inherit; }
-    .kr-print-foot { margin-top: 1.5rem; padding-top: 0.5rem; border-top: 1px solid #e3e0d6; color: #6b6a63; font-size: 0.8rem; }
   }
 
   .view-download-all { margin-top: -0.75rem; }
 
   /* Issue #262: model thumbnails under "3D printed parts" and in Files & Models. */
   .view-models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-  .view-models-grid__item { margin: 0; text-align: center; padding: 8px; border: 1px solid rgba(0,0,0,.08); border-radius: 8px; }
+  .view-models-grid__item { position: relative; margin: 0; text-align: center; padding: 8px; border: 1px solid rgba(0,0,0,.08); border-radius: 8px; }
   .view-models-grid__item img, .view-models-grid__item .fa-cube { display: block; margin: 0 auto 6px; }
   .view-models-grid__item .fa-cube { width: 128px; height: 128px; line-height: 128px; }
   .view-model-thumb { object-fit: contain; }
@@ -719,6 +722,8 @@ description: View project details
 <script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/image-viewer.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/model-thumbnails.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-models.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-download.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-interactions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/badge-toast.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Builder-mode renderer — shared with the project editor's
@@ -1083,9 +1088,9 @@ description: View project details
       // Show download button if there are files or content
       const downloadBtn = document.getElementById('download-project-btn');
       downloadBtn.classList.remove('d-none');
-      downloadBtn.addEventListener('click', () => downloadProject(project, downloadBtn));
+      downloadBtn.addEventListener('click', () => ProjectDownload.zip(project, downloadBtn, { pdf: () => pdfBlob(project) }));
       const downloadAllBtn = document.getElementById('download-all-btn');
-      downloadAllBtn.addEventListener('click', () => downloadProject(project, downloadAllBtn));
+      downloadAllBtn.addEventListener('click', () => ProjectDownload.zip(project, downloadAllBtn, { pdf: () => pdfBlob(project) }));
       document.getElementById('view-side-downloads').classList.remove('d-none');
       document.getElementById('download-pdf-btn').addEventListener('click', () => downloadPdf(project));
 
@@ -1627,16 +1632,29 @@ description: View project details
 
     if (models.length) {
       document.getElementById('view-models-section').classList.remove('d-none');
-      document.getElementById('view-models').innerHTML = `<table class="table table-single table-narrow table-hover mb-0"><tbody>${models.map(f => row(f,
-        viewable(f)
-          ? `<button type="button" class="btn btn-link p-0" data-view-model="${f.id}" title="View ${esc(f.filename)} in 3D">${thumb(f, 56)}</button>`
-          : thumb(f, 56))).join('')}</tbody></table>`;
+      // A filmstrip gallery of the models, as on Printables.
+      ProjectModels.render(document.getElementById('view-models'), models, {
+        thumbUrl,
+        canView: viewable,
+        openViewer: f => openModel(f.id),
+        details: f => `
+          <div class="kr-models-details-main">
+            <div class="kr-models-details-name">${esc(f.filename)}</div>
+            ${f.description ? `<div>${esc(f.description)}</div>` : ''}
+            ${f.print_settings ? `<div class="text-muted small"><i class="fas fa-sliders-h me-1"></i>${esc(f.print_settings)}</div>` : ''}
+            <div class="kr-models-details-meta">${fKind(f.filename)} · ${size(f)} · <i class="fas fa-download"></i> ${(f.download_count || 0)}</div>
+          </div>
+          <div class="kr-models-details-actions">
+            <a href="${downloadUrl(f)}" class="btn btn-sm btn-outline-secondary" title="Download ${esc(f.filename)}" aria-label="Download ${esc(f.filename)}"><i class="fas fa-download"></i></a>
+          </div>`,
+      });
       const grid = document.getElementById('view-models-grid');
       grid.innerHTML = models.map(f => `
         <figure class="view-models-grid__item">
           ${viewable(f)
             ? `<button type="button" class="btn btn-link p-0" data-view-model="${f.id}" title="View in 3D">${thumb(f, 128)}</button>`
             : `<a href="${downloadUrl(f)}">${thumb(f, 128)}</a>`}
+          ${f.thumbnail_version ? '<span class="kr-model-badge" title="Rendered from the 3D model" aria-hidden="true"><i class="fas fa-cube"></i></span>' : ''}
           <figcaption class="small text-truncate"><a href="${downloadUrl(f)}">${esc(f.filename)}</a></figcaption>
         </figure>`).join('');
       grid.dataset.ready = '1';
@@ -1870,125 +1888,14 @@ description: View project details
       : 'https://www.kevsrobots.com/projects/view.html?id=' + project.id;
   }
 
-  async function downloadProject(project, btn) {
-    const label = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Packaging...';
-
-    try {
-      const zip = new JSZip();
-      var slug = projectSlug(project);
-
-      // README.md
-      var readme = '# ' + project.title + '\n\n';
-      if (project.short_description) readme += '*' + project.short_description + '*\n\n';
-      if (project.difficulty) readme += '**Difficulty:** ' + project.difficulty + '\n';
-      if (project.estimated_minutes) readme += '**Estimated time:** ' + project.estimated_minutes + ' minutes\n';
-      if (project.code_repo_url) readme += '**Code:** ' + project.code_repo_url + '\n';
-      readme += '\n---\n\n';
-      if (project.content_md) readme += PartLinks.absolutize(project.content_md) + '\n';
-      readme += '\n\n*Downloaded from [KevsRobots](' + publicProjectUrl(project) + ')*\n';
-      zip.file('README.md', readme);
-
-      // Images
-      var imgResp = await fetch(API + '/api/projects/' + project.id + '/images', { credentials: 'include' });
-      var images = await imgResp.json();
-      for (var img of images) {
-        try {
-          var data = await fetch(API + '/api/projects/' + project.id + '/images/' + img.id + '/view');
-          if (data.ok) {
-            var blob = await data.blob();
-            zip.file('images/' + img.filename, blob);
-          }
-        } catch (e) {}
-      }
-
-      // Files
-      var fileResp = await fetch(API + '/api/projects/' + project.id + '/files', { credentials: 'include' });
-      var files = await fileResp.json();
-      for (var f of files) {
-        try {
-          var data = await fetch(API + '/api/projects/' + project.id + '/files/' + f.id + '/download');
-          if (data.ok) {
-            var blob = await data.blob();
-            var ext = f.filename.split('.').pop().toLowerCase();
-            var folder = ['stl', 'obj', 'gcode', '3mf'].indexOf(ext) > -1 ? 'models/' : 'files/';
-            zip.file(folder + f.filename, blob);
-          }
-        } catch (e) {}
-      }
-
-      // BOM as CSV
-      var bomResp = await fetch(API + '/api/projects/' + project.id + '/bom', { credentials: 'include' });
-      var bom = await bomResp.json();
-      if (bom.length > 0) {
-        // Issue #149: include currency column so the CSV is parseable
-        // when prices are denominated in different currencies.
-        var csv = 'Part,Quantity,Unit,Unit Cost,Currency,Supplier URL\n';
-        bom.forEach(function(item) {
-          csv += '"' + (item.name||'').replace(/"/g, '""') + '",' + item.quantity + ',' + item.unit + ',' + (item.unit_cost||0) + ',"' + (item.currency_code||'') + '","' + (item.supplier_url||'') + '"\n';
-        });
-        zip.file('bill-of-materials.csv', csv);
-      }
-
-      // Build Instructions PDF — only if the project has authored
-      // any steps. Uses the same builder-renderer that powers the
-      // public viewer's per-step previews; rasterises each step to
-      // a PNG client-side then posts the bundle to the projects-api
-      // PDF endpoint. Failures don't abort the ZIP — we just skip
-      // the PDF and surface a console warning.
-      if (window.BuilderRenderer &&
-          typeof window.BuilderRenderer.exportInstructionsPdf === 'function') {
-        try {
-          btn.innerHTML =
-            '<i class="fas fa-spinner fa-spin me-2"></i> Rendering instructions PDF…';
-          var pdfBlob = await window.BuilderRenderer.exportInstructionsPdf(
-            project.id,
-            {
-              project_title: project.title,
-              steps_per_page: 1,
-              include_title_page: true,
-              onProgress: function (done, total) {
-                btn.innerHTML =
-                  '<i class="fas fa-spinner fa-spin me-2"></i>' +
-                  ' Rendering step ' + done + ' of ' + total + '…';
-              },
-            }
-          );
-          if (pdfBlob) {
-            zip.file('instructions.pdf', pdfBlob);
-          }
-        } catch (e) {
-          console.warn('[ZIP] PDF export skipped:', e);
-        }
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Packaging…';
-      }
-
-      var content = await zip.generateAsync({ type: 'blob' });
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(content);
-      a.download = slug + '.zip';
-      a.click();
-      URL.revokeObjectURL(a.href);
-
-    } catch (e) {
-      console.error('Download failed:', e);
-      alert('Failed to package project. Please try again.');
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = label;
-  }
-
   // The write-up as a PDF: a print-only copy of the title, details and
   // rendered document, printed with the browser's dialog (Save as PDF),
   // so the text stays selectable and the links keep working. The page's
   // title becomes the suggested file name.
-  async function downloadPdf(project) {
-    const stale = document.getElementById('kr-print-root');
-    if (stale) stale.remove();
+  // A copy of the title, details and the whole rendered write-up, for
+  // printing (downloadPdf) or drawing into the zip's PDF (pdfBlob).
+  function buildPrintCopy(project) {
     const root = document.createElement('div');
-    root.id = 'kr-print-root';
     root.className = 'kr-print';
 
     const head = document.createElement('header');
@@ -2039,7 +1946,55 @@ description: View project details
     foot.className = 'kr-print-foot';
     foot.innerHTML = 'From KevsRobots: <a href="' + url + '">' + esc(url) + '</a>';
     root.appendChild(foot);
+    return root;
+  }
 
+  function imagesLoaded(root) {
+    return Promise.race([
+      Promise.all(Array.from(root.querySelectorAll('img')).map(img => img.complete
+        ? null : new Promise(done => { img.onload = img.onerror = done; }))),
+      new Promise(done => setTimeout(done, 5000)),
+    ]);
+  }
+
+  // The write-up as a .pdf file, for the Download files zip: the same copy
+  // Download PDF prints, drawn with html2pdf (loaded on first use).
+  let html2pdfLoading = null;
+  function loadHtml2pdf() {
+    if (window.html2pdf) return Promise.resolve(window.html2pdf);
+    if (!html2pdfLoading) {
+      html2pdfLoading = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = () => resolve(window.html2pdf);
+        script.onerror = () => { html2pdfLoading = null; reject(new Error('Could not load the PDF library')); };
+        document.head.appendChild(script);
+      });
+    }
+    return html2pdfLoading;
+  }
+
+  async function pdfBlob(project) {
+    const html2pdf = await loadHtml2pdf();
+    const root = buildPrintCopy(project);
+    root.classList.add('kr-print-pdf');
+    // Left out of the page: html2pdf draws its own copy of it. scrollX/Y
+    // 0, or a scrolled page draws blank.
+    await imagesLoaded(root);
+    return html2pdf().set({
+      margin: [14, 12, 14, 12],
+      image: { type: 'jpeg', quality: 0.92 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['img', 'pre', 'table', 'figure', 'blockquote', '.callout', 'svg'] },
+    }).from(root).outputPdf('blob');
+  }
+
+  async function downloadPdf(project) {
+    const stale = document.getElementById('kr-print-root');
+    if (stale) stale.remove();
+    const root = buildPrintCopy(project);
+    root.id = 'kr-print-root';
     document.body.appendChild(root);
     document.body.classList.add('kr-printing');
     // Wait for the copy's images, so none prints blank.
