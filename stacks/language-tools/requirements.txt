@@ -4,4 +4,3 @@ pydantic==2.14.1
 pydantic-settings==2.16.0
 python-jose[cryptography]==3.5.0
 httpx==0.28.1
-anthropic==2.3.0
