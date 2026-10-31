@@ -261,6 +261,36 @@
     return picker;
   }
 
+  // ------------------------------------------------------------ galleries
+
+  const GALLERY_LAYOUTS = [
+    { layout: 'filmstrip', label: 'Filmstrip', detail: 'One large picture, the rest in a strip under it', icon: 'M2 2.5h12v8H2zM2 12.5h3v1.5H2zM6.5 12.5h3v1.5h-3zM11 12.5h3v1.5h-3z' },
+    { layout: 'bento', label: 'Bento', detail: 'A grid of tiles, the first one big', icon: 'M2 2.5h7v7H2zM10.5 2.5H14v3h-3.5zM10.5 7H14v2.5h-3.5zM2 11h12v2.5H2z' },
+    { layout: 'lightbox', label: 'Lightbox', detail: 'Even thumbnails that open full size', icon: 'M2 2.5h3.5V6H2zM6.25 2.5h3.5V6h-3.5zM10.5 2.5H14V6h-3.5zM2 7.5h3.5V11H2zM6.25 7.5h3.5V11h-3.5zM10.5 7.5H14V11h-3.5z' },
+  ];
+
+  // The block's Markdown: one picture per line, between its fences.
+  function galleryMarkdown(layout, images) {
+    const lines = images.map(img => {
+      const alt = img.caption || String(img.name || '').replace(/\.[^.]+$/, '');
+      return '![' + mdLinkText(alt) + '](' + img.url + ')';
+    });
+    return '::: gallery ' + layout + '\n' + lines.join('\n') + (lines.length ? '\n' : '') + ':::';
+  }
+
+  // With pictures the cursor ends after the block, so it shows as the
+  // gallery; without any it waits on the empty line inside for one.
+  function insertGallery(view, heading, layout, images) {
+    if (images.length) {
+      insertAtCursor(view, heading + galleryMarkdown(layout, images), true);
+      return;
+    }
+    const open = heading + '::: gallery ' + layout + '\n';
+    insertAtCursor(view, open + '\n:::', true);
+    const at = view.state.doc.toString().lastIndexOf(open, view.state.selection.main.head) + open.length;
+    if (at >= open.length) view.dispatch({ selection: { anchor: at }, scrollIntoView: true });
+  }
+
   // ------------------------------------------------------------ commands
 
   // The commands for MarkdownEditor's `slashCommands` option.
@@ -268,6 +298,7 @@
   //   ctx.modelFiles()  the files already loaded (sync), for 3D printed parts
   //   ctx.uploadFile()  asks for a file, uploads it, resolves to { name, url } or null
   //   ctx.listVideos()  resolves to the project's videos: { id, title }
+  //   ctx.listImages()  resolves to the project's gallery pictures: { url, name, caption }
   //   ctx.listParts()   resolves to the BOM: { name, url (catalog page or null), detail }
   //   ctx.searchParts(q), ctx.createPart(name)   the parts catalog, see partPicker
   //   ctx.diagrams()    resolves to the Mermaid starters, [{ label, detail, md }]
@@ -341,6 +372,30 @@
           } : null;
         },
         load: async () => [],
+      });
+    }
+
+    // Gallery asks for a layout, then writes a `::: gallery <layout>` block
+    // of every picture in the project's gallery, in its order. Choosing and
+    // ordering is then deleting and moving lines (ProjectGallery,
+    // project-gallery.js). Its heading goes in once; later picks add just
+    // another block, so it is never hidden.
+    const gallery = sections.find(c => c.id === 'section-gallery');
+    if (gallery) {
+      delete gallery.insert;
+      gallery.hidden = () => false;
+      gallery.run = view => openPicker(view, {
+        placeholder: 'Choose a gallery layout…',
+        load: async () => GALLERY_LAYOUTS.map(l => ({
+          label: l.label,
+          detail: l.detail,
+          icon: l.icon,
+          pick: async () => {
+            const images = ctx.listImages ? await ctx.listImages().catch(() => []) : [];
+            const heading = sectionsIn(view.state).has('gallery') ? '' : '# ' + window.ProjectSections.get('gallery').heading + '\n\n';
+            insertGallery(view, heading, l.layout, images);
+          },
+        })),
       });
     }
 
@@ -600,5 +655,5 @@
     }
   }
 
-  window.ProjectSlashCommands = { create, openPicker, partPicker, partLink, insertAtCursor, bomTableParts, isTotalRow };
+  window.ProjectSlashCommands = { create, openPicker, partPicker, partLink, insertAtCursor, bomTableParts, isTotalRow, galleryMarkdown };
 })();

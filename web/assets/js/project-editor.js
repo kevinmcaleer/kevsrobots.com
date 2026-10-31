@@ -841,6 +841,10 @@
         input.click();
       }),
       listVideos: async () => (await getJson('/videos')).map(v => ({ id: v.youtube_id, title: v.title })),
+      // The gallery's pictures, in its order, for a new `::: gallery` block.
+      listImages: async () => (await fetchProjectImages()).map(img => ({
+        url: imageViewUrl(img), name: img.filename, caption: img.caption || '',
+      })),
       listParts: async () => (await getJson('/bom')).filter(item => item.name).map(item => ({
         name: item.name,
         url: item.part_slug ? '/parts/view.html?slug=' + encodeURIComponent(item.part_slug) : null,
