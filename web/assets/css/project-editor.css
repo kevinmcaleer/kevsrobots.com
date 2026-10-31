@@ -873,6 +873,30 @@ a.part-link:hover,
   object-fit: cover;
   border-radius: 6px;
 }
+/* The card's button to the part's own page (opens in a new tab). */
+.part-link-card a.part-link-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border: 1px solid #1f5f2a;
+  border-radius: 6px;
+  color: #1f5f2a;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.part-link-card a.part-link-open::after {
+  content: "\2197";
+  font-weight: 400;
+}
+.part-link-card a.part-link-open:hover,
+.part-link-card a.part-link-open:focus {
+  background: #1f5f2a;
+  color: #fff;
+  outline: none;
+}
 
 /* Right-clicking a part link in the editor. */
 .part-link-menu {
