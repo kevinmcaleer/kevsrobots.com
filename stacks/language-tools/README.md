@@ -29,19 +29,24 @@ grammar rules.
 | `LANGUAGETOOL_URL` | empty (grammar off) | Set to `http://127.0.0.1:8010` by the compose file |
 | `WORDNET_DIR` | `/usr/share/wordnet` in the image | WordNet's `dict/` files |
 | `LIBRETRANSLATE_URL`, `LIBRETRANSLATE_API_KEY` | empty (off) | Optional translation |
-| `CORS_ORIGINS` | `https://www.kevsrobots.com,http://localhost:4000` | Origins allowed to call with credentials |
+| `CORS_ORIGINS` | `https://www.kevsrobots.com,https://kevsrobots.com,http://localhost:4000,http://local.kevsrobots.com:4000` | Origins allowed to call with credentials |
 | `CHECK_PER_MINUTE`, `LOOKUP_PER_MINUTE`, `TRANSLATE_PER_MINUTE` | 30, 120, 20 | Per-user limits; 0 turns a limit off |
 | `LANGUAGE_TUNNEL_TOKEN` | | The Cloudflare tunnel for `language.kevsrobots.com` |
 
 ## Deploy
 
-1. Nothing to build by hand: `docker compose up -d --build` (step 3) builds
+1. Nothing to build by hand: `docker compose up -d --build` (step 4) builds
    the image. `docker compose push language-tools` publishes it to the registry.
 2. In Cloudflare Zero Trust, create a tunnel (or add a public hostname to the
    Projects API's tunnel) for `language.kevsrobots.com` → `http://localhost:8310`.
    If you reuse the Projects API's tunnel, drop the `cloudflared` service here.
-3. `docker compose up -d --build`. LanguageTool takes
+3. `cp .env.example .env` and fill in `JWT_SECRET` and `LANGUAGE_TUNNEL_TOKEN`.
+4. `docker compose up -d --build`. LanguageTool takes
    a minute or so to start, and uses about 1 GB of memory.
+5. Check it: `curl http://127.0.0.1:8310/health` on the server, then
+   `curl -i -H 'Origin: http://local.kevsrobots.com:4000' https://language.kevsrobots.com/api/language`
+   from anywhere (a 401 with `access-control-allow-origin` is right when
+   signed out; a Cloudflare 530/1033 means the tunnel isn't connected).
 
 The editor's base URL is `LANGUAGE_API` in `web/assets/js/project-editor.js`.
 
