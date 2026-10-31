@@ -190,8 +190,15 @@
         list.appendChild(row);
       });
       input.setAttribute('aria-activedescendant', listId + '-' + active);
+      // Scroll the list, never the page: scrollIntoView would also move
+      // the page (and the cell being edited) to show the row.
       const row = list.children[active];
-      if (row && row.scrollIntoView) row.scrollIntoView({ block: 'nearest' });
+      if (row && row.getBoundingClientRect) {
+        const r = row.getBoundingClientRect();
+        const b = list.getBoundingClientRect();
+        if (r.top < b.top) list.scrollTop -= b.top - r.top;
+        else if (r.bottom > b.bottom) list.scrollTop += r.bottom - b.bottom;
+      }
     }
 
     async function choose(i) {
@@ -548,8 +555,14 @@
   //   ctx.searchParts(q)     resolves to catalog parts: { name, slug, url, thumb, detail }
   //   ctx.createPart(name)   adds one, resolving to { name, slug, url }, or null
   //   ctx.browseCatalog(view, q)  opens the full catalog (with opts.browse)
+  //
+  // In the Bill of Materials table itself the picker offers only the
+  // catalog: its own rows are what's being linked or added, so listing
+  // them would only suggest the row back to itself.
   function partPicker(view, ctx, pick, opts) {
     const key = p => (p.slug ? 'slug:' + p.slug : 'name:' + p.name.toLowerCase());
+    const inBom = inBomTable(view.state.doc.toString(), view.state.doc.lineAt(view.state.selection.main.head).number - 1);
+    const catalogOnly = (opts && opts.catalogOnly) || inBom;
     const item = p => ({
       key: key(p),
       label: p.name,
@@ -563,7 +576,7 @@
       placeholder: (opts && opts.placeholder) || 'Find a part…',
       empty: 'Type to search the parts catalog',
       load: async () => {
-        if (opts && opts.catalogOnly) return [];
+        if (catalogOnly) return [];
         // The Bill of Materials table in the text, then the structured
         // BOM rows it doesn't already name.
         const parts = bomTableParts(view.state.doc.toString());
@@ -614,6 +627,15 @@
     return /^\*\*total\*\*$/i.test((row[0] || '').trim());
   }
 
+  // Whether line (from 0) is in the Bill of Materials table, its header
+  // and divider included.
+  function inBomTable(markdown, line) {
+    const table = window.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return false;
+    const last = table.lines.length ? table.lines[table.lines.length - 1] : table.headerLine + 1;
+    return line >= table.headerLine && line <= last;
+  }
+
   function bomTableParts(markdown) {
     const table = window.ProjectSections.sectionTable(markdown, 'bill-of-materials');
     if (!table) return [];
@@ -661,5 +683,5 @@
     }
   }
 
-  window.ProjectSlashCommands = { create, openPicker, partPicker, partLink, insertAtCursor, bomTableParts, isTotalRow, galleryMarkdown };
+  window.ProjectSlashCommands = { create, openPicker, partPicker, partLink, insertAtCursor, bomTableParts, inBomTable, isTotalRow, galleryMarkdown };
 })();
