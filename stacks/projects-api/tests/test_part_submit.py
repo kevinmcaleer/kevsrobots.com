@@ -118,6 +118,21 @@ async def test_sender_can_add_photos_and_edit_while_pending(client) -> None:
         headers=make_auth_header("newbie"),
     )
     assert edit.status_code == 200, edit.text
+    pins = await client.put(
+        f"/api/parts/{slug}/definition",
+        json={"headers": [{"id": "h1", "pins": [{"number": 1, "name": "VIN"}]}]},
+        headers=make_auth_header("newbie"),
+    )
+    assert pins.status_code == 200, pins.text
+    model = await client.post(
+        f"/api/parts/{slug}/mesh",
+        files={"file": ("ubec.stl", b"solid ubec\nendsolid ubec\n", "model/stl")},
+        headers=make_auth_header("newbie"),
+    )
+    assert model.status_code == 200, model.text
+    assert model.json()["has_mesh"] is True
+    gone = await client.delete(f"/api/parts/{slug}/mesh", headers=make_auth_header("newbie"))
+    assert gone.status_code == 200, gone.text
 
 
 @pytest.mark.asyncio
@@ -142,6 +157,12 @@ async def test_new_account_cannot_edit_others_parts(client, monkeypatch) -> None
         headers=make_auth_header("newcomer"),
     )
     assert photo.status_code == 403
+    model = await client.post(
+        f"/api/parts/{slug}/mesh",
+        files={"file": ("x.stl", b"solid x\nendsolid x\n", "model/stl")},
+        headers=make_auth_header("newcomer"),
+    )
+    assert model.status_code == 403
     # Once approved, the sender is a new account editing a catalog part: held back too.
     ok = await client.post(f"/api/admin/parts/{slug}/approve", headers=make_auth_header("admin"))
     assert ok.status_code == 200

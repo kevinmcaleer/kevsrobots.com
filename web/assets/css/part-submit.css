@@ -299,6 +299,22 @@ body.part-submit-open {
 .part-submit-status.is-error {
   color: var(--danger);
 }
+/* After the part is added: the step to its pins and 3-D model. */
+.part-submit-next {
+  margin: 0.25rem 0 1rem;
+}
+.part-submit-next-title {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+}
+.part-submit-next-text {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.part-submit-next.is-error .part-submit-next-text {
+  color: var(--danger);
+}
 .part-submit-foot {
   display: flex;
   justify-content: flex-end;
