@@ -1516,13 +1516,16 @@ async def upload_mesh(
     slug: str,
     file: UploadFile,
     change_summary: Optional[str] = Query(None, max_length=200),
-    user: str = Depends(require_terms_accepted_aged),
+    writer: PartWriter = Depends(require_part_writer),
     session: AsyncSession = Depends(get_session),
 ) -> PartDetail:
     """Attach a 3-D model (STL, GLB or OBJ) to the part, as a revision
     (issue #269). Earlier files stay in storage, so restoring an older
-    revision brings its model back."""
+    revision brings its model back. Like its pins, a part's sender may add
+    its model while the part waits for review."""
     part = await _get_part_by_slug(session, slug)
+    writer.check_part(part)
+    user = writer.username
     name = file.filename or ""
     ext = ("." + name.rsplit(".", 1)[-1].lower()) if "." in name else ""
     if ext not in MESH_UPLOAD_EXTENSIONS:
@@ -1545,11 +1548,13 @@ async def upload_mesh(
 @router.delete("/{slug}/mesh", response_model=PartDetail)
 async def remove_mesh(
     slug: str,
-    user: str = Depends(require_terms_accepted_aged),
+    writer: PartWriter = Depends(require_part_writer),
     session: AsyncSession = Depends(get_session),
 ) -> PartDetail:
     """Detach the part's 3-D model, as a revision (the file is kept)."""
     part = await _get_part_by_slug(session, slug)
+    writer.check_part(part)
+    user = writer.username
     if not part.mesh_file_path:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No mesh for this part")
     next_spec = spec_values(part)

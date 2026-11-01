@@ -248,7 +248,7 @@
         resolve(result);
       }
       function onKey(e) {
-        if (e.key === 'Escape' && !busy) { e.preventDefault(); e.stopPropagation(); finish(null); }
+        if (e.key === 'Escape' && !busy) { e.preventDefault(); e.stopPropagation(); finish(made); }
         else if (e.key === 'Tab') {
           const f = [...dialog.querySelectorAll('input:not([hidden]), select, textarea, button, summary, [tabindex="0"]')].filter(x => !x.disabled && x.offsetParent);
           if (!f.length) return;
@@ -257,9 +257,10 @@
         }
       }
       document.addEventListener('keydown', onKey, true);
-      close.addEventListener('click', () => !busy && finish(null));
-      cancel.addEventListener('click', () => !busy && finish(null));
-      overlay.addEventListener('mousedown', e => { if (e.target === overlay && !busy) finish(null); });
+      // Once the part is made, closing the dialog any way still hands it back.
+      close.addEventListener('click', () => !busy && finish(made));
+      cancel.addEventListener('click', () => !busy && finish(made));
+      overlay.addEventListener('mousedown', e => { if (e.target === overlay && !busy) finish(made); });
 
       function say(text, bad) {
         status.textContent = text || '';
@@ -356,6 +357,30 @@
       name.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(findMatches, 250); });
       findMatches();
 
+      // --- after it's added: pins and a 3-D model
+      function showNext(part, failed) {
+        const next = el('div', 'part-submit-next');
+        next.appendChild(el('p', 'part-submit-next-title', '“' + part.name + '” is added.'));
+        next.appendChild(el('p', 'part-submit-next-text', failed.length
+          ? failed.length + ' of the pictures could not be uploaded (' + failed[0] + '). You can add them on the part’s page.'
+          : 'Next, place its pins on the picture and say what each one does, and add a 3-D model if you have one. That lets everyone wire it up, here and in Snakie.'));
+        next.classList.toggle('is-error', !!failed.length);
+        const go = el('a', 'btn btn-outline-primary part-submit-next-go');
+        go.href = electronicsUrl(part.slug);
+        go.target = '_blank';
+        go.rel = 'noopener';
+        go.innerHTML = '<i class="fas fa-microchip me-1" aria-hidden="true"></i> Add pins and a 3-D model';
+        go.addEventListener('click', () => setTimeout(() => finish(made), 0));
+        next.appendChild(go);
+        [...dialog.children].forEach(c => { if (c !== head && c !== foot) c.style.display = 'none'; });
+        dialog.insertBefore(next, foot);
+        save.disabled = false;
+        save.textContent = 'Done';
+        cancel.hidden = true;
+        title.textContent = 'Part added';
+        go.focus();
+      }
+
       // --- send it
       dialog.addEventListener('submit', async e => {
         e.preventDefault();
@@ -413,16 +438,12 @@
               failed.push(err.message || String(err));
             }
           }
-          if (!failed.length) { finish(result); return; }
-          // The part is made; say which pictures didn't make it, then let them go on.
+          // The part is made. Next: its pins and 3-D model, which Snakie's
+          // Part Editor on the part's Electronics tab does (in a new tab, so
+          // the project stays open). Say which pictures didn't make it.
           busy = false;
-          say('“' + part.name + '” was added, but ' + failed.length + ' of the pictures could not be uploaded (' + failed[0] + '). You can add them on the part’s page.', true);
-          save.disabled = false;
-          save.textContent = 'Done';
-          cancel.hidden = true;
-          close.disabled = true;
-          dialog.querySelectorAll('input, select, textarea').forEach(x => { x.disabled = true; });
           made = result;
+          showNext(part, failed);
         } catch (err) {
           busy = false;
           save.disabled = cancel.disabled = false;
@@ -433,7 +454,13 @@
     });
   }
 
-  const api = { open, payload, imageLinks, hostName, errorText };
+  // The part's Electronics tab: Snakie's Part Editor (pins, pin types, the
+  // symbol) and its 3-D model upload.
+  function electronicsUrl(slug) {
+    return '/parts/edit.html?slug=' + encodeURIComponent(slug) + '&tab=electronics';
+  }
+
+  const api = { open, payload, imageLinks, hostName, errorText, electronicsUrl };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.PartSubmit = api;
 })(typeof window !== 'undefined' ? window : globalThis);
