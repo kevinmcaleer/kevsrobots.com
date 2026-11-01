@@ -1070,7 +1070,15 @@
       },
       bomRows: () => {
         const parsed = BomSync.parse(view.state.doc.toString());
-        return parsed ? parsed.rows.map(r => ({ name: r.name, slug: r.part_slug })) : [];
+        return parsed ? parsed.rows.map(r => ({ name: r.name, slug: r.part_slug, qty: r.quantity })) : [];
+      },
+      setBomQty: (slug, qty) => {
+        const edit = BomSync.setRowQty(view.state.doc.toString(), slug, qty);
+        if (!edit) return false;
+        const line = view.state.doc.line(edit.line + 1);
+        if (line.text !== edit.text) view.dispatch({ changes: { from: line.from, to: line.to, insert: edit.text }, userEvent: 'input' });
+        scheduleBomTotals();
+        return true;
       },
       linkBomRow: (name, part) => linkBomRow(view, name, part),
       createPart: createCatalogPart,

@@ -49,7 +49,8 @@ test('entries: every row once, with its state', () => {
   assert.deepEqual(e.map(x => x.name), ['Pico', 'LED', 'TT Motor', 'Gaffer tape', 'Gone']);
   assert.equal(e[0].isTheBoard, true);
   assert.equal(e[0].onCanvas, true);
-  assert.equal(e[1].onCanvas, true);
+  // Two rows for the LED: two wanted, one placed.
+  assert.deepEqual([e[1].qty, e[1].placed, e[1].left, e[1].onCanvas], [2, 1, 1, false]);
   assert.equal(e[2].pins, false);
   assert.equal(e[2].onCanvas, false);
   assert.equal(e[3].linked, false);
@@ -71,6 +72,68 @@ test('relink swaps a placeholder in place and drops its wires', () => {
   assert.equal(next.parts[1], robot.parts[1]);
   assert.deepEqual(next.connections.map(c => c.id), ['w2']);
   assert.equal(W.relink(robot, W.BOM_LIB, 'row-nothing', 'kevsrobots', 'x'), robot);
+});
+
+test('entries count copies against the Qty', () => {
+  const servo = { id: 'sg90', name: 'SG90', headers: pins(3) };
+  const rows = [
+    { name: 'SG90', slug: 'sg90', qty: 4 },
+    { name: 'TT Motor', slug: 'tt-motor', qty: 2 },
+    { name: 'Wheels', slug: null, qty: 4 },
+    { name: 'LED', slug: 'led', qty: 1 },
+  ];
+  const at = (id, lib, part) => ({ id, lib, part });
+  const robot = { parts: [
+    at('sg90', 'kevsrobots', 'sg90'), at('sg902', 'kevsrobots', 'sg90'),
+    at('tt-motor', 'kevsrobots', 'tt-motor'),
+    at('row-wheels', W.BOM_LIB, 'row-wheels'),
+    at('led', 'kevsrobots', 'led'), at('led2', 'kevsrobots', 'led'),
+  ], connections: [] };
+  const e = W.entries(rows, robot, new Map([['sg90', servo], ['tt-motor', motor], ['led', led]]));
+  const pick = x => [x.qty, x.placed, x.left, x.onCanvas];
+  assert.deepEqual(pick(e[0]), [4, 2, 2, false]);
+  // Cards: one is enough to be done, but the Qty still allows more.
+  assert.deepEqual(pick(e[1]), [2, 1, 1, true]);
+  assert.deepEqual(pick(e[2]), [4, 1, 3, true]);
+  // More than the Qty.
+  assert.deepEqual(pick(e[3]), [1, 2, 0, true]);
+  assert.deepEqual(W.overQty(e), [{ slug: 'led', name: 'LED', qty: 1, placed: 2 }]);
+  // No Qty (or nonsense) is one.
+  assert.equal(W.entries([{ name: 'LED', slug: 'led', qty: 'x' }], { parts: [] }, new Map())[0].qty, 1);
+  // The board counts as one placed.
+  const b = W.entries([{ name: 'Pico', slug: 'pico', qty: 2 }], { board: 'pico', parts: [] }, new Map([['pico', pico]]))[0];
+  assert.deepEqual(pick(b), [2, 1, 1, false]);
+});
+
+test('copyLabels numbers copies of a part', () => {
+  const empty = { parts: [], connections: [] };
+  assert.deepEqual(W.copyLabels(empty, 'kevsrobots', 'sg90', 'SG90', 1), { robot: empty, labels: ['SG90'] });
+  assert.deepEqual(W.copyLabels(empty, 'kevsrobots', 'sg90', 'SG90', 3).labels, ['SG90 1', 'SG90 2', 'SG90 3']);
+  // The plain first copy becomes "SG90 1".
+  const one = { parts: [{ id: 'sg90', lib: 'kevsrobots', part: 'sg90', label: 'SG90' }, { id: 'led', lib: 'kevsrobots', part: 'led', label: 'LED' }] };
+  const r = W.copyLabels(one, 'kevsrobots', 'sg90', 'SG90', 2);
+  assert.deepEqual(r.labels, ['SG90 2', 'SG90 3']);
+  assert.equal(r.robot.parts[0].label, 'SG90 1');
+  assert.equal(r.robot.parts[1], one.parts[1]);
+  assert.equal(one.parts[0].label, 'SG90');
+  // Gaps are filled; renamed copies are left alone; odd characters in names.
+  const gaps = { parts: [
+    { id: 'a', lib: 'l', part: 'p', label: 'M (x) 1' },
+    { id: 'b', lib: 'l', part: 'p', label: 'M (x) 3' },
+    { id: 'c', lib: 'l', part: 'p', label: 'Left wheel' },
+  ] };
+  const g = W.copyLabels(gaps, 'l', 'p', 'M (x)', 2);
+  assert.equal(g.robot, gaps);
+  assert.deepEqual(g.labels, ['M (x) 2', 'M (x) 4']);
+});
+
+test('relink numbers several copies', () => {
+  const robot = { parts: [
+    { id: 'a', lib: W.BOM_LIB, part: 'row-servo', label: 'Servo 1' },
+    { id: 'b', lib: W.BOM_LIB, part: 'row-servo', label: 'Servo 2' },
+  ], connections: [] };
+  const next = W.relink(robot, W.BOM_LIB, 'row-servo', 'kevsrobots', 'sg90', 'SG90');
+  assert.deepEqual(next.parts.map(p => p.label), ['SG90 1', 'SG90 2']);
 });
 
 test('linkedSince finds placeholders whose row is linked now', () => {

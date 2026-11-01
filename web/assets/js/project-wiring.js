@@ -150,7 +150,9 @@
   //   projectId()           the project's id, saving it first if it's new
   //   markdown()            the document's text
   //   bomSlugs()            the catalog slugs the BOM table links, in order
-  //   bomRows()             every BOM row as [{ name, slug|null }], in order
+  //   bomRows()             every BOM row as [{ name, slug|null, qty }], in order
+  //   setBomQty(slug, qty)  sets the Qty of the row linking `slug`; false when
+  //                         the table has no such row or no Qty column
   //   linkBomRow(name, part) links the unlinked row `name` to part { name, slug } in the
   //                         BOM table; false when the table was left alone
   //   createPart(name, origin)  opens the "New part" dialog for the row `name`;
@@ -351,10 +353,11 @@
         emptyHint: 'Add parts from the Bill of Materials list, or with Add parts.',
         onChange: () => markDirty(),
       });
-      // A new wiring starts with the BOM's parts that have pins.
+      // A new wiring starts with the BOM's parts that have pins, as many
+      // of each as its Qty says.
       if (fresh) {
-        const place = parts.filter(d => d.id !== robot.board && hasPins(d));
-        if (place.length) handle.addParts(place.map(part => ({ libraryId: LIB, part })));
+        const list = WiringBom.entries(ctx.bomRows(), robot, new Map(parts.map(d => [d.id, d])));
+        addCopies(list.filter(e => e.linked && e.pins && e.left > 0 && e.def).map(e => ({ e, n: e.left })));
         dirty = false;
         status(ctx.bomRows().length ? '' : 'Add parts here, and they go in the Bill of Materials too.');
       }
@@ -385,17 +388,36 @@
       const parts = [];
       for (const { lib, def } of items) {
         if (boardFree && lib === LIB && isBoard(def) && hasPins(def)) { handle.setBoard(def.id); boardFree = false; continue; }
-        parts.push({ libraryId: lib, part: def });
+        parts.push({ lib, def });
       }
-      if (parts.length) handle.addParts(parts);
+      if (!parts.length) return;
+      // Copies of one part are numbered ("Servo 1", "Servo 2"…), so the
+      // canvas and the pinout table can tell them apart.
+      let next = handle.robot();
+      const out = [];
+      const groups = new Map();
+      parts.forEach(p => { const k = p.lib + '/' + p.def.id; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); });
+      for (const group of groups.values()) {
+        const { lib, def } = group[0];
+        const named = WiringBom.copyLabels(next, lib, def.id, def.name, group.length);
+        next = named.robot;
+        named.labels.forEach(label => out.push({ libraryId: lib, part: label === def.name ? def : Object.assign({}, def, { name: label }) }));
+      }
+      if (next !== handle.robot()) handle.setRobot(next);
+      handle.addParts(out);
     }
 
     function entryDef(e) {
       return e.lib === BOM_LIB ? bomLibrary.parts.find(d => d.id === e.part) : defOf(e.slug);
     }
 
-    function addEntries(list) {
-      const items = list.map(e => ({ lib: e.lib, def: entryDef(e) })).filter(i => i.def);
+    // [{ e, n }]: n more copies of each BOM entry e on the canvas.
+    function addCopies(list) {
+      const items = [];
+      for (const { e, n } of list) {
+        const def = entryDef(e);
+        for (let i = 0; def && i < n; i++) items.push({ lib: e.lib, def });
+      }
       if (items.length) place(items);
     }
 
@@ -526,15 +548,26 @@
       const list = WiringBom.entries(rows, robot, new Map(library.parts.map(d => [d.id, d])));
       const count = overlay.querySelector('[data-bom-count]');
       if (count) count.textContent = list.length ? list.filter(e => e.onCanvas).length + '/' + list.length : '';
-      const waiting = list.filter(e => !e.onCanvas);
+      // What "Add all" puts on: every copy the Qty asks for of a part with
+      // pins, one card for a row with nothing on the canvas yet.
+      const waiting = list.filter(e => !e.onCanvas && (e.def || !e.linked)).map(e => ({ e, n: e.pins ? e.left : 1 }));
+      const waitingCount = waiting.reduce((n, w) => n + w.n, 0);
       const thumb = e => {
         const d = entryDef(e);
         const src = d && d.imageData && (e.linked || e.lib === BOM_LIB) ? d.imageData : '';
         return src ? '<img src="' + esc(src) + '" alt="">' : '<i class="fas fa-microchip" aria-hidden="true"></i>';
       };
       const state = e => {
-        if (e.isTheBoard) return '<span class="wb-state is-board"><i class="fas fa-check"></i> The board</span>';
-        const placed = e.onCanvas ? '<i class="fas fa-check"></i> On the canvas' : '';
+        if (e.isTheBoard && e.qty === 1) return '<span class="wb-state is-board"><i class="fas fa-check"></i> The board</span>';
+        // With a Qty over 1 (or more on the canvas than the Qty), the count.
+        const counted = e.qty > 1 || e.placed > e.qty;
+        const tick = e.onCanvas ? '<i class="fas fa-check"></i> ' : '';
+        const placed = !e.placed ? ''
+          : !counted ? tick + 'On the canvas'
+          : e.placed > e.qty ? '<i class="fas fa-triangle-exclamation"></i> ' + e.placed + ' on the canvas, Qty ' + e.qty
+          : tick + e.placed + ' of ' + e.qty + ' on the canvas' + (e.isTheBoard ? ' (one is the board)' : '');
+        if (e.placed > e.qty && e.pins) return '<span class="wb-state is-nopins">' + placed + '</span>';
+        if (!e.placed && counted && e.pins) return '<span class="wb-state">Qty ' + e.qty + '</span>';
         const why = !e.linked ? 'not linked' : !e.def ? 'not in the catalog' : !e.pins ? 'no pins yet' : '';
         if (!why) return placed ? '<span class="wb-state is-placed">' + placed + '</span>' : '';
         const cls = e.linked && e.def ? 'is-nopins' : 'is-unlinked';
@@ -542,9 +575,14 @@
       };
       const acts = (e, i) => {
         const out = [];
-        if (!e.onCanvas && (e.def || !e.linked)) {
+        if (e.left > 0 && (e.def || !e.linked)) {
           const asBoard = e.board && e.pins && !robot.board;
-          out.push('<button type="button" class="btn btn-sm btn-outline-primary" data-bom-add="' + i + '">' + (asBoard ? 'Add as board' : 'Add') + '</button>');
+          const label = asBoard ? 'Add as board' : e.placed ? 'Add another' : 'Add';
+          const title = e.qty > 1 ? ' title="Puts one more on the canvas: ' + e.left + ' of ' + e.qty + ' to go"' : '';
+          out.push('<button type="button" class="btn btn-sm btn-outline-primary" data-bom-add="' + i + '"' + title + '>' + label + '</button>');
+          if (e.pins && e.left > 1 && !asBoard) {
+            out.push('<button type="button" class="btn btn-sm btn-outline-primary" data-bom-addall="' + i + '" title="Puts all ' + e.left + ' on the canvas">+' + e.left + '</button>');
+          }
         }
         if (!e.linked) {
           out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-link="' + i + '"><i class="fas fa-link me-1"></i>Link…</button>');
@@ -567,7 +605,7 @@
       const unlinked = list.filter(e => !e.linked).length;
       box.innerHTML =
         '<div class="wb-head"><strong>Bill of Materials</strong>' +
-        (waiting.length > 1 ? '<button type="button" class="btn btn-sm btn-link p-0 ms-auto" data-bom-all>Add all ' + waiting.length + '</button>' : '') +
+        (waitingCount > 1 ? '<button type="button" class="btn btn-sm btn-link p-0 ms-auto" data-bom-all>Add all ' + waitingCount + '</button>' : '') +
         '</div>' +
         (list.length || strayBoard
           ? '<ul class="wb-list">' + strayBoard + list.map((e, i) =>
@@ -576,10 +614,11 @@
               '<span class="wb-acts">' + acts(e, i) + '</span></li>').join('') + '</ul>'
           : '<p class="wb-empty">The Bill of Materials is empty. Parts you add here go into it.</p>') +
         (unlinked ? '<p class="wb-foot"><strong>Link…</strong> a row to its part in the catalog to give it pins and a photo. Not in the catalog? <i class="fas fa-plus"></i> adds it as a new part, for everyone to use.</p>' : '');
-      box.querySelectorAll('[data-bom-add]').forEach(b => b.addEventListener('click', () => addEntries([list[+b.dataset.bomAdd]])));
+      box.querySelectorAll('[data-bom-add]').forEach(b => b.addEventListener('click', () => addCopies([{ e: list[+b.dataset.bomAdd], n: 1 }])));
+      box.querySelectorAll('[data-bom-addall]').forEach(b => b.addEventListener('click', () => { const e = list[+b.dataset.bomAddall]; addCopies([{ e, n: e.left }]); }));
       box.querySelectorAll('[data-bom-link]').forEach(b => b.addEventListener('click', ev => pickLink(list[+b.dataset.bomLink], ev.currentTarget)));
       const all = box.querySelector('[data-bom-all]');
-      if (all) all.addEventListener('click', () => addEntries(waiting.filter(e => e.def || !e.linked)));
+      if (all) all.addEventListener('click', () => addCopies(waiting));
       const unboard = box.querySelector('[data-bom-unboard]');
       if (unboard) unboard.addEventListener('click', () => {
         if (window.confirm('Take the board off the wiring? Its wires go too.')) handle.setBoard(null);
@@ -672,6 +711,13 @@
           if (window.confirm('Remove ' + names.join(', ') + ' from the Bill of Materials too?')) ctx.removeBomRows(gone);
         }
         startSlugs = now;
+        // More of a part on the canvas than its Qty: offer to raise it.
+        const over = WiringBom.overQty(WiringBom.entries(ctx.bomRows(), data, new Map(library.parts.map(d => [d.id, d]))));
+        if (over.length && window.confirm('The wiring has more than the Bill of Materials lists:\n' +
+            over.map(o => '\u2022 ' + o.name + ': ' + o.placed + ' on the canvas, Qty ' + o.qty).join('\n') +
+            '\n\nRaise the Qty in the table to match?')) {
+          over.forEach(o => ctx.setBomQty(o.slug, o.placed));
+        }
         drawBom();
         const pin = ctx.hasPinout() ? ctx.wiringSaved(PinoutSync.fromGenerated(handle.pinoutMarkdown())) : null;
         status(pin && pin.stale
