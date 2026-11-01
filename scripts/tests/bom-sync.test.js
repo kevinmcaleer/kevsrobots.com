@@ -276,6 +276,19 @@ test('catalogPrice prefers a shop in the table currency, then the cheapest', () 
   assert.equal(BomSync.catalogPrice(shops.slice(3), 'GBP'), null);
 });
 
+test('setRowQty writes the Qty cell of the linked row', () => {
+  const md = pricedDoc();
+  const lines = md.split('\n');
+  const sg = lines.findIndex(l => l.includes('slug=sg90'));
+  assert.deepEqual(BomSync.setRowQty(md, 'sg90', 4), {
+    line: sg, text: lines[sg].replace('| 2 |', '| 4 |'),
+  });
+  assert.equal(BomSync.setRowQty(md, 'nope', 4), null);
+  assert.equal(BomSync.setRowQty(doc('| Part | Price |\n| --- | --- |\n| [Pico](/parts/view.html?slug=pico) | £4 |'), 'pico', 2), null);
+  assert.equal(BomSync.setRowQty(doc('| Part | Quantity |\n| --- | --- |\n| [Pico](/parts/view.html?slug=pico) |  |'), 'pico', 2).text,
+    '| [Pico](/parts/view.html?slug=pico) | 2 |');
+});
+
 test('setRowPrice writes the price cell and adds a note', () => {
   const md = pricedDoc();
   const lines = md.split('\n');

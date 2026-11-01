@@ -101,12 +101,22 @@
   }
 
   // The rows the panel lists, one per distinct part, in BOM order:
-  //   { name, slug, lib, part, def, linked, pins, board, onCanvas, isTheBoard }
-  // `rows` is [{ name, slug }] from the BOM table, `defs` a Map of slug ->
+  //   { name, slug, lib, part, def, linked, pins, board, isTheBoard,
+  //     qty, placed, left, onCanvas }
+  // `rows` is [{ name, slug, qty }] from the BOM table (qty defaults to 1;
+  // two rows for the same part add up), `defs` a Map of slug ->
   // PartDefinition (or null when the catalog doesn't have it).
+  // `placed` counts that part on the canvas (the board counts as one) and
+  // `left` how many more the Qty allows. `onCanvas` is whether the row is
+  // done: every one of a part with pins, since each gets wired; for a card
+  // (unlinked, or no pins yet) one is enough, though more can go on.
   function entries(rows, robot, defs) {
-    const placed = new Set((robot.parts || []).map(p => p.lib + '/' + p.part));
-    const seen = new Set();
+    const placedCount = new Map();
+    for (const p of robot.parts || []) {
+      const key = p.lib + '/' + p.part;
+      placedCount.set(key, (placedCount.get(key) || 0) + 1);
+    }
+    const byKey = new Map();
     const out = [];
     for (const r of rows) {
       const def = r.slug ? defs.get(r.slug) || null : null;
@@ -114,10 +124,10 @@
       const lib = linked ? 'kevsrobots' : BOM_LIB;
       const part = linked ? r.slug : placeholderId(r.name);
       const key = lib + '/' + part;
-      if (seen.has(key)) continue;
-      seen.add(key);
+      const qty = Math.max(1, parseInt(r.qty, 10) || 1);
+      if (byKey.has(key)) { byKey.get(key).qty += qty; continue; }
       const isTheBoard = linked && robot.board === r.slug;
-      out.push({
+      const e = {
         name: r.name,
         slug: r.slug || null,
         lib,
@@ -127,28 +137,76 @@
         pins: hasPins(def),
         board: isBoard(def),
         isTheBoard,
-        onCanvas: isTheBoard || placed.has(key),
-      });
+        qty,
+        placed: (placedCount.get(key) || 0) + (isTheBoard ? 1 : 0),
+      };
+      byKey.set(key, e);
+      out.push(e);
+    }
+    for (const e of out) {
+      e.left = Math.max(0, e.qty - e.placed);
+      e.onCanvas = e.pins ? e.placed >= e.qty : e.placed > 0;
     }
     return out;
   }
 
+  // The labels for the next `count` copies of `lib/part` on the canvas,
+  // named `name`: "Servo" for the only one, "Servo 2", "Servo 3"… after
+  // that, skipping numbers already used. When a second copy goes on, a
+  // first copy still called plain "Servo" becomes "Servo 1", so the
+  // pinout table can tell them apart. { robot, labels }: `robot` is the
+  // same object when nothing was renamed.
+  function copyLabels(robot, lib, part, name, count) {
+    const mine = (robot.parts || []).filter(p => p.lib === lib && p.part === part);
+    const base = String(name || part).trim();
+    if (!mine.length && count === 1) return { robot, labels: [base] };
+    const re = new RegExp('^' + base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' (\\d+)$');
+    const used = new Set();
+    let next = robot;
+    let plain = null;
+    for (const p of mine) {
+      const m = String(p.label || '').match(re);
+      if (m) used.add(+m[1]);
+      else if (!p.label || p.label === base) plain = plain || p;
+    }
+    if (plain && !used.has(1)) {
+      used.add(1);
+      next = Object.assign({}, robot, { parts: robot.parts.map(p => (p === plain ? Object.assign({}, p, { label: base + ' 1' }) : p)) });
+    }
+    const labels = [];
+    let n = 1;
+    while (labels.length < count) {
+      if (!used.has(n)) { used.add(n); labels.push(base + ' ' + n); }
+      n++;
+    }
+    return { robot: next, labels };
+  }
+
   // The wiring with every placed `fromLib/fromPart` swapped for
   // `toLib/toPart`, where it stands. Wires on the old part's pins go: a
-  // placeholder has none, and a new part's pins are its own.
+  // placeholder has none, and a new part's pins are its own. With a
+  // `label`, one copy is called that and several "label 1", "label 2"…
   function relink(robot, fromLib, fromPart, toLib, toPart, label) {
     const ids = new Set();
+    const count = (robot.parts || []).filter(p => p.lib === fromLib && p.part === fromPart).length;
     const parts = (robot.parts || []).map(p => {
       if (p.lib !== fromLib || p.part !== fromPart) return p;
       ids.add(p.id);
       const next = Object.assign({}, p, { lib: toLib, part: toPart });
-      if (label) next.label = label;
+      if (label) next.label = count > 1 ? label + ' ' + ids.size : label;
       return next;
     });
     if (!ids.size) return robot;
     const onPart = end => ids.has(String(end).split('.')[0]);
     const connections = (robot.connections || []).filter(c => !onPart(c.from) && !onPart(c.to));
     return Object.assign({}, robot, { parts, connections });
+  }
+
+  // Parts with pins the canvas has more of than the Bill of Materials'
+  // Qty: [{ slug, name, qty, placed }], to offer raising the Qty.
+  function overQty(list) {
+    return list.filter(e => e.linked && e.pins && e.placed > e.qty)
+      .map(e => ({ slug: e.slug, name: e.name, qty: e.qty, placed: e.placed }));
   }
 
   // Placeholders on the canvas whose row has since been linked (in the BOM
@@ -167,7 +225,7 @@
     return out;
   }
 
-  const api = { BOM_LIB, placeholderId, placeholderPart, placeholderImage, withFallbackImage, fitToPhoto, hasPins, isBoard, entries, relink, linkedSince };
+  const api = { BOM_LIB, placeholderId, placeholderPart, placeholderImage, withFallbackImage, fitToPhoto, hasPins, isBoard, entries, copyLabels, relink, overQty, linkedSince };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.WiringBom = api;
 })(typeof window !== 'undefined' ? window : globalThis);

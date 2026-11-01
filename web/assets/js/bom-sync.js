@@ -455,13 +455,7 @@
       if (!m || m[1].toLowerCase() !== String(slug).toLowerCase()) continue;
       const lineNo = table.lines[r];
       const text = lines[lineNo];
-      const pipes = [...text.matchAll(/(?<!\\)\|/g)].map(x => x.index);
-      // Each cell's span between its pipes, so only the changed ones move.
-      const bounds = text.trim().startsWith('|') ? pipes : [-1, ...pipes];
-      const cells = [];
-      for (let c = 0; c + 1 < bounds.length || (bounds[c] !== undefined && text.slice(bounds[c] + 1).trim()); c++) {
-        cells.push({ from: bounds[c] + 1, to: bounds[c + 1] === undefined ? text.length : bounds[c + 1] });
-      }
+      const cells = cellSpans(text);
       const edits = [];
       if (cells[priceCol]) edits.push({ ...cells[priceCol], insert: ' ' + priceText + ' ' });
       else return null;
@@ -472,6 +466,43 @@
       let out = text;
       edits.sort((a, b) => b.from - a.from).forEach(e => { out = out.slice(0, e.from) + e.insert + out.slice(e.to); });
       return { line: lineNo, text: out };
+    }
+    return null;
+  }
+
+  // Each cell's span between its pipes on a table line, [{ from, to }], so
+  // an edit moves only the cells it changes.
+  function cellSpans(text) {
+    const pipes = [...text.matchAll(/(?<!\\)\|/g)].map(x => x.index);
+    const bounds = text.trim().startsWith('|') ? pipes : [-1, ...pipes];
+    const cells = [];
+    for (let c = 0; c + 1 < bounds.length || (bounds[c] !== undefined && text.slice(bounds[c] + 1).trim()); c++) {
+      cells.push({ from: bounds[c] + 1, to: bounds[c + 1] === undefined ? text.length : bounds[c + 1] });
+    }
+    return cells;
+  }
+
+  // The first Bill of Materials row linking catalog part `slug` with its
+  // Qty set to `qty`: { line, text }, or null when there's no such row or
+  // no Qty column (the wiring workspace raising a Qty to what it places).
+  function setRowQty(markdown, slug, qty) {
+    const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table) return null;
+    const header = table.header.map(plain);
+    let partCol = header.findIndex(h => PART_COL.test(h));
+    if (partCol < 0) partCol = 0;
+    const qtyCol = header.findIndex(h => QTY_COL.test(h));
+    if (qtyCol < 0 || qtyCol === partCol) return null;
+    const lines = String(markdown).split('\n');
+    for (let r = 0; r < table.rows.length; r++) {
+      const link = (table.rows[r][partCol] || '').trim().match(/^\[(?:\\.|[^\]\\])*\]\(([^)\s]+)[^)]*\)$/);
+      const m = link && link[1].match(SLUG_RE);
+      if (!m || m[1].toLowerCase() !== String(slug).toLowerCase()) continue;
+      const lineNo = table.lines[r];
+      const text = lines[lineNo];
+      const cell = cellSpans(text)[qtyCol];
+      if (!cell) return null;
+      return { line: lineNo, text: text.slice(0, cell.from) + ' ' + qty + ' ' + text.slice(cell.to) };
     }
     return null;
   }
@@ -498,7 +529,7 @@
 
   const api = {
     parse, linkRow, rowDetails, price, formatPrice, tableFromRows, totalsChanges, withTotals,
-    CURRENCIES, headerCurrency, withCurrency, tableCurrency, linkedRows, catalogPrice, setRowPrice, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
+    CURRENCIES, headerCurrency, withCurrency, tableCurrency, linkedRows, catalogPrice, setRowPrice, setRowQty, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
   };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.BomSync = api;
