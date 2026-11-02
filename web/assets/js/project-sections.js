@@ -161,7 +161,9 @@
       for (; i < lines.length && !/^\s*\|/.test(lines[i]); i++) {
         if (/^ {0,3}#{1,6}\s/.test(lines[i])) return null;
       }
-      if (i + 1 >= lines.length || !/^\s*\|?\s*:?-{3,}/.test(lines[i + 1])) return null;
+      // Any delimiter row counts: one dash per cell (`| - | - |`) is how a
+      // fit-to-content table is written, so it must still read as a table.
+      if (i + 1 >= lines.length || !/^\s*\|?\s*:?-+:?\s*(\||$)/.test(lines[i + 1])) return null;
       const table = { header: cells(lines[i]).map(h => h.toLowerCase()), rows: [], headerLine: i, lines: [] };
       for (let r = i + 2; r < lines.length && /^\s*\|/.test(lines[r]); r++) {
         table.rows.push(cells(lines[r]));
