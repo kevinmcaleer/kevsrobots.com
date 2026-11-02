@@ -116,3 +116,19 @@ async def test_pages_through_every_projects_text(client, project_id, admin) -> N
     second = (await client.get("/api/admin/migration/contents?offset=1&limit=1", headers=admin)).json()
     assert [p["project_id"] for p in first + second] == [project_id, project_id + 1]
     assert second[0]["content_md"] == ""
+
+
+@pytest.mark.asyncio
+async def test_unversioned_lists_public_projects_with_no_live_version(client, admin, session) -> None:
+    """Issue #440: a public project with nothing live is listed; publishing clears it."""
+    resp = await client.post("/api/projects", json={"title": "Legacy", "status": "draft"}, headers=make_auth_header())
+    pid = resp.json()["id"]
+    assert (await client.get("/api/admin/migration/unversioned", headers=admin)).json() == []
+    project = await session.get(Project, pid)
+    project.status = "completed"
+    await session.commit()
+    rows = (await client.get("/api/admin/migration/unversioned", headers=admin)).json()
+    assert [r["project_id"] for r in rows] == [pid]
+    assert (await client.post(f"/api/projects/{pid}/publish", headers=make_auth_header())).status_code == 200
+    assert (await client.get("/api/admin/migration/unversioned", headers=admin)).json() == []
+    assert (await client.get("/api/admin/migration/unversioned", headers=make_auth_header())).status_code == 403

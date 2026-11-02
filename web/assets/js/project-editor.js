@@ -55,8 +55,6 @@
   const timeInput = document.getElementById('project-time');
   const tagsContainer = document.getElementById('tags-container');
   const tagInput = document.getElementById('tag-input');
-  const publishSwitch = document.getElementById('publish-switch');
-  const publishSwitchLabel = document.getElementById('publish-switch-label');
   const saveIndicator = document.getElementById('save-indicator');
   // --- Auth ---
   const IS_LOCAL = location.hostname === 'localhost'
@@ -127,7 +125,8 @@
         withRepoSection(currentProject.content_md, currentProject.code_repo_url), projectVideos));
       difficultySelect.value = currentProject.difficulty || '';
       timeInput.value = currentProject.estimated_minutes || '';
-      updateStatusBadge(currentProject.status);
+      updateVersionBar();
+      refreshVersions();
       renderTags(currentProject.tags || []);
       loadFiles();
       loadImages();
@@ -245,15 +244,24 @@
 
     // Saving now, so a pending autosave (or retry) isn't needed.
     if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+    // Another tab or a restore changed the project: never overwrite it.
+    if (staleTab) return;
     showSaveStatus('saving');
     try {
       let resp;
       if (currentProject) {
+        // Issue #437: the server refuses (409 stale) if the project changed
+        // since this tab last saw it.
+        if (currentProject.updated_at) data.expected_updated_at = currentProject.updated_at;
         resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
           method: 'PUT', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
+        if (resp.status === 409) {
+          markStale();
+          return;
+        }
       } else {
         // Issue #260: a new project is a private draft until published.
         resp = await apiFetch(API + '/api/projects', {
@@ -268,14 +276,9 @@
         history.replaceState(null, '', '?id=' + currentProject.id);
       }
       if (projectVideos === null && !projectId) projectVideos = [];
-      // Issue #190: a title save can change the slug, so refresh the
-      // "View live" / view-toggle links from the (possibly new) slug.
-      // updateStatusBadge already reads currentProject.slug to rebuild
-      // both hrefs, so a single call here keeps the displayed public
-      // URL in sync silently — no page reload required. The editor's
-      // own URL stays at /projects/editor.html?id=<id>, so we do NOT
-      // history.replaceState anything slug-shaped here.
-      updateStatusBadge(currentProject.status);
+      // The Publish button, the "Unpublished changes" pill and the View
+      // link follow what the server says about the working copy now.
+      updateVersionBar();
       lastSaveFailed = false;
       // More was typed while this save was in flight: that's still to save.
       showSaveStatus(autoSaveTimer ? 'saving' : 'saved');
@@ -297,65 +300,398 @@
   }
 
   function scheduleAutoSave() {
+    if (staleTab) return;
     if (autoSaveTimer) clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(saveProject, 3000);
     // The cloud turns from the first change: it isn't saved yet.
     showSaveStatus('saving', 'Saving your changes in a moment…');
   }
 
-  // --- Save / Status / Delete --- (autosave only; no manual save button)
+  // --- Versions (epic #433) ---
+  // The row the editor saves into is the WORKING COPY; readers see the live
+  // version. Publish makes the working copy the next version and puts it
+  // live; the drop-down lists the versions and restores one as the working
+  // copy (after saving the working copy as an unpublished version).
+  const V = window.ProjectVersions;
+  const publishBtn = document.getElementById('publish-btn');
+  const publishBtnLabel = document.getElementById('publish-btn-label');
+  const versionsBtn = document.getElementById('versions-btn');
+  const versionsLabel = document.getElementById('versions-label');
+  const versionsMenu = document.getElementById('versions-menu');
+  const unpublishedPill = document.getElementById('unpublished-pill');
+  const archiveBtn = document.getElementById('archive-btn');
+  const unpublishBtn = document.getElementById('unpublish-btn');
+  const compareLiveBtn = document.getElementById('compare-live-btn');
+  let versionList = null; // the last GET /versions
+  let staleTab = false;
+  let publishing = false;
 
-  // The top bar's switch is Draft / Published (issue #260); switching on
-  // publishes as ``completed``. ``wip`` also reads as Draft: a projects
-  // API from before #260 has no ``draft`` status, so Draft is saved as
-  // ``wip`` there (still public on that API). The Archived checkbox beside
-  // the switch is the third state; publishing, or unticking it, un-archives
-  // (back to a draft).
-  let draftStatus = 'draft'; // becomes 'wip' once the API turns 'draft' down
+  function isLive() { return !!(currentProject && currentProject.live_number); }
 
-  async function putStatus(status) {
-    return apiFetch(API + '/api/projects/' + currentProject.id, {
-      method: 'PUT', credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: status }),
-    });
+  function liveUrl() {
+    // Issue #152: the canonical /projects/<owner>/<slug> URL, or ?id= for a
+    // row without a slug.
+    return (currentProject.slug && currentProject.author_username)
+      ? '/projects/' + encodeURIComponent(currentProject.author_username) + '/' + encodeURIComponent(currentProject.slug)
+      : '/projects/view.html?id=' + currentProject.id;
   }
 
-  async function setStatus(status) {
-    if (!currentProject) { await saveProject(); if (!currentProject) return; }
+  function previewUrl(version) {
+    return '/projects/view.html?id=' + currentProject.id + '&version=' + encodeURIComponent(version);
+  }
+
+  // The top bar from currentProject: Publish's three states, the drop-down
+  // label, the pill, View (or Preview before the first publish) and the
+  // ⋯ menu's Archive / Unpublish.
+  function updateVersionBar() {
+    if (!currentProject) {
+      if (publishBtn) publishBtn.disabled = true;
+      return;
+    }
+    const live = currentProject.live_number;
+    const changed = !!currentProject.has_unpublished_changes;
+    if (publishBtn) {
+      publishBtn.disabled = publishing || staleTab || (live != null && !changed);
+      publishBtnLabel.textContent = live == null ? 'Publish' : (changed ? 'Publish changes' : 'Published · up to date');
+      publishBtn.title = live == null
+        ? 'Make this project public, as version 1'
+        : (changed ? 'Readers see v' + live + '. Publish your working copy as the next version.' : 'Readers see your working copy as it is now.');
+    }
+    if (versionsLabel) versionsLabel.textContent = live == null ? 'v0 · not published yet' : 'Working copy · v' + live + ' live';
+    if (unpublishedPill) unpublishedPill.classList.toggle('d-none', !(live != null && changed));
+    const viewToggle = document.getElementById('view-toggle-btn');
+    if (viewToggle) {
+      viewToggle.classList.remove('d-none');
+      // Issue #438: View is the live page; before the first publish it's a
+      // preview of the working copy. Both open in a new tab so autosave
+      // keeps running here.
+      viewToggle.href = live == null ? previewUrl('working') : liveUrl();
+      document.getElementById('view-toggle-label').textContent = live == null ? 'Preview' : 'View';
+      viewToggle.title = live == null ? 'See the page as readers will, once published' : 'The live page readers see';
+    }
+    const archived = currentProject.status === 'archived';
+    if (archiveBtn) document.getElementById('archive-btn-label').textContent = archived ? 'Unarchive' : 'Archive project';
+    if (archiveBtn) archiveBtn.title = archived
+      ? 'Back on the hub, search and your profile'
+      : 'Hide it from the hub, search and your profile without deleting it. The live page still works by link.';
+    if (unpublishBtn) unpublishBtn.classList.toggle('d-none', live == null);
+    if (compareLiveBtn) compareLiveBtn.classList.toggle('d-none', !(live != null && changed));
+  }
+
+  async function refreshVersions() {
+    if (!currentProject) { renderVersionsMenu(); return null; }
     try {
-      if (status === 'draft') status = draftStatus;
-      let resp = await putStatus(status);
-      if (resp.status === 422 && status === 'draft') {
-        // An API from before issue #260 doesn't know "draft": use "wip".
-        draftStatus = status = 'wip';
-        resp = await putStatus(status);
-      }
-      if (resp.ok) {
-        currentProject = await resp.json();
-        updateStatusBadge(currentProject.status);
-        showSaveStatus('saved', currentProject.status === 'wip'
-          ? 'Saved as Draft (still listed in the hub until the projects API is updated)'
-          : 'Status updated');
-        if (window.BadgeToast) BadgeToast.fromResponse(currentProject);
-      } else {
-        throw new Error('HTTP ' + resp.status);
-      }
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/versions', { credentials: 'include' });
+      if (!resp.ok) return null;
+      versionList = await resp.json();
+      currentProject.live_number = versionList.live_number;
+      currentProject.has_unpublished_changes = versionList.has_unpublished_changes;
+      updateVersionBar();
+      renderVersionsMenu();
+      return versionList;
     } catch (e) {
-      console.error(e);
-      showSaveStatus('error', "Couldn't change the project's status. Try the switch again.");
-      updateStatusBadge(currentProject ? currentProject.status : 'draft');
+      console.error('Could not load the versions', e);
+      return null;
     }
   }
 
-  if (publishSwitch) publishSwitch.addEventListener('change', () => {
-    setStatus(publishSwitch.checked ? 'completed' : 'draft');
+  function renderVersionsMenu() {
+    if (!versionsMenu) return;
+    const rows = (versionList && versionList.versions) || [];
+    const changed = currentProject && currentProject.has_unpublished_changes;
+    let html = '<div class="kr-version-row is-current"><span class="kr-version-name"><i class="fas fa-check me-1" aria-hidden="true"></i>Working copy (editing)</span>' +
+      (currentProject && currentProject.live_number != null
+        ? '<span class="kr-version-when">' + (changed ? 'Has changes that aren’t live yet' : 'The same as the live version') + '</span>'
+        : '') + '</div>';
+    if (!rows.length) {
+      html += '<div class="kr-versions-empty">v0 — nothing published yet. Press <strong>Publish</strong> when the write-up is ready; that becomes version 1.</div>';
+    }
+    rows.forEach(v => {
+      const when = v.published_at || v.created_at;
+      const actions = ['<a href="' + V.esc(previewUrl(v.number)) + '" target="_blank" rel="noopener">View</a>'];
+      if (v.is_live) {
+        if (changed) actions.push('<button type="button" data-restore="' + v.number + '">Discard unpublished changes</button>');
+      } else {
+        actions.push('<button type="button" data-restore="' + v.number + '">Restore</button>');
+      }
+      actions.push('<button type="button" data-compare="' + v.number + '">Compare</button>');
+      if (!v.is_live) actions.push('<button type="button" class="kr-version-delete" data-delete="' + v.number + '">Delete</button>');
+      html += '<div class="kr-version-row">' +
+        '<span class="kr-version-name' + (v.is_live ? ' kr-version-live' : '') + '">' + V.esc(V.label(v)) + '</span>' +
+        '<span class="kr-version-when">' + V.esc(V.date(when, true)) + (v.title ? ' · ' + V.esc(v.title) : '') + '</span>' +
+        (v.note && v.kind === 'published' ? '<span class="kr-version-note">“' + V.esc(v.note) + '”</span>' : '') +
+        '<div class="kr-version-actions">' + actions.join('') + '</div></div>';
+    });
+    versionsMenu.innerHTML = html;
+  }
+
+  if (versionsBtn) versionsBtn.addEventListener('show.bs.dropdown', () => { renderVersionsMenu(); refreshVersions(); });
+  if (versionsMenu) versionsMenu.addEventListener('click', e => {
+    const restore = e.target.closest('[data-restore]');
+    const compareBtn = e.target.closest('[data-compare]');
+    const del = e.target.closest('[data-delete]');
+    if (restore) restoreVersion(Number(restore.dataset.restore));
+    else if (compareBtn) compareVersion(Number(compareBtn.dataset.compare));
+    else if (del) deleteVersion(Number(del.dataset.delete));
   });
 
-  const archiveCheck = document.getElementById('archive-check');
-  if (archiveCheck) archiveCheck.addEventListener('change', () => {
-    setStatus(archiveCheck.checked ? 'archived' : 'draft');
+  // Everything this tab has typed is on the server: the pending autosave
+  // runs now, and the Bill of Materials / video rows it rewrites have
+  // finished. False when the save failed (nothing more should happen).
+  async function flushSave() {
+    if (staleTab) return false;
+    if (autoSaveTimer || !currentProject || getEditorValue() !== (currentProject.content_md || '')) {
+      await saveProject();
+    }
+    if (lastSaveFailed || staleTab || !currentProject) return false;
+    await Promise.all([bomSync, videoSync]).catch(() => {});
+    return true;
+  }
+
+  function closeVersionsMenu() {
+    if (versionsBtn && window.bootstrap && bootstrap.Dropdown) {
+      const dd = bootstrap.Dropdown.getInstance(versionsBtn);
+      if (dd) dd.hide();
+    }
+  }
+
+  async function publishProject() {
+    if (publishing) return;
+    if (!currentProject) { await saveProject(); if (!currentProject) return; }
+    const first = currentProject.live_number == null;
+    const numbers = ((versionList && versionList.versions) || []).map(v => v.number);
+    const next = (numbers.length ? Math.max.apply(null, numbers) : 0) + 1;
+    const live = currentProject.live_number;
+    const answer = await V.dialog({
+      title: first ? 'Publish this project?' : 'Publish your changes?',
+      body: first
+        ? 'It becomes visible to everyone on kevsrobots.com as version 1. You can keep editing afterwards: readers only see new changes when you publish again.'
+        : 'v' + next + ' goes live now, and readers see this version. v' + live + ' stays in your version list.',
+      confirm: first ? 'Publish' : 'Publish v' + next,
+      // #441: an optional note, shown in the version list (never to readers).
+      input: { label: 'What changed? (optional, only you see this)', maxlength: 200, placeholder: first ? 'First version' : 'e.g. Added the battery wiring' },
+    });
+    if (!answer.ok) return;
+    publishing = true;
+    updateVersionBar();
+    try {
+      if (!(await flushSave())) {
+        showSaveStatus('error', "Couldn't publish: your latest changes aren't saved yet. Try again in a moment.");
+        return;
+      }
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/publish', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: answer.value || null }),
+      });
+      if (resp.status === 409) {
+        // Nothing to publish: the working copy is the live version.
+        currentProject.has_unpublished_changes = false;
+        return;
+      }
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const result = await resp.json();
+      currentProject = result.project;
+      showToast('v' + result.version.number + ' is live.', { href: liveUrl(), label: 'View' });
+      if (window.BadgeToast) BadgeToast.fromResponse(currentProject);
+    } catch (e) {
+      console.error('Publish failed:', e);
+      showSaveStatus('error', "Couldn't publish. Your work is saved.");
+    } finally {
+      publishing = false;
+      updateVersionBar();
+      refreshVersions();
+    }
+  }
+  if (publishBtn) publishBtn.addEventListener('click', publishProject);
+
+  // Issue #437: restore version n as the working copy. The working copy is
+  // saved first as an unpublished version, so there is always a way back.
+  // The page then reloads from the server (the same path as opening the
+  // editor), after the editor's local draft is cleared so stale text isn't
+  // offered back.
+  async function restoreVersion(number, opts) {
+    opts = opts || {};
+    closeVersionsMenu();
+    const target = ((versionList && versionList.versions) || []).find(v => v.number === number);
+    const discard = target && target.is_live;
+    if (!opts.skipConfirm) {
+      const answer = await V.dialog({
+        title: discard ? 'Discard your unpublished changes?' : 'Restore ' + (target ? V.name(target) : 'v' + number) + ' as your working copy?',
+        body: (discard
+          ? 'Your working copy goes back to the live version (v' + number + '). '
+          : '') +
+          'Your current work is saved first as an unpublished version, so you can always get back to it. Nothing changes on the live page until you publish.',
+        confirm: discard ? 'Discard changes' : 'Restore',
+      });
+      if (!answer.ok) return;
+    }
+    if (!(await flushSave())) {
+      showSaveStatus('error', "Couldn't restore: your latest changes aren't saved yet, so nothing was changed. Try again in a moment.");
+      return;
+    }
+    try {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/versions/' + number + '/restore', {
+        method: 'POST', credentials: 'include',
+      });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const result = await resp.json();
+      if (mde) mde.clearDraft();
+      try {
+        sessionStorage.setItem('projects.restored.' + currentProject.id, JSON.stringify({
+          restored: result.restored, saved_as: result.saved_as, discard: !!discard,
+        }));
+      } catch (_) {}
+      // Nothing may save over the restored copy on the way out.
+      staleTab = true;
+      window.location.reload();
+    } catch (e) {
+      console.error('Restore failed:', e);
+      showSaveStatus('error', "Couldn't restore that version. Your working copy is unchanged.");
+    }
+  }
+
+  // After the reload a restore does: say what happened, with Undo.
+  function showRestoredToast() {
+    if (!projectId) return;
+    let info = null;
+    try {
+      const key = 'projects.restored.' + projectId;
+      info = JSON.parse(sessionStorage.getItem(key) || 'null');
+      sessionStorage.removeItem(key);
+    } catch (_) {}
+    if (!info) return;
+    const what = info.discard ? 'Discarded your unpublished changes.' : 'Restored v' + info.restored + '.';
+    if (info.saved_as) {
+      showToast(what + ' Your previous work is saved as Unpublished (v' + info.saved_as + ').', {
+        label: 'Undo', onClick: () => restoreVersion(info.saved_as, { skipConfirm: true }),
+      });
+    } else {
+      showToast(what);
+    }
+  }
+
+  async function snapshotOf(number) {
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/versions/' + number, { credentials: 'include' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return resp.json();
+  }
+
+  // The working copy, shaped like a version's snapshot (for Compare).
+  async function workingSnapshot() {
+    await flushSave();
+    const get = async path => {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + path, { credentials: 'include' });
+      return resp.ok ? resp.json() : null;
+    };
+    const [bom, images, files, wiring, diagrams] = await Promise.all([
+      get('/bom'), get('/images'), get('/files'), get('/wiring'), get('/diagrams'),
+    ]);
+    const full = diagrams ? await Promise.all(diagrams.map(d => get('/diagrams/' + d.id))) : [];
+    return {
+      title: currentProject.title,
+      short_description: currentProject.short_description,
+      content_md: getEditorValue(),
+      difficulty: currentProject.difficulty,
+      estimated_minutes: currentProject.estimated_minutes,
+      tags: currentProject.tags || [],
+      bom: bom || [],
+      images: (images || []).map(i => ({ id: i.id })),
+      files: (files || []).map(f => ({ id: f.id })),
+      wiring: wiring ? { data: wiring.data } : null,
+      diagrams: Object.fromEntries(full.filter(Boolean).map(d => [String(d.id), { data: d.data }])),
+    };
+  }
+
+  // #441: the working copy (or the next version up) against version n.
+  async function compareVersion(number) {
+    closeVersionsMenu();
+    try {
+      const older = await snapshotOf(number);
+      const mine = await workingSnapshot();
+      await V.compare(
+        { label: older.kind === 'unpublished' ? 'Unpublished v' + number : 'v' + number + (older.is_live ? ' (live)' : ''), snapshot: older.snapshot },
+        { label: 'Working copy', snapshot: mine },
+      );
+    } catch (e) {
+      console.error('Compare failed:', e);
+      showToast("Couldn't load that version to compare.");
+    }
+  }
+  if (compareLiveBtn) compareLiveBtn.addEventListener('click', () => {
+    if (currentProject && currentProject.live_number) compareVersion(currentProject.live_number);
   });
+
+  // Issue #440: delete a version that isn't live. Its number is never reused.
+  async function deleteVersion(number) {
+    closeVersionsMenu();
+    const target = ((versionList && versionList.versions) || []).find(v => v.number === number);
+    const when = target ? V.date(target.published_at || target.created_at, true) : '';
+    const answer = await V.dialog({
+      title: 'Delete ' + (target ? V.name(target) : 'v' + number) + '?',
+      body: 'The version from ' + when + ' is deleted for good, with any pictures only it used. The live page and your working copy don’t change.',
+      confirm: 'Delete version', danger: true,
+    });
+    if (!answer.ok) return;
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/versions/' + number, {
+      method: 'DELETE', credentials: 'include',
+    });
+    if (!resp.ok) showToast("Couldn't delete that version.");
+    refreshVersions();
+  }
+
+  // Issue #440: Unpublish takes the page off the site and keeps the versions.
+  if (unpublishBtn) unpublishBtn.addEventListener('click', async () => {
+    if (!currentProject) return;
+    const answer = await V.dialog({
+      title: 'Take this project off kevsrobots.com?',
+      body: 'Readers won’t find it any more. Your versions are kept, and you can publish again any time.',
+      confirm: 'Unpublish', danger: true,
+    });
+    if (!answer.ok) return;
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/unpublish', {
+      method: 'POST', credentials: 'include',
+    });
+    if (!resp.ok) { showToast("Couldn't unpublish the project."); return; }
+    currentProject = await resp.json();
+    updateVersionBar();
+    refreshVersions();
+    showToast('Unpublished. Only you can see this project now.');
+  });
+
+  // Archive keeps the live version live, but off the hub, search and profile.
+  if (archiveBtn) archiveBtn.addEventListener('click', async () => {
+    if (!currentProject) { await saveProject(); if (!currentProject) return; }
+    const archived = currentProject.status === 'archived';
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + (archived ? '/unarchive' : '/archive'), {
+      method: 'POST', credentials: 'include',
+    });
+    if (!resp.ok) { showToast("Couldn't change that. Try again."); return; }
+    currentProject = await resp.json();
+    updateVersionBar();
+    showToast(archived ? 'Back on the hub and your profile.' : 'Archived: hidden from the hub, search and your profile. The page still works by link.');
+  });
+
+  // Issue #437: another tab saved (or restored) after this one loaded.
+  function markStale() {
+    staleTab = true;
+    if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+    document.getElementById('stale-notice').classList.remove('d-none');
+    showSaveStatus('error', 'Not saved: this project was changed in another tab. Reload to carry on.');
+    updateVersionBar();
+  }
+  const staleReload = document.getElementById('stale-reload-btn');
+  if (staleReload) staleReload.addEventListener('click', () => window.location.reload());
+
+  // The editor's own ?restore=N link (the project page's "Restore as
+  // working copy" goes through the same dialog as the drop-down).
+  async function restoreFromLink() {
+    const n = Number(params.get('restore'));
+    if (!n || !currentProject) return;
+    history.replaceState(null, '', '?id=' + currentProject.id);
+    if (!versionList) await refreshVersions();
+    restoreVersion(n);
+  }
 
   const deleteBtn = document.getElementById('delete-btn');
   if (deleteBtn) deleteBtn.addEventListener('click', async () => {
@@ -368,28 +704,6 @@
       window.location.href = '/projects/hub';
     } catch (e) { console.error(e); }
   });
-
-  // The switch only ever reads Draft or Published; Archived is shown by
-  // its own checkbox.
-  function updateStatusBadge(status) {
-    const published = status === 'completed';
-    if (publishSwitch) publishSwitch.checked = published;
-    if (publishSwitchLabel) publishSwitchLabel.textContent = published ? 'Published' : 'Draft';
-    if (archiveCheck) archiveCheck.checked = status === 'archived';
-    const viewToggle = document.getElementById('view-toggle-btn');
-    if (currentProject) {
-      // Issue #152: link to the canonical /projects/<owner>/<slug> URL
-      // when the loaded project has a slug; fall back to ?id= for any
-      // legacy row whose slug hasn't been backfilled yet.
-      var liveUrl = (currentProject.slug && currentProject.author_username)
-        ? '/projects/' + encodeURIComponent(currentProject.author_username) + '/' + encodeURIComponent(currentProject.slug)
-        : '/projects/view.html?id=' + currentProject.id;
-      if (viewToggle) {
-        viewToggle.classList.remove('d-none');
-        viewToggle.href = liveUrl;
-      }
-    }
-  }
 
   // --- Tags ---
   // Keyword -> tag map for auto-detection. Keys are matched case-insensitively
@@ -903,6 +1217,19 @@
         ],
         note: 'These headings fill the page navigation and the completeness check.',
         link: { label: 'First project? Read the step-by-step getting started guide', href: '/projects/getting-started/' },
+      },
+      {
+        title: 'Publishing and versions',
+        rows: [
+          ['Working copy', 'What you edit here. It saves as you type, and only you can see it'],
+          ['Publish', 'Makes your working copy the live page readers see. The first publish is version 1; before that the project is v0 and private'],
+          ['Publish changes', 'Shows when your working copy differs from the live page. Each publish adds the next version (v2, v3 \u2026); the live page doesn\u2019t change until you press it'],
+          ['Versions \u25be', 'Every version you published, newest first. View one, Compare it with your working copy, or Restore it'],
+          ['Restore', 'Copies that version into your working copy. Your current work is saved first as an unpublished version, so you can always get back'],
+          ['Discard unpublished changes', 'On the live version: go back to what readers see'],
+          ['\u22ef \u2192 Unpublish', 'Takes the page off the site. Your versions are kept'],
+        ],
+        note: 'Readers never see your working copy or version numbers, only the date you first published and the date of the latest version.',
       },
       {
         title: 'Bill of Materials',
@@ -2572,9 +2899,15 @@
         const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
           method: 'PUT', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ files_view: view }),
+          body: JSON.stringify({ files_view: view, expected_updated_at: currentProject.updated_at }),
         });
+        if (resp.status === 409) { markStale(); throw new Error('stale'); }
         if (!resp.ok) throw new Error(await resp.text());
+        // Keep the newer updated_at, or the next autosave would look stale.
+        const saved = await resp.json();
+        currentProject.updated_at = saved.updated_at;
+        currentProject.has_unpublished_changes = saved.has_unpublished_changes;
+        updateVersionBar();
       } catch (err) {
         console.error('Could not save the Files & Models view', err);
         currentProject.files_view = before;
@@ -2932,7 +3265,8 @@
   }
 
   // A short note at the top right that goes by itself.
-  function showToast(message) {
+  // ``action`` adds a link ({ href, label }) or a button ({ onClick, label }).
+  function showToast(message, action) {
     let toast = document.getElementById('editor-toast');
     if (!toast) {
       toast = document.createElement('div');
@@ -2943,6 +3277,18 @@
       document.body.appendChild(toast);
     }
     toast.textContent = message;
+    if (action && action.label) {
+      const el = document.createElement(action.href ? 'a' : 'button');
+      el.className = 'alert-link ms-2';
+      el.textContent = action.label;
+      if (action.href) { el.href = action.href; el.target = '_blank'; el.rel = 'noopener'; }
+      else {
+        el.type = 'button';
+        el.style.cssText = 'background:none;border:0;padding:0;text-decoration:underline;';
+        el.addEventListener('click', () => { toast.remove(); action.onClick(); });
+      }
+      toast.appendChild(el);
+    }
     const close = document.createElement('button');
     close.type = 'button';
     close.className = 'btn-close';
@@ -4090,12 +4436,15 @@
     // Load first so the editor opens on the saved text, and only offers
     // its local draft back when that differs.
     if (projectId) await loadProject();
+    updateVersionBar();
     initEditor();
     seedBomPrices();
     scheduleBomTotals();
     loadStoredBom().catch(() => {});
     editorContainer.classList.remove('d-none');
     showGettingStartedTip();
+    showRestoredToast();
+    restoreFromLink();
     const completenessCard = document.getElementById('completeness-card');
     if (completenessCard && !completenessClosed) completenessCard.classList.remove('d-none');
     recomputeCompleteness();

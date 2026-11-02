@@ -29,7 +29,7 @@ This guide walks you through your first project, from an empty page to a write-u
 6. [Write the assembly instructions](#write-the-assembly-instructions)
 7. [Tables](#tables)
 8. [Callouts](#callouts)
-9. [Publish it](#publish-it)
+9. [Publish it](#publish-it), then keep working
 
 ---
 
@@ -241,13 +241,23 @@ Add `-` after the type (`> [!info]- Full parts spec`) to make a callout that sta
 
 ## Publish it
 
-Projects start as a **Draft**, which only you can see. When you're ready:
+A new project is private: only you can see it (the editor calls it **v0 · not published yet**). When you're ready:
 
 1. Check the **Project completeness** box in the corner. It lists anything missing, such as a cover picture or a difficulty level. Click an item to go to it.
-2. Click **View** at the top to see the page as readers will.
-3. Turn on the **Published** switch. Your project now appears in the Projects Hub and on your profile.
+2. Click **Preview** at the top to see the page as readers will.
+3. Click **Publish**. Your project becomes **version 1** and appears in the Projects Hub and on your profile.
 
-You can keep editing after publishing. Changes save as you go and show on the project page straight away.
+### Publish, then keep working
+
+After publishing, the editor works on your **working copy**. It still saves as you type, but readers keep seeing the version you published, so a half-finished change never shows on your page.
+
+- An amber **Unpublished changes** label appears beside the save cloud once your working copy differs from the live page.
+- **Publish changes** puts your working copy live as the next version (v2, v3 and so on). You can add a short note saying what changed; only you see it.
+- The **versions** drop-down (`Working copy · v3 live ▾`) lists everything you've published. **View** opens a version, **Compare** shows what changed (added words in green, removed in red), and **Restore** copies it back into your working copy. Your current work is saved first as an unpublished version, so you can always get back to it.
+- **Discard unpublished changes** on the live version takes your working copy back to what readers see.
+- **⋯ → Unpublish** takes the page off the site. Your versions are kept, and you can publish again any time. **⋯ → Archive project** hides it from the hub and your profile but keeps the page working by link.
+
+Readers never see your working copy or version numbers, only the date you first published and the date of the latest version.
 
 **Ready to start?** [Create a new project](/projects/editor.html) or browse the [Projects Hub](/projects/hub) to see how other makers write theirs.
 

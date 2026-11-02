@@ -6,6 +6,11 @@ layout: content
 thanks: false
 ---
 
+<style>
+  /* Epic #433: the working copy has changes that aren't live yet. */
+  .kr-badge-unpublished { background: #fbf3dc; color: #7a5300; border: 1px solid #ecd9a3; }
+</style>
+
 {% include nav_projects.html %}
 
 # My Projects
@@ -140,15 +145,18 @@ async function checkAuth() {
   }
 }
 
-// Update status counts. Issue #260: projects are Draft, Published or
-// Archived. Published is ``completed``; ``wip`` counts as a Draft (it is
-// how an API from before #260 stores one).
+// Update status counts. Projects are Draft, Published or Archived. Epic
+// #433: Published means a version is live (``live_number``); an archived
+// project keeps its live version but sits in the Archived tab. ``status``
+// is the fallback for an API from before versions.
 function isPublished(p) {
+  if (p.status === 'archived') return false;
+  if (p.live_number !== undefined) return p.live_number != null;
   return p.status === 'completed';
 }
 
 function isDraft(p) {
-  return p.status === 'draft' || p.status === 'wip';
+  return p.status !== 'archived' && !isPublished(p);
 }
 
 function updateCounts() {
@@ -233,7 +241,13 @@ function createProjectCard(project) {
   if (isDraft(project)) {
     statusBadge = '<span class="badge bg-light text-dark border"><i class="fas fa-lock me-1"></i>Draft</span>';
   } else if (isPublished(project)) {
-    statusBadge = '<span class="badge bg-success">Published</span>';
+    // Epic #433: which version is live, and whether the working copy has
+    // changed since (amber, like the editor's pill).
+    statusBadge = '<span class="badge bg-success">' +
+      (project.live_number ? 'v' + project.live_number + ' live' : 'Published') + '</span>' +
+      (project.has_unpublished_changes
+        ? ' <span class="badge kr-badge-unpublished" title="Saved in the editor, not live yet">Unpublished changes</span>'
+        : '');
   } else {
     statusBadge = '<span class="badge bg-secondary">Archived</span>';
   }

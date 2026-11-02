@@ -88,6 +88,32 @@ sitemap: false
       </div>
     </div>
 
+    <!-- 2b. Public projects with no live version (#440) -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-code-branch me-2"></i> Public projects with no published version</span>
+        <span id="unversioned-count" class="badge bg-secondary">0</span>
+      </div>
+      <div class="card-body p-0">
+        <p class="small text-muted px-3 pt-3 mb-2">
+          Project versions give every public project a live version (v1 for
+          projects that were public before versions). Readers see a project
+          listed here as its working copy, so this should be zero. The owner
+          pressing Publish fixes one.
+        </p>
+        <div id="unversioned-none" class="text-center text-muted py-4 d-none">
+          <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+          <p>Every public project has a published version.</p>
+        </div>
+        <div class="table-responsive">
+          <table id="unversioned-table" class="table table-hover mb-0 d-none">
+            <thead><tr><th>Project</th><th>Owner</th><th>Status</th></tr></thead>
+            <tbody id="unversioned-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- 3. Every project opens and saves unchanged -->
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
@@ -152,9 +178,10 @@ sitemap: false
 
   async function init() {
     try {
-      const [bom, schematics] = await Promise.all([
+      const [bom, schematics, unversioned] = await Promise.all([
         getJson('/api/admin/migration/bom'),
         getJson('/api/admin/migration/schematics'),
+        getJson('/api/admin/migration/unversioned').catch(() => []),
       ]);
       document.getElementById('loading').classList.add('d-none');
       document.getElementById('admin-content').classList.remove('d-none');
@@ -162,6 +189,7 @@ sitemap: false
       bomCandidates = bom.filter(p => p.rows.length && !BomSync.parse(p.content_md));
       renderBom(bom.length - bomCandidates.length);
       renderSchematics(schematics);
+      renderUnversioned(unversioned);
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');
       document.getElementById('access-denied').classList.remove('d-none');
@@ -229,6 +257,16 @@ sitemap: false
   }
 
   // --- 2. Old schematics ---
+
+  function renderUnversioned(rows) {
+    const none = rows.length === 0;
+    document.getElementById('unversioned-count').textContent = rows.length;
+    document.getElementById('unversioned-none').classList.toggle('d-none', !none);
+    document.getElementById('unversioned-table').classList.toggle('d-none', none);
+    document.getElementById('unversioned-body').innerHTML = rows.map(p =>
+      '<tr><td>' + projectLink(p.project_id, p.title) + '</td><td>' + esc(p.author_username) +
+      '</td><td>' + esc(p.status) + '</td></tr>').join('');
+  }
 
   function renderSchematics(rows) {
     const none = rows.length === 0;
