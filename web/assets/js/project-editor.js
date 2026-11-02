@@ -869,8 +869,10 @@
       scheduleBomPrices();
       scheduleGalleryAddBar();
       schedulePinout();
+      scheduleFilesPlacement();
     });
     schedulePinout();
+    scheduleFilesPlacement();
     // Hints set before the editor was mounted (a closed completeness panel).
     if (editorHints.size) mde.setHints(Array.from(editorHints.values()));
     setupImageAutocomplete(mde);
@@ -895,7 +897,7 @@
           [heading('assembly-instructions'), 'How to build it, step by step'],
           [heading('wiring'), 'The wiring diagram, drawn in the wiring workspace'],
           [heading('code-repository'), 'A link to your code repository'],
-          [heading('3d-printed-parts'), 'Your STL files'],
+          [heading('files-and-models'), 'Your files and 3D models go under this heading on the page, wherever you put it, as a filmstrip or a table with Qty, Colour and Filament. Without it they go at the end'],
           [heading('videos'), 'Your YouTube videos, as a group of cards: / then Videos, then add, delete or move link lines'],
           [heading('gallery'), 'Your pictures as a gallery: / then Gallery and pick a layout. Add pictures in its bar; hover a picture to move or remove it, or drag it'],
         ],
@@ -2166,7 +2168,7 @@
     return FILE_ICONS[ext] || 'fa-file fas';
   }
 
-  let projectFiles = []; // the last list loadFiles() fetched, for `/3d printed parts`
+  let projectFiles = []; // the last list loadFiles() fetched
   let modelGallery = null; // ProjectModels handle, to keep the shown model across re-renders
   async function loadFiles() {
     if (!currentProject) return;
@@ -2268,7 +2270,74 @@
 
     const download = document.getElementById('download-files');
     if (download) download.hidden = files.length === 0;
+    updateFilesPlacement();
   }
+
+  // --- Where Files & Models go on the page ---
+  //
+  // The page puts the files and models under the write-up's Files & Models
+  // heading (or an alias such as "3D printed parts"), wherever it is, and
+  // at the end without one. While there are files and no heading, the
+  // section says so, the hints panel offers to add it, and so does a drop.
+  function hasFilesHeading(markdown) {
+    let fence = null;
+    return String(markdown || '').split('\n').some(line => {
+      const f = /^ {0,3}(`{3,}|~{3,})/.exec(line);
+      if (f) { fence = fence ? (f[1][0] === fence ? null : fence) : f[1][0]; return false; }
+      if (fence) return false;
+      const m = /^ {0,3}#{1,6}\s+(.*?)\s*#*\s*$/.exec(line);
+      const section = m && ProjectSections.match(m[1]);
+      return !!(section && section.id === 'files-and-models');
+    });
+  }
+
+  // A # Files & Models heading at the end of the text, then scrolls to it.
+  function addFilesSection() {
+    if (!mde || !mde.view) return;
+    const view = mde.view;
+    const doc = view.state.doc;
+    const markdown = doc.toString();
+    if (hasFilesHeading(markdown)) return;
+    const tail = markdown.trim() ? (markdown.endsWith('\n\n') ? '' : markdown.endsWith('\n') ? '\n' : '\n\n') : '';
+    const heading = '# ' + ProjectSections.get('files-and-models').heading;
+    const insert = tail + heading + '\n\n';
+    view.dispatch({
+      changes: { from: doc.length, insert },
+      selection: { anchor: doc.length + insert.length },
+      scrollIntoView: true,
+      userEvent: 'input.files-section',
+    });
+    view.focus();
+    showToast('Added a Files & Models section at the end. Move the heading wherever you want your files to show.');
+  }
+
+  let filesPlacementTimer = null;
+  function scheduleFilesPlacement() {
+    clearTimeout(filesPlacementTimer);
+    filesPlacementTimer = setTimeout(updateFilesPlacement, 600);
+  }
+
+  function updateFilesPlacement() {
+    const note = document.getElementById('files-placement');
+    const placed = !!(mde && hasFilesHeading(getEditorValue()));
+    const missing = projectFiles.length > 0 && !placed;
+    if (note) {
+      note.hidden = !projectFiles.length;
+      note.classList.toggle('is-missing', missing);
+      note.innerHTML = missing
+        ? '<i class="fas fa-info-circle" aria-hidden="true"></i> <span>Your write-up has no Files &amp; Models section, so these go at the end of the page.</span> ' +
+          '<button type="button" class="btn btn-sm btn-outline-secondary" data-action="add-files-section">Add the section</button>'
+        : '<i class="fas fa-check" aria-hidden="true"></i> <span>On the page these show under your Files &amp; Models heading.</span>';
+    }
+    setEditorHint('files-section', missing ? {
+      title: 'Your files have no section yet',
+      detail: 'Add a Files & Models heading where you want your files and 3D models to show on the page. Until then they go at the end.',
+      actions: [{ label: 'Add the section', run: addFilesSection }],
+    } : null);
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-action="add-files-section"]')) addFilesSection();
+  });
 
   function fileThumbUrl(f) {
     return API + '/api/projects/' + currentProject.id + '/files/' + f.id + '/thumbnail?v=' + f.thumbnail_version;
@@ -3356,10 +3425,11 @@
     if (!row) return;
     row.querySelector('.drop-progress__status').innerHTML = html;
   }
-  function finishProgress(summary) {
+  function finishProgress(summary, opts) {
     if (!dropProgressEl) return;
     dropProgressTitle.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> ' + summary;
-    setTimeout(() => { dropProgressEl.classList.add('d-none'); }, 4000);
+    // A question in it stays until answered or closed.
+    if (!(opts && opts.stay)) setTimeout(() => { dropProgressEl.classList.add('d-none'); }, 4000);
   }
 
   // Upload a file and, for a model the browser can draw, its thumbnail
@@ -3515,7 +3585,17 @@
     if (!summary) summary = 'Nothing added';
     if (errorCount) summary += ' (' + errorCount + ' failed)';
     if (skippedCount) summary += ' (' + skippedCount + ' unsupported)';
-    finishProgress(summary);
+    // Files with nowhere to go in the write-up: say so, and offer the section.
+    const askForSection = (modelCount || fileCount) && mde && !hasFilesHeading(getEditorValue());
+    if (askForSection) {
+      const row = document.createElement('div');
+      row.className = 'drop-progress__ask';
+      row.innerHTML = '<span>Add a Files &amp; Models section to choose where these show on the page. Without one they go at the end.</span>' +
+        '<button type="button" class="btn btn-sm btn-success" data-action="add-files-section">Add the section</button>';
+      row.querySelector('button').addEventListener('click', () => dropProgressEl.classList.add('d-none'));
+      if (dropProgressBody) dropProgressBody.appendChild(row);
+    }
+    finishProgress(summary, { stay: !!askForSection });
   }
 
   // Set up global drag overlay using a counter pattern.

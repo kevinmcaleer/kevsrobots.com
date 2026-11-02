@@ -94,3 +94,9 @@ def test_card_titles_are_not_sections():
     assert "wiring" not in canonical_sections(md)
     # An unclosed block hides nothing.
     assert "wiring" in canonical_sections("::: cards\n## Wiring\n")
+
+
+def test_files_and_models_aliases() -> None:
+    # "3D printed parts" was its own section; it now counts as Files & Models.
+    for heading in ("# Files & Models", "## files and models", "# 3D printed parts", "### Downloads"):
+        assert canonical_sections(heading + "\n") == ["files-and-models"]

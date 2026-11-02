@@ -18,7 +18,7 @@ SECTIONS: list[tuple[str, str]] = [
     ("wiring", "Wiring"),
     ("code", "Code"),
     ("code-repository", "Code repository"),
-    ("3d-printed-parts", "3D printed parts"),
+    ("files-and-models", "Files & Models"),
     ("videos", "Videos"),
     ("gallery", "Gallery"),
 ]
@@ -38,6 +38,10 @@ def _normalise(text: str) -> str:
 ALIASES: dict[str, list[str]] = {
     "bill-of-materials": ["BOM", "Parts", "Parts list"],
     "assembly-instructions": ["Assembly", "Build"],
+    "files-and-models": [
+        "Files and Models", "3D printed parts", "3D prints", "Printed parts",
+        "Models", "Files", "Downloads", "STL files",
+    ],
     "gallery": ["Photos", "Pictures"],
 }
 
