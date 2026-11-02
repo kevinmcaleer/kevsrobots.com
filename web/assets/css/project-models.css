@@ -343,3 +343,15 @@ img.is-tinting { visibility: hidden; }
   .kr-models-strip { grid-auto-columns: 5.5rem; }
   .kr-models-hero { aspect-ratio: 4 / 3; }
 }
+
+/* Editor: the panel in the text, under the author's Files & Models (or
+   3D printed parts) heading. That heading names it, so its own title steps
+   back and its buttons sit on the right. */
+#editor-files-section.is-in-text { margin: 0; padding: 0; border: 0; }
+#editor-files-section.is-in-text .kr-section-head { justify-content: flex-end; border: 0; padding-top: 0; margin-bottom: 0.25rem; }
+#editor-files-section.is-in-text .kr-section-title { display: none; }
+#editor-files-section.is-in-text .kr-section-hint { margin-bottom: 0.5rem; }
+/* The editor styles inputs in its text; these stay quiet until used. */
+#editor-files-section.is-in-text .kr-print-input { border-color: transparent; background: transparent; box-shadow: none; }
+#editor-files-section.is-in-text .kr-print-input:hover { border-color: var(--border, #e5e7eb); }
+#editor-files-section.is-in-text .kr-print-input:focus { border-color: var(--accent, #2563eb); background: var(--bs-body-bg, #fff); }

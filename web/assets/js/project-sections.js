@@ -46,12 +46,21 @@
     {
       // The project's files and 3D models (project-models.js): the page
       // shows them under this heading, wherever it is, as a filmstrip or a
-      // table with each part's Qty, Colour and Filament. Without the
-      // heading they go at the end of the page.
+      // table with each part's Qty, Colour and Filament: in the editor too.
+      // Without it they go under 3D printed parts, else at the end.
       id: 'files-and-models',
       heading: 'Files & Models',
-      aliases: ['Files and Models', '3D printed parts', '3D prints', 'Printed parts', 'Models', 'Files', 'Downloads', 'STL files'],
-      keywords: ['3d', 'printed', 'print', 'stl', 'models', 'cad', 'files', 'downloads', 'filament'],
+      aliases: ['Files and Models', 'Models', 'Files', 'Downloads'],
+      keywords: ['files', 'downloads', 'models', 'cad', 'stl'],
+      icon: 'M4 1.5h5.5L12.5 4.5v10h-8.5zM9.5 1.5v3h3M6.5 8h4M6.5 10.5h4',
+    },
+    {
+      // Its own section again (Kev, 2026-11-02). Without a Files & Models
+      // heading, the files and models go under this one.
+      id: '3d-printed-parts',
+      heading: '3D printed parts',
+      aliases: ['3D prints', 'Printed parts', 'STL files'],
+      keywords: ['3d', 'printed', 'print', 'stl', 'models', 'cad', 'filament'],
       icon: 'M8 1.8 13.5 5v6L8 14.2 2.5 11V5zM2.5 5 8 8.2 13.5 5M8 8.2v6',
     },
     {

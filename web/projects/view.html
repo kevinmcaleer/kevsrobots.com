@@ -2640,12 +2640,13 @@ description: View project details
     // rows would only repeat it.
     if (bomSection && sectionHasTable('bill-of-materials', headings)) bomSection.classList.add('d-none');
     const bomUnderHeading = placeUnderHeading(bomSection, 'bill-of-materials', headings);
-    // Files & Models go under the author's Files & Models heading (or an
-    // alias such as "3D printed parts"), wherever it is; at the end
+    // Files & Models go under the author's Files & Models heading, else
+    // their 3D printed parts heading, wherever it is; at the end
     // without one. Placed, the heading names them, so the block's own
     // titles step back (the Files title stays when there are models too).
     const filesBlock = document.getElementById('view-files-block');
-    const filesPlaced = !!(filesBlock && placeUnderHeading(filesBlock, 'files-and-models', headings));
+    const filesPlaced = !!(filesBlock && (placeUnderHeading(filesBlock, 'files-and-models', headings)
+      || placeUnderHeading(filesBlock, '3d-printed-parts', headings)));
     if (filesBlock) {
       const modelsTitle = filesBlock.querySelector('#view-models-section > .kr-section-title');
       const filesTitle = filesBlock.querySelector('#view-files-section > .kr-section-title');
