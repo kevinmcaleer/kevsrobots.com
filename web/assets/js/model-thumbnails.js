@@ -76,10 +76,11 @@
 
   // A lit scene with the model in it, Z-up (as printers and CAD export it)
   // turned to Three's Y-up, and a camera on the isometric diagonal.
-  function buildScene(THREE, geometry, aspect) {
+  // `colour` (#rrggbb) is the part's print colour, when the author set one.
+  function buildScene(THREE, geometry, aspect, colour) {
     const scene = new THREE.Scene();
     const mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
-      color: COLOUR, specular: 0x222222, shininess: 40,
+      color: colour ? new THREE.Color(colour) : COLOUR, specular: 0x222222, shininess: 40,
     }));
     mesh.rotation.x = -Math.PI / 2;
     const pivot = new THREE.Group();
@@ -196,7 +197,7 @@
 
   // Show the STL at `url` (fetched with credentials or the dev token, so a
   // draft's author sees theirs). `downloadUrl` is the counted download link.
-  async function openViewer({ url, name, downloadUrl }) {
+  async function openViewer({ url, name, downloadUrl, colour }) {
     const v = viewerShell();
     if (v.close) v.close();
     v.title.textContent = name || '';
@@ -239,7 +240,7 @@
       v.stage.appendChild(renderer.domElement);
       const rect = v.stage.getBoundingClientRect();
       renderer.setSize(rect.width, rect.height, false);
-      const { scene, camera, pivot, distance } = buildScene(THREE, geometry, rect.width / rect.height);
+      const { scene, camera, pivot, distance } = buildScene(THREE, geometry, rect.width / rect.height, colour);
       v.status.style.display = 'none';
 
       let zoom = 1;

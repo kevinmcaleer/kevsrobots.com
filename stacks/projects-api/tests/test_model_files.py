@@ -178,3 +178,54 @@ async def test_delete_removes_thumbnail(client, project_id) -> None:
                                headers=make_auth_header())
     assert resp.status_code == 204
     assert (await client.get(f"/api/projects/{project_id}/files")).json() == []
+
+
+@pytest.mark.asyncio
+async def test_print_details_round_trip(client, project_id) -> None:
+    f = await _upload(client, project_id, "leg.stl", STL)
+    url = f"/api/projects/{project_id}/files/{f['id']}"
+    resp = await client.put(
+        url, json={"print_qty": 4, "print_colour": "#ff8800", "filament": "PETG"},
+        headers=make_auth_header(),
+    )
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert (body["print_qty"], body["print_colour"], body["filament"]) == (4, "#ff8800", "PETG")
+
+    # A word works as a colour, and null clears the qty.
+    resp = await client.put(
+        url, json={"print_colour": "silk gold", "print_qty": None}, headers=make_auth_header(),
+    )
+    body = resp.json()
+    assert body["print_colour"] == "silk gold"
+    assert body["print_qty"] is None
+    assert body["filament"] == "PETG"
+
+    listed = (await client.get(f"/api/projects/{project_id}/files")).json()
+    assert listed[0]["print_colour"] == "silk gold"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("patch", [
+    {"print_qty": 0}, {"print_qty": 1000},
+    {"print_colour": "red;background:url(x)"}, {"print_colour": "x" * 41},
+    {"filament": "y" * 61},
+])
+async def test_print_details_rejects_bad_values(client, project_id, patch) -> None:
+    f = await _upload(client, project_id, "leg.stl", STL)
+    resp = await client.put(
+        f"/api/projects/{project_id}/files/{f['id']}", json=patch, headers=make_auth_header(),
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_files_view_default_and_update(client, project_id) -> None:
+    url = f"/api/projects/{project_id}"
+    assert (await client.get(url, headers=make_auth_header())).json()["files_view"] == "filmstrip"
+    resp = await client.put(url, json={"files_view": "table"}, headers=make_auth_header())
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["files_view"] == "table"
+    assert (await client.get(url, headers=make_auth_header())).json()["files_view"] == "table"
+    bad = await client.put(url, json={"files_view": "grid"}, headers=make_auth_header())
+    assert bad.status_code == 422

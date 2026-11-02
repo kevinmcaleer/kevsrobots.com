@@ -182,6 +182,8 @@ description: View project details
         <!-- Files & Models: printable models (issue #261) -->
         <div id="view-models-section" class="kr-section d-none">
           <h2 class="kr-section-title"><i class="fas fa-cube" aria-hidden="true"></i> Files &amp; Models</h2>
+          <!-- Filmstrip or Table: the author picks the first, visitors can switch. -->
+          <div class="kr-models-viewbar" id="view-models-viewbar"></div>
           <div id="view-models"></div>
         </div>
 
@@ -1085,7 +1087,7 @@ description: View project details
       loadRemixesSidebar(project);
 
       loadBOM();
-      loadFiles();
+      loadFiles(project);
       loadImages(project);
       loadLinks();
       if (viewMode === 'markdown') loadLegacySchematic();
@@ -1586,7 +1588,7 @@ description: View project details
     return html;
   }
 
-  async function loadFiles() {
+  async function loadFiles(project) {
     const resp = await fetch(API + '/api/projects/' + projectId + '/files', { credentials: 'include' });
     const files = await resp.json();
     if (files.length === 0) return;
@@ -1619,12 +1621,13 @@ description: View project details
       : (f.file_size / 1024).toFixed(1) + ' KB');
     // A model's thumbnail, or a cube until it has one (OBJ and 3MF for now).
     const thumb = (f, px) => f.thumbnail_version
-      ? `<img src="${thumbUrl(f)}" alt="${esc(f.filename)}" width="${px}" height="${px}" loading="lazy" class="view-model-thumb">`
+      ? `<img src="${thumbUrl(f)}" alt="${esc(f.filename)}" width="${px}" height="${px}" loading="lazy" class="view-model-thumb"${colourOf(f) ? ` data-tint="${colourOf(f)}"` : ''}>`
       : `<i class="fas fa-cube text-muted" style="font-size:${Math.round(px / 2)}px"></i>`;
+    const colourOf = f => ProjectModels.colourHex(f.print_colour);
     const openModel = id => {
       const f = files.find(x => x.id === id);
       if (!f) return;
-      ModelThumbnails.openViewer({ url: downloadUrl(f) + '?preview=1', name: f.filename, downloadUrl: downloadUrl(f) });
+      ModelThumbnails.openViewer({ url: downloadUrl(f) + '?preview=1', name: f.filename, downloadUrl: downloadUrl(f), colour: colourOf(f) });
     };
 
     const models = files.filter(f => f.file_type === 'model');
@@ -1645,8 +1648,11 @@ description: View project details
 
     if (models.length) {
       document.getElementById('view-models-section').classList.remove('d-none');
-      // A filmstrip gallery of the models, as on Printables.
-      ProjectModels.render(document.getElementById('view-models'), models, {
+      const pm = ProjectModels;
+      const attr = pm.esc;
+      const unset = '<span class="kr-unset">—</span>';
+      const has = key => models.some(f => f[key]);
+      const filmstripOpts = {
         thumbUrl,
         canView: viewable,
         openViewer: f => openModel(f.id),
@@ -1654,13 +1660,45 @@ description: View project details
           <div class="kr-models-details-main">
             <div class="kr-models-details-name">${esc(f.filename)}</div>
             ${f.description ? `<div>${esc(f.description)}</div>` : ''}
+            ${pm.printDetails(f)}
             ${f.print_settings ? `<div class="text-muted small"><i class="fas fa-sliders-h me-1"></i>${esc(f.print_settings)}</div>` : ''}
             <div class="kr-models-details-meta">${fKind(f.filename)} · ${size(f)} · <i class="fas fa-download"></i> ${(f.download_count || 0)}</div>
           </div>
           <div class="kr-models-details-actions">
-            <a href="${downloadUrl(f)}" class="btn btn-sm btn-outline-secondary" title="Download ${esc(f.filename)}" aria-label="Download ${esc(f.filename)}"><i class="fas fa-download"></i></a>
+            <a href="${downloadUrl(f)}" class="btn btn-sm btn-outline-secondary" title="Download ${attr(f.filename)}" aria-label="Download ${attr(f.filename)}"><i class="fas fa-download"></i></a>
           </div>`,
+      };
+      // The table shows the Qty, Colour and Filament columns any model fills in.
+      const cols = { qty: has('print_qty'), colour: has('print_colour'), filament: has('filament') };
+      const tableOpts = {
+        thumbUrl,
+        canView: viewable,
+        openViewer: f => openModel(f.id),
+        head: `<th>Part</th>${cols.qty ? '<th class="kr-col-qty">Qty</th>' : ''}${cols.colour ? '<th class="kr-col-colour">Colour</th>' : ''}${cols.filament ? '<th class="kr-col-filament">Filament</th>' : ''}<th class="kr-col-size">Size</th><th style="width:44px"><span class="visually-hidden">Download</span></th>`,
+        cells: f => `
+          <td>
+            <a href="${downloadUrl(f)}" class="fw-semibold">${esc(f.filename)}</a>
+            ${f.description ? `<small class="text-muted d-block">${esc(f.description)}</small>` : ''}
+            ${f.print_settings ? `<small class="text-muted d-block"><i class="fas fa-sliders-h me-1"></i>${esc(f.print_settings)}</small>` : ''}
+          </td>
+          ${cols.qty ? `<td class="kr-col-qty">${f.print_qty || unset}</td>` : ''}
+          ${cols.colour ? `<td class="kr-col-colour">${f.print_colour ? `${pm.swatch(f.print_colour)} ${esc(f.print_colour)}` : unset}</td>` : ''}
+          ${cols.filament ? `<td class="kr-col-filament">${f.filament ? esc(f.filament) : unset}</td>` : ''}
+          <td class="kr-col-size">${size(f)}<span class="d-block" title="Downloads"><i class="fas fa-download"></i> ${(f.download_count || 0)}</span></td>
+          <td class="text-end"><a href="${downloadUrl(f)}" class="btn btn-sm btn-outline-secondary" title="Download ${attr(f.filename)}" aria-label="Download ${attr(f.filename)}"><i class="fas fa-download"></i></a></td>`,
+      };
+      const bar = document.getElementById('view-models-viewbar');
+      const showModels = view => {
+        const target = document.getElementById('view-models');
+        if (view === 'table') pm.renderTable(target, models, tableOpts);
+        else pm.render(target, models, filmstripOpts);
+        bar.innerHTML = pm.viewToggle(view, 'Show models as');
+      };
+      bar.addEventListener('click', e => {
+        const b = e.target.closest('[data-models-view]');
+        if (b) showModels(b.dataset.modelsView);
       });
+      showModels(pm.normaliseView(project && project.files_view));
       const grid = document.getElementById('view-models-grid');
       grid.innerHTML = models.map(f => `
         <figure class="view-models-grid__item">
@@ -1671,6 +1709,7 @@ description: View project details
           <figcaption class="small text-truncate"><a href="${downloadUrl(f)}">${esc(f.filename)}</a></figcaption>
         </figure>`).join('');
       grid.dataset.ready = '1';
+      ProjectModels.tintAll(grid);
     }
     if (others.length) {
       document.getElementById('view-files-section').classList.remove('d-none');
