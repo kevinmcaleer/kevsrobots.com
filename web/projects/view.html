@@ -1646,6 +1646,7 @@ description: View project details
         thumbUrl,
         canView: viewable,
         openViewer: f => openModel(f.id),
+        modelUrl: f => downloadUrl(f) + '?preview=1',
         details: f => `
           <div class="kr-models-details-main">
             <div class="kr-models-details-name">${esc(f.filename)}</div>
