@@ -1843,3 +1843,57 @@ async def backfill_wip_projects_to_draft() -> None:
         session.add(AppliedMigration(name=name))
         await session.commit()
         logger.warning("Moved %d work-in-progress projects to draft (issue #260)", result.rowcount)
+
+
+async def add_project_version_columns_if_missing() -> None:
+    """Epic #433: ``projects.published_version_id`` / ``last_version_number``
+    and the #439 ``removed_at`` columns on images and files. The
+    ``project_versions`` table itself is new, so ``create_all`` (which runs
+    first) has already made it."""
+    await _add_columns_if_missing(
+        "projects",
+        {
+            "published_version_id": (
+                "INTEGER REFERENCES project_versions(id) ON DELETE SET NULL"
+            ),
+            "last_version_number": "INTEGER NOT NULL DEFAULT 0",
+        },
+        "issue #434",
+    )
+    await _add_columns_if_missing("project_images", {"removed_at": "TIMESTAMP"}, "issue #439")
+    await _add_columns_if_missing("project_files", {"removed_at": "TIMESTAMP"}, "issue #439")
+
+
+async def backfill_published_versions() -> None:
+    """Issue #434: every public project gets a v1 from its current row and
+    that version goes live, so the public pages read the same as before.
+    ``wip`` becomes ``completed``; an archived project keeps its status but
+    gets a live v1 too (it was reachable by link). Drafts get nothing.
+    Runs once (``applied_migrations``) and skips projects that already have
+    a live version, so it's safe to run again."""
+    from .models import AppliedMigration, Project
+    from .versions import PUBLISHED, create_version
+
+    name = "434-published-versions"
+    sessionmaker = get_sessionmaker()
+    async with sessionmaker() as session:
+        if await session.get(AppliedMigration, name) is not None:
+            return
+        projects = (
+            await session.scalars(
+                select(Project).where(
+                    Project.status.in_(("completed", "wip", "archived")),
+                    Project.published_version_id.is_(None),
+                )
+            )
+        ).all()
+        for project in projects:
+            version = await create_version(
+                session, project, kind=PUBLISHED, published_at=project.updated_at
+            )
+            project.published_version_id = version.id
+            if project.status == "wip":
+                project.status = "completed"
+        session.add(AppliedMigration(name=name))
+        await session.commit()
+        logger.warning("Gave %d published projects a live v1 (issue #434)", len(projects))

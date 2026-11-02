@@ -26,6 +26,7 @@ from ..badges import evaluate_user
 from ..db import get_session
 from ..models import Project, ProjectTag
 from ..visibility import DRAFT, can_view, is_draft, not_draft
+from ..versions import live_views, resolve_view
 from ..schemas import (
     ProjectListItem,
     ProjectResponse,
@@ -75,25 +76,33 @@ async def create_remix(
     from the original to give the remixer a starting point; they can edit
     everything afterwards via the normal editor flow.
     """
-    original = await session.get(Project, project_id)
-    if original is None or not can_view(original, user):
+    # Epic #433: someone else's project is remixed from its live version;
+    # the author's own from their working copy.
+    view = await resolve_view(session, project_id, user)
+    original = view.project
+    if original is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
+    snap = view.snapshot or {}
+
+    def source(name: str):
+        return snap[name] if name in snap else getattr(original, name)
+
     if getattr(original, "is_blocked", False):
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             detail="This project is blocked and cannot be remixed",
         )
 
-    title = (body.title or f"Remix of {original.title}").strip()
+    title = (body.title or f"Remix of {source('title')}").strip()
     if len(title) < 5:
-        title = f"Remix of {original.title}"
+        title = f"Remix of {source('title')}"
 
     remix = Project(
         title=title[:200],
-        short_description=original.short_description,
-        content_md=original.content_md,
-        difficulty=original.difficulty,
-        estimated_minutes=original.estimated_minutes,
+        short_description=source("short_description"),
+        content_md=source("content_md"),
+        difficulty=source("difficulty"),
+        estimated_minutes=source("estimated_minutes"),
         # Don't inherit the original code_repo_url — the remixer's fork
         # will live somewhere different. They can fill it in later.
         code_repo_url=None,
@@ -108,7 +117,7 @@ async def create_remix(
 
     # Inherit tags from the original so the remix shows up in the same
     # filters by default. Remixer can edit these later.
-    inherited_tags = await _get_tags(session, original.id)
+    inherited_tags = snap["tags"] if "tags" in snap else await _get_tags(session, original.id)
     if inherited_tags:
         await _set_tags(session, remix.id, inherited_tags)
 
@@ -150,8 +159,8 @@ async def list_remixes(
     ).all()
 
     items: list[ProjectListItem] = []
-    for r in remixes:
-        tags = await _get_tags(session, r.id)
+    for r in await live_views(session, list(remixes)):  # epic #433
+        tags = list(r.live_tags) if hasattr(r, "live_tags") else await _get_tags(session, r.id)
         items.append(_list_item_from_project(r, tags))
     return items
 
@@ -193,10 +202,10 @@ async def remix_chain(
     chain.reverse()
 
     items: list[ProjectListItem] = []
-    for p in chain:
+    for p in await live_views(session, chain):  # epic #433
         # Issue #260: drafts (other than the one asked about) stay private.
         if is_draft(p) and p.id != project_id:
             continue
-        tags = await _get_tags(session, p.id)
+        tags = list(p.live_tags) if hasattr(p, "live_tags") else await _get_tags(session, p.id)
         items.append(_list_item_from_project(p, tags))
     return items

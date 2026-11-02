@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile, status
 from fastapi.responses import Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +16,8 @@ from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Download, Project, ProjectFile, ProjectImage
-from ..visibility import hide_drafts
+from ..visibility import NO_STORE
+from .. import versions as v
 from ..schemas import FileResponse, FileUpdate, ImageResponse
 from ..storage import (
     MAX_THUMBNAIL_SIZE,
@@ -157,20 +158,44 @@ async def store_thumbnail(
 router = APIRouter(prefix="/api/projects/{project_id}/files", tags=["files"])
 
 
+async def _private_file(session: AsyncSession, project_id: int, file_id: int, user: Optional[str]) -> bool:
+    """404 (uncached) for anyone but the author when the live page doesn't
+    have file ``file_id``; returns whether it is private (not to be cached)."""
+    project = await session.get(Project, project_id)
+    public = await v.item_public(session, project, "files", file_id)
+    if not public and user != project.author_username:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="File not found", headers=NO_STORE)
+    return not public
+
+
 @router.get("", response_model=list[FileResponse])
 async def list_files(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> list[FileResponse]:
-    await hide_drafts(session, project_id, user)
-    items = (
-        await session.scalars(
-            select(ProjectFile)
-            .where(ProjectFile.project_id == project_id)
-            .order_by(ProjectFile.uploaded_at.desc())
-        )
-    ).all()
+    """The working copy's files for the author (removed ones left out),
+    the live version's for everyone else (epic #433)."""
+    view = await v.resolve_view(session, project_id, user, version)
+    query = select(ProjectFile).where(ProjectFile.project_id == project_id)
+    if view.snapshot is None:
+        query = query.where(ProjectFile.removed_at.is_(None))
+    else:
+        query = query.where(ProjectFile.id.in_(view.file_ids() or {-1}))
+    items = list((await session.scalars(query.order_by(ProjectFile.uploaded_at.desc()))).all())
+    if view.snapshot is not None:
+        # The version's print details, not whatever the working copy has now.
+        # Detached copies, so nothing is written back to the rows.
+        shown = []
+        for i in items:
+            entry = view.entry("files", i.id) or {}
+            session.expunge(i)
+            for f in v.FILE_FIELDS:
+                if f != "id" and f in entry:
+                    setattr(i, f, entry[f])
+            shown.append(i)
+        items = shown
     # Per-file download counts — bulk fetch in one query to avoid n+1.
     counts: dict[int, int] = {}
     if items:
@@ -278,8 +303,8 @@ async def download_file(
     record = await session.get(ProjectFile, file_id)
     if record is None or record.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
-    # Issue #260: a draft's files are the author's alone.
-    draft = await hide_drafts(session, project_id, user)
+    # Issue #260 / #435: a file the live page doesn't have is the author's alone.
+    draft = await _private_file(session, project_id, file_id, user)
 
     data = read_file(record.file_path)
     if data is None:
@@ -380,7 +405,7 @@ async def view_thumbnail(
     record = await session.get(ProjectFile, file_id)
     if record is None or record.project_id != project_id or not record.thumbnail_path:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
-    draft = await hide_drafts(session, project_id, user)
+    draft = await _private_file(session, project_id, file_id, user)
     data = read_file(record.thumbnail_path)
     if data is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Thumbnail not found in storage")
@@ -411,8 +436,10 @@ async def delete_file_endpoint(
     if record is None or record.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
-    delete_file(record.file_path)
-    if record.thumbnail_path:
-        delete_file(record.thumbnail_path)
-    await session.delete(record)
+    # Issue #439: a file a version still has stays for it.
+    if await v.guard_removal(session, project, "files", record):
+        delete_file(record.file_path)
+        if record.thumbnail_path:
+            delete_file(record.thumbnail_path)
+        await session.delete(record)
     await session.commit()

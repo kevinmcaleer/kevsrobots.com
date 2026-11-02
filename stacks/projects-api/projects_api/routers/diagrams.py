@@ -20,7 +20,7 @@ import base64
 import binascii
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -36,7 +36,8 @@ from ..schemas import (
 )
 from ..storage import delete_file, read_file, save_file
 from ..svg_safety import SVG_CSP, UnsafeSvg, clean_svg
-from ..visibility import NO_STORE, hide_drafts
+from ..visibility import NO_STORE
+from .. import versions as v
 
 router = APIRouter(prefix="/api/projects/{project_id}/diagrams", tags=["diagrams"])
 
@@ -63,22 +64,46 @@ async def _diagram(
     return d
 
 
-def _url(d: ProjectDiagram, ext: str) -> str:
+def _url(d: ProjectDiagram, ext: str, version: Optional[str] = None) -> str:
     base = get_settings().public_base_url.rstrip("/")
-    return f"{base}/api/projects/{d.project_id}/diagrams/{d.id}.{ext}"
+    query = f"?version={version}" if version and version != "working" else ""
+    return f"{base}/api/projects/{d.project_id}/diagrams/{d.id}.{ext}{query}"
 
 
-def _summary(d: ProjectDiagram) -> ProjectDiagramSummary:
+def _from_snapshot(project_id: int, did: str, snap: dict, when, version: Optional[str]) -> ProjectDiagram:
+    """A version's diagram as a (detached) row, for the response helpers."""
+    return ProjectDiagram(
+        id=int(did), project_id=project_id, title=snap.get("title") or "Diagram",
+        data=snap.get("data") or {}, svg_path=snap.get("svg_path"), png_path=snap.get("png_path"),
+        created_at=when, updated_at=when,
+    )
+
+
+def _view_diagrams(view, project_id: int) -> dict[int, ProjectDiagram]:
+    when = view.version.created_at
+    return {
+        int(did): _from_snapshot(project_id, did, d, when, view.label)
+        for did, d in (view.snapshot.get("diagrams") or {}).items()
+    }
+
+
+def _version_query(view) -> Optional[str]:
+    """What the picture URLs in a response carry, so an author previewing
+    a version sees that version's pictures."""
+    return view.label if view is not None and view.is_author and view.snapshot is not None else None
+
+
+def _summary(d: ProjectDiagram, version: Optional[str] = None) -> ProjectDiagramSummary:
     return ProjectDiagramSummary(
         id=d.id, project_id=d.project_id, title=d.title,
-        svg_url=_url(d, "svg") if d.svg_path else None,
-        png_url=_url(d, "png") if d.png_path else None,
+        svg_url=_url(d, "svg", version) if d.svg_path else None,
+        png_url=_url(d, "png", version) if d.png_path else None,
         updated_at=d.updated_at,
     )
 
 
-def _full(d: ProjectDiagram) -> ProjectDiagramResponse:
-    return ProjectDiagramResponse(**_summary(d).model_dump(), data=d.data, created_at=d.created_at)
+def _full(d: ProjectDiagram, version: Optional[str] = None) -> ProjectDiagramResponse:
+    return ProjectDiagramResponse(**_summary(d, version).model_dump(), data=d.data, created_at=d.created_at)
 
 
 def _check_canvas(data: dict) -> None:
@@ -106,8 +131,12 @@ async def list_diagrams(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> list[ProjectDiagramSummary]:
-    await hide_drafts(session, project_id, user)
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is not None:
+        rows = _view_diagrams(view, project_id)
+        return [_summary(rows[k], _version_query(view)) for k in sorted(rows)]
     rows = (
         await session.scalars(
             select(ProjectDiagram).where(ProjectDiagram.project_id == project_id).order_by(ProjectDiagram.id)
@@ -143,6 +172,19 @@ def _file_response(path: Optional[str], media_type: str, draft: bool, extra: Opt
     return Response(content=data, media_type=media_type, headers=headers)
 
 
+async def _shown_diagram(session, project_id: int, diagram_id: int, user, version):
+    """The diagram ``user`` is shown (the live version's copy for readers,
+    epic #433) and whether the picture is private (not to be cached)."""
+    view = await v.resolve_view(session, project_id, user, version, no_store=True)
+    private = view.private or view.is_author
+    if view.snapshot is not None:
+        d = _view_diagrams(view, project_id).get(diagram_id)
+        if d is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Diagram not found", headers=NO_STORE)
+        return d, private
+    return await _diagram(session, project_id, diagram_id, no_store=True), private
+
+
 # The export routes come before /{diagram_id} so "3.svg" isn't read as an id.
 @router.get("/{diagram_id}.svg")
 async def get_diagram_svg(
@@ -150,10 +192,10 @@ async def get_diagram_svg(
     diagram_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> Response:
-    draft = await hide_drafts(session, project_id, user, no_store=True)
-    d = await _diagram(session, project_id, diagram_id, no_store=True)
-    return _file_response(d.svg_path, "image/svg+xml", draft, {"Content-Security-Policy": SVG_CSP})
+    d, private = await _shown_diagram(session, project_id, diagram_id, user, version)
+    return _file_response(d.svg_path, "image/svg+xml", private, {"Content-Security-Policy": SVG_CSP})
 
 
 @router.get("/{diagram_id}.png")
@@ -162,10 +204,10 @@ async def get_diagram_png(
     diagram_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> Response:
-    draft = await hide_drafts(session, project_id, user, no_store=True)
-    d = await _diagram(session, project_id, diagram_id, no_store=True)
-    return _file_response(d.png_path, "image/png", draft)
+    d, private = await _shown_diagram(session, project_id, diagram_id, user, version)
+    return _file_response(d.png_path, "image/png", private)
 
 
 @router.get("/{diagram_id}", response_model=ProjectDiagramResponse)
@@ -174,8 +216,14 @@ async def get_diagram(
     diagram_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> ProjectDiagramResponse:
-    await hide_drafts(session, project_id, user)
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is not None:
+        d = _view_diagrams(view, project_id).get(diagram_id)
+        if d is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Diagram not found")
+        return _full(d, _version_query(view))
     return _full(await _diagram(session, project_id, diagram_id))
 
 

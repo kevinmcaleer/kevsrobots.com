@@ -27,7 +27,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -61,6 +61,8 @@ router = APIRouter(prefix="/api/projects", tags=["projects-by-slug"])
 async def get_project_by_slug(
     owner: str,
     slug: str,
+    response: Response,
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
     user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ):
@@ -82,12 +84,13 @@ async def get_project_by_slug(
         session, owner, slug
     )
     if canonical_slug is not None and canonical_slug != slug:
+        query = f"?version={version}" if isinstance(version, str) and version else ""
         return RedirectResponse(
-            url=f"/api/projects/by-slug/{owner}/{canonical_slug}",
+            url=f"/api/projects/by-slug/{owner}/{canonical_slug}{query}",
             status_code=301,
         )
     return await projects_router_module.get_project(
-        project_id=project_id, user=user, session=session
+        project_id=project_id, response=response, version=version, user=user, session=session
     )
 
 
@@ -104,10 +107,11 @@ async def list_bom_by_slug(
     slug: str,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None),
 ) -> list[BOMItemResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await bom_router_module.list_bom(
-        project_id=project_id, session=session, user=user
+        project_id=project_id, session=session, user=user, version=version
     )
 
 
@@ -117,10 +121,11 @@ async def list_images_by_slug(
     slug: str,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None),
 ) -> list[ImageResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await images_router_module.list_images(
-        project_id=project_id, session=session, user=user
+        project_id=project_id, session=session, user=user, version=version
     )
 
 
@@ -130,10 +135,11 @@ async def list_files_by_slug(
     slug: str,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None),
 ) -> list[FileResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await files_router_module.list_files(
-        project_id=project_id, session=session, user=user
+        project_id=project_id, session=session, user=user, version=version
     )
 
 
@@ -143,10 +149,11 @@ async def list_links_by_slug(
     slug: str,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None),
 ) -> list[LinkResponse]:
     project_id = await resolve_project_id(session, owner, slug)
     return await links_router_module.list_links(
-        project_id=project_id, session=session, user=user
+        project_id=project_id, session=session, user=user, version=version
     )
 
 

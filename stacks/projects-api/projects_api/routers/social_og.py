@@ -36,6 +36,7 @@ from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
+from ..versions import LiveView, live_view
 from ..models import Project
 from ..visibility import is_draft
 from .projects import _get_tags, resolve_project_id
@@ -216,7 +217,9 @@ async def project_og_card(
             headers=CACHE_HEADERS,
         )
 
-    tags = await _get_tags(session, project_id)
+    # Epic #433: the card shows the live version.
+    project = await live_view(session, project)
+    tags = list(project.live_tags) if isinstance(project, LiveView) else await _get_tags(session, project_id)
     html_body = render_og_html(project, tags)
     return Response(
         content=html_body,

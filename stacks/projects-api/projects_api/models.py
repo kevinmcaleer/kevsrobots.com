@@ -87,6 +87,21 @@ class Project(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
+    # Issue #433: the row is the author's WORKING COPY. What readers see is
+    # the snapshot in ``project_versions`` this points at; NULL means
+    # nothing is live (a draft, or an unpublished project).
+    published_version_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey(
+            "project_versions.id", ondelete="SET NULL", use_alter=True,
+            name="fk_projects_published_version_id",
+        ),
+        nullable=True,
+    )
+    # Highest version number ever given out, so a deleted version's number
+    # is never reused.
+    last_version_number: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
 
     __table_args__ = (
         # Issue #152: slug is unique within an author's portfolio. Two
@@ -94,6 +109,38 @@ class Project(Base):
         UniqueConstraint(
             "author_username", "slug", name="uq_projects_author_slug"
         ),
+    )
+
+
+class ProjectVersion(Base):
+    """An immutable snapshot of a project (issue #433).
+
+    ``kind`` is ``published`` (it went live when it was made) or
+    ``unpublished`` (the working copy, saved before a restore). ``snapshot``
+    is what :func:`projects_api.versions.snapshot_project` builds: the
+    project's fields, tags, BOM / video / link rows, wiring, diagrams,
+    schematic and the images and files it uses. Numbers count up per
+    project from 1 and are never reused. Brand-new table.
+    """
+
+    __tablename__ = "project_versions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    kind: Mapped[str] = mapped_column(String(20), nullable=False, default="published")
+    snapshot: Mapped[dict] = mapped_column(JsonType, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    published_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    restored_from_number: Mapped[Optional[int]] = mapped_column(Integer)
+    note: Mapped[Optional[str]] = mapped_column(String(200))
+
+    __table_args__ = (
+        UniqueConstraint("project_id", "number", name="uq_project_versions_number"),
     )
 
 
@@ -405,6 +452,9 @@ class ProjectFile(Base):
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
+    # Issue #439: removed from the working copy but still used by an older
+    # version, so the file stays for that version's previews and restores.
+    removed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
 
 class ProjectImage(Base):
@@ -421,6 +471,8 @@ class ProjectImage(Base):
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
+    # Issue #439: see ``ProjectFile.removed_at``.
+    removed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
 
 class ProjectJournalEntry(Base):

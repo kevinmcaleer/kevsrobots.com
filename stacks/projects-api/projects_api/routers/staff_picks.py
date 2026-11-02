@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth import get_optional_user
 from ..config import get_settings
 from ..db import get_session
+from ..versions import live_view
 from ..models import Project, StaffPick, StaffPickItem
 from ..visibility import is_draft
 from ..schemas import (
@@ -81,6 +82,7 @@ async def _load_items(session: AsyncSession, pick_id: int) -> list[StaffPickItem
         project_ref: Optional[StaffPickProjectRef] = None
         # Issue #260: a project moved back to draft shows as missing.
         if project is not None and not is_draft(project):
+            project = await live_view(session, project)  # epic #433
             project_ref = StaffPickProjectRef(
                 id=project.id,
                 slug=getattr(project, "slug", None),

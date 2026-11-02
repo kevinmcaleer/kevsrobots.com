@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,7 +20,7 @@ from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..fx import get_rate
 from ..models import Part, PartRevision, PartSupplier, Project, ProjectBOMItem
-from ..visibility import hide_drafts
+from .. import versions as v
 from ..schemas import BOMItemCreate, BOMItemResponse, BOMSync
 from .parts import first_photo_cover_urls
 
@@ -272,15 +272,29 @@ async def list_bom(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> list[BOMItemResponse]:
-    await hide_drafts(session, project_id, user)
-    items = (
-        await session.scalars(
-            select(ProjectBOMItem)
-            .where(ProjectBOMItem.project_id == project_id)
-            .order_by(ProjectBOMItem.sort_order)
-        )
-    ).all()
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is not None:
+        # The version's rows (never added to the session), priced like the
+        # working copy's: links, pinned revisions and supplier prices are
+        # looked up now, as they always were.
+        items = [
+            ProjectBOMItem(
+                project_id=project_id,
+                **{f: r.get(f) for f in v.BOM_FIELDS if f != "id"},
+                id=r.get("id") or -(n + 1),
+            )
+            for n, r in enumerate(view.snapshot.get("bom") or [])
+        ]
+    else:
+        items = (
+            await session.scalars(
+                select(ProjectBOMItem)
+                .where(ProjectBOMItem.project_id == project_id)
+                .order_by(ProjectBOMItem.sort_order)
+            )
+        ).all()
     part_ids = [i.part_id for i in items if i.part_id is not None]
     parts_meta = await _fetch_parts_meta(session, list(set(part_ids)))
     # Batch-load supplier prices in one round-trip — see

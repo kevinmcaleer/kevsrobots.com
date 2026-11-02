@@ -5,8 +5,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from sqlalchemy import delete, func, select
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from sqlalchemy import case, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user, require_terms_accepted
@@ -18,6 +20,7 @@ from ..models import (
     ProjectBOMItem,
     ProjectSlugHistory,
     ProjectTag,
+    ProjectVersion,
     UserFollow,
 )
 from ..schemas import (
@@ -29,8 +32,12 @@ from ..schemas import (
 )
 from ..sections import canonical_sections
 from ..slugs import slugify_title, unique_slug_for_author
-from ..visibility import can_view, is_draft, not_draft
+from ..visibility import is_draft, not_draft
+from .. import versions as versions_mod
+from ..versions import LiveView, View, live_views, resolve_view
 from .users import log_activity  # Issue #111: profile activity feed.
+
+logger = logging.getLogger(__name__)
 
 
 async def resolve_project_id(
@@ -148,7 +155,10 @@ async def _download_count(session: AsyncSession, project_id: int) -> int:
 
 async def _sections(session: AsyncSession, project: Project) -> list[str]:
     """Canonical sections for a list card (issue #259): headings in the
-    Markdown, plus the Bill of Materials when the structured BOM has rows."""
+    Markdown, plus the Bill of Materials when the structured BOM has rows.
+    A :class:`LiveView` answers from its live version."""
+    if isinstance(project, LiveView):
+        return canonical_sections(project.content_md, has_bom=project.live_has_bom)
     has_bom = (
         await session.execute(
             select(ProjectBOMItem.id).where(ProjectBOMItem.project_id == project.id).limit(1)
@@ -157,6 +167,13 @@ async def _sections(session: AsyncSession, project: Project) -> list[str]:
     return canonical_sections(project.content_md, has_bom=has_bom)
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
+
+
+async def tags_for(session: AsyncSession, project) -> list[str]:
+    """A card's tags: the live version's for a :class:`LiveView`."""
+    if isinstance(project, LiveView):
+        return list(project.live_tags)
+    return await _get_tags(session, project.id)
 
 
 async def _get_tags(session: AsyncSession, project_id: int) -> list[str]:
@@ -176,8 +193,19 @@ async def _set_tags(session: AsyncSession, project_id: int, tags: list[str]) -> 
         session.add(ProjectTag(project_id=project_id, tag=tag.strip().lower()))
 
 
-async def _project_response(session: AsyncSession, project: Project) -> ProjectResponse:
-    tags = await _get_tags(session, project.id)
+async def _project_response(
+    session: AsyncSession, project: Project, view: Optional[View] = None
+) -> ProjectResponse:
+    """The project as ``view`` shows it (epic #433). Without a view it is
+    the author's working copy (the write endpoints)."""
+    snap = view.snapshot if view is not None else None
+    is_author = view.is_author if view is not None else True
+    tags = sorted(snap.get("tags") or []) if snap is not None else await _get_tags(session, project.id)
+
+    def field(name: str, default=None):
+        if snap is not None and name in snap:
+            return snap[name]
+        return getattr(project, name, default)
 
     # Issue #108: compute remix attribution & counts.
     remixed_from_ref: Optional[RemixedFromRef] = None
@@ -185,10 +213,11 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
     if parent_id is not None:
         parent = await session.get(Project, parent_id)
         if parent is not None:
+            shown = await versions_mod.live_view(session, parent)
             remixed_from_ref = RemixedFromRef(
                 id=parent.id,
                 slug=getattr(parent, "slug", None),
-                title=parent.title,
+                title=shown.title,
                 author_username=parent.author_username,
             )
 
@@ -200,23 +229,33 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         )
     ) or 0
 
+    live = await versions_mod.live_version(session, project)
+    shown_version = view.version if view is not None else None
+    updated_at = project.updated_at
+    if snap is not None and shown_version is not None:
+        updated_at = shown_version.published_at or shown_version.created_at
+    live_number = live.number if (is_author and live is not None) else None
+    unpublished = None
+    if is_author:
+        unpublished = live is not None and await versions_mod.has_unpublished_changes(session, project, live)
+
     return ProjectResponse(
         id=project.id,
         slug=getattr(project, "slug", None),
-        title=project.title,
-        short_description=project.short_description,
-        content_md=project.content_md,
-        content_mode=getattr(project, "content_mode", "markdown") or "markdown",
-        difficulty=project.difficulty,
-        estimated_minutes=project.estimated_minutes,
-        code_repo_url=project.code_repo_url,
-        files_view=getattr(project, "files_view", None) or "filmstrip",
+        title=field("title"),
+        short_description=field("short_description"),
+        content_md=field("content_md"),
+        content_mode=field("content_mode", "markdown") or "markdown",
+        difficulty=field("difficulty"),
+        estimated_minutes=field("estimated_minutes"),
+        code_repo_url=field("code_repo_url"),
+        files_view=field("files_view") or "filmstrip",
         status=project.status,
         author_username=project.author_username,
-        cover_image=project.cover_image,
+        cover_image=field("cover_image"),
         tags=tags,
         created_at=project.created_at,
-        updated_at=project.updated_at,
+        updated_at=updated_at,
         remixed_from=remixed_from_ref,
         remix_description=getattr(project, "remix_description", None),
         remixes_count=int(remixes_count),
@@ -227,7 +266,52 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         featured_at=getattr(project, "featured_at", None),
         featured_by=getattr(project, "featured_by", None),
         featured_note=getattr(project, "featured_note", None),
+        published_at=await versions_mod.first_published_at(session, project.id),
+        live_number=live_number,
+        has_unpublished_changes=unpublished,
+        viewing=view.label if view is not None else "working",
     )
+
+
+async def list_item(session: AsyncSession, p, **extra) -> ProjectListItem:
+    """A card for ``p`` (a project row, or a :class:`LiveView` of one)."""
+    return ProjectListItem(
+        id=p.id,
+        slug=getattr(p, "slug", None),
+        title=p.title,
+        short_description=p.short_description,
+        difficulty=p.difficulty,
+        estimated_minutes=p.estimated_minutes,
+        status=p.status,
+        author_username=p.author_username,
+        cover_image=p.cover_image,
+        tags=await tags_for(session, p),
+        created_at=p.created_at,
+        is_remix=getattr(p, "remixed_from_id", None) is not None,
+        download_count=await _download_count(session, p.id),
+        is_featured=bool(getattr(p, "is_featured", False)),
+        featured_note=getattr(p, "featured_note", None),
+        sections=await _sections(session, p),
+        **extra,
+    )
+
+
+async def regenerate_slug(session: AsyncSession, project: Project, title: str) -> None:
+    """Point the project's slug at ``title``, keeping the old one in
+    ``project_slug_history`` so it 301s (issues #152/#190)."""
+    previous_slug = project.slug
+    new_slug = await unique_slug_for_author(
+        session,
+        author_username=project.author_username,
+        base_slug=slugify_title(title),
+        exclude_project_id=project.id,
+    )
+    if new_slug != previous_slug:
+        # No-op history when ``previous_slug`` is None (legacy rows that
+        # have never had a slug have nothing worth archiving).
+        if previous_slug:
+            session.add(ProjectSlugHistory(project_id=project.id, slug=previous_slug))
+        project.slug = new_slug
 
 
 @router.get("", response_model=list[ProjectListItem])
@@ -252,36 +336,51 @@ async def list_projects(
     user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> list[ProjectListItem]:
-    query = select(Project).where(
-        Project.status != "archived",
-        Project.is_blocked == False,  # noqa: E712
+    # Epic #433: readers see the live version, so search and the
+    # difficulty filter look at the live version's fields (the working
+    # copy's for a project that has never been snapshotted).
+    live = ProjectVersion
+
+    def live_field(name: str):
+        return case(
+            (live.id.is_not(None), live.snapshot[name].as_string()),
+            else_=getattr(Project, name),
+        )
+
+    live_title = live_field("title")
+    live_desc = live_field("short_description")
+    live_difficulty = live_field("difficulty")
+    query = (
+        select(Project)
+        .outerjoin(live, live.id == Project.published_version_id)
+        .where(
+            Project.status != "archived",
+            Project.is_blocked == False,  # noqa: E712
+        )
     )
     # Issue #260: drafts are private. The only listing that includes one
     # is an author's own profile (``author`` == the caller).
     if not (author and user and author == user):
         query = query.where(not_draft())
     if difficulty:
-        query = query.where(Project.difficulty == difficulty)
+        query = query.where(live_difficulty == difficulty)
     if author:
         query = query.where(Project.author_username == author)
     if search:
         query = query.where(
-            Project.title.ilike(f"%{search}%")
-            | Project.short_description.ilike(f"%{search}%")
+            live_title.ilike(f"%{search}%") | live_desc.ilike(f"%{search}%")
         )
     query = query.order_by(Project.created_at.desc()).limit(limit).offset(offset)
 
-    projects = list((await session.scalars(query)).all())
+    projects = await live_views(session, list((await session.scalars(query)).all()))
 
     if tag:
-        tagged_ids = set(
-            (
-                await session.execute(
-                    select(ProjectTag.project_id).where(ProjectTag.tag == tag.lower())
-                )
-            ).scalars().all()
-        )
-        projects = [p for p in projects if p.id in tagged_ids]
+        wanted_tag = tag.lower()
+        kept = []
+        for p in projects:
+            if wanted_tag in await tags_for(session, p):
+                kept.append(p)
+        projects = kept
 
     # Issue #140: bump followed-authors when the caller asked for it.
     # Stable sort so within-bucket order (the SQL "created_at desc") is
@@ -297,49 +396,36 @@ async def list_projects(
             ).scalars().all()
         )
         if followed:
-            def _bucket(p: Project) -> tuple[int, int]:
+            def _bucket(p) -> tuple[int, int]:
                 completed = 0 if p.status == "completed" else 1
                 followed_author = 0 if p.author_username in followed else 1
                 return (completed, followed_author)
 
             projects.sort(key=_bucket)
 
-    items = []
-    for p in projects:
-        tags = await _get_tags(session, p.id)
-        items.append(
-            ProjectListItem(
-                id=p.id,
-                slug=getattr(p, "slug", None),
-                title=p.title,
-                short_description=p.short_description,
-                difficulty=p.difficulty,
-                estimated_minutes=p.estimated_minutes,
-                status=p.status,
-                author_username=p.author_username,
-                cover_image=p.cover_image,
-                tags=tags,
-                created_at=p.created_at,
-                is_remix=getattr(p, "remixed_from_id", None) is not None,
-                download_count=await _download_count(session, p.id),
-                is_featured=bool(getattr(p, "is_featured", False)),
-                featured_note=getattr(p, "featured_note", None),
-                sections=await _sections(session, p),
-            )
-        )
-    return items
+    return [await list_item(session, p) for p in projects]
 
 
 @router.get("/{project_id}", response_model=ProjectResponse)
 async def get_project(
     project_id: int,
+    response: Response,
+    version: Optional[str] = Query(
+        None,
+        description=(
+            "Epic #433: ``live``, or (author only) ``working`` or a version "
+            "number. Default: the working copy for the author, the live "
+            "version for everyone else."
+        ),
+    ),
     user: Optional[str] = Depends(get_optional_user),
     session: AsyncSession = Depends(get_session),
 ) -> ProjectResponse:
-    project = await session.get(Project, project_id)
-    if project is None or not can_view(project, user):
+    view = await resolve_view(session, project_id, user, version)
+    if view.project is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found")
-    return await _project_response(session, project)
+    response.headers.update(view.headers)
+    return await _project_response(session, view.project, view)
 
 
 @router.post("", response_model=ProjectResponse, status_code=201)
@@ -374,6 +460,10 @@ async def create_project(
     await session.flush()
     if body.tags:
         await _set_tags(session, project.id, body.tags)
+    # Epic #433: the editor creates drafts and publishes with POST /publish.
+    # A project an older API client creates public (``wip``, the old
+    # default) has no version until it's published, and until then reads
+    # as before #433 (``versions.resolve_view``).
     # Issue #111: log create as a profile-activity event. project_updated
     # would be wrong (no audience yet) — we use the same row to mean
     # "started a project"; the listener treats it the same as a publish
@@ -438,67 +528,48 @@ async def update_project(
 
     update_data = body.model_dump(exclude_unset=True)
     tags = update_data.pop("tags", None)
-    # Issue #152 / #190: ``regenerate_slug`` started life as the explicit
-    # opt-in for re-slugifying on rename. As of #190 a title change ALWAYS
-    # regenerates the slug — the old slug is preserved in
-    # ``project_slug_history`` so inbound links keep working via a 301
-    # redirect. We still pop the flag so it never lands on the ORM row;
-    # callers that pass ``regenerate_slug: true`` without a new title get
-    # the same auto-regen against the existing title (a no-op when the
-    # computed slug already matches).
+    # Issue #434/#437: refuse to overwrite a row that changed since the
+    # caller last read it (another tab, or a restore).
+    expected = update_data.pop("expected_updated_at", None)
+    if expected is not None:
+        if expected.tzinfo is not None:
+            expected = expected.astimezone(timezone.utc).replace(tzinfo=None)
+        if project.updated_at is not None and expected != project.updated_at:
+            raise HTTPException(status.HTTP_409_CONFLICT, detail="stale")
+    # Issue #152 / #190 / #435: a title change regenerates the slug only
+    # while nothing is live. Once a version is live the URL follows the
+    # *published* title, so it changes on publish, not on autosave.
     explicit_regen = bool(update_data.pop("regenerate_slug", False))
+    new_status = update_data.pop("status", None)
     title_changed = "title" in update_data and update_data["title"] != project.title
-    previous_status = project.status
-    previous_slug = project.slug
-    for field, value in update_data.items():
-        setattr(project, field, value)
+    for field_name, value in update_data.items():
+        setattr(project, field_name, value)
     project.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
 
-    # Issue #190: regenerate the slug whenever the title actually changed.
-    # The legacy ``regenerate_slug=true`` opt-in still forces a refresh so
-    # callers can re-slugify after a slugify_title rule change without
-    # editing the title.
-    if title_changed or explicit_regen:
-        base = slugify_title(project.title)
-        new_slug = await unique_slug_for_author(
-            session,
-            author_username=project.author_username,
-            base_slug=base,
-            exclude_project_id=project.id,
-        )
-        if new_slug != previous_slug:
-            # Stash the OLD slug so historic links keep resolving via
-            # ``project_slug_history`` and 301 to the canonical URL.
-            # No-op when ``previous_slug`` is None (legacy rows that
-            # have never had a slug have nothing worth archiving).
-            if previous_slug:
-                session.add(
-                    ProjectSlugHistory(
-                        project_id=project.id,
-                        slug=previous_slug,
-                    )
-                )
-            project.slug = new_slug
+    if (title_changed or explicit_regen) and project.published_version_id is None:
+        await regenerate_slug(session, project, project.title)
 
     if tags is not None:
         await _set_tags(session, project.id, tags)
+    await session.flush()
 
-    # Issue #111: emit activity. A status flip from non-completed to
-    # completed is the first-time "publish" event; everything else is
-    # generic project_updated. Archived → completed is also a publish.
-    # Issue #260: a draft has no audience, so edits to it log nothing.
-    became_completed = (
-        previous_status != "completed" and project.status == "completed"
-    )
-    if not is_draft(project):
-        await log_activity(
-            session,
-            user_id=user,
-            kind="project_published" if became_completed else "project_updated",
-            subject_id=project.id,
-            subject_title=project.title,
-            subject_url=f"/projects/view.html?id={project.id}",
-        )
+    # Epic #433: publishing is ``POST /publish`` now. Until every editor
+    # uses it, ``status`` still works the old way: ``completed`` (or the
+    # retired ``wip``) publishes the working copy, ``draft`` unpublishes,
+    # ``archived`` archives (the live version stays live).
+    if new_status is not None:
+        if new_status in ("completed", "wip"):
+            logger.warning(
+                "PUT status=%s on project %s: deprecated, use POST /publish (epic #433)",
+                new_status, project.id,
+            )
+            from .versions import publish_and_announce  # local: avoids an import cycle
+
+            await publish_and_announce(session, project, user, note=None, quiet_if_unchanged=True)
+        elif new_status == "draft":
+            versions_mod.unpublish(project)
+        elif new_status == "archived":
+            project.status = "archived"
 
     await session.commit()
     await session.refresh(project)
@@ -525,6 +596,8 @@ async def my_projects(
     user: str = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> list[ProjectListItem]:
+    """The author's own projects, as their working copies, with which
+    version is live and whether the working copy has changed since."""
     projects = (
         await session.scalars(
             select(Project)
@@ -534,25 +607,17 @@ async def my_projects(
     ).all()
     items = []
     for p in projects:
-        tags = await _get_tags(session, p.id)
+        live = await versions_mod.live_version(session, p)
         items.append(
-            ProjectListItem(
-                id=p.id,
-                slug=getattr(p, "slug", None),
-                title=p.title,
-                short_description=p.short_description,
-                difficulty=p.difficulty,
-                estimated_minutes=p.estimated_minutes,
-                status=p.status,
-                author_username=p.author_username,
-                cover_image=p.cover_image,
-                tags=tags,
-                created_at=p.created_at,
-                is_remix=getattr(p, "remixed_from_id", None) is not None,
-                download_count=await _download_count(session, p.id),
-                is_featured=bool(getattr(p, "is_featured", False)),
-                featured_note=getattr(p, "featured_note", None),
-                sections=await _sections(session, p),
+            await list_item(
+                session,
+                p,
+                live_number=live.number if live is not None else None,
+                has_unpublished_changes=(
+                    await versions_mod.has_unpublished_changes(session, p, live)
+                    if live is not None
+                    else False
+                ),
             )
         )
     return items

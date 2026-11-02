@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,7 +27,8 @@ from ..models import Project, ProjectWiring
 from ..schemas import ProjectWiringResponse, ProjectWiringUpdate
 from ..storage import delete_file, read_file, save_file
 from ..svg_safety import SVG_CSP, UnsafeSvg, clean_svg
-from ..visibility import NO_STORE, hide_drafts
+from ..visibility import NO_STORE
+from .. import versions as v
 
 router = APIRouter(prefix="/api/projects/{project_id}", tags=["wiring"])
 
@@ -47,9 +48,10 @@ async def _wiring(session: AsyncSession, project_id: int) -> Optional[ProjectWir
     ).first()
 
 
-def _svg_url(project_id: int) -> str:
+def _svg_url(project_id: int, version: Optional[str] = None) -> str:
     base = get_settings().public_base_url.rstrip("/")
-    return f"{base}/api/projects/{project_id}/wiring.svg"
+    query = f"?version={version}" if version and version != "working" else ""
+    return f"{base}/api/projects/{project_id}/wiring.svg{query}"
 
 
 def _response(w: ProjectWiring) -> ProjectWiringResponse:
@@ -73,8 +75,21 @@ async def get_wiring(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> ProjectWiringResponse:
-    await hide_drafts(session, project_id, user)
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is not None:
+        snap = view.snapshot.get("wiring")
+        if snap is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No wiring for this project")
+        when = view.version.created_at
+        return ProjectWiringResponse(
+            project_id=project_id,
+            data=snap.get("data") or {},
+            svg_url=_svg_url(project_id, view.label if view.is_author else None) if snap.get("svg_path") else None,
+            created_at=when,
+            updated_at=when,
+        )
     w = await _wiring(session, project_id)
     if w is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No wiring for this project")
@@ -137,10 +152,18 @@ async def get_wiring_svg(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> Response:
-    draft = await hide_drafts(session, project_id, user, no_store=True)
-    w = await _wiring(session, project_id)
-    data = read_file(w.svg_path) if w and w.svg_path else None
+    # Epic #433: readers get the live version's own copy of the picture,
+    # so redrawing the working copy changes nothing public until publish.
+    view = await v.resolve_view(session, project_id, user, version, no_store=True)
+    draft = view.private or view.is_author
+    if view.snapshot is not None:
+        path = (view.snapshot.get("wiring") or {}).get("svg_path")
+    else:
+        w = await _wiring(session, project_id)
+        path = w.svg_path if w else None
+    data = read_file(path) if path else None
     if data is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No wiring diagram for this project", headers=NO_STORE)
     return Response(
