@@ -19,7 +19,6 @@
     add: 'M8 3v10M3 8h10',
     browse: 'M2 2.5h5v5H2zM9 2.5h5v5H9zM2 9.5h5v5H2zM9 9.5h5v5H9z',
   };
-  const MODEL_FILE_RE = /\.(stl|3mf|obj|step|stp)$/i;
 
   // ------------------------------------------------------------ inserting
 
@@ -303,7 +302,6 @@
 
   // The commands for MarkdownEditor's `slashCommands` option.
   //   ctx.listFiles()   resolves to the project's files: { name, url }
-  //   ctx.modelFiles()  the files already loaded (sync), for 3D printed parts
   //   ctx.uploadFile()  asks for a file, uploads it, resolves to { name, url } or null
   //   ctx.listVideos()  resolves to the project's videos: { id, title }
   //   ctx.listImages()  resolves to the project's gallery pictures: { url, name, caption }
@@ -672,13 +670,10 @@
         return { before: h + '1. ', placeholder: 'First step', after: '\n' };
       case 'wiring':
         return { before: h + '| From | To | Notes |\n| --- | --- | --- |\n| ', placeholder: 'Pico GP0', after: ' |  |  |\n' };
-      case '3d-printed-parts': {
-        const models = (ctx.modelFiles ? ctx.modelFiles() : []).filter(f => MODEL_FILE_RE.test(f.name));
-        const head = h + '| Part | Qty | Notes |\n| --- | --- | --- |\n';
-        if (!models.length) return { before: head + '| ', placeholder: 'Part name', after: ' | 1 |  |\n' };
-        const rows = models.map(f => '| [' + mdTableCell(mdLinkText(f.name)) + '](' + f.url + ') | ' + (f.qty || 1) + ' |  |\n').join('');
-        return { before: head + rows };
-      }
+      case 'files-and-models':
+        // Just the heading: the page puts the files and models under it
+        // (each part's Qty, Colour and Filament live on the file).
+        return { before: h };
       default:
         return { before: h };
     }

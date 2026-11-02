@@ -44,9 +44,14 @@
       icon: 'M4.5 2.5v11M11.5 6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM11.5 6.5c0 3.5-7 2-7 5.5',
     },
     {
-      id: '3d-printed-parts',
-      heading: '3D printed parts',
-      keywords: ['3d', 'printed', 'print', 'stl', 'models', 'cad'],
+      // The project's files and 3D models (project-models.js): the page
+      // shows them under this heading, wherever it is, as a filmstrip or a
+      // table with each part's Qty, Colour and Filament. Without the
+      // heading they go at the end of the page.
+      id: 'files-and-models',
+      heading: 'Files & Models',
+      aliases: ['Files and Models', '3D printed parts', '3D prints', 'Printed parts', 'Models', 'Files', 'Downloads', 'STL files'],
+      keywords: ['3d', 'printed', 'print', 'stl', 'models', 'cad', 'files', 'downloads', 'filament'],
       icon: 'M8 1.8 13.5 5v6L8 14.2 2.5 11V5zM2.5 5 8 8.2 13.5 5M8 8.2v6',
     },
     {

@@ -175,11 +175,10 @@ description: View project details
         </section>
 
 
-        <!-- Thumbnail grid of the models, moved under the author's
-             "3D printed parts" heading when there is one (issue #262). -->
-        <div id="view-models-grid" class="view-models-grid mb-3 d-none"></div>
-
-        <!-- Files & Models: printable models (issue #261) -->
+        <!-- Files & Models: moved under the author's Files & Models heading
+             (or "3D printed parts"…) wherever it is; at the end without one. -->
+        <div id="view-files-block">
+        <!-- Printable models (issue #261) -->
         <div id="view-models-section" class="kr-section d-none">
           <h2 class="kr-section-title"><i class="fas fa-cube" aria-hidden="true"></i> Files &amp; Models</h2>
           <!-- Filmstrip or Table: the author picks the first, visitors can switch. -->
@@ -203,6 +202,7 @@ description: View project details
             <i class="fas fa-file-archive me-1"></i> Download files
           </button>
           <small class="text-muted ms-2">One .zip of every file and picture, with the write-up as README.md</small>
+        </div>
         </div>
 
         <!-- BOM -->
@@ -418,12 +418,6 @@ description: View project details
 
   .view-download-all { margin-top: -0.75rem; }
 
-  /* Issue #262: model thumbnails under "3D printed parts" and in Files & Models. */
-  .view-models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-  .view-models-grid__item { position: relative; margin: 0; text-align: center; padding: 8px; border: 1px solid rgba(0,0,0,.08); border-radius: 8px; }
-  .view-models-grid__item img, .view-models-grid__item .fa-cube { display: block; margin: 0 auto 6px; }
-  .view-models-grid__item .fa-cube { width: 128px; height: 128px; line-height: 128px; }
-  .view-model-thumb { object-fit: contain; }
 
   .like-pulse { animation: likePulse 0.3s ease; }
   @keyframes likePulse {
@@ -1402,7 +1396,7 @@ description: View project details
   // the shops have it now, in the reader's currency, a badge when the part
   // has changed since, and an estimated total under the table.
   async function enrichBomTable(items) {
-    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading, .md-card *)'));
+    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading, .md-card *, #view-files-block *)'));
     const table = sectionTableEl('bill-of-materials', headings);
     if (!table || !items.length || table.dataset.enriched) return;
     table.dataset.enriched = '1';
@@ -1619,10 +1613,6 @@ description: View project details
     const size = f => (f.file_size / 1024 >= 1024
       ? (f.file_size / 1048576).toFixed(1) + ' MB'
       : (f.file_size / 1024).toFixed(1) + ' KB');
-    // A model's thumbnail, or a cube until it has one (OBJ and 3MF for now).
-    const thumb = (f, px) => f.thumbnail_version
-      ? `<img src="${thumbUrl(f)}" alt="${esc(f.filename)}" width="${px}" height="${px}" loading="lazy" class="view-model-thumb"${colourOf(f) ? ` data-tint="${colourOf(f)}"` : ''}>`
-      : `<i class="fas fa-cube text-muted" style="font-size:${Math.round(px / 2)}px"></i>`;
     const colourOf = f => ProjectModels.colourHex(f.print_colour);
     const openModel = id => {
       const f = files.find(x => x.id === id);
@@ -1699,17 +1689,6 @@ description: View project details
         if (b) showModels(b.dataset.modelsView);
       });
       showModels(pm.normaliseView(project && project.files_view));
-      const grid = document.getElementById('view-models-grid');
-      grid.innerHTML = models.map(f => `
-        <figure class="view-models-grid__item">
-          ${viewable(f)
-            ? `<button type="button" class="btn btn-link p-0" data-view-model="${f.id}" title="View in 3D">${thumb(f, 128)}</button>`
-            : `<a href="${downloadUrl(f)}">${thumb(f, 128)}</a>`}
-          ${f.thumbnail_version ? '<span class="kr-model-badge" title="Rendered from the 3D model" aria-hidden="true"><i class="fas fa-cube"></i></span>' : ''}
-          <figcaption class="small text-truncate"><a href="${downloadUrl(f)}">${esc(f.filename)}</a></figcaption>
-        </figure>`).join('');
-      grid.dataset.ready = '1';
-      ProjectModels.tintAll(grid);
     }
     if (others.length) {
       document.getElementById('view-files-section').classList.remove('d-none');
@@ -1725,13 +1704,16 @@ description: View project details
     }
 
     // Thumbnails open the 3D viewer, and so do links to an STL in the
-    // write-up (the /3d printed parts and /file commands insert them).
+    // write-up (the /file command inserts them).
     if (!loadFiles._bound) {
       loadFiles._bound = true;
       document.addEventListener('click', e => {
         const btn = e.target.closest('[data-view-model]');
         if (btn) { e.preventDefault(); openModel(Number(btn.dataset.viewModel)); return; }
         const link = e.target.closest('#view-content a[href]');
+        // The Files & Models block sits in the text once placed; its own
+        // links download.
+        if (link && link.closest('#view-files-block')) return;
         const m = link && link.getAttribute('href').match(/\/api\/projects\/\d+\/files\/(\d+)\/download$/);
         const f = m && files.find(x => x.id === Number(m[1]));
         if (f && viewable(f) && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
@@ -2543,7 +2525,7 @@ description: View project details
     if (!root) return;
     root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
       // A heading in a table cell (project-cell-headings.js) is a label, not a section.
-      if (h.dataset.anchored || h.closest('#view-bom-section') || h.classList.contains('cell-heading') || h.closest('.md-card')) return;
+      if (h.dataset.anchored || h.closest('#view-bom-section, #view-files-block') || h.classList.contains('cell-heading') || h.closest('.md-card')) return;
       let id = h.id;
       if (!id) {
         const base = slugify(headingText(h)) || 'section';
@@ -2619,7 +2601,7 @@ description: View project details
       const level = Number(heading.tagName[1]);
       for (let el = heading.nextElementSibling; el; el = el.nextElementSibling) {
         if (/^H[1-6]$/.test(el.tagName) && Number(el.tagName[1]) <= level) break;
-        if (el.id === 'view-bom-section') continue; // the stored rows, once moved here
+        if (el.id === 'view-bom-section' || el.id === 'view-files-block') continue; // blocks moved here
         const table = el.tagName === 'TABLE' ? el : el.querySelector && el.querySelector('table');
         if (table && table.querySelector('tbody tr')) return table;
       }
@@ -2650,7 +2632,7 @@ description: View project details
     // H1s are the top level and H2s nest under them (issue #259); deeper
     // headings stay in the text only.
     anchorHeadings(document.getElementById('view-content'));
-    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading, .md-card *)'));
+    const headings = Array.from(document.querySelectorAll('#view-content :is(h1, h2, h3):not(.cell-heading, .md-card *, #view-files-block *)'));
 
     const bomSection = document.getElementById('view-bom-section');
     // The editor no longer edits the stored BOM rows: once the author's own
@@ -2658,11 +2640,19 @@ description: View project details
     // rows would only repeat it.
     if (bomSection && sectionHasTable('bill-of-materials', headings)) bomSection.classList.add('d-none');
     const bomUnderHeading = placeUnderHeading(bomSection, 'bill-of-materials', headings);
-    // The models' thumbnails go under the author's 3D printed parts heading.
-    const modelsGrid = document.getElementById('view-models-grid');
-    if (modelsGrid && modelsGrid.dataset.ready) {
-      modelsGrid.classList.remove('d-none');
-      if (!placeUnderHeading(modelsGrid, '3d-printed-parts', headings)) modelsGrid.classList.add('d-none');
+    // Files & Models go under the author's Files & Models heading (or an
+    // alias such as "3D printed parts"), wherever it is; at the end
+    // without one. Placed, the heading names them, so the block's own
+    // titles step back (the Files title stays when there are models too).
+    const filesBlock = document.getElementById('view-files-block');
+    const filesPlaced = !!(filesBlock && placeUnderHeading(filesBlock, 'files-and-models', headings));
+    if (filesBlock) {
+      const modelsTitle = filesBlock.querySelector('#view-models-section > .kr-section-title');
+      const filesTitle = filesBlock.querySelector('#view-files-section > .kr-section-title');
+      const hasModels = !document.getElementById('view-models-section').classList.contains('d-none');
+      if (modelsTitle) modelsTitle.classList.toggle('d-none', filesPlaced);
+      if (filesTitle) filesTitle.classList.toggle('d-none', filesPlaced && !hasModels);
+      filesBlock.classList.toggle('kr-files-placed', filesPlaced);
     }
     // Sections rendered outside the markdown, listed when visible.
     const extras = [
@@ -2673,6 +2663,7 @@ description: View project details
     ].filter(ex => {
       const el = document.getElementById(ex.key);
       if (!el || el.classList.contains('d-none')) return false;
+      if (filesPlaced && (ex.key === 'view-models-section' || ex.key === 'view-files-section')) return false;
       return !(ex.key === 'view-bom-section' && bomUnderHeading);
     });
 
