@@ -2280,8 +2280,8 @@
   // at the end without one. While there are files and no heading, the
   // section says so, the hints panel offers to add it, and so does a drop.
   // The files go under the Files & Models heading, else under 3D printed
-  // parts (the same order as view.html). Where that section's text ends:
-  // { heading line, last line } (1-based), or null.
+  // parts (the same order as view.html): { heading line, the line the
+  // panel follows } (1-based), or null.
   const FILES_SECTIONS = ['files-and-models', '3d-printed-parts'];
   function filesSectionLines(markdown) {
     const lines = String(markdown || '').split('\n');
@@ -2297,26 +2297,13 @@
         headings.push({ index: i, level: m[1].length, id: section && section.id });
       }
     });
-    // A page break ends a section too (project-pages.js's marker).
-    const PAGE_BREAK = /^\s*<!--\s*page(?:\s*break)?\s*-->\s*$/i;
     for (const id of FILES_SECTIONS) {
       const k = headings.findIndex(h => h.id === id);
       if (k < 0) continue;
       const h = headings[k];
-      const next = headings.slice(k + 1).find(x => x.level <= h.level);
-      let end = next ? next.index : lines.length;
-      for (let i = h.index + 1; i < end; i++) {
-        if (PAGE_BREAK.test(lines[i])) { end = i; break; }
-      }
-      // Straight after the section's last line of text (the heading, when
-      // it has none), not after the blank lines or page break that follow.
-      let last = end - 1;
-      while (last > h.index && !lines[last].trim()) last--;
-      // A block on a picture's line would replace the picture: go after
-      // the blank line below it instead, else under the heading.
-      if (last > h.index && /^\s*!\[/.test(lines[last])) {
-        last = last + 1 < end ? last + 1 : h.index;
-      }
+      // Straight under the heading line, above the section's own text
+      // (Kev, 2026-11-02).
+      const last = h.index;
       return { heading: h.index + 1, last: last + 1, id };
     }
     return null;
