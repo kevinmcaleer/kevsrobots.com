@@ -310,3 +310,15 @@ test('setRowPrice writes the price cell and adds a note', () => {
   // No Price column.
   assert.equal(BomSync.setRowPrice(doc('| Part | Qty |\n| --- | --- |\n| [Pico](/parts/view.html?slug=pico) | 1 |'), 'pico', '£4'), null);
 });
+
+test('reads a fit-to-content table (one dash per delimiter cell)', () => {
+  const md = doc([
+    '| Part | Qty | Price |',
+    '| - | - | -: |',
+    '| [18650 cell](/parts/view.html?slug=18650) | 2 | £5.00 |',
+  ].join('\n'));
+  const table = globalThis.ProjectSections.sectionTable(md, 'bill-of-materials');
+  assert.ok(table, 'the table is found');
+  assert.equal(table.rows.length, 1);
+  assert.equal(BomSync.parse(md).rows.length, 1);
+});
