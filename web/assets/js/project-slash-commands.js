@@ -671,8 +671,9 @@
       case 'wiring':
         return { before: h + '| From | To | Notes |\n| --- | --- | --- |\n| ', placeholder: 'Pico GP0', after: ' |  |  |\n' };
       case 'files-and-models':
-        // Just the heading: the page puts the files and models under it
-        // (each part's Qty, Colour and Filament live on the file).
+      case '3d-printed-parts':
+        // Just the heading: the files and models go under it, in the editor
+        // and on the page (each part's Qty, Colour and Filament live on the file).
         return { before: h };
       default:
         return { before: h };

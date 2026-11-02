@@ -97,6 +97,7 @@ def test_card_titles_are_not_sections():
 
 
 def test_files_and_models_aliases() -> None:
-    # "3D printed parts" was its own section; it now counts as Files & Models.
-    for heading in ("# Files & Models", "## files and models", "# 3D printed parts", "### Downloads"):
+    for heading in ("# Files & Models", "## files and models", "### Downloads"):
         assert canonical_sections(heading + "\n") == ["files-and-models"]
+    for heading in ("# 3D printed parts", "## Printed parts", "# STL files"):
+        assert canonical_sections(heading + "\n") == ["3d-printed-parts"]

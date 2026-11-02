@@ -2279,16 +2279,75 @@
   // heading (or an alias such as "3D printed parts"), wherever it is, and
   // at the end without one. While there are files and no heading, the
   // section says so, the hints panel offers to add it, and so does a drop.
-  function hasFilesHeading(markdown) {
+  // The files go under the Files & Models heading, else under 3D printed
+  // parts (the same order as view.html). Where that section's text ends:
+  // { heading line, last line } (1-based), or null.
+  const FILES_SECTIONS = ['files-and-models', '3d-printed-parts'];
+  function filesSectionLines(markdown) {
+    const lines = String(markdown || '').split('\n');
+    const headings = [];
     let fence = null;
-    return String(markdown || '').split('\n').some(line => {
+    lines.forEach((line, i) => {
       const f = /^ {0,3}(`{3,}|~{3,})/.exec(line);
-      if (f) { fence = fence ? (f[1][0] === fence ? null : fence) : f[1][0]; return false; }
-      if (fence) return false;
-      const m = /^ {0,3}#{1,6}\s+(.*?)\s*#*\s*$/.exec(line);
-      const section = m && ProjectSections.match(m[1]);
-      return !!(section && section.id === 'files-and-models');
+      if (f) { fence = fence ? (f[1][0] === fence ? null : fence) : f[1][0]; return; }
+      if (fence) return;
+      const m = /^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$/.exec(line);
+      if (m) {
+        const section = ProjectSections.match(m[2]);
+        headings.push({ index: i, level: m[1].length, id: section && section.id });
+      }
     });
+    for (const id of FILES_SECTIONS) {
+      const k = headings.findIndex(h => h.id === id);
+      if (k < 0) continue;
+      const h = headings[k];
+      const next = headings.slice(k + 1).find(x => x.level <= h.level);
+      let last = (next ? next.index : lines.length) - 1;
+      // After a blank line where there is one, so the block sits clear of
+      // the text; never on a picture's line (a block would replace it).
+      while (last > h.index && /^\s*!\[/.test(lines[last])) last = h.index;
+      return { heading: h.index + 1, last: last + 1, id };
+    }
+    return null;
+  }
+  function hasFilesHeading(markdown) {
+    return !!filesSectionLines(markdown);
+  }
+
+  // In the editor too, the Files & Models panel sits under that section's
+  // text (an editor block), and goes back below the editor without one.
+  let filesBlock = null;
+  let filesHome = null;
+  function placeFilesPanel() {
+    const panel = document.getElementById('editor-files-section');
+    if (!panel || !mde || !mde.view || typeof mde.openBlock !== 'function') return false;
+    if (!filesHome) filesHome = { parent: panel.parentNode, next: panel.nextSibling };
+    const doc = mde.view.state.doc;
+    const where = filesSectionLines(doc.toString());
+    if (!where) {
+      if (filesBlock) { const b = filesBlock; filesBlock = null; b.close(); }
+      if (panel.parentNode !== filesHome.parent) filesHome.parent.insertBefore(panel, filesHome.next);
+      panel.classList.remove('is-in-text');
+      return false;
+    }
+    const pos = doc.line(Math.min(where.last, doc.lines)).from;
+    if (filesBlock && filesBlock.isOpen()) {
+      if (doc.lineAt(Math.max(0, filesBlock.pos())).number !== doc.lineAt(pos).number) filesBlock.moveTo(pos);
+    } else {
+      filesBlock = mde.openBlock(pos, {
+        slot: 'files',
+        estimatedHeight: 480,
+        onClose: () => {
+          // Closed by the editor (it went away): put the panel back home.
+          if (filesBlock && !filesBlock.isOpen()) filesBlock = null;
+          if (panel.parentNode !== filesHome.parent) filesHome.parent.insertBefore(panel, filesHome.next);
+          panel.classList.remove('is-in-text');
+        },
+      });
+    }
+    if (panel.parentNode !== filesBlock.element) filesBlock.element.appendChild(panel);
+    panel.classList.add('is-in-text');
+    return true;
   }
 
   // A # Files & Models heading at the end of the text, then scrolls to it.
@@ -2320,18 +2379,20 @@
   function updateFilesPlacement() {
     const note = document.getElementById('files-placement');
     const placed = !!(mde && hasFilesHeading(getEditorValue()));
+    if (mde) placeFilesPanel();
     const missing = projectFiles.length > 0 && !placed;
     if (note) {
-      note.hidden = !projectFiles.length;
+      // In the text, the panel's place says it all.
+      note.hidden = !missing;
       note.classList.toggle('is-missing', missing);
       note.innerHTML = missing
         ? '<i class="fas fa-info-circle" aria-hidden="true"></i> <span>Your write-up has no Files &amp; Models section, so these go at the end of the page.</span> ' +
           '<button type="button" class="btn btn-sm btn-outline-secondary" data-action="add-files-section">Add the section</button>'
-        : '<i class="fas fa-check" aria-hidden="true"></i> <span>On the page these show under your Files &amp; Models heading.</span>';
+        : '';
     }
     setEditorHint('files-section', missing ? {
       title: 'Your files have no section yet',
-      detail: 'Add a Files & Models heading where you want your files and 3D models to show on the page. Until then they go at the end.',
+      detail: 'Add a Files & Models (or 3D printed parts) heading where you want your files and 3D models to show. Until then they go at the end of the page.',
       actions: [{ label: 'Add the section', run: addFilesSection }],
     } : null);
   }

@@ -390,7 +390,13 @@ hide_nibsy: true
 
     // Page sections rendered outside the editor
     const extras = [];
-    extras.push({ key: 'editor-files-section', text: 'Files & Models' });
+    // Once the text has a Files & Models (or 3D printed parts) heading, the
+    // panel sits under it, and that heading is its entry.
+    const filesInText = headings.some(h => {
+      const s = ProjectSections.match(h.text);
+      return s && (s.id === 'files-and-models' || s.id === '3d-printed-parts');
+    });
+    if (!filesInText) extras.push({ key: 'editor-files-section', text: 'Files & Models' });
 
     const toc = ProjectToc.render(nav, entries, {
       extras,
