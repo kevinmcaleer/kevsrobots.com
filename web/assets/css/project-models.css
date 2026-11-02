@@ -23,10 +23,43 @@
   border-radius: var(--kr-models-radius);
   background: radial-gradient(circle at 50% 45%, #fff, var(--surface, #f3f4f6) 75%);
   overflow: hidden;
-  cursor: zoom-in;
 }
-.kr-models-hero[disabled] { cursor: default; }
-.kr-models-hero:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; }
+.kr-models-hero.is-clickable { cursor: zoom-in; }
+
+/* The big preview is the model itself, drawn in 3D: drag to turn it
+   (Kev, 2026-11-02). Its picture shows until the model has loaded. A
+   vertical swipe on a phone still scrolls the page. */
+.kr-models-hero.is-live { cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.kr-models-hero.is-live.is-turning { cursor: grabbing; }
+.kr-models-hero .model-viewer__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.kr-models-hero.is-3d .model-viewer__canvas { opacity: 1; }
+.kr-models-hero.is-3d .kr-models-hero-img,
+.kr-models-hero.is-3d .kr-model-badge { visibility: hidden; }
+.kr-models-hero.is-loading-3d .kr-model-badge { animation: kr-models-pulse 1s ease-in-out infinite alternate; }
+@keyframes kr-models-pulse { from { opacity: 1; } to { opacity: 0.3; } }
+
+/* "Drag to turn" under the model, faint until hovered. */
+.kr-models-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 0.6rem;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: var(--muted, #6b7280);
+  pointer-events: none;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+.kr-models-hint i { margin-right: 0.3rem; }
+.kr-models-stage:hover .kr-models-hint { opacity: 1; }
 
 .kr-models-hero-img {
   display: block;
@@ -55,6 +88,24 @@
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
 }
 .kr-models-open:hover { filter: brightness(1.08); }
+
+/* With the model live in the preview, full screen is a small icon button
+   in the bottom right corner. */
+.kr-models-open.is-icon {
+  left: auto;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  transform: none;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  justify-content: center;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--card, #fff);
+  color: var(--muted, #4b5563);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+.kr-models-open.is-icon:hover { color: var(--accent, #2563eb); filter: none; }
 
 /* A cube in the corner: this picture is rendered from the model. Just
    the icon, no box (Kev, 2026-10-31). */

@@ -7,8 +7,9 @@
 // /api/projects/{id}/files/{file_id}/thumbnail. The admin backfill page
 // does the same for models uploaded before this existed.
 //
-// The project page opens a model in ModelThumbnails.openViewer(): the same
-// renderer, drag to turn, wheel or pinch to zoom.
+// mountViewer() draws a model you can turn into any element (the big
+// preview in the Files & Models filmstrip); openViewer() does the same in a
+// full-screen dialog. Drag to turn, wheel or pinch to zoom.
 //
 // Only STL renders today. OBJ and 3MF show a cube icon until they do.
 (function () {
@@ -195,24 +196,20 @@
     return viewer;
   }
 
-  // Show the STL at `url` (fetched with credentials or the dev token, so a
-  // draft's author sees theirs). `downloadUrl` is the counted download link.
-  async function openViewer({ url, name, downloadUrl, colour }) {
-    const v = viewerShell();
-    if (v.close) v.close();
-    v.title.textContent = name || '';
-    v.download.href = downloadUrl || url;
-    v.status.textContent = 'Loading model…';
-    v.status.style.display = '';
-    v.el.classList.remove('d-none');
-
+  // Fetch the STL at `url` (with credentials or the dev token, so a draft's
+  // author sees theirs) and draw it into `stage`, drag to turn. Returns
+  // { ready, destroy }: `ready` resolves once the model is on screen and
+  // rejects when it can't be shown. `inline` is for a model sitting in the
+  // page: wheel zooms only with Ctrl/Cmd held (so the page still scrolls)
+  // and a vertical swipe on a phone scrolls the page, not the model.
+  function mountViewer(stage, { url, colour, inline }) {
     let renderer = null;
     let geometry = null;
-    let closed = false;
+    let destroyed = false;
     const cleanups = [];
-    v.close = () => {
-      closed = true;
-      v.el.classList.add('d-none');
+    const destroy = () => {
+      if (destroyed) return;
+      destroyed = true;
       cleanups.forEach(fn => fn());
       if (geometry) geometry.dispose();
       if (renderer) {
@@ -220,10 +217,9 @@
         if (renderer.forceContextLoss) renderer.forceContextLoss();
         renderer.domElement.remove();
       }
-      v.close = null;
     };
 
-    try {
+    const ready = (async () => {
       const THREE = await loadThree();
       // Through ProjectAuth where the page has it: a draft's files are its
       // author's alone, and with a dev token (local http) the login cookie
@@ -233,15 +229,17 @@
         : await fetch(url, { credentials: 'include' });
       if (!resp.ok) throw new Error('Could not load the model (' + resp.status + ')');
       const buffer = await resp.arrayBuffer();
-      if (closed) return;
+      if (destroyed) return;
       geometry = parseStl(THREE, buffer);
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(window.devicePixelRatio || 1);
-      v.stage.appendChild(renderer.domElement);
-      const rect = v.stage.getBoundingClientRect();
-      renderer.setSize(rect.width, rect.height, false);
-      const { scene, camera, pivot, distance } = buildScene(THREE, geometry, rect.width / rect.height, colour);
-      v.status.style.display = 'none';
+      renderer.domElement.className = 'model-viewer__canvas';
+      stage.appendChild(renderer.domElement);
+      const rect = stage.getBoundingClientRect();
+      const w = rect.width || 1;
+      const h = rect.height || 1;
+      renderer.setSize(w, h, false);
+      const { scene, camera, pivot, distance } = buildScene(THREE, geometry, w / h, colour);
 
       let zoom = 1;
       const draw = () => {
@@ -254,8 +252,10 @@
       const pointers = new Map();
       let pinch = 0;
       const onDown = e => {
-        v.stage.setPointerCapture(e.pointerId);
+        if (e.button && e.button !== 0) return;
+        try { stage.setPointerCapture(e.pointerId); } catch (err) {}
         pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        stage.classList.add('is-turning');
       };
       const onMove = e => {
         const last = pointers.get(e.pointerId);
@@ -273,37 +273,79 @@
         }
         draw();
       };
-      const onUp = e => { pointers.delete(e.pointerId); pinch = 0; };
+      const onUp = e => {
+        pointers.delete(e.pointerId);
+        pinch = 0;
+        if (!pointers.size) stage.classList.remove('is-turning');
+      };
       const onWheel = e => {
+        if (inline && !e.ctrlKey && !e.metaKey) return;
         e.preventDefault();
         zoom = Math.min(4, Math.max(0.25, zoom * (e.deltaY > 0 ? 1.1 : 0.9)));
         draw();
       };
       const onResize = () => {
-        const r = v.stage.getBoundingClientRect();
+        if (destroyed) return;
+        const r = stage.getBoundingClientRect();
+        if (!r.width || !r.height) return;
         renderer.setSize(r.width, r.height, false);
         camera.aspect = r.width / r.height;
         camera.updateProjectionMatrix();
         draw();
       };
-      v.stage.addEventListener('pointerdown', onDown);
-      v.stage.addEventListener('pointermove', onMove);
-      v.stage.addEventListener('pointerup', onUp);
-      v.stage.addEventListener('pointercancel', onUp);
-      v.stage.addEventListener('wheel', onWheel, { passive: false });
-      window.addEventListener('resize', onResize);
+      stage.addEventListener('pointerdown', onDown);
+      stage.addEventListener('pointermove', onMove);
+      stage.addEventListener('pointerup', onUp);
+      stage.addEventListener('pointercancel', onUp);
+      stage.addEventListener('wheel', onWheel, { passive: false });
+      let observer = null;
+      if (window.ResizeObserver) {
+        observer = new ResizeObserver(onResize);
+        observer.observe(stage);
+      } else {
+        window.addEventListener('resize', onResize);
+      }
       cleanups.push(() => {
-        v.stage.removeEventListener('pointerdown', onDown);
-        v.stage.removeEventListener('pointermove', onMove);
-        v.stage.removeEventListener('pointerup', onUp);
-        v.stage.removeEventListener('pointercancel', onUp);
-        v.stage.removeEventListener('wheel', onWheel);
-        window.removeEventListener('resize', onResize);
+        stage.removeEventListener('pointerdown', onDown);
+        stage.removeEventListener('pointermove', onMove);
+        stage.removeEventListener('pointerup', onUp);
+        stage.removeEventListener('pointercancel', onUp);
+        stage.removeEventListener('wheel', onWheel);
+        stage.classList.remove('is-turning');
+        if (observer) observer.disconnect();
+        else window.removeEventListener('resize', onResize);
       });
+    })();
+    ready.catch(() => {});
+    return { ready, destroy };
+  }
+
+  // The full-screen viewer: the same renderer in a dialog.
+  // `downloadUrl` is the counted download link.
+  async function openViewer({ url, name, downloadUrl, colour }) {
+    const v = viewerShell();
+    if (v.close) v.close();
+    v.title.textContent = name || '';
+    v.download.href = downloadUrl || url;
+    v.status.textContent = 'Loading model…';
+    v.status.style.display = '';
+    v.el.classList.remove('d-none');
+
+    const mounted = mountViewer(v.stage, { url, colour });
+    let closed = false;
+    v.close = () => {
+      closed = true;
+      v.el.classList.add('d-none');
+      mounted.destroy();
+      v.close = null;
+    };
+    try {
+      await mounted.ready;
+      if (!closed) v.status.style.display = 'none';
     } catch (e) {
       if (!closed) v.status.textContent = e.message || 'Could not show this model';
     }
   }
 
-  window.ModelThumbnails = { canRender, renderPng, upload, openViewer, parseStl, loadThree };
+  window.ModelThumbnails = { canRender, renderPng, upload, openViewer, mountViewer, parseStl, loadThree };
 })();

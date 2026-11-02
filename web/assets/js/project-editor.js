@@ -2230,6 +2230,7 @@
       modelGallery = ProjectModels.render(gallery, models, {
         selectedId: modelGallery && modelGallery.selectedId(),
         thumbUrl: fileThumbUrl, canView, openViewer, fetch: fetchThumb,
+        modelUrl: f => fileDownloadUrl(f) + '?preview=1',
         details: f => `
           <div class="kr-models-details-main">
             <div class="kr-models-details-name"><a href="${fileDownloadUrl(f)}">${escapeHtmlAttr(f.filename)}</a></div>

@@ -1,12 +1,15 @@
 // Files & Models: a project's 3D models as a filmstrip gallery, in the
-// editor and on the project page. One model large, with a cube badge on a
-// picture rendered from the model and an Open 3D viewer button, and a
-// strip of the other models under it that swap it when clicked. Under the
+// editor and on the project page. One model large, drawn in 3D so it can be
+// dragged round (its picture shows until the model loads, and a button
+// opens it full screen), and a strip of pictures of the other models under
+// it that swap it when clicked. Under the
 // strip sit the shown model's name, description and print settings,
 // which the page fills in (the editor's are editable).
 //
 // ProjectModels.render(el, models, {
 //   thumbUrl(f), canView(f), openViewer(f), details(f) -> html, selectedId,
+//   modelUrl(f) (the model's bytes, for the big 3D preview; without it the
+//   big preview stays a picture),
 //   fetch(url) (for colouring pictures; defaults to ProjectAuth.apiFetch),
 // })
 // returns { select(id), selectedId() }.
@@ -172,6 +175,7 @@
   // ---- Table -------------------------------------------------------------
   function renderTable(el, models, opts) {
     if (!el) return;
+    stopInline(el);
     if (!models.length) { el.innerHTML = ''; return; }
     el.innerHTML = `<div class="kr-models-table-wrap"><table class="table table-hover mb-0 kr-models-table">
       <thead><tr><th class="kr-models-table-pic"><span class="visually-hidden">Picture</span></th>${opts.head}</tr></thead>
@@ -192,8 +196,52 @@
     tintAll(el, opts.fetch);
   }
 
+  // The big preview's live 3D model, one per gallery element. Stopped
+  // (its WebGL context given back) whenever the gallery redraws or the
+  // selection moves on: browsers allow only a handful of contexts.
+  function stopInline(el) {
+    if (el && el._krModels3d) { el._krModels3d(); el._krModels3d = null; }
+  }
+
+  // Load f's model into `hero` once it scrolls near the screen, then swap
+  // the picture for it. Returns a stop function.
+  function startInline(hero, f, opts) {
+    const MT = window.ModelThumbnails;
+    if (!MT || !MT.mountViewer || !opts.modelUrl) return () => {};
+    let mounted = null;
+    let stopped = false;
+    const begin = () => {
+      if (stopped || mounted) return;
+      hero.classList.add('is-loading-3d');
+      mounted = MT.mountViewer(hero, { url: opts.modelUrl(f), colour: colourHex(f.print_colour), inline: true });
+      mounted.ready.then(() => {
+        if (stopped) return;
+        hero.classList.remove('is-loading-3d');
+        hero.classList.add('is-3d');
+      }, () => {
+        // No WebGL, or the file wouldn't load: the picture stays.
+        hero.classList.remove('is-loading-3d');
+      });
+    };
+    let io = null;
+    if (window.IntersectionObserver) {
+      io = new IntersectionObserver(entries => {
+        if (entries.some(e => e.isIntersecting)) { io.disconnect(); io = null; begin(); }
+      }, { rootMargin: '200px' });
+      io.observe(hero);
+    } else {
+      begin();
+    }
+    return () => {
+      stopped = true;
+      if (io) io.disconnect();
+      if (mounted) mounted.destroy();
+    };
+  }
+
   function render(el, models, opts) {
     if (!el) return null;
+    stopInline(el);
     if (!models.length) { el.innerHTML = ''; return null; }
     let current = models.find(f => f.id === opts.selectedId) || models[0];
 
@@ -217,12 +265,17 @@
     function show(f, focus) {
       current = f;
       const viewable = opts.canView(f);
+      stopInline(el);
+      const live = viewable && !!opts.modelUrl && !!(window.ModelThumbnails && ModelThumbnails.mountViewer);
       stage.innerHTML = `
-        <button type="button" class="kr-models-hero" ${viewable ? '' : 'disabled'}
-          title="${viewable ? 'Open ' + esc(f.filename) + ' in 3D' : esc(f.filename)}">
+        <div class="kr-models-hero${live ? ' is-live' : ''}${viewable && !live ? ' is-clickable' : ''}"
+          ${live ? `role="img" aria-label="${esc(f.filename)} in 3D, drag to turn"` : ''}
+          title="${live ? '' : viewable ? 'Open ' + esc(f.filename) + ' in 3D' : esc(f.filename)}">
           ${picture(f, opts, 'kr-models-hero-img')}
-        </button>
-        ${viewable ? '<button type="button" class="kr-models-open"><i class="fas fa-cube" aria-hidden="true"></i> Open 3D viewer</button>' : ''}`;
+        </div>
+        ${live ? `<span class="kr-models-hint" aria-hidden="true"><i class="fas fa-sync-alt"></i> Drag to turn</span>` : ''}
+        ${viewable ? `<button type="button" class="kr-models-open${live ? ' is-icon' : ''}" title="Open ${esc(f.filename)} full screen" aria-label="Open ${esc(f.filename)} full screen">${live ? '<i class="fas fa-expand" aria-hidden="true"></i>' : '<i class="fas fa-cube" aria-hidden="true"></i> Open 3D viewer'}</button>` : ''}`;
+      if (live) el._krModels3d = startInline(stage.querySelector('.kr-models-hero'), f, opts);
       details.innerHTML = opts.details(f);
       tintAll(stage, opts.fetch);
       strip.querySelectorAll('.kr-models-thumb').forEach(b => {
@@ -235,7 +288,7 @@
     }
 
     stage.addEventListener('click', e => {
-      if (e.target.closest('.kr-models-hero:not([disabled]), .kr-models-open')) opts.openViewer(current);
+      if (e.target.closest('.kr-models-hero.is-clickable, .kr-models-open')) opts.openViewer(current);
     });
     strip.addEventListener('click', e => {
       const b = e.target.closest('.kr-models-thumb');
