@@ -1345,6 +1345,17 @@ async def add_supplier_kind_and_availability_if_missing() -> None:
     }, "issue #267")
 
 
+async def add_print_details_columns_if_missing() -> None:
+    """Files & Models print details: per-model qty, colour and filament,
+    and the project's default Files & Models view."""
+    await _add_columns_if_missing("project_files", {
+        "print_qty": "INTEGER",
+        "print_colour": "VARCHAR(40)",
+        "filament": "VARCHAR(60)",
+    }, "print details")
+    await _add_columns_if_missing("projects", {"files_view": "VARCHAR(20)"}, "print details")
+
+
 async def add_feedback_admin_notes_if_missing() -> None:
     """Additive migration for the Snakie dev-mode Bug Tracker (issue #206).
 

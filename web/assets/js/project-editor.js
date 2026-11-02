@@ -982,7 +982,7 @@
       listFiles: async () => (await getJson('/files')).map(f => ({
         name: f.filename, description: f.description, url: fileDownloadUrl(f),
       })),
-      modelFiles: () => currentProject ? projectFiles.map(f => ({ name: f.filename, url: fileDownloadUrl(f) })) : [],
+      modelFiles: () => currentProject ? projectFiles.map(f => ({ name: f.filename, url: fileDownloadUrl(f), qty: f.print_qty })) : [],
       uploadFile: () => new Promise(resolve => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -2184,7 +2184,9 @@
   // the description is being edited (issues #187, #261).
   function renderFiles() {
     const section = document.getElementById('editor-files-section');
-    if (section && section.querySelector('.kr-file-fields.is-editing')) {
+    if (section && (section.querySelector('.kr-file-fields.is-editing')
+        || (document.activeElement && document.activeElement.closest('.kr-print-inputs, .kr-print-cell')
+            && section.contains(document.activeElement)))) {
       section.dataset.renderPending = '1';
       return;
     }
@@ -2192,22 +2194,54 @@
     const files = projectFiles;
     const models = files.filter(f => f.file_type === 'model');
     const others = files.filter(f => f.file_type !== 'model');
+    const view = ProjectModels.normaliseView(currentProject && currentProject.files_view);
 
-    modelGallery = window.ProjectModels ? ProjectModels.render(document.getElementById('model-gallery'), models, {
-      selectedId: modelGallery && modelGallery.selectedId(),
-      thumbUrl: fileThumbUrl,
-      canView: f => !!(window.ModelThumbnails && ModelThumbnails.canRender(f.filename)),
-      openViewer: f => ModelThumbnails.openViewer({ url: fileDownloadUrl(f) + '?preview=1', name: f.filename, downloadUrl: fileDownloadUrl(f) }),
-      details: f => `
-        <div class="kr-models-details-main">
-          <div class="kr-models-details-name"><a href="${fileDownloadUrl(f)}">${escapeHtmlAttr(f.filename)}</a></div>
-          <div class="kr-models-details-meta">${fileKind(f.filename)} · ${ProjectModels.formatSize(f.file_size)}</div>
-          ${renderFileFields(f)}
-        </div>
-        <div class="kr-models-details-actions">
-          <button type="button" class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})" title="Delete ${escapeHtmlAttr(f.filename)}" aria-label="Delete ${escapeHtmlAttr(f.filename)}"><i class="fas fa-trash fa-xs"></i></button>
-        </div>`,
-    }) : null;
+    const bar = document.getElementById('editor-models-viewbar');
+    if (bar) bar.innerHTML = models.length ? ProjectModels.viewToggle(view, 'Show models to visitors as') : '';
+
+    const gallery = document.getElementById('model-gallery');
+    const canView = f => !!(window.ModelThumbnails && ModelThumbnails.canRender(f.filename));
+    const openViewer = f => ModelThumbnails.openViewer({
+      url: fileDownloadUrl(f) + '?preview=1', name: f.filename, downloadUrl: fileDownloadUrl(f),
+      colour: ProjectModels.colourHex(f.print_colour),
+    });
+    const fetchThumb = url => apiFetch(url, { credentials: 'include' });
+    const del = f => `<button type="button" class="btn btn-sm text-danger p-0" onclick="deleteFile(${f.id})" title="Delete ${escapeHtmlAttr(f.filename)}" aria-label="Delete ${escapeHtmlAttr(f.filename)}"><i class="fas fa-trash fa-xs"></i></button>`;
+    if (!window.ProjectModels) {
+      modelGallery = null;
+    } else if (view === 'table') {
+      ProjectModels.renderTable(gallery, models, {
+        thumbUrl: fileThumbUrl, canView, openViewer, fetch: fetchThumb,
+        head: '<th>Part</th><th class="kr-col-qty">Qty</th><th class="kr-col-colour">Colour</th><th class="kr-col-filament">Filament</th><th class="kr-col-size">Size</th><th style="width:30px"></th>',
+        cells: f => `
+          <td class="file-description">
+            <a href="${fileDownloadUrl(f)}" class="fw-semibold">${escapeHtmlAttr(f.filename)}</a>
+            ${renderFileFields(f)}
+          </td>
+          <td class="kr-col-qty kr-print-cell" data-file-id="${f.id}">${printInput(f, 'print_qty')}</td>
+          <td class="kr-col-colour kr-print-cell" data-file-id="${f.id}">${printInput(f, 'print_colour')}</td>
+          <td class="kr-col-filament kr-print-cell" data-file-id="${f.id}">${printInput(f, 'filament')}</td>
+          <td class="kr-col-size">${ProjectModels.formatSize(f.file_size)}</td>
+          <td>${del(f)}</td>`,
+      });
+    } else {
+      modelGallery = ProjectModels.render(gallery, models, {
+        selectedId: modelGallery && modelGallery.selectedId(),
+        thumbUrl: fileThumbUrl, canView, openViewer, fetch: fetchThumb,
+        details: f => `
+          <div class="kr-models-details-main">
+            <div class="kr-models-details-name"><a href="${fileDownloadUrl(f)}">${escapeHtmlAttr(f.filename)}</a></div>
+            <div class="kr-models-details-meta">${fileKind(f.filename)} · ${ProjectModels.formatSize(f.file_size)}</div>
+            ${renderFileFields(f)}
+            <div class="kr-print-inputs" data-file-id="${f.id}">
+              <label>Qty ${printInput(f, 'print_qty')}</label>
+              <label>Colour ${printInput(f, 'print_colour')}</label>
+              <label>Filament ${printInput(f, 'filament')}</label>
+            </div>
+          </div>
+          <div class="kr-models-details-actions">${del(f)}</div>`,
+      });
+    }
 
     const list = document.getElementById('file-list');
     list.innerHTML = others.length ? `<table class="table table-single table-hover mb-0 files-table">
@@ -2299,6 +2333,127 @@
     }).filter(Boolean);
     return `<div class="kr-file-fields" data-file-id="${f.id}">${lines.join('')}</div>`;
   }
+
+  // A model's print details as quiet inputs (Qty, Colour, Filament), in
+  // the table's cells and under the filmstrip. Each saves on change.
+  function printInput(f, field) {
+    const id = f.id;
+    if (field === 'print_qty') {
+      return `<input type="number" class="kr-print-input" data-field="print_qty" data-file-id="${id}" min="1" max="999" step="1"
+        value="${f.print_qty || ''}" placeholder="1" aria-label="How many to print">`;
+    }
+    if (field === 'print_colour') {
+      const hex = ProjectModels.colourHex(f.print_colour);
+      return `<span class="kr-colour-field">
+        <span class="kr-colour-pick${hex ? '' : ' is-empty'}" ${hex ? `style="background:${hex}"` : ''} title="Pick a colour">
+          <input type="color" data-colour-pick="${id}" value="${hex || '#3d8b5a'}" aria-label="Pick a colour">
+        </span>
+        <input type="text" class="kr-print-input" data-field="print_colour" data-file-id="${id}" maxlength="40"
+          value="${escapeHtmlAttr(f.print_colour || '')}" placeholder="Any" aria-label="Colour, e.g. white or #ff8800">
+      </span>`;
+    }
+    return `<input type="text" class="kr-print-input" data-field="filament" data-file-id="${id}" maxlength="60" list="filament-types"
+      value="${escapeHtmlAttr(f.filament || '')}" placeholder="Any" aria-label="Filament type, e.g. PLA">`;
+  }
+
+  // The value a print input holds, as the API takes it (null clears).
+  function printValue(input) {
+    const v = input.value.trim();
+    if (input.dataset.field === 'print_qty') {
+      const n = parseInt(v, 10);
+      return n >= 1 ? Math.min(n, 999) : null;
+    }
+    if (input.dataset.field === 'print_colour') return v.replace(/[^#A-Za-z0-9 -]/g, '').slice(0, 40) || null;
+    return v.slice(0, 60) || null;
+  }
+
+  async function savePrintInput(input) {
+    const file = projectFiles.find(f => f.id === Number(input.dataset.fileId));
+    if (!file) return;
+    const field = input.dataset.field;
+    const value = printValue(input);
+    if ((file[field] || null) === value) return;
+    file[field] = value;
+    try {
+      await saveFileFields(file.id, { [field]: value });
+    } catch (_) {
+      loadFiles();
+      return;
+    }
+    // A new colour redraws the pictures in it.
+    if (field === 'print_colour') renderFilesWhenIdle();
+  }
+
+  // Re-render once the focus has left the print inputs (renderFiles waits
+  // while one is focused, so typing isn't interrupted).
+  function renderFilesWhenIdle() {
+    setTimeout(() => {
+      const section = document.getElementById('editor-files-section');
+      if (section) section.dataset.renderPending = '1';
+      renderFiles();
+    }, 0);
+  }
+
+  function setupPrintInputs() {
+    const section = document.getElementById('editor-files-section');
+    if (!section || section.dataset.printBound === '1') return;
+    section.dataset.printBound = '1';
+    section.addEventListener('change', e => {
+      const input = e.target.closest('.kr-print-input');
+      if (input) { savePrintInput(input); return; }
+      const pick = e.target.closest('[data-colour-pick]');
+      if (pick) {
+        const text = section.querySelector(`.kr-print-input[data-field="print_colour"][data-file-id="${pick.dataset.colourPick}"]`);
+        if (text) savePrintInput(text);
+      }
+    });
+    // The picker fills in the hex as it moves; the swatch follows the text.
+    section.addEventListener('input', e => {
+      const pick = e.target.closest('[data-colour-pick]');
+      const box = e.target.closest('.kr-colour-field');
+      if (!box) return;
+      const text = box.querySelector('.kr-print-input');
+      if (pick) text.value = pick.value;
+      const hex = ProjectModels.colourHex(text.value);
+      const dot = box.querySelector('.kr-colour-pick');
+      dot.classList.toggle('is-empty', !hex);
+      dot.style.background = hex || '';
+    });
+    section.addEventListener('keydown', e => {
+      const input = e.target.closest('.kr-print-input');
+      if (input && e.key === 'Enter') { e.preventDefault(); input.blur(); }
+    });
+    section.addEventListener('focusout', e => {
+      if (!section.dataset.renderPending) return;
+      const next = e.relatedTarget;
+      if (next && next.closest && next.closest('.kr-print-inputs, .kr-print-cell')) return;
+      setTimeout(() => { if (section.dataset.renderPending) renderFiles(); }, 0);
+    });
+    // Filmstrip / Table: the author's choice is the page's first view.
+    const bar = document.getElementById('editor-models-viewbar');
+    if (bar) bar.addEventListener('click', async e => {
+      const b = e.target.closest('[data-models-view]');
+      if (!b || !currentProject) return;
+      const view = b.dataset.modelsView;
+      if (currentProject.files_view === view) return;
+      const before = currentProject.files_view;
+      currentProject.files_view = view;
+      renderFiles();
+      try {
+        const resp = await apiFetch(API + '/api/projects/' + currentProject.id, {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ files_view: view }),
+        });
+        if (!resp.ok) throw new Error(await resp.text());
+      } catch (err) {
+        console.error('Could not save the Files & Models view', err);
+        currentProject.files_view = before;
+        renderFiles();
+      }
+    });
+  }
+  setupPrintInputs();
 
   // Track in-flight PUTs per file so a fast typer doesn't fire overlapping
   // requests — serialise per file by chaining onto the previous promise.

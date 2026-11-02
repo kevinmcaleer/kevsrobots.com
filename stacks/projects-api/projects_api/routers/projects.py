@@ -210,6 +210,7 @@ async def _project_response(session: AsyncSession, project: Project) -> ProjectR
         difficulty=project.difficulty,
         estimated_minutes=project.estimated_minutes,
         code_repo_url=project.code_repo_url,
+        files_view=getattr(project, "files_view", None) or "filmstrip",
         status=project.status,
         author_username=project.author_username,
         cover_image=project.cover_image,

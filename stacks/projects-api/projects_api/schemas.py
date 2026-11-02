@@ -79,6 +79,8 @@ class ProjectUpdate(BaseModel):
     difficulty: Optional[str] = Field(None, pattern="^(beginner|intermediate|advanced)$")
     estimated_minutes: Optional[int] = Field(None, ge=1)
     code_repo_url: Optional[str] = None
+    # How the published page first shows Files & Models.
+    files_view: Optional[str] = Field(None, pattern="^(filmstrip|table)$")
     status: Optional[str] = Field(None, pattern="^(draft|wip|completed|archived)$")
     cover_image: Optional[str] = None
     tags: Optional[list[str]] = None
@@ -119,6 +121,8 @@ class ProjectResponse(BaseModel):
     difficulty: Optional[str]
     estimated_minutes: Optional[int]
     code_repo_url: Optional[str]
+    # ``filmstrip`` or ``table``: how the page first shows Files & Models.
+    files_view: str = "filmstrip"
     status: str
     author_username: str
     cover_image: Optional[str]
@@ -748,6 +752,9 @@ class FileResponse(BaseModel):
     file_type: str
     description: Optional[str]
     print_settings: Optional[str] = None
+    print_qty: Optional[int] = None
+    print_colour: Optional[str] = None
+    filament: Optional[str] = None
     # Set when a rendered thumbnail exists (issue #262); it is served at
     # ``/api/projects/{id}/files/{file_id}/thumbnail?v=<thumbnail_version>``.
     thumbnail_version: Optional[str] = None
@@ -767,6 +774,13 @@ class FileUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=2000)
     # Issue #261: slicer settings for a model (layer height, infill, …).
     print_settings: Optional[str] = Field(None, max_length=2000)
+    # Print details for a model; null clears each one.
+    print_qty: Optional[int] = Field(None, ge=1, le=999)
+    # A hex value from the colour picker (#ffffff) or a word ("white",
+    # "silk gold"). Letters, digits, spaces, # and - only, so it is safe
+    # to use as a CSS colour on the page.
+    print_colour: Optional[str] = Field(None, max_length=40, pattern=r"^[#A-Za-z0-9 \-]*$")
+    filament: Optional[str] = Field(None, max_length=60)
 
 
 class ModelMissingThumbnail(BaseModel):

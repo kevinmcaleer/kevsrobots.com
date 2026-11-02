@@ -180,6 +180,9 @@ hide_nibsy: true
         <div class="kr-section-head">
           <h2 class="kr-section-title"><i class="fas fa-paperclip" aria-hidden="true"></i> Files &amp; Models</h2>
           <div class="kr-section-actions">
+            <!-- Filmstrip or Table: how visitors first see the models (they
+                 can switch). Filled in by project-editor.js renderFiles. -->
+            <span id="editor-models-viewbar" class="kr-models-viewbar m-0" title="Visitors see this view first, and can switch"></span>
             <!-- Drop targets unified: the entire page is the dropzone (see the
                  #global-dropzone overlay above). This keeps a click-to-pick
                  button for users who prefer the file dialog. -->
@@ -192,6 +195,11 @@ hide_nibsy: true
         <p class="kr-section-hint">Or drag files anywhere on the page: .stl, .3mf, .py, .ino, .dxf, .pdf, .md, .zip &hellip; up to 25MB each.</p>
         <!-- The models as a filmstrip gallery, then the other files. -->
         <div id="model-gallery"></div>
+        <datalist id="filament-types">
+          <option value="PLA"><option value="PLA+"><option value="Silk PLA"><option value="Matte PLA">
+          <option value="PETG"><option value="ABS"><option value="ASA"><option value="TPU">
+          <option value="Nylon"><option value="PC"><option value="CF-PLA"><option value="Resin">
+        </datalist>
         <div id="file-list"></div>
         <div id="file-progress" class="d-none">
           <div class="progress"><div class="progress-bar" role="progressbar" style="width: 0%"></div></div>

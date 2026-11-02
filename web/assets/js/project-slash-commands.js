@@ -676,7 +676,7 @@
         const models = (ctx.modelFiles ? ctx.modelFiles() : []).filter(f => MODEL_FILE_RE.test(f.name));
         const head = h + '| Part | Qty | Notes |\n| --- | --- | --- |\n';
         if (!models.length) return { before: head + '| ', placeholder: 'Part name', after: ' | 1 |  |\n' };
-        const rows = models.map(f => '| [' + mdTableCell(mdLinkText(f.name)) + '](' + f.url + ') | 1 |  |\n').join('');
+        const rows = models.map(f => '| [' + mdTableCell(mdLinkText(f.name)) + '](' + f.url + ') | ' + (f.qty || 1) + ' |  |\n').join('');
         return { before: head + rows };
       }
       default:

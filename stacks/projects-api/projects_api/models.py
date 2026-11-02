@@ -54,6 +54,9 @@ class Project(Base):
     difficulty: Mapped[Optional[str]] = mapped_column(String(20))
     estimated_minutes: Mapped[Optional[int]] = mapped_column(Integer)
     code_repo_url: Mapped[Optional[str]] = mapped_column(Text)
+    # How the published page first shows Files & Models: ``filmstrip``
+    # (the default, when NULL) or ``table``. Visitors can switch.
+    files_view: Mapped[Optional[str]] = mapped_column(String(20))
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="wip")
     author_username: Mapped[str] = mapped_column(String(100), nullable=False)
     cover_image: Mapped[Optional[str]] = mapped_column(Text)
@@ -394,6 +397,11 @@ class ProjectFile(Base):
     print_settings: Mapped[Optional[str]] = mapped_column(Text)
     # Issue #262: storage path of the PNG rendered in the browser.
     thumbnail_path: Mapped[Optional[str]] = mapped_column(Text)
+    # Print details for a model: how many to print, the colour (a hex
+    # value or a word like "white") and the filament type. All optional.
+    print_qty: Mapped[Optional[int]] = mapped_column(Integer)
+    print_colour: Mapped[Optional[str]] = mapped_column(String(40))
+    filament: Mapped[Optional[str]] = mapped_column(String(60))
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
