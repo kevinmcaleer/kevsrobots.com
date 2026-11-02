@@ -372,6 +372,13 @@
   overflow-wrap: break-word;
 }
 
+/* Fit to content (one dash in every delimiter cell, project-table-widths.js):
+   only as wide as what's in it. */
+.project-prose table.table-fit {
+  width: auto;
+  max-width: 100%;
+}
+
 /* A table of images is a grid of cards (image-grid.css): the table rules
    above give way to it, keeping only the space around the block. */
 .project-prose table.image-grid {
