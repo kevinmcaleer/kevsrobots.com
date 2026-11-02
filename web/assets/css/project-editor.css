@@ -549,23 +549,6 @@
   padding-bottom: 6rem;
 }
 
-/* Top bar Draft / Published switch */
-.publish-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding-left: 0;
-}
-.publish-switch .form-check-input {
-  margin: 0;
-  float: none;
-  cursor: pointer;
-}
-.publish-switch .form-check-label {
-  min-width: 4.5rem;
-  cursor: pointer;
-}
-
 #completeness-card .progress {
   background-color: var(--kr-pop-hover);
   border-radius: 4px;

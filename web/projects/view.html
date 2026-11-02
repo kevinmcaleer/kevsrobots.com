@@ -21,6 +21,7 @@ description: View project details
 <link rel="stylesheet" href="/assets/css/project-content.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-models.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-videos.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-versions.css?v={{ site.time | date: '%s' }}">
 <script src="/assets/js/featured-projects.js?v={{ site.time | date: '%s' }}"></script>
 
 <!-- .kr-notes: the Notes look shared with the editor (project-notes.css). -->
@@ -722,6 +723,7 @@ description: View project details
 <script src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
 <script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-versions.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #150: display-only currency conversion. Loads after
      project-auth so getPreferredCurrency can use ProjectAuth.apiFetch. -->
 <script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
@@ -767,6 +769,24 @@ description: View project details
   const ownerParam = params.get('owner');
   const slugParam = params.get('slug');
 
+  // Epic #433: ?version=working or ?version=N is the author's preview of
+  // their working copy or a past version. Without it the page asks for the
+  // live version (what readers get anyway; the author too, so the author
+  // sees what readers see). Every API read passes it on.
+  const versionParam = (params.get('version') || '').trim().toLowerCase();
+  const isPreview = !!versionParam && versionParam !== 'live';
+  const VERSION_QS = 'version=' + encodeURIComponent(isPreview ? versionParam : 'live');
+  function withVersion(url) {
+    return url + (url.indexOf('?') === -1 ? '?' : '&') + VERSION_QS;
+  }
+  if (isPreview) {
+    // Previews are the author's alone: keep them out of search engines.
+    const robots = document.createElement('meta');
+    robots.name = 'robots';
+    robots.content = 'noindex';
+    document.head.appendChild(robots);
+  }
+
   // projectId is what every downstream API call needs (the existing
   // id-based endpoints stay in place for back-compat). When we only
   // have (owner, slug), we resolve it lazily inside loadProject().
@@ -791,7 +811,9 @@ description: View project details
   // still resolve after the rewrite.
   function rewriteUrlToCanonical(project) {
     if (!project || !project.author_username || !project.slug) return;
-    const target = canonicalUrl(project) + (window.location.hash || '');
+    // A preview keeps its ?version= (epic #433).
+    const target = canonicalUrl(project) + (isPreview ? '?version=' + encodeURIComponent(versionParam) : '') +
+      (window.location.hash || '');
     if (window.location.pathname + window.location.search + window.location.hash !== target) {
       try { history.replaceState(null, '', target); } catch (e) {}
     }
@@ -888,6 +910,98 @@ description: View project details
     });
   }
 
+  // --- Versions (epic #433, #438) ---------------------------------------
+
+  // The wiring and diagram pictures in the text are drawn per version. The
+  // author's own <img> requests would get the working copy's, so ask for
+  // the version this page shows. (Readers always get the live one.)
+  function pinPictureVersions(root) {
+    root.querySelectorAll('img[src]').forEach(img => {
+      const src = img.getAttribute('src');
+      if (!/\/api\/projects\/\d+\/(wiring\.svg|diagrams\/\d+\.(svg|png))/.test(src)) return;
+      if (/[?&]version=/.test(src)) return;
+      img.setAttribute('src', withVersion(src));
+    });
+  }
+
+  function editorUrl(project, extra) {
+    return '/projects/editor.html?id=' + encodeURIComponent(project.id) + (extra || '');
+  }
+
+  function renderVersionBar(project) {
+    const host = document.getElementById('project-view');
+    if (!host || document.getElementById('version-bar')) return;
+    const V = window.ProjectVersions;
+    const bar = document.createElement('div');
+    bar.id = 'version-bar';
+    bar.setAttribute('role', 'status');
+    if (isPreview) {
+      bar.className = 'kr-preview-bar';
+      if (versionParam === 'working') {
+        bar.innerHTML = '<span><i class="fas fa-eye me-1" aria-hidden="true"></i><strong>Preview of your working copy</strong> \u2014 not live.</span>' +
+          '<span class="kr-preview-links">' +
+          (project.live_number == null || project.has_unpublished_changes
+            ? '<button type="button" data-act="publish">' + (project.live_number == null ? 'Publish' : 'Publish changes') + '</button>' : '') +
+          '<a href="' + editorUrl(project) + '">Back to editor</a></span>';
+      } else {
+        const shown = Number(project.viewing);
+        const isLive = shown === project.live_number;
+        bar.innerHTML = '<span><i class="fas fa-code-branch me-1" aria-hidden="true"></i><strong>Version ' + shown +
+          (isLive ? ' (live)' : '') + '</strong>' +
+          (project.updated_at ? ' \u00b7 ' + V.esc(V.date(project.updated_at)) : '') + '</span>' +
+          '<span class="kr-preview-links">' +
+          '<a href="' + editorUrl(project, '&restore=' + shown) + '">' + (isLive ? 'Discard unpublished changes' : 'Restore as working copy') + '</a>' +
+          '<a href="' + editorUrl(project) + '">Back to editor</a></span>';
+      }
+    } else if (project.live_number != null && project.has_unpublished_changes) {
+      bar.className = 'kr-live-banner';
+      bar.innerHTML = '<span><i class="fas fa-globe me-1" aria-hidden="true"></i>You\u2019re looking at the live version (v' + project.live_number +
+        '). You have unpublished changes.</span>' +
+        '<span class="kr-preview-links">' +
+        '<a href="' + canonicalUrl(project) + '?version=working">Preview</a>' +
+        '<button type="button" data-act="publish">Publish changes</button>' +
+        '<a href="' + editorUrl(project) + '">Edit</a></span>';
+    } else {
+      return;
+    }
+    host.prepend(bar);
+    const publishBtn = bar.querySelector('[data-act="publish"]');
+    if (publishBtn) publishBtn.addEventListener('click', async () => {
+      const first = project.live_number == null;
+      const answer = await V.dialog({
+        title: first ? 'Publish this project?' : 'Publish your changes?',
+        body: first
+          ? 'It becomes visible to everyone on kevsrobots.com as version 1.'
+          : 'Your working copy becomes the live page readers see. v' + project.live_number + ' stays in your version list.',
+        confirm: 'Publish',
+        input: { label: 'What changed? (optional, only you see this)', maxlength: 200 },
+      });
+      if (!answer.ok) return;
+      publishBtn.disabled = true;
+      try {
+        const resp = await ProjectAuth.apiFetch(API + '/api/projects/' + project.id + '/publish', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note: answer.value || null }),
+        });
+        if (!resp.ok && resp.status !== 409) throw new Error('HTTP ' + resp.status);
+        const result = resp.ok ? await resp.json() : null;
+        const live = result ? result.project : project;
+        window.location.href = canonicalUrl(live);
+      } catch (e) {
+        publishBtn.disabled = false;
+        alert("Couldn't publish. Your work is saved; try again from the editor.");
+      }
+    });
+    if (isPreview) {
+      // Hearts, makes, reports and remixes belong to the live page.
+      ['like-container', 'remix-icon', 'makes-section', 'report-section', 'comments-container'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('d-none');
+      });
+    }
+  }
+
   async function loadProject() {
     try {
       // Issue #152: pick the API path that matches the inbound URL shape.
@@ -902,9 +1016,11 @@ description: View project details
                    encodeURIComponent(ownerParam) + '/' +
                    encodeURIComponent(slugParam);
       }
-      const resp = await fetch(fetchUrl, { credentials: 'include' });
+      const resp = await fetch(withVersion(fetchUrl), { credentials: 'include' });
       if (!resp.ok) throw new Error('Not found');
       const project = await resp.json();
+      // Only the author is told the version numbers (epic #433).
+      const viewerIsAuthor = project.has_unpublished_changes !== null && project.has_unpublished_changes !== undefined;
       // #todo notes are the writer's reminders, not part of the page: take
       // them out once, here, so nothing below (the write-up, its pages, the
       // read time, the Download files README) ever sees them.
@@ -924,7 +1040,7 @@ description: View project details
 
       // Issue #260: only the author can load a draft, so tell them it's
       // private and point back at the editor's publish switch.
-      if (project.status === 'draft' && !document.getElementById('draft-banner')) {
+      if (project.status === 'draft' && !isPreview && !document.getElementById('draft-banner')) {
         const banner = document.createElement('div');
         banner.id = 'draft-banner';
         banner.className = 'alert alert-secondary d-flex align-items-center gap-2';
@@ -932,6 +1048,10 @@ description: View project details
           + '<a href="/projects/editor.html?id=' + encodeURIComponent(project.id) + '">Publish it from the editor</a> when it\'s ready.</div>';
         document.getElementById('project-view').prepend(banner);
       }
+
+      // Epic #433 (#438): the author's preview bar, or on the live page the
+      // banner saying their working copy has changes that aren't live.
+      if (viewerIsAuthor) renderVersionBar(project);
 
       document.getElementById('view-title').textContent = project.title;
       // Issue #115: Staff Pick badge near the title with the editor note
@@ -942,9 +1062,10 @@ description: View project details
       }
       document.getElementById('view-description').textContent = project.short_description || '';
       // The byline carries the published date; add the last update when
-      // it was on a later day.
-      const created = new Date(project.created_at);
-      const updated = new Date(project.updated_at);
+      // it was on a later day. Epic #433: published is the first publish,
+      // updated is when the live version went live (no version numbers).
+      const created = apiDate(project.published_at || project.created_at);
+      const updated = apiDate(project.updated_at);
       if (project.updated_at && updated.toDateString() !== created.toDateString()) {
         document.getElementById('view-updated').textContent = updated.toLocaleDateString(undefined, {
           day: 'numeric', month: 'long', year: 'numeric'
@@ -1013,6 +1134,7 @@ description: View project details
       } else if (project.content_md) {
         const contentEl = document.getElementById('view-content');
         contentEl.innerHTML = marked.parse(project.content_md);
+        if (viewerIsAuthor) pinPictureVersions(contentEl);
         ProjectImageSizes.render(contentEl);
         ProjectImageGrid.render(contentEl);
         ProjectGallery.render(contentEl);
@@ -1168,12 +1290,19 @@ description: View project details
   // Render the metadata strip under the title: date, read time, author,
   // share icons. The author renders as the username up-front; the
   // Chatter lookup upgrades it asynchronously when it resolves.
+  // API times are UTC without a zone.
+  function apiDate(value) {
+    return window.ProjectVersions ? ProjectVersions.parseTime(value) : new Date(value);
+  }
+
   function renderMetaStrip(project) {
-    // Published date (created_at). Format: "12 May 2026".
+    // Published date: the first publish (epic #433), or created_at for a
+    // project that has never been published. Format: "12 May 2026".
     const dateEl = document.getElementById('meta-date-text');
-    if (dateEl && project.created_at) {
+    const publishedAt = project.published_at || project.created_at;
+    if (dateEl && publishedAt) {
       try {
-        const d = new Date(project.created_at);
+        const d = apiDate(publishedAt);
         dateEl.textContent = d.toLocaleDateString(undefined, {
           day: 'numeric', month: 'long', year: 'numeric'
         });
@@ -1464,7 +1593,7 @@ description: View project details
   }
 
   async function loadBOM() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/bom', { credentials: 'include' });
+    const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/bom'), { credentials: 'include' });
     const items = await resp.json();
     if (items.length === 0) return;
     enrichBomTable(items).catch(e => console.error('BOM enrichment failed:', e));
@@ -1583,7 +1712,7 @@ description: View project details
   }
 
   async function loadFiles(project) {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/files', { credentials: 'include' });
+    const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/files'), { credentials: 'include' });
     const files = await resp.json();
     if (files.length === 0) return;
     var fileKinds = {
@@ -1733,7 +1862,7 @@ description: View project details
   async function loadImages(project) {
     const markdown = (project && project.content_md) || '';
     if (/^[ \t]{0,3}:::[ \t]*gallery\b/im.test(markdown)) return;
-    const resp = await fetch(API + '/api/projects/' + projectId + '/images', { credentials: 'include' });
+    const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/images'), { credentials: 'include' });
     if (!resp.ok) return;
     const images = (await resp.json()).filter(img => !markdown.includes('/images/' + img.id + '/view'));
     if (images.length === 0) return;
@@ -1790,7 +1919,7 @@ description: View project details
     if (videosInContent) return;
     let videos = [];
     try {
-      const resp = await fetch(API + '/api/projects/' + projectId + '/videos', { credentials: 'include' });
+      const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/videos'), { credentials: 'include' });
       if (!resp.ok) return;
       videos = await resp.json();
     } catch (_) { return; }
@@ -1846,12 +1975,12 @@ description: View project details
   // Builder projects draw their schematic in their steps; a Markdown
   // project's old schematic gets its own section.
   async function loadLegacySchematic() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/schematic', { credentials: 'include' }).catch(() => null);
+    const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/schematic'), { credentials: 'include' }).catch(() => null);
     if (!resp || !resp.ok) return;
     const schematic = await resp.json();
     if (!schematic.schematic_data) return;
     // Redrawn in the electronics workspace: the wiring replaces it.
-    const wiring = await fetch(API + '/api/projects/' + projectId + '/wiring', { credentials: 'include' }).catch(() => null);
+    const wiring = await fetch(withVersion(API + '/api/projects/' + projectId + '/wiring'), { credentials: 'include' }).catch(() => null);
     if (wiring && wiring.ok) return;
     document.getElementById('view-schematic-section').classList.remove('d-none');
     if (window.BuilderRenderer && BuilderRenderer.renderSchematicPreview) {
@@ -1860,7 +1989,7 @@ description: View project details
   }
 
   async function loadLinks() {
-    const resp = await fetch(API + '/api/projects/' + projectId + '/links', { credentials: 'include' });
+    const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/links'), { credentials: 'include' });
     const links = await resp.json();
     if (links.length === 0) return;
     document.getElementById('view-links-section').classList.remove('d-none');

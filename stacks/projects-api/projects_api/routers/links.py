@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectLink
-from ..visibility import hide_drafts
+from .. import versions as v
 from ..schemas import LinkCreate, LinkResponse, LinkUpdate
 
 router = APIRouter(prefix="/api/projects/{project_id}/links", tags=["links"])
@@ -22,8 +22,15 @@ async def list_links(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> list[LinkResponse]:
-    await hide_drafts(session, project_id, user)
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is not None:
+        return [
+            LinkResponse(id=r.get("id") or n + 1, title=r.get("title") or "", url=r.get("url") or "",
+                         link_type=r.get("link_type") or "article")
+            for n, r in enumerate(view.snapshot.get("links") or [])
+        ]
     items = (
         await session.scalars(
             select(ProjectLink)

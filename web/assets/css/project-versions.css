@@ -1,0 +1,306 @@
+/* Project versions (epic #433): the editor's Publish button, version
+   drop-down and "Unpublished changes" pill, the project page's preview
+   bar and author banner, and the compare dialog. Uses the Notes tokens
+   (project-notes.css), so both themes follow. */
+
+.kr-btn-publish,
+.kr-btn-publish:focus {
+  background: var(--success, #3d7a3d);
+  border: 1px solid var(--success, #3d7a3d);
+  color: #fff;
+  font-weight: 600;
+}
+.kr-btn-publish:hover {
+  filter: brightness(1.08);
+  color: #fff;
+}
+.kr-btn-publish:disabled,
+.kr-btn-publish.disabled {
+  background: transparent;
+  border-color: var(--border, #e3e0d6);
+  color: var(--muted, #6b6a63);
+  font-weight: 500;
+  opacity: 1;
+}
+
+.kr-unpublished-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--notice-bg, #fbf3dc);
+  border: 1px solid var(--notice-border, #ecd9a3);
+  color: #7a5300;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+[data-theme="dark"] .kr-unpublished-pill,
+.kr-notes[data-theme="dark"] .kr-unpublished-pill {
+  color: #f0d48a;
+}
+
+.kr-versions-btn {
+  border: 1px solid var(--border, #e3e0d6);
+  background: var(--surface, #fff);
+  color: var(--text, #141413);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.kr-versions-btn:hover,
+.kr-versions-btn[aria-expanded="true"] {
+  background: var(--code-bg, #f0eee6);
+  color: var(--text, #141413);
+}
+
+.kr-versions-menu {
+  min-width: 20rem;
+  max-width: min(26rem, 94vw);
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0.35rem;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e3e0d6);
+  border-radius: var(--radius, 12px);
+  box-shadow: var(--shadow-pop);
+  font-size: 0.85rem;
+}
+.kr-version-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm, 8px);
+}
+.kr-version-row + .kr-version-row {
+  border-top: 1px solid var(--border, #e3e0d6);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.kr-version-row.is-current {
+  background: var(--code-bg, #f0eee6);
+}
+.kr-version-row .kr-version-name {
+  font-weight: 600;
+  color: var(--text, #141413);
+}
+.kr-version-row .kr-version-live {
+  color: var(--success, #3d7a3d);
+}
+.kr-version-row .kr-version-when,
+.kr-version-row .kr-version-note,
+.kr-versions-empty {
+  color: var(--muted, #6b6a63);
+  font-size: 0.78rem;
+}
+.kr-version-row .kr-version-note {
+  font-style: italic;
+}
+.kr-version-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.1rem;
+}
+.kr-version-actions a,
+.kr-version-actions button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 0.78rem;
+  color: var(--accent-strong, #9c4628);
+  text-decoration: none;
+  cursor: pointer;
+}
+.kr-version-actions a:hover,
+.kr-version-actions button:hover {
+  text-decoration: underline;
+}
+.kr-version-actions .kr-version-delete {
+  color: var(--danger, #b4322a);
+}
+.kr-versions-empty {
+  padding: 0.6rem;
+  line-height: 1.45;
+}
+
+/* Stale-tab notice above the editor. */
+.kr-stale-notice {
+  position: sticky;
+  top: var(--kr-top-bar-height, 56px);
+  z-index: 1050;
+}
+
+/* --- Dialog --------------------------------------------------------- */
+
+.kr-version-dialog-back {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: rgb(20 20 19 / 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.kr-version-dialog {
+  width: min(28rem, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface, #fff);
+  color: var(--text, #141413);
+  border: 1px solid var(--border, #e3e0d6);
+  border-radius: var(--radius, 12px);
+  box-shadow: var(--shadow-pop);
+  padding: 1.1rem 1.2rem 1rem;
+  font-family: var(--font-sans);
+}
+.kr-version-dialog--wide {
+  width: min(64rem, 100%);
+}
+.kr-version-dialog-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.kr-version-dialog-body {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text, #141413);
+}
+.kr-version-dialog-field {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--muted, #6b6a63);
+}
+.kr-version-dialog-field input {
+  margin-top: 0.25rem;
+}
+.kr-version-dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* --- Compare (#441) -------------------------------------------------- */
+
+.kr-compare-summary {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.kr-compare-note {
+  color: var(--muted, #6b6a63);
+  font-style: italic;
+}
+.kr-compare-meta {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  font-size: 0.82rem;
+}
+.kr-compare-meta th {
+  width: 8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem 0.2rem 0;
+  vertical-align: top;
+}
+.kr-compare-meta td {
+  padding: 0.2rem 0.5rem;
+  vertical-align: top;
+}
+.kr-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.kr-compare-col h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+}
+.kr-compare-col pre {
+  margin: 0;
+  max-height: 55vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  background: var(--code-bg, #f0eee6);
+  color: var(--code-text, #3d3929);
+  border-radius: var(--radius-sm, 8px);
+  padding: 0.6rem 0.7rem;
+}
+.kr-diff-add {
+  background: rgb(61 122 61 / 0.2);
+  color: inherit;
+  border-radius: 3px;
+}
+.kr-diff-del {
+  background: rgb(180 50 42 / 0.18);
+  color: inherit;
+  text-decoration: line-through;
+  border-radius: 3px;
+}
+@media (max-width: 767.98px) {
+  .kr-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Project page: preview bar and author banner (#438) -------------- */
+
+.kr-preview-bar,
+.kr-live-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.9rem;
+  padding: 0.55rem 0.9rem;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.9rem;
+}
+.kr-preview-bar {
+  background: var(--notice-bg, #fbf3dc);
+  border: 1px solid var(--notice-border, #ecd9a3);
+  color: #5c3f00;
+}
+.kr-live-banner {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e3e0d6);
+  color: var(--text, #141413);
+}
+.kr-preview-bar a,
+.kr-preview-bar button,
+.kr-live-banner a,
+.kr-live-banner button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-weight: 600;
+  color: var(--accent-strong, #9c4628);
+  text-decoration: none;
+  cursor: pointer;
+}
+.kr-preview-bar a:hover,
+.kr-preview-bar button:hover,
+.kr-live-banner a:hover,
+.kr-live-banner button:hover {
+  text-decoration: underline;
+}
+.kr-preview-bar .kr-preview-links,
+.kr-live-banner .kr-preview-links {
+  display: inline-flex;
+  gap: 0.9rem;
+  margin-left: auto;
+}
+
+/* The top bar's menus (versions, ⋯) are Bootstrap dropdowns (z-index
+   1000), under the completeness card (1030). While one is open, drop
+   the card below it. */
+body:has(#editor-status .dropdown-menu.show) .completeness-overlay {
+  z-index: 999;
+}

@@ -90,6 +90,10 @@ class ProjectUpdate(BaseModel):
     # unless the user explicitly opts in. This keeps inbound links from
     # blogs / search engines stable until the author asks for a refresh.
     regenerate_slug: Optional[bool] = None
+    # Issue #434/#437: the ``updated_at`` the editor last saw. When the row
+    # has changed since (another tab saved, or a restore), the PUT is
+    # refused with 409 ``stale`` rather than overwriting it.
+    expected_updated_at: Optional[datetime] = None
 
 
 class RemixedFromRef(BaseModel):
@@ -146,6 +150,16 @@ class ProjectResponse(BaseModel):
     # this to surface a toast notification. Always omitted from
     # response bodies that didn't trigger evaluation.
     newly_awarded_badges: list[EarnedBadgeResponse] = Field(default_factory=list)
+    # Epic #433: versions. ``published_at`` is the first publish (None if
+    # never published); for readers ``updated_at`` is when the live version
+    # was published. ``live_number`` and ``has_unpublished_changes`` are the
+    # author's alone (None for readers, who never see version numbers).
+    # ``viewing`` says which state this response is: ``live``, ``working``
+    # or a version number.
+    published_at: Optional[datetime] = None
+    live_number: Optional[int] = None
+    has_unpublished_changes: Optional[bool] = None
+    viewing: str = "working"
 
 
 class ProjectListItem(BaseModel):
@@ -174,6 +188,49 @@ class ProjectListItem(BaseModel):
     # Issue #259: ids of the canonical sections the project has (Bill of
     # Materials, Wiring, ...), so cards can show a completeness hint.
     sections: list[str] = Field(default_factory=list)
+    # Epic #433, author's own list (``/my/list``) only.
+    live_number: Optional[int] = None
+    has_unpublished_changes: Optional[bool] = None
+
+
+class VersionSummary(BaseModel):
+    """A row of the editor's version drop-down (issue #434)."""
+
+    number: int
+    kind: str
+    title: Optional[str] = None
+    created_at: datetime
+    published_at: Optional[datetime] = None
+    is_live: bool = False
+    restored_from_number: Optional[int] = None
+    note: Optional[str] = None
+
+
+class VersionList(BaseModel):
+    live_number: Optional[int] = None
+    has_unpublished_changes: bool = False
+    versions: list[VersionSummary] = Field(default_factory=list)
+
+
+class VersionDetail(VersionSummary):
+    snapshot: dict
+
+
+class PublishRequest(BaseModel):
+    note: Optional[str] = Field(None, max_length=200)
+
+
+class PublishResponse(BaseModel):
+    version: VersionSummary
+    project: "ProjectResponse"
+
+
+class RestoreResponse(BaseModel):
+    project: "ProjectResponse"
+    restored: int
+    # The number the working copy was saved as first, or None when it was
+    # identical to the newest version already.
+    saved_as: Optional[int] = None
 
 
 class ProjectRemixCreate(BaseModel):

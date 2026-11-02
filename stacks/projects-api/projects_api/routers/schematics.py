@@ -26,14 +26,14 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectSchematic
-from ..visibility import hide_drafts
+from .. import versions as v
 from ..schemas import (
     ProjectSchematicCreate,
     ProjectSchematicResponse,
@@ -84,9 +84,20 @@ async def get_schematic(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> ProjectSchematicResponse:
-    """Public read — surfaces user-authored content."""
-    await hide_drafts(session, project_id, user)
+    """Public read — surfaces user-authored content (the live version's
+    for readers, epic #433)."""
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is not None:
+        snap = view.snapshot.get("schematic")
+        if snap is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No schematic for this project")
+        when = view.version.created_at
+        return ProjectSchematicResponse(
+            id=0, project_id=project_id, name=snap.get("name"), description=snap.get("description"),
+            schematic_data=snap.get("schematic_data"), created_at=when, updated_at=when,
+        )
     schematic = await _get_schematic(session, project_id)
     if schematic is None:
         raise HTTPException(

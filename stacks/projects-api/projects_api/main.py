@@ -47,6 +47,8 @@ from .db import (
     backfill_part_image_url_to_photos,
     backfill_part_revisions_if_missing,
     backfill_wip_projects_to_draft,
+    backfill_published_versions,
+    add_project_version_columns_if_missing,
     create_all,
     drop_legacy_link_type_check_if_present,
     migrate_image_files_to_images,
@@ -89,6 +91,7 @@ from .routers import (
     symbols,
     users,
     videos,
+    versions,
     wiring,
     diagrams,
 )
@@ -101,6 +104,9 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await create_all()
     await repair_stale_fks()
+    # Epic #433: version columns on projects / images / files. First, since
+    # every later full-model select of those tables expects them.
+    await add_project_version_columns_if_missing()
     # Issue #108: ensure remix columns exist on legacy Postgres deployments.
     await add_remix_columns_if_missing()
     # Issue #121: ensure project_bom_items.part_id column exists.
@@ -207,6 +213,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await migrate_image_files_to_images()
     # Issue #260: existing work-in-progress projects become private drafts.
     await backfill_wip_projects_to_draft()
+    # Issue #434: every public project gets a live v1 from its current row.
+    await backfill_published_versions()
     # Issue #106: seed the badge catalog (idempotent upsert by slug).
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
@@ -264,6 +272,8 @@ def create_app() -> FastAPI:
     # /api/projects/featured and that path must beat /api/projects/{id}.
     app.include_router(featured.router)
     app.include_router(projects.router)
+    # Epic #433: publish / versions / restore.
+    app.include_router(versions.router)
     # Issue #152: slug-based read endpoints. Mounted after projects.router
     # because none of the by-slug paths overlap with the id-based ones
     # (different segment counts) — ordering is for readability only.

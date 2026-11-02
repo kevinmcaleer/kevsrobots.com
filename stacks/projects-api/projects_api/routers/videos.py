@@ -25,14 +25,14 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..db import get_session
 from ..models import Project, ProjectVideo
-from ..visibility import hide_drafts
+from .. import versions as v
 from ..schemas import VideoCreate, VideoResponse, VideoUpdate
 from ..youtube import extract_youtube_id
 
@@ -53,10 +53,24 @@ async def list_videos(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> list[VideoResponse]:
     """Public read. Order is ``sort_order`` ASC then ``id`` ASC so
-    rows with the same sort key fall back to insertion order."""
-    await hide_drafts(session, project_id, user)
+    rows with the same sort key fall back to insertion order. Readers get
+    the live version's videos (epic #433)."""
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is not None:
+        return [
+            VideoResponse(
+                id=r.get("id") or n + 1,
+                project_id=project_id,
+                youtube_id=r.get("youtube_id") or "",
+                title=r.get("title"),
+                sort_order=r.get("sort_order") or 0,
+                created_at=view.version.created_at,
+            )
+            for n, r in enumerate(view.snapshot.get("videos") or [])
+        ]
     items = (
         await session.scalars(
             select(ProjectVideo)

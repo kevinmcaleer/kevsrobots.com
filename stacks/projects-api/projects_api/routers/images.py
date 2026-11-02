@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
 from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +13,8 @@ from ..auth import get_current_user, get_optional_user, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Project, ProjectImage
-from ..visibility import hide_drafts
+from ..visibility import NO_STORE
+from .. import versions as v
 from ..schemas import ImageResponse
 from ..storage import (
     ALLOWED_IMAGE_EXTENSIONS,
@@ -31,16 +32,35 @@ async def list_images(
     project_id: int,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
+    version: Optional[str] = Query(None, description="Epic #433: live, working or a number"),
 ) -> list[ImageResponse]:
-    await hide_drafts(session, project_id, user)
-    items = (
+    """The gallery: the working copy's (removed pictures left out) for the
+    author, the live version's for everyone else (epic #433)."""
+    view = await v.resolve_view(session, project_id, user, version)
+    if view.snapshot is None:
+        items = (
+            await session.scalars(
+                select(ProjectImage)
+                .where(ProjectImage.project_id == project_id, ProjectImage.removed_at.is_(None))
+                .order_by(ProjectImage.sort_order)
+            )
+        ).all()
+        return [ImageResponse.model_validate(i, from_attributes=True) for i in items]
+    wanted = view.image_ids() or set()
+    rows = (
         await session.scalars(
-            select(ProjectImage)
-            .where(ProjectImage.project_id == project_id)
-            .order_by(ProjectImage.sort_order)
+            select(ProjectImage).where(ProjectImage.project_id == project_id, ProjectImage.id.in_(wanted))
         )
-    ).all()
-    return [ImageResponse.model_validate(i, from_attributes=True) for i in items]
+    ).all() if wanted else []
+    out = []
+    for i in rows:
+        resp = ImageResponse.model_validate(i, from_attributes=True)
+        entry = view.entry("images", i.id) or {}
+        resp.caption = entry.get("caption", resp.caption)
+        resp.sort_order = entry.get("sort_order", resp.sort_order) or 0
+        out.append(resp)
+    out.sort(key=lambda r: (r.sort_order, r.id))
+    return out
 
 
 @router.post("", response_model=ImageResponse, status_code=201)
@@ -91,10 +111,16 @@ async def view_image(
     record = await session.get(ProjectImage, image_id)
     if record is None or record.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
-    # Issue #260: a draft's images are the author's alone. <img> requests
-    # carry the .kevsrobots.com access_token cookie, so this works on
-    # the site; tell caches not to keep a copy for anyone else.
-    draft = await hide_drafts(session, project_id, user)
+    # Issue #260 / #435: a picture the live page doesn't show (a draft's,
+    # or one only the working copy or an older version has) is the
+    # author's alone. <img> requests carry the .kevsrobots.com
+    # access_token cookie, so this works on the site; tell caches not to
+    # keep a copy for anyone else.
+    project = await session.get(Project, project_id)
+    public = await v.item_public(session, project, "images", image_id)
+    if not public and user != project.author_username:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Image not found", headers=NO_STORE)
+    draft = not public
 
     data = read_file(record.file_path)
     if data is None:
@@ -152,6 +178,8 @@ async def delete_image(
     if record is None or record.project_id != project_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
 
-    delete_file(record.file_path)
-    await session.delete(record)
+    # Issue #439: never break the live page; keep what older versions use.
+    if await v.guard_removal(session, project, "images", record):
+        delete_file(record.file_path)
+        await session.delete(record)
     await session.commit()

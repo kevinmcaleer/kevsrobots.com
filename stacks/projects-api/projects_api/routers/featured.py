@@ -27,6 +27,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
+from ..versions import LiveView, live_views
 from ..models import Project, ProjectTag
 from ..visibility import not_draft
 from ..schemas import (
@@ -166,9 +167,10 @@ async def list_featured_projects(
         .order_by(Project.featured_at.desc().nullslast(), Project.id.desc())
         .limit(limit)
     )
-    projects = list((await session.scalars(query)).all())
+    # Epic #433: cards show the live version.
+    projects = await live_views(session, list((await session.scalars(query)).all()))
     out: list[FeaturedProjectResponse] = []
     for p in projects:
-        tags = await _tags_for(session, p.id)
+        tags = list(p.live_tags) if isinstance(p, LiveView) else await _tags_for(session, p.id)
         out.append(_to_response(p, tags))
     return out

@@ -23,6 +23,7 @@ hide_nibsy: true
 <link rel="stylesheet" href="/assets/js/markdown-editor/markdown-editor.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-toc.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/project-videos.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/project-versions.css?v={{ site.time | date: '%s' }}">
 
 <!-- Global drag-and-drop overlay (issue #117) -->
 <div id="global-dropzone" class="global-dropzone d-none" aria-hidden="true">
@@ -51,33 +52,52 @@ hide_nibsy: true
 
 <!-- .kr-notes: the Notes look shared with the project page (project-notes.css). -->
 <div class="container-fluid py-3 kr-notes" id="project-editor-page">
-  <!-- Top bar: save state, View, the Draft / Published switch (it
-       replaced the sidebar's status card) and the Archive / Delete menu. -->
+  <!-- Top bar (epic #433): save state, the "Unpublished changes" pill, the
+       version drop-down, Publish, View and the ⋯ menu (Archive, Unpublish,
+       Compare, Delete). The editor works on a private working copy;
+       Publish makes it the live version readers see. -->
   <div class="d-flex justify-content-end align-items-center mb-3">
     <div id="editor-status" class="d-flex align-items-center gap-2">
       <span id="save-indicator" class="text-muted small"></span>
-      <a id="view-toggle-btn" href="#" class="btn btn-sm btn-outline-secondary d-none"><i class="fas fa-eye me-1"></i> View</a>
-      <div class="form-check form-switch publish-switch mb-0" title="Drafts are only visible to you. Switch on to publish.">
-        <input class="form-check-input" type="checkbox" role="switch" id="publish-switch">
-        <label class="form-check-label small" for="publish-switch" id="publish-switch-label">Draft</label>
+      <span id="unpublished-pill" class="kr-unpublished-pill d-none"
+            title="Saved to your working copy, not live yet. Press Publish changes.">
+        <i class="fas fa-pen-nib" aria-hidden="true"></i> <span id="unpublished-pill-text">Unpublished changes</span>
+      </span>
+      <div class="dropdown">
+        <button type="button" id="versions-btn" class="btn btn-sm kr-versions-btn"
+                data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+                title="Versions of this project">
+          <i class="fas fa-code-branch me-1" aria-hidden="true"></i><span id="versions-label">v0 · not published yet</span>
+          <i class="fas fa-chevron-down ms-1 small" aria-hidden="true"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end kr-versions-menu" id="versions-menu" aria-labelledby="versions-btn"></div>
       </div>
-      <!-- Archived hides the project from the hub, search and profiles
-           without deleting it. Unticking it, or publishing, brings it back. -->
-      <div class="form-check mb-0 archive-check" title="Hide this project from the hub without deleting it">
-        <input class="form-check-input" type="checkbox" id="archive-check">
-        <label class="form-check-label small" for="archive-check">Archived</label>
-      </div>
-      <!-- Delete. The rest of the details sit under the title. -->
+      <button type="button" id="publish-btn" class="btn btn-sm kr-btn-publish">
+        <i class="fas fa-upload me-1" aria-hidden="true"></i><span id="publish-btn-label">Publish</span>
+      </button>
+      <a id="view-toggle-btn" href="#" class="btn btn-sm btn-outline-secondary d-none" target="_blank" rel="noopener"><i class="fas fa-eye me-1"></i> <span id="view-toggle-label">View</span></a>
       <div class="dropdown">
         <button type="button" id="project-menu-btn" class="btn btn-sm btn-outline-secondary"
                 data-bs-toggle="dropdown" aria-expanded="false" aria-label="More project actions" title="More">
           <i class="fas fa-ellipsis"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="project-menu-btn">
+          <li><button type="button" class="dropdown-item d-none" id="compare-live-btn"><i class="fas fa-code-compare me-1"></i> Compare with live</button></li>
+          <li><button type="button" class="dropdown-item" id="archive-btn"><i class="fas fa-box-archive me-1"></i> <span id="archive-btn-label">Archive project</span></button></li>
+          <li><button type="button" class="dropdown-item d-none" id="unpublish-btn"><i class="fas fa-eye-slash me-1"></i> Unpublish</button></li>
+          <li><hr class="dropdown-divider"></li>
           <li><button type="button" class="dropdown-item text-danger" id="delete-btn"><i class="fas fa-trash me-1"></i> Delete project</button></li>
         </ul>
       </div>
     </div>
+  </div>
+
+  <!-- Another tab (or a restore) changed this project since it loaded:
+       autosave stops so it can't overwrite that. -->
+  <div id="stale-notice" class="kr-notice kr-stale-notice mb-2 d-none" role="alert">
+    <i class="fas fa-triangle-exclamation"></i>
+    <span class="flex-grow-1">This project was changed in another tab. Reload to carry on; nothing more is saved from this tab until you do.</span>
+    <button type="button" class="btn btn-sm kr-btn-publish" id="stale-reload-btn">Reload</button>
   </div>
 
   <div id="auth-required" class="kr-notice d-none">
@@ -101,7 +121,7 @@ hide_nibsy: true
            hides it for good (localStorage). -->
       <div id="getting-started-tip" class="kr-notice mb-2 d-none" role="status">
         <i class="fas fa-circle-question"></i>
-        <span class="flex-grow-1">First project? The <a href="/projects/getting-started/" target="_blank" rel="noopener">getting started guide</a> shows how to add your parts, draw the wiring and write the build steps.</span>
+        <span class="flex-grow-1">First project? The <a href="/projects/getting-started/" target="_blank" rel="noopener">getting started guide</a> shows how to add your parts, draw the wiring and write the build steps. Nothing is public until you press <strong>Publish</strong>.</span>
         <button type="button" class="btn-close btn-sm" id="getting-started-tip-close" aria-label="Close"></button>
       </div>
       <div id="title-needs-attention" class="kr-notice mb-2 d-none" role="alert">
@@ -301,6 +321,7 @@ hide_nibsy: true
 <script src="/assets/js/wiring-bom.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-wiring.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/diagram-editor.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-versions.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-editor.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 // Editor TOC — live-updates from markdown source as the user types

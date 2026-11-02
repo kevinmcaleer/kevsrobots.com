@@ -23,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_current_user
 from ..db import get_session
+from ..versions import LiveView, live_view
 from ..models import Download, Project, ProjectFile, ProjectTag
 from ..visibility import not_draft
 from ..schemas import (
@@ -200,12 +201,17 @@ async def popular_projects(
     rows = (await session.execute(query)).all()
 
     items: list[PopularProjectItem] = []
-    for project, dl_count in rows:
-        tags = (
-            await session.execute(
-                select(ProjectTag.tag).where(ProjectTag.project_id == project.id)
-            )
-        ).scalars().all()
+    for row_project, dl_count in rows:
+        # Epic #433: cards show the live version.
+        project = await live_view(session, row_project)
+        if isinstance(project, LiveView):
+            tags = project.live_tags
+        else:
+            tags = (
+                await session.execute(
+                    select(ProjectTag.tag).where(ProjectTag.project_id == project.id)
+                )
+            ).scalars().all()
         items.append(
             PopularProjectItem(
                 id=project.id,

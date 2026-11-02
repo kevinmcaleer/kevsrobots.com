@@ -170,3 +170,24 @@ async def count_contents(
     session: AsyncSession = Depends(get_session),
 ) -> dict:
     return {"count": await session.scalar(select(func.count(Project.id)))}
+
+
+@router.get("/unversioned")
+async def list_unversioned(
+    _admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> list[dict]:
+    """Issue #440: public projects with no live version. The #434 backfill
+    gives every one a v1, so this should stay empty; a row here means a
+    project readers see as its working copy."""
+    rows = (
+        await session.scalars(
+            select(Project)
+            .where(Project.status.in_(("completed", "wip")), Project.published_version_id.is_(None))
+            .order_by(Project.id)
+        )
+    ).all()
+    return [
+        {"project_id": p.id, "title": p.title, "author_username": p.author_username, "status": p.status}
+        for p in rows
+    ]
