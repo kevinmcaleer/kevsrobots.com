@@ -693,6 +693,59 @@
     restoreVersion(n);
   }
 
+  // Where page n starts in the Markdown: the first line with text after
+  // the (n-1)th top-level <!-- page --> line (not in a code block), with
+  // the marker's start for the scroll. Pages with no text are skipped, as
+  // project-pages.js drops them. Null for page 1 or past the last page.
+  function pageStart(markdown, n) {
+    const lines = markdown.split('\n');
+    const pages = [{ marker: 0, text: null }];
+    let pos = 0;
+    let fence = null;
+    for (const line of lines) {
+      const f = line.match(/^ {0,3}(`{3,}|~{3,})/);
+      if (fence) { if (f && f[1][0] === fence[0] && f[1].length >= fence.length) fence = null; }
+      else if (f) fence = f[1];
+      const page = pages[pages.length - 1];
+      if (!fence && !f && /^ {0,3}<!--\s*page(?:\s*break)?\s*-->\s*$/i.test(line)) {
+        pages.push({ marker: pos, text: null });
+      } else if (page.text === null && line.trim()) {
+        page.text = pos;
+      }
+      pos += line.length + 1;
+    }
+    const filled = pages.filter(p => p.text !== null);
+    return n > 1 && n <= filled.length ? filled[n - 1] : null;
+  }
+
+  // The project page's Edit link says which page the author was reading
+  // (?page=N): put the cursor at that page's start, with its "Page N" rule
+  // just below the sticky toolbar. Scroll again once pictures above have
+  // taken their height, unless the author has scrolled by then.
+  function openAtPageFromLink() {
+    const n = Number(params.get('page'));
+    if (!n || !mde || !mde.view) return;
+    if (currentProject) history.replaceState(null, '', '?id=' + currentProject.id);
+    const view = mde.view;
+    const start = pageStart(view.state.doc.toString(), n);
+    if (!start) return;
+    view.dispatch({ selection: { anchor: start.text } });
+    try { view.contentDOM.focus({ preventScroll: true }); } catch (e) { /* older browsers */ }
+    let moved = false;
+    const stop = () => { moved = true; };
+    ['wheel', 'touchmove', 'keydown', 'mousedown'].forEach(ev =>
+      window.addEventListener(ev, stop, { once: true, passive: true }));
+    const scroll = () => {
+      if (moved) return;
+      const bar = document.querySelector('#content-markdown-pane .mde-toolbar');
+      const below = bar ? Math.max(0, bar.getBoundingClientRect().bottom) : 120;
+      const top = view.lineBlockAt(start.marker).top + view.documentTop;
+      window.scrollTo({ top: Math.max(0, top + window.scrollY - below - 12) });
+    };
+    requestAnimationFrame(scroll);
+    [150, 600, 1500].forEach(ms => setTimeout(scroll, ms));
+  }
+
   const deleteBtn = document.getElementById('delete-btn');
   if (deleteBtn) deleteBtn.addEventListener('click', async () => {
     if (!currentProject) return;
@@ -4444,6 +4497,7 @@
     editorContainer.classList.remove('d-none');
     showGettingStartedTip();
     showRestoredToast();
+    openAtPageFromLink();
     restoreFromLink();
     const completenessCard = document.getElementById('completeness-card');
     if (completenessCard && !completenessClosed) completenessCard.classList.remove('d-none');

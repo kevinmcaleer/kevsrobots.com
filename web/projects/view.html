@@ -2682,6 +2682,22 @@ description: View project details
   // around, until the reader scrolls on their own.
   let readerScrolled = false;
   let projectPages = null; // ProjectPages.paginate's result, when the text has pages
+
+  // Edit while reading page N opens the editor at page N (the text after
+  // the author's (N-1)th <!-- page --> line): the link gains &page=N as it
+  // is clicked. Not for one-page view, page 1, ?pages=auto (those pages
+  // aren't the author's) or a "Restore" link.
+  function withEditorPage(ev) {
+    const a = ev.target.closest && ev.target.closest('a[href^="/projects/editor.html?"]');
+    if (!a) return;
+    const href = a.getAttribute('href').replace(/&page=\d+/, '');
+    let n = 0;
+    if (projectPages && !projectPages.isOneView() && !/[?&](restore|page)=/.test(href) &&
+        new URLSearchParams(location.search).get('pages') !== 'auto') n = projectPages.current();
+    a.setAttribute('href', n > 1 ? href + '&page=' + n : href);
+  }
+  document.addEventListener('click', withEditorPage, true);
+  document.addEventListener('auxclick', withEditorPage, true);
   ['wheel', 'touchmove', 'keydown'].forEach(ev =>
     window.addEventListener(ev, () => { readerScrolled = true; }, { once: true, passive: true }));
   function scrollToHash() {
