@@ -148,6 +148,11 @@ Key data files:
   }
   ```
   **Symptom:** the icon appears 1–3px too high inside its container. **Do NOT use** flex/grid centring for FA glyphs inside fixed-size containers under ~40px — flex centres the line-box, not the glyph's optical centre, and FA glyphs have non-symmetric metrics. The block-and-line-height pattern works because setting `line-height` equal to the container height makes the inline box exactly fill the container, putting the glyph at its natural baseline (which IS the visual centre). Flex alignment can be used for *layout-level* centring (e.g. centring a row of icons inside a wide bar) but not for the icon's vertical position inside its own small container. Sub-tip: if the container has a `border`, subtract 2×border-width from the line-height so the glyph centres inside the content box, not the border box.
+- **Icon-only buttons: centred glyph, no outline** (Kev, 2026-11-02, after the 3D viewer's full-screen button shipped off-centre). Every icon-only button (full screen, close, expand, toolbar icons…) must:
+  - centre its glyph with the block + `line-height` pattern above, not flex;
+  - override the site-wide `i { width: 16px !important }` in `main.scss` with `width: auto !important; margin: 0` on the `<i>`, or a wider glyph spills off-centre;
+  - have **no border/outline and no box-shadow**: a transparent background, a muted icon colour, and a faint background tint on hover. Keep a `:focus-visible` outline for keyboard users only.
+  Check it with a zoomed screenshot before shipping.
 - **Icon + heading spacing** - When a Font Awesome icon precedes the text of an `<h1>`–`<h4>`, the default `me-2` (Bootstrap 0.5rem) gap is **too tight at heading sizes** — the icon visually overlaps the text. Use `me-3` and keep a literal space between `</i>` and the heading text:
   ```html
   <!-- Right -->

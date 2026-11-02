@@ -90,22 +90,35 @@
 .kr-models-open:hover { filter: brightness(1.08); }
 
 /* With the model live in the preview, full screen is a small icon button
-   in the bottom right corner. */
+   in the bottom right corner: no outline (Kev, 2026-11-02), and the glyph
+   centred the claude.md way (block + line-height = height, not flex). */
 .kr-models-open.is-icon {
   left: auto;
   right: 0.6rem;
   bottom: 0.6rem;
   transform: none;
-  width: 2rem;
-  height: 2rem;
+  display: block;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  justify-content: center;
-  border: 1px solid var(--border, #e5e7eb);
-  background: var(--card, #fff);
+  text-align: center;
+  line-height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
   color: var(--muted, #4b5563);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+  box-shadow: none;
+  font-size: 1rem;
 }
-.kr-models-open.is-icon:hover { color: var(--accent, #2563eb); filter: none; }
+.kr-models-open.is-icon > i {
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
+  width: auto !important; /* beat the site-wide i { width: 16px !important } */
+  margin: 0;
+}
+.kr-models-open.is-icon:hover { color: var(--accent, #2563eb); background: rgb(0 0 0 / 0.05); filter: none; }
+.kr-models-open.is-icon:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 1px; }
 
 /* A cube in the corner: this picture is rendered from the model. Just
    the icon, no box (Kev, 2026-10-31). */
