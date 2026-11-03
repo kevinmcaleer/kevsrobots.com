@@ -1188,7 +1188,12 @@
         },
       },
       // ```snakie: a gist / GitHub file (or code) as a runnable Snakie box.
-      codeRenderers: { mermaid: renderMermaid, snakie: ProjectEmbeds.renderSnakieBlock },
+      codeRenderers: {
+        mermaid: renderMermaid,
+        snakie: (source, el) => ProjectEmbeds.renderSnakieBlock(source, el, {
+          edit: next => replaceFencedBlock(el, 'snakie', source, next),
+        }),
+      },
       codeEditors: { mermaid: editMermaid },
       // Mermaid Factory's highlighter for ```mermaid fences in Raw.
       codeLanguages: { mermaid: () => loadMermaidTools().then(tools => tools.mermaidStreamParser) },
@@ -2005,6 +2010,28 @@
     partMenu.style.left = Math.min(x, window.innerWidth - partMenu.offsetWidth - 8) + 'px';
     partMenu.style.top = Math.min(y, window.innerHeight - partMenu.offsetHeight - 8) + 'px';
     partMenu.querySelector('button').focus();
+  }
+
+  // Swaps the code of the ```lang block drawn in `el` (its text was `source`)
+  // for `next`. Several blocks can hold the same code, so it takes the one
+  // nearest the drawing.
+  function replaceFencedBlock(el, lang, source, next) {
+    if (!mde || !mde.view) return;
+    const view = mde.view;
+    let at = 0;
+    try { at = view.posAtDOM(el); } catch (e) { /* not in the editor any more */ return; }
+    const doc = view.state.doc.toString();
+    const fence = new RegExp('^(`{3,}|~{3,})' + lang + '[^\\n]*\\n([\\s\\S]*?)^\\1[ \\t]*$', 'gim');
+    let best = null;
+    let m;
+    while ((m = fence.exec(doc))) {
+      if (m[2].trim() !== String(source).trim()) continue;
+      const from = m.index + m[0].indexOf('\n') + 1;
+      const to = from + m[2].length;
+      if (!best || Math.abs(from - at) < Math.abs(best.from - at)) best = { from, to };
+    }
+    if (!best) return;
+    view.dispatch({ changes: { from: best.from, to: best.to, insert: next.replace(/\n*$/, '\n') } });
   }
 
   function setupPartLinks(editor) {
