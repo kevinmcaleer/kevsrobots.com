@@ -97,12 +97,13 @@ Notice that there are two equals signs `==`. This is because we use one equal si
 
 We an also compare values to check if they are the same:
 
-```python
+{% capture snakie_code %}
 a = 1
 b = 1
 
 if a == b: print('They are the same')
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="if_elif_else.py" %}
 
 In the example above we assign the value `1` to the variable named `a`, and then we assign the value `1` to the variable `b`. We then compare the two using the `if a == b` condition. 
 

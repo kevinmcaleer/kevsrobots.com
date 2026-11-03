@@ -26,7 +26,7 @@ In this lesson, we will explore the principles of `object-oriented programming` 
 
 In Python, almost everything is an `object`, with its `properties` and `methods`. A Class is like an object constructor, or a blueprint for creating objects.
 
-```python
+{% capture snakie_code %}
 # Define a class
 class Car:
     def __init__(self, color, brand):
@@ -37,7 +37,8 @@ class Car:
 my_car = Car('red', 'Toyota')
 print(my_car.color)  # Prints 'red'
 print(my_car.brand)  # Prints 'Toyota'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="oop_1.py" engine="pyodide" %}
 
 ---
 
@@ -45,7 +46,7 @@ print(my_car.brand)  # Prints 'Toyota'
 
 `Methods` are functions defined inside the body of a class. They are used to perform operations with the attributes of our objects.
 
-```python
+{% capture snakie_code %}
 class Car:
     def __init__(self, color, brand):
         self.color = color
@@ -57,7 +58,8 @@ class Car:
 
 my_car = Car('red', 'Toyota')
 print(my_car.honk())  # Prints 'Beep beep!'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="oop_2.py" engine="pyodide" %}
 
 ---
 
@@ -65,7 +67,7 @@ print(my_car.honk())  # Prints 'Beep beep!'
 
 `Inheritance` is a powerful feature in object-oriented programming. It refers to defining a new class with little or no modification to an existing class. The new class is called `derived` (or child) class and the one from which it inherits is called the `base` (or parent) class.
 
-```python
+{% capture snakie_code %}
 class Vehicle:
     def __init__(self, color):
         self.color = color
@@ -81,7 +83,8 @@ class Car(Vehicle):
 
 my_car = Car('red', 'Toyota')
 print(my_car.honk())  # Prints 'Honk honk!'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="oop_3.py" engine="pyodide" %}
 
 ---
 

@@ -12,7 +12,7 @@ cover: /learn/pandas_and_numpy/assets/pandas07.png
 
 Effective data analysis often involves summarising data, grouping it, and performing calculations on each group. We'll keep using the robot sensor data.
 
-```python
+{% capture snakie_code %}
 import pandas as pd
 
 df = pd.DataFrame({
@@ -22,7 +22,8 @@ df = pd.DataFrame({
     'battery': [87, 64, 85, 60, 92, 90],
 })
 print(df)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="analysis.py" engine="pyodide" %}
 
 ---
 

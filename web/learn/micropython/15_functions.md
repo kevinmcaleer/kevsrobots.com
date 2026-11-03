@@ -82,14 +82,15 @@ Lets create a simple function that will print a message when its called:
 
 ##### Example
 
-```python
+{% capture snakie_code %}
 def say_hello():
     # This function prints the message hello
     print('hello')
 
 
 say_hello()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_1.py" %}
 
 The example above defines (thats why its the `def` keyword) the function called `say_hello`, notice that we also need to provide the `()` brackets as functions need this, we also need to use the `:` colon symbol to tell MicroPython that the following block of code relates to this function.
 
@@ -103,14 +104,15 @@ We often want our function to take in an input variable so that we can use it in
 
 ##### Example
 
-```python
+{% capture snakie_code %}
 def say_hello(name, age):
     # This function prints the message hello
     print('hello', name, 'how does',age,'feel?')
 
 
 say_hello('Kev', 47)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_2.py" %}
 
 In the example above we've added two parameters `name` and `age`. Our functions can use these parameters within its block of code, in this case we use it to print out the message `hello Kev how does 47 feel?`.
 Notice how Python accepts the two different types of variables - the `name` is a string (`Str`) of text, and `age` is an integer (a whole number with no decimal points).
@@ -121,7 +123,7 @@ We can take this a step further and pass variables to the function and it will w
 
 ##### Example
 
-```python
+{% capture snakie_code %}
 def say_hello(name, age):
     # This function prints the message hello
     print('hello', name, 'how does',age,'feel?')
@@ -130,7 +132,8 @@ my_name = 'Kev'
 my_age = 47
 
 say_hello(my_name, my_age)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_3.py" %}
 
 Functions can also call other functions, though on a MicroController you may find that the device crashes if it runs out of memory, if you nest too many functions, but that will take quite a few levels.
 
@@ -142,14 +145,15 @@ Functions can do more than just run blocks of code, they can return values too. 
 
 ##### Example
 
-```python
+{% capture snakie_code %}
 def add_one(number):
     number += 1
     return number
 
 a = add_one(1)
 print(a)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_4.py" %}
 
 In the example above we define the function `add_one` which has one parameter `number`. It then adds `1` to the number and `return`s the number to the caller.
 

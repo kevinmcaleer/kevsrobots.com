@@ -115,10 +115,11 @@ if x > 5:
 
 **For Loop:**
 
-```python
+{% capture snakie_code %}
 for i in range(5):
     print(i)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="python_basics_for_robotics_1.py" %}
 
 **While Loop:**
 
@@ -134,12 +135,13 @@ while x > 0:
 
 Functions are blocks of code that only run when called. They can receive data, operate on it, and return the result.
 
-```python
+{% capture snakie_code %}
 def greet(name):
     return "Hello, " + name + "!"
 
 print(greet("Robot"))
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="python_basics_for_robotics_2.py" %}
 
 ---
 

@@ -63,7 +63,8 @@ Serial.println("World");
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 value = 42
 voltage = 3.3
 message = "Hello"
@@ -74,7 +75,8 @@ print(f"{message} World")
 
 # Or combine everything
 print(f"Value: {value}, Voltage: {voltage:.2f}V, Message: {message} World")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="serial_basics_1.py" %}
 
 Python's f-strings are much cleaner!
 
@@ -93,7 +95,8 @@ Serial.println(" Done!");
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 import time
 
 print("Loading", end="")  # No newline
@@ -101,7 +104,8 @@ for i in range(5):
     print(".", end="")  # No newline
     time.sleep(1)
 print(" Done!")  # With newline
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="serial_basics_2.py" %}
 
 Use the `end=""` parameter to suppress the newline.
 
@@ -119,7 +123,8 @@ Serial.println(z);
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 x, y, z = 10, 20, 30
 
 # Method 1: F-string (best)
@@ -130,7 +135,8 @@ print("X:", x, ", Y:", y, ", Z:", z)
 
 # Method 3: Old-style formatting
 print("X: {}, Y: {}, Z: {}".format(x, y, z))
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="serial_basics_3.py" %}
 
 ## The REPL: Interactive Python
 
@@ -269,7 +275,8 @@ Serial.println("V");
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 voltage = 3.287
 
 # F-string with formatting
@@ -281,7 +288,8 @@ print(f"Voltage: {voltage:.1f}V")   # 1 decimal: 3.3
 print(f"Hex: 0x{42:02X}")           # Hex: 0x2A
 print(f"Binary: {42:08b}")          # Binary: 00101010
 print(f"Padded: {42:05d}")          # Padded: 00042
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="serial_basics_4.py" %}
 
 Format specification:
 - `:.2f` - Float with 2 decimal places

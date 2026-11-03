@@ -64,7 +64,7 @@ Time to put it all together. We'll work through one complete example, from gener
 
 Imagine your robot logs its battery level every hour for a week. We'll use NumPy to make some realistic-looking data, then clean it, analyse it and chart it with Pandas.
 
-```python
+{% capture snakie_code %}
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -94,7 +94,8 @@ log['smooth'] = log['battery'].rolling(window=6).mean()
 log.plot(x='time', y=['battery', 'smooth'], title='Robot battery level')
 plt.ylabel('Battery %')
 plt.show()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="case_studies.py" engine="pyodide" %}
 
 ### How it works
 

@@ -86,7 +86,7 @@ In this livestream I go beyond the basics with Python for robotics.
 
 Decorators allow us to wrap another function in order to extend the behavior of the wrapped function, without permanently modifying it.
 
-```python
+{% capture snakie_code %}
 def my_decorator(func):
     def wrapper():
         print("Before function call")
@@ -99,11 +99,12 @@ def say_hello():
     print("Hello!")
 
 say_hello()  # prints: Before function call, Hello!, After function call
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="advanced_1.py" engine="pyodide" %}
 
 That `wrapper()` only works for functions with no arguments. A more general decorator passes everything through and keeps the original function's name with `functools.wraps`:
 
-```python
+{% capture snakie_code %}
 import functools
 import time
 
@@ -121,7 +122,8 @@ def add(a, b):
     return a + b
 
 print(add(2, 3))
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="advanced_2.py" engine="pyodide" %}
 
 ---
 
@@ -129,7 +131,7 @@ print(add(2, 3))
 
 Generators are a type of iterable, like lists or tuples. Unlike lists, they produce values one at a time, only when asked, so they use very little memory even for huge sequences. You can't index them, but you can loop over them.
 
-```python
+{% capture snakie_code %}
 def simple_generator():
     yield 1
     yield 2
@@ -137,7 +139,8 @@ def simple_generator():
 
 for value in simple_generator():
     print(value)  # prints: 1, 2, 3
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="advanced_3.py" engine="pyodide" %}
 
 ---
 

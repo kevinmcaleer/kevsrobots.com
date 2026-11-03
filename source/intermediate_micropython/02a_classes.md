@@ -128,10 +128,11 @@ Almost everything in Python is an object, including `int`, `float`, `list`, `dic
 
 You may have already used objects and their methods without realizing it. For example, the `str` object has a method called `upper()` that converts the string to uppercase.
 
-```python
+{% capture snakie_code %}
 message = "hello" # create a string called message and store the value "hello"
 print(message.upper()) # prints out the message string in uppercase, this uses the str object's upper() method
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="classes.py" %}
 
 ---
 

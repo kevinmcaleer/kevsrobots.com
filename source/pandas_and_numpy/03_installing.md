@@ -52,12 +52,13 @@ This downloads and installs the latest versions of Pandas and NumPy from the Pyt
 
 After installation, you can verify that Pandas and NumPy are correctly installed by importing them in Python. Open your Python interpreter or a Python script and try the following commands:
 
-```python
+{% capture snakie_code %}
 import pandas as pd
 import numpy as np
 print("Pandas version:", pd.__version__)
 print("NumPy version:", np.__version__)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="installing.py" engine="pyodide" %}
 
 If the installation was successful, these commands should run without errors, and you will see the installed versions of Pandas and NumPy.
 

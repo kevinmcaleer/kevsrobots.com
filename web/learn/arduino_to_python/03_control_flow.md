@@ -202,13 +202,15 @@ while (count < 10) {
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 count = 0
 
 while count < 10:
     print(count)
     count += 1  # Python has +=, but no ++ operator
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="control_flow_1.py" %}
 
 **Important:** Python doesn't have `++` or `--` operators. Use `+= 1` or `-= 1` instead.
 
@@ -419,7 +421,8 @@ switch (mode) {
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 mode = 2
 
 if mode == 1:
@@ -430,11 +433,12 @@ elif mode == 3:
     print("Mode 3")
 else:
     print("Unknown")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="control_flow_2.py" %}
 
 **Alternative: Dictionary dispatch** (advanced pattern):
 
-```python
+{% capture snakie_code %}
 mode = 2
 
 actions = {
@@ -444,7 +448,8 @@ actions = {
 }
 
 actions.get(mode, lambda: print("Unknown"))()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="control_flow_3.py" %}
 
 This is more Pythonic but less beginner-friendly. Stick with if/elif for now.
 
@@ -553,7 +558,7 @@ Write MicroPython code that:
 
 **Answer:**
 
-```python
+{% capture snakie_code %}
 from machine import Pin
 
 temperature = 25  # Simulate sensor reading
@@ -577,7 +582,8 @@ else:
     red_led.off()
     green_led.off()
     blue_led.on()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="control_flow_4.py" %}
 
 **Exercise 2: Button Counter**
 

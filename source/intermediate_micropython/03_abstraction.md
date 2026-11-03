@@ -27,7 +27,7 @@ In the example below, we model a popular road bike, the Yamaha MT-07, using a **
 
 The **Bike** class also has a private property `__mileage` that stores the mileage of the bike. `__mileage` can only be accessed by the `ride()` method to increase the mileage, and `get_mileage()` method to return the current mileage the bike has traveled.
 
-```python
+{% capture snakie_code %}
 class Bike:
     def __init__(self, make, model):
         self.make = make
@@ -43,7 +43,8 @@ class Bike:
 my_bike = Bike("Yamaha", "MT-07")
 my_bike.ride(100)
 print(my_bike.get_mileage())
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="abstraction_1.py" %}
 
 The ***Bike*** class is an abstraction of a real-world bike. It hides the ***complexity*** of how the bike works and provides a simple interface for interacting with the bike object.
 
@@ -57,7 +58,7 @@ Classes can be composed ***of other*** classes, which allows us to create comple
 
 For example, if we want to create a robot, we could create a class for the robot and then create objects for the sensors, motors, and other components that make up the robot.
 
-```python
+{% capture snakie_code %}
 class Sensor:
     def __init__(self, type):
         self.type = type
@@ -88,7 +89,8 @@ class Robot:
 robot = Robot("Robo")
 robot.move_forward()
 print(robot.read_sensor())
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="abstraction_2.py" %}
 
 We cover [`Modules`](07_modules) in a future lesson.
 

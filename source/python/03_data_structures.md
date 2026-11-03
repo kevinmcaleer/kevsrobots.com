@@ -25,7 +25,7 @@ Data structures in Python are containers that organize and group data types toge
 
 [^1]: Many people prefer double quotes, because then you can use apostrophes inside a string without escaping them, like `"It's here"`. The [Black](18_tips_and_tricks.html#pep-8-and-the-black-code-formatter) code formatter uses double quotes too.
 
-```python
+{% capture snakie_code %}
 # A string in Python
 greeting = "Hello, World!"
 
@@ -36,7 +36,8 @@ print(first_char)  # Prints 'H'
 # Strings are immutable
 # The following line will raise an error
 # greeting[0] = 'h'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_structures_1.py" engine="pyodide" %}
 
 ---
 
@@ -44,7 +45,7 @@ print(first_char)  # Prints 'H'
 
 `Lists` are ordered and mutable collections, which means you can replace, add or remove elements. Lists can contain items of different data types.
 
-```python
+{% capture snakie_code %}
 # Creating a list
 numbers = [1, 2, 3, 4, 5]
 
@@ -55,7 +56,8 @@ print(first_number)  # Prints '1'
 # Modifying a list
 numbers[0] = 10
 print(numbers)  # Prints '[10, 2, 3, 4, 5]'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_structures_2.py" engine="pyodide" %}
 
 ---
 
@@ -63,7 +65,7 @@ print(numbers)  # Prints '[10, 2, 3, 4, 5]'
 
 `Tuples` are similar to lists but they are immutable, which means you can't change elements of a tuple once it's defined.
 
-```python
+{% capture snakie_code %}
 # Creating a tuple
 coordinates = (10.0, 20.0)
 
@@ -74,7 +76,8 @@ print(x_coordinate)  # Prints '10.0'
 # Tuples are immutable
 # The following line will raise an error
 # coordinates[0] = 20.0
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_structures_3.py" engine="pyodide" %}
 
 ---
 
@@ -82,7 +85,7 @@ print(x_coordinate)  # Prints '10.0'
 
 `Dictionaries` are collections of key-value pairs. They are mutable and indexed by keys, and since Python 3.7 they remember the order you added items in.
 
-```python
+{% capture snakie_code %}
 # Creating a dictionary
 student = {'name': 'John', 'age': 15, 'grade': 'A'}
 
@@ -93,7 +96,8 @@ print(name)  # Prints 'John'
 # Modifying a dictionary
 student['age'] = 16
 print(student)  # Prints "{'name': 'John', 'age': 16, 'grade': 'A'}"
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_structures_4.py" engine="pyodide" %}
 
 ---
 
@@ -101,7 +105,7 @@ print(student)  # Prints "{'name': 'John', 'age': 16, 'grade': 'A'}"
 
 `Sets` are unordered collections of unique elements. They are mutable, but they cannot contain mutable elements.
 
-```python
+{% capture snakie_code %}
 # Creating a set
 fruits = {'apple', 'banana', 'cherry'}
 
@@ -115,7 +119,8 @@ print(fruits)  # May print "{'cherry', 'orange', 'banana', 'apple'}"
 # Removing an element from the set
 fruits.remove('apple')
 print(fruits)  # May print "{'cherry', 'orange', 'banana'}"
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_structures_5.py" engine="pyodide" %}
 
 ---
 

@@ -40,7 +40,7 @@ squares = [i * i for i in range(10)]
 
 - Loop over items directly, and use `enumerate()` when you need the position too:
 
-```python
+{% capture snakie_code %}
 fruits = ["apple", "banana", "cherry"]
 
 # Non-Pythonic
@@ -50,7 +50,8 @@ for i in range(len(fruits)):
 # Pythonic
 for i, fruit in enumerate(fruits):
     print(i, fruit)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="tips_and_tricks.py" engine="pyodide" %}
 
 - Use built-in functions like `sum()`, `max()` and `sorted()` instead of writing your own loops:
 

@@ -80,7 +80,7 @@ In summary, DataFrames simplify data manipulation and analysis, making them a pr
 
 You can create a Data Frame from various sources like lists, dictionaries, or external data sources (CSV, Excel files). Here's an example of creating a Data Frame from a dictionary:
 
-```python
+{% capture snakie_code %}
 import pandas as pd
 
 data = {
@@ -91,7 +91,8 @@ data = {
 
 df = pd.DataFrame(data)
 print(df)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="first_dataframe.py" engine="pyodide" %}
 
 ---
 

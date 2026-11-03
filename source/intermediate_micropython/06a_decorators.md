@@ -22,7 +22,7 @@ Decorators are a way to wrap a function, modifying its behavior. They take anoth
 
 Here is a simple example of a decorator:
 
-```python
+{% capture snakie_code %}
 def my_decorator(func):
     def wrapper():
         print("Something is happening before the function is called.")
@@ -35,7 +35,8 @@ def say_hello():
 
 say_hello = my_decorator(say_hello)
 say_hello()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="decorators_1.py" %}
 
 In the example above, we define a decorator `my_decorator` that takes a function `func` as an argument. The `wrapper` function is used to wrap the `func` function, adding functionality before and after the function is called.
 
@@ -51,7 +52,7 @@ In Python, we can use the `@` symbol to apply a decorator to a function. This is
 
 Here is the same example using the `@` symbol:
 
-```python
+{% capture snakie_code %}
 def my_decorator(func):
     def wrapper():
         print("Something is happening before the function is called.")
@@ -64,7 +65,8 @@ def say_hello():
     print("Hello!")
 
 say_hello()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="decorators_2.py" %}
 
 The `@my_decorator` syntax is a shorthand for applying the decorator to the function.
 
@@ -76,7 +78,7 @@ In MicroPython, we can use decorators to create ***setters*** and ***getters*** 
 
 Here is an example of a class with a setter and getter:
 
-```python
+{% capture snakie_code %}
 class Robot:
     def __init__(self, name):
         self.name = name
@@ -100,7 +102,8 @@ r.speed = 50
 print(r.speed)  
 r.speed = 150
 print(r.speed)  # notice the speed was capped at 100
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="decorators_3.py" %}
 
 In this example, the `@property` decorator is used to define a getter method for the `speed` attribute, and the `@speed.setter` decorator is used to define a setter method.
 

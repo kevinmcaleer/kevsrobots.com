@@ -31,18 +31,19 @@ In Python, `exceptions` are events that occur during the execution of a program 
 
 You can use a `try/except` block to catch exceptions and define how your program should respond to them.
 
-```python
+{% capture snakie_code %}
 try:
     x = 1 / 0  # This will raise a ZeroDivisionError
 except ZeroDivisionError:
     x = 0  # This code will run if a ZeroDivisionError occurs
 
 print(x)  # Prints '0'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="errors_1.py" engine="pyodide" %}
 
 You can catch multiple exceptions by providing multiple `except` blocks. If you want to execute a block of code regardless of whether an exception was raised, you can use a `finally` block.
 
-```python
+{% capture snakie_code %}
 try:
     # Try to open a non-existent file
     f = open("non_existent_file.txt", "r")
@@ -50,7 +51,8 @@ except FileNotFoundError:
     print("File not found.")
 finally:
     print("This gets executed no matter what.")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="errors_2.py" engine="pyodide" %}
 
 ---
 

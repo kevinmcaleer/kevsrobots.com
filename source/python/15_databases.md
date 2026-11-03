@@ -37,7 +37,7 @@ SQLite is a lightweight database that keeps everything in a single file. It does
 >
 > Learn more about SQLite in our dedicated [SQLite3 course](/learn/sqlite3/)
 
-```python
+{% capture snakie_code %}
 import sqlite3
 
 # Connect to SQLite database
@@ -62,7 +62,8 @@ for row in c.execute("SELECT * FROM stocks"):
 
 # Close the connection
 conn.close()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="databases.py" engine="pyodide" %}
 
 ---
 

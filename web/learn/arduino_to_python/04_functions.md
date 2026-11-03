@@ -299,13 +299,14 @@ This structure:
 
 This Python pattern might look confusing at first:
 
-```python
+{% capture snakie_code %}
 def main():
     print("Program running")
 
 if __name__ == '__main__':
     main()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_1.py" %}
 
 **What it means:**
 - If this file is run directly, execute `main()`
@@ -348,7 +349,7 @@ set_motor_speed(motor_fwd, motor_rev, 0)    # Stop
 
 Python has anonymous functions called lambdas - quick one-line functions:
 
-```python
+{% capture snakie_code %}
 # Regular function
 def add(a, b):
     return a + b
@@ -360,7 +361,8 @@ add = lambda a, b: a + b
 temperatures_c = [20, 25, 30]
 temperatures_f = list(map(lambda c: c * 9/5 + 32, temperatures_c))
 print(temperatures_f)  # [68.0, 77.0, 86.0]
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_2.py" %}
 
 You won't need lambdas often in MicroPython, but they're handy for quick operations.
 
@@ -463,7 +465,7 @@ Test them with a few values and print the results.
 
 **Answer:**
 
-```python
+{% capture snakie_code %}
 def celsius_to_fahrenheit(c):
     return (c * 9/5) + 32
 
@@ -475,7 +477,8 @@ print(f"25C = {celsius_to_fahrenheit(25)}F")
 print(f"77F = {fahrenheit_to_celsius(77)}C")
 print(f"0C = {celsius_to_fahrenheit(0)}F")
 print(f"32F = {fahrenheit_to_celsius(32)}C")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_3.py" %}
 
 **Exercise 2: LED Blink Patterns**
 
@@ -523,7 +526,7 @@ Test it with values: 0, 20000, 40000, 60000
 
 **Answer:**
 
-```python
+{% capture snakie_code %}
 def analyze_sensor(raw_value):
     voltage = (raw_value / 65535) * 3.3
 
@@ -545,4 +548,5 @@ for value in test_values:
     voltage, status, safe = analyze_sensor(value)
     safe_text = "SAFE" if safe else "UNSAFE"
     print(f"Raw: {value:5d} | {voltage:.2f}V | {status:6s} | {safe_text}")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="functions_4.py" %}
