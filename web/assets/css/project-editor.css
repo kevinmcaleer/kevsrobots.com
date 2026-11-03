@@ -1160,12 +1160,19 @@ a.part-link:hover,
   margin: 0;
   cursor: pointer;
 }
-.snakie-size-pick select {
+/* Three classes: beats the editor's own `.mde select` look. */
+.snakie-size-bar .snakie-size-pick .snakie-size-select {
+  appearance: none;
+  -webkit-appearance: none;
   font: inherit;
   color: var(--text, inherit);
-  background: var(--surface, #fff);
+  /* Our own chevron, inset from the right edge. */
+  background: var(--surface, #fff)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 0.6rem center / 10px 6px;
   border: 1px solid var(--border, #d1d5db);
   border-radius: 6px;
-  padding: 0.1rem 0.35rem;
+  padding: 0.15rem 1.9rem 0.15rem 0.6rem;
+  line-height: 1.4;
   cursor: pointer;
 }

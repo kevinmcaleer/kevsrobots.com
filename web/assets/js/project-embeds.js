@@ -386,6 +386,7 @@
   const SNAKIE_WIDTHS = [['full', 'Full width'], ['wide', 'Wide'], ['medium', 'Medium'], ['narrow', 'Narrow']];
   const SNAKIE_HEIGHTS = [['auto', 'Fit the code'], ['short', 'Short'], ['medium', 'Medium'], ['tall', 'Tall']];
   const SNAKIE_WIDTH_PX = { wide: '860px', medium: '680px', narrow: '520px' };
+  const SNAKIE_HEIGHT_PX = { short: 320, medium: 460, tall: 640 };
 
   // The block's text with its width/height lines set to `sizes` (a default
   // value drops the line).
@@ -402,6 +403,7 @@
     wrap.className = 'snakie-size-pick';
     wrap.append(label + ' ');
     const select = document.createElement('select');
+    select.className = 'snakie-size-select';
     let known = false;
     choices.forEach(([v, text]) => {
       const o = new Option(text, v);
@@ -481,19 +483,22 @@
     }
     const box = document.createElement('div');
     box.className = 'project-code-embed snakie-box';
-    // The size and the rounded clip are set here too, so they hold even
-    // before snakie-embed.js loads (or on an older copy of it).
-    const width = SNAKIE_WIDTH_PX[String(opts.width || '').toLowerCase()] ||
-      (/^\d+(px|%)?$/.test(opts.width || '') ? (/\D$/.test(opts.width) ? opts.width : opts.width + 'px') : '');
-    if (width) {
-      box.style.maxWidth = width;
-      box.style.marginLeft = box.style.marginRight = 'auto';
-    }
+    // The size and the rounded clip are set here, not left to snakie-embed.js,
+    // so they hold on any copy of it: the box clips the frame to its rounded
+    // corners (no dark corners), a narrower box sits at the left, and a named
+    // height becomes pixels for the whole box (Run bar and REPL included).
+    box.style.borderRadius = '12px';
+    box.style.overflow = 'hidden';
+    const w = String(opts.width || '').trim().toLowerCase();
+    const width = SNAKIE_WIDTH_PX[w] || (/^\d+(px|%)?$/.test(w) ? (/\D$/.test(w) ? w : w + 'px') : '');
+    if (width) box.style.maxWidth = width;
+    const h = String(opts.height || '').trim().toLowerCase();
+    const mountOpts = SNAKIE_HEIGHT_PX[h] ? Object.assign({}, opts, { height: String(SNAKIE_HEIGHT_PX[h]) }) : opts;
     box.appendChild(snakieFallback(opts));
     if (host && typeof host.edit === 'function') element.appendChild(snakieSizeBar(source, opts, host.edit));
     element.appendChild(box);
     return loadSnakieEmbed()
-      .then(api => { if (api && box.isConnected !== false) api.mount(box, opts); })
+      .then(api => { if (api && box.isConnected !== false) api.mount(box, mountOpts); })
       .catch(() => { /* the fallback stays */ });
   }
 
