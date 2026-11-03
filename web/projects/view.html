@@ -1158,6 +1158,7 @@ description: View project details
         ProjectCellHeadings.render(contentEl);
         const videoBlocks = ProjectEmbeds.renderVideoBlocks(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
+        ProjectEmbeds.embedCode(contentEl);
         videosInContent = embedVideoSection(contentEl) || videoBlocks > 0;
         ProjectCallouts.render(contentEl);
         PartLinks.decorate(contentEl);
@@ -2060,6 +2061,7 @@ description: View project details
     ProjectGallery.render(journalEl);
     ProjectImageCaptions.render(journalEl);
     ProjectEmbeds.renderVideoBlocks(journalEl);
+    ProjectEmbeds.embedCode(journalEl);
     ProjectCellHeadings.render(journalEl);
     ProjectCallouts.render(journalEl);
     CodeCopy.attach(journalEl);

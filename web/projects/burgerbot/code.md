@@ -49,7 +49,7 @@ To use this code copy the following files to your Pico:
 
 ## BurgerBot libraries
 
-<script src="https://gist.github.com/kevinmcaleer/87a7e27a3273c30a413b2195927296fe.js"></script>
+{% include snakie.html gist="kevinmcaleer/87a7e27a3273c30a413b2195927296fe" %}
 
 ---
 

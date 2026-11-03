@@ -1,0 +1,56 @@
+{%- comment -%}
+  A Snakie code box (kevinmcaleer/Snakie#1285, kevsrobots #454 / #455): code
+  from a GitHub gist, a repo file or the page itself, in Snakie's editor, with
+  Run and a REPL for Python and links to GitHub and the full Snakie app. It
+  replaces trinket.io, Coddy and GitHub's script-tag gist embed.
+
+    {% include snakie.html gist="kevinmcaleer/87a7e27a3273c30a413b2195927296fe" %}
+    {% include snakie.html gist="…" file="main.py" view="split" %}
+    {% include snakie.html repo="kevinmcaleer/burgerbot" path="main.py" ref="main" lines="10-40" %}
+    {% capture code %}print("hello"){% endcapture %}
+    {% include snakie.html code=code name="hello.py" engine="pyodide" %}
+
+  Options (all optional): file, path, ref, lines, view (code|blocks|split),
+  toolbox (basic|advanced), run ("0" = read-only viewer), autorun ("1"),
+  theme (skeuomorph|dark), height (px), engine (micropython|pyodide),
+  packages ("numpy,pandas"), name (for code=). Files that aren't Python are
+  shown read-only. A gist with several files gets a file picker.
+
+  Without JavaScript the box shows a link to GitHub (or the code itself).
+  The output stays on one line so it also works inside a > blockquote.
+{%- endcomment -%}
+{%- assign snk_nl = "
+" -%}
+{%- assign snk_code = include.code | strip | escape | replace: snk_nl, "&#10;" -%}
+{%- assign snk_gist = include.gist | strip -%}
+{%- assign snk_repo = include.repo | strip -%}
+{%- if snk_gist != "" -%}
+  {%- assign snk_link = "https://gist.github.com/" | append: snk_gist -%}
+{%- elsif snk_repo != "" -%}
+  {%- assign snk_ref = include.ref | default: "main" -%}
+  {%- assign snk_link = "https://github.com/" | append: snk_repo | append: "/blob/" | append: snk_ref | append: "/" | append: include.path -%}
+{%- else -%}
+  {%- assign snk_link = "" -%}
+{%- endif -%}
+<div class="snakie-box"
+{%- if snk_gist != "" %} data-snakie-gist="{{ snk_gist | escape }}"{% endif -%}
+{%- if snk_repo != "" %} data-snakie-repo="{{ snk_repo | escape }}"{% endif -%}
+{%- if include.code %} data-snakie-code="{{ snk_code }}"{% endif -%}
+{%- if include.file %} data-file="{{ include.file | escape }}"{% endif -%}
+{%- if include.path %} data-path="{{ include.path | escape }}"{% endif -%}
+{%- if include.ref %} data-ref="{{ include.ref | escape }}"{% endif -%}
+{%- if include.lines %} data-lines="{{ include.lines | escape }}"{% endif -%}
+{%- if include.name %} data-name="{{ include.name | escape }}"{% endif -%}
+{%- if include.view %} data-view="{{ include.view | escape }}"{% endif -%}
+{%- if include.toolbox %} data-toolbox="{{ include.toolbox | escape }}"{% endif -%}
+{%- if include.run %} data-run="{{ include.run | escape }}"{% endif -%}
+{%- if include.autorun %} data-autorun="{{ include.autorun | escape }}"{% endif -%}
+{%- if include.theme %} data-theme="{{ include.theme | escape }}"{% endif -%}
+{%- if include.height %} data-height="{{ include.height | escape }}"{% endif -%}
+{%- if include.engine %} data-engine="{{ include.engine | escape }}"{% endif -%}
+{%- if include.packages %} data-packages="{{ include.packages | escape }}"{% endif -%}
+>
+{%- if snk_link != "" -%}<a href="{{ snk_link }}" target="_blank" rel="noopener">See the code on GitHub</a>
+{%- elsif include.code -%}<pre><code>{{ snk_code }}</code></pre>{%- endif -%}
+</div>
+{%- unless snakie_embed_script -%}<script src="https://app.snakie.org/snakie-embed.js" defer></script>{%- assign snakie_embed_script = true -%}{%- endunless -%}

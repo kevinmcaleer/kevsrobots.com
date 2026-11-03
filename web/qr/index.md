@@ -48,6 +48,6 @@ I've created a bunch of QR code control cards that you can print out and use to 
 
 ## MicroPython code
 
-<script src="https://gist.github.com/kevinmcaleer/1e5c5bc882cf2af6888832578b108c59.js"></script>
+{% include snakie.html gist="kevinmcaleer/1e5c5bc882cf2af6888832578b108c59" %}
 
 ---

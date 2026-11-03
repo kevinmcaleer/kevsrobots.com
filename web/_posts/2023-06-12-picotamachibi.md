@@ -330,7 +330,7 @@ Functional methods:
 
 You can find the full sourcecode for `Picotamachibi` here: <https://github.com/kevinmcaleer/picotamachibi>, the main program is listed below, but you will need to upload all the `.pbm` files along with the `icons.py`, `ssd1306.py` and `picotamachibi.py` to the Raspberry Pi Pico. It's easy to do this with [Thonny](https://thonny.org).
 
-<script src="https://gist.github.com/kevinmcaleer/90022e3b44be7e6dc0057321aa102447.js"></script>
+{% include snakie.html gist="kevinmcaleer/90022e3b44be7e6dc0057321aa102447" %}
 
 ---
 

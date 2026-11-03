@@ -80,7 +80,7 @@ I used MicroPython to program the Pico Jumbo. The code is simple and uses the `m
 
 Make sure you copy the `music.py` and `tunes.py` files to the Pico Jumbo as well as the `operation.py` file. To automatically run the game when the Pico Jumbo is powered on, rename the `operation.py` file to `main.py`.
 
-<script src="https://gist.github.com/kevinmcaleer/f823715d9e11a92dba77dd8d927147e4.js"></script>
+{% include snakie.html gist="kevinmcaleer/f823715d9e11a92dba77dd8d927147e4" %}
 
 ---
 

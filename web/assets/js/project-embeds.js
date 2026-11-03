@@ -319,7 +319,96 @@
     return grid;
   }
 
+  // ------------------------------------------------------- Snakie code
+  //
+  // A GitHub gist or a file in a GitHub repo, linked on a line of its own,
+  // shows as a Snakie code box (kevinmcaleer/Snakie#1285): the code in
+  // Snakie's editor, Run and a REPL for Python, and links to GitHub and to
+  // the full Snakie app. Like a YouTube link, it stays a plain link in the
+  // Markdown. `/code` in the editor writes one.
+  //
+  //   https://gist.github.com/kevinmcaleer/87a7e27a3273c30a413b2195927296fe
+  //   https://github.com/kevinmcaleer/burgerbot/blob/main/burgerbot.py#L10-L40
+
+  const SNAKIE_ORIGIN = 'https://app.snakie.org';
+
+  // { gist, file? } or { repo, path, ref, lines? } for a gist / repo-file
+  // URL, else null.
+  function snakieSource(s) {
+    let url;
+    try { url = new URL(String(s || '').trim()); } catch (_) { return null; }
+    const host = url.hostname.toLowerCase();
+    const parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
+    if (host === 'gist.github.com') {
+      const id = parts[parts.length - 1];
+      if (!id || !/^[A-Za-z0-9]+$/.test(id) || parts.length > 2) return null;
+      // A gist with several files shows a file picker in the box.
+      return { gist: parts.length === 2 ? parts[0] + '/' + id : id };
+    }
+    if (host === 'github.com' && parts.length >= 5 && parts[2] === 'blob') {
+      const out = { repo: parts[0] + '/' + parts[1], ref: parts[3], path: parts.slice(4).join('/') };
+      const m = /^#L(\d+)(?:-L(\d+))?$/.exec(url.hash);
+      if (m) out.lines = m[2] ? m[1] + '-' + m[2] : m[1];
+      return out;
+    }
+    return null;
+  }
+
+  // Loads snakie-embed.js once; resolves to window.SnakieEmbed.
+  let snakieScript = null;
+  function loadSnakieEmbed() {
+    if (window.SnakieEmbed) return Promise.resolve(window.SnakieEmbed);
+    if (!snakieScript) {
+      snakieScript = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = SNAKIE_ORIGIN + '/snakie-embed.js';
+        el.async = true;
+        el.onload = () => resolve(window.SnakieEmbed);
+        el.onerror = () => { snakieScript = null; reject(new Error('snakie-embed.js failed to load')); };
+        document.head.appendChild(el);
+      });
+    }
+    return snakieScript;
+  }
+
+  // Swaps each paragraph that is nothing but a gist or GitHub file URL for a
+  // Snakie code box. The link stays inside it until the box loads, so a
+  // reader without JavaScript (or offline) still has it. Returns how many.
+  function embedCode(root) {
+    let count = 0;
+    root.querySelectorAll('p').forEach(p => {
+      const text = p.textContent.trim();
+      if (!/^https?:\/\/\S+$/.test(text)) return;
+      const kids = p.children;
+      if (kids.length > 1 || (kids.length === 1 && kids[0].tagName !== 'A')) return;
+      const src = snakieSource(text);
+      if (!src) return;
+      const box = document.createElement('div');
+      box.className = 'project-code-embed snakie-box mb-3';
+      if (src.gist) box.dataset.snakieGist = src.gist;
+      if (src.repo) {
+        box.dataset.snakieRepo = src.repo;
+        box.dataset.path = src.path;
+        box.dataset.ref = src.ref;
+        if (src.lines) box.dataset.lines = src.lines;
+      }
+      const link = document.createElement('a');
+      link.href = text;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'See the code on GitHub';
+      box.appendChild(link);
+      p.replaceWith(box);
+      count++;
+    });
+    if (count) {
+      loadSnakieEmbed().then(api => api && api.scan(root)).catch(() => { /* the links stay */ });
+    }
+    return count;
+  }
+
   window.ProjectEmbeds = {
+    snakieSource, embedCode, loadSnakieEmbed,
     youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards,
     videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
   };

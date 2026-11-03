@@ -18,6 +18,7 @@
     upload: 'M8 11V3M5 6l3-3 3 3M3 11v2.5h10V11',
     add: 'M8 3v10M3 8h10',
     browse: 'M2 2.5h5v5H2zM9 2.5h5v5H9zM2 9.5h5v5H2zM9 9.5h5v5H9z',
+    code: 'M5.5 4.5 2 8l3.5 3.5M10.5 4.5 14 8l-3.5 3.5M9 3 7 13',
   };
 
   // ------------------------------------------------------------ inserting
@@ -457,6 +458,32 @@
     }
 
     return sections.concat([
+      {
+        // A gist or a GitHub file as a Snakie code box (Snakie#1285): the
+        // link on a line of its own, which the project page draws as the
+        // code with Run and a REPL (ProjectEmbeds.embedCode).
+        id: 'snakie-code',
+        label: 'Code from GitHub',
+        keywords: ['gist', 'github', 'code', 'snakie', 'python', 'run', 'repl', 'playground', 'embed'],
+        group: 'project',
+        icon: ICONS.code,
+        block: true,
+        run: view => openPicker(view, {
+          placeholder: 'Paste a gist or GitHub file link…',
+          empty: 'Paste a gist, or a link to one file on GitHub',
+          free: q => {
+            const url = String(q || '').trim();
+            const src = window.ProjectEmbeds && window.ProjectEmbeds.snakieSource(url);
+            return src ? {
+              label: 'Show this code with Run',
+              detail: src.gist ? 'Gist ' + src.gist : src.repo + ' \u203a ' + src.path,
+              icon: ICONS.code,
+              pick: () => insertAtCursor(view, url, true),
+            } : null;
+          },
+          load: async () => [],
+        }),
+      },
       {
         id: 'file',
         label: 'File',

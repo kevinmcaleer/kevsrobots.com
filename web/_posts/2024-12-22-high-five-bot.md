@@ -178,6 +178,6 @@ The code is made up of two drivers, and the main program. The drivers are for th
 
 You will need to copy the `range_finder.py` and `stepper_28byj48.py` drivers to the Raspberry Pi Pico, along with the `main.py` program.
 
-<script src="https://gist.github.com/kevinmcaleer/09b0c47347c3e5df9be34e2e1e160941.js"></script>
+{% include snakie.html gist="kevinmcaleer/09b0c47347c3e5df9be34e2e1e160941" %}
 
 ---

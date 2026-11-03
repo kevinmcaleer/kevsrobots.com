@@ -185,7 +185,25 @@ df.loc[0, 'Salary'] = 77000   # Alice's salary
 
 Experiment with what you have learned in this lesson below:
 
-<figure style="margin:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden"><iframe src="https://coddy.tech/embed-editor?lang=matplotlib&theme=light&layout=stacked&code=aW1wb3J0IHBhbmRhcyBhcyBwZAoKZGF0YSA9IHsKICAgICdOYW1lJzogWydBbGljZScsICdCb2InLCAnQ2hhcmxpZSddLAogICAgJ0FnZSc6IFsyNSwgMzAsIDM1XSwKICAgICdDaXR5JzogWydOZXcgWW9yaycsICdQYXJpcycsICdMb25kb24nXQp9CgpkZiA9IHBkLkRhdGFGcmFtZShkYXRhKQpwcmludChkZikKcHJpbnQoZGYuc2hhcGUpCgojIEFkZCBhIGNvbHVtbiwgdGhlbiBkZWxldGUgb25lCmRmWydTYWxhcnknXSA9IFs3MDAwMCwgODAwMDAsIDkwMDAwXQpkZWwgZGZbJ0FnZSddCnByaW50KGRmKQo&credit=0" width="100%" height="460" style="display:block;border:0;width:100%" title="Python code editor by Coddy" loading="lazy"></iframe><figcaption style="box-sizing:border-box;padding:5px 12px;font:11px/1.4 system-ui,-apple-system,sans-serif;color:#64748b;background:#f1f5f9;border-top:1px solid #e2e8f0;text-align:right" dir="ltr">Powered by <a href="https://coddy.tech/embed" target="_blank" rel="noopener" style="color:#0077ff;font-weight:600;text-decoration:none;">Coddy</a></figcaption></figure>
+{% capture snakie_code %}
+import pandas as pd
+
+data = {
+    'Name': ['Alice', 'Bob', 'Charlie'],
+    'Age': [25, 30, 35],
+    'City': ['New York', 'Paris', 'London']
+}
+
+df = pd.DataFrame(data)
+print(df)
+print(df.shape)
+
+# Add a column, then delete one
+df['Salary'] = [70000, 80000, 90000]
+del df['Age']
+print(df)
+{% endcapture %}
+{% include snakie.html code=snakie_code name="dataframes.py" engine="pyodide" packages="numpy,pandas" %}
 
 ---
 

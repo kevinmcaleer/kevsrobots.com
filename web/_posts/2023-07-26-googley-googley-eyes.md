@@ -171,6 +171,6 @@ python3 motor_wave.py
 
 Here is the code you will need, please note this is a work in progress so the code will improve over time.
 
-<script src="https://gist.github.com/kevinmcaleer/8bf03bf74ac6cbf43314c41582d1e471.js"></script>
+{% include snakie.html gist="kevinmcaleer/8bf03bf74ac6cbf43314c41582d1e471" %}
 
 ---
