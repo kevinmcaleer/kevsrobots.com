@@ -1187,7 +1187,8 @@
           return resp.blob();
         },
       },
-      codeRenderers: { mermaid: renderMermaid },
+      // ```snakie: a gist / GitHub file (or code) as a runnable Snakie box.
+      codeRenderers: { mermaid: renderMermaid, snakie: ProjectEmbeds.renderSnakieBlock },
       codeEditors: { mermaid: editMermaid },
       // Mermaid Factory's highlighter for ```mermaid fences in Raw.
       codeLanguages: { mermaid: () => loadMermaidTools().then(tools => tools.mermaidStreamParser) },

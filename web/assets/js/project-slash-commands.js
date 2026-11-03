@@ -459,9 +459,9 @@
 
     return sections.concat([
       {
-        // A gist or a GitHub file as a Snakie code box (Snakie#1285): the
-        // link on a line of its own, which the project page draws as the
-        // code with Run and a REPL (ProjectEmbeds.embedCode).
+        // A gist or a GitHub file as a Snakie code box (Snakie#1285): a
+        // ```snakie block holding the link, drawn as the code with Run and
+        // a REPL in the live view and on the project page (ProjectEmbeds).
         id: 'snakie-code',
         label: 'Code from GitHub',
         keywords: ['gist', 'github', 'code', 'snakie', 'python', 'run', 'repl', 'playground', 'embed'],
@@ -478,7 +478,7 @@
               label: 'Show this code with Run',
               detail: src.gist ? 'Gist ' + src.gist : src.repo + ' \u203a ' + src.path,
               icon: ICONS.code,
-              pick: () => insertAtCursor(view, url, true),
+              pick: () => insertAtCursor(view, window.ProjectEmbeds.snakieBlockMarkdown(url), true),
             } : null;
           },
           load: async () => [],
