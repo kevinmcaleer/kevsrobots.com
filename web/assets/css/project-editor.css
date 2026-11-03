@@ -1180,7 +1180,8 @@ a.part-link:hover,
   align-items: center;
 }
 .snakie-size-bar .snakie-link-input {
-  flex: 1 1 16rem;
+  /* The link gets its own row; the switches and pickers sit under it. */
+  flex: 1 1 100%;
   min-width: 10rem;
   font: inherit;
   color: var(--text, inherit);
@@ -1221,4 +1222,10 @@ a.part-link:hover,
   margin: 0.25rem 0 0;
   font-size: 0.85rem;
   color: var(--muted, #6b7280);
+}
+
+.snakie-size-bar .snakie-toggle input {
+  margin: 0;
+  accent-color: var(--accent, #16a34a);
+  cursor: pointer;
 }

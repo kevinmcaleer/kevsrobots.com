@@ -11,6 +11,7 @@
     {% include snakie.html code=code name="hello.py" engine="pyodide" %}
 
   Options (all optional): file, path, ref, lines, view (code|blocks|split),
+  views ("0" = hide the Code/Split/Blocks switch),
   toolbox (basic|advanced), run ("0" = read-only viewer), autorun ("1"),
   theme (skeuomorph|dark), height (auto|short|medium|tall|px),
   width (full|wide|medium|narrow|px|"60%"), engine (micropython|pyodide),
@@ -43,6 +44,7 @@
 {%- if include.lines %} data-lines="{{ include.lines | escape }}"{% endif -%}
 {%- if include.name %} data-name="{{ include.name | escape }}"{% endif -%}
 {%- if include.view %} data-view="{{ include.view | escape }}"{% endif -%}
+{%- if include.views %} data-views="{{ include.views | escape }}"{% endif -%}
 {%- if include.toolbox %} data-toolbox="{{ include.toolbox | escape }}"{% endif -%}
 {%- if include.run %} data-run="{{ include.run | escape }}"{% endif -%}
 {%- if include.autorun %} data-autorun="{{ include.autorun | escape }}"{% endif -%}

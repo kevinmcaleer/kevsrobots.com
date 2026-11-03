@@ -380,7 +380,7 @@
   //   ```snakie
   //   https://github.com/apirrone/Open_Duck_Mini_Runtime/blob/v2/scripts/configure_motor.py
   //   ```
-  const SNAKIE_OPTIONS = ['file', 'path', 'ref', 'lines', 'view', 'toolbox', 'run', 'autorun', 'theme', 'height', 'width', 'engine', 'packages', 'name'];
+  const SNAKIE_OPTIONS = ['file', 'path', 'ref', 'lines', 'view', 'views', 'toolbox', 'run', 'autorun', 'theme', 'height', 'width', 'engine', 'packages', 'name'];
 
   // Box sizes the editor offers (snakie-embed.js knows the same names).
   const SNAKIE_WIDTHS = [['full', 'Full width'], ['wide', 'Wide'], ['medium', 'Medium'], ['narrow', 'Narrow']];
@@ -414,6 +414,14 @@
     select.addEventListener('change', () => onPick(select.value));
     wrap.appendChild(select);
     return wrap;
+  }
+
+  // The block's text with a `key: off` line, or without it when `on`.
+  function snakieBlockWithFlag(source, key, on) {
+    const re = new RegExp('^\\s*' + key + '\\s*[:=]', 'i');
+    const lines = String(source || '').replace(/\s+$/, '').split('\n').filter(l => !re.test(l));
+    if (!on) lines.push(key + ': off');
+    return lines.join('\n');
   }
 
   // The block's text with its link (first line) set to `url`.
@@ -464,6 +472,25 @@
       bar.appendChild(link);
     }
     if (opts && host.edit) {
+      // Run & REPL and the view switch: on unless the block says `off`.
+      const isOff = v => /^(0|false|no|off)$/i.test(String(v || '').trim());
+      const toggle = (key, label, title) => {
+        const wrap = document.createElement('label');
+        wrap.className = 'snakie-size-pick snakie-toggle';
+        wrap.title = title;
+        const box = document.createElement('input');
+        box.type = 'checkbox';
+        box.checked = !isOff(opts[key]);
+        box.addEventListener('change', () => host.edit(snakieBlockWithFlag(source, key, box.checked)));
+        wrap.append(box, ' ' + label);
+        return wrap;
+      };
+      if (!opts.code) {
+        bar.append(
+          toggle('run', 'Run & REPL', 'Off: just the code, with no Run button or REPL'),
+          toggle('views', 'View switch', 'Off: hide the Code / Split / Blocks switch'),
+        );
+      }
       const current = {
         width: (opts.width || 'full').toLowerCase(),
         height: (opts.height || 'auto').toLowerCase(),
@@ -596,7 +623,7 @@
   }
 
   window.ProjectEmbeds = {
-    snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock, snakieBlockWithSizes, snakieBlockWithLink,
+    snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock, snakieBlockWithSizes, snakieBlockWithLink, snakieBlockWithFlag,
     youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards,
     videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
   };
