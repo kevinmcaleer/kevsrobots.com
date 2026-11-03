@@ -1192,6 +1192,7 @@
         mermaid: renderMermaid,
         snakie: (source, el) => ProjectEmbeds.renderSnakieBlock(source, el, {
           edit: next => replaceFencedBlock(el, 'snakie', source, next),
+          remove: () => replaceFencedBlock(el, 'snakie', source, null),
         }),
       },
       codeEditors: { mermaid: editMermaid },
@@ -2013,8 +2014,9 @@
   }
 
   // Swaps the code of the ```lang block drawn in `el` (its text was `source`)
-  // for `next`. Several blocks can hold the same code, so it takes the one
-  // nearest the drawing.
+  // for `next`, or removes the whole block (fences too) when `next` is null.
+  // Several blocks can hold the same code, so it takes the one nearest the
+  // drawing.
   function replaceFencedBlock(el, lang, source, next) {
     if (!mde || !mde.view) return;
     const view = mde.view;
@@ -2028,9 +2030,21 @@
       if (m[2].trim() !== String(source).trim()) continue;
       const from = m.index + m[0].indexOf('\n') + 1;
       const to = from + m[2].length;
-      if (!best || Math.abs(from - at) < Math.abs(best.from - at)) best = { from, to };
+      if (!best || Math.abs(from - at) < Math.abs(best.from - at)) {
+        best = { from, to, start: m.index, end: m.index + m[0].length };
+      }
     }
     if (!best) return;
+    if (next === null) {
+      // The block, plus one blank line around it so no gap is left behind.
+      let start = best.start;
+      let end = best.end;
+      if (doc[end] === '\n') end++;
+      if (doc.slice(end, end + 1) === '\n') end++;
+      else if (start > 0 && doc[start - 1] === '\n' && doc[start - 2] === '\n') start--;
+      view.dispatch({ changes: { from: start, to: end, insert: '' } });
+      return;
+    }
     view.dispatch({ changes: { from: best.from, to: best.to, insert: next.replace(/\n*$/, '\n') } });
   }
 
