@@ -19,6 +19,10 @@
 // ProjectModels.renderTable(el, models, { thumbUrl, canView, openViewer,
 //   fetch, modelUrl, renderMissing, head: html of the <th>s after the picture, cells(f) -> <td>s })
 // draws the same models as a table with a small picture on each row.
+// A <th> in head with data-sort="name|qty|colour|filament|size|downloads"
+// becomes a sort button: click to sort A→Z / smallest first, again to
+// reverse. Empty values always go last. The choice is kept on el, so it
+// survives re-renders (the editor redraws the table after every edit).
 //
 // A model's print details (print_qty, print_colour, filament) show as
 // printDetails(f); a model with a colour is drawn in that colour.
@@ -237,13 +241,57 @@
   function normaliseView(v) { return v === 'table' ? 'table' : 'filmstrip'; }
 
   // ---- Table -------------------------------------------------------------
+  const SORT_VALUES = {
+    name: f => f.filename || '',
+    qty: f => f.print_qty,
+    colour: f => f.print_colour || '',
+    filament: f => f.filament || '',
+    size: f => f.file_size,
+    downloads: f => f.download_count || 0,
+  };
+  const collator = (typeof Intl !== 'undefined' && Intl.Collator)
+    ? new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }) : null;
+  function compareValues(a, b) {
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    a = String(a); b = String(b);
+    return collator ? collator.compare(a, b) : a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+  }
+  // Models sorted by sort = { key, dir: 'asc'|'desc' }; ties and no sort keep
+  // the given (upload) order; empty values go last either way.
+  function sortModels(models, sort) {
+    const get = sort && SORT_VALUES[sort.key];
+    if (!get) return models.slice();
+    const empty = v => v == null || v === '';
+    const sign = sort.dir === 'desc' ? -1 : 1;
+    return models.map((f, i) => ({ f, i, v: get(f) })).sort((a, b) => {
+      if (empty(a.v) || empty(b.v)) return (empty(a.v) - empty(b.v)) || (a.i - b.i);
+      return (sign * compareValues(a.v, b.v)) || (a.i - b.i);
+    }).map(x => x.f);
+  }
+  // Turns the head's <th data-sort> cells into sort buttons.
+  function sortableHead(el, sort) {
+    el.querySelectorAll('thead th[data-sort]').forEach(th => {
+      const key = th.dataset.sort;
+      const on = sort && sort.key === key;
+      const dir = on ? sort.dir : null;
+      const label = th.textContent.trim();
+      th.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : dir === 'desc' ? 'descending' : 'none');
+      th.classList.add('kr-sortable');
+      const icon = dir === 'asc' ? 'fa-caret-up' : dir === 'desc' ? 'fa-caret-down' : 'fa-sort';
+      th.innerHTML = `<button type="button" class="kr-sort${on ? ' is-active' : ''}" data-sort-key="${esc(key)}"
+        title="Sort by ${esc(label.toLowerCase())}${dir === 'asc' ? ' (reverse)' : ''}">${esc(label)}<i class="fas ${icon}" aria-hidden="true"></i></button>`;
+    });
+  }
+
   function renderTable(el, models, opts) {
     if (!el) return;
     stopInline(el);
     if (!models.length) { el.innerHTML = ''; return; }
+    const sort = el._krSort || null;
+    const rows = sortModels(models, sort);
     el.innerHTML = `<div class="kr-models-table-wrap"><table class="table table-hover mb-0 kr-models-table">
       <thead><tr><th class="kr-models-table-pic"><span class="visually-hidden">Picture</span></th>${opts.head}</tr></thead>
-      <tbody>${models.map(f => {
+      <tbody>${rows.map(f => {
         const viewable = opts.canView(f);
         return `<tr data-model-id="${f.id}">
           <td class="kr-models-table-pic">
@@ -251,6 +299,17 @@
               title="${viewable ? 'Open ' + esc(f.filename) + ' in 3D' : esc(f.filename)}">${picture(f, opts, 'kr-models-table-img')}</button>
           </td>${opts.cells(f)}</tr>`;
       }).join('')}</tbody></table></div>`;
+    sortableHead(el, sort);
+    el.querySelectorAll('.kr-sort').forEach(b => {
+      b.addEventListener('click', () => {
+        const key = b.dataset.sortKey;
+        const cur = el._krSort;
+        el._krSort = { key, dir: cur && cur.key === key && cur.dir === 'asc' ? 'desc' : 'asc' };
+        renderTable(el, models, opts);
+        const again = el.querySelector(`.kr-sort[data-sort-key="${key}"]`);
+        if (again) again.focus();
+      });
+    });
     el.querySelectorAll('.kr-models-table-thumb:not([disabled])').forEach(b => {
       b.addEventListener('click', () => {
         const f = models.find(m => m.id === Number(b.closest('tr').dataset.modelId));
@@ -379,7 +438,7 @@
   }
 
   window.ProjectModels = {
-    render, renderTable, formatSize, esc, colourHex, swatch, printDetails, qtyText,
+    render, renderTable, sortModels, formatSize, esc, colourHex, swatch, printDetails, qtyText,
     viewToggle, normaliseView, tintAll,
   };
 })();

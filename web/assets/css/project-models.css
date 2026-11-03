@@ -419,3 +419,18 @@ img.is-tinting { visibility: hidden; }
 #editor-files-section.is-in-text .kr-print-input { border-color: transparent; background: transparent; box-shadow: none; }
 #editor-files-section.is-in-text .kr-print-input:hover { border-color: var(--border, #e5e7eb); }
 #editor-files-section.is-in-text .kr-print-input:focus { border-color: var(--accent, #2563eb); background: var(--bs-body-bg, #fff); }
+
+/* Sortable table headers: the label is a button, the arrow shows the order. */
+.kr-models-table th.kr-sortable { padding-top: 0; padding-bottom: 0; vertical-align: middle; }
+.kr-models-table .kr-sort {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.5rem 0; border: 0; background: none; box-shadow: none;
+  font: inherit; color: inherit; cursor: pointer; white-space: nowrap;
+}
+.kr-models-table .kr-sort:hover,
+.kr-models-table .kr-sort.is-active { color: var(--text, #111827); }
+.kr-models-table .kr-sort:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; border-radius: 4px; }
+.kr-models-table .kr-sort i { width: auto !important; font-size: 0.7rem; opacity: 0.45; }
+.kr-models-table .kr-sort.is-active i { opacity: 1; }
+.kr-models-table th.kr-col-size .kr-sort { flex-direction: row-reverse; }
+.kr-models-table th.kr-col-size { font-size: 0.75rem; }

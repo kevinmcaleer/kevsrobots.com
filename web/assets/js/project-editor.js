@@ -2648,7 +2648,7 @@
     } else if (view === 'table') {
       ProjectModels.renderTable(gallery, models, {
         thumbUrl: fileThumbUrl, canView, openViewer, fetch: fetchThumb,
-        head: '<th>Part</th><th class="kr-col-qty">Qty</th><th class="kr-col-colour">Colour</th><th class="kr-col-filament">Filament</th><th class="kr-col-size">Size</th><th style="width:30px"></th>',
+        head: '<th data-sort="name">Part</th><th class="kr-col-qty" data-sort="qty">Qty</th><th class="kr-col-colour" data-sort="colour">Colour</th><th class="kr-col-filament" data-sort="filament">Filament</th><th class="kr-col-size" data-sort="size">Size</th><th style="width:30px"></th>',
         cells: f => `
           <td class="file-description">
             <a href="${fileDownloadUrl(f)}" class="fw-semibold">${escapeHtmlAttr(f.filename)}</a>
