@@ -4,7 +4,40 @@ title: Page Not Found
 permalink: /404.html
 ---
 
-<div class="container my-5">
+<script>
+// Project and profile links like /projects/<owner>/<slug> land here first
+// and are forwarded to the real page below. Decide that now, before the
+// "Page Not Found" text below is drawn, so a visitor following a good
+// link sees "Loading page…" rather than a flash of "Page Not Found".
+(function () {
+  const p = window.location.pathname;
+  const KNOWN_PROJECTS_PAGES = ['admin', 'analytics', 'edit', 'editor', 'hub', 'index',
+    'my-projects', 'new', 'search', 'staff-picks', 'view'];
+  const pm = p.match(/^\/projects\/([^\/]+)\/([^\/]+)\/?$/);
+  const isProject = pm && KNOWN_PROJECTS_PAGES.indexOf(pm[1]) === -1 &&
+    !/\.[a-z0-9]+$/i.test(pm[1]) && !/\.[a-z0-9]+$/i.test(pm[2]);
+  if (/^\/profile\/[^\/]+/.test(p) || isProject) {
+    document.documentElement.classList.add('kr-404-redirecting');
+    document.title = 'Loading…';
+  }
+})();
+</script>
+<style>
+  .kr-404-loading { display: none; }
+  .kr-404-redirecting .kr-404-loading { display: block; }
+  .kr-404-redirecting .kr-404-missing { display: none; }
+</style>
+
+<div class="container my-5 kr-404-loading" role="status">
+  <div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+      <div class="spinner-border text-primary mb-3" aria-hidden="true"></div>
+      <p class="lead text-muted">Loading page…</p>
+    </div>
+  </div>
+</div>
+
+<div class="container my-5 kr-404-missing">
   <div class="row">
     <div class="col-lg-8 mx-auto text-center">
       <h1 class="display-1 text-muted">404</h1>
