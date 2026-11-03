@@ -416,20 +416,74 @@
     return wrap;
   }
 
-  // The editor's size bar over a box: Width / Height pickers that rewrite the
-  // block's option lines through `edit(newSource)`.
-  function snakieSizeBar(source, opts, edit) {
+  // The block's text with its link (first line) set to `url`.
+  function snakieBlockWithLink(source, url) {
+    const lines = String(source || '').replace(/\s+$/, '').split('\n');
+    const first = lines.findIndex(l => l.trim());
+    if (first >= 0 && snakieSource(lines[first].trim())) lines[first] = url;
+    else if (first < 0) return url;
+    else lines.unshift(url);
+    return lines.join('\n');
+  }
+
+  const TRASH_SVG = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9.5h6.6L12 4M6.75 6.5v4.5M9.25 6.5v4.5"/></svg>';
+
+  // The editor's bar over a box: the link (change it here), Width / Height
+  // pickers, and a bin to remove the block. Edits go through
+  // `host.edit(newSource)`; the bin through `host.remove()`.
+  function snakieEditBar(source, opts, host) {
     const bar = document.createElement('div');
     bar.className = 'snakie-size-bar';
-    const current = {
-      width: (opts.width || 'full').toLowerCase(),
-      height: (opts.height || 'auto').toLowerCase(),
-    };
-    const pick = key => value => edit(snakieBlockWithSizes(source, Object.assign({}, current, { [key]: value })));
-    bar.append(
-      sizeSelect('Width', SNAKIE_WIDTHS, current.width, pick('width')),
-      sizeSelect('Height', SNAKIE_HEIGHTS, current.height, pick('height')),
-    );
+    const isLink = !opts || !opts.code;
+    if (isLink) {
+      const lines = String(source || '').split('\n');
+      const first = lines.find(l => l.trim()) || '';
+      const link = document.createElement('input');
+      link.type = 'url';
+      link.className = 'snakie-link-input';
+      link.placeholder = 'Paste a gist or GitHub file link';
+      link.setAttribute('aria-label', 'Gist or GitHub file link');
+      link.value = snakieSource(first.trim()) ? first.trim() : '';
+      const commit = () => {
+        const url = link.value.trim();
+        if (!url || url === link.defaultValue) return;
+        if (!snakieSource(url)) {
+          link.classList.add('is-invalid');
+          link.title = 'Use a gist link, or a github.com/…/blob/… file link';
+          return;
+        }
+        host.edit(snakieBlockWithLink(source, url));
+      };
+      link.defaultValue = link.value;
+      link.addEventListener('input', () => link.classList.remove('is-invalid'));
+      link.addEventListener('change', commit);
+      link.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        if (e.key === 'Escape') { link.value = link.defaultValue; link.blur(); }
+      });
+      bar.appendChild(link);
+    }
+    if (opts && host.edit) {
+      const current = {
+        width: (opts.width || 'full').toLowerCase(),
+        height: (opts.height || 'auto').toLowerCase(),
+      };
+      const pick = key => value => host.edit(snakieBlockWithSizes(source, Object.assign({}, current, { [key]: value })));
+      bar.append(
+        sizeSelect('Width', SNAKIE_WIDTHS, current.width, pick('width')),
+        sizeSelect('Height', SNAKIE_HEIGHTS, current.height, pick('height')),
+      );
+    }
+    if (typeof host.remove === 'function') {
+      const bin = document.createElement('button');
+      bin.type = 'button';
+      bin.className = 'snakie-remove';
+      bin.title = 'Remove this code box';
+      bin.setAttribute('aria-label', 'Remove this code box');
+      bin.innerHTML = TRASH_SVG;
+      bin.addEventListener('click', () => host.remove());
+      bar.appendChild(bin);
+    }
     // Keep clicks here from opening the block's source.
     ['mousedown', 'click'].forEach(type => bar.addEventListener(type, e => e.stopPropagation()));
     return bar;
@@ -477,8 +531,17 @@
   function renderSnakieBlock(source, element, host) {
     const opts = snakieBlockOptions(source);
     element.replaceChildren();
+    const editing = host && typeof host.edit === 'function';
     if (!opts) {
-      element.textContent = 'Paste a gist or GitHub file link here.';
+      if (editing) {
+        element.appendChild(snakieEditBar(source, null, host));
+        const hint = document.createElement('p');
+        hint.className = 'snakie-empty-hint';
+        hint.textContent = 'Paste a gist or GitHub file link above.';
+        element.appendChild(hint);
+      } else {
+        element.textContent = 'Paste a gist or GitHub file link here.';
+      }
       return undefined;
     }
     const box = document.createElement('div');
@@ -495,7 +558,7 @@
     const h = String(opts.height || '').trim().toLowerCase();
     const mountOpts = SNAKIE_HEIGHT_PX[h] ? Object.assign({}, opts, { height: String(SNAKIE_HEIGHT_PX[h]) }) : opts;
     box.appendChild(snakieFallback(opts));
-    if (host && typeof host.edit === 'function') element.appendChild(snakieSizeBar(source, opts, host.edit));
+    if (editing) element.appendChild(snakieEditBar(source, opts, host));
     element.appendChild(box);
     return loadSnakieEmbed()
       .then(api => { if (api && box.isConnected !== false) api.mount(box, mountOpts); })
@@ -531,7 +594,7 @@
   }
 
   window.ProjectEmbeds = {
-    snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock, snakieBlockWithSizes,
+    snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock, snakieBlockWithSizes, snakieBlockWithLink,
     youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards,
     videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
   };

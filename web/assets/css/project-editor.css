@@ -1176,3 +1176,49 @@ a.part-link:hover,
   line-height: 1.4;
   cursor: pointer;
 }
+.snakie-size-bar {
+  align-items: center;
+}
+.snakie-size-bar .snakie-link-input {
+  flex: 1 1 16rem;
+  min-width: 10rem;
+  font: inherit;
+  color: var(--text, inherit);
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 6px;
+  padding: 0.15rem 0.6rem;
+  line-height: 1.4;
+}
+.snakie-size-bar .snakie-link-input.is-invalid {
+  border-color: var(--danger, #dc2626);
+}
+/* Icon-only: no box, the bin centred in its button. */
+.snakie-size-bar .snakie-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--muted, #6b7280);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.snakie-size-bar .snakie-remove:hover,
+.snakie-size-bar .snakie-remove:focus-visible {
+  color: var(--danger, #dc2626);
+}
+.snakie-size-bar .snakie-remove svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+.snakie-empty-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted, #6b7280);
+}
