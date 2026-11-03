@@ -380,7 +380,58 @@
   //   ```snakie
   //   https://github.com/apirrone/Open_Duck_Mini_Runtime/blob/v2/scripts/configure_motor.py
   //   ```
-  const SNAKIE_OPTIONS = ['file', 'path', 'ref', 'lines', 'view', 'toolbox', 'run', 'autorun', 'theme', 'height', 'engine', 'packages', 'name'];
+  const SNAKIE_OPTIONS = ['file', 'path', 'ref', 'lines', 'view', 'toolbox', 'run', 'autorun', 'theme', 'height', 'width', 'engine', 'packages', 'name'];
+
+  // Box sizes the editor offers (snakie-embed.js knows the same names).
+  const SNAKIE_WIDTHS = [['full', 'Full width'], ['wide', 'Wide'], ['medium', 'Medium'], ['narrow', 'Narrow']];
+  const SNAKIE_HEIGHTS = [['auto', 'Fit the code'], ['short', 'Short'], ['medium', 'Medium'], ['tall', 'Tall']];
+  const SNAKIE_WIDTH_PX = { wide: '860px', medium: '680px', narrow: '520px' };
+
+  // The block's text with its width/height lines set to `sizes` (a default
+  // value drops the line).
+  function snakieBlockWithSizes(source, sizes) {
+    const lines = String(source || '').replace(/\s+$/, '').split('\n')
+      .filter(l => !/^\s*(width|height)\s*:/i.test(l));
+    if (sizes.width && sizes.width !== 'full') lines.push('width: ' + sizes.width);
+    if (sizes.height && sizes.height !== 'auto') lines.push('height: ' + sizes.height);
+    return lines.join('\n');
+  }
+
+  function sizeSelect(label, choices, value, onPick) {
+    const wrap = document.createElement('label');
+    wrap.className = 'snakie-size-pick';
+    wrap.append(label + ' ');
+    const select = document.createElement('select');
+    let known = false;
+    choices.forEach(([v, text]) => {
+      const o = new Option(text, v);
+      if (v === value) { o.selected = true; known = true; }
+      select.add(o);
+    });
+    if (!known && value) select.add(new Option(value, value, true, true));
+    select.addEventListener('change', () => onPick(select.value));
+    wrap.appendChild(select);
+    return wrap;
+  }
+
+  // The editor's size bar over a box: Width / Height pickers that rewrite the
+  // block's option lines through `edit(newSource)`.
+  function snakieSizeBar(source, opts, edit) {
+    const bar = document.createElement('div');
+    bar.className = 'snakie-size-bar';
+    const current = {
+      width: (opts.width || 'full').toLowerCase(),
+      height: (opts.height || 'auto').toLowerCase(),
+    };
+    const pick = key => value => edit(snakieBlockWithSizes(source, Object.assign({}, current, { [key]: value })));
+    bar.append(
+      sizeSelect('Width', SNAKIE_WIDTHS, current.width, pick('width')),
+      sizeSelect('Height', SNAKIE_HEIGHTS, current.height, pick('height')),
+    );
+    // Keep clicks here from opening the block's source.
+    ['mousedown', 'click'].forEach(type => bar.addEventListener(type, e => e.stopPropagation()));
+    return bar;
+  }
 
   function snakieBlockOptions(source) {
     const text = String(source || '').replace(/\s+$/, '');
@@ -419,8 +470,9 @@
   }
 
   // Draws a ```snakie block's box into `element` (the editor's live view
-  // and the view page both use it).
-  function renderSnakieBlock(source, element) {
+  // and the view page both use it). In the editor, `host.edit(newSource)`
+  // rewrites the block, and a Width / Height bar sits over the box.
+  function renderSnakieBlock(source, element, host) {
     const opts = snakieBlockOptions(source);
     element.replaceChildren();
     if (!opts) {
@@ -429,7 +481,16 @@
     }
     const box = document.createElement('div');
     box.className = 'project-code-embed snakie-box';
+    // The size and the rounded clip are set here too, so they hold even
+    // before snakie-embed.js loads (or on an older copy of it).
+    const width = SNAKIE_WIDTH_PX[String(opts.width || '').toLowerCase()] ||
+      (/^\d+(px|%)?$/.test(opts.width || '') ? (/\D$/.test(opts.width) ? opts.width : opts.width + 'px') : '');
+    if (width) {
+      box.style.maxWidth = width;
+      box.style.marginLeft = box.style.marginRight = 'auto';
+    }
     box.appendChild(snakieFallback(opts));
+    if (host && typeof host.edit === 'function') element.appendChild(snakieSizeBar(source, opts, host.edit));
     element.appendChild(box);
     return loadSnakieEmbed()
       .then(api => { if (api && box.isConnected !== false) api.mount(box, opts); })
@@ -465,7 +526,7 @@
   }
 
   window.ProjectEmbeds = {
-    snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock,
+    snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock, snakieBlockWithSizes,
     youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards,
     videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
   };

@@ -1136,3 +1136,36 @@ a.part-link:hover,
   justify-content: flex-end;
   border-top: 1px solid #e3e0d6;
 }
+
+/* ```snakie box in the editor: a Width / Height bar over it (Snakie#1285). */
+.snakie-size-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  color: var(--muted, #6b7280);
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+.cm-md-rendered:hover .snakie-size-bar,
+.snakie-size-bar:focus-within {
+  opacity: 1;
+}
+.snakie-size-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  cursor: pointer;
+}
+.snakie-size-pick select {
+  font: inherit;
+  color: var(--text, inherit);
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 6px;
+  padding: 0.1rem 0.35rem;
+  cursor: pointer;
+}

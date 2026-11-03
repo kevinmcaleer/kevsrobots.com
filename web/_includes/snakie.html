@@ -12,7 +12,8 @@
 
   Options (all optional): file, path, ref, lines, view (code|blocks|split),
   toolbox (basic|advanced), run ("0" = read-only viewer), autorun ("1"),
-  theme (skeuomorph|dark), height (px), engine (micropython|pyodide),
+  theme (skeuomorph|dark), height (auto|short|medium|tall|px),
+  width (full|wide|medium|narrow|px|"60%"), engine (micropython|pyodide),
   packages ("numpy,pandas"), name (for code=). Files that aren't Python are
   shown read-only. A gist with several files gets a file picker.
 
@@ -32,7 +33,7 @@
 {%- else -%}
   {%- assign snk_link = "" -%}
 {%- endif -%}
-<div class="snakie-box"
+<div class="snakie-box" style="border-radius:12px;overflow:hidden"
 {%- if snk_gist != "" %} data-snakie-gist="{{ snk_gist | escape }}"{% endif -%}
 {%- if snk_repo != "" %} data-snakie-repo="{{ snk_repo | escape }}"{% endif -%}
 {%- if include.code %} data-snakie-code="{{ snk_code }}"{% endif -%}
@@ -47,6 +48,7 @@
 {%- if include.autorun %} data-autorun="{{ include.autorun | escape }}"{% endif -%}
 {%- if include.theme %} data-theme="{{ include.theme | escape }}"{% endif -%}
 {%- if include.height %} data-height="{{ include.height | escape }}"{% endif -%}
+{%- if include.width %} data-width="{{ include.width | escape }}"{% endif -%}
 {%- if include.engine %} data-engine="{{ include.engine | escape }}"{% endif -%}
 {%- if include.packages %} data-packages="{{ include.packages | escape }}"{% endif -%}
 >
