@@ -1799,6 +1799,7 @@ description: View project details
         canView: viewable,
         openViewer: f => openModel(f.id),
         modelUrl: f => downloadUrl(f) + '?preview=1',
+        renderMissing: true,
         details: f => `
           <div class="kr-models-details-main">
             <div class="kr-models-details-name">${esc(f.filename)}</div>
@@ -1817,6 +1818,8 @@ description: View project details
         thumbUrl,
         canView: viewable,
         openViewer: f => openModel(f.id),
+        modelUrl: f => downloadUrl(f) + '?preview=1',
+        renderMissing: true,
         head: `<th>Part</th>${cols.qty ? '<th class="kr-col-qty">Qty</th>' : ''}${cols.colour ? '<th class="kr-col-colour">Colour</th>' : ''}${cols.filament ? '<th class="kr-col-filament">Filament</th>' : ''}<th class="kr-col-size">Size</th><th style="width:44px"><span class="visually-hidden">Download</span></th>`,
         cells: f => `
           <td>

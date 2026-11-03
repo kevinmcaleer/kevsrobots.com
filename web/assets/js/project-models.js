@@ -11,11 +11,13 @@
 //   modelUrl(f) (the model's bytes, for the big 3D preview; without it the
 //   big preview stays a picture),
 //   fetch(url) (for colouring pictures; defaults to ProjectAuth.apiFetch),
+//   renderMissing (draw a picture from the model itself, via modelUrl, for
+//   models that have no saved thumbnail yet),
 // })
 // returns { select(id), selectedId() }.
 //
 // ProjectModels.renderTable(el, models, { thumbUrl, canView, openViewer,
-//   fetch, head: html of the <th>s after the picture, cells(f) -> <td>s })
+//   fetch, modelUrl, renderMissing, head: html of the <th>s after the picture, cells(f) -> <td>s })
 // draws the same models as a table with a small picture on each row.
 //
 // A model's print details (print_qty, print_colour, filament) show as
@@ -90,35 +92,39 @@
   function defaultFetch(url) {
     return window.ProjectAuth ? ProjectAuth.apiFetch(url, {}) : fetch(url, { credentials: 'include' });
   }
+  // A picture (a Blob) redrawn in `hex`, as a blob: URL.
+  async function tintBlob(blob, hex) {
+    const bitmap = await createImageBitmap(blob);
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0);
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d = img.data;
+    // Very dark colours keep a little light, or a black part would be
+    // a silhouette.
+    const t = [1, 3, 5].map(i => 34 + parseInt(hex.slice(i, i + 2), 16) * (221 / 255));
+    for (let i = 0; i < d.length; i += 4) {
+      if (!d[i + 3]) continue;
+      const shade = (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / BASE_LUMA;
+      for (let c = 0; c < 3; c++) {
+        d[i + c] = shade <= 1
+          ? t[c] * shade
+          : Math.min(255, t[c] + (255 - t[c]) * (shade - 1) * 0.8);
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    const out = await new Promise(r => canvas.toBlob(r, 'image/png'));
+    return URL.createObjectURL(out);
+  }
   function tintUrl(url, hex, fetcher) {
     const key = url + '|' + hex;
     if (!tinted.has(key)) {
       tinted.set(key, (async () => {
         const resp = await (fetcher || defaultFetch)(url);
         if (!resp.ok) throw new Error('thumbnail ' + resp.status);
-        const bitmap = await createImageBitmap(await resp.blob());
-        const canvas = document.createElement('canvas');
-        canvas.width = bitmap.width;
-        canvas.height = bitmap.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(bitmap, 0, 0);
-        const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const d = img.data;
-        // Very dark colours keep a little light, or a black part would be
-        // a silhouette.
-        const t = [1, 3, 5].map(i => 34 + parseInt(hex.slice(i, i + 2), 16) * (221 / 255));
-        for (let i = 0; i < d.length; i += 4) {
-          if (!d[i + 3]) continue;
-          const shade = (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / BASE_LUMA;
-          for (let c = 0; c < 3; c++) {
-            d[i + c] = shade <= 1
-              ? t[c] * shade
-              : Math.min(255, t[c] + (255 - t[c]) * (shade - 1) * 0.8);
-          }
-        }
-        ctx.putImageData(img, 0, 0);
-        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-        return URL.createObjectURL(blob);
+        return tintBlob(await resp.blob(), hex);
       })());
       tinted.get(key).catch(() => tinted.delete(key));
     }
@@ -145,7 +151,65 @@
       return `<img src="${esc(opts.thumbUrl(f))}" alt="${esc(f.filename)}" class="${cls}" loading="lazy"${hex ? ` data-tint="${hex}"` : ''}>${BADGE}`;
     }
     const hex = colourHex(f.print_colour);
-    return `<span class="kr-model-placeholder ${cls}" aria-hidden="true"${hex ? ` style="color:${hex};opacity:1"` : ''}><i class="fas fa-cube"></i></span>`;
+    const drawable = opts.renderMissing && opts.modelUrl && opts.canView(f);
+    return `<span class="kr-model-placeholder ${cls}" aria-hidden="true"${drawable ? ` data-draw-model="${f.id}"` : ''}${hex ? ` style="color:${hex};opacity:1"` : ''}><i class="fas fa-cube"></i></span>`;
+  }
+
+  // ---- Pictures for models without one ------------------------------------
+  // A model uploaded before thumbnails existed has none until its author
+  // opens the editor (which renders and saves one). On the page, with
+  // `renderMissing`, its placeholders are drawn here from the model
+  // itself instead, once they scroll near the screen: one model at a time,
+  // each drawn once a page load and shared by the strip, hero and table.
+  const drawn = new Map(); // model URL -> Promise<blob: URL of the green picture>
+  let drawQueue = Promise.resolve();
+  function drawModel(url, fetcher) {
+    if (!drawn.has(url)) {
+      const job = drawQueue.then(async () => {
+        const resp = await (fetcher || defaultFetch)(url);
+        if (!resp.ok) throw new Error('model ' + resp.status);
+        const png = await window.ModelThumbnails.renderPng(await resp.arrayBuffer());
+        return png;
+      });
+      drawQueue = job.catch(() => {});
+      drawn.set(url, job);
+    }
+    return drawn.get(url);
+  }
+  function drawMissing(root, models, opts) {
+    const MT = window.ModelThumbnails;
+    if (!root || !opts.renderMissing || !opts.modelUrl || !MT || !MT.renderPng) return;
+    const spots = Array.from(root.querySelectorAll('[data-draw-model]'));
+    if (!spots.length) return;
+    const go = () => spots.forEach(spot => {
+      const f = models.find(m => m.id === Number(spot.dataset.drawModel));
+      if (!f) return;
+      spot.removeAttribute('data-draw-model');
+      const hex = colourHex(f.print_colour);
+      const key = opts.modelUrl(f) + '|drawn|' + (hex || '');
+      if (!tinted.has(key)) {
+        tinted.set(key, drawModel(opts.modelUrl(f), opts.fetch)
+          .then(png => (hex && typeof createImageBitmap === 'function' ? tintBlob(png, hex) : URL.createObjectURL(png))));
+        tinted.get(key).catch(() => tinted.delete(key));
+      }
+      tinted.get(key).then(src => {
+        if (!spot.isConnected) return;
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = f.filename;
+        img.className = spot.className.replace(/\bkr-model-placeholder\b/, '').trim();
+        spot.replaceWith(img);
+        img.insertAdjacentHTML('afterend', BADGE);
+      }, () => { /* no WebGL or no file: the cube stays */ });
+    });
+    if (window.IntersectionObserver) {
+      const io = new IntersectionObserver(entries => {
+        if (entries.some(e => e.isIntersecting)) { io.disconnect(); go(); }
+      }, { rootMargin: '200px' });
+      io.observe(root);
+    } else {
+      go();
+    }
   }
 
   // ---- Print details -----------------------------------------------------
@@ -194,6 +258,7 @@
       });
     });
     tintAll(el, opts.fetch);
+    drawMissing(el, models, opts);
   }
 
   // The big preview's live 3D model, one per gallery element. Stopped
@@ -278,6 +343,7 @@
       if (live) el._krModels3d = startInline(stage.querySelector('.kr-models-hero'), f, opts);
       details.innerHTML = opts.details(f);
       tintAll(stage, opts.fetch);
+      drawMissing(stage, models, opts);
       strip.querySelectorAll('.kr-models-thumb').forEach(b => {
         const on = Number(b.dataset.modelId) === f.id;
         b.classList.toggle('is-active', on);
@@ -305,6 +371,7 @@
 
     show(current);
     tintAll(strip, opts.fetch);
+    drawMissing(strip, models, opts);
     return {
       select(id) { const f = models.find(m => m.id === id); if (f) show(f); },
       selectedId() { return current.id; },
