@@ -325,7 +325,7 @@
   // shows as a Snakie code box (kevinmcaleer/Snakie#1285): the code in
   // Snakie's editor, Run and a REPL for Python, and links to GitHub and to
   // the full Snakie app. Like a YouTube link, it stays a plain link in the
-  // Markdown. `/code` in the editor writes one.
+  // Markdown. `/Code from GitHub` writes a ```snakie block (below).
   //
   //   https://gist.github.com/kevinmcaleer/87a7e27a3273c30a413b2195927296fe
   //   https://github.com/kevinmcaleer/burgerbot/blob/main/burgerbot.py#L10-L40
@@ -371,44 +371,101 @@
     return snakieScript;
   }
 
-  // Swaps each paragraph that is nothing but a gist or GitHub file URL for a
-  // Snakie code box. The link stays inside it until the box loads, so a
-  // reader without JavaScript (or offline) still has it. Returns how many.
+  // ```snakie blocks: the form `/Code from GitHub` writes, which the editor's
+  // live view can draw too (as a codeRenderer, like ```mermaid). The first
+  // line is a gist or GitHub file link; `key: value` lines after it set
+  // options (view: split, engine: pyodide, lines: 10-40, run: 0…). A block
+  // with no link is the code itself, run in the box.
+  //
+  //   ```snakie
+  //   https://github.com/apirrone/Open_Duck_Mini_Runtime/blob/v2/scripts/configure_motor.py
+  //   ```
+  const SNAKIE_OPTIONS = ['file', 'path', 'ref', 'lines', 'view', 'toolbox', 'run', 'autorun', 'theme', 'height', 'engine', 'packages', 'name'];
+
+  function snakieBlockOptions(source) {
+    const text = String(source || '').replace(/\s+$/, '');
+    const lines = text.split('\n');
+    const first = lines.findIndex(l => l.trim());
+    const src = first >= 0 ? snakieSource(lines[first].trim()) : null;
+    if (!src) return text.trim() ? { code: text, name: 'main.py' } : null;
+    const opts = Object.assign({}, src);
+    lines.slice(first + 1).forEach(line => {
+      const m = /^\s*([a-z]+)\s*[:=]\s*(.+?)\s*$/i.exec(line);
+      if (m && SNAKIE_OPTIONS.includes(m[1].toLowerCase())) opts[m[1].toLowerCase()] = m[2];
+    });
+    return opts;
+  }
+
+  function snakieBlockMarkdown(url) {
+    return '```snakie\n' + String(url).trim() + '\n```';
+  }
+
+  // The fallback inside a box: the GitHub link, or the code itself.
+  function snakieFallback(opts) {
+    if (opts.code) {
+      const pre = document.createElement('pre');
+      const code = document.createElement('code');
+      code.textContent = opts.code;
+      pre.appendChild(code);
+      return pre;
+    }
+    const link = document.createElement('a');
+    link.href = opts.gist ? 'https://gist.github.com/' + opts.gist
+      : 'https://github.com/' + opts.repo + '/blob/' + (opts.ref || 'main') + '/' + opts.path;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = 'See the code on GitHub';
+    return link;
+  }
+
+  // Draws a ```snakie block's box into `element` (the editor's live view
+  // and the view page both use it).
+  function renderSnakieBlock(source, element) {
+    const opts = snakieBlockOptions(source);
+    element.replaceChildren();
+    if (!opts) {
+      element.textContent = 'Paste a gist or GitHub file link here.';
+      return undefined;
+    }
+    const box = document.createElement('div');
+    box.className = 'project-code-embed snakie-box';
+    box.appendChild(snakieFallback(opts));
+    element.appendChild(box);
+    return loadSnakieEmbed()
+      .then(api => { if (api && box.isConnected !== false) api.mount(box, opts); })
+      .catch(() => { /* the fallback stays */ });
+  }
+
+  // Swaps each ```snakie block, and each paragraph that is nothing but a gist
+  // or GitHub file URL, for a Snakie code box. The link (or code) stays inside
+  // it until the box loads, so a reader without JavaScript still has it.
+  // Returns how many.
   function embedCode(root) {
     let count = 0;
+    root.querySelectorAll('pre > code.language-snakie').forEach(code => {
+      const holder = document.createElement('div');
+      holder.className = 'mb-3';
+      code.parentElement.replaceWith(holder);
+      renderSnakieBlock(code.textContent, holder);
+      count++;
+    });
     root.querySelectorAll('p').forEach(p => {
       const text = p.textContent.trim();
       if (!/^https?:\/\/\S+$/.test(text)) return;
       const kids = p.children;
       if (kids.length > 1 || (kids.length === 1 && kids[0].tagName !== 'A')) return;
-      const src = snakieSource(text);
-      if (!src) return;
-      const box = document.createElement('div');
-      box.className = 'project-code-embed snakie-box mb-3';
-      if (src.gist) box.dataset.snakieGist = src.gist;
-      if (src.repo) {
-        box.dataset.snakieRepo = src.repo;
-        box.dataset.path = src.path;
-        box.dataset.ref = src.ref;
-        if (src.lines) box.dataset.lines = src.lines;
-      }
-      const link = document.createElement('a');
-      link.href = text;
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.textContent = 'See the code on GitHub';
-      box.appendChild(link);
-      p.replaceWith(box);
+      if (!snakieSource(text)) return;
+      const holder = document.createElement('div');
+      holder.className = 'mb-3';
+      p.replaceWith(holder);
+      renderSnakieBlock(text, holder);
       count++;
     });
-    if (count) {
-      loadSnakieEmbed().then(api => api && api.scan(root)).catch(() => { /* the links stay */ });
-    }
     return count;
   }
 
   window.ProjectEmbeds = {
-    snakieSource, embedCode, loadSnakieEmbed,
+    snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock,
     youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards,
     videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
   };
