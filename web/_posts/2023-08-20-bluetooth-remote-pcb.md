@@ -76,7 +76,7 @@ A simple script was written to detect button presses and translate them into Blu
 
 The MicroPython code is available here:
 
-<script src="https://gist.github.com/kevinmcaleer/cb8026c14ecb2b5a22fba065eb11af8c.js"></script>
+{% include snakie.html gist="kevinmcaleer/cb8026c14ecb2b5a22fba065eb11af8c" %}
 
 ---
 

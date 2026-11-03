@@ -113,7 +113,7 @@ It's also worth noting that you can have coroutines that have other coroutines i
 
 I've uploaded the working code to Github Gists so you can understand whats going on.
 
-<script src="https://gist.github.com/kevinmcaleer/cb8026c14ecb2b5a22fba065eb11af8c.js"></script>
+{% include snakie.html gist="kevinmcaleer/cb8026c14ecb2b5a22fba065eb11af8c" %}
 
 To use this code:
 

@@ -62,7 +62,7 @@ The code for this project is written in MicroPython. The code reads the temperat
 
 Copy the `main.py` to the pico along with `simple.py`. You'll also need to create a `wifi_config.py` file with your WiFi credentials, and upload that to the pico too.
 
-<script src="https://gist.github.com/kevinmcaleer/711ced03eab0cc7b10edd1d492dd1ae9.js"></script>
+{% include snakie.html gist="kevinmcaleer/711ced03eab0cc7b10edd1d492dd1ae9" %}
 
 ---
 
