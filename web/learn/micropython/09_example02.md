@@ -130,11 +130,12 @@ We can use variables in maths, for example if we want to find the missing angle 
 
 type:
 
-```python
+{% capture snakie_code %}
 a = 65
 b = 42
 c = 180 - a + b 
 print('the missing angle is: ', c)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="example02.py" %}
 
 ---

@@ -4,7 +4,7 @@ description: This is an example program highlighting some of the simple concepts
 layout: lesson
 ---
 
-```python
+{% capture snakie_code %}
 import sqlite3
 
 # Create a database and establish a connection
@@ -43,7 +43,8 @@ for row in data:
 
 # Close the database connection
 connection.close()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="demo_program.py" engine="pyodide" %}
 
 In this demo program, we create a database named "mydatabase.db" and establish a connection to it using the `sqlite3` module. We then create a table named "books" with columns for book title, author, and year. Next, we insert some sample data into the table using the `executemany()` method, inside a `with connection:` block so the rows are committed to the file.
 

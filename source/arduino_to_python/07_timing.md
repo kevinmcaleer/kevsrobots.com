@@ -270,7 +270,7 @@ time.sleep_us(50)      # 50 microseconds - clear
 
 MicroPython also has real-time clock functions (if your board has an RTC):
 
-```python
+{% capture snakie_code %}
 import time
 
 # Get current time as tuple (year, month, day, hour, min, sec, weekday, yearday)
@@ -284,7 +284,8 @@ print(f"Time: {current_time[3]:02d}:{current_time[4]:02d}:{current_time[5]:02d}"
 # Get Unix timestamp (seconds since Jan 1, 1970)
 timestamp = time.time()
 print(f"Timestamp: {timestamp}")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="timing_1.py" %}
 
 **Note:** On most MicroPython boards, `time.time()` starts from 0 at boot unless you sync with NTP (Network Time Protocol) over WiFi.
 
@@ -358,7 +359,8 @@ Serial.println("ms");
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 from machine import Pin
 import time
 
@@ -373,7 +375,8 @@ for i in range(1000):
 
 duration = time.ticks_diff(time.ticks_us(), start)
 print(f"Duration: {duration}us ({duration/1000:.2f}ms)")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="timing_2.py" %}
 
 ## Debounce with Timing
 

@@ -84,13 +84,14 @@ In Python, a `module` is a `file` containing Python code. A `library` is a colle
 
 You can use the `import` keyword to import a module or a library. Once imported, you can use the dot notation to access the functions, classes, and variables defined in that module.
 
-```python
+{% capture snakie_code %}
 # Importing the math module
 import math
 
 # Using a function from the math module
 print(math.sqrt(16))  # Prints '4.0'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="libraries_1.py" engine="pyodide" %}
 
 ---
 
@@ -98,7 +99,7 @@ print(math.sqrt(16))  # Prints '4.0'
 
 The `math` module provides mathematical functions and constants.
 
-```python
+{% capture snakie_code %}
 import math
 
 # Constants
@@ -109,7 +110,8 @@ print(math.sin(math.pi/2))  # Prints '1.0'
 
 # Logarithmic functions
 print(math.log(100, 10))  # Prints '2.0'
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="libraries_2.py" engine="pyodide" %}
 
 ---
 
@@ -117,7 +119,7 @@ print(math.log(100, 10))  # Prints '2.0'
 
 The `random` module provides functions for generating random numbers.
 
-```python
+{% capture snakie_code %}
 import random
 
 # Generate a random float between 0 and 1
@@ -128,7 +130,8 @@ print(random.randint(1, 10))
 
 # Randomly choose an item from a list
 print(random.choice(['apple', 'banana', 'cherry']))
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="libraries_3.py" engine="pyodide" %}
 
 ---
 
@@ -136,7 +139,7 @@ print(random.choice(['apple', 'banana', 'cherry']))
 
 The `datetime` module provides classes for manipulating dates and times.
 
-```python
+{% capture snakie_code %}
 import datetime
 
 # Get the current date and time
@@ -150,7 +153,8 @@ print(independence_day)
 # Calculate the difference between two dates
 delta = now - independence_day
 print(delta.days)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="libraries_4.py" engine="pyodide" %}
 
 ---
 

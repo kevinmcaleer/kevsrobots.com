@@ -87,7 +87,7 @@ Once activated, your command line will indicate that you're inside the virtual e
 
 A Pydantic model defines the structure of your data, including the types and validation rules. Here's a simple example:
 
-```python
+{% capture snakie_code %}
 from pydantic import BaseModel
 
 class User(BaseModel):
@@ -99,7 +99,8 @@ class User(BaseModel):
 user = User(name="John Doe", age=30)
 
 print(user)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="setting_up_your_development_environment.py" engine="pyodide" %}
 
 This code defines a `User` model with three fields: `name`, `age`, and `is_active`. The `is_active` field is optional and defaults to `True` if not provided.
 

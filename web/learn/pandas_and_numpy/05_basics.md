@@ -58,7 +58,7 @@ navigation:
 
 Data Frames are central to data manipulation in Pandas, and knowing how to select, filter, sort and summarise them is key to unlocking their power. In this lesson we'll use a small table of robot sensor readings, which we'll keep using for the next few lessons.
 
-```python
+{% capture snakie_code %}
 import pandas as pd
 
 df = pd.DataFrame({
@@ -68,7 +68,8 @@ df = pd.DataFrame({
     'battery': [87, 64, 85, 60, 92, 90],
 })
 print(df)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="basics.py" engine="pyodide" %}
 
 ---
 

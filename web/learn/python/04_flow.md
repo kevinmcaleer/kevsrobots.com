@@ -78,7 +78,7 @@ In this lesson, we'll explore how to control the flow of your Python programs us
 
 In Python, we use `if`, `elif` (else if), and `else` to control conditional flows. They help the program to make decisions based on certain conditions.
 
-```python
+{% capture snakie_code %}
 age = 20
 
 if age < 13:
@@ -87,7 +87,8 @@ elif age < 20:
     print("You are a teenager.")
 else:
     print("You are an adult.")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="flow_1.py" engine="pyodide" %}
 
 ---
 
@@ -97,19 +98,21 @@ Python has two types of loops - `for` and `while`.
 
 - The `for` loop is used for iterating over a sequence or performing an action a specific number of times:
 
-```python
+{% capture snakie_code %}
 for i in range(5):
     print(i)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="flow_2.py" engine="pyodide" %}
 
 - The `while` loop repeats a block of code as long as a certain condition is true:
 
-```python
+{% capture snakie_code %}
 counter = 0
 while counter < 5:
     print(counter)
     counter += 1
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="flow_3.py" engine="pyodide" %}
 
 ---
 
@@ -117,7 +120,7 @@ while counter < 5:
 
 Functions are reusable pieces of code. They only run when called and can receive parameters and return data.
 
-```python
+{% capture snakie_code %}
 # Defining a function
 def greet(name):
     return f"Hello, {name}!"
@@ -125,7 +128,8 @@ def greet(name):
 # Calling a function
 message = greet("Alice")
 print(message)  # Prints "Hello, Alice!"
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="flow_4.py" engine="pyodide" %}
 
 ---
 

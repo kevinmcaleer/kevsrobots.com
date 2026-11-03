@@ -118,9 +118,10 @@ The next step is to set up your Python development environment. You'll need a te
 
 Let's write your first Python program, a classic 'Hello, World!' example:
 
-```python
+{% capture snakie_code %}
 print("Hello, World!")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="intro.py" engine="pyodide" %}
 
 To run this program:
 

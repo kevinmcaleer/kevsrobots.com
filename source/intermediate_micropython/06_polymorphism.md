@@ -22,7 +22,7 @@ Polymorphism is the ability of different objects to respond, each in its own way
 
 Consider a scenario where we have different classes for different types of animals. Each animal can make a sound, but the sound is different for each animal.
 
-```python
+{% capture snakie_code %}
 class Dog:
     def make_sound(self):
         return "Bark"
@@ -46,7 +46,8 @@ cow = Cow()
 animal_sound(dog)  # Outputs: Bark
 animal_sound(cat)  # Outputs: Meow
 animal_sound(cow)  # Outputs: Moo
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="polymorphism_1.py" %}
 
 In the example above, the `animal_sound` function uses polymorphism to call the `make_sound` method on different animal objects. Each object responds to the `make_sound` method in its own way.
 
@@ -64,7 +65,7 @@ In the example above, the `animal_sound` function uses polymorphism to call the 
 
 Imagine a media player application that can play different types of media files (audio, video, etc.). Each media type has its own way of being played, but the media player can use a single interface to play any type of media file.
 
-```python
+{% capture snakie_code %}
 class Audio:
     def play(self):
         return "Playing audio"
@@ -88,7 +89,8 @@ image = Image()
 play_media(audio)  # Outputs: Playing audio
 play_media(video)  # Outputs: Playing video
 play_media(image)  # Outputs: Displaying image
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="polymorphism_2.py" %}
 
 In this example, the `play_media` function uses polymorphism to play different types of media files. Each media type responds to the `play` method in its own way.
 
@@ -100,7 +102,7 @@ Polymorphism and inheritance are closely related concepts in OOP. While inherita
 
 For example, we can have a base class `Animal` with a method `make_sound`, and different animal classes (e.g., `Dog`, `Cat`) inherit from the base class and implement their own version of `make_sound`.
 
-```python
+{% capture snakie_code %}
 class Animal:
     def make_sound(self):
         raise NotImplementedError("Subclasses must implement this method")
@@ -122,7 +124,8 @@ cat = Cat()
 
 animal_sound(dog)  # Outputs: Bark
 animal_sound(cat)  # Outputs: Meow
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="polymorphism_3.py" %}
 
 ---
 

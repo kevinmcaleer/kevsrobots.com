@@ -11,7 +11,7 @@ cover: assets/cover.png
 
 In object-oriented programming (OOP), `Inheritance` is a way to create new classes based on existing classes. The new classes, known as `derived classes`, inherit attributes and methods from the existing classes, known as `base classes`.
 
-```python
+{% capture snakie_code %}
 class Animal:
     def __init__(self, name):
         self.name = name
@@ -30,7 +30,8 @@ class Dog(Animal):
 animal = Animal("Animal")
 dog = Dog("Dog", "Labrador")
 dog.speak()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="inheritance_1.py" %}
 
 First we define the base class, `Animal`, it has a `name` property and a `speak` method.
 Next we define a `Dog` class, that inherits from the Animal class.
@@ -94,7 +95,7 @@ class Robot:
 
 In MicroPython, classes can inherit from multiple base classes. This is known as multiple inheritance. When a class inherits from multiple classes, it inherits attributes and methods from all the parent classes.
 
-```python
+{% capture snakie_code %}
 class A:
     def method_a(self):
         print("Method A")
@@ -111,7 +112,8 @@ c = C()
 c.method_a()
 c.method_b()
 c.method_c()
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="inheritance_2.py" %}
 
 ---
 

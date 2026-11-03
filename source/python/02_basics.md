@@ -62,10 +62,11 @@ if age > 18:
 
 - **Statements**: In Python, each logical line of code is called a "statement". Python interprets these statements in the order they appear.
 
-```python
+{% capture snakie_code %}
 print("Hello, World!")
 print("Welcome to Python programming.")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="basics_1.py" engine="pyodide" %}
 
 - **Line Continuation**: For breaking long statements into multiple lines, you can use the line continuation character (`\`).
 
@@ -80,7 +81,7 @@ total = 1 + 2 + 3 + \
 
 Comments are essential in making your code understandable to others and your future self. They are lines that are not executed by the Python interpreter.
 
-```python
+{% capture snakie_code %}
 # This is a single-line comment
 print("Hello, World!")  # This is an inline comment
 
@@ -89,7 +90,8 @@ This is a
 multi-line string,
 often used as a comment
 """
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="basics_2.py" engine="pyodide" %}
 
 Python doesn't have a true multi-line comment. A triple-quoted string that isn't assigned to anything is ignored, so people often use one as a comment. You can also just start each line with `#`.
 
@@ -101,7 +103,7 @@ Python supports a variety of operators:
 
 - **Arithmetic Operators**: `+`, `-`, `*`, `/`, `//`, `%`, `**`
 
-```python
+{% capture snakie_code %}
 x = 10
 y = 3
 
@@ -112,7 +114,8 @@ print(x / y)  # Division
 print(x // y)  # Floor division
 print(x % y)  # Modulus
 print(x ** y)  # Exponentiation
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="basics_3.py" engine="pyodide" %}
 
 - **Comparison Operators**: `==`, `!=`, `>`, `<`, `>=`, `<=`
 
@@ -127,13 +130,14 @@ print(x <= y)  # Less than or equal to
 
 - **Logical Operators**: `and`, `or`, `not`
 
-```python
+{% capture snakie_code %}
 age = 22
 is_student = True
 
 if age > 18 and is_student:
     print("You are an adult student.")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="basics_4.py" engine="pyodide" %}
 
 ---
 

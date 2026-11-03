@@ -168,7 +168,7 @@ Not all addresses can be used by devices. Some are reserved by the I2C specifica
 
 Regular devices use addresses from **0x08 to 0x77** (8 to 119 decimal).
 
-```python
+{% capture snakie_code %}
 # Check if an address is valid for devices
 def is_valid_device_address(addr):
     """Check if address is in valid device range"""
@@ -177,7 +177,8 @@ def is_valid_device_address(addr):
 address = 0x76
 if is_valid_device_address(address):
     print(f"0x{address:02X} is a valid device address")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="scanning-i2c-devices.py" %}
 
 ## Interactive Scanner with Device Recognition
 

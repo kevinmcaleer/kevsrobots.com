@@ -12,10 +12,11 @@ Often we want to run a piece of code a specific number of times.
 
 We can use the `for` statement to run a block of code a number of times:
 
-```python
+{% capture snakie_code %}
 for i in range(100):
     print('i is:',i)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="loops_1.py" %}
 
 In this example, the loop will start by assign the variable `i` the value `0`, and then run the block of code `print('i is:',i)` which will print out:
 
@@ -53,10 +54,11 @@ The `range()` function returns a sequence of numbers, starting from `0` by defau
 
 ##### Example
 
-```python
+{% capture snakie_code %}
 for i in range(100):
     print(i)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="loops_2.py" %}
 
 ---
 
@@ -66,10 +68,11 @@ If two parameters are provided, the `range()` function starts from `start` value
 
 ##### Example
 
-```python
+{% capture snakie_code %}
 for i in range(50,200):
     print(i)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="loops_3.py" %}
 
 ---
 
@@ -81,10 +84,11 @@ If three parameters are provided, the `range()` function starts from `start` val
 
 ##### Example
 
-```python
+{% capture snakie_code %}
 for i in range(50,200,10):
     print(i)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="loops_4.py" %}
 
 ---
 

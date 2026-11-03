@@ -74,9 +74,10 @@ Lets create a simple program that will display the message ‘Hello World’[^1]
 
 First, here is the code, type this into your MicroPython editor:
 
-```python
+{% capture snakie_code %}
 print ("Hello World!")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="our_first_program.py" %}
 
 When we run this, we will see the following printed to our screen (also refered to as the console):
 

@@ -6,11 +6,12 @@ layout: lesson
 
 Type of the program below into your MicroPython Editor.
 
-```python
+{% capture snakie_code %}
 # Hello World
 
 print("Hello, world!")
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="hello_world.py" %}
 
 In Thonny, save the file and then run it with the green `run` button.
 

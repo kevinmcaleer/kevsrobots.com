@@ -12,7 +12,7 @@ cover: /learn/pandas_and_numpy/assets/pandas06.png
 
 Real data is messy: values go missing, rows get duplicated and text comes in different shapes. In this lesson we'll clean up the robot sensor data from the last lesson.
 
-```python
+{% capture snakie_code %}
 import pandas as pd
 
 df = pd.DataFrame({
@@ -22,7 +22,8 @@ df = pd.DataFrame({
     'battery': [87, 64, 85, 60, 92, 90],
 })
 print(df)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="cleansing.py" engine="pyodide" %}
 
 ---
 

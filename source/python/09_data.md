@@ -24,7 +24,7 @@ Python is a powerful tool for working with data. In this lesson, we will learn a
 
 A list is a collection which is ordered and changeable. Lists are written with square brackets.
 
-```python
+{% capture snakie_code %}
 # Create a list
 fruits = ["apple", "banana", "cherry"]
 
@@ -34,7 +34,8 @@ print(fruits[0])  # Prints 'apple'
 # Modify items in a list
 fruits[1] = "blueberry"
 print(fruits)  # Prints ['apple', 'blueberry', 'cherry']
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_1.py" engine="pyodide" %}
 
 ---
 
@@ -42,7 +43,7 @@ print(fruits)  # Prints ['apple', 'blueberry', 'cherry']
 
 A dictionary is a collection which is ordered, changeable and indexed by keys. Dictionaries are written with curly brackets, and have keys and values.
 
-```python
+{% capture snakie_code %}
 # Create a dictionary
 fruit_colors = {"apple": "red", "banana": "yellow", "cherry": "red"}
 
@@ -52,7 +53,8 @@ print(fruit_colors["apple"])  # Prints 'red'
 # Modify items in a dictionary
 fruit_colors["banana"] = "green"
 print(fruit_colors)  # Prints {'apple': 'red', 'banana': 'green', 'cherry': 'red'}
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_2.py" engine="pyodide" %}
 
 ---
 
@@ -62,7 +64,7 @@ Pandas is a powerful library for data manipulation and analysis. It provides dat
 
 Pandas isn't built in, so install it first with `pip install pandas`.
 
-```python
+{% capture snakie_code %}
 # Import the pandas library
 import pandas as pd
 
@@ -80,7 +82,8 @@ print(df["Fruit"])
 
 # Access rows in a DataFrame
 print(df.loc[0])
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="data_3.py" engine="pyodide" %}
 
 ---
 

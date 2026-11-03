@@ -58,12 +58,13 @@ A `library` is a collection of modules that provide additional functionality to 
 
 MicroPython includes several built-in libraries you can use. For example, the `math` library offers mathematical functions:
 
-```python
+{% capture snakie_code %}
 import math
 
 print(math.sqrt(16))  # Outputs: 4.0
 print(math.pi)        # Outputs: 3.141592653589793
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="modules.py" %}
 
 ---
 

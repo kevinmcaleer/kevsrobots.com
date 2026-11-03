@@ -48,7 +48,7 @@ The most commonly used modes are:
 
 You can read from a text file using the `read()`, `readline()`, or `readlines()` methods, and you can write using the `write()` or `writelines()` methods.
 
-```python
+{% capture snakie_code %}
 # Writing to a file
 f = open("test.txt", "w")
 f.write("Hello, World!")
@@ -60,7 +60,8 @@ content = f.read()
 f.close()
 
 print(content)  # Prints "Hello, World!"
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="files_1.py" engine="pyodide" %}
 
 ---
 
@@ -68,7 +69,7 @@ print(content)  # Prints "Hello, World!"
 
 You can read from and write to binary files just like text files, but you use the `'b'` mode.
 
-```python
+{% capture snakie_code %}
 # Writing binary data to a file
 data = bytes(range(5))
 f = open("test.bin", "wb")
@@ -81,7 +82,8 @@ data = f.read()
 f.close()
 
 print(list(data))  # Prints "[0, 1, 2, 3, 4]"
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="files_2.py" engine="pyodide" %}
 
 ---
 
@@ -89,13 +91,14 @@ print(list(data))  # Prints "[0, 1, 2, 3, 4]"
 
 Python provides the `with` statement to make working with files easier and cleaner. It automatically closes the file when you're done with it.
 
-```python
+{% capture snakie_code %}
 with open("test.txt", "w") as f:
     f.write("Hello, World!")
 
 with open("test.txt", "r") as f:
     print(f.read())  # Prints "Hello, World!"
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="files_3.py" engine="pyodide" %}
 
 ---
 

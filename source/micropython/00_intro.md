@@ -49,9 +49,10 @@ For example keywords are highlighed inline with the course text like `this`.
 
 Longer examples of code are hightlighted like this:
 
-```python
+{% capture snakie_code %}
 print('this is an example')
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="intro.py" %}
 
 Important notes will be highlighted in sections like the two below:
 

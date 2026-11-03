@@ -117,7 +117,7 @@ Protected methods and properties can be accessed from outside the class but shou
 
 Below is an example of private and protected properties and methods in a class:
 
-```python
+{% capture snakie_code %}
 class Robot:
     __battery_max_voltage = 4.2
     __battery_min_voltage = 3.0
@@ -135,7 +135,8 @@ class Robot:
     
 r = Robot()
 print(r.battery())
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="encapsulation.py" %}
 
 In the example above, the complexity of calculating the battery level is hidden. The user doesn’t need to know the voltage levels or the formula used. The `__battery_max_voltage` and `__battery_min_voltage` are hidden from the user; IDEs such as [Thonny](https://thonny.org/) will not suggest them via autocomplete.
 

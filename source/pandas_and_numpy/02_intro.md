@@ -30,12 +30,13 @@ We use Numpy to perform mathematical and logical operations on arrays. It is the
 
 For example, let's create a NumPy array:
 
-```python
+{% capture snakie_code %}
 import numpy as np
 
 arr = np.array([1, 2, 3, 4, 5])
 print(arr)
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="numpy_array.py" engine="pyodide" %}
 
 Output:
 

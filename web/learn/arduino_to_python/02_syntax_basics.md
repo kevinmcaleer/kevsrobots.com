@@ -117,7 +117,8 @@ Key differences:
 Python variables can change type during runtime. This is powerful but requires care:
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 value = 42           # int
 print(value)         # 42
 
@@ -126,7 +127,8 @@ print(value)         # Hello
 
 value = 3.14         # Now it's a float!
 print(value)         # 3.14
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="syntax_basics_1.py" %}
 
 You can't do this in C++ - once an int, always an int. Python's flexibility is useful but can cause bugs if you're not careful.
 
@@ -278,11 +280,13 @@ Serial.println(value);
 ```
 
 **MicroPython:**
-```python
+
+{% capture snakie_code %}
 value = 42
 print(f"Value: {value}")
 # No setup needed - print() just works!
-```
+{% endcapture %}
+{% include snakie.html code=snakie_code name="syntax_basics_2.py" %}
 
 ## Constants
 

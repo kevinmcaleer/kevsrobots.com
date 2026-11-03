@@ -190,6 +190,14 @@ Key data files:
 - **Naming Convention** - Use `00_intro.md`, `01_lesson.md`, `02_lesson.md`, etc.
 - **Structure** - Each course needs `course.yml` metadata file
 - **Content Quality** - See "Course Content Guidelines" section below
+- **Runnable code** - A Python example that runs on its own and prints something goes in a Snakie box so readers can run and edit it in the page:
+  ```
+  {% capture snakie_code %}
+  print("Hello, World!")
+  {% endcapture %}
+  {% include snakie.html code=snakie_code name="hello.py" %}
+  ```
+  MicroPython courses use the default engine (it has a simulated `machine` module); CPython courses add `engine="pyodide"` (numpy, pandas, matplotlib, sqlite3, pydantic). Leave as plain code: fragments that need earlier code, `input()`, turtle, endless `while True` loops, and hardware code (I2C, SPI, UART, sensors, drivers) whose output would be fake. See `web/_includes/snakie.html` for all options.
 
 ### Nginx Configuration
 - **Backend** - `/stacks/kevsrobots/nginx-optimized.conf`
