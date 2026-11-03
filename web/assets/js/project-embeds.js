@@ -478,6 +478,8 @@
       const bin = document.createElement('button');
       bin.type = 'button';
       bin.className = 'snakie-remove';
+      // The editor's mark for a drawing's own bin, so it doesn't add a second one.
+      bin.dataset.mdRemove = '';
       bin.title = 'Remove this code box';
       bin.setAttribute('aria-label', 'Remove this code box');
       bin.innerHTML = TRASH_SVG;

@@ -1229,6 +1229,12 @@
       // Canonical sections (Bill of Materials, Wiring…) are # headings, so a
       // project has several H1s on purpose: no "More than one H1" hint.
       lintSkip: ['multiple-h1'],
+      // A bin on each canonical section's heading (shown on hover): it takes
+      // out the heading and everything under it, with an Undo note.
+      sectionRemove: heading => {
+        const section = ProjectSections.match(heading);
+        return section ? heading : null;
+      },
     });
 
     // Leaving a price writes it in the table's currency ("4" -> "£4.00").
@@ -2036,6 +2042,12 @@
     }
     if (!best) return;
     if (next === null) {
+      // The editor's own removal: the block and a blank line next to it,
+      // then a "Code box removed · Undo" note, like its other bins.
+      if (typeof mde.removeBlock === 'function') {
+        mde.removeBlock(best.start, Math.max(best.start, best.end - 1), 'Code box');
+        return;
+      }
       // The block, plus one blank line around it so no gap is left behind.
       let start = best.start;
       let end = best.end;
