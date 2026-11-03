@@ -26,14 +26,24 @@ description: View project details
 
 <!-- .kr-notes: the Notes look shared with the editor (project-notes.css). -->
 <div class="container-fluid py-3 kr-notes" id="project-view-page">
-  <div id="loading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
+  <div id="loading" class="text-center py-5" role="status">
+    <div class="spinner-border text-primary mb-3" aria-hidden="true"></div>
+    <p class="lead text-muted">Loading page…</p>
   </div>
 
   <div id="not-found" class="text-center py-5 d-none">
     <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
     <h3>Project not found</h3>
     <a href="/projects/hub" class="btn btn-primary mt-3">Browse Projects</a>
+  </div>
+
+  <!-- Shown when the project could not be loaded for any reason other than
+       "it does not exist" (network down, server error): not a 404. -->
+  <div id="load-failed" class="text-center py-5 d-none">
+    <i class="fas fa-plug fa-3x text-muted mb-3"></i>
+    <h3>We couldn't load this project</h3>
+    <p class="text-muted">Check your connection and try again.</p>
+    <button type="button" class="btn btn-primary mt-3" onclick="location.reload()">Try again</button>
   </div>
 
   <div id="project-view" class="d-none">
@@ -1017,7 +1027,13 @@ description: View project details
                    encodeURIComponent(slugParam);
       }
       const resp = await fetch(withVersion(fetchUrl), { credentials: 'include' });
-      if (!resp.ok) throw new Error('Not found');
+      // Only a real 404 means the project doesn't exist; anything else
+      // (server error, network) gets "couldn't load" and a retry.
+      if (!resp.ok) {
+        const err = new Error('HTTP ' + resp.status);
+        err.notFound = resp.status === 404 || resp.status === 422;
+        throw err;
+      }
       const project = await resp.json();
       // Only the author is told the version numbers (epic #433).
       const viewerIsAuthor = project.has_unpublished_changes !== null && project.has_unpublished_changes !== undefined;
@@ -1226,8 +1242,15 @@ description: View project details
       document.getElementById('download-pdf-btn').addEventListener('click', () => downloadPdf(project));
 
     } catch (e) {
+      // A slip while drawing part of a project that already showed must
+      // not hide it behind an error message.
+      if (!document.getElementById('project-view').classList.contains('d-none')) {
+        console.error('Project view:', e);
+        return;
+      }
+      console.error('Project load failed:', e);
       document.getElementById('loading').classList.add('d-none');
-      document.getElementById('not-found').classList.remove('d-none');
+      document.getElementById(e && e.notFound ? 'not-found' : 'load-failed').classList.remove('d-none');
     }
   }
 
