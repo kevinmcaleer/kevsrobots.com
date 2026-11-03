@@ -1821,7 +1821,7 @@ description: View project details
         openViewer: f => openModel(f.id),
         modelUrl: f => downloadUrl(f) + '?preview=1',
         renderMissing: true,
-        head: `<th>Part</th>${cols.qty ? '<th class="kr-col-qty">Qty</th>' : ''}${cols.colour ? '<th class="kr-col-colour">Colour</th>' : ''}${cols.filament ? '<th class="kr-col-filament">Filament</th>' : ''}<th class="kr-col-size">Size</th><th style="width:44px"><span class="visually-hidden">Download</span></th>`,
+        head: `<th data-sort="name">Part</th>${cols.qty ? '<th class="kr-col-qty" data-sort="qty">Qty</th>' : ''}${cols.colour ? '<th class="kr-col-colour" data-sort="colour">Colour</th>' : ''}${cols.filament ? '<th class="kr-col-filament" data-sort="filament">Filament</th>' : ''}<th class="kr-col-size" data-sort="size">Size</th><th style="width:44px"><span class="visually-hidden">Download</span></th>`,
         cells: f => `
           <td>
             <a href="${downloadUrl(f)}" class="fw-semibold">${esc(f.filename)}</a>
