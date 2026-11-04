@@ -58,6 +58,7 @@ sitemap: false
               <th data-sort="kept" class="text-end">Kept<span class="sort-mark"></span></th>
               <th data-sort="files" class="text-end">Files<span class="sort-mark"></span></th>
               <th data-sort="images" class="text-end">Pictures<span class="sort-mark"></span></th>
+              <th data-sort="versions" class="text-end">Versions<span class="sort-mark"></span></th>
               <th data-sort="largest_size">Largest file<span class="sort-mark"></span></th>
             </tr>
           </thead>
@@ -116,12 +117,14 @@ sitemap: false
     if (!files) inner = '<div class="text-center py-2"><span class="spinner-border spinner-border-sm"></span></div>';
     else if (files.error) inner = '<div class="text-danger small">' + esc(files.error) + '</div>';
     else if (!files.length) inner = '<div class="text-muted small">No files.</div>';
-    else inner = '<table class="table table-sm mb-0 storage-files"><thead><tr><th>File</th><th>Type</th><th class="text-end">Size</th><th>Uploaded</th><th></th></tr></thead><tbody>' +
+    else inner = '<table class="table table-sm mb-0 storage-files"><thead><tr><th>File</th><th>Type</th><th class="text-end">Size</th><th>Uploaded</th><th></th><th>Used by versions</th></tr></thead><tbody>' +
       files.map(f => '<tr' + (f.removed_at ? ' class="text-muted"' : '') + '><td>' + esc(f.filename) + '</td><td>' + esc(f.file_type) +
         '</td><td class="text-end">' + size(f.file_size) + '</td><td>' + esc((f.uploaded_at || '').slice(0, 10)) + '</td><td>' +
-        (f.removed_at ? '<span class="badge bg-secondary">kept for a version</span>' : '') + '</td></tr>').join('') +
+        (f.removed_at ? '<span class="badge bg-secondary">kept for a version</span>' : '') + '</td><td>' +
+        (f.versions && f.versions.length ? f.versions.map(n => 'v' + n).join(', ') : '') + '</td></tr>').join('') +
       '</tbody></table>';
-    return '<tr class="table-light"><td colspan="9" class="px-4">' + inner + '</td></tr>';
+    return '<tr class="table-light"><td colspan="10" class="px-4"><div class="small mb-1"><a href="/projects/editor.html?id=' + pid +
+      '">Open in editor</a></div>' + inner + '</td></tr>';
   }
 
   function render() {
@@ -145,6 +148,7 @@ sitemap: false
         '<td class="text-end text-muted">' + (p.kept ? size(p.kept) + ' (' + p.kept_files + ')' : '') + '</td>' +
         '<td class="text-end">' + p.files + '</td>' +
         '<td class="text-end">' + p.images + '</td>' +
+        '<td class="text-end">' + p.versions + '</td>' +
         '<td class="small">' + (p.largest_file ? esc(p.largest_file) + ' <span class="text-muted">' + size(p.largest_size) + '</span>' : '') + '</td>' +
       '</tr>' + (open === p.project_id ? filesRow(p.project_id) : '');
     }).join('');

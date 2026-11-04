@@ -13,7 +13,7 @@ from .conftest import make_auth_header
 @pytest.mark.asyncio
 async def test_project_storage_sizes(client, monkeypatch) -> None:
     from projects_api.db import get_sessionmaker
-    from projects_api.models import ProjectFile
+    from projects_api.models import ProjectFile, ProjectVersion
 
     monkeypatch.setenv("ADMIN_USERNAMES", "admin")
     admin = make_auth_header("admin")
@@ -28,6 +28,7 @@ async def test_project_storage_sizes(client, monkeypatch) -> None:
     await up(small, "a.py", 10)
     async with get_sessionmaker()() as s:
         await s.execute(update(ProjectFile).where(ProjectFile.id == old).values(removed_at=datetime(2026, 1, 1)))
+        s.add(ProjectVersion(project_id=big, number=1, kind="published", snapshot={"files": [{"id": old}]}))
         await s.commit()
 
     assert (await client.get("/api/admin/storage/projects", headers=headers)).status_code == 403
@@ -42,5 +43,7 @@ async def test_project_storage_sizes(client, monkeypatch) -> None:
 
     files = (await client.get(f"/api/admin/storage/projects/{big}/files", headers=admin)).json()
     assert [f["filename"] for f in files] == ["robot.model.json", "old.py"]
-    assert files[1]["removed_at"] is not None
+    assert files[1]["removed_at"] is not None and files[1]["versions"] == [1]
+    assert files[0]["versions"] == []
+    assert rows[big]["versions"] == 1
     assert (await client.get("/api/admin/storage/projects/9999/files", headers=admin)).status_code == 404
