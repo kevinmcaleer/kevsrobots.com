@@ -4,7 +4,7 @@
   description: Transition from Arduino C++ to MicroPython quickly and easily. Learn
     Python syntax with side-by-side comparisons, control hardware, and build IoT and
     robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.
-  duration: 1h 36m
+  duration: 1h 38m
   groups:
   - micropython
   - arduino
@@ -192,6 +192,20 @@
   link: /learn/freecad_smars/00_intro.html
   name: Building SMARS with FreeCAD
 - author: Kevin McAleer
+  cover: /learn/git/assets/cover.jpg
+  date_published: 2026-11-04
+  description: 'Learn to track your code and projects with Git: commits, history,
+    undoing mistakes, branches, merging, and sharing your work on GitHub.'
+  duration: 1h 14m
+  groups:
+  - git
+  - github
+  - productivity
+  lessons: 14
+  level: beginner
+  link: /learn/git/00_intro.html
+  name: Git for Beginners
+- author: Kevin McAleer
   cover: /learn/gymnasium/assets/cover.jpg
   date_published: 2026-06-14
   description: Take your Q-learning skills to the industry-standard Gymnasium API
@@ -225,7 +239,7 @@
   description: Master I2C and SPI communication protocols on Raspberry Pi Pico. Learn
     to connect sensors, scan for devices, read datasheets, and build real-world projects
     with practical hands-on examples using the BME280 sensor.
-  duration: 1h 54m
+  duration: 1h 55m
   groups:
   - micropython
   - electronics
@@ -333,6 +347,22 @@
   level: beginner
   link: /learn/markdown/01_overview.html
   name: Mastering Markdown for Documentation with Jekyll
+- author: Kevin McAleer
+  cover: /learn/mermaid/assets/cover.jpg
+  date_published: 2026-11-04
+  description: Learn to draw flowcharts, sequence diagrams, state machines, database
+    diagrams and more by writing simple text with Mermaid, then put them in your READMEs,
+    notes and project docs.
+  duration: 1h 20m
+  groups:
+  - mermaid
+  - markdown
+  - documentation
+  - productivity
+  lessons: 15
+  level: beginner
+  link: /learn/mermaid/00_intro.html
+  name: Create Diagrams with Mermaid
 - author: Kevin McAleer
   cover: /learn/meshcore/assets/cover.png
   date_published: 2026-08-05
@@ -595,7 +625,7 @@
   date_published: 2023-07-20
   description: Get started with Python programming, learn why you should  learn Python
     and how to setup your Python environment.
-  duration: 0h 52m
+  duration: 0h 54m
   groups:
   - python
   lessons: 18

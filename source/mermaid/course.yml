@@ -1,0 +1,51 @@
+- name: Create Diagrams with Mermaid
+  author: Kevin McAleer
+  date_created: 2026-11-04
+  date_published: 2026-11-04
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - mermaid
+      - markdown
+      - documentation
+      - productivity
+  description: >-
+     Learn to draw flowcharts, sequence diagrams, state machines, database diagrams and more by writing simple text with Mermaid, then put them in your READMEs, notes and project docs.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Getting Started
+      content:
+      - 01_what-is-mermaid.md
+      - 02_your-first-diagram.md
+  - section:
+      name: Flowcharts
+      content:
+      - 03_flowcharts.md
+      - 04_flowcharts-in-depth.md
+  - section:
+      name: Diagrams for Code and Data
+      content:
+      - 05_sequence-diagrams.md
+      - 06_state-diagrams.md
+      - 07_class-diagrams.md
+      - 08_entity-relationship-diagrams.md
+  - section:
+      name: Planning and Ideas
+      content:
+      - 09_gantt-and-timeline.md
+      - 10_more-diagram-types.md
+  - section:
+      name: Looking Good and Sharing
+      content:
+      - 11_themes-and-styling.md
+      - 12_exporting-and-sharing.md
+  - section:
+      name: Project
+      content:
+      - 13_project-document-a-robot.md
+      - 14_cheat-sheet-and-next-steps.md

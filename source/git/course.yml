@@ -1,0 +1,46 @@
+- name: Git for Beginners
+  author: Kevin McAleer
+  date_created: 2026-11-04
+  date_published: 2026-11-04
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - git
+      - github
+      - productivity
+  description: >-
+     Learn to track your code and projects with Git: commits, history, undoing mistakes, branches, merging, and sharing your work on GitHub.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Getting Started
+      content:
+      - 01_what-is-git.md
+      - 02_installing-git.md
+      - 03_your-first-repository.md
+  - section:
+      name: Saving Your Work
+      content:
+      - 04_staging-and-committing.md
+      - 05_viewing-history.md
+      - 06_undoing-changes.md
+      - 07_ignoring-files.md
+  - section:
+      name: Branches
+      content:
+      - 08_branches.md
+      - 09_merging-and-conflicts.md
+  - section:
+      name: Working with GitHub
+      content:
+      - 10_github-and-remotes.md
+      - 11_pulling-and-collaborating.md
+  - section:
+      name: Putting It All Together
+      content:
+      - 12_project-version-control-a-robot.md
+      - 13_cheat-sheet-and-next-steps.md
