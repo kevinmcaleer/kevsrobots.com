@@ -2662,6 +2662,22 @@
 
   let projectFiles = []; // the last list loadFiles() fetched
   let modelGallery = null; // ProjectModels handle, to keep the shown model across re-renders
+  // The Files & Models panel, even while it's out of the page: under its
+  // heading it lives in an editor block, which the editor takes out of the
+  // document when it scrolls out of view (or a 3D scene covers it), so
+  // getElementById can't find it or anything in it then.
+  var filesPanelEl = null;
+  function filesPart(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      if (id === 'editor-files-section') filesPanelEl = el;
+      else if (!filesPanelEl) filesPanelEl = el.closest('#editor-files-section');
+      return el;
+    }
+    if (!filesPanelEl) return null;
+    return filesPanelEl.id === id ? filesPanelEl : filesPanelEl.querySelector('#' + id);
+  }
+
   async function loadFiles() {
     if (!currentProject) return;
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', { credentials: 'include' });
@@ -2677,7 +2693,7 @@
   // place; a model's print settings are an optional second box shown when
   // the description is being edited (issues #187, #261).
   function renderFiles() {
-    const section = document.getElementById('editor-files-section');
+    const section = filesPart('editor-files-section');
     if (section && (section.querySelector('.kr-file-fields.is-editing')
         || (document.activeElement && document.activeElement.closest('.kr-print-inputs, .kr-print-cell')
             && section.contains(document.activeElement)))) {
@@ -2690,10 +2706,10 @@
     const others = files.filter(f => f.file_type !== 'model');
     const view = ProjectModels.normaliseView(currentProject && currentProject.files_view);
 
-    const bar = document.getElementById('editor-models-viewbar');
+    const bar = filesPart('editor-models-viewbar');
     if (bar) bar.innerHTML = models.length ? ProjectModels.viewToggle(view, 'Show models to visitors as') : '';
 
-    const gallery = document.getElementById('model-gallery');
+    const gallery = filesPart('model-gallery');
     const canView = f => !!(window.ModelThumbnails && ModelThumbnails.canRender(f.filename));
     const openViewer = f => ModelThumbnails.openViewer({
       url: fileDownloadUrl(f) + '?preview=1', name: f.filename, downloadUrl: fileDownloadUrl(f),
@@ -2738,8 +2754,8 @@
       });
     }
 
-    const list = document.getElementById('file-list');
-    list.innerHTML = others.length ? `<table class="table table-single table-hover mb-0 files-table">
+    const list = filesPart('file-list');
+    if (list) list.innerHTML = others.length ? `<table class="table table-single table-hover mb-0 files-table">
       <thead>
         <tr>
           <th style="width:36px"></th>
@@ -2761,7 +2777,7 @@
         </tr>
       `).join('')}</tbody></table>` : '';
 
-    const download = document.getElementById('download-files');
+    const download = filesPart('download-files');
     if (download) download.hidden = files.length === 0;
     updateFilesPlacement();
   }
@@ -2810,7 +2826,7 @@
   let filesBlock = null;
   let filesHome = null;
   function placeFilesPanel() {
-    const panel = document.getElementById('editor-files-section');
+    const panel = filesPart('editor-files-section');
     if (!panel || !mde || !mde.view || typeof mde.openBlock !== 'function') return false;
     if (!filesHome) filesHome = { parent: panel.parentNode, next: panel.nextSibling };
     const doc = mde.view.state.doc;
@@ -3009,14 +3025,14 @@
   // while one is focused, so typing isn't interrupted).
   function renderFilesWhenIdle() {
     setTimeout(() => {
-      const section = document.getElementById('editor-files-section');
+      const section = filesPart('editor-files-section');
       if (section) section.dataset.renderPending = '1';
       renderFiles();
     }, 0);
   }
 
   function setupPrintInputs() {
-    const section = document.getElementById('editor-files-section');
+    const section = filesPart('editor-files-section');
     if (!section || section.dataset.printBound === '1') return;
     section.dataset.printBound = '1';
     section.addEventListener('change', e => {
@@ -3051,7 +3067,7 @@
       setTimeout(() => { if (section.dataset.renderPending) renderFiles(); }, 0);
     });
     // Filmstrip / Table: the author's choice is the page's first view.
-    const bar = document.getElementById('editor-models-viewbar');
+    const bar = filesPart('editor-models-viewbar');
     if (bar) bar.addEventListener('click', async e => {
       const b = e.target.closest('[data-models-view]');
       if (!b || !currentProject) return;
@@ -3109,7 +3125,7 @@
   // Inline editing, wired by delegation on the section so it survives
   // re-renders of the gallery and the table.
   function setupFileDescriptionEditing() {
-    const section = document.getElementById('editor-files-section');
+    const section = filesPart('editor-files-section');
     if (!section || section.dataset.descBound === '1') return;
     section.dataset.descBound = '1';
 
@@ -3170,7 +3186,7 @@
       Object.assign(file, patch);
       box.classList.remove('is-editing');
       box.outerHTML = renderFileFields(file);
-      const section = document.getElementById('editor-files-section');
+      const section = filesPart('editor-files-section');
       if (section && section.dataset.renderPending) renderFiles();
       if (!Object.keys(patch).length) return;
       try {
