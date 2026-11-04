@@ -470,3 +470,61 @@ async def test_public_list_surfaces_file_description(
         r["id"] == uploaded_file and r["description"] == "Drill template (PDF)"
         for r in rows
     )
+
+
+@pytest.mark.asyncio
+async def test_storage_limit_skips_the_replaced_file(client, project_id, monkeypatch) -> None:
+    """The 3D scenes' model file is uploaded anew on each save, then the old
+    one deleted: the one it replaces mustn't count, or a big model can never
+    be saved twice."""
+    monkeypatch.setenv("MAX_PROJECT_STORAGE", "100")
+    headers = make_auth_header()
+    first = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("robot.model.json", b"x" * 60, "application/json")},
+        headers=headers,
+    )
+    assert first.status_code == 201
+    over = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("robot.model.json", b"y" * 60, "application/json")},
+        headers=headers,
+    )
+    assert over.status_code == 400
+    assert "storage limit" in over.json()["detail"]
+    ok = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("robot.model.json", b"y" * 60, "application/json")},
+        data={"replaces": str(first.json()["id"])},
+        headers=headers,
+    )
+    assert ok.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_storage_limit_skips_files_only_kept_for_versions(client, project_id, monkeypatch) -> None:
+    """A file removed from the working copy but kept for a published version
+    (issue #439) can't be freed by the author, so it isn't counted."""
+    from datetime import datetime
+
+    from sqlalchemy import update
+
+    from projects_api.db import get_sessionmaker
+    from projects_api.models import ProjectFile
+
+    monkeypatch.setenv("MAX_PROJECT_STORAGE", "100")
+    headers = make_auth_header()
+    first = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("a.py", b"x" * 60, "text/plain")},
+        headers=headers,
+    )
+    async with get_sessionmaker()() as s:
+        await s.execute(update(ProjectFile).where(ProjectFile.id == first.json()["id"]).values(removed_at=datetime(2026, 1, 1)))
+        await s.commit()
+    ok = await client.post(
+        f"/api/projects/{project_id}/files",
+        files={"file": ("b.py", b"y" * 60, "text/plain")},
+        headers=headers,
+    )
+    assert ok.status_code == 201

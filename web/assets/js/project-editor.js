@@ -1415,7 +1415,9 @@
     if (!currentProject) throw new Error('Save the project first.');
     const old = projectFiles.filter(x => MODEL_FILE.test(x.filename || ''));
     const file = new File([JSON.stringify(model)], modelFileName(), { type: 'application/json' });
-    const saved = await uploadSingleFile(file);
+    // `replaces`: the old model file isn't counted against the storage limit
+    // while the new one goes up (it is deleted just after).
+    const saved = await uploadSingleFile(file, old.length ? { replaces: old[0].id } : undefined);
     for (const f of old) {
       await apiFetch(API + '/api/projects/' + currentProject.id + '/files/' + f.id, { method: 'DELETE', credentials: 'include' }).catch(() => {});
     }
@@ -4036,9 +4038,10 @@
   }
 
   // Upload a single file via the files API and return the response JSON.
-  async function uploadSingleFile(file) {
+  async function uploadSingleFile(file, fields) {
     const form = new FormData();
     form.append('file', file);
+    for (const [k, v] of Object.entries(fields || {})) form.append(k, String(v));
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files', {
       method: 'POST', credentials: 'include', body: form,
     });
