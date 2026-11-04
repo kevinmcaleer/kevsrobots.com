@@ -910,6 +910,91 @@
     ]
   },
   {
+    "slug": "git",
+    "name": "Git for Beginners",
+    "description": "Learn to track your code and projects with Git: commits, history, undoing mistakes, branches, merging, and sharing your work on GitHub.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-04",
+    "groups": [
+      "git",
+      "github",
+      "productivity"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/git/00_intro.html"
+      },
+      {
+        "file": "01_what-is-git.md",
+        "section": "Getting Started",
+        "url": "/learn/git/01_what-is-git.html"
+      },
+      {
+        "file": "02_installing-git.md",
+        "section": "Getting Started",
+        "url": "/learn/git/02_installing-git.html"
+      },
+      {
+        "file": "03_your-first-repository.md",
+        "section": "Getting Started",
+        "url": "/learn/git/03_your-first-repository.html"
+      },
+      {
+        "file": "04_staging-and-committing.md",
+        "section": "Saving Your Work",
+        "url": "/learn/git/04_staging-and-committing.html"
+      },
+      {
+        "file": "05_viewing-history.md",
+        "section": "Saving Your Work",
+        "url": "/learn/git/05_viewing-history.html"
+      },
+      {
+        "file": "06_undoing-changes.md",
+        "section": "Saving Your Work",
+        "url": "/learn/git/06_undoing-changes.html"
+      },
+      {
+        "file": "07_ignoring-files.md",
+        "section": "Saving Your Work",
+        "url": "/learn/git/07_ignoring-files.html"
+      },
+      {
+        "file": "08_branches.md",
+        "section": "Branches",
+        "url": "/learn/git/08_branches.html"
+      },
+      {
+        "file": "09_merging-and-conflicts.md",
+        "section": "Branches",
+        "url": "/learn/git/09_merging-and-conflicts.html"
+      },
+      {
+        "file": "10_github-and-remotes.md",
+        "section": "Working with GitHub",
+        "url": "/learn/git/10_github-and-remotes.html"
+      },
+      {
+        "file": "11_pulling-and-collaborating.md",
+        "section": "Working with GitHub",
+        "url": "/learn/git/11_pulling-and-collaborating.html"
+      },
+      {
+        "file": "12_project-version-control-a-robot.md",
+        "section": "Putting It All Together",
+        "url": "/learn/git/12_project-version-control-a-robot.html"
+      },
+      {
+        "file": "13_cheat-sheet-and-next-steps.md",
+        "section": "Putting It All Together",
+        "url": "/learn/git/13_cheat-sheet-and-next-steps.html"
+      }
+    ]
+  },
+  {
     "slug": "gymnasium",
     "name": "Reinforcement Learning with Gymnasium",
     "description": "Take your Q-learning skills to the industry-standard Gymnasium API and Stable-Baselines3. You will wrap the BurgerBot grid-world as a proper Gymnasium environment, discretize CartPole with your own binning code, and train neural-network agents that export a policy table you can drop straight onto a Pico.",
@@ -1699,6 +1784,97 @@
         "file": "10_deploying_to_github_pages.md",
         "section": "Publishing Your Site",
         "url": "/learn/markdown/10_deploying_to_github_pages.html"
+      }
+    ]
+  },
+  {
+    "slug": "mermaid",
+    "name": "Create Diagrams with Mermaid",
+    "description": "Learn to draw flowcharts, sequence diagrams, state machines, database diagrams and more by writing simple text with Mermaid, then put them in your READMEs, notes and project docs.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-04",
+    "groups": [
+      "mermaid",
+      "markdown",
+      "documentation",
+      "productivity"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/mermaid/00_intro.html"
+      },
+      {
+        "file": "01_what-is-mermaid.md",
+        "section": "Getting Started",
+        "url": "/learn/mermaid/01_what-is-mermaid.html"
+      },
+      {
+        "file": "02_your-first-diagram.md",
+        "section": "Getting Started",
+        "url": "/learn/mermaid/02_your-first-diagram.html"
+      },
+      {
+        "file": "03_flowcharts.md",
+        "section": "Flowcharts",
+        "url": "/learn/mermaid/03_flowcharts.html"
+      },
+      {
+        "file": "04_flowcharts-in-depth.md",
+        "section": "Flowcharts",
+        "url": "/learn/mermaid/04_flowcharts-in-depth.html"
+      },
+      {
+        "file": "05_sequence-diagrams.md",
+        "section": "Diagrams for Code and Data",
+        "url": "/learn/mermaid/05_sequence-diagrams.html"
+      },
+      {
+        "file": "06_state-diagrams.md",
+        "section": "Diagrams for Code and Data",
+        "url": "/learn/mermaid/06_state-diagrams.html"
+      },
+      {
+        "file": "07_class-diagrams.md",
+        "section": "Diagrams for Code and Data",
+        "url": "/learn/mermaid/07_class-diagrams.html"
+      },
+      {
+        "file": "08_entity-relationship-diagrams.md",
+        "section": "Diagrams for Code and Data",
+        "url": "/learn/mermaid/08_entity-relationship-diagrams.html"
+      },
+      {
+        "file": "09_gantt-and-timeline.md",
+        "section": "Planning and Ideas",
+        "url": "/learn/mermaid/09_gantt-and-timeline.html"
+      },
+      {
+        "file": "10_more-diagram-types.md",
+        "section": "Planning and Ideas",
+        "url": "/learn/mermaid/10_more-diagram-types.html"
+      },
+      {
+        "file": "11_themes-and-styling.md",
+        "section": "Looking Good and Sharing",
+        "url": "/learn/mermaid/11_themes-and-styling.html"
+      },
+      {
+        "file": "12_exporting-and-sharing.md",
+        "section": "Looking Good and Sharing",
+        "url": "/learn/mermaid/12_exporting-and-sharing.html"
+      },
+      {
+        "file": "13_project-document-a-robot.md",
+        "section": "Project",
+        "url": "/learn/mermaid/13_project-document-a-robot.html"
+      },
+      {
+        "file": "14_cheat-sheet-and-next-steps.md",
+        "section": "Project",
+        "url": "/learn/mermaid/14_cheat-sheet-and-next-steps.html"
       }
     ]
   },
