@@ -1186,12 +1186,12 @@
           if (!resp.ok) throw new Error('Could not load the picture (HTTP ' + resp.status + ')');
           return resp.blob();
         },
-        // A graphic's 3D scenes offer the project's STL files (Files & Models).
+        // A graphic's 3D scenes offer the project's STL and STEP files (Files & Models).
         listModels: async () => {
           if (!currentProject) return [];
           if (!projectFiles.length) await loadFiles();
           return projectFiles
-            .filter(f => /\.stl$/i.test(f.filename || ''))
+            .filter(f => /\.(stl|step|stp)$/i.test(f.filename || ''))
             .map(f => ({
               url: fileDownloadUrl(f) + '?preview=1',
               title: f.filename,

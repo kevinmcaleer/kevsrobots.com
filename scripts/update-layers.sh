@@ -31,6 +31,12 @@ for f in "$pkg"/dist/*.js; do
   node --input-type=module --check < "$dest/$(basename "$f")"
 done
 
+# OpenCascade's STEP reader (occt-import-js, LGPL), its own unchanged files,
+# loaded only when a 3D scene opens a STEP file.
+if [ -d "$pkg/dist/occt" ]; then
+  cp -R "$pkg/dist/occt" "$dest/occt"
+fi
+
 version="$(node -p "require('$pkg/package.json').version")"
 commit="$(git -C "$studio" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 echo "layers $version (markdown-studio $commit)" > "$dest/VERSION"
