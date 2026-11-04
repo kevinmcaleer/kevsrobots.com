@@ -1192,7 +1192,15 @@
           if (!projectFiles.length) await loadFiles();
           return projectFiles
             .filter(f => /\.stl$/i.test(f.filename || ''))
-            .map(f => ({ url: fileDownloadUrl(f) + '?preview=1', title: f.filename }));
+            .map(f => ({
+              url: fileDownloadUrl(f) + '?preview=1',
+              title: f.filename,
+              // The saved STL thumbnail, if there is one; without it Layers draws the model.
+              thumbnail: f.thumbnail_version ? async () => {
+                const resp = await apiFetch(fileThumbUrl(f), { credentials: 'include' });
+                return resp.ok ? resp.blob() : null;
+              } : undefined,
+            }));
         },
         fetchModel: async url => {
           const resp = await apiFetch(url, { credentials: 'include' });
