@@ -59,6 +59,7 @@ from .db import (
 from .routers import (
     admin_feedback,
     admin_files,
+    admin_storage,
     admin_migration,
     admin_parts,
     auth,
@@ -341,6 +342,7 @@ def create_app() -> FastAPI:
     app.include_router(admin_feedback.router)
     # Issue #262: admin backfill of 3D model thumbnails.
     app.include_router(admin_files.router)
+    app.include_router(admin_storage.router)
     # Issue #273: moving existing projects to the new editor.
     app.include_router(admin_migration.router)
     # Issue #150: public FX conversion endpoint.
