@@ -1,7 +1,16 @@
 ---
-title: Lesson 02 - Turning
-description: Learn how to make your robot turn left and right
 layout: lesson
+title: Lesson 02 - Turning
+author: Kevin McAleer
+type: page
+cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
+previous: 01_lesson_01.html
+next: 03_lesson_03.html
+description: Learn how to make your robot turn left and right
+percent: 36
+duration: 5
+quiz_total: 17
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:

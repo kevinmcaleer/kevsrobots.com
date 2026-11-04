@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Staging and Committing
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 03_your-first-repository.html
+next: 05_viewing-history.html
 description: Learn Git's three areas, stage changes with git add, save them with git
   commit, and write good commit messages
-layout: lesson
-type: page
+percent: 35
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

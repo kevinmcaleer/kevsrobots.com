@@ -1,8 +1,17 @@
 ---
+layout: lesson
 title: Lesson 05 - Bluetooth
+author: Kevin McAleer
+type: page
+cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
+previous: 04_lesson_04.html
+next: 06_lesson_06.html
 description: Learn how to connect a Bluetooth module to your Arduino and then use
   that to pair to an iOS or Android phone
-layout: lesson
+percent: 72
+duration: 5
+quiz_total: 17
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:

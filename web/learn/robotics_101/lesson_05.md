@@ -1,8 +1,15 @@
 ---
 layout: lesson
 title: How does a Robot think?
-description: The Robot Brain
+author: Kevin McAleer
 type: page
+cover: /learn/robotics_101/assets/basics_101.jpg
+date: 2023-01-17
+previous: lesson_04.html
+description: The Robot Brain
+percent: 100
+duration: 2
+quiz_total: 12
 navigation:
 - name: Robotics 101
 - content:

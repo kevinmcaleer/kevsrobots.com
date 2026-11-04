@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: What is Git?
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 00_intro.html
+next: 02_installing-git.html
 description: 'Version control explained: snapshots, repositories, commits, and the
   difference between Git and GitHub'
-layout: lesson
-type: page
+percent: 14
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:
