@@ -1207,6 +1207,10 @@
           if (!resp.ok) throw new Error('Could not load the model (HTTP ' + resp.status + ')');
           return resp.arrayBuffer();
         },
+        // The project's 3D model of joined parts, which every 3D scene picks
+        // its parts from: a <project>.model.json in Files & Models.
+        loadModel: loadProjectModel,
+        saveModel: saveProjectModel,
       },
       // ```snakie: a gist / GitHub file (or code) as a runnable Snakie box.
       codeRenderers: {
@@ -1386,6 +1390,39 @@
   // What the Project `/` commands (issue #257) read from and upload to.
   function fileDownloadUrl(f) {
     return API + '/api/projects/' + currentProject.id + '/files/' + f.id + '/download';
+  }
+
+  // --- The project's 3D model (Layers 3D scenes) ---
+  // One file per project in Files & Models, <project>.model.json: the parts
+  // and joints that every assembly graphic's 3D scenes pick from. A save
+  // uploads the new file, then removes the old one.
+  const MODEL_FILE = /\.model\.json$/i;
+  function modelFileName() {
+    const slug = String((currentProject && (currentProject.slug || currentProject.title)) || 'robot')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+    return (slug || 'robot') + '.model.json';
+  }
+  async function loadProjectModel() {
+    if (!currentProject) return null;
+    await loadFiles();
+    const f = projectFiles.find(x => MODEL_FILE.test(x.filename || ''));
+    if (!f) return null;
+    const resp = await apiFetch(fileDownloadUrl(f) + '?preview=1', { credentials: 'include' });
+    if (!resp.ok) throw new Error('Could not load the 3D model (HTTP ' + resp.status + ')');
+    return resp.json();
+  }
+  async function saveProjectModel(model) {
+    if (!currentProject) throw new Error('Save the project first.');
+    const old = projectFiles.filter(x => MODEL_FILE.test(x.filename || ''));
+    const file = new File([JSON.stringify(model)], modelFileName(), { type: 'application/json' });
+    const saved = await uploadSingleFile(file);
+    for (const f of old) {
+      await apiFetch(API + '/api/projects/' + currentProject.id + '/files/' + f.id, { method: 'DELETE', credentials: 'include' }).catch(() => {});
+    }
+    if (saved && saved.id) {
+      await saveFileFields(saved.id, { description: "The project's 3D model: the parts and joints its assembly pictures are drawn from (made in a graphic's 3D scene)." }).catch(() => {});
+    }
+    await loadFiles();
   }
 
   function slashContext() {
