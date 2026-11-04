@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, UploadFile, status
 from fastapi.responses import Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -214,6 +214,7 @@ async def list_files(
 async def upload_file(
     project_id: int,
     file: UploadFile,
+    replaces: Optional[int] = Form(None, description="A file of this project this upload replaces (the caller deletes it after): its size isn't counted against the storage limit"),
     user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> FileResponse | ImageResponse:
@@ -230,11 +231,17 @@ async def upload_file(
     if not ok:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=err)
 
-    # Check total storage for this project.
-    total = await session.scalar(
-        select(func.coalesce(func.sum(ProjectFile.file_size), 0))
-        .where(ProjectFile.project_id == project_id)
-    ) or 0
+    # Check total storage for this project: the working copy's files. A file
+    # only kept for a published version (removed_at, issue #439) isn't
+    # counted, as the author can't free it; nor is the file this upload
+    # replaces (the 3D scenes' <project>.model.json is uploaded anew on each
+    # save, then the old one deleted, so it would otherwise count twice).
+    query = select(func.coalesce(func.sum(ProjectFile.file_size), 0)).where(
+        ProjectFile.project_id == project_id, ProjectFile.removed_at.is_(None)
+    )
+    if replaces is not None:
+        query = query.where(ProjectFile.id != replaces)
+    total = await session.scalar(query) or 0
     if total + len(content) > settings.max_project_storage:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
