@@ -61,6 +61,7 @@ from .routers import (
     admin_files,
     admin_migration,
     admin_parts,
+    admin_storage,
     auth,
     badges,
     bom,
@@ -343,6 +344,8 @@ def create_app() -> FastAPI:
     app.include_router(admin_files.router)
     # Issue #273: moving existing projects to the new editor.
     app.include_router(admin_migration.router)
+    # Storage each project uses, against the per-project limit.
+    app.include_router(admin_storage.router)
     # Issue #150: public FX conversion endpoint.
     app.include_router(fx.router)
     return app

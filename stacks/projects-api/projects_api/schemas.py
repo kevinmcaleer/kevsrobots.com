@@ -1943,3 +1943,43 @@ class FeedbackCountsResponse(BaseModel):
     by_sentiment: dict[str, int] = Field(
         default_factory=lambda: {"love": 0, "like": 0, "issue": 0, "idea": 0}
     )
+
+
+class ProjectStorageRow(BaseModel):
+    """One project's storage, for the admin storage page.
+
+    ``counted_bytes`` is what the per-project limit adds up: every file
+    row, the ones removed from the working copy but kept for a version
+    (``removed_bytes``) included. Images aren't counted against the limit.
+    """
+
+    project_id: int
+    title: str
+    slug: Optional[str] = None
+    author_username: str
+    status: str
+    file_count: int
+    file_bytes: int
+    removed_count: int
+    removed_bytes: int
+    counted_bytes: int
+    image_count: int
+    version_count: int
+    largest_filename: Optional[str] = None
+    largest_bytes: int = 0
+
+
+class ProjectStorageList(BaseModel):
+    limit_bytes: int
+    projects: list[ProjectStorageRow]
+
+
+class ProjectStorageFile(BaseModel):
+    """A file row of one project, with the versions that use it."""
+
+    id: int
+    filename: str
+    file_size: int
+    uploaded_at: datetime
+    removed_at: Optional[datetime] = None
+    versions: list[int]

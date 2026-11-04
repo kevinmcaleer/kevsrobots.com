@@ -1,0 +1,205 @@
+---
+title: Project Storage
+layout: default
+description: How much storage each project uses against the per-project limit
+permalink: /admin/projects/storage/
+sitemap: false
+---
+
+{% include nav_admin.html %}
+
+<div class="container py-4">
+  <h1><i class="fas fa-hard-drive me-3"></i> Project Storage</h1>
+  <p class="text-muted">
+    What each project's files take against the per-project limit. <strong>Removed</strong>
+    files have been taken out of the working copy but are kept because a version still
+    uses them, and they still count. Images aren't counted. Click a column to sort, and
+    a project to see its files.
+  </p>
+
+  <div id="access-denied" class="d-none">
+    <div class="alert alert-danger mt-4">
+      <i class="fas fa-lock me-2"></i> You do not have permission to access this page.
+    </div>
+  </div>
+
+  <div id="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div id="admin-content" class="d-none">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span><i class="fas fa-folder-open me-2"></i> Projects <span id="project-count" class="badge bg-secondary ms-1">0</span></span>
+        <span class="small text-muted">Limit <span id="limit"></span> &middot; total <span id="total"></span></span>
+        <input type="search" id="filter" class="form-control form-control-sm" style="max-width: 16rem" placeholder="Filter by title or author">
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 storage-table">
+            <thead>
+              <tr>
+                <th data-sort="title">Project</th>
+                <th data-sort="author_username">Author</th>
+                <th data-sort="counted_bytes" class="text-end">Counted</th>
+                <th data-sort="pct" style="min-width: 9rem">Of limit</th>
+                <th data-sort="file_bytes" class="text-end">Files</th>
+                <th data-sort="removed_bytes" class="text-end">Removed</th>
+                <th data-sort="largest_bytes" class="text-end">Largest file</th>
+                <th data-sort="image_count" class="text-end">Images</th>
+                <th data-sort="version_count" class="text-end">Versions</th>
+              </tr>
+            </thead>
+            <tbody id="storage-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .storage-table th[data-sort] { cursor: pointer; user-select: none; white-space: nowrap; }
+  .storage-table th[data-sort]::after { content: ''; display: inline-block; width: 1em; }
+  .storage-table th.sort-asc::after { content: ' \25B2'; }
+  .storage-table th.sort-desc::after { content: ' \25BC'; }
+  .storage-table tr.project-row { cursor: pointer; }
+  .storage-table td { vertical-align: middle; }
+</style>
+
+<script>
+(function() {
+  const API = 'https://projects.kevsrobots.com';
+  let projects = [];
+  let limit = 0;
+  let sortKey = 'counted_bytes';
+  let sortDir = -1;
+  const open = new Set();
+  const fileCache = {};
+
+  function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t == null ? '' : String(t);
+    return d.innerHTML;
+  }
+
+  function size(b) {
+    if (!b) return '0';
+    if (b < 1024) return b + ' B';
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+    return (b / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function bar(p) {
+    const pct = Math.min(100, p * 100);
+    const colour = p >= 1 ? 'bg-danger' : p >= 0.8 ? 'bg-warning' : 'bg-success';
+    return '<div class="d-flex align-items-center gap-2">' +
+      '<div class="progress flex-grow-1" style="height: 6px"><div class="progress-bar ' + colour + '" style="width:' + pct + '%"></div></div>' +
+      '<span class="small text-muted">' + Math.round(p * 100) + '%</span></div>';
+  }
+
+  async function init() {
+    try {
+      const resp = await fetch(API + '/api/admin/storage/projects', { credentials: 'include' });
+      document.getElementById('loading').classList.add('d-none');
+      if (resp.status === 403 || resp.status === 401) {
+        document.getElementById('access-denied').classList.remove('d-none');
+        return;
+      }
+      if (!resp.ok) throw new Error('Failed');
+      const body = await resp.json();
+      limit = body.limit_bytes;
+      projects = body.projects.map(p => Object.assign(p, { pct: limit ? p.counted_bytes / limit : 0 }));
+      document.getElementById('admin-content').classList.remove('d-none');
+      document.getElementById('limit').textContent = size(limit);
+      document.getElementById('total').textContent = size(projects.reduce((n, p) => n + p.counted_bytes, 0));
+      render();
+    } catch (e) {
+      document.getElementById('loading').classList.add('d-none');
+      document.getElementById('access-denied').classList.remove('d-none');
+    }
+  }
+
+  function filesHtml(pid) {
+    const files = fileCache[pid];
+    if (!files) return '<div class="text-muted small py-2"><i class="fas fa-spinner fa-spin me-1"></i> Loading files&hellip;</div>';
+    if (!files.length) return '<div class="text-muted small py-2">No files.</div>';
+    return '<table class="table table-sm mb-0 small"><thead><tr><th>File</th><th class="text-end">Size</th>' +
+      '<th>Uploaded</th><th>State</th><th>Used by versions</th></tr></thead><tbody>' +
+      files.map(f => '<tr' + (f.removed_at ? ' class="text-muted"' : '') + '>' +
+        '<td>' + esc(f.filename) + '</td>' +
+        '<td class="text-end">' + size(f.file_size) + '</td>' +
+        '<td>' + esc((f.uploaded_at || '').slice(0, 16).replace('T', ' ')) + '</td>' +
+        '<td>' + (f.removed_at ? '<span class="badge bg-secondary">removed ' + esc(f.removed_at.slice(0, 10)) + '</span>' : '<span class="badge bg-success">in working copy</span>') + '</td>' +
+        '<td>' + (f.versions.length ? f.versions.map(n => 'v' + n).join(', ') : '&mdash;') + '</td>' +
+      '</tr>').join('') + '</tbody></table>';
+  }
+
+  function render() {
+    const q = document.getElementById('filter').value.trim().toLowerCase();
+    const shown = projects.filter(p => !q || (p.title || '').toLowerCase().includes(q) || (p.author_username || '').toLowerCase().includes(q));
+    shown.sort((a, b) => {
+      const x = a[sortKey], y = b[sortKey];
+      const c = typeof x === 'string' || typeof y === 'string'
+        ? String(x || '').localeCompare(String(y || ''), undefined, { sensitivity: 'base' })
+        : (x || 0) - (y || 0);
+      return c * sortDir;
+    });
+    document.getElementById('project-count').textContent = shown.length;
+    document.querySelectorAll('.storage-table th[data-sort]').forEach(th => {
+      th.classList.toggle('sort-asc', th.dataset.sort === sortKey && sortDir === 1);
+      th.classList.toggle('sort-desc', th.dataset.sort === sortKey && sortDir === -1);
+    });
+    document.getElementById('storage-body').innerHTML = shown.map(p => {
+      const row = '<tr class="project-row" data-pid="' + p.project_id + '">' +
+        '<td><i class="fas fa-chevron-' + (open.has(p.project_id) ? 'down' : 'right') + ' text-muted me-2 small"></i>' +
+          esc(p.title) + ' <span class="text-muted small">#' + p.project_id + (p.status === 'draft' ? '  &middot; draft' : '') + '</span></td>' +
+        '<td>' + esc(p.author_username) + '</td>' +
+        '<td class="text-end fw-semibold">' + size(p.counted_bytes) + '</td>' +
+        '<td>' + bar(p.pct) + '</td>' +
+        '<td class="text-end">' + size(p.file_bytes) + ' <span class="text-muted small">(' + p.file_count + ')</span></td>' +
+        '<td class="text-end">' + (p.removed_count ? size(p.removed_bytes) + ' <span class="text-muted small">(' + p.removed_count + ')</span>' : '&mdash;') + '</td>' +
+        '<td class="text-end">' + (p.largest_filename ? '<span class="small text-muted">' + esc(p.largest_filename) + '</span> ' + size(p.largest_bytes) : '&mdash;') + '</td>' +
+        '<td class="text-end">' + p.image_count + '</td>' +
+        '<td class="text-end">' + p.version_count + '</td>' +
+      '</tr>';
+      const detail = open.has(p.project_id)
+        ? '<tr><td colspan="9" class="bg-light px-4">' +
+            '<div class="small mb-1"><a href="/projects/view.html?id=' + p.project_id + '">View project</a>  &middot; ' +
+            '<a href="/projects/editor.html?id=' + p.project_id + '">Open in editor</a></div>' +
+            filesHtml(p.project_id) + '</td></tr>'
+        : '';
+      return row + detail;
+    }).join('');
+  }
+
+  async function toggle(pid) {
+    if (open.has(pid)) { open.delete(pid); render(); return; }
+    open.add(pid);
+    render();
+    if (fileCache[pid]) return;
+    try {
+      const resp = await fetch(API + '/api/admin/storage/projects/' + pid + '/files', { credentials: 'include' });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      fileCache[pid] = await resp.json();
+    } catch (e) {
+      fileCache[pid] = [];
+    }
+    render();
+  }
+
+  document.querySelectorAll('.storage-table th[data-sort]').forEach(th => th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (key === sortKey) sortDir = -sortDir;
+    else { sortKey = key; sortDir = (key === 'title' || key === 'author_username') ? 1 : -1; }
+    render();
+  }));
+  document.getElementById('storage-body').addEventListener('click', e => {
+    if (e.target.closest('a')) return;
+    const row = e.target.closest('tr.project-row');
+    if (row) toggle(Number(row.dataset.pid));
+  });
+  document.getElementById('filter').addEventListener('input', render);
+  init();
+})();
+</script>
