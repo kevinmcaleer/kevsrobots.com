@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Create a ROS2 Python Subscriber
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 12_create_publisher.html
+next: 14_docker_x11.html
 description: Let's create a new Python Subscriber program
+percent: 70
+duration: 3
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

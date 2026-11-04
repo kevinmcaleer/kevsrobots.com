@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Merging and Conflicts
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 08_branches.html
+next: 10_github-and-remotes.html
 description: Bring a branch back into main with git merge, and learn how to fix merge
   conflicts calmly
-layout: lesson
-type: page
+percent: 70
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

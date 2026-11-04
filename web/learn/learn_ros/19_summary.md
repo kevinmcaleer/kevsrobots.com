@@ -1,8 +1,15 @@
 ---
 layout: lesson
 title: Summary and next steps
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 18_laserscan.html
 description: What you've learned about ROS 2 and where to go next
+percent: 100
+duration: 2
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

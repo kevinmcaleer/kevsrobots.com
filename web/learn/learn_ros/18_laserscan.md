@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Laserscan data
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 17_tf2.html
+next: 19_summary.html
 description: Let's Visualise our Laser scan data
+percent: 95
+duration: 2
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:
