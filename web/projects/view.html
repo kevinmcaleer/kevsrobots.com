@@ -392,6 +392,16 @@ description: View project details
 </div>
 
 <style>
+  /* Phones: the page's text sits 1rem from the screen edges. The content
+     layout's own margin and padding (2rem) plus the container's gutter
+     left the text a lot narrower than the screen. */
+  @media (max-width: 575.98px) {
+    #project-view-page { width: auto; margin-inline: -1rem; padding-inline: 0; }
+  }
+  /* The Files list is a table, not list items: a block, so a wide table
+     scrolls inside the page instead of pushing past its edge (1px each
+     side keeps the collapsed outer borders from being clipped). */
+  #view-files { display: block; overflow-x: auto; padding-inline: 1px; }
   /* The left column: the nav with the PDF download under it, sticky
      together. z-index 1, not sticky-top's 1020, which painted over the
      site's sticky top bar. The nav leaves room for the button. */
