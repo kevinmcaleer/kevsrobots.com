@@ -62,6 +62,7 @@
       // User is logged in - show user menu
       console.log('Showing user menu for:', username);
       usernameDisplay.textContent = username;
+      checkAdmin(username);
       guestDropdown.style.setProperty('display', 'none', 'important');
       userDropdown.style.setProperty('display', 'block', 'important');
 
@@ -81,10 +82,61 @@
   }
 
   /**
+   * Show "Admin console" in the user menu for admins. The Projects API's
+   * /api/auth/me says whether the user is an admin; the answer is kept
+   * for the browser session so other pages don't ask again.
+   */
+  const PROJECTS_API = 'https://projects.kevsrobots.com';
+
+  function showAdminLink(show) {
+    const item = document.getElementById('admin-console-item');
+    if (item) item.hidden = !show;
+  }
+
+  function adminCacheKey(username) {
+    return 'kr_is_admin:' + username;
+  }
+
+  function readAdminCache(username) {
+    try { return sessionStorage.getItem(adminCacheKey(username)); } catch (e) { return null; }
+  }
+
+  function writeAdminCache(username, isAdmin) {
+    try { sessionStorage.setItem(adminCacheKey(username), isAdmin ? '1' : '0'); } catch (e) {}
+  }
+
+  async function checkAdmin(username) {
+    const cached = readAdminCache(username);
+    if (cached !== null) {
+      showAdminLink(cached === '1');
+      return;
+    }
+    try {
+      const opts = { credentials: 'include' };
+      let token = null;
+      try { token = localStorage.getItem('dev_jwt_token'); } catch (e) {}
+      if (token) opts.headers = { Authorization: 'Bearer ' + token };
+      const r = await fetch(PROJECTS_API + '/api/auth/me', opts);
+      if (!r.ok) return; // don't cache a failure; try again on the next page
+      const me = await r.json();
+      const isAdmin = !!(me && me.is_admin === true);
+      writeAdminCache(username, isAdmin);
+      showAdminLink(isAdmin);
+    } catch (e) {
+      // The API is unreachable: leave the link hidden.
+    }
+  }
+
+  /**
    * Handle logout action
    */
   async function handleLogout(event) {
     event.preventDefault();
+
+    const username = getUsername();
+    if (username) {
+      try { sessionStorage.removeItem(adminCacheKey(username)); } catch (e) {}
+    }
 
     try {
       // Call logout endpoint
