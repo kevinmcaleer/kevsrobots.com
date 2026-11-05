@@ -438,6 +438,9 @@ class ProjectFile(Base):
     filename: Mapped[str] = mapped_column(String(255), nullable=False)
     file_path: Mapped[str] = mapped_column(Text, nullable=False)
     file_size: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Bytes it takes in storage when that differs from file_size (stored
+    # gzipped, see storage.compress_for_storage); what the project limit counts.
+    stored_size: Mapped[Optional[int]] = mapped_column(Integer)
     file_type: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
     # Issue #261: slicer settings for a printable model, free text.

@@ -7,6 +7,7 @@ Falls back to local disk if NAS is unreachable.
 
 from __future__ import annotations
 
+import gzip
 import logging
 import uuid
 from pathlib import Path
@@ -170,15 +171,41 @@ def save_file(content: bytes, filename: str, project_id: int, file_type: str) ->
 
 
 def read_file(file_path: str) -> Optional[bytes]:
-    """Read file from NAS or local storage."""
+    """Read file from NAS or local storage (a file stored compressed comes
+    back as it was uploaded, see ``compress_for_storage``)."""
 
+    data: Optional[bytes] = None
     if file_path.startswith("nas:"):
-        return _read_from_nas(file_path[4:])
+        data = _read_from_nas(file_path[4:])
     elif file_path.startswith("local:"):
         local = LOCAL_STORAGE_PATH / file_path[6:]
         if local.exists():
-            return local.read_bytes()
-    return None
+            data = local.read_bytes()
+    if data is not None and file_path.endswith(STORED_GZ):
+        data = gzip.decompress(data)
+    return data
+
+
+# Text-heavy files (models, code, data) are stored gzipped when that saves
+# at least a tenth, and read back as uploaded, so a download is the exact
+# original. A binary STL is about a third of its size gzipped. The stored
+# name ends in STORED_GZ, which no generated name does (an uploaded .gz
+# keeps plain ".gz"), so read_file knows to unzip it.
+STORED_GZ = ".stored.gz"
+COMPRESSIBLE_EXTENSIONS = {
+    ".stl", ".obj", ".step", ".stp", ".gcode", ".ply", ".dxf", ".svg", ".scad",
+    ".json", ".txt", ".csv", ".md", ".py", ".ino", ".cpp", ".h", ".c", ".js", ".html", ".xml",
+}
+
+
+def compress_for_storage(filename: str, content: bytes) -> Tuple[bytes, bool]:
+    """``(bytes to store, whether they're gzipped)`` for an upload."""
+    if Path(filename or "").suffix.lower() not in COMPRESSIBLE_EXTENSIONS or not content:
+        return content, False
+    packed = gzip.compress(content, compresslevel=6, mtime=0)
+    if len(packed) <= len(content) * 0.9:
+        return packed, True
+    return content, False
 
 
 def delete_file(file_path: str) -> bool:
