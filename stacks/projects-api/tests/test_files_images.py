@@ -529,3 +529,15 @@ async def test_storage_limit_skips_files_only_kept_for_versions(client, project_
         headers=headers,
     )
     assert ok.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_storage_usage_for_the_author(client, project_id) -> None:
+    headers = make_auth_header()
+    empty = (await client.get(f"/api/projects/{project_id}/files/usage", headers=headers)).json()
+    assert empty["used"] == 0 and empty["limit"] == 50 * 1024 * 1024 and empty["max_file_size"] > 0
+    data = os.urandom(500)
+    await client.post(f"/api/projects/{project_id}/files", files={"file": ("a.zip", data, "application/zip")}, headers=headers)
+    assert (await client.get(f"/api/projects/{project_id}/files/usage", headers=headers)).json()["used"] == 500
+    assert (await client.get(f"/api/projects/{project_id}/files/usage", headers=make_auth_header("other_user"))).status_code == 403
+    assert (await client.get(f"/api/projects/{project_id}/files/usage")).status_code == 401

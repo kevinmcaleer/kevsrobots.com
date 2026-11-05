@@ -2729,6 +2729,41 @@
     projectFiles = await resp.json();
     renderFiles();
     renderMissingThumbnails();
+    loadQuota();
+  }
+
+  // The project's storage at the top of Files & Models: how much of its
+  // limit its files use (as stored: models are kept gzipped) and what's left.
+  async function loadQuota() {
+    const box = filesPart('files-quota');
+    if (!box || !currentProject) return;
+    try {
+      const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/files/usage', { credentials: 'include' });
+      if (!resp.ok) { box.hidden = true; return; }
+      renderQuota(box, await resp.json());
+    } catch (e) {
+      box.hidden = true;
+    }
+  }
+
+  function renderQuota(box, q) {
+    const mb = n => {
+      const v = n / (1024 * 1024);
+      return (v >= 10 || v === 0 ? Math.round(v) : v.toFixed(1)) + ' MB';
+    };
+    const used = Math.max(0, q.used || 0);
+    const limit = Math.max(1, q.limit || 1);
+    const pct = Math.min(100, used / limit * 100);
+    const left = Math.max(0, limit - used);
+    box.classList.toggle('is-near', pct >= 80 && pct < 100);
+    box.classList.toggle('is-full', pct >= 100 || left < 1024 * 1024);
+    box.innerHTML =
+      '<div class="kr-files-quota-text"><span><strong>' + mb(used) + '</strong> of ' + mb(limit) + ' used</span>' +
+      '<span class="kr-files-quota-left">' + (left ? mb(left) + ' left' : 'Storage full: delete a file to make room') + '</span></div>' +
+      '<div class="kr-files-quota-bar" role="progressbar" aria-label="Project storage used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' +
+      Math.round(pct) + '"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
+    box.title = '3D models and text files are stored compressed, so they take less than their download size. Pictures don\u2019t count.';
+    box.hidden = false;
   }
 
   // Files & Models: the models as a filmstrip gallery (project-models.js,

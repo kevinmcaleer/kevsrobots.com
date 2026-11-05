@@ -1946,3 +1946,11 @@ class FeedbackCountsResponse(BaseModel):
     by_sentiment: dict[str, int] = Field(
         default_factory=lambda: {"love": 0, "like": 0, "issue": 0, "idea": 0}
     )
+
+
+class StorageUsage(BaseModel):
+    """A project's storage use against its limit (bytes; files as stored)."""
+
+    used: int
+    limit: int
+    max_file_size: int

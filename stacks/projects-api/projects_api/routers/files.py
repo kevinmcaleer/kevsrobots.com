@@ -18,7 +18,7 @@ from ..db import get_session
 from ..models import Download, Project, ProjectFile, ProjectImage
 from ..visibility import NO_STORE
 from .. import versions as v
-from ..schemas import FileResponse, FileUpdate, ImageResponse
+from ..schemas import FileResponse, FileUpdate, ImageResponse, StorageUsage
 from ..storage import (
     MAX_THUMBNAIL_SIZE,
     STORED_GZ,
@@ -170,6 +170,39 @@ async def _private_file(session: AsyncSession, project_id: int, file_id: int, us
     return not public
 
 
+async def storage_used(session: AsyncSession, project_id: int, exclude: Optional[int] = None) -> int:
+    """Bytes counted against the project's storage limit: its working-copy
+    files as stored (gzipped size when kept compressed), leaving out
+    ``exclude`` (a file being replaced)."""
+    query = select(func.coalesce(func.sum(func.coalesce(ProjectFile.stored_size, ProjectFile.file_size)), 0)).where(
+        ProjectFile.project_id == project_id, ProjectFile.removed_at.is_(None)
+    )
+    if exclude is not None:
+        query = query.where(ProjectFile.id != exclude)
+    return int(await session.scalar(query) or 0)
+
+
+@router.get("/usage", response_model=StorageUsage)
+async def storage_usage(
+    project_id: int,
+    user: str = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> StorageUsage:
+    """How much of its storage limit the project uses, for the author's
+    Files & Models section."""
+    project = await session.get(Project, project_id)
+    if project is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    if project.author_username != user:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+    settings = get_settings()
+    return StorageUsage(
+        used=await storage_used(session, project_id),
+        limit=settings.max_project_storage,
+        max_file_size=settings.max_file_size,
+    )
+
+
 @router.get("", response_model=list[FileResponse])
 async def list_files(
     project_id: int,
@@ -238,12 +271,7 @@ async def upload_file(
     # counted, as the author can't free it; nor is the file this upload
     # replaces (the 3D scenes' <project>.model.json is uploaded anew on each
     # save, then the old one deleted, so it would otherwise count twice).
-    query = select(func.coalesce(func.sum(func.coalesce(ProjectFile.stored_size, ProjectFile.file_size)), 0)).where(
-        ProjectFile.project_id == project_id, ProjectFile.removed_at.is_(None)
-    )
-    if replaces is not None:
-        query = query.where(ProjectFile.id != replaces)
-    total = await session.scalar(query) or 0
+    total = await storage_used(session, project_id, exclude=replaces)
     # Counted as stored: a model is kept gzipped when that's smaller.
     stored, packed = (content, False) if is_image(file.filename) else compress_for_storage(file.filename, content)
     if total + len(stored) > settings.max_project_storage:
