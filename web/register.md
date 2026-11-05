@@ -2,6 +2,7 @@
 layout: content
 title: Register
 description: Create a new kevsrobots.com account
+thanks: false
 ---
 
 # Register
