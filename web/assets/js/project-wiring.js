@@ -731,5 +731,138 @@
     });
   }
 
-  window.ProjectWiring = { open, pinoutFor, findImage, isWiringSrc, svgUrl };
+  // --- For 3D scenes (Layers' scene/wiring2d.ts) ---
+  //
+  // A graphic's 3D scenes link their wires to this diagram: each placed
+  // part with its ports (a header group's pins, an STS3215's "bus-1": D1 V1
+  // G1, or a connector's), the connections, and the 3D sockets a catalog
+  // part keeps for its model (its definition's `sockets3d`).
+
+  // A catalog part's JSON (for the sockets it keeps), or null.
+  const raws = new Map(); // slug -> Promise<object|null>
+  function rawPart(slug, ctx) {
+    if (!raws.has(slug)) {
+      raws.set(slug, ctx.apiFetch(API + '/api/parts/' + encodeURIComponent(slug))
+        .then(r => (r.ok ? r.json() : null)).catch(() => null));
+    }
+    return raws.get(slug);
+  }
+
+  // A part definition's ports: each pin group (in the definition's order),
+  // each header with no groups, and each connector, its pins in order.
+  function portsOf(def) {
+    if (!def) return [];
+    const pinOf = p => (p.label ? { name: String(p.name), label: String(p.label) } : { name: String(p.name) });
+    const grouped = new Map();
+    const headers = [];
+    (def.headers || []).forEach((h, i) => {
+      const pins = (h.pins || []).filter(p => p && p.name);
+      pins.filter(p => p.group).forEach(p => {
+        if (!grouped.has(p.group)) grouped.set(p.group, []);
+        grouped.get(p.group).push(pinOf(p));
+      });
+      const loose = pins.filter(p => !p.group);
+      if (loose.length) headers.push({ id: 'header-' + (i + 1), name: h.label || ('Header ' + (i + 1)), pins: loose.map(pinOf) });
+    });
+    const names = new Map((def.groups || []).map(g => [g.id, g.name || g.id]));
+    const order = [...new Set([...(def.groups || []).map(g => g.id), ...grouped.keys()])].filter(id => grouped.has(id));
+    const groups = order.map(id => ({ id: String(id), name: String(names.get(id) || id), pins: grouped.get(id) }));
+    const connectors = (def.connectors || []).map((c, i) => ({
+      id: 'connector-' + (i + 1),
+      name: c.label || String(c.kind || 'Connector').toUpperCase(),
+      pins: (c.pins || []).filter(p => p && p.name).map(pinOf),
+    })).filter(c => c.pins.length);
+    return [...groups, ...headers, ...connectors];
+  }
+
+  // The saved diagram as 3D scenes see it ({ parts, connections }), or null
+  // when there isn't one. ctx: { projectId, bomSlugs(), apiFetch() }.
+  async function diagram(ctx) {
+    const { saved } = await loadSaved(ctx, ctx.projectId);
+    const robot = saved && saved.data;
+    if (!robot || !Array.isArray(robot.parts)) return null;
+    const entry = async (id, slug, label) => {
+      const [def, raw] = slug ? await Promise.all([definition(slug), rawPart(slug, ctx)]) : [null, null];
+      const sockets = raw && raw.definition && raw.definition.sockets3d;
+      const out = { id, name: label || (def && def.name) || (raw && raw.name) || id, ports: portsOf(def) };
+      if (slug && raw) out.slug = slug;
+      if (sockets && Array.isArray(sockets.sockets)) out.sockets = sockets;
+      return out;
+    };
+    const parts = await Promise.all(robot.parts.map(p => entry(p.id, p.lib === BOM_LIB || p.lib === LIB ? p.part : null, p.label)));
+    if (robot.board) parts.unshift(await entry('board', robot.board, null));
+    const connections = (robot.connections || []).map(c => {
+      const out = { id: c.id, from: c.from, to: c.to };
+      if (c.net) out.net = c.net;
+      if (c.color) out.color = c.color;
+      if (c.cable) out.cable = c.cable;
+      return out;
+    });
+    return { parts, connections };
+  }
+
+  // Adds connections (from a 3D wire) to the saved diagram and saves it, with
+  // its picture drawn again; resolves with them, ids given. ctx: as diagram's,
+  // plus placeImage(url) to refresh the picture's link in the document.
+  async function addConnections(ctx, add) {
+    const { SP, saved, library } = await loadSaved(ctx, ctx.projectId);
+    if (!saved || !saved.data) throw new Error('The project has no wiring diagram yet: open Wiring to start one.');
+    const robot = JSON.parse(JSON.stringify(saved.data));
+    robot.connections = robot.connections || [];
+    const used = new Set(robot.connections.map(c => c.id));
+    const made = add.map(c => {
+      let id;
+      do { id = 'w' + Math.random().toString(36).slice(2, 8); } while (used.has(id));
+      used.add(id);
+      const out = { id, from: c.from, to: c.to };
+      if (c.net) out.net = c.net;
+      if (c.color) out.color = c.color;
+      if (c.cable) out.cable = c.cable;
+      return out;
+    });
+    robot.connections.push(...made);
+    // Drawn out of sight, for the saved picture.
+    const box = document.createElement('div');
+    box.setAttribute('aria-hidden', 'true');
+    box.style.cssText = 'position:fixed;left:-10000px;top:0;width:1200px;height:800px;visibility:hidden;pointer-events:none';
+    document.body.appendChild(box);
+    let svg;
+    try {
+      const handle = SP.mountWiring(box, { robot, libraries: [library], onChange: () => {} });
+      try { svg = await rasterizeSvgImages(await handle.exportSvg()); } finally { handle.unmount(); }
+    } finally {
+      box.remove();
+    }
+    const resp = await ctx.apiFetch(API + '/api/projects/' + ctx.projectId + '/wiring', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: robot, svg }),
+    });
+    if (!resp.ok) throw new Error('Could not save the wiring diagram (HTTP ' + resp.status + ').');
+    if (ctx.placeImage) ctx.placeImage(svgUrl(ctx.projectId) + '?v=' + Date.now());
+    return made;
+  }
+
+  // Keeps a model's 3D sockets on a catalog part (its definition's
+  // `sockets3d`), as a new revision, so every project using it gets them.
+  async function saveSockets(ctx, slug, sockets) {
+    raws.delete(slug);
+    const resp = await ctx.apiFetch(API + '/api/parts/' + encodeURIComponent(slug));
+    if (!resp.ok) throw new Error('Could not read the catalog part (HTTP ' + resp.status + ').');
+    const part = await resp.json();
+    if (!part.definition) throw new Error('The catalog part has no pins yet: add them on its page first.');
+    const definition = Object.assign({}, part.definition, { sockets3d: sockets });
+    const put = await ctx.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/definition?change_summary=' + encodeURIComponent('3D sockets for its model'), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(definition),
+    });
+    if (!put.ok) {
+      let detail = 'HTTP ' + put.status;
+      try { const j = await put.json(); if (typeof j.detail === 'string') detail = j.detail; } catch (_) {}
+      throw new Error(detail);
+    }
+  }
+
+  window.ProjectWiring = { open, pinoutFor, findImage, isWiringSrc, svgUrl, diagram, addConnections, saveSockets, portsOf };
 })();
