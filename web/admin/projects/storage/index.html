@@ -36,6 +36,12 @@ sitemap: false
     </div>
   </div>
 
+  <div id="load-error" class="d-none">
+    <div class="alert alert-warning mt-4">
+      <i class="fas fa-exclamation-triangle me-2"></i> <span></span>
+    </div>
+  </div>
+
   <div id="loading" class="text-center py-5">
     <div class="spinner-border text-primary" role="status"></div>
   </div>
@@ -176,15 +182,19 @@ sitemap: false
         document.getElementById('access-denied').classList.remove('d-none');
         return;
       }
-      if (!resp.ok) throw new Error('Failed');
+      if (resp.status === 404) throw new Error('The projects API doesn\u2019t have the storage report yet: redeploy projects-api on dev02 (docker compose up -d --build).');
+      if (!resp.ok) throw new Error('The storage report couldn\u2019t be loaded (HTTP ' + resp.status + ').');
       const body = await resp.json();
       limit = body.limit;
       projects = body.projects;
       document.getElementById('admin-content').classList.remove('d-none');
       render();
     } catch (e) {
+      // Not a permissions problem: say what went wrong instead.
       document.getElementById('loading').classList.add('d-none');
-      document.getElementById('access-denied').classList.remove('d-none');
+      const box = document.getElementById('load-error');
+      box.querySelector('span').textContent = e.message && e.message !== 'Failed to fetch' ? e.message : 'The projects API couldn\u2019t be reached.';
+      box.classList.remove('d-none');
     }
   }
 
