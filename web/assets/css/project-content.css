@@ -27,12 +27,13 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* The editor's box: parchment, a hairline border and round corners. */
+/* No box: the text sits straight on the page, with no border or inner
+   padding, so it gets the page's full width (phones most of all). */
 .project-doc {
-  padding: 1.25rem calc(1.25rem + 6px) calc(3rem - var(--block-gap));
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
 }
 
 .project-prose p,
@@ -477,18 +478,13 @@
   border-radius: 6px;
 }
 
-/* The last block's gap is in the box's own padding. */
+/* The last block keeps its gap above whatever follows the document. */
 .project-prose > :last-child {
   margin-bottom: var(--block-gap);
 }
 
-/* Narrow screens: a wide table scrolls sideways inside the box. */
+/* Narrow screens: a wide table scrolls sideways on the page. */
 @media (max-width: 575.98px) {
-  .project-doc {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
   .project-prose table {
     display: block;
     overflow-x: auto;
