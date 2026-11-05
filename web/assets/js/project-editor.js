@@ -1252,6 +1252,16 @@
         // its parts from: a <project>.model.json in Files & Models.
         loadModel: loadProjectModel,
         saveModel: saveProjectModel,
+        // The Wiring section's diagram, which 3D scenes' wires link to: they
+        // take its colours, "Add missing wires" routes its cables between
+        // sockets, a wire drawn in 3D first can be added to it, and a part's
+        // sockets can be kept on its catalog part.
+        wiring: {
+          load: () => (currentProject ? ProjectWiring.diagram(sceneWiringCtx()) : Promise.resolve(null)),
+          addConnections: list => ProjectWiring.addConnections(sceneWiringCtx(), list),
+          open: () => openWiring(),
+          saveSockets: (slug, sockets) => ProjectWiring.saveSockets(sceneWiringCtx(), slug, sockets),
+        },
         // Earlier versions of a graphic, kept because a version shows them.
         history: graphicHistory,
       },
@@ -1526,6 +1536,22 @@
         });
         if (parts.length) addBomRows(view, parts);
         else view.focus();
+      },
+    };
+  }
+
+  // What the wiring module needs to read and add to the saved diagram for a 3D scene.
+  function sceneWiringCtx() {
+    return {
+      projectId: currentProject && currentProject.id,
+      bomSlugs: () => {
+        const parsed = BomSync.parse(mde.view.state.doc.toString());
+        return parsed ? [...new Set(parsed.rows.map(r => r.part_slug).filter(Boolean))] : [];
+      },
+      apiFetch: (url, opts) => apiFetch(url, Object.assign({ credentials: 'include' }, opts || {})),
+      // The diagram's picture in the document shows the new connections.
+      placeImage: url => {
+        if (ProjectWiring.findImage(mde.view.state.doc.toString())) placeWiringImage(mde.view, url, null);
       },
     };
   }
