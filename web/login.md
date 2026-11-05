@@ -3,6 +3,7 @@ layout: content
 title: Login
 description: Login to your kevsrobots.com account
 hide_likes_and_comments: true
+thanks: false
 ---
 
 # Login
