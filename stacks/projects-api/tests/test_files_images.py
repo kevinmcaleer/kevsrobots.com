@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import os
 
 import pytest
 from .conftest import make_auth_header
@@ -481,20 +482,20 @@ async def test_storage_limit_skips_the_replaced_file(client, project_id, monkeyp
     headers = make_auth_header()
     first = await client.post(
         f"/api/projects/{project_id}/files",
-        files={"file": ("robot.model.json", b"x" * 60, "application/json")},
+        files={"file": ("robot.model.json", os.urandom(60), "application/json")},
         headers=headers,
     )
     assert first.status_code == 201
     over = await client.post(
         f"/api/projects/{project_id}/files",
-        files={"file": ("robot.model.json", b"y" * 60, "application/json")},
+        files={"file": ("robot.model.json", os.urandom(60), "application/json")},
         headers=headers,
     )
     assert over.status_code == 400
     assert "storage limit" in over.json()["detail"]
     ok = await client.post(
         f"/api/projects/{project_id}/files",
-        files={"file": ("robot.model.json", b"y" * 60, "application/json")},
+        files={"file": ("robot.model.json", os.urandom(60), "application/json")},
         data={"replaces": str(first.json()["id"])},
         headers=headers,
     )
@@ -516,7 +517,7 @@ async def test_storage_limit_skips_files_only_kept_for_versions(client, project_
     headers = make_auth_header()
     first = await client.post(
         f"/api/projects/{project_id}/files",
-        files={"file": ("a.py", b"x" * 60, "text/plain")},
+        files={"file": ("a.py", os.urandom(60), "text/plain")},
         headers=headers,
     )
     async with get_sessionmaker()() as s:
@@ -524,7 +525,7 @@ async def test_storage_limit_skips_files_only_kept_for_versions(client, project_
         await s.commit()
     ok = await client.post(
         f"/api/projects/{project_id}/files",
-        files={"file": ("b.py", b"y" * 60, "text/plain")},
+        files={"file": ("b.py", os.urandom(60), "text/plain")},
         headers=headers,
     )
     assert ok.status_code == 201

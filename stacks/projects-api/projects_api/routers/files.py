@@ -21,6 +21,8 @@ from .. import versions as v
 from ..schemas import FileResponse, FileUpdate, ImageResponse
 from ..storage import (
     MAX_THUMBNAIL_SIZE,
+    STORED_GZ,
+    compress_for_storage,
     delete_file,
     file_category,
     generate_filename,
@@ -236,13 +238,15 @@ async def upload_file(
     # counted, as the author can't free it; nor is the file this upload
     # replaces (the 3D scenes' <project>.model.json is uploaded anew on each
     # save, then the old one deleted, so it would otherwise count twice).
-    query = select(func.coalesce(func.sum(ProjectFile.file_size), 0)).where(
+    query = select(func.coalesce(func.sum(func.coalesce(ProjectFile.stored_size, ProjectFile.file_size)), 0)).where(
         ProjectFile.project_id == project_id, ProjectFile.removed_at.is_(None)
     )
     if replaces is not None:
         query = query.where(ProjectFile.id != replaces)
     total = await session.scalar(query) or 0
-    if total + len(content) > settings.max_project_storage:
+    # Counted as stored: a model is kept gzipped when that's smaller.
+    stored, packed = (content, False) if is_image(file.filename) else compress_for_storage(file.filename, content)
+    if total + len(stored) > settings.max_project_storage:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
             detail=f"Project storage limit exceeded ({settings.max_project_storage // (1024*1024)}MB)",
@@ -279,7 +283,7 @@ async def upload_file(
         await session.refresh(image)
         return ImageResponse.model_validate(image, from_attributes=True)
 
-    path = save_file(content, filename, project_id, "files")
+    path = save_file(stored, filename + STORED_GZ if packed else filename, project_id, "files")
     if path is None:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to save file")
 
@@ -288,6 +292,7 @@ async def upload_file(
         filename=file.filename,
         file_path=path,
         file_size=len(content),
+        stored_size=len(stored) if packed else None,
         file_type=file_category(file.filename),
     )
     session.add(record)

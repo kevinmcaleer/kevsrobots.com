@@ -1345,6 +1345,11 @@ async def add_supplier_kind_and_availability_if_missing() -> None:
     }, "issue #267")
 
 
+async def add_file_stored_size_if_missing() -> None:
+    """``project_files.stored_size``: bytes stored when gzipped."""
+    await _add_columns_if_missing("project_files", {"stored_size": "INTEGER"}, "compressed storage")
+
+
 async def add_print_details_columns_if_missing() -> None:
     """Files & Models print details: per-model qty, colour and filament,
     and the project's default Files & Models view."""

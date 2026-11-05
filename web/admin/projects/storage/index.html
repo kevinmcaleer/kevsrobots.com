@@ -26,8 +26,10 @@ sitemap: false
     <strong>Used</strong> is what counts toward each project's limit: its Files &amp; Models
     (3D scene models live in its <code>.model.json</code>). <strong>Kept</strong> is files
     taken out of the project but kept for a published version, which don't count.
-    Pictures and graphics never count, so only their number is shown. Click a project
-    to see its files.
+    Pictures and graphics never count, so only their number is shown. Models and other
+    text-heavy files are stored gzipped (downloads are the exact original), and sizes here
+    are as stored. Files uploaded before that can be compressed with <strong>Compress</strong>.
+    Click a project to see its files.
   </p>
 
   <div id="access-denied" class="d-none">
@@ -50,6 +52,7 @@ sitemap: false
     <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
       <input type="search" id="filter" class="form-control" style="max-width: 320px" placeholder="Filter by title or author">
       <span id="summary" class="text-muted small"></span>
+      <button type="button" id="compress-all" class="btn btn-sm btn-outline-primary ms-auto d-none"></button>
     </div>
     <div class="card">
       <div class="table-responsive">
@@ -125,12 +128,17 @@ sitemap: false
     else if (!files.length) inner = '<div class="text-muted small">No files.</div>';
     else inner = '<table class="table table-sm mb-0 storage-files"><thead><tr><th>File</th><th>Type</th><th class="text-end">Size</th><th>Uploaded</th><th></th><th>Used by versions</th></tr></thead><tbody>' +
       files.map(f => '<tr' + (f.removed_at ? ' class="text-muted"' : '') + '><td>' + esc(f.filename) + '</td><td>' + esc(f.file_type) +
-        '</td><td class="text-end">' + size(f.file_size) + '</td><td>' + esc((f.uploaded_at || '').slice(0, 10)) + '</td><td>' +
+        '</td><td class="text-end">' + size(f.stored_size || f.file_size) +
+        (f.stored_size && f.stored_size < f.file_size ? ' <span class="text-muted">(' + size(f.file_size) + ' unzipped)</span>' : '') + '</td><td>' + esc((f.uploaded_at || '').slice(0, 10)) + '</td><td>' +
         (f.removed_at ? '<span class="badge bg-secondary">kept for a version</span>' : '') + '</td><td>' +
         (f.versions && f.versions.length ? f.versions.map(n => 'v' + n).join(', ') : '') + '</td></tr>').join('') +
       '</tbody></table>';
+    const p = projects.find(x => x.project_id === pid);
+    const compress = p && p.compressible
+      ? ' · <button type="button" class="btn btn-sm btn-outline-primary py-0" data-compress="' + pid + '">Compress ' + p.compressible + ' file' + (p.compressible === 1 ? '' : 's') + '</button>'
+      : '';
     return '<tr class="table-light"><td colspan="10" class="px-4"><div class="small mb-1"><a href="/projects/editor.html?id=' + pid +
-      '">Open in editor</a></div>' + inner + '</td></tr>';
+      '">Open in editor</a>' + compress + '</div>' + inner + '</td></tr>';
   }
 
   function render() {
@@ -144,6 +152,10 @@ sitemap: false
     const near = list.filter(p => limit && p.used >= limit * 0.8).length;
     document.getElementById('summary').textContent = list.length + ' projects · ' + size(total) + ' used · limit ' + size(limit) +
       ' each' + (near ? ' · ' + near + ' at 80% or more' : '');
+    const waiting = projects.filter(p => p.compressible);
+    const all = document.getElementById('compress-all');
+    all.classList.toggle('d-none', !waiting.length);
+    if (!all.disabled) all.textContent = 'Compress ' + waiting.reduce((n, p) => n + p.compressible, 0) + ' files in ' + waiting.length + ' projects';
     document.getElementById('storage-body').innerHTML = list.map(function(p) {
       return '<tr class="project-row" data-pid="' + p.project_id + '">' +
         '<td><a href="/projects/view.html?id=' + p.project_id + '" onclick="event.stopPropagation()">' + esc(p.title || 'Untitled') + '</a> <span class="text-muted small">#' + p.project_id + '</span></td>' +
@@ -152,12 +164,51 @@ sitemap: false
         '<td class="text-end fw-semibold">' + size(p.used) + '</td>' +
         '<td>' + bar(p.used) + '</td>' +
         '<td class="text-end text-muted">' + (p.kept ? size(p.kept) + ' (' + p.kept_files + ')' : '') + '</td>' +
-        '<td class="text-end">' + p.files + '</td>' +
+        '<td class="text-end">' + p.files + (p.compressible ? ' <span class="badge bg-info text-dark" title="Files that can be compressed">' + p.compressible + ' to compress</span>' : '') + '</td>' +
         '<td class="text-end">' + p.images + '</td>' +
         '<td class="text-end">' + p.versions + '</td>' +
         '<td class="small">' + (p.largest_file ? esc(p.largest_file) + ' <span class="text-muted">' + size(p.largest_size) + '</span>' : '') + '</td>' +
       '</tr>' + (open === p.project_id ? filesRow(p.project_id) : '');
     }).join('');
+  }
+
+  async function compress(pid) {
+    const resp = await fetch(API + '/api/admin/storage/projects/' + pid + '/compress', { method: 'POST', credentials: 'include' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    delete filesCache[pid];
+    return resp.json();
+  }
+
+  async function reload() {
+    const resp = await fetch(API + '/api/admin/storage/projects', { credentials: 'include' });
+    if (resp.ok) {
+      const body = await resp.json();
+      limit = body.limit;
+      projects = body.projects;
+    }
+  }
+
+  async function runCompress(pids, button) {
+    if (!window.confirm('Compress the files of ' + pids.length + ' project' + (pids.length === 1 ? '' : 's') +
+      '? Each file is gzipped and checked before the original copy is replaced; downloads stay the same.')) return;
+    button.disabled = true;
+    let saved = 0, failed = 0, done = 0;
+    for (const pid of pids) {
+      button.textContent = 'Compressing ' + (done + 1) + ' of ' + pids.length + '…';
+      try {
+        const r = await compress(pid);
+        saved += r.saved;
+        failed += r.failed;
+      } catch (e) {
+        failed++;
+      }
+      done++;
+    }
+    await reload();
+    button.disabled = false;
+    render();
+    if (open !== null && !filesCache[open]) { const o = open; open = null; toggle(o); }
+    window.alert('Saved ' + size(saved) + (failed ? ', ' + failed + ' failed (left as they were)' : '') + '.');
   }
 
   async function toggle(pid) {
@@ -206,7 +257,12 @@ sitemap: false
       render();
     });
   });
+  document.getElementById('compress-all').addEventListener('click', function(e) {
+    runCompress(projects.filter(p => p.compressible).map(p => p.project_id), e.currentTarget);
+  });
   document.getElementById('storage-body').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-compress]');
+    if (btn) { runCompress([Number(btn.dataset.compress)], btn); return; }
     const row = e.target.closest('tr.project-row');
     if (row) toggle(Number(row.dataset.pid));
   });
