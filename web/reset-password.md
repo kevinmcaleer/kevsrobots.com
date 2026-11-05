@@ -2,6 +2,7 @@
 layout: content
 title: Reset Password
 description: Reset your password using a reset code
+thanks: false
 ---
 
 # Reset Password
