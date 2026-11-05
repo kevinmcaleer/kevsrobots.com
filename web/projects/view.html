@@ -1855,7 +1855,10 @@ description: View project details
         const b = e.target.closest('[data-models-view]');
         if (b) showModels(b.dataset.modelsView);
       });
-      showModels(pm.normaliseView(project && project.files_view));
+      // Phones open on the filmstrip whatever the author picked: the table's
+      // columns don't fit a phone screen. Visitors can still switch.
+      const phone = window.matchMedia('(max-width: 575.98px)').matches;
+      showModels(phone ? 'filmstrip' : pm.normaliseView(project && project.files_view));
     }
     if (others.length) {
       document.getElementById('view-files-section').classList.remove('d-none');
