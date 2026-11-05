@@ -473,6 +473,12 @@ class ProjectImage(Base):
     )
     # Issue #439: see ``ProjectFile.removed_at``.
     removed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    # Layers graphics (graphics.py): every render of one graphic shares
+    # ``graphic_id`` (the first render's id), and a render a newer one
+    # replaced has ``superseded_at``. Superseded renders leave the gallery;
+    # they're kept only while the text or a version shows them.
+    graphic_id: Mapped[Optional[int]] = mapped_column(Integer, index=True)
+    superseded_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
 
 class ProjectJournalEntry(Base):

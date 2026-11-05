@@ -1089,6 +1089,21 @@ a.part-link:hover,
   color: #6b6a63;
   font-size: 0.875rem;
 }
+.unplaced-pictures-tidy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 10px 16px 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f6f3ea;
+  color: #3d3d3a;
+  font-size: 0.875rem;
+}
+.unplaced-pictures-tidy span {
+  flex: 1 1 200px;
+}
 .unplaced-pictures-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

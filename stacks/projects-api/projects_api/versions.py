@@ -47,6 +47,7 @@ from .models import (
     ProjectVideo,
     ProjectWiring,
 )
+from .graphics import referenced_ids
 from .storage import delete_file, read_file, save_file
 from .visibility import DRAFT, NO_STORE
 
@@ -175,6 +176,8 @@ async def snapshot_project(session: AsyncSession, project: Project) -> dict:
         if schematic is not None
         else None
     )
+    # A graphic's old renders (graphics.py) only while the text still shows them.
+    shown = referenced_ids(pid, project.content_md, project.cover_image)
     snap["images"] = [
         _row(i, IMAGE_FIELDS)
         for i in (
@@ -184,6 +187,7 @@ async def snapshot_project(session: AsyncSession, project: Project) -> dict:
                 .order_by(ProjectImage.sort_order, ProjectImage.id)
             )
         ).all()
+        if getattr(i, "superseded_at", None) is None or i.id in shown
     ]
     snap["files"] = [
         _row(f, FILE_FIELDS)

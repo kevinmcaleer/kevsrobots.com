@@ -897,6 +897,9 @@ class ImageResponse(BaseModel):
     caption: Optional[str]
     sort_order: int
     uploaded_at: datetime
+    # Layers graphics: the first render's id, shared by all its renders.
+    graphic_id: Optional[int] = None
+    superseded_at: Optional[datetime] = None
 
 
 # --- Moderation schemas ---
