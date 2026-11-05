@@ -30,6 +30,7 @@ from ..schemas import (
     ProjectUpdate,
     RemixedFromRef,
 )
+from ..graphics import prune_superseded
 from ..sections import canonical_sections
 from ..slugs import slugify_title, unique_slug_for_author
 from ..visibility import is_draft, not_draft
@@ -552,6 +553,9 @@ async def update_project(
     if tags is not None:
         await _set_tags(session, project.id, tags)
     await session.flush()
+    # Old renders of Layers graphics the text no longer shows (graphics.py).
+    if "content_md" in update_data or "cover_image" in update_data:
+        await prune_superseded(session, project)
 
     # Epic #433: publishing is ``POST /publish`` now. Until every editor
     # uses it, ``status`` still works the old way: ``completed`` (or the

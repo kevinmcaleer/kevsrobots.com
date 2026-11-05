@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
-from fastapi.responses import Response
+from fastapi import APIRouter, Body, Depends, Form, HTTPException, Query, UploadFile, status
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +14,7 @@ from ..config import get_settings
 from ..db import get_session
 from ..models import Project, ProjectImage
 from ..visibility import NO_STORE
+from .. import graphics
 from .. import versions as v
 from ..schemas import ImageResponse
 from ..storage import (
@@ -45,7 +46,8 @@ async def list_images(
                 .order_by(ProjectImage.sort_order)
             )
         ).all()
-        return [ImageResponse.model_validate(i, from_attributes=True) for i in items]
+        # Old renders of a Layers graphic aren't gallery pictures (graphics.py).
+        return [ImageResponse.model_validate(i, from_attributes=True) for i in graphics.visible(items)]
     wanted = view.image_ids() or set()
     rows = (
         await session.scalars(
@@ -67,6 +69,9 @@ async def list_images(
 async def upload_image(
     project_id: int,
     file: UploadFile,
+    replaces: Optional[int] = Form(
+        None, description="A Layers graphic's picture this is a newer render of (graphics.py)"
+    ),
     user: str = Depends(require_terms_accepted),
     session: AsyncSession = Depends(get_session),
 ) -> ImageResponse:
@@ -96,9 +101,51 @@ async def upload_image(
         file_path=path,
     )
     session.add(record)
+    await session.flush()
+    await graphics.supersede(session, project, record, replaces)
     await session.commit()
     await session.refresh(record)
     return ImageResponse.model_validate(record, from_attributes=True)
+
+
+async def _own_project(session: AsyncSession, project_id: int, user: str) -> Project:
+    project = await session.get(Project, project_id)
+    if project is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    if project.author_username != user:
+        raise HTTPException(status.HTTP_403_FORBIDDEN)
+    return project
+
+
+@router.get("/history")
+async def graphic_histories(
+    project_id: int,
+    user: str = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """The author's Layers graphics' earlier renders that versions keep:
+    ``{"<current picture id>": [{id, uploaded_at, versions: [...]}, ...]}``."""
+    project = await _own_project(session, project_id, user)
+    data = await graphics.histories(session, project)
+    return JSONResponse({str(k): val for k, val in data.items()}, headers=NO_STORE)
+
+
+@router.post("/tidy-graphics")
+async def tidy_graphics(
+    project_id: int,
+    body: Optional[dict] = Body(None),
+    dry_run: bool = Query(False),
+    user: str = Depends(require_terms_accepted),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Clears old graphic renders the text doesn't show (graphics.py).
+    ``text``: the editor's text, if it has changes not saved yet."""
+    project = await _own_project(session, project_id, user)
+    text = (body or {}).get("text") if isinstance(body, dict) else None
+    result = await graphics.tidy_graphics(session, project, text=text if isinstance(text, str) else None, dry_run=dry_run)
+    if not dry_run:
+        await session.commit()
+    return result
 
 
 @router.get("/{image_id}/view")

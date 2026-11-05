@@ -1862,6 +1862,9 @@ async def add_project_version_columns_if_missing() -> None:
     )
     await _add_columns_if_missing("project_images", {"removed_at": "TIMESTAMP"}, "issue #439")
     await _add_columns_if_missing("project_files", {"removed_at": "TIMESTAMP"}, "issue #439")
+    await _add_columns_if_missing(
+        "project_images", {"graphic_id": "INTEGER", "superseded_at": "TIMESTAMP"}, "graphic renders"
+    )
 
 
 async def backfill_published_versions() -> None:

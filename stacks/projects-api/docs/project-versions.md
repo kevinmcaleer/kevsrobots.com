@@ -90,3 +90,26 @@ no live version gets v1 from its current row (`published_at` = its
 
 Not versioned: journal entries, makes, and the Instruction Builder's steps
 (they stay project-level).
+
+## Layers graphic renders
+
+Saving or updating a Layers graphic (`*.layers.png`) uploads a new render with
+`replaces=<old picture id>` (`POST /images`). Renders of one graphic share
+`graphic_id`; the replaced one gets `superseded_at` and leaves the gallery
+(`GET /images` and new snapshots leave it out unless the text still shows it).
+
+On the next save of the text, a superseded render older than an hour (time to
+undo) that the working copy doesn't show is deleted for good, or soft-removed
+(`removed_at`) when a version's page shows it. Those kept renders are the
+graphic's history: `GET /images/history` (author only) lists them per current
+render, with the versions that show each, for the editor's History button.
+
+"A version's page shows it" means its `content_md` or cover links to it, or,
+for a version with no `::: gallery` block, it is in the version's pictures
+(the page lists those under the text).
+
+`POST /images/tidy-graphics` (author only, `?dry_run=true` to count; body
+`{"text": …}` with the editor's unsaved text) clears renders made before they
+were linked: graphics the text doesn't show, deleted unless a version shows
+them (then kept for it, hidden). The "pictures aren't on your page" dialog
+offers it as "Tidy them away". Code: `projects_api/graphics.py`.

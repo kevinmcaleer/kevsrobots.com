@@ -1024,14 +1024,55 @@
   }
 
   // Pasted, dropped and picked images go into the project's gallery.
-  async function uploadEditorImage(file) {
+  // A graphic's new render says which picture it replaces (options.replaces,
+  // its old link): projects-api keeps the old one only while the text or a
+  // version shows it, so saving a graphic again doesn't add a picture.
+  async function uploadEditorImage(file, options) {
     if (!currentProject) {
       await saveProject();
       if (!currentProject) throw new Error('Add a title and save before adding images');
     }
-    const img = await uploadSingleImage(file);
+    const m = options && options.replaces && /\/projects\/(\d+)\/images\/(\d+)\/view/.exec(options.replaces);
+    const replaces = m && String(currentProject.id) === m[1] ? m[2] : null;
+    const img = await uploadSingleImage(file, replaces);
     loadImages();
     return imageViewUrl(img);
+  }
+
+  // A graphic's History button: its earlier renders that versions keep,
+  // from /images/history ({ "<picture id>": [{ id, uploaded_at, versions }] }).
+  let graphicHistories = null;
+  function loadGraphicHistories() {
+    if (!graphicHistories) {
+      graphicHistories = currentProject
+        ? apiFetch(API + '/api/projects/' + currentProject.id + '/images/history', { credentials: 'include' })
+          .then(resp => (resp.ok ? resp.json() : {}), () => ({}))
+        : Promise.resolve({});
+    }
+    return graphicHistories;
+  }
+  function historyDate(iso) {
+    if (!iso) return '';
+    const d = new Date(/Z|[+-]\d\d:?\d\d$/.test(iso) ? iso : iso + 'Z');
+    return isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  async function graphicHistory(url) {
+    const m = /\/images\/(\d+)\/view/.exec(url || '');
+    if (!m || !currentProject) return [];
+    const entries = (await loadGraphicHistories())[m[1]] || [];
+    return entries.map(e => {
+      const published = (e.versions || []).filter(v => v.kind === 'published');
+      const numbers = published.map(v => v.number);
+      const live = (e.versions || []).some(v => v.live);
+      const last = published[published.length - 1];
+      return {
+        url: imageViewUrl({ id: e.id }),
+        label: numbers.length
+          ? (numbers.length === 1 ? 'Version ' : 'Versions ') + numbers.join(', ') + (live ? ' \u00b7 live' : '')
+          : 'Saved before a restore',
+        detail: last && last.published_at ? 'Published ' + historyDate(last.published_at) : 'Saved ' + historyDate(e.uploaded_at),
+      };
+    });
   }
 
   function loadMermaidTools() {
@@ -1211,6 +1252,8 @@
         // its parts from: a <project>.model.json in Files & Models.
         loadModel: loadProjectModel,
         saveModel: saveProjectModel,
+        // Earlier versions of a graphic, kept because a version shows them.
+        history: graphicHistory,
       },
       // ```snakie: a gist / GitHub file (or code) as a runnable Snakie box.
       codeRenderers: {
@@ -3230,6 +3273,7 @@
   async function loadImages() {
     if (!currentProject) return;
     try { projectImages = await fetchProjectImages(); } catch (e) { return; }
+    graphicHistories = null;
     updateGalleryAddBar();
     if (window._recomputeCompleteness) window._recomputeCompleteness();
   }
@@ -3374,6 +3418,29 @@
         case 'add':
           if (img) addPicturesToGallery([galleryPicture(img)]);
           break;
+        case 'tidy-graphics': {
+          const n = unplaced.filter(isGraphicUpload).length;
+          if (!n || !confirm('Remove ' + n + ' old graphic ' + (n === 1 ? 'picture' : 'pictures') + ' your text doesn\u2019t show?\n\n' +
+            'Any that a published version shows are kept for it (out of your gallery); the rest are deleted for good.')) return;
+          action.disabled = true;
+          try {
+            const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images/tidy-graphics', {
+              method: 'POST', credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: mde.view.state.doc.toString() }),
+            });
+            if (!resp.ok) throw new Error('Couldn\u2019t tidy them (HTTP ' + resp.status + ')');
+            const done = await resp.json();
+            const gone = new Set([...(done.deleted_ids || []), ...(done.kept_ids || [])]);
+            projectImages = projectImages.filter(i => !gone.has(i.id));
+            loadImages();
+          } catch (err) {
+            action.disabled = false;
+            alert(err.message || 'Couldn\u2019t tidy them');
+            return;
+          }
+          break;
+        }
         case 'delete':
           if (!img || !confirm('Delete \u201c' + (img.filename || 'this picture') + '\u201d? This can\u2019t be undone.')) return;
           action.disabled = true;
@@ -3398,12 +3465,18 @@
     const unplaced = unplacedImages(mde.view.state.doc.toString());
     if (!unplaced.length) { dialog.close(); return; }
     const n = unplaced.length;
+    const graphics = unplaced.filter(isGraphicUpload).length;
     dialog.innerHTML =
       '<header class="unplaced-pictures-head">' +
         '<h2 id="unplaced-pictures-title">' + n + ' ' + (n === 1 ? 'picture isn\u2019t' : 'pictures aren\u2019t') + ' on your page</h2>' +
         '<button type="button" class="btn-close" data-action="close" aria-label="Close"></button>' +
       '</header>' +
       '<p class="unplaced-pictures-intro">You uploaded these, but your text doesn\u2019t show them. Add them to the gallery, or delete the ones you don\u2019t need.</p>' +
+      (graphics
+        ? '<p class="unplaced-pictures-tidy"><span>' + (graphics === 1 ? 'One is an old graphic' : graphics + ' are old graphics') +
+          ', saved each time a graphic changed.</span>' +
+          '<button type="button" class="btn btn-sm btn-outline-secondary" data-action="tidy-graphics">Tidy ' + (graphics === 1 ? 'it' : 'them') + ' away</button></p>'
+        : '') +
       '<ul class="unplaced-pictures-grid">' + unplaced.map(img =>
         '<li class="unplaced-picture">' +
           '<a class="unplaced-picture-thumb" href="' + escapeHtmlAttr(imageViewUrl(img)) + '" target="_blank" rel="noopener" title="Open full size">' +
@@ -3420,6 +3493,10 @@
         '<button type="button" class="btn btn-sm btn-link" data-action="close">Close</button>' +
         '<button type="button" class="btn btn-sm btn-success" data-action="add-all">Add ' + (n === 1 ? 'it' : 'all ' + n) + ' to the gallery</button>' +
       '</footer>';
+  }
+  // A Layers graphic's picture (graphicFileName in the editor names them *.layers.png).
+  function isGraphicUpload(img) {
+    return /\.layers\.png$/i.test(img.filename || '');
   }
   function openUnplacedDialog() {
     const dialog = unplacedDialog();
@@ -4054,9 +4131,10 @@
   }
 
   // Upload a single image via the images API.
-  async function uploadSingleImage(file) {
+  async function uploadSingleImage(file, replaces) {
     const form = new FormData();
     form.append('file', file);
+    if (replaces) form.append('replaces', String(replaces));
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', {
       method: 'POST', credentials: 'include', body: form,
     });
