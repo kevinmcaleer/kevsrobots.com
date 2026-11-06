@@ -866,26 +866,15 @@
     return { parts, connections };
   }
 
-  // Adds connections (from a 3D wire) to the saved diagram and saves it, with
-  // its picture drawn again; resolves with them, ids given. ctx: as diagram's,
-  // plus placeImage(url) to refresh the picture's link in the document.
-  async function addConnections(ctx, add) {
+  // Saves a changed diagram (`change(robot)` alters a copy of the saved one
+  // and returns what to resolve with), with its picture drawn again. ctx: as
+  // diagram's, plus placeImage(url) to refresh the picture's link in the document.
+  async function saveChanged(ctx, change) {
     const { SP, saved, library } = await loadSaved(ctx, ctx.projectId);
     if (!saved || !saved.data) throw new Error('The project has no wiring diagram yet: open Wiring to start one.');
     const robot = JSON.parse(JSON.stringify(saved.data));
     robot.connections = robot.connections || [];
-    const used = new Set(robot.connections.map(c => c.id));
-    const made = add.map(c => {
-      let id;
-      do { id = 'w' + Math.random().toString(36).slice(2, 8); } while (used.has(id));
-      used.add(id);
-      const out = { id, from: c.from, to: c.to };
-      if (c.net) out.net = c.net;
-      if (c.color) out.color = c.color;
-      if (c.cable) out.cable = c.cable;
-      return out;
-    });
-    robot.connections.push(...made);
+    const result = change(robot);
     // Drawn out of sight, for the saved picture.
     const box = document.createElement('div');
     box.setAttribute('aria-hidden', 'true');
@@ -905,7 +894,43 @@
     });
     if (!resp.ok) throw new Error('Could not save the wiring diagram (HTTP ' + resp.status + ').');
     if (ctx.placeImage) ctx.placeImage(svgUrl(ctx.projectId) + '?v=' + Date.now());
-    return made;
+    return result;
+  }
+
+  // Adds connections (from a 3D wire) to the saved diagram and saves it;
+  // resolves with them, ids given.
+  function addConnections(ctx, add) {
+    return saveChanged(ctx, robot => {
+      const used = new Set(robot.connections.map(c => c.id));
+      const made = add.map(c => {
+        let id;
+        do { id = 'w' + Math.random().toString(36).slice(2, 8); } while (used.has(id));
+        used.add(id);
+        const out = { id, from: c.from, to: c.to };
+        if (c.net) out.net = c.net;
+        if (c.color) out.color = c.color;
+        if (c.cable) out.cable = c.cable;
+        return out;
+      });
+      robot.connections.push(...made);
+      return made;
+    });
+  }
+
+  // Moves connections' ends to other pins (a 3D wire's end moved): changes
+  // are [{ id, from?, to? }] ("part.pin"); resolves with them as saved.
+  function updateConnections(ctx, changes) {
+    return saveChanged(ctx, robot => {
+      const out = [];
+      for (const ch of changes) {
+        const c = robot.connections.find(x => x.id === ch.id);
+        if (!c) throw new Error('The wiring diagram has no connection ' + ch.id + ' now: open Wiring to check it.');
+        if (typeof ch.from === 'string' && ch.from) c.from = ch.from;
+        if (typeof ch.to === 'string' && ch.to) c.to = ch.to;
+        out.push({ ...c });
+      }
+      return out;
+    });
   }
 
   // Keeps a model's 3D sockets on a catalog part (its definition's
@@ -930,5 +955,5 @@
     }
   }
 
-  window.ProjectWiring = { open, pinoutFor, findImage, isWiringSrc, svgUrl, diagram, bomModels, addConnections, saveSockets, portsOf };
+  window.ProjectWiring = { open, pinoutFor, findImage, isWiringSrc, svgUrl, diagram, bomModels, addConnections, updateConnections, saveSockets, portsOf };
 })();
