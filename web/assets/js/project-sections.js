@@ -22,6 +22,16 @@
       icon: 'M2.5 3.5h1v3M2.5 6.5h2M6.5 4h7M6.5 8h7M6.5 12h7M2.5 10.5h2l-2 2.5h2',
     },
     {
+      // The flat-pack booklet the editor's /Assembly guide draws from the
+      // project's 3D model (markdown-studio layersBlock.ts), a section of
+      // its own at the end. Not in the `/` menu: /Assembly guide adds it.
+      id: 'assembly-guide',
+      heading: 'Assembly guide',
+      keywords: ['booklet', 'flat-pack', 'ikea', 'manual', 'guide'],
+      icon: 'M8 4C6.5 3 4.5 2.5 2 2.5v10c2.5 0 4.5.5 6 1.5 1.5-1 3.5-1.5 6-1.5v-10c-2.5 0-4.5.5-6 1.5zM8 4v10',
+      menu: false,
+    },
+    {
       id: 'wiring',
       heading: 'Wiring',
       keywords: ['circuit', 'electronics', 'connections', 'schematic', 'pins'],
