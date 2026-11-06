@@ -45,7 +45,8 @@ async def sync_snakie_library(
     _admin: str = Depends(require_admin),
     session: AsyncSession = Depends(get_session),
 ) -> dict:
-    """Admin: import Snakie's Standard parts library from GitHub.
+    """Admin: import Snakie's Standard parts library from GitHub, plus the
+    catalog-only parts Snakie keeps out of the app (``kevsrobots-catalog``).
 
     The same import as ``python -m projects_api.import_snakie_parts --github``
     (Snakie is the master copy of the catalog). Parts are matched by slug,

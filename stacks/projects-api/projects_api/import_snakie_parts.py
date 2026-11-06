@@ -8,7 +8,10 @@ per part, each with ``parts.yml`` and optionally an image and a mesh.
 Snakie's Standard library is the master copy of the catalog, so
 ``--github`` downloads it straight from GitHub (the ``master`` branch, or
 the branch, tag or commit given) instead of needing a checkout on the
-server.
+server. It also brings in ``examples/parts/kevsrobots-catalog``: parts the
+site's catalog needs but Snakie must not offer, such as the Arduino UNO
+boards, which MicroPython doesn't run on. They are unpacked beside the
+Standard parts and imported the same way.
 
 Each part is matched to the catalog by slug (Snakie's ``id``), then by
 name, then by part number, and created as a draft when nothing matches.
@@ -54,6 +57,9 @@ logger = logging.getLogger(__name__)
 AUTHOR = "snakie-import"
 GITHUB_REPO = "kevinmcaleer/Snakie"
 GITHUB_LIBRARY_PATH = "examples/parts/snakie-standard"
+# Catalog-only parts (Snakie never loads this folder). Optional, so an older
+# ref without it still imports.
+GITHUB_CATALOG_ONLY_PATH = "examples/parts/kevsrobots-catalog"
 MESH_EXTENSIONS = {".stl", ".glb", ".gltf", ".obj"}
 
 
@@ -345,9 +351,23 @@ def extract_library(tarball: bytes, dest: Path, library_path: str = GITHUB_LIBRA
 
 
 def download_github_library(ref: str, dest: Path) -> Path:
+    """Download Snakie at ``ref`` and unpack the Standard library into
+    ``dest``, with the catalog-only parts beside it when the ref has them."""
     with urllib.request.urlopen(github_tarball_url(ref), timeout=120) as resp:
         data = resp.read()
-    return extract_library(data, dest)
+    return extract_catalog(data, dest)
+
+
+def extract_catalog(tarball: bytes, dest: Path) -> Path:
+    """The Standard library plus, if present, the catalog-only folder, in one
+    folder of parts. The catalog-only folder has no ``library.yml``, so the
+    Standard library's manifest still names the import."""
+    root = extract_library(tarball, dest)
+    try:
+        extract_library(tarball, dest, GITHUB_CATALOG_ONLY_PATH)
+    except ValueError:
+        pass
+    return root
 
 
 def main(argv: Optional[list[str]] = None) -> int:
