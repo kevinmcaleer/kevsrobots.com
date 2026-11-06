@@ -810,6 +810,29 @@
     return [...groups, ...headers, ...connectors];
   }
 
+  // A catalog part's 3-D model as a 3D scene takes it ({ url, file }), or
+  // null: STL or STEP only (a STEP one's link says so, as Layers reads it by
+  // its name).
+  function meshOf(slug, raw) {
+    const fmt = raw && raw.has_mesh ? String(raw.mesh_format || 'stl').toLowerCase() : '';
+    if (!/^(stl|step|stp)$/.test(fmt)) return null;
+    const url = API + '/api/parts/' + encodeURIComponent(slug) + '/mesh';
+    return { url: fmt === 'stl' ? url : url + '?as=' + encodeURIComponent(slug + '.' + fmt), file: slug + '.' + fmt };
+  }
+
+  // The parts list's catalog parts that have a 3-D model, for a 3D scene's
+  // "From the parts list" (a battery, a board, motors): Layers SceneModels.
+  async function bomModels(ctx) {
+    const slugs = ctx.bomSlugs();
+    const got = await Promise.all(slugs.map(async slug => {
+      const raw = await rawPart(slug, ctx);
+      const model = meshOf(slug, raw);
+      if (!model) return null;
+      return { url: model.url, file: model.file, title: (raw && raw.name) || slug, group: 'parts', slug };
+    }));
+    return got.filter(Boolean);
+  }
+
   // The saved diagram as 3D scenes see it ({ parts, connections }), or null
   // when there isn't one. ctx: { projectId, bomSlugs(), apiFetch() }.
   async function diagram(ctx) {
@@ -824,11 +847,8 @@
       if (sockets && Array.isArray(sockets.sockets)) out.sockets = sockets;
       // The catalog part's 3-D model, so a 3D scene can add it (STL or STEP;
       // a STEP one's link says so, as Layers reads it by its name).
-      const fmt = raw && raw.has_mesh ? String(raw.mesh_format || 'stl').toLowerCase() : '';
-      if (slug && /^(stl|step|stp)$/.test(fmt)) {
-        const url = API + '/api/parts/' + encodeURIComponent(slug) + '/mesh';
-        out.model = { url: fmt === 'stl' ? url : url + '?as=' + encodeURIComponent(slug + '.' + fmt), file: slug + '.' + fmt };
-      }
+      const model = slug ? meshOf(slug, raw) : null;
+      if (model) out.model = model;
       return out;
     };
     const parts = await Promise.all(robot.parts.map(p => entry(p.id, p.lib === BOM_LIB || p.lib === LIB ? p.part : null, p.label)));
@@ -906,5 +926,5 @@
     }
   }
 
-  window.ProjectWiring = { open, pinoutFor, findImage, isWiringSrc, svgUrl, diagram, addConnections, saveSockets, portsOf };
+  window.ProjectWiring = { open, pinoutFor, findImage, isWiringSrc, svgUrl, diagram, bomModels, addConnections, saveSockets, portsOf };
 })();
