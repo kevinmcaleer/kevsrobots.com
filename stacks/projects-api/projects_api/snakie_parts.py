@@ -112,3 +112,55 @@ def to_parts_yml(
     if mesh_url:
         out["mesh"] = mesh_url
     return yaml.safe_dump(out, sort_keys=False, allow_unicode=True, width=1000)
+
+
+# --- 3-D pin maps (``definition.sockets3d``) --------------------------------
+#
+# Where a part's pins are on its 3-D model, for wiring in project 3D scenes
+# (markdown-studio Layers' CatalogSockets: ``{size, sockets: [...]}``, each
+# socket a plug's place on a port or a bare pin). Saved from a scene with
+# "Save pins to the catalog part", or shipped with a Snakie part.
+
+PIN_MAP_SUMMARIES = ("3D sockets for its model", "3D pin map for its model")
+
+
+def pin_ports(definition: Optional[dict]) -> dict[str, list[str]]:
+    """A definition's ports as 3D scenes name them (project-wiring.js
+    ``portsOf``): each pin group, each header with ungrouped pins
+    (``header-<n>``), each connector (``connector-<n>``), its pin names."""
+    d = definition or {}
+    ports: dict[str, list[str]] = {}
+    for i, h in enumerate(d.get("headers") or []):
+        if not isinstance(h, dict):
+            continue
+        pins = [p for p in (h.get("pins") or []) if isinstance(p, dict) and p.get("name")]
+        for p in pins:
+            if p.get("group"):
+                ports.setdefault(str(p["group"]), []).append(str(p["name"]))
+        loose = [str(p["name"]) for p in pins if not p.get("group")]
+        if loose:
+            ports[f"header-{i + 1}"] = loose
+    for i, c in enumerate(d.get("connectors") or []):
+        if not isinstance(c, dict):
+            continue
+        names = [str(p["name"]) for p in (c.get("pins") or []) if isinstance(p, dict) and p.get("name")]
+        if names:
+            ports[f"connector-{i + 1}"] = names
+    return ports
+
+
+def pin_map_stats(definition: Optional[dict]) -> tuple[int, int]:
+    """(pins placed on the 3-D model, pins in the 2-D pinout)."""
+    ports = pin_ports(definition)
+    every = {n for names in ports.values() for n in names}
+    sockets = ((definition or {}).get("sockets3d") or {}).get("sockets") or []
+    placed: set[str] = set()
+    for s in sockets:
+        if not isinstance(s, dict):
+            continue
+        if s.get("connector") == "pin":
+            if s.get("pin") in every:
+                placed.add(str(s["pin"]))
+        elif s.get("port") in ports:
+            placed.update(ports[str(s["port"])])
+    return len(placed), len(every)
