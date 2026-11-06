@@ -269,6 +269,29 @@ def test_extract_library_keeps_only_the_standard_library(tmp_path) -> None:
     assert sorted(p.name for p in root.iterdir()) == ["library.yml", "pico"]
 
 
+def test_extract_catalog_adds_the_catalog_only_parts(tmp_path) -> None:
+    from projects_api.import_snakie_parts import extract_catalog
+    data = _tarball({
+        "Snakie-master/examples/parts/snakie-standard/library.yml": b"id: snakie-standard\n",
+        "Snakie-master/examples/parts/snakie-standard/pico/parts.yml": b"id: pico\nname: Pico\n",
+        "Snakie-master/examples/parts/kevsrobots-catalog/README.md": b"x",
+        "Snakie-master/examples/parts/kevsrobots-catalog/arduino-uno-r3/parts.yml": b"id: arduino-uno-r3\n",
+    })
+    root = extract_catalog(data, tmp_path / "lib")
+    assert (root / "pico" / "parts.yml").is_file()
+    assert (root / "arduino-uno-r3" / "parts.yml").read_text() == "id: arduino-uno-r3\n"
+    assert (root / "library.yml").read_text() == "id: snakie-standard\n"
+
+
+def test_extract_catalog_without_catalog_only_parts(tmp_path) -> None:
+    from projects_api.import_snakie_parts import extract_catalog
+    data = _tarball({
+        "Snakie-master/examples/parts/snakie-standard/pico/parts.yml": b"id: pico\n",
+    })
+    root = extract_catalog(data, tmp_path / "lib")
+    assert sorted(p.name for p in root.iterdir()) == ["pico"]
+
+
 def test_extract_library_without_the_library_fails(tmp_path) -> None:
     from projects_api.import_snakie_parts import extract_library
     with pytest.raises(ValueError):
