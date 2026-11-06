@@ -209,7 +209,6 @@
         <button type="button" class="btn btn-sm btn-primary" data-act="save"><i class="fas fa-save me-1"></i>Save</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" data-act="close">Close</button>
       </div>
-      <div class="project-wiring-warnings" hidden></div>
       <div class="project-wiring-body">
         <div class="project-wiring-canvas"><div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div></div>
         <aside class="project-wiring-bom" aria-label="Bill of Materials"></aside>
@@ -306,15 +305,6 @@
     $('[data-act=close]').addEventListener('click', close);
     $('[data-act=mode]').addEventListener('click', () => setMode(mode === 'full' ? 'inline' : 'full'));
 
-    function showWarnings() {
-      const box = $('.project-wiring-warnings');
-      // One line each: a part with two GND pins (both QWIIC ports, say)
-      // would say the same thing twice.
-      const list = handle ? handle.warnings().filter((w, i, all) => all.findIndex(x => x.message === w.message) === i) : [];
-      box.hidden = !list.length;
-      box.innerHTML = list.map(w => `<div class="project-wiring-warning is-${esc(w.kind)}"><i class="fas ${w.kind === 'short' || w.kind === 'rails' ? 'fa-bolt' : 'fa-triangle-exclamation'} me-1"></i>${esc(w.message)}</div>`).join('');
-    }
-
     const defOf = slug => library.parts.find(d => d.id === slug) || null;
 
     // Placeholders: one per unlinked row, and one for each placed
@@ -326,7 +316,7 @@
       bomLibrary = { id: BOM_LIB, name: 'Bill of Materials', parts: [...want].map(([id, name]) => Object.assign(WiringBom.placeholderPart(name), { id })) };
     }
 
-    function markDirty(text) { dirty = true; status(text || 'Not saved'); showWarnings(); drawBom(); }
+    function markDirty(text) { dirty = true; status(text || 'Not saved'); drawBom(); }
 
     try {
       const loaded = await loadSaved(ctx, projectId);
@@ -369,7 +359,6 @@
         status(ctx.bomRows().length ? '' : 'Add parts here, and they go in the Bill of Materials too.');
       }
       if (relinked) markDirty(relinked + (relinked === 1 ? ' placeholder was' : ' placeholders were') + ' swapped for the part linked in the Bill of Materials. Not saved');
-      showWarnings();
       drawBom();
       window.addEventListener('focus', onFocus);
       bomKey = JSON.stringify(ctx.bomRows());
