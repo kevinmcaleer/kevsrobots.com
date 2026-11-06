@@ -14,7 +14,11 @@
 //            caller gets back on a click: an element id on the view page,
 //            a line number in the editor.
 //   options  { extras: [{ text, key, section? }], onSelect(key, entry),
-//              empty: 'text when there are no headings' }
+//              empty: 'text when there are no headings',
+//              onMove(fromKey, toKey, after) }
+//            With `onMove` (the editor) the headings can be dragged to
+//            reorder them: an entry drops before or after (`after` true)
+//            another entry at its own level, and the caller moves the text.
 //            An extra with `section` (a canonical id) gets that section's
 //            icon, and is left out when a heading already names it.
 // Returns { links: Map(key -> <a>), setActive(key) }.
@@ -67,9 +71,11 @@
       const e = node.entry;
       const cls = [sub ? 'kr-toc-sub' : '', node.section ? 'kr-toc-section' : ''].filter(Boolean).join(' ');
       const icon = node.section ? window.ProjectSections.iconSvg(node.section) : '';
+      const drag = opts.onMove && !node.extra;
       return '<a href="' + (typeof e.key === 'string' ? '#' + esc(e.key) : '#') + '"' +
-        (cls ? ' class="' + cls + '"' : '') + ' data-toc-key="' + esc(e.key) + '">' +
-        icon + '<span>' + esc(e.text) + '</span></a>';
+        (cls ? ' class="' + cls + '"' : '') + ' data-toc-key="' + esc(e.key) + '"' +
+        (drag ? ' draggable="true" data-toc-level="' + esc(e.level) + '" title="Drag to move this section"' : '') + '>' +
+        icon + '<span>' + esc(e.text) + '</span>' + (drag ? GRIP : '') + '</a>';
     }
     function items(nodes, sub) {
       return nodes.map(n => '<li>' + link(n, sub) +
@@ -107,7 +113,79 @@
       });
     });
 
+    if (opts.onMove) dragToReorder(nav, opts.onMove);
     return { links, setActive };
+  }
+
+  // A six-dot grip, shown on hover, that says the entry can be dragged.
+  const GRIP = '<svg class="kr-toc-grip" width="10" height="14" viewBox="0 0 10 14" aria-hidden="true">' +
+    [3, 7].map(x => [3, 7, 11].map(y => '<circle cx="' + x + '" cy="' + y + '" r="1.2"/>').join('')).join('') +
+    '</svg>';
+
+  // Drag an entry onto another at its level: the top half of the target
+  // (with its sub-headings) drops before it, the bottom half after it.
+  function dragToReorder(nav, onMove) {
+    let dragged = null; // the dragged <a>
+    let target = null;  // { li, a, after }
+
+    function clearMark() {
+      if (target) target.li.classList.remove('kr-toc-drop-before', 'kr-toc-drop-after');
+      target = null;
+    }
+
+    // The <li> under the pointer whose own entry is at the dragged level.
+    function dropTarget(ev) {
+      const level = dragged.dataset.tocLevel;
+      let li = ev.target.closest && ev.target.closest('li');
+      while (li && nav.contains(li)) {
+        const a = li.querySelector(':scope > a[data-toc-key]');
+        if (a && a.dataset.tocLevel === level) {
+          if (a === dragged) return null;
+          const r = li.getBoundingClientRect();
+          return { li, a, after: ev.clientY > r.top + r.height / 2 };
+        }
+        li = li.parentElement && li.parentElement.closest('li');
+      }
+      return null;
+    }
+
+    nav.addEventListener('dragstart', ev => {
+      const a = ev.target.closest && ev.target.closest('a[draggable="true"]');
+      if (!a) return;
+      dragged = a;
+      a.classList.add('is-dragging');
+      nav.classList.add('kr-toc-dragging');
+      ev.dataTransfer.effectAllowed = 'move';
+      try { ev.dataTransfer.setData('text/plain', a.textContent); } catch (_) {}
+    });
+    nav.addEventListener('dragover', ev => {
+      if (!dragged) return;
+      const t = dropTarget(ev);
+      clearMark();
+      if (!t) return;
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = 'move';
+      target = t;
+      t.li.classList.add(t.after ? 'kr-toc-drop-after' : 'kr-toc-drop-before');
+    });
+    nav.addEventListener('dragleave', ev => {
+      if (!nav.contains(ev.relatedTarget)) clearMark();
+    });
+    nav.addEventListener('drop', ev => {
+      if (!dragged || !target) return;
+      ev.preventDefault();
+      const from = dragged.dataset.tocKey;
+      const to = target.a.dataset.tocKey;
+      const after = target.after;
+      clearMark();
+      onMove(from, to, after);
+    });
+    nav.addEventListener('dragend', () => {
+      clearMark();
+      if (dragged) dragged.classList.remove('is-dragging');
+      nav.classList.remove('kr-toc-dragging');
+      dragged = null;
+    });
   }
 
   window.ProjectToc = { group, render };
