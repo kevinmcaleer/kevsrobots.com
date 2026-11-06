@@ -46,6 +46,27 @@
   // at the same place.
   a:not(.kr-toc-section)::before { content: ''; flex: none; width: 16px; }
 
+  // Dragging headings to reorder the sections (editor only).
+  a[draggable="true"] { cursor: grab; }
+  .kr-toc-grip { flex: none; width: 10px; height: 14px; margin-left: auto; fill: currentColor; opacity: 0; color: var(--muted, #{$kr-ink-soft}); }
+  a[draggable="true"]:hover .kr-toc-grip { opacity: 0.7; }
+  a.is-dragging { opacity: 0.4; }
+  &.kr-toc-dragging a { cursor: grabbing; }
+  li { position: relative; }
+  li.kr-toc-drop-before::before,
+  li.kr-toc-drop-after::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--accent-strong, #{$kevred});
+    pointer-events: none;
+  }
+  li.kr-toc-drop-before::before { top: -2px; }
+  li.kr-toc-drop-after::after { bottom: -2px; }
+
   .kr-toc-extras { padding-top: 0.6rem; border-top: 1px solid $kr-line; }
   .kr-toc-empty { color: $kr-ink-soft; font-size: 0.8rem; font-style: italic; padding: 0.3rem 0.7rem; }
 }

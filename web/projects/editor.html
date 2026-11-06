@@ -304,6 +304,7 @@ hide_nibsy: true
 <!-- Issue #257: the Project `/` commands, the canonical section names
      they insert, and the YouTube embed shared with the view page. -->
 <script src="/assets/js/project-sections.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-section-move.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/page-jump.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
@@ -402,6 +403,33 @@ hide_nibsy: true
     PageJump.toEditorLine(window.projectMarkdownEditor, line, { offset: stickyTop() + 16 });
   }
 
+  // Dragging a heading in "On this page" moves its whole section (the
+  // heading, its text and its sub-headings, up to the next heading at its
+  // level or above) before or after another section's. One change, so
+  // Ctrl+Z puts it back. Lines are counted from 0.
+  function moveSection(fromLine, toLine, after) {
+    const editor = window.projectMarkdownEditor;
+    if (!editor || !editor.view || editor.view.state.readOnly) return;
+    const md = editor.getDoc();
+    const result = ProjectSectionMove.move(md, ProjectSections.headings(md), fromLine, toLine, after);
+    if (!result) return;
+    const view = editor.view;
+    // Replace only the part that changed.
+    let a = 0;
+    while (a < md.length && a < result.doc.length && md[a] === result.doc[a]) a++;
+    let b = 0;
+    while (b < md.length - a && b < result.doc.length - a &&
+           md[md.length - 1 - b] === result.doc[result.doc.length - 1 - b]) b++;
+    const headingAt = result.doc.split('\n').slice(0, result.line).join('\n').length + (result.line ? 1 : 0);
+    view.dispatch({
+      changes: { from: a, to: md.length - b, insert: result.doc.slice(a, result.doc.length - b) },
+      selection: { anchor: headingAt },
+      userEvent: 'move.section',
+    });
+    render();
+    scrollToLine(result.line);
+  }
+
   // Issue #259: the same "On this page" as the project page, built by
   // project-toc.js: H1s with their H2s in document order (canonical
   // sections marked with icons), then the editor's own cards.
@@ -428,6 +456,7 @@ hide_nibsy: true
         if (typeof key === 'string') scrollToSection(key);
         else scrollToLine(key);
       },
+      onMove: editor ? (from, to, after) => moveSection(Number(from), Number(to), after) : null,
     });
     showDuplicates(duplicateHeadings(headings), toc);
   }
