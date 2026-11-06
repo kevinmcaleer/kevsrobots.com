@@ -59,19 +59,6 @@
   border-bottom: 1px solid #e3e0d6;
   background: #fff;
 }
-.project-wiring-warnings {
-  padding: 0.35rem 0.75rem;
-  border-bottom: 1px solid #f0d9a8;
-  background: #fff8e6;
-  font-size: 0.8125rem;
-  max-height: 6.5rem;
-  overflow: auto;
-}
-.project-wiring-warning.is-short,
-.project-wiring-warning.is-rails {
-  color: #9a2b12;
-  font-weight: 600;
-}
 .project-wiring-canvas {
   position: relative;
   flex: 1;
