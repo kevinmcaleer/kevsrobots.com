@@ -1187,6 +1187,10 @@
     if (window.ResizeObserver) new ResizeObserver(update).observe(bar);
   }
 
+  // Called on every change to the text, for open tools that follow it (the
+  // wiring workspace's Bill of Materials list follows the table's Qty).
+  const docWatchers = new Set();
+
   function initEditor() {
     if (mde) return;
     // The default toolbar, with Raw (which has line numbers) in place of Preview and Side by side.
@@ -1328,6 +1332,7 @@
       scheduleGalleryAddBar();
       schedulePinout();
       scheduleFilesPlacement();
+      docWatchers.forEach(fn => { try { fn(); } catch (_) {} });
     });
     schedulePinout();
     scheduleFilesPlacement();
@@ -1596,6 +1601,7 @@
         const parsed = BomSync.parse(view.state.doc.toString());
         return parsed ? parsed.rows.map(r => ({ name: r.name, slug: r.part_slug, qty: r.quantity })) : [];
       },
+      onDocChange: fn => { docWatchers.add(fn); return () => docWatchers.delete(fn); },
       setBomQty: (slug, qty) => {
         const edit = BomSync.setRowQty(view.state.doc.toString(), slug, qty);
         if (!edit) return false;

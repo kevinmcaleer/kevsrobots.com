@@ -167,6 +167,8 @@
   //   wiringSaved(block)    the pinout table the just-saved wiring makes;
   //                         returns { stale } for the table in the text
   //   apiFetch(url, opts)   fetch with the signed-in user's token
+  //   onDocChange(fn)       (optional) calls fn on each change to the text;
+  //                         returns a function that stops it
   // where: where it opens. { block, onForcedClose(fn) }: in the document,
   // in the editor's host block (MarkdownEditor openBlock: { element,
   // close() }), with a button to go full screen and back; the host calls
@@ -261,6 +263,9 @@
     let handle = null;
     let dirty = false;
     let closed = false;
+    let unwatchDoc = null;
+    let bomEditTimer = null;
+    let bomKey = null;
     let library = { id: LIB, name: 'This project', parts: [] };
     let bomLibrary = { id: BOM_LIB, name: 'Bill of Materials', parts: [] };
     let startSlugs = new Set();
@@ -278,6 +283,8 @@
       document.body.classList.remove('project-wiring-open');
       document.removeEventListener('keydown', onKey, true);
       window.removeEventListener('focus', onFocus);
+      if (unwatchDoc) unwatchDoc();
+      clearTimeout(bomEditTimer);
       if (block) block.close();
     }
     function close() {
@@ -365,6 +372,8 @@
       showWarnings();
       drawBom();
       window.addEventListener('focus', onFocus);
+      bomKey = JSON.stringify(ctx.bomRows());
+      if (ctx.onDocChange) unwatchDoc = ctx.onDocChange(onDocEdited);
     } catch (e) {
       $('.project-wiring-canvas').innerHTML = '<div class="alert alert-danger m-3">' + esc(e.message || e) + '</div>';
       return;
@@ -517,6 +526,32 @@
       } catch (err) {
         dlg.querySelector('.pwp-body').innerHTML = '<div class="alert alert-danger m-3">' + esc(err.message || err) + '</div>';
       }
+    }
+
+    // The Bill of Materials edited while the workspace is open (a Qty
+    // stepped up, a row added or renamed): the list follows it, so "1 of 2
+    // on the canvas" and Add another show up without closing the wiring.
+    function onDocEdited() {
+      clearTimeout(bomEditTimer);
+      bomEditTimer = setTimeout(() => {
+        if (closed || !handle) return;
+        const key = JSON.stringify(ctx.bomRows());
+        if (key === bomKey) return;
+        bomKey = key;
+        const before = bomLibrary.parts.map(d => d.id).join('\n');
+        syncPlaceholders(handle.robot());
+        if (bomLibrary.parts.map(d => d.id).join('\n') !== before) handle.setLibraries(libraries());
+        drawBom();
+        // A row linked in the table since: its part, so it can go on.
+        const missing = [...new Set(ctx.bomRows().map(r => r.slug).filter(s => s && !defOf(s)))];
+        if (missing.length) {
+          Promise.all(missing.map(s => definition(s))).then(found => {
+            if (closed || !handle) return;
+            const got = found.filter(Boolean).map(d => WiringBom.withFallbackImage(d));
+            if (got.length) { addToLibrary(got); drawBom(); }
+          });
+        }
+      }, 250);
     }
 
     // Back from editing a part in another tab (its part page): read the
