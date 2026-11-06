@@ -169,9 +169,16 @@
   background: #e8f4fd;
 }
 
-#view-content img {
+#view-content img,
+#view-content video.project-animated-model {
   max-width: 100%;
   border-radius: 6px;
+}
+
+/* An animated model (MP4): sized like a picture, no player chrome. */
+video.project-animated-model {
+  display: block;
+  height: auto;
 }
 
 /* Image picker popover */
