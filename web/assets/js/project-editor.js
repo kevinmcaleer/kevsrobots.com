@@ -1235,7 +1235,10 @@
         listModels: async () => {
           if (!currentProject) return [];
           if (!projectFiles.length) await loadFiles();
-          return projectFiles
+          // The parts list's catalog parts with 3-D models come first, as
+          // "From the parts list" (they link to the wiring diagram's parts).
+          const parts = await ProjectWiring.bomModels(sceneWiringCtx()).catch(() => []);
+          return parts.concat(projectFiles
             .filter(f => /\.(stl|step|stp)$/i.test(f.filename || ''))
             .map(f => ({
               url: fileDownloadUrl(f) + '?preview=1',
@@ -1245,7 +1248,7 @@
                 const resp = await apiFetch(fileThumbUrl(f), { credentials: 'include' });
                 return resp.ok ? resp.blob() : null;
               } : undefined,
-            }));
+            })));
         },
         fetchModel: async url => {
           const resp = await apiFetch(url, { credentials: 'include' });
