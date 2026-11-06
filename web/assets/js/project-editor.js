@@ -1266,7 +1266,9 @@
         wiring: {
           load: () => (currentProject ? ProjectWiring.diagram(sceneWiringCtx()) : Promise.resolve(null)),
           addConnections: list => ProjectWiring.addConnections(sceneWiringCtx(), list),
-          open: () => openWiring(),
+          // Over the 3D scene (which hides meanwhile); the scene reads the
+          // diagram again once it's closed.
+          open: () => openWiringOverScene(),
           saveSockets: (slug, sockets) => ProjectWiring.saveSockets(sceneWiringCtx(), slug, sockets),
         },
         // Earlier versions of a graphic, kept because a version shows them.
@@ -1573,15 +1575,30 @@
   // Full screen button; a new wiring opens after the cursor's line, and
   // its diagram goes there when it's first saved.
   let wiringBlock = null;
-  function openWiring() {
+  // The wiring diagram full screen, from a 3D scene: the scene's overlay
+  // (Layers, on top of everything) hides while it's open, and comes back
+  // when it closes. Resolves then.
+  function openWiringOverScene() {
+    return new Promise(resolve => {
+      const scenes = [...document.querySelectorAll('.lyr-overlay')];
+      scenes.forEach(el => { el.style.visibility = 'hidden'; });
+      const back = () => {
+        scenes.forEach(el => { el.style.visibility = ''; });
+        resolve();
+      };
+      Promise.resolve(openWiring({ full: true, onClose: back })).catch(back);
+    });
+  }
+
+  function openWiring(over) {
     const view = mde.view;
-    if (wiringBlock && wiringBlock.isOpen()) {
+    if (!over && wiringBlock && wiringBlock.isOpen()) {
       wiringBlock.element.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       return;
     }
     let block = null;
     let forced = null;
-    if (typeof mde.openBlock === 'function') {
+    if (!over && typeof mde.openBlock === 'function') {
       const found = ProjectWiring.findImage(view.state.doc.toString());
       block = mde.openBlock(found ? found.index : view.state.selection.main.head, {
         estimatedHeight: 560,
@@ -1625,7 +1642,7 @@
         return checkPinout();
       },
       apiFetch: (url, opts) => apiFetch(url, Object.assign({ credentials: 'include' }, opts || {})),
-    }, block ? { block, onForcedClose: fn => { forced = fn; } } : null);
+    }, block ? { block, onForcedClose: fn => { forced = fn; } } : over ? { onClose: over.onClose } : null);
   }
 
   // The wiring diagram in the text: its link refreshed when it's there,

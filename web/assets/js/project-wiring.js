@@ -173,11 +173,12 @@
   // in the editor's host block (MarkdownEditor openBlock: { element,
   // close() }), with a button to go full screen and back; the host calls
   // the fn onForcedClose gives it when the editor closes the block itself.
-  // Without a block it opens full screen, as it used to.
+  // Without a block it opens full screen, as it used to. onClose() (either
+  // way) is called once it has closed (a 3D scene shows itself again).
   async function open(ctx, where) {
     const block = where && where.block ? where.block : null;
     const projectId = await ctx.projectId();
-    if (!projectId) { if (block) block.close(); return; }
+    if (!projectId) { if (block) block.close(); if (where && where.onClose) where.onClose(); return; }
     // The workspace. In the page it sits in the block; full screen, it
     // moves into an overlay on the body (the same element, so the canvas
     // keeps everything), and back.
@@ -285,6 +286,7 @@
       if (unwatchDoc) unwatchDoc();
       clearTimeout(bomEditTimer);
       if (block) block.close();
+      if (where && where.onClose) where.onClose();
     }
     function close() {
       if (closed) return;
