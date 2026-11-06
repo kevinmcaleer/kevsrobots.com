@@ -1276,6 +1276,7 @@
         wiring: {
           load: () => (currentProject ? ProjectWiring.diagram(sceneWiringCtx()) : Promise.resolve(null)),
           addConnections: list => ProjectWiring.addConnections(sceneWiringCtx(), list),
+          updateConnections: changes => ProjectWiring.updateConnections(sceneWiringCtx(), changes),
           // Over the 3D scene (which hides meanwhile); the scene reads the
           // diagram again once it's closed.
           open: () => openWiringOverScene(),
