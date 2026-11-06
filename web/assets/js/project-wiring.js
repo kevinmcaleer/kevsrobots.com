@@ -787,6 +787,13 @@
       const out = { id, name: label || (def && def.name) || (raw && raw.name) || id, ports: portsOf(def) };
       if (slug && raw) out.slug = slug;
       if (sockets && Array.isArray(sockets.sockets)) out.sockets = sockets;
+      // The catalog part's 3-D model, so a 3D scene can add it (STL or STEP;
+      // a STEP one's link says so, as Layers reads it by its name).
+      const fmt = raw && raw.has_mesh ? String(raw.mesh_format || 'stl').toLowerCase() : '';
+      if (slug && /^(stl|step|stp)$/.test(fmt)) {
+        const url = API + '/api/parts/' + encodeURIComponent(slug) + '/mesh';
+        out.model = { url: fmt === 'stl' ? url : url + '?as=' + encodeURIComponent(slug + '.' + fmt), file: slug + '.' + fmt };
+      }
       return out;
     };
     const parts = await Promise.all(robot.parts.map(p => entry(p.id, p.lib === BOM_LIB || p.lib === LIB ? p.part : null, p.label)));
