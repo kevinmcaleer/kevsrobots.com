@@ -1927,9 +1927,10 @@
     });
   }
 
-  // "Edit wiring" / "Edit diagram" on those images in the live view. The
-  // editor redraws its images at will, so the buttons go back on whenever
-  // one appears.
+  // "Edit wiring" / "Edit diagram" on those images in the live view, and a
+  // double-click on the picture does the same. The editor redraws its images
+  // at will, so the buttons go back on whenever one appears. (Layers graphics
+  // and 3D scenes open on a double-click in the editor bundle itself.)
   function setupImageEditButtons(mde) {
     const root = mde.view.dom;
     const button = (wrap, icon, label, run) => {
@@ -1947,9 +1948,23 @@
         const img = wrap.querySelector('img.cm-md-image');
         if (!img || wrap.querySelector('.project-wiring-edit')) return;
         const src = img.getAttribute('src');
-        if (ProjectWiring.isWiringSrc(src)) button(wrap, 'fa-plug', 'Edit wiring', openWiring);
+        const onDoubleClick = (what, run) => {
+          img.title = 'Click to change the picture, double-click to edit the ' + what;
+          // Tells the editor a double-click opens something, so a single
+          // click's popover waits for it (markdown-editor livePreview.ts).
+          img.dataset.mdDoubleClick = what;
+          img.addEventListener('dblclick', e => { e.preventDefault(); run(); });
+        };
+        if (ProjectWiring.isWiringSrc(src)) {
+          button(wrap, 'fa-plug', 'Edit wiring', openWiring);
+          onDoubleClick('wiring', openWiring);
+        }
         const id = diagramSrcId(src);
-        if (id) button(wrap, 'fa-shapes', 'Edit diagram', () => currentProject && openDiagram(id));
+        if (id) {
+          const edit = () => currentProject && openDiagram(id);
+          button(wrap, 'fa-shapes', 'Edit diagram', edit);
+          onDoubleClick('diagram', edit);
+        }
       });
     };
     new MutationObserver(decorate).observe(root, { childList: true, subtree: true });
