@@ -541,3 +541,68 @@ async def test_storage_usage_for_the_author(client, project_id) -> None:
     assert (await client.get(f"/api/projects/{project_id}/files/usage", headers=headers)).json()["used"] == 500
     assert (await client.get(f"/api/projects/{project_id}/files/usage", headers=make_auth_header("other_user"))).status_code == 403
     assert (await client.get(f"/api/projects/{project_id}/files/usage")).status_code == 401
+
+
+# --- /Animated model as an MP4 ---------------------------------------------
+#
+# The editor saves the animated model as a short MP4 where the browser can
+# encode one. It goes in through the images endpoint and is served as
+# video/mp4 with byte ranges, which Safari needs to play a video.
+
+_MP4 = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2" + bytes(range(256)) * 4
+
+
+async def _upload_mp4(client, project_id) -> int:
+    resp = await client.post(
+        f"/api/projects/{project_id}/images",
+        files={"file": ("animated-model.mp4", _MP4, "video/mp4")},
+        headers=make_auth_header(),
+    )
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["filename"] == "animated-model.mp4"
+    return resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_animation_mp4_served_as_video(client, project_id) -> None:
+    image_id = await _upload_mp4(client, project_id)
+    resp = await client.get(f"/api/projects/{project_id}/images/{image_id}/view", headers=make_auth_header())
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "video/mp4"
+    assert resp.headers["accept-ranges"] == "bytes"
+    assert resp.content == _MP4
+
+
+@pytest.mark.asyncio
+async def test_animation_mp4_byte_ranges(client, project_id) -> None:
+    image_id = await _upload_mp4(client, project_id)
+    url = f"/api/projects/{project_id}/images/{image_id}/view"
+    auth = make_auth_header()
+    size = len(_MP4)
+
+    resp = await client.get(url, headers={**auth, "Range": "bytes=0-1"})
+    assert resp.status_code == 206
+    assert resp.content == _MP4[:2]
+    assert resp.headers["content-range"] == f"bytes 0-1/{size}"
+
+    resp = await client.get(url, headers={**auth, "Range": "bytes=100-"})
+    assert resp.status_code == 206
+    assert resp.content == _MP4[100:]
+
+    resp = await client.get(url, headers={**auth, "Range": "bytes=-10"})
+    assert resp.status_code == 206
+    assert resp.content == _MP4[-10:]
+
+    resp = await client.get(url, headers={**auth, "Range": f"bytes={size}-"})
+    assert resp.status_code == 416
+    assert resp.headers["content-range"] == f"bytes */{size}"
+
+
+@pytest.mark.asyncio
+async def test_other_video_types_still_refused(client, project_id) -> None:
+    resp = await client.post(
+        f"/api/projects/{project_id}/images",
+        files={"file": ("clip.mov", b"x", "video/quicktime")},
+        headers=make_auth_header(),
+    )
+    assert resp.status_code == 400

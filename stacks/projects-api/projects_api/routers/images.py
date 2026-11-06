@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Body, Depends, Form, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Body, Depends, Form, HTTPException, Query, Request, UploadFile, status
 from fastapi.responses import JSONResponse, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,6 +19,7 @@ from .. import versions as v
 from ..schemas import ImageResponse
 from ..storage import (
     ALLOWED_IMAGE_EXTENSIONS,
+    ANIMATION_VIDEO_EXTENSIONS,
     delete_file,
     generate_filename,
     read_file,
@@ -85,7 +86,7 @@ async def upload_image(
     content = await file.read()
 
     ext = "." + file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
-    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+    if ext not in ALLOWED_IMAGE_EXTENSIONS | ANIMATION_VIDEO_EXTENSIONS:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=f"Image type {ext} not allowed")
     if len(content) > settings.max_image_size:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Image too large")
@@ -152,6 +153,7 @@ async def tidy_graphics(
 async def view_image(
     project_id: int,
     image_id: int,
+    request: Request,
     session: AsyncSession = Depends(get_session),
     user: Optional[str] = Depends(get_optional_user),
 ) -> Response:
@@ -175,12 +177,49 @@ async def view_image(
 
     ext = record.filename.rsplit(".", 1)[-1].lower() if "." in record.filename else "png"
     media_types = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
-                   "gif": "image/gif", "webp": "image/webp", "svg": "image/svg+xml"}
-    return Response(
-        content=data,
-        media_type=media_types.get(ext, "application/octet-stream"),
-        headers={"Cache-Control": "private, no-store"} if draft else None,
-    )
+                   "gif": "image/gif", "webp": "image/webp", "svg": "image/svg+xml",
+                   "mp4": "video/mp4"}
+    media_type = media_types.get(ext, "application/octet-stream")
+    headers = {"Cache-Control": "private, no-store"} if draft else {}
+    if media_type.startswith("video/"):
+        # Safari plays a video only from a server that answers byte ranges.
+        headers["Accept-Ranges"] = "bytes"
+        span = _byte_range(request.headers.get("range"), len(data))
+        if span == "bad":
+            return Response(status_code=416, headers={**headers, "Content-Range": f"bytes */{len(data)}"})
+        if span is not None:
+            start, end = span
+            return Response(
+                content=data[start:end + 1],
+                status_code=206,
+                media_type=media_type,
+                headers={**headers, "Content-Range": f"bytes {start}-{end}/{len(data)}"},
+            )
+    return Response(content=data, media_type=media_type, headers=headers or None)
+
+
+def _byte_range(header: Optional[str], size: int):
+    """A single ``Range: bytes=a-b`` (or ``a-`` or ``-n``) as (start, end)
+    inclusive; None to send the whole file (no header, or one we don't
+    handle, such as several ranges); "bad" when it lies outside the file."""
+    if not header or not header.startswith("bytes=") or "," in header:
+        return None
+    first, _, last = header[6:].strip().partition("-")
+    try:
+        if first == "":
+            if not last:
+                return None
+            n = int(last)
+            if n <= 0:
+                return "bad"
+            return (max(0, size - n), size - 1)
+        start = int(first)
+        end = int(last) if last else size - 1
+    except ValueError:
+        return None
+    if start >= size or start > end:
+        return "bad"
+    return (start, min(end, size - 1))
 
 
 @router.put("/{image_id}", response_model=ImageResponse)

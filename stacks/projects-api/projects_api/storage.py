@@ -29,6 +29,10 @@ ALLOWED_FILE_EXTENSIONS = {
     ".f3d", ".fcstd",
 }
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
+# A project picture that is a short silent video: the editor's /Animated model
+# saves an MP4 where the browser can encode one (markdown-studio), shown as a
+# looping video. Only through the images endpoint, not as a general picture.
+ANIMATION_VIDEO_EXTENSIONS = {".mp4"}
 
 def _check_nas() -> bool:
     """Check NAS connectivity. Retries every time — no caching of failures."""

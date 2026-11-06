@@ -87,6 +87,35 @@
     });
   }
 
+  // An animated model saved as an MP4 (its link ends in #animated-video=<key>,
+  // markdown-studio's /Animated model) plays as a silent loop, as an animated
+  // picture would: the <img> becomes a <video>, keeping its classes and size.
+  function animatedVideos(root) {
+    let count = 0;
+    root.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src') || '';
+      if (!/#animated-video(=[0-9a-z]*)?$/i.test(src)) return;
+      const v = document.createElement('video');
+      v.src = src;
+      v.muted = true;
+      v.loop = true;
+      v.autoplay = true;
+      v.playsInline = true;
+      ['muted', 'loop', 'autoplay', 'playsinline'].forEach(a => v.setAttribute(a, ''));
+      v.preload = 'auto';
+      if (img.className) v.className = img.className;
+      v.classList.add('project-animated-model');
+      if (img.getAttribute('style')) v.setAttribute('style', img.getAttribute('style'));
+      ['width', 'height'].forEach(a => img.hasAttribute(a) && v.setAttribute(a, img.getAttribute(a)));
+      const label = img.getAttribute('alt') || img.getAttribute('title') || 'Animated model';
+      v.setAttribute('aria-label', label);
+      v.title = img.getAttribute('title') || '';
+      img.replaceWith(v);
+      count++;
+    });
+    return count;
+  }
+
   // The videos in a table's rows (the header row first, each cell's text or
   // Markdown): the YouTube link in the Video column, and the Title column.
   function videoTableItems(rows) {
@@ -624,7 +653,7 @@
 
   window.ProjectEmbeds = {
     snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock, snakieBlockWithSizes, snakieBlockWithLink, snakieBlockWithFlag,
-    youTubeId, videoMarkdown, embedVideos, videoTableItems, videoCards,
+    youTubeId, videoMarkdown, embedVideos, animatedVideos, videoTableItems, videoCards,
     videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
   };
 })();

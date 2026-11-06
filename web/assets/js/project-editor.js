@@ -1017,6 +1017,16 @@
     return API + '/api/projects/' + currentProject.id + '/images/' + img.id + '/view';
   }
 
+  // An animated model saved as an MP4 (markdown-studio's /Animated model) is
+  // kept with the images but is a video: it's left out of picture pickers and
+  // never the cover.
+  function isVideoImage(img) {
+    return /\.mp4$/i.test((img && img.filename) || '');
+  }
+  function pictureImages(imgs) {
+    return (imgs || []).filter(img => !isVideoImage(img));
+  }
+
   async function fetchProjectImages() {
     if (!currentProject) return [];
     const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
@@ -1215,7 +1225,7 @@
       uploadImage: uploadEditorImage,
       // Several images dropped on the text at once go to the end of the gallery.
       addImages: files => processDroppedFiles(files),
-      imageLibrary: async () => (await fetchProjectImages()).map(img => ({
+      imageLibrary: async () => pictureImages(await fetchProjectImages()).map(img => ({
         url: imageViewUrl(img), alt: img.caption || img.filename,
       })),
       deleteLibraryImage: deleteLibraryImage,
@@ -1523,7 +1533,7 @@
       }),
       listVideos: async () => (await getJson('/videos')).map(v => ({ id: v.youtube_id, title: v.title })),
       // The gallery's pictures, in its order, for a new `::: gallery` block.
-      listImages: async () => (await fetchProjectImages()).map(img => ({
+      listImages: async () => pictureImages(await fetchProjectImages()).map(img => ({
         url: imageViewUrl(img), name: img.filename, caption: img.caption || '',
       })),
       listParts: async () => (await getJson('/bom')).filter(item => item.name).map(item => ({
@@ -1916,7 +1926,7 @@
       apiFetch: (url, o) => apiFetch(url, Object.assign({ credentials: 'include' }, o || {})),
       listImages: async () => {
         const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/images', { credentials: 'include' });
-        return resp.ok ? (await resp.json()).map(img => ({ url: imageViewUrl(img), title: img.caption || (img.filename || '').replace(/\.[^.]+$/, '') })) : [];
+        return resp.ok ? pictureImages(await resp.json()).map(img => ({ url: imageViewUrl(img), title: img.caption || (img.filename || '').replace(/\.[^.]+$/, '') })) : [];
       },
       uploadImage: async (blob, name) => {
         const file = blob instanceof File ? blob : new File([blob], name || 'diagram-image.png', { type: blob.type || 'image/png' });
@@ -2580,7 +2590,7 @@
 
     function fetchImages() {
       fetchProjectImages().then(imgs => {
-        images = imgs.map(img => ({ url: imageViewUrl(img), name: img.filename }));
+        images = pictureImages(imgs).map(img => ({ url: imageViewUrl(img), name: img.filename }));
         if (start !== null) update();
       }).catch(() => {});
     }
@@ -3410,11 +3420,20 @@
   function coverUrl(markdown) {
     const lines = String(markdown || '').split('\n');
     const gallery = firstGallery(lines);
-    const inGallery = gallery && PICTURE.exec(lines.slice(gallery.open + 1, gallery.close).join('\n'));
-    if (inGallery) return inGallery[1];
-    const anywhere = PICTURE.exec(markdown || '');
-    if (anywhere) return anywhere[1];
-    return projectImages.length && currentProject ? imageViewUrl(projectImages[0]) : null;
+    const inGallery = gallery && firstPicture(lines.slice(gallery.open + 1, gallery.close).join('\n'));
+    if (inGallery) return inGallery;
+    const anywhere = firstPicture(markdown || '');
+    if (anywhere) return anywhere;
+    const first = pictureImages(projectImages)[0];
+    return first && currentProject ? imageViewUrl(first) : null;
+  }
+
+  // The first picture's URL in this text that isn't an animated model's video.
+  function firstPicture(text) {
+    const re = new RegExp(PICTURE.source, 'g');
+    let m;
+    while ((m = re.exec(text))) if (!/#animated-video\b/i.test(m[1])) return m[1];
+    return null;
   }
 
   // Uploads the text doesn't show: pictures from the old Images section, or
