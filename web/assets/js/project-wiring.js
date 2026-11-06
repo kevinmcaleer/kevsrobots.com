@@ -776,7 +776,14 @@
   // each header with no groups, and each connector, its pins in order.
   function portsOf(def) {
     if (!def) return [];
-    const pinOf = p => (p.label ? { name: String(p.name), label: String(p.label) } : { name: String(p.name) });
+    // A pin, with where it is on the part's picture (fractions across and
+    // down), so a 3D scene can find it on the part's model.
+    const pinOf = p => {
+      const out = { name: String(p.name) };
+      if (p.label) out.label = String(p.label);
+      if (Number.isFinite(p.x) && Number.isFinite(p.y)) { out.x = p.x; out.y = p.y; }
+      return out;
+    };
     const grouped = new Map();
     const headers = [];
     (def.headers || []).forEach((h, i) => {
@@ -834,6 +841,11 @@
       const out = { id, name: label || (def && def.name) || (raw && raw.name) || id, ports: portsOf(def) };
       if (slug && raw) out.slug = slug;
       if (sockets && Array.isArray(sockets.sockets)) out.sockets = sockets;
+      // The footprint (mm) and picture, for finding its pins on its model
+      // and showing them on the picture in "Pins on the model".
+      const dims = def && def.dimensions;
+      if (dims && dims.width > 0 && dims.height > 0) out.size = [Number(dims.width), Number(dims.height)];
+      if (def && typeof def.imageData === 'string' && def.imageData) out.image = def.imageData;
       // The catalog part's 3-D model, so a 3D scene can add it (STL or STEP;
       // a STEP one's link says so, as Layers reads it by its name).
       const model = slug ? meshOf(slug, raw) : null;
@@ -903,7 +915,8 @@
     const part = await resp.json();
     if (!part.definition) throw new Error('The catalog part has no pins yet: add them on its page first.');
     const definition = Object.assign({}, part.definition, { sockets3d: sockets });
-    const put = await ctx.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/definition?change_summary=' + encodeURIComponent('3D sockets for its model'), {
+    // An admin checks pin maps saved from projects (Admin > Parts > Pin maps to check).
+    const put = await ctx.apiFetch(API + '/api/parts/' + encodeURIComponent(slug) + '/definition?change_summary=' + encodeURIComponent('3D pin map for its model'), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(definition),

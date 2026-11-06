@@ -1151,6 +1151,25 @@ class PartReviewItem(BaseModel):
     photo_count: int = 0
     links: list[str] = Field(default_factory=list)
     usage_count: int = 0
+    # Its 3-D model and pin map (definition.sockets3d): pins placed on the
+    # model of those in its 2-D pinout.
+    has_mesh: bool = False
+    pins_total: int = 0
+    pins_on_model: int = 0
+
+
+class PinMapReviewItem(BaseModel):
+    """A part's 3-D pin map someone saved from a project, for an admin to check."""
+
+    slug: str
+    name: str
+    status: str
+    cover_url: Optional[str] = None
+    has_mesh: bool = False
+    pins_total: int = 0
+    pins_on_model: int = 0
+    saved_by: str
+    saved_at: datetime
 
 
 class PartUpdate(BaseModel):

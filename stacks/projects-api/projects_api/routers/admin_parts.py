@@ -25,8 +25,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import require_admin
 from ..db import get_session
-from ..models import Part, PartPhoto, PartSupplier
-from ..schemas import PartDetail, PartPhotoReview, PartReviewItem, PartSupplierResponse
+from ..models import Part, PartPhoto, PartRevision, PartSupplier
+from ..schemas import PartDetail, PartPhotoReview, PartReviewItem, PartSupplierResponse, PinMapReviewItem
+from ..snakie_parts import PIN_MAP_SUMMARIES, pin_map_stats
 from ..import_snakie_parts import download_github_library, import_library
 from ..supplier_health import recheck_part_suppliers
 
@@ -185,9 +186,112 @@ async def submitted_parts(
             cover_url=covers.get(p.id) or p.image_url, photo_count=photo_counts.get(p.id, 0),
             links=links.get(p.id, []) + ([p.datasheet_url] if p.datasheet_url else []),
             usage_count=p.usage_count or 0,
+            has_mesh=bool(p.mesh_file_path),
+            **dict(zip(("pins_on_model", "pins_total"), pin_map_stats(p.definition))),
         )
         for p in parts
     ]
+
+
+# --- 3-D pin maps saved from projects -------------------------------------
+#
+# A pin map (definition.sockets3d) saved from a project's 3D scene ("Save
+# pins to the catalog part") reaches every project using the part, so an
+# admin checks it, as a submitted part is. It's checked once marked so
+# (``sockets3d.checked``); saving it again from a scene drops the mark, as
+# the scene writes the map afresh. Pin maps shipped with Snakie parts are
+# Snakie's, and aren't listed.
+
+
+async def _pin_map_saves(session: AsyncSession) -> dict[int, PartRevision]:
+    """Each part's latest pin-map revision from a project, by part id."""
+    revs = (
+        await session.scalars(
+            select(PartRevision)
+            .where(PartRevision.change_summary.in_(PIN_MAP_SUMMARIES))
+            .order_by(PartRevision.created_at.desc(), PartRevision.id.desc())
+        )
+    ).all()
+    latest: dict[int, PartRevision] = {}
+    for r in revs:
+        latest.setdefault(r.part_id, r)
+    return latest
+
+
+@router.get("/pin-maps", response_model=list[PinMapReviewItem])
+async def pin_maps_to_check(
+    _admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> list[PinMapReviewItem]:
+    """Admin: parts whose 3-D pin map was saved from a project and not
+    checked yet, newest first."""
+    from .parts import first_photo_cover_urls
+
+    saves = await _pin_map_saves(session)
+    if not saves:
+        return []
+    parts = (await session.scalars(select(Part).where(Part.id.in_(list(saves))))).all()
+    todo = [
+        p for p in parts
+        if isinstance((p.definition or {}).get("sockets3d"), dict)
+        and (p.definition or {})["sockets3d"].get("sockets")
+        and not (p.definition or {})["sockets3d"].get("checked")
+    ]
+    covers = await first_photo_cover_urls(session, {p.id: p.slug for p in todo})
+    todo.sort(key=lambda p: (saves[p.id].created_at, saves[p.id].id), reverse=True)
+    out = []
+    for p in todo:
+        on, total = pin_map_stats(p.definition)
+        out.append(PinMapReviewItem(
+            slug=p.slug, name=p.name, status=p.status, cover_url=covers.get(p.id) or p.image_url,
+            has_mesh=bool(p.mesh_file_path), pins_total=total, pins_on_model=on,
+            saved_by=saves[p.id].author, saved_at=saves[p.id].created_at,
+        ))
+    return out
+
+
+async def _part_with_pin_map(session: AsyncSession, slug: str) -> Part:
+    part = await session.scalar(select(Part).where(Part.slug == slug))
+    if part is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Part not found")
+    if not isinstance((part.definition or {}).get("sockets3d"), dict):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="The part has no 3-D pin map")
+    return part
+
+
+@router.post("/{slug}/pin-map/checked", response_model=PartDetail)
+async def pin_map_checked(
+    slug: str,
+    admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Admin: the part's 3-D pin map looks right. Marked on the map itself
+    (not a new revision), so the part's history isn't cluttered."""
+    from .parts import _part_detail
+
+    part = await _part_with_pin_map(session, slug)
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    sockets3d = {**part.definition["sockets3d"], "checked": {"by": admin, "at": now.isoformat(timespec="seconds")}}
+    part.definition = {**part.definition, "sockets3d": sockets3d}
+    await session.commit()
+    await session.refresh(part)
+    return await _part_detail(session, part)
+
+
+@router.delete("/{slug}/pin-map", response_model=PartDetail)
+async def remove_pin_map(
+    slug: str,
+    admin: str = Depends(require_admin),
+    session: AsyncSession = Depends(get_session),
+) -> PartDetail:
+    """Admin: take a wrong 3-D pin map off the part, as a revision (so it
+    can be restored). Projects then find its pins from its picture again."""
+    from .parts import _spec_revision, spec_values
+
+    part = await _part_with_pin_map(session, slug)
+    next_spec = spec_values(part)
+    next_spec["definition"] = {k: v for k, v in (part.definition or {}).items() if k != "sockets3d"}
+    return await _spec_revision(session, part, admin, next_spec, "Removed the 3D pin map")
 
 
 async def _set_review_status(session: AsyncSession, slug: str, new_status: str) -> PartDetail:

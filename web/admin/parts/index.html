@@ -60,6 +60,15 @@ permalink: /admin/parts/
       </div>
     </div>
 
+    <!-- 3-D pin maps people saved from their projects' 3D scenes -->
+    <div class="card mb-4" id="pin-maps">
+      <div class="card-body">
+        <h5 class="mb-1"><i class="fas fa-plug me-2"></i> Pin maps to check <span class="badge bg-info text-dark" id="pin-maps-count">0</span></h5>
+        <div class="text-muted small mb-3">Where a part's pins are on its 3-D model, saved from a project's 3D scene ("Save pins to the catalog part"). Every project using the part gets them, so check they look right. Removing one is a revision, so it can be restored; projects then find the pins from the part's picture again.</div>
+        <div id="pin-maps-list" class="vstack gap-2"></div>
+      </div>
+    </div>
+
     <ul class="nav nav-pills mb-3" id="status-tabs">
       <li class="nav-item"><button type="button" class="nav-link active" data-status="open">Open <span class="badge bg-light text-dark ms-1" id="badge-open">0</span></button></li>
       <li class="nav-item"><button type="button" class="nav-link" data-status="resolved">Resolved</button></li>
@@ -285,6 +294,56 @@ permalink: /admin/parts/
     }
   });
 
+  // A part's 3-D model and how many of its pins are placed on it.
+  function pinMapLine(p) {
+    const model = p.has_mesh ? '3-D model' : 'No 3-D model';
+    if (!p.pins_total) return model + ' · no pins in its pinout';
+    const done = p.pins_on_model === p.pins_total;
+    return model + ' · <span class="' + (done ? 'text-success' : '') + '">' + p.pins_on_model + ' of ' + p.pins_total + ' pin' + (p.pins_total === 1 ? '' : 's') + ' on the model</span>';
+  }
+
+  // --- 3-D pin maps to check -------------------------------------------------
+  async function loadPinMaps() {
+    const box = document.getElementById('pin-maps-list');
+    const resp = await ProjectAuth.apiFetch(API + '/api/admin/parts/pin-maps');
+    if (!resp.ok) { box.innerHTML = '<div class="text-danger small">Could not load (HTTP ' + resp.status + ').</div>'; return; }
+    const maps = await resp.json();
+    document.getElementById('pin-maps-count').textContent = maps.length;
+    if (!maps.length) { box.innerHTML = '<div class="text-muted small fst-italic">Nothing to check.</div>'; return; }
+    const img = u => (u ? (u.startsWith('/') ? API + u : u) : '');
+    box.innerHTML = maps.map(m => `
+      <div class="d-flex flex-wrap align-items-start gap-3 border rounded p-2" data-slug="${esc(m.slug)}">
+        ${m.cover_url ? `<img src="${esc(img(m.cover_url))}" alt="" width="64" height="64" style="object-fit:contain;border-radius:6px;background:#f6f6f6">` : '<div style="width:64px;height:64px;border-radius:6px;background:#f0f0f0" class="d-grid text-muted" title="No picture"><i class="fas fa-image m-auto"></i></div>'}
+        <div class="flex-grow-1" style="min-width:14rem">
+          <a href="/parts/view.html?slug=${encodeURIComponent(m.slug)}" target="_blank" class="fw-semibold">${esc(m.name)}</a>
+          ${m.status === 'pending' ? '<span class="badge bg-warning text-dark ms-1">Waiting for review</span>' : ''}
+          <div class="small text-muted">saved by <strong>${esc(m.saved_by)}</strong> · ${fmtTime(m.saved_at)}</div>
+          <div class="small text-muted">${pinMapLine(m)}</div>
+          <div class="pin-map-feedback small"></div>
+        </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-sm btn-outline-secondary" href="/parts/history.html?slug=${encodeURIComponent(m.slug)}" target="_blank"><i class="fas fa-clock-rotate-left me-1"></i> History</a>
+          <button type="button" class="btn btn-sm btn-success" data-pin-map="checked"><i class="fas fa-check me-1"></i> Looks right</button>
+          <button type="button" class="btn btn-sm btn-outline-danger" data-pin-map="remove"><i class="fas fa-times me-1"></i> Remove</button>
+        </div>
+      </div>`).join('');
+    box.querySelectorAll('[data-pin-map]').forEach(btn => btn.addEventListener('click', async () => {
+      const row = btn.closest('[data-slug]');
+      const remove = btn.dataset.pinMap === 'remove';
+      if (remove && !window.confirm("Remove this part's 3-D pin map? Projects using it find its pins from its picture again (it can be restored from the part's history).")) return;
+      btn.disabled = true;
+      const url = API + '/api/admin/parts/' + encodeURIComponent(row.dataset.slug) + '/pin-map' + (remove ? '' : '/checked');
+      const r = await ProjectAuth.apiFetch(url, { method: remove ? 'DELETE' : 'POST' });
+      if (r.ok) { row.remove(); loadPinMaps(); loadSubmitted(); }
+      else {
+        btn.disabled = false;
+        let body = {};
+        try { body = await r.json(); } catch (_) {}
+        row.querySelector('.pin-map-feedback').innerHTML = '<span class="text-danger">' + esc(body.detail || ('HTTP ' + r.status)) + '</span>';
+      }
+    }));
+  }
+
   // --- New parts to review ------------------------------------------------
   let submittedStatus = 'pending';
   async function loadSubmitted() {
@@ -305,6 +364,7 @@ permalink: /admin/parts/
           <a href="/parts/view.html?slug=${encodeURIComponent(p.slug)}" target="_blank" class="fw-semibold">${esc(p.name)}</a>
           ${p.category ? `<span class="badge bg-light text-dark ms-1">${esc(p.category)}</span>` : ''}
           <div class="small text-muted">by <strong>${esc(p.created_by)}</strong> · ${fmtTime(p.created_at)} · ${p.photo_count} picture${p.photo_count === 1 ? '' : 's'} · used in ${p.usage_count} project${p.usage_count === 1 ? '' : 's'}</div>
+          <div class="small text-muted">${pinMapLine(p)}</div>
           ${p.description_md ? `<div class="small mt-1" style="white-space:pre-wrap">${esc(p.description_md.slice(0, 300))}</div>` : ''}
           ${p.links.length ? `<div class="small mt-1">${p.links.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener nofollow" class="me-2">${esc(u.replace(/^https?:\/\/(www\.)?/, '').slice(0, 50))}</a>`).join('')}</div>` : ''}
           <div class="submitted-feedback small"></div>
@@ -339,5 +399,6 @@ permalink: /admin/parts/
   loadList();
   loadPhotoReview();
   loadSubmitted();
+  loadPinMaps();
 })();
 </script>

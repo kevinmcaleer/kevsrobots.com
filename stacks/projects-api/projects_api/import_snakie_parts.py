@@ -243,6 +243,11 @@ async def import_part(session: AsyncSession, folder: Path, report: ImportReport,
         {f: getattr(part, f) for f in ("manufacturer", "package", "voltage", "pin_spacing",
                                        "dimensions_mm", "definition", "mesh_file_path")},
     )
+    # A 3-D pin map people saved from a project (definition.sockets3d) stays
+    # until Snakie ships one of its own: Snakie doesn't know about it yet.
+    kept = (part.definition or {}).get("sockets3d") if not created else None
+    if kept and not spec["definition"].get("sockets3d"):
+        spec["definition"] = {**spec["definition"], "sockets3d": kept}
     # Snakie owns the spec; the catalog keeps whatever people wrote.
     for column, value in spec.items():
         setattr(part, column, value)
