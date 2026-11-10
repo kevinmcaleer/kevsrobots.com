@@ -26,7 +26,7 @@ ALLOWED_FILE_EXTENSIONS = {
     ".json", ".xml", ".yaml", ".yml", ".csv", ".toml",
     ".zip", ".tar", ".gz", ".7z", ".rar",
     ".scad", ".kicad_pcb", ".kicad_sch", ".brd", ".sch",
-    ".f3d", ".fcstd",
+    ".f3d", ".fcstd", ".bcad", ".urdf",
 }
 ALLOWED_IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
 # A project picture that is a short silent video: the editor's /Animated model
