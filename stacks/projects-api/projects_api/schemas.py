@@ -1973,3 +1973,36 @@ class StorageUsage(BaseModel):
     used: int
     limit: int
     max_file_size: int
+
+
+# --- Imports from other apps (BetterCad build steps) ---
+
+
+class ImportResponse(BaseModel):
+    id: int
+    project_id: int
+    source: str
+    status: str
+    title: str
+    steps: int
+    pictures: int = 0
+    files: int = 0
+    model_url: Optional[str] = None
+    created_at: datetime
+    applied_at: Optional[datetime] = None
+    # An earlier import from the same app was brought in: this one updates it.
+    is_update: bool = False
+
+
+class ImportApply(BaseModel):
+    # The editor's text as it stands; the section is put into it.
+    content_md: Optional[str] = None
+
+
+class ImportApplied(BaseModel):
+    content_md: str
+    import_: ImportResponse = Field(..., alias="import")
+    pictures: int
+    files: int
+
+    model_config = {"populate_by_name": True}

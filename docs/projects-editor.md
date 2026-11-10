@@ -84,6 +84,24 @@ table in the text nothing is synced.
   mermaid-tools (`web/assets/js/mermaid-tools/`, `scripts/update-mermaid-tools.sh`),
   themed by `project-mermaid-theme.js`.
 
+### BetterCad models and build steps
+
+BetterCad's *Send to kevsrobots* posts its Build steps .zip (README.md,
+`images/`, the `.bcad` and printable parts) to
+`POST /api/projects/{id}/imports` (`routers/imports.py`,
+`bettercad_import.py`), using the shared kevsrobots sign-in, so
+bettercad.kevsrobots.com is in `CORS_ORIGINS`. It waits there as the
+project's pending import; a newer send replaces it.
+
+When the author opens the project, a bar above the text says it is ready
+(`checkBetterCadImport` in `project-editor.js`), with **Import**, or
+**Update** when an earlier send was imported. Importing adds the pictures to
+the gallery and the files to Files & Models, takes out the previous import's
+(kept for any published version, issue #439), and puts a `## Build steps`
+section in the text between `<!-- bettercad:start -->` and
+`<!-- bettercad:end -->`. An update replaces only what is between the
+markers. The editor then saves the text the usual way.
+
 ## The project page
 
 `view.html` renders `content_md` with marked and the same helpers

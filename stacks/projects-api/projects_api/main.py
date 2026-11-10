@@ -75,6 +75,7 @@ from .routers import (
     fx,
     health,
     images,
+    imports,
     instructions,
     journal,
     links,
@@ -299,6 +300,8 @@ def create_app() -> FastAPI:
     app.include_router(schematics.router)
     # Issue #268: the project's wiring, from Snakie's electronics workspace.
     app.include_router(wiring.router)
+    # BetterCad sends a model and its build steps for the editor to import.
+    app.include_router(imports.router)
     # Issue #270: freeform diagrams (Fabric canvas JSON + its SVG/PNG export).
     app.include_router(diagrams.router)
     # Symbol Designer: per-project user-designed schematic symbols.

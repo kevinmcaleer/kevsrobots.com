@@ -1674,3 +1674,39 @@ class LibrarySymbolRevision(Base):
     )
     description: Mapped[Optional[str]] = mapped_column(Text)
     symbol_data: Mapped[Optional[str]] = mapped_column(Text)
+
+
+class ProjectImport(Base):
+    """A model and its build steps sent from another app (BetterCad) for
+    the author to bring into the project (``bettercad_import.py``).
+
+    ``status`` is ``pending`` until the author imports it in the editor
+    (``applied``) or says not now (``dismissed``); a newer send replaces a
+    pending one (``superseded``). An applied import remembers the pictures
+    and files it added (``image_ids``, ``file_ids``) so the next one, an
+    update, replaces them. Brand-new table — ``create_all`` builds it.
+    """
+
+    __tablename__ = "project_imports"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    source: Mapped[str] = mapped_column(String(40), nullable=False, default="bettercad")
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending", index=True)
+    # The model's name, as the sending app called it.
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    steps: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    pictures: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    files: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # Where to open the model in the sending app, when it has a link.
+    model_url: Mapped[Optional[str]] = mapped_column(Text)
+    archive_path: Mapped[str] = mapped_column(Text, nullable=False)
+    archive_size: Mapped[int] = mapped_column(Integer, nullable=False)
+    image_ids: Mapped[Optional[list]] = mapped_column(JsonType)
+    file_ids: Mapped[Optional[list]] = mapped_column(JsonType)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
+    applied_at: Mapped[Optional[datetime]] = mapped_column(DateTime)

@@ -4814,6 +4814,88 @@
     });
   }
 
+  // --- BetterCad imports ---
+  // BetterCad sends a model and its build steps to a project; they wait on
+  // the server until the author brings them in here. Import (or Update,
+  // when an earlier send was imported) puts the pictures in the gallery, the
+  // models in Files & Models, and a Build steps section in the text,
+  // replacing the last import's section and leaving the author's own words.
+  let pendingImport = null;
+
+  async function checkBetterCadImport() {
+    if (!currentProject) return;
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/imports/pending', { credentials: 'include' }).catch(() => null);
+    pendingImport = resp && resp.ok ? await resp.json().catch(() => null) : null;
+    showBetterCadImportBar();
+  }
+
+  function showBetterCadImportBar(message) {
+    const bar = document.getElementById('bettercad-import-bar');
+    if (!bar) return;
+    const p = pendingImport;
+    if (!p) { bar.hidden = true; return; }
+    const steps = p.steps === 1 ? '1 build step' : p.steps + ' build steps';
+    const files = p.files === 1 ? '1 model file' : p.files + ' model files';
+    const what = p.is_update
+      ? 'BetterCad has an update to “' + escapeHtmlAttr(p.title) + '”: ' + steps + ' and ' + files + '.'
+      : 'A model and build steps from BetterCad are ready: “' + escapeHtmlAttr(p.title) + '”, ' + steps + ' and ' + files + '.';
+    bar.innerHTML =
+      '<i class="fas fa-cube" aria-hidden="true"></i>' +
+      '<span>' + (message ? escapeHtmlAttr(message) : what) + '</span>' +
+      (message ? '' :
+        '<button type="button" class="btn btn-sm btn-success" data-action="import">' + (p.is_update ? 'Update' : 'Import') + '</button>' +
+        '<button type="button" class="btn btn-sm btn-link" data-action="later">Not now</button>' +
+        '<button type="button" class="btn btn-sm btn-link" data-action="discard">Discard</button>');
+    bar.hidden = false;
+  }
+
+  async function applyBetterCadImport() {
+    const p = pendingImport;
+    if (!p || !currentProject) return;
+    showBetterCadImportBar(p.is_update ? 'Updating the build steps…' : 'Importing the build steps…');
+    const resp = await apiFetch(API + '/api/projects/' + currentProject.id + '/imports/' + p.id + '/apply', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content_md: getEditorValue() }),
+    }).catch(() => null);
+    if (!resp || !resp.ok) {
+      const detail = resp ? (await resp.json().catch(() => ({}))).detail : null;
+      pendingImport = null;
+      showBetterCadImportBar(detail || 'The build steps didn’t import. Try again from BetterCad.');
+      return;
+    }
+    const done = await resp.json();
+    if (mde && mde.view) {
+      const doc = mde.view.state.doc;
+      mde.view.dispatch({ changes: { from: 0, to: doc.length, insert: done.content_md }, userEvent: 'input' });
+    } else {
+      setEditorValue(done.content_md);
+    }
+    pendingImport = null;
+    showBetterCadImportBar();
+    loadFiles();
+    loadImages();
+    scheduleAutoSave();
+  }
+
+  (function wireBetterCadImportBar() {
+    const bar = document.getElementById('bettercad-import-bar');
+    if (!bar) return;
+    bar.addEventListener('click', async e => {
+      const action = e.target.closest('[data-action]');
+      if (!action || !pendingImport) return;
+      if (action.dataset.action === 'import') applyBetterCadImport();
+      else if (action.dataset.action === 'later') bar.hidden = true;
+      else if (action.dataset.action === 'discard') {
+        await apiFetch(API + '/api/projects/' + currentProject.id + '/imports/' + pendingImport.id + '/dismiss', {
+          method: 'POST', credentials: 'include',
+        }).catch(() => null);
+        pendingImport = null;
+        bar.hidden = true;
+      }
+    });
+  })();
+
   async function init() {
     const authed = await checkAuth();
     if (!authed) return;
@@ -4822,6 +4904,7 @@
     if (projectId) await loadProject();
     updateVersionBar();
     initEditor();
+    checkBetterCadImport();
     seedBomPrices();
     scheduleBomTotals();
     loadStoredBom().catch(() => {});

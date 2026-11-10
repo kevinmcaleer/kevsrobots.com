@@ -28,7 +28,9 @@ class Settings(BaseSettings):
 
     # app.snakie.org posts anonymous Snakie bug reports (X-Snakie-Key) from the
     # browser, so it needs CORS — keep it in the server's CORS_ORIGINS env too.
-    cors_origins: str = "https://www.kevsrobots.com,https://app.snakie.org,http://localhost:4000"
+    # bettercad.kevsrobots.com sends models and build steps to a project
+    # (routers/imports.py) with the shared kevsrobots sign-in.
+    cors_origins: str = "https://www.kevsrobots.com,https://app.snakie.org,https://bettercad.kevsrobots.com,http://localhost:4000"
 
     @computed_field
     @property
