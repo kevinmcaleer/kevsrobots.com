@@ -8,13 +8,18 @@ project (``bettercad_import.py``), and the editor offers to bring them in.
 - ``POST …/imports/{import_id}/apply``: the editor brings it in. Pictures go
   to the gallery and models to Files & Models, replacing the last import's,
   and the editor's text comes back with the Build steps section in it. The
-  editor puts that text in and saves it the usual way.
+  editor puts that text in and saves it the usual way. The parts' STLs go
+  into the project's 3D model too (``<project>.model.json``), so the 3D
+  scenes can show them.
 - ``POST …/imports/{import_id}/dismiss``: not now.
 """
 
 from __future__ import annotations
 
+import json
 import posixpath
+import re
+import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -165,6 +170,63 @@ async def _pending(session: AsyncSession, project_id: int, import_id: int) -> Pr
     return row
 
 
+MODEL_FILE = re.compile(r"\.model\.json$", re.I)
+MODEL_DESCRIPTION = (
+    "The project's 3D model: the parts and joints its assembly pictures are drawn from (made in a graphic's 3D scene)."
+)
+
+
+def _model_file_name(project: Project) -> str:
+    """As the editor names it (project-editor.js ``modelFileName``)."""
+    slug = re.sub(r"[^a-z0-9]+", "-", (project.slug or project.title or "robot").lower()).strip("-")[:60]
+    return (slug or "robot") + ".model.json"
+
+
+async def _put_in_model(session: AsyncSession, project: Project, parts: list[dict]) -> int:
+    """Puts BetterCad's parts into the project's 3D model file, made if there
+    isn't one, replacing the old file as the editor does when it saves."""
+    if not parts:
+        return 0
+    old_files = (
+        await session.scalars(
+            select(ProjectFile)
+            .where(ProjectFile.project_id == project.id, ProjectFile.removed_at.is_(None))
+            .order_by(ProjectFile.id.desc())
+        )
+    ).all()
+    old_files = [f for f in old_files if MODEL_FILE.search(f.filename or "")]
+    old = None
+    if old_files:
+        raw = read_file(old_files[0].file_path)
+        try:
+            old = json.loads(raw) if raw else None
+        except ValueError:
+            old = None
+    model = bc.merge_model(old, parts, int(time.time() * 1000))
+    content = json.dumps(model, separators=(",", ":")).encode("utf-8")
+    name = _model_file_name(project)
+    stored, packed = compress_for_storage(name, content)
+    filename = generate_filename(name, project.id)
+    stored_path = save_file(stored, filename + STORED_GZ if packed else filename, project.id, "files")
+    if stored_path is None:
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="The 3D model couldn't be stored.")
+    session.add(ProjectFile(
+        project_id=project.id,
+        filename=name,
+        file_path=stored_path,
+        file_size=len(content),
+        stored_size=len(stored) if packed else None,
+        file_type=file_category(name),
+        description=MODEL_DESCRIPTION,
+    ))
+    for f in old_files:
+        if await v.guard_removal(session, project, "files", f):
+            delete_file(f.file_path)
+            await session.delete(f)
+    await session.flush()
+    return len(parts)
+
+
 async def _remove_last(session: AsyncSession, project: Project, last: Optional[ProjectImport]) -> None:
     """Takes the pictures and files the last import added out of the
     working copy, keeping any a version still shows (issue #439)."""
@@ -263,6 +325,7 @@ async def apply_import(
         urls[path] = f"{base}/api/projects/{project_id}/files/{record.id}/download"
 
     content_md = bc.splice(body.content_md, bc.section(bundle.readme, urls.get))
+    parts = await _put_in_model(session, project, bc.model_parts(bundle, urls.get))
 
     row.status = "applied"
     row.applied_at = _now()
@@ -273,7 +336,7 @@ async def apply_import(
     await session.refresh(row)
     resp = await _response(session, row)
     resp.is_update = last is not None
-    return ImportApplied(content_md=content_md, import_=resp, pictures=len(image_ids), files=len(file_ids))
+    return ImportApplied(content_md=content_md, import_=resp, pictures=len(image_ids), files=len(file_ids), parts=parts)
 
 
 @router.post("/{import_id}/dismiss", response_model=ImportResponse)

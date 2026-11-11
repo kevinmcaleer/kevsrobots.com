@@ -2004,5 +2004,7 @@ class ImportApplied(BaseModel):
     import_: ImportResponse = Field(..., alias="import")
     pictures: int
     files: int
+    # Parts put into the project's 3D model (its STLs).
+    parts: int = 0
 
     model_config = {"populate_by_name": True}
