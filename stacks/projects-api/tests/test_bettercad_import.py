@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import math
 import zipfile
 
 import pytest
@@ -290,7 +291,7 @@ def test_model_parts_use_the_assembly_then_the_stl() -> None:
 
 def test_a_bad_assembly_is_left_out() -> None:
     b = read(make_zip(extra={"assembly.json": b"not json"}))
-    assert b.assembly.parts == {} and b.assembly.joints == []
+    assert b.assembly.parts == [] and b.assembly.joints == []
 
 
 def test_merge_keeps_the_authors_parts_and_joins() -> None:
@@ -416,3 +417,69 @@ async def test_import_puts_the_parts_in_the_3d_model(client, session, project_id
     for p in model2["parts"]:
         if p["id"].startswith(bc.PART_PREFIX):
             assert int(p["url"].split("/files/")[1].split("/")[0]) in ids
+
+
+# --- copies of one shape share an STL ---
+
+
+def _scene_place(joint: dict) -> tuple[list[float], list[float]]:
+    """The 3D scene's jointPlace (markdown-studio layers/src/scene/joint.ts):
+    the child's position and rotation from a joint's picks."""
+    pn = joint["normal"]
+    cn = joint["childNormal"]
+    q = bc._from_to(cn, [-v for v in pn])
+    if joint.get("spin"):
+        q = bc._mul(bc._axis_angle(pn, math.radians(joint["spin"])), q)
+    rc = bc._app(q, joint["childPoint"])
+    target = [joint["point"][k] + pn[k] * joint.get("gap", 0) for k in range(3)]
+    return [target[k] - rc[k] for k in range(3)], bc._rpy(q)
+
+
+def shared_zip() -> bytes:
+    import json
+    piece = binary_stl((0, 0, 0), (10, 4, 2), (0, 4, 2))
+    return make_zip(extra={
+        "models/Rover-Track.stl": piece,
+        "models/Rover-Wheel.stl": piece,
+        "models/Rover-Base.stl": piece,
+        "assembly.json": json.dumps({"generator": "BetterCad", "parts": [
+            {"name": "Base", "file": "models/Rover-Base.stl", "position": [0, 0, 0]},
+            {"name": "Track", "file": "models/Rover-Track.stl", "position": [10, 0, 0]},
+            {"name": "Track 2", "file": "models/Rover-Track.stl", "position": [20, 0, 0], "rotation": [0, 0, 90]},
+            {"name": "Track 3", "file": "models/Rover-Track.stl", "position": [30, 0, 0], "rotation": [180, 0, 0]},
+            {"name": "Wheel", "file": "models/Rover-Wheel.stl", "position": [5, 40, 10], "rotation": [90, 0, 30], "link": "w"},
+        ], "links": [{"id": "w", "name": "Wheel"}], "joints": [
+            {"kind": "continuous", "child": "w", "parent": None, "origin": [5, 35, 10], "axis": [0, 1, 0], "lower": 0, "upper": 0},
+        ]}).encode(),
+    })
+
+
+def test_copies_share_an_stl_and_keep_their_turns() -> None:
+    b = read(shared_zip())
+    assert bc.print_counts(b)["models/Rover-Track.stl"] == 3
+    parts = {p["name"]: p for p in bc.model_parts(b, lambda p: f"https://x/{p}")}
+    tracks = [parts["Track"], parts["Track 2"], parts["Track 3"]]
+    assert {t["url"] for t in tracks} == {"https://x/models/Rover-Track.stl"}
+    assert [t["rotation"] for t in tracks] == [[0, 0, 0], [0, 0, 90], [180, 0, 0]]
+    assert tracks[2]["position"] == [30, 0, 0]
+
+
+def test_a_turned_child_keeps_its_place_and_turn_on_its_joint() -> None:
+    parts = {p["name"]: p for p in bc.model_parts(read(shared_zip()), lambda p: f"https://x/{p}")}
+    wheel = parts["Wheel"]
+    assert wheel["parent"] == parts["Base"]["id"]
+    position, rotation = _scene_place(wheel["joint"])
+    assert [round(v, 2) for v in position] == [round(v, 2) for v in wheel["position"]]
+    assert [round(v, 2) for v in rotation] == [90, 0, 30]
+    assert wheel["joint"]["type"] == "revolute"
+
+
+@pytest.mark.asyncio
+async def test_import_sets_how_many_to_print(client, session, project_id) -> None:
+    sent = (await send(client, project_id, data=shared_zip())).json()
+    resp = await client.post(f"/api/projects/{project_id}/imports/{sent['id']}/apply", json={}, headers=make_auth_header())
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["parts"] == 6
+    files = {f.filename: f for f in (await session.scalars(select(ProjectFile).where(ProjectFile.project_id == project_id))).all()}
+    assert files["Rover-Track.stl"].print_qty == 3
+    assert files["Rover-Wheel.stl"].print_qty == 1

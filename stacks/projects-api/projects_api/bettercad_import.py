@@ -57,9 +57,14 @@ class BundleError(ValueError):
 
 @dataclass
 class Placed:
-    """A part's STL as BetterCad placed it: its middle at home (mm, world)."""
+    """A part as BetterCad placed it: its STL (``path`` in the zip), its
+    middle at home (mm, world) and its turn from the STL (roll, pitch, yaw in
+    degrees, R = Rz Ry Rx, about its middle). Copies of one shape share an
+    STL, each placed and turned its own way."""
+    path: str
     name: str
     position: list[float]
+    rotation: Optional[list[float]] = None
     link: Optional[str] = None
 
 
@@ -79,8 +84,8 @@ class Joint:
 
 @dataclass
 class Assembly:
-    # STL path in the zip -> where it sits.
-    parts: dict[str, Placed] = field(default_factory=dict)
+    # Every part, in order; several can share an STL.
+    parts: list[Placed] = field(default_factory=list)
     joints: list[Joint] = field(default_factory=list)
     # Component -> the component it sits inside, if any.
     link_parent: dict[str, Optional[str]] = field(default_factory=dict)
@@ -233,7 +238,10 @@ def _assembly(raw: bytes, files: dict[str, bytes]) -> Assembly:
         pos = _vec(p.get("position"))
         if path not in files or pos is None:
             continue
-        out.parts[path] = Placed(name=_text(p.get("name")), position=pos, link=_text(p.get("link"), 80) or None)
+        out.parts.append(Placed(
+            path=path, name=_text(p.get("name")), position=pos,
+            rotation=_vec(p.get("rotation")), link=_text(p.get("link"), 80) or None,
+        ))
     joints = data.get("joints")
     for j in joints if isinstance(joints, list) else []:
         if not isinstance(j, dict):
@@ -303,49 +311,132 @@ def _r(n: float) -> float:
     return round(n, 3) + 0.0
 
 
+# --- turns (3×3, row-major lists), as the 3D scene has them ---
+
+Mat = list[float]
+
+
+def _rot(rpy: Optional[list[float]]) -> Mat:
+    """R = Rz(yaw) Ry(pitch) Rx(roll), from degrees."""
+    r, p, y = (math.radians(v) for v in (rpy or [0, 0, 0]))
+    cr, sr, cp, sp, cy, sy = math.cos(r), math.sin(r), math.cos(p), math.sin(p), math.cos(y), math.sin(y)
+    return [
+        cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr,
+        sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr,
+        -sp, cp * sr, cp * cr,
+    ]
+
+
+def _rpy(m: Mat) -> list[float]:
+    pitch = math.asin(max(-1.0, min(1.0, -m[6])))
+    if abs(m[6]) < 0.9999999:
+        roll, yaw = math.atan2(m[7], m[8]), math.atan2(m[3], m[0])
+    else:
+        roll, yaw = 0.0, math.atan2(-m[1], m[4])
+    return [_r(math.degrees(v)) for v in (roll, pitch, yaw)]
+
+
+def _t(m: Mat) -> Mat:
+    return [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]
+
+
+def _mul(a: Mat, b: Mat) -> Mat:
+    return [sum(a[r * 3 + k] * b[k * 3 + c] for k in range(3)) for r in range(3) for c in range(3)]
+
+
+def _app(m: Mat, v: list[float]) -> list[float]:
+    return [m[r * 3] * v[0] + m[r * 3 + 1] * v[1] + m[r * 3 + 2] * v[2] for r in range(3)]
+
+
+def _cross(a: list[float], b: list[float]) -> list[float]:
+    return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]
+
+
+def _dot(a: list[float], b: list[float]) -> float:
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+
+
+def _axis_angle(axis: list[float], angle: float) -> Mat:
+    x, y, z = axis
+    c, s, t = math.cos(angle), math.sin(angle), 1 - math.cos(angle)
+    return [
+        t * x * x + c, t * x * y - s * z, t * x * z + s * y,
+        t * x * y + s * z, t * y * y + c, t * y * z - s * x,
+        t * x * z - s * y, t * y * z + s * x, t * z * z + c,
+    ]
+
+
+def _from_to(a: list[float], b: list[float]) -> Mat:
+    """The shortest turn taking unit ``a`` to unit ``b``, as three.js's
+    ``Quaternion.setFromUnitVectors`` picks it (the scene's joint maths)."""
+    d = _dot(a, b)
+    if d < -1 + 1e-6:
+        axis = [-a[1], a[0], 0.0] if abs(a[0]) > abs(a[2]) else [0.0, -a[2], a[1]]
+        n = math.hypot(*axis)
+        return _axis_angle([v / n for v in axis], math.pi)
+    axis = _cross(a, b)
+    n = math.hypot(*axis)
+    if n < 1e-12:
+        return [1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0]
+    return _axis_angle([v / n for v in axis], math.atan2(n, d))
+
+
+def _spin(turn: Mat, child_normal: list[float], normal: list[float]) -> float:
+    """The spin (degrees about ``normal``) the scene adds after lining
+    ``child_normal`` up against ``normal`` so the child ends up turned ``turn``."""
+    base = _from_to(child_normal, [-v for v in normal])
+    # A direction square to the child's normal, where the line-up and the turn each take it.
+    helper = [1.0, 0, 0] if abs(child_normal[0]) < 0.9 else [0, 1.0, 0]
+    side = _cross(child_normal, helper)
+    a, b = _app(base, side), _app(turn, side)
+    return math.degrees(math.atan2(_dot(_cross(a, b), normal), _dot(a, b)))
+
+
 def model_parts(bundle: Bundle, url_for: Callable[[str], Optional[str]]) -> list[dict]:
-    """A part of the project's 3D model for each STL in the bundle, where it
-    sits in BetterCad (``assembly.json``), or where its STL says, joined as
-    BetterCad joins them.
+    """A part of the project's 3D model for each part BetterCad placed
+    (``assembly.json``; copies of one shape share an STL), or one per STL
+    where its STL says, joined as BetterCad joins them.
 
     The first part of each component leads it: the component's other parts
     hang from it, fixed, and it hangs from the lead part of the component its
     joint hangs from (Base: the first part in no component) with that
     joint's axis as the joined faces' normal, so a hinge turns about the same
-    line and a slider slides along it. Nothing turns at home, so each child
-    sits where it is by the difference of their middles.
+    line and a slider slides along it. A child's place is in its parent's
+    frame, turns and all.
     """
     asm = bundle.assembly
+    placed = [p for p in asm.parts if _ext(p.path) == ".stl" and url_for(p.path)]
+    seen = {p.path for p in placed}
+    for path, content in bundle.files.items():
+        if _ext(path) == ".stl" and path not in seen and url_for(path):
+            box = stl_box(content)
+            placed.append(Placed(path=path, name="", position=box[0] if box else [0.0, 0.0, 0.0]))
+    sizes = {path: (max(box[1]) if (box := stl_box(content)) else 20.0) for path, content in bundle.files.items() if _ext(path) == ".stl"}
+
     out: list[dict] = []
     used: set[str] = set()
     middle: dict[str, list[float]] = {}
+    turn: dict[str, Mat] = {}
     size: dict[str, float] = {}
     lead: dict[Optional[str], str] = {}
-    for path, content in bundle.files.items():
-        url = url_for(path)
-        if _ext(path) != ".stl" or not url:
-            continue
-        placed = asm.parts.get(path)
-        file = posixpath.basename(path)
-        name = (placed.name if placed else "") or posixpath.splitext(file)[0]
-        box = stl_box(content)
-        position = placed.position if placed else (box[0] if box else [0.0, 0.0, 0.0])
+    from_assembly = set(id(p) for p in asm.parts)
+    for pl in placed:
+        file = posixpath.basename(pl.path)
+        name = pl.name or posixpath.splitext(file)[0]
         stem = (PART_PREFIX + (_slug(name) or "part"))[:36]
         part_id, n = stem, 2
         while part_id in used:
             part_id, n = f"{stem}-{n}", n + 1
         used.add(part_id)
-        middle[part_id] = position
-        size[part_id] = max(box[1]) if box else 20.0
-        link = placed.link if placed else None
-        part = {"id": part_id, "name": name, "url": url, "file": file, "position": [_r(v) for v in position], "rotation": [0, 0, 0]}
-        if link is not None and link in lead:
-            # Bolted to its component's lead part.
-            at = middle[lead[link]]
-            part["parent"] = lead[link]
-            part["position"] = [_r(position[k] - at[k]) for k in range(3)]
-        elif placed is not None and link not in lead:
-            lead[link] = part_id
+        middle[part_id], turn[part_id], size[part_id] = pl.position, _rot(pl.rotation), sizes.get(pl.path, 20.0)
+        part = {
+            "id": part_id, "name": name, "url": url_for(pl.path), "file": file,
+            "position": [_r(v) for v in pl.position], "rotation": _rpy(turn[part_id]),
+        }
+        if pl.link is not None and pl.link in lead:
+            _hang(part, lead[pl.link], middle, turn)
+        elif id(pl) in from_assembly and pl.link not in lead:
+            lead[pl.link] = part_id
         out.append(part)
 
     by_id = {p["id"]: p for p in out}
@@ -359,19 +450,23 @@ def model_parts(bundle: Bundle, url_for: Callable[[str], Optional[str]]) -> list
         parent_id = lead.get(parent_link)
         if parent_id is None or parent_id == child_id:
             continue
-        child, at, c = by_id[child_id], middle[parent_id], middle[child_id]
-        child["parent"] = parent_id
-        child["position"] = [_r(c[k] - at[k]) for k in range(3)]
+        child = by_id[child_id]
+        _hang(child, parent_id, middle, turn)
         if j is None:
             continue
+        rp, rc = turn[parent_id], turn[child_id]
         length = math.hypot(*j.axis)
-        axis = [_r(v / length) for v in j.axis]
+        axis = [v / length for v in j.axis]
+        normal = _app(_t(rp), axis)
+        child_normal = _app(_t(rc), [-v for v in axis])
+        rel = _mul(_t(rp), rc)
+        at, c = middle[parent_id], middle[child_id]
         joint = {
-            "normal": axis,
-            "point": [_r(j.origin[k] - at[k]) for k in range(3)],
-            "childNormal": [_r(-v) for v in axis],
-            "childPoint": [_r(j.origin[k] - c[k]) for k in range(3)],
-            "spin": 0,
+            "normal": [_r(v) for v in normal],
+            "point": [_r(v) for v in _app(_t(rp), [j.origin[k] - at[k] for k in range(3)])],
+            "childNormal": [_r(v) for v in child_normal],
+            "childPoint": [_r(v) for v in _app(_t(rc), [j.origin[k] - c[k] for k in range(3)])],
+            "spin": _r(_spin(rel, child_normal, normal)),
             "gap": 0,
             "distance": max(10, round(size[child_id] * 0.6)),
         }
@@ -383,6 +478,22 @@ def model_parts(bundle: Bundle, url_for: Callable[[str], Optional[str]]) -> list
             joint.update(type="prismatic", lower=j.lower, upper=j.upper)
         child["joint"] = joint
     return out
+
+
+def _hang(part: dict, parent_id: str, middle: dict[str, list[float]], turn: dict[str, Mat]) -> None:
+    """Puts ``part`` in ``parent_id``'s frame, where it is now."""
+    rp, at, c = turn[parent_id], middle[parent_id], middle[part["id"]]
+    part["parent"] = parent_id
+    part["position"] = [_r(v) for v in _app(_t(rp), [c[k] - at[k] for k in range(3)])]
+    part["rotation"] = _rpy(_mul(_t(rp), turn[part["id"]]))
+
+
+def print_counts(bundle: Bundle) -> dict[str, int]:
+    """How many of each STL to print: one per part BetterCad placed from it."""
+    counts: dict[str, int] = {}
+    for p in bundle.assembly.parts:
+        counts[p.path] = counts.get(p.path, 0) + 1
+    return counts
 
 
 # What a part keeps from the model when BetterCad sends it again: how the
