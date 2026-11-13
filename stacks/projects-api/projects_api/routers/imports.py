@@ -304,6 +304,7 @@ async def apply_import(
         image_ids.append(image.id)
         urls[path] = f"{base}/api/projects/{project_id}/images/{image.id}/view"
 
+    counts = bc.print_counts(bundle)
     for path, content, stored, packed in stored_files:
         name = posixpath.basename(path)
         filename = generate_filename(name, project_id)
@@ -318,6 +319,7 @@ async def apply_import(
             stored_size=len(stored) if packed else None,
             file_type=file_category(name),
             description="From BetterCad" if path.endswith(".bcad") else None,
+            print_qty=counts.get(path),
         )
         session.add(record)
         await session.flush()
