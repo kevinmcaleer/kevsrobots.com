@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Pulling and Collaborating
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 10_github-and-remotes.html
+next: 12_project-version-control-a-robot.html
 description: Keep your copies in sync with git fetch and git pull, and learn how pull
   requests let people work together
-layout: lesson
-type: page
+percent: 84
+duration: 6
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

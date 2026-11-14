@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: What are the different parts of a Robot?
-description: The Anatomy of a Robot
+author: Kevin McAleer
 type: page
+cover: /learn/robotics_101/assets/basics_101.jpg
+date: 2023-01-17
+previous: lesson_03.html
+next: lesson_05.html
+description: The Anatomy of a Robot
+percent: 80
+duration: 3
+quiz_total: 12
 navigation:
 - name: Robotics 101
 - content:

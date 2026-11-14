@@ -1,8 +1,15 @@
 ---
-title: Cheat Sheet and Next Steps
-description: Every Git command from the course on one page, plus where to go next
 layout: lesson
+title: Cheat Sheet and Next Steps
+author: Kevin McAleer
 type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 12_project-version-control-a-robot.html
+description: Every Git command from the course on one page, plus where to go next
+percent: 100
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

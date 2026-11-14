@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Installing updates
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 02_pi_setup.html
+next: 04_docker_install.html
 description: Update and Upgrade the OS to the latest patch level
+percent: 20
+duration: 1
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

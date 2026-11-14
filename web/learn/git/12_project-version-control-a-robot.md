@@ -1,10 +1,18 @@
 ---
+layout: lesson
 title: 'Project: Version Control a Robot'
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 11_pulling-and-collaborating.html
+next: 13_cheat-sheet-and-next-steps.html
 description: 'Put everything together: start a brand new MicroPython robot project
   with Git, build a feature on a branch, merge it, tag a release and publish it on
   GitHub'
-layout: lesson
-type: page
+percent: 91
+duration: 8
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

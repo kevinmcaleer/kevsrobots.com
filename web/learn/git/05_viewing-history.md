@@ -1,8 +1,16 @@
 ---
-title: Viewing History
-description: Explore your project's past with git log, git show and git diff
 layout: lesson
+title: Viewing History
+author: Kevin McAleer
 type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 04_staging-and-committing.html
+next: 06_undoing-changes.html
+description: Explore your project's past with git log, git show and git diff
+percent: 42
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

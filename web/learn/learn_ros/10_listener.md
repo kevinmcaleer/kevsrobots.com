@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Talker ROS2 Program
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 09_first_ros_program.html
+next: 11_create_py_package.html
 description: Let's create a talker program to publish messages
+percent: 55
+duration: 2
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

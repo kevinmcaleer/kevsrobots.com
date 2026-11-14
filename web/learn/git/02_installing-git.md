@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Installing Git
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 01_what-is-git.html
+next: 03_your-first-repository.html
 description: Install Git on Windows, macOS, Linux or Raspberry Pi, and set your name,
   email and default branch
-layout: lesson
-type: page
+percent: 21
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:
