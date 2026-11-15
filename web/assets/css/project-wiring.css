@@ -164,6 +164,30 @@ body.project-wiring-open {
 .project-wiring-bom .wb-state.is-unlinked { color: #9a5b12; }
 .project-wiring-bom .wb-state.is-nopins { color: #8a6d1a; }
 .project-wiring-bom .wb-acts { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+/* How complete the row's catalog part is (part-quality.js), and a more
+   complete part to switch to. */
+.project-wiring-bom .wb-quality { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.15rem; font-size: 0.7rem; color: #c3bda9; }
+.project-wiring-bom .wb-quality .is-on { color: #2f6b3b; }
+.project-wiring-bom .wb-complete { padding: 0 0.4rem; border-radius: 999px; background: rgba(47, 107, 59, 0.1); color: #2f6b3b; font-weight: 600; }
+.project-wiring-bom .wb-suggest {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.4rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  background: #fff6dd;
+  border: 1px solid #f0dfa8;
+  font-size: 0.75rem;
+  color: #5c4b14;
+}
+.project-wiring-bom .wb-suggest > .fa-lightbulb { color: #c58b00; }
+.project-wiring-bom .wb-suggest > span:first-of-type { flex: 1 1 160px; min-width: 0; }
+.project-wiring-bom .wb-suggest a { font-weight: 600; color: inherit; }
+.project-wiring-bom .wb-suggest-acts { display: flex; align-items: center; gap: 0.15rem; }
+.project-wiring-bom .wb-suggest .btn { --bs-btn-padding-y: 0.05rem; --bs-btn-padding-x: 0.45rem; --bs-btn-font-size: 0.75rem; }
+.project-wiring-bom .wb-suggest .btn-link { color: #7a6a33; text-decoration: none; }
 .project-wiring-bom .wb-acts:empty { display: none; }
 .project-wiring-bom .wb-acts .btn { --bs-btn-padding-y: 0.1rem; --bs-btn-padding-x: 0.45rem; --bs-btn-font-size: 0.75rem; }
 .project-wiring-bom .wb-empty,

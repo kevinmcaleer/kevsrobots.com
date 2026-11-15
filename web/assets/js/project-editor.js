@@ -1642,6 +1642,7 @@
         return true;
       },
       linkBomRow: (name, part) => linkBomRow(view, name, part),
+      switchBomRows: (slug, part) => switchBomRows(view, slug, part),
       createPart: createCatalogPart,
       addBomRows: parts => addBomRows(view, parts),
       removeBomRows: slugs => removeBomRows(view, slugs),
@@ -1860,6 +1861,22 @@
     view.dispatch({ changes: { from: line.from, to: line.to, insert: edit.text }, userEvent: 'input' });
     scheduleBomLinks();
     return true;
+  }
+
+  // Every Bill of Materials row linking catalog part `slug` switched to
+  // part { slug, name } (BomSync.switchRows), named after it: how many
+  // rows changed.
+  function switchBomRows(view, slug, part) {
+    if (!part || !part.slug) return 0;
+    const edits = BomSync.switchRows(view.state.doc.toString(), slug, part.slug, part.name);
+    if (!edits.length) return 0;
+    const changes = edits.map(e => {
+      const line = view.state.doc.line(e.line + 1);
+      return { from: line.from, to: line.to, insert: e.text };
+    });
+    view.dispatch({ changes, userEvent: 'input' });
+    scheduleBomLinks();
+    return edits.length;
   }
 
   // The Bill of Materials rows that link any of `slugs`, taken out.

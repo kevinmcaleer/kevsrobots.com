@@ -1236,6 +1236,14 @@ class PartCatalogEntry(BaseModel):
     usage_count: int = 0
     cover_url: Optional[str] = None
     has_price: bool = False
+    # How complete the part is, for the catalog's quality marks and the
+    # wiring workspace's "a more complete part" suggestions: a 3-D model,
+    # pins in its pinout (and how many are placed on the model), and a
+    # curated wiring picture (the definition's photo_id, or Snakie's cut-out).
+    has_mesh: bool = False
+    pin_count: int = 0
+    pins_on_model: int = 0
+    curated_photo: bool = False
 
 
 class PartResolveResult(BaseModel):

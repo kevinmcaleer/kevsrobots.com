@@ -78,6 +78,20 @@ table in the text nothing is synced.
   `snakie-host.js`, the embed bundle in `web/assets/js/snakie-parts/`).
   It is stored in `project_wiring` and the text shows its render,
   `/api/projects/{id}/wiring.svg`.
+- A linked row's **Switch** (⇄) swaps its part for another catalog part
+  (a home-made "SG90 Servo" for the catalog's "Tower Pro SG90"): every
+  BOM row linking it links the new part, named after it
+  (`BomSync.switchRows`), and each copy on the canvas becomes the new part
+  where it stands. Wires stay on when the new part has the same pin, by
+  name, label, or the only pin of the same kind (GND, power, signal);
+  the rest come off after a confirm (`WiringBom.switchPart`).
+- How complete a part is: `GET /api/parts/_catalog` reports `has_mesh`,
+  `pin_count`, `pins_on_model` and `curated_photo` (the definition's
+  `photo_id`, or Snakie's cut-out). The parts catalog shows them as marks
+  on each card, with a "Complete parts" filter, and lists complete parts
+  first when searching. The wiring BOM panel shows them per row, and
+  suggests a more complete part with a matching name (`part-quality.js`,
+  `PartQuality.suggest`) with one-press Switch or Link.
 - `/diagram` is the Canva-lite diagram tool (`diagram-editor.js`, Fabric),
   stored in `project_diagrams` with an SVG the text links to.
 - ```` ```mermaid ```` blocks stay as text and are drawn by Mermaid Factory's
