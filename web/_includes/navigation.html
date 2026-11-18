@@ -12,9 +12,13 @@
 {% assign logo='/assets/img/logo_white.png' %}
 {% endif %}
 
+<script type="module" src="/assets/suite/kr-suite.js"></script>
 <nav class="navbar navbar-expand-md justify-content-between" id="myNavbar">
     <div class="container-fluid">
-        <div class="navbar-brand mx-3"><a href="/"><img class="logo" src="{{logo}}" alt="The kevsrobots site logo, a graphic of a robot looking at the user combined with the letters K and R"></a></div>
+        <div class="navbar-brand kr-brand mx-3"><a href="/"><img class="logo" src="{{logo}}" alt="The kevsrobots site logo, a graphic of a robot looking at the user combined with the letters K and R"></a>
+          {%- comment -%} The suite app switcher (#581): Learn, Projects, Snakie and BetterCAD. {%- endcomment -%}
+          <kr-app-switcher app="{% if page.url contains '/projects/' %}projects{% else %}learn{% endif %}"{% if page.mode == 'dark' %} theme="dark"{% else %} theme="light"{% endif %}></kr-app-switcher>
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
