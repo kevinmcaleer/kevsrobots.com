@@ -36,15 +36,17 @@ _ACCOUNT_AGE_NEGATIVE_TTL_SECONDS = 60  # cache lookup failures briefly
 MIN_ACCOUNT_AGE_DAYS = 14
 
 
-def _decode_username(
+APP_TOKEN_REFUSED = "App tokens can't be used here"
+
+
+def _decode_claims(
     access_token: Optional[str],
     authorization: Optional[str],
-) -> str:
-    """Extract and verify the username from a Chatter JWT token.
+) -> dict[str, Any]:
+    """Verify a Chatter JWT and return its claims (``sub`` is always there).
 
-    Pure JWT decode — no DB access. Used internally; callers that want the
-    full live check (including ``is_disabled``) should use
-    :func:`get_current_user`.
+    Pure JWT decode — no DB access. Raises 401 when there's no token, or it's
+    bad, expired or has no ``sub``.
     """
 
     settings = get_settings()
@@ -60,18 +62,39 @@ def _decode_username(
         payload = jwt.decode(
             token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
         )
-        username = payload.get("sub")
-        if not username:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token",
-            )
-        return username
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
         )
+    if not payload.get("sub"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+    return payload
+
+
+def is_app_token(payload: dict[str, Any]) -> bool:
+    """True for a "Sign in with kevsrobots" token an app such as Snakie holds
+    (Chatter#80). It carries ``client_id`` and a space-separated ``scope``."""
+    return "client_id" in payload
+
+
+def _decode_username(
+    access_token: Optional[str],
+    authorization: Optional[str],
+) -> str:
+    """Extract and verify the username from a Chatter sign-in token.
+
+    App tokens are refused (403): they only work on routes that ask for a
+    scope with :func:`require_scope`, so an app can never reach the rest of
+    the API.
+    """
+    payload = _decode_claims(access_token, authorization)
+    if is_app_token(payload):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=APP_TOKEN_REFUSED)
+    return payload["sub"]
 
 
 async def _is_user_disabled(
@@ -139,8 +162,9 @@ async def get_optional_user(
     try:
         return await get_current_user(access_token, authorization, session)
     except HTTPException as exc:
-        if exc.status_code == status.HTTP_403_FORBIDDEN:
+        if exc.status_code == status.HTTP_403_FORBIDDEN and exc.detail != APP_TOKEN_REFUSED:
             raise
+        # Signed out, or an app token (Chatter#80): public pages see a visitor.
         return None
 
 
@@ -502,3 +526,44 @@ async def require_part_writer(
             f"Account must be at least {MIN_ACCOUNT_AGE_DAYS} days old to edit the parts catalog. Come back in {remaining} day(s).",
         )
     return PartWriter(username, True)
+
+
+def require_scope(scope: str, terms: bool = False):
+    """Dependency for routes an app may call with a "Sign in with kevsrobots"
+    token (Chatter#80), such as Snakie sending its wiring.
+
+    A normal sign-in (the kevsrobots cookie, or a Bearer sign-in token) passes
+    as with :func:`get_current_user`. An app token passes only when its
+    ``scope`` claim holds ``scope``; otherwise 403 with
+    ``WWW-Authenticate: Bearer error="insufficient_scope"``. Disabled accounts
+    get 403 either way. With ``terms=True`` the T&Cs gate of
+    :func:`require_terms_accepted` applies too, for writes.
+
+    App tokens last an hour. Disconnecting the app on the account page stops
+    new ones at once; one already issued runs out within that hour.
+    """
+
+    async def dependency(
+        access_token: Optional[str] = Cookie(default=None),
+        authorization: Optional[str] = Header(default=None),
+        session: AsyncSession = Depends(get_session),
+    ) -> str:
+        payload = _decode_claims(access_token, authorization)
+        username = payload["sub"]
+        if is_app_token(payload) and scope not in str(payload.get("scope", "")).split():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"This app wasn't given the {scope} permission",
+                headers={"WWW-Authenticate": f'Bearer error="insufficient_scope", scope="{scope}"'},
+            )
+        disabled, reason = await _is_user_disabled(session, username)
+        if disabled:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=reason or "Account disabled",
+            )
+        if terms:
+            await _check_terms_accepted(session, username)
+        return username
+
+    return dependency

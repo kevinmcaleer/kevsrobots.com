@@ -544,6 +544,27 @@ class ProjectWiringUpdate(BaseModel):
     svg: Optional[str] = None
 
 
+class WiringSend(BaseModel):
+    """Snakie's "Send to kevsrobots" (kevsrobots.com#582, Snakie#1310): the
+    wiring (a RobotDefinition), its picture, and where the code lives."""
+
+    data: dict
+    svg: Optional[str] = None
+    # The project's code on GitHub. Projects never store code (GitHub does).
+    repo_url: Optional[str] = Field(default=None, max_length=500)
+
+
+class WiringSent(BaseModel):
+    project_id: int
+    title: str
+    # The project page on kevsrobots.com, or None for a project with no slug yet.
+    url: Optional[str] = None
+    svg_url: Optional[str] = None
+    repo_url: Optional[str] = None
+    # True when the project had no Wiring section and one was added for the picture.
+    added_wiring_section: bool = False
+
+
 class ProjectWiringResponse(BaseModel):
     project_id: int
     data: dict
