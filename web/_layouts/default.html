@@ -7,7 +7,7 @@
 {% assign bg-col ='white'%}
 {% endif%}
 
-<html lang="en">
+<html lang="en" data-kr-app="learn">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,6 +16,8 @@
         
         <link rel="stylesheet" href="/assets/css/main.css?v={{ site.time | date: '%s' }}" type="text/css">
         <link rel="stylesheet" href="/assets/css/ptor.css?v={{ site.time | date: '%s' }}" type="text/css">
+        <link rel="stylesheet" href="/assets/suite/kr-tokens.css?v={{ site.time | date: '%s' }}" type="text/css">
+        <script src="/assets/suite/kr-suite-bar.js?v={{ site.time | date: '%s' }}" defer></script>
         {% include consent.html %}
         
    

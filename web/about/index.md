@@ -32,6 +32,15 @@ My aim is to inspire, educate and entertain you, and hopefully you'll find somet
 
 If you're a business and you'd be interesting in working with me sending samples for review, you can always get in touch via [Twitter](/twitter) and we can take it from there.
 
+## The kevsrobots suite
+
+kevsrobots.com is the home of a small family of free apps that work together. Learn here, write and run your code in **Snakie by kevsrobots**, design printable parts in **BetterCAD by kevsrobots**, and share the whole build in **Projects**. See [what's new](/whats-new/) in each of them.
+
+{% endcapture %}
+{{ content | markdownify }}
+{% include suite_links.html tone="light" %}
+{% capture content %}
+
 Please note this is a hobby project of mine (though I do take it very seriously), but that means I'm unlikely to have capacity to work on builds for anyone for the forseeable.
 
 {% endcapture %}

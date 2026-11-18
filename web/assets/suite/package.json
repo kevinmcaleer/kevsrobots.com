@@ -1,0 +1,25 @@
+{
+  "name": "@kevsrobots/suite",
+  "version": "0.1.0",
+  "description": "The kevsrobots suite look: shared --kr-* design tokens and the <kr-suite-bar> web component, for kevsrobots.com, Snakie and BetterCAD.",
+  "license": "MIT",
+  "author": "Kevin McAleer",
+  "homepage": "https://www.kevsrobots.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinmcaleer/kevsrobots.com.git",
+    "directory": "web/assets/suite"
+  },
+  "bugs": "https://github.com/kevinmcaleer/kevsrobots.com/issues",
+  "keywords": ["kevsrobots", "design-tokens", "web-component", "snakie", "bettercad"],
+  "main": "kr-suite-bar.js",
+  "exports": {
+    ".": "./kr-suite-bar.js",
+    "./kr-suite-bar.js": "./kr-suite-bar.js",
+    "./kr-tokens.css": "./kr-tokens.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": true,
+  "files": ["kr-suite-bar.js", "kr-tokens.css", "README.md"],
+  "publishConfig": { "access": "public" }
+}

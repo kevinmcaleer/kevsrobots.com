@@ -1,0 +1,592 @@
+# What's new fallback (#581): used when the build can't reach GitHub.
+# Regenerate with: ruby web/_plugins/suite_releases.rb --write web/_data/whats_new.yml
+---
+- app: snakie
+  app_name: Snakie
+  version: v0.91.0
+  title: Snakie v0.91.0
+  date: '2026-09-20'
+  url: https://github.com/kevinmcaleer/snakie/blob/HEAD/CHANGELOG.md
+  body: |-
+    ### Added
+
+    - **`RangeFinder` joins the bundled HC-SR04 driver (`hcsr04` 1.1.0).** The
+      standalone `range_finder.py` that circulates with HC-SR04 projects is now part
+      of the installable `hcsr04` module, as a `RangeFinder` class alongside
+      `HCSR04`: positional `trigger_pin` / `echo_pin` arguments, `distance` and
+      `distance_cm` as properties, and `duration` / `distance_to_object` recorded on
+      each read. Unlike the loose copy it replaces it inherits this driver's echo
+      timeout, so a missing or out-of-range target returns `-1` instead of
+      busy-waiting on the echo pin forever. Installing the HC-SR04 module from the
+      Modules manager now covers both styles of script; existing boards will be
+      offered the 1.1.0 update.
+    - **"What block is this?" (#1245).** A drop zone in the bottom-left corner of
+      the blocks canvas. Drag any block onto it — including one from a program
+      somebody else wrote — and it says what the block is: its shape and what that
+      shape means, the drawer it lives in, whether it came from Snakie's palette, a
+      part, a plugin or an imported module, the Python library it imports, the pin
+      it claims and which way it drives it, what is plugged into each socket, and
+      the Python that one block writes. The block springs straight back to where it
+      was, so asking about a program never edits it, and a block this build has no
+      description for says exactly that instead of guessing. Blocks with a help
+      article offer a **Read more about this** button straight into the in-app help.
+    - **Detect the modules baked into a board's firmware (#1246).** Snakie could
+      only ever see two kinds of module: the ones in its own catalog, and the `.py`
+      files sitting in `/` and `/lib`. A vendor MicroPython image compiles modules
+      INTO the binary — an Arduino Alvik's carries `arduino_alvik`, `ucPack` and a
+      frozen `modulino` — and none of them are files, so the Detected panel listed
+      nothing and the learner was left with an import that works and an app that
+      says the module isn't there. A new discovery probe asks the board to
+      enumerate itself: `help('modules')` for everything built in or frozen, a walk
+      of `sys.path` for the files (which `help('modules')` deliberately doesn't
+      scan), and `sys.modules` for whatever is already live. The Detected shelf
+      grows a **Built into the firmware** section, labelled with the board's own
+      description, and expanding a row runs `dir()` on that one module — the only
+      way to see inside something with no source file, and honest about what
+      freezing discards: names only, no signatures. Nothing is imported to build
+      the list, because importing a whole firmware's worth of modules is how an
+      ESP32 runs out of memory.
+
+    - **A catalog module the firmware already provides now reads BUILT IN
+      (#1246).** It imports, so the old probe called it installed and offered an
+      UPDATE for something with no `/lib` copy to update and nothing Snakie could
+      replace. A `/lib` copy that shadows the frozen one still reads as an ordinary
+      install, because that copy is the one that actually imports.
+
+    - **Function settings, in one place (#1218, epic #1206).** A `def` or method
+      block's right-click menu has a new **Function settings…** dialog holding both
+      of the things written around a function that are text rather than sockets:
+      its decorators (#1215), which had no editing UI at all, and its extra
+      parameters (#1134) — a default, a `*args`, a `**kwargs` — which were only
+      reachable through a hidden row on the block. Decorators can be added, typed,
+      reordered and removed, with `@property`, `@staticmethod`, `@classmethod` and
+      `@micropython.native` offered as one-click entries. The old **Add extra
+      parameters…** item stays as a shortcut into the same dialog, focused on the
+      extras box. The generated Python is unchanged — only where the text is edited
+      has moved — and the parameter list itself stays on Blockly's own cog, because
+      renaming a parameter there renames it in every call.
+
+    - **`self.x` and `obj.x` are blocks of their own (#1223, epic #1206).** Reading
+      and changing something an object remembers used to open as the grey Python
+      escape hatch — the second-biggest theme in the corpus, sitting in the drawer
+      for the Python the palette does not model. Four new advanced blocks claim it:
+      *self . speed* and *set self . speed to …*, which have the `self` decision
+      built in and no socket to unplug, and *( ) . speed* / *set ( ) . speed to …*
+      for any other object. Files open with them automatically; method calls
+      (`self.led.on()`) and deeper targets (`self.motor.speed`) are unchanged.
+    - **Advanced blocks in a simple-mode file are offered, never removed (#1212,
+      epic #1206).** Opening a file that uses advanced blocks while the advanced
+      drawers are off now shows one dismissable line — *"This file uses advanced
+      blocks — show them in the toolbox?"* — with a **Show them** button that flips
+      the setting, and a caret that names the blocks. It appears once per file
+      open, not on every edit. Nothing about the file changes either way: the
+      reader takes no notice of the level, so the same Python becomes the same
+      blocks in both tiers, they render, drag, duplicate and generate normally on
+      the canvas, and no line is quietly downgraded to a grey Python block because
+      of a preference. The level decides what is in the drawer and nothing else.
+
+    - **Courses can ask for the blocks they need (#1214, epic #1206).** A lesson —
+      or a whole course — can now declare `level: advanced` in its `course.yml`, and
+      opening it switches **Advanced blocks** on, with a one-line note in the Learn
+      panel saying so and where to switch them off again. Leaving the lesson does
+      not put the drawers away: the learner has now seen them. The blocks track's
+      "When the block you need doesn't exist yet" lesson carries the key, so the
+      grey Python blocks it teaches are in the toolbox even for a learner who
+      started in simple mode. A course that declares nothing never turns advanced
+
+    …
+- app: snakie
+  app_name: Snakie
+  version: v0.85.4
+  title: Snakie v0.85.4
+  date: '2026-09-19'
+  url: https://github.com/kevinmcaleer/snakie/blob/HEAD/CHANGELOG.md
+  body: |-
+    ### Added
+
+    - **3-D model for the Yellow TT Motor.** The Standard-library `tt-motor` part
+      now ships `model.stl` (mm) so it appears in the Robot View / build workspace
+      instead of a footprint box. The mesh is Adafruit's 3777 TT Motor from the
+      MIT-licensed [Adafruit_CAD_Parts](https://github.com/adafruit/Adafruit_CAD_Parts)
+      repository; the help article credits it. It ships with the `meshRotation` and
+      `meshOffset` that lay it flat the way it mounts in a chassis — axle horizontal
+      across X, body along Y, underside on `z = 0` — because the file as published
+      stands the motor on its end.
+
+    - **⌘S / Ctrl+S saves the active file from anywhere in the window.** The
+      shortcut already worked with the cursor in the code editor and, on the
+      desktop, through the File menu's accelerator. Now a window-level listener
+      also catches it with focus in the file tree, the shell or a panel — which
+      matters most in the web app, where there is no native menu and the key
+      otherwise fell through to the browser's "Save page as…" dialog. Same on
+      macOS, Windows and Linux.
+
+    - **Breadboard (400 point) in the Standard library.** A half-size solderless
+      breadboard part whose 400 tie points are wired internally like the real
+      thing: each row's `a`–`e` and `f`–`j` are two 5-way nets (the centre channel
+      splits them) and each `+`/`−` rail runs the full 30 rows as one net, so a
+      wire dragged to `a5` reaches `b5`–`e5` in the netlist and ERC. Ships a
+      top-down image, a mini-help article on how the holes connect, and a 3-D
+      model (`model.stl`) for the Robot View.
+
+    ### Changed
+
+    - **The Yellow TT Motor's footprint is now its real size**, 36.6 × 70.6 mm
+      (shaft tip to shaft tip by overall length) rather than the placeholder
+      22 × 44 mm. The 2-D artwork is drawn in normalised coordinates so it rescales
+      with the part; the change matters because the new 3-D model is placed at true
+      millimetre scale, and the old footprint disagreed with it by a third.
+
+    ### Fixed
+
+    - **PDF export drew some parts as `part library not installed`.** A placed
+      part is named in `robot.yml` by the library it was placed from, and that
+      name does not follow the part: a part promoted from `my-parts` into the
+      Standard library, or a desktop project opened in the web app (which ships
+      only the Standard library), still says `my-parts`. The bill of materials
+      already fell back to the part's id in any installed library; the wiring
+      diagram did not, so the same document named the part on one page and drew
+      a grey placeholder with no pins on the next. Every place a placed part is
+      resolved — the breadboard, the netlist and ERC, the help panel, the driver
+      banner, the Robot View and the part blocks — now shares that fallback.
+    - **Zoom to fit centres the blocks.** Pressing the fit control on the blocks
+      canvas left the fitted stacks below the bottom edge, so the learner still had
+      to scroll. The canvas is now re-measured before the fit and the view is
+      scrolled so the blocks' bounding box sits in the middle of it.
+
+    - **A pin's "hide label" flag now survives a save.** `parts.yml` dropped
+      `labelHidden` on both read and write, so the Part Editor's checkbox reset on
+      every reload.
+- app: snakie
+  app_name: Snakie
+  version: v0.84.1
+  title: Snakie v0.84.1
+  date: '2026-09-19'
+  url: https://github.com/kevinmcaleer/snakie/blob/HEAD/CHANGELOG.md
+  body: |-
+    ### Changed
+
+    - **New canvases default to the `scratch` block shape.** Settings ▸
+      Appearance still offers `standard` and `classic`, and an existing choice in
+      storage is unaffected — this only changes what a first-run canvas looks
+      like, from Blockly's compact `standard` row layout to the taller,
+      Scratch/MakeCode-style pill blocks newcomers are more likely to recognise.
+
+    ### Fixed
+
+    - **Blocks never overlap, and the functions use the width of the canvas.**
+      Open a converted `.py` and its functions, classes and main program could
+      land on top of each other. The canvas measured each stack straight after
+      loading it, but Blockly draws on the next animation frame, so every stack
+      measured 0px tall and they were laid one gutter apart. The layout now
+      flushes Blockly's render queue before it measures, so each island of blocks
+      gets a box of its true size and no two boxes share a pixel. The functions
+      no longer trail down a single column, either: they flow into as many columns
+      beside the main program as the viewport is wide, each column as tall as the
+      program (or the screen, for a short program) before the next one opens. A
+      file whose layout the learner arranged keeps that layout, but not its
+      overlaps — a stack that has grown into the one below it moves the lower one
+      down, on opening and after each edit, with the stack being edited staying
+      where it is. The PDF export's off-screen blocks get the same layout.
+    - **Run on the web simulator shows the program's output while it runs.** Click
+      Run on a blink program — `while True:` around `time.sleep(1)` and a
+      `print('hello')` — and the console stayed empty: no `hello`, ever, until
+      Stop. The program was running; its output was not leaving the simulator's
+      worker. The worker posted output to the page on a timer, and `time.sleep`
+      in the WebAssembly port is a busy-wait inside the interpreter, so a program
+      that never returns never let the timer fire. The desktop simulator had
+      learned this already and posted each line as it was printed; the web one had
+      not. Both workers now share one output pump that posts a line the moment it
+      is complete, so `hello` appears once a second, on the web as on the desktop.
+    - **The PDF export always includes the blocks.** The blocks pages read the
+      Blockly canvas on screen and nothing else, and that canvas only exists while
+      the Blocks view is open. Press the print button from the Code workspace, from
+      Electronics or Build, or with the split collapsed to its Python-only view,
+      and the document went out with every other section in it and no blocks — and
+      nothing said so. The export now photographs the canvas on screen when there
+      is one, and otherwise builds the active file's blocks into an off-screen
+      workspace (the same footer-or-derived reading the Blocks view opens on, in
+      the same theme and renderer), prints them, and throws it away. A file whose
+      blocks this build cannot read is reported as "exported without the blocks"
+      in the status bar rather than quietly dropped.
+
+    ### Added
+
+    - **The functions get a column of their own, and nothing is drawn on top of
+      anything.** Opening a MicroPython file in Blocks or Split laid every
+      top-level stack out in one tall column — so a file that defines four
+      functions opened with its program a screen and a half below the last of them,
+      and you scrolled past everything to find where it starts. Worse, the column
+      was spaced by an ESTIMATE: the converter is pure and has never loaded Blockly,
+      so it counted rows and multiplied by numbers somebody had read off a
+      screenshot. When the estimate came in short — which a `def` full of
+      arithmetic reliably did — the next stack was drawn straight over the one
+      above it.
+
+      Now the program runs down the left and the functions and methods stand beside
+      it in a second column, each clear of the one above, and the sizes are
+      MEASURED rather than guessed: the canvas asks each stack how big it actually
+      rendered. A layout you arranged yourself is still yours — a file whose footer
+      matched its code opens exactly as you left it, and a stack you drag aside
+      stays where you put it even as the code pane keeps re-converting around it.
+
+    - **Settings ▸ Appearance ▸ Block shape — try all three Blockly geometries.**
+      Blockly ships three renderers and they are three vocabularies rather than
+      three settings of one dial, so which one suits a room is not a question the
+      app can answer on its own: a class arriving from Scratch wants the pills and
+      the hexagons, and somebody reading a forty-line robot file wants the compact
+      rows.
+
+      **Standard** is `thrasos`, the flat standard rows, and the default. **Classic**
+      is `geras`, Blockly's own default, the same geometry with a bevelled edge.
+      **Scratch** is `zelos`, the `scratch-blocks` port — pill reporters, hexagonal
+      booleans, roughly twice as tall. All three wear the same Soft Shell palette,
+      fonts and per-category lettering, so the choice is a SHAPE and nothing else,
+      and all three are stock: the hand-tuning that made the old canvas fragile is
+      not coming back on any of them.
+
+      An open canvas redraws as soon as you pick one. Blockly fixes its renderer
+      when a workspace is created and offers no setter, so this is the one
+      appearance setting that re-injects the canvas rather than restyling it — your
+      file, your scroll position and your arrangement come straight back. The
+      printed PDF follows the same setting, so a page matches the screen it was
+      printed from.
+
+    - **A PWM can be named with its frequency: `name PWM on pin [GP15 ▾] as
+      [motor_a] at [1000] Hz`.** `pwm_motor_a = PWM(motor_a, freq=1000)` is
+      how nearly every robot tutorial opens, and it matched nothing this palette
+      writes — so `pwm_motor_a` was not a name the blocks knew, and every
+      `pwm_motor_a.duty_u16(int(50 * 65535 / 100))` under it came back as the
+      generic *call duty_u16 on (pwm_motor_a) with (turn (50 × 65535 ÷ 100) into a
+
+    …
+- app: snakie
+  app_name: Snakie
+  version: v0.68.8
+  title: Snakie v0.68.8
+  date: '2026-09-16'
+  url: https://github.com/kevinmcaleer/snakie/blob/HEAD/CHANGELOG.md
+  body: |-
+    ### Added
+
+    - **A Modules drawer, filled from your program's own imports** (#1048, epic
+      #1007). Open a real driver program and it converts perfectly — ten blocks, no
+      warnings, byte-exact round trip — and offers you *nothing*: the `oled.text(…)`
+      lines are raw Python blocks you can drag but cannot author more of. That is the
+      right floor and a poor ceiling.
+
+      There is now a **Modules** category, one sub-drawer per module the program
+      imports, separate from **My parts** — which keeps meaning "things on your
+      breadboard", because that distinction earns its keep.
+
+      This first tier is the one the issue calls a free win: the curated symbol
+      tables already carried kinds and one-line details for ~39 modules and were
+      wired only to Monaco's completions. Nothing in the blocks stack had ever
+      imported them. So `machine`, `time`, `neopixel` and friends get blocks with
+      **no parsing, no file and no board** — which matters because those are exactly
+      the modules whose source we will never have: they are frozen into the
+      firmware. The `detail` lines turn out to be signatures, so the blocks get real
+      parameter names too. Member-level dialect scope is respected, so a
+      CircuitPython board is not offered `time.sleep_ms`.
+
+      Three tiers now fill the drawer, best first, and a module answered by one is
+      never asked of the next:
+
+      1. **Its own source, wherever the nearest copy is** — your project folder, then
+         the board's `/lib`, then the drivers Snakie bundles. `module-api.ts` reads
+         the classes, methods, parameters and defaults out of the `.py` with #1019's
+         lexer: **parsing only, never importing**, because a module a learner
+         downloaded is somebody else's code and importing it on the host to look
+         inside would run it. Real parameter names, real defaults, and a socket only
+         for the arguments that have no default.
+      2. **The curated tables**, as above.
+      3. **The board's own `dir()`** — one batched round trip for the modules
+         nothing else could describe (a C module, a stripped `.mpy`), and only for
+         those. This tier imports on the *board*, which is the same exposure as
+         pressing Run.
+
+      Reading a module's source also retires a guess that has been visible on the
+      face of every derived part block since #1017. `vl53l0x` → `VL53L0X` is right
+      for most drivers and plainly wrong for the rest; a wired part whose driver we
+      can find now carries the class the driver actually declares — the Grove I²C
+      motor driver says `GroveMotorDriver`, not `TB6612`. The field stays editable,
+      and a part whose driver is nowhere keeps the old guess.
+
+    - **The hardware blocks speak CircuitPython** (#1040, epic #1007 and epic #209).
+      The same block, on a Feather, writes `digitalio.DigitalInOut(board.GP15)`
+      instead of `Led(pin=Pin(15, Pin.OUT))` — **one block, two templates**, which
+      is the decision #1040 left open and `docs/blockly-epic.md` §9.7b now records.
+
+      The argument in one line: *a learner's program should be a program, not a
+      program-for-a-Pico*. Two block sets would have thrown away the portability the
+      `.py`-with-a-footer format exists for; with one block a canvas built in a
+      classroom's MicroPython half opens and runs in its CircuitPython half. The
+      objection — a block whose code you cannot predict — is answered by the mirror
+      next door, which shows exactly what it generated.
+
+      Nine of the twelve hardware blocks do it. Servo and buzzer have no
+      CircuitPython *core* equivalent (they want `adafruit_motor` and `simpleio`,
+      third-party libraries and a different promise), so the toolbox withholds them
+      there — and scope is now **derived** from what a block can generate, so a
+      working block can never be hidden from the board it works on.
+
+      Pin names come off the board's own silk label, which is what CircuitPython's
+      `board` module is built from: `board.GP15` on an RP2040, `board.IO15` on an
+      ESP32-S3.
+
+    - **Hardware lines come back as hardware blocks** (#1058, epic #1007). Only the
+      turtle palette declared `read`, so a hardware program converted
+      asymmetrically: blocks → Python perfect, Python → blocks dropping to a raw
+      block on exactly the lines that mattered. `led_15.set(True)` was a grey box of
+      text; the learner could read their program but not build it.
+
+      A hardware block doesn't write one line — it writes a constructor hoisted into
+      the setup section *and* a call on it, with the pin in the object's **name**.
+      Reading one back means reading both lines and then not emitting the
+      constructor a second time. Eight of the twelve hardware blocks now do:
+      LED on/off and toggle, pin write and read, PWM frequency, servo angle, and the
+      buzzer's tone and stop. A pull resistor is read out of the *constructor*,
+      which is the only place it appears.
+
+      **All or nothing per object.** If any use of a hoisted object can't be read,
+      none of them are and its constructor stays — otherwise you get two `Led`s
+      driving one pin, the learner's and the block's own hoisted copy. And a
+      constructor that isn't character-for-character what the block would have
+      written is somebody else's line, and is left alone.
+
+      The four left out say why in the code: the onboard LED has no pin in its name,
+      "button is pressed" changes the *shape* of its line with the dropdown, and the
+      PWM-duty and ADC blocks wrap theirs in arithmetic that is the lesson. Those
+      still convert to raw blocks, exactly as before.
+
+    - **An I²C bus, as a block** (#1057, epic #1007). Wiring an I²C sensor is one of
+      the first things anyone does on a Pico, and there was no block for it — not
+      I²C, not SPI. So `i2c = I2C(Pin(0), Pin(1))` and `print(i2c.scan())` came back
+      from the Python converter as two raw-Python blocks: a program you could read
+      and could not build.
+
+      **Hardware** now has *"the I²C devices on SDA / SCL"*, handing back the
+      addresses as a list, and *"is there a device at address … on SDA / SCL"*,
+      which is the question a wiring problem actually asks and drops straight into
+
+    …
+- app: snakie
+  app_name: Snakie
+  version: v0.56.0
+  title: Snakie v0.56.0
+  date: '2026-09-06'
+  url: https://github.com/kevinmcaleer/snakie/blob/HEAD/CHANGELOG.md
+  body: |-
+    ### Added
+
+    - **Compile to `.mpy` in the browser** (#970). On app.snakie.org the file tree's
+      context menu read **"Compile to .mpy (unavailable)"**, greyed out. Nothing was
+      stopping it: `mpy-cross` is already WebAssembly, and a browser tab runs
+      WebAssembly perfectly well — it had simply only ever been wired to the desktop
+      app's main process. It now works in both, from the same menu item.
+
+      The compiler is built **twice from the same objects** and ships **one
+      `.wasm`**: a CommonJS loader for node (`.cjs`, because this package is
+      `"type": "module"` and a `.js` would parse as ESM and hand `require()` an
+      empty object) and an ES module for the browser (`-sENVIRONMENT=web,worker`,
+      which also links Emscripten's `require("node:fs")` branches out entirely). A
+      test compiles the same source through **both** loaders and fails if the
+      bytecode differs by a byte — a student's `.mpy` must not depend on which app
+      they used.
+
+      It runs **in a worker**. A compile is short, but it is a synchronous WASM run
+      with no yield the browser could paint between; the simulator learned that the
+      expensive way. The `.wasm` is a static asset of the web bundle, fetched once
+      and handed in as `wasmBinary` (so nothing has to guess at a hashed asset
+      path), and it is precached by the service worker — so compiling works offline
+      after the first visit.
+
+      Only the two ends differ between the platforms now: **where the module is
+      loaded from, and where the file comes from and goes**. The run in between —
+      Emscripten's in-memory filesystem, the callbacks, the wording of a syntax
+      error — is one shared module both call, so a fix to it reaches both. On the
+      web the file ends are the web filesystem (a real folder via the File System
+      Access API, or the OPFS `Projects/` folder on an iPad), and the `.mpy` goes
+      out through the **bytes** channel, never the text one, which would UTF-8
+      mangle every byte above 0x7F.
+
+    ### Fixed
+
+
+    - **The browser build picks up a new deploy on its own** (#971). app.snakie.org
+      could keep serving an older build until you hard-reloaded the tab. Not HTTP
+      caching — the **service worker** (#464), and two halves of one mistake.
+
+      `registerType: 'autoUpdate'` was silently inert. vite-plugin-pwa only turns it
+      into `skipWaiting` + `clientsClaim` when `injectRegister` is `'auto'` or absent,
+      and we set `'script'` — chosen so the registration wasn't an inline script the
+      strict CSP rejects. So Workbox shipped a worker that calls `skipWaiting()` only
+      when the page posts it a `SKIP_WAITING` message, and never calls
+      `clients.claim()`. Nothing ever posted that message, because the registration the
+      plugin injected was a bare `navigator.serviceWorker.register(…)` with no update
+      handling at all.
+
+      A new deploy therefore installed and then sat in `waiting` until every tab of the
+      origin closed — which, for the tab you keep the IDE open in, is never — while
+      each navigation kept being answered from the **old** precache. A hard reload
+      worked because it is the one thing that bypasses the worker. The config read as
+      if it auto-updated; the build disagreed, with no warning.
+
+      Both flags are now set **explicitly**, so the behaviour can't hinge on a plugin
+      inference again, and the app registers the worker itself — our bundle is
+      `'self'`, so the CSP reason for `injectRegister: 'script'` still holds without
+      its side effect.
+
+      When a new build lands the page **reloads itself** — but only when nothing is
+      unsaved. Snakie is an editor, and reloading over an unsaved buffer would be a
+      worse bug than the stale build. With work in progress it says so instead, through
+      the same notifier the desktop app uses, and waits for you; the notice says
+      *reload*, not *restart*, because a browser tab has no restart. The check assumes
+      there IS unsaved work until the UI says otherwise — a needless prompt is an
+      annoyance, a discarded buffer is not.
+
+      A `version.json` stamp ships beside the bundle and is fetched `no-store`, so the
+      staleness check can't itself be answered from a cache. It names the new version
+      in the notice, and covers contexts with no service worker at all.
+
+    - **macOS releases no longer fail at random** (#968). Signing died with
+      `security set-key-partition-list … SecKeychainUnlock: The user name or passphrase
+      you entered is not correct` — v0.51.1 and v0.55.0 each needed three attempts.
+      It is a defect in electron-builder's own keychain setup: `importCerts` passes the
+      **.p12's** password to `set-key-partition-list -k`, which wants the **keychain's**.
+      `security` only consults `-k` when it has to unlock the keychain, so the wrong
+      password is invisible while the keychain happens to still be unlocked and fatal
+      once anything has relocked it — a latent bug that shows up as a coin toss.
+
+      `release.yml` now builds and unlocks the signing keychain itself, imports the
+      certificate with the right password in each place, asserts the identity landed,
+      and hands electron-builder the keychain via `CSC_KEYCHAIN`. With `CSC_LINK`
+      absent, electron-builder skips its own keychain code entirely, so the broken path
+      is never taken. Unsigned builds (a fork, secrets unset) are unaffected — the step
+      is a no-op without a certificate. Background in `docs/macos-signing.md`.
+
+      Failures here were also **silent**: the tag pushed, master claimed a release, and
+      no release existed. The identity check now fails in seconds with a clear message
+      rather than twenty minutes in.
+
+    - **The Cancel button is readable in the Simulated device memory dialog** (#969).
+      It was near-white at rest and pure white on hover, over the dialog's light card.
+      `ConnectionControl` renders the dialog inline, so it is a DOM descendant of
+      `.conn-control` — and the shell header's chip rules, whose colours are chosen for
+      a dark green bar, reached it through a descendant combinator and painted a modal
+      button as if it sat on the header. Every real header control is a direct child, so
+
+    …
+- app: snakie
+  app_name: Snakie
+  version: v0.55.0
+  title: Snakie v0.55.0
+  date: '2026-09-06'
+  url: https://github.com/kevinmcaleer/snakie/blob/HEAD/CHANGELOG.md
+  body: |-
+    ### Added
+
+    - **File sizes in both file trees** (#955). Neither the local nor the device tree
+      showed how big a file was, which hid the one case worth seeing: **a 0-byte file
+      looks exactly like a good one**. This repo has met that — a truncated
+      `lsm6dsox.py` on a board threw a `SyntaxError` at line 159 and cost real
+      diagnosis time, which is what #864's atomic writes exist to prevent.
+
+      Sizes read as `0 B`, `847 B`, `2 KB`, `1.4 MB`, `1 TB` — **plain bytes below a
+      kilobyte**, deliberately. The app's other formatter renders a 213-byte file as
+      `0.2 KB` and an empty one as `0 KB`, which is exactly the reading this exists
+      to replace.
+
+      An unknown size shows **nothing**, never `0 B`. A `stat` can fail — a broken
+      symlink, a file deleted between the listing and the stat — and a zero invented
+      there would manufacture the very problem the column was added to reveal.
+      Folders show nothing too: a folder is not an empty file.
+
+      The device tree had the number all along (`os.ilistdir` returns it); it was
+      simply never displayed. The local listing now stats each file, in parallel, and
+      a failure leaves the size absent rather than failing the listing.
+
+    - **The status bar keeps a history** (#953). It shows one line at a time and
+      every message wipes the one before it, so anything you were not looking at was
+      simply gone — including the ones that matter afterwards: which file failed to
+      sync, what the compile said, why an install stopped.
+
+      Click the message to see the recent ones; **Show all** opens the full log,
+      where it can be copied to the clipboard, saved as a text file, or cleared.
+      Settings ▸ Editor carries the three questions worth asking: keep a history at
+      all, how many lines, and clear what is there.
+
+      Newest first on screen, **oldest first in the file** — the thing you just
+      missed is the thing you clicked for, while a saved log is read by other tools
+      and by scrolling down, and those want time running forwards.
+
+      Messages are recorded from the `snakie:status` **event** rather than from
+      `showStatus`, so a plugin posting to the bar directly is kept too, and the
+      listener attaches at module load rather than from a component — the panel that
+      reads the history is opened *after* the message you wanted. The cap is a ring
+      buffer, applied to what is already stored as well as to what arrives, so
+      lowering it in Settings takes effect immediately rather than drifting until
+      enough new messages reconcile the two numbers. Turning history off discards
+      what was kept, because a switch that says "don't keep a history" and leaves the
+      old one on disk is not telling the truth.
+
+    - **Right-click a `.py` and compile it to `.mpy`** (#949). MicroPython's own
+      `mpy-cross` turns a source file into the bytecode container a board imports
+      without ever seeing the source — smaller, and faster to import. It is now a
+      context-menu item in the Files tree, writing the `.mpy` beside its `.py`, with
+      the compiler's own diagnostics when it fails: `SyntaxError` with the line, not
+      a shrug.
+
+    - **We build the compiler ourselves** (#950). The published
+      `@pybricks/mpy-cross-v6` works, but it is pinned to MicroPython **v1.19**
+      because its Makefile lists every `py/*.c` file **by hand** — ~108 of them,
+      where v1.29 has 133. `scripts/build-mpy-cross.sh` has no such list: it points
+      `PROG` at a `.js` and lets MicroPython's own `py.mk` compute the sources, so
+      the build tracks whatever the pinned tag needs and moving to a new MicroPython
+      is one line. A test asserts the compiler is built from the same release the
+      Board Finder offers firmware for, because a compiler older than the firmware
+      we hand people is exactly the drift worth not having.
+
+      It ships as **WebAssembly**: no per-platform binaries, and no third executable
+      to sign and notarize inside the app bundle. It runs in the main process, which
+      keeps 334 KB of `.wasm` out of the renderer and away from the asset-path
+      problem #947 was. And there is no third-party JavaScript in it either — the
+      published package bakes its filesystem wiring into the artifact with
+      `--pre-js`, where ours passes `preRun`/`print`/`printErr`/`onExit` from our own
+      typed code. What ships is `mpy-cross` and nothing else.
+
+      Three things cost real time and are written down where they bit: `emmake`
+      rewrites `CC=gcc` into `emgcc`, which does not exist; modern Emscripten prunes
+      `wasmBinary` from the incoming module API unless it is declared; and the
+      loader must be named **`.cjs`**, because this package is `"type": "module"` and
+      a `.js` is parsed as ESM, so Emscripten's CommonJS export never runs and
+      `require` hands back an empty object — the same trap that makes the preload
+      `index.cjs`.
+
+    ### Changed
+
+    - **The docs describe the app that ships** (#962). The README announced
+      "v0.13.0 released" at v0.54.x, and `docs/micropython-boards.md` claimed 219
+      boards from a July snapshot while the shipped index held 225 from MicroPython
+      v1.29.0. Nothing from this run of releases appeared anywhere: not the Board
+      Finder, not the File / Device / Tools menus, not the shortcut sheet, not
+      `.py` → `.mpy`, not the status history, not file sizes.
+
+      The board catalogue is **generated** now, by `scripts/build-boards-doc.mjs`
+      from the same index the app ships, and a test holds its total, its MicroPython
+      release and every one of its rows to that source. It drifted because it had to
+      be retyped, and a reference that is quietly wrong is worse than none — the
+      reader trusts it.
+
+      The README's Status section no longer names a version at all. A number there
+      has to be maintained to stay true, and Releases already has it; what belongs in
+      a README is what the app does.
+
+      **No screenshots were audited: the repository contains none.** Any that exist
+      live outside it, and are still worth a pass against the current UI.
+
+    ### Fixed
+
+    - **Copying a `.mpy` to the board no longer produces a 0-byte file — and ⌘S no
+
+    …

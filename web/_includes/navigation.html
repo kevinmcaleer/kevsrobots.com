@@ -14,7 +14,18 @@
 
 <nav class="navbar navbar-expand-md justify-content-between" id="myNavbar">
     <div class="container-fluid">
-        <div class="navbar-brand mx-3"><a href="/"><img class="logo" src="{{logo}}" alt="The kevsrobots site logo, a graphic of a robot looking at the user combined with the letters K and R"></a></div>
+        {%- comment -%}
+          The suite bar's brand corner (#581): the kevsrobots mark, the app
+          switcher (Learn, Projects, Snakie, BetterCAD) and the app name. The
+          rest of this navbar stays as it is until phase 2 restyles it. The
+          fallback inside the element shows until the component loads, or for
+          good without JavaScript.
+        {%- endcomment -%}
+        <div class="navbar-brand mx-3 kr-suite-brand">
+          <kr-suite-bar variant="brand" app="learn" home="/" mark-src="{{logo}}"{% if page.mode == 'dark' %} theme="dark"{% endif %}>
+            <a href="/"><img class="logo" src="{{logo}}" alt="The kevsrobots site logo, a graphic of a robot looking at the user combined with the letters K and R"></a>
+          </kr-suite-bar>
+        </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle Navigation">
             <span class="navbar-toggler-icon"></span>
         </button>

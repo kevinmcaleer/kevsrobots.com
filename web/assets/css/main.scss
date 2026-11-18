@@ -2048,3 +2048,111 @@ pre {
   color: #666;
   margin-top: 0.25rem;
 }
+// kevsrobots suite (#581) ------------------------------------------------------
+
+// The suite bar's brand corner in the Bootstrap navbar.
+.kr-suite-brand {
+  display: flex;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  kr-suite-bar:not(:defined) img { width: 48px; height: 48px; }
+}
+
+// "Open in Snakie" under each Python block in a lesson.
+.kr-open-snakie-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin: -0.5rem 0 1rem;
+}
+
+a.kr-open-snakie {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--kr-radius, 8px);
+  background: var(--kr-green, #26A269);
+  color: #fff;
+  font: 600 12px/1 var(--kr-font-ui, system-ui, sans-serif);
+  text-decoration: none;
+
+  &:hover, &:focus-visible { background: #1E8456; color: #fff; }
+  &:focus-visible { outline: 2px solid var(--kr-green, #26A269); outline-offset: 2px; }
+}
+
+// Snakie boxes without JavaScript: the link sits in the text, not as a button.
+.snakie-box a.kr-open-snakie {
+  display: inline;
+  height: auto;
+  padding: 0;
+  background: none;
+  color: var(--kr-green, #26A269);
+  font: inherit;
+  text-decoration: underline;
+}
+
+// Cross-links to the other apps (footer, About page).
+.kr-suite-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  a {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: var(--kr-radius-lg, 12px);
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, .25);
+  }
+  a:hover, a:focus-visible { background: rgba(255, 255, 255, .08); }
+
+  .kr-ic {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-family: "Oswald", sans-serif;
+    font-weight: 600;
+  }
+  b { display: block; }
+  small { display: block; opacity: .8; }
+}
+
+.kr-suite-links.on-light a { border-color: var(--kr-line, #E2E4E8); }
+.kr-suite-links.on-light a:hover, .kr-suite-links.on-light a:focus-visible { background: var(--kr-sunk, #EEF0EC); }
+
+// What's new
+.kr-whats-new {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+
+  > li {
+    border: 1px solid var(--kr-line, #E2E4E8);
+    border-left: 4px solid var(--kr-accent-item, var(--kr-red, #C22032));
+    border-radius: var(--kr-radius-lg, 12px);
+    padding: 14px 16px;
+    background: var(--kr-panel, #fff);
+  }
+  .kr-wn-app { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--kr-accent-item); }
+  .kr-wn-date { font-size: 13px; color: var(--kr-ink-soft, #5A6275); }
+  h3 { font-size: 1.15rem; margin: 4px 0 8px; }
+  .kr-wn-body { font-size: .95rem; max-height: 18rem; overflow: auto; }
+  .kr-wn-body h1, .kr-wn-body h2, .kr-wn-body h3 { font-size: 1rem; margin-top: .75rem; }
+}
+.kr-wn-snakie { --kr-accent-item: var(--kr-green, #26A269); }
+.kr-wn-bettercad { --kr-accent-item: var(--kr-violet, #7C3AED); }
