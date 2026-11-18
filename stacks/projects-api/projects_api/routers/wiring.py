@@ -10,21 +10,27 @@ image, so the document stays portable and the diagram editable.
 * ``PUT    /api/projects/{id}/wiring``      owner + T&Cs; creates or replaces
 * ``DELETE /api/projects/{id}/wiring``      owner + T&Cs
 * ``GET    /api/projects/{id}/wiring.svg``  the last render, as an image
+* ``PUT    /api/projects/{id}/wiring/send``  Snakie's "Send to kevsrobots"
+  (kevsrobots.com#582): the same save, plus the GitHub link and a Wiring
+  section for the picture. Takes a "Sign in with kevsrobots" app token with
+  ``projects:write`` (Chatter#80) as well as the cookie.
 """
 
 from __future__ import annotations
 
+import re
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_optional_user, require_terms_accepted
+from ..auth import get_optional_user, require_scope, require_terms_accepted
 from ..config import get_settings
 from ..db import get_session
 from ..models import Project, ProjectWiring
-from ..schemas import ProjectWiringResponse, ProjectWiringUpdate
+from ..schemas import ProjectWiringResponse, ProjectWiringUpdate, WiringSend, WiringSent
+from ..sections import canonical_sections
 from ..storage import delete_file, read_file, save_file
 from ..svg_safety import SVG_CSP, UnsafeSvg, clean_svg
 from ..visibility import NO_STORE
@@ -104,6 +110,11 @@ async def put_wiring(
     user: str = Depends(require_terms_accepted),
 ) -> ProjectWiringResponse:
     project = await _owned_project(session, project_id, user)
+    return await _save_wiring(session, project, body)
+
+
+async def _save_wiring(session: AsyncSession, project: Project, body: ProjectWiringUpdate) -> ProjectWiringResponse:
+    project_id = project.id
     _check_robot(body.data)
     new_path = None
     if body.svg is not None:
@@ -128,6 +139,50 @@ async def put_wiring(
     await session.commit()
     await session.refresh(w)
     return _response(w)
+
+
+GITHUB_REPO = re.compile(r"^https://github\.com/[A-Za-z0-9-]+/[A-Za-z0-9._-]+(/[^\s]*)?$")
+SITE_PROJECTS = "https://www.kevsrobots.com/projects"
+
+
+@router.put("/wiring/send", response_model=WiringSent)
+async def send_wiring(
+    project_id: int,
+    body: WiringSend,
+    session: AsyncSession = Depends(get_session),
+    user: str = Depends(require_scope("projects:write", terms=True)),
+) -> WiringSent:
+    """Snakie's "Send to kevsrobots": replace the project's wiring (sending
+    again updates it, never adds a copy), keep the GitHub link in the Code
+    repository field, and give the picture a Wiring section when the project
+    has none. Like any edit, it changes the working copy; readers see it once
+    the author publishes."""
+    project = await _owned_project(session, project_id, user)
+    repo_url = (body.repo_url or "").strip() or None
+    if repo_url is not None and not GITHUB_REPO.match(repo_url):
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="repo_url must be a GitHub address, like https://github.com/you/robot",
+        )
+    saved = await _save_wiring(session, project, ProjectWiringUpdate(data=body.data, svg=body.svg))
+    added = False
+    if repo_url is not None:
+        project.code_repo_url = repo_url
+    if saved.svg_url and "wiring" not in canonical_sections(project.content_md):
+        text = (project.content_md or "").rstrip()
+        project.content_md = (text + "\n\n" if text else "") + f"## Wiring\n\n![Wiring diagram]({saved.svg_url})\n"
+        added = True
+    if repo_url is not None or added:
+        await session.commit()
+        await session.refresh(project)
+    return WiringSent(
+        project_id=project.id,
+        title=project.title,
+        url=f"{SITE_PROJECTS}/{project.author_username}/{project.slug}" if project.slug else None,
+        svg_url=saved.svg_url,
+        repo_url=project.code_repo_url,
+        added_wiring_section=added,
+    )
 
 
 @router.delete("/wiring", status_code=204)

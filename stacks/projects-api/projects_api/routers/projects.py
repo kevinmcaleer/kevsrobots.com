@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 from sqlalchemy import case, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..auth import get_current_user, get_optional_user, require_terms_accepted
+from ..auth import get_current_user, get_optional_user, require_scope, require_terms_accepted
 from ..badges import evaluate_user
 from ..db import get_session
 from ..models import (
@@ -597,7 +597,8 @@ async def delete_project(
 
 @router.get("/my/list", response_model=list[ProjectListItem])
 async def my_projects(
-    user: str = Depends(get_current_user),
+    # Snakie lists your projects to send wiring to one (kevsrobots.com#582).
+    user: str = Depends(require_scope("projects:read")),
     session: AsyncSession = Depends(get_session),
 ) -> list[ProjectListItem]:
     """The author's own projects, as their working copies, with which
