@@ -4,6 +4,11 @@ description: This is the official website of Kevin McAleer
 baseurl: ""
 url: "https://www.kevsrobots.com"
 
+# Where people sign in (kevsrobots suite, kevinmcaleer/Chatter#81). /login, /register and /reset-password forward
+# here. chatter.kevsrobots.com forwards on to accounts.kevsrobots.com once Chatter's ACCOUNTS_URL is set, so this can
+# change to https://accounts.kevsrobots.com later without breaking anything in between.
+accounts_url: "https://chatter.kevsrobots.com"
+
 markdown: kramdown
 permalink: /blog/:title:output_ext
 
