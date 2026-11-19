@@ -22,3 +22,17 @@ This folder is the canonical copy. Snakie (`src/renderer/src/vendor/kr-suite.js`
 BetterCAD (`web/src/vendor/kr-suite.js`) bundle the same file so they work offline and on
 the desktop. Change it here, bump `KR_SUITE_VERSION` and `version`, then copy it across.
 Tests: `node --test scripts/tests/kr-suite.test.js`.
+
+## Tokens: `kr-tokens.css`
+
+The `--kr-*` custom properties the components read, plus the rest of the suite
+palette: neutrals, status colours, the suite gold (#D9A441), one accent per app
+(`data-kr-app="learn|projects|snakie|bettercad"` on `<html>`), radii, spacing
+(`--kr-space-1` to `-8`, 4 px steps), shadows, focus ring and font stacks.
+
+```html
+<link rel="stylesheet" href="https://www.kevsrobots.com/assets/suite/kr-tokens.css">
+```
+
+The light set is the default, so a light-only page can load it safely.
+`data-kr-theme="dark"` turns on the dark set, and `"auto"` follows the system.

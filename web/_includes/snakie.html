@@ -18,7 +18,9 @@
   packages ("numpy,pandas"), name (for code=). Files that aren't Python are
   shown read-only. A gist with several files gets a file picker.
 
-  Without JavaScript the box shows a link to GitHub (or the code itself).
+  Without JavaScript the box shows a link to GitHub and "Open in Snakie" (or
+  the code itself). With it, the embed's own footer has "Open in Snakie",
+  which carries the reader's edits too (#581).
   The output stays on one line so it also works inside a > blockquote.
 {%- endcomment -%}
 {%- assign snk_nl = "
@@ -28,11 +30,16 @@
 {%- assign snk_repo = include.repo | strip -%}
 {%- if snk_gist != "" -%}
   {%- assign snk_link = "https://gist.github.com/" | append: snk_gist -%}
+  {%- assign snk_open = "https://app.snakie.org/?gist=" | append: snk_gist -%}
+  {%- if include.file -%}{%- assign snk_open = snk_open | append: "&file=" | append: include.file -%}{%- endif -%}
 {%- elsif snk_repo != "" -%}
   {%- assign snk_ref = include.ref | default: "main" -%}
   {%- assign snk_link = "https://github.com/" | append: snk_repo | append: "/blob/" | append: snk_ref | append: "/" | append: include.path -%}
+  {%- assign snk_open = "https://app.snakie.org/?repo=" | append: snk_repo | append: "&path=" | append: include.path -%}
+  {%- if include.ref -%}{%- assign snk_open = snk_open | append: "&ref=" | append: include.ref -%}{%- endif -%}
 {%- else -%}
   {%- assign snk_link = "" -%}
+  {%- assign snk_open = "" -%}
 {%- endif -%}
 <div class="snakie-box" style="border-radius:12px;overflow:hidden"
 {%- if snk_gist != "" %} data-snakie-gist="{{ snk_gist | escape }}"{% endif -%}
@@ -54,7 +61,7 @@
 {%- if include.engine %} data-engine="{{ include.engine | escape }}"{% endif -%}
 {%- if include.packages %} data-packages="{{ include.packages | escape }}"{% endif -%}
 >
-{%- if snk_link != "" -%}<a href="{{ snk_link }}" target="_blank" rel="noopener">See the code on GitHub</a>
+{%- if snk_link != "" -%}<a href="{{ snk_link }}" target="_blank" rel="noopener">See the code on GitHub</a> · <a class="kr-open-snakie" href="{{ snk_open | escape }}" target="_blank" rel="noopener">Open in Snakie</a>
 {%- elsif include.code -%}<pre><code>{{ snk_code }}</code></pre>{%- endif -%}
 </div>
 {%- unless snakie_embed_script -%}<script src="https://app.snakie.org/snakie-embed.js" defer></script>{%- assign snakie_embed_script = true -%}{%- endunless -%}

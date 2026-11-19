@@ -1,0 +1,165 @@
+/*
+ * @kevsrobots/suite: the shared token layer (kevsrobots.com #581).
+ * =============================================================================
+ *
+ * One set of `--kr-*` custom properties for every app in the kevsrobots suite:
+ * Learn (kevsrobots.com), Projects, Snakie by kevsrobots and BetterCAD by
+ * kevsrobots. Shared neutrals, status colours and the suite gold; each app owns
+ * one accent, picked with `data-kr-app` on <html> (or any element):
+ *
+ *   <html data-kr-app="snakie">        → --kr-accent is Snakie green
+ *   <html data-kr-theme="dark">        → the dark set
+ *   <html data-kr-theme="auto">        → follows the system setting
+ *
+ * The default is the light set, so a page that is light-only (kevsrobots.com
+ * today) can load this without anything turning dark under it.
+ *
+ * Served from https://www.kevsrobots.com/assets/suite/kr-tokens.css and
+ * published as `@kevsrobots/suite/kr-tokens.css` for apps that bundle it.
+ */
+
+:root,
+[data-kr-theme="light"] {
+  /* Neutrals */
+  --kr-paper: #F7F7F4;
+  --kr-panel: #FFFFFF;
+  --kr-sunk: #EEF0EC;
+  --kr-ink: #1C2230;
+  --kr-ink-soft: #5A6275;
+  --kr-line: #E2E4E8;
+  --kr-on-accent: #FFFFFF;
+
+  /* App accents */
+  --kr-red: #C22032;
+  --kr-red-soft: #FBE9EB;
+  --kr-green: #26A269;
+  --kr-green-soft: #E3F4EB;
+  --kr-violet: #7C3AED;
+  --kr-violet-soft: #F1EAFE;
+
+  /* Suite gold: highlights, Projects, the avatar */
+  --kr-gold: #D9A441;
+  --kr-gold-soft: #FBF1DC;
+  --kr-on-gold: #1C2230;
+
+  /* Status */
+  --kr-success: #1E8E5A;
+  --kr-success-soft: #E3F4EB;
+  --kr-warning: #B7791F;
+  --kr-warning-soft: #FBF1DC;
+  --kr-danger: #C2412D;
+  --kr-danger-soft: #FBE7E3;
+  --kr-info: #2F6FDB;
+  --kr-info-soft: #E6EEFC;
+
+  /* Shadows */
+  --kr-shadow-sm: 0 1px 2px rgba(28, 34, 48, .06);
+  --kr-shadow: 0 1px 2px rgba(28, 34, 48, .06), 0 8px 24px rgba(28, 34, 48, .08);
+  --kr-shadow-lg: 0 2px 4px rgba(28, 34, 48, .08), 0 16px 40px rgba(28, 34, 48, .14);
+
+  color-scheme: light;
+}
+
+:root {
+  /* The current app's accent. Learn (kevsrobots) unless data-kr-app says otherwise. */
+  --kr-accent: var(--kr-red);
+  --kr-accent-soft: var(--kr-red-soft);
+
+  /* Type: Plus Jakarta Sans for UI and body, IBM Plex Mono for code, Oswald
+     for kevsrobots headings and the wordmark. The fonts themselves are not
+     loaded here; each app loads (or bundles) them. */
+  --kr-font-ui: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --kr-font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --kr-font-display: "Oswald", "Arial Narrow", sans-serif;
+
+  /* Radii */
+  --kr-radius-sm: 6px;
+  --kr-radius: 8px;
+  --kr-radius-lg: 12px;
+  --kr-radius-pill: 999px;
+
+  /* Spacing (4 px steps) */
+  --kr-space-1: 4px;
+  --kr-space-2: 8px;
+  --kr-space-3: 12px;
+  --kr-space-4: 16px;
+  --kr-space-5: 24px;
+  --kr-space-6: 32px;
+  --kr-space-7: 48px;
+  --kr-space-8: 64px;
+
+  /* Focus ring: a 2 px accent ring with a 2 px gap, on any background */
+  --kr-focus-ring: 0 0 0 2px var(--kr-panel), 0 0 0 4px var(--kr-accent);
+
+  /* The suite bar */
+  --kr-suite-bar-height: 48px;
+}
+
+/* One accent per app */
+[data-kr-app="learn"] { --kr-accent: var(--kr-red); --kr-accent-soft: var(--kr-red-soft); }
+[data-kr-app="projects"] { --kr-accent: var(--kr-gold); --kr-accent-soft: var(--kr-gold-soft); }
+[data-kr-app="snakie"] { --kr-accent: var(--kr-green); --kr-accent-soft: var(--kr-green-soft); }
+[data-kr-app="bettercad"] { --kr-accent: var(--kr-violet); --kr-accent-soft: var(--kr-violet-soft); }
+
+/* The dark set: opt in with data-kr-theme="dark", or "auto" to follow the system. */
+[data-kr-theme="dark"] {
+  --kr-paper: #14161B;
+  --kr-panel: #1C1F26;
+  --kr-sunk: #181B21;
+  --kr-ink: #E8EAEE;
+  --kr-ink-soft: #A2A9B8;
+  --kr-line: #2E323B;
+  --kr-red: #F0596A;
+  --kr-red-soft: #3A1E23;
+  --kr-green: #4CC98C;
+  --kr-green-soft: #173326;
+  --kr-violet: #A78BFA;
+  --kr-violet-soft: #2D2546;
+  --kr-gold: #E6B85C;
+  --kr-gold-soft: #3A2F17;
+  --kr-success: #4CC98C;
+  --kr-success-soft: #173326;
+  --kr-warning: #E6B85C;
+  --kr-warning-soft: #3A2F17;
+  --kr-danger: #F07A66;
+  --kr-danger-soft: #3A211C;
+  --kr-info: #7AA7F5;
+  --kr-info-soft: #1C2A44;
+  --kr-on-accent: #14161B;
+  --kr-shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+  --kr-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  --kr-shadow-lg: 0 2px 4px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .45);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-kr-theme="auto"] {
+    --kr-paper: #14161B;
+    --kr-panel: #1C1F26;
+    --kr-sunk: #181B21;
+    --kr-ink: #E8EAEE;
+    --kr-ink-soft: #A2A9B8;
+    --kr-line: #2E323B;
+    --kr-red: #F0596A;
+    --kr-red-soft: #3A1E23;
+    --kr-green: #4CC98C;
+    --kr-green-soft: #173326;
+    --kr-violet: #A78BFA;
+    --kr-violet-soft: #2D2546;
+    --kr-gold: #E6B85C;
+    --kr-gold-soft: #3A2F17;
+    --kr-success: #4CC98C;
+    --kr-success-soft: #173326;
+    --kr-warning: #E6B85C;
+    --kr-warning-soft: #3A2F17;
+    --kr-danger: #F07A66;
+    --kr-danger-soft: #3A211C;
+    --kr-info: #7AA7F5;
+    --kr-info-soft: #1C2A44;
+    --kr-on-accent: #14161B;
+    --kr-shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+    --kr-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+    --kr-shadow-lg: 0 2px 4px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+}
