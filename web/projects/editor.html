@@ -192,6 +192,8 @@ hide_nibsy: true
         <!-- A model and build steps sent from BetterCad, waiting to be imported (routers/imports.py). -->
         <div class="bom-link-bar kr-notice" id="bettercad-import-bar" role="status" hidden></div>
         <div class="bom-link-bar kr-notice" id="bom-link-bar" role="status" hidden></div>
+        <!-- Where a code box and the wiring disagree: "main.py uses GP14, but nothing is wired to GP14" (project-live.js). -->
+        <div class="bom-link-bar kr-notice code-wiring-bar" id="code-wiring-bar" role="status" hidden></div>
         <!-- Uploaded pictures the text doesn't show (the retired Images section's), with a button to add them to the gallery. -->
         <div class="bom-link-bar kr-notice" id="gallery-add-bar" role="status" hidden></div>
         <textarea id="content-editor"></textarea>
@@ -310,6 +312,7 @@ hide_nibsy: true
 <script src="/assets/js/project-toc.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/page-jump.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-live.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/currency-convert.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/parts-catalog.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/part-submit.js?v={{ site.time | date: '%s' }}"></script>

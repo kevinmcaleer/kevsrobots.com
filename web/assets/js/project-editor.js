@@ -65,6 +65,17 @@
     return ProjectAuth.apiFetch(url, opts || {});
   }
 
+  // A bar over the text when a code box uses a pin the wiring doesn't (#590).
+  // The author's own request reads the working copy's wiring.
+  (function watchCodeAndWiring() {
+    const bar = document.getElementById('code-wiring-bar');
+    if (!bar || !window.ProjectLive || !projectId) return;
+    ProjectLive.watchWarnings(bar, () =>
+      apiFetch(API + '/api/projects/' + projectId + '/wiring', { credentials: 'include' })
+        .then(r => (r.ok ? r.json() : null))
+        .then(body => (body && body.data) || null));
+  })();
+
   async function checkAuth() {
     try {
       const resp = await apiFetch(API + '/api/projects/my/list');

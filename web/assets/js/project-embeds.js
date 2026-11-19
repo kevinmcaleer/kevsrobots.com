@@ -586,8 +586,11 @@
   // Draws a ```snakie block's box into `element` (the editor's live view
   // and the view page both use it). In the editor, `host.edit(newSource)`
   // rewrites the block, and a Width / Height bar sits over the box.
-  function renderSnakieBlock(source, element, host) {
-    const opts = snakieBlockOptions(source);
+  // `extra` adds options the Markdown doesn't carry: the view page passes
+  // { project: id } so the box can name the parts on each pin (#590).
+  function renderSnakieBlock(source, element, host, extra) {
+    const parsed = snakieBlockOptions(source);
+    const opts = parsed && extra ? Object.assign({}, parsed, extra) : parsed;
     element.replaceChildren();
     const editing = host && typeof host.edit === 'function';
     if (!opts) {
@@ -627,13 +630,13 @@
   // or GitHub file URL, for a Snakie code box. The link (or code) stays inside
   // it until the box loads, so a reader without JavaScript still has it.
   // Returns how many.
-  function embedCode(root) {
+  function embedCode(root, extra) {
     let count = 0;
     root.querySelectorAll('pre > code.language-snakie').forEach(code => {
       const holder = document.createElement('div');
       holder.className = 'mb-3';
       code.parentElement.replaceWith(holder);
-      renderSnakieBlock(code.textContent, holder);
+      renderSnakieBlock(code.textContent, holder, undefined, extra);
       count++;
     });
     root.querySelectorAll('p').forEach(p => {
@@ -645,7 +648,7 @@
       const holder = document.createElement('div');
       holder.className = 'mb-3';
       p.replaceWith(holder);
-      renderSnakieBlock(text, holder);
+      renderSnakieBlock(text, holder, undefined, extra);
       count++;
     });
     return count;

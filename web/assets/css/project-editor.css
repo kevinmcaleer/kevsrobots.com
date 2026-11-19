@@ -1251,3 +1251,84 @@ a.part-link:hover,
   accent-color: var(--accent, #16a34a);
   cursor: pointer;
 }
+
+/* Live project pages (#590): the wiring picture as a viewer that lights with
+   the code boxes (project-live.js). */
+.wiring-live {
+  position: relative;
+  margin: 0 0 1rem;
+  border: 1px solid rgba(0, 0, 0, .12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0d1117;
+}
+.wiring-live-stage {
+  overflow: hidden;
+  touch-action: pan-y;
+  line-height: 0;
+}
+.wiring-live.is-zoomed .wiring-live-stage {
+  cursor: grab;
+  touch-action: none;
+}
+.wiring-live-stage > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  transform-origin: 50% 50%;
+}
+.wiring-live-tools {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+}
+.wiring-live-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 8px;
+  background: rgba(13, 17, 23, .8);
+  color: #fff;
+  font: 600 14px/1 inherit;
+  cursor: pointer;
+}
+.wiring-live-btn:hover,
+.wiring-live-btn:focus-visible {
+  background: rgba(255, 255, 255, .18);
+}
+.wiring-live-tip {
+  padding: 6px 12px;
+  min-height: 2.1em;
+  background: rgba(255, 255, 255, .06);
+  color: #e6edf3;
+  font-size: .875rem;
+  line-height: 1.4;
+}
+.wiring-live [data-wire] {
+  cursor: pointer;
+  transition: opacity .12s ease;
+}
+.wiring-live.has-lit [data-wire]:not(.is-lit) {
+  opacity: .22;
+}
+.wiring-live [data-wire].is-lit .wc__wire {
+  stroke-width: 5.5px;
+  filter: drop-shadow(0 0 3px rgba(255, 225, 77, .9));
+}
+/* The flat picture is for paper and for readers without JavaScript. */
+img.wiring-live-print {
+  display: none !important;
+}
+@media print {
+  .wiring-live { display: none; }
+  img.wiring-live-print { display: block !important; }
+}
+.code-wiring-bar {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
