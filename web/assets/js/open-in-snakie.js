@@ -1,121 +1,168 @@
 /*
- * "Open in Snakie" on lesson code (kevsrobots.com #581, Learn → Snakie).
- * =============================================================================
+ * "Open in Snakie" on lesson code (kevsrobots.com#581, Snakie by kevsrobots).
  *
- * Every Python code block in a lesson gets an "Open in Snakie" link under it.
- * It opens app.snakie.org with the block's code in a new tab, the same way the
- * Snakie code embed's own button does (kevinmcaleer/Snakie#1287): the code is
- * deflated, base64url-encoded and carried in the hash as `#src=…`, so it never
- * reaches a server log. `?name=` carries a file name for the tab (lesson
- * slug plus a number) for when Snakie reads it; today it opens as main.py.
+ * Every Python code block in a lesson gets a small "Open in Snakie" link at
+ * its top right, beside the copy button. It opens app.snakie.org in a new tab
+ * with the block's code in a new, unsaved tab named after the lesson
+ * (e.g. 06_our_first_program.py). Next to it, a desktop icon hands the same
+ * code to the installed Snakie app through a snakie://open link.
  *
- * Snakie boxes ({% include snakie.html %}) are left alone: the embed has its
- * own "Open in Snakie" that also carries the reader's edits.
+ * The code travels in the URL's hash, compressed the way Snakie's own code
+ * embeds do it (raw DEFLATE, then base64url): `#src=…`. A hash never reaches
+ * a server, so nothing is stored on kevsrobots or logged by Snakie. Browsers
+ * without CompressionStream send `?code=<plain text>` instead, which Snakie
+ * also reads.
  *
- * Desktop: once the Snakie desktop app registers `snakie://` (Snakie epic
- * kevinmcaleer/Snakie#1310), setting localStorage "kr.snakie.target" to
- * "desktop" sends these links to `snakie://open?…#src=…` instead. Until then
- * the web app is the only target.
+ * {% include snakie.html %} boxes are skipped: Snakie's embed has its own
+ * Open in Snakie link. To leave a block out, add {: .no-snakie } under its
+ * fence; to leave a whole lesson out, set `snakie: false` in its front matter
+ * (the layout then doesn't load this script). REPL transcripts (`>>>`) are
+ * skipped too, since they aren't a program.
+ *
+ * Pages that render Markdown later can call OpenInSnakie.attach(root).
  */
 (function () {
   'use strict';
 
   var APP = 'https://app.snakie.org/';
-  var SELECTOR = [
-    'div.language-python pre code',
-    'div.language-py pre code',
-    'div.language-micropython pre code',
-    'pre > code.language-python',
-    'pre > code.language-py',
-    'pre > code.language-micropython'
-  ].join(',');
-  // A program that long would make a URL some browsers refuse.
-  var MAX_PAYLOAD = 30000;
+  var DESKTOP = 'snakie://open';
+  var LANGS = ['python', 'py', 'python3', 'micropython', 'upython'];
 
-  var SNAKIE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 3h6a3 3 0 0 1 0 6H6a3 3 0 0 0 0 6h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="11.5" cy="5.5" r=".9" fill="currentColor"/></svg>';
+  var SNAKIE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M3 4.5h10M3 8h6.5M3 11.5h4.5M11 10l2.5 1.5L11 13"/></svg>';
+  var DESKTOP_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M2.5 3.5h11v7h-11zM6 13.5h4M8 10.5v3"/></svg>';
 
-  function target() {
-    try {
-      return window.localStorage.getItem('kr.snakie.target') === 'desktop' ? 'desktop' : 'web';
-    } catch (e) {
-      return 'web';
-    }
-  }
+  // --- Pure helpers (also used by scripts/tests/open-in-snakie.test.js) ---
 
   function toBase64Url(bytes) {
     var bin = '';
-    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    for (var i = 0; i < bytes.length; i += 0x8000) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    }
     return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 
-  // Raw deflate, which is what Snakie's decoder (fflate inflateSync) reads.
-  function encode(code) {
-    var stream = new Blob([code]).stream().pipeThrough(new CompressionStream('deflate-raw'));
-    return new Response(stream).arrayBuffer().then(function (buf) {
-      return toBase64Url(new Uint8Array(buf));
-    });
+  /** Snakie's code payload: raw DEFLATE, base64url. Null if the browser can't. */
+  function encodeCode(code) {
+    if (typeof CompressionStream === 'undefined' || typeof TextEncoder === 'undefined') {
+      return Promise.resolve(null);
+    }
+    try {
+      var stream = new Blob([new TextEncoder().encode(code)]).stream()
+        .pipeThrough(new CompressionStream('deflate-raw'));
+      return new Response(stream).arrayBuffer().then(function (buf) {
+        return toBase64Url(new Uint8Array(buf));
+      }, function () { return null; });
+    } catch (e) {
+      return Promise.resolve(null);
+    }
   }
 
-  function snakieUrl(name, payload) {
-    var query = 'name=' + encodeURIComponent(name);
-    var hash = '#src=' + payload;
-    if (target() === 'desktop') return 'snakie://open?' + query + hash;
-    return APP + '?' + query + hash;
+  /** A file name for the n-th (1-based) Python block of a lesson at `pathname`. */
+  function fileName(pathname, n) {
+    var last = String(pathname || '').replace(/\/+$/, '').split('/').pop() || '';
+    var slug = decodeURIComponent(last).replace(/\.html?$/i, '')
+      .replace(/[^A-Za-z0-9_-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60);
+    if (!slug || slug === 'index') slug = 'main';
+    return slug + (n > 1 ? '_' + n : '') + '.py';
   }
 
-  function baseName() {
-    var last = window.location.pathname.replace(/\/+$/, '').split('/').pop() || 'lesson';
-    last = last.replace(/\.html?$/, '').replace(/[^A-Za-z0-9_-]+/g, '_');
-    return last || 'lesson';
+  /** Both links, from the code and its (possibly null) compressed payload. */
+  function links(code, name, payload) {
+    var q = 'name=' + encodeURIComponent(name);
+    if (payload !== null) {
+      return { web: APP + '?' + q + '#src=' + payload, desktop: DESKTOP + '?' + q + '#src=' + payload };
+    }
+    var plain = q + '&code=' + encodeURIComponent(code);
+    return { web: APP + '?' + plain, desktop: DESKTOP + '?' + plain };
   }
 
-  function addLink(code, name) {
-    var text = code.textContent.replace(/\n$/, '');
-    if (!text.trim()) return Promise.resolve();
-    // The copy button wraps the <pre>; put the link after that wrapper.
+  /** Worth opening as a program: not empty, not a `>>>` REPL session. */
+  function isProgram(code) {
+    var first = String(code).split('\n').filter(function (l) { return l.trim() !== ''; })[0];
+    return !!first && !/^\s*(>>>|\$ )/.test(first);
+  }
+
+  function isPythonBlock(code) {
+    var holder = code.closest('[class*="language-"]') || code;
+    for (var i = 0; i < LANGS.length; i++) {
+      if (holder.classList.contains('language-' + LANGS[i]) || code.classList.contains('language-' + LANGS[i])) {
+        return !holder.closest('.no-snakie, .snakie-box');
+      }
+    }
+    return false;
+  }
+
+  // --- The DOM side ---
+
+  function link(cls, label, icon, text) {
+    var a = document.createElement('a');
+    a.className = cls;
+    a.title = label;
+    a.setAttribute('aria-label', label);
+    a.innerHTML = icon + (text ? '<span>' + text + '</span>' : '');
+    return a;
+  }
+
+  function addLinks(code, n) {
     var pre = code.parentElement;
-    var anchor = pre.parentElement && pre.parentElement.classList.contains('code-copy-wrap') ? pre.parentElement : pre;
-    return encode(text).then(function (payload) {
-      if (payload.length > MAX_PAYLOAD) return;
-      var bar = document.createElement('div');
-      bar.className = 'kr-open-snakie-bar';
-      var link = document.createElement('a');
-      link.className = 'kr-open-snakie';
-      link.href = snakieUrl(name, payload);
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.title = 'Open this code in Snakie, the kevsrobots Python editor';
-      link.innerHTML = SNAKIE_ICON + '<span>Open in Snakie</span>';
-      bar.appendChild(link);
-      anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+    if (!pre || pre.dataset.openInSnakie) return false;
+    var text = code.textContent.replace(/\n$/, '');
+    if (!isProgram(text)) return false;
+    pre.dataset.openInSnakie = '1';
+
+    // code-copy.js (loaded in <head>) has usually wrapped the <pre> already.
+    var wrap = pre.parentElement && pre.parentElement.classList.contains('code-copy-wrap')
+      ? pre.parentElement : null;
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.className = 'code-copy-wrap';
+      pre.parentNode.insertBefore(wrap, pre);
+      wrap.appendChild(pre);
+    }
+    wrap.classList.add('has-open-in-snakie');
+
+    var name = fileName(window.location.pathname, n);
+    var group = document.createElement('div');
+    group.className = 'open-in-snakie';
+    var web = link('open-in-snakie-web', 'Open ' + name + ' in Snakie (opens app.snakie.org)', SNAKIE_ICON, 'Open in Snakie');
+    web.target = '_blank';
+    web.rel = 'noopener';
+    var desk = link('open-in-snakie-desktop', 'Open ' + name + ' in the Snakie desktop app', DESKTOP_ICON, '');
+    group.appendChild(web);
+    group.appendChild(desk);
+    wrap.appendChild(group);
+
+    var plain = links(text, name, null);
+    web.href = plain.web;
+    desk.href = plain.desktop;
+    encodeCode(text).then(function (payload) {
+      if (payload === null) return;
+      var l = links(text, name, payload);
+      web.href = l.web;
+      desk.href = l.desktop;
     });
+    return true;
   }
 
   function attach(root) {
-    if (typeof CompressionStream === 'undefined') return;
-    var blocks = Array.prototype.slice.call((root || document).querySelectorAll(SELECTOR));
-    var seen = [];
-    var base = baseName();
     var n = 0;
-    blocks.forEach(function (code) {
-      if (seen.indexOf(code) !== -1 || code.closest('.snakie-box') || code.dataset.krSnakie) return;
-      seen.push(code);
-      code.dataset.krSnakie = '1';
-      n += 1;
-      var name = base + (n > 1 ? '_' + n : '') + '.py';
-      addLink(code, name).catch(function (err) {
-        console.warn('Open in Snakie: could not encode a code block', err);
-      });
+    (root || document).querySelectorAll('pre > code').forEach(function (code) {
+      if (!isPythonBlock(code)) return;
+      if (addLinks(code, n + 1) || code.parentElement.dataset.openInSnakie) n += 1;
     });
   }
 
-  window.OpenInSnakie = { attach: attach };
+  var api = { attach: attach, fileName: fileName, links: links, isProgram: isProgram, encodeCode: encodeCode };
 
-  // After code-copy.js, which also runs on DOMContentLoaded and wraps the <pre>.
-  function start() { setTimeout(function () { attach(document); }, 0); }
+  if (typeof module === 'object' && module.exports) {
+    module.exports = api;
+    return;
+  }
+
+  window.OpenInSnakie = api;
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
+    document.addEventListener('DOMContentLoaded', function () { attach(document); });
   } else {
-    start();
+    attach(document);
   }
 })();
