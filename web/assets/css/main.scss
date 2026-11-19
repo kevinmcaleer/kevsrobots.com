@@ -1716,6 +1716,65 @@ table .w-30 {
   opacity: 1;
   color: #198754;
 }
+
+/* "Open in Snakie" on lesson code (assets/js/open-in-snakie.js, #581).
+   Sits left of the copy button; Snakie's green on hover. */
+.open-in-snakie {
+  position: absolute;
+  top: 6px;
+  right: 42px;
+  z-index: 2;
+  display: inline-flex;
+  gap: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 10px;
+    color: #555;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .open-in-snakie-desktop {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+  }
+  a:hover,
+  a:focus-visible {
+    color: #1E7F52;
+    border-color: #26A269;
+  }
+  svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+.code-copy-wrap:hover .open-in-snakie,
+.open-in-snakie:focus-within {
+  opacity: 1;
+}
+/* Phones and tablets have no desktop app to hand the code to. */
+@media (pointer: coarse) {
+  .open-in-snakie-desktop {
+    display: none !important;
+  }
+}
 pre {
   position: relative;
 }
