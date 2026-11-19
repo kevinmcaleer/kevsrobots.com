@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const zlib = require('node:zlib');
 
-const { fileName, links, isProgram, encodeCode } = require(path.join(__dirname, '../../web/assets/js/open-in-snakie.js'));
+const { fileName, links, isProgram, encodeCode, runPlan, imports } = require(path.join(__dirname, '../../web/assets/js/open-in-snakie.js'));
 
 // Snakie's decodeCode (src/renderer/src/code-embed/share.ts): base64url, raw inflate.
 function decode(payload) {
@@ -49,4 +49,19 @@ test('REPL sessions and empty blocks are not programs', () => {
   assert.equal(isProgram('>>> 1 + 1\n2'), false);
   assert.equal(isProgram('$ pip install x'), false);
   assert.equal(isProgram('   \n'), false);
+});
+
+test('reads the modules a program imports', () => {
+  assert.deepEqual(imports('import time, machine as m  # two\nfrom machine import Pin\nimport os.path\nx = 1'), ['time', 'machine', 'machine', 'os']);
+  assert.deepEqual(imports('print("import this")'), []);
+});
+
+test('Run here is offered only for code a browser can run', () => {
+  assert.deepEqual(runPlan('from machine import Pin\nled = Pin("LED", Pin.OUT)\nled.toggle()'), { engine: 'micropython' });
+  assert.deepEqual(runPlan('import numpy as np\nprint(np.arange(3))'), { engine: 'pyodide' });
+  assert.equal(runPlan('name = input("Name? ")\nprint(name)'), null);
+  assert.equal(runPlan('import network\nwlan = network.WLAN()'), null);
+  assert.equal(runPlan('import numpy\nimport requests'), null);
+  assert.equal(runPlan('>>> print(1)\n1'), null);
+  assert.equal(runPlan(''), null);
 });
