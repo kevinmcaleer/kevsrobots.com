@@ -101,6 +101,10 @@ thanks: false
         <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
         </p>
         <script src="/assets/js/course-progress.js?v={{ site.time | date: '%s' }}"></script>
+        {% unless page.snakie == false %}
+        {%- comment -%} "Open in Snakie" on the lesson's Python code (#581). Set `snakie: false` in a lesson's front matter to leave it out. {%- endcomment -%}
+        <script src="/assets/js/open-in-snakie.js?v={{ site.time | date: '%s' }}" defer></script>
+        {% endunless %}
         {% unless page.hide_likes_and_comments %}
         <hr />
         {% include like-comment.html %}
