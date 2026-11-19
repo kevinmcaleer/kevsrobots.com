@@ -928,6 +928,24 @@ blockquote {
   height: 48px;
 }
 
+/* The suite app switcher sits beside the logo (#581). */
+.kr-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+kr-app-switcher {
+  --kr-accent: #{$kevred};
+}
+
+/* Before the module loads, keep its space so the navbar doesn't jump. */
+kr-app-switcher:not(:defined) {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+}
+
 .scoring-table {
   border-color: $clr-lightgrey;
   border-style: solid;

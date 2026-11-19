@@ -1,0 +1,17 @@
+{
+  "name": "@kevsrobots/suite",
+  "version": "1.0.0",
+  "description": "The kevsrobots suite app switcher and account button, as dependency-free web components.",
+  "type": "module",
+  "main": "kr-suite.js",
+  "exports": {
+    ".": "./kr-suite.js"
+  },
+  "files": ["kr-suite.js", "README.md"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinmcaleer/kevsrobots.com.git",
+    "directory": "web/assets/suite"
+  }
+}
