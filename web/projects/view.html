@@ -177,6 +177,11 @@ description: View project details
              comments, community makes. When the text has pages, this
              shows once, on the last page, above the page controls. -->
         <div id="view-end">
+        <div id="view-robot-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-robot" aria-hidden="true"></i> Robot</h2>
+          <p class="small text-muted mb-2">Press Run in a code box on this page and the robot moves with it.</p>
+          <div class="view-robot-box"></div>
+        </div>
         <div id="view-code-section" class="kr-section d-none">
           <h2 class="kr-section-title"><i class="fas fa-code" aria-hidden="true"></i> Code</h2>
           <div class="view-code-box"></div>
@@ -1764,6 +1769,8 @@ description: View project details
     const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/files'), { credentials: 'include' });
     const files = await resp.json();
     if (files.length === 0) return;
+    // The robot among the files (a URDF and its meshes), drawn by Snakie.
+    ProjectLive.robotSection(document.getElementById('view-robot-section'), { files, projectId });
     var fileKinds = {
       py:'Python Script',cpp:'C++ Source',h:'Header',ino:'Arduino Sketch',
       md:'Markdown',txt:'Text',pdf:'PDF Document',csv:'Spreadsheet',

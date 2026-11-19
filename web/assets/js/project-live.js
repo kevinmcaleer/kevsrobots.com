@@ -442,6 +442,36 @@
     });
   }
 
+  // ------------------------------------------------------------ robot frame
+
+  /** Does this list of project files hold a robot model (a URDF)? */
+  function hasRobot(files) {
+    return (files || []).some(function (f) { return f && /\.urdf$/i.test(String(f.filename || '')); });
+  }
+
+  /**
+   * The project's robot as a Snakie frame: it draws the URDF and meshes among
+   * the project's files, and Run in a code box on the page turns the joints
+   * the wiring binds to servo pins. Shown only when the project has a URDF and
+   * the Snakie script on hand knows robot frames. Resolves to whether it showed.
+   */
+  function robotSection(section, opts) {
+    if (!section || !hasRobot(opts.files) || !window.ProjectEmbeds) return Promise.resolve(false);
+    return window.ProjectEmbeds.loadSnakieEmbed().then(function (api) {
+      if (!api || !api.robot) return false;
+      var box = section.querySelector('.view-robot-box');
+      box.replaceChildren();
+      var holder = document.createElement('div');
+      holder.className = 'project-robot-embed snakie-box';
+      holder.style.borderRadius = '12px';
+      holder.style.overflow = 'hidden';
+      box.appendChild(holder);
+      section.classList.remove('d-none');
+      api.mount(holder, { robot: '1', project: String(opts.projectId), title: 'This project’s robot in Snakie' });
+      return true;
+    }).catch(function () { return false; });
+  }
+
   // ------------------------------------------------------- editor warnings
 
   /**
@@ -499,7 +529,8 @@
   var api = {
     boardPins: boardPins, pinKey: pinKey, isSupply: isSupply, wireLabel: wireLabel, mismatches: mismatches,
     unusedPins: unusedPins, parseRepo: parseRepo, pickFiles: pickFiles, cleanSvg: cleanSvg,
-    wiringViewers: wiringViewers, codeSection: codeSection, watchWarnings: watchWarnings
+    wiringViewers: wiringViewers, codeSection: codeSection, watchWarnings: watchWarnings,
+    hasRobot: hasRobot, robotSection: robotSection
   };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else window.ProjectLive = api;

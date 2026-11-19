@@ -80,3 +80,9 @@ test('picks the Python files to show, the program a board runs first', () => {
   assert.deepEqual(L.pickFiles(listing, 2), ['main.py', 'arm.py']);
   assert.deepEqual(L.pickFiles({ message: 'rate limited' }, 5), []);
 });
+
+test('knows a project with a robot model among its files', () => {
+  assert.equal(L.hasRobot([{ filename: 'base.stl' }, { filename: 'Arm.URDF' }]), true);
+  assert.equal(L.hasRobot([{ filename: 'base.stl' }, { filename: 'urdf-notes.md' }]), false);
+  assert.equal(L.hasRobot(null), false);
+});
