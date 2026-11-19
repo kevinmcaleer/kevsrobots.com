@@ -1174,6 +1174,7 @@ description: View project details
         ProjectCellHeadings.render(contentEl);
         const videoBlocks = ProjectEmbeds.renderVideoBlocks(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
+        ProjectEmbeds.embedModels(contentEl);
         // Code boxes know the project, so they can name the part on each pin,
         // and the wiring picture becomes a viewer that lights with them (#590).
         ProjectEmbeds.embedCode(contentEl, { project: String(project.id) });
@@ -2090,6 +2091,7 @@ description: View project details
     ProjectEmbeds.animatedVideos(journalEl);
     ProjectEmbeds.renderVideoBlocks(journalEl);
     ProjectEmbeds.embedCode(journalEl, { project: String(projectId) });
+    ProjectEmbeds.embedModels(journalEl);
     ProjectCellHeadings.render(journalEl);
     ProjectCallouts.render(journalEl);
     CodeCopy.attach(journalEl);

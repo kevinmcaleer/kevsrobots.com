@@ -1332,3 +1332,55 @@ img.wiring-live-print {
   align-items: flex-start;
   gap: 2px;
 }
+
+/* A BetterCAD share link as a 3D frame (#591, project-embeds.js). */
+.project-model-embed {
+  border: 1px solid rgba(0, 0, 0, .12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f4f1ea;
+}
+.project-model-stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9e5db;
+}
+.project-model-stage > iframe,
+.project-model-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.project-model-poster {
+  object-fit: contain;
+}
+.project-model-start {
+  position: relative;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(20, 24, 31, .88);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.project-model-start:hover,
+.project-model-start:focus-visible {
+  background: #14181f;
+}
+.project-model-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: .875rem;
+  color: #5b6472;
+}
+@media print {
+  .project-model-start { display: none; }
+}
