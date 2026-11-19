@@ -928,6 +928,24 @@ blockquote {
   height: 48px;
 }
 
+/* The suite app switcher sits beside the logo (#581). */
+.kr-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+kr-app-switcher {
+  --kr-accent: #{$kevred};
+}
+
+/* Before the module loads, keep its space so the navbar doesn't jump. */
+kr-app-switcher:not(:defined) {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+}
+
 .scoring-table {
   border-color: $clr-lightgrey;
   border-style: solid;
@@ -2108,16 +2126,6 @@ pre {
   margin-top: 0.25rem;
 }
 // kevsrobots suite (#581) ------------------------------------------------------
-
-// The suite bar's brand corner in the Bootstrap navbar.
-.kr-suite-brand {
-  display: flex;
-  align-items: center;
-  padding-top: 0;
-  padding-bottom: 0;
-
-  kr-suite-bar:not(:defined) img { width: 48px; height: 48px; }
-}
 
 // Snakie boxes without JavaScript: the link sits in the text, not as a button.
 .snakie-box a.kr-open-snakie {
