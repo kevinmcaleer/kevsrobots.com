@@ -485,6 +485,30 @@
         }),
       },
       {
+        // A BetterCAD share link as a 3D frame (#591): the link on a line of
+        // its own, which the project page draws as the model (ProjectEmbeds).
+        id: 'bettercad-model',
+        label: '3D model from BetterCAD',
+        keywords: ['bettercad', 'cad', '3d', 'model', 'viewer', 'share', 'embed', 'stl'],
+        group: 'project',
+        icon: ICONS.file,
+        block: true,
+        run: view => openPicker(view, {
+          placeholder: 'Paste a BetterCAD share link…',
+          empty: 'In BetterCAD, choose Share, copy the link and paste it here',
+          free: q => {
+            const token = window.ProjectEmbeds && window.ProjectEmbeds.betterCadToken(String(q || '').trim());
+            return token ? {
+              label: 'Show this model in 3D',
+              detail: 'BetterCAD share link',
+              icon: ICONS.file,
+              pick: () => insertAtCursor(view, window.ProjectEmbeds.betterCadMarkdown(token), true),
+            } : null;
+          },
+          load: async () => [],
+        }),
+      },
+      {
         id: 'file',
         label: 'File',
         keywords: ['download', 'attachment', 'upload', 'pdf', 'zip'],

@@ -177,6 +177,15 @@ description: View project details
              comments, community makes. When the text has pages, this
              shows once, on the last page, above the page controls. -->
         <div id="view-end">
+        <div id="view-robot-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-robot" aria-hidden="true"></i> Robot</h2>
+          <p class="small text-muted mb-2">Press Run in a code box on this page and the robot moves with it.</p>
+          <div class="view-robot-box"></div>
+        </div>
+        <div id="view-code-section" class="kr-section d-none">
+          <h2 class="kr-section-title"><i class="fas fa-code" aria-hidden="true"></i> Code</h2>
+          <div class="view-code-box"></div>
+        </div>
 
         <!-- Pictures from the retired Images section: shown as a gallery
              only while the project's text has no gallery of its own. -->
@@ -758,6 +767,7 @@ description: View project details
 <script src="/assets/js/builder-renderer.js?v={{ site.time | date: '%s' }}"></script>
 <!-- Issue #257: a YouTube link on its own line plays inline. -->
 <script src="/assets/js/project-embeds.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/project-live.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/part-links.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-callouts.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/project-mermaid-theme.js?v={{ site.time | date: '%s' }}"></script>
@@ -1169,7 +1179,11 @@ description: View project details
         ProjectCellHeadings.render(contentEl);
         const videoBlocks = ProjectEmbeds.renderVideoBlocks(contentEl);
         ProjectEmbeds.embedVideos(contentEl);
-        ProjectEmbeds.embedCode(contentEl);
+        ProjectEmbeds.embedModels(contentEl);
+        // Code boxes know the project, so they can name the part on each pin,
+        // and the wiring picture becomes a viewer that lights with them (#590).
+        ProjectEmbeds.embedCode(contentEl, { project: String(project.id) });
+        ProjectLive.wiringViewers(contentEl, { api: API, projectId: project.id, withVersion }).catch(() => {});
         videosInContent = embedVideoSection(contentEl) || videoBlocks > 0;
         ProjectCallouts.render(contentEl);
         PartLinks.decorate(contentEl);
@@ -1192,6 +1206,11 @@ description: View project details
         const repoLink = document.getElementById('view-repo');
         repoLink.href = project.code_repo_url;
         repoLink.classList.remove('d-none');
+        // The repository as a Snakie box with a tab per file. The code stays on GitHub.
+        ProjectLive.codeSection(document.getElementById('view-code-section'), {
+          repoUrl: project.code_repo_url,
+          projectId: project.id,
+        }).catch(() => {});
       }
 
       // Edit button & report button (check if current user is author)
@@ -1750,6 +1769,8 @@ description: View project details
     const resp = await fetch(withVersion(API + '/api/projects/' + projectId + '/files'), { credentials: 'include' });
     const files = await resp.json();
     if (files.length === 0) return;
+    // The robot among the files (a URDF and its meshes), drawn by Snakie.
+    ProjectLive.robotSection(document.getElementById('view-robot-section'), { files, projectId });
     var fileKinds = {
       py:'Python Script',cpp:'C++ Source',h:'Header',ino:'Arduino Sketch',
       md:'Markdown',txt:'Text',pdf:'PDF Document',csv:'Spreadsheet',
@@ -2076,7 +2097,8 @@ description: View project details
     ProjectImageCaptions.render(journalEl);
     ProjectEmbeds.animatedVideos(journalEl);
     ProjectEmbeds.renderVideoBlocks(journalEl);
-    ProjectEmbeds.embedCode(journalEl);
+    ProjectEmbeds.embedCode(journalEl, { project: String(projectId) });
+    ProjectEmbeds.embedModels(journalEl);
     ProjectCellHeadings.render(journalEl);
     ProjectCallouts.render(journalEl);
     CodeCopy.attach(journalEl);

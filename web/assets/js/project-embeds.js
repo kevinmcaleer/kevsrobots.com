@@ -586,8 +586,11 @@
   // Draws a ```snakie block's box into `element` (the editor's live view
   // and the view page both use it). In the editor, `host.edit(newSource)`
   // rewrites the block, and a Width / Height bar sits over the box.
-  function renderSnakieBlock(source, element, host) {
-    const opts = snakieBlockOptions(source);
+  // `extra` adds options the Markdown doesn't carry: the view page passes
+  // { project: id } so the box can name the parts on each pin (#590).
+  function renderSnakieBlock(source, element, host, extra) {
+    const parsed = snakieBlockOptions(source);
+    const opts = parsed && extra ? Object.assign({}, parsed, extra) : parsed;
     element.replaceChildren();
     const editing = host && typeof host.edit === 'function';
     if (!opts) {
@@ -627,13 +630,13 @@
   // or GitHub file URL, for a Snakie code box. The link (or code) stays inside
   // it until the box loads, so a reader without JavaScript still has it.
   // Returns how many.
-  function embedCode(root) {
+  function embedCode(root, extra) {
     let count = 0;
     root.querySelectorAll('pre > code.language-snakie').forEach(code => {
       const holder = document.createElement('div');
       holder.className = 'mb-3';
       code.parentElement.replaceWith(holder);
-      renderSnakieBlock(code.textContent, holder);
+      renderSnakieBlock(code.textContent, holder, undefined, extra);
       count++;
     });
     root.querySelectorAll('p').forEach(p => {
@@ -645,13 +648,102 @@
       const holder = document.createElement('div');
       holder.className = 'mb-3';
       p.replaceWith(holder);
-      renderSnakieBlock(text, holder);
+      renderSnakieBlock(text, holder, undefined, extra);
+      count++;
+    });
+    return count;
+  }
+
+  // ------------------------------------------------------- BetterCAD model
+  //
+  // A BetterCAD share link on a line of its own shows as a 3D frame (#591):
+  // the model's picture first, and the live model (orbit, zoom, explode, the
+  // joints) once the reader asks for it, so a page of models doesn't start a
+  // CAD kernel for each. Like a YouTube link, it stays a plain link in the
+  // Markdown. `/3D model from BetterCAD` writes one.
+  //
+  //   https://bettercad.kevsrobots.com/view/3kq9...
+
+  const BETTERCAD_ORIGIN = 'https://bettercad.kevsrobots.com';
+
+  // The share token in a BetterCAD share link (either form of it), else null.
+  function betterCadToken(s) {
+    let url;
+    try { url = new URL(String(s || '').trim()); } catch (_) { return null; }
+    if (url.origin !== BETTERCAD_ORIGIN) return null;
+    const m = /^\/view\/([A-Za-z0-9_-]{6,200})\/?$/.exec(url.pathname)
+      || (url.pathname === '/' ? /^#\/view\/([A-Za-z0-9_-]{6,200})(?:\?.*)?$/.exec(url.hash) : null);
+    return m ? m[1] : null;
+  }
+
+  // The Markdown `/3D model from BetterCAD` inserts: the share link, on its own line.
+  function betterCadMarkdown(token) {
+    return BETTERCAD_ORIGIN + '/view/' + token;
+  }
+
+  function modelBox(token) {
+    const share = BETTERCAD_ORIGIN + '/view/' + encodeURIComponent(token);
+    const box = document.createElement('div');
+    box.className = 'project-model-embed mb-3';
+    const stage = document.createElement('div');
+    stage.className = 'project-model-stage';
+    const poster = document.createElement('img');
+    poster.className = 'project-model-poster';
+    poster.alt = '';
+    poster.loading = 'lazy';
+    poster.src = BETTERCAD_ORIGIN + '/api/shared/' + encodeURIComponent(token) + '/thumbnail';
+    // A model with no picture yet: the button alone, on the stage's own background.
+    poster.addEventListener('error', () => poster.remove());
+    const start = document.createElement('button');
+    start.type = 'button';
+    start.className = 'project-model-start';
+    start.innerHTML = '<i class="fas fa-cube" aria-hidden="true"></i> View in 3D';
+    start.addEventListener('click', () => {
+      const frame = document.createElement('iframe');
+      frame.src = share + '?frame=1';
+      frame.title = '3D model in BetterCAD';
+      frame.setAttribute('allow', 'fullscreen; cross-origin-isolated');
+      frame.setAttribute('allowfullscreen', '');
+      frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      stage.replaceChildren(frame);
+    });
+    stage.appendChild(poster);
+    stage.appendChild(start);
+    const foot = document.createElement('div');
+    foot.className = 'project-model-foot';
+    const made = document.createElement('span');
+    made.textContent = '3D model from BetterCAD';
+    const open = document.createElement('a');
+    open.href = share;
+    open.target = '_blank';
+    open.rel = 'noopener';
+    open.textContent = 'Open in BetterCAD';
+    foot.appendChild(made);
+    foot.appendChild(open);
+    box.appendChild(stage);
+    box.appendChild(foot);
+    return box;
+  }
+
+  // Swaps each paragraph that is nothing but a BetterCAD share link for the
+  // 3D frame. Returns how many.
+  function embedModels(root) {
+    let count = 0;
+    root.querySelectorAll('p').forEach(p => {
+      const text = p.textContent.trim();
+      if (!/^https?:\/\/\S+$/.test(text)) return;
+      const kids = p.children;
+      if (kids.length > 1 || (kids.length === 1 && kids[0].tagName !== 'A')) return;
+      const token = betterCadToken(text);
+      if (!token) return;
+      p.replaceWith(modelBox(token));
       count++;
     });
     return count;
   }
 
   window.ProjectEmbeds = {
+    betterCadToken, betterCadMarkdown, embedModels,
     snakieSource, embedCode, loadSnakieEmbed, snakieBlockOptions, snakieBlockMarkdown, renderSnakieBlock, snakieBlockWithSizes, snakieBlockWithLink, snakieBlockWithFlag,
     youTubeId, videoMarkdown, embedVideos, animatedVideos, videoTableItems, videoCards,
     videoFromLine, videoBlockItems, videoLine, videoBlock, findVideoBlocks, renderVideoBlocks, markedExtension,
