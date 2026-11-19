@@ -102,8 +102,8 @@ thanks: false
         </p>
         <script src="/assets/js/course-progress.js?v={{ site.time | date: '%s' }}"></script>
         {% unless page.snakie == false %}
-        {%- comment -%} "Open in Snakie" on the lesson's Python code (#581). Set `snakie: false` in a lesson's front matter to leave it out. {%- endcomment -%}
-        <script src="/assets/js/open-in-snakie.js?v={{ site.time | date: '%s' }}" defer></script>
+        {%- comment -%} "Open in Snakie" on the lesson's Python code (#581). Set `snakie: false` in a lesson's front matter to leave it out. `board:` (pico2w, pico-plus-2, tiny2040, tiny2350, esp32-devkit) picks the board Run here draws (#589). {%- endcomment -%}
+        <script src="/assets/js/open-in-snakie.js?v={{ site.time | date: '%s' }}"{% if page.board %} data-board="{{ page.board | escape }}"{% endif %} defer></script>
         {% endunless %}
         {% unless page.hide_likes_and_comments %}
         <hr />
