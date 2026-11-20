@@ -1,0 +1,95 @@
+---
+layout: null
+---
+{%- comment -%}
+Nibsy content catalogue.
+
+The Nibsy API (stacks/nibsy-api) downloads this file once a day and uses it
+as its only list of pages it may recommend. Everything Nibsy needs to relate
+one page to another has to be here: the real URL, the title, the description
+and the tags/groups from the front matter.
+
+Add a new content type by appending another block to "items" - keep the same
+keys (type, title, url, description, tags, date, cover).
+{%- endcomment -%}
+{%- assign none = "" | split: "" -%}
+{
+  "version": 1,
+  "generated": {{ site.time | date_to_xmlschema | jsonify }},
+  "items": [
+    {%- assign first = true -%}
+    {%- for post in site.posts -%}
+      {%- assign tags = post.tags | default: none -%}
+      {%- assign groups = post.groups | default: none -%}
+      {%- unless first -%},{%- endunless -%}{%- assign first = false %}
+    {
+      "type": "post",
+      "title": {{ post.title | jsonify }},
+      "url": {{ post.url | jsonify }},
+      "description": {{ post.description | default: post.excerpt | strip_html | strip | truncate: 400 | jsonify }},
+      "tags": {{ tags | concat: groups | jsonify }},
+      "date": {{ post.date | date: "%Y-%m-%d" | jsonify }},
+      "cover": {{ post.cover | jsonify }},
+      "videos": {{ post.videos | default: none | jsonify }}
+    }
+    {%- endfor -%}
+    {%- for course in site.data.courses -%}
+      {%- unless course.link and course.name -%}{%- continue -%}{%- endunless -%}
+      {%- assign tags = course.groups | default: none -%}
+      {%- unless first -%},{%- endunless -%}{%- assign first = false %}
+    {
+      "type": "course",
+      "title": {{ course.name | jsonify }},
+      "url": {{ course.link | jsonify }},
+      "description": {{ course.description | strip | truncate: 400 | jsonify }},
+      "tags": {{ tags | jsonify }},
+      "date": {{ course.date_published | date: "%Y-%m-%d" | jsonify }},
+      "cover": {{ course.cover | jsonify }},
+      "level": {{ course.level | jsonify }},
+      "duration": {{ course.duration | jsonify }}
+    }
+    {%- endfor -%}
+    {%- for review in site.reviews -%}
+      {%- unless review.title and review.excerpt -%}{%- continue -%}{%- endunless -%}
+      {%- assign tags = review.tags | default: none -%}
+      {%- unless first -%},{%- endunless -%}{%- assign first = false %}
+    {
+      "type": "review",
+      "title": {{ review.title | jsonify }},
+      "url": {{ review.url | jsonify }},
+      "description": {{ review.excerpt | strip_html | strip | truncate: 400 | jsonify }},
+      "tags": {{ tags | jsonify }},
+      "date": {{ review.date | date: "%Y-%m-%d" | jsonify }},
+      "cover": {{ review.cover | jsonify }}
+    }
+    {%- endfor -%}
+    {%- for robot in site.data.robots -%}
+      {%- unless robot.link and robot.name -%}{%- continue -%}{%- endunless -%}
+      {%- unless first -%},{%- endunless -%}{%- assign first = false %}
+    {
+      "type": "robot",
+      "title": {{ robot.name | jsonify }},
+      "url": {{ robot.link | jsonify }},
+      "description": {{ robot.description | strip | truncate: 400 | jsonify }},
+      "tags": [],
+      "date": {{ robot.date | date: "%Y-%m-%d" | jsonify }},
+      "cover": {{ robot.cover | jsonify }}
+    }
+    {%- endfor -%}
+    {%- for video in site.data.youtube -%}
+      {%- unless video.video_id and video.title -%}{%- continue -%}{%- endunless -%}
+      {%- unless first -%},{%- endunless -%}{%- assign first = false %}
+    {
+      "type": "video",
+      "title": {{ video.title | jsonify }},
+      "url": {{ "https://youtube.com/watch?v=" | append: video.video_id | jsonify }},
+      "description": null,
+      "tags": [],
+      "date": {{ video.published | date: "%Y-%m-%d" | jsonify }},
+      "video_id": {{ video.video_id | jsonify }},
+      "video_type": {{ video.type | jsonify }}
+    }
+    {%- endfor %}
+  ],
+  "popular_videos": {{ site.data.popular_videos | default: none | jsonify }}
+}

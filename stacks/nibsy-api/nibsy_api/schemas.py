@@ -23,6 +23,7 @@ class IngestStats(BaseModel):
     updated: int = 0
     unchanged: int = 0
     skipped: int = 0
+    removed: int = 0
     errors: int = 0
     files_processed: list[str] = Field(default_factory=list)
     error_details: list[str] = Field(default_factory=list)
@@ -57,6 +58,14 @@ class RecommendationsResponse(BaseModel):
     recommendations: list[RecommendationItem] = Field(default_factory=list)
     generated_at: Optional[datetime] = None
     generator_version: Optional[str] = None
+    # What the picks are based on: "page" (the page itself), "course" (a
+    # lesson mapped to its course) or "fallback" (trending for the section).
+    basis: Optional[str] = None
+    # True when the request carried a valid login; the widget uses it to
+    # decide whether to report the page view.
+    logged_in: bool = False
+    # True when the user's viewing history shaped these picks.
+    personalised: bool = False
 
 
 class AdminStatus(BaseModel):

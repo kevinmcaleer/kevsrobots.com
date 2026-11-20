@@ -137,6 +137,22 @@ async def get_current_user(
     return _decode_username(access_token, authorization)
 
 
+async def get_optional_user(
+    access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
+) -> Optional[str]:
+    """Username if the request carries a valid Chatter token, else ``None``.
+
+    For endpoints that work for everyone but do more for logged-in users.
+    A missing, bad or expired token is simply "not logged in".
+    """
+
+    try:
+        return _decode_username(access_token, authorization)
+    except HTTPException:
+        return None
+
+
 def require_admin(user: str = Depends(get_current_user)) -> str:
     """FastAPI dependency: 401 if not logged in, 403 if not in admin list.
 

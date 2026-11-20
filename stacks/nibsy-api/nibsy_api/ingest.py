@@ -242,6 +242,57 @@ def _rows_from_glossary(data: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+# --- Site catalogue ------------------------------------------------------
+
+# The site build publishes one JSON file listing every page Nibsy may
+# recommend (see web/assets/data/nibsy-catalogue.json). Unlike the raw YAML
+# files above it is actually served by the live site, and it carries the
+# front-matter tags the scorer needs.
+CATALOGUE_PATH = "/assets/data/nibsy-catalogue.json"
+
+_CATALOGUE_TYPES = {"post", "course", "review", "robot", "video"}
+# Keys copied into `metadata` when present on a catalogue item.
+_CATALOGUE_META_KEYS = ("cover", "level", "duration", "videos", "video_id", "video_type")
+
+
+def _rows_from_catalogue(data: Any) -> list[dict[str, Any]]:
+    """Turn the catalogue JSON into content rows, first URL wins.
+
+    Posts are listed before robots, so a robot that is really a blog post
+    keeps the post's tags.
+    """
+
+    items = data.get("items") if isinstance(data, dict) else None
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for entry in items or []:
+        if not isinstance(entry, dict):
+            continue
+        url = entry.get("url")
+        title = entry.get("title")
+        content_type = entry.get("type")
+        if not url or not title or content_type not in _CATALOGUE_TYPES:
+            continue
+        if url in seen:
+            continue
+        seen.add(url)
+        tags = sorted({str(t).strip().lower() for t in entry.get("tags") or [] if t})
+        rows.append(
+            {
+                "content_type": content_type,
+                "title": str(title),
+                "url": url,
+                "description": entry.get("description"),
+                "tags": tags,
+                "date_published": _parse_date(entry.get("date")),
+                "content_metadata": {
+                    k: entry[k] for k in _CATALOGUE_META_KEYS if entry.get(k)
+                },
+            }
+        )
+    return rows
+
+
 # --- Upsert --------------------------------------------------------------
 
 
@@ -331,17 +382,6 @@ async def _merge_popular_videos(
 # --- Public entrypoint ---------------------------------------------------
 
 
-_REMOTE_FILES = [
-    "courses.yml",
-    "posts.yaml",
-    "youtube.yml",
-    "robots.yml",
-    "reviews.yml",
-    "glossary.yml",
-    "popular_videos.yaml",
-]
-
-
 _FILE_HANDLERS: dict[str, Any] = {
     "courses.yml": _rows_from_courses,
     "posts.yaml": _rows_from_posts,
@@ -418,62 +458,67 @@ async def ingest_from_data_dir(
     return stats
 
 
-async def ingest_from_remote(
-    base_url: str, session: AsyncSession
-) -> IngestStats:
-    """Fetch YAML files over HTTP from the live site and ingest them (#69)."""
+async def ingest_catalogue(data: Any, session: AsyncSession) -> IngestStats:
+    """Upsert the site catalogue and remove pages that no longer exist.
 
-    stats = IngestStats()
-    base_url = base_url.rstrip("/")
+    The catalogue is the full list of recommendable pages, so anything in
+    `nibsy_content` that is missing from it is a dead link. Pruning is
+    skipped when the catalogue looks truncated (fewer than half the rows we
+    already hold) so a bad build cannot wipe the table.
+    """
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        # Pass 1 — row-producing files.
-        for filename in _REMOTE_FILES:
-            if filename == "popular_videos.yaml":
-                continue
-            handler = _FILE_HANDLERS.get(filename)
-            if handler is None:
-                continue
-            url = f"{base_url}/assets/data/{filename}"
-            try:
-                resp = await client.get(url)
-                resp.raise_for_status()
-            except httpx.HTTPError as exc:
-                stats.errors += 1
-                stats.error_details.append(f"{filename}: {exc}")
-                continue
-            try:
-                data = yaml.safe_load(resp.text)
-            except yaml.YAMLError as exc:
-                stats.errors += 1
-                stats.error_details.append(f"{filename}: {exc}")
-                continue
-            if data is None:
-                continue
-            stats.files_processed.append(filename)
-            rows = handler(data)
-            for row in rows:
-                try:
-                    await _upsert_row(session, row, stats)
-                except Exception as exc:  # noqa: BLE001
-                    stats.errors += 1
-                    stats.error_details.append(f"{filename} {row.get('url')}: {exc}")
+    stats = IngestStats(files_processed=["nibsy-catalogue.json"])
+    rows = _rows_from_catalogue(data)
+    if not rows:
+        stats.errors += 1
+        stats.error_details.append("nibsy-catalogue.json: no usable items")
+        return stats
 
-        await session.flush()
-
-        # Pass 2 — popular_videos.yaml merges metadata only.
-        pop_url = f"{base_url}/assets/data/popular_videos.yaml"
+    for row in rows:
         try:
-            resp = await client.get(pop_url)
-            resp.raise_for_status()
-            pop_data = yaml.safe_load(resp.text)
-        except (httpx.HTTPError, yaml.YAMLError) as exc:
+            await _upsert_row(session, row, stats)
+        except Exception as exc:  # noqa: BLE001 — log + continue
             stats.errors += 1
-            stats.error_details.append(f"popular_videos.yaml: {exc}")
-            pop_data = None
-        if pop_data is not None:
-            stats.files_processed.append("popular_videos.yaml")
-            await _merge_popular_videos(pop_data, session, stats)
+            stats.error_details.append(f"catalogue {row.get('url')}: {exc}")
+    await session.flush()
+
+    popular = data.get("popular_videos") if isinstance(data, dict) else None
+    if popular:
+        await _merge_popular_videos(popular, session, stats)
+
+    existing_urls = set((await session.scalars(select(NibsyContent.url))).all())
+    catalogue_urls = {row["url"] for row in rows}
+    stale = existing_urls - catalogue_urls
+    if stale and len(catalogue_urls) * 2 >= len(existing_urls):
+        await session.execute(
+            delete(NibsyContent).where(NibsyContent.url.in_(stale))
+        )
+        stats.removed = len(stale)
+        logger.info("ingest: removed %s pages no longer in the catalogue", len(stale))
+    elif stale:
+        stats.error_details.append(
+            f"catalogue has {len(catalogue_urls)} items but {len(existing_urls)} "
+            "are stored — skipped pruning"
+        )
 
     await session.commit()
     return stats
+
+
+async def ingest_from_remote(
+    base_url: str, session: AsyncSession
+) -> IngestStats:
+    """Fetch the catalogue from the live site and ingest it (#69)."""
+
+    url = f"{base_url.rstrip('/')}{CATALOGUE_PATH}"
+    try:
+        async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+            resp = await client.get(url)
+            resp.raise_for_status()
+            data = resp.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        stats = IngestStats(errors=1)
+        stats.error_details.append(f"{url}: {exc}")
+        logger.error("ingest: could not load the site catalogue from %s: %s", url, exc)
+        return stats
+    return await ingest_catalogue(data, session)

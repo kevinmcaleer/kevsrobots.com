@@ -46,15 +46,16 @@ export INGEST_SCHEDULE_HOUR=1                       # UTC hour for daily ingest 
 
 Then hit `http://127.0.0.1:8200/health`.
 
-On first boot the service ingests `NIBSY_DATA_DIR`, generates an initial
-recommendation set, and schedules a refresh every
-`RECOMMENDATION_REFRESH_DAYS` days (default `14`).
+On first boot the service ingests `NIBSY_DATA_DIR` if the content table
+is empty. After that the catalogue comes from the live site: the Jekyll
+build publishes `/assets/data/nibsy-catalogue.json`
+(`web/assets/data/nibsy-catalogue.json`), and the service downloads it
+shortly after every start and once a day at `INGEST_SCHEDULE_HOUR`.
 
-To force a re-ingest or a recommendation refresh:
+To force a refresh (admin login required):
 
 ```bash
-curl -X POST http://127.0.0.1:8200/api/admin/ingest
-curl -X POST http://127.0.0.1:8200/api/admin/regenerate-recommendations
+curl -X POST https://nibsy.kevsrobots.com/api/admin/ingest-remote
 ```
 
 ## Running tests
@@ -111,47 +112,84 @@ curl https://nibsy.kevsrobots.com/health
 | Path | Status | Notes |
 |---|---|---|
 | `GET /health` | implemented | `{status, content_count, recommendation_count}` |
-| `GET /api/recommendations` | implemented | Precomputed top-N lookup keyed by `?page=...` |
+| `GET /api/recommendations` | implemented | Live, page-aware recommendations for `?page=...` |
 | `GET /api/related/{content_id}` | implemented | Tag/affinity-based related content (#67) |
 | `GET /api/recommendations/next-course` | implemented | Next course in pathway or related courses (#76) |
 | `GET /api/trending` | implemented | Composite trending scores: clicks + page views + YouTube views (#67, #72) |
 | `POST /api/track/click` | implemented | Log recommendation clicks (#68) |
 | `POST /api/track/impression` | implemented | Log recommendation impressions (#68) |
+| `POST /api/track/view` | implemented | Record a logged-in user's page view (ignored when anonymous) |
+| `GET /api/me/history` | implemented | The logged-in user's stored viewing history |
+| `DELETE /api/me/history` | implemented | Erase the logged-in user's viewing history |
 | `GET /api/analytics/top-clicked` | implemented | Most clicked content by period (#68) |
 | `GET /api/analytics/nibsy-stats` | implemented | Dashboard-level stats (#68) |
 | `POST /api/admin/ingest` | implemented | Re-ingest from `NIBSY_DATA_DIR` |
 | `GET /api/admin/categorise/export` | implemented | Export content for manual AI categorisation (#75) |
 | `POST /api/admin/categorise/import` | implemented | Import categorisation results (#75) |
 | `POST /api/admin/recompute-trending` | implemented | Recompute trending scores (#72) |
-| `POST /api/admin/ingest-remote` | implemented | Re-ingest from live site over HTTP (#69) |
-| `POST /api/admin/regenerate-recommendations` | implemented | Ad-hoc recompute (also runs on a 14-day schedule) |
+| `POST /api/admin/ingest-remote` | implemented | Re-ingest the site catalogue over HTTP (#69) |
+| `POST /api/admin/regenerate-recommendations` | legacy | Rebuilds the precomputed table, which the widget no longer reads |
 
 ## How recommendations work
 
-Recommendations are **precomputed in batch**, not generated on each
-request. A scheduler runs `generate_recommendations` on a 14-day cadence
-(and on first boot when `nibsy_recommendations` is empty); each call
-recomputes the top-6 picks per source URL and persists them as a JSONB
-array. The widget endpoint then becomes a single indexed lookup.
+Recommendations are **computed live on every request** (`recommender.py`).
+Nothing is stored, so there is nothing to regenerate and nothing that can
+go stale; new content is recommendable as soon as the catalogue is
+re-ingested.
 
-The v0 scorer (`generator.py`) combines three cheap signals:
+1. **Resolve the page.** `?page=` is normalised (`/blog/x.html`,
+   `/blog/x` and `/blog/x.html?utm=...` are the same page). A lesson
+   (`/learn/<course>/<lesson>.html`) uses its course.
+2. **Compare it with everything else.** Each catalogue item is a weighted
+   bag of terms: tags (x3), title words (x2) and description words (x1),
+   each multiplied by IDF so rare terms like `oled` matter more than
+   common ones like `python`. Similarity is the cosine between two bags.
+   Because titles count, untagged items (YouTube videos, reviews) still
+   match.
+3. **Break ties** with a small content-type affinity and recency bonus,
+   apply a soft same-type penalty so the list is a mix, and keep one slot
+   for the best related video.
+4. **Fall back** when the page is not in the catalogue (home page,
+   section indexes) or has too few related items: trending items for that
+   section, rotated daily.
 
-```
-score(source → target) =
-    1.0 × jaccard(source.tags, target.tags)        # tag overlap
-  + 0.5 × affinity(source.type, target.type)        # content-type matrix
-  + 0.3 × recency_bonus(target.date_published)      # newer targets get a bump
-```
+The response carries `basis` (`page`, `course` or `fallback`) so you can
+see which path a page took.
 
-After scoring, a greedy pick with a soft same-type penalty
-(`0.8 ** count_of_same_type_already_chosen`) breaks the obvious
-monoculture failure mode where six courses or six videos would dominate.
+The catalogue index is cached in memory and rebuilt only when
+`nibsy_content` changes. Scoring ~800 items takes about 2ms.
 
-The scorer is intentionally simple — the AI categorisation pass in
-**#75** layers richer topic extraction on top of `tags`, at which point
-this same heuristic produces materially better neighbours without any
-algorithm change. The `generator_version` column lets consumers invalidate
-caches when the scoring evolves.
+The older batch generator (`generator.py`, the `nibsy_recommendations`
+table and `POST /api/admin/regenerate-recommendations`) is no longer read
+by the widget.
+
+### Personalised suggestions (logged-in users)
+
+When the request carries a valid Chatter login cookie, the picks are also
+shaped by what that user has read:
+
+- The widget reports each page view to `POST /api/track/view`. It is
+  stored in `nibsy_page_views` as one row per (username, page) with a
+  count and last-viewed time. A lesson counts as a view of its course.
+  Anonymous requests are ignored.
+- On each request the history is blended into an interest profile (recent
+  views weigh most, 30-day half-life) and every candidate is scored as
+  `similarity to this page + 0.6 x similarity to the profile`. On pages
+  with no topic of their own (home, section indexes) the profile decides.
+- Pages the user has already read are not suggested, and a pick that the
+  history earned says why: "Because you read ...".
+- **No recommendation or profile is ever stored**, only the views. Rows
+  older than `VIEW_HISTORY_DAYS` (default 90) are deleted daily.
+- Users can see and erase their data: `GET` / `DELETE /api/me/history`
+  ("Forget What I've Read" in the Nibsy menu).
+
+### Trending
+
+`trending.py` recomputes scores hourly from Nibsy clicks (7 days), page
+views (last 30 days, from the pagecount database at `PAGE_COUNT_URL`),
+YouTube views and recency. If `pages_with_views` in the
+`/api/admin/recompute-trending` response is 0, the page-view signal is
+not connected and trending is recency only.
 
 ## Roadmap
 

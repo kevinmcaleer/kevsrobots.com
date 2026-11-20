@@ -134,3 +134,26 @@ class NibsyRecommendation(Base):
     generator_version: Mapped[str] = mapped_column(
         Text, nullable=False, server_default="v0"
     )
+
+
+class NibsyPageView(Base):
+    """Which catalogue pages a logged-in user has read, for personalisation.
+
+    One row per (user, page): the last time they viewed it and how often.
+    This is the only personal data Nibsy keeps. Recommendations are never
+    stored — they are recomputed from these rows on every request — and
+    rows older than ``VIEW_HISTORY_DAYS`` are purged daily. Anonymous
+    visitors are never recorded.
+    """
+
+    __tablename__ = "nibsy_page_views"
+
+    # Chatter username (the JWT ``sub``).
+    username: Mapped[str] = mapped_column(String(100), primary_key=True)
+    content_id: Mapped[int] = mapped_column(
+        ForeignKey("nibsy_content.id", ondelete="CASCADE"), primary_key=True
+    )
+    view_count: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    last_viewed_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
