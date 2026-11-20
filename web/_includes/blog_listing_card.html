@@ -7,8 +7,9 @@ Compact card: cover, title, short description, date, author, views/likes/comment
 No tag chips, so cards stay short.
 
 On desktop (a fine pointer that can hover), hovering or tabbing into the card
-lifts it Netflix-style and drops down a panel with the longer excerpt,
-reading time, difficulty, topics, tags and a Watch on YouTube button.
+opens a Netflix-style expanded card across the full width of the grid, with a
+large cover, the longer excerpt, reading time, difficulty, topics, tags and a
+Watch on YouTube button.
 Touch devices never see the panel. Styles: assets/css/blog-cards.css
 {% endcomment %}
 {% assign p = include.post %}
@@ -55,42 +56,52 @@ Touch devices never see the panel. Styles: assets/css/blog-cards.css
       {% include like-comment-summary.html url=url_without_slash %}
     </div>
 
+  </article>
     <div class="blog-card-more" aria-hidden="true">
-      {% if more_text != "" %}
-      <p class="small blog-card-excerpt">{{ more_text }}</p>
+      {% if p.cover %}
+      <a class="blog-card-more-media" href="{{ p.url }}" tabindex="-1"><img src="{{ p.cover }}" alt="" loading="lazy"></a>
       {% endif %}
-
-      <ul class="blog-card-facts small">
-        <li><i class="fa-regular fa-clock"></i> {{ read_minutes }} min read</li>
-        {% if p.difficulty %}<li><i class="fa-solid fa-signal"></i> {{ p.difficulty | capitalize }}</li>{% endif %}
-        {% if p.videos.size > 1 %}<li><i class="fa-brands fa-youtube"></i> {{ p.videos.size }} videos</li>{% endif %}
-      </ul>
-
-      {% if p.groups %}
-      <p class="small blog-card-topics mb-2">
-        <i class="fa-solid fa-layer-group"></i>
-        {% for g in p.groups %}
-          {% assign group_doc = site.groups | where: "slug", g | first %}
-          <a href="{% if group_doc %}{{ group_doc.url }}{% else %}/ideas/{{ g }}.html{% endif %}" tabindex="-1">{% if group_doc %}{{ group_doc.title }}{% else %}{{ g }}{% endif %}</a>{% unless forloop.last %}, {% endunless %}
-        {% endfor %}
-      </p>
-      {% endif %}
-
-      {% if p.tags %}
-      <div class="blog-card-tags mb-2">
-        {% for tag in p.tags limit: 8 %}
-        <a class="badge bg-secondary text-decoration-none" href="/tags/{{ tag | slugify }}/" tabindex="-1">{{ tag | replace: '_', ' ' }}</a>
-        {% endfor %}
-        {% if p.tags.size > 8 %}<span class="small dark-grey">+{{ p.tags.size | minus: 8 }} more</span>{% endif %}
-      </div>
-      {% endif %}
-
-      <div class="blog-card-actions">
-        <a class="btn btn-sm btn-dark" href="{{ p.url }}" tabindex="-1"><i class="fa-solid fa-book-open"></i> Read</a>
-        {% if main_video %}
-        <a class="btn btn-sm btn-danger" href="https://www.youtube.com/watch?v={{ main_video }}" target="_blank" rel="noopener" tabindex="-1"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
+      <div class="blog-card-more-body">
+        <p class="blog-card-more-title"><a href="{{ p.url }}" class="black text-decoration-none" tabindex="-1">{{ p.title }}</a></p>
+        <p class="small dark-grey mb-2"><i class="fa-solid fa-calendar-days"></i>&nbsp;{{ p.date | date: "%e %B %Y" }}{% if p.author %} &nbsp;·&nbsp; <i class="fa-solid fa-user"></i>&nbsp;{{ p.author }}{% endif %}</p>
+        {% if desc_text != "" %}<p class="blog-card-more-desc">{{ desc_text }}</p>{% endif %}
+        {% if more_text != "" %}
+        <p class="small blog-card-excerpt">{{ more_text }}</p>
         {% endif %}
+
+        <ul class="blog-card-facts small">
+          <li><i class="fa-regular fa-clock"></i> {{ read_minutes }} min read</li>
+          {% if p.difficulty %}<li><i class="fa-solid fa-signal"></i> {{ p.difficulty | capitalize }}</li>{% endif %}
+          {% if p.videos.size > 1 %}<li><i class="fa-brands fa-youtube"></i> {{ p.videos.size }} videos</li>{% endif %}
+        </ul>
+
+        {% if p.groups %}
+        <p class="small blog-card-topics mb-2">
+          <i class="fa-solid fa-layer-group"></i>
+          {% for g in p.groups %}
+            {% assign group_doc = site.groups | where: "slug", g | first %}
+            <a href="{% if group_doc %}{{ group_doc.url }}{% else %}/ideas/{{ g }}.html{% endif %}" tabindex="-1">{% if group_doc %}{{ group_doc.title }}{% else %}{{ g }}{% endif %}</a>{% unless forloop.last %}, {% endunless %}
+          {% endfor %}
+        </p>
+        {% endif %}
+
+        {% if p.tags %}
+        <div class="blog-card-tags mb-2">
+          {% for tag in p.tags limit: 8 %}
+          <a class="badge bg-secondary text-decoration-none" href="/tags/{{ tag | slugify }}/" tabindex="-1">{{ tag | replace: '_', ' ' }}</a>
+          {% endfor %}
+          {% if p.tags.size > 8 %}<span class="small dark-grey">+{{ p.tags.size | minus: 8 }} more</span>{% endif %}
+        </div>
+        {% endif %}
+
+        <div class="blog-card-actions">
+          <a class="btn btn-sm btn-dark" href="{{ p.url }}" tabindex="-1"><i class="fa-solid fa-book-open"></i> Read</a>
+          {% if main_video %}
+          <a class="btn btn-sm btn-danger" href="https://www.youtube.com/watch?v={{ main_video }}" target="_blank" rel="noopener" tabindex="-1"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a>
+          {% endif %}
+        </div>
+
+        {% include like-comment-summary.html url=url_without_slash %}
       </div>
     </div>
-  </article>
 </div>
