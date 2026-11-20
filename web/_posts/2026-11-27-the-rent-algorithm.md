@@ -26,6 +26,10 @@ groups:
   - everyday-algorithms
 ---
 
+This is the next article in a series of posts exploring how everyday algorithms influence lives, often in ways we don't immediately notice.
+
+---
+
 Imagine three apartment blocks on the same street, owned by three different companies. In a healthy market they compete. If one has empty flats, it drops the rent to fill them, and the others have to follow or lose tenants.
 
 Now imagine all three quietly plug into the same piece of software. Each one hands over its private numbers: what tenants are actually paying, how many flats are empty, which leases are coming up for renewal. The software crunches everyone's data together and sends each landlord a recommended rent.

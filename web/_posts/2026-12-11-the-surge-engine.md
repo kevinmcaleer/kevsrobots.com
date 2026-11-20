@@ -26,6 +26,10 @@ groups:
   - everyday-algorithms
 ---
 
+This is the next article in a series of posts exploring how everyday algorithms influence lives, often in ways we don't immediately notice.
+
+---
+
 {% split image="/assets/img/blog/surge_engine/round-number.png" alt="Two phone screens showing a 2.0 times surge and a 2.1 times surge, with riders more likely to accept 2.1 times" caption="A higher multiplier that riders were more willing to accept" side="right" %}
 It's raining, it's late, and you open a ride-hailing app. The price is **2.1×** normal. You sigh, and you book it anyway.
 

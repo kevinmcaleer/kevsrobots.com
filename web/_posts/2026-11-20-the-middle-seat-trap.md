@@ -25,6 +25,11 @@ tags:
 groups:
   - everyday-algorithms
 ---
+
+This is the first in a series of posts exploring how everyday algorithms influence lives, often in ways we don't immediately notice.
+
+---
+
 {% split image="/assets/img/blog/middle_seat/app-nudge.png" alt="A phone app showing boarding passes for seats 24B and 31E with an upgrade button underneath" caption="Two middle seats, rows apart, and a button to fix it for a fee" side="right" %}
 You book a cheap flight, skip the £15 seat-selection fee, and wait until check-in opens. Twenty-four hours before takeoff, you open the app to claim your boarding pass—and there it is: 24B. A middle seat near the back of the plane.
 
