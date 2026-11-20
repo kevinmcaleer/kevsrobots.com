@@ -21,7 +21,7 @@ groups:
   - everyday-algorithms
 ---
 
-This is the next article in a series of posts exploring how everyday algorithms influence lives, often in ways we don't immediately notice.
+This is the next article in a series of posts exploring how **everyday algorithms** influence lives, often in ways we don't immediately notice.
 
 ---
 
