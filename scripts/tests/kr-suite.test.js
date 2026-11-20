@@ -45,5 +45,5 @@ test('keeps the card on screen', async () => {
 
 test('every app has its icon', async () => {
   const { KR_APPS } = await load();
-  for (const app of KR_APPS) assert.match(app.icon, /^data:image\/svg\+xml;base64,/, app.id);
+  for (const app of KR_APPS) assert.match(app.icon, /^data:image\/svg\+xml,/, app.id);
 });

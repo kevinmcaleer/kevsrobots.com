@@ -11,9 +11,15 @@ import { fileURLToPath } from 'node:url'
 const suite = join(dirname(fileURLToPath(import.meta.url)), '..', 'web', 'assets', 'suite')
 const file = join(suite, 'kr-suite.js')
 const ids = ['learn', 'projects', 'snakie', 'bettercad']
-const lines = ids
-  .map((id) => `  ${id}: 'data:image/svg+xml;base64,${readFileSync(join(suite, 'icons', `${id}.svg`)).toString('base64')}'`)
-  .join(',\n')
+/** A small, gzip-friendly SVG data URI: single quotes inside, only the characters a URL needs escaped. */
+const dataUri = (svg) =>
+  'data:image/svg+xml,' +
+  svg
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/"/g, "'")
+    .replace(/[%#<>{}\n]/g, (c) => encodeURIComponent(c))
+const lines = ids.map((id) => `  ${id}: ${JSON.stringify(dataUri(readFileSync(join(suite, 'icons', `${id}.svg`), 'utf8')))}`).join(',\n')
 const src = readFileSync(file, 'utf8')
 const next = src.replace(/export const KR_ICONS = Object\.freeze\(\{\n[\s\S]*?\n\}\)/, `export const KR_ICONS = Object.freeze({\n${lines}\n})`)
 if (next === src) console.log('kr-suite.js: icons already up to date')
