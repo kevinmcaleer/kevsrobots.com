@@ -76,6 +76,159 @@
     ]
   },
   {
+    "slug": "bettercad",
+    "name": "Learn BetterCad",
+    "description": "Design your own 3D printable parts in BetterCad, the free CAD tool that runs in your browser. Sketch, extrude, add screw holes that fit, hollow out an enclosure, drive a model with parameters, then build a phone stand from scratch.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-20",
+    "groups": [
+      "3ddesign",
+      "3dprinting"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/bettercad/00_intro.html"
+      },
+      {
+        "file": "01_look_around_and_sketch.md",
+        "section": "Your First Part",
+        "url": "/learn/bettercad/01_look_around_and_sketch.html"
+      },
+      {
+        "file": "02_extrude_and_fillet.md",
+        "section": "Your First Part",
+        "url": "/learn/bettercad/02_extrude_and_fillet.html"
+      },
+      {
+        "file": "03_export_your_first_print.md",
+        "section": "Your First Part",
+        "url": "/learn/bettercad/03_export_your_first_print.html"
+      },
+      {
+        "file": "04_sketching_with_constraints.md",
+        "section": "Sketching Properly",
+        "url": "/learn/bettercad/04_sketching_with_constraints.html"
+      },
+      {
+        "file": "05_dimensions.md",
+        "section": "Sketching Properly",
+        "url": "/learn/bettercad/05_dimensions.html"
+      },
+      {
+        "file": "06_push_pull_and_shapes.md",
+        "section": "Building With Shapes",
+        "url": "/learn/bettercad/06_push_pull_and_shapes.html"
+      },
+      {
+        "file": "07_combining_parts_and_holes.md",
+        "section": "Building With Shapes",
+        "url": "/learn/bettercad/07_combining_parts_and_holes.html"
+      },
+      {
+        "file": "08_fillets_chamfers_and_shells.md",
+        "section": "Building With Shapes",
+        "url": "/learn/bettercad/08_fillets_chamfers_and_shells.html"
+      },
+      {
+        "file": "09_the_timeline_and_parameters.md",
+        "section": "Models That Change",
+        "url": "/learn/bettercad/09_the_timeline_and_parameters.html"
+      },
+      {
+        "file": "10_saving_sharing_and_printing.md",
+        "section": "Models That Change",
+        "url": "/learn/bettercad/10_saving_sharing_and_printing.html"
+      },
+      {
+        "file": "11_project_phone_stand.md",
+        "section": "Project",
+        "url": "/learn/bettercad/11_project_phone_stand.html"
+      },
+      {
+        "file": "12_summary.md",
+        "section": "Project",
+        "url": "/learn/bettercad/12_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "bettercad_printing",
+    "name": "Print It Right with BetterCad",
+    "description": "Get parts that fit first time. Set up your printer in BetterCad, catch overhangs and thin walls before you print, calibrate holes and fits to your own machine, then design a box with a lid that closes just right.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-20",
+    "groups": [
+      "3dprinting",
+      "3ddesign"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/bettercad_printing/00_intro.html"
+      },
+      {
+        "file": "01_set_up_your_printer.md",
+        "section": "Will It Print",
+        "url": "/learn/bettercad_printing/01_set_up_your_printer.html"
+      },
+      {
+        "file": "02_overhangs_and_supports.md",
+        "section": "Will It Print",
+        "url": "/learn/bettercad_printing/02_overhangs_and_supports.html"
+      },
+      {
+        "file": "03_thin_walls.md",
+        "section": "Will It Print",
+        "url": "/learn/bettercad_printing/03_thin_walls.html"
+      },
+      {
+        "file": "04_choosing_an_orientation.md",
+        "section": "Will It Print",
+        "url": "/learn/bettercad_printing/04_choosing_an_orientation.html"
+      },
+      {
+        "file": "05_holes_that_fit.md",
+        "section": "Will It Fit",
+        "url": "/learn/bettercad_printing/05_holes_that_fit.html"
+      },
+      {
+        "file": "06_fits_between_parts.md",
+        "section": "Will It Fit",
+        "url": "/learn/bettercad_printing/06_fits_between_parts.html"
+      },
+      {
+        "file": "07_where_parts_meet.md",
+        "section": "Will It Fit",
+        "url": "/learn/bettercad_printing/07_where_parts_meet.html"
+      },
+      {
+        "file": "08_material_and_weight.md",
+        "section": "Out to the Slicer",
+        "url": "/learn/bettercad_printing/08_material_and_weight.html"
+      },
+      {
+        "file": "09_exporting_for_your_slicer.md",
+        "section": "Out to the Slicer",
+        "url": "/learn/bettercad_printing/09_exporting_for_your_slicer.html"
+      },
+      {
+        "file": "10_project_box_with_a_lid.md",
+        "section": "Project",
+        "url": "/learn/bettercad_printing/10_project_box_with_a_lid.html"
+      },
+      {
+        "file": "11_summary.md",
+        "section": "Project",
+        "url": "/learn/bettercad_printing/11_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "bottango",
     "name": "Bottango Basics",
     "description": "Learn how to bring characters and props to life using Bottango, a powerful no-code motion tool for animating servos and creating interactive scenes.  This course walks you through installing Bottango, wiring servos, programming boards, and creating expressive motion sequences.",

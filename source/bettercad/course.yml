@@ -1,0 +1,44 @@
+- name: Learn BetterCad
+  author: Kevin McAleer
+  date_created: 2026-11-20
+  date_published: 2026-11-20
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - 3ddesign
+      - 3dprinting
+  description: >-
+    Design your own 3D printable parts in BetterCad, the free CAD tool that runs in your browser. Sketch, extrude, add screw holes that fit, hollow out an enclosure, drive a model with parameters, then build a phone stand from scratch.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Your First Part
+      content:
+      - 01_look_around_and_sketch.md
+      - 02_extrude_and_fillet.md
+      - 03_export_your_first_print.md
+  - section:
+      name: Sketching Properly
+      content:
+      - 04_sketching_with_constraints.md
+      - 05_dimensions.md
+  - section:
+      name: Building With Shapes
+      content:
+      - 06_push_pull_and_shapes.md
+      - 07_combining_parts_and_holes.md
+      - 08_fillets_chamfers_and_shells.md
+  - section:
+      name: Models That Change
+      content:
+      - 09_the_timeline_and_parameters.md
+      - 10_saving_sharing_and_printing.md
+  - section:
+      name: Project
+      content:
+      - 11_project_phone_stand.md
+      - 12_summary.md
