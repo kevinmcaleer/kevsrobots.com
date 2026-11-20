@@ -36,15 +36,18 @@ I live in the UK (up North), with my beautiful wife, 2 Chihuahuas and way too ma
 
 ---
 
-## Contact
+{% endcapture %}
+{{ content | markdownify }}
 
-If you want to contact me about something, feel free to reachout to <kevinmcaleer@gmail.com>
+{% include social_feed.html %}
+
+{% capture content %}
 
 ---
 
-## Recent Videos
+## Contact
 
-{% include youtube_latest.html%}
+If you want to contact me about something, feel free to reachout to <kevinmcaleer@gmail.com>
 
 ---
 

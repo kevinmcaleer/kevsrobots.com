@@ -1,0 +1,219 @@
+{%- comment -%}
+  Latest from Kev: YouTube first (it pays the bills), then Instagram, TikTok and X.
+  YouTube data: _data/youtube.yml. Other platforms: _data/social_feed.yml.
+  Third-party embed scripts are only loaded when their tab is opened.
+{%- endcomment -%}
+{%- assign feed = site.data.social_feed -%}
+{%- assign vids = site.data.youtube | sort: 'published' | reverse -%}
+{%- assign long_form = vids | where: 'type', 'video' -%}
+{%- assign hero = long_form | first -%}
+{%- unless hero -%}{%- assign hero = vids | first -%}{%- endunless -%}
+
+<section class="social-feed my-4" aria-labelledby="social-feed-title">
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h2 id="social-feed-title" class="m-0">Latest from Kev</h2>
+    <a class="btn btn-danger" href="https://www.youtube.com/@kevinmcaleer28?sub_confirmation=1" target="_blank" rel="noopener">
+      <i class="fab fa-youtube me-1"></i> Subscribe on YouTube
+    </a>
+  </div>
+
+  {%- if hero %}
+  <!-- Latest YouTube video, front and centre -->
+  <div class="row g-4 align-items-center mb-3">
+    <div class="col-12 col-lg-7">
+      <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm bg-dark social-feed-yt"
+           data-video-id="{{ hero.video_id }}">
+        <button type="button" class="btn p-0 border-0 social-feed-yt-play"
+                aria-label="Play {{ hero.title | escape }}">
+          <img src="https://i.ytimg.com/vi/{{ hero.video_id }}/hqdefault.jpg" alt=""
+               class="w-100 h-100 object-fit-cover" loading="lazy">
+          <span class="position-absolute top-50 start-50 translate-middle">
+            <i class="fab fa-youtube fa-4x text-danger bg-white rounded-3 px-1"></i>
+          </span>
+        </button>
+      </div>
+    </div>
+    <div class="col-12 col-lg-5">
+      <span class="badge bg-danger mb-2">Newest video</span>
+      <h3 class="h4">{{ hero.title }}</h3>
+      <p class="text-muted small mb-3">{{ hero.published | date: "%-d %B %Y" }}</p>
+      <a class="btn btn-outline-dark btn-sm me-2" href="https://www.youtube.com/watch?v={{ hero.video_id }}" target="_blank" rel="noopener">
+        Watch on YouTube
+      </a>
+      <a class="btn btn-link btn-sm" href="/videos">All videos &rsaquo;</a>
+    </div>
+  </div>
+  {%- endif %}
+
+  <!-- More recent videos, shorts and livestreams -->
+  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 mb-4">
+    {%- assign shown = 0 -%}
+    {%- for vid in vids -%}
+      {%- if vid.video_id == hero.video_id -%}{%- continue -%}{%- endif -%}
+      {%- if shown >= 6 -%}{%- break -%}{%- endif -%}
+      {%- assign shown = shown | plus: 1 %}
+    <div class="col">
+      <a class="card h-100 border-0 bg-light text-decoration-none card-hover shadow-hover"
+         href="https://www.youtube.com/watch?v={{ vid.video_id }}" target="_blank" rel="noopener">
+        <img src="https://i.ytimg.com/vi/{{ vid.video_id }}/mqdefault.jpg" class="card-img-top" loading="lazy"
+             alt="YouTube thumbnail for {{ vid.title | escape }}">
+        <div class="card-body p-2">
+          <p class="small text-dark mb-1 social-feed-clamp">{{ vid.title }}</p>
+          <span class="badge {% if vid.type == 'short' %}bg-success{% elsif vid.type == 'livestream' %}bg-danger{% else %}bg-secondary{% endif %}">{{ vid.type | capitalize }}</span>
+        </div>
+      </a>
+    </div>
+    {%- endfor %}
+  </div>
+
+  <!-- Instagram / TikTok / X -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="sf-instagram-tab" data-bs-toggle="tab" data-bs-target="#sf-instagram"
+              type="button" role="tab" aria-controls="sf-instagram" aria-selected="true">
+        <i class="fab fa-instagram me-1"></i> Instagram
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="sf-tiktok-tab" data-bs-toggle="tab" data-bs-target="#sf-tiktok"
+              type="button" role="tab" aria-controls="sf-tiktok" aria-selected="false">
+        <i class="fab fa-tiktok me-1"></i> TikTok
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="sf-x-tab" data-bs-toggle="tab" data-bs-target="#sf-x"
+              type="button" role="tab" aria-controls="sf-x" aria-selected="false">
+        <i class="fa-brands fa-x-twitter me-1"></i> X
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content border border-top-0 rounded-bottom p-3">
+
+    <!-- Instagram -->
+    <div class="tab-pane fade show active" id="sf-instagram" role="tabpanel" aria-labelledby="sf-instagram-tab"
+         data-embed-script="https://www.instagram.com/embed.js">
+      {%- if feed.instagram.posts.size > 0 %}
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        {%- for post in feed.instagram.posts limit: 6 %}
+        <div class="col d-flex justify-content-center">
+          <blockquote class="instagram-media w-100" data-instgrm-permalink="{{ post.url }}" data-instgrm-version="14"
+                      style="max-width:540px;min-width:280px;">
+            <a href="{{ post.url }}" target="_blank" rel="noopener">View this post on Instagram</a>
+          </blockquote>
+        </div>
+        {%- endfor %}
+      </div>
+      {%- else %}
+      <p class="mb-2">Behind-the-scenes photos of whatever I'm building this week.</p>
+      {%- endif %}
+      <a class="btn btn-outline-dark btn-sm mt-3" href="{{ feed.instagram.url }}" target="_blank" rel="noopener">
+        Follow @{{ feed.instagram.handle }} on Instagram
+      </a>
+    </div>
+
+    <!-- TikTok -->
+    <div class="tab-pane fade" id="sf-tiktok" role="tabpanel" aria-labelledby="sf-tiktok-tab"
+         data-embed-script="https://www.tiktok.com/embed.js">
+      {%- if feed.tiktok.posts.size > 0 %}
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        {%- for post in feed.tiktok.posts limit: 6 %}
+        {%- assign tt_id = post.url | split: '?' | first | split: '/' | last %}
+        <div class="col d-flex justify-content-center">
+          <blockquote class="tiktok-embed" cite="{{ post.url }}" data-video-id="{{ tt_id }}"
+                      style="max-width:325px;min-width:280px;">
+            <section><a href="{{ post.url }}" target="_blank" rel="noopener">Watch on TikTok</a></section>
+          </blockquote>
+        </div>
+        {%- endfor %}
+      </div>
+      {%- else %}
+      <blockquote class="tiktok-embed" cite="{{ feed.tiktok.url }}" data-unique-id="{{ feed.tiktok.handle }}"
+                  data-embed-type="creator" style="max-width:780px;min-width:288px;">
+        <section><a href="{{ feed.tiktok.url }}?refer=creator_embed" target="_blank" rel="noopener">@{{ feed.tiktok.handle }}</a></section>
+      </blockquote>
+      {%- endif %}
+      <a class="btn btn-outline-dark btn-sm mt-3" href="{{ feed.tiktok.url }}" target="_blank" rel="noopener">
+        Follow @{{ feed.tiktok.handle }} on TikTok
+      </a>
+    </div>
+
+    <!-- X -->
+    <div class="tab-pane fade" id="sf-x" role="tabpanel" aria-labelledby="sf-x-tab"
+         data-embed-script="https://platform.twitter.com/widgets.js">
+      {%- if feed.x.posts.size > 0 %}
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        {%- for post in feed.x.posts limit: 6 %}
+        <div class="col">
+          <blockquote class="twitter-tweet" data-dnt="true">
+            <a href="{{ post.url | replace: 'https://x.com', 'https://twitter.com' }}">View this post on X</a>
+          </blockquote>
+        </div>
+        {%- endfor %}
+      </div>
+      {%- else %}
+      <a class="twitter-timeline" data-height="600" data-dnt="true" data-chrome="noheader nofooter"
+         href="https://twitter.com/{{ feed.x.handle }}">Posts by @{{ feed.x.handle }}</a>
+      {%- endif %}
+      <a class="btn btn-outline-dark btn-sm mt-3" href="{{ feed.x.url }}" target="_blank" rel="noopener">
+        Follow @{{ feed.x.handle }} on X
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .social-feed-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .social-feed-yt-play:focus-visible { outline: 3px solid #dc3545; }
+</style>
+
+<script>
+(function () {
+  // Click-to-play: only load the YouTube player when someone asks for it.
+  document.querySelectorAll('.social-feed-yt').forEach(function (box) {
+    var btn = box.querySelector('.social-feed-yt-play');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + box.dataset.videoId + '?autoplay=1&rel=0';
+      iframe.title = btn.getAttribute('aria-label') || 'YouTube video';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      box.replaceChildren(iframe);
+    });
+  });
+
+  // Load each platform's embed script the first time its tab is visible.
+  var loaded = {};
+  function loadEmbeds(pane) {
+    var src = pane && pane.dataset.embedScript;
+    if (!src || loaded[src]) return;
+    loaded[src] = true;
+    var s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    document.body.appendChild(s);
+  }
+
+  document.querySelectorAll('.social-feed [data-bs-toggle="tab"]').forEach(function (tab) {
+    tab.addEventListener('shown.bs.tab', function () {
+      loadEmbeds(document.querySelector(tab.dataset.bsTarget));
+    });
+  });
+
+  var first = document.querySelector('.social-feed .tab-pane.active');
+  if (first && 'IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) {
+        loadEmbeds(first);
+        io.disconnect();
+      }
+    }, { rootMargin: '200px' });
+    io.observe(first);
+  } else {
+    loadEmbeds(first);
+  }
+})();
+</script>

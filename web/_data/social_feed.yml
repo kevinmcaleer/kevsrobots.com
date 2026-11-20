@@ -1,0 +1,38 @@
+# Social feed shown on /about/bio (see _includes/social_feed.html)
+#
+# YouTube comes from _data/youtube.yml, so it needs nothing here.
+#
+# Instagram, TikTok and X:
+#   - Paste post URLs into `posts` by hand (newest first) and they render
+#     with each platform's official embed. No API keys needed.
+#   - Or set API tokens and run `python3 scripts/fetch_social_feeds.py`
+#     (the "Refresh social feeds" GitHub Action does this on a schedule).
+#     The script only replaces a platform's posts when its fetch succeeds,
+#     so hand-curated posts are never wiped by a failed or missing token.
+#
+# With no posts listed, the bio page falls back to:
+#   Instagram -> a "follow" card, TikTok -> TikTok's creator embed (shows the
+#   latest videos automatically), X -> X's profile timeline embed.
+
+updated: ""
+
+instagram:
+  handle: kevinmcaleer
+  url: https://www.instagram.com/kevinmcaleer
+  posts: []
+  # posts:
+  #   - url: https://www.instagram.com/p/XXXXXXXXXXX/
+
+tiktok:
+  handle: kevinmcaleer6
+  url: https://www.tiktok.com/@kevinmcaleer6
+  posts: []
+  # posts:
+  #   - url: https://www.tiktok.com/@kevinmcaleer6/video/1234567890123456789
+
+x:
+  handle: kevsmac
+  url: https://x.com/kevsmac
+  posts: []
+  # posts:
+  #   - url: https://x.com/kevsmac/status/1234567890123456789
