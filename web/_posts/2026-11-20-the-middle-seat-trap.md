@@ -17,6 +17,8 @@ tags:
   - travel
   - pricing
   - dark patterns
+groups:
+  - everyday-algorithms
 ---
 
 You book a cheap flight, skip the £15 seat-selection fee, and wait until check-in opens. Twenty-four hours before takeoff, you open the app to claim your boarding pass—and there it is: 24B. A middle seat near the back of the plane.
