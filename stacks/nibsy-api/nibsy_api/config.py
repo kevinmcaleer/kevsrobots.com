@@ -49,13 +49,12 @@ class Settings(BaseSettings):
     # Hour (UTC) at which the daily remote ingest runs. Set negative to disable.
     ingest_schedule_hour: int = 1
 
+    # Also refresh from the live site right after boot, so a deploy picks up
+    # new content without waiting for the daily run. Tests turn this off.
+    ingest_on_startup: bool = True
+
     # Service port — #70 standardises on 8200.
     port: int = 8200
-
-    # How often the recommendations generator (#74) re-runs in the background.
-    # Production default is 14 days; tests/dev can shorten it via env var.
-    # Set to 0 or negative to disable the scheduler entirely.
-    recommendation_refresh_days: int = 14
 
     # ---- Auth / admin (#158) --------------------------------------------
     # Chatter signs every access_token with this secret. Must match the

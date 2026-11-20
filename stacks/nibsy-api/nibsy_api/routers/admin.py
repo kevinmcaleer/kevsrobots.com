@@ -149,11 +149,11 @@ async def trigger_regenerate(
     session: AsyncSession = Depends(get_session),
     _user: str = Depends(require_admin),
 ) -> GenerationStats:
-    """Trigger a manual recommendations regeneration (#74).
+    """Rebuild the legacy precomputed `nibsy_recommendations` table (#74).
 
-    The scheduler also runs this every `RECOMMENDATION_REFRESH_DAYS` days
-    in the background; this endpoint is for ad-hoc refreshes after a
-    content change or an algorithm tweak.
+    The widget no longer reads this table — `/api/recommendations` is
+    computed live per request — so this only matters to anything still
+    inspecting the table directly.
     """
 
     return await generate_recommendations(session)

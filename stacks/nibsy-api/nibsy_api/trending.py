@@ -2,7 +2,7 @@
 
 Combines multiple signals into a composite trending score per content item:
 - Nibsy click-throughs (high signal, 7-day window)
-- Page views from the pagecount database (direct query, no HTTP)
+- Page views from the last 30 days in the pagecount database (direct query, no HTTP)
 - YouTube view counts from popular_videos metadata
 - Recency boost for newer content
 
@@ -20,6 +20,7 @@ from sqlalchemy import create_engine, text, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import NibsyClick, NibsyContent, NibsyTrending
+from .recommender import normalise_url
 
 logger = logging.getLogger(__name__)
 
@@ -36,22 +37,59 @@ def _recency_boost(date_published: Optional[datetime], now: datetime) -> float:
     return min(1.0, 1.0 / (1.0 + days / 90.0))
 
 
+# Page views older than this do not count towards "trending".
+PAGE_VIEW_WINDOW_DAYS = 30
+
+
 def _fetch_all_page_views(pagecount_db_url: str) -> dict[str, int]:
-    """Query the pagecount database directly for visit counts per URL."""
+    """Recent visit counts from the pagecount database, keyed by page.
+
+    The counter stores whatever ``window.location.href`` was (with or
+    without ``www``, with query strings and fragments), so every stored URL
+    is folded to the same key the catalogue uses before counting. Falls
+    back to all-time counts if the table has no usable timestamp column.
+    """
 
     if not pagecount_db_url:
+        logger.warning(
+            "trending: PAGE_COUNT_URL is not set — trending has no page views"
+        )
         return {}
+    cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(
+        days=PAGE_VIEW_WINDOW_DAYS
+    )
+    queries = (
+        (
+            "SELECT page_url, COUNT(*) FROM page_visits "
+            "WHERE timestamp >= :cutoff GROUP BY page_url",
+            {"cutoff": cutoff},
+        ),
+        ("SELECT page_url, COUNT(*) FROM page_visits GROUP BY page_url", {}),
+    )
     try:
         engine = create_engine(pagecount_db_url)
-        with engine.connect() as conn:
-            rows = conn.execute(
-                text("SELECT page_url, COUNT(*) as views FROM page_visits GROUP BY page_url")
-            ).fetchall()
-        engine.dispose()
-        return {row[0]: row[1] for row in rows}
-    except Exception as exc:
-        logger.warning("trending: could not query pagecount DB: %s", exc)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("trending: bad PAGE_COUNT_URL: %s", exc)
         return {}
+    rows = None
+    try:
+        for sql, params in queries:
+            try:
+                with engine.connect() as conn:
+                    rows = conn.execute(text(sql), params).fetchall()
+                break
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("trending: pagecount query failed (%s): %s", sql, exc)
+    finally:
+        engine.dispose()
+
+    counts: dict[str, int] = {}
+    for page_url, views in rows or []:
+        if not page_url:
+            continue
+        key = normalise_url(page_url)
+        counts[key] = counts.get(key, 0) + int(views)
+    return counts
 
 
 async def compute_trending(
@@ -96,8 +134,7 @@ async def compute_trending(
         if content.content_type == "video":
             youtube_views = meta.get("views", 0) or 0
 
-        full_url = f"https://www.kevsrobots.com{content.url}"
-        page_views = page_view_counts.get(full_url, 0)
+        page_views = page_view_counts.get(normalise_url(content.url), 0)
 
         recency = _recency_boost(content.date_published, now)
 
@@ -121,5 +158,22 @@ async def compute_trending(
 
     await session.commit()
     duration_ms = int((time.monotonic() - start) * 1000)
-    logger.info("trending: computed %s scores in %sms", computed, duration_ms)
-    return {"computed": computed, "duration_ms": duration_ms}
+    with_views = sum(
+        1 for c in contents if page_view_counts.get(normalise_url(c.url))
+    )
+    if not with_views:
+        logger.warning(
+            "trending: no catalogue page matched any page view — "
+            "scores are recency and clicks only"
+        )
+    logger.info(
+        "trending: computed %s scores in %sms (%s pages with views)",
+        computed,
+        duration_ms,
+        with_views,
+    )
+    return {
+        "computed": computed,
+        "duration_ms": duration_ms,
+        "pages_with_views": with_views,
+    }

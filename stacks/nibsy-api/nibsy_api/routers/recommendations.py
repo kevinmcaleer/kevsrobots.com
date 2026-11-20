@@ -1,11 +1,8 @@
-"""Public recommendations endpoint (issue #67, #74).
+"""Public recommendations endpoints (issue #67, #74).
 
-Thin read against the precomputed `nibsy_recommendations` table. The
-generator (#74) keeps the table populated; this handler just looks up by
-`source_url` and applies `limit` and `exclude` filters in-memory.
-
-We deliberately return 200 with an empty list when the source page has
-no recommendations yet, rather than 404. Nibsy is best-effort by design —
+`/api/recommendations` is computed live for the page the visitor is on
+(see `recommender.py`). It always answers 200, with an empty list only
+when the catalogue itself is empty — Nibsy is best-effort by design and
 the widget should degrade gracefully, never throw.
 """
 
@@ -21,7 +18,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
 from ..generator import _jaccard, _affinity, _recency
-from ..models import NibsyClick, NibsyContent, NibsyRecommendation, NibsyTrending
+from ..models import NibsyClick, NibsyContent, NibsyTrending
+from ..recommender import (
+    ALGORITHM_VERSION,
+    get_index,
+    load_trending,
+    recommend_for_page,
+)
 from ..schemas import RecommendationItem, RecommendationsResponse
 
 logger = logging.getLogger(__name__)
@@ -29,8 +32,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["recommendations"])
 
 
-# Match the TOP_N from the generator so we never claim to return more
-# than what was precomputed.
+# The widget shows a handful of tips; there is no reason to return more.
 _MAX_LIMIT = 6
 
 
@@ -62,42 +64,41 @@ async def get_recommendations(
     ),
     session: AsyncSession = Depends(get_session),
 ) -> RecommendationsResponse:
-    """Return the precomputed top-N recommendations for a source page."""
+    """Return recommendations for the page the visitor is on.
 
-    row = await session.scalar(
-        select(NibsyRecommendation).where(
-            NibsyRecommendation.source_url == page
-        )
-    )
-    if row is None:
-        # No precomputed entry — graceful 200 with an empty list so the
-        # widget can render its fallback without special-casing 404s.
-        logger.debug("recommendations: no row for source_url=%s", page)
+    Computed on every request from the current catalogue — see
+    ``recommender.py`` for how pages are compared.
+    """
+
+    index = await get_index(session)
+    if not index.items:
         return RecommendationsResponse(source_url=page)
 
-    excluded_ids = _parse_exclude(exclude)
-    items: list[RecommendationItem] = []
-    for entry in row.recommendations or []:
-        if entry.get("content_id") in excluded_ids:
-            continue
-        items.append(
-            RecommendationItem(
-                content_id=entry["content_id"],
-                url=entry["url"],
-                title=entry["title"],
-                type=entry["type"],
-                reason=entry.get("reason", ""),
-                score=entry.get("score"),
-            )
-        )
-        if len(items) >= limit:
-            break
-
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    picks, basis = recommend_for_page(
+        index,
+        page,
+        limit,
+        _parse_exclude(exclude),
+        await load_trending(session),
+        now,
+    )
     return RecommendationsResponse(
-        source_url=row.source_url,
-        recommendations=items,
-        generated_at=row.generated_at,
-        generator_version=row.generator_version,
+        source_url=page,
+        recommendations=[
+            RecommendationItem(
+                content_id=p.item.id,
+                url=p.item.url,
+                title=p.item.title,
+                type=p.item.type,
+                reason=p.reason,
+                score=round(p.score, 4),
+            )
+            for p in picks
+        ],
+        generated_at=now,
+        generator_version=ALGORITHM_VERSION,
+        basis=basis,
     )
 
 

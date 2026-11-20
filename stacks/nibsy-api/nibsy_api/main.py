@@ -1,14 +1,15 @@
 """FastAPI application entrypoint.
 
 Builds the app, wires routers, runs an auto-ingest on startup (if the
-content table is empty and `NIBSY_DATA_DIR` is configured), kicks off a
-first-run recommendations generation if the recommendations table is
-empty, and registers an APScheduler job to re-generate every
-`recommendation_refresh_days` days (#74).
+content table is empty and `NIBSY_DATA_DIR` is configured), then keeps the
+catalogue fresh from the live site: once shortly after boot and once a day.
+Recommendations themselves are computed per request, so there is nothing
+to regenerate.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
@@ -22,10 +23,9 @@ from sqlalchemy import func, select
 
 from .config import get_settings
 from .db import create_all, get_sessionmaker
-from .generator import generate_recommendations
 from .ingest import ingest_from_data_dir, ingest_from_remote
 from .trending import compute_trending
-from .models import NibsyContent, NibsyRecommendation
+from .models import NibsyContent
 from .routers import admin, analytics, health, recommendations, stubs, tracking
 
 logger = logging.getLogger(__name__)
@@ -56,42 +56,26 @@ async def _maybe_startup_ingest() -> None:
         logger.info("startup ingest finished: %s", stats.model_dump())
 
 
-async def _maybe_startup_generate() -> None:
-    """Run a first-time generation if the recommendations table is empty."""
-
-    sessionmaker = get_sessionmaker()
-    async with sessionmaker() as session:
-        content_count = await session.scalar(
-            select(func.count()).select_from(NibsyContent)
-        )
-        rec_count = await session.scalar(
-            select(func.count()).select_from(NibsyRecommendation)
-        )
-        if not content_count:
-            logger.info("nibsy_content empty — skipping startup generation")
-            return
-        if rec_count:
-            logger.info(
-                "nibsy_recommendations has %s rows — skipping startup generation",
-                rec_count,
-            )
-            return
-        logger.info("nibsy_recommendations is empty — running first-time generation")
-        stats = await generate_recommendations(session)
-        logger.info("startup generation finished: %s", stats.model_dump())
-
-
 async def _scheduled_remote_ingest() -> None:
-    """Daily remote ingest from the live site (#69)."""
+    """Refresh the catalogue from the live site (#69), then trending.
+
+    A failed or empty refresh is logged at ERROR: a silently failing
+    refresh is how the catalogue once sat frozen for six months.
+    """
 
     settings = get_settings()
     sessionmaker = get_sessionmaker()
     async with sessionmaker() as session:
         try:
             stats = await ingest_from_remote(settings.site_base_url, session)
-            logger.info("scheduled remote ingest finished: %s", stats.model_dump())
         except Exception:  # noqa: BLE001
-            logger.exception("scheduled remote ingest failed")
+            logger.exception("remote ingest failed")
+            return
+        if stats.errors:
+            logger.error("remote ingest finished with errors: %s", stats.model_dump())
+        else:
+            logger.info("remote ingest finished: %s", stats.model_dump())
+    await _scheduled_trending()
 
 
 async def _scheduled_trending() -> None:
@@ -107,48 +91,24 @@ async def _scheduled_trending() -> None:
             logger.exception("scheduled trending failed")
 
 
-async def _scheduled_regenerate() -> None:
-    """Periodic regeneration job invoked by APScheduler."""
-
-    sessionmaker = get_sessionmaker()
-    async with sessionmaker() as session:
-        try:
-            stats = await generate_recommendations(session)
-            logger.info("scheduled generation finished: %s", stats.model_dump())
-        except Exception:  # noqa: BLE001 — never let the scheduler die
-            logger.exception("scheduled generation failed")
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Boot sequence: create tables, ingest, generate, schedule."""
+    """Boot sequence: create tables, ingest, schedule."""
 
     await create_all()
     await _maybe_startup_ingest()
-    await _maybe_startup_generate()
 
     settings = get_settings()
     scheduler: AsyncIOScheduler | None = None
     has_jobs = False
+    startup_refresh: asyncio.Task | None = None
 
-    if settings.recommendation_refresh_days > 0 or settings.ingest_schedule_hour >= 0:
+    if settings.ingest_schedule_hour >= 0:
         scheduler = AsyncIOScheduler()
-
-    if scheduler and settings.recommendation_refresh_days > 0:
-        scheduler.add_job(
-            _scheduled_regenerate,
-            trigger=IntervalTrigger(days=settings.recommendation_refresh_days),
-            id="nibsy-regenerate",
-            name="Regenerate Nibsy recommendations",
-            max_instances=1,
-            coalesce=True,
-            replace_existing=True,
-        )
-        has_jobs = True
-        logger.info(
-            "scheduled: regenerate every %s day(s)",
-            settings.recommendation_refresh_days,
-        )
+        if settings.ingest_on_startup:
+            # Don't make a deploy wait on the live site: refresh in the
+            # background so the service is healthy immediately.
+            startup_refresh = asyncio.create_task(_scheduled_remote_ingest())
 
     if scheduler and settings.ingest_schedule_hour >= 0:
         scheduler.add_job(
@@ -189,6 +149,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     try:
         yield
     finally:
+        if startup_refresh is not None and not startup_refresh.done():
+            startup_refresh.cancel()
         if scheduler is not None:
             scheduler.shutdown(wait=False)
             logger.info("scheduler stopped")

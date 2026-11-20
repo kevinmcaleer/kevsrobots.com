@@ -43,6 +43,8 @@ def _env(monkeypatch: pytest.MonkeyPatch) -> None:
     # gating logic explicitly.
     monkeypatch.setenv("JWT_SECRET", "test-secret")
     monkeypatch.setenv("ADMIN_USERNAMES", "kev")
+    # Never reach out to the live site from the test suite.
+    monkeypatch.setenv("INGEST_ON_STARTUP", "false")
 
 
 def make_admin_header(username: str = "kev") -> dict[str, str]:
