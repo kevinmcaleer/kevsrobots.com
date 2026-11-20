@@ -42,3 +42,8 @@ test('keeps the card on screen', async () => {
   // Never wider than the screen.
   assert.equal(placeCard({ left: 0, right: 32, top: 0, bottom: 32 }, card, { width: 300, height: 600 }).width, 284);
 });
+
+test('every app has its icon', async () => {
+  const { KR_APPS } = await load();
+  for (const app of KR_APPS) assert.match(app.icon, /^data:image\/svg\+xml;base64,/, app.id);
+});

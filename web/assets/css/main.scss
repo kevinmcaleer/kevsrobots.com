@@ -2277,14 +2277,10 @@ pre {
   a:hover, a:focus-visible { background: rgba(255, 255, 255, .08); }
 
   .kr-ic {
+    display: block;
     width: 36px;
     height: 36px;
     border-radius: 9px;
-    display: grid;
-    place-items: center;
-    color: #fff;
-    font-family: "Oswald", sans-serif;
-    font-weight: 600;
   }
   b { display: block; }
   small { display: block; opacity: .8; }

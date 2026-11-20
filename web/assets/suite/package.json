@@ -1,6 +1,6 @@
 {
   "name": "@kevsrobots/suite",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The kevsrobots suite: shared --kr-* design tokens, and the app switcher and account button as dependency-free web components.",
   "type": "module",
   "main": "kr-suite.js",
@@ -11,6 +11,7 @@
   "files": [
     "kr-suite.js",
     "kr-tokens.css",
+    "icons",
     "README.md"
   ],
   "license": "MIT",
