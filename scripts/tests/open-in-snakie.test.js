@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const zlib = require('node:zlib');
 
-const { fileName, links, isProgram, encodeCode, runPlan, imports } = require(path.join(__dirname, '../../web/assets/js/open-in-snakie.js'));
+const { fileName, links, isProgram, encodeCode, runPlan, whyNot, imports } = require(path.join(__dirname, '../../web/assets/js/open-in-snakie.js'));
 
 // Snakie's decodeCode (src/renderer/src/code-embed/share.ts): base64url, raw inflate.
 function decode(payload) {
@@ -64,4 +64,14 @@ test('Run here is offered only for code a browser can run', () => {
   assert.equal(runPlan('import numpy\nimport requests'), null);
   assert.equal(runPlan('>>> print(1)\n1'), null);
   assert.equal(runPlan(''), null);
+});
+
+test('play on code a browser can\'t run says why, instead of being switched off', () => {
+  assert.equal(whyNot('print("hi")'), null);
+  assert.match(whyNot('name = input("Name? ")'), /type/);
+  assert.match(whyNot('import network\nwlan = network.WLAN()'), /network/);
+  // whyNot() and runPlan() agree on every block.
+  ['print(1)', 'import numpy', 'input()', 'import socket', '>>> 1', 'from machine import Pin'].forEach((code) => {
+    assert.equal(whyNot(code) === null, runPlan(code) !== null, code);
+  });
 });

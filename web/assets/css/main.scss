@@ -1735,20 +1735,20 @@ table .w-30 {
   color: #198754;
 }
 
-/* "Open in Snakie" on lesson code (assets/js/open-in-snakie.js, #581).
-   Sits left of the copy button; Snakie's green on hover. */
+/* Lesson code: play, Open in Snakie and copy (assets/js/open-in-snakie.js,
+   #581). Sits left of the copy button. Play is the one solid thing on a
+   block, in Snakie's green (Snakie Flat primary #1d8150), so it reads as
+   "press me" the way a video's play button does. */
 .open-in-snakie {
   position: absolute;
   top: 6px;
   right: 42px;
   z-index: 2;
   display: inline-flex;
-  gap: 4px;
-  opacity: 0.6;
-  transition: opacity 0.15s;
+  align-items: center;
+  gap: 6px;
 
-  a,
-  button {
+  .open-in-snakie-web {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -1764,27 +1764,110 @@ table .w-30 {
     line-height: 1;
     text-decoration: none;
     white-space: nowrap;
-    transition: color 0.15s, border-color 0.15s;
+    opacity: 0.6;
+    transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+
+    svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
   }
-  .open-in-snakie-desktop {
-    width: 30px;
-    padding: 0;
-    justify-content: center;
+  .open-in-snakie-web:hover,
+  .open-in-snakie-web:focus-visible {
+    opacity: 1;
+    color: #1d8150;
+    border-color: #1d8150;
   }
-  button {
-    cursor: pointer;
-  }
-  a:hover,
-  a:focus-visible,
-  button:hover,
-  button:focus-visible {
-    color: #1E7F52;
-    border-color: #26A269;
-  }
-  /* Run here (#589): the play mark is filled, in Snakie's green. */
-  .open-in-snakie-run svg {
-    fill: #26A269;
+}
+.code-copy-wrap:hover .open-in-snakie-web,
+.open-in-snakie:focus-within .open-in-snakie-web {
+  opacity: 1;
+}
+/* The play button: a round, solid Snakie-green disc with a white triangle. */
+.snakie-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0 0 0 2px;
+  color: #fff;
+  background: #1d8150;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  transition: background-color 0.15s, transform 0.1s;
+
+  svg {
+    fill: currentColor;
     stroke: none;
+  }
+  &:hover,
+  &:focus-visible {
+    background: #176a41;
+  }
+  &:active {
+    transform: scale(0.94);
+  }
+  &:focus-visible {
+    outline: 2px solid #1d8150;
+    outline-offset: 2px;
+  }
+  /* Running: the same disc shows a stop square. */
+  &.is-running {
+    padding: 0;
+  }
+  /* Fetching Snakie on the first press. */
+  &.is-loading {
+    animation: snakie-play-wait 1s ease-in-out infinite;
+  }
+}
+@keyframes snakie-play-wait {
+  50% { opacity: 0.55; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .snakie-play.is-loading { animation: none; }
+}
+/* Code a browser can't run: a short note under the block, with the next step. */
+.snakie-run-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 1rem;
+  padding: 8px 8px 8px 12px;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: #333;
+  background: #f4f1ea;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+
+  > span {
+    flex: 1 1 auto;
+  }
+}
+.snakie-run-note-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 12px;
+  color: #fff;
+  background: #1d8150;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus-visible {
+    color: #fff;
+    background: #176a41;
   }
   svg {
     fill: none;
@@ -1794,32 +1877,42 @@ table .w-30 {
     stroke-linejoin: round;
   }
 }
-/* Under the live box Run here made: back to the plain block. */
-.run-here-back {
-  display: block;
-  margin: 4px 0 1rem auto;
-  padding: 2px 6px;
+.snakie-run-note-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   color: #555;
   background: none;
   border: 0;
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-decoration: underline;
+  border-radius: 6px;
   cursor: pointer;
+
+  svg {
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+  &:hover,
+  &:focus-visible {
+    background: rgba(0, 0, 0, 0.06);
+  }
 }
-.run-here-back:hover,
-.run-here-back:focus-visible {
-  color: #1E7F52;
-}
-.code-copy-wrap:hover .open-in-snakie,
-.open-in-snakie:focus-within {
-  opacity: 1;
-}
-/* Phones and tablets have no desktop app to hand the code to. */
-@media (pointer: coarse) {
-  .open-in-snakie-desktop {
-    display: none !important;
+@media (max-width: 480px) {
+  .snakie-run-note {
+    flex-wrap: wrap;
+  }
+  /* A phone's code column is narrow: the Snakie mark alone says it. */
+  .open-in-snakie-web span {
+    display: none;
+  }
+  .open-in-snakie .open-in-snakie-web {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
   }
 }
 pre {
