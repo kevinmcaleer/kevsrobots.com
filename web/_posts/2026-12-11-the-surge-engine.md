@@ -4,11 +4,16 @@ description: >-
   Surge pricing is the algorithm everyone loves to hate. Uber's own data shows what happens when it switches off, round numbers change how riders behave, and the UK regulator found the Oasis ticket fiasco wasn't an algorithm at all.
 excerpt: >-
   When Uber's surge pricing broke on New Year's Eve, waits tripled. When Oasis tickets doubled in price, everyone blamed an algorithm that, according to the regulator, wasn't there. The strange psychology of prices that move.
-layout: showcase
+layout: article
+hero_style: split
 mode: light
 date: 2026-12-11
 author: Kevin McAleer
 difficulty: beginner
+specs:
+  Surge updates: every 5 minutes
+  Wait with surge broken: 8 minutes
+  Oasis algorithm found: none
 cover: /assets/img/blog/surge_engine/cover.png
 hero: /assets/img/blog/surge_engine/cover.png
 tags:
@@ -21,11 +26,13 @@ groups:
   - everyday-algorithms
 ---
 
+{% split image="/assets/img/blog/surge_engine/round-number.png" alt="Two phone screens showing a 2.0 times surge and a 2.1 times surge, with riders more likely to accept 2.1 times" caption="A higher multiplier that riders were more willing to accept" side="right" %}
 It's raining, it's late, and you open a ride-hailing app. The price is **2.1×** normal. You sigh, and you book it anyway.
 
-Few algorithms make people as angry as surge pricing. It feels like the app is kicking you while you're down. But the story of what surge pricing actually does, and what it gets blamed for, is far stranger than "big tech squeezes customers". It involves a broken server on New Year's Eve, the curious power of round numbers, and a ticket sale where the algorithm everyone blamed turned out, according to the regulator, not to exist.
+Few algorithms make people as angry as surge pricing. It feels like the app is kicking you while you're down.
+{% endsplit %}
 
----
+But the story of what surge pricing actually does, and what it gets blamed for, is far stranger than "big tech squeezes customers". It involves a broken server on New Year's Eve, the curious power of round numbers, and a ticket sale where the algorithm everyone blamed turned out, according to the regulator, not to exist.
 
 ## What the surge algorithm actually does
 
@@ -38,9 +45,12 @@ A higher price is meant to do two jobs at once:
 1. **Pull in drivers.** A 2× fare is a reason for a driver to log on, or to drive across town to where the riders are.
 2. **Sort the riders.** Some people decide to walk, wait or take the bus, leaving the cars for the people who most need them right now.
 
-That's the theory. The interesting question is whether it works, and that's where an accident comes in.
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/surge_engine/surge-loop.png" alt="A four-step loop: riders outnumber drivers, the multiplier goes up, drivers head over and some riders wait, the gap closes and the multiplier drops, repeating every five minutes in each zone" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">Surge works like a thermostat for taxis, checking each zone every five minutes</figcaption>
+</figure>
 
----
+That's the theory. The interesting question is whether it works, and that's where an accident comes in.
 
 ## The night surge pricing broke
 
@@ -52,9 +62,14 @@ Uber's own economists, Jonathan Hall, Cory Kendrick and Chris Nosko, published a
 
 Without the price signal, rides didn't get cheaper for everyone. They simply became *unavailable* for a quarter of the people asking, and they went to whoever happened to tap first rather than whoever needed them most.
 
-Two health warnings. First, this is Uber's own research about Uber's own product, so treat it like a company's homework marked by the company. Second, TechCrunch noted a separate Washington Post analysis suggesting surge mostly *relocates* drivers already on the road rather than summoning new ones. Both can be true: surge can be good at moving cars to where they're needed without making the total pool much bigger.
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/surge_engine/surge-outage.png" alt="Comparison: a concert with surge working had a 2.6 minute average wait; New Year's Eve with surge broken had 8 minute waits and 1 in 4 requests unfulfilled" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">Figures from Uber's own New York case study</figcaption>
+</figure>
 
----
+{% callout warning "Two health warnings" %}
+First, this is Uber's own research about Uber's own product, so treat it like a company's homework marked by the company. Second, TechCrunch noted a separate Washington Post analysis suggesting surge mostly *relocates* drivers already on the road rather than summoning new ones. Both can be true: surge can be good at moving cars to where they're needed without making the total pool much bigger.
+{% endcallout %}
 
 ## The nudge in the number
 
@@ -68,9 +83,9 @@ A plausible explanation is about how humans read numbers. A clean "2.0×" looks 
 
 Chen also revealed, according to [Engadget's write-up](https://www.engadget.com/2016-05-20-uber-surge-pricing-battery-life.html), that people whose phone battery is about to die are more willing to pay a surge price. The app knows your battery level (it uses it to switch into a power-saving mode). Chen was clear that Uber does **not** use battery level to set prices. But think about what that finding means: the company had the data to show that a desperate customer is a less price-sensitive customer, and the only thing standing between that insight and a pricing feature was a decision not to build it.
 
-That's the real lesson of algorithmic pricing. **The algorithm learns what you'll tolerate. Policy decides what it's allowed to act on.**
-
----
+{% callout tip "The real lesson" %}
+**The algorithm learns what you'll tolerate. Policy decides what it's allowed to act on.**
+{% endcallout %}
 
 ## The Oasis plot twist
 
@@ -88,9 +103,12 @@ What it found instead was older and simpler:
 
 So the villain wasn't a machine learning model watching demand in real time. It was a human-designed price list combined with a queue that hid information. It *felt* algorithmic because the price changed while people waited, and in 2024 "the algorithm did it" was the obvious explanation.
 
-Ticketmaster gave the CMA undertakings, "without any admission of wrongdoing or liability", to warn fans 24 hours in advance when tiered pricing is used, show the price range when people join a queue, update them when cheaper tickets sell out, drop misleading labels, and report to the CMA for two years. In Ireland, the [Irish Times reported](https://www.irishtimes.com/culture/music/2025/09/25/ticketmaster-commits-to-greater-price-transparency-after-oasis-sale/) that the Competition and Consumer Protection Commission is still investigating the Croke Park sale.
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/surge_engine/oasis-queue.png" alt="A queue of fans: the first ones get standard-price tickets, then tier 1 sells out and everyone behind gets a higher fixed price without warning; the CMA found no evidence of algorithmic dynamic pricing" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">What the regulator actually found: two price tiers and a queue that kept quiet about them</figcaption>
+</figure>
 
----
+Ticketmaster gave the CMA undertakings, "without any admission of wrongdoing or liability", to warn fans 24 hours in advance when tiered pricing is used, show the price range when people join a queue, update them when cheaper tickets sell out, drop misleading labels, and report to the CMA for two years. In Ireland, the [Irish Times reported](https://www.irishtimes.com/culture/music/2025/09/25/ticketmaster-commits-to-greater-price-transparency-after-oasis-sale/) that the Competition and Consumer Protection Commission is still investigating the Croke Park sale.
 
 ## What makes a moving price feel fair?
 
@@ -105,17 +123,15 @@ Put the Uber and Oasis stories side by side and a pattern appears. People don't 
 
 That last row is the uncomfortable one. It means that how a price is *displayed* can change how fair it feels, without the price itself changing at all. That's a nudge, and companies know it works.
 
----
-
-## The takeaway
+{% fullwidth style="dark" %}
+## The Bottom Line
 
 Surge pricing is a neat bit of engineering: a feedback loop that uses price as a signal to balance supply and demand every five minutes, a bit like a thermostat for taxis. When it switched off on New Year's Eve, the system didn't become fairer; it just broke.
 
 But the same data that makes the loop work also reveals exactly how desperate, rushed or low-on-battery each of us is. The algorithm doesn't need to be evil to be worrying. It just needs to be good at learning, with nobody deciding what it's allowed to learn *from*.
 
 And the next time a price jumps while you're waiting and everyone blames "the algorithm"? Check first. Sometimes it's a machine. Sometimes, as Oasis fans found out, it's just a spreadsheet and a queue.
-
----
+{% endfullwidth %}
 
 ## Sources
 

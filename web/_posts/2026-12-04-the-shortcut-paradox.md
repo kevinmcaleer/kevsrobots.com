@@ -4,11 +4,16 @@ description: >-
   Every driver following their own fastest route sounds efficient. Maths from 1968 says it can make everyone slower. How navigation apps turn a game theory puzzle into real traffic, from Los Angeles back streets to a New Jersey town that shut its roads.
 excerpt: >-
   Add a new road and traffic gets worse. Remove one and it gets better. The 1968 maths puzzle that explains what happens when millions of drivers all follow their sat-nav.
-layout: showcase
+layout: article
+hero_style: split
 mode: light
 date: 2026-12-04
 author: Kevin McAleer
 difficulty: beginner
+specs:
+  Drivers: 4,000
+  Without the shortcut: 65 min
+  With the shortcut: 80 min
 cover: /assets/img/blog/shortcut_paradox/cover.png
 hero: /assets/img/blog/shortcut_paradox/cover.png
 tags:
@@ -26,8 +31,6 @@ Your sat-nav has one job: get *you* there as fast as possible. It looks at live 
 That sounds like it can only make things better. If everyone gets the fastest route, surely everyone gets there faster?
 
 Not quite. In 1968 a German mathematician called Dietrich Braess showed that when every driver picks their own best route, **adding a road can make every single journey slower**. For decades it was a curiosity in transport textbooks. Then we put a route-optimising computer in every car and every phone, and the curiosity moved onto real streets.
-
----
 
 ## The puzzle: 4,000 drivers and a shortcut
 
@@ -48,13 +51,20 @@ Once everyone has worked this out, all 4,000 drivers go Start → A → B → En
 
 Every single driver is 15 minutes slower than before the shortcut existed. And here's the cruel part: nobody can fix it on their own. If you switch back to the old route, your first leg is still 40 minutes (everyone else is on it) plus 45 on the motorway: 85 minutes. Staying on the shortcut is still your best choice. Everyone is stuck.
 
-Game theorists call this a **Nash equilibrium**: a situation where nobody can do better by changing only their own choice, even though everyone could do better if they all changed together.
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/shortcut_paradox/braess-before-after.png" alt="Two road networks: before the shortcut 2,000 cars take each route and every trip takes 65 minutes; after it all 4,000 cars take the shortcut and every trip takes 80 minutes" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">Same drivers, same destination, one extra road: every trip gets 15 minutes longer</figcaption>
+</figure>
 
----
+{% callout note "Nash equilibrium" %}
+Game theorists call this a **Nash equilibrium**: a situation where nobody can do better by changing only their own choice, even though everyone could do better if they all changed together.
+{% endcallout %}
 
 ## Try it yourself
 
-You can simulate this with a few lines of Python. Each "driver" in turn looks at the current traffic and picks the fastest route, exactly like a sat-nav does:
+{% callout try "Try it yourself" %}
+You can simulate this with a few lines of Python. Each "driver" in turn looks at the current traffic and picks the fastest route, exactly like a sat-nav does.
+{% endcallout %}
 
 ```python
 DRIVERS = 4000
@@ -91,9 +101,9 @@ Shortcut open: False  routes: {'top': 2000, 'bottom': 2000, 'shortcut': 0}  jour
 Shortcut open: True  routes: {'top': 0, 'bottom': 0, 'shortcut': 4000}  journey: 80 min
 ```
 
+{% callout tip "The paradox in one line" %}
 Each driver made the smart choice. The crowd made the dumb one.
-
----
+{% endcallout %}
 
 ## It isn't just a textbook trick
 
@@ -104,8 +114,6 @@ The [Wikipedia article on the paradox](https://en.wikipedia.org/wiki/Braess%27s_
 - **Seoul, 2003–2005:** traffic around the city sped up after the Cheonggye Expressway was demolished and replaced with a park and stream.
 
 How bad can it get? In a famous paper, [How Bad Is Selfish Routing?](https://www.timroughgarden.org/papers/routing.pdf), computer scientists Tim Roughgarden and Éva Tardos proved that on networks where delays grow in a straight line with traffic, everyone choosing selfishly gives total journey times **at most 4/3 of the best possible**, or 33% worse. That's a worst case. In our example, a traffic controller who could tell drivers which way to go would send just 500 of them over the shortcut, for an average trip of about 64.7 minutes. Selfish routing gives 80, about 24% worse. This gap between what selfish drivers get and what a coordinator could achieve has a wonderful name: the **price of anarchy**.
-
----
 
 ## Enter the apps
 
@@ -119,8 +127,6 @@ Researchers at UC Berkeley's Institute of Transportation Studies, led by Théoph
 
 [NPR reported](https://www.npr.org/sections/alltechconsidered/2016/06/13/481871496/the-road-less-traveled-not-since-waze-came-to-los-angeles) on the same Sherman Oaks streets, where residents blamed Waze for morning queues of "thirty cars already just waiting" by 7 a.m. To be fair, the city's transport department pointed out that cut-through traffic "is definitely not new".
 
----
-
 ## The insight most articles miss: the advantage evaporates
 
 Here's the part of the Berkeley research I find most interesting, and it's buried in a table.
@@ -129,9 +135,14 @@ The team simulated a stretch of the I-210 with different shares of drivers using
 
 In other words, a navigation app is most valuable when *other people aren't using it*. Its edge comes from knowing a shortcut the crowd doesn't. As more drivers get the same advice, the shortcut fills up and the advantage drains away, slowly heading towards the Braess endpoint where everyone has the same "smart" route and nobody is better off.
 
-The authors are careful here: they say that in their model the rerouting "seems to make the system more efficient" overall, and they stress that their measurements "confirm phenomena and trends, but do not prove them". So this isn't proof that apps make traffic worse in general. It's evidence that the benefit is a relative one, and that the cost lands on people who aren't using the app at all: the residents of the side streets.
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/shortcut_paradox/app-advantage.png" alt="Bar chart: when 25% of drivers use a navigation app they save 48% on travel time, at 50% they save 36%, at 75% they save 27%" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">The app's edge shrinks as more drivers get the same advice</figcaption>
+</figure>
 
----
+{% callout warning "What the study doesn't say" %}
+The authors are careful here: they say that in their model the rerouting "seems to make the system more efficient" overall, and they stress that their measurements "confirm phenomena and trends, but do not prove them". So this isn't proof that apps make traffic worse in general. It's evidence that the benefit is a relative one, and that the cost lands on people who aren't using the app at all: the residents of the side streets.
+{% endcallout %}
 
 ## When a town fights back
 
@@ -143,8 +154,6 @@ It didn't last. In August 2018 a state judge [struck the closures down](https://
 
 Leonia's story shows the real problem. The app is solving the right problem for each user and the wrong problem for the town. There's nobody whose job it is to optimise the whole network.
 
----
-
 ## What robots can teach sat-navs
 
 If you've ever built a robot that plans a path, you've used the same algorithms your sat-nav uses: Dijkstra's algorithm or A*. Each robot finds the shortest path from where it is to where it wants to be.
@@ -153,9 +162,16 @@ But look at a warehouse full of hundreds of delivery robots and you'll notice th
 
 That's the difference between a **user equilibrium** (everyone does what's best for them) and a **system optimum** (do what's best for everyone). Robot fleets can choose the second because one company owns all the robots. Roads can't, because every driver is their own boss.
 
-So the next time your sat-nav sends you on a wild detour through a housing estate to save ninety seconds, remember: it's playing a game against every other driver's sat-nav. And as Braess showed back in 1968, sometimes everyone playing that game perfectly is exactly how everyone loses.
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/shortcut_paradox/fleet.png" alt="Two warehouse floor plans: on the left every robot queues in the same aisle; on the right a central planner spreads them across all the aisles" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">Selfish shortest paths jam one aisle; a fleet planner spreads the load</figcaption>
+</figure>
 
----
+{% fullwidth style="dark" %}
+## The Bottom Line
+
+So the next time your sat-nav sends you on a wild detour through a housing estate to save ninety seconds, remember: it's playing a game against every other driver's sat-nav. And as Braess showed back in 1968, sometimes everyone playing that game perfectly is exactly how everyone loses.
+{% endfullwidth %}
 
 ## Sources
 
