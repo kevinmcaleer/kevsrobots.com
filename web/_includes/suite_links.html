@@ -7,7 +7,7 @@
 <ul class="kr-suite-links{% if include.tone == 'light' %} on-light{% endif %}">
 {%- for app in site.data.suite %}
   <li><a href="{{ app.url }}"{% unless app.url contains '://' %}{% else %} target="_blank" rel="noopener"{% endunless %}>
-    <span class="kr-ic" style="background:{{ app.colour }};color:{{ app.ink }}" aria-hidden="true">{{ app.mark }}</span>
+    <img class="kr-ic" src="{{ app.icon }}" alt="" width="36" height="36">
     <span><b>{{ app.name }}{% if app.by != "" %} <span class="fw-normal">{{ app.by }}</span>{% endif %}</b><small>{{ app.blurb }}</small></span>
   </a></li>
 {%- endfor %}

@@ -1,14 +1,12 @@
 # The kevsrobots suite (#581). Used by the footer, the About page and What's new.
-# The <kr-suite-bar> switcher keeps its own copy of this list in
-# assets/suite/kr-suite-bar.js, so it works in apps that bundle it.
+# The <kr-app-switcher> keeps its own copy of this list in
+# assets/suite/kr-suite.js, so it works in apps that bundle it.
 - id: projects
   name: Projects
   by: ""
   url: /projects/hub
   blurb: Your builds, steps and parts lists
-  mark: P
-  colour: "#D9A441"
-  ink: "#1C2230"
+  icon: /assets/suite/icons/projects.svg
 - id: snakie
   name: Snakie
   by: by kevsrobots
@@ -16,15 +14,11 @@
   site: https://www.snakie.org/
   repo: kevinmcaleer/snakie
   blurb: Write and run MicroPython, in your browser or on your desktop
-  mark: S
-  colour: "#26A269"
-  ink: "#FFFFFF"
+  icon: /assets/suite/icons/snakie.svg
 - id: bettercad
   name: BetterCAD
   by: by kevsrobots
   url: https://bettercad.kevsrobots.com/
   repo: kevinmcaleer/bettercad
   blurb: Free CAD for designing parts to 3D print
-  mark: B
-  colour: "#7C3AED"
-  ink: "#FFFFFF"
+  icon: /assets/suite/icons/bettercad.svg
