@@ -1,0 +1,178 @@
+/*
+ * Blog listing cards (/blog/), markup in _includes/blog_listing_card.html.
+ *
+ * Mobile / touch: a compact card, no tags, no hover panel.
+ * Desktop (fine pointer that can hover, >= 768px): hovering or focusing a
+ * card lifts it and drops a details panel below it, Netflix style. The panel
+ * overlays whatever is underneath, so the grid never reflows.
+ */
+
+.blog-card {
+  position: relative;
+}
+
+.blog-card .blog-card-title {
+  margin-bottom: 0.5rem;
+}
+
+.blog-card .card-img-top {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* Read / Watch line. The Watch pill sits above the stretched link. */
+.blog-card-kind {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.blog-card-play {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #e62117;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.blog-card-play:hover,
+.blog-card-play:focus {
+  background: #c4180f;
+  color: #fff;
+}
+
+/* The details panel only exists on hover-capable desktops. */
+.blog-card-more {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+  /* The animate-on-scroll transform gives every column its own stacking
+     context, so lift the whole column above its neighbours. */
+  .blog-card-col {
+    position: relative;
+    z-index: 1;
+  }
+
+  .blog-card-col:hover,
+  .blog-card-col:focus-within {
+    z-index: 30;
+  }
+
+  .blog-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-radius 0.25s ease;
+    transform-origin: center top;
+  }
+
+  .blog-card-more {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: -0.5rem;
+    padding: 0.5rem 1rem 1rem;
+    background: inherit;
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: 0 1rem 1.5rem rgba(0, 0, 0, 0.18);
+    color: #444;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.5rem);
+    /* Leaving: hide straight away. */
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+    pointer-events: none;
+  }
+
+  /* Short delay before expanding so sweeping the mouse across the row
+     doesn't make every card pop. */
+  .blog-card-col:hover .blog-card,
+  .blog-card-col:focus-within .blog-card {
+    transform: scale(1.06);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.18);
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    transition-delay: 0.2s;
+  }
+
+  .blog-card-col:hover .blog-card-more,
+  .blog-card-col:focus-within .blog-card-more {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity 0.2s ease 0.2s, transform 0.2s ease 0.2s, visibility 0s linear 0.2s;
+  }
+
+  /* Show the full title and description once expanded. */
+  .blog-card-col:hover .blog-card-title,
+  .blog-card-col:focus-within .blog-card-title,
+  .blog-card-col:hover .blog-card-desc,
+  .blog-card-col:focus-within .blog-card-desc {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+
+  /* Panel links sit above the card's stretched link. */
+  .blog-card-more a {
+    position: relative;
+    z-index: 3;
+  }
+}
+
+.blog-card-excerpt {
+  line-height: 1.45;
+  margin-bottom: 0.6rem;
+}
+
+.blog-card-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem;
+  color: #555;
+}
+
+.blog-card-topics a {
+  color: inherit;
+}
+
+.blog-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.blog-card-tags .badge {
+  font-weight: 500;
+}
+
+.blog-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-card,
+  .blog-card-more {
+    transition: none !important;
+  }
+  .blog-card-col:hover .blog-card,
+  .blog-card-col:focus-within .blog-card {
+    transform: none;
+  }
+}
