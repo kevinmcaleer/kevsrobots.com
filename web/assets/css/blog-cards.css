@@ -2,9 +2,10 @@
  * Blog listing cards (/blog/), markup in _includes/blog_listing_card.html.
  *
  * Mobile / touch: a compact card, no tags, no hover panel.
- * Desktop (fine pointer that can hover, >= 768px): hovering or focusing a
- * card lifts it and drops a details panel below it, Netflix style. The panel
- * overlays whatever is underneath, so the grid never reflows.
+ * Desktop (fine pointer that can hover, >= 768px): hovering a card opens an
+ * expanded version that spans the full width of the card grid, Netflix
+ * style, with a large cover and all the details. It overlays the row, so the
+ * grid never reflows; moving the mouse off it closes it.
  */
 
 .blog-card {
@@ -49,80 +50,102 @@
   color: #fff;
 }
 
-/* The details panel only exists on hover-capable desktops. */
+/* The expanded card only exists on hover-capable desktops. */
 .blog-card-more {
   display: none;
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 768px) {
-  /* The animate-on-scroll transform gives every column its own stacking
-     context, so lift the whole column above its neighbours. */
-  .blog-card-col {
+  /* The expanded card is positioned against the whole grid, not the column,
+     so it can span the full grid width. The animate-on-scroll transform would
+     make each column its containing block, so drop it once the card is in view. */
+  .blog-cards {
     position: relative;
-    z-index: 1;
   }
 
-  .blog-card-col:hover,
-  .blog-card-col:focus-within {
-    z-index: 30;
+  .blog-cards > .blog-card-col.in-view {
+    transform: none;
   }
 
   .blog-card {
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-radius 0.25s ease;
-    transform-origin: center top;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .blog-card-col:hover .blog-card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   }
 
   .blog-card-more {
-    display: block;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: -0.5rem;
-    padding: 0.5rem 1rem 1rem;
-    background: inherit;
-    border-radius: 0 0 0.5rem 0.5rem;
-    box-shadow: 0 1rem 1.5rem rgba(0, 0, 0, 0.18);
+    z-index: 40;
+    top: 0;
+    left: calc(var(--bs-gutter-x) * 0.5);
+    right: calc(var(--bs-gutter-x) * 0.5);
+    min-height: calc(100% - var(--bs-gutter-y));
+    margin-top: var(--bs-gutter-y);
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.25);
+    overflow: hidden;
     color: #444;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-0.5rem);
-    /* Leaving: hide straight away. */
+    transform: scale(0.96);
+    /* Leaving: close straight away. */
     transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
     pointer-events: none;
   }
 
-  /* Short delay before expanding so sweeping the mouse across the row
-     doesn't make every card pop. */
-  .blog-card-col:hover .blog-card,
-  .blog-card-col:focus-within .blog-card {
-    transform: scale(1.06);
-    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.18);
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    transition-delay: 0.2s;
-  }
-
+  /* Short delay before opening, so sweeping the mouse across the row
+     doesn't flash the expanded card. */
   .blog-card-col:hover .blog-card-more,
   .blog-card-col:focus-within .blog-card-more {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: scale(1);
     pointer-events: auto;
-    transition: opacity 0.2s ease 0.2s, transform 0.2s ease 0.2s, visibility 0s linear 0.2s;
+    transition: opacity 0.2s ease 0.35s, transform 0.2s ease 0.35s, visibility 0s linear 0.35s;
   }
 
-  /* Show the full title and description once expanded. */
-  .blog-card-col:hover .blog-card-title,
-  .blog-card-col:focus-within .blog-card-title,
-  .blog-card-col:hover .blog-card-desc,
-  .blog-card-col:focus-within .blog-card-desc {
+  /* Grow out of the hovered card's side of the row. */
+  .blog-card-col:nth-child(4n+1) .blog-card-more { transform-origin: left center; }
+  .blog-card-col:nth-child(4n+2) .blog-card-more { transform-origin: 35% center; }
+  .blog-card-col:nth-child(4n+3) .blog-card-more { transform-origin: 65% center; }
+  .blog-card-col:nth-child(4n) .blog-card-more { transform-origin: right center; }
+
+  /* Show the whole cover (no cropping of the thumbnail text). */
+  .blog-card-more-media {
     display: block;
-    -webkit-line-clamp: unset;
-    overflow: visible;
+    position: relative;
+    z-index: 3;
+    align-self: start;
+    padding: 1rem 0 1rem 1rem;
   }
 
-  /* Panel links sit above the card's stretched link. */
+  .blog-card-more-media img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.4rem;
+  }
+
+  .blog-card-more-body {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .blog-card-more-title {
+    font-size: 1.35rem;
+    line-height: 1.25;
+    margin-bottom: 0.35rem;
+  }
+
+  .blog-card-more-desc {
+    margin-bottom: 0.6rem;
+  }
+
+  /* Links in the expanded card sit above the compact card's stretched link. */
   .blog-card-more a {
     position: relative;
     z-index: 3;
@@ -170,9 +193,6 @@
   .blog-card,
   .blog-card-more {
     transition: none !important;
-  }
-  .blog-card-col:hover .blog-card,
-  .blog-card-col:focus-within .blog-card {
-    transform: none;
+    transform: none !important;
   }
 }
