@@ -7,6 +7,9 @@
 
 .kr-article {
   color: $kr-ink;
+  // An explicit background, so the "On this page" list has something to
+  // blend against (mix-blend-mode ignores the page canvas behind <body>).
+  background-color: #fff;
   overflow-x: clip;
 
   a:focus-visible, button:focus-visible { outline: 3px solid $ocre; outline-offset: 2px; }
@@ -299,13 +302,26 @@ a:hover > .kr-play { transform: translate(-50%, -50%) scale(1.08); }
     width: 220px;
     max-height: calc(100vh - 8rem);
     overflow-y: auto;
-    z-index: 1;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s, visibility 0.2s;
     &.is-visible { opacity: 1; visibility: visible; }
+
+    // Sit above full-width bands and invert against whatever is behind:
+    // dark text over the light page, light text over a dark band.
+    // With mix-blend-mode: difference each colour below is white minus the
+    // colour it shows as on the white page: #B5AD99 shows as $kr-ink-soft
+    // there and as a light warm grey over a dark band.
+    z-index: 3;
+    mix-blend-mode: difference;
   }
   @include kr-toc-list;
+  @media (min-width: 1400px) {
+    p { color: #B5AD99; }                  // $kr-ink-soft on white
+    a { color: #B5AD99; border-left-color: #1C1913; } // border shows as $kr-line
+    a:hover { color: #3DDFCD; }            // shows as $kevred on white
+    a.is-active { color: #E3DDCF; border-color: #3DDFCD; } // $kr-ink, $kevred
+  }
 }
 
 // ---------- Blocks ----------
