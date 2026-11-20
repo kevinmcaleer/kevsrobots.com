@@ -168,6 +168,34 @@
     return null;
   }
 
+  // Switching every Bill of Materials row that links catalog part `from`
+  // to part `to` (the wiring workspace's Switch part): [{ line, text }],
+  // one per row changed (none when no row links `from`). The link text
+  // becomes `name`, the new part's name, when given; else it's kept. The
+  // row's other cells (Qty, Price, Notes) are left as they are.
+  function switchRows(markdown, from, to, name) {
+    const table = root.ProjectSections.sectionTable(markdown, 'bill-of-materials');
+    if (!table || !from || !to) return [];
+    const header = table.header.map(plain);
+    let partCol = header.findIndex(h => PART_COL.test(h));
+    if (partCol < 0) partCol = 0;
+    const lines = String(markdown).split('\n');
+    const out = [];
+    for (let r = 0; r < table.rows.length; r++) {
+      const link = (table.rows[r][partCol] || '').trim().match(/^\[((?:\\.|[^\]\\])*)\]\(([^)\s]+)[^)]*\)$/);
+      const m = link && link[2].match(SLUG_RE);
+      if (!m || m[1].toLowerCase() !== String(from).toLowerCase()) continue;
+      const lineNo = table.lines[r];
+      const text = lines[lineNo];
+      const cell = cellSpans(text)[partCol];
+      if (!cell) continue;
+      const label = name ? String(name).replace(/([\[\]\\|])/g, '\\$1') : link[1];
+      const insert = ' [' + label + '](/parts/view.html?slug=' + encodeURIComponent(to) + ') ';
+      out.push({ line: lineNo, text: text.slice(0, cell.from) + insert + text.slice(cell.to) });
+    }
+    return out;
+  }
+
   // What the Bill of Materials row named `name` says about its part, to
   // fill in the "New part" dialog: { name, shopUrl, price, currency, notes }
   // (each null when the row doesn't say), or null when there's no such row.
@@ -529,7 +557,7 @@
 
   const api = {
     parse, linkRow, rowDetails, price, formatPrice, tableFromRows, totalsChanges, withTotals,
-    CURRENCIES, headerCurrency, withCurrency, tableCurrency, linkedRows, catalogPrice, setRowPrice, setRowQty, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
+    CURRENCIES, headerCurrency, withCurrency, tableCurrency, linkedRows, catalogPrice, setRowPrice, setRowQty, switchRows, isPriceHeader: h => PRICE_COL.test(plain(h).toLowerCase()),
   };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.BomSync = api;

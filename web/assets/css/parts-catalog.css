@@ -208,6 +208,29 @@
 .parts-catalog-badge.is-disputed {
   color: #b45309;
 }
+/* How complete a part is: 3D model, pins, curated picture (part-quality.js). */
+.parts-catalog-quality {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding: 0 10px 8px;
+  font-size: 0.75rem;
+  color: #b8b3a3;
+}
+.parts-catalog-mark.is-on {
+  color: var(--ok);
+}
+.parts-catalog-complete {
+  margin-left: auto;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(61, 122, 61, 0.1);
+  color: var(--ok);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  line-height: 1.6;
+}
 .parts-catalog-check {
   position: absolute;
   top: 8px;

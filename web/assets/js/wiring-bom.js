@@ -202,6 +202,109 @@
     return Object.assign({}, robot, { parts, connections });
   }
 
+  // A part definition's pins in the canvas's order (what a wire end's
+  // "#n" counts): every header's pins, then every connector's.
+  function pinList(def) {
+    if (!def) return [];
+    const out = [];
+    (def.headers || []).forEach(h => (h.pins || []).forEach(p => out.push(p)));
+    (def.connectors || []).forEach(c => (c.pins || []).forEach(p => out.push(p)));
+    return out;
+  }
+
+  // Pin names that mean the same thing on different makers' parts. A pin
+  // is only matched this way when exactly one pin of the new part fits.
+  const PIN_KINDS = [
+    ['ground', /^(gnd|ground|g|-|vss|0v|neg|negative|v-|brown|black)$/],
+    ['power', /^(vcc|v\+|\+|vin|vdd|v|pwr|power|5v|\+5v|vbus|positive|pos|red)$/],
+    ['3v3', /^(3v3|3\.3v|\+3v3|\+3\.3v)$/],
+    ['signal', /^(sig|signal|s|pwm|ctrl|control|data|dat|in|input|pulse|orange|yellow|white)$/],
+  ];
+  const pinKey = s => String(s == null ? '' : s).trim().toLowerCase().replace(/\s*\(.*\)\s*$/, '').replace(/\s+/g, '');
+  function pinKind(pin) {
+    for (const key of [pinKey(pin.name), pinKey(pin.label)]) {
+      if (!key) continue;
+      const k = PIN_KINDS.find(([, re]) => re.test(key));
+      if (k) return k[0];
+    }
+    return null;
+  }
+
+  // The index in `pins` (a pinList) of the pin that does the job of `pin`,
+  // or -1: the same name (the same position when several share it), else
+  // the same label, else the only pin of the same kind (GND, power, signal…).
+  function matchPin(pin, oldIndex, pins) {
+    if (!pin) return -1;
+    const name = pinKey(pin.name);
+    const same = pins.map((p, i) => (pinKey(p.name) === name && name ? i : -1)).filter(i => i >= 0);
+    if (same.length) return same.includes(oldIndex) ? oldIndex : same[0];
+    const label = pinKey(pin.label);
+    if (label) {
+      const byLabel = pins.map((p, i) => (pinKey(p.label) === label || pinKey(p.name) === label ? i : -1)).filter(i => i >= 0);
+      if (byLabel.length === 1) return byLabel[0];
+    }
+    const kind = pinKind(pin);
+    if (kind) {
+      const byKind = pins.map((p, i) => (pinKind(p) === kind ? i : -1)).filter(i => i >= 0);
+      if (byKind.length === 1) return byKind[0];
+    }
+    return -1;
+  }
+
+  // Switches every placed `fromLib/fromPart` (and the board, when it is
+  // `fromPart`) for `toLib/toPart` where it stands, keeping each wire whose
+  // pin the new part also has (matchPin) and moving it onto that pin.
+  // `fromDef` and `toDef` are the two PartDefinitions (null when unknown:
+  // then no wire on the part is kept). With a `label`, one copy is called
+  // that and several "label 1", "label 2"…
+  //   -> { robot, kept, dropped }: the wires moved and taken off.
+  function switchPart(robot, fromLib, fromPart, toLib, toPart, fromDef, toDef, label) {
+    const ids = new Set();
+    const count = (robot.parts || []).filter(p => p.lib === fromLib && p.part === fromPart).length;
+    const parts = (robot.parts || []).map(p => {
+      if (p.lib !== fromLib || p.part !== fromPart) return p;
+      ids.add(p.id);
+      const next = Object.assign({}, p, { lib: toLib, part: toPart });
+      if (label) next.label = count > 1 ? label + ' ' + ids.size : label;
+      return next;
+    });
+    const board = robot.board && robot.board === fromPart;
+    if (board) ids.add('board');
+    if (!ids.size) return { robot, kept: 0, dropped: 0 };
+    const oldPins = pinList(fromDef);
+    const newPins = pinList(toDef);
+    let kept = 0;
+    let dropped = 0;
+    // A wire end ("part.pin#n") on the new part, or null when it has no such pin.
+    const moveEnd = end => {
+      const s = String(end);
+      const hash = s.lastIndexOf('#');
+      const head = hash >= 0 ? s.slice(0, hash) : s;
+      const dot = head.indexOf('.');
+      const key = dot >= 0 ? head.slice(0, dot) : head;
+      if (!ids.has(key)) return s;
+      if (!toDef || !fromDef) return null;
+      const pinName = dot >= 0 ? head.slice(dot + 1) : '';
+      let idx = hash >= 0 ? parseInt(s.slice(hash + 1), 10) : -1;
+      if (!(idx >= 0 && oldPins[idx] && String(oldPins[idx].name) === pinName)) idx = oldPins.findIndex(p => String(p.name) === pinName);
+      const pin = idx >= 0 ? oldPins[idx] : { name: pinName };
+      const to = matchPin(pin, idx, newPins);
+      return to < 0 ? null : key + '.' + newPins[to].name + '#' + to;
+    };
+    const connections = [];
+    for (const c of robot.connections || []) {
+      const from = moveEnd(c.from);
+      const to = moveEnd(c.to);
+      const touches = from !== String(c.from) || to !== String(c.to);
+      if (from === null || to === null) { dropped++; continue; }
+      if (touches) { kept++; connections.push(Object.assign({}, c, { from, to })); }
+      else connections.push(c);
+    }
+    const next = Object.assign({}, robot, { parts, connections });
+    if (board) next.board = toPart;
+    return { robot: next, kept, dropped };
+  }
+
   // Parts with pins the canvas has more of than the Bill of Materials'
   // Qty: [{ slug, name, qty, placed }], to offer raising the Qty.
   function overQty(list) {
@@ -225,7 +328,7 @@
     return out;
   }
 
-  const api = { BOM_LIB, placeholderId, placeholderPart, placeholderImage, withFallbackImage, fitToPhoto, hasPins, isBoard, entries, copyLabels, relink, overQty, linkedSince };
+  const api = { BOM_LIB, placeholderId, placeholderPart, placeholderImage, withFallbackImage, fitToPhoto, hasPins, isBoard, entries, copyLabels, relink, pinList, matchPin, switchPart, overQty, linkedSince };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.WiringBom = api;
 })(typeof window !== 'undefined' ? window : globalThis);

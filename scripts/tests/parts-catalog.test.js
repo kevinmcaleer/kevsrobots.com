@@ -57,3 +57,19 @@ test('shelves: biggest first, uncategorised last, and ?category= by slug', () =>
   s.category = 'microcontroller';
   assert.equal(C.applyFilters(parts, s, '').length, 3);
 });
+
+test('every word of the query matches, and a search puts complete parts first', () => {
+  const list = [
+    { slug: 'home', name: 'SG90 Servo', category: 'Motor', status: 'draft' },
+    { slug: 'tp', name: 'Tower Pro SG-90 Micro Servo', category: 'Motor', status: 'verified', has_mesh: true, pin_count: 3, curated_photo: true },
+    { slug: 'mg', name: 'MG90S Servo', category: 'Motor', status: 'draft', pin_count: 3 },
+  ];
+  const s = sel();
+  assert.deepEqual(C.applyFilters(list, s, 'SG90 servo').map(p => p.slug), ['home', 'tp']);
+  assert.deepEqual(C.shelves(C.applyFilters(list, s, 'servo'), true)[0].parts.map(p => p.slug), ['tp', 'mg', 'home']);
+  assert.deepEqual(C.shelves(list)[0].parts.map(p => p.slug), ['home', 'tp', 'mg']);
+  s.complete = true;
+  assert.deepEqual(C.applyFilters(list, s, '').map(p => p.slug), ['tp']);
+  assert.equal(C.facets(list, sel(), '').complete, 1);
+  assert.equal(C.isComplete(list[1]), true);
+});

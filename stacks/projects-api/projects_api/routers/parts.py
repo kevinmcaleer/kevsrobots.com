@@ -82,7 +82,7 @@ from ..auth import require_terms_accepted
 from ..config import get_settings
 from ..parts_lifecycle import compute_part_status
 from ..price_history import last_snapshot, record_price
-from ..snakie_parts import spec_from_definition, stored_definition, to_parts_yml
+from ..snakie_parts import pin_map_stats, spec_from_definition, stored_definition, to_parts_yml
 from ..storage import generate_filename, read_file, save_file
 from ..parts_taxonomy import canonicalize, merge_for_suggestions
 from ..schemas import (
@@ -688,15 +688,44 @@ async def parts_catalog(
         ).all()
     )
     covers = await first_photo_cover_urls(session, {p.id: p.slug for p in parts})
-    return [
-        PartCatalogEntry(
+    curated = await _curated_photo_ids(session, parts)
+    out: list[PartCatalogEntry] = []
+    for p in parts:
+        pins_on_model, pin_count = pin_map_stats(p.definition)
+        out.append(PartCatalogEntry(
             id=p.id, slug=p.slug, name=p.name, sku=p.sku, mpn=p.mpn,
             category=p.category, family=p.family, manufacturer=p.manufacturer,
             tags=list(p.tags or []), status=p.status, usage_count=p.usage_count,
             cover_url=covers.get(p.id) or p.image_url, has_price=p.id in priced,
-        )
+            has_mesh=bool(p.mesh_file_path), pin_count=pin_count,
+            pins_on_model=pins_on_model, curated_photo=p.id in curated,
+        ))
+    return out
+
+
+async def _curated_photo_ids(session: AsyncSession, parts: list[Part]) -> set[int]:
+    """The ids of parts with a curated wiring picture: the photo their
+    definition's pins were placed over (``photo_id``, set in the Part
+    Editor) or the cut-out imported from Snakie's library. A part with only
+    a product shot, or none, isn't counted. One query for the whole set."""
+    if not parts:
+        return set()
+    chosen = {
+        p.id: (p.definition or {}).get("photo_id")
         for p in parts
-    ]
+        if isinstance((p.definition or {}).get("photo_id"), int)
+    }
+    rows = (
+        await session.execute(
+            select(PartPhoto.id, PartPhoto.part_id, PartPhoto.source)
+            .where(PartPhoto.part_id.in_([p.id for p in parts]))
+        )
+    ).all()
+    out: set[int] = set()
+    for photo_id, part_id, source in rows:
+        if chosen.get(part_id) == photo_id or (source or "").endswith(" (Snakie)"):
+            out.add(part_id)
+    return out
 
 
 @router.post("", response_model=PartDetail, status_code=201)

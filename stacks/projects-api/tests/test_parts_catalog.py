@@ -43,3 +43,22 @@ async def test_catalog_lists_every_part_with_facets(client, session) -> None:
     assert rows["pico"]["has_price"] is False
     assert rows[slug]["has_price"] is True and rows[slug]["tags"] == ["wire"]
     assert rows["sg90"]["cover_url"] is None
+
+
+@pytest.mark.asyncio
+async def test_catalog_says_how_complete_each_part_is(client, session) -> None:
+    """The quality marks: a 3-D model, pins, and a curated wiring picture."""
+    await import_library(LIBRARY, session)
+    resp = await client.post("/api/parts", json={"name": "Mystery servo"}, headers=make_auth_header())
+    slug = resp.json()["slug"]
+
+    rows = {r["slug"]: r for r in (await client.get("/api/parts/_catalog")).json()}
+    # Pico: pins from Snakie's library, over Snakie's cut-out picture.
+    assert rows["pico"]["pin_count"] > 0
+    assert rows["pico"]["curated_photo"] is True
+    assert rows["pico"]["has_mesh"] is False
+    # A part someone just added has none of them.
+    assert rows[slug]["pin_count"] == 0
+    assert rows[slug]["curated_photo"] is False
+    assert rows[slug]["has_mesh"] is False
+    assert rows[slug]["pins_on_model"] == 0

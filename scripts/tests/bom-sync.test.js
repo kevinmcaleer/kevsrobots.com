@@ -322,3 +322,28 @@ test('reads a fit-to-content table (one dash per delimiter cell)', () => {
   assert.equal(table.rows.length, 1);
   assert.equal(BomSync.parse(md).rows.length, 1);
 });
+
+test('switchRows relinks every row of a part to another, renamed', () => {
+  const md = doc([
+    '| Part | Qty | Price | Notes |',
+    '| --- | --- | --- | --- |',
+    '| [SG90 Servo](/parts/view.html?slug=sg90-servo) | 2 | £3.00 | head |',
+    '| [Pico](/parts/view.html?slug=pico) | 1 | £4.00 |  |',
+    '| [Spare servo](/parts/view.html?slug=sg90-servo) | 1 |  | spare |',
+  ].join('\n'));
+  const lines = md.split('\n');
+  const out = BomSync.switchRows(md, 'sg90-servo', 'tower-pro-sg90', 'Tower Pro SG90 [9g]');
+  assert.equal(out.length, 2);
+  assert.equal(out[0].line, lines.findIndex(l => l.includes('SG90 Servo')));
+  assert.equal(out[0].text, '| [Tower Pro SG90 \\[9g\\]](/parts/view.html?slug=tower-pro-sg90) | 2 | £3.00 | head |');
+  // Read back: the new part, the same Qty and price.
+  const next = lines.slice();
+  out.forEach(e => { next[e.line] = e.text; });
+  const rows = BomSync.parse(next.join('\n')).rows;
+  assert.deepEqual(rows.map(r => [r.name, r.part_slug, r.quantity]), [
+    ['Tower Pro SG90 [9g]', 'tower-pro-sg90', 2], ['Pico', 'pico', 1], ['Tower Pro SG90 [9g]', 'tower-pro-sg90', 1],
+  ]);
+  // Without a name the row's own words stay.
+  assert.equal(BomSync.switchRows(md, 'pico', 'pico-2', null)[0].text, '| [Pico](/parts/view.html?slug=pico-2) | 1 | £4.00 |  |');
+  assert.deepEqual(BomSync.switchRows(md, 'nope', 'x', 'X'), []);
+});

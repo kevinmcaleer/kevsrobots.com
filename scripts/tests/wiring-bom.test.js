@@ -160,3 +160,61 @@ test('a pin-less part takes its photo’s shape', () => {
   const led = { id: 'led', headers: pins(2), aspect: 0.6 };
   assert.equal(W.fitToPhoto(led, 800, 400), led);
 });
+
+test('switchPart keeps the wires whose pins the new part has', () => {
+  const homeMade = { id: 'sg90-servo', name: 'SG90 Servo', headers: [{ edge: 'left', pins: [{ name: 'PWM' }, { name: 'VCC' }, { name: 'GND' }] }] };
+  const towerPro = { id: 'tower-pro-sg90', name: 'Tower Pro SG90', headers: [{ edge: 'left', pins: [{ name: 'GND', label: 'Brown' }, { name: '5V' }, { name: 'Signal' }] }] };
+  const robot = {
+    board: 'pico',
+    parts: [
+      { id: 's1', lib: 'kevsrobots', part: 'sg90-servo', label: 'SG90 Servo 1', x: 5 },
+      { id: 's2', lib: 'kevsrobots', part: 'sg90-servo', label: 'SG90 Servo 2' },
+      { id: 'led', lib: 'kevsrobots', part: 'led' },
+    ],
+    connections: [
+      { id: 'w1', from: 'board.GP0#0', to: 's1.PWM#0', net: 'signal' },
+      { id: 'w2', from: 's1.VCC#1', to: 'board.VBUS#3' },
+      { id: 'w3', from: 's2.GND#2', to: 'board.GND#2' },
+      { id: 'w4', from: 'led.P0#0', to: 'board.GP1#1' },
+    ],
+  };
+  const out = W.switchPart(robot, 'kevsrobots', 'sg90-servo', 'kevsrobots', 'tower-pro-sg90', homeMade, towerPro, 'Tower Pro SG90');
+  assert.deepEqual(out.robot.parts.map(p => [p.id, p.part, p.label, p.x]), [
+    ['s1', 'tower-pro-sg90', 'Tower Pro SG90 1', 5], ['s2', 'tower-pro-sg90', 'Tower Pro SG90 2', undefined], ['led', 'led', undefined, undefined],
+  ]);
+  assert.deepEqual(out.robot.connections.map(c => [c.id, c.from, c.to]), [
+    ['w1', 'board.GP0#0', 's1.Signal#2'], ['w2', 's1.5V#1', 'board.VBUS#3'], ['w3', 's2.GND#0', 'board.GND#2'], ['w4', 'led.P0#0', 'board.GP1#1'],
+  ]);
+  assert.equal(out.robot.connections[0].net, 'signal');
+  assert.equal(out.robot.connections[3], robot.connections[3]);
+  assert.deepEqual([out.kept, out.dropped], [3, 0]);
+  assert.equal(out.robot.board, 'pico');
+});
+
+test('switchPart drops wires with no matching pin, and swaps the board', () => {
+  const picoDef = { id: 'pico', name: 'Pico', headers: [{ edge: 'left', pins: [{ name: 'GP0' }, { name: 'GP1' }, { name: 'GND' }] }] };
+  const pico2 = { id: 'pico2', name: 'Pico 2', headers: [{ edge: 'left', pins: [{ name: 'GND' }, { name: 'GP0' }] }] };
+  const robot = {
+    board: 'pico', parts: [{ id: 'led', lib: 'kevsrobots', part: 'led' }],
+    connections: [{ id: 'a', from: 'board.GP0#0', to: 'led.P0#0' }, { id: 'b', from: 'board.GP1#1', to: 'led.P1#1' }, { id: 'c', from: 'led.P1#1', to: 'board.GND#2' }],
+  };
+  const out = W.switchPart(robot, 'kevsrobots', 'pico', 'kevsrobots', 'pico2', picoDef, pico2, 'Pico 2');
+  assert.equal(out.robot.board, 'pico2');
+  assert.deepEqual(out.robot.connections.map(c => [c.id, c.from, c.to]), [['a', 'board.GP0#1', 'led.P0#0'], ['c', 'led.P1#1', 'board.GND#0']]);
+  assert.deepEqual([out.kept, out.dropped], [2, 1]);
+  // A new part with no pins yet: every wire on it goes.
+  const bare = W.switchPart(robot, 'kevsrobots', 'pico', 'kevsrobots', 'x', picoDef, null);
+  assert.deepEqual([bare.kept, bare.dropped, bare.robot.connections.length], [0, 3, 0]);
+  // Nothing placed: the same robot back.
+  assert.equal(W.switchPart(robot, 'kevsrobots', 'nope', 'kevsrobots', 'x', null, null).robot, robot);
+});
+
+test('matchPin: by name, then label, then the only pin of that kind', () => {
+  const pins = [{ name: 'GND' }, { name: 'GND' }, { name: 'VCC' }, { name: 'S', label: 'Signal' }];
+  assert.equal(W.matchPin({ name: 'gnd' }, 1, pins), 1);
+  assert.equal(W.matchPin({ name: 'GND' }, 7, pins), 0);
+  assert.equal(W.matchPin({ name: 'Signal' }, 0, pins), 3);
+  assert.equal(W.matchPin({ name: '+' }, 0, pins), 2);
+  assert.equal(W.matchPin({ name: 'Ground (brown)' }, 0, [{ name: 'V-' }, { name: 'V+' }]), 0);
+  assert.equal(W.matchPin({ name: 'SDA' }, 0, pins), -1);
+});

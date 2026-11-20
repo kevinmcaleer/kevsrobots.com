@@ -155,6 +155,8 @@
   //                         the table has no such row or no Qty column
   //   linkBomRow(name, part) links the unlinked row `name` to part { name, slug } in the
   //                         BOM table; false when the table was left alone
+  //   switchBomRows(slug, part)  relinks every row linking `slug` to part
+  //                         { name, slug }, named after it; how many rows changed
   //   createPart(name, origin)  opens the "New part" dialog for the row `name`;
   //                         resolves to the part { name, slug, existing }, or null
   //   addBomRows(parts)     adds rows for [{ name, slug }]
@@ -270,6 +272,11 @@
     let bomLibrary = { id: BOM_LIB, name: 'Bill of Materials', parts: [] };
     let startSlugs = new Set();
     const libraries = () => [library, bomLibrary];
+    // The parts catalog's list (GET /api/parts/_catalog), for each row's
+    // quality marks and "a more complete part" suggestions; [] until it
+    // loads. Suggestions the writer said no to stay away while it's open.
+    let catalog = [];
+    const dismissed = new Set();
 
     // Takes the workspace away, with no asking: also what happens when the
     // editor closes the block itself (another one opened, or it went).
@@ -362,6 +369,7 @@
       }
       if (relinked) markDirty(relinked + (relinked === 1 ? ' placeholder was' : ' placeholders were') + ' swapped for the part linked in the Bill of Materials. Not saved');
       drawBom();
+      loadCatalog();
       window.addEventListener('focus', onFocus);
       bomKey = JSON.stringify(ctx.bomRows());
       if (ctx.onDocChange) unwatchDoc = ctx.onDocChange(onDocEdited);
@@ -445,6 +453,63 @@
       markDirty('Linked “' + e.name + '” to ' + (def ? def.name : part.name) + '.' +
         (inTable ? ' The Bill of Materials table links it too.' : ' The Bill of Materials table was left as it is: its row links a shop page and has no Notes column to move that link to. Link the row in the table by hand.') +
         (pins ? '' : ' It has no pins in the catalog yet: use Edit part.') + ' Not saved');
+    }
+
+    async function loadCatalog() {
+      try {
+        const resp = await fetch(API + '/api/parts/_catalog');
+        if (!resp.ok) return;
+        const list = await resp.json();
+        if (closed || !Array.isArray(list)) return;
+        catalog = list;
+        drawBom();
+      } catch (_) { /* no marks or suggestions, nothing else lost */ }
+    }
+
+    // Switches the linked row `e`'s part for another catalog part: every
+    // Bill of Materials row linking it links the new part (named after
+    // it), and each copy on the canvas becomes the new part where it
+    // stands, keeping the wires whose pins the new part has too.
+    async function switchEntry(e, part) {
+      if (!e || !e.slug || !part || !part.slug || part.slug === e.slug) return;
+      status('Switching…');
+      const fromDef = defOf(e.slug);
+      const fetched = await definition(part.slug);
+      const toDef = fetched ? WiringBom.withFallbackImage(fetched) : null;
+      if (toDef) addToLibrary([toDef]);
+      const name = (toDef && toDef.name) || part.name;
+      const before = handle.robot();
+      const out = WiringBom.switchPart(before, LIB, e.slug, LIB, part.slug, fromDef, toDef && hasPins(toDef) ? toDef : null, name);
+      if (out.dropped && !window.confirm(out.dropped + (out.dropped === 1 ? ' wire is' : ' wires are') + ' on pins ' + name +
+          ' doesn’t have, so ' + (out.dropped === 1 ? 'it comes' : 'they come') + ' off' + (out.kept ? ' (' + out.kept + ' stay on matching pins)' : '') + '. Switch anyway?')) {
+        status('');
+        return;
+      }
+      const rows = ctx.switchBomRows ? ctx.switchBomRows(e.slug, { slug: part.slug, name }) : 0;
+      let robot = out.robot;
+      // A board needs pins: one without goes on as a card instead.
+      const boardless = before.board === e.slug && !(toDef && hasPins(toDef));
+      if (boardless) robot = Object.assign({}, robot, { board: undefined });
+      if (robot !== before) handle.setRobot(robot);
+      if (boardless && toDef) place([{ lib: LIB, def: toDef }]);
+      syncPlaceholders(handle.robot());
+      handle.setLibraries(libraries());
+      const wires = out.kept + out.dropped;
+      markDirty('Switched “' + e.name + '” for ' + name + '.' +
+        (rows ? ' The Bill of Materials links it too.' : ' The Bill of Materials table was left as it is.') +
+        (wires ? ' ' + (out.dropped
+          ? out.kept + ' of ' + wires + ' wires kept; ' + out.dropped + ' had no matching pin and came off.'
+          : (wires === 1 ? 'Its wire is' : 'All ' + wires + ' wires are') + ' on the matching pins.') : '') +
+        (toDef && !hasPins(toDef) ? ' It has no pins in the catalog yet: use Edit part.' : '') + ' Not saved');
+    }
+
+    async function pickSwitch(e, origin) {
+      const picked = await PartsCatalog.open({
+        api: API, query: PartQuality.searchQuery(e.name), origin,
+        title: 'Switch “' + e.name + '” for another catalog part', addLabel: 'Switch',
+        single: true, exclude: [e.slug], chooseText: 'Choose the part to switch to. Complete parts come first.',
+      });
+      if (picked.length) await switchEntry(e, picked[0]);
     }
 
     async function pickLink(e, origin) {
@@ -618,7 +683,40 @@
         } else if (e.def) {
           out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-edit="' + i + '" title="Edit the part: pins, labels, size, picture" aria-label="Edit “' + esc(e.name) + '”"><i class="fas fa-pen-ruler"></i></button>');
         }
+        if (e.linked) {
+          out.push('<button type="button" class="btn btn-sm btn-outline-secondary" data-bom-switch="' + i + '" title="Switch to another catalog part: the Bill of Materials links it, and wires stay on matching pins" aria-label="Switch “' + esc(e.name) + '” for another part"><i class="fas fa-right-left"></i></button>');
+        }
         return out.join('');
+      };
+      // How complete the row's catalog part is: 3D model, pins, picture.
+      const marks = e => {
+        const p = e.linked && catalog.find(x => x.slug === e.slug);
+        if (!p) return '';
+        const q = PartQuality.quality(p);
+        return '<span class="wb-quality' + (q.complete ? ' is-complete' : '') + '" title="' + esc(p.name + ' has ' + PartQuality.describe(p)) + '">' +
+          PartQuality.marks(p).map(m => '<i class="fas ' + ({ model: 'fa-cube', pins: 'fa-plug', photo: 'fa-image' })[m.key] + (m.on ? ' is-on' : '') + '" aria-label="' + esc(m.label) + '"></i>').join('') +
+          (q.complete ? '<span class="wb-complete">Complete</span>' : '') + '</span>';
+      };
+      // A more complete catalog part with a matching name: Switch (or Link)
+      // in one press, or × to say no.
+      const suggestions = new Map();
+      if (catalog.length) {
+        list.forEach((e, i) => {
+          const key = (e.slug || '') + '|' + e.name;
+          if (dismissed.has(key)) return;
+          const s = PartQuality.suggest({ name: e.name, slug: e.slug }, catalog);
+          if (s) suggestions.set(i, Object.assign(s, { key }));
+        });
+      }
+      const suggest = (e, i) => {
+        const s = suggestions.get(i);
+        if (!s) return '';
+        const verb = e.linked ? 'Switch' : 'Link';
+        return '<div class="wb-suggest"><i class="fas fa-lightbulb" aria-hidden="true"></i>' +
+          '<span><a href="/parts/view.html?slug=' + encodeURIComponent(s.part.slug) + '" target="_blank" rel="noopener">' + esc(s.part.name) + '</a> ' +
+          (s.quality.complete ? 'is a complete part' : 'has more') + ': ' + esc(PartQuality.describe(s.part)) + '.</span>' +
+          '<span class="wb-suggest-acts"><button type="button" class="btn btn-sm btn-outline-primary" data-bom-suggest="' + i + '">' + verb + '</button>' +
+          '<button type="button" class="btn btn-sm btn-link" data-bom-dismiss="' + i + '" aria-label="Not this part" title="Not this part">×</button></span></div>';
       };
       // The board, when it isn't one of the BOM's parts (an old wiring's
       // Pico, say): it can be taken away.
@@ -636,8 +734,8 @@
         (list.length || strayBoard
           ? '<ul class="wb-list">' + strayBoard + list.map((e, i) =>
               '<li class="wb-row' + (e.onCanvas ? ' is-placed' : '') + '"><span class="wb-thumb">' + thumb(e) + '</span>' +
-              '<span class="wb-text"><span class="wb-name">' + esc(e.name) + '</span>' + state(e) + '</span>' +
-              '<span class="wb-acts">' + acts(e, i) + '</span></li>').join('') + '</ul>'
+              '<span class="wb-text"><span class="wb-name">' + esc(e.name) + '</span>' + state(e) + marks(e) + '</span>' +
+              '<span class="wb-acts">' + acts(e, i) + '</span>' + suggest(e, i) + '</li>').join('') + '</ul>'
           : '<p class="wb-empty">The Bill of Materials is empty. Parts you add here go into it.</p>') +
         (unlinked ? '<p class="wb-foot"><strong>Link…</strong> a row to its part in the catalog to give it pins and a photo. Not in the catalog? <i class="fas fa-plus"></i> adds it as a new part, for everyone to use.</p>' : '');
       box.querySelectorAll('[data-bom-add]').forEach(b => b.addEventListener('click', () => addCopies([{ e: list[+b.dataset.bomAdd], n: 1 }])));
@@ -651,6 +749,18 @@
       });
       box.querySelectorAll('[data-bom-new]').forEach(b => b.addEventListener('click', ev => newPart(list[+b.dataset.bomNew], ev.currentTarget)));
       box.querySelectorAll('[data-bom-edit]').forEach(b => b.addEventListener('click', () => editPart(list[+b.dataset.bomEdit])));
+      box.querySelectorAll('[data-bom-switch]').forEach(b => b.addEventListener('click', ev => pickSwitch(list[+b.dataset.bomSwitch], ev.currentTarget)));
+      box.querySelectorAll('[data-bom-suggest]').forEach(b => b.addEventListener('click', () => {
+        const e = list[+b.dataset.bomSuggest];
+        const s = suggestions.get(+b.dataset.bomSuggest);
+        if (!s) return;
+        const part = { slug: s.part.slug, name: s.part.name };
+        if (e.linked) switchEntry(e, part); else linkEntry(e, part);
+      }));
+      box.querySelectorAll('[data-bom-dismiss]').forEach(b => b.addEventListener('click', () => {
+        const s = suggestions.get(+b.dataset.bomDismiss);
+        if (s) { dismissed.add(s.key); drawBom(); }
+      }));
     }
 
     overlay.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {

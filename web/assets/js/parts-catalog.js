@@ -25,14 +25,25 @@
   const tagsOf = p => (p.tags || []).map(t => String(t).trim().toLowerCase()).filter(Boolean);
 
   function emptySelection() {
-    return { families: new Set(), manufacturers: new Set(), tags: new Set(), statuses: new Set(), priced: false, category: null };
+    return { families: new Set(), manufacturers: new Set(), tags: new Set(), statuses: new Set(), priced: false, complete: false, category: null };
   }
 
+  // A complete part: a 3-D model, pins and a curated wiring picture
+  // (part-quality.js says the same, with more detail).
+  const isComplete = p => !!(p.has_mesh && p.pin_count > 0 && p.curated_photo);
+  const qualityScore = p => (p.has_mesh ? 1 : 0) + (p.pin_count > 0 ? 1 : 0) + (p.curated_photo ? 1 : 0);
+
+  // Every word of the query somewhere in the part, so "SG90 servo" finds
+  // "Tower Pro SG90 Micro Servo".
   function matchesQuery(p, query) {
     const q = String(query || '').trim().toLowerCase();
     if (!q) return true;
-    return [p.name, p.sku, p.mpn, p.manufacturer, p.family, p.category].concat(p.tags || [])
-      .filter(Boolean).join(' ').toLowerCase().includes(q);
+    const text = [p.name, p.sku, p.mpn, p.manufacturer, p.family, p.category].concat(p.tags || [])
+      .filter(Boolean).join(' ').toLowerCase();
+    if (text.includes(q)) return true;
+    const squash = s => s.replace(/[^a-z0-9]+/g, '');
+    const flat = squash(text);
+    return q.split(/\s+/).every(w => text.includes(w) || (squash(w) && flat.includes(squash(w))));
   }
 
   // OR within a facet, AND across facets. `except` skips one axis, so a
@@ -47,6 +58,7 @@
       if (![...sel.tags].some(x => t.includes(x))) return false;
     }
     if (except !== 'priced' && sel.priced && !p.has_price) return false;
+    if (except !== 'complete' && sel.complete && !isComplete(p)) return false;
     return true;
   }
 
@@ -91,19 +103,24 @@
         value, count: tagCounts.get(value) || 0, selected: sel.tags.has(value), rare: tagTotals.get(value) < 2,
       })).sort((a, b) => (a.rare - b.rare) || byCount(a, b)),
       priced: parts.filter(p => p.has_price && matchesQuery(p, query) && matchesSelection(p, sel, 'priced')).length,
+      complete: parts.filter(p => isComplete(p) && matchesQuery(p, query) && matchesSelection(p, sel, 'complete')).length,
     };
   }
 
   // Shelves in the order a reader scans them: the biggest first, the
-  // catch-all last. [{ category, parts }]
-  function shelves(parts) {
+  // catch-all last. [{ category, parts }]. `byQuality`: on each shelf the
+  // most complete parts first (a search, so the official part leads).
+  function shelves(parts, byQuality) {
     const by = new Map();
     parts.forEach(p => {
       const c = categoryOf(p);
       if (!by.has(c)) by.set(c, []);
       by.get(c).push(p);
     });
-    return [...by].map(([category, list]) => ({ category, parts: list }))
+    return [...by].map(([category, list]) => ({
+      category,
+      parts: byQuality ? list.map((p, i) => ({ p, i })).sort((a, b) => qualityScore(b.p) - qualityScore(a.p) || a.i - b.i).map(x => x.p) : list,
+    }))
       .sort((a, b) => (a.category === 'Other parts') - (b.category === 'Other parts') ||
         b.parts.length - a.parts.length || a.category.localeCompare(b.category));
   }
@@ -123,6 +140,25 @@
 
   const STATUS_LABEL = { verified: 'Verified', draft: 'Draft', disputed: 'Disputed' };
 
+  // The three quality marks on a card: 3D model, pins, curated picture,
+  // lit when the part has it. A complete part gets a "Complete" mark.
+  function qualityMarks(p) {
+    const box = el('span', 'parts-catalog-quality' + (isComplete(p) ? ' is-complete' : ''));
+    box.setAttribute('aria-hidden', 'true');
+    [
+      ['fa-cube', p.has_mesh, p.has_mesh ? 'Has a 3D model' : 'No 3D model yet'],
+      ['fa-plug', p.pin_count > 0, p.pin_count > 0 ? 'Has pins (' + p.pin_count + ')' : 'No pins yet'],
+      ['fa-image', p.curated_photo, p.curated_photo ? 'Has a curated wiring picture' : 'No curated wiring picture yet'],
+    ].forEach(([icon, on, title]) => {
+      const m = el('span', 'parts-catalog-mark' + (on ? ' is-on' : ''));
+      m.title = title;
+      m.appendChild(el('i', 'fas ' + icon));
+      box.appendChild(m);
+    });
+    if (isComplete(p)) box.appendChild(el('span', 'parts-catalog-complete', 'Complete'));
+    return box;
+  }
+
   let uid = 0;
 
   // Draws the catalog into `host`.
@@ -131,6 +167,9 @@
   //   addLabel      the Add button's words ("Add to Bill of Materials")
   //   onAddMany(parts)  the chosen parts, when Add is pressed
   //   initial       { category, family, query } to start from (the URL's)
+  //   single        picking: one part at a time (choosing another unticks it)
+  //   exclude       slugs not to list (the part being switched away from)
+  //   chooseText    the Add bar's words before anything is chosen
   // Resolves to { setQuery, focus } once the parts have loaded.
   async function mount(host, opts) {
     opts = opts || {};
@@ -190,6 +229,7 @@
       const resp = await fetch(api + '/api/parts/_catalog');
       if (!resp.ok) throw new Error(String(resp.status));
       parts = await resp.json();
+      if (opts.exclude && opts.exclude.length) parts = parts.filter(p => !opts.exclude.includes(p.slug));
     } catch (_) {
       status.textContent = 'The parts catalog couldn’t be loaded. Try again in a moment.';
       return { setQuery() {}, focus() { search.focus(); } };
@@ -231,6 +271,14 @@
       box.dataset.axis = 'priced';
       priced.append(box, el('span', null, 'Has a price'), el('small', null, String(f.priced)));
       side.appendChild(priced);
+      const complete = el('label', 'parts-catalog-facet-value parts-catalog-priced');
+      complete.title = 'Parts with a 3D model, pins and a curated wiring picture: they work in the wiring, the pinout table and 3D scenes.';
+      const cbox = el('input');
+      cbox.type = 'checkbox';
+      cbox.checked = sel.complete;
+      cbox.dataset.axis = 'complete';
+      complete.append(cbox, el('span', null, 'Complete parts'), el('small', null, String(f.complete)));
+      side.appendChild(complete);
       [
         facetGroup('Type', f.families, 'families'),
         facetGroup('Manufacturer', f.manufacturers, 'manufacturers'),
@@ -255,6 +303,7 @@
       const box = e.target;
       if (!box.dataset || !box.dataset.axis) return;
       if (box.dataset.axis === 'priced') sel.priced = box.checked;
+      else if (box.dataset.axis === 'complete') sel.complete = box.checked;
       else if (box.checked) sel[box.dataset.axis].add(box.dataset.value);
       else sel[box.dataset.axis].delete(box.dataset.value);
       draw();
@@ -266,7 +315,9 @@
       const maker = (p.manufacturer || '').trim();
       const node = el(opts.pick ? 'label' : 'a', 'parts-catalog-card');
       node.dataset.slug = p.slug;
-      const describe = [p.name, maker, STATUS_LABEL[statusOf(p)], p.has_price ? 'has a price' : '']
+      const has = [p.has_mesh ? '3D model' : '', p.pin_count > 0 ? 'pins' : '', p.curated_photo ? 'curated picture' : ''].filter(Boolean);
+      const describe = [p.name, maker, STATUS_LABEL[statusOf(p)], p.has_price ? 'has a price' : '',
+        isComplete(p) ? 'complete part' : has.length ? 'has ' + has.join(', ') : '']
         .filter(Boolean).join(', ');
       if (opts.pick) {
         const box = el('input', 'parts-catalog-check');
@@ -297,12 +348,14 @@
       if (maker) text.append(el('span', 'parts-catalog-maker', maker));
       node.appendChild(text);
       if (statusOf(p) !== 'draft') node.appendChild(el('span', 'parts-catalog-badge is-' + statusOf(p), STATUS_LABEL[statusOf(p)]));
+      node.appendChild(qualityMarks(p));
       return node;
     }
 
     function draw() {
       drawFacets();
       const shown = applyFilters(parts, sel, query);
+      const searching = !!String(query || '').trim();
       status.textContent = shown.length === parts.length
         ? parts.length + (parts.length === 1 ? ' part' : ' parts')
         : shown.length + ' of ' + parts.length + ' parts';
@@ -310,7 +363,7 @@
       if (!shown.length) {
         main.appendChild(el('p', 'parts-catalog-empty', 'No parts match. Try fewer filters, or another word.'));
       }
-      shelves(shown).forEach((shelf, n) => {
+      shelves(shown, searching).forEach((shelf, n) => {
         const section = el('section', 'parts-catalog-shelf');
         const headId = id + '-shelf-' + n;
         const head = el('h2', null, shelf.category);
@@ -343,7 +396,7 @@
       if (!addBar) return;
       addBar.querySelector('.parts-catalog-chosen').textContent = chosen.size
         ? chosen.size + (chosen.size === 1 ? ' part chosen' : ' parts chosen')
-        : 'Choose parts to add';
+        : (opts.chooseText || 'Choose parts to add');
       addBtn.disabled = !chosen.size;
     }
 
@@ -351,6 +404,12 @@
       const slug = e.target.dataset && e.target.dataset.slug;
       if (!slug) return;
       const p = parts.find(x => x.slug === slug);
+      if (e.target.checked && opts.single) {
+        chosen.clear();
+        main.querySelectorAll('.parts-catalog-check:checked').forEach(b => {
+          if (b !== e.target) { b.checked = false; b.closest('.parts-catalog-card').classList.remove('is-chosen'); }
+        });
+      }
       if (e.target.checked && p) chosen.set(slug, p);
       else chosen.delete(slug);
       e.target.closest('.parts-catalog-card').classList.toggle('is-chosen', e.target.checked);
@@ -447,12 +506,13 @@
       overlay.addEventListener('mousedown', e => { if (e.target === overlay) finish([]); });
       mount(host, {
         api: opts.api, pick: true, addLabel: opts.addLabel, initial: { query: opts.query || '' },
+        single: opts.single, exclude: opts.exclude, chooseText: opts.chooseText,
         onAddMany: parts => finish(parts),
       }).then(c => c.focus());
     });
   }
 
-  const api = { mount, open, facets, applyFilters, shelves, emptySelection };
+  const api = { mount, open, facets, applyFilters, shelves, emptySelection, isComplete };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.PartsCatalog = api;
 })(typeof window !== 'undefined' ? window : globalThis);
