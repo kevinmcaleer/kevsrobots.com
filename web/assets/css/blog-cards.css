@@ -1,5 +1,5 @@
 /*
- * Blog listing cards (/blog/), markup in _includes/blog_card.html.
+ * Blog listing cards (/blog/), markup in _includes/blog_listing_card.html.
  *
  * Mobile / touch: a compact card, no tags, no hover panel.
  * Desktop (fine pointer that can hover, >= 768px): hovering or focusing a
