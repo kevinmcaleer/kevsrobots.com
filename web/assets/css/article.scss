@@ -250,7 +250,8 @@ a:hover > .kr-play { transform: translate(-50%, -50%) scale(1.08); }
 }
 
 // ---------- Body and prose grid ----------
-// Three nested tracks: content (reading width), wide (cards, splits), full (bands).
+// Three nested tracks: content (one reading width shared by prose, splits, columns
+// and cards, so their edges line up), wide (spare breakout track), full (bands).
 
 .kr-prose {
   display: grid;
@@ -266,13 +267,13 @@ a:hover > .kr-play { transform: translate(-50%, -50%) scale(1.08); }
   line-height: 1.7;
 
   > * { grid-column: content; min-width: 0; }
-  > .kr-split, > .kr-cards, > .kr-columns { grid-column: wide; }
   > .kr-band { grid-column: full; }
 
   h2 { font-size: 2rem; margin: 2.2rem 0 0.8rem; scroll-margin-top: 1rem; }
   h3 { margin: 1.6rem 0 0.6rem; scroll-margin-top: 1rem; }
   p, ul, ol, table, pre, .highlighter-rouge { margin-bottom: 1.1rem; }
   img { max-width: 100%; height: auto; }
+  > figure { margin-inline: 0; }
   table { display: block; overflow-x: auto; border-collapse: collapse; font-size: 0.95rem; }
   th {
     text-align: left;
@@ -384,7 +385,7 @@ a.kr-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgb
   a { color: $ocre; }
 }
 .kr-band-inner {
-  width: unquote("min(#{$kr-content} + 12rem, 100% - 32px)");
+  width: unquote("min(#{$kr-content}, 100% - 32px)");
   margin-inline: auto;
   > :last-child { margin-bottom: 0; }
   .kr-card, .kr-callout { color: $kr-ink; }
