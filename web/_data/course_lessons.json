@@ -4233,6 +4233,85 @@
     ]
   },
   {
+    "slug": "snakie_blocks",
+    "name": "Snakie Blocks - From Blocks to Python",
+    "description": "Program a Raspberry Pi Pico by snapping blocks together in Snakie, and watch the real MicroPython appear beside them. Draw with the turtle, drive LEDs, buttons, servos and buzzers, then build a reaction timer game and read every line of its Python.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-20",
+    "groups": [
+      "micropython",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_blocks/00_intro.html"
+      },
+      {
+        "file": "01_the_blocks_workspace.md",
+        "section": "Overview",
+        "url": "/learn/snakie_blocks/01_the_blocks_workspace.html"
+      },
+      {
+        "file": "02_turtle_draw_a_square.md",
+        "section": "Blocks Basics",
+        "url": "/learn/snakie_blocks/02_turtle_draw_a_square.html"
+      },
+      {
+        "file": "03_variables_maths_and_loops.md",
+        "section": "Blocks Basics",
+        "url": "/learn/snakie_blocks/03_variables_maths_and_loops.html"
+      },
+      {
+        "file": "04_making_decisions.md",
+        "section": "Blocks Basics",
+        "url": "/learn/snakie_blocks/04_making_decisions.html"
+      },
+      {
+        "file": "05_leds_and_buttons.md",
+        "section": "Blocks and Hardware",
+        "url": "/learn/snakie_blocks/05_leds_and_buttons.html"
+      },
+      {
+        "file": "06_pwm_servos_and_buzzers.md",
+        "section": "Blocks and Hardware",
+        "url": "/learn/snakie_blocks/06_pwm_servos_and_buzzers.html"
+      },
+      {
+        "file": "07_functions.md",
+        "section": "Blocks and Hardware",
+        "url": "/learn/snakie_blocks/07_functions.html"
+      },
+      {
+        "file": "08_my_parts.md",
+        "section": "Blocks and Hardware",
+        "url": "/learn/snakie_blocks/08_my_parts.html"
+      },
+      {
+        "file": "09_reading_the_python.md",
+        "section": "From Blocks to Python",
+        "url": "/learn/snakie_blocks/09_reading_the_python.html"
+      },
+      {
+        "file": "10_simple_and_advanced_blocks.md",
+        "section": "From Blocks to Python",
+        "url": "/learn/snakie_blocks/10_simple_and_advanced_blocks.html"
+      },
+      {
+        "file": "11_project_reaction_timer.md",
+        "section": "Project",
+        "url": "/learn/snakie_blocks/11_project_reaction_timer.html"
+      },
+      {
+        "file": "12_summary.md",
+        "section": "Project",
+        "url": "/learn/snakie_blocks/12_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "snakie_getting_started",
     "name": "Getting Started with Snakie",
     "description": "Meet Snakie, the robotics-first MicroPython editor. Write and run your first programs on the built-in simulator, then find your board, flash MicroPython, and build a traffic light on a real Raspberry Pi Pico.",

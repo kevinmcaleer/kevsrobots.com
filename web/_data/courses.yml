@@ -782,6 +782,21 @@
   link: /learn/smars_quad/00_intro.html
   name: Build a SMARS Quad Walking Robot
 - author: Kevin McAleer
+  cover: /learn/snakie_blocks/assets/cover.jpg
+  date_published: 2026-11-20
+  description: Program a Raspberry Pi Pico by snapping blocks together in Snakie,
+    and watch the real MicroPython appear beside them. Draw with the turtle, drive
+    LEDs, buttons, servos and buzzers, then build a reaction timer game and read every
+    line of its Python.
+  duration: 1h 1m
+  groups:
+  - micropython
+  - pico
+  lessons: 13
+  level: beginner
+  link: /learn/snakie_blocks/00_intro.html
+  name: Snakie Blocks - From Blocks to Python
+- author: Kevin McAleer
   cover: /learn/snakie_getting_started/assets/cover.jpg
   date_published: 2026-11-20
   description: Meet Snakie, the robotics-first MicroPython editor. Write and run your

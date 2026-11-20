@@ -1,0 +1,41 @@
+- name: "Snakie Blocks - From Blocks to Python"
+  author: Kevin McAleer
+  date_created: 2026-11-20
+  date_published: 2026-11-20
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - micropython
+      - pico
+  description: >-
+    Program a Raspberry Pi Pico by snapping blocks together in Snakie, and watch the real MicroPython appear beside them. Draw with the turtle, drive LEDs, buttons, servos and buzzers, then build a reaction timer game and read every line of its Python.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_the_blocks_workspace.md
+  - section:
+      name: Blocks Basics
+      content:
+      - 02_turtle_draw_a_square.md
+      - 03_variables_maths_and_loops.md
+      - 04_making_decisions.md
+  - section:
+      name: Blocks and Hardware
+      content:
+      - 05_leds_and_buttons.md
+      - 06_pwm_servos_and_buzzers.md
+      - 07_functions.md
+      - 08_my_parts.md
+  - section:
+      name: From Blocks to Python
+      content:
+      - 09_reading_the_python.md
+      - 10_simple_and_advanced_blocks.md
+  - section:
+      name: Project
+      content:
+      - 11_project_reaction_timer.md
+      - 12_summary.md
