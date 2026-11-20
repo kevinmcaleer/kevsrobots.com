@@ -1,0 +1,40 @@
+- name: Print It Right with BetterCad
+  author: Kevin McAleer
+  date_created: 2026-11-20
+  date_published: 2026-11-20
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - 3dprinting
+      - 3ddesign
+  description: >-
+    Get parts that fit first time. Set up your printer in BetterCad, catch overhangs and thin walls before you print, calibrate holes and fits to your own machine, then design a box with a lid that closes just right.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Will It Print
+      content:
+      - 01_set_up_your_printer.md
+      - 02_overhangs_and_supports.md
+      - 03_thin_walls.md
+      - 04_choosing_an_orientation.md
+  - section:
+      name: Will It Fit
+      content:
+      - 05_holes_that_fit.md
+      - 06_fits_between_parts.md
+      - 07_where_parts_meet.md
+  - section:
+      name: Out to the Slicer
+      content:
+      - 08_material_and_weight.md
+      - 09_exporting_for_your_slicer.md
+  - section:
+      name: Project
+      content:
+      - 10_project_box_with_a_lid.md
+      - 11_summary.md

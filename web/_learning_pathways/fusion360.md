@@ -6,6 +6,7 @@ description: Learn how to create robots in 3D, using Fusion 360 and FreeCAD. The
 layout: course_pathway
 cover: /assets/img/learn/learn_3d_design.png
 courses:
+  - "Learn BetterCad"
   - "Build a SMARS Robot in Fusion 360"
   - "Robot Eye Mechanism"
   - "Introduction to FreeCAD for Beginners"
