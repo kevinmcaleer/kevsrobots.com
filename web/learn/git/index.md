@@ -1,9 +1,15 @@
 ---
-title: Course Overview
-description: What you'll learn in Git for Beginners
 layout: lesson
+title: Course Overview
+author: Kevin McAleer
 type: page
 cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+next: 01_what-is-git.html
+description: What you'll learn in Git for Beginners
+percent: 7
+duration: 4
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

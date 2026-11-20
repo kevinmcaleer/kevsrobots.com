@@ -1,9 +1,16 @@
 ---
 layout: lesson
 title: Rviz2 Displays
+author: Kevin McAleer
 type: page
-description: Let's learn about RViz2 Displays and setting it up for Laser scans
 cover: /learn/learn_ros/assets/rviz03.jpg
+date: 2023-01-07
+previous: 15_rviz.html
+next: 17_tf2.html
+description: Let's learn about RViz2 Displays and setting it up for Laser scans
+percent: 85
+duration: 3
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

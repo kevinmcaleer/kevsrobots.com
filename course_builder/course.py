@@ -327,23 +327,31 @@ class Course:
                 # Get lesson duration from cache
                 lesson_duration = self._get_lesson_duration(item)
 
-                front_matter = "---\n"
-                front_matter += f"layout: {self.layout}\n"
-                front_matter += f"title: {item}\n"
-                front_matter += f"author: {self.author}\n"
-                front_matter += f"type: {self.type}\n"
-                front_matter += f"cover: {self.cover}\n"
-                front_matter += f"date: {self.date_published}\n"
+                # Build as a dict and let yaml quote the values: a description
+                # containing ": " (e.g. "Arduino C++: drive it") is invalid
+                # YAML when pasted in raw, and the whole block was dropped.
+                generated = {
+                    "layout": self.layout,
+                    "title": item,
+                    "author": self.author,
+                    "type": self.type,
+                    "cover": self.cover,
+                    "date": self.date_published,
+                }
                 if previous_l is not None:
-                    front_matter += f"previous: {previous_l}\n"
+                    generated["previous"] = previous_l
                 if next_l is not None:
-                    front_matter += f"next: {next_l}\n"
-                front_matter += f"description: {self.description}\n"
-                front_matter += f"percent: {item_percentage}\n"
-                front_matter += f"duration: {lesson_duration}\n"
+                    generated["next"] = next_l
+                generated["description"] = self.description
+                generated["percent"] = item_percentage
+                generated["duration"] = lesson_duration
                 if quiz_total:
-                    front_matter += f"quiz_total: {quiz_total}\n"
-                front_matter += "---\n"
+                    generated["quiz_total"] = quiz_total
+                front_matter = (
+                    "---\n"
+                    + yaml.safe_dump(generated, sort_keys=False, allow_unicode=True)
+                    + "---\n"
+                )
 
                 # Read lesson file content (from cache)
                 _, _, raw_content = self._read_lesson_file(item)

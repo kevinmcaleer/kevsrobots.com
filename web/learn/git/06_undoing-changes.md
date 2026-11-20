@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Undoing Changes
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 05_viewing-history.html
+next: 07_ignoring-files.html
 description: Throw away edits with git restore, unstage files, fix your last commit
   with --amend, and undo commits safely with git revert
-layout: lesson
-type: page
+percent: 49
+duration: 6
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Skills and Knowledge
-description: "What you\u2019ll need to know to build robots and bring them to life"
+author: Kevin McAleer
 type: page
+cover: /learn/robotics_101/assets/basics_101.jpg
+date: 2023-01-17
+previous: lesson_02.html
+next: lesson_04.html
+description: "What you\u2019ll need to know to build robots and bring them to life"
+percent: 64
+duration: 2
+quiz_total: 12
 navigation:
 - name: Robotics 101
 - content:

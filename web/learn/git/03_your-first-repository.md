@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Your First Repository
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 02_installing-git.html
+next: 04_staging-and-committing.html
 description: Create a Git repository with git init, look inside the .git folder, and
   learn to read git status
-layout: lesson
-type: page
+percent: 28
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

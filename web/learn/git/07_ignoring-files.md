@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Ignoring Files
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 06_undoing-changes.html
+next: 08_branches.html
 description: Keep junk files, build output and secrets out of your repository with
   .gitignore
-layout: lesson
-type: page
+percent: 56
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

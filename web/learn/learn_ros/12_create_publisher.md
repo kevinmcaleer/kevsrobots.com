@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Create a ROS2 Python Publisher
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 11_create_py_package.html
+next: 13_create_subscriber.html
 description: Let's create a new Python Publisher program
+percent: 65
+duration: 3
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

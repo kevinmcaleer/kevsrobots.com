@@ -1,7 +1,16 @@
 ---
-title: Lesson 01 - Movement
-description: Learn how to move your robot
 layout: lesson
+title: Lesson 01 - Movement
+author: Kevin McAleer
+type: page
+cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
+previous: 00_intro.html
+next: 02_lesson_02.html
+description: Learn how to move your robot
+percent: 24
+duration: 10
+quiz_total: 17
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:

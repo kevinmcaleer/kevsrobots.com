@@ -1,9 +1,17 @@
 ---
 layout: lesson
 title: VSCode setup
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 07_build_container.html
+next: 09_first_ros_program.html
 description: Install the VSCode extensions so we can remotely connect to the Raspberry
   Pi and Docker container instances
+percent: 45
+duration: 3
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

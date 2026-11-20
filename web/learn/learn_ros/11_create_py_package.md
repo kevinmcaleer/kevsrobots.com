@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Create a ROS2 Python Package
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 10_listener.html
+next: 12_create_publisher.html
 description: Let's create a new Python Package
+percent: 60
+duration: 2
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

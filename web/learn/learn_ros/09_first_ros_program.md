@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: First ROS2 Program
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 08_vscode_setup.html
+next: 10_listener.html
 description: Let's create our first ROS2 program
+percent: 50
+duration: 3
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

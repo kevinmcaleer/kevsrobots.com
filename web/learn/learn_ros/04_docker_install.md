@@ -1,8 +1,16 @@
 ---
 layout: lesson
 title: Docker Install
+author: Kevin McAleer
 type: page
+cover: /learn/learn_ros/assets/learn_ros.jpg
+date: 2023-01-07
+previous: 03_install_updates.html
+next: 05_get_cubie.html
 description: Install and configure Docker
+percent: 25
+duration: 2
+quiz_total: 14
 navigation:
 - name: Learn ROS with me
 - content:

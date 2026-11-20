@@ -1,9 +1,17 @@
 ---
+layout: lesson
 title: Branches
+author: Kevin McAleer
+type: page
+cover: /learn/git/assets/cover.jpg
+date: 2026-11-04
+previous: 07_ignoring-files.html
+next: 09_merging-and-conflicts.html
 description: Use branches to work on new features without breaking the code that already
   works
-layout: lesson
-type: page
+percent: 63
+duration: 5
+quiz_total: 35
 navigation:
 - name: Git for Beginners
 - content:

@@ -1,7 +1,16 @@
 ---
-title: Lesson 06 - How to control servos
-description: Learn how to control SG90 Servos with Arduino
 layout: lesson
+title: Lesson 06 - How to control servos
+author: Kevin McAleer
+type: page
+cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
+previous: 05_lesson_05.html
+next: 07_lesson_07.html
+description: Learn how to control SG90 Servos with Arduino
+percent: 84
+duration: 3
+quiz_total: 17
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:

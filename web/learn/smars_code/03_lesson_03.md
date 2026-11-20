@@ -1,7 +1,16 @@
 ---
-title: Lesson 03 - Ultrasonic distance sensor
-description: Learn how to detect distance using an ultrasonic sensor
 layout: lesson
+title: Lesson 03 - Ultrasonic distance sensor
+author: Kevin McAleer
+type: page
+cover: /learn/smars_code/assets/program_smars.png
+date: 2023-09-10
+previous: 02_lesson_02.html
+next: 04_lesson_04.html
+description: Learn how to detect distance using an ultrasonic sensor
+percent: 48
+duration: 8
+quiz_total: 17
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:
