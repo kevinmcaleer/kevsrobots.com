@@ -21,6 +21,10 @@ groups:
   - everyday-algorithms
 ---
 
+This is the next article in a series of posts exploring how everyday algorithms influence lives, often in ways we don't immediately notice.
+
+---
+
 Your sat-nav has one job: get *you* there as fast as possible. It looks at live traffic, runs a shortest-path search (the same family of algorithms we use to steer robots around a room) and picks the quickest route.
 
 That sounds like it can only make things better. If everyone gets the fastest route, surely everyone gets there faster?

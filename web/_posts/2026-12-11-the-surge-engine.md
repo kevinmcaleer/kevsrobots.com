@@ -21,6 +21,10 @@ groups:
   - everyday-algorithms
 ---
 
+This is the next article in a series of posts exploring how everyday algorithms influence lives, often in ways we don't immediately notice.
+
+---
+
 It's raining, it's late, and you open a ride-hailing app. The price is **2.1×** normal. You sigh, and you book it anyway.
 
 Few algorithms make people as angry as surge pricing. It feels like the app is kicking you while you're down. But the story of what surge pricing actually does, and what it gets blamed for, is far stranger than "big tech squeezes customers". It involves a broken server on New Year's Eve, the curious power of round numbers, and a ticket sale where the algorithm everyone blamed turned out, according to the regulator, not to exist.
