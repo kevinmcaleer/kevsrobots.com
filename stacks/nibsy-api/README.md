@@ -118,6 +118,9 @@ curl https://nibsy.kevsrobots.com/health
 | `GET /api/trending` | implemented | Composite trending scores: clicks + page views + YouTube views (#67, #72) |
 | `POST /api/track/click` | implemented | Log recommendation clicks (#68) |
 | `POST /api/track/impression` | implemented | Log recommendation impressions (#68) |
+| `POST /api/track/view` | implemented | Record a logged-in user's page view (ignored when anonymous) |
+| `GET /api/me/history` | implemented | The logged-in user's stored viewing history |
+| `DELETE /api/me/history` | implemented | Erase the logged-in user's viewing history |
 | `GET /api/analytics/top-clicked` | implemented | Most clicked content by period (#68) |
 | `GET /api/analytics/nibsy-stats` | implemented | Dashboard-level stats (#68) |
 | `POST /api/admin/ingest` | implemented | Re-ingest from `NIBSY_DATA_DIR` |
@@ -159,6 +162,26 @@ The catalogue index is cached in memory and rebuilt only when
 The older batch generator (`generator.py`, the `nibsy_recommendations`
 table and `POST /api/admin/regenerate-recommendations`) is no longer read
 by the widget.
+
+### Personalised suggestions (logged-in users)
+
+When the request carries a valid Chatter login cookie, the picks are also
+shaped by what that user has read:
+
+- The widget reports each page view to `POST /api/track/view`. It is
+  stored in `nibsy_page_views` as one row per (username, page) with a
+  count and last-viewed time. A lesson counts as a view of its course.
+  Anonymous requests are ignored.
+- On each request the history is blended into an interest profile (recent
+  views weigh most, 30-day half-life) and every candidate is scored as
+  `similarity to this page + 0.6 x similarity to the profile`. On pages
+  with no topic of their own (home, section indexes) the profile decides.
+- Pages the user has already read are not suggested, and a pick that the
+  history earned says why: "Because you read ...".
+- **No recommendation or profile is ever stored**, only the views. Rows
+  older than `VIEW_HISTORY_DAYS` (default 90) are deleted daily.
+- Users can see and erase their data: `GET` / `DELETE /api/me/history`
+  ("Forget What I've Read" in the Nibsy menu).
 
 ### Trending
 

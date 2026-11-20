@@ -12,11 +12,13 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..auth import get_optional_user
 from ..db import get_session
+from ..history import load_history
 from ..generator import _jaccard, _affinity, _recency
 from ..models import NibsyClick, NibsyContent, NibsyTrending
 from ..recommender import (
@@ -57,24 +59,31 @@ def _parse_exclude(raw: Optional[str]) -> set[int]:
 
 @router.get("/recommendations", response_model=RecommendationsResponse)
 async def get_recommendations(
+    response: Response,
     page: str = Query(..., description="URL path of the current page"),
     limit: int = Query(5, ge=1, le=_MAX_LIMIT),
     exclude: Optional[str] = Query(
         None, description="Comma-separated content IDs to exclude"
     ),
     session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
 ) -> RecommendationsResponse:
     """Return recommendations for the page the visitor is on.
 
     Computed on every request from the current catalogue — see
-    ``recommender.py`` for how pages are compared.
+    ``recommender.py`` for how pages are compared. For a logged-in
+    reader the picks are also shaped by their viewing history.
     """
+
+    # Personalised responses must never be cached and served to someone else.
+    response.headers["Cache-Control"] = "private, no-store"
 
     index = await get_index(session)
     if not index.items:
-        return RecommendationsResponse(source_url=page)
+        return RecommendationsResponse(source_url=page, logged_in=user is not None)
 
     now = datetime.now(timezone.utc).replace(tzinfo=None)
+    history = await load_history(session, user, now) if user else []
     picks, basis = recommend_for_page(
         index,
         page,
@@ -82,8 +91,11 @@ async def get_recommendations(
         _parse_exclude(exclude),
         await load_trending(session),
         now,
+        history,
     )
     return RecommendationsResponse(
+        logged_in=user is not None,
+        personalised=any(p.personal for p in picks),
         source_url=page,
         recommendations=[
             RecommendationItem(

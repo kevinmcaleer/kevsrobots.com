@@ -61,6 +61,11 @@ class RecommendationsResponse(BaseModel):
     # What the picks are based on: "page" (the page itself), "course" (a
     # lesson mapped to its course) or "fallback" (trending for the section).
     basis: Optional[str] = None
+    # True when the request carried a valid login; the widget uses it to
+    # decide whether to report the page view.
+    logged_in: bool = False
+    # True when the user's viewing history shaped these picks.
+    personalised: bool = False
 
 
 class AdminStatus(BaseModel):

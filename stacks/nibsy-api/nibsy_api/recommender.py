@@ -15,6 +15,13 @@ words. Similarity is the cosine between two bags. A small content-type
 affinity and a small recency bonus only break ties between equally
 related items - they can never make an unrelated item win.
 
+Logged-in readers
+-----------------
+When a viewing history is supplied, the pages in it are blended into an
+interest profile (recent views weigh most) and every candidate is also
+compared with that profile. Pages already read are not suggested again.
+The profile is rebuilt from the history on each request and never stored.
+
 Pages that are not in the catalogue
 -----------------------------------
 - A lesson (``/learn/<course>/<lesson>.html``) uses its course.
@@ -50,6 +57,13 @@ W_DESCRIPTION = 1.0
 # good match is 0.2-0.8, so these reorder near-equal candidates only.
 W_AFFINITY = 0.08
 W_RECENCY = 0.05
+
+# How much the reader's history counts next to the page they are on. Under
+# 1.0 so the current page still leads; history steers and fills the gaps.
+W_PROFILE = 0.6
+
+# A view loses half its influence on the profile every this many days.
+PROFILE_HALF_LIFE_DAYS = 30.0
 
 # Below this similarity a candidate is not "related" - we would rather fall
 # back to trending than pretend.
@@ -160,6 +174,17 @@ class Pick:
     item: Item
     score: float
     reason: str
+    # True when the reader's history, not the current page, earned the slot.
+    personal: bool = False
+
+
+@dataclass
+class View:
+    """One row of a user's viewing history."""
+
+    content_id: int
+    last_viewed_at: datetime
+    view_count: int = 1
 
 
 class CatalogueIndex:
@@ -321,30 +346,92 @@ def _mix(candidates: list[Pick], limit: int) -> list[Pick]:
     return chosen
 
 
-def related_to_vector(
+def build_profile(
+    index: CatalogueIndex, history: Sequence[View], now: datetime
+) -> dict[str, float]:
+    """Blend the pages a user has read into one interest vector.
+
+    Each viewed page contributes its (unit-length) term vector, weighted
+    so that recent views count most (half-life ``PROFILE_HALF_LIFE_DAYS``)
+    and repeat views count a little more. Nothing about the result is
+    stored; it is rebuilt from the history on every request.
+    """
+
+    profile: dict[str, float] = {}
+    for view in history:
+        item = index.by_id.get(view.content_id)
+        if item is None or not item.norm:
+            continue
+        age_days = max(0.0, (now - view.last_viewed_at).total_seconds() / 86400)
+        weight = 0.5 ** (age_days / PROFILE_HALF_LIFE_DAYS) * (
+            1.0 + math.log(max(1, view.view_count))
+        )
+        scale = weight / item.norm
+        for term, value in item.vector.items():
+            profile[term] = profile.get(term, 0.0) + value * scale
+    return profile
+
+
+def _related(
     index: CatalogueIndex,
-    vector: dict[str, float],
-    source_type: str,
+    source: Optional[Item],
+    profile: dict[str, float],
     excluded: set[int],
     now: datetime,
 ) -> list[Pick]:
-    """Every catalogue item related to a term vector, unsorted."""
+    """Every item related to the current page and/or the reader's profile.
 
-    norm = math.sqrt(sum(v * v for v in vector.values()))
+    relevance = similarity to the page + W_PROFILE x similarity to the
+    profile. With no page (home, section indexes) the profile stands alone.
+    """
+
+    profile_norm = math.sqrt(sum(v * v for v in profile.values()))
+    profile_weight = W_PROFILE if source is not None else 1.0
+    source_type = source.type if source is not None else "profile"
     picks: list[Pick] = []
     for target in index.items:
         if target.id in excluded:
             continue
-        sim = index.similarity(vector, norm, target)
-        if sim < MIN_SIMILARITY:
+        page_sim = (
+            index.similarity(source.vector, source.norm, target) if source else 0.0
+        )
+        personal_sim = (
+            profile_weight * index.similarity(profile, profile_norm, target)
+            if profile_norm
+            else 0.0
+        )
+        if max(page_sim, personal_sim) < MIN_SIMILARITY:
             continue
         score = (
-            sim
+            page_sim
+            + personal_sim
             + W_AFFINITY * _affinity(source_type, target.type)
             + W_RECENCY * _recency(target.date, now)
         )
-        picks.append(Pick(target, score, index.reason(vector, target)))
+        personal = personal_sim > page_sim
+        reason = "" if personal else index.reason(source.vector, target)
+        picks.append(Pick(target, score, reason, personal))
     return picks
+
+
+def _because_you_read(
+    index: CatalogueIndex, history: Sequence[View], target: Item
+) -> str:
+    """Name the viewed page that best explains a personal pick."""
+
+    best: Optional[Item] = None
+    best_sim = 0.0
+    for view in history:
+        viewed = index.by_id.get(view.content_id)
+        if viewed is None:
+            continue
+        sim = index.similarity(viewed.vector, viewed.norm, target)
+        if sim > best_sim:
+            best, best_sim = viewed, sim
+    if best is None:
+        return "Picked for you"
+    title = best.title if len(best.title) <= 40 else best.title[:39].rstrip() + "…"
+    return f"Because you read {title}"
 
 
 def fallback_picks(
@@ -389,18 +476,28 @@ def recommend_for_page(
     excluded_ids: set[int],
     trending: dict[int, float],
     now: datetime,
+    history: Sequence[View] = (),
 ) -> tuple[list[Pick], str]:
-    """Recommendations for one page. Returns ``(picks, basis)``."""
+    """Recommendations for one page. Returns ``(picks, basis)``.
+
+    ``history`` is the logged-in reader's viewing history, if any. Pages
+    they have already read are never suggested back to them.
+    """
 
     source, basis = index.resolve(page)
     excluded = set(excluded_ids)
-    picks: list[Pick] = []
     if source is not None:
         excluded.add(source.id)
-        candidates = related_to_vector(
-            index, source.vector, source.type, excluded, now
-        )
-        picks = _mix(candidates, limit)
+    profile = build_profile(index, history, now)
+    if profile:
+        excluded |= {v.content_id for v in history}
+
+    picks: list[Pick] = []
+    if source is not None or profile:
+        picks = _mix(_related(index, source, profile, excluded, now), limit)
+        for pick in picks:
+            if pick.personal:
+                pick.reason = _because_you_read(index, history, pick.item)
 
     if len(picks) < limit:
         # Not enough genuinely related items - top up from trending.

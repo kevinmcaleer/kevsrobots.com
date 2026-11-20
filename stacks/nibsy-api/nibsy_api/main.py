@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -26,7 +27,8 @@ from .db import create_all, get_sessionmaker
 from .ingest import ingest_from_data_dir, ingest_from_remote
 from .trending import compute_trending
 from .models import NibsyContent
-from .routers import admin, analytics, health, recommendations, stubs, tracking
+from .history import purge_old_views
+from .routers import admin, analytics, health, me, recommendations, stubs, tracking
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +77,10 @@ async def _scheduled_remote_ingest() -> None:
             logger.error("remote ingest finished with errors: %s", stats.model_dump())
         else:
             logger.info("remote ingest finished: %s", stats.model_dump())
+        try:
+            await purge_old_views(session, datetime.now(timezone.utc).replace(tzinfo=None))
+        except Exception:  # noqa: BLE001
+            logger.exception("purging old page views failed")
     await _scheduled_trending()
 
 
@@ -174,13 +180,14 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
         allow_credentials=True,
-        allow_methods=["GET", "POST"],
+        allow_methods=["GET", "POST", "DELETE"],
         allow_headers=["*"],
     )
     app.include_router(health.router)
     app.include_router(admin.router)
     app.include_router(recommendations.router)
     app.include_router(tracking.router)
+    app.include_router(me.router)
     app.include_router(analytics.router)
     app.include_router(stubs.router)
     return app
