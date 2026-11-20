@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import hashlib
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..auth import get_optional_user
 from ..db import get_session
+from ..history import record_view
 from ..models import NibsyClick, NibsyImpression
 
 router = APIRouter(prefix="/api/track", tags=["tracking"])
@@ -26,6 +29,10 @@ class ImpressionRequest(BaseModel):
     content_ids: list[int]
     source_page: str
     session_id: Optional[str] = None
+
+
+class ViewRequest(BaseModel):
+    page: str = Field(..., max_length=2000)
 
 
 def _anonymize_ip(ip: Optional[str]) -> Optional[str]:
@@ -69,3 +76,21 @@ async def track_impression(
         )
     await session.commit()
     return {"status": "ok", "recorded": len(body.content_ids)}
+
+
+@router.post("/view")
+async def track_view(
+    body: ViewRequest,
+    session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
+) -> dict:
+    """Record that a logged-in user viewed a page (for personalisation).
+
+    Anonymous requests are accepted and ignored — nothing is stored for
+    visitors who are not logged in.
+    """
+
+    if user is None:
+        return {"status": "ok", "recorded": False}
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    return {"status": "ok", "recorded": await record_view(session, user, body.page, now)}

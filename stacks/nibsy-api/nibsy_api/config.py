@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     # new content without waiting for the daily run. Tests turn this off.
     ingest_on_startup: bool = True
 
+    # How long a logged-in user's viewing history is kept for personalised
+    # recommendations. Older rows are deleted by the daily job.
+    view_history_days: int = 90
+
     # Service port — #70 standardises on 8200.
     port: int = 8200
 

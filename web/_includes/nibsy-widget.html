@@ -190,6 +190,10 @@
   text-align: left;
 }
 
+.nibsy-menu-item[hidden] {
+  display: none;
+}
+
 .nibsy-menu-item:hover {
   background: #f0f4f8;
   color: #333;
@@ -694,6 +698,7 @@
     <div class="nibsy-menu-divider"></div>
     <button class="nibsy-menu-item" id="nw-trending-btn"><i class="fas fa-fire"></i> What's Trending</button>
     <button class="nibsy-menu-item" id="nw-tip-btn"><i class="fas fa-lightbulb"></i> Show New Tip</button>
+    <button class="nibsy-menu-item" id="nw-forget-btn" hidden><i class="fas fa-eraser"></i> Forget What I've Read</button>
     <button class="nibsy-menu-item nibsy-hide-btn" id="nw-hide-btn"><i class="fas fa-eye-slash"></i> Hide Nibsy</button>
   </div>
   <div class="nibsy-stage">
@@ -800,6 +805,7 @@
   const showBtn = document.getElementById('nw-show-btn');
   const tipBtn = document.getElementById('nw-tip-btn');
   const trendingBtn = document.getElementById('nw-trending-btn');
+  const forgetBtn = document.getElementById('nw-forget-btn');
   const eyeLeft = document.getElementById('nw-eye-left');
   const eyeRight = document.getElementById('nw-eye-right');
 
@@ -839,9 +845,16 @@
   async function fetchRecommendations() {
     try {
       const page = window.location.pathname;
-      const res = await fetch(NIBSY_API + '/api/recommendations?page=' + encodeURIComponent(page) + '&limit=6');
+      // credentials: the login cookie lets the API personalise for members.
+      const res = await fetch(NIBSY_API + '/api/recommendations?page=' + encodeURIComponent(page) + '&limit=6', { credentials: 'include' });
       if (!res.ok) return;
       const data = await res.json();
+      if (data.logged_in) {
+        // Members only: remember this page so future tips fit what they read.
+        // Nothing is sent for visitors who are not logged in.
+        sendBeaconJSON('/api/track/view', { page: page });
+        forgetBtn.hidden = false;
+      }
       const recs = data.recommendations || [];
       if (recs.length === 0) return;
       apiTips = recs.map(r => ({
@@ -1404,6 +1417,20 @@
       '<a href="' + t.url + '" data-nibsy-id="' + t.id + '" data-nibsy-url="' + t.url + '">' + t.title + '</a>'
     ).join('<br>');
     showSpeech('🔥 Trending now:<br>' + links, 8000, true);
+  });
+
+  // --- Forget What I've Read (logged-in members) ---
+
+  forgetBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    closeMenu();
+    try {
+      const res = await fetch(NIBSY_API + '/api/me/history', { method: 'DELETE', credentials: 'include' });
+      if (!res.ok) throw new Error(res.status);
+      showSpeech("Done! I've forgotten everything you've read.", 5000);
+    } catch (err) {
+      showSpeech("Sorry, I couldn't clear that just now. Try again later!", 5000);
+    }
   });
 
   // --- Show New Tip ---
