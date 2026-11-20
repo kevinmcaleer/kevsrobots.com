@@ -1,0 +1,37 @@
+- name: "Snakie Instruments - Oscilloscope, Multimeter and Plotter"
+  author: Kevin McAleer
+  date_created: 2026-11-20
+  date_published: 2026-11-20
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - micropython
+      - pico
+      - electronics
+  description: >-
+    See what your MicroPython program is really doing. Use Snakie's built-in plotter, multimeter, oscilloscope and data logger to watch sensors and signals live, then scan a room for its brightest spot with a servo and a light sensor and log the results to a file.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_the_instrument_dock.md
+      - 02_telemetry_and_live.md
+  - section:
+      name: The Instruments
+      content:
+      - 03_the_plotter.md
+      - 04_the_multimeter.md
+      - 05_the_oscilloscope.md
+      - 06_watch_and_update.md
+  - section:
+      name: Blocks and Logging
+      content:
+      - 07_instruments_from_blocks.md
+      - 08_logging_data.md
+  - section:
+      name: Project
+      content:
+      - 09_project_light_scanner.md
+      - 10_summary.md

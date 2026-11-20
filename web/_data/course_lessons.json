@@ -4465,6 +4465,82 @@
     ]
   },
   {
+    "slug": "snakie_electronics",
+    "name": "Wire It Up - Electronics in Snakie",
+    "description": "Plan a circuit on screen before you touch a wire. Use Snakie's Electronics workspace to pick parts, wire them to a Raspberry Pi Pico, check the wiring for mistakes and print a build guide, then wire and code a two-wheeled obstacle-avoiding robot.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-20",
+    "groups": [
+      "micropython",
+      "pico",
+      "electronics",
+      "robots"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_electronics/00_intro.html"
+      },
+      {
+        "file": "01_the_electronics_workspace.md",
+        "section": "Overview",
+        "url": "/learn/snakie_electronics/01_the_electronics_workspace.html"
+      },
+      {
+        "file": "02_the_parts_library.md",
+        "section": "Parts",
+        "url": "/learn/snakie_electronics/02_the_parts_library.html"
+      },
+      {
+        "file": "03_placing_parts.md",
+        "section": "Parts",
+        "url": "/learn/snakie_electronics/03_placing_parts.html"
+      },
+      {
+        "file": "04_wiring_with_noodles.md",
+        "section": "Wiring",
+        "url": "/learn/snakie_electronics/04_wiring_with_noodles.html"
+      },
+      {
+        "file": "05_the_schematic_view.md",
+        "section": "Wiring",
+        "url": "/learn/snakie_electronics/05_the_schematic_view.html"
+      },
+      {
+        "file": "06_checking_your_wiring.md",
+        "section": "Wiring",
+        "url": "/learn/snakie_electronics/06_checking_your_wiring.html"
+      },
+      {
+        "file": "07_drivers_help_and_code.md",
+        "section": "From Wiring to Code",
+        "url": "/learn/snakie_electronics/07_drivers_help_and_code.html"
+      },
+      {
+        "file": "08_connections_and_measurements.md",
+        "section": "From Wiring to Code",
+        "url": "/learn/snakie_electronics/08_connections_and_measurements.html"
+      },
+      {
+        "file": "09_exporting_and_sharing.md",
+        "section": "From Wiring to Code",
+        "url": "/learn/snakie_electronics/09_exporting_and_sharing.html"
+      },
+      {
+        "file": "10_project_obstacle_robot.md",
+        "section": "Project",
+        "url": "/learn/snakie_electronics/10_project_obstacle_robot.html"
+      },
+      {
+        "file": "11_summary.md",
+        "section": "Project",
+        "url": "/learn/snakie_electronics/11_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "snakie_getting_started",
     "name": "Getting Started with Snakie",
     "description": "Meet Snakie, the robotics-first MicroPython editor. Write and run your first programs on the built-in simulator, then find your board, flash MicroPython, and build a traffic light on a real Raspberry Pi Pico.",
@@ -4535,6 +4611,76 @@
         "file": "11_summary.md",
         "section": "Project",
         "url": "/learn/snakie_getting_started/11_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "snakie_instruments",
+    "name": "Snakie Instruments - Oscilloscope, Multimeter and Plotter",
+    "description": "See what your MicroPython program is really doing. Use Snakie's built-in plotter, multimeter, oscilloscope and data logger to watch sensors and signals live, then scan a room for its brightest spot with a servo and a light sensor and log the results to a file.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-20",
+    "groups": [
+      "micropython",
+      "pico",
+      "electronics"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_instruments/00_intro.html"
+      },
+      {
+        "file": "01_the_instrument_dock.md",
+        "section": "Overview",
+        "url": "/learn/snakie_instruments/01_the_instrument_dock.html"
+      },
+      {
+        "file": "02_telemetry_and_live.md",
+        "section": "Overview",
+        "url": "/learn/snakie_instruments/02_telemetry_and_live.html"
+      },
+      {
+        "file": "03_the_plotter.md",
+        "section": "The Instruments",
+        "url": "/learn/snakie_instruments/03_the_plotter.html"
+      },
+      {
+        "file": "04_the_multimeter.md",
+        "section": "The Instruments",
+        "url": "/learn/snakie_instruments/04_the_multimeter.html"
+      },
+      {
+        "file": "05_the_oscilloscope.md",
+        "section": "The Instruments",
+        "url": "/learn/snakie_instruments/05_the_oscilloscope.html"
+      },
+      {
+        "file": "06_watch_and_update.md",
+        "section": "The Instruments",
+        "url": "/learn/snakie_instruments/06_watch_and_update.html"
+      },
+      {
+        "file": "07_instruments_from_blocks.md",
+        "section": "Blocks and Logging",
+        "url": "/learn/snakie_instruments/07_instruments_from_blocks.html"
+      },
+      {
+        "file": "08_logging_data.md",
+        "section": "Blocks and Logging",
+        "url": "/learn/snakie_instruments/08_logging_data.html"
+      },
+      {
+        "file": "09_project_light_scanner.md",
+        "section": "Project",
+        "url": "/learn/snakie_instruments/09_project_light_scanner.html"
+      },
+      {
+        "file": "10_summary.md",
+        "section": "Project",
+        "url": "/learn/snakie_instruments/10_summary.html"
       }
     ]
   },

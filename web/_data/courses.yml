@@ -825,6 +825,23 @@
   link: /learn/snakie_blocks/00_intro.html
   name: Snakie Blocks - From Blocks to Python
 - author: Kevin McAleer
+  cover: /learn/snakie_electronics/assets/cover.jpg
+  date_published: 2026-11-20
+  description: Plan a circuit on screen before you touch a wire. Use Snakie's Electronics
+    workspace to pick parts, wire them to a Raspberry Pi Pico, check the wiring for
+    mistakes and print a build guide, then wire and code a two-wheeled obstacle-avoiding
+    robot.
+  duration: 1h 2m
+  groups:
+  - micropython
+  - pico
+  - electronics
+  - robots
+  lessons: 12
+  level: beginner
+  link: /learn/snakie_electronics/00_intro.html
+  name: Wire It Up - Electronics in Snakie
+- author: Kevin McAleer
   cover: /learn/snakie_getting_started/assets/cover.jpg
   date_published: 2026-11-20
   description: Meet Snakie, the robotics-first MicroPython editor. Write and run your
@@ -838,6 +855,22 @@
   level: beginner
   link: /learn/snakie_getting_started/00_intro.html
   name: Getting Started with Snakie
+- author: Kevin McAleer
+  cover: /learn/snakie_instruments/assets/cover.jpg
+  date_published: 2026-11-20
+  description: See what your MicroPython program is really doing. Use Snakie's built-in
+    plotter, multimeter, oscilloscope and data logger to watch sensors and signals
+    live, then scan a room for its brightest spot with a servo and a light sensor
+    and log the results to a file.
+  duration: 0h 48m
+  groups:
+  - micropython
+  - pico
+  - electronics
+  lessons: 11
+  level: beginner
+  link: /learn/snakie_instruments/00_intro.html
+  name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - author: Kevin McAleer
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
