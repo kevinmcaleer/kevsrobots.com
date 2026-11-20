@@ -782,6 +782,20 @@
   link: /learn/smars_quad/00_intro.html
   name: Build a SMARS Quad Walking Robot
 - author: Kevin McAleer
+  cover: /learn/snakie_getting_started/assets/cover.jpg
+  date_published: 2026-11-20
+  description: Meet Snakie, the robotics-first MicroPython editor. Write and run your
+    first programs on the built-in simulator, then find your board, flash MicroPython,
+    and build a traffic light on a real Raspberry Pi Pico.
+  duration: 0h 47m
+  groups:
+  - micropython
+  - pico
+  lessons: 12
+  level: beginner
+  link: /learn/snakie_getting_started/00_intro.html
+  name: Getting Started with Snakie
+- author: Kevin McAleer
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
   description: Learn the fundamentals of SQL, relational database theory, and essential

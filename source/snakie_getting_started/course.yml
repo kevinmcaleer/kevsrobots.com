@@ -1,0 +1,37 @@
+- name: Getting Started with Snakie
+  author: Kevin McAleer
+  date_created: 2026-11-20
+  date_published: 2026-11-20
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - micropython
+      - pico
+  description: >-
+    Meet Snakie, the robotics-first MicroPython editor. Write and run your first programs on the built-in simulator, then find your board, flash MicroPython, and build a traffic light on a real Raspberry Pi Pico.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_web_or_desktop.md
+      - 02_tour_of_the_workspaces.md
+  - section:
+      name: Your First Programs
+      content:
+      - 03_first_program_on_the_simulator.md
+      - 04_the_repl_and_console.md
+      - 05_seeing_your_pins.md
+  - section:
+      name: Real Hardware
+      content:
+      - 06_finding_your_board.md
+      - 07_flashing_micropython.md
+      - 08_connect_run_stop.md
+      - 09_files_local_and_device.md
+  - section:
+      name: Project
+      content:
+      - 10_project_traffic_light.md
+      - 11_summary.md

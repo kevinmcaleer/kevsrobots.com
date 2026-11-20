@@ -4233,6 +4233,80 @@
     ]
   },
   {
+    "slug": "snakie_getting_started",
+    "name": "Getting Started with Snakie",
+    "description": "Meet Snakie, the robotics-first MicroPython editor. Write and run your first programs on the built-in simulator, then find your board, flash MicroPython, and build a traffic light on a real Raspberry Pi Pico.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-20",
+    "groups": [
+      "micropython",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_getting_started/00_intro.html"
+      },
+      {
+        "file": "01_web_or_desktop.md",
+        "section": "Overview",
+        "url": "/learn/snakie_getting_started/01_web_or_desktop.html"
+      },
+      {
+        "file": "02_tour_of_the_workspaces.md",
+        "section": "Overview",
+        "url": "/learn/snakie_getting_started/02_tour_of_the_workspaces.html"
+      },
+      {
+        "file": "03_first_program_on_the_simulator.md",
+        "section": "Your First Programs",
+        "url": "/learn/snakie_getting_started/03_first_program_on_the_simulator.html"
+      },
+      {
+        "file": "04_the_repl_and_console.md",
+        "section": "Your First Programs",
+        "url": "/learn/snakie_getting_started/04_the_repl_and_console.html"
+      },
+      {
+        "file": "05_seeing_your_pins.md",
+        "section": "Your First Programs",
+        "url": "/learn/snakie_getting_started/05_seeing_your_pins.html"
+      },
+      {
+        "file": "06_finding_your_board.md",
+        "section": "Real Hardware",
+        "url": "/learn/snakie_getting_started/06_finding_your_board.html"
+      },
+      {
+        "file": "07_flashing_micropython.md",
+        "section": "Real Hardware",
+        "url": "/learn/snakie_getting_started/07_flashing_micropython.html"
+      },
+      {
+        "file": "08_connect_run_stop.md",
+        "section": "Real Hardware",
+        "url": "/learn/snakie_getting_started/08_connect_run_stop.html"
+      },
+      {
+        "file": "09_files_local_and_device.md",
+        "section": "Real Hardware",
+        "url": "/learn/snakie_getting_started/09_files_local_and_device.html"
+      },
+      {
+        "file": "10_project_traffic_light.md",
+        "section": "Project",
+        "url": "/learn/snakie_getting_started/10_project_traffic_light.html"
+      },
+      {
+        "file": "11_summary.md",
+        "section": "Project",
+        "url": "/learn/snakie_getting_started/11_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "sql",
     "name": "Getting Started with SQL",
     "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management.",
