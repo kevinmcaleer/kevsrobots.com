@@ -19,6 +19,10 @@
 #   page.levels         the levels it covers, easiest first, e.g. ["beginner", "intermediate"]
 #   page.related        up to three other pathways, the ones sharing most courses first
 #
+# and lists every pathway in site.data.pathways, sorted by its front matter
+# `order:` (lowest first, pathways without one last, then by title). The
+# Learn homepage and the pathways index show them in that order.
+#
 # so layouts and cards never loop over every course to find one, and the
 # totals are worked out in one place.
 #
@@ -64,6 +68,10 @@ module KevsRobots
         raise Jekyll::Errors::FatalException,
               "Learning pathways list courses that are not in _data/courses.yml " \
               "(names must match a course's `name:` exactly):\n  " + problems.join("\n  ")
+      end
+
+      site.data["pathways"] = pathways.sort_by do |doc|
+        [doc.data["order"] || 9999, doc.data["title"].to_s]
       end
 
       pathways.each do |doc|

@@ -1,0 +1,26 @@
+{% comment %}
+  One learning pathway as a card: cover, title, course count, total time,
+  level range and a short description.
+
+  Usage: include pathway_card.html pathway=pathway
+  (pathway = a page from site.data.pathways, see _plugins/pathways.rb).
+  Styles: assets/css/learn-pathways.css
+{% endcomment %}
+{% assign p = include.pathway %}
+<div class="pathway-card-col">
+  <article class="pathway-card">
+    {% if p.cover %}
+    <img class="pathway-card-cover" src="{{ p.cover }}" alt="" loading="lazy">
+    {% endif %}
+    <div class="pathway-card-body">
+      <h3 class="pathway-card-title"><a class="stretched-link" href="{{ p.url }}">{{ p.title }}</a></h3>
+      <p class="pathway-meta">
+        <span>{{ p.course_count }} {% if p.course_count == 1 %}course{% else %}courses{% endif %}</span>
+        <span><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ p.duration }}</span>
+        {% if p.video %}<span class="pathway-video-badge"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Video</span>{% endif %}
+      </p>
+      <p class="pathway-meta">{% include pathway_levels.html levels=p.levels %}</p>
+      <p class="pathway-card-desc">{{ p.description }}</p>
+    </div>
+  </article>
+</div>

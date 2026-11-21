@@ -7,4 +7,5 @@ cover: /assets/img/learn/learn_linux.png
 description: Learn Linux from the basics to advanced topics.
 courses:
   - "Introduction to the Linux Command Line on Raspberry Pi OS"
+order: 14
 ---

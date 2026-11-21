@@ -11,6 +11,7 @@ courses:
   - "Getting Started with C on the Raspberry Pi Pico"
   - "Building Websites with Jekyll"
   - "Mastering Markdown for Documentation with Jekyll"
+order: 12
 ---
 
 Learn how to Program in Python, C, Rust, and more.

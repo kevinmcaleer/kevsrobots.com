@@ -14,4 +14,5 @@ courses:
   - "Using the Raspberry Pi Pico's Built-in Temperature Sensor"
   - "MicroPython Robotics Projects with the Raspberry Pi Pico"
   - "Talking to the World - Working with I2C and SPI"
+order: 3
 ---
