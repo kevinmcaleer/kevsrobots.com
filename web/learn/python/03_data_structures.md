@@ -10,7 +10,7 @@ next: 04_flow.html
 description: Discover the primary data structures in Python, including strings, lists,
   tuples, dictionaries, and sets.
 percent: 15
-duration: 3
+duration: 4
 quiz_total: 27
 navigation:
 - name: Python for beginners

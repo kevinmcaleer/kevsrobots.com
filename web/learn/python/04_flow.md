@@ -10,7 +10,7 @@ next: 05_files.html
 description: Understand how to control the flow of your Python programs using conditional
   statements, loops, and functions.
 percent: 20
-duration: 2
+duration: 3
 quiz_total: 27
 navigation:
 - name: Python for beginners
