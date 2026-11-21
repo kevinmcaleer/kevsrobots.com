@@ -1,0 +1,40 @@
+- name: "Pixel Art and Animation in Snakie"
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - micropython
+      - robots
+      - pico
+  description: >-
+    Give your robot a face. Draw 1-bit sprites and frame animations in Snakie's Sprite editor, learn how pixels become bytes, then use MicroPython's framebuf to make a pair of eyes blink, glance around and react to light on a simulated OLED, before moving the same code to a real SSD1306 screen.
+  content:
+    - section:
+        name: Overview
+        content:
+          - 00_intro.md
+          - 01_tiny_screens_and_pixels.md
+    - section:
+        name: Drawing
+        content:
+          - 02_the_sprite_editor.md
+          - 03_drawing_your_first_sprite.md
+          - 04_frames_and_animation.md
+          - 05_saving_and_exporting.md
+    - section:
+        name: Sprites in Code
+        content:
+          - 06_pixels_into_bytes.md
+          - 07_a_screen_in_the_simulator.md
+          - 08_putting_a_sprite_on_screen.md
+          - 09_animating_the_face.md
+          - 10_bigger_and_smarter.md
+    - section:
+        name: Going Further
+        content:
+          - 11_sprite_files_on_the_board.md
+          - 12_a_real_oled.md
+          - 13_summary.md
