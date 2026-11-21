@@ -76,7 +76,7 @@ for i in range(300):
 {% endcapture %}
 {% include snakie.html code=snakie_code name="wave.py" view="code" %}
 
-The box above is a mini Snakie with no instruments, so it shows the raw lines your program sends. Click **Open in Snakie** to load the same program into the full app, press **Run**, and watch two waves draw themselves on the **Plotter** in the instrument dock on the right.
+The box above is a mini Snakie with no instruments, so it shows the raw lines your program sends. Click **Open in Snakie** to run the same program in the full app and watch two waves draw themselves on the plotter.
 
 ## Course Content
 
