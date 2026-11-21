@@ -10,7 +10,7 @@ next: 09_when_the_bridge_goes_wrong.html
 description: Build Q Board stage 5, where the sketch sends sensor readings up to Python
   and asks Python for its settings over the Bridge
 percent: 90
-duration: 10
+duration: 11
 quiz_total: 27
 date_updated: 2026-11-21
 navigation:
@@ -257,6 +257,18 @@ So the pattern is:
 {:class="table table-single"}
 
 **Changing the limit.** The limit lives in Python (`LIMIT = 50`), and the sketch fetches it. To change the alarm level you only edit one number in Python, and the sketch never needs recompiling.
+
+---
+
+## Try it in the simulator
+
+This box runs the `main.py` above. The stand-in sketch does what the real one does: it asks for `get_limit`, sends `on_reading` once a second and lights LED 3 red above the limit. The slider is the potentiometer on A0.
+
+{% include uno_q_sim.html sketch="sensor" %}
+
+Press **Run** and move the slider past 50. LED 3 and LED 4 turn red. Now change `LIMIT` to 30 and run it again. For a useful mistake, add `Bridge.call("draw", bytes(104))` inside `on_reading` and read the `RuntimeError`.
+
+As before, this is a stand-in. No C++ runs here, so finish by running the App on your board.
 
 ---
 

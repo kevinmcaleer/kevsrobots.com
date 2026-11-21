@@ -143,6 +143,14 @@ App.run(user_loop=loop)
 
 Press **Run** again. You should see LED 3 blinking green at half-second intervals, and LED 1 blinking blue faster. Two brains, two programs, two speeds.
 
+### No board yet? Try it here
+
+The box below runs the Python above in your browser. A stand-in sketch blinks LED 3 green, and your Python blinks LED 1.
+
+{% include uno_q_sim.html sketch="blink" %}
+
+Press **Run**, then change the two `time.sleep()` values and run it again. The simulator is a stand-in, not the real board: no C++ runs in it, so do try this on your Uno Q as well.
+
 **Q Board stage 1 is complete.** Notice something: neither side knows the other exists. How would Python tell the sketch to do something? That is the question lesson 6 answers, and in the meantime we'll use the microcontroller to draw on the LED matrix in lesson 4.
 
 ---

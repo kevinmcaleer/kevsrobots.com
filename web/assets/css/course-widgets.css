@@ -82,3 +82,24 @@
 @media (prefers-reduced-motion: reduce) {
   .kr-br-lane, .kr-w-btn { transition: none; }
 }
+
+/* Uno Q simulator */
+.kr-sim-layout { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: flex-start; margin-bottom: 0.75rem; }
+.kr-sim-code { flex: 3 1 340px; min-width: 0; }
+.kr-sim-board { flex: 2 1 260px; min-width: 0; max-width: 420px; }
+.kr-sim-editor { box-sizing: border-box; width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; line-height: 1.4; border: 1px solid #ccc; border-radius: 6px; padding: 0.5rem 0.75rem; background: white; color: #222; resize: vertical; white-space: pre; overflow: auto; tab-size: 4; }
+.kr-sim-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 0.5rem; }
+.kr-sim-grid .kr-mx-led { cursor: default; display: block; }
+.kr-sim-leds { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin: 0.6rem 0; font-size: 0.8rem; color: #444; }
+.kr-sim-led-box { display: inline-flex; align-items: center; gap: 0.35rem; }
+.kr-sim-led { width: 0.9rem; height: 0.9rem; border-radius: 50%; background: #d9d9d9; border: 1px solid #bbb; }
+.kr-sim-led.is-on { border-color: #888; box-shadow: 0 0 8px rgba(0, 0, 0, 0.35); }
+.kr-sim-potbox { display: grid; grid-template-columns: 1fr auto; gap: 0 0.5rem; align-items: center; margin: 0.5rem 0; font-size: 0.85rem; }
+.kr-sim-potbox .kr-mx-caption { grid-column: 1 / -1; }
+.kr-sim-pot { width: 100%; }
+.kr-sim-sketch { font-size: 0.8rem; color: #555; margin: 0.5rem 0; }
+.kr-sim-msg { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: baseline; font-size: 0.78rem; padding: 0.2rem 0; border-top: 1px solid #eee; }
+.kr-sim-who { font-weight: 600; color: #444; }
+.kr-sim-up .kr-sim-who { color: #0b6b3a; }
+.kr-sim-count { margin-left: auto; color: #555; }
+.kr-sim-out { margin: 0; min-height: 3rem; max-height: 12rem; overflow: auto; background: #10151c; color: #e6edf3; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.8rem; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
