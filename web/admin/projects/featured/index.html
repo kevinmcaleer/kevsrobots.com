@@ -8,6 +8,7 @@ permalink: /admin/projects/featured/
 {% include nav_admin.html %}
 
 <link rel="stylesheet" href="/assets/css/featured-projects.css?v={{ site.time | date: '%s' }}">
+<script src="/assets/js/project-gradient.js"></script>
 
 <div class="container py-4">
   <h1><i class="fas fa-star text-warning me-3"></i> Featured Projects</h1>
@@ -34,24 +35,46 @@ permalink: /admin/projects/featured/
       </div>
       <div class="card-body">
         <p class="text-muted small mb-3">
-          Find a project by ID below and toggle its featured state.
+          Search for a published project by title, author or ID, pick it, add an
+          optional note and feature it. Projects that are already featured
+          aren't listed.
         </p>
 
-        <div class="row g-2 mb-4 align-items-end admin-feature-row">
-          <div class="col-md-2">
-            <label for="feature-project-id" class="form-label small mb-1">Project ID</label>
-            <input type="number" class="form-control" id="feature-project-id" min="1" placeholder="e.g. 42">
+        <div class="mb-3 feature-picker" id="feature-picker">
+          <label for="feature-search" class="form-label small mb-1">Project</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
+            <input type="search" class="form-control" id="feature-search" autocomplete="off"
+                   placeholder="Search by title, author or ID"
+                   role="combobox" aria-expanded="false" aria-controls="feature-results" aria-autocomplete="list">
           </div>
-          <div class="col-md-7">
+          <div id="feature-results" class="feature-results list-group d-none" role="listbox"></div>
+
+          <div id="feature-selected" class="feature-selected d-none">
+            <div class="feature-thumb" id="feature-selected-thumb"></div>
+            <div class="flex-grow-1 min-w-0">
+              <div class="fw-semibold text-truncate" id="feature-selected-title"></div>
+              <div class="small text-muted" id="feature-selected-meta"></div>
+            </div>
+            <a class="btn btn-sm btn-link" id="feature-selected-link" target="_blank" rel="noopener">View</a>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="feature-clear">
+              <i class="fas fa-times me-1"></i> Change
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-2 mb-4 align-items-end">
+          <div class="col-md-9">
             <label for="feature-note-input" class="form-label small mb-1">Editor note (optional, max 200 chars)</label>
-            <input type="text" class="form-control feature-note-input" id="feature-note-input" maxlength="200" placeholder="Why is this project being featured?">
+            <input type="text" class="form-control" id="feature-note-input" maxlength="200" placeholder="Why is this project being featured?">
           </div>
           <div class="col-md-3">
-            <button type="button" class="btn btn-warning w-100" id="feature-btn">
+            <button type="button" class="btn btn-warning w-100" id="feature-btn" disabled>
               <i class="fas fa-star me-1"></i> Feature project
             </button>
           </div>
         </div>
+        <div id="feature-status" class="small mb-3" role="status" aria-live="polite"></div>
 
         <h6 class="mb-2">Currently featured</h6>
         <div id="no-featured" class="text-muted small py-2 d-none">No featured projects yet.</div>
@@ -97,6 +120,7 @@ permalink: /admin/projects/featured/
       if (!resp.ok) throw new Error('Failed');
       document.getElementById('admin-content').classList.remove('d-none');
       loadFeatured();
+      setupPicker();
       setupFeatureButton();
     } catch (e) {
       document.getElementById('loading').classList.add('d-none');
@@ -136,41 +160,182 @@ permalink: /admin/projects/featured/
     } catch (e) {}
   }
 
+  // ---- Project picker -------------------------------------------------
+
+  var selected = null;      // the project picked from the list
+  var results = [];         // last search results
+  var activeIndex = -1;     // keyboard-highlighted row
+  var searchSeq = 0;        // ignore out-of-order responses
+  var searchTimer = null;
+
+  function thumbHtml(p) {
+    if (p.cover_image) {
+      return '<img src="' + esc(p.cover_image) + '" alt="" loading="lazy">';
+    }
+    var initials = (p.title || 'P').split(/\s+/).map(function(w) { return w[0] || ''; }).join('').substring(0, 2).toUpperCase();
+    var bg = (typeof projectGradient === 'function') ? projectGradient(p.title) : '#adb5bd';
+    return '<span class="feature-thumb-fallback" style="background:' + bg + '">' + esc(initials) + '</span>';
+  }
+
+  function projectUrl(p) {
+    return p.slug ? '/projects/' + encodeURIComponent(p.author_username) + '/' + encodeURIComponent(p.slug)
+                  : '/projects/view.html?id=' + p.id;
+  }
+
+  function setOpen(open) {
+    var list = document.getElementById('feature-results');
+    list.classList.toggle('d-none', !open);
+    document.getElementById('feature-search').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  function renderResults(message) {
+    var list = document.getElementById('feature-results');
+    if (message) {
+      list.innerHTML = '<div class="list-group-item small text-muted">' + esc(message) + '</div>';
+      setOpen(true);
+      return;
+    }
+    list.innerHTML = results.map(function(p, i) {
+      return '<button type="button" role="option" class="list-group-item list-group-item-action feature-result' +
+          (i === activeIndex ? ' active' : '') + '" data-index="' + i + '" id="feature-opt-' + i + '"' +
+          ' aria-selected="' + (i === activeIndex ? 'true' : 'false') + '">' +
+          '<span class="feature-thumb">' + thumbHtml(p) + '</span>' +
+          '<span class="flex-grow-1 min-w-0 text-start">' +
+            '<span class="d-block fw-semibold text-truncate">' + esc(p.title) + '</span>' +
+            '<span class="d-block small feature-result-meta">by ' + esc(p.author_username) + '</span>' +
+          '</span>' +
+          '<span class="badge text-bg-light feature-id">#' + p.id + '</span>' +
+        '</button>';
+    }).join('');
+    document.getElementById('feature-search').setAttribute(
+      'aria-activedescendant', activeIndex >= 0 ? 'feature-opt-' + activeIndex : '');
+    setOpen(true);
+  }
+
+  async function runSearch() {
+    var q = document.getElementById('feature-search').value.trim();
+    var seq = ++searchSeq;
+    try {
+      var url = API + '/api/admin/projects/feature-candidates?limit=30' + (q ? '&q=' + encodeURIComponent(q) : '');
+      var resp = await fetch(url, { credentials: 'include' });
+      if (seq !== searchSeq) return;
+      if (!resp.ok) { results = []; renderResults('Search failed (' + resp.status + ').'); return; }
+      results = await resp.json();
+      activeIndex = results.length ? 0 : -1;
+      if (!results.length) {
+        renderResults(q ? 'No unfeatured projects match "' + q + '".' : 'Every published project is already featured.');
+      } else {
+        renderResults();
+      }
+    } catch (e) {
+      if (seq === searchSeq) renderResults('Network error.');
+    }
+  }
+
+  function scheduleSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(runSearch, 200);
+  }
+
+  function pick(p) {
+    selected = p;
+    clearTimeout(searchTimer);
+    searchSeq++;  // drop any search still in flight so it can't reopen the list
+    setOpen(false);
+    document.getElementById('feature-search').closest('.input-group').classList.add('d-none');
+    document.getElementById('feature-selected-thumb').innerHTML = thumbHtml(p);
+    document.getElementById('feature-selected-title').textContent = p.title;
+    document.getElementById('feature-selected-meta').textContent = 'by ' + p.author_username + ' · #' + p.id;
+    document.getElementById('feature-selected-link').href = projectUrl(p);
+    document.getElementById('feature-selected').classList.remove('d-none');
+    document.getElementById('feature-btn').disabled = false;
+    document.getElementById('feature-note-input').focus();
+  }
+
+  function clearPick(focus) {
+    selected = null;
+    document.getElementById('feature-selected').classList.add('d-none');
+    document.getElementById('feature-search').closest('.input-group').classList.remove('d-none');
+    document.getElementById('feature-btn').disabled = true;
+    var input = document.getElementById('feature-search');
+    input.value = '';
+    if (focus) { input.focus(); runSearch(); }
+  }
+
+  function setStatus(text, kind) {
+    var el = document.getElementById('feature-status');
+    el.className = 'small mb-3' + (kind ? ' text-' + kind : '');
+    el.textContent = text || '';
+  }
+
+  function setupPicker() {
+    var input = document.getElementById('feature-search');
+    var list = document.getElementById('feature-results');
+
+    input.addEventListener('focus', function() { runSearch(); });
+    input.addEventListener('input', scheduleSearch);
+    input.addEventListener('keydown', function(e) {
+      var open = !list.classList.contains('d-none');
+      if (e.key === 'ArrowDown' && results.length) {
+        e.preventDefault();
+        activeIndex = Math.min(results.length - 1, activeIndex + 1);
+        renderResults();
+      } else if (e.key === 'ArrowUp' && results.length) {
+        e.preventDefault();
+        activeIndex = Math.max(0, activeIndex - 1);
+        renderResults();
+      } else if (e.key === 'Enter' && open && activeIndex >= 0) {
+        e.preventDefault();
+        pick(results[activeIndex]);
+      } else if (e.key === 'Escape') {
+        setOpen(false);
+      }
+      var row = document.getElementById('feature-opt-' + activeIndex);
+      if (row) row.scrollIntoView({ block: 'nearest' });
+    });
+    // mousedown so the pick lands before the input's blur closes the list.
+    list.addEventListener('mousedown', function(e) {
+      var row = e.target.closest('.feature-result');
+      if (!row) return;
+      e.preventDefault();
+      pick(results[parseInt(row.getAttribute('data-index'), 10)]);
+    });
+    input.addEventListener('blur', function() { setTimeout(function() { setOpen(false); }, 150); });
+    document.getElementById('feature-clear').addEventListener('click', function() { clearPick(true); });
+  }
+
   function setupFeatureButton() {
     var btn = document.getElementById('feature-btn');
     if (!btn) return;
     btn.addEventListener('click', async function() {
-      var idInput = document.getElementById('feature-project-id');
+      if (!selected) return;
       var noteInput = document.getElementById('feature-note-input');
-      var pid = parseInt(idInput.value, 10);
-      if (!pid || pid < 1) {
-        alert('Enter a valid project ID.');
-        return;
-      }
       var note = (noteInput.value || '').trim();
       if (note.length > 200) {
-        alert('Editor note is limited to 200 characters.');
+        setStatus('Editor note is limited to 200 characters.', 'danger');
         return;
       }
+      btn.disabled = true;
       try {
-        var resp = await fetch(API + '/api/admin/projects/' + pid + '/feature', {
+        var resp = await fetch(API + '/api/admin/projects/' + selected.id + '/feature', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({ note: note || null })
         });
-        if (resp.status === 404) {
-          alert('Project not found.');
-          return;
-        }
         if (!resp.ok) {
-          alert('Failed to feature project.');
+          setStatus(resp.status === 404 ? 'That project no longer exists.' : 'Failed to feature project.', 'danger');
+          btn.disabled = false;
           return;
         }
-        idInput.value = '';
+        setStatus('Featured "' + selected.title + '".', 'success');
         noteInput.value = '';
+        clearPick(false);
         loadFeatured();
-      } catch (e) { alert('Network error.'); }
+      } catch (e) {
+        setStatus('Network error.', 'danger');
+        btn.disabled = false;
+      }
     });
   }
 
