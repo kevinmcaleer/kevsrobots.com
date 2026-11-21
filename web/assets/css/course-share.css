@@ -1,0 +1,284 @@
+/*
+ * Course complete: the dialog on lesson pages (_includes/course_complete_dialog.html),
+ * the share buttons (_includes/course_share_buttons.html) and the
+ * /learn/<slug>/completed.html landing page (_layouts/course_completed.html).
+ */
+
+/* --- Share buttons ------------------------------------------------------- */
+.kr-share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.kr-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.kr-share-btn:hover,
+.kr-share-btn:focus-visible {
+  color: #fff;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.kr-share-btn[hidden] { display: none; }
+
+.kr-share-native   { background: #C22032; }
+.kr-share-x        { background: #000; }
+.kr-share-bluesky  { background: #1185fe; }
+.kr-share-linkedin { background: #0a66c2; }
+.kr-share-facebook { background: #1877f2; }
+.kr-share-mastodon { background: #6364ff; }
+.kr-share-copy {
+  background: #fff;
+  color: #212529;
+  border-color: #ced4da;
+}
+.kr-share-copy:hover,
+.kr-share-copy:focus-visible { color: #212529; }
+
+.kr-share-mastodon-form {
+  flex-basis: 100%;
+  font-size: 0.9rem;
+}
+.kr-share-mastodon-form label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #555;
+}
+.kr-share-mastodon-row {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 24rem;
+}
+.kr-share-mastodon-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.4rem;
+}
+
+.kr-share-status:empty { display: none; }
+
+.kr-share-status {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #2EA05A;
+}
+
+/* --- Sidebar link on lesson pages --------------------------------------- */
+.kr-share-achievement {
+  display: inline-block;
+  margin: 0.25rem 0 0.4rem;
+  font-weight: 600;
+  color: #C22032;
+}
+.kr-share-achievement[hidden] { display: none; }
+
+/* --- The "Course complete" dialog --------------------------------------- */
+.kr-complete {
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  padding: 2rem 1.75rem 1.5rem;
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  overflow: auto;
+}
+
+.kr-complete::backdrop {
+  background: rgba(20, 23, 31, 0.6);
+}
+
+.kr-complete[open] {
+  animation: kr-complete-in 0.25s ease-out;
+}
+
+@keyframes kr-complete-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+.kr-complete-close {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0 !important;
+  outline-offset: 2px;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f3f5;
+  color: #333;
+}
+.kr-complete-close:hover { background: #e2e6ea; }
+.kr-complete-title:focus { outline: none; }
+
+.kr-complete-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #2EA05A;
+}
+
+.kr-complete-title {
+  margin: 0 2rem 0.5rem 0;
+  text-transform: none;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.kr-complete-sub {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.kr-complete-card {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 1.1rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.kr-complete-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.kr-complete-confetti {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+.kr-complete-confetti i {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0;
+  animation-name: kr-confetti;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+@keyframes kr-confetti {
+  0%   { opacity: 1; top: -12px; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; top: 100%; }
+}
+
+@media (max-width: 575.98px) {
+  .kr-complete { padding: 1.5rem 1rem 1rem; }
+  .kr-complete-title { font-size: 1.3rem; }
+  .kr-share-btn { padding: 0.45rem 0.7rem; }
+}
+
+/* --- /learn/<slug>/completed.html ---------------------------------------- */
+.kr-completed-hero {
+  padding: 2.5rem 0 1.5rem;
+}
+
+.kr-completed-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: #e8f6ee;
+  color: #1f7a45;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.kr-completed-hero h1 {
+  /* main.scss sets every h1 to 40pt !important; course names are long */
+  font-size: clamp(1.9rem, 4.5vw, 3rem) !important;
+  overflow-wrap: break-word;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.kr-completed-lead {
+  max-width: 60ch;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+.kr-completed-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin: 1rem 0 1.25rem;
+  padding: 0;
+  list-style: none;
+  color: #555;
+}
+
+.kr-completed-actions .fa-youtube,
+.kr-complete-next .fa-youtube { margin-right: 0.35rem; }
+
+.kr-completed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.kr-completed-media {
+  overflow: hidden;
+  border-radius: 0.9rem;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+.kr-completed-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.kr-completed-you {
+  margin: 1.5rem 0 0;
+  padding: 1.25rem;
+  border: 1px solid #f4d78a;
+  border-radius: 0.9rem;
+  background: #fff9e6;
+}
+.kr-completed-you[hidden] { display: none; }
+.kr-completed-you h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}

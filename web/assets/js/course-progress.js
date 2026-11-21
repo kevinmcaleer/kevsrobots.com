@@ -3,7 +3,8 @@
 // Everything is kept in the reader's browser (localStorage), one record per
 // course, keyed by the course folder (e.g. /learn/micropython/):
 //   { visited: { "01_intro": true, ... }, answers: { "<question id>": true|false },
-//     last: "01_intro", updated: <ms since 1970> }
+//     last: "01_intro", updated: <ms since 1970>,
+//     completed: <ms since 1970, set when the "Course complete" dialog was shown> }
 // Only the first answer to each question counts towards the score.
 (function () {
     const STORAGE_PREFIX = 'kr-course:';
@@ -67,6 +68,9 @@
                 : `${visited} of ${links.length} lessons visited (${percent}%)`;
         }
 
+        const shareLink = document.querySelector('[data-course-share-open]');
+        if (shareLink) shareLink.hidden = visited !== links.length;
+
         const score = document.querySelector('[data-quiz-score]');
         if (score) {
             const total = Number(score.dataset.quizTotal) || 0;
@@ -76,6 +80,41 @@
             score.querySelector('[data-quiz-score-text]').textContent =
                 `${correct} / ${total}` + (answered.length < total ? ` (${total - answered.length} to go)` : '');
         }
+    }
+
+    // --- Course complete: congratulate once, then offer to share ------------
+    // course-share.js (loaded only for courses with social cards) provides
+    // window.krCourseShare. state.completed remembers we've said well done.
+    function quizScore() {
+        const el = document.querySelector('[data-quiz-score]');
+        const total = el ? Number(el.dataset.quizTotal) || 0 : 0;
+        const answered = Object.values(state.answers);
+        if (total === 0 || answered.length < total) return '';
+        return `${answered.filter(Boolean).length}/${total}`;
+    }
+
+    function isComplete() {
+        const links = Array.from(document.querySelectorAll('.course-nav-item'));
+        return links.length > 0 &&
+            links.every(link => state.visited[lessonId(link.getAttribute('href') || '')]);
+    }
+
+    function checkComplete() {
+        if (!window.krCourseShare) return;
+        window.krCourseShare.setScore(quizScore());
+        if (isComplete() && !state.completed) {
+            state.completed = Date.now();
+            save(state);
+            window.krCourseShare.open({ score: quizScore() });
+        }
+    }
+
+    const shareOpen = document.querySelector('[data-course-share-open]');
+    if (shareOpen) {
+        shareOpen.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.krCourseShare) window.krCourseShare.open({ score: quizScore() });
+        });
     }
 
     // --- Quizzes --------------------------------------------------------------
@@ -103,6 +142,7 @@
                 state.answers[qid] = right;
                 save(state);
                 updateSidebar();
+                if (window.krCourseShare) window.krCourseShare.setScore(quizScore());
             }
 
             options.forEach((o, i) => {
@@ -137,10 +177,12 @@
             if (!confirm('Reset your progress and quiz score for this course?')) return;
             state.visited = { [currentLesson]: true };
             state.answers = {};
+            delete state.completed;
             save(state);
             updateSidebar();
         });
     }
 
     updateSidebar();
+    checkComplete();
 })();
