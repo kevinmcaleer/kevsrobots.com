@@ -339,6 +339,21 @@ async def list_projects(
         None,
         description="Only projects made with this suite app: snakie or bettercad.",
     ),
+    ids: Optional[str] = Query(
+        None,
+        max_length=600,
+        description=(
+            "Comma-separated project ids (at most 50), e.g. the projects "
+            "someone liked. Unknown, draft or blocked ids are left out."
+        ),
+    ),
+    following: bool = Query(
+        False,
+        description=(
+            "Only projects by people the caller follows (the homepage's "
+            "\"From people you follow\" tab). Empty for anonymous callers."
+        ),
+    ),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     user: Optional[str] = Depends(get_optional_user),
@@ -376,6 +391,20 @@ async def list_projects(
         query = query.where(Project.author_username == author)
     if made_with:
         query = query.where(made_with_clause(made_with))
+    if ids is not None:
+        try:
+            wanted = [int(i) for i in ids.split(",") if i.strip()][:50]
+        except ValueError:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="ids must be numbers")
+        query = query.where(Project.id.in_(wanted))
+    if following:
+        if not user:
+            return []
+        query = query.where(
+            Project.author_username.in_(
+                select(UserFollow.followee_id).where(UserFollow.follower_id == user)
+            )
+        )
     if search:
         query = query.where(
             live_title.ilike(f"%{search}%") | live_desc.ilike(f"%{search}%")

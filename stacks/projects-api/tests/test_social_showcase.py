@@ -107,6 +107,27 @@ async def test_feed_shows_people_you_follow(client) -> None:
 
 
 @pytest.mark.asyncio
+async def test_gallery_of_people_you_follow(client) -> None:
+    bob = await _project(client, "bob", "Bob's robot")
+    await _project(client, "carol", "Carol's robot")
+    await client.post("/api/users/bob/follow", headers=make_auth_header("alice"))
+
+    r = await client.get("/api/projects?following=true", headers=make_auth_header("alice"))
+    assert [p["id"] for p in r.json()] == [bob]
+    assert (await client.get("/api/projects?following=true")).json() == []
+
+
+@pytest.mark.asyncio
+async def test_gallery_by_ids(client) -> None:
+    a = await _project(client, "alice", "Robot arm")
+    b = await _project(client, "bob", "Bob's robot")
+    secret = await _project(client, "bob", "Secret", status="draft")
+    r = await client.get(f"/api/projects?ids={a},{b},{secret},999")
+    assert sorted(p["id"] for p in r.json()) == sorted([a, b])
+    assert (await client.get("/api/projects?ids=1,x")).status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_feed_needs_sign_in(client) -> None:
     assert (await client.get("/api/users/me/feed")).status_code == 401
 
