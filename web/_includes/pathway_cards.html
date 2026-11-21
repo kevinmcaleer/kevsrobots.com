@@ -1,0 +1,37 @@
+{% comment %}
+  Grid of learning pathway cards, in site.data.pathways order.
+
+  Usage: include pathway_cards.html            every pathway
+         include pathway_cards.html first=8    the first 8, with a button to show the rest
+{% endcomment %}
+{% assign first = include.first | default: 0 | plus: 0 %}
+<div class="pathway-cards" {% if first > 0 %}data-pathway-first="{{ first }}"{% endif %}>
+  {% for pathway in site.data.pathways %}
+    {% include pathway_card.html pathway=pathway %}
+  {% endfor %}
+</div>
+{% if first > 0 and site.data.pathways.size > first %}
+<p class="pathway-cards-more" hidden>
+  <button type="button" class="btn btn-outline-dark" data-pathway-toggle
+          data-more="Show all {{ site.data.pathways.size }} pathways" data-fewer="Show fewer pathways">Show all {{ site.data.pathways.size }} pathways</button>
+</p>
+<script>
+// Collapse the grid to its first few cards. Done here rather than in the HTML
+// so every pathway is listed, and linked, when JavaScript is off.
+(function () {
+    const grid = document.currentScript.previousElementSibling.previousElementSibling;
+    const more = document.currentScript.previousElementSibling;
+    const button = more.querySelector('[data-pathway-toggle]');
+    const first = Number(grid.dataset.pathwayFirst);
+    const extra = Array.from(grid.children).slice(first);
+    function set(open) {
+        extra.forEach(card => { card.hidden = !open; });
+        button.textContent = open ? button.dataset.fewer : button.dataset.more;
+        button.setAttribute('aria-expanded', open);
+    }
+    more.hidden = false;
+    set(false);
+    button.addEventListener('click', () => set(button.getAttribute('aria-expanded') !== 'true'));
+})();
+</script>
+{% endif %}

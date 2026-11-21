@@ -27,6 +27,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
+from ..made_with import App, made_with_clause, made_with_map
 from ..versions import LiveView, live_views
 from ..models import Project, ProjectTag
 from ..visibility import not_draft
@@ -49,7 +50,9 @@ async def _tags_for(session: AsyncSession, project_id: int) -> list[str]:
     return list(rows)
 
 
-def _to_response(project: Project, tags: list[str]) -> FeaturedProjectResponse:
+def _to_response(
+    project: Project, tags: list[str], made_with: Optional[list[str]] = None
+) -> FeaturedProjectResponse:
     return FeaturedProjectResponse(
         id=project.id,
         slug=getattr(project, "slug", None),
@@ -66,6 +69,7 @@ def _to_response(project: Project, tags: list[str]) -> FeaturedProjectResponse:
         featured_at=project.featured_at,
         featured_by=project.featured_by,
         featured_note=project.featured_note,
+        made_with=made_with or [],
     )
 
 
@@ -146,6 +150,10 @@ async def unfeature_project(
 )
 async def list_featured_projects(
     limit: int = Query(20, ge=1, le=100),
+    made_with: Optional[App] = Query(
+        None,
+        description="Only featured projects made with this suite app: snakie or bettercad.",
+    ),
     session: AsyncSession = Depends(get_session),
 ) -> list[FeaturedProjectResponse]:
     """Public endpoint: featured projects newest-feature-first.
@@ -167,10 +175,13 @@ async def list_featured_projects(
         .order_by(Project.featured_at.desc().nullslast(), Project.id.desc())
         .limit(limit)
     )
+    if made_with:
+        query = query.where(made_with_clause(made_with))
     # Epic #433: cards show the live version.
     projects = await live_views(session, list((await session.scalars(query)).all()))
+    apps = await made_with_map(session, [p.id for p in projects])
     out: list[FeaturedProjectResponse] = []
     for p in projects:
         tags = list(p.live_tags) if isinstance(p, LiveView) else await _tags_for(session, p.id)
-        out.append(_to_response(p, tags))
+        out.append(_to_response(p, tags, apps.get(p.id)))
     return out

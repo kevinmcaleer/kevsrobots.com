@@ -1,0 +1,84 @@
+{% comment %}
+  The Learn homepage (/learn/), top to bottom:
+
+    1. Heading and search
+       (then "Continue learning", only for readers with saved lesson progress)
+    2. Learning pathways (the first 8, button for the rest)
+    3. New courses (the 4 newest)
+    4. Periodic Table of Robotics, as a slim strip
+    5. All courses, with filters (learn_filter.html)
+    6. Resources links
+
+  Pathways lead because they answer "where do I start". The full catalogue
+  is still here, at #all-courses. Styles: assets/css/learn.css
+{% endcomment %}
+{% assign newest = site.data.courses | sort: "date_published" | reverse %}
+
+<header class="learn-head">
+  <div>
+    <h1>Learn robotics, step by step</h1>
+    <p class="learn-lead">{{ site.data.courses.size }} free courses, grouped into {{ site.data.pathways.size }} learning pathways. Pick a pathway and follow it from lesson one, or jump in at your level.</p>
+  </div>
+  <form class="learn-search" id="learn-search" role="search" action="#all-courses">
+    <input type="search" class="form-control" id="learn-search-input" placeholder="Search courses" aria-label="Search courses">
+    <button type="submit" class="btn btn-outline-dark">Search</button>
+  </form>
+</header>
+
+{% comment %} Filled in by assets/js/learn-progress.js for readers with saved lesson progress. {% endcomment %}
+<section class="learn-continue" id="learn-continue" aria-labelledby="learn-continue-title" hidden>
+  <h2 id="learn-continue-title">Continue learning</h2>
+  <div class="learn-continue-cards" data-continue-cards></div>
+</section>
+
+<section aria-labelledby="learn-pathways-title">
+  <div class="learn-section-head">
+    <div>
+      <h2 id="learn-pathways-title">Choose a learning pathway</h2>
+      <p>A pathway is a set of courses in order. Hover a card to see what is inside.</p>
+    </div>
+    <a href="/learn/learning_pathways/">About learning pathways</a>
+  </div>
+  {% include pathway_cards.html first=8 %}
+</section>
+
+<section aria-labelledby="learn-new-title">
+  <div class="learn-section-head">
+    <h2 id="learn-new-title">New courses</h2>
+    <a href="#all-courses">Browse all {{ site.data.courses.size }} courses</a>
+  </div>
+  <div class="learn-new">
+    {% for course in newest limit: 4 %}
+    <a class="learn-new-card" href="{{ course.link }}">
+      <img src="{{ course.cover }}" alt="" loading="lazy">
+      <span class="learn-new-body">
+        <span class="learn-new-title">{{ course.name }}</span>
+        <span class="pathway-meta">
+          <span class="pathway-level pathway-level-{{ course.level | default: 'beginner' }}">{{ course.level | default: "beginner" }}</span>
+          <span><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ course.duration | remove: "0h " }}</span>
+        </span>
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% include ptor_feature.html slim=true %}
+
+<section id="all-courses" aria-labelledby="learn-all-title">
+  <div class="learn-section-head">
+    <h2 id="learn-all-title">All courses</h2>
+  </div>
+  {% include learn_filter.html %}
+</section>
+
+<nav class="learn-resources" aria-label="More ways to learn">
+  <span>More ways to learn:</span>
+  <a href="/learn/recent">Recent courses</a>
+  <a href="/resources/glossary">Glossary</a>
+  <a href="/resources/how_it_works/">How It Works</a>
+  <a href="/resources/boards/">Boards</a>
+  <a href="/stem/">STEM Centre</a>
+</nav>
+
+<script src="/assets/js/learn-progress.js?v={{ site.time | date: '%s' }}"></script>

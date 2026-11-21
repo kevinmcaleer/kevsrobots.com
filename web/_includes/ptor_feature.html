@@ -3,11 +3,33 @@
   Reusable on the homepage and the /learn/ header. Shows a curated teaser
   strip of element tiles (looked up from the data file so codes/colours
   stay in sync) plus a heading and CTA. ptor.css is loaded globally
-  (default.html). Optional param: include.compact (tighter header padding).
+  (default.html). Optional params: include.compact (tighter header padding),
+  include.slim (one short strip: a line of text, ten small tiles and the
+  button, used on /learn/ where the courses lead).
 {% endcomment %}
 {% assign pt = site.data.periodic_table %}
 {% assign teaser = "ar,py,mp,rp,pi,cv,oh,pr,ro,sm,ra,dr" | split: "," %}
 
+{% if include.slim %}
+<div class="ptor-feature ptor-feature-slim rounded-3">
+  <div class="ptor-feature-slim-text">
+    <h2>The Periodic Table of Robotics</h2>
+    <p class="ptor-feature-lead">Not sure what to learn? Explore {{ pt.elements.size }} topics and find the courses for each.</p>
+  </div>
+  <div class="ptor-feature-slim-tiles">
+    {% for slug in teaser limit: 10 %}
+      {% assign el = pt.elements | where: "slug", slug | first %}
+      {% if el %}
+      <a class="ptor-feature-tile ptor-cat-{{ el.category }}"
+         href="/periodic-table/{{ el.slug }}.html" title="{{ el.name }}" aria-label="{{ el.name }}">
+        <span class="ptor-feature-code">{{ el.code }}</span>
+      </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <a href="/periodic-table/" class="btn btn-light btn-sm"><i class="fas fa-atom me-2"></i>Explore the table</a>
+</div>
+{% else %}
 <div class="ptor-feature rounded-3 {% if include.compact %}p-3 my-2{% else %}p-4 my-3{% endif %}">
   <div class="row align-items-center g-3">
     <div class="col-lg-7">
@@ -38,3 +60,4 @@
     </div>
   </div>
 </div>
+{% endif %}

@@ -31,6 +31,7 @@ from ..schemas import (
     RemixedFromRef,
 )
 from ..graphics import prune_superseded
+from ..made_with import App, made_with_clause, made_with_for
 from ..sections import canonical_sections
 from ..slugs import slugify_title, unique_slug_for_author
 from ..visibility import is_draft, not_draft
@@ -271,6 +272,7 @@ async def _project_response(
         live_number=live_number,
         has_unpublished_changes=unpublished,
         viewing=view.label if view is not None else "working",
+        made_with=await made_with_for(session, project.id),
     )
 
 
@@ -293,6 +295,7 @@ async def list_item(session: AsyncSession, p, **extra) -> ProjectListItem:
         is_featured=bool(getattr(p, "is_featured", False)),
         featured_note=getattr(p, "featured_note", None),
         sections=await _sections(session, p),
+        made_with=await made_with_for(session, p.id),
         **extra,
     )
 
@@ -332,6 +335,25 @@ async def list_projects(
             "general pool. Ignored for anonymous callers."
         ),
     ),
+    made_with: Optional[App] = Query(
+        None,
+        description="Only projects made with this suite app: snakie or bettercad.",
+    ),
+    ids: Optional[str] = Query(
+        None,
+        max_length=600,
+        description=(
+            "Comma-separated project ids (at most 50), e.g. the projects "
+            "someone liked. Unknown, draft or blocked ids are left out."
+        ),
+    ),
+    following: bool = Query(
+        False,
+        description=(
+            "Only projects by people the caller follows (the homepage's "
+            "\"From people you follow\" tab). Empty for anonymous callers."
+        ),
+    ),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     user: Optional[str] = Depends(get_optional_user),
@@ -367,6 +389,22 @@ async def list_projects(
         query = query.where(live_difficulty == difficulty)
     if author:
         query = query.where(Project.author_username == author)
+    if made_with:
+        query = query.where(made_with_clause(made_with))
+    if ids is not None:
+        try:
+            wanted = [int(i) for i in ids.split(",") if i.strip()][:50]
+        except ValueError:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="ids must be numbers")
+        query = query.where(Project.id.in_(wanted))
+    if following:
+        if not user:
+            return []
+        query = query.where(
+            Project.author_username.in_(
+                select(UserFollow.followee_id).where(UserFollow.follower_id == user)
+            )
+        )
     if search:
         query = query.where(
             live_title.ilike(f"%{search}%") | live_desc.ilike(f"%{search}%")

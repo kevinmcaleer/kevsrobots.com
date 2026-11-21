@@ -1,0 +1,142 @@
+/* kr-project-card: the shared project card (assets/js/kr-project-card.js).
+ * Suite tokens from /assets/suite/kr-tokens.css; Snakie green and BetterCAD
+ * violet mark which app a project was made with. */
+
+.krc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--kr-space-4, 16px);
+}
+
+.krc {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--kr-panel, #fff);
+  border: 1px solid var(--kr-line, #e2e4e8);
+  border-radius: var(--kr-radius-lg, 12px);
+  overflow: visible;
+  font-family: var(--kr-font-ui, system-ui, sans-serif);
+  color: var(--kr-ink, #1c2230);
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+.krc:hover { box-shadow: var(--kr-shadow, 0 8px 24px rgba(28, 34, 48, .08)); }
+
+.krc-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--kr-radius-lg, 12px) var(--kr-radius-lg, 12px) 0 0;
+  background: var(--kr-sunk, #eef0ec);
+  text-decoration: none !important;
+}
+.krc-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.krc-cover-fallback {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font: 700 2.6rem/1 var(--kr-font-display, sans-serif);
+  color: rgba(255, 255, 255, .85);
+  background: linear-gradient(150deg, hsl(var(--krc-h, 200), 45%, 38%), hsl(calc(var(--krc-h, 200) + 40), 50%, 22%));
+}
+
+.krc-made { position: absolute; left: 8px; top: 8px; display: flex; gap: 4px; flex-wrap: wrap; }
+.krc-app {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--kr-radius-pill, 999px);
+  background: rgba(255, 255, 255, .94);
+  font-size: .7rem; font-weight: 700; line-height: 1.2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+}
+.krc-app::before { content: ""; width: 7px; height: 7px; border-radius: 2px; background: currentColor; }
+.krc-app-snakie { color: #1e7f52; }
+.krc-app-bettercad { color: var(--kr-violet, #7c3aed); }
+
+.krc-body { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 10px; flex: 1; min-width: 0; }
+.krc-title { margin: 0; font: 700 .95rem/1.3 var(--kr-font-ui, system-ui, sans-serif); }
+.krc-title a { color: inherit; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.krc-title a:hover { color: var(--kr-red, #c22032); }
+.krc-desc { margin: 0; font-size: .85rem; color: var(--kr-ink-soft, #5a6275); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.krc-by { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: .8rem; }
+.krc-author { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; color: var(--kr-ink-soft, #5a6275); text-decoration: none; }
+.krc-author:hover .krc-author-name { text-decoration: underline; }
+.krc-author-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.krc-avatar {
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .68rem; font-weight: 700; color: #fff;
+  background: hsl(var(--krc-h, 0), 55%, 45%);
+}
+
+.krc-follow {
+  flex: none;
+  font: 700 .72rem/1 var(--kr-font-ui, system-ui, sans-serif);
+  padding: 5px 10px;
+  border-radius: var(--kr-radius-pill, 999px);
+  border: 1px solid var(--kr-red, #c22032);
+  background: transparent;
+  color: var(--kr-red, #c22032);
+  cursor: pointer;
+}
+.krc-follow[aria-pressed="true"] { background: var(--kr-red, #c22032); color: #fff; }
+.krc-follow:disabled { opacity: .6; }
+/* Desktop: Follow appears on hover or focus unless you already follow. */
+@media (hover: hover) and (pointer: fine) {
+  .krc .krc-follow[aria-pressed="false"] { opacity: 0; transition: opacity .15s; }
+  .krc:hover .krc-follow, .krc:focus-within .krc-follow { opacity: 1; }
+}
+
+.krc-acts {
+  display: flex; align-items: center; gap: 14px;
+  margin-top: auto; padding-top: 8px;
+  border-top: 1px solid var(--kr-line, #e2e4e8);
+  font-size: .8rem; color: var(--kr-ink-soft, #5a6275);
+  position: relative;
+}
+.krc-acts button, .krc-acts a {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 0; border: 0; background: none;
+  font: inherit; color: inherit; text-decoration: none; cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.krc-acts button:hover, .krc-acts a:hover { color: var(--kr-ink, #1c2230); }
+.krc-spacer { flex: 1; }
+.krc-ico { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.krc-like[aria-pressed="true"] { color: var(--kr-red, #c22032); }
+.krc-like[aria-pressed="true"] .krc-heart { fill: currentColor; }
+@media (prefers-reduced-motion: no-preference) {
+  .krc-like:active .krc-heart { transform: scale(1.25); }
+  .krc-heart { transition: transform .12s; }
+}
+
+.krc button:focus-visible, .krc a:focus-visible { outline: 2px solid var(--kr-red, #c22032); outline-offset: 2px; border-radius: 4px; }
+
+.krc-share-menu {
+  position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 20;
+  display: flex; flex-direction: column; min-width: 170px; max-width: 260px;
+  padding: 6px;
+  background: var(--kr-panel, #fff);
+  border: 1px solid var(--kr-line, #e2e4e8);
+  border-radius: var(--kr-radius, 8px);
+  box-shadow: var(--kr-shadow-lg, 0 16px 40px rgba(28, 34, 48, .14));
+}
+.krc-share-menu a, .krc-share-menu button {
+  display: block; width: 100%; text-align: left;
+  padding: 7px 10px; border-radius: 6px;
+  color: var(--kr-ink, #1c2230) !important;
+}
+.krc-share-menu a:hover, .krc-share-menu button:hover { background: var(--kr-sunk, #eef0ec); }
+.krc-share-menu .krc-share-copy { font-weight: 700; }
+.krc-share-menu .krc-share-url { font-weight: 400; word-break: break-all; user-select: all; }
+
+/* Large variant: pinned projects on profiles. */
+.krc-lg .krc-title { font-size: 1.05rem; }
+.krc-lg .krc-cover { aspect-ratio: 16 / 10; }
+
+/* While a grid loads: same height as the cards, so nothing below jumps. */
+.krc-skeleton { border: 1px solid var(--kr-line, #e2e4e8); border-radius: var(--kr-radius-lg, 12px); background: var(--kr-panel, #fff); overflow: hidden; }
+.krc-skeleton::before { content: ""; display: block; aspect-ratio: 4 / 3; background: var(--kr-sunk, #eef0ec); }
+.krc-skeleton::after { content: ""; display: block; height: 96px; }

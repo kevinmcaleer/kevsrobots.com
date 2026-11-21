@@ -15,3 +15,8 @@ print(courses.output_yml('web/_data'))
 # Kept as a separate module so it can also be run standalone.
 import build_course_manifest
 build_course_manifest.build()
+
+# Social share cards (og:image) for every course, incl. the "I completed it"
+# card used by /learn/<course>/completed.html. See course_builder/social_cards.py.
+from course_builder.social_cards import generate as generate_social_cards
+generate_social_cards()

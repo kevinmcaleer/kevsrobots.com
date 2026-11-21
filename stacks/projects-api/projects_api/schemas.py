@@ -160,6 +160,9 @@ class ProjectResponse(BaseModel):
     live_number: Optional[int] = None
     has_unpublished_changes: Optional[bool] = None
     viewing: str = "working"
+    # Suite apps the project was made with ("snakie", "bettercad"),
+    # worked out from its wiring and imports (made_with.py).
+    made_with: list[str] = Field(default_factory=list)
 
 
 class ProjectListItem(BaseModel):
@@ -191,6 +194,8 @@ class ProjectListItem(BaseModel):
     # Epic #433, author's own list (``/my/list``) only.
     live_number: Optional[int] = None
     has_unpublished_changes: Optional[bool] = None
+    # Suite apps the project was made with ("snakie", "bettercad").
+    made_with: list[str] = Field(default_factory=list)
 
 
 class VersionSummary(BaseModel):
@@ -1430,6 +1435,14 @@ class UserProfileResponse(BaseModel):
     stats: UserProfileStats = Field(default_factory=UserProfileStats)
     # Issue #150: ISO 4217 code or None ("auto-detect / show native").
     preferred_currency: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
+    # The owner's pinned projects, as cards, in their chosen order. Only
+    # public projects are included, so the list can be shorter than
+    # ``pinned_project_ids``.
+    pinned_project_ids: list[int] = Field(default_factory=list)
+    pinned: list[ProjectListItem] = Field(default_factory=list)
+    # How many public projects were made with each suite app, for the
+    # profile's "Builds with" chips: {"snakie": 7, "bettercad": 3}.
+    builds_with: dict[str, int] = Field(default_factory=dict)
 
 
 class UserProfileUpdate(BaseModel):
@@ -1450,6 +1463,8 @@ class UserProfileUpdate(BaseModel):
     # (back to auto-detect). Must be a 3-letter ISO 4217 alpha code.
     # The route validates the value is in the supported allow-list.
     preferred_currency: Optional[str] = Field(None, pattern=r"^[A-Z]{3}$")
+    # Up to 3 of the caller's own public project ids; [] clears.
+    pinned_project_ids: Optional[list[int]] = Field(None, max_length=3)
 
 
 class UserActivityItem(BaseModel):
@@ -1464,6 +1479,18 @@ class UserActivityItem(BaseModel):
 class UserActivityResponse(BaseModel):
     username: str
     items: list[UserActivityItem] = Field(default_factory=list)
+    limit: int
+    offset: int
+
+
+class FeedItem(UserActivityItem):
+    """An activity row in the caller's following feed: whose it is too."""
+
+    username: str
+
+
+class FeedResponse(BaseModel):
+    items: list[FeedItem] = Field(default_factory=list)
     limit: int
     offset: int
 
@@ -1820,6 +1847,8 @@ class FeaturedProjectResponse(BaseModel):
     featured_at: Optional[datetime] = None
     featured_by: Optional[str] = None
     featured_note: Optional[str] = None
+    # Suite apps the project was made with ("snakie", "bettercad").
+    made_with: list[str] = Field(default_factory=list)
 
 
 class StaffPickCreate(BaseModel):

@@ -34,6 +34,7 @@ from ..auth import get_current_user
 from ..config import get_settings
 from ..db import get_session
 from ..fx import SUPPORTED_CURRENCIES
+from ..made_with import APPS, made_with_clause
 from ..models import (
     Download,
     Make,
@@ -45,7 +46,10 @@ from ..models import (
 )
 from ..visibility import not_draft
 from ..schemas import (
+    FeedItem,
+    FeedResponse,
     FollowCheckResponse,
+    ProjectListItem,
     UserActivityItem,
     UserActivityResponse,
     UserListItem,
@@ -90,6 +94,49 @@ def _validate_optional_url(value: Optional[str], field: str) -> Optional[str]:
 
 
 # --- Profile GET ---------------------------------------------------------
+
+
+def _public_projects_of(username: str):
+    """Filters for a user's projects that anyone may see on their profile."""
+    return (
+        Project.author_username == username,
+        Project.is_blocked == False,  # noqa: E712
+        Project.status != "archived",
+        not_draft(),
+    )
+
+
+async def _builds_with(session: AsyncSession, username: str) -> dict[str, int]:
+    """Public project counts per suite app, leaving out apps never used."""
+    counts: dict[str, int] = {}
+    for app in APPS:
+        n = await session.scalar(
+            select(func.count(Project.id)).where(
+                *_public_projects_of(username), made_with_clause(app)
+            )
+        ) or 0
+        if n:
+            counts[app] = int(n)
+    return counts
+
+
+async def _pinned_cards(
+    session: AsyncSession, username: str, ids: list[int]
+) -> list[ProjectListItem]:
+    """Cards for the pinned ids that are still public, in pinned order."""
+    if not ids:
+        return []
+    from ..versions import live_views
+    from .projects import list_item  # projects.py imports this module
+
+    rows = (
+        await session.scalars(
+            select(Project).where(Project.id.in_(ids), *_public_projects_of(username))
+        )
+    ).all()
+    by_id = {p.id: p for p in await live_views(session, list(rows))}
+    return [await list_item(session, by_id[i]) for i in ids if i in by_id]
+
 
 
 async def _compute_stats(session: AsyncSession, username: str) -> UserProfileStats:
@@ -249,6 +296,9 @@ async def get_profile(
         if profile and profile.featured_badge_slugs
         else []
     )
+    pinned_ids = [
+        int(i) for i in (profile.pinned_project_ids or [] if profile else [])
+    ][:3]
 
     return UserProfileResponse(
         username=username,
@@ -261,6 +311,9 @@ async def get_profile(
         featured_badge_slugs=featured,
         stats=stats,
         preferred_currency=(profile.preferred_currency if profile else None),
+        pinned_project_ids=pinned_ids,
+        pinned=await _pinned_cards(session, username, pinned_ids),
+        builds_with=await _builds_with(session, username),
     )
 
 
@@ -358,6 +411,10 @@ async def update_my_profile(
             )
         featured = cleaned_slugs
 
+    pinned: Optional[list[int]] = None
+    if body.pinned_project_ids is not None:
+        pinned = await _clean_pinned_ids(session, user, body.pinned_project_ids)
+
     profile = await session.get(UserProfile, user)
     now = datetime.utcnow()
     if profile is None:
@@ -369,6 +426,7 @@ async def update_my_profile(
             social_links=social,
             featured_badge_slugs=featured,
             preferred_currency=preferred_currency,
+            pinned_project_ids=pinned,
             created_at=now,
             updated_at=now,
         )
@@ -389,12 +447,43 @@ async def update_my_profile(
             profile.featured_badge_slugs = featured
         if "preferred_currency" in sent:
             profile.preferred_currency = preferred_currency
+        if "pinned_project_ids" in sent:
+            profile.pinned_project_ids = pinned
         profile.updated_at = now
 
     await session.commit()
     await session.refresh(profile)
 
     return await get_profile(user, session=session)
+
+
+async def _clean_pinned_ids(
+    session: AsyncSession, username: str, ids: list[int]
+) -> list[int]:
+    """Dedupe, keep order, and check every id is the caller's own public
+    project. 400 names the first id that isn't."""
+    cleaned = list(dict.fromkeys(int(i) for i in ids))
+    if len(cleaned) > 3:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="pinned_project_ids may contain at most 3 projects",
+        )
+    allowed = set(
+        (
+            await session.scalars(
+                select(Project.id).where(
+                    Project.id.in_(cleaned), *_public_projects_of(username)
+                )
+            )
+        ).all()
+    )
+    for pid in cleaned:
+        if pid not in allowed:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                detail=f"Project {pid} is not one of your public projects",
+            )
+    return cleaned
 
 
 # --- Activity feed -------------------------------------------------------
@@ -433,6 +522,38 @@ async def get_activity(
     return UserActivityResponse(
         username=username,
         items=[_activity_item(r) for r in rows],
+        limit=limit,
+        offset=offset,
+    )
+
+
+@router.get(
+    "/api/users/me/feed",
+    response_model=FeedResponse,
+)
+async def get_following_feed(
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    user: str = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> FeedResponse:
+    """Activity from the people the caller follows, newest first: the
+    homepage's "From people you follow" tab."""
+    followees = select(UserFollow.followee_id).where(UserFollow.follower_id == user)
+    rows = (
+        await session.execute(
+            select(UserActivity)
+            .where(UserActivity.user_id.in_(followees))
+            .order_by(UserActivity.created_at.desc(), UserActivity.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+    ).scalars().all()
+    return FeedResponse(
+        items=[
+            FeedItem(**_activity_item(r).model_dump(), username=r.user_id)
+            for r in rows
+        ],
         limit=limit,
         offset=offset,
     )

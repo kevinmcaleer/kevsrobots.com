@@ -8,9 +8,8 @@ description: Know your way round BetterCad? Put it to work on robots. Design pri
 courses:
   - "Design Robot Parts with BetterCad"
   - "Make It Move with BetterCad"
+order: 11
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}
 
 Know your way round [BetterCad](https://bettercad.kevsrobots.com)? This pathway puts it to work on robots. You'll design printed parts around the servos, motors, boards and bearings a robot really uses: drop them in from the built-in catalogue, cut their pockets and screw holes in one click, add standoffs and servo horn mounts, and generate gears, racks and belt pulleys that mesh first time. The project is a geared servo deck for an SG90 and a Raspberry Pi Pico.
 

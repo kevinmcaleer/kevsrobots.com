@@ -1,88 +1,79 @@
 {% comment %}
-  Course index for /learn/. Every course card is rendered here at build time
+  Course catalogue for /learn/ (the "All courses" section of learn_home.html).
+  Every course card is rendered here at build time
   from site.data.courses (written by build.py), so new courses appear on the
   next site build and search engines can see the links. The script at the
   bottom only shows/hides cards: tag checkboxes (a course must match every
   ticked tag), level, a text search and sort order. No backend needed.
+  Filters sit in one bar above the cards; topics are checkboxes drawn as chips.
+  The search box in the page heading (#learn-search) feeds the same search.
 {% endcomment %}
 {% assign courses_sorted = site.data.courses | sort: "date_published" | reverse %}
 {% assign all_tags = "" | split: "" %}
 {% for course in courses_sorted %}{% assign all_tags = all_tags | concat: course.groups %}{% endfor %}
 {% assign all_tags = all_tags | uniq | sort %}
-<div class="container-fluid">
-    <div class="row">
-        <!-- Learn sidebar -->
-        <div class="col-md-3 col-lg-2">
-            {% include learn_sidebar.html %}
+<div class="learn-catalogue bg-ocre rounded-3">
+    <div class="learn-tools">
+        <input type="search" id="course-search" class="form-control" placeholder="Search {{ courses_sorted.size }} courses" aria-label="Search all courses">
+        <select id="course-level" class="form-select" aria-label="Level">
+            <option value="">All levels</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+        </select>
+        <select id="course-sort" class="form-select" aria-label="Sort courses">
+            <option value="newest">Newest first</option>
+            <option value="name">A to Z</option>
+            <option value="shortest">Shortest first</option>
+        </select>
+        <button type="button" id="course-clear" class="btn btn-outline-secondary">Clear filters</button>
+    </div>
+    <div class="learn-topics-wrap">
+        <div id="filters" class="learn-topics is-collapsed" role="group" aria-label="Topics">
+            {% for tag in all_tags %}
+            <span class="learn-topic" data-tag="{{ tag | escape }}">
+                <input type="checkbox" class="btn-check" value="{{ tag | escape }}" id="filter-{{ tag | slugify }}" autocomplete="off">
+                <label for="filter-{{ tag | slugify }}">{{ tag }}</label>
+            </span>
+            {% endfor %}
         </div>
-        <!-- Filters column -->
-        <div class="col-md-2 col-lg-2">
-            <div class="mb-1 p-3 bg-light rounded-1">
-            <p><b>Filters</b></p>
-            <p class="card-text mute small">Check or uncheck the boxes to filter the courses</p>
-            <input type="search" id="course-search" class="form-control form-control-sm mb-2" placeholder="Search courses" aria-label="Search courses">
-            <select id="course-level" class="form-select form-select-sm mb-2" aria-label="Level">
-                <option value="">All levels</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-            </select>
-            <select id="course-sort" class="form-select form-select-sm mb-2" aria-label="Sort courses">
-                <option value="newest">Newest first</option>
-                <option value="name">A to Z</option>
-                <option value="shortest">Shortest first</option>
-            </select>
-            <button type="button" id="course-clear" class="btn btn-sm btn-outline-secondary w-100">Clear filters</button>
-            </div>
-            <div id="filters" class="list-group-flush">
-                {% for tag in all_tags %}
-                <div class="list-group-item" data-tag="{{ tag | escape }}">
-                    <input type="checkbox" class="form-check-input me-1" value="{{ tag | escape }}" id="filter-{{ tag | slugify }}">
-                    <label class="form-check-label small orange" for="filter-{{ tag | slugify }}">{{ tag }}</label>
+        <button type="button" id="topics-toggle" class="btn btn-link btn-sm p-0" aria-expanded="false" hidden>Show all topics</button>
+    </div>
+    <p class="learn-count"><span id="course-count">{{ courses_sorted.size }} courses</span></p>
+    <div id="courses" class="row">
+        {% for course in courses_sorted %}
+        {% assign dur = course.duration | split: " " %}
+        {% assign hours = dur[0] | remove: "h" | plus: 0 %}
+        {% assign mins = dur[1] | remove: "m" | plus: 0 %}
+        {% assign total_mins = hours | times: 60 | plus: mins %}
+        {% assign tag_text = course.groups | join: " " %}
+        {% assign level = course.level | default: "beginner" %}
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4 course-card"
+             data-name="{{ course.name | downcase | escape }}"
+             data-search="{{ course.name | append: ' ' | append: course.description | append: ' ' | append: tag_text | downcase | escape }}"
+             data-tags="{{ course.groups | join: '|' | escape }}"
+             data-level="{{ level }}"
+             data-date="{{ course.date_published }}"
+             data-minutes="{{ total_mins }}"
+             data-lessons="{{ course.lessons | default: 0 }}">
+        <a href="{{ course.link }}" class="text-decoration-none">
+            <div class="card border-0 card-hover card-shadown h-100">
+                <img src="{{ course.cover }}" class="card-img-top" alt="" loading="lazy">
+                <div class="card-body">
+                    <h3 class="learn-course-title" data-course-name>{{ course.name }}</h3>
+                    <p class="pathway-meta mb-2">
+                        <span class="pathway-level pathway-level-{{ level }}">{{ level }}</span>
+                        <span><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ course.duration | remove: "0h " }}</span>
+                        {% if course.lessons %}<span>{{ course.lessons }} lessons</span>{% endif %}
+                        {% if course.video %}<span class="pathway-video-badge"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Video</span>{% endif %}
+                    </p>
+                    <p class="learn-course-desc">{{ course.description }}</p>
                 </div>
-                {% endfor %}
             </div>
-            {% include boards_sidenav.html %}
+        </a>
         </div>
-        <!-- Main content for course cards -->
-        <div class="col-md-7 col-lg-8">
-            <h1>{{page.title}}</h1>
-            <h2>{{page.description}}</h2>
-            <hr>
-            <div class="container-fluid bg-ocre rounded-3 pt-3">
-            <p><b>Courses</b> <span id="course-count" class="small grey">{{ courses_sorted.size }} courses</span></p>
-            <div id="courses" class="row">
-                {% for course in courses_sorted %}
-                {% assign dur = course.duration | split: " " %}
-                {% assign hours = dur[0] | remove: "h" | plus: 0 %}
-                {% assign mins = dur[1] | remove: "m" | plus: 0 %}
-                {% assign total_mins = hours | times: 60 | plus: mins %}
-                {% assign tag_text = course.groups | join: " " %}
-                <div class="col-md-6 mb-4 col-sm-6 col-lg-3 course-card"
-                     data-name="{{ course.name | downcase | escape }}"
-                     data-search="{{ course.name | append: ' ' | append: course.description | append: ' ' | append: tag_text | downcase | escape }}"
-                     data-tags="{{ course.groups | join: '|' | escape }}"
-                     data-level="{{ course.level | default: 'beginner' }}"
-                     data-date="{{ course.date_published }}"
-                     data-minutes="{{ total_mins }}">
-                <a href="{{ course.link }}" class="text-decoration-none">
-                    <div class="card border-0 card-hover card-shadown h-100">
-                        <img src="{{ course.cover }}" class="card-img-top" alt="{{ course.name | escape }}" loading="lazy">
-                        <div class="card-body">
-                            <h5 class="card-title black">{{ course.name }}</h5>
-                            <p class="card-text small grey"><i class="fa-sharp fa-regular fa-clock"></i> {{ course.duration | remove: "0h " }}
-                            | {{ course.author }}</p>
-                            <p class="card-text small"><span class="badge bg-secondary text-capitalize">{{ course.level | default: "beginner" }}</span>
-                            {% for tag in course.groups %}<span class="badge bg-primary">{{ tag }}</span> {% endfor %}</p>
-                        </div>
-                    </div>
-                </a>
-                </div>
-                {% endfor %}
-                <p id="no-courses" class="small" hidden>No courses match those filters.</p>
-            </div>
-            </div>
-        </div>
+        {% endfor %}
+        <p id="no-courses" class="small" hidden>No courses match those filters.</p>
     </div>
 </div>
 
@@ -97,6 +88,10 @@
     const sort = document.getElementById('course-sort');
     const count = document.getElementById('course-count');
     const empty = document.getElementById('no-courses');
+    const topics = document.getElementById('filters');
+    const topicsToggle = document.getElementById('topics-toggle');
+    const section = document.getElementById('all-courses');
+    const headSearch = document.getElementById('learn-search');
 
     // Restore state from the URL so filtered views can be linked, e.g. /learn/?tag=micropython&level=beginner
     const params = new URLSearchParams(window.location.search);
@@ -170,8 +165,33 @@
         apply();
     });
 
+    // Topics show as two rows of chips until asked for the rest.
+    function setTopics(open) {
+        topics.classList.toggle('is-collapsed', !open);
+        topicsToggle.textContent = open ? 'Show fewer topics' : 'Show all topics';
+        topicsToggle.setAttribute('aria-expanded', open);
+    }
+    topicsToggle.hidden = false;
+    topicsToggle.addEventListener('click', () => setTopics(topicsToggle.getAttribute('aria-expanded') !== 'true'));
+    setTopics(urlTags.length > 0);
+
+    // The search box in the page heading searches the catalogue.
+    if (headSearch) {
+        headSearch.addEventListener('submit', (event) => {
+            event.preventDefault();
+            search.value = document.getElementById('learn-search-input').value;
+            apply();
+            if (section) section.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
     sortCards();
     apply();
+
+    // A filtered link such as /learn/?tag=micropython goes straight to its results.
+    if (section && Array.from(params.keys()).some(k => ['tag', 'level', 'q', 'sort'].includes(k))) {
+        section.scrollIntoView();
+    }
 
     // Fade cards in row by row as they scroll into view. The class is added
     // here rather than in the HTML so cards stay visible if JS is off.

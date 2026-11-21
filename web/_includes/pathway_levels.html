@@ -1,0 +1,2 @@
+{% comment %} Level badges, easiest first: include pathway_levels.html levels=page.levels {% endcomment %}
+{% for level in include.levels %}{% unless forloop.first %} <span class="pathway-level-to" aria-hidden="true">to</span> {% endunless %}<span class="pathway-level pathway-level-{{ level }}">{{ level }}</span>{% endfor %}

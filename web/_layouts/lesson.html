@@ -28,6 +28,9 @@ thanks: false
                     </div>
                     <p class="text-small mb-1" data-course-progress-text>{{page.percent}}% complete</p>
                     <p class="text-small mb-1" data-quiz-score data-quiz-total="{{ page.quiz_total | default: 0 }}" hidden><i class="fa-solid fa-trophy"></i>&nbsp; Quiz score <b data-quiz-score-text></b></p>
+                    {% if page.course_share %}
+                    <a href="#" class="kr-share-achievement" data-course-share-open hidden><i class="fa-solid fa-share-nodes" aria-hidden="true"></i>&nbsp; Share your achievement</a>
+                    {% endif %}
                     <a href="#" class="text-small grey course-nav-reset" data-course-reset>Reset my progress</a>
                 </div>
             </div>
@@ -104,6 +107,11 @@ thanks: false
         <p class="text-center">
         <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
         </p>
+        {% if page.course_share %}
+        {% include course_complete_dialog.html %}
+        <link rel="stylesheet" href="/assets/css/course-share.css?v={{ site.time | date: '%s' }}">
+        <script src="/assets/js/course-share.js?v={{ site.time | date: '%s' }}"></script>
+        {% endif %}
         <script src="/assets/js/course-progress.js?v={{ site.time | date: '%s' }}"></script>
         <script src="/assets/js/course-nav.js?v={{ site.time | date: '%s' }}" defer></script>
         {% unless page.snakie == false %}
