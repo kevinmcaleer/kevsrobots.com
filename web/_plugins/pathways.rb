@@ -29,6 +29,27 @@
 # A name that matches no course stops the build with a message saying which
 # pathway and which name. Before this check a renamed course simply vanished
 # from its pathway.
+#
+# A pathway can instead split its courses into stages (#631):
+#
+#   stages:
+#     start:                       # no experience needed
+#       - "How to install MicroPython"
+#     build:                       # the core skills
+#       - "Raspberry Pi Pico with MicroPython - GPIO Mastery"
+#       - soon: "Sensors for robots"   # a course not written yet
+#         issue: 639                    # optional: its GitHub issue
+#     further:                     # pick what interests you
+#       - "Introduction to Rust"
+#
+# The stages are flattened, in that order, into `courses` (so totals and
+# `related` work as before), and the page also gets
+#
+#   page.stage_items    [{key, label, blurb, items}], items being course
+#                       records or {"soon" => title, "issue" => n} placeholders
+#
+# Placeholders are shown as "Coming soon" and are not counted in the totals.
+# Every course that is in no pathway is listed in a build warning.
 
 module KevsRobots
   class PathwayGenerator < Jekyll::Generator
@@ -37,6 +58,15 @@ module KevsRobots
 
     LEVELS = %w[beginner intermediate advanced].freeze
 
+    STAGES = [
+      ["start", "Start", "No experience needed"],
+      ["build", "Build", "The core skills"],
+      ["further", "Go further", "Pick what interests you"]
+    ].freeze
+
+    # Courses that are deliberately in no pathway.
+    UNPATHED_OK = ["How to use the Learning Platform"].freeze
+
     def generate(site)
       collection = site.collections["learning_pathways"]
       return unless collection
@@ -44,8 +74,10 @@ module KevsRobots
       by_name = {}
       (site.data["courses"] || []).each { |course| by_name[course["name"]] = course }
 
-      pathways = collection.docs.select { |doc| doc.data["courses"].is_a?(Array) }
       problems = []
+      collection.docs.each { |doc| expand_stages(doc, by_name, problems) if doc.data["stages"].is_a?(Hash) }
+
+      pathways = collection.docs.select { |doc| doc.data["courses"].is_a?(Array) }
 
       pathways.each do |doc|
         items = doc.data["courses"].map do |name|
@@ -70,6 +102,13 @@ module KevsRobots
               "(names must match a course's `name:` exactly):\n  " + problems.join("\n  ")
       end
 
+      in_a_pathway = pathways.flat_map { |doc| doc.data["courses"] }
+      unpathed = by_name.keys - in_a_pathway - UNPATHED_OK
+      unless unpathed.empty?
+        Jekyll.logger.warn "Pathways:", "#{unpathed.size} course(s) are in no learning pathway:"
+        unpathed.sort.each { |name| Jekyll.logger.warn "", "  #{name}" }
+      end
+
       site.data["pathways"] = pathways.sort_by do |doc|
         [doc.data["order"] || 9999, doc.data["title"].to_s]
       end
@@ -82,6 +121,30 @@ module KevsRobots
         end
         doc.data["related"] = ranked.first(3)
       end
+    end
+
+    # stages: {start: [...], build: [...], further: [...]} -> courses + stage_items
+    def expand_stages(doc, by_name, problems)
+      stages = doc.data["stages"]
+      unknown = stages.keys - STAGES.map(&:first)
+      problems << "#{doc.relative_path}: unknown stage(s) #{unknown.join(', ')} (use start, build, further)" unless unknown.empty?
+
+      names = []
+      doc.data["stage_items"] = STAGES.filter_map do |key, label, blurb|
+        entries = Array(stages[key])
+        next if entries.empty?
+
+        items = entries.filter_map do |entry|
+          if entry.is_a?(Hash) && entry["soon"]
+            { "soon" => entry["soon"].to_s, "issue" => entry["issue"] }
+          else
+            names << entry.to_s
+            by_name[entry.to_s]
+          end
+        end
+        { "key" => key, "label" => label, "blurb" => blurb, "items" => items }
+      end
+      doc.data["courses"] = names
     end
 
     # "1h 38m" -> 98

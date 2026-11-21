@@ -51,13 +51,39 @@ layout: content
     </div>
   </header>
 
-  <h2 class="pathway-section-title">Courses in order</h2>
+  <h2 class="pathway-section-title">{% if page.stage_items %}Courses by stage{% else %}Courses in order{% endif %}</h2>
   {% if page.course_count > 1 %}
-  <p class="pathway-skip">Each course stands on its own. If you already know the first ones, check the level and description and start further down.</p>
+  <p class="pathway-skip">{% if page.stage_items %}Start has what you need if you are new. Build is the core of the path. Go further is a menu: pick the courses that interest you.{% else %}Each course stands on its own. If you already know the first ones, check the level and description and start further down.{% endif %}</p>
   {% endif %}
 
   <p class="pathway-progress" data-pathway-progress hidden></p>
 
+  {% if page.stage_items %}
+  {% assign number = 0 %}
+  {% for stage in page.stage_items %}
+  <section class="pathway-stage pathway-stage-{{ stage.key }}" aria-labelledby="stage-{{ stage.key }}">
+    <h3 class="pathway-stage-title" id="stage-{{ stage.key }}"><span class="pathway-stage-number">{{ forloop.index }}</span> {{ stage.label }} <span class="pathway-stage-blurb">{{ stage.blurb }}</span></h3>
+    <ol class="pathway-steps">
+      {% for item in stage.items %}
+        {% if item.soon %}
+        <li class="pathway-step pathway-step-soon">
+          <span class="pathway-step-number" aria-hidden="true"><i class="fa-regular fa-hourglass-half"></i></span>
+          <article class="pathway-row pathway-row-soon">
+            <div class="pathway-row-body">
+              <h3 class="pathway-row-title">{{ item.soon }}</h3>
+              <p class="pathway-meta"><span class="pathway-soon-badge">Coming soon</span>{% if item.issue %} <a href="https://github.com/kevinmcaleer/kevsrobots.com/issues/{{ item.issue }}" rel="noopener">Follow progress</a>{% endif %}</p>
+            </div>
+          </article>
+        </li>
+        {% else %}
+        {% assign number = number | plus: 1 %}
+        {% include pathway_course_row.html course=item number=number %}
+        {% endif %}
+      {% endfor %}
+    </ol>
+  </section>
+  {% endfor %}
+  {% else %}
   <ol class="pathway-steps">
     {% assign previous_level = "" %}
     {% for course in page.course_items %}
@@ -72,6 +98,7 @@ layout: content
       {% assign previous_level = level %}
     {% endfor %}
   </ol>
+  {% endif %}
 
   <script src="/assets/js/learn-progress.js?v={{ site.time | date: '%s' }}"></script>
 
