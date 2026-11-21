@@ -1,0 +1,130 @@
+/* "What next?" on a course's last lesson (_includes/course/next_steps.html, #635) */
+.course-next {
+  margin: 2rem 0 1rem;
+  padding: 1.25rem;
+  border: 1px solid #e6e2dc;
+  border-radius: 0.9rem;
+  background: #f7f5f2;
+}
+
+.course-next h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.4rem;
+}
+
+.course-next h3 {
+  margin: 1.25rem 0 0.1rem;
+  font-size: 1.1rem;
+}
+
+.course-next-courses {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.course-next-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #e6e2dc;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+}
+
+.course-next-card:hover {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.course-next-card img {
+  flex: none;
+  width: 7.5rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.course-next-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.course-next-kicker {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #c22032;
+}
+
+.course-next-meta {
+  font-size: 0.85rem;
+  color: #5a5a5f;
+}
+
+.course-next-card .btn {
+  flex: none;
+}
+
+.course-next-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+.course-next-project {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-bottom: 0.6rem;
+  border: 1px solid #e6e2dc;
+  border-radius: 0.75rem;
+  background: #fff;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+}
+
+.course-next-project img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.course-next-project b,
+.course-next-pin {
+  padding: 0 0.75rem;
+}
+
+.course-next-pin {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e7f4f;
+}
+
+.course-next-more {
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 575.98px) {
+  .course-next-card {
+    flex-wrap: wrap;
+  }
+
+  .course-next-card img {
+    width: 5.5rem;
+  }
+
+  .course-next-card .btn {
+    width: 100%;
+  }
+}

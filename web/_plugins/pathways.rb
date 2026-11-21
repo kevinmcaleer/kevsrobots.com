@@ -50,6 +50,13 @@
 #
 # Placeholders are shown as "Coming soon" and are not counted in the totals.
 # Every course that is in no pathway is listed in a build warning.
+#
+# Every lesson page also gets, for the "What next" box on a course's last
+# lesson and the "Course complete" dialog (#635):
+#
+#   page.course_pathways  [{title, url, position, of, next}] for each pathway
+#                         the course is in, `next` being the following course
+#                         record (nil at the end of the pathway)
 
 module KevsRobots
   class PathwayGenerator < Jekyll::Generator
@@ -120,6 +127,31 @@ module KevsRobots
           [-(names & other.data["courses"]).size, -other.data["course_count"], other.data["title"].to_s]
         end
         doc.data["related"] = ranked.first(3)
+      end
+
+      add_course_pathways(site)
+    end
+
+    def add_course_pathways(site)
+      by_slug = Hash.new { |hash, key| hash[key] = [] }
+      site.data["pathways"].each do |doc|
+        items = doc.data["course_items"]
+        items.each_with_index do |course, index|
+          slug = course["link"].to_s[%r{\A/learn/([^/]+)/}, 1]
+          next unless slug
+
+          by_slug[slug] << {
+            "title" => doc.data["title"], "url" => doc.url,
+            "position" => index + 1, "of" => items.size, "next" => items[index + 1]
+          }
+        end
+      end
+
+      site.pages.each do |page|
+        next unless page.data["layout"] == "lesson"
+
+        slug = page.url[%r{\A/learn/([^/]+)/}, 1]
+        page.data["course_pathways"] = by_slug[slug] if slug && by_slug.key?(slug)
       end
     end
 
