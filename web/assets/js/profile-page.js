@@ -1,578 +1,464 @@
 /**
- * Public user profile page — issue #111.
+ * Public user profile page (profile.html): a maker's portfolio.
  *
- * Replaces the original #140-era page with the full profile system:
- *   1. Header: avatar + name + bio + location + website + social links
- *   2. Stats bar: projects, makes, downloads, likes, followers, following
- *   3. Featured badges row (up to 3 — pinned by user)
- *   4. Tabs: Projects | Makes | Activity
- *   5. Follower / following modal lists
- *   6. Comments (from Chatter)
+ *   Header      avatar, name, @handle, location, Follow / Edit, Share profile
+ *   Meta        bio, stats (projects, likes received, followers, following),
+ *               website and socials, "Builds with" chips, featured badges
+ *   Pinned      up to 3 projects the owner picked (else their 3 most liked)
+ *   Tabs        Projects (filter by app, sort newest / most liked), Makes,
+ *               Activity (with recent comments), Liked (only if public)
  *
- * The page is read-only public; auth-requiring actions (Follow button)
- * appear only when the viewer is logged in and not viewing their own
- * profile.
+ * Requests on load, all in parallel: the projects-api profile (bio, stats,
+ * pinned, builds_with), the project list, Chatter's profile (name, avatar),
+ * then one Chatter batch call for every card's likes and comments
+ * (kr-project-card.js). Makes, Activity and Liked load when opened.
  *
- * Defensive design: any API endpoint can be missing/404 — the page
- * gracefully hides that section. This is necessary because #106
- * (badges system) is being built in parallel; if it isn't deployed
- * yet, the badges card hides itself.
+ * Short link: /@username. 404.html forwards it here as ?u=, and this page
+ * puts /@username back in the address bar. ?u=, ?username= and
+ * /profile/<username> links keep working.
+ *
+ * Any endpoint can be missing; its section stays hidden.
  */
 (function () {
   'use strict';
 
   var PROJECTS_API = 'https://projects.kevsrobots.com';
   var CHATTER_API = 'https://chatter.kevsrobots.com';
+  var Card = window.KrProjectCard;
 
-  // --- Username extraction ------------------------------------------------
+  // --- Username -------------------------------------------------------------
 
   function getUsernameFromUrl() {
-    var urlParams = new URLSearchParams(window.location.search);
-    var username = urlParams.get('u') || urlParams.get('username');
-    if (username) return username;
-    // /profile/<username>/ form — the /profile/index.html redirector
-    // forwards to ?username= form, but if a static deploy ever serves
-    // the bare path we still want to render.
+    var params = new URLSearchParams(window.location.search);
+    var u = params.get('u') || params.get('username');
+    if (u) return u;
     var parts = window.location.pathname.split('/').filter(Boolean);
-    if (parts.length > 1 && (parts[0] === 'profile' || parts[0] === 'profile.html')) {
-      try { return decodeURIComponent(parts[1]); } catch (e) { return parts[1]; }
-    }
+    var first = parts[0] || '';
+    try {
+      if (first.charAt(0) === '@') return decodeURIComponent(first.slice(1));
+      if (parts.length > 1 && (first === 'profile' || first === 'profile.html')) return decodeURIComponent(parts[1]);
+    } catch (e) { /* bad escape: fall through */ }
     return null;
   }
 
   var username = getUsernameFromUrl();
+  var root = document.getElementById('profile-root');
   if (!username) {
-    document.getElementById('profile-root').innerHTML =
-      '<div class="alert alert-danger">No username provided.</div>';
+    root.innerHTML = '<p class="kr-profile-empty">No username in the link. Profile links look like kevsrobots.com/@username.</p>';
     return;
   }
+  var shortUrl = window.location.origin + '/@' + encodeURIComponent(username);
+  try { window.history.replaceState(null, '', '/@' + encodeURIComponent(username) + window.location.hash); } catch (e) { /* keep the old URL */ }
 
-  // --- Helpers ------------------------------------------------------------
+  var me = Card ? Card.viewer() : null;
+  var isOwn = !!me && me === username;
+
+  // --- Helpers ----------------------------------------------------------------
+
+  function $(id) { return document.getElementById(id); }
 
   function esc(s) {
-    var d = document.createElement('div');
-    d.textContent = s == null ? '' : String(s);
-    return d.innerHTML;
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  function profileLink(u) {
-    return '/profile/?u=' + encodeURIComponent(u);
+  function getJSON(url, opts) {
+    return fetch(url, opts).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
   }
 
-  // Probe who the viewer is. Returns { authed, username }.
-  function probeViewer() {
-    if (!window.ProjectAuth) {
-      return Promise.resolve({ authed: false, username: '' });
-    }
-    return window.ProjectAuth.apiFetch(PROJECTS_API + '/api/auth/me')
-      .then(function (r) {
-        if (r.ok) {
-          return r.json().then(function (j) {
-            return { authed: true, username: (j && (j.username || j.sub)) || '' };
-          });
-        }
-        if (r.status === 401 || r.status === 403) {
-          return { authed: false, username: '' };
-        }
-        // Fall back to my-projects which the older deploy supports.
-        return window.ProjectAuth.apiFetch(PROJECTS_API + '/api/projects/my/list')
-          .then(function (r2) {
-            return r2.ok ? { authed: true, username: '' } : { authed: false, username: '' };
-          })
-          .catch(function () { return { authed: false, username: '' }; });
-      })
-      .catch(function () {
-        return window.ProjectAuth.apiFetch(PROJECTS_API + '/api/projects/my/list')
-          .then(function (r2) {
-            return r2.ok ? { authed: true, username: '' } : { authed: false, username: '' };
-          })
-          .catch(function () { return { authed: false, username: '' }; });
-      });
+  function hue(text) {
+    var h = 0;
+    for (var i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) % 360;
+    return h;
   }
 
-  // --- Chatter header (avatar + display name + location) ------------------
-  //
-  // Chatter is the source of truth for avatar / display name; the
-  // /api/users/{username}/profile endpoint owns bio, social links etc.
-  // If Chatter returns 404 (e.g. local dev with no Chatter mock) we
-  // fall back to a generated initial avatar.
-
-  function loadChatterProfile() {
-    return fetch(CHATTER_API + '/profile/' + encodeURIComponent(username), {
-      credentials: 'include'
-    })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (profile) {
-        var avatarDiv = document.getElementById('profile-avatar');
-        var initial = (username && username[0]) || '?';
-        var fallbackHtml =
-          '<div class="rounded-circle bg-secondary d-inline-flex align-items-center ' +
-          'justify-content-center text-white" ' +
-          'style="width:150px;height:150px;font-size:3rem;">' +
-          esc(initial.toUpperCase()) + '</div>';
-        if (profile && profile.profile_picture_url) {
-          var pictureUrl = profile.profile_picture_url.indexOf('http') === 0
-            ? profile.profile_picture_url
-            : CHATTER_API + profile.profile_picture_url;
-          // Chatter rotates the picture URL hash per profile fetch; if the
-          // image 404s (stale URL, cache mismatch, missing file) fall back
-          // to the initial-letter avatar instead of a broken-image icon.
-          avatarDiv.innerHTML =
-            '<img src="' + esc(pictureUrl) + '" alt="' + esc(username) + '" ' +
-            'class="rounded-circle img-fluid" ' +
-            'style="max-width:150px;max-height:150px;object-fit:cover;" ' +
-            'onerror="this.parentNode.innerHTML=' +
-            JSON.stringify(fallbackHtml).replace(/"/g, '&quot;') + ';">';
-        } else {
-          avatarDiv.innerHTML = fallbackHtml;
-        }
-
-        var name = profile
-          ? [profile.firstname, profile.lastname].filter(Boolean).join(' ').trim()
-          : '';
-        document.getElementById('profile-name').textContent = name || username;
-        document.getElementById('profile-username').textContent = '@' + username;
-        document.title = (name || username) + "'s Profile - Kev's Robots";
-
-        return profile || { username: username, is_own_profile: false };
-      });
+  function compact(n) {
+    n = n || 0;
+    if (n < 1000) return String(n);
+    return (n / 1000).toFixed(n < 10000 ? 1 : 0).replace(/\.0$/, '') + 'k';
   }
 
-  // --- Profile body (bio, website, socials, joined_at, featured badges) ---
+  var APP_NAMES = { snakie: 'Snakie', bettercad: 'BetterCAD' };
 
-  var socialIcons = {
-    github: 'fa-brands fa-github',
-    twitter: 'fa-brands fa-x-twitter',
-    youtube: 'fa-brands fa-youtube',
-    mastodon: 'fa-brands fa-mastodon'
+  // --- Header ---------------------------------------------------------------
+
+  function paintAvatar(chatter) {
+    var el = $('profile-avatar');
+    var h = hue(username);
+    el.style.setProperty('--krp-h', h);
+    $('profile-banner').style.setProperty('--krp-h', h);
+    el.textContent = username.charAt(0).toUpperCase();
+    var pic = chatter && chatter.profile_picture_url;
+    if (!pic) return;
+    var img = new Image();
+    img.alt = '';
+    img.onload = function () { el.textContent = ''; el.appendChild(img); };
+    img.src = pic.indexOf('http') === 0 ? pic : CHATTER_API + pic;
+  }
+
+  function paintName(chatter) {
+    var name = chatter ? [chatter.firstname, chatter.lastname].filter(Boolean).join(' ').trim() : '';
+    $('profile-name').textContent = name || username;
+    $('profile-username').textContent = '@' + username;
+    document.title = (name || username) + ' on kevsrobots';
+  }
+
+  var SOCIALS = {
+    github: ['fa-brands fa-github', 'GitHub'],
+    twitter: ['fa-brands fa-x-twitter', 'X'],
+    youtube: ['fa-brands fa-youtube', 'YouTube'],
+    mastodon: ['fa-brands fa-mastodon', 'Mastodon']
   };
 
-  function renderSocialLinks(links) {
-    var wrap = document.getElementById('profile-socials');
-    if (!wrap) return;
-    var html = '';
-    Object.keys(socialIcons).forEach(function (key) {
-      var url = links && links[key];
-      if (!url) return;
-      html += '<a class="btn btn-sm btn-outline-secondary" href="' + esc(url) +
-              '" target="_blank" rel="noopener noreferrer nofollow" title="' + esc(key) + '">' +
-              '<i class="' + socialIcons[key] + '"></i></a>';
-    });
-    wrap.innerHTML = html;
-  }
-
-  function loadProfile() {
-    return fetch(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/profile')
-      .then(function (r) {
-        if (r.status === 404) return null;
-        return r.ok ? r.json() : null;
-      })
-      .then(function (profile) {
-        if (!profile) return null;
-        if (profile.bio) {
-          var bioEl = document.getElementById('profile-bio');
-          bioEl.style.display = 'block';
-          bioEl.textContent = profile.bio;
-        }
-        if (profile.location) {
-          document.getElementById('profile-location').style.display = 'block';
-          document.getElementById('location-text').textContent = profile.location;
-        }
-        if (profile.website_url) {
-          var wrap = document.getElementById('profile-website');
-          var link = document.getElementById('website-link');
-          wrap.style.display = 'block';
-          link.href = profile.website_url;
-          link.textContent = profile.website_url.replace(/^https?:\/\//, '');
-        }
-        renderSocialLinks(profile.social_links || {});
-        if (profile.joined_at) {
-          var d = new Date(profile.joined_at);
-          document.getElementById('profile-joined').textContent =
-            'Joined ' + d.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-        }
-        // Stats
-        var stats = profile.stats || {};
-        document.getElementById('stat-projects').textContent = stats.projects || 0;
-        document.getElementById('stat-makes').textContent = stats.makes || 0;
-        document.getElementById('stat-downloads').textContent = stats.downloads || 0;
-        document.getElementById('stat-likes').textContent = stats.likes || 0;
-        document.getElementById('stat-followers').textContent = stats.followers || 0;
-        document.getElementById('stat-following').textContent = stats.following || 0;
-        return profile;
-      })
-      .catch(function () { return null; });
-  }
-
-  // --- Follow button ------------------------------------------------------
-
-  function setupFollowButton(viewer, profile) {
-    var btn = document.getElementById('follow-btn');
-    if (!btn) return;
-    if (!viewer.authed) return;
-    if (profile && profile.is_own_profile) return;
-    if (viewer.username && viewer.username === username) return;
-
-    btn.classList.remove('d-none');
-
-    function render(following) {
-      var label = btn.querySelector('[data-follow-label]');
-      var icon = btn.querySelector('i');
-      if (following) {
-        btn.classList.remove('btn-outline-primary');
-        btn.classList.add('btn-primary');
-        if (label) label.textContent = 'Following';
-        if (icon) icon.className = 'fas fa-user-check me-1';
-        btn.setAttribute('data-following', '1');
-      } else {
-        btn.classList.add('btn-outline-primary');
-        btn.classList.remove('btn-primary');
-        if (label) label.textContent = 'Follow';
-        if (icon) icon.className = 'fas fa-user-plus me-1';
-        btn.setAttribute('data-following', '0');
-      }
+  function paintProfile(p) {
+    if (!p) return;
+    if (p.bio) { $('profile-bio').hidden = false; $('profile-bio').textContent = p.bio; }
+    if (p.location) { $('profile-location').hidden = false; $('location-text').textContent = p.location; }
+    if (p.website_url) {
+      var w = $('profile-website');
+      w.hidden = false;
+      w.href = p.website_url;
+      w.textContent = p.website_url.replace(/^https?:\/\//, '').replace(/\/$/, '');
     }
+    var links = p.social_links || {};
+    $('profile-socials').innerHTML = Object.keys(SOCIALS).filter(function (k) { return links[k]; }).map(function (k) {
+      return '<a href="' + esc(links[k]) + '" target="_blank" rel="noopener noreferrer nofollow" title="' + SOCIALS[k][1] + '" aria-label="' + SOCIALS[k][1] + '">' +
+        '<i class="' + SOCIALS[k][0] + '" aria-hidden="true"></i></a>';
+    }).join('');
+    if (p.joined_at) {
+      $('profile-joined').textContent = 'Joined ' + new Date(p.joined_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    }
+    var s = p.stats || {};
+    $('stat-projects').textContent = compact(s.projects);
+    $('stat-followers').textContent = compact(s.followers);
+    $('stat-following').textContent = compact(s.following);
+    $('tab-projects-n').textContent = s.projects || '';
+    $('tab-makes-n').textContent = s.makes || '';
 
-    window.ProjectAuth.apiFetch(
-      PROJECTS_API + '/api/users/me/follows/' + encodeURIComponent(username)
-    ).then(function (r) {
-      return r.ok ? r.json() : null;
-    }).then(function (data) {
-      render(!!(data && data.following));
-    }).catch(function () { render(false); });
-
-    btn.addEventListener('click', function () {
-      var following = btn.getAttribute('data-following') === '1';
-      var method = following ? 'DELETE' : 'POST';
-      btn.disabled = true;
-      window.ProjectAuth.apiFetch(
-        PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/follow',
-        { method: method }
-      ).then(function (r) {
-        if (!r.ok) throw new Error('follow_failed');
-        return r.json();
-      }).then(function (data) {
-        render(!!data.following);
-        var fc = document.getElementById('stat-followers');
-        if (fc) {
-          var n = parseInt(fc.textContent, 10) || 0;
-          n += following ? -1 : 1;
-          fc.textContent = Math.max(0, n);
-        }
-      }).catch(function () {
-        alert('Failed to update follow. Please try again.');
-      }).then(function () {
-        btn.disabled = false;
+    var builds = p.builds_with || {};
+    var apps = Object.keys(builds).filter(function (a) { return APP_NAMES[a]; });
+    if (apps.length) {
+      var wrap = $('profile-builds');
+      wrap.hidden = false;
+      apps.forEach(function (a) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'kr-profile-build kr-profile-build-' + a;
+        b.setAttribute('data-filter', a);
+        b.textContent = APP_NAMES[a] + ' · ' + builds[a] + (builds[a] === 1 ? ' project' : ' projects');
+        wrap.appendChild(b);
+        document.querySelector('#project-filters [data-filter="' + a + '"]').hidden = false;
       });
+    }
+  }
+
+  // Follow button: same .krc-follow wiring as the cards (kr-project-card.js).
+  function setupFollow() {
+    var btn = $('follow-btn');
+    if (isOwn) { $('edit-profile-button').hidden = false; return; }
+    btn.hidden = false;
+    btn.setAttribute('data-krc-follow', username);
+    if (Card) {
+      Card.hydrate(document.createElement('div'));
+      Card.following().then(function (set) {
+        if (!set) return;
+        var on = set.has(username);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.textContent = on ? 'Following' : 'Follow';
+      });
+    }
+    document.addEventListener('krc:followed', function (e) {
+      if (e.detail.username !== username) return;
+      var el = $('stat-followers');
+      var n = parseInt(el.textContent, 10);
+      if (!isNaN(n) && el.textContent.indexOf('k') === -1) el.textContent = Math.max(0, n + (e.detail.following ? 1 : -1));
     });
   }
 
-  // --- Edit profile button (own profile only) -----------------------------
-
-  function setupEditButton(viewer) {
-    if (!viewer.authed) return;
-    if (viewer.username && viewer.username !== username) return;
-    // Show the edit link. If we don't know the viewer's username we still
-    // show it — /account itself requires auth and will bounce to /login.
-    // All profile editing now lives on /account (issue #151 consolidation);
-    // /profile/edit.html is a redirect stub kept only for legacy bookmarks.
-    document.getElementById('edit-profile-button').innerHTML =
-      '<a href="/account" class="btn btn-outline-secondary btn-sm">' +
-      '<i class="fas fa-pencil-alt me-1"></i>Edit profile</a>';
+  function setupShare() {
+    var btn = $('share-profile-btn');
+    btn.addEventListener('click', function () {
+      if (Card) Card.openShare(btn, shortUrl, $('profile-name').textContent + ' on kevsrobots');
+    });
   }
 
-  // --- Projects tab -------------------------------------------------------
+  // --- Badges -----------------------------------------------------------------
 
-  function renderProjectCard(p) {
-    // Use the shared thumbnail helper; the .kr-project-card CSS wrapper
-    // pins it to 4:3 with object-fit:cover so all cards stay uniform
-    // regardless of cover image aspect.
-    var thumb = typeof projectThumbnail === 'function'
-      ? projectThumbnail(p)
-      : (p.cover_image
-          ? '<img src="' + esc(p.cover_image) + '" class="card-img-top" loading="lazy" alt="">'
-          : '<div class="card-img-top d-flex align-items-center justify-content-center text-muted"><i class="fas fa-cube fa-2x"></i></div>');
-    var diff = p.difficulty
-      ? '<span class="badge bg-light text-dark me-1">' + esc(p.difficulty) + '</span>'
-      : '';
-    var status = p.status === 'completed'
-      ? '<span class="badge bg-success me-1">Completed</span>' : '';
-    var remix = p.is_remix
-      ? '<span class="badge bg-light text-muted me-1" title="Remix"><i class="fas fa-code-branch"></i></span>'
-      : '';
-    // Issue #152: prefer canonical /projects/<owner>/<slug> URL when
-    // the API surfaced a slug on the list item.
-    var viewHref = (p.slug && p.author_username)
-      ? '/projects/' + encodeURIComponent(p.author_username) + '/' + encodeURIComponent(p.slug)
-      : '/projects/view.html?id=' + p.id;
-    return '' +
-      '<div class="col">' +
-        '<a href="' + viewHref + '" class="text-decoration-none">' +
-          '<div class="card kr-project-card h-100 shadow-sm card-hover">' +
-            thumb +
-            '<div class="card-body p-3">' +
-              '<h6 class="card-title text-dark mb-1">' + esc(p.title) + '</h6>' +
-              '<p class="card-text text-muted small mb-2 kr-card-description">' +
-                esc(p.short_description || '') +
-              '</p>' +
-              '<div class="kr-card-tags">' + status + diff + remix + '</div>' +
-            '</div>' +
-          '</div>' +
-        '</a>' +
-      '</div>';
+  function loadBadges(profile) {
+    var pinned = (profile && profile.featured_badge_slugs) || [];
+    if (!pinned.length) return;
+    getJSON(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/badges').then(function (data) {
+      if (!data || !data.badges) return;
+      var byKey = {};
+      data.badges.forEach(function (b) { byKey[(b.key || '').toLowerCase()] = b; });
+      var matched = pinned.slice(0, 3).map(function (s) { return byKey[(s || '').toLowerCase()]; }).filter(Boolean);
+      if (!matched.length) return;
+      var list = $('badges-list');
+      list.hidden = false;
+      list.innerHTML = matched.map(function (b) {
+        return '<span class="kr-profile-badge" title="' + esc(b.description) + '"><i class="fas ' + esc(b.icon) + '" aria-hidden="true"></i>' + esc(b.name) + '</span>';
+      }).join('');
+    });
+  }
+
+  // --- Projects ---------------------------------------------------------------
+
+  var projects = [];
+  var filter = 'all';
+  var sort = 'newest';
+  var likeCounts = {};
+
+  function readLikeCounts(container) {
+    container.querySelectorAll('.krc').forEach(function (c) {
+      likeCounts[c.getAttribute('data-krc-key')] = parseInt(c.querySelector('.krc-like-n').textContent, 10) || 0;
+    });
+  }
+
+  function likesOf(p) { return likeCounts[Card.likeKey(p)] || 0; }
+
+  function visibleProjects() {
+    var list = projects.filter(function (p) {
+      return filter === 'all' || (p.made_with || []).indexOf(filter) !== -1;
+    });
+    if (sort === 'liked') list = list.slice().sort(function (a, b) { return likesOf(b) - likesOf(a); });
+    return list;
+  }
+
+  function drawProjects() {
+    var grid = $('projects-grid');
+    var list = visibleProjects();
+    $('projects-empty').hidden = list.length > 0;
+    $('projects-empty').textContent = projects.length
+      ? 'No projects made with ' + (APP_NAMES[filter] || 'that') + ' yet.'
+      : (isOwn ? 'You have no public projects yet. Publish one from My Projects.' : 'No public projects yet.');
+    return Card.render(grid, list, { showAuthor: false }).then(function () {
+      grid.removeAttribute('aria-busy');
+      readLikeCounts(grid);
+    });
+  }
+
+  function setPressed(group, attr, value) {
+    group.querySelectorAll('[' + attr + ']').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute(attr) === value ? 'true' : 'false');
+    });
+  }
+
+  function setFilter(value) {
+    filter = value;
+    setPressed($('project-filters'), 'data-filter', value);
+    selectTab('projects');
+    drawProjects();
+  }
+
+  function setupProjectControls() {
+    $('project-filters').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-filter]');
+      if (b) setFilter(b.getAttribute('data-filter'));
+    });
+    $('profile-builds').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-filter]');
+      if (!b) return;
+      setFilter(filter === b.getAttribute('data-filter') ? 'all' : b.getAttribute('data-filter'));
+      $('tab-projects').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    document.querySelector('.kr-profile-sort').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-sort]');
+      if (!b) return;
+      sort = b.getAttribute('data-sort');
+      setPressed(document.querySelector('.kr-profile-sort'), 'data-sort', sort);
+      drawProjects();
+    });
+    document.addEventListener('krc:liked', function (e) {
+      var card = document.querySelector('#projects-grid .krc[data-krc-key="' + e.detail.key + '"]');
+      if (card) readLikeCounts($('projects-grid'));
+    });
   }
 
   function loadProjects() {
-    var url = PROJECTS_API + '/api/projects?author=' + encodeURIComponent(username) + '&limit=100';
-    fetch(url).then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (projects) {
-        document.getElementById('projects-loading').classList.add('d-none');
-        var grid = document.getElementById('projects-grid');
-        var empty = document.getElementById('projects-empty');
-        if (!projects || projects.length === 0) {
-          empty.classList.remove('d-none');
-          return;
-        }
-        grid.classList.remove('d-none');
-        grid.innerHTML = projects.map(renderProjectCard).join('');
-      })
-      .catch(function () {
-        document.getElementById('projects-loading').classList.add('d-none');
-        document.getElementById('projects-empty').classList.remove('d-none');
+    return getJSON(PROJECTS_API + '/api/projects?author=' + encodeURIComponent(username) + '&limit=100', { credentials: 'include' })
+      .then(function (list) {
+        projects = (list || []).filter(function (p) { return p.status !== 'draft' || isOwn; });
+        return drawProjects();
       });
   }
 
-  // --- Makes tab (lazy: loads on first tab-show) --------------------------
-
-  var makesLoaded = false;
-  function loadMakes() {
-    if (makesLoaded) return;
-    makesLoaded = true;
-    var loading = document.getElementById('makes-loading');
-    var empty = document.getElementById('makes-empty');
-    var grid = document.getElementById('makes-grid');
-    loading.classList.remove('d-none');
-    fetch(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/makes')
-      .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (makes) {
-        loading.classList.add('d-none');
-        if (!makes || makes.length === 0) {
-          empty.classList.remove('d-none');
-          return;
-        }
-        grid.classList.remove('d-none');
-        grid.innerHTML = makes.map(function (m) {
-          var title = m.project_title || 'a project';
-          return '' +
-            '<div class="col">' +
-              '<a href="/projects/view.html?id=' + m.project_id + '#makes" class="text-decoration-none">' +
-                '<div class="card h-100 shadow-sm card-hover">' +
-                  '<div class="card-body p-3">' +
-                    '<h6 class="card-title text-dark mb-1"><i class="fas fa-hammer me-2 text-muted"></i>' + esc(title) + '</h6>' +
-                    (m.notes ? '<p class="card-text text-muted small mb-2">' + esc((m.notes || '').slice(0, 120)) + '</p>' : '') +
-                    '<small class="text-muted">' + new Date(m.created_at).toLocaleDateString() + '</small>' +
-                  '</div>' +
-                '</div>' +
-              '</a>' +
-            '</div>';
-        }).join('');
-      })
-      .catch(function () {
-        loading.classList.add('d-none');
-        empty.classList.remove('d-none');
-      });
+  function totalLikes() {
+    var sum = 0;
+    projects.forEach(function (p) { sum += likesOf(p); });
+    $('stat-likes').textContent = compact(sum);
   }
 
-  // --- Activity tab (lazy) ------------------------------------------------
+  // Pinned: the owner's picks, else their three most liked (with any likes).
+  function drawPinned(profile) {
+    var cards = (profile && profile.pinned) || [];
+    if (!cards.length) {
+      cards = projects.slice().sort(function (a, b) { return likesOf(b) - likesOf(a); })
+        .filter(function (p) { return likesOf(p) > 0; }).slice(0, 3);
+      if (projects.length < 4) cards = [];
+    }
+    if (!cards.length) return;
+    $('pinned-section').hidden = false;
+    $('pinned-title').textContent = profile && profile.pinned && profile.pinned.length ? 'Pinned' : 'Most liked';
+    Card.render($('pinned-grid'), cards, { showAuthor: false, size: 'lg' });
+  }
 
-  var activityLoaded = false;
-  var ACTIVITY_ICONS = {
-    project_published: { icon: 'fa-rocket', color: 'text-success', verb: 'Published' },
-    project_updated: { icon: 'fa-cube', color: 'text-primary', verb: 'Updated' },
-    make_posted: { icon: 'fa-hammer', color: 'text-dark', verb: 'Posted a make on' },
-    comment_posted: { icon: 'fa-comment', color: 'text-info', verb: 'Commented on' },
-    badge_earned: { icon: 'fa-medal', color: 'text-warning', verb: 'Earned a badge:' },
-    collection_created: { icon: 'fa-folder', color: 'text-secondary', verb: 'Created collection' }
+  // --- Tabs -------------------------------------------------------------------
+
+  var loaders = {};
+  var tabs = ['projects', 'makes', 'activity', 'liked'];
+
+  function selectTab(name, focus) {
+    tabs.forEach(function (t) {
+      var on = t === name;
+      var btn = $('tab-' + t + '-btn');
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      btn.tabIndex = on ? 0 : -1;
+      $('tab-' + t).hidden = !on;
+      if (on && focus) btn.focus();
+    });
+    if (loaders[name]) { loaders[name](); loaders[name] = null; }
+  }
+
+  function setupTabs() {
+    var bar = document.querySelector('.kr-profile-tabs');
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('[role="tab"]');
+      if (b) selectTab(b.id.replace(/^tab-|-btn$/g, ''));
+    });
+    bar.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var shown = tabs.filter(function (t) { return !$('tab-' + t + '-btn').hidden; });
+      var cur = shown.indexOf(document.activeElement.id.replace(/^tab-|-btn$/g, ''));
+      var next = shown[(cur + (e.key === 'ArrowRight' ? 1 : -1) + shown.length) % shown.length];
+      selectTab(next, true);
+      e.preventDefault();
+    });
+  }
+
+  loaders.makes = function () {
+    getJSON(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/makes').then(function (makes) {
+      makes = makes || [];
+      $('makes-empty').hidden = makes.length > 0;
+      $('makes-grid').innerHTML = makes.map(function (m) {
+        return '<a class="kr-profile-make" href="/projects/view.html?id=' + encodeURIComponent(m.project_id) + '#makes">' +
+          '<b>' + esc(m.project_title || 'a project') + '</b>' +
+          (m.notes ? '<span>' + esc(String(m.notes).slice(0, 140)) + '</span>' : '') +
+          '<small>' + new Date(m.created_at).toLocaleDateString() + '</small></a>';
+      }).join('');
+    });
+  };
+
+  var VERBS = {
+    project_published: 'Published',
+    project_updated: 'Updated',
+    make_posted: 'Posted a make of',
+    comment_posted: 'Commented on',
+    badge_earned: 'Earned the badge',
+    collection_created: 'Created the collection'
   };
 
   function timeAgo(iso) {
-    var d = new Date(iso);
-    var s = Math.round((Date.now() - d.getTime()) / 1000);
-    if (s < 60) return s + 's ago';
-    var m = Math.round(s / 60);
-    if (m < 60) return m + 'm ago';
-    var h = Math.round(m / 60);
-    if (h < 24) return h + 'h ago';
-    var dd = Math.round(h / 24);
-    if (dd < 30) return dd + 'd ago';
-    return d.toLocaleDateString();
+    var s = Math.round((Date.now() - new Date(iso).getTime()) / 1000);
+    if (s < 3600) return Math.max(1, Math.round(s / 60)) + ' min ago';
+    if (s < 86400) return Math.round(s / 3600) + ' h ago';
+    if (s < 30 * 86400) return Math.round(s / 86400) + ' days ago';
+    return new Date(iso).toLocaleDateString();
   }
 
-  function loadActivity() {
-    if (activityLoaded) return;
-    activityLoaded = true;
-    var loading = document.getElementById('activity-loading');
-    var list = document.getElementById('activity-list');
-    var empty = document.getElementById('activity-empty');
-    loading.classList.remove('d-none');
-    fetch(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/activity?limit=20')
-      .then(function (r) { return r.ok ? r.json() : { items: [] }; })
+  loaders.activity = function () {
+    getJSON(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/activity?limit=20').then(function (data) {
+      var items = (data && data.items) || [];
+      $('activity-empty').hidden = items.length > 0;
+      $('activity-list').innerHTML = items.map(function (e) {
+        var subject = e.subject_url
+          ? '<a href="' + esc(e.subject_url) + '">' + esc(e.subject_title || 'an item') + '</a>'
+          : esc(e.subject_title || '');
+        return '<li><span>' + esc(VERBS[e.kind] || e.kind) + ' ' + subject + '</span><small>' + timeAgo(e.created_at) + '</small></li>';
+      }).join('');
+    });
+    getJSON(CHATTER_API + '/profile/' + encodeURIComponent(username) + '/comments?limit=10').then(function (data) {
+      var list = (data && data.comments) || [];
+      $('comments-list').innerHTML = list.length ? list.map(function (c) {
+        return '<div class="kr-profile-comment"><p>' + esc(c.content) + '</p><small><a href="/' + esc(String(c.url).replace(/^\//, '')) + '">' +
+          esc(c.url) + '</a> · ' + new Date(c.created_at).toLocaleDateString() + '</small></div>';
+      }).join('') : '<p class="kr-profile-empty">No comments yet.</p>';
+    });
+  };
+
+  // Liked: only when the person made their likes public (or it's your own).
+  function setupLiked() {
+    getJSON(CHATTER_API + '/interact/users/' + encodeURIComponent(username) + '/liked?prefix=projects/&limit=24', { credentials: 'include' })
       .then(function (data) {
-        loading.classList.add('d-none');
-        var items = (data && data.items) || [];
-        if (items.length === 0) {
-          empty.classList.remove('d-none');
-          return;
-        }
-        list.classList.remove('d-none');
-        list.innerHTML = items.map(function (e) {
-          var meta = ACTIVITY_ICONS[e.kind] || { icon: 'fa-circle', color: 'text-muted', verb: e.kind };
-          var subject = e.subject_url
-            ? '<a href="' + esc(e.subject_url) + '">' + esc(e.subject_title || 'an item') + '</a>'
-            : esc(e.subject_title || '');
-          return '<li class="activity-item d-flex align-items-start mb-2">' +
-                   '<i class="fas ' + esc(meta.icon) + ' ' + esc(meta.color) + ' me-2 mt-1"></i>' +
-                   '<div class="flex-grow-1">' +
-                     '<div>' + esc(meta.verb) + ' ' + subject + '</div>' +
-                     '<small class="text-muted">' + timeAgo(e.created_at) + '</small>' +
-                   '</div>' +
-                 '</li>';
-        }).join('');
-      })
-      .catch(function () {
-        loading.classList.add('d-none');
-        empty.classList.remove('d-none');
+        if (!data) return;
+        $('tab-liked-btn').hidden = false;
+        loaders.liked = function () {
+          var ids = (data.urls || []).map(function (u) { var m = /[?&]id=(\d+)/.exec(u); return m && m[1]; }).filter(Boolean);
+          if (!ids.length) { $('liked-empty').hidden = false; return; }
+          getJSON(PROJECTS_API + '/api/projects?limit=50&ids=' + ids.join(',')).then(function (list) {
+            var order = {};
+            ids.forEach(function (id, i) { order[id] = i; });
+            list = (list || []).sort(function (a, b) { return order[a.id] - order[b.id]; });
+            $('liked-empty').hidden = list.length > 0;
+            Card.render($('liked-grid'), list);
+          });
+        };
       });
   }
 
-  // Hook tab switches.
-  var tabMakes = document.getElementById('tab-makes-btn');
-  if (tabMakes) tabMakes.addEventListener('shown.bs.tab', loadMakes);
-  var tabActivity = document.getElementById('tab-activity-btn');
-  if (tabActivity) tabActivity.addEventListener('shown.bs.tab', loadActivity);
+  // --- Followers / following list ---------------------------------------------
 
-  // --- Featured badges row ------------------------------------------------
-  //
-  // Reads the user's pinned slugs from /profile and the full badge
-  // catalog from /badges, then renders the intersection. If badges API
-  // 404s or the slug list is empty, the section stays hidden.
-
-  function loadFeaturedBadges(profile) {
-    var pinned = (profile && profile.featured_badge_slugs) || [];
-    if (!pinned || pinned.length === 0) return;
-    fetch(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/badges')
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (data) {
-        if (!data || !data.badges) return;
-        var byKey = {};
-        data.badges.forEach(function (b) { byKey[b.key.toLowerCase()] = b; });
-        var matched = pinned.slice(0, 3)
-          .map(function (s) { return byKey[(s || '').toLowerCase()]; })
-          .filter(Boolean);
-        if (matched.length === 0) return;
-        var card = document.getElementById('badges-card');
-        var list = document.getElementById('badges-list');
-        card.classList.remove('d-none');
-        list.innerHTML = matched.map(function (b) {
-          var cls = 'bg-' + (b.color || 'primary');
-          return '<span class="badge ' + cls + ' p-2 d-inline-flex align-items-center" ' +
-                 'title="' + esc(b.description) + '">' +
-                 '<i class="fas ' + esc(b.icon) + ' me-1"></i> ' + esc(b.name) +
-                 '</span>';
-        }).join('');
-      })
-      .catch(function () {});
-  }
-
-  // --- Followers / following modal ---------------------------------------
-
-  function openUserListModal(kind /* 'followers' or 'following' */) {
-    var title = document.getElementById('user-list-title');
-    var loading = document.getElementById('user-list-loading');
-    var list = document.getElementById('user-list-list');
-    var empty = document.getElementById('user-list-empty');
+  function openUserList(kind) {
+    var title = $('user-list-title');
+    var loading = $('user-list-loading');
+    var list = $('user-list-list');
+    var empty = $('user-list-empty');
     title.textContent = kind === 'followers' ? 'Followers' : 'Following';
     list.classList.add('d-none');
     empty.classList.add('d-none');
     loading.classList.remove('d-none');
-    list.innerHTML = '';
     if (window.bootstrap && window.bootstrap.Modal) {
-      var modalEl = document.getElementById('user-list-modal');
-      var modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
-      modal.show();
+      window.bootstrap.Modal.getOrCreateInstance($('user-list-modal')).show();
     }
-    fetch(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/' + kind + '?limit=200')
-      .then(function (r) { return r.ok ? r.json() : { users: [] }; })
-      .then(function (data) {
-        loading.classList.add('d-none');
-        var users = (data && data.users) || [];
-        if (users.length === 0) {
-          empty.classList.remove('d-none');
-          return;
-        }
-        list.classList.remove('d-none');
-        list.innerHTML = users.map(function (u) {
-          return '<li class="d-flex align-items-center mb-2">' +
-                   '<i class="fas fa-user-circle me-2 text-muted"></i>' +
-                   '<a href="' + profileLink(u.username) + '" class="text-decoration-none">' +
-                     esc(u.username) +
-                   '</a>' +
-                 '</li>';
-        }).join('');
-      })
-      .catch(function () {
-        loading.classList.add('d-none');
-        empty.classList.remove('d-none');
-      });
+    getJSON(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/' + kind + '?limit=200').then(function (data) {
+      loading.classList.add('d-none');
+      var users = (data && data.users) || [];
+      if (!users.length) { empty.classList.remove('d-none'); return; }
+      list.classList.remove('d-none');
+      list.innerHTML = users.map(function (u) {
+        return '<li class="mb-2"><a class="text-decoration-none" href="/@' + encodeURIComponent(u.username) + '">@' + esc(u.username) + '</a></li>';
+      }).join('');
+    });
   }
 
-  var fBtn = document.getElementById('stat-followers-btn');
-  if (fBtn) fBtn.addEventListener('click', function () { openUserListModal('followers'); });
-  var gBtn = document.getElementById('stat-following-btn');
-  if (gBtn) gBtn.addEventListener('click', function () { openUserListModal('following'); });
+  // --- Boot -------------------------------------------------------------------
 
-  // --- Chatter comments ---------------------------------------------------
+  paintName(null);
+  paintAvatar(null);
+  setupTabs();
+  setupShare();
+  setupFollow();
+  setupProjectControls();
+  $('stat-followers-btn').addEventListener('click', function () { openUserList('followers'); });
+  $('stat-following-btn').addEventListener('click', function () { openUserList('following'); });
 
-  function loadComments() {
-    var commentsDiv = document.getElementById('comments-list');
-    fetch(CHATTER_API + '/profile/' + encodeURIComponent(username) + '/comments?limit=10')
-      .then(function (r) { return r.ok ? r.json() : { comments: [] }; })
-      .then(function (data) {
-        if (data.comments && data.comments.length > 0) {
-          commentsDiv.innerHTML = data.comments.map(function (c) {
-            return '<div class="border-bottom pb-3 mb-3">' +
-                     '<p class="mb-2">' + esc(c.content) + '</p>' +
-                     '<small class="text-muted">' +
-                       '<i class="fas fa-link me-1"></i>' +
-                       '<a href="https://www.kevsrobots.com/' + esc(c.url) + '" ' +
-                          'target="_blank" class="text-decoration-none">' +
-                         esc(c.url) +
-                       '</a>' +
-                       '<span class="ms-3"><i class="fas fa-clock me-1"></i>' +
-                         new Date(c.created_at).toLocaleDateString() + '</span>' +
-                     '</small>' +
-                   '</div>';
-          }).join('');
-        } else {
-          commentsDiv.innerHTML = '<p class="text-muted small mb-0">No comments yet.</p>';
-        }
-      })
-      .catch(function () {
-        commentsDiv.innerHTML = '<p class="text-muted small mb-0">Comments unavailable.</p>';
-      });
-  }
+  var chatterP = getJSON(CHATTER_API + '/profile/' + encodeURIComponent(username), { credentials: 'include' });
+  var profileP = getJSON(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/profile');
+  var projectsP = loadProjects();
 
-  // --- Boot ---------------------------------------------------------------
-
-  Promise.all([loadChatterProfile(), probeViewer(), loadProfile()]).then(function (results) {
-    var chatterProfile = results[0];
-    var viewer = results[1];
-    var profile = results[2];
-    setupFollowButton(viewer, chatterProfile);
-    setupEditButton(viewer);
-    loadFeaturedBadges(profile);
+  chatterP.then(function (c) { paintName(c); paintAvatar(c); });
+  profileP.then(function (p) { paintProfile(p); loadBadges(p); });
+  Promise.all([profileP, projectsP]).then(function (r) {
+    totalLikes();
+    drawPinned(r[0]);
   });
+  Promise.all([chatterP, profileP]).then(function (r) {
+    if (!r[0] && !r[1]) {
+      $('profile-name').textContent = 'We couldn\'t find @' + username;
+      document.title = 'Profile not found - kevsrobots';
+    }
+  });
+  setupLiked();
 
-  loadProjects();
-  loadComments();
+  if (/^#(makes|activity|liked)$/.test(window.location.hash)) selectTab(window.location.hash.slice(1));
 })();
