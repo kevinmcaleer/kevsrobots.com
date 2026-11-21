@@ -68,6 +68,17 @@
                 : `${visited} of ${links.length} lessons visited (${percent}%)`;
         }
 
+        // "1/3" beside each section heading
+        document.querySelectorAll('.course-section').forEach(section => {
+            const items = section.querySelectorAll('.course-nav-item');
+            const done = section.querySelectorAll('.course-nav-item.visited').length;
+            const count = section.querySelector('[data-section-count]');
+            if (count) {
+                count.textContent = `${done}/${items.length}`;
+                count.classList.toggle('is-done', items.length > 0 && done === items.length);
+            }
+        });
+
         const shareLink = document.querySelector('[data-course-share-open]');
         if (shareLink) shareLink.hidden = visited !== links.length;
 
@@ -80,6 +91,11 @@
             score.querySelector('[data-quiz-score-text]').textContent =
                 `${correct} / ${total}` + (answered.length < total ? ` (${total - answered.length} to go)` : '');
         }
+
+        // Lets the lesson nav (course-nav.js) refresh its phone bar and sheet
+        document.dispatchEvent(new CustomEvent('kr-course-progress', {
+            detail: { visited, total: links.length, percent }
+        }));
     }
 
     // --- Course complete: congratulate once, then offer to share ------------
@@ -170,9 +186,10 @@
     document.querySelectorAll('.kr-quiz-q').forEach(setupQuestion);
 
     // Reset button in the sidebar
-    const resetLink = document.querySelector('[data-course-reset]');
-    if (resetLink) {
-        resetLink.addEventListener('click', (e) => {
+    // (delegated, so the copy in the phone lesson sheet works too)
+    document.addEventListener('click', (e) => {
+        const resetLink = e.target.closest('[data-course-reset]');
+        if (resetLink) {
             e.preventDefault();
             if (!confirm('Reset your progress and quiz score for this course?')) return;
             state.visited = { [currentLesson]: true };
@@ -180,8 +197,8 @@
             delete state.completed;
             save(state);
             updateSidebar();
-        });
-    }
+        }
+    });
 
     updateSidebar();
     checkComplete();
