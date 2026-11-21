@@ -64,6 +64,7 @@ from .routers import (
     admin_storage,
     admin_migration,
     admin_parts,
+    app_send,
     auth,
     badges,
     bom,
@@ -278,6 +279,9 @@ def create_app() -> FastAPI:
     # Same constraint applies to the featured router — it owns
     # /api/projects/featured and that path must beat /api/projects/{id}.
     app.include_router(featured.router)
+    # Snakie's Share sheet: POST /api/projects/app/new must beat
+    # /api/projects/{project_id} too.
+    app.include_router(app_send.router)
     app.include_router(projects.router)
     # Epic #433: publish / versions / restore.
     app.include_router(versions.router)
