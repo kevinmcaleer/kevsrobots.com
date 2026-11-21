@@ -1,0 +1,42 @@
+- name: "Wire It Up - Electronics in Snakie"
+  author: Kevin McAleer
+  date_created: 2026-11-20
+  date_published: 2026-11-20
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - micropython
+      - pico
+      - electronics
+      - robots
+  description: >-
+    Plan a circuit on screen before you touch a wire. Use Snakie's Electronics workspace to pick parts, wire them to a Raspberry Pi Pico, check the wiring for mistakes and print a build guide, then wire and code a two-wheeled obstacle-avoiding robot.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_the_electronics_workspace.md
+  - section:
+      name: Parts
+      content:
+      - 02_the_parts_library.md
+      - 03_placing_parts.md
+  - section:
+      name: Wiring
+      content:
+      - 04_wiring_with_noodles.md
+      - 05_the_schematic_view.md
+      - 06_checking_your_wiring.md
+  - section:
+      name: From Wiring to Code
+      content:
+      - 07_drivers_help_and_code.md
+      - 08_connections_and_measurements.md
+      - 09_exporting_and_sharing.md
+  - section:
+      name: Project
+      content:
+      - 10_project_obstacle_robot.md
+      - 11_summary.md
