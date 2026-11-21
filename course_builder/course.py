@@ -177,6 +177,11 @@ class Course:
             # Projects to suggest at the end of the course ("Build something
             # next"), as site URLs. Nibsy shows these first (#632).
             self.projects = [str(p) for p in manifest.get("projects") or []]
+            # Optional, for the course overview page (#635): what you will
+            # be able to do, what you should know first, what to have ready.
+            self.outcomes = [str(o) for o in manifest.get("outcomes") or []]
+            self.prerequisites = [str(o) for o in manifest.get("prerequisites") or []]
+            self.you_need = [str(o) for o in manifest.get("you_need") or []]
             cover_folder = self.course_folder.replace("source", "/learn")
             self.cover = cover_folder + "/" + manifest["cover"]
             self.cover = self.cover.replace("//learn", "/learn")
@@ -188,11 +193,42 @@ class Course:
         return self
 
     def build_index(self):
-        """Copy the first course file as index.md."""
-        if self.lessons:
-            src = Path(self.output_folder) / self.lessons[0]
-            dst = Path(self.output_folder) / "index.md"
-            shutil.copyfile(str(src), str(dst))
+        """Write index.md, the course overview page (#635).
+
+        It used to be a copy of the first lesson. Now it is its own page
+        (layout: course_overview) with the course's details, what you will
+        learn, what you need, and the syllabus; the body is empty.
+        """
+        if not self.lessons:
+            return
+        first = self.lessons[0].replace(".md", ".html")
+        generated = {
+            "layout": "course_overview",
+            "title": self.name,
+            "author": self.author,
+            "cover": self.cover,
+            "date": self.date_published,
+            "description": self.description,
+            "level": self.level,
+            "course_duration": self.duration_str,
+            "lesson_count": self.no_of_lessons,
+            "first_lesson": first,
+        }
+        if self.quiz_total:
+            generated["quiz_total"] = self.quiz_total
+        if getattr(self, "video", None):
+            generated["video"] = self.video
+        for key in ("outcomes", "prerequisites", "you_need"):
+            if getattr(self, key, None):
+                generated[key] = getattr(self, key)
+        page = (
+            "---\n"
+            + yaml.safe_dump(generated, sort_keys=False, allow_unicode=True)
+            + "navigation:\n"
+            + self.build_navigation()
+            + "---\n"
+        )
+        (Path(self.output_folder) / "index.md").write_text(page)
 
     def create_output(self, output_folder=None):
         """Create the output directory for the course."""

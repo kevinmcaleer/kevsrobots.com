@@ -1,14 +1,14 @@
 ---
-layout: lesson
-title: Introduction
+layout: course_overview
+title: Mini-Rack 3D Design Tutorial
 author: Kevin McAleer
-type: page
 cover: /learn/mini_rack/assets/cover.jpg
 date: 2025-02-16
-next: 01_components.html
-description: Overview of this course
-percent: 10
-duration: 1
+description: Design a 3D printable 10" mini-rack for your Raspberry Pi home lab.
+level: beginner
+course_duration: 0h 13m
+lesson_count: 10
+first_lesson: 00_intro.html
 navigation:
 - name: Mini-Rack 3D Design Tutorial
 - content:
@@ -38,25 +38,4 @@ navigation:
     content:
     - name: Print the parts
       link: 07_print.html
----
-
-
-![Mini-Rack](assets/cover.jpg){:class="cover"}
-
-Learn how to design and build your own 10" mini-rack for your Raspberry Pi cluster or home lab. This project is perfect for upgrading your home lab and keeping your equipment organized and easily accessible.
-
----
-
-## What is a Mini-Rack?
-
-A Mini-Rack is a small, 10" rack that can hold network equipment, computers and other related equipment. A full size rack, one you typically find in a server room or data center are 19" wide. A mini-rack is 10" wide, and designed for smaller spaces, perfect for a home lab or small office.
-
-![Mini-Rack](assets/minirack.png){:class="img-fluid w-100"}
-
----
-
-## Why a Mini-Rack?
-
-A mini-rack is a great way to keep your equipment organized and easily accessible. It keeps cables tidy and everything neat and in its place. It also helps with cooling, as the equipment is mounted in a way that allows for better airflow.
-
 ---

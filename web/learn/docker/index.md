@@ -1,14 +1,15 @@
 ---
-layout: lesson
-title: Overview
+layout: course_overview
+title: Docker
 author: Kevin McAleer
-type: page
 cover: /learn/docker/assets/docker.jpg
 date: 2024-01-21
-next: 01_what-is-docker.html
-description: An introductory overview of the Docker for Beginners course.
-percent: 9
-duration: 1
+description: Learn how to use Docker to build and deploy applications in a containerised
+  environment.
+level: beginner
+course_duration: 0h 27m
+lesson_count: 11
+first_lesson: 00_intro.html
 navigation:
 - name: Docker
 - content:
@@ -40,15 +41,4 @@ navigation:
       link: 09_dockerise.html
     - name: Conclusion and Next Steps
       link: 10_conclusion.html
----
-
-
-![Docker cover artwork](/learn/docker/assets/docker.jpg){:class="cover"}
-
-## Welcome to the Docker for Beginners Course
-
-Welcome to this introductory course on Docker, a powerful tool for creating, deploying, and running applications in containers.
-
-In this course, you'll gain a solid understanding of Docker, learn how to use it effectively, and see how it can be applied in real-world scenarios. We'll cover everything from the basics of Docker images and containers to more advanced topics like Docker Compose and container networking.
-
 ---

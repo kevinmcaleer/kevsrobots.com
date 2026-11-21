@@ -1,15 +1,17 @@
 ---
-layout: lesson
-title: Overview of Pydantic and Data Validation
+layout: course_overview
+title: Mastering Pydantic for Robust Data Validation
 author: Kevin McAleer
-type: page
-cover: assets/pydantic.png
+cover: /learn/pydantic/assets/pydantic.png
 date: 2024-03-23
-next: 02_setting_up_your_development_environment.html
-description: Introduction to the fundamentals of Pydantic and the advantages of using
-  it for data validation in Python applications.
-percent: 8
-duration: 2
+description: This in-depth course is designed to teach you how to leverage Pydantic
+  for data validation and settings management in Python applications. From understanding
+  Pydantic's basics to integrating it with FastAPI for web development, you'll master
+  everything needed to use Pydantic effectively.
+level: intermediate
+course_duration: 0h 25m
+lesson_count: 12
+first_lesson: 01_overview_of_pydantic.html
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:
@@ -45,55 +47,4 @@ navigation:
       link: 11_performance_optimization_tips.html
     - name: Performance Optimization in FastAPI and Pydantic Applications
       link: 12_case_studies_and_real_world_applications.html
----
-
-
-![Pydantic cover image]({{ page.cover }}){:class="cover"}
-
-## What is Pydantic?
-
-Pydantic is a data validation and settings management library using Python type annotations. It enables complex data parsing and validation for Python applications, simplifying the process of converting input data into Python data types, validating it, and performing serialization and deserialization.
-
-Developed as an open-source project, Pydantic is widely used in the Python community for creating robust, error-resistant applications. It is particularly popular in web development with FastAPI but is versatile enough for a wide range of applications.
-
----
-
-## Understanding Data Validation
-
-Data validation is crucial in software development to ensure that input data meets the expected format, type, and constraints. Validating data helps prevent common errors and security issues, making applications more reliable and secure.
-
----
-
-## Why Choose Pydantic?
-
-- **Ease of Use:** Pydantic utilizes Python type annotations for data validation, making it intuitive and straightforward to use for developers familiar with Python.
-- **Performance:** Pydantic is designed for speed and can quickly validate and parse data, making it suitable for performance-critical applications.
-- **Flexibility:** It supports complex data types, custom validation, and is extendable, making it adaptable for various use cases.
-- **Integration:** Pydantic works well with other Python frameworks, especially FastAPI for web development, enhancing productivity and code quality.
-
----
-
-## Real-World Examples
-
-Pydantic is used in numerous projects and frameworks, most notably `FastAPI`, where it plays a central role in request validation and schema definition. Its adoption by major projects underscores its reliability and utility in the Python ecosystem.
-
----
-
-## Getting Ready
-
-In the upcoming lessons, we'll explore Pydantic's features in detail, from basic data validation to advanced usage scenarios. You'll learn how to define models, use validators, and integrate Pydantic with web frameworks like FastAPI.
-
----
-
-## Additional Resources
-
-- [Pydantic's Official Documentation](https://pydantic-docs.helpmanual.io/)
-- [Tutorials and Community Contributions](https://pydantic-docs.helpmanual.io/#external-links)
-
----
-
-## Lesson Assignment
-
-Consider the role of data validation in software development and how Pydantic facilitates this process with its design and features. Reflect on how adopting Pydantic could improve the robustness and reliability of your Python applications.
-
 ---

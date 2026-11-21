@@ -1,0 +1,101 @@
+---
+layout: default
+---
+{%- comment -%}
+  Course overview (#635): /learn/<course>/, written by course_builder
+  (build_index) for every course. It used to be a copy of the first lesson.
+  Shows the course at a glance, what you will learn, what to have ready, the
+  syllabus with your progress ticked (assets/js/course-overview.js reads the
+  same browser record as the lessons), and the pathways it belongs to.
+
+  Optional course.yml keys fill the middle: `outcomes:`, `prerequisites:`
+  and `you_need:` (lists of short sentences).
+{%- endcomment -%}
+{%- assign course_nav = page.navigation -%}
+{%- assign course_key = page.url | remove: "index.html" -%}
+<link rel="stylesheet" href="/assets/css/learn-pathways.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/course-overview.css?v={{ site.time | date: '%s' }}">
+<div class="container-fluid px-3">
+{% include nav_courses.html %}
+{% include breadcrumbs.html %}
+</div>
+
+<div class="container-xl co" data-course-overview data-course-key="{{ course_key }}" data-lessons="{{ page.lesson_count }}">
+  <header class="co-hero">
+    <img class="co-cover" src="{{ page.cover }}" alt="" width="1200" height="900">
+    <div class="co-hero-body">
+      <p class="co-kicker">Free course</p>
+      <h1>{{ page.title }}</h1>
+      <p class="co-lead">{{ page.description }}</p>
+      <ul class="co-meta">
+        {% if page.level %}<li><span class="pathway-level pathway-level-{{ page.level }}">{{ page.level }}</span></li>{% endif %}
+        <li>{{ page.lesson_count }} lessons</li>
+        <li>{{ page.course_duration }}</li>
+        {% if page.quiz_total %}<li>{{ page.quiz_total }} quiz questions</li>{% endif %}
+      </ul>
+      <div class="co-progress" data-co-progress hidden>
+        <span class="co-bar"><span data-co-bar></span></span>
+        <span data-co-progress-text></span>
+      </div>
+      <div class="co-actions">
+        <a class="btn btn-primary btn-lg" href="{{ page.first_lesson }}" data-co-go>Start the course</a>
+        {% if page.video %}<a class="btn btn-outline-dark btn-lg" href="https://www.youtube.com/watch?v={{ page.video }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch the video</a>{% endif %}
+      </div>
+    </div>
+  </header>
+
+  <div class="co-columns">
+    <div class="co-main">
+      {% if page.outcomes %}
+      <section class="co-section">
+        <h2>What you'll learn</h2>
+        <ul class="co-ticks">{% for o in page.outcomes %}<li>{{ o }}</li>{% endfor %}</ul>
+      </section>
+      {% endif %}
+
+      <section class="co-section" aria-labelledby="co-syllabus">
+        <h2 id="co-syllabus">Lessons</h2>
+        {% assign n = 0 %}
+        {% for item in course_nav %}{% for section in item.content %}
+        <div class="co-syllabus-section">
+          <h3>{{ section.section }}</h3>
+          <ol class="co-lessons">
+            {% for lesson in section.content %}{% assign n = n | plus: 1 %}
+            <li data-lesson-id="{{ lesson.link | remove: '.html' }}"><a href="{{ lesson.link }}"><span class="co-lesson-n" aria-hidden="true">{{ n }}</span><span class="co-lesson-name">{{ lesson.name }}</span><span class="co-lesson-done" hidden>Done</span></a></li>
+            {% endfor %}
+          </ol>
+        </div>
+        {% endfor %}{% endfor %}
+      </section>
+    </div>
+
+    <aside class="co-side">
+      {% if page.prerequisites or page.you_need %}
+      <section class="co-card">
+        {% if page.prerequisites %}
+        <h2>Before you start</h2>
+        <ul>{% for o in page.prerequisites %}<li>{{ o }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% if page.you_need %}
+        <h2>What you need</h2>
+        <ul>{% for o in page.you_need %}<li>{{ o }}</li>{% endfor %}</ul>
+        {% endif %}
+      </section>
+      {% endif %}
+
+      {% if page.course_pathways.size > 0 %}
+      <section class="co-card">
+        <h2>Part of a learning pathway</h2>
+        {% for p in page.course_pathways %}
+        <p class="co-path"><a href="{{ p.url }}">{{ p.title }}</a><span>Course {{ p.position }} of {{ p.of }}</span></p>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      <p class="co-mine"><a href="/learn/me/">See all your courses in My Learning</a></p>
+    </aside>
+  </div>
+</div>
+
+<script src="/assets/js/progress-sync.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/course-overview.js?v={{ site.time | date: '%s' }}"></script>

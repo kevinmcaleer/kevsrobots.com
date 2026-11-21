@@ -46,6 +46,19 @@ A YAML **list with one entry** (this exact shape — `build.py` depends on it):
 
 Check `/web/_groups/` for valid group names before assigning them.
 
+Optional keys, shown on the course overview page (`/learn/<slug>/`) and at the end of the course:
+
+```yaml
+  outcomes:                 # "What you'll learn": 3 to 6 things the learner can do afterwards
+    - Read a button and debounce it
+  prerequisites:            # "Before you start": what to know first, ideally a course name
+    - Learn MicroPython - The basics
+  you_need:                 # "What you need": hardware and software
+    - A Raspberry Pi Pico or Pico W
+  projects:                 # "Build something next": project URLs to suggest at the end
+    - /projects/burgerbot/index.html
+```
+
 ## Lesson files
 
 - Naming: `00_intro.md`, then sequential `01_`, `02_`… with descriptive snake_case names (`09_coding_the_learning_loop.md`, not `09_lesson.md`). End with `NN_summary.md`.

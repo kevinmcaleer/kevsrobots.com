@@ -2499,3 +2499,14 @@ pre {
 }
 .kr-wn-snakie { --kr-accent-item: var(--kr-green, #26A269); }
 .kr-wn-bettercad { --kr-accent-item: var(--kr-violet, #7C3AED); }
+
+/* Lesson sidebar: the course name links to the course overview (#635) */
+.course-nav-title a.course-nav-overview {
+  color: inherit;
+  text-decoration: none;
+}
+
+.course-nav-title a.course-nav-overview:hover {
+  text-decoration: underline;
+}
+
