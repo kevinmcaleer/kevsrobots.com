@@ -14,6 +14,8 @@ on:
       - "source/**.md"
       - "scripts/check_course_code.py"
       - "scripts/course_code_stubs.py"
+      - "scripts/uno_q_checks.py"
+      - "scripts/uno_q_stubs/**"
   workflow_dispatch:
 
 permissions:
@@ -45,7 +47,7 @@ jobs:
       - name: Checker self-test
         run: |
           pip install --quiet pytest
-          python3 -m pytest -q scripts/tests/test_check_course_code.py
+          python3 -m pytest -q scripts/tests
 
       - name: Check lessons changed in this pull request
         if: github.event_name == 'pull_request'

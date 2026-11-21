@@ -1,0 +1,14 @@
+{%- comment -%}
+  LED matrix painter for the Arduino UNO Q's 8 x 13 matrix: click to paint,
+  copy the finished sketch. See docs/course_widgets.md.
+
+    {% include matrix_painter.html %}
+    {% include matrix_painter.html preset="Heart" name="heart" %}
+
+  preset: Heart | Smile | Arrow | Fade (optional starting picture)
+  name:   the C array's name (default "frame")
+{%- endcomment -%}
+<div data-kr-widget="matrix-painter"{% if include.preset %} data-preset="{{ include.preset | escape }}"{% endif %}{% if include.name %} data-name="{{ include.name | escape }}"{% endif %}>
+<p><em>The LED matrix painter needs JavaScript. Without it, draw your picture as 8 rows of 13 numbers (0 for off, 1 for on) in the <code>frame</code> array.</em></p>
+</div>
+{% include course_widget_assets.html %}

@@ -49,6 +49,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import uno_q_checks  # noqa: E402  (Arduino UNO Q: Bridge contract, sketch lint, main.py run)
 
 PY_FENCES = {"python", "py", "python3", "micropython", "mpy", "upython"}
 
@@ -584,12 +586,13 @@ def changed_lessons(base: str) -> list:
     return [REPO / f for f in res.stdout.split() if f.endswith(".md")]
 
 
-def check(paths: list, mp: str | None, timeout: float = 5.0) -> Report:
+def check(paths: list, mp: str | None, timeout: float = 5.0, run_host: bool = True) -> Report:
     report = Report()
     for lesson in lesson_files(paths):
         text = lesson.read_text(encoding="utf-8", errors="replace")
         course_mods = course_module_names(lesson)
         defined = set()
+        host_blocks = []
         for block in extract_blocks(lesson):
             report.blocks += 1
             tree = static_checks(block, report, text)
@@ -597,7 +600,10 @@ def check(paths: list, mp: str | None, timeout: float = 5.0) -> Report:
                 continue
             if mp and block.run and block.target == "micropython":
                 run_block(mp, block, tree, defined, course_mods, report, timeout)
+            if block.target == "cpython":
+                host_blocks.append((block, tree))
             defined |= names_defined(tree)
+        uno_q_checks.check_lesson(lesson, text, host_blocks, report, run=run_host, timeout=timeout)
     return report
 
 
@@ -642,7 +648,7 @@ def main(argv=None) -> int:
               "but not run. Build one with scripts/get_micropython.sh (once, ~2 minutes)",
               file=sys.stderr)
 
-    report = check(paths, mp, args.timeout)
+    report = check(paths, mp, args.timeout, run_host=not args.no_run)
     report.findings = dedupe(report.findings)
     errors = [f for f in report.findings if f.level == "error"]
     shown = errors if args.errors_only else report.findings
@@ -656,7 +662,7 @@ def main(argv=None) -> int:
             msg = f.message.replace("%", "%25").replace("\n", "%0A")
             print(f"::{f.level} file={rel},line={f.line},title={f.rule}::{msg}")
     warnings = len(report.findings) - len(errors)
-    print(f"\n{report.blocks} code blocks checked, {report.ran} run on MicroPython: "
+    print(f"\n{report.blocks} code blocks checked, {report.ran} run: "
           f"{len(errors)} errors, {warnings} warnings")
     return 1 if errors else 0
 

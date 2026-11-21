@@ -240,7 +240,7 @@ It parses every code block, checks MicroPython blocks against what the Pico's fi
 
 The MicroPython traps to watch for: `localtime()` is a tuple (`t[3]` is the hour); no `time.strftime`, `datetime`, `perf_counter` or `monotonic` (use `ticks_ms()`/`ticks_diff()`); `ADC.read_u16()` not `read()`; `PWM.duty_u16()` not `duty()`; no `print(flush=True)`; no `defaultdict`, `statistics`, `threading` or `dataclasses`; `RPi.GPIO`/`gpiozero` are Raspberry Pi Linux libraries, not Pico ones. The Pico has no battery-backed clock, so timestamps are only real if Thonny or `ntptime` set them: say so.
 
-In your final report, include the checker's summary line (e.g. `42 code blocks checked, 30 run on MicroPython: 0 errors, 3 warnings`) and how you handled each warning.
+In your final report, include the checker's summary line (e.g. `42 code blocks checked, 30 run: 0 errors, 3 warnings`) and how you handled each warning.
 
 ## What to Avoid
 

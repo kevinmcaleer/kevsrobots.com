@@ -1,0 +1,6 @@
+{%- comment -%} Loads the lesson widget CSS and JS once per page. Used by the widget includes. {%- endcomment -%}
+{%- unless kr_course_widget_assets -%}
+<link rel="stylesheet" href="/assets/css/course-widgets.css?v={{ site.time | date: '%s' }}">
+<script src="/assets/js/course-widgets.js?v={{ site.time | date: '%s' }}" defer></script>
+{%- assign kr_course_widget_assets = true -%}
+{%- endunless -%}
