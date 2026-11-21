@@ -67,14 +67,14 @@ The host does three jobs:
 2. It loads each one
 3. It waits for Snakie to ask for something
 
-```
- Snakie (the editor)                  Plugin host (Python)
-+---------------------+   request   +----------------------+
-| "run the command    | ----------> | finds your function  |
-|  called clubkit.hi" |             | and calls it         |
-|                     | <---------- |                      |
-| shows the message   |   answer    | returns a message    |
-+---------------------+             +----------------------+
+```mermaid
+sequenceDiagram
+    participant S as Snakie (the editor)
+    participant H as Plugin host (Python)
+    S->>H: request: "run the command called clubkit.hi"
+    Note over H: finds your function and calls it
+    H-->>S: answer: returns a message
+    Note over S: shows the message
 ```
 
 Snakie sends a request such as "run this command on this file". The host calls your Python function and sends back the answer. Snakie then acts on it.
