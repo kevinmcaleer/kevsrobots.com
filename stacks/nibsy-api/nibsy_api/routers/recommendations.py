@@ -25,6 +25,7 @@ from ..recommender import (
     ALGORITHM_VERSION,
     get_index,
     load_trending,
+    next_in_pathways,
     recommend_for_page,
 )
 from ..schemas import RecommendationItem, RecommendationsResponse
@@ -162,8 +163,8 @@ async def get_next_course(
 ) -> dict:
     """Recommend the next course to take after the current one (#76).
 
-    If the current course belongs to a pathway (metadata.pathway),
-    return the next course in the sequence. Otherwise, fall back to
+    If the current course belongs to a learning pathway, return the next
+    course in it. Otherwise, fall back to
     the top related courses by tag overlap and recency.
     """
 
@@ -179,37 +180,26 @@ async def get_next_course(
     if source is None or source.content_type != "course":
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Course not found")
 
-    # Check for explicit pathway metadata.
-    meta = source.content_metadata or {}
-    pathway = meta.get("pathway")
-    if pathway and isinstance(pathway, dict):
-        pathway_name = pathway.get("name")
-        pathway_order = pathway.get("order", 0)
-        if pathway_name:
-            # Find the next course in this pathway.
-            all_courses = (
-                await session.scalars(
-                    select(NibsyContent).where(NibsyContent.content_type == "course")
-                )
-            ).all()
-            for c in all_courses:
-                c_meta = (c.content_metadata or {}).get("pathway", {})
-                if (
-                    isinstance(c_meta, dict)
-                    and c_meta.get("name") == pathway_name
-                    and c_meta.get("order") == pathway_order + 1
-                ):
-                    return {
-                        "source": "pathway",
-                        "pathway": pathway_name,
-                        "next_course": {
-                            "id": c.id,
-                            "title": c.title,
-                            "url": c.url,
-                            "description": c.description,
-                            "reason": f"Next in {pathway_name} pathway",
-                        },
-                    }
+    # The next course in the first learning pathway that continues past
+    # this one (pathways come from the site catalogue, #632).
+    index = await get_index(session)
+    item = index.by_id.get(source.id)
+    nexts = next_in_pathways(index, item) if item is not None else []
+    if nexts:
+        entry, nxt = nexts[0]
+        pathway_name = entry.get("title") or entry.get("slug")
+        return {
+            "source": "pathway",
+            "pathway": pathway_name,
+            "pathway_url": entry.get("url"),
+            "next_course": {
+                "id": nxt.id,
+                "title": nxt.title,
+                "url": nxt.url,
+                "description": (await session.get(NibsyContent, nxt.id)).description,
+                "reason": f"Next in {pathway_name}",
+            },
+        }
 
     # Fallback: top related courses by tag/affinity scoring.
     now = datetime.now(timezone.utc).replace(tzinfo=None)

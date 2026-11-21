@@ -167,6 +167,14 @@ class Item:
     date: Optional[datetime]
     vector: dict[str, float] = field(default_factory=dict)
     norm: float = 0.0
+    # The row's metadata: cover, level, duration, pins, pathways, ...
+    meta: dict = field(default_factory=dict)
+
+    @property
+    def is_project(self) -> bool:
+        """Something to build: a project, a robot, or a post on the projects list."""
+
+        return self.type in ("project", "robot") or bool(self.meta.get("project"))
 
 
 @dataclass
@@ -195,6 +203,8 @@ class CatalogueIndex:
         self.by_id: dict[int, Item] = {}
         self.by_key: dict[str, Item] = {}
         self.course_by_slug: dict[str, Item] = {}
+        # Pathway slug -> its courses in order (#632).
+        self.pathways: dict[str, list[Item]] = {}
         # Canonical tag term -> the label to show a visitor ("raspberrypi" -> "raspberry pi").
         self.tag_labels: dict[str, str] = {}
         self.idf: dict[str, float] = {}
@@ -249,6 +259,7 @@ class CatalogueIndex:
                 url=row.url,
                 key=normalise_url(row.url),
                 date=row.date_published,
+                meta=dict(row.content_metadata or {}),
             )
             raw.append((item, terms))
 
@@ -270,6 +281,16 @@ class CatalogueIndex:
                 parts = item.key.strip("/").split("/")
                 if len(parts) >= 2 and parts[0] == "learn":
                     self.course_by_slug.setdefault(parts[1], item)
+
+        placed: dict[str, list[tuple[int, Item]]] = {}
+        for item in self.items:
+            for entry in item.meta.get("pathways") or []:
+                if isinstance(entry, dict) and entry.get("slug"):
+                    placed.setdefault(entry["slug"], []).append((int(entry.get("position", 0)), item))
+        self.pathways = {
+            slug: [item for _pos, item in sorted(entries, key=lambda e: e[0])]
+            for slug, entries in placed.items()
+        }
 
     # ---- lookups ---------------------------------------------------------
 
@@ -504,6 +525,79 @@ def recommend_for_page(
         excluded |= {p.item.id for p in picks}
         picks += fallback_picks(index, page, limit - len(picks), excluded, trending, now)
     return picks, basis
+
+
+# ---- learning (#632) -------------------------------------------------------
+
+
+def resolve_pins(index: CatalogueIndex, urls, excluded: set[int]) -> list[Item]:
+    """The catalogue items a page pins, in the order given, skipping unknowns."""
+
+    found: list[Item] = []
+    for url in urls or []:
+        item, _basis = index.resolve(str(url))
+        if item is not None and item.id not in excluded and item not in found:
+            found.append(item)
+    return found
+
+
+def next_in_pathways(index: CatalogueIndex, course: Item) -> list[tuple[dict, Item]]:
+    """For each pathway the course is in, the course that comes after it.
+
+    Returns ``[(pathway entry, next course)]`` in the order the course's
+    pathways were listed. The last course of a pathway has no next.
+    """
+
+    out: list[tuple[dict, Item]] = []
+    for entry in course.meta.get("pathways") or []:
+        courses = index.pathways.get(entry.get("slug"), [])
+        if course not in courses:
+            continue
+        position = courses.index(course)
+        if position + 1 < len(courses):
+            out.append((entry, courses[position + 1]))
+    return out
+
+
+def related_of_kind(
+    index: CatalogueIndex,
+    source: Optional[Item],
+    keep,
+    limit: int,
+    excluded: set[int],
+    now: datetime,
+    pins=(),
+    profile: Optional[dict[str, float]] = None,
+) -> list[Pick]:
+    """Pinned items first, then the items ``keep(item)`` accepts, most related first.
+
+    Used for "Learn the skills" (courses for a post or project) and
+    "Build something next" (projects for a course). Unlike the widget, no
+    trending top-up: a weak match is left out rather than padded.
+    """
+
+    picks: list[Pick] = []
+    taken = set(excluded)
+    if source is not None:
+        taken.add(source.id)
+    for item in resolve_pins(index, pins, taken):
+        if len(picks) >= limit:
+            break
+        picks.append(Pick(item, 1.0, "Recommended by Kev"))
+        taken.add(item.id)
+
+    if len(picks) < limit and (source is not None or profile):
+        candidates = [
+            p
+            for p in _related(index, source, profile or {}, taken, now)
+            if keep(p.item)
+        ]
+        candidates.sort(key=lambda p: p.score, reverse=True)
+        for pick in candidates[: limit - len(picks)]:
+            if not pick.reason:
+                pick.reason = "Picked for you"
+            picks.append(pick)
+    return picks
 
 
 # ---- cached index ----------------------------------------------------------

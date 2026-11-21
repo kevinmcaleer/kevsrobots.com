@@ -11,6 +11,11 @@ and the tags/groups from the front matter.
 
 Add a new content type by appending another block to "items" - keep the same
 keys (type, title, url, description, tags, date, cover).
+
+Pins (#632): a post's front matter `courses:` and a course.yml `projects:`
+list URLs that Nibsy always shows first ("pins"). "pathways" lists every
+learning pathway with its courses in order and their stage, so Nibsy knows
+what comes next.
 {%- endcomment -%}
 {%- assign none = "" | split: "" -%}
 {
@@ -30,7 +35,8 @@ keys (type, title, url, description, tags, date, cover).
       "tags": {{ tags | concat: groups | jsonify }},
       "date": {{ post.date | date: "%Y-%m-%d" | jsonify }},
       "cover": {{ post.cover | jsonify }},
-      "videos": {{ post.videos | default: none | jsonify }}
+      "videos": {{ post.videos | default: none | jsonify }},
+      "pins": {{ post.courses | default: none | jsonify }}
     }
     {%- endfor -%}
     {%- for course in site.data.courses -%}
@@ -46,7 +52,8 @@ keys (type, title, url, description, tags, date, cover).
       "date": {{ course.date_published | date: "%Y-%m-%d" | jsonify }},
       "cover": {{ course.cover | jsonify }},
       "level": {{ course.level | jsonify }},
-      "duration": {{ course.duration | jsonify }}
+      "duration": {{ course.duration | jsonify }},
+      "pins": {{ course.projects | default: none | jsonify }}
     }
     {%- endfor -%}
     {%- for review in site.reviews -%}
@@ -76,6 +83,20 @@ keys (type, title, url, description, tags, date, cover).
       "cover": {{ robot.cover | jsonify }}
     }
     {%- endfor -%}
+    {%- for project in site.data.projects -%}
+      {%- unless project.link and project.name -%}{%- continue -%}{%- endunless -%}
+      {%- assign tags = project.tags | default: none -%}
+      {%- unless first -%},{%- endunless -%}{%- assign first = false %}
+    {
+      "type": "project",
+      "title": {{ project.name | jsonify }},
+      "url": {{ project.link | jsonify }},
+      "description": {{ project.description | strip | truncate: 400 | jsonify }},
+      "tags": {{ tags | jsonify }},
+      "date": {{ project.date | date: "%Y-%m-%d" | jsonify }},
+      "cover": {{ project.cover | jsonify }}
+    }
+    {%- endfor -%}
     {%- for video in site.data.youtube -%}
       {%- unless video.video_id and video.title -%}{%- continue -%}{%- endunless -%}
       {%- unless first -%},{%- endunless -%}{%- assign first = false %}
@@ -89,6 +110,28 @@ keys (type, title, url, description, tags, date, cover).
       "video_id": {{ video.video_id | jsonify }},
       "video_type": {{ video.type | jsonify }}
     }
+    {%- endfor %}
+  ],
+  "pathways": [
+    {%- for pathway in site.data.pathways %}
+    {
+      "slug": {{ pathway.slug | jsonify }},
+      "title": {{ pathway.title | jsonify }},
+      "url": {{ pathway.url | jsonify }},
+      "courses": [
+        {%- if pathway.stage_items -%}
+          {%- assign firstc = true -%}
+          {%- for stage in pathway.stage_items -%}{%- for c in stage.items -%}{%- if c.soon -%}{%- continue -%}{%- endif -%}
+          {%- unless firstc -%},{%- endunless -%}{%- assign firstc = false %}
+        {"url": {{ c.link | jsonify }}, "stage": {{ stage.key | jsonify }}}
+          {%- endfor -%}{%- endfor -%}
+        {%- else -%}
+          {%- for c in pathway.course_items -%}{%- unless forloop.first -%},{%- endunless %}
+        {"url": {{ c.link | jsonify }}, "stage": null}
+          {%- endfor -%}
+        {%- endif %}
+      ]
+    }{%- unless forloop.last -%},{%- endunless -%}
     {%- endfor %}
   ],
   "popular_videos": {{ site.data.popular_videos | default: none | jsonify }}
