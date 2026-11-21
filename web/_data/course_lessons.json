@@ -229,6 +229,91 @@
     ]
   },
   {
+    "slug": "bettercad_robot_parts",
+    "name": "Design Robot Parts with BetterCad",
+    "description": "Design printed parts around the servos, boards and gears a robot really uses. Drop parts in from BetterCad's robot catalogue, cut their pockets in one click, add standoffs and horn mounts, generate gears that mesh, and finish with a geared servo deck for a Raspberry Pi Pico.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "3ddesign",
+      "3dprinting",
+      "robots"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/bettercad_robot_parts/00_intro.html"
+      },
+      {
+        "file": "01_reference_bodies.md",
+        "section": "Designing Around Real Parts",
+        "url": "/learn/bettercad_robot_parts/01_reference_bodies.html"
+      },
+      {
+        "file": "02_the_robot_parts_catalogue.md",
+        "section": "Designing Around Real Parts",
+        "url": "/learn/bettercad_robot_parts/02_the_robot_parts_catalogue.html"
+      },
+      {
+        "file": "03_measure_before_you_trust.md",
+        "section": "Designing Around Real Parts",
+        "url": "/learn/bettercad_robot_parts/03_measure_before_you_trust.html"
+      },
+      {
+        "file": "04_cutting_a_pocket.md",
+        "section": "Designing Around Real Parts",
+        "url": "/learn/bettercad_robot_parts/04_cutting_a_pocket.html"
+      },
+      {
+        "file": "05_standoffs_for_a_board.md",
+        "section": "Mounts",
+        "url": "/learn/bettercad_robot_parts/05_standoffs_for_a_board.html"
+      },
+      {
+        "file": "06_horn_mounts.md",
+        "section": "Mounts",
+        "url": "/learn/bettercad_robot_parts/06_horn_mounts.html"
+      },
+      {
+        "file": "07_your_first_gear.md",
+        "section": "Gears and Drives",
+        "url": "/learn/bettercad_robot_parts/07_your_first_gear.html"
+      },
+      {
+        "file": "08_bores_hubs_and_small_gears.md",
+        "section": "Gears and Drives",
+        "url": "/learn/bettercad_robot_parts/08_bores_hubs_and_small_gears.html"
+      },
+      {
+        "file": "09_meshing_gears.md",
+        "section": "Gears and Drives",
+        "url": "/learn/bettercad_robot_parts/09_meshing_gears.html"
+      },
+      {
+        "file": "10_racks_pulleys_and_belts.md",
+        "section": "Gears and Drives",
+        "url": "/learn/bettercad_robot_parts/10_racks_pulleys_and_belts.html"
+      },
+      {
+        "file": "11_from_mesh_to_editable_part.md",
+        "section": "Parts You Already Have",
+        "url": "/learn/bettercad_robot_parts/11_from_mesh_to_editable_part.html"
+      },
+      {
+        "file": "12_project_geared_servo_deck.md",
+        "section": "Project",
+        "url": "/learn/bettercad_robot_parts/12_project_geared_servo_deck.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Project",
+        "url": "/learn/bettercad_robot_parts/13_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "bottango",
     "name": "Bottango Basics",
     "description": "Learn how to bring characters and props to life using Bottango, a powerful no-code motion tool for animating servos and creating interactive scenes.  This course walks you through installing Bottango, wiring servos, programming boards, and creating expressive motion sequences.",

@@ -43,6 +43,22 @@
   link: /learn/bettercad_printing/00_intro.html
   name: Print It Right with BetterCad
 - author: Kevin McAleer
+  cover: /learn/bettercad_robot_parts/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Design printed parts around the servos, boards and gears a robot really
+    uses. Drop parts in from BetterCad's robot catalogue, cut their pockets in one
+    click, add standoffs and horn mounts, generate gears that mesh, and finish with
+    a geared servo deck for a Raspberry Pi Pico.
+  duration: 1h 16m
+  groups:
+  - 3ddesign
+  - 3dprinting
+  - robots
+  lessons: 14
+  level: intermediate
+  link: /learn/bettercad_robot_parts/00_intro.html
+  name: Design Robot Parts with BetterCad
+- author: Kevin McAleer
   cover: /learn/bottango/assets/cover.jpg
   date_published: 2025-05-10
   description: Learn how to bring characters and props to life using Bottango, a powerful
