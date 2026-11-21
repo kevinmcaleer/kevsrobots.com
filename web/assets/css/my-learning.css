@@ -1,0 +1,369 @@
+/*
+ * My Learning (/learn/me/, #634), drawn by assets/js/my-learning.js.
+ * Uses the Learn page's heading and section styles from learn.css.
+ */
+
+.my-learning {
+  --ml-line: #e6e2dc;
+  --ml-soft: #f7f5f2;
+  --ml-muted: #5a5a5f;
+  --ml-done: #1e7f4f;
+  --ml-accent: #c22032;
+  --ml-track: #efebe5;
+}
+
+.ml-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+}
+
+.ml-stats div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.ml-stats dt {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ml-muted);
+}
+
+.ml-stats dd {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.ml-signin {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ml-line);
+  border-radius: 0.75rem;
+  background: var(--ml-soft);
+}
+
+.ml-empty {
+  padding: 2rem 1.5rem;
+  border: 1px dashed var(--ml-line);
+  border-radius: 0.9rem;
+  text-align: center;
+}
+
+.ml-empty p {
+  max-width: 48ch;
+  margin: 0.5rem auto 1rem;
+  color: var(--ml-muted);
+}
+
+.ml-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ml-muted);
+}
+
+.ml-meta {
+  font-size: 0.82rem;
+  color: var(--ml-muted);
+}
+
+.ml-bar {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ml-track);
+  overflow: hidden;
+}
+
+.ml-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--ml-done);
+}
+
+.ml-cover-blank {
+  display: block;
+  background: var(--ml-track);
+}
+
+/* Continue where you left off */
+.ml-resume {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--ml-line);
+  border-radius: 0.9rem;
+  background: var(--ml-soft);
+}
+
+.ml-resume img,
+.ml-resume .ml-cover-blank {
+  flex: none;
+  width: 11rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.6rem;
+}
+
+.ml-resume-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.ml-resume-body h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.ml-resume-body p {
+  margin: 0;
+  color: var(--ml-muted);
+}
+
+.ml-resume .btn {
+  flex: none;
+}
+
+/* Paths and courses in progress */
+.ml-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem;
+}
+
+.ml-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--ml-line);
+  border-radius: 0.9rem;
+}
+
+.ml-panel h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.ml-panel > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.ml-path,
+.ml-course,
+.ml-next-card,
+.ml-done-card {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ml-path {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ml-path-head,
+.ml-course-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+}
+
+.ml-path-head span,
+.ml-course-head span {
+  flex: none;
+  font-size: 0.82rem;
+  color: var(--ml-muted);
+}
+
+.ml-path:hover b,
+.ml-course:hover b,
+.ml-next-card:hover b,
+.ml-done-card:hover b {
+  color: var(--ml-accent);
+}
+
+.ml-segs {
+  display: flex;
+  gap: 3px;
+}
+
+.ml-seg {
+  flex: 1;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--ml-track);
+}
+
+.ml-seg.is-done {
+  background: var(--ml-done);
+}
+
+.ml-seg.is-started {
+  background: linear-gradient(90deg, var(--ml-done) 50%, var(--ml-track) 50%);
+}
+
+.ml-seg.is-soon {
+  background: repeating-linear-gradient(45deg, var(--ml-track) 0 3px, transparent 3px 6px);
+  outline: 1px dashed var(--ml-line);
+  outline-offset: -1px;
+}
+
+.ml-path-note {
+  font-size: 0.8rem;
+  color: var(--ml-muted);
+}
+
+.ml-course {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ml-course img,
+.ml-course .ml-cover-blank {
+  flex: none;
+  width: 4.5rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.4rem;
+}
+
+.ml-course-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+/* Up next */
+.ml-next {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.ml-next-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ml-line);
+  border-radius: 0.9rem;
+  overflow: hidden;
+}
+
+.ml-next-card img,
+.ml-next-card .ml-cover-blank {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.ml-next-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.75rem 0.9rem 0.9rem;
+}
+
+.ml-next-body .ml-kicker {
+  color: var(--ml-accent);
+}
+
+/* Completed */
+.ml-done {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem;
+}
+
+.ml-done-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  border: 1px solid var(--ml-line);
+  border-radius: 0.7rem;
+}
+
+.ml-done-card img,
+.ml-done-card .ml-cover-blank {
+  flex: none;
+  width: 4rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.4rem;
+}
+
+.ml-done-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  font-size: 0.9rem;
+}
+
+.ml-clear {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+}
+
+.ml-clear .btn-link {
+  font-size: inherit;
+  color: var(--ml-muted);
+}
+
+@media (max-width: 575.98px) {
+  .ml-stats {
+    gap: 1rem;
+  }
+
+  .ml-resume {
+    flex-wrap: wrap;
+  }
+
+  .ml-resume img,
+  .ml-resume .ml-cover-blank {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .ml-resume .btn {
+    width: 100%;
+  }
+
+  .ml-columns {
+    grid-template-columns: 1fr;
+  }
+
+  /* Up next as compact rows, so three cards don't fill three screens */
+  .ml-next-card {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .ml-next-card img,
+  .ml-next-card .ml-cover-blank {
+    flex: none;
+    width: 6rem;
+    aspect-ratio: 4 / 3;
+    margin-left: 0.6rem;
+    border-radius: 0.4rem;
+  }
+
+  .ml-next-body {
+    padding: 0.6rem 0.75rem;
+  }
+}

@@ -9,9 +9,10 @@
 //
 // window.krProgressSync:
 //   signedIn()          true when the Chatter "username" cookie is set
-//   syncAll()           send every course in this browser (on the first
+//   syncAll(opts)       send every course in this browser (on the first
 //                       visit after signing in, then at most every few
-//                       minutes); resolves when the browser is up to date
+//                       minutes, or now with {force: true}); resolves when
+//                       the browser is up to date
 //   syncCourse(key)     send one course (after a lesson or quiz answer)
 //   reset(key)          forget one course on the account too
 (function () {
@@ -102,12 +103,12 @@
         });
     }
 
-    function syncAll() {
+    function syncAll(options) {
         const user = username();
         if (!signedIn()) return Promise.resolve(null);
         const importedKey = 'kr-progress-imported:' + user;
         const last = Number(session('kr-progress-all:' + user)) || 0;
-        if (local(importedKey) === '1' && Date.now() - last < ALL_EVERY_MS) return Promise.resolve(null);
+        if (!(options && options.force) && local(importedKey) === '1' && Date.now() - last < ALL_EVERY_MS) return Promise.resolve(null);
 
         const courses = [];
         try {
