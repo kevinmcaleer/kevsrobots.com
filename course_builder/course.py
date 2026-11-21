@@ -11,6 +11,7 @@ from pathlib import Path
 
 
 QUIZ_BLOCK = re.compile(r"{%-?\s*quiz\s*-?%}(.*?){%-?\s*endquiz\s*-?%}", re.S)
+YOUTUBE_EMBED = re.compile(r"{%-?\s*include\s+youtubeplayer\.html\s+id=[\"']?([\w-]{6,})")
 
 
 class Course:
@@ -121,6 +122,24 @@ class Course:
         for block in QUIZ_BLOCK.findall(body_text):
             count += sum(1 for line in block.splitlines() if line.strip().startswith("?"))
         return count
+
+    @property
+    def video(self):
+        """YouTube id of the course's video, or None.
+
+        `video:` in course.yml wins. Otherwise it is the first video embedded
+        with {% include youtubeplayer.html id="..." %}, looking through the
+        lessons in order, so the intro's video is found first.
+        """
+        manifest_video = (self._course_manifest or {}).get("video")
+        if manifest_video:
+            return str(manifest_video)
+        for item in self.lessons:
+            _, body_text, _ = self._read_lesson_file(item)
+            match = YOUTUBE_EMBED.search(body_text)
+            if match:
+                return match.group(1)
+        return None
 
     @property
     def quiz_total(self):
@@ -383,7 +402,7 @@ class Course:
         """Return a dictionary representation for courses.yml output."""
         link_path = self.output_folder.replace("web", "") + "/" + self.link
 
-        return {
+        data = {
             "description": self.description,
             "name": self.name,
             "cover": self.cover,
@@ -395,3 +414,7 @@ class Course:
             "level": self.level,
             "lessons": self.no_of_lessons,
         }
+        # Only courses with a video get the key, so cards can test for it.
+        if self.video:
+            data["video"] = self.video
+        return data

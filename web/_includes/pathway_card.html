@@ -49,7 +49,7 @@
         </span>
         <span class="pathway-more-facts">
           <span class="pathway-level pathway-level-{{ level }}">{{ level }}</span>
-          <span>{{ c.duration | remove: "0h " }}{% if c.lessons %} · {{ c.lessons }} lessons{% endif %}</span>
+          <span>{% if c.video %}<i class="fa-brands fa-youtube pathway-more-video" title="Has a video"></i> {% endif %}{{ c.duration | remove: "0h " }}{% if c.lessons %} · {{ c.lessons }} lessons{% endif %}</span>
         </span>
       </a>
       {% endfor %}

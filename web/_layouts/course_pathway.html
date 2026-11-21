@@ -56,6 +56,8 @@ layout: content
   <p class="pathway-skip">Each course stands on its own. If you already know the first ones, check the level and description and start further down.</p>
   {% endif %}
 
+  <p class="pathway-progress" data-pathway-progress hidden></p>
+
   <ol class="pathway-steps">
     {% assign previous_level = "" %}
     {% for course in page.course_items %}
@@ -70,6 +72,8 @@ layout: content
       {% assign previous_level = level %}
     {% endfor %}
   </ol>
+
+  <script src="/assets/js/learn-progress.js?v={{ site.time | date: '%s' }}"></script>
 
   {% if page.related.size > 0 %}
   <div class="pathway-next-head">

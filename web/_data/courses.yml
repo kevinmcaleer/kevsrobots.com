@@ -120,6 +120,7 @@
   level: beginner
   link: /learn/burgerbot/00_intro.html
   name: Build your own BurgerBot
+  video: 5G6psAuTYT4
 - author: Kevin McAleer
   cover: /learn/c_pico/assets/cover.jpg
   date_published: 2025-06-16
@@ -151,6 +152,7 @@
   level: intermediate
   link: /learn/cvzone/00_intro.html
   name: Computer Vision on Raspberry Pi with CVZone
+  video: FrLHFZZIozk
 - author: Kevin McAleer
   cover: /learn/docker/assets/docker.jpg
   date_published: 2024-01-21
@@ -204,6 +206,7 @@
   level: intermediate
   link: /learn/eye_mechanism/00_intro.html
   name: Robot Eye Mechanism
+  video: JbWKsdy5iOk
 - author: Kevin McAleer
   cover: /learn/fastapi/assets/cover.png
   date_published: 2024-03-28
@@ -367,6 +370,7 @@
   level: intermediate
   link: /learn/learn_ros/00_intro.html
   name: Learn ROS with me
+  video: _cTJhCRv858
 - author: Kevin McAleer
   cover: /learn/learning_platform/assets/learn.jpg
   date_published: 2022-12-04
@@ -467,6 +471,7 @@
   level: beginner
   link: /learn/micropython/00_intro.html
   name: Learn MicroPython - The basics
+  video: TkuDQ-SzXwU
 - author: Kevin McAleer
   cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
   date_published: 2023-04-14
@@ -482,6 +487,7 @@
   level: beginner
   link: /learn/micropython_gpio/00_intro.html
   name: Raspberry Pi Pico with MicroPython - GPIO Mastery
+  video: M-0P6ipVwNU
 - author: Kevin McAleer
   cover: /learn/micropython_robotics/assets/cover.jpg
   date_published: 2025-05-20
@@ -613,6 +619,7 @@
   level: beginner
   link: /learn/pandas_and_numpy/01_overview.html
   name: Data Manipulation with Pandas and Numpy
+  video: kD5r-dph7Lg
 - author: Kevin McAleer
   cover: /learn/pca9685/assets/cover.png
   date_published: 2024-04-06
@@ -692,6 +699,7 @@
   level: beginner
   link: /learn/python/01_intro.html
   name: Python for beginners
+  video: uRNsqHZEzUM
 - author: Kevin McAleer
   cover: /learn/redis/assets/redis-cover.jpg
   date_published: 2023-04-12
@@ -737,6 +745,7 @@
   level: beginner
   link: /learn/robotics_101/00_overview.html
   name: Robotics 101
+  video: bHOi_JGL0QE
 - author: Kevin McAleer
   cover: /learn/rust/assets/cover.png
   date_published: 2024-03-09
@@ -780,6 +789,7 @@
   level: beginner
   link: /learn/smars/00_intro.html
   name: Build a SMARS Robot
+  video: XhArIe9UDoc
 - author: Kevin McAleer
   cover: /learn/smars_code/assets/program_smars.png
   date_published: 2023-09-10
@@ -795,6 +805,7 @@
   level: beginner
   link: /learn/smars_code/00_intro.html
   name: Learn how to program SMARS with Arduino
+  video: XhArIe9UDoc
 - author: Kevin McAleer
   cover: /learn/smars_fusion360/assets/smars_fusion360.png
   date_published: 2023-07-20
@@ -810,6 +821,7 @@
   level: beginner
   link: /learn/smars_fusion360/00_intro.html
   name: Design a SMARS Robot in Fusion 360 - Part 1, The Chassis Shell
+  video: 3qd_63cWbvk
 - author: Kevin McAleer
   cover: /learn/smars_fusion360_part2/assets/cover.jpg
   date_published: 2023-07-20
@@ -825,6 +837,7 @@
   level: beginner
   link: /learn/smars_fusion360_part2/00_intro.html
   name: Design a SMARS Robot in Fusion 360 - Part 2, Motor Holders and Stub Wheels
+  video: 3qd_63cWbvk
 - author: Kevin McAleer
   cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
   date_published: 2023-03-04
@@ -841,6 +854,7 @@
   level: intermediate
   link: /learn/smars_quad/00_intro.html
   name: Build a SMARS Quad Walking Robot
+  video: 32GXhAuXZrQ
 - author: Kevin McAleer
   cover: /learn/snakie_blocks/assets/cover.jpg
   date_published: 2026-11-20
@@ -856,6 +870,7 @@
   level: beginner
   link: /learn/snakie_blocks/00_intro.html
   name: Snakie Blocks - From Blocks to Python
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/snakie_build_urdf/assets/cover.jpg
   date_published: 2026-11-21
@@ -871,6 +886,7 @@
   level: intermediate
   link: /learn/snakie_build_urdf/00_intro.html
   name: Build and Animate a Robot in Snakie
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/snakie_code_tools/assets/cover.jpg
   date_published: 2026-11-21
@@ -887,6 +903,7 @@
   level: intermediate
   link: /learn/snakie_code_tools/00_intro.html
   name: Coding Faster in Snakie
+  video: qfT_Ndq-tJI
 - author: Kevin McAleer
   cover: /learn/snakie_electronics/assets/cover.jpg
   date_published: 2026-11-20
@@ -904,6 +921,7 @@
   level: beginner
   link: /learn/snakie_electronics/00_intro.html
   name: Wire It Up - Electronics in Snakie
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/snakie_getting_started/assets/cover.jpg
   date_published: 2026-11-20
@@ -918,6 +936,7 @@
   level: beginner
   link: /learn/snakie_getting_started/00_intro.html
   name: Getting Started with Snakie
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/snakie_instruments/assets/cover.jpg
   date_published: 2026-11-20
@@ -934,6 +953,7 @@
   level: beginner
   link: /learn/snakie_instruments/00_intro.html
   name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/snakie_part_editor/assets/cover.jpg
   date_published: 2026-11-21
@@ -949,6 +969,7 @@
   level: intermediate
   link: /learn/snakie_part_editor/00_intro.html
   name: Make Your Own Parts and Boards in Snakie
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/snakie_plugins/assets/cover.jpg
   date_published: 2026-11-21
@@ -965,6 +986,7 @@
   level: intermediate
   link: /learn/snakie_plugins/00_intro.html
   name: Extend Snakie with Python Plugins
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/snakie_sprites/assets/cover.jpg
   date_published: 2026-11-21
@@ -981,6 +1003,7 @@
   level: beginner
   link: /learn/snakie_sprites/00_intro.html
   name: Pixel Art and Animation in Snakie
+  video: QVe9meIHZtk
 - author: Kevin McAleer
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
@@ -1006,3 +1029,4 @@
   level: beginner
   link: /learn/sqlite3/00_intro.html
   name: Create Databases with Python and SQLite3
+  video: 8BCsBgt-5zY

@@ -644,3 +644,62 @@
     transform: none !important;
   }
 }
+
+/* Watch button and saved progress on course rows (assets/js/learn-progress.js) */
+.pathway-row-go {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: stretch;
+  text-align: center;
+}
+
+.pathway-row-progress {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.pathway-progress {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  background: #e2f3e4;
+  color: #1d6b2c;
+  font-weight: 600;
+}
+
+.pathway-step.is-done .pathway-step-number {
+  border-color: #1d6b2c;
+  background: #1d6b2c;
+  color: #fff;
+}
+
+.pathway-step.is-started .pathway-step-number {
+  border-color: orangered;
+  background: orangered;
+  color: #fff;
+}
+
+.pathway-more-video {
+  color: #e62117;
+}
+
+/* Below 992px the Start button is hidden, but Watch and progress stay,
+   in a line under the description. */
+@media (max-width: 991.98px) {
+  .pathway-row-go {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+  }
+
+  .pathway-row-go [data-course-go] {
+    display: none;
+  }
+
+  .pathway-row-go:not(:has(.pathway-watch-btn, .pathway-row-progress:not([hidden]))) {
+    display: none;
+  }
+}
