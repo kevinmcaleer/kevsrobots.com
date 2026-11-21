@@ -128,13 +128,15 @@
             links.every(link => state.visited[lessonId(link.getAttribute('href') || '')]);
     }
 
+    // Every course records when it was finished (My Learning and the
+    // public profile use it); courses with share cards also say well done.
     function checkComplete() {
-        if (!window.krCourseShare) return;
-        window.krCourseShare.setScore(quizScore());
+        if (window.krCourseShare) window.krCourseShare.setScore(quizScore());
         if (isComplete() && !state.completed) {
             state.completed = Date.now();
             save(state);
-            window.krCourseShare.open({ score: quizScore() });
+            syncToAccount();
+            if (window.krCourseShare) window.krCourseShare.open({ score: quizScore() });
         }
     }
 

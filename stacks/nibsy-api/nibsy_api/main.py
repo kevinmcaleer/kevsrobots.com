@@ -188,6 +188,7 @@ def create_app() -> FastAPI:
     app.include_router(recommendations.router)
     app.include_router(tracking.router)
     app.include_router(me.router)
+    app.include_router(me.public_router)
     app.include_router(learn.router)
     app.include_router(analytics.router)
     app.include_router(stubs.router)

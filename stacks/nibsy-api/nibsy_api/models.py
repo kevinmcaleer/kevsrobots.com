@@ -180,3 +180,17 @@ class NibsyCourseProgress(Base):
     started_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+
+class NibsyLearnerSettings(Base):
+    """A learner's choices about their learning data (#638).
+
+    ``show_courses``: list the courses they have finished on their public
+    profile. Off until they turn it on in My Learning.
+    """
+
+    __tablename__ = "nibsy_learner_settings"
+
+    username: Mapped[str] = mapped_column(String(100), primary_key=True)
+    show_courses: Mapped[bool] = mapped_column(nullable=False, default=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

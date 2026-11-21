@@ -367,3 +367,13 @@
     padding: 0.6rem 0.75rem;
   }
 }
+
+.ml-profile {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ml-muted);
+}
+
+.ml-profile .btn-link {
+  font-size: inherit;
+}

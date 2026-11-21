@@ -5,6 +5,8 @@
  *   Meta        bio, stats (projects, likes received, followers, following),
  *               website and socials, "Builds with" chips, featured badges
  *   Pinned      up to 3 projects the owner picked (else their 3 most liked)
+ *   Courses     courses finished on kevsrobots, only if the owner turned
+ *               that on in My Learning (Nibsy, #638)
  *   Tabs        Projects (filter by app, sort newest / most liked), Makes,
  *               Activity (with recent comments), Liked (only if public)
  *
@@ -24,6 +26,7 @@
 
   var PROJECTS_API = 'https://projects.kevsrobots.com';
   var CHATTER_API = 'https://chatter.kevsrobots.com';
+  var NIBSY_API = 'https://nibsy.kevsrobots.com';
   var Card = window.KrProjectCard;
 
   // --- Username -------------------------------------------------------------
@@ -442,6 +445,22 @@
   $('stat-followers-btn').addEventListener('click', function () { openUserList('followers'); });
   $('stat-following-btn').addEventListener('click', function () { openUserList('following'); });
 
+  // Courses finished, shown only when the owner opted in (Nibsy returns
+  // an empty list otherwise).
+  function loadCourses() {
+    getJSON(NIBSY_API + '/api/learners/' + encodeURIComponent(username) + '/courses').then(function (body) {
+      var courses = body && Array.isArray(body.courses) ? body.courses : [];
+      if (!courses.length) return;
+      $('courses-list').innerHTML = courses.map(function (c) {
+        var date = new Date(c.completed + 'T00:00:00Z').toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+        return '<a class="kr-profile-course" href="' + esc(c.url) + '">' +
+          (c.cover ? '<img src="' + esc(c.cover) + '" alt="" loading="lazy">' : '') +
+          '<span><b>' + esc(c.title) + '</b><span>Finished ' + esc(date) + '</span></span></a>';
+      }).join('');
+      $('courses-section').hidden = false;
+    });
+  }
+
   var chatterP = getJSON(CHATTER_API + '/profile/' + encodeURIComponent(username), { credentials: 'include' });
   var profileP = getJSON(PROJECTS_API + '/api/users/' + encodeURIComponent(username) + '/profile');
   var projectsP = loadProjects();
@@ -459,6 +478,7 @@
     }
   });
   setupLiked();
+  loadCourses();
 
   if (/^#(makes|activity|liked)$/.test(window.location.hash)) selectTab(window.location.hash.slice(1));
 })();

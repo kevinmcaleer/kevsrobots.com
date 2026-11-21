@@ -317,6 +317,44 @@
         done.then(render);
     });
 
+    // Finished courses on the public profile (#638): off until turned on.
+    function setupProfileToggle() {
+        const box = $('[data-ml-profile]');
+        const match = document.cookie.match(/(?:^|;\s*)username=([^;]+)/);
+        if (!box || !match || !(window.krProgressSync && window.krProgressSync.signedIn())) return;
+        const user = decodeURIComponent(match[1]);
+        $('[data-ml-profile-link]').href = '/@' + encodeURIComponent(user);
+        const button = $('[data-ml-profile-toggle]');
+        let showing = false;
+        function paint() {
+            $('[data-ml-profile-state]').textContent = showing ? 'shown' : 'hidden';
+            button.textContent = showing ? 'Hide them' : 'Show them';
+            box.hidden = false;
+        }
+        const call = (method, body) => fetch(NIBSY_API + '/api/me/learning-settings', {
+            method,
+            credentials: 'include',
+            headers: body ? { 'Content-Type': 'application/json' } : undefined,
+            body: body ? JSON.stringify(body) : undefined
+        }).then(res => (res.ok ? res.json() : null)).catch(() => null);
+        call('GET').then(settings => {
+            if (!settings) return;
+            showing = !!settings.show_courses;
+            paint();
+        });
+        let busy = false;
+        button.addEventListener('click', () => {
+            if (busy) return;
+            busy = true;
+            call('POST', { show_courses: !showing }).then(settings => {
+                busy = false;
+                if (settings) showing = !!settings.show_courses;
+                paint();
+            });
+        });
+    }
+
+    setupProfileToggle();
     render();
     if (window.krProgressSync && window.krProgressSync.signedIn()) {
         window.krProgressSync.syncAll({ force: true }).then(body => { if (body) render(); });
