@@ -825,6 +825,22 @@
   link: /learn/snakie_blocks/00_intro.html
   name: Snakie Blocks - From Blocks to Python
 - author: Kevin McAleer
+  cover: /learn/snakie_code_tools/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Get more from Snakie's editor. Use MicroPython-aware autocomplete,
+    hover help, linting and one-click refactors, install packages, compile to .mpy
+    and keep your project under Git, then put it all to work on an ultrasonic sensor
+    driver.
+  duration: 1h 15m
+  groups:
+  - micropython
+  - pico
+  - python
+  lessons: 15
+  level: intermediate
+  link: /learn/snakie_code_tools/00_intro.html
+  name: Coding Faster in Snakie
+- author: Kevin McAleer
   cover: /learn/snakie_electronics/assets/cover.jpg
   date_published: 2026-11-20
   description: Plan a circuit on screen before you touch a wire. Use Snakie's Electronics

@@ -1,0 +1,111 @@
+---
+title: Find and Replace
+description: Search a MicroPython file and change many places at once with Snakie's Find and Replace, and learn when whole-word matching saves you from a bug
+layout: lesson
+type: page
+cover: /learn/snakie_code_tools/assets/banners/03_find_and_replace.jpg
+date_updated: 2026-11-21
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+Sooner or later you'll want to change the same thing in six places. Doing it by hand means missing one. This is what Find and Replace is for.
+
+---
+
+## Opening it
+
+Click **Find** at the top right of the editor, or press <kbd>Ctrl</kbd>+<kbd>F</kbd>. To go straight to replacing, press <kbd>Ctrl</kbd>+<kbd>H</kbd>. In the desktop app it's also under **Tools ▸ Find & Replace…**, and it opens as a small window of its own that you can park beside your code.
+
+![The Find and Replace window](/learn/snakie_code_tools/assets/find_window.jpg){:class="img-fluid w-100"}
+
+Type `MOTOR_PIN` in the **Find** box. Every match in the file is highlighted, and the window counts them: **4 matches**.
+
+## The controls
+
+| Control | What it does |
+|---|---|
+| **Aa** | Match case. `pin` no longer finds `Pin` |
+| **\|ab\|** | Whole word. `left` no longer finds `left_speed` |
+| **↑** **↓** | Previous and next match |
+| **Replace** | Change the current match |
+| **Replace+Find** | Change it and move to the next |
+| **Replace all** | Change every match at once |
+{:class="table table-single"}
+
+The keyboard does the same: <kbd>Enter</kbd> for the next match, <kbd>Shift</kbd>+<kbd>Enter</kbd> for the previous one, <kbd>Esc</kbd> to close.
+
+## Why whole word matters
+
+Say you want to rename the variable `left` to `left_motor`. Our file has these lines:
+
+```python
+left = PWM(Pin(LEFT_MOTOR_PIN))
+left.duty_u16(duty)
+```
+
+Search for `left` with nothing switched on and you might expect two matches. But a search that ignores case also finds the `LEFT` in `LEFT_MOTOR_PIN`. **Replace all** would turn that into `left_motor_MOTOR_PIN`, and your program would stop with a `NameError`.
+
+Switch on **Aa** and **\|ab\|** before any Replace all. Then check the match count is what you expect. If you thought there were two and it says five, stop and look.
+
+## Replace one at a time
+
+When you're not sure, don't use Replace all. Use **Replace+Find**. It changes the highlighted match and jumps to the next, so you see every change as it's made. Press **↓** to skip one you want to keep.
+
+And remember <kbd>Ctrl</kbd>+<kbd>Z</kbd>. A Replace all that went wrong is one undo away.
+
+## A quicker way for one name
+
+If you only want to change a name everywhere in the file, there's a shortcut that needs no window. Put the cursor on the name and press <kbd>Ctrl</kbd>+<kbd>F2</kbd> (**Change All Occurrences** in the right-click menu). Every occurrence gets a cursor, and whatever you type is typed in all of them at once.
+
+It matches the text, not the meaning, so the same care applies.
+
+## Find is also for reading
+
+Search isn't only for changing things. <kbd>Ctrl</kbd>+<kbd>F</kbd>, type `sleep`, and step through with <kbd>Enter</kbd>: you've just found every place your program pauses. That's often the first step in working out why a robot feels sluggish.
+
+---
+
+## Try it Yourself
+
+1. In the robot's `main.py`, find `drive`. How many matches are there with whole word on, and what are they?
+2. Replace `TOO_CLOSE_MM` with `STOP_DISTANCE_MM` using Replace+Find, one at a time.
+3. Use <kbd>Ctrl</kbd>+<kbd>F2</kbd> on `duty` inside the `drive` function and rename it to `level`. Undo it afterwards.
+
+## Common Issues
+
+**Problem**: Replace all changed things I didn't mean to change.
+**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd>, then switch on **Aa** and **\|ab\|** and try again.
+**Why**: Without them, a short search term matches inside longer names.
+
+**Problem**: It says no matches, but I can see the word.
+**Solution**: Check **Aa** isn't on when the capitals differ, and that there's no stray space in the Find box.
+**Why**: With match case on, `Pin` and `pin` are different words.
+
+**Problem**: I lost the Find window.
+**Solution**: Press <kbd>Ctrl</kbd>+<kbd>F</kbd> again.
+**Why**: On the desktop it's a separate window, and it can slip behind the main one.
+
+## Check your understanding
+
+{% quiz %}
+? What does the |ab| button do?
+- [ ] Makes the text bold
+- [x] Matches whole words only
+- [ ] Replaces everything
+> With whole word on, "left" won't match inside "left_speed".
+
+? What should you check before pressing Replace all?
+- [ ] The board is connected
+- [ ] The file is saved
+- [x] The match count is what you expect
+> An unexpected count means the search is finding things you didn't intend.
+
+? Which shortcut edits every occurrence of a name at once, with no window?
+- [x] Ctrl+F2
+- [ ] Ctrl+P
+- [ ] F12
+> Change All Occurrences puts a cursor on each one.
+{% endquiz %}

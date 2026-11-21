@@ -1,0 +1,47 @@
+- name: "Coding Faster in Snakie"
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  level: intermediate
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - micropython
+      - pico
+      - python
+  description: >-
+    Get more from Snakie's editor. Use MicroPython-aware autocomplete, hover help, linting and one-click refactors, install packages, compile to .mpy and keep your project under Git, then put it all to work on an ultrasonic sensor driver.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Writing
+      content:
+      - 01_smart_autocomplete.md
+      - 02_hover_help_and_definitions.md
+      - 03_find_and_replace.md
+  - section:
+      name: Checking
+      content:
+      - 04_linting_and_problems.md
+      - 05_micropython_refactors.md
+      - 06_yaml_and_json.md
+  - section:
+      name: Libraries
+      content:
+      - 07_installing_packages.md
+      - 08_the_modules_shelf.md
+      - 09_compiling_to_mpy.md
+  - section:
+      name: Working Like a Pro
+      content:
+      - 10_version_control_with_git.md
+      - 11_ai_chat_and_suggestions.md
+      - 12_menus_and_shortcuts.md
+  - section:
+      name: Project
+      content:
+      - 13_project_sensor_driver.md
+      - 14_summary.md

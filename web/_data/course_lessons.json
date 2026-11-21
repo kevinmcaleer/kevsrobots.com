@@ -4465,6 +4465,96 @@
     ]
   },
   {
+    "slug": "snakie_code_tools",
+    "name": "Coding Faster in Snakie",
+    "description": "Get more from Snakie's editor. Use MicroPython-aware autocomplete, hover help, linting and one-click refactors, install packages, compile to .mpy and keep your project under Git, then put it all to work on an ultrasonic sensor driver.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "micropython",
+      "pico",
+      "python"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_code_tools/00_intro.html"
+      },
+      {
+        "file": "01_smart_autocomplete.md",
+        "section": "Writing",
+        "url": "/learn/snakie_code_tools/01_smart_autocomplete.html"
+      },
+      {
+        "file": "02_hover_help_and_definitions.md",
+        "section": "Writing",
+        "url": "/learn/snakie_code_tools/02_hover_help_and_definitions.html"
+      },
+      {
+        "file": "03_find_and_replace.md",
+        "section": "Writing",
+        "url": "/learn/snakie_code_tools/03_find_and_replace.html"
+      },
+      {
+        "file": "04_linting_and_problems.md",
+        "section": "Checking",
+        "url": "/learn/snakie_code_tools/04_linting_and_problems.html"
+      },
+      {
+        "file": "05_micropython_refactors.md",
+        "section": "Checking",
+        "url": "/learn/snakie_code_tools/05_micropython_refactors.html"
+      },
+      {
+        "file": "06_yaml_and_json.md",
+        "section": "Checking",
+        "url": "/learn/snakie_code_tools/06_yaml_and_json.html"
+      },
+      {
+        "file": "07_installing_packages.md",
+        "section": "Libraries",
+        "url": "/learn/snakie_code_tools/07_installing_packages.html"
+      },
+      {
+        "file": "08_the_modules_shelf.md",
+        "section": "Libraries",
+        "url": "/learn/snakie_code_tools/08_the_modules_shelf.html"
+      },
+      {
+        "file": "09_compiling_to_mpy.md",
+        "section": "Libraries",
+        "url": "/learn/snakie_code_tools/09_compiling_to_mpy.html"
+      },
+      {
+        "file": "10_version_control_with_git.md",
+        "section": "Working Like a Pro",
+        "url": "/learn/snakie_code_tools/10_version_control_with_git.html"
+      },
+      {
+        "file": "11_ai_chat_and_suggestions.md",
+        "section": "Working Like a Pro",
+        "url": "/learn/snakie_code_tools/11_ai_chat_and_suggestions.html"
+      },
+      {
+        "file": "12_menus_and_shortcuts.md",
+        "section": "Working Like a Pro",
+        "url": "/learn/snakie_code_tools/12_menus_and_shortcuts.html"
+      },
+      {
+        "file": "13_project_sensor_driver.md",
+        "section": "Project",
+        "url": "/learn/snakie_code_tools/13_project_sensor_driver.html"
+      },
+      {
+        "file": "14_summary.md",
+        "section": "Project",
+        "url": "/learn/snakie_code_tools/14_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "snakie_electronics",
     "name": "Wire It Up - Electronics in Snakie",
     "description": "Plan a circuit on screen before you touch a wire. Use Snakie's Electronics workspace to pick parts, wire them to a Raspberry Pi Pico, check the wiring for mistakes and print a build guide, then wire and code a two-wheeled obstacle-avoiding robot.",
