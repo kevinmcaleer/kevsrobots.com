@@ -15,6 +15,24 @@
   link: /learn/arduino_to_python/00_intro.html
   name: Arduino to MicroPython - A Quick Start Guide
 - author: Kevin McAleer
+  cover: /learn/arduino_uno_q/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Learn the Arduino Uno Q from first boot to a project that runs by itself.
+    Split a job between its Linux computer and its microcontroller, make Python and
+    an Arduino sketch talk over the Bridge, and build the Q Board, a number display
+    you drive from Python.
+  duration: 1h 15m
+  groups:
+  - arduino
+  - electronics
+  - python
+  - ai
+  lessons: 10
+  level: beginner
+  link: /learn/arduino_uno_q/00_intro.html
+  name: Arduino Uno Q - Two Brains, One Board
+  video: 4HFb-FGQ8_w
+- author: Kevin McAleer
   cover: /learn/bettercad/assets/cover.jpg
   date_published: 2026-11-20
   description: Design your own 3D printable parts in BetterCad, the free CAD tool

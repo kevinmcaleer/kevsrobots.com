@@ -1,0 +1,17 @@
+{%- comment -%}
+  An Arduino UNO Q simulator box: the reader edits python/main.py and runs it
+  in the browser against a stand-in Bridge, a drawn LED matrix and LEDs.
+  See docs/course_widgets.md.
+
+    {% include uno_q_sim.html sketch="clock" %}
+
+  sketch: which lesson sketch the box plays. blink, clock (default) or sensor.
+  code:   the program to start with. Leave it out and the box starts with the
+          nearest Python code block above it in the lesson.
+{%- endcomment -%}
+{%- assign uq_code = include.code | strip -%}
+<div data-kr-widget="uno-q-sim" data-sketch="{{ include.sketch | default: 'clock' | escape }}">
+<p><em>The simulator needs JavaScript. Without it, read the program{% if uq_code == "" %} above{% endif %} and run it on your board.</em></p>
+{% if uq_code != "" %}<pre>{{ include.code | escape }}</pre>{% endif %}
+</div>
+{% include course_widget_assets.html %}

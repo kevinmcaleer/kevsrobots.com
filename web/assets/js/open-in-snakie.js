@@ -52,7 +52,7 @@
   // Nothing in a browser tab can stand in for these.
   var NO_RUN_MODULES = ['network', 'socket', 'usocket', 'bluetooth', 'aioble', 'espnow', 'urequests', 'requests',
     'umqtt', 'serial', 'tkinter', 'pygame', 'cv2', 'picamera', 'picamera2', 'RPi', 'gpiozero', 'flask', 'fastapi',
-    'subprocess', 'rclpy'];
+    'subprocess', 'rclpy', 'arduino'];
 
   var SNAKIE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M3 4.5h10M3 8h6.5M3 11.5h4.5M11 10l2.5 1.5L11 13"/></svg>';
   var PLAY_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M5 3.2v9.6l7.6-4.8z"/></svg>';
