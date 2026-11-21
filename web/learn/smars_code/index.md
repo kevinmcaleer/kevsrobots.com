@@ -1,16 +1,18 @@
 ---
-layout: lesson
-title: Overview
+layout: course_overview
+title: Learn how to program SMARS with Arduino
 author: Kevin McAleer
-type: page
 cover: /learn/smars_code/assets/program_smars.png
 date: 2023-09-10
-next: 01_lesson_01.html
-description: Learn to program your SMARS robot in Arduino C++, from first moves to
-  line following
-percent: 12
-duration: 2
+description: 'Program your SMARS robot in Arduino C++: drive it around, avoid obstacles
+  with an ultrasonic sensor, sense its position, control it over Bluetooth, move servos
+  and follow a line.'
+level: beginner
+course_duration: 0h 42m
+lesson_count: 8
+first_lesson: 00_intro.html
 quiz_total: 17
+video: XhArIe9UDoc
 navigation:
 - name: Learn how to program SMARS with Arduino
 - content:
@@ -39,50 +41,3 @@ navigation:
     - name: Lesson 07 - Line Following
       link: 07_lesson_07.html
 ---
-
-
-![Program SMARS with Arduino](assets/program_smars.png){:class="cover"}
-
-## Watch the video
-
-{% include youtubeplayer.html id="XhArIe9UDoc" %}
-
-Every lesson in this course also has a livestream video where I build the code live, so you can follow along.
-
----
-
-## Overview
-
-You've built a SMARS robot, now let's bring it to life! This course teaches you to program SMARS in Arduino `C++`, one sensor or skill at a time. Each lesson builds on the last, starting with making the motors turn and ending with a robot that follows a line on its own.
-
-## Course Content
-
-- Moving forwards, backwards and turning
-- Controlling SMARS from the keyboard with the Serial Monitor
-- Measuring distance with an ultrasonic sensor and avoiding obstacles
-- Sensing pitch, roll and heading with an MPU-6050
-- Driving SMARS from your phone over Bluetooth
-- Controlling servos
-- Following a line with a TCRT5000 sensor
-
-## Key Results
-
-By the end of this course you will be able to:
-
-- Write, verify and upload Arduino sketches
-- Use variables, functions, `if` statements, `while` loops and `switch` statements
-- Read sensors and make your robot react to the world around it
-
-## What you'll need
-
-- A [SMARS robot](/learn/smars/) with an Arduino Uno and Fundumoto motor shield
-- A USB cable and a computer with the [Arduino IDE](https://www.arduino.cc/en/software)
-- For later lessons: an HC-SR04 ultrasonic sensor, an MPU-6050 module, a Bluetooth module, an SG90 servo and a TCRT5000 line sensor (each lesson says what it needs)
-
-## How the course works
-
-Each lesson has a livestream video, the complete code to type in, and an explanation of what each part does. Typing the code yourself (rather than copying it) is the best way to learn. There's a quick quiz at the end of each lesson.
-
-## Prerequisites
-
-- [Build a SMARS Robot](/learn/smars/)

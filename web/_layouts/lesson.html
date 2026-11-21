@@ -15,13 +15,9 @@ thanks: false
         <div class="container-fluid py-3 course-nav-top">
             <div class="learn-nav m-0 p-0">
         <div class="card border-0 shadow-lg course-nav-card">
-            <div class="card-header bg-learnhead py-0">
-              <p class="text-white my-0 text-center text-nowrap text-truncate ">
-                <i class="fa-sharp fa-solid fa-graduation-cap "></i>&nbsp;&nbsp; KevsRobots Learning Platform</p>
-            </div>
             <div class="card-body">
                 <div class="container mb-3 course-nav-summary">
-                    <h5 class="course-nav-title">{{nav[0].name}}</h5>
+                    <h5 class="course-nav-title"><a href="./" class="course-nav-overview" title="Course overview">{{nav[0].name}}</a></h5>
                     
                     <div class="progress">
                         <div class="progress-bar" role="progressbar" data-course-progress-bar style="width: {{page.percent}}%" aria-valuenow="{{page.percent}}" aria-valuemin="0" aria-valuemax="100"></div>
@@ -103,9 +99,6 @@ thanks: false
         {% if page.next %}
         <link rel="next" href="{{ page.next }}">
         {% endif %}
-        </p>
-        <p class="text-center">
-        <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
         </p>
         <link rel="stylesheet" href="/assets/css/course-next.css?v={{ site.time | date: '%s' }}">
         {% include lesson_helpful.html %}

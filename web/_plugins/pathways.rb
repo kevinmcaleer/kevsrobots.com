@@ -51,7 +51,7 @@
 # Placeholders are shown as "Coming soon" and are not counted in the totals.
 # Every course that is in no pathway is listed in a build warning.
 #
-# Every lesson page also gets, for the "What next" box on a course's last
+# Every lesson page and course overview page also gets, for the "What next" box on a course's last
 # lesson and the "Course complete" dialog (#635):
 #
 #   page.course_pathways  [{title, url, position, of, next}] for each pathway
@@ -148,7 +148,7 @@ module KevsRobots
       end
 
       site.pages.each do |page|
-        next unless page.data["layout"] == "lesson"
+        next unless %w[lesson course_overview].include?(page.data["layout"])
 
         slug = page.url[%r{\A/learn/([^/]+)/}, 1]
         page.data["course_pathways"] = by_slug[slug] if slug && by_slug.key?(slug)
