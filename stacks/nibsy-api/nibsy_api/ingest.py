@@ -250,9 +250,38 @@ def _rows_from_glossary(data: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
 # front-matter tags the scorer needs.
 CATALOGUE_PATH = "/assets/data/nibsy-catalogue.json"
 
-_CATALOGUE_TYPES = {"post", "course", "review", "robot", "video"}
+_CATALOGUE_TYPES = {"post", "course", "review", "robot", "video", "project"}
 # Keys copied into `metadata` when present on a catalogue item.
-_CATALOGUE_META_KEYS = ("cover", "level", "duration", "videos", "video_id", "video_type")
+_CATALOGUE_META_KEYS = (
+    "cover", "level", "duration", "videos", "video_id", "video_type", "pins",
+)
+
+
+def _pathways_by_course(data: Any) -> dict[str, list[dict[str, Any]]]:
+    """Course URL -> the pathways it is in, with its stage and position (#632).
+
+    The catalogue lists each pathway's courses in order; a course can be in
+    several pathways.
+    """
+
+    pathways = data.get("pathways") if isinstance(data, dict) else None
+    by_course: dict[str, list[dict[str, Any]]] = {}
+    for pathway in pathways or []:
+        if not isinstance(pathway, dict) or not pathway.get("slug"):
+            continue
+        courses = [c for c in pathway.get("courses") or [] if isinstance(c, dict) and c.get("url")]
+        for position, course in enumerate(courses):
+            by_course.setdefault(course["url"], []).append(
+                {
+                    "slug": pathway["slug"],
+                    "title": pathway.get("title"),
+                    "url": pathway.get("url"),
+                    "stage": course.get("stage"),
+                    "position": position,
+                    "of": len(courses),
+                }
+            )
+    return by_course
 
 
 def _rows_from_catalogue(data: Any) -> list[dict[str, Any]]:
@@ -263,8 +292,9 @@ def _rows_from_catalogue(data: Any) -> list[dict[str, Any]]:
     """
 
     items = data.get("items") if isinstance(data, dict) else None
+    pathways = _pathways_by_course(data)
     rows: list[dict[str, Any]] = []
-    seen: set[str] = set()
+    seen: dict[str, dict[str, Any]] = {}
     for entry in items or []:
         if not isinstance(entry, dict):
             continue
@@ -274,22 +304,26 @@ def _rows_from_catalogue(data: Any) -> list[dict[str, Any]]:
         if not url or not title or content_type not in _CATALOGUE_TYPES:
             continue
         if url in seen:
+            # A showcase project that is really a blog post keeps the post's
+            # row, flagged so it can be suggested as something to build.
+            if content_type == "project":
+                seen[url]["content_metadata"]["project"] = True
             continue
-        seen.add(url)
         tags = sorted({str(t).strip().lower() for t in entry.get("tags") or [] if t})
-        rows.append(
-            {
-                "content_type": content_type,
-                "title": str(title),
-                "url": url,
-                "description": entry.get("description"),
-                "tags": tags,
-                "date_published": _parse_date(entry.get("date")),
-                "content_metadata": {
-                    k: entry[k] for k in _CATALOGUE_META_KEYS if entry.get(k)
-                },
-            }
-        )
+        meta = {k: entry[k] for k in _CATALOGUE_META_KEYS if entry.get(k)}
+        if content_type == "course" and url in pathways:
+            meta["pathways"] = pathways[url]
+        row = {
+            "content_type": content_type,
+            "title": str(title),
+            "url": url,
+            "description": entry.get("description"),
+            "tags": tags,
+            "date_published": _parse_date(entry.get("date")),
+            "content_metadata": meta,
+        }
+        seen[url] = row
+        rows.append(row)
     return rows
 
 

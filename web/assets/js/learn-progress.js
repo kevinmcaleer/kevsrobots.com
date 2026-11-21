@@ -3,7 +3,9 @@
 // course-progress.js saves each reader's progress in their own browser
 // (localStorage, one "kr-course:/learn/<course>/" record per course). This
 // script reads those records, so it works whether or not the reader is
-// logged in, and does nothing for a reader with no progress.
+// logged in, and does nothing for a reader with no progress. For a signed-in
+// reader, progress-sync.js first brings in progress from their account
+// (other devices), and the page is drawn again if anything came back.
 //
 //   /learn/           fills the "Continue learning" strip (#learn-continue)
 //                     with up to three courses in progress, most recent first.
@@ -34,6 +36,7 @@
         return progress;
     }
 
+    function render() {
     const progress = readProgress();
     if (Object.keys(progress).length === 0) return;
 
@@ -70,6 +73,7 @@
         courses.sort((a, b) => b.updated - a.updated || b.visited - a.visited);
 
         const holder = strip.querySelector('[data-continue-cards]');
+        holder.textContent = '';
         courses.slice(0, 3).forEach(course => {
             const percent = Math.round((course.visited / course.lessons) * 100);
             const card = el('a', 'learn-continue-card');
@@ -101,16 +105,23 @@
         let finished = 0;
         let started = 0;
         steps.forEach(step => {
+            const go = step.querySelector('[data-course-go]');
+            if (go && !go.dataset.original) {
+                go.dataset.original = JSON.stringify({ text: go.textContent, href: go.getAttribute('href') });
+            }
             const saved = progress[step.dataset.courseKey];
             const lessons = Number(step.dataset.lessons) || 0;
             if (!saved || lessons === 0) return;
             started++;
             const done = saved.visited >= lessons;
             if (done) finished++;
+            step.classList.remove('is-done', 'is-started');
             step.classList.add(done ? 'is-done' : 'is-started');
 
-            const go = step.querySelector('[data-course-go]');
             if (go) {
+                const original = JSON.parse(go.dataset.original);
+                go.href = original.href;
+                go.classList.replace('btn-primary', 'btn-outline-dark');
                 go.textContent = done ? 'Review' : 'Continue';
                 if (!done && saved.last) go.href = step.dataset.courseKey + saved.last + '.html';
                 if (!done) go.classList.replace('btn-outline-dark', 'btn-primary');
@@ -129,5 +140,11 @@
             summary.textContent = `You have finished ${finished} of ${steps.length} courses in this pathway.`;
             summary.hidden = false;
         }
+    }
+    }
+
+    render();
+    if (window.krProgressSync && window.krProgressSync.signedIn()) {
+        window.krProgressSync.syncAll().then(body => { if (body) render(); });
     }
 })();

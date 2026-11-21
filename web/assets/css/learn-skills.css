@@ -1,0 +1,71 @@
+/* "Learn the skills for this build" on posts and projects (_includes/learn_skills.html, #636) */
+.learn-skills {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #e6e2dc;
+  border-radius: 0.9rem;
+  background: #f7f5f2;
+}
+
+.learn-skills h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.learn-skills h2 i {
+  color: #c22032;
+}
+
+.learn-skills-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.75rem;
+}
+
+.learn-skills-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.7rem;
+  border: 1px solid #e6e2dc;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+}
+
+.learn-skills-card:hover {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.learn-skills-card img {
+  flex: none;
+  width: 6rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.learn-skills-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.learn-skills-meta {
+  font-size: 0.82rem;
+  color: #5a5a5f;
+}
+
+.learn-skills-state {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #c22032;
+}
+
+.learn-skills-state.is-done {
+  color: #1e7f4f;
+}

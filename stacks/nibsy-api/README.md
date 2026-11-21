@@ -121,6 +121,15 @@ curl https://nibsy.kevsrobots.com/health
 | `POST /api/track/view` | implemented | Record a logged-in user's page view (ignored when anonymous) |
 | `GET /api/me/history` | implemented | The logged-in user's stored viewing history |
 | `DELETE /api/me/history` | implemented | Erase the logged-in user's viewing history |
+| `GET /api/me/progress` | implemented | The logged-in learner's course progress, most recent first |
+| `POST /api/me/progress` | implemented | Merge `{courses: [...]}` from the browser (course-progress.js records) and return the full stored progress |
+| `DELETE /api/me/progress[?course=]` | implemented | Reset one course, or all course progress |
+| `GET`/`POST /api/me/learning-settings` | implemented | `{show_courses}`: list finished courses on the public profile (off by default) |
+| `GET /api/learners/{username}/courses` | implemented | Public: a learner's finished courses, empty unless they turned `show_courses` on |
+| `POST /api/learn/helpful` | implemented | `{page, helpful, previous?}`: count a "Was this lesson helpful?" answer (counts only) |
+| `GET /api/learn/helpful` | implemented | Votes per course and lesson, for `/learn/course-health/` |
+| `GET /api/learn/for-page?page=` | implemented | Courses that teach what a post or project page uses (pins first) |
+| `GET /api/learn/follow-on?course=` | implemented | The next course in each of a course's pathways, and projects to build |
 | `GET /api/analytics/top-clicked` | implemented | Most clicked content by period (#68) |
 | `GET /api/analytics/nibsy-stats` | implemented | Dashboard-level stats (#68) |
 | `POST /api/admin/ingest` | implemented | Re-ingest from `NIBSY_DATA_DIR` |
@@ -182,6 +191,10 @@ shaped by what that user has read:
   older than `VIEW_HISTORY_DAYS` (default 90) are deleted daily.
 - Users can see and erase their data: `GET` / `DELETE /api/me/history`
   ("Forget What I've Read" in the Nibsy menu).
+- Course progress (`nibsy_course_progress`) is stored only for signed-in
+  learners, only what lesson pages already keep in the browser (lessons
+  opened, first quiz answers, last lesson, completion), and is kept until the
+  learner resets a course or clears it: `GET` / `DELETE /api/me/progress`
 
 ### Trending
 

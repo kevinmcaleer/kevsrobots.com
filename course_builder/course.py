@@ -174,6 +174,9 @@ class Course:
             self.date_published = manifest["date_published"]
             self.content = manifest["content"]
             self.level = manifest.get("level", "beginner")
+            # Projects to suggest at the end of the course ("Build something
+            # next"), as site URLs. Nibsy shows these first (#632).
+            self.projects = [str(p) for p in manifest.get("projects") or []]
             cover_folder = self.course_folder.replace("source", "/learn")
             self.cover = cover_folder + "/" + manifest["cover"]
             self.cover = self.cover.replace("//learn", "/learn")
@@ -417,4 +420,6 @@ class Course:
         # Only courses with a video get the key, so cards can test for it.
         if self.video:
             data["video"] = self.video
+        if getattr(self, "projects", None):
+            data["projects"] = self.projects
         return data

@@ -27,7 +27,10 @@
 
 {% comment %} Filled in by assets/js/learn-progress.js for readers with saved lesson progress. {% endcomment %}
 <section class="learn-continue" id="learn-continue" aria-labelledby="learn-continue-title" hidden>
-  <h2 id="learn-continue-title">Continue learning</h2>
+  <div class="learn-continue-head">
+    <h2 id="learn-continue-title">Continue learning</h2>
+    <a href="/learn/me/">My Learning</a>
+  </div>
   <div class="learn-continue-cards" data-continue-cards></div>
 </section>
 
@@ -81,4 +84,5 @@
   <a href="/stem/">STEM Centre</a>
 </nav>
 
+<script src="/assets/js/progress-sync.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/learn-progress.js?v={{ site.time | date: '%s' }}"></script>

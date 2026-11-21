@@ -6,6 +6,8 @@
 //     last: "01_intro", updated: <ms since 1970>,
 //     completed: <ms since 1970, set when the "Course complete" dialog was shown> }
 // Only the first answer to each question counts towards the score.
+// For signed-in readers, progress-sync.js also saves the record to their
+// account and brings back what they did on other devices.
 (function () {
     const STORAGE_PREFIX = 'kr-course:';
 
@@ -42,6 +44,17 @@
     state.last = currentLesson;
     state.updated = Date.now();
     save(state);
+
+    // Save to the reader's account, then show anything done on another device.
+    function syncToAccount() {
+        if (!window.krProgressSync || !window.krProgressSync.signedIn()) return;
+        window.krProgressSync.syncCourse(courseKey).then(body => {
+            if (!body) return;
+            const merged = load();
+            Object.assign(state, merged);
+            updateSidebar();
+        });
+    }
 
     // --- Sidebar: progress bar, visited ticks, quiz score -------------------
     function updateSidebar() {
@@ -115,13 +128,15 @@
             links.every(link => state.visited[lessonId(link.getAttribute('href') || '')]);
     }
 
+    // Every course records when it was finished (My Learning and the
+    // public profile use it); courses with share cards also say well done.
     function checkComplete() {
-        if (!window.krCourseShare) return;
-        window.krCourseShare.setScore(quizScore());
+        if (window.krCourseShare) window.krCourseShare.setScore(quizScore());
         if (isComplete() && !state.completed) {
             state.completed = Date.now();
             save(state);
-            window.krCourseShare.open({ score: quizScore() });
+            syncToAccount();
+            if (window.krCourseShare) window.krCourseShare.open({ score: quizScore() });
         }
     }
 
@@ -157,6 +172,7 @@
             if (firstTry) {
                 state.answers[qid] = right;
                 save(state);
+                syncToAccount();
                 updateSidebar();
                 if (window.krCourseShare) window.krCourseShare.setScore(quizScore());
             }
@@ -197,9 +213,13 @@
             delete state.completed;
             save(state);
             updateSidebar();
+            if (window.krProgressSync && window.krProgressSync.signedIn()) {
+                window.krProgressSync.reset(courseKey).then(syncToAccount);
+            }
         }
     });
 
     updateSidebar();
     checkComplete();
+    syncToAccount();
 })();

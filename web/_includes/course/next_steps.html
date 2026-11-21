@@ -1,1 +1,40 @@
-<!-- Suggest the next course from the learning pathway -->
+{%- comment -%}
+  "What next" at the end of a course (#635): shown on a course's last lesson,
+  below the lesson. page.course_pathways (from _plugins/pathways.rb) gives
+  the next course in each learning pathway this course is part of;
+  assets/js/course-next.js fills "Build something next" with projects from
+  Nibsy (pinned by the course's `projects:` in course.yml, then related).
+{%- endcomment -%}
+{%- assign with_next = page.course_pathways | where_exp: "p", "p.next" -%}
+<section class="course-next" aria-labelledby="course-next-title">
+  <h2 id="course-next-title">What next?</h2>
+  {% if with_next.size > 0 %}
+  <div class="course-next-courses">
+    {% for p in with_next limit: 2 %}
+    {%- assign c = p.next -%}
+    <a class="course-next-card" href="{{ c.link }}">
+      <img src="{{ c.cover }}" alt="" loading="lazy">
+      <span class="course-next-body">
+        <span class="course-next-kicker">Next in {{ p.title }} · course {{ p.position | plus: 1 }} of {{ p.of }}</span>
+        <b>{{ c.name }}</b>
+        <span class="course-next-meta">{{ c.level | capitalize }} · {{ c.duration }} · {{ c.lessons }} lessons</span>
+      </span>
+      <span class="btn btn-primary btn-sm">Start next course</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% elsif page.course_pathways.size > 0 %}
+  {%- assign p = page.course_pathways | first -%}
+  <p>This is the last course in <a href="{{ p.url }}">{{ p.title }}</a>. Well done for getting this far. <a href="/learn/learning_pathways/">Pick another pathway</a> to keep going.</p>
+  {% else %}
+  <p><a href="/learn/learning_pathways/">Pick a learning pathway</a> to find your next course.</p>
+  {% endif %}
+
+  <div class="course-next-projects" data-course-projects hidden>
+    <h3>Build something next</h3>
+    <p class="course-next-meta">Projects that use what this course taught.</p>
+    <div class="course-next-grid" data-course-projects-list></div>
+  </div>
+  <p class="course-next-more"><a href="/learn/me/">See all your courses in My Learning</a></p>
+</section>
+<script src="/assets/js/course-next.js?v={{ site.time | date: '%s' }}" data-course="{{ page.url | escape }}" defer></script>

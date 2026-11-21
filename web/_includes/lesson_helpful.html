@@ -1,0 +1,13 @@
+{%- comment -%}
+  "Was this lesson helpful?" (#637) at the end of every lesson.
+  assets/js/lesson-helpful.js sends the answer to Nibsy (only counts are
+  kept, never who voted) and remembers it in the browser so the reader can
+  change their mind. The tallies show on /learn/course-health/.
+{%- endcomment -%}
+<div class="lesson-helpful" data-lesson-helpful>
+  <span class="lesson-helpful-q">Was this lesson helpful?</span>
+  <button type="button" class="btn btn-outline-secondary btn-sm" data-helpful="yes"><i class="fa-regular fa-thumbs-up" aria-hidden="true"></i> Yes</button>
+  <button type="button" class="btn btn-outline-secondary btn-sm" data-helpful="no"><i class="fa-regular fa-thumbs-down" aria-hidden="true"></i> No</button>
+  <span class="lesson-helpful-thanks" data-helpful-thanks role="status"></span>
+</div>
+<script src="/assets/js/lesson-helpful.js?v={{ site.time | date: '%s' }}" defer></script>

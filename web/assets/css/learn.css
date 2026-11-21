@@ -280,8 +280,16 @@
   background: #f8f9fa;
 }
 
+.learn-continue-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
 .learn-continue h2 {
-  margin: 0 0 0.75rem;
+  margin: 0;
   font-size: 1.3rem;
 }
 

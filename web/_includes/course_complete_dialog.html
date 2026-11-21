@@ -17,7 +17,13 @@
     {% if info.video %}
     <a class="btn btn-danger btn-sm" href="https://www.youtube.com/watch?v={{ info.video }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch the course video</a>
     {% endif %}
+    {%- assign next_paths = page.course_pathways | where_exp: "p", "p.next" -%}
+    {% if next_paths.size > 0 %}
+    {%- assign np = next_paths | first -%}
+    <a class="btn btn-primary btn-sm" href="{{ np.next.link }}" title="Next in {{ np.title | escape }}">Next: {{ np.next.name }}</a>
+    {% else %}
     <a class="btn btn-outline-secondary btn-sm" href="/learn/">Find your next course</a>
+    {% endif %}
     <a class="btn btn-link btn-sm" href="{{ info.completed_card }}" download="{{ info.slug }}-completed.jpg"><i class="fa-solid fa-download" aria-hidden="true"></i> Download your card</a>
   </div>
 </dialog>

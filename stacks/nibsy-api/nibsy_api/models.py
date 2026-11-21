@@ -157,3 +157,56 @@ class NibsyPageView(Base):
     last_viewed_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
+
+
+class NibsyCourseProgress(Base):
+    """How far a logged-in learner is through one course (#633).
+
+    One row per (user, course). Lesson pages keep the same record in the
+    reader's browser and send it here when they are logged in, so progress
+    follows them between devices. ``course`` is the course folder URL, e.g.
+    ``/learn/micropython/``; ``visited`` the lesson ids opened; ``answers``
+    the first answer to each quiz question (true when right). Kept until
+    the learner resets the course or clears it from My Learning.
+    """
+
+    __tablename__ = "nibsy_course_progress"
+
+    username: Mapped[str] = mapped_column(String(100), primary_key=True)
+    course: Mapped[str] = mapped_column(String(300), primary_key=True)
+    visited: Mapped[list[str]] = mapped_column(JsonType, nullable=False, default=list)
+    answers: Mapped[dict[str, bool]] = mapped_column(JsonType, nullable=False, default=dict)
+    last_lesson: Mapped[Optional[str]] = mapped_column(String(200))
+    started_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+
+class NibsyLearnerSettings(Base):
+    """A learner's choices about their learning data (#638).
+
+    ``show_courses``: list the courses they have finished on their public
+    profile. Off until they turn it on in My Learning.
+    """
+
+    __tablename__ = "nibsy_learner_settings"
+
+    username: Mapped[str] = mapped_column(String(100), primary_key=True)
+    show_courses: Mapped[bool] = mapped_column(nullable=False, default=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class NibsyLessonVote(Base):
+    """"Was this lesson helpful?" tallies per lesson (#637).
+
+    Only counts are kept, never who voted. The course health page sums them
+    per course.
+    """
+
+    __tablename__ = "nibsy_lesson_votes"
+
+    lesson: Mapped[str] = mapped_column(String(300), primary_key=True)
+    course: Mapped[str] = mapped_column(String(300), nullable=False, index=True)
+    up: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    down: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

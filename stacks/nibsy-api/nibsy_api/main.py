@@ -28,7 +28,7 @@ from .ingest import ingest_from_data_dir, ingest_from_remote
 from .trending import compute_trending
 from .models import NibsyContent
 from .history import purge_old_views
-from .routers import admin, analytics, health, me, recommendations, stubs, tracking
+from .routers import admin, analytics, health, learn, me, recommendations, stubs, tracking
 
 logger = logging.getLogger(__name__)
 
@@ -188,6 +188,8 @@ def create_app() -> FastAPI:
     app.include_router(recommendations.router)
     app.include_router(tracking.router)
     app.include_router(me.router)
+    app.include_router(me.public_router)
+    app.include_router(learn.router)
     app.include_router(analytics.router)
     app.include_router(stubs.router)
     return app
