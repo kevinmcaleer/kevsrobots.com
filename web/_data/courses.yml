@@ -872,6 +872,22 @@
   link: /learn/snakie_instruments/00_intro.html
   name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - author: Kevin McAleer
+  cover: /learn/snakie_sprites/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Give your robot a face. Draw 1-bit sprites and frame animations in
+    Snakie's Sprite editor, learn how pixels become bytes, then use MicroPython's
+    framebuf to make a pair of eyes blink, glance around and react to light on a simulated
+    OLED, before moving the same code to a real SSD1306 screen.
+  duration: 1h 11m
+  groups:
+  - micropython
+  - robots
+  - pico
+  lessons: 14
+  level: beginner
+  link: /learn/snakie_sprites/00_intro.html
+  name: Pixel Art and Animation in Snakie
+- author: Kevin McAleer
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
   description: Learn the fundamentals of SQL, relational database theory, and essential
