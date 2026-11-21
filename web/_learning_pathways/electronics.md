@@ -8,8 +8,7 @@ description: Understand the circuits behind your projects, wire them up in Snaki
 order: 5
 stages:
   start:
-  - soon: Electronics basics
-    issue: 639
+  - Electronics basics
   - Wire It Up - Electronics in Snakie
   build:
   - Snakie Instruments - Oscilloscope, Multimeter and Plotter
