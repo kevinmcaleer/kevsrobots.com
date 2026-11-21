@@ -8,56 +8,60 @@ thanks: false
 {% include course_navigation.html %}
 </div>
 <div class="row m-0 p-0">
-    <div class="col-12 col-md-12 col-lg-3 bg-light">
+    <div class="col-12 col-md-12 col-lg-3 bg-light course-sidebar">
         {% assign nav = page.navigation %}
-        <div class="container-fluid py-3">
+        {%- comment -%} The sidebar sticks on wide screens and tightens to titles + ticks once you scroll into the lesson; on phones the list folds away and a slim bar follows you down the page (assets/js/course-nav.js). {%- endcomment -%}
+        <div class="course-nav" data-course-nav>
+        <div class="container-fluid py-3 course-nav-top">
             <div class="learn-nav m-0 p-0">
-        <div class="card border-0 shadow-lg">
+        <div class="card border-0 shadow-lg course-nav-card">
             <div class="card-header bg-learnhead py-0">
               <p class="text-white my-0 text-center text-nowrap text-truncate ">
                 <i class="fa-sharp fa-solid fa-graduation-cap "></i>&nbsp;&nbsp; KevsRobots Learning Platform</p>
             </div>
             <div class="card-body">
-                <div class="container mb-3">
-                    <h5>{{nav[0].name}}</h5>
+                <div class="container mb-3 course-nav-summary">
+                    <h5 class="course-nav-title">{{nav[0].name}}</h5>
                     
                     <div class="progress">
                         <div class="progress-bar" role="progressbar" data-course-progress-bar style="width: {{page.percent}}%" aria-valuenow="{{page.percent}}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                     <p class="text-small mb-1" data-course-progress-text>{{page.percent}}% complete</p>
                     <p class="text-small mb-1" data-quiz-score data-quiz-total="{{ page.quiz_total | default: 0 }}" hidden><i class="fa-solid fa-trophy"></i>&nbsp; Quiz score <b data-quiz-score-text></b></p>
-                    <a href="#" class="text-small grey" data-course-reset>Reset my progress</a>
+                    <a href="#" class="text-small grey course-nav-reset" data-course-reset>Reset my progress</a>
                 </div>
             </div>
             </div>  
         </div>
+        <button type="button" class="course-nav-toggle" data-course-nav-toggle aria-expanded="false" aria-controls="course-lessons">Show all lessons</button>
         </div>
         
-        <div class="container-fluid m-0 test">
+        <div class="container-fluid m-0 course-lessons" id="course-lessons" data-course-lessons>
             {% for item in nav %}
             {% for section in item.content %}
-            
-            <h5 class="course-heading">{{section.section}}</h5>
+            <div class="course-section">
+            <h5 class="course-heading">{{section.section}} <span class="course-section-count" data-section-count></span></h5>
     
             <ul class="nav flex-column m-0 p-0">
             {% for lesson in section.content %}
             {% assign page_url = page.url | relative_url %}
             {% assign current = page.url | downcase | split: '/' %}
             
-                <!-- <li class="nav-link m-0 mb-1 p-0 {% if current[-1] == lesson.link %}active{% endif %}"><a href="{{lesson.link}}" class="nav-item dotted {% if current[-1] == lesson.link %}active{% endif %}">{{lesson.name}}</a></li> -->
-                <li class="course-nav-link m-0 mb-1 p-0 {% if current[-1] == lesson.link %}active{% endif %}"><a href="{{lesson.link}}" class="course-nav-item {% if current[-1] == lesson.link %}active{% endif %}">{{lesson.name}}</a></li>
+                <li class="course-nav-link m-0 mb-1 p-0 {% if current[-1] == lesson.link %}active{% endif %}"><a href="{{lesson.link}}" class="course-nav-item {% if current[-1] == lesson.link %}active{% endif %}"{% if current[-1] == lesson.link %} aria-current="page"{% endif %}>{{lesson.name}}</a></li>
                 {% endfor %}
             </ul>
             <hr class="m-1 p-0"/>
+            </div>
             {% endfor %}
             {% endfor %}
             </div>
+        </div>
 
         </div>
     
     <div class="col-12 col-md-12 col-lg-9">
         <div class="px-3 m-3">
-            <h1>{{page.title}}</h1>
+            <h1 data-lesson-title>{{page.title}}</h1>
             <h2>{{page.description}}</h2>
             <div class="container m-0 p-0">
             <div class="d-flex justify-content-between m-0 p-0">
@@ -101,6 +105,7 @@ thanks: false
         <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
         </p>
         <script src="/assets/js/course-progress.js?v={{ site.time | date: '%s' }}"></script>
+        <script src="/assets/js/course-nav.js?v={{ site.time | date: '%s' }}" defer></script>
         {% unless page.snakie == false %}
         {%- comment -%} "Open in Snakie" on the lesson's Python code (#581). Set `snakie: false` in a lesson's front matter to leave it out. `board:` (pico2w, pico-plus-2, tiny2040, tiny2350, esp32-devkit) picks the board Run here draws (#589). {%- endcomment -%}
         <script src="/assets/js/open-in-snakie.js?v={{ site.time | date: '%s' }}"{% if page.board %} data-board="{{ page.board | escape }}"{% endif %} defer></script>

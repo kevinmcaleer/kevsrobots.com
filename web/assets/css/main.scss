@@ -1354,6 +1354,193 @@ table .w-30 {
 }
 
 // ----------------------------------------------------------------------
+// Lesson sidebar: sticky, collapses on scroll; phone bar + sheet
+// (_layouts/lesson.html, assets/js/course-nav.js)
+// ----------------------------------------------------------------------
+.course-section-count {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #888;
+  margin-left: 0.35em;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.course-section-count.is-done { color: #198754; }
+.course-section-count.is-done::before { content: "\2713\00a0"; }
+
+.course-nav-toggle {
+  display: none;
+  border: 0;
+  background: none;
+  padding: 0.25rem 0.75rem 0;
+  color: #0d6efd;
+  font-size: 0.95rem;
+}
+.course-nav-toggle::after {
+  content: "\25BE";
+  margin-left: 0.35em;
+}
+.course-nav.is-open .course-nav-toggle::after { content: "\25B4"; }
+
+@media (min-width: 992px) {
+  .course-nav {
+    position: sticky;
+    top: var(--kr-sticky-top, 0px);
+    max-height: calc(100vh - var(--kr-sticky-top, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding-bottom: 1.5rem;
+  }
+
+  // The tightened look once you've scrolled into the lesson
+  .course-nav .card-header {
+    max-height: 3rem;
+    overflow: hidden;
+  }
+  .course-nav.is-compact {
+    .course-nav-top { padding-top: 0.6rem !important; padding-bottom: 0.25rem !important; }
+    .card-header { max-height: 0; padding-top: 0 !important; padding-bottom: 0 !important; border-bottom-width: 0; }
+    .card-body { padding: 0.55rem 0.75rem; }
+    .course-nav-summary { margin-bottom: 0 !important; padding: 0; }
+    .course-nav-title {
+      font-size: 0.95rem !important; // beats the site-wide h5 size
+      margin-bottom: 0.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .progress { height: 6px; }
+    .course-nav-summary .text-small { font-size: 0.78rem; margin: 0.3rem 0 0 !important; }
+    .course-nav-reset { font-size: 0.78rem; display: inline-block; margin-top: 0.1rem; }
+    .course-heading {
+      font-size: 0.72rem !important;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      padding-top: 0.75rem !important;
+      margin-bottom: 0.25rem;
+    }
+    .course-section hr { opacity: 0; margin: 0 !important; }
+    .course-nav-link { margin-bottom: 0 !important; }
+    .course-nav-item { font-size: 0.92rem; }
+  }
+  .course-nav.is-ready {
+    .card-header, .card-body, .course-nav-top, .course-nav-title, .progress,
+    .course-nav-summary .text-small, .course-heading, .course-nav-item, .course-section hr {
+      transition: all 0.2s ease;
+    }
+  }
+}
+
+// Phones and narrow windows: fold the lesson list away
+@media (max-width: 991.98px) {
+  .course-nav-toggle { display: inline-block; }
+  .course-nav:not(.is-open) .course-lessons { display: none; }
+  .course-nav-top { padding-bottom: 0.5rem !important; }
+}
+
+.course-nav-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--kr-sticky-top, 0px);
+  z-index: 1019; // just under Bootstrap's .sticky-top top bar
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #e3e3e3;
+  padding: 0;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  text-align: left;
+  font-size: 0.95rem;
+  color: #212529;
+  transform: translateY(-110%);
+  visibility: hidden;
+  transition: transform 0.2s ease, visibility 0.2s;
+}
+.course-nav-bar.is-shown { transform: none; visibility: visible; }
+.course-nav-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+}
+.course-nav-bar-count { white-space: nowrap; }
+.course-nav-bar-title {
+  flex: 1;
+  min-width: 0;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.course-nav-bar-open { color: #0d6efd; white-space: nowrap; font-size: 0.9rem; }
+.course-nav-bar-progress { display: block; height: 3px; background: #e9ecef; }
+.course-nav-bar-progress i { display: block; height: 100%; width: 0; background: #0d6efd; }
+
+.course-sheet { position: fixed; inset: 0; z-index: 10050; } // above the Nibsy helper
+.course-sheet-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.course-sheet-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: #F8F9FA;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.25);
+  transform: translateY(100%);
+  transition: transform 0.2s ease;
+}
+.course-sheet.is-open .course-sheet-scrim { opacity: 1; }
+.course-sheet.is-open .course-sheet-panel { transform: none; }
+.course-sheet-grab { width: 44px; height: 5px; border-radius: 3px; background: #ccc; margin: 8px auto 2px; }
+.course-sheet-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 0.5rem;
+  padding: 0.25rem 0.5rem 0.6rem 1.25rem;
+  border-bottom: 1px solid #e6e6e6;
+  font-size: 0.9rem;
+}
+.course-sheet-title { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.course-sheet-meta { grid-column: 1; grid-row: 2; color: #666; font-size: 0.85rem; }
+.course-sheet-meta a { color: #666; }
+.course-sheet-close:focus:not(:focus-visible) { outline: none; }
+.course-sheet-close { grid-column: 2; grid-row: 1 / span 2; border: 0; background: none; font-size: 1.6rem; line-height: 1; padding: 0.25rem 0.6rem; color: #555; }
+.course-sheet-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 0.75rem calc(1rem + env(safe-area-inset-bottom));
+}
+.course-sheet-body .course-heading {
+  font-size: 0.72rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+  padding-top: 0.9rem !important;
+  margin-bottom: 0.3rem;
+}
+.course-sheet-body .course-section hr { display: none; }
+.course-sheet-body .course-nav-item { display: block; padding: 0.2rem 0; }
+html.course-sheet-open { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .course-nav *, .course-nav-bar, .course-sheet-scrim, .course-sheet-panel { transition: none !important; }
+}
+
+// ----------------------------------------------------------------------
 // Lesson quizzes (quiz block tag, _plugins/quiz.rb)
 // ----------------------------------------------------------------------
 .kr-quiz {
