@@ -29,6 +29,22 @@
   link: /learn/bettercad/00_intro.html
   name: Learn BetterCad
 - author: Kevin McAleer
+  cover: /learn/bettercad_joints_urdf/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Turn a design that sits still into a robot that moves. Add hinge, wheel
+    and slider joints in BetterCad, pose them, drag an arm by its tip, check every
+    pose for clashes, link joints through gears, and export the lot as URDF. The project
+    is a two-joint desk arm.
+  duration: 1h 10m
+  groups:
+  - 3ddesign
+  - robots
+  - robotarms
+  lessons: 14
+  level: intermediate
+  link: /learn/bettercad_joints_urdf/00_intro.html
+  name: Make It Move with BetterCad
+- author: Kevin McAleer
   cover: /learn/bettercad_printing/assets/cover.jpg
   date_published: 2026-11-20
   description: Get parts that fit first time. Set up your printer in BetterCad, catch
