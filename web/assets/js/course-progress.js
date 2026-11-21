@@ -2,7 +2,8 @@
 //
 // Everything is kept in the reader's browser (localStorage), one record per
 // course, keyed by the course folder (e.g. /learn/micropython/):
-//   { visited: { "01_intro": true, ... }, answers: { "<question id>": true|false } }
+//   { visited: { "01_intro": true, ... }, answers: { "<question id>": true|false },
+//     last: "01_intro", updated: <ms since 1970> }
 // Only the first answer to each question counts towards the score.
 (function () {
     const STORAGE_PREFIX = 'kr-course:';
@@ -21,7 +22,7 @@
         try {
             const data = JSON.parse(localStorage.getItem(STORAGE_PREFIX + courseKey));
             if (data && typeof data === 'object') {
-                return { visited: data.visited || {}, answers: data.answers || {} };
+                return { ...data, visited: data.visited || {}, answers: data.answers || {} };
             }
         } catch (e) { /* storage blocked or corrupt: start fresh */ }
         return { visited: {}, answers: {} };
@@ -35,6 +36,10 @@
 
     const state = load();
     state.visited[currentLesson] = true;
+    // For "Continue learning" on /learn/ (learn-progress.js): where the
+    // reader was last, and when.
+    state.last = currentLesson;
+    state.updated = Date.now();
     save(state);
 
     // --- Sidebar: progress bar, visited ticks, quiz score -------------------

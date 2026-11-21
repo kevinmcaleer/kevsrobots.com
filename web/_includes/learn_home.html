@@ -2,6 +2,7 @@
   The Learn homepage (/learn/), top to bottom:
 
     1. Heading and search
+       (then "Continue learning", only for readers with saved lesson progress)
     2. Learning pathways (the first 8, button for the rest)
     3. New courses (the 4 newest)
     4. Periodic Table of Robotics, as a slim strip
@@ -23,6 +24,12 @@
     <button type="submit" class="btn btn-outline-dark">Search</button>
   </form>
 </header>
+
+{% comment %} Filled in by assets/js/learn-progress.js for readers with saved lesson progress. {% endcomment %}
+<section class="learn-continue" id="learn-continue" aria-labelledby="learn-continue-title" hidden>
+  <h2 id="learn-continue-title">Continue learning</h2>
+  <div class="learn-continue-cards" data-continue-cards></div>
+</section>
 
 <section aria-labelledby="learn-pathways-title">
   <div class="learn-section-head">
@@ -73,3 +80,5 @@
   <a href="/resources/boards/">Boards</a>
   <a href="/stem/">STEM Centre</a>
 </nav>
+
+<script src="/assets/js/learn-progress.js?v={{ site.time | date: '%s' }}"></script>
