@@ -1,0 +1,54 @@
+- name: Arduino Uno Q - Two Brains, One Board
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  level: beginner
+  layout: course
+  cover: assets/cover.jpg
+  video: 4HFb-FGQ8_w
+  code_target: cpython
+  code_board: uno-q
+  groups:
+      - arduino
+      - electronics
+      - python
+      - ai
+  description: >-
+    Learn the Arduino Uno Q from first boot to a project that runs by itself. Split a job between
+    its Linux computer and its microcontroller, make Python and an Arduino sketch talk over the
+    Bridge, and build the Q Board, a number display you drive from Python.
+  outcomes:
+    - Explain what the Linux side and the microcontroller side of the Uno Q are each good at
+    - Set the board up in Arduino App Lab and work on it over Wi-Fi
+    - Draw pictures and animations on the LED matrix
+    - Read sensors and move a servo from an Arduino sketch
+    - Call sketch functions from Python, and Python functions from a sketch, over the Bridge
+    - Find and fix the common Bridge bugs, including the provide() deadlock
+  prerequisites:
+    - A little Python or a little Arduino C++. You don't need both
+  you_need:
+    - An Arduino Uno Q (2 GB or 4 GB)
+    - A USB-C data cable
+    - Arduino App Lab on a Windows, macOS or Linux computer
+    - A 10k potentiometer and three jumper wires (lessons 5 and 8)
+    - Optional, a Modulino Thermo with a Qwiic cable, and a small hobby servo (lesson 5)
+  content:
+    - section:
+        name: Meet the board
+        content:
+          - 00_intro.md
+          - 01_two_brains_one_board.md
+          - 02_first_boot_app_lab_and_wifi.md
+          - 03_your_first_app.md
+    - section:
+        name: The microcontroller side
+        content:
+          - 04_drawing_on_the_led_matrix.md
+          - 05_pins_sensors_and_servos.md
+    - section:
+        name: The Bridge
+        content:
+          - 06_how_the_bridge_works.md
+          - 07_python_calls_the_sketch.md
+          - 08_the_sketch_calls_python.md
+          - 09_when_the_bridge_goes_wrong.md

@@ -76,6 +76,72 @@
     ]
   },
   {
+    "slug": "arduino_uno_q",
+    "name": "Arduino Uno Q - Two Brains, One Board",
+    "description": "Learn the Arduino Uno Q from first boot to a project that runs by itself. Split a job between its Linux computer and its microcontroller, make Python and an Arduino sketch talk over the Bridge, and build the Q Board, a number display you drive from Python.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "arduino",
+      "electronics",
+      "python",
+      "ai"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Meet the board",
+        "url": "/learn/arduino_uno_q/00_intro.html"
+      },
+      {
+        "file": "01_two_brains_one_board.md",
+        "section": "Meet the board",
+        "url": "/learn/arduino_uno_q/01_two_brains_one_board.html"
+      },
+      {
+        "file": "02_first_boot_app_lab_and_wifi.md",
+        "section": "Meet the board",
+        "url": "/learn/arduino_uno_q/02_first_boot_app_lab_and_wifi.html"
+      },
+      {
+        "file": "03_your_first_app.md",
+        "section": "Meet the board",
+        "url": "/learn/arduino_uno_q/03_your_first_app.html"
+      },
+      {
+        "file": "04_drawing_on_the_led_matrix.md",
+        "section": "The microcontroller side",
+        "url": "/learn/arduino_uno_q/04_drawing_on_the_led_matrix.html"
+      },
+      {
+        "file": "05_pins_sensors_and_servos.md",
+        "section": "The microcontroller side",
+        "url": "/learn/arduino_uno_q/05_pins_sensors_and_servos.html"
+      },
+      {
+        "file": "06_how_the_bridge_works.md",
+        "section": "The Bridge",
+        "url": "/learn/arduino_uno_q/06_how_the_bridge_works.html"
+      },
+      {
+        "file": "07_python_calls_the_sketch.md",
+        "section": "The Bridge",
+        "url": "/learn/arduino_uno_q/07_python_calls_the_sketch.html"
+      },
+      {
+        "file": "08_the_sketch_calls_python.md",
+        "section": "The Bridge",
+        "url": "/learn/arduino_uno_q/08_the_sketch_calls_python.html"
+      },
+      {
+        "file": "09_when_the_bridge_goes_wrong.md",
+        "section": "The Bridge",
+        "url": "/learn/arduino_uno_q/09_when_the_bridge_goes_wrong.html"
+      }
+    ]
+  },
+  {
     "slug": "bettercad",
     "name": "Learn BetterCad",
     "description": "Design your own 3D printable parts in BetterCad, the free CAD tool that runs in your browser. Sketch, extrude, add screw holes that fit, hollow out an enclosure, drive a model with parameters, then build a phone stand from scratch.",
@@ -967,6 +1033,101 @@
         "file": "11_mini_capstone.md",
         "section": "Conclusion and Next Steps",
         "url": "/learn/duckdb/11_mini_capstone.html"
+      }
+    ]
+  },
+  {
+    "slug": "electronics_basics",
+    "name": "Electronics basics",
+    "description": "Learn the electronics every robot builder needs: voltage, current, resistance, Ohm's law, breadboards, multimeters, voltage dividers and transistors. You will build a light-sensing night light on a breadboard, then hand it over to a Raspberry Pi Pico running MicroPython.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "electronics",
+      "pico",
+      "robots"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/electronics_basics/00_intro.html"
+      },
+      {
+        "file": "01_voltage_current_resistance.md",
+        "section": "The basics",
+        "url": "/learn/electronics_basics/01_voltage_current_resistance.html"
+      },
+      {
+        "file": "02_ohms_law.md",
+        "section": "The basics",
+        "url": "/learn/electronics_basics/02_ohms_law.html"
+      },
+      {
+        "file": "03_the_breadboard.md",
+        "section": "The basics",
+        "url": "/learn/electronics_basics/03_the_breadboard.html"
+      },
+      {
+        "file": "04_first_circuit_led_and_resistor.md",
+        "section": "The basics",
+        "url": "/learn/electronics_basics/04_first_circuit_led_and_resistor.html"
+      },
+      {
+        "file": "05_multimeter_measuring_voltage.md",
+        "section": "Measuring",
+        "url": "/learn/electronics_basics/05_multimeter_measuring_voltage.html"
+      },
+      {
+        "file": "06_multimeter_current_and_resistance.md",
+        "section": "Measuring",
+        "url": "/learn/electronics_basics/06_multimeter_current_and_resistance.html"
+      },
+      {
+        "file": "07_series_and_parallel.md",
+        "section": "Building blocks",
+        "url": "/learn/electronics_basics/07_series_and_parallel.html"
+      },
+      {
+        "file": "08_voltage_dividers.md",
+        "section": "Building blocks",
+        "url": "/learn/electronics_basics/08_voltage_dividers.html"
+      },
+      {
+        "file": "09_reading_datasheets.md",
+        "section": "Building blocks",
+        "url": "/learn/electronics_basics/09_reading_datasheets.html"
+      },
+      {
+        "file": "10_switches_and_pull_resistors.md",
+        "section": "Building blocks",
+        "url": "/learn/electronics_basics/10_switches_and_pull_resistors.html"
+      },
+      {
+        "file": "11_transistors_as_switches.md",
+        "section": "Building blocks",
+        "url": "/learn/electronics_basics/11_transistors_as_switches.html"
+      },
+      {
+        "file": "12_powering_your_projects.md",
+        "section": "Building blocks",
+        "url": "/learn/electronics_basics/12_powering_your_projects.html"
+      },
+      {
+        "file": "13_connecting_to_the_pico.md",
+        "section": "Into the Pico",
+        "url": "/learn/electronics_basics/13_connecting_to_the_pico.html"
+      },
+      {
+        "file": "14_project_night_light.md",
+        "section": "Project",
+        "url": "/learn/electronics_basics/14_project_night_light.html"
+      },
+      {
+        "file": "15_summary.md",
+        "section": "Project",
+        "url": "/learn/electronics_basics/15_summary.html"
       }
     ]
   },
@@ -2857,6 +3018,107 @@
         "file": "17_summary.md",
         "section": "Wrapping Up",
         "url": "/learn/mongodb/17_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "motors_and_drivers",
+    "name": "Motors and motor drivers",
+    "description": "Learn how DC motors, servos and stepper motors work, why they need a motor driver, and how to control all three from a Raspberry Pi Pico with MicroPython. Along the way you will build Scout, a two-wheeled drive base with a servo-mounted head that drives a square, spins on the spot and looks left and right.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "robots",
+      "micropython",
+      "pico",
+      "electronics"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Introduction",
+        "url": "/learn/motors_and_drivers/00_intro.html"
+      },
+      {
+        "file": "01_how_motors_work.md",
+        "section": "Motor basics",
+        "url": "/learn/motors_and_drivers/01_how_motors_work.html"
+      },
+      {
+        "file": "02_why_you_need_a_driver.md",
+        "section": "Motor basics",
+        "url": "/learn/motors_and_drivers/02_why_you_need_a_driver.html"
+      },
+      {
+        "file": "03_powering_motors.md",
+        "section": "Motor basics",
+        "url": "/learn/motors_and_drivers/03_powering_motors.html"
+      },
+      {
+        "file": "04_the_h_bridge.md",
+        "section": "DC motors",
+        "url": "/learn/motors_and_drivers/04_the_h_bridge.html"
+      },
+      {
+        "file": "05_wiring_a_motor_driver.md",
+        "section": "DC motors",
+        "url": "/learn/motors_and_drivers/05_wiring_a_motor_driver.html"
+      },
+      {
+        "file": "06_speed_with_pwm.md",
+        "section": "DC motors",
+        "url": "/learn/motors_and_drivers/06_speed_with_pwm.html"
+      },
+      {
+        "file": "07_a_motor_class.md",
+        "section": "DC motors",
+        "url": "/learn/motors_and_drivers/07_a_motor_class.html"
+      },
+      {
+        "file": "08_driving_two_motors.md",
+        "section": "DC motors",
+        "url": "/learn/motors_and_drivers/08_driving_two_motors.html"
+      },
+      {
+        "file": "09_ramping_and_braking.md",
+        "section": "DC motors",
+        "url": "/learn/motors_and_drivers/09_ramping_and_braking.html"
+      },
+      {
+        "file": "10_servo_basics.md",
+        "section": "Servos",
+        "url": "/learn/motors_and_drivers/10_servo_basics.html"
+      },
+      {
+        "file": "11_a_servo_class_and_calibration.md",
+        "section": "Servos",
+        "url": "/learn/motors_and_drivers/11_a_servo_class_and_calibration.html"
+      },
+      {
+        "file": "12_continuous_rotation_servos.md",
+        "section": "Servos",
+        "url": "/learn/motors_and_drivers/12_continuous_rotation_servos.html"
+      },
+      {
+        "file": "13_stepper_motors.md",
+        "section": "Steppers and sensing",
+        "url": "/learn/motors_and_drivers/13_stepper_motors.html"
+      },
+      {
+        "file": "14_measuring_speed_with_encoders.md",
+        "section": "Steppers and sensing",
+        "url": "/learn/motors_and_drivers/14_measuring_speed_with_encoders.html"
+      },
+      {
+        "file": "15_project_drive_base.md",
+        "section": "Project",
+        "url": "/learn/motors_and_drivers/15_project_drive_base.html"
+      },
+      {
+        "file": "16_summary.md",
+        "section": "Project",
+        "url": "/learn/motors_and_drivers/16_summary.html"
       }
     ]
   },
