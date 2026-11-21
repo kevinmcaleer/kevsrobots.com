@@ -1,0 +1,46 @@
+- name: Design Robot Parts with BetterCad
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  level: intermediate
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - 3ddesign
+      - 3dprinting
+      - robots
+  description: >-
+    Design printed parts around the servos, boards and gears a robot really uses. Drop parts in from BetterCad's robot catalogue, cut their pockets in one click, add standoffs and horn mounts, generate gears that mesh, and finish with a geared servo deck for a Raspberry Pi Pico.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Designing Around Real Parts
+      content:
+      - 01_reference_bodies.md
+      - 02_the_robot_parts_catalogue.md
+      - 03_measure_before_you_trust.md
+      - 04_cutting_a_pocket.md
+  - section:
+      name: Mounts
+      content:
+      - 05_standoffs_for_a_board.md
+      - 06_horn_mounts.md
+  - section:
+      name: Gears and Drives
+      content:
+      - 07_your_first_gear.md
+      - 08_bores_hubs_and_small_gears.md
+      - 09_meshing_gears.md
+      - 10_racks_pulleys_and_belts.md
+  - section:
+      name: Parts You Already Have
+      content:
+      - 11_from_mesh_to_editable_part.md
+  - section:
+      name: Project
+      content:
+      - 12_project_geared_servo_deck.md
+      - 13_summary.md

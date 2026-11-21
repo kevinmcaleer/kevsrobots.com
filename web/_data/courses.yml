@@ -29,6 +29,22 @@
   link: /learn/bettercad/00_intro.html
   name: Learn BetterCad
 - author: Kevin McAleer
+  cover: /learn/bettercad_joints_urdf/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Turn a design that sits still into a robot that moves. Add hinge, wheel
+    and slider joints in BetterCad, pose them, drag an arm by its tip, check every
+    pose for clashes, link joints through gears, and export the lot as URDF. The project
+    is a two-joint desk arm.
+  duration: 1h 10m
+  groups:
+  - 3ddesign
+  - robots
+  - robotarms
+  lessons: 14
+  level: intermediate
+  link: /learn/bettercad_joints_urdf/00_intro.html
+  name: Make It Move with BetterCad
+- author: Kevin McAleer
   cover: /learn/bettercad_printing/assets/cover.jpg
   date_published: 2026-11-20
   description: Get parts that fit first time. Set up your printer in BetterCad, catch
@@ -42,6 +58,22 @@
   level: beginner
   link: /learn/bettercad_printing/00_intro.html
   name: Print It Right with BetterCad
+- author: Kevin McAleer
+  cover: /learn/bettercad_robot_parts/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Design printed parts around the servos, boards and gears a robot really
+    uses. Drop parts in from BetterCad's robot catalogue, cut their pockets in one
+    click, add standoffs and horn mounts, generate gears that mesh, and finish with
+    a geared servo deck for a Raspberry Pi Pico.
+  duration: 1h 16m
+  groups:
+  - 3ddesign
+  - 3dprinting
+  - robots
+  lessons: 14
+  level: intermediate
+  link: /learn/bettercad_robot_parts/00_intro.html
+  name: Design Robot Parts with BetterCad
 - author: Kevin McAleer
   cover: /learn/bottango/assets/cover.jpg
   date_published: 2025-05-10
