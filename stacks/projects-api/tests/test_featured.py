@@ -236,3 +236,72 @@ async def test_featured_flag_surfaces_on_listing_and_detail(client):
     items = {p["id"]: p for p in r.json()}
     assert items[pid]["is_featured"] is True
     assert items[pid]["featured_note"] == "Surface"
+
+
+# ---- Admin picker: feature candidates ----
+
+
+@pytest.mark.asyncio
+async def test_feature_candidates_excludes_already_featured(client):
+    keep = await _create_project(client, title="Line Follower")
+    featured = await _create_project(client, title="Already Featured Bot")
+    await client.post(
+        f"/api/admin/projects/{featured}/feature",
+        json={"note": "x"},
+        headers=make_auth_header(ADMIN_USER),
+    )
+    resp = await client.get(
+        "/api/admin/projects/feature-candidates",
+        headers=make_auth_header(ADMIN_USER),
+    )
+    assert resp.status_code == 200, resp.text
+    ids = [p["id"] for p in resp.json()]
+    assert keep in ids
+    assert featured not in ids
+
+
+@pytest.mark.asyncio
+async def test_feature_candidates_search_by_title_author_and_id(client):
+    rover = await _create_project(client, owner="alice", title="Mars Rover")
+    arm = await _create_project(client, owner="bob", title="Robot Arm")
+
+    async def search(q):
+        r = await client.get(
+            "/api/admin/projects/feature-candidates",
+            params={"q": q},
+            headers=make_auth_header(ADMIN_USER),
+        )
+        assert r.status_code == 200, r.text
+        return [p["id"] for p in r.json()]
+
+    assert await search("rover") == [rover]
+    assert await search("BOB") == [arm]
+    assert arm in await search(str(arm))
+    # Wildcards are literal, not "match everything".
+    assert await search("%") == []
+
+
+@pytest.mark.asyncio
+async def test_feature_candidates_excludes_drafts(client):
+    draft = await _create_project(client, title="Secret Draft")
+    resp = await client.put(
+        f"/api/projects/{draft}",
+        json={"status": "draft"},
+        headers=make_auth_header("maker"),
+    )
+    assert resp.status_code == 200, resp.text
+    r = await client.get(
+        "/api/admin/projects/feature-candidates",
+        params={"q": "Secret"},
+        headers=make_auth_header(ADMIN_USER),
+    )
+    assert r.json() == []
+
+
+@pytest.mark.asyncio
+async def test_feature_candidates_requires_admin(client):
+    resp = await client.get(
+        "/api/admin/projects/feature-candidates",
+        headers=make_auth_header("not_an_admin"),
+    )
+    assert resp.status_code == 403

@@ -9,6 +9,8 @@ Three concerns live here:
   columns. Also idempotent.
 * ``GET /api/projects/featured`` — public list, newest-feature-first,
   excluding archived / blocked projects.
+* ``GET /api/admin/projects/feature-candidates`` — admin picker: public
+  projects that are *not* featured yet, searchable by title, author or id.
 
 The per-project feature endpoints intentionally live in this dedicated
 router rather than ``moderation.py`` to keep the URL prefix consistent
@@ -23,13 +25,13 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import case, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_session
 from ..made_with import App, made_with_clause, made_with_map
 from ..versions import LiveView, live_views
-from ..models import Project, ProjectTag
+from ..models import Project, ProjectTag, ProjectVersion
 from ..visibility import not_draft
 from ..schemas import (
     FeatureProjectRequest,
@@ -71,6 +73,63 @@ def _to_response(
         featured_note=project.featured_note,
         made_with=made_with or [],
     )
+
+
+@router.get(
+    "/api/admin/projects/feature-candidates",
+    response_model=list[FeaturedProjectResponse],
+)
+async def list_feature_candidates(
+    q: Optional[str] = Query(
+        None,
+        max_length=100,
+        description="Match title or author (case-insensitive), or an exact project id.",
+    ),
+    limit: int = Query(30, ge=1, le=100),
+    admin: str = Depends(get_admin_user),
+    session: AsyncSession = Depends(get_session),
+) -> list[FeaturedProjectResponse]:
+    """Projects an admin could feature: public (not draft, archived or
+    blocked) and not already featured, newest first. Powers the picker on
+    /admin/projects/featured/ so nobody has to look up a numeric id.
+
+    The title match uses the live version's title, which is what the
+    carousel would show.
+    """
+    live = ProjectVersion
+    live_title = case(
+        (live.id.is_not(None), live.snapshot["title"].as_string()),
+        else_=Project.title,
+    )
+    query = (
+        select(Project)
+        .outerjoin(live, live.id == Project.published_version_id)
+        .where(
+            Project.is_featured == False,  # noqa: E712
+            Project.status != "archived",
+            not_draft(),
+            Project.is_blocked == False,  # noqa: E712
+        )
+    )
+    term = (q or "").strip()
+    if term:
+        like = "%" + term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+        conditions = [
+            live_title.ilike(like, escape="\\"),
+            Project.author_username.ilike(like, escape="\\"),
+        ]
+        if term.lstrip("#").isdigit():
+            conditions.append(Project.id == int(term.lstrip("#")))
+        query = query.where(or_(*conditions))
+    query = query.order_by(Project.created_at.desc(), Project.id.desc()).limit(limit)
+
+    projects = await live_views(session, list((await session.scalars(query)).all()))
+    apps = await made_with_map(session, [p.id for p in projects])
+    out: list[FeaturedProjectResponse] = []
+    for p in projects:
+        tags = list(p.live_tags) if isinstance(p, LiveView) else await _tags_for(session, p.id)
+        out.append(_to_response(p, tags, apps.get(p.id)))
+    return out
 
 
 @router.post(
