@@ -1,0 +1,11 @@
+{%- comment -%}
+  Step through what happens to one Bridge (RPC) message on the Arduino UNO Q.
+  See docs/course_widgets.md.
+
+    {% include bridge_steps.html %}                      a normal Bridge.call()
+    {% include bridge_steps.html scenario="deadlock" %}  a print inside provide()
+{%- endcomment -%}
+<div data-kr-widget="bridge-steps" data-scenario="{{ include.scenario | default: 'call' | escape }}">
+<p><em>This step-through needs JavaScript. In short: Python packs the call into a message, the Arduino Router passes it to the sketch, the sketch runs the function, and the answer comes back the same way.</em></p>
+</div>
+{% include course_widget_assets.html %}

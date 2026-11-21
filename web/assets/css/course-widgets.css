@@ -1,0 +1,84 @@
+/* Interactive lesson widgets (assets/js/course-widgets.js, docs/course_widgets.md).
+   Matches the quiz block: white card, orangered accent. */
+[data-kr-widget] {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e3e3e3;
+  border-left: 4px solid orangered;
+  border-radius: 8px;
+  background: #fffaf7;
+}
+[data-kr-widget]:not(.is-live) > .kr-w-fallback { display: block; }
+.kr-w-head { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; align-items: baseline; justify-content: space-between; margin-bottom: 0.75rem; }
+.kr-w-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: orangered; }
+.kr-w-hint { font-size: 0.85rem; color: #555; }
+.kr-w-btn { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 0.35rem 0.75rem; cursor: pointer; font-size: 0.9rem; color: #222; transition: border-color 0.15s, background 0.15s; }
+.kr-w-btn:hover:not(:disabled) { border-color: orangered; background: #fff3ee; }
+.kr-w-btn:focus-visible, .kr-mx-led:focus-visible, .kr-mx-level:focus-visible { outline: 2px solid #0d6efd; outline-offset: 2px; }
+.kr-w-btn:disabled { opacity: 0.5; cursor: default; }
+.kr-w-btn-main { background: orangered; border-color: orangered; color: white; font-weight: 600; }
+.kr-w-btn-main:hover:not(:disabled) { background: #e03e00; border-color: #e03e00; }
+
+/* LED matrix painter */
+.kr-mx-layout { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: flex-start; }
+.kr-mx-board { flex: 1 1 320px; max-width: 520px; }
+.kr-mx-side { flex: 1 1 200px; display: grid; gap: 0.75rem; }
+.kr-mx-grid { background: #10151c; border-radius: 10px; padding: 10px; display: grid; gap: 4px; touch-action: none; user-select: none; }
+.kr-mx-row { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; }
+.kr-mx-led { --kr-led: 0; aspect-ratio: 1; min-width: 0; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: color-mix(in srgb, #4aa8ff calc(var(--kr-led) * 100%), #25303d); }
+.kr-mx-led.is-on { box-shadow: 0 0 calc(var(--kr-led) * 8px) rgba(74, 168, 255, 0.9); }
+.kr-mx-status { margin: 0.4rem 0 0; font-size: 0.85rem; color: #555; }
+.kr-mx-caption { display: block; font-size: 0.8rem; font-weight: 600; color: #444; margin-bottom: 0.25rem; }
+.kr-mx-levels { display: flex; gap: 4px; flex-wrap: wrap; }
+.kr-mx-level { --kr-led: 1; width: 2rem; height: 2rem; border-radius: 6px; border: 2px solid transparent; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: white;
+  background: color-mix(in srgb, #1f7fe0 calc(var(--kr-led) * 100%), #25303d); }
+.kr-mx-level.is-picked { border-color: orangered; }
+.kr-mx-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.kr-mx-out { margin-top: 1rem; }
+.kr-mx-out-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; }
+.kr-mx-out-head .kr-mx-caption { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.kr-mx-code { box-sizing: border-box; width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; line-height: 1.35; border: 1px solid #ccc; border-radius: 6px; padding: 0.5rem 0.75rem; background: white; color: #222; resize: vertical; white-space: pre; }
+
+/* Bridge step-through */
+.kr-br-lanes { display: grid; grid-template-columns: 1fr 2rem 1fr 2rem 1fr; align-items: stretch; }
+.kr-br-lane { border: 2px solid #ddd; border-radius: 8px; background: white; padding: 0.6rem 0.75rem; min-height: 7rem; position: relative; opacity: 0.55; transition: opacity 0.2s, border-color 0.2s; min-width: 0; }
+.kr-br-lane.is-active { opacity: 1; border-color: orangered; }
+.kr-br-lane.is-stuck { border-color: #b02a37; background: #fdf1f2; }
+.kr-br-lane.is-fixed { border-color: #198754; background: #f1faf5; }
+.kr-br-lane-title { font-weight: 700; }
+.kr-br-lane-sub { font-size: 0.75rem; color: #555; margin-bottom: 0.4rem; }
+.kr-br-code { margin: 0; padding: 0.4rem 0.5rem; background: #f4f4f4; border-radius: 4px; font-size: 0.72rem; line-height: 1.35; white-space: pre-wrap; overflow-wrap: anywhere; }
+.kr-br-gap { display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #ccc; }
+.kr-br-gap.is-crossing { color: orangered; font-weight: 700; }
+.kr-br-led { position: absolute; top: 0.6rem; right: 0.6rem; width: 0.9rem; height: 0.9rem; border-radius: 50%; background: #d9d9d9; border: 1px solid #bbb; }
+.kr-br-led.is-on { background: #ff3b30; border-color: #c41e14; box-shadow: 0 0 8px rgba(255, 59, 48, 0.8); }
+.kr-br-wire { margin-top: 0.75rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; background: #10151c; color: #9fd0ff; border-radius: 6px; padding: 0.4rem 0.75rem; overflow-wrap: anywhere; }
+.kr-br-text { margin: 0.75rem 0; min-height: 4.5em; }
+.kr-br-nav { display: flex; gap: 0.5rem; align-items: center; }
+.kr-br-count { font-size: 0.85rem; color: #555; margin-left: auto; }
+
+/* Sorter */
+.kr-so-card { background: white; border: 1px solid #ccc; border-radius: 8px; padding: 1rem; font-weight: 600; font-size: 1.05rem; text-align: center; }
+.kr-so-card.is-done { border-color: #198754; color: #198754; }
+.kr-so-picks { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin: 0.75rem 0; }
+.kr-so-pick { flex: 1 1 10rem; max-width: 16rem; padding: 0.6rem 0.75rem; font-weight: 600; }
+.kr-so-progress { font-size: 0.85rem; color: #555; }
+.kr-so-why { margin: 0 0 0.75rem; min-height: 3em; }
+.kr-so-why.is-right { color: #146c43; }
+.kr-so-why.is-wrong { color: #b02a37; }
+.kr-so-buckets { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.kr-so-bucket { background: white; border: 1px dashed #bbb; border-radius: 8px; padding: 0.5rem 0.75rem; min-height: 4rem; }
+.kr-so-bucket-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #444; }
+.kr-so-list { margin: 0.35rem 0 0; padding-left: 1.1rem; font-size: 0.9rem; }
+.kr-so-list .was-wrong { color: #b02a37; }
+
+@media (max-width: 575px) {
+  .kr-br-lanes { grid-template-columns: 1fr; }
+  .kr-br-gap { height: 1.6rem; transform: rotate(90deg); }
+  .kr-br-lane { min-height: 0; }
+  .kr-so-buckets { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kr-br-lane, .kr-w-btn { transition: none; }
+}

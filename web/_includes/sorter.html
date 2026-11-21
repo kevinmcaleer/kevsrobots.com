@@ -1,0 +1,25 @@
+{%- comment -%}
+  Sort items into two buckets, with the reason shown after each answer.
+  See docs/course_widgets.md.
+
+    {% capture items %}
+    Read a wheel encoder 10,000 times a second | right | It needs exact timing, and Linux can pause your program at any moment.
+    Serve a web page | left | Networking and web servers are what Linux is for.
+    {% endcapture %}
+    {% include sorter.html title="Which brain?" left="Linux side" right="Microcontroller" items=items %}
+
+  One item per line: text | left or right | why. Keep `|` out of the text.
+{%- endcomment -%}
+{%- assign so_lines = include.items | newline_to_br | split: "<br />" -%}
+<div data-kr-widget="sorter" data-title="{{ include.title | default: 'Sort it' | escape }}" data-left="{{ include.left | default: 'Left' | escape }}" data-right="{{ include.right | default: 'Right' | escape }}">
+<ul>
+{%- for so_line in so_lines -%}
+{%- assign so_parts = so_line | strip | split: "|" -%}
+{%- if so_parts.size >= 2 -%}
+{%- assign so_answer = so_parts[1] | strip | downcase -%}
+<li data-answer="{{ so_answer | escape }}" data-why="{{ so_parts[2] | strip | escape }}">{{ so_parts[0] | strip | escape }}</li>
+{%- endif -%}
+{%- endfor -%}
+</ul>
+</div>
+{% include course_widget_assets.html %}

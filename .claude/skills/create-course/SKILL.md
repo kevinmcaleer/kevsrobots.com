@@ -182,6 +182,19 @@ Also remember the Pico has no battery-backed clock: `time.localtime()` is only t
 
 When unsure whether an API exists, check the MicroPython docs for the rp2 port (docs.micropython.org/en/latest/rp2/quickref.html and the `machine` library pages), not CPython's docs.
 
+### Arduino UNO Q lessons
+
+A lesson that mentions `arduino.app_utils` or `Arduino_RouterBridge` gets extra checks (`scripts/uno_q_checks.py`), because an UNO Q App is a Python script and a C++ sketch joined by the Bridge:
+
+- `bridge-contract`: every name Python calls or notifies must be provided by a sketch block **in the same lesson**, with the same number of arguments, and the other way round. Show both halves in each lesson, even when one hasn't changed.
+- `bridge-deadlock`: a function registered with `Bridge.provide()` must not print or use the Bridge. Use `Bridge.provide_safe()`.
+- `uno-q-servo`, `uno-q-reserved`, `uno-q-qwiic`, `bridge-begin`: `Arduino_HardwareServo` not `Servo`; never open `Serial1` or `/dev/ttyHS1`; Qwiic is `Wire1`; call `Bridge.begin()` in `setup()`.
+- Each full `main.py` is run against a strict stand-in for `arduino.app_utils` (`scripts/uno_q_stubs/`): only `Bridge.call/notify/provide/unprovide`, `App.run` and the `call/notify/provide` decorators exist. A block importing an `arduino.app_bricks` Brick is not run: check its API against the Brick's README in github.com/arduino/app-bricks-py.
+
+Put `code_target: cpython` in `course.yml`. Verify UNO Q facts against Arduino's docs source (github.com/arduino/docs-content, `content/hardware/uno/boards/uno-q` and `content/software/app-lab`), not memory. The checks can't prove code works on the board: say in the PR which lessons still need a run on real hardware.
+
+Lesson widgets (`{% include matrix_painter.html %}`, `bridge_steps.html`, `sorter.html`) are documented in `docs/course_widgets.md`.
+
 Pull requests that touch `source/**.md` run the same check in CI (`.github/workflows/course-code-check.yml`) on the changed lessons, and fail on errors.
 
 ## After building
