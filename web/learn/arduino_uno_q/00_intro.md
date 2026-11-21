@@ -8,9 +8,9 @@ date: 2026-11-21
 next: 01_two_brains_one_board.html
 description: Meet the Arduino Uno Q, a board with a Linux computer and a microcontroller
   on it, and see how this course teaches you to make them work together
-percent: 10
+percent: 5
 duration: 4
-quiz_total: 27
+quiz_total: 50
 date_updated: 2026-11-21
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
@@ -41,6 +41,24 @@ navigation:
       link: 08_the_sketch_calls_python.html
     - name: When the Bridge goes wrong
       link: 09_when_the_bridge_goes_wrong.html
+  - section: The Linux side
+    content:
+    - name: Linux survival kit
+      link: 10_linux_survival_kit.html
+    - name: A web page for your project
+      link: 11_a_web_page_for_your_project.html
+    - name: Bricks, a camera and AI without the setup
+      link: 12_bricks_camera_and_ai.html
+    - name: Run at startup
+      link: 13_run_at_startup.html
+  - section: Showcase builds
+    content:
+    - name: An always-on AI agent
+      link: 14_an_always_on_ai_agent.html
+    - name: The chess camera
+      link: 15_the_chess_camera.html
+    - name: Summary
+      link: 16_summary.html
 ---
 
 
@@ -61,8 +79,6 @@ Watch this first, then come back and let's build.
 The Uno Q looks like an Arduino Uno, but it is really two computers sharing one board. One is a small Linux computer that runs Debian. The other is a microcontroller that runs Arduino sketches. A built-in link called the **Bridge** lets them call each other's functions.
 
 That is the valuable skill here: deciding which job belongs on which side, then making the two sides talk. You'll learn it by building one project, the **Q Board**, which grows a little in every lesson.
-
-Lessons 10 to 16 are being published now, so the list on the left will grow.
 
 ```mermaid
 flowchart LR

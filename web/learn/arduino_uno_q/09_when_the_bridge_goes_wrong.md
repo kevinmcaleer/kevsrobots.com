@@ -6,11 +6,12 @@ type: page
 cover: /learn/arduino_uno_q/assets/banners/09_when_the_bridge_goes_wrong.jpg
 date: 2026-11-21
 previous: 08_the_sketch_calls_python.html
+next: 10_linux_survival_kit.html
 description: Learn the handful of Bridge mistakes everyone makes, how to spot each
   one from its error, and how to fix it quickly
-percent: 100
+percent: 50
 duration: 7
-quiz_total: 27
+quiz_total: 50
 date_updated: 2026-11-21
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
@@ -41,6 +42,24 @@ navigation:
       link: 08_the_sketch_calls_python.html
     - name: When the Bridge goes wrong
       link: 09_when_the_bridge_goes_wrong.html
+  - section: The Linux side
+    content:
+    - name: Linux survival kit
+      link: 10_linux_survival_kit.html
+    - name: A web page for your project
+      link: 11_a_web_page_for_your_project.html
+    - name: Bricks, a camera and AI without the setup
+      link: 12_bricks_camera_and_ai.html
+    - name: Run at startup
+      link: 13_run_at_startup.html
+  - section: Showcase builds
+    content:
+    - name: An always-on AI agent
+      link: 14_an_always_on_ai_agent.html
+    - name: The chess camera
+      link: 15_the_chess_camera.html
+    - name: Summary
+      link: 16_summary.html
 ---
 
 

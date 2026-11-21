@@ -1,0 +1,9 @@
+{%- comment -%}
+  Months until a one-off purchase beats a monthly rental. See docs/course_widgets.md.
+
+    {% include cost_breakeven.html board="53" monthly="5" %}
+{%- endcomment -%}
+<div data-kr-widget="cost-breakeven" data-board="{{ include.board | default: '53' | escape }}" data-monthly="{{ include.monthly | default: '5' | escape }}">
+<p><em>This calculator needs JavaScript. To work it out by hand, divide the cost of the board by the monthly cost of renting and round up: that is the number of months until the board has paid for itself.</em></p>
+</div>
+{% include course_widget_assets.html %}

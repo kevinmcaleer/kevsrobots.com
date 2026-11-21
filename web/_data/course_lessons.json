@@ -78,7 +78,7 @@
   {
     "slug": "arduino_uno_q",
     "name": "Arduino Uno Q - Two Brains, One Board",
-    "description": "Learn the Arduino Uno Q from first boot to a project that runs by itself. Split a job between its Linux computer and its microcontroller, make Python and an Arduino sketch talk over the Bridge, and build the Q Board, a number display you drive from Python.",
+    "description": "Learn the Arduino Uno Q from first boot to a project that runs by itself. Split a job between its Linux computer and its microcontroller, make Python and an Arduino sketch talk over the Bridge, and build the Q Board, a number display you drive from Python, a web page and a camera.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2026-11-21",
@@ -138,6 +138,41 @@
         "file": "09_when_the_bridge_goes_wrong.md",
         "section": "The Bridge",
         "url": "/learn/arduino_uno_q/09_when_the_bridge_goes_wrong.html"
+      },
+      {
+        "file": "10_linux_survival_kit.md",
+        "section": "The Linux side",
+        "url": "/learn/arduino_uno_q/10_linux_survival_kit.html"
+      },
+      {
+        "file": "11_a_web_page_for_your_project.md",
+        "section": "The Linux side",
+        "url": "/learn/arduino_uno_q/11_a_web_page_for_your_project.html"
+      },
+      {
+        "file": "12_bricks_camera_and_ai.md",
+        "section": "The Linux side",
+        "url": "/learn/arduino_uno_q/12_bricks_camera_and_ai.html"
+      },
+      {
+        "file": "13_run_at_startup.md",
+        "section": "The Linux side",
+        "url": "/learn/arduino_uno_q/13_run_at_startup.html"
+      },
+      {
+        "file": "14_an_always_on_ai_agent.md",
+        "section": "Showcase builds",
+        "url": "/learn/arduino_uno_q/14_an_always_on_ai_agent.html"
+      },
+      {
+        "file": "15_the_chess_camera.md",
+        "section": "Showcase builds",
+        "url": "/learn/arduino_uno_q/15_the_chess_camera.html"
+      },
+      {
+        "file": "16_summary.md",
+        "section": "Showcase builds",
+        "url": "/learn/arduino_uno_q/16_summary.html"
       }
     ]
   },

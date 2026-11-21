@@ -133,6 +133,8 @@ That's it. It'll give you a URL to authenticate — open that on your phone or l
 
 ### Step 2: Install Hermes
 
+> **Update, November 2026:** The Hermes README now gives the install command as `curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash`. If the command below fails, use that one, and check the [README](https://github.com/NousResearch/hermes-agent) for the latest.
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 ```

@@ -65,8 +65,33 @@ With no `code`, the box starts with the nearest Python code block above it, so t
 | `blink` | Blinks LED 3 green every half second. Provides nothing |
 | `clock` (default) | Provides `draw` (104 values) and `set_status` (red, green, blue for LED 4) |
 | `sensor` | As `clock`, and once a second calls `get_limit`, notifies `on_reading` with the slider value and lights LED 3 red above the limit |
+| `webpage` | As `sensor`, and provides `set_limit`. Adds a pretend phone page that asks `GET /status` each second and sends `POST /limit` from its slider, through a stand-in for the WebUI Brick's `expose_api` |
 
 The stand-in keeps the rules that matter: an unknown name raises `ValueError`, `Bridge.call()` inside a provided function raises `RuntimeError`, and a `main.py` that never reaches `App.run()` stops. It does not run C++ and its timing is loose, so every lesson that uses it should say so and end with a run on the real board. To add a sketch, add it to `SIM_SKETCHES` and to `provides` or `sketchTick` in `simWorker` in `course-widgets.js`.
+
+## Confidence demo
+
+A threshold slider over six made-up object detections. Shows which ones the Video Object Detection Brick would report at that `confidence`, and how many people the lesson's code would count.
+
+```liquid
+{% include confidence_demo.html %}
+```
+
+## Cost break-even
+
+Two number boxes: a one-off cost and a monthly cost. Shows the months until the one-off purchase has paid for itself.
+
+```liquid
+{% include cost_breakeven.html board="53" monthly="5" %}
+```
+
+## Move detector
+
+A chess board in the opening position. The reader makes a move, sees how much each square "changed", and sees the 20 legal moves scored until one is left. A switch adds camera noise and a brushed piece. It is a simplified picture of the detector in Kev's chess camera: the idea, not his code.
+
+```liquid
+{% include move_detector.html %}
+```
 
 ## Tips
 

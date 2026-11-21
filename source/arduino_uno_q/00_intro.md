@@ -25,8 +25,6 @@ The Uno Q looks like an Arduino Uno, but it is really two computers sharing one 
 
 That is the valuable skill here: deciding which job belongs on which side, then making the two sides talk. You'll learn it by building one project, the **Q Board**, which grows a little in every lesson.
 
-Lessons 10 to 16 are being published now, so the list on the left will grow.
-
 ```mermaid
 flowchart LR
     A["Meet the board"] --> B["The microcontroller side"]

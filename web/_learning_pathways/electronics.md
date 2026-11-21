@@ -13,6 +13,7 @@ stages:
   build:
   - Snakie Instruments - Oscilloscope, Multimeter and Plotter
   - Talking to the World - Working with I2C and SPI
+  - Arduino Uno Q - Two Brains, One Board
   further:
   - Off-Grid Messaging with MeshCore
   - MeshCore Room Servers and Sensors
