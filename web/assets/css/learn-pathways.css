@@ -703,3 +703,65 @@
     display: none;
   }
 }
+
+/* Stages (#631): Start, Build, Go further, each with its own numbered line. */
+.pathway-stage {
+  margin-top: 1.5rem;
+}
+
+.pathway-stage-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.pathway-stage-number {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: #222;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.pathway-stage-blurb {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #555;
+}
+
+.pathway-stage .pathway-steps {
+  margin-bottom: 1rem;
+}
+
+/* A course that is not written yet */
+.pathway-step-soon .pathway-step-number {
+  border-style: dashed;
+  border-color: #8a5300;
+  color: #8a5300;
+  font-size: 0.95rem;
+}
+
+.pathway-row-soon {
+  grid-template-columns: minmax(0, 1fr);
+  border: 1px dashed #d9a441;
+  background: #fbf7ee;
+}
+
+.pathway-row-soon:hover {
+  box-shadow: none;
+}
+
+.pathway-soon-badge {
+  font-weight: 700;
+  color: #8a5300;
+}

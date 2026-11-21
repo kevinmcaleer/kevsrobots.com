@@ -1,16 +1,18 @@
 ---
-title: Learn Databases
+title: Data and Databases
 name: Databases
 date_published: 2023-07-20
 layout: course_pathway
-description: Learn how to create Databases in Python, with SQLite3 and Redis.
 cover: /assets/img/learn/learn_databases.png
-courses:
-  - "Getting Started with SQL"
-  - "Create Databases with Python and SQLite3"
-  - "Using Redis with Python"
-  - "DuckDB - Fast, free analytics"
-order: 15
+description: 'Store and query your projects'' data: SQL from the ground up, SQLite from Python, then MongoDB, Redis and DuckDB for when you need something different.'
+order: 14
+stages:
+  start:
+  - Getting Started with SQL
+  - Create Databases with Python and SQLite3
+  build:
+  - MongoDB - Your First Database
+  - Using Redis with Python
+  further:
+  - DuckDB - Fast, free analytics
 ---
-
-Learn how to create Databases in Python, with SQLite3 and Redis.
