@@ -437,7 +437,410 @@
     show();
   }
 
-  var WIDGETS = { 'matrix-painter': matrixPainter, 'bridge-steps': bridgeSteps, sorter: sorter };
+  // ------------------------------------------------------------- simulator
+  // A stand-in UNO Q for lessons that use the Bridge. The reader's main.py
+  // runs in the browser (Pyodide, in a worker) against a stand-in
+  // arduino.app_utils, and a small JavaScript "sketch" plays the lesson's
+  // sketch.ino: it provides the same Bridge names and drives a drawn LED
+  // matrix and LEDs. It is not the board: no C++ runs and timing is loose.
+  var PYODIDE_BASE = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+
+  var SIM_SKETCHES = {
+    blink: { text: 'The sketch blinks LED 3 green every half second. It provides nothing over the Bridge.', pot: false },
+    clock: { text: 'The sketch provides draw (104 values) and set_status (red, green, blue for LED 4).', pot: false },
+    sensor: { text: 'The sketch provides draw and set_status. Once a second it calls get_limit (until it gets an answer), notifies on_reading with the knob value, and lights LED 3 red above the limit.', pot: true }
+  };
+
+  var SIM_STUB = [
+    'import _krsim',
+    'from pyodide.ffi import to_js as _to_js',
+    '',
+    '__all__ = ["App", "Bridge", "Leds"]',
+    '',
+    'class AppError(Exception):',
+    '    pass',
+    '',
+    'class _Started(BaseException):',
+    '    pass',
+    '',
+    'class _Bridge:',
+    '    def __init__(self):',
+    '        self._handlers = {}',
+    '        self._in_handler = False',
+    '',
+    '    def provide(self, method_name, handler):',
+    '        if not callable(handler):',
+    '            raise ValueError("handler is not callable")',
+    '        self._handlers[method_name] = handler',
+    '',
+    '    def _send(self, kind, method_name, args):',
+    '        error = _krsim.send(kind, method_name, _to_js(list(args)))',
+    '        if error and kind == "call":',
+    '            raise ValueError(error)',
+    '',
+    '    def call(self, method_name, *args, timeout=10):',
+    '        if self._in_handler:',
+    '            raise RuntimeError("Bridge.call() was used inside a function provided to the Bridge. Nested calls are not supported: store the value and call from loop() instead.")',
+    '        self._send("call", method_name, args)',
+    '',
+    '    def notify(self, method_name, *args):',
+    '        self._send("notify", method_name, args)',
+    '',
+    '    def _has(self, method_name):',
+    '        return method_name in self._handlers',
+    '',
+    '    def _dispatch(self, method_name, *args):',
+    '        self._in_handler = True',
+    '        try:',
+    '            return self._handlers[method_name](*args)',
+    '        finally:',
+    '            self._in_handler = False',
+    '',
+    'Bridge = _Bridge()',
+    '',
+    'class _App:',
+    '    def run(self, user_loop=None):',
+    '        if user_loop is not None and not callable(user_loop):',
+    '            raise TypeError("user_loop must be a function")',
+    '        _krsim.started(user_loop)',
+    '        raise _Started()',
+    '',
+    'App = _App()',
+    '',
+    'class _Leds:',
+    '    def _set(self, number, r, g, b):',
+    '        for value in (r, g, b):',
+    '            if value not in (0, 1, True, False):',
+    '                raise ValueError("LED colour values are 0 or 1")',
+    '        _krsim.led(number, bool(r), bool(g), bool(b))',
+    '',
+    '    def set_led1_color(self, r, g, b):',
+    '        self._set(1, r, g, b)',
+    '',
+    '    def set_led2_color(self, r, g, b):',
+    '        self._set(2, r, g, b)',
+    '',
+    'Leds = _Leds()',
+    ''
+  ].join('\n');
+
+  // Runs inside the worker. Self-contained: it is turned into source text.
+  function simWorker(cfg) {
+    var py = null, bridge = null, loopFn = null, started = false, stopped = false;
+    var state = { matrix: [], led1: [0, 0, 0], led2: [0, 0, 0], led3: [0, 0, 0], led4: [0, 0, 0] };
+    for (var i = 0; i < 104; i++) state.matrix.push(0);
+    var dirty = true, out = [], traffic = {}, trafficDirty = false, pot = 50;
+    var sk = { limit: 50, haveLimit: false, last: 0 };
+
+    function say(text) { out.push(String(text)); if (out.length > 200) out.splice(0, out.length - 200); }
+    function count(dir, kind, name, detail) {
+      var key = dir + kind + name;
+      var row = traffic[key] || (traffic[key] = { dir: dir, kind: kind, name: name, count: 0, detail: '' });
+      row.count++; row.detail = detail; trafficDirty = true;
+    }
+    function flush() {
+      if (!dirty && !out.length && !trafficDirty) return;
+      var rows = null;
+      if (trafficDirty) { rows = []; for (var k in traffic) rows.push(traffic[k]); }
+      self.postMessage({ type: 'update', state: dirty ? state : null, out: out, traffic: rows });
+      dirty = false; out = []; trafficDirty = false;
+    }
+    function describe(args) {
+      var parts = [];
+      for (var i = 0; i < args.length; i++) {
+        var a = args[i];
+        if (a && typeof a === 'object' && typeof a.length === 'number') parts.push(a.length + (a instanceof Uint8Array ? ' bytes' : ' values'));
+        else if (a === true) parts.push('True');
+        else if (a === false) parts.push('False');
+        else parts.push(String(a));
+      }
+      return parts.join(', ');
+    }
+    // The reader's part of a Python traceback: from their file down, without
+    // the frames inside Pyodide or the stand-in library.
+    function lastLine(err) {
+      var lines = String(err && err.message ? err.message : err).split('\n').filter(function (l) { return l.trim(); });
+      var from = -1;
+      for (var i = 0; i < lines.length; i++) { if (lines[i].indexOf('File "<exec>"') !== -1) { from = i; break; } }
+      if (from === -1) return lines.slice(-1).join('\n');
+      var keep = [];
+      for (var j = from; j < lines.length; j++) {
+        if (lines[j].indexOf('File "/') !== -1) { j++; continue; }
+        keep.push(lines[j].replace('File "<exec>"', 'File "main.py"'));
+      }
+      return keep.slice(-8).join('\n');
+    }
+
+    // What the lesson's sketch provides, played in JavaScript.
+    var provides = {};
+    if (cfg.sketch === 'clock' || cfg.sketch === 'sensor') {
+      provides.draw = function (args) {
+        if (args.length !== 1) return 'draw takes 1 argument, the frame';
+        var frame = args[0];
+        if (!frame || typeof frame !== 'object' || typeof frame.length !== 'number') return 'draw expects the frame as bytes';
+        var n = Math.min(frame.length, 104);
+        for (var i = 0; i < n; i++) state.matrix[i] = Math.max(0, Math.min(7, frame[i] | 0));
+        dirty = true;
+        return null;
+      };
+      provides.set_status = function (args) {
+        if (args.length !== 3) return 'set_status takes 3 arguments: red, green, blue';
+        state.led4 = [args[0] ? 1 : 0, args[1] ? 1 : 0, args[2] ? 1 : 0];
+        dirty = true;
+        return null;
+      };
+    }
+
+    function sketchTick() {
+      var now = Date.now();
+      if (cfg.sketch === 'blink') {
+        var on = Math.floor(now / 500) % 2 === 0 ? 1 : 0;
+        if (state.led3[1] !== on) { state.led3 = [0, on, 0]; dirty = true; }
+        return;
+      }
+      if (cfg.sketch !== 'sensor' || now - sk.last < 1000) return;
+      sk.last = now;
+      if (!sk.haveLimit) {
+        count('up', 'call', 'get_limit', '');
+        if (bridge && bridge._has('get_limit')) {
+          try {
+            var value = bridge._dispatch('get_limit');
+            if (typeof value === 'number') { sk.limit = Math.round(value); sk.haveLimit = true; }
+          } catch (err) { say('Error in get_limit:\n' + lastLine(err)); }
+        }
+      }
+      count('up', 'notify', 'on_reading', String(pot));
+      if (bridge && bridge._has('on_reading')) {
+        try { bridge._dispatch('on_reading', pot); } catch (err) { say('Error in on_reading:\n' + lastLine(err)); }
+      }
+      var red = pot > sk.limit ? 1 : 0;
+      if (state.led3[0] !== red) { state.led3 = [red, 0, 0]; dirty = true; }
+    }
+
+    var api = {
+      send: function (kind, name, args) {
+        var list = [];
+        for (var i = 0; i < args.length; i++) list.push(args[i]);
+        count('down', kind, name, describe(list));
+        var fn = provides[name];
+        if (!fn) return 'The simulated sketch does not provide "' + name + '". Check the spelling.';
+        return fn(list);
+      },
+      started: function (loop) { started = true; loopFn = loop && loop.copy ? loop.copy() : (loop || null); },
+      led: function (number, r, g, b) { state['led' + number] = [r ? 1 : 0, g ? 1 : 0, b ? 1 : 0]; dirty = true; }
+    };
+
+    function finish(message) {
+      stopped = true;
+      if (message) say(message);
+      flush();
+      self.postMessage({ type: 'done' });
+    }
+    function tick() {
+      if (stopped) return;
+      sketchTick();
+      if (loopFn) {
+        try { loopFn(); } catch (err) { finish(lastLine(err)); return; }
+      }
+      setTimeout(tick, loopFn ? 5 : 50);
+    }
+    function run(code) {
+      try {
+        py.runPython(code);
+      } catch (err) {
+        if (!started) { finish(lastLine(err)); return; }
+      }
+      if (!started) { finish('main.py reached the end without calling App.run(), so the App stopped.'); return; }
+      bridge = py.pyimport('arduino.app_utils').Bridge;
+      tick();
+    }
+
+    self.onmessage = function (event) {
+      var msg = event.data;
+      if (msg.type === 'pot') { pot = msg.value; return; }
+      if (msg.type !== 'run') return;
+      try {
+        self.importScripts(cfg.base + 'pyodide.js');
+      } catch (err) {
+        self.postMessage({ type: 'failed' });
+        return;
+      }
+      self.loadPyodide({ indexURL: cfg.base, stdout: say, stderr: say }).then(function (p) {
+        py = p;
+        py.registerJsModule('_krsim', api);
+        py.FS.mkdirTree('/home/pyodide/arduino');
+        py.FS.writeFile('/home/pyodide/arduino/__init__.py', '');
+        py.FS.writeFile('/home/pyodide/arduino/app_utils.py', cfg.stub);
+        self.postMessage({ type: 'ready' });
+        setInterval(flush, 60);
+        run(msg.code);
+      }, function () { self.postMessage({ type: 'failed' }); });
+    };
+  }
+
+  function unoQSim(root) {
+    var kind = root.getAttribute('data-sketch');
+    var sketch = SIM_SKETCHES[kind] || SIM_SKETCHES.clock;
+    if (!SIM_SKETCHES[kind]) kind = 'clock';
+    // The program: the include's own code, or else the nearest Python block
+    // above the box, so a lesson shows its code once.
+    var srcNode = root.querySelector('pre');
+    var given = srcNode ? srcNode.textContent.replace(/^\n+|\s+$/g, '') : '';
+    if (!given) {
+      var blocks = document.querySelectorAll('.language-python pre, pre code.language-python');
+      for (var b = blocks.length - 1; b >= 0; b--) {
+        if (root.compareDocumentPosition(blocks[b]) & Node.DOCUMENT_POSITION_PRECEDING) {
+          given = blocks[b].textContent.replace(/^\n+|\s+$/g, '');
+          break;
+        }
+      }
+    }
+    var original = given + '\n';
+    var worker = null;
+
+    var editor = el('textarea', { class: 'kr-sim-editor', spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', 'aria-label': 'python/main.py', rows: Math.min(26, Math.max(8, original.split('\n').length)) });
+    editor.value = original;
+    editor.addEventListener('keydown', function (event) {
+      if (event.key !== 'Tab' || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return;
+      event.preventDefault();
+      var at = editor.selectionStart;
+      editor.value = editor.value.slice(0, at) + '    ' + editor.value.slice(editor.selectionEnd);
+      editor.selectionStart = editor.selectionEnd = at + 4;
+    });
+
+    var cells = [];
+    var grid = el('div', { class: 'kr-mx-grid kr-sim-grid', role: 'img', 'aria-label': 'Simulated LED matrix' });
+    for (var r = 0; r < ROWS; r++) {
+      var row = el('div', { class: 'kr-mx-row' });
+      for (var c = 0; c < COLS; c++) {
+        var cell = el('span', { class: 'kr-mx-led' });
+        cells.push(cell);
+        row.appendChild(cell);
+      }
+      grid.appendChild(row);
+    }
+    var leds = {};
+    var ledRow = el('div', { class: 'kr-sim-leds' });
+    [['led1', 'LED 1', 'Linux'], ['led2', 'LED 2', 'Linux'], ['led3', 'LED 3', 'sketch'], ['led4', 'LED 4', 'sketch']].forEach(function (d) {
+      leds[d[0]] = el('span', { class: 'kr-sim-led' });
+      ledRow.appendChild(el('span', { class: 'kr-sim-led-box', title: d[1] + ' belongs to ' + (d[2] === 'Linux' ? 'Linux' : 'the sketch') }, [leds[d[0]], el('span', { text: d[1] })]));
+    });
+
+    var potValue = el('span', { text: '50' });
+    var pot = el('input', { type: 'range', min: '0', max: '99', value: '50', class: 'kr-sim-pot', 'aria-label': 'Potentiometer on A0' });
+    pot.addEventListener('input', function () {
+      potValue.textContent = pot.value;
+      if (worker) worker.postMessage({ type: 'pot', value: Number(pot.value) });
+    });
+    var potBox = sketch.pot ? el('label', { class: 'kr-sim-potbox' }, [el('span', { class: 'kr-mx-caption', text: 'Potentiometer on A0' }), pot, potValue]) : null;
+
+    var status = el('span', { class: 'kr-w-hint', role: 'status', text: 'Press Run to start.' });
+    var output = el('pre', { class: 'kr-sim-out', 'aria-label': 'Python output', tabindex: '0' });
+    var traffic = el('div', { class: 'kr-sim-traffic' });
+    var lines = [];
+
+    function paint(state) {
+      for (var i = 0; i < 104; i++) {
+        var v = state.matrix[i] / 7;
+        cells[i].style.setProperty('--kr-led', String(v));
+        cells[i].classList.toggle('is-on', v > 0);
+      }
+      Object.keys(leds).forEach(function (name) {
+        var rgb = state[name];
+        var lit = rgb[0] || rgb[1] || rgb[2];
+        leds[name].style.background = lit ? 'rgb(' + (rgb[0] ? 255 : 30) + ',' + (rgb[1] ? 220 : 30) + ',' + (rgb[2] ? 255 : 30) + ')' : '';
+        leds[name].classList.toggle('is-on', !!lit);
+      });
+    }
+    function blank() {
+      var matrix = [];
+      for (var i = 0; i < 104; i++) matrix.push(0);
+      paint({ matrix: matrix, led1: [0, 0, 0], led2: [0, 0, 0], led3: [0, 0, 0], led4: [0, 0, 0] });
+    }
+    function showTraffic(rows) {
+      traffic.textContent = '';
+      if (!rows.length) return;
+      traffic.appendChild(el('span', { class: 'kr-mx-caption', text: 'Messages on the Bridge' }));
+      rows.forEach(function (row) {
+        var who = row.dir === 'down' ? 'Python to sketch' : 'Sketch to Python';
+        traffic.appendChild(el('div', { class: 'kr-sim-msg kr-sim-' + row.dir }, [
+          el('span', { class: 'kr-sim-who', text: who }),
+          el('code', { text: row.kind + ' ' + row.name + (row.detail ? ' (' + row.detail + ')' : '') }),
+          el('span', { class: 'kr-sim-count', text: 'x ' + row.count })
+        ]));
+      });
+    }
+    function print(newLines) {
+      newLines.forEach(function (text) { String(text).split('\n').forEach(function (l) { lines.push(l); }); });
+      if (lines.length > 200) lines = lines.slice(-200);
+      output.textContent = lines.join('\n');
+      output.scrollTop = output.scrollHeight;
+    }
+
+    var runBtn = el('button', { type: 'button', class: 'kr-w-btn kr-w-btn-main', text: 'Run', onclick: run });
+    var stopBtn = el('button', { type: 'button', class: 'kr-w-btn', text: 'Stop', disabled: 'disabled', onclick: function () { stop('Stopped.'); } });
+    var resetBtn = el('button', { type: 'button', class: 'kr-w-btn', text: 'Reset code', onclick: function () { editor.value = original; } });
+
+    function stop(message) {
+      if (worker) { worker.terminate(); worker = null; }
+      runBtn.disabled = false;
+      stopBtn.disabled = true;
+      status.textContent = message;
+    }
+    function run() {
+      if (worker) return;
+      if (!window.Worker || !window.Blob || !window.URL) { status.textContent = 'This browser cannot run the simulator.'; return; }
+      lines = [];
+      output.textContent = '';
+      showTraffic([]);
+      blank();
+      runBtn.disabled = true;
+      stopBtn.disabled = false;
+      status.textContent = 'Loading Python. The first run takes a few seconds.';
+      var source = '(' + simWorker.toString() + ')(' + JSON.stringify({ base: PYODIDE_BASE, sketch: kind, stub: SIM_STUB }) + ');';
+      var url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }));
+      worker = new Worker(url);
+      URL.revokeObjectURL(url);
+      worker.onmessage = function (event) {
+        var msg = event.data;
+        if (msg.type === 'ready') status.textContent = 'Running. Press Stop to end it.';
+        else if (msg.type === 'failed') stop('Python could not be loaded. Check your connection and try again.');
+        else if (msg.type === 'done') stop('The App stopped. See the output below.');
+        else if (msg.type === 'update') {
+          if (msg.state) paint(msg.state);
+          if (msg.out && msg.out.length) print(msg.out);
+          if (msg.traffic) showTraffic(msg.traffic);
+        }
+      };
+      worker.onerror = function () { stop('The simulator hit a problem. Press Run to try again.'); };
+      worker.postMessage({ type: 'run', code: editor.value });
+      if (sketch.pot) worker.postMessage({ type: 'pot', value: Number(pot.value) });
+    }
+
+    root.textContent = '';
+    root.appendChild(el('div', { class: 'kr-w-head' }, [
+      el('span', { class: 'kr-w-label', text: 'Uno Q simulator' }),
+      el('span', { class: 'kr-w-hint', text: 'A stand-in for the board. Edit the Python and press Run.' })
+    ]));
+    root.appendChild(el('div', { class: 'kr-sim-layout' }, [
+      el('div', { class: 'kr-sim-code' }, [
+        el('span', { class: 'kr-mx-caption', text: 'python/main.py' }),
+        editor,
+        el('div', { class: 'kr-sim-buttons' }, [runBtn, stopBtn, resetBtn, status])
+      ]),
+      el('div', { class: 'kr-sim-board' }, [
+        el('span', { class: 'kr-mx-caption', text: 'The board' }),
+        grid, ledRow, potBox,
+        el('p', { class: 'kr-sim-sketch', text: sketch.text }),
+        traffic
+      ])
+    ]));
+    root.appendChild(el('span', { class: 'kr-mx-caption', text: 'Python output' }));
+    root.appendChild(output);
+    blank();
+  }
+
+  var WIDGETS = { 'matrix-painter': matrixPainter, 'bridge-steps': bridgeSteps, sorter: sorter, 'uno-q-sim': unoQSim };
 
   function start() {
     document.querySelectorAll('[data-kr-widget]').forEach(function (root) {

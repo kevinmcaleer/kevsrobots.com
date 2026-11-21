@@ -50,6 +50,24 @@ Serve a web page | left | Networking and web servers are what Linux is for.
 
 One item per line: `text | left or right | why`. Don't use `|` inside the text. Six to eight items works well. The sorter doesn't count towards the lesson's quiz score, so keep a `{% quiz %}` at the end of the lesson as well.
 
+## Uno Q simulator
+
+A stand-in Arduino UNO Q for lessons that use the Bridge. The reader edits `python/main.py` and presses **Run**. The Python runs in the browser (Pyodide, in a worker, loaded only when Run is pressed) against a stand-in `arduino.app_utils`, and a small JavaScript "sketch" plays the lesson's `sketch.ino`. The box draws the LED matrix, the four LEDs, the Python output and a count of every message that crossed the Bridge.
+
+```liquid
+{% include uno_q_sim.html sketch="clock" %}
+```
+
+With no `code`, the box starts with the nearest Python code block above it, so the lesson shows its code once and the checker still sees it. Pass `code=` (from a `{% capture %}`) to start with something else.
+
+| Sketch | Plays |
+| --- | --- |
+| `blink` | Blinks LED 3 green every half second. Provides nothing |
+| `clock` (default) | Provides `draw` (104 values) and `set_status` (red, green, blue for LED 4) |
+| `sensor` | As `clock`, and once a second calls `get_limit`, notifies `on_reading` with the slider value and lights LED 3 red above the limit |
+
+The stand-in keeps the rules that matter: an unknown name raises `ValueError`, `Bridge.call()` inside a provided function raises `RuntimeError`, and a `main.py` that never reaches `App.run()` stops. It does not run C++ and its timing is loose, so every lesson that uses it should say so and end with a run on the real board. To add a sketch, add it to `SIM_SKETCHES` and to `provides` or `sketchTick` in `simWorker` in `course-widgets.js`.
+
 ## Tips
 
 - Put a widget straight after the paragraph that explains the idea, and follow it with one sentence saying what to try.

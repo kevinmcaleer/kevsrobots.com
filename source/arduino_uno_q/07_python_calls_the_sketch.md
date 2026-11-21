@@ -190,6 +190,18 @@ Two worked examples:
 
 ---
 
+## Try it in the simulator
+
+This box runs the `main.py` above in your browser. A stand-in plays the sketch: it provides `draw` and `set_status`, and shows the matrix and LED 4.
+
+{% include uno_q_sim.html sketch="clock" %}
+
+Press **Run** and watch the seconds count. Under the board you can see each message that crosses the Bridge and how many times it has been sent. Then break it on purpose: change `"draw"` to `"drew"` in the Python, run it again and read the error.
+
+The simulator is a stand-in, not the real board. It does not run your C++, and its timing is looser. Use it to get the Python right, then run the App on your Uno Q.
+
+---
+
 ## One pass through the loop
 
 Here is one trip round `loop()`. Python is on the left and the sketch on the right. The router sits between them and carries every message, so it is left out to keep the picture simple.

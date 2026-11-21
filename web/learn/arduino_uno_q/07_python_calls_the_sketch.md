@@ -10,7 +10,7 @@ next: 08_the_sketch_calls_python.html
 description: Build Q Board stage 4, where Python reads the real clock and tells the
   sketch what to draw on the LED matrix over the Bridge
 percent: 80
-duration: 10
+duration: 11
 quiz_total: 27
 date_updated: 2026-11-21
 navigation:
@@ -225,6 +225,18 @@ Two worked examples:
 - `Bridge.notify("set_status", ...)` is **fire and forget**. Python sends it and carries on straight away. It is best effort: if one is lost, nobody tells you. For an LED we update again 0.2 seconds later, so a lost one hardly matters.
 
 `App.run(user_loop=loop)` calls `loop()` again and again, and it must be the last line of `main.py`.
+
+---
+
+## Try it in the simulator
+
+This box runs the `main.py` above in your browser. A stand-in plays the sketch: it provides `draw` and `set_status`, and shows the matrix and LED 4.
+
+{% include uno_q_sim.html sketch="clock" %}
+
+Press **Run** and watch the seconds count. Under the board you can see each message that crosses the Bridge and how many times it has been sent. Then break it on purpose: change `"draw"` to `"drew"` in the Python, run it again and read the error.
+
+The simulator is a stand-in, not the real board. It does not run your C++, and its timing is looser. Use it to get the Python right, then run the App on your Uno Q.
 
 ---
 
