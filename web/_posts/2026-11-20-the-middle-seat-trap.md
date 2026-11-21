@@ -63,7 +63,13 @@ Depending on who you fly with, getting stuck in the middle happens through one o
 
 On ultra-low-cost carriers—such as Ryanair and Wizz Air in Europe, or Spirit and Frontier in North America—ancillary fees (bags, priority boarding, seat selection) make up a massive chunk of total profits.
 
-Consumer investigations, including reviews by the UK Civil Aviation Authority (CAA) and Which?, have shown that certain budget carriers assign middle seats and split up companions on the same booking at dramatically higher rates than rivals—even when the plane is half-empty.
+Consumer investigations, including reviews by the [UK Civil Aviation Authority (CAA)](https://caa.co.uk/publication/download/17017) and [Which?](https://www.which.co.uk/news/2019/03/ryanairs-paid-for-seating-policy-puts-profits-before-passenger-safety/), have shown that certain budget carriers assign middle seats and split up companions on the same booking at dramatically higher rates than rivals—even when the plane is half-empty.
+
+{% callout note "What the investigations found" %}
+- **CAA, 2018:** in a survey of 14,716 adults, passengers who didn't pay for seats reported a 35% chance of being split up on Ryanair, against 12% to 22% on the other large airlines flying from the UK.
+- **Which?, 2019:** only 46% of Ryanair passengers who didn't pay for a seat were seated together, compared with 73% on Wizz Air and 85% or more on the other eight airlines it looked at. When Which? sent four groups of four on Ryanair flights, all 16 passengers were given middle seats, and Ryanair admitted it withholds window and aisle seats from "random seat" customers.
+- **Which?, 2020:** even with flights around three-quarters full, Ryanair passengers who didn't pay were still put in middle seats next to strangers.
+{% endcallout %}
 
 <figure class="text-center my-4">
   <img src="/assets/img/blog/middle_seat/seatmap-active.png" alt="Seat map of a half-empty plane where every free check-in passenger has been put in a B or E middle seat while windows and aisles sit empty" loading="lazy" class="img-fluid rounded-3">
@@ -117,3 +123,9 @@ Just make sure not to cut it so close that you miss the check-in deadline, as bu
 
 The next time an airline app hands you a middle seat on a seemingly empty flight, remember that it's rarely personal—it's just math. Airlines have realized they don't need to raise ticket prices to make more money; they just need to make the free option slightly uncomfortable enough that you'll gladly pay to change it.
 {% endfullwidth %}
+
+## Sources
+
+- UK Civil Aviation Authority, [Paid-for allocated seating in aviation: an update (CAP 1709)](https://caa.co.uk/publication/download/17017) (October 2018)
+- Guy Hobbs, Which?, [Ryanair's paid-for seating policy 'puts profits before passenger safety'](https://www.which.co.uk/news/2019/03/ryanairs-paid-for-seating-policy-puts-profits-before-passenger-safety/) (12 March 2019)
+- Lauren Bell, Which?, [Airlines not seating passengers at a social distance even when the middle seat can be kept free](https://www.which.co.uk/news/2020/09/airlines-not-seating-passengers-at-a-social-distance-even-when-middle-seat-can-be-kept-free/) (29 September 2020)
