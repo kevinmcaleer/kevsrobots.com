@@ -1,0 +1,31 @@
+{% comment %}
+  One course in a learning pathway, as a full-width row: cover, name,
+  description, level, length, lessons and topics, so a learner can judge
+  whether to take it or skip ahead.
+
+  Usage: include pathway_course_row.html course=course number=1
+  (course = a record from _data/courses.yml). Styles: assets/css/learn-pathways.css
+{% endcomment %}
+{% assign c = include.course %}
+{% assign level = c.level | default: "beginner" %}
+<li class="pathway-step">
+  <span class="pathway-step-number" aria-hidden="true">{{ include.number }}</span>
+  <article class="pathway-row">
+    <a class="pathway-row-cover" href="{{ c.link }}" tabindex="-1" aria-hidden="true">
+      <img src="{{ c.cover }}" alt="" loading="lazy">
+    </a>
+    <div class="pathway-row-body">
+      <h3 class="pathway-row-title"><a href="{{ c.link }}"><span class="visually-hidden">Course {{ include.number }}: </span>{{ c.name }}</a></h3>
+      <p class="pathway-row-desc">{{ c.description }}</p>
+      <p class="pathway-meta">
+        <span class="pathway-level pathway-level-{{ level }}">{{ level }}</span>
+        <span><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ c.duration | remove: "0h " }}</span>
+        {% if c.lessons %}<span><i class="fa-solid fa-list-ol" aria-hidden="true"></i> {{ c.lessons }} lessons</span>{% endif %}
+        {% for tag in c.groups limit: 3 %}<a class="pathway-tag" href="/learn/?tag={{ tag | url_encode }}">#{{ tag }}</a>{% endfor %}
+      </p>
+    </div>
+    <div class="pathway-row-go">
+      <a class="btn btn-outline-dark btn-sm" href="{{ c.link }}" tabindex="-1" aria-hidden="true">Start course</a>
+    </div>
+  </article>
+</li>

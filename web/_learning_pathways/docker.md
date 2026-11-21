@@ -12,7 +12,5 @@ courses:
   - "From Docker to Podman"
   - "Running K3s on Raspberry Pi"
   - "Mini-Rack 3D Design Tutorial"
-
+order: 13
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}

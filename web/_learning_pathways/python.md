@@ -15,6 +15,5 @@ courses:
   - "Building a Robot Arm with Raspberry Pi and PCA9685"
   - "Building User Authentication for Static Sites with FastAPI"
   - "Mastering Pydantic for Robust Data Validation"
+order: 4
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}

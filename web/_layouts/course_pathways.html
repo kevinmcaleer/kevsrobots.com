@@ -1,19 +1,21 @@
 ---
 layout: content
 ---
+{% comment %} The Learning Pathways index: every pathway as a card, in site.data.pathways order. {% endcomment %}
+<link rel="stylesheet" href="/assets/css/learn-pathways.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/learn.css?v={{ site.time | date: '%s' }}">
 
 <div class="px-0 py-0 mx-0 my-0">
 {% include breadcrumbs.html %}
-<div class="row">
-    <div class="col-12 col-md-3 col-lg-2">
-        {% include learn_sidebar.html %}
-    </div>
-    <div class="col-12 col-md-9 col-lg-10">
-        <h1>{{page.title}}</h1>
-        <h2>{{page.description}}</h2>
-        <hr>
-        {{ content }}
-        {% include learning_pathways_part.html %}
-    </div>
-</div>
+<header class="learn-head">
+  <div>
+    <h1>{{ page.title }}</h1>
+    <div class="learn-lead">{{ content }}</div>
+  </div>
+</header>
+{% include pathway_cards.html %}
+<nav class="learn-resources" aria-label="More ways to learn">
+  <a href="/learn/">All courses</a>
+  <a href="/learn/recent">Recent courses</a>
+</nav>
 </div>

@@ -8,9 +8,8 @@ description: New to CAD, or new to BetterCad? Start here. Design your first 3D p
 courses:
   - "Learn BetterCad"
   - "Print It Right with BetterCad"
+order: 7
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}
 
 New to CAD, or new to [BetterCad](https://bettercad.kevsrobots.com)? Start here. BetterCad is a free CAD tool for 3D printing that runs in your browser, with nothing to install and no account needed. You'll design your first parts, build a parametric phone stand, then learn to check, calibrate and export your designs so they print cleanly and fit first time.
 
