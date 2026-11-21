@@ -158,3 +158,11 @@ async def test_follow_on_last_course_has_no_next(client, session) -> None:
     await ingest_catalogue(CATALOGUE, session)
     body = (await client.get("/api/learn/follow-on?course=/learn/rust/00_intro.html")).json()
     assert body["next"] == []
+
+
+@pytest.mark.asyncio
+async def test_for_page_finds_a_project_by_its_folder_url(client, session) -> None:
+    await ingest_catalogue(CATALOGUE, session)
+    body = (await client.get("/api/learn/for-page?page=/projects/dog/")).json()
+    assert body["basis"] == "page"
+    assert body["courses"][0]["url"] == "/learn/servos/00_intro.html"

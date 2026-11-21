@@ -122,6 +122,8 @@ layout: default
             <div class="container lighten-2 py-3">
             <article>
             <div class="container mt-3">
+            {%- assign url_end = page.url | slice: -1, 1 -%}
+            {% if url_end == "/" or page.url contains "/index.html" %}{% include learn_skills.html %}{% endif %}
             {{content}}
             </div>
             </article>

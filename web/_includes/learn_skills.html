@@ -1,0 +1,13 @@
+{%- comment -%}
+  "Learn the skills for this build" (#636) on blog posts and project pages.
+  assets/js/learn-skills.js asks Nibsy (/api/learn/for-page) for the courses
+  that teach what this page uses: courses pinned in the page's front matter
+  (`courses:` with course URLs) first, then the closest matches, personalised
+  for signed-in readers. The box stays hidden when nothing fits.
+{%- endcomment -%}
+<link rel="stylesheet" href="/assets/css/learn-skills.css?v={{ site.time | date: '%s' }}">
+<section class="learn-skills" data-learn-skills data-page="{{ page.url | escape }}" hidden aria-labelledby="learn-skills-title">
+  <h2 id="learn-skills-title"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Learn the skills for this build</h2>
+  <div class="learn-skills-list" data-learn-skills-list></div>
+</section>
+<script src="/assets/js/learn-skills.js?v={{ site.time | date: '%s' }}" defer></script>
