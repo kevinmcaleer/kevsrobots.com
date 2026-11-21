@@ -1,0 +1,423 @@
+{
+  "schema": 3,
+  "app": "bettercad",
+  "version": "0.1.0",
+  "id": "mmwpss0w21",
+  "created": "2026-11-21T02:38:10.433Z",
+  "modified": "2026-11-21T03:19:51.598Z",
+  "name": "Desk arm",
+  "document": {
+    "features": [
+      {
+        "id": "fmwpss46i1d",
+        "name": "Box 1",
+        "part": {
+          "id": "pmwpss46i1c",
+          "kind": "box",
+          "name": "Box 1",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "x": 20,
+            "y": 20,
+            "z": 20
+          }
+        },
+        "type": "add"
+      },
+      {
+        "id": "fmwpss5931j",
+        "name": "Resize 1",
+        "parts": [
+          "pmwpss46i1c"
+        ],
+        "size": {
+          "x": 60,
+          "y": 60,
+          "z": 6
+        },
+        "type": "resize"
+      },
+      {
+        "id": "fmwpss8vx2g",
+        "name": "Box 2",
+        "part": {
+          "id": "pmwpss8vx2f",
+          "kind": "box",
+          "name": "Box 2",
+          "position": {
+            "x": 25,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "x": 20,
+            "y": 20,
+            "z": 20
+          }
+        },
+        "type": "add"
+      },
+      {
+        "id": "fmwpss9o92m",
+        "name": "Resize 2",
+        "parts": [
+          "pmwpss8vx2f"
+        ],
+        "size": {
+          "x": 6,
+          "y": 24,
+          "z": 50
+        },
+        "type": "resize"
+      },
+      {
+        "id": "fmwpssb5f32",
+        "name": "Move 1",
+        "parts": [
+          "pmwpss8vx2f"
+        ],
+        "position": {
+          "x": 0,
+          "z": 6
+        },
+        "type": "move"
+      },
+      {
+        "depth": null,
+        "fit": "printed",
+        "frame": {
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "origin": [
+            3,
+            0,
+            30.999999999999996
+          ],
+          "x": [
+            0,
+            0,
+            -1
+          ]
+        },
+        "head": "none",
+        "id": "fmwpssgnk41",
+        "name": "Hole 1",
+        "offset": 0.4,
+        "part": "pmwpss8vx2f",
+        "points": [
+          [
+            -15,
+            0
+          ]
+        ],
+        "size": "M3",
+        "type": "hole"
+      },
+      {
+        "id": "fmwpssjpa4g",
+        "mode": "group",
+        "name": "Group 1",
+        "target": "pmwpss46i1c",
+        "tools": [
+          {
+            "id": "pmwpss8vx2f",
+            "op": "join"
+          }
+        ],
+        "type": "combine"
+      },
+      {
+        "id": "fmwpsskn34r",
+        "name": "Box 3",
+        "part": {
+          "id": "pmwpsskn34q",
+          "kind": "box",
+          "name": "Box 3",
+          "position": {
+            "x": 25,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "x": 20,
+            "y": 20,
+            "z": 20
+          }
+        },
+        "type": "add"
+      },
+      {
+        "id": "fmwpsslhb4y",
+        "name": "Resize 3",
+        "parts": [
+          "pmwpsskn34q"
+        ],
+        "size": {
+          "x": 90,
+          "z": 6
+        },
+        "type": "resize"
+      },
+      {
+        "id": "fmwpssmt359",
+        "name": "Move 2",
+        "parts": [
+          "pmwpsskn34q"
+        ],
+        "position": {
+          "x": 80
+        },
+        "type": "move"
+      },
+      {
+        "depth": null,
+        "fit": "printed",
+        "frame": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            80,
+            0,
+            6
+          ],
+          "x": [
+            -1,
+            0,
+            0
+          ]
+        },
+        "head": "none",
+        "id": "fmwpsss5964",
+        "name": "Hole 2",
+        "offset": 0.4,
+        "part": "pmwpsskn34q",
+        "points": [
+          [
+            35,
+            0
+          ],
+          [
+            -35,
+            0
+          ]
+        ],
+        "size": "M3",
+        "type": "hole"
+      },
+      {
+        "id": "fmwpssv756k",
+        "name": "Box 4",
+        "part": {
+          "id": "pmwpssv756j",
+          "kind": "box",
+          "name": "Box 4",
+          "position": {
+            "x": 50,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "x": 20,
+            "y": 20,
+            "z": 20
+          }
+        },
+        "type": "add"
+      },
+      {
+        "id": "fmwpssw2n6q",
+        "name": "Resize 4",
+        "parts": [
+          "pmwpssv756j"
+        ],
+        "size": {
+          "x": 70,
+          "z": 6
+        },
+        "type": "resize"
+      },
+      {
+        "id": "fmwpssxce71",
+        "name": "Move 3",
+        "parts": [
+          "pmwpssv756j"
+        ],
+        "position": {
+          "x": 80,
+          "y": 40
+        },
+        "type": "move"
+      },
+      {
+        "depth": null,
+        "fit": "printed",
+        "frame": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            79.99999999999999,
+            39.99999999999999,
+            6
+          ],
+          "x": [
+            -1,
+            0,
+            0
+          ]
+        },
+        "head": "none",
+        "id": "fmwpst2nr81",
+        "name": "Hole 3",
+        "offset": 0.4,
+        "part": "pmwpssv756j",
+        "points": [
+          [
+            25,
+            0
+          ]
+        ],
+        "size": "M3",
+        "type": "hole"
+      },
+      {
+        "id": "fmwpu7c0y2n",
+        "name": "Upper arm",
+        "parts": [
+          "pmwpsskn34q"
+        ],
+        "type": "link"
+      },
+      {
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "child": "fmwpu7c0y2n",
+        "from": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "point": [
+            44.999999654,
+            -6.5e-08,
+            6
+          ]
+        },
+        "id": "fmwpu7fy031",
+        "kind": "revolute",
+        "lower": -90,
+        "name": "Shoulder",
+        "origin": [
+          3,
+          6.5e-08,
+          45.999999654
+        ],
+        "parent": null,
+        "type": "joint",
+        "upper": 90
+      },
+      {
+        "id": "fmwpu7tto4o",
+        "name": "Forearm",
+        "parts": [
+          "pmwpssv756j"
+        ],
+        "type": "link"
+      },
+      {
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "child": "fmwpu7tto4o",
+        "from": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "point": [
+            54.999999391,
+            39.999999839,
+            6
+          ]
+        },
+        "id": "fmwpu7xhs52",
+        "kind": "revolute",
+        "lower": -90,
+        "name": "Elbow",
+        "origin": [
+          9,
+          5.28e-07,
+          116.00000206
+        ],
+        "parent": "fmwpu7c0y2n",
+        "type": "joint",
+        "upper": 90
+      }
+    ],
+    "format": "bettercad",
+    "looks": {
+      "pmwpss46i1c": {
+        "name": "Base"
+      },
+      "pmwpss8vx2f": {
+        "name": "Upright"
+      },
+      "pmwpsskn34q": {
+        "name": "Upper arm"
+      },
+      "pmwpssv756j": {
+        "name": "Forearm"
+      }
+    },
+    "name": "Desk arm",
+    "poses": [
+      {
+        "id": "pmwpu8eet79",
+        "name": "Reach",
+        "values": {
+          "fmwpu7fy031": 40,
+          "fmwpu7xhs52": 60
+        }
+      },
+      {
+        "id": "pmwpu8hkn7u",
+        "name": "Folded",
+        "values": {
+          "fmwpu7fy031": -60,
+          "fmwpu7xhs52": -90
+        }
+      }
+    ],
+    "tools": [
+      {
+        "link": "fmwpu7tto4o",
+        "point": [
+          14.999999999999943,
+          -3.0584150015892817,
+          172.0198301668093
+        ]
+      }
+    ],
+    "version": 2
+  },
+  "thumbnail": "data:image/png;base64,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"
+}

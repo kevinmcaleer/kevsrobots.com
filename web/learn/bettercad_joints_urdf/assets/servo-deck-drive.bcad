@@ -1,0 +1,867 @@
+{
+  "schema": 3,
+  "app": "bettercad",
+  "version": "0.1.0",
+  "id": "mmwps4k9v1",
+  "created": "2026-11-21T02:21:28.621Z",
+  "modified": "2026-11-21T03:21:41.554Z",
+  "name": "Servo deck",
+  "document": {
+    "features": [
+      {
+        "id": "fmwps4nxq16",
+        "name": "Box 1",
+        "part": {
+          "id": "pmwps4nxq15",
+          "kind": "box",
+          "name": "Box 1",
+          "position": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "x": 20,
+            "y": 20,
+            "z": 20
+          }
+        },
+        "type": "add"
+      },
+      {
+        "id": "fmwps4p511c",
+        "name": "Resize 1",
+        "parts": [
+          "pmwps4nxq15"
+        ],
+        "size": {
+          "x": 120,
+          "y": 100,
+          "z": 4
+        },
+        "type": "resize"
+      },
+      {
+        "id": "fmwps5lf72m",
+        "name": "SG90 micro servo",
+        "part": {
+          "id": "pmwps5lf72l",
+          "name": "SG90 micro servo"
+        },
+        "position": {
+          "x": -35,
+          "y": 0,
+          "z": 4
+        },
+        "record": {
+          "category": "servo",
+          "checked": false,
+          "cutout": {
+            "depth": 15.9,
+            "holes": [
+              {
+                "at": [
+                  -13.9,
+                  0
+                ],
+                "screw": "M2"
+              },
+              {
+                "at": [
+                  13.9,
+                  0
+                ],
+                "screw": "M2"
+              }
+            ],
+            "pocket": [
+              {
+                "at": [
+                  0,
+                  0
+                ],
+                "kind": "rect",
+                "size": [
+                  22.2,
+                  11.8
+                ]
+              }
+            ]
+          },
+          "description": "The common 9 g plastic-geared micro servo. 180° travel, about 1.8 kg·cm.",
+          "id": "sg90",
+          "licence": "MIT",
+          "mass": 9,
+          "model": [
+            {
+              "at": [
+                0,
+                0,
+                -15.9
+              ],
+              "kind": "box",
+              "size": [
+                22.2,
+                11.8,
+                22.7
+              ]
+            },
+            {
+              "at": [
+                0,
+                0,
+                0
+              ],
+              "kind": "box",
+              "size": [
+                32.2,
+                11.8,
+                2.5
+              ]
+            },
+            {
+              "at": [
+                5.199999999999999,
+                0,
+                6.799999999999999
+              ],
+              "kind": "cylinder",
+              "size": [
+                11.8,
+                11.8,
+                4
+              ]
+            },
+            {
+              "at": [
+                5.199999999999999,
+                0,
+                10.799999999999999
+              ],
+              "kind": "cylinder",
+              "size": [
+                4.8,
+                4.8,
+                3.2
+              ]
+            }
+          ],
+          "mount": {
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "origin": [
+              5.199999999999999,
+              0,
+              14
+            ]
+          },
+          "name": "SG90 micro servo",
+          "source": "Sizes from the Tower Pro SG90 sheet as widely copied. Clones vary by a few tenths: measure yours.",
+          "version": 1
+        },
+        "type": "insert"
+      },
+      {
+        "id": "fmwps5mdv2s",
+        "name": "Move 1",
+        "parts": [
+          "pmwps5lf72l"
+        ],
+        "position": {
+          "x": -35.2
+        },
+        "type": "move"
+      },
+      {
+        "id": "fmwps5x5w3v",
+        "name": "SG90 micro servo pocket",
+        "sketch": {
+          "constraints": [
+            {
+              "e": "lmwps5x5wm",
+              "id": "kmwps5x5wq",
+              "type": "horizontal"
+            },
+            {
+              "e": "lmwps5x5wo",
+              "id": "kmwps5x5wr",
+              "type": "horizontal"
+            },
+            {
+              "e": "lmwps5x5wn",
+              "id": "kmwps5x5ws",
+              "type": "vertical"
+            },
+            {
+              "e": "lmwps5x5wp",
+              "id": "kmwps5x5wt",
+              "type": "vertical"
+            },
+            {
+              "id": "kmwps5x5wy",
+              "line": "lmwps5x5wx",
+              "p": "pmwps5x5ww",
+              "type": "midpoint"
+            }
+          ],
+          "dimensions": [
+            {
+              "driving": true,
+              "expression": "22.2",
+              "id": "dmwps5x5wu",
+              "kind": "length",
+              "labelOffset": [
+                0,
+                0
+              ],
+              "refs": [
+                "lmwps5x5wm"
+              ],
+              "value": 22.2
+            },
+            {
+              "driving": true,
+              "expression": "11.8",
+              "id": "dmwps5x5wv",
+              "kind": "length",
+              "labelOffset": [
+                0,
+                0
+              ],
+              "refs": [
+                "lmwps5x5wn"
+              ],
+              "value": 11.8
+            }
+          ],
+          "entities": [
+            {
+              "id": "pmwps5x5wi",
+              "kind": "point",
+              "x": -11.1,
+              "y": -5.9
+            },
+            {
+              "id": "pmwps5x5wj",
+              "kind": "point",
+              "x": 11.1,
+              "y": -5.9
+            },
+            {
+              "id": "pmwps5x5wk",
+              "kind": "point",
+              "x": 11.1,
+              "y": 5.9
+            },
+            {
+              "id": "pmwps5x5wl",
+              "kind": "point",
+              "x": -11.1,
+              "y": 5.9
+            },
+            {
+              "a": "pmwps5x5wi",
+              "b": "pmwps5x5wj",
+              "id": "lmwps5x5wm",
+              "kind": "line"
+            },
+            {
+              "a": "pmwps5x5wj",
+              "b": "pmwps5x5wk",
+              "id": "lmwps5x5wn",
+              "kind": "line"
+            },
+            {
+              "a": "pmwps5x5wk",
+              "b": "pmwps5x5wl",
+              "id": "lmwps5x5wo",
+              "kind": "line"
+            },
+            {
+              "a": "pmwps5x5wl",
+              "b": "pmwps5x5wi",
+              "id": "lmwps5x5wp",
+              "kind": "line"
+            },
+            {
+              "construction": true,
+              "id": "pmwps5x5ww",
+              "kind": "point",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "a": "pmwps5x5wi",
+              "b": "pmwps5x5wk",
+              "construction": true,
+              "id": "lmwps5x5wx",
+              "kind": "line"
+            }
+          ],
+          "id": "fmwps5x5w3v",
+          "name": "SG90 micro servo pocket",
+          "plane": {
+            "face": {
+              "body": "pmwps5lf72l",
+              "face": 0
+            },
+            "frame": {
+              "normal": [
+                0,
+                0,
+                1
+              ],
+              "origin": [
+                -35,
+                0,
+                4
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
+            },
+            "kind": "face",
+            "offset": 0
+          }
+        },
+        "type": "sketch"
+      },
+      {
+        "body": {
+          "id": "pmwps5x5w3x",
+          "name": "Body 1"
+        },
+        "direction": "one",
+        "distance": -15.9,
+        "fit": "sliding",
+        "gap": 0.25,
+        "id": "fmwps5x5w3w",
+        "name": "Extrude 1",
+        "operation": "cut",
+        "seeds": [
+          [
+            0,
+            0
+          ]
+        ],
+        "sketch": "fmwps5x5w3v",
+        "target": "pmwps4nxq15",
+        "type": "extrude"
+      },
+      {
+        "depth": null,
+        "fit": "printed",
+        "frame": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            -35,
+            0,
+            4
+          ],
+          "x": [
+            1,
+            0,
+            0
+          ]
+        },
+        "head": "none",
+        "id": "fmwps5x5w3y",
+        "name": "Hole 1",
+        "offset": 0.4,
+        "part": "pmwps4nxq15",
+        "points": [
+          [
+            -13.9,
+            0
+          ],
+          [
+            13.9,
+            0
+          ]
+        ],
+        "size": "M2",
+        "type": "hole"
+      },
+      {
+        "access": 3,
+        "arm": 10,
+        "frame": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            0.8613045646935691,
+            -8.534913625913007e-17,
+            4
+          ],
+          "x": [
+            1,
+            0,
+            0
+          ]
+        },
+        "height": 6,
+        "hole": "insert",
+        "horn": "single",
+        "hub": 7.5,
+        "id": "fmwps672c50",
+        "kind": "standoffs",
+        "name": "Standoffs 1",
+        "offset": 0.4,
+        "outer": 6,
+        "part": "pmwps4nxq15",
+        "points": [
+          [
+            -4.5,
+            -43.7
+          ],
+          [
+            42.5,
+            -43.7
+          ],
+          [
+            42.5,
+            -32.3
+          ],
+          [
+            -4.5,
+            -32.3
+          ]
+        ],
+        "recess": 2,
+        "size": "M2",
+        "type": "mount"
+      },
+      {
+        "id": "fmwps6gbq5w",
+        "name": "Raspberry Pi Pico",
+        "part": {
+          "id": "pmwps6gbq5v",
+          "name": "Raspberry Pi Pico"
+        },
+        "position": {
+          "x": 20,
+          "y": -15,
+          "z": 4
+        },
+        "record": {
+          "category": "board",
+          "checked": true,
+          "cutout": {
+            "depth": 0,
+            "holes": [
+              {
+                "at": [
+                  -23.5,
+                  -5.7
+                ],
+                "screw": "M2"
+              },
+              {
+                "at": [
+                  23.5,
+                  -5.7
+                ],
+                "screw": "M2"
+              },
+              {
+                "at": [
+                  23.5,
+                  5.7
+                ],
+                "screw": "M2"
+              },
+              {
+                "at": [
+                  -23.5,
+                  5.7
+                ],
+                "screw": "M2"
+              }
+            ],
+            "pocket": []
+          },
+          "description": "The RP2040 microcontroller board. Board's underside at z = 0, on M2 standoffs.",
+          "id": "pico",
+          "licence": "MIT",
+          "mass": 3,
+          "model": [
+            {
+              "at": [
+                0,
+                0,
+                0
+              ],
+              "kind": "box",
+              "size": [
+                51,
+                21,
+                1
+              ]
+            },
+            {
+              "at": [
+                -24,
+                0,
+                1
+              ],
+              "kind": "box",
+              "size": [
+                5.6,
+                8,
+                2.6
+              ]
+            },
+            {
+              "at": [
+                0,
+                0,
+                1
+              ],
+              "kind": "box",
+              "size": [
+                7,
+                7,
+                1
+              ]
+            }
+          ],
+          "name": "Raspberry Pi Pico",
+          "source": "Outline and holes from the Raspberry Pi Pico datasheet's mechanical drawing (51 × 21 mm, Ø2.1 mm holes 47 × 11.4 mm apart). Components are blocks.",
+          "version": 1
+        },
+        "type": "insert"
+      },
+      {
+        "id": "fmwps6hhx62",
+        "name": "Move 2",
+        "parts": [
+          "pmwps6gbq5v"
+        ],
+        "position": {
+          "y": -38,
+          "z": 10
+        },
+        "type": "move"
+      },
+      {
+        "body": {
+          "id": "pmwps6ohv6u",
+          "name": "Gear 24T"
+        },
+        "bore": {
+          "arm": 7,
+          "diameter": 7,
+          "kind": "horn"
+        },
+        "frame": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            -29.99999971458388,
+            1.156235570242391e-18,
+            18
+          ],
+          "x": [
+            1,
+            0,
+            0
+          ]
+        },
+        "gear": {
+          "backlash": 0.15,
+          "clearance": 0.25,
+          "module": 1,
+          "pressure": 20,
+          "shift": 0,
+          "teeth": 24
+        },
+        "id": "fmwps6ohv6t",
+        "name": "Gear 24T",
+        "type": "gear",
+        "width": 5
+      },
+      {
+        "body": {
+          "id": "pmwps6wc27r",
+          "name": "Gear 48T"
+        },
+        "bore": {
+          "diameter": 3.4,
+          "kind": "round"
+        },
+        "frame": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            -29.99999971458388,
+            1.156235570242391e-18,
+            18
+          ],
+          "x": [
+            1,
+            0,
+            0
+          ]
+        },
+        "gear": {
+          "backlash": 0.15,
+          "clearance": 0.25,
+          "module": 1,
+          "pressure": 20,
+          "shift": 0,
+          "teeth": 48
+        },
+        "id": "fmwps6wc27q",
+        "mesh": {
+          "angle": 0,
+          "gear": "fmwps6ohv6t"
+        },
+        "name": "Gear 48T",
+        "type": "gear",
+        "width": 5
+      },
+      {
+        "id": "fmwps74nm8v",
+        "name": "Cylinder 1",
+        "part": {
+          "id": "pmwps74nk8u",
+          "kind": "cylinder",
+          "name": "Cylinder 1",
+          "position": {
+            "x": 125,
+            "y": 0,
+            "z": 0
+          },
+          "size": {
+            "x": 20,
+            "y": 20,
+            "z": 30
+          }
+        },
+        "type": "add"
+      },
+      {
+        "id": "fmwps75zq91",
+        "name": "Resize 2",
+        "parts": [
+          "pmwps74nk8u"
+        ],
+        "size": {
+          "x": 8,
+          "y": 8,
+          "z": 14
+        },
+        "type": "resize"
+      },
+      {
+        "id": "fmwps780f9g",
+        "name": "Move 3",
+        "parts": [
+          "pmwps74nk8u"
+        ],
+        "position": {
+          "x": 6,
+          "z": 4
+        },
+        "type": "move"
+      },
+      {
+        "id": "fmwpsif621r",
+        "mode": "group",
+        "name": "Group 1",
+        "target": "pmwps4nxq15",
+        "tools": [
+          {
+            "id": "pmwps74nk8u",
+            "op": "join"
+          }
+        ],
+        "type": "combine"
+      },
+      {
+        "depth": null,
+        "fit": "printed",
+        "frame": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "origin": [
+            6.0000000618262925,
+            2.2743873991290395e-17,
+            18
+          ],
+          "x": [
+            0.7071067811865476,
+            -0.7071067811865476,
+            0
+          ]
+        },
+        "head": "none",
+        "id": "fmwpsikcg2i",
+        "name": "Hole 2",
+        "offset": 0.4,
+        "part": "pmwps4nxq15",
+        "points": [
+          [
+            0,
+            0
+          ]
+        ],
+        "size": "M3",
+        "type": "hole"
+      },
+      {
+        "id": "fmwpub6941o",
+        "name": "Move 4",
+        "parts": [
+          "pmwps6ohv6u"
+        ],
+        "position": {
+          "y": 60
+        },
+        "type": "move"
+      },
+      {
+        "id": "fmwpub8ud23",
+        "name": "Move 5",
+        "parts": [
+          "pmwps6wc27r"
+        ],
+        "position": {
+          "y": 60
+        },
+        "type": "move"
+      },
+      {
+        "id": "fmwpubfhk2s",
+        "name": "Gear 24T",
+        "parts": [
+          "pmwps6ohv6u"
+        ],
+        "type": "link"
+      },
+      {
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "child": "fmwpubfhk2s",
+        "from": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "point": [
+            -30.000000102,
+            59.99999924,
+            23
+          ]
+        },
+        "id": "fmwpubsim3q",
+        "kind": "continuous",
+        "lower": 0,
+        "name": "Servo",
+        "origin": [
+          -30.000000099,
+          1.38e-7,
+          18
+        ],
+        "parent": null,
+        "type": "joint",
+        "upper": 0
+      },
+      {
+        "id": "fmwpuc49p4w",
+        "name": "Gear 48T",
+        "parts": [
+          "pmwps6wc27r"
+        ],
+        "type": "link"
+      },
+      {
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "child": "fmwpuc49p4w",
+        "from": {
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "point": [
+            6.000000529,
+            60.00000013,
+            23
+          ]
+        },
+        "id": "fmwpuc9dh5b",
+        "kind": "continuous",
+        "lower": 0,
+        "name": "Output",
+        "origin": [
+          5.999999989,
+          1.3e-8,
+          18
+        ],
+        "parent": null,
+        "type": "joint",
+        "upper": 0
+      },
+      {
+        "driven": "fmwpuc9dh5b",
+        "driver": "fmwpubsim3q",
+        "id": "fmwpucrs872",
+        "kind": "gear",
+        "name": "Drive 1",
+        "ratio": 1,
+        "type": "drive"
+      }
+    ],
+    "format": "bettercad",
+    "looks": {
+      "pmwps4nxq15": {
+        "name": "Deck"
+      },
+      "pmwps5lf72l": {
+        "hidden": false
+      },
+      "pmwps6gbq5v": {
+        "hidden": false
+      },
+      "pmwps6wc27r": {
+        "hidden": false
+      },
+      "pmwps74nk8u": {
+        "name": "Gear post"
+      }
+    },
+    "name": "Servo deck",
+    "version": 2
+  },
+  "thumbnail": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAADICAYAAACZBDirAAAQAElEQVR4AeydC7xVVZ3H/+dSpoaQLwi4ipojPtDEJJUJTcXAi6afkmaaTHIsG2GSFD6fURubHB11RsFUzIFUMKccARsfCWIafbRQUEARUElQBFHAZwI+Mu7s77p3XfY9997z3Pucvc/5Xe5/r7XXXs/f2ut7//vBOQ2mHykgBaRAnSogANbpxGvYUkAKmAmAOgukgBSoWwXqGoB1O+sauBSQAk4BAdDJoI0UkAL1qIAAWI+zrjFLASngFBAAnQx1uNGQpYAU0EMQnQNSQArUrwLyAOt37jVyKVD3CgiAdX8K1KMAGrMUaFFAAGzRQVspIAXqUAEBsA4nXUOWAlKgRQEBsEUHbaVAvSigcYYUEABDYigqBaRAfSkgANbXfGu0UkAKhBQQAENiKCoFpEBtK5A9OgEwWxHtSwEpUDcKCIB1M9UaqBSQAtkKCIDZimhfCkiBulGgrgBYN7OqgUoBKVCQAgJgQTIpkxSQArWogABYi7OqMUkBKVCQAgJgQTLVQCYNQQpIgQ4KCIAdJFGCFJAC9aKAAFgvM61xSgEp0EEBAbCDJEqoPQU0IinQuQICYOe6KFUKSIE6UEAArINJ1hClgBToXAEBsHNdlCoFakUBjSOHAgJgDnF0SApIgdpWQACs7fnV6KSAFMihgACYQxwdkgJSIN0K5Ou9AJhPIR2XAlKgZhUQAGt2ajUwKSAF8ikgAOZTSMelgBSoWQVqGoA1O2samBSQApEoIABGIqMqkQJSII0KCIBpnDX1WQpIgUgUEAAjkTGBlahLUkAK5FVAAMwrkTJIASlQqwoIgLU6sxqXFJACeRUQAPNKpAzpU0A9lgKFKSAAFqaTckkBKVCDCgiANTipGpIUkAKFKSAAFqaTckmBtCigfhahgABYhFjKKgWkQG0pIADW1nxqNFJAChShgABYhFjKKgWkQLIVKLZ3AmCxiim/FJACNaOAAFgzU6mBSAEpUKwCAmCxiim/FJACNaNATQGwZmZFA5ECUqAiCgiAFZFZjUgBKZBEBQTAJM6K+iQFpEBFFBAAKyJzBRpRE1JAChStgABYtGQqIAWkQK0oIADWykxqHFJAChStgABYtGQqkDwF1CMpUJoCAmBpuqmUFJACNaCAAFgDk6ghSAEpUJoCAmBpuqmUFEiKAupHGQoIgGWIp6JSQAqkWwEBMN3zl4red+/efQqWis6qk3WlgABYV9Nd2cECvRkzZjS/995752LESatsL9RaLStQ7tgEwHIVVPkOCgA5YAf0Ro0a1XacOGkcI0/bAUWkQJUUEACrJHwtNgvUgBuQA3ZdjZFj5CEvZbrKp3QpELcCAmDcCtdo/WFwEQdmQA24FTpk8lKGstRRaDnlkwJRKZBqAEYlgurZrgAgwkgBTCNHjmxmnzjm47fddtu54Tgwo0wpRlmBsBTlVKZcBQTAchWskfLADGM4HkbEf/Ob3xiwA1LY9773vXMJb7/9dpdOnhtuuMFmzpzpjP1SjXp9274vpdalclKgEAUEwEJUqtE8QMbbVVdddS5wA3YMFxhhPk6ITZo0icAAI8exwYMHu7Rp06Y5CAJDl1DihjoFwhLFU7GiFBAAi5IrQZkj6grAw3r37m3ADfgEMLSf/exnDma5mrnmmmvsppt+1lbu7LPPdtkff/zxvGVdxjwb+iIQ5hFJh8tSQAAsS770FubeHuBjBIAGI47tv//+tueeexppeHNX/+d/2vXXX283ZUFxn332sV699qSIM/IDv2OOOcYIKesOlLmhXoGwTBFVvFMFBMBOZan9xBEnn2w333yzg1z2aAEONvTYY617911s2Ikn2vDhI6zp5CYbPPiLdt1117ki5MHcTusGL/Laa6+1Hj16GBBsTY4koC2BMBIpVUmrAg2toYI6UuCcc85p7t2rl5133nk5R91/7/62rXmbNTeTzW2IWCaTcWFXmwkTJtghhxxir776aldZXHrYQ7zwwgtdGhvSsew4+9ioUaNMIEQJWbkKCIDlKpjC8kcccURBvT7ttK/aY48+ag8//FubM+dBmz17dmAPWL9+/fKWf/nll23goYe6fNkwYx/g4dH5OJ4jcYx0ChIPe5HsYxzzJhB6JRSWooAAWIpqKS9zxx3/Yxs2bLB77rmnw8OKiy+5JHiwcZMbISC6+uqr7eKLL7YLLvihjR07xsaMGeMum8ePn2CTJ092+cKboUOPdXUvW7bM/ueOO9rq9+CiTvJzn5CQfeDn4+yH4/4Y5f0x4hj5vHE/07+n6NMUSoF8CgiA+RSqsePdu3ef8tFHH9rq1avt9NNP7zC6IwYNCh5s9OqQnp1w9NFHGU+Ow+knnHBCcI/wSFf3KaecYldccUXbYeCFkUCIES/EyIuRl9Ab+2EQkg4IL7jgAvfyNsdr0DSkCBUQACMUM6lVAT0MD4lLRvq5ZMkSW7tunb2wcqXz0gAJBkQw8uQy8mCU4XKW8Gtf+7p7JSbs3ZEHy1VXqceo1xt10Af2N2zc6O4RCoSoIsulgACYS52UHwtDD/ABB4Z03HHH2b777msjgie7PYOntSsDCD72hz+4p7ZAhHcAyYexT4iF47wD6Pc98FavXuVgSjsYZSpltIfRp9NPO831g37hEQJ+tKhUX9ROehQQANMzVwX3lMXOog9DzxcGEAcdcIy99NJLZsHD3MWBJ2jBU92XVr9ku+zSwxYsWGD8kO+s0d9xDz+IY+sCj5EQW7x4MdkC0MxyIfDhfh2hS6jShvYxmp879yECZwKhkyH1m6gHIABGrWgV68sHPsC1btWH9uGWZtt3r8MtE/yzZrNhJw6zTCbYC8wsY/zMnTvXGty+2ctr1ti9995Lst0YPPjw8fXrXwseiJwR2PbP/HOZErABgrfc8nPXk8ce+4ML2fBHgT8OGHqRJqtfBQTAGph7FjILmsXNws8e0s//e6YNPfoMZxz7y18+skMP/oJdc9UUW/vKRstkMnbwwQfZ8uXLXPzjj/9KNmvo1s2Ft916qwvZvLFpk50WXGLeeeed1rdvn0TCj356Q4+hQ7/kdvFu+SNAGoZe6IZ+LoM2daeAAJjiKWfhsoBZyCzoroaydcu7dteMW+3+B1ouV8m3Zt2Ltu9+/a2xX6Pd+vM7bfWfNlnPnj0DAJotWrSILNbiC7posMlYY2OjXXbZZUHcgkvfmYmHn+tosPHaHHXUUcFeS99dJNhwDP3QET2DJP3WkQKpAmAdzUvOobJQWbAsXBZwzszBwSXPPBVszY790rHW8MkPrOmUk+y8fzrPeuzS3fbYrZ8NH/Y123uvfdzrK90/1d/23Xugy899wq3vbXPxNcFlMO8Obty4yYGvkHZdwYRs6C/27LJl9uSTLXqEu8Yx9ERX9A0fU7x2FRAAUzS3LEwWKAuVBVto16f/4r+t79497cG59wdPfk914c9vmWp7NR5kQ445IagmE4TH2xGHHR/Em+3ZZ1Yu7d840K74yc027geX2GEDj7Lzz/+Be++vV+jDDyyFP4cOHOjeVeRSuLPuoyv6ojN6d5ZHabWjgACYgrlkIbIgWZgs0FK6TLlx479r/zC6KQS+7TXNf3yevbp2w9JPNPScuMMnd7AH5zz41k03Tl76u3lzHATx/DYF9/+2l0hv7IUXVhqeYK4RoBd6ozv658qrY+lVQABM6Nyx6DAWIAtxVOjb1crpMvf3/tqw3uY//jtXDeHMGXcu3a3nPhMPHXjUb11isBk54lvTXn5lZeOcAITX33il4fn5j8gKDsfye+mlP3YfuxV+DzHqhgDbgAEHGJ7g5Zdfnrd68qM/88B85C2gDKlSQABM2HSxyFhsLDqMBRh1F6nz2p9eaoAQry8MvnBbQLBp+DenvfPm1rfw/rDw8Sjj/pKUj+lqahrpHrJEWX+4rvvuv99efPFFO/DAA8PJOeNoxnwwN8xRzsw6mBoFBMCETBWLisXFImOxVaJbtHPn3ZMPe3bZgpNytXfaGV/eDe8Py5WvnGP05fLL/92WPvNM8JBioXvQUk59ucp+9dRTjQ995f9D58rX2TH6yRwxV8xZZ3mUlh4FBMAqzxWLiMXEomJxVaM7QPBvBu44PhcI8f74aCrvqcXVTzTA2tcf/d6aNa+UVSl9ZM6YO+awrMpUuGoKCIBVkp5Fw+JhEbGYqtSNtmbpgwfhK+tebGw7EEQee2TF0m3NzbbvfvsFe+n+BeCvvfa6devWENgnyh4MujGHzCVzWnaFqqCiCgiAFZXbjEXCYmHRsHgq3Hze5ujTHxc8uBseYTgzL0V/tnfvcFJq4336fNb1/eOPP3ZhFBt0Y06ZW+Y4ijpVR/wKCIDxa+xaYFGwOFgkLBaXmOANfQSC4ctiPKd1r74a6wOKuCXZsHGjvfb665ZpaLDm4F/U7aEbc8xcM+cR1K8qYlRAAIxRXKpmEbAYWBQsDtLSYvSXy+I+/Xc4zPU5cAMb+/WL9QGFayemDZe/vXv1sj6fDTzAZrP9P/e5mFoypxFzztxzDsTWkCouSwEBsCz5ui7MSc/JzyIAJF3nTP4RPlfPf/zVq6+ut4kTJ9k1116b/I6Hegj8eJCzYcNGez3wAEOHYo0y95wDnAucE7E2psqLVkAALFqyrgtwgmOc7Jz0nPxd507PEcYxYsQI9+EIhHvvvZft07+/uxQGLEkfiX+xmtd4mpqaWi98m52XVqm+oyHnBOcG50il2k17O3H3XwCMQGFOaE5sTnCMkz2CahNVBa/A8DH6UJCP0h8wYICtWrXafYp0ojoa6gxwxgAf3t+RRw5232pHliVPP01QcePc4BzhfOG8qXgH1GA7BQTAdnKUtnPllVeey4ldWul0lOLTnk8++eSWzgb3zywg4U477Wi9evW2yy+/wm648UZL0g/g8/9/GfjRN77Wk3Dhwift9unTiVbNOF8EwqrJ39awANgmRXmRGwMAsOjKqyXZpfEC5z74YLtODhs2zAIWugcLjP9f/uUiq+bPj370rzZ58k2uC6tWvejC8IZ7mWvWvBxOqmpcIKyq/JZoAFZXmsJbv+SSS6biHQ0aNMjdFyu8ZLpy4gWOGzeuQ6czAQFXrvyTLV+xwh0DhJi/9+YSY9zQ1vXXX++0P/zwz1vQHRs8+IvBJfoqa//TbMzTY48+2j45AXsCYXUmQQCMQPfNmzd/31cDBGvdG1y3bq298MLzLUPOtAR+mwn277rrLlu0yH9p0kwHpqhheNVVV9vESZNc3b5tnvByubuk9QubfDohH36watWqij74oN1iTSAsVrHy8guA5enXVjoA39Q5c+a4fbyMYL/d4nQHamSDJ8hCdQ9FgjE9u+zZYGs4XsbPIYccYn6Hb53j0tmCHzw1bOjQY80Dke8U5pKV9CBLO81Iu+6669rSzjzz2/btb3/b7e+//+eCJjJ2eOB133333UHRjPGEN4i0++WSlwRe5aHfxNNg6Bu+R6gHJvHMmgAYka54geeff34mAN9UX2UQN7xBv19UXLpAUQAAEABJREFUmILM06dPt5dWr7Yzvv71tt4+9xyeYcbBicQMm1bDO/vww49a91q+m+PJp55qAxfAmz17jvveEeL33HOvy/vymjUGKNn5/OGH2/r1693H9weN8Euy+Qgf29+2Y2a33HKL8RQYoAS7qful34AQ05Pj6KdPAIxYU0AYgK+dNwgEWdARN5WI6ligGF7gwQcfbGee+a2C+8VTWp+Ze4h8Tp/fB3KLFy/yu/bGG2+4eBioPs5D6QwEzJgtX77cRowY7j5SyxUINvQvCFL/yzgEwminUQCMVk9XGxDEG0zzJXGxwP7fO+9099e43AVCCMF9N0LMX4oS79IgmTsYkMyFLZsMcGuJtm3vu+/+1njGhXzAwezZs23dunWuH8DCf3+xy1BDG8YmEEYzoQJgNDp2WgsQxBv0B4O4uyQuFi6+fJQhfeD7gjHi4bpJe+fNlkvUcHohce6zzZo106666spQ9oy7FG1LCJiVE4iZtpztImuCS2FrheEHH7xvjY2Nxh+Zta+84qD3z2PH2hNPPGH18uNBeMEFF7T96aiXsUc1TgEwKiW7qAdvMABfu0tibtxnQ6eL4pEn0y6AG3r0GXbqyDNc/cRJ5z4bRiLHgCB5OUZasQYMg7HbpEkTXVGgt2DhAuM1lB49erg0Lm0XLXrKnn225UHK0qXP2PJly90xNkCOEOOb6caPv9CWLHnajjvuOAe9H/zgn23+/PkcrktjbhoatIxLnXwpV6pyRZQDgniDeCu+GBCs9P+eAGbADrjRj/sfmEVgU6bcZC+u2GI9d97PeFo6YL8v2MrnXmoDpAehy1zkBi/FF+GBxI033OB2gWOvXnvacytWOJD17dvH1qx52RYtWmQzZtwVQG6Je2eP8hMmjLdTTz3V5aPw9OnTAqhOIlrXNmHChEg+1LWeRRQAKzj7QDDwiKY+GHpdBgjyVzzOblA/8AuDz8Nv/boN1rextz0y71479JDBtn7NVtu65X074KB92yDoy1EHdUXVV+Dm6wKIj4ZeUOYJM2n+eDivT6vRMO+wmAPgN2TI37q8U6ZMaXvzwCVoU7ACAmDBUkWTMdsb5J1BvEFO6mha6FjL+lfedYlAD3M7oc0bb66zwUcOtbvvuc02bXzLdv70Tg5+QNBnA4KY9wbj7K9vU2FHBdC9W7dPmIff/Pl/NM6pjjmVUogCAmAhKsWQZ9z552eOGDSo7S83EIzTG9y65d3As2sBIcN5atHjBviaTjnBdvzkrvbmO2utd79P21eGncZh27TpbRdmb4AgaYCQxUhcVhkF8PqAn29t9Oizpk6cODF4pORTFBargABYrGIR5ucvNxD09wbj8gb77t2zrdd/nP+IA993z/muDTtxuEvf8MYaGz/uJ/a90T+2z+zaw3bc+VO26667uGOdbYAgBgSjvizurL16T+MPDfALe33Aj/On1rSp9HgEwEorntUeJzHeoIcgh703SLxc46nuimc22Dtvf2Br1663rzZtf1H54Ufm2tNPL7ez/uH8tmb4v7wZC/4RaUvtPAIEOQIIWaTEZdEqgK54fWH44fVx3kTbUn3WJgAmZN6BIN6g7w7eYDmXxCycy/51sh10wDF25KDj7JgvnhjA78zgUvd1e+SRhx34zj7rhy1PerPeIoN9mUzG3Qf0/ekqBIIYEJQ32JVKpaXj9QE/XxqvD/j5fYXlKyAAlq9hZDXwVx0Iem8QCOINArNCG8HjA0R4fTzd7blTf+v92d1tr/597IMPPnTA+/FFN7qQOnndpbn1Q+IzJLAJLJMJNuwXaECQrB6ExGWlKcB8A7+w1wf8OD9Kq1GlulIgUQDsqpP1lM5JjjfoIcjYgWCh3iDv8VHm+98fa3v2/Jwde8Jge239Jtu04S3bccdPOa9u83tbyOKMJ71vbnrH1ry03u1ngsvfDevfsLffete9CuMSC9ycOnL7y9VAmIVcYFFla1UAzfD6wvDD6+O8aM2iIEIFBMAIxYyyKiBYijfI+3I88b1rxq0OYEuXPG89e+4SPAF+3/78582Brxdc72Z5d0DwsEEH2sYAkm+9+a594ahD7egvDSp5OB6E3htkUZdcWR0VxOsDfn7IeH3Az+8rjF4BATB6TSOrkb/6gLAzbzBXI+PGf9d48nv3/0235/600Hr13s0a9+5tffruaZlMpsuigBDrMkORBwAhRQChIIgSnRvaAL+w1wf8mP/OSyg1KgUEwKiULLeeHOWBIN6gz8K9wXyXxHiCo77ZZJu3vGOz7rk9KAr4MjkBGGQq+nfWjJl2yY8utM5esKYyIIgBQV0Wo0h7A354fWH44fUJfu11imtPAIxL2YjrZUEAQe8NAkHuDbKAumpq27Zt9q2zTrdd9/iE/fq+X9jD8+53ANzy3tauihScDvCA36c+nbFjhgyxD7c0dwlBKgWChB6ExOvdxmf9X168PuBX77pUcvwCYCXVLrMtIIg36CFIdUAQb5B4tvH5eKQ1NY20HrtmnDc479HZJJVsHnwAD/gBNuyMb4xydQJF8ridrA35MJLr2Rvkjxbw+9vW/8uLHsCP+SUuq5wCAmDltI6sJSCIN+grxBsEgiwsn0bIp6g8+eRCmz0ngF5w72/nHn+1t9970da/sTSnt0bZzgywefABPA8zn5d9oEief/v38T65Q0g+Er03OHPmTHbrwpijhqz/yyv4VW/qBcDqaV9Wy3gLQNB7g0CwM2+Qe4Fjx4yxH44bZxdfdJH7GCkekPCkGKAV04lf/mqqATgPsM7Kcow8y5Zv/zj7rvKRl2OAEDAQr2XD6wN+jDETbPggAy55mctgV79VUEAArILoUTXJwinUGwy3CRR5UvyZ3c14XaZQEP7vLx8ywEmZcH0+Tj3TfvFTt3v3Xb93Yb4NEMSAYK1eFgN34OcfdKAJXh/wIy6rngICYPW0j6xlQNiZN8jCy9UIICzWG/y7b5xjO3+6p130o/PaXUYDPj5dZo/dG9v+l0mutrOPAUHSAGG+fpMvLcZY8Po8/PD6vjP6rKnMWesYFFRRAQGwiuJH2TQLCm/QXxJTd2eXxKSHDQjiDeby7ML5iQOrq//j5jZvEPgBvrPPav2/xWQqwagXA4K14A3i9QE/LwXwmzRxYoa58mkKq6uAAFhd/SNvHQjiDfqKuTfY2QMSf9yHQBBvkMtbLmV9eq7Qe4Plgi+7DSBImgch8TQZXh/w814ffcfrA37EZclRQABMzlxE1hM8DCDovUEgGKc3GFnHQxUBQYykNHmDwA+vz8MPrw/4MSeMRdZegWrvCYDVnoGY2mfB4Q16CNIMIIzLG6T+OAwIYt4bBDBxtBNFnXh9wM/XBfzw+pgLn6YwWQoIgMmaj8h7AwTxBn3FQBBvMB9IuDfIJTH3Bgu9JPZtxBECQeoFhPn6Tr5KGv0Bft7ro228PuBHXJZcBQTA5M5NZD3DAwGCYW8QCOIN5moECHJvsNjXZXLVWeyxlc+tNm9AEAOCXBYXW1cc+YEfXp+HH14f8EPzONpTndEqUFUARjsU1ZZLARZkZ94gEGQR5yoLCCvtDXroHXDQfuaNNPoJBHnlJl+/yRun4fUBP98G8MPrQ2ufpjDZCgiAyZ6fyHvH4gx7g/6SGBDmagwI4g1ySVzMk+JcdeY7BvieeuJZe2bxc8bnGrI/ZcpNxms3+x/QaPQpXx1xHAe8wM97fbSB1wf8iMvSo4AAmJ65iqynQBBvMHxJDAiBIIs7V0NAMG5vEE8P2BH27rOH8XH+/ffpa8Bvh53+YtWGH16fhx9eH/BD01y66VgyFRAAqzUvCWgXCOIN+q4AQe4N5oMgnhcg9N6gLx9V6OFH+P7W9+2Xv5puE2/4iR38+d5VhR9eH/Dz4wR+eH2Cn1ckfaEAmL45i7THLF4gGPYGgSDeYL6GgCDeYByXxLvt3tNd9s57dI69//FaO2n4EFuxYoVtDYCYr19RH+cPAvDzXh/14/UBP+Ky9CogAKZ37iLrORDEGwxDEG8QCLL4czUUlzc49+H77PfzZ9mHH79tY8aMsQEDBtiXv3y8bWvelqs7kR9j/Hh9Hn54fcAPzSJvTBVWXAEBsOKSJ7dBIBj2BoFgHN7gyue2v9rCfT7MmgNdWu3+38yyDZvWWL+9drdz/+mslkPBseYgtm1bEAmyVuIXrw/4+baAH16f4OcVSX8oAKZ/DiMdAYsbEJbqDXJJzL3Brl6eBnbc2wt3+oAD97OVz692SdPu+Kk9uWi+jf7Hv7OmkU0uzW+amwMEbovfA8TrA37e66N9vD7gR1xWOwoIgLUzl5GOBAjiDfpKvTcIHHxaZ6G/JO7w8jSOGxYUAoI77PBJ232PXY2nvIufWm4vrFps//XT8e4hx9RbrrOH5s4Ncrb+unLBJvhduHBha2I8AePD6/Pww+sDfvxhiKdF1VpNBQTAaqqf8LZZ9EAw7A0WekkMCNu8weCSNtdQfzVjsn1mDzO+1J1y5G1sbDT/nSbsB+yz3/9+np100jB2YzG8PuDnKwd+eH3o4NMiCFVFghQQABM0GUnsCosfbzAMQbzBoh6QbH3X7pp5q/sA1V1362lc8n700V9s1q9/ZVOmXWanff1EN3QPP3aI81H+fKfJ008vsT+tXGmXXXZZLC8/4/UBP+/10b6HH3FZ7SogANbu3EY6MiCIN+grBYKFeoP+dZmtAQgfCp7uLn36ebvtFxPt3a2rrV+/fvb8889bVw83AKE333aUIfDD6wvDj0tePL8o21FdyVRAAEzmvCSyV3iDQLAcb3Dzlrfd6y1fHDLQxowZa1/5ynA7/vgTjAcclR40Xh/w8+3i9QE/xunTFEarQNJqEwCTNiMJ7w9wwBvMhiDeIN5Uvu5/7RvD3estTU0jO2QtpHyHQiUk0A7wC3t9wA+vj/GVUKWKpFQBATClE1ftbgPBbG8QCHJvMF/fmpqazPheSNv+02w85ti+H1cM+OH1heGH1wf84mpT9SZXAQEwuXOT+J7hLQHCbG8QCAKazgbw0EOh11vCGSrAP7w+4OebxesDfozDpymsLwUqCsD6krZ+RgsE8Qb9iHM9IBk/frzNnv2AzX7gAZcdIM6b9zv75jf/PpYnvDQCjIFf2OsDfnh9gh8K1a8JgPU795GOHJAAwUK8wbFjxwYPQMbYkiWLDSBeeumlkfYlXBnww+sLww+vD/iF8ylenwoIgPU577GMGgjiDWZDkHuDgCi7UV5vyU6Lch+vD/j5OvH6gB/99GkK61sBAbBS819H7QBBvMHwkIEg9wbDaXHFgS3wC3t9wA+vT/CLS/V01isApnPeEt9rQAMEs71BIAig4hoAdTd062Zh+OH1Ab+42lS96VVAAEzv3CW+50Aw2xvM9YCk3AHh9TV06xZU0/KODV4f8KMfQaJ+pUAHBQTADpIoIWoFNm/e/P04vUG8PuA3ZMiQtq4DP7w+wa9NEkU6UUAA7EQUJUWvACDCG8y+JObeIAArtUXKNnTjkpL8IGMAAAL9SURBVNfDL2N4fcCv1DpVrn4UEADrZ64TMVIgiDcY7gwQ5N5gOK2QOF5fQzcueVtyz58/38EP2LakaCsFcisgAObWR0djUABAAcFsbxAI4tHla5I8wK/9Je98w+uj7nzlK3xczSVYAQEwwZNTy10DVHiD2RDM5w0Cv4Zu4UteC7y+0VOBXy3rpbHFo4AAGI+uqrVABYAg3mA4O0+KO/MG8foaumVf8o6eCkzD5RWXAoUqIAAWqpTyxaYAAAOCnXmDeHwY8NMlb2xTEFvFSa9YAEz6DNVJ/4BgZ94gl8RPLFhgYfh9Z7QueevktIh9mAJg7BKrgWIUAITZ3mC4PPAjTzhNcSlQqgICYKnKqVxsCgA4vMHwJXHLKy663xeb6HVacawArFNNNeyIFACCeINUx1NewEhcJgWiUkAAjEpJ1ROLAkAP+MVSuSqtewUEwLo/BSSAFKhfBQTAuOZe9UoBKZB4BQTAxE+ROigFpEBcCgiAcSmreqWAFEi8AgJg4qcojR1Un6VAOhQQANMxT+qlFJACMSggAMYgqqqUAlIgHQoIgOmYJ/UyPQqopylSQABM0WSpq1JACkSrgAAYrZ6qTQpIgRQpIACmaLLUVSmQdAXS1j8BMG0zpv5KASkQmQICYGRSqiIpIAXSpoAAmLYZU3+lgBSITIFIARhZr1SRFJACUqACCgiAFRBZTUgBKZBMBQTAZM6LeiUFpEAFFBAAoxJZ9UgBKZA6BQTA1E2ZOiwFpEBUCgiAUSmpeqSAFEidAgJg6qYsiR1Wn6RAOhUQANM5b+q1FJACESggAEYgoqqQAlIgnQoIgOmcN/U6OQqoJylWQABM8eSp61JACpSngABYnn4qLQWkQIoVEABTPHnquhSotgJpb18ATPsMqv9SQAqUrIAAWLJ0KigFpEDaFRAA0z6D6r8UkAIlK1AWAEtuVQWlgBSQAglQQABMwCSoC1JAClRHAQGwOrqrVSkgBRKggABY6iSonBSQAqlXQABM/RRqAFJACpSqwP8DAAD//3Bjm38AAAAGSURBVAMAe74xY9d6qLkAAAAASUVORK5CYII="
+}

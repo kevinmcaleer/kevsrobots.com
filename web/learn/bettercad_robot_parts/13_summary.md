@@ -113,9 +113,11 @@ Before you press print on a part that holds something:
 
 ## What's Next
 
-Your deck's gears mesh on screen, but they don't turn yet. BetterCad can do that too. The **Assemble** tab has joints, poses, a clash check that sweeps every joint through its range, and a URDF export for simulators and for Snakie. A course on making your designs move is on its way.
+Your deck's gears mesh on screen, but they don't turn yet. BetterCad can do that too. The **Assemble** tab has joints, poses, a clash check that sweeps every joint through its range, and a URDF export for simulators.
 
-Until then:
+- [Make It Move with BetterCad](/learn/bettercad_joints_urdf/) is the next course. It builds a two-joint arm, and one lesson comes back to this deck to make its gears drive each other
+
+Also worth a look:
 
 - [Learn BetterCad](/learn/bettercad/) if you skipped the basics
 - [Print It Right with BetterCad](/learn/bettercad_printing/) to calibrate the fits and holes this course relies on

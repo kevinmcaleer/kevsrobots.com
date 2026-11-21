@@ -1,0 +1,46 @@
+- name: Make It Move with BetterCad
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  level: intermediate
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - 3ddesign
+      - robots
+      - robotarms
+  description: >-
+    Turn a design that sits still into a robot that moves. Add hinge, wheel and slider joints in BetterCad, pose them, drag an arm by its tip, check every pose for clashes, link joints through gears, and export the lot as URDF. The project is a two-joint desk arm.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+  - section:
+      name: Joints
+      content:
+      - 01_components_and_the_assemble_tab.md
+      - 02_your_first_joint.md
+      - 03_posing_a_joint.md
+      - 04_a_second_joint.md
+      - 05_joint_kinds_and_line_up.md
+  - section:
+      name: Poses
+      content:
+      - 06_named_poses.md
+      - 07_drag_the_arm_by_its_tip.md
+  - section:
+      name: Checks
+      content:
+      - 08_mass_and_balance.md
+      - 09_checking_for_clashes.md
+      - 10_sweeps_and_joint_limits.md
+  - section:
+      name: Drives
+      content:
+      - 11_drive_links.md
+  - section:
+      name: Export
+      content:
+      - 12_exporting_urdf.md
+      - 13_summary.md

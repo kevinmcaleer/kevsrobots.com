@@ -155,6 +155,91 @@
     ]
   },
   {
+    "slug": "bettercad_joints_urdf",
+    "name": "Make It Move with BetterCad",
+    "description": "Turn a design that sits still into a robot that moves. Add hinge, wheel and slider joints in BetterCad, pose them, drag an arm by its tip, check every pose for clashes, link joints through gears, and export the lot as URDF. The project is a two-joint desk arm.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "3ddesign",
+      "robots",
+      "robotarms"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/bettercad_joints_urdf/00_intro.html"
+      },
+      {
+        "file": "01_components_and_the_assemble_tab.md",
+        "section": "Joints",
+        "url": "/learn/bettercad_joints_urdf/01_components_and_the_assemble_tab.html"
+      },
+      {
+        "file": "02_your_first_joint.md",
+        "section": "Joints",
+        "url": "/learn/bettercad_joints_urdf/02_your_first_joint.html"
+      },
+      {
+        "file": "03_posing_a_joint.md",
+        "section": "Joints",
+        "url": "/learn/bettercad_joints_urdf/03_posing_a_joint.html"
+      },
+      {
+        "file": "04_a_second_joint.md",
+        "section": "Joints",
+        "url": "/learn/bettercad_joints_urdf/04_a_second_joint.html"
+      },
+      {
+        "file": "05_joint_kinds_and_line_up.md",
+        "section": "Joints",
+        "url": "/learn/bettercad_joints_urdf/05_joint_kinds_and_line_up.html"
+      },
+      {
+        "file": "06_named_poses.md",
+        "section": "Poses",
+        "url": "/learn/bettercad_joints_urdf/06_named_poses.html"
+      },
+      {
+        "file": "07_drag_the_arm_by_its_tip.md",
+        "section": "Poses",
+        "url": "/learn/bettercad_joints_urdf/07_drag_the_arm_by_its_tip.html"
+      },
+      {
+        "file": "08_mass_and_balance.md",
+        "section": "Checks",
+        "url": "/learn/bettercad_joints_urdf/08_mass_and_balance.html"
+      },
+      {
+        "file": "09_checking_for_clashes.md",
+        "section": "Checks",
+        "url": "/learn/bettercad_joints_urdf/09_checking_for_clashes.html"
+      },
+      {
+        "file": "10_sweeps_and_joint_limits.md",
+        "section": "Checks",
+        "url": "/learn/bettercad_joints_urdf/10_sweeps_and_joint_limits.html"
+      },
+      {
+        "file": "11_drive_links.md",
+        "section": "Drives",
+        "url": "/learn/bettercad_joints_urdf/11_drive_links.html"
+      },
+      {
+        "file": "12_exporting_urdf.md",
+        "section": "Export",
+        "url": "/learn/bettercad_joints_urdf/12_exporting_urdf.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Export",
+        "url": "/learn/bettercad_joints_urdf/13_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "bettercad_printing",
     "name": "Print It Right with BetterCad",
     "description": "Get parts that fit first time. Set up your printer in BetterCad, catch overhangs and thin walls before you print, calibrate holes and fits to your own machine, then design a box with a lid that closes just right.",
