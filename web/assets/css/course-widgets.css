@@ -103,3 +103,45 @@
 .kr-sim-up .kr-sim-who { color: #0b6b3a; }
 .kr-sim-count { margin-left: auto; color: #555; }
 .kr-sim-out { margin: 0; min-height: 3rem; max-height: 12rem; overflow: auto; background: #10151c; color: #e6edf3; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.8rem; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Confidence demo, and the score rows the move detector shares */
+.kr-cf-control { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: center; margin-bottom: 0.75rem; }
+.kr-cf-slider { flex: 1 1 12rem; }
+.kr-cf-row { display: grid; grid-template-columns: 5.5rem 1fr 3rem 4.5rem; gap: 0.5rem; align-items: center; font-size: 0.85rem; padding: 0.2rem 0; }
+.kr-md-table .kr-cf-row { grid-template-columns: 5.5rem 1fr 3rem; }
+.kr-cf-track { background: #eee; border-radius: 4px; height: 0.7rem; overflow: hidden; }
+.kr-cf-bar { display: block; height: 100%; background: #198754; }
+.kr-cf-row.is-out { color: #777; }
+.kr-cf-row.is-out .kr-cf-bar { background: #bbb; }
+.kr-cf-row.is-best { font-weight: 700; }
+.kr-cf-score { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align: right; }
+.kr-cf-result, .kr-cb-result, .kr-md-text { margin: 0.75rem 0 0.25rem; font-weight: 600; }
+
+/* Cost break-even */
+.kr-cb-fields { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; }
+.kr-cb-field { flex: 1 1 12rem; }
+.kr-cb-input { box-sizing: border-box; width: 100%; padding: 0.35rem 0.5rem; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+
+/* Move detector */
+.kr-md-layout { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; }
+.kr-md-col { flex: 1 1 240px; max-width: 360px; min-width: 0; }
+.kr-md-board { display: grid; grid-template-columns: repeat(8, 1fr); border: 2px solid #444; border-radius: 4px; overflow: hidden; }
+.kr-md-sq { position: relative; aspect-ratio: 1; min-width: 0; padding: 0; border: 0; background: #f0d9b5; display: flex; align-items: center; justify-content: center; }
+.kr-md-sq.is-dark { background: #b58863; }
+button.kr-md-sq:not(:disabled) { cursor: pointer; }
+button.kr-md-sq:focus-visible { outline: 3px solid #0d6efd; outline-offset: -3px; }
+.kr-md-sq.is-picked { box-shadow: inset 0 0 0 3px orangered; }
+.kr-md-sq.is-target::after { content: ""; width: 30%; height: 30%; border-radius: 50%; background: rgba(255, 69, 0, 0.75); }
+.kr-md-piece { width: 74%; height: 74%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: clamp(0.6rem, 2.4vw, 0.95rem); background: #222; color: #ffd84a; border: 1px solid #000; }
+.kr-md-piece.is-white { background: #fff6dc; color: #b3261e; border-color: #8a7a55; }
+.kr-md-glow { position: absolute; inset: 0; background: #00c2ff; opacity: 0; transition: opacity 0.3s; }
+.kr-md-noise { font-size: 0.85rem; }
+
+/* Simulator: the pretend phone page */
+.kr-sim-phone { margin: 0.75rem 0; padding: 0.6rem 0.75rem; border: 2px solid #444; border-radius: 14px; background: #f4f4f4; text-align: center; font-size: 0.85rem; }
+.kr-sim-phone.is-over { background: #ffd9d6; }
+.kr-sim-phone .kr-mx-caption { text-align: left; font-weight: 400; color: #555; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.kr-sim-phone-title { font-weight: 700; font-size: 1rem; }
+.kr-sim-phone-reading { font-size: 2.6rem; font-weight: 700; line-height: 1.2; }
+.kr-sim-phone input { width: 100%; }
+.kr-sim-phone-state { color: #555; font-size: 0.8rem; }

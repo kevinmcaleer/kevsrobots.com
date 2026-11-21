@@ -335,6 +335,8 @@ void loop() {
 
 > **Note:** On the Uno Q, use `Monitor.println` instead of the usual `Serial.println`. The `Arduino_RouterBridge.h` library handles communication between the microcontroller and the Linux side of the board.
 
+> **Update, November 2026:** Since version 0.55.0 of the Uno Q board platform, `Serial.println` works too and shows in App Lab's Serial Monitor tab. `Monitor.println` still works. The [Arduino Uno Q course](/learn/arduino_uno_q/) covers both, and how the two sides of the board talk to each other.
+
 Upload the sketch wirelessly through App Lab and check the Sketch Console for output. If you see your messages appearing, everything is set up correctly.
 
 **Challenge:** Try modifying the sketch to print the current millis() value alongside each message, so you can see how long the board has been running.

@@ -448,8 +448,45 @@
   var SIM_SKETCHES = {
     blink: { text: 'The sketch blinks LED 3 green every half second. It provides nothing over the Bridge.', pot: false },
     clock: { text: 'The sketch provides draw (104 values) and set_status (red, green, blue for LED 4).', pot: false },
-    sensor: { text: 'The sketch provides draw and set_status. Once a second it calls get_limit (until it gets an answer), notifies on_reading with the knob value, and lights LED 3 red above the limit.', pot: true }
+    sensor: { text: 'The sketch provides draw and set_status. Once a second it calls get_limit (until it gets an answer), notifies on_reading with the knob value, and lights LED 3 red above the limit.', pot: true },
+    webpage: { text: 'The sketch does what the sensor sketch does, and also provides set_limit. The phone stands in for assets/index.html: it asks GET /status once a second and sends POST /limit when you move its slider.', pot: true, page: true }
   };
+
+  // Stand-in for the WebUI - HTML Brick: only the REST side (expose_api).
+  var SIM_WEBUI_STUB = [
+    'import json',
+    '',
+    '_routes = {}',
+    '',
+    'class WebUI:',
+    '    def __init__(self, **options):',
+    '        pass',
+    '',
+    '    def expose_api(self, method, path, function):',
+    '        if not callable(function):',
+    '            raise TypeError("expose_api(method, path, function)")',
+    '        _routes[(method.upper(), path)] = function',
+    '',
+    '    def on_message(self, message_type, callback):',
+    '        pass',
+    '',
+    '    def on_connect(self, callback):',
+    '        pass',
+    '',
+    '    def on_disconnect(self, callback):',
+    '        pass',
+    '',
+    '    def send_message(self, message_type, message=None, room=None):',
+    '        pass',
+    '',
+    'def _request(method, path, value):',
+    '    function = _routes.get((method, path))',
+    '    if function is None:',
+    '        return ""',
+    '    result = function() if value is None else function(int(value))',
+    '    return json.dumps(result)',
+    ''
+  ].join('\n');
 
   var SIM_STUB = [
     'import _krsim',
@@ -526,7 +563,8 @@
 
   // Runs inside the worker. Self-contained: it is turned into source text.
   function simWorker(cfg) {
-    var py = null, bridge = null, loopFn = null, started = false, stopped = false;
+    var py = null, bridge = null, webui = null, loopFn = null, started = false, stopped = false;
+    var sensing = cfg.sketch === 'sensor' || cfg.sketch === 'webpage';
     var state = { matrix: [], led1: [0, 0, 0], led2: [0, 0, 0], led3: [0, 0, 0], led4: [0, 0, 0] };
     for (var i = 0; i < 104; i++) state.matrix.push(0);
     var dirty = true, out = [], traffic = {}, trafficDirty = false, pot = 50;
@@ -573,7 +611,7 @@
 
     // What the lesson's sketch provides, played in JavaScript.
     var provides = {};
-    if (cfg.sketch === 'clock' || cfg.sketch === 'sensor') {
+    if (cfg.sketch === 'clock' || sensing) {
       provides.draw = function (args) {
         if (args.length !== 1) return 'draw takes 1 argument, the frame';
         var frame = args[0];
@@ -590,6 +628,14 @@
         return null;
       };
     }
+    if (cfg.sketch === 'webpage') {
+      provides.set_limit = function (args) {
+        if (args.length !== 1 || typeof args[0] !== 'number') return 'set_limit takes 1 argument, a whole number';
+        sk.limit = Math.round(args[0]);
+        sk.haveLimit = true;
+        return null;
+      };
+    }
 
     function sketchTick() {
       var now = Date.now();
@@ -598,7 +644,7 @@
         if (state.led3[1] !== on) { state.led3 = [0, on, 0]; dirty = true; }
         return;
       }
-      if (cfg.sketch !== 'sensor' || now - sk.last < 1000) return;
+      if (!sensing || now - sk.last < 1000) return;
       sk.last = now;
       if (!sk.haveLimit) {
         count('up', 'call', 'get_limit', '');
@@ -652,12 +698,22 @@
       }
       if (!started) { finish('main.py reached the end without calling App.run(), so the App stopped.'); return; }
       bridge = py.pyimport('arduino.app_utils').Bridge;
+      if (py.runPython('import sys; "arduino.app_bricks.web_ui" in sys.modules')) webui = py.pyimport('arduino.app_bricks.web_ui');
       tick();
     }
 
     self.onmessage = function (event) {
       var msg = event.data;
       if (msg.type === 'pot') { pot = msg.value; return; }
+      if (msg.type === 'api') {
+        // The pretend phone asking the App's web addresses.
+        var body = null;
+        if (webui && !stopped) {
+          try { body = webui._request(msg.method, msg.path, msg.value); } catch (err) { say('Error in ' + msg.method + ' ' + msg.path + ':\n' + lastLine(err)); }
+        }
+        self.postMessage({ type: 'api', path: msg.path, body: body });
+        return;
+      }
       if (msg.type !== 'run') return;
       try {
         self.importScripts(cfg.base + 'pyodide.js');
@@ -671,6 +727,9 @@
         py.FS.mkdirTree('/home/pyodide/arduino');
         py.FS.writeFile('/home/pyodide/arduino/__init__.py', '');
         py.FS.writeFile('/home/pyodide/arduino/app_utils.py', cfg.stub);
+        py.FS.mkdirTree('/home/pyodide/arduino/app_bricks');
+        py.FS.writeFile('/home/pyodide/arduino/app_bricks/__init__.py', '');
+        py.FS.writeFile('/home/pyodide/arduino/app_bricks/web_ui.py', cfg.webui);
         self.postMessage({ type: 'ready' });
         setInterval(flush, 60);
         run(msg.code);
@@ -734,6 +793,37 @@
     });
     var potBox = sketch.pot ? el('label', { class: 'kr-sim-potbox' }, [el('span', { class: 'kr-mx-caption', text: 'Potentiometer on A0' }), pot, potValue]) : null;
 
+    // The pretend phone (sketch="webpage"): what assets/index.html does.
+    var phone = null, phoneReading, phoneLimit, phoneSlider, phoneState, phoneTimer = null;
+    if (sketch.page) {
+      phoneReading = el('div', { class: 'kr-sim-phone-reading', text: '--' });
+      phoneLimit = el('span', { text: '50' });
+      phoneSlider = el('input', { type: 'range', min: '0', max: '99', value: '50', 'aria-label': 'Alarm limit on the phone page' });
+      phoneState = el('div', { class: 'kr-sim-phone-state', text: 'Not running' });
+      phoneSlider.addEventListener('input', function () { phoneLimit.textContent = phoneSlider.value; });
+      phoneSlider.addEventListener('change', function () {
+        if (worker) worker.postMessage({ type: 'api', method: 'POST', path: '/limit', value: Number(phoneSlider.value) });
+      });
+      phone = el('div', { class: 'kr-sim-phone' }, [
+        el('span', { class: 'kr-mx-caption', text: 'Phone: http://qboard.local:7000' }),
+        el('div', { class: 'kr-sim-phone-title', text: 'Q Board' }),
+        phoneReading,
+        el('div', {}, [el('span', { text: 'Alarm limit: ' }), phoneLimit]),
+        phoneSlider,
+        phoneState
+      ]);
+    }
+    function phoneAnswer(msg) {
+      if (!phone || msg.path !== '/status') return;
+      if (msg.body === null) { phoneState.textContent = 'Lost contact with the board'; return; }
+      if (msg.body === '') { phoneState.textContent = 'The App has no /status address yet'; return; }
+      var data = JSON.parse(msg.body);
+      phoneReading.textContent = data.reading === null || data.reading === undefined ? '--' : data.reading;
+      phone.classList.toggle('is-over', typeof data.reading === 'number' && data.reading > data.limit);
+      if (document.activeElement !== phoneSlider && typeof data.limit === 'number') { phoneSlider.value = data.limit; phoneLimit.textContent = data.limit; }
+      phoneState.textContent = 'Connected';
+    }
+
     var status = el('span', { class: 'kr-w-hint', role: 'status', text: 'Press Run to start.' });
     var output = el('pre', { class: 'kr-sim-out', 'aria-label': 'Python output', tabindex: '0' });
     var traffic = el('div', { class: 'kr-sim-traffic' });
@@ -783,6 +873,8 @@
 
     function stop(message) {
       if (worker) { worker.terminate(); worker = null; }
+      if (phoneTimer) { clearInterval(phoneTimer); phoneTimer = null; }
+      if (phone) { phoneState.textContent = 'Lost contact with the board'; phone.classList.remove('is-over'); }
       runBtn.disabled = false;
       stopBtn.disabled = true;
       status.textContent = message;
@@ -797,13 +889,17 @@
       runBtn.disabled = true;
       stopBtn.disabled = false;
       status.textContent = 'Loading Python. The first run takes a few seconds.';
-      var source = '(' + simWorker.toString() + ')(' + JSON.stringify({ base: PYODIDE_BASE, sketch: kind, stub: SIM_STUB }) + ');';
+      var source = '(' + simWorker.toString() + ')(' + JSON.stringify({ base: PYODIDE_BASE, sketch: kind, stub: SIM_STUB, webui: SIM_WEBUI_STUB }) + ');';
       var url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }));
       worker = new Worker(url);
       URL.revokeObjectURL(url);
       worker.onmessage = function (event) {
         var msg = event.data;
-        if (msg.type === 'ready') status.textContent = 'Running. Press Stop to end it.';
+        if (msg.type === 'ready') {
+          status.textContent = 'Running. Press Stop to end it.';
+          if (phone) phoneTimer = setInterval(function () { if (worker) worker.postMessage({ type: 'api', method: 'GET', path: '/status', value: null }); }, 1000);
+        }
+        else if (msg.type === 'api') phoneAnswer(msg);
         else if (msg.type === 'failed') stop('Python could not be loaded. Check your connection and try again.');
         else if (msg.type === 'done') stop('The App stopped. See the output below.');
         else if (msg.type === 'update') {
@@ -830,7 +926,7 @@
       ]),
       el('div', { class: 'kr-sim-board' }, [
         el('span', { class: 'kr-mx-caption', text: 'The board' }),
-        grid, ledRow, potBox,
+        grid, ledRow, potBox, phone,
         el('p', { class: 'kr-sim-sketch', text: sketch.text }),
         traffic
       ])
@@ -840,7 +936,212 @@
     blank();
   }
 
-  var WIDGETS = { 'matrix-painter': matrixPainter, 'bridge-steps': bridgeSteps, sorter: sorter, 'uno-q-sim': unoQSim };
+  // ------------------------------------------------------ confidence demo
+  // Made-up detections from one camera frame, and the threshold that decides
+  // which ones the App hears about (the Video Object Detection Brick's
+  // `confidence` setting). Shows what on_detect_all() would be given.
+  var SEEN = [['person', 0.91], ['chair', 0.62], ['cup', 0.55], ['person', 0.48], ['dog', 0.33], ['person', 0.27]];
+
+  function confidenceDemo(root) {
+    var slider = el('input', { type: 'range', min: '0.1', max: '0.95', step: '0.05', value: '0.5', class: 'kr-cf-slider', 'aria-label': 'Confidence threshold' });
+    var value = el('strong', { text: '0.50' });
+    var list = el('div', { class: 'kr-cf-list' });
+    var result = el('p', { class: 'kr-cf-result', role: 'status' });
+    var rows = SEEN.map(function (d) {
+      var bar = el('span', { class: 'kr-cf-bar' });
+      bar.style.width = Math.round(d[1] * 100) + '%';
+      var row = el('div', { class: 'kr-cf-row' }, [
+        el('span', { class: 'kr-cf-label', text: d[0] }),
+        el('span', { class: 'kr-cf-track' }, [bar]),
+        el('span', { class: 'kr-cf-score', text: d[1].toFixed(2) }),
+        el('span', { class: 'kr-cf-verdict' })
+      ]);
+      list.appendChild(row);
+      return row;
+    });
+    function show() {
+      var limit = Number(slider.value);
+      value.textContent = limit.toFixed(2);
+      var counts = {}, people = 0;
+      SEEN.forEach(function (d, i) {
+        var pass = d[1] >= limit;
+        rows[i].classList.toggle('is-out', !pass);
+        rows[i].lastChild.textContent = pass ? 'reported' : 'ignored';
+        if (pass) { counts[d[0]] = (counts[d[0]] || 0) + 1; if (d[0] === 'person') people++; }
+      });
+      var labels = Object.keys(counts).map(function (k) { return counts[k] + ' x ' + k; });
+      result.textContent = (labels.length ? 'Your function is given: ' + labels.join(', ') + '.' : 'Nothing passes, so your function is not called.') + ' People counted: ' + people + '.';
+    }
+    slider.addEventListener('input', show);
+    root.textContent = '';
+    root.appendChild(el('div', { class: 'kr-w-head' }, [
+      el('span', { class: 'kr-w-label', text: 'Confidence threshold' }),
+      el('span', { class: 'kr-w-hint', text: 'Made-up scores for one camera frame. Drag the slider.' })
+    ]));
+    root.appendChild(el('label', { class: 'kr-cf-control' }, [el('span', { text: 'confidence = ' }), value, slider]));
+    root.appendChild(list);
+    root.appendChild(result);
+    show();
+  }
+
+  // -------------------------------------------------------- cost break-even
+  function costBreakeven(root) {
+    function field(label, start) {
+      var input = el('input', { type: 'number', min: '0', step: '1', value: start, class: 'kr-cb-input' });
+      return { input: input, box: el('label', { class: 'kr-cb-field' }, [el('span', { class: 'kr-mx-caption', text: label }), input]) };
+    }
+    var board = field('One-off cost of the board', root.getAttribute('data-board') || '53');
+    var monthly = field('Monthly cost of renting a server', root.getAttribute('data-monthly') || '5');
+    var result = el('p', { class: 'kr-cb-result', role: 'status' });
+    function show() {
+      var b = Number(board.input.value), m = Number(monthly.input.value);
+      if (!(b > 0) || !(m > 0)) { result.textContent = 'Enter both costs to see the break-even point.'; return; }
+      var months = Math.ceil(b / m);
+      result.textContent = 'The board has paid for itself after ' + months + (months === 1 ? ' month' : ' months') +
+        '. Over two years, renting costs ' + (m * 24).toFixed(0) + ' and the board still cost ' + b.toFixed(0) + '.';
+    }
+    board.input.addEventListener('input', show);
+    monthly.input.addEventListener('input', show);
+    root.textContent = '';
+    root.appendChild(el('div', { class: 'kr-w-head' }, [
+      el('span', { class: 'kr-w-label', text: 'Buy or rent?' }),
+      el('span', { class: 'kr-w-hint', text: 'Use your own prices, in your own currency.' })
+    ]));
+    root.appendChild(el('div', { class: 'kr-cb-fields' }, [board.box, monthly.box]));
+    root.appendChild(result);
+    root.appendChild(el('p', { class: 'kr-w-hint', text: 'This leaves out electricity and the cost of the AI model itself, which you pay either way.' }));
+    show();
+  }
+
+  // --------------------------------------------------------- move detector
+  // A simplified picture of how Kev's chess camera reads a move without
+  // recognising pieces (kevsrobots.com/blog/uno-q-chess-camera.html): score
+  // how much each square changed, then ask the rules which legal move fits.
+  // Opening position, white to move: exactly 20 legal moves.
+  var FILES = 'abcdefgh';
+  function squareName(index) { return FILES[index % 8] + (8 - Math.floor(index / 8)); }
+  function startPosition() {
+    var back = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'], board = [];
+    for (var i = 0; i < 64; i++) board.push(null);
+    for (var f = 0; f < 8; f++) {
+      board[f] = { piece: back[f], white: false };
+      board[8 + f] = { piece: 'P', white: false };
+      board[48 + f] = { piece: 'P', white: true };
+      board[56 + f] = { piece: back[f], white: true };
+    }
+    return board;
+  }
+  function openingMoves() {
+    var moves = [];
+    for (var f = 0; f < 8; f++) { moves.push([48 + f, 40 + f]); moves.push([48 + f, 32 + f]); }
+    [[57, 40], [57, 42], [62, 45], [62, 47]].forEach(function (m) { moves.push(m); });
+    return moves;
+  }
+
+  function moveDetector(root) {
+    var board, change, picked, done, moves = openingMoves();
+    var noise = el('input', { type: 'checkbox' });
+    var boardEl = el('div', { class: 'kr-md-board', role: 'group', 'aria-label': 'Chess board. Choose a white pawn or knight, then where it goes.' });
+    var heatEl = el('div', { class: 'kr-md-board kr-md-heat', role: 'img', 'aria-label': 'How much each square changed' });
+    var text = el('p', { class: 'kr-md-text', role: 'status' });
+    var table = el('div', { class: 'kr-md-table' });
+    var squares = [], heats = [];
+    for (var i = 0; i < 64; i++) {
+      var dark = (Math.floor(i / 8) + i % 8) % 2 === 1;
+      var sq = el('button', { type: 'button', class: 'kr-md-sq' + (dark ? ' is-dark' : ''), 'data-index': i });
+      sq.addEventListener('click', onSquare);
+      squares.push(sq);
+      boardEl.appendChild(sq);
+      var heat = el('span', { class: 'kr-md-sq' + (dark ? ' is-dark' : '') }, [el('span', { class: 'kr-md-glow' })]);
+      heats.push(heat);
+      heatEl.appendChild(heat);
+    }
+    function targets(from) { return moves.filter(function (m) { return m[0] === from; }).map(function (m) { return m[1]; }); }
+    function draw() {
+      for (var i = 0; i < 64; i++) {
+        var p = board[i], sq = squares[i];
+        sq.textContent = '';
+        if (p) sq.appendChild(el('span', { class: 'kr-md-piece' + (p.white ? ' is-white' : ''), text: p.piece }));
+        var can = !done && (picked === null ? targets(i).length > 0 : targets(picked).indexOf(i) !== -1);
+        sq.classList.toggle('is-picked', picked === i);
+        sq.classList.toggle('is-target', !done && picked !== null && targets(picked).indexOf(i) !== -1);
+        sq.disabled = !(can || picked === i);
+        sq.setAttribute('aria-label', squareName(i) + (p ? ', ' + (p.white ? 'white ' : 'black ') + p.piece : ', empty'));
+        heats[i].firstChild.style.opacity = change ? String(Math.min(1, change[i])) : '0';
+      }
+    }
+    function onSquare(event) {
+      var i = Number(event.currentTarget.getAttribute('data-index'));
+      if (done) return;
+      if (picked === null) { if (targets(i).length) picked = i; }
+      else if (i === picked) picked = null;
+      else if (targets(picked).indexOf(i) !== -1) { play(picked, i); return; }
+      text.textContent = picked === null ? 'Choose a white pawn or knight.' : 'Now choose where it goes.';
+      draw();
+    }
+    function play(from, to) {
+      board[to] = board[from];
+      board[from] = null;
+      picked = null;
+      done = true;
+      change = [];
+      for (var i = 0; i < 64; i++) change.push(noise.checked ? Math.random() * 0.15 : 0);
+      change[from] = 0.85 + Math.random() * 0.15;
+      change[to] = 0.85 + Math.random() * 0.15;
+      var brushed = null;
+      if (noise.checked) {
+        // A sleeve brushes a neighbouring piece on the way past.
+        brushed = from + (from % 8 === 7 ? -1 : 1);
+        change[brushed] = 0.35;
+      }
+      var scored = moves.map(function (m) {
+        var elsewhere = 0;
+        for (var i = 0; i < 64; i++) if (i !== m[0] && i !== m[1]) elsewhere = Math.max(elsewhere, change[i]);
+        return { from: m[0], to: m[1], score: change[m[0]] + change[m[1]] - elsewhere };
+      }).sort(function (a, b) { return b.score - a.score; });
+      table.textContent = '';
+      table.appendChild(el('span', { class: 'kr-mx-caption', text: 'The 20 legal moves, best fit first (top 5 shown)' }));
+      scored.slice(0, 5).forEach(function (s, n) {
+        var bar = el('span', { class: 'kr-cf-bar' });
+        bar.style.width = Math.max(0, Math.round(s.score / 2 * 100)) + '%';
+        table.appendChild(el('div', { class: 'kr-cf-row' + (n === 0 ? ' is-best' : ' is-out') }, [
+          el('span', { class: 'kr-cf-label', text: squareName(s.from) + ' to ' + squareName(s.to) }),
+          el('span', { class: 'kr-cf-track' }, [bar]),
+          el('span', { class: 'kr-cf-score', text: s.score.toFixed(2) })
+        ]));
+      });
+      var best = scored[0];
+      text.textContent = 'The camera saw two squares change a lot: ' + squareName(from) + ' and ' + squareName(to) + '. ' +
+        (brushed !== null ? 'It also saw ' + squareName(brushed) + ' change a little, where a piece was brushed. ' : '') +
+        'Only one legal move fits, so the App reads ' + squareName(best.from) + ' to ' + squareName(best.to) + '. It never needed to know which piece it was.';
+      draw();
+    }
+    function reset() {
+      board = startPosition(); change = null; picked = null; done = false;
+      table.textContent = '';
+      text.textContent = 'You are white. Choose a pawn or a knight, then where it goes.';
+      draw();
+    }
+    root.textContent = '';
+    root.appendChild(el('div', { class: 'kr-w-head' }, [
+      el('span', { class: 'kr-w-label', text: 'Read a move without knowing the pieces' }),
+      el('span', { class: 'kr-w-hint', text: 'A simplified picture of the chess camera.' })
+    ]));
+    root.appendChild(el('div', { class: 'kr-md-layout' }, [
+      el('div', { class: 'kr-md-col' }, [el('span', { class: 'kr-mx-caption', text: 'The board' }), boardEl]),
+      el('div', { class: 'kr-md-col' }, [el('span', { class: 'kr-mx-caption', text: 'What the camera scores: how much each square changed' }), heatEl])
+    ]));
+    root.appendChild(text);
+    root.appendChild(table);
+    root.appendChild(el('div', { class: 'kr-sim-buttons' }, [
+      el('button', { type: 'button', class: 'kr-w-btn kr-w-btn-main', text: 'New move', onclick: reset }),
+      el('label', { class: 'kr-md-noise' }, [noise, el('span', { text: ' Add camera noise and a brushed piece' })])
+    ]));
+    reset();
+  }
+
+  var WIDGETS = { 'matrix-painter': matrixPainter, 'bridge-steps': bridgeSteps, sorter: sorter, 'uno-q-sim': unoQSim,
+    'confidence-demo': confidenceDemo, 'cost-breakeven': costBreakeven, 'move-detector': moveDetector };
 
   function start() {
     document.querySelectorAll('[data-kr-widget]').forEach(function (root) {

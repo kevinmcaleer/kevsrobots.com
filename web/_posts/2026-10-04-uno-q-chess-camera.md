@@ -143,6 +143,8 @@ Ordinary moves get no comment, so it doesn't nag you all game. It only speaks up
 
 ## Set it up yourself
 
+New to the UNO Q? The [Arduino Uno Q course](/learn/arduino_uno_q/) takes you from first boot to the web page, camera and Bridge skills this project uses.
+
 ### 1. Get the app onto the UNO Q
 
 Clone the repo into App Lab's apps folder on the board:

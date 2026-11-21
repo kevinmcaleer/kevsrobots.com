@@ -20,14 +20,14 @@
   description: Learn the Arduino Uno Q from first boot to a project that runs by itself.
     Split a job between its Linux computer and its microcontroller, make Python and
     an Arduino sketch talk over the Bridge, and build the Q Board, a number display
-    you drive from Python.
-  duration: 1h 15m
+    you drive from Python, a web page and a camera.
+  duration: 2h 16m
   groups:
   - arduino
   - electronics
   - python
   - ai
-  lessons: 10
+  lessons: 17
   level: beginner
   link: /learn/arduino_uno_q/00_intro.html
   name: Arduino Uno Q - Two Brains, One Board

@@ -12,6 +12,7 @@ stages:
   build:
   - Building Object Detection Models with Raspberry Pi AI Camera
   - Reinforcement Learning for Beginners
+  - Arduino Uno Q - Two Brains, One Board
   further:
   - Reinforcement Learning with Gymnasium
   - Build a RAG for Your Obsidian Vault
