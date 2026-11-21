@@ -19,6 +19,11 @@ services:
       - SITE_BASE_URL=${SITE_BASE_URL}
       - PAGE_COUNT_URL=${PAGE_COUNT_URL}
       - INGEST_SCHEDULE_HOUR=${INGEST_SCHEDULE_HOUR}
+      # Login: JWT_SECRET must match Chatter's SECRET_KEY, or every admin
+      # call returns 401 and personalised suggestions never switch on.
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_USERNAMES=${ADMIN_USERNAMES}
+      - VIEW_HISTORY_DAYS=${VIEW_HISTORY_DAYS:-90}
       - PORT=8200
     deploy:
       replicas: 1
