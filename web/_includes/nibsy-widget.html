@@ -791,6 +791,8 @@
   <button class="nibsy-show-btn" id="nw-show-btn" title="Show Nibsy">🤖</button>
 </div>
 
+{%- comment -%} Notes each page read in this browser, for read-next.js. {%- endcomment %}
+<script src="/assets/js/nibsy-history.js?v={{ site.time | date: '%s' }}"></script>
 <script>
 (function() {
   const widget = document.getElementById('nibsy-widget');
@@ -817,6 +819,7 @@
     return sid;
   })();
   let apiTips = null;
+  let signedIn = false;
 
   function sendBeaconJSON(path, data) {
     try {
@@ -853,6 +856,7 @@
         // Members only: remember this page so future tips fit what they read.
         // Nothing is sent for visitors who are not logged in.
         sendBeaconJSON('/api/track/view', { page: page });
+        signedIn = true;
         forgetBtn.hidden = false;
       }
       const recs = data.recommendations || [];
@@ -1421,9 +1425,17 @@
 
   // --- Forget What I've Read (logged-in members) ---
 
+  // Visitors who are not signed in have history in this browser only.
+  if (window.NibsyHistory && window.NibsyHistory.list().length) forgetBtn.hidden = false;
+
   forgetBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
     closeMenu();
+    if (window.NibsyHistory) window.NibsyHistory.clear();
+    if (!signedIn) {
+      showSpeech("Done! I've forgotten everything you've read.", 5000);
+      return;
+    }
     try {
       const res = await fetch(NIBSY_API + '/api/me/history', { method: 'DELETE', credentials: 'include' });
       if (!res.ok) throw new Error(res.status);

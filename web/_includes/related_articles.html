@@ -1,52 +1,52 @@
+{%- comment -%}
+  "If you liked this" at the bottom of posts and project pages.
 
-<div class="related-posts">
-
-  {% assign max_related = 6 %}
-  {% assign related_counter = 0 %}
-  {% assign related_posts = "" | split: "" %}
-  
-  {% for tag in page.tags %}
-    {% for post in site.tags[tag] %}
-      {% unless post.url == page.url %}
-        {% assign related_posts = related_posts | push: post %}
-      {% endunless %}
-    {% endfor %}
-  {% endfor %}
-  
-  {% assign related_posts = related_posts | uniq %}
-  
-  <div class="container-fluid">
-    {% if related_posts.size > 0 %}
-    <h2>Liked this article? You might like these too.</h2>
-    {% endif %}
-    <div class="row row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-12 g-3 animate-on-scroll">
-    
-    {% for post in related_posts %}
-      {% if related_counter < max_related %}
-    
-        <div class="col-12 col">
-          <a href="{{ post.url }}" class="text-decoration-none black">
-          <div class="card mb-3 bg-light h-100 border-0 card-hover shadow-hover">
-            <img src="{{post.cover}}" class="card-img-top" alt="{{post.title}}">
-                         
-              <div class="card-body">
-                <p class="card-title limited-title">{{post.title}}</p>
-                <p class="card-text text-decoration-none small limited-content">{{post.excerpt | remove: '<p>' | remove: '</p>' | strip_html}}</p>
-             {% assign url_without_slash = post.url | remove_first: "/" %}
-              {% include like-comment-summary.html url=url_without_slash %}
-              </div>
-             
+  The page is built with three posts that share this one's tags, as compact
+  /blog/ cards. assets/js/read-next.js then asks Nibsy for three posts and a
+  course picked for this page and for what the reader has already read or
+  learned (their account history when signed in, their browser's history
+  otherwise, see nibsy-history.js) and swaps them in. If Nibsy can't be
+  reached the tag-related posts stay.
+{%- endcomment -%}
+{%- assign related_posts = "" | split: "" -%}
+{%- for tag in page.tags -%}
+  {%- for post in site.tags[tag] -%}
+    {%- unless post.url == page.url -%}{%- assign related_posts = related_posts | push: post -%}{%- endunless -%}
+  {%- endfor -%}
+{%- endfor -%}
+{%- assign related_posts = related_posts | uniq -%}
+<link rel="stylesheet" href="/assets/css/blog-cards.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/read-next.css?v={{ site.time | date: '%s' }}">
+<section class="read-next" data-read-next data-page="{{ page.url | escape }}" aria-labelledby="read-next-title"{% if related_posts.size == 0 %} hidden{% endif %}>
+  <h2 id="read-next-title">If you liked this, you might like these too</h2>
+  <p class="read-next-why" data-read-next-why hidden></p>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 blog-cards" data-read-next-posts>
+    {%- for post in related_posts limit: 3 -%}
+    {%- assign main_video = post.videos | first %}
+    <div class="col blog-card-col">
+      <article class="card blog-card bg-light rounded-3 border-0 h-100">
+        {%- if post.cover %}
+        <div class="blog-card-media"><img src="{{ post.cover }}" class="card-img-top" alt="{{ post.title | escape }}" loading="lazy"></div>
+        {%- endif %}
+        <div class="card-body">
+          <p class="blog-card-title black text-truncate-2-lines"><a href="{{ post.url }}" class="stretched-link text-decoration-none black">{{ post.title }}</a></p>
+          <div class="blog-card-kind small dark-grey mb-2">
+            <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> Read</span>
+            {%- if main_video %}
+            <a class="blog-card-play" href="https://www.youtube.com/watch?v={{ main_video }}" target="_blank" rel="noopener" aria-label="Watch the video for {{ post.title | escape }} on YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch</a>
+            {%- endif %}
           </div>
-          </a>
+          {%- assign desc_text = post.description | default: post.excerpt | strip_html | strip %}
+          {%- if desc_text != "" %}
+          <p class="small dark-grey blog-card-desc text-truncate-3-lines">{{ desc_text }}</p>
+          {%- endif %}
+          <p class="small dark-grey my-1"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i>&nbsp;{{ post.date | date: "%e %b %y" }}</p>
         </div>
-  
-        {% assign related_counter = related_counter | plus: 1 %}
-  
-      {% endif %}
-    {% endfor %}
-  
+      </article>
     </div>
+    {%- endfor %}
   </div>
-  
-  </div>
-  
+  <div class="read-next-course-slot" data-read-next-course hidden></div>
+</section>
+<script src="/assets/js/nibsy-history.js?v={{ site.time | date: '%s' }}" defer></script>
+<script src="/assets/js/read-next.js?v={{ site.time | date: '%s' }}" defer></script>
