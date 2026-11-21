@@ -677,9 +677,89 @@
   animation: nw-mouth-pop 0.5s ease-in-out forwards;
   transform-origin: 100px 152px;
 }
+
+/* ---- Lesson pages: run off and tuck into a tab (#lesson-minimise) ----
+   On course lessons Nibsy covers the Run button and lesson popups, so he
+   runs off to the right and waits in a small tab on the page edge. A
+   reader who taps the tab gets him back for the rest of the visit. */
+
+@keyframes nibsy-run-off {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  15%  { transform: translate(-14px, 4px) rotate(-6deg) scaleY(0.92); }
+  30%  { transform: translate(-6px, -14px) rotate(8deg); }
+  45%  { transform: translate(40px, 0) rotate(12deg); }
+  60%  { transform: translate(90px, -8px) rotate(14deg); }
+  75%  { transform: translate(150px, 0) rotate(14deg); opacity: 1; }
+  100% { transform: translate(240px, -6px) rotate(16deg); opacity: 0; }
+}
+
+#nibsy-widget.nibsy-running-off .nibsy-char {
+  animation: nibsy-run-off 0.9s cubic-bezier(0.45, 0, 0.7, 1) forwards;
+}
+
+#nibsy-widget.nibsy-running-off #nw-legs {
+  animation: nw-legs-scamper 0.15s linear infinite;
+  transform-origin: 100px 202px;
+}
+
+@keyframes nw-legs-scamper {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  50%      { transform: translateY(-4px) rotate(8deg); }
+}
+
+#nibsy-widget.nibsy-minimised .nibsy-char,
+#nibsy-widget.nibsy-minimised .nibsy-menu,
+#nibsy-widget.nibsy-minimised .nibsy-widget-speech {
+  display: none;
+}
+
+.nibsy-tab {
+  display: none;
+  position: fixed;
+  right: 0;
+  bottom: 96px;
+  width: 40px;
+  height: 56px;
+  padding: 0 0 0 4px;
+  border: 2px solid #D0D0D0;
+  border-right: none;
+  border-radius: 14px 0 0 14px;
+  background: white;
+  box-shadow: -2px 2px 10px rgba(0,0,0,0.12);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  transition: width 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nibsy-tab svg { width: 30px; height: 30px; flex: none; display: block; }
+
+.nibsy-tab:hover,
+.nibsy-tab:focus-visible {
+  width: 50px;
+  box-shadow: -3px 3px 14px rgba(74, 144, 217, 0.35);
+}
+
+.nibsy-tab:focus-visible { outline: 2px solid #4A90D9; outline-offset: 2px; }
+
+#nibsy-widget.nibsy-minimised .nibsy-tab {
+  display: flex;
+  animation: nibsy-tab-peek 0.35s ease-out;
+}
+
+@keyframes nibsy-tab-peek {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #nibsy-widget.nibsy-minimised .nibsy-tab { animation: none; }
+  .nibsy-tab { transition: none; }
+}
 </style>
 
-<div id="nibsy-widget" class="nibsy-entering">
+<div id="nibsy-widget" class="nibsy-entering"{% if page.layout == "lesson" %} data-lesson{% endif %}>
   <div class="nibsy-widget-speech" id="nw-speech">
     <span id="nw-speech-text"></span>
     <div class="nibsy-tip-nav">
@@ -699,6 +779,7 @@
     <button class="nibsy-menu-item" id="nw-trending-btn"><i class="fas fa-fire"></i> What's Trending</button>
     <button class="nibsy-menu-item" id="nw-tip-btn"><i class="fas fa-lightbulb"></i> Show New Tip</button>
     <button class="nibsy-menu-item" id="nw-forget-btn" hidden><i class="fas fa-eraser"></i> Forget What I've Read</button>
+    <button class="nibsy-menu-item" id="nw-tuck-btn" hidden><i class="fas fa-arrow-right-to-bracket"></i> Tuck Nibsy Away</button>
     <button class="nibsy-menu-item nibsy-hide-btn" id="nw-hide-btn"><i class="fas fa-eye-slash"></i> Hide Nibsy</button>
   </div>
   <div class="nibsy-stage">
@@ -789,6 +870,17 @@
     </div>
   </div>
   <button class="nibsy-show-btn" id="nw-show-btn" title="Show Nibsy">🤖</button>
+  <button class="nibsy-tab" id="nw-tab" type="button" title="Bring Nibsy back" aria-label="Bring Nibsy back">
+    <svg viewBox="34 44 132 132" aria-hidden="true" focusable="false">
+      <line x1="100" y1="85" x2="100" y2="64" stroke="#D0D0D0" stroke-width="5" stroke-linecap="round" />
+      <circle cx="100" cy="58" r="10" fill="#F5C542" stroke="#E0A800" stroke-width="2" />
+      <path d="M40,140 Q40,88 100,85 Q160,88 160,140 Q160,168 100,168 Q40,168 40,140 Z" fill="#FAFAFA" stroke="#D0D0D0" stroke-width="4" />
+      <circle cx="78" cy="128" r="9" fill="#222" />
+      <circle cx="122" cy="128" r="9" fill="#222" />
+      <circle cx="81" cy="125" r="3" fill="#FFF" />
+      <circle cx="125" cy="125" r="3" fill="#FFF" />
+    </svg>
+  </button>
 </div>
 
 {%- comment -%} Notes each page read in this browser, for read-next.js. {%- endcomment %}
@@ -805,6 +897,8 @@
   const tipNextBtn = document.getElementById('nw-tip-next');
   const hideBtn = document.getElementById('nw-hide-btn');
   const showBtn = document.getElementById('nw-show-btn');
+  const tabBtn = document.getElementById('nw-tab');
+  const tuckBtn = document.getElementById('nw-tuck-btn');
   const tipBtn = document.getElementById('nw-tip-btn');
   const trendingBtn = document.getElementById('nw-trending-btn');
   const forgetBtn = document.getElementById('nw-forget-btn');
@@ -897,6 +991,56 @@
 
   // --- Entrance ---
 
+  // Course lessons: Nibsy runs off and waits in a tab so he doesn't cover
+  // the Run button or lesson popups. Tapping the tab brings him back for the
+  // rest of the visit (sessionStorage). Any other page shows him as normal.
+  const onLesson = widget.hasAttribute('data-lesson');
+  const LESSON_OPEN_KEY = 'nibsy-lesson-open';   // reader brought him back this visit
+  const RAN_OFF_KEY = 'nibsy-lesson-ran-off';    // run-off already played since entering lessons
+  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function sessionGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function sessionSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+
+  function startActivity() {
+    widget.classList.add('nibsy-idle');
+    startBlinking();
+    startEyeTracking();
+    startInactivityWatch();
+  }
+
+  function stopActivity() {
+    stopBlinking();
+    stopEyeTracking();
+    stopNavTips();
+    stopFidgets();
+    if (inactivityTimer) { clearInterval(inactivityTimer); inactivityTimer = null; }
+    widget.classList.remove('nibsy-idle', 'nibsy-sleeping');
+    sleeping = false;
+  }
+
+  function minimise() {
+    hidden = true;           // pauses tips, CTAs and fidgets
+    hideSpeech();
+    widget.classList.remove('nibsy-entering', 'nibsy-running-off', 'nibsy-idle');
+    widget.classList.add('nibsy-minimised');
+  }
+
+  function runOff() {
+    stopActivity();
+    closeMenu();
+    hidden = true;
+    sessionSet(RAN_OFF_KEY, 'true');
+    if (reducedMotion) { minimise(); return; }
+    widget.classList.remove('nibsy-entering');
+    showSpeech("Happy learning! I'll wait over here 👉", 1500);
+    setTimeout(() => {
+      hideSpeech();
+      widget.classList.add('nibsy-running-off');
+      setTimeout(minimise, 900);
+    }, 1500);
+  }
+
   function init() {
     if (hidden) {
       widget.classList.remove('nibsy-entering');
@@ -904,13 +1048,23 @@
       return;
     }
 
+    if (!onLesson) {
+      try { sessionStorage.removeItem(RAN_OFF_KEY); } catch (e) {}
+    } else if (sessionGet(LESSON_OPEN_KEY) !== 'true') {
+      // Still fetch, so tips are ready and members' reading history counts.
+      fetchRecommendations();
+      // Run off the first lesson after arriving from elsewhere; on the next
+      // lessons he is already tucked away.
+      if (sessionGet(RAN_OFF_KEY) === 'true') minimise();
+      else runOff();
+      return;
+    }
+    if (onLesson) tuckBtn.hidden = false;
+
     widget.classList.add('nibsy-entering');
     setTimeout(() => {
       widget.classList.remove('nibsy-entering');
-      widget.classList.add('nibsy-idle');
-      startBlinking();
-      startEyeTracking();
-      startInactivityWatch();
+      startActivity();
       showSpeech("Hi! I'm Nibsy! Click me for help 😊", 4000);
       setTimeout(showContextGreeting, 6000);
       setTimeout(() => { if (shouldShowCTA()) setTimeout(showCTA, CTA_DELAY_MS); else scheduleCTA(); }, 100);
@@ -1492,6 +1646,33 @@
       startInactivityWatch();
       showSpeech("I'm back! 👋", 2500);
     }, 1400);
+  });
+
+  // --- Lesson tab ---
+
+  tabBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sessionSet(LESSON_OPEN_KEY, 'true');
+    hidden = false;
+    tuckBtn.hidden = false;
+    widget.classList.remove('nibsy-minimised');
+    if (reducedMotion) {
+      startActivity();
+      showSpeech("I'm back! 👋", 2500);
+      return;
+    }
+    widget.classList.add('nibsy-entering');
+    setTimeout(() => {
+      widget.classList.remove('nibsy-entering');
+      startActivity();
+      showSpeech("I'm back! 👋", 2500);
+    }, 1400);
+  });
+
+  tuckBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    try { sessionStorage.removeItem(LESSON_OPEN_KEY); } catch (err) {}
+    runOff();
   });
 
   // --- Init ---
