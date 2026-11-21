@@ -16,7 +16,7 @@ permalink: /404.html
   const pm = p.match(/^\/projects\/([^\/]+)\/([^\/]+)\/?$/);
   const isProject = pm && KNOWN_PROJECTS_PAGES.indexOf(pm[1]) === -1 &&
     !/\.[a-z0-9]+$/i.test(pm[1]) && !/\.[a-z0-9]+$/i.test(pm[2]);
-  if (/^\/profile\/[^\/]+/.test(p) || isProject) {
+  if (/^\/profile\/[^\/]+/.test(p) || /^\/@[^\/]+\/?$/.test(p) || isProject) {
     document.documentElement.classList.add('kr-404-redirecting');
     document.title = 'Loading…';
   }
@@ -57,6 +57,13 @@ if (profileMatch && profileMatch[1]) {
   const username = profileMatch[1];
   // Redirect to the correct profile page with query parameter
   window.location.replace(`/profile?username=${encodeURIComponent(username)}`);
+}
+
+// Short profile links: /@username. The old /profile/<username> and
+// /profile.html?u=<username> links keep working too.
+const shortProfile = pathname.match(/^\/@([^\/]+)\/?$/);
+if (shortProfile) {
+  window.location.replace('/profile.html?u=' + encodeURIComponent(decodeURIComponent(shortProfile[1])));
 }
 
 // Issue #152: pretty project URLs of the form /projects/<owner>/<slug>.

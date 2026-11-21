@@ -1361,6 +1361,13 @@ async def add_print_details_columns_if_missing() -> None:
     await _add_columns_if_missing("projects", {"files_view": "VARCHAR(20)"}, "print details")
 
 
+async def add_profile_pinned_projects_if_missing() -> None:
+    """``user_profiles.pinned_project_ids``: the profile's pinned projects."""
+    await _add_columns_if_missing(
+        "user_profiles", {"pinned_project_ids": "JSONB"}, "pinned projects"
+    )
+
+
 async def add_feedback_admin_notes_if_missing() -> None:
     """Additive migration for the Snakie dev-mode Bug Tracker (issue #206).
 

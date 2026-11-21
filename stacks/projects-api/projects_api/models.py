@@ -928,6 +928,9 @@ class UserProfile(Base):
     # the API layer; we do not enforce a FK here so adding new currencies
     # is a code-only change.
     preferred_currency: Mapped[Optional[str]] = mapped_column(String(3))
+    # Up to 3 of the user's own project ids, shown large at the top of
+    # their public profile, in the order given.
+    pinned_project_ids: Mapped[Optional[list]] = mapped_column(JsonType)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )

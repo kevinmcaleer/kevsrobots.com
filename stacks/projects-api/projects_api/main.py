@@ -28,6 +28,7 @@ from .db import (
     add_part_symbol_id_if_missing,
     add_project_content_mode_if_missing,
     add_file_stored_size_if_missing,
+    add_profile_pinned_projects_if_missing,
     add_print_details_columns_if_missing,
     add_project_featured_columns_if_missing,
     add_project_file_description_if_missing,
@@ -163,6 +164,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Files & Models print details (qty, colour, filament, files_view).
     await add_print_details_columns_if_missing()
     await add_file_stored_size_if_missing()
+    # Pinned projects on public profiles.
+    await add_profile_pinned_projects_if_missing()
     # B3 (issue #178): ensure instruction_steps.step_type / body /
     # video_url / schematic_id columns exist on legacy Postgres
     # deployments. No-op on fresh deploys / SQLite tests.

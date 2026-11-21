@@ -3,153 +3,97 @@ layout: default
 title: User Profile
 ---
 
+<link rel="stylesheet" href="/assets/css/kr-project-card.css?v={{ site.time | date: '%s' }}">
 <link rel="stylesheet" href="/assets/css/profile.css?v={{ site.time | date: '%s' }}">
 
-<div class="container my-5" id="profile-root">
-  <div class="row">
-    <div class="col-lg-10 mx-auto">
+<div class="kr-profile" id="profile-root">
+  <div class="kr-profile-banner" id="profile-banner"></div>
 
-      <!-- Profile Header -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-body p-4">
-          <div class="row align-items-center">
-            <div class="col-md-3 text-center mb-3 mb-md-0">
-              <div id="profile-avatar"></div>
-            </div>
-            <div class="col-md-9">
-              <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
-                <div>
-                  <h2 class="mb-1" id="profile-name"></h2>
-                  <p class="text-muted mb-0" id="profile-username"></p>
-                </div>
-                <div class="d-flex gap-2 align-items-center" id="profile-actions">
-                  <!-- Follow button (filled in dynamically) -->
-                  <button id="follow-btn" class="btn btn-sm btn-outline-primary d-none" type="button">
-                    <i class="fas fa-user-plus me-1"></i> <span data-follow-label>Follow</span>
-                  </button>
-                  <div id="edit-profile-button"></div>
-                </div>
-              </div>
-
-              <div id="profile-location" class="mb-2" style="display: none;">
-                <i class="fas fa-map-marker-alt me-1 text-muted"></i>
-                <span id="location-text"></span>
-              </div>
-
-              <p id="profile-bio" class="mb-3" style="display: none;"></p>
-
-              <div id="profile-website" class="mb-2" style="display: none;">
-                <i class="fas fa-globe me-1 text-muted"></i>
-                <a id="website-link" href="#" target="_blank" rel="noopener noreferrer nofollow"></a>
-              </div>
-
-              <div id="profile-socials" class="mb-3 d-flex flex-wrap gap-2"></div>
-
-              <div class="d-flex flex-wrap gap-3 small text-muted">
-                <span>
-                  <i class="fas fa-calendar me-1"></i>
-                  <span id="profile-joined"></span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats Bar -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-body py-3">
-          <div class="row text-center" id="profile-stats">
-            <div class="col"><div class="fw-bold" id="stat-projects">0</div><small class="text-muted">Projects</small></div>
-            <div class="col"><div class="fw-bold" id="stat-makes">0</div><small class="text-muted">Makes</small></div>
-            <div class="col"><div class="fw-bold" id="stat-downloads">0</div><small class="text-muted">Downloads</small></div>
-            <div class="col"><div class="fw-bold" id="stat-likes">0</div><small class="text-muted">Likes</small></div>
-            <div class="col">
-              <button id="stat-followers-btn" class="btn btn-link p-0 text-decoration-none">
-                <div class="fw-bold text-dark" id="stat-followers">0</div>
-                <small class="text-muted">Followers</small>
-              </button>
-            </div>
-            <div class="col">
-              <button id="stat-following-btn" class="btn btn-link p-0 text-decoration-none">
-                <div class="fw-bold text-dark" id="stat-following">0</div>
-                <small class="text-muted">Following</small>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Featured Badges (up to 3, pinned by user) -->
-      <div class="card shadow-sm mb-4 d-none" id="badges-card">
-        <div class="card-header bg-light">
-          <h5 class="mb-0"><i class="fas fa-medal me-3 text-warning"></i> Featured badges</h5>
-        </div>
-        <div class="card-body">
-          <div id="badges-list" class="d-flex flex-wrap gap-2"></div>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <ul class="nav nav-tabs mb-3" id="profile-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="tab-projects-btn" data-bs-toggle="tab" data-bs-target="#tab-projects" type="button" role="tab">
-            <i class="fas fa-cubes me-1"></i> Projects
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="tab-makes-btn" data-bs-toggle="tab" data-bs-target="#tab-makes" type="button" role="tab">
-            <i class="fas fa-hammer me-1"></i> Makes
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="tab-activity-btn" data-bs-toggle="tab" data-bs-target="#tab-activity" type="button" role="tab">
-            <i class="fas fa-stream me-1"></i> Activity
-          </button>
-        </li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane fade show active" id="tab-projects" role="tabpanel">
-          <div id="projects-loading" class="text-center py-3">
-            <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
-          </div>
-          <div id="projects-empty" class="text-muted small mb-0 d-none">No public projects yet.</div>
-          <div id="projects-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 d-none"></div>
-        </div>
-        <div class="tab-pane fade" id="tab-makes" role="tabpanel">
-          <div id="makes-loading" class="text-center py-3 d-none">
-            <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
-          </div>
-          <div id="makes-empty" class="text-muted small mb-0 d-none">No makes posted yet.</div>
-          <div id="makes-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 d-none"></div>
-        </div>
-        <div class="tab-pane fade" id="tab-activity" role="tabpanel">
-          <div id="activity-loading" class="text-center py-3 d-none">
-            <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
-          </div>
-          <ul id="activity-list" class="list-unstyled mb-0 d-none"></ul>
-          <div id="activity-empty" class="text-muted small mb-0 d-none">No recent activity to show.</div>
-        </div>
-      </div>
-
-      <!-- Recent Comments (from Chatter) -->
-      <div class="card shadow-sm mt-4">
-        <div class="card-header bg-light">
-          <h5 class="mb-0"><i class="fas fa-comment me-3 text-success"></i> Recent comments</h5>
-        </div>
-        <div class="card-body p-4">
-          <div id="comments-list">
-            <div class="text-center py-3">
-              <div class="spinner-border text-primary spinner-border-sm" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+  <header class="kr-profile-head">
+    <div class="kr-profile-avatar" id="profile-avatar" aria-hidden="true"></div>
+    <div class="kr-profile-id">
+      <h1 id="profile-name">&nbsp;</h1>
+      <p class="kr-profile-handle"><span id="profile-username"></span><span id="profile-location" hidden> · <span id="location-text"></span></span></p>
     </div>
+    <div class="kr-profile-actions" id="profile-actions">
+      <button type="button" id="follow-btn" class="krc-follow kr-profile-follow" aria-pressed="false" hidden>Follow</button>
+      <a id="edit-profile-button" class="kr-profile-btn" href="/account" hidden>Edit profile</a>
+      <button type="button" id="share-profile-btn" class="kr-profile-btn" aria-haspopup="true" aria-expanded="false">Share profile</button>
+    </div>
+  </header>
+
+  <div class="kr-profile-meta">
+    <p id="profile-bio" class="kr-profile-bio" hidden></p>
+
+    <div class="kr-profile-stats" id="profile-stats">
+      <span><b id="stat-projects">0</b> Projects</span>
+      <span><b id="stat-likes">0</b> Likes</span>
+      <button type="button" id="stat-followers-btn"><b id="stat-followers">0</b> Followers</button>
+      <button type="button" id="stat-following-btn"><b id="stat-following">0</b> Following</button>
+      <span id="profile-joined"></span>
+    </div>
+
+    <div class="kr-profile-links">
+      <a id="profile-website" hidden target="_blank" rel="noopener noreferrer nofollow"></a>
+      <span id="profile-socials"></span>
+    </div>
+
+    <div class="kr-profile-builds" id="profile-builds" hidden>
+      <span class="kr-profile-label-inline">Builds with</span>
+    </div>
+
+    <div class="kr-profile-badges" id="badges-list" hidden></div>
   </div>
+
+  <section class="kr-profile-section" id="pinned-section" hidden aria-labelledby="pinned-title">
+    <h2 class="kr-profile-label" id="pinned-title">Pinned</h2>
+    <div class="krc-grid kr-profile-pinned" id="pinned-grid"></div>
+  </section>
+
+  <section class="kr-profile-section">
+    <div class="kr-profile-tabs" role="tablist" aria-label="Profile">
+      <button type="button" role="tab" id="tab-projects-btn" aria-selected="true" aria-controls="tab-projects">Projects <span class="kr-tab-n" id="tab-projects-n"></span></button>
+      <button type="button" role="tab" id="tab-makes-btn" aria-selected="false" aria-controls="tab-makes" tabindex="-1">Makes <span class="kr-tab-n" id="tab-makes-n"></span></button>
+      <button type="button" role="tab" id="tab-activity-btn" aria-selected="false" aria-controls="tab-activity" tabindex="-1">Activity</button>
+      <button type="button" role="tab" id="tab-liked-btn" aria-selected="false" aria-controls="tab-liked" tabindex="-1" hidden>Liked</button>
+    </div>
+
+    <div role="tabpanel" id="tab-projects" aria-labelledby="tab-projects-btn">
+      <div class="kr-profile-filters">
+        <div class="kr-profile-chips" id="project-filters" role="group" aria-label="Made with">
+          <button type="button" aria-pressed="true" data-filter="all">All</button>
+          <button type="button" aria-pressed="false" data-filter="snakie" hidden><span class="kr-tab-dot kr-tab-snakie" aria-hidden="true"></span>Snakie</button>
+          <button type="button" aria-pressed="false" data-filter="bettercad" hidden><span class="kr-tab-dot kr-tab-bettercad" aria-hidden="true"></span>BetterCAD</button>
+        </div>
+        <div class="kr-profile-sort" role="group" aria-label="Sort">
+          Sort:
+          <button type="button" aria-pressed="true" data-sort="newest">Newest</button>
+          <button type="button" aria-pressed="false" data-sort="liked">Most liked</button>
+        </div>
+      </div>
+      <div id="projects-grid" class="krc-grid" aria-busy="true">
+        <div class="krc-skeleton"></div><div class="krc-skeleton"></div><div class="krc-skeleton"></div>
+      </div>
+      <p id="projects-empty" class="kr-profile-empty" hidden>No public projects yet.</p>
+    </div>
+
+    <div role="tabpanel" id="tab-makes" aria-labelledby="tab-makes-btn" hidden>
+      <div id="makes-grid" class="kr-profile-makes"></div>
+      <p id="makes-empty" class="kr-profile-empty" hidden>No makes posted yet.</p>
+    </div>
+
+    <div role="tabpanel" id="tab-activity" aria-labelledby="tab-activity-btn" hidden>
+      <ul id="activity-list" class="kr-profile-activity"></ul>
+      <p id="activity-empty" class="kr-profile-empty" hidden>No recent activity to show.</p>
+      <h3 class="kr-profile-label">Recent comments</h3>
+      <div id="comments-list" class="kr-profile-comments"></div>
+    </div>
+
+    <div role="tabpanel" id="tab-liked" aria-labelledby="tab-liked-btn" hidden>
+      <div id="liked-grid" class="krc-grid"></div>
+      <p id="liked-empty" class="kr-profile-empty" hidden>No liked projects yet.</p>
+    </div>
+  </section>
 </div>
 
 <!-- Followers/following modal -->
@@ -172,5 +116,5 @@ title: User Profile
 </div>
 
 <script src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
-<script src="/assets/js/project-gradient.js?v={{ site.time | date: '%s' }}"></script>
+<script src="/assets/js/kr-project-card.js?v={{ site.time | date: '%s' }}"></script>
 <script src="/assets/js/profile-page.js?v={{ site.time | date: '%s' }}"></script>

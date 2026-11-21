@@ -155,6 +155,19 @@ description: Manage your kevsrobots.com account
               <div id="featured-badges-options" class="d-flex flex-wrap gap-2"></div>
             </fieldset>
 
+            <!-- Pinned projects: up to 3 shown large at the top of the profile. -->
+            <fieldset class="mb-3 d-none" id="pinned-projects-fieldset">
+              <legend class="h6 fw-bold">Pinned Projects</legend>
+              <p class="form-text">Pick up to 3 of your projects to show first on your public profile. With none picked, your three most liked show there.</p>
+              <div id="pinned-projects-options" class="d-flex flex-column gap-1"></div>
+            </fieldset>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="likes_public">
+              <label class="form-check-label" for="likes_public">Show the projects I like on my profile</label>
+              <div class="form-text">Adds a Liked tab to your public profile. Off unless you turn it on.</div>
+            </div>
+
             <button class="btn btn-primary mb-3" id="save-profile-btn">
               <i class="fas fa-save me-2"></i>Save Public Profile
             </button>
@@ -276,6 +289,7 @@ description: Manage your kevsrobots.com account
   let projectsProfile = null;
   // Badge picker state — slugs the user has selected (max 3).
   let pickedSlugs = [];
+  let pinnedIds = [];
 
   const PROJECTS_API = 'https://projects.kevsrobots.com';
 
@@ -299,7 +313,7 @@ description: Manage your kevsrobots.com account
 
       // Display user info
       document.getElementById('account-username').textContent = currentUser.username;
-      document.getElementById('profile-link').value = `https://www.kevsrobots.com/profile?username=${currentUser.username}`;
+      document.getElementById('profile-link').value = `https://www.kevsrobots.com/@${encodeURIComponent(currentUser.username)}`;
       document.getElementById('public-profile-link').href = `/profile.html?u=${encodeURIComponent(currentUser.username)}`;
       document.getElementById('fullname-display').textContent = `${currentUser.firstname} ${currentUser.lastname}`;
       document.getElementById('email').value = currentUser.email;
@@ -406,6 +420,82 @@ description: Manage your kevsrobots.com account
     }
 
     loadBadgePicker(currentUser.username, projectsProfile);
+    loadPinnedPicker(currentUser.username, projectsProfile);
+    loadLikesPrivacy();
+  }
+
+  // --- Pinned projects picker ---------------------------------------------
+  // Lists the caller's public projects (drafts can't be pinned) as
+  // checkboxes, in pinned order first. Hidden when they have none.
+
+  function loadPinnedPicker(username, profile) {
+    pinnedIds = ((profile && profile.pinned_project_ids) || []).slice(0, 3);
+    fetch(`${PROJECTS_API}/api/projects?author=${encodeURIComponent(username)}&limit=100`)
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (projects) {
+        projects = (projects || []).filter(function (p) { return p.status !== 'draft'; });
+        if (!projects.length) return;
+        const fieldset = document.getElementById('pinned-projects-fieldset');
+        const wrap = document.getElementById('pinned-projects-options');
+        fieldset.classList.remove('d-none');
+        wrap.replaceChildren();
+        projects.forEach(function (p) {
+          const label = document.createElement('label');
+          label.className = 'form-check';
+          const box = document.createElement('input');
+          box.type = 'checkbox';
+          box.className = 'form-check-input pin-pick';
+          box.value = String(p.id);
+          box.checked = pinnedIds.indexOf(p.id) !== -1;
+          const text = document.createElement('span');
+          text.className = 'form-check-label';
+          text.textContent = p.title;
+          label.append(box, text);
+          wrap.append(label);
+        });
+        wrap.addEventListener('change', function (e) {
+          if (!e.target.classList.contains('pin-pick')) return;
+          const id = parseInt(e.target.value, 10);
+          if (e.target.checked) {
+            if (pinnedIds.length >= 3) {
+              e.target.checked = false;
+              ChatterAPI.displayError('error-message', 'You can pin 3 projects. Untick one first.');
+              return;
+            }
+            pinnedIds.push(id);
+          } else {
+            pinnedIds = pinnedIds.filter(function (x) { return x !== id; });
+          }
+        });
+      })
+      .catch(function () {});
+  }
+
+  // --- "Show the projects I like" (stored in Chatter) ----------------------
+
+  function loadLikesPrivacy() {
+    fetch('https://chatter.kevsrobots.com/interact/me/privacy', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        const box = document.getElementById('likes_public');
+        if (!d) { box.closest('.form-check').classList.add('d-none'); return; }
+        box.checked = !!d.likes_public;
+        box.dataset.loaded = '1';
+      })
+      .catch(function () {
+        document.getElementById('likes_public').closest('.form-check').classList.add('d-none');
+      });
+  }
+
+  function saveLikesPrivacy() {
+    const box = document.getElementById('likes_public');
+    if (!box.dataset.loaded) return Promise.resolve(true);
+    return fetch('https://chatter.kevsrobots.com/interact/me/privacy', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ likes_public: box.checked })
+    }).then(function (r) { return r.ok; }).catch(function () { return false; });
   }
 
   // Load activity data
@@ -744,6 +834,9 @@ description: Manage your kevsrobots.com account
         featured_badge_slugs: pickedSlugs.slice(0, 3),
         preferred_currency: preferredCurrency
       };
+      if (!document.getElementById('pinned-projects-fieldset').classList.contains('d-none')) {
+        payload.pinned_project_ids = pinnedIds.slice(0, 3);
+      }
     } catch (err) {
       ChatterAPI.displayError('error-message', err.message);
       return;
@@ -767,7 +860,10 @@ description: Manage your kevsrobots.com account
       if (response.ok) {
         const data = await response.json().catch(() => null);
         projectsProfile = data || projectsProfile;
-        ChatterAPI.displaySuccess('success-message', 'Public profile updated successfully!');
+        const privacySaved = await saveLikesPrivacy();
+        ChatterAPI.displaySuccess('success-message', privacySaved
+          ? 'Public profile updated successfully!'
+          : 'Public profile updated, but the Liked tab setting could not be saved. Try again in a minute.');
         // Backfill done — hide the prompt if it was visible.
         document.getElementById('backfill-prompt').classList.add('d-none');
       } else {
