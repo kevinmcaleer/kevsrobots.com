@@ -1,0 +1,42 @@
+# Blocks for the VL53L0X Distance Sensor part.
+version: 1
+blocks:
+  - id: sensor
+    message: VL53L0X on I²C %1 with SDA %2 and SCL %3
+    shape: value
+    output: Object
+    args:
+      - name: BUS
+        kind: number-field
+        default: 0
+      - name: SDA
+        kind: pin
+        capability: i2c
+        default: 4
+      - name: SCL
+        kind: pin
+        capability: i2c
+        default: 5
+    setup:
+      key: "vl53l0x:{BUS}:{SDA}:{SCL}"
+      name: tof
+      expr: "VL53L0X(I2C({BUS}, sda=Pin({SDA}), scl=Pin({SCL})))"
+    code: "{SETUP}"
+    imports:
+      - module: vl53l0x
+        name: VL53L0X
+      - module: machine
+        name: I2C
+      - module: machine
+        name: Pin
+    tooltip: The distance sensor itself. Plug it into the distance block.
+  - id: distance
+    message: distance in mm from %1
+    shape: value
+    output: Number
+    args:
+      - name: SENSOR
+        kind: any
+        shadow: sensor
+    code: "{SENSOR}.ping()"
+    tooltip: How far away the nearest thing is, in millimetres.

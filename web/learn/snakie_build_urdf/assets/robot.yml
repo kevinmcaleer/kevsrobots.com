@@ -1,0 +1,130 @@
+robot:
+  urdf: robot.urdf
+  version: 1
+  servoJointMap:
+    - pin: "0"
+      joint: waist
+      jointMin: -90
+      jointMax: 90
+      servoMin: 0
+      servoMax: 180
+    - pin: "1"
+      joint: shoulder
+      jointMin: -90
+      jointMax: 90
+      servoMin: 0
+      servoMax: 180
+    - pin: "2"
+      joint: elbow
+      jointMin: -90
+      jointMax: 90
+      servoMin: 0
+      servoMax: 180
+  jointRoll:
+    shoulder: 0
+    elbow: 0
+  jointNormal:
+    shoulder:
+      - 0
+      - 0
+      - 1
+    elbow:
+      - 1.0000000000000002
+      - -5.551115123125783e-17
+      - 1.1102230246251565e-16
+  linkMass:
+    base_link:
+      source: estimated
+      material: PLA
+      infill: 0.2
+    tower:
+      source: estimated
+      material: PLA
+      infill: 0.2
+    upper_arm:
+      source: estimated
+      material: PLA
+      infill: 0.2
+    forearm:
+      source: estimated
+      material: PLA
+      infill: 0.2
+  contacts:
+    base_link:
+      - - 0.04
+        - 0.04
+        - -0.01
+      - - 0.04
+        - -0.04
+        - -0.01
+      - - -0.04
+        - -0.04
+        - -0.01
+      - - -0.04
+        - 0.04
+        - -0.01
+  poses:
+    - name: rest
+      values:
+        waist: 0
+        shoulder: 0
+        elbow: 0
+    - name: reach
+      values:
+        waist: -40
+        shoulder: 60
+        elbow: 30
+    - name: tuck
+      values:
+        waist: -40
+        shoulder: -30
+        elbow: -80
+  timeline:
+    duration: 2
+    easing: easeInOut
+    loop: true
+    tracks:
+      - joint: waist
+        keys:
+          - t: 0
+            value: 0
+          - t: 1
+            value: -40
+          - t: 2
+            value: -40
+      - joint: shoulder
+        keys:
+          - t: 0
+            value: 0
+          - t: 1
+            value: 60
+          - t: 2
+            value: -30
+      - joint: elbow
+        keys:
+          - t: 0
+            value: 0
+          - t: 1
+            value: 30
+          - t: 2
+            value: -80
+    fps: 20
+  sequences:
+    - loop: true
+      steps:
+        - pose: rest
+          duration: 0.5
+          easing: easeInOut
+        - pose: reach
+          duration: 0.5
+          easing: easeInOut
+        - pose: tuck
+          duration: 0.5
+          easing: easeInOut
+        - pose: reach
+          duration: 0.5
+          easing: easeInOut
+      name: sequence
+      fps: 20
+parts: []
+connections: []

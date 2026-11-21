@@ -4635,6 +4635,101 @@
     ]
   },
   {
+    "slug": "snakie_build_urdf",
+    "name": "Build and Animate a Robot in Snakie",
+    "description": "Build a robot in 3-D inside Snakie, then make it move. Stack blocks into a three-joint desk arm, add hinges, save poses, build an animation, bind servos and drive the model from MicroPython on the simulator.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "robots",
+      "robotarms",
+      "micropython"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_build_urdf/00_intro.html"
+      },
+      {
+        "file": "01_the_build_workspace.md",
+        "section": "Overview",
+        "url": "/learn/snakie_build_urdf/01_the_build_workspace.html"
+      },
+      {
+        "file": "02_your_first_block.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/02_your_first_block.html"
+      },
+      {
+        "file": "03_joining_blocks.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/03_joining_blocks.html"
+      },
+      {
+        "file": "04_hinges_wheels_and_sliders.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/04_hinges_wheels_and_sliders.html"
+      },
+      {
+        "file": "05_mass_balance_and_measuring.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/05_mass_balance_and_measuring.html"
+      },
+      {
+        "file": "06_posing_the_arm.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/06_posing_the_arm.html"
+      },
+      {
+        "file": "07_saving_poses.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/07_saving_poses.html"
+      },
+      {
+        "file": "08_building_a_motion.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/08_building_a_motion.html"
+      },
+      {
+        "file": "09_joint_tracks_and_keyframes.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/09_joint_tracks_and_keyframes.html"
+      },
+      {
+        "file": "10_binding_servos.md",
+        "section": "Servos and Code",
+        "url": "/learn/snakie_build_urdf/10_binding_servos.html"
+      },
+      {
+        "file": "11_driving_the_arm_from_code.md",
+        "section": "Servos and Code",
+        "url": "/learn/snakie_build_urdf/11_driving_the_arm_from_code.html"
+      },
+      {
+        "file": "12_exporting_a_motion_to_micropython.md",
+        "section": "Servos and Code",
+        "url": "/learn/snakie_build_urdf/12_exporting_a_motion_to_micropython.html"
+      },
+      {
+        "file": "13_urdf_in_and_out.md",
+        "section": "Sharing",
+        "url": "/learn/snakie_build_urdf/13_urdf_in_and_out.html"
+      },
+      {
+        "file": "14_render_a_movie.md",
+        "section": "Sharing",
+        "url": "/learn/snakie_build_urdf/14_render_a_movie.html"
+      },
+      {
+        "file": "15_summary.md",
+        "section": "Sharing",
+        "url": "/learn/snakie_build_urdf/15_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "snakie_code_tools",
     "name": "Coding Faster in Snakie",
     "description": "Get more from Snakie's editor. Use MicroPython-aware autocomplete, hover help, linting and one-click refactors, install packages, compile to .mpy and keep your project under Git, then put it all to work on an ultrasonic sensor driver.",
@@ -4941,6 +5036,171 @@
         "file": "10_summary.md",
         "section": "Project",
         "url": "/learn/snakie_instruments/10_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "snakie_part_editor",
+    "name": "Make Your Own Parts and Boards in Snakie",
+    "description": "Add any sensor, breakout or microcontroller board to Snakie with the Part Editor. Draw the board, place its pins, trace a photo, attach a driver and give it its own blocks, by building a VL53L0X distance sensor part from scratch.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "electronics",
+      "micropython",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_part_editor/00_intro.html"
+      },
+      {
+        "file": "01_what_a_part_is.md",
+        "section": "Overview",
+        "url": "/learn/snakie_part_editor/01_what_a_part_is.html"
+      },
+      {
+        "file": "02_tour_of_the_part_editor.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/02_tour_of_the_part_editor.html"
+      },
+      {
+        "file": "03_board_size_and_details.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/03_board_size_and_details.html"
+      },
+      {
+        "file": "04_pins_types_and_capabilities.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/04_pins_types_and_capabilities.html"
+      },
+      {
+        "file": "05_holes_components_and_labels.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/05_holes_components_and_labels.html"
+      },
+      {
+        "file": "06_tracing_a_board_photo.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/06_tracing_a_board_photo.html"
+      },
+      {
+        "file": "07_schematic_symbol_and_electrical_details.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/07_schematic_symbol_and_electrical_details.html"
+      },
+      {
+        "file": "08_drivers_and_built_in_help.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/08_drivers_and_built_in_help.html"
+      },
+      {
+        "file": "09_using_your_part_in_a_project.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/09_using_your_part_in_a_project.html"
+      },
+      {
+        "file": "10_giving_your_part_its_own_blocks.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/10_giving_your_part_its_own_blocks.html"
+      },
+      {
+        "file": "11_making_a_microcontroller_board.md",
+        "section": "Boards and Sharing",
+        "url": "/learn/snakie_part_editor/11_making_a_microcontroller_board.html"
+      },
+      {
+        "file": "12_sharing_your_parts.md",
+        "section": "Boards and Sharing",
+        "url": "/learn/snakie_part_editor/12_sharing_your_parts.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Boards and Sharing",
+        "url": "/learn/snakie_part_editor/13_summary.html"
+      }
+    ]
+  },
+  {
+    "slug": "snakie_plugins",
+    "name": "Extend Snakie with Python Plugins",
+    "description": "Write your own Snakie plugins in plain Python. Build ClubKit, a toolkit for a robot club, with commands that read and change code, a linter with one-click fixes that catches MicroPython mistakes as you type, and custom blocks for your own robot.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "micropython",
+      "python",
+      "robots"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_plugins/00_intro.html"
+      },
+      {
+        "file": "01_how_plugins_work.md",
+        "section": "Overview",
+        "url": "/learn/snakie_plugins/01_how_plugins_work.html"
+      },
+      {
+        "file": "02_the_plugin_rack.md",
+        "section": "Overview",
+        "url": "/learn/snakie_plugins/02_the_plugin_rack.html"
+      },
+      {
+        "file": "03_your_first_plugin.md",
+        "section": "Commands",
+        "url": "/learn/snakie_plugins/03_your_first_plugin.html"
+      },
+      {
+        "file": "04_when_plugins_break.md",
+        "section": "Commands",
+        "url": "/learn/snakie_plugins/04_when_plugins_break.html"
+      },
+      {
+        "file": "05_commands_that_read_code.md",
+        "section": "Commands",
+        "url": "/learn/snakie_plugins/05_commands_that_read_code.html"
+      },
+      {
+        "file": "06_commands_that_change_code.md",
+        "section": "Commands",
+        "url": "/learn/snakie_plugins/06_commands_that_change_code.html"
+      },
+      {
+        "file": "07_your_first_linter.md",
+        "section": "Linters",
+        "url": "/learn/snakie_plugins/07_your_first_linter.html"
+      },
+      {
+        "file": "08_quick_fixes.md",
+        "section": "Linters",
+        "url": "/learn/snakie_plugins/08_quick_fixes.html"
+      },
+      {
+        "file": "09_rules_for_your_hardware.md",
+        "section": "Linters",
+        "url": "/learn/snakie_plugins/09_rules_for_your_hardware.html"
+      },
+      {
+        "file": "10_blocks_from_a_plugin.md",
+        "section": "Blocks and Sharing",
+        "url": "/learn/snakie_plugins/10_blocks_from_a_plugin.html"
+      },
+      {
+        "file": "11_sharing_your_plugin.md",
+        "section": "Blocks and Sharing",
+        "url": "/learn/snakie_plugins/11_sharing_your_plugin.html"
+      },
+      {
+        "file": "12_summary.md",
+        "section": "Blocks and Sharing",
+        "url": "/learn/snakie_plugins/12_summary.html"
       }
     ]
   },

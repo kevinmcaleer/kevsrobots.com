@@ -1,0 +1,39 @@
+- name: "Extend Snakie with Python Plugins"
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  level: intermediate
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - micropython
+      - python
+      - robots
+  description: >-
+    Write your own Snakie plugins in plain Python. Build ClubKit, a toolkit for a robot club, with commands that read and change code, a linter with one-click fixes that catches MicroPython mistakes as you type, and custom blocks for your own robot.
+  content:
+    - section:
+        name: Overview
+        content:
+          - 00_intro.md
+          - 01_how_plugins_work.md
+          - 02_the_plugin_rack.md
+    - section:
+        name: Commands
+        content:
+          - 03_your_first_plugin.md
+          - 04_when_plugins_break.md
+          - 05_commands_that_read_code.md
+          - 06_commands_that_change_code.md
+    - section:
+        name: Linters
+        content:
+          - 07_your_first_linter.md
+          - 08_quick_fixes.md
+          - 09_rules_for_your_hardware.md
+    - section:
+        name: Blocks and Sharing
+        content:
+          - 10_blocks_from_a_plugin.md
+          - 11_sharing_your_plugin.md
+          - 12_summary.md

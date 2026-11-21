@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!-- New robot — add links/joints, or import meshes from the Assembly panel. -->
+<robot name="my_robot">
+  <material name="steel"><color rgba="0.62 0.65 0.69 1"/></material>
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.0317"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <geometry><box size="0.08 0.08 0.02"/></geometry>
+      <material name="steel"/>
+    </visual>
+  </link>
+  <link name="tower">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.006"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.02 0.02 0.06"/></geometry>
+      <material name="box__col"><color rgba="0.2784 0.3333 0.4118 1"/></material>
+    </visual>
+  </link>
+      <joint name="waist" type="revolute">
+    <parent link="base_link"/>
+    <child link="tower"/>
+    <origin xyz="0 0 0.04" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.5708" upper="1.5708" effort="1" velocity="1"/>
+  </joint>
+  <link name="upper_arm">
+    <inertial>
+      <origin xyz="0.04 0 0" rpy="0 0 0"/>
+      <mass value="0.0025"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.04 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.08 0.016 0.008"/></geometry>
+      <material name="box__col"><color rgba="0.9608 0.6196 0.0431 1"/></material>
+    </visual>
+  </link>
+        <joint name="shoulder" type="revolute">
+    <parent link="tower"/>
+    <child link="upper_arm"/>
+    <origin xyz="0 0 0.03" rpy="0 -1.5708 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="1" velocity="1"/>
+  </joint>
+  <link name="forearm">
+    <inertial>
+      <origin xyz="0.03 0 0" rpy="0 0 0"/>
+      <mass value="0.0014"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.03 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.06 0.012 0.008"/></geometry>
+      <material name="box__col"><color rgba="0.0863 0.6392 0.2902 1"/></material>
+    </visual>
+  </link>
+        <joint name="elbow" type="revolute">
+    <parent link="upper_arm"/>
+    <child link="forearm"/>
+    <origin xyz="0.08 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="1.5708" effort="1" velocity="1"/>
+  </joint>
+</robot>
