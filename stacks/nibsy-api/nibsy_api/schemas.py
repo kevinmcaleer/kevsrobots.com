@@ -49,6 +49,41 @@ class RecommendationItem(BaseModel):
     type: str
     reason: str
     score: Optional[float] = None
+    # What a page needs to draw a card (the read-next section on posts).
+    description: Optional[str] = None
+    cover: Optional[str] = None
+    date: Optional[str] = None
+    # The YouTube video a card should offer: a post's first `videos:` id,
+    # or the video itself. The site is paid for by these, so always sent.
+    video_id: Optional[str] = None
+    level: Optional[str] = None
+    duration: Optional[str] = None
+
+
+class SeenPage(BaseModel):
+    """One page an anonymous reader's browser says they read."""
+
+    page: str = Field(..., max_length=300)
+    # When, as epoch milliseconds (what the browser stores). Missing = now.
+    at: Optional[int] = None
+
+
+class RecommendationsRequest(BaseModel):
+    """Body of `POST /api/recommendations`.
+
+    The POST form exists so a reader's local history travels in the body,
+    which access logs never record, rather than in the query string.
+    """
+
+    page: str = Field(..., max_length=300)
+    limit: int = Field(5, ge=1, le=6)
+    exclude: list[int] = Field(default_factory=list, max_length=50)
+    # Only recommend these content types ("post", "video", ...). Empty = any.
+    types: list[str] = Field(default_factory=list, max_length=10)
+    # Pages read in this browser, newest first. Used for this answer only.
+    seen: list[SeenPage] = Field(default_factory=list, max_length=100)
+    # Also return up to this many related courses.
+    courses: int = Field(0, ge=0, le=3)
 
 
 class RecommendationsResponse(BaseModel):
@@ -66,6 +101,8 @@ class RecommendationsResponse(BaseModel):
     logged_in: bool = False
     # True when the user's viewing history shaped these picks.
     personalised: bool = False
+    # Related courses, when the request asked for them.
+    courses: list[RecommendationItem] = Field(default_factory=list)
 
 
 class AdminStatus(BaseModel):

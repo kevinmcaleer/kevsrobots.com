@@ -169,6 +169,7 @@ class Item:
     norm: float = 0.0
     # The row's metadata: cover, level, duration, pins, pathways, ...
     meta: dict = field(default_factory=dict)
+    description: Optional[str] = None
 
     @property
     def is_project(self) -> bool:
@@ -260,6 +261,7 @@ class CatalogueIndex:
                 key=normalise_url(row.url),
                 date=row.date_published,
                 meta=dict(row.content_metadata or {}),
+                description=row.description,
             )
             raw.append((item, terms))
 
@@ -393,12 +395,55 @@ def build_profile(
     return profile
 
 
+def views_from_pages(
+    index: CatalogueIndex,
+    seen: Sequence[tuple[str, datetime]],
+) -> list[View]:
+    """Turn the pages a browser says it read into history rows.
+
+    ``seen`` is ``(page path, when)`` pairs. Pages outside the catalogue
+    are dropped and a lesson counts as its course, exactly as for stored
+    views. Nothing here is written anywhere.
+    """
+
+    views: dict[int, View] = {}
+    for page, when in seen:
+        item, _basis = index.resolve(page)
+        if item is None:
+            continue
+        view = views.get(item.id)
+        if view is None:
+            views[item.id] = View(item.id, when, 1)
+        else:
+            view.view_count += 1
+            view.last_viewed_at = max(view.last_viewed_at, when)
+    return list(views.values())
+
+
+def merge_views(*histories: Sequence[View]) -> list[View]:
+    """Combine histories, one row per page: latest view, summed counts."""
+
+    merged: dict[int, View] = {}
+    for history in histories:
+        for view in history:
+            have = merged.get(view.content_id)
+            if have is None:
+                merged[view.content_id] = View(
+                    view.content_id, view.last_viewed_at, view.view_count
+                )
+            else:
+                have.view_count += view.view_count
+                have.last_viewed_at = max(have.last_viewed_at, view.last_viewed_at)
+    return list(merged.values())
+
+
 def _related(
     index: CatalogueIndex,
     source: Optional[Item],
     profile: dict[str, float],
     excluded: set[int],
     now: datetime,
+    keep=None,
 ) -> list[Pick]:
     """Every item related to the current page and/or the reader's profile.
 
@@ -411,7 +456,7 @@ def _related(
     source_type = source.type if source is not None else "profile"
     picks: list[Pick] = []
     for target in index.items:
-        if target.id in excluded:
+        if target.id in excluded or (keep is not None and not keep(target)):
             continue
         page_sim = (
             index.similarity(source.vector, source.norm, target) if source else 0.0
@@ -462,8 +507,13 @@ def fallback_picks(
     excluded: set[int],
     trending: dict[int, float],
     now: datetime,
+    types: Optional[set[str]] = None,
 ) -> list[Pick]:
-    """Trending (or newest) items for the page's section, rotated daily."""
+    """Trending (or newest) items for the page's section, rotated daily.
+
+    ``types`` limits the pool to those content types (the read-next
+    section on blog posts asks for posts only).
+    """
 
     preferred = _SECTION_TYPES.get(_section(normalise_url(page)))
 
@@ -472,7 +522,10 @@ def fallback_picks(
             return trending.get(item.id, 0.0)
         return _recency(item.date, now)
 
-    pool = [i for i in index.items if i.id not in excluded]
+    pool = [
+        i for i in index.items
+        if i.id not in excluded and (not types or i.type in types)
+    ]
     if preferred:
         in_section = [i for i in pool if i.type in preferred]
         if len(in_section) >= limit:
@@ -498,11 +551,14 @@ def recommend_for_page(
     trending: dict[int, float],
     now: datetime,
     history: Sequence[View] = (),
+    types: Optional[set[str]] = None,
 ) -> tuple[list[Pick], str]:
     """Recommendations for one page. Returns ``(picks, basis)``.
 
-    ``history`` is the logged-in reader's viewing history, if any. Pages
-    they have already read are never suggested back to them.
+    ``history`` is the reader's viewing history, if any: the logged-in
+    reader's stored views, and/or what an anonymous reader's browser says
+    they read. Pages they have already read are never suggested back.
+    ``types`` limits the picks to those content types.
     """
 
     source, basis = index.resolve(page)
@@ -515,7 +571,8 @@ def recommend_for_page(
 
     picks: list[Pick] = []
     if source is not None or profile:
-        picks = _mix(_related(index, source, profile, excluded, now), limit)
+        keep = (lambda item: item.type in types) if types else None
+        picks = _mix(_related(index, source, profile, excluded, now, keep), limit)
         for pick in picks:
             if pick.personal:
                 pick.reason = _because_you_read(index, history, pick.item)
@@ -523,7 +580,9 @@ def recommend_for_page(
     if len(picks) < limit:
         # Not enough genuinely related items - top up from trending.
         excluded |= {p.item.id for p in picks}
-        picks += fallback_picks(index, page, limit - len(picks), excluded, trending, now)
+        picks += fallback_picks(
+            index, page, limit - len(picks), excluded, trending, now, types
+        )
     return picks, basis
 
 

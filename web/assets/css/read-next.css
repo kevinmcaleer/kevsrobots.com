@@ -1,0 +1,113 @@
+/* "If you liked this" at the bottom of posts (_includes/related_articles.html,
+   assets/js/read-next.js). Post cards reuse blog-cards.css. */
+.read-next {
+  margin: 2rem 0 1.5rem;
+}
+
+.read-next h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.read-next-why {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: #5a5a5f;
+}
+
+.read-next .blog-cards {
+  margin-top: 0.25rem;
+}
+
+.read-next .blog-card .card-img-top {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.read-next-reason {
+  color: #c22032;
+  font-weight: 600;
+}
+
+.read-next-course-slot {
+  margin-top: 1rem;
+}
+
+.read-next-course {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e6e2dc;
+  border-radius: 0.9rem;
+  background: #f7f5f2;
+  color: inherit;
+  text-decoration: none;
+}
+
+.read-next-course:hover,
+.read-next-course:focus {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.read-next-course img {
+  flex: none;
+  width: 9rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.6rem;
+}
+
+.read-next-course-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.read-next-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #c22032;
+}
+
+.read-next-course b {
+  font-size: 1.05rem;
+}
+
+.read-next-course-meta {
+  font-size: 0.85rem;
+  color: #5a5a5f;
+}
+
+.read-next-course-desc {
+  font-size: 0.88rem;
+  color: #3a3a3f;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-next-course-btn {
+  flex: none;
+}
+
+@media (max-width: 575.98px) {
+  .read-next-course {
+    flex-wrap: wrap;
+  }
+
+  .read-next-course img {
+    width: 100%;
+  }
+
+  .read-next-course-btn {
+    width: 100%;
+  }
+}

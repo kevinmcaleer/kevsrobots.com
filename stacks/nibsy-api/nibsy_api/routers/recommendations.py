@@ -17,18 +17,29 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_optional_user
+from ..config import get_settings
 from ..db import get_session
 from ..history import load_history
 from ..generator import _jaccard, _affinity, _recency
 from ..models import NibsyClick, NibsyContent, NibsyTrending
 from ..recommender import (
     ALGORITHM_VERSION,
+    Pick,
+    build_profile,
     get_index,
     load_trending,
+    merge_views,
     next_in_pathways,
     recommend_for_page,
+    related_of_kind,
+    views_from_pages,
 )
-from ..schemas import RecommendationItem, RecommendationsResponse
+from ..schemas import (
+    RecommendationItem,
+    RecommendationsRequest,
+    RecommendationsResponse,
+    SeenPage,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +69,118 @@ def _parse_exclude(raw: Optional[str]) -> set[int]:
     return out
 
 
+def _card(pick: Pick) -> RecommendationItem:
+    """One recommendation with what a page needs to draw it as a card."""
+
+    item, meta = pick.item, pick.item.meta
+    video_id = meta.get("video_id")
+    if not video_id:
+        videos = meta.get("videos")
+        if isinstance(videos, list) and videos:
+            video_id = str(videos[0])
+        elif isinstance(videos, str) and videos:
+            video_id = videos
+    cover = meta.get("cover")
+    if not cover and item.type == "video" and video_id:
+        cover = f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg"
+    return RecommendationItem(
+        content_id=item.id,
+        url=item.url,
+        title=item.title,
+        type=item.type,
+        reason=pick.reason,
+        score=round(pick.score, 4),
+        description=item.description,
+        cover=cover,
+        date=item.date.strftime("%Y-%m-%d") if item.date else None,
+        video_id=video_id,
+        level=meta.get("level"),
+        duration=meta.get("duration"),
+    )
+
+
+def _seen_pages(seen: list[SeenPage], now: datetime) -> list[tuple[str, datetime]]:
+    """A browser's reading list as ``(page, when)``, dropping expired views."""
+
+    cutoff = now - timedelta(days=get_settings().view_history_days)
+    out: list[tuple[str, datetime]] = []
+    for entry in seen:
+        when = now
+        if entry.at:
+            try:
+                when = min(
+                    now,
+                    datetime.fromtimestamp(entry.at / 1000, tz=timezone.utc).replace(
+                        tzinfo=None
+                    ),
+                )
+            except (OverflowError, OSError, ValueError):
+                continue
+        if when >= cutoff:
+            out.append((entry.page, when))
+    return out
+
+
+async def _recommend(
+    session: AsyncSession,
+    user: Optional[str],
+    page: str,
+    limit: int,
+    excluded: set[int],
+    types: Optional[set[str]] = None,
+    seen: Optional[list[SeenPage]] = None,
+    course_limit: int = 0,
+) -> RecommendationsResponse:
+    """Shared by the GET (widget) and POST (read-next section) forms."""
+
+    index = await get_index(session)
+    if not index.items:
+        return RecommendationsResponse(source_url=page, logged_in=user is not None)
+
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    history = await load_history(session, user, now) if user else []
+    if seen:
+        # What this browser read is combined with any stored history for
+        # this one answer, and is not written anywhere.
+        history = merge_views(history, views_from_pages(index, _seen_pages(seen, now)))
+    picks, basis = recommend_for_page(
+        index,
+        page,
+        limit,
+        excluded,
+        await load_trending(session),
+        now,
+        history,
+        types or None,
+    )
+
+    courses: list[Pick] = []
+    if course_limit:
+        source, _basis = index.resolve(page)
+        profile = build_profile(index, history, now) if history else None
+        courses = related_of_kind(
+            index,
+            source,
+            lambda item: item.type == "course",
+            course_limit,
+            set(excluded),
+            now,
+            pins=(source.meta.get("pins") or []) if source is not None else [],
+            profile=profile,
+        )
+
+    return RecommendationsResponse(
+        logged_in=user is not None,
+        personalised=any(p.personal for p in picks),
+        source_url=page,
+        recommendations=[_card(p) for p in picks],
+        courses=[_card(p) for p in courses],
+        generated_at=now,
+        generator_version=ALGORITHM_VERSION,
+        basis=basis,
+    )
+
+
 @router.get("/recommendations", response_model=RecommendationsResponse)
 async def get_recommendations(
     response: Response,
@@ -78,40 +201,37 @@ async def get_recommendations(
 
     # Personalised responses must never be cached and served to someone else.
     response.headers["Cache-Control"] = "private, no-store"
+    return await _recommend(session, user, page, limit, _parse_exclude(exclude))
 
-    index = await get_index(session)
-    if not index.items:
-        return RecommendationsResponse(source_url=page, logged_in=user is not None)
 
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
-    history = await load_history(session, user, now) if user else []
-    picks, basis = recommend_for_page(
-        index,
-        page,
-        limit,
-        _parse_exclude(exclude),
-        await load_trending(session),
-        now,
-        history,
-    )
-    return RecommendationsResponse(
-        logged_in=user is not None,
-        personalised=any(p.personal for p in picks),
-        source_url=page,
-        recommendations=[
-            RecommendationItem(
-                content_id=p.item.id,
-                url=p.item.url,
-                title=p.item.title,
-                type=p.item.type,
-                reason=p.reason,
-                score=round(p.score, 4),
-            )
-            for p in picks
-        ],
-        generated_at=now,
-        generator_version=ALGORITHM_VERSION,
-        basis=basis,
+@router.post("/recommendations", response_model=RecommendationsResponse)
+async def post_recommendations(
+    response: Response,
+    body: RecommendationsRequest,
+    session: AsyncSession = Depends(get_session),
+    user: Optional[str] = Depends(get_optional_user),
+) -> RecommendationsResponse:
+    """Recommendations with options: the "read next" section on blog posts.
+
+    Same picks as the GET form, plus:
+
+    - ``types`` keeps only those content types (the section asks for posts),
+    - ``seen`` is the reading history an anonymous reader's browser keeps.
+      It shapes this answer only and is never stored; it rides in the body
+      so it never lands in an access log,
+    - ``courses`` also returns that many related courses.
+    """
+
+    response.headers["Cache-Control"] = "private, no-store"
+    return await _recommend(
+        session,
+        user,
+        body.page,
+        body.limit,
+        set(body.exclude),
+        {t for t in body.types if t},
+        body.seen,
+        body.courses,
     )
 
 
