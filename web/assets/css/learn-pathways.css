@@ -356,3 +356,108 @@
     transition: none;
   }
 }
+
+/*
+ * Pathway cards (_includes/pathway_card.html, grid in pathway_cards.html),
+ * used on the Learn homepage and the Learning Pathways index.
+ */
+.pathway-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.pathway-card-col {
+  min-width: 0;
+}
+
+.pathway-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #f8f9fa;
+  transition: box-shadow 0.2s ease;
+}
+
+.pathway-card:hover,
+.pathway-card:focus-within {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.pathway-card-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.pathway-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem 1rem;
+}
+
+.pathway-card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
+.pathway-card-title a {
+  color: #111;
+  text-decoration: none;
+}
+
+.pathway-card-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.pathway-video-badge {
+  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  background: #e62117;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.pathway-cards-more {
+  margin: 1rem 0 0;
+  text-align: center;
+}
+
+@media (max-width: 991.98px) {
+  .pathway-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .pathway-cards {
+    gap: 0.6rem;
+  }
+
+  .pathway-card-title {
+    font-size: 1.05rem;
+  }
+
+  .pathway-card-desc {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pathway-card {
+    transition: none;
+  }
+}

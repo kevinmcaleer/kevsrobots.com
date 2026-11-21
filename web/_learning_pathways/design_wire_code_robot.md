@@ -15,6 +15,7 @@ courses:
   - "Build and Animate a Robot in Snakie"
   - "Pixel Art and Animation in Snakie"
 video: QVe9meIHZtk
+order: 6
 ---
 
 This pathway takes one robot all the way from an idea to a machine that moves, using two free tools that work together: [BetterCad](https://bettercad.kevsrobots.com) for the body and [Snakie](https://app.snakie.org) for the wiring and the code. Both run in your browser.

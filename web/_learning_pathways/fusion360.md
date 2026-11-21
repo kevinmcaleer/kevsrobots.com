@@ -13,6 +13,7 @@ courses:
   - "Introduction to FreeCAD for Beginners"
   - "Mini-Rack 3D Design Tutorial"
   - "Building SMARS with FreeCAD"
+order: 8
 ---
 
 Learn how to create robots in 3D, using Fusion 360 and FreeCAD. The models can be printed out using a 3D printer and then assembled into a physical robot.
