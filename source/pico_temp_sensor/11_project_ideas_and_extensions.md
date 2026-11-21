@@ -16,13 +16,27 @@ Now that you've built a functional temperature monitoring and alert system, it's
 ### 1. **Temperature Data Logger**
 
    - Store temperature readings over time for analysis.
-   - Use a microSD card module or external storage to save data in a `.csv` format.
-   - Example script snippet:
+   - The Pico has about 1.4 MB of its own flash storage, so you can save a `.csv` file straight onto it without any extra hardware. For long-term logging, a microSD card module gives you far more space.
+   - Example script, which adds one line to the file every minute:
 
      ```python
-     with open("temperature_log.csv", "a") as log:
-         log.write(f"{timestamp.tm_hour:02}:{timestamp.tm_min:02}:{timestamp.tm_sec:02}, {temperature:.2f}\n")
+     import machine
+     import time
+
+     sensor_adc = machine.ADC(4)
+
+     while True:
+         voltage = sensor_adc.read_u16() * 3.3 / 65535
+         temperature = 27 - (voltage - 0.706) / 0.001721
+         t = time.localtime()  # a tuple in MicroPython
+
+         with open("temperature_log.csv", "a") as log:
+             log.write(f"{t[3]:02}:{t[4]:02}:{t[5]:02},{temperature:.2f}\n")
+
+         time.sleep(60)
      ```
+
+   - Flash memory wears out after many thousands of writes, so log every minute or so rather than every second.
 
 ---
 
@@ -32,14 +46,25 @@ Now that you've built a functional temperature monitoring and alert system, it's
      - Green: Normal range
      - Red: Too high
      - Blue: Too low
-   - Example using GPIO:
+   - Example using the Pico's onboard LED, which lights up when it's too hot:
    
      ```python
      import machine
+     import time
 
-     led = machine.Pin(25, machine.Pin.OUT)
-     led.on() if temperature > MAX_TEMP else led.off()
+     MAX_TEMP = 30
+
+     sensor_adc = machine.ADC(4)
+     led = machine.Pin("LED", machine.Pin.OUT)  # the onboard LED
+
+     while True:
+         voltage = sensor_adc.read_u16() * 3.3 / 65535
+         temperature = 27 - (voltage - 0.706) / 0.001721
+         led.value(temperature > MAX_TEMP)
+         time.sleep(1)
      ```
+
+   - `Pin("LED")` works on the Pico, Pico W and Pico 2. On the Pico W the LED is wired to the Wi-Fi chip, so the older `Pin(25)` does not work there.
 
 ---
 
@@ -78,21 +103,37 @@ Now that you've built a functional temperature monitoring and alert system, it's
 ### 2. **Graphical Display**
 
    - Connect an OLED or LCD screen to display real-time temperature readings and status.
-   - Example with an I2C OLED:
+   - The `ssd1306` driver is not built into MicroPython. Install it first from Thonny's **Tools > Manage packages** (search for `ssd1306`), or from the Shell with `import mip` then `mip.install("ssd1306")` on a Pico W.
+   - Example with an I2C OLED wired to GP0 (SDA) and GP1 (SCL):
+
      ```python
+     import machine
      from ssd1306 import SSD1306_I2C
 
+     import time
+
+     sensor_adc = machine.ADC(4)
+     i2c = machine.I2C(0, sda=machine.Pin(0), scl=machine.Pin(1))
      oled = SSD1306_I2C(128, 64, i2c)
-     oled.text(f"Temp: {temperature:.2f}C", 0, 0)
-     oled.show()
+
+     while True:
+         voltage = sensor_adc.read_u16() * 3.3 / 65535
+         temperature = 27 - (voltage - 0.706) / 0.001721
+
+         oled.fill(0)  # clear the screen
+         oled.text(f"Temp: {temperature:.1f}C", 0, 0)
+         oled.show()
+         time.sleep(1)
      ```
+
+   - The built-in font has no degree symbol, which is why the example writes just `C`.
 
 ---
 
 ### 3. **Battery-Powered Temperature Monitor**
 
    - Add a battery pack to make your temperature monitor portable.
-   - Use low-power modes to optimize energy consumption.
+   - Use low-power modes such as `machine.lightsleep()` between readings to save energy.
 
 ---
 

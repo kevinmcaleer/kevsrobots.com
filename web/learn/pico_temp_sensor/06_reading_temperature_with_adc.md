@@ -38,7 +38,7 @@ navigation:
       link: 08_formatting_temperature_readings.html
   - section: Enhancing Your Temperature Monitoring Project
     content:
-    - name: Converting ADC Values to Temperature
+    - name: Getting More Accurate Temperature Readings
       link: 09_converting_adc_to_temperature.html
     - name: Creating a Temperature Alert System
       link: 10_creating_a_temperature_alert_system.html
@@ -59,11 +59,23 @@ Raw ADC values aren’t particularly useful on their own. This lesson will show 
 
 ## The Conversion Formula
 
-The Pico’s temperature sensor uses the following formula to calculate temperature in degrees Celsius:
+The conversion happens in two steps.
+
+First, turn the raw reading into a voltage. `read_u16()` gives a number from 0 to 65535 that covers 0 V to 3.3 V:
 
 ```python
-temperature = 27 - (raw_value - 0.706) / 0.001721
+voltage = raw_value * 3.3 / 65535
 ```
+{: .no-snakie }
+
+Second, turn the voltage into a temperature with the formula from the RP2040 datasheet:
+
+```python
+temperature = 27 - (voltage - 0.706) / 0.001721
+```
+{: .no-snakie }
+
+Note that the second formula uses the **voltage**, not the raw ADC value. Putting `raw_value` straight into it gives a nonsense answer of about minus eight million degrees.
 
 ## Step 1: Updating Your Script
 Modify your previous script to include the temperature calculation:

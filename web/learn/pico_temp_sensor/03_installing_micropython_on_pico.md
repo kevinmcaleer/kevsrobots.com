@@ -10,7 +10,7 @@ next: 04_overview_of_pico_temperature_sensor.html
 description: Learn how to install MicroPython on your Raspberry Pi Pico to enable
   programming and communication through Thonny.
 percent: 24
-duration: 1
+duration: 2
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:
@@ -38,7 +38,7 @@ navigation:
       link: 08_formatting_temperature_readings.html
   - section: Enhancing Your Temperature Monitoring Project
     content:
-    - name: Converting ADC Values to Temperature
+    - name: Getting More Accurate Temperature Readings
       link: 09_converting_adc_to_temperature.html
     - name: Creating a Temperature Alert System
       link: 10_creating_a_temperature_alert_system.html
@@ -59,8 +59,11 @@ MicroPython is a lightweight version of Python specifically designed for microco
 
 ## Step 1: Download MicroPython Firmware
 
-1. Visit the [official MicroPython download page](https://micropython.org/download/rp2-pico/).
-2. Download the latest `.uf2` firmware file for the Raspberry Pi Pico.
+1. Visit the official MicroPython download page for your board. Each board needs its own firmware:
+   - Raspberry Pi Pico: [micropython.org/download/RPI_PICO](https://micropython.org/download/RPI_PICO/)
+   - Raspberry Pi Pico W: [micropython.org/download/RPI_PICO_W](https://micropython.org/download/RPI_PICO_W/)
+   - Raspberry Pi Pico 2: [micropython.org/download/RPI_PICO2](https://micropython.org/download/RPI_PICO2/)
+2. Download the latest stable `.uf2` firmware file (not a preview build).
 
 ---
 
@@ -68,27 +71,27 @@ MicroPython is a lightweight version of Python specifically designed for microco
 
 1. Hold down the **BOOTSEL** button on your Pico.
 2. While holding the button, connect the Pico to your computer using a USB cable.
-3. The Pico will appear as a removable storage device.
+3. Let go of the button. The Pico will appear as a removable storage device called `RPI-RP2` (`RP2350` on a Pico 2).
 
 ---
 
 ## Step 3: Flash the Firmware
 
 1. Drag and drop the downloaded `.uf2` file onto the Pico’s drive.
-2. The Pico will reboot and appear as a MicroPython device.
+2. The Pico copies the firmware, reboots, and the drive disappears. That is normal: the Pico is now running MicroPython and shows up as a serial port instead of a drive.
 
 ---
 
 ## Step 4: Verify the Installation
 
-1. Open Thonny and select **MicroPython (Raspberry Pi Pico)** in the interpreter settings.
-2. In the console, type:
+1. Open Thonny and select **MicroPython (RP2040)** in the interpreter settings (called **MicroPython (Raspberry Pi Pico)** in older versions of Thonny).
+2. You should see a `>>>` prompt in Thonny’s Shell. Type:
 
    ```python
    print("MicroPython is ready!")
    ```
 
-3. You should see the message displayed in the console.
+3. Press Enter. You should see the message displayed in the Shell.
 
 Congratulations, MicroPython is now installed on your Raspberry Pi Pico!
 

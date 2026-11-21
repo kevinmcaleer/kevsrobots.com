@@ -11,7 +11,7 @@ description: Learn how to use the Raspberry Pi Pico's built-in temperature senso
   step-by-step tutorials and practical examples, you'll gain the skills to confidently
   use the Pico for sensor-based projects.
 level: beginner
-course_duration: 0h 23m
+course_duration: 0h 33m
 lesson_count: 12
 first_lesson: 01_course_introduction.html
 navigation:
@@ -41,7 +41,7 @@ navigation:
       link: 08_formatting_temperature_readings.html
   - section: Enhancing Your Temperature Monitoring Project
     content:
-    - name: Converting ADC Values to Temperature
+    - name: Getting More Accurate Temperature Readings
       link: 09_converting_adc_to_temperature.html
     - name: Creating a Temperature Alert System
       link: 10_creating_a_temperature_alert_system.html

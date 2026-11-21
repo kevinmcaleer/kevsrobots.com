@@ -1,16 +1,16 @@
 ---
 layout: lesson
-title: Converting ADC Values to Temperature
+title: Getting More Accurate Temperature Readings
 author: Kevin McAleer
 type: page
 cover: /learn/pico_temp_sensor/assets/cover.jpg
 date: 2024-11-22
 previous: 08_formatting_temperature_readings.html
 next: 10_creating_a_temperature_alert_system.html
-description: Learn how to accurately convert ADC readings from the Pico's temperature
-  sensor into temperature values in degrees Celsius.
+description: Understand what each number in the temperature formula means, then smooth
+  out noisy readings and calibrate the Pico's sensor against a thermometer.
 percent: 72
-duration: 2
+duration: 4
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:
@@ -38,7 +38,7 @@ navigation:
       link: 08_formatting_temperature_readings.html
   - section: Enhancing Your Temperature Monitoring Project
     content:
-    - name: Converting ADC Values to Temperature
+    - name: Getting More Accurate Temperature Readings
       link: 09_converting_adc_to_temperature.html
     - name: Creating a Temperature Alert System
       link: 10_creating_a_temperature_alert_system.html
@@ -53,29 +53,43 @@ navigation:
 
 ## Introduction
 
-The Raspberry Pi Pico's ADC provides raw digital values that correspond to the temperature of the RP2040 chip. To make these readings meaningful, we need to convert them into temperature values in degrees Celsius. In this lesson, you’ll learn how to use a mathematical formula for this conversion.
+You already have a script that converts the Pico's ADC readings into degrees Celsius. In this lesson you'll look more closely at that formula, find out why the readings jump around and are often a few degrees out, and make them steadier and more accurate.
 
 ---
 
 ## Step 1: Understanding the Conversion Formula
 
-The built-in temperature sensor measures the voltage output of the chip's temperature sensing circuit. This voltage is then converted to an ADC value, which can be transformed into a temperature in degrees Celsius using the formula:
+The built-in sensor produces a small voltage that changes with the chip's temperature. The ADC measures that voltage, and this formula from the RP2040 datasheet turns it into degrees Celsius:
 
 ```python
 temperature = 27 - (voltage - 0.706) / 0.001721
 ```
+{: .no-snakie }
 
 ### Explanation:
 
-- `27` is the nominal room temperature in degrees Celsius.
-- `0.706` is the reference voltage at room temperature.
-- `0.001721` is the voltage change per degree Celsius.
+- `0.706` is the sensor's typical output voltage, in volts, when the chip is at 27°C.
+- `27` is that reference temperature, in degrees Celsius.
+- `0.001721` is how much the voltage changes for each degree: 1.721 mV per °C.
+- The sensor's voltage **falls** as the chip warms up, which is why the formula subtracts. A voltage below 0.706 V means warmer than 27°C, and one above means cooler.
+
+These are *typical* values. Every chip is slightly different, so two Picos side by side can disagree by a few degrees.
 
 ---
 
-## Step 2: Reading and Converting ADC Values
+## Step 2: Why the Readings Are Not Perfect
 
-Update your script to include the conversion formula:
+There are three main reasons your readings may be noisy or a little off:
+
+1. **It's the chip's temperature, not the room's.** The chip warms itself while it runs, so readings are usually a few degrees above the air around it.
+2. **The steps are coarse.** The ADC is 12-bit, so each step is about 0.8 mV, which is roughly 0.47°C. Readings jump in steps of about half a degree, and the last digit of `{temperature:.2f}` is not meaningful.
+3. **The 3.3 V reference is not exact.** The formula assumes the ADC's reference is exactly 3.3 V. On the Pico it comes from the board's 3.3 V supply, which can be a little high or low and has some electrical noise on it. Because the sensor's voltage changes by less than 2 mV per degree, an error of just 1% in the reference shifts the result by about 4°C.
+
+---
+
+## Step 3: Smoothing the Readings
+
+Taking several readings and averaging them removes most of the jitter:
 
 ```python
 import machine
@@ -84,53 +98,86 @@ import time
 # Initialize the ADC for the temperature sensor
 sensor_adc = machine.ADC(4)
 
-while True:
-    # Read the raw ADC value
-    raw_value = sensor_adc.read_u16()
-    
-    # Convert the ADC value to voltage
+SAMPLES = 20  # number of readings to average
+
+def read_temperature():
+    total = 0
+    for _ in range(SAMPLES):
+        total += sensor_adc.read_u16()
+    raw_value = total / SAMPLES
+
+    # Convert the average ADC value to voltage
     voltage = raw_value * 3.3 / 65535
 
     # Convert voltage to temperature
-    temperature = 27 - (voltage - 0.706) / 0.001721
+    return 27 - (voltage - 0.706) / 0.001721
 
-    # Print the temperature
-    print(f"Temperature: {temperature:.2f}°C")
+while True:
+    temperature = read_temperature()
+    print(f"Temperature: {temperature:.1f}°C")
     time.sleep(1)
 ```
 
+Printing one decimal place (`.1f`) is more honest than two, given how coarse the sensor is.
+
 ---
 
-## Step 3: Running the Script
+## Step 4: Calibrating Against a Thermometer
+
+To correct the offset for *your* Pico:
+
+1. Leave the Pico running in a room with a thermometer you trust for a few minutes so the chip settles.
+2. Note the difference between the thermometer and the Pico. If the thermometer says 21.0°C and the Pico says 23.4°C, the offset is `21.0 - 23.4 = -2.4`.
+3. Add that offset to every reading:
+
+```python
+import machine
+import time
+
+sensor_adc = machine.ADC(4)
+
+SAMPLES = 20
+OFFSET = -2.4  # thermometer reading minus Pico reading, for your Pico
+
+def read_temperature():
+    total = 0
+    for _ in range(SAMPLES):
+        total += sensor_adc.read_u16()
+    voltage = (total / SAMPLES) * 3.3 / 65535
+    return 27 - (voltage - 0.706) / 0.001721 + OFFSET
+
+while True:
+    print(f"Temperature: {read_temperature():.1f}°C")
+    time.sleep(1)
+```
+
+The offset is only valid for the Pico you measured it on, and works best close to the temperature where you measured it.
+
+---
+
+## Step 5: Running the Script
 
 1. Save the script as `convert_adc_to_temp.py`.
 2. Run the script in Thonny.
-3. Observe the temperature readings in the console, now displayed in degrees Celsius.
-
----
-
-## Step 4: Verifying the Readings
-
-To ensure the readings are accurate:
-
-- Compare the readings with a thermometer in the same environment.
-- Note that the Pico's sensor measures the temperature of the chip, which may be slightly higher than the ambient temperature due to heat generated by the chip.
+3. Compare the steadier readings with the ones from your earlier script.
 
 ---
 
 ## What You’ve Learned
 
-- How to use a formula to convert ADC values to temperature.
-- How to write a script that continuously displays temperature readings in degrees Celsius.
+- What each number in the temperature formula means, and why it subtracts.
+- Why the built-in sensor is noisy and often a few degrees out.
+- How to average readings to smooth them out.
+- How to calibrate your Pico against a thermometer with an offset.
 
 ---
 
 ## Example Output
 
 ```raw
-Temperature: 26.84°C
-Temperature: 26.85°C
-Temperature: 26.87°C
+Temperature: 21.2°C
+Temperature: 21.0°C
+Temperature: 21.2°C
 ```
 
 ---

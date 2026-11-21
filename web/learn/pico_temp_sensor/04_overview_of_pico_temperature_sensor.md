@@ -38,7 +38,7 @@ navigation:
       link: 08_formatting_temperature_readings.html
   - section: Enhancing Your Temperature Monitoring Project
     content:
-    - name: Converting ADC Values to Temperature
+    - name: Getting More Accurate Temperature Readings
       link: 09_converting_adc_to_temperature.html
     - name: Creating a Temperature Alert System
       link: 10_creating_a_temperature_alert_system.html
@@ -59,9 +59,10 @@ The Raspberry Pi Pico comes with a built-in temperature sensor that you can acce
 
 ## How the Temperature Sensor Works
 
-1. The temperature sensor is integrated into the Pico’s RP2040 chip.
-2. It measures the temperature of the chip itself and converts the reading into an ADC value.
-3. The ADC value can be translated into a temperature in degrees Celsius using a formula.
+1. The temperature sensor is built into the Pico’s microcontroller chip: the RP2040 on the Pico and Pico W, and the RP2350 on the Pico 2. There is nothing to wire up.
+2. It measures the temperature of the chip itself, not the air around it. The chip warms up a little when it is busy, so readings are usually a few degrees above room temperature.
+3. The sensor is a tiny diode whose voltage drops as it gets warmer: about 0.706 V at 27°C, falling by about 1.721 mV for every degree Celsius. That voltage is fed to the ADC’s fifth input, channel 4, which is why you will see `machine.ADC(4)` in the code.
+4. The ADC turns that voltage into a number, and a formula turns the number back into degrees Celsius.
 
 ---
 
@@ -75,9 +76,10 @@ The Raspberry Pi Pico comes with a built-in temperature sensor that you can acce
 
 ## Understanding ADC
 
-- The Pico’s ADC converts analog signals (like temperature) into digital values.
-- ADC values range from 0 to 65535 on the Pico.
-- The temperature sensor’s output can be processed using a specific formula.
+- The Pico’s ADC converts analog voltages into digital values. Channels 0 to 2 are the pins GP26 to GP28, and channel 4 is the internal temperature sensor.
+- The ADC itself is 12-bit, so it really measures 4,096 steps (0 to 4095). MicroPython’s `read_u16()` scales that up to the range 0 to 65535, so your code works the same way on boards with different ADCs.
+- The full range represents 0 V to about 3.3 V. Each real 12-bit step is about 0.8 mV, which is roughly half a degree Celsius for this sensor, so expect readings to move in small jumps rather than smoothly.
+- The sensor is not very precise: treat a single reading as accurate to within a few degrees. Later lessons show how to smooth and calibrate it.
 
 ---
 
