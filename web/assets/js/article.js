@@ -52,6 +52,22 @@
         });
       }, { rootMargin: '0px 0px -70% 0px' });
       headings.forEach(function (h) { spy.observe(h); });
+
+      // The list is position: fixed, so on its own it would sit over whatever
+      // follows the article (likes, comments). Once the end of the article
+      // body scrolls up past the bottom of the list, push the list up with it
+      // so it leaves the screen together with the article.
+      var ticking = false;
+      var follow = function () {
+        ticking = false;
+        var top = parseFloat(getComputedStyle(toc).top) || 0;
+        var shift = Math.min(0, prose.getBoundingClientRect().bottom - (top + toc.offsetHeight));
+        toc.style.transform = shift ? 'translateY(' + shift + 'px)' : '';
+      };
+      var onScroll = function () { if (!ticking) { ticking = true; requestAnimationFrame(follow); } };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      follow();
     } else {
       toc.classList.add('is-visible');
     }
