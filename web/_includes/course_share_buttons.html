@@ -1,0 +1,43 @@
+{%- comment -%}
+  Share buttons for a finished course. Used by the "Course complete" dialog on
+  lesson pages (course_complete_dialog.html) and by /learn/<slug>/completed.html.
+
+    {% include course_share_buttons.html info=page.course_share %}
+
+  info is a course record from _plugins/course_share.rb (name, share_url,
+  completed_card). The links work without JavaScript; assets/js/course-share.js
+  rewrites their text to add the reader's quiz score, adds the Mastodon server
+  picker, Copy link and the phone's own Share sheet.
+{%- endcomment -%}
+{%- assign info = include.info -%}
+{%- capture share_text -%}I just completed "{{ info.name }}", a free course on KevsRobots{%- endcapture -%}
+{%- capture share_text_url -%}{{ share_text }} {{ info.share_url }}{%- endcapture -%}
+<div class="kr-share" data-course-share data-share-url="{{ info.share_url }}" data-share-name="{{ info.name | escape }}" data-share-text="{{ share_text | escape }}">
+  <button type="button" class="kr-share-btn kr-share-native" data-share-native hidden>
+    <i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i><span>Share</span>
+  </button>
+  <a class="kr-share-btn kr-share-x" data-share-to="x" target="_blank" rel="noopener"
+     href="https://x.com/intent/post?text={{ share_text | url_encode }}&url={{ info.share_url | url_encode }}">
+    <i class="fa-brands fa-x-twitter" aria-hidden="true"></i><span>Post</span></a>
+  <a class="kr-share-btn kr-share-bluesky" data-share-to="bluesky" target="_blank" rel="noopener"
+     href="https://bsky.app/intent/compose?text={{ share_text_url | url_encode }}">
+    <i class="fa-brands fa-bluesky" aria-hidden="true"></i><span>Bluesky</span></a>
+  <a class="kr-share-btn kr-share-linkedin" data-share-to="linkedin" target="_blank" rel="noopener"
+     href="https://www.linkedin.com/sharing/share-offsite/?url={{ info.share_url | url_encode }}">
+    <i class="fa-brands fa-linkedin" aria-hidden="true"></i><span>LinkedIn</span></a>
+  <a class="kr-share-btn kr-share-facebook" data-share-to="facebook" target="_blank" rel="noopener"
+     href="https://www.facebook.com/sharer/sharer.php?u={{ info.share_url | url_encode }}">
+    <i class="fa-brands fa-facebook" aria-hidden="true"></i><span>Facebook</span></a>
+  <button type="button" class="kr-share-btn kr-share-mastodon" data-share-mastodon aria-expanded="false">
+    <i class="fa-brands fa-mastodon" aria-hidden="true"></i><span>Mastodon</span></button>
+  <button type="button" class="kr-share-btn kr-share-copy" data-share-copy>
+    <i class="fa-solid fa-link" aria-hidden="true"></i><span>Copy link</span></button>
+  <form class="kr-share-mastodon-form" data-share-mastodon-form hidden>
+    <label for="kr-mastodon-{{ include.id | default: 'share' }}">Your Mastodon server</label>
+    <div class="kr-share-mastodon-row">
+      <input id="kr-mastodon-{{ include.id | default: 'share' }}" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="mastodon.social" data-share-mastodon-server>
+      <button type="submit" class="btn btn-sm btn-dark">Share</button>
+    </div>
+  </form>
+  <p class="kr-share-status" data-share-status role="status" aria-live="polite"></p>
+</div>

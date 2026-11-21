@@ -1,0 +1,23 @@
+{%- comment -%}
+  "Course complete" dialog on lesson pages. assets/js/course-progress.js opens
+  it the first time every lesson in the course has been visited, and the
+  "Share your achievement" link in the sidebar opens it again later.
+  Only rendered for courses with social cards (_plugins/course_share.rb).
+{%- endcomment -%}
+{%- assign info = page.course_share -%}
+<dialog class="kr-complete" id="kr-course-complete" aria-labelledby="kr-complete-title">
+  <button type="button" class="kr-complete-close" data-complete-close aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+  <div class="kr-complete-confetti" aria-hidden="true"></div>
+  <p class="kr-complete-kicker"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Course complete</p>
+  <h2 class="kr-complete-title" id="kr-complete-title" tabindex="-1" autofocus>Congratulations, you finished {{ info.name }}!</h2>
+  <p class="kr-complete-sub">That's all {{ info.lessons }} lessons done<span data-complete-score hidden></span>. Let people know, it's a great way to inspire someone else to start.</p>
+  <img class="kr-complete-card" src="{{ info.completed_card }}" width="1200" height="630" alt="Share card: I completed {{ info.name | escape }} on KevsRobots" loading="lazy">
+  {% include course_share_buttons.html info=info id="dialog" %}
+  <div class="kr-complete-next">
+    {% if info.video %}
+    <a class="btn btn-danger btn-sm" href="https://www.youtube.com/watch?v={{ info.video }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch the course video</a>
+    {% endif %}
+    <a class="btn btn-outline-secondary btn-sm" href="/learn/">Find your next course</a>
+    <a class="btn btn-link btn-sm" href="{{ info.completed_card }}" download="{{ info.slug }}-completed.jpg"><i class="fa-solid fa-download" aria-hidden="true"></i> Download your card</a>
+  </div>
+</dialog>

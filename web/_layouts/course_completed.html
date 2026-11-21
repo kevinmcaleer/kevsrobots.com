@@ -1,0 +1,81 @@
+---
+layout: content
+---
+{% comment %}
+  /learn/<slug>/completed.html: the page learners share when they finish a
+  course. Made for every course by _plugins/course_share.rb, which also sets
+  the title ("I completed <course> on KevsRobots") and the og:image (the
+  completed card from course_builder/social_cards.py).
+
+  Whoever clicks a shared link lands here, so it leads with the course video
+  (front and centre: the videos are what keep the site going), then how to
+  start the course. A reader who finished the course themselves also gets the
+  share buttons again (assets/js/course-share.js reads their saved progress).
+{% endcomment %}
+{%- assign info = page.course_share -%}
+<link rel="stylesheet" href="/assets/css/course-share.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/learn-pathways.css?v={{ site.time | date: '%s' }}">
+
+<div class="container-xl px-0">
+  <div class="row g-4 g-lg-5 align-items-center kr-completed-hero">
+    <div class="col-12 col-lg-6 order-lg-2">
+      <div class="kr-completed-media">
+        {% if info.video %}
+        <div class="ratio ratio-16x9">
+          <iframe src="https://www.youtube.com/embed/{{ info.video }}" title="{{ info.name | escape }} video" frameborder="0" allowfullscreen></iframe>
+        </div>
+        {% else %}
+        <img src="{{ info.cover }}" alt="" width="1200" height="900">
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-12 col-lg-6 order-lg-1">
+      <span class="kr-completed-kicker"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> A KevsRobots learner finished this course</span>
+      <h1>{{ info.name }}</h1>
+      <p class="kr-completed-lead">{{ info.description }}</p>
+      <ul class="kr-completed-meta">
+        <li><i class="fa-regular fa-file-lines" aria-hidden="true"></i> {{ info.lessons }} lessons</li>
+        <li><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ info.duration }}</li>
+        {% if info.level %}<li><span class="pathway-level pathway-level-{{ info.level }}">{{ info.level }}</span></li>{% endif %}
+        <li><i class="fa-solid fa-tag" aria-hidden="true"></i> Free</li>
+      </ul>
+      <div class="kr-completed-actions">
+        <a class="btn btn-primary btn-lg" href="{{ info.link }}">Start this course</a>
+        {% if info.video %}
+        <a class="btn btn-danger btn-lg" href="https://www.youtube.com/watch?v={{ info.video }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch on YouTube</a>
+        {% endif %}
+      </div>
+
+      <div class="kr-completed-you" data-completed-you hidden>
+        <h2><i class="fa-solid fa-trophy" aria-hidden="true"></i> You finished this one!</h2>
+        <p class="mb-2">Share it with your friends:</p>
+        {% include course_share_buttons.html info=info id="page" %}
+      </div>
+    </div>
+  </div>
+
+  {% if info.pathways %}
+  <section class="mb-4">
+    <h2 class="h4">Part of a learning pathway</h2>
+    <p class="text-body-secondary">This course is one step in a bigger journey. Pick up where it leads.</p>
+    <ul class="list-unstyled d-flex flex-wrap gap-2">
+      {% for pathway in info.pathways %}
+      <li><a class="btn btn-outline-secondary" href="{{ pathway.url }}"><i class="fa-solid fa-route" aria-hidden="true"></i> {{ pathway.title }} <span class="text-body-secondary">({{ pathway.course_count }} courses)</span></a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <p class="mb-5"><a href="/learn/">Browse all {{ site.data.courses | size }} free courses &rarr;</a></p>
+</div>
+
+<script src="/assets/js/course-share.js?v={{ site.time | date: '%s' }}"></script>
+<script>
+  // Show the share buttons to a reader who finished this course themselves
+  (function () {
+    try {
+      var data = JSON.parse(localStorage.getItem('kr-course:/learn/{{ info.slug }}/'));
+      if (data && data.completed) document.querySelector('[data-completed-you]').hidden = false;
+    } catch (e) { /* no saved progress */ }
+  })();
+</script>
