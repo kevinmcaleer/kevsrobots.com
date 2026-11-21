@@ -1,0 +1,71 @@
+- name: Motors and motor drivers
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - robots
+      - micropython
+      - pico
+      - electronics
+  description: >-
+    Learn how DC motors, servos and stepper motors work, why they need a motor driver, and how to control all three
+    from a Raspberry Pi Pico with MicroPython. Along the way you will build Scout, a two-wheeled drive base with a
+    servo-mounted head that drives a square, spins on the spot and looks left and right.
+  outcomes:
+    - Explain the difference between DC, servo and stepper motors and pick the right one for a job
+    - Wire an L298N or DRV8833 motor driver to a Pico with a safe, separate motor supply and a common ground
+    - Control motor speed and direction with PWM, including braking and soft starts
+    - Position a hobby servo precisely using pulse widths and calibrate its real range
+    - Step a 28BYJ-48 stepper motor through an exact number of degrees
+    - Build and tune a complete two-wheel drive base that drives a square and spins on the spot
+  prerequisites:
+    - Electronics basics
+    - Learn MicroPython - The basics
+  you_need:
+    - A Raspberry Pi Pico with headers
+    - An L298N or DRV8833 motor driver board
+    - Two TT gear motors with wheels, on a chassis such as SMARS or a cheap 2WD kit
+    - An SG90 servo
+    - Optional, a 28BYJ-48 stepper motor with a ULN2003 driver board
+    - A 4xAA battery pack
+    - A breadboard and jumper wires
+  projects:
+    - /projects/burgerbot/index.html
+  content:
+    - section:
+        name: Introduction
+        content:
+          - 00_intro.md
+    - section:
+        name: Motor basics
+        content:
+          - 01_how_motors_work.md
+          - 02_why_you_need_a_driver.md
+          - 03_powering_motors.md
+    - section:
+        name: DC motors
+        content:
+          - 04_the_h_bridge.md
+          - 05_wiring_a_motor_driver.md
+          - 06_speed_with_pwm.md
+          - 07_a_motor_class.md
+          - 08_driving_two_motors.md
+          - 09_ramping_and_braking.md
+    - section:
+        name: Servos
+        content:
+          - 10_servo_basics.md
+          - 11_a_servo_class_and_calibration.md
+          - 12_continuous_rotation_servos.md
+    - section:
+        name: Steppers and sensing
+        content:
+          - 13_stepper_motors.md
+          - 14_measuring_speed_with_encoders.md
+    - section:
+        name: Project
+        content:
+          - 15_project_drive_base.md
+          - 16_summary.md

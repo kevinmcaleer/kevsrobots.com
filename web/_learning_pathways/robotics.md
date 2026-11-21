@@ -9,12 +9,10 @@ order: 1
 stages:
   start:
   - Robotics 101
-  - soon: Electronics basics
-    issue: 639
+  - Electronics basics
   - Build a SMARS Robot
   build:
-  - soon: Motors and motor drivers
-    issue: 640
+  - Motors and motor drivers
   - Learn how to program SMARS with Arduino
   - Build your own BurgerBot
   - Building a Robot Arm with Raspberry Pi and PCA9685

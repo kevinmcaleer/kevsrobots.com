@@ -194,6 +194,22 @@
   link: /learn/duckdb/00_intro.html
   name: DuckDB - Fast, free analytics
 - author: Kevin McAleer
+  cover: /learn/electronics_basics/assets/cover.jpg
+  date_published: 2026-11-21
+  description: 'Learn the electronics every robot builder needs: voltage, current,
+    resistance, Ohm''s law, breadboards, multimeters, voltage dividers and transistors.
+    You will build a light-sensing night light on a breadboard, then hand it over
+    to a Raspberry Pi Pico running MicroPython.'
+  duration: 1h 12m
+  groups:
+  - electronics
+  - pico
+  - robots
+  lessons: 16
+  level: beginner
+  link: /learn/electronics_basics/00_intro.html
+  name: Electronics basics
+- author: Kevin McAleer
   cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
   date_published: 2023-01-29
   description: Design a 3D-printable robot eye mechanism in Fusion 360, with upper
@@ -532,6 +548,25 @@
   level: beginner
   link: /learn/mongodb/00_intro.html
   name: MongoDB - Your First Database
+- author: Kevin McAleer
+  cover: /learn/motors_and_drivers/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Learn how DC motors, servos and stepper motors work, why they need
+    a motor driver, and how to control all three from a Raspberry Pi Pico with MicroPython.
+    Along the way you will build Scout, a two-wheeled drive base with a servo-mounted
+    head that drives a square, spins on the spot and looks left and right.
+  duration: 1h 16m
+  groups:
+  - robots
+  - micropython
+  - pico
+  - electronics
+  lessons: 17
+  level: beginner
+  link: /learn/motors_and_drivers/00_intro.html
+  name: Motors and motor drivers
+  projects:
+  - /projects/burgerbot/index.html
 - author: Kevin McAleer
   cover: /learn/object_model/assets/cover.jpg
   date_published: 2025-12-04

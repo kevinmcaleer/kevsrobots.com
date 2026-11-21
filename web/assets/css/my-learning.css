@@ -377,3 +377,6 @@
 .ml-profile .btn-link {
   font-size: inherit;
 }
+
+/* Bootstrap does this too; kept here so a hidden box never shows if it fails to load */
+.co [hidden], .my-learning [hidden] { display: none !important; }

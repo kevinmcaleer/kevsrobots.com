@@ -49,3 +49,6 @@
   .co-cover { width: 100%; aspect-ratio: 16 / 9; }
   .co-actions .btn { flex: 1 1 100%; }
 }
+
+/* Bootstrap does this too; kept here so a hidden box never shows if it fails to load */
+.co [hidden], .my-learning [hidden] { display: none !important; }
