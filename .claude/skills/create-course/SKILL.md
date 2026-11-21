@@ -11,10 +11,11 @@ Courses are authored as Markdown in `/source/<slug>/` and compiled by `python3 b
 
 1. **Validate the outline first.** Before writing content, sanity-check the proposed structure: 10–20 lessons, progressive difficulty, one concrete project threaded through the whole course (KevsRobots courses always build toward a working thing — name it explicitly). Report fixes to Kev before or while building, don't silently restructure.
 2. **Scaffold** `/source/<slug>/` with `course.yml`, lesson files, and an `assets/` folder.
-3. **Write lessons** (use the course-architect agent for bulk writing — give it the full per-lesson spec and the conventions below in the prompt; it won't see this file).
-4. **Course cover**: every course needs `assets/cover.jpg` at **exactly 1200×900 (4:3)**, under 300KB — this is the *card thumbnail* in course listings, not the page header. **Never 16:9** (1920×1080, 1600×900 etc.): the /learn/ cards are 4:3, so a wide cover shows as a short strip and the card sits out of line with its neighbours. Lay out the title, subtitle and artwork for a 4:3 canvas rather than resizing or cropping a wide one. If no real image exists yet, generate a placeholder with PIL (Pillow is installed) so nothing 404s, and tell Kev to replace it. Verify the rendered placeholder by Reading the .jpg — text bands can hide drawn elements.
-5. **Lesson header banners**: run `python3 generate_banners.py <slug>` — see the section below. Do this *after* the lessons exist and `course.yml` lists them. Not optional: a page with no header is a wall of grey text.
-6. **Verify**: check the cover size with `python3 -c "from PIL import Image; print(Image.open('source/<slug>/assets/cover.jpg').size)"` — it must print `(1200, 900)`. Then run `python3 build.py` from the repo root; confirm the course appears in the output, check `/web/learn/<slug>/` was generated, and check the entry in `/web/_data/courses.yml` (it gains a computed `duration` and `link`).
+3. **Write lessons** (use the course-architect agent for bulk writing — give it the full per-lesson spec and the conventions below in the prompt, including the "Code fact-check" section; it won't see this file).
+4. **Fact-check every code block**: `python3 scripts/check_course_code.py source/<slug>` must finish with **0 errors** before the course is done. See "Code fact-check" below. Do this yourself after the agent returns, even if it says it ran the check.
+5. **Course cover**: every course needs `assets/cover.jpg` at **exactly 1200×900 (4:3)**, under 300KB — this is the *card thumbnail* in course listings, not the page header. **Never 16:9** (1920×1080, 1600×900 etc.): the /learn/ cards are 4:3, so a wide cover shows as a short strip and the card sits out of line with its neighbours. Lay out the title, subtitle and artwork for a 4:3 canvas rather than resizing or cropping a wide one. If no real image exists yet, generate a placeholder with PIL (Pillow is installed) so nothing 404s, and tell Kev to replace it. Verify the rendered placeholder by Reading the .jpg — text bands can hide drawn elements.
+6. **Lesson header banners**: run `python3 generate_banners.py <slug>` — see the section below. Do this *after* the lessons exist and `course.yml` lists them. Not optional: a page with no header is a wall of grey text.
+7. **Verify**: check the cover size with `python3 -c "from PIL import Image; print(Image.open('source/<slug>/assets/cover.jpg').size)"` — it must print `(1200, 900)`. Then run `python3 build.py` from the repo root; confirm the course appears in the output, check `/web/learn/<slug>/` was generated, and check the entry in `/web/_data/courses.yml` (it gains a computed `duration` and `link`).
 
 ## course.yml format
 
@@ -138,6 +139,50 @@ Adding a pattern means adding a function to `PATTERNS` in `generate_banners.py`.
 - All code must be complete and runnable. Prefer standard-library-only Python for simulations; actually execute project-lesson code to confirm it runs. MicroPython examples should target the Pico with pin assignments consistent with the existing `micropython_robotics` course.
 - Word counts: intro 300–500 (may run over to fit required sections), concept lessons 400–800, project lessons 800–1500 (code listings may push this over — that's fine).
 - `00_intro.md` must contain: `## Overview`, `## Course Content` (bullets), `## Key Results`, `## What you'll need`, `## How the course works`, plus prerequisite links to related `/learn/...` courses. The summary lesson links onward ("What's Next") to related courses.
+
+## Code fact-check
+
+Course code that looks right but doesn't run is the worst thing a beginner can meet: they assume *they* got it wrong. The Pico temperature course shipped `time.localtime().tm_hour`, which is CPython; on MicroPython `localtime()` returns a plain tuple and the lesson crashed with `AttributeError: 'tuple' object has no attribute 'tm_hour'`. Never trust memory for an API: check it.
+
+```bash
+scripts/get_micropython.sh                           # once: builds the MicroPython unix port (~1-2 min, cached)
+python3 scripts/check_course_code.py source/<slug>   # the whole course
+python3 scripts/check_course_code.py source/<slug>/07_lesson.md   # one lesson
+```
+
+What it does for every ```` ```python ```` block and `{% capture snakie_code %}` box:
+
+1. **Parses** it as Python 3.
+2. **Checks MicroPython APIs** against the Pico (rp2) firmware: `time`, `machine` and `os` attributes, `tm_*` on `localtime()`, CPython-only imports (`datetime`, `statistics`, `threading`, `RPi.GPIO`, ...), `print(flush=True)`.
+3. **Runs** MicroPython blocks on the real MicroPython interpreter with strict stand-ins for `machine`, `rp2`, `neopixel` and `dht` that only have the methods the Pico has, so `ADC.read()` or `PWM.duty()` fail just as on the board. `while True:` loops stop after a few `sleep()` calls; sensors return plausible readings.
+
+A block is MicroPython if it imports `machine`/`rp2`/`network`/etc., or the course is in the `micropython` or `pico` group. For a course that mixes computer-side Python with Pico code (simulations, pyserial, Flask), put `code_target: cpython` in the front matter of the computer-side lessons (or in `course.yml` for the whole course).
+
+**Errors must be fixed. Warnings must be read:**
+
+- `fragment`: the block uses a name nothing earlier in the lesson defines. Fine for a deliberate snippet (one formula, one line of a longer program): mark it so readers aren't offered a Run button for it, with `{: .no-snakie }` on the line straight after the closing fence (or `<!-- code-check: fragment -->` above the opening fence). If it's meant to be a full program, add the missing imports and setup. Every program a learner is told to save and run must be complete.
+- `external-module`: needs a driver that isn't in the firmware (`ssd1306`, `hcsr04`, ...). The lesson must say where to get it and how to copy it to the Pico.
+- `run-hardware`: failed against blank simulated hardware (no I2C devices, zeros from sensors, no files). Read the code and check it would work with the real part attached.
+- A block that's wrong *on purpose* (a "find the bug" exercise, a C++ comparison) gets `<!-- code-check: skip -->` above the fence.
+
+**MicroPython is not CPython.** The traps the agent falls into most:
+
+| Looks right (CPython) | On a Pico running MicroPython |
+|---|---|
+| `time.localtime().tm_hour` | `t = time.localtime()` then `t[3]` (tuple: year, month, mday, hour, minute, second, weekday, yearday) |
+| `time.strftime(...)`, `datetime.now()` | Build the string yourself: `f"{t[3]:02}:{t[4]:02}:{t[5]:02}"` |
+| `time.perf_counter()`, `time.monotonic()` | `time.ticks_ms()` / `time.ticks_us()` with `time.ticks_diff()` |
+| `adc.read()`, `pwm.duty(512)` | `adc.read_u16()` (0-65535), `pwm.duty_u16(32768)` |
+| `print(..., flush=True)` | `print(...)`: there's no `flush` argument |
+| `from collections import defaultdict`, `import statistics, threading, dataclasses` | Not in the firmware: plain dicts, `sum()/len()`, `_thread` or `asyncio` |
+| `import RPi.GPIO` / `gpiozero` | That's Raspberry Pi (Linux). Pico: `machine.Pin`, or `picozero` |
+{:class="table table-single"}
+
+Also remember the Pico has no battery-backed clock: `time.localtime()` is only the real time if Thonny set it when connecting, or the code called `ntptime.settime()` on a Pico W. Say so in any lesson that prints timestamps.
+
+When unsure whether an API exists, check the MicroPython docs for the rp2 port (docs.micropython.org/en/latest/rp2/quickref.html and the `machine` library pages), not CPython's docs.
+
+Pull requests that touch `source/**.md` run the same check in CI (`.github/workflows/course-code-check.yml`) on the changed lessons, and fail on errors.
 
 ## After building
 

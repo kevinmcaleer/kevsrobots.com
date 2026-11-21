@@ -179,7 +179,7 @@ When creating or reviewing a course:
 
 3. **Develop Rich Content**
    - Write clear explanations with real-world context
-   - Create working code examples (test them!)
+   - Create working code examples, and prove they work with `python3 scripts/check_course_code.py source/<slug>` (see "Code Fact-Check" below)
    - Design meaningful practice exercises
    - Anticipate common mistakes and confusions
    - Include visual aids where they enhance understanding
@@ -189,7 +189,7 @@ When creating or reviewing a course:
    - Check lesson numbering and naming conventions
    - Validate `course.yml` structure
    - Confirm frontmatter in all lessons
-   - Test code examples
+   - Run the code fact-check and fix every error
    - Review for consistent tone and pacing
 
 5. **Build Progressive Complexity**
@@ -206,7 +206,8 @@ Before considering a course complete:
 - [ ] Starts with `00_intro.md` containing all required sections
 - [ ] Each lesson has proper frontmatter with title, description, layout
 - [ ] `course.yml` complete with metadata, sections, and content list
-- [ ] All code examples are tested and working
+- [ ] `python3 scripts/check_course_code.py source/<slug>` reports **0 errors**, and every warning has been read and dealt with
+- [ ] Every program the learner is told to save and run is complete (imports, setup, loop), not a fragment
 - [ ] Real-world examples for every concept (not just reference tables)
 - [ ] "Try it Yourself" sections in appropriate lessons
 - [ ] Troubleshooting guidance for complex topics
@@ -215,6 +216,31 @@ Before considering a course complete:
 - [ ] `python3 generate_banners.py <slug>` has been run, and every lesson has a distinct header banner
 - [ ] Links to prerequisite/follow-up courses
 - [ ] Consistent friendly, maker-focused tone throughout
+
+## Code Fact-Check
+
+Code that looks plausible but doesn't run is the most damaging mistake a course can make, because beginners assume the fault is theirs. A real example: the Pico temperature course printed `time.localtime().tm_hour`. That is CPython. On MicroPython `localtime()` returns a plain tuple, so every learner hit `AttributeError: 'tuple' object has no attribute 'tm_hour'`.
+
+**Never write an API from memory without checking which Python it runs on.** For Pico code, the reference is the MicroPython rp2 docs (docs.micropython.org/en/latest/rp2/quickref.html), not CPython's.
+
+After writing or changing lessons, run:
+
+```bash
+scripts/get_micropython.sh                           # once, builds the MicroPython interpreter the check runs on
+python3 scripts/check_course_code.py source/<slug>
+```
+
+It parses every code block, checks MicroPython blocks against what the Pico's firmware really has, and runs them on the real MicroPython interpreter with strict stand-ins for `machine` and `rp2`. Fix every **error** and run it again until it's clean. Then read every **warning**:
+
+- `fragment`: a snippet that uses names it doesn't define. If it's a deliberate one-liner, put `{: .no-snakie }` on the line after the closing fence. If it's a program the learner runs, make it complete.
+- `external-module`: a driver not in the firmware. Say in the lesson where to get it.
+- `run-hardware`: failed on blank simulated sensors; check the logic by reading it.
+- Deliberately broken code (a "spot the bug" exercise) gets `<!-- code-check: skip -->` above the fence.
+- A lesson that runs on the computer rather than the Pico (simulation, pyserial, Flask) gets `code_target: cpython` in its front matter.
+
+The MicroPython traps to watch for: `localtime()` is a tuple (`t[3]` is the hour); no `time.strftime`, `datetime`, `perf_counter` or `monotonic` (use `ticks_ms()`/`ticks_diff()`); `ADC.read_u16()` not `read()`; `PWM.duty_u16()` not `duty()`; no `print(flush=True)`; no `defaultdict`, `statistics`, `threading` or `dataclasses`; `RPi.GPIO`/`gpiozero` are Raspberry Pi Linux libraries, not Pico ones. The Pico has no battery-backed clock, so timestamps are only real if Thonny or `ntptime` set them: say so.
+
+In your final report, include the checker's summary line (e.g. `42 code blocks checked, 30 run on MicroPython: 0 errors, 3 warnings`) and how you handled each warning.
 
 ## What to Avoid
 
@@ -226,6 +252,7 @@ Before considering a course complete:
 ❌ Inconsistent lesson numbering (always start at 00)
 ❌ Vague or generic course descriptions
 ❌ Code examples without explanations
+❌ CPython APIs in MicroPython lessons (`tm_hour`, `strftime`, `datetime`, `flush=True`) — run the code fact-check
 ❌ Missing "what you'll need" requirements
 ❌ No progression indicators or navigation aids
 

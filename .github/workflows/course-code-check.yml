@@ -1,0 +1,66 @@
+name: Course code check
+
+# Fact-checks the Python and MicroPython in course lessons a pull request
+# touches: every block must parse, MicroPython blocks must only use APIs the
+# Pico's firmware has, and they're run on the MicroPython unix port with strict
+# machine/rp2 stand-ins. See scripts/check_course_code.py.
+#
+# Run it over every course by hand from the Actions tab (workflow_dispatch):
+# that run reports but never fails, since older courses predate the check.
+
+on:
+  pull_request:
+    paths:
+      - "source/**.md"
+      - "scripts/check_course_code.py"
+      - "scripts/course_code_stubs.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  MP_VERSION: v1.26.1
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache MicroPython unix port
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/kevsrobots/micropython
+          key: micropython-unix-${{ env.MP_VERSION }}-${{ runner.os }}
+
+      - name: Build MicroPython unix port
+        run: scripts/get_micropython.sh
+
+      - name: Checker self-test
+        run: |
+          pip install --quiet pytest
+          python3 -m pytest -q scripts/tests/test_check_course_code.py
+
+      - name: Check lessons changed in this pull request
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files?per_page=100" \
+            --paginate --jq '.[] | select(.status != "removed") | .filename' \
+            | grep -E '^source/.*\.md$' > changed.txt || true
+          if [ ! -s changed.txt ]; then
+            echo "No lessons changed."
+            exit 0
+          fi
+          xargs python3 scripts/check_course_code.py --github < changed.txt
+
+      - name: Check every course (report only)
+        if: github.event_name == 'workflow_dispatch'
+        run: python3 scripts/check_course_code.py source --github || true
