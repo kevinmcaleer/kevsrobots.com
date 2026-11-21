@@ -24,25 +24,26 @@ Before you can start programming your Raspberry Pi Pico, you need an Integrated 
 1. Visit [thonny.org](https://thonny.org) to download the latest version of Thonny for your operating system.
 2. Follow the installation instructions for your platform:
    - **Windows:** Run the installer and follow the prompts.
-   - **MacOS:** Drag the Thonny app to your Applications folder.
-   - **Linux:** Use your package manager (e.g., `sudo apt install thonny` on Debian-based systems).
+   - **macOS:** Open the downloaded `.pkg` file and follow the installer.
+   - **Linux:** Use your package manager (e.g., `sudo apt install thonny` on Debian-based systems), or the install script from thonny.org for the newest version.
+   - **Raspberry Pi OS:** Thonny is already installed.
 
 ---
 
 ## Step 2: Connect the Raspberry Pi Pico
 
-1. Plug your Raspberry Pi Pico into your computer using a USB cable.
-2. Hold down the **BOOTSEL** button while connecting the USB cable to enter the Pico’s bootloader mode.
-3. The Pico should appear as a removable drive on your computer.
+1. Use a USB cable that carries data, not a charge-only cable. A charge-only cable powers the Pico but your computer will never see it.
+2. **If your Pico already has MicroPython on it**, just plug it in. It shows up as a serial port, not as a drive.
+3. **If your Pico is brand new (or you are not sure)**, hold down the **BOOTSEL** button while you plug in the USB cable, then let go. The Pico appears as a removable drive called `RPI-RP2` (or `RP2350` on a Pico 2). This bootloader mode is only needed to install firmware.
 
 ---
 
-## Step 3: Install MicroPython on the Pico
+## Step 3: Choose the MicroPython Interpreter
 
 1. Open Thonny.
-2. From the menu, go to **Tools > Options** and select the **Interpreter** tab.
-3. Choose **MicroPython (Raspberry Pi Pico)** as the interpreter.
-4. If prompted, install the MicroPython firmware on your Pico.
+2. From the menu, go to **Tools > Options** and select the **Interpreter** tab (or click the interpreter name in the bottom-right corner of the Thonny window).
+3. Choose **MicroPython (RP2040)** as the interpreter. Older versions of Thonny call it **MicroPython (Raspberry Pi Pico)**. Pick the Pico’s port in the **Port** list, or leave it on **Try to detect port automatically**.
+4. If your Pico is in BOOTSEL mode, click **Install or update MicroPython** in the same dialog, choose your board, and click **Install**. The next lesson shows how to do this by hand instead.
 
 ---
 

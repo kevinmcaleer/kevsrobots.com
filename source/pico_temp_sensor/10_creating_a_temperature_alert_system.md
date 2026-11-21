@@ -18,6 +18,7 @@ To create the alert system, define the acceptable temperature range:
 MIN_TEMP = 20  # Minimum acceptable temperature in °C
 MAX_TEMP = 30  # Maximum acceptable temperature in °C
 ```
+{: .no-snakie }
 
 ---
 
@@ -90,8 +91,9 @@ Alert: Temperature is too low! (19.45°C)
 
 You can enhance the alert system by:
 1. Adding visual alerts (e.g., blinking an LED when the temperature is out of range).
-2. Sending notifications via email or messaging platforms.
+2. Sending notifications via email or messaging platforms (this needs a Wi-Fi board such as the Pico W).
 3. Logging the temperature data for analysis.
+4. Averaging several readings, as in the previous lesson, so a single noisy reading doesn't trigger a false alert.
 
 ---
 

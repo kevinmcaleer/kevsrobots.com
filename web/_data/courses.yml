@@ -647,7 +647,7 @@
     the Pico's ADC, and creating your first temperature monitoring project.  Through
     step-by-step tutorials and practical examples, you'll gain the skills to confidently
     use the Pico for sensor-based projects.
-  duration: 0h 23m
+  duration: 0h 33m
   groups:
   - pico
   - micropython

@@ -275,6 +275,8 @@
   function addLinks(code, n) {
     var pre = code.parentElement;
     if (!pre || pre.dataset.openInSnakie) return false;
+    // {: .no-snakie } under a fence lands on the block's wrapper div.
+    if (pre.closest && pre.closest('.no-snakie')) return false;
     var text = code.textContent.replace(/\n$/, '');
     if (!isProgram(text)) return false;
     pre.dataset.openInSnakie = '1';

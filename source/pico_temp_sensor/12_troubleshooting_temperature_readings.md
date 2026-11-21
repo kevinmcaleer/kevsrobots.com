@@ -27,12 +27,18 @@ Even the best-designed systems can encounter issues. This lesson will guide you 
 
    **Solutions**:
 
+   - Remember the sensor reads the chip's own temperature, which is normally a few degrees above the room.
    - Ensure the Pico is not under load (e.g., running intensive scripts) during measurements.
-   - Verify the conversion formula is correct:
+   - Verify the conversion formula is correct, and that it is given the **voltage**, not the raw ADC value:
 
      ```python
+     voltage = raw_value * 3.3 / 65535
      temperature = 27 - (voltage - 0.706) / 0.001721
      ```
+     {: .no-snakie }
+
+   - Average several readings to smooth out jitter. Readings naturally jump in steps of about half a degree, because each ADC step is about 0.47°C.
+   - Apply a calibration offset measured against a thermometer (see the lesson on getting more accurate readings). The formula assumes a perfect 3.3 V reference, and a 1% error there shifts the result by about 4°C.
 
    - Test the readings in a stable room temperature environment and compare them with a thermometer.
 
@@ -45,7 +51,8 @@ Even the best-designed systems can encounter issues. This lesson will guide you 
 
    **Possible Causes**:
    - The script isn’t running properly.
-   - The ADC pin initialization is incorrect.
+   - The ADC channel is wrong. The temperature sensor is ADC channel 4, not a GPIO pin.
+   - Thonny is set to the wrong interpreter (for example, your computer's own Python instead of MicroPython on the Pico).
 
    **Solutions**:
    - Check that the ADC pin is correctly initialized:
@@ -53,6 +60,8 @@ Even the best-designed systems can encounter issues. This lesson will guide you 
      ```python
      sensor_adc = machine.ADC(4)
      ```
+     {: .no-snakie }
+   - Read the last line of any error message in the Shell. For example, `AttributeError: 'tuple' object has no attribute 'tm_hour'` means the code was written for Python on a PC: in MicroPython `time.localtime()` returns a tuple, so use `timestamp[3]` for the hour.
    - Verify the script is saved and run in Thonny.
    - Restart the Pico by unplugging and reconnecting it.
 
@@ -73,13 +82,17 @@ Even the best-designed systems can encounter issues. This lesson will guide you 
      ```python
      print(f"Raw ADC Value: {raw_value}")
      ```
+     {: .no-snakie }
    - Verify the while loop is executing:
 
      ```python
+     import time
+
      count = 0
      while True:
          print(f"The loop is running {count}")
-         count += 1 # Increment the count
+         count += 1  # Increment the count
+         time.sleep(1)  # without this the loop floods the Shell
      ```
 
 ---
@@ -98,6 +111,7 @@ Even the best-designed systems can encounter issues. This lesson will guide you 
      ```python
      time.sleep(1)
      ```
+     {: .no-snakie }
    - Limit the frequency of printed messages by updating only when necessary.
 
 ---
@@ -116,7 +130,8 @@ Even the best-designed systems can encounter issues. This lesson will guide you 
      ```python
      voltage = raw_value * 3.3 / 65535
      ```
-   - Test the ADC separately by feeding a known voltage to verify accuracy.
+     {: .no-snakie }
+   - Test the ADC separately by connecting a known voltage between 0 V and 3.3 V to GP26 (ADC channel 0) and reading `machine.ADC(26).read_u16()`. Never connect more than 3.3 V to an ADC pin.
 
 ---
 

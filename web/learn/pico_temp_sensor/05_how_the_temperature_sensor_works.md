@@ -10,7 +10,7 @@ next: 06_reading_temperature_with_adc.html
 description: Learn how to write a Python script to read raw data from the Raspberry
   Pi Pico's built-in temperature sensor using its ADC.
 percent: 40
-duration: 1
+duration: 2
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:
@@ -38,7 +38,7 @@ navigation:
       link: 08_formatting_temperature_readings.html
   - section: Enhancing Your Temperature Monitoring Project
     content:
-    - name: Converting ADC Values to Temperature
+    - name: Getting More Accurate Temperature Readings
       link: 09_converting_adc_to_temperature.html
     - name: Creating a Temperature Alert System
       link: 10_creating_a_temperature_alert_system.html
@@ -72,7 +72,7 @@ The Pico’s ADC provides a digital representation of the temperature sensor’s
    import machine
    import time
 
-   # Initialize the ADC for the temperature sensor
+   # Initialize the ADC for the temperature sensor (channel 4)
    sensor_adc = machine.ADC(4)
 
    while True:
@@ -89,12 +89,21 @@ The Pico’s ADC provides a digital representation of the temperature sensor’s
 ### Step 3: Running the Script
 
 1. Run the script in Thonny by pressing the green Run button.
-2. Observe the raw ADC values printed in the console.
+2. Observe the raw ADC values printed in the Shell, one per second.
+3. The `while True:` loop runs forever. Click the red **Stop** button (or press **Ctrl+C**) to stop it.
 
 ---
 
 ### What You’ll See
 
-The raw ADC value will change depending on the temperature of the Pico’s chip. In the next lesson, you’ll learn to convert these values into meaningful temperature readings.
+You should see numbers somewhere around 13,000 to 15,000 at room temperature, for example:
+
+```raw
+Raw ADC Value: 14018
+Raw ADC Value: 14034
+Raw ADC Value: 14002
+```
+
+The raw ADC value changes with the temperature of the Pico’s chip. Because the sensor’s voltage *falls* as the chip warms up, the number goes **down** when the Pico gets warmer. Try holding your finger on the chip in the middle of the board and watch it drop. In the next lesson, you’ll learn to convert these values into meaningful temperature readings.
 
 ---

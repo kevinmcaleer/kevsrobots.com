@@ -10,7 +10,7 @@ next: 09_converting_adc_to_temperature.html
 description: Improve the readability of temperature readings by formatting them with
   custom labels and adding visual enhancements.
 percent: 64
-duration: 2
+duration: 3
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:
@@ -38,7 +38,7 @@ navigation:
       link: 08_formatting_temperature_readings.html
   - section: Enhancing Your Temperature Monitoring Project
     content:
-    - name: Converting ADC Values to Temperature
+    - name: Getting More Accurate Temperature Readings
       link: 09_converting_adc_to_temperature.html
     - name: Creating a Temperature Alert System
       link: 10_creating_a_temperature_alert_system.html
@@ -64,6 +64,7 @@ To make the output visually appealing, you can add a simple separator line:
 ```python
 print("-" * 30)
 ```
+{: .no-snakie }
 
 ### Updated Code
 
@@ -84,12 +85,11 @@ while True:
     # Convert voltage to temperature
     temperature = 27 - (voltage - 0.706) / 0.001721
 
-    # Get the current time
+    # Get the current time (a tuple in MicroPython)
     timestamp = time.localtime()
 
     # Print formatted output
-    print("-" * 30)
-    print(f"Time: {timestamp.tm_hour:02}:{timestamp.tm_min:02}:{timestamp.tm_sec:02}")
+    print(f"Time: {timestamp[3]:02}:{timestamp[4]:02}:{timestamp[5]:02}")
     print(f"Temperature: {temperature:.2f}°C")
     print("-" * 30)
     time.sleep(1)
@@ -109,10 +109,19 @@ elif temperature < 20:
 else:
     status = "Normal"
 ```
+{: .no-snakie }
 
 ### Updated Code
 
+Here is the complete script with the status added:
+
 ```python
+import machine
+import time
+
+# Initialize the ADC for the temperature sensor
+sensor_adc = machine.ADC(4)
+
 while True:
     # Read the raw ADC value
     raw_value = sensor_adc.read_u16()
@@ -131,12 +140,11 @@ while True:
     else:
         status = "Normal"
 
-    # Get the current time
+    # Get the current time (a tuple in MicroPython)
     timestamp = time.localtime()
 
     # Print formatted output with status
-    print("-" * 30)
-    print(f"Time: {timestamp.tm_hour:02}:{timestamp.tm_min:02}:{timestamp.tm_sec:02}")
+    print(f"Time: {timestamp[3]:02}:{timestamp[4]:02}:{timestamp[5]:02}")
     print(f"Temperature: {temperature:.2f}°C - Status: {status}")
     print("-" * 30)
     time.sleep(1)
@@ -155,14 +163,15 @@ while True:
 ## Example Output
 
 ```raw
-------------------------------
 Time: 15:34:21
-Temperature: 28.45°C - Status: Normal
+Temperature: 29.80°C - Status: Normal
 ------------------------------
 Time: 15:34:22
-Temperature: 32.10°C - Status: High
+Temperature: 30.27°C - Status: High
 ------------------------------
 ```
+
+Tip: the chip warms up quickly if you hold a finger on it, which is an easy way to see the status change to **High**.
 
 ---
 
