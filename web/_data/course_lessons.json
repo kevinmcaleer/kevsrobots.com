@@ -5035,6 +5035,91 @@
     ]
   },
   {
+    "slug": "snakie_sprites",
+    "name": "Pixel Art and Animation in Snakie",
+    "description": "Give your robot a face. Draw 1-bit sprites and frame animations in Snakie's Sprite editor, learn how pixels become bytes, then use MicroPython's framebuf to make a pair of eyes blink, glance around and react to light on a simulated OLED, before moving the same code to a real SSD1306 screen.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "micropython",
+      "robots",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_sprites/00_intro.html"
+      },
+      {
+        "file": "01_tiny_screens_and_pixels.md",
+        "section": "Overview",
+        "url": "/learn/snakie_sprites/01_tiny_screens_and_pixels.html"
+      },
+      {
+        "file": "02_the_sprite_editor.md",
+        "section": "Drawing",
+        "url": "/learn/snakie_sprites/02_the_sprite_editor.html"
+      },
+      {
+        "file": "03_drawing_your_first_sprite.md",
+        "section": "Drawing",
+        "url": "/learn/snakie_sprites/03_drawing_your_first_sprite.html"
+      },
+      {
+        "file": "04_frames_and_animation.md",
+        "section": "Drawing",
+        "url": "/learn/snakie_sprites/04_frames_and_animation.html"
+      },
+      {
+        "file": "05_saving_and_exporting.md",
+        "section": "Drawing",
+        "url": "/learn/snakie_sprites/05_saving_and_exporting.html"
+      },
+      {
+        "file": "06_pixels_into_bytes.md",
+        "section": "Sprites in Code",
+        "url": "/learn/snakie_sprites/06_pixels_into_bytes.html"
+      },
+      {
+        "file": "07_a_screen_in_the_simulator.md",
+        "section": "Sprites in Code",
+        "url": "/learn/snakie_sprites/07_a_screen_in_the_simulator.html"
+      },
+      {
+        "file": "08_putting_a_sprite_on_screen.md",
+        "section": "Sprites in Code",
+        "url": "/learn/snakie_sprites/08_putting_a_sprite_on_screen.html"
+      },
+      {
+        "file": "09_animating_the_face.md",
+        "section": "Sprites in Code",
+        "url": "/learn/snakie_sprites/09_animating_the_face.html"
+      },
+      {
+        "file": "10_bigger_and_smarter.md",
+        "section": "Sprites in Code",
+        "url": "/learn/snakie_sprites/10_bigger_and_smarter.html"
+      },
+      {
+        "file": "11_sprite_files_on_the_board.md",
+        "section": "Going Further",
+        "url": "/learn/snakie_sprites/11_sprite_files_on_the_board.html"
+      },
+      {
+        "file": "12_a_real_oled.md",
+        "section": "Going Further",
+        "url": "/learn/snakie_sprites/12_a_real_oled.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Going Further",
+        "url": "/learn/snakie_sprites/13_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "sql",
     "name": "Getting Started with SQL",
     "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management.",
