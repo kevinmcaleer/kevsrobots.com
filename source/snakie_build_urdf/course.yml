@@ -1,0 +1,45 @@
+- name: "Build and Animate a Robot in Snakie"
+  author: Kevin McAleer
+  date_created: 2026-11-21
+  date_published: 2026-11-21
+  level: intermediate
+  layout: course
+  cover: assets/cover.jpg
+  groups:
+      - robots
+      - robotarms
+      - micropython
+  description: >-
+    Build a robot in 3-D inside Snakie, then make it move. Stack blocks into a three-joint desk arm, add hinges, save poses, build an animation, bind servos and drive the model from MicroPython on the simulator.
+  content:
+  - section:
+      name: Overview
+      content:
+      - 00_intro.md
+      - 01_the_build_workspace.md
+  - section:
+      name: Building the Arm
+      content:
+      - 02_your_first_block.md
+      - 03_joining_blocks.md
+      - 04_hinges_wheels_and_sliders.md
+      - 05_mass_balance_and_measuring.md
+  - section:
+      name: Making It Move
+      content:
+      - 06_posing_the_arm.md
+      - 07_saving_poses.md
+      - 08_building_a_motion.md
+      - 09_joint_tracks_and_keyframes.md
+  - section:
+      name: Servos and Code
+      content:
+      - 10_binding_servos.md
+      - 11_driving_the_arm_from_code.md
+      - 12_exporting_a_motion_to_micropython.md
+  - section:
+      name: Sharing
+      content:
+      - 13_urdf_in_and_out.md
+      - 14_render_a_movie.md
+      - 15_summary.md

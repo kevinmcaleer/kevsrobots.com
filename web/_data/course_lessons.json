@@ -4465,6 +4465,101 @@
     ]
   },
   {
+    "slug": "snakie_build_urdf",
+    "name": "Build and Animate a Robot in Snakie",
+    "description": "Build a robot in 3-D inside Snakie, then make it move. Stack blocks into a three-joint desk arm, add hinges, save poses, build an animation, bind servos and drive the model from MicroPython on the simulator.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "robots",
+      "robotarms",
+      "micropython"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_build_urdf/00_intro.html"
+      },
+      {
+        "file": "01_the_build_workspace.md",
+        "section": "Overview",
+        "url": "/learn/snakie_build_urdf/01_the_build_workspace.html"
+      },
+      {
+        "file": "02_your_first_block.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/02_your_first_block.html"
+      },
+      {
+        "file": "03_joining_blocks.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/03_joining_blocks.html"
+      },
+      {
+        "file": "04_hinges_wheels_and_sliders.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/04_hinges_wheels_and_sliders.html"
+      },
+      {
+        "file": "05_mass_balance_and_measuring.md",
+        "section": "Building the Arm",
+        "url": "/learn/snakie_build_urdf/05_mass_balance_and_measuring.html"
+      },
+      {
+        "file": "06_posing_the_arm.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/06_posing_the_arm.html"
+      },
+      {
+        "file": "07_saving_poses.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/07_saving_poses.html"
+      },
+      {
+        "file": "08_building_a_motion.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/08_building_a_motion.html"
+      },
+      {
+        "file": "09_joint_tracks_and_keyframes.md",
+        "section": "Making It Move",
+        "url": "/learn/snakie_build_urdf/09_joint_tracks_and_keyframes.html"
+      },
+      {
+        "file": "10_binding_servos.md",
+        "section": "Servos and Code",
+        "url": "/learn/snakie_build_urdf/10_binding_servos.html"
+      },
+      {
+        "file": "11_driving_the_arm_from_code.md",
+        "section": "Servos and Code",
+        "url": "/learn/snakie_build_urdf/11_driving_the_arm_from_code.html"
+      },
+      {
+        "file": "12_exporting_a_motion_to_micropython.md",
+        "section": "Servos and Code",
+        "url": "/learn/snakie_build_urdf/12_exporting_a_motion_to_micropython.html"
+      },
+      {
+        "file": "13_urdf_in_and_out.md",
+        "section": "Sharing",
+        "url": "/learn/snakie_build_urdf/13_urdf_in_and_out.html"
+      },
+      {
+        "file": "14_render_a_movie.md",
+        "section": "Sharing",
+        "url": "/learn/snakie_build_urdf/14_render_a_movie.html"
+      },
+      {
+        "file": "15_summary.md",
+        "section": "Sharing",
+        "url": "/learn/snakie_build_urdf/15_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "snakie_code_tools",
     "name": "Coding Faster in Snakie",
     "description": "Get more from Snakie's editor. Use MicroPython-aware autocomplete, hover help, linting and one-click refactors, install packages, compile to .mpy and keep your project under Git, then put it all to work on an ultrasonic sensor driver.",
