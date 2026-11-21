@@ -8,5 +8,3 @@ description: Learn Linux from the basics to advanced topics.
 courses:
   - "Introduction to the Linux Command Line on Raspberry Pi OS"
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}

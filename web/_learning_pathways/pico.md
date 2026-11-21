@@ -15,5 +15,3 @@ courses:
   - "Introduction to Rust"
   - "Using the Raspberry Pi Pico's Built-in Temperature Sensor"
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}

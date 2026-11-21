@@ -1,0 +1,358 @@
+/*
+ * Learning pathway pages (_layouts/course_pathway.html) and the course rows
+ * in them (_includes/pathway_course_row.html).
+ *
+ * Desktop: header with text left and video or cover right, then one row per
+ * course on a numbered vertical line. Phone: everything stacks.
+ */
+
+.pathway-header {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.pathway-eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pathway-eyebrow a {
+  color: #666;
+  text-decoration: none;
+}
+
+.pathway-eyebrow a:hover {
+  text-decoration: underline;
+}
+
+.pathway-intro {
+  max-width: 70ch;
+  font-size: 1.05rem;
+}
+
+.pathway-intro > :last-child {
+  margin-bottom: 0;
+}
+
+.pathway-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  color: #444;
+}
+
+.pathway-stats b {
+  font-size: 1.25rem;
+  color: #111;
+  font-variant-numeric: tabular-nums;
+}
+
+.pathway-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pathway-watch-btn,
+.pathway-watch-btn:hover,
+.pathway-watch-btn:focus {
+  background: #e62117;
+  border-color: #e62117;
+  color: #fff;
+}
+
+.pathway-watch-btn:hover,
+.pathway-watch-btn:focus {
+  background: #c4180f;
+}
+
+.pathway-header-media {
+  min-width: 0;
+}
+
+.pathway-header-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pathway-header-media iframe {
+  border-radius: 0.5rem;
+}
+
+/* Level badges */
+.pathway-level {
+  display: inline-block;
+  padding: 0.05rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.pathway-level-beginner { background: #e2f3e4; color: #1d6b2c; }
+.pathway-level-intermediate { background: #fdeccb; color: #8a5300; }
+.pathway-level-advanced { background: #f6dfe6; color: #8c1f45; }
+
+.pathway-level-to {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.pathway-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  align-items: center;
+  margin: 0;
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.pathway-meta > span {
+  white-space: nowrap;
+}
+
+.pathway-tag {
+  color: #555;
+  text-decoration: none;
+}
+
+.pathway-tag:hover {
+  color: orangered;
+  text-decoration: underline;
+}
+
+/* Course rows */
+.pathway-section-title {
+  margin-top: 0.5rem;
+}
+
+.pathway-skip {
+  max-width: 70ch;
+  color: #555;
+}
+
+.pathway-steps {
+  position: relative;
+  list-style: none;
+  margin: 1rem 0 2.5rem;
+  padding: 0;
+}
+
+/* The line the numbers sit on */
+.pathway-steps::before {
+  content: "";
+  position: absolute;
+  top: 1.5rem;
+  bottom: 1.5rem;
+  left: calc(1.25rem - 1px);
+  width: 2px;
+  background: #ddd;
+}
+
+.pathway-step,
+.pathway-level-mark {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+
+.pathway-step-number {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-top: 1rem;
+  border: 2px solid #222;
+  border-radius: 50%;
+  background: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.pathway-level-mark {
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #8a5300;
+}
+
+.pathway-level-dot {
+  z-index: 1;
+  justify-self: center;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: #8a5300;
+  box-shadow: 0 0 0 4px #fff;
+}
+
+.pathway-row {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  min-width: 0;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: #f8f9fa;
+  transition: box-shadow 0.2s ease;
+}
+
+.pathway-row:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+}
+
+.pathway-row-cover img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+/* Sentence case and body font: course names are long, and the site's
+   uppercase heading style makes them hard to scan in a list. */
+.pathway-row-title {
+  margin: 0 0 0.35rem;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.pathway-row-title a {
+  color: #111;
+  text-decoration: none;
+}
+
+.pathway-row-title a:hover {
+  text-decoration: underline;
+}
+
+.pathway-row-desc {
+  max-width: 75ch;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.pathway-row-go {
+  padding-right: 0.25rem;
+}
+
+/* Where next */
+.pathway-next-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.pathway-next {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0.75rem 0 2rem;
+}
+
+.pathway-next-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #f8f9fa;
+  color: inherit;
+  text-decoration: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.pathway-next-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+  color: inherit;
+}
+
+.pathway-next-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.pathway-next-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+@media (max-width: 991.98px) {
+  .pathway-row {
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  .pathway-row-go {
+    display: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .pathway-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .pathway-next {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .pathway-step,
+  .pathway-level-mark {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  .pathway-steps::before {
+    left: calc(1rem - 1px);
+  }
+
+  .pathway-step-number {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.95rem;
+  }
+
+  .pathway-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pathway-row,
+  .pathway-next-card {
+    transition: none;
+  }
+}

@@ -14,9 +14,8 @@ courses:
   - "Wire It Up - Electronics in Snakie"
   - "Build and Animate a Robot in Snakie"
   - "Pixel Art and Animation in Snakie"
+video: QVe9meIHZtk
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}
 
 This pathway takes one robot all the way from an idea to a machine that moves, using two free tools that work together: [BetterCad](https://bettercad.kevsrobots.com) for the body and [Snakie](https://app.snakie.org) for the wiring and the code. Both run in your browser.
 
@@ -30,7 +29,5 @@ It follows the order you'd work in on a real build:
 6. **Give it a face.** Finish with a pair of animated eyes on an OLED screen
 
 The desk arm you joint in BetterCad is the same arm you animate in Snakie, so your work carries over from one course to the next.
-
-{% include youtubeplayer.html id="QVe9meIHZtk" %}
 
 Already know one of the tools? Skip its first course and join where the robot work starts.

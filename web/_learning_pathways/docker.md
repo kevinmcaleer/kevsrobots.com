@@ -14,5 +14,3 @@ courses:
   - "Mini-Rack 3D Design Tutorial"
 
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}

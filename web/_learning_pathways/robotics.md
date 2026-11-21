@@ -20,8 +20,4 @@ courses:
 
 ---
 
-![Cover image]({{page.cover}}){:class="cover"}
-
 Learn how to build robots, starting with the basics, then move on to learning Python and MicroPython for microcontrollers, finally learn how to make things with Fusion 360.
-
----

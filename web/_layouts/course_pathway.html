@@ -1,40 +1,95 @@
 ---
 layout: content
 ---
+{% comment %}
+  One learning pathway (web/_learning_pathways/*.md).
 
-<div class="px-0 py-0 mx-0 my-0">
-    {% include breadcrumbs.html %}
-<div class="p-0 m-0">
-    
+  Header: title, the pathway's own text (or its description), totals, and
+  either the intro video (front matter `video:` = YouTube id) or the cover.
+  Then every course in order as a full-width row (_includes/pathway_course_row.html).
 
-<h1>{{page.title}}</h1>
-<h2>Course Pathway</h2>
-<hr>
+  page.course_items, course_count, duration, lesson_count, levels and related
+  are worked out by _plugins/pathways.rb. Styles: assets/css/learn-pathways.css
+{% endcomment %}
+<link rel="stylesheet" href="/assets/css/learn-pathways.css?v={{ site.time | date: '%s' }}">
 
-{% include nav_learning_pathways.html %}
-<div class="row">
-    <div class="col-3 ">
-    
-    {% include courses_sidenav.html %}
+<div class="pathway-page px-0 py-0 mx-0 my-0">
+  {% include breadcrumbs.html %}
+
+  <header class="pathway-header">
+    <div class="pathway-header-text">
+      <p class="pathway-eyebrow"><a href="/learn/learning_pathways/">Learning pathway</a></p>
+      <h1>{{ page.title }}</h1>
+      {% assign body = content | strip %}
+      <div class="pathway-intro">
+        {% if body != "" %}{{ content }}{% else %}<p>{{ page.description }}</p>{% endif %}
+      </div>
+      <ul class="pathway-stats">
+        <li><b>{{ page.course_count }}</b> {% if page.course_count == 1 %}course{% else %}courses{% endif %}</li>
+        <li><b>{{ page.duration }}</b> total</li>
+        <li><b>{{ page.lesson_count }}</b> lessons</li>
+        <li>{% include pathway_levels.html levels=page.levels %}</li>
+      </ul>
+      {% assign first_course = page.course_items | first %}
+      <div class="pathway-actions">
+        {% if first_course %}
+        <a class="btn btn-primary" href="{{ first_course.link }}">Start with course 1</a>
+        {% endif %}
+        {% if page.video %}
+        <a class="btn pathway-watch-btn" href="https://www.youtube.com/watch?v={{ page.video }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch on YouTube</a>
+        {% endif %}
+      </div>
     </div>
-    <div class="col-9">
-        <div class="p-0 m-0">
-            
-            {{ content }}
-            <div class="container-fluid bg-ocre p-3 rounded-3">
-            <div class="row row-cols-lg-4 row-cols-md-2 row-cols-sm-1 g-3 animate-on-scroll">
-            {% assign count = 1 %}
-            {% for item in page.courses %}
-            <div class="col">
-                {% include course.html course=item count=count%}
-            </div>
-            {% assign count = count | plus: 1 %}
-            {% endfor %}
-        </div>
-        </div>
-        </div>
-        {% include like-comment.html %}
+    <div class="pathway-header-media">
+      {% if page.video %}
+      <div class="ratio ratio-16x9">
+        <iframe src="https://www.youtube.com/embed/{{ page.video }}" title="{{ page.title | escape }} video" loading="lazy" frameborder="0" allowfullscreen></iframe>
+      </div>
+      {% elsif page.cover %}
+      <img src="{{ page.cover }}" alt="" class="rounded-3">
+      {% endif %}
     </div>
-</div>
-</div>
+  </header>
+
+  <h2 class="pathway-section-title">Courses in order</h2>
+  {% if page.course_count > 1 %}
+  <p class="pathway-skip">Each course stands on its own. If you already know the first ones, check the level and description and start further down.</p>
+  {% endif %}
+
+  <ol class="pathway-steps">
+    {% assign previous_level = "" %}
+    {% for course in page.course_items %}
+      {% assign level = course.level | default: "beginner" %}
+      {% assign step_up = false %}
+      {% if previous_level == "beginner" and level != "beginner" %}{% assign step_up = true %}{% endif %}
+      {% if previous_level == "intermediate" and level == "advanced" %}{% assign step_up = true %}{% endif %}
+      {% if step_up %}
+      <li class="pathway-level-mark" aria-hidden="true"><span class="pathway-level-dot"></span><span>Steps up to {{ level }}</span></li>
+      {% endif %}
+      {% include pathway_course_row.html course=course number=forloop.index %}
+      {% assign previous_level = level %}
+    {% endfor %}
+  </ol>
+
+  {% if page.related.size > 0 %}
+  <div class="pathway-next-head">
+    <h2 class="pathway-section-title">Where next</h2>
+    <a href="/learn/learning_pathways/">All learning pathways</a>
+  </div>
+  <div class="pathway-next">
+    {% for other in page.related %}
+    <a class="pathway-next-card" href="{{ other.url }}">
+      <span class="pathway-next-title">{{ other.title }}</span>
+      <span class="pathway-meta">
+        <span>{{ other.course_count }} {% if other.course_count == 1 %}course{% else %}courses{% endif %}</span>
+        <span><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ other.duration }}</span>
+      </span>
+      <span class="pathway-meta">{% include pathway_levels.html levels=other.levels %}</span>
+      <span class="pathway-next-desc">{{ other.description }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% include like-comment.html %}
 </div>

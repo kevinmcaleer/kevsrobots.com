@@ -16,5 +16,3 @@ courses:
   - "Building User Authentication for Static Sites with FastAPI"
   - "Mastering Pydantic for Robust Data Validation"
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}

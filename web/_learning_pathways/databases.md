@@ -12,8 +12,4 @@ courses:
   - "DuckDB - Fast, free analytics"
 ---
 
-![Cover image]({{page.cover}}){:class="cover"}
-
 Learn how to create Databases in Python, with SQLite3 and Redis.
-
----

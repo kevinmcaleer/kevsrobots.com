@@ -13,8 +13,4 @@ courses:
   - "Mastering Markdown for Documentation with Jekyll"
 ---
 
-![Cover image]({{page.cover}}){:class="cover"}
-
 Learn how to Program in Python, C, Rust, and more.
-
----

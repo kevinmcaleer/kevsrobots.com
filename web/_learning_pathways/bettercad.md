@@ -10,8 +10,6 @@ courses:
   - "Print It Right with BetterCad"
 ---
 
-![Cover image]({{page.cover}}){:class="cover"}
-
 New to CAD, or new to [BetterCad](https://bettercad.kevsrobots.com)? Start here. BetterCad is a free CAD tool for 3D printing that runs in your browser, with nothing to install and no account needed. You'll design your first parts, build a parametric phone stand, then learn to check, calibrate and export your designs so they print cleanly and fit first time.
 
 Ready for more? The [BetterCad for Robot Builders](/learn/learning_pathways/bettercad-robot-builders.html) pathway covers servos, mounts and gears.

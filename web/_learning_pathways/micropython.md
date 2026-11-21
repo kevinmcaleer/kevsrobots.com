@@ -15,5 +15,3 @@ courses:
   - "MicroPython Robotics Projects with the Raspberry Pi Pico"
   - "Talking to the World - Working with I2C and SPI"
 ---
-
-![Cover image]({{page.cover}}){:class="cover"}
