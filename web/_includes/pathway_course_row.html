@@ -1,14 +1,17 @@
 {% comment %}
   One course in a learning pathway, as a full-width row: cover, name,
   description, level, length, lessons and topics, so a learner can judge
-  whether to take it or skip ahead.
+  whether to take it or skip ahead. Courses with a video (course.video, set
+  by build.py) get a Watch button. assets/js/learn-progress.js marks the row
+  finished or in progress from the reader's saved lesson progress.
 
   Usage: include pathway_course_row.html course=course number=1
   (course = a record from _data/courses.yml). Styles: assets/css/learn-pathways.css
 {% endcomment %}
 {% assign c = include.course %}
 {% assign level = c.level | default: "beginner" %}
-<li class="pathway-step">
+{% assign key_parts = c.link | split: "/" %}{% assign course_key = "/learn/" | append: key_parts[2] | append: "/" %}
+<li class="pathway-step" data-course-key="{{ course_key }}" data-lessons="{{ c.lessons | default: 0 }}">
   <span class="pathway-step-number" aria-hidden="true">{{ include.number }}</span>
   <article class="pathway-row">
     <a class="pathway-row-cover" href="{{ c.link }}" tabindex="-1" aria-hidden="true">
@@ -25,7 +28,11 @@
       </p>
     </div>
     <div class="pathway-row-go">
-      <a class="btn btn-outline-dark btn-sm" href="{{ c.link }}" tabindex="-1" aria-hidden="true">Start course</a>
+      <a class="btn btn-outline-dark btn-sm" href="{{ c.link }}" tabindex="-1" aria-hidden="true" data-course-go>Start course</a>
+      {% if c.video %}
+      <a class="btn btn-sm pathway-watch-btn" href="https://www.youtube.com/watch?v={{ c.video }}" target="_blank" rel="noopener" aria-label="Watch the video for {{ c.name | escape }} on YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Watch</a>
+      {% endif %}
+      <span class="pathway-row-progress" data-course-progress hidden></span>
     </div>
   </article>
 </li>

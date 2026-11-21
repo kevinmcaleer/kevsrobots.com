@@ -54,16 +54,18 @@
              data-tags="{{ course.groups | join: '|' | escape }}"
              data-level="{{ level }}"
              data-date="{{ course.date_published }}"
-             data-minutes="{{ total_mins }}">
+             data-minutes="{{ total_mins }}"
+             data-lessons="{{ course.lessons | default: 0 }}">
         <a href="{{ course.link }}" class="text-decoration-none">
             <div class="card border-0 card-hover card-shadown h-100">
                 <img src="{{ course.cover }}" class="card-img-top" alt="" loading="lazy">
                 <div class="card-body">
-                    <h3 class="learn-course-title">{{ course.name }}</h3>
+                    <h3 class="learn-course-title" data-course-name>{{ course.name }}</h3>
                     <p class="pathway-meta mb-2">
                         <span class="pathway-level pathway-level-{{ level }}">{{ level }}</span>
                         <span><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ course.duration | remove: "0h " }}</span>
                         {% if course.lessons %}<span>{{ course.lessons }} lessons</span>{% endif %}
+                        {% if course.video %}<span class="pathway-video-badge"><i class="fa-brands fa-youtube" aria-hidden="true"></i> Video</span>{% endif %}
                     </p>
                     <p class="learn-course-desc">{{ course.description }}</p>
                 </div>

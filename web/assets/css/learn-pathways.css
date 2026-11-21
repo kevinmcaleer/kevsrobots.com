@@ -461,3 +461,245 @@
     transition: none;
   }
 }
+
+/*
+ * Hover panel on pathway cards (markup in pathway_card.html). Same idea as
+ * blog-cards.css: on hover-capable desktops a panel opens across the whole
+ * grid, over the row, so the grid never reflows. It has no `top`, so it
+ * starts where it sits in the column: level with the top of its card.
+ */
+.pathway-card-more {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 992px) {
+  .pathway-cards {
+    position: relative;
+  }
+
+  .pathway-card-more {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 8fr);
+    position: absolute;
+    z-index: 40;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.3), 0 0 0 1px #e3e3e3;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.97);
+    pointer-events: none;
+    /* Leaving: close straight away. */
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+  }
+
+  /* Short delay before opening, so sweeping the mouse across the row
+     doesn't flash the panel. */
+  .pathway-card-col:hover .pathway-card-more,
+  .pathway-card-col:focus-within .pathway-card-more {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    pointer-events: auto;
+    transition: opacity 0.2s ease 0.35s, transform 0.2s ease 0.35s, visibility 0s linear 0.35s;
+  }
+
+  /* Grow out of the hovered card's side of the row. */
+  .pathway-card-col:nth-child(4n+1) .pathway-card-more { transform-origin: left top; }
+  .pathway-card-col:nth-child(4n+2) .pathway-card-more { transform-origin: 35% top; }
+  .pathway-card-col:nth-child(4n+3) .pathway-card-more { transform-origin: 65% top; }
+  .pathway-card-col:nth-child(4n) .pathway-card-more { transform-origin: right top; }
+
+  .pathway-more-about {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem;
+    background: #f8f9fa;
+  }
+
+  .pathway-more-about img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+
+  .pathway-more-about p {
+    margin: 0;
+  }
+
+  .pathway-more-title a {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #111;
+    text-decoration: none;
+  }
+
+  .pathway-more-desc {
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .pathway-more-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: auto !important;
+    padding-top: 0.25rem;
+  }
+
+  .pathway-more-courses {
+    min-width: 0;
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .pathway-more-label {
+    margin: 0.15rem 0 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .pathway-more-row {
+    display: grid;
+    grid-template-columns: 1.4rem 4rem minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 0.4rem 0.35rem;
+    border-top: 1px solid #e3e3e3;
+    border-radius: 0.35rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pathway-more-row:hover {
+    background: #fff4dd;
+    color: inherit;
+  }
+
+  .pathway-more-number {
+    text-align: center;
+    font-weight: 700;
+    color: #666;
+  }
+
+  .pathway-more-row img {
+    display: block;
+    width: 4rem;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 0.3rem;
+  }
+
+  .pathway-more-text {
+    min-width: 0;
+  }
+
+  .pathway-more-name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #111;
+  }
+
+  .pathway-more-rowdesc {
+    display: block;
+    overflow: hidden;
+    font-size: 0.8rem;
+    color: #666;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .pathway-more-facts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+    font-size: 0.78rem;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  .pathway-more-rest {
+    display: block;
+    padding: 0.6rem 0.35rem 0;
+    border-top: 1px solid #e3e3e3;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pathway-card-more {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Watch button and saved progress on course rows (assets/js/learn-progress.js) */
+.pathway-row-go {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: stretch;
+  text-align: center;
+}
+
+.pathway-row-progress {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.pathway-progress {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  background: #e2f3e4;
+  color: #1d6b2c;
+  font-weight: 600;
+}
+
+.pathway-step.is-done .pathway-step-number {
+  border-color: #1d6b2c;
+  background: #1d6b2c;
+  color: #fff;
+}
+
+.pathway-step.is-started .pathway-step-number {
+  border-color: orangered;
+  background: orangered;
+  color: #fff;
+}
+
+.pathway-more-video {
+  color: #e62117;
+}
+
+/* Below 992px the Start button is hidden, but Watch and progress stay,
+   in a line under the description. */
+@media (max-width: 991.98px) {
+  .pathway-row-go {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+  }
+
+  .pathway-row-go [data-course-go] {
+    display: none;
+  }
+
+  .pathway-row-go:not(:has(.pathway-watch-btn, .pathway-row-progress:not([hidden]))) {
+    display: none;
+  }
+}
