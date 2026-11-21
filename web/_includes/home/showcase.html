@@ -1,0 +1,30 @@
+{%- comment -%}
+  "Made by the community": one tabbed showcase that replaced Featured
+  Projects. Nothing loads until the section is near the screen; then one
+  projects-api call for the open tab and one Chatter call for its hearts
+  (kr-project-card.js). Other tabs load when picked. The grid keeps its
+  height while loading, and the whole section hides if the API is down.
+{%- endcomment -%}
+<link rel="stylesheet" href="/assets/css/kr-project-card.css?v={{ site.time | date: '%s' }}">
+<section id="home-showcase" class="kr-showcase" aria-labelledby="kr-showcase-title">
+  <div class="kr-showcase-top">
+    <div>
+      <h2 id="kr-showcase-title">Made by the community</h2>
+      <p>Robots and gadgets people built with Snakie, BetterCAD and a lot of solder.</p>
+    </div>
+    <a class="kr-suite-btn" href="/projects/hub">Browse all projects <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="kr-showcase-tabs" role="tablist" aria-label="Projects">
+    <button type="button" role="tab" id="kr-tab-staff" aria-selected="true" aria-controls="kr-showcase-grid" data-tab="staff">Staff picks</button>
+    <button type="button" role="tab" id="kr-tab-snakie" aria-selected="false" aria-controls="kr-showcase-grid" data-tab="snakie"><span class="kr-tab-dot kr-tab-snakie" aria-hidden="true"></span>Made with Snakie</button>
+    <button type="button" role="tab" id="kr-tab-bettercad" aria-selected="false" aria-controls="kr-showcase-grid" data-tab="bettercad"><span class="kr-tab-dot kr-tab-bettercad" aria-hidden="true"></span>Made with BetterCAD</button>
+    <button type="button" role="tab" id="kr-tab-following" aria-selected="false" aria-controls="kr-showcase-grid" data-tab="following" hidden>From people you follow</button>
+  </div>
+  <div id="kr-showcase-grid" class="krc-grid" role="tabpanel" aria-labelledby="kr-tab-staff" aria-live="polite">
+    <div class="krc-skeleton"></div><div class="krc-skeleton"></div><div class="krc-skeleton"></div>
+  </div>
+  <p class="kr-showcase-empty" hidden></p>
+</section>
+<script defer src="/assets/js/project-auth.js?v={{ site.time | date: '%s' }}"></script>
+<script defer src="/assets/js/kr-project-card.js?v={{ site.time | date: '%s' }}"></script>
+<script defer src="/assets/js/home-showcase.js?v={{ site.time | date: '%s' }}"></script>

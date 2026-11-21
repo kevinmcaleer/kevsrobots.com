@@ -1,0 +1,51 @@
+{%- comment -%}
+  "Build with the suite": Snakie and BetterCAD on the homepage.
+  Static screenshots only (about 20 KB each as WebP) and no script, so it
+  costs the page almost nothing. "See projects" switches the showcase
+  below to that app's tab.
+{%- endcomment -%}
+<link rel="stylesheet" href="/assets/css/home-suite.css?v={{ site.time | date: '%s' }}">
+<section class="kr-suite-band" aria-labelledby="kr-suite-band-title">
+  <div class="kr-suite-head">
+    <h2 id="kr-suite-band-title">Build robots with the kevsrobots suite</h2>
+    <p>Free tools that work together, in your browser or on your desktop.</p>
+  </div>
+  <div class="kr-suite-apps">
+    <article class="kr-suite-app" data-kr-app="snakie">
+      <a class="kr-suite-shot" href="https://app.snakie.org/" aria-hidden="true" tabindex="-1">
+        <img src="/assets/img/suite/snakie-800.webp"
+             srcset="/assets/img/suite/snakie-480.webp 480w, /assets/img/suite/snakie-800.webp 800w"
+             sizes="(max-width: 700px) 92vw, 46vw"
+             width="800" height="400" alt="Snakie showing MicroPython code next to a Raspberry Pi Pico with the pins it uses lit up"
+             loading="lazy" decoding="async">
+      </a>
+      <div class="kr-suite-body">
+        <h3><span class="kr-suite-dot" aria-hidden="true"></span>Snakie</h3>
+        <p>The MicroPython editor for robots. Wire your board, write the code and run it on a Pico, or right in your browser.</p>
+        <div class="kr-suite-btns">
+          <a class="kr-suite-btn kr-suite-btn-primary" href="https://app.snakie.org/">Open in browser</a>
+          <a class="kr-suite-btn" href="https://www.snakie.org/#install">Download</a>
+          <a class="kr-suite-btn kr-suite-btn-quiet" href="#home-showcase" data-showcase-tab="snakie">See projects</a>
+        </div>
+      </div>
+    </article>
+    <article class="kr-suite-app" data-kr-app="bettercad">
+      <a class="kr-suite-shot" href="https://bettercad.kevsrobots.com/" aria-hidden="true" tabindex="-1">
+        <img src="/assets/img/suite/bettercad-800.webp"
+             srcset="/assets/img/suite/bettercad-480.webp 480w, /assets/img/suite/bettercad-800.webp 800w"
+             sizes="(max-width: 700px) 92vw, 46vw"
+             width="800" height="400" alt="A phone stand modelled in BetterCAD"
+             loading="lazy" decoding="async">
+      </a>
+      <div class="kr-suite-body">
+        <h3><span class="kr-suite-dot" aria-hidden="true"></span>BetterCAD</h3>
+        <p>3D design for robot parts. Model it, add joints, then export STLs and build steps to your project.</p>
+        <div class="kr-suite-btns">
+          <a class="kr-suite-btn kr-suite-btn-primary" href="https://bettercad.kevsrobots.com/">Open BetterCAD</a>
+          <a class="kr-suite-btn kr-suite-btn-quiet" href="#home-showcase" data-showcase-tab="bettercad">See projects</a>
+        </div>
+      </div>
+    </article>
+  </div>
+  <p class="kr-suite-flow"><b>Design</b> in BetterCAD <span aria-hidden="true">→</span> <b>wire and code</b> in Snakie <span aria-hidden="true">→</span> <b>publish</b> on <a href="/projects/hub">kevsrobots Projects</a></p>
+</section>
