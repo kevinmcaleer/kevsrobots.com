@@ -888,6 +888,21 @@
   link: /learn/snakie_instruments/00_intro.html
   name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - author: Kevin McAleer
+  cover: /learn/snakie_part_editor/assets/cover.jpg
+  date_published: 2026-11-21
+  description: Add any sensor, breakout or microcontroller board to Snakie with the
+    Part Editor. Draw the board, place its pins, trace a photo, attach a driver and
+    give it its own blocks, by building a VL53L0X distance sensor part from scratch.
+  duration: 1h 7m
+  groups:
+  - electronics
+  - micropython
+  - pico
+  lessons: 14
+  level: intermediate
+  link: /learn/snakie_part_editor/00_intro.html
+  name: Make Your Own Parts and Boards in Snakie
+- author: Kevin McAleer
   cover: /learn/sql/assets/cover.jpg
   date_published: 2024-11-01
   description: Learn the fundamentals of SQL, relational database theory, and essential

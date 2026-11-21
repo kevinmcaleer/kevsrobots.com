@@ -4775,6 +4775,91 @@
     ]
   },
   {
+    "slug": "snakie_part_editor",
+    "name": "Make Your Own Parts and Boards in Snakie",
+    "description": "Add any sensor, breakout or microcontroller board to Snakie with the Part Editor. Draw the board, place its pins, trace a photo, attach a driver and give it its own blocks, by building a VL53L0X distance sensor part from scratch.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-21",
+    "groups": [
+      "electronics",
+      "micropython",
+      "pico"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Overview",
+        "url": "/learn/snakie_part_editor/00_intro.html"
+      },
+      {
+        "file": "01_what_a_part_is.md",
+        "section": "Overview",
+        "url": "/learn/snakie_part_editor/01_what_a_part_is.html"
+      },
+      {
+        "file": "02_tour_of_the_part_editor.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/02_tour_of_the_part_editor.html"
+      },
+      {
+        "file": "03_board_size_and_details.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/03_board_size_and_details.html"
+      },
+      {
+        "file": "04_pins_types_and_capabilities.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/04_pins_types_and_capabilities.html"
+      },
+      {
+        "file": "05_holes_components_and_labels.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/05_holes_components_and_labels.html"
+      },
+      {
+        "file": "06_tracing_a_board_photo.md",
+        "section": "Drawing the Part",
+        "url": "/learn/snakie_part_editor/06_tracing_a_board_photo.html"
+      },
+      {
+        "file": "07_schematic_symbol_and_electrical_details.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/07_schematic_symbol_and_electrical_details.html"
+      },
+      {
+        "file": "08_drivers_and_built_in_help.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/08_drivers_and_built_in_help.html"
+      },
+      {
+        "file": "09_using_your_part_in_a_project.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/09_using_your_part_in_a_project.html"
+      },
+      {
+        "file": "10_giving_your_part_its_own_blocks.md",
+        "section": "Making It Smart",
+        "url": "/learn/snakie_part_editor/10_giving_your_part_its_own_blocks.html"
+      },
+      {
+        "file": "11_making_a_microcontroller_board.md",
+        "section": "Boards and Sharing",
+        "url": "/learn/snakie_part_editor/11_making_a_microcontroller_board.html"
+      },
+      {
+        "file": "12_sharing_your_parts.md",
+        "section": "Boards and Sharing",
+        "url": "/learn/snakie_part_editor/12_sharing_your_parts.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Boards and Sharing",
+        "url": "/learn/snakie_part_editor/13_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "sql",
     "name": "Getting Started with SQL",
     "description": "Learn the fundamentals of SQL, relational database theory, and essential skills for database management.",
