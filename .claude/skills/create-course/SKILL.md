@@ -191,7 +191,7 @@ A lesson that mentions `arduino.app_utils` or `Arduino_RouterBridge` gets extra 
 - `uno-q-servo`, `uno-q-reserved`, `uno-q-qwiic`, `bridge-begin`: `Arduino_HardwareServo` not `Servo`; never open `Serial1` or `/dev/ttyHS1`; Qwiic is `Wire1`; call `Bridge.begin()` in `setup()`.
 - Each full `main.py` is run against a strict stand-in for `arduino.app_utils` (`scripts/uno_q_stubs/`): only `Bridge.call/notify/provide/unprovide`, `App.run` and the `call/notify/provide` decorators exist. A block importing an `arduino.app_bricks` Brick is not run: check its API against the Brick's README in github.com/arduino/app-bricks-py.
 
-Put `code_target: cpython` in `course.yml`. Verify UNO Q facts against Arduino's docs source (github.com/arduino/docs-content, `content/hardware/uno/boards/uno-q` and `content/software/app-lab`), not memory. The checks can't prove code works on the board: say in the PR which lessons still need a run on real hardware.
+Put `code_target: cpython` and `code_board: uno-q` in `course.yml`: the second switches the sketch lint on for lessons that have a sketch but no Bridge. Verify UNO Q facts against Arduino's docs source (github.com/arduino/docs-content, `content/hardware/uno/boards/uno-q` and `content/software/app-lab`), not memory. The checks can't prove code works on the board: say in the PR which lessons still need a run on real hardware.
 
 Lesson widgets (`{% include matrix_painter.html %}`, `bridge_steps.html`, `sorter.html`) are documented in `docs/course_widgets.md`.
 
