@@ -2,12 +2,62 @@
   One learning pathway as a card: cover, title, course count, total time,
   level range and a short description.
 
+  On desktop (a fine pointer that can hover), hovering or tabbing into the
+  card opens a panel across the full width of the card grid, the same way
+  the blog cards do: the full description on the left and the pathway's
+  courses as rows on the right (level, length, lessons), each linking to
+  its course. Long pathways show six rows and a link to the rest.
+  Touch devices never see the panel; the card opens the pathway page.
+
   Usage: include pathway_card.html pathway=pathway
   (pathway = a page from site.data.pathways, see _plugins/pathways.rb).
   Styles: assets/css/learn-pathways.css
 {% endcomment %}
 {% assign p = include.pathway %}
+{% assign row_limit = p.course_count %}
+{% if p.course_count > 7 %}{% assign row_limit = 6 %}{% endif %}
+{% assign rows_left = p.course_count | minus: row_limit %}
+{% assign first_course = p.course_items | first %}
 <div class="pathway-card-col">
+  {% comment %} Before the card, so its top lines up with the card's top. {% endcomment %}
+  <div class="pathway-card-more" aria-hidden="true">
+    <div class="pathway-more-about">
+      {% if p.cover %}<a href="{{ p.url }}" tabindex="-1"><img src="{{ p.cover }}" alt="" loading="lazy"></a>{% endif %}
+      <p class="pathway-more-title"><a href="{{ p.url }}" tabindex="-1">{{ p.title }}</a></p>
+      <p class="pathway-meta">
+        <span>{{ p.course_count }} {% if p.course_count == 1 %}course{% else %}courses{% endif %}</span>
+        <span><i class="fa-regular fa-clock"></i> {{ p.duration }}</span>
+        <span>{{ p.lesson_count }} lessons</span>
+      </p>
+      <p class="pathway-meta">{% include pathway_levels.html levels=p.levels %}</p>
+      <p class="pathway-more-desc">{{ p.description }}</p>
+      <p class="pathway-more-actions">
+        <a class="btn btn-primary btn-sm" href="{{ p.url }}" tabindex="-1">View this pathway</a>
+        {% if p.video %}<a class="btn btn-sm pathway-watch-btn" href="https://www.youtube.com/watch?v={{ p.video }}" target="_blank" rel="noopener" tabindex="-1"><i class="fa-brands fa-youtube"></i> Watch the intro</a>{% endif %}
+      </p>
+    </div>
+    <div class="pathway-more-courses">
+      <p class="pathway-more-label">Courses in this pathway. Jump in anywhere.</p>
+      {% for c in p.course_items limit: row_limit %}
+      {% assign level = c.level | default: "beginner" %}
+      <a class="pathway-more-row" href="{{ c.link }}" tabindex="-1">
+        <span class="pathway-more-number">{{ forloop.index }}</span>
+        <img src="{{ c.cover }}" alt="" loading="lazy">
+        <span class="pathway-more-text">
+          <span class="pathway-more-name">{{ c.name }}</span>
+          <span class="pathway-more-rowdesc">{{ c.description }}</span>
+        </span>
+        <span class="pathway-more-facts">
+          <span class="pathway-level pathway-level-{{ level }}">{{ level }}</span>
+          <span>{{ c.duration | remove: "0h " }}{% if c.lessons %} · {{ c.lessons }} lessons{% endif %}</span>
+        </span>
+      </a>
+      {% endfor %}
+      {% if rows_left > 0 %}
+      <a class="pathway-more-rest" href="{{ p.url }}" tabindex="-1">+ {{ rows_left }} more courses. See the full pathway</a>
+      {% endif %}
+    </div>
+  </div>
   <article class="pathway-card">
     {% if p.cover %}
     <img class="pathway-card-cover" src="{{ p.cover }}" alt="" loading="lazy">
