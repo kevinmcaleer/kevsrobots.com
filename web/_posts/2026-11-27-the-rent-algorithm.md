@@ -4,11 +4,16 @@ description: >-
   Millions of US apartments had their rents set with help from the same piece of software. Here's how RealPage's pricing algorithm worked, why the US Justice Department called it a cartel without a meeting room, and what the settlement changes.
 excerpt: >-
   No secret meeting, no handshake, no phone call. Just rival landlords feeding their private data into the same algorithm. How rent-pricing software ended up in an antitrust case.
-layout: showcase
+layout: article
+hero_style: split
 mode: light
 date: 2026-11-27
 author: Kevin McAleer
 difficulty: beginner
+specs:
+  Market share: about 80%
+  Suggestions adopted: up to 90%
+  Coordination cost: $25 per flat per month
 cover: /assets/img/blog/rent_algorithm/cover.png
 hero: /assets/img/blog/rent_algorithm/cover.png
 tags:
@@ -31,9 +36,12 @@ Now imagine all three quietly plug into the same piece of software. Each one han
 
 Nobody has met in a smoky back room. Nobody has shaken hands on a price. And yet the price war has stopped.
 
-That, in a nutshell, is the case the US Department of Justice brought against a company called RealPage. It's one of the clearest examples yet of an algorithm changing how a market behaves in a way that nobody would have predicted from the code alone.
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/rent_algorithm/price-war.png" alt="Two charts: on the left three landlords' rents fall after one cuts its price; on the right three rents rise together" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">On their own, one price cut drags everyone down. Sharing one algorithm, nobody undercuts</figcaption>
+</figure>
 
----
+That, in a nutshell, is the case the US Department of Justice brought against a company called RealPage. It's one of the clearest examples yet of an algorithm changing how a market behaves in a way that nobody would have predicted from the code alone.
 
 ## What the software actually does
 
@@ -47,9 +55,9 @@ The software does three things:
 
 On paper a landlord can ignore the suggestion. In practice, a [2022 ProPublica investigation](https://www.propublica.org/article/yieldstar-rent-increase-realpage-rent) reported that "as many as 90%" of the software's suggestions were adopted, according to former RealPage employees. The DOJ said the company encouraged this with an "auto accept" feature and with pricing advisors "who monitor landlords' compliance."
 
-The DOJ also said RealPage held about **80% of the market** for this kind of software in multifamily housing. When four out of five big landlords in a city are asking the same oracle, the oracle starts to look a lot like a cartel.
-
----
+The DOJ also said RealPage held about **80% of the market** for this kind of software in multifamily housing. {% callout note "One oracle, many landlords" %}
+When four out of five big landlords in a city are asking the same oracle, the oracle starts to look a lot like a cartel.
+{% endcallout %}
 
 ## The ratchet hidden in the rules
 
@@ -57,7 +65,9 @@ The most interesting part of the case isn't the data sharing. It's the shape of 
 
 According to the DOJ's complaint, the software "tends to maximize price increases, minimize price decreases." Think of it as a ratchet: it turns easily one way and stiffly the other.
 
+{% callout try "Try it yourself" %}
 Here's a toy model you can run yourself to see why that matters. It isn't RealPage's code (nobody outside the company has that). It's a simple illustration of what an asymmetric pricing rule does over time.
+{% endcallout %}
 
 ```python
 import random
@@ -83,11 +93,18 @@ print(f"Symmetric pricing after 3 years: ${normal:,.0f}")
 print(f"Ratchet pricing after 3 years:   ${sticky:,.0f}")
 ```
 
-With that random seed, the symmetric rent ends up around **$730** and the ratchet rent around **$1,210**, even though demand is pure random noise with no upward trend at all. Try other seeds: the ratchet comes out on top almost every time. A single landlord using a sticky rule like this would just lose tenants to a cheaper rival down the street. But if the rival is running the same rule, there's nobody left to undercut you.
+With that random seed, the symmetric rent ends up around **$730** and the ratchet rent around **$1,210**, even though demand is pure random noise with no upward trend at all. Try other seeds: the ratchet comes out on top almost every time.
 
-That's the unexpected bit. **An algorithm that would fail in a competitive market can succeed when everyone uses it.**
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/rent_algorithm/ratchet-chart.png" alt="Line chart over 36 months: the ratchet rent climbs to about $1,209 while the symmetric rent falls to about $727, above a bar chart of random demand" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">The output of the model above: same demand, very different rents</figcaption>
+</figure>
 
----
+A single landlord using a sticky rule like this would just lose tenants to a cheaper rival down the street. But if the rival is running the same rule, there's nobody left to undercut you.
+
+{% callout tip "The unexpected bit" %}
+**An algorithm that would fail in a competitive market can succeed when everyone uses it.**
+{% endcallout %}
 
 ## What the economists found
 
@@ -102,8 +119,6 @@ Their findings are more nuanced than the headlines, which is exactly why they're
 The White House Council of Economic Advisers built on that research in a [2024 issue brief](https://bidenwhitehouse.archives.gov/wp-content/uploads/2024/12/Appendix-for-CEA-Issue-Brief-The-Anticompetitive-Costs-of-Algorithmic-Pricing-in-Rental-Housing.pdf), and New York's governor later cited an estimate that price-fixing algorithms cost renters [$3.8 billion in a single year](https://www.governor.ny.gov/news/governor-hochul-signs-legislative-package-bolster-homeownership-and-strengthen-protections).
 
 ProPublica's reporting gives a more human-scale example from the prosecutors' case: one landlord "started increasing rents within a week" of adopting the software and had raised them by more than 25% within 11 months ([ProPublica, 2025](https://www.propublica.org/article/doj-realpage-settlement-rental-price-fixing-case)).
-
----
 
 ## So is using a pricing algorithm illegal?
 
@@ -122,8 +137,6 @@ So the legal line isn't "algorithms bad". It's much more specific:
 
 That table is, more or less, the shape of the settlement.
 
----
-
 ## What the settlement changes
 
 In November 2025 the DOJ [announced a proposed settlement](https://www.justice.gov/opa/pr/justice-department-requires-realpage-end-sharing-competitively-sensitive-information-and). If the court approves it, RealPage must:
@@ -133,19 +146,25 @@ In November 2025 the DOJ [announced a proposed settlement](https://www.justice.g
 - "Remove or redesign features that limited price decreases or aligned pricing between competing users". In other words, take the ratchet out.
 - Accept a court-appointed monitor.
 
-RealPage said the settlement involves no financial penalty and no admission of wrongdoing. The DOJ's separate case against several large landlords carries on. The largest, Greystar, settled in August 2025, again without admitting wrongdoing.
+{% callout warning "No admission" %}
+RealPage said the settlement involves no financial penalty and no admission of wrongdoing.
+{% endcallout %}
+
+The DOJ's separate case against several large landlords carries on. The largest, Greystar, settled in August 2025, again without admitting wrongdoing.
 
 Here's the clever bit that I haven't seen discussed much. The 12-month rule turns the shared dataset from a **live feed** into a **history book**. Year-old data is still useful for learning seasonal patterns ("rents rise in summer"), but it's useless for coordinating today's prices ("your rival just put their rent up, so you can too"). It's a neat engineering fix to a legal problem: the regulators didn't ban the machine learning, they changed what time the model is allowed to see.
 
----
+<figure class="text-center my-4">
+  <img src="/assets/img/blog/rent_algorithm/history-book.png" alt="Timeline: lease data older than 12 months is allowed for training, the most recent 12 months is off limits" loading="lazy" class="img-fluid rounded-3">
+  <figcaption class="text-muted small mt-2">Year-old data still teaches seasons and trends, but not what your rivals did this morning</figcaption>
+</figure>
 
 ## The states go further
 
 Some lawmakers decided that line-drawing wasn't enough. In October 2025 New York became, according to [Wilson Sonsini](https://www.wsgr.com/en/insights/new-york-prohibits-use-of-pricing-algorithms-for-rent-setting.html), "the first state to outright ban the use of pricing algorithms by landlords" that pool data from two or more owners to recommend rents. California passed its own law the same month.
 
----
-
-## Why this matters beyond rent
+{% fullwidth style="dark" %}
+## The Bottom Line
 
 The RealPage story is a preview of a problem that's going to keep coming up as more businesses hand pricing over to software:
 
@@ -154,8 +173,7 @@ The RealPage story is a preview of a problem that's going to keep coming up as m
 - **Where the data comes from matters as much as what the code does.** The same algorithm trained on your own data is a tool; trained on your competitors' live data, it's something else.
 
 If you're building anything that learns from data, from a robot that adapts its behaviour to a model that sets prices, it's worth asking the RealPage question: *whose data is this, and what happens when everyone uses the same model?*
-
----
+{% endfullwidth %}
 
 ## Sources
 
