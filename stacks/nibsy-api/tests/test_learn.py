@@ -166,3 +166,27 @@ async def test_for_page_finds_a_project_by_its_folder_url(client, session) -> No
     body = (await client.get("/api/learn/for-page?page=/projects/dog/")).json()
     assert body["basis"] == "page"
     assert body["courses"][0]["url"] == "/learn/servos/00_intro.html"
+
+
+@pytest.mark.asyncio
+async def test_helpful_votes_tally_per_course(client, session) -> None:
+    await ingest_catalogue(CATALOGUE, session)
+    page = "https://www.kevsrobots.com/learn/servos/05_wiring.html"
+    for helpful in (True, True, False):
+        assert (await client.post("/api/learn/helpful", json={"page": page, "helpful": helpful})).status_code == 200
+    # Changing your mind moves the vote rather than adding one.
+    await client.post("/api/learn/helpful", json={"page": page, "helpful": True, "previous": False})
+    body = (await client.get("/api/learn/helpful")).json()
+    assert body["courses"]["/learn/servos/"]["up"] == 3
+    assert body["courses"]["/learn/servos/"]["down"] == 0
+    assert body["courses"]["/learn/servos/"]["lessons"] == {"/learn/servos/05_wiring": {"up": 3, "down": 0}}
+
+
+@pytest.mark.asyncio
+async def test_helpful_votes_only_count_lessons(client, session) -> None:
+    await ingest_catalogue(CATALOGUE, session)
+    for page in ("/blog/servo-tester.html", "/learn/nowhere/01.html", "/learn/../x/"):
+        response = await client.post("/api/learn/helpful", json={"page": page, "helpful": True})
+        assert response.status_code == 422, page
+    response = await client.post("/api/learn/helpful", json={"page": "/learn/servos/01.html", "helpful": "yes"})
+    assert response.status_code == 422

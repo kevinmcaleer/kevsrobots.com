@@ -1,0 +1,17 @@
+/* /learn/course-health/ (#637) */
+.ch-lead { max-width: 70ch; color: #5a5a5f; }
+.ch-wrap { overflow-x: auto; margin-bottom: 2rem; }
+.ch-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.ch-table th, .ch-table td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #e6e2dc; vertical-align: middle; }
+.ch-table thead th { position: sticky; top: 0; background: #f7f5f2; font-size: 0.75rem; text-align: left; }
+.ch-table tbody th { font-weight: 600; min-width: 16rem; text-align: left; }
+.ch-lessons { display: block; font-size: 0.75rem; font-weight: 400; color: #5a5a5f; }
+.ch-check { text-align: center !important; }
+.ch-yes { color: #1e7f4f; font-weight: 700; }
+.ch-no { color: #b3aca2; }
+.ch-score { font-weight: 700; white-space: nowrap; }
+.ch-score-good { color: #1e7f4f; }
+.ch-score-ok { color: #a86b00; }
+.ch-score-low { color: #c22032; }
+.ch-helpful, .ch-updated { white-space: nowrap; }
+.ch-helpful small { color: #5a5a5f; }

@@ -107,6 +107,8 @@ thanks: false
         <p class="text-center">
         <span>You can use the arrows&nbsp;</span><code> ← → </code><span>on your keyboard to navigate between lessons.</span>
         </p>
+        <link rel="stylesheet" href="/assets/css/course-next.css?v={{ site.time | date: '%s' }}">
+        {% include lesson_helpful.html %}
         {% unless page.next %}
         {% include course/next_steps.html %}
         {% endunless %}

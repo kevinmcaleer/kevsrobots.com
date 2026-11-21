@@ -126,6 +126,8 @@ curl https://nibsy.kevsrobots.com/health
 | `DELETE /api/me/progress[?course=]` | implemented | Reset one course, or all course progress |
 | `GET`/`POST /api/me/learning-settings` | implemented | `{show_courses}`: list finished courses on the public profile (off by default) |
 | `GET /api/learners/{username}/courses` | implemented | Public: a learner's finished courses, empty unless they turned `show_courses` on |
+| `POST /api/learn/helpful` | implemented | `{page, helpful, previous?}`: count a "Was this lesson helpful?" answer (counts only) |
+| `GET /api/learn/helpful` | implemented | Votes per course and lesson, for `/learn/course-health/` |
 | `GET /api/learn/for-page?page=` | implemented | Courses that teach what a post or project page uses (pins first) |
 | `GET /api/learn/follow-on?course=` | implemented | The next course in each of a course's pathways, and projects to build |
 | `GET /api/analytics/top-clicked` | implemented | Most clicked content by period (#68) |

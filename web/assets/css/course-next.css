@@ -128,3 +128,30 @@
     width: 100%;
   }
 }
+
+/* "Was this lesson helpful?" (_includes/lesson_helpful.html, #637) */
+.lesson-helpful {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.lesson-helpful-q {
+  font-weight: 600;
+}
+
+.lesson-helpful .is-picked {
+  border-color: #1e7f4f;
+  background: #1e7f4f;
+  color: #fff;
+}
+
+.lesson-helpful-thanks {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #5a5a5f;
+}

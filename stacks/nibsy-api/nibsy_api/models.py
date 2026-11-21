@@ -194,3 +194,19 @@ class NibsyLearnerSettings(Base):
     username: Mapped[str] = mapped_column(String(100), primary_key=True)
     show_courses: Mapped[bool] = mapped_column(nullable=False, default=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class NibsyLessonVote(Base):
+    """"Was this lesson helpful?" tallies per lesson (#637).
+
+    Only counts are kept, never who voted. The course health page sums them
+    per course.
+    """
+
+    __tablename__ = "nibsy_lesson_votes"
+
+    lesson: Mapped[str] = mapped_column(String(300), primary_key=True)
+    course: Mapped[str] = mapped_column(String(300), nullable=False, index=True)
+    up: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    down: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

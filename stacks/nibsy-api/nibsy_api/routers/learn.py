@@ -4,6 +4,8 @@
                             blog post or project page uses.
 - ``/api/learn/follow-on``  the end of a course: the next course in each of its
                             learning pathways, and projects to build next.
+- ``/api/learn/helpful``    "Was this lesson helpful?" votes (#637): POST one,
+                            GET the tallies per course for the health page.
 
 Both put the page's pins first (a post's ``courses:`` front matter, a
 course's ``projects:`` in course.yml), then fill from the catalogue by
@@ -16,18 +18,22 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..auth import get_optional_user
 from ..db import get_session
 from ..history import load_history
+from ..models import NibsyLessonVote
+from ..progress import course_key
 from ..recommender import (
     Item,
     Pick,
     build_profile,
     get_index,
     next_in_pathways,
+    normalise_url,
     related_of_kind,
 )
 
@@ -127,3 +133,60 @@ async def follow_on(
         "next": nexts,
         "projects": _cards(projects),
     }
+
+
+@router.post("/helpful")
+async def vote_helpful(
+    body: dict = Body(...),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Count one "Was this lesson helpful?" answer.
+
+    ``previous`` (the reader's earlier answer, which the page remembers)
+    is taken back first, so changing your mind doesn't count twice.
+    """
+
+    helpful = body.get("helpful")
+    previous = body.get("previous")
+    if not isinstance(helpful, bool) or (previous is not None and not isinstance(previous, bool)):
+        raise HTTPException(status_code=422, detail="helpful must be true or false")
+    lesson = normalise_url(str(body.get("page") or ""))
+    course = course_key(lesson)
+    index = await get_index(session)
+    source, _basis = index.resolve(lesson)
+    if course is None or len(lesson) > 300 or source is None or source.type != "course":
+        raise HTTPException(status_code=422, detail="not a lesson")
+
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    row = await session.get(NibsyLessonVote, lesson)
+    if row is None:
+        row = NibsyLessonVote(lesson=lesson, course=course, up=0, down=0, updated_at=now)
+        session.add(row)
+    if previous is True:
+        row.up = max(0, row.up - 1)
+    elif previous is False:
+        row.down = max(0, row.down - 1)
+    if helpful:
+        row.up += 1
+    else:
+        row.down += 1
+    row.updated_at = now
+    await session.commit()
+    return {"lesson": lesson, "helpful": helpful}
+
+
+@router.get("/helpful")
+async def helpful_tallies(
+    response: Response,
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Votes per course, with each lesson's, for the course health page."""
+
+    response.headers["Cache-Control"] = "public, max-age=600"
+    courses: dict[str, dict] = {}
+    for row in (await session.scalars(select(NibsyLessonVote))).all():
+        entry = courses.setdefault(row.course, {"up": 0, "down": 0, "lessons": {}})
+        entry["up"] += row.up
+        entry["down"] += row.down
+        entry["lessons"][row.lesson] = {"up": row.up, "down": row.down}
+    return {"courses": courses}

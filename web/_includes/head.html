@@ -19,6 +19,7 @@
 <meta property="og:description" content="{{ page.description }}" />
 <meta property="description" content="{{ page.description }}" />
 <meta name="description" content="{{ page.description }}" />
+{% if page.noindex %}<meta name="robots" content="noindex" />{% endif %}
 {% endif %}
 
 {% if page.date %}

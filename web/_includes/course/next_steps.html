@@ -6,7 +6,6 @@
   Nibsy (pinned by the course's `projects:` in course.yml, then related).
 {%- endcomment -%}
 {%- assign with_next = page.course_pathways | where_exp: "p", "p.next" -%}
-<link rel="stylesheet" href="/assets/css/course-next.css?v={{ site.time | date: '%s' }}">
 <section class="course-next" aria-labelledby="course-next-title">
   <h2 id="course-next-title">What next?</h2>
   {% if with_next.size > 0 %}
