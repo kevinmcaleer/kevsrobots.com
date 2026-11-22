@@ -3465,14 +3465,12 @@
   {
     "slug": "openclaw_raspberry_pi",
     "name": "OpenClaw on Raspberry Pi",
-    "description": "Learn how to set up and run OpenClaw, a powerful AI agent framework, on your Raspberry Pi using Docker.  This course covers installation, configuration, management, and production best practices for running  local AI agents on your own hardware.",
+    "description": "Run OpenClaw, the open-source personal AI agent, on a Raspberry Pi in Docker. Build Pi Butler, an always-on assistant you talk to from your phone, with its own persona, a custom skill that reports how the Pi is feeling, a morning brief, backups, safe upgrades and a security check.",
     "cover": "assets/openclaw.jpg",
     "author": "Kevin McAleer",
     "date_published": "2026-01-31",
     "groups": [
-      "openclaw",
-      "raspberry pi",
-      "docker",
+      "raspberrypi",
       "ai"
     ],
     "lessons": [
