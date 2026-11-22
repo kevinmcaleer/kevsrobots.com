@@ -5,12 +5,10 @@
  *      cards. Anchored at the top-left of the project card image. Uses a
  *      gradient on a real <span> rather than a clip-path so screen readers
  *      announce the text and so the badge survives a print stylesheet.
- *   2. `.featured-carousel` — the horizontally-scrollable row of featured
- *      project cards that appears at the top of /projects/hub. Uses native
- *      `overflow-x: auto` + scroll-snap rather than Bootstrap's
- *      `.carousel` because the latter pages between slides; we want a
- *      scrollable shelf the user can flick through. Falls back to a plain
- *      grid on no-JS / older browsers.
+ *   2. `.featured-carousel` — the row of featured project cards at the
+ *      top of /projects/hub. It is a CSS grid that always fits the page
+ *      width (no horizontal scroll): every card shares one row on desktop,
+ *      and the cards wrap to three or two columns on tablets and phones.
  */
 
 .featured-ribbon {
@@ -73,34 +71,48 @@
 }
 
 .featured-carousel {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.5rem 0.25rem 1rem;
-  /* Hide scrollbar visually on macOS while keeping it functional on touch. */
-  scrollbar-width: thin;
+  padding: 0.5rem 0 1rem;
 }
 
-.featured-carousel::-webkit-scrollbar {
-  height: 6px;
+/* Two columns on a phone. Titles get two lines instead of one truncated
+ * line, and an odd last card takes the full row (with a wider, shorter
+ * thumbnail) rather than leaving a gap beside it. */
+@media (max-width: 575.98px) {
+  .featured-carousel-card .text-truncate {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .featured-carousel-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .featured-carousel-card:last-child:nth-child(odd) .project-thumb {
+    aspect-ratio: 2 / 1;
+  }
 }
 
-.featured-carousel::-webkit-scrollbar-thumb {
-  background: rgba(255, 143, 0, 0.4);
-  border-radius: 3px;
+@media (min-width: 576px) {
+  .featured-carousel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Desktop: one row, however many cards are featured, each sharing the
+ * width equally. */
+@media (min-width: 992px) {
+  .featured-carousel {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
 }
 
 .featured-carousel-card {
-  flex: 0 0 260px;
-  scroll-snap-align: start;
-}
-
-@media (min-width: 768px) {
-  .featured-carousel-card {
-    flex: 0 0 280px;
-  }
+  min-width: 0;
 }
 
 .featured-carousel-card .card {
