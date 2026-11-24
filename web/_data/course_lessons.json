@@ -507,9 +507,8 @@
     "author": "Kevin McAleer",
     "date_published": "2025-05-10",
     "groups": [
-      "animation",
-      "robotics",
-      "arduino"
+      "arduino",
+      "robots"
     ],
     "lessons": [
       {

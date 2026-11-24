@@ -1,161 +1,112 @@
 ---
 title: Using Bottango with a Gamepad
-description: Learn how to control your animations and servos in real time using a USB gamepad or joystick.
+description: Learn how to control servos live with a gamepad using a Bottango control scheme, and how to record the result.
 layout: lesson
 type: page
 cover: /learn/bottango/assets/banners/09_use_with_gamepad.jpg
-date_updated: 2025-05-03
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Want to control your servos live — like a puppet? Bottango supports USB **gamepads and joysticks**, letting you trigger animations or control servo positions in real time. Great for live performances, interactive demos, or fun robot battles!
+By the end of this lesson you will be able to map a gamepad to servos with a control scheme and use it to puppeteer or record an animation.
 
----
+Want to perform your robot like a puppeteer? Bottango can take live input, such as a gamepad, and use it to move servos in real time. You can perform it live, or record your performance as keyframes and tidy them afterwards.
 
-## Compatible Devices
+> **Note**: this lesson follows the **Recording and Puppeteering** pages of the [Bottango docs](https://docs.bottango.com). Older versions of this lesson listed menu names such as Devices and Gamepad Settings, which we could not confirm. The names for control scheme settings may differ in your version.
 
-Bottango supports most USB gamepads and joysticks, including:
+## What is a control scheme?
 
-- Xbox controllers
-- PlayStation controllers
-- Generic USB gamepads
-- Flight sticks and arcade sticks
+The docs define a control scheme as "a set of mappings between parts and inputs", along with its settings. A project can have as many as you like, for example one for the head and one for the arms.
 
-> Plug in your controller **before launching Bottango** to ensure it’s recognized.
+```mermaid
+flowchart LR
+    G["Gamepad stick or button"] --> M["Control scheme<br/>mapping"]
+    M --> S["Servo part"]
+    S --> R{"Mode"}
+    R -->|"Live Animation"| K["Records movement over time as keyframes"]
+    R -->|"Snapshot"| P["Captures a pose as keyframes at the chosen time"]
+```
 
----
+## Two types of scheme
 
-## Step 1: Enable Gamepad Input
+The **Control Scheme Type** setting has two choices:
 
-1. Open Bottango
-2. Go to **Devices > Gamepad Settings**
-3. You should see your controller listed
-4. Test buttons and joysticks to confirm they register
+- **Live Animation** (the default): records the live input over time.
+- **Snapshot**: lets you set a pose with live input, and then capture it as keyframes at the selected time. Snapshot schemes replace the record button with a camera icon.
 
----
+Live Animation suits a performance, such as a talking beak. Snapshot suits poses, such as a set of facial expressions that you place carefully on the timeline.
 
-## Step 2: Assign Gamepad Controls
+## Step 1: Plug in your gamepad
 
-You can assign gamepad inputs to either:
+The docs list a gamepad as a supported recording input. Connect it to your computer by USB, and if it is not recognised, restart Bottango with the gamepad already plugged in.
 
-- **Trigger animations** (e.g., press button A to wave)
-- **Directly control servo positions** (e.g., move a joystick to control a jaw)
+## Step 2: Make a control scheme
 
-### To trigger an animation:
+1. Open the control scheme editor in the Animate view and choose to create or edit a scheme.
+2. Map a stick or button to a servo part.
+3. Set the range so the input travels across the servo's safe movement, not beyond it.
 
-1. Go to the **Triggers** panel
-2. Click **Add Trigger**
-3. Choose **Gamepad Button**
-4. Select the button (e.g., Button A)
-5. Set the action to **Play Animation** and choose your animation
+## Step 3: Perform and record
 
-### To control a servo directly:
+1. In the Animate view, pick the active scheme from the dropdown. Choose none to switch recording off.
+2. Make sure Master Live is on so the real servos follow.
+3. Record, move the stick, and stop.
+4. Play back what you recorded and tidy the keyframes by hand as in lesson 5.
 
-1. Select your servo in the timeline
-2. In the **Servo Settings**, choose **Gamepad Axis** under input method
-3. Select the joystick axis (e.g., Left Stick Y)
-4. Set the range (min/max) to match your servo's limits
+## Tips for smooth control
 
----
-
-## Test It Out
-
-- Press your assigned gamepad button — the servo should move or play an animation
-- Move a joystick — the servo should follow your movement in real time
-
-> You can control multiple servos simultaneously with different axes!
-
----
-
-## Creative Uses
-
-- Real-time puppet shows (control eyes, mouth, head)
-- Remote-controlled robots with expressive motion
-- Assistive tools (e.g., gamepad-controlled grippers)
-- Multiplayer animatronic props or characters
-
----
-
-## Tips for Smooth Gamepad Control
-
-- Use **easing curves** or filtering for smoother servo movement
-- Avoid using the same axis for multiple servos unless needed
-- Keep servo limits in mind to avoid jitter or strain
-
----
-
-With a gamepad in hand, your project becomes a **live, expressive performer**.
-
----
-
-## Try it Yourself
-
-Time to take control! Try these gamepad exercises:
-
-1. **Button Triggers**: Set up four buttons to control a servo:
-   - Button A → Move servo to 0°
-   - Button B → Move servo to 90°
-   - Button X → Move servo to 180°
-   - Button Y → Play a custom animation you created
-
-   Practice switching between positions quickly!
-
-2. **Joystick Control**: Connect a servo to the left joystick Y-axis:
-   - Moving stick up → Servo moves to maximum position
-   - Moving stick down → Servo moves to minimum position
-   - Center stick → Servo returns to 90° (neutral)
-
-   How smooth can you make the movement?
-
-3. **Multi-Servo Puppet**: If you have 2+ servos, create a simple "puppet":
-   - Left stick Y-axis → Controls vertical head movement
-   - Left stick X-axis → Controls horizontal head movement
-   - Right stick Y-axis → Controls jaw open/close
-   - Button A → Trigger a "blink" animation (if you have eye servos)
-
-   Practice "performing" with your puppet!
-
-4. **Animation Playlist**: Create 4 short animations (2-3 seconds each):
-   - D-Pad Up → Play "nod yes"
-   - D-Pad Down → Play "shake no"
-   - D-Pad Left → Play "look left"
-   - D-Pad Right → Play "look right"
-
-   Create a sequence by pressing buttons in order!
-
-**Advanced Challenge**: Build a "live performance system":
-- Joysticks control real-time servo positions
-- Buttons trigger pre-made animations
-- One button acts as "home" position (resets all servos)
-- Practice a 30-second performance combining both control methods
-
-**Pro Tip**: Invert an axis if your servo moves the "wrong way" when you push the stick!
-
----
+- Keep the servo's safe range tight, so a hard push on a stick cannot overdrive it.
+- Use one axis per servo until you are confident.
+- Tidy recorded movement afterwards. Raw hand movement has small wobbles you can smooth.
 
 ## Common Issues
 
-- **Problem**: Gamepad not detected in Bottango
-- **Solution**: Plug in controller before launching Bottango, then restart the application
-- **Why**: Bottango scans for controllers on startup
+- **Problem**: Bottango does not see my gamepad.
+- **Solution**: Plug it in before starting Bottango, then restart Bottango and check again.
+- **Why**: Programs commonly look for controllers when they start.
 
-- **Problem**: Servo jitters when controlled by joystick
-- **Solution**: Add a small deadzone (5-10%) and enable smoothing/filtering in servo settings
-- **Why**: Joysticks have sensitive analog inputs that can cause micro-movements
+- **Problem**: The servo moves the wrong way when I push the stick.
+- **Solution**: Look for an invert option in the scheme mapping, or swap the range ends.
+- **Why**: Different controllers and servos point in different directions.
 
-- **Problem**: Joystick axis controls servo backwards
-- **Solution**: Invert the axis in Bottango's gamepad settings or servo configuration
-- **Why**: Different controllers map axes differently (positive/negative)
+- **Problem**: The servo jitters.
+- **Solution**: Look for smoothing or dead-zone settings in the control scheme, and tidy the recorded keyframes afterwards.
+- **Why**: Analogue sticks never sit perfectly still, so small noise reaches the servo.
 
-- **Problem**: Multiple button presses don't work smoothly
-- **Solution**: Ensure animations are set to "interrupt" previous animations, not "queue"
-- **Why**: Queued animations will play in sequence, causing lag
+- **Problem**: I recorded but nothing happens when I play back.
+- **Solution**: Check that an active scheme is selected before recording, and that the animation has keyframes after the recording.
+- **Why**: Selecting none disables recording.
 
----
+> **Teachers**: gamepads are good for sharing, but one performer at a time means others wait. Plan for pairs, with one performer and one "safety" person who watches the servo supply and can switch it off. Check USB gamepads work on your lab computers before the lesson, as some managed machines block them.
 
-Next up: [Course Summary and Next Steps](10_summary.md)
+## Try it Yourself
 
----
+1. Map one stick axis to one servo and move it live. How smooth can you make it?
+2. Record a 10 second performance and play it back. Tidy it up using keyframes.
+3. Make a Snapshot scheme with three poses (neutral, look left, look right) and capture each on the timeline.
+4. Challenge: map two axes to a head with two servos, and perform a short "looking around" animation.
+
+## Check your understanding
+
+{% quiz %}
+? Which Control Scheme Type records live input over time?
+- [x] Live Animation
+- [ ] Snapshot
+- [ ] None
+> Live Animation is the default and records over time. Snapshot captures one pose.
+
+? What does a Snapshot scheme give you instead of the record button?
+- [ ] A speaker icon
+- [x] A camera icon
+- [ ] A save icon
+> The lesson says Snapshot schemes replace the record button with a camera icon.
+
+? How do you switch recording off in the Animate view?
+- [ ] Unplug the gamepad
+- [x] Select none as the active scheme
+- [ ] Delete the animation
+> Choosing none from the active scheme dropdown disables recording.
+{% endquiz %}

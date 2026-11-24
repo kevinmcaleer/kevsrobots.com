@@ -100,11 +100,10 @@
     no-code motion tool for animating servos and creating interactive scenes.  This
     course walks you through installing Bottango, wiring servos, programming boards,
     and creating expressive motion sequences.
-  duration: 0h 33m
+  duration: 0h 54m
   groups:
-  - animation
-  - robotics
   - arduino
+  - robots
   lessons: 11
   level: beginner
   link: /learn/bottango/00_intro.html
