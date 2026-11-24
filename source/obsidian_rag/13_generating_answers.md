@@ -4,12 +4,15 @@ description: Turn retrieved chunks into a grounded prompt, call the Messages API
 layout: lesson
 type: page
 cover: /learn/obsidian_rag/assets/banners/13_generating_answers.jpg
-date_updated: 2026-08-23
+date_updated: 2026-11-24
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build a grounded prompt from retrieved chunks, call the Claude Messages API with and without streaming, and test the prompt with a fake client so it costs nothing.
 
 Half the pipeline is done. We can find the right paragraphs. Now let's turn them into an answer.
 
@@ -26,6 +29,22 @@ Put that in your shell profile so it persists. Never put it in `config.py` - tha
 The SDK picks the key up from the environment automatically, which is why the client below takes no arguments.
 
 ---
+
+```mermaid
+sequenceDiagram
+    participant U as You
+    participant R as retrieve.py
+    participant A as answer.py
+    participant C as Claude API
+    U->>R: question
+    R-->>A: hits (numbered chunks)
+    A->>A: build_prompt: sources first, question last
+    A->>C: system prompt plus user turn
+    C-->>A: streamed text with citations
+    A-->>U: answer, printed as it arrives
+```
+
+> **Teachers**: The API key is the catch. Access needs an account and usage is billed, so decide who owns the key before the lesson, and never let learners paste a key into a shared document or commit it to a repository (a class repository is public more often than you think). The environment variable approach above keeps it out of the code. Remember too that the excerpts sent with each question leave the machine, so keep learners on the practice vault. If you have no budget or the school firewall blocks the API, learners can still do everything in this lesson except the real call: the fake-client test near the end exercises the whole prompt-building path without a network.
 
 ## The shape of a grounded prompt
 
@@ -158,7 +177,7 @@ Points worth pausing on:
 
 **`response.content` is a list of blocks, not a string.** Checking `block.type == "text"` and joining is the correct way to read a reply. Reaching straight for `response.content[0].text` works right up until the day the first block is something else.
 
-**The model.** `claude-opus-5` is set in `config.py`. For a tool you run a few times a day the cost is small, and this is the step where quality shows.
+**The model.** `claude-opus-5` is set in `config.py`. Model names change over time, so check Anthropic's models page for the current list before you run this. Both `claude-opus-5` and `claude-sonnet-5-5` are in the model list of the `anthropic` 2.13.0 SDK I tested with, and switching is a one-line change in `config.py`. This is the step where quality shows, so start with a capable model, then try a cheaper one and see whether you notice.
 
 ---
 
@@ -233,7 +252,7 @@ That runs in milliseconds, costs nothing, and catches the mistakes you actually 
 1. Print `build_prompt(...)` for a real question and read it as though you were the model. Is the answer findable in there? If not, this is a retrieval problem and no prompt will save it.
 2. Ask something your notes definitely do not cover. Does it say so, or does it guess? If it guesses, tighten the system prompt.
 3. Remove the "ONLY the numbered sources" line and ask a question about a well known topic you have *not* written about. Watch general knowledge leak in. Put the line back.
-4. Count tokens: roughly `len(prompt) / 4`. Six chunks of 1200 characters is around 2,000 tokens - pennies per question.
+4. Count tokens: roughly `len(prompt) / 4`. Six chunks of 1200 characters is around 2,000 tokens, which is small. Check Anthropic's pricing page for what that costs with the model you picked.
 5. Ask the same question with `TOP_K=3` and `TOP_K=10`. More context is not automatically better.
 
 ---
@@ -255,3 +274,37 @@ That runs in milliseconds, costs nothing, and catches the mistakes you actually 
 - **Problem**: `AttributeError: 'ToolUseBlock' object has no attribute 'text'`
 - **Solution**: Filter on `block.type == "text"` before reading `.text`.
 - **Why**: `response.content` can contain several block types. Only text blocks have text.
+
+- **Problem**: `TypeError: "Could not resolve authentication method. Expected one of api_key, auth_token, or credentials to be set..."`
+- **Solution**: `ANTHROPIC_API_KEY` is not set in the shell you are running from. Export it, or in the finished tool let `amv ask` check for it first (lesson 15 adds that check).
+- **Why**: The SDK only looks for a key when it makes the request, so a missing key is not reported until `ask`, and the message is about "authentication methods" rather than "you forgot your key".
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why do the sources go before the question in the prompt?
+- [ ] The API requires it
+- [x] A model that reads the question first tends to answer from what it already knows and then look for support
+- [ ] It makes the prompt shorter
+> Evidence first, question last, keeps answers closer to the sources.
+
+? `retrieve` returns no hits. What should `answer()` do?
+- [ ] Ask Claude anyway, in case it knows
+- [x] Return a plain "could not find anything" message without calling the API
+- [ ] Retry the search with more results
+> With nothing to ground an answer in, asking anyway is how you get a confident fabrication.
+
+? Why read the reply with `"".join(block.text for block in response.content if block.type == "text")`?
+- [x] `response.content` is a list of blocks of different types, and only text blocks have `.text`
+- [ ] Because the reply is always exactly one block
+- [ ] Because `.text` is faster than `.content[0]`
+> Reaching for `content[0].text` works until the first block is something else.
+
+? How does the fake client in `test_answer.py` help?
+- [x] It lets you check the prompt your code builds without an API key or any cost
+- [ ] It makes real answers more accurate
+- [ ] It caches replies between runs
+> It asserts on the model name and the `<source id="1">` block, then returns a canned reply.
+{% endquiz %}

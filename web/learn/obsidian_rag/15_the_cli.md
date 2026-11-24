@@ -10,8 +10,10 @@ next: 16_keeping_it_fresh.html
 description: Wire every piece together into a real command line tool with index, search,
   ask and stats commands
 percent: 80
-duration: 8
-date_updated: 2026-08-23
+duration: 10
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to wire the pipeline into an `amv` command with `index`, `search`, `ask` and `stats` subcommands, and install it with `pip install -e .`.
+
 Every piece works. Time to put a handle on it.
 
 ## Four commands
@@ -94,6 +98,15 @@ Every piece works. Time to put a handle on it.
 
 ---
 
+```mermaid
+flowchart LR
+    A["amv ask 'why did the motors stall' --tag robots"] --> P["argparse picks the subcommand"]
+    P --> F["set_defaults(func=cmd_ask)"]
+    F --> S["hybrid_search"]
+    S --> G["stream_answer"]
+    G --> O["print the answer,<br/>then the Sources list"]
+```
+
 ## The skeleton
 
 ```python
@@ -101,13 +114,14 @@ Every piece works. Time to put a handle on it.
 """Ask My Vault - command line interface."""
 
 import argparse
+import os
 import sys
 import time
 from pathlib import Path
 
 from .config import DB_PATH, TOP_K, VAULT_PATH
 from .index import collection_stats, index_vault
-from .retrieve import build_filter, search
+from .retrieve import build_filter, hybrid_search
 ```
 
 Notice `answer` is **not** imported here. It gets imported inside `cmd_ask`, because importing it pulls in the `anthropic` package, and there is no reason for `amv search` to pay that cost.
@@ -136,7 +150,7 @@ Each command returns an exit code. `0` for success, non-zero for failure - so `a
 # vault_rag/cli.py  (add below cmd_index)
 def cmd_search(args) -> int:
     where = build_filter(tag=args.tag, folder=args.folder)
-    hits = search(args.question, top_k=args.top_k, db_path=args.db, where=where)
+    hits = hybrid_search(args.question, top_k=args.top_k, db_path=args.db, where=where)
     if not hits:
         print("No matches. Have you run `amv index` yet?")
         return 1
@@ -157,10 +171,15 @@ def cmd_search(args) -> int:
 ```python
 # vault_rag/cli.py  (add below cmd_search)
 def cmd_ask(args) -> int:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print("ANTHROPIC_API_KEY is not set. `amv search` works without it.",
+              file=sys.stderr)
+        return 1
+
     from .answer import check_citations, stream_answer
 
     where = build_filter(tag=args.tag, folder=args.folder)
-    hits = search(args.question, top_k=args.top_k, db_path=args.db, where=where)
+    hits = hybrid_search(args.question, top_k=args.top_k, db_path=args.db, where=where)
     if not hits:
         print("Nothing in your vault matches that. Try `amv index` first.")
         return 1
@@ -182,7 +201,7 @@ def cmd_ask(args) -> int:
     return 0
 ```
 
-We collect the streamed pieces into a list as well as printing them, so the citation check from lesson 14 has the full text to work with. The `-` marker in the source list flags anything that was retrieved but never cited.
+The key check at the top is worth having: without it a missing key surfaces as an unfriendly `TypeError` from the SDK, and with it everything else still works while `amv ask` says exactly what is wrong. We collect the streamed pieces into a list as well as printing them, so the citation check from lesson 14 has the full text to work with. The `-` marker in the source list flags anything that was retrieved but never cited.
 
 ---
 
@@ -383,3 +402,37 @@ That is the tool finished.
 - **Problem**: The `--db` flag has no effect.
 - **Solution**: It is a top-level argument, so it goes *before* the subcommand: `amv --db ./testdb search "..."`.
 - **Why**: argparse binds arguments to the parser they were added to, and subcommand arguments come after the subcommand name.
+
+- **Problem**: `amv ask` prints `ANTHROPIC_API_KEY is not set`.
+- **Solution**: Export the key in the shell you are running from (`export ANTHROPIC_API_KEY="sk-ant-..."`), or put it in your shell profile.
+- **Why**: The check runs before any search, so you find out straight away rather than after a model load. `amv search` never needs a key.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why is `answer` imported inside `cmd_ask` rather than at the top of `cli.py`?
+- [ ] Python forbids top-level imports in a CLI
+- [x] Importing it loads the `anthropic` package, and `amv search` should not pay that cost
+- [ ] So the import can fail silently
+> Lazy import keeps the commands that do not need Claude quick.
+
+? What does `set_defaults(func=cmd_ask)` on a subparser achieve?
+- [x] Each subcommand attaches its own handler, so dispatch is a single `args.func(args)` call
+- [ ] It sets the default question
+- [ ] It makes the command run on a timer
+> It replaces a chain of `if args.command == ...`.
+
+? You run `amv search "motors" --db ./testdb` and the flag has no effect. Why?
+- [ ] `--db` is not a real option
+- [x] `--db` belongs to the top-level parser, so it must come before the subcommand
+- [ ] The database is read only
+> argparse binds each option to the parser it was added to.
+
+? What does the `-` marker in front of a source in the `amv ask` output mean?
+- [x] The source was retrieved and sent but never cited in the answer
+- [ ] The source is a deleted note
+- [ ] The source had a negative score
+> It flags retrieved-but-unused sources, a hint that retrieval pulled in something weak.
+{% endquiz %}

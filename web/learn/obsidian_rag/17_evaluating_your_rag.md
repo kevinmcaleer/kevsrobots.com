@@ -10,8 +10,10 @@ next: 18_troubleshooting.html
 description: Build a small evaluation set and measure retrieval, so you can tell whether
   a change helped or just felt different
 percent: 90
-duration: 6
-date_updated: 2026-08-23
+duration: 8
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to write an evaluation set for your vault, score retrieval with hit rate and mean reciprocal rank, and use the numbers to test one change at a time.
+
 You have a tool that works. Now: is it any *good*?
 
 That question sounds soft, but it has a hard answer, and getting one changes how you work. Without measurement, tuning a RAG pipeline is guesswork - you change the chunk size, ask a couple of questions, think "hmm, that felt better", and move on. Three changes later you have no idea which one helped or whether any of them did.
@@ -85,6 +89,18 @@ That question sounds soft, but it has a hard answer, and getting one changes how
 Twenty minutes of setup fixes this permanently.
 
 ---
+
+```mermaid
+flowchart LR
+    B["Baseline run:<br/>hit rate and MRR"] --> C["Change ONE thing"]
+    C --> I["Re-index with full=True"]
+    I --> R["Run eval.py again"]
+    R --> D{"Better?"}
+    D -- yes --> K["Keep it,<br/>log the new numbers"]
+    D -- no --> U["Undo it"]
+    K --> C
+    U --> C
+```
 
 ## Measure retrieval, not the answer
 
@@ -145,7 +161,8 @@ from vault_rag.retrieve import search
 
 
 def evaluate(eval_path: str, db_path: str, top_k: int = 6) -> dict:
-    cases = yaml.safe_load(open(eval_path))
+    with open(eval_path, encoding="utf-8") as handle:
+        cases = yaml.safe_load(handle)
     hits_at_k = 0
     reciprocal_ranks = []
     misses = []
@@ -191,6 +208,8 @@ if __name__ == "__main__":
             print(f"  {question}\n    {detail}")
 ```
 
+The output has this shape. (These figures illustrate the format for a larger vault. With the four-note practice vault there is so little to confuse the search that you should see a hit rate at or near 100%, so run it for real on your own vault.)
+
 ```
 Hit rate @6: 85%
 MRR:         0.712
@@ -208,18 +227,20 @@ The miss list is the most valuable output. It tells you *which* questions fail, 
 
 Now every change becomes an experiment. Record a baseline, make one change, re-run:
 
+Keep a log like this one, filling in your own numbers as you go:
+
 | Change | Hit rate | MRR |
 |---|---|---|
-| Baseline (1200 char chunks) | 85% | 0.712 |
-| Chunk size 600 | 90% | 0.781 |
-| Chunk size 2400 | 75% | 0.590 |
-| 600 chars, no breadcrumb prefix | 70% | 0.512 |
-| 600 chars, tags in prefix too | 90% | 0.804 |
+| Baseline (1200 character chunks) | | |
+| Chunk size 600 | | |
+| Chunk size 2400 | | |
+| 600 characters, no breadcrumb prefix | | |
+| 600 characters, tags in the prefix too | | |
 {:class="table table-single"}
 
-(Those numbers are from one particular vault. Yours will differ - that is exactly why you measure rather than copying a table.)
+I am deliberately leaving the numbers blank: they depend entirely on your notes, and a table of someone else's results would only tempt you to copy them.
 
-The pattern that usually shows up: smaller chunks help up to a point then hurt, and the breadcrumb prefix matters more than the chunk size does. But "usually" is not "on your vault", and now you can check.
+A pattern often reported in RAG write-ups: smaller chunks help up to a point then hurt, and the breadcrumb prefix can matter more than the chunk size. Treat that as a hypothesis to test, because "often" is not "on your vault", and now you can check.
 
 **Change one thing at a time**, and always re-index with `full=True` between runs. Otherwise unchanged notes keep their old chunk boundaries and you are measuring a mixture.
 
@@ -269,3 +290,33 @@ Both are computed from text you already have, with no extra API calls.
 - **Problem**: The `expect: null` cases always fail.
 - **Solution**: Our `search` returns *something* for almost any question, since it returns the nearest chunks however far away they are.
 - **Why**: Add `drop_stragglers` from lesson 10 to the evaluation path, or score those cases on the *generated* answer declining rather than on retrieval returning nothing.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why measure retrieval rather than judge the generated answers?
+- [ ] Answers cannot be read by a computer
+- [x] Retrieval has a hard test (did the right note appear, and how high) while judging prose is subjective
+- [ ] Retrieval is cheaper than indexing
+> If the right note is retrieved a good prompt almost always works, and if it is not, nothing downstream can save you.
+
+? A question's right note appears at position 2. What does it add to the mean reciprocal rank?
+- [ ] 2
+- [x] 0.5
+- [ ] 0
+> Reciprocal rank is 1 divided by the position: 1, 0.5, 0.33 and so on, or 0 if the note is absent.
+
+? Why re-index with `full=True` between experiments?
+- [x] Otherwise unchanged notes keep their old chunk boundaries and you measure a mixture of two strategies
+- [ ] It makes the evaluation run faster
+- [ ] To reset the API key
+> Change one thing at a time, and rebuild between runs.
+
+? Your hit rate is 100% on the first try with fifteen questions. What is the likely problem?
+- [x] The questions quote the notes back at themselves, so you are testing keyword matching
+- [ ] The index is perfect
+- [ ] You have too few notes
+> Rewrite questions in different words, as you would actually type them.
+{% endquiz %}

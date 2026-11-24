@@ -9,8 +9,10 @@ previous: 01_what_is_rag.html
 next: 03_project_setup.html
 description: How text becomes a list of numbers, and why that makes meaning searchable
 percent: 15
-duration: 7
-date_updated: 2026-08-23
+duration: 10
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -77,6 +79,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain what an embedding is, calculate the cosine distance between two vectors, and judge search results by rank rather than by an absolute cutoff.
+
 An **embedding** is a list of numbers that represents the meaning of a piece of text. That is the whole idea. Everything else is detail.
 
 Feed the sentence *"the robot's motors stalled on the carpet"* into an embedding model and you get back something like:
@@ -92,6 +96,43 @@ Now here is the useful bit. *"the drive train couldn't handle the deep pile rug"
 Similar meaning, nearby points. That is the entire trick.
 
 ---
+
+## The idea with three numbers
+
+You do not need a model to feel how this works. Here is the same idea with only three dimensions, which we can write by hand. Each number says how much a note is about *mechanical things*, *food* and *wireless*:
+
+```python
+# cosine_by_hand.py - a scratch script, no model download needed
+import math
+
+
+def cosine_distance(a, b):
+    """1 minus the cosine of the angle between two vectors."""
+    dot = sum(x * y for x, y in zip(a, b))
+    length_a = math.sqrt(sum(x * x for x in a))
+    length_b = math.sqrt(sum(y * y for y in b))
+    return 1 - dot / (length_a * length_b)
+
+
+#              [mechanical, food, wireless]
+motor_note = [0.9, 0.0, 0.1]
+bread_note = [0.0, 1.0, 0.0]
+wifi_note = [0.1, 0.0, 0.9]
+question = [0.8, 0.0, 0.2]      # "why won't my robot move?"
+
+for name, vector in [("motor note", motor_note),
+                     ("bread note", bread_note),
+                     ("wifi note", wifi_note)]:
+    print(f"{cosine_distance(question, vector):.3f}  {name}")
+```
+
+```
+0.009  motor note
+1.000  bread note
+0.652  wifi note
+```
+
+The question points almost exactly the same way as the motor note, at right angles to the bread note, and somewhere in between for the wifi note. A real model does exactly this, only with 384 invented dimensions instead of three labelled ones.
 
 ## Thinking in fewer dimensions
 
@@ -114,6 +155,17 @@ Ask "why did my robot stop moving?" and it lands down in the bottom right, near 
 Real embedding models do this in hundreds of dimensions, and no single axis has a tidy human name. But the principle holds exactly.
 
 ---
+
+```mermaid
+flowchart LR
+    T1["Sentence about a robot"] --> M["Embedding model<br/>all-MiniLM-L6-v2"]
+    T2["Your question"] --> M
+    M --> V1["384 numbers"]
+    M --> V2["384 numbers"]
+    V1 --> C["Cosine distance"]
+    V2 --> C
+    C --> R["Smaller means closer.<br/>Rank the results."]
+```
 
 ## Measuring closeness
 
@@ -204,7 +256,7 @@ Run it and you get something like:
 0.969  Feed the sourdough starter every 12 hours
 ```
 
-Both robot sentences beat the bread one comfortably, and the question contained none of the words "motor", "stall", "carpet" or "drive". That is semantic search working.
+Both robot sentences beat the bread one comfortably, and the question contained none of the words "motor", "stall", "carpet" or "drive". That is semantic search working. Your exact numbers will differ a little from mine, and that is fine: it is the order that matters.
 
 Look at those numbers again though. The best match scored **0.70**. If you had written a rule saying "only accept results below 0.3" you would have thrown away the correct answer. Rank, not threshold.
 
@@ -223,11 +275,13 @@ Being honest about the limits saves you a lot of debugging later:
 
 ---
 
+> **Teachers**: The first call to the default embedding model downloads about 80MB from the internet into each learner's home folder (`~/.cache/chroma/onnx_models/`). On a school network that blocks downloads, or on shared machines where home folders are wiped between lessons, this will fail or repeat for every learner. Test it on one machine beforehand, and consider downloading once and copying the cache folder to the others. The three-number example above needs no download, so it is a good activity if the network is not behaving.
+
 ## Try it Yourself
 
 1. Run the distance script above, then add a sentence of your own that is *about* robots but shares no vocabulary with the others. Where does it score?
 2. Try two sentences that are opposites - "the battery is fully charged" and "the battery is completely flat". Are they close or far? Does that surprise you?
-3. Embed the same sentence twice and compare the vectors. The distance should be exactly 0.0 - embedding is deterministic, which is what makes caching possible.
+3. Embed the same sentence twice and compare the vectors. The distance should be 0.0 give or take rounding error (something like 1e-16) - embedding is deterministic, which is what makes caching possible.
 4. Time it: embed 100 short sentences and see how long it takes. That number tells you roughly how long indexing your whole vault will take.
 
 ---
@@ -245,3 +299,33 @@ Being honest about the limits saves you a lot of debugging later:
 - **Problem**: Embedding is slow on a Raspberry Pi.
 - **Solution**: Expect it. Index once and let it run; queries afterwards are fast because only the question needs embedding.
 - **Why**: Indexing embeds every chunk in the vault. Querying embeds one short string.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? In cosine distance, which result is the better match?
+- [ ] The one with the larger number
+- [x] The one with the smaller number
+- [ ] The one closest to 1.0
+> It is a distance, so smaller is better. 0.0 is identical and 1.0 is at right angles.
+
+? Your best match has a distance of 0.70. What should you do?
+- [ ] Throw it away because it is above 0.3
+- [x] Nothing: judge results by their rank, not an absolute cutoff
+- [ ] Re-install ChromaDB
+> With a small model even an excellent match often sits around 0.5 to 0.7. Rank is what matters.
+
+? Which question will embeddings handle worst?
+- [ ] "why won't my robot move?"
+- [x] A search for an exact part number such as TB6612FNG
+- [ ] A question phrased in different words from the note
+> Embeddings blur exact identifiers into a general meaning, so those need keyword search (lesson 12).
+
+? How many numbers does the default embedding model produce for each piece of text?
+- [ ] 3
+- [x] 384
+- [ ] One per word
+> all-MiniLM-L6-v2 produces 384 dimensional vectors.
+{% endquiz %}
