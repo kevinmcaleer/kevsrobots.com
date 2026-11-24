@@ -2610,9 +2610,7 @@
     "author": "Kevin McAleer",
     "date_published": "2026-08-05",
     "groups": [
-      "electronics",
-      "lora",
-      "meshcore"
+      "electronics"
     ],
     "lessons": [
       {

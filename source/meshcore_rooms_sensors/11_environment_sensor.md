@@ -4,13 +4,16 @@ description: Wire a BME280 to the Heltec V3 for temperature, humidity and pressu
 type: page
 layout: lesson
 cover: /learn/meshcore_rooms_sensors/assets/banners/11_environment_sensor.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Four wires and a £5 breakout, and your mesh can tell you whether the greenhouse went below freezing last night. This is the most satisfying build in the course.
+By the end of this lesson you will be able to wire a BME280 to the sensor bus, read it with `sensor list`, and place it so the readings mean something.
+
+Four wires and a small breakout board, and your mesh can tell you whether the greenhouse went below freezing last night. This is the most satisfying build in the course.
 
 ---
 
@@ -30,7 +33,7 @@ That is the entire build. Four Dupont jumpers, no resistors, no soldering if you
 
 **Two things to check before you power up:**
 
-**Voltage.** Wire the breakout to **3V3, not 5V**. Many BME280 modules include a regulator and tolerate 5V, but the ESP32-S3's I2C lines are 3.3V logic, and a 5V-referenced bus can damage the microcontroller. 3V3 is always the safe answer here.
+**Voltage.** Wire the breakout to **3V3, not 5V**. The Bosch BME280 datasheet gives a supply range of 1.71 to 3.6V. Some breakouts include a regulator and tolerate 5V, but the ESP32-S3's I2C lines are 3.3V logic, and a 5V-referenced bus can damage the microcontroller. 3V3 is always the safe answer here.
 
 **Pull-up resistors.** I2C needs them, and essentially every BME280 breakout has them fitted on board. If you are using a bare chip rather than a breakout, you need 4.7kΩ pull-ups from SDA and SCL to 3V3.
 
@@ -42,7 +45,7 @@ This is the one thing to get right. GPIO17 and GPIO18 are the **OLED's** I2C bus
 
 Wire your BME280 to 17 and 18 - as most generic Heltec tutorials will tell you to - and everything will look correct, the board will boot happily, the screen will work, and `sensor list` will show nothing at all. It is a frustrating fault precisely because nothing appears broken.
 
-On its own bus your BME280 sits at **0x76** or **0x77**, selected by the SDO pin. With only one device on that bus there is nothing to clash with.
+On its own bus your BME280 sits at **0x76** (SDO to GND) or **0x77** (SDO to VDD), and the MeshCore driver tries 0x76 first and then 0x77. With only one device on that bus there is nothing to clash with.
 
 ---
 
@@ -92,7 +95,7 @@ The sensor measures the air immediately around it, which sounds obvious right up
 1. A small vented enclosure, or an upturned plant pot as a rudimentary radiation shield
 2. The Heltec V3 inside, antenna out through the top, vertical
 3. The BME280 on 15cm of wire, hanging **below** the enclosure in shade and free air
-4. A 3.7V LiPo on the SH1.25 connector
+4. A single-cell LiPo with a protection circuit, plugged into the board's battery connector (check polarity first)
 5. Optionally a small solar panel - see the next lesson
 
 Keeping the sensor on a short lead away from the board is worth doing. It gets the measurement away from the board's own warmth and puts it in the air you actually care about.
@@ -103,13 +106,28 @@ Keeping the sensor on a short lead away from the board is worth doing. It gets t
 
 ## Reading the numbers sensibly
 
-**Temperature** is the reliable one. Expect around ±1°C accuracy from a BME280, which is more than adequate for "did it freeze?".
+**Temperature** is the reliable one. The datasheet quotes about ±1°C over the normal range, which is more than adequate for "did it freeze?".
 
 **Humidity** takes time to settle. Move the sensor from indoors to outdoors and it may take several minutes to stabilise. A step change in the reading is often the sensor catching up, not the weather.
 
-**Pressure** is far more precise than it is accurate. The absolute figure may be off by a few hPa, but the *trend* is excellent - and the trend is what tells you weather is coming.
+**Pressure** is far more precise than it is accurate. The absolute figure may be off by a hPa or more, but the *trend* is excellent - and the trend is what tells you weather is coming.
 
 **Self-heating** is real. A BME280 sitting on a warm board reads high, often by a degree or two. This is the main argument for the short lead.
+
+---
+
+## Wiring checklist
+
+| Check | What good looks like |
+|---|---|
+| Supply | VCC on the 3V3 pin, never 5V |
+| Bus | SDA on GPIO33 and SCL on GPIO34 |
+| Address | 0x76 or 0x77, one device per address |
+| Lead length | Under about 30cm |
+| Power | Board unplugged while you move wires |
+{:class="table table-single"}
+
+> **Teachers**: Mounting an outdoor sensor needs a ladder or a roof, so assign that to an adult. Keep mains out of it entirely: run the board from USB or a protected LiPo only. In a greenhouse, keep the electronics out of splash and condensation, and do not leave a LiPo in a sealed hot box in summer.
 
 ---
 
@@ -124,34 +142,47 @@ Keeping the sensor on a short lead away from the board is worth doing. It gets t
 
 ## Common Issues
 
-**Problem**: `sensor list` shows no BME280.
+- **Problem**: `sensor list` shows no BME280.
+- **Solution**: Check all four wires, confirm 3V3 not 5V, confirm your firmware build includes the BME280 driver, then `reboot`.
+- **Why**: Detection runs at boot only. A correct wiring job done after power-on looks identical to a broken one until you reset.
 
-**Solution**: Check all four wires, confirm 3V3 not 5V, then `reboot`.
+- **Problem**: Everything looks right but `sensor list` is empty, and the screen still works fine.
+- **Solution**: Check you used GPIO33 and GPIO34, not GPIO17 and GPIO18.
+- **Why**: The OLED and the sensors are on different buses. A working screen tells you nothing about your sensor wiring, and the OLED bus is the one most tutorials name.
 
-**Why**: Detection runs at boot only. A correct wiring job done after power-on looks identical to a broken one until you reset.
+- **Problem**: Temperature reads 2°C higher than a thermometer next to it.
+- **Solution**: Move the sensor away from the board, onto a short lead in free air.
+- **Why**: Self-heating from the board's regulator and radio. It is the single most common cause of a sensor that reads plausibly but consistently high.
 
-**Problem**: Everything looks right but `sensor list` is empty, and the screen still works fine.
+- **Problem**: Humidity is pinned at 100%.
+- **Solution**: Check for condensation on the sensor, and let it dry out somewhere warm.
+- **Why**: A saturated sensing element reads 100% until the moisture leaves. It usually recovers; repeated soaking degrades accuracy permanently.
 
-**Solution**: Check you used GPIO33 and GPIO34, not GPIO17 and GPIO18.
-
-**Why**: The OLED and the sensors are on different buses. A working screen tells you nothing about your sensor wiring, and the OLED bus is the one most tutorials name.
-
-**Problem**: Temperature reads 2°C higher than a thermometer next to it.
-
-**Solution**: Move the sensor away from the board, onto a short lead in free air.
-
-**Why**: Self-heating from the board's regulator and radio. It is the single most common cause of a sensor that reads plausibly but consistently high.
-
-**Problem**: Humidity is pinned at 100%.
-
-**Solution**: Check for condensation on the sensor, and let it dry out somewhere warm.
-
-**Why**: A saturated sensing element reads 100% until the moisture leaves. It usually recovers; repeated soaking degrades accuracy permanently.
-
-**Problem**: I get temperature and pressure but no humidity.
-
-**Solution**: You have a BMP280, not a BME280.
-
-**Why**: The two share a breakout footprint and a bus address. Both have a hole in the lid, so that is not the tell - the BME280 is square with a centred hole, the BMP280 rectangular with a corner one. In practice, missing humidity data *is* the diagnosis.
+- **Problem**: I get temperature and pressure but no humidity.
+- **Solution**: You have a BMP280, not a BME280.
+- **Why**: The two share a breakout footprint and a bus address. In practice, missing humidity data *is* the diagnosis, and the lesson 2 package-shape tell can confirm it.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why does a sensor pressed against the board read a degree or two high?
+- [x] Self-heating from the board's regulator and radio
+- [ ] The BME280 is faulty
+- [ ] The antenna is fitted
+> Move it onto a short lead in free air.
+
+? What is the maximum comfortable I2C lead length from the lesson?
+- [x] Under about 30cm
+- [ ] About 30 metres
+- [ ] Any length
+> I2C is designed for centimetres, not metres.
+
+? Which I2C address pair can a BME280 use?
+- [x] 0x76 or 0x77
+- [ ] 0x29 or 0x40
+- [ ] 0x50 or 0x51
+> The SDO pin selects between them.
+
+{% endquiz %}

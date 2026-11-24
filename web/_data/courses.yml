@@ -506,11 +506,9 @@
   description: Part 2 of the MeshCore series. Build the other two node types - a room
     server that stores messages for people who were out of range, and a sensor node
     that reports temperature, battery and tank levels across kilometres.
-  duration: 1h 37m
+  duration: 2h 11m
   groups:
   - electronics
-  - lora
-  - meshcore
   lessons: 17
   level: intermediate
   link: /learn/meshcore_rooms_sensors/00_intro.html

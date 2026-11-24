@@ -10,7 +10,9 @@ next: 05_room_server_config.html
 description: Load room server firmware, set the UK radio settings, and confirm first
   boot
 percent: 25
-duration: 4
+duration: 7
+quiz_total: 53
+date_updated: 2026-11-24
 navigation:
 - name: MeshCore Room Servers and Sensors
 - content:
@@ -63,6 +65,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to flash room server firmware, check the radio settings match your mesh, and set the clock.
+
 This will feel familiar - it is the same flasher and the same process you used in part one, with a different firmware variant selected.
 
 ---
@@ -82,7 +86,7 @@ This will feel familiar - it is the same flasher and the same process you used i
 2. Open [flasher.meshcore.io](https://flasher.meshcore.io)
 3. Select your board: **Heltec V3**
 4. Select the firmware variant: **Room Server**
-5. Select the region preset: **EU/UK (Narrow)** - the same one your repeater and client are on
+5. Select the region preset your part one mesh uses (for the UK that was **EU/UK (Narrow)**; wording may differ between flasher versions)
 6. Click **Flash** and choose the serial port
 7. Wait for the reboot
 
@@ -100,7 +104,7 @@ get role
 get radio
 ```
 
-You should see a firmware version, a role of room server, and your radio parameters. Check them against the rest of your mesh:
+You should see a firmware version, a role of room server, and your radio parameters. Check them against the rest of your mesh. These are the UK values from part one; if your mesh uses different numbers, match your mesh instead:
 
 | Setting | Expected |
 |---|---|
@@ -147,13 +151,13 @@ Set the clock. It takes five seconds and saves an evening.
 get tx
 ```
 
-A room server is fixed and mains powered, so there is no reason to be shy:
+A room server is fixed and mains powered, so power use is not a worry, but stay within your legal limit. For a room that only serves a village, a moderate value is plenty:
 
 ```text
 set tx 20
 ```
 
-The valid range is 1 to 22 dBm, and the Heltec V3 tops out around 21 (Heltec quote 21 ±1 dBm).
+The setting accepts 1 to 22 dBm, and the board's real output may be a little lower at the top end. Your country sets the legal limit (in the UK and EU the 868MHz sub-band you use has its own power and duty-cycle limits), so check the rules before you go to full power, and use less if it is not needed.
 
 ---
 
@@ -162,6 +166,25 @@ The valid range is 1 to 22 dBm, and the Heltec V3 tops out around 21 (Heltec quo
 The OLED on a room server will show its name, uptime, and packet counters, much like the repeater. It will not show posts - the room's contents live in memory and are served over the radio, not displayed.
 
 If the screen is blank but the board is warm, the flash probably failed partway. Flash it again; nothing is harmed by reflashing.
+
+---
+
+## The flashing flow
+
+```mermaid
+flowchart TD
+  A[Fit antenna] --> B[Plug in with a data cable]
+  B --> C[Open the flasher in Chrome or Edge]
+  C --> D[Pick board and Room Server firmware]
+  D --> E[Pick the radio preset]
+  E --> F[Flash and reboot]
+  F --> G{get radio matches the mesh?}
+  G -- no --> H[set radio and reboot]
+  G -- yes --> I[clock sync, then get tx]
+  H --> I
+```
+
+> **Teachers**: Flashing needs Chrome or Edge on a computer where learners may use WebUSB or Web Serial, which some school-managed machines block. Test one machine first. Label each board before flashing, and keep the antenna fitted whenever a board is powered.
 
 ---
 
@@ -175,22 +198,43 @@ If the screen is blank but the board is warm, the flash probably failed partway.
 
 ## Common Issues
 
-**Problem**: There is no Room Server variant listed for my board.
+- **Problem**: There is no Room Server variant listed for my board.
+- **Solution**: Check you selected the right board, and check the firmware version. If your hardware genuinely has no room server build, you will need to build it yourself from the MeshCore repository.
+- **Why**: Firmware variants are compiled per board. Not every supported board gets every role in the prebuilt list.
 
-**Solution**: Check you selected the right board, and check the firmware version. If your hardware genuinely has no room server build, you will need to build it yourself from the MeshCore repository.
+- **Problem**: The console connects but every command returns nothing.
+- **Solution**: Check the baud rate is 115200, and press enter on a blank line first.
+- **Why**: Some terminals need a newline to wake the prompt, and any other baud rate turns the reply into noise.
 
-**Why**: Firmware variants are compiled per board. Not every supported board gets every role in the prebuilt list.
+- **Problem**: The board gets hot or the radio seems dead after power-up.
+- **Solution**: Unplug it, fit the antenna, and check the antenna connector is seated.
+- **Why**: A LoRa radio transmitting with no antenna can be damaged, so the antenna always goes on first.
 
-**Problem**: The console connects but every command returns nothing.
-
-**Solution**: Check the baud rate is 115200, and press enter on a blank line first.
-
-**Why**: Some terminals need a newline to wake the prompt, and any other baud rate turns the reply into noise.
-
-**Problem**: `set freq` is rejected over the air.
-
-**Solution**: Set frequency from the USB serial console instead.
-
-**Why**: Frequency is serial-only for setting on some builds - deliberately, because changing it remotely instantly disconnects you from the node you are configuring.
+- **Problem**: `set freq` is rejected over the air.
+- **Solution**: Set frequency from the USB serial console instead.
+- **Why**: Frequency is serial-only for setting on some builds - deliberately, because changing it remotely instantly disconnects you from the node you are configuring.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why must the room server's radio settings match the rest of your mesh?
+- [x] Otherwise it is invisible to the other nodes
+- [ ] Otherwise the OLED turns off
+- [ ] Otherwise it uses more power
+> Mismatched frequency, bandwidth or spreading factor means nobody hears it.
+
+? Why does the clock matter more on a room server than a repeater?
+- [x] Sync points for catching up are based on timestamps
+- [ ] The OLED shows the time
+- [ ] Passwords expire
+> A badly wrong clock delivers the wrong posts, or none.
+
+? Which console command sets the transmit power in dBm?
+- [x] set tx
+- [ ] set power
+- [ ] set radio.tx
+> `get tx` and `set tx` accept 1 to 22 dBm, within your legal limit.
+
+{% endquiz %}

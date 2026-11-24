@@ -10,7 +10,9 @@ next: 06_joining_a_room.html
 description: Name, location, admin and guest passwords, read-only access and advert
   intervals
 percent: 30
-duration: 6
+duration: 7
+quiz_total: 53
+date_updated: 2026-11-24
 navigation:
 - name: MeshCore Room Servers and Sensors
 - content:
@@ -63,6 +65,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to name a room server, replace both default passwords, and choose between private and read-only public access.
+
 The board is flashed and on the right frequency. Now we give it an identity and lock it down, because the passwords it shipped with are printed in the public documentation.
 
 ---
@@ -70,12 +74,12 @@ The board is flashed and on the right frequency. Now we give it an identity and 
 ## Step 1 - name it
 
 ```text
-set name Liverpool-Makers-Room
+set name Village-Noticeboard
 ```
 
-**Why this matters:** the name is what your group looks for in their contacts list. Make it obvious what the room is *for*. `Kev-Room-01` tells nobody anything; `Village-Noticeboard` tells them everything.
+**Why this matters:** the name is what your group looks for in their contacts list. Make it obvious what the room is *for*. `Room-01` tells nobody anything; `Village-Noticeboard` tells them everything.
 
-Names can run to roughly 24 to 32 bytes depending on the field, so keep it reasonably short - and remember it goes out over the air on every advert.
+The official CLI reference says advertised names can use up to 23 bytes when a location is included and 31 bytes otherwise, and some characters take more than one byte. Keep it short, and remember it goes out over the air on every advert.
 
 ---
 
@@ -87,7 +91,7 @@ Names can run to roughly 24 to 32 bytes depending on the field, so keep it reaso
 password <your-new-admin-password>
 ```
 
-The factory default is `password`. It is documented publicly, which means every MeshCore user in the world already knows it. Until you change it, anyone in radio range can log in as admin and reconfigure your node.
+The factory default is `password`. It is in the public FAQ, which means every MeshCore user in the world can look it up. Until you change it, anyone in radio range can log in as admin and reconfigure your node.
 
 Write the new one down somewhere you will still have it in a year.
 
@@ -99,7 +103,7 @@ Write the new one down somewhere you will still have it in a year.
 set guest.password <your-group-password>
 ```
 
-The factory default is `hello`, and it is equally public.
+The FAQ gives `hello` as the default (the CLI reference lists it as blank, so builds differ), and either way it is public.
 
 **How to think about this password:** it is the one you actually hand out. It is what a member of your group types once to join the room. Pick something memorable and speakable - people will be reading it to each other. `hedgehog-fields` is a better group password than `Xk9$2p`.
 
@@ -130,8 +134,8 @@ With this on, anyone can read the room's posts without a password. They still ne
 ## Step 5 - set the location
 
 ```text
-set lat 53.4084
-set lon -2.9916
+set lat <your-latitude>
+set lon <your-longitude>
 ```
 
 Same guidance as the repeater in part one: use your own coordinates, and round to three decimal places (roughly 100 metres) if you would rather not publish your exact address.
@@ -141,8 +145,10 @@ Same guidance as the repeater in part one: use your own coordinates, and round t
 ## Step 6 - set the owner info
 
 ```text
-set owner.info Kev - kevsrobots.com
+set owner.info <your name or club> - <contact>
 ```
+
+This setting needs firmware 1.12 or newer.
 
 **Why this matters:** if your room server ever misbehaves, floods, or needs turning off, this is how somebody finds you. It is a small courtesy that makes you a good neighbour on a shared mesh.
 
@@ -204,8 +210,24 @@ Take a screenshot or copy the output somewhere. When something goes odd in three
 | `set owner.info <text>` | Who to contact | Pipe becomes newline |
 | `set advert.interval <mins>` | Local advert | 60 to 240 |
 | `set flood.advert.interval <hrs>` | Mesh-wide advert | 3 to 168 |
-| `set repeat on/off` | Also act as a repeater | Default on - see lesson 8 |
+| `set repeat on/off` | Also act as a repeater | CLI default on, but room firmware sets it off and may reject it - see lesson 8 |
 {:class="table table-single"}
+
+---
+
+## Who gets in with what
+
+```mermaid
+flowchart TD
+  A[Login with a password] --> B{Which password?}
+  B -- admin password --> C[Admin: everything]
+  B -- guest password --> D[Read-write: read and post]
+  B -- none or wrong --> E{allow.read.only on?}
+  E -- yes --> F[Guest: read only]
+  E -- no --> G[No reply, login times out]
+```
+
+> **Teachers**: Never publish a school's exact coordinates on an open mesh. Round the latitude and longitude to three decimal places or leave them out, and do not put pupils' names in `owner.info`. Keep the admin password with the teacher and the guest password on a card for the group.
 
 ---
 
@@ -219,22 +241,39 @@ Take a screenshot or copy the output somewhere. When something goes odd in three
 
 ## Common Issues
 
-**Problem**: I changed the admin password and now I cannot get in.
+- **Problem**: I changed the admin password and now I cannot get in.
+- **Solution**: Connect over USB serial and run `password <new-password>` again.
+- **Why**: The serial console is always trusted - the password only ever gates access over the air. Physical access is always the way back in.
 
-**Solution**: Connect over USB serial and run `password <new-password>` again.
+- **Problem**: `set guest.password` returns an error.
+- **Solution**: Check you are on room server firmware, not repeater firmware.
+- **Why**: A guest password only exists on roles that have guests. A repeater has no concept of one.
 
-**Why**: The serial console is always trusted - the password only ever gates access over the air. Physical access is always the way back in.
-
-**Problem**: `set guest.password` returns an error.
-
-**Solution**: Check you are on room server firmware, not repeater firmware.
-
-**Why**: A guest password only exists on roles that have guests. A repeater has no concept of one.
-
-**Problem**: My group can read the room but cannot post.
-
-**Solution**: They have joined as read-only guests. Give them the guest password.
-
-**Why**: With `allow.read.only on`, joining without a password succeeds and grants read access only. It looks like a working join right up until they try to say something.
+- **Problem**: My group can read the room but cannot post.
+- **Solution**: They have joined as read-only guests. Give them the guest password.
+- **Why**: With `allow.read.only on`, joining without a password succeeds and grants read access only. It looks like a working join right up until they try to say something.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? How do you regain admin access if you forget the admin password?
+- [x] Connect over USB serial and set a new one with `password`
+- [ ] Wait an hour
+- [ ] Ask someone nearby to guess it
+> The serial console is always trusted; the password only gates access over the air.
+
+? What does `set allow.read.only on` allow?
+- [x] Reading posts without a password
+- [ ] Posting without a password
+- [ ] Admin access for everyone
+> Posting still needs the guest password.
+
+? Which setting controls how often a room server floods an advert across the mesh?
+- [x] flood.advert.interval, in hours
+- [ ] advert.interval, in minutes
+- [ ] set repeat
+> `flood.advert.interval` accepts 3 to 168 hours; twelve is plenty for a fixed node.
+
+{% endquiz %}

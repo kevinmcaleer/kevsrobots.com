@@ -4,11 +4,14 @@ description: Power, placement, the repeat question, and keeping a room alive lon
 type: page
 layout: lesson
 cover: /learn/meshcore_rooms_sensors/assets/banners/08_room_operations.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to power and place a room server so it keeps its posts, and monitor its uptime.
 
 A room server is infrastructure. Once your group depends on it, the interesting problems stop being about firmware and start being about electricity.
 
@@ -24,7 +27,7 @@ A repeater that reboots comes back in seconds and nobody notices. A room server 
 
 ### Ranking the power options
 
-**Best: mains USB with a battery backup.** A 5V mains charger for normal running, plus a LiPo on the SH1.25 connector as a fallback. The board runs from USB, charges the cell, and rides through a cut without dropping.
+**Best: mains USB with a battery backup.** A 5V mains charger for normal running, plus a LiPo on the board's battery connector as a fallback. **Check the connector polarity against the markings on the board before you plug a cell in**: matching plugs from different suppliers can be wired the opposite way round, which can destroy the board and the cell. Use only a single-cell LiPo with a built-in protection circuit, never puncture or crush it, and do not leave it charging unattended or in a sealed hot box. The board runs from USB, charges the cell, and rides through a cut without dropping.
 
 **Good: mains USB alone.** Simple and reliable, right up until the power goes off.
 
@@ -34,7 +37,7 @@ A repeater that reboots comes back in seconds and nobody notices. A room server 
 
 ### Sizing a backup cell
 
-A Heltec V3 is not a low-power board. Heltec quote around **90mA** with the radio receiving, and **200 to 230mA** while transmitting depending on power level. A 2000mAh LiPo therefore gives you roughly **20 hours** of standalone running - enough to ride out a typical power cut, but not a long outage.
+A Heltec V3 is not a low-power board: its ESP32-S3 and radio draw tens to hundreds of milliamps (see Heltec's datasheet for exact figures). Divide the cell's capacity by the average current to estimate the runtime. At an average of 100mA, a 2000mAh LiPo gives you roughly 20 hours, which is enough for a typical power cut but not a long outage. Measure your own board rather than trusting this sum.
 
 If you need days rather than hours, the answer is different hardware: a Heltec T114 on nRF52840 draws a fraction of this.
 
@@ -50,37 +53,37 @@ A room server has an easier life than a repeater, because it does not need to re
 
 **Do not:** put it in a metal cabinet, behind a fridge, or wedged next to a WiFi router. And keep the antenna vertical - horizontal costs you range for free.
 
-**A useful trick:** if you already have a repeater at a good site, put the room server next to it on the same power supply. The two boards together cost £30, use one socket, and give you a room that reaches everyone the repeater reaches.
+**A useful trick:** if you already have a repeater at a good site, put the room server next to it on the same power supply. The two boards use one socket and give you a room that reaches everyone the repeater reaches.
 
 ---
 
 ## The repeat question
 
-A room server *can* also forward packets. The setting is:
+On some firmware versions a room server can also forward packets. The CLI has:
 
 ```text
 get repeat
 set repeat off
 ```
 
-**Room server firmware ships with forwarding off**, so a fresh room server is not repeating unless you turned it on. Check anyway - it takes a second and it is worth knowing.
+The room server source sets forwarding off by default, and recent builds may answer `set repeat on` with an error saying it is deprecated, so a fresh room server is usually not repeating. Check anyway, because versions differ.
 
 **The case for leaving repeat on:** one board, one socket, two jobs. Tempting when you have one good site.
 
 **The case against - and it is the stronger one:**
 
-- The official guidance is to run a room server with repeat off and use a separate board for repeating, because a room server with repeat on lacks the full set of repeater and remote administration features
+- The official FAQ says room server repeating is not recommended or encouraged, and advises running a repeater and a room server on separate devices
 - Two jobs on one board means one failure takes out both
 - A room server's RAM is holding your posts. Anything that increases the chance of a reset is working against you
 - Repeating adds transmit load, which adds heat and current draw
 
-**The recommendation:** if the room matters, `set repeat off` and spend another £15 on a dedicated repeater. If you are experimenting, leave it on and see how you get on.
+**The recommendation:** if the room matters, keep repeat off and add a dedicated repeater board. If you are experimenting, leave it on and see how you get on.
 
 ---
 
 ## Monitoring it
 
-Log in over the mesh from your phone occasionally and run:
+Connect over USB serial occasionally and run the statistics commands (the CLI reference lists `stats-core`, `stats-radio` and `stats-packets` as serial only):
 
 ```text
 stats-core
@@ -121,6 +124,23 @@ People are entirely fine with limitations they know about. What annoys them is a
 
 ---
 
+## Choosing a power setup
+
+```mermaid
+flowchart TD
+  A[Room server power] --> B{Mains available?}
+  B -- no --> C[Use a repeater site with solar, or reconsider]
+  B -- yes --> D{Power cuts a worry?}
+  D -- no --> E[Mains USB charger]
+  D -- yes --> F[Mains USB plus protected LiPo]
+  E --> G[Check uptime weekly]
+  F --> G
+```
+
+> **Teachers**: Charged LiPo cells are a fire risk if damaged or short-circuited. Store them in a metal tin or fireproof bag, never charge unattended, and inspect them for swelling before each lesson. Do not leave a room server on a school socket without the site manager agreeing, and note that an unattended mains device may need a PAT-tested charger.
+
+---
+
 ## Try it Yourself
 
 1. Run `stats-core` and note the uptime. Check again in a week - has it kept counting?
@@ -131,22 +151,43 @@ People are entirely fine with limitations they know about. What annoys them is a
 
 ## Common Issues
 
-**Problem**: The room empties itself every few days.
+- **Problem**: The room empties itself every few days.
+- **Solution**: Check `stats-core` uptime, then suspect the power supply - especially if it is a USB power bank.
+- **Why**: Many power banks auto-shutdown below a current threshold, and an idle room server draws very little. The board reboots, RAM clears, posts are gone.
 
-**Solution**: Check `stats-core` uptime, then suspect the power supply - especially if it is a USB power bank.
+- **Problem**: My room server is also repeating and I want to stop it.
+- **Solution**: `set repeat off`, then confirm with `get repeat`.
+- **Why**: Forwarding is normally off on room server firmware, so if it is repeating, a different build or a setting change turned it on.
 
-**Why**: Many power banks auto-shutdown below a current threshold, and an idle room server draws very little. The board reboots, RAM clears, posts are gone.
+- **Problem**: The battery is hot, swollen or the board smells of burning.
+- **Solution**: Unplug everything, move it somewhere non-flammable such as outside on stone, and do not use that cell again.
+- **Why**: A damaged or reverse-connected LiPo can overheat and catch fire.
 
-**Problem**: My room server is also repeating and I want to stop it.
-
-**Solution**: `set repeat off`, then confirm with `get repeat`.
-
-**Why**: Forwarding is off by default on room server firmware, so if it is repeating, somebody enabled it - possibly you, experimenting.
-
-**Problem**: People near the repeater can use the room but people at the edge cannot.
-
-**Solution**: Move the room server to the repeater's site, or add a repeater between the room and the people who cannot reach it.
-
-**Why**: Room traffic is point to point, so a client needs a working path to the server specifically. Being able to hear a repeater is not the same as being able to reach the room through it.
+- **Problem**: People near the repeater can use the room but people at the edge cannot.
+- **Solution**: Move the room server to the repeater's site, or add a repeater between the room and the people who cannot reach it.
+- **Why**: Room traffic is point to point, so a client needs a working path to the server specifically. Being able to hear a repeater is not the same as being able to reach the room through it.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why can a USB power bank cause a room server to lose its posts?
+- [x] It can shut off when the load is low, rebooting the board and clearing RAM
+- [ ] It makes the radio transmit too loudly
+- [ ] It changes the radio frequency
+> An idle room server draws little, so some power banks switch off.
+
+? What should you check before plugging a LiPo into the board connector?
+- [x] The polarity against the board's markings
+- [ ] The colour of the wires only
+- [ ] The cell's price
+> Connectors that look identical can be wired in reverse.
+
+? Which command do you use to read uptime, and over which connection?
+- [x] stats-core over USB serial
+- [ ] get uptime over the air
+- [ ] advert
+> The CLI reference marks stats-core as serial only.
+
+{% endquiz %}
