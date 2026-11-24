@@ -3,54 +3,59 @@ layout: lesson
 title: Getting Rviz2 and RQT to work in docker
 type: page
 description: Let's learn how to redirect our X11 Display
-cover: /learn/learn_ros/assets/x11cover.jpg
+date_updated: 2026-11-24
+cover: /learn/learn_ros/assets/banners/14_docker_x11.jpg
 ---
 
-![Cover Photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-To get the ROS visualisation tool `rviz2` to work in our docker container we need to redirect any graphics calls to outside our container into the hosts's X11 environment.
+By the end of this lesson you will be able to explain how a program in a container can draw a window on the Pi's desktop, and set up `xhost` and `DISPLAY` to make it happen.
+
+To use the ROS visualisation tool `rviz2` from inside our Docker container, we need to send its graphics out of the container and onto the Pi's screen.
 
 ## What is X11
 
-`X11` is a software package developed by the Massachusetts Institute of Technology (MIT) in the 1980s that enables graphical user interfaces (GUIs) to be created and used on Unix-based systems.
-It works by using a network protocol called the X Window System Protocol to communicate between the server and the client.
-The **X server** runs on the computer with the screen, keyboard and mouse, and draws everything. The **clients** are the applications, such as RViz2, which send drawing commands to the server.
-Because it's a network protocol, an application running in one place (like our Docker container) can draw windows on a screen somewhere else (like the Raspberry Pi desktop).
+`X11` is the window system developed at MIT in the 1980s that most Linux desktops have used to draw windows. It splits the work in two. The **X server** runs on the computer with the screen, keyboard and mouse, and draws everything. The **clients** are applications, such as RViz2, which send drawing commands to the server.
 
-X11 is the traditional display system on Linux, and X servers are available for macOS and Windows too. (Newer Raspberry Pi OS releases use Wayland, but still run X11 applications through XWayland.)
+Because it's a network protocol, a client in one place (our Docker container) can draw windows on a server somewhere else (the Raspberry Pi desktop). (Newer Raspberry Pi OS releases use Wayland, but still run X11 applications through a compatibility layer called XWayland.)
 
-![X11 example desktop](assets/x11.jpg){:class="img-fluid w-100"}
+```mermaid
+sequenceDiagram
+    participant R as RViz2 (in container)
+    participant X as X server (Pi desktop)
+    R->>X: draw window / points / lines
+    X-->>R: mouse and keyboard events
+```
 
 ---
 
 ## Redirecting the X11 Display to the host
 
-To redirect any X11 display commands from within the docker container running ROS2, to outside the container (our Raspberry Pi 4 OS), we need to do two things:
+To send the display out of the container we do two things:
 
-1. Use `xhost` to enable other processes to access the X11 server (this isn't exactly secure, but for now it works)
-1. `export` the `DISPLAY` environment variable - this will complete the plumbing so we can run [RViz2](/resources/glossary#rviz2).
+1. Use `xhost` to let programs in the container use the Pi's X server. (This isn't very secure, but for a learning Pi on your own desk it works.)
+1. Pass the `DISPLAY` environment variable into the container, so it knows *which* screen to draw on, then run [RViz2](/resources/glossary#rviz2).
 
-* **xhost** - from the raspberry pi terminal type:
+* **Allow the container** - from a terminal on the Pi's desktop, type:
 
 ```bash
-xhost local:root
+xhost +local:root
 ```
 
-* **Add display to docker-compose.yml** - Edit the docker-compose.yml file to include the lines:
+It should reply `non-network local connections being added to access control list`. This lets local programs running as `root` (which our container does) use your screen.
+
+* **Add the display to docker-compose.yml** - edit the file in `~/cubie-1/docker` so the service includes:
 
 ```yaml
-environment:
-  - DISPLAY
+    environment:
+      - DISPLAY
 ```
 
-*We also add `network_mode: host` so the container shares the Pi's network, which ROS 2 needs to find nodes running outside the container.*
-
-The full docker-compose.yml file should now look like this:
+The full file should now look like this (change `/home/kev` to your own home folder):
 
 ```yaml
-version: "3.9"
 services:
   ros2:
     build: .
@@ -65,18 +70,70 @@ services:
       - DISPLAY
 ```
 
+`network_mode: host` was already there. As well as helping ROS 2 find nodes outside the container, it lets the container reach the Pi's X server. `- DISPLAY` with no value means "copy the `DISPLAY` variable from my shell".
+
 ---
 
-## Bring up the new docker-container
+## Bring up the new container
 
-Now that we have updated our docker-compose file we need to bring the new container online; docker-compose has a simple command for this called `up`:
-
-* **docker compose up -d** - from the Raspberry Pi's terminal, in the folder where the updated docker-compose.yml is, type:
+A running container doesn't pick up changes to the compose file, so we recreate it:
 
 ```bash
 docker compose up -d
 ```
 
-**Note** the `-d` parameter means run the container detached (in the background). If you don't include it, all the container output will display on this terminal, and the container will stop when the terminal session ends.
+*The `-d` means run detached (in the background). Without it, the container's output fills this terminal, and the container stops when you close it.*
+
+Before moving on, check the display is set in the terminal you start Docker from:
+
+```bash
+echo $DISPLAY
+```
+
+On the Pi's own desktop this prints something like `:0`.
+
+> **Teachers**: `xhost +local:root` lets any local program running as root draw on the learner's screen, and the `docker` group is already powerful, so treat this as a classroom-only setup. Turn it off afterwards with `xhost -local:root`. Learners connected by SSH will need a monitor on the Pi, or screen sharing, to see RViz2.
 
 ---
+
+## Try it Yourself
+
+1. Run `docker compose exec ros2 bash` and then `echo $DISPLAY` inside the container. Does it match the Pi?
+2. Run `xhost` on its own on the Pi to list what is allowed to connect.
+3. Challenge: remove access with `xhost -local:root`, and describe what you'd expect to happen when RViz2 starts. Then switch it back on.
+
+## Common Issues
+
+- **Problem**: `echo $DISPLAY` prints nothing when I'm connected over SSH.
+- **Solution**: Run Docker from a terminal on the Pi's desktop, or set `export DISPLAY=:0` first, then run `docker compose up -d` again.
+- **Why**: SSH sessions have no screen of their own, so there's no `DISPLAY` to pass to the container.
+
+- **Problem**: RViz2 says `could not connect to display`.
+- **Solution**: Run `xhost +local:root` again on the Pi, and check the container was recreated after you edited the compose file.
+- **Why**: The permission resets when the Pi restarts, and an old container still has the old settings.
+
+- **Problem**: The container won't start after editing the YAML.
+- **Solution**: Check the indentation; YAML uses spaces only, and `environment` must line up with `build`.
+- **Why**: YAML structure is defined by indentation.
+
+## Check your understanding
+
+{% quiz %}
+? In X11, which program draws the windows on screen?
+- [ ] The client (RViz2)
+- [x] The X server, running on the computer with the screen
+- [ ] Docker
+> Clients send drawing commands, and the server does the drawing.
+
+? What does `xhost +local:root` do?
+- [x] Allows local programs running as root, such as our container, to use the Pi's display
+- [ ] Installs RViz2
+- [ ] Opens the LiDAR port
+> It's quick but not very secure, so only use it on a Pi you control.
+
+? Why do we pass `DISPLAY` into the container?
+- [ ] To make ROS faster
+- [x] So programs inside know which screen to draw on
+- [ ] To connect to Wi-Fi
+> `DISPLAY` names the X server and screen, for example `:0`.
+{% endquiz %}
