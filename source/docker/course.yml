@@ -5,10 +5,24 @@
   level: beginner
   layout: course
   cover: assets/docker.jpg
-  description: >- 
-    Learn how to use Docker to build and deploy applications in a containerised environment.
+  description: >-
+    Learn how to use Docker on a Raspberry Pi or Linux PC. Build a robot status web app, package it in an image, then run it with Redis, a network and a volume using Docker Compose.
   groups:
-    - docker
+    - raspberrypi
+    - python
+  outcomes:
+    - Explain the difference between an image and a container
+    - Install Docker Engine and the Compose plugin on Raspberry Pi OS
+    - Write a Dockerfile and build your own image
+    - Debug a container using its logs and a shell
+    - Connect containers with ports and networks, and keep data in volumes
+    - Run a multi-container app with a Compose file
+  prerequisites:
+    - Introduction to the Linux Command Line on Raspberry Pi OS
+  you_need:
+    - A Raspberry Pi 4 or 5 running Raspberry Pi OS (64-bit), or a Linux PC
+    - An internet connection
+    - A web browser on any computer on the same network
   content:
   - section:
       name: Overview
