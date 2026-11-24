@@ -2820,15 +2820,16 @@
     "author": "Kevin McAleer",
     "date_published": "2025-05-20",
     "groups": [
-      "robotics",
+      "robots",
       "micropython",
-      "raspberry pi"
+      "raspberrypi",
+      "pico"
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/micropython_robotics/01_intro.html"
+        "url": "/learn/micropython_robotics/00_intro.html"
       },
       {
         "file": "02_dc_motors.md",

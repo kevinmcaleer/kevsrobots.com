@@ -10,15 +10,16 @@ next: 04_line_following.html
 description: Understand how H-bridge motor drivers like the L298N control motor direction
   and speed for two-wheeled robots.
 percent: 24
-duration: 3
-date_updated: 2025-05-10
+duration: 7
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico
 - content:
   - section: Introduction
     content:
     - name: Introduction to MicroPython Robotics Projects
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Motors and Movement
     content:
     - name: Controlling DC Motors with the Raspberry Pi Pico
@@ -49,11 +50,11 @@ navigation:
       link: 10_autonomous_robot.html
   - section: Final Project
     content:
-    - name: "Final Project \u2013 Build Your Own Robot"
+    - name: Final Project - Build Your Own Robot
       link: 11_final_project.html
   - section: Summary
     content:
-    - name: "Course Summary and What\u2019s Next"
+    - name: Course Summary and What's Next
       link: 12_summary.html
 ---
 
@@ -62,144 +63,190 @@ navigation:
 
 ---
 
-An **H-bridge** is a circuit that lets you control the direction of a DC motor by switching the current flow. It’s essential for robotics because it allows you to drive motors forward and backward with just a few control signals.
+By the end of this lesson you will be able to explain how an H-bridge reverses a motor, and drive two motors together with a reusable `robot.py` module that gives you `forward()`, `backward()` and spin turns.
 
----
+An **H-bridge** is a circuit that lets current flow through a motor in either direction. Without one, you would have to swap the motor wires by hand to reverse it. With one, a couple of control pins do it for you.
 
-## How the H-Bridge Works
+## How the H-bridge works
 
-The H-bridge gets its name from the circuit diagram, which looks like an “H” made of transistors or switches.
+The name comes from the shape of the circuit: four switches arranged like the letter H, with the motor as the crossbar.
 
 {% include gallery.html titles="H Bridge" images="assets/hbridge.jpg" descriptions="The S1 - S4 in this diagram are Transistors that act like switches. The motors are controlled by these switches." noborder=true cols=2 %}
 
----
+Close the top-left and bottom-right switches and current runs left to right through the motor. Close the other diagonal pair and it runs right to left, so the motor reverses. The L298N has these switches built in, and you control them with IN1 and IN2 (and IN3 and IN4 for the second motor). Here is the truth table from the L298 datasheet, in terms of our pins:
 
-It allows current to flow in either direction through the motor:
+| ENA | IN1 | IN2 | Motor does |
+|-----|-----|-----|------------|
+| high (PWM) | high | low | Spins one way |
+| high (PWM) | low | high | Spins the other way |
+| high | low | low | Brakes (both sides pulled to ground) |
+| high | high | high | Brakes (both sides pulled high) |
+| low | any | any | Free running, it coasts to a stop |
+{:class="table table-single"}
 
-- IN1 high, IN2 low → forward
-- IN1 low, IN2 high → backward
-- IN1 and IN2 same → brake/stop
+So PWM on the enable pin switches the whole bridge on and off quickly, which sets the speed. In our code, "stop" sets duty to 0, so the motor coasts.
 
-When paired with **PWM on the enable pin**, you can also control the **speed** of the motor.
-
----
-
-## Wiring Two Motors with L298N
+## Wiring two motors
 
 {% include gallery.html titles="L298N Motor Driver" images="assets/l298n.png" descriptions="Works with up to 12v for powerful motors." cols=2 %}
 
----
+The L298N has two H-bridges, one for each motor. Keep motor A wiring from lesson 2 and add motor B:
 
-The L298N has two H-bridges inside — perfect for controlling two motors independently. Here’s a typical wiring setup:
+| L298N | Pico pin | Physical pin |
+|-------|----------|--------------|
+| IN1 | GP0 | 1 |
+| IN2 | GP1 | 2 |
+| ENA | GP2 | 4 |
+| IN3 | GP3 | 5 |
+| IN4 | GP4 | 6 |
+| ENB | GP5 | 7 |
+| GND | GND | 3 |
+{:class="table table-single"}
 
-- **Motor A**
-  - GP0 → IN1  
-  - GP1 → IN2  
-  - GP2 (PWM) → ENA  
-
-- **Motor B**
-  - GP3 → IN3  
-  - GP4 → IN4  
-  - GP5 (PWM) → ENB  
-
-`GP` pins are the GPIO pins on the Pico.
+Remove the jumper from ENB as well as ENA. Motor A is the robot's left motor, motor B its right.
 
 {% include gallery.html images="assets/pico_pinouts.jpg" titles="Raspberry Pi Pico Pinouts" descriptions="Each of the green edge connectors are referred to as GPIO or General Purpose Input Output pins. The black are the common ground pins." cols=2 %}
 
----
+## A reusable robot module
 
-> Don't forget: Pico GND must connect to L298N GND.
+Two motors with four direction functions each gets messy fast. So let's wrap the details in a small module, `robot.py`, and from now on every lesson just says `bot.forward()`.
 
----
-
-## Writing the Code
-
-Here’s a MicroPython script for controlling both motors:
+Create a new file on the Pico called `robot.py` (in Thonny, File, Save as, choose Raspberry Pi Pico) and paste this in:
 
 ```python
+# robot.py - two-motor drive for an L298N
 from machine import Pin, PWM
-from time import sleep
 
-# Motor A
-in1 = Pin(0, Pin.OUT)
-in2 = Pin(1, Pin.OUT)
-ena = PWM(Pin(2))
-ena.freq(1000)
+MAX_DUTY = 65535
 
-# Motor B
-in3 = Pin(3, Pin.OUT)
-in4 = Pin(4, Pin.OUT)
-enb = PWM(Pin(5))
-enb.freq(1000)
 
-def motor_a_forward(speed=50000):
-    in1.high()
-    in2.low()
-    ena.duty_u16(speed)
+class Motor:
+    """One L298N channel: two direction pins and a PWM enable pin."""
 
-def motor_a_backward(speed=50000):
-    in1.low()
-    in2.high()
-    ena.duty_u16(speed)
+    def __init__(self, in_a, in_b, enable, invert=False):
+        self.in_a = Pin(in_a, Pin.OUT)
+        self.in_b = Pin(in_b, Pin.OUT)
+        self.enable = PWM(Pin(enable))
+        self.enable.freq(1000)
+        self.invert = invert
+        self.stop()
 
-def motor_b_forward(speed=50000):
-    in3.high()
-    in4.low()
-    enb.duty_u16(speed)
+    def run(self, speed):
+        """speed runs from -100 (full reverse) to 100 (full forward)."""
+        speed = max(-100, min(100, speed))
+        if self.invert:
+            speed = -speed
+        self.in_a.value(1 if speed > 0 else 0)
+        self.in_b.value(1 if speed < 0 else 0)
+        self.enable.duty_u16(abs(speed) * MAX_DUTY // 100)
 
-def motor_b_backward(speed=50000):
-    in3.low()
-    in4.high()
-    enb.duty_u16(speed)
+    def stop(self):
+        self.in_a.value(0)
+        self.in_b.value(0)
+        self.enable.duty_u16(0)
 
-def stop_motors():
-    in1.low()
-    in2.low()
-    in3.low()
-    in4.low()
-    ena.duty_u16(0)
-    enb.duty_u16(0)
 
-# Test
-motor_a_forward()
-motor_b_forward()
-sleep(2)
+class Robot:
+    """Left motor on GP0, GP1, GP2. Right motor on GP3, GP4, GP5."""
 
-motor_a_backward()
-motor_b_backward()
-sleep(2)
+    def __init__(self, invert_left=False, invert_right=False):
+        self.left = Motor(0, 1, 2, invert_left)
+        self.right = Motor(3, 4, 5, invert_right)
 
-stop_motors()
+    def drive(self, left_speed, right_speed):
+        self.left.run(left_speed)
+        self.right.run(right_speed)
+
+    def forward(self, speed=70):
+        self.drive(speed, speed)
+
+    def backward(self, speed=70):
+        self.drive(-speed, -speed)
+
+    def spin_left(self, speed=70):
+        self.drive(-speed, speed)
+
+    def spin_right(self, speed=70):
+        self.drive(speed, -speed)
+
+    def stop(self):
+        self.left.stop()
+        self.right.stop()
 ```
 
----
+The speed maths is one line: `abs(speed) * 65535 // 100`. For a speed of 70 that is 70 x 65535 / 100 = 45874 (the `//` throws away the fraction). The sign of the speed picks the direction, so the same number does both jobs.
 
-## Why This Matters
+Now a short test. Save this as `main.py` or run it from Thonny, with the robot lifted off the table so the wheels can spin freely:
 
-With two motors under your control, you can:
+```python
+from time import sleep
+from robot import Robot
 
-- Drive forward/backward
+bot = Robot()
 
-- Turn left/right
+bot.forward()
+sleep(1.5)
+bot.backward()
+sleep(1.5)
+bot.spin_left()
+sleep(1)
+bot.spin_right()
+sleep(1)
+bot.stop()
+print("Done")
+```
 
-- Rotate on the spot (tank steering)
+```mermaid
+flowchart TD
+    M["main.py: bot.forward()"] --> R["robot.py: Robot.drive(70, 70)"]
+    R --> L["Motor.run(70) for each side"]
+    L --> P["IN pins set direction, ENA and ENB get PWM"]
+    P --> D["L298N switches battery current to the motors"]
+```
 
-This forms the basic movement logic for most two-wheeled robots.
+**Why spinning works:** a two-wheeled robot turns when its wheels go at different speeds. If the left wheel runs backwards and the right runs forwards, the robot spins on the spot. This "tank steering" is the basis of every lesson from here on.
 
----
+> If a wheel turns the wrong way, do not rewire anything: make the robot with `Robot(invert_left=True)` (or `invert_right`).
 
-## Try It Yourself
+## Common Issues
 
-Try setting different speeds for left and right motors.
+- **Problem**: `ImportError: no module named 'robot'`.
+- **Solution**: Check `robot.py` is saved on the Pico itself (not your computer) and that the file name is exactly lowercase `robot.py`.
+- **Why**: MicroPython can only import files that live on the board's own storage.
 
-- Create a function to “spin in place.”
+- **Problem**: The robot spins when you ask it to go forward.
+- **Solution**: One motor is wired the opposite way. Use `Robot(invert_left=True)` or `invert_right=True` to flip it.
+- **Why**: Motors mounted facing opposite directions need opposite polarity to turn the wheels the same way.
 
-- Add buttons to manually control each motor.
+- **Problem**: One motor runs and the other stays silent.
+- **Solution**: Check the ENB jumper is removed and that GP3, GP4 and GP5 go to IN3, IN4 and ENB.
+- **Why**: Each motor has its own set of three signals, and one loose wire silences it.
 
----
+## Try it Yourself
 
-You’re now ready to add some intelligence to your robot!
+1. Add a `turn_left()` method that runs the left motor at half the speed of the right, so the robot curves instead of spinning.
+2. Change the default speed to 50 and find the slowest speed at which both wheels turn.
+3. Write a loop that drives a square: forward for one second, spin for the time it takes to turn 90 degrees, four times.
+4. Challenge: add a `speed` argument that slowly ramps up, so the robot does not jerk off the line.
 
-Next up: [Line Following with IR Sensors](04_line_following)
+## Check your understanding
 
----
+{% quiz %}
+? What does the H-bridge let a controller do?
+- [ ] Make a motor run faster than its rating
+- [x] Reverse the direction of current through a motor using control pins
+- [ ] Measure the motor's speed
+> Switching which diagonal pair of transistors is closed reverses the current, and the motor.
+
+? With the enable pin high and both IN1 and IN2 low, what does the L298N do?
+- [ ] Spins forward
+- [ ] Spins backward
+- [x] Brakes the motor
+> The truth table in the lesson shows equal inputs with the enable high pull both motor wires to the same level, which stops the motor quickly.
+
+? How does a two-wheeled robot spin on the spot?
+- [x] One wheel goes forward and the other goes backward
+- [ ] Both wheels go forward at the same speed
+- [ ] Both wheels stop
+> Opposite wheel directions turn the chassis around its centre, which is what `spin_left()` does.
+{% endquiz %}

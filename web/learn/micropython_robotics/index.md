@@ -10,17 +10,37 @@ description: Learn how to build simple yet powerful robots using the Raspberry P
   robots.  Perfect for makers ready to go beyond GPIO and start building real-world
   robotics projects.
 level: intermediate
-course_duration: 0h 27m
+course_duration: 1h 14m
 lesson_count: 12
-first_lesson: 01_intro.html
-video: ZuX45_rid68
+first_lesson: 00_intro.html
+quiz_total: 36
+video: 6YqzOQ7OZkQ
+outcomes:
+- Drive two DC motors forwards, backwards and at different speeds with an L298N driver
+  and PWM
+- Read an infrared line sensor and an HC-SR04 ultrasonic sensor, and turn the readings
+  into decisions
+- Aim an SG90 servo by working out the pulse width for any angle
+- Control the robot from a phone over Bluetooth (HC-05) or Wi-Fi (Pico W)
+- Combine motors and sensors into an autonomous robot that avoids obstacles and follows
+  a line
+prerequisites:
+- Learn MicroPython - The basics
+- Raspberry Pi Pico with MicroPython - GPIO Mastery
+you_need:
+- A Raspberry Pi Pico or Pico W (a Pico W for the Wi-Fi lesson) running MicroPython
+- An L298N motor driver module and two small DC gear motors with wheels
+- An HC-SR04 ultrasonic sensor, one or two TCRT5000 style IR line sensors and an SG90
+  servo
+- A battery pack for the motors, jumper wires and resistors (1k and 2k ohm)
+- Optional, an HC-05 Bluetooth module
 navigation:
 - name: MicroPython Robotics Projects with the Raspberry Pi Pico
 - content:
   - section: Introduction
     content:
     - name: Introduction to MicroPython Robotics Projects
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Motors and Movement
     content:
     - name: Controlling DC Motors with the Raspberry Pi Pico
@@ -51,10 +71,10 @@ navigation:
       link: 10_autonomous_robot.html
   - section: Final Project
     content:
-    - name: "Final Project \u2013 Build Your Own Robot"
+    - name: Final Project - Build Your Own Robot
       link: 11_final_project.html
   - section: Summary
     content:
-    - name: "Course Summary and What\u2019s Next"
+    - name: Course Summary and What's Next
       link: 12_summary.html
 ---
