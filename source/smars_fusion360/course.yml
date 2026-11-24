@@ -6,9 +6,22 @@
   layout: course
   cover: assets/smars_fusion360.png
   groups:
-      - smars
-      - robotics
-      - fusion 360
+      - 3ddesign
+      - 3dprinting
+      - robots
+  outcomes:
+    - Sketch a dimensioned rectangle and turn it into a solid with Extrude
+    - Hollow a block with Shell and round its edges with Fillet
+    - Cut openings, side shapes, holes and slots through a body with Extrude set to Cut
+    - Mirror a feature to the other side of a part
+    - Explain why printed parts need wall thickness, rounded edges and clearance holes
+  prerequisites:
+    - None, no CAD experience needed
+    - Helpful but not required, Build a SMARS robot
+  you_need:
+    - A computer that can run Autodesk Fusion (the free personal-use licence is fine)
+    - A mouse with a scroll wheel, which makes orbiting and zooming easier
+    - A 3D printer is optional, only to print the finished design
   description: >-
      Design the SMARS robot chassis in Fusion 360, step by step. In Part 1 you sketch
      and extrude the base, shell it, shape the classic SMARS sides and cut the wheel
