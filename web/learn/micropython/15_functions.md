@@ -3,7 +3,7 @@ layout: lesson
 title: Functions
 author: Kevin McAleer
 type: page
-cover: /learn/micropython/assets/micropython.jpg
+cover: /learn/micropython/assets/banners/15_functions.jpg
 date: 2022-12-04
 previous: 14_operators.html
 next: 16_repl.html
@@ -67,6 +67,10 @@ navigation:
       link: 18_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Photo of a laptop and notepad on a desk](assets//functions.jpg){:.cover}
 

@@ -1,0 +1,1359 @@
+# Written by scripts/course_quality.py --write. Do not edit by hand.
+arduino_to_python:
+  areas:
+    accuracy: 15
+    content: 12.0
+    interactive: 12.0
+    objectives: 2.6
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 11.0
+  band: B
+  gaps:
+  - 'no quiz in 11 of 11 lessons: 01_why_micropython.md, 02_syntax_basics.md, 03_control_flow.md, 04_functions.md, 05_pin_control.md, 06_analog_pwm.md, 07_timing.md, 08_serial_basics.md, 09_iot_project.md, 10_robot_project.md, 11_next_steps.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 10 lessons: 02_syntax_basics.md, 03_control_flow.md, 04_functions.md, 05_pin_control.md, 06_analog_pwm.md, 07_timing.md, 08_serial_basics.md, 09_iot_project.md, 10_robot_project.md, 11_next_steps.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 11 lessons
+  - Common Issues in only 0 of 11 lessons
+  score: 68
+arduino_uno_q:
+  areas:
+    accuracy: 15
+    content: 19.0
+    interactive: 19.2
+    objectives: 7.2
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 15
+  band: A
+  gaps:
+  - 'no opening objective in 11 lessons: 01_two_brains_one_board.md, 02_first_boot_app_lab_and_wifi.md, 03_your_first_app.md, 06_how_the_bridge_works.md, 07_python_calls_the_sketch.md, 08_the_sketch_calls_python.md, 09_when_the_bridge_goes_wrong.md, 10_linux_survival_kit.md, 12_bricks_camera_and_ai.md, 15_the_chess_camera.md, 16_summary.md'
+  - no Teachers note in the intro
+  score: 90
+bettercad:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 3.2
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: B
+  gaps:
+  - no video
+  - no outcomes in course.yml
+  - 'no opening objective in 10 lessons: 02_extrude_and_fillet.md, 03_export_your_first_print.md, 04_sketching_with_constraints.md, 06_push_pull_and_shapes.md, 07_combining_parts_and_holes.md, 08_fillets_chamfers_and_shells.md, 09_the_timeline_and_parameters.md, 10_saving_sharing_and_printing.md, 11_project_phone_stand.md, 12_summary.md'
+  - no Teachers note in the intro
+  score: 73
+bettercad_joints_urdf:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 14.9
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: B
+  gaps:
+  - no video
+  - no outcomes in course.yml
+  - 'no opening objective in 13 lessons: 01_components_and_the_assemble_tab.md, 02_your_first_joint.md, 03_posing_a_joint.md, 04_a_second_joint.md, 05_joint_kinds_and_line_up.md, 06_named_poses.md, 07_drag_the_arm_by_its_tip.md, 08_mass_and_balance.md, 09_checking_for_clashes.md, 10_sweeps_and_joint_limits.md, 11_drive_links.md, 12_exporting_urdf.md, 13_summary.md'
+  - no Teachers note in the intro
+  score: 66
+bettercad_printing:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: B
+  gaps:
+  - no video
+  - no outcomes in course.yml
+  - 'no opening objective in 11 lessons: 01_set_up_your_printer.md, 02_overhangs_and_supports.md, 03_thin_walls.md, 04_choosing_an_orientation.md, 05_holes_that_fit.md, 06_fits_between_parts.md, 07_where_parts_meet.md, 08_material_and_weight.md, 09_exporting_for_your_slicer.md, 10_project_box_with_a_lid.md, 11_summary.md'
+  - no Teachers note in the intro
+  score: 72
+bettercad_robot_parts:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 17.7
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: B
+  gaps:
+  - no video
+  - no outcomes in course.yml
+  - 'no opening objective in 13 lessons: 01_reference_bodies.md, 02_the_robot_parts_catalogue.md, 03_measure_before_you_trust.md, 04_cutting_a_pocket.md, 05_standoffs_for_a_board.md, 06_horn_mounts.md, 07_your_first_gear.md, 08_bores_hubs_and_small_gears.md, 09_meshing_gears.md, 10_racks_pulleys_and_belts.md, 11_from_mesh_to_editable_part.md, 12_project_geared_servo_deck.md, 13_summary.md'
+  - no Teachers note in the intro
+  score: 69
+bottango:
+  areas:
+    accuracy: 15
+    content: 16.4
+    interactive: 3.7
+    objectives: 2.7
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 10 of 10 lessons: 01_install.md, 02_setup_board.md, 03_wiring.md, 04_configure_bottango.md, 05_create_motion.md, 06_triggers.md, 07_sync_music.md, 08_arduino_mode.md, 09_use_with_gamepad.md, 10_summary.md'
+  - 'no Try it Yourself in 6 lessons: 01_install.md, 02_setup_board.md, 03_wiring.md, 04_configure_bottango.md, 08_arduino_mode.md, 10_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 9 lessons: 01_install.md, 02_setup_board.md, 04_configure_bottango.md, 05_create_motion.md, 06_triggers.md, 07_sync_music.md, 08_arduino_mode.md, 09_use_with_gamepad.md, 10_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 9 lessons
+  score: 53
+brachiograph:
+  areas:
+    accuracy: 14
+    content: 20.0
+    interactive: 6.4
+    objectives: 5.1
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 12.0
+  band: B
+  gaps:
+  - 'no quiz in 7 of 7 lessons: 01_build.md, 02_wire.md, 03_setup_pi.md, 04_code.md, 05_draw.md, 06_vectorize.md, 07_summary.md'
+  - 'no Try it Yourself in 6 lessons: 01_build.md, 02_wire.md, 03_setup_pi.md, 05_draw.md, 06_vectorize.md, 07_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 4 lessons: 01_build.md, 05_draw.md, 06_vectorize.md, 07_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 4 lessons
+  - 'dated commands or versions: pi 3'
+  score: 71
+burgerbot:
+  areas:
+    accuracy: 15
+    content: 17.9
+    interactive: 16.3
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 15
+  band: A
+  gaps:
+  - 'no quiz in 4 of 11 lessons: 02_assembly.md, 04_loading_the_code.md, 08_line_following.md, 09_camera.md'
+  - 'no Try it Yourself in 6 lessons: 01_what_is_burger_bot.md, 02_assembly.md, 03_getting_the_code.md, 04_loading_the_code.md, 08_line_following.md, 09_camera.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 11 lessons: 01_what_is_burger_bot.md, 02_assembly.md, 03_getting_the_code.md, 04_loading_the_code.md, 05_basic_movement.md, 06_measuring_distance.md, 07_object_avoidance.md, 08_pen.md, 08_line_following.md, 08_line_following_code.md, 09_camera.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 6 lessons
+  - Common Issues in only 4 of 11 lessons
+  score: 81
+c_pico:
+  areas:
+    accuracy: 15
+    content: 10.8
+    interactive: 3.0
+    objectives: 3.4
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 9 of 9 lessons: 02_what_is_c.md, 03_variables_and_types.md, 04_conditionals_and_loops.md, 05_functions.md, 06_setting_up_toolchain.md, 07_first_program.md, 08_gpio_basics.md, 09_blinking_led.md, 10_summary.md'
+  - 'no Try it Yourself in 9 lessons: 02_what_is_c.md, 03_variables_and_types.md, 04_conditionals_and_loops.md, 05_functions.md, 06_setting_up_toolchain.md, 07_first_program.md, 08_gpio_basics.md, 09_blinking_led.md, 10_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 6 lessons: 02_what_is_c.md, 04_conditionals_and_loops.md, 05_functions.md, 06_setting_up_toolchain.md, 07_first_program.md, 10_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 9 lessons
+  - Common Issues in only 0 of 9 lessons
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 46
+cvzone:
+  areas:
+    accuracy: 15
+    content: 13.4
+    interactive: 20
+    objectives: 4.9
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 13.0
+  band: A
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 3 lessons: 03_hand.md, 04_posture.md, 05_advanced.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 4 lessons
+  - Common Issues in only 1 of 5 lessons
+  score: 81
+docker:
+  areas:
+    accuracy: 12
+    content: 10.6
+    interactive: 2.7
+    objectives: 1.4
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: D
+  gaps:
+  - no video
+  - 'no quiz in 10 of 10 lessons: 01_what-is-docker.md, 02_installing-docker.md, 03_basics.md, 04_building.md, 05_managing.md, 06_networking.md, 07_volumes.md, 08_docker-compose.md, 09_dockerise.md, 10_conclusion.md'
+  - 'no Try it Yourself in 9 lessons: 01_what-is-docker.md, 02_installing-docker.md, 03_basics.md, 04_building.md, 05_managing.md, 06_networking.md, 07_volumes.md, 08_docker-compose.md, 10_conclusion.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 8 lessons: 02_installing-docker.md, 03_basics.md, 05_managing.md, 06_networking.md, 07_volumes.md, 08_docker-compose.md, 09_dockerise.md, 10_conclusion.md'
+  - no Teachers note in the intro
+  - '1 lessons under 120 words: 00_intro.md'
+  - no picture or diagram in 10 lessons
+  - Common Issues in only 2 of 10 lessons
+  - 'dated commands or versions: docker-compose, sudo pip, version: ''3'
+  score: 42
+docker_swarm:
+  areas:
+    accuracy: 13
+    content: 13.4
+    interactive: 4.0
+    objectives: 2.5
+    pathway: 5
+    style: 10.0
+    teachers: 4.0
+    video: 10.5
+  band: C
+  gaps:
+  - 'no quiz in 15 of 15 lessons: 01_planning-the-cluster.md, 02_cloning-raspberry-pi-os.md, 03_initializing-docker-swarm.md, 04_adding-worker-nodes.md, 05_verifying-cluster-setup.md, 06_docker-compose-and-swarm-stacks.md, 07_writing-a-docker-compose-file.md, 08_deploying-a-stack.md, 09_managing-and-scaling-services.md, 09_rebalancing.md, 10_monitoring-tools.md, 11_cluster-maintenance.md, 12_backup-and-recovery.md, 13_project-ideas.md, 14_further-resources.md'
+  - 'no Try it Yourself in 14 lessons: 01_planning-the-cluster.md, 02_cloning-raspberry-pi-os.md, 03_initializing-docker-swarm.md, 04_adding-worker-nodes.md, 05_verifying-cluster-setup.md, 06_docker-compose-and-swarm-stacks.md, 07_writing-a-docker-compose-file.md, 08_deploying-a-stack.md, 09_managing-and-scaling-services.md, 09_rebalancing.md, 10_monitoring-tools.md, 11_cluster-maintenance.md, 12_backup-and-recovery.md, 14_further-resources.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 14 lessons: 02_cloning-raspberry-pi-os.md, 03_initializing-docker-swarm.md, 04_adding-worker-nodes.md, 05_verifying-cluster-setup.md, 06_docker-compose-and-swarm-stacks.md, 07_writing-a-docker-compose-file.md, 08_deploying-a-stack.md, 09_managing-and-scaling-services.md, 09_rebalancing.md, 10_monitoring-tools.md, 11_cluster-maintenance.md, 12_backup-and-recovery.md, 13_project-ideas.md, 14_further-resources.md'
+  - no picture or diagram in 14 lessons
+  - Common Issues in only 4 of 15 lessons
+  - 'dated commands or versions: docker-compose, version: ''3'
+  score: 62
+duckdb:
+  areas:
+    accuracy: 14
+    content: 14.4
+    interactive: 7.5
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 13 of 13 lessons: quickstart.md, troubleshooting.md, 01_installing.md, 02_basic_queries.md, 03_advanced_features.md, 04_python_integration.md, 05_data_analysis.md, 06_datalakes.md, 07_parquet.md, 08_performance_tuning.md, 09_conclusion.md, 10_additional_resources.md, 11_mini_capstone.md'
+  - 'no Try it Yourself in 10 lessons: quickstart.md, troubleshooting.md, 01_installing.md, 03_advanced_features.md, 04_python_integration.md, 06_datalakes.md, 08_performance_tuning.md, 09_conclusion.md, 10_additional_resources.md, 11_mini_capstone.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 13 lessons: quickstart.md, troubleshooting.md, 01_installing.md, 02_basic_queries.md, 03_advanced_features.md, 04_python_integration.md, 05_data_analysis.md, 06_datalakes.md, 07_parquet.md, 08_performance_tuning.md, 09_conclusion.md, 10_additional_resources.md, 11_mini_capstone.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 11 lessons
+  - 'dated commands or versions: stretch'
+  score: 52
+electronics_basics:
+  areas:
+    accuracy: 15
+    content: 16.0
+    interactive: 12.0
+    objectives: 9.3
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: B
+  gaps:
+  - no video
+  - 'no quiz in 15 of 15 lessons: 01_voltage_current_resistance.md, 02_ohms_law.md, 03_the_breadboard.md, 04_first_circuit_led_and_resistor.md, 05_multimeter_measuring_voltage.md, 06_multimeter_current_and_resistance.md, 07_series_and_parallel.md, 08_voltage_dividers.md, 09_reading_datasheets.md, 10_switches_and_pull_resistors.md, 11_transistors_as_switches.md, 12_powering_your_projects.md, 13_connecting_to_the_pico.md, 14_project_night_light.md, 15_summary.md'
+  - 'no opening objective in 6 lessons: 02_ohms_law.md, 07_series_and_parallel.md, 08_voltage_dividers.md, 11_transistors_as_switches.md, 14_project_night_light.md, 15_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 15 lessons
+  score: 67
+eye_mechanism:
+  areas:
+    accuracy: 15
+    content: 15.0
+    interactive: 11.4
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 11.4
+  band: B
+  gaps:
+  - 'no quiz in 5 of 9 lessons: 01_create_component.md, 02_create_sketch.md, 04_create_hinges.md, 06_lower_eyelid_sketch.md, 07_create_lower_sketch.md'
+  - 'no Try it Yourself in 8 lessons: 01_create_component.md, 02_create_sketch.md, 03_revolve.md, 04_create_hinges.md, 05_hinge.md, 06_lower_eyelid_sketch.md, 07_create_lower_sketch.md, 08_hinge.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 9 lessons: 01_create_component.md, 02_create_sketch.md, 03_revolve.md, 04_create_hinges.md, 05_hinge.md, 06_lower_eyelid_sketch.md, 07_create_lower_sketch.md, 08_hinge.md, 09_joint_and_export.md'
+  - no Teachers note in the intro
+  - Common Issues in only 0 of 9 lessons
+  score: 70
+fastapi:
+  areas:
+    accuracy: 14
+    content: 12.6
+    interactive: 7.1
+    objectives: 0.0
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 8 of 8 lessons: 02_setting_up_the_environment.md, 03_fastapi_intro.md, 04_user_authentication_flow.md, 05_creating_user_models.md, 06_implementing_registration_and_login.md, 07_user_management_apis.md, 08_integrating_with_jekyll.md, 09_deploying_the_solution.md'
+  - 'no Try it Yourself in 7 lessons: 02_setting_up_the_environment.md, 03_fastapi_intro.md, 04_user_authentication_flow.md, 05_creating_user_models.md, 06_implementing_registration_and_login.md, 07_user_management_apis.md, 08_integrating_with_jekyll.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 8 lessons: 02_setting_up_the_environment.md, 03_fastapi_intro.md, 04_user_authentication_flow.md, 05_creating_user_models.md, 06_implementing_registration_and_login.md, 07_user_management_apis.md, 08_integrating_with_jekyll.md, 09_deploying_the_solution.md'
+  - no Teachers note in the intro
+  - Common Issues in only 0 of 8 lessons
+  - 'dated commands or versions: python 3.7'
+  - first lesson is 01_course_overview.md, not 00_intro.md
+  score: 48
+freecad:
+  areas:
+    accuracy: 15
+    content: 13.8
+    interactive: 9.0
+    objectives: 1.4
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 13.4
+  band: B
+  gaps:
+  - 'no quiz in 10 of 10 lessons: 02_installing_freecad.md, 03_user_interface_overview.md, 04_creating_basic_shapes.md, 05_modifying_objects.md, 06_boolean_operations.md, 07_assembly_design.md, 08_creating_drawings.md, 09_exporting_models.md, 10_practical_examples.md, 11_tips_and_tricks.md'
+  - 'no Try it Yourself in 4 lessons: 02_installing_freecad.md, 03_user_interface_overview.md, 06_boolean_operations.md, 11_tips_and_tricks.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 8 lessons: 02_installing_freecad.md, 03_user_interface_overview.md, 06_boolean_operations.md, 07_assembly_design.md, 08_creating_drawings.md, 09_exporting_models.md, 10_practical_examples.md, 11_tips_and_tricks.md'
+  - no Teachers note in the intro
+  - Common Issues in only 2 of 10 lessons
+  - first lesson is 01_introduction_to_freecad.md, not 00_intro.md
+  score: 67
+freecad_smars:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 12.0
+    objectives: 7
+    pathway: 5
+    style: 9.0
+    teachers: 3.0
+    video: 11.2
+  band: A
+  gaps:
+  - 'no quiz in 10 of 10 lessons: 01_navigation.md, 02_creating_the_base.md, 03_shell_and_fillet.md, 04_sides_and_holes.md, 05_front_rear_profiles.md, 06_arduino_slots.md, 07_wheel_stubs.md, 08_motor_holder.md, 09_save_as_stl.md, 10_summary.md'
+  - no outcomes in course.yml
+  - 12 unstyled tables
+  score: 82
+git:
+  areas:
+    accuracy: 15
+    content: 18.5
+    interactive: 20
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: B
+  gaps:
+  - no video
+  - no outcomes in course.yml
+  - 'no opening objective in 13 lessons: 01_what-is-git.md, 02_installing-git.md, 03_your-first-repository.md, 04_staging-and-committing.md, 05_viewing-history.md, 06_undoing-changes.md, 07_ignoring-files.md, 08_branches.md, 09_merging-and-conflicts.md, 10_github-and-remotes.md, 11_pulling-and-collaborating.md, 12_project-version-control-a-robot.md, 13_cheat-sheet-and-next-steps.md'
+  - no Teachers note in the intro
+  score: 70
+gymnasium:
+  areas:
+    accuracy: 15
+    content: 16.0
+    interactive: 12.0
+    objectives: 3.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 14 of 14 lessons: 01_from_handbuilt_to_standard.md, 02_first_environment.md, 03_terminated_vs_truncated.md, 04_spaces.md, 05_qlearning_on_gymnasium.md, 06_seeding_and_lifecycle.md, 07_anatomy_of_custom_env.md, 08_wrapping_the_burgerbot.md, 09_registering_and_rendering.md, 10_wrappers.md, 11_vectorized_envs.md, 12_meet_stable_baselines3.md, 13_train_evaluate_export.md, 14_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 12 lessons: 02_first_environment.md, 03_terminated_vs_truncated.md, 04_spaces.md, 05_qlearning_on_gymnasium.md, 06_seeding_and_lifecycle.md, 07_anatomy_of_custom_env.md, 08_wrapping_the_burgerbot.md, 09_registering_and_rendering.md, 10_wrappers.md, 11_vectorized_envs.md, 12_meet_stable_baselines3.md, 14_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 14 lessons
+  score: 61
+how_to_install_micropython:
+  areas:
+    accuracy: 15
+    content: 6.3
+    interactive: 1.0
+    objectives: 2.4
+    pathway: 5
+    style: 8.0
+    teachers: 0.0
+    video: 0.0
+  band: D
+  gaps:
+  - no video
+  - 'no quiz in 3 of 3 lessons: 02_types.md, 03_install.md, 04_next_steps.md'
+  - 'no Try it Yourself in 3 lessons: 02_types.md, 03_install.md, 04_next_steps.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 2 lessons: 03_install.md, 04_next_steps.md'
+  - no Teachers note in the intro
+  - '1 lessons under 120 words: 04_next_steps.md'
+  - no picture or diagram in 2 lessons
+  - Common Issues in only 0 of 3 lessons
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 38
+i2c_spi:
+  areas:
+    accuracy: 14
+    content: 15.0
+    interactive: 12.0
+    objectives: 7
+    pathway: 5
+    style: 10.0
+    teachers: 1.0
+    video: 10.7
+  band: B
+  gaps:
+  - 'no quiz in 12 of 12 lessons: 01_what-is-i2c.md, 02_i2c-hardware-setup.md, 03_scanning-i2c-devices.md, 04_reading-i2c-sensor.md, 05_demystifying-datasheets.md, 06_bme280-deep-dive.md, 07_what-is-spi.md, 08_spi-hardware-setup.md, 09_spi-sensor-example.md, 10_i2c-vs-spi.md, 11_common-issues.md, 12_final-project.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 12 lessons
+  - 'dated commands or versions: import urequests'
+  score: 75
+intermediate_micropython:
+  areas:
+    accuracy: 14
+    content: 14.5
+    interactive: 6.0
+    objectives: 1.5
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 15 of 15 lessons: 02_oop.md, 02a_classes.md, 03_abstraction.md, 04_inheritance.md, 05_encapsulation.md, 06_polymorphism.md, 06a_decorators.md, 07_modules.md, 08_packages.md, 09_pypi.md, 10_docstrings.md, 11_interrupts.md, 12_timers.md, 13_mp_remote.md, 14_summary.md'
+  - 'no Try it Yourself in 15 lessons: 02_oop.md, 02a_classes.md, 03_abstraction.md, 04_inheritance.md, 05_encapsulation.md, 06_polymorphism.md, 06a_decorators.md, 07_modules.md, 08_packages.md, 09_pypi.md, 10_docstrings.md, 11_interrupts.md, 12_timers.md, 13_mp_remote.md, 14_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 14 lessons: 02_oop.md, 03_abstraction.md, 04_inheritance.md, 05_encapsulation.md, 06_polymorphism.md, 06a_decorators.md, 07_modules.md, 08_packages.md, 09_pypi.md, 10_docstrings.md, 11_interrupts.md, 12_timers.md, 13_mp_remote.md, 14_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 8 lessons
+  - Common Issues in only 0 of 15 lessons
+  - 'dated commands or versions: import urequests'
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 50
+jekyll:
+  areas:
+    accuracy: 15
+    content: 9.9
+    interactive: 2.6
+    objectives: 5
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 7 of 7 lessons: 02_install.md, 03_content.md, 04_customizing.md, 05_advanced.md, 06_deploy.md, 07_realworld.md, 08_bonus.md'
+  - 'no Try it Yourself in 7 lessons: 02_install.md, 03_content.md, 04_customizing.md, 05_advanced.md, 06_deploy.md, 07_realworld.md, 08_bonus.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 7 lessons
+  - Common Issues in only 1 of 7 lessons
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 46
+k3s:
+  areas:
+    accuracy: 15
+    content: 11.7
+    interactive: 3.5
+    objectives: 3.9
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 17 of 17 lessons: 02_hardware_requirements.md, 03_os_installation.md, 04_cluster_networking.md, 05_installing_k3s.md, 06_adding_nodes.md, 07_troubleshooting_install.md, 08_kubectl_basics.md, 09_dashboard_and_monitoring.md, 10_storage_and_volumes.md, 11_ingress_and_services.md, 12_deploying_apps.md, 13_using_helm.md, 14_ci_cd_on_k3s.md, 15_custom_cni.md, 16_securing_your_cluster.md, 17_final_project.md, 18_summary.md'
+  - 'no Try it Yourself in 16 lessons: 02_hardware_requirements.md, 03_os_installation.md, 04_cluster_networking.md, 05_installing_k3s.md, 06_adding_nodes.md, 07_troubleshooting_install.md, 08_kubectl_basics.md, 09_dashboard_and_monitoring.md, 10_storage_and_volumes.md, 11_ingress_and_services.md, 12_deploying_apps.md, 13_using_helm.md, 14_ci_cd_on_k3s.md, 15_custom_cni.md, 16_securing_your_cluster.md, 18_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 10 lessons: 02_hardware_requirements.md, 07_troubleshooting_install.md, 08_kubectl_basics.md, 09_dashboard_and_monitoring.md, 10_storage_and_volumes.md, 11_ingress_and_services.md, 13_using_helm.md, 16_securing_your_cluster.md, 17_final_project.md, 18_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 17 lessons
+  - Common Issues in only 3 of 17 lessons
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 48
+learn_ros:
+  areas:
+    accuracy: 12
+    content: 13.6
+    interactive: 5.7
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 15
+  band: C
+  gaps:
+  - 'no quiz in 13 of 19 lessons: 02_pi_setup.md, 03_install_updates.md, 05_get_cubie.md, 06_clone_images.md, 08_vscode_setup.md, 09_first_ros_program.md, 11_create_py_package.md, 12_create_publisher.md, 14_docker_x11.md, 15_rviz.md, 16_rviz_displays.md, 17_tf2.md, 19_summary.md'
+  - 'no Try it Yourself in 19 lessons: 01_what_is_ros.md, 02_pi_setup.md, 03_install_updates.md, 04_docker_install.md, 05_get_cubie.md, 06_clone_images.md, 07_build_container.md, 08_vscode_setup.md, 09_first_ros_program.md, 10_listener.md, 11_create_py_package.md, 12_create_publisher.md, 13_create_subscriber.md, 14_docker_x11.md, 15_rviz.md, 16_rviz_displays.md, 17_tf2.md, 18_laserscan.md, 19_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 19 lessons: 01_what_is_ros.md, 02_pi_setup.md, 03_install_updates.md, 04_docker_install.md, 05_get_cubie.md, 06_clone_images.md, 07_build_container.md, 08_vscode_setup.md, 09_first_ros_program.md, 10_listener.md, 11_create_py_package.md, 12_create_publisher.md, 13_create_subscriber.md, 14_docker_x11.md, 15_rviz.md, 16_rviz_displays.md, 17_tf2.md, 18_laserscan.md, 19_summary.md'
+  - no Teachers note in the intro
+  - '2 lessons under 120 words: 03_install_updates.md, 05_get_cubie.md'
+  - Common Issues in only 0 of 19 lessons
+  - 'dated commands or versions: docker-compose, foxy, version: "3'
+  score: 63
+learning_platform:
+  areas:
+    accuracy: 13
+    content: 2.8
+    interactive: 1.0
+    objectives: 0.0
+    pathway: 2
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: D
+  gaps:
+  - no video
+  - 'no quiz in 3 of 3 lessons: 01_how_to_use.md, 02_navigate_content.md, 03_download_content.md'
+  - 'no Try it Yourself in 3 lessons: 01_how_to_use.md, 02_navigate_content.md, 03_download_content.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 3 lessons: 01_how_to_use.md, 02_navigate_content.md, 03_download_content.md'
+  - no Teachers note in the intro
+  - '3 lessons under 120 words: 00_intro.md, 01_how_to_use.md, 03_download_content.md'
+  - no picture or diagram in 2 lessons
+  - Common Issues in only 0 of 3 lessons
+  - 'placeholder lessons: 03_download_content.md'
+  - not in a learning pathway
+  score: 29
+linux_intro:
+  areas:
+    accuracy: 15
+    content: 9.7
+    interactive: 3.0
+    objectives: 5
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 10.1
+  band: C
+  gaps:
+  - 'no quiz in 20 of 20 lessons: 01a_man.md, 02_basic_navigation.md, 02a_user.md, 03_working_with_files.md, 04_working_with_directories.md, 05_file_permissions.md, 06_installing_software.md, 07_managing_software.md, 08_monitoring_performance.md, 09_managing_processes.md, 10_networking_commands.md, 11_transferring_files.md, 12_intro_scripting.md, 13_basic_scripting_constructs.md, 14_intro_git.md, 15_basic_git_commands.md, 16_final_project_overview.md, 17_final_project_steps.md, 18_resources_next_steps.md, 19_cheatsheet.md'
+  - 'no Try it Yourself in 18 lessons: 02_basic_navigation.md, 03_working_with_files.md, 04_working_with_directories.md, 05_file_permissions.md, 06_installing_software.md, 07_managing_software.md, 08_monitoring_performance.md, 09_managing_processes.md, 10_networking_commands.md, 11_transferring_files.md, 12_intro_scripting.md, 13_basic_scripting_constructs.md, 14_intro_git.md, 15_basic_git_commands.md, 16_final_project_overview.md, 17_final_project_steps.md, 18_resources_next_steps.md, 19_cheatsheet.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 16 lessons
+  - Common Issues in only 2 of 20 lessons
+  - first lesson is 01_intro_terminal.md, not 00_intro.md
+  score: 57
+markdown:
+  areas:
+    accuracy: 15
+    content: 13.0
+    interactive: 9.7
+    objectives: 0.0
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 9 of 9 lessons: 02_markdown_basics.md, 03_setup_environment.md, 04_writing_content_in_markdown.md, 05_working_with_layouts_and_includes.md, 06_managing_static_assets.md, 07_using_liquid_templating.md, 08_customizing_themes_and_plugins.md, 09_building_and_testing_locally.md, 10_deploying_to_github_pages.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 9 lessons: 02_markdown_basics.md, 03_setup_environment.md, 04_writing_content_in_markdown.md, 05_working_with_layouts_and_includes.md, 06_managing_static_assets.md, 07_using_liquid_templating.md, 08_customizing_themes_and_plugins.md, 09_building_and_testing_locally.md, 10_deploying_to_github_pages.md'
+  - no Teachers note in the intro
+  - Common Issues in only 1 of 9 lessons
+  - first lesson is 01_overview.md, not 00_intro.md
+  score: 52
+mermaid:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: B
+  gaps:
+  - no video
+  - no outcomes in course.yml
+  - 'no opening objective in 14 lessons: 01_what-is-mermaid.md, 02_your-first-diagram.md, 03_flowcharts.md, 04_flowcharts-in-depth.md, 05_sequence-diagrams.md, 06_state-diagrams.md, 07_class-diagrams.md, 08_entity-relationship-diagrams.md, 09_gantt-and-timeline.md, 10_more-diagram-types.md, 11_themes-and-styling.md, 12_exporting-and-sharing.md, 13_project-document-a-robot.md, 14_cheat-sheet-and-next-steps.md'
+  - no Teachers note in the intro
+  score: 72
+meshcore:
+  areas:
+    accuracy: 15
+    content: 17.3
+    interactive: 8.8
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 15 of 15 lessons: 01_what_is_meshcore.md, 02_how_lora_works.md, 03_the_hardware.md, 04_antennas_and_the_law.md, 05_flashing.md, 06_radio_settings.md, 07_repeater_setup.md, 08_repeater_placement.md, 09_client_setup.md, 10_first_contact.md, 11_channels.md, 12_paths_and_routing.md, 13_remote_admin.md, 14_troubleshooting.md, 15_next_steps.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 15 lessons: 01_what_is_meshcore.md, 02_how_lora_works.md, 03_the_hardware.md, 04_antennas_and_the_law.md, 05_flashing.md, 06_radio_settings.md, 07_repeater_setup.md, 08_repeater_placement.md, 09_client_setup.md, 10_first_contact.md, 11_channels.md, 12_paths_and_routing.md, 13_remote_admin.md, 14_troubleshooting.md, 15_next_steps.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 10 lessons
+  score: 57
+meshcore_rooms_sensors:
+  areas:
+    accuracy: 15
+    content: 17.2
+    interactive: 9.0
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 16 of 16 lessons: 01_beyond_repeaters.md, 02_hardware.md, 03_what_is_a_room_server.md, 04_flashing_the_room_server.md, 05_room_server_config.md, 06_joining_a_room.md, 07_permissions.md, 08_room_operations.md, 09_what_is_a_sensor_node.md, 10_flashing_the_sensor.md, 11_environment_sensor.md, 12_battery_telemetry.md, 13_contact_and_level.md, 14_reading_telemetry.md, 15_troubleshooting.md, 16_next_steps.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 16 lessons: 01_beyond_repeaters.md, 02_hardware.md, 03_what_is_a_room_server.md, 04_flashing_the_room_server.md, 05_room_server_config.md, 06_joining_a_room.md, 07_permissions.md, 08_room_operations.md, 09_what_is_a_sensor_node.md, 10_flashing_the_sensor.md, 11_environment_sensor.md, 12_battery_telemetry.md, 13_contact_and_level.md, 14_reading_telemetry.md, 15_troubleshooting.md, 16_next_steps.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 11 lessons
+  score: 57
+micropython:
+  areas:
+    accuracy: 15
+    content: 11.7
+    interactive: 6.5
+    objectives: 1.0
+    pathway: 5
+    style: 9.0
+    teachers: 3.0
+    video: 10.2
+  band: C
+  gaps:
+  - 'no quiz in 19 of 19 lessons: 00_videos.md, 01_why_is_it_called_micropython.md, 02_where_to_get_micropython.md, 03_installing_micropython.md, 04_why_use_micropython.md, 05_ides.md, 06_our_first_program.md, 07_hello_world.md, 08_variables.md, 09_example02.md, 10_values_and_variable_types.md, 11_reserved_words.md, 12_if_elif_else.md, 13_loops.md, 14_operators.md, 15_functions.md, 16_repl.md, 17_modules.md, 18_summary.md'
+  - 'no Try it Yourself in 18 lessons: 00_videos.md, 01_why_is_it_called_micropython.md, 02_where_to_get_micropython.md, 03_installing_micropython.md, 04_why_use_micropython.md, 05_ides.md, 06_our_first_program.md, 07_hello_world.md, 08_variables.md, 09_example02.md, 10_values_and_variable_types.md, 11_reserved_words.md, 12_if_elif_else.md, 13_loops.md, 14_operators.md, 16_repl.md, 17_modules.md, 18_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 19 lessons: 00_videos.md, 01_why_is_it_called_micropython.md, 02_where_to_get_micropython.md, 03_installing_micropython.md, 04_why_use_micropython.md, 05_ides.md, 06_our_first_program.md, 07_hello_world.md, 08_variables.md, 09_example02.md, 10_values_and_variable_types.md, 11_reserved_words.md, 12_if_elif_else.md, 13_loops.md, 14_operators.md, 15_functions.md, 16_repl.md, 17_modules.md, 18_summary.md'
+  - '4 lessons under 120 words: 00_videos.md, 04_why_use_micropython.md, 07_hello_world.md, 11_reserved_words.md'
+  - Common Issues in only 0 of 19 lessons
+  score: 61
+micropython_gpio:
+  areas:
+    accuracy: 15
+    content: 13.1
+    interactive: 19.0
+    objectives: 7
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.3
+  band: B
+  gaps:
+  - 'no Try it Yourself in 7 lessons: 03_voltage_levels.md, 05_pwm.md, 10_temperature_sensors.md, 12_i2c.md, 13_spi.md, 16_ground_pins.md, 17_summary.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 16 lessons
+  - Common Issues in only 2 of 17 lessons
+  score: 79
+micropython_robotics:
+  areas:
+    accuracy: 15
+    content: 11.0
+    interactive: 12.0
+    objectives: 4.9
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 7.0
+  band: C
+  gaps:
+  - video is not in the intro
+  - 'no quiz in 11 of 11 lessons: 02_dc_motors.md, 03_hbridge_control.md, 04_line_following.md, 05_ultrasonic_sensor.md, 06_build_robot.md, 07_servo_scanning.md, 08_bluetooth_control.md, 09_wifi_control.md, 10_autonomous_robot.md, 11_final_project.md, 12_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 5 lessons: 03_hbridge_control.md, 05_ultrasonic_sensor.md, 07_servo_scanning.md, 11_final_project.md, 12_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 9 lessons
+  - Common Issues in only 0 of 11 lessons
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 64
+mini_rack:
+  areas:
+    accuracy: 15
+    content: 6.2
+    interactive: 6.0
+    objectives: 0.8
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 11.4
+  band: C
+  gaps:
+  - 'no quiz in 9 of 9 lessons: 01_components.md, 02_2u_design.md, 03_bottom.md, 04_top.md, 05_handle.md, 06_panel.md, 07_pi_tray.md, 08_top_panel.md, 07_print.md'
+  - 'no Try it Yourself in 9 lessons: 01_components.md, 02_2u_design.md, 03_bottom.md, 04_top.md, 05_handle.md, 06_panel.md, 07_pi_tray.md, 08_top_panel.md, 07_print.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 8 lessons: 01_components.md, 03_bottom.md, 04_top.md, 05_handle.md, 06_panel.md, 07_pi_tray.md, 08_top_panel.md, 07_print.md'
+  - no Teachers note in the intro
+  - '3 lessons under 120 words: 01_components.md, 06_panel.md, 07_print.md'
+  - Common Issues in only 0 of 9 lessons
+  score: 54
+mongodb:
+  areas:
+    accuracy: 15
+    content: 16.0
+    interactive: 8.1
+    objectives: 6.2
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 17 of 17 lessons: 01_what_is_a_database.md, 02_documents_and_collections.md, 03_installing_mongodb.md, 04_first_steps_in_mongosh.md, 05_inserting_documents.md, 06_finding_documents.md, 07_query_operators.md, 08_updating_documents.md, 09_deleting_documents.md, 10_nested_documents_and_arrays.md, 11_designing_your_data.md, 12_aggregation_basics.md, 13_indexes.md, 14_python_and_pymongo.md, 15_building_the_parts_bin_app.md, 16_keeping_your_data_safe.md, 17_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 7 lessons: 01_what_is_a_database.md, 02_documents_and_collections.md, 03_installing_mongodb.md, 05_inserting_documents.md, 07_query_operators.md, 09_deleting_documents.md, 17_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 17 lessons
+  score: 60
+motors_and_drivers:
+  areas:
+    accuracy: 15
+    content: 16.0
+    interactive: 12.0
+    objectives: 5.0
+    pathway: 5
+    style: 10.0
+    teachers: 1.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 16 of 16 lessons: 01_how_motors_work.md, 02_why_you_need_a_driver.md, 03_powering_motors.md, 04_the_h_bridge.md, 05_wiring_a_motor_driver.md, 06_speed_with_pwm.md, 07_a_motor_class.md, 08_driving_two_motors.md, 09_ramping_and_braking.md, 10_servo_basics.md, 11_a_servo_class_and_calibration.md, 12_continuous_rotation_servos.md, 13_stepper_motors.md, 14_measuring_speed_with_encoders.md, 15_project_drive_base.md, 16_summary.md'
+  - 'no opening objective in 16 lessons: 01_how_motors_work.md, 02_why_you_need_a_driver.md, 03_powering_motors.md, 04_the_h_bridge.md, 05_wiring_a_motor_driver.md, 06_speed_with_pwm.md, 07_a_motor_class.md, 08_driving_two_motors.md, 09_ramping_and_braking.md, 10_servo_basics.md, 11_a_servo_class_and_calibration.md, 12_continuous_rotation_servos.md, 13_stepper_motors.md, 14_measuring_speed_with_encoders.md, 15_project_drive_base.md, 16_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 16 lessons
+  score: 64
+object_model:
+  areas:
+    accuracy: 14
+    content: 16.0
+    interactive: 12.0
+    objectives: 7
+    pathway: 5
+    style: 10.0
+    teachers: 1.0
+    video: 11.7
+  band: B
+  gaps:
+  - 'no quiz in 8 of 8 lessons: 01_setup.md, 02_dataset_prep.md, 03_training.md, 04_onnx_conversion.md, 05_deployment.md, 06_realtime_detection.md, 07_troubleshooting.md, 08_summary.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 8 lessons
+  - 'dated commands or versions: python 3.8'
+  score: 77
+obsidian:
+  areas:
+    accuracy: 15
+    content: 9.7
+    interactive: 3.7
+    objectives: 2.2
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.8
+  band: C
+  gaps:
+  - 'no quiz in 12 of 12 lessons: 01_installing.md, 02_first_vault.md, 03_creating_notes.md, 04_tagging_notes.md, 05_linking_notes.md, 06_canvas.md, 07_tasks.md, 08_dataview_and_bases.md, 09_properties.md, 12_graph_view.md, 10_markdown_in_obsidian.md, 11_markdown_course_link.md'
+  - 'no Try it Yourself in 11 lessons: 01_installing.md, 02_first_vault.md, 03_creating_notes.md, 04_tagging_notes.md, 05_linking_notes.md, 06_canvas.md, 07_tasks.md, 08_dataview_and_bases.md, 12_graph_view.md, 10_markdown_in_obsidian.md, 11_markdown_course_link.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 10 lessons: 01_installing.md, 03_creating_notes.md, 04_tagging_notes.md, 05_linking_notes.md, 06_canvas.md, 07_tasks.md, 08_dataview_and_bases.md, 09_properties.md, 12_graph_view.md, 10_markdown_in_obsidian.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 11 lessons
+  - Common Issues in only 0 of 12 lessons
+  score: 56
+obsidian_rag:
+  areas:
+    accuracy: 15
+    content: 16.0
+    interactive: 12.0
+    objectives: 2.8
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 19 of 19 lessons: 01_what_is_rag.md, 02_embeddings_and_vectors.md, 03_project_setup.md, 04_meet_chromadb.md, 05_reading_the_vault.md, 06_parsing_notes.md, 07_chunking_notes.md, 08_building_the_index.md, 09_incremental_indexing.md, 10_querying_the_index.md, 11_metadata_filters.md, 12_improving_retrieval.md, 13_generating_answers.md, 14_citations_and_grounding.md, 15_the_cli.md, 16_keeping_it_fresh.md, 17_evaluating_your_rag.md, 18_troubleshooting.md, 19_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 17 lessons: 01_what_is_rag.md, 02_embeddings_and_vectors.md, 04_meet_chromadb.md, 05_reading_the_vault.md, 06_parsing_notes.md, 07_chunking_notes.md, 08_building_the_index.md, 09_incremental_indexing.md, 10_querying_the_index.md, 11_metadata_filters.md, 13_generating_answers.md, 14_citations_and_grounding.md, 15_the_cli.md, 16_keeping_it_fresh.md, 17_evaluating_your_rag.md, 18_troubleshooting.md, 19_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 19 lessons
+  score: 61
+octapi:
+  areas:
+    accuracy: 14
+    content: 5.0
+    interactive: 7.4
+    objectives: 0.0
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: D
+  gaps:
+  - no video
+  - 'no quiz in 6 of 6 lessons: 01_lesson01.md, 02_lesson02.md, 03_lesson03.md, 04_lesson04.md, 05_dispy.md, 06_octapi.md'
+  - 'no Try it Yourself in 5 lessons: 01_lesson01.md, 02_lesson02.md, 03_lesson03.md, 04_lesson04.md, 06_octapi.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 6 lessons: 01_lesson01.md, 02_lesson02.md, 03_lesson03.md, 04_lesson04.md, 05_dispy.md, 06_octapi.md'
+  - no Teachers note in the intro
+  - '2 lessons under 120 words: 03_lesson03.md, 06_octapi.md'
+  - no picture or diagram in 5 lessons
+  - Common Issues in only 0 of 6 lessons
+  - 'dated commands or versions: docker-compose'
+  score: 40
+openclaw_raspberry_pi:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 10
+    pathway: 5
+    style: 10.0
+    teachers: 5
+    video: 11.5
+  band: A
+  gaps: []
+  score: 97
+pandas_and_numpy:
+  areas:
+    accuracy: 15
+    content: 15.5
+    interactive: 15.6
+    objectives: 6
+    pathway: 5
+    style: 9.0
+    teachers: 1.0
+    video: 11.0
+  band: B
+  gaps:
+  - 'no quiz in 1 of 11 lessons: 03_installing.md'
+  - 'no Try it Yourself in 9 lessons: 02_intro.md, 03_installing.md, 04_dataframes.md, 06_import_export.md, 08_analysis.md, 09_advanced.md, 10_visualisation.md, 11_case_studies.md, 12_recap.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 9 lessons
+  - Common Issues in only 1 of 11 lessons
+  - first lesson is 01_overview.md, not 00_intro.md
+  score: 78
+pca9685:
+  areas:
+    accuracy: 15
+    content: 14.7
+    interactive: 11.5
+    objectives: 1.3
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 11.0
+  band: B
+  gaps:
+  - 'no quiz in 11 of 11 lessons: 02_raspberry_pi_setup.md, 03_python_basics_for_robotics.md, 04_introduction_to_pca9685.md, 05_setting_up_the_pca9685_with_raspberry_pi.md, 06_designing_your_robot_arm.md, 07_assembling_the_robot_arm.md, 08_controlling_servos_with_python.md, 09_creating_basic_arm_movements.md, 10_advanced_arm_control_and_automation.md, 11_project_ideas.md, 12_troubleshooting_common_issues.md'
+  - 'no Try it Yourself in 4 lessons: 02_raspberry_pi_setup.md, 04_introduction_to_pca9685.md, 05_setting_up_the_pca9685_with_raspberry_pi.md, 08_controlling_servos_with_python.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 9 lessons: 02_raspberry_pi_setup.md, 03_python_basics_for_robotics.md, 04_introduction_to_pca9685.md, 07_assembling_the_robot_arm.md, 08_controlling_servos_with_python.md, 09_creating_basic_arm_movements.md, 10_advanced_arm_control_and_automation.md, 11_project_ideas.md, 12_troubleshooting_common_issues.md'
+  - no Teachers note in the intro
+  - Common Issues in only 1 of 11 lessons
+  - first lesson is 01_course_introduction.md, not 00_intro.md
+  score: 67
+pico_temp_sensor:
+  areas:
+    accuracy: 15
+    content: 9.1
+    interactive: 6.8
+    objectives: 5
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 11 of 11 lessons: 02_setting_up_thonny.md, 03_installing_micropython_on_pico.md, 04_overview_of_pico_temperature_sensor.md, 05_how_the_temperature_sensor_works.md, 06_reading_temperature_with_adc.md, 07_displaying_temperature_in_thonny_console.md, 08_formatting_temperature_readings.md, 09_converting_adc_to_temperature.md, 10_creating_a_temperature_alert_system.md, 11_project_ideas_and_extensions.md, 12_troubleshooting_temperature_readings.md'
+  - 'no Try it Yourself in 10 lessons: 02_setting_up_thonny.md, 03_installing_micropython_on_pico.md, 04_overview_of_pico_temperature_sensor.md, 05_how_the_temperature_sensor_works.md, 06_reading_temperature_with_adc.md, 07_displaying_temperature_in_thonny_console.md, 08_formatting_temperature_readings.md, 09_converting_adc_to_temperature.md, 10_creating_a_temperature_alert_system.md, 12_troubleshooting_temperature_readings.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 11 lessons
+  - Common Issues in only 1 of 11 lessons
+  - first lesson is 01_course_introduction.md, not 00_intro.md
+  score: 50
+podman:
+  areas:
+    accuracy: 14
+    content: 12.5
+    interactive: 4.4
+    objectives: 2.2
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 10.7
+  band: C
+  gaps:
+  - 'no quiz in 12 of 12 lessons: 02_docker_vs_podman_architecture.md, 03_installing_podman.md, 04_cli_compatibility_and_commands.md, 05_podman_unique_features.md, 06_managing_containers_and_images.md, 07_working_with_pods.md, 08_docker_compose_vs_podman_compose.md, 09_podman_and_kubernetes.md, 10_podman_in_production.md, 11_troubleshooting_and_debugging.md, 12_migration_project.md, 13_wrap_up_and_future.md'
+  - 'no Try it Yourself in 10 lessons: 02_docker_vs_podman_architecture.md, 03_installing_podman.md, 05_podman_unique_features.md, 06_managing_containers_and_images.md, 07_working_with_pods.md, 08_docker_compose_vs_podman_compose.md, 09_podman_and_kubernetes.md, 10_podman_in_production.md, 11_troubleshooting_and_debugging.md, 13_wrap_up_and_future.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 10 lessons: 02_docker_vs_podman_architecture.md, 03_installing_podman.md, 04_cli_compatibility_and_commands.md, 06_managing_containers_and_images.md, 07_working_with_pods.md, 08_docker_compose_vs_podman_compose.md, 09_podman_and_kubernetes.md, 10_podman_in_production.md, 12_migration_project.md, 13_wrap_up_and_future.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 12 lessons
+  - Common Issues in only 4 of 12 lessons
+  - 'dated commands or versions: version: "3'
+  - first lesson is 01_intro_to_podman.md, not 00_intro.md
+  score: 58
+pydantic:
+  areas:
+    accuracy: 13
+    content: 12.1
+    interactive: 6.0
+    objectives: 1.3
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 11 of 11 lessons: 02_setting_up_your_development_environment.md, 03_basic_data_models.md, 04_advanced_validation_techniques.md, 05_custom_data_types.md, 06_recursive_models.md, 07_integrating_pydantic_with_fastapi.md, 08_request_validation_and_serialization.md, 09_building_a_crud_application.md, 10_pydantic_best_practices.md, 11_performance_optimization_tips.md, 12_case_studies_and_real_world_applications.md'
+  - 'no Try it Yourself in 11 lessons: 02_setting_up_your_development_environment.md, 03_basic_data_models.md, 04_advanced_validation_techniques.md, 05_custom_data_types.md, 06_recursive_models.md, 07_integrating_pydantic_with_fastapi.md, 08_request_validation_and_serialization.md, 09_building_a_crud_application.md, 10_pydantic_best_practices.md, 11_performance_optimization_tips.md, 12_case_studies_and_real_world_applications.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 9 lessons: 02_setting_up_your_development_environment.md, 03_basic_data_models.md, 04_advanced_validation_techniques.md, 05_custom_data_types.md, 06_recursive_models.md, 07_integrating_pydantic_with_fastapi.md, 08_request_validation_and_serialization.md, 09_building_a_crud_application.md, 10_pydantic_best_practices.md'
+  - no Teachers note in the intro
+  - Common Issues in only 0 of 11 lessons
+  - 'dated commands or versions: python 3.6, python 3.7'
+  - first lesson is 01_overview_of_pydantic.md, not 00_intro.md
+  score: 46
+python:
+  areas:
+    accuracy: 14
+    content: 9.0
+    interactive: 16.5
+    objectives: 5
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 6.3
+  band: B
+  gaps:
+  - video is not in the intro
+  - 'no quiz in 1 of 17 lessons: 17_apps.md'
+  - 'no Try it Yourself in 12 lessons: 02_basics.md, 05_files.md, 06_errors.md, 07_libraries.md, 09_data.md, 10_webscraping.md, 11_data_visualisation.md, 12_ml.md, 13_deep_learning.md, 14_automation.md, 15_databases.md, 16_advanced.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 17 lessons
+  - Common Issues in only 0 of 17 lessons
+  - 'dated commands or versions: python 3.7'
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 65
+redis:
+  areas:
+    accuracy: 15
+    content: 11.5
+    interactive: 14.0
+    objectives: 7
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no Try it Yourself in 9 lessons: 02_redis_basics.md, 03_data_types.md, 04_commands_and_transactions.md, 05_redis_lists.md, 06_redis_sets.md, 07_redis_hashes.md, 08_redis_sorted_sets.md, 09_redis_pub_sub.md, 10_summary.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 9 lessons
+  - Common Issues in only 0 of 9 lessons
+  - first lesson is 01_introduction.md, not 00_intro.md
+  score: 62
+reinforcement_learning:
+  areas:
+    accuracy: 13
+    content: 16.0
+    interactive: 12.0
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 12.0
+  band: B
+  gaps:
+  - 'no quiz in 15 of 15 lessons: 01_beyond_predefined_steps.md, 02_anatomy_of_robotic_rl.md, 03_designing_the_reward_function.md, 04_mapping_the_robots_world.md, 05_markov_decision_processes.md, 06_looking_into_the_future.md, 07_the_q_table.md, 08_exploration_vs_exploitation.md, 09_coding_the_learning_loop.md, 10_training_in_simulation.md, 11_the_sim_to_real_gap.md, 12_discretizing_real_sensors.md, 13_deploying_the_brain.md, 14_scaling_up_to_deep_rl.md, 15_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 15 lessons: 01_beyond_predefined_steps.md, 02_anatomy_of_robotic_rl.md, 03_designing_the_reward_function.md, 04_mapping_the_robots_world.md, 05_markov_decision_processes.md, 06_looking_into_the_future.md, 07_the_q_table.md, 08_exploration_vs_exploitation.md, 09_coding_the_learning_loop.md, 10_training_in_simulation.md, 11_the_sim_to_real_gap.md, 12_discretizing_real_sensors.md, 13_deploying_the_brain.md, 14_scaling_up_to_deep_rl.md, 15_summary.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 15 lessons
+  - 'dated commands or versions: python 3.7, python 3.8'
+  score: 70
+robotics_101:
+  areas:
+    accuracy: 15
+    content: 13.8
+    interactive: 14.0
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 15
+  band: B
+  gaps:
+  - 'no Try it Yourself in 5 lessons: lesson_01.md, lesson_02.md, lesson_03.md, lesson_04.md, lesson_05.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 5 lessons: lesson_01.md, lesson_02.md, lesson_03.md, lesson_04.md, lesson_05.md'
+  - no Teachers note in the intro
+  - Common Issues in only 0 of 5 lessons
+  score: 74
+rust:
+  areas:
+    accuracy: 15
+    content: 8.6
+    interactive: 3.7
+    objectives: 5
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 10.8
+  band: C
+  gaps:
+  - 'no quiz in 12 of 12 lessons: 02_rust_and_python.md, 03_rust_basics.md, 04_ownership_and_borrowing.md, 05_structs_and_enums.md, 06_error_handling.md, 07_common_collections.md, 08_concurrency.md, 09_ecosystem_and_tools.md, 10_example.md, 11_rust_for_pico.md, 12_summary_and_resources.md, 13_cargo.md'
+  - 'no Try it Yourself in 11 lessons: 02_rust_and_python.md, 03_rust_basics.md, 04_ownership_and_borrowing.md, 05_structs_and_enums.md, 06_error_handling.md, 07_common_collections.md, 08_concurrency.md, 09_ecosystem_and_tools.md, 10_example.md, 11_rust_for_pico.md, 13_cargo.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 12 lessons
+  - Common Issues in only 1 of 12 lessons
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 57
+scrawly_wally:
+  areas:
+    accuracy: 13
+    content: 6.8
+    interactive: 3.0
+    objectives: 0.0
+    pathway: 5
+    style: 9.0
+    teachers: 0.0
+    video: 11.2
+  band: C
+  gaps:
+  - 'no quiz in 10 of 10 lessons: 02_components.md, 03_assembly.md, 04_wiring.md, 05_setup_pi.md, 06_software.md, 07_control.md, 08_positioning.md, 09_draw.md, 10_vectorize.md, 11_summary.md'
+  - 'no Try it Yourself in 10 lessons: 02_components.md, 03_assembly.md, 04_wiring.md, 05_setup_pi.md, 06_software.md, 07_control.md, 08_positioning.md, 09_draw.md, 10_vectorize.md, 11_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 10 lessons: 02_components.md, 03_assembly.md, 04_wiring.md, 05_setup_pi.md, 06_software.md, 07_control.md, 08_positioning.md, 09_draw.md, 10_vectorize.md, 11_summary.md'
+  - no Teachers note in the intro
+  - '4 lessons under 120 words: 07_control.md, 09_draw.md, 10_vectorize.md, 11_summary.md'
+  - Common Issues in only 0 of 10 lessons
+  - 'placeholder lessons: 07_control.md'
+  - first lesson is 01_intro.md, not 00_intro.md
+  score: 48
+smars:
+  areas:
+    accuracy: 15
+    content: 9.1
+    interactive: 6.5
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 15
+  band: C
+  gaps:
+  - 'no quiz in 10 of 14 lessons: smars02.md, smars03.md, smars04.md, smars05.md, smars06.md, smars08.md, smars09.md, smars10.md, smars12.md, summary.md'
+  - 'no Try it Yourself in 13 lessons: smars01.md, smars02.md, smars03.md, smars04.md, smars05.md, smars06.md, smars07.md, smars08.md, smars09.md, smars10.md, smars11.md, smars12.md, summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 14 lessons: smars01.md, smars02.md, smars03.md, smars04.md, smars05.md, smars06.md, smars07.md, smars08.md, smars09.md, smars10.md, smars11.md, smars12.md, smars13.md, summary.md'
+  - no Teachers note in the intro
+  - '8 lessons under 120 words: smars03.md, smars04.md, smars05.md, smars06.md, smars08.md, smars09.md, smars10.md, smars12.md'
+  - Common Issues in only 2 of 14 lessons
+  score: 63
+smars_code:
+  areas:
+    accuracy: 15
+    content: 12.7
+    interactive: 14.7
+    objectives: 7
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 15
+  band: B
+  gaps:
+  - 'no Try it Yourself in 4 lessons: 01_lesson_01.md, 03_lesson_03.md, 04_lesson_04.md, 05_lesson_05.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 6 lessons
+  - Common Issues in only 0 of 7 lessons
+  score: 79
+smars_fusion360:
+  areas:
+    accuracy: 15
+    content: 7.0
+    interactive: 5.4
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.4
+  band: C
+  gaps:
+  - 'no quiz in 13 of 16 lessons: 01_base.md, 02_extrude_base.md, 03_shell.md, 04_fillet.md, 06_front.md, 07_cut.md, 08_side.md, 09_sidecut.md, 10_fillet.md, 11_back.md, 13_wheel.md, 14_cut.md, 15_slots.md'
+  - 'no Try it Yourself in 15 lessons: 01_base.md, 02_extrude_base.md, 03_shell.md, 04_fillet.md, 05_thin.md, 06_front.md, 07_cut.md, 08_side.md, 09_sidecut.md, 10_fillet.md, 11_back.md, 12_back.md, 13_wheel.md, 14_cut.md, 15_slots.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 16 lessons: 01_base.md, 02_extrude_base.md, 03_shell.md, 04_fillet.md, 05_thin.md, 06_front.md, 07_cut.md, 08_side.md, 09_sidecut.md, 10_fillet.md, 11_back.md, 12_back.md, 13_wheel.md, 14_cut.md, 15_slots.md, 16_cut.md'
+  - no Teachers note in the intro
+  - '13 lessons under 120 words: 01_base.md, 02_extrude_base.md, 03_shell.md, 04_fillet.md, 06_front.md, 07_cut.md, 08_side.md, 09_sidecut.md, 10_fillet.md, 11_back.md, 13_wheel.md, 14_cut.md, 15_slots.md'
+  - Common Issues in only 0 of 16 lessons
+  score: 55
+smars_fusion360_part2:
+  areas:
+    accuracy: 15
+    content: 7.0
+    interactive: 5.3
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.3
+  band: C
+  gaps:
+  - 'no quiz in 14 of 17 lessons: 01_motor.md, 02_extrude.md, 03_nub.md, 04_extrude.md, 06_front.md, 07_cut.md, 08_stub.md, 09_cut.md, 10_stub.md, 11_stub.md, 12_revolve.md, 13_cut.md, 15_slots.md, 16_cut.md'
+  - 'no Try it Yourself in 16 lessons: 01_motor.md, 02_extrude.md, 03_nub.md, 04_extrude.md, 05_chamfer.md, 06_front.md, 07_cut.md, 08_stub.md, 09_cut.md, 10_stub.md, 11_stub.md, 12_revolve.md, 13_cut.md, 14_extrude.md, 15_slots.md, 16_cut.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 17 lessons: 01_motor.md, 02_extrude.md, 03_nub.md, 04_extrude.md, 05_chamfer.md, 06_front.md, 07_cut.md, 08_stub.md, 09_cut.md, 10_stub.md, 11_stub.md, 12_revolve.md, 13_cut.md, 14_extrude.md, 15_slots.md, 16_cut.md, 17_final.md'
+  - no Teachers note in the intro
+  - '13 lessons under 120 words: 02_extrude.md, 03_nub.md, 04_extrude.md, 06_front.md, 07_cut.md, 08_stub.md, 09_cut.md, 10_stub.md, 11_stub.md, 12_revolve.md, 13_cut.md, 15_slots.md, 16_cut.md'
+  - Common Issues in only 0 of 17 lessons
+  score: 55
+smars_quad:
+  areas:
+    accuracy: 15
+    content: 7.6
+    interactive: 5.6
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 12.2
+  band: C
+  gaps:
+  - 'no quiz in 11 of 14 lessons: quad_01.md, quad_02.md, quad_04.md, quad_05.md, quad_06.md, quad_07.md, quad_08.md, quad_09.md, quad_10.md, quad_12.md, quad_13.md'
+  - 'no Try it Yourself in 14 lessons: quad_01.md, quad_02.md, quad_03.md, quad_04.md, quad_05.md, quad_06.md, quad_07.md, quad_08.md, quad_09.md, quad_10.md, quad_11.md, quad_12.md, quad_13.md, quad_14.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 14 lessons: quad_01.md, quad_02.md, quad_03.md, quad_04.md, quad_05.md, quad_06.md, quad_07.md, quad_08.md, quad_09.md, quad_10.md, quad_11.md, quad_12.md, quad_13.md, quad_14.md'
+  - no Teachers note in the intro
+  - '10 lessons under 120 words: quad_01.md, quad_02.md, quad_04.md, quad_05.md, quad_06.md, quad_07.md, quad_08.md, quad_09.md, quad_10.md, quad_12.md'
+  - Common Issues in only 1 of 14 lessons
+  score: 57
+snakie_blocks:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 4.0
+    video: 10.8
+  band: A
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 12 lessons: 01_the_blocks_workspace.md, 02_turtle_draw_a_square.md, 03_variables_maths_and_loops.md, 04_making_decisions.md, 05_leds_and_buttons.md, 06_pwm_servos_and_buzzers.md, 07_functions.md, 08_my_parts.md, 09_reading_the_python.md, 10_simple_and_advanced_blocks.md, 11_project_reaction_timer.md, 12_summary.md'
+  score: 87
+snakie_build_urdf:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 15.6
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.5
+  band: B
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 15 lessons: 01_the_build_workspace.md, 02_your_first_block.md, 03_joining_blocks.md, 04_hinges_wheels_and_sliders.md, 05_mass_balance_and_measuring.md, 06_posing_the_arm.md, 07_saving_poses.md, 08_building_a_motion.md, 09_joint_tracks_and_keyframes.md, 10_binding_servos.md, 11_driving_the_arm_from_code.md, 12_exporting_a_motion_to_micropython.md, 13_urdf_in_and_out.md, 14_render_a_movie.md, 15_summary.md'
+  - no Teachers note in the intro
+  score: 77
+snakie_code_tools:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 19.1
+    objectives: 2.5
+    pathway: 5
+    style: 10.0
+    teachers: 1.0
+    video: 10.6
+  band: A
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 13 lessons: 01_smart_autocomplete.md, 02_hover_help_and_definitions.md, 03_find_and_replace.md, 04_linting_and_problems.md, 05_micropython_refactors.md, 06_yaml_and_json.md, 07_installing_packages.md, 08_the_modules_shelf.md, 09_compiling_to_mpy.md, 10_version_control_with_git.md, 11_ai_chat_and_suggestions.md, 13_project_sensor_driver.md, 14_summary.md'
+  - no Teachers note in the intro
+  score: 83
+snakie_electronics:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 4.0
+    video: 11.0
+  band: A
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 11 lessons: 01_the_electronics_workspace.md, 02_the_parts_library.md, 03_placing_parts.md, 04_wiring_with_noodles.md, 05_the_schematic_view.md, 06_checking_your_wiring.md, 07_drivers_help_and_code.md, 08_connections_and_measurements.md, 09_exporting_and_sharing.md, 10_project_obstacle_robot.md, 11_summary.md'
+  score: 87
+snakie_getting_started:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 16.7
+    objectives: 3.3
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 13.0
+  band: A
+  gaps:
+  - 'no quiz in 1 of 11 lessons: 11_summary.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 9 lessons: 01_web_or_desktop.md, 03_first_program_on_the_simulator.md, 04_the_repl_and_console.md, 05_seeing_your_pins.md, 06_finding_your_board.md, 07_flashing_micropython.md, 08_connect_run_stop.md, 10_project_traffic_light.md, 11_summary.md'
+  - no Teachers note in the intro
+  score: 83
+snakie_instruments:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 2.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 11.2
+  band: A
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 10 lessons: 01_the_instrument_dock.md, 02_telemetry_and_live.md, 03_the_plotter.md, 04_the_multimeter.md, 05_the_oscilloscope.md, 06_watch_and_update.md, 07_instruments_from_blocks.md, 08_logging_data.md, 09_project_light_scanner.md, 10_summary.md'
+  - no Teachers note in the intro
+  score: 83
+snakie_part_editor:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 17.0
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.7
+  band: B
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 13 lessons: 01_what_a_part_is.md, 02_tour_of_the_part_editor.md, 03_board_size_and_details.md, 04_pins_types_and_capabilities.md, 05_holes_components_and_labels.md, 06_tracing_a_board_photo.md, 07_schematic_symbol_and_electrical_details.md, 08_drivers_and_built_in_help.md, 09_using_your_part_in_a_project.md, 10_giving_your_part_its_own_blocks.md, 11_making_a_microcontroller_board.md, 12_sharing_your_parts.md, 13_summary.md'
+  - no Teachers note in the intro
+  score: 79
+snakie_plugins:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 2
+    video: 10.8
+  band: A
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 12 lessons: 01_how_plugins_work.md, 02_the_plugin_rack.md, 03_your_first_plugin.md, 04_when_plugins_break.md, 05_commands_that_read_code.md, 06_commands_that_change_code.md, 07_your_first_linter.md, 08_quick_fixes.md, 09_rules_for_your_hardware.md, 10_blocks_from_a_plugin.md, 11_sharing_your_plugin.md, 12_summary.md'
+  - no Teachers note in the intro
+  score: 84
+snakie_sprites:
+  areas:
+    accuracy: 15
+    content: 20.0
+    interactive: 20
+    objectives: 1.0
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.7
+  band: A
+  gaps:
+  - no outcomes in course.yml
+  - 'no opening objective in 13 lessons: 01_tiny_screens_and_pixels.md, 02_the_sprite_editor.md, 03_drawing_your_first_sprite.md, 04_frames_and_animation.md, 05_saving_and_exporting.md, 06_pixels_into_bytes.md, 07_a_screen_in_the_simulator.md, 08_putting_a_sprite_on_screen.md, 09_animating_the_face.md, 10_bigger_and_smarter.md, 11_sprite_files_on_the_board.md, 12_a_real_oled.md, 13_summary.md'
+  - no Teachers note in the intro
+  score: 82
+sql:
+  areas:
+    accuracy: 15
+    content: 10.5
+    interactive: 9.0
+    objectives: 5
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 0.0
+  band: C
+  gaps:
+  - no video
+  - 'no quiz in 15 of 15 lessons: 01_introduction_to_sql.md, 02_setting_up_environment.md, 03_basic_sql_commands.md, 04_working_with_tables.md, 05_data_insertion_and_modification.md, 06_querying_data_with_select.md, 07_advanced_filtering.md, 08_working_with_joins.md, 09_grouping_and_aggregating_data.md, 10_introduction_to_normalization.md, 11_boyce_codd_normal_form.md, 12_subqueries_and_nested_queries.md, 13_views_and_indexes.md, 14_sql_functions_and_expressions.md, 15_wrap_up_and_final_project.md'
+  - no outcomes in course.yml
+  - no Teachers note in the intro
+  - no picture or diagram in 15 lessons
+  - Common Issues in only 0 of 15 lessons
+  score: 54
+sqlite3:
+  areas:
+    accuracy: 15
+    content: 13.4
+    interactive: 15.0
+    objectives: 4.1
+    pathway: 5
+    style: 10.0
+    teachers: 0.0
+    video: 10.3
+  band: B
+  gaps:
+  - 'no quiz in 3 of 17 lessons: 11_summary.md, 16_demo_program.md, 17_tools.md'
+  - 'no Try it Yourself in 15 lessons: 01_introduction_to_databases.md, 03_creating_tables_and_schema.md, 04.inserting_and_retrieving_data.md, 05_updating_and_deleting_data.md, 07_advanced_queries.md, 08_transations_and_error_handling.md, 09_indexes_and_performance.md, 10_securing_and_backing_up.md, 11_summary.md, 13_1nf.md, 14_2nf.md, 15_3nf.md, 12_boyce_codd_normal_form.md, 16_demo_program.md, 17_tools.md'
+  - no outcomes in course.yml
+  - 'no opening objective in 12 lessons: 01_introduction_to_databases.md, 02_getting_started_with_sqlite3.md, 03_creating_tables_and_schema.md, 09_indexes_and_performance.md, 10_securing_and_backing_up.md, 11_summary.md, 13_1nf.md, 14_2nf.md, 15_3nf.md, 12_boyce_codd_normal_form.md, 16_demo_program.md, 17_tools.md'
+  - no Teachers note in the intro
+  - no picture or diagram in 15 lessons
+  - Common Issues in only 0 of 17 lessons
+  score: 73

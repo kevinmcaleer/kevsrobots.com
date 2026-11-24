@@ -10,13 +10,14 @@ layout: content
 <link rel="stylesheet" href="/assets/css/course-health.css?v={{ site.time | date: '%s' }}">
 
 <h1>Course health</h1>
-<p class="ch-lead">{{ page.health_rows.size }} courses, lowest score first. Each column is one thing that makes a course easier to learn from; a dash means it is missing. "Helpful" is the share of "Was this lesson helpful?" votes that said yes. This page is not linked from the site and is hidden from search engines.</p>
+<p class="ch-lead">{{ page.health_rows.size }} courses, lowest quality first. "Quality" is the 100-point course quality checklist (80 or more meets the bar; hover for what is missing), written by <code>scripts/course_quality.py --write</code>. Each other column is one thing that makes a course easier to learn from; a dash means it is missing. "Helpful" is the share of "Was this lesson helpful?" votes that said yes. This page is not linked from the site and is hidden from search engines.</p>
 
 <div class="ch-wrap">
 <table class="ch-table">
   <thead>
     <tr>
       <th scope="col">Course</th>
+      <th scope="col">Quality</th>
       <th scope="col">Score</th>
       {% for check in page.health_checks %}<th scope="col" class="ch-check">{{ check.label }}</th>{% endfor %}
       <th scope="col">Helpful</th>
@@ -27,6 +28,7 @@ layout: content
     {% for row in page.health_rows %}
     <tr data-course-key="{{ row.key }}">
       <th scope="row"><a href="{{ row.link }}">{{ row.name }}</a><span class="ch-lessons">{{ row.lessons }} lessons</span></th>
+      <td class="ch-score ch-score-{% if row.quality >= 80 %}good{% elsif row.quality >= 65 %}ok{% else %}low{% endif %}"{% if row.gaps != "" %} title="{{ row.gaps | escape }}"{% endif %}>{% if row.quality %}{{ row.quality }} {{ row.band }}{% else %}–{% endif %}</td>
       <td class="ch-score ch-score-{% if row.score >= 7 %}good{% elsif row.score >= 5 %}ok{% else %}low{% endif %}">{{ row.score }}/{{ page.health_checks.size }}</td>
       {% for ok in row.checks %}<td class="ch-check">{% if ok %}<span class="ch-yes" title="Yes">✓</span>{% else %}<span class="ch-no" title="Missing">–</span>{% endif %}</td>{% endfor %}
       <td class="ch-helpful" data-helpful>…</td>

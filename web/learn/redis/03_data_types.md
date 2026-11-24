@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Data Types
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/03_data_types.jpg
 date: 2023-04-12
 previous: 02_redis_basics.html
 next: 04_commands_and_transactions.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis data types](assets/redis-data-types.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

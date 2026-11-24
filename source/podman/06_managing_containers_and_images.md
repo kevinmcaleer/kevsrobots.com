@@ -3,11 +3,11 @@ title: Managing Containers and Images
 description: Learn how to manage containers, images, volumes, and logs using Podman’s CLI — including useful commands for day-to-day development and operations.
 layout: lesson
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/06_managing_containers_and_images.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ You’ll use the Podman CLI to list, inspect, stop, remove, and troubleshoot con
 
 ---
 
-## 📋 Listing and Inspecting Containers
+## Listing and Inspecting Containers
 
 ### View running containers
 
@@ -37,11 +37,11 @@ podman ps -a
 podman inspect <container-id>
 ```
 
-> 🧠 This returns detailed JSON output including network, storage, environment variables, and more.
+> This returns detailed JSON output including network, storage, environment variables, and more.
 
 ---
 
-## 🧼 Starting, Stopping, and Removing
+## Starting, Stopping, and Removing
 
 ### Start a container
 
@@ -61,11 +61,11 @@ podman stop <container-id>
 podman rm <container-id>
 ```
 
-> 🛑 Always stop a container before removing it, unless you use `-f` (force).
+> Always stop a container before removing it, unless you use `-f` (force).
 
 ---
 
-## 🖼 Managing Images
+## Managing Images
 
 ### Pull an image
 
@@ -85,11 +85,11 @@ podman images
 podman rmi <image-id>
 ```
 
-> 🔍 Need more control? Use `podman image inspect` or `podman image history` to see build layers and metadata.
+> Need more control? Use `podman image inspect` or `podman image history` to see build layers and metadata.
 
 ---
 
-## 📦 Volumes and Persistent Storage
+## Volumes and Persistent Storage
 
 ### Create a named volume
 
@@ -115,11 +115,11 @@ podman volume ls
 podman volume rm mydata
 ```
 
-> 📁 Podman volumes live under `~/.local/share/containers/storage/volumes` (in rootless mode).
+> Podman volumes live under `~/.local/share/containers/storage/volumes` (in rootless mode).
 
 ---
 
-## 🪵 Logs and Output
+## Logs and Output
 
 ### View container logs
 
@@ -133,11 +133,11 @@ podman logs <container-id>
 podman logs -f <container-id>
 ```
 
-> 📜 Podman log output goes to the standard user log files in rootless mode. Combine with `journalctl` for systemd-managed containers.
+> Podman log output goes to the standard user log files in rootless mode. Combine with `journalctl` for systemd-managed containers.
 
 ---
 
-## 🧰 Useful Extras
+## Useful Extras
 
 ### Copy files into a container
 

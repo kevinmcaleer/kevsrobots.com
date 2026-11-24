@@ -3,7 +3,7 @@ layout: lesson
 title: Overview of Jekyll and Static Sites
 author: Kevin McAleer
 type: page
-cover: assets/markdown.png
+cover: /learn/markdown/assets/banners/01_overview.jpg
 date: 2024-03-21
 next: 02_markdown_basics.html
 description: Introduction to the fundamentals of Jekyll and the advantages of using
@@ -44,7 +44,9 @@ navigation:
 ---
 
 
-![Jekyll cover image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is Jekyll?
 

@@ -3,7 +3,7 @@ layout: lesson
 title: More Diagram Types
 author: Kevin McAleer
 type: page
-cover: /learn/mermaid/assets/cover.jpg
+cover: /learn/mermaid/assets/banners/10_more-diagram-types.jpg
 date: 2026-11-04
 previous: 09_gantt-and-timeline.html
 next: 11_themes-and-styling.html
@@ -61,6 +61,10 @@ navigation:
       link: 14_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Four more tools for your toolbox
 

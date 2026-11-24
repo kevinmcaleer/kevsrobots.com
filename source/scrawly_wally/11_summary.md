@@ -3,8 +3,12 @@ title: Summary and Next Steps
 description: Recap of what you've learned and suggestions for further exploration.
 layout: lesson
 type: page
-cover: assets/summary.png
+cover: /learn/scrawly_wally/assets/banners/11_summary.jpg
 date_updated: 2024-08-02
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Summary

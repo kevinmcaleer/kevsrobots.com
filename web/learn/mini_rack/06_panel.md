@@ -3,7 +3,7 @@ layout: lesson
 title: Create the Cluster Panel
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/06_panel.jpg
 date: 2025-02-16
 previous: 05_handle.html
 next: 07_pi_tray.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Cluster Panel Design](assets/cluster_panel_design.png){:class="img-fluid w-100"}
 

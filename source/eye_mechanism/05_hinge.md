@@ -3,6 +3,11 @@ title: Extrude The Hinge
 description: Create the hinge from the profile and join it to the eyelid
 layout: lesson
 type: page
+cover: /learn/eye_mechanism/assets/banners/05_hinge.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 * **Extrude Join** - Extrude the middle and inner circle out towards the outer edge of the eyelid by `2mm`.

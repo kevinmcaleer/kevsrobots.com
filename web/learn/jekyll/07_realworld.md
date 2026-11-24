@@ -3,7 +3,7 @@ layout: lesson
 title: Real-World Applications of Jekyll
 author: Kevin McAleer
 type: page
-cover: /learn/jekyll/assets/jekyll.jpg
+cover: /learn/jekyll/assets/banners/07_realworld.jpg
 date: 2024-01-24
 previous: 06_deploy.html
 next: 08_bonus.html
@@ -38,6 +38,10 @@ navigation:
       link: 08_bonus.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

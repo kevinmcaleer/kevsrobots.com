@@ -3,6 +3,10 @@ title: Deploying a Stack
 description: Learn how to deploy your Docker Compose-defined applications as a stack in Docker Swarm, taking advantage of Swarm's distributed architecture for scalability and resilience.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/08_deploying-a-stack.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

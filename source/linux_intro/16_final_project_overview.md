@@ -2,10 +2,12 @@
 title: Final Project Overview
 description: Plan and outline a simple command-line tool as your final project.
 layout: lesson
-cover: /learn/linux_intro/assets/project.jpg
+cover: /learn/linux_intro/assets/banners/16_final_project_overview.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

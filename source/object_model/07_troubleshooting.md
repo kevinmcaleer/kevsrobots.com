@@ -4,6 +4,11 @@ description: >-
     Master troubleshooting techniques and optimization strategies for production-ready object detection systems
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/07_troubleshooting.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

@@ -3,7 +3,7 @@ layout: lesson
 title: Ignoring Files
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/07_ignoring-files.jpg
 date: 2026-11-04
 previous: 06_undoing-changes.html
 next: 08_branches.html
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Not everything belongs in Git
 

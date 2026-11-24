@@ -2,6 +2,11 @@
 title: Front Cutout Profile
 description: Cut away the range finder area
 layout: lesson
+cover: /learn/smars_fusion360/assets/banners/06_front.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The Front and Back sides need to have a section cut out of them, first we need to create a profile for the cutout.

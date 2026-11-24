@@ -3,6 +3,11 @@ title: Conclusion and Next Steps
 description: Wrapping up the Docker for Beginners course and exploring further learning resources.
 layout: lesson
 type: page
+cover: /learn/docker/assets/banners/10_conclusion.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Course Recap

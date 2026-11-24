@@ -3,7 +3,7 @@ layout: lesson
 title: Inheritance
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/04_inheritance.jpg
 date: 2024-07-07
 previous: 03_abstraction.html
 next: 05_encapsulation.html
@@ -63,6 +63,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Inheritance
 

@@ -2,6 +2,11 @@
 title: Advanced SQL Queries
 description: Module 7 delves into advanced SQL queries in SQLite
 layout: lesson
+cover: /learn/sqlite3/assets/banners/07_advanced_queries.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Module 7 delves into advanced SQL queries in SQLite. You will learn about aggregating data, using grouping and filtering conditions, and working with subqueries and nested queries.

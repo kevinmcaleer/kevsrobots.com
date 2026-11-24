@@ -3,7 +3,7 @@ layout: lesson
 title: Undoing Changes
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/06_undoing-changes.jpg
 date: 2026-11-04
 previous: 05_viewing-history.html
 next: 07_ignoring-files.html
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Mistakes are fine
 

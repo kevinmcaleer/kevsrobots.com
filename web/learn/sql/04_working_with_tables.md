@@ -3,7 +3,7 @@ layout: lesson
 title: Working with Tables and Data Types
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/04_working_with_tables.jpg
 date: 2024-11-01
 previous: 03_basic_sql_commands.html
 next: 05_data_insertion_and_modification.html
@@ -56,6 +56,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore how to structure data in tables and choose appropriate data types for each column. You’ll also learn about primary keys and constraints, essential concepts for organizing and securing data in a relational database.
 

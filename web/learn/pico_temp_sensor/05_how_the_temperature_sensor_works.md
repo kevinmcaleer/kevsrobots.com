@@ -3,7 +3,7 @@ layout: lesson
 title: Reading Temperature with the ADC
 author: Kevin McAleer
 type: page
-cover: /learn/pico_temp_sensor/assets/cover.jpg
+cover: /learn/pico_temp_sensor/assets/banners/05_how_the_temperature_sensor_works.jpg
 date: 2024-11-22
 previous: 04_overview_of_pico_temperature_sensor.html
 next: 06_reading_temperature_with_adc.html
@@ -50,6 +50,10 @@ navigation:
       link: 12_troubleshooting_temperature_readings.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

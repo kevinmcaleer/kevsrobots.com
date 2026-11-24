@@ -3,11 +3,11 @@ title: Bluetooth Control with HC-05
 description: Learn how to control your robot remotely using Bluetooth and a smartphone or computer.
 layout: lesson
 type: page
-cover: assets/bluetooth_control.jpg
+cover: /learn/micropython_robotics/assets/banners/08_bluetooth_control.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -15,7 +15,7 @@ With Bluetooth, you can control your robot wirelessly from a phone, tablet, or P
 
 ---
 
-## 🔌 What You’ll Need
+## What You’ll Need
 
 - HC-05 Bluetooth module
 - Raspberry Pi Pico
@@ -24,7 +24,7 @@ With Bluetooth, you can control your robot wirelessly from a phone, tablet, or P
 
 ---
 
-## ⚠️ Wiring the HC-05 to the Pico
+## Wiring the HC-05 to the Pico
 
 | HC-05 Pin | Connect to                                                                              |
 |-----------|-----------------------------------------------------------------------------------------|
@@ -36,11 +36,11 @@ With Bluetooth, you can control your robot wirelessly from a phone, tablet, or P
 
 ---
 
-> 💡 The HC-05 RX pin **must not receive 3.3V directly** from Pico TX. Use a voltage divider (e.g., 1kΩ + 2kΩ).
+> The HC-05 RX pin **must not receive 3.3V directly** from Pico TX. Use a voltage divider (e.g., 1kΩ + 2kΩ).
 
 ---
 
-## 🧪 Simple Bluetooth Control Script
+## Simple Bluetooth Control Script
 
 ```python
 from machine import UART, Pin, PWM
@@ -90,7 +90,7 @@ while True:
 
 ---
 
-## 📱 Sending Commands from Your Phone
+## Sending Commands from Your Phone
 
 Use a Bluetooth terminal app and pair it with the HC-05 (usually pin 1234 or 0000). Then send single-character commands:
 
@@ -102,7 +102,7 @@ Use a Bluetooth terminal app and pair it with the HC-05 (usually pin 1234 or 000
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 - Add more commands (e.g., speed control)
 - Use a smartphone joystick app instead of typing letters

@@ -3,7 +3,7 @@ layout: lesson
 title: Monitoring Tools for Docker Swarm
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/10_monitoring-tools.jpg
 date: 2024-02-03
 previous: 09_rebalancing.html
 next: 11_cluster-maintenance.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Effective Monitoring in Docker Swarm
 

@@ -3,6 +3,11 @@ layout: lesson
 title: Controlling LEDs with PWM
 type: page
 description: Learn how to control LEDs using Pulse Width Modulation (PWM) with the Raspberry Pi Pico and MicroPython.
+cover: /learn/micropython_gpio/assets/banners/06_leds.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

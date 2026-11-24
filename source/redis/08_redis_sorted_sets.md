@@ -3,9 +3,12 @@ layout: lesson
 title: Redis Sorted Sets
 type: page
 description: Learn about Redis sorted sets and how to use them with Python.
+cover: /learn/redis/assets/banners/08_redis_sorted_sets.jpg
 ---
 
-<!-- ![Cover photo of Redis sorted sets](assets/redis-sorted-sets.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

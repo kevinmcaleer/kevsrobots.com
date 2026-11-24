@@ -3,7 +3,7 @@ layout: lesson
 title: Python Integration
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/04_python_integration.jpg
 date: 2025-09-04
 previous: 03_advanced_features.html
 next: 05_data_analysis.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 DuckDB integrates tightly with Pandas and Polars. You can query DataFrames directly using SQL and get results back as DataFrames.
 

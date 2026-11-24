@@ -3,9 +3,12 @@ title: What is I2C?
 description: Understand the I2C protocol, how it works, and why it's one of the most popular communication methods in electronics
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/01_what-is-i2c.jpg
 ---
 
-<!-- ![I2C Communication Diagram](/learn/i2c_spi/assets/i2c-diagram.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding I2C
 

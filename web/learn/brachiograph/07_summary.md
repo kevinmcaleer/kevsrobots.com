@@ -3,7 +3,7 @@ layout: lesson
 title: Summary and Key Takeaways
 author: Kevin McAleer
 type: page
-cover: /learn/brachiograph/assets/cover.png
+cover: /learn/brachiograph/assets/banners/07_summary.jpg
 date: 2024-07-26
 previous: 06_vectorize.html
 description: Review the key concepts and skills learned in the BrachioGraph course.
@@ -38,6 +38,10 @@ navigation:
       link: 07_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Summary and Key Takeaways
 

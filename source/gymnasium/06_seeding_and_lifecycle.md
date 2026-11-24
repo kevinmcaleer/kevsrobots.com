@@ -3,11 +3,11 @@ title: Seeding and the Episode Lifecycle
 description: Make your training runs reproducible with env.reset(seed=...) and action_space.seed(), then learn the full episode lifecycle and env.close().
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/06_seeding_and_lifecycle.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

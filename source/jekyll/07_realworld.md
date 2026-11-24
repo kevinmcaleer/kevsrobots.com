@@ -3,6 +3,11 @@ title: Real-World Applications of Jekyll
 description: Explore how Jekyll can be used to build various types of websites such as blogs, portfolios, and small business websites.
 layout: lesson
 type: page
+cover: /learn/jekyll/assets/banners/07_realworld.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

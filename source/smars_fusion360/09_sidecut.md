@@ -2,6 +2,11 @@
 title: Side Cutout
 description: Create the classic shape
 layout: lesson
+cover: /learn/smars_fusion360/assets/banners/09_sidecut.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The [side profile](08_side.html) is now extruded to cut all the way through the main body.

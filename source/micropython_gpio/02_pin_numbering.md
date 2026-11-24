@@ -3,6 +3,11 @@ layout: lesson
 title: Pin Numbering
 type: page
 description: Understand the Raspberry Pi Pico's pin numbering system and the role of each pin.
+cover: /learn/micropython_gpio/assets/banners/02_pin_numbering.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

@@ -3,7 +3,7 @@ layout: lesson
 title: Drawing with a Pen
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/08_pen.jpg
 date: 2023-04-27
 previous: 08_video.html
 next: 08_line_following.html
@@ -56,6 +56,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

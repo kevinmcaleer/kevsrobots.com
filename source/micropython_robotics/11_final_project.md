@@ -3,11 +3,11 @@ title: Final Project – Build Your Own Robot
 description: Apply what you’ve learned to design, build, and code your very own autonomous robot project.
 layout: lesson
 type: page
-cover: assets/final_project.jpg
+cover: /learn/micropython_robotics/assets/banners/11_final_project.jpg
 date_updated: 2025-05-10
 ---
 
-![Cover](assets/02.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ This is your chance to get creative and build something unique using the techniq
 
 ---
 
-## 🛠️ Project Guidelines
+## Project Guidelines
 
 Your final project should:
 
@@ -28,7 +28,7 @@ Your final project should:
 
 ---
 
-## 🎯 Project Ideas
+## Project Ideas
 
 Need inspiration? Try one of these:
 
@@ -40,7 +40,7 @@ Need inspiration? Try one of these:
 
 ---
 
-## 📋 Planning Your Project
+## Planning Your Project
 
 Start with a plan:
 
@@ -52,7 +52,7 @@ Start with a plan:
 
 ---
 
-## 🧩 Sharing Your Work
+## Sharing Your Work
 
 Take photos and videos of your build, and share your code and wiring diagrams. Include:
 
@@ -65,7 +65,7 @@ This is a great way to reflect on what you’ve learned — and show off your sk
 
 ---
 
-## 🏁 Final Tips
+## Final Tips
 
 - Keep it simple and achievable
 - Start with basic behavior, then improve it

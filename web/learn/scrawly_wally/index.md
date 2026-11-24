@@ -12,6 +12,7 @@ level: beginner
 course_duration: 0h 14m
 lesson_count: 11
 first_lesson: 01_intro.html
+video: JB4rPNBCL3Q
 navigation:
 - name: Wall Drawing Robot Tutorial
 - content:

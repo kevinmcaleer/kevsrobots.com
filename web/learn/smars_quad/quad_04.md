@@ -3,7 +3,7 @@ layout: lesson
 title: Servo Frame
 author: Kevin McAleer
 type: page
-cover: /learn/smars_quad/assets/how_to_build_a_quad.jpg
+cover: /learn/smars_quad/assets/banners/quad_04.jpg
 date: 2023-03-04
 previous: quad_03.html
 next: quad_05.html
@@ -54,6 +54,10 @@ navigation:
       link: quad_14.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## 4 Fit the servo holders into the frame
 

@@ -3,11 +3,11 @@ title: Installing Podman
 description: Learn how to install Podman on Linux, macOS, and Windows, and verify your setup for development or production use.
 layout: lesson
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/03_installing_podman.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,32 +17,32 @@ Let’s walk through how to install Podman on your platform of choice.
 
 ---
 
-## 🐧 Installing Podman on Linux
+## Installing Podman on Linux
 
-### 📦 On Fedora, CentOS, or RHEL
+### On Fedora, CentOS, or RHEL
 
 ```bash
 sudo dnf install podman
 ````
 
-### 🐧 On Ubuntu or Debian
+### On Ubuntu or Debian
 
 ```bash
 sudo apt update
 sudo apt install podman
 ```
 
-### 🏗️ On Arch Linux
+### On Arch Linux
 
 ```bash
 sudo pacman -S podman
 ```
 
-> ✅ **Tip:** Use your system's package manager for the latest stable version, or check the [Podman GitHub Releases](https://github.com/containers/podman/releases) for newer versions.
+> **Tip:** Use your system's package manager for the latest stable version, or check the [Podman GitHub Releases](https://github.com/containers/podman/releases) for newer versions.
 
 ---
 
-## 🍏 Installing Podman on macOS
+## Installing Podman on macOS
 
 ### Step 1: Install Podman via Homebrew
 
@@ -57,11 +57,11 @@ podman machine init
 podman machine start
 ```
 
-> 🛠️ Podman on macOS runs inside a lightweight Linux VM (using QEMU or Apple’s Virtualization framework).
+> Podman on macOS runs inside a lightweight Linux VM (using QEMU or Apple’s Virtualization framework).
 
 ---
 
-## 🪟 Installing Podman on Windows
+## Installing Podman on Windows
 
 ### Option 1: Use the Windows Installer
 
@@ -82,11 +82,11 @@ sudo apt update
 sudo apt install podman
 ```
 
-> 🧰 **Note:** Podman Desktop is available for both macOS and Windows with a GUI interface and built-in machine management.
+> **Note:** Podman Desktop is available for both macOS and Windows with a GUI interface and built-in machine management.
 
 ---
 
-## 🍓 Install on Raspberry Pi OS
+## Install on Raspberry Pi OS
 ### Step 1: Update Your System
 
 ```bash
@@ -129,7 +129,7 @@ podman machine start
 
 ---
 
-## ✅ Verifying Your Installation
+## Verifying Your Installation
 
 To check that Podman is working:
 
@@ -143,7 +143,7 @@ If everything is set up correctly, you’ll see Podman pull the image and run it
 
 ---
 
-## 📦 Bonus: Installing Podman Compose
+## Bonus: Installing Podman Compose
 
 If you plan to use `docker-compose`-style workflows:
 
@@ -151,7 +151,7 @@ If you plan to use `docker-compose`-style workflows:
 pip3 install podman-compose
 ```
 
-> 🔁 Podman Compose is a community-supported tool that interprets Docker Compose files using Podman under the hood.
+> Podman Compose is a community-supported tool that interprets Docker Compose files using Podman under the hood.
 
 ---
 

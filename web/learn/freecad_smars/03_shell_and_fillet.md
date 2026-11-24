@@ -3,7 +3,7 @@ layout: lesson
 title: Shell and Fillet the Base
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/03_shell_and_fillet.jpg
 date: 2025-12-12
 previous: 02_creating_the_base.html
 next: 04_sides_and_holes.html
@@ -45,6 +45,10 @@ navigation:
       link: 10_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What We're Building
 
@@ -169,6 +173,7 @@ Press `0` on your keyboard to return to the isometric view.
 | 2mm front/back walls | Will have large cutouts - don't need extra material |
 | 4mm fillet radius | Visible rounding, better print quality |
 | Shell before fillet | Easier to select edges after hollowing |
+{:class="table table-single"}
 
 ---
 

@@ -3,6 +3,11 @@ layout: lesson
 title: How does a Robot think?
 description: The Robot Brain
 type: page
+cover: /learn/robotics_101/assets/banners/lesson_05.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Video

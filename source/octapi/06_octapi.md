@@ -2,6 +2,11 @@
 title: Cracking Enigma with OctaPi
 description: Learn how to use DisPy and a Cluster of Raspberry Pis to perform a Bruteforce decryption.
 layout: lesson
+cover: /learn/octapi/assets/banners/06_octapi.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Cluster Setup

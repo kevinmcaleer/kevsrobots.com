@@ -3,7 +3,7 @@ layout: lesson
 title: Reinforcement Learning with Gymnasium
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/00_intro.jpg
 date: 2026-06-14
 next: 01_from_handbuilt_to_standard.html
 description: Meet the industry-standard Gymnasium API, explore Stable-Baselines3,
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Lesson 02 - Turning
 author: Kevin McAleer
 type: page
-cover: /learn/smars_code/assets/program_smars.png
+cover: /learn/smars_code/assets/banners/02_lesson_02.jpg
 date: 2023-09-10
 previous: 01_lesson_01.html
 next: 03_lesson_03.html
@@ -41,6 +41,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What you'll learn
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Object-Oriented Programming in MicroPython
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/02_oop.jpg
 date: 2024-07-07
 previous: 01_intro.html
 next: 02a_classes.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is Object-Oriented Programming (OOP)
 

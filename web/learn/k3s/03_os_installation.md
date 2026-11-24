@@ -3,14 +3,14 @@ layout: lesson
 title: Installing the Operating System
 author: Kevin McAleer
 type: page
-cover: assets/k3s02.jpg
+cover: /learn/k3s/assets/banners/03_os_installation.jpg
 date: 2025-06-01
 previous: 02_hardware_requirements.html
 next: 04_cluster_networking.html
 description: Prepare your Raspberry Pi nodes with a lightweight, 64-bit Linux OS ready
   for Kubernetes and K3s.
 percent: 15
-duration: 3
+duration: 2
 date_updated: 2025-05-24
 navigation:
 - name: Running K3s on Raspberry Pi
@@ -70,7 +70,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -80,7 +80,7 @@ In this lesson, we’ll walk through choosing an operating system, installing it
 
 ---
 
-## 🧠 Recommended Operating Systems
+## Recommended Operating Systems
 
 | OS                            | Notes                               |
 |-------------------------------|-------------------------------------|
@@ -89,11 +89,11 @@ In this lesson, we’ll walk through choosing an operating system, installing it
 | DietPi or Arch Linux          | For advanced users, highly minimal  |
 {:class="table table-striped"}
 
-> ⚠️ Ensure you're using a **64-bit image**, not 32-bit — Kubernetes requires 64-bit support.
+> Ensure you're using a **64-bit image**, not 32-bit — Kubernetes requires 64-bit support.
 
 ---
 
-## 💽 Step 1: Flash the OS
+## Step 1: Flash the OS
 
 ### Tools You Can Use:
 
@@ -111,7 +111,7 @@ In this lesson, we’ll walk through choosing an operating system, installing it
 
 ---
 
-## 🧑‍💻 Step 2: First Boot and Configuration
+## Step 2: First Boot and Configuration
 
 1. Insert the card/SSD into each Pi.
 2. Power up and SSH in:
@@ -139,7 +139,7 @@ Use consistent names like `pi-master`, `pi-node1`, `pi-node2`, etc.
 
 ---
 
-## 🌐 Step 3: Set Static IP or DHCP Reservation
+## Step 3: Set Static IP or DHCP Reservation
 
 On your router:
 
@@ -168,7 +168,7 @@ sudo netplan apply
 
 ---
 
-## 🧹 Step 4: Recommended Cleanup and Config
+## Step 4: Recommended Cleanup and Config
 
 - Enable cgroups (required for Kubernetes):
   Check `/boot/firmware/cmdline.txt` (Ubuntu) or `/boot/cmdline.txt` (Pi OS):
@@ -187,7 +187,7 @@ sudo netplan apply
 
 ---
 
-## 🧪 Verify
+## Verify
 
 After reboot, confirm:
 
@@ -198,7 +198,7 @@ After reboot, confirm:
 
 ---
 
-✅ Now your Pi cluster is ready for **K3s installation**!
+Now your Pi cluster is ready for **K3s installation**!
 
 Next up: [Installing K3s](05_installing_k3s)
 

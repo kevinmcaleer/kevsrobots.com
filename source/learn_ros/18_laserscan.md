@@ -3,6 +3,11 @@ layout: lesson
 title: Laserscan data
 type: page
 description: Let's Visualise our Laser scan data
+cover: /learn/learn_ros/assets/banners/18_laserscan.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Visualise Laserscan
@@ -31,7 +36,7 @@ It's finally time to visualise the laser scan data.
 
 ---
 
-🥳 you should now be able to see the Lidar Data in the middle panel
+you should now be able to see the Lidar Data in the middle panel
 
 ![Create Display](assets/rviz2.jpg){:class="img-fluid w-100 shadow-lg"}
 

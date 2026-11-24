@@ -3,7 +3,7 @@ layout: lesson
 title: Python Object-Oriented Programming (OOP)
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/1.png
+cover: /learn/python/assets/banners/08_oop.jpg
 date: 2023-07-20
 previous: 07_libraries.html
 next: 09_data.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

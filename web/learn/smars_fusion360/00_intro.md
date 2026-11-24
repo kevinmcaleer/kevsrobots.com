@@ -3,7 +3,7 @@ layout: lesson
 title: Overview
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/00_intro.jpg
 date: 2023-07-20
 next: 01_base.html
 description: Design the SMARS robot chassis in Fusion 360, starting with the outer
@@ -59,7 +59,9 @@ navigation:
 ---
 
 
-![SMARS in Fusion 360](assets/smars_fusion360.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video first
 

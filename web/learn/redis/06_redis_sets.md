@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Sets
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/06_redis_sets.jpg
 date: 2023-04-12
 previous: 05_redis_lists.html
 next: 07_redis_hashes.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis sets](assets/redis-sets.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

@@ -3,10 +3,12 @@ title: Overview of Pydantic and Data Validation
 description: Introduction to the fundamentals of Pydantic and the advantages of using it for data validation in Python applications.
 layout: lesson
 type: page
-cover: assets/pydantic.png
+cover: /learn/pydantic/assets/banners/01_overview_of_pydantic.jpg
 ---
 
-![Pydantic cover image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is Pydantic?
 

@@ -2,6 +2,11 @@
 title: Test Motors
 description: Test Motors to ensure they work ok
 layout: lesson
+cover: /learn/smars/assets/banners/smars07.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Test Motors

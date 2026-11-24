@@ -33,6 +33,7 @@ Sound travels about 343 metres a second, and it goes there *and back*, so:
 # 343 m/s is 0.343 mm per microsecond, halved for the round trip
 distance_mm = duration * 343 // 2000
 ```
+{: .no-snakie }
 
 ## Step 1: set up the project
 

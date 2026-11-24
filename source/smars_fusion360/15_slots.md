@@ -2,6 +2,11 @@
 title: Arduino slot profile
 description: Create the slots for the Arduino
 layout: lesson
+cover: /learn/smars_fusion360/assets/banners/15_slots.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The slots for the Arduino are sketched next. They go all the way from the back edge to the inner front edge. The dimensions of the Arduino slots are:

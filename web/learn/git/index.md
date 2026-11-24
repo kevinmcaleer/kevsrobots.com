@@ -7,7 +7,7 @@ date: 2026-11-04
 description: 'Learn to track your code and projects with Git: commits, history, undoing
   mistakes, branches, merging, and sharing your work on GitHub.'
 level: beginner
-course_duration: 1h 14m
+course_duration: 1h 15m
 lesson_count: 14
 first_lesson: 00_intro.html
 quiz_total: 35

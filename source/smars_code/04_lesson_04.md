@@ -2,6 +2,11 @@
 title: Lesson 04 - Positioning with the MPU-6050
 description: Learn how to detect the position and acceleration in space using the MPU-6050 module
 layout: lesson
+cover: /learn/smars_code/assets/banners/04_lesson_04.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the livestream

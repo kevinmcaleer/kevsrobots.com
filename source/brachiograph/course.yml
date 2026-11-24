@@ -5,6 +5,7 @@
   level: beginner
   layout: course
   cover: assets/cover.png
+  video: tkAv3HIw3CY
   groups:
       - robot arm
       - python

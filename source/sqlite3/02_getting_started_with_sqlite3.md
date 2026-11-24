@@ -3,6 +3,11 @@ title: Getting Started with Python and SQLite3
 description: >-
    We will cover the initial steps to set up Python and SQLite3, establish a connection to a database, and perform basic operations using Python's sqlite3 module
 layout: lesson
+cover: /learn/sqlite3/assets/banners/02_getting_started_with_sqlite3.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In Module 2, we will cover the initial steps to set up Python and SQLite3, establish a connection to a database, and perform basic operations using Python's `sqlite3` module.

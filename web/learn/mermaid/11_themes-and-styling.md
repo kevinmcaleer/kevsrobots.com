@@ -3,7 +3,7 @@ layout: lesson
 title: Themes and Styling
 author: Kevin McAleer
 type: page
-cover: /learn/mermaid/assets/cover.jpg
+cover: /learn/mermaid/assets/banners/11_themes-and-styling.jpg
 date: 2026-11-04
 previous: 10_more-diagram-types.html
 next: 12_exporting-and-sharing.html
@@ -61,6 +61,10 @@ navigation:
       link: 14_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Styling the whole diagram
 

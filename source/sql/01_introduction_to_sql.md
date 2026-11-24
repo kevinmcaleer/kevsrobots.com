@@ -3,6 +3,11 @@ title: Introduction to SQL and Relational Databases
 description: >-
     Overview of SQL, its importance, and foundational database concepts
 layout: lesson
+cover: /learn/sql/assets/banners/01_introduction_to_sql.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll explore the fundamentals of `SQL` (Structured Query Language) and relational databases. SQL is the standard language for interacting with databases, and relational databases are widely used to store, organize, and manage data in a structured way.

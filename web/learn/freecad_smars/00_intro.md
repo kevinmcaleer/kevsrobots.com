@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Building SMARS with FreeCAD
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/00_intro.jpg
 date: 2025-12-12
 next: 01_navigation.html
 description: Learn to design a real robot chassis from scratch using free, open-source
@@ -46,7 +46,11 @@ navigation:
 ---
 
 
-![Course Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+{% include youtubeplayer.html id="S7EoZHd03FY" %}
 
 Watch the video, then follow along here to build the chassis step by step.
 
@@ -210,6 +214,7 @@ Before we start designing, let's understand what we're building:
 | Wall thickness | 2-3mm | Strong enough to handle, light enough for motors |
 | Motor hole diameter | 4.5mm | Fits N20 motor shafts with slight clearance |
 | Fillet radius | 4mm | Reduces stress concentration, looks professional |
+{:class="table table-single"}
 
 These aren't arbitrary numbers - each was chosen to work with specific components. As you progress, you'll understand why.
 

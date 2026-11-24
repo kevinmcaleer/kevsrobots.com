@@ -3,7 +3,7 @@ layout: lesson
 title: Laserscan data
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/18_laserscan.jpg
 date: 2023-01-07
 previous: 17_tf2.html
 next: 19_summary.html
@@ -75,6 +75,10 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
 ## Visualise Laserscan
 
 It's finally time to visualise the laser scan data.
@@ -101,7 +105,7 @@ It's finally time to visualise the laser scan data.
 
 ---
 
-🥳 you should now be able to see the Lidar Data in the middle panel
+you should now be able to see the Lidar Data in the middle panel
 
 ![Create Display](assets/rviz2.jpg){:class="img-fluid w-100 shadow-lg"}
 

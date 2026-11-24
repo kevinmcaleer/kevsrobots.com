@@ -3,7 +3,7 @@ layout: lesson
 title: Loading the code
 author: Kevin McAleer
 type: page
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/04_loading_the_code.jpg
 date: 2023-04-27
 previous: 03_getting_the_code.html
 next: 05_basic_movement.html
@@ -57,6 +57,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Uploading the code
 

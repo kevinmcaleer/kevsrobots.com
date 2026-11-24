@@ -3,14 +3,14 @@ layout: lesson
 title: GitHub and Remotes
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/10_github-and-remotes.jpg
 date: 2026-11-04
 previous: 09_merging-and-conflicts.html
 next: 11_pulling-and-collaborating.html
 description: Put your repository on GitHub, push your commits, sign in safely, and
   clone repositories onto other computers
 percent: 77
-duration: 5
+duration: 6
 quiz_total: 35
 navigation:
 - name: Git for Beginners
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What's a remote?
 

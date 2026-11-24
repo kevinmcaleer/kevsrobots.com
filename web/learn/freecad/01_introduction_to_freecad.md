@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to FreeCAD
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/freecad/assets/banners/01_introduction_to_freecad.jpg
 date: 2024-04-17
 next: 02_installing_freecad.html
 description: Learn what FreeCAD is and why it is a powerful tool for 3D modeling and
@@ -46,7 +46,9 @@ navigation:
 ---
 
 
-![FreeCAD cover image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 See FreeCAD in action first: this video uses it to build a robot chassis from scratch.
 

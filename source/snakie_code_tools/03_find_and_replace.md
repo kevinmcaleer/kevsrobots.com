@@ -45,6 +45,7 @@ Say you want to rename the variable `left` to `left_motor`. Our file has these l
 left = PWM(Pin(LEFT_MOTOR_PIN))
 left.duty_u16(duty)
 ```
+{: .no-snakie }
 
 Search for `left` with nothing switched on and you might expect two matches. But a search that ignores case also finds the `LEFT` in `LEFT_MOTOR_PIN`. **Replace all** would turn that into `left_motor_MOTOR_PIN`, and your program would stop with a `NameError`.
 

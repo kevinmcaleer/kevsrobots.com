@@ -3,7 +3,7 @@ layout: lesson
 title: Downloading Course Content
 author: Kevin McAleer
 type: page
-cover: /learn/learning_platform/assets/learn.jpg
+cover: /learn/learning_platform/assets/banners/03_download_content.jpg
 date: 2022-12-04
 previous: 02_navigate_content.html
 description: Learn how to download supporting files and content
@@ -26,6 +26,10 @@ navigation:
       link: 03_download_content.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Downloadable content
 

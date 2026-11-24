@@ -3,7 +3,7 @@ layout: lesson
 title: Decrypting a message
 author: Kevin McAleer
 type: page
-cover: /learn/octapi/assets/octapi.jpg
+cover: /learn/octapi/assets/banners/02_lesson02.jpg
 date: 2024-02-18
 previous: 01_lesson01.html
 next: 03_lesson03.html
@@ -37,6 +37,10 @@ navigation:
       link: 06_octapi.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Decrypting a message
 

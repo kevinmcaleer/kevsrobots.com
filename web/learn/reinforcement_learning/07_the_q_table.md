@@ -3,7 +3,7 @@ layout: lesson
 title: The Q-Table
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/07_the_q_table.jpg
 date: 2026-06-13
 previous: 06_looking_into_the_future.html
 next: 08_exploration_vs_exploitation.html
@@ -11,6 +11,7 @@ description: "Build the robot's cheat sheet \u2014 a Python dictionary that stor
   \ the estimated value of every action in every state."
 percent: 48
 duration: 6
+code_target: cpython
 date_updated: 2026-06-13
 navigation:
 - name: Reinforcement Learning for Beginners
@@ -60,7 +61,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

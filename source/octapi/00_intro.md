@@ -2,9 +2,12 @@
 title: Introduction
 description: What you'll learn in this course
 layout: lesson
+cover: /learn/octapi/assets/banners/00_intro.jpg
 ---
 
-![Course Image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this course you will learn about `OctaPi` and how to crack the Enigma machine using Python, a bunch of Raspberry Pi's and a little bit of parallel computing.
 

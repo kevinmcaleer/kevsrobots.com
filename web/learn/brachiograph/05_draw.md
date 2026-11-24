@@ -3,7 +3,7 @@ layout: lesson
 title: Draw
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/05_draw.jpg
 date: 2024-07-26
 previous: 04_code.html
 next: 06_vectorize.html
@@ -39,6 +39,10 @@ navigation:
       link: 07_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Draw a simple box
 

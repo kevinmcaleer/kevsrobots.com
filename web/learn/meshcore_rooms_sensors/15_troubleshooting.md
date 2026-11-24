@@ -3,7 +3,7 @@ layout: lesson
 title: Troubleshooting
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/15_troubleshooting.jpg
 date: 2026-08-05
 previous: 14_reading_telemetry.html
 next: 16_next_steps.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Work down this list in order. As in part one, most problems are in the first few items, and most of those are radio settings or wiring.
 

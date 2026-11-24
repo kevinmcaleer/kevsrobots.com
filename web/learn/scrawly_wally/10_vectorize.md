@@ -3,7 +3,7 @@ layout: lesson
 title: Vectorizing Images for Drawing
 author: Kevin McAleer
 type: page
-cover: assets/vectorize.png
+cover: /learn/scrawly_wally/assets/banners/10_vectorize.jpg
 date: 2024-08-02
 previous: 09_draw.html
 next: 11_summary.html
@@ -46,6 +46,10 @@ navigation:
       link: 11_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Vectorizing Images
 

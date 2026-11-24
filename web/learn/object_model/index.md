@@ -9,9 +9,10 @@ description: Learn how to build custom object detection models using the Raspber
   and run real-time detection on Raspberry Pi hardware. Complete hands-on course from
   dataset creation to production deployment.
 level: intermediate
-course_duration: 1h 0m
+course_duration: 1h 1m
 lesson_count: 9
 first_lesson: 00_intro.html
+video: ARCtzjHfyMg
 navigation:
 - name: Building Object Detection Models with Raspberry Pi AI Camera
 - content:

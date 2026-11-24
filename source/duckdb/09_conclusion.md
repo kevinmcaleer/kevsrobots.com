@@ -3,6 +3,11 @@ title: Conclusion and Next Steps
 description: Wrap up the course with key takeaways and patterns for using DuckDB in real projects.
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/09_conclusion.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Conclusion and Next Steps

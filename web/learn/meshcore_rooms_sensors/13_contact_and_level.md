@@ -3,7 +3,7 @@ layout: lesson
 title: Contact and Level Sensing
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/13_contact_and_level.jpg
 date: 2026-08-05
 previous: 12_battery_telemetry.html
 next: 14_reading_telemetry.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 "Is the shed door open?" and "how full is the water tank?" are two of the most requested things people want from a remote sensor. This lesson is an honest account of how to get them, because the obvious approach is not the supported one.
 

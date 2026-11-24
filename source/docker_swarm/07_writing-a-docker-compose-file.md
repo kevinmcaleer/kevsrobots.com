@@ -3,6 +3,10 @@ title: Writing a Docker Compose File
 description: This lesson guides you through the process of writing a Docker Compose file, enabling you to define and deploy multi-container applications with ease.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/07_writing-a-docker-compose-file.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

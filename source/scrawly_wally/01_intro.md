@@ -3,13 +3,15 @@ title: Introduction to the Wall Drawing Robot
 description: Learn about the project and what you will accomplish.
 layout: lesson
 type: page
-cover: /learn/scrawly_wally/assets/cover.png
+cover: /learn/scrawly_wally/assets/banners/01_intro.jpg
 date_updated: 2024-08-02
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+{% include youtubeplayer.html id="JB4rPNBCL3Q" %}
 
 ## Introduction
 

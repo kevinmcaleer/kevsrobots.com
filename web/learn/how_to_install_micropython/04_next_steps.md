@@ -3,7 +3,7 @@ layout: lesson
 title: Next Steps
 author: Kevin McAleer
 type: page
-cover: /learn/how_to_install_micropython/assets/cover.jpg
+cover: /learn/how_to_install_micropython/assets/banners/04_next_steps.jpg
 date: 2024-08-10
 previous: 03_install.html
 description: What to do next after installing MicroPython on your Raspberry Pi Pico
@@ -28,6 +28,10 @@ navigation:
       link: 04_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 There are many exciting projects you can build now that you have MicroPython installed on you Raspberry Pi Pico. 
 

@@ -3,6 +3,11 @@ title: Querying data lakes (HTTP/S3)
 description: "Read CSV/Parquet from cloud/object storage with DuckDB’s httpfs, and use partition pruning."
 type: page
 layout: lesson
+cover: /learn/duckdb/assets/banners/06_datalakes.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 DuckDB can read remote files over HTTPS and S3 without running a server.

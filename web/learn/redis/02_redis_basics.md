@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Basics
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/02_redis_basics.jpg
 date: 2023-04-12
 previous: 01_introduction.html
 next: 03_data_types.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis basics](assets/redis-basics.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

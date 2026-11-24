@@ -3,10 +3,12 @@ title: Course Overview
 description: >-
     What you'll learn in "Getting Started with SQL"
 layout: lesson
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/00_course_overview.jpg
 ---
 
-![cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 This course provides a foundational understanding of SQL, database management, and relational database theory. Here’s what each lesson covers:
 

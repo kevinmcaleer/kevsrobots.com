@@ -3,7 +3,7 @@ layout: lesson
 title: 'Bonus: Python Tips, Tricks and Best Practices'
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/4.png
+cover: /learn/python/assets/banners/18_tips_and_tricks.jpg
 date: 2023-07-20
 previous: 17_apps.html
 description: Discover various Python tips, tricks, and best practices, such as writing
@@ -57,7 +57,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

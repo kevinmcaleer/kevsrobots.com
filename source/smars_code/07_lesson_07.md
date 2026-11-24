@@ -2,9 +2,12 @@
 title: Lesson 07 - Line Following
 description: Learn how to use the line follow module
 layout: lesson
+cover: /learn/smars_code/assets/banners/07_lesson_07.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
+---
 
 ## Watch the livestream
 

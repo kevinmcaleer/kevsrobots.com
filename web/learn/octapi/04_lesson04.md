@@ -3,7 +3,7 @@ layout: lesson
 title: Bruteforce descryption
 author: Kevin McAleer
 type: page
-cover: /learn/octapi/assets/octapi.jpg
+cover: /learn/octapi/assets/banners/04_lesson04.jpg
 date: 2024-02-18
 previous: 03_lesson03.html
 next: 05_dispy.html
@@ -37,6 +37,10 @@ navigation:
       link: 06_octapi.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is a brute force attack?
 

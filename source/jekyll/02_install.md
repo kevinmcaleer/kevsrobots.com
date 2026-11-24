@@ -3,6 +3,11 @@ title: Installation and Setup
 description: A step-by-step guide to installing Jekyll and setting up your first static site, with practical insights.
 layout: lesson
 type: page
+cover: /learn/jekyll/assets/banners/02_install.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

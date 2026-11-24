@@ -3,7 +3,7 @@ layout: lesson
 title: Print the parts
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/07_print.jpg
 date: 2025-02-16
 previous: 08_top_panel.html
 description: Learn how to print the parts for the mini-rack
@@ -40,6 +40,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Tips
 

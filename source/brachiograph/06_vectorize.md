@@ -3,7 +3,11 @@ title: Vectorize Images
 description: Calibrate the BrachioGraph
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/06_vectorize.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Using the linedraw.py Module to Vectorize Images

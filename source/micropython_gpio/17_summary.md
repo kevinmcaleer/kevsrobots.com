@@ -3,6 +3,11 @@ layout: lesson
 title: Recap and Review
 type: page
 description: A summary of what you have learned in the Raspberry Pi Pico with MicroPython - GPIO Mastery course.
+cover: /learn/micropython_gpio/assets/banners/17_summary.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

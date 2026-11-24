@@ -6,9 +6,10 @@ cover: /learn/obsidian/assets/cover.jpg
 date: 2025-08-24
 description: Learn how to use Obsidian for note-taking and knowledge management.
 level: beginner
-course_duration: 0h 30m
+course_duration: 0h 31m
 lesson_count: 13
 first_lesson: 00_intro.html
+video: zo3mb3EeJXQ
 navigation:
 - name: Obsidian
 - content:

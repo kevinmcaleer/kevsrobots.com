@@ -3,7 +3,7 @@ layout: lesson
 title: Course Overview
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/overview01.jpg
+cover: /learn/sqlite3/assets/banners/00_intro.jpg
 date: 2023-07-15
 next: 01_introduction_to_databases.html
 description: What you'll learn
@@ -62,7 +62,9 @@ navigation:
 ---
 
 
-![banner]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

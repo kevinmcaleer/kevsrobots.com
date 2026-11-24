@@ -3,11 +3,11 @@ title: Kubectl Basics
 description: Learn the essential `kubectl` commands to interact with your K3s Kubernetes cluster from the command line.
 layout: lesson
 type: page
-cover: assets/k3s01.jpg
+cover: /learn/k3s/assets/banners/08_kubectl_basics.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -17,7 +17,7 @@ This lesson will walk you through the basics of exploring and managing your clus
 
 ---
 
-## ✅ Setting Up `kubectl` Access
+## Setting Up `kubectl` Access
 
 On the **master node**, or from your development machine:
 
@@ -41,7 +41,7 @@ chmod 600 ~/.kube/config
 
 ---
 
-## 🔍 Inspecting the Cluster
+## Inspecting the Cluster
 
 List all nodes:
 
@@ -63,7 +63,7 @@ kubectl get pods -n kube-system
 
 ---
 
-## 🚀 Deploying a Simple App
+## Deploying a Simple App
 
 Create a simple deployment:
 
@@ -87,7 +87,7 @@ Access it via any node's IP and the port listed.
 
 ---
 
-## 📁 Useful Commands
+## Useful Commands
 
 | Command                          | Description                                |
 | -------------------------------- | ------------------------------------------ |
@@ -101,7 +101,7 @@ Access it via any node's IP and the port listed.
 
 ---
 
-## 🧠 Pro Tips
+## Pro Tips
 
 * Use `-A` to view resources across all namespaces
 * Add bash completion for `kubectl`:
@@ -114,7 +114,7 @@ Access it via any node's IP and the port listed.
 
 ---
 
-## 🔍 Example: Get Details on Your Node
+## Example: Get Details on Your Node
 
 ```bash
 kubectl describe node pi-master
@@ -129,7 +129,7 @@ Look at:
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 

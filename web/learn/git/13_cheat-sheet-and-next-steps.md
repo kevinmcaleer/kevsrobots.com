@@ -3,7 +3,7 @@ layout: lesson
 title: Cheat Sheet and Next Steps
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/13_cheat-sheet-and-next-steps.jpg
 date: 2026-11-04
 previous: 12_project-version-control-a-robot.html
 description: Every Git command from the course on one page, plus where to go next
@@ -55,6 +55,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Well done!
 

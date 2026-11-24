@@ -3,7 +3,7 @@ layout: lesson
 title: Control Flow - If, Loops, and No Braces!
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/03_control_flow.jpg
 date: 2025-11-20
 previous: 02_syntax_basics.html
 next: 04_functions.html
@@ -48,6 +48,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Control Flow: The Python Way
 
@@ -147,6 +151,7 @@ These are identical in both languages:
 | `<` | Less than | `if x < 10:` |
 | `>=` | Greater or equal | `if x >= 10:` |
 | `<=` | Less or equal | `if x <= 10:` |
+{:class="table table-single"}
 
 ## Logical Operators
 
@@ -184,6 +189,7 @@ if not door_open:
 | `&&` | `and` | Both conditions true |
 | `||` | `or` | Either condition true |
 | `!` | `not` | Negation |
+{:class="table table-single"}
 
 Python's word-based operators are more readable once you get used to them.
 
@@ -237,6 +243,7 @@ while True:  # Explicit infinite loop
     led.off()
     time.sleep(1)
 ```
+{: .no-snakie }
 
 `while True:` is the Python equivalent of Arduino's `loop()`. You'll use this pattern in almost every MicroPython program.
 
@@ -396,6 +403,7 @@ for i in range(10):
         continue  # Skip even numbers
     print(i)
 ```
+{: .no-snakie }
 
 ## Switch Statements: Python Doesn't Have Them!
 

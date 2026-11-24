@@ -2,6 +2,11 @@
 title: Attach Wheels
 description: Attach Wheels to the motors
 layout: lesson
+cover: /learn/smars/assets/banners/smars06.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Attach Wheels

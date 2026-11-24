@@ -3,7 +3,7 @@ layout: lesson
 title: Installing MicroPython on the Pico
 author: Kevin McAleer
 type: page
-cover: assets/micropython_install_cover.png
+cover: /learn/pico_temp_sensor/assets/banners/03_installing_micropython_on_pico.jpg
 date: 2024-11-22
 previous: 02_setting_up_thonny.html
 next: 04_overview_of_pico_temperature_sensor.html
@@ -50,6 +50,10 @@ navigation:
       link: 12_troubleshooting_temperature_readings.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

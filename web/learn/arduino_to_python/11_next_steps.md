@@ -3,7 +3,7 @@ layout: lesson
 title: Next Steps and Quick Reference
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/cover.jpg
+cover: /learn/arduino_to_python/assets/banners/11_next_steps.jpg
 date: 2025-11-20
 previous: 10_robot_project.html
 description: Course summary, quick reference guide for converting Arduino C++ to MicroPython,
@@ -47,6 +47,10 @@ navigation:
       link: 11_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Congratulations!
 
@@ -163,7 +167,7 @@ Let's review what you've learned and where to go next.
 
 **Common Conversions:**
 
-```python
+```text
 # Arduino delay to MicroPython
 delay(1000)           → time.sleep(1)          # 1 second
 delay(500)            → time.sleep(0.5)        # 0.5 seconds
@@ -198,6 +202,7 @@ time.sleep(1)
 # If you're thinking in milliseconds:
 time.sleep_ms(1000)  # 1000 milliseconds = 1 second
 ```
+{: .no-snakie }
 
 **2. Boolean Values**
 
@@ -208,9 +213,11 @@ flag = true
 # RIGHT - capitalize
 flag = True
 ```
+{: .no-snakie }
 
 **3. Indentation Errors**
 
+<!-- code-check: skip -->
 ```python
 # WRONG - inconsistent indentation
 if x > 10:
@@ -222,6 +229,7 @@ if x > 10:
     print("Big")
     print("Really big")
 ```
+{: .no-snakie }
 
 **4. Pin Numbers**
 
@@ -237,6 +245,7 @@ led = Pin("LED", Pin.OUT)
 # Arduino Nano ESP32 - use Arduino numbers
 led = Pin(13, Pin.OUT)  # D13
 ```
+{: .no-snakie }
 
 **5. ADC Resolution**
 
@@ -248,6 +257,7 @@ led = Pin(13, Pin.OUT)  # D13
 # Convert MicroPython to Arduino range:
 arduino_value = adc.read_u16() >> 6  # Shift right 6 bits
 ```
+{: .no-snakie }
 
 ## When to Use Each Language
 

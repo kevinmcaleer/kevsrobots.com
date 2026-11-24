@@ -3,7 +3,11 @@ title: Interrupts
 description: Learn about interrupts in MicroPython and how they allow immediate response to events.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/11_interrupts.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Interrupts

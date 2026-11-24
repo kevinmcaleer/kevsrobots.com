@@ -4,6 +4,11 @@ description: >-
     Convert your trained PyTorch model to ONNX format for deployment on the Raspberry Pi AI Camera
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/04_onnx_conversion.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

@@ -3,7 +3,7 @@ layout: lesson
 title: Revolve
 author: Kevin McAleer
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/03_revolve.jpg
 date: 2023-01-29
 previous: 02_create_sketch.html
 next: 04_create_hinges.html
@@ -46,6 +46,10 @@ navigation:
       link: 09_joint_and_export.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 * **Select the profile** - Click within the newly created profile to select it
 

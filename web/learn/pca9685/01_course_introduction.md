@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/pca9685/assets/banners/01_course_introduction.jpg
 date: 2024-04-06
 next: 02_raspberry_pi_setup.html
 description: Kickstart your journey into robotics by learning about the components,
@@ -50,7 +50,11 @@ navigation:
 ---
 
 
-![Robot Arm Course Cover Image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+{% include youtubeplayer.html id="_JJAV97Mm98" %}
 
 ## Welcome to the Course
 

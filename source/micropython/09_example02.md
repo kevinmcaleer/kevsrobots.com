@@ -2,6 +2,11 @@
 title: Example 02
 description: Variables
 layout: lesson
+cover: /learn/micropython/assets/banners/09_example02.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Let’s do something more interesting.

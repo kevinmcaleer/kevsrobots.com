@@ -3,7 +3,7 @@ layout: lesson
 title: Working with Joins
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/08_working_with_joins.jpg
 date: 2024-11-01
 previous: 07_advanced_filtering.html
 next: 09_grouping_and_aggregating_data.html
@@ -55,6 +55,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore how to work with multiple tables in a relational database using **joins**. Joins are essential for combining data across tables, helping you retrieve meaningful insights by connecting related data.
 

@@ -3,7 +3,7 @@ layout: lesson
 title: "What You Have Built \u2014 and Where to Go Next"
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/14_summary.jpg
 date: 2026-06-14
 previous: 13_train_evaluate_export.html
 description: Recap the journey from hand-built loop to Gymnasium environment to neural-network
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

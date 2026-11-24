@@ -3,7 +3,7 @@ layout: lesson
 title: What is ROS
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/01_what_is_ros.jpg
 date: 2023-01-07
 previous: 00_intro.html
 next: 02_pi_setup.html
@@ -74,6 +74,10 @@ navigation:
       link: 19_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is ROS?
 

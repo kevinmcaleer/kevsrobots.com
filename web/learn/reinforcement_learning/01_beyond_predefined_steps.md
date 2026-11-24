@@ -3,7 +3,7 @@ layout: lesson
 title: Beyond Predefined Steps
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/01_beyond_predefined_steps.jpg
 date: 2026-06-13
 previous: 00_intro.html
 next: 02_anatomy_of_robotic_rl.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -162,6 +162,7 @@ for episode in range(500):
 
     print(f"Episode {episode}: total reward = {total_reward:.1f}")
 ```
+{: .no-snakie }
 
 Each episode, the robot tries to navigate a grid, gets rewards for good moves and penalties for collisions, and updates a table of "how good is each action in each situation?" values. After enough episodes, that table holds a surprisingly competent policy — no rules written by hand.
 

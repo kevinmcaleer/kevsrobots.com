@@ -3,7 +3,7 @@ layout: lesson
 title: Voltage Levels
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/03_voltage_levels.jpg
 date: 2023-04-14
 previous: 02_pin_numbering.html
 next: 04_digital_io.html
@@ -69,6 +69,10 @@ navigation:
       link: 17_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

@@ -3,7 +3,7 @@ layout: lesson
 title: From Hand-Built to Standard
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/01_from_handbuilt_to_standard.jpg
 date: 2026-06-14
 previous: 00_intro.html
 next: 02_first_environment.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Front cut
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/07_cut.jpg
 date: 2023-07-20
 previous: 06_front.html
 next: 08_stub.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The [Front profile](06_front.html) created above is used to extrude a cut into the front side of the chassis.
 

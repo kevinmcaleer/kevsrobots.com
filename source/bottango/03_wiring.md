@@ -15,7 +15,7 @@ Servos are the muscles of your project – they move parts back and forth in res
 
 ---
 
-## 🧩 What You'll Need
+## What You'll Need
 
 - 1–3 servo motors (SG90 or MG90S are great)
 - Jumper wires (female-to-male or male-to-male depending on your board)
@@ -24,7 +24,7 @@ Servos are the muscles of your project – they move parts back and forth in res
 
 ---
 
-## 🔌 Servo Pinout
+## Servo Pinout
 
 Most servo motors have **3 wires**:
 
@@ -36,13 +36,14 @@ Make sure to check your specific servo's color code.
 
 ---
 
-## ⚙️ Connect to Arduino Uno/Nano
+## Connect to Arduino Uno/Nano
 
 | Servo Wire | Arduino Pin |
 |------------|-------------|
 | GND        | GND         |
 | VCC        | 5V          |
 | Signal     | D3, D5, D6  |
+{:class="table table-single"}
 
 Use one digital pin per servo for signal. For example:
 
@@ -54,7 +55,7 @@ You can connect VCC and GND for all servos to the same 5V and GND pins — but *
 
 ---
 
-## ⚡ Powering More Than One Servo
+## Powering More Than One Servo
 
 The Arduino’s onboard 5V regulator **can only power 1 small servo reliably**.
 
@@ -64,11 +65,11 @@ If you're using multiple servos:
 2. Connect servo VCC to the external power **+5V**.
 3. Connect **all grounds together** — including the Arduino GND and the external power GND.
 
-> 🛑 **Never power high-current servos directly from the Arduino!**
+> **Never power high-current servos directly from the Arduino!**
 
 ---
 
-## 🔧 ESP32 Wiring
+## ESP32 Wiring
 
 Most ESP32 dev boards support 3.3V logic but are 5V-tolerant. You can safely connect:
 
@@ -80,7 +81,7 @@ Consult your board’s pinout diagram for available GPIOs.
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Once everything is wired:
 

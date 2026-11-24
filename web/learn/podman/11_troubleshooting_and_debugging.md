@@ -3,7 +3,7 @@ layout: lesson
 title: Troubleshooting and Debugging
 author: Kevin McAleer
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/11_troubleshooting_and_debugging.jpg
 date: 2025-05-24
 previous: 10_podman_in_production.html
 next: 12_migration_project.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -66,7 +66,7 @@ Even with a solid setup, container issues are bound to happen. In this lesson, y
 
 ---
 
-## 🛠 Inspecting Containers
+## Inspecting Containers
 
 Start with `podman inspect` to view everything about a container:
 
@@ -82,7 +82,7 @@ This gives you:
 * Restart policies
 * Container state and exit codes
 
-> 📦 Use `jq` or `grep` to filter specific values:
+> Use `jq` or `grep` to filter specific values:
 >
 > ```bash
 > podman inspect <id> | jq '.[0].State.ExitCode'
@@ -90,7 +90,7 @@ This gives you:
 
 ---
 
-## 📜 Viewing Logs
+## Viewing Logs
 
 To see standard output and error logs:
 
@@ -110,11 +110,11 @@ If using systemd:
 journalctl --user -u container-<name>
 ```
 
-> 🧠 Podman containers integrate cleanly with the **Linux journal** when managed via systemd.
+> Podman containers integrate cleanly with the **Linux journal** when managed via systemd.
 
 ---
 
-## 🧪 Executing Commands in a Running Container
+## Executing Commands in a Running Container
 
 Use `exec` to get a shell or run diagnostics inside a container:
 
@@ -132,7 +132,7 @@ This is great for checking filesystem paths, environment variables, or running t
 
 ---
 
-## ❌ Common Errors and Fixes
+## Common Errors and Fixes
 
 ### "Image not found"
 
@@ -181,7 +181,7 @@ podman run -it <image> sh
 
 ---
 
-## 🧹 Cleaning Up
+## Cleaning Up
 
 Remove exited containers:
 
@@ -203,7 +203,7 @@ podman volume prune
 
 ---
 
-## 🧰 Useful Tools
+## Useful Tools
 
 | Tool/Command     | Purpose                          |
 | ---------------- | -------------------------------- |

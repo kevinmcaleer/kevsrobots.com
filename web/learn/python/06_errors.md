@@ -3,7 +3,7 @@ layout: lesson
 title: Error Handling and Exceptions in Python
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/6.png
+cover: /learn/python/assets/banners/06_errors.jpg
 date: 2023-07-20
 previous: 05_files.html
 next: 07_libraries.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

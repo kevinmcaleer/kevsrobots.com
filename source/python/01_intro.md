@@ -2,10 +2,12 @@
 title: Introduction to Python Programming
 description: Understand the fundamentals of Python, install it, and write your first program.
 layout: lesson
-cover: /learn/python/assets/1.png
+cover: /learn/python/assets/banners/01_intro.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

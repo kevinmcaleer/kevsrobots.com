@@ -3,7 +3,7 @@ layout: lesson
 title: Vectorize Images
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/brachiograph/assets/banners/06_vectorize.jpg
 date: 2024-07-26
 previous: 05_draw.html
 next: 07_summary.html
@@ -39,6 +39,10 @@ navigation:
       link: 07_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Using the linedraw.py Module to Vectorize Images
 

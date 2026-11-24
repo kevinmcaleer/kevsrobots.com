@@ -3,7 +3,7 @@ layout: lesson
 title: The Anatomy of Robotic RL
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/02_anatomy_of_robotic_rl.jpg
 date: 2026-06-13
 previous: 01_beyond_predefined_steps.html
 next: 03_designing_the_reward_function.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
@@ -181,6 +181,7 @@ next_state, reward, done = env.step(action)  # environment responds
 agent.learn(state, action, reward, next_state)  # agent updates its knowledge
 state = next_state                    # move forward in time
 ```
+{: .no-snakie }
 
 This loop runs inside an **episode** — a single attempt at the task, from start to finish (or until a time limit). After an episode ends (the robot reached the goal, or crashed, or ran out of time), the environment resets and a new episode begins.
 

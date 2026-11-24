@@ -3,11 +3,11 @@ title: Reinforcement Learning with Gymnasium
 description: Meet the industry-standard Gymnasium API, explore Stable-Baselines3, and train neural-network agents on the BurgerBot grid-world you already know.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/00_intro.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

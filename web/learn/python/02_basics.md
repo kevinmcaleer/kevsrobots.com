@@ -3,7 +3,7 @@ layout: lesson
 title: Python Basics
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/2.png
+cover: /learn/python/assets/banners/02_basics.jpg
 date: 2023-07-20
 previous: 01_intro.html
 next: 03_data_structures.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

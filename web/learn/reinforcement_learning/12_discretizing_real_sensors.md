@@ -3,7 +3,7 @@ layout: lesson
 title: Discretising Real Sensors
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/12_discretizing_real_sensors.jpg
 date: 2026-06-13
 previous: 11_the_sim_to_real_gap.html
 next: 13_deploying_the_brain.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

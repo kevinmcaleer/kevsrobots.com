@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Lists
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/05_redis_lists.jpg
 date: 2023-04-12
 previous: 04_commands_and_transactions.html
 next: 06_redis_sets.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis lists](assets/redis-lists.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

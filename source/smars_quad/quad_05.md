@@ -2,6 +2,11 @@
 title: Servo Arms
 description: 5 Print the servo arms
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_05.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 5 Print the servo arms

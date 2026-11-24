@@ -3,9 +3,12 @@ title: SPI Hardware Setup
 description: Learn how to wire SPI devices to your Raspberry Pi Pico with proper connections
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/08_spi-hardware-setup.jpg
 ---
 
-<!-- ![SPI Wiring](/learn/i2c_spi/assets/spi-wiring.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Wiring Your First SPI Device
 
@@ -262,6 +265,7 @@ spi = SPI(0, baudrate=100000, ...)  # 100 kHz
 # Once working, increase gradually
 spi = SPI(0, baudrate=1000000, ...)  # 1 MHz
 ```
+{: .no-snakie }
 
 ### Wrong SPI Mode
 
@@ -282,6 +286,7 @@ spi = SPI(0, baudrate=1000000, polarity=1, phase=0, ...)
 # Mode 3
 spi = SPI(0, baudrate=1000000, polarity=1, phase=1, ...)
 ```
+{: .no-snakie }
 
 ## Multiple SPI Devices
 

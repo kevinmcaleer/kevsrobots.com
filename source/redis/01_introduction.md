@@ -3,10 +3,12 @@ layout: lesson
 title: Introduction to Redis
 type: page
 description: Get started with Redis, learn what it is, why you should use it, and where to download it.
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/01_introduction.jpg
 ---
 
-![Cover photo of Redis logo](assets/redis-cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

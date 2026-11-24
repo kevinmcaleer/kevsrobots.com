@@ -3,9 +3,12 @@ layout: lesson
 title: Introduction
 type: page
 description: Learn how to control the GPIO pins on the Raspberry Pi Pico with MicroPython, and connect LEDs, motors, servos and sensors.
+cover: /learn/micropython_gpio/assets/banners/00_intro.jpg
 ---
 
-![Cover photo]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the videos
 

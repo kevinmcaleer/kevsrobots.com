@@ -3,7 +3,7 @@ layout: lesson
 title: DisPy
 author: Kevin McAleer
 type: page
-cover: /learn/octapi/assets/octapi.jpg
+cover: /learn/octapi/assets/banners/05_dispy.jpg
 date: 2024-02-18
 previous: 04_lesson04.html
 next: 06_octapi.html
@@ -38,6 +38,10 @@ navigation:
       link: 06_octapi.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is DisPy?
 

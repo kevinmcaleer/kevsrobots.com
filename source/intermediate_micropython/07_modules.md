@@ -3,7 +3,11 @@ title: Modules & Libraries
 description: Learn about modules and libraries in MicroPython and how they enhance your projects.
 layout: lesson
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/07_modules.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Modules and Libraries

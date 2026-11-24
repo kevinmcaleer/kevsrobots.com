@@ -3,7 +3,7 @@ layout: lesson
 title: First Contact
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/10_first_contact.jpg
 date: 2026-08-05
 previous: 09_client_setup.html
 next: 11_channels.html
@@ -61,6 +61,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Two boards, two roles, matching settings. This is the lesson where it becomes a network.
 

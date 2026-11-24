@@ -2,7 +2,11 @@
 title: Motor Holder
 description: Create the final structural feature - motor mounting tabs and retention cutouts
 layout: lesson
-cover: assets/cover.jpg
+cover: /learn/freecad_smars/assets/banners/08_motor_holder.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What We're Building
@@ -176,6 +180,7 @@ The motor mounting works as a system:
 | Wheel stubs | Connect to wheels on outside |
 | Floor pads | Elevate and position motor |
 | Retention cutouts | Lock motor tabs in place |
+{:class="table table-single"}
 
 When assembled:
 1. Motor slides into position on floor pads

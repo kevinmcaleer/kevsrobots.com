@@ -3,7 +3,7 @@ layout: lesson
 title: PyPi & MIP
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/09_pypi.jpg
 date: 2024-07-07
 previous: 08_packages.html
 next: 10_docstrings.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## PyPi
 

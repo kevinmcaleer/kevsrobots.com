@@ -3,6 +3,11 @@ title: Joints and Export
 description: Connect the eyelids with a joint, test the movement and export the parts for 3D printing
 layout: lesson
 type: page
+cover: /learn/eye_mechanism/assets/banners/09_joint_and_export.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Join the eyelids

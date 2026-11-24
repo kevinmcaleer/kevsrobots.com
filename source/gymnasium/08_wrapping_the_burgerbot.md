@@ -3,11 +3,11 @@ title: Wrapping the BurgerBot
 description: Port the BurgerBot GridWorld from the previous course into a proper Gymnasium environment, validate it with check_env, and run a random-agent rollout.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/gymnasium/assets/banners/08_wrapping_the_burgerbot.jpg
 date_updated: 2026-06-14
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

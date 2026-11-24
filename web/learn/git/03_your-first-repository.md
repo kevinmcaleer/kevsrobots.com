@@ -3,7 +3,7 @@ layout: lesson
 title: Your First Repository
 author: Kevin McAleer
 type: page
-cover: /learn/git/assets/cover.jpg
+cover: /learn/git/assets/banners/03_your-first-repository.jpg
 date: 2026-11-04
 previous: 02_installing-git.html
 next: 04_staging-and-committing.html
@@ -57,6 +57,10 @@ navigation:
       link: 13_cheat-sheet-and-next-steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Make a project folder
 

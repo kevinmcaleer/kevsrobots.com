@@ -3,7 +3,7 @@ layout: lesson
 title: Recap and Review
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/17_summary.jpg
 date: 2023-04-14
 previous: 16_ground_pins.html
 description: A summary of what you have learned in the Raspberry Pi Pico with MicroPython
@@ -68,6 +68,10 @@ navigation:
       link: 17_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

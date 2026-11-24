@@ -3,9 +3,12 @@ layout: lesson
 title: Introduction
 type: page
 description: Get started with Robotics
+cover: /learn/robotics_101/assets/banners/00_overview.jpg
 ---
 
-![Cover photo](assets/basics_101.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

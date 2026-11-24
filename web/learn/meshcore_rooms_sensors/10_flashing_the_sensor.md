@@ -3,7 +3,7 @@ layout: lesson
 title: Flashing the Sensor Node
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore_rooms_sensors/assets/cover.png
+cover: /learn/meshcore_rooms_sensors/assets/banners/10_flashing_the_sensor.jpg
 date: 2026-08-05
 previous: 09_what_is_a_sensor_node.html
 next: 11_environment_sensor.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Third board, third firmware variant. The process is identical; the interesting part comes at first boot, when the firmware goes looking for sensors.
 

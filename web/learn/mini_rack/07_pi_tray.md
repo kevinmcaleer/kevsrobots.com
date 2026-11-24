@@ -3,7 +3,7 @@ layout: lesson
 title: Create the Pi-Tray
 author: Kevin McAleer
 type: page
-cover: /learn/mini_rack/assets/cover.jpg
+cover: /learn/mini_rack/assets/banners/07_pi_tray.jpg
 date: 2025-02-16
 previous: 06_panel.html
 next: 08_top_panel.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_print.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 1. Create a new file named `pi_tray` in Fusion 360
 

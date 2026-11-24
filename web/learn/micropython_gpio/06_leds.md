@@ -3,7 +3,7 @@ layout: lesson
 title: Controlling LEDs with PWM
 author: Kevin McAleer
 type: page
-cover: /learn/micropython_gpio/assets/raspberry_pi_pico_gpio.jpg
+cover: /learn/micropython_gpio/assets/banners/06_leds.jpg
 date: 2023-04-14
 previous: 05_pwm.html
 next: 07_motors.html
@@ -69,6 +69,10 @@ navigation:
       link: 17_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Overview
 

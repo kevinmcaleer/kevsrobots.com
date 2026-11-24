@@ -4,6 +4,11 @@ description: >-
     Draw the states a robot can be in, and what makes it change between them, with Mermaid state diagrams
 layout: lesson
 type: page
+cover: /learn/mermaid/assets/banners/06_state-diagrams.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Robots have moods

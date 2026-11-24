@@ -2,6 +2,11 @@
 title: Modules
 description: Learn about the built-in Modules
 layout: lesson
+cover: /learn/micropython/assets/banners/17_modules.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Picture of a honeycomb close up](assets/modules.jpg){:.cover}
@@ -62,6 +67,7 @@ From the `REPL` type:
 ```python
 dir(machine)
 ```
+{: .no-snakie }
 
 In the example above you'll discover a list of all the functions, classes and Constants in the module named `machine`.
 

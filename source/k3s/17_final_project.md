@@ -3,21 +3,21 @@ title: Final Project – Deploying a Multi-Service App
 description: Bring together everything you've learned to deploy a real, multi-service application on your K3s cluster with persistence, ingress, and CI/CD integration.
 layout: lesson
 type: page
-cover: assets/k3s04.jpg
+cover: /learn/k3s/assets/banners/17_final_project.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-🎉 You've made it to the final project!
+You've made it to the final project!
 
 Now it’s time to apply everything you’ve learned and build a **real Kubernetes deployment** on your Raspberry Pi cluster using K3s.
 
 ---
 
-## 🎯 Objective
+## Objective
 
 Deploy a complete multi-service web application with:
 
@@ -30,7 +30,7 @@ Deploy a complete multi-service web application with:
 
 ---
 
-## 📁 Project Structure Example
+## Project Structure Example
 
 Your repo should include:
 
@@ -49,7 +49,7 @@ k8s/
 
 ---
 
-## ✅ Requirements
+## Requirements
 
 - All services deployed with Kubernetes **Deployments**
 - Internal Services defined with **ClusterIP**
@@ -59,7 +59,7 @@ k8s/
 
 ---
 
-## 🛠 Steps to Complete
+## Steps to Complete
 
 ### 1. Choose Your Stack
 
@@ -124,7 +124,7 @@ Use a subdomain like `app.local` with an `Ingress` rule and test via `/etc/hosts
 
 ---
 
-## 🧪 Bonus Challenges
+## Bonus Challenges
 
 - Enable horizontal pod autoscaling
 - Add Prometheus + Grafana monitoring
@@ -133,7 +133,7 @@ Use a subdomain like `app.local` with an `Ingress` rule and test via `/etc/hosts
 
 ---
 
-## 📸 Share Your Work
+## Share Your Work
 
 - Take a photo of your Raspberry Pi cluster
 - Share your architecture diagram or GitHub repo
@@ -141,7 +141,7 @@ Use a subdomain like `app.local` with an `Ingress` rule and test via `/etc/hosts
 
 ---
 
-## 🏁 Summary
+## Summary
 
 This final project ties together:
 
@@ -149,7 +149,7 @@ This final project ties together:
 - K3s cluster installation
 - Deployments, services, storage, ingress, and GitOps
 
-You've built a full-featured Kubernetes platform on affordable hardware — congrats! 🎉
+You've built a full-featured Kubernetes platform on affordable hardware — congrats!
 
 ---
 

@@ -3,6 +3,11 @@ title: Data Insertion, Modification, and Deletion
 description: >-
     How to perform CRUD operations (Create, Read, Update, Delete) in SQL
 layout: lesson
+cover: /learn/sql/assets/banners/05_data_insertion_and_modification.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll explore how to insert, modify, and delete data in SQL tables. These operations are commonly referred to as **CRUD** operations: **Create**, **Read**, **Update**, and **Delete**.

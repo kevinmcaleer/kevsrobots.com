@@ -4,6 +4,11 @@ description: >-
     Put your repository on GitHub, push your commits, sign in safely, and clone repositories onto other computers
 layout: lesson
 type: page
+cover: /learn/git/assets/banners/10_github-and-remotes.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## What's a remote?

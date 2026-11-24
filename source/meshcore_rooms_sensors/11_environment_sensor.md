@@ -3,6 +3,11 @@ title: Building an Environment Sensor
 description: Wire a BME280 to the Heltec V3 for temperature, humidity and pressure from a greenhouse or loft
 type: page
 layout: lesson
+cover: /learn/meshcore_rooms_sensors/assets/banners/11_environment_sensor.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Four wires and a £5 breakout, and your mesh can tell you whether the greenhouse went below freezing last night. This is the most satisfying build in the course.

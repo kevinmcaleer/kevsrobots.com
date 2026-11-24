@@ -3,7 +3,7 @@ layout: lesson
 title: Joints and Export
 author: Kevin McAleer
 type: page
-cover: /learn/eye_mechanism/assets/eye_mechanism.jpg
+cover: /learn/eye_mechanism/assets/banners/09_joint_and_export.jpg
 date: 2023-01-29
 previous: 08_hinge.html
 description: Connect the eyelids with a joint, test the movement and export the parts
@@ -46,6 +46,10 @@ navigation:
       link: 09_joint_and_export.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Join the eyelids
 

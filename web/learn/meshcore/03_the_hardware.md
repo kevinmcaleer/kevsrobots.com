@@ -3,7 +3,7 @@ layout: lesson
 title: The Hardware
 author: Kevin McAleer
 type: page
-cover: /learn/meshcore/assets/cover.png
+cover: /learn/meshcore/assets/banners/03_the_hardware.jpg
 date: 2026-08-05
 previous: 02_how_lora_works.html
 next: 04_antennas_and_the_law.html
@@ -62,6 +62,10 @@ navigation:
       link: 15_next_steps.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Time to spend some money. The good news is that this is one of the cheapest useful radio projects you can build.
 

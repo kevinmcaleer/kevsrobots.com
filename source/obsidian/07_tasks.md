@@ -3,8 +3,12 @@ title: Tasks in Obsidian
 description: Manage your tasks and to-dos in Obsidian using checkboxes and plugins.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/07_tasks.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Tasks in Obsidian
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Deploying a Stack
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/08_deploying-a-stack.jpg
 date: 2024-02-03
 previous: 07_writing-a-docker-compose-file.html
 next: 09_managing-and-scaling-services.html
@@ -59,6 +59,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Deploying Applications with Docker Swarm Stacks
 

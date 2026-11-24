@@ -3,8 +3,12 @@ title: Linking Notes
 description: How to link notes together in Obsidian for better knowledge management.
 type: page
 layout: lesson
+cover: /learn/obsidian/assets/banners/05_linking_notes.jpg
 ---
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Linking Notes
 

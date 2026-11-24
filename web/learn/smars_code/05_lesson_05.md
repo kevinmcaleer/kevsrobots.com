@@ -3,7 +3,7 @@ layout: lesson
 title: Lesson 05 - Bluetooth
 author: Kevin McAleer
 type: page
-cover: /learn/smars_code/assets/program_smars.png
+cover: /learn/smars_code/assets/banners/05_lesson_05.jpg
 date: 2023-09-10
 previous: 04_lesson_04.html
 next: 06_lesson_06.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_lesson_07.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the livestream
 

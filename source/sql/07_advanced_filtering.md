@@ -3,6 +3,11 @@ title: Advanced Filtering and Conditional Logic
 description: >-
     Use SQL's AND, OR, and CASE statements for more control over queries
 layout: lesson
+cover: /learn/sql/assets/banners/07_advanced_filtering.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll explore advanced filtering techniques and conditional logic with SQL. You’ll learn how to refine your queries using multiple conditions and implement conditional expressions with the `CASE` statement.

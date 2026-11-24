@@ -14,6 +14,7 @@
   level: beginner
   link: /learn/arduino_to_python/00_intro.html
   name: Arduino to MicroPython - A Quick Start Guide
+  video: A7ZJ5TC-zUk
 - author: Kevin McAleer
   cover: /learn/arduino_uno_q/assets/cover.jpg
   date_published: 2026-11-21
@@ -99,7 +100,7 @@
     no-code motion tool for animating servos and creating interactive scenes.  This
     course walks you through installing Bottango, wiring servos, programming boards,
     and creating expressive motion sequences.
-  duration: 0h 34m
+  duration: 0h 33m
   groups:
   - animation
   - robotics
@@ -124,6 +125,7 @@
   level: beginner
   link: /learn/brachiograph/00_intro.html
   name: BrachioGraph Tutorial
+  video: tkAv3HIw3CY
 - author: Kevin McAleer
   cover: /learn/burgerbot/assets/burgerbot.jpg
   date_published: 2023-04-27
@@ -197,6 +199,7 @@
   level: intermediate
   link: /learn/docker_swarm/00_intro.html
   name: Raspberry Pi 5 Cluster with Docker Swarm
+  video: tDENgLiJSh0
 - author: Kevin McAleer
   cover: /learn/duckdb/assets/cover.jpg
   date_published: 2025-09-04
@@ -295,7 +298,7 @@
   date_published: 2026-11-04
   description: 'Learn to track your code and projects with Git: commits, history,
     undoing mistakes, branches, merging, and sharing your work on GitHub.'
-  duration: 1h 14m
+  duration: 1h 15m
   groups:
   - git
   - github
@@ -339,7 +342,7 @@
   description: Master I2C and SPI communication protocols on Raspberry Pi Pico. Learn
     to connect sensors, scan for devices, read datasheets, and build real-world projects
     with practical hands-on examples using the BME280 sensor.
-  duration: 1h 55m
+  duration: 1h 56m
   groups:
   - micropython
   - electronics
@@ -384,7 +387,7 @@
     \ networking, persistent storage, and deploying real workloads \u2014 all on affordable\
     \ single-board computers. Ideal for homelabbers, IoT developers, and anyone curious\
     \ about Kubernetes at the edge."
-  duration: 0h 44m
+  duration: 0h 41m
   groups:
   - docker
   - raspberry pi
@@ -398,7 +401,7 @@
   description: 'Learn ROS 2, the Robot Operating System, on a Raspberry Pi: run it
     in Docker, write Python nodes that publish and subscribe to topics, and visualise
     LiDAR scans in RViz2.'
-  duration: 0h 45m
+  duration: 0h 46m
   groups:
   - ros
   - raspberry pi
@@ -432,6 +435,7 @@
   level: beginner
   link: /learn/linux_intro/01_intro_terminal.html
   name: Introduction to the Linux Command Line on Raspberry Pi OS
+  video: UDo6tvoOQHg
 - author: Kevin McAleer
   cover: /learn/markdown/assets/markdown.png
   date_published: 2024-03-21
@@ -470,7 +474,7 @@
   description: Build your own off-grid LoRa mesh network with MeshCore and two cheap
     Heltec V3 boards - one as a repeater, one as a client. No internet, no phone signal,
     no subscription.
-  duration: 1h 17m
+  duration: 1h 19m
   groups:
   - electronics
   - lora
@@ -542,6 +546,7 @@
   level: intermediate
   link: /learn/micropython_robotics/01_intro.html
   name: MicroPython Robotics Projects with the Raspberry Pi Pico
+  video: ZuX45_rid68
 - author: Kevin McAleer
   cover: /learn/mini_rack/assets/cover.jpg
   date_published: 2025-02-16
@@ -555,6 +560,7 @@
   level: beginner
   link: /learn/mini_rack/00_intro.html
   name: Mini-Rack 3D Design Tutorial
+  video: fJC68N9nphA
 - author: Kevin McAleer
   cover: /learn/mongodb/assets/cover.jpg
   date_published: 2026-10-18
@@ -595,7 +601,7 @@
     Pi AI Camera. Train your own models with PyTorch, optimize them for edge deployment,
     and run real-time detection on Raspberry Pi hardware. Complete hands-on course
     from dataset creation to production deployment.
-  duration: 1h 0m
+  duration: 1h 1m
   groups:
   - python
   - ai
@@ -605,11 +611,12 @@
   level: intermediate
   link: /learn/object_model/00_intro.html
   name: Building Object Detection Models with Raspberry Pi AI Camera
+  video: ARCtzjHfyMg
 - author: Kevin McAleer
   cover: /learn/obsidian/assets/cover.jpg
   date_published: 2025-08-24
   description: Learn how to use Obsidian for note-taking and knowledge management.
-  duration: 0h 30m
+  duration: 0h 31m
   groups:
   - obsidian
   - raspberry pi
@@ -617,6 +624,7 @@
   level: beginner
   link: /learn/obsidian/00_intro.html
   name: Obsidian
+  video: zo3mb3EeJXQ
 - author: Kevin McAleer
   cover: /learn/obsidian_rag/assets/cover.jpg
   date_published: 2026-08-23
@@ -693,6 +701,7 @@
   level: beginner
   link: /learn/pca9685/01_course_introduction.html
   name: Building a Robot Arm with Raspberry Pi and PCA9685
+  video: _JJAV97Mm98
 - author: Kevin McAleer
   cover: /learn/pico_temp_sensor/assets/cover.jpg
   date_published: 2024-11-22
@@ -718,7 +727,7 @@
     everything from  architectural differences and CLI compatibility to unique Podman
     features like systemd integration  and Kubernetes support. Perfect for developers
     and DevOps professionals looking to modernize  their container workflows.
-  duration: 0h 31m
+  duration: 0h 32m
   groups:
   - raspberry pi
   - docker
@@ -815,6 +824,7 @@
   level: intermediate
   link: /learn/rust/01_intro.html
   name: Introduction to Rust
+  video: M9LekkoQyf0
 - author: Kevin McAleer
   cover: /learn/scrawly_wally//assets/cover.png
   date_published: 2024-08-02
@@ -831,6 +841,7 @@
   level: beginner
   link: /learn/scrawly_wally/01_intro.html
   name: Wall Drawing Robot Tutorial
+  video: JB4rPNBCL3Q
 - author: Kevin McAleer
   cover: /learn/smars/assets/how_to_build_a_smars.jpg
   date_published: 2023-02-19

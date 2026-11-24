@@ -3,7 +3,7 @@ layout: lesson
 title: Course Overview
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/00_course_overview.jpg
 date: 2024-11-01
 next: 01_introduction_to_sql.html
 description: What you'll learn in "Getting Started with SQL"
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-![cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 This course provides a foundational understanding of SQL, database management, and relational database theory. Here’s what each lesson covers:
 

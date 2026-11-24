@@ -3,10 +3,12 @@ title: "Project: Building a Simple Python Application"
 description: >-
     Put everything you've learned to use by building a simple Python application. This project will provide hands-on experience with Python programming.
 layout: lesson
-cover: /learn/python/assets/3.png
+cover: /learn/python/assets/banners/17_apps.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

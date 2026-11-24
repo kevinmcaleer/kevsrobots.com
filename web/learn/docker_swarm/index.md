@@ -11,6 +11,7 @@ level: intermediate
 course_duration: 0h 50m
 lesson_count: 16
 first_lesson: 00_intro.html
+video: tDENgLiJSh0
 navigation:
 - name: Raspberry Pi 5 Cluster with Docker Swarm
 - content:

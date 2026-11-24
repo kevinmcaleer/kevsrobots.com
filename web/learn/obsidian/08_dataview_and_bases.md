@@ -3,7 +3,7 @@ layout: lesson
 title: Dataview and Bases
 author: Kevin McAleer
 type: page
-cover: /learn/obsidian/assets/cover.jpg
+cover: /learn/obsidian/assets/banners/08_dataview_and_bases.jpg
 date: 2025-08-24
 previous: 07_tasks.html
 next: 09_properties.html
@@ -53,6 +53,9 @@ navigation:
 ---
 
 
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Dataview and Bases
 

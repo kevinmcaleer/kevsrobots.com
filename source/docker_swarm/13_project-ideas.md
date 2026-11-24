@@ -3,6 +3,10 @@ title: Project Ideas
 description: Explore a range of project ideas to apply your Docker Swarm knowledge, enhancing your learning through practical, real-world applications.
 layout: lesson
 type: page
+cover: /learn/docker_swarm/assets/banners/13_project-ideas.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

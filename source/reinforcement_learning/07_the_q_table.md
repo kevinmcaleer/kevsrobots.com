@@ -2,12 +2,13 @@
 title: The Q-Table
 description: Build the robot's cheat sheet — a Python dictionary that stores the estimated value of every action in every state.
 layout: lesson
+code_target: cpython
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/07_the_q_table.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: The Sim-to-Real Gap
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/11_the_sim_to_real_gap.jpg
 date: 2026-06-13
 previous: 10_training_in_simulation.html
 next: 12_discretizing_real_sensors.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

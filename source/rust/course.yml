@@ -5,6 +5,7 @@
   level: intermediate
   layout: course
   cover: assets/cover.png
+  video: M9LekkoQyf0
   groups:
       - rust
       - pico

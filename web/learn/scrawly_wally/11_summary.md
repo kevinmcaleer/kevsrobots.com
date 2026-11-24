@@ -3,7 +3,7 @@ layout: lesson
 title: Summary and Next Steps
 author: Kevin McAleer
 type: page
-cover: assets/summary.png
+cover: /learn/scrawly_wally/assets/banners/11_summary.jpg
 date: 2024-08-02
 previous: 10_vectorize.html
 description: Recap of what you've learned and suggestions for further exploration.
@@ -45,6 +45,10 @@ navigation:
       link: 11_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Summary
 

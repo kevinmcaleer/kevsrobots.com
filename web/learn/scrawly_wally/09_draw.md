@@ -3,7 +3,7 @@ layout: lesson
 title: Creating Your First Drawing
 author: Kevin McAleer
 type: page
-cover: assets/draw.png
+cover: /learn/scrawly_wally/assets/banners/09_draw.jpg
 date: 2024-08-02
 previous: 08_positioning.html
 next: 10_vectorize.html
@@ -46,6 +46,10 @@ navigation:
       link: 11_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Creating Your First Drawing
 

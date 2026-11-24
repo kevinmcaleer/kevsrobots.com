@@ -2,6 +2,11 @@
 title: Print the Parts
 description: Download and print the files
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_01.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 1 Print the Parts

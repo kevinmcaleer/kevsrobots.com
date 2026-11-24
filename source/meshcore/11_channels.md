@@ -3,6 +3,11 @@ title: Channels and Group Chat
 description: How MeshCore channels work, the public channel key, and creating your own private group
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/11_channels.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Direct messages are one to one. Channels are how a group talks - a family, a hiking club, a village, or the whole regional network.

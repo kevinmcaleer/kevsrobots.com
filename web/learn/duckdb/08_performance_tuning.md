@@ -3,7 +3,7 @@ layout: lesson
 title: Performance tuning (practical)
 author: Kevin McAleer
 type: page
-cover: /learn/duckdb/assets/cover.jpg
+cover: /learn/duckdb/assets/banners/08_performance_tuning.jpg
 date: 2025-09-04
 previous: 07_parquet.html
 next: 09_conclusion.html
@@ -54,6 +54,10 @@ navigation:
       link: 11_mini_capstone.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 This lesson is a checklist of practical steps you can apply to most DuckDB analytics workloads.
 

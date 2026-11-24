@@ -3,6 +3,11 @@ title: Antennas and the Law
 description: Antenna basics, the golden rule of never transmitting without one, and what Ofcom allows on 868MHz
 type: page
 layout: lesson
+cover: /learn/meshcore/assets/banners/04_antennas_and_the_law.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Your antenna matters more than your transmit power. A £5 antenna change can do more for your range than any setting in the firmware. This lesson covers what to buy, what not to do, and what the rules are in the UK.

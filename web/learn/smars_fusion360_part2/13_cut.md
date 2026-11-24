@@ -3,7 +3,7 @@ layout: lesson
 title: Stub wheel cutout profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/13_cut.jpg
 date: 2023-07-20
 previous: 12_revolve.html
 next: 14_extrude.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The stub wheel needs a cut out section to allow the two halves of the stub wheel to squeeze together when pushing on an unpowered wheel.
 

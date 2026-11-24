@@ -3,7 +3,7 @@ layout: lesson
 title: Modules & Libraries
 author: Kevin McAleer
 type: page
-cover: assets/cover.png
+cover: /learn/intermediate_micropython/assets/banners/07_modules.jpg
 date: 2024-07-07
 previous: 06a_decorators.html
 next: 08_packages.html
@@ -64,6 +64,10 @@ navigation:
       link: 14_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Modules and Libraries
 

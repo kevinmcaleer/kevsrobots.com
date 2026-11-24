@@ -3,7 +3,7 @@ layout: lesson
 title: Python Libraries and Modules
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/7.png
+cover: /learn/python/assets/banners/07_libraries.jpg
 date: 2023-07-20
 previous: 06_errors.html
 next: 08_oop.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

@@ -3,7 +3,7 @@ layout: lesson
 title: BurgerBot Assembly video
 author: Kevin McAleer
 type: video
-cover: /learn/burgerbot/assets/burgerbot.jpg
+cover: /learn/burgerbot/assets/banners/02_video.jpg
 date: 2023-04-27
 previous: 02_assembly.html
 next: 03_getting_the_code.html
@@ -58,6 +58,10 @@ navigation:
       link: 09_camera.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this video I show you how to assemble a BurgerBot.
 

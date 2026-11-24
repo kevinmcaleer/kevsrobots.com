@@ -3,7 +3,7 @@ layout: lesson
 title: Motor nub extrude
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/04_extrude.jpg
 date: 2023-07-20
 previous: 03_nub.html
 next: 05_chamfer.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Using the [Motor nub profile](03_nub.html) created earlier, we extrude the Motor nub up by:
 

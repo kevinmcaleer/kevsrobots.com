@@ -3,7 +3,7 @@ layout: lesson
 title: Create a ROS2 Python Subscriber
 author: Kevin McAleer
 type: page
-cover: /learn/learn_ros/assets/learn_ros.jpg
+cover: /learn/learn_ros/assets/banners/13_create_subscriber.jpg
 date: 2023-01-07
 previous: 12_create_publisher.html
 next: 14_docker_x11.html
@@ -74,6 +74,10 @@ navigation:
       link: 19_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Create a new Python file called sub.py
 

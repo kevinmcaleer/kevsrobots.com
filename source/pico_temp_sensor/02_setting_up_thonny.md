@@ -3,6 +3,11 @@ title: Setting Up Thonny
 description: Get your environment ready by installing and configuring the Thonny IDE to program your Raspberry Pi Pico with MicroPython.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/02_setting_up_thonny.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

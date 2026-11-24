@@ -3,7 +3,7 @@ layout: lesson
 title: Docker Compose and Swarm Stacks
 author: Kevin McAleer
 type: page
-cover: /learn/docker_swarm/assets/docker_swarm.jpg
+cover: /learn/docker_swarm/assets/banners/06_docker-compose-and-swarm-stacks.jpg
 date: 2024-02-03
 previous: 05_verifying-cluster-setup.html
 next: 07_writing-a-docker-compose-file.html
@@ -58,6 +58,10 @@ navigation:
       link: 14_further-resources.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction to Deployment Tools
 

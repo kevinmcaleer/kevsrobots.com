@@ -3,7 +3,7 @@ layout: lesson
 title: Coding the Learning Loop
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/09_coding_the_learning_loop.jpg
 date: 2026-06-13
 previous: 08_exploration_vs_exploitation.html
 next: 10_training_in_simulation.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

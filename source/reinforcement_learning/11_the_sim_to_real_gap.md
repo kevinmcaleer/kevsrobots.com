@@ -3,11 +3,11 @@ title: The Sim-to-Real Gap
 description: Understand why trained policies sometimes fail on real hardware — and practical strategies to bridge the gap before you deploy.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/11_the_sim_to_real_gap.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Database Normalization
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/10_introduction_to_normalization.jpg
 date: 2024-11-01
 previous: 09_grouping_and_aggregating_data.html
 next: 11_boyce_codd_normal_form.html
@@ -56,6 +56,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll discuss **database normalization**, a process that organizes data to reduce redundancy and improve data integrity. You’ll learn about the first three normal forms (1NF, 2NF, and 3NF), which are essential for creating efficient and well-structured databases.
 

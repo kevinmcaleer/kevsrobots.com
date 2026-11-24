@@ -4,6 +4,11 @@ description: >-
     Train a custom PyTorch object detection model using transfer learning with Faster R-CNN to detect your own objects
 type: page
 layout: lesson
+cover: /learn/object_model/assets/banners/03_training.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Overview

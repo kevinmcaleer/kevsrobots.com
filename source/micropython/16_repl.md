@@ -2,6 +2,11 @@
 title: The REPL
 description: Read Evaluation Print Loop
 layout: lesson
+cover: /learn/micropython/assets/banners/16_repl.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Picture of a Reptile close up](assets/repl.jpg){:.cover}

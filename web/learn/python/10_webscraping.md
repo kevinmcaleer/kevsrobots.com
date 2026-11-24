@@ -3,7 +3,7 @@ layout: lesson
 title: Web Scraping with Python
 author: Kevin McAleer
 type: page
-cover: /learn/python/assets/3.png
+cover: /learn/python/assets/banners/10_webscraping.jpg
 date: 2023-07-20
 previous: 09_data.html
 next: 11_data_visualisation.html
@@ -58,7 +58,9 @@ navigation:
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 
