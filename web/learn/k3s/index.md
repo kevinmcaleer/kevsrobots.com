@@ -10,7 +10,7 @@ description: Learn how to build your own lightweight Kubernetes cluster using K3
   single-board computers. Ideal for homelabbers, IoT developers, and anyone curious
   about Kubernetes at the edge.
 level: advanced
-course_duration: 0h 44m
+course_duration: 0h 41m
 lesson_count: 18
 first_lesson: 01_intro.html
 navigation:

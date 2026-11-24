@@ -17,7 +17,7 @@ In this lesson, we’ll explore the unique capabilities of Podman that make it a
 
 ---
 
-## 🚫 Rootless Containers
+## Rootless Containers
 
 Podman was built from the ground up with **rootless** containers in mind:
 
@@ -25,11 +25,11 @@ Podman was built from the ground up with **rootless** containers in mind:
 - No `sudo`, no elevated permissions
 - Improves security and auditability
 
-> 🔐 Containers cannot access system-wide files unless explicitly allowed — helping to prevent privilege escalation vulnerabilities.
+> Containers cannot access system-wide files unless explicitly allowed — helping to prevent privilege escalation vulnerabilities.
 
 ---
 
-## 🛑 Daemonless Architecture
+## Daemonless Architecture
 
 No long-running daemon process:
 
@@ -37,11 +37,11 @@ No long-running daemon process:
 - Easier to understand and debug
 - No single point of failure
 
-> 💡 Each Podman container is just a **regular Linux process**, making it more transparent than Docker’s centralized daemon model.
+> Each Podman container is just a **regular Linux process**, making it more transparent than Docker’s centralized daemon model.
 
 ---
 
-## ⚙️ Systemd Integration
+## Systemd Integration
 
 You can generate native `systemd` unit files from containers or pods:
 
@@ -56,11 +56,11 @@ systemctl --user enable container-mycontainer.service
 systemctl --user start container-mycontainer.service
 ```
 
-> 🧠 This makes Podman perfect for running containers **as background services** that survive reboots — especially on servers or IoT devices.
+> This makes Podman perfect for running containers **as background services** that survive reboots — especially on servers or IoT devices.
 
 ---
 
-## 🫙 Pods: Kubernetes-Style Container Grouping
+## Pods: Kubernetes-Style Container Grouping
 
 Podman supports **pods**, just like Kubernetes:
 
@@ -76,7 +76,7 @@ podman run -dt --pod webpod redis
 
 ---
 
-## 🛠 Modular Ecosystem
+## Modular Ecosystem
 
 Podman is part of a container toolchain that includes:
 
@@ -88,27 +88,27 @@ These tools can be combined or used independently for **fine-grained control**.
 
 ---
 
-## 🧪 Enhanced Security with SELinux and AppArmor
+## Enhanced Security with SELinux and AppArmor
 
 Podman has **first-class support for SELinux and AppArmor**, allowing more robust security profiles:
 
 - Containers are isolated using Linux security modules
 - Great for use in hardened or multi-user environments
 
-> 🛡️ Rootless + SELinux = secure containers with minimal privileges
+> Rootless + SELinux = secure containers with minimal privileges
 
 ---
 
-## ✨ Summary of Unique Features
+## Summary of Unique Features
 
 | Feature               |  Docker   |  Podman  |
 |-----------------------|:----------|:---------|
-| Rootless by default   |     ❌     |    ✅     |
-| Daemonless            |     ❌     |    ✅     |
-| Systemd integration   | 🔸 Manual | ✅ Native |
-| Kubernetes-style pods |     ❌     |    ✅     |
-| SELinux/AppArmor      |  Limited  |  ✅ Full  |
-| OCI toolchain support |     ❌     |    ✅     |
+| Rootless by default   |         |        |
+| Daemonless            |         |        |
+| Systemd integration   | Manual | Native |
+| Kubernetes-style pods |         |        |
+| SELinux/AppArmor      |  Limited  |  Full  |
+| OCI toolchain support |         |        |
 {:class="table table-striped"}
 
 ---

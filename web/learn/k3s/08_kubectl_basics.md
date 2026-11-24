@@ -80,7 +80,7 @@ This lesson will walk you through the basics of exploring and managing your clus
 
 ---
 
-## ✅ Setting Up `kubectl` Access
+## Setting Up `kubectl` Access
 
 On the **master node**, or from your development machine:
 
@@ -104,7 +104,7 @@ chmod 600 ~/.kube/config
 
 ---
 
-## 🔍 Inspecting the Cluster
+## Inspecting the Cluster
 
 List all nodes:
 
@@ -126,7 +126,7 @@ kubectl get pods -n kube-system
 
 ---
 
-## 🚀 Deploying a Simple App
+## Deploying a Simple App
 
 Create a simple deployment:
 
@@ -150,7 +150,7 @@ Access it via any node's IP and the port listed.
 
 ---
 
-## 📁 Useful Commands
+## Useful Commands
 
 | Command                          | Description                                |
 | -------------------------------- | ------------------------------------------ |
@@ -164,7 +164,7 @@ Access it via any node's IP and the port listed.
 
 ---
 
-## 🧠 Pro Tips
+## Pro Tips
 
 * Use `-A` to view resources across all namespaces
 * Add bash completion for `kubectl`:
@@ -177,7 +177,7 @@ Access it via any node's IP and the port listed.
 
 ---
 
-## 🔍 Example: Get Details on Your Node
+## Example: Get Details on Your Node
 
 ```bash
 kubectl describe node pi-master
@@ -192,7 +192,7 @@ Look at:
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 

@@ -397,7 +397,7 @@ if __name__ == "__main__":
 
 ---
 
-## ▶️ Running the Trainer
+## Running the Trainer
 
 ```bash
 python3 train.py

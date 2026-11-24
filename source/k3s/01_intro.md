@@ -17,7 +17,7 @@ In this course, you’ll learn how to create a lightweight, fully functional **K
 
 ---
 
-## 🚀 What Is K3s?
+## What Is K3s?
 
 **K3s** is a lightweight Kubernetes distribution created by Rancher (now part of SUSE). It’s designed for:
 
@@ -29,20 +29,20 @@ K3s includes all the essential components of Kubernetes, while stripping away fe
 
 ---
 
-## 🍓 Why Use K3s on Raspberry Pi?
+## Why Use K3s on Raspberry Pi?
 
 | Benefit                     | Why It Matters                        |
 |-----------------------------|----------------------------------------|
-| 🧠 Learn Kubernetes         | Build real clusters with real tools    |
-| 💡 Low Cost                | Great for budget labs and education    |
-| 🌍 Portable & Scalable     | Run anywhere: desk, shed, edge         |
-| ⚡ Lightweight              | K3s runs well on 1GB–4GB RAM devices   |
-| 🛠️ Real Workloads         | Deploy apps, databases, dashboards     |
+| Learn Kubernetes         | Build real clusters with real tools    |
+| Low Cost                | Great for budget labs and education    |
+| Portable & Scalable     | Run anywhere: desk, shed, edge         |
+| Lightweight              | K3s runs well on 1GB–4GB RAM devices   |
+| Real Workloads         | Deploy apps, databases, dashboards     |
 {:class="table table-single"}
 
 ---
 
-## 🧰 What You’ll Learn
+## What You’ll Learn
 
 By the end of this course, you’ll be able to:
 
@@ -55,7 +55,7 @@ By the end of this course, you’ll be able to:
 
 ---
 
-## 📦 What You’ll Need
+## What You’ll Need
 
 - 2–4 Raspberry Pi 4 or 5 boards (ideally with 2GB+ RAM)
 - microSD cards (32GB+ recommended)
@@ -67,7 +67,7 @@ By the end of this course, you’ll be able to:
 
 ---
 
-## 📋 Course Format
+## Course Format
 
 Each lesson in this course builds on the previous one. Lessons include:
 

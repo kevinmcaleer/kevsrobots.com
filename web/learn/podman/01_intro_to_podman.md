@@ -67,7 +67,7 @@ If you've used Docker, you're already familiar with how containers can revolutio
 
 ---
 
-## 📦 What You’ll Learn
+## What You’ll Learn
 
 In this lesson, you’ll:
 
@@ -78,7 +78,7 @@ In this lesson, you’ll:
 
 ---
 
-## 🔍 Why Podman?
+## Why Podman?
 
 Podman is part of a modern container toolkit built to address many limitations of Docker, including:
 
@@ -89,7 +89,7 @@ Podman is part of a modern container toolkit built to address many limitations o
 
 ---
 
-## 🧠 A Bit of Background
+## A Bit of Background
 
 Podman was created by Red Hat as a more secure and flexible alternative to Docker, and it works well with other tools like:
 
@@ -101,7 +101,7 @@ Together, these form a robust, modular container toolchain.
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 Before you start, you should:
 

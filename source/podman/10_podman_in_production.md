@@ -17,7 +17,7 @@ Let’s explore how to run containers in production with confidence.
 
 ---
 
-## 🛠 Rootless in Production
+## Rootless in Production
 
 One of Podman’s key strengths is that it runs containers as the current user:
 
@@ -25,11 +25,11 @@ One of Podman’s key strengths is that it runs containers as the current user:
 - Keeps services isolated to specific users
 - Reduces the impact of potential security breaches
 
-> ✅ Great for shared environments or untrusted code execution
+> Great for shared environments or untrusted code execution
 
 ---
 
-## ⚙️ Systemd Integration
+## Systemd Integration
 
 Use `podman generate systemd` to create service unit files that run containers like any other Linux service.
 
@@ -56,7 +56,7 @@ This ensures:
 
 ---
 
-## 📈 Monitoring and Logging
+## Monitoring and Logging
 
 Since containers are just regular Linux processes, you can use standard tools:
 
@@ -68,11 +68,11 @@ Since containers are just regular Linux processes, you can use standard tools:
   podman logs myapp
   ```
 
-> 📊 You can also integrate with monitoring tools like **Prometheus**, **Grafana**, and **Logrotate**.
+> You can also integrate with monitoring tools like **Prometheus**, **Grafana**, and **Logrotate**.
 
 ---
 
-## 🔒 Security Best Practices
+## Security Best Practices
 
 | Practice                     | Benefit                                       |
 | ---------------------------- | --------------------------------------------- |
@@ -82,11 +82,11 @@ Since containers are just regular Linux processes, you can use standard tools:
 | Use SELinux or AppArmor      | Enforce policy-based isolation                |
 {:class="table table-striped"}
 
-> 🔐 Podman is designed with **security in mind**, so you can run containers with minimal trust assumptions.
+> Podman is designed with **security in mind**, so you can run containers with minimal trust assumptions.
 
 ---
 
-## 🧪 CI/CD and Automation
+## CI/CD and Automation
 
 Podman can be easily integrated into:
 
@@ -98,7 +98,7 @@ Rootless mode makes Podman easier to run in **restricted CI environments** with 
 
 ---
 
-## ☁️ Where People Use Podman
+## Where People Use Podman
 
 - **On-prem Linux servers** running systemd services
 - **Cloud VMs** where root access is restricted
@@ -107,7 +107,7 @@ Rootless mode makes Podman easier to run in **restricted CI environments** with 
 
 ---
 
-## 🧩 Production Considerations
+## Production Considerations
 
 - Use tagged image versions (avoid `:latest`)
 - Set up log rotation and monitoring
