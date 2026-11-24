@@ -10,8 +10,11 @@ next: 17_summary.html
 description: Back up and restore the Parts Bin with mongodump and mongorestore, export
   it to spreadsheets, and lock MongoDB down with users and passwords
 percent: 85
-duration: 12
-date_updated: 2026-10-18
+duration: 14
+quiz_total: 64
+date_updated: 2026-11-24
+code_target: cpython
+snakie: false
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -72,6 +75,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to back up and restore a database with mongodump and mongorestore, export CSV, and lock MongoDB down with authentication and a localhost-only port.
+
 Our Parts Bin now holds real information about real stock. That makes it worth protecting from two very different dangers:
 
 1. **Losing it** - a mistyped `deleteMany({})`, a dead SD card, or a Docker volume removed by accident.
@@ -80,6 +85,21 @@ Our Parts Bin now holds real information about real stock. That makes it worth p
 In this lesson we'll fix both. We'll make **backups** (a copy of your data you can put back later), export the parts to a spreadsheet, and then add a username and password to MongoDB.
 
 We'll work with the data as lesson 15 left it: 14 parts, including the BME280 Sensor, plus the indexes from lesson 13.
+
+---
+
+## The big picture
+
+Two jobs in this lesson, both about not losing control of your data. First the safety net, then the locks.
+
+```mermaid
+flowchart LR
+    DB[("workshop database")] -->|"mongodump"| BK["Backup file<br/>stored OUTSIDE the container"]
+    BK -->|"mongorestore --drop"| DB
+    DB -->|"mongoexport"| CSV["parts.csv for a spreadsheet"]
+    CSV -->|"mongoimport"| DB
+    X["Client with a username and password"] -->|"127.0.0.1:27017 only"| DB
+```
 
 ---
 
@@ -403,6 +423,8 @@ echo ".env" >> .gitignore
 
 ---
 
+> **Teachers**: do the authentication steps on a throwaway local container, not on a server the whole class shares, because turning on `--auth` locks out everyone who is not given a user. Use made-up passwords for practice, and remind learners that passwords typed in class end up in terminal history and in shared screens.
+
 ## Try it Yourself
 
 1. Make a backup file with today's date in its name, like `workshop-2026-10-18.gz`.
@@ -437,29 +459,59 @@ mongoexport --db workshop --collection parts --type csv --fields name,quantity -
 
 ## Common Issues
 
-**Problem:** `mongodump: command not found`  
-**Solution:** Docker users run it inside the container: `docker exec mongodb mongodump ...`. Everyone else installs the MongoDB Database Tools.  
-**Why:** The tools are a separate download from the server and from `mongosh`.
+- **Problem**: `mongodump: command not found`
+- **Solution**: Docker users run it inside the container: `docker exec mongodb mongodump ...`. Everyone else installs the MongoDB Database Tools.
+- **Why**: The tools are a separate download from the server and from `mongosh`.
 
-**Problem:** `mongorestore` reports `E11000 duplicate key error` and `0 document(s) restored successfully`.  
-**Solution:** Add `--drop` to replace the collection with the backup.  
-**Why:** The documents are still there, and every `_id` in the backup already exists.
+- **Problem**: `mongorestore` reports `E11000 duplicate key error` and `0 document(s) restored successfully`.
+- **Solution**: Add `--drop` to replace the collection with the backup.
+- **Why**: The documents are still there, and every `_id` in the backup already exists.
 
-**Problem:** `Failed: CSV mode requires a field list`  
-**Solution:** Add `--fields name,category,quantity` (or whichever fields you want).  
-**Why:** A CSV file is a flat table, so MongoDB needs to know which columns to make.
+- **Problem**: `Failed: CSV mode requires a field list`
+- **Solution**: Add `--fields name,category,quantity` (or whichever fields you want).
+- **Why**: A CSV file is a flat table, so MongoDB needs to know which columns to make.
 
-**Problem:** `MongoServerError: Authentication failed.`  
-**Solution:** Check the username, password and the database at the end of the connection string. The admin user needs `?authSource=admin` or `--authenticationDatabase admin`.  
-**Why:** A user belongs to the database it was created in, and MongoDB looks for it there.
+- **Problem**: `MongoServerError: Authentication failed.`
+- **Solution**: Check the username, password and the database at the end of the connection string. The admin user needs `?authSource=admin` or `--authenticationDatabase admin`.
+- **Why**: A user belongs to the database it was created in, and MongoDB looks for it there.
 
-**Problem:** `InvalidURI: Username and password must be escaped according to RFC 3986`  
-**Solution:** Encode the password first: `python -c "from urllib.parse import quote_plus; print(quote_plus('p@ss/word'))"` gives `p%40ss%2Fword`.  
-**Why:** Characters like `@`, `/` and `:` have special meanings in a connection string.
+- **Problem**: `InvalidURI: Username and password must be escaped according to RFC 3986`
+- **Solution**: Encode the password first: `python -c "from urllib.parse import quote_plus; print(quote_plus('p@ss/word'))"` gives `p%40ss%2Fword`.
+- **Why**: Characters like `@`, `/` and `:` have special meanings in a connection string.
 
-**Problem:** `parts_bin.py` crashes with `OperationFailure: Command find requires authentication`.  
-**Solution:** Set `MONGODB_URI` with the username and password, as above.  
-**Why:** Our `ping` check passes without logging in, because the server answers pings from anyone. The first real query is where it says no.
+- **Problem**: `parts_bin.py` crashes with `OperationFailure: Command find requires authentication`.
+- **Solution**: Set `MONGODB_URI` with the username and password, as above.
+- **Why**: Our `ping` check passes without logging in, because the server answers pings from anyone. The first real query is where it says no.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which tool makes a backup that keeps dates, ObjectIds and indexes?
+- [ ] mongoexport to CSV
+- [x] mongodump
+- [ ] mongoimport
+> mongodump writes BSON, which preserves every type, and its metadata file remembers the indexes.
+
+? Why add 127.0.0.1: to the Docker -p option?
+- [x] So the port is reachable only from your own computer
+- [ ] To make MongoDB faster
+- [ ] To turn on authentication
+> Otherwise port 27017 listens on every network your computer is connected to.
+
+? Where should a backup be kept?
+- [ ] Inside the same container and volume
+- [x] Outside the container and its volume
+- [ ] In the parts collection
+> A backup in the same place as the data disappears with it.
+
+? Which file should you add to .gitignore?
+- [x] .env
+- [ ] parts.py
+- [ ] backup.gz only
+> .env holds your connection string and password, so it must never be committed.
+{% endquiz %}
 
 ---
 

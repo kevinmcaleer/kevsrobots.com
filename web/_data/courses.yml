@@ -565,7 +565,7 @@
   description: Never made a database before? Start here. Learn what a database is,
     install MongoDB, and store, find, update and organise your data - then build Parts
     Bin, a Python app that keeps track of every servo, sensor and screw in your workshop.
-  duration: 2h 42m
+  duration: 3h 12m
   groups:
   - python
   - raspberrypi

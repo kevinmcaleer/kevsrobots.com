@@ -10,8 +10,9 @@ next: 04_first_steps_in_mongosh.html
 description: Get a MongoDB 8.0 server running with Docker, the free Atlas cloud tier,
   or a native install, then check it works
 percent: 20
-duration: 7
-date_updated: 2026-10-18
+duration: 10
+quiz_total: 64
+date_updated: 2026-11-24
 navigation:
 - name: MongoDB - Your First Database
 - content:
@@ -72,6 +73,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to start a MongoDB server using Docker, Atlas or a native install, connect with mongosh, and check it is alive with a ping.
+
 Time to get a real MongoDB server running. There are three ways to do it, and you only need **one**:
 
 | Option | Best for | What you install |
@@ -82,6 +85,25 @@ Time to get a real MongoDB server running. There are three ways to do it, and yo
 {:class="table table-single"}
 
 Whichever you choose, you will finish this lesson at the same place: a `mongosh` prompt connected to a MongoDB 8.0 server.
+
+---
+
+## The big picture
+
+Pick one route. They all finish at the same place, a mongosh prompt connected to a running server.
+
+```mermaid
+flowchart TD
+    A{"Which computer?"} -->|"Laptop or PC with Docker"| D["Option 1: docker run mongo:8.0"]
+    A -->|"No install wanted"| T["Option 2: Atlas free M0 cluster"]
+    A -->|"Raspberry Pi 5, 64-bit OS"| D
+    A -->|"Older Raspberry Pi"| T
+    A -->|"Prefer no Docker"| N["Option 3: native install"]
+    D --> M["mongosh connects"]
+    T --> M
+    N --> M
+    M --> P["db.runCommand ping returns ok: 1"]
+```
 
 ---
 
@@ -174,10 +196,12 @@ MongoDB isn't in the standard package lists, so you add MongoDB's own package re
 
 ## A note for Raspberry Pi owners
 
-MongoDB 5.0 and later need a processor that supports **ARMv8.2-A**.
+MongoDB's official 64-bit ARM builds need a 64-bit operating system, and MongoDB 5.0 and later also need a processor that supports the **ARMv8.2-A** instruction set. That decides which Pi can run which version.
 
-- **Raspberry Pi 5** has one, so it runs MongoDB 8.0 happily. Use 64-bit Raspberry Pi OS and Option 1 (the `mongo:8.0` Docker image).
-- **Raspberry Pi 4 and earlier** don't, so the newest MongoDB they can run is 4.4, which is long out of support. Use **Atlas** (Option 2) instead and connect from the Pi with `mongosh` or Python.
+- **Raspberry Pi 5** has a processor with ARMv8.2-A, so it can run current MongoDB releases. Use 64-bit Raspberry Pi OS and Option 1 (the `mongo:8.0` Docker image).
+- **Raspberry Pi 4 and earlier** do not have ARMv8.2-A, so the official current builds will not run on them. Use **Atlas** (Option 2) and connect from the Pi with `mongosh` or Python.
+
+MongoDB's support list changes with each release, so check the supported platforms in MongoDB's [installation docs](https://www.mongodb.com/docs/manual/installation/) for your exact version before you plan a build around a Pi.
 
 ---
 
@@ -213,6 +237,8 @@ The last number may be different for you. Anything starting with `8.0` is perfec
 
 ---
 
+> **Teachers**: this is the lesson most likely to snag a classroom. Docker Desktop needs administrator rights to install, and school filters sometimes block Docker Hub and Atlas. Options: ask IT to pre-install Docker and pull the `mongo:8.0` image once so it runs offline, run one shared server for the class (see the note in lesson 9 about shared data), or use Atlas on a teacher account with each learner connecting with their own database user. Allow a full session, and have a spare working setup for anyone who gets stuck.
+
 ## Try it Yourself
 
 1. Find out which version of `mongosh` itself you have. Hint: try `version()`.
@@ -231,21 +257,51 @@ The last number may be different for you. Anything starting with `8.0` is perfec
 
 ## Common Issues
 
-**Problem:** `MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017`  
-**Solution:** The server isn't running. Docker users run `docker start mongodb`; Homebrew users run `brew services start mongodb-community@8.0`; Linux users run `sudo systemctl start mongod`.  
-**Why:** `mongosh` is only a client. It needs a server listening on port 27017 to talk to.
+- **Problem**: `MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017`
+- **Solution**: The server isn't running. Docker users run `docker start mongodb`; Homebrew users run `brew services start mongodb-community@8.0`; Linux users run `sudo systemctl start mongod`.
+- **Why**: `mongosh` is only a client. It needs a server listening on port 27017 to talk to.
 
-**Problem:** `docker: Error response from daemon: Conflict. The container name "/mongodb" is already in use`  
-**Solution:** You already created it. Use `docker start mongodb` instead of `docker run`.  
-**Why:** `docker run` creates a new container each time, and names must be unique.
+- **Problem**: `docker: Error response from daemon: Conflict. The container name "/mongodb" is already in use`
+- **Solution**: You already created it. Use `docker start mongodb` instead of `docker run`.
+- **Why**: `docker run` creates a new container each time, and names must be unique.
 
-**Problem:** Atlas connection hangs and then times out.  
-**Solution:** Check your IP address is on the Atlas **IP access list**. Your home IP can change, so you may need to add it again.  
-**Why:** Atlas silently refuses connections from addresses it doesn't recognise.
+- **Problem**: Atlas connection hangs and then times out.
+- **Solution**: Check your IP address is on the Atlas **IP access list**. Your home IP can change, so you may need to add it again.
+- **Why**: Atlas silently refuses connections from addresses it doesn't recognise.
 
-**Problem:** `mongosh: command not found`  
-**Solution:** Install `mongosh` separately, or use `docker exec -it mongodb mongosh` if you went the Docker route.  
-**Why:** The server and the shell are separate programs, and some installers only include the server.
+- **Problem**: `mongosh: command not found`
+- **Solution**: Install `mongosh` separately, or use `docker exec -it mongodb mongosh` if you went the Docker route.
+- **Why**: The server and the shell are separate programs, and some installers only include the server.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does the -v mongodb_data:/data/db part of the docker run command do?
+- [x] Keeps your data in a volume so it survives restarts
+- [ ] Makes the server verbose
+- [ ] Picks the MongoDB version
+> The volume stores the database files outside the container, so docker stop and docker start keep your data.
+
+? You rebooted and mongosh says ECONNREFUSED. What is the Docker fix?
+- [ ] docker run again with the same name
+- [x] docker start mongodb
+- [ ] Reinstall mongosh
+> The container still exists but is stopped. docker run would fail because the name is already in use.
+
+? Your Atlas connection hangs and times out. What do you check first?
+- [x] That your IP address is on the IP access list
+- [ ] That you have Python installed
+- [ ] That the collection exists
+> Atlas silently refuses connections from addresses it does not recognise.
+
+? What does ok: 1 from db.runCommand({ ping: 1 }) tell you?
+- [x] The server heard you and replied
+- [ ] The database is empty
+- [ ] You have a password set
+> It is the quickest way to prove the client and server are talking.
+{% endquiz %}
 
 ---
 

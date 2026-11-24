@@ -4,18 +4,37 @@ description: Query and update fields inside sub-documents and lists with dot not
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/10_nested_documents_and_arrays.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to reach inside nested documents with dot notation, query lists with $all, $size and $elemMatch, and update a nested field.
+
 One of the best things about MongoDB is that a document doesn't have to be flat. Our parts already have a document *inside* a document (`location: { shelf: "A", bin: 1 }`) and lists of values (`tags`, `used_in`). A document inside another document is called a **sub-document** or **embedded document**.
 
 So far we've mostly looked at these from the outside. In this lesson we'll reach inside them - finding everything on shelf D, every part that runs on 5V, and which shop has a Pico W in stock.
 
 > **Starting fresh:** lessons 08 and 09 changed some parts, so let's reset. Run `db.parts.drop()` and re-run the `insertMany` from [lesson 05](05_inserting_documents). The outputs below assume the original 13 parts.
+
+---
+
+## The big picture
+
+A part is a tree. Dot notation is a path from the top of the document down to the field you want.
+
+```mermaid
+flowchart TD
+    P["Part document"] --> N["name: SG90 Micro Servo"]
+    P --> L["location"]
+    L --> LS["shelf: A"]
+    L --> LB["bin: 1"]
+    P --> T["tags: servo, 5v, smars"]
+    P --> U["used_in: SMARS, BurgerBot"]
+    LS -. "location.shelf" .-> Z["the dotted path"]
+```
 
 ---
 
@@ -285,21 +304,51 @@ After this lesson, the Pico W and SG90 have `suppliers` lists, and everything el
 
 ## Common Issues
 
-**Problem:** `SyntaxError: Unexpected token, expected ","` on a query with a dot in it.  
-**Solution:** Put quotes around the field name: `"location.shelf"`.  
-**Why:** Without quotes, the shell reads the dot as JavaScript rather than part of a field name.
+- **Problem**: `SyntaxError: Unexpected token, expected ","` on a query with a dot in it.
+- **Solution**: Put quotes around the field name: `"location.shelf"`.
+- **Why**: Without quotes, the shell reads the dot as JavaScript rather than part of a field name.
 
-**Problem:** `The positional operator did not find the match needed from the query.`  
-**Solution:** Include the array field in the filter, e.g. `"suppliers.shop": "The Pi Hut"`.  
-**Why:** `$` points at the item your filter matched. If the filter doesn't mention the list, there's nothing for it to point at.
+- **Problem**: `The positional operator did not find the match needed from the query.`
+- **Solution**: Include the array field in the filter, e.g. `"suppliers.shop": "The Pi Hut"`.
+- **Why**: `$` points at the item your filter matched. If the filter doesn't mention the list, there's nothing for it to point at.
 
-**Problem:** `Failed to parse $size. Expected a number`  
-**Solution:** `$size` only takes an exact number, so `{ $size: { $gt: 1 } }` won't work. Use `{ "used_in.1": { $exists: true } }` to mean "has at least two items".  
-**Why:** `$size` is a simple length check. Checking whether position 1 exists is a handy workaround.
+- **Problem**: `Failed to parse $size. Expected a number`
+- **Solution**: `$size` only takes an exact number, so `{ $size: { $gt: 1 } }` won't work. Use `{ "used_in.1": { $exists: true } }` to mean "has at least two items".
+- **Why**: `$size` is a simple length check. Checking whether position 1 exists is a handy workaround.
 
-**Problem:** A query on two conditions in an array of sub-documents returns too much.  
-**Solution:** Wrap the conditions in `$elemMatch`.  
-**Why:** Without it, each condition can be satisfied by a different item in the list.
+- **Problem**: A query on two conditions in an array of sub-documents returns too much.
+- **Solution**: Wrap the conditions in `$elemMatch`.
+- **Why**: Without it, each condition can be satisfied by a different item in the list.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? How do you filter on the shelf inside a location sub-document?
+- [x] { "location.shelf": "A" }
+- [ ] { location.shelf: "A" }
+- [ ] { location: shelf: "A" }
+> Dot notation must be in quotes, because location.shelf is not a valid bare key.
+
+? When do you need $elemMatch?
+- [x] When several conditions must be true of the same list item
+- [ ] To count list items
+- [ ] To sort a list
+> Without it, different items could satisfy different conditions.
+
+? What does { tags: { $all: ["servo", "5v"] } } match?
+- [x] Lists containing both servo and 5v
+- [ ] Lists containing either one
+- [ ] Lists that are exactly those two
+> $all needs every value in the list to be present.
+
+? What happens if you $set location to a new sub-document with only a shelf?
+- [ ] The bin field is kept
+- [x] The whole sub-document is replaced, so bin is lost
+- [ ] MongoDB rejects it
+> $set with dot notation changes one nested field. Without it you replace the whole sub-document.
+{% endquiz %}
 
 ---
 

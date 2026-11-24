@@ -4,12 +4,16 @@ description: Build parts_bin.py, a Python command line app that lists, searches,
 layout: lesson
 type: page
 cover: /learn/mongodb/assets/banners/15_building_the_parts_bin_app.jpg
-date_updated: 2026-10-18
+date_updated: 2026-11-24
+code_target: cpython
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build a command line app that lists, finds, adds, uses and restocks parts, and reports low stock and total value.
 
 This is the lesson the whole course has been building towards. We're going to turn our `workshop` database into a proper tool: **`parts_bin.py`**, a command line app you can run any time you grab a part from a drawer.
 
@@ -42,6 +46,26 @@ name_1
 ```
 
 Running it again when the index already exists is harmless - MongoDB just hands back the same name.
+
+---
+
+## The big picture
+
+Each command in the app is a few lines of Python wrapped around one MongoDB idea you already know.
+
+```mermaid
+flowchart LR
+    CLI["python parts_bin.py"] --> A["list, find"]
+    CLI --> B["add"]
+    CLI --> C["use, restock"]
+    CLI --> D["low"]
+    CLI --> E["value"]
+    A -->|"find, $regex"| M[("MongoDB: workshop.parts")]
+    B -->|"insert_one, unique index"| M
+    C -->|"update_one with $inc"| M
+    D -->|"find with $lt"| M
+    E -->|"aggregate"| M
+```
 
 ---
 
@@ -770,6 +794,8 @@ Each command has its own help too, such as `python parts_bin.py add --help`.
 
 ---
 
+> **Teachers**: this is a project lesson, so plan 60 to 90 minutes, or split it over two sessions (steps 1 to 3, then steps 4 to 6). Pairs work well, one typing and one reading. The Try it Yourself tasks make good extension work for quicker learners.
+
 ## Try it Yourself
 
 1. Add a `delete NAME` command that removes a part with `delete_one` and reports whether anything was deleted.
@@ -805,21 +831,51 @@ def cmd_delete(parts, args):
 
 ## Common Issues
 
-**Problem:** `parts_bin.py: error: unrecognized arguments: Micro Servo`  
-**Solution:** Put quotes around names with spaces: `python parts_bin.py use "SG90 Micro Servo"`.  
-**Why:** Your terminal splits what you type at every space, so without quotes argparse receives three separate words and only expects one name.
+- **Problem**: `parts_bin.py: error: unrecognized arguments: Micro Servo`
+- **Solution**: Put quotes around names with spaces: `python parts_bin.py use "SG90 Micro Servo"`.
+- **Why**: Your terminal splits what you type at every space, so without quotes argparse receives three separate words and only expects one name.
 
-**Problem:** `add` happily adds the same part twice.  
-**Solution:** Recreate the unique index in `mongosh`: `db.parts.createIndex({ name: 1 }, { unique: true })`. You'll need to delete the duplicate first, or the index can't be built.  
-**Why:** The duplicate check is done by the index. Dropping the collection to reset it removes its indexes too.
+- **Problem**: `add` happily adds the same part twice.
+- **Solution**: Recreate the unique index in `mongosh`: `db.parts.createIndex({ name: 1 }, { unique: true })`. You'll need to delete the duplicate first, or the index can't be built.
+- **Why**: The duplicate check is done by the index. Dropping the collection to reset it removes its indexes too.
 
-**Problem:** `use` says "No part called ..." for a part you can see in `list`.  
-**Solution:** Copy the name exactly, including capitals - or use `find` to check the spelling.  
-**Why:** `use` and `restock` match the name exactly, so "sg90 micro servo" isn't the same as "SG90 Micro Servo". Only `find` ignores case.
+- **Problem**: `use` says "No part called ..." for a part you can see in `list`.
+- **Solution**: Copy the name exactly, including capitals - or use `find` to check the spelling.
+- **Why**: `use` and `restock` match the name exactly, so "sg90 micro servo" isn't the same as "SG90 Micro Servo". Only `find` ignores case.
 
-**Problem:** `KeyError: 'location'` when running `list`.  
-**Solution:** Give the offending part a location with `updateOne` and `$set` in `mongosh`.  
-**Why:** A part added by hand without a `location` field breaks `print_parts`, which expects every part to have one. Schema validation from [lesson 11](11_designing_your_data) can make `location` required.
+- **Problem**: `KeyError: 'location'` when running `list`.
+- **Solution**: Give the offending part a location with `updateOne` and `$set` in `mongosh`.
+- **Why**: A part added by hand without a `location` field breaks `print_parts`, which expects every part to have one. Schema validation from [lesson 11](11_designing_your_data) can make `location` required.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? How does the app stop you adding the same part twice?
+- [x] A unique index on name, caught as DuplicateKeyError
+- [ ] It checks a text file
+- [ ] It cannot
+> The index does the duplicate check, so the app needs no extra query.
+
+? Which command matches names ignoring case?
+- [ ] use
+- [ ] restock
+- [x] find
+> Only find ignores case. use and restock match the name exactly.
+
+? Where should an Atlas password live?
+- [ ] In the Python source file
+- [x] In the MONGODB_URI environment variable
+- [ ] In the part names
+> Code gets shared and uploaded, so the connection string stays in the environment.
+
+? Which MongoDB feature produces the value report?
+- [x] The aggregation pipeline
+- [ ] A projection
+- [ ] explain
+> The value command groups by category and sums quantity times price.
+{% endquiz %}
 
 ---
 
