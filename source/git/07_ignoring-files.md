@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/07_ignoring-files.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to keep junk files and secrets out of your repository with a `.gitignore` file, and stop tracking a file you committed by mistake.
 
 ## Not everything belongs in Git
 
@@ -133,6 +136,8 @@ git check-ignore -v secrets.py
 ```
 
 That means line 2 of `.gitignore` matched it.
+
+> **Teachers**: use this lesson to set the rule early: no passwords, Wi-Fi details or tokens go into a repository, especially one that will be pushed to a public site. Pupils should use made-up values in the exercises.
 
 ---
 

@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/01_what-is-git.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain what version control is, name the key words (repository, commit, branch, remote), and say how Git differs from GitHub.
 
 ## The problem Git solves
 

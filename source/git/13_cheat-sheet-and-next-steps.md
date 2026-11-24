@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/13_cheat-sheet-and-next-steps.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find any command from the course quickly, and choose what to learn next.
 
 ## Well done!
 
@@ -162,6 +165,12 @@ Related courses on this site:
 - [x] `git add -p`
 - [ ] `git commit -a`
 > `-p` (patch) shows each chunk of changes and asks whether to stage it.
+
+? You staged a file by mistake. Which command unstages it but keeps your edits?
+- [ ] `git restore <file>`
+- [x] `git restore --staged <file>`
+- [ ] `git revert <hash>`
+> `--staged` only removes the file from the staging area, so nothing is lost.
 {% endquiz %}
 
 ---

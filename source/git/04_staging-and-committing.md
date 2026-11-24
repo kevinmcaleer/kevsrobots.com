@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/04_staging-and-committing.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to stage changes with `git add`, save them with `git commit`, and write a commit message that your future self will thank you for.
 
 ## Saving a snapshot takes two steps
 
@@ -89,6 +92,7 @@ Let's go round it once. Add a motor pin to `main.py`, just under the `led` line:
 ```python
 left_motor = Pin(14, Pin.OUT)
 ```
+{: .no-snakie }
 
 Git now sees a change to a tracked file:
 

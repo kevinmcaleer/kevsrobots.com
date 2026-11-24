@@ -1436,9 +1436,8 @@
     "author": "Kevin McAleer",
     "date_published": "2026-11-04",
     "groups": [
-      "git",
-      "github",
-      "productivity"
+      "productivity",
+      "micropython"
     ],
     "lessons": [
       {

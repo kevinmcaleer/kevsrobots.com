@@ -11,7 +11,8 @@ description: Throw away edits with git restore, unstage files, fix your last com
   with --amend, and undo commits safely with git revert
 percent: 49
 duration: 6
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose the right command to throw away an edit, unstage a file, fix the last commit or safely undo an older one.
 
 ## Mistakes are fine
 

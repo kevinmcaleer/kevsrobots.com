@@ -10,8 +10,9 @@ next: 09_merging-and-conflicts.html
 description: Use branches to work on new features without breaking the code that already
   works
 percent: 63
-duration: 5
-quiz_total: 35
+duration: 6
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create, switch between and delete branches, so new features never break your working code.
 
 ## Why branches?
 
@@ -234,7 +237,7 @@ Don't delete `obstacle-avoidance` yet, though: we'll merge it in the next module
 - **Solution**: Switch to it with `git switch obstacle-avoidance` (no `-c`).
 - **Why**: `-c` creates a branch, and the name is already taken.
 
-- **Problem**: `error: The branch 'add-buzzer' is not fully merged`
+- **Problem**: `error: the branch 'add-buzzer' is not fully merged`
 - **Solution**: Merge it first, or use `git branch -D` if you really want to throw it away.
 - **Why**: Git is protecting you from deleting commits that only exist on that branch.
 
@@ -254,6 +257,12 @@ Don't delete `obstacle-avoidance` yet, though: we'll merge it in the next module
 - [ ] It's still in the folder
 - [x] It's safe on the other branch, and comes back when you switch to it
 > Switching branches changes your files to match that branch's latest commit.
+
+? Git refuses to delete a branch with `git branch -d`. What does that tell you?
+- [ ] The branch name is too long
+- [x] The branch has commits that haven't been merged anywhere
+- [ ] You are on the wrong computer
+> `-d` only deletes fully merged branches. Use a capital `-D` if you really want to throw the work away.
 {% endquiz %}
 
 ---

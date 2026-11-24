@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/09_merging-and-conflicts.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to merge a branch into `main`, tell a fast-forward from a merge commit, and resolve a merge conflict calmly.
 
 ## Merging a branch
 
