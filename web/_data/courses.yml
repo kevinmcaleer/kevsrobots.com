@@ -112,15 +112,14 @@
 - author: Kevin McAleer
   cover: /learn/brachiograph/assets/cover.png
   date_published: 2024-07-26
-  description: Learn how to build your own BrachioGraph, a simple drawing robot that
-    uses two stepper motors to create beautiful drawings.  This course covers the
-    essential steps from assembling the robot, installing the software, and creating
-    your first drawing.
-  duration: 0h 30m
+  description: Build your own BrachioGraph, a cheap pen plotter made from three hobby
+    servos, lolly sticks and a Raspberry Pi. Wire it up, install the software, calibrate
+    it, and draw shapes and vectorised images from Python.
+  duration: 0h 43m
   groups:
-  - robot arm
+  - robotarms
   - python
-  - raspberry pi
+  - raspberrypi
   lessons: 8
   level: beginner
   link: /learn/brachiograph/00_intro.html

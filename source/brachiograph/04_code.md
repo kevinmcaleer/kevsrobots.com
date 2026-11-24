@@ -1,116 +1,113 @@
 ---
 title: Code
-description: Learn how to code the BrachioGraph
+description: Create a BrachioGraph object, attach the arms at their default positions, test the angles and the pen, and read the status report.
 layout: lesson
 type: page
 cover: /learn/brachiograph/assets/banners/04_code.jpg
+date_updated: 2026-11-24
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Creating a BrachioGraph
+By the end of this lesson you will be able to create a BrachioGraph in Python, attach each arm at its default angle, move the servos with `set_angles()`, and raise and lower the pen.
 
-In this lesson, we will learn how to code the BrachioGraph plotter using Python.
+## Meet the plotter in Python
 
----
+Everything starts with one object. Creating a `BrachioGraph` tells the library to set the shoulder and elbow servos to their default "parked" position (a pulse-width of 1500 microseconds each, the middle of most servos' range). That is why we have not glued the arms on yet.
 
-Type the following code into the Python command line (also known as the Read Execute Print Loop or REPL) to import the BrachioGraph library:
+> **Warning**: Detach the inner arm from the servo before you create the plotter for the first time. The official docs warn that the machine may flail when the servos are energised.
+
+Start the service and the environment as in lesson 3:
+
+```bash
+sudo pigpiod
+source env/bin/activate
+cd BrachioGraph
+python
+```
+
+Then, at the Python prompt:
 
 ```python
 from brachiograph import BrachioGraph
 
-bg = BrachioGraph() # This will create a new BrachioGraph object
+bg = BrachioGraph()
+```
+
+The motors buzz as they move to their default positions. The variable `bg` is your plotter, and everything else in this course is a method on `bg`.
+
+```mermaid
+flowchart TD
+    A["Create BrachioGraph()"] --> B["Servos go to parked position"]
+    B --> C["Attach inner arm near -90 degrees"]
+    C --> D["Test with set_angles(0, 90)"]
+    D --> E["Attach outer arm at 90 degrees to inner arm"]
+    E --> F["Test with set_angles(-90, 120)"]
+    F --> G["Adjust the pen lift"]
+    G --> H["Check bg.status()"]
 ```
 
 ---
 
-You can now use the `bg` object to control the BrachioGraph plotter.
+## Attach and test the inner arm
 
-When the BrachioGraph object is created, the arm will move to the default position.
-
----
-
-## Attach the inner arm to the Shoulder servo
-
-Now that the servo motor has been set to its default position by the code we have just run, we can attach the inner arm to the shoulder servo.
+Push the inner arm onto the shoulder servo so that it sits as close as possible to -90 degrees on the grid. It won't be exact, and calibration in lesson 5 deals with that.
 
 ![Default Position](assets/default_position.jpg){:class="w-100 card-hover card-shadow rounded-3"}
 
----
-
-The servo might not attach at exactly 90 degrees, but that's okay. The calibration code will take care of that, later.
-
----
-
-Test the arm by running the following code:
+Now test it. `set_angles(a, b)` takes the inner arm angle first and the outer arm angle second:
 
 ```python
 bg.set_angles(0, 90)
 ```
 
-This will move the arm to the 0, 90 position; the shoulder servo will move to 0 degrees and the elbow servo will move to 90 degrees. Note that the arm will move their very quickly, without any motion easing.
-
----
-
-## Park the arm
-
-To park the arm, run the following code:
+The inner arm should swing clockwise to about 0 degrees. Bring it back with:
 
 ```python
 bg.park()
 ```
 
-This will move the arm to the park position, which is the default position.
+`park()` also raises the pen. The arm moves quickly because `set_angles()` goes straight to the new angle with no easing.
 
 ---
 
-## Attach the outer arm to the Elbow servo
+## Attach and test the outer arm
 
-Now that the inner arm is attached to the shoulder servo, we can attach the outer arm to the elbow servo.
-
-You can also add the pen (or pencil) to the clothes peg at the end of the outer arm. The tip of the pen should not be touching the paper.
-
-Let's test the arm by running the following code:
+Attach the outer arm so it sits as close to 90 degrees from the inner arm as you can. Test with:
 
 ```python
 bg.set_angles(-90, 120)
 ```
 
-This will move the arm to the -90, 120 position; the shoulder servo will move to -90 degrees and the elbow servo will move to 120 degrees.
+The outer arm should swing clockwise by about 30 degrees from where it was. Park again with `bg.park()`.
 
 ---
 
-## Rasing and lowering the pen
+## Raise and lower the pen
 
-To lower the pen to the writing position, run the following code:
+Put a pen in the clothes peg, then try:
 
 ```python
 bg.pen.down()
-```
-
-The pen should now be touching the paper, if its not, adjust the positon of the pen accordingly.
-
-To raise the pen, run the following code:
-
-```python
 bg.pen.up()
 ```
 
+Adjust the pen servo horn and the position of the pen in the peg until the pen firmly touches the paper when down, and clears it by a millimetre or two when up. You can also pass `pw_up` and `pw_down` pulse-width values when creating the plotter, if you need to change how far the servo travels.
+
 ---
 
-## Check the status of the BrachioGraph
-
-You can check the status of the BrachioGraph by running the following code:
+## Read the status report
 
 ```python
 bg.status()
 ```
 
-The BrachioGraph will report its status:
+You get a table of pulse-width, angle and hysteresis correction for each servo (servo 1 is the shoulder, servo 2 is the elbow), then whether the pen is up or down, and the plotting area. Something like this, though your numbers will be different:
 
-```bash
+```text
 ------------------------------------------
                       | Servo 1 | Servo 2
                       | Shoulder| Elbow
@@ -127,72 +124,86 @@ bottom left: (-8, 4) top right: (6, 13)
 ------------------------------------------
 ```
 
+The last line is the default drawing area in centimetres from the shoulder spindle.
+
+---
+
+## A complete first program
+
+Here is the whole routine as a script you can save as `first_move.py` in the `BrachioGraph` folder and run with `python first_move.py`. It moves the arm, puts the pen down and up, and parks.
+
+```python
+import time
+
+from brachiograph import BrachioGraph
+
+bg = BrachioGraph()
+
+bg.set_angles(0, 90)
+time.sleep(1)
+
+bg.set_angles(-90, 120)
+time.sleep(1)
+
+bg.pen.down()
+time.sleep(1)
+bg.pen.up()
+
+bg.park()
+bg.status()
+```
+
+> **Teachers**: Servos can be moved by hand and pinch fingers, so keep fingers clear when the program starts. Pairs share one plotter, so agree who types and who watches the arm. If your Pi is shared, make sure only one student starts `pigpiod`.
+
 ---
 
 ## Try it Yourself
 
-Congratulations! Your BrachioGraph just moved for the first time! Now let's practice controlling it:
-
-1. **Explore Servo Angles**: Try different angle combinations to see where the arm can reach:
-   ```python
-   bg.set_angles(45, 45)   # Try this
-   bg.set_angles(-45, 135) # And this
-   bg.set_angles(0, 180)   # What about this?
-   ```
-   Watch how the arm moves to each position. Which position reaches furthest from the base?
-
-2. **Test the Pen**: Practice raising and lowering the pen:
-   ```python
-   bg.pen.down()
-   # Wait 2 seconds - is the pen touching the paper?
-   bg.pen.up()
-   ```
-   If the pen doesn't touch the paper when down, adjust it in the clothes peg.
-
-3. **Movement Sequence**: Create a simple movement pattern:
-   ```python
-   bg.set_angles(-90, 90)  # Move to one corner
-   bg.set_angles(90, 90)   # Move to opposite corner
-   bg.set_angles(0, 120)   # Move to center
-   bg.park()               # Return to park position
-   ```
-
-4. **Check Status Between Moves**: Run `bg.status()` after different movements to see how the values change. This helps you understand what each servo is doing.
-
-**Challenge**: Can you figure out which angle values make the arm point:
-- Straight forward?
-- To the left?
-- To the right?
-- Furthest away from the base?
-
-Write down your observations - understanding the coordinate system now will help when you start drawing!
+1. Change the angles in `first_move.py` to `(45, 45)`, then `(-45, 135)`. Which position reaches furthest from the base?
+2. Add a line that raises the pen, moves to a new angle and lowers it again. Does the pen mark the paper where you expect?
+3. Run `bg.status()` after each move and write down how the angles change.
+4. Challenge: find the angle pairs that point the arm straight forward, left and right. Write them on your template next to the 0,0 point.
 
 ---
 
 ## Common Issues
 
-- **Problem**: `ImportError: No module named 'brachiograph'`
-- **Solution**: Make sure you installed the library with `pip install brachiograph` and are using Python 3
-- **Why**: The BrachioGraph library must be installed before you can import it
+- **Problem**: `ModuleNotFoundError: No module named 'brachiograph'`.
+- **Solution**: Run Python from inside the `BrachioGraph` folder, with `(env)` showing in your prompt.
+- **Why**: The library is the `brachiograph.py` file in the repository, so Python only finds it from there.
 
-- **Problem**: The servos don't move when I run the code
-- **Solution**: Check that your servos are wired correctly to GPIO pins 14, 15, and 18. Verify the Pi has power and the code runs without errors. Try running `bg.status()` - does it show values?
-- **Why**: Servos need proper power and signal connections to respond to commands
+- **Problem**: Nothing moves and there is no error.
+- **Solution**: Run `sudo pigpiod`, then restart Python and create the plotter again. Also check the wiring against lesson 2.
+- **Why**: Without the daemon the library switches to a virtual plotter.
 
-- **Problem**: The arm moves but to the wrong position
-- **Solution**: This is normal! Each servo has slight variations. You'll calibrate the exact positions in a later lesson
-- **Why**: Servos aren't perfectly accurate "out of the box" - calibration fixes this
+- **Problem**: The arm goes to the wrong place.
+- **Solution**: Expect this at first. The horns can't be fitted at exactly the right angle, so you fine-tune with parked pulse-widths in lesson 5.
+- **Why**: A servo spindle has teeth, so the arm lands within a tooth or so of ideal.
 
-- **Problem**: When I create the BrachioGraph object, I get a warning about GPIO
-- **Solution**: Run your Python script with `sudo python3 script.py` or configure GPIO permissions
-- **Why**: GPIO pin access on Raspberry Pi requires elevated permissions
-
-- **Problem**: The pen servo doesn't lift the pen high enough
-- **Solution**: Check the `bg.pen.up()` position - you may need to adjust the pen servo arm angle or the pen position in the clothes peg
-- **Why**: The pen mechanism needs proper mechanical adjustment, not just code
-
-- **Problem**: Servos make buzzing noise but don't move smoothly
-- **Solution**: Make sure you're using an external 5V power supply for the servos, not powering them from the Pi's 5V pin
-- **Why**: Servos draw significant current that can cause voltage drops and erratic behavior
+- **Problem**: The servos buzz at rest.
+- **Solution**: Check the mechanical joints aren't binding. The library also has a `quiet()` method for switching servo pulses off, which you can look up in the plotter reference.
+- **Why**: A servo holding a position keeps working against any force that pushes it away from that position.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? Why do we detach the inner arm before creating the plotter?
+- [ ] The library can't find the arm otherwise
+- [x] The servos jump to their default position and the arm might flail
+- [ ] The pen would run out of ink
+> The servos move as soon as the plotter is created, so the arm is attached afterwards.
+
+? In `bg.set_angles(0, 90)`, which number is the inner arm angle?
+- [x] 0, the first
+- [ ] 90, the second
+- [ ] Both are for the outer arm
+> The first value is the inner arm angle, the second is the outer arm angle.
+
+? Which call lifts the pen off the paper?
+- [ ] bg.pen.down()
+- [x] bg.pen.up()
+- [ ] bg.park()
+> `bg.pen.up()` raises the pen, and `bg.park()` also raises it while returning to the park position.
+{% endquiz %}

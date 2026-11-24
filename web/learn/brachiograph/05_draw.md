@@ -7,9 +7,14 @@ cover: /learn/brachiograph/assets/banners/05_draw.jpg
 date: 2024-07-26
 previous: 04_code.html
 next: 06_vectorize.html
-description: Learn how to draw with the BrachioGraph
+description: Draw boxes, test patterns and a demo image with the BrachioGraph, then
+  calibrate it with parked pulse-widths, hysteresis correction and degrees-per-pulse-width
+  values.
 percent: 72
-duration: 4
+duration: 6
+quiz_total: 21
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: BrachioGraph Tutorial
 - content:
@@ -44,60 +49,49 @@ navigation:
 
 ---
 
-## Draw a simple box
+By the end of this lesson you will be able to draw a box, a test pattern and a demo file, and improve the results by calibrating the parked pulse-widths, hysteresis correction and angle scaling in a `custom.py` file.
 
-Type the following code:
+## Your first box
+
+The drawing area is measured in centimetres, from the shoulder spindle at 0,0. The `bounds` for a box are `[left, bottom, right, top]`, which are the bottom-left and top-right corners. Put a sheet of A5 paper on the grid, tape it down, put a pen in the peg, and try:
 
 ```python
 bg.box(bounds=[-2, 7, 2, 11])
 ```
 
-This will draw a box with the following coordinates:
+That box spans x from -2 to 2 and y from 7 to 11, so it should be about 4cm by 4cm. Called with no bounds, `bg.box()` draws around the whole default drawing area, which is a great way to see how far your plotter reaches. Your lines will be a little wobbly. That is normal for this machine, and the rest of the lesson is about making them better.
 
-- x1: -2
-- x2: 7
-- y1: 2
-- y2: 11
-
-The box will be drawn in the top right corner of the drawing area.
-
-The box will be sligthy swiggly, because the BrachioGraph is not perfectly calibrated, and because thats part of the charm of a BrachioGraph drawing. The box should be around 4cm by 4cm.
-
----
-
-## Test Patterns
-
-The BrachioGraph library has a few test patterns and images we can try out. Here are a few examples:
-
-```python
-bg.test_pattern()
+```mermaid
+flowchart LR
+    A["box(): check reach and bounds"] --> B["test_pattern(): see the slack"]
+    B --> C["custom.py: park correctly"]
+    C --> D["hysteresis_correction"]
+    D --> E["degree_ms values"]
+    E --> F["plot_file(): a real drawing"]
 ```
 
 ---
 
-Note that the grid that is drawn will be wobbley and imperfect. This is because the BrachioGraph needs to be tighted up to remove some of the slack. To do this you can attach the small screws that came with the Servos to the inner and outer arms of the BrachioGraph. This will help to remove some of the slack in the arms and make the drawing more accurate.
+## Test patterns and a demo drawing
 
----
+```python
+bg.test_pattern()
+bg.test_pattern(reverse=True)
+```
 
-## Draw our first image
-
-Now that we have a basic understanding of how to draw with the BrachioGraph, we can start to draw our first image. We will start with a simple image of the BrachioGraph library creator.
-
-The BrachioGraph doesn't know how to draw pictures directly; they need to be converted into a series of points that the BrachioGraph can draw. We'll learn how to do that shortly, but first lets try to plot our first image.
+The pattern is a set of lines. Drawing it forwards and in reverse shows how far apart the lines land, because the arm's slack and friction make it stop short in one direction. Then try the demo file, which is a list of lines in a JSON file:
 
 ```python
 bg.plot_file("images/demo.json")
 ```
 
+> **Teachers**: Pens, paper and tape are cheap, but a plot can take several minutes, so give each group a timer and a small test pattern to run first. Plan for a spare pen per group, because a pen left down on the paper while the plotter pauses leaves a blot.
+
 ---
 
-## Enhancing Your BrachioGraph Setup with Calibration
+## Calibrating with custom.py
 
-### Creating a Custom Configuration File
-
-Let's start by creating a file to store your custom BrachioGraph configuration. In the same directory as `brachiograph.py`, create a new file named `custom.py`.
-
-In `custom.py`, import the `BrachioGraph` class and create an instance with the specific pulse-width values you used earlier. Here’s an example:
+Instead of retyping settings each session, put them in a file. Inside the `BrachioGraph` folder, create `custom.py`:
 
 ```python
 from brachiograph import BrachioGraph
@@ -108,7 +102,9 @@ bg = BrachioGraph(
 )
 ```
 
-Save this file. From now on, you can initialize your BrachioGraph in the Python shell using this custom definition. Try it out:
+The values 1570 and 1450 are the official docs' example for their own build. Yours will be different: the right numbers depend on how your horns happen to be fitted. To find your own, use `bg.set_pulse_widths(shoulder, elbow)` and nudge each value in steps of no more than 100 until the arms sit perpendicular to each other and to the drawing area, then write those values into `custom.py`.
+
+Load it with:
 
 ```python
 from custom import bg
@@ -116,11 +112,9 @@ from custom import bg
 
 ---
 
-### Correcting Hysteresis
+## Correcting hysteresis
 
-Next, we'll work on improving the machine's performance. Due to the limited power of the motors and the inherent flex in the arms and plastic gears, you might notice some slack in the system. This often causes the arms to fall short of their target positions. When approached from the opposite direction, the error appears on the other side of the target. This phenomenon is known as hysteresis.
-
-To counteract hysteresis, we can command the motors to slightly overshoot their targets. Update your BrachioGraph definition in `custom.py` to include hysteresis correction:
+The motors are weak and the arms flex, so when you approach a position from one direction, the arm stops a little short, and from the other direction it stops short on the other side. That error is called hysteresis. Counter it by asking for a small overshoot:
 
 ```python
 from brachiograph import BrachioGraph
@@ -133,51 +127,94 @@ bg = BrachioGraph(
 )
 ```
 
-Restart the Python shell, import your custom-defined BrachioGraph again:
-
-```python
-from custom import bg
-```
-
-Test the improved performance by running the test pattern in both directions:
+Restart Python, import the plotter again, and compare:
 
 ```python
 bg.test_pattern(both=True)
 ```
 
-You should see better results now. Experiment with hysteresis correction values between 7 and 20 to find the optimal settings. Remember to restart the Python shell and re-import the definition each time you make changes.
+The official docs suggest trying correction values between 7 and 20.
 
 ---
 
-### Fine-Tuning Angle Calculations
+## Fine-tuning the angle calculation
 
-The default BrachioGraph definition assumes a 10 µs change in pulse-width corresponds to a 1-degree change in the motor's position. However, in practice, this might not be entirely accurate, causing distortions in your drawings. 
+By default the library assumes that a change of 10 in pulse-width means a change of 1 degree. Your servos may disagree. To measure it:
 
-To correct this, first ensure that when you call `bg.park()`, the inner arm is exactly at -90˚. Then, execute:
+1. Park the plotter and check that the inner arm is at -90 degrees.
+2. Run `bg.set_angles(angle_1=0)`. Is the inner arm at 0 degrees? If not, adjust the pulse-width until it is.
+3. Take the difference between that pulse-width and the -90 degree one, then divide by 90. That is your pulse-width change per degree.
+4. Repeat for the outer arm.
 
-```python
-bg.set_angles(angle_1=0)
-```
+Put your numbers in as `servo_1_degree_ms` and `servo_2_degree_ms`. The docs' example values are -9.8 and 10.1. Servo 1's value is negative because that servo is mounted so it turns the other way. If you get the sign wrong the arm moves the wrong way, so just flip it.
 
-Check if the inner arm is precisely at 0˚. If not, adjust `angle_1` until it is. Determine the actual pulse-width value needed to reach 0˚ and subtract it from the -90˚ pulse-width value. This gives you the pulse-width difference required for a 90˚ movement. Divide this difference by 90 to find the pulse-width change per degree.
+If you want to go further, the docs have a [more sophisticated calibration](https://www.brachiograph.art/tutorial/sophisticated-calibration/) using `bg.capture_pws()`, which records pulse-widths for each angle in both directions.
 
-Perform a similar calibration for the outer arm. Once you have these values, update your `custom.py` file as follows:
+---
+
+## No hardware? Use the virtual plotter
+
+You can run the whole thing without servos. Create the plotter in virtual mode and add the on-screen turtle preview:
 
 ```python
 from brachiograph import BrachioGraph
 
-bg = BrachioGraph(
-    servo_1_parked_pw=1570,
-    servo_2_parked_pw=1450,
-    hysteresis_correction_1=10,
-    hysteresis_correction_2=10,
-    servo_1_degree_ms=-9.8,
-    servo_2_degree_ms=10.1,
-)
+bg = BrachioGraph(virtual=True, turtle=True)
+bg.box(bounds=[-2, 7, 2, 11])
+bg.test_pattern()
 ```
 
-Notice that the value for `servo_1_degree_ms` might be negative. This is because one of the servos could be mounted upside-down. If the sign is incorrect, the arm will move in the opposite direction.
-
-With these adjustments, your BrachioGraph should now function more accurately, providing more precise and consistent drawings.
+The turtle window draws what the plotter would have drawn. You need tkinter available (we installed `python3-tk` in lesson 3).
 
 ---
+
+## Try it Yourself
+
+1. Draw a box in a different place using `bounds`. Check it fits within the default drawing area.
+2. Run `bg.test_pattern()` with hysteresis correction at 0, 10 and 15. Which looks best?
+3. Create a `custom.py` with your own parked pulse-widths and import it.
+4. Challenge: calibrate `servo_1_degree_ms` and `servo_2_degree_ms` for your plotter and compare a before and after test pattern.
+
+---
+
+## Common Issues
+
+- **Problem**: The box is squashed or skewed.
+- **Solution**: Check the arm lengths are 8cm and calibrate the degree values.
+- **Why**: The library's geometry assumes accurate arms and accurate angles.
+
+- **Problem**: The pattern is wobbly or doubled.
+- **Solution**: Add hysteresis correction and tighten the joints. The advanced calibration page suggests screwing the horns to the arms for less flex.
+- **Why**: Slack in the joints means the arm lands on different points depending on direction.
+
+- **Problem**: The arm moves in the wrong direction when I set degree values.
+- **Solution**: Flip the sign of the `servo_*_degree_ms` value.
+- **Why**: Servos can be mounted facing opposite ways.
+
+- **Problem**: My changes in `custom.py` have no effect.
+- **Solution**: Restart Python and import `custom` again.
+- **Why**: Python only reads the file when you import it.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What order are the four numbers in `bounds=[-2, 7, 2, 11]`?
+- [ ] x1, x2, y1, y2
+- [x] left, bottom, right, top
+- [ ] top, right, bottom, left
+> The bounds are the bottom-left and top-right corners, so left, bottom, right, top.
+
+? What is hysteresis in this plotter?
+- [ ] The pen running out of ink
+- [x] The arm stopping short of its target, on a different side depending on direction
+- [ ] The Pi overheating
+> Slack and flex mean the arm falls short, and the error flips sign when approached from the opposite direction.
+
+? Where should you get your parked pulse-width values from?
+- [ ] Copy 1570 and 1450 from the lesson
+- [x] Measure them on your own plotter
+- [ ] Ask the Pi
+> The numbers are per-build, so the lesson shows the method with the docs' example values.
+{% endquiz %}

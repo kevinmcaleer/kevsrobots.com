@@ -6,11 +6,13 @@ type: page
 cover: /learn/brachiograph/assets/banners/00_intro.jpg
 date: 2024-07-26
 next: 01_build.html
-description: Build and program a BrachioGraph; a simple and fun drawing robot that
-  can be controlled using Python.
+description: Build and program a BrachioGraph, a cheap and cheerful drawing robot
+  made from three hobby servos, lolly sticks and a Raspberry Pi, and drive it from
+  Python.
 percent: 12
 duration: 5
-date_updated: 2024-07-30
+quiz_total: 21
+date_updated: 2026-11-24
 navigation:
 - name: BrachioGraph Tutorial
 - content:
@@ -47,30 +49,38 @@ navigation:
 
 {% include youtubeplayer.html id="tkAv3HIw3CY" %}
 
+By the end of this lesson you will be able to describe how a BrachioGraph draws, and check that you have everything you need to build one.
+
 ## Overview
 
-A BrachioGraph (from the Greek `Brachio`; *Arm*, and `Graph`; *draw*) is a simple pen plotter that you can build at home using a few simple components. It's a fun project that will help you learn about robotics, programming, and electronics while creating a working drawing robot!
+A BrachioGraph (from the Greek *brachio*, arm, and *graph*, draw) is a pen plotter you can build at home for very little money. It was designed by Daniele Procida, and the project is open source. Two hobby servos swing a two-part arm, a third servo lifts and lowers the pen, and a Raspberry Pi tells all three what to do from a Python program.
 
-A BrachioGraph is a type of robotic arm designed for drawing using a pen or pencil. It's made up of hobby servos and household items such as popsicle sticks, hot glue, and a foam core board. The robot is controlled by a Raspberry Pi, which sends commands to the servos to move the pen in the X and Y directions.
+The arm is made from lolly sticks, card and hot glue, so the drawings are a little wobbly. That is part of the charm, and it is also what makes it such a good teaching robot: every wobble has a cause you can find and fix, with better building or better code.
 
-In this tutorial we'll use a Raspberry Pi to drive the arm. The Raspberry Pi will run a Python script that sends commands to the servos to move the pen precisely. The BrachioGraph can draw simple shapes, write text, or even create intricate designs and plot images!
+```mermaid
+flowchart LR
+    PY["Python program on the Pi"] --> LIB["BrachioGraph library"]
+    LIB --> PIG["pigpio daemon"]
+    PIG --> S1["Shoulder servo (GPIO 14)"]
+    PIG --> S2["Elbow servo (GPIO 15)"]
+    PIG --> S3["Pen servo (GPIO 18)"]
+    S1 --> ARM["Two-part arm and pen"]
+    S2 --> ARM
+    S3 --> ARM
+```
 
-The BrachioGraph Python code is available at <https://github.com/evildmp/brachiograph> and we'll walk you through the complete process of building the hardware, installing the software, and creating your first drawings.
+The software is the official BrachioGraph library, which lives in the evildmp/BrachioGraph repository on GitHub. The official documentation is at [brachiograph.art](https://www.brachiograph.art/), and this course follows it closely, so keep it open in another tab.
 
 ---
 
 ## Course Content
 
-In this course, you'll learn:
-
-- How to assemble the BrachioGraph hardware from simple materials (popsicle sticks, servos, foam board)
-- Wiring servos to Raspberry Pi GPIO pins safely and correctly
-- Installing and configuring the BrachioGraph Python library
-- Understanding servo control and coordinate systems
-- Writing Python code to control the robotic arm
-- Creating your first drawings with simple shapes
-- Converting bitmap images to vector format for plotting
-- Calibrating and fine-tuning your plotter for accuracy
+- Building the base, inner arm, outer arm and pen lift
+- Wiring three servos to the Raspberry Pi GPIO pins
+- Installing the BrachioGraph library and the pigpio service
+- Moving the arm with angles and lowering the pen
+- Drawing boxes and test patterns, then calibrating the plotter
+- Turning ordinary images into plottable line drawings with `linedraw`
 
 ---
 
@@ -78,114 +88,66 @@ In this course, you'll learn:
 
 After completing this course, you will be able to:
 
-- Build a working pen plotter robot from inexpensive household materials
-- Understand how servo motors are controlled using GPIO pins
-- Write Python code to control a 2-axis robotic arm
-- Create drawings programmatically using coordinates
-- Convert images to plottable vector format
-- Troubleshoot and calibrate a servo-based robot
-- Apply these skills to other robotics projects with similar mechanics
+- Build a working pen plotter from lolly sticks, card, servos and a Raspberry Pi
+- Wire three hobby servos to the correct GPIO pins
+- Install the BrachioGraph library and start the pigpio service
+- Move the arm and pen from Python and read the plotter status
+- Calibrate the plotter using parked pulse-widths, hysteresis correction and degrees-per-pulse-width values
+- Vectorise a picture and plot it
 
 ---
 
 ## What you'll need
 
-### Hardware
+| Item | Notes | Quantity |
+| --- | --- | --- |
+| Hobby servos | The official docs recommend TowerPro SG90 | 3 |
+| Raspberry Pi | With a GPIO header, power supply, microSD card. Pi OS Bullseye Lite is what the official install steps were tested on | 1 |
+| Lolly (popsicle) sticks or stiff card | For the two arms | A few |
+| Clothes peg | Holds the pen | 1 |
+| Foam board, card or similar | A4-sized base | 1 |
+| Jumper wires | To reach from servos to the GPIO header | 1 pack |
+| Pen or pencil | Fine tip works best | 1 |
+| Hot glue gun | With glue sticks | 1 |
+{:class="table table-single"}
 
-Item | Description | Quantity | Approx. Cost
------|-------------|----------|-------------
-**SG90 Servo Motors** | Micro servo motors for controlling the arm joints | 3 | $3
-**Raspberry Pi 3+** | Microcontroller for running the code (any Pi 3 or newer) | 1 | $25
-**Popsicle Sticks** | Craft sticks for building the mechanical structure | Pack of 50 | $1
-**Hot Glue Gun** | For assembling the parts (with glue sticks) | 1 | $5
-**Clothes Peg** | For holding the pen or pencil | 1 | $0.50
-**Foam Core Board** | For the base (A4 size minimum) | 1 | $1
-**Jumper Wires** | Female-to-female for connecting servos to Pi | 1 pack | $5
-**Mini Breadboard** | For organizing the servo connections | 1 | $1
-**Pen or Pencil** | For drawing (ballpoint or fine-tip marker works best) | 1 | You have this!
-{:class="table table-bordered table-striped"}
+Tools: a ruler, a pencil, scissors, and a small drill or bradawl for pilot holes in the arms (optional). You will also need a computer to write the SD card, and a keyboard, mouse and monitor for the Pi, or a way to connect to it over SSH.
 
-**Total Cost:** Approximately $40 (assuming you already have a Raspberry Pi)
-
-### Software
-
-- Raspberry Pi OS (latest version)
-- Python 3.x (pre-installed on Raspberry Pi OS)
-- BrachioGraph library (installation covered in the course)
-
-### Tools
-
-- Small drill (1-2mm bit) for making pilot holes
-- Ruler or measuring tape
-- Pencil for marking
-- Scissors or craft knife (optional, for cutting foam board)
-
-### Skills
-
-This course is beginner-friendly! You don't need:
-- Prior robotics experience
-- Advanced Python knowledge (basic familiarity helpful)
-- Electronics expertise
-
-If you're completely new to Raspberry Pi, you might want to familiarize yourself with basic setup first, but we'll guide you through everything you need for this project.
+> **Which Pi?** The official install page does not name Pi models, and the original version of this course used a Raspberry Pi 3+. We could not confirm from the pigpio or BrachioGraph sources how pigpio behaves on the newest Pi models and OS releases, so if you have a recent Pi, check [brachiograph.art](https://www.brachiograph.art/) and the pigpio project first. The virtual plotter in lesson 5 needs no servos at all.
 
 ---
 
 ## How the course works
 
-This course combines hands-on hardware construction with Python programming. You'll physically build the robot first, then progressively learn to control it with code.
+You build the hardware first, then bring it to life in code.
 
-**What to expect in each lesson:**
+1. **Build** the base, arms and pen lift
+2. **Wire** the servos to the Pi
+3. **Set up** the Pi and install the library
+4. **Code** your first movements
+5. **Draw** boxes, test patterns and calibrate
+6. **Vectorise** images and plot them
 
-- **Clear step-by-step instructions** with numbered steps
-- **Photos and diagrams** showing assembly details and wiring
-- **Working Python code examples** you can type and run immediately
-- **Troubleshooting tips** for common issues
-- **Interactive exercises** to practice your skills
+Every lesson opens with an objective, finishes with exercises, common problems, and a short quiz. Code blocks marked as complete programs can be saved and run on the Pi. Short snippets are meant to be typed into the Python prompt (the REPL) while the plotter is running. The Run button on the web page cannot work with this course, because the code needs the BrachioGraph library and the pigpio service, which only exist on your Pi.
 
-**Learning approach:**
-
-1. **Build** - Assemble the physical plotter from simple materials
-2. **Wire** - Connect servos safely to GPIO pins
-3. **Install** - Set up the software on your Raspberry Pi
-4. **Code** - Learn to control servos with Python
-5. **Draw** - Create your first programmatic drawings
-6. **Advanced** - Convert images and create complex plots
-
-Each lesson builds on the previous one, so work through them in order for the best learning experience.
-
-> **Note:** Code examples use the BrachioGraph Python library and are designed to be typed into the Python REPL or saved as scripts. Don't worry if you make mistakes - debugging is part of learning!
+> **Teachers**: This course suits ages 11 and up, in pairs or threes, and works well as a half-term project. Allow about 60 to 90 minutes for the build lesson (hot glue needs time to set), 30 minutes for wiring, 45 for the Pi setup and 45 to 60 minutes per coding lesson. Per group you need one full kit from the table above plus a Pi, power supply and screen. Hot glue guns and craft knives need supervision, and wiring should always be done with the Pi switched off. With no hardware, a class can still do lessons 4 to 6 using the virtual plotter described in lesson 5, though the Pi still needs the library installed.
 
 ---
 
 ## Prerequisites
 
-**This course assumes you have:**
-- Basic comfort using a computer
-- A Raspberry Pi set up with Raspberry Pi OS
-- Basic familiarity with the command line (helpful but we'll guide you)
-
-**No prior experience needed with:**
-- Python programming (we'll teach you what you need)
-- Electronics or wiring (we'll show you step-by-step)
-- Robotics or servo motors (you'll learn by building!)
-
-If you've never used a Raspberry Pi before, consider checking out our [Raspberry Pi Getting Started Guide](/learn/raspberry-pi/) first - but it's not required!
+This course assumes you can use a keyboard and a terminal a little. If the command line is new to you, try [Introduction to the Linux Command Line on Raspberry Pi OS](/learn/linux_intro/) first. Basic Python helps, and [Python for beginners](/learn/python/) covers it.
 
 ---
 
 ## What's Next
 
-After completing this course, you might enjoy:
+After this course, try:
 
-- [SMARS Robot](/learn/smars/) - Build a wheeled robot with similar servo control concepts
-- [MicroPython GPIO](/learn/micropython_gpio/) - Deep dive into GPIO pin control
-- [Python for Beginners](/learn/python/) - Expand your Python programming skills
-- [Robot Arm Kinematics](/learn/pca9685/) - Build more complex robot arms with PCA9685 servo controller
-
-You'll also have the skills to create your own custom drawings, automate art creation, and even design your own servo-based robotic projects!
-
----
+- [Wall Drawing Robot Tutorial](/learn/scrawly_wally/) for a very different drawing robot
+- [Building a Robot Arm with Raspberry Pi and PCA9685](/learn/pca9685/) for a bigger servo arm
+- [Robotics 101](/learn/robotics_101/) for the wider picture
+- [Python for beginners](/learn/python/) to get more from the code
 
 Let's get building!
 
