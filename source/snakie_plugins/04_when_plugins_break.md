@@ -29,6 +29,7 @@ There are two kinds of failure, and Snakie shows them in different places.
 
 Open `__init__.py` and delete the colon from the end of the `def` line:
 
+<!-- code-check: skip -->
 ```python
 @plugin.command("clubkit.hi", "Say hi")
 def say_hi(ctx: Context)

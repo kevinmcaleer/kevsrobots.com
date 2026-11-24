@@ -133,6 +133,7 @@ It gets a squiggle. The linter is reading text, and a comment is text. That's a 
 
 The simplest cure is to cut each line off at the `#` before checking it. Add one line at the top of the loop and use `code` in place of `line` in both checks:
 
+<!-- code-check: skip -->
 ```python
     for number, line in enumerate(ctx.file.content.splitlines(), start=1):
         code = line.split("#")[0]

@@ -141,6 +141,7 @@ digitalWrite(13,HIGH);
 ```
 
 **MicroPython:**
+<!-- code-check: skip -->
 ```python
 # Indentation defines the block
 from machine import Pin
@@ -330,6 +331,7 @@ Key changes:
 
 This MicroPython code has syntax errors from C++ habits. Find them:
 
+<!-- code-check: skip -->
 ```python
 from machine import Pin;
 import time;

@@ -121,7 +121,7 @@ Let's review what you've learned and where to go next.
 
 **Common Conversions:**
 
-```python
+```text
 # Arduino delay to MicroPython
 delay(1000)           → time.sleep(1)          # 1 second
 delay(500)            → time.sleep(0.5)        # 0.5 seconds
@@ -169,6 +169,7 @@ flag = True
 
 **3. Indentation Errors**
 
+<!-- code-check: skip -->
 ```python
 # WRONG - inconsistent indentation
 if x > 10:
