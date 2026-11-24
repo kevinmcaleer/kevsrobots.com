@@ -12,7 +12,7 @@ description: Build Q Board stage 5, where the sketch sends sensor readings up to
 percent: 45
 duration: 11
 quiz_total: 50
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
 - content:
@@ -66,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to let a sketch call a Python function over the Bridge and report a sensor reading up to Python.
 
 In lesson 7 Python gave the orders and the sketch obeyed. Now we turn the Bridge around. The sketch reads a sensor and reports up to Python, and Python holds the settings.
 

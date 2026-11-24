@@ -12,7 +12,7 @@ description: Meet the Bridge, the Arduino Router and the four calls that let Pyt
 percent: 35
 duration: 7
 quiz_total: 50
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
 - content:
@@ -66,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to describe how a call travels across the Bridge, name the four verbs, and say which types can cross it.
 
 So far the two brains have lived side by side without a word between them. This lesson gives them a way to talk. It is the most valuable idea in the whole course, so let's take it slowly.
 

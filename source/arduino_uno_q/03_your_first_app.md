@@ -4,12 +4,14 @@ description: Create the Q Board App, learn what is inside an App folder, and mak
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/03_your_first_app.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create an App, say what each file in its folder does, and blink one LED from each brain.
 
 Now let's build something of our own. We'll create an App called **Q Board** and make two LEDs blink, one from each brain. This is **Q Board stage 1**, and everything else in the course builds on it.
 

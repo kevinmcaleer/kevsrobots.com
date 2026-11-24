@@ -12,7 +12,7 @@ description: Get a terminal on your Uno Q, learn the everyday Linux commands, an
 percent: 55
 duration: 10
 quiz_total: 50
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
 - content:
@@ -66,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to open a terminal on the board, use the everyday Linux commands, install software, back up your Apps and shut the board down safely.
 
 Your Uno Q has a real Linux computer on it, and App Lab hides most of it from you. That is lovely until the day something needs fixing, and then you want a terminal. This lesson is your small survival kit: how to get in, the dozen commands you will actually use, and the habits that keep the board healthy.
 
@@ -259,6 +261,8 @@ sudo halt
 After `halt` the board stays powered but Linux has stopped, so it is safe to pull the cable.
 
 ---
+
+> **Teachers**: Allow about 45 minutes (our estimate). Learners need the board password they chose in lesson 2, and sudo commands ask for it. Installing software with apt, and App Python packages, need the board to have internet access, which a restricted school network may block. Make sure learners use the halt command before unplugging a shared board, as shutdown and poweroff restart it shortly afterwards.
 
 ## Try it Yourself
 

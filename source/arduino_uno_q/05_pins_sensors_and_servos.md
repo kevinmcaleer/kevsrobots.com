@@ -4,7 +4,7 @@ description: Read a potentiometer, draw a bar graph on the matrix and optionally
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/05_pins_sensors_and_servos.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -226,6 +226,8 @@ So a servo on D9 will misbehave if you use `analogWrite` on D10. Keep servos and
 **Power.** A servo draws its power from the 5V pin, so use a 5 V / 3 A USB-C supply. For big servos, or several at once, power them from an external supply and join its ground to the board's GND.
 
 ---
+
+> **Teachers**: Allow about 60 minutes (our estimate). The pins are 3.3 V and the analogue inputs A0 to A5 and D3 are not 5 V tolerant, so check parts before learners wire them, as a 5 V signal can damage the board. Shared kit needs a potentiometer and three jumper wires per learner or pair. The Modulino Thermo and servo are optional, and each has a no-part route.
 
 ## Try it Yourself
 

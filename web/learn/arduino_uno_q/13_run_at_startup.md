@@ -12,7 +12,7 @@ description: Make your Q Board start by itself every time the board gets power, 
 percent: 70
 duration: 6
 quiz_total: 50
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
 - content:
@@ -151,6 +151,8 @@ A headless board has no screen and no App Lab open. Here is how to live with tha
 Before unplugging a board you care about, run `sudo halt` over SSH, wait, then unplug it. Lesson 10 explains why.
 
 ---
+
+> **Teachers**: Allow about 30 minutes (our estimate). A board running on its own needs a USB-C 5 V 3 A supply or power bank, and a weaker one can stop it working, so test the supply before the lesson. The App takes a while to appear after power-on because Linux has to boot first, so build waiting time into the plan.
 
 ## Try it Yourself
 

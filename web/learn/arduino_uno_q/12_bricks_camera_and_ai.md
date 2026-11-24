@@ -10,9 +10,9 @@ next: 13_run_at_startup.html
 description: Build Q Board stage 7, a people counter that uses a USB webcam and a
   ready-made AI Brick, then shows the count on the LED matrix
 percent: 65
-duration: 10
+duration: 11
 quiz_total: 50
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Arduino Uno Q - Two Brains, One Board
 - content:
@@ -66,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use the Video Object Detection Brick to count people with a camera and show the count on the matrix.
 
 Normally, teaching a computer to spot people in a camera picture means installing a model, a runtime and a stack of libraries before you write a line of your own code. On the Uno Q, a Brick does that setup for you. You ask it what it can see, and it tells you.
 
@@ -290,6 +292,8 @@ The other setting, `debounce_sec`, is the minimum time between repeat reports of
 You have reached **Q Board stage 7**.
 
 ---
+
+> **Teachers**: Allow about 60 minutes (our estimate). This lesson needs a USB webcam and a powered USB-C hub with power delivery for each board, which is extra cost and usually shared kit. Apple USB-C multiport adapters are not supported. A camera pointed at a room captures people, so agree who may be in view before you run it. With no camera, learners can follow the confidence demo, and the rest of the course does not depend on this lesson.
 
 ## Try it Yourself
 

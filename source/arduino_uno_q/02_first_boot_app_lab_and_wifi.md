@@ -4,12 +4,14 @@ description: Power up your Uno Q, install Arduino App Lab, set a password and Wi
 layout: lesson
 type: page
 cover: /learn/arduino_uno_q/assets/banners/02_first_boot_app_lab_and_wifi.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to install Arduino App Lab, set up the board with a name, password and Wi-Fi, and run a first Python program on it.
 
 Let's get your board running. This lesson has no code to write. By the end the board is named, online, and blinking an LED from a Python program, which proves everything is working.
 
@@ -86,6 +88,8 @@ Press **Stop** (the Run button turns into it) when you've seen enough.
 If an LED blinked, congratulations. Your board, cable, App Lab and Python side are all working.
 
 ---
+
+> **Teachers**: Allow about 45 minutes (our estimate). Check every USB-C cable carries data, as a charge-only cable lets the board light up but App Lab never finds it. Apple USB-C multiport adapters are not supported. The setup wizard needs normal Wi-Fi: a network that asks for a web-page login (a captive portal) is not supported, and the computer and board must share a network. Each learner chooses a board password, so have them note it down.
 
 ## Try it Yourself
 
