@@ -4,10 +4,15 @@ description: >-
     Use the Mermaid Live Editor, learn how every diagram is put together, and add a diagram to a Markdown file
 layout: lesson
 type: page
+date_updated: 2026-11-24
 cover: /learn/mermaid/assets/banners/02_your-first-diagram.jpg
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to draw a diagram in the Mermaid Live Editor and add it to a Markdown file inside a `mermaid` code block.
 
 ---
 
@@ -95,6 +100,10 @@ The **Actions** panel in the Live Editor lets you:
 - Copy the image to paste into a document or slide
 
 We'll look at exporting in more detail in the [Exporting and Sharing](12_exporting-and-sharing.html) lesson.
+
+---
+
+> **Teachers**: The Mermaid Live Editor is a website, so check that your school network allows `mermaid.live` before the lesson. Diagrams are stored in the page address and nothing needs an account, but remind learners not to put anything personal in a shared link. If the site is blocked, any Markdown editor that draws Mermaid (such as Obsidian or VS Code with a Mermaid extension) will do. Allow about 45 minutes.
 
 ---
 

@@ -8,10 +8,23 @@ description: Learn to draw flowcharts, sequence diagrams, state machines, databa
   diagrams and more by writing simple text with Mermaid, then put them in your READMEs,
   notes and project docs.
 level: beginner
-course_duration: 1h 20m
+course_duration: 1h 23m
 lesson_count: 15
 first_lesson: 00_intro.html
 quiz_total: 41
+outcomes:
+- Write Mermaid diagrams and preview them in the Mermaid Live Editor
+- Draw flowcharts, sequence, state, class and entity relationship diagrams for a robot
+  project
+- Plan a build with a Gantt chart and a timeline, and brainstorm with a mind map
+- Style diagrams with themes, classes and theme variables
+- Put diagrams in a GitHub README and export them as PNG or SVG images
+- Document a Pico robot with a set of diagrams
+prerequisites:
+- None needed; a little Markdown helps, as in Mastering Markdown
+you_need:
+- A computer with a web browser
+- Optional, a GitHub account, Obsidian or VS Code to see diagrams in your own projects
 navigation:
 - name: Create Diagrams with Mermaid
 - content:
