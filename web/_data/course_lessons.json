@@ -2249,15 +2249,13 @@
     "author": "Kevin McAleer",
     "date_published": "2024-03-21",
     "groups": [
-      "markdown",
-      "jekyll",
-      "documentation"
+      "productivity"
     ],
     "lessons": [
       {
-        "file": "01_overview.md",
+        "file": "00_intro.md",
         "section": "Introduction to Markdown and Jekyll",
-        "url": "/learn/markdown/01_overview.html"
+        "url": "/learn/markdown/00_intro.html"
       },
       {
         "file": "02_markdown_basics.md",
@@ -2303,6 +2301,11 @@
         "file": "10_deploying_to_github_pages.md",
         "section": "Publishing Your Site",
         "url": "/learn/markdown/10_deploying_to_github_pages.html"
+      },
+      {
+        "file": "11_summary.md",
+        "section": "Publishing Your Site",
+        "url": "/learn/markdown/11_summary.html"
       }
     ]
   },
