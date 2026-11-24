@@ -68,6 +68,12 @@ navigation:
 
 Your duck walks. But nobody programmed that walk step by step. So where did it come from? In this lesson we'll open up the duck's walking brain and see how it was made. If you've done [Reinforcement Learning for Beginners](/learn/reinforcement_learning/), you'll recognise a lot of it.
 
+Before the duck, I tried the same idea on the smallest thing I could: a pendulum that learns to balance from nothing but a score. Watch that first. It's Part 1 of my *Robot Duck Taught Itself to Walk* series, and it explains the RL loop in plain English.
+
+{% include youtubeplayer.html id="epuO7xpz6i4" %}
+
+The [write-up on the blog](/blog/i-taught-a-computer-to-learn-from-its-mistakes.html) has the full setup, and the code is in my [rl-duck repo](https://github.com/kevinmcaleer/rl-duck).
+
 ---
 
 ## The four RL words, duck edition
