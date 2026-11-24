@@ -1233,19 +1233,19 @@
   {
     "slug": "fastapi",
     "name": "Building User Authentication for Static Sites with FastAPI",
-    "description": "This course teaches you how to build a user authentication system using Python, FastAPI, PyDantic, and SQLAlchemy for statically generated websites. You'll learn to implement features like registration, login, and user management, integrating these with a frontend built with Jekyll.",
+    "description": "Build a robot telemetry API with Python and FastAPI: a Pico or any robot posts sensor readings, a static Jekyll dashboard shows them, and only logged-in users can switch the robot's LEDs. You will use Pydantic v2 models, SQLite, hashed passwords, signed tokens, CORS and a safe deployment.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-03-28",
     "groups": [
-      "fastapi",
-      "python"
+      "python",
+      "raspberrypi"
     ],
     "lessons": [
       {
-        "file": "01_course_overview.md",
+        "file": "00_intro.md",
         "section": "Introduction to User Authentication",
-        "url": "/learn/fastapi/01_course_overview.html"
+        "url": "/learn/fastapi/00_intro.html"
       },
       {
         "file": "02_setting_up_the_environment.md",
@@ -1286,6 +1286,11 @@
         "file": "09_deploying_the_solution.md",
         "section": "Integrating with a Jekyll Site",
         "url": "/learn/fastapi/09_deploying_the_solution.html"
+      },
+      {
+        "file": "10_summary.md",
+        "section": "Integrating with a Jekyll Site",
+        "url": "/learn/fastapi/10_summary.html"
       }
     ]
   },
