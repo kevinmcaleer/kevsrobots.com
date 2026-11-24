@@ -4,12 +4,14 @@ description: "Batteries, regulators, 3.3 V versus 5 V, common ground, and why yo
 layout: lesson
 type: page
 cover: /learn/electronics_basics/assets/banners/12_powering_your_projects.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose a power source for a project, explain why grounds must be shared, and say why motors never run from a Pico pin.
 
 ## Overview
 
@@ -19,7 +21,7 @@ A robot with great code and the wrong power supply will reset, stutter or give s
 
 - **AA alkaline**: 1.5 V each (1.6 V fresh, dropping as they drain). Easy, cheap, safe. Three give 4.5 V, four give 6 V.
 - **AA NiMH rechargeable**: 1.2 V each. Four give 4.8 V, which is great for the Pico's VSYS pin.
-- **LiPo / Li-ion**: 3.7 V nominal each (4.2 V full, 3.0 V empty). Light and powerful, but they need respect: never short them, never puncture or crush them, never discharge below about 3.0 V per cell, and charge them only with a proper LiPo charger. Use a protected cell or add a protection board.
+- **LiPo / Li-ion**: 3.7 V nominal each (4.2 V full, 3.0 V empty). Light and powerful, but they need respect. A short circuit, a puncture or a crush can cause fire. Never short them or damage them, never discharge below about 3.0 V per cell, and charge them only with a proper LiPo charger. Use a protected cell or add a protection board, and never leave a charging battery unattended.
 - **9 V PP3**: tiny capacity, high resistance. It is usually a poor choice for robots.
 
 Battery life is easy to estimate:
@@ -71,8 +73,20 @@ Wasted as heat: 0.8 W
 The Pico's chip runs at **3.3 V**. Its GPIO pins are **not** 5 V tolerant: feeding 5 V into a pin can damage it. The Pico can be powered from:
 
 - **USB**: 5 V arrives at the VBUS pin (physical pin 40), and the Pico makes its own 3.3 V.
-- **VSYS** (physical pin 39): accepts roughly 1.8 V to 5.5 V, so three AA cells work nicely.
+- **VSYS** (physical pin 39): accepts roughly 1.8 V to 5.5 V, so three AA cells work nicely. Check the polarity twice before connecting a battery.
 - **3V3(OUT)** (physical pin 36): a 3.3 V output for your circuits, up to about 300 mA shared between everything you hang on it.
+
+Two supplies, two positive lines, one shared ground:
+
+```mermaid
+flowchart LR
+    U["USB 5 V"] --> P["Pico<br>makes its own 3.3 V"]
+    B["Battery pack"] --> M["Motor or big load<br>via a transistor"]
+    P -->|"signal from a GPIO pin"| M
+    P --- G["Common ground"]
+    B --- G
+    M --- G
+```
 
 ## Common ground
 
@@ -96,6 +110,8 @@ Give motors their own battery, use a driver to switch them, and join the grounds
 - Joining a 5 V signal to a Pico pin.
 - Forgetting the common ground.
 
+> **Teachers**: keep classroom projects on AA cells or USB. LiPo cells are a fire risk if shorted, crushed or charged badly, so many schools ban them, and charging should only ever be done by an adult with a proper charger. Fit new batteries out of reach of any metal tools, and never let learners connect battery packs end to end or to mains-powered chargers.
+
 ## Try it Yourself
 
 1. Work out how long your battery pack would last running a 100 mA load.
@@ -104,10 +120,32 @@ Give motors their own battery, use a driver to switch them, and join the grounds
 
 ## Common Issues
 
-**Problem**: The Pico resets when something else switches on.
-**Solution**: Give the big load its own supply, and add a capacitor (100 uF) across the Pico's power.
-**Why**: The load pulls the shared voltage down for a moment.
+- **Problem**: The Pico resets when something else switches on.
+- **Solution**: Give the big load its own supply, and add a capacitor (100 uF) across the Pico's power.
+- **Why**: The load pulls the shared voltage down for a moment.
 
-**Problem**: A transistor does not switch when the load has its own supply.
-**Solution**: Connect the two grounds together.
-**Why**: The base voltage needs the same zero as the emitter.
+- **Problem**: A transistor does not switch when the load has its own supply.
+- **Solution**: Connect the two grounds together.
+- **Why**: The base voltage needs the same zero as the emitter.
+
+## Check your understanding
+
+{% quiz %}
+? Two separate supplies power one circuit. What must you connect together?
+- [x] Their grounds
+- [ ] Their positive terminals
+- [ ] Nothing, they stay separate
+> Voltage is a difference between two points, so signals need a shared ground reference. Keep the positives separate.
+
+? Why is a linear regulator going from 9 V to 5 V at 200 mA a poor choice?
+- [ ] It produces too little current
+- [x] It wastes 0.8 W as heat
+- [ ] It cannot make 5 V
+> Heat is (Vin - Vout) x current = 4 x 0.2 = 0.8 W. A buck converter wastes much less.
+
+? Why should motors not be powered from the Pico's 3V3 pin or GPIO pins?
+- [x] They draw far more current than the pins give and create noise and brownouts
+- [ ] They need exactly 3.3 V AC
+- [ ] Motors do not work on DC
+> A small motor draws 200 mA running and over 1 A stalled, and its spikes and gulps of current can reset the Pico.
+{% endquiz %}

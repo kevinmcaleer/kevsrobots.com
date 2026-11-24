@@ -10,8 +10,9 @@ next: 05_multimeter_measuring_voltage.html
 description: 'Build the first stage of the night light: an LED on a breadboard, with
   the resistor value chosen using Ohm''s law.'
 percent: 30
-duration: 5
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -65,6 +66,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose a current limiting resistor for an LED and build the first stage of the night light.
 
 ## Overview
 
@@ -132,6 +135,15 @@ Output:
 
 The second line is the 3.3 V case, which we will use when the Pico takes over.
 
+The finished circuit is one loop. The numbers on the arrows are the voltage dropped at each part:
+
+```mermaid
+flowchart LR
+    P["Battery positive<br>4.5 V"] -->|"drops 2.5 V"| R["270 ohm resistor"]
+    R -->|"drops 2.0 V"| L["Red LED<br>long leg to short leg"]
+    L --> N["Battery negative<br>0 V"]
+```
+
 ## Build it
 
 You need: breadboard, 3 x AA battery pack, one red LED, one 270 ohm resistor (red, violet, brown) and two jumpers.
@@ -148,6 +160,8 @@ Safety: never connect the battery's positive directly to negative with a bare wi
 
 **Why this matters:** this exact pattern, supply, resistor, LED, ground, is on nearly every board you will ever buy, from status LEDs on your Pico to the lights in a robot's eyes.
 
+> **Teachers**: LEDs are cheap but easy to burn out, so give each learner a couple of spares and a resistor before the first power-up. A shorted battery pack gets warm quickly, so ask learners to build with the battery disconnected and to tell you if any wire feels warm. Colour codes are hard in poor light, so let learners check resistors with a meter (lesson 6).
+
 ## Try it Yourself
 
 1. Swap the 270 ohm resistor for 1k. What happens to the brightness? Use the script to predict the current first.
@@ -156,14 +170,36 @@ Safety: never connect the battery's positive directly to negative with a bare wi
 
 ## Common Issues
 
-**Problem**: The LED does not light.
-**Solution**: Flip the LED around.
-**Why**: LEDs only conduct one way. Long leg to positive, short leg to negative.
+- **Problem**: The LED does not light.
+- **Solution**: Flip the LED around.
+- **Why**: LEDs only conduct one way. Long leg to positive, short leg to negative.
 
-**Problem**: The LED is very dim.
-**Solution**: Check the resistor value. A brown, black, red resistor is 1k, not 100 ohm. Also check the battery is fresh.
-**Why**: Ten times the resistance means about a tenth of the current.
+- **Problem**: The LED is very dim.
+- **Solution**: Check the resistor value. A brown, black, red resistor is 1k, not 100 ohm. Also check the battery is fresh.
+- **Why**: Ten times the resistance means about a tenth of the current.
 
-**Problem**: The LED flashed brightly and died.
-**Solution**: Replace it, and check the resistor is actually in the loop.
-**Why**: Without a resistor, the current is limited only by the battery.
+- **Problem**: The LED flashed brightly and died.
+- **Solution**: Replace it, and check the resistor is actually in the loop.
+- **Why**: Without a resistor, the current is limited only by the battery.
+
+## Check your understanding
+
+{% quiz %}
+? Why does an LED need a resistor in series?
+- [x] Without it the current rises until the LED burns out
+- [ ] To make the LED a different colour
+- [ ] To stop the battery going flat
+> Once on, an LED has very little resistance of its own, so the resistor limits the current.
+
+? A 4.5 V pack, a red LED (2.0 V) and 10 mA. Which resistor from the E12 series do you pick?
+- [ ] 250 ohm
+- [x] 270 ohm
+- [ ] 100 ohm
+> R = (4.5 - 2.0) / 0.010 = 250 ohm, which is not standard. The next value up is 270 ohm, which gives about 9.3 mA.
+
+? The LED does not light and everything is plugged in. What is the first thing to try?
+- [ ] Use a bigger battery
+- [ ] Remove the resistor
+- [x] Flip the LED round
+> LEDs conduct one way only. Long leg to positive, short leg to negative.
+{% endquiz %}

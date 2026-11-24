@@ -10,8 +10,9 @@ next: 12_powering_your_projects.html
 description: Use an NPN transistor to let a tiny signal switch a bigger load, the
   way our night light's LED will be driven.
 percent: 72
-duration: 4
-date_updated: 2026-11-21
+duration: 6
+quiz_total: 48
+date_updated: 2026-11-24
 navigation:
 - name: Electronics basics
 - content:
@@ -66,6 +67,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to switch an LED with an NPN transistor and choose the base resistor.
+
 ## Overview
 
 A microcontroller pin can only supply a few milliamps. Motors, bright LEDs and relays need much more. A transistor is an electronic switch: a tiny current into one pin controls a much bigger current through the other two. It is the part that lets the Pico control the real world, and it is how our night light's LED will be driven.
@@ -79,6 +82,16 @@ An NPN transistor (2N2222 or BC547) has:
 - **Emitter (E)**: where the current leaves, connected to ground.
 
 Rule of thumb: when about 0.7 V appears between the base and the emitter, and a little current flows into the base, the transistor lets a much larger current flow from the collector to the emitter. The ratio is the **gain (hFE)**, often 100 or more. Remove the base current and the switch turns off.
+
+Here is the chain of events when the code sets GP15 high:
+
+```mermaid
+flowchart LR
+    P["GP15 goes to 3.3 V"] --> B["About 2.6 mA<br>flows through 1k into the base"]
+    B --> T["Transistor turns on"]
+    T --> C["LED current flows<br>collector to emitter to GND"]
+    C --> L["LED lights"]
+```
 
 ## The circuit
 
@@ -106,7 +119,7 @@ Say the LED needs 20 mA, and the transistor's minimum gain is 100. Base current 
 R base = (Pin voltage - 0.7) / base current = (3.3 - 0.7) / 0.002 = 1300 ohm
 ```
 
-Use 1k (the next standard value down), which gives about 2.6 mA.
+Use 1k (the next standard value down), which gives about 2.6 mA. That is more than the 2 mA we aimed for, so the transistor is firmly on, and still well inside what a Pico pin can drive.
 
 ```python
 # Run on your computer or the Pico
@@ -132,7 +145,11 @@ Base resistor: 1300 ohm (use 1k)
 With 1k the base current is 2.6 mA
 ```
 
+> **Teachers**: transistor pinouts are the usual stumbling block, and a wrongly wired transistor can get hot. Check each learner's wiring before power goes on, and keep a labelled example photo or diagram of the exact part in your kit. If a transistor feels warm, unplug the USB cable straight away.
+
 ## Try it on the Pico
+
+In our circuit the LED has a 150 ohm resistor on 3.3 V, so it only draws about 7 mA ((3.3 - 2.0 - about 0.2) / 150), far less than the 20 mA we designed for. The 1k base resistor therefore has plenty of margin, and the same driver can switch a bigger load later.
 
 Build: GP15 (physical pin 20) to a 1k resistor to the transistor's base. Emitter to GND (physical pin 23). Collector to the LED's cathode (short leg). LED's anode through a 150 ohm resistor to the Pico's **3V3(OUT)** (physical pin 36). Check your pinout with the datasheet before wiring.
 
@@ -169,10 +186,32 @@ Because the transistor does the heavy lifting, the same circuit could switch a 5
 
 ## Common Issues
 
-**Problem**: The LED is always on, or always off.
-**Solution**: Check the transistor's pin order against the datasheet.
-**Why**: With the collector and emitter swapped, a transistor behaves badly.
+- **Problem**: The LED is always on, or always off.
+- **Solution**: Check the transistor's pin order against the datasheet.
+- **Why**: With the collector and emitter swapped, a transistor behaves badly.
 
-**Problem**: The LED is dim.
-**Solution**: Check the 3V3 supply, resistor value and base resistor. The base resistor may be too large.
-**Why**: Too little base current means the transistor is only partly on.
+- **Problem**: The LED is dim.
+- **Solution**: Check the 3V3 supply, resistor value and base resistor. The base resistor may be too large.
+- **Why**: Too little base current means the transistor is only partly on.
+
+## Check your understanding
+
+{% quiz %}
+? Why must there be a resistor between the Pico pin and the transistor base?
+- [ ] It makes the LED brighter
+- [ ] The Pico needs it to boot
+- [x] The base behaves like a diode and would draw too much current from the pin
+> Without a base resistor the pin would push as much current as it can into the base, which could damage the Pico or the transistor.
+
+? A 20 mA load, a minimum gain (hFE) of 100 and a 10 times overdrive. What base current do you aim for?
+- [x] 2 mA
+- [ ] 0.2 mA
+- [ ] 20 mA
+> 20 mA / 100 = 0.2 mA, times 10 to make sure the transistor is fully on gives 2 mA.
+
+? The LED is always off. Which check comes first?
+- [ ] The colour of the LED
+- [x] The transistor's pin order against its datasheet
+- [ ] The length of the jumper wires
+> Swapped collector and emitter legs are the most common fault with transistor circuits.
+{% endquiz %}

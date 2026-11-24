@@ -20,7 +20,8 @@
     - Power a project safely and understand why motors need their own supply
   prerequisites:
     - None. This is a good first course.
-    - Robotics 101
+    - Robotics 101 (optional, for the big picture)
+    - Learn MicroPython - The basics (helpful for lessons 13 to 14)
   you_need:
     - A solderless breadboard (half size or full size)
     - Jumper wires (male to male)

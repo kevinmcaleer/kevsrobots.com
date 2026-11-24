@@ -221,7 +221,7 @@
     resistance, Ohm''s law, breadboards, multimeters, voltage dividers and transistors.
     You will build a light-sensing night light on a breadboard, then hand it over
     to a Raspberry Pi Pico running MicroPython.'
-  duration: 1h 12m
+  duration: 1h 37m
   groups:
   - electronics
   - pico
