@@ -10,9 +10,9 @@ next: 06_tracing_a_board_photo.html
 description: Add mounting holes, component shapes and text labels to a part in the
   Snakie Part Editor so it looks like the real board
 percent: 42
-duration: 4
+duration: 5
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add mounting holes, a component body and text labels to a part, and control the order they are drawn in.
 
 Your part works already: it has a size and six pins. This lesson makes it *look* like the real thing, which matters more than you'd think. On a busy breadboard you find a part by its shape.
 

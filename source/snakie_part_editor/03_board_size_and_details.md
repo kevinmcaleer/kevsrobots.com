@@ -4,12 +4,14 @@ description: Set the real size and colour of your part in the Snakie Part Editor
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/03_board_size_and_details.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to set a part's size, name and details, and save it to your My Parts library.
 
 Every part starts with two questions: how big is it, and what is it? Get the size right first, because everything else is placed relative to it.
 
@@ -91,6 +93,8 @@ Saved "VL53L0X Distance Sensor" to my-parts (v0.1.0).
 ```
 
 You now have a real part on disk. Save again whenever you finish a step.
+
+> **Teachers**: Saving a part needs the Snakie desktop app, because the browser version cannot write files, so check that it can be installed on school machines before the lesson. Learners do not need to own a VL53L0X: a ruler, a datasheet or the seller's dimension drawing is enough, and the whole course can be followed with no hardware.
 
 ---
 

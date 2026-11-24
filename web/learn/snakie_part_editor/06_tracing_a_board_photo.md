@@ -10,9 +10,9 @@ next: 07_schematic_symbol_and_electrical_details.html
 description: Use a photo of a real board as the picture for your Snakie part, remove
   its background and line the pins up on top
 percent: 49
-duration: 5
+duration: 6
 quiz_total: 41
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Make Your Own Parts and Boards in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to put a photo of a board on a part, remove its background, and line the pins up with the pads.
 
 Drawn shapes are quick, but nothing beats the real board. The Part Editor can put a **photo** on your part, cut away the background and scale it to fit. Then you just check the pins sit on top of the pads.
 
@@ -145,6 +147,8 @@ The photo already shows the chip and the printed text, so the shapes from the la
 ## The other side
 
 Does your board have parts on the back? Click **Flip to back** below the canvas and add a second photo there. Any pin can be moved to the back by setting **Side** to **Rear** in the Inspector.
+
+> **Teachers**: Learners need a photo of a real board, or they can use the practice picture linked in the lesson. A product photo from a shop or manufacturer may be copyrighted, so ask learners to photograph their own board or use the practice picture, especially if the part will be shared. Check that nobody appears in a photo that is saved or shared.
 
 ---
 

@@ -4,7 +4,7 @@ description: Learn to add your own sensors, breakouts and microcontroller boards
 layout: lesson
 type: page
 cover: /learn/snakie_part_editor/assets/banners/00_intro.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -74,6 +74,8 @@ This is an intermediate course. You should already be comfortable wiring parts i
 - [Wire It Up - Electronics in Snakie](/learn/snakie_electronics/)
 - [Snakie Blocks - From Blocks to Python](/learn/snakie_blocks/), for the blocks lessons
 - [Coding Faster in Snakie](/learn/snakie_code_tools/), the other half of the Snakie Power User pathway
+
+> **Teachers**: this is an intermediate course for learners who can already wire parts in the Electronics workspace. Allow about 30 to 45 minutes per lesson. Saving a part needs the Snakie desktop app, so check it can be installed on school machines first, and remember that parts are saved as files on the computer, which matters on shared machines. No hardware is needed: the course can be followed from a ruler measurement, a datasheet or the practice photo, and the code runs on a stand-in sensor.
 
 Let's make a part.
 
