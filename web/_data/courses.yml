@@ -757,13 +757,13 @@
     the Pico's ADC, and creating your first temperature monitoring project.  Through
     step-by-step tutorials and practical examples, you'll gain the skills to confidently
     use the Pico for sensor-based projects.
-  duration: 0h 33m
+  duration: 1h 10m
   groups:
   - pico
   - micropython
-  lessons: 12
+  lessons: 13
   level: beginner
-  link: /learn/pico_temp_sensor/01_course_introduction.html
+  link: /learn/pico_temp_sensor/00_intro.html
   name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - author: Kevin McAleer
   cover: /learn/podman/assets/cover.jpg

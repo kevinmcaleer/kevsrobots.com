@@ -4,171 +4,151 @@ description: Learn how to diagnose and fix common issues with your Raspberry Pi 
 layout: lesson
 type: page
 cover: /learn/pico_temp_sensor/assets/banners/12_troubleshooting_temperature_readings.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Introduction
+By the end of this lesson you will be able to work through a temperature problem step by step, from the cable to the formula.
 
-Even the best-designed systems can encounter issues. This lesson will guide you through diagnosing and resolving common problems you may face with your Raspberry Pi Pico temperature monitoring system.
+Even the best-designed project misbehaves sometimes, and that is part of making. The trick is to stop guessing and check things in order, from the outside in. This lesson is your toolbox.
 
----
-
-## Common Issues and Solutions
-
-### 1. **Inaccurate Temperature Readings**
-
-   **Symptoms**:
-
-   - Temperature values appear much higher or lower than expected.
-   - Temperature fluctuates wildly.
-
-   **Possible Causes**:
-
-   - The temperature sensor is measuring the Pico chip's temperature, which may be affected by heat from the board itself.
-   - Incorrect conversion formula.
-
-   **Solutions**:
-
-   - Remember the sensor reads the chip's own temperature, which is normally a few degrees above the room.
-   - Ensure the Pico is not under load (e.g., running intensive scripts) during measurements.
-   - Verify the conversion formula is correct, and that it is given the **voltage**, not the raw ADC value:
-
-     ```python
-     voltage = raw_value * 3.3 / 65535
-     temperature = 27 - (voltage - 0.706) / 0.001721
-     ```
-     {: .no-snakie }
-
-   - Average several readings to smooth out jitter. Readings naturally jump in steps of about half a degree, because each ADC step is about 0.47°C.
-   - Apply a calibration offset measured against a thermometer (see the lesson on getting more accurate readings). The formula assumes a perfect 3.3 V reference, and a 1% error there shifts the result by about 4°C.
-
-   - Test the readings in a stable room temperature environment and compare them with a thermometer.
+```mermaid
+flowchart TD
+    A["Reading looks wrong"] --> B{"Anything printing at all?"}
+    B -- no --> C["Check cable, interpreter, ADC channel 4"]
+    B -- yes --> D{"Number changes when you warm the chip?"}
+    D -- no --> E["Print raw_value and check the loop runs"]
+    D -- yes --> F{"Value sensible?"}
+    F -- no --> G["Check voltage step and formula"]
+    F -- yes --> H["Average and calibrate"]
+```
 
 ---
 
-### 2. **No Readings Displayed**
+## Problem 1: Inaccurate temperature readings
 
-   **Symptoms**:
-   - Thonny console shows no output or an error message.
+**Symptoms:** values are much higher or lower than expected, or they fluctuate.
 
-   **Possible Causes**:
-   - The script isn’t running properly.
-   - The ADC channel is wrong. The temperature sensor is ADC channel 4, not a GPIO pin.
-   - Thonny is set to the wrong interpreter (for example, your computer's own Python instead of MicroPython on the Pico).
+**What to check:**
 
-   **Solutions**:
-   - Check that the ADC pin is correctly initialized:
+- The sensor reads the chip's own temperature, which is normally a few degrees above the room.
+- Make sure the Pico is not busy with heavy work while you measure.
+- Check the formula uses the **voltage**, not the raw ADC value:
 
-     ```python
-     sensor_adc = machine.ADC(4)
-     ```
-     {: .no-snakie }
-   - Read the last line of any error message in the Shell. For example, `AttributeError: 'tuple' object has no attribute 'tm_hour'` means the code was written for Python on a PC: in MicroPython `time.localtime()` returns a tuple, so use `timestamp[3]` for the hour.
-   - Verify the script is saved and run in Thonny.
-   - Restart the Pico by unplugging and reconnecting it.
+```python
+voltage = raw_value * 3.3 / 65535
+temperature = 27 - (voltage - 0.706) / 0.001721
+```
+{: .no-snakie }
 
----
+- Average several readings. Readings naturally jump in steps of about half a degree, because each ADC step is about 0.47°C.
+- Apply a calibration offset measured against a thermometer (see lesson 9). The formula assumes a perfect 3.3 V reference, and a 1% error there shifts the result by about 4°C.
 
-### 3. **Temperature Readings Do Not Change**
+## Problem 2: No readings displayed
 
-   **Symptoms**:
-   - Temperature stays constant regardless of changes in the environment.
+**Symptoms:** the Thonny Shell shows no output, or an error.
 
-   **Possible Causes**:
-   - ADC readings are not being updated.
-   - Sensor data is not being processed correctly.
+**What to check:**
 
-   **Solutions**:
-   - Add debugging statements to ensure the ADC values are being updated:
+- The ADC channel. The temperature sensor is channel 4, not a GPIO pin:
 
-     ```python
-     print(f"Raw ADC Value: {raw_value}")
-     ```
-     {: .no-snakie }
-   - Verify the while loop is executing:
+```python
+sensor_adc = machine.ADC(4)
+```
+{: .no-snakie }
 
-     ```python
-     import time
+- The interpreter. Thonny must be set to MicroPython, not your computer's own Python.
+- The last line of any error message. For example, `AttributeError: 'tuple' object has no attribute 'tm_hour'` means the code was written for Python on a PC: in MicroPython `time.localtime()` returns a tuple, so use `timestamp[3]` for the hour.
 
-     count = 0
-     while True:
-         print(f"The loop is running {count}")
-         count += 1  # Increment the count
-         time.sleep(1)  # without this the loop floods the Shell
-     ```
+## Problem 3: Readings do not change
 
----
+Add a debug print to see whether the ADC value moves, and run a tiny loop on its own to prove the loop works:
 
-### 4. **Script Crashes or Freezes**
+```python
+import time
 
-   **Symptoms**:
-   - The script stops responding or Thonny freezes.
+count = 0
+while True:
+    print(f"The loop is running {count}")
+    count += 1  # Increment the count
+    time.sleep(1)  # without this the loop floods the Shell
+```
 
-   **Possible Causes**:
-   - Infinite loop or too many prints in a short time.
-   - Thonny struggling to handle high-frequency updates.
+If the count rises, the loop is fine and the problem is in your sensor code. If nothing prints, the problem is the connection or the interpreter.
 
-   **Solutions**:
-   - Add a delay to the loop:
-     ```python
-     time.sleep(1)
-     ```
-     {: .no-snakie }
-   - Limit the frequency of printed messages by updating only when necessary.
+## Problem 4: Voltage conversion issues
 
----
+If the voltage looks wrong, check the formula:
 
-### 5. **Voltage Conversion Issues**
+```python
+voltage = raw_value * 3.3 / 65535
+```
+{: .no-snakie }
 
-   **Symptoms**:
-   - Voltage values seem too high or too low.
+To test the ADC on its own, connect a known voltage between 0 V and 3.3 V to GP26 (ADC channel 0) and read it with `machine.ADC(26).read_u16()`. Never connect more than 3.3 V to an ADC pin, as it can damage the Pico.
 
-   **Possible Causes**:
-   - Incorrect formula for converting ADC to voltage.
-   - Miscalibrated ADC range.
+## A debugging routine that works
 
-   **Solutions**:
-   - Ensure the correct formula is used:
-     ```python
-     voltage = raw_value * 3.3 / 65535
-     ```
-     {: .no-snakie }
-   - Test the ADC separately by connecting a known voltage between 0 V and 3.3 V to GP26 (ADC channel 0) and reading `machine.ADC(26).read_u16()`. Never connect more than 3.3 V to an ADC pin.
+1. **Use debugging prints.** Print `raw_value`, `voltage` and `temperature` to find which step goes wrong.
+2. **Simplify the script.** Strip it back to just the ADC read and a print.
+3. **Check the connection.** Confirm the USB cable carries data and Thonny shows the MicroPython `>>>` prompt.
+4. **Restart.** Unplug and reconnect the Pico to reset it.
+
+> **Teachers**: debugging is a skill worth teaching on purpose. A good classroom activity is to hand out copies of the formula script with one deliberate bug each, such as feeding the raw value into the formula, and have pairs find and fix them using the flowchart above. It also works with no hardware if you show the printed Shell output.
 
 ---
 
-## Debugging Tips
-
-1. **Use Debugging Prints**:
-   - Print intermediate values like `raw_value`, `voltage`, and `temperature` to pinpoint where the issue lies.
-
-2. **Simplify the Script**:
-   - Strip down your script to just the ADC reading and print functions to isolate the problem.
-
-3. **Check Hardware Connections**:
-   - Ensure the Pico is properly connected to your computer.
-   - Verify the Pico is running MicroPython by checking the Thonny interpreter settings.
-
-4. **Restart the System**:
-   - Unplug and reconnect the Pico to reset it.
-
----
-
-## What You’ve Learned
+## What you've learned
 
 - How to identify and fix common issues with temperature readings.
 - Debugging techniques for MicroPython scripts.
 - Best practices for ensuring accurate and reliable temperature monitoring.
 
----
-
-## Final Thoughts
-
-Troubleshooting is an essential part of working with microcontrollers and sensors. By systematically identifying and resolving issues, you’ll not only fix your project but also strengthen your problem-solving skills.
-
-Congratulations on completing this lesson—and the course! Keep experimenting and building exciting projects with your Raspberry Pi Pico.
+The last lesson pulls the whole course together into one finished program.
 
 ---
+
+## Try it Yourself
+
+1. Break the script on purpose by passing `raw_value` into the formula, run it, and read the answer. Then fix it.
+2. Remove `time.sleep(1)` from the loop in a copy of your program and see what the Shell does, then put it back.
+3. Challenge: write a short program that prints `raw_value`, `voltage` and `temperature` side by side, so you can spot a bad step at a glance.
+
+## Common Issues
+
+- **Problem**: The Shell floods with lines and Thonny becomes slow.
+- **Solution**: Add `time.sleep(1)` inside the loop and press Stop.
+- **Why**: A loop with no delay prints thousands of lines a second faster than Thonny can draw them.
+
+- **Problem**: The Pico does not respond at all.
+- **Solution**: Press Stop, then unplug and replug the Pico. If it still fails, reinstall the firmware from lesson 3.
+- **Why**: A stuck program or a corrupt install can stop the board from answering Thonny.
+
+- **Problem**: You fixed one thing and the reading is still wrong.
+- **Solution**: Change one thing at a time and re-run after each change.
+- **Why**: Several changes at once make it impossible to tell which one helped.
+
+## Check your understanding
+
+{% quiz %}
+? A temperature reads about minus eight million degrees. What is the likely cause?
+- [ ] The Pico is frozen
+- [x] The raw ADC value was passed into the formula instead of the voltage
+- [ ] The cable is faulty
+> The formula expects a voltage near 0.7 V, so a raw number in the thousands gives a huge negative answer.
+
+? You see `AttributeError: 'tuple' object has no attribute 'tm_hour'`. What is the fix?
+- [ ] Reinstall Thonny
+- [x] Use `timestamp[3]` instead of `timestamp.tm_hour`
+- [ ] Change the ADC channel
+> MicroPython's `localtime()` returns a plain tuple, so you use positions.
+
+? What should you do before applying a calibration offset?
+- [ ] Nothing
+- [x] Compare the Pico with a trusted thermometer once the chip has settled
+- [ ] Switch to Fahrenheit
+> The offset is the thermometer reading minus the Pico reading, taken when both are stable.
+{% endquiz %}

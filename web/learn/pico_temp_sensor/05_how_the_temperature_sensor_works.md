@@ -9,15 +9,17 @@ previous: 04_overview_of_pico_temperature_sensor.html
 next: 06_reading_temperature_with_adc.html
 description: Learn how to write a Python script to read raw data from the Raspberry
   Pi Pico's built-in temperature sensor using its ADC.
-percent: 40
-duration: 2
+percent: 35
+duration: 4
+quiz_total: 36
+date_updated: 2026-11-24
 navigation:
 - name: Using the Raspberry Pi Pico's Built-in Temperature Sensor
 - content:
   - section: Introduction to the Raspberry Pi Pico and MicroPython
     content:
     - name: Course Introduction
-      link: 01_course_introduction.html
+      link: 00_intro.html
     - name: Setting Up Thonny
       link: 02_setting_up_thonny.html
     - name: Installing MicroPython on the Pico
@@ -48,6 +50,8 @@ navigation:
       link: 11_project_ideas_and_extensions.html
     - name: Troubleshooting Temperature Readings
       link: 12_troubleshooting_temperature_readings.html
+    - name: Summary and Next Steps
+      link: 13_summary_and_next_steps.html
 ---
 
 
@@ -55,21 +59,27 @@ navigation:
 
 ---
 
-## Introduction
+By the end of this lesson you will be able to write a MicroPython program that reads the raw value from the temperature sensor once a second and shows it in the Shell.
 
-In this lesson, you’ll write your first script to interact with the Raspberry Pi Pico’s temperature sensor. You’ll read raw ADC values and display them in the Thonny console.
+Let's build your first sensor script. We are not converting anything to degrees yet. First we simply listen to what the sensor says, because seeing the raw numbers makes the next lesson's maths feel much less like magic.
+
+```mermaid
+flowchart LR
+    A["machine.ADC(4)"] --> B["read_u16()"]
+    B --> C["print the number"]
+    C --> D["sleep 1 second"]
+    D --> B
+```
 
 ---
 
-## Step 1: Understanding the Code
+## Step 1: Understanding the code
 
-The Pico’s ADC provides a digital representation of the temperature sensor’s reading. In Python, you can use the `machine` module to access the ADC.
+The Pico's ADC gives a digital version of the sensor's voltage. In MicroPython you reach it through the `machine` module. Two lines do the work: `machine.ADC(4)` opens channel 4, and `read_u16()` returns one reading as a number from 0 to 65535.
 
----
+## Step 2: Writing the script
 
-## Step 2: Writing the Script
-
-1. Open Thonny.
+1. Open Thonny, with the MicroPython interpreter selected.
 2. Type the following code:
 
    ```python
@@ -86,19 +96,15 @@ The Pico’s ADC provides a digital representation of the temperature sensor’s
        time.sleep(1)
    ```
 
-3. Save the script to your Pico as read_temp.py.
+3. Save the script to your Pico as `read_temp.py`.
 
----
-
-### Step 3: Running the Script
+## Step 3: Running the script
 
 1. Run the script in Thonny by pressing the green Run button.
-2. Observe the raw ADC values printed in the Shell, one per second.
+2. Watch the raw ADC values printed in the Shell, one per second.
 3. The `while True:` loop runs forever. Click the red **Stop** button (or press **Ctrl+C**) to stop it.
 
----
-
-### What You’ll See
+## What you'll see
 
 You should see numbers somewhere around 13,000 to 15,000 at room temperature, for example:
 
@@ -108,6 +114,58 @@ Raw ADC Value: 14034
 Raw ADC Value: 14002
 ```
 
-The raw ADC value changes with the temperature of the Pico’s chip. Because the sensor’s voltage *falls* as the chip warms up, the number goes **down** when the Pico gets warmer. Try holding your finger on the chip in the middle of the board and watch it drop. In the next lesson, you’ll learn to convert these values into meaningful temperature readings.
+The raw value changes with the temperature of the Pico's chip. Because the sensor's voltage *falls* as the chip warms up, the number goes **down** when the Pico gets warmer. Try holding your finger on the chip in the middle of the board and watch it drop.
+
+**Why this matters:** every sensor you will ever connect to a Pico, from a light sensor to a joystick, is read the same way. Open an ADC, call `read_u16()`, and turn the number into something useful.
+
+**Common mistakes:**
+
+- Forgetting `time.sleep(1)`. The loop then prints thousands of lines a second and floods the Shell.
+- Calling `sensor_adc.read()`. In MicroPython the method is `read_u16()`.
+- Expecting the number to go up as the chip gets hotter. It goes down, and the next lesson explains why.
+
+> **Teachers**: this is a good moment for learners to predict before they measure. Ask them what will happen to the number when they put a finger on the chip, then run the program. A warm finger, not ice or hot water, is all that is needed, and there is no safety risk beyond ordinary care with the USB connection.
 
 ---
+
+## Try it Yourself
+
+1. Change `time.sleep(1)` to `time.sleep(0.2)`. How does the output change?
+2. Warm the chip with a finger for ten seconds, then let go. Write down the highest and lowest number you see.
+3. Challenge: add a variable `count` that goes up by one each loop and print it beside the reading, so you can see how many readings you have taken.
+
+## Common Issues
+
+- **Problem**: `AttributeError: 'ADC' object has no attribute 'read'`.
+- **Solution**: Use `read_u16()` instead of `read()`.
+- **Why**: MicroPython's ADC returns a 16-bit value through `read_u16()`.
+
+- **Problem**: Nothing prints and Thonny seems stuck.
+- **Solution**: Press Stop, check the Shell shows the MicroPython `>>>` prompt, then run again.
+- **Why**: The program may still be running from an earlier attempt, or Thonny may be set to the wrong interpreter.
+
+- **Problem**: The number never changes at all.
+- **Solution**: Check you used `machine.ADC(4)` and not another channel number.
+- **Why**: Other channels read pins GP26 to GP28, which are not connected to anything.
+
+## Check your understanding
+
+{% quiz %}
+? What does `machine.ADC(4)` open?
+- [ ] Pin GP4
+- [x] The internal temperature sensor channel
+- [ ] The fourth LED
+> Channel 4 of the ADC is the built-in sensor, not a GPIO pin.
+
+? What range does `read_u16()` return?
+- [ ] 0 to 255
+- [ ] 0 to 4095
+- [x] 0 to 65535
+> `read_u16()` scales the 12-bit reading up to a 16-bit value.
+
+? You warm the chip with your finger. What happens to the raw number?
+- [ ] It goes up
+- [x] It goes down
+- [ ] It stays the same
+> The sensor's voltage falls as the chip warms, so the raw reading drops.
+{% endquiz %}
