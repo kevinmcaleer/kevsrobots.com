@@ -7,11 +7,13 @@ cover: /learn/gymnasium/assets/banners/05_qlearning_on_gymnasium.jpg
 date: 2026-06-14
 previous: 04_spaces.html
 next: 06_seeding_and_lifecycle.html
-description: "Port your tabular Q-learning agent from the previous course to run against\
-  \ CartPole-v1 \u2014 the same algorithm, now against a standard Gymnasium environment."
+description: Port your tabular Q-learning agent from the previous course to run against
+  CartPole-v1, the same algorithm now on a standard Gymnasium environment.
 percent: 36
 duration: 7
-date_updated: 2026-06-14
+quiz_total: 56
+snakie: false
+date_updated: 2026-11-24
 navigation:
 - name: Reinforcement Learning with Gymnasium
 - content:
@@ -53,7 +55,7 @@ navigation:
       link: 12_meet_stable_baselines3.html
     - name: Train, Evaluate, and Export
       link: 13_train_evaluate_export.html
-    - name: "What You Have Built \u2014 and Where to Go Next"
+    - name: What You Have Built, and Where to Go Next
       link: 14_summary.html
 ---
 
@@ -62,134 +64,88 @@ navigation:
 
 ---
 
-## The Bridge Lesson
+By the end of this lesson you will be able to run a tabular Q-learning agent on a Gymnasium environment by binning its continuous observations.
 
-This lesson is a bridge. You already know Q-learning — the update rule, epsilon-greedy exploration, and the Q-table dictionary. You already know Gymnasium — the five-return `step()`, the two-return `reset()`, and the space API.
+---
 
-Now let's put them together. We will run your tabular Q-learning agent on `CartPole-v1` using the Gymnasium API. No new concepts — just the familiar algorithm in the new standard wrapper.
+This is a bridge lesson. You already know Q-learning: the update rule, epsilon-greedy exploration and the dictionary Q-table. You now know the Gymnasium API. Let's put them together and run your old algorithm on `CartPole-v1`.
 
-The interesting challenge: CartPole's observation is a continuous `Box(4)` — four floating-point values. Your Q-table needs discrete keys. You need to bin those continuous values into discrete buckets.
+There is one catch. CartPole's observation is four continuous numbers, and a dictionary needs keys you can match exactly. You solved this in the previous course by turning ultrasonic readings into "near", "medium" or "far". We do the same thing here, with four numbers instead of one.
 
-You did exactly this in lesson 4 of the previous course with the `discretize()` function that converted ultrasonic sensor readings into "near", "medium", or "far". Let's do the same thing here.
+## Binning CartPole
 
-## Discretising CartPole's Observation
+CartPole gives you four numbers per step: cart position, cart velocity, pole angle (radians) and pole angular velocity. We clip each into a sensible range, then slice that range into `N_BINS` equal buckets. The four bucket numbers become the Q-table key.
 
-CartPole gives you four continuous values per step:
-
-- Cart position (roughly -4.8 to 4.8)
-- Cart velocity (unbounded, practically -4 to 4)
-- Pole angle (roughly -0.418 to 0.418 radians)
-- Pole angular velocity (unbounded, practically -4 to 4)
-
-We will bin each one into a small number of discrete buckets, then combine the four bucket indices into a tuple that becomes the Q-table key. This is the same idea as the previous course's `discretize()` — just applied to four dimensions instead of one.
-
-```python
-import numpy as np
-
-# Number of bins per dimension. More bins = more states = slower learning.
-# Fewer bins = coarser representation = faster learning but less precision.
-N_BINS = 6
-
-# Clip limits. Values beyond these get clamped to the edge bin.
-# We use tighter limits than the space's true bounds because the agent
-# rarely reaches the extreme ends before failing.
-CLIP_LOW  = np.array([-2.4, -3.0, -0.25, -3.0])
-CLIP_HIGH = np.array([ 2.4,  3.0,  0.25,  3.0])
-
-def discretize(obs):
-    """
-    Convert a CartPole continuous observation into a tuple of bin indices.
-
-    This is the same idea as the RL course's discretize() for ultrasonic
-    readings, but applied to 4 dimensions at once using NumPy.
-    """
-    # Clip values to our expected range
-    obs_clipped = np.clip(obs, CLIP_LOW, CLIP_HIGH)
-
-    # Scale to [0, N_BINS - 1]
-    # (obs - low) / (high - low) gives a value in [0, 1]
-    # multiply by N_BINS and floor to get a bin index in [0, N_BINS - 1]
-    scaled = (obs_clipped - CLIP_LOW) / (CLIP_HIGH - CLIP_LOW)
-    bins = np.floor(scaled * N_BINS).astype(int)
-
-    # Clamp to [0, N_BINS - 1] to handle any edge cases at the exact maximum
-    bins = np.clip(bins, 0, N_BINS - 1)
-
-    return tuple(bins)   # e.g. (3, 2, 4, 1)
+```mermaid
+flowchart LR
+    O["obs: 0.04, -0.04, 0.01, -0.02"] --> C["clip to expected range"]
+    C --> S["scale to 0..1"]
+    S --> B["multiply by N_BINS, round down"]
+    B --> K["key: (3, 2, 3, 2)"]
+    K --> Q["q_table[key] = [left value, right value]"]
 ```
 
-A quick sanity check before using it:
+With 6 bins per number there are `6 x 6 x 6 x 6 = 1,296` possible keys, but the agent only ever visits a small share of them, so we create Q-table rows lazily when a key is first seen.
+
+## The complete program
+
+Save this as `cartpole_q.py`. You will recognise `choose_action`, `update_q` and the training loop. The differences from the previous course are the ones you learned in lessons 2 and 3: `reset()` returns two values, `step()` returns five, and only `terminated` switches the bootstrap off.
 
 ```python
-import gymnasium as gym
-
-env = gym.make("CartPole-v1")
-obs, info = env.reset(seed=0)
-print("Raw obs:", obs)
-print("Discretized:", discretize(obs))
-env.close()
-# Raw obs: [ 0.04  -0.04   0.01  -0.02]
-# Discretized: (3, 2, 3, 2)
-```
-
-## The Complete Q-Learning Script
-
-Here is the full training loop. You will recognise `choose_action`, `update_q`, and the episode loop from the previous course. The only changes are:
-
-- `env.reset()` returns `(obs, info)` not just `obs`
-- `env.step()` returns five values not three
-- Actions are integers (0 or 1) not strings
-- States are tuples of bin indices not `(row, col, heading, sensor)` tuples
-
-```python
-import numpy as np
-import gymnasium as gym
 import random
 
-# ── Discretisation settings ──────────────────────────────────────────────────
-N_BINS  = 6
-CLIP_LOW  = np.array([-2.4, -3.0, -0.25, -3.0])
-CLIP_HIGH = np.array([ 2.4,  3.0,  0.25,  3.0])
+import gymnasium as gym
+import numpy as np
+
+# Discretisation settings
+N_BINS = 6
+CLIP_LOW = np.array([-2.4, -3.0, -0.25, -3.0])
+CLIP_HIGH = np.array([2.4, 3.0, 0.25, 3.0])
+
 
 def discretize(obs):
-    obs_clipped = np.clip(obs, CLIP_LOW, CLIP_HIGH)
-    scaled = (obs_clipped - CLIP_LOW) / (CLIP_HIGH - CLIP_LOW)
+    """Turn CartPole's four floats into a tuple of four bin numbers."""
+    clipped = np.clip(obs, CLIP_LOW, CLIP_HIGH)
+    scaled = (clipped - CLIP_LOW) / (CLIP_HIGH - CLIP_LOW)
     bins = np.floor(scaled * N_BINS).astype(int)
     bins = np.clip(bins, 0, N_BINS - 1)
-    return tuple(bins)
+    return tuple(int(b) for b in bins)
 
-# ── Q-learning hyperparameters ───────────────────────────────────────────────
-ALPHA         = 0.1     # learning rate
-GAMMA         = 0.99    # discount factor
-EPSILON_START = 1.0     # start fully random
-EPSILON_MIN   = 0.01    # never go below 1 % random
-DECAY_RATE    = 0.995   # per-episode decay (same as RL course)
-NUM_EPISODES  = 500     # enough to see clear improvement
 
-# ── Q-table ──────────────────────────────────────────────────────────────────
+# Q-learning settings
+ALPHA = 0.1
+GAMMA = 0.99
+EPSILON_START = 1.0
+EPSILON_MIN = 0.01
+DECAY_RATE = 0.995
+NUM_EPISODES = 500
+
 q_table = {}
 
+
 def get_q(state):
-    """Return Q-values for state, initialising to zero if unseen."""
+    """Return the Q-values for a state, creating a row of zeros if unseen."""
     if state not in q_table:
-        q_table[state] = [0.0, 0.0]   # one value per action (0=left, 1=right)
+        q_table[state] = [0.0, 0.0]   # value of push left, push right
     return q_table[state]
+
 
 def choose_action(state, epsilon):
     if random.random() < epsilon:
-        return random.randint(0, 1)    # explore
-    return int(np.argmax(get_q(state))) # exploit
+        return random.randint(0, 1)
+    return int(np.argmax(get_q(state)))
+
 
 def update_q(state, action, reward, next_state, terminated):
     current_q = get_q(state)[action]
     if terminated:
-        # No future reward from a terminal state
-        td_target = reward
+        td_target = reward                 # real ending: no future reward
     else:
         td_target = reward + GAMMA * max(get_q(next_state))
     get_q(state)[action] += ALPHA * (td_target - current_q)
 
-# ── Training loop ─────────────────────────────────────────────────────────────
+
+random.seed(0)
 env = gym.make("CartPole-v1")
 epsilon = EPSILON_START
 recent_rewards = []
@@ -205,8 +161,8 @@ for episode in range(1, NUM_EPISODES + 1):
         next_obs, reward, terminated, truncated, info = env.step(action)
         next_state = discretize(next_obs)
 
-        # Only pass terminated to update_q, not truncated.
-        # A time-limit ending is not a true terminal state.
+        # Only `terminated` counts as a real ending. A time-out (`truncated`)
+        # still bootstraps, as lesson 3 explained.
         update_q(state, action, reward, next_state, terminated)
 
         state = next_state
@@ -224,44 +180,74 @@ env.close()
 print(f"\nFinal Q-table: {len(q_table)} states visited")
 ```
 
-## What to Expect
-
-With 500 episodes and 6 bins, you should see something like:
+We fixed `random.seed(0)` and used `reset(seed=episode)`, so you should see the same numbers we did:
 
 ```
-Episode   50  avg(50)=  18.4  epsilon=0.778  states=142
-Episode  100  avg(50)=  32.1  epsilon=0.606  states=287
-Episode  150  avg(50)=  56.8  epsilon=0.472  states=391
-Episode  200  avg(50)=  89.3  epsilon=0.368  states=430
-Episode  300  avg(50)= 142.7  epsilon=0.223  states=461
-Episode  400  avg(50)= 178.4  epsilon=0.135  states=472
-Episode  500  avg(50)= 195.2  epsilon=0.082  states=478
+Episode   50  avg(50)=  22.8  epsilon=0.778  states=57
+Episode  100  avg(50)=  24.5  epsilon=0.606  states=80
+Episode  150  avg(50)=  29.4  epsilon=0.471  states=84
+Episode  200  avg(50)=  35.8  epsilon=0.367  states=97
+Episode  250  avg(50)=  48.4  epsilon=0.286  states=138
+Episode  300  avg(50)=  60.5  epsilon=0.222  states=154
+Episode  350  avg(50)=  81.0  epsilon=0.173  states=165
+Episode  400  avg(50)=  65.7  epsilon=0.135  states=167
+Episode  450  avg(50)=  72.5  epsilon=0.105  states=169
+Episode  500  avg(50)=  91.6  epsilon=0.082  states=178
 
-Final Q-table: 478 states visited
+Final Q-table: 178 states visited
 ```
 
-CartPole gives a reward of +1 for every step the pole stays up. The maximum is 500 (the episode time limit). Reaching an average of 180+ by episode 500 with a tabular agent and only 6 bins per dimension is a good result.
+## Reading the result
 
-## Why This Matters
+A random agent scores about 20 on CartPole, and the best possible is 500. Going from about 23 to about 92 in 500 episodes, with a 178-row table, is real learning, but it is slow and wobbly: the average dipped at episode 400 even though epsilon was shrinking. Tabular learning on a binned continuous problem is like that. Each bucket mixes many slightly different situations, so the table cannot be exact.
 
-You just ran your tabular Q-learning algorithm on a completely different environment by:
-1. Writing a `discretize()` function for the new observation type
-2. Changing one string (`"CartPole-v1"`) and the action count from 4 to 2
+That is the honest limit of the table, and it is why the second half of the course moves to neural networks. For now, notice what did *not* change: the loop and the update rule are the ones from the previous course. Only `discretize()` and the number of actions (2, not 4) are new. That is the standard API doing its job.
 
-The training loop itself did not change at all. That is the standard API working as designed.
+## Try it Yourself
 
-## Try It Yourself
-
-1. Increase `N_BINS` from 6 to 10 and retrain. Does the agent reach a higher average reward? Does it take longer to converge? What happens to `len(q_table)`?
-2. Reduce `N_BINS` to 3 and retrain. Is 3 bins enough information for the agent to learn a reasonable policy?
-3. Add a `print(discretize(obs))` at the start of each episode to watch the starting states. Are they all the same with a fixed seed? What happens if you remove the seed?
+1. Set `N_BINS = 10` and run again. In our test it reached about 101 at episode 500 with 365 states. Does it for you? What happens to `len(q_table)`?
+2. Set `N_BINS = 3`. In our test the average stayed near 44 with only 31 states. Why can't a table this coarse balance the pole?
+3. Set `NUM_EPISODES = 2000` and `DECAY_RATE = 0.998` and print every 250 episodes. In our test the 50-episode average climbed into the 100s. Is it steady?
+4. Challenge: run the same agent on `MountainCar-v0`. You need new clip limits and `get_q` must hold three actions. Does it learn? Why might that environment be harder for a table?
 
 ## Common Issues
 
-**Problem:** The average reward stays near 9-15 and never improves.
-**Solution:** Your epsilon is decaying too fast. Try `DECAY_RATE = 0.999` to explore for longer.
-**Why:** With too few exploration steps the agent never visits enough states to build a useful Q-table.
+- **Problem**: The average reward stays around 20 and never improves.
+- **Solution**: Make epsilon decay more slowly (`DECAY_RATE = 0.999`) and give it more episodes.
+- **Why**: With too little exploration the agent never visits enough buckets to build a useful table.
 
-**Problem:** The Q-table grows to tens of thousands of states.
-**Solution:** Reduce `N_BINS`. More bins mean an exponential explosion in possible states. With 10 bins and 4 dimensions, that is up to 10,000 possible states — many of which the agent will never visit.
-**Why:** The state space size with binning is `N_BINS ** 4`. With 6 bins that is 1,296 possible states; with 10 bins it is 10,000.
+- **Problem**: The Q-table gets huge and learning slows down.
+- **Solution**: Reduce `N_BINS`.
+- **Why**: The number of possible keys is `N_BINS ** 4`. Ten bins is 10,000 keys, and each key needs visits before it is useful.
+
+- **Problem**: Your numbers differ from the output shown.
+- **Solution**: Check that you kept `random.seed(0)`, `reset(seed=episode)` and the same constants.
+- **Why**: Both Python's `random` module and the environment have their own random number generators, and both must be seeded. Lesson 6 covers this.
+
+## Check your understanding
+
+{% quiz %}
+? Why must CartPole's observation be discretised for a dictionary Q-table?
+- [ ] Gymnasium forbids floats
+- [x] The observation is four continuous floats, and a table needs keys that repeat exactly
+- [ ] CartPole has too many actions
+> Continuous values almost never repeat exactly, so we bucket them into bin numbers.
+
+? In `update_q`, which flag is passed to switch the bootstrap off?
+- [ ] `truncated`
+- [x] `terminated`
+- [ ] `terminated or truncated`
+> A time-out is not a real ending, so only `terminated` removes the future-reward term.
+
+? With `N_BINS = 6`, how many possible Q-table keys are there for CartPole?
+- [ ] 24
+- [x] 1,296
+- [ ] 6
+> Four numbers with six bins each: 6 x 6 x 6 x 6.
+
+? What changed from the previous course's training loop?
+- [ ] The update rule
+- [x] The Gymnasium return values and the discretize function
+- [ ] The epsilon decay formula
+> The algorithm is the same. Only the interface and the observation handling are new.
+{% endquiz %}

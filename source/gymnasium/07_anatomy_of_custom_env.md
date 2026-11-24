@@ -1,196 +1,231 @@
 ---
 title: Anatomy of a Custom Environment
-description: Learn the gym.Env contract — what you must implement to write a valid Gymnasium environment — and validate it with check_env.
+description: Learn the gym.Env contract, what you must implement to write a valid Gymnasium environment, and validate it with check_env.
 layout: lesson
+snakie: false
 type: page
 cover: /learn/gymnasium/assets/banners/07_anatomy_of_custom_env.jpg
-date_updated: 2026-06-14
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## The Contract
+By the end of this lesson you will be able to write a small `gym.Env` subclass and validate it with `check_env`.
 
-To write a Gymnasium environment, you subclass `gym.Env` and implement four things:
+---
 
-1. `observation_space` and `action_space` — defined in `__init__`
-2. `reset(*, seed=None, options=None)` — returns `(obs, info)`
-3. `step(action)` — returns `(obs, reward, terminated, truncated, info)`
-4. Optionally: `render()` and `metadata`
+## The contract
 
-That is the entire contract. Anything that satisfies these four points will work with Stable-Baselines3, Gymnasium wrappers, and any other tool that speaks the API.
+To write a Gymnasium environment you subclass `gym.Env` and provide four things:
 
-## A Minimal Example: The Corridor
+1. `observation_space` and `action_space`, set up in `__init__`
+2. `reset(*, seed=None, options=None)`, which returns `(obs, info)`
+3. `step(action)`, which returns `(obs, reward, terminated, truncated, info)`
+4. Optionally `render()` and a `metadata` dictionary
 
-Let's build a minimal environment before we tackle BurgerBot. A one-dimensional corridor: the agent starts at position 0 and must reach position 9. It can move left or right. Hitting either wall (position -1 or 10) ends the episode.
+That is the entire contract. Anything that follows it works with Stable-Baselines3, with Gymnasium's wrappers and with any other tool that speaks the API.
 
-This is intentionally tiny — the goal is to see every piece of the contract clearly, not to solve an interesting problem.
+```mermaid
+classDiagram
+    class Env {
+        observation_space
+        action_space
+        metadata
+        reset(seed, options) obs, info
+        step(action) obs, reward, terminated, truncated, info
+        render()
+        close()
+    }
+    class CorridorEnv
+    class BurgerBotEnv
+    Env <|-- CorridorEnv
+    Env <|-- BurgerBotEnv
+```
+
+## A tiny example: the corridor
+
+Before BurgerBot, let's build something so small you can see every piece. A 10-cell corridor: the agent starts in cell 0 and the goal is cell 9. It can move left or right, and stepping left off cell 0 is a crash.
+
+Save this as `corridor.py`:
 
 ```python
-import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
+from gymnasium.utils.env_checker import check_env
+
 
 class CorridorEnv(gym.Env):
-    """
-    A 10-cell 1D corridor. Agent starts at 0, goal is 9.
-    Actions: 0=left, 1=right.
-    Observation: current position (integer 0-9).
+    """A 10-cell corridor. The agent starts at cell 0 and the goal is cell 9.
+
+    Actions: 0 = left, 1 = right.
+    Observation: the agent's cell number, 0 to 9.
     """
 
-    # metadata tells wrappers what render modes this env supports.
     metadata = {"render_modes": ["ansi"]}
 
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, max_steps=50):
         super().__init__()
-
-        # The spaces MUST be defined in __init__.
-        # Discrete(10) means the observation is an integer in {0, ..., 9}.
         self.observation_space = spaces.Discrete(10)
-        # Discrete(2) means the agent can do action 0 (left) or 1 (right).
         self.action_space = spaces.Discrete(2)
-
         self.render_mode = render_mode
-        self.position = 0    # current agent position
+        self.max_steps = max_steps
+        self.position = 0
+        self.steps = 0
 
     def reset(self, *, seed=None, options=None):
-        # Call super().reset(seed=seed) to let Gymnasium handle the RNG.
-        # This gives you self.np_random for reproducible environment randomness.
-        super().reset(seed=seed)
-
-        self.position = 0    # always start at the left
-        observation = self.position
-
-        # reset() MUST return (observation, info).
-        # info is a dict — empty is fine.
-        return observation, {}
+        super().reset(seed=seed)       # sets up self.np_random
+        self.position = 0
+        self.steps = 0
+        return self.position, {}       # (observation, info)
 
     def step(self, action):
-        # Apply the action
-        if action == 0:   # move left
-            self.position -= 1
-        elif action == 1: # move right
-            self.position += 1
+        self.steps += 1
+        self.position += 1 if action == 1 else -1
 
-        # Determine outcome
-        hit_wall = self.position < 0 or self.position >= 10
+        hit_wall = self.position < 0
         reached_goal = self.position == 9
 
-        # Compute reward
         if hit_wall:
+            self.position = 0          # keep the observation inside the space
             reward = -5.0
-            self.position = max(0, min(9, self.position))  # clamp position
         elif reached_goal:
             reward = 10.0
         else:
-            reward = -0.1   # small cost per step to encourage speed
+            reward = -0.1              # a small cost per step encourages speed
 
-        # terminated: goal reached or wall hit
-        terminated = reached_goal or hit_wall
-        # truncated: never — this env has no time limit of its own
-        truncated = False
-
-        observation = self.position
-
-        # step() MUST return (observation, reward, terminated, truncated, info).
-        return observation, reward, terminated, truncated, {}
+        terminated = reached_goal or hit_wall      # the task's own endings
+        truncated = self.steps >= self.max_steps   # the outside time limit
+        return self.position, reward, terminated, truncated, {}
 
     def render(self):
         if self.render_mode == "ansi":
-            # Build a simple text representation
             cells = ["."] * 10
-            cells[self.position] = "A"   # agent
-            cells[9] = "G"               # goal
+            cells[9] = "G"
+            cells[self.position] = "A"
             return "[" + " ".join(cells) + "]"
+
+
+if __name__ == "__main__":
+    check_env(CorridorEnv())
+    print("CorridorEnv passed check_env")
+
+    env = CorridorEnv(render_mode="ansi")
+    obs, info = env.reset(seed=0)
+    print(env.render())
+    total, steps, done = 0.0, 0, False
+    while not done:
+        obs, reward, terminated, truncated, info = env.step(1)   # always right
+        total += reward
+        steps += 1
+        done = terminated or truncated
+        if steps == 4:
+            print(env.render())
+    print(env.render())
+    print(f"Steps: {steps}, total reward: {total:.1f}")
+    env.close()
 ```
 
-## Validating with check_env
+Run it with `python3 corridor.py`:
 
-Gymnasium ships a checker that verifies your environment follows the contract. It catches common mistakes: wrong return types, out-of-range observations, incorrect space definitions.
+```
+CorridorEnv passed check_env
+[A . . . . . . . . G]
+[. . . . A . . . . G]
+[. . . . . . . . . A]
+Steps: 9, total reward: 9.2
+```
+
+You may also see a `WARN` line before the first message about the environment not having a spec or a render fps. For this text-only environment those warnings are harmless; they appear because we built the class directly instead of through `gym.make`.
+
+The reward adds up as 8 steps at -0.1 plus 10.0 for the goal, which is 9.2.
+
+Notice the shape of `step()`: it moves the agent, decides what happened, picks a reward, and sets the two flags, with the crash and goal as `terminated` and the step limit as `truncated`. `BurgerBotEnv` will follow exactly the same pattern.
+
+## What check_env tests
+
+`check_env` runs your environment through a battery of tests: it calls `reset()` with and without a seed, checks every observation against `observation_space`, takes some random steps, and checks the types of everything `step()` returns. Run it on every environment you write. Let's break the corridor on purpose and see what it says:
 
 ```python
-from gymnasium.utils.env_checker import check_env
+from corridor import CorridorEnv, check_env
 
-env = CorridorEnv()
-check_env(env)
-print("CorridorEnv passed check_env!")
+
+class ForgetsSuper(CorridorEnv):
+    def reset(self, *, seed=None, options=None):
+        self.position = 0              # no super().reset(seed=seed)!
+        self.steps = 0
+        return self.position, {}
+
+
+class FloatObs(CorridorEnv):
+    def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
+        return 0.0, {}                 # a float is not a Discrete observation
+
+
+for broken in (ForgetsSuper, FloatObs):
+    try:
+        check_env(broken())
+    except AssertionError as error:
+        print(broken.__name__, "->", str(error)[:100])
 ```
 
-If everything is correct, `check_env` prints nothing and returns. If there is a problem, it raises an error with a clear description of what went wrong.
+Save that as `break_it.py` beside `corridor.py` and run it. We cut each message to 100 characters, and in our run they read:
 
-Run `check_env` on every custom environment you write. It catches:
-- Missing `super().reset(seed=seed)` calls
-- Observations returned as plain Python `int` or `float` instead of the correct type
-- Observations outside the declared space bounds
-- Missing or wrong keys in returned info dicts (Gymnasium 1.x is lenient here but warns)
-
-## Running the Corridor
-
-```python
-env = CorridorEnv(render_mode="ansi")
-obs, info = env.reset(seed=0)
-
-print(env.render())   # [A . . . . . . . . G]
-
-done = False
-total_reward = 0
-steps = 0
-
-while not done:
-    action = 1   # always move right
-    obs, reward, terminated, truncated, info = env.step(action)
-    total_reward += reward
-    steps += 1
-    done = terminated or truncated
-
-print(env.render())   # [. . . . . . . . . G] — agent is at goal
-print(f"Steps: {steps}, Total reward: {total_reward:.1f}")
-# Steps: 9, Total reward: 9.1 (9 steps at -0.1 + 10.0 for goal)
-env.close()
+```
+ForgetsSuper -> Expects the random number generator to have been generated given a seed was passed to reset. Most li
+FloatObs -> The first element returned by `env.reset()` is not within the observation space.
 ```
 
-## Common Mistakes and What check_env Catches
+Good error messages. Read them first, they usually tell you the fix.
 
-### Forgetting super().reset(seed=seed)
+One more subtle trap: `check_env` is a smoke test, not a proof. If you declare `Discrete(9)` when the corridor really has 10 cells, `check_env` still passed in our test, because a few random steps never reached cell 9. Check the *edges* of your space by hand: the first, last and terminal observations.
 
-```python
-def reset(self, *, seed=None, options=None):
-    # BAD: no super() call
-    self.position = 0
-    return self.position, {}
-```
+## Try it Yourself
 
-`check_env` will warn that `self.np_random` is not properly initialised. Always call `super().reset(seed=seed)`.
+1. Change `max_steps` to 5 and run an agent that always chooses action 1. Which flag fires: `terminated` or `truncated`? Why does it not reach the goal?
+2. Make the reward grow with the cell number (`reward += 0.1 * self.position`). Does it still pass `check_env`? Does a random agent score higher?
+3. Write a `SnailEnv`: the observation is a counter from 0 to 9, the only action is "wait" (`Discrete(1)`), and the episode ends after 10 steps. It is the smallest useful environment, and a handy scaffold for debugging.
+4. Challenge: break the corridor in a way not shown here, for example `observation_space = spaces.Discrete(9)`. Does `check_env` catch it? What test would?
 
-### Returning the Wrong Type
+## Common Issues
 
-```python
-def reset(self, *, seed=None, options=None):
-    super().reset(seed=seed)
-    self.position = 0
-    return self.position, {}   # int, not np.int64
-```
+- **Problem**: `check_env` fails with a message about the random number generator.
+- **Solution**: Add `super().reset(seed=seed)` as the first line of your `reset()`.
+- **Why**: That call sets up `self.np_random`, which Gymnasium uses to seed the environment.
 
-`Discrete(10)` expects a NumPy scalar or integer compatible with its dtype. `check_env` may warn about this. Safe fix:
+- **Problem**: The first observation is "not within the observation space".
+- **Solution**: Return the type the space declares: an `int` for `Discrete`, a `float32` array for a `float32` Box.
+- **Why**: Spaces check type and range together, as lesson 4 showed.
 
-```python
-return np.int64(self.position), {}
-```
+- **Problem**: `step()` complains it cannot unpack your return value.
+- **Solution**: Return exactly five things: `obs, reward, terminated, truncated, info`.
+- **Why**: Gymnasium wrappers and libraries unpack five values and cannot guess which one you left out.
 
-### Off-by-One in Space Definition
+## Check your understanding
 
-```python
-# BAD: positions are 0-9 but space says only 9 values
-self.observation_space = spaces.Discrete(9)
-# position=9 (the goal) is outside this space!
-```
+{% quiz %}
+? Which line should begin your `reset()` method?
+- [ ] `self.position = 0`
+- [x] `super().reset(seed=seed)`
+- [ ] `return obs, {}`
+> It sets up `self.np_random` so seeding works.
 
-`check_env` will catch this the first time the agent reaches the goal. The space must cover every possible observation value including terminal ones.
+? What does `step()` return in Gymnasium?
+- [ ] `obs, reward, done, info`
+- [x] `obs, reward, terminated, truncated, info`
+- [ ] `obs, reward`
+> Five values, with the old `done` split in two.
 
-## Try It Yourself
+? In the corridor, why is hitting the left wall `terminated` rather than `truncated`?
+- [x] It is an ending defined by the task's own rules
+- [ ] It happens after a time limit
+- [ ] Walls are always truncation
+> The step limit is the only truncation. A crash is a real ending.
 
-1. Add a `max_steps=20` limit to `CorridorEnv`. Set `truncated = (self.steps >= self.max_steps)` and test with `check_env`. Does the corridor still solve with `action=1` always?
-2. Change the reward function so the agent gets a bonus proportional to its position (`reward += self.position * 0.1`). Does this help or hurt a random agent?
-3. Write a `SnailEnv` where the observation is just a timestep counter (0 to 9) and the only action is "wait". The episode ends after 10 steps. Run `check_env`. This is the simplest possible environment — it is a useful debugging scaffold.
+? Does a passing `check_env` prove your spaces are correct?
+- [ ] Yes, it checks every possible state
+- [x] No, it runs a few random steps, so you must check the edges yourself
+> Our `Discrete(9)` mistake passed, because the random steps never reached cell 9.
+{% endquiz %}
