@@ -1702,7 +1702,7 @@
   {
     "slug": "how_to_install_micropython",
     "name": "How to install MicroPython",
-    "description": "Install MicroPython on your Raspberry Pi Pico.",
+    "description": "Work out which Raspberry Pi Pico you have, download the right MicroPython firmware, install it with Thonny or by drag and drop, and check it worked.",
     "cover": "assets/cover.jpg",
     "author": "Kevin McAleer",
     "date_published": "2024-08-10",
@@ -1712,9 +1712,9 @@
     ],
     "lessons": [
       {
-        "file": "01_intro.md",
+        "file": "00_intro.md",
         "section": "Introduction",
-        "url": "/learn/how_to_install_micropython/01_intro.html"
+        "url": "/learn/how_to_install_micropython/00_intro.html"
       },
       {
         "file": "02_types.md",
@@ -1727,9 +1727,24 @@
         "url": "/learn/how_to_install_micropython/03_install.html"
       },
       {
-        "file": "04_next_steps.md",
+        "file": "04_drag_and_drop.md",
+        "section": "Raspberry Pi Pico",
+        "url": "/learn/how_to_install_micropython/04_drag_and_drop.html"
+      },
+      {
+        "file": "05_check_it_worked.md",
+        "section": "Check and maintain",
+        "url": "/learn/how_to_install_micropython/05_check_it_worked.html"
+      },
+      {
+        "file": "06_update_and_reset.md",
+        "section": "Check and maintain",
+        "url": "/learn/how_to_install_micropython/06_update_and_reset.html"
+      },
+      {
+        "file": "07_summary.md",
         "section": "Where to go from here",
-        "url": "/learn/how_to_install_micropython/04_next_steps.html"
+        "url": "/learn/how_to_install_micropython/07_summary.html"
       }
     ]
   },

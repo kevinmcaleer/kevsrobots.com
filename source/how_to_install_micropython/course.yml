@@ -9,19 +9,37 @@
     - micropython
     - pico
   description: >-
-    Install MicroPython on your Raspberry Pi Pico.
+    Work out which Raspberry Pi Pico you have, download the right MicroPython firmware, install it with Thonny or by drag and drop, and check it worked.
+  outcomes:
+    - Identify your Pico model and pick the matching MicroPython firmware file
+    - Install MicroPython with Thonny
+    - Install MicroPython by dragging a UF2 file onto the Pico in BOOTSEL mode
+    - Check from the REPL which version and board you are running
+    - Update MicroPython, and wipe a Pico back to a clean state
+  prerequisites:
+    - No programming experience needed
+  you_need:
+    - A Raspberry Pi Pico, Pico W, Pico 2 or Pico 2 W
+    - A micro USB cable that carries data, not just power
+    - A computer running Windows, macOS or Linux
+    - Thonny (free) or the Snakie IDE
   content:
     - section:
         name: Introduction
         content:
-          - 01_intro.md
+          - 00_intro.md
     - section:
         name: Raspberry Pi Pico
         content:
           - 02_types.md
           - 03_install.md
+          - 04_drag_and_drop.md
+    - section:
+        name: Check and maintain
+        content:
+          - 05_check_it_worked.md
+          - 06_update_and_reset.md
     - section:
         name: Where to go from here
         content:
-          - 04_next_steps.md
-          
+          - 07_summary.md
