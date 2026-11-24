@@ -8,11 +8,25 @@ description: Finish the SMARS robot chassis in Fusion 360. In Part 2 you add the
   holders and nubs, the front cut, the unpowered stub wheels and the motor holder
   slots, ready to export and 3D print.
 level: beginner
-course_duration: 0h 20m
+course_duration: 0h 56m
 lesson_count: 18
 first_lesson: 00_intro.html
-quiz_total: 6
+quiz_total: 51
 video: 3qd_63cWbvk
+outcomes:
+- Sketch and extrude motor holders and nubs that keep a motor in place
+- Use a circular pattern to repeat a feature on the opposite side of a part
+- Add a chamfer and explain how it differs from a fillet
+- Build a round snap-fit stub wheel by revolving a profile, then cut a slot so it
+  can flex
+- Cut shallow pressure-fit slots and export the finished chassis as an STL
+prerequisites:
+- Design a SMARS Robot in Fusion 360, Part 1 (finished chassis shell with wheel holes)
+you_need:
+- A computer that can run Autodesk Fusion (the free personal-use licence is fine)
+- Your finished chassis design from Part 1
+- A mouse with a scroll wheel (helpful)
+- A 3D printer and slicer, only if you want to print the result
 navigation:
 - name: Design a SMARS Robot in Fusion 360 - Part 2, Motor Holders and Stub Wheels
 - content:

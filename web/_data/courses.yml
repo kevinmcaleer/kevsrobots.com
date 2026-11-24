@@ -942,11 +942,11 @@
   description: Finish the SMARS robot chassis in Fusion 360. In Part 2 you add the
     motor holders and nubs, the front cut, the unpowered stub wheels and the motor
     holder slots, ready to export and 3D print.
-  duration: 0h 20m
+  duration: 0h 56m
   groups:
-  - smars
-  - robotics
-  - fusion 360
+  - 3ddesign
+  - 3dprinting
+  - robots
   lessons: 18
   level: beginner
   link: /learn/smars_fusion360_part2/00_intro.html
