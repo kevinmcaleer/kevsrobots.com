@@ -7,10 +7,25 @@
   cover: assets/computer_vision.jpg
   description: >- 
      Detect faces, hands and body poses in real time on a Raspberry Pi with Python, OpenCV and CVZone
+  outcomes:
+    - Set up a Python virtual environment with OpenCV, MediaPipe and CVZone on a Raspberry Pi
+    - Capture live video from a USB webcam or a Raspberry Pi camera module
+    - Detect faces and use their position and size in your own code
+    - Track a hand, count raised fingers and measure a pinch distance
+    - Find body landmarks and measure the angle at a joint
+    - Overlay live text and feedback on the video, and build a repetition counter
+  prerequisites:
+    - Comfortable writing and running simple Python programs, such as the Python course
+    - Basic Linux command line use, such as the Introduction to the Linux Command Line course
+  you_need:
+    - A Raspberry Pi 4 or Pi 5 running 64-bit Raspberry Pi OS with the desktop
+    - A USB webcam or a Raspberry Pi camera module
+    - A screen, keyboard and mouse, or remote desktop access, because the examples open a video window
+    - An internet connection for the installs and for the one-off model downloads
   groups:
-    - computer vision
+    - raspberrypi
+    - ai
     - python
-    - cvzone
   content:
   - section:
       name: Overview

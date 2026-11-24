@@ -182,11 +182,11 @@
   date_published: 2023-10-07
   description: Detect faces, hands and body poses in real time on a Raspberry Pi with
     Python, OpenCV and CVZone
-  duration: 1h 19m
+  duration: 1h 29m
   groups:
-  - computer vision
+  - raspberrypi
+  - ai
   - python
-  - cvzone
   lessons: 6
   level: intermediate
   link: /learn/cvzone/00_intro.html
