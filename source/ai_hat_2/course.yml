@@ -1,0 +1,63 @@
+- name: Raspberry Pi AI HAT+ 2 - Vision and Generative AI
+  author: Kevin McAleer
+  date_created: 2026-11-24
+  date_published: 2026-11-24
+  level: intermediate
+  layout: course
+  cover: assets/cover.jpg
+  video: lT1NJfkuiU8
+  code_target: cpython
+  groups:
+      - ai
+      - raspberrypi
+      - robots
+  description: >-
+    Give a robot eyes and a brain with the Raspberry Pi AI HAT+ 2. Fit the HAT, run object detection
+    and pose estimation from the camera, turn detections into robot behaviour, then run a language
+    model and a vision-language model on the HAT itself.
+  outcomes:
+    - Fit the AI HAT+ 2 to a Raspberry Pi 5 and check that it is working
+    - Run camera object detection and pose estimation with rpicam-apps
+    - Start a Hailo camera pipeline from Python and know where to find the detection data
+    - Turn detections into robot behaviour, such as a person-following decision
+    - Run a language model on the HAT with hailo-ollama and talk to it from a terminal, Python or a browser
+    - Choose between the AI Camera, the AI HAT+ and the AI HAT+ 2 for a project
+  prerequisites:
+    - Introduction to the Linux Command Line on Raspberry Pi OS
+    - Computer Vision on Raspberry Pi with CVZone
+  you_need:
+    - A Raspberry Pi 5
+    - A Raspberry Pi AI HAT+ 2
+    - A supported Raspberry Pi camera, such as Camera Module 3
+    - 64-bit Raspberry Pi OS (Trixie) on a microSD card, and a power supply for the Pi 5
+    - A Raspberry Pi Active Cooler (recommended by the docs)
+    - A Phillips crosshead screwdriver
+    - Optional, a monitor and keyboard, or SSH access from another computer
+    - Optional, Docker, for the Open WebUI chat page (lesson 9)
+  content:
+    - section:
+        name: Meet the HAT
+        content:
+          - 00_intro.md
+          - 01_what_is_the_ai_hat_2.md
+          - 02_fitting_the_hat.md
+          - 03_software_setup.md
+    - section:
+        name: Eyes
+        content:
+          - 04_object_detection_with_rpicam_apps.md
+          - 05_pose_and_segmentation.md
+          - 06_reading_detections_in_python.md
+          - 07_detections_to_robot_behaviour.md
+    - section:
+        name: A brain
+        content:
+          - 08_a_language_model_on_the_hat.md
+          - 09_a_chat_page_in_your_browser.md
+          - 10_asking_the_robot_what_it_sees.md
+    - section:
+        name: Choosing and fixing
+        content:
+          - 11_performance_and_choosing_hardware.md
+          - 12_troubleshooting.md
+          - 13_summary.md

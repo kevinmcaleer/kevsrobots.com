@@ -1,5 +1,90 @@
 [
   {
+    "slug": "ai_hat_2",
+    "name": "Raspberry Pi AI HAT+ 2 - Vision and Generative AI",
+    "description": "Give a robot eyes and a brain with the Raspberry Pi AI HAT+ 2. Fit the HAT, run object detection and pose estimation from the camera, turn detections into robot behaviour, then run a language model and a vision-language model on the HAT itself.",
+    "cover": "assets/cover.jpg",
+    "author": "Kevin McAleer",
+    "date_published": "2026-11-24",
+    "groups": [
+      "ai",
+      "raspberrypi",
+      "robots"
+    ],
+    "lessons": [
+      {
+        "file": "00_intro.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/00_intro.html"
+      },
+      {
+        "file": "01_what_is_the_ai_hat_2.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/01_what_is_the_ai_hat_2.html"
+      },
+      {
+        "file": "02_fitting_the_hat.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/02_fitting_the_hat.html"
+      },
+      {
+        "file": "03_software_setup.md",
+        "section": "Meet the HAT",
+        "url": "/learn/ai_hat_2/03_software_setup.html"
+      },
+      {
+        "file": "04_object_detection_with_rpicam_apps.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/04_object_detection_with_rpicam_apps.html"
+      },
+      {
+        "file": "05_pose_and_segmentation.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/05_pose_and_segmentation.html"
+      },
+      {
+        "file": "06_reading_detections_in_python.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/06_reading_detections_in_python.html"
+      },
+      {
+        "file": "07_detections_to_robot_behaviour.md",
+        "section": "Eyes",
+        "url": "/learn/ai_hat_2/07_detections_to_robot_behaviour.html"
+      },
+      {
+        "file": "08_a_language_model_on_the_hat.md",
+        "section": "A brain",
+        "url": "/learn/ai_hat_2/08_a_language_model_on_the_hat.html"
+      },
+      {
+        "file": "09_a_chat_page_in_your_browser.md",
+        "section": "A brain",
+        "url": "/learn/ai_hat_2/09_a_chat_page_in_your_browser.html"
+      },
+      {
+        "file": "10_asking_the_robot_what_it_sees.md",
+        "section": "A brain",
+        "url": "/learn/ai_hat_2/10_asking_the_robot_what_it_sees.html"
+      },
+      {
+        "file": "11_performance_and_choosing_hardware.md",
+        "section": "Choosing and fixing",
+        "url": "/learn/ai_hat_2/11_performance_and_choosing_hardware.html"
+      },
+      {
+        "file": "12_troubleshooting.md",
+        "section": "Choosing and fixing",
+        "url": "/learn/ai_hat_2/12_troubleshooting.html"
+      },
+      {
+        "file": "13_summary.md",
+        "section": "Choosing and fixing",
+        "url": "/learn/ai_hat_2/13_summary.html"
+      }
+    ]
+  },
+  {
     "slug": "arduino_to_python",
     "name": "Arduino to MicroPython - A Quick Start Guide",
     "description": "Transition from Arduino C++ to MicroPython quickly and easily. Learn Python syntax with side-by-side comparisons, control hardware, and build IoT and robotics projects on Arduino Nano ESP32, Raspberry Pi Pico W, or Pico 2W.",
