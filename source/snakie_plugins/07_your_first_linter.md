@@ -4,12 +4,14 @@ description: Write a Snakie linter plugin that underlines a classic MicroPython 
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/07_your_first_linter.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write a linter that underlines a classic MicroPython mistake as you type and lists it in the Problems panel.
 
 ## A helper that never needs asking
 

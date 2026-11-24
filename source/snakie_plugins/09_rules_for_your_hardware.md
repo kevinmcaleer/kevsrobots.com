@@ -4,12 +4,14 @@ description: Teach your Snakie linter about the Raspberry Pi Pico's reserved pin
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/09_rules_for_your_hardware.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to teach your linter about the Pico's reserved pins, ignore comments, and decide what deserves an error.
 
 ## Rules a general linter can't know
 

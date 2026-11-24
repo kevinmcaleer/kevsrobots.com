@@ -12,7 +12,7 @@ description: Use the edit action in a Snakie plugin to rewrite the open file, an
 percent: 49
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use the edit action to rewrite the open file, and follow the rules for commands that change code safely.
 
 ## From reading to writing
 

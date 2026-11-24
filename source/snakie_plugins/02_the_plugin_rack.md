@@ -4,12 +4,14 @@ description: Tour the Snakie Plugins panel, see the plugins that ship with the a
 layout: lesson
 type: page
 cover: /learn/snakie_plugins/assets/banners/02_the_plugin_rack.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find your way around the Plugins panel and run a command from a plugin that ships with Snakie.
 
 ## Open the rack
 
@@ -91,6 +93,8 @@ def hello(ctx: Context):
 ```
 
 You can already read most of it. A function receives `ctx`, looks at the file name and content, and returns a message. The `@plugin.command` line is what turns the function into a button. You'll write one of your own in the next lesson.
+
+> **Teachers**: The Plugins panel is hidden in the browser version of Snakie, because the browser cannot start a Python program on the computer. If a learner cannot see the panel, check they are using the desktop app.
 
 ---
 

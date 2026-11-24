@@ -12,7 +12,7 @@ description: What a Snakie plugin is, how Snakie runs it in a separate Python pr
 percent: 14
 duration: 5
 quiz_total: 36
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Extend Snakie with Python Plugins
 - content:
@@ -56,6 +56,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain what a Snakie plugin is, how Snakie runs it in a separate Python process, and what plugins can and cannot do.
 
 ## Two programs talking
 
@@ -146,6 +148,8 @@ Three good reasons:
 - **It's real Python.** Your plugin can use anything in Python's standard library, such as `re` for patterns
 - **A crash stays put.** If your plugin has a bug, the host reports it. The editor carries on
 - **It's clear who runs what.** Plugin code runs on your computer as you. Snakie tells you so at the top of the Plugins panel
+
+> **Teachers**: Plugins run as the logged-in user, using the Python 3 installed on the computer, and load from `.snakie/plugins` in the home folder. On shared or locked-down machines check that learners can create and keep files there, and that their plugins will still be there next session.
 
 ---
 
