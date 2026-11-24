@@ -3,6 +3,11 @@ title: Subqueries and Nested Queries
 description: >-
     Using subqueries in SQL to perform complex queries within queries
 layout: lesson
+cover: /learn/sql/assets/banners/12_subqueries_and_nested_queries.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll explore **subqueries** (also known as nested queries), which allow you to perform queries within queries. Subqueries are powerful tools for retrieving data based on the results of other queries, enabling more advanced data analysis and manipulation.

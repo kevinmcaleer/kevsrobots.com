@@ -3,7 +3,7 @@ layout: lesson
 title: Stub wheel profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/11_stub.jpg
 date: 2023-07-20
 previous: 10_stub.html
 next: 12_revolve.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The stub wheel is actually created using a profile that is then revolved around an axis to form a rounded part.
 

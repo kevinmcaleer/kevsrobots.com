@@ -285,6 +285,7 @@ The Mirror workflow is essential for professional CAD:
 | Single feature + Mirror | Symmetric parts (like SMARS) |
 | Datum planes | Reference surfaces for operations |
 | Construction geometry | Guides that don't become features |
+{:class="table table-single"}
 
 These skills transfer to any parametric CAD software!
 

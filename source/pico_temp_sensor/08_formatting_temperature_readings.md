@@ -3,6 +3,11 @@ title: Enhancing Temperature Readings
 description: Improve the readability of temperature readings by formatting them with custom labels and adding visual enhancements.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/08_formatting_temperature_readings.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

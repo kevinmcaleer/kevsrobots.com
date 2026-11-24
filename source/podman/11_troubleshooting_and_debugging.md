@@ -3,11 +3,11 @@ title: Troubleshooting and Debugging
 description: Learn how to troubleshoot and debug Podman containers using built-in tools like `inspect`, `logs`, `exec`, and systemd journal logs.
 layout: lesson
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/11_troubleshooting_and_debugging.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

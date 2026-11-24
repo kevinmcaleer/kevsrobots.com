@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to the Wall Drawing Robot
 author: Kevin McAleer
 type: page
-cover: /learn/scrawly_wally/assets/cover.png
+cover: /learn/scrawly_wally/assets/banners/01_intro.jpg
 date: 2024-08-02
 next: 02_components.html
 description: Learn about the project and what you will accomplish.
@@ -46,7 +46,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

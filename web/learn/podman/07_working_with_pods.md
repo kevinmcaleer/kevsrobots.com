@@ -3,7 +3,7 @@ layout: lesson
 title: Working with Pods
 author: Kevin McAleer
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/07_working_with_pods.jpg
 date: 2025-05-24
 previous: 06_managing_containers_and_images.html
 next: 08_docker_compose_vs_podman_compose.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

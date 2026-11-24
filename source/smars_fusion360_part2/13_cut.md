@@ -3,6 +3,11 @@ title: Stub wheel cutout profile
 description: Cut out the center
 layout: lesson
 redirect_from: /learn/smars_fusion360/29_cut.html
+cover: /learn/smars_fusion360_part2/assets/banners/13_cut.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 The stub wheel needs a cut out section to allow the two halves of the stub wheel to squeeze together when pushing on an unpowered wheel.

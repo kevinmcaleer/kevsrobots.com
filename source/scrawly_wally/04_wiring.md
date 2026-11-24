@@ -3,11 +3,11 @@ title: Wiring the Components
 description: Guide to wiring the stepper motors, servo, and Raspberry Pi.
 layout: lesson
 type: page
-cover: assets/wiring.png
+cover: /learn/scrawly_wally/assets/banners/04_wiring.jpg
 date_updated: 2024-08-02
 ---
 
-![Wiring](assets/wiring01.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

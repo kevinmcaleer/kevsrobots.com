@@ -3,8 +3,12 @@ title: Writing Control Code
 description: Write Python code to control the wall drawing robot.
 layout: lesson
 type: page
-cover: assets/control_code.png
+cover: /learn/scrawly_wally/assets/banners/07_control.jpg
 date_updated: 2024-08-02
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Writing Control Code

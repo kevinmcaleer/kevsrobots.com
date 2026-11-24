@@ -3,7 +3,7 @@ layout: lesson
 title: Docker Compose vs Podman Compose
 author: Kevin McAleer
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/08_docker_compose_vs_podman_compose.jpg
 date: 2025-05-24
 previous: 07_working_with_pods.html
 next: 09_podman_and_kubernetes.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

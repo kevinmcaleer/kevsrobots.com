@@ -3,7 +3,7 @@ layout: lesson
 title: Writing Control Code
 author: Kevin McAleer
 type: page
-cover: assets/control_code.png
+cover: /learn/scrawly_wally/assets/banners/07_control.jpg
 date: 2024-08-02
 previous: 06_software.html
 next: 08_positioning.html
@@ -46,6 +46,10 @@ navigation:
       link: 11_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Writing Control Code
 

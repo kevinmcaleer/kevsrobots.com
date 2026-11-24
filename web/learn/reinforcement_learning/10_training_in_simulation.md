@@ -3,7 +3,7 @@ layout: lesson
 title: Training in Simulation
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/10_training_in_simulation.jpg
 date: 2026-06-13
 previous: 09_coding_the_learning_loop.html
 next: 11_the_sim_to_real_gap.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

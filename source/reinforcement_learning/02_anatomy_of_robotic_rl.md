@@ -3,11 +3,11 @@ title: The Anatomy of Robotic RL
 description: Define the core reinforcement learning vocabulary — agent, environment, state, action, reward — in concrete robot terms.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/02_anatomy_of_robotic_rl.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -3,8 +3,12 @@ title: Understanding Positioning with Trigonometry
 description: Learn how the robot calculates the position of the gondola using simple trigonometry and math.
 layout: lesson
 type: page
-cover: assets/positioning.png
+cover: /learn/scrawly_wally/assets/banners/08_positioning.jpg
 date_updated: 2024-08-02
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Understanding Positioning with Trigonometry

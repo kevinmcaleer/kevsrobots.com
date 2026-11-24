@@ -3,7 +3,7 @@ layout: lesson
 title: Assembling the Robot
 author: Kevin McAleer
 type: page
-cover: assets/assembly.png
+cover: /learn/scrawly_wally/assets/banners/03_assembly.jpg
 date: 2024-08-02
 previous: 02_components.html
 next: 04_wiring.html
@@ -47,7 +47,7 @@ navigation:
 ---
 
 
-![Assembly](assets/wiring01.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

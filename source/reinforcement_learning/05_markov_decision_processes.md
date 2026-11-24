@@ -3,11 +3,11 @@ title: Markov Decision Processes
 description: Understand why your robot only needs to know where it is right now — and the mathematical idea that makes that claim safe.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/05_markov_decision_processes.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

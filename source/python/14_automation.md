@@ -2,10 +2,12 @@
 title: Python for Automating Tasks
 description: Learn how Python can be used to automate tasks such as file manipulation and web browsing.
 layout: lesson
-cover: /learn/python/assets/7.png
+cover: /learn/python/assets/banners/14_automation.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

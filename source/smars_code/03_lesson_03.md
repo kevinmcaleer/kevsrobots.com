@@ -2,6 +2,11 @@
 title: Lesson 03 - Ultrasonic distance sensor
 description: Learn how to detect distance using an ultrasonic sensor
 layout: lesson
+cover: /learn/smars_code/assets/banners/03_lesson_03.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the livestream

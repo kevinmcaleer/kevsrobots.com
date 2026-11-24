@@ -3,7 +3,7 @@ layout: lesson
 title: Querying and Joining Tables
 author: Kevin McAleer
 type: page
-cover: /learn/sqlite3/assets/database.png
+cover: /learn/sqlite3/assets/banners/06_querying_and_joining_tables.jpg
 date: 2023-07-15
 previous: 05_updating_and_deleting_data.html
 next: 07_advanced_queries.html
@@ -63,6 +63,10 @@ navigation:
       link: 17_tools.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Module 6 focuses on more advanced querying techniques in SQLite, including working with multiple tables and performing joins. You will learn how to retrieve data from multiple tables, establish relationships, and use join operations to combine data.
 

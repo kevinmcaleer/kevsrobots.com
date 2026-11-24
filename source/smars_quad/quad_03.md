@@ -2,6 +2,11 @@
 title: Fit the servos
 description: Fit the servos into the servo holder
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_03.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 3 Fit the servo into the servo holder

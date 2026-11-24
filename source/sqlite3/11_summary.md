@@ -3,6 +3,11 @@ title: Course Summary
 description: >-
     Throughout this course, you have gained a solid foundation in working with databases using Python and SQLite3
 layout: lesson
+cover: /learn/sqlite3/assets/banners/11_summary.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Congratulations! You have completed the `Create Databases with Python and SQLite3` course. Throughout this course, you have gained a solid foundation in working with databases using Python and SQLite3. Let's summarize what we have covered:

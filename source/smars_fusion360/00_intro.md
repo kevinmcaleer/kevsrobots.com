@@ -2,9 +2,12 @@
 title: Overview
 description: Design the SMARS robot chassis in Fusion 360, starting with the outer shell
 layout: lesson
+cover: /learn/smars_fusion360/assets/banners/00_intro.jpg
 ---
 
-![SMARS in Fusion 360](assets/smars_fusion360.png){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video first
 

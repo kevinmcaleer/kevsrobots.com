@@ -3,11 +3,11 @@ title: Installing Podman
 description: Learn how to install Podman on Linux, macOS, and Windows, and verify your setup for development or production use.
 layout: lesson
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/03_installing_podman.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

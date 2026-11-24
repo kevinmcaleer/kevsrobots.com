@@ -2,6 +2,11 @@
 title: Fit the Motors
 description: Fit the Motors to the chassis
 layout: lesson
+cover: /learn/smars/assets/banners/smars03.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Fit Motors

@@ -3,7 +3,7 @@ layout: lesson
 title: Scaling Up to Deep RL
 author: Kevin McAleer
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/14_scaling_up_to_deep_rl.jpg
 date: 2026-06-13
 previous: 13_deploying_the_brain.html
 next: 15_summary.html
@@ -60,7 +60,7 @@ navigation:
 ---
 
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

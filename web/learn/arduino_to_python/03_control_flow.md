@@ -147,6 +147,7 @@ These are identical in both languages:
 | `<` | Less than | `if x < 10:` |
 | `>=` | Greater or equal | `if x >= 10:` |
 | `<=` | Less or equal | `if x <= 10:` |
+{:class="table table-single"}
 
 ## Logical Operators
 
@@ -184,6 +185,7 @@ if not door_open:
 | `&&` | `and` | Both conditions true |
 | `||` | `or` | Either condition true |
 | `!` | `not` | Negation |
+{:class="table table-single"}
 
 Python's word-based operators are more readable once you get used to them.
 

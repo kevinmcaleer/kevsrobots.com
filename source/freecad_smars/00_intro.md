@@ -163,6 +163,7 @@ Before we start designing, let's understand what we're building:
 | Wall thickness | 2-3mm | Strong enough to handle, light enough for motors |
 | Motor hole diameter | 4.5mm | Fits N20 motor shafts with slight clearance |
 | Fillet radius | 4mm | Reduces stress concentration, looks professional |
+{:class="table table-single"}
 
 These aren't arbitrary numbers - each was chosen to work with specific components. As you progress, you'll understand why.
 

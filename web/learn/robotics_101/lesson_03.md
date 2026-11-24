@@ -3,7 +3,7 @@ layout: lesson
 title: Skills and Knowledge
 author: Kevin McAleer
 type: page
-cover: /learn/robotics_101/assets/basics_101.jpg
+cover: /learn/robotics_101/assets/banners/lesson_03.jpg
 date: 2023-01-17
 previous: lesson_02.html
 next: lesson_04.html
@@ -32,6 +32,10 @@ navigation:
       link: lesson_05.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ![Skills and Knowledge Venn diagram](assets/skills_and_knowledge.jpg){:class="img-fluid w-50"}
 

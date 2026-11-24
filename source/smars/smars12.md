@@ -2,6 +2,11 @@
 title: Load the code
 description: Bring the SMARS to life!
 layout: lesson
+cover: /learn/smars/assets/banners/smars12.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the video

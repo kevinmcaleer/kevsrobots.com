@@ -3,7 +3,7 @@ layout: lesson
 title: Lesson 04 - Positioning with the MPU-6050
 author: Kevin McAleer
 type: page
-cover: /learn/smars_code/assets/program_smars.png
+cover: /learn/smars_code/assets/banners/04_lesson_04.jpg
 date: 2023-09-10
 previous: 03_lesson_03.html
 next: 05_lesson_05.html
@@ -41,6 +41,10 @@ navigation:
       link: 07_lesson_07.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the livestream
 

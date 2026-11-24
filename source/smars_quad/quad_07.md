@@ -2,6 +2,11 @@
 title: Calibrate Servos
 description: Check the servo rotation
 layout: lesson
+cover: /learn/smars_quad/assets/banners/quad_07.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## 7 Check the servo rotation

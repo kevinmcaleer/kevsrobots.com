@@ -3,11 +3,11 @@ title: Working with Pods
 description: Learn how to use Podman’s built-in support for pods to group and manage multiple containers with shared networking — just like Kubernetes.
 layout: lesson
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/07_working_with_pods.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

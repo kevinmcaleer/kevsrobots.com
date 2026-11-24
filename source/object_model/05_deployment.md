@@ -341,6 +341,7 @@ On Raspberry Pi 5 with AI Camera:
 | **Power consumption** | ~5W | Total system power |
 | **Accuracy** | Same as validation | Should match your test set results |
 | **Startup time** | 2-3 seconds | Model loading time |
+{:class="table table-single"}
 
 **Raspberry Pi 4 will be slightly slower** (~20-50% depending on model).
 

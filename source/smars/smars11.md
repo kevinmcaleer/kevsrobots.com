@@ -2,6 +2,11 @@
 title: Attach Tracks
 description: The tracks provide all terrain grip for the robot
 layout: lesson
+cover: /learn/smars/assets/banners/smars11.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Attach Tracks

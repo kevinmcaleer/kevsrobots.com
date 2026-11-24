@@ -3,11 +3,11 @@ title: Deploying the Brain
 description: Export the trained Q-table to JSON, load it on the Pico, and run the complete MicroPython control loop that reads sensors, looks up the best action, and drives the motors.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/13_deploying_the_brain.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

@@ -85,6 +85,7 @@ Enter a filename like `smars_robot_base.stl` and click `Save`.
 | **PLA** | Easy to print, no heated bed required | Can warp in heat | Indoor robots, beginners |
 | **PETG** | Stronger, heat resistant | Strings more | Outdoor use, durability |
 | **ABS** | Very strong, heat resistant | Needs enclosure, fumes | Professional use |
+{:class="table table-single"}
 
 **Recommendation**: Start with PLA. It's forgiving and produces great results.
 
@@ -95,6 +96,7 @@ Enter a filename like `smars_robot_base.stl` and click `Save`.
 | 0.3mm | Fast print, visible layers - good for prototypes |
 | 0.2mm | Balanced speed and quality - **recommended** |
 | 0.1mm | Slow print, smooth finish - cosmetic parts |
+{:class="table table-single"}
 
 For functional robot parts like SMARS, **0.2mm** is ideal.
 
@@ -105,6 +107,7 @@ For functional robot parts like SMARS, **0.2mm** is ideal.
 | 15-20% | Standard - good strength-to-weight ratio |
 | 30-40% | Extra durability for high-stress parts |
 | 50%+ | Usually unnecessary - wastes filament |
+{:class="table table-single"}
 
 **Recommendation**: 20% infill with grid or gyroid pattern.
 
@@ -143,6 +146,7 @@ This orientation:
 | **Cura** | Win/Mac/Linux | Most popular, extensive settings |
 | **PrusaSlicer** | Win/Mac/Linux | Great defaults, good documentation |
 | **Bambu Studio** | Win/Mac | For Bambu printers |
+{:class="table table-single"}
 
 ### Import Settings
 

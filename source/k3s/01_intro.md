@@ -38,6 +38,7 @@ K3s includes all the essential components of Kubernetes, while stripping away fe
 | 🌍 Portable & Scalable     | Run anywhere: desk, shed, edge         |
 | ⚡ Lightweight              | K3s runs well on 1GB–4GB RAM devices   |
 | 🛠️ Real Workloads         | Deploy apps, databases, dashboards     |
+{:class="table table-single"}
 
 ---
 

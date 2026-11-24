@@ -3,11 +3,11 @@ title: Podman and Kubernetes
 description: Learn how to use Podman with Kubernetes — including generating Kubernetes YAML files, running them locally, and preparing workloads for production.
 layout: lesson
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/09_podman_and_kubernetes.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

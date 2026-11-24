@@ -3,11 +3,11 @@ title: Docker Compose vs Podman Compose
 description: Learn how to use `podman-compose` to run multi-container apps, and understand the differences and limitations compared to Docker Compose.
 layout: lesson
 type: page
-cover: assets/podman02.jpg
+cover: /learn/podman/assets/banners/08_docker_compose_vs_podman_compose.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

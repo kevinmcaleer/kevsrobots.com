@@ -3,7 +3,7 @@ layout: lesson
 title: Setting Up Thonny
 author: Kevin McAleer
 type: page
-cover: /learn/pico_temp_sensor/assets/cover.jpg
+cover: /learn/pico_temp_sensor/assets/banners/02_setting_up_thonny.jpg
 date: 2024-11-22
 previous: 01_course_introduction.html
 next: 03_installing_micropython_on_pico.html
@@ -50,6 +50,10 @@ navigation:
       link: 12_troubleshooting_temperature_readings.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

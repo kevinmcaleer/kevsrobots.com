@@ -3,7 +3,7 @@ layout: lesson
 title: Podman in Production
 author: Kevin McAleer
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/10_podman_in_production.jpg
 date: 2025-05-24
 previous: 09_podman_and_kubernetes.html
 next: 11_troubleshooting_and_debugging.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

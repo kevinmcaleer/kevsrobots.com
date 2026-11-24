@@ -2,6 +2,11 @@
 title: Demo program
 description: This is an example program highlighting some of the simple concepts covered in this course
 layout: lesson
+cover: /learn/sqlite3/assets/banners/16_demo_program.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 {% capture snakie_code %}

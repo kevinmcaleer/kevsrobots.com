@@ -3,7 +3,7 @@ layout: lesson
 title: Side Profile
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360/assets/smars_fusion360.png
+cover: /learn/smars_fusion360/assets/banners/08_side.jpg
 date: 2023-07-20
 previous: 07_cut.html
 next: 09_sidecut.html
@@ -58,6 +58,10 @@ navigation:
       link: 16_cut.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The profile for the side cutout is created next. This is an inverted trapezium shape, with three main dimensions:
 

@@ -3,7 +3,7 @@ layout: lesson
 title: Views and Indexes
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/13_views_and_indexes.jpg
 date: 2024-11-01
 previous: 12_subqueries_and_nested_queries.html
 next: 14_sql_functions_and_expressions.html
@@ -56,6 +56,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore **views** and **indexes**, two powerful tools that improve database usability and performance. Views allow you to simplify complex queries by saving them as virtual tables, while indexes optimize query speed by improving data retrieval efficiency.
 

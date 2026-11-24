@@ -2,10 +2,12 @@
 title: Web Scraping with Python
 description: Understand the basics of web scraping using Python, including the use of libraries like Beautiful Soup and requests.
 layout: lesson
-cover: /learn/python/assets/3.png
+cover: /learn/python/assets/banners/10_webscraping.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

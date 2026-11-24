@@ -3,7 +3,7 @@ layout: lesson
 title: Setting Up Your SQL Environment
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/02_setting_up_environment.jpg
 date: 2024-11-01
 previous: 01_introduction_to_sql.html
 next: 03_basic_sql_commands.html
@@ -55,6 +55,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll guide you through setting up a SQL environment on your computer, so you’re ready to start creating and managing databases.
 

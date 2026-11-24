@@ -3,7 +3,7 @@ layout: lesson
 title: Overview of Pydantic and Data Validation
 author: Kevin McAleer
 type: page
-cover: assets/pydantic.png
+cover: /learn/pydantic/assets/banners/01_overview_of_pydantic.jpg
 date: 2024-03-23
 next: 02_setting_up_your_development_environment.html
 description: Introduction to the fundamentals of Pydantic and the advantages of using
@@ -48,7 +48,9 @@ navigation:
 ---
 
 
-![Pydantic cover image]({{ page.cover }}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## What is Pydantic?
 

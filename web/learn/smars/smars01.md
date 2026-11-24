@@ -3,7 +3,7 @@ layout: lesson
 title: Print the Parts
 author: Kevin McAleer
 type: page
-cover: /learn/smars/assets/how_to_build_a_smars.jpg
+cover: /learn/smars/assets/banners/smars01.jpg
 date: 2023-02-19
 previous: 00_intro.html
 next: smars02.html
@@ -58,6 +58,10 @@ navigation:
       link: summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the video
 

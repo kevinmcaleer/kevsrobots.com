@@ -3,11 +3,11 @@ title: Podman in Production
 description: Learn how to use Podman in production environments, including rootless services, systemd integration, monitoring, and best practices.
 layout: lesson
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/10_podman_in_production.jpg
 date_updated: 2025-05-24
 ---
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

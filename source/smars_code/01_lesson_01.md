@@ -2,6 +2,11 @@
 title: Lesson 01 - Movement
 description: Learn how to move your robot
 layout: lesson
+cover: /learn/smars_code/assets/banners/01_lesson_01.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Watch the livestream

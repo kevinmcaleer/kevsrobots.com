@@ -3,6 +3,11 @@ title: Converting ADC Values to Temperature
 description: Learn how to convert raw ADC values from the temperature sensor into human-readable temperatures in degrees Celsius.
 layout: lesson
 type: page
+cover: /learn/pico_temp_sensor/assets/banners/06_reading_temperature_with_adc.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

@@ -2,6 +2,11 @@
 title: Add Motor Shield
 description: Add Motor Shield to the Arduino
 layout: lesson
+cover: /learn/smars/assets/banners/smars09.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Add Motor Shield

@@ -2,10 +2,12 @@
 title: Python Data Structures
 description: Discover the primary data structures in Python, including strings, lists, tuples, dictionaries, and sets.
 layout: lesson
-cover: /learn/python/assets/3.png
+cover: /learn/python/assets/banners/03_data_structures.jpg
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Introduction
 

@@ -3,11 +3,11 @@ title: Beyond Predefined Steps
 description: Why hardcoded robot routines fail in dynamic environments, and how trial-and-error learning offers a better path.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/01_beyond_predefined_steps.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

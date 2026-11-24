@@ -3,7 +3,7 @@ layout: lesson
 title: Wrap-up and Future Outlook
 author: Kevin McAleer
 type: page
-cover: assets/podman01.jpg
+cover: /learn/podman/assets/banners/13_wrap_up_and_future.jpg
 date: 2025-05-24
 previous: 12_migration_project.html
 description: "Review what you\u2019ve learned, explore how Podman fits into the future\
@@ -57,7 +57,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

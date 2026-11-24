@@ -3,7 +3,7 @@ layout: lesson
 title: Installing Podman
 author: Kevin McAleer
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/03_installing_podman.jpg
 date: 2025-05-24
 previous: 02_docker_vs_podman_architecture.html
 next: 04_cli_compatibility_and_commands.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

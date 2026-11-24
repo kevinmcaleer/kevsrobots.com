@@ -3,11 +3,11 @@ title: Looking Into the Future
 description: Discover why future rewards are worth less than immediate ones, and use discount factors and the Bellman equation to see the idea working in Python.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/06_looking_into_the_future.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

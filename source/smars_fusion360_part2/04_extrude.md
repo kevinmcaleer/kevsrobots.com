@@ -3,6 +3,11 @@ title: Motor nub extrude
 description: Stops the motor from moving
 layout: lesson
 redirect_from: /learn/smars_fusion360/20_extrude.html
+cover: /learn/smars_fusion360_part2/assets/banners/04_extrude.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 Using the [Motor nub profile](03_nub.html) created earlier, we extrude the Motor nub up by:

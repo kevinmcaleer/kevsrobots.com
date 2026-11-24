@@ -3,7 +3,7 @@ layout: lesson
 title: Managing Containers and Images
 author: Kevin McAleer
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/06_managing_containers_and_images.jpg
 date: 2025-05-24
 previous: 05_podman_unique_features.html
 next: 07_working_with_pods.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

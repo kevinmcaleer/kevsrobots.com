@@ -3,7 +3,7 @@ layout: lesson
 title: Installing the Software
 author: Kevin McAleer
 type: page
-cover: assets/software.png
+cover: /learn/scrawly_wally/assets/banners/06_software.jpg
 date: 2024-08-02
 previous: 05_setup_pi.html
 next: 07_control.html
@@ -46,6 +46,10 @@ navigation:
       link: 11_summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Installing the Software
 

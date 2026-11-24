@@ -3,7 +3,7 @@ layout: lesson
 title: Migration Project
 author: Kevin McAleer
 type: page
-cover: assets/podman03.jpg
+cover: /learn/podman/assets/banners/12_migration_project.jpg
 date: 2025-05-24
 previous: 11_troubleshooting_and_debugging.html
 next: 13_wrap_up_and_future.html
@@ -58,7 +58,7 @@ navigation:
 ---
 
 
-![Cover]({{page.cover}}){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

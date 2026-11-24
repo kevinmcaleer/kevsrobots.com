@@ -3,6 +3,11 @@ title: Wrap-up and Final Project
 description: >-
     Apply everything you've learned in this SQL course to a final project
 layout: lesson
+cover: /learn/sql/assets/banners/15_wrap_up_and_final_project.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 In this lesson, we’ll review the key topics covered in this course and introduce a final project that lets you apply everything you’ve learned to a real-world scenario.

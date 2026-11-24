@@ -3,7 +3,7 @@ layout: lesson
 title: Arduino Code
 author: Kevin McAleer
 type: page
-cover: /learn/smars/assets/how_to_build_a_smars.jpg
+cover: /learn/smars/assets/banners/smars13.jpg
 date: 2023-02-19
 previous: smars12.html
 next: summary.html
@@ -58,6 +58,10 @@ navigation:
       link: summary.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 Below is a sample program to control your SMARS with an additional Bluetooth serial module (such as an HC-05). The module is connected to the Arduino's serial pins, so anything you send from a Bluetooth terminal app on your phone arrives with `Serial.read()`.
 

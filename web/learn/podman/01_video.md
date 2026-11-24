@@ -3,14 +3,14 @@ layout: lesson
 title: 'Video: Podman vs Docker'
 author: Kevin McAleer
 type: video
-cover: /learn/podman/assets/cover.jpg
+cover: /learn/podman/assets/banners/01_video.jpg
 date: 2025-05-24
 previous: 01_intro_to_podman.html
 next: 02_docker_vs_podman_architecture.html
 description: Learn what Podman is, why it's a powerful alternative to Docker, and
   how it's changing the container landscape.
 percent: 14
-duration: 0
+duration: 1
 video_id: zwn2mXlYwis
 navigation:
 - name: From Docker to Podman
@@ -55,5 +55,10 @@ navigation:
     content:
     - name: Wrap-up and Future Outlook
       link: 13_wrap_up_and_future.html
+---
+
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 

@@ -3,7 +3,11 @@ title: Installing MicroPython on the Pico
 description: Learn how to install MicroPython on your Raspberry Pi Pico to enable programming and communication through Thonny.
 layout: lesson
 type: page
-cover: assets/micropython_install_cover.png
+cover: /learn/pico_temp_sensor/assets/banners/03_installing_micropython_on_pico.jpg
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ## Introduction

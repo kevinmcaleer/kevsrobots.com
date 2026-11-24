@@ -3,11 +3,11 @@ title: Mapping the Robot's World
 description: Turn continuous ultrasonic sensor readings into discrete states a Q-table can index — and understand the trade-offs in state-space size.
 layout: lesson
 type: page
-cover: assets/cover.jpg
+cover: /learn/reinforcement_learning/assets/banners/04_mapping_the_robots_world.jpg
 date_updated: 2026-06-13
 ---
 
-![Cover](assets/cover.jpg){:class="cover"}
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 

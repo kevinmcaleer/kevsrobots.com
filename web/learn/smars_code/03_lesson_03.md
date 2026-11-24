@@ -3,7 +3,7 @@ layout: lesson
 title: Lesson 03 - Ultrasonic distance sensor
 author: Kevin McAleer
 type: page
-cover: /learn/smars_code/assets/program_smars.png
+cover: /learn/smars_code/assets/banners/03_lesson_03.jpg
 date: 2023-09-10
 previous: 02_lesson_02.html
 next: 04_lesson_04.html
@@ -40,6 +40,10 @@ navigation:
       link: 07_lesson_07.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Watch the livestream
 

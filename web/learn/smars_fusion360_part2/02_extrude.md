@@ -3,7 +3,7 @@ layout: lesson
 title: Motor holder profile extruded
 author: Kevin McAleer
 type: page
-cover: /learn/smars_fusion360_part2/assets/cover.jpg
+cover: /learn/smars_fusion360_part2/assets/banners/02_extrude.jpg
 date: 2023-07-20
 previous: 01_motor.html
 next: 03_nub.html
@@ -65,6 +65,10 @@ navigation:
       link: 17_final.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 The [Motor holder profile](01_motor.html) is used to extrude up the motor holders.
 The dimensions are:

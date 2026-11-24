@@ -3,7 +3,7 @@ layout: lesson
 title: SQL Functions and Expressions
 author: Kevin McAleer
 type: page
-cover: /learn/sql/assets/cover.jpg
+cover: /learn/sql/assets/banners/14_sql_functions_and_expressions.jpg
 date: 2024-11-01
 previous: 13_views_and_indexes.html
 next: 15_wrap_up_and_final_project.html
@@ -56,6 +56,10 @@ navigation:
       link: 15_wrap_up_and_final_project.html
 ---
 
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 In this lesson, we’ll explore **SQL functions and expressions** that enhance your ability to manipulate, analyze, and transform data. SQL provides a variety of functions, including string, numeric, date, and aggregate functions, that make it easier to handle different types of data efficiently.
 
