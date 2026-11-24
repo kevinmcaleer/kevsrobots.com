@@ -27,7 +27,7 @@ The second piece of code is written in `MicroPython`:
 ## MicroPython
 
 ```python
-  print(“hello world)
+print("hello world")
 ```
 
 As you can see, the MicroPython code is simpler, easier to read, shorter and faster to write.

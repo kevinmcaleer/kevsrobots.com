@@ -76,6 +76,7 @@ Look at `patrol.py` again:
 ```python
 sense = Pin(29, Pin.IN)
 ```
+{: .no-snakie }
 
 Somebody has "wired a sensor to GP29". There's no GP29 pad to wire it to. The program runs without a single error message and the sensor never works. That's the second mistake, and it's a perfect job for a linter.
 
@@ -104,6 +105,7 @@ Then add a second check inside the `for` loop of `club_rules`, after the sleep c
                     source="clubkit",
                 ))
 ```
+{: .no-snakie }
 
 Three things are new:
 
@@ -133,6 +135,7 @@ It gets a squiggle. The linter is reading text, and a comment is text. That's a 
 
 The simplest cure is to cut each line off at the `#` before checking it. Add one line at the top of the loop and use `code` in place of `line` in both checks:
 
+<!-- code-check: skip -->
 ```python
     for number, line in enumerate(ctx.file.content.splitlines(), start=1):
         code = line.split("#")[0]
@@ -141,6 +144,7 @@ The simplest cure is to cut each line off at the `#` before checking it. Add one
         ...
         for match in PIN_USE.finditer(code):
 ```
+{: .no-snakie }
 
 The columns still line up, because we only chopped off the end of the line.
 

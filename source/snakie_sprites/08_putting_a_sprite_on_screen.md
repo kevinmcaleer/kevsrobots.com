@@ -35,6 +35,7 @@ Frames are numbered from 0, so your five are 0 to 4.
 ```python
 screen.blit(eye.frame(0), 40, 24)
 ```
+{: .no-snakie }
 
 That copies frame 0 so its top-left corner lands at x = 40, y = 24.
 

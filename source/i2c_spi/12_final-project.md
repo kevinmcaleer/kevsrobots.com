@@ -72,7 +72,7 @@ Raspberry Pi Pico:
 
 ### Connection Summary
 
-```python
+```text
 # Pico to BME280
 GP8  → SDA
 GP9  → SCL

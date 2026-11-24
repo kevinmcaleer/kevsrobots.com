@@ -38,6 +38,7 @@ It has four parts. Here they are, shortened.
 SNAKIE_POSES = { "rest": { "waist": 0, "shoulder": 0, "elbow": 0 }, ... }
 # --- snakie:poses:end ---
 ```
+{: .no-snakie }
 
 Leave those alone. Snakie rewrites them each time you export. Everything outside the markers is yours and is kept.
 
@@ -52,6 +53,7 @@ elbow_servo = PWM(Pin(2))
 elbow = Servo(elbow_servo, pin=2)
 SERVOS = (waist, shoulder, elbow)
 ```
+{: .no-snakie }
 
 This is why good joint names mattered back in lesson 2.
 

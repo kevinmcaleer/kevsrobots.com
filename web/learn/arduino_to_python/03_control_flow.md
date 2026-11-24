@@ -237,6 +237,7 @@ while True:  # Explicit infinite loop
     led.off()
     time.sleep(1)
 ```
+{: .no-snakie }
 
 `while True:` is the Python equivalent of Arduino's `loop()`. You'll use this pattern in almost every MicroPython program.
 
@@ -396,6 +397,7 @@ for i in range(10):
         continue  # Skip even numbers
     print(i)
 ```
+{: .no-snakie }
 
 ## Switch Statements: Python Doesn't Have Them!
 
