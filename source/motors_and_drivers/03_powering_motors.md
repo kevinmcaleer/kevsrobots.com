@@ -4,12 +4,14 @@ description: Choose batteries, split motor and logic power, share a common groun
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/03_powering_motors.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to power a Pico robot from two supplies joined by a common ground, and explain what a brownout is and how to prevent one.
 
 Most "my motor code is broken" problems turn out to be power problems. This lesson is short, but it will save you the most debugging time of the whole course.
 
@@ -17,12 +19,14 @@ Most "my motor code is broken" problems turn out to be power problems. This less
 
 Scout has two kinds of load. The Pico and sensors need a clean, steady 3.3 V. The motors need lots of current and make electrical noise. We give them separate supplies and join them at ground:
 
-```text
-USB (or regulated 5V) ---> Pico ---- GPIO signals ---> Driver logic
-                            |                              |
-                           GND ----------------------- GND (common ground)
-                                                           |
-4xAA battery pack  --------------------------------> Driver motor supply
+```mermaid
+flowchart LR
+    USB["USB or regulated 5V"] --> PICO["Raspberry Pi Pico"]
+    PICO -->|"GPIO signals"| DRV["Driver logic inputs"]
+    BAT["4xAA battery pack"] -->|"motor current"| SUP["Driver motor supply"]
+    PICO --- GND["Common ground"]
+    DRV --- GND
+    BAT --- GND
 ```
 
 The **common ground** is essential. Signals are voltages measured *relative to ground*, so if the Pico and the driver do not share a ground wire, the driver has no idea what a "1" from the Pico means. Wheels twitching randomly is the classic symptom.
@@ -81,10 +85,33 @@ While you learn, keep the Pico on USB. When Scout goes untethered, remember that
 
 ## Common Issues
 
-**Problem**: The motors twitch or the driver ignores the Pico.
-**Solution**: Connect a ground wire between the Pico and the driver.
-**Why**: Without a shared reference, the driver cannot read the Pico's signals.
+- **Problem**: The motors twitch or the driver ignores the Pico.
+- **Solution**: Connect a ground wire between the Pico and the driver.
+- **Why**: Without a shared reference, the driver cannot read the Pico's signals.
 
-**Problem**: The Pico resets when I start both motors at once.
-**Solution**: Use a separate battery for the motors, add a capacitor, and ramp the speed up.
-**Why**: The starting surge makes the supply voltage dip below what the Pico needs.
+- **Problem**: The Pico resets when I start both motors at once.
+- **Solution**: Use a separate battery for the motors, add a capacitor, and ramp the speed up.
+- **Why**: The starting surge makes the supply voltage dip below what the Pico needs.
+
+> **Teachers**: AA packs, either alkaline or rechargeable NiMH, are the safest choice for a classroom. Keep LiPo cells for older, supervised learners: charge them only with a proper LiPo charger, never unattended, and never use a puffy or dented cell. Take the batteries out at the end of every session so a loose wire cannot short them in a bag.
+
+## Check your understanding
+
+{% quiz %}
+? Why must the Pico and the motor driver share a ground?
+- [x] Signals are voltages measured relative to ground, so the driver needs the same reference
+- [ ] It makes the motors spin faster
+- [ ] It charges the battery
+> Without a common ground the driver cannot tell what a '1' from the Pico means, and the wheels twitch randomly.
+
+? Which driver loses about 2 V of the battery voltage as heat?
+- [ ] DRV8833
+- [x] L298N
+> The L298N has lossy bipolar outputs and drops roughly 2 V. The DRV8833 drops only a few tenths of a volt.
+
+? A fresh 4xAA alkaline pack gives about 6 V. Why not connect it straight to the Pico's VSYS?
+- [x] VSYS takes up to 5.5 V, so 6 V is too high
+- [ ] VSYS needs at least 9 V
+- [ ] Batteries cannot power a Pico
+> Use NiMH cells, or a small 5 V regulator module, between the pack and the Pico.
+{% endquiz %}

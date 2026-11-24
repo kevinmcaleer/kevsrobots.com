@@ -4,14 +4,16 @@ description: Turn a hobby servo into a geared wheel motor with pulse-width speed
 layout: lesson
 type: page
 cover: /learn/motors_and_drivers/assets/banners/12_continuous_rotation_servos.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-Here is a clever hybrid. Take a servo, remove its position sensor's travel stop, and what comes out is a **continuous rotation servo**. It has a gearbox, a built-in driver and a single signal wire, but instead of an angle, the pulse width sets *speed and direction*.
+By the end of this lesson you will be able to drive a continuous rotation servo with pulse width as speed and direction, and trim its stop point so the wheel is still.
+
+Here is a clever hybrid. Take a servo, remove its mechanical travel stop and its position feedback, and what comes out is a **continuous rotation servo**. It has a gearbox, a built-in driver and a single signal wire, but instead of an angle, the pulse width sets *speed and direction*.
 
 ## The meaning of the pulse
 
@@ -37,6 +39,15 @@ print(speed_to_pulse(0))      # 1500.0  stopped
 print(speed_to_pulse(100))    # 2000.0  full speed one way
 print(speed_to_pulse(-100))   # 1000.0  full speed the other way
 print(speed_to_pulse(40))     # 1700.0  gentle
+```
+
+Think of the pulse as a speed dial with a stop in the middle:
+
+```mermaid
+flowchart LR
+    A["Shorter than 1500 us"] --> B["Spins one way"]
+    C["About 1500 us"] --> D["Stopped"]
+    E["Longer than 1500 us"] --> F["Spins the other way"]
 ```
 
 ## A ContinuousServo class
@@ -125,10 +136,32 @@ Continuous servos are a great way to get a first robot rolling, but Scout uses D
 
 ## Common Issues
 
-**Problem**: The wheel never fully stops.
-**Solution**: Adjust `stop_us` by 10 us at a time, or use the trimmer on the servo.
-**Why**: The factory centre point is only approximately 1500 us.
+- **Problem**: The wheel never fully stops.
+- **Solution**: Adjust `stop_us` by 10 us at a time, or use the trimmer on the servo.
+- **Why**: The factory centre point is only approximately 1500 us.
 
-**Problem**: One wheel is faster than the other at the same speed.
-**Solution**: Use `span_us` to give the quicker one a smaller range.
-**Why**: Cheap servos vary in their gearing and electronics.
+- **Problem**: One wheel is faster than the other at the same speed.
+- **Solution**: Use `span_us` to give the quicker one a smaller range.
+- **Why**: Cheap servos vary in their gearing and electronics.
+
+## Check your understanding
+
+{% quiz %}
+? What does the pulse width control on a continuous rotation servo?
+- [x] Speed and direction
+- [ ] Angle
+- [ ] Power supply voltage
+> The same 50 Hz pulse now means speed: about 1500 us stops it, and either side spins it one way or the other.
+
+? The wheel creeps at speed 0. What do you adjust?
+- [x] stop_us
+- [ ] span_us
+- [ ] the pin number
+> The factory centre point is only roughly 1500 us. Nudge stop_us, or use the trimmer screw if it has one.
+
+? How many Pico pins does one continuous servo need compared with a DC motor on an L298N?
+- [x] One signal pin, versus two or three
+- [ ] Four
+- [ ] None
+> The built-in driver is the advantage, but plastic gears and a coarse speed range are the cost.
+{% endquiz %}
