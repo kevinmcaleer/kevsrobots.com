@@ -7,10 +7,12 @@ cover: /learn/arduino_to_python/assets/banners/08_serial_basics.jpg
 date: 2025-11-20
 previous: 07_timing.html
 next: 09_iot_project.html
-description: Learn how print() replaces Serial.print() and discover the power of MicroPython's
-  REPL for interactive debugging
+description: Learn how print() replaces Serial.print(), how to format output, and
+  how the REPL gives you interactive debugging on the board
 percent: 72
-duration: 9
+duration: 5
+quiz_total: 43
+date_updated: 2026-11-24
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:
@@ -53,231 +55,133 @@ navigation:
 
 ---
 
-## Serial Communication: Simpler in Python
+By the end of this lesson you will be able to use `print()` and f-strings for debugging, log CSV data, and use the REPL to test hardware live.
 
-Arduino requires you to initialize serial communication with `Serial.begin()`. MicroPython's `print()` function just works - no setup required. And the REPL (Read-Eval-Print Loop) gives you an interactive Python console on your microcontroller!
+## print() just works
 
-This is one area where MicroPython is dramatically simpler and more powerful than Arduino.
-
-## Serial Output: print() vs Serial.println()
+Arduino needs `Serial.begin(9600)` and then `Serial.print()` and `Serial.println()`. MicroPython sends `print()` output down the USB connection with no setup, and no baud rate to match. `print()` adds a newline by default.
 
 **Arduino C++:**
 ```cpp
-void setup() {
-    Serial.begin(9600);  // Must initialize serial
-}
-
+void setup() { Serial.begin(9600); }
 void loop() {
-    Serial.print("Temperature: ");
-    Serial.println(temperature);
+    Serial.print("Voltage: ");
+    Serial.print(voltage, 2);
+    Serial.println("V");
     delay(1000);
 }
 ```
 
 **MicroPython:**
-```python
-import time
-
-while True:
-    print(f"Temperature: {temperature}")
-    time.sleep(1)
-```
-{: .no-snakie }
-
-Key differences:
-- **No initialization needed** - `print()` just works
-- **No baud rate** - USB serial is always ready
-- **No `println` vs `print`** - `print()` adds newline by default
-- **F-strings** make formatting easier
-
-## Print vs Serial.print Comparison
-
-**Arduino C++:**
-```cpp
-int value = 42;
-float voltage = 3.3;
-String message = "Hello";
-
-Serial.print("Value: ");
-Serial.println(value);
-
-Serial.print("Voltage: ");
-Serial.print(voltage, 2);  // 2 decimal places
-Serial.println("V");
-
-Serial.print(message);
-Serial.print(" ");
-Serial.println("World");
-```
-
-**MicroPython:**
 
 {% capture snakie_code %}
-value = 42
-voltage = 3.3
-message = "Hello"
+import time
 
-print(f"Value: {value}")
-print(f"Voltage: {voltage:.2f}V")  # 2 decimal places
-print(f"{message} World")
-
-# Or combine everything
-print(f"Value: {value}, Voltage: {voltage:.2f}V, Message: {message} World")
+voltage = 3.287
+for _ in range(3):
+    print(f"Voltage: {voltage:.2f}V")   # two decimals, newline added
+    time.sleep(1)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="serial_basics_1.py" %}
 
-Python's f-strings are much cleaner!
-
-## Print Without Newline
-
-Sometimes you want to print without a newline:
-
-**Arduino C++:**
-```cpp
-Serial.print("Loading");
-for (int i = 0; i < 5; i++) {
-    Serial.print(".");
-    delay(1000);
-}
-Serial.println(" Done!");
-```
-
-**MicroPython:**
+To stay on one line, use `end=""`:
 
 {% capture snakie_code %}
 import time
 
-print("Loading", end="")  # No newline
+print("Loading", end="")
 for i in range(5):
-    print(".", end="")  # No newline
-    time.sleep(1)
-print(" Done!")  # With newline
+    print(".", end="")
+    time.sleep(0.5)
+print(" Done!")
 {% endcapture %}
 {% include snakie.html code=snakie_code name="serial_basics_2.py" %}
 
-Use the `end=""` parameter to suppress the newline.
+There is no `flush=True` option on a Pico, and you do not need one.
 
-## Printing Multiple Values
-
-**Arduino C++:**
-```cpp
-int x = 10, y = 20, z = 30;
-Serial.print("X: ");
-Serial.print(x);
-Serial.print(", Y: ");
-Serial.print(y);
-Serial.print(", Z: ");
-Serial.println(z);
-```
-
-**MicroPython:**
+## Formatting cheat sheet
 
 {% capture snakie_code %}
-x, y, z = 10, 20, 30
-
-# Method 1: F-string (best)
-print(f"X: {x}, Y: {y}, Z: {z}")
-
-# Method 2: Multiple arguments
-print("X:", x, ", Y:", y, ", Z:", z)
-
-# Method 3: Old-style formatting
-print("X: {}, Y: {}, Z: {}".format(x, y, z))
+value = 42
+voltage = 3.287
+print(f"{voltage:.3f}")     # 3.287  (3 decimals)
+print(f"{value:05d}")       # 00042  (padded to 5 digits)
+print(f"{value:08b}")       # 00101010  (binary)
+print(f"0x{value:02X}")     # 0x2A  (hex)
+print(f"{'left':<8}|{'right':>8}")   # left-aligned and right-aligned columns
 {% endcapture %}
 {% include snakie.html code=snakie_code name="serial_basics_3.py" %}
 
-## The REPL: Interactive Python
+## The REPL: type to your hardware
 
-Here's where MicroPython really shines. The REPL (Read-Eval-Print Loop) is an interactive Python prompt that runs **on your microcontroller**.
+The REPL is a Python prompt running on the board. You reach it through the Shell in Thonny, or with a serial terminal such as `screen` or PuTTY at 115200 baud (the baud rate is only used when you open a raw terminal like these).
 
-**How to access the REPL:**
-
-1. Connect your board via USB
-2. Open a serial terminal:
-   - **Thonny IDE** (easiest) - Tools → Options → Interpreter
-   - **PuTTY** (Windows) - Connect to COM port at 115200 baud
-   - **screen** (Mac/Linux) - `screen /dev/tty.usbmodem* 115200`
-
-You'll see the Python prompt:
-
-```
->>>
+```mermaid
+sequenceDiagram
+    participant You
+    participant Shell as Thonny Shell
+    participant Board as Pico running MicroPython
+    You->>Shell: led.on()
+    Shell->>Board: send line over USB
+    Board->>Board: run it now
+    Board-->>Shell: output or error
+    Shell-->>You: LED lights, prompt returns
 ```
 
-Now you can type Python commands and see instant results!
-
-**REPL Examples:**
+The prompt looks like `>>>`. Type these one line at a time:
 
 ```python
->>> print("Hello from MicroPython!")
-Hello from MicroPython!
-
 >>> 2 + 2
 4
-
 >>> from machine import Pin
->>> led = Pin(25, Pin.OUT)
+>>> led = Pin("LED", Pin.OUT)
 >>> led.on()
 >>> led.off()
-
->>> import time
->>> for i in range(5):
+>>> for i in range(3):
 ...     print(i)
-...     time.sleep(0.5)
 ...
 0
 1
 2
-3
-4
 ```
 
-**This is impossible in Arduino!** You can't interact with your code while it's running. The REPL is perfect for:
-- Testing pin numbers
-- Debugging sensor readings
-- Trying out code snippets
-- Learning MicroPython
+You cannot do this with Arduino C++, where changing anything means recompiling and uploading. The REPL is perfect for finding the right pin, checking what a sensor really returns, and trying a snippet before you put it in a file.
 
-## REPL Special Commands
+Useful keys:
 
-The REPL has special commands:
+- **Ctrl+C** stops the running program and returns to the prompt
+- **Ctrl+D** does a soft reset, which runs `boot.py` and `main.py` again
+- `help(Pin)` lists what an object can do, and `dir(Pin)` lists its names
 
-**Ctrl+C** - Stop running program, return to REPL prompt
-**Ctrl+D** - Soft reboot (restarts MicroPython, runs boot.py and main.py)
-**help()** - Show help information
-**help(object)** - Show help for specific object
+## Debug messages that help
 
+Labels turn a stream of numbers into something readable:
+
+**MicroPython:**
 ```python
->>> help()
-Welcome to MicroPython!
-...
+from machine import Pin, ADC
+import time
 
->>> from machine import Pin
->>> help(Pin)
-# Shows Pin documentation
+DEBUG = True     # set to False to silence the debug lines
+
+sensor = ADC(Pin(26))
+led = Pin("LED", Pin.OUT)
+
+def debug(message):
+    if DEBUG:
+        print(f"[DEBUG] {message}")
+
+while True:
+    raw = sensor.read_u16()
+    debug(f"raw = {raw}")
+    led.value(raw > 32768)
+    print(f"LED: {'ON' if led.value() else 'OFF'}")
+    time.sleep(1)
 ```
 
-## Debugging with Print Statements
+## Logging data as CSV
 
-**Arduino C++:**
-```cpp
-void loop() {
-    int sensorValue = analogRead(A0);
-
-    Serial.print("DEBUG: Raw value = ");
-    Serial.println(sensorValue);
-
-    if (sensorValue > 500) {
-        Serial.println("DEBUG: Value is high");
-        digitalWrite(LED_PIN, HIGH);
-    } else {
-        Serial.println("DEBUG: Value is low");
-        digitalWrite(LED_PIN, LOW);
-    }
-
-    delay(1000);
-}
-```
+Printing `timestamp,value` lines gives you data you can paste into a spreadsheet:
 
 **MicroPython:**
 ```python
@@ -285,384 +189,83 @@ from machine import Pin, ADC
 import time
 
 sensor = ADC(Pin(26))
-led = Pin(25, Pin.OUT)
+start = time.ticks_ms()
 
+print("ms,raw,volts")                       # header row
 while True:
-    sensor_value = sensor.read_u16()
-
-    print(f"DEBUG: Raw value = {sensor_value}")
-
-    if sensor_value > 32768:
-        print("DEBUG: Value is high")
-        led.on()
-    else:
-        print("DEBUG: Value is low")
-        led.off()
-
+    ms = time.ticks_diff(time.ticks_ms(), start)
+    raw = sensor.read_u16()
+    print(f"{ms},{raw},{raw / 65535 * 3.3:.3f}")
     time.sleep(1)
 ```
 
-**Pro tip:** Use descriptive debug messages:
+## Reading from the keyboard
 
-```python
-print(f"[SENSOR] Raw: {sensor_value}, Voltage: {voltage:.2f}V")
-print(f"[LED] State: {'ON' if led.value() else 'OFF'}")
-print(f"[ERROR] Sensor reading out of range: {sensor_value}")
-```
-
-## Formatted Output
-
-Python has powerful string formatting:
-
-**Arduino C++:**
-```cpp
-float voltage = 3.287;
-Serial.print("Voltage: ");
-Serial.print(voltage, 2);  // 2 decimals: 3.29
-Serial.println("V");
-```
-
-**MicroPython:**
-
-{% capture snakie_code %}
-voltage = 3.287
-
-# F-string with formatting
-print(f"Voltage: {voltage:.2f}V")  # 2 decimals: 3.29
-
-# More formatting examples
-print(f"Voltage: {voltage:.3f}V")   # 3 decimals: 3.287
-print(f"Voltage: {voltage:.1f}V")   # 1 decimal: 3.3
-print(f"Hex: 0x{42:02X}")           # Hex: 0x2A
-print(f"Binary: {42:08b}")          # Binary: 00101010
-print(f"Padded: {42:05d}")          # Padded: 00042
-{% endcapture %}
-{% include snakie.html code=snakie_code name="serial_basics_4.py" %}
-
-Format specification:
-- `:.2f` - Float with 2 decimal places
-- `:05d` - Integer padded to 5 digits
-- `:08b` - Binary with 8 digits
-- `:02X` - Hex with 2 digits (uppercase)
-
-## Reading Serial Input
-
-In Arduino, you read serial input with `Serial.read()`. In MicroPython, it's trickier because the REPL uses the serial port. You can use `sys.stdin.read()` but it's not commonly used in MicroPython projects.
-
-**Arduino C++:**
-```cpp
-void loop() {
-    if (Serial.available() > 0) {
-        char incoming = Serial.read();
-        Serial.print("Received: ");
-        Serial.println(incoming);
-    }
-}
-```
-
-**MicroPython (less common):**
-```python
-import sys
-import select
-
-poll = select.poll()
-poll.register(sys.stdin, select.POLLIN)
-
-while True:
-    events = poll.poll(0)  # Non-blocking
-    if events:
-        char = sys.stdin.read(1)
-        print(f"Received: {char}")
-```
-
-**Note:** For most MicroPython projects, you don't read from serial. Instead, you:
-1. Use the REPL interactively
-2. Control your program through WiFi/network
-3. Use buttons or sensors for input
-
-## Logging Sensor Data
-
-**Arduino C++:**
-```cpp
-void loop() {
-    int temp = readTemperature();
-    int humidity = readHumidity();
-
-    Serial.print(millis());
-    Serial.print(",");
-    Serial.print(temp);
-    Serial.print(",");
-    Serial.println(humidity);
-
-    delay(1000);
-}
-```
-
-**MicroPython:**
-```python
-import time
-
-def read_temperature():
-    # Your sensor code
-    return 25
-
-def read_humidity():
-    # Your sensor code
-    return 65
-
-while True:
-    temp = read_temperature()
-    humidity = read_humidity()
-    timestamp = time.ticks_ms()
-
-    # CSV format
-    print(f"{timestamp},{temp},{humidity}")
-
-    time.sleep(1)
-```
-
-This CSV output can be copied from the terminal and imported into Excel or Python for analysis.
-
-## Conditional Debug Messages
-
-Use a debug flag to toggle verbose output:
+`Serial.read()` has no direct partner, because the serial port is also the REPL. The simplest way to get a line of text from the Shell is `input()`:
 
 **MicroPython:**
 ```python
 from machine import Pin
-import time
 
-DEBUG = True  # Set to False to disable debug output
-
-led = Pin(25, Pin.OUT)
-
-def debug(message):
-    if DEBUG:
-        print(f"[DEBUG] {message}")
+led = Pin("LED", Pin.OUT)
 
 while True:
-    debug("Turning LED on")
-    led.on()
-    time.sleep(1)
-
-    debug("Turning LED off")
-    led.off()
-    time.sleep(1)
-```
-
-## Pretty Printing Data
-
-For complex data, use formatting to make it readable:
-
-**MicroPython:**
-```python
-from machine import Pin, ADC
-import time
-
-sensor1 = ADC(Pin(26))
-sensor2 = ADC(Pin(27))
-
-while True:
-    s1 = sensor1.read_u16()
-    s2 = sensor2.read_u16()
-    v1 = (s1 / 65535) * 3.3
-    v2 = (s2 / 65535) * 3.3
-
-    # Pretty formatted table
-    print("=" * 40)
-    print(f"{'Sensor':<10} {'Raw':>10} {'Voltage':>10}")
-    print("-" * 40)
-    print(f"{'Sensor 1':<10} {s1:>10} {v1:>9.2f}V")
-    print(f"{'Sensor 2':<10} {s2:>10} {v2:>9.2f}V")
-    print("=" * 40)
-
-    time.sleep(2)
-```
-
-Output:
-```
-========================================
-Sensor         Raw    Voltage
-----------------------------------------
-Sensor 1     32768      1.65V
-Sensor 2     45678      2.30V
-========================================
-```
-
-## Complete Example: Sensor Monitor
-
-**MicroPython:**
-```python
-from machine import Pin, ADC
-import time
-
-# Hardware setup
-temp_sensor = ADC(Pin(26))
-light_sensor = ADC(Pin(27))
-led = Pin(25, Pin.OUT)
-
-# Configuration
-TEMP_THRESHOLD = 30000
-LIGHT_THRESHOLD = 20000
-DEBUG = True
-
-def debug(message):
-    if DEBUG:
-        print(f"[DEBUG] {message}")
-
-def read_sensors():
-    temp_raw = temp_sensor.read_u16()
-    light_raw = light_sensor.read_u16()
-
-    temp_voltage = (temp_raw / 65535) * 3.3
-    light_voltage = (light_raw / 65535) * 3.3
-
-    return temp_raw, light_raw, temp_voltage, light_voltage
-
-def check_alerts(temp_raw, light_raw):
-    alert = False
-
-    if temp_raw > TEMP_THRESHOLD:
-        print("[ALERT] Temperature too high!")
-        alert = True
-
-    if light_raw < LIGHT_THRESHOLD:
-        print("[ALERT] Light level too low!")
-        alert = True
-
-    return alert
-
-while True:
-    debug("Reading sensors...")
-    temp_raw, light_raw, temp_v, light_v = read_sensors()
-
-    debug(f"Temperature: {temp_raw} ({temp_v:.2f}V)")
-    debug(f"Light: {light_raw} ({light_v:.2f}V)")
-
-    alert = check_alerts(temp_raw, light_raw)
-
-    if alert:
+    command = input("Type on or off: ")     # waits for Enter
+    if command == "on":
         led.on()
-    else:
+    elif command == "off":
         led.off()
-
-    # Summary output
-    print(f"T:{temp_v:.2f}V | L:{light_v:.2f}V | LED:{'ON' if led.value() else 'OFF'}")
-
-    time.sleep(1)
-```
-
-## Try It Yourself
-
-**Exercise 1: Interactive LED Control via REPL**
-
-Connect to the REPL and control an LED interactively:
-1. Import the Pin class
-2. Create an LED on pin 25
-3. Turn it on, wait, turn it off
-4. Try different timing patterns
-
-No code to write - just interact with the REPL!
-
-**Answer:**
-
-```python
-# In the REPL:
->>> from machine import Pin
->>> import time
->>> led = Pin(25, Pin.OUT)
->>> led.on()
->>> time.sleep(2)
->>> led.off()
->>> led.toggle()
->>> for i in range(5):
-...     led.toggle()
-...     time.sleep(0.5)
-...
-```
-
-**Exercise 2: Data Logger**
-
-Create a program that logs sensor data in CSV format:
-- Read an ADC sensor every second
-- Print: timestamp, raw value, voltage
-- Format as CSV (comma-separated)
-- Include a header row
-
-**Answer:**
-
-```python
-from machine import Pin, ADC
-import time
-
-sensor = ADC(Pin(26))
-
-# Print CSV header
-print("Timestamp(ms),Raw,Voltage(V)")
-
-start_time = time.ticks_ms()
-
-while True:
-    timestamp = time.ticks_diff(time.ticks_ms(), start_time)
-    raw = sensor.read_u16()
-    voltage = (raw / 65535) * 3.3
-
-    # CSV format
-    print(f"{timestamp},{raw},{voltage:.3f}")
-
-    time.sleep(1)
-```
-
-**Exercise 3: Formatted Sensor Dashboard**
-
-Create a continuously updating dashboard that displays:
-- Current time (seconds since boot)
-- Three sensor readings with labels
-- Status indicators (OK/WARNING/ALERT based on values)
-- Use clear formatting with borders
-
-Make it look professional!
-
-**Answer:**
-
-```python
-from machine import Pin, ADC
-import time
-
-sensor1 = ADC(Pin(26))
-sensor2 = ADC(Pin(27))
-sensor3 = ADC(Pin(28))
-
-def get_status(value, low, high):
-    if value < low:
-        return "ALERT  "
-    elif value > high:
-        return "WARNING"
     else:
-        return "OK     "
-
-start_time = time.ticks_ms()
-
-while True:
-    uptime = time.ticks_diff(time.ticks_ms(), start_time) / 1000
-
-    s1 = sensor1.read_u16()
-    s2 = sensor2.read_u16()
-    s3 = sensor3.read_u16()
-
-    # Clear screen (terminal escape code)
-    print("\033[2J\033[H", end="")
-
-    # Dashboard
-    print("=" * 50)
-    print(f"    SENSOR DASHBOARD - Uptime: {uptime:.1f}s")
-    print("=" * 50)
-    print(f"{'Sensor':<12} {'Value':>10} {'Status':>10}")
-    print("-" * 50)
-    print(f"{'Temperature':<12} {s1:>10} {get_status(s1, 20000, 40000):>10}")
-    print(f"{'Light':<12} {s2:>10} {get_status(s2, 15000, 50000):>10}")
-    print(f"{'Pressure':<12} {s3:>10} {get_status(s3, 25000, 45000):>10}")
-    print("=" * 50)
-
-    time.sleep(1)
+        print("I only know on and off")
 ```
+
+`input()` waits, so nothing else runs while it does. In real projects people more often use buttons, sensors or WiFi for input.
+
+## Try it Yourself
+
+1. In the REPL, create an LED on `"LED"` and turn it on and off by hand.
+2. Print the voltage from an ADC pin with a label and two decimal places once a second.
+3. Log CSV with a header row, then paste it into a spreadsheet and draw a chart.
+4. Challenge: print a neat two-line table showing the raw values of two ADC pins (GP26 and GP27) with aligned columns.
+
+## Common Issues
+
+- **Problem**: No output appears in the Shell.
+- **Solution**: Press Stop, check the interpreter shows MicroPython (Raspberry Pi Pico), and make sure your code calls `print()`.
+- **Why**: Thonny must be connected to the board's serial port to display output.
+
+- **Problem**: Thonny will not let you run a new program because the old one is still going.
+- **Solution**: Press Stop in Thonny, or Ctrl+C in a terminal.
+- **Why**: A `while True:` loop keeps the board busy until you interrupt it.
+
+- **Problem**: `TypeError: can't convert 'int' object to str implicitly`.
+- **Solution**: Use an f-string, or `str(value)`.
+- **Why**: Python will not join text and numbers with `+`.
+
+## Check your understanding
+
+{% quiz %}
+? What do you need to call before `print()` works in MicroPython?
+- [ ] `Serial.begin(115200)`
+- [x] Nothing: it works straight away
+- [ ] `print.begin()`
+> There is no setup step for `print()`.
+
+? What does Ctrl+C do at the REPL?
+- [ ] Copies text
+- [x] Stops the running program
+- [ ] Erases the board
+> It interrupts the program and returns you to the `>>>` prompt.
+
+? Which prints a float with 2 decimal places?
+- [ ] `print(f"{x:2}")`
+- [x] `print(f"{x:.2f}")`
+- [ ] `print(x, 2)`
+> `:.2f` means a float with two digits after the point.
+
+? What is the REPL good for?
+- [ ] Only for installing firmware
+- [x] Trying code and testing hardware live
+- [ ] Replacing `main.py`
+> You can type commands and see results immediately.
+{% endquiz %}

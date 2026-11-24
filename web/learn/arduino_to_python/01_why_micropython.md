@@ -7,10 +7,12 @@ cover: /learn/arduino_to_python/assets/banners/01_why_micropython.jpg
 date: 2025-11-20
 previous: 00_intro.html
 next: 02_syntax_basics.html
-description: Understand when to use MicroPython vs C++ for your microcontroller projects
-  and make the right choice for your needs
+description: Understand when to use MicroPython and when to stick with Arduino C++,
+  and meet the REPL, the biggest change to how you work
 percent: 16
-duration: 7
+duration: 5
+quiz_total: 43
+date_updated: 2026-11-24
 navigation:
 - name: Arduino to MicroPython - A Quick Start Guide
 - content:
@@ -53,81 +55,54 @@ navigation:
 
 ---
 
-## Why Learn MicroPython?
+By the end of this lesson you will be able to decide whether a project suits MicroPython or Arduino C++, and explain what the REPL is.
 
-If you're coming from Arduino's C++ world, you might wonder why you'd switch to MicroPython. The answer isn't "always use Python" - it's about picking the right tool for your project.
+## It is about the right tool
 
-MicroPython brings Python's simplicity to microcontrollers like the Arduino Nano ESP32, Raspberry Pi Pico W, and Pico 2W. You get rapid development, interactive debugging, and readable code without sacrificing too much performance.
+If you are coming from Arduino's C++ world, you might wonder why you would switch. The answer is not "always use Python". It is about picking the right tool for the project in front of you.
 
-## The Big Difference
+MicroPython is a lean version of Python 3 that runs directly on a microcontroller such as the Raspberry Pi Pico W. You get quick experiments, readable code and an interactive prompt, in exchange for some raw speed and memory.
 
-Here's the core philosophical shift:
+## The big difference: how you work
 
-**Arduino C++**: Compile code on your computer, upload binary to board, hope it works, repeat.
+With Arduino C++ the loop is: write, compile on your computer, upload a binary, watch it run, repeat. With MicroPython you copy a text file to the board (or just type into it) and it runs straight away.
 
-**MicroPython**: Upload code as text files, run instantly, test in real-time with REPL, fix bugs on the fly.
+```mermaid
+flowchart LR
+    subgraph Arduino C++
+    A1["Edit sketch"] --> A2["Compile"] --> A3["Upload binary"] --> A4["Run"]
+    end
+    subgraph MicroPython
+    M1["Edit or type code"] --> M2["Run immediately"]
+    end
+```
 
-That REPL (Read-Eval-Print Loop) is a game changer. You can type commands directly to your microcontroller and see instant results - like having a conversation with your hardware.
+The star of the show is the **REPL** (Read-Eval-Print Loop). It is a Python prompt running on the board itself. Type `1 + 1` and the board answers `2`. Type a line that turns on an LED and the LED turns on. It is like having a conversation with your hardware, and we use it throughout the course.
 
-## When to Use MicroPython
+## When MicroPython is a great fit
 
-**Choose MicroPython when:**
+- Prototyping, where fast iteration matters
+- Anything that needs WiFi and networking, such as a weather station or a web-controlled robot
+- Data handling, such as logging sensor readings or formatting text
+- Teaching and workshops, where readable code helps
+- Projects where you want to test hardware interactively before committing to code
 
-- You're prototyping and want fast iteration
-- You need to debug interactively (REPL is amazing)
-- You're building IoT devices with WiFi/networking
-- You want to process data or handle complex logic
-- You're teaching programming or building educational projects
-- Development speed matters more than peak performance
-- You're comfortable with Python syntax
+## When Arduino C++ still wins
 
-**Example perfect projects:**
-- WiFi weather station
-- Home automation controller
-- Sensor data logger
-- Web-controlled robot
-- Environmental monitor
+- Tight timing, such as microsecond-precise protocols or fast motor control loops
+- Very small memory budgets
+- Battery projects where you must squeeze out every milliamp of sleep current
+- Libraries that only exist for Arduino
+- Existing C++ code you want to build on
 
-## When to Stick with C++
+## Is MicroPython slow?
 
-**Choose Arduino C++ when:**
+Yes, it is slower than compiled C++. For most maker projects you will never notice, because a sensor read once a second spends almost all its time waiting. Blinking an LED, reading a temperature sensor and sending it over WiFi are all comfortable. You will feel the difference with tight loops, such as bit-banging a protocol or processing thousands of readings every second.
 
-- You need absolute maximum performance
-- You're working with time-critical operations (microsecond precision)
-- You need the smallest possible memory footprint
-- You're using specialized Arduino libraries not available in MicroPython
-- You're building battery-powered devices where every milliamp counts
-- You need to integrate with existing C++ codebases
-
-**Example perfect projects:**
-- High-speed motor control (PID loops)
-- Audio processing
-- LED matrix animations (tight timing)
-- Ultra-low-power battery devices
-
-## The Performance Trade-off
-
-Let's be honest: MicroPython is slower than C++. But here's the secret - for most projects, you won't notice.
-
-**Speed comparison:**
-- C++: Blink LED every 1ms? No problem.
-- MicroPython: Blink LED every 1ms? Also no problem (usually).
-
-**Where you'll notice the difference:**
-- Processing thousands of sensor readings per second
-- Bit-banging complex protocols
-- Mathematical operations in tight loops
-- Audio/video processing
-
-For reading a temperature sensor every second and sending it over WiFi? MicroPython wins on development time.
-
-## Code Comparison: First Impressions
-
-Let's see what the same simple program looks like:
+## Your first comparison
 
 **Arduino C++:**
 ```cpp
-// Blink built-in LED
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 }
@@ -142,11 +117,10 @@ void loop() {
 
 **MicroPython:**
 ```python
-# Blink built-in LED
 from machine import Pin
 import time
 
-led = Pin(25, Pin.OUT)  # Pin 25 on Pico
+led = Pin("LED", Pin.OUT)  # on-board LED on a Pico W or Pico 2 W
 
 while True:
     led.on()
@@ -155,138 +129,50 @@ while True:
     time.sleep(1)
 ```
 
-Notice:
-- No semicolons in Python
-- No `setup()` and `loop()` - just regular Python code
-- More readable function names (`led.on()` vs `digitalWrite`)
-- Simpler overall structure
+Notice there are no semicolons, no `setup()` and `loop()`, and the pin is an object with `.on()` and `.off()` methods instead of a number passed to a global function.
 
-## Hardware Compatibility
+## What about CircuitPython?
 
-This course focuses on three excellent MicroPython-compatible boards:
+CircuitPython is a friendly fork of MicroPython from Adafruit. The board appears as a USB drive, you edit `code.py` and it reruns every time you save. It has its own libraries (`board`, `digitalio`) instead of `machine`. The two are similar enough that what you learn transfers, but code is not always portable. This course teaches MicroPython, which is what Thonny and the Pico documentation use.
 
-**Arduino Nano ESP32**
-- Dual-core ESP32-S3 processor
-- Built-in WiFi and Bluetooth
-- Familiar Arduino form factor
-- Perfect for IoT projects
+## Which board?
 
-**Raspberry Pi Pico W**
-- RP2040 processor with WiFi
-- Ultra-affordable (around $6)
-- Massive community support
-- Great for learning
+The examples target the Raspberry Pi Pico W and Pico 2 W, because they are cheap and well documented. Any board with MicroPython firmware works, but pin numbers and the on-board LED differ. The Arduino Nano ESP32 also runs MicroPython; look up its pin names in Arduino's documentation rather than assuming they match Arduino sketches.
 
-**Raspberry Pi Pico 2W**
-- Faster RP2350 processor with WiFi
-- More memory and features
-- Backwards compatible with Pico W
-- Future-proof choice
+## Try it Yourself
 
-All three run MicroPython beautifully and share similar APIs.
+1. Pick a project you have built with Arduino. Write down whether it needs WiFi, microsecond timing or very low power. Which language would you choose, and why?
+2. If you have a board with MicroPython installed, connect it in Thonny, and in the Shell type `print("Hello from MicroPython!")`, then `1 + 1`.
+3. Challenge: in the Shell, type `from machine import Pin`, then `led = Pin("LED", Pin.OUT)`, then `led.on()`. You have just controlled hardware without any upload step.
 
-> ## What About CircuitPython?
->
-> You might have heard of **CircuitPython** - another Python implementation for microcontrollers. Here's what you need to know:
->
-> ### What is CircuitPython?
-> - A beginner-friendly fork of MicroPython created by Adafruit
-> - Designed specifically for education and maker projects
-> - Focuses on simplicity and ease of use over raw performance
->
-> **Key Differences:**
-> - **File system**: CircuitPython shows up as a USB drive (drag-and-drop code!)
-> - **File names**: Uses `code.py` instead of `main.py`
-> - **Libraries**: Pre-installed libraries for Adafruit hardware
-> - **Development**: Optimized for beginners, simpler workflow
-> - **Hardware**: Best support for Adafruit boards, good on Pico too
->
-> **Pros of CircuitPython:**
-> - ✅ Easier for absolute beginners (drag-and-drop files)
-> - ✅ Excellent hardware abstraction
-> - ✅ Great documentation and community support
-> - ✅ Pre-built libraries for common sensors
->
-> **Cons of CircuitPython:**
-> - ❌ Slower than MicroPython (prioritizes ease over speed)
-> - ❌ Larger memory footprint
-> - ❌ Less flexible for advanced use cases
-> - ❌ Smaller device support (focused on specific boards)
->
-> **Which Should You Learn?**
-> - **MicroPython**: More versatile, works on more boards, better performance
-> - **CircuitPython**: Easier onboarding, better for teaching kids, excellent for Adafruit hardware
->
-> The good news: they're ~95% compatible. Learn one, and you mostly know the other!
->
-> This course focuses on **MicroPython** because it works on Arduino Nano ESP32, all Raspberry Pi Pico variants, and gives you more flexibility. But everything you learn applies to CircuitPython too!
+## Common Issues
 
-## Decision Guide
+- **Problem**: Thonny shows no `>>>` prompt in the Shell.
+- **Solution**: Choose the interpreter at the bottom right of Thonny (MicroPython (Raspberry Pi Pico)), press the Stop button once, or unplug and replug the board.
+- **Why**: Thonny talks to the board over USB serial, and it needs to interrupt whatever program is running to reach the prompt.
 
-Ask yourself these questions:
+- **Problem**: `ImportError: no module named 'machine'` appears.
+- **Solution**: You are running the code on your computer's Python, not the board. Switch the interpreter to MicroPython.
+- **Why**: The `machine` module only exists in MicroPython firmware.
 
-**1. Do I need to finish this project quickly?**
-- Yes → MicroPython (faster development)
-- No → Either works
+## Check your understanding
 
-**2. Will I need to debug complex behavior?**
-- Yes → MicroPython (REPL makes debugging easier)
-- No → Either works
+{% quiz %}
+? What does REPL stand for, and what is it?
+- [ ] Run, Execute, Process, Load: a type of compiler
+- [x] Read-Eval-Print Loop: an interactive prompt running on the board
+- [ ] Remote Embedded Programming Link: a programming cable
+> The REPL lets you type Python and see the board's answer instantly, with no compile or upload step.
 
-**3. Am I doing time-critical operations under 1ms?**
-- Yes → C++ (better timing precision)
-- No → Either works
+? Which project is the best fit for MicroPython?
+- [ ] A motor control loop that needs microsecond timing
+- [x] A WiFi weather station that logs a reading every minute
+- [ ] A battery device that must sleep for months
+> Network-connected data projects with relaxed timing suit MicroPython, while tight timing and ultra-low power favour C++.
 
-**4. Will this run on battery for months?**
-- Yes → C++ (lower power consumption)
-- No → Either works
-
-**5. Am I more comfortable with Python or C++?**
-- Python → MicroPython (stick with what you know)
-- C++ → C++ or try MicroPython (learning curve is gentle)
-
-## What You'll Learn in This Course
-
-This course will teach you:
-
-- How Python syntax differs from C++ (no semicolons, indentation matters)
-- Converting Arduino code patterns to MicroPython
-- Pin control, analog reading, PWM in Python
-- Timing and delays (seconds vs milliseconds - important!)
-- Serial communication and debugging with REPL
-- Building an IoT temperature monitor project
-- Building a simple robot control project
-
-By the end, you'll be able to translate any Arduino project into MicroPython and know when each approach is best.
-
-## Try It Yourself
-
-**Exercise 1: Evaluate Your Next Project**
-
-Think of a project you want to build. Answer these questions:
-- Does it need WiFi or networking?
-- Will you need to debug complex behavior?
-- Does it need microsecond-level timing?
-- Are you more comfortable in Python or C++?
-
-Based on your answers, which language would you choose?
-
-**Exercise 2: Explore the REPL**
-
-If you have a Pico, Pico 2W, or Nano ESP32 with MicroPython installed:
-1. Connect via USB
-2. Open a serial terminal (Thonny, PuTTY, or screen)
-3. Type `print("Hello from MicroPython!")` and press Enter
-4. Try `1 + 1` and see the instant result
-
-This is the REPL in action - something you can't do with Arduino C++!
-
-**Exercise 3: Compare Code**
-
-Look at an Arduino sketch you've written before. Identify:
-- Where are the semicolons?
-- Where are the curly braces `{}`?
-- What does `setup()` do? What does `loop()` do?
-
-In the next lessons, you'll learn how to convert each of these to MicroPython.
-
+? What is the main trade-off of MicroPython compared with C++?
+- [ ] It cannot control pins
+- [x] It is slower and uses more memory
+- [ ] It needs a compiler on your computer
+> MicroPython trades some speed and memory for faster development and readable code.
+{% endquiz %}
