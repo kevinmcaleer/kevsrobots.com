@@ -1395,14 +1395,14 @@
     "author": "Kevin McAleer",
     "date_published": "2024-04-17",
     "groups": [
-      "freecad",
-      "3d modeling"
+      "3ddesign",
+      "3dprinting"
     ],
     "lessons": [
       {
-        "file": "01_introduction_to_freecad.md",
+        "file": "00_intro.md",
         "section": "Getting Started with FreeCAD",
-        "url": "/learn/freecad/01_introduction_to_freecad.html"
+        "url": "/learn/freecad/00_intro.html"
       },
       {
         "file": "02_installing_freecad.md",

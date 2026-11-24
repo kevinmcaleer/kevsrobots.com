@@ -287,13 +287,13 @@
     modeling with this powerful, open-source tool. From basic shapes to more complex
     designs, learn the fundamentals of CAD software and how to apply them in your
     own projects.
-  duration: 0h 22m
+  duration: 0h 43m
   groups:
-  - freecad
-  - 3d modeling
+  - 3ddesign
+  - 3dprinting
   lessons: 11
   level: beginner
-  link: /learn/freecad/01_introduction_to_freecad.html
+  link: /learn/freecad/00_intro.html
   name: Introduction to FreeCAD for Beginners
 - author: Kevin McAleer
   cover: /learn/freecad_smars/assets/cover.jpg
