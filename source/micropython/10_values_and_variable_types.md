@@ -1,124 +1,156 @@
 ---
 title: Values & Variables Types
-description: NUMBERS, TEXT, LISTS AND DICTIONARIES
+description: Numbers, text, lists and dictionaries
 layout: lesson
+type: page
+date_updated: 2026-11-24
 ---
 
-![Cover photo of a yellow typewritter](assets/types.jpg){:class="cover"}
-
-## Data Types
-
-Programs often need to work with numbers and text, adding and subtracting, asking questions and processing answers.
-
-MicroPython is able to label different types of values so that it can make different commands available to us.
-
-The different types of values are listed below:
-
-{:.caption}
-List of MicroPython data types
-
-| **Text type:** | `str`
-| **Numeric types:** | `int`, `float`, `complex`|
-| **Lists and sequences:** | `list`, `tuple` |
-| **Dictionaries (mapping of key-value pairs)** | `dict` |
-| **Set types:** | `set`, `frozenset` |
-| **True/False (Boolean) type:** | `bool`|
-| **Binary types:** | `bytes`, `bytearray`, `memoryview` |
-| **None type:** | `NoneType`|
-{:class="table w-auto table-bordered"}
+![Cover photo of a yellow typewriter](assets/types.jpg){:class="cover"}
 
 ---
 
-{:.caption}
-List of common MicroPython data types with examples
+By the end of this lesson you will be able to name the main types of value in MicroPython, check a value's type with `type()`, and convert between types.
 
-| Value Types | Description                                                        | Example                                                |
-|:------------|:-------------------------------------------------------------------|--------------------------------------------------------|
-| `int`       | A whole number, which can be positive or negative                  | `1`, `2`, `3`, `4`, `-500`, `1000`                     |
-| `float`     | A decimal number, which can be positive or negative                | `3.14`, `-2.5`, `1.66666`                              |
-| `str`       | A line of text                                                     | `'hello world'`, `'my name is Kevin'`                  |
-| `list`      | A collection of words or numbers, or objects, (with no duplicates) | `[‘cat’,’dog’,’fish’,’gecko’],` or `[1,2,3,5,8,13,21]` |
-| `dict`      | A dictionary - a list, with pairs of values                        | `{‘name’:’Kevin’, ‘address’:’UK’, ‘age’:45}`          |
-| `tuple`     | A collection of ordered items, can have duplicates                 | `("fish",1,2,3,)`                                      |
-| `object`    | An instance of a class (we’ll cover this in a later session)       | Object of `'Cat()'` Class                                |
-| `byte`      | A single 8 bit byte, which is a value between 0 and 255            | `255`, `'0xFF'`, `'0b11111111'`                        |
-{:class="table-w100 table table-bordered"}
+## Data types
 
-**Note** The more complex data types have been excluded from this list. We'll look at them in more detail in later modules.
+Programs work with numbers and text, adding and subtracting, asking questions and processing answers. MicroPython labels each value with a **type** so it knows what you are allowed to do with it. You can add two numbers, but you can't add a number to a name.
 
----
+Here are the types you'll use most, with robot examples:
 
-When we assign a value to a variable, it is said to have the a *type*.
-e.g.
+| Type | What it holds | Example |
+|:-----|:--------------|:--------|
+| `int` | A whole number, positive or negative | `60`, `-5` |
+| `float` | A number with a decimal point | `3.14`, `-2.5` |
+| `str` | Text, wrapped in quotes | `'Bolt'`, `"hello"` |
+| `bool` | `True` or `False` | `True` |
+| `list` | An ordered collection you can change | `["left", "centre", "right"]` |
+| `tuple` | An ordered collection you can't change | `(10, 20)` |
+| `dict` | A dictionary of key and value pairs | `{"name": "Bolt", "speed": 60}` |
+{:class="table table-single"}
+
+There are more types, such as sets and bytes, which we'll meet in later courses.
+
+When we assign a value to a variable, the variable takes the value's type. Let's see them all with `type()`:
 
 ```python
-a = 1
-b = 2.1
-c = "hello"
+speed = 60
+distance = 12.5
+robot_name = "Bolt"
+moving = True
+sensors = ["left", "centre", "right"]
+position = (10, 20)
+settings = {"name": "Bolt", "speed": 60}
+
+for value in (speed, distance, robot_name, moving, sensors, position, settings):
+    print(value, type(value))
 ```
 
-In this example `a` contains the value `1` and is of type `integer`, `b` contains the value `2.1` and is of type `float` (because it has a decimal point), and `c` contains `hello` and is of type `string` because it contains a text wrapped inside some speech marks.
+(That `for` loop repeats the print for each value. Loops are in lesson 13.) The shell prints something like `60 <class 'int'>`.
 
----
+## Getting at values
+
+A list uses a position number, which starts at `0`. A dictionary uses a key:
+
+```python
+sensors = ["left", "centre", "right"]
+settings = {"name": "Bolt", "speed": 60}
+
+print(sensors[0])
+print(settings["name"])
+
+sensors.append("rear")
+settings["speed"] = 80
+print(sensors, settings)
+```
+
+## Changing type
+
+Sometimes we need a different type, for example when `input()` gives us text. This is called `casting`:
+
+```python
+text = "42"
+number = int(text)
+half = number / 2
+print(number + 1, half, str(number) + " cm")
+```
+
+Notice `/` always gives a `float` (`21.0`). Use `int()` to change type, `float()` for decimals and `str()` for text.
 
 > ## Implied Types
 >
-> In other languages, such as `C/C++` you will need to tell the compiler what kind of datatype a variable
-> is before it is used.
-> This is known as a `strongly typed` language; it helps the compiler allocate the correct amount of
-> memory for the variable before it is used.
->
-> ##### C++ Example
+> In languages such as `C/C++` you must tell the compiler the type of a variable before you use it:
 >
 > ```c++
-> int a;   // tells the compiler that 'a' is an integer
-> float b; // tells the compiler that 'b' is a floating point number 
+> int a;
+> float b;
 > a = 1;
 > b = 2.3;
 > ```
 >
-> ---
->
-> In `Python` and `MicroPython` you do not need to assign a type to a variable, Python is smart enough to
-> figure this out by the value being assigned to it. This is known as `weakly typed` language.
-> The trade off is that Python looks cleaner to read and doesn't need data types to be assigned before
-> they're used, however this can lead to confusion if another type of value is expected or assigned to a
-> variable of a differnet type.
->
-> ##### MicroPython Example
+> In `MicroPython` you don't. It works the type out from the value you assign, which is called `dynamic typing`:
 >
 > ```python
-> a = 1   # python knows that 1 is an integer value so 'a' becomes an 'int' type
-> b = 2.3 # python knows that 2.3 is a floating point value so 'b' becomes a 'float' type
+> a = 1
+> b = 2.3
 > ```
->
-
----
-
-> ## George Boole the Father of Boolean Logic
->
-> English mathematician and logician [George Boole](https://en.wikipedia.org/wiki/George_Boole) was the author of `The Laws of Thought` *(1854)*
-> which documents the *algebra of logic*. He founded the idea that logic can be expressed in a series
-> of symbols that show an output of `True` or `False` given a set of inputs. These can be expressed as
-> `Truth Tables`, and is now commonly called `Boolean Logic`, which is what all modern computing is
-> based upon.
->
-> ---
-> 
-> ##### Example Truth Table
->
-> **'AND' Logic**
->
-> | input a | input b | output x |
-> |:--:|:--:|:--:|
-> |False|False|False|
-> |`True`|False|False|
-> |`True`|`True`|`True`|
-> {:class="table w-auto table-bordered"}
-> 
-> An `AND` logic gate has two inputs; `a` and `b` and one output `x`. The table shows each of the possible state the inputs and the outputs can be in. With `AND` gates both inputs need to be `True` for the output to be `True`. This is used a lot in graphics processing too.
->
-> We will look at logic operators in MicroPython in [the Operators lesson](14_operators).
 {:.bg-blue}
 
----
+The flip side is that a variable can later be given a value of a different type, which can lead to surprises if you forget.
+
+## George Boole and the bool
+
+English mathematician [George Boole](https://en.wikipedia.org/wiki/George_Boole) wrote `The Laws of Thought` (1854), showing that logic can be expressed in symbols with an output of `True` or `False`. It is now called `Boolean logic`, and all modern computing is based on it. This is the truth table for `and`, where both inputs must be `True` for the output to be `True`:
+
+| input a | input b | output |
+|:--:|:--:|:--:|
+| `False` | `False` | `False` |
+| `True` | `False` | `False` |
+| `False` | `True` | `False` |
+| `True` | `True` | `True` |
+{:class="table table-single"}
+
+We'll use this in the [Operators lesson](14_operators.html).
+
+## Try it Yourself
+
+1. Create one variable of each type in the table, and print its `type()`.
+2. Make a list of three sensor names, then add a fourth with `append()` and print the list.
+3. Make a dictionary for a robot with a name and a speed. Change the speed and print it.
+4. Challenge: ask for a number with `input()`, convert it, and print half of it.
+
+## Common Issues
+
+- **Problem**: `TypeError: unsupported types for __add__: 'int', 'str'`.
+- **Solution**: Convert one side so both match, such as `str(number) + " cm"`.
+- **Why**: You can't add a number to text, so one has to change type first.
+
+- **Problem**: `IndexError: list index out of range`.
+- **Solution**: Remember positions start at 0, so a list of three has positions 0, 1 and 2.
+- **Why**: You asked for a position that doesn't exist.
+
+- **Problem**: `TypeError: 'tuple' object doesn't support item assignment`.
+- **Solution**: Use a list if you need to change items.
+- **Why**: Tuples can't be changed after they are created.
+
+## Check your understanding
+
+{% quiz %}
+? What type is the value `2.5`?
+- [ ] `int`
+- [x] `float`
+- [ ] `str`
+> A number with a decimal point is a `float`.
+
+? How do you get the first item of a list called `sensors`?
+- [ ] `sensors[1]`
+- [x] `sensors[0]`
+- [ ] `sensors.first`
+> List positions start at 0.
+
+? What will `type(True)` show?
+- [ ] `<class 'int'>`
+- [x] `<class 'bool'>`
+- [ ] `<class 'str'>`
+> `True` and `False` are booleans.
+{% endquiz %}

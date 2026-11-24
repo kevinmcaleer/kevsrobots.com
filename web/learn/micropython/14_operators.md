@@ -7,9 +7,11 @@ cover: /learn/micropython/assets/micropython.jpg
 date: 2022-12-04
 previous: 13_loops.html
 next: 15_functions.html
-description: Comparitive operators
+description: Arithmetic, comparison, assignment and logical operators
 percent: 80
-duration: 7
+duration: 6
+quiz_total: 57
+date_updated: 2026-11-24
 navigation:
 - name: Learn MicroPython - The basics
 - content:
@@ -70,144 +72,176 @@ navigation:
 
 ![Cover photo of a telephone operator from the 1920s](assets/operators.jpg){:class="cover"}
 
-## Operators
-
 ---
 
-Operators are the symbols such as `+` and `-`.
+By the end of this lesson you will be able to use arithmetic, comparison, assignment and logical operators to make a robot calculate and decide.
 
-There are **many** types of operators, and we use them to do things like add numbers together, compare numbers and variables, and do some more advanced things that python is good at, like managing `sets`. We'll look at those in later tutorials.
+Operators are symbols such as `+` and `-` that do something with values. There are several families of them. Don't worry about memorising them, you'll pick them up as you use them, and you probably know a few already.
 
-Here is a list of all the operators available. Don't worry if this is overwhelming, you don't need to know many, and you probably already know a few of the [arithmetic ones](#arithmetic-operators).
+## Arithmetic operators
 
-Have a look through these, but don't worry, there isn't a test!
+In these examples `a = 10` and `b = 3`.
 
----
+| Operator | Symbol | Example | Result |
+|---|:--:|---|---|
+| Addition | `+` | `a + b` | `13` |
+| Subtraction | `-` | `a - b` | `7` |
+| Multiplication | `*` | `a * b` | `30` |
+| Division | `/` | `a / b` | `3.3333...` (always a `float`) |
+| Floor division | `//` | `a // b` | `3` (the whole number part) |
+| Modulus | `%` | `a % b` | `1` (the remainder) |
+| Exponent | `**` | `a ** b` | `1000` (10 to the power 3) |
+{:class="table table-single"}
 
-Here are the shortcut links to each of the types of Operators defined below:
+Here they are working for a robot that drives wheels at different speeds:
 
-[Arithmetic Operators](#arithmetic-operators){:.btn.btn-primary.my-3}
-[Comparison (Relational) Operators](#comparison-operators){:.btn.btn-primary.my-3}
-[Assignment Operators](#assignment-operators){:.btn.btn-primary.my-3}
-[Logical Operators](#logical-operators){:.btn.btn-primary.my-3}
-[Bitwise Operators](#bitwise-operators){:.btn.btn-primary.my-3}
-[Membership Operators](#membership-operators){:.btn.btn-primary.my-3}
-[Identity Operators](#identity-operators){:.btn.btn-primary.my-3}
+{% capture snakie_code %}
+left_speed = 50
+right_speed = 30
 
----
+total = left_speed + right_speed
+average = total / 2
+difference = left_speed - right_speed
+print('total', total, 'average', average, 'difference', difference)
 
-## Arithmetic Operators
+# which of 4 sensors comes next, wrapping back to 0?
+sensor = 3
+next_sensor = (sensor + 1) % 4
+print('next sensor is', next_sensor)
+{% endcapture %}
+{% include snakie.html code=snakie_code name="operators_1.py" %}
 
-In the examples below `a` = `10`, `b` = `20`.
+The `%` modulus operator is handy for "wrap around" logic, like cycling through four sensors, or doing something every 10th time.
 
-Table of MicroPython Arithmetic Operators
-{:.caption}
+## Comparison operators
 
-| Operator       | Symbol | Description                                                                                                                                                                                                                                                 | Example                                                           |
-|----------------|:------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
-| Addition       |  `+`   | Adds values on either side of the operator.                                                                                                                                                                                                                 | `a + b = 30`                                                      |
-| Subtraction    |  `-`   | Subtracts right hand operand from left hand operand.                                                                                                                                                                                                        | `a – b = -10`                                                     |
-| Multiplication |  `*`   | Multiplies values on either side of the operator                                                                                                                                                                                                            | `a * b = 200`                                                     |
-| Division       |  `/`   | Divides left hand operand by right hand operand                                                                                                                                                                                                             | `b / a = 2.0`                                                     |
-| Modulus        |  `%`   | Divides left hand operand by right hand operand and returns remainder                                                                                                                                                                                       | `b % a = 0`                                                       |
-| Exponent       |  `**`  | Performs exponential (power) calculation on operators                                                                                                                                                                                                       | `a**b =10` to the power 20                                        |
-| Floor          |  `//`  | Floor Division - The division of operands where the result is the quotient in which the digits after the decimal point are removed. But if one of the operands is negative, the result is floored, i.e., rounded away from zero (towards negative infinity) | `9//2 = 4` and `9.0//2.0 = 4.0`, `-11//3 = -4`, `-11.0//3 = -4.0` |
-{:class="table-w100 table table-bordered"}
+Comparison operators compare two values and give `True` or `False`. We met some in the `if` lesson.
 
----
+| Operator | Symbol | Example with `a = 10`, `b = 20` | Result |
+|---|:--:|---|---|
+| Equal | `==` | `a == b` | `False` |
+| Not equal | `!=` | `a != b` | `True` |
+| Greater than | `>` | `a > b` | `False` |
+| Less than | `<` | `a < b` | `True` |
+| Greater or equal | `>=` | `a >= b` | `False` |
+| Less or equal | `<=` | `a <= b` | `True` |
+{:class="table table-single"}
 
-## Comparison Operators
+## Assignment operators
 
-Table of MicroPython Comparitive Operators
-{:.caption}
+`=` assigns a value. The others are shortcuts that change a variable using its own value:
 
-| Operator              | Symbol | Description                                                                                                       | Example                                               |
-|-----------------------|:------:|-------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
-| Equals                |  `==`  | If the values of two operands are equal, then the condition becomes true.                                         | `(a == b)` is not true.                               |
-| Not Equal             |  `!=`  | If values of two operands are not equal, then condition becomes true.                                             | `(a != b)` is true.                                   |
-| Not Equal             |  `<>`  | If values of two operands are not equal, then condition becomes true.                                             | `(a <> b)` is true. This is similar to `!=` operator. |
-| Greater than          |  `>`   | If the value of left operand is greater than the value of right operand, then condition becomes true.             | `(a > b)` is not true.                                |
-| Less than             |  `<`   | If the value of left operand is less than the value of right operand, then condition becomes true.                | `(a < b)` is true.                                    |
-| Greater or Equal to   |  `>=`  | If the value of left operand is greater than or equal to the value of right operand, then condition becomes true. | `(a >= b)` is not true.                               |
-| Less than or Equal to |  `<=`  | If the value of left operand is less than or equal to the value of right operand, then condition becomes true.    | `(a <= b)` is true.                                   |
-{:class="table-w100 table table-bordered"}
+| Operator | Example | Same as |
+|:--:|---|---|
+| `=` | `a = 10` | puts `10` in `a` |
+| `+=` | `a += 5` | `a = a + 5` |
+| `-=` | `a -= 5` | `a = a - 5` |
+| `*=` | `a *= 2` | `a = a * 2` |
+| `/=` | `a /= 2` | `a = a / 2` |
+| `%=` | `a %= 3` | `a = a % 3` |
+| `//=` | `a //= 3` | `a = a // 3` |
+| `**=` | `a **= 2` | `a = a ** 2` |
+{:class="table table-single"}
 
----
+```python
+speed = 40
+speed += 10     # speed is now 50
+speed *= 2      # speed is now 100
+print(speed)
+```
 
-## Assignment Operators
+## Logical operators
 
-Table of MicroPython Assignment Operators
-{:.caption}
+Logical operators join conditions together, using the Boolean logic from lesson 10:
 
-| Operator       | Symbol | Description                                                                                | Example                                 |
-|----------------|:------:|--------------------------------------------------------------------------------------------|-----------------------------------------|
-| Equals         |  `=`   | Assigns values from right side operands to left side operand                               | `a = 10` assigns value of `10` into `a` |
-| Add AND        |  `+=`  | It adds right operand to the left operand and assign the result to left operand            | `c += a` is equivalent to `c = c + a`   |
-| Subtract AND   |  `-=`  | It subtracts right operand from the left operand and assign the result to left operand     | `c -= a` is equivalent to `c = c - a`   |
-| Multiply AND   |  `*=`  | It multiplies right operand with the left operand and assign the result to left operand    | `c *= a` is equivalent to `c = c * a`   |
-| Divide AND     |  `/=`  | It divides left operand with the right operand and assign the result to left operand       | `c /= a` is equivalent to `c = c / a`   |
-| Modulus AND    |  `%=`  | It takes modulus using two operands and assign the result to left operand                  | `c %= a` is equivalent to `c = c % a`   |
-| Exponent AND   | `**=`  | Performs exponential (power) calculation on operators and assign value to the left operand | `c **= a` is equivalent to `c = c ** a` |
-| Floor Division | `//=`  | It performs floor division on operators and assign value to the left operand               | `c //= a` is equivalent to `c = c // a` |
-{:class="table-w100 table table-bordered"}
+| Operator | Meaning | Example |
+|:--:|---|---|
+| `and` | both must be `True` | `battery > 20 and path_clear` |
+| `or` | at least one is `True` | `left_bump or right_bump` |
+| `not` | flips `True` and `False` | `not moving` |
+{:class="table table-single"}
 
----
+{% capture snakie_code %}
+battery = 80
+path_clear = True
+left_bump = False
+right_bump = True
 
-## Logical Operators
+if battery > 20 and path_clear:
+    print('Drive forward')
 
-Table of MicroPython Logical Operators
-{:.caption}
+if left_bump or right_bump:
+    print('Back up, we hit something')
 
-| Operator    | Symbol | Description                                                          | Example                  |
-|-------------|:------:|----------------------------------------------------------------------|--------------------------|
-| Logical AND | `and`  | If both the operands are true then condition becomes true.           | `(a and b)` is true.     |
-| Logical OR  |  `or`  | If any of the two operands are non-zero then condition becomes true. | `(a or b)` is true.      |
-| Logical NOT | `not`  | Used to reverse the logical state of its operand.                    | `not(a and b)` is false. |
-{:class="table-w100 table table-bordered"}
+if not path_clear:
+    print('Turn around')
+{% endcapture %}
+{% include snakie.html code=snakie_code name="operators_2.py" %}
 
----
+## Membership and identity
 
-## Bitwise Operators
+`in` checks whether a value is inside a list, text or dictionary. `is` checks whether two names point at the very same thing, and is most often used with `None`:
 
-In the examples below `a` = `60`, `b` = `13`.
+```python
+sensors = ["left", "centre", "right"]
+print("left" in sensors)
+print("rear" not in sensors)
 
-Table of MicroPython Bitwise Operators
-{:.caption}
+reading = None
+print(reading is None)
+```
 
-| Operator               | Symbol | Description                                                                                  | Example                                                                              |
-|------------------------|:------:|----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| Binary AND             |  `&`   | Operator copies a bit to the result if it exists in both operands                            | `(a & b) = 12` (means 0000 1100)                                                          |
-| Binary OR              |  `|`   | It copies a bit if it exists in either operand.                                              | `(a | b) = 61` (means 0011 1101)                                                     |
-| Binary XOR             |  `^`   | It copies the bit if it is set in one operand but not both.                                  | `(a ^ b) = 49` (means 0011 0001)                                                     |
-| Binary Ones Complement |  `~`   | It is unary and has the effect of 'flipping' bits.                                           | `(~a ) = -61` (means 1100 0011 in 2's complement form due to a signed binary number. |
-| Binary Left Shift      |  `<<`  | The left operands value is moved left by the number of bits specified by the right operand.  | `a << 2 = 240` (means 1111 0000)                                                     |
-| Binary Right Shift     |  `>>`  | The left operands value is moved right by the number of bits specified by the right operand. | `a >> 2 = 15` (means 0000 1111)                                                      |
-{:class="table-w100 table table-bordered"}
+## Bitwise operators
 
----
+Bitwise operators work on the individual 1s and 0s of a number: `&` (and), `|` (or), `^` (exclusive or), `~` (flip), `<<` and `>>` (shift). You'll use them later to work with registers and sensor data. Here is a peek, with `a = 60` (`0011 1100`) and `b = 13` (`0000 1101`):
 
-## Membership Operators
+```python
+a = 60
+b = 13
+print(a & b, a | b, a ^ b, a << 2, a >> 2)
+```
 
-Table of MicroPython Membership Operators
-{:.caption}
+This prints `12 61 49 240 15`.
 
-| Operator | Description                                                                                      | Example                                                                      |
-|:--------:|--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-|   `in`   | Evaluates to true if it finds a variable in the specified sequence and false otherwise.          | `x in y`, here in results in a 1 if x is a member of sequence y.             |
-| `not in` | Evaluates to true if it does not finds a variable in the specified sequence and false otherwise. | `x not in y`, here not in results in a 1 if x is not a member of sequence y. |
-{:class="table-w100 table table-bordered"}
+## Try it Yourself
 
----
+1. Work out `17 // 5` and `17 % 5` in your head, then check in your editor.
+2. Write a program that stores a wheel diameter of 6.5 and calculates the circumference by multiplying by `3.14159`.
+3. Use `and` and `or` to print `Go` only when the battery is above 20 and neither bumper is pressed.
+4. Challenge: use `%` to print `tick` every time a loop counter is a multiple of 5, as the counter counts to 20.
 
-## Identity Operators
+## Common Issues
 
-Table of MicroPython Identity Operators
-{:.caption}
+- **Problem**: My answer is `3.0` when I expected `3`.
+- **Solution**: Use `//` for a whole number answer, or wrap the result in `int()`.
+- **Why**: A single `/` always gives a decimal `float`.
 
-| Operator | Description                                                                                                     | Example                                                                  |
-|:--------:|-----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-|   `is`   | Evaluates to true if the variables on either side of the operator point to the same object and false otherwise. | `x is y`, here `is` results in 1 if id(x) equals id(y).                  |
-| `is not` | Evaluates to false if the variables on either side of the operator point to the same object and true otherwise. | `x is not y`, here `is not` results in 1 if id(x) is not equal to id(y). |
-{:class="table-w100 table table-bordered"}
+- **Problem**: `ZeroDivisionError: divide by zero`.
+- **Solution**: Check the bottom number is not `0` before you divide.
+- **Why**: Dividing by zero has no answer.
 
----
+- **Problem**: `if a = 5:` gives a syntax error.
+- **Solution**: Use `==` to compare.
+- **Why**: `=` assigns a value and can't be used as a test.
+
+## Check your understanding
+
+{% quiz %}
+? What is `17 % 5`?
+- [ ] `3`
+- [x] `2`
+- [ ] `3.4`
+> `%` gives the remainder: 17 divided by 5 is 3 remainder 2.
+
+? What is `speed += 10` the same as?
+- [ ] `speed = 10`
+- [x] `speed = speed + 10`
+- [ ] `speed == 10`
+> `+=` adds to the variable's current value.
+
+? When is `left_bump or right_bump` `True`?
+- [ ] Only when both are `True`
+- [x] When at least one is `True`
+- [ ] Only when both are `False`
+> `or` needs just one side to be `True`.
+{% endquiz %}

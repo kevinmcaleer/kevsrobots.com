@@ -7,10 +7,24 @@ date: 2022-12-04
 description: Get started with MicroPython, What Python is, where to download it and
   which software to use to develop MicroPython code
 level: beginner
-course_duration: 0h 48m
+course_duration: 1h 27m
 lesson_count: 20
 first_lesson: 00_intro.html
+quiz_total: 57
 video: TkuDQ-SzXwU
+outcomes:
+- Install MicroPython on a Raspberry Pi Pico and run your first program
+- Store values in variables and constants, and choose the right data type
+- Make a program decide with if, elif and else, and repeat with for and while loops
+- Write your own functions with parameters and return values
+- Use the REPL to test code and explore your board, and import modules
+prerequisites:
+- None. This course is for complete beginners
+you_need:
+- A Raspberry Pi Pico, Pico W, Pico 2 or Pico 2 W (the examples also run in the Snakie
+  simulator)
+- A micro USB cable that carries data
+- A computer with Snakie (web or desktop) or Thonny
 navigation:
 - name: Learn MicroPython - The basics
 - content:
