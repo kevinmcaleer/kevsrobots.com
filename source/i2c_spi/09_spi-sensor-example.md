@@ -3,9 +3,12 @@ title: SPI Sensor Example
 description: Build a complete temperature monitoring system using the MAX31855 thermocouple amplifier
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/09_spi-sensor-example.jpg
 ---
 
-<!-- ![Temperature Monitoring](/learn/i2c_spi/assets/max31855-monitor.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Building a Temperature Monitor
 

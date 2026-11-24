@@ -3,7 +3,7 @@ layout: lesson
 title: Common Issues and Troubleshooting
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/11_common-issues.jpg
 date: 2026-01-15
 previous: 10_i2c-vs-spi.html
 next: 12_final-project.html
@@ -54,7 +54,9 @@ navigation:
 ---
 
 
-<!-- ![Troubleshooting Guide](/learn/i2c_spi/assets/troubleshooting.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Systematic Troubleshooting
 

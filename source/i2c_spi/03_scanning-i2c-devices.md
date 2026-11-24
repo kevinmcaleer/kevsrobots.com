@@ -3,9 +3,12 @@ title: Scanning I2C Devices
 description: Learn how to scan for I2C devices, understand hexadecimal addresses, and identify what's connected to your bus
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/03_scanning-i2c-devices.jpg
 ---
 
-<!-- ![I2C Scanner Output](/learn/i2c_spi/assets/i2c-scanner.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Finding Devices on the I2C Bus
 

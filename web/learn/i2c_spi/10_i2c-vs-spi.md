@@ -3,7 +3,7 @@ layout: lesson
 title: I2C vs SPI - Choosing the Right Protocol
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/10_i2c-vs-spi.jpg
 date: 2026-01-15
 previous: 09_spi-sensor-example.html
 next: 11_common-issues.html
@@ -55,7 +55,9 @@ navigation:
 ---
 
 
-<!-- ![I2C vs SPI Comparison](/learn/i2c_spi/assets/i2c-vs-spi.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Making the Right Choice
 

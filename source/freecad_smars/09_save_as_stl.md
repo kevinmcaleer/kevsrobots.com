@@ -52,8 +52,6 @@ In the Model tree, select the final body/feature of your SMARS base. This should
 
 Click `File` menu in the top left corner.
 
-![File menu](assets/stl02.png){:class="img-fluid w-100"}
-
 ### 3. Select Export
 
 From the dropdown menu, select `Export...`

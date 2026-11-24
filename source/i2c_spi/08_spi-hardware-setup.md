@@ -3,9 +3,12 @@ title: SPI Hardware Setup
 description: Learn how to wire SPI devices to your Raspberry Pi Pico with proper connections
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/08_spi-hardware-setup.jpg
 ---
 
-<!-- ![SPI Wiring](/learn/i2c_spi/assets/spi-wiring.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Wiring Your First SPI Device
 

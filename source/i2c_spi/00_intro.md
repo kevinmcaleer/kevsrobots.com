@@ -3,9 +3,13 @@ title: Introduction to I2C and SPI Communication
 description: Learn how to make your Raspberry Pi Pico talk to sensors and devices using I2C and SPI protocols
 layout: lesson
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/00_intro.jpg
 videos:
   - lthSloWM3Fk
+---
+
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
 ---
 
 ![Course Cover](/learn/i2c_spi/assets/cover.jpg){:class="cover"}

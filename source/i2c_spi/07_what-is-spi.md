@@ -3,9 +3,12 @@ title: What is SPI?
 description: Learn about the SPI protocol, how it differs from I2C, and when to use it
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/07_what-is-spi.jpg
 ---
 
-<!-- ![SPI Communication](/learn/i2c_spi/assets/spi-diagram.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding SPI
 

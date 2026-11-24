@@ -80,7 +80,7 @@ The **HC-SR04** sends out a burst of ultrasound and listens for the echo. By mea
 
 ## 🔌 Wiring the HC-SR04 to the Pico
 
-![HC-SR04](assets/hc-sr04.jpg){:class="w-100 rounded-3"}
+![HC-SR04](assets/hcsr04.jpg){:class="w-100 rounded-3"}
 
 - **VCC** → 3.3V (The Pico needs the 3.3v versino of the HC-SR04)  
 - **GND** → GND  

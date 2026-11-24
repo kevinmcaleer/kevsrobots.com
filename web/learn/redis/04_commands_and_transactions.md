@@ -3,7 +3,7 @@ layout: lesson
 title: Redis Commands and Transactions
 author: Kevin McAleer
 type: page
-cover: /learn/redis/assets/redis-cover.jpg
+cover: /learn/redis/assets/banners/04_commands_and_transactions.jpg
 date: 2023-04-12
 previous: 03_data_types.html
 next: 05_redis_lists.html
@@ -47,7 +47,9 @@ navigation:
 ---
 
 
-<!-- ![Cover photo of Redis commands and transactions](assets/redis-commands.jpg){:class="cover"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ### Overview
 

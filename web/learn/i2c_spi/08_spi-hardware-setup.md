@@ -3,7 +3,7 @@ layout: lesson
 title: SPI Hardware Setup
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/08_spi-hardware-setup.jpg
 date: 2026-01-15
 previous: 07_what-is-spi.html
 next: 09_spi-sensor-example.html
@@ -54,7 +54,9 @@ navigation:
 ---
 
 
-<!-- ![SPI Wiring](/learn/i2c_spi/assets/spi-wiring.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Wiring Your First SPI Device
 

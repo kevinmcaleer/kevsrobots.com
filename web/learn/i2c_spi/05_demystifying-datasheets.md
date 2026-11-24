@@ -3,7 +3,7 @@ layout: lesson
 title: Demystifying Datasheets
 author: Kevin McAleer
 type: page
-cover: /learn/i2c_spi/assets/cover.jpg
+cover: /learn/i2c_spi/assets/banners/05_demystifying-datasheets.jpg
 date: 2026-01-15
 previous: 04_reading-i2c-sensor.html
 next: 06_bme280-deep-dive.html
@@ -54,7 +54,9 @@ navigation:
 ---
 
 
-<!-- ![Datasheet Example](/learn/i2c_spi/assets/datasheet.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Understanding Datasheets
 

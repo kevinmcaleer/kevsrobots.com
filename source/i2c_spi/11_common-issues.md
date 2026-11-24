@@ -3,9 +3,12 @@ title: Common Issues and Troubleshooting
 description: Learn how to diagnose and fix common I2C and SPI problems
 layout: lesson
 type: page
+cover: /learn/i2c_spi/assets/banners/11_common-issues.jpg
 ---
 
-<!-- ![Troubleshooting Guide](/learn/i2c_spi/assets/troubleshooting.jpg){:class="img-fluid w-100"} -->
+![Course Cover Image]({{page.cover}}){:class="cover"}
+
+---
 
 ## Systematic Troubleshooting
 
