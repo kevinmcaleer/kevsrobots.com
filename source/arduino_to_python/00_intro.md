@@ -3,7 +3,7 @@ title: Introduction to Arduino to MicroPython
 description: A quick start guide for Arduino C++ makers learning MicroPython, with side-by-side code for every idea and two finished projects
 layout: lesson
 type: page
-cover: /learn/arduino_to_python/assets/intro.jpg
+cover: /learn/arduino_to_python/assets/banner01.jpg
 date_updated: 2026-11-24
 ---
 

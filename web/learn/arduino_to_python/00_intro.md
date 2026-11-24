@@ -3,7 +3,7 @@ layout: lesson
 title: Introduction to Arduino to MicroPython
 author: Kevin McAleer
 type: page
-cover: /learn/arduino_to_python/assets/intro.jpg
+cover: /learn/arduino_to_python/assets/banner01.jpg
 date: 2025-11-20
 next: 01_why_micropython.html
 description: A quick start guide for Arduino C++ makers learning MicroPython, with
