@@ -65,7 +65,7 @@ Line-following robots are one of the most classic and satisfying robotics projec
 
 ---
 
-## 🕵️ How IR Line Sensors Work
+## How IR Line Sensors Work
 
 IR (infrared) sensors detect reflected light. They shine infrared light onto the surface and measure how much bounces back:
 
@@ -78,7 +78,7 @@ We’ll use a common TCRT5000 or similar sensor with digital output for this pro
 
 ---
 
-## 🔌 Wiring the IR Sensor
+## Wiring the IR Sensor
 
 Wire the sensor to the Pico as follows:
 
@@ -90,7 +90,7 @@ Wire the sensor to the Pico as follows:
 
 ---
 
-## 🧪 Reading the Sensor in MicroPython
+## Reading the Sensor in MicroPython
 
 ```python
 from machine import Pin
@@ -111,7 +111,7 @@ while True:
 
 Try placing your sensor over black tape on a white surface to see the output change.
 
-## 🧠 Line Following Logic
+## Line Following Logic
 
 With two sensors (left and right), you can create simple decision-making logic:
 
@@ -122,7 +122,7 @@ With two sensors (left and right), you can create simple decision-making logic:
 
 ---
 
-## 🧰 Example: Two-Sensor Line Follower
+## Example: Two-Sensor Line Follower
 
 ```python
 from machine import Pin, PWM
@@ -169,7 +169,7 @@ while True:
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 - Tune the logic to make turns smoother or sharper.
 - Try an analog sensor and adjust thresholds.

@@ -17,7 +17,7 @@ This lesson will show you how **storage works in K3s**, how to use the **built-i
 
 ---
 
-## 💾 How Storage Works in K3s
+## How Storage Works in K3s
 
 K3s includes a **default dynamic storage provisioner** called `local-path-provisioner`.
 
@@ -25,11 +25,11 @@ K3s includes a **default dynamic storage provisioner** called `local-path-provis
 - PVCs are automatically provisioned
 - Easy to use, but not shared across nodes
 
-> ⚠️ If a pod moves to a different node, its data may not follow.
+> If a pod moves to a different node, its data may not follow.
 
 ---
 
-## 📁 Step 1: Test with a Simple PVC
+## Step 1: Test with a Simple PVC
 
 Create a file `pvc-demo.yaml`:
 
@@ -54,7 +54,7 @@ kubectl apply -f pvc-demo.yaml
 
 ---
 
-## 📦 Step 2: Mount PVC in a Pod
+## Step 2: Mount PVC in a Pod
 
 Create a pod with a volume mount:
 
@@ -94,7 +94,7 @@ cat /data/test.txt
 
 ---
 
-## 🧠 Where Is the Data Stored?
+## Where Is the Data Stored?
 
 On the node hosting the pod, the data is typically under:
 
@@ -106,7 +106,7 @@ Each PVC is stored in its own directory.
 
 ---
 
-## 📤 External Storage Options (Optional)
+## External Storage Options (Optional)
 
 For more advanced setups:
 
@@ -117,11 +117,11 @@ For more advanced setups:
 | Ceph       | Highly available block storage | More complex to set up                |
 {:class="table table-striped"}
 
-> 🛠 Consider using **Longhorn** if you want persistent block storage with replication and snapshots.
+> Consider using **Longhorn** if you want persistent block storage with replication and snapshots.
 
 ---
 
-## 🧪 Cleanup
+## Cleanup
 
 To remove test volumes and pods:
 
@@ -132,7 +132,7 @@ kubectl delete pvc demo-pvc
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 

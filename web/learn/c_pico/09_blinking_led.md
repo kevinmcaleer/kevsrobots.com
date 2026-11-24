@@ -135,7 +135,7 @@ int main() {
 3. Hold **BOOTSEL**, plug in your Pico
 4. Copy the `blink.uf2` file to the **RPI-RP2** drive
 
-🎉 The LED should start blinking!
+The LED should start blinking!
 
 ---
 

@@ -84,7 +84,7 @@ docker compose exec ros2 bash
 
 > To list all the running containers, type `docker ps` from the terminal
 
-> 🎉 Congratulations, you've now setup ROS2 in a container on the Raspberry Pi and connected to it from another computer running VSCode.
+> Congratulations, you've now setup ROS2 in a container on the Raspberry Pi and connected to it from another computer running VSCode.
 {:class="bg-blue"}
 
 ---

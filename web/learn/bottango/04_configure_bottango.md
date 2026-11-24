@@ -56,7 +56,7 @@ Now that your servos are wired up and your board is connected, it’s time to co
 
 ---
 
-## 🗂️ Step 1: Create a New Project
+## Step 1: Create a New Project
 
 1. Open Bottango.
 2. Click **New Project**.
@@ -64,11 +64,11 @@ Now that your servos are wired up and your board is connected, it’s time to co
 4. Choose a save location on your computer.
 5. Click **Create**.
 
-> 💾 Bottango projects are stored as `.btproj` files and contain all your servo assignments, motion data, and triggers.
+> Bottango projects are stored as `.btproj` files and contain all your servo assignments, motion data, and triggers.
 
 ---
 
-## 🎚️ Step 2: Add a Servo to the Scene
+## Step 2: Add a Servo to the Scene
 
 1. In the main timeline view, click **Add Servo**.
 2. A new servo object will appear in the left-hand panel.
@@ -76,7 +76,7 @@ Now that your servos are wired up and your board is connected, it’s time to co
 
 ---
 
-## 📌 Step 3: Assign a Pin to the Servo
+## Step 3: Assign a Pin to the Servo
 
 1. Select the servo you just added.
 2. In the **Servo Settings** panel (bottom left), choose the correct **Board**.
@@ -84,11 +84,11 @@ Now that your servos are wired up and your board is connected, it’s time to co
 4. Set the **Min** and **Max** angles (e.g., 0–180).
 5. Click **Save**.
 
-> 🔄 You can test the servo by dragging the position slider — it should move in real time!
+> You can test the servo by dragging the position slider — it should move in real time!
 
 ---
 
-## 🔄 Step 4: Add More Servos (Optional)
+## Step 4: Add More Servos (Optional)
 
 Repeat the steps above for each additional servo in your setup. You can:
 
@@ -98,7 +98,7 @@ Repeat the steps above for each additional servo in your setup. You can:
 
 ---
 
-## 🧪 Test All Servos
+## Test All Servos
 
 Use the sliders or create a simple timeline keyframe to test each servo's range of motion. This helps:
 
@@ -108,7 +108,7 @@ Use the sliders or create a simple timeline keyframe to test each servo's range 
 
 ---
 
-## 🗒️ Servo Configuration Tips
+## Servo Configuration Tips
 
 - If the servo moves the *wrong direction*, you can invert it in the settings.
 - Avoid using pins reserved for USB/Serial on some boards (e.g., D0/D1 on Arduino).

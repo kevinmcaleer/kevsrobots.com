@@ -72,7 +72,7 @@ Let’s explore the implications of this and what it means for how you work with
 
 ---
 
-## 🏗️ Docker’s Architecture
+## Docker’s Architecture
 
 Docker uses a **client-server** model:
 
@@ -91,7 +91,7 @@ Docker uses a **client-server** model:
 
 ---
 
-## 🔧 Podman’s Architecture
+## Podman’s Architecture
 
 Podman is **daemonless** and **runs as the user**:
 
@@ -112,23 +112,23 @@ Podman is **daemonless** and **runs as the user**:
 
 ---
 
-## 🛡️ Security Implications
+## Security Implications
 
 | Feature               | Docker                  | Podman                       |
 |----------------------|:------------------------|:-----------------------------|
-| Rootless Support      | ❌ Experimental/limited | ✅ Full support               |
-| Daemon Required       | ✅ Yes                  | ❌ No                         |
-| SELinux Integration   | 🟡 Limited              | ✅ Strong                     |
-| Auditability          | ❌ Shared daemon logs   | ✅ Per-process/user logging   |
+| Rootless Support      | Experimental/limited | Full support               |
+| Daemon Required       | Yes                  | No                         |
+| SELinux Integration   | Limited              | Strong                     |
+| Auditability          | Shared daemon logs   | Per-process/user logging   |
 {:class="table table-striped"}
 
 ---
 
-> 🔒 **Rootless containers** allow users to run containers without elevated privileges, greatly reducing attack surface.
+> **Rootless containers** allow users to run containers without elevated privileges, greatly reducing attack surface.
 
 ---
 
-## 🧠 Why It Matters
+## Why It Matters
 
 Podman’s architecture empowers users and sysadmins to:
 
@@ -139,7 +139,7 @@ Podman’s architecture empowers users and sysadmins to:
 
 ---
 
-## 🚧 When It Matters
+## When It Matters
 
 - **On servers:** Fewer root processes = safer environment
 - **In dev environments:** No need for `sudo`

@@ -15,7 +15,7 @@ Now that you’ve mastered motor and sensor control, it’s time to build your r
 
 ---
 
-## 🧱 Components You'll Need
+## Components You'll Need
 
 - **Chassis kit** (with mounting holes for motors and wheels)
 - **2x DC gear motors**
@@ -31,7 +31,7 @@ Now that you’ve mastered motor and sensor control, it’s time to build your r
 
 ---
 
-## 🛠️ Assembly Instructions
+## Assembly Instructions
 
 1. **Attach Motors to the Chassis**  
    Secure each DC motor to the motor mounts on your chassis. Make sure both motor shafts face the same direction.
@@ -56,11 +56,11 @@ Now that you’ve mastered motor and sensor control, it’s time to build your r
    - Pico GND → L298N GND  
    - Power the Pico separately via USB or from L298N 5V pin (if jumper is present and you're using 6V–12V input).
 
-> ⚠️ **Double-check polarity before powering on!**
+> **Double-check polarity before powering on!**
 
 ---
 
-## 🎛️ Testing the Setup
+## Testing the Setup
 
 Run the motor control and sensor code from previous lessons to verify:
 
@@ -72,7 +72,7 @@ Make adjustments to wheel orientation or wiring as needed.
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 - Experiment with motor speed and turning radius.
 - Reposition sensors for better detection.

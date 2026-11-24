@@ -66,7 +66,7 @@ With a fixed ultrasonic sensor, your robot can only detect what’s directly in 
 
 ---
 
-## 🔄 How Servos Work
+## How Servos Work
 
 A servo motor rotates to a specific angle between 0° and 180°. You control it by sending **PWM signals** with specific duty cycles that correspond to different angles.
 
@@ -78,20 +78,20 @@ A servo motor rotates to a specific angle between 0° and 180°. You control it 
 
 ---
 
-## 🔌 Wiring the Servo and Sensor
+## Wiring the Servo and Sensor
 
 - **Servo**
   - Signal → GP10 (or any PWM-capable pin)
   - VCC → 5V
   - GND → GND
 
-> ⚠️ Some servos draw a lot of current — consider powering them from the L298N 5V output or a separate regulator.
+> Some servos draw a lot of current — consider powering them from the L298N 5V output or a separate regulator.
 
 - **Ultrasonic sensor** remains wired to GP8 (TRIG) and GP9 (ECHO)
 
 ---
 
-## 🧪 Basic Servo Test
+## Basic Servo Test
 
 ```python
 from machine import Pin, PWM
@@ -116,7 +116,7 @@ while True:
 
 ---
 
-## 🧠 Scanning with the Ultrasonic Sensor
+## Scanning with the Ultrasonic Sensor
 
 Combine the servo sweep with distance measurement:
 
@@ -154,7 +154,7 @@ for angle in range(0, 181, 30):
 
 ---
 
-## 🤖 Applications
+## Applications
 
 - Detect which direction has the most space
 - Map simple environments
@@ -163,7 +163,7 @@ Choose direction to turn based on obstacle data
 
 ---
 
-## 🧩 Try It Yourself
+## Try It Yourself
 
 - Add left/right logic based on where the most space is
 - Mount two IR sensors on a servo for sweeping ground detection
