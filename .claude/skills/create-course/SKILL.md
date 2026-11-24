@@ -13,6 +13,7 @@ Courses are authored as Markdown in `/source/<slug>/` and compiled by `python3 b
 2. **Scaffold** `/source/<slug>/` with `course.yml`, lesson files, and an `assets/` folder.
 3. **Write lessons** (use the course-architect agent for bulk writing — give it the full per-lesson spec and the conventions below in the prompt, including the "Code fact-check" section; it won't see this file).
 4. **Fact-check every code block**: `python3 scripts/check_course_code.py source/<slug>` must finish with **0 errors** before the course is done. See "Code fact-check" below. Do this yourself after the agent returns, even if it says it ran the check.
+   Then score it: `python3 scripts/course_quality.py source/<slug>` must print **80 or more** with no placeholder lessons, missing images or emoji headings. See "Quality bar" below.
 5. **Course cover**: every course needs `assets/cover.jpg` at **exactly 1200×900 (4:3)**, under 300KB — this is the *card thumbnail* in course listings, not the page header. **Never 16:9** (1920×1080, 1600×900 etc.): the /learn/ cards are 4:3, so a wide cover shows as a short strip and the card sits out of line with its neighbours. Lay out the title, subtitle and artwork for a 4:3 canvas rather than resizing or cropping a wide one. If no real image exists yet, generate a placeholder with PIL (Pillow is installed) so nothing 404s, and tell Kev to replace it. Verify the rendered placeholder by Reading the .jpg — text bands can hide drawn elements.
 6. **Lesson header banners**: run `python3 generate_banners.py <slug>` — see the section below. Do this *after* the lessons exist and `course.yml` lists them. Not optional: a page with no header is a wall of grey text.
 7. **Verify**: check the cover size with `python3 -c "from PIL import Image; print(Image.open('source/<slug>/assets/cover.jpg').size)"` — it must print `(1200, 900)`. Then run `python3 build.py` from the repo root; confirm the course appears in the output, check `/web/learn/<slug>/` was generated, and check the entry in `/web/_data/courses.yml` (it gains a computed `duration` and `link`).
@@ -139,6 +140,20 @@ Adding a pattern means adding a function to `PATTERNS` in `generate_banners.py`.
 - All code must be complete and runnable. Prefer standard-library-only Python for simulations; actually execute project-lesson code to confirm it runs. MicroPython examples should target the Pico with pin assignments consistent with the existing `micropython_robotics` course.
 - Word counts: intro 300–500 (may run over to fit required sections), concept lessons 400–800, project lessons 800–1500 (code listings may push this over — that's fine).
 - `00_intro.md` must contain: `## Overview`, `## Course Content` (bullets), `## Key Results`, `## What you'll need`, `## How the course works`, plus prerequisite links to related `/learn/...` courses. The summary lesson links onward ("What's Next") to related courses.
+
+## Quality bar
+
+Every course is scored out of 100 by `scripts/course_quality.py` (epic #655). A course is done at **80 or more**. Run it on your course and it lists what is missing. What it looks for, and so what every course needs:
+
+- **Video front and centre.** If Kev has a video for the course, `{% include youtubeplayer.html id="..." %}` goes straight under the cover in `00_intro.md`, and `video: <id>` goes in `course.yml`. Embed further videos in the lessons they match. Never invent a video id: take it from `web/_data/youtube.yml`.
+- **Every lesson opens with its objective**: one or two plain sentences starting "By the end of this lesson you will be able to ...".
+- **Every lesson (except the intro) ends with** `## Try it Yourself` (2 to 4 exercises of rising difficulty), `## Common Issues` where things can go wrong, and `## Check your understanding` with a `{% quiz %}` of 3 or more questions (see `docs/course_quizzes.md`).
+- **`course.yml` has** `outcomes` (3 to 6), `prerequisites`, `you_need` and `level`.
+- **Notes for teachers.** The intro has a `> **Teachers**:` note: who the course suits, time per lesson, kit per group, what works with no hardware. Any lesson with a classroom catch (safety, shared kit, accounts, cost, school Wi-Fi) gets its own `> **Teachers**:` note.
+- **Something to look at in every lesson**: a photo, screenshot, or a ```` ```mermaid ```` diagram. Never reference an image file that isn't in `assets/`.
+- **No stub lessons.** Nothing under about 150 words, and never "coming soon".
+
+The score measures what is on the page. It can't tell whether the content is true, so facts (commands, versions, pin numbers, menu names) still have to be checked against the real tool.
 
 ## Code fact-check
 

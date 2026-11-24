@@ -13,6 +13,7 @@ on:
     paths:
       - "source/**.md"
       - "scripts/check_course_code.py"
+      - "scripts/course_quality.py"
       - "scripts/course_code_stubs.py"
       - "scripts/uno_q_checks.py"
       - "scripts/uno_q_stubs/**"
@@ -62,6 +63,17 @@ jobs:
             exit 0
           fi
           xargs python3 scripts/check_course_code.py --github < changed.txt
+
+      - name: Course quality checks on the courses this pull request touches
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ ! -s changed.txt ]; then
+            exit 0
+          fi
+          pip install --quiet pyyaml pillow
+          # Fails on placeholder lessons, missing images and emoji headings.
+          # The scores are printed for information; they don't fail the check.
+          xargs python3 scripts/course_quality.py --strict --no-code-check --gaps < changed.txt
 
       - name: Check every course (report only)
         if: github.event_name == 'workflow_dispatch'
