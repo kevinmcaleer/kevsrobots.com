@@ -827,17 +827,17 @@
   cover: /learn/scrawly_wally//assets/cover.png
   date_published: 2024-08-02
   description: Learn how to build your own wall drawing robot using a Raspberry Pi
-    Zero 2 W, stepper motors, and a gondola with a marker.  This course covers the
+    Zero 2 W, stepper motors, and a gondola with a marker. This course covers the
     essential steps from assembling the robot, installing the software, and creating
     your first drawing.
-  duration: 0h 14m
+  duration: 1h 8m
   groups:
-  - raspberry pi
-  - robotics
-  - robot arm
+  - raspberrypi
+  - robots
+  - python
   lessons: 11
-  level: beginner
-  link: /learn/scrawly_wally/01_intro.html
+  level: intermediate
+  link: /learn/scrawly_wally/00_intro.html
   name: Wall Drawing Robot Tutorial
   video: JB4rPNBCL3Q
 - author: Kevin McAleer
