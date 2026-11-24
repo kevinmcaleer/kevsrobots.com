@@ -83,6 +83,7 @@ while True:
     led.off()
     time.sleep(0.5)    # Wait 0.5 seconds
 ```
+{: .no-snakie }
 
 **Critical differences:**
 - **`delay(1000)`** in Arduino = **`time.sleep(1)`** in MicroPython

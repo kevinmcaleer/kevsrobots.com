@@ -101,6 +101,7 @@ for addr, name in sensors:
     data = i2c.readfrom(addr, 1)
     print(f"{name}: {data}")
 ```
+{: .no-snakie }
 
 **Why I2C wins**: Only 2 wires for everything. SPI would need 10 chip select pins plus 3 shared signals (13 total GPIO).
 
@@ -125,6 +126,7 @@ while True:
     print(f"Temp: {temp}°C")
     time.sleep(1)  # Update rate: 1 Hz
 ```
+{: .no-snakie }
 
 **Why I2C wins**: 400 kHz I2C is plenty fast for 1 Hz updates. No need for SPI's complexity.
 
@@ -140,6 +142,7 @@ cs1 = Pin(5, Pin.OUT)
 cs2 = Pin(6, Pin.OUT)
 cs3 = Pin(7, Pin.OUT)
 ```
+{: .no-snakie }
 
 **Why I2C wins**: Fewer connections = less to wire, debug, and troubleshoot.
 
@@ -151,6 +154,7 @@ cs3 = Pin(7, Pin.OUT)
 i2c_device = BME280(i2c)
 i2c_device.set_mode(MODE_FORCED)  # Ultra-low power
 ```
+{: .no-snakie }
 
 **Why I2C wins**: Lower clock speeds = less current draw. Perfect for solar or battery-powered sensors.
 
@@ -167,6 +171,7 @@ for frame in range(60):
     display.write_frame(frame_buffer)  # ~4ms with SPI
     # Would take ~150ms with I2C!
 ```
+{: .no-snakie }
 
 **Why SPI wins**: 100x faster transfer rates. Essential for displays and video.
 
@@ -182,6 +187,7 @@ rx_data = bytearray(3)
 # Send and receive at the same time
 spi.write_readinto(tx_data, rx_data)
 ```
+{: .no-snakie }
 
 **Why SPI wins**: True full-duplex. I2C can only send OR receive, not both simultaneously.
 
@@ -196,6 +202,7 @@ data = sd_card.read_block(block_num)
 
 # Would take ~10ms with I2C
 ```
+{: .no-snakie }
 
 **Why SPI wins**: SD cards, flash memory, and EEPROMs need fast transfer. SPI is the standard.
 
@@ -220,6 +227,7 @@ spi = SPI(0, baudrate=2500000)  # Precise timing
 # Send WS2812 data via SPI (timing-critical)
 spi.write(led_data)
 ```
+{: .no-snakie }
 
 **Why SPI wins**: SPI provides deterministic timing. I2C has variable timing due to ACK/NACK overhead.
 
@@ -247,6 +255,7 @@ oled = SSD1306_I2C(i2c, 0x3C)
 spi = SPI(0, baudrate=10000000, sck=Pin(2), mosi=Pin(3), miso=Pin(4))
 sd_card = SDCard(spi, cs=Pin(5))
 ```
+{: .no-snakie }
 
 **Why**: Use I2C where it makes sense (simpler wiring for sensors), SPI where needed (fast SD card writes).
 
@@ -273,6 +282,7 @@ sensors = {
     'compass': QMC5883L(i2c, 0x0D)
 }
 ```
+{: .no-snakie }
 
 **Why**: I2C handles many devices easily, tolerates longer wires across chassis, and sensors don't need high speed.
 
@@ -294,6 +304,7 @@ for channel in range(8):
     value = adc.read_channel(channel)  # ~10µs with SPI
     process_data(value)
 ```
+{: .no-snakie }
 
 **Why**: I2C @ 400 kHz couldn't keep up with 10 kHz sampling rate. SPI's speed is essential.
 
@@ -324,6 +335,7 @@ while True:
     bme280.set_mode(MODE_SLEEP)
     time.sleep(60)  # Sleep 1 minute
 ```
+{: .no-snakie }
 
 **Why**: I2C's lower power consumption extends battery life significantly.
 
@@ -354,6 +366,7 @@ while True:
 
     time.sleep(1)
 ```
+{: .no-snakie }
 
 ## Decision Flowchart
 

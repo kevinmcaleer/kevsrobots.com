@@ -39,6 +39,7 @@ while True:
     print(f"Temperature: {temperature}")
     time.sleep(1)
 ```
+{: .no-snakie }
 
 Key differences:
 - **No initialization needed** - `print()` just works

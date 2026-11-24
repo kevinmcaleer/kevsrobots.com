@@ -38,6 +38,7 @@ led_pin = 13
 brightness = 128
 led.value(1)
 ```
+{: .no-snakie }
 
 Notice how much cleaner Python looks? Each line is a statement - no semicolons needed. Python uses line breaks to separate statements.
 
@@ -145,6 +146,7 @@ digitalWrite(13,HIGH);
 ```
 
 **MicroPython:**
+<!-- code-check: skip -->
 ```python
 # Indentation defines the block
 from machine import Pin
@@ -158,6 +160,7 @@ if temperature > 25:
 if temperature > 25:
 led.on()  # ERROR: IndentationError
 ```
+{: .no-snakie }
 
 **Indentation rules:**
 - Use 4 spaces per indentation level (Python standard)
@@ -334,6 +337,7 @@ Key changes:
 
 This MicroPython code has syntax errors from C++ habits. Find them:
 
+<!-- code-check: skip -->
 ```python
 from machine import Pin;
 import time;
@@ -346,6 +350,7 @@ while True
     led_pin.off();
     time.sleep(1);
 ```
+{: .no-snakie }
 
 **Answer:**
 

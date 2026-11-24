@@ -125,7 +125,7 @@ Let's review what you've learned and where to go next.
 
 **Common Conversions:**
 
-```python
+```text
 # Arduino delay to MicroPython
 delay(1000)           → time.sleep(1)          # 1 second
 delay(500)            → time.sleep(0.5)        # 0.5 seconds
@@ -160,6 +160,7 @@ time.sleep(1)
 # If you're thinking in milliseconds:
 time.sleep_ms(1000)  # 1000 milliseconds = 1 second
 ```
+{: .no-snakie }
 
 **2. Boolean Values**
 
@@ -170,9 +171,11 @@ flag = true
 # RIGHT - capitalize
 flag = True
 ```
+{: .no-snakie }
 
 **3. Indentation Errors**
 
+<!-- code-check: skip -->
 ```python
 # WRONG - inconsistent indentation
 if x > 10:
@@ -184,6 +187,7 @@ if x > 10:
     print("Big")
     print("Really big")
 ```
+{: .no-snakie }
 
 **4. Pin Numbers**
 
@@ -199,6 +203,7 @@ led = Pin("LED", Pin.OUT)
 # Arduino Nano ESP32 - use Arduino numbers
 led = Pin(13, Pin.OUT)  # D13
 ```
+{: .no-snakie }
 
 **5. ADC Resolution**
 
@@ -210,6 +215,7 @@ led = Pin(13, Pin.OUT)  # D13
 # Convert MicroPython to Arduino range:
 arduino_value = adc.read_u16() >> 6  # Shift right 6 bits
 ```
+{: .no-snakie }
 
 ## When to Use Each Language
 

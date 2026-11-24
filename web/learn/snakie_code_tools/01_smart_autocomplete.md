@@ -73,11 +73,13 @@ Autocomplete is the editor finishing your word. In Snakie it does a bit more tha
 
 Open a new file and type these two lines, then start a third with `left.`
 
+<!-- code-check: skip -->
 ```python
 from machine import Pin, PWM
 left = PWM(Pin(10))
 left.
 ```
+{: .no-snakie }
 
 The moment you type the dot, a list appears.
 
