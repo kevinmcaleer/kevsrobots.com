@@ -919,10 +919,9 @@
   description: 'Program your SMARS robot in Arduino C++: drive it around, avoid obstacles
     with an ultrasonic sensor, sense its position, control it over Bluetooth, move
     servos and follow a line.'
-  duration: 0h 42m
+  duration: 1h 4m
   groups:
-  - smars
-  - robotics
+  - robots
   - arduino
   lessons: 8
   level: beginner

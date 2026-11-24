@@ -2,12 +2,16 @@
 title: Lesson 06 - How to control servos
 description: Learn how to control SG90 Servos with Arduino
 layout: lesson
+type: page
 cover: /learn/smars_code/assets/banners/06_lesson_06.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wire an SG90 servo to an Arduino and use the `Servo` library to move it to any angle from 0 to 180 degrees.
 
 ## Watch the livestream
 
@@ -90,6 +94,13 @@ An SG90 servo has three wires:
 | Orange (signal) | D9 |
 {:class="table table-striped"}
 
+```mermaid
+flowchart LR
+    Servo[SG90 servo] -- brown wire --> GND
+    Servo -- red wire --> V5[5V]
+    Servo -- orange wire --> D9[Arduino pin 9]
+```
+
 ## What the code means
 
 - `#include <Servo.h>` loads the Arduino's built-in servo library.
@@ -97,11 +108,31 @@ An SG90 servo has three wires:
 - `myservo.write(pos)` moves the servo to an angle between 0 and 180 degrees.
 - The two `for` loops step the angle up from 0 to 180, then back down again, one degree every 15 milliseconds, so the servo sweeps smoothly back and forth.
 
-## Try it yourself
+## Try it Yourself
 
 1. Change `delay(15)` to `delay(5)`. What happens to the sweep?
 2. Make the servo move to just three positions: 0, 90 and 180 degrees, pausing for a second at each.
-3. Challenge: mount the ultrasonic sensor on the servo and make SMARS "look" left and right before choosing which way to turn.
+3. Challenge: combine this lesson with lesson 3. Fix the ultrasonic sensor to the servo horn, and at 0, 90 and 180 degrees print the distance to the Serial Monitor, so SMARS can "look" left, ahead and right. Keep the motors still while you do this (see the first Common Issue below).
+
+> **Teachers**: Servos are cheap but delicate: the plastic gears strip if a learner forces the arm by hand, so tell them to let the code move it. Fit the horn with the servo set to a known angle, and keep spare SG90 servos in the kit box. A servo that is jammed against something will get hot and draw a lot of current, so unplug the USB cable if it buzzes and does not move.
+
+## Common Issues
+
+- **Problem**: Motor A stops working after you add the `Servo` library to a robot sketch.
+- **Solution**: Run the servo sketch on its own in this lesson. To use a servo and the motors in the same sketch you need motor speed pins other than 9 and 10, which depends on your motor shield.
+- **Why**: On the Uno, the `Servo` library switches off `analogWrite()` (PWM) on pins 9 and 10, and our sketches use pin 10 for motor A's speed.
+
+- **Problem**: The servo twitches, buzzes or the Arduino keeps resetting.
+- **Solution**: Check the three wires are firmly in the right places. Power the servo from the Arduino 5V, not a 3.3V pin, and try it with the motors off.
+- **Why**: A moving servo draws a burst of current, which can briefly pull the supply voltage down.
+
+- **Problem**: The servo does not move at all.
+- **Solution**: Check the orange signal wire is on D9, the same pin as in `myservo.attach(9)`, and that brown is on GND and red is on 5V.
+- **Why**: The servo only moves when it sees its control signal on the pin the code is using.
+
+- **Problem**: The servo moves, but never reaches its end positions.
+- **Solution**: Try the sweep with values like 10 to 170 instead of 0 to 180.
+- **Why**: Cheap servos vary, and driving one against its end stop makes it strain.
 
 ---
 
@@ -118,4 +149,10 @@ An SG90 servo has three wires:
 - [ ] Ground
 - [ ] Power
 - [x] Carries the signal that tells the servo where to move
+
+? Which line in the sketch tells the Arduino which pin the servo's signal wire is on?
+- [ ] `#include <Servo.h>`
+- [x] `myservo.attach(9);`
+- [ ] `int pos = 0;`
+> `attach(9)` links the servo object to pin 9, which is where the orange wire goes.
 {% endquiz %}

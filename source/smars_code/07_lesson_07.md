@@ -2,12 +2,16 @@
 title: Lesson 07 - Line Following
 description: Learn how to use the line follow module
 layout: lesson
+type: page
 cover: /learn/smars_code/assets/banners/07_lesson_07.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read a TCRT5000 line sensor with `analogRead()` and tune a threshold so SMARS follows the edge of a black line.
 
 ## Watch the livestream
 
@@ -32,6 +36,10 @@ Download the PDFs here:
 * [smars_line_follow_track_05_wiggley.pdf](assets/smars_line_follow_track_05_wiggley.pdf)
 * [smars_line_follow_track_06_round_corner.pdf](assets/smars_line_follow_track_06_round_corner.pdf)
 
+Here is the first track, a simple loop, to give you an idea of what to print:
+
+![Track 01, a simple loop](assets/smars_line_follow_track_01_loop.jpg){:class="img-fluid w-50" loading="lazy"}
+
 ---
 
 ## What you'll need
@@ -40,6 +48,21 @@ Download the PDFs here:
 * A USB Cable to connect to your computer
 * A Computer that can run the [Arduino IDE](https://www.arduino.cc/en/software)
 * A [line follow module](/resources/glossary#tcrt5000) - TCRT5000 or equivalent
+
+* A black line on white paper (print a track above, or use black tape on white card)
+
+---
+
+## Wiring
+
+| Line sensor pin | Arduino pin |
+| --- | --- |
+| VCC | 5V |
+| GND | GND |
+| AO (analog output) | A4 |
+{:class="table table-striped"}
+
+The sketch reads the sensor on `A4`, the same pin lesson 4 used for the MPU-6050's SDA wire. Unplug the MPU-6050 before you wire the line sensor. If your module's pins are labelled differently (some only have a digital `DO` output), use the analogue output.
 
 ---
 
@@ -220,11 +243,31 @@ void loop() {
 
 Every sensor and every floor is different, so watch the numbers in the Serial Monitor and adjust `light_threshold` to sit halfway between your white and black readings.
 
-## Try it yourself
+## Try it Yourself
 
 1. Print one of the track PDFs and see how fast SMARS can get round it.
 2. Change `wait_in_milliseconds` from `10` to `20`. Is it faster or does it lose the line?
 3. Challenge: use the `dark_threshold` variable so the robot only turns when the reading is really dark.
+
+> **Teachers**: Line following depends on light, so results vary between classrooms: bright windows and shiny desks change the readings. Run the Serial Monitor first, read the numbers for white and for black, and pick the threshold from those, rather than trusting 650. Stand a wall of card around the track so the robot cannot wander off the table, and print the tracks on matt paper because glossy paper reflects too much light.
+
+## Common Issues
+
+- **Problem**: SMARS drives straight off the line, or spins on the spot and never moves forwards.
+- **Solution**: Open the Serial Monitor at `9600` baud, hold the sensor over white paper and then over the line, and set `light_threshold` roughly halfway between the two readings.
+- **Why**: Light changes the numbers the sensor gives, so a threshold that worked on one table may be wrong on another.
+
+- **Problem**: The reading is always about the same, whatever is under the sensor.
+- **Solution**: Check the sensor sits a few millimetres above the paper, that its signal wire is on `A4`, and that you are using the analogue output pin.
+- **Why**: The TCRT5000 only works at a short range, and a digital output can only say "light" or "dark".
+
+- **Problem**: SMARS keeps losing the line on tight corners.
+- **Solution**: Try a shorter `wait_in_milliseconds`, or a wider, more gentle track.
+- **Why**: Each forward burst is a fixed time, so it can overshoot a bend before the sensor can react.
+
+- **Problem**: Nothing appears in the Serial Monitor.
+- **Solution**: Make sure the baud rate box says `9600`, matching `Serial.begin(9600);`.
+- **Why**: The sketch and the Serial Monitor must agree on the speed.
 
 ---
 
@@ -242,6 +285,12 @@ Every sensor and every floor is different, so watch the numbers in the Serial Mo
 - [ ] Remove the tracks
 - [ ] Change the baud rate
 > Lighting and paper change the readings, so the threshold needs tuning for your track.
+
+? In this sketch, what does the robot do while the sensor reading is above `light_threshold`?
+- [ ] Turns left
+- [x] Drives forward in short bursts
+- [ ] Goes backwards
+> A high reading means white paper, so the `while` loop keeps calling `forward()`.
 {% endquiz %}
 
 ## What's next
