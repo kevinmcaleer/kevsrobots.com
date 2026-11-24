@@ -11,15 +11,16 @@ description: Dive into advanced data manipulation techniques in Pandas, includin
   merging datasets, joining, and handling time series data for sophisticated data
   analysis.
 percent: 72
-duration: 4
-quiz_total: 17
+duration: 5
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
   - section: Overview
     content:
     - name: About this course
-      link: 01_overview.html
+      link: 00_intro.html
   - section: Introduction to Pandas
     content:
     - name: Pandas and NumPy
@@ -54,6 +55,10 @@ navigation:
 
 
 ![Cover photo]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to combine tables with `concat()`, `merge()` and `join()`, and total readings by week with `resample()`.
 
 ## Overview
 
@@ -137,7 +142,41 @@ weekly = log.resample('W', on='date').sum()
 print(weekly)
 ```
 
+```shell
+            distance_m
+date
+2024-01-07          27
+2024-01-14          29
+```
+
+Each week is labelled with its last day, a Sunday. The 1st and 3rd of January (12 and 15) add up to 27, and the 9th and 12th (9 and 20) add up to 29.
+
 `resample()` groups rows into time periods, here weeks (`'W'`). Use `'D'` for days or `'MS'` for months. If the dates are the index, you can leave out `on=`.
+
+---
+
+## Try it Yourself
+
+1. Run the `merge` example again with `how='left'`, and add a robot to `all_days` that is missing from `specs`. What shows up in the `wheels` column?
+2. Use `pd.concat()` without `ignore_index=True`, and print the index. What do you notice?
+3. Change `resample('W', ...)` to `resample('MS', ...)` to get a monthly total.
+4. Challenge: merge `all_days` with `specs`, then use `groupby('robot')` to find the total distance for each robot.
+
+---
+
+## Common Issues
+
+- **Problem**: `TypeError: Only valid with DatetimeIndex, TimedeltaIndex or PeriodIndex` when you call `resample()`.
+- **Solution**: Convert the dates first with `log['date'] = pd.to_datetime(log['date'])`.
+- **Why**: Dates read from a file or typed as strings are plain text. `resample()` only works on real dates.
+
+- **Problem**: After `merge()` some rows have `NaN` or have disappeared.
+- **Solution**: Check the key values match exactly (spelling, spaces, case), and choose `how='left'` or `how='outer'` to decide which unmatched rows you keep.
+- **Why**: The default is an inner merge, which keeps only the rows whose key appears in both tables.
+
+- **Problem**: The key column has different names in the two tables.
+- **Solution**: Use `pd.merge(a, b, left_on='name', right_on='robot')`.
+- **Why**: `on=` expects the same name in both tables.
 
 ---
 
@@ -169,6 +208,8 @@ These tips can significantly enhance your efficiency and effectiveness in data m
 
 ---
 
+## Check your understanding
+
 {% quiz %}
 ? Which function stacks the rows of two Data Frames on top of each other?
 - [x] `pd.concat()`
@@ -181,6 +222,12 @@ These tips can significantly enhance your efficiency and effectiveness in data m
 - [x] Adds up the values for each week
 - [ ] Removes weekends
 > `resample()` groups rows into time periods, then `sum()` totals each one.
+
+? By default, what does `pd.merge(a, b, on='robot')` keep?
+- [ ] Every row from both tables
+- [x] Only rows whose `robot` value appears in both tables
+- [ ] Only rows from the first table
+> The default is an inner merge. Add `how='left'` or `how='outer'` to keep unmatched rows.
 {% endquiz %}
 
 ---

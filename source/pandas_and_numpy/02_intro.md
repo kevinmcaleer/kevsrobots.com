@@ -4,9 +4,14 @@ title: Pandas and NumPy
 type: page
 description: Kickstart your journey in data manipulation in Python with an introduction to Pandas and NumPy, two powerhouse libraries.
 cover: /learn/pandas_and_numpy/assets/pandas01.png
+date_updated: 2026-11-24
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to explain what Pandas and NumPy are for, and create a NumPy array and a Pandas Series.
 
 ## Overview
 
@@ -36,7 +41,7 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 print(arr)
 {% endcapture %}
-{% include snakie.html code=snakie_code name="numpy_array.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="numpy_array.py" engine="pyodide" packages="numpy,pandas" %}
 
 Output:
 
@@ -70,6 +75,16 @@ Data Frames are two-dimensional, size-mutable, and potentially heterogeneous tab
 
 A Series, in Pandas, is a one-dimensional array-like object that can hold many data types, such as numbers or strings.
 
+### How the libraries fit together
+
+```mermaid
+flowchart LR
+    NP["NumPy: fast arrays of numbers"] --> PD["Pandas: labelled tables built on NumPy"]
+    PD --> MPL["Matplotlib: charts drawn from your tables"]
+```
+
+NumPy does the number crunching, Pandas adds row and column labels so you can work with data the way you do in a spreadsheet, and Matplotlib turns the result into a chart. We use all three in this course.
+
 ---
 
 ## Code Playground
@@ -92,6 +107,25 @@ print(s)
 
 ---
 
+## Try it Yourself
+
+1. In the playground, change the array to hold five battery readings from a robot, such as `[87, 85, 82, 80, 76]`, and print it.
+2. Add `print(arr * 2)` and `print(arr.mean())`. Notice that NumPy works on the whole array at once, with no loop.
+3. Give the Series labels: `pd.Series([87, 85, 82], index=['Mon', 'Tue', 'Wed'])`. Then print `s['Tue']`.
+4. Challenge: make a second Series for a different robot and print the two added together.
+
+---
+
+## Common Issues
+
+- **Problem**: `ModuleNotFoundError: No module named 'pandas'`
+- **Solution**: Install it with `pip install pandas numpy`, making sure you use the same Python that runs your script. The next lesson covers this in detail.
+- **Why**: Pandas and NumPy are not part of the Python that comes with your computer. They are separate packages you add once.
+
+---
+
+## Check your understanding
+
 {% quiz %}
 ? What is a Pandas Series?
 - [x] A one-dimensional labelled array, like a single column
@@ -104,6 +138,12 @@ print(s)
 - [x] NumPy
 - [ ] Seaborn
 > Pandas stores its data in NumPy arrays, which is why the two are taught together.
+
+? What does NumPy let you do that a plain Python list does not?
+- [ ] Draw charts
+- [x] Do maths on a whole array at once, such as `arr * 2`
+- [ ] Read Excel files
+> NumPy arrays apply an operation to every element without a loop. Charts come from Matplotlib.
 {% endquiz %}
 
 ---

@@ -4,9 +4,14 @@ title: Practical Examples and Case Studies
 type: page
 description: Apply your skills with Pandas and NumPy to real-world scenarios through practical examples and detailed case studies.
 cover: /learn/pandas_and_numpy/assets/pandas10.png
+date_updated: 2026-11-24
 ---
 
 ![Cover photo]({{page.cover}}){:class="cover"}
+
+---
+
+By the end of this lesson you will be able to combine cleaning, analysis and charting in one worked example, and choose a project of your own.
 
 ## Overview
 
@@ -49,7 +54,7 @@ log.plot(x='time', y=['battery', 'smooth'], title='Robot battery level')
 plt.ylabel('Battery %')
 plt.show()
 {% endcapture %}
-{% include snakie.html code=snakie_code name="case_studies.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="case_studies.py" engine="pyodide" packages="numpy,pandas,matplotlib" %}
 
 ### How it works
 
@@ -58,6 +63,29 @@ plt.show()
 3. `interpolate()` fills each gap with a value between its neighbours, which suits a smoothly changing reading like this
 4. `resample('D', on='time')` groups the readings by day, and `rolling(window=6).mean()` averages each reading with the five before it, smoothing out the noise
 5. `plot()` draws the raw and smoothed lines together
+
+---
+
+## Try it Yourself
+
+1. Change `window=6` to `window=12` and look at the chart. Is the smoothed line smoother or more delayed?
+2. Print the time of the lowest battery reading with `log.loc[log['battery'].idxmin()]`.
+3. Count how many hours the battery was below 40 with `(log['battery'] < 40).sum()`.
+4. Challenge: change the `seed` and the number of dropped-out readings, then check the clean-up still works.
+
+---
+
+## Common Issues
+
+- **Problem**: The first few `smooth` values are `NaN`.
+- **Solution**: This is expected. If you want a value from the first reading, use `rolling(window=6, min_periods=1)`.
+- **Why**: A rolling average needs a full window of readings before it can give an answer.
+
+- **Problem**: A different `seed` gives different numbers from the ones in this lesson.
+- **Solution**: Use the same `seed=42` to match, or leave the seed out if you do not need repeatable results.
+- **Why**: The seed starts the random number generator at a known place, so the same seed gives the same numbers.
+
+> **Teachers**: the worked example makes its own data, so there is nothing to download, and it runs in a fraction of a second. For the projects, real datasets are a good chance to talk about size. A school machine may struggle to open a file with millions of rows, so give learners a trimmed sample (a few thousand rows) and remind them to check where a dataset came from and whether they are allowed to use it.
 
 ---
 
@@ -81,12 +109,26 @@ Log readings from a real sensor, such as a Raspberry Pi Pico's temperature senso
 
 ---
 
+## Check your understanding
+
 {% quiz %}
 ? Why does the worked example use `rolling(window=6).mean()`?
 - [ ] To fill in missing values
 - [x] To smooth out noise by averaging each reading with the ones before it
 - [ ] To sort the readings
 > A rolling average shows the overall trend without the jitter of individual readings.
+
+? Why does the example set a `seed` for the random number generator?
+- [ ] To make the chart colourful
+- [x] So you get the same numbers every time you run it
+- [ ] To speed up the code
+> A fixed seed makes the random data repeatable, so your results match the lesson.
+
+? What does `interpolate()` do to the dropped-out readings?
+- [ ] Deletes the rows
+- [x] Fills each gap with a value between its neighbours
+- [ ] Sets them to zero
+> The battery changes smoothly, so estimating from the readings either side is reasonable.
 {% endquiz %}
 
 ---

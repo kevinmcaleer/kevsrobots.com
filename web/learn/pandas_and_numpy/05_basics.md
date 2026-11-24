@@ -10,15 +10,16 @@ next: 06_import_export.html
 description: Master the fundamental operations with Data Frames in Pandas, including
   data selection, filtering, sorting, and basic computations.
 percent: 40
-duration: 3
-quiz_total: 17
+duration: 5
+quiz_total: 33
+date_updated: 2026-11-24
 navigation:
 - name: Data Manipulation with Pandas and Numpy
 - content:
   - section: Overview
     content:
     - name: About this course
-      link: 01_overview.html
+      link: 00_intro.html
   - section: Introduction to Pandas
     content:
     - name: Pandas and NumPy
@@ -54,6 +55,10 @@ navigation:
 
 ![Cover photo]({{page.cover}}){:class="cover"}
 
+---
+
+By the end of this lesson you will be able to select, filter and sort the rows of a Data Frame and calculate simple statistics.
+
 ## Overview
 
 Data Frames are central to data manipulation in Pandas, and knowing how to select, filter, sort and summarise them is key to unlocking their power. In this lesson we'll use a small table of robot sensor readings, which we'll keep using for the next few lessons.
@@ -69,7 +74,7 @@ df = pd.DataFrame({
 })
 print(df)
 {% endcapture %}
-{% include snakie.html code=snakie_code name="basics.py" engine="pyodide" %}
+{% include snakie.html code=snakie_code name="basics.py" engine="pyodide" packages="numpy,pandas" %}
 
 ---
 
@@ -163,9 +168,30 @@ no_sensor = df.drop(columns=['sensor'])
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
-Find all the readings from the `distance` sensor, sorted from nearest to furthest.
+1. Find all the readings from the `distance` sensor, sorted from nearest to furthest.
+2. Show only the `robot` and `battery` columns for robots with a battery below 70.
+3. Print the average battery of the rows where the sensor is `distance`.
+4. Challenge: find the robot with the lowest battery in one line, using `sort_values()` and `iloc[0]`.
+
+---
+
+## Common Issues
+
+- **Problem**: `ValueError: The truth value of a Series is ambiguous` when you filter.
+- **Solution**: Use `&` for and, `|` for or, and put brackets round each condition, like `df[(df['battery'] > 80) & (df['sensor'] == 'distance')]`.
+- **Why**: Python's `and` and `or` only work on single True or False values. `&` and `|` compare each row.
+
+- **Problem**: You changed a filtered table, but the original `df` did not change (older versions of Pandas may show a `SettingWithCopyWarning`).
+- **Solution**: Change the original with `loc`, for example `df.loc[df['battery'] > 80, 'battery'] = 100`.
+- **Why**: A filtered table is a copy. Current Pandas never writes changes on a copy back to `df`, so use `loc` on `df` itself.
+
+- **Problem**: You called `df.drop(...)` but the column is still there.
+- **Solution**: Assign the result back, `df = df.drop(columns=['sensor'])`.
+- **Why**: `drop()` returns a new Data Frame and leaves the original alone.
+
+## Check your understanding
 
 {% quiz %}
 ? What does `df[df['battery'] > 80]` return?
@@ -179,6 +205,12 @@ Find all the readings from the `distance` sensor, sorted from nearest to furthes
 - [ ] `iloc` selects columns, `loc` selects rows
 - [ ] There is no difference
 > `iloc[0]` is always the first row, while `loc[0]` is the row labelled 0.
+
+? Which operator combines two conditions in a filter?
+- [ ] `and`
+- [x] `&`, with brackets round each condition
+- [ ] `+`
+> `and` fails on a whole column. `&` compares row by row.
 {% endquiz %}
 
 ---

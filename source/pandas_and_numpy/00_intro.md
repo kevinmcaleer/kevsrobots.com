@@ -3,12 +3,17 @@ layout: lesson
 title: About this course
 type: page
 description: Learn the basics of data manipulation in Python using Pandas and NumPy, including installation, understanding data structures, and performing data operations.
-cover: /learn/pandas_and_numpy/assets/banners/01_overview.jpg
+cover: /learn/pandas_and_numpy/assets/banners/00_intro.jpg
+redirect_from: /learn/pandas_and_numpy/01_overview.html
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to describe what the course covers and what you need to follow along.
+
 
 ## Watch the video
 
@@ -53,8 +58,8 @@ After completing this course, you will be able to:
 
 To follow along with this course, you will need:
 
-* A computer with Python installed
-* Familiarity with basic Python syntax. If you're new to Python, take [Python for beginners](/learn/python/) first
+* A computer with Python installed (or just a web browser, because every runnable example has a built-in code box)
+* Familiarity with basic Python syntax: variables, lists, dictionaries and functions. If you're new to Python, take [Python for beginners](/learn/python/) first
 * A text editor or an IDE for writing Python code
 * Internet connection to install Pandas and NumPy packages
 
@@ -81,6 +86,12 @@ Important tips and notes are provided in highlighted sections like below:
 
 ---
 
+Each lesson opens with what you will be able to do by the end, and finishes with **Try it Yourself** exercises, a **Common Issues** list for when things go wrong, and a short quiz. The examples use a made-up log from a few robots (SMARS, BurgerBot and a quadruped), so the data feels like the stuff you will collect from your own builds.
+
 This course is designed to be interactive and hands-on. We encourage you to practice the examples and exercises provided in each lesson. If you have any questions or need assistance, please reach out through the comments section or contact us directly. Let's dive into the world of data manipulation with Python!
+
+---
+
+> **Teachers**: this course suits learners aged 13 and up who already know basic Python. Allow 30 to 45 minutes per lesson, so about eight hours in all. Each learner needs only a computer. Installs are the usual catch on school machines: many lock down `pip`, so ask IT to add Pandas, NumPy and Matplotlib to the image, or have learners use the built-in code boxes or a free Google Colab account (which needs a Google account, so check your school's rules). Most examples also run in the built-in code boxes, so a lot of the course needs no installs at all. Datasets in the course are tiny on purpose, so nothing is slow, but remind learners that real files with millions of rows need far more memory.
 
 ---

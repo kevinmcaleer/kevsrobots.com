@@ -3876,13 +3876,13 @@
     "author": "Kevin McAleer",
     "date_published": "2023-11-14",
     "groups": [
-      "pandas & numpy"
+      "python"
     ],
     "lessons": [
       {
-        "file": "01_overview.md",
+        "file": "00_intro.md",
         "section": "Overview",
-        "url": "/learn/pandas_and_numpy/01_overview.html"
+        "url": "/learn/pandas_and_numpy/00_intro.html"
       },
       {
         "file": "02_intro.md",

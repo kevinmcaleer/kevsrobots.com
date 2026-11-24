@@ -728,12 +728,12 @@
   cover: /learn/pandas_and_numpy/assets/pandas.png
   date_published: 2023-11-14
   description: Learn how to manipulate data using Pandas and Numpy
-  duration: 0h 37m
+  duration: 0h 59m
   groups:
-  - pandas & numpy
+  - python
   lessons: 12
   level: beginner
-  link: /learn/pandas_and_numpy/01_overview.html
+  link: /learn/pandas_and_numpy/00_intro.html
   name: Data Manipulation with Pandas and Numpy
   video: kD5r-dph7Lg
 - author: Kevin McAleer
