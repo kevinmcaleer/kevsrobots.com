@@ -1,130 +1,154 @@
 ---
 title: Introduction to Shell Scripting
-description: Learn the basics of shell scripting, including how to create and run simple scripts.
+description: Write, save and run your first bash script on the Pi, and learn what the shebang line and the execute bit are for.
 layout: lesson
+type: page
 cover: /learn/linux_intro/assets/shell.jpg
+date_updated: 2026-11-24
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-Shell scripting allows you to automate tasks on your Raspberry Pi by writing scripts—collections of commands executed in sequence. This lesson introduces you to the basics of shell scripting, including how to create and run simple scripts.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
+By the end of this lesson you will be able to write a short bash script with `nano`, make it executable, and run it.
 
-- Understand what a shell script is and its uses.
-- Create a simple shell script.
-- Run and test your shell script.
+## Typing once, running forever
 
----
+Everything we have typed so far runs once and is forgotten. A **shell script** is those same commands saved in a text file, so you can run them again with one word. It is how you turn "the five commands I run every Sunday" into a single command, and it is how people set up Pis again and again without remembering the steps.
 
-### What is a Shell Script?
+Our scripts live in `~/homelab/scripts`, where we made a home for them earlier.
 
-A `shell script` is a text file containing a sequence of commands that the shell (command interpreter) can execute. Shell scripts can automate repetitive tasks, manage system configurations, and much more.
+```mermaid
+flowchart LR
+    A["nano: write the commands in a file"] --> B["chmod +x: allow it to run"]
+    B --> C["./script.sh: run it"]
+    C --> D["bash reads it, one line at a time"]
+```
 
----
+## Your first script
 
-### Creating a Simple Shell Script
+Open a new file with `nano`:
 
-`echo` is a command that prints text to the terminal.
+```bash
+$ cd ~/homelab/scripts
+$ nano hello.sh
+```
 
-      echo "Hello, World!"
+Type this, then save with `Ctrl + O`, `Enter`, and quit with `Ctrl + X`:
 
-This will simply print "Hello, World!" to the terminal.
+```bash
+#!/bin/bash
+# hello.sh - greet the Pi's owner
+echo "Hello from $(hostname)!"
+echo "Today is $(date '+%A %d %B')"
+echo "You are logged in as $(whoami)"
+```
 
-You can also redirect the text to a file by using the `>` operator:
+What is going on in each line:
 
-      echo "Hello, World!" > hello.sh
+- `#!/bin/bash` is the **shebang**. It must be the very first line and tells the system which program should run the file, here `bash`.
+- A line starting with `#` is a **comment**. The shell ignores it, so it is a note for humans.
+- `$(...)` runs a command and puts its output in place. So `$(hostname)` becomes `raspberrypi`.
 
-This will create a file named `hello.sh` that contains the text "Hello, World!".
+## Running it
 
-How do we know the contents of the file? For that, we can use the `cat` command.
+If you try right now, it will not work, just as we saw in the permissions lesson:
 
----
+```bash
+$ ./hello.sh
+bash: ./hello.sh: Permission denied
+$ chmod +x hello.sh
+$ ./hello.sh
+Hello from raspberrypi!
+Today is Tuesday 24 November
+You are logged in as pi
+```
 
-## What is the `cat` Command?
+`chmod +x` gives the file the execute permission. The `./` means "the file in this folder". Without it, the shell only looks in the system program folders and says `command not found`.
 
-`cat` (catalog) is a command that displays the contents of a file:
+You can also hand any script to bash directly, with no `chmod` needed, which is handy for a quick test:
 
-   cat hello.sh
+```bash
+$ bash hello.sh
+```
 
----
+## Writing output to a file
 
-## How to Edit a File
+Scripts get more useful when they keep a record. Remember `>` and `>>` from the files lesson:
 
-`echo` and `cat` only works if you want to add a single line of text, or show the contents of a file. If you want to add multiple lines of text or edit an existing file you can use a text editor like `nano`.
+```bash
+#!/bin/bash
+# note.sh - add a timestamped line to the notes file
+echo "$(date '+%Y-%m-%d %H:%M') $1" >> "$HOME/homelab/notes.txt"
+echo "Saved your note."
+```
 
----
+`$1` is the first thing you type after the script's name:
 
-To create a shell script, you can use the `nano` text editor. For example, to create a script that prints "Hello, World!":
+```bash
+$ chmod +x note.sh
+$ ./note.sh "Installed tree and htop"
+Saved your note.
+$ tail -n 1 ~/homelab/notes.txt
+2026-11-24 10:42 Installed tree and htop
+```
 
-1. Open `nano` and create a new file:
+`$HOME` is a built-in variable holding your home folder, which is more reliable than typing the path.
 
-         nano hello.sh
+## About editors
 
-   Add the following content to the file:
+`nano` is the friendliest editor and the one used in this course. If you like `vim`, it is not included in the default Pi OS image, so install it with `sudo apt install vim`. In vim, press `i` to type, `Esc` to stop, then `:wq` and `Enter` to save and quit. It has a steeper learning curve, but many people love it.
 
-         #!/bin/bash
-         echo "Hello, World!"
+> **Careful**: a script does exactly what it says, with your permissions. Do not run scripts from the internet without reading them first, and be extra wary of any that need `sudo`. When you test your own, begin with harmless commands such as `echo`.
 
-   Save and exit nano (use `Ctrl + O` to save and `Ctrl + X` to exit).
+Pi progress: you have your first two scripts in `~/homelab/scripts`. Next we give them a brain, with variables, decisions and loops.
 
----
+## Try it Yourself
 
-## Running Your Shell Script
+1. Add a fourth line to `hello.sh` that prints the Pi's IP address using `$(hostname -I)`.
+2. Write `uptime.sh` that prints `Up for:` followed by the output of `uptime -p`, make it executable and run it.
+3. Change `note.sh` so it also prints how many lines are now in the notes file (hint: `wc -l`).
+4. Challenge: write a script that creates a folder called `projects/` followed by today's date in `YYYY-MM-DD` form, with `mkdir -p`.
 
-To run your script, you need to make it executable and then execute it:
+## Common Issues
 
-Make the script executable:
+- **Problem**: `bash: ./hello.sh: Permission denied`.
+- **Solution**: Run `chmod +x hello.sh`.
+- **Why**: The file has no execute permission yet.
 
-      chmod +x hello.sh
+- **Problem**: `bash: hello.sh: command not found`.
+- **Solution**: Run it as `./hello.sh`, or give the full path.
+- **Why**: The current folder is not on the shell's search path, so you must say where the script is.
 
-   This will give the script permission to run as an executable.
+- **Problem**: `bad interpreter: No such file or directory`, or odd `^M` characters.
+- **Solution**: The file has Windows line endings. Run `sed -i 's/\r$//' hello.sh` to fix it.
+- **Why**: A script written on Windows ends lines with an extra invisible character that confuses the shebang line.
 
-   Run the script:
+## Check your understanding
 
-      ./hello.sh
+{% quiz %}
+? What does `#!/bin/bash` on the first line do?
+- [ ] It is a comment that does nothing
+- [x] It tells the system to run the file with bash
+- [ ] It makes the file executable
+> The shebang names the program that runs the script. `chmod +x` is a separate step.
 
-You should see "Hello, World!" printed in the terminal.
+? Why does `./hello.sh` say `Permission denied` straight after creating the file?
+- [ ] The file is empty
+- [x] It does not have the execute permission yet
+- [ ] bash is not installed
+> New files are not executable by default, so add it with `chmod +x`.
 
----
+? What does `$(hostname)` do inside an echo?
+- [ ] Prints the text $(hostname)
+- [x] Runs the command and puts its output in place
+- [ ] Creates a variable
+> `$(...)` is command substitution, so it gets replaced by the output.
 
-## Vim
-
-If you prefer using `vim` as a text editor, you can create a shell script using the following steps:
-
-1. Open `vim` and create a new file:
-
-         vim hello.sh
-
-1. Press `i` to enter insert mode and add the following content to the file:
-
-         #!/bin/bash
-         echo "Hello, World!"
-
-1. Press `Esc` to exit insert mode, then type `:wq` and press `Enter` to save and exit.
-
-> ## What does Vim stand for
->
-> Vim stands for Vi IMproved.
->
-> ---
->
-> ### Explanation
->
-> `Vi`: Vim is an enhanced version of the older text editor called `vi`, which stands for "visual." Vi was one of the earliest text editors in the Unix operating system and became widely used due to its efficiency and powerful editing capabilities.
->
-`IMproved`: Vim stands for "Vi IMproved" because it includes many enhancements and additional features that were not present in the original vi editor. These improvements include features like syntax highlighting, multi-level undo, support for plugins, and a more extensive command set, making it a much more powerful and flexible tool than the original vi.
->
-> `vim` retains compatibility with `vi` while offering these additional features, which is why it's often considered a superset of `vi`. Despite its steep learning curve, Vim is highly regarded for its speed, efficiency, and the extensive control it gives users over text editing.
-
----
-
-## Summary
-
-In this lesson, you learned what a shell script is and how to create and run a simple shell script. Shell scripting is a powerful tool for automating tasks and managing your Raspberry Pi more efficiently.
-
----
+? What is `$1` in a script?
+- [x] The first argument typed after the script name
+- [ ] The first line of the script
+- [ ] The number of arguments
+> `./note.sh "text"` makes `$1` equal to `text`.
+{% endquiz %}

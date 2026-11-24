@@ -2131,13 +2131,13 @@
     "author": "Kevin McAleer",
     "date_published": "2024-08-23",
     "groups": [
-      "linux"
+      "raspberrypi"
     ],
     "lessons": [
       {
-        "file": "01_intro_terminal.md",
+        "file": "00_intro.md",
         "section": "Getting Started with the Command Line",
-        "url": "/learn/linux_intro/01_intro_terminal.html"
+        "url": "/learn/linux_intro/00_intro.html"
       },
       {
         "file": "01a_man.md",
@@ -2190,6 +2190,11 @@
         "url": "/learn/linux_intro/09_managing_processes.html"
       },
       {
+        "file": "09a_services.md",
+        "section": "System Monitoring and Management",
+        "url": "/learn/linux_intro/09a_services.html"
+      },
+      {
         "file": "10_networking_commands.md",
         "section": "Networking Basics",
         "url": "/learn/linux_intro/10_networking_commands.html"
@@ -2231,12 +2236,12 @@
       },
       {
         "file": "18_resources_next_steps.md",
-        "section": "Resources and Next Steps",
+        "section": "Summary and Next Steps",
         "url": "/learn/linux_intro/18_resources_next_steps.html"
       },
       {
         "file": "19_cheatsheet.md",
-        "section": "Resources and Next Steps",
+        "section": "Summary and Next Steps",
         "url": "/learn/linux_intro/19_cheatsheet.html"
       }
     ]

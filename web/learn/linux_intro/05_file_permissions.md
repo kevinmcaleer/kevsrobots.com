@@ -7,17 +7,19 @@ cover: /learn/linux_intro/assets/permissions_cover.jpg
 date: 2024-08-23
 previous: 04_working_with_directories.html
 next: 06_installing_software.html
-description: Understand file permissions and learn how to change them using chmod
-  and chown.
+description: Read the permission string from ls -l, change it with chmod, and fix
+  ownership with chown, with safe ways to practise.
 percent: 28
-duration: 5
+duration: 6
+quiz_total: 85
+date_updated: 2026-11-24
 navigation:
 - name: Introduction to the Linux Command Line on Raspberry Pi OS
 - content:
   - section: Getting Started with the Command Line
     content:
-    - name: Introduction to the Terminal
-      link: 01_intro_terminal.html
+    - name: Course Overview
+      link: 00_intro.html
     - name: Getting Help with `man`
       link: 01a_man.html
     - name: Basic Command Line Navigation
@@ -44,6 +46,8 @@ navigation:
       link: 08_monitoring_performance.html
     - name: Managing Processes
       link: 09_managing_processes.html
+    - name: Services and systemctl
+      link: 09a_services.html
   - section: Networking Basics
     content:
     - name: Networking Commands
@@ -68,169 +72,169 @@ navigation:
       link: 16_final_project_overview.html
     - name: Final Project Steps
       link: 17_final_project_steps.html
-  - section: Resources and Next Steps
+  - section: Summary and Next Steps
     content:
-    - name: Resources and Next Steps
+    - name: Summary and Next Steps
       link: 18_resources_next_steps.html
     - name: Linux Command Line Cheatsheet
       link: 19_cheatsheet.html
 ---
 
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-File permissions and ownership are critical for system security and multi-user environments. This lesson will teach you how to view and modify file permissions and ownership.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
+By the end of this lesson you will be able to read a permission string such as `-rwxr-xr--`, change it with `chmod` in letters or numbers, and fix a file's owner with `chown`.
 
-- Understand file permissions and how they work.
-- Change file permissions using `chmod`.
-- Change file ownership using `chown`.
+## Why permissions exist
 
----
+Your Pi might one day hold a web server, a database password and a robot's control code. Permissions decide who may read, change or run each one. They stop a mistake in one program from wrecking another, and they keep secrets (like a password file) away from other users. Docker leans on them heavily: when a container cannot write to a folder, the answer is almost always permissions.
 
-### Understanding File Permissions
+## Reading a permission string
 
-Every file and directory in Linux has a set of permissions that determine who can read, write, or execute it. These are represented by a series of letters and dashes, like `-rwxr-xr-x`.
+Run a long listing on a file in our scripts folder:
 
-- **r**: Read
-- **w**: Write
-- **x**: Execute
+```bash
+$ touch ~/homelab/scripts/hello.sh
+$ ls -l ~/homelab/scripts/hello.sh
+-rw-r--r-- 1 pi pi 0 Nov 24 10:02 /home/pi/homelab/scripts/hello.sh
+```
 
-Permissions are divided into three groups:
+![ls -l output](/learn/linux_intro/assets/ls-l.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
 
-1. **Owner**: The user who owns the file.
-1. **Group**: The group that owns the file.
-1. **Others**: Everyone else.
+The first column is the permission string. Split it up:
+
+```mermaid
+flowchart LR
+    A["- rw- r-- r--"] --> T["- : file (d means folder)"]
+    A --> U["rw- : owner can read and write"]
+    A --> G["r-- : group can only read"]
+    A --> O["r-- : everyone else can only read"]
+```
+
+After the permissions come the **owner** (`pi`) and the **group** (`pi`), then the size, the date and the name.
 
 ![permissions meaning](/learn/linux_intro/assets/permissions_meaning.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
 
----
+What do `r`, `w` and `x` mean?
 
-### **Understanding File and Directory Permissions in Unix**
-
-In Unix-like operating systems (like Linux), every file and directory has a set of permissions that determine who can read, write, or execute them. These permissions control what different users can do with a file or directory.
-
-#### **The Three Types of Permissions:**
-
-1. **`r` - Read:**
-   - If you have **read** permission (`r`), you can **open and view** the contents of a file or list the contents of a directory.
-   - **Example:** If you have read permission on a text file, you can open and read it, but you can't make changes to it.
-
-2. **`w` - Write:**
-   - If you have **write** permission (`w`), you can **modify** the contents of a file or **make changes** within a directory.
-   - **For a file:** This means you can edit the file, add new content, delete content, or even delete the file itself.
-   - **For a directory:** Write permission lets you create new files or delete existing files within that directory.
-   - **Example:** If you have write permission on a document, you can edit it, save changes, or even delete it.
-
-3. **`x` - Execute:**
-   - If you have **execute** permission (`x`), you can **run** the file as a program or script.
-   - **For a file:** This is usually used for scripts or programs. If a file is marked as executable, you can run it directly from the command line.
-   - **For a directory:** Execute permission means you can **enter** the directory (using the `cd` command) and access the files within it.
-   - **Example:** If you have execute permission on a script file, you can run that script, and it will perform its programmed tasks.
-
-#### **Who Can Have These Permissions?**
-
-Permissions are set for three types of users:
-
-1. **Owner (User):**
-   - The person who created the file or directory. They usually have full control over it.
-
-2. **Group:**
-   - A group of users who are assigned certain permissions. This is useful for teams or collaborators working on the same files.
-
-3. **Others:**
-   - Everyone else who is not the owner or in the group. These are users who might need limited access to the file or directory.
-
-#### **Example of Permissions:**
-
-Let's say you have a file with the following permissions: `rwxr-xr--`.
-
-- **Owner (`rwx`)**: The owner can read, write, and execute the file. This means they can do anything with the file—open it, edit it, run it as a program, etc.
-- **Group (`r-x`)**: The group can read and execute the file, but they **cannot** modify it. They can view the file and run it if it's a script or program, but they can't change its contents.
-- **Others (`r--`)**: Everyone else can only read the file. They can't modify or execute it.
-
-#### **Putting It All Together:**
-
-Permissions ensure that files and directories are secure and that only the right people can access or modify them. Understanding these basics will help you manage your files better and keep your system safe.
-
-- **Read (`r`)**: You can **look at** the contents.
-- **Write (`w`)**: You can **change or delete** the contents.
-- **Execute (`x`)**: You can **run** the file as a program or **enter** the directory.
-
-Learning to work with these permissions is an essential skill when using the command line, especially in multi-user environments like Linux servers or shared systems.
-
----
-
-### Viewing Permissions
-
-To view the permissions of a file, use the `ls -l` command:
-
-        ls -l example.txt
-
----
-
-### Changing Permissions with chmod
-
-The `chmod` command is used to change file permissions. For example, to make a file executable by the owner, use:
-
-        chmod u+x example.sh
-
-the `u+x` means ***add execute permission for the owner***. You can also use `g` for group and `o` for others:
-
-        chmod g+r example.sh
-        chmod o-w example.sh
-
-You can also use numeric values to set permissions:
-
-        chmod 755 example.sh
-
-The numeric values are calculated as follows:
-
-- **4**: Read
-- **2**: Write
-- **1**: Execute
-
-The sum of these values gives the permission level. For example, `755` means:
-
-- **Owner**: Read, write, execute (4+2+1 = 7)
-- **Group**: Read, execute (4+1 = 5)
-- **Others**: Read, execute (4+1 = 5)
-
----
-
-## Changing Ownership with chown
-
-- The `chown` command changes the ownership of a file. For example, to change the owner of example.txt to pi:
-
-        sudo chown pi example.txt
-
-    In this example, `pi` is the new owner. 
-
-- To change the group ownership:
-
-        sudo chown :pi example.txt
-
-    In this example, `pi` is the new group owner.
-
----
-
-## What the commands mean
-
-Command | Description
---------|--------------------------------
-`chmod` | ***change file permissions*** - **ch**ange **mod**e
-`chown` | ***change file ownership*** - **ch**ange **own**er
+| Letter | On a file | On a folder |
+|---|---|---|
+| `r` read | Look at the contents | List what is inside |
+| `w` write | Change or empty the file | Create, rename or delete things inside |
+| `x` execute | Run it as a program or script | Enter it with `cd` |
 {:class="table table-single"}
 
----
+So `-rwxr-xr--` means: a file, the owner can do anything, the group can read and run it, and everyone else can only read it.
 
-## Summary
+## Changing permissions with `chmod`
 
-In this lesson, you learned how to ***view*** and ***modify*** file permissions and ownership using the `chmod` and `chown` commands. Properly managing permissions is essential for securing your Raspberry Pi.
+`chmod` (change mode) has two styles. The **letter style** says who and what: `u` (user/owner), `g` (group), `o` (others), `a` (all), then `+` to add or `-` to remove:
 
----
+```bash
+$ cd ~/homelab/scripts
+$ ./hello.sh
+bash: ./hello.sh: Permission denied
+$ chmod u+x hello.sh
+$ ls -l hello.sh
+-rwxr--r-- 1 pi pi 0 Nov 24 10:02 hello.sh
+```
+
+The file was not allowed to run until we added `x`. That "Permission denied" is the most common thing beginners hit when a script will not run.
+
+The **number style** adds the numbers for each person: read is 4, write is 2, execute is 1.
+
+```mermaid
+flowchart LR
+    A["7 = 4+2+1 = rwx"] --- B["6 = 4+2 = rw-"]
+    B --- C["5 = 4+1 = r-x"]
+    C --- D["4 = r--"]
+    D --- E["0 = ---"]
+```
+
+Three digits: owner, group, others. Two you will use constantly:
+
+```bash
+$ chmod 755 hello.sh      # rwxr-xr-x: a script everyone can run, only you can change
+$ echo "DB_PASSWORD=changeme" > secrets.env
+$ chmod 600 secrets.env   # rw-------: only you can read or change it
+$ ls -l secrets.env
+-rw------- 1 pi pi 21 Nov 24 10:05 secrets.env
+```
+
+`600` is the right choice for anything secret, such as the `.env` files you will meet with Docker.
+
+> **Careful**: `chmod -R` (recursive) changes every file in a folder tree. `chmod -R 777` makes everything writable by everyone and is a classic way to break security. Do not use 777 to "make it work". Practise `-R` only on a throwaway folder you made, and look at the result with `ls -lR`.
+
+## Changing ownership with `chown`
+
+The owner is usually fine, but if you create a file with `sudo`, root owns it, and your normal user then cannot change it:
+
+```bash
+$ sudo touch ~/homelab/scripts/oops.txt
+$ ls -l ~/homelab/scripts/oops.txt
+-rw-r--r-- 1 root root 0 Nov 24 10:10 /home/pi/homelab/scripts/oops.txt
+$ sudo chown pi:pi ~/homelab/scripts/oops.txt
+$ ls -l ~/homelab/scripts/oops.txt
+-rw-r--r-- 1 pi pi 0 Nov 24 10:10 /home/pi/homelab/scripts/oops.txt
+```
+
+The pattern is `chown owner:group file`. To hand a whole tree back to yourself, add `-R`, and use `$USER` so you cannot mistype your name:
+
+```bash
+$ sudo chown -R $USER:$USER ~/homelab
+```
+
+> **Careful**: with `sudo chown -R` you are rewriting ownership of every file under the path. Double check the path. Never run it on `/`, `/etc` or `/home` as a whole. Stick to a folder you made yourself, like `~/homelab`.
+
+Pi progress: your `scripts` folder is set up so you can write scripts and run them, and you know how to protect a secrets file.
+
+## Try it Yourself
+
+1. Run `ls -l` in your home folder and decode three permission strings out loud.
+2. Create `test.sh`, make it executable with `chmod u+x`, then remove the execute permission with `chmod u-x` and see what happens when you run it.
+3. Set `secrets.env` to `600`, then work out what number gives `rwxr-x---` (owner everything, group read and run, others nothing).
+4. Challenge: create a folder `shared`, set it to `770`, and explain what a user outside your group would get when running `ls shared` (hint: it is the `x` and `r` on the folder).
+
+## Common Issues
+
+- **Problem**: `bash: ./script.sh: Permission denied`.
+- **Solution**: Run `chmod +x script.sh`, then `./script.sh`.
+- **Why**: A file needs the execute (`x`) bit before the shell will run it as a program.
+
+- **Problem**: `touch: cannot touch 'file': Permission denied`.
+- **Solution**: Check who owns the folder with `ls -ld folder`. If root owns it, fix it with `sudo chown $USER:$USER folder`.
+- **Why**: You need write (`w`) permission on the folder to create a file in it.
+
+- **Problem**: I ran `chmod 777` and now nothing feels safe.
+- **Solution**: Put it back to `755` for folders and scripts or `644` for plain files, or `600` for secrets.
+- **Why**: 777 lets every user on the Pi read, change and run the file.
+
+## Check your understanding
+
+{% quiz %}
+? What does `-rwxr-xr--` tell you about the group?
+- [ ] They can read, write and run the file
+- [x] They can read and run it, but not change it
+- [ ] They have no access
+> The middle three characters `r-x` are the group: read and execute, no write.
+
+? Which command gives the owner read and write, and no one else any access?
+- [ ] chmod 755 file
+- [ ] chmod 777 file
+- [x] chmod 600 file
+> 6 is read (4) plus write (2) for the owner, and the two zeros give the group and others nothing.
+
+? A script says `Permission denied` when run as `./hello.sh`. What is the usual fix?
+- [x] chmod u+x hello.sh
+- [ ] sudo rm hello.sh
+- [ ] chown 777 hello.sh
+> The file is missing its execute bit, and `chmod u+x` adds it for the owner.
+
+? What does `x` mean on a folder?
+- [ ] You can run the folder as a program
+- [x] You can enter it with cd
+- [ ] You can rename it
+> On a folder, execute means you may enter it and reach the files inside.
+{% endquiz %}
