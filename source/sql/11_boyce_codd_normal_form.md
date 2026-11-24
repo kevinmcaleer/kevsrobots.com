@@ -1,174 +1,201 @@
 ---
 title: Boyce-Codd Normal Form (BCNF)
-description: >-
-    Understanding Boyce-Codd Normal Form (BCNF) and its role in advanced database normalization
+description: Understand the stricter Boyce-Codd normal form, spot a violation in a workshop mentoring table, and fix it by splitting the table.
 layout: lesson
+type: page
 cover: /learn/sql/assets/banners/11_boyce_codd_normal_form.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, we’ll explore **Boyce-Codd Normal Form (BCNF)**, an advanced normalization form that extends Third Normal Form (3NF). BCNF is used to ensure that all dependencies in a table are based strictly on keys, enhancing data integrity and minimizing redundancy.
+By the end of this lesson you will be able to state the Boyce-Codd rule, recognise a table that breaks it, and split that table so it complies.
 
 ---
 
-## 1. What is Boyce-Codd Normal Form (BCNF)?
+Third normal form catches most design problems. **Boyce-Codd normal form (BCNF)** closes a small gap that remains, and it appears when a table has more than one way to identify a row. It is a stricter cousin of 3NF, sometimes called "3.5NF".
 
-A table is in **Boyce-Codd Normal Form (BCNF)** if it meets the following conditions:
+## The rule
 
-1. The table is already in 3NF.
-2. For every functional dependency `X -> Y`, `X` must be a superkey (a unique identifier for each row in the table).
+Some columns **determine** others: knowing `robot_id` tells you the robot's name. We write that as `robot_id -> name`, and call it a **functional dependency**.
 
-BCNF resolves specific dependency issues that may still exist in 3NF. It is particularly useful when a table has multiple candidate keys (alternative primary keys) or when complex relationships exist between columns.
+> **BCNF**: whenever one set of columns determines another, the determining columns must be able to identify the whole row on their own (a **candidate key**).
 
-> **Note**: BCNF and 3NF are often the same. However, BCNF enforces stricter rules on functional dependencies, especially in cases where non-key dependencies are involved.
+In plain words: if a column can decide the value of another column, it had better be a key. Almost all well-designed tables already follow this, which is why the problem cases feel a bit contrived.
 
----
+## A table that breaks the rule
 
-## 2. Identifying BCNF Violations
+The workshop runs tool sessions. Each builder books a tool, and each tool is taught by one mentor. The rules of the club:
 
-A BCNF violation occurs when a non-trivial functional dependency exists, and the determinant (the left side of the dependency) is not a superkey. This often happens in cases where tables have multiple candidate keys.
+1. A builder can book several tools, but each tool only once.
+2. Each **mentor teaches exactly one tool** (Ada always does soldering, Grace always does 3D printing).
+3. A tool can have more than one mentor.
 
-### Example of a BCNF Violation
+```sql
+CREATE TABLE tool_sessions (
+    builder TEXT,
+    tool    TEXT,
+    mentor  TEXT,
+    PRIMARY KEY (builder, tool)
+);
 
-Consider a `courses` table where each professor teaches a specific course in only one room, but each course can have multiple professors.
-
-```plaintext
-| course_id | professor | room      |
-|-----------|-----------|-----------|
-| 1         | Dr. Smith | Room 101  |
-| 1         | Dr. Jones | Room 101  |
-| 2         | Dr. Brown | Room 102  |
-| 2         | Dr. White | Room 102  |
+INSERT INTO tool_sessions VALUES
+    ('Kev', 'soldering',   'Ada'),
+    ('Sam', 'soldering',   'Ada'),
+    ('Kev', '3d printing', 'Grace'),
+    ('Jo',  '3d printing', 'Grace');
 ```
 
-In this example:
+The key is (`builder`, `tool`), and that determines the mentor. This table is in 3NF. But rule 2 gives us another dependency, `mentor -> tool`, and `mentor` alone is **not** a key, because Ada appears in several rows. That breaks BCNF.
 
-- **Primary Key**: `(course_id, professor)`
-- **Dependency**: `course_id -> room` (each course is taught in a specific room)
-
-This dependency violates BCNF because `course_id` (a non-superkey) determines `room`, creating a partial dependency.
-
----
-
-## 3. Converting a Table to BCNF
-
-To bring the table into BCNF, we must remove the dependency by splitting the table into smaller, related tables.
-
-### Step-by-Step BCNF Conversion
-
-1. **Identify the BCNF Violation**: In our example, `course_id -> room` violates BCNF because `course_id` alone determines `room`, while `(course_id, professor)` is the full primary key.
-
-2. **Separate the Violating Dependency**: Split the table into two tables, one for the `course_id -> room` relationship and another for the professor-course relationship.
-
-**courses_rooms**:
-
-```plaintext
-| course_id | room      |
-|-----------|-----------|
-| 1         | Room 101  |
-| 2         | Room 102  |
+```mermaid
+flowchart LR
+    A["builder + tool"] -->|"determines"| C["mentor"]
+    C -->|"determines (but is not a key)"| B["tool"]
 ```
 
-**professors_courses**:
+## Why it matters: an anomaly
 
-```plaintext
-| course_id | professor |
-|-----------|-----------|
-| 1         | Dr. Smith |
-| 1         | Dr. Jones |
-| 2         | Dr. Brown |
-| 2         | Dr. White |
+Ada switches from soldering to laser cutting. We try to record that for one row:
+
+```sql
+UPDATE tool_sessions SET tool = 'laser cutting'
+WHERE mentor = 'Ada' AND builder = 'Kev';
+
+SELECT * FROM tool_sessions ORDER BY builder, tool;
 ```
 
-Now, each table adheres to BCNF rules, with no functional dependencies violating BCNF.
+```text
+builder  tool           mentor
+-------  -------------  ------
+Jo       3d printing    Grace
+Kev      3d printing    Grace
+Kev      laser cutting  Ada
+Sam      soldering      Ada
+```
 
----
+Now Ada teaches laser cutting for Kev and soldering for Sam, which contradicts rule 2. The table let us store a state that should be impossible, because the fact "Ada teaches X" is written in every one of her rows.
 
-## 4. Why Use BCNF?
+Put the data back before we fix the design:
 
-BCNF reduces redundancy and dependency issues that may still be present after 3NF. By ensuring that all dependencies are based on superkeys, BCNF enhances the database’s integrity, ensuring that:
+```sql
+DELETE FROM tool_sessions;
+INSERT INTO tool_sessions VALUES
+    ('Kev', 'soldering',   'Ada'),
+    ('Sam', 'soldering',   'Ada'),
+    ('Kev', '3d printing', 'Grace'),
+    ('Jo',  '3d printing', 'Grace');
+```
 
-- **Data Redundancy is Minimized**: Redundant data is reduced, leading to efficient storage.
-- **Update Anomalies are Prevented**: Changes made in one place won’t lead to inconsistencies elsewhere.
-- **Data Integrity is Maintained**: Ensures a consistent and reliable structure for complex databases with candidate keys.
+## The fix: split the table
 
-> **Note**: While BCNF helps improve database design, splitting tables too much can lead to performance trade-offs, especially if many joins are required for common queries.
+Give the `mentor -> tool` fact its own table, where `mentor` is the key. Then keep only who booked which mentor:
 
----
+```sql
+CREATE TABLE mentors (
+    mentor TEXT PRIMARY KEY,
+    tool   TEXT NOT NULL
+);
+CREATE TABLE bookings (
+    builder TEXT NOT NULL,
+    mentor  TEXT NOT NULL REFERENCES mentors (mentor),
+    PRIMARY KEY (builder, mentor)
+);
 
-## 5. BCNF vs. 3NF: Key Differences
+INSERT INTO mentors  SELECT DISTINCT mentor, tool FROM tool_sessions;
+INSERT INTO bookings SELECT builder, mentor FROM tool_sessions;
+```
 
-While both 3NF and BCNF aim to eliminate redundancy and dependencies, BCNF is stricter. Here’s a comparison:
+`INSERT ... SELECT` copies rows straight from one table into another, which is a handy way to migrate data. Check the pieces:
 
-Criteria      | Third Normal Form (3NF)                                   | Boyce-Codd Normal Form (BCNF)
---------------|-----------------------------------------------------------|--------------------------------
-Dependency    | All non-key attributes depend on the primary key           | For every dependency `X -> Y`, `X` must be a superkey
-Goal          | Eliminate transitive dependencies                         | Eliminate all non-superkey dependencies
-Example Usage | General normalization requirements                        | Useful when a table has multiple candidate keys
-{:class="table table-striped"}
+```sql
+SELECT * FROM mentors;
+```
 
----
+```text
+mentor  tool
+------  -----------
+Ada     soldering
+Grace   3d printing
+```
 
-## 6. Practice Exercise: Identifying and Converting BCNF Violations
+Now Ada's change is one update, in one place:
 
-1. **Identify BCNF Violations**: Analyze the following table and determine if it violates BCNF.
+```sql
+UPDATE mentors SET tool = 'laser cutting' WHERE mentor = 'Ada';
 
-    ```plaintext
-    | student_id | advisor_id | department |
-    |------------|------------|------------|
-    | 1          | A1         | Physics    |
-    | 2          | A1         | Physics    |
-    | 3          | A2         | Chemistry  |
-    | 4          | A3         | Mathematics|
-    ```
+SELECT b.builder, m.tool, m.mentor
+FROM bookings AS b
+JOIN mentors AS m ON m.mentor = b.mentor
+ORDER BY b.builder, m.tool;
+```
 
-    - **Hint**: Is there a dependency between `advisor_id` and `department`? If so, does it violate BCNF?
+```text
+builder  tool           mentor
+-------  -------------  ------
+Jo       3d printing    Grace
+Kev      3d printing    Grace
+Kev      laser cutting  Ada
+Sam      laser cutting  Ada
+```
 
-2. **Solution**:
-    - Dependency: `advisor_id -> department` (each advisor belongs to one department).
-    - Since `student_id` and `advisor_id` together form the primary key, this dependency violates BCNF.
-    - **BCNF Conversion**: Split the table into two tables.
+Every one of Ada's bookings now agrees. The join rebuilds the original view of the data whenever you want it.
 
-    **advisors_departments**:
+## 3NF versus BCNF
 
-    ```plaintext
-    | advisor_id | department |
-    |------------|------------|
-    | A1         | Physics    |
-    | A2         | Chemistry  |
-    | A3         | Mathematics|
-    ```
+| Question | 3NF | BCNF |
+|---|-----|------|
+| Rule | Non-key columns depend only on the key | Every determining column set must be a key |
+| Strictness | Allows a dependency whose target is part of a key | Allows no exceptions |
+| Cost | Rarely loses anything | Can lose the ability to enforce a rule with a constraint |
+{:class="table table-single"}
 
-    **students_advisors**:
-    
-    ```plaintext
-    | student_id | advisor_id |
-    |------------|------------|
-    | 1          | A1         |
-    | 2          | A1         |
-    | 3          | A2         |
-    | 4          | A3         |
-    ```
+The trade-off is in that last row. After our split, nothing stops one builder from booking two soldering mentors, whereas rule 1 said each tool only once per builder. BCNF removed a contradiction but made one rule harder to enforce. In practice, designers aim for BCNF and accept 3NF when a split would lose an important rule.
 
-Now, the tables conform to BCNF, with all dependencies based on superkeys.
+> **Teachers**: this is the most abstract lesson in the course. Try the "who determines what" game on paper first: write each rule on a card, and have pairs mark which columns decide which. Students who struggle can safely stop at 3NF and move on, as BCNF is a refinement and nothing later depends on it.
 
----
+## Try it Yourself
 
-## Summary of Boyce-Codd Normal Form (BCNF)
+1. Add a new mentor, `Linus`, who teaches `laser cutting`, and book Jo with him. Which tables do you change?
+2. Query which builders have booked a mentor who teaches `soldering`. Use the join from above.
+3. Challenge: a `courses(room, hour, teacher)` table has the rule that each teacher always uses the same room. Which dependency breaks BCNF, and how would you split the table?
 
-BCNF is an advanced level of database normalization that ensures all dependencies rely on superkeys, enhancing data integrity and minimizing redundancy. Here’s a summary of BCNF concepts:
+## Common Issues
 
-Concept            | Description
--------------------|--------------------------------------------------------
-Functional Dependency | A relationship between two attributes, where one attribute determines another
-BCNF Requirement   | Every functional dependency `X -> Y` requires `X` to be a superkey
-Purpose of BCNF    | Eliminate remaining redundancy after achieving 3NF
-Typical Use Cases  | When tables have multiple candidate keys or complex dependencies
-{:class="table table-striped"}
+- **Problem**: I can't tell whether a column is a key or just unique-looking.
+- **Solution**: Ask "could two rows ever share this value in the real world?" If yes, it isn't a key, however unique your sample data looks.
+- **Why**: Keys are rules about the real world, not patterns in a few rows.
 
-With BCNF, you have a powerful tool for refining database design, especially for complex databases with multiple candidate keys. In the next lesson, we’ll explore subqueries and nested queries, which add versatility to SQL queries by allowing queries within queries.
+- **Problem**: `FOREIGN KEY constraint failed` when I insert into `bookings`.
+- **Solution**: Insert into `mentors` first, as `bookings` points at it.
+- **Why**: A booking can't refer to a mentor who doesn't exist yet.
 
----
+- **Problem**: My split table seems to have lost data.
+- **Solution**: Use `INSERT ... SELECT DISTINCT` for the lookup table, and check row counts with `COUNT(*)`.
+- **Why**: Without `DISTINCT`, duplicate mentors cause a primary key clash. Without the copy, rows never arrive.
+
+## Check your understanding
+
+{% quiz %}
+? What does BCNF require?
+- [ ] Every table must have at least three columns
+- [x] Whenever some columns determine another column, they must be a key of the table
+- [ ] No table may have a foreign key
+> That is the Boyce-Codd rule: every determinant must be a candidate key.
+
+? In `tool_sessions`, why does `mentor -> tool` break BCNF?
+- [x] `mentor` determines `tool`, but `mentor` alone is not a key, since Ada has several rows
+- [ ] `tool` is not unique
+- [ ] The table has a composite primary key
+> The determining column isn't a key, so the fact is repeated and can contradict itself.
+
+? What did splitting into `mentors` and `bookings` fix?
+- [ ] It made the queries shorter
+- [x] Each mentor's tool is stored once, so it can't conflict with itself
+- [ ] It removed the need for joins
+> The update anomaly is gone, though a join is now needed to see tool and builder together.
+{% endquiz %}
+
+Now let's learn to put one query inside another.

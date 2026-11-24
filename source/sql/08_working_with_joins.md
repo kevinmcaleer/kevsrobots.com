@@ -1,248 +1,244 @@
 ---
 title: Working with Joins
-description: >-
-    Learn how to combine data from multiple tables using SQL joins
+description: Combine robots and sensors with INNER, LEFT, RIGHT and FULL joins, find rows with no match, and avoid the cross-join and WHERE-on-LEFT-JOIN traps.
 layout: lesson
+type: page
 cover: /learn/sql/assets/banners/08_working_with_joins.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-In this lesson, we’ll explore how to work with multiple tables in a relational database using **joins**. Joins are essential for combining data across tables, helping you retrieve meaningful insights by connecting related data.
+By the end of this lesson you will be able to combine two tables with `JOIN`, choose between `INNER` and `LEFT` joins, and find rows that have no match.
 
 ---
 
-## 1. Understanding Joins
+Our data lives in separate tables on purpose: robots in one, sensors in another, linked by `robot_id`. A **join** puts them back together for a query, matching rows where the keys agree.
 
-In relational databases, data is often distributed across multiple tables. Joins allow us to retrieve data from two or more tables based on related columns, typically through primary and foreign keys.
+```mermaid
+flowchart LR
+    subgraph robots
+        R1["1 Smars"]
+        R2["2 Pico Walker"]
+        R3["3 Arm Buddy"]
+        R4["4 Line Chaser"]
+        R5["5 Mystery Bot"]
+    end
+    subgraph sensors
+        S1["HC-SR04 (robot 1)"]
+        S2["TCRT5000 (robot 1)"]
+        S3["HC-SR04 (robot 2)"]
+        S4["MPU6050 (robot 2)"]
+        S5["TCRT5000 (robot 4)"]
+        S6["TCRT5000 (robot 4)"]
+        S7["VL53L0X (no robot)"]
+    end
+    R1 --- S1
+    R1 --- S2
+    R2 --- S3
+    R2 --- S4
+    R4 --- S5
+    R4 --- S6
+```
 
-### Types of Joins
+Look at the picture. Arm Buddy and Mystery Bot have no lines, and the VL53L0X has none either. How each join treats those loose ends is the whole story.
 
-- **INNER JOIN**: Returns records with matching values in both tables.
-- **LEFT JOIN** (or **LEFT OUTER JOIN**): Returns all records from the left table and matching records from the right table. Unmatched rows from the right table return `NULL`.
-- **RIGHT JOIN** (or **RIGHT OUTER JOIN**): Returns all records from the right table and matching records from the left table. Unmatched rows from the left table return `NULL`.
-- **FULL JOIN** (or **FULL OUTER JOIN**): Returns all records when there is a match in either table. Non-matching rows from both tables return `NULL`.
-
----
-
-## 2. Inner Join: Retrieving Matching Records
-
-An **INNER JOIN** returns records that have matching values in both tables.
-
-### Basic INNER JOIN Syntax
+## INNER JOIN: only the matches
 
 ```sql
-SELECT columns
-FROM table1
-INNER JOIN table2
-ON table1.common_column = table2.common_column;
+SELECT r.name, s.model
+FROM robots AS r
+INNER JOIN sensors AS s ON s.robot_id = r.robot_id
+ORDER BY r.robot_id, s.sensor_id;
 ```
 
-### Example: Inner Join with `users` and `orders` Tables
-
-Suppose we have two tables:
-
-**users**
-
-```plaintext
-| user_id | name    |
-|---------|---------|
-| 1       | Alice   |
-| 2       | Bob     |
-| 3       | Charlie |
+```text
+name         model
+-----------  --------
+Smars        HC-SR04
+Smars        TCRT5000
+Pico Walker  HC-SR04
+Pico Walker  MPU6050
+Line Chaser  TCRT5000
+Line Chaser  TCRT5000
 ```
 
-**orders**
+Three pieces make a join work:
 
-```plaintext
-| order_id | user_id | item        |
-|----------|---------|-------------|
-| 101      | 1       | Laptop      |
-| 102      | 2       | Smartphone  |
-| 103      | 1       | Tablet      |
-```
+- `AS r` and `AS s` give each table a short **alias**, so you can write `r.name` instead of `robots.name`.
+- `ON s.robot_id = r.robot_id` says which columns must match.
+- Rows with no partner (Arm Buddy, Mystery Bot, the spare VL53L0X) vanish. Plain `JOIN` means `INNER JOIN`.
 
-- **Example**: Retrieve each user and their orders.
+## LEFT JOIN: keep everything from the left table
 
-    ```sql
-    SELECT users.name, orders.item
-    FROM users
-    INNER JOIN orders ON users.user_id = orders.user_id;
-    ```
-
-**Result**:
-
-```plaintext
-| name   | item       |
-|--------|------------|
-| Alice  | Laptop     |
-| Bob    | Smartphone |
-| Alice  | Tablet     |
-```
-
-Only users with orders appear in the results.
-
----
-
-## 3. Left Join: Retrieving All Records from the Left Table
-
-A **LEFT JOIN** returns all records from the left table and the matched records from the right table. If there is no match, the result is `NULL` for the columns from the right table.
-
-### Basic LEFT JOIN Syntax
+Say you want every robot, whether or not it has sensors:
 
 ```sql
-SELECT columns
-FROM table1
-LEFT JOIN table2
-ON table1.common_column = table2.common_column;
+SELECT r.name, s.model
+FROM robots AS r
+LEFT JOIN sensors AS s ON s.robot_id = r.robot_id
+ORDER BY r.robot_id, s.sensor_id;
 ```
 
-### Example: Left Join with `users` and `orders`
-
-- **Example**: Retrieve all users and their orders, including users without orders.
-
-    ```sql
-    SELECT users.name, orders.item
-    FROM users
-    LEFT JOIN orders ON users.user_id = orders.user_id;
-    ```
-
-**Result**:
-
-```plaintext
-| name     | item       |
-|----------|------------|
-| Alice    | Laptop     |
-| Bob      | Smartphone |
-| Alice    | Tablet     |
-| Charlie  | NULL       |
+```text
+name         model
+-----------  --------
+Smars        HC-SR04
+Smars        TCRT5000
+Pico Walker  HC-SR04
+Pico Walker  MPU6050
+Arm Buddy
+Line Chaser  TCRT5000
+Line Chaser  TCRT5000
+Mystery Bot
 ```
 
-The `NULL` value indicates that Charlie has no orders.
-
----
-
-## 4. Right Join: Retrieving All Records from the Right Table
-
-A **RIGHT JOIN** is the opposite of a left join. It returns all records from the right table and the matched records from the left table, with `NULL` for unmatched rows from the left.
-
-### Basic RIGHT JOIN Syntax
+Arm Buddy and Mystery Bot are back, with blank (`NULL`) sensor columns. That gives us a neat trick for finding **orphans**: robots with no sensors at all.
 
 ```sql
-SELECT columns
-FROM table1
-RIGHT JOIN table2
-ON table1.common_column = table2.common_column;
+SELECT r.name
+FROM robots AS r
+LEFT JOIN sensors AS s ON s.robot_id = r.robot_id
+WHERE s.sensor_id IS NULL;
 ```
 
-- **Example**: If using `RIGHT JOIN` with `users` and `orders`, we’d retrieve all orders, with `NULL` for users without matching entries. This syntax is more commonly supported in MySQL and PostgreSQL than SQLite.
+```text
+name
+-----------
+Arm Buddy
+Mystery Bot
+```
 
-> **Note**: Not all SQL databases support `RIGHT JOIN`. SQLite, for example, does not support `RIGHT JOIN` directly.
-
----
-
-## 5. Full Join: Retrieving All Records with Matches from Either Table
-
-A **FULL JOIN** returns all records when there’s a match in either table. Unmatched rows from each table show `NULL` for the other table’s columns.
-
-### Basic FULL JOIN Syntax
+Flip the tables round to find sensors sitting in the drawer:
 
 ```sql
-SELECT columns
-FROM table1
-FULL JOIN table2
-ON table1.common_column = table2.common_column;
+SELECT s.model, s.kind
+FROM sensors AS s
+LEFT JOIN robots AS r ON r.robot_id = s.robot_id
+WHERE r.robot_id IS NULL;
 ```
 
-- **Example**: Retrieve all users and orders, showing `NULL` where there’s no match in either table.
-
-> **Note**: SQLite does not support `FULL JOIN` directly, but similar results can be achieved using `UNION` of `LEFT JOIN` and `RIGHT JOIN`.
-
----
-
-## 6. Self Join: Joining a Table with Itself
-
-A **self join** is when a table is joined with itself. This is useful for hierarchical data or when finding relationships within the same table.
-
-### Example: Self Join on an `employees` Table
-
-**employees**
-
-```plaintext
-| emp_id | name     | manager_id |
-|--------|----------|------------|
-| 1      | Alice    | NULL       |
-| 2      | Bob      | 1          |
-| 3      | Charlie  | 1          |
-| 4      | Diana    | 2          |
+```text
+model    kind
+-------  --------
+VL53L0X  distance
 ```
 
-- **Example**: Retrieve each employee and their manager’s name.
+## RIGHT and FULL joins
 
-    ```sql
-    SELECT e1.name AS employee, e2.name AS manager
-    FROM employees AS e1
-    LEFT JOIN employees AS e2 ON e1.manager_id = e2.emp_id;
-    ```
+`RIGHT JOIN` keeps everything from the second table instead, and `FULL JOIN` keeps unmatched rows from both. SQLite only supports them from version 3.39, so on an older system, swap the table order and use `LEFT JOIN`. For a full join on the robots and sensors, this shows all three kinds of rows:
 
-**Result**:
-
-```plaintext
-| employee | manager |
-|----------|---------|
-| Alice    | NULL    |
-| Bob      | Alice   |
-| Charlie  | Alice   |
-| Diana    | Bob     |
+```sql
+SELECT r.name, s.model
+FROM robots AS r
+FULL JOIN sensors AS s ON s.robot_id = r.robot_id
+ORDER BY r.robot_id, s.sensor_id;
 ```
 
----
+```text
+name         model
+-----------  --------
+             VL53L0X
+Smars        HC-SR04
+Smars        TCRT5000
+Pico Walker  HC-SR04
+Pico Walker  MPU6050
+Arm Buddy
+Line Chaser  TCRT5000
+Line Chaser  TCRT5000
+Mystery Bot
+```
 
-## Practice Exercise: Working with Joins
+The spare VL53L0X comes first because its `robot_id` is `NULL`, and `NULL` sorts first. MySQL has no `FULL JOIN`, so there it takes a `UNION` of a left and a right join.
 
-1. **Inner Join**: Retrieve all users and their orders using an inner join.
+## Filtering joined data
 
-    ```sql
-    SELECT users.name, orders.item
-    FROM users
-    INNER JOIN orders ON users.user_id = orders.user_id;
-    ```
+A `WHERE` on the sensor table works as you'd hope with an inner join:
 
-2. **Left Join**: Retrieve all users, including those without orders.
+```sql
+SELECT r.name, s.model
+FROM robots AS r
+JOIN sensors AS s ON s.robot_id = r.robot_id
+WHERE s.kind = 'distance';
+```
 
-    ```sql
-    SELECT users.name, orders.item
-    FROM users
-    LEFT JOIN orders ON users.user_id = orders.user_id;
-    ```
+That gives Smars and Pico Walker, each with an HC-SR04. But beware: put the same `WHERE s.kind = 'distance'` on a **left** join and Arm Buddy and the others disappear again, because their `s.kind` is `NULL`, which fails the test. To keep every robot, move the condition into the `ON`:
 
-3. **Self Join**: Retrieve each employee and their manager from the `employees` table.
+```sql
+SELECT r.name, s.model
+FROM robots AS r
+LEFT JOIN sensors AS s ON s.robot_id = r.robot_id AND s.kind = 'distance'
+ORDER BY r.robot_id, s.sensor_id;
+```
 
-    ```sql
-    SELECT e1.name AS employee, e2.name AS manager
-    FROM employees AS e1
-    LEFT JOIN employees AS e2 ON e1.manager_id = e2.emp_id;
-    ```
+```text
+name         model
+-----------  -------
+Smars        HC-SR04
+Pico Walker  HC-SR04
+Arm Buddy
+Line Chaser
+Mystery Bot
+```
 
-4. **Full Join (Advanced)**: If your database supports it, retrieve all users and orders using a full join.
+## The accidental cross join
 
----
+If you forget the `ON`, the database pairs **every** robot with **every** sensor:
 
-## Summary of Join Types
+```sql
+SELECT COUNT(*) FROM robots, sensors;
+```
 
-Here’s a summary of the join types covered in this lesson:
+```text
+COUNT(*)
+--------
+35
+```
 
-Join Type     | Description                                                        | Example
---------------|--------------------------------------------------------------------|-------------------------------------
-INNER JOIN    | Returns records with matching values in both tables                | `INNER JOIN orders ON users.user_id = orders.user_id`
-LEFT JOIN     | Returns all records from the left table and matched records from the right | `LEFT JOIN orders ON users.user_id = orders.user_id`
-RIGHT JOIN    | Returns all records from the right table and matched records from the left | `RIGHT JOIN orders ON users.user_id = orders.user_id`
-FULL JOIN     | Returns all records when there’s a match in either table           | `FULL JOIN orders ON users.user_id = orders.user_id`
-SELF JOIN     | Joins a table with itself to compare rows within the same table    | `FROM employees AS e1 LEFT JOIN employees AS e2`
-{:class="table table-striped"}
+5 robots times 7 sensors is 35 rows, nearly all nonsense. With big tables, that can be millions of rows. If a join returns far more rows than expected, check your `ON`.
 
-By mastering joins, you can retrieve and analyze data from multiple tables effectively. In the next lesson, we’ll focus on grouping and aggregating data for even more insightful analyses.
+## Try it Yourself
 
----
+1. List every sensor with the name of the robot it is fitted to, ordered by sensor model. Keep the spare sensor in the list.
+2. Find robots that have a `line` sensor fitted.
+3. Challenge: list each robot and its sensor models, but only for robots built before `2025-01-01`. Decide whether you need an `INNER` or `LEFT` join, and why.
+
+## Common Issues
+
+- **Problem**: `ambiguous column name: robot_id`.
+- **Solution**: Put the table alias in front of the column, as in `r.robot_id`.
+- **Why**: Both tables have a `robot_id` column, so the database can't guess which you mean.
+
+- **Problem**: My `LEFT JOIN` has dropped the unmatched rows.
+- **Solution**: Check for a `WHERE` on the right-hand table. Move the test into the `ON` clause, or add `OR s.sensor_id IS NULL`.
+- **Why**: A `WHERE` runs after the join, and `NULL` fails most tests.
+
+- **Problem**: `RIGHT and FULL OUTER JOINs are not currently supported`.
+- **Solution**: Swap the table order and use `LEFT JOIN`, or update SQLite to 3.39 or newer.
+- **Why**: Older SQLite versions only knew `INNER` and `LEFT` joins.
+
+## Check your understanding
+
+{% quiz %}
+? Which join keeps robots that have no sensors?
+- [ ] `INNER JOIN` from robots to sensors
+- [x] `LEFT JOIN` from robots to sensors
+- [ ] Neither. Joins only keep matching rows
+> `LEFT JOIN` keeps every row from the left table, filling the right side with `NULL` when there is no match.
+
+? What does `ON s.robot_id = r.robot_id` do?
+- [ ] Filters the output to one robot
+- [x] Says which rows from the two tables belong together
+- [ ] Creates a foreign key
+> The `ON` clause is the matching rule for the join.
+
+? What would `SELECT * FROM robots, sensors` (no `ON` or `WHERE`) return for 5 robots and 7 sensors?
+- [ ] 7 rows
+- [ ] 12 rows
+- [x] 35 rows
+> Every robot is paired with every sensor, so 5 times 7 rows.
+{% endquiz %}
+
+Joins let us combine data. Next we'll summarise it.

@@ -5,18 +5,35 @@ author: Kevin McAleer
 cover: /learn/sql/assets/cover.jpg
 date: 2024-11-01
 description: Learn the fundamentals of SQL, relational database theory, and essential
-  skills for database management.
+  skills for database management, by building a Robot Workshop database in SQLite.
 level: beginner
-course_duration: 1h 22m
+course_duration: 1h 37m
 lesson_count: 16
-first_lesson: 00_course_overview.html
+first_lesson: 00_intro.html
+quiz_total: 46
+outcomes:
+- Explain what tables, rows, primary keys and foreign keys are, and why data is split
+  across linked tables
+- Create a SQLite database and tables with sensible data types and constraints
+- Insert, update and delete rows safely, and undo mistakes with transactions
+- Filter, sort and combine data with SELECT, WHERE, CASE and JOIN
+- Summarise data with GROUP BY and aggregate functions, and answer questions with
+  subqueries
+- Design tables with normal forms, and speed up queries with views and indexes
+prerequisites:
+- None. Being comfortable typing commands in a terminal helps, for example Introduction
+  to the Linux Command Line
+you_need:
+- A computer running Windows, macOS or Linux, or a Raspberry Pi
+- The sqlite3 command-line tool, or Python 3 (which includes SQLite)
+- A text editor for saving your SQL files
 navigation:
 - name: Getting Started with SQL
 - content:
   - section: Introduction
     content:
     - name: Course Overview
-      link: 00_course_overview.html
+      link: 00_intro.html
   - section: SQL Basics
     content:
     - name: Introduction to SQL and Relational Databases
