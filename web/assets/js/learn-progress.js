@@ -9,6 +9,8 @@
 //
 //   /learn/           fills the "Continue learning" strip (#learn-continue)
 //                     with up to three courses in progress, most recent first.
+//   homepage          the same strip, in the Courses band; course names and
+//                     covers come from #kr-course-index (home/courses.html).
 //   pathway pages     marks each course row finished or in progress, and
 //                     says how many courses are finished.
 (function () {
@@ -51,6 +53,27 @@
     const strip = document.getElementById('learn-continue');
     if (strip) {
         const courses = [];
+        // The homepage has no course catalogue to read names and covers
+        // from, so it gives the same facts as JSON (#kr-course-index).
+        const index = document.getElementById('kr-course-index');
+        if (index) {
+            let list = [];
+            try { list = JSON.parse(index.textContent); } catch (e) { list = []; }
+            list.forEach(c => {
+                const key = c.link.substring(0, c.link.lastIndexOf('/') + 1);
+                const saved = progress[key];
+                const lessons = Number(c.lessons) || 0;
+                if (!saved || lessons === 0 || saved.visited >= lessons) return;
+                courses.push({
+                    href: saved.last ? key + saved.last + '.html' : c.link,
+                    name: c.name,
+                    cover: c.cover,
+                    visited: saved.visited,
+                    lessons: lessons,
+                    updated: saved.updated
+                });
+            });
+        }
         document.querySelectorAll('#courses .course-card').forEach(card => {
             const link = card.querySelector('a[href]');
             if (!link) return;
