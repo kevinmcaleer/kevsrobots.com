@@ -1,11 +1,16 @@
 - name: Open Duck Mini
   link: /projects/kev/open-duck-mini
+  videos:
+    - _YHOQFOzjKg
+    - 5EZGgPj6ZLE
   cover: https://projects.kevsrobots.com/api/projects/31/images/932/view
   description: "Open Duck Mini - a compact modular robot"
   date: 2026/11/15
   hero: /projects/open-duck-mini/assets/img/hero.png
 - name: Modulino SMARS
-  link: /blog/modulino-smars.html
+  link: /blog/my-first-robot-just-got-five-new-senses.html
+  videos:
+    - 1K1A1YGcOEE
   cover: /assets/img/blog/modulino_smars/cover.jpg
   description: "Modulino SMARS - a modular robot that can be built with Arduino Modulinos"
   date: 2026/08/23

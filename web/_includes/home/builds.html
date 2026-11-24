@@ -1,0 +1,44 @@
+{%- comment -%}
+  "Kev's builds": Robots and Projects in one band, with tabs (Latest, Robots,
+  Projects). Replaces robots_section.html and projects_section.html on the
+  homepage.
+
+  Every card leads with the build's YouTube video, because the videos are
+  what pays for the site. The thumbnail and "Watch the build" go to YouTube;
+  the title and "Read the guide" go to the write-up. Builds with no video
+  show their cover instead.
+
+  Data: site.data.home_builds, made by _plugins/home_builds.rb from
+  _data/robots.yml and _data/projects.yml plus the `videos:` front matter of
+  each linked page. All three tabs are in the HTML, so the band works and
+  every card is linked with JavaScript off (the tabs then just show Latest).
+  Styles: assets/css/home-builds.css. Tabs: assets/js/home-builds.js.
+{%- endcomment -%}
+{% assign builds = site.data.home_builds %}
+{% assign lists = "latest,robots,projects" | split: "," %}
+<link rel="stylesheet" href="/assets/css/home-builds.css?v={{ site.time | date: '%s' }}">
+<section class="kb-band" id="kevs-builds" aria-labelledby="kb-title">
+  <div class="kb-top">
+    <div>
+      <h2 id="kb-title">Kev's builds</h2>
+      <p>Robots and gadgets I've built. Each one has a video, a full write-up, a parts list, STL files and code.</p>
+    </div>
+    <div class="kb-links">
+      <a class="kb-btn" href="/robots/">All robots</a>
+      <a class="kb-btn" href="/robots/projects/">All projects</a>
+    </div>
+  </div>
+  <div class="kb-tabs" role="tablist" aria-label="Kev's builds" hidden>
+    <button type="button" role="tab" id="kb-tab-latest" aria-selected="true" aria-controls="kb-panel-latest">Latest</button>
+    <button type="button" role="tab" id="kb-tab-robots" aria-selected="false" aria-controls="kb-panel-robots" tabindex="-1">Robots</button>
+    <button type="button" role="tab" id="kb-tab-projects" aria-selected="false" aria-controls="kb-panel-projects" tabindex="-1">Projects</button>
+  </div>
+  {% for list in lists %}
+  <div class="kb-grid" role="tabpanel" id="kb-panel-{{ list }}" aria-labelledby="kb-tab-{{ list }}" {% unless forloop.first %}hidden{% endunless %}>
+    {% for build in builds[list] limit: 4 %}
+      {% include home/build_card.html build=build %}
+    {% endfor %}
+  </div>
+  {% endfor %}
+</section>
+<script defer src="/assets/js/home-builds.js?v={{ site.time | date: '%s' }}"></script>
