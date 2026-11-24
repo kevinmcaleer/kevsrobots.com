@@ -106,7 +106,7 @@ Here's a list of recommended components to follow along with the course:
 
 You'll also need to download Bottango from the official site:
 
-🔗 [Download Bottango](https://bottango.com)
+[Download Bottango](https://bottango.com)
 
 ---
 

@@ -17,7 +17,7 @@ K3s includes **Traefik** as its default ingress controller, which makes this eas
 
 ---
 
-## 🌐 What Is a Service?
+## What Is a Service?
 
 A Kubernetes **Service** is an abstraction that exposes a set of pods to other services or users.
 
@@ -30,7 +30,7 @@ A Kubernetes **Service** is an abstraction that exposes a set of pods to other s
 
 ---
 
-## 🚀 Exposing a Pod with a Service
+## Exposing a Pod with a Service
 
 Let’s say you have a deployment called `hello-world` (like from Lesson 8). You can expose it:
 
@@ -48,7 +48,7 @@ Then open `http://<node-ip>:<nodePort>` in your browser.
 
 ---
 
-## 🌍 What Is an Ingress?
+## What Is an Ingress?
 
 Ingress is a more flexible way to expose multiple services using a **reverse proxy** and **host/path routing**.
 
@@ -61,7 +61,7 @@ K3s ships with **Traefik**, a built-in Ingress controller.
 
 ---
 
-## 🧱 Step 1: Define an Ingress Resource
+## Step 1: Define an Ingress Resource
 
 Create a file called `hello-ingress.yaml`:
 
@@ -94,7 +94,7 @@ kubectl apply -f hello-ingress.yaml
 
 ---
 
-## 🛠 Step 2: Update Your Local DNS
+## Step 2: Update Your Local DNS
 
 On your workstation, edit `/etc/hosts`:
 
@@ -112,7 +112,7 @@ http://hello.local
 
 ---
 
-## 🧪 Verify Ingress
+## Verify Ingress
 
 Check if the Ingress was created:
 
@@ -128,7 +128,7 @@ kubectl logs -n kube-system -l app=traefik
 
 ---
 
-## 🔒 Optional: Enable HTTPS with Let’s Encrypt
+## Optional: Enable HTTPS with Let’s Encrypt
 
 K3s and Traefik support automated HTTPS with Let's Encrypt — but you’ll need a real domain and port 80/443 open.
 
@@ -136,7 +136,7 @@ If you'd like to add this, let me know and I can walk you through it.
 
 ---
 
-## ✅ Summary
+## Summary
 
 You now know how to:
 
