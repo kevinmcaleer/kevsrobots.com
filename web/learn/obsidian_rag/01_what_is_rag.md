@@ -10,8 +10,10 @@ next: 02_embeddings_and_vectors.html
 description: Why keyword search fails on your own notes, and how retrieval augmented
   generation fixes it
 percent: 10
-duration: 5
-date_updated: 2026-08-23
+duration: 7
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to explain what retrieval augmented generation is, why it beats pasting a whole vault into a chatbot, and which stage of the pipeline each later lesson builds.
+
 Let's start with the problem, because RAG only makes sense once you have felt the pain.
 
 ## The problem with searching your own notes
@@ -100,7 +104,7 @@ That fails for three reasons:
 
 | Problem | What actually happens |
 |---|---|
-| Size | A 2,000 note vault is millions of tokens. Even a large context window fills up, and you pay for every token |
+| Size | A vault of a couple of thousand notes can run to a million tokens or more. Even a large context window fills up, and you pay for every token |
 | Noise | Bury three relevant sentences in a million words of shopping lists and the model's accuracy drops |
 | Cost and latency | You resend the entire vault on every single question |
 {:class="table table-single"}
@@ -115,17 +119,13 @@ That is RAG.
 
 **Retrieval augmented generation** is exactly what the name says - you *augment* the model's *generation* by *retrieving* relevant context first.
 
-```
-Your question
-     |
-     v
-[ RETRIEVE ]  <---- searches your indexed notes, returns the top few chunks
-     |
-     v
-[ GENERATE ]  <---- Claude reads only those chunks and writes the answer
-     |
-     v
-Answer + citations
+```mermaid
+flowchart TD
+    Q["Your question"] --> R["RETRIEVE<br/>search the indexed notes,<br/>return the top few chunks"]
+    R --> G["GENERATE<br/>Claude reads only those chunks<br/>and writes the answer"]
+    G --> A["Answer with citations"]
+    R -. "check here first:<br/>amv search" .-> D1["Were the right chunks found?"]
+    G -. "then here:<br/>amv ask" .-> D2["Did the prompt use them well?"]
 ```
 
 Two completely separate systems, and you can debug them separately. That turns out to matter enormously. When your RAG gives a bad answer there are only two possible causes:
@@ -169,6 +169,8 @@ And it is a `pip install`. No Docker, no server, no port to remember. For a pers
 
 ---
 
+> **Teachers**: Learners will point this at their own notes, and personal notes can hold names, passwords and private thoughts. Indexing stays on the machine, but when a learner runs `amv ask`, the few excerpts retrieved for that question are sent to a hosted service. For a class, have everyone use the practice vault from lesson 3 (or a vault of non-sensitive notes), and agree before lesson 13 what is and is not fine to send.
+
 ## Try it Yourself
 
 Before writing any code, get a feel for the problem in your own vault:
@@ -187,4 +189,35 @@ Before writing any code, get a feel for the problem in your own vault:
 
 - **Problem**: "Does this send all my notes to an AI company?"
 - **Solution**: No. Indexing is entirely local - the embedding model runs on your machine. Only the handful of retrieved chunks for a specific question are sent, and only when you run `ask`.
-- **Why**: Embedding and generation are separate models. We use a local one for embedding and a hosted one for writing the answer. If you want a fully offline tool, lesson 19 covers swapping the generation step for a local model too.
+- **Why**: Embedding and generation are separate models. We use a local one for embedding and a hosted one for writing the answer. If you want a fully offline tool, lesson 19 points at how to swap the generation step for a local model too.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What does the retrieval half of RAG do?
+- [x] Finds the few chunks of your notes that are most relevant to the question
+- [ ] Writes the final answer in fluent English
+- [ ] Retrains a model on your vault
+- [ ] Deletes duplicate notes
+> Retrieval searches the index and returns the top few chunks. Writing the answer is the generation half.
+
+? Why is pasting the whole vault into a chatbot a trap?
+- [x] It is too big, buries the useful text in noise, and you pay to resend it on every question
+- [ ] Chatbots cannot read Markdown
+- [ ] It makes Obsidian delete your notes
+> The lesson lists size, noise, and cost and latency as the three problems.
+
+? Your RAG gives a wrong answer. Why is it useful that retrieval and generation are separate systems?
+- [x] You can look at what was retrieved and tell in seconds which half is at fault
+- [ ] It means the model can never be wrong
+- [ ] It makes indexing faster
+> That is why the course builds both a `search` command and an `ask` command.
+
+? Which stages happen only when you index, not when you ask a question?
+- [x] Read, chunk, embed and store
+- [ ] Retrieve and generate
+- [ ] Only the generate stage
+> The first five stages run at index time. Only retrieve and generate run for each question, which is why asking is fast.
+{% endquiz %}

@@ -10,8 +10,10 @@ next: 11_metadata_filters.html
 description: Turn a question into ranked hits, understand what the distance means,
   and stop one note hogging every slot
 percent: 55
-duration: 8
-date_updated: 2026-08-23
+duration: 10
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to turn a question into ranked hits, read a distance as a rank rather than a threshold, and use oversampling and a per-note cap so one note cannot fill every slot.
+
 The index is built. Now let's ask it things.
 
 ## A hit, not a dictionary
@@ -104,6 +108,7 @@ class Hit:
     title: str
     section: str
     distance: float
+    chunk_index: int = 0
 
     @property
     def score(self) -> float:
@@ -117,7 +122,7 @@ class Hit:
 
 `score` exists purely for humans. Everyone reads "72%" faster than "distance 0.28", and `max(0.0, ...)` stops a distance above 1.0 - which happens for genuinely unrelated text - from displaying as a negative percentage.
 
-Do **not** rank by `score` and do not filter on it. Chroma already returned the results in distance order. This is a display convenience, nothing more.
+Do **not** rank by `score` and do not filter on it. Chroma already returned the results in distance order. This is a display convenience, nothing more. The `chunk_index` field just carries the chunk's position in its note, so that lesson 12 can fetch a hit's neighbours.
 
 ---
 
@@ -146,6 +151,7 @@ def search(question: str, top_k: int = TOP_K, db_path: Path = DB_PATH,
             title=metadata.get("title", metadata["path"]),
             section=metadata.get("section", ""),
             distance=distance,
+            chunk_index=metadata.get("chunk_index", 0),
         )
         for document, metadata, distance in zip(
             result["documents"][0], result["metadatas"][0], result["distances"][0]
@@ -172,6 +178,15 @@ Returning `[]` early lets the CLI print "have you run index yet?" instead of a t
 **Oversampling.** We ask Chroma for `top_k * 3` results and then narrow them down ourselves. That is the next section.
 
 ---
+
+```mermaid
+flowchart LR
+    Q["Question"] --> E["Embed it"]
+    E --> N["Ask Chroma for<br/>top_k x 3 results"]
+    N --> D["diversify:<br/>at most 2 chunks per note"]
+    D --> T["Keep the first top_k"]
+    T --> H["Hits, ranked by distance"]
+```
 
 ## Oversampling and diversity
 
@@ -249,7 +264,7 @@ for number, hit in enumerate(search("which GPIO pins drive the motors?", db_path
     Daily > 2026-08-20  Ordered more PETG. Tested the SMARS on carpet - the N20 motors stall...
 ```
 
-Look at those percentages. The best hit is **52%** - and it is unambiguously the correct answer. Result three at 20% is loosely related. Result six, on a bigger vault, would be under 5% and pure noise.
+(Your own percentages will differ a little from the ones printed here, because they depend on the embedding model, but the pattern will not.) Look at those percentages. The best hit is **52%** - and it is unambiguously the correct answer. Result three at 20% is loosely related. Result six, on a bigger vault, would be under 5% and pure noise.
 
 This is why absolute thresholds do not work. A rule like "reject anything under 60%" would have thrown away every single correct answer here.
 
@@ -291,9 +306,9 @@ It is optional. Extra weak context costs a few tokens and a well-prompted model 
 - **Solution**: Check the `path` metadata is actually different. If you index the same vault under two different absolute paths, `relative_path` saves you - but only if you index relative to the vault root.
 - **Why**: `diversify` groups by `hit.path`, so identical paths count as one note.
 
-- **Problem**: `IndexError: list index out of range` on `result["documents"][0]`.
-- **Solution**: The collection is empty, or `include` did not request documents.
-- **Why**: Chroma returns `None` rather than an empty list for anything you did not include, and `None[0]` fails in a way that does not obviously point at `include`.
+- **Problem**: `TypeError: 'NoneType' object is not subscriptable` on `result["documents"][0]`.
+- **Solution**: Add `"documents"` to the `include` list in your `query()` call.
+- **Why**: Chroma returns `None` rather than an empty list for anything you did not include, and `None[0]` fails in a way that does not obviously point at `include`. (An empty collection is a different case: it returns `[[]]`, so `[0]` works and you just get no hits.)
 
 - **Problem**: Scores are all above 100% or come out negative.
 - **Solution**: The collection was not created with cosine space.
@@ -302,3 +317,33 @@ It is optional. Extra weak context costs a few tokens and a well-prompted model 
 - **Problem**: Search is slow on the first call and fast afterwards.
 - **Solution**: Normal - the embedding model is loading into memory.
 - **Why**: The model loads lazily on first use. For a CLI that exits between commands you pay it every time, which is one reason lesson 15 offers an interactive mode.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Your best hit has a score of 52% and it is clearly the right answer. What does that tell you?
+- [ ] The search is broken, because a good score should be above 90%
+- [x] Nothing is wrong: with a small model, good matches often score around half, so judge by rank
+- [ ] You should raise the cutoff to 60%
+> An absolute threshold would throw away every correct answer in the lesson's example.
+
+? Why ask Chroma for `top_k * 3` results and then narrow them down?
+- [x] After capping chunks per note there are still enough left to fill every slot
+- [ ] It makes Chroma run faster
+- [ ] Chroma always returns three times too few
+> If we asked for exactly 6 and threw four away, we would return only 2 results.
+
+? Why does `search` return `[]` immediately when the collection is empty?
+- [ ] Empty collections cannot be queried at all
+- [x] `n_results` would be computed as 0, which Chroma rejects with a TypeError
+- [ ] To make the first query faster
+> Returning early also lets the CLI print a helpful message instead of a traceback.
+
+? What does `drop_stragglers` compare each hit against?
+- [x] The best hit's score, so the bar moves with the quality of the match
+- [ ] A fixed 60% cutoff
+- [ ] The average distance of the whole vault
+> A relative cutoff keeps working whether the best match is 52% or 90%.
+{% endquiz %}

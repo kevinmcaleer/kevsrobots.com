@@ -4,18 +4,35 @@ description: Parse the YAML frontmatter, collect inline tags and extract wikilin
 layout: lesson
 type: page
 cover: /learn/obsidian_rag/assets/banners/06_parsing_notes.jpg
-date_updated: 2026-08-23
+date_updated: 2026-11-24
+snakie: false
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
+By the end of this lesson you will be able to strip YAML frontmatter from a note, collect frontmatter and inline tags, and extract wikilinks, without letting one badly formed note stop an indexing run.
+
 Right now every note's `body` includes its frontmatter block, its `tags` list is empty, and its `title` is just the filename. Let's fix all three.
 
 Why bother? Because metadata is what turns a search into a *useful* search. "What did I write about motors" is fine. "What did I write about motors, in notes tagged `robots`, since March" is much better - and that only works if the tags and dates are in the index.
 
 ---
+
+```mermaid
+flowchart LR
+    F["Raw file text"] --> S["split_frontmatter"]
+    S --> FM["frontmatter dict"]
+    S --> B["body text"]
+    FM --> T["extract_tags"]
+    B --> T
+    B --> L["extract_links"]
+    T --> N["Note"]
+    L --> N
+    FM --> N
+    B --> N
+```
 
 ## Stripping the frontmatter
 
@@ -185,6 +202,37 @@ def load_note(path: Path, vault_path: Path) -> Note:
 
 ---
 
+Here is the whole set of parsers on one small note, so you can see exactly what comes out. This script needs only the `vault_rag` package:
+
+```python
+# try_parse.py - a scratch script in the project root
+from vault_rag.vault import extract_links, extract_tags, split_frontmatter
+
+text = """---
+title: Pico notes
+tags: [pico, micropython]
+---
+
+# Pico notes
+
+Printed a case for it today. #petg #worked-first-time
+See [[SMARS|my robot]] and [[Pico W#Power]].
+"""
+
+frontmatter, body = split_frontmatter(text)
+print(frontmatter)
+print(extract_tags(frontmatter, body))
+print(extract_links(body))
+```
+
+```
+{'title': 'Pico notes', 'tags': ['pico', 'micropython']}
+['pico', 'micropython', 'petg', 'worked-first-time']
+['Pico W', 'SMARS']
+```
+
+Frontmatter tags come first, inline tags follow, and the links are sorted and stripped of their `|alias` and `#heading` parts.
+
 ## Try it Yourself
 
 ```python
@@ -226,3 +274,33 @@ for tag, count in tag_counts.most_common(20):
 - **Problem**: One note has 200 tags.
 - **Solution**: Look at the note. It is almost certainly a MOC or index note that lists every tag in your vault.
 - **Why**: Nothing is broken, but that note will match far too many tag filters. Consider skipping notes with an absurd tag count.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why does the frontmatter regex start with `\A`?
+- [x] It anchors to the very start of the text, so a `---` rule halfway down a note is not mistaken for frontmatter
+- [ ] It makes the match case insensitive
+- [ ] It skips blank lines
+> Frontmatter only counts when it is the first thing in the file.
+
+? Why use `yaml.safe_load` and never `yaml.load`?
+- [ ] `safe_load` is faster
+- [x] `safe_load` cannot construct arbitrary Python objects, and your vault may contain text pasted from the internet
+- [ ] `load` does not exist in PyYAML
+> Safety first: a note is untrusted text.
+
+? Why are code fences removed before looking for inline tags?
+- [x] Comments such as `# initialise` inside code would otherwise become tags
+- [ ] Code fences are never valid Markdown
+- [ ] Tags are not allowed in notes with code
+> The lesson's example is tags called `initialise`, `TODO` and `set` appearing from code comments.
+
+? What does `extract_links` return for `[[SMARS#Motor wiring]]`?
+- [ ] `SMARS#Motor wiring`
+- [x] `SMARS`
+- [ ] `Motor wiring`
+> The pattern stops at the first `]`, `|` or `#`, so it handles plain links, aliases and heading links together.
+{% endquiz %}

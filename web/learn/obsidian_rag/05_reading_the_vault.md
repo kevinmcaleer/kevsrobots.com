@@ -10,8 +10,10 @@ next: 06_parsing_notes.html
 description: Find every markdown note in an Obsidian vault, skip the folders you do
   not want, and load them into Note objects
 percent: 30
-duration: 6
-date_updated: 2026-08-23
+duration: 7
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to walk an Obsidian vault, skip folders you do not want, and load each note into a `Note` object with a content hash.
+
 An Obsidian vault is just a folder of markdown files. No database, no proprietary format - which is the whole reason Obsidian is worth building tools for.
 
 That does mean a few things are lurking in there that you do not want in your index.
@@ -96,6 +100,18 @@ That does mean a few things are lurking in there that you do not want in your in
 Those are already in `SKIP_DIRS` in `config.py`. Add your own as you find them.
 
 ---
+
+Here is what `iter_notes` decides for every file it meets:
+
+```mermaid
+flowchart TD
+    A["rglob every .md file<br/>in sorted order"] --> B{"Any folder name in the path<br/>is in SKIP_DIRS?"}
+    B -- yes --> X["Skip it"]
+    B -- no --> C["load_note builds a Note"]
+    C --> D{"Is the body empty?"}
+    D -- yes --> X
+    D -- no --> E["yield the Note"]
+```
 
 ## The Note object
 
@@ -243,3 +259,33 @@ Then try these:
 - **Problem**: `UnicodeDecodeError` on one specific file.
 - **Solution**: You dropped `errors="replace"` from `read_text`.
 - **Why**: Not every file in a long-lived vault is clean UTF-8.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why is `iter_notes` a generator (it uses `yield`) rather than returning a list?
+- [x] A big vault has thousands of notes and we only need one in memory at a time
+- [ ] Generators are faster at reading files
+- [ ] Chroma only accepts generators
+> The indexer processes one note, then lets it go.
+
+? Why does the skip check use the path relative to the vault?
+- [ ] Absolute paths are not allowed on Windows
+- [x] If the vault itself lived under a folder called `templates`, an absolute path would skip every note
+- [ ] It is quicker to type
+> The check intersects `path.relative_to(vault_path).parts` with `SKIP_DIRS`.
+
+? What does `content_hash` hash, and why?
+- [x] The note body, so touching a file without editing it does not trigger a re-index
+- [ ] The file's modification time, so edits are noticed
+- [ ] The absolute path, so renames are noticed
+> Hashing the body means the fingerprint changes only when the note's text changes.
+
+? What does `errors="replace"` do when reading a note?
+- [ ] Replaces the note with an empty one
+- [x] Swaps invalid bytes for a placeholder character so one badly encoded file cannot stop the run
+- [ ] Deletes the file
+> Old files pasted from other systems can contain bytes that are not valid UTF-8.
+{% endquiz %}

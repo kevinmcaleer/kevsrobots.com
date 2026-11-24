@@ -10,8 +10,10 @@ next: 17_evaluating_your_rag.html
 description: Re-index on a schedule, watch the vault for changes, and decide which
   approach suits how you actually work
 percent: 85
-duration: 7
-date_updated: 2026-08-23
+duration: 11
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to keep the index up to date with a `--fresh` flag, a scheduled job or a debounced file watcher, and choose the simplest option that suits how you work.
+
 An index is only useful if it matches your notes. Right now you have to remember to run `amv index`, and you will not.
 
 Because indexing is incremental, keeping up to date is cheap - a no-change run on a big vault takes well under a second. That opens up options that would be silly if a rebuild took a minute.
@@ -97,25 +101,32 @@ Start at the top. Move down only when the one above stops being good enough.
 
 ---
 
+```mermaid
+flowchart TD
+    S["How fresh must the index be?"] --> A{"Fine to wait a few seconds<br/>before each question?"}
+    A -- yes --> F["amv ask --fresh<br/>(or make it the default)"]
+    A -- no --> B{"Fine if it is up to<br/>half an hour behind?"}
+    B -- yes --> C["cron or a timer<br/>running amv index"]
+    B -- no --> W["amv watch<br/>with a 5 second debounce"]
+```
+
 ## Just index before you ask
 
 The simplest thing that works. Add a flag:
 
 ```python
-# vault_rag/cli.py  (in build_parser - give ask its own subparser rather than
-# building it in the shared loop, so only ask gets this flag)
-ask_parser.add_argument("--fresh", action="store_true",
-                        help="Re-index before answering")
+# vault_rag/cli.py  (in build_parser, inside the loop that builds search and ask -
+#                     indent it to sit inside that for loop)
+if name == "ask":
+    sub.add_argument("--fresh", action="store_true",
+                     help="Re-index before answering")
 ```
 
 ```python
-# vault_rag/cli.py  (add these lines to the top of cmd_ask)
-def cmd_ask(args) -> int:
-    from .answer import check_citations, stream_answer
-
-    if args.fresh:
-        index_vault(VAULT_PATH, args.db, verbose=False)
-    ...
+# vault_rag/cli.py  (in cmd_ask, just below the `from .answer import ...` line -
+#                     indent it to sit inside the function)
+if args.fresh:
+    index_vault(VAULT_PATH, args.db, verbose=False)
 ```
 
 On a vault where nothing changed, `index_vault` reads the hashes, compares, and returns. You will not notice it happen.
@@ -194,6 +205,10 @@ class VaultHandler(FileSystemEventHandler):
 
 def watch(vault_path: Path = VAULT_PATH, db_path: Path = DB_PATH):
     """Re-index a few seconds after the last change settles."""
+    # Catch up on anything that changed while the watcher was not running
+    stats = index_vault(vault_path, db_path, verbose=False)
+    print(f"Caught up: {stats.summary()}")
+
     handler = VaultHandler()
     observer = Observer()
     observer.schedule(handler, str(Path(vault_path).expanduser()), recursive=True)
@@ -221,7 +236,7 @@ def watch(vault_path: Path = VAULT_PATH, db_path: Path = DB_PATH):
 
 **We do not track which file changed.** We could, but incremental indexing already figures that out from the hashes, and a "something changed, go look" signal is far simpler than maintaining a queue of paths. Let each layer do its own job.
 
-**Only printing when something happened** keeps the terminal quiet. A watcher that logs "0 changed" every five seconds is a watcher you will kill.
+**The catch-up index on startup** means edits made while the watcher was off are not missed. **Only printing when something happened** keeps the terminal quiet. A watcher that logs "0 changed" every five seconds is a watcher you will kill.
 
 Add it as a command:
 
@@ -231,6 +246,14 @@ def cmd_watch(args) -> int:
     from .watch import watch
     watch(args.vault, args.db)
     return 0
+```
+
+```python
+# vault_rag/cli.py  (in build_parser, just above `return parser` -
+#                     indent it to sit inside the function)
+watch_parser = subparsers.add_parser("watch", help="Re-index when notes change")
+watch_parser.add_argument("--vault", type=Path, default=VAULT_PATH)
+watch_parser.set_defaults(func=cmd_watch)
 ```
 
 ---
@@ -295,6 +318,152 @@ The one thing to avoid is putting the Chroma database inside the synced vault. I
 
 ---
 
+## Checkpoint: the finished cli.py
+
+Pieces added in two lessons are easy to get out of order, so here is the whole file as it should look now. It also switches `search` and `ask` over to `hybrid_search` from lesson 12. If yours behaves differently, compare it with this one:
+
+```python
+# vault_rag/cli.py  (the finished file - it replaces the pieces from lessons 15 and 16)
+"""Ask My Vault - command line interface."""
+
+import argparse
+import os
+import sys
+import time
+from pathlib import Path
+
+from .config import DB_PATH, TOP_K, VAULT_PATH
+from .index import collection_stats, index_vault
+from .retrieve import build_filter, hybrid_search
+
+
+def cmd_index(args) -> int:
+    print(f"Indexing {args.vault}")
+    start = time.time()
+    stats = index_vault(args.vault, args.db, full=args.full, verbose=args.verbose)
+    print(f"Done in {time.time() - start:.1f}s: {stats.summary()}")
+    return 0
+
+
+def cmd_search(args) -> int:
+    where = build_filter(tag=args.tag, folder=args.folder)
+    hits = hybrid_search(args.question, top_k=args.top_k, db_path=args.db, where=where)
+    if not hits:
+        print("No matches. Have you run `amv index` yet?")
+        return 1
+    for number, hit in enumerate(hits, start=1):
+        print(f"\n[{number}] {hit.label}  ({hit.score:.0%})")
+        print(f"    {hit.path}")
+        snippet = hit.text.replace("\n", " ")[:180]
+        print(f"    {snippet}...")
+    return 0
+
+
+def cmd_ask(args) -> int:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print("ANTHROPIC_API_KEY is not set. `amv search` works without it.",
+              file=sys.stderr)
+        return 1
+
+    from .answer import check_citations, stream_answer
+
+    if args.fresh:
+        index_vault(VAULT_PATH, args.db, verbose=False)
+
+    where = build_filter(tag=args.tag, folder=args.folder)
+    hits = hybrid_search(args.question, top_k=args.top_k, db_path=args.db, where=where)
+    if not hits:
+        print("Nothing in your vault matches that. Try `amv index` first.")
+        return 1
+
+    pieces = []
+    for piece in stream_answer(args.question, hits):
+        pieces.append(piece)
+        print(piece, end="", flush=True)
+
+    cited, invalid = check_citations("".join(pieces), len(hits))
+
+    print("\n\nSources:")
+    for number, hit in enumerate(hits, start=1):
+        marker = " " if number in cited else "-"
+        print(f" {marker}[{number}] {hit.path}  ({hit.score:.0%})")
+
+    if invalid:
+        print(f"\nWarning: cited sources that do not exist: {sorted(invalid)}")
+    return 0
+
+
+def cmd_stats(args) -> int:
+    info = collection_stats(args.db)
+    print(f"Database: {info['path']}")
+    print(f"Notes indexed: {info['notes']}")
+    print(f"Chunks stored: {info['chunks']}")
+    return 0
+
+
+def cmd_watch(args) -> int:
+    from .watch import watch
+
+    watch(args.vault, args.db)
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="amv", description="Ask questions about your Obsidian vault."
+    )
+    parser.add_argument("--db", type=Path, default=DB_PATH,
+                        help="Where the Chroma database lives")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    index_parser = subparsers.add_parser("index", help="Index or re-index the vault")
+    index_parser.add_argument("--vault", type=Path, default=VAULT_PATH)
+    index_parser.add_argument("--full", action="store_true",
+                              help="Wipe and rebuild from scratch")
+    index_parser.add_argument("--quiet", dest="verbose", action="store_false")
+    index_parser.set_defaults(func=cmd_index)
+
+    for name, handler, help_text in [
+        ("search", cmd_search, "Show the raw chunks that match"),
+        ("ask", cmd_ask, "Get an answer with citations"),
+    ]:
+        sub = subparsers.add_parser(name, help=help_text)
+        sub.add_argument("question")
+        sub.add_argument("--top-k", type=int, default=TOP_K)
+        sub.add_argument("--tag", help="Only search notes with this tag")
+        sub.add_argument("--folder", help="Only search notes in this folder")
+        if name == "ask":
+            sub.add_argument("--fresh", action="store_true",
+                             help="Re-index before answering")
+        sub.set_defaults(func=handler)
+
+    stats_parser = subparsers.add_parser("stats", help="Show index statistics")
+    stats_parser.set_defaults(func=cmd_stats)
+
+    watch_parser = subparsers.add_parser("watch", help="Re-index when notes change")
+    watch_parser.add_argument("--vault", type=Path, default=VAULT_PATH)
+    watch_parser.set_defaults(func=cmd_watch)
+
+    return parser
+
+
+def main(argv=None) -> int:
+    args = build_parser().parse_args(argv)
+    try:
+        return args.func(args)
+    except FileNotFoundError as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        return 130
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+> **Teachers**: The cron job, launch agent and systemd unit all leave a program running in the background, which is fine on a learner's own machine and a poor idea on a shared school computer. Keep the scheduling and watcher sections as demonstrations on one teacher or home machine, and have learners do the `--fresh` flag and a foreground `amv watch` (stopped with Ctrl-C) instead. If someone does set up a job, make sure they know how to remove it with `crontab -e`, `launchctl unload` or `systemctl --user disable --now amv`.
+
 ## Try it Yourself
 
 1. Time `amv index` on your vault with nothing changed. Under a second? Then `--fresh` on every ask costs you nothing.
@@ -322,3 +491,33 @@ The one thing to avoid is putting the Chroma database inside the synced vault. I
 - **Problem**: The database gets corrupted every few days.
 - **Solution**: Move it out of the synced vault folder.
 - **Why**: Sync clients merge file changes byte-wise, which is fatal for a SQLite database being written from two machines.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why does the watcher wait five seconds after the last change before re-indexing?
+- [x] Obsidian saves repeatedly while you type, so without a debounce one paragraph would trigger a dozen re-indexes
+- [ ] Chroma needs five seconds to start
+- [ ] The embedding model takes five seconds to load
+> Waiting for a pause means you index once, when you stop typing.
+
+? Why does the cron job use the absolute path to `.venv/bin/amv`?
+- [ ] Cron cannot run Python
+- [x] Cron does not run your shell profile, so the virtualenv is not active and `amv` is not on the PATH
+- [ ] Absolute paths are faster
+> Cron also has almost no environment, so `VAULT_PATH` must be set in the crontab or in `config.py`.
+
+? Where must the Chroma database NOT live?
+- [ ] In your home folder
+- [x] Inside a vault folder that is synced between machines
+- [ ] On an external drive
+> Sync clients merge file changes byte-wise, which is fatal for a SQLite database written from two machines.
+
+? Why does the watcher not track which file changed?
+- [x] Incremental indexing already works that out from the hashes, so "something changed, go look" is enough
+- [ ] Watchdog cannot report file names
+- [ ] It would make the index larger
+> Let each layer do its own job.
+{% endquiz %}

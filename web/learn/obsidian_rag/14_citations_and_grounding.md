@@ -10,8 +10,10 @@ next: 15_the_cli.html
 description: Make the answer traceable, verify the citations it produces, and get
   the model to admit when your notes do not know
 percent: 75
-duration: 7
-date_updated: 2026-08-23
+duration: 9
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to print the sources behind an answer, check that every citation number is real, and test that the tool declines to answer questions your notes do not cover.
+
 A RAG tool that answers confidently but cannot show its working is worse than no tool at all - because you will believe it.
 
 This lesson is about the difference between *sounding* grounded and *being* grounded.
@@ -93,6 +97,17 @@ When the answer says:
 Without those markers you have a paragraph that might be a faithful summary of your notes, might be the model's general knowledge about motor drivers, or might be a blend. There is no way to tell by reading it, and the blend is the dangerous one.
 
 ---
+
+```mermaid
+flowchart TD
+    A["Answer text from Claude"] --> R["Find every [n] with a regular expression"]
+    R --> C["cited: numbers used"]
+    C --> I{"Any number below 1<br/>or above the hit count?"}
+    I -- yes --> W["Warn: invalid citation,<br/>the model is drifting"]
+    I -- no --> U{"Any source never cited?"}
+    U -- yes --> N["Flag it: retrieved but unused,<br/>maybe TOP_K is too high"]
+    U -- no --> OK["Every source earned its place"]
+```
 
 ## Printing the source list
 
@@ -138,6 +153,23 @@ def check_citations(text: str, hit_count: int) -> tuple[set[int], set[int]]:
     invalid = {n for n in cited if n < 1 or n > hit_count}
     return cited - invalid, invalid
 ```
+
+Try it on its own first. It needs no API key, because it only reads text:
+
+```python
+# try_cite.py - a scratch script in the project root
+from vault_rag.answer import check_citations
+
+print(check_citations("Swapped the driver [1] and the motors still stalled [2][7].", 3))
+```
+
+```
+({1, 2}, {7})
+```
+
+We pretended three sources were sent, so source 7 does not exist and lands in the second set.
+
+Wire it in after the answer arrives:
 
 Wire it in after the answer arrives:
 
@@ -210,6 +242,8 @@ The practical upshot: use the citation. Click through. The point of the link is 
 
 ---
 
+> **Teachers**: This is a good lesson for a discussion about trust, not just code. Ask learners: if a tool shows you a citation, does that make the claim true? Have them plant a wrong fact in a practice note and watch the tool repeat it with a citation. It makes a concrete, memorable point about checking sources, which carries well beyond this project.
+
 ## Try it Yourself
 
 1. Ask three questions your vault definitely cannot answer. Count how many get a straight "your notes do not cover this".
@@ -237,3 +271,33 @@ The practical upshot: use the citation. Click through. The point of the link is 
 - **Problem**: Citations appear as `(1)` or `Source 1` instead of `[1]`.
 - **Solution**: Show the exact format you want in the system prompt - we write `like [1] or [2][3]`.
 - **Why**: Describing a format in words gets approximate compliance. Showing an example gets exact compliance, and your `CITATION_RE` depends on exact.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why does the CLI list every source it sent, not only the ones cited?
+- [x] A source that was retrieved but never used is a signal that retrieval pulled in something irrelevant
+- [ ] To make the output longer
+- [ ] Because Chroma requires it
+> Seeing what was not used tells you as much as seeing what was.
+
+? What does an invalid citation, such as `[7]` when only 3 sources were sent, tell you?
+- [ ] The vault has too many notes
+- [x] The model is drifting from the prompt, so the system prompt needs tightening
+- [ ] Chroma lost a chunk
+> It is rare with a clear prompt, but it is cheap to check.
+
+? You ask "what is the capital of France?" and the tool answers "Paris". What should you conclude?
+- [x] The system prompt is not strong enough: the tool should say your notes do not cover it
+- [ ] The tool is working perfectly
+- [ ] Your vault contains a geography note
+> The model knows the answer, so this is the sharper test that grounding really holds.
+
+? What can a citation NOT tell you?
+- [ ] Which note the claim came from
+- [x] Whether the claim in that note is actually correct
+- [ ] Which section it came from
+> RAG grounds answers in your notes. It does not grade your notes.
+{% endquiz %}

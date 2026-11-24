@@ -10,8 +10,10 @@ next: 12_improving_retrieval.html
 description: Narrow the search before it happens using Chroma metadata filters, and
   understand what each operator really does
 percent: 60
-duration: 7
-date_updated: 2026-08-23
+duration: 8
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to build a Chroma `where` clause from tag, folder and date options, and explain why a filter changes which chunks win rather than just removing results.
+
 Semantic search finds things that *mean* the same. Metadata filters find things that *are* a certain kind. Together they are much stronger than either alone.
 
 "What did I write about power consumption" searches everything. "What did I write about power consumption, in notes tagged `pico`, since June" searches the twelve notes that could possibly be relevant - and the results are dramatically better, because there is far less to be wrong about.
@@ -93,6 +97,14 @@ That means a filtered search does not return fewer results - it returns *differe
 Which is exactly what you want, and occasionally surprising: filter hard enough and you will get low-scoring results, because the best available match in a small pool is not very good. That is the filter telling you something true.
 
 ---
+
+```mermaid
+flowchart LR
+    A["All chunks<br/>in the index"] --> F["where clause<br/>tag, folder, mtime"]
+    F --> P["Only chunks that match<br/>are left in the pool"]
+    P --> S["Nearest neighbours<br/>found inside the pool"]
+    S --> H["Hits"]
+```
 
 ## Building the clause
 
@@ -199,6 +211,8 @@ for hit in search("how do I save power", db_path="testdb", where=where):
   6%  electronics/Pico W.md
 ```
 
+(Exact percentages depend on the embedding model. What to look for is that every hit comes from the tagged note.)
+
 Filtered to the `pico` tag, only chunks from that note can compete - and the top score of 22% is honest about the fact that this small test vault does not have a great answer.
 
 Folder filtering behaves the same way:
@@ -251,3 +265,33 @@ That is worth planning for. If you think you might one day want "only notes with
 - **Problem**: The `mtime` filter never matches.
 - **Solution**: Print an actual stored `mtime` and compare magnitudes with your filter value.
 - **Why**: `mtime` is Unix seconds, around 1.7 billion. Comparing against a value in milliseconds - or against a `datetime` - matches nothing, and Chroma will not warn you that you are comparing incomparable numbers.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? A `where` filter is applied...
+- [ ] after ranking, to trim the results
+- [x] before ranking, so the nearest neighbours are found inside whatever survives
+- [ ] only to the document text
+> That is why a filtered search returns different results, not just fewer.
+
+? Which filter finds chunks whose `tags` list contains `pico`?
+- [ ] `{"tags": {"$in": ["pico"]}}`
+- [x] `{"tags": {"$contains": "pico"}}`
+- [ ] `{"tags": "pico"}`
+> `$in` compares the whole field to each candidate, and a list is never equal to a string, so it matches nothing.
+
+? What should `build_filter` return when no options are given?
+- [ ] An empty dict `{}`
+- [x] `None`
+- [ ] The string `"all"`
+> Chroma raises an error for `{}` because it is not a valid filter.
+
+? Why does `build_filter` lowercase the tag?
+- [x] Tags were lowercased at index time, so the query must be normalised the same way
+- [ ] Chroma ignores uppercase letters
+- [ ] To make the filter faster
+> Any normalisation applied to stored data has to be applied to the query too.
+{% endquiz %}

@@ -9,9 +9,28 @@ description: Build Ask My Vault - a Python tool that indexes your Obsidian notes
   Learn embeddings, chunking, vector search and grounded generation by building the
   whole pipeline yourself.
 level: intermediate
-course_duration: 2h 17m
+course_duration: 3h 6m
 lesson_count: 20
 first_lesson: 00_intro.html
+quiz_total: 76
+outcomes:
+- Explain how embeddings turn text into points you can search by meaning
+- Parse an Obsidian vault into chunks that keep their heading context
+- Build and incrementally update a ChromaDB index with tag, folder and date filters
+- Write a grounded prompt that cites its sources and admits when your notes do not
+  know
+- Run an amv command line tool against your own vault
+- Measure retrieval with hit rate and mean reciprocal rank so you know a change helped
+prerequisites:
+- Python for beginners
+- Obsidian
+you_need:
+- A computer with Python 3.10 or newer and about 500MB of free disk space
+- An Obsidian vault of Markdown notes (a four-note practice vault is built in lesson
+  3)
+- An Anthropic API key for the answer step in lessons 13 to 15 (lessons 1 to 12 need
+  none)
+- Internet access for the first run, when the embedding model downloads
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:

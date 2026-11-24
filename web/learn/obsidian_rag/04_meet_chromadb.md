@@ -10,8 +10,10 @@ next: 05_reading_the_vault.html
 description: Collections, documents, metadata and queries - everything ChromaDB does,
   in one lesson
 percent: 25
-duration: 7
-date_updated: 2026-08-23
+duration: 9
+quiz_total: 76
+date_updated: 2026-11-24
+snakie: false
 navigation:
 - name: Build a RAG for Your Obsidian Vault
 - content:
@@ -78,6 +80,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to create a persistent ChromaDB collection, upsert documents with metadata, query by meaning, and filter and delete by metadata.
+
 Before we point ChromaDB at a real vault, let's spend a lesson just playing with it. It has a small API and you can learn nearly all of it in twenty minutes.
 
 ## The mental model
@@ -93,6 +97,16 @@ Documents live in a **collection**, which is a bit like a table. We will use exa
 That is genuinely it.
 
 ---
+
+```mermaid
+flowchart TB
+    C["PersistentClient<br/>a folder on disk"] --> COL["Collection: notes<br/>cosine distance"]
+    COL --> D1["Document: id note1-0"]
+    COL --> D2["Document: id note2-0"]
+    D1 --> T["text"]
+    D1 --> M["metadata<br/>flat dictionary"]
+    D1 --> E["embedding<br/>made by Chroma"]
+```
 
 ## Your first collection
 
@@ -201,7 +215,7 @@ for document, metadata, distance in zip(
 
 ### Ask for only what you need
 
-`include=["documents", "metadatas", "distances"]` is not optional politeness - it is a real optimisation. Leave it off and older Chroma versions hand back the full 384 number embedding for every hit, which you then throw away.
+`include=["documents", "metadatas", "distances"]` spells out exactly what you want back. Current Chroma versions already leave the 384 number embeddings out of a `query()` by default, but older ones sent them for every hit, which you then threw away. Being explicit also tells the next reader what the code uses, and it matters for `get()` and for the `None` trap in the Common Issues below.
 
 ---
 
@@ -282,6 +296,8 @@ Deleting by `where` is exactly how we will handle an edited note in lesson 9 - d
 
 ---
 
+> **Teachers**: This lesson is a good one to run as pairs at a keyboard, because every step is a tiny script with a visible result. The first query downloads the embedding model (see the note in lesson 2). Each learner's scratch database is just a folder (`scratch_db`), so resetting a learner who has got in a muddle means deleting that one folder.
+
 ## Try it Yourself
 
 1. Add three documents about a topic you know well, then query with a question that uses none of the same words. Did the right one come back?
@@ -301,10 +317,40 @@ Deleting by `where` is exactly how we will handle an edited note in lesson 9 - d
 - **Solution**: Never pass `{}` as a metadata entry. Pass at least one key, or leave the whole `metadatas` argument off.
 - **Why**: An empty dict is almost always a bug in your code rather than a deliberate choice, so Chroma refuses it.
 
-- **Problem**: Metadata comes back as `None` for a document you definitely gave metadata to.
-- **Solution**: Check for a `None` *value* in the dict - something like `{"title": None}` when a note had no title.
-- **Why**: A `None` value causes the entire metadata dictionary to be stored as `None`. Coerce your values to strings, or drop the key, before writing. We handle this properly in lesson 8.
+- **Problem**: A metadata field you wrote is missing when you read it back, or the whole metadata comes back as `None`.
+- **Solution**: Look for a `None` *value* in the dict, something like `{"title": None}` when a note had no title. Replace it with a string, or leave the key out.
+- **Why**: Chroma silently drops any key whose value is `None`. If that leaves nothing, the whole entry reads back as `None`. Later code that does `metadata["title"]` then fails with a `KeyError` or a `TypeError`. We handle this properly in lesson 8.
 
 - **Problem**: Distances look wrong, or all results seem equally close.
 - **Solution**: Check you passed `configuration={"hnsw": {"space": "cosine"}}` when the collection was **created**.
 - **Why**: Setting it on an existing collection is ignored silently. Delete the database directory and rebuild.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why should you use `upsert()` rather than `add()`?
+- [ ] `add()` is slower
+- [x] `add()` silently keeps the old document if the id already exists, so edits never reach the index
+- [ ] `upsert()` is the only one that accepts metadata
+> The lesson shows `add()` leaving the old text in place with no warning. `upsert()` overwrites.
+
+? Why do query results look like `[['note1-0', 'note2-0']]`, with double brackets?
+- [ ] Chroma returns the results twice
+- [x] `query_texts` is a list, so every result is a list of lists, one inner list per question
+- [ ] The extra brackets mark the best match
+> We ask one question at a time, which is why our code uses `[0]` to unwrap the result.
+
+? A document has metadata `{"tags": ["pico", "micropython"]}`. Which filter finds it?
+- [ ] `{"tags": {"$in": ["pico"]}}`
+- [x] `{"tags": {"$contains": "pico"}}`
+- [ ] `{"tags": {"$regex": "pico"}}`
+> `$contains` checks whether a list holds a value. `$in` compares the whole field to a list of candidates and matches nothing here, and `$regex` is not allowed on metadata.
+
+? When must the distance metric be set to cosine?
+- [x] When the collection is first created
+- [ ] Any time, by editing the collection later
+- [ ] On every query
+> Changing it on an existing collection is ignored, so you would have to delete the database and rebuild.
+{% endquiz %}
