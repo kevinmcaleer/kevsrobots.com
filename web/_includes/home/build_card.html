@@ -1,0 +1,50 @@
+{%- comment -%}
+  One card in the "Kev's builds" band (home/builds.html).
+
+  YouTube thumbnails are 16:9 and the thumbnail box is 16:9, so the video
+  picture is never cropped. hqdefault.jpg is YouTube's 480x360 image: the
+  16:9 frame with black bars above and below, and object-fit trims only
+  those bars. A build with no video shows its 4:3 cover whole (contain)
+  over a blurred copy of itself, so covers are not cropped either.
+
+  Usage: include home/build_card.html build=entry  (entry from site.data.home_builds)
+{%- endcomment -%}
+{% assign b = include.build %}
+{% assign first_video = b.videos | first %}
+<div class="kb-col">
+  <article class="kb-card{% if b.video_count > 0 %} has-video{% endif %}">
+    {% if first_video %}
+    <a class="kb-thumb" href="https://www.youtube.com/watch?v={{ first_video.id }}" target="_blank" rel="noopener" aria-label="Watch {{ b.name | escape }} on YouTube">
+      <img src="https://i.ytimg.com/vi/{{ first_video.id }}/hqdefault.jpg" alt="" loading="lazy" decoding="async" width="480" height="270">
+      <span class="kb-play" aria-hidden="true"></span>
+      <span class="kb-count">{% if b.video_count > 1 %}{{ b.video_count }} videos{% else %}Video{% endif %}</span>
+    </a>
+    {% else %}
+    <a class="kb-thumb kb-thumb-cover" href="{{ b.link }}" tabindex="-1" aria-hidden="true">
+      <img class="kb-cover-blur" src="{{ b.cover }}" alt="" loading="lazy" decoding="async">
+      <img class="kb-cover" src="{{ b.cover }}" alt="" loading="lazy" decoding="async">
+    </a>
+    {% endif %}
+    <div class="kb-body">
+      <p class="kb-kind">{{ b.kind }} · {{ b.sort_date | date: "%-d %b %Y" }}</p>
+      <h3 class="kb-name"><a href="{{ b.link }}">{{ b.name }}</a></h3>
+      <p class="kb-desc">{{ b.description }}</p>
+      <div class="kb-actions">
+        {% if first_video %}
+        <a class="kb-btn kb-btn-watch" href="https://www.youtube.com/watch?v={{ first_video.id }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube" aria-hidden="true"></i> {% if b.video_count > 1 %}Watch the series{% else %}Watch the build{% endif %}</a>
+        {% endif %}
+        <a class="kb-btn kb-btn-guide" href="{{ b.link }}">Read the guide</a>
+      </div>
+    </div>
+    {% if b.video_count > 1 %}
+    <div class="kb-more">
+      <p class="kb-more-label">All {{ b.video_count }} videos</p>
+      <ol>
+        {% for v in b.videos %}
+        <li><a href="https://www.youtube.com/watch?v={{ v.id }}" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/{{ v.id }}/mqdefault.jpg" alt="" loading="lazy" decoding="async" width="320" height="180"><span>{{ v.title }}</span></a></li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endif %}
+  </article>
+</div>

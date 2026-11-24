@@ -1,0 +1,275 @@
+/* Homepage "Kev's builds" band: _includes/home/builds.html + build_card.html.
+ *
+ * Thumbnails: the box is 16:9 to match YouTube, so video thumbnails are
+ * never cropped (only the black bars YouTube adds to hqdefault.jpg are
+ * trimmed). Covers without a video are 4:3 and are shown whole (contain)
+ * over a blurred copy, so they are not cropped either.
+ *
+ * Desktop (fine pointer that can hover): a build with more than one video
+ * opens a panel under its card listing every video, overlaying the page
+ * below, so nothing reflows. Touch devices never see the panel.
+ */
+
+.kb-band {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: #3d86bd url('/assets/img/projects_background.jpg') center / cover;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.kb-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.kb-band h2 {
+  margin: 0;
+  font-family: var(--kr-font-display, "Oswald", sans-serif);
+  font-weight: 600;
+  font-size: 2rem;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.kb-top p {
+  margin: 0.25rem 0 0;
+  max-width: 60ch;
+  opacity: 0.92;
+}
+
+.kb-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.kb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  background: #fff;
+  color: #1c2230 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none !important;
+  white-space: nowrap;
+}
+
+.kb-btn:hover { filter: brightness(0.93); }
+.kb-btn:focus-visible,
+.kb-tabs [role="tab"]:focus-visible,
+.kb-card a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.kb-btn-watch { background: #e62117; color: #fff !important; }
+.kb-btn-guide { background: transparent; color: #fff !important; border: 1px solid rgba(255, 255, 255, 0.6); }
+
+/* Tabs */
+.kb-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.kb-tabs[hidden], .kb-band [hidden] { display: none !important; }
+.kb-tabs [role="tab"] {
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.kb-tabs [role="tab"][aria-selected="true"] { background: #fff; color: #1c2230; border-color: #fff; }
+
+/* Grid: 4 across on desktop, 2 on tablets, 1 on phones (never one alone). */
+.kb-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+@media (max-width: 991.98px) { .kb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 575.98px) { .kb-grid { grid-template-columns: 1fr; } }
+
+.kb-col { position: relative; min-width: 0; }
+
+.kb-card {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #20445a;
+  color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kb-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+}
+
+.kb-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.kb-thumb-cover .kb-cover-blur {
+  position: absolute;
+  inset: 0;
+  filter: blur(14px) brightness(0.7);
+  transform: scale(1.15);
+}
+
+.kb-thumb-cover .kb-cover {
+  position: relative;
+  object-fit: contain;
+}
+
+.kb-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 40px;
+  margin: -20px 0 0 -28px;
+  border-radius: 10px;
+  background: #e62117;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease;
+}
+.kb-play::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: 12px;
+  border-style: solid;
+  border-width: 8px 0 8px 14px;
+  border-color: transparent transparent transparent #fff;
+}
+.kb-thumb:hover .kb-play { transform: scale(1.08); }
+
+.kb-count {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.kb-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem 0.9rem;
+}
+
+.kb-kind {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.kb-band .kb-name {
+  margin: 0;
+  font-family: var(--kr-font-display, "Oswald", sans-serif);
+  font-size: 1.15rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.kb-name a { color: #fff !important; text-decoration: none !important; }
+.kb-name a:hover { text-decoration: underline !important; }
+
+.kb-desc {
+  margin: 0;
+  font-size: 0.86rem;
+  opacity: 0.85;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.kb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+.kb-actions .kb-btn { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
+
+/* Every video in a series, on hover (desktop only). */
+.kb-more { display: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .kb-col:hover,
+  .kb-col:focus-within { z-index: 5; }
+  .kb-col:hover .kb-card { transform: translateY(-3px); box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.35); }
+
+  .kb-card.has-video { overflow: visible; }
+  .kb-card.has-video .kb-thumb { border-radius: 8px 8px 0 0; }
+
+  .kb-col:hover .kb-more,
+  .kb-col:focus-within .kb-more {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% - 8px);
+    padding: 0.75rem 0.9rem 0.9rem;
+    border-radius: 0 0 8px 8px;
+    background: #20445a;
+    box-shadow: 0 0.75rem 1.25rem rgba(0, 0, 0, 0.35);
+  }
+
+  .kb-more-label {
+    margin: 0 0 0.5rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .kb-more ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+  .kb-more a {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 0.6rem;
+    align-items: center;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  .kb-more a:hover span { text-decoration: underline; }
+  .kb-more img { width: 80px !important; height: 45px !important; max-width: none; object-fit: cover; border-radius: 4px; display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kb-card, .kb-play { transition: none; }
+  .kb-col:hover .kb-card { transform: none; }
+}

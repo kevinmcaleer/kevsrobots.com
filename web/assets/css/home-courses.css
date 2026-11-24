@@ -1,0 +1,90 @@
+/* Homepage Courses band (_includes/home/courses.html). The pathway cards and
+ * the Continue learning strip are styled by learn-pathways.css and learn.css;
+ * this file only adds the red band around them. */
+
+.hc-band {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: #c0342b url('/assets/img/courses_background.jpg') center / cover;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hc-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.hc-band h2 {
+  margin: 0;
+  font-family: var(--kr-font-display, "Oswald", sans-serif);
+  font-weight: 600;
+  font-size: 2rem;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.hc-top p {
+  margin: 0.25rem 0 0;
+  max-width: 60ch;
+  opacity: 0.92;
+}
+
+.hc-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  background: #fff;
+  color: #1c2230 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none !important;
+  white-space: nowrap;
+}
+.hc-btn:hover { filter: brightness(0.93); }
+.hc-btn:focus-visible,
+.hc-new a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.hc-band [hidden] { display: none !important; }
+
+/* The strip keeps its light /learn/ look; only the spacing changes here. */
+.hc-continue { margin: 0; color: #1c2230; }
+.hc-continue h3 { margin: 0; font-size: 1.2rem; font-weight: 600; }
+
+.hc-pathways .pathway-card { color: #1c2230; }
+
+.hc-new {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 0.88rem;
+}
+
+.hc-new-label {
+  font-family: var(--kr-font-display, "Oswald", sans-serif);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.hc-new a { color: #fff !important; }
+.hc-new-more { opacity: 0.85; }
+
+/* The homepage sets bigger, uppercase headings than /learn/, so keep long
+ * pathway names inside their cards on phones. */
+@media (max-width: 575.98px) {
+  .hc-band { padding: 1rem; }
+  .hc-pathways .pathway-card-title { font-size: 1rem; overflow-wrap: break-word; }
+}
