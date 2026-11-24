@@ -3,11 +3,15 @@ title: Navigation in FreeCAD
 description: Master the 3D workspace - the foundation skill for efficient CAD work
 layout: lesson
 cover: /learn/freecad_smars/assets/banners/01_navigation.jpg
+type: page
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to orbit, pan and zoom around a model in FreeCAD and jump to any standard view using the navigation cube and number keys.
 
 ## Why Navigation Matters
 
@@ -83,6 +87,8 @@ Memorize these - they'll save you hundreds of mouse movements:
 
 ---
 
+> **Teachers**: FreeCAD must be installed on each machine before the lesson, so ask your IT team early, as school computers often block installs. Navigation relies on a middle mouse button. If your classroom has laptops with touchpads only, have learners pick a touchpad navigation style in the preferences (see Common Issues), or supply spare USB mice. Allow about 20 minutes.
+
 ## Try It Yourself
 
 Before moving to the next lesson, practice these exercises:
@@ -99,20 +105,48 @@ Spend 5 minutes on this. It pays off enormously later!
 ## Common Issues
 
 ### "My view spins out of control!"
-**Problem**: Moving the mouse while holding middle button causes wild spinning.
-**Solution**: Move slowly and deliberately. Your cursor position affects the rotation center.
+- **Problem**: Moving the mouse while holding middle button causes wild spinning.
+- **Solution**: Move slowly and deliberately. Your cursor position affects the rotation center.
+- **Why**: The rotation centre follows your cursor, so fast or off-centre movement swings the view.
 
 ### "I can't find my model anymore!"
-**Problem**: After zooming or panning, the model disappeared.
-**Solution**: Press `Ctrl + 0` to fit all objects in view, or press `0` for isometric view.
+- **Problem**: After zooming or panning, the model disappeared.
+- **Solution**: Press `Ctrl + 0` to fit all objects in view, or press `0` for isometric view.
+- **Why**: Zooming and panning can move the model out of the visible area, and Fit all recentres the camera.
 
 ### "Middle mouse button doesn't work!"
-**Problem**: Some laptops don't have a proper middle click.
-**Solution**: Go to Edit → Preferences → Display → Navigation. Choose a navigation style that works with your hardware (like "Touchpad").
+- **Problem**: Some laptops don't have a proper middle click.
+- **Solution**: Go to Edit → Preferences → Display → Navigation. Choose a navigation style that works with your hardware (like "Touchpad").
+- **Why**: The default navigation style expects a middle button, and the touchpad style replaces it.
 
 ### "The view is upside down!"
-**Problem**: Model appears flipped after rotating.
-**Solution**: Press `0` to reset to isometric view, or click a face on the navigation cube.
+- **Problem**: Model appears flipped after rotating.
+- **Solution**: Press `0` to reset to isometric view, or click a face on the navigation cube.
+- **Why**: Rotating can leave the camera at an odd angle, and the standard views reset it.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which mouse action orbits (rotates) the view in FreeCAD?
+- [ ] Scroll the mouse wheel
+- [x] Hold the middle mouse button and move the mouse
+- [ ] Hold Shift and the left mouse button
+> Orbit is middle button plus movement. The scroll wheel zooms, and Shift plus the middle button pans.
+
+? You have lost your model after zooming and panning. Which shortcut brings everything back into view?
+- [ ] `1`
+- [x] `Ctrl + 0`
+- [ ] `Shift + F`
+> `Ctrl + 0` fits all objects in view. Pressing `0` also returns you to the isometric view.
+
+? Which number key shows the Top view?
+- [ ] `1`
+- [ ] `5`
+- [x] `3`
+> 1 is Front, 2 Back, 3 Top, 4 Bottom, 5 Left, 6 Right and 0 Isometric.
+{% endquiz %}
 
 ---
 

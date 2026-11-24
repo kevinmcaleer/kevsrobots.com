@@ -9,7 +9,9 @@ previous: 08_motor_holder.html
 next: 10_summary.html
 description: Export your SMARS base for 3D printing with optimal settings
 percent: 90
-duration: 7
+duration: 8
+quiz_total: 30
+date_updated: 2026-11-24
 navigation:
 - name: Building SMARS with FreeCAD
 - content:
@@ -49,6 +51,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to export your SMARS base as an STL file and check its size and orientation in a slicer before printing.
 
 ## What We're Building
 
@@ -274,6 +278,8 @@ Before building the full robot, verify:
 
 ---
 
+> **Teachers**: Printer time is the main catch. The lesson estimates 2 to 4 hours per base, so a class of 15 needs either several printers, a print queue run outside lessons, or a makerspace or online service. Agree in advance who may start prints. Learners should not touch the nozzle or bed while the printer is hot or running, and the printer should be in a well-ventilated room. Learners can still complete the whole export and slicer preview without a printer.
+
 ## Try It Yourself
 
 1. **Export the STL** following the steps above
@@ -286,19 +292,46 @@ Before building the full robot, verify:
 ## Common Issues
 
 ### "FreeCAD shows export errors"
-**Problem**: The model has geometry issues preventing clean export.
-**Solution**:
-- Check for overlapping faces in the Model tree
-- Try using Part → Check Geometry to find problems
-- As a workaround, export as STEP first, then convert to STL
+- **Problem**: The model has geometry issues preventing clean export.
+- **Solution**:
+  - Check for overlapping faces in the Model tree
+  - Try using Part → Check Geometry to find problems
+  - As a workaround, export as STEP first, then convert to STL
+- **Why**: Overlapping or open faces cannot be turned into a closed mesh.
 
 ### "STL file is empty or wrong size"
-**Problem**: Wrong item selected during export.
-**Solution**: Select the Body or Part in the Model tree, not a sketch or single feature.
+- **Problem**: Wrong item selected during export.
+- **Solution**: Select the Body or Part in the Model tree, not a sketch or single feature.
+- **Why**: The export only contains what is selected.
 
 ### "Slicer shows the model as too small/large"
-**Problem**: Unit mismatch between FreeCAD and slicer.
-**Solution**: FreeCAD should be in mm. If the model is 1000x too big, FreeCAD was in meters. Scale by 0.001 in the slicer.
+- **Problem**: Unit mismatch between FreeCAD and slicer.
+- **Solution**: FreeCAD should be in mm. If the model is 1000x too big, FreeCAD was in meters. Scale by 0.001 in the slicer.
+- **Why**: STL files carry no unit information, so slicers guess.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? What must you select in the Model tree before exporting?
+- [ ] A single sketch
+- [x] The body or part
+- [ ] Nothing
+> Only what is selected is exported, so a sketch gives an empty or wrong file.
+
+? Which orientation does the lesson recommend for printing?
+- [ ] On its side
+- [x] Open top facing up, flat bottom on the bed
+- [ ] Upside down
+> This needs no supports.
+
+? Your model looks 1000 times too big in the slicer. What does the lesson say to do?
+- [ ] Change the filament
+- [x] Scale it by 0.001 in the slicer, because of a unit mismatch
+- [ ] Increase the infill
+> FreeCAD should be working in millimetres.
+{% endquiz %}
 
 ---
 

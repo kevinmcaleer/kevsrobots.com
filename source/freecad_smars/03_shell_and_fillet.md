@@ -3,11 +3,15 @@ title: Shell and Fillet the Base
 description: Transform a solid block into a hollow enclosure with smooth, strong edges
 layout: lesson
 cover: /learn/freecad_smars/assets/banners/03_shell_and_fillet.jpg
+type: page
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to hollow a solid with the Thickness tool, round its edges with a fillet, and explain why the SMARS base uses 3mm walls and a 4mm fillet.
 
 ## What We're Building
 
@@ -18,7 +22,7 @@ Right now we have a solid brick. By the end of this lesson, it will be a **hollo
 | Shell (3mm walls) | Creates interior space while maintaining strength |
 | Fillet (4mm radius) | Reduces stress concentration, easier to print |
 | Thin front/back walls (2mm) | Saves material, makes room for cable routing |
-{: .table .table-single }
+{:class="table table-single"}
 
 ---
 
@@ -147,24 +151,53 @@ Press `0` on your keyboard to return to the isometric view.
 ## Common Issues
 
 ### "The shell operation fails with an error"
-**Problem**: FreeCAD can't compute the shell for complex geometry.
-**Solution**: This usually means wall thickness is larger than some feature. Try a smaller shell value (2mm instead of 3mm).
+- **Problem**: FreeCAD can't compute the shell for complex geometry.
+- **Solution**: This usually means wall thickness is larger than some feature. Try a smaller shell value (2mm instead of 3mm).
+- **Why**: A wall thickness bigger than a nearby feature leaves no room for the offset.
 
 ### "I selected the wrong face for shell"
-**Problem**: The interior is on the wrong side.
-**Solution**: Undo (`Ctrl+Z`), then carefully click only the face you want removed. Use the rotation view to verify your selection before confirming.
+- **Problem**: The interior is on the wrong side.
+- **Solution**: Undo (`Ctrl+Z`), then carefully click only the face you want removed. Use the rotation view to verify your selection before confirming.
+- **Why**: Thickness removes whichever face is selected, so the wrong face gives a different hollow.
 
 ### "Fillet fails on some edges"
-**Problem**: The fillet radius is too large for certain edges.
-**Solution**: Either reduce the radius, or deselect the problematic edges and fillet them separately with a smaller radius.
+- **Problem**: The fillet radius is too large for certain edges.
+- **Solution**: Either reduce the radius, or deselect the problematic edges and fillet them separately with a smaller radius.
+- **Why**: A fillet cannot be larger than the room available at that edge.
 
 ### "I can't select the interior face"
-**Problem**: Clicking seems to select the exterior.
-**Solution**: Rotate the view so you're looking INTO the box. Click on the visible interior surface. Zoom in for precise selection.
+- **Problem**: Clicking seems to select the exterior.
+- **Solution**: Rotate the view so you're looking INTO the box. Click on the visible interior surface. Zoom in for precise selection.
+- **Why**: Clicks select whatever is nearest the camera, which from outside is the exterior.
 
 ### "The wall thickness isn't uniform"
-**Problem**: Some walls appear thicker than others.
-**Solution**: This can happen if you applied thickness to the wrong faces. Undo and start fresh, being careful about face selection.
+- **Problem**: Some walls appear thicker than others.
+- **Solution**: This can happen if you applied thickness to the wrong faces. Undo and start fresh, being careful about face selection.
+- **Why**: Thickness offsets each selected face, so faces chosen by mistake change those walls.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Which face do you select to remove when hollowing the block with Thickness?
+- [ ] The bottom face
+- [x] The top face
+- [ ] The front face
+> Removing the top face leaves a hollow box with an open top.
+
+? Why does the lesson fillet the edges after hollowing, not before?
+- [ ] Fillets cannot be applied to solid blocks
+- [x] It is easier to select the edges after hollowing
+- [ ] The shell tool needs rounded edges
+> The design table says: shell before fillet, because edge selection is easier.
+
+? What are the wall thicknesses of the finished base?
+- [x] 3mm sides and 2mm front and back
+- [ ] 2mm sides and 3mm front and back
+- [ ] 4mm all round
+> The front and back walls are thinned by a further 1mm, because they will get large cutouts.
+{% endquiz %}
 
 ---
 
