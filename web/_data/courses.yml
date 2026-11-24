@@ -926,11 +926,11 @@
   description: Design the SMARS robot chassis in Fusion 360, step by step. In Part
     1 you sketch and extrude the base, shell it, shape the classic SMARS sides and
     cut the wheel holes and Arduino slots.
-  duration: 0h 20m
+  duration: 0h 57m
   groups:
-  - smars
-  - robotics
-  - fusion 360
+  - 3ddesign
+  - 3dprinting
+  - robots
   lessons: 17
   level: beginner
   link: /learn/smars_fusion360/00_intro.html
