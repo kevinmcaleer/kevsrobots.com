@@ -7,11 +7,24 @@ date: 2023-01-29
 description: Design a 3D-printable robot eye mechanism in Fusion 360, with upper and
   lower eyelids that open and close around a central eyeball on a single servo.
 level: intermediate
-course_duration: 0h 25m
+course_duration: 0h 39m
 lesson_count: 10
 first_lesson: 00_intro.html
-quiz_total: 9
+quiz_total: 27
 video: JbWKsdy5iOk
+outcomes:
+- Model a curved eyelid in Fusion 360 by revolving a sketch profile
+- Build a hinge with a screw hole using extrude, cut and mirror
+- Organise a design into components and join them with a revolute joint
+- Test the movement of the eyelids on screen
+- Export each eyelid as an STL file ready to 3D print
+prerequisites:
+- Basic computer skills; no earlier course is required
+you_need:
+- A computer that can run Autodesk Fusion 360
+- A free Autodesk account with the educational or hobbyist licence
+- A mouse with a scroll wheel
+- Optional, to print the parts, a 3D printer and a small screw for the hinge pin
 navigation:
 - name: Robot Eye Mechanism
 - content:

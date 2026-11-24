@@ -4,11 +4,14 @@ description: Let's create the lower eyelid hinge from the new profile
 layout: lesson
 type: page
 cover: /learn/eye_mechanism/assets/banners/08_hinge.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to extrude a lower hinge that fits over the upper one, and use Extrude to Object to close a gap.
 
 ## Lower Hinge
 
@@ -58,6 +61,18 @@ Let's mirror this new feature.
 
 ---
 
+## Try it Yourself
+
+1. Use Extrude to Object on a different gap and notice how the end face is chosen.
+2. Hide the Upper Eyelid and look at the lower hinge on its own.
+3. Challenge: explain in your own words why the lower hinge circles are larger than the upper ones.
+
+## Common Issues
+
+- **Problem**: There is still a gap between the hinges.
+- **Solution**: Use Extrude with the extent type `To Object` and pick the face of the upper hinge.
+- **Why**: To Object stops the extrusion exactly at the chosen face instead of at a typed distance.
+
 ## Check your understanding
 
 {% quiz %}
@@ -71,4 +86,10 @@ Let's mirror this new feature.
 - [x] It fits over the outside of the upper eyelid's hinge
 - [ ] It holds the servo
 - [ ] To make the eyelid heavier
+
+? What does the extent type `To Object` do?
+- [x] Stops the extrusion exactly at a face you pick
+- [ ] Extrudes by a fixed 2mm
+- [ ] Mirrors the feature
+> It closes the small gap between the parts without you measuring it.
 {% endquiz %}

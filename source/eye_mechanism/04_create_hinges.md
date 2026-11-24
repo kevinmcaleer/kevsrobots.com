@@ -4,11 +4,14 @@ description: Create the hinge profile
 layout: lesson
 type: page
 cover: /learn/eye_mechanism/assets/banners/04_create_hinges.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create an offset plane and sketch the hinge profile on it using circles, a rectangle and constraints.
 
 * **Create new Sketch** - Create a new sketch on the edge of the eyelid by clicking the `CONSTRUCT` Menu and selecting the `offset plane` option.
 
@@ -84,3 +87,41 @@ The origin of each circle is the point where the horizontal and vertical lines o
 * **Finish Sketch** - Click the `Finish Sketch` button
 
 ---
+
+## Try it Yourself
+
+1. Turn Slice off and on again and orbit the view to see what changes.
+2. Add a tangent constraint between one more line and a circle, and watch the sketch colour.
+3. Challenge: change the 8mm circle to 9mm. Which later features would you need to check, and why?
+
+## Common Issues
+
+- **Problem**: The offset plane is created in the wrong place.
+- **Solution**: Edit the feature in the timeline and pick the point on the eyelid again, then check the 20mm offset.
+- **Why**: The plane is positioned from the plane and the point you pick.
+
+- **Problem**: You cannot see the sketch because the eyelid is in the way.
+- **Solution**: Use Slice from the Sketch Palette and move the camera inside the eyelid with the ViewCube.
+- **Why**: Slice hides the part of the model between you and the sketch plane.
+
+## Check your understanding
+
+{% quiz %}
+? What does the Tangent constraint do?
+- [x] Makes a line touch a circle at one point so they line up
+- [ ] Makes two circles the same size
+- [ ] Fixes the sketch so it cannot be edited
+> Tangent keeps the rectangle edge touching the circle.
+
+? What is a constraint?
+- [x] A rule that relates one sketch entity to another
+- [ ] A 3D printer setting
+- [ ] A length in millimetres
+> Constraints use geometric expressions to keep a sketch in shape.
+
+? What does the ViewCube let you do?
+- [x] Move the camera around the model
+- [ ] Change the units
+- [ ] Export the model
+> We use it to look from inside the eyelid when sketching.
+{% endquiz %}

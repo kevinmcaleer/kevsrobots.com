@@ -4,11 +4,14 @@ layout: lesson
 description: Creating the initial Sketch
 type: page
 cover: /learn/eye_mechanism/assets/banners/02_create_sketch.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to sketch a dimensioned, fully defined eyelid profile using circles, construction lines and the Break tool.
 
 ## Create a Sketch
 
@@ -130,3 +133,45 @@ You will see two red `x`'s appear where the horizontal and vertical lines inters
 ![Fusion full screen](assets/eye17.jpg){:class="img-fluid w-50"}
 
 ---
+
+## Try it Yourself
+
+1. Change the outer circle to 50mm and the gap to 3mm and watch how the profile changes, then put it back to 44mm and 2mm.
+2. Delete one dimension on purpose. What colour does the geometry go? Add the dimension back until it is black again.
+3. Challenge: change the gap so the eyelid wall is twice as thick, and say which dimension you changed.
+
+## Common Issues
+
+- **Problem**: A circle or line stays blue after you dimension it.
+- **Solution**: Look for a missing dimension or constraint, for example a centre that is not on the origin, and add it.
+- **Why**: Blue means the sketch can still move; it turns black once it is fully defined.
+
+- **Problem**: The Break tool does nothing.
+- **Solution**: Click on the circle near where the construction line crosses it.
+- **Why**: Break splits geometry where it meets other geometry, so the lines must cross the circle first.
+
+- **Problem**: The profile will not select in the next lesson.
+- **Solution**: Check the outline is closed, with no gaps between the lines and arcs.
+- **Why**: Fusion can only make a solid from a closed loop.
+
+## Check your understanding
+
+{% quiz %}
+? What does pressing `d` do in a sketch?
+- [x] Enters Dimension mode
+- [ ] Draws a diagonal line
+- [ ] Deletes the selection
+> The `d` key starts the dimension tool.
+
+? Why do we make some lines construction lines?
+- [x] They guide the sketch but do not become part of the solid
+- [ ] They are printed thinner
+- [ ] They make the sketch fully defined
+> Construction lines help position things and are ignored when the profile is turned into a solid.
+
+? What does the Break tool do?
+- [x] Splits a line or arc into pieces where it meets other geometry
+- [ ] Deletes a sketch
+- [ ] Mirrors the sketch
+> Once split, each piece can be a normal line or a construction line.
+{% endquiz %}

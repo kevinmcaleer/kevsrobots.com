@@ -8,8 +8,9 @@ date: 2023-01-29
 next: 01_create_component.html
 description: Design a robot eye mechanism with moving eyelids in Fusion 360
 percent: 10
-duration: 2
-quiz_total: 9
+duration: 3
+quiz_total: 27
+date_updated: 2026-11-24
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -93,7 +94,10 @@ By the end of this course you will be able to:
 
 ## How the course works
 
-Each lesson is a list of steps with a screenshot of what you should see. Keyboard shortcuts are shown like `this`. Use the video if you get stuck, and try the quiz at the end of each section.
+Each lesson is a list of steps with a screenshot of what you should see. Keyboard shortcuts are shown like `this`. Use the video if you get stuck. Every lesson starts with what you will be able to do by the end, and finishes with exercises, common problems and a short quiz so you can check you have it before moving on. The course has no code to run: it is all modelling in Fusion 360, finishing with STL files you can print.
+
+> **Teachers**: This course suits learners aged about 12 and up who are comfortable with a mouse and keyboard, and works well in pairs. Each lesson takes about 20 to 40 minutes, so the whole course fits in four to six sessions. Each learner or pair needs a computer with Fusion 360 and an Autodesk account with the free educational licence, so set these up beforehand and check that your school network allows Fusion 360 to sign in. The 3D printing at the end needs a printer, filament and a small screw for the hinge pin, but it is optional: a class with no printer can finish at the joint and test the movement on screen. Printers are hot, so supervise them, and keep small screws counted and out of reach of younger learners.
+{:class="bg-blue"}
 
 ## Prerequisites
 

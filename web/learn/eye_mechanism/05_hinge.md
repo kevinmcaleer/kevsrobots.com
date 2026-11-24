@@ -9,8 +9,9 @@ previous: 04_create_hinges.html
 next: 06_lower_eyelid_sketch.html
 description: Create the hinge from the profile and join it to the eyelid
 percent: 60
-duration: 3
-quiz_total: 9
+duration: 4
+quiz_total: 27
+date_updated: 2026-11-24
 navigation:
 - name: Robot Eye Mechanism
 - content:
@@ -51,6 +52,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to extrude, cut and mirror features to build a hinge with a screw hole on both sides of the eyelid.
+
 * **Extrude Join** - Extrude the middle and inner circle out towards the outer edge of the eyelid by `2mm`.
 
 ![Extrude](assets/eye31.jpg){:class="img-fluid w-50"}
@@ -61,11 +64,11 @@ Make sure the operation is set to `join` in the `Edit Feature` dialog box, then 
 
 ---
 
-When you Clicked `ok` in the last operation, Fusion hid the Sketch2 profile that we had created. To make this visible again we need to click the little `eye` icon next to the sketch.
+When you Clicked `ok` in the last operation, Fusion hid the hinge sketch that we had created. To make this visible again we need to click the little `eye` icon next to the sketch.
 
 ![Extrude](assets/eye33.jpg){:class="img-fluid w-50"}
 
-* **Make the Sketch Visible** - Click the `eye` icon next to the sketch named `sketch1`
+* **Make the Sketch Visible** - Click the `eye` icon next to the hinge sketch
 
 ![Extrude](assets/eye34.jpg){:class="img-fluid w-50"}
 
@@ -135,6 +138,22 @@ The Eyelid Model should look like this:
 
 ---
 
+## Try it Yourself
+
+1. Edit the 1mm cut depth to 0.5mm in the timeline and see how the hinge changes. Put it back afterwards.
+2. Click the eye icon beside a sketch to hide it, then show it again.
+3. Challenge: explain why we mirror features instead of drawing the second hinge from scratch.
+
+## Common Issues
+
+- **Problem**: The sketch disappeared after the extrude.
+- **Solution**: Click the little eye icon beside the sketch in the browser to show it again.
+- **Why**: Fusion hides a sketch once a feature has used it.
+
+- **Problem**: The cut does not go all the way through.
+- **Solution**: Set the Extent Type and Distance to `All`, and make sure the operation is `Cut`.
+- **Why**: Without `All`, the cut stops at the distance you typed.
+
 ## Check your understanding
 
 {% quiz %}
@@ -148,4 +167,10 @@ The Eyelid Model should look like this:
 - [ ] To make them bigger
 - [x] So the other side of the eyelid gets an identical hinge without drawing it again
 - [ ] To turn them into construction lines
+
+? What does the Extrude Cut operation do to the eyelid?
+- [x] Removes material from it
+- [ ] Adds material to it
+- [ ] Mirrors it
+> The extrusion turns red when it is a cut, because it removes material.
 {% endquiz %}
