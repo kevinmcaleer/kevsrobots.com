@@ -10,8 +10,8 @@ next: 07_motors.html
 description: Learn how to control LEDs using Pulse Width Modulation (PWM) with the
   Raspberry Pi Pico and MicroPython.
 percent: 35
-duration: 2
-quiz_total: 33
+duration: 4
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -73,6 +73,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wire an LED safely and fade it up and down with PWM.
 
 ## Overview
 
@@ -141,9 +143,45 @@ while True:
 
 ---
 
-## Try it yourself
+---
 
-Add a potentiometer later in the course (lesson 9) and use its reading to set the LED brightness directly.
+## Choosing the resistor with Ohm's law
+
+A red LED drops about 2V, and a GPIO pin outputs 3.3V, so the resistor has to absorb the other 1.3V. With a 220Ω resistor:
+
+```
+I = V / R = (3.3V - 2.0V) / 220Ω = 1.3 / 220 = about 6mA
+```
+
+6mA is comfortably below the 12mA limit from lesson 3, and still bright. A 330Ω resistor gives about 4mA, which is dimmer but gentler on the pin. Do not go much below 100Ω, which would push the current past 12mA.
+
+| Part | Connects to |
+| --- | --- |
+| GP15 (physical pin 20) | 220Ω resistor |
+| 220Ω resistor | LED long leg (anode) |
+| LED short leg (cathode) | GND (physical pin 18) |
+{:class="table table-single"}
+
+---
+
+## Try it Yourself
+
+1. Run the fade program and watch the LED.
+2. Change the `sleep(0.01)` to `sleep(0.002)`. How does the speed change?
+3. Use the squared value from the note (`duty * duty // 65535`) and compare the look of the fade.
+4. Challenge: wire a second LED to GP14 and make the two fade in opposite directions.
+
+## Common Issues
+
+- **Problem**: The LED never lights.
+- **Solution**: Flip it round so the long leg faces the resistor, and check the resistor is in the circuit.
+- **Why**: LEDs only conduct one way, and without a complete path to GND no current flows.
+
+- **Problem**: The LED is very dim even at full duty.
+- **Solution**: Check the resistor reads 220Ω (red red brown) not 220kΩ.
+- **Why**: A resistor 1000 times too large cuts the current to almost nothing.
+
+## Check your understanding
 
 {% quiz %}
 ? Why does the LED need a resistor?
@@ -156,6 +194,12 @@ Add a potentiometer later in the course (lesson 9) and use its reading to set th
 - [ ] The long leg (anode)
 - [x] The short leg (cathode)
 > Current flows from the anode (long leg) to the cathode (short leg).
+
+? A red LED drops about 2V and a pin gives 3.3V. What is the current with a 220Ω resistor?
+- [ ] About 15mA
+- [x] About 6mA
+- [ ] About 60mA
+> I = (3.3 - 2.0) / 220 is about 6mA.
 {% endquiz %}
 
 ---

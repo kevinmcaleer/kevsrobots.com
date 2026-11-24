@@ -517,7 +517,7 @@
   description: Master the use of GPIO pins on the Raspberry Pi Pico with MicroPython.
     Learn about various types of pins, their functions, and how to work with them
     in real-world projects.
-  duration: 0h 46m
+  duration: 1h 6m
   groups:
   - micropython
   - gpio

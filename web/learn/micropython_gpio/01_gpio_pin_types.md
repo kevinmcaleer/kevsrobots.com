@@ -10,8 +10,8 @@ next: 02_pin_numbering.html
 description: Learn about the different types of GPIO pins on the Raspberry Pi Pico
   and their basic functions.
 percent: 10
-duration: 3
-quiz_total: 33
+duration: 4
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -74,6 +74,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to name the jobs a Pico GPIO pin can do and say which pins can read an analog voltage.
+
 ## Overview
 
 In this lesson we'll look at the different jobs a Pico GPIO pin can do. The clever part is that most pins can do *several* jobs: you choose which one in your code.
@@ -131,9 +133,19 @@ led.value(1)
 
 ---
 
-## Try it yourself
+## Try it Yourself
 
-Change `led.value(1)` to `led.value(0)` and run the code again. Then try `led.toggle()` a few times from the Thonny shell.
+1. Change `led.value(1)` to `led.value(0)` and run the code again.
+2. From the Thonny shell, call `led.toggle()` a few times and watch the on-board LED.
+3. Challenge: use `time.sleep()` and `led.toggle()` in a `while True:` loop to make the LED blink twice a second.
+
+## Common Issues
+
+- **Problem**: `Pin(25, Pin.OUT)` raises an error on a Pico W.
+- **Solution**: Use `Pin("LED", Pin.OUT)` instead.
+- **Why**: On the Pico W the LED hangs off the wireless chip, not GP25, so the name is the portable way to reach it.
+
+## Check your understanding
 
 {% quiz %}
 ? Which Pico pins can be used for PWM?
@@ -147,6 +159,12 @@ Change `led.value(1)` to `led.value(0)` and run the code again. Then try `led.to
 - [x] GP26, GP27 and GP28
 - [ ] Any GPIO pin
 > Only GP26, GP27 and GP28 (ADC0 to ADC2) are wired to the analog-to-digital converter.
+
+? Which of these is a power pin rather than a GPIO pin?
+- [ ] GP15
+- [x] VBUS
+- [ ] GP28
+> VBUS, VSYS and 3V3 are power pins. GP numbers are GPIO pins.
 {% endquiz %}
 
 ---

@@ -9,8 +9,8 @@ previous: 07_motors.html
 next: 09_potentiometers.html
 description: Learn about analog input and the ADC on the Raspberry Pi Pico using MicroPython.
 percent: 45
-duration: 2
-quiz_total: 33
+duration: 4
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -73,6 +73,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to read an analog voltage with the ADC and turn the reading into volts.
+
 ## Overview
 
 Digital pins only see on or off. Many sensors give you a voltage that can be anywhere in between. In this lesson you'll learn how the Pico's Analog-to-Digital Converter (ADC) turns a voltage into a number.
@@ -91,7 +93,7 @@ The Pico's ADC is available on three pins:
 | ADC1 | GP27 | 32 |
 | ADC2 | GP28 | 34 |
 | ADC4 | - | Internal temperature sensor |
-{:class="table table-striped"}
+{:class="table table-single"}
 
 The input must stay between 0V and 3.3V.
 
@@ -131,9 +133,46 @@ print(f"{voltage:.2f} V")
 
 ---
 
-## Try it yourself
+---
 
-Connect GP26 to 3V3, then to GND, and print the reading each time. What do you get when the pin is connected to nothing?
+## A complete example
+
+Join GP26 to the 3V3(OUT) pin (physical pin 36) with a jumper, then run:
+
+```python
+from machine import ADC
+from time import sleep
+
+adc = ADC(26)
+
+while True:
+    value = adc.read_u16()
+    voltage = value * 3.3 / 65535
+    print(value, f"{voltage:.2f} V")
+    sleep(0.5)
+```
+
+You should see a value near 65535 and about 3.30V. Move the wire to GND and it falls to near 0.
+
+---
+
+## Try it Yourself
+
+1. Run the example with the jumper on 3V3, then on GND.
+2. Remove the jumper entirely. What does the reading do, and why?
+3. Challenge: print "bright" when the reading is above 50000 and "dark" otherwise.
+
+## Common Issues
+
+- **Problem**: `ValueError` when creating `ADC`.
+- **Solution**: Use GP26, GP27 or GP28 (or channel 4 for the internal sensor).
+- **Why**: Only those pins are wired to the converter.
+
+- **Problem**: The reading wobbles when nothing is connected.
+- **Solution**: Connect the pin to a known voltage, or ignore the reading.
+- **Why**: A pin with nothing attached floats and picks up noise, just like a digital input.
+
+## Check your understanding
 
 {% quiz %}
 ? Which of these will work as an ADC input?
@@ -147,6 +186,18 @@ Connect GP26 to 3V3, then to GND, and print the reading each time. What do you g
 - [x] 1.65V
 - [ ] 3.3V
 > 32768 is half of 65535, so the voltage is about half of 3.3V.
+
+? The Pico's ADC is really how many bits?
+- [ ] 8
+- [x] 12
+- [ ] 16
+> The hardware is 12-bit (0 to 4095). MicroPython scales it to 16 bits for `read_u16()`.
+
+? What is the highest voltage you can put on an ADC pin?
+- [ ] 5V
+- [x] 3.3V
+- [ ] 12V
+> The input must stay between 0V and 3.3V.
 {% endquiz %}
 
 ---

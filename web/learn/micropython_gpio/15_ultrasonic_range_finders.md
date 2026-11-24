@@ -10,8 +10,8 @@ next: 16_ground_pins.html
 description: Learn how ultrasonic range finders work and how to use them with the
   Raspberry Pi Pico and MicroPython.
 percent: 80
-duration: 3
-quiz_total: 33
+duration: 4
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -73,6 +73,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to measure distance with an HC-SR04 and wire it to the Pico without damaging the input.
 
 ## Overview
 
@@ -143,9 +145,39 @@ while True:
 
 ---
 
-## Try it yourself
+---
 
-Combine this with lesson 6 so an LED lights up when something is closer than 20cm.
+## Wiring table
+
+| HC-SR04 pin | Connects to |
+| --- | --- |
+| VCC | VBUS (5V), physical pin 40 |
+| GND | GND |
+| Trig | GP2 |
+| Echo | 1kΩ to GP3, with 2kΩ from GP3 to GND |
+{:class="table table-single"}
+
+---
+
+## Try it Yourself
+
+1. Run the program and point the sensor at a wall. Move it nearer and further away.
+2. Check the reading against a ruler. How close is it?
+3. Challenge: light an LED when something is closer than 20cm.
+
+## Common Issues
+
+- **Problem**: It always prints "Out of range".
+- **Solution**: Check `Trig` and `Echo` are on the right pins and VCC has 5V.
+- **Why**: No echo means the pulse never arrived before the timeout.
+
+- **Problem**: Readings jump around.
+- **Solution**: Point at a flat surface, and average a few readings.
+- **Why**: Soft or angled surfaces scatter the sound.
+
+> **Teachers**: The HC-SR04 needs 5V and a divider, so check each group's circuit before powering up. Pre-build the divider on a small piece of breadboard if time is short.
+
+## Check your understanding
 
 {% quiz %}
 ? Why do we divide by 58 (rather than 29) to get centimetres?
@@ -159,6 +191,12 @@ Combine this with lesson 6 so an LED lights up when something is closer than 20c
 - [ ] To make the echo louder
 - [ ] To slow the pulse down
 > The divider brings the 5V echo signal down to a safe level for the Pico.
+
+? How long does the Trig pulse need to be?
+- [ ] 1 second
+- [x] About 10 microseconds
+- [ ] 30 milliseconds
+> The program sends a 10 microsecond high pulse on Trig.
 {% endquiz %}
 
 ---

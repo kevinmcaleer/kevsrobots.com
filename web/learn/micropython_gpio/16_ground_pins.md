@@ -10,8 +10,8 @@ next: 17_summary.html
 description: Learn about ground pins on the Raspberry Pi Pico and how to use them
   in your projects.
 percent: 85
-duration: 2
-quiz_total: 33
+duration: 3
+quiz_total: 54
 navigation:
 - name: Raspberry Pi Pico with MicroPython - GPIO Mastery
 - content:
@@ -74,6 +74,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to find the Pico's ground pins and explain why every circuit and power supply needs a shared ground.
+
 ## Overview
 
 Ground pins don't do anything clever, but every circuit needs them and a missing ground is behind a lot of "it doesn't work" moments. This short lesson explains why.
@@ -106,6 +108,31 @@ All the ground pins are connected together, so you can use whichever is closest.
 
 ---
 
+---
+
+```mermaid
+flowchart LR
+    B["Battery -"] --- G["Pico GND"]
+    G --- S["Servo ground"]
+    G --- R["Breadboard - rail"]
+```
+
+---
+
+## Try it Yourself
+
+1. Mark the eight ground pins on a printout of the pinout.
+2. Wire an LED circuit using the ground pin nearest the LED.
+3. Challenge: connect a battery-powered servo with and without a shared ground and describe what changes.
+
+## Common Issues
+
+- **Problem**: A sensor reads nonsense or twitches.
+- **Solution**: Check every power supply's ground goes to the Pico's GND.
+- **Why**: Voltages only mean something relative to the same 0V reference.
+
+## Check your understanding
+
 {% quiz %}
 ? A servo has its own battery pack and twitches randomly. What's the most likely fix?
 - [ ] Use a faster PWM frequency
@@ -118,6 +145,12 @@ All the ground pins are connected together, so you can use whichever is closest.
 - [x] Pin 33, AGND
 - [ ] It must be a GPIO pin set to 0
 > AGND is the reference for the ADC, so it gives the cleanest readings.
+
+? How many ground pins does the Pico have?
+- [ ] Two
+- [x] Eight
+- [ ] Forty
+> They are at physical pins 3, 8, 13, 18, 23, 28, 33 and 38.
 {% endquiz %}
 
 ---
