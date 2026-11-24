@@ -3950,20 +3950,20 @@
   {
     "slug": "pca9685",
     "name": "Building a Robot Arm with Raspberry Pi and PCA9685",
-    "description": "Dive into the exciting world of robotics by learning how to control a robot arm using a Raspberry Pi, Python, and the PCA9685 board. This course covers everything from setting up your Raspberry Pi, understanding the PCA9685 board, programming with Python, to constructing and controlling a 4-servo robot arm. Perfect for beginners and enthusiasts alike, this course will guide you through each step with practical examples and hands-on projects.",
+    "description": "Build Buddy Jr, a small 3D printed robot arm with four servos, and bring it to life with a Raspberry Pi, Python and a PCA9685 servo driver. You'll set up the Pi, wire the board safely with a separate servo supply, learn the maths from angle to pulse, assemble the arm and program smooth, repeatable movements.",
     "cover": "assets/cover.png",
     "author": "Kevin McAleer",
     "date_published": "2024-04-06",
     "groups": [
-      "robotics",
-      "raspberry pi",
-      "pca9685"
+      "robotarms",
+      "raspberrypi",
+      "electronics"
     ],
     "lessons": [
       {
-        "file": "01_course_introduction.md",
+        "file": "00_intro.md",
         "section": "Getting Started with Raspberry Pi and Python",
-        "url": "/learn/pca9685/01_course_introduction.html"
+        "url": "/learn/pca9685/00_intro.html"
       },
       {
         "file": "02_raspberry_pi_setup.md",
