@@ -4,12 +4,14 @@ description: Save BetterCad models to a file or your account, share a link, and 
 layout: lesson
 type: page
 cover: /learn/bettercad/assets/banners/10_saving_sharing_and_printing.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to save a model to a file, explain what an account adds, and run the overhang, thin wall and orientation checks before you print.
 
 You can design a part now. This lesson is about looking after it: where your work is kept, how to hand it to someone else, and how to catch print problems while they're still free to fix.
 
@@ -110,6 +112,8 @@ Before any print:
 
 ---
 
+> **Teachers**: autosave lives in one browser on one computer, and clearing browsing data clears it, so on shared or wiped school machines it is not a safe place for work. Have learners press Ctrl+S at the end of every session and save the `.bcad` file to a USB stick, network drive or cloud folder. An account is optional. Signing in with a kevsrobots.com account adds My models, Versions and share links, but nothing in the course needs one, so skip it if your school restricts accounts. A shared link opens read-only for anyone who has it, so agree rules before learners post links anywhere public.
+
 ## Try it Yourself
 
 1. Run both checks on your enclosure from lessons 6 to 9. Does the cable hole show up as an overhang?
@@ -118,17 +122,17 @@ Before any print:
 
 ## Common Issues
 
-**Problem**: I closed the tab without saving.
-**Solution**: Open BetterCad again in the same browser and accept the offer to recover the model.
-**Why**: Autosave keeps your recent models in the browser's storage.
+- **Problem**: I closed the tab without saving.
+- **Solution**: Open BetterCad again in the same browser and accept the offer to recover the model.
+- **Why**: Autosave keeps your recent models in the browser's storage.
 
-**Problem**: Share is greyed out, or asks me to sign in.
-**Solution**: Sign in and save the model to your account first.
-**Why**: A share link points at a model stored on the server. A file on your computer can't be linked to.
+- **Problem**: Share is greyed out, or asks me to sign in.
+- **Solution**: Sign in and save the model to your account first.
+- **Why**: A share link points at a model stored on the server. A file on your computer can't be linked to.
 
-**Problem**: The overhang check flags a flat span between two walls.
-**Solution**: If it's short, ignore it. Printers can bridge a gap of a few centimetres.
-**Why**: The check doesn't recognise bridges yet, so it flags every downward face.
+- **Problem**: The overhang check flags a flat span between two walls.
+- **Solution**: If it's short, ignore it. Printers can bridge a gap of a few centimetres.
+- **Why**: The check doesn't recognise bridges yet, so it flags every downward face.
 
 ## Check your understanding
 

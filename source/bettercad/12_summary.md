@@ -4,12 +4,14 @@ description: A recap of everything in Learn BetterCad, a keyboard shortcut cheat
 layout: lesson
 type: page
 cover: /learn/bettercad/assets/banners/12_summary.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recall the main tools and shortcuts from the course, and pick a next part to design.
 
 You started with an empty screen and finished with a parametric phone stand that prints without supports. That's the whole journey from idea to object, and you can repeat it for any part you need.
 
@@ -78,6 +80,7 @@ The best practice is a part you actually need. Some ideas, roughly in order of d
 
 - **[Print It Right](/learn/bettercad_printing/)** is the follow-on course. It covers calibrating holes and fits to your own printer, choosing an orientation, tolerances for parts that slide or snap together, and exporting for different slicers
 - The **[Start with BetterCad](/learn/learning_pathways/bettercad.html)** pathway puts the BetterCad courses in order
+- Building robots? After Print It Right, take **[Design Robot Parts with BetterCad](/learn/bettercad_robot_parts/)** and then **[Make It Move with BetterCad](/learn/bettercad_joints_urdf/)**, both in the **[BetterCad for Robot Builders](/learn/learning_pathways/bettercad-robot-builders.html)** pathway
 - Want to see how other CAD tools approach the same ideas? Try [Introduction to FreeCAD for Beginners](/learn/freecad/)
 - Have a design that needs a brain? [Getting Started with Snakie](/learn/snakie_getting_started/) gets a Raspberry Pi Pico running MicroPython
 
