@@ -8,9 +8,9 @@ date: 2026-11-20
 previous: 10_project_traffic_light.html
 description: What you learned in Getting Started with Snakie, and where to go next
 percent: 100
-duration: 2
-quiz_total: 20
-date_updated: 2026-11-20
+duration: 3
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -52,6 +52,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recall the main parts of Snakie you have used and choose where to go next.
 
 Well done! You've gone from opening Snakie for the first time to a traffic light that runs by itself on a Raspberry Pi Pico.
 
@@ -97,3 +99,25 @@ Carry on along the **Start with Snakie** pathway:
 - [Raspberry Pi Pico with MicroPython - GPIO Mastery](/learn/micropython_gpio/) - go deeper on pins, PWM, analogue inputs, I2C and SPI
 
 And when you're ready to build something that moves, try [MicroPython Robotics Projects with the Raspberry Pi Pico](/learn/micropython_robotics/).
+
+## Check your understanding
+
+{% quiz %}
+? Which button runs the code in the editor on the board without saving it there?
+- [x] Run
+- [ ] Reset
+- [ ] Flash firmware
+> Run sends the code to the board and runs it from memory. It does not save it on the board.
+
+? How do you make a program start by itself at power-up?
+- [ ] Press Run twice
+- [x] Upload it to the board as `/main.py`
+- [ ] Name it `run.py`
+> MicroPython runs `main.py` at every start.
+
+? Which tool helps you check which firmware your board needs?
+- [ ] The REPL
+- [ ] The Inspect panel
+- [x] The Board Finder
+> The Board Finder identifies your board and the firmware it needs.
+{% endquiz %}

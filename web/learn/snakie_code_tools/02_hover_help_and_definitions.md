@@ -12,7 +12,7 @@ description: Read documentation by hovering, open a full help article for any sy
 percent: 18
 duration: 4
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use hover help, Help for symbol and Go to Definition to find out what a name is and where it came from.
 
 Reading code is harder than writing it. These tools answer the two questions you ask most when reading: *what is this?* and *where did it come from?*
 
@@ -128,17 +130,17 @@ For a long file this is a table of contents. `LEFT_MOTOR_PIN  5`, `sensor  9`, `
 
 ## Common Issues
 
-**Problem**: Nothing appears when I hover.
-**Solution**: Hold the mouse still on the name for a moment, and check it's a name and not a number or a bracket.
-**Why**: The card waits briefly so it doesn't flash up as you move across the code.
+- **Problem**: Nothing appears when I hover.
+- **Solution**: Hold the mouse still on the name for a moment, and check it's a name and not a number or a bracket.
+- **Why**: The card waits briefly so it doesn't flash up as you move across the code.
 
-**Problem**: <kbd>F12</kbd> does nothing.
-**Solution**: Click on the name first so the cursor is in it. On some laptops you need the <kbd>Fn</kbd> key for function keys, or use <kbd>Ctrl</kbd>+click.
-**Why**: Go to Definition acts on the name under the cursor.
+- **Problem**: <kbd>F12</kbd> does nothing.
+- **Solution**: Click on the name first so the cursor is in it. On some laptops you need the <kbd>Fn</kbd> key for function keys, or use <kbd>Ctrl</kbd>+click.
+- **Why**: Go to Definition acts on the name under the cursor.
 
-**Problem**: Help for symbol opens a general page.
-**Solution**: Right-click directly on the name you want, such as `PWM`, not on the variable it's assigned to.
-**Why**: Articles exist for MicroPython's classes and functions, not for your own variable names.
+- **Problem**: Help for symbol opens a general page.
+- **Solution**: Right-click directly on the name you want, such as `PWM`, not on the variable it's assigned to.
+- **Why**: Articles exist for MicroPython's classes and functions, not for your own variable names.
 
 ## Check your understanding
 

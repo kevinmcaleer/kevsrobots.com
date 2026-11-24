@@ -4,12 +4,14 @@ description: Build a reaction timer game from blocks in Snakie with an LED, a bu
 layout: lesson
 type: page
 cover: /learn/snakie_blocks/assets/banners/11_project_reaction_timer.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to build a reaction timer game from blocks and read every line of the Python it writes.
 
 Time to put it all together. You're going to build a game: an LED lights up after a random wait, and you hit the button as fast as you can. The Pico times you in milliseconds and beeps when you beat your best.
 
@@ -153,6 +155,8 @@ To make the game start whenever the Pico is powered, save it to the board as `ma
 
 ---
 
+> **Teachers**: Plan a full session. The program runs on the simulator, but with no button to press every round scores 0 ms, so each learner or group needs a Pico, a breadboard, an LED with a 330 ohm resistor, a push button, a piezo buzzer and jumper wires to actually play. Learners can check their block order on the simulator first.
+
 ## Try it Yourself
 
 1. Change the random wait to between 1 and 8 seconds.
@@ -163,21 +167,21 @@ To make the game start whenever the Pico is powered, save it to the board as `ma
 
 ## Common Issues
 
-**Problem**: It says `Your time: 0 ms` straight away.
-**Solution**: On the simulator that's expected. On a real Pico, check the while loop's question compares with `1`, and that the pin is set **with pull-up**.
-**Why**: Without the pull-up the pin can read 0 with nothing pressed, so the loop ends at once.
+- **Problem**: It says `Your time: 0 ms` straight away.
+- **Solution**: On the simulator that's expected. On a real Pico, check the while loop's question compares with `1`, and that the pin is set **with pull-up**.
+- **Why**: Without the pull-up the pin can read 0 with nothing pressed, so the loop ends at once.
 
-**Problem**: The LED never goes off between rounds.
-**Solution**: Make sure **turn LED off** is inside forever, near the top.
-**Why**: It has to run at the start of every round, not once.
+- **Problem**: The LED never goes off between rounds.
+- **Solution**: Make sure **turn LED off** is inside forever, near the top.
+- **Why**: It has to run at the start of every round, not once.
 
-**Problem**: `New best!` prints every single round.
-**Solution**: Check **set best to reaction** is inside the if block.
-**Why**: If `best` never changes from 9999, every time beats it.
+- **Problem**: `New best!` prints every single round.
+- **Solution**: Check **set best to reaction** is inside the if block.
+- **Why**: If `best` never changes from 9999, every time beats it.
 
-**Problem**: On a real board the times look too good to be true.
-**Solution**: Check the button is wired between GP14 and GND, not 3.3V.
-**Why**: A button wired to 3.3V never pulls the pin to 0, so a loose wire does the "pressing".
+- **Problem**: On a real board the times look too good to be true.
+- **Solution**: Check the button is wired between GP14 and GND, not 3.3V.
+- **Why**: A button wired to 3.3V never pulls the pin to 0, so a loose wire does the "pressing".
 
 ## Check your understanding
 

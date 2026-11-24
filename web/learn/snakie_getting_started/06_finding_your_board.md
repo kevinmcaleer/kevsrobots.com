@@ -11,8 +11,8 @@ description: Use the Snakie Board Finder to identify your microcontroller, compa
   boards, and see every pin
 percent: 56
 duration: 4
-quiz_total: 20
-date_updated: 2026-11-20
+quiz_total: 23
+date_updated: 2026-11-24
 navigation:
 - name: Getting Started with Snakie
 - content:
@@ -54,6 +54,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use the Board Finder to identify your board and the firmware it needs.
 
 There are hundreds of boards that run MicroPython, and they don't all take the same firmware. Before we put MicroPython on a real board, let's find out exactly which board you have.
 
@@ -128,9 +130,9 @@ The four Pico boards take four different firmware files, so this matters.
 
 ## Common Issues
 
-**Problem**: My board isn't in the list.
-**Solution**: Search for its chip instead, such as `esp32s3`. In the flasher you can also choose **Other / set up manually**.
-**Why**: MicroPython builds are per chip family, so a generic build often runs on a board that has no entry of its own.
+- **Problem**: My board isn't in the list.
+- **Solution**: Search for its chip instead, such as `esp32s3`. In the flasher you can also choose **Other / set up manually**.
+- **Why**: MicroPython builds are per chip family, so a generic build often runs on a board that has no entry of its own.
 
 ## Check your understanding
 

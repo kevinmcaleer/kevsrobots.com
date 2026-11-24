@@ -10,9 +10,9 @@ next: 02_hover_help_and_definitions.html
 description: Use Snakie's MicroPython-aware autocomplete and signature help to write
   hardware code faster and with fewer typos
 percent: 12
-duration: 4
+duration: 5
 quiz_total: 42
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Coding Faster in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to use Snakie's MicroPython-aware autocomplete and signature help to write code with fewer trips to the documentation.
 
 Autocomplete is the editor finishing your word. In Snakie it does a bit more than that, because it has read the MicroPython documentation so you don't have to.
 
@@ -155,17 +157,17 @@ Autocomplete follows simple assignments like `left = PWM(Pin(10))`. It won't alw
 
 ## Common Issues
 
-**Problem**: The list doesn't appear.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Space</kbd>. Check the file name ends in `.py`.
-**Why**: Completions are for Python files, and the list closes when you press <kbd>Esc</kbd> or click away.
+- **Problem**: The list doesn't appear.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>Space</kbd>. Check the file name ends in `.py`.
+- **Why**: Completions are for Python files, and the list closes when you press <kbd>Esc</kbd> or click away.
 
-**Problem**: I accepted the wrong suggestion.
-**Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd> and carry on typing to narrow the list first.
-**Why**: <kbd>Enter</kbd> accepts whatever is highlighted, which is the top item until you move.
+- **Problem**: I accepted the wrong suggestion.
+- **Solution**: Press <kbd>Ctrl</kbd>+<kbd>Z</kbd> and carry on typing to narrow the list first.
+- **Why**: <kbd>Enter</kbd> accepts whatever is highlighted, which is the top item until you move.
 
-**Problem**: A suggestion is labelled CircuitPython.
-**Solution**: Ignore it if your board runs MicroPython.
-**Why**: Snakie supports both, and their module names differ. The label tells you which family a suggestion belongs to.
+- **Problem**: A suggestion is labelled CircuitPython.
+- **Solution**: Ignore it if your board runs MicroPython.
+- **Why**: Snakie supports both, and their module names differ. The label tells you which family a suggestion belongs to.
 
 ## Check your understanding
 

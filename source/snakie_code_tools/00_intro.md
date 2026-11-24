@@ -4,7 +4,7 @@ description: Learn the editor tools in Snakie that make MicroPython faster to wr
 layout: lesson
 type: page
 cover: /learn/snakie_code_tools/assets/banners/00_intro.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
@@ -75,6 +75,8 @@ Each lesson covers one tool, with screenshots and a short task. We use the same 
 Where a lesson has code to run, it's in a live Snakie box. Screenshots are from Snakie 0.92 on the desktop, using the Ctrl key. On a Mac, read <kbd>Ctrl</kbd> as <kbd>Cmd</kbd>.
 
 Every lesson ends with things to try, fixes for common problems and a short quiz.
+
+> **Teachers**: this is an intermediate course for learners who can already write a short MicroPython program. It needs no hardware, and most lessons work in the browser. Four lessons (Python linting, Git, the AI chat and the full menus) need the Snakie desktop app, so plan installs in advance, and Git needs Git installed on the computer. The AI chat needs a learner's own API key, which is tied to a payment account, so decide who holds keys before using it with a class.
 
 ## Prerequisites
 

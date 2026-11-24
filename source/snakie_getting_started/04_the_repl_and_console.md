@@ -4,12 +4,14 @@ description: Use the MicroPython REPL in Snakie to try out code one line at a ti
 layout: lesson
 type: page
 cover: /learn/snakie_getting_started/assets/banners/04_the_repl_and_console.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to type MicroPython into the REPL, one line at a time, and use it to check your own programs.
 
 The black panel at the bottom of Snakie is more than a place for output. It's a direct line to MicroPython, and it's one of the best tools you have for learning and for debugging robots.
 
@@ -90,13 +92,13 @@ The **Inspect** panel in the side bar shows the same thing as a list of the vari
 
 ## Common Issues
 
-**Problem**: Typing does nothing.
-**Solution**: Click inside the console first so it has the cursor.
-**Why**: The editor above keeps the keyboard until you click elsewhere.
+- **Problem**: Typing does nothing.
+- **Solution**: Click inside the console first so it has the cursor.
+- **Why**: The editor above keeps the keyboard until you click elsewhere.
 
-**Problem**: The prompt shows `...` instead of `>>>`.
-**Solution**: Press <kbd>Enter</kbd> on an empty line, or <kbd>Ctrl</kbd>+<kbd>C</kbd> to cancel.
-**Why**: MicroPython thinks you're in the middle of a block, such as a loop, and is waiting for more.
+- **Problem**: The prompt shows `...` instead of `>>>`.
+- **Solution**: Press <kbd>Enter</kbd> on an empty line, or <kbd>Ctrl</kbd>+<kbd>C</kbd> to cancel.
+- **Why**: MicroPython thinks you're in the middle of a block, such as a loop, and is waiting for more.
 
 ## Check your understanding
 

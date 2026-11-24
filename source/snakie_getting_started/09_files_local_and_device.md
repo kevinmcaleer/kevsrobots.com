@@ -4,12 +4,14 @@ description: Save MicroPython programs to your computer and to your board in Sna
 layout: lesson
 type: page
 cover: /learn/snakie_getting_started/assets/banners/09_files_local_and_device.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to save a program on your computer and on your board, and make it run at power-up as main.py.
 
 A robot that only works while it's plugged into your laptop isn't much of a robot. In this lesson you'll save your program onto the board so it runs by itself.
 
@@ -80,6 +82,8 @@ No board? Everything in this lesson works on the simulated device too. It has a 
 
 ---
 
+> **Teachers**: On shared computers, keep each learner's master copy in their own folder on the computer, because a board can be wiped or lost. If boards are shared between classes, each new learner will find the previous learner's main.py running, so agree who overwrites it. Only one program can use a board's serial port at a time.
+
 ## Try it Yourself
 
 1. Upload the blink program from the last lesson as `/main.py` and press **Reset**.
@@ -88,17 +92,17 @@ No board? Everything in this lesson works on the simulated device too. It has a 
 
 ## Common Issues
 
-**Problem**: I uploaded the file but it isn't in the list.
-**Solution**: Click **Refresh** in the Device files toolbar.
-**Why**: The list isn't re-read after every upload.
+- **Problem**: I uploaded the file but it isn't in the list.
+- **Solution**: Click **Refresh** in the Device files toolbar.
+- **Why**: The list isn't re-read after every upload.
 
-**Problem**: My program doesn't start at power-up.
-**Solution**: Check the file is named exactly `main.py`, in lower case, at the top level of the board and not in a folder.
-**Why**: MicroPython only looks for that exact name in that exact place.
+- **Problem**: My program doesn't start at power-up.
+- **Solution**: Check the file is named exactly `main.py`, in lower case, at the top level of the board and not in a folder.
+- **Why**: MicroPython only looks for that exact name in that exact place.
 
-**Problem**: I can't connect because `main.py` is stuck in a loop.
-**Solution**: Connect anyway and press **Stop**. Snakie interrupts the program so you can get back in.
-**Why**: A running `main.py` keeps the board busy until it's interrupted.
+- **Problem**: I can't connect because `main.py` is stuck in a loop.
+- **Solution**: Connect anyway and press **Stop**. Snakie interrupts the program so you can get back in.
+- **Why**: A running `main.py` keeps the board busy until it's interrupted.
 
 ## Check your understanding
 
