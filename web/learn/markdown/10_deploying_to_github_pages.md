@@ -6,17 +6,20 @@ type: page
 cover: assets/10.png
 date: 2024-03-21
 previous: 09_building_and_testing_locally.html
-description: Step-by-step guide on how to deploy your Jekyll site to GitHub Pages,
-  making your site accessible to anyone on the internet.
-percent: 100
-duration: 2
+next: 11_summary.html
+description: Push your Jekyll site to GitHub, switch on GitHub Pages and publish your
+  build log at a public web address.
+percent: 90
+duration: 6
+quiz_total: 35
+date_updated: 2026-11-24
 navigation:
 - name: Mastering Markdown for Documentation with Jekyll
 - content:
   - section: Introduction to Markdown and Jekyll
     content:
-    - name: Overview of Jekyll and Static Sites
-      link: 01_overview.html
+    - name: Course Overview
+      link: 00_intro.html
     - name: Introduction to Markdown
       link: 02_markdown_basics.html
     - name: Setting Up Your Environment
@@ -41,52 +44,129 @@ navigation:
       link: 09_building_and_testing_locally.html
     - name: Deploying to GitHub Pages
       link: 10_deploying_to_github_pages.html
+    - name: Summary and Next Steps
+      link: 11_summary.html
 ---
 
 
 ![Deploying to GitHub Pages cover image]({{ page.cover }}){:class="cover"}
 
-## Introduction
+By the end of this lesson you will be able to publish your Jekyll site on GitHub Pages and update it by pushing a change.
 
-Deploying your Jekyll site to GitHub Pages is a straightforward way to make your content accessible on the internet. GitHub Pages provides a free hosting service that integrates directly with GitHub repositories, making it an ideal platform for hosting Jekyll-based sites.
+## Publishing, the easy way
 
-## Preparing Your Site for GitHub Pages
+GitHub Pages is a free hosting service built into GitHub. You push your site's files to a repository, GitHub runs Jekyll for you, and your pages appear at a public address. Your Markdown stays the source of truth, and publishing becomes a `git push`.
 
-Before deploying, ensure your site is compatible with GitHub Pages:
+```mermaid
+sequenceDiagram
+    participant You
+    participant GitHub as GitHub repository
+    participant Pages as GitHub Pages
+    You->>GitHub: git push
+    GitHub->>Pages: Build the site with Jekyll
+    Pages-->>You: Site live at username.github.io/robot-log
+```
 
-1. **GitHub Pages Dependency Versions:** Check that your Jekyll version and any plugins are supported by GitHub Pages.
-2. **Repository Setup:** Your site should be in a GitHub repository, either in the root of the `master` branch, the `gh-pages` branch, or in a `/docs` folder on the `master` branch.
+> **Teachers**: GitHub Pages sites are public to the whole internet. Each learner needs a GitHub account, and GitHub's terms set a minimum age, so check them first, and consider one shared class account or organisation instead. Remind learners not to publish names, photos, locations or contact details of anyone without permission, and never to commit passwords or keys. Free GitHub accounts publish Pages from public repositories, so check current plan rules before assuming a repository can be private. The school network may also block GitHub, so test it beforehand.
 
-## Deploying Your Site
+## Step 1: prepare your site
 
-1. **GitHub Pages Activation:**
-   - Go to your repository's settings on GitHub.
-   - Find the "GitHub Pages" section.
-   - Select the branch and folder you want to deploy from, then click "Save".
+1. In `_config.yml`, set the address of your site and, for a project site, the repository name as baseurl:
 
-2. **Custom Domain (Optional):**
-   If you have a custom domain, you can configure it in the GitHub Pages settings.
+```yaml
+url: "https://YOUR-USERNAME.github.io"
+baseurl: "/robot-log"
+```
 
-3. **Wait for Deployment:**
-   GitHub automatically builds your site when you push changes to the configured branch. The process may take a few minutes.
+2. Check that every asset link uses `relative_url` (lesson 6), and that your site builds and looks right locally (lesson 9).
 
-4. **Access Your Site:**
-   Once deployed, GitHub will provide a URL to access your site, such as `https://<username>.github.io/<repository>`.
+Use your real GitHub username and repository name in place of the capitals and example name.
 
-## Updating Your Site
+GitHub builds Jekyll sites with its own fixed set of gem versions, which may differ from the ones on your computer, and only allows the plugins we met in lesson 8. GitHub's guide, "About GitHub Pages and Jekyll", explains how to match your local setup, and it is worth a read if your site builds locally but fails on GitHub.
 
-Any changes you make to your site can be pushed to the configured branch in your GitHub repository. GitHub Pages will automatically rebuild and redeploy your site.
+## Step 2: create the repository and push
 
-## Practice Exercise
+On github.com, create a new **public** repository named `robot-log` with no README, then, in your site folder:
 
-1. Ensure your Jekyll site is ready for deployment, following the GitHub Pages requirements.
-2. Deploy your site to GitHub Pages, using either the `master`, `gh-pages` branch, or a `/docs` folder.
-3. Customize your site with a custom domain, if available.
-4. Make a change to your site, push the change to GitHub, and verify that your site updates automatically.
+```bash
+git add .
+git commit -m "Robot log ready to publish"
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/robot-log.git
+git push -u origin main
+```
 
-## Additional Resources
+Replace `YOUR-USERNAME` with your own. If you want your site at the shorter address `https://YOUR-USERNAME.github.io/` with no repository name, name the repository `YOUR-USERNAME.github.io` and leave `baseurl` empty.
 
-- [GitHub Pages Documentation](https://pages.github.com/)
-- [Jekyll on GitHub Pages](https://jekyllrb.com/docs/github-pages/)
+## Step 3: switch on Pages
 
----
+1. Open the repository on GitHub and choose **Settings**, then **Pages** in the left menu.
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
+3. Choose the `main` branch and the `/ (root)` folder, and save. If your site's files are in a folder called `docs`, choose `/docs` instead.
+
+GitHub's menu names move around now and then, so if your screen looks a little different, follow GitHub's "Configuring a publishing source for your GitHub Pages site" guide.
+
+Wait a minute or two. The Pages settings screen will show the address of your site when it is ready, and the **Actions** tab shows the build running.
+
+## Updating your site
+
+Edit a Markdown file, test it locally, and then:
+
+```bash
+git add .
+git commit -m "Add day 2 build log"
+git push
+```
+
+GitHub rebuilds automatically, and the change is live a minute or two later.
+
+## A custom domain (optional)
+
+If you own a domain name, you can add it under **Settings**, **Pages**, **Custom domain**. You will also need to set records at your domain provider, and GitHub's guide to custom domains walks through that.
+
+## Try it Yourself
+
+1. Publish your Robot Build Log and open its address on your phone.
+2. Add a new post, push it, and time how long it takes to appear.
+3. Look at the **Actions** tab on GitHub and find your latest build.
+4. Challenge: break the build on purpose with a bad front matter line, push, and find the error message on GitHub. Then fix it.
+
+## Common Issues
+
+- **Problem**: The address shows a 404 page right after switching on Pages.
+- **Solution**: Wait a few minutes and refresh. Then check the branch and folder you chose contain an `index.md`, `index.markdown` or `index.html`.
+- **Why**: The first build takes a little while, and the site needs a home page to show.
+
+- **Problem**: The site is live but has no styling or the images are missing.
+- **Solution**: Set `baseurl` to `"/repository-name"` in `_config.yml`, and use `relative_url` for links.
+- **Why**: A project site is served in a subfolder, so root-relative paths point to the wrong place.
+
+- **Problem**: The build fails on GitHub but works on my computer.
+- **Solution**: Open the **Actions** tab, read the error, and check you are using only supported plugins and versions.
+- **Why**: GitHub builds with its own fixed versions and allows only approved plugins.
+
+- **Problem**: `git push` is refused or asks for a password that does not work.
+- **Solution**: Sign in using GitHub's current method, such as a personal access token or GitHub's credential helper, rather than your account password.
+- **Why**: GitHub no longer accepts account passwords for pushes over HTTPS.
+
+## Check your understanding
+
+{% quiz %}
+? What publishes your site once GitHub Pages is switched on?
+- [ ] Copying `_site` to a USB stick
+- [x] Pushing your changes to the chosen branch
+- [ ] Running `jekyll serve` on GitHub
+> GitHub rebuilds the site each time you push to the branch you chose.
+
+? Your project site is at `username.github.io/robot-log`. What must `baseurl` be?
+- [ ] An empty string
+- [x] `"/robot-log"`
+- [ ] `"/username"`
+> A project site lives in a subfolder named after the repository.
+
+? Who can see a site published on GitHub Pages?
+- [ ] Only you
+- [ ] Only your class
+- [x] Anyone on the internet
+> The teachers' note explains Pages sites are public, so only publish what you are happy to share.
+{% endquiz %}

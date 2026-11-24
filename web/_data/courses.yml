@@ -461,14 +461,12 @@
     use Markdown for creating and maintaining documentation on GitHub Pages with Jekyll.
     From the basics of Markdown to deploying your site, you'll learn everything you
     need to get started.
-  duration: 0h 20m
+  duration: 1h 0m
   groups:
-  - markdown
-  - jekyll
-  - documentation
-  lessons: 10
+  - productivity
+  lessons: 11
   level: beginner
-  link: /learn/markdown/01_overview.html
+  link: /learn/markdown/00_intro.html
   name: Mastering Markdown for Documentation with Jekyll
 - author: Kevin McAleer
   cover: /learn/mermaid/assets/cover.jpg
