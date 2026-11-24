@@ -11,7 +11,8 @@ description: Put your repository on GitHub, push your commits, sign in safely, a
   clone repositories onto other computers
 percent: 77
 duration: 6
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -62,6 +63,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to create a repository on GitHub, sign in safely, push your commits, and clone a repository onto another computer.
+
 ## What's a remote?
 
 So far your repository only exists on your computer. A **remote** is a copy of it somewhere else, usually on GitHub. Having one means:
@@ -82,6 +85,8 @@ flowchart LR
 ---
 
 ## Create a repository on GitHub
+
+GitHub's website changes its menus and button labels from time to time, so if something below looks different, check [GitHub's docs](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository).
 
 1. Sign in to [github.com](https://github.com) (sign up for a free account if you don't have one).
 2. Click the **+** at the top right, then **New repository**.
@@ -120,10 +125,11 @@ origin	https://github.com/your-username/pico-bot.git (push)
 
 ## Signing in to GitHub
 
-GitHub doesn't accept your normal password from the command line. You need a safer way to sign in. Pick one:
+GitHub doesn't accept your normal account password from the command line (that was switched off in 2021). You need a safer way to sign in. Pick one:
 
 * **Windows**: Git Credential Manager (installed with Git for Windows) pops up a browser window the first time you push. Sign in and you're done.
 * **macOS, Linux and Raspberry Pi**: the easiest option is the [GitHub CLI](https://cli.github.com). Install it (`brew install gh` on a Mac, or follow the instructions on the website for Linux and Raspberry Pi OS), then run `gh auth login`. Choose **GitHub.com**, then **HTTPS**, and say **Yes** when it asks to authenticate Git with your GitHub credentials.
+* **Any computer**: create a personal access token (a long password that you can limit and delete) in GitHub under your profile picture, then **Settings**, then **Developer settings**, then **Personal access tokens**, and paste it when Git asks for a password. See GitHub's guide to [managing personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). Treat it like a password and never commit it.
 * **SSH keys** are another popular option. GitHub's guide to [connecting with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh) walks you through it. If you use SSH, your remote address starts `git@github.com:` instead of `https://`.
 
 You only need to do this once per computer.
@@ -173,6 +179,8 @@ This downloads the whole repository, every commit and branch, into a new `pico-b
 ```bash
 git clone https://github.com/kevinmcaleer/smars.git
 ```
+
+> **Teachers**: every learner needs their own GitHub account (check GitHub's minimum age rules and your school's policy), and some school networks block github.com or SSH. Public repositories are visible to everyone, so choose **Private** for pupils' work, or use one teacher-run account.
 
 ---
 

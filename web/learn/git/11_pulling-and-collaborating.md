@@ -11,7 +11,8 @@ description: Keep your copies in sync with git fetch and git pull, and learn how
   requests let people work together
 percent: 84
 duration: 6
-quiz_total: 35
+quiz_total: 39
+date_updated: 2026-11-24
 navigation:
 - name: Git for Beginners
 - content:
@@ -61,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to keep copies of a project in sync with `git fetch` and `git pull`, and explain how a pull request works.
 
 ## Keeping copies in sync
 

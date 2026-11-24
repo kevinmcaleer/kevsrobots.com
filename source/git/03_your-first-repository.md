@@ -5,11 +5,14 @@ description: >-
 layout: lesson
 type: page
 cover: /learn/git/assets/banners/03_your-first-repository.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to create a repository with `git init`, find the hidden `.git` folder, and read the output of `git status`.
 
 ## Make a project folder
 
@@ -172,6 +175,12 @@ There's a second way to get a repository: copy someone else's with `git clone`. 
 - [ ] The file has been deleted
 - [ ] The file has been committed
 > Git never tracks a new file until you tell it to with `git add`.
+
+? Which command shows you the hidden `.git` folder?
+- [ ] `ls`
+- [x] `ls -a`
+- [ ] `git hidden`
+> Names that start with a dot are hidden, so you need `ls -a` (or a file manager setting) to see them.
 {% endquiz %}
 
 ---

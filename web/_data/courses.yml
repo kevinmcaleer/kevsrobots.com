@@ -319,11 +319,10 @@
   date_published: 2026-11-04
   description: 'Learn to track your code and projects with Git: commits, history,
     undoing mistakes, branches, merging, and sharing your work on GitHub.'
-  duration: 1h 15m
+  duration: 1h 18m
   groups:
-  - git
-  - github
   - productivity
+  - micropython
   lessons: 14
   level: beginner
   link: /learn/git/00_intro.html
