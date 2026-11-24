@@ -4,12 +4,14 @@ description: Export a BetterCad robot as a URDF zip with meshes, masses and join
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/12_exporting_urdf.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to export a robot as a URDF zip, and explain what the links, joints and meshes in it mean.
 
 Your arm moves on screen. To make it move anywhere else, in a physics simulator, in ROS, in a motion planner, those tools need to know everything you've just set up: the parts, how they're joined, how far each joint turns and what each part weighs.
 
@@ -59,6 +61,15 @@ Desk_arm/
 ```
 
 One URDF file and one mesh for each moving part. Base has become `base_link`, the usual name for the root of a robot in ROS. Spaces in names have become underscores.
+
+```mermaid
+flowchart LR
+    BL["link: base_link"] -->|"joint: Shoulder"| UA["link: Upper_arm"]
+    UA -->|"joint: Elbow, revolute"| FA["link: Forearm"]
+    BL -.- M1["meshes/base_link.stl"]
+    UA -.- M2["meshes/Upper_arm.stl"]
+    FA -.- M3["meshes/Forearm.stl"]
+```
 
 ---
 
@@ -162,6 +173,8 @@ URDF always describes the robot at home. Other formats in the same box are worth
 - **GLB** and **glTF** suit web viewers and slides
 
 ---
+
+> **Teachers**: the export is a zip file that downloads to the learner's computer, so on shared machines have them move it somewhere safe before logging out. Reading the URDF needs only a text editor. Using it in a simulator or ROS needs separate software that this course does not cover, and school computers often cannot install it, so treat the export itself as the finish line unless your IT team has set something up.
 
 ## Try it Yourself
 

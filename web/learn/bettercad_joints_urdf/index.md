@@ -9,10 +9,27 @@ description: Turn a design that sits still into a robot that moves. Add hinge, w
   for clashes, link joints through gears, and export the lot as URDF. The project
   is a two-joint desk arm.
 level: intermediate
-course_duration: 1h 10m
+course_duration: 1h 18m
 lesson_count: 14
 first_lesson: 00_intro.html
-quiz_total: 39
+quiz_total: 42
+outcomes:
+- Turn a body into a moving part and joint it to another with a hinge, wheel, slider
+  or fixed joint
+- Pose a mechanism by slider, by typing, and by dragging, and save named poses
+- Drag an arm by its tip and find where it can and cannot reach
+- Catch collisions and set safe joint limits by sweeping every joint
+- Link two joints through a gear pair so they turn in step
+- Export a robot as URDF with meshes, masses and joint limits
+prerequisites:
+- Learn BetterCad, for adding shapes, Properties, the Browser and the timeline
+- Design Robot Parts with BetterCad for the drive links lesson. A finished deck can
+  be downloaded instead
+you_need:
+- A computer with a recent browser and a mouse. BetterCad needs no install and no
+  account
+- A text editor, to read the URDF file you export
+- No printer or other hardware. Everything happens on screen
 navigation:
 - name: Make It Move with BetterCad
 - content:

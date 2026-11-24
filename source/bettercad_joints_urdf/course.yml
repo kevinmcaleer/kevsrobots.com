@@ -5,6 +5,20 @@
   level: intermediate
   layout: course
   cover: assets/cover.jpg
+  outcomes:
+    - Turn a body into a moving part and joint it to another with a hinge, wheel, slider or fixed joint
+    - Pose a mechanism by slider, by typing, and by dragging, and save named poses
+    - Drag an arm by its tip and find where it can and cannot reach
+    - Catch collisions and set safe joint limits by sweeping every joint
+    - Link two joints through a gear pair so they turn in step
+    - Export a robot as URDF with meshes, masses and joint limits
+  prerequisites:
+    - Learn BetterCad, for adding shapes, Properties, the Browser and the timeline
+    - Design Robot Parts with BetterCad for the drive links lesson. A finished deck can be downloaded instead
+  you_need:
+    - A computer with a recent browser and a mouse. BetterCad needs no install and no account
+    - A text editor, to read the URDF file you export
+    - No printer or other hardware. Everything happens on screen
   groups:
       - 3ddesign
       - robots

@@ -4,12 +4,14 @@ description: Link two BetterCad joints through gears, a belt, a rack or a typed 
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/11_drive_links.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to link two joints through a gear, belt, rack or typed ratio so that turning one turns the other.
 
 Every joint so far has had its own motor, in spirit at least. Plenty of mechanisms don't work that way. One servo turns a gear, the gear turns another, and that one moves the part you care about. Two joints, one motor.
 
@@ -98,6 +100,11 @@ In the Pose section, **Output** now says "Driven by Servo", and **Servo** has a 
 
 Output reads -45. Half as far, the other way.
 
+```mermaid
+flowchart LR
+    S["Servo joint: Gear 24T, 90 degrees"] -->|"Drive link through Gears, -0.5x"| O["Output joint: Gear 48T, -45 degrees"]
+```
+
 19. Click **Play**.
 
 ![Playing the drive, with both gears turning](/learn/bettercad_joints_urdf/assets/drive_play.jpg){:class="img-fluid w-100"}
@@ -139,6 +146,8 @@ Open the small arrow under the Motion group and choose **Link joints**. Pick a *
 **The export knows.** The drive is written into the URDF file, so a simulator turns the output gear when it turns the servo.
 
 ---
+
+> **Teachers**: this lesson starts from the geared servo deck in the Design Robot Parts course. Learners who have not taken that course can download the finished deck, so no lesson time needs to go on building it. Nothing is printed.
 
 ## Try it Yourself
 

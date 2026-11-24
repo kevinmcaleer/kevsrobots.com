@@ -11,8 +11,8 @@ description: Learn the difference between a body and a component in BetterCad an
   lay out the three parts of the desk arm
 percent: 14
 duration: 5
-quiz_total: 39
-date_updated: 2026-11-21
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -63,6 +63,8 @@ navigation:
 
 ---
 
+By the end of this lesson you will be able to tell a body from a component, and lay out the three parts of the desk arm in the Assemble tab.
+
 Before anything can move, BetterCad needs to know which bits move *together*. A forearm might be one printed part, or a printed part with a sensor screwed to it and a cable clip on the side. Either way it swings as one lump.
 
 BetterCad calls that lump a **component**.
@@ -77,6 +79,14 @@ BetterCad calls that lump a **component**.
 | **Component** | A named group of bodies that move as one. A joint always moves a component |
 | **Base** | Everything that isn't in a component. It stays still, and the rest of the robot hangs from it |
 {:class="table table-single"}
+
+```mermaid
+flowchart LR
+    B1["Body: one solid shape"] --> C["Component: bodies that move as one"]
+    B2["Another body, such as a sensor bracket"] --> C
+    C --> J["A joint moves the component"]
+    BASE["Base: everything not in a component, stays still"] --> J
+```
 
 You rarely have to make a component by hand. Pick a plain body as the part that moves and the Joint tool makes it a component for you. You'll see that happen in the next lesson.
 

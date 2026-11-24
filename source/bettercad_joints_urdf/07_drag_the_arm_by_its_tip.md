@@ -4,12 +4,14 @@ description: Set a tool point in BetterCad and drag a robot arm by its tip so th
 layout: lesson
 type: page
 cover: /learn/bettercad_joints_urdf/assets/banners/07_drag_the_arm_by_its_tip.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to set a tool point and drag the arm by its tip, using joint locks and reach limits.
 
 So far you've moved the arm one joint at a time: this much shoulder, that much elbow, and see where the tip ends up. Real jobs go the other way round. You know where the tip should be, and you want the joint angles that put it there.
 

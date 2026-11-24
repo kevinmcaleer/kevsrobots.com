@@ -11,8 +11,8 @@ description: Read the mass and centre of mass of each moving part in BetterCad a
   enter datasheet masses for servos and boards
 percent: 63
 duration: 6
-quiz_total: 39
-date_updated: 2026-11-21
+quiz_total: 42
+date_updated: 2026-11-24
 navigation:
 - name: Make It Move with BetterCad
 - content:
@@ -62,6 +62,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read the mass and centre of mass of each moving part, and enter datasheet masses for bought parts.
 
 A servo doesn't care how nice your arm looks. It cares how heavy the arm is and how far that weight sits from the shaft. Get it wrong and the shoulder servo buzzes, gets hot, and drops the arm when you switch it on.
 
