@@ -6,15 +6,27 @@
   layout: course
   cover: assets/cover.jpg
   video: UDo6tvoOQHg
+  outcomes:
+    - Move around the Raspberry Pi OS filesystem and manage files and folders confidently
+    - Read and change file permissions, users and groups
+    - Install, update and remove software with apt
+    - Check disk, memory, temperature, processes and services with systemctl
+    - Log in over SSH and copy files between your computer and the Pi
+    - Write a shell script and schedule it with cron, tracked with Git
+  prerequisites:
+    - None. This is the first course in the Homelab learning pathway
+  you_need:
+    - A Raspberry Pi 4 or 5 running Raspberry Pi OS (64-bit), with power, a microSD card and a network connection
+    - A keyboard and screen, or a second computer to log in from over SSH
   groups:
-    - linux
+    - raspberrypi
   description: >-
      Learn the fundamentals of using the Linux command line on Raspberry Pi OS. This course covers essential topics including navigation, file management, software installation, system monitoring, networking, and basic scripting.
   content:
   - section:
       name: Getting Started with the Command Line
       content:
-        - 01_intro_terminal.md
+        - 00_intro.md
         - 01a_man.md
         - 02_basic_navigation.md
         - 02a_user.md
@@ -34,6 +46,7 @@
       content:
         - 08_monitoring_performance.md
         - 09_managing_processes.md
+        - 09a_services.md
   - section:
       name: Networking Basics
       content:
@@ -55,7 +68,7 @@
         - 16_final_project_overview.md
         - 17_final_project_steps.md
   - section:
-      name: Resources and Next Steps
+      name: Summary and Next Steps
       content:
         - 18_resources_next_steps.md
         - 19_cheatsheet.md

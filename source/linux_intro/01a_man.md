@@ -1,105 +1,146 @@
 ---
 title: Getting Help with `man`
-description: Learn how to use the `man` command to access manual pages for other commands, providing detailed information and usage examples.
+description: Learn how to read manual pages, search them by keyword, and use --help to work out any command without leaving the terminal.
 layout: lesson
+type: page
 cover: /learn/linux_intro/assets/man.png
+date_updated: 2026-11-24
 ---
 
-![cover image]({{page.cover}}){:class="cover"}
-
-## Introduction
-
-As you start working with the Linux command line, you might come across commands or options you're not familiar with. The `man` command is an invaluable tool that provides detailed documentation for almost every command available on the system. In this lesson, you'll learn how to use `man` to access these manual pages, helping you understand and utilize commands effectively.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Learning Objectives
+By the end of this lesson you will be able to look up any command with `man` and `--help`, move around a manual page, and find a command when you only know what you want to do.
 
-- Understand the purpose of the `man` command.
-- Learn how to access and navigate manual pages using `man`.
-- Interpret the information provided in manual pages.
+## Why start with help?
 
----
+Nobody remembers every command. Experienced Linux users look things up all day, and the trick is knowing where to look. Your Pi already has the answers built in, even with no internet connection, which is handy for a robot out in the garden.
 
-### What is the `man` Command?
+Let's get comfortable with that before we learn anything else, because from here on, whenever a command surprises you, you can ask the Pi.
 
-The `man` command, short for "manual," provides a comprehensive reference for most commands and utilities in Linux. Each command typically has an associated manual page (or "man page") that explains what the command does, how to use it, and what options are available.
+## The `man` command
 
----
-
-### Using the `man` Command
-
-To use the `man` command, simply type `man` followed by the name of the command you want to learn more about. For example, to read the manual page for the `ls` command:
+`man` (short for manual) shows the manual page for a command. Type `man` and then the command name:
 
 ```bash
-man ls
-```
+$ man ls
+LS(1)                            User Commands                           LS(1)
 
-This will open the manual page for `ls`, displaying detailed information on how to use it.
+NAME
+       ls - list directory contents
+
+SYNOPSIS
+       ls [OPTION]... [FILE]...
+
+DESCRIPTION
+       List information about the FILEs (the current directory by default).
+       Sort entries alphabetically if none of -cftuvSUX nor --sort is
+       specified.
+```
 
 ![Man command](/learn/linux_intro/assets/man.png){:class="w-100 img-fluid card-hover card-shadow rounded-3"}
 
----
+The page opens in a viewer called `less`. It fills the whole terminal, so the way out is the key to learn first: **press `q` to quit**.
 
-### Navigating the Manual Pages
+## Moving around a manual page
 
-Once inside a manual page, you can navigate using the following keys:
+| Key | What it does |
+|---|---|
+| Up and Down arrows | Scroll one line at a time |
+| Space | Down one screen |
+| `b` | Back up one screen |
+| `/word` then Enter | Search for `word`. Press `n` for the next match |
+| `q` | Quit and get your prompt back |
+{:class="table table-single"}
 
-- **Arrow Keys**: Move up and down line by line.
-- **Spacebar**: Move down one screen at a time.
-- **b**: Move up one screen at a time.
-- **/search_term**: Search for a specific term within the page (press `n` to jump to the next occurrence).
-- **q**: Quit the manual page and return to the command prompt.
+Try searching: inside `man ls`, type `/human` and press `Enter`. It jumps to the line about `-h, --human-readable`, which turns a size like `4096` into `4.0K`. We will use that option all the time.
 
----
+## Reading the layout
 
-### Understanding the Structure of a Man Page
+Most manual pages share the same sections:
 
-Most man pages follow a similar structure, typically including the following sections:
-
-1. **NAME**: The name of the command and a brief description.
-1. **SYNOPSIS**: A summary of how to use the command, showing the command’s syntax, including options and arguments.
-1. **DESCRIPTION**: A detailed explanation of what the command does.
-1. **OPTIONS**: Lists all the options available with the command, often including examples.
-1. **EXAMPLES**: Practical examples of how to use the command.
-1. **SEE ALSO**: References to related commands or further reading.
-
-For example, in the `ls` man page, the OPTIONS section would describe flags like `-l` (long listing format) and `-a` (include hidden files).
-
----
-
-### Finding the Right Man Page
-
-Sometimes, you might not know the exact command but want to search for a keyword. You can do this using:
-
-```bash
-man -k search_term
+```mermaid
+flowchart TD
+    A["NAME: what it is, in one line"] --> B["SYNOPSIS: how to type it"]
+    B --> C["DESCRIPTION: what it does"]
+    C --> D["OPTIONS: the flags you can add"]
+    D --> E["EXAMPLES and SEE ALSO: related commands"]
 ```
 
-This command searches the short descriptions in all the man pages for the keyword you provide and returns a list of relevant commands. For example:
+The **SYNOPSIS** is the part beginners skip and experts read first. Square brackets mean "optional", so `ls [OPTION]... [FILE]...` tells you that `ls` on its own is perfectly fine. Three dots mean "you can give more than one".
+
+## When you do not know the command name
+
+Searching the short descriptions of every manual page uses `man -k` (the same as the `apropos` command):
 
 ```bash
-man -k directory
+$ man -k "list directory"
+dir (1)              - list directory contents
+ls (1)               - list directory contents
+vdir (1)             - list directory contents
 ```
 
-This might return commands like `mkdir`, `rmdir`, and `ls`, which all relate to directories.
+The exact list depends on what is installed on your Pi. If you get `nothing appropriate`, the search index has not been built yet. Build it once with `sudo mandb` (it uses `sudo`, which we explain in the next lessons), then try again.
 
----
+## A quicker answer with `--help`
 
-## Summary
+Manual pages are thorough, which can be a lot when you only want to remember a flag. Most commands also print a short summary with `--help`:
 
-In this lesson, you learned how to use the `man` command to access detailed documentation for Linux commands. Understanding how to navigate and interpret man pages is crucial for mastering the command line and solving problems independently.
+```bash
+$ mkdir --help
+Usage: mkdir [OPTION]... DIRECTORY...
+Create the DIRECTORY(ies), if they do not already exist.
 
----
+  -p, --parents     no error if existing, make parent directories as needed
+  -v, --verbose     print a message for each created directory
+```
 
-## Practice Exercise
+A good habit: try `--help` first for a quick reminder, and open `man` when you need the detail.
 
-Try using the `man` command to learn more about the following commands:
+Pi progress: you can now answer your own questions about any command. That will save you hours.
 
-1. `man pwd`
-1. `man mkdir`
-1. `man chmod`
+## Try it Yourself
 
-Explore the options and examples provided in each man page to deepen your understanding of these commands.
+1. Open `man pwd`, find out what the `-P` option does, then quit with `q`.
+2. Use `man -k directory` to find at least three commands that mention directories.
+3. Run `cp --help` and work out which option asks before overwriting a file.
+4. Challenge: open `man man`, find the section list, and work out what section 1 is for.
 
----
+## Common Issues
+
+- **Problem**: I am stuck in a manual page and typing does nothing useful.
+- **Solution**: Press `q`.
+- **Why**: `man` hands the page to `less`, which is a viewer, not a prompt. `q` is its quit key.
+
+- **Problem**: `man: command not found`, or `No manual entry for ...`.
+- **Solution**: Install the manual viewer with `sudo apt install man-db`. For a missing entry, check the spelling, or try `--help`.
+- **Why**: Lean installs sometimes leave out the manual pages to save space, and some small tools only have `--help`.
+
+## Check your understanding
+
+{% quiz %}
+? How do you leave a manual page?
+- [ ] Press Ctrl + S
+- [ ] Type exit
+- [x] Press q
+> The page is shown in a viewer, and `q` quits it.
+
+? You want to find a command that lists a directory but do not know its name. What do you type?
+- [ ] man list
+- [x] man -k "list directory"
+- [ ] man --find
+> `man -k` searches the one-line descriptions of every manual page for your words.
+
+? What does a part in square brackets, like `[OPTION]`, mean in a SYNOPSIS?
+- [x] It is optional
+- [ ] It is required
+- [ ] It is a file name
+> Square brackets mean you can leave that part out.
+
+? Which gives a short usage reminder for most commands?
+- [x] command --help
+- [ ] command --list
+- [ ] command --short
+> Most commands print a short usage summary with `--help`.
+{% endquiz %}
