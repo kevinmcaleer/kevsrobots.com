@@ -1,0 +1,58 @@
+{%- comment -%}
+  Homepage Courses band, top to bottom:
+
+    1. "Continue learning", only for readers with saved lesson progress
+       (assets/js/learn-progress.js, the same strip as /learn/)
+    2. The first four learning pathways, in the order /learn/ uses
+       (pathway_card.html, so they open the same hover panel)
+    3. "New this week": courses published in the last 7 days, as one line.
+       Hidden when there are none.
+
+  Replaces courses_section.html, which showed the three newest courses and
+  so often offered beginners an intermediate follow-up course.
+  Styles: assets/css/home-courses.css plus learn.css / learn-pathways.css.
+{%- endcomment -%}
+{% assign newest = site.data.courses | sort: "date_published" | reverse %}
+{% assign cutoff = site.time | date: "%s" | minus: 604800 %}
+{% assign fresh = "" | split: "" %}
+{% for course in newest %}
+  {% assign published = course.date_published | date: "%s" | plus: 0 %}
+  {% if published >= cutoff %}{% assign fresh = fresh | push: course %}{% else %}{% break %}{% endif %}
+{% endfor %}
+<link rel="stylesheet" href="/assets/css/learn-pathways.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/learn.css?v={{ site.time | date: '%s' }}">
+<link rel="stylesheet" href="/assets/css/home-courses.css?v={{ site.time | date: '%s' }}">
+<section class="hc-band" id="home-courses" aria-labelledby="hc-title">
+  <div class="hc-top">
+    <div>
+      <h2 id="hc-title">Courses</h2>
+      <p>{{ site.data.courses.size }} free courses, no sign-up. Pick a pathway and follow it from lesson one, or jump in at your level.</p>
+    </div>
+    <a class="hc-btn" href="/learn/">All pathways and courses</a>
+  </div>
+
+  <section class="learn-continue hc-continue" id="learn-continue" aria-labelledby="learn-continue-title" hidden>
+    <div class="learn-continue-head">
+      <h3 id="learn-continue-title">Continue learning</h3>
+      <a href="/learn/me/">My Learning</a>
+    </div>
+    <div class="learn-continue-cards" data-continue-cards></div>
+  </section>
+
+  <div class="pathway-cards hc-pathways">
+    {% for pathway in site.data.pathways limit: 4 %}
+      {% include pathway_card.html pathway=pathway %}
+    {% endfor %}
+  </div>
+
+  {% if fresh.size > 0 %}
+  <p class="hc-new">
+    <span class="hc-new-label">New this week</span>
+    {% for course in fresh limit: 3 %}<a href="{{ course.link }}">{{ course.name }}</a>{% endfor %}
+    {% if fresh.size > 3 %}<a class="hc-new-more" href="/learn/recent">+{{ fresh.size | minus: 3 }} more</a>{% endif %}
+  </p>
+  {% endif %}
+</section>
+<script type="application/json" id="kr-course-index">[{% for c in site.data.courses %}{"link":{{ c.link | jsonify }},"name":{{ c.name | jsonify }},"cover":{{ c.cover | jsonify }},"lessons":{{ c.lessons | default: 0 }}}{% unless forloop.last %},{% endunless %}{% endfor %}]</script>
+<script defer src="/assets/js/progress-sync.js?v={{ site.time | date: '%s' }}"></script>
+<script defer src="/assets/js/learn-progress.js?v={{ site.time | date: '%s' }}"></script>
