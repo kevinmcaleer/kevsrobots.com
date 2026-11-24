@@ -12,7 +12,7 @@ description: Add frames to make the eye blink and look left and right, using dup
 percent: 35
 duration: 5
 quiz_total: 39
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to add frames to make the eye blink and look around, using duplicate, onion skin and the filmstrip.
 
 ## Five frames
 

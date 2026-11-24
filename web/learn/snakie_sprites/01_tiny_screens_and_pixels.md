@@ -10,9 +10,9 @@ next: 02_the_sprite_editor.html
 description: How small OLED screens and LED matrices work, what a sprite is and why
   one bit per pixel is enough
 percent: 14
-duration: 4
+duration: 5
 quiz_total: 39
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Pixel Art and Animation in Snakie
 - content:
@@ -58,6 +58,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to explain how a small screen is a grid of pixels, what a sprite is and why one bit per pixel is enough.
 
 ## A screen is a grid of lights
 

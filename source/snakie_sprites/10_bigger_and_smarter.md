@@ -4,12 +4,14 @@ description: Scale the eyes up to fill the screen and make the robot face react 
 layout: lesson
 type: page
 cover: /learn/snakie_sprites/assets/banners/10_bigger_and_smarter.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to scale the eyes up to fill the screen and make the face react to a light sensor.
 
 ## Small eyes on a big screen
 
