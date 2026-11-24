@@ -3,22 +3,25 @@ layout: lesson
 title: Integrating Pydantic with FastAPI
 author: Kevin McAleer
 type: page
-cover: assets/7.png
+cover: /learn/pydantic/assets/banners/07_integrating_pydantic_with_fastapi.jpg
 date: 2024-03-23
 previous: 06_recursive_models.html
 next: 08_request_validation_and_serialization.html
-description: Discover how to leverage Pydantic models within FastAPI applications
-  for efficient data validation and serialization in web development.
+description: Build a FastAPI endpoint where a Pydantic model validates incoming robot
+  telemetry automatically.
 percent: 56
-duration: 2
+duration: 5
+quiz_total: 39
+date_updated: 2026-11-24
+code_target: cpython
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:
   - section: Introduction to Pydantic
     content:
     - name: Overview of Pydantic and Data Validation
-      link: 01_overview_of_pydantic.html
-    - name: Setting Up Your Environment
+      link: 00_intro.html
+    - name: Setting Up Your Development Environment
       link: 02_setting_up_your_development_environment.html
     - name: Basic Data Models
       link: 03_basic_data_models.html
@@ -26,97 +29,164 @@ navigation:
     content:
     - name: Advanced Validation Techniques
       link: 04_advanced_validation_techniques.html
-    - name: Working with Custom Data Types
+    - name: Custom Data Types
       link: 05_custom_data_types.html
-    - name: Managing Recursive Models
+    - name: Nested and Recursive Models
       link: 06_recursive_models.html
   - section: Pydantic with FastAPI
     content:
     - name: Integrating Pydantic with FastAPI
       link: 07_integrating_pydantic_with_fastapi.html
-    - name: Advanced Features in FastAPI
+    - name: Request Validation and Serialization
       link: 08_request_validation_and_serialization.html
-    - name: Building a CRUD Application with FastAPI
+    - name: Building a CRUD Application
       link: 09_building_a_crud_application.html
   - section: Best Practices and Real-world Applications
     content:
-    - name: Deploying Your FastAPI & Pydantic App
+    - name: Pydantic Best Practices
       link: 10_pydantic_best_practices.html
-    - name: Pydantic Best Practices for FastAPI Applications
+    - name: Performance Optimization Tips
       link: 11_performance_optimization_tips.html
-    - name: Performance Optimization in FastAPI and Pydantic Applications
-      link: 12_case_studies_and_real_world_applications.html
+    - name: Case Study and Course Summary
+      link: 12_case_study_and_summary.html
 ---
 
 
-![Pydantic and FastAPI Integration]({{ page.cover }}){:class="cover"}
-
-## Pydantic and FastAPI: A Powerful Duo
-
-FastAPI is a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python type hints. The synergy between FastAPI and Pydantic is one of the key features of FastAPI, offering automatic request validation, serialization, and documentation.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Using Pydantic Models in FastAPI
+By the end of this lesson you will be able to write a FastAPI endpoint that uses a Pydantic model to validate a JSON request body, and test it without starting a server.
 
-FastAPI uses Pydantic models to define the data structures of request and response payloads. This integration simplifies data validation and conversion, ensuring that the data exchanged between clients and the server is correct and consistent.
+Your Pico can send readings over Wi-Fi with an HTTP POST. Something has to receive them, check them and refuse nonsense. FastAPI is a web framework built on Pydantic, so the model you already know becomes the gatekeeper of your API.
 
----
-
-### Defining a Pydantic Model
-
-First, define a Pydantic model to represent the data structure for your API endpoints.
-
-```python
-from pydantic import BaseModel
-
-class Item(BaseModel):
-    name: str
-    description: str = None
-    price: float
-    tax: float = 0.1
+```mermaid
+sequenceDiagram
+    participant P as Pico
+    participant F as FastAPI
+    participant M as Pydantic model
+    participant H as Your function
+    P->>F: POST /readings with JSON
+    F->>M: validate body
+    alt body is valid
+        M->>H: Reading object
+        H-->>P: 200 and result
+    else body is invalid
+        M-->>P: 422 with error details
+    end
 ```
 
----
+## The app
 
-### Creating FastAPI Endpoints
-
-With the Pydantic model defined, you can now create FastAPI endpoints that automatically validate incoming requests against the model.
+Install the packages from lesson 2 (`fastapi`, plus `httpx` for testing). Save this as `app07.py`:
 
 ```python
-from fastapi import FastAPI, HTTPException
-app = FastAPI()
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
 
-@app.post("/items/")
-async def create_item(item: Item):
-    return {"name": item.name, "price": item.price}
+app = FastAPI(title="Robot Telemetry")
+
+
+class Reading(BaseModel):
+    sensor: str = Field(min_length=1)
+    temperature_c: float = Field(ge=-40, le=125)
+    battery_mv: int = Field(ge=0, le=5000)
+
+
+@app.post("/readings")
+def add_reading(reading: Reading):
+    return {"received": reading.sensor, "temperature_f": reading.temperature_c * 9 / 5 + 32}
 ```
 
-In this example, the `create_item` endpoint expects a request body matching the `Item` model. FastAPI automatically validates the request data, and Pydantic's model instance is directly available in the function parameters.
+That is the whole API. Because the function parameter `reading` is typed as a Pydantic model, FastAPI reads the JSON body, validates it, and only calls your function when it is valid. Inside the function you get a real `Reading`, not a dict.
 
----
+## Trying it without a server
 
-## Request Validation and Serialization
+FastAPI ships a `TestClient`, so you can call your app from a script. Save this as `try_app07.py` next to the app:
 
-FastAPI leverages Pydantic models to validate request data and serialize response data. This seamless integration makes it easy to ensure that the data conforms to the specified types and constraints defined in your Pydantic models.
+```python
+from fastapi.testclient import TestClient
 
----
+from app07 import app
 
-## Exception Handling and Documentation
+client = TestClient(app)
 
-When a request fails validation, FastAPI automatically returns a detailed error response. Additionally, FastAPI uses Pydantic models to generate OpenAPI schema documentation for your API, enhancing the developer experience with auto-generated docs.
+ok = client.post(
+    "/readings",
+    json={"sensor": "pico-1", "temperature_c": 21.5, "battery_mv": 3920},
+)
+print(ok.status_code, ok.json())
 
----
+bad = client.post(
+    "/readings",
+    json={"sensor": "pico-1", "temperature_c": 999, "battery_mv": "low"},
+)
+print(bad.status_code)
+print(bad.json())
+```
 
-## Lesson Assignment
+Output (you may also see a deprecation warning about `httpx` from the test client; it does no harm):
 
-Create a FastAPI application with an endpoint to handle creating a user. Define a Pydantic model for a `User` with fields for `username`, `email`, and `full_name`. Implement the endpoint to validate incoming requests using this model and return the user data in the response.
+```
+200 {'received': 'pico-1', 'temperature_f': 70.7}
+422
+{'detail': [{'type': 'less_than_equal', 'loc': ['body', 'temperature_c'], 'msg': 'Input should be less than or equal to 125', 'input': 999, 'ctx': {'le': 125.0}}, {'type': 'int_parsing', 'loc': ['body', 'battery_mv'], 'msg': 'Input should be a valid integer, unable to parse string as an integer', 'input': 'low'}]}
+```
 
----
+To run it as a real server, install `uvicorn` and run `uvicorn app07:app --reload`, then visit `http://127.0.0.1:8000/docs` for an automatic interactive page generated from your model.
 
-## Additional Resources
+## What to notice
 
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Pydantic Documentation](https://pydantic-docs.helpmanual.io/)
+**What it does:** the bad request never reached your function. FastAPI answered with status 422 (unprocessable) and a list of every problem, with `loc` showing that the faults were in the `body`. These are the same errors you met in lesson 3, packaged as JSON.
 
----
+**Why this matters:** your handler can assume its data is sound. No `if "temperature_c" not in data` checks, no `try`/`except` around `float()`. The Pico gets an error it can log, and your server stays up.
+
+**Common mistakes:**
+
+- Declaring the parameter as `dict`. You lose all validation, so use the model.
+- Using `reading.dict()` from an old tutorial. Use `reading.model_dump()`.
+
+> **Teachers**: A running server listens on a network port, and school networks and firewalls often block other machines from reaching it. Run the server and the test client on the same computer, or use `TestClient` as shown, which needs no network at all. Never expose a learner's test server to the internet.
+
+## Try it Yourself
+
+1. Add a `location: str = "unknown"` field and send a request without it.
+2. Add `status_code=201` to the `@app.post` decorator and check the code in the test.
+3. Print `Reading.model_json_schema()` and compare it with what appears at `/docs` when you run the server.
+4. Challenge: add a `@app.get("/health")` endpoint that returns `{"ok": True}` and test it.
+
+## Common Issues
+
+- **Problem**: `ModuleNotFoundError: No module named 'httpx'` when using `TestClient`.
+- **Solution**: Run `python -m pip install httpx`.
+- **Why**: The test client sends requests with httpx, which is not installed by default.
+
+- **Problem**: The endpoint returns 422 even though your JSON looks right.
+- **Solution**: Read the `loc` and `msg` in the response, and check you sent JSON (`json=...`) and not form data (`data=...`).
+- **Why**: A form-encoded body is not a JSON body, so the model finds nothing to validate.
+
+- **Problem**: `uvicorn: command not found`.
+- **Solution**: Install it with `python -m pip install uvicorn` into the active environment, or run `python -m uvicorn app07:app`.
+- **Why**: Tools install into the environment, and a different or inactive one will not have it.
+
+## Check your understanding
+
+{% quiz %}
+? How does FastAPI know to validate the request body?
+- [ ] You call `validate()` yourself
+- [x] The function parameter is typed as a Pydantic model
+- [ ] It guesses from the URL
+> A parameter annotated with a BaseModel subclass is read from the JSON body and validated.
+
+? What status code does FastAPI return for a body that fails validation?
+- [ ] 200
+- [ ] 404
+- [x] 422
+> 422 means the request was well formed but the data could not be processed.
+
+? Why is `TestClient` useful?
+- [x] You can test your API from a script without starting a server
+- [ ] It makes your API faster
+- [ ] It replaces Pydantic
+> The test client calls the app directly, so tests need no network.
+{% endquiz %}

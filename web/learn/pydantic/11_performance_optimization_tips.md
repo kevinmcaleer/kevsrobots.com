@@ -1,24 +1,27 @@
 ---
 layout: lesson
-title: Pydantic Best Practices for FastAPI Applications
+title: Performance Optimization Tips
 author: Kevin McAleer
 type: page
-cover: assets/11.png
+cover: /learn/pydantic/assets/banners/11_performance_optimization_tips.jpg
 date: 2024-03-23
 previous: 10_pydantic_best_practices.html
-next: 12_case_studies_and_real_world_applications.html
-description: Explore best practices in using Pydantic with FastAPI to enhance code
-  quality, maintainability, and performance of your web applications.
+next: 12_case_study_and_summary.html
+description: Measure validation speed yourself and learn the habits that keep Pydantic
+  fast, from validate_json to TypeAdapter.
 percent: 88
-duration: 2
+duration: 4
+quiz_total: 39
+date_updated: 2026-11-24
+code_target: cpython
 navigation:
 - name: Mastering Pydantic for Robust Data Validation
 - content:
   - section: Introduction to Pydantic
     content:
     - name: Overview of Pydantic and Data Validation
-      link: 01_overview_of_pydantic.html
-    - name: Setting Up Your Environment
+      link: 00_intro.html
+    - name: Setting Up Your Development Environment
       link: 02_setting_up_your_development_environment.html
     - name: Basic Data Models
       link: 03_basic_data_models.html
@@ -26,98 +29,149 @@ navigation:
     content:
     - name: Advanced Validation Techniques
       link: 04_advanced_validation_techniques.html
-    - name: Working with Custom Data Types
+    - name: Custom Data Types
       link: 05_custom_data_types.html
-    - name: Managing Recursive Models
+    - name: Nested and Recursive Models
       link: 06_recursive_models.html
   - section: Pydantic with FastAPI
     content:
     - name: Integrating Pydantic with FastAPI
       link: 07_integrating_pydantic_with_fastapi.html
-    - name: Advanced Features in FastAPI
+    - name: Request Validation and Serialization
       link: 08_request_validation_and_serialization.html
-    - name: Building a CRUD Application with FastAPI
+    - name: Building a CRUD Application
       link: 09_building_a_crud_application.html
   - section: Best Practices and Real-world Applications
     content:
-    - name: Deploying Your FastAPI & Pydantic App
+    - name: Pydantic Best Practices
       link: 10_pydantic_best_practices.html
-    - name: Pydantic Best Practices for FastAPI Applications
+    - name: Performance Optimization Tips
       link: 11_performance_optimization_tips.html
-    - name: Performance Optimization in FastAPI and Pydantic Applications
-      link: 12_case_studies_and_real_world_applications.html
+    - name: Case Study and Course Summary
+      link: 12_case_study_and_summary.html
 ---
 
 
-![Pydantic Best Practices]({{ page.cover }}){:class="cover"}
-
-## Introduction to Best Practices
-
-Adopting best practices in using Pydantic with FastAPI not only improves the reliability and efficiency of your applications but also makes your code more readable and easier to maintain.
+![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## Structuring Your Project
+By the end of this lesson you will be able to measure how long validation takes, and use `TypeAdapter` and `model_validate_json` to validate large batches of data efficiently.
 
-- **Modularize your Pydantic models:** Organize your models into separate modules or files based on their purpose or domain to enhance readability and maintainability.
-- **Shared models and utilities:** Place common base models and utility functions in shared modules to avoid duplication and foster reusability.
+Pydantic v2 does its validation in Rust, so it is already fast. For a hobby robot you may never need to think about speed. But if you log thousands of readings, it helps to know the one habit that matters, and how to measure instead of guess.
 
----
+## Measure first
 
-## Model Optimization
-
-- **Use Pydantic's `orm_mode`:** When integrating with ORMs, enable Pydantic models to work with ORM objects by setting `orm_mode = True` in the model's Config class. This allows for more seamless integration with databases.
-  
-```python
-class UserBase(BaseModel):
-    username: str
-    email: str
-
-    class Config:
-        orm_mode = True
-```
-
----
-
-- **Selective field inclusion:** Use Pydantic's `include` and `exclude` to control which fields are included in serialization, reducing payload size and hiding sensitive information.
-
----
-
-## Validation and Customization
-
-- **Advanced field validation:** Utilize Pydantic's validator decorators for complex validations that go beyond type checks, ensuring data integrity.
-- **Custom data types:** Define custom data types for specific fields that require unique validation or transformation, enhancing the robustness of your data handling.
-
----
-
-## Error Handling
-
-- **Custom error handling:** Implement custom exception handlers in FastAPI to return more informative error responses when Pydantic validation errors occur.
+Never optimise on a hunch. Time the thing you care about. Here we make 10,000 readings as JSON text, then validate them two ways:
 
 ```python
-@app.exception_handler(ValidationError)
-async def validation_exception_handler(request: Request, exc: ValidationError):
-    return JSONResponse(status_code=400, content={"detail": exc.errors()})
+import json
+import time
+
+from pydantic import BaseModel, TypeAdapter
+
+
+class Reading(BaseModel):
+    sensor: str
+    temperature_c: float
+    battery_mv: int
+
+
+payload = json.dumps(
+    [{"sensor": f"pico-{i % 5}", "temperature_c": 20 + i % 7, "battery_mv": 3900} for i in range(10_000)]
+)
+
+# Way 1: parse JSON to dicts, then validate each dict in a Python loop
+start = time.perf_counter()
+readings = [Reading.model_validate(item) for item in json.loads(payload)]
+slow = time.perf_counter() - start
+
+# Way 2: hand the whole JSON text to a TypeAdapter and let Rust do the work
+adapter = TypeAdapter(list[Reading])
+start = time.perf_counter()
+readings = adapter.validate_json(payload)
+fast = time.perf_counter() - start
+
+print(len(readings), "readings")
+print(f"loop of model_validate: {slow * 1000:.1f} ms")
+print(f"TypeAdapter.validate_json: {fast * 1000:.1f} ms")
 ```
 
----
+On the machine used for this course the output was:
 
-## Performance Considerations
+```
+10000 readings
+loop of model_validate: 17.8 ms
+TypeAdapter.validate_json: 11.5 ms
+```
 
-- **Use Pydantic's `BaseModel` wisely:** While Pydantic models are convenient, overusing them, especially for read-heavy endpoints, can impact performance. Consider alternatives like dataclasses for read-optimized paths.
-- **Precompile Pydantic models:** Precompile your models using Pydantic's `create_model` to improve performance in critical code paths.
+Your numbers will be different, because they depend on your computer, so run it yourself. What matters is the ratio and the habit.
 
----
+## What this tells us
 
-## Lesson Assignment
+**`TypeAdapter`** validates things that are not models, such as `list[Reading]`, `dict[str, int]` or a lone `int`. Create it once (building the validator has a cost) and reuse it.
 
-Review a FastAPI application you've previously developed or create a new simple project. Refactor the application to incorporate the best practices mentioned in this lesson. Focus on model organization, advanced validation, custom error handling, and performance optimization.
+**`model_validate_json`** (and `TypeAdapter.validate_json`) parse and validate in one step inside Rust. You skip building an intermediate Python dictionary for every message. For one message that is a tiny saving, for 100,000 it adds up.
 
----
+**Other habits that help:**
 
-## Additional Resources
+- Build `TypeAdapter` objects at module level, not inside a loop or a function that runs often.
+- Validate at the edge, once. Do not re-validate the same object at every layer.
+- Use `model_construct()` only for data you have already validated and trust, because it skips every check.
+- Keep validators simple. A `field_validator` written in Python runs for each field, and slow work in it slows every request.
+- Use specific types such as `list[int]` rather than `Any`, since the typed form is checked in Rust.
 
-- [Pydantic Documentation](https://pydantic-docs.helpmanual.io/)
-- [FastAPI Best Practices](https://fastapi.tiangolo.com/best-practices/)
+```mermaid
+flowchart LR
+    A["JSON text"] --> B["json.loads: dicts"]
+    B --> C["Reading.model_validate in a loop"]
+    A --> D["adapter.validate_json: one step"]
+    C --> E["list of Reading"]
+    D --> E
+```
 
----
+**Why this matters:** a robot that streams sensors at 50 Hz makes 180,000 readings an hour. Knowing the efficient path means your Raspberry Pi 4 keeps up without effort.
+
+**Common mistakes:**
+
+- Optimising before measuring. The slow part is usually the network or the disk, not validation.
+- Creating `TypeAdapter(list[Reading])` inside a loop, which rebuilds the validator each time.
+
+## Try it Yourself
+
+1. Change `range(10_000)` to `range(100_000)` and rerun. Do the two ways scale the same?
+2. Move the `TypeAdapter(...)` creation inside the timed region and see what it costs.
+3. Time `Reading.model_construct(**item)` for each item, and note what you give up.
+4. Challenge: use `timeit` to repeat each measurement 5 times and report the best.
+
+## Common Issues
+
+- **Problem**: Your timings jump around from run to run.
+- **Solution**: Repeat the measurement several times and take the smallest.
+- **Why**: Other programs on the computer compete for the processor, so single runs are noisy.
+
+- **Problem**: `validate_json` raises "Invalid JSON" for text that looks fine.
+- **Solution**: Make sure the text is real JSON, with double quotes, produced by `json.dumps` and not by `print` or `str()` of a dict.
+- **Why**: Python prints dicts with single quotes, which JSON does not allow.
+
+## Check your understanding
+
+{% quiz %}
+? What does `TypeAdapter(list[Reading])` let you do?
+- [ ] Turn a model into a class
+- [x] Validate a list of models without writing a wrapper model
+- [ ] Speed up the Pico
+> A TypeAdapter validates any type, not just models.
+
+? Why is `model_validate_json` often faster than `json.loads` plus `model_validate`?
+- [ ] It skips validation
+- [x] It parses and validates in one step, without building intermediate dicts
+- [ ] It caches the results forever
+> The parsing and checking both happen inside Rust.
+
+? What should you do before optimising?
+- [x] Measure where the time actually goes
+- [ ] Rewrite everything in C
+- [ ] Remove all validation
+> The slow part is often not validation at all.
+{% endquiz %}

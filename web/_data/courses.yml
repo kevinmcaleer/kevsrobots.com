@@ -790,14 +790,12 @@
     for data validation and settings management in Python applications. From understanding
     Pydantic's basics to integrating it with FastAPI for web development, you'll master
     everything needed to use Pydantic effectively.
-  duration: 0h 25m
+  duration: 1h 0m
   groups:
-  - pydantic
-  - data validation
-  - fastapi
+  - python
   lessons: 12
   level: intermediate
-  link: /learn/pydantic/01_overview_of_pydantic.html
+  link: /learn/pydantic/00_intro.html
   name: Mastering Pydantic for Robust Data Validation
 - author: Kevin McAleer
   cover: /learn/python/assets/python.png
