@@ -2,12 +2,16 @@
 title: Lesson 04 - Positioning with the MPU-6050
 description: Learn how to detect the position and acceleration in space using the MPU-6050 module
 layout: lesson
+type: page
 cover: /learn/smars_code/assets/banners/04_lesson_04.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to wire an MPU-6050 to an Arduino over I2C and read the robot's yaw, pitch and roll in degrees.
 
 ## Watch the livestream
 
@@ -49,6 +53,28 @@ Before you begin, you'll need to make sure you have a couple of things before yo
 | SCL | A5 |
 | SDA | A4 |
 {:class="table table-striped"}
+
+The MPU-6050 talks to the Arduino over **I2C**, which needs only two data wires plus power:
+
+```mermaid
+flowchart LR
+    subgraph MPU[MPU-6050 module]
+        V[VCC]
+        G[GND]
+        SC[SCL]
+        SD[SDA]
+    end
+    subgraph UNO[Arduino Uno]
+        P5[5V]
+        PG[GND]
+        A5[A5]
+        A4[A4]
+    end
+    V --- P5
+    G --- PG
+    SC --- A5
+    SD --- A4
+```
 
 Install the **MPU6050** library (by Electronic Cats) from **Tools > Manage Libraries** in the Arduino IDE. It includes the `I2Cdev` and `MotionApps` files this sketch needs.
 
@@ -130,6 +156,37 @@ void loop() {
   - **Roll**: tilting to the left or right
 
 Open the Serial Monitor at **115200 baud**, then tilt and turn your robot to see the numbers change. Yaw will slowly drift over time because there's no compass to correct it.
+
+This lesson only reads the sensor, so SMARS doesn't need to drive. Hold it in your hands and tilt it, which is much safer than chasing it round the desk.
+
+---
+
+## Try it Yourself
+
+1. Tilt the robot nose-up and nose-down by hand. Which of the three numbers changes? Then roll it on its side.
+2. Turn the robot slowly on the spot by hand. Watch yaw change, and see how far it has drifted after a minute of sitting still.
+3. Add a line to `loop()` that prints `"Ramp!"` when the pitch is more than 15 degrees. You can use `if (ypr[1] * 180 / M_PI > 15) { Serial.println("Ramp!"); }`.
+4. Challenge: print `"Tipping over!"` when roll goes past 45 degrees either way.
+
+> **Teachers**: This lesson needs a library installed from the Library Manager, which needs internet access and often administrator rights on school laptops. Install it ahead of the lesson. The calibration step needs the robot held still, so tell learners not to nudge the table while they wait. The MPU-6050 is a small, easily bent board, so handle it by the edges and do not push the header pins in sideways.
+
+## Common Issues
+
+- **Problem**: The Serial Monitor shows `MPU6050 connection failed`.
+- **Solution**: Check SDA is on A4 and SCL is on A5 (they are easy to swap), VCC is on 5V and GND is on GND, and that the header pins are soldered to the module.
+- **Why**: The Arduino can only talk to the sensor when the two I2C data wires and power are right.
+
+- **Problem**: The Serial Monitor shows garbled characters.
+- **Solution**: Set the baud rate box at the bottom of the Serial Monitor to `115200`.
+- **Why**: This sketch uses `Serial.begin(115200)`, not 9600 like the earlier lessons, and the two ends must match.
+
+- **Problem**: Verify fails with `I2Cdev.h: No such file or directory`.
+- **Solution**: Install the **MPU6050** library by Electronic Cats from the Library Manager, as described above.
+- **Why**: The sketch includes files that come with that library and they are not part of the standard Arduino install.
+
+- **Problem**: Yaw keeps changing when the robot is sitting still.
+- **Solution**: This is normal. Restart the sketch to reset it, and use pitch and roll when you need steady readings.
+- **Why**: Yaw is worked out from the gyroscope alone, and small errors build up over time.
 
 ---
 

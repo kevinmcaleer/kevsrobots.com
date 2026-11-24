@@ -2,12 +2,16 @@
 title: Lesson 01 - Movement
 description: Learn how to move your robot
 layout: lesson
+type: page
 cover: /learn/smars_code/assets/banners/01_lesson_01.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write, verify and upload an Arduino sketch that drives SMARS forwards, and explain what `setup()`, `loop()` and a function do.
 
 ## Watch the livestream
 
@@ -274,9 +278,9 @@ If you get an error message, read the message and look at the area of code it is
 
 ### Set the Connection
 
-Select the Arduino connection using the dropdown box next to the upload arrow button. You will see a list of boards to choose from. SMARS robots use the `Arduino/Generic` UNO board type. Select the Port your SMARS is connected to (you should see this in the list).
+Select the Arduino connection using the dropdown box next to the upload arrow button. You will see a list of boards to choose from. SMARS robots use an **Arduino Uno**, so choose that board. Then select the Port your SMARS is connected to (you should see it in the list).
 
-Click OK to continue.
+> The Arduino IDE has changed its look between version 1 and version 2, so the menus on your screen may be arranged a little differently to the ones in the video. The two things to get right are the same in both: the board must be `Arduino Uno` and the port must be the one your SMARS is plugged into.
 
 ---
 
@@ -303,6 +307,34 @@ If you've made it this far you've successfully created your first SMARS program 
 How would you change this program to make the robot go backwards?
 
 Take a minute to appreciate what you've done, and then move on to the next lesson: [Lesson 2 - turning](02_lesson_02.html).
+
+---
+
+## Try it Yourself
+
+1. Change `wait_in_milliseconds` to `500`, upload, and watch how far SMARS travels. Then try `2000`. Measure the distance each time with a ruler.
+2. Swap `LOW` and `HIGH` in the two `digitalWrite` lines inside `forward()`. Which way does SMARS go now? That is the whole trick behind driving backwards.
+3. Challenge: write a second function called `backward()` and call it from `loop()` after `forward()`, so SMARS shuffles forwards and then returns to where it started.
+
+> **Teachers**: SMARS can drive off a desk in about two seconds, so run it on the floor or in a tray with raised edges. The USB cable is short, so for testing prop the robot on a block with its tracks in the air, and only put it on the floor once the code works. The motors need the battery fitted: if USB alone is powering the Arduino, the board may light up but the robot will not drive, so check the battery before debugging the code. On shared laptops, the first upload may need the Arduino driver installed by an administrator, so try one upload before the lesson starts.
+
+## Common Issues
+
+- **Problem**: The Verify step shows a red error such as `expected ';' before '}' token`.
+- **Solution**: Look at the line number the message points to, and the line just above it. Check for a missing semicolon `;`, a missing curly brace `}` or a misspelt name. Compare against the code at the top of this page.
+- **Why**: The Arduino can only compile code that follows the rules exactly. One missing character stops the whole sketch.
+
+- **Problem**: The upload fails, or the Port menu is empty.
+- **Solution**: Try a different USB cable (some are charge-only), plug the Arduino in again and re-select the port. Check the board is set to `Arduino Uno`.
+- **Why**: The IDE can only upload to a board it can see. Charge-only cables carry power but no data.
+
+- **Problem**: The upload works but the wheels do not turn.
+- **Solution**: Check the battery is fitted and charged, and that the motor wires are firmly in the motor shield connectors.
+- **Why**: The motors draw far more power than a USB port is meant to supply, so they run from the battery.
+
+- **Problem**: SMARS goes backwards instead of forwards, or one track turns the wrong way.
+- **Solution**: Swap the `LOW` and `HIGH` values for that motor in the code, or swap that motor's two wires in the shield connector.
+- **Why**: Which way a motor turns depends on how its wires were soldered, so every build can differ.
 
 ---
 

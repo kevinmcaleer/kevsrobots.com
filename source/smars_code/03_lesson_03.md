@@ -2,12 +2,16 @@
 title: Lesson 03 - Ultrasonic distance sensor
 description: Learn how to detect distance using an ultrasonic sensor
 layout: lesson
+type: page
 cover: /learn/smars_code/assets/banners/03_lesson_03.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to measure distance with an HC-SR04 ultrasonic sensor and use the reading to make SMARS back away from obstacles.
 
 ## Watch the livestream
 
@@ -45,6 +49,20 @@ Before you begin, you'll need to make sure you have a couple of things before yo
 You can download the code below from [GitHub](https://www.github.com/kevinmcaleer/lesson_03_sensors), but it's better to type it in yourself line by line, as you will get to understand what each line means.
 
 ## Wiring
+
+Here is how a measurement works, from the Arduino's point of view:
+
+```mermaid
+sequenceDiagram
+    participant A as Arduino
+    participant S as HC-SR04
+    participant O as Obstacle
+    A->>S: Trig HIGH for 10 microseconds
+    S->>O: Burst of ultrasound
+    O-->>S: Echo bounces back
+    S->>A: Echo pin HIGH for the whole trip time
+    A->>A: pulseIn() times it, then distance = time x 0.034 / 2
+```
 
 | HC-SR04 pin | Arduino pin |
 | --- | --- |
@@ -117,7 +135,7 @@ These two lines define the constants `echoPin` and `trigPin` which correspond to
 
 The Range finder has an ultrasonic speaker and an ultrasonic microphone. The Trigger is the speaker or output, and the echo is the microphone or input. We can output to the trigger by making the pin `HIGH` and stopping it sending out a signal by sending a `LOW` to the pin.
 
-We can then read in the time taken for the echo pin to receive back the sound of the trigger pin by setting the pin `HIGH` on the echo pin and then reading in the value using the `pulseIn` function. This will return the time taken for the ping to bounce off any objects within range.
+After the trigger pulse, the sensor sends out a burst of sound and sets the echo pin `HIGH` until the sound comes back. The `pulseIn(echoPin, HIGH)` function waits for the echo pin to go `HIGH`, times how long it stays high, and returns that time in microseconds. That is the time the ping took to bounce off an object and return.
 
 Next is:
 
@@ -348,6 +366,31 @@ You now have a real robot, that can take inputs from sensors in the real world a
 ## Extra credit
 
 What other ways of avoiding obstacles can you think of, other than going backwards and turning right? These are called algorithms, and there are many types of obstacle avoidance algorithms to choose from.
+
+---
+
+## Try it Yourself
+
+1. Upload the Range Finder program, open the Serial Monitor at `9600` baud and move your hand towards the sensor. Check the reading against a ruler.
+2. In the avoid program, change `10` to `20`. What is different about how SMARS behaves near a wall?
+3. Make SMARS turn left instead of right when it meets an obstacle.
+4. Challenge: add a variable that alternates left and right turns each time it meets an obstacle, so SMARS does not get stuck in a corner.
+
+> **Teachers**: The avoid sketch drives the robot, so test it on the floor in a pen made of books or boxes with a ruler-measured gap, never on a desk edge. Soft or angled objects (a jumper, a cushion) can absorb the sound and the robot may drive straight into them: this makes a good discussion about how sensors have limits. A lot of the class will be wiring the HC-SR04 with jumper wires at the same time, so check Trig and Echo are not swapped before power-up.
+
+## Common Issues
+
+- **Problem**: The Serial Monitor always shows `Distance: 0 cm`, and SMARS keeps reversing even in open space.
+- **Solution**: Check all four wires (VCC, Trig, Echo, GND) and that Trig is on D7 and Echo is on D8. To stop a missing echo counting as an obstacle, change the test in `loop()` to `if (dist > 0 && dist < 10)`.
+- **Why**: When no echo arrives, `pulseIn` gives up and returns 0, and 0 is less than 10.
+
+- **Problem**: The distance readings jump around or are wildly wrong.
+- **Solution**: Point the sensor at a hard, flat surface straight in front of it, and keep it at least a few centimetres from the obstacle.
+- **Why**: Soft or sloped surfaces bounce the sound away from the sensor instead of straight back.
+
+- **Problem**: Verify fails with `'ping' was not declared`.
+- **Solution**: Make sure the `int ping()` function is typed in above `loop()`, and check the spelling.
+- **Why**: The `loop()` calls `ping()`, so it has to be part of the sketch.
 
 ---
 
