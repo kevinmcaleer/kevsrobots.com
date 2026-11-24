@@ -4,12 +4,14 @@ description: Turn the motion you animated in Snakie into a ready-to-run MicroPyt
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/12_exporting_a_motion_to_micropython.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to turn an animated motion into a ready-to-run MicroPython program and explain the code it writes.
 
 ## Let Snakie write the loop
 
@@ -33,6 +35,7 @@ It has four parts. Here they are, shortened.
 
 **1. Your project data.** Three blocks marked "managed by Snakie" hold your poses, your Timeline sequence and your servo bindings.
 
+<!-- code-check: skip -->
 ```python
 # --- snakie:poses v1 --- managed by Snakie Motion Studio
 SNAKIE_POSES = { "rest": { "waist": 0, "shoulder": 0, "elbow": 0 }, ... }

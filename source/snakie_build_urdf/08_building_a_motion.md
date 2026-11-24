@@ -4,12 +4,14 @@ description: String poses into a looping motion on Snakie's timeline and preview
 layout: lesson
 type: page
 cover: /learn/snakie_build_urdf/assets/banners/08_building_a_motion.jpg
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to string poses into a looping motion on the timeline and preview it with play, loop and onion skin.
 
 ## Poses in a row
 

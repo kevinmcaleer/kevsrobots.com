@@ -9,9 +9,9 @@ next: 01_the_build_workspace.html
 description: Learn to build a robot in 3-D in Snakie from blocks and joints, pose
   and animate it, then drive it from MicroPython
 percent: 6
-duration: 3
+duration: 4
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -125,3 +125,5 @@ This course was written with Snakie **0.92.0**. Snakie changes quickly, so a but
 Each lesson adds one thing to the same arm, so do them in order. Screenshots show exactly what to expect, there's a **Try it Yourself** task in every lesson, and a short quiz at the end checks that the idea has stuck.
 
 Snakie also has a short built-in course called **Build a Robot in 3-D** under the **Learn** button. This course goes further and builds a different robot, so the two work well together.
+
+> **Teachers**: This course suits learners who are comfortable with the basics of Snakie, from about secondary school age upwards. Each lesson is a hands-on build of roughly 30 to 45 minutes, so a class can cover one or two lessons a session. Nothing needs installing: Snakie runs in Chrome or Edge at app.snakie.org (or as the desktop app), and the whole course runs on the simulated device, so no robot hardware is needed. Three servos and a Pico are optional extras for building the real thing afterwards. The Build workspace saves its files in a project folder, so on shared computers give each learner or pair their own empty folder and have them copy it somewhere safe before they log out.

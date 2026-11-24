@@ -12,7 +12,7 @@ description: Write MicroPython that moves servos and watch the 3-D robot in Snak
 percent: 72
 duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to write MicroPython that moves servos and watch the 3-D robot follow it on the simulated device.
 
 ## Your code, your robot
 

@@ -11,7 +11,7 @@ description: A recap of building, animating and coding a robot arm in Snakie, wi
 percent: 100
 duration: 4
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -63,6 +63,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to recap what you built and choose where to take your robot next.
 
 ## You built a robot
 

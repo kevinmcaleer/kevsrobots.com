@@ -10,9 +10,9 @@ next: 09_joint_tracks_and_keyframes.html
 description: String poses into a looping motion on Snakie's timeline and preview it
   with play, loop and onion skin
 percent: 54
-duration: 4
+duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to string poses into a looping motion on the timeline and preview it with play, loop and onion skin.
 
 ## Poses in a row
 

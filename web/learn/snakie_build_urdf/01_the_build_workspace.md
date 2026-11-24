@@ -10,9 +10,9 @@ next: 02_your_first_block.html
 description: Tour Snakie's Build workspace, start a new robot and meet the three files
   that describe it
 percent: 12
-duration: 4
+duration: 5
 quiz_total: 46
-date_updated: 2026-11-21
+date_updated: 2026-11-24
 navigation:
 - name: Build and Animate a Robot in Snakie
 - content:
@@ -64,6 +64,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to start a new robot in Snakie's Build workspace, find your way around it and say what the three project files are for.
 
 ## Where robots get built
 
@@ -125,6 +127,8 @@ Look at your folder in the **Code** workspace and you'll find Snakie has written
 {:class="table table-single"}
 
 **URDF** stands for Unified Robot Description Format. It's the standard way to describe a robot, used by ROS and most robot simulators. You never have to write it by hand here. Every click in the Build workspace edits `robot.urdf` for you, and a small **saved** badge appears at the bottom of the view each time.
+
+> **Teachers**: Each robot lives in a project folder that the learner chooses, and the browser asks permission to edit files there. On shared machines, give each learner or pair a named empty folder (such as `desk-arm`) so one group's robot does not overwrite another's.
 
 ---
 
