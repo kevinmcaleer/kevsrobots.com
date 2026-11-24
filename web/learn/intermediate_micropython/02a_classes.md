@@ -7,16 +7,19 @@ cover: /learn/intermediate_micropython/assets/banners/02a_classes.jpg
 date: 2024-07-07
 previous: 02_oop.html
 next: 03_abstraction.html
-description: Learn how to create classes and objects in MicroPython
+description: Build your first robot class with __init__, self, methods, and the difference
+  between class and instance attributes
 percent: 18
 duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Intermediate level MicroPython
 - content:
   - section: Introduction
     content:
     - name: Introduction to Intermediate MicroPython
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Object Oriented Programming
     content:
     - name: Object-Oriented Programming in MicroPython
@@ -37,15 +40,15 @@ navigation:
       link: 06a_decorators.html
   - section: Modules and Packages
     content:
-    - name: Modules & Libraries
+    - name: Modules
       link: 07_modules.html
     - name: Packages
       link: 08_packages.html
-    - name: PyPi & MIP
+    - name: PyPi and MIP
       link: 09_pypi.html
   - section: DocStrings
     content:
-    - name: DocStrings
+    - name: Docstrings
       link: 10_docstrings.html
   - section: Interrupts and Timers
     content:
@@ -55,11 +58,11 @@ navigation:
       link: 12_timers.html
   - section: MP Remote
     content:
-    - name: MP Remote
+    - name: mpremote
       link: 13_mp_remote.html
   - section: Conclusion
     content:
-    - name: MP Remote
+    - name: Summary
       link: 14_summary.html
 ---
 
@@ -68,165 +71,168 @@ navigation:
 
 ---
 
-## Introduction
+By the end of this lesson you will be able to write a class with a constructor and methods, create several objects from it, and explain the difference between class and instance attributes.
 
-In this lesson, we will explore the concepts of classes and objects in MicroPython. Understanding these concepts is fundamental to mastering object-oriented programming (OOP) and will help you build more organized and reusable code.
+Let's build a robot, in code. A **class** is the blueprint, and an **object** is one robot built from it. Every robot has a name and a battery level (its *attributes*) and can say hello or use up some battery (its *methods*).
 
----
-
-## What is a Class?
-
-![Classes](assets/whatisaclass.png){:class="img-fluid w-100 card-shadow card-hover rounded-3"}
-
-A `class` is a ***blueprint*** for creating `objects`. It defines the `properties` and `methods` that an object will have. In MicroPython, you can define a class using the `class` keyword.
-
-An `instance` of a class is also known as an `object`. By *instance*, we mean a single occurrence of an object:
-
-```python
-a = 1         # a is an instance of an integer object
-b = "hello"   # b is an instance of a string object
-c = [1, 2, 3] # c is an instance of a list object
-```
+![What is a class](assets/whatisaclass.png){:class="img-fluid w-100 card-shadow card-hover rounded-3"}
 
 ---
 
-## Properties and Methods
+## Your first class
 
-A class `property` is the name we give to ***variables*** within a class. A class `method` is the name we give to ***functions*** within a class.
-
-```python
+{% capture snakie_code %}
 class Robot:
-    robot_name = "" # this is a class property
-    color = ""      # this is another class property
+    def __init__(self, name, battery=100):
+        self.name = name
+        self.battery = battery
 
     def say_hello(self):
-        # This is a class method
-        print(f"Hello, I am {self.robot_name}")
+        print(f"Hello, I am {self.name}")
 
-    def change_color(self, new_color):
-        # This is another class method
-        self.color = new_color
-```
+    def drive(self, minutes):
+        self.battery -= minutes * 5
+        if self.battery < 0:
+            self.battery = 0
 
----
+r2 = Robot("R2")
+bb = Robot("BB", battery=60)
 
-## Classes Model the Real World
+r2.say_hello()
+bb.say_hello()
 
-We use classes to model real-world things, such as a Robot or a Car. For example, we can create a class called `Robot` with properties like `robot_name` and `color`, and methods like `say_hello` and `change_color`—similar to a real-world robot.
+r2.drive(4)
+print(r2.name, "battery:", r2.battery)
+print(bb.name, "battery:", bb.battery)
+{% endcapture %}
+{% include snakie.html code=snakie_code name="classes_1.py" %}
 
-```python
-class Robot:
-    robot_name = ""
-
-    def __init__(self, name, color):
-        self.robot_name = name
-        self.color = color
-
-    def say_hello(self):
-        print(f"Hello, I am {self.robot_name}")
-
-    def change_color(self, new_color):
-        self.color = new_color
-```
-
-You can create multiple objects from the same class, each with its own set of properties and methods. Note that property values can differ for each object, but the methods remain the same.
-
-```python
-r2d2 = Robot("R2D2", "Blue")
-c3po = Robot("C3PO", "Gold")
-```
-
-> ### Constructors
->
-> Notice the `__init__(self, name, color)` method in the `Robot` example above. This is called the `constructor` of the class. It is called when a new object is created from the class.
->
-> We use the ***constructor*** to set the initial values of the object's properties.
-
----
-
-### Naming Conventions & Indentation
-
-The convention is to name classes with an ***uppercase*** letter at the start of each word. In the example above, we have a class called `Robot`.
-
-Notice how the ***methods*** within the class are indented. This means these methods are only accessible *within* the class or via the dot "`.`" operator.
-
-Also, notice that there is a variable called `robot_name` within the class. This is a `class variable` shared by all instances of the class.
+Run it. `r2` and `bb` come from the same class, but each has its own `name` and `battery`. Driving `r2` did not drain `bb`.
 
 ![Blueprints](assets/blueprints.png){:class="img-fluid w-100 card-shadow card-hover rounded-3"}
 
 ---
 
-## What is an Object?
+## The constructor: `__init__`
 
-In Python and MicroPython, an `object` is an *instance* of a class. It is created using the *class* as a blueprint.
+`__init__` is the **constructor**. MicroPython calls it automatically when you write `Robot("R2")`, and its job is to set up the new object's starting values. Notice that we passed `"R2"` and `__init__` received it as `name`.
+
+By convention, class names use CapWords (`Robot`, `DistanceSensor`) and everything else uses lowercase_with_underscores.
+
+---
+
+## What is `self`?
+
+Every method's first parameter is `self`. It is the particular object the method is working on. When you write `r2.drive(4)`, MicroPython quietly turns it into `Robot.drive(r2, 4)`, and inside the method `self` is `r2`. That is how `self.battery` finds the right robot's battery.
+
+![Self](assets/self.png){:class="img-fluid w-100 card-shadow card-hover rounded-3"}
+
+You never type `self` when calling a method, but you must write it in the `def` line. `self` is only a convention, but everyone uses it, so you should too.
+
+**Common mistake:** forgetting `self.` inside a method. Writing `battery -= 5` changes a throwaway local variable, not the robot's battery.
+
+---
+
+## Instance attributes and class attributes
+
+So far each attribute was set with `self.something`, which makes it an **instance attribute**: every object gets its own copy. You can also put a value directly in the class body. That makes a **class attribute**, shared by every object.
+
+{% capture snakie_code %}
+class Robot:
+    count = 0            # class attribute: one copy, shared
+
+    def __init__(self, name):
+        self.name = name  # instance attribute: one per robot
+        Robot.count += 1
+
+a = Robot("A")
+b = Robot("B")
+c = Robot("C")
+print("Robots built:", Robot.count)
+print(a.name, b.name, c.name)
+{% endcapture %}
+{% include snakie.html code=snakie_code name="classes_2.py" %}
+
+Use class attributes for things that really are shared, like a counter or a maximum speed limit that is the same for the whole fleet. Use instance attributes for everything that differs between robots.
 
 ![Objects](assets/objects.png){:class="img-fluid w-100 card-shadow card-hover rounded-3"}
 
-An **object** is like a variable that also has functions *attached* to it. These functions are the `class methods`.
+---
 
-You can call the **methods** of an object using the dot "`.`" operator.
+## A class that drives hardware
+
+Classes are not just for pretend robots. Here is an LED wrapped in a class. Wire an LED with a 330 ohm resistor from GP15 to GND, then save and run this on your Pico:
 
 ```python
-# Create an object of the Robot class
-r1 = Robot("R2D2", "Blue")
+from machine import Pin
+from time import sleep
 
-# Call the say_hello method
-r1.say_hello()
+class Led:
+    def __init__(self, pin_number):
+        self.pin = Pin(pin_number, Pin.OUT)
 
-# Change the color of the robot
-r1.change_color("Red")
+    def on(self):
+        self.pin.value(1)
 
-# Access the color of the robot
-print(r1.color)
+    def off(self):
+        self.pin.value(0)
+
+    def blink(self, times, delay=0.25):
+        for _ in range(times):
+            self.on()
+            sleep(delay)
+            self.off()
+            sleep(delay)
+
+status = Led(15)
+status.blink(3)
 ```
 
----
+Now adding a second LED is one line: `warning = Led(14)`. No copy and paste.
 
-## Everything in Python is an Object
-
-Almost everything in Python is an object, including `int`, `float`, `list`, `dict`, and `str`. This means they have properties and methods that you can access.
-
-You may have already used objects and their methods without realizing it. For example, the `str` object has a method called `upper()` that converts the string to uppercase.
-
-{% capture snakie_code %}
-message = "hello" # create a string called message and store the value "hello"
-print(message.upper()) # prints out the message string in uppercase, this uses the str object's upper() method
-{% endcapture %}
-{% include snakie.html code=snakie_code name="classes.py" %}
+> Everything in Python is an object, including strings and lists. When you call `"hello".upper()` you are calling a method of the `str` class.
 
 ---
 
-## What is Self?
+## Try it Yourself
 
-In the `__init__` method and other class methods, you will see a parameter called `self`. This is a reference to the current instance of the class. It is used to access the variables and methods of the class.
-
-`self` is always the first parameter in a class method; it cannot be omitted.
-
-```python
-class Robot:
-    # Class Properties
-    robot_name = "" # this is a class property
-    color = ""      # this is another class property
-
-    def __init__(self, name, color):
-        self.robot_name = name # changes this object's robot_name to the name provided
-        self.color = color     # changes this object's color to the color provided
-
-    def change_color(self, new_color):
-        # This is a class method
-        self.color = new_color
-```
-
-> ## Did You Know?
->
-> "`self`" can actually have ***any*** name, but it is a convention to use "`self`" in Python.
->
-> You could use "`this`" or "`me`" or any other name, but it is best to stick with "`self`" to avoid confusion. As long as the first parameter of a class method is the reference to the current instance of the class, it will work.
+1. Add a `charge(self, minutes)` method to `Robot` that adds 10 battery per minute but never goes above 100.
+2. Create three robots in a list and use a `for` loop to call `say_hello()` on each.
+3. Add a `toggle()` method to the `Led` class that flips the LED using `self.pin.value()`.
+4. Challenge: add a class attribute `max_speed = 100` to a `Motor` class and see what happens when you change it for one object with `m1.max_speed = 50`. Does `m2` change too?
 
 ---
 
-### Summary
+## Common Issues
 
-In this lesson, we've learned about classes and objects in MicroPython. We explored how classes act as blueprints for creating objects, how to define properties and methods, and the importance of the `self` parameter. We also covered naming conventions and the concept that everything in Python is an object.
+- **Problem**: `TypeError: m() takes 0 positional arguments but 1 were given` (the numbers vary) when calling a method.
+- **Solution**: Check the `def` line of the method includes `self` as its first parameter.
+- **Why**: Python passes the object in automatically as the first argument, so a method that forgets `self` receives one argument too many.
+
+- **Problem**: `AttributeError: 'Robot' object has no attribute 'battery'`.
+- **Solution**: Make sure `__init__` sets `self.battery = ...`, with the `self.` prefix and with two underscores each side of `init`.
+- **Why**: Attributes only exist once they have been assigned on `self`. A misspelt `__init__` is never called.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? What is the relationship between a class and an object?
+- [ ] They are the same thing
+- [x] A class is a blueprint and an object is one thing built from it
+- [ ] An object is a blueprint for classes
+> The class describes the attributes and methods. Each object is an instance with its own values.
+
+? What does `self` refer to inside a method?
+- [ ] The class itself
+- [ ] The Pico board
+- [x] The particular object the method was called on
+> When you call `r2.drive(4)`, `self` inside `drive` is `r2`.
+
+? In the `Robot` counter example, why does `Robot.count` reach 3?
+- [x] It is a class attribute shared by all robots
+- [ ] Each robot has its own count that adds up
+- [ ] `__init__` is called only once
+> A class attribute has one copy shared by every object, and each `__init__` call adds one to it.
+{% endquiz %}

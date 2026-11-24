@@ -7,17 +7,19 @@ cover: /learn/intermediate_micropython/assets/banners/03_abstraction.jpg
 date: 2024-07-07
 previous: 02a_classes.html
 next: 04_inheritance.html
-description: Learn about abstraction in MicroPython and how it simplifies code interaction
-  by hiding complexity.
+description: Hide the messy hardware details behind a simple class so your robot code
+  reads like plain English
 percent: 24
-duration: 3
+duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Intermediate level MicroPython
 - content:
   - section: Introduction
     content:
     - name: Introduction to Intermediate MicroPython
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Object Oriented Programming
     content:
     - name: Object-Oriented Programming in MicroPython
@@ -38,15 +40,15 @@ navigation:
       link: 06a_decorators.html
   - section: Modules and Packages
     content:
-    - name: Modules & Libraries
+    - name: Modules
       link: 07_modules.html
     - name: Packages
       link: 08_packages.html
-    - name: PyPi & MIP
+    - name: PyPi and MIP
       link: 09_pypi.html
   - section: DocStrings
     content:
-    - name: DocStrings
+    - name: Docstrings
       link: 10_docstrings.html
   - section: Interrupts and Timers
     content:
@@ -56,11 +58,11 @@ navigation:
       link: 12_timers.html
   - section: MP Remote
     content:
-    - name: MP Remote
+    - name: mpremote
       link: 13_mp_remote.html
   - section: Conclusion
     content:
-    - name: MP Remote
+    - name: Summary
       link: 14_summary.html
 ---
 
@@ -69,117 +71,179 @@ navigation:
 
 ---
 
-## Abstraction
+By the end of this lesson you will be able to wrap hardware in a class with a simple interface, and swap the inside of that class without changing the code that uses it.
 
-In [OOP](02_oop), `Abstraction` means hiding the complexity of a system by exposing only the necessary details.
+## What is abstraction?
 
-We achieve this by creating simple interfaces that allow interaction with the code without needing to know its inner workings.
+When you drive a car you use the pedals and the steering wheel. You do not think about fuel injection. The car has *abstracted away* the engine and handed you a simple interface.
 
-This approach allows us to change how the system works without affecting the code that interacts with it, or the user noticing any change.
+Robot code deserves the same treatment. Spinning a motor with PWM involves pins, a frequency and a 16-bit duty cycle. Your robot's main program should not care. It should say `left.forward(50)` and move on.
 
 ![Abstraction](assets/abstraction.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
 ---
 
-## How We Use Abstraction in MicroPython
+## A motor with a simple face
 
-In MicroPython, we use [`classes`](02a_classes) to create abstractions. A ***class*** is a blueprint for creating objects that represent real-world entities.
+Suppose a motor driver has one direction pin and one speed pin that takes PWM. Wire direction to GP14 and speed to GP15 (and give the driver its own power: never run motors from a Pico pin). Save and run this on your Pico:
 
-In the example below, we model a popular road bike, the Yamaha MT-07, using a ***class***. We provide two public methods `ride` and `get_mileage` to interact with the bike object.
+```python
+from machine import Pin, PWM
+from time import sleep
 
-The **Bike** class also has a private property `__mileage` that stores the mileage of the bike. `__mileage` can only be accessed by the `ride()` method to increase the mileage, and `get_mileage()` method to return the current mileage the bike has traveled.
+class Motor:
+    def __init__(self, direction_pin, speed_pin):
+        self._dir = Pin(direction_pin, Pin.OUT)
+        self._pwm = PWM(Pin(speed_pin))
+        self._pwm.freq(1000)
+        self.stop()
+
+    def forward(self, percent):
+        self._dir.value(0)
+        self._set_speed(percent)
+
+    def backward(self, percent):
+        self._dir.value(1)
+        self._set_speed(percent)
+
+    def stop(self):
+        self._pwm.duty_u16(0)
+
+    def _set_speed(self, percent):
+        percent = max(0, min(100, percent))
+        self._pwm.duty_u16(int(percent * 65535 / 100))
+
+left = Motor(14, 15)
+left.forward(50)
+sleep(2)
+left.stop()
+```
+
+Look at what the caller needs to know: `forward`, `backward`, `stop`, and a speed from 0 to 100. The 16-bit duty maths, the clamping and the PWM frequency are hidden inside.
+
+```mermaid
+flowchart LR
+    A["Your robot code"] -->|"forward(50)"| B["Motor class"]
+    B -->|"duty_u16(32767)"| C["PWM pin"]
+    B -->|"value(0)"| D["Direction pin"]
+    C --> E["Motor driver"]
+    D --> E
+```
+
+---
+
+## Why it pays off: change the inside, keep the outside
+
+Here is the real benefit. Say your next robot uses a different driver chip with two PWM pins (one for each direction) instead of a direction pin. You write a new class with the *same* method names:
 
 {% capture snakie_code %}
-class Bike:
-    def __init__(self, make, model):
-        self.make = make
-        self.model = model
-        self.__mileage = 0
+class FakeMotor:
+    """A motor stand-in that just prints, for testing without hardware."""
 
-    def ride(self, distance):
-        self.__mileage += distance
-    
-    def get_mileage(self):
-        return self.__mileage
-    
-my_bike = Bike("Yamaha", "MT-07")
-my_bike.ride(100)
-print(my_bike.get_mileage())
+    def __init__(self, name):
+        self.name = name
+
+    def forward(self, percent):
+        print(self.name, "forward at", percent)
+
+    def backward(self, percent):
+        print(self.name, "backward at", percent)
+
+    def stop(self):
+        print(self.name, "stopped")
+
+def square_dance(motor):
+    motor.forward(50)
+    motor.stop()
+    motor.backward(30)
+    motor.stop()
+
+square_dance(FakeMotor("left"))
 {% endcapture %}
 {% include snakie.html code=snakie_code name="abstraction_1.py" %}
 
-The ***Bike*** class is an abstraction of a real-world bike. It hides the ***complexity*** of how the bike works and provides a simple interface for interacting with the bike object.
+`square_dance` does not know or care whether it was given a real `Motor` or a `FakeMotor`. This is also a handy trick for teaching: learners without a robot can still run their movement code.
 
 ---
 
-## Modularity
+## Abstraction by composition
 
-MicroPython allows us to create modular code by using classes to create objects that represent real-world entities.
-
-Classes can be composed ***of other*** classes, which allows us to create complex objects that are made up of simpler objects.
-
-For example, if we want to create a robot, we could create a class for the robot and then create objects for the sensors, motors, and other components that make up the robot.
+Bigger objects can be built from smaller ones. A `Robot` *has* two motors and one sensor, and gives the program a single simple interface:
 
 {% capture snakie_code %}
-class Sensor:
-    def __init__(self, type):
-        self.type = type
-
-    def read_value(self):
-        # Simulate reading a sensor value
-        return 42
-
-class Motor:
-    def __init__(self, power):
-        self.power = power
-
-    def move(self, direction):
-        print(f"Moving {direction} with power {self.power}")
-
-class Robot:
+class FakeMotor:
     def __init__(self, name):
         self.name = name
-        self.sensor = Sensor("Ultrasonic")
-        self.motor = Motor(100)
 
-    def move_forward(self):
-        self.motor.move("forward")
+    def forward(self, percent):
+        print(self.name, "forward at", percent)
 
-    def read_sensor(self):
-        return self.sensor.read_value()
+    def stop(self):
+        print(self.name, "stopped")
 
-robot = Robot("Robo")
-robot.move_forward()
-print(robot.read_sensor())
+class Robot:
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def go(self, speed):
+        self.left.forward(speed)
+        self.right.forward(speed)
+
+    def halt(self):
+        self.left.stop()
+        self.right.stop()
+
+bot = Robot(FakeMotor("left"), FakeMotor("right"))
+bot.go(60)
+bot.halt()
 {% endcapture %}
 {% include snakie.html code=snakie_code name="abstraction_2.py" %}
 
-We cover [`Modules`](07_modules) in a future lesson.
+Notice that we pass the motors *into* `Robot`. That keeps `Robot` independent of which kind of motor it uses.
+
+> **Abstraction or encapsulation?** They are cousins. Abstraction is about the *simple interface* you offer. [Encapsulation](05_encapsulation) is about *protecting the data* behind it. We cover the second next.
 
 ---
 
-## Abstraction vs. Encapsulation
+## Try it Yourself
 
-`Abstraction` is about hiding complexity by exposing only the necessary details, while `Encapsulation` is about hiding properties and methods using access modifiers. We cover [`Encapsulation`](05_encapsulation) in a future lesson.
-
----
-
-### Real-World Example
-
-Think of a car. You don’t need to know how the engine works to drive it. You just use the pedals, steering wheel, and gear stick. The engine is abstracted away from you.
+1. Add a `turn_left()` method to `Robot` that runs the left motor at 20 and the right at 60. Test it with `FakeMotor`.
+2. Write a `FakeSensor` class with a `read_cm()` method that always returns 25, then use it to write a function `too_close(sensor)` that returns `True` below 10.
+3. Challenge: add a `speed_limit` argument to `Motor.__init__` and clamp every call to it. Does any code outside the class need to change?
 
 ---
 
-### Benefits of Abstraction
+## Common Issues
 
-- **Simplicity**: Abstraction simplifies complex systems by hiding unnecessary details.
-- **Flexibility**: We can change the system's implementation without affecting the code that interacts with it.
-- **Reusability**: Abstraction allows us to create interfaces that can be reused in different contexts.
+- **Problem**: `AttributeError: 'FakeMotor' object has no attribute 'backward'`.
+- **Solution**: Add every method the calling code uses to your stand-in class.
+- **Why**: A stand-in only works if it offers the same interface as the real thing.
 
----
-
-### Summary
-
-Abstraction in OOP allows us to hide complexity and create simple interfaces for interacting with systems. It helps simplify, add flexibility, and reuse code in our programs.
+- **Problem**: The motor stutters or the Pico resets when it starts.
+- **Solution**: Power the motor from its own battery through the driver board and join the grounds.
+- **Why**: Motors draw far more current than a GPIO pin can give, and a sudden surge can brown out the Pico.
 
 ---
+
+## Check your understanding
+
+{% quiz %}
+? What is the goal of abstraction?
+- [ ] To make the code run faster
+- [x] To offer a simple interface and hide the complicated inside
+- [ ] To stop anyone reading your code
+> The caller uses simple methods like `forward(50)` without knowing about PWM duty cycles.
+
+? Why did `square_dance` work with both a real and a fake motor?
+- [ ] Python converts one into the other
+- [x] Both classes offer the same method names
+- [ ] They share a global variable
+> The function only calls `forward`, `backward` and `stop`, which both classes provide.
+
+? Why does `Robot` receive its motors as arguments?
+- [x] So it does not depend on one particular kind of motor
+- [ ] Because classes cannot create objects
+- [ ] To save memory
+> Passing the motors in lets you give it real or fake ones.
+{% endquiz %}

@@ -5,19 +5,34 @@
   level: intermediate
   layout: course
   cover: assets/cover.png
+  prerequisites:
+    - The Learn MicroPython - the basics course, or equivalent: variables, loops, functions and the machine.Pin class
+  you_need:
+    - A Raspberry Pi Pico, Pico W or Pico 2 running MicroPython
+    - A computer with Thonny installed
+    - A micro USB or USB-C cable that carries data
+    - One push button, one LED, a 330 ohm resistor and a breadboard with jumper wires (lessons 11 and 12)
+    - A Pico W and Wi-Fi (lesson 9 only)
+  outcomes:
+    - Design robot code as classes, using inheritance and composition where they help
+    - Explain what MicroPython does differently from CPython, and write code that works on a Pico
+    - Split a project into modules and packages and install libraries with mip
+    - Respond to buttons with pin interrupts and run repeating jobs with timers
+    - Copy files to and run code on a board from the command line with mpremote
   groups:
     - micropython
     - python
     - pico
   description: >-
-    This course is designed to take you from a beginner to an intermediate level of
-    MicroPython programming. It covers the basics of Object Oriented Programming, 
-    Modules and Packages, DocStrings, Interrupts and Timers, and MP Remote.
+    Take your MicroPython further. Build robot code with classes, inheritance and
+    decorators, organise it into modules and packages, respond to the world with
+    interrupts and timers, and manage your Pico from the command line with mpremote.
+    Every example is checked on MicroPython, not just standard Python.
   content:
     - section:
         name: Introduction
         content:
-          - 01_intro.md
+          - 00_intro.md
     - section:
         name: Object Oriented Programming
         content:

@@ -7,17 +7,19 @@ cover: /learn/intermediate_micropython/assets/banners/06a_decorators.jpg
 date: 2024-07-07
 previous: 06_polymorphism.html
 next: 07_modules.html
-description: Learn about decorators in MicroPython and how they extend the functionality
-  of functions and methods.
+description: Wrap functions with decorators to add timing and logging, and use @property
+  to guard robot settings, all running on MicroPython
 percent: 48
-duration: 3
+duration: 5
+quiz_total: 45
+date_updated: 2026-11-24
 navigation:
 - name: Intermediate level MicroPython
 - content:
   - section: Introduction
     content:
     - name: Introduction to Intermediate MicroPython
-      link: 01_intro.html
+      link: 00_intro.html
   - section: Object Oriented Programming
     content:
     - name: Object-Oriented Programming in MicroPython
@@ -38,15 +40,15 @@ navigation:
       link: 06a_decorators.html
   - section: Modules and Packages
     content:
-    - name: Modules & Libraries
+    - name: Modules
       link: 07_modules.html
     - name: Packages
       link: 08_packages.html
-    - name: PyPi & MIP
+    - name: PyPi and MIP
       link: 09_pypi.html
   - section: DocStrings
     content:
-    - name: DocStrings
+    - name: Docstrings
       link: 10_docstrings.html
   - section: Interrupts and Timers
     content:
@@ -56,11 +58,11 @@ navigation:
       link: 12_timers.html
   - section: MP Remote
     content:
-    - name: MP Remote
+    - name: mpremote
       link: 13_mp_remote.html
   - section: Conclusion
     content:
-    - name: MP Remote
+    - name: Summary
       link: 14_summary.html
 ---
 
@@ -69,125 +71,187 @@ navigation:
 
 ---
 
-## Decorators
+By the end of this lesson you will be able to write a decorator that adds behaviour to a function, and use `@property` to control how a robot setting is read and written.
 
-In MicroPython, a ***decorator*** is a function that takes another function as an argument and extends its functionality without modifying it.
+## Functions are values
 
-Decorators are a powerful tool that allows us to add functionality to a function without changing its code. They are a way to ***wrap*** a function, modifying its behavior.
+In Python a function is just another value. You can store it in a variable, pass it to another function, or return it from one. That single fact is what makes decorators possible.
+
+A **decorator** is a function that takes a function and returns a new, souped-up one. Say you want to time how long your sensor-reading function takes. You could paste timing code into every function, or you could wrap them.
 
 ![Decorators](assets/decorators.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
 ---
 
-## How Decorators Work
-
-Decorators are a way to wrap a function, modifying its behavior. They take another function as an argument and extend its functionality without modifying the original function.
-
-Here is a simple example of a decorator:
+## Your first decorator
 
 {% capture snakie_code %}
-def my_decorator(func):
+def shout(func):
     def wrapper():
-        print("Something is happening before the function is called.")
+        print("Before the call")
         func()
-        print("Something is happening after the function is called.")
+        print("After the call")
     return wrapper
 
 def say_hello():
-    print("Hello!")
+    print("Hello, makers!")
 
-say_hello = my_decorator(say_hello)
+say_hello = shout(say_hello)
 say_hello()
 {% endcapture %}
 {% include snakie.html code=snakie_code name="decorators_1.py" %}
 
-In the example above, we define a decorator `my_decorator` that takes a function `func` as an argument. The `wrapper` function is used to wrap the `func` function, adding functionality before and after the function is called.
-
-We then apply the decorator to the `say_hello` function by reassigning `say_hello` to the result of calling `my_decorator(say_hello)`.
+`shout` receives `say_hello`, builds a `wrapper` function that calls it between two prints, and hands the wrapper back. We then replace `say_hello` with the wrapper. The wrapper remembers `func` even after `shout` has finished, which is how the inner function keeps working.
 
 ![Inner functions](assets/innerfunctions.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
----
+### The `@` shortcut
 
-## Using the `@` Symbol
-
-In Python, we can use the `@` symbol to apply a decorator to a function. This is a more concise way of applying a decorator.
-
-Here is the same example using the `@` symbol:
+Writing `say_hello = shout(say_hello)` every time is clumsy. The `@` symbol does the same job on the line above the function:
 
 {% capture snakie_code %}
-def my_decorator(func):
+def shout(func):
     def wrapper():
-        print("Something is happening before the function is called.")
+        print("Before the call")
         func()
-        print("Something is happening after the function is called.")
+        print("After the call")
     return wrapper
 
-@my_decorator
+@shout
 def say_hello():
-    print("Hello!")
+    print("Hello, makers!")
 
 say_hello()
 {% endcapture %}
 {% include snakie.html code=snakie_code name="decorators_2.py" %}
 
-The `@my_decorator` syntax is a shorthand for applying the decorator to the function.
+---
+
+## A useful decorator: timing
+
+Real functions take arguments and return values, so a practical wrapper uses `*args` and `**kwargs` to pass everything through. MicroPython has no `time.perf_counter()`, so we use the Pico's millisecond counter instead. Save and run on your Pico:
+
+```python
+from time import sleep_ms, ticks_ms, ticks_diff
+
+def timed(func):
+    def wrapper(*args, **kwargs):
+        start = ticks_ms()
+        result = func(*args, **kwargs)
+        print(func.__name__, "took", ticks_diff(ticks_ms(), start), "ms")
+        return result
+    return wrapper
+
+@timed
+def read_sensor(samples):
+    total = 0
+    for _ in range(samples):
+        total += 42          # pretend reading
+        sleep_ms(10)
+    return total // samples
+
+print(read_sensor(5))
+```
+
+The wrapper times the call, prints the duration and returns the original result, so nothing else in your program has to change. Put `@timed` above any function to measure it, and delete the line when you are done.
+
+> **MicroPython note:** desktop Python programmers often add `@functools.wraps(func)` inside decorators to keep the original function's name. The `functools` module is not part of the standard Pico firmware, so we do not use it. Our `wrapper` works without it.
 
 ---
 
-## Setters and Getters
+## Properties: guarded settings
 
-In MicroPython, we can use decorators to create ***setters*** and ***getters*** for class properties. Setters and getters control access to class properties, ensuring values are valid and within a specified range.
-
-Here is an example of a class with a setter and getter:
+The most common decorator in robot code is `@property`. It lets a method *look like* an attribute, so you can check values as they are set.
 
 {% capture snakie_code %}
-class Robot:
-    def __init__(self, name):
-        self.name = name
-        self.__speed = 0
+class Motor:
+    def __init__(self):
+        self._speed = 0
 
     @property
     def speed(self):
-        return self.__speed
+        return self._speed
 
     @speed.setter
     def speed(self, value):
         if value < 0:
-            self.__speed = 0
+            value = 0
         elif value > 100:
-            self.__speed = 100
-        else:
-            self.__speed = value
+            value = 100
+        self._speed = value
 
-r = Robot("Robbie")
-r.speed = 50
-print(r.speed)  
-r.speed = 150
-print(r.speed)  # notice the speed was capped at 100
+m = Motor()
+m.speed = 50
+print(m.speed)
+m.speed = 150          # too high: clamped
+print(m.speed)
 {% endcapture %}
 {% include snakie.html code=snakie_code name="decorators_3.py" %}
 
-In this example, the `@property` decorator is used to define a getter method for the `speed` attribute, and the `@speed.setter` decorator is used to define a setter method.
+From the outside it reads like a plain attribute (`m.speed = 50`), but behind the scenes the setter clamps the value. This is a lovely way to apply [encapsulation](05_encapsulation) without making users call `set_speed()`.
 
-![properties](assets/properties.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
+![Properties](assets/properties.png){:class="img-fluid rounded-3 w-100 card-shadow card-hover"}
 
-> ## Don't Go Crazy with Property Decorators
->
-> There is a temptation to use property decorators for every class property. This is not necessary and can make your code harder to read. Only use property decorators when you need to control access to a class property.
+```mermaid
+sequenceDiagram
+    participant Code as Your code
+    participant Prop as speed property
+    participant Attr as _speed
+    Code->>Prop: m.speed = 150
+    Prop->>Prop: clamp to 100
+    Prop->>Attr: store 100
+    Code->>Prop: print(m.speed)
+    Prop->>Attr: read
+    Attr-->>Code: 100
+```
+
+Don't turn every attribute into a property. Use one only when you need to check, convert or compute something. A plain attribute is simpler and uses less RAM.
+
+---
+
+## Try it Yourself
+
+1. Apply `@timed` to a function that loops a million times. Is it faster or slower than you expected?
+2. Write a decorator `announce` that prints `"Starting <name>"` before the function runs.
+3. Add a read-only property `is_stopped` to `Motor` that returns `True` when `speed` is 0.
+4. Challenge: write a decorator `repeat(times)` that runs the function several times. (Hint: this needs a function inside a function inside a function.)
 
 ---
 
-### Benefits of Decorators
+## Common Issues
 
-- **Code Reusability**: Decorators allow you to reuse common functionality across different functions and methods.
-- **Code Organization**: They help in organizing code by separating concerns, keeping core logic clean.
-- **Enhanced Functionality**: Decorators add additional behavior to functions and methods without modifying their code.
+- **Problem**: `TypeError` about the number of arguments when calling a decorated function.
+- **Solution**: Make the wrapper take `*args, **kwargs` and pass them to `func`.
+- **Why**: A wrapper with no parameters cannot accept the arguments the original function needed.
+
+- **Problem**: A decorated function returns `None`.
+- **Solution**: Add `return result` to the wrapper after calling `func`.
+- **Why**: The wrapper replaces the original, so it must hand back the original's return value.
+
+- **Problem**: An `AttributeError` when you assign to a property.
+- **Solution**: Define a `@name.setter` method for the property.
+- **Why**: A property with only a getter is read-only.
 
 ---
 
-### Summary
+## Check your understanding
 
-Decorators in MicroPython are a powerful feature that allows you to extend the functionality of functions and methods without modifying their code. By using decorators, you can create more reusable, organized, and maintainable code.
+{% quiz %}
+? What is a decorator?
+- [ ] A comment that explains a function
+- [x] A function that takes a function and returns an extended version
+- [ ] A kind of class attribute
+> The wrapper adds behaviour around the original without editing the original.
 
----
+? Why does the timing decorator use `ticks_ms()` and `ticks_diff()`?
+- [ ] Because `print` needs them
+- [x] MicroPython has no `perf_counter`, and `ticks_diff` copes with the counter wrapping round
+- [ ] They are faster than `sleep`
+> The Pico firmware provides the `ticks` functions for timing.
+
+? What does `@property` do?
+- [x] Lets a method be read like an attribute, so you can check or compute values
+- [ ] Makes an attribute private
+- [ ] Saves RAM
+> The getter runs when you read it, and a setter can validate values as they are assigned.
+{% endquiz %}

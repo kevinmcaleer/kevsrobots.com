@@ -1,74 +1,153 @@
 ---
-title: PyPi & MIP
-description: Learn about PyPi and MIP in MicroPython and how they can enhance your projects.
+title: PyPi and MIP
+description: Install libraries onto your Pico with mip, from micropython-lib or GitHub, and understand why you cannot just pip install from PyPI
 layout: lesson
 type: page
 cover: /learn/intermediate_micropython/assets/banners/09_pypi.jpg
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
 
-## PyPi
+By the end of this lesson you will be able to install a library onto your Pico with `mip`, from the REPL or from your computer, and explain why PyPI packages usually do not work on a microcontroller.
 
-In MicroPython, the Python Package Index `PyPi` (<https://www.pypi.org>) is an opensource repository of software packages that you can install to extend the functionality of your projects. PyPi contains libraries, modules, and tools that you can use in your MicroPython programs. You can also create a free account on PyPi and submit your own packages to share with the community.
+## Do not write what you can install
 
----
+Someone has already written a driver for your display, a client for MQTT and a Bluetooth library. Installing them saves you days. On a computer you would use `pip` and the Python Package Index, **PyPI**. A Pico is different.
 
-## What is PyPi?
+### Why not PyPI?
 
-The Python Package Index (`PyPi`) is a repository of software packages for the Python programming language. It contains libraries, modules, and tools that you can install and use in your Python projects. PyPi is a valuable resource for developers, as it provides access to a wide range of packages that can help you build and enhance your projects.
+PyPI hosts hundreds of thousands of packages written for desktop Python. Most assume a big standard library, plenty of RAM and an operating system with files and threads. A Pico has none of that, and `pip` itself does not run on it. A package that is pure Python and small might work if you copy the files by hand, but you cannot count on it.
 
-### Benefits of Using PyPi
+### Meet `mip`
 
-- **Extensive Library Collection**: PyPi hosts thousands of packages, ranging from data analysis tools to web frameworks, making it a comprehensive resource for developers.
-- **Easy Installation**: Installing packages from PyPi is straightforward, typically requiring just a single command.
-- **Community Support**: Many packages on PyPi are maintained by a community of developers, ensuring continuous updates and support.
+MicroPython has its own installer, **`mip`**, built to download libraries onto the board. By default it fetches from **micropython-lib**, the official collection of MicroPython-friendly libraries, and it can also pull files straight from GitHub, GitLab and Codeberg.
 
-### Using PyPi in MicroPython
-
-While PyPi is primarily designed for standard Python, many packages are also compatible with MicroPython. However, due to the limited resources of microcontrollers, not all PyPi packages will work with MicroPython.
-
-To install a package from PyPi, you would typically use the `pip` tool in standard Python. However, for MicroPython, you will often use a similar tool called `mip`.
-
----
-
-## MIP
-
-MicroPython includes the `mip` module, which can install packages from the `micropython-lib` repository and third-party sites like GitHub and GitLab. The `mip` tool is similar to Python’s `pip` but is tailored for MicroPython’s ecosystem. It does not use the PyPI index; instead, it defaults to `micropython-lib`.
-
-### What is MIP?
-
-`MIP` (MicroPython Install Packages) is a package manager for MicroPython. It allows you to install and manage packages specifically designed for MicroPython. This includes libraries that are optimized for the constraints of microcontrollers.
-
-### Using MIP
-
-You can use `mip` from the REPL to install packages. Here are some examples:
-
-```python
-import mip
-
-# Install the latest version of "pkgname" (and dependencies)
-mip.install("pkgname")
-
-# Install a specific version of "pkgname"
-mip.install("pkgname", version="x.y")
-
-# Install the source version (i.e., .py rather than .mpy files)
-mip.install("pkgname", mpy=False)
+```mermaid
+flowchart LR
+    A["Your Pico"] -->|"mip.install(...)"| B{"Where from?"}
+    B --> C["micropython-lib (default)"]
+    B --> D["github:org/repo/file.py"]
+    C --> E["/lib on the board"]
+    D --> E
+    E --> F["import it in your program"]
 ```
 
-### Benefits of Using MIP
+---
 
-- **Optimized for MicroPython**: Packages are tailored for the limitations and capabilities of microcontrollers.
-- **Supports Multiple Sources**: MIP can install packages from `micropython-lib` and third-party repositories like GitHub and GitLab.
-- **Efficient Installation**: Automatically fetches compiled `.mpy` files when available, ensuring efficient use of memory and processing power.
+## Install from the Pico
+
+`mip` downloads over Wi-Fi, so this route needs a board with Wi-Fi, such as the Pico W or Pico 2 W. Save and run this on the board, with your own network details:
+
+```python
+import network
+import mip
+from time import sleep
+
+SSID = "your-network-name"
+PASSWORD = "your-password"
+
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(SSID, PASSWORD)
+
+for _ in range(20):
+    if wlan.isconnected():
+        break
+    sleep(1)
+
+if wlan.isconnected():
+    print("Connected:", wlan.ifconfig()[0])
+    mip.install("umqtt.simple")
+else:
+    print("Could not connect to Wi-Fi")
+```
+
+On success, `mip` prints which files it fetched and where it put them. Libraries land in the `/lib` folder, which MicroPython already searches, so afterwards you can simply write:
+
+```python
+from umqtt.simple import MQTTClient
+```
+{: .no-snakie }
+
+Other useful names in micropython-lib include `aioble` (Bluetooth Low Energy) and `requests` (HTTP). The full catalogue is browsable at [github.com/micropython/micropython-lib](https://github.com/micropython/micropython-lib).
+
+> **Careful with passwords.** Do not leave your real Wi-Fi password in code you share, post online or commit to GitHub.
+
+### Options
+
+- `mip.install("name", version="1.2")` installs a specific version.
+- `mip.install("name", target="/lib")` chooses the destination folder.
+- `mip.install("name", mpy=False)` fetches readable `.py` source instead of compiled `.mpy` files, handy when you want to read or edit a library.
+- `mip.install("github:org/repo/file.py")` installs from a GitHub repository.
 
 ---
 
-### Summary
+## Install from your computer with mpremote
 
-PyPi and MIP are essential tools for enhancing your MicroPython projects. PyPi provides a vast repository of packages for standard Python, many of which are compatible with MicroPython. MIP, on the other hand, is specifically designed for MicroPython, allowing you to install and manage packages optimized for microcontrollers. By leveraging these tools, you can significantly extend the functionality and capabilities of your MicroPython projects.
+You do not need Wi-Fi on the board for this one, as your computer does the downloading. If you have `mpremote` (next lesson), run:
+
+```bash
+mpremote mip install umqtt.simple
+```
+
+The same command accepts GitHub links, for example `mpremote mip install github:org/repo`, where `org/repo` is the repository you want. This is the best route for a Pico without Wi-Fi.
 
 ---
+
+## A note on `urequests`
+
+Older tutorials (including earlier versions of this course) say to install `urequests`. That name is out of date: HTTP requests now live in a module called **`requests`**, which is built into current Wi-Fi firmware and is also in micropython-lib. Try `import requests` first, and only install it if you get an `ImportError`.
+
+> **Teachers**: Installing libraries needs a network. Many school Wi-Fi networks block devices that cannot sign in through a web page, which includes the Pico. Use `mpremote mip install` from a laptop on the school network instead, or download the library once and copy the file to each board. A phone hotspot is another option, and not all schools allow them.
+
+---
+
+## Try it Yourself
+
+1. Run `mpremote devs` to list connected boards, then `mpremote mip install` any small library from micropython-lib and look in `/lib` using the Thonny Files pane.
+2. Install a library with `mpy=False` and open the `.py` file to read how it works.
+3. Look through micropython-lib on GitHub and note down two libraries that would help a robot project.
+4. Challenge: find a library on GitHub with a single `.py` driver file and install it with `github:` syntax.
+
+---
+
+## Common Issues
+
+- **Problem**: `OSError` or `Could not connect` when calling `mip.install`.
+- **Solution**: Confirm `wlan.isconnected()` is `True` first, and check you are on a 2.4 GHz network.
+- **Why**: `mip` downloads from the internet, so the board must be online. The Pico's Wi-Fi works on the 2.4 GHz band.
+
+- **Problem**: `mip` says the package was not found.
+- **Solution**: Check the exact name in micropython-lib, such as `umqtt.simple` rather than `umqtt`.
+- **Why**: Package names must match what micropython-lib publishes.
+
+- **Problem**: `import mip` fails with `ImportError`.
+- **Solution**: Use `mpremote mip install ...` from your computer, or update your MicroPython firmware.
+- **Why**: `mip` is only present on reasonably recent firmware.
+
+---
+
+## Check your understanding
+
+{% quiz %}
+? Why can't you simply `pip install` from PyPI onto a Pico?
+- [ ] PyPI blocks microcontrollers
+- [x] Most PyPI packages need more standard library and RAM than MicroPython offers, and `pip` does not run on the board
+- [ ] Pico boards cannot store files
+> PyPI packages are written for desktop Python.
+
+? Where does `mip` put installed libraries by default?
+- [x] In the `/lib` folder on the board
+- [ ] On your computer's Desktop
+- [ ] In RAM only
+> `/lib` is already on the import search path.
+
+? Which route works for a Pico with no Wi-Fi?
+- [ ] `mip.install` run on the Pico
+- [x] `mpremote mip install` run from your computer
+- [ ] None of them
+> The computer does the downloading and sends files over USB.
+{% endquiz %}
