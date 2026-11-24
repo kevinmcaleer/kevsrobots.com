@@ -4,12 +4,14 @@ description: Record a run with Snakie's Data Logger, tear off a CSV file, write 
 layout: lesson
 type: page
 cover: /learn/snakie_instruments/assets/banners/08_logging_data.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to record a run with the Data Logger, save it as a CSV file and write your own log file on the board.
 
 Instruments show you *now*. Sometimes you need *then*: a record you can study after the run, compare with yesterday's, or put in a report.
 
@@ -89,6 +91,8 @@ Those column summaries answer a lot of questions before you've opened a spreadsh
 | What's recorded | Every telemetry stream | Exactly what you write |
 | Where it's saved | Your computer | The board |
 {:class="table table-single"}
+
+> **Teachers**: The Data Logger saves its CSV file to the computer you are using, so on shared machines ask learners to move or rename their files before they log off. A file written on the board stays on the board, so the next group using that board will find it under Device Files. Name files clearly, or delete old ones, when boards are shared.
 
 ---
 

@@ -12,7 +12,7 @@ description: Find Snakie's instrument dock, open and close instruments, read the
 percent: 18
 duration: 4
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -52,6 +52,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to find the Instrument Dock, open and close instruments, read their help pages and float one in its own window.
 
 Every instrument in Snakie lives in one place. Let's find it and learn the controls they all share.
 

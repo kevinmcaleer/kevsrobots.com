@@ -4,12 +4,14 @@ description: Chart values from a running MicroPython program with Snakie's Plott
 layout: lesson
 type: page
 cover: /learn/snakie_instruments/assets/banners/03_the_plotter.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to chart one or more values from a running program on the Plotter and read the trends, spikes and flat lines it shows.
 
 The Plotter is the instrument you'll reach for most. If a number changes over time, plot it.
 

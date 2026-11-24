@@ -4,12 +4,14 @@ description: Review Snakie's instruments, the helpers that feed them and when to
 layout: lesson
 type: page
 cover: /learn/snakie_instruments/assets/banners/10_summary.jpg
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 ---
 
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to choose the right instrument for a question and follow the expect, measure, compare debugging habit.
 
 You can now see inside a running program. That changes how you build things: fewer guesses, more measurements.
 
@@ -67,6 +69,11 @@ We covered four instruments. The dock has many more, and they all work the same 
 - [Learn MicroPython - The basics](/learn/micropython/): more Python for the programs behind the readings
 - [Raspberry Pi Pico with MicroPython - GPIO Mastery](/learn/micropython_gpio/): PWM, ADC and the rest of the Pico's pins in depth
 
+## Try it Yourself
+
+1. Pick a program from this course and write down, before you run it, what each instrument should show. Then check.
+2. Choose a question from the table above that you have not tried yet and answer it with the matching instrument.
+
 ## Final check
 
 {% quiz %}
@@ -76,11 +83,11 @@ We covered four instruments. The dock has many more, and they all work the same 
 - [ ] The Plotter's legend
 > MIN remembers the lowest reading, however briefly it happened.
 
-? Which two helpers return a value your program can use?
-- [ ] inst.plot() and inst.scope()
-- [ ] inst.watch() and inst.update()
-- [x] inst.read_adc() and inst.read_pwm()
-> read_adc() returns volts and read_pwm() returns the duty, so measuring costs no extra lines.
+? Which helper reads a pin, feeds the Multimeter and gives your program the volts?
+- [ ] inst.plot()
+- [ ] inst.watch()
+- [x] inst.read_adc()
+> read_adc() sends the volts to the Multimeter and returns them, so measuring costs no extra lines.
 
 ? What's the first step of the debugging habit?
 - [x] Say what you expect to see

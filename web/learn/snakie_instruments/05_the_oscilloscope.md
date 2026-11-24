@@ -10,9 +10,9 @@ next: 06_watch_and_update.html
 description: Use Snakie's Oscilloscope to see a PWM signal, read its frequency, duty
   cycle and period, and understand how LEDs dim and servos steer
 percent: 54
-duration: 5
+duration: 6
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -52,6 +52,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to read a PWM signal's frequency, period and duty cycle on the Oscilloscope and use it to check a servo signal.
 
 Some signals change far too fast to plot point by point. For those, engineers use an oscilloscope: an instrument that draws the *shape* of a signal.
 

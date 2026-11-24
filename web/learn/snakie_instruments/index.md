@@ -9,11 +9,26 @@ description: See what your MicroPython program is really doing. Use Snakie's bui
   then scan a room for its brightest spot with a servo and a light sensor and log
   the results to a file.
 level: beginner
-course_duration: 0h 48m
+course_duration: 0h 54m
 lesson_count: 11
 first_lesson: 00_intro.html
 quiz_total: 30
 video: QVe9meIHZtk
+outcomes:
+- Plot any value from a running program with one line of code
+- Read a pin's voltage on the Multimeter, with min, max and average
+- Read a PWM signal's frequency and duty cycle on the Oscilloscope
+- Choose the right instrument for a debugging question
+- Record a run and save it as a CSV file, or log to a file on the board
+- Build a servo and light sensor scanner and check it with three instruments
+prerequisites:
+- Getting Started with Snakie
+- Wire It Up - Electronics in Snakie (helpful, not required)
+you_need:
+- A web browser, or the Snakie desktop app
+- Nothing else for the lessons, which run on the simulated device
+- For the real project, a Raspberry Pi Pico, an SG90 servo, a photoresistor and a
+  10 kilohm resistor
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:

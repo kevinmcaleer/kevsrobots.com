@@ -12,7 +12,7 @@ description: Point Snakie's instruments at your PWM and ADC objects once with wa
 percent: 63
 duration: 4
 quiz_total: 30
-date_updated: 2026-11-20
+date_updated: 2026-11-24
 navigation:
 - name: Snakie Instruments - Oscilloscope, Multimeter and Plotter
 - content:
@@ -52,6 +52,8 @@ navigation:
 ![Course Cover Image]({{page.cover}}){:class="cover"}
 
 ---
+
+By the end of this lesson you will be able to register objects with inst.watch() and report them all with one inst.update() call in your loop.
 
 So far every reading has had its own line of code. With several things to measure that soon clutters a loop. There's a tidier way.
 
